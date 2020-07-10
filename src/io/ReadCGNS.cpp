@@ -36,7 +36,7 @@ ReadCGNS::ReadCGNS( Interface* impl ) : fileName( NULL ), mesh_dim( 0 ), mbImpl(
     mbImpl->query_interface( readMeshIface );
 }
 
-ReadCGNS::~ReadCGNS( )
+ReadCGNS::~ReadCGNS()
 {
     if( readMeshIface )
     {
@@ -55,21 +55,21 @@ ErrorCode ReadCGNS::read_tag_values( const char* /* file_name */, const char* /*
 ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_set*/, const FileOptions& opts,
                                const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
-    int        num_material_sets = 0;
+    int num_material_sets        = 0;
     const int* material_set_list = 0;
 
     if( subset_list )
     {
-        if( subset_list->tag_list_length > 1 && !strcmp( subset_list->tag_list[ 0 ].tag_name, MATERIAL_SET_TAG_NAME ) )
+        if( subset_list->tag_list_length > 1 && !strcmp( subset_list->tag_list[0].tag_name, MATERIAL_SET_TAG_NAME ) )
         { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "CGNS supports subset read only by material ID" ); }
-        material_set_list = subset_list->tag_list[ 0 ].tag_values;
-        num_material_sets = subset_list->tag_list[ 0 ].num_tag_values;
+        material_set_list = subset_list->tag_list[0].tag_values;
+        num_material_sets = subset_list->tag_list[0].num_tag_values;
     }
 
     ErrorCode result;
 
-    geomSets.clear( );
-    globalId = mbImpl->globalId_tag( );
+    geomSets.clear();
+    globalId = mbImpl->globalId_tag();
 
     // Create set for more convenient check for material set ids
     std::set< int > blocks;
@@ -98,10 +98,10 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
 
     // Read number of verts, elements, sets
     long num_verts = 0, num_elems = 0, num_sets = 0;
-    int  num_bases = 0, num_zones = 0, num_sections = 0;
+    int num_bases = 0, num_zones = 0, num_sections = 0;
 
-    char     zoneName[ 128 ];
-    cgsize_t size[ 3 ];
+    char zoneName[128];
+    cgsize_t size[3];
 
     mesh_dim = 3;  // Default to 3D
 
@@ -127,9 +127,9 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
             // Read number of sections/Parts in current zone.
             cg_nsections( filePtr, indexBase, indexZone, &num_sections );
 
-            num_verts = size[ 0 ];
-            num_elems = size[ 1 ];
-            num_sets = num_sections;
+            num_verts = size[0];
+            num_elems = size[1];
+            num_sets  = num_sections;
 
             std::cout << "\nnumber of nodes = " << num_verts;
             std::cout << "\nnumber of elems = " << num_elems;
@@ -142,56 +142,56 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
             // start_handle, and the reader is passed back double*'s pointing to MOAB's native
             // storage for vertex coordinates for those verts
             std::vector< double* > coord_arrays;
-            EntityHandle           handle = 0;
-            result = readMeshIface->get_node_coords( 3, num_verts, MB_START_ID, handle, coord_arrays );MB_CHK_SET_ERR( result, fileName << ": Trouble reading vertices" );
+            EntityHandle handle = 0;
+            result              = readMeshIface->get_node_coords( 3, num_verts, MB_START_ID, handle, coord_arrays );MB_CHK_SET_ERR( result, fileName << ": Trouble reading vertices" );
 
             // Fill in vertex coordinate arrays
             cgsize_t beginPos = 1, endPos = num_verts;
 
             // Read nodes coordinates.
             cg_coord_read( filePtr, indexBase, indexZone, "CoordinateX", RealDouble, &beginPos, &endPos,
-                           coord_arrays[ 0 ] );
+                           coord_arrays[0] );
             cg_coord_read( filePtr, indexBase, indexZone, "CoordinateY", RealDouble, &beginPos, &endPos,
-                           coord_arrays[ 1 ] );
+                           coord_arrays[1] );
             cg_coord_read( filePtr, indexBase, indexZone, "CoordinateZ", RealDouble, &beginPos, &endPos,
-                           coord_arrays[ 2 ] );
+                           coord_arrays[2] );
 
             // CGNS seems to always include the Z component, even if the mesh is 2D.
             // Check if Z is zero and determine mesh dimension.
             // Also create the node_id_map data.
             double sumZcoord = 0.0;
-            double eps = 1.0e-12;
+            double eps       = 1.0e-12;
             for( long i = 0; i < num_verts; ++i, ++handle )
             {
                 int index = i + 1;
 
                 node_id_map.insert( std::pair< long, EntityHandle >( index, handle ) ).second;
 
-                sumZcoord += *( coord_arrays[ 2 ] + i );
+                sumZcoord += *( coord_arrays[2] + i );
             }
             if( std::abs( sumZcoord ) <= eps ) mesh_dim = 2;
 
             // Create reverse map from handle to id
-            std::vector< int >                    ids( num_verts );
-            std::vector< int >::iterator          id_iter = ids.begin( );
-            std::vector< EntityHandle >           handles( num_verts );
-            std::vector< EntityHandle >::iterator h_iter = handles.begin( );
-            for( std::map< long, EntityHandle >::iterator i = node_id_map.begin( ); i != node_id_map.end( );
+            std::vector< int > ids( num_verts );
+            std::vector< int >::iterator id_iter = ids.begin();
+            std::vector< EntityHandle > handles( num_verts );
+            std::vector< EntityHandle >::iterator h_iter = handles.begin();
+            for( std::map< long, EntityHandle >::iterator i = node_id_map.begin(); i != node_id_map.end();
                  ++i, ++id_iter, ++h_iter )
             {
                 *id_iter = i->first;
-                *h_iter = i->second;
+                *h_iter  = i->second;
             }
             // Store IDs in tags
-            result = mbImpl->tag_set_data( globalId, &handles[ 0 ], num_verts, &ids[ 0 ] );
+            result = mbImpl->tag_set_data( globalId, &handles[0], num_verts, &ids[0] );
             if( MB_SUCCESS != result ) return result;
             if( file_id_tag )
             {
-                result = mbImpl->tag_set_data( *file_id_tag, &handles[ 0 ], num_verts, &ids[ 0 ] );
+                result = mbImpl->tag_set_data( *file_id_tag, &handles[0], num_verts, &ids[0] );
                 if( MB_SUCCESS != result ) return result;
             }
-            ids.clear( );
-            handles.clear( );
+            ids.clear();
+            handles.clear();
 
             // //////////////////////////////////
             // Read elements data
@@ -207,9 +207,9 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
             for( int section = 0; section < num_sections; ++section )
             {
                 ElementType_t elemsType;
-                int           iparent_flag, nbndry;
-                char          sectionName[ 128 ];
-                int           verts_per_elem;
+                int iparent_flag, nbndry;
+                char sectionName[128];
+                int verts_per_elem;
 
                 int cgSection = section + 1;
 
@@ -223,41 +223,41 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
                 switch( elemsType )
                 {
                     case BAR_2:
-                        ent_type = MBEDGE;
+                        ent_type       = MBEDGE;
                         verts_per_elem = 2;
                         break;
                     case TRI_3:
-                        ent_type = MBTRI;
+                        ent_type       = MBTRI;
                         verts_per_elem = 3;
-                        if( mesh_dim == 2 ) volumeID[ section ] = 1;
+                        if( mesh_dim == 2 ) volumeID[section] = 1;
                         break;
                     case QUAD_4:
-                        ent_type = MBQUAD;
+                        ent_type       = MBQUAD;
                         verts_per_elem = 4;
-                        if( mesh_dim == 2 ) volumeID[ section ] = 1;
+                        if( mesh_dim == 2 ) volumeID[section] = 1;
                         break;
                     case TETRA_4:
-                        ent_type = MBTET;
+                        ent_type       = MBTET;
                         verts_per_elem = 4;
-                        if( mesh_dim == 3 ) volumeID[ section ] = 1;
+                        if( mesh_dim == 3 ) volumeID[section] = 1;
                         break;
                     case PYRA_5:
-                        ent_type = MBPYRAMID;
+                        ent_type       = MBPYRAMID;
                         verts_per_elem = 5;
-                        if( mesh_dim == 3 ) volumeID[ section ] = 1;
+                        if( mesh_dim == 3 ) volumeID[section] = 1;
                         break;
                     case PENTA_6:
-                        ent_type = MBPRISM;
+                        ent_type       = MBPRISM;
                         verts_per_elem = 6;
-                        if( mesh_dim == 3 ) volumeID[ section ] = 1;
+                        if( mesh_dim == 3 ) volumeID[section] = 1;
                         break;
                     case HEXA_8:
-                        ent_type = MBHEX;
+                        ent_type       = MBHEX;
                         verts_per_elem = 8;
-                        if( mesh_dim == 3 ) volumeID[ section ] = 1;
+                        if( mesh_dim == 3 ) volumeID[section] = 1;
                         break;
                     case MIXED:
-                        ent_type = MBMAXTYPE;
+                        ent_type       = MBMAXTYPE;
                         verts_per_elem = 0;
                         break;
                     default:
@@ -278,7 +278,7 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
                     // Need a temporary vector to later cast to conn_array.
                     std::vector< cgsize_t > elemNodes( connDataSize );
 
-                    cg_elements_read( filePtr, indexBase, indexZone, cgSection, &elemNodes[ 0 ], &iparentdata );
+                    cg_elements_read( filePtr, indexBase, indexZone, cgSection, &elemNodes[0], &iparentdata );
 
                     // //////////////////////////////////
                     // Create elements, sets and tags
@@ -297,13 +297,13 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
 
                     std::vector< cgsize_t > elemNodes( connDataSize );
 
-                    cg_elements_read( filePtr, indexBase, indexZone, cgSection, &elemNodes[ 0 ], &iparentdata );
+                    cg_elements_read( filePtr, indexBase, indexZone, cgSection, &elemNodes[0], &iparentdata );
 
                     std::vector< cgsize_t > elemsConn_EDGE;
                     std::vector< cgsize_t > elemsConn_TRI, elemsConn_QUAD;
                     std::vector< cgsize_t > elemsConn_TET, elemsConn_PYRA, elemsConn_PRISM, elemsConn_HEX;
-                    cgsize_t                count_EDGE, count_TRI, count_QUAD;
-                    cgsize_t                count_TET, count_PYRA, count_PRISM, count_HEX;
+                    cgsize_t count_EDGE, count_TRI, count_QUAD;
+                    cgsize_t count_TET, count_PYRA, count_PRISM, count_HEX;
 
                     // First, get elements count for current section
 
@@ -313,7 +313,7 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
                     int connIndex = 0;
                     for( int i = beginPos; i <= endPos; i++ )
                     {
-                        elemsType = ElementType_t( elemNodes[ connIndex ] );
+                        elemsType = ElementType_t( elemNodes[connIndex] );
 
                         // Get current cell node count.
                         cg_npe( elemsType, &verts_per_elem );
@@ -366,7 +366,7 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
                     connIndex = 0;
                     for( int i = beginPos; i <= endPos; i++ )
                     {
-                        elemsType = ElementType_t( elemNodes[ connIndex ] );
+                        elemsType = ElementType_t( elemNodes[connIndex] );
 
                         // Get current cell node count.
                         cg_npe( elemsType, &verts_per_elem );
@@ -375,37 +375,37 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
                         {
                             case BAR_2:
                                 for( int j = 0; j < 2; ++j )
-                                    elemsConn_EDGE[ idx_edge + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_EDGE[idx_edge + j] = elemNodes[connIndex + j + 1];
                                 idx_edge += 2;
                                 break;
                             case TRI_3:
                                 for( int j = 0; j < 3; ++j )
-                                    elemsConn_TRI[ idx_tri + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_TRI[idx_tri + j] = elemNodes[connIndex + j + 1];
                                 idx_tri += 3;
                                 break;
                             case QUAD_4:
                                 for( int j = 0; j < 4; ++j )
-                                    elemsConn_QUAD[ idx_quad + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_QUAD[idx_quad + j] = elemNodes[connIndex + j + 1];
                                 idx_quad += 4;
                                 break;
                             case TETRA_4:
                                 for( int j = 0; j < 4; ++j )
-                                    elemsConn_TET[ idx_tet + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_TET[idx_tet + j] = elemNodes[connIndex + j + 1];
                                 idx_tet += 4;
                                 break;
                             case PYRA_5:
                                 for( int j = 0; j < 5; ++j )
-                                    elemsConn_PYRA[ idx_pyra + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_PYRA[idx_pyra + j] = elemNodes[connIndex + j + 1];
                                 idx_pyra += 5;
                                 break;
                             case PENTA_6:
                                 for( int j = 0; j < 6; ++j )
-                                    elemsConn_PRISM[ idx_prism + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_PRISM[idx_prism + j] = elemNodes[connIndex + j + 1];
                                 idx_prism += 6;
                                 break;
                             case HEXA_8:
                                 for( int j = 0; j < 8; ++j )
-                                    elemsConn_HEX[ idx_hex + j ] = elemNodes[ connIndex + j + 1 ];
+                                    elemsConn_HEX[idx_hex + j] = elemNodes[connIndex + j + 1];
                                 idx_hex += 8;
                                 break;
                             default:
@@ -443,13 +443,13 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
                     if( count_HEX > 0 )
                         create_elements( sectionName, file_id_tag, MBHEX, 8, section_offset, count_HEX, elemsConn_HEX );
                 }  // Mixed mesh type
-            }  // num_sections
+            }      // num_sections
 
             cg_close( filePtr );
 
             return result;
         }  // indexZone for
-    }  // indexBase for
+    }      // indexBase for
 
     return MB_SUCCESS;
 }
@@ -463,11 +463,11 @@ ErrorCode ReadCGNS::create_elements( char* sectionName, const Tag* file_id_tag, 
     // Create the element sequence; passes back a pointer to the internal storage for connectivity
     // and the starting entity handle
     EntityHandle* conn_array;
-    EntityHandle  handle = 0;
+    EntityHandle handle = 0;
 
     result = readMeshIface->get_element_connect( elems_count, verts_per_elem, ent_type, 1, handle, conn_array );MB_CHK_SET_ERR( result, fileName << ": Trouble reading elements" );
 
-    memcpy( conn_array, &elemsConn[ 0 ], elemsConn.size( ) * sizeof( EntityHandle ) );
+    memcpy( conn_array, &elemsConn[0], elemsConn.size() * sizeof( EntityHandle ) );
 
     // Notify MOAB of the new elements
     result = readMeshIface->update_adjacencies( handle, elems_count, verts_per_elem, conn_array );
@@ -484,7 +484,7 @@ ErrorCode ReadCGNS::create_elements( char* sectionName, const Tag* file_id_tag, 
 
     // Add 1 to offset id to 1-based numbering
     for( cgsize_t i = 0; i < elems_count; ++i )
-        id_list[ i ] = i + 1 + section_offset;
+        id_list[i] = i + 1 + section_offset;
     section_offset += elems_count;
 
     create_sets( sectionName, file_id_tag, ent_type, elements, id_list, 0 );
@@ -497,12 +497,12 @@ ErrorCode ReadCGNS::create_sets( char* sectionName, const Tag* file_id_tag, Enti
 {
     ErrorCode result;
 
-    result = mbImpl->tag_set_data( globalId, elements, &set_ids[ 0 ] );
+    result = mbImpl->tag_set_data( globalId, elements, &set_ids[0] );
     if( MB_SUCCESS != result ) return result;
 
     if( file_id_tag )
     {
-        result = mbImpl->tag_set_data( *file_id_tag, elements, &set_ids[ 0 ] );
+        result = mbImpl->tag_set_data( *file_id_tag, elements, &set_ids[0] );
         if( MB_SUCCESS != result ) return result;
     }
 
@@ -531,7 +531,7 @@ ErrorCode ReadCGNS::create_sets( char* sectionName, const Tag* file_id_tag, Enti
 ErrorCode ReadCGNS::process_options( const FileOptions& opts )
 {
     // Mark all options seen, to avoid compile warning on unused variable
-    opts.mark_all_seen( );
+    opts.mark_all_seen();
 
     return MB_SUCCESS;
 }

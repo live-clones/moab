@@ -39,12 +39,12 @@
 namespace MBMesquite
 {
 
-std::string TSizeB1::get_name( ) const
+std::string TSizeB1::get_name() const
 {
     return "TSizeB1";
 }
 
-TSizeB1::~TSizeB1( ) {}
+TSizeB1::~TSizeB1() {}
 
 bool TSizeB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -67,13 +67,13 @@ bool TSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, Ms
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
         return false;
     }
-    result = d + 1.0 / d - 2.0;
+    result      = d + 1.0 / d - 2.0;
     deriv_wrt_T = ( 1 - 1 / ( d * d ) ) * transpose_adj( T );
     return true;
 }
 
 bool TSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                  MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                  MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
     double d = det( T );
     if( TMetric::invalid_determinant( d ) )
@@ -81,10 +81,10 @@ bool TSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, Ms
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
         return false;
     }
-    result = d + 1.0 / d - 2.0;
+    result                 = d + 1.0 / d - 2.0;
     MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    const double      f = 1 - 1 / ( d * d );
-    deriv_wrt_T = f * adjt;
+    const double f         = 1 - 1 / ( d * d );
+    deriv_wrt_T            = f * adjt;
 
     set_scaled_outer_product( second_wrt_T, 2 / ( d * d * d ), adjt );
     pluseq_scaled_2nd_deriv_of_det( second_wrt_T, f, T );
@@ -112,13 +112,13 @@ bool TSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, Ms
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
         return false;
     }
-    result = d + 1.0 / d - 2.0;
+    result      = d + 1.0 / d - 2.0;
     deriv_wrt_T = ( 1 - 1 / ( d * d ) ) * transpose_adj( T );
     return true;
 }
 
 bool TSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                  MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                  MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
     double d = det( T );
     if( TMetric::invalid_determinant( d ) )
@@ -126,10 +126,10 @@ bool TSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, Ms
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
         return false;
     }
-    result = d + 1.0 / d - 2.0;
+    result                 = d + 1.0 / d - 2.0;
     MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    const double      f = 1 - 1 / ( d * d );
-    deriv_wrt_T = f * adjt;
+    const double f         = 1 - 1 / ( d * d );
+    deriv_wrt_T            = f * adjt;
 
     set_scaled_outer_product( second_wrt_T, 2 / ( d * d * d ), adjt );
     pluseq_scaled_2nd_deriv_of_det( second_wrt_T, f, T );

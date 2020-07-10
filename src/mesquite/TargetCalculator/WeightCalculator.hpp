@@ -49,7 +49,7 @@ class Settings;
 class MESQUITE_EXPORT WeightCalculator
 {
   public:
-    virtual ~WeightCalculator( );
+    virtual ~WeightCalculator();
 
     //!\brief Called at start of instruction queue processing
     //!

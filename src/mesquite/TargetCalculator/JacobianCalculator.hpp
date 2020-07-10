@@ -79,9 +79,9 @@ class JacobianCalculator
     {
         MAX_ELEM_NODES = 27
     };
-    size_t         mIndices[ MAX_ELEM_NODES ];
-    MsqVector< 3 > mDerivs3D[ MAX_ELEM_NODES ];
-    MsqVector< 2 > mDerivs2D[ MAX_ELEM_NODES ];
+    size_t mIndices[MAX_ELEM_NODES];
+    MsqVector< 3 > mDerivs3D[MAX_ELEM_NODES];
+    MsqVector< 2 > mDerivs2D[MAX_ELEM_NODES];
 };
 
 }  // namespace MBMesquite

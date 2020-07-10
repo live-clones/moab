@@ -63,18 +63,18 @@ class PowerQualityMetric : public QualityMetric
     PowerQualityMetric( QualityMetric* qm1, double pow_double );
 
     // virtual destructor ensures use of polymorphism during destruction
-    virtual ~PowerQualityMetric( );
+    virtual ~PowerQualityMetric();
 
-    MetricType get_metric_type( ) const
+    MetricType get_metric_type() const
     {
-        return mMetric.get_metric_type( );
+        return mMetric.get_metric_type();
     }
 
-    std::string get_name( ) const;
+    std::string get_name() const;
 
-    int get_negate_flag( ) const;
+    int get_negate_flag() const;
 
-    QualityMetric* get_metric( ) const
+    QualityMetric* get_metric() const
     {
         return &mMetric;
     }
@@ -95,7 +95,7 @@ class PowerQualityMetric : public QualityMetric
                                         MsqError& err );
 
   private:
-    QualityMetric&       mMetric;
+    QualityMetric& mMetric;
     MBMesquite::Exponent mPower;
 };
 

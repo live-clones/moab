@@ -51,34 +51,34 @@ class WriteUtilIface;
 //! initialize_exodus_file to initialize the file header for increased speed
 struct MaterialSetData
 {
-    int              id;
-    int              number_elements;
-    int              number_nodes_per_element;
-    int              number_attributes;
+    int id;
+    int number_elements;
+    int number_nodes_per_element;
+    int number_attributes;
     ExoIIElementType element_type;
-    Range            elements;
+    Range elements;
 };
 
 //! struct used to hold data for each nodeset to be output in Exodus; used by
 //! initialize_exodus_file to initialize the file header for increased speed
 struct DirichletSetData
 {
-    int                         id;
-    int                         number_nodes;
+    int id;
+    int number_nodes;
     std::vector< EntityHandle > nodes;
-    std::vector< double >       node_dist_factors;
+    std::vector< double > node_dist_factors;
 };
 
 //! struct used to hold data for each sideset to be output in Exodus; used by
 //! initialize_exodus_file to initialize the file header for increased speed
 struct NeumannSetData
 {
-    int                         id;
-    int                         number_elements;
+    int id;
+    int number_elements;
     std::vector< EntityHandle > elements;
-    std::vector< int >          side_numbers;
-    EntityHandle                mesh_set_handle;
-    std::vector< double >       ss_dist_factors;
+    std::vector< int > side_numbers;
+    EntityHandle mesh_set_handle;
+    std::vector< double > ss_dist_factors;
 };
 
 //! Output Exodus File for VERDE
@@ -92,13 +92,13 @@ class WriteNCDF : public WriterIface
     WriteNCDF( Interface* impl );
 
     //! Destructor
-    virtual ~WriteNCDF( );
+    virtual ~WriteNCDF();
 
     //! writes out an ExoII file
     ErrorCode write_file( const char* exodus_file_name, const bool overwrite, const FileOptions& opts,
                           const EntityHandle* output_list, const int num_sets,
                           const std::vector< std::string >& qa_records, const Tag* = NULL, int = 0,
-                          int                               user_dimension = 3 );
+                          int user_dimension = 3 );
 
   protected:
     //! number of dimensions in this exo file
@@ -110,25 +110,25 @@ class WriteNCDF : public WriterIface
     //! contains the general information about a mesh
     struct ExodusMeshInfo
     {
-        unsigned int               num_dim;
-        unsigned int               num_nodes;
-        unsigned int               num_elements;
-        unsigned int               num_elementblocks;
-        unsigned int               num_polyhedra_blocks;
+        unsigned int num_dim;
+        unsigned int num_nodes;
+        unsigned int num_elements;
+        unsigned int num_elementblocks;
+        unsigned int num_polyhedra_blocks;
         std::vector< std::string > qaRecords;
-        Range                      nodes;
-        Range                      polyhedronFaces;  // they will accumulate, like nodes
+        Range nodes;
+        Range polyhedronFaces;  // they will accumulate, like nodes
         // they will be written before any other face blocks, and before polyhedra blocks
     };
 
   private:
     //! interface instance
-    Interface*      mdbImpl;
+    Interface* mdbImpl;
     WriteUtilIface* mWriteIface;
 
     //! file name
     std::string exodusFile;
-    int         ncFile;
+    int ncFile;
 
     //! Meshset Handle for the mesh that is currently being read
     EntityHandle mCurrentMeshHandle;
@@ -149,7 +149,7 @@ class WriteNCDF : public WriterIface
     int repeat_face_blocks;  // only to make paraview and visit happy
 
     ErrorCode gather_mesh_information( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
-                                       std::vector< NeumannSetData >&   sideset_info,
+                                       std::vector< NeumannSetData >& sideset_info,
                                        std::vector< DirichletSetData >& nodeset_info,
                                        std::vector< EntityHandle >& blocks, std::vector< EntityHandle >& sidesets,
                                        std::vector< EntityHandle >& nodesets );
@@ -159,7 +159,7 @@ class WriteNCDF : public WriterIface
                             const char* filename );
 
     ErrorCode initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_data,
-                                      std::vector< NeumannSetData >&   sideset_data,
+                                      std::vector< NeumannSetData >& sideset_data,
                                       std::vector< DirichletSetData >& nodeset_data, const char* title_string,
                                       bool write_maps = true, bool write_sideset_distribution_factors = true );
 

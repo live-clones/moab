@@ -52,12 +52,12 @@ double gtol = 1.e-9;  // this is for geometry tolerance
 
 double radius = 1.;
 
-bool writeFiles = true;
+bool writeFiles    = true;
 bool parallelWrite = false;
-bool velocity = false;
+bool velocity      = false;
 
-int    numSteps = 200;  // number of times with velocity displayed at points
-double T = 5;
+int numSteps = 200;  // number of times with velocity displayed at points
+double T     = 5;
 
 Intx2MeshOnSphere* pworker = NULL;
 
@@ -67,16 +67,16 @@ int main( int argc, char* argv[] )
     MPI_Init( &argc, &argv );
 
     // set up MOAB interface and parallel communication
-    moab::Core         moab;
-    moab::Interface&   mb = moab;
+    moab::Core moab;
+    moab::Interface& mb = moab;
     moab::ParallelComm mb_pcomm( &mb, MPI_COMM_WORLD );
 
     // int rank = mb_pcomm->proc_config().proc_rank();
-    int rank = mb_pcomm.proc_config( ).proc_rank( );
+    int rank = mb_pcomm.proc_config().proc_rank();
 
     // create meshset
     moab::EntityHandle euler_set;
-    moab::ErrorCode    rval = mb.create_meshset( MESHSET_SET, euler_set );MB_CHK_ERR( rval );
+    moab::ErrorCode rval = mb.create_meshset( MESHSET_SET, euler_set );MB_CHK_ERR( rval );
 
     // std::stringstream opts;
     // opts <<
@@ -85,7 +85,7 @@ int main( int argc, char* argv[] )
     // rval = mb.load_file(file_name.c_str(), &euler_set, opts.str().c_str());
     std::string fileN = TestDir + "/mbcslam/fine4.h5m";
 
-    rval = mb.load_file( fileN.c_str( ), &euler_set );MB_CHK_ERR( rval );
+    rval = mb.load_file( fileN.c_str(), &euler_set );MB_CHK_ERR( rval );
 
     // Create tag for cell density
     moab::Tag rhoTag = 0;
@@ -96,15 +96,15 @@ int main( int argc, char* argv[] )
     rval = mb.tag_get_handle( "Area", 1, moab::MB_TYPE_DOUBLE, areaTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for cell barycenters in 3D Cartesian space
     moab::Tag barycenterTag = 0;
-    rval = mb.tag_get_handle( "CellBarycenter", 3, moab::MB_TYPE_DOUBLE, barycenterTag,
+    rval                    = mb.tag_get_handle( "CellBarycenter", 3, moab::MB_TYPE_DOUBLE, barycenterTag,
                               moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for cell density reconstruction coefficients
     moab::Tag rhoCoefTag = 0;
-    rval = mb.tag_get_handle( "LinearCoefRho", 3, moab::MB_TYPE_DOUBLE, rhoCoefTag,
+    rval                 = mb.tag_get_handle( "LinearCoefRho", 3, moab::MB_TYPE_DOUBLE, rhoCoefTag,
                               moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for index of gnomonic plane for each cell
     moab::Tag planeTag = 0;
-    rval = mb.tag_get_handle( "gnomonicPlane", 1, moab::MB_TYPE_INTEGER, planeTag,
+    rval               = mb.tag_get_handle( "gnomonicPlane", 1, moab::MB_TYPE_INTEGER, planeTag,
                               moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for intersection weights
     moab::Tag weightsTag = 0;
@@ -122,8 +122,8 @@ int main( int argc, char* argv[] )
     // Get initial values for use in error computation
     moab::Range redEls;
     rval = mb.get_entities_by_dimension( euler_set, 2, redEls );MB_CHK_ERR( rval );
-    std::vector< double > iniValsRho( redEls.size( ) );
-    rval = mb.tag_get_data( rhoTag, redEls, &iniValsRho[ 0 ] );MB_CHK_ERR( rval );
+    std::vector< double > iniValsRho( redEls.size() );
+    rval = mb.tag_get_data( rhoTag, redEls, &iniValsRho[0] );MB_CHK_ERR( rval );
 
     // Get Lagrangian set
     moab::EntityHandle out_set, lagrange_set, covering_set;
@@ -133,7 +133,7 @@ int main( int argc, char* argv[] )
     // rval = create_lagr_mesh(&mb, euler_set, lagrange_set);
     rval = IntxUtilsCSLAM::deep_copy_set( &mb, euler_set, lagrange_set );MB_CHK_ERR( rval );
     moab::EntityHandle dum = 0;
-    moab::Tag          corrTag;
+    moab::Tag corrTag;
     rval = mb.tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE | MB_TAG_CREAT, &dum );MB_CHK_ERR( rval );
     // Set up intersection of two meshes
 
@@ -167,7 +167,7 @@ int main( int argc, char* argv[] )
         {
             std::stringstream newDensity;
             newDensity << "Density" << rank << "_" << ts - 1 << ".vtk";
-            rval = mb.write_file( newDensity.str( ).c_str( ), 0, 0, &euler_set, 1 );
+            rval = mb.write_file( newDensity.str().c_str(), 0, 0, &euler_set, 1 );
         }
 
         // get linear reconstruction coefficients
@@ -190,7 +190,7 @@ int main( int argc, char* argv[] )
         {
             std::stringstream newDensity;
             newDensity << "Density" << rank << "_" << ts << ".vtk";
-            rval = mb.write_file( newDensity.str( ).c_str( ), 0, 0, &euler_set, 1 );MB_CHK_ERR( rval );
+            rval = mb.write_file( newDensity.str().c_str(), 0, 0, &euler_set, 1 );MB_CHK_ERR( rval );
         }
 
         // delete the polygons and elements of out_set
@@ -223,36 +223,36 @@ int main( int argc, char* argv[] )
     }
 
     // final vals and errors
-    moab::Range::iterator iter = redEls.begin( );
-    double                norm1 = 0.;
-    double                norm2 = 0.;
-    double                exact2 = 0.;
-    double                exact1 = 0.;
-    int                   count = 0;
-    void*                 data;
-    int                   j = 0;  // index in iniVals
-    while( iter != redEls.end( ) )
+    moab::Range::iterator iter = redEls.begin();
+    double norm1               = 0.;
+    double norm2               = 0.;
+    double exact2              = 0.;
+    double exact1              = 0.;
+    int count                  = 0;
+    void* data;
+    int j = 0;  // index in iniVals
+    while( iter != redEls.end() )
     {
-        rval = mb.tag_iterate( rhoTag, iter, redEls.end( ), count, data );MB_CHK_ERR( rval );
+        rval = mb.tag_iterate( rhoTag, iter, redEls.end(), count, data );MB_CHK_ERR( rval );
         double* ptrTracer = (double*)data;
 
-        rval = mb.tag_iterate( areaTag, iter, redEls.end( ), count, data );MB_CHK_ERR( rval );
+        rval = mb.tag_iterate( areaTag, iter, redEls.end(), count, data );MB_CHK_ERR( rval );
         double* ptrArea = (double*)data;
         for( int i = 0; i < count; i++, ++iter, ptrTracer++, ptrArea++, j++ )
         {
             // double area = *ptrArea;
-            norm1 += fabs( *ptrTracer - iniValsRho[ j ] ) * ( *ptrArea );
-            norm2 += ( *ptrTracer - iniValsRho[ j ] ) * ( *ptrTracer - iniValsRho[ j ] ) * ( *ptrArea );
-            exact1 += ( iniValsRho[ j ] ) * ( *ptrArea );
-            exact2 += ( iniValsRho[ j ] ) * ( iniValsRho[ j ] ) * ( *ptrArea );
+            norm1 += fabs( *ptrTracer - iniValsRho[j] ) * ( *ptrArea );
+            norm2 += ( *ptrTracer - iniValsRho[j] ) * ( *ptrTracer - iniValsRho[j] ) * ( *ptrArea );
+            exact1 += ( iniValsRho[j] ) * ( *ptrArea );
+            exact2 += ( iniValsRho[j] ) * ( iniValsRho[j] ) * ( *ptrArea );
         }
     }
 
-    double total_norm1 = 0;
-    double total_norm2 = 0;
+    double total_norm1  = 0;
+    double total_norm2  = 0;
     double total_exact1 = 0;
     double total_exact2 = 0;
-    int    mpi_err = MPI_Reduce( &norm1, &total_norm1, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    int mpi_err         = MPI_Reduce( &norm1, &total_norm1, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
     if( mpi_err ) std::cout << " error in MPI_reduce:" << mpi_err << "\n";
     mpi_err = MPI_Reduce( &norm2, &total_norm2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
     if( mpi_err ) std::cout << " error in MPI_reduce:" << mpi_err << "\n";
@@ -264,7 +264,7 @@ int main( int argc, char* argv[] )
         std::cout << " numSteps:" << numSteps << " 1-norm:" << total_norm1 / total_exact1
                   << " 2-norm:" << total_norm2 / total_exact2 << "\n";
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return 0;
 }
 
@@ -272,20 +272,20 @@ moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set,
 {
     // get all entities of dimension 2
     moab::Range cells;
-    ErrorCode   rval = mb->get_entities_by_dimension( set, 2, cells );MB_CHK_ERR( rval );
+    ErrorCode rval = mb->get_entities_by_dimension( set, 2, cells );MB_CHK_ERR( rval );
 
-    for( Range::iterator it = cells.begin( ); it != cells.end( ); ++it )
+    for( Range::iterator it = cells.begin(); it != cells.end(); ++it )
     {
         moab::EntityHandle icell = *it;
 
         // get the nodes
         const moab::EntityHandle* verts;
-        int                       num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( icell, verts, num_nodes );MB_CHK_ERR( rval );
 
         // get coordinates
         std::vector< double > coords( 3 * num_nodes );
-        rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );MB_CHK_ERR( rval );
+        rval = mb->get_coords( verts, num_nodes, &coords[0] );MB_CHK_ERR( rval );
 
         // get cell center
         double centerx = 0;
@@ -293,14 +293,14 @@ moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set,
         double centerz = 0;
         for( int inode = 0; inode < num_nodes; inode++ )
         {
-            centerx += coords[ inode * 3 ] / num_nodes;
-            centery += coords[ inode * 3 + 1 ] / num_nodes;
-            centerz += coords[ inode * 3 + 2 ] / num_nodes;
+            centerx += coords[inode * 3] / num_nodes;
+            centery += coords[inode * 3 + 1] / num_nodes;
+            centerz += coords[inode * 3 + 2] / num_nodes;
         }
         double rad = std::sqrt( centerx * centerx + centery * centery + centerz * centerz );
-        centerx = centerx / rad;
-        centery = centery / rad;
-        centerz = centerz / rad;
+        centerx    = centerx / rad;
+        centery    = centery / rad;
+        centerz    = centerz / rad;
         moab::CartVect center( centerx, centery, centerz );
 
         // define gnomonic plane based on cell center coordinates
@@ -319,42 +319,40 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
 
     // get all entities of dimension 2
     moab::Range cells;
-    ErrorCode   rval = mb->get_entities_by_dimension( set, 2, cells );MB_CHK_ERR( rval );
+    ErrorCode rval = mb->get_entities_by_dimension( set, 2, cells );MB_CHK_ERR( rval );
 
     // set sphere radius to 1
     double R = 1.0;
 
-    for( Range::iterator it = cells.begin( ); it != cells.end( ); ++it )
+    for( Range::iterator it = cells.begin(); it != cells.end(); ++it )
     {
         moab::EntityHandle icell = *it;
 
         // get the nodes
         const moab::EntityHandle* verts;
-        int                       num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( icell, verts, num_nodes );MB_CHK_ERR( rval );
 
         // get coordinates
         std::vector< double > coords( 3 * num_nodes );
-        rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );MB_CHK_ERR( rval );
+        rval = mb->get_coords( verts, num_nodes, &coords[0] );MB_CHK_ERR( rval );
 
         // get gnomonic plane
         int plane = 0;
-        rval = mb->tag_get_data( planeTag, &icell, 1, &plane );MB_CHK_ERR( rval );
+        rval      = mb->tag_get_data( planeTag, &icell, 1, &plane );MB_CHK_ERR( rval );
 
         // get vertex coordinates and project onto gnomonic plane
         std::vector< double > x( num_nodes );
         std::vector< double > y( num_nodes );
-        double                area = 0;
-        double                bary_x = 0;
-        double                bary_y = 0;
+        double area   = 0;
+        double bary_x = 0;
+        double bary_y = 0;
         for( int inode = 0; inode < num_nodes; inode++ )
         {
-            double rad =
-                sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] + coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
-                      coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
-            CartVect xyzcoord( coords[ inode * 3 ] / rad, coords[ inode * 3 + 1 ] / rad,
-                               coords[ inode * 3 + 2 ] / rad );
-            moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane, x[ inode ], y[ inode ] );
+            double rad = sqrt( coords[inode * 3] * coords[inode * 3] + coords[inode * 3 + 1] * coords[inode * 3 + 1] +
+                               coords[inode * 3 + 2] * coords[inode * 3 + 2] );
+            CartVect xyzcoord( coords[inode * 3] / rad, coords[inode * 3 + 1] / rad, coords[inode * 3 + 2] / rad );
+            moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane, x[inode], y[inode] );
         }
 
         // integrate over cell to get barycenter in gnomonic coordinates
@@ -362,23 +360,22 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
         {
             int inode2 = inode + 1;
             if( inode2 >= num_nodes ) inode2 = 0;
-            double xmid = 0.5 * ( x[ inode ] + x[ inode2 ] );
-            double ymid = 0.5 * ( y[ inode ] + y[ inode2 ] );
-            double r1 = sqrt( 1 + x[ inode ] * x[ inode ] + y[ inode ] * y[ inode ] );
-            double rm = sqrt( 1 + xmid * xmid + ymid * ymid );
-            double r2 = sqrt( 1 + x[ inode2 ] * x[ inode2 ] + y[ inode2 ] * y[ inode2 ] );
-            double hx = x[ inode2 ] - x[ inode ];
+            double xmid = 0.5 * ( x[inode] + x[inode2] );
+            double ymid = 0.5 * ( y[inode] + y[inode2] );
+            double r1   = sqrt( 1 + x[inode] * x[inode] + y[inode] * y[inode] );
+            double rm   = sqrt( 1 + xmid * xmid + ymid * ymid );
+            double r2   = sqrt( 1 + x[inode2] * x[inode2] + y[inode2] * y[inode2] );
+            double hx   = x[inode2] - x[inode];
 
-            area +=
-                -hx *
-                ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                  y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
-                6.0;
+            area += -hx *
+                    ( y[inode] / ( r1 * ( 1 + x[inode] * x[inode] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                      y[inode2] / ( r2 * ( 1 + x[inode2] * x[inode2] ) ) ) /
+                    6.0;
 
             bary_x += -hx *
-                      ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
+                      ( x[inode] * y[inode] / ( r1 * ( 1 + x[inode] * x[inode] ) ) +
                         4.0 * xmid * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                        x[ inode2 ] * y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                        x[inode2] * y[inode2] / ( r2 * ( 1 + x[inode2] * x[inode2] ) ) ) /
                       6.0;
 
             bary_y += hx * ( 1.0 / r1 + 4.0 / rm + 1.0 / r2 ) / 6.0;
@@ -392,10 +389,10 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
 
         // set barycenter
         std::vector< double > barycenter( 3 );
-        barycenter[ 0 ] = barycent[ 0 ];
-        barycenter[ 1 ] = barycent[ 1 ];
-        barycenter[ 2 ] = barycent[ 2 ];
-        rval = mb->tag_set_data( barycenterTag, &icell, 1, &barycenter[ 0 ] );MB_CHK_ERR( rval );
+        barycenter[0] = barycent[0];
+        barycenter[1] = barycent[1];
+        barycenter[2] = barycent[2];
+        rval          = mb->tag_set_data( barycenterTag, &icell, 1, &barycenter[0] );MB_CHK_ERR( rval );
 
         // set area
         rval = mb->tag_set_data( areaTag, &icell, 1, &area );MB_CHK_ERR( rval );
@@ -408,22 +405,21 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, 
                              moab::Tag& rhoTag, int field_type )
 {
     // get cells
-    moab::Range     cells;
+    moab::Range cells;
     moab::ErrorCode rval = mb->get_entities_by_dimension( euler_set, 2, cells );MB_CHK_ERR( rval );
 
     // get barycenters
-    std::vector< double > cell_barys( 3 * cells.size( ) );
-    rval = mb->tag_get_data( barycenterTag, cells, &cell_barys[ 0 ] );MB_CHK_ERR( rval );
+    std::vector< double > cell_barys( 3 * cells.size() );
+    rval = mb->tag_get_data( barycenterTag, cells, &cell_barys[0] );MB_CHK_ERR( rval );
 
     // loop over cells
     int cell_ind = 0;
-    for( Range::iterator it = cells.begin( ); it != cells.end( ); ++it )
+    for( Range::iterator it = cells.begin(); it != cells.end(); ++it )
     {
         moab::EntityHandle icell = *it;
 
         // convert barycenter from 3-D Cartesian to lat/lon
-        moab::CartVect                bary_xyz( cell_barys[ cell_ind * 3 ], cell_barys[ cell_ind * 3 + 1 ],
-                                 cell_barys[ cell_ind * 3 + 2 ] );
+        moab::CartVect bary_xyz( cell_barys[cell_ind * 3], cell_barys[cell_ind * 3 + 1], cell_barys[cell_ind * 3 + 2] );
         moab::IntxUtils::SphereCoords sphCoord = moab::IntxUtils::cart_to_spherical( bary_xyz );
 
         if( field_type == 1 )  // cosine bells
@@ -432,24 +428,24 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, 
             double params[] = { 5 * M_PI / 6.0, 0.0, 7 * M_PI / 6, 0.0, 0.1, 0.9, 1., 0.5 };
 
             double rho_barycent = IntxUtilsCSLAM::quasi_smooth_field( sphCoord.lon, sphCoord.lat, params );
-            rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
+            rval                = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
         if( field_type == 2 )  // Gaussian hills
         {
-            moab::CartVect                p1, p2;
+            moab::CartVect p1, p2;
             moab::IntxUtils::SphereCoords spr;
-            spr.R = 1;
+            spr.R   = 1;
             spr.lat = M_PI / 3;
             spr.lon = M_PI;
-            p1 = moab::IntxUtils::spherical_to_cart( spr );
+            p1      = moab::IntxUtils::spherical_to_cart( spr );
             spr.lat = -M_PI / 3;
-            p2 = moab::IntxUtils::spherical_to_cart( spr );
+            p2      = moab::IntxUtils::spherical_to_cart( spr );
             // X1, Y1, Z1, X2, Y2, Z2, ?, ?
-            double params[] = { p1[ 0 ], p1[ 1 ], p1[ 2 ], p2[ 0 ], p2[ 1 ], p2[ 2 ], 1, 5. };
+            double params[] = { p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], 1, 5. };
 
             double rho_barycent = IntxUtilsCSLAM::smooth_field( sphCoord.lon, sphCoord.lat, params );
-            rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
+            rval                = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
         if( field_type == 3 )  // Zalesak cylinders
@@ -458,13 +454,13 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, 
             double params[] = { 5 * M_PI / 6.0, 0.0, 7 * M_PI / 6.0, 0.0, 0.1, 0.9, 0.5 };
 
             double rho_barycent = IntxUtilsCSLAM::slotted_cylinder_field( sphCoord.lon, sphCoord.lat, params );
-            rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
+            rval                = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
         if( field_type == 4 )  // constant
         {
             double rho_barycent = 1.0;
-            rval = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
+            rval                = mb->tag_set_data( rhoTag, &icell, 1, &rho_barycent );MB_CHK_ERR( rval );
         }
 
         cell_ind++;
@@ -477,17 +473,17 @@ moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHand
                                            moab::Tag& planeTag, moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
-    Range     cells;
+    Range cells;
     ErrorCode rval = mb->get_entities_by_dimension( set, 2, cells );MB_CHK_ERR( rval );
 
     // Get coefficients for reconstruction (in cubed-sphere coordinates)
-    for( Range::iterator it = cells.begin( ); it != cells.end( ); ++it )
+    for( Range::iterator it = cells.begin(); it != cells.end(); ++it )
     {
         moab::EntityHandle icell = *it;
 
         // get the nodes, then the coordinates
         const moab::EntityHandle* verts;
-        int                       num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( icell, verts, num_nodes );MB_CHK_ERR( rval );
 
         moab::Range adjacentEdges;
@@ -499,84 +495,84 @@ moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHand
 
         // get gnomonic plane
         int plane = 0;
-        rval = mb->tag_get_data( planeTag, &icell, 1, &plane );MB_CHK_ERR( rval );
+        rval      = mb->tag_get_data( planeTag, &icell, 1, &plane );MB_CHK_ERR( rval );
 
-        std::vector< double > dx( adjacentCells.size( ) - 1 );
-        std::vector< double > dy( adjacentCells.size( ) - 1 );
-        std::vector< double > dr( adjacentCells.size( ) - 1 );
-        double                bary_x;
-        double                bary_y;
+        std::vector< double > dx( adjacentCells.size() - 1 );
+        std::vector< double > dy( adjacentCells.size() - 1 );
+        std::vector< double > dr( adjacentCells.size() - 1 );
+        double bary_x;
+        double bary_y;
 
         // get barycenter of cell where reconstruction occurs
-        double                rad = 1;
+        double rad = 1;
         std::vector< double > barycent( 3 );
-        rval = mb->tag_get_data( barycenterTag, &icell, 1, &barycent[ 0 ] );MB_CHK_ERR( rval );
-        CartVect barycenter( barycent[ 0 ], barycent[ 1 ], barycent[ 2 ] );
-        double   cellbaryx = 0;
-        double   cellbaryy = 0;
+        rval = mb->tag_get_data( barycenterTag, &icell, 1, &barycent[0] );MB_CHK_ERR( rval );
+        CartVect barycenter( barycent[0], barycent[1], barycent[2] );
+        double cellbaryx = 0;
+        double cellbaryy = 0;
         moab::IntxUtils::gnomonic_projection( barycenter, rad, plane, cellbaryx, cellbaryy );
 
         // get density value
         double rhocell = 0;
-        rval = mb->tag_get_data( rhoTag, &icell, 1, &rhocell );MB_CHK_ERR( rval );
+        rval           = mb->tag_get_data( rhoTag, &icell, 1, &rhocell );MB_CHK_ERR( rval );
 
         // get barycenters of surrounding cells
-        std::vector< double > cell_barys( 3 * adjacentCells.size( ) );
-        rval = mb->tag_get_data( barycenterTag, adjacentCells, &cell_barys[ 0 ] );MB_CHK_ERR( rval );
+        std::vector< double > cell_barys( 3 * adjacentCells.size() );
+        rval = mb->tag_get_data( barycenterTag, adjacentCells, &cell_barys[0] );MB_CHK_ERR( rval );
 
         // get density of surrounding cells
-        std::vector< double > rho_vals( adjacentCells.size( ) );
-        rval = mb->tag_get_data( rhoTag, adjacentCells, &rho_vals[ 0 ] );MB_CHK_ERR( rval );
+        std::vector< double > rho_vals( adjacentCells.size() );
+        rval = mb->tag_get_data( rhoTag, adjacentCells, &rho_vals[0] );MB_CHK_ERR( rval );
 
         std::size_t jind = 0;
-        for( std::size_t i = 0; i < adjacentCells.size( ); i++ )
+        for( std::size_t i = 0; i < adjacentCells.size(); i++ )
         {
 
-            if( adjacentCells[ i ] != icell )
+            if( adjacentCells[i] != icell )
             {
 
-                CartVect bary_xyz( cell_barys[ i * 3 ], cell_barys[ i * 3 + 1 ], cell_barys[ i * 3 + 2 ] );
+                CartVect bary_xyz( cell_barys[i * 3], cell_barys[i * 3 + 1], cell_barys[i * 3 + 2] );
                 moab::IntxUtils::gnomonic_projection( bary_xyz, rad, plane, bary_x, bary_y );
 
-                dx[ jind ] = bary_x - cellbaryx;
-                dy[ jind ] = bary_y - cellbaryy;
-                dr[ jind ] = rho_vals[ i ] - rhocell;
+                dx[jind] = bary_x - cellbaryx;
+                dy[jind] = bary_y - cellbaryy;
+                dr[jind] = rho_vals[i] - rhocell;
 
                 jind++;
             }
         }
 
         std::vector< double > linearCoef( 3 );
-        if( adjacentCells.size( ) == 5 )
+        if( adjacentCells.size() == 5 )
         {
 
             // compute normal equations matrix
-            double N11 = dx[ 0 ] * dx[ 0 ] + dx[ 1 ] * dx[ 1 ] + dx[ 2 ] * dx[ 2 ] + dx[ 3 ] * dx[ 3 ];
-            double N22 = dy[ 0 ] * dy[ 0 ] + dy[ 1 ] * dy[ 1 ] + dy[ 2 ] * dy[ 2 ] + dy[ 3 ] * dy[ 3 ];
-            double N12 = dx[ 0 ] * dy[ 0 ] + dx[ 1 ] * dy[ 1 ] + dx[ 2 ] * dy[ 2 ] + dx[ 3 ] * dy[ 3 ];
+            double N11 = dx[0] * dx[0] + dx[1] * dx[1] + dx[2] * dx[2] + dx[3] * dx[3];
+            double N22 = dy[0] * dy[0] + dy[1] * dy[1] + dy[2] * dy[2] + dy[3] * dy[3];
+            double N12 = dx[0] * dy[0] + dx[1] * dy[1] + dx[2] * dy[2] + dx[3] * dy[3];
 
             // rhs
-            double Rx = dx[ 0 ] * dr[ 0 ] + dx[ 1 ] * dr[ 1 ] + dx[ 2 ] * dr[ 2 ] + dx[ 3 ] * dr[ 3 ];
-            double Ry = dy[ 0 ] * dr[ 0 ] + dy[ 1 ] * dr[ 1 ] + dy[ 2 ] * dr[ 2 ] + dy[ 3 ] * dr[ 3 ];
+            double Rx = dx[0] * dr[0] + dx[1] * dr[1] + dx[2] * dr[2] + dx[3] * dr[3];
+            double Ry = dy[0] * dr[0] + dy[1] * dr[1] + dy[2] * dr[2] + dy[3] * dr[3];
 
             // determinant
             double Det = N11 * N22 - N12 * N12;
 
             // solution
-            linearCoef[ 0 ] = ( Rx * N22 - Ry * N12 ) / Det;
-            linearCoef[ 1 ] = ( Ry * N11 - Rx * N12 ) / Det;
-            linearCoef[ 2 ] = rhocell - linearCoef[ 0 ] * cellbaryx - linearCoef[ 1 ] * cellbaryy;
+            linearCoef[0] = ( Rx * N22 - Ry * N12 ) / Det;
+            linearCoef[1] = ( Ry * N11 - Rx * N12 ) / Det;
+            linearCoef[2] = rhocell - linearCoef[0] * cellbaryx - linearCoef[1] * cellbaryy;
         }
         else
         {
             // default to first order
-            linearCoef[ 0 ] = 0.0;
-            linearCoef[ 1 ] = 0.0;
-            linearCoef[ 2 ] = rhocell;
+            linearCoef[0] = 0.0;
+            linearCoef[1] = 0.0;
+            linearCoef[2] = rhocell;
             std::cout << "Need 4 adjacent cells for linear reconstruction! \n";
         }
 
-        rval = mb->tag_set_data( linearCoefTag, &icell, 1, &linearCoef[ 0 ] );MB_CHK_ERR( rval );
+        rval = mb->tag_set_data( linearCoefTag, &icell, 1, &linearCoef[0] );MB_CHK_ERR( rval );
     }
 
     return moab::MB_SUCCESS;
@@ -586,23 +582,23 @@ moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle eule
                                     moab::EntityHandle covering_set, int tStep, Range& connecVerts )
 {
     EntityHandle dum = 0;
-    Tag          corrTag;
+    Tag corrTag;
     mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE, &dum );
 
-    double t = tStep * T / numSteps;  // numSteps is global; so is T
-    double delta_t = T / numSteps;  // this is global too, actually
+    double t       = tStep * T / numSteps;  // numSteps is global; so is T
+    double delta_t = T / numSteps;          // this is global too, actually
     // double delta_t = 0.0001;
     // double t = delta_t;
 
-    Range     polys;
+    Range polys;
     ErrorCode rval = mb->get_entities_by_dimension( euler_set, 2, polys );MB_CHK_ERR( rval );
 
     // change coordinates of lagr mesh vertices
-    for( Range::iterator vit = connecVerts.begin( ); vit != connecVerts.end( ); ++vit )
+    for( Range::iterator vit = connecVerts.begin(); vit != connecVerts.end(); ++vit )
     {
         moab::EntityHandle oldV = *vit;
-        CartVect           posi;
-        rval = mb->get_coords( &oldV, 1, &( posi[ 0 ] ) );MB_CHK_ERR( rval );
+        CartVect posi;
+        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
 
         // Intx utils, case 1
         CartVect newPos;
@@ -612,7 +608,7 @@ moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle eule
         rval = mb->tag_get_data( corrTag, &oldV, 1, &new_vert );MB_CHK_ERR( rval );
 
         // set the new position for the new vertex
-        rval = mb->set_coords( &new_vert, 1, &( newPos[ 0 ] ) );MB_CHK_ERR( rval );
+        rval = mb->set_coords( &new_vert, 1, &( newPos[0] ) );MB_CHK_ERR( rval );
     }
 
     // if in parallel, we have to move some elements to another proc, and receive other cells
@@ -628,10 +624,10 @@ moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_se
                                 moab::Tag& rhoCoefsTag, moab::Tag& weightsTag, moab::Tag& planeTag )
 {
     //  moab::ParallelComm * parcomm = ParallelComm::get_pcomm(mb, 0);
-    ErrorCode          rval;
-    double             R = 1.0;
+    ErrorCode rval;
+    double R               = 1.0;
     moab::EntityHandle dum = 0;
-    Tag                corrTag;
+    Tag corrTag;
 
     rval = mb->tag_get_handle( CORRTAGNAME, 1, MB_TYPE_HANDLE, corrTag, MB_TAG_DENSE, &dum );MB_CHK_ERR( rval );
 
@@ -648,19 +644,19 @@ moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_se
     rval = mb->get_entities_by_dimension( euler_set, 2, rs2 );MB_CHK_ERR( rval );
 
     // get gnomonic plane for Eulerian cells
-    std::vector< int > plane( rs2.size( ) );
-    rval = mb->tag_get_data( planeTag, rs2, &plane[ 0 ] );MB_CHK_ERR( rval );
+    std::vector< int > plane( rs2.size() );
+    rval = mb->tag_get_data( planeTag, rs2, &plane[0] );MB_CHK_ERR( rval );
 
     // get Eulerian cell reconstruction coefficients
-    std::vector< double > rhoCoefs( 3 * rs2.size( ) );
-    rval = mb->tag_get_data( rhoCoefsTag, rs2, &rhoCoefs[ 0 ] );MB_CHK_ERR( rval );
+    std::vector< double > rhoCoefs( 3 * rs2.size() );
+    rval = mb->tag_get_data( rhoCoefsTag, rs2, &rhoCoefs[0] );MB_CHK_ERR( rval );
 
     // get intersection weights
-    std::vector< double > weights( 3 * polys.size( ) );
-    rval = mb->tag_get_data( weightsTag, polys, &weights[ 0 ] );MB_CHK_ERR( rval );
+    std::vector< double > weights( 3 * polys.size() );
+    rval = mb->tag_get_data( weightsTag, polys, &weights[0] );MB_CHK_ERR( rval );
 
     // Initialize the new values
-    std::vector< double > newValues( rs2.size( ), 0. );  // initialize with 0 all of them
+    std::vector< double > newValues( rs2.size(), 0. );  // initialize with 0 all of them
 
     // For each polygon get red/blue parent
     moab::Tag tgtParentTag;
@@ -671,49 +667,49 @@ moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_se
     // mass_lagr = (\sum_intx \int rho^h(x,y) dV)
     // rho_eul^n+1 = mass_lagr/area_eul
     double check_intx_area = 0.;
-    int    polyIndex = 0;
-    for( Range::iterator it = polys.begin( ); it != polys.end( ); ++it )
+    int polyIndex          = 0;
+    for( Range::iterator it = polys.begin(); it != polys.end(); ++it )
     {
         moab::EntityHandle poly = *it;
-        int                blueIndex, redIndex;
+        int blueIndex, redIndex;
         rval = mb->tag_get_data( srcParentTag, &poly, 1, &blueIndex );MB_CHK_ERR( rval );
 
-        moab::EntityHandle blue = rs1[ blueIndex ];
-        rval = mb->tag_get_data( tgtParentTag, &poly, 1, &redIndex );MB_CHK_ERR( rval );
+        moab::EntityHandle blue = rs1[blueIndex];
+        rval                    = mb->tag_get_data( tgtParentTag, &poly, 1, &redIndex );MB_CHK_ERR( rval );
 
         moab::EntityHandle redArr;
         rval = mb->tag_get_data( corrTag, &blue, 1, &redArr );MB_CHK_ERR( rval );
         int arrRedIndex = rs2.index( redArr );
 
         // sum into new density values
-        newValues[ arrRedIndex ] += rhoCoefs[ redIndex * 3 ] * weights[ polyIndex * 3 ] +
-                                    rhoCoefs[ redIndex * 3 + 1 ] * weights[ polyIndex * 3 + 1 ] +
-                                    rhoCoefs[ redIndex * 3 + 2 ] * weights[ polyIndex * 3 + 2 ];
+        newValues[arrRedIndex] += rhoCoefs[redIndex * 3] * weights[polyIndex * 3] +
+                                  rhoCoefs[redIndex * 3 + 1] * weights[polyIndex * 3 + 1] +
+                                  rhoCoefs[redIndex * 3 + 2] * weights[polyIndex * 3 + 2];
 
-        check_intx_area += weights[ polyIndex * 3 + 2 ];
+        check_intx_area += weights[polyIndex * 3 + 2];
 
         polyIndex++;
     }
 
     // now divide by red area (current)
-    int             j = 0;
-    Range::iterator iter = rs2.begin( );
-    void*           data = NULL;  // used for stored area
-    int             count = 0;
-    double          total_mass_local = 0.;
-    while( iter != rs2.end( ) )
+    int j                   = 0;
+    Range::iterator iter    = rs2.begin();
+    void* data              = NULL;  // used for stored area
+    int count               = 0;
+    double total_mass_local = 0.;
+    while( iter != rs2.end() )
     {
-        rval = mb->tag_iterate( areaTag, iter, rs2.end( ), count, data );MB_CHK_ERR( rval );
+        rval = mb->tag_iterate( areaTag, iter, rs2.end(), count, data );MB_CHK_ERR( rval );
 
         double* ptrArea = (double*)data;
         for( int i = 0; i < count; i++, ++iter, j++, ptrArea++ )
         {
-            total_mass_local += newValues[ j ];
-            newValues[ j ] /= ( *ptrArea );
+            total_mass_local += newValues[j];
+            newValues[j] /= ( *ptrArea );
         }
     }
 
-    rval = mb->tag_set_data( rhoTag, rs2, &newValues[ 0 ] );MB_CHK_ERR( rval );
+    rval = mb->tag_set_data( rhoTag, rs2, &newValues[0] );MB_CHK_ERR( rval );
 
     std::cout << "total mass now:" << total_mass_local << "\n";
     std::cout << "check: total intersection area: (4 * M_PI * R^2): " << 4 * M_PI * R * R << " " << check_intx_area
@@ -730,11 +726,11 @@ void departure_point_swirl( moab::CartVect& arrival_point, double t, double delt
 
     // always assume radius is 1 here?
     moab::IntxUtils::SphereCoords sph = moab::IntxUtils::cart_to_spherical( arrival_point );
-    double                        k = 2.4;  // flow parameter
+    double k                          = 2.4;  // flow parameter
     /*     radius needs to be within some range   */
-    double sl2 = sin( sph.lon / 2 );
-    double pit = M_PI * t / T;
-    double omega = M_PI / T;
+    double sl2      = sin( sph.lon / 2 );
+    double pit      = M_PI * t / T;
+    double omega    = M_PI / T;
     double costheta = cos( sph.lat );
     // double u = k * sl2*sl2 * sin(2*sph.lat) * cos(pit);
     double v = k * sin( sph.lon ) * costheta * cos( pit );
@@ -756,7 +752,7 @@ void departure_point_swirl( moab::CartVect& arrival_point, double t, double delt
                            u_tilda * cos( sph.lon ) * cos( sph.lat ) * cos( pit ) +
                            v * sin( sph.lon ) * sin( sph.lat ) * cos( pit ) );
     moab::IntxUtils::SphereCoords sph_dep;
-    sph_dep.R = 1.;  // radius
+    sph_dep.R   = 1.;  // radius
     sph_dep.lat = lat_dep;
     sph_dep.lon = lon_dep;
 
@@ -772,12 +768,12 @@ void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double 
 {
 
     moab::IntxUtils::SphereCoords sph = moab::IntxUtils::cart_to_spherical( arrival_point );
-    double                        omega = M_PI / T;
-    double                        gt = cos( M_PI * t / T );
+    double omega                      = M_PI / T;
+    double gt                         = cos( M_PI * t / T );
 
-    double lambda = sph.lon - 2.0 * omega * t;
+    double lambda  = sph.lon - 2.0 * omega * t;
     double u_tilda = 4.0 * sin( lambda ) * sin( lambda ) * sin( sph.lat ) * gt + 2.0 * omega;
-    double v = 2.0 * sin( 2.0 * lambda ) * cos( sph.lat ) * gt;
+    double v       = 2.0 * sin( 2.0 * lambda ) * cos( sph.lat ) * gt;
 
     double lon_dep = sph.lon - delta_t * u_tilda -
                      delta_t * delta_t * 2.0 * sin( lambda ) *
@@ -793,7 +789,7 @@ void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double 
                            v * sin( sph.lat ) * cos( omega * t ) * sin( lambda ) * cos( lambda ) );
 
     moab::IntxUtils::SphereCoords sph_dep;
-    sph_dep.R = 1.;  // radius
+    sph_dep.R   = 1.;  // radius
     sph_dep.lat = lat_dep;
     sph_dep.lon = lon_dep;
 
@@ -810,7 +806,7 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
 {
     // get all intersection polygons
     moab::Range polys;
-    ErrorCode   rval = mb->get_entities_by_dimension( intx_set, 2, polys );MB_CHK_ERR( rval );
+    ErrorCode rval = mb->get_entities_by_dimension( intx_set, 2, polys );MB_CHK_ERR( rval );
 
     // get all Eulerian cells
     moab::Range eul_cells;
@@ -829,22 +825,22 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
     rval = mb->tag_get_handle( "SourceParent", 1, MB_TYPE_INTEGER, srcParentTag, MB_TAG_DENSE );MB_CHK_ERR( rval );
 
     // get gnomonic plane for Eulerian cells
-    std::vector< int > plane( eul_cells.size( ) );
-    rval = mb->tag_get_data( planeTag, eul_cells, &plane[ 0 ] );MB_CHK_ERR( rval );
+    std::vector< int > plane( eul_cells.size() );
+    rval = mb->tag_get_data( planeTag, eul_cells, &plane[0] );MB_CHK_ERR( rval );
 
     double total_area = 0.;
-    for( moab::Range::iterator it = polys.begin( ); it != polys.end( ); ++it )
+    for( moab::Range::iterator it = polys.begin(); it != polys.end(); ++it )
     {
         moab::EntityHandle poly = *it;
 
         // get the nodes
         const moab::EntityHandle* verts;
-        int                       num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( poly, verts, num_nodes );MB_CHK_ERR( rval );
 
         // get coordinates
         std::vector< double > coords( 3 * num_nodes );
-        rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );MB_CHK_ERR( rval );
+        rval = mb->get_coords( verts, num_nodes, &coords[0] );MB_CHK_ERR( rval );
 
         // get index of Eulerian parent cell for polygon
         int redIndex;
@@ -856,18 +852,17 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
 
         std::vector< double > x( num_nodes );
         std::vector< double > y( num_nodes );
-        double                poly_area = 0;
-        double                poly_intx = 0;
-        double                poly_inty = 0;
-        double                R = 1.0;
+        double poly_area = 0;
+        double poly_intx = 0;
+        double poly_inty = 0;
+        double R         = 1.0;
         for( int inode = 0; inode < num_nodes; inode++ )
         {
-            double rad =
-                sqrt( coords[ inode * 3 ] * coords[ inode * 3 ] + coords[ inode * 3 + 1 ] * coords[ inode * 3 + 1 ] +
-                      coords[ inode * 3 + 2 ] * coords[ inode * 3 + 2 ] );
-            moab::CartVect xyzcoord( coords[ inode * 3 ] / rad, coords[ inode * 3 + 1 ] / rad,
-                                     coords[ inode * 3 + 2 ] / rad );
-            moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane[ redIndex ], x[ inode ], y[ inode ] );
+            double rad = sqrt( coords[inode * 3] * coords[inode * 3] + coords[inode * 3 + 1] * coords[inode * 3 + 1] +
+                               coords[inode * 3 + 2] * coords[inode * 3 + 2] );
+            moab::CartVect xyzcoord( coords[inode * 3] / rad, coords[inode * 3 + 1] / rad,
+                                     coords[inode * 3 + 2] / rad );
+            moab::IntxUtils::gnomonic_projection( xyzcoord, R, plane[redIndex], x[inode], y[inode] );
         }
 
         std::vector< double > weights( 3 );
@@ -875,34 +870,33 @@ moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandl
         {
             int inode2 = inode + 1;
             if( inode2 >= num_nodes ) inode2 = 0;
-            double xmid = 0.5 * ( x[ inode ] + x[ inode2 ] );
-            double ymid = 0.5 * ( y[ inode ] + y[ inode2 ] );
-            double r1 = sqrt( 1 + x[ inode ] * x[ inode ] + y[ inode ] * y[ inode ] );
-            double rm = sqrt( 1 + xmid * xmid + ymid * ymid );
-            double r2 = sqrt( 1 + x[ inode2 ] * x[ inode2 ] + y[ inode2 ] * y[ inode2 ] );
-            double hx = x[ inode2 ] - x[ inode ];
+            double xmid = 0.5 * ( x[inode] + x[inode2] );
+            double ymid = 0.5 * ( y[inode] + y[inode2] );
+            double r1   = sqrt( 1 + x[inode] * x[inode] + y[inode] * y[inode] );
+            double rm   = sqrt( 1 + xmid * xmid + ymid * ymid );
+            double r2   = sqrt( 1 + x[inode2] * x[inode2] + y[inode2] * y[inode2] );
+            double hx   = x[inode2] - x[inode];
 
-            poly_area +=
-                -hx *
-                ( y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                  y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
-                6.0;
+            poly_area += -hx *
+                         ( y[inode] / ( r1 * ( 1 + x[inode] * x[inode] ) ) + 4.0 * ymid / ( rm * ( 1 + xmid * xmid ) ) +
+                           y[inode2] / ( r2 * ( 1 + x[inode2] * x[inode2] ) ) ) /
+                         6.0;
 
             poly_intx += -hx *
-                         ( x[ inode ] * y[ inode ] / ( r1 * ( 1 + x[ inode ] * x[ inode ] ) ) +
+                         ( x[inode] * y[inode] / ( r1 * ( 1 + x[inode] * x[inode] ) ) +
                            4.0 * xmid * ymid / ( rm * ( 1 + xmid * xmid ) ) +
-                           x[ inode2 ] * y[ inode2 ] / ( r2 * ( 1 + x[ inode2 ] * x[ inode2 ] ) ) ) /
+                           x[inode2] * y[inode2] / ( r2 * ( 1 + x[inode2] * x[inode2] ) ) ) /
                          6.0;
 
             poly_inty += hx * ( 1.0 / r1 + 4.0 / rm + 1.0 / r2 ) / 6.0;
         }
-        weights[ 0 ] = poly_intx;
-        weights[ 1 ] = poly_inty;
-        weights[ 2 ] = poly_area;
+        weights[0] = poly_intx;
+        weights[1] = poly_inty;
+        weights[2] = poly_area;
 
         total_area += poly_area;
 
-        rval = mb->tag_set_data( weightsTag, &poly, 1, &weights[ 0 ] );MB_CHK_ERR( rval );
+        rval = mb->tag_set_data( weightsTag, &poly, 1, &weights[0] );MB_CHK_ERR( rval );
     }
 
     std::cout << "polygon area = " << total_area << "\n";
@@ -921,7 +915,7 @@ ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set, m
 
     MB_CHK_ERR( rval );
     // give the same global id to new verts and cells created in the lagr(departure) mesh
-    moab::Tag gid = mb->globalId_tag( );
+    moab::Tag gid = mb->globalId_tag();
 
     moab::Range polys;
     rval = mb->get_entities_by_dimension( euler_set, 2, polys );MB_CHK_ERR( rval );
@@ -930,17 +924,17 @@ ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set, m
     rval = mb->get_connectivity( polys, connecVerts );MB_CHK_ERR( rval );
 
     std::map< moab::EntityHandle, moab::EntityHandle > newNodes;
-    for( Range::iterator vit = connecVerts.begin( ); vit != connecVerts.end( ); ++vit )
+    for( Range::iterator vit = connecVerts.begin(); vit != connecVerts.end(); ++vit )
     {
         moab::EntityHandle oldV = *vit;
-        moab::CartVect     posi;
-        rval = mb->get_coords( &oldV, 1, &( posi[ 0 ] ) );MB_CHK_ERR( rval );
+        moab::CartVect posi;
+        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );MB_CHK_ERR( rval );
         int global_id;
         rval = mb->tag_get_data( gid, &oldV, 1, &global_id );MB_CHK_ERR( rval );
         moab::EntityHandle new_vert;
         // duplicate the position
-        rval = mb->create_vertex( &( posi[ 0 ] ), new_vert );MB_CHK_ERR( rval );
-        newNodes[ oldV ] = new_vert;
+        rval = mb->create_vertex( &( posi[0] ), new_vert );MB_CHK_ERR( rval );
+        newNodes[oldV] = new_vert;
         // set also the correspondent tag :)
         rval = mb->tag_set_data( corrTag, &oldV, 1, &new_vert );MB_CHK_ERR( rval );
 
@@ -952,26 +946,26 @@ ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set, m
         rval = mb->tag_set_data( gid, &new_vert, 1, &global_id );MB_CHK_ERR( rval );
     }
 
-    for( Range::iterator it = polys.begin( ); it != polys.end( ); ++it )
+    for( Range::iterator it = polys.begin(); it != polys.end(); ++it )
     {
-        moab::EntityHandle        q = *it;
-        int                       global_id;
-        int                       nnodes;
+        moab::EntityHandle q = *it;
+        int global_id;
+        int nnodes;
         const moab::EntityHandle* conn;
 
         rval = mb->get_connectivity( q, conn, nnodes );MB_CHK_ERR( rval );
         rval = mb->tag_get_data( gid, &q, 1, &global_id );MB_CHK_ERR( rval );
 
-        EntityType                        typeElem = mb->type_from_handle( q );
+        EntityType typeElem = mb->type_from_handle( q );
         std::vector< moab::EntityHandle > new_conn( nnodes );
         for( int i = 0; i < nnodes; i++ )
         {
-            moab::EntityHandle v1 = conn[ i ];
-            new_conn[ i ] = newNodes[ v1 ];
+            moab::EntityHandle v1 = conn[i];
+            new_conn[i]           = newNodes[v1];
         }
 
         moab::EntityHandle newElement;
-        rval = mb->create_element( typeElem, &new_conn[ 0 ], nnodes, newElement );MB_CHK_ERR( rval );
+        rval = mb->create_element( typeElem, &new_conn[0], nnodes, newElement );MB_CHK_ERR( rval );
         // set the corresponding tag; not sure we need this one, from old to new
         /*rval = mb->tag_set_data(corrTag, &q, 1, &newElement);MB_CHK_ERR(rval);*/
         rval = mb->tag_set_data( corrTag, &newElement, 1, &q );MB_CHK_ERR( rval );

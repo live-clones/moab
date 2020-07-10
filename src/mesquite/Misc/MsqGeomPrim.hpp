@@ -46,22 +46,22 @@ class MESQUITE_EXPORT MsqLine
     Vector3D mDirection;  // unit direction
 
   public:
-    MsqLine( const Vector3D& p_point, const Vector3D& p_dir ) : mPoint( p_point ), mDirection( p_dir / p_dir.length( ) )
+    MsqLine( const Vector3D& p_point, const Vector3D& p_dir ) : mPoint( p_point ), mDirection( p_dir / p_dir.length() )
     {
     }
 
-    MsqLine( ) : mPoint( 0, 0, 0 ), mDirection( 0, 0, 0 ) {}
+    MsqLine() : mPoint( 0, 0, 0 ), mDirection( 0, 0, 0 ) {}
 
     static MsqLine two_point( const Vector3D& p1, const Vector3D& p2 )
     {
         return MsqLine( p1, p2 - p1 );
     }
 
-    const Vector3D& point( ) const
+    const Vector3D& point() const
     {
         return mPoint;
     }
-    const Vector3D& direction( ) const
+    const Vector3D& direction() const
     {
         return mDirection;
     }
@@ -69,7 +69,7 @@ class MESQUITE_EXPORT MsqLine
     //! Get point given parameter (mPoint + param * mDirection)
     Vector3D point( double param ) const
     {
-        return point( ) + param * direction( );
+        return point() + param * direction();
     }
 
     //! Get parameter value for location on line closest to input point.
@@ -80,7 +80,7 @@ class MESQUITE_EXPORT MsqLine
 
     double distance( const Vector3D& from_point ) const
     {
-        return ( point( closest( from_point ) ) - from_point ).length( );
+        return ( point( closest( from_point ) ) - from_point ).length();
     }
 
     //! Find intersection between two lines
@@ -97,13 +97,13 @@ class MESQUITE_EXPORT MsqCircle
   private:
     Vector3D mCenter;
     Vector3D mNormal;  //!< unit normal
-    double   mRadius;
+    double mRadius;
 
   public:
-    MsqCircle( ) : mCenter( 0, 0, 0 ), mNormal( 0, 0, 0 ), mRadius( 0 ) {}
+    MsqCircle() : mCenter( 0, 0, 0 ), mNormal( 0, 0, 0 ), mRadius( 0 ) {}
 
     MsqCircle( const Vector3D& p_center, const Vector3D& p_normal, double p_radius )
-        : mCenter( p_center ), mNormal( p_normal / p_normal.length( ) ), mRadius( p_radius )
+        : mCenter( p_center ), mNormal( p_normal / p_normal.length() ), mRadius( p_radius )
     {
     }
 
@@ -115,21 +115,21 @@ class MESQUITE_EXPORT MsqCircle
     //!\return false if points are colinear or not equidistant from center, true otherwise.
     static bool two_point( const Vector3D& center, const Vector3D& p1, const Vector3D& p2, MsqCircle& result );
 
-    const Vector3D& center( ) const
+    const Vector3D& center() const
     {
         return mCenter;
     }
-    const Vector3D& normal( ) const
+    const Vector3D& normal() const
     {
         return mNormal;
     }
-    double radius( ) const
+    double radius() const
     {
         return mRadius;
     }
 
     //! Get arbitrary radial vector (vector in plane with length equal to radius)
-    Vector3D radial_vector( ) const;
+    Vector3D radial_vector() const;
 
     //! Find closest point on circle to input position.  Returns
     //! arbitrary location on circle if point is at center.
@@ -146,7 +146,7 @@ class MESQUITE_EXPORT MsqPlane
 {
   private:
     Vector3D mNormal;  //!< unit normal
-    double   mCoeff;
+    double mCoeff;
 
   public:
     MsqPlane( const Vector3D& p_normal, double coeff );
@@ -155,19 +155,19 @@ class MESQUITE_EXPORT MsqPlane
     MsqPlane( double a, double b, double c, double d );
 
     //! get unit normal vector for plane
-    const Vector3D& normal( ) const
+    const Vector3D& normal() const
     {
         return mNormal;
     }
 
     //! get coefficient term for plane
-    double coefficient( ) const
+    double coefficient() const
     {
         return mCoeff;
     }
 
     //! Get point on plane closest to origin.
-    Vector3D point( ) const
+    Vector3D point() const
     {
         return -mCoeff * mNormal;
     }
@@ -175,13 +175,13 @@ class MESQUITE_EXPORT MsqPlane
     //! Get distance from point to plane
     double distance( const Vector3D& p_point ) const
     {
-        return fabs( normal( ) % p_point + coefficient( ) );
+        return fabs( normal() % p_point + coefficient() );
     }
 
     //! Get closest location on plane to input position
     Vector3D closest( const Vector3D& p_point ) const
     {
-        return p_point - normal( ) * ( normal( ) % p_point + coefficient( ) );
+        return p_point - normal() * ( normal() % p_point + coefficient() );
     }
 
     //! Find intersection of this plane with another.
@@ -198,16 +198,16 @@ class MESQUITE_EXPORT MsqSphere
 {
   private:
     Vector3D mCenter;
-    double   mRadius;
+    double mRadius;
 
   public:
     MsqSphere( const Vector3D& p_center, double p_radius ) : mCenter( p_center ), mRadius( p_radius ) {}
 
-    const Vector3D& center( ) const
+    const Vector3D& center() const
     {
         return mCenter;
     }
-    double radius( ) const
+    double radius() const
     {
         return mRadius;
     }
@@ -223,7 +223,7 @@ class MESQUITE_EXPORT MsqSphere
 
     double distance( const Vector3D& point ) const
     {
-        return fabs( ( center( ) - point ).length( ) - radius( ) );
+        return fabs( ( center() - point ).length() - radius() );
     }
 
     //! Intersect plane with sphere

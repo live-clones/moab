@@ -38,9 +38,9 @@
 namespace MBMesquite
 {
 
-TShape3DB2::~TShape3DB2( ) {}
+TShape3DB2::~TShape3DB2() {}
 
-std::string TShape3DB2::get_name( ) const
+std::string TShape3DB2::get_name() const
 {
     return "TShape3DB2";
 }
@@ -83,7 +83,7 @@ bool TShape3DB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
 }
 
 bool TShape3DB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T,
-                                     MsqMatrix< 3, 3 > second[ 6 ], MsqError& err )
+                                     MsqMatrix< 3, 3 > second[6], MsqError& err )
 {
     double f = sqr_Frobenius( T );
     double g = sqr_Frobenius( adj( T ) );
@@ -94,10 +94,10 @@ bool TShape3DB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
         return false;
     }
     const double den = 1.0 / ( 9 * d * d );
-    result = f * g * den - 1;
+    result           = f * g * den - 1;
 
-    MsqMatrix< 3, 3 > dg = 2 * ( f * T - T * transpose( T ) * T );
-    MsqMatrix< 3, 3 > df = 2 * T;
+    MsqMatrix< 3, 3 > dg   = 2 * ( f * T - T * transpose( T ) * T );
+    MsqMatrix< 3, 3 > df   = 2 * T;
     MsqMatrix< 3, 3 > dtau = transpose_adj( T );
 
     wrt_T = g * df + f * dg - 2 * f * g / d * transpose_adj( T );

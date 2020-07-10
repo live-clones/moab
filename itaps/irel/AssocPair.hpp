@@ -17,11 +17,11 @@ class AssocPair
                iRel_RelationStatus status0, iBase_Instance iface1, iRel_RelationType ent_or_set1, iRel_IfaceType type1,
                iRel_RelationStatus status1 );
 
-    ~AssocPair( );
+    ~AssocPair();
 
-    iBase_Instance      iface_instance( int iface_no ) const;
-    iRel_IfaceType      iface_type( int iface_no ) const;
-    iRel_RelationType   relation_type( int iface_no ) const;
+    iBase_Instance iface_instance( int iface_no ) const;
+    iRel_IfaceType iface_type( int iface_no ) const;
+    iRel_RelationType relation_type( int iface_no ) const;
     iRel_RelationStatus relation_status( int iface_no ) const;
 
     int change_type( int iface_no, iRel_RelationType type );
@@ -65,40 +65,40 @@ class AssocPair
     int get_dims( int iface_no, iBase_EntitySetHandle* sets, int num_sets, int* tag_values );
 
   private:
-    AssocPair( );
+    AssocPair();
 
     int populate_recursive( int iface_no, iBase_EntitySetHandle set, iBase_EntityHandle related_ent );
     int populate_recursive( int iface_no, iBase_EntitySetHandle set, iBase_EntitySetHandle related_set );
 
     int unpopulate_recursive( int iface_no, iBase_EntitySetHandle set );
 
-    iRel_Instance       instance;
-    AssocPairSide*      relSides[ 2 ];
-    iRel_RelationType   entOrSet[ 2 ];
-    iRel_RelationStatus relStatus[ 2 ];
-    int                 pairId;
+    iRel_Instance instance;
+    AssocPairSide* relSides[2];
+    iRel_RelationType entOrSet[2];
+    iRel_RelationStatus relStatus[2];
+    int pairId;
 
     static int currId;
 };
 
 inline iBase_Instance AssocPair::iface_instance( int iface_no ) const
 {
-    return relSides[ iface_no ]->instance( );
+    return relSides[iface_no]->instance();
 }
 
 inline iRel_IfaceType AssocPair::iface_type( int iface_no ) const
 {
-    return relSides[ iface_no ]->type( );
+    return relSides[iface_no]->type();
 }
 
 inline iRel_RelationType AssocPair::relation_type( int iface_no ) const
 {
-    return entOrSet[ iface_no ];
+    return entOrSet[iface_no];
 }
 
 inline iRel_RelationStatus AssocPair::relation_status( int iface_no ) const
 {
-    return relStatus[ iface_no ];
+    return relStatus[iface_no];
 }
 
 static inline AssocPair* assocpair_handle( iRel_PairHandle pair )

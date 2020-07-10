@@ -42,7 +42,7 @@ class HiReconstruction
     HiReconstruction( Core* impl, ParallelComm* comm = 0, EntityHandle meshIn = 0, int minpnts = 5,
                       bool recwhole = true );
 
-    ~HiReconstruction( );
+    ~HiReconstruction();
 
     ErrorCode initialize( bool recwhole );
 
@@ -245,7 +245,7 @@ class HiReconstruction
     };
 
   protected:
-    Core*         mbImpl;
+    Core* mbImpl;
     ParallelComm* pcomm;
     HalfFacetRep* ahf;
     // prevent copying
@@ -256,25 +256,25 @@ class HiReconstruction
     EntityHandle _mesh2rec;
     //_verts2rec all locally hosted vertices, in parallel might be different from _invert which is
     // all the vertices in _mesh2rec, including ghost vertices
-    Range  _verts2rec, _inverts, _inedges, _infaces, _incells;
+    Range _verts2rec, _inverts, _inedges, _infaces, _incells;
     size_t _nv2rec;  // size of _verts2rec
 
-    int    _MAXPNTS, _MINPNTS;
+    int _MAXPNTS, _MINPNTS;
     double _MINEPS;
 
     // in curve mesh, _hasderiv=true means vertex tangent vectors have been computed over _verts2rec
     // in surface mesh, _hasderiv=true means vertex normals have been computed over _verts2rec
     bool _hasderiv;
 
-    GEOMTYPE              _geom;
-    int                   _dim;
-    bool                  _hasfittings;
-    bool                  _initfittings;
+    GEOMTYPE _geom;
+    int _dim;
+    bool _hasfittings;
+    bool _initfittings;
     std::vector< double > _local_coords;
     std::vector< double > _local_fit_coeffs;
     std::vector< size_t > _vertID2coeffID;
-    std::vector< int >    _degrees_out;
-    std::vector< bool >   _interps;
+    std::vector< int > _degrees_out;
+    std::vector< bool > _interps;
 
     // Estimate stencil size
     int estimate_num_rings( int degree, bool interp );
@@ -334,7 +334,7 @@ class HiReconstruction
     /** Compute weighted average vertex normals for all vertices in _verts2rec, not including ghost
      * vertices, results are stored interally in _local_coords
      */
-    ErrorCode compute_average_vertex_normals_surf( );
+    ErrorCode compute_average_vertex_normals_surf();
 
     /** Return the normals of given vertices in a Range, writing to preallocated memory
      * If normals have been computed and stored, just access them
@@ -354,7 +354,7 @@ class HiReconstruction
     /** Compute weighted average vertex tangent vectors for all vertices in _verts2rec, not
      * including ghost vertices, results are stored interally in _local_coords
      */
-    ErrorCode compute_average_vertex_tangents_curve( );
+    ErrorCode compute_average_vertex_tangents_curve();
 
     /** Return the tangent vectors of given vertices in a Range, writing to preallocated memory
      * If tangent vectors have been computed and stored, just access them

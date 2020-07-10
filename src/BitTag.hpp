@@ -25,9 +25,9 @@ class BitTag : public TagInfo
   public:
     static BitTag* create_tag( const char* name, int size, const void* default_value = 0 );
 
-    virtual ~BitTag( );
+    virtual ~BitTag();
 
-    virtual TagType get_storage_type( ) const;
+    virtual TagType get_storage_type() const;
 
     /**\brief Remove/clear tag data for all entities
      *
@@ -283,7 +283,7 @@ class BitTag : public TagInfo
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
                                                 Range& output_entities, const void* value, int value_bytes = 0,
-                                                EntityType   type = MBMAXTYPE,
+                                                EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */
@@ -302,27 +302,27 @@ class BitTag : public TagInfo
 
     enum
     {
-        Ln2PageSize = 12,  //!< Constant: log2(PageSize)
-        PageSize = ( 1u << Ln2PageSize )  //!< Constant: Bytes per BitPage (power of 2)
+        Ln2PageSize = 12,                    //!< Constant: log2(PageSize)
+        PageSize    = ( 1u << Ln2PageSize )  //!< Constant: Bytes per BitPage (power of 2)
     };
 
   private:
     BitTag( const BitTag& );
-    BitTag&   operator=( const BitTag& );
+    BitTag& operator=( const BitTag& );
     ErrorCode reserve( unsigned bits );
 
-    inline unsigned char default_val( ) const
+    inline unsigned char default_val() const
     {
-        if( get_default_value( ) )
-            return *reinterpret_cast< const unsigned char* >( get_default_value( ) );
+        if( get_default_value() )
+            return *reinterpret_cast< const unsigned char* >( get_default_value() );
         else
             return 0;
     }
 
-    std::vector< BitPage* > pageList[ MBMAXTYPE ];  //!< Array of BitPage instances storing actual data.
-    unsigned int            requestedBitsPerEntity;  //!< user-requested bits per entity
-    unsigned int            storedBitsPerEntity;  //!< allocated bits per entity (power of 2)
-    unsigned int            pageShift;  //!< log2( ents_per_page() )
+    std::vector< BitPage* > pageList[MBMAXTYPE];  //!< Array of BitPage instances storing actual data.
+    unsigned int requestedBitsPerEntity;          //!< user-requested bits per entity
+    unsigned int storedBitsPerEntity;             //!< allocated bits per entity (power of 2)
+    unsigned int pageShift;                       //!< log2( ents_per_page() )
 
     /**\brief Get indices from handle
      *
@@ -332,22 +332,23 @@ class BitTag : public TagInfo
      */
     void unpack( EntityHandle h, EntityType& type, size_t& page, int& offset ) const
     {
-        type = TYPE_FROM_HANDLE( h );
-        h = ID_FROM_HANDLE( h );
-        page = ( (size_t)h ) >> pageShift;  // h / ents_per_page()
+        type   = TYPE_FROM_HANDLE( h );
+        h      = ID_FROM_HANDLE( h );
+        page   = ( (size_t)h ) >> pageShift;        // h / ents_per_page()
         offset = h & ( ( 1u << pageShift ) - 1u );  // h % ends_per_page()
     }
 
     /**\brief Get the number of tag values that are stored in each BitPage */
-    int ents_per_page( ) const
+    int ents_per_page() const
     {
         return 8 * PageSize / storedBitsPerEntity;
     }
 
-    template< class Container > inline void get_tagged( EntityType type, Container& entities ) const;
-    template< class Container >
+    template < class Container >
+    inline void get_tagged( EntityType type, Container& entities ) const;
+    template < class Container >
     inline void get_tagged( Range::const_iterator begin, Range::const_iterator end, Container& entities ) const;
-    template< class Container >
+    template < class Container >
     inline void get_tagged( Container& entities, EntityType type, const Range* intersect ) const;
 };
 

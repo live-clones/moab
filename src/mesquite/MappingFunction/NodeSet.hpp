@@ -58,7 +58,7 @@ class MESQUITE_EXPORT NodeSet
     //! a function of those three values and the size of the bit storage.
     // enum {
     static const BitSet NUM_TOTAL_BITS = 8 * sizeof( BitSet );
-    static const BitSet MSB_POS = NUM_TOTAL_BITS - 1;
+    static const BitSet MSB_POS        = NUM_TOTAL_BITS - 1;
     //! Maximum number of corner nodes.
     static const BitSet NUM_CORNER_BITS = 8;
     //! Maximum number of mid-edge nodes
@@ -125,10 +125,10 @@ class MESQUITE_EXPORT NodeSet
     }
 
   public:
-    NodeSet( ) : bits( 0u ) {}
+    NodeSet() : bits( 0u ) {}
 
     //! Clear all values
-    void clear( )
+    void clear()
     {
         bits = 0u;
     }
@@ -137,33 +137,33 @@ class MESQUITE_EXPORT NodeSet
     inline void set_all_nodes( EntityTopology type );
 
     //! Number of marked/flagged nodes
-    unsigned num_nodes( ) const
+    unsigned num_nodes() const
     {
         return popcount( bits );
     }
 
     //! Check if any mid-nodes (higher-order nodes) are flaged
-    BitSet have_any_mid_node( ) const
+    BitSet have_any_mid_node() const
     {
         return bits & MID_NODE_MASK;
     }
     //! Check if any corner nodes are present
-    BitSet have_any_corner_node( ) const
+    BitSet have_any_corner_node() const
     {
         return bits & CORNER_MASK;
     }
     //! Check if any mid-edge nodes are present
-    BitSet have_any_mid_edge_node( ) const
+    BitSet have_any_mid_edge_node() const
     {
         return bits & EDGE_MASK;
     }
     //! Check if any mid-face nodes are present
-    BitSet have_any_mid_face_node( ) const
+    BitSet have_any_mid_face_node() const
     {
         return bits & FACE_MASK;
     }
     //! Check if any mid-region nodes are present
-    BitSet have_any_mid_region_node( ) const
+    BitSet have_any_mid_region_node() const
     {
         return bits & REGION_MASK;
     }
@@ -353,27 +353,27 @@ class MESQUITE_EXPORT NodeSet
     inline void set_all_mid_region_nodes( EntityTopology type );
 
     //! Clear all mid-nodes
-    void clear_all_mid_nodes( )
+    void clear_all_mid_nodes()
     {
         bits &= ~MID_NODE_MASK;
     }
     //! Clear all corner nodes
-    void clear_all_corner_nodes( )
+    void clear_all_corner_nodes()
     {
         bits &= ~CORNER_MASK;
     }
     //! Clear all mid-edge nodes
-    void clear_all_mid_edge_nodes( )
+    void clear_all_mid_edge_nodes()
     {
         bits &= ~EDGE_MASK;
     }
     //! Clear all mid-face nodes
-    void clear_all_mid_face_nodes( )
+    void clear_all_mid_face_nodes()
     {
         bits &= ~FACE_MASK;
     }
     //! Clear all mid-region nodes
-    void clear_all_mid_region_nodes( )
+    void clear_all_mid_region_nodes()
     {
         bits &= ~REGION_MASK;
     }
@@ -421,7 +421,7 @@ class MESQUITE_EXPORT NodeSet
         }
     }
 
-    unsigned get_bits( ) const
+    unsigned get_bits() const
     {
         return bits;
     }
@@ -449,7 +449,7 @@ void NodeSet::set_all_mid_face_nodes( EntityTopology p_type )
 //! Set all mid-region nodes
 void NodeSet::set_all_mid_region_nodes( EntityTopology )
 {
-    set_mid_region_node( );
+    set_mid_region_node();
 }
 
 void NodeSet::set_all_nodes( EntityTopology p_type )
@@ -457,7 +457,7 @@ void NodeSet::set_all_nodes( EntityTopology p_type )
     switch( TopologyInfo::dimension( p_type ) )
     {
         case 3:
-            set_mid_region_node( );
+            set_mid_region_node();
         case 2:
             set_all_mid_face_nodes( p_type );
         case 1:

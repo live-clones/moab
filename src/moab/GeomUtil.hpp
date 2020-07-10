@@ -71,7 +71,7 @@ namespace GeomUtil
      *                  intersect test.
      *\return true if intersection, false otherwise.
      */
-    bool ray_tri_intersect( const CartVect vertices[ 3 ], const CartVect& ray_point, const CartVect& ray_unit_direction,
+    bool ray_tri_intersect( const CartVect vertices[3], const CartVect& ray_point, const CartVect& ray_unit_direction,
                             double& t_out, const double* ray_length = 0 );
 
     /**\brief Plücker test for intersection between a ray and a triangle.
@@ -117,10 +117,10 @@ namespace GeomUtil
        6 = pip1 = pip2 == 0 -> NODE2 */
     const intersection_type type_list[] = { INTERIOR, EDGE0, EDGE1, NODE1, EDGE2, NODE0, NODE2 };
 
-    bool   plucker_ray_tri_intersect( const CartVect vertices[ 3 ], const CartVect& ray_point,
-                                      const CartVect& ray_unit_direction, double& dist_out,
-                                      const double* nonneg_ray_length = 0, const double* neg_ray_length = 0,
-                                      const int* orientation = 0, intersection_type* int_type = 0 );
+    bool plucker_ray_tri_intersect( const CartVect vertices[3], const CartVect& ray_point,
+                                    const CartVect& ray_unit_direction, double& dist_out,
+                                    const double* nonneg_ray_length = 0, const double* neg_ray_length = 0,
+                                    const int* orientation = 0, intersection_type* int_type = 0 );
     double plucker_edge_test( const CartVect& vertexa, const CartVect& vertexb, const CartVect& ray,
                               const CartVect& ray_normal );
 
@@ -191,7 +191,7 @@ namespace GeomUtil
      *                    test.
      *\return true if overlap, false otherwise.
      */
-    bool box_tri_overlap( const CartVect triangle_corners[ 3 ], const CartVect& box_min_corner,
+    bool box_tri_overlap( const CartVect triangle_corners[3], const CartVect& box_min_corner,
                           const CartVect& box_max_corner, double tolerance );
 
     /**\brief Test if triangle intersects axis-aligned box
@@ -203,7 +203,7 @@ namespace GeomUtil
      *                    box_center to the boundary of the box.
      *\return true if overlap, false otherwise.
      */
-    bool box_tri_overlap( const CartVect triangle_corners[ 3 ], const CartVect& box_center,
+    bool box_tri_overlap( const CartVect triangle_corners[3], const CartVect& box_center,
                           const CartVect& box_half_dims );
 
     bool box_point_overlap( const CartVect& box_min_corner, const CartVect& box_max_corner, const CartVect& point,
@@ -291,11 +291,11 @@ namespace GeomUtil
 
     // Finds whether or not a box defined by the center and the half
     // width intersects a trilinear hex defined by its eight vertices.
-    bool box_hex_overlap( const CartVect hexv[ 8 ], const CartVect& box_center, const CartVect& box_dims );
+    bool box_hex_overlap( const CartVect hexv[8], const CartVect& box_center, const CartVect& box_dims );
 
     // Finds whether or not a box defined by the center and the half
     // width intersects a linear tetrahedron defined by its four vertices.
-    bool box_tet_overlap( const CartVect tet_corners[ 4 ], const CartVect& box_center, const CartVect& box_dims );
+    bool box_tet_overlap( const CartVect tet_corners[4], const CartVect& box_center, const CartVect& box_dims );
 
     // tests if 2 boxes overlap within a tolerance
     // assume that data is valid, box_min1 << box_max1, and box_min2<< box_max2

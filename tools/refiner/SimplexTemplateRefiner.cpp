@@ -10,13 +10,13 @@
 
 // Static arrays holding parametric coordinates of element vertices
 static double MBVertexParametric[] = { 0., 0., 0. };
-static double MBEdgeParametric[] = { 0., 0., 0., 1., 0., 0. };
-static double MBTriParametric[] = { 0., 0., 0., 1., 0., 0., 0., 1., 0. };
-static double MBTetParametric[] = { 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0., 1. };
+static double MBEdgeParametric[]   = { 0., 0., 0., 1., 0., 0. };
+static double MBTriParametric[]    = { 0., 0., 0., 1., 0., 0., 0., 1., 0. };
+static double MBTetParametric[]    = { 0., 0., 0., 1., 0., 0., 0., 1., 0., 0., 0., 1. };
 
 #ifdef MB_DEBUG_TESSELLATOR
-#define MB_TESSELLATOR_INCR_CASE_COUNT( cs ) this->case_counts[ cs ]++
-#define MB_TESSELLATOR_INCR_SUBCASE_COUNT( cs, sc ) this->subcase_counts[ cs ][ sc ]++
+#define MB_TESSELLATOR_INCR_CASE_COUNT( cs )        this->case_counts[cs]++
+#define MB_TESSELLATOR_INCR_SUBCASE_COUNT( cs, sc ) this->subcase_counts[cs][sc]++
 #else  // MB_DEBUG_TESSELLATOR
 #define MB_TESSELLATOR_INCR_CASE_COUNT( cs )
 #define MB_TESSELLATOR_INCR_SUBCASE_COUNT( cs, sc )
@@ -26,18 +26,18 @@ namespace moab
 {
 
 /// Construct a template refiner.
-SimplexTemplateRefiner::SimplexTemplateRefiner( )
+SimplexTemplateRefiner::SimplexTemplateRefiner()
 {
-    this->tag_manager = 0;
+    this->tag_manager  = 0;
     this->tag_assigner = new SimplexTemplateTagAssigner( this );
     this->corner_coords.resize( 6 * 8 );  // Hex has 8 verts w/ 6 coordinates each
-    this->corner_tags.resize( 8 );  // Hex has 8 verts (this is a pointer, not the actual tag data)
-    this->corner_handles.resize( 8 );  // Hex has 8 verts (this is a pointer, not actual hash data)
-    this->input_is_output = false;  // Until we know better
+    this->corner_tags.resize( 8 );        // Hex has 8 verts (this is a pointer, not the actual tag data)
+    this->corner_handles.resize( 8 );     // Hex has 8 verts (this is a pointer, not actual hash data)
+    this->input_is_output = false;        // Until we know better
 }
 
 /// Empty destructor for good form.
-SimplexTemplateRefiner::~SimplexTemplateRefiner( )
+SimplexTemplateRefiner::~SimplexTemplateRefiner()
 {
     delete this->tag_assigner;
 }
@@ -46,35 +46,34 @@ SimplexTemplateRefiner::~SimplexTemplateRefiner( )
  */
 bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity )
 {
-    this->reset_heap_pointers( );
-    bool                rval = true;
+    this->reset_heap_pointers();
+    bool rval = true;
     const EntityHandle* conn;
-    int                 num_nodes;
-    Interface*          imesh = this->tag_manager->get_input_mesh( );
+    int num_nodes;
+    Interface* imesh = this->tag_manager->get_input_mesh();
     if( imesh->get_connectivity( entity, conn, num_nodes ) != MB_SUCCESS ) { return false; }
     this->corner_coords.resize( 6 * num_nodes );
     this->corner_tags.resize( num_nodes );
     this->corner_handles.resize( num_nodes );
 
     // Have to make num_nodes calls to get_coords() because we need xyz interleaved with rst coords.
-    Tag   tag_handle;
-    int   tag_offset;
+    Tag tag_handle;
+    int tag_offset;
     void* tag_data;
     for( int n = 0; n < num_nodes; ++n )
     {
-        if( imesh->get_coords( &conn[ n ], 1, &corner_coords[ 6 * n + 3 ] ) != MB_SUCCESS ) { return false; }
-        tag_data = this->heap_tag_storage( );
-        for( int i = 0; i < this->tag_manager->get_number_of_vertex_tags( ); ++i )
+        if( imesh->get_coords( &conn[n], 1, &corner_coords[6 * n + 3] ) != MB_SUCCESS ) { return false; }
+        tag_data = this->heap_tag_storage();
+        for( int i = 0; i < this->tag_manager->get_number_of_vertex_tags(); ++i )
         {
             this->tag_manager->get_input_vertex_tag( i, tag_handle, tag_offset );
-            if( imesh->tag_get_data( tag_handle, &conn[ n ], 1, (char*)tag_data + tag_offset ) != MB_SUCCESS )
+            if( imesh->tag_get_data( tag_handle, &conn[n], 1, (char*)tag_data + tag_offset ) != MB_SUCCESS )
             { return false; }
         }
-        if( this->input_is_output ) { this->corner_handles[ n ] = conn[ n ]; }
+        if( this->input_is_output ) { this->corner_handles[n] = conn[n]; }
         else
         {
-            this->corner_handles[ n ] =
-                this->output_functor->map_vertex( conn[ n ], &corner_coords[ 6 * n ], tag_data );
+            this->corner_handles[n] = this->output_functor->map_vertex( conn[n], &corner_coords[6 * n], tag_data );
 #if 0
       std::cout << "#+# " << this->corner_handles[n] << " < "
         << corner_coords[ 6 * n + 3 ] << ", "
@@ -82,28 +81,28 @@ bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity
         << corner_coords[ 6 * n + 5 ] << ">\n";
 #endif  // 0
         }
-        this->corner_tags[ n ] = tag_data;
+        this->corner_tags[n] = tag_data;
     }
 
     switch( etyp )
     {
         case MBVERTEX:
-            this->assign_parametric_coordinates( 1, MBVertexParametric, &this->corner_coords[ 0 ] );
-            this->refine_0_simplex( &this->corner_coords[ 0 ], this->corner_tags[ 0 ], this->corner_handles[ 0 ] );
+            this->assign_parametric_coordinates( 1, MBVertexParametric, &this->corner_coords[0] );
+            this->refine_0_simplex( &this->corner_coords[0], this->corner_tags[0], this->corner_handles[0] );
             rval = false;
             break;
         case MBEDGE:
-            this->assign_parametric_coordinates( 2, MBEdgeParametric, &this->corner_coords[ 0 ] );
-            rval = this->refine_1_simplex( this->maximum_number_of_subdivisions, &this->corner_coords[ 0 ],
-                                           this->corner_tags[ 0 ], this->corner_handles[ 0 ], &this->corner_coords[ 6 ],
-                                           this->corner_tags[ 1 ], this->corner_handles[ 1 ] );
+            this->assign_parametric_coordinates( 2, MBEdgeParametric, &this->corner_coords[0] );
+            rval = this->refine_1_simplex( this->maximum_number_of_subdivisions, &this->corner_coords[0],
+                                           this->corner_tags[0], this->corner_handles[0], &this->corner_coords[6],
+                                           this->corner_tags[1], this->corner_handles[1] );
             break;
         case MBTRI:
-            this->assign_parametric_coordinates( 3, MBTriParametric, &this->corner_coords[ 0 ] );
-            rval = this->refine_2_simplex(
-                this->maximum_number_of_subdivisions, 7, &this->corner_coords[ 0 ], this->corner_tags[ 0 ],
-                this->corner_handles[ 0 ], &this->corner_coords[ 6 ], this->corner_tags[ 1 ], this->corner_handles[ 1 ],
-                &this->corner_coords[ 12 ], this->corner_tags[ 2 ], this->corner_handles[ 2 ] );
+            this->assign_parametric_coordinates( 3, MBTriParametric, &this->corner_coords[0] );
+            rval = this->refine_2_simplex( this->maximum_number_of_subdivisions, 7, &this->corner_coords[0],
+                                           this->corner_tags[0], this->corner_handles[0], &this->corner_coords[6],
+                                           this->corner_tags[1], this->corner_handles[1], &this->corner_coords[12],
+                                           this->corner_tags[2], this->corner_handles[2] );
             break;
         case MBQUAD:
             std::cerr << "Quadrilaterals not handled yet\n";
@@ -114,12 +113,12 @@ bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity
             rval = false;
             break;
         case MBTET:
-            this->assign_parametric_coordinates( 4, MBTetParametric, &this->corner_coords[ 0 ] );
-            rval = this->refine_3_simplex(
-                this->maximum_number_of_subdivisions, &this->corner_coords[ 0 ], this->corner_tags[ 0 ],
-                this->corner_handles[ 0 ], &this->corner_coords[ 6 ], this->corner_tags[ 1 ], this->corner_handles[ 1 ],
-                &this->corner_coords[ 12 ], this->corner_tags[ 2 ], this->corner_handles[ 2 ],
-                &this->corner_coords[ 18 ], this->corner_tags[ 3 ], this->corner_handles[ 3 ] );
+            this->assign_parametric_coordinates( 4, MBTetParametric, &this->corner_coords[0] );
+            rval = this->refine_3_simplex( this->maximum_number_of_subdivisions, &this->corner_coords[0],
+                                           this->corner_tags[0], this->corner_handles[0], &this->corner_coords[6],
+                                           this->corner_tags[1], this->corner_handles[1], &this->corner_coords[12],
+                                           this->corner_tags[2], this->corner_handles[2], &this->corner_coords[18],
+                                           this->corner_tags[3], this->corner_handles[3] );
             break;
         case MBPYRAMID:
             std::cerr << "Pyramid schemes not handled yet\n";
@@ -175,7 +174,7 @@ bool SimplexTemplateRefiner::prepare( RefinerTagManager* tmgr, EntityRefinerOutp
 {
     this->tag_manager = tmgr;
     this->tag_assigner->set_tag_manager( tmgr );
-    this->input_is_output = ( this->tag_manager->get_input_mesh( ) == this->tag_manager->get_output_mesh( ) );
+    this->input_is_output = ( this->tag_manager->get_input_mesh() == this->tag_manager->get_output_mesh() );
     // this->tag_assigner->set_edge_size_evaluator( this->edge_size_evaluator );
     return this->EntityRefiner::prepare( tmgr, ofunc );
 }
@@ -214,26 +213,26 @@ bool SimplexTemplateRefiner::refine_1_simplex( int max_depth, const double* v0, 
     int edge_code = 0;
 
     double* midptc;
-    void*   midptt;
+    void* midptt;
     // NB: If support for multiple recursive subdivisions (without a merge in between) is required,
     //     this will have to change as it assumes that h0 and h1 have only a single entry.
     EntityHandle midpth = 0;
 
     if( max_depth-- > 0 )
     {
-        midptc = this->heap_coord_storage( );
-        midptt = this->heap_tag_storage( );
+        midptc = this->heap_coord_storage();
+        midptt = this->heap_tag_storage();
         int i;
         // make valgrind happy
         // vtkstd::fill( midpt0, midpt0 + 6, 0. );
         for( i = 0; i < 6; i++ )
-            midptc[ i ] = ( v0[ i ] + v1[ i ] ) / 2.;
+            midptc[i] = ( v0[i] + v1[i] ) / 2.;
 
         ( *this->tag_assigner )( v0, t0, h0, midptc, midptt, v1, t1, h1 );
         if( this->edge_size_evaluator->evaluate_edge( v0, t0, midptc, midptt, v1, t1 ) )
         {
             edge_code = 1;
-            midpth = ( *this->output_functor )( h0, h1, midptc, midptt );
+            midpth    = ( *this->output_functor )( h0, h1, midptc, midptt );
         }
     }
 
@@ -264,12 +263,12 @@ bool SimplexTemplateRefiner::refine_2_simplex( int max_depth, int move, const do
 {
     int edge_code = 0;
 
-    double*      midpt0c;
-    double*      midpt1c;
-    double*      midpt2c;
-    void*        midpt0t;
-    void*        midpt1t;
-    void*        midpt2t;
+    double* midpt0c;
+    double* midpt1c;
+    double* midpt2c;
+    void* midpt0t;
+    void* midpt1t;
+    void* midpt2t;
     EntityHandle midpt0h = 0;
     EntityHandle midpt1h = 0;
     EntityHandle midpt2h = 0;
@@ -277,20 +276,20 @@ bool SimplexTemplateRefiner::refine_2_simplex( int max_depth, int move, const do
     if( max_depth-- > 0 )
     {
         int i;
-        midpt0c = this->heap_coord_storage( );
-        midpt1c = this->heap_coord_storage( );
-        midpt2c = this->heap_coord_storage( );
-        midpt0t = this->heap_tag_storage( );
-        midpt1t = this->heap_tag_storage( );
-        midpt2t = this->heap_tag_storage( );
+        midpt0c = this->heap_coord_storage();
+        midpt1c = this->heap_coord_storage();
+        midpt2c = this->heap_coord_storage();
+        midpt0t = this->heap_tag_storage();
+        midpt1t = this->heap_tag_storage();
+        midpt2t = this->heap_tag_storage();
         midpt0h = 0;
         midpt1h = 0;
         midpt2h = 0;
         for( i = 0; i < 6; ++i )
         {
-            midpt0c[ i ] = ( v0[ i ] + v1[ i ] ) / 2.;
-            midpt1c[ i ] = ( v1[ i ] + v2[ i ] ) / 2.;
-            midpt2c[ i ] = ( v2[ i ] + v0[ i ] ) / 2.;
+            midpt0c[i] = ( v0[i] + v1[i] ) / 2.;
+            midpt1c[i] = ( v1[i] + v2[i] ) / 2.;
+            midpt2c[i] = ( v2[i] + v0[i] ) / 2.;
         }
         ( *this->tag_assigner )( v0, t0, h0, midpt0c, midpt0t, v1, t1, h1 );
         ( *this->tag_assigner )( v1, t1, h1, midpt1c, midpt1t, v2, t2, h2 );
@@ -433,28 +432,28 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
 
     if( max_depth-- > 0 )
     {
-        midpt0c = this->heap_coord_storage( );
-        midpt1c = this->heap_coord_storage( );
-        midpt2c = this->heap_coord_storage( );
-        midpt3c = this->heap_coord_storage( );
-        midpt4c = this->heap_coord_storage( );
-        midpt5c = this->heap_coord_storage( );
+        midpt0c = this->heap_coord_storage();
+        midpt1c = this->heap_coord_storage();
+        midpt2c = this->heap_coord_storage();
+        midpt3c = this->heap_coord_storage();
+        midpt4c = this->heap_coord_storage();
+        midpt5c = this->heap_coord_storage();
 
-        midpt0t = this->heap_tag_storage( );
-        midpt1t = this->heap_tag_storage( );
-        midpt2t = this->heap_tag_storage( );
-        midpt3t = this->heap_tag_storage( );
-        midpt4t = this->heap_tag_storage( );
-        midpt5t = this->heap_tag_storage( );
+        midpt0t = this->heap_tag_storage();
+        midpt1t = this->heap_tag_storage();
+        midpt2t = this->heap_tag_storage();
+        midpt3t = this->heap_tag_storage();
+        midpt4t = this->heap_tag_storage();
+        midpt5t = this->heap_tag_storage();
 
         for( int i = 0; i < 6; ++i )
         {
-            midpt0c[ i ] = ( v0[ i ] + v1[ i ] ) * .5;
-            midpt1c[ i ] = ( v1[ i ] + v2[ i ] ) * .5;
-            midpt2c[ i ] = ( v2[ i ] + v0[ i ] ) * .5;
-            midpt3c[ i ] = ( v0[ i ] + v3[ i ] ) * .5;
-            midpt4c[ i ] = ( v1[ i ] + v3[ i ] ) * .5;
-            midpt5c[ i ] = ( v2[ i ] + v3[ i ] ) * .5;
+            midpt0c[i] = ( v0[i] + v1[i] ) * .5;
+            midpt1c[i] = ( v1[i] + v2[i] ) * .5;
+            midpt2c[i] = ( v2[i] + v0[i] ) * .5;
+            midpt3c[i] = ( v0[i] + v3[i] ) * .5;
+            midpt4c[i] = ( v1[i] + v3[i] ) * .5;
+            midpt5c[i] = ( v2[i] + v3[i] ) * .5;
         }
 
         ( *this->tag_assigner )( v0, t0, h0, midpt0c, midpt0t, v1, t1, h1 );
@@ -496,25 +495,25 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
         }
     }
 
-    double edge_length2[ 6 ];
+    double edge_length2[6];
     for( int ei = 0; ei < 6; ++ei )
-        edge_length2[ ei ] = 0.;
+        edge_length2[ei] = 0.;
 
     for( int c = 0; c < 3; ++c )
     {
         double tmp;
-        tmp = v1[ c ] - v0[ c ];
-        edge_length2[ 0 ] += tmp * tmp;
-        tmp = v2[ c ] - v1[ c ];
-        edge_length2[ 1 ] += tmp * tmp;
-        tmp = v2[ c ] - v0[ c ];
-        edge_length2[ 2 ] += tmp * tmp;
-        tmp = v3[ c ] - v0[ c ];
-        edge_length2[ 3 ] += tmp * tmp;
-        tmp = v3[ c ] - v1[ c ];
-        edge_length2[ 4 ] += tmp * tmp;
-        tmp = v3[ c ] - v2[ c ];
-        edge_length2[ 5 ] += tmp * tmp;
+        tmp = v1[c] - v0[c];
+        edge_length2[0] += tmp * tmp;
+        tmp = v2[c] - v1[c];
+        edge_length2[1] += tmp * tmp;
+        tmp = v2[c] - v0[c];
+        edge_length2[2] += tmp * tmp;
+        tmp = v3[c] - v0[c];
+        edge_length2[3] += tmp * tmp;
+        tmp = v3[c] - v1[c];
+        edge_length2[4] += tmp * tmp;
+        tmp = v3[c] - v2[c];
+        edge_length2[5] += tmp * tmp;
     }
 
     if( 0 == edge_code )
@@ -533,50 +532,49 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
     double* facept1c;
     double* facept2c;
     double* facept3c;
-    facept0c = this->heap_coord_storage( );
-    facept1c = this->heap_coord_storage( );
-    facept2c = this->heap_coord_storage( );
-    facept3c = this->heap_coord_storage( );
-    double* vertex_coords[ 14 ] = { v0,      v1,      v2,      v3,       midpt0c,  midpt1c,  midpt2c,
-                                    midpt3c, midpt4c, midpt5c, facept0c, facept1c, facept2c, facept3c };
+    facept0c                  = this->heap_coord_storage();
+    facept1c                  = this->heap_coord_storage();
+    facept2c                  = this->heap_coord_storage();
+    facept3c                  = this->heap_coord_storage();
+    double* vertex_coords[14] = { v0,      v1,      v2,      v3,       midpt0c,  midpt1c,  midpt2c,
+                                  midpt3c, midpt4c, midpt5c, facept0c, facept1c, facept2c, facept3c };
 
-    void* facept0t = this->heap_tag_storage( );
-    void* facept1t = this->heap_tag_storage( );
-    void* facept2t = this->heap_tag_storage( );
-    void* facept3t = this->heap_tag_storage( );
-    void* vertex_tags[ 14 ] = { t0,      t1,      t2,      t3,       midpt0t,  midpt1t,  midpt2t,
-                                midpt3t, midpt4t, midpt5t, facept0t, facept1t, facept2t, facept3t };
+    void* facept0t        = this->heap_tag_storage();
+    void* facept1t        = this->heap_tag_storage();
+    void* facept2t        = this->heap_tag_storage();
+    void* facept3t        = this->heap_tag_storage();
+    void* vertex_tags[14] = { t0,      t1,      t2,      t3,       midpt0t,  midpt1t,  midpt2t,
+                              midpt3t, midpt4t, midpt5t, facept0t, facept1t, facept2t, facept3t };
 
-    EntityHandle vertex_hash[ 14 ] = { h0,      h1,      h2,      h3, midpt0h, midpt1h, midpt2h,
-                                       midpt3h, midpt4h, midpt5h, 0,  0,       0,       0 };
+    EntityHandle vertex_hash[14] = { h0, h1, h2, h3, midpt0h, midpt1h, midpt2h, midpt3h, midpt4h, midpt5h, 0, 0, 0, 0 };
 
     // Generate tetrahedra that are compatible except when edge
     // lengths are equal on indeterminately subdivided faces.
-    double*      permuted_coords[ 14 ];
-    void*        permuted_tags[ 14 ];
-    EntityHandle permuted_hash[ 14 ];
-    double       permlen[ 6 ];  // permuted edge lengths
-    int          C = SimplexTemplateRefiner::template_index[ edge_code ][ 0 ];
-    int          P = SimplexTemplateRefiner::template_index[ edge_code ][ 1 ];
+    double* permuted_coords[14];
+    void* permuted_tags[14];
+    EntityHandle permuted_hash[14];
+    double permlen[6];  // permuted edge lengths
+    int C = SimplexTemplateRefiner::template_index[edge_code][0];
+    int P = SimplexTemplateRefiner::template_index[edge_code][1];
 
     // 1. Permute the tetrahedron into our canonical configuration
     for( int i = 0; i < 14; ++i )
     {
-        permuted_coords[ i ] = vertex_coords[ SimplexTemplateRefiner::permutations_from_index[ P ][ i ] ];
-        permuted_tags[ i ] = vertex_tags[ SimplexTemplateRefiner::permutations_from_index[ P ][ i ] ];
-        permuted_hash[ i ] = vertex_hash[ SimplexTemplateRefiner::permutations_from_index[ P ][ i ] ];
+        permuted_coords[i] = vertex_coords[SimplexTemplateRefiner::permutations_from_index[P][i]];
+        permuted_tags[i]   = vertex_tags[SimplexTemplateRefiner::permutations_from_index[P][i]];
+        permuted_hash[i]   = vertex_hash[SimplexTemplateRefiner::permutations_from_index[P][i]];
     }
 
     for( int i = 4; i < 10; ++i )
     {
         // permute edge lengths too
-        permlen[ i - 4 ] = edge_length2[ SimplexTemplateRefiner::permutations_from_index[ P ][ i ] - 4 ];
+        permlen[i - 4] = edge_length2[SimplexTemplateRefiner::permutations_from_index[P][i] - 4];
     }
 
-    int                comparison_bits;
+    int comparison_bits;
     std::stack< int* > output_tets;
     std::stack< int* > output_perm;
-    std::stack< int >  output_sign;
+    std::stack< int > output_sign;
 
     // cout << "Case " << C << "  Permutation " << P << endl;
     // 2. Generate tetrahedra based on the configuration.
@@ -587,48 +585,46 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
         case 1:  // Ruprecht-Müller Case 1
             MB_TESSELLATOR_INCR_CASE_COUNT( 0 );
             output_tets.push( SimplexTemplateRefiner::templates + 0 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 0, 0 );
             break;
         case 2:  // Ruprecht-Müller Case 2a
-            comparison_bits = ( permlen[ 0 ] <= permlen[ 1 ] ? 1 : 0 ) | ( permlen[ 0 ] >= permlen[ 1 ] ? 2 : 0 ) | 0;
+            comparison_bits = ( permlen[0] <= permlen[1] ? 1 : 0 ) | ( permlen[0] >= permlen[1] ? 2 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 10 ][ i ] = ( permuted_coords[ 0 ][ i ] + permuted_coords[ 2 ][ i ] ) * .375 +
-                                                 permuted_coords[ 1 ][ i ] * .25;
+                    permuted_coords[10][i] =
+                        ( permuted_coords[0][i] + permuted_coords[2][i] ) * .375 + permuted_coords[1][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 0 ], permuted_tags[ 2 ], permuted_tags[ 1 ],
-                                         permuted_tags[ 10 ] );
-                permuted_hash[ 10 ] =
-                    ( *this->output_functor )( permuted_hash[ 0 ], permuted_hash[ 2 ], permuted_hash[ 1 ],
-                                               permuted_coords[ 10 ], permuted_tags[ 10 ] );
+                ( *this->tag_assigner )( permuted_tags[0], permuted_tags[2], permuted_tags[1], permuted_tags[10] );
+                permuted_hash[10] = ( *this->output_functor )( permuted_hash[0], permuted_hash[2], permuted_hash[1],
+                                                               permuted_coords[10], permuted_tags[10] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 1 );
             output_tets.push( SimplexTemplateRefiner::templates + 9 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 1, 0 );
             switch( comparison_bits )
             {
                 case 2:  // 0>1
                     output_tets.push( SimplexTemplateRefiner::templates + 14 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 1, 1 );
                     break;
                 case 1:  // 1>0
                     output_tets.push( SimplexTemplateRefiner::templates + 14 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 13 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[13] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 1, 2 );
                     break;
                 case 3:  // 0=1
                     output_tets.push( SimplexTemplateRefiner::templates + 23 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 1, 3 );
                     break;
@@ -637,138 +633,132 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
         case 3:  // Ruprecht-Müller Case 2b
             MB_TESSELLATOR_INCR_CASE_COUNT( 2 );
             output_tets.push( SimplexTemplateRefiner::templates + 40 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 2, 0 );
             break;
         case 4:  // Ruprecht-Müller Case 3a
-            comparison_bits = ( permlen[ 0 ] <= permlen[ 3 ] ? 1 : 0 ) | ( permlen[ 0 ] >= permlen[ 3 ] ? 2 : 0 ) |
-                              ( permlen[ 2 ] <= permlen[ 3 ] ? 4 : 0 ) | ( permlen[ 2 ] >= permlen[ 3 ] ? 8 : 0 ) |
-                              ( permlen[ 0 ] <= permlen[ 2 ] ? 16 : 0 ) | ( permlen[ 0 ] >= permlen[ 2 ] ? 32 : 0 ) | 0;
+            comparison_bits = ( permlen[0] <= permlen[3] ? 1 : 0 ) | ( permlen[0] >= permlen[3] ? 2 : 0 ) |
+                              ( permlen[2] <= permlen[3] ? 4 : 0 ) | ( permlen[2] >= permlen[3] ? 8 : 0 ) |
+                              ( permlen[0] <= permlen[2] ? 16 : 0 ) | ( permlen[0] >= permlen[2] ? 32 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 11 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 3 ][ i ] ) * .375 +
-                                                 permuted_coords[ 0 ][ i ] * .25;
+                    permuted_coords[11][i] =
+                        ( permuted_coords[1][i] + permuted_coords[3][i] ) * .375 + permuted_coords[0][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 3 ], permuted_tags[ 0 ],
-                                         permuted_tags[ 11 ] );
-                permuted_hash[ 11 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 3 ], permuted_hash[ 0 ],
-                                               permuted_coords[ 11 ], permuted_tags[ 11 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[3], permuted_tags[0], permuted_tags[11] );
+                permuted_hash[11] = ( *this->output_functor )( permuted_hash[1], permuted_hash[3], permuted_hash[0],
+                                                               permuted_coords[11], permuted_tags[11] );
             }
             if( ( comparison_bits & 12 ) == 12 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 13 ][ i ] = ( permuted_coords[ 2 ][ i ] + permuted_coords[ 3 ][ i ] ) * .375 +
-                                                 permuted_coords[ 0 ][ i ] * .25;
+                    permuted_coords[13][i] =
+                        ( permuted_coords[2][i] + permuted_coords[3][i] ) * .375 + permuted_coords[0][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 2 ], permuted_tags[ 3 ], permuted_tags[ 0 ],
-                                         permuted_tags[ 13 ] );
-                permuted_hash[ 13 ] =
-                    ( *this->output_functor )( permuted_hash[ 2 ], permuted_hash[ 3 ], permuted_hash[ 0 ],
-                                               permuted_coords[ 13 ], permuted_tags[ 13 ] );
+                ( *this->tag_assigner )( permuted_tags[2], permuted_tags[3], permuted_tags[0], permuted_tags[13] );
+                permuted_hash[13] = ( *this->output_functor )( permuted_hash[2], permuted_hash[3], permuted_hash[0],
+                                                               permuted_coords[13], permuted_tags[13] );
             }
             if( ( comparison_bits & 48 ) == 48 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 10 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 2 ][ i ] ) * .375 +
-                                                 permuted_coords[ 0 ][ i ] * .25;
+                    permuted_coords[10][i] =
+                        ( permuted_coords[1][i] + permuted_coords[2][i] ) * .375 + permuted_coords[0][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 2 ], permuted_tags[ 0 ],
-                                         permuted_tags[ 10 ] );
-                permuted_hash[ 10 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 2 ], permuted_hash[ 0 ],
-                                               permuted_coords[ 10 ], permuted_tags[ 10 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[2], permuted_tags[0], permuted_tags[10] );
+                permuted_hash[10] = ( *this->output_functor )( permuted_hash[1], permuted_hash[2], permuted_hash[0],
+                                                               permuted_coords[10], permuted_tags[10] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 3 );
             output_tets.push( SimplexTemplateRefiner::templates + 57 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 0 );
             switch( comparison_bits )
             {
                 case 42:  // 0>2>3<0
                     output_tets.push( SimplexTemplateRefiner::templates + 62 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 1 );
                     break;
                 case 25:  // 2>3>0<2
                     output_tets.push( SimplexTemplateRefiner::templates + 62 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 11 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[11] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 2 );
                     break;
                 case 37:  // 3>0>2<3
                     output_tets.push( SimplexTemplateRefiner::templates + 62 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 3 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[3] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 3 );
                     break;
                 case 21:  // 3>2>0<3
                     output_tets.push( SimplexTemplateRefiner::templates + 62 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 22 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[22] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 4 );
                     break;
                 case 26:  // 2>0>3<2
                     output_tets.push( SimplexTemplateRefiner::templates + 62 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 12 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[12] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 5 );
                     break;
                 case 38:  // 0>3>2<0
                     output_tets.push( SimplexTemplateRefiner::templates + 62 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 6 );
                     break;
                 case 58:  // 0=2>3<0
                     output_tets.push( SimplexTemplateRefiner::templates + 75 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 7 );
                     break;
                 case 29:  // 2=3>0<2
                     output_tets.push( SimplexTemplateRefiner::templates + 75 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 11 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[11] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 8 );
                     break;
                 case 39:  // 0=3>2<0
                     output_tets.push( SimplexTemplateRefiner::templates + 75 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 3 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[3] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 9 );
                     break;
                 case 53:  // 3>0=2<3
                     output_tets.push( SimplexTemplateRefiner::templates + 96 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 10 );
                     break;
                 case 46:  // 0>2=3<0
                     output_tets.push( SimplexTemplateRefiner::templates + 96 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 11 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[11] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 11 );
                     break;
                 case 27:  // 2>0=3<2
                     output_tets.push( SimplexTemplateRefiner::templates + 96 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 3 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[3] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 12 );
                     break;
                 case 63:  // 0=2=3=0
                     output_tets.push( SimplexTemplateRefiner::templates + 117 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 3, 13 );
                     break;
@@ -777,394 +767,373 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
         case 5:  // Ruprecht-Müller Case 3b
             MB_TESSELLATOR_INCR_CASE_COUNT( 4 );
             output_tets.push( SimplexTemplateRefiner::templates + 162 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 4, 0 );
             break;
         case 6:  // Ruprecht-Müller Case 3c
-            comparison_bits = ( permlen[ 0 ] <= permlen[ 1 ] ? 1 : 0 ) | ( permlen[ 0 ] >= permlen[ 1 ] ? 2 : 0 ) |
-                              ( permlen[ 0 ] <= permlen[ 3 ] ? 4 : 0 ) | ( permlen[ 0 ] >= permlen[ 3 ] ? 8 : 0 ) | 0;
+            comparison_bits = ( permlen[0] <= permlen[1] ? 1 : 0 ) | ( permlen[0] >= permlen[1] ? 2 : 0 ) |
+                              ( permlen[0] <= permlen[3] ? 4 : 0 ) | ( permlen[0] >= permlen[3] ? 8 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 10 ][ i ] = ( permuted_coords[ 0 ][ i ] + permuted_coords[ 2 ][ i ] ) * .375 +
-                                                 permuted_coords[ 1 ][ i ] * .25;
+                    permuted_coords[10][i] =
+                        ( permuted_coords[0][i] + permuted_coords[2][i] ) * .375 + permuted_coords[1][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 0 ], permuted_tags[ 2 ], permuted_tags[ 1 ],
-                                         permuted_tags[ 10 ] );
-                permuted_hash[ 10 ] =
-                    ( *this->output_functor )( permuted_hash[ 0 ], permuted_hash[ 2 ], permuted_hash[ 1 ],
-                                               permuted_coords[ 10 ], permuted_tags[ 10 ] );
+                ( *this->tag_assigner )( permuted_tags[0], permuted_tags[2], permuted_tags[1], permuted_tags[10] );
+                permuted_hash[10] = ( *this->output_functor )( permuted_hash[0], permuted_hash[2], permuted_hash[1],
+                                                               permuted_coords[10], permuted_tags[10] );
             }
             if( ( comparison_bits & 12 ) == 12 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 11 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 3 ][ i ] ) * .375 +
-                                                 permuted_coords[ 0 ][ i ] * .25;
+                    permuted_coords[11][i] =
+                        ( permuted_coords[1][i] + permuted_coords[3][i] ) * .375 + permuted_coords[0][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 3 ], permuted_tags[ 0 ],
-                                         permuted_tags[ 11 ] );
-                permuted_hash[ 11 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 3 ], permuted_hash[ 0 ],
-                                               permuted_coords[ 11 ], permuted_tags[ 11 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[3], permuted_tags[0], permuted_tags[11] );
+                permuted_hash[11] = ( *this->output_functor )( permuted_hash[1], permuted_hash[3], permuted_hash[0],
+                                                               permuted_coords[11], permuted_tags[11] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 5 );
             switch( comparison_bits )
             {
                 case 10:  // 0>1,0>3
                     output_tets.push( SimplexTemplateRefiner::templates + 179 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 0 );
                     break;
                 case 5:  // 1>0,3>0
                     output_tets.push( SimplexTemplateRefiner::templates + 200 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 1 );
                     break;
                 case 6:  // 0>1,3>0
                     output_tets.push( SimplexTemplateRefiner::templates + 221 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 2 );
                     break;
                 case 9:  // 1>0,0>3
                     output_tets.push( SimplexTemplateRefiner::templates + 242 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 3 );
                     break;
                 case 11:  // 0=1,0>3
                     output_tets.push( SimplexTemplateRefiner::templates + 263 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 4 );
                     break;
                 case 14:  // 0=3,0>1
                     output_tets.push( SimplexTemplateRefiner::templates + 263 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 5 );
                     break;
                 case 7:  // 3>0,0=1
                     output_tets.push( SimplexTemplateRefiner::templates + 292 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 6 );
                     break;
                 case 13:  // 1>0,0=3
                     output_tets.push( SimplexTemplateRefiner::templates + 292 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 7 );
                     break;
                 case 15:  // 0=1,0=3
                     output_tets.push( SimplexTemplateRefiner::templates + 321 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 5, 8 );
                     break;
             }
             break;
         case 7:  // Ruprecht-Müller Case 3d
-            comparison_bits = ( permlen[ 0 ] <= permlen[ 2 ] ? 1 : 0 ) | ( permlen[ 0 ] >= permlen[ 2 ] ? 2 : 0 ) |
-                              ( permlen[ 0 ] <= permlen[ 4 ] ? 4 : 0 ) | ( permlen[ 0 ] >= permlen[ 4 ] ? 8 : 0 ) | 0;
+            comparison_bits = ( permlen[0] <= permlen[2] ? 1 : 0 ) | ( permlen[0] >= permlen[2] ? 2 : 0 ) |
+                              ( permlen[0] <= permlen[4] ? 4 : 0 ) | ( permlen[0] >= permlen[4] ? 8 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 10 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 2 ][ i ] ) * .375 +
-                                                 permuted_coords[ 0 ][ i ] * .25;
+                    permuted_coords[10][i] =
+                        ( permuted_coords[1][i] + permuted_coords[2][i] ) * .375 + permuted_coords[0][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 2 ], permuted_tags[ 0 ],
-                                         permuted_tags[ 10 ] );
-                permuted_hash[ 10 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 2 ], permuted_hash[ 0 ],
-                                               permuted_coords[ 10 ], permuted_tags[ 10 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[2], permuted_tags[0], permuted_tags[10] );
+                permuted_hash[10] = ( *this->output_functor )( permuted_hash[1], permuted_hash[2], permuted_hash[0],
+                                                               permuted_coords[10], permuted_tags[10] );
             }
             if( ( comparison_bits & 12 ) == 12 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 11 ][ i ] = ( permuted_coords[ 0 ][ i ] + permuted_coords[ 3 ][ i ] ) * .375 +
-                                                 permuted_coords[ 1 ][ i ] * .25;
+                    permuted_coords[11][i] =
+                        ( permuted_coords[0][i] + permuted_coords[3][i] ) * .375 + permuted_coords[1][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 0 ], permuted_tags[ 3 ], permuted_tags[ 1 ],
-                                         permuted_tags[ 11 ] );
-                permuted_hash[ 11 ] =
-                    ( *this->output_functor )( permuted_hash[ 0 ], permuted_hash[ 3 ], permuted_hash[ 1 ],
-                                               permuted_coords[ 11 ], permuted_tags[ 11 ] );
+                ( *this->tag_assigner )( permuted_tags[0], permuted_tags[3], permuted_tags[1], permuted_tags[11] );
+                permuted_hash[11] = ( *this->output_functor )( permuted_hash[0], permuted_hash[3], permuted_hash[1],
+                                                               permuted_coords[11], permuted_tags[11] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 6 );
             switch( comparison_bits )
             {
                 case 10:  // 0>4,0>2
                     output_tets.push( SimplexTemplateRefiner::templates + 362 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 0 );
                     break;
                 case 5:  // 4>0,2>0
                     output_tets.push( SimplexTemplateRefiner::templates + 383 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 1 );
                     break;
                 case 9:  // 0>4,2>0
                     output_tets.push( SimplexTemplateRefiner::templates + 404 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 2 );
                     break;
                 case 6:  // 4>0,0>2
                     output_tets.push( SimplexTemplateRefiner::templates + 425 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 3 );
                     break;
                 case 14:  // 0=4,0>2
                     output_tets.push( SimplexTemplateRefiner::templates + 446 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 4 );
                     break;
                 case 11:  // 0=2,0>4
                     output_tets.push( SimplexTemplateRefiner::templates + 446 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 5 );
                     break;
                 case 13:  // 2>0,0=4
                     output_tets.push( SimplexTemplateRefiner::templates + 475 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 6 );
                     break;
                 case 7:  // 4>0,0=2
                     output_tets.push( SimplexTemplateRefiner::templates + 475 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 7 );
                     break;
                 case 15:  // 0=4,0=2
                     output_tets.push( SimplexTemplateRefiner::templates + 504 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 6, 8 );
                     break;
             }
             break;
         case 8:  // Ruprecht-Müller Case 4a
-            comparison_bits = ( permlen[ 4 ] <= permlen[ 5 ] ? 1 : 0 ) | ( permlen[ 4 ] >= permlen[ 5 ] ? 2 : 0 ) |
-                              ( permlen[ 3 ] <= permlen[ 4 ] ? 4 : 0 ) | ( permlen[ 3 ] >= permlen[ 4 ] ? 8 : 0 ) | 0;
+            comparison_bits = ( permlen[4] <= permlen[5] ? 1 : 0 ) | ( permlen[4] >= permlen[5] ? 2 : 0 ) |
+                              ( permlen[3] <= permlen[4] ? 4 : 0 ) | ( permlen[3] >= permlen[4] ? 8 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 12 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 2 ][ i ] ) * .375 +
-                                                 permuted_coords[ 3 ][ i ] * .25;
+                    permuted_coords[12][i] =
+                        ( permuted_coords[1][i] + permuted_coords[2][i] ) * .375 + permuted_coords[3][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 2 ], permuted_tags[ 3 ],
-                                         permuted_tags[ 12 ] );
-                permuted_hash[ 12 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 2 ], permuted_hash[ 3 ],
-                                               permuted_coords[ 12 ], permuted_tags[ 12 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[2], permuted_tags[3], permuted_tags[12] );
+                permuted_hash[12] = ( *this->output_functor )( permuted_hash[1], permuted_hash[2], permuted_hash[3],
+                                                               permuted_coords[12], permuted_tags[12] );
             }
             if( ( comparison_bits & 12 ) == 12 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 11 ][ i ] = ( permuted_coords[ 0 ][ i ] + permuted_coords[ 1 ][ i ] ) * .375 +
-                                                 permuted_coords[ 3 ][ i ] * .25;
+                    permuted_coords[11][i] =
+                        ( permuted_coords[0][i] + permuted_coords[1][i] ) * .375 + permuted_coords[3][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 0 ], permuted_tags[ 1 ], permuted_tags[ 3 ],
-                                         permuted_tags[ 11 ] );
-                permuted_hash[ 11 ] =
-                    ( *this->output_functor )( permuted_hash[ 0 ], permuted_hash[ 1 ], permuted_hash[ 3 ],
-                                               permuted_coords[ 11 ], permuted_tags[ 11 ] );
+                ( *this->tag_assigner )( permuted_tags[0], permuted_tags[1], permuted_tags[3], permuted_tags[11] );
+                permuted_hash[11] = ( *this->output_functor )( permuted_hash[0], permuted_hash[1], permuted_hash[3],
+                                                               permuted_coords[11], permuted_tags[11] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 7 );
             output_tets.push( SimplexTemplateRefiner::templates + 545 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 0 );
             switch( comparison_bits )
             {
                 case 5:  // 5>4>3
                     output_tets.push( SimplexTemplateRefiner::templates + 554 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 1 );
                     break;
                 case 10:  // 3>4>5
                     output_tets.push( SimplexTemplateRefiner::templates + 554 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 13 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[13] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 2 );
                     break;
                 case 6:  // 3<4>5
                     output_tets.push( SimplexTemplateRefiner::templates + 571 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 3 );
                     break;
                 case 9:  // 3>4<5
                     output_tets.push( SimplexTemplateRefiner::templates + 588 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 4 );
                     break;
                 case 14:  // 3=4>5
                     output_tets.push( SimplexTemplateRefiner::templates + 605 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 5 );
                     break;
                 case 7:  // 4=5,4>3
                     output_tets.push( SimplexTemplateRefiner::templates + 605 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 13 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[13] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 6 );
                     break;
                 case 13:  // 5>4,3=4
                     output_tets.push( SimplexTemplateRefiner::templates + 630 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 7 );
                     break;
                 case 11:  // 3>4=5
                     output_tets.push( SimplexTemplateRefiner::templates + 630 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 13 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[13] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 8 );
                     break;
                 case 15:  // 3=4=5
                     output_tets.push( SimplexTemplateRefiner::templates + 655 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 7, 9 );
                     break;
             }
             break;
         case 9:  // Ruprecht-Müller Case 4b
-            comparison_bits = ( permlen[ 1 ] <= permlen[ 2 ] ? 1 : 0 ) | ( permlen[ 1 ] >= permlen[ 2 ] ? 2 : 0 ) |
-                              ( permlen[ 2 ] <= permlen[ 3 ] ? 4 : 0 ) | ( permlen[ 2 ] >= permlen[ 3 ] ? 8 : 0 ) |
-                              ( permlen[ 3 ] <= permlen[ 4 ] ? 16 : 0 ) | ( permlen[ 3 ] >= permlen[ 4 ] ? 32 : 0 ) |
-                              ( permlen[ 1 ] <= permlen[ 4 ] ? 64 : 0 ) | ( permlen[ 1 ] >= permlen[ 4 ] ? 128 : 0 ) |
-                              0;
+            comparison_bits = ( permlen[1] <= permlen[2] ? 1 : 0 ) | ( permlen[1] >= permlen[2] ? 2 : 0 ) |
+                              ( permlen[2] <= permlen[3] ? 4 : 0 ) | ( permlen[2] >= permlen[3] ? 8 : 0 ) |
+                              ( permlen[3] <= permlen[4] ? 16 : 0 ) | ( permlen[3] >= permlen[4] ? 32 : 0 ) |
+                              ( permlen[1] <= permlen[4] ? 64 : 0 ) | ( permlen[1] >= permlen[4] ? 128 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 10 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 0 ][ i ] ) * .375 +
-                                                 permuted_coords[ 2 ][ i ] * .25;
+                    permuted_coords[10][i] =
+                        ( permuted_coords[1][i] + permuted_coords[0][i] ) * .375 + permuted_coords[2][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 0 ], permuted_tags[ 2 ],
-                                         permuted_tags[ 10 ] );
-                permuted_hash[ 10 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 0 ], permuted_hash[ 2 ],
-                                               permuted_coords[ 10 ], permuted_tags[ 10 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[0], permuted_tags[2], permuted_tags[10] );
+                permuted_hash[10] = ( *this->output_functor )( permuted_hash[1], permuted_hash[0], permuted_hash[2],
+                                                               permuted_coords[10], permuted_tags[10] );
             }
             if( ( comparison_bits & 12 ) == 12 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 13 ][ i ] = ( permuted_coords[ 2 ][ i ] + permuted_coords[ 3 ][ i ] ) * .375 +
-                                                 permuted_coords[ 0 ][ i ] * .25;
+                    permuted_coords[13][i] =
+                        ( permuted_coords[2][i] + permuted_coords[3][i] ) * .375 + permuted_coords[0][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 2 ], permuted_tags[ 3 ], permuted_tags[ 0 ],
-                                         permuted_tags[ 13 ] );
-                permuted_hash[ 13 ] =
-                    ( *this->output_functor )( permuted_hash[ 2 ], permuted_hash[ 3 ], permuted_hash[ 0 ],
-                                               permuted_coords[ 13 ], permuted_tags[ 13 ] );
+                ( *this->tag_assigner )( permuted_tags[2], permuted_tags[3], permuted_tags[0], permuted_tags[13] );
+                permuted_hash[13] = ( *this->output_functor )( permuted_hash[2], permuted_hash[3], permuted_hash[0],
+                                                               permuted_coords[13], permuted_tags[13] );
             }
             if( ( comparison_bits & 48 ) == 48 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 11 ][ i ] = ( permuted_coords[ 0 ][ i ] + permuted_coords[ 1 ][ i ] ) * .375 +
-                                                 permuted_coords[ 3 ][ i ] * .25;
+                    permuted_coords[11][i] =
+                        ( permuted_coords[0][i] + permuted_coords[1][i] ) * .375 + permuted_coords[3][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 0 ], permuted_tags[ 1 ], permuted_tags[ 3 ],
-                                         permuted_tags[ 11 ] );
-                permuted_hash[ 11 ] =
-                    ( *this->output_functor )( permuted_hash[ 0 ], permuted_hash[ 1 ], permuted_hash[ 3 ],
-                                               permuted_coords[ 11 ], permuted_tags[ 11 ] );
+                ( *this->tag_assigner )( permuted_tags[0], permuted_tags[1], permuted_tags[3], permuted_tags[11] );
+                permuted_hash[11] = ( *this->output_functor )( permuted_hash[0], permuted_hash[1], permuted_hash[3],
+                                                               permuted_coords[11], permuted_tags[11] );
             }
             if( ( comparison_bits & 192 ) == 192 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 12 ][ i ] = ( permuted_coords[ 2 ][ i ] + permuted_coords[ 3 ][ i ] ) * .375 +
-                                                 permuted_coords[ 1 ][ i ] * .25;
+                    permuted_coords[12][i] =
+                        ( permuted_coords[2][i] + permuted_coords[3][i] ) * .375 + permuted_coords[1][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 2 ], permuted_tags[ 3 ], permuted_tags[ 1 ],
-                                         permuted_tags[ 12 ] );
-                permuted_hash[ 12 ] =
-                    ( *this->output_functor )( permuted_hash[ 2 ], permuted_hash[ 3 ], permuted_hash[ 1 ],
-                                               permuted_coords[ 12 ], permuted_tags[ 12 ] );
+                ( *this->tag_assigner )( permuted_tags[2], permuted_tags[3], permuted_tags[1], permuted_tags[12] );
+                permuted_hash[12] = ( *this->output_functor )( permuted_hash[2], permuted_hash[3], permuted_hash[1],
+                                                               permuted_coords[12], permuted_tags[12] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 8 );
             switch( comparison_bits )
             {
                 case 85:  // 2>1,3>2,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 0 );
                     break;
                 case 102:  // 1>2,3>2,3>4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 1 );
                     break;
                 case 170:  // 1>2,2>3,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 2 );
                     break;
                 case 153:  // 2>1,2>3,4>3,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 3 );
                     break;
                 case 90:  // 1>2,2>3,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 9 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[9] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 4 );
                     break;
                 case 105:  // 2>1,2>3,3>4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 7 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[7] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 5 );
                     break;
                 case 165:  // 2>1,3>2,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 19 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[19] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 6 );
                     break;
                 case 150:  // 1>2,3>2,4>3,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 688 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 23 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[23] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 7 );
                     break;
@@ -1174,7 +1143,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 0, 1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 8 );
                     break;
@@ -1184,7 +1153,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 14, -1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 9 );
                     break;
@@ -1194,7 +1163,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 5, 1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 10 );
                     break;
@@ -1204,293 +1173,289 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 15, -1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 11 );
                     break;
                 case 89:  // 2>1,2>3,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 763 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 12 );
                     break;
                 case 166:  // 1>2,3>2,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 763 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 13 );
                     break;
                 case 103:  // 1=2,3>2,3>4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 14 );
                     break;
                 case 87:  // 1=2,3>2,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 15 );
                     break;
                 case 185:  // 2>1,2>3,3=4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 16 );
                     break;
                 case 186:  // 1>2,2>3,3=4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 17 );
                     break;
                 case 158:  // 1>2,2=3,4>3,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 9 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[9] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 18 );
                     break;
                 case 229:  // 2>1,3>2,3>4,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 7 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[7] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 19 );
                     break;
                 case 233:  // 2>1,2>3,3>4,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 19 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[19] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 20 );
                     break;
                 case 94:  // 1>2,2=3,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 788 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 23 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[23] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 21 );
                     break;
                 case 155:  // 1=2,2>3,4>3,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 22 );
                     break;
                 case 171:  // 1=2,2>3,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 23 );
                     break;
                 case 118:  // 1>2,3>2,3=4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 24 );
                     break;
                 case 117:  // 2>1,3>2,3=4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 25 );
                     break;
                 case 109:  // 2>1,2=3,3>4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 9 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[9] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 26 );
                     break;
                 case 218:  // 1>2,2>3,4>3,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 7 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[7] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 27 );
                     break;
                 case 214:  // 1>2,3>2,4>3,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 19 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[19] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 28 );
                     break;
                 case 173:  // 2>1,2=3,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 825 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 23 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[23] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 29 );
                     break;
                 case 91:  // 1=2,2>3,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 30 );
                     break;
                 case 167:  // 1=2,3>2,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 31 );
                     break;
                 case 182:  // 1>2,3>2,3=4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 32 );
                     break;
                 case 121:  // 2>1,2>3,3=4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 33 );
                     break;
                 case 93:  // 2>1,2=3,4>3,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 9 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[9] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 34 );
                     break;
                 case 217:  // 2>1,2>3,4>3,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 7 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[7] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 35 );
                     break;
                 case 230:  // 1>2,3>2,3>4,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 19 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[19] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 36 );
                     break;
                 case 174:  // 1>2,2=3,3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 862 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 23 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[23] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 37 );
                     break;
                 case 119:  // 1=2,3>2,3=4,4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 899 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 38 );
                     break;
                 case 187:  // 1=2>3=4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 899 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 39 );
                     break;
                 case 222:  // 1>2,2=3,4>3,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 899 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 9 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[9] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 40 );
                     break;
                 case 237:  // 2>1,2=3,3>4,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 899 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 7 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[7] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 41 );
                     break;
                 case 95:  // 4>1=2=3,4>3
                     output_tets.push( SimplexTemplateRefiner::templates + 944 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 42 );
                     break;
                 case 231:  // 1=2,3>2,3>4,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 944 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 43 );
                     break;
                 case 190:  // 1>2=3=4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 944 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 44 );
                     break;
                 case 249:  // 2>1,2>3,3=4,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 944 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 45 );
                     break;
                 case 175:  // 1=2=3>4,1>4
                     output_tets.push( SimplexTemplateRefiner::templates + 993 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 46 );
                     break;
                 case 219:  // 1=2>3,4>3,1=4
                     output_tets.push( SimplexTemplateRefiner::templates + 993 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 47 );
                     break;
                 case 125:  // 2>1,2=3=4>1
                     output_tets.push( SimplexTemplateRefiner::templates + 993 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 48 );
                     break;
                 case 246:  // 1>2,3>2,3=4=1
                     output_tets.push( SimplexTemplateRefiner::templates + 993 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 49 );
                     break;
                 case 255:  // 1=2=3=4=1
                     output_tets.push( SimplexTemplateRefiner::templates + 1042 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 8, 50 );
                     break;
             }
             break;
         case 10:  // Ruprecht-Müller Case 5
-            comparison_bits = ( permlen[ 1 ] <= permlen[ 2 ] ? 1 : 0 ) | ( permlen[ 1 ] >= permlen[ 2 ] ? 2 : 0 ) |
-                              ( permlen[ 3 ] <= permlen[ 4 ] ? 4 : 0 ) | ( permlen[ 3 ] >= permlen[ 4 ] ? 8 : 0 ) | 0;
+            comparison_bits = ( permlen[1] <= permlen[2] ? 1 : 0 ) | ( permlen[1] >= permlen[2] ? 2 : 0 ) |
+                              ( permlen[3] <= permlen[4] ? 4 : 0 ) | ( permlen[3] >= permlen[4] ? 8 : 0 ) | 0;
             if( ( comparison_bits & 3 ) == 3 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 10 ][ i ] = ( permuted_coords[ 1 ][ i ] + permuted_coords[ 0 ][ i ] ) * .375 +
-                                                 permuted_coords[ 2 ][ i ] * .25;
+                    permuted_coords[10][i] =
+                        ( permuted_coords[1][i] + permuted_coords[0][i] ) * .375 + permuted_coords[2][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 1 ], permuted_tags[ 0 ], permuted_tags[ 2 ],
-                                         permuted_tags[ 10 ] );
-                permuted_hash[ 10 ] =
-                    ( *this->output_functor )( permuted_hash[ 1 ], permuted_hash[ 0 ], permuted_hash[ 2 ],
-                                               permuted_coords[ 10 ], permuted_tags[ 10 ] );
+                ( *this->tag_assigner )( permuted_tags[1], permuted_tags[0], permuted_tags[2], permuted_tags[10] );
+                permuted_hash[10] = ( *this->output_functor )( permuted_hash[1], permuted_hash[0], permuted_hash[2],
+                                                               permuted_coords[10], permuted_tags[10] );
             }
             if( ( comparison_bits & 12 ) == 12 )
             {
                 // Compute face point and tag
                 for( int i = 0; i < 6; ++i )
                 {
-                    permuted_coords[ 11 ][ i ] = ( permuted_coords[ 0 ][ i ] + permuted_coords[ 1 ][ i ] ) * .375 +
-                                                 permuted_coords[ 3 ][ i ] * .25;
+                    permuted_coords[11][i] =
+                        ( permuted_coords[0][i] + permuted_coords[1][i] ) * .375 + permuted_coords[3][i] * .25;
                 }
-                ( *this->tag_assigner )( permuted_tags[ 0 ], permuted_tags[ 1 ], permuted_tags[ 3 ],
-                                         permuted_tags[ 11 ] );
-                permuted_hash[ 11 ] =
-                    ( *this->output_functor )( permuted_hash[ 0 ], permuted_hash[ 1 ], permuted_hash[ 3 ],
-                                               permuted_coords[ 11 ], permuted_tags[ 11 ] );
+                ( *this->tag_assigner )( permuted_tags[0], permuted_tags[1], permuted_tags[3], permuted_tags[11] );
+                permuted_hash[11] = ( *this->output_functor )( permuted_hash[0], permuted_hash[1], permuted_hash[3],
+                                                               permuted_coords[11], permuted_tags[11] );
             }
             MB_TESSELLATOR_INCR_CASE_COUNT( 9 );
             output_tets.push( SimplexTemplateRefiner::templates + 1107 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 0 );
             switch( comparison_bits )
             {
                 case 10:  // 1>2,3>4
                     output_tets.push( SimplexTemplateRefiner::templates + 1116 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 1 );
                     break;
                 case 5:  // 2>1,4>3
                     output_tets.push( SimplexTemplateRefiner::templates + 1116 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 2 );
                     break;
@@ -1500,7 +1465,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 0, 1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 3 );
                     break;
@@ -1510,7 +1475,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 14, -1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 4 );
                     break;
@@ -1520,7 +1485,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 0, 1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 5 );
                     break;
@@ -1530,7 +1495,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 14, -1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 14 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[14] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 6 );
                     break;
@@ -1540,7 +1505,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 5, 1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 5 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[5] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 7 );
                     break;
@@ -1550,13 +1515,13 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                     output_tets.push( SimplexTemplateRefiner::templates +
                                       this->best_tets( alternates, permuted_coords, 15, -1 ) );
                 }
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 15 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[15] );
                     output_sign.push( -1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 8 );
                     break;
                 case 15:  // 1=2,3=4
                     output_tets.push( SimplexTemplateRefiner::templates + 1278 );
-                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+                    output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
                     output_sign.push( 1 );
                     MB_TESSELLATOR_INCR_SUBCASE_COUNT( 9, 9 );
                     break;
@@ -1565,7 +1530,7 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
         case 11:  // Ruprecht-Müller Case 6
             MB_TESSELLATOR_INCR_CASE_COUNT( 10 );
             output_tets.push( SimplexTemplateRefiner::templates + 1319 );
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 10, 0 );
             {
@@ -1573,43 +1538,42 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
                 output_tets.push( SimplexTemplateRefiner::templates +
                                   this->best_tets( alternates, permuted_coords, 0, 1 ) );
             }
-            output_perm.push( SimplexTemplateRefiner::permutations_from_index[ 0 ] );
+            output_perm.push( SimplexTemplateRefiner::permutations_from_index[0] );
             output_sign.push( 1 );
             MB_TESSELLATOR_INCR_SUBCASE_COUNT( 10, 1 );
             break;
     }
 
     int* tets;
-    int  ntets;
+    int ntets;
     int* perm;
-    int  sgn;
+    int sgn;
 #ifdef MB_DEBUG_TESSELLATOR
-    if( output_tets.empty( ) ) { cout << "Argh! Case " << C << " Perm " << P << " has no output!" << endl; }
+    if( output_tets.empty() ) { cout << "Argh! Case " << C << " Perm " << P << " has no output!" << endl; }
 #endif  // MB_DEBUG_TESSELLATOR
-    while( !output_tets.empty( ) )
+    while( !output_tets.empty() )
     {
-        tets = output_tets.top( );
+        tets  = output_tets.top();
         ntets = *tets;
         tets++;
-        perm = output_perm.top( );
-        sgn = output_sign.top( );
+        perm = output_perm.top();
+        sgn  = output_sign.top();
 
-        output_tets.pop( );
-        output_perm.pop( );
-        output_sign.pop( );
+        output_tets.pop();
+        output_perm.pop();
+        output_sign.pop();
 
         int t;
         if( sgn > 0 )
         {
             for( t = 0; t < ntets; ++t )
             {
-                this->refine_3_simplex( max_depth, permuted_coords[ perm[ tets[ 0 ] ] ],
-                                        permuted_tags[ perm[ tets[ 0 ] ] ], permuted_hash[ perm[ tets[ 0 ] ] ],
-                                        permuted_coords[ perm[ tets[ 1 ] ] ], permuted_tags[ perm[ tets[ 1 ] ] ],
-                                        permuted_hash[ perm[ tets[ 1 ] ] ], permuted_coords[ perm[ tets[ 2 ] ] ],
-                                        permuted_tags[ perm[ tets[ 2 ] ] ], permuted_hash[ perm[ tets[ 2 ] ] ],
-                                        permuted_coords[ perm[ tets[ 3 ] ] ], permuted_tags[ perm[ tets[ 3 ] ] ],
-                                        permuted_hash[ perm[ tets[ 3 ] ] ] );
+                this->refine_3_simplex( max_depth, permuted_coords[perm[tets[0]]], permuted_tags[perm[tets[0]]],
+                                        permuted_hash[perm[tets[0]]], permuted_coords[perm[tets[1]]],
+                                        permuted_tags[perm[tets[1]]], permuted_hash[perm[tets[1]]],
+                                        permuted_coords[perm[tets[2]]], permuted_tags[perm[tets[2]]],
+                                        permuted_hash[perm[tets[2]]], permuted_coords[perm[tets[3]]],
+                                        permuted_tags[perm[tets[3]]], permuted_hash[perm[tets[3]]] );
                 tets += 4;
             }
         }
@@ -1619,13 +1583,12 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
             // so the orientation is positive.
             for( t = 0; t < ntets; ++t )
             {
-                this->refine_3_simplex( max_depth, permuted_coords[ perm[ tets[ 1 ] ] ],
-                                        permuted_tags[ perm[ tets[ 1 ] ] ], permuted_hash[ perm[ tets[ 1 ] ] ],
-                                        permuted_coords[ perm[ tets[ 0 ] ] ], permuted_tags[ perm[ tets[ 0 ] ] ],
-                                        permuted_hash[ perm[ tets[ 0 ] ] ], permuted_coords[ perm[ tets[ 2 ] ] ],
-                                        permuted_tags[ perm[ tets[ 2 ] ] ], permuted_hash[ perm[ tets[ 2 ] ] ],
-                                        permuted_coords[ perm[ tets[ 3 ] ] ], permuted_tags[ perm[ tets[ 3 ] ] ],
-                                        permuted_hash[ perm[ tets[ 3 ] ] ] );
+                this->refine_3_simplex( max_depth, permuted_coords[perm[tets[1]]], permuted_tags[perm[tets[1]]],
+                                        permuted_hash[perm[tets[1]]], permuted_coords[perm[tets[0]]],
+                                        permuted_tags[perm[tets[0]]], permuted_hash[perm[tets[0]]],
+                                        permuted_coords[perm[tets[2]]], permuted_tags[perm[tets[2]]],
+                                        permuted_hash[perm[tets[2]]], permuted_coords[perm[tets[3]]],
+                                        permuted_tags[perm[tets[3]]], permuted_hash[perm[tets[3]]] );
                 tets += 4;
             }
         }
@@ -1640,7 +1603,7 @@ void SimplexTemplateRefiner::assign_parametric_coordinates( int num_nodes, const
 {
     for( int i = 0; i < num_nodes; ++i, src += 3, tgt += 6 )
         for( int j = 0; j < 3; ++j )
-            tgt[ j ] = src[ j ];
+            tgt[j] = src[j];
 }
 
 /**\brief Returns true if || a0a1 || < || b0b1 ||
@@ -1656,9 +1619,9 @@ bool SimplexTemplateRefiner::compare_Hopf_cross_string_dist( const double* a0, c
     for( int i = 0; i < 3; ++i )
     {
         double tmp;
-        tmp = a0[ i ] - a1[ i ];
+        tmp = a0[i] - a1[i];
         sq_mag_a += tmp * tmp;
-        tmp = b0[ i ] - b1[ i ];
+        tmp = b0[i] - b1[i];
         sq_mag_b += tmp * tmp;
     }
     return sq_mag_a < sq_mag_b;
@@ -1700,7 +1663,7 @@ bool SimplexTemplateRefiner::compare_Hopf_cross_string_dist( const double* a0, c
  *   Tetrahedron Subdivision, Mathematical Visualization (eds.
  *   Hege and Polthier), pp. 61--70. Springer-Verlag. 1998.
  */
-int SimplexTemplateRefiner::template_index[ 64 ][ 2 ] = {
+int SimplexTemplateRefiner::template_index[64][2] = {
     /*      code case      C    P */
     /* 000000  0  0  */ { 0, 0 },
     /* 100000  1  1  */ { 1, 0 },
@@ -1788,7 +1751,7 @@ int SimplexTemplateRefiner::template_index[ 64 ][ 2 ] = {
  * There are 24 entries, 6 for each of the 4 faces of
  * the tetrahedron.
  */
-int SimplexTemplateRefiner::permutations_from_index[ 24 ][ 14 ] = {
+int SimplexTemplateRefiner::permutations_from_index[24][14] = {
     /* corners      midpoints          face points   */
     /* POSITIVE ARRANGEMENTS                         */
     { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 }, /* Face 0-1-2 */

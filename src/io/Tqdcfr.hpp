@@ -45,14 +45,14 @@ class SidesetHeader;
 class Tqdcfr : public ReaderIface
 {
   public:
-    void FSEEK( unsigned offset );  // set cubFile offset to specified value
-    void FREADI( unsigned num_ents );  // read integers into uint_buf
-    void FREADD( unsigned num_ents );  // read doubles into dbl_buf
-    void FREADC( unsigned num_ents );  // read characters into char_buf
+    void FSEEK( unsigned offset );                           // set cubFile offset to specified value
+    void FREADI( unsigned num_ents );                        // read integers into uint_buf
+    void FREADD( unsigned num_ents );                        // read doubles into dbl_buf
+    void FREADC( unsigned num_ents );                        // read characters into char_buf
     void FREADIA( unsigned num_ents, unsigned int* array );  // read integers
-    void FREADDA( unsigned num_ents, double* array );  // read doubles
-    void FREADCA( unsigned num_ents, char* arrat );  // read bytes
-    void CONVERT_TO_INTS( unsigned int num_ents );  // convert uint_buf to int_buf in-place
+    void FREADDA( unsigned num_ents, double* array );        // read doubles
+    void FREADCA( unsigned num_ents, char* arrat );          // read bytes
+    void CONVERT_TO_INTS( unsigned int num_ents );           // convert uint_buf to int_buf in-place
 
     // class for holding the file table of contents
     class FileTOC
@@ -60,8 +60,8 @@ class Tqdcfr : public ReaderIface
       public:
         unsigned int fileEndian, fileSchema, numModels, modelTableOffset, modelMetaDataOffset, activeFEModel;
 
-        FileTOC( );
-        void print( );
+        FileTOC();
+        void print();
     };
 
     //
@@ -75,9 +75,9 @@ class Tqdcfr : public ReaderIface
           public:
             unsigned numEntities, tableOffset, metaDataOffset;
 
-            ArrayInfo( );
+            ArrayInfo();
 
-            void print( );
+            void print();
             void init( const std::vector< unsigned int >& uint_buf_in );
         };
 
@@ -85,7 +85,7 @@ class Tqdcfr : public ReaderIface
 
         void init( const unsigned int offset, Tqdcfr* instance );
 
-        void print( );
+        void print();
     };
 
     class MetaDataContainer
@@ -96,23 +96,23 @@ class Tqdcfr : public ReaderIface
         class MetaDataEntry
         {
           public:
-            unsigned int                mdOwner, mdDataType, mdIntValue;
-            std::string                 mdName, mdStringValue;
+            unsigned int mdOwner, mdDataType, mdIntValue;
+            std::string mdName, mdStringValue;
             std::vector< unsigned int > mdIntArrayValue;
-            double                      mdDblValue;
-            std::vector< double >       mdDblArrayValue;
+            double mdDblValue;
+            std::vector< double > mdDblArrayValue;
 
-            MetaDataEntry( );
+            MetaDataEntry();
 
-            void print( );
+            void print();
         };
 
-        void print( );
+        void print();
 
         int get_md_entry( const unsigned int owner, const std::string& name );
 
         std::vector< MetaDataEntry > metadataEntries;
-        MetaDataContainer( );
+        MetaDataContainer();
     };
 
     class GeomHeader
@@ -124,12 +124,12 @@ class Tqdcfr : public ReaderIface
 
         EntityHandle setHandle;
 
-        void print( );
+        void print();
 
         static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
                                            Tqdcfr* instance, GeomHeader*& entity_headers );
 
-        GeomHeader( );
+        GeomHeader();
     };
 
     class GroupHeader
@@ -139,12 +139,12 @@ class Tqdcfr : public ReaderIface
 
         EntityHandle setHandle;
 
-        void print( );
+        void print();
 
         static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
                                            Tqdcfr* instance, GroupHeader*& entity_headers );
 
-        GroupHeader( );
+        GroupHeader();
     };
 
     class BlockHeader
@@ -157,15 +157,15 @@ class Tqdcfr : public ReaderIface
 
         EntityType blockEntityType;
 
-        int hasMidNodes[ 4 ];
+        int hasMidNodes[4];
 
-        void print( );
+        void print();
 
         static ErrorCode read_info_header( const double data_version, const unsigned int model_offset,
                                            const FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
                                            BlockHeader*& block_headers );
 
-        BlockHeader( );
+        BlockHeader();
     };
 
     class NodesetHeader
@@ -175,12 +175,12 @@ class Tqdcfr : public ReaderIface
 
         EntityHandle setHandle;
 
-        void print( );
+        void print();
 
         static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
                                            Tqdcfr* instance, NodesetHeader*& entity_headers );
 
-        NodesetHeader( );
+        NodesetHeader();
     };
 
     class SidesetHeader
@@ -190,12 +190,12 @@ class Tqdcfr : public ReaderIface
 
         EntityHandle setHandle;
 
-        void print( );
+        void print();
 
         static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
                                            Tqdcfr* instance, SidesetHeader*& entity_headers );
 
-        SidesetHeader( );
+        SidesetHeader();
     };
 
     // class to hold model entry data for various kinds of models
@@ -203,22 +203,22 @@ class Tqdcfr : public ReaderIface
     class ModelEntry
     {
       public:
-        ModelEntry( );
+        ModelEntry();
 
-        ~ModelEntry( );
+        ~ModelEntry();
 
         unsigned int modelHandle, modelOffset, modelLength, modelType, modelOwner, modelPad;
 
-        FEModelHeader  feModelHeader;
-        GeomHeader*    feGeomH;
-        GroupHeader*   feGroupH;
-        BlockHeader*   feBlockH;
+        FEModelHeader feModelHeader;
+        GeomHeader* feGeomH;
+        GroupHeader* feGroupH;
+        BlockHeader* feBlockH;
         NodesetHeader* feNodeSetH;
         SidesetHeader* feSideSetH;
 
         MetaDataContainer geomMD, nodeMD, elementMD, groupMD, blockMD, nodesetMD, sidesetMD;
 
-        void print( );
+        void print();
 
         void print_geom_headers( const char* prefix, GeomHeader* header, unsigned int num_headers );
 
@@ -251,34 +251,34 @@ class Tqdcfr : public ReaderIface
     struct AcisRecord
     {
         unsigned int rec_type;
-        std::string  att_string;
-        bool         processed;
-        int          first_attrib;
-        int          att_prev, att_next, att_ent_num;
+        std::string att_string;
+        bool processed;
+        int first_attrib;
+        int att_prev, att_next, att_ent_num;
         EntityHandle entity;
     };
 
-    ~Tqdcfr( );
+    ~Tqdcfr();
 
-    ReadUtilIface*            readUtilIface;
-    Interface*                mdbImpl;
-    FILE*                     cubFile;
-    FileTOC                   fileTOC;
+    ReadUtilIface* readUtilIface;
+    Interface* mdbImpl;
+    FILE* cubFile;
+    FileTOC fileTOC;
     std::vector< ModelEntry > modelEntries;
-    MetaDataContainer         modelMetaData;
-    long                      currVHandleOffset;
-    Range                     beforeEnts;
-    long                      currElementIdOffset[ MBMAXTYPE ];
+    MetaDataContainer modelMetaData;
+    long currVHandleOffset;
+    Range beforeEnts;
+    long currElementIdOffset[MBMAXTYPE];
     Tag globalIdTag, cubIdTag, geomTag, uniqueIdTag, blockTag, nsTag, ssTag, attribVectorTag, entityNameTag,
         categoryTag, hasMidNodesTag;
     std::map< int, EntityHandle > uidSetMap;
-    std::map< int, EntityHandle > gidSetMap[ 6 ];
-    bool                          swapForEndianness;
+    std::map< int, EntityHandle > gidSetMap[6];
+    bool swapForEndianness;
 
     std::vector< unsigned int > uint_buf;
-    int*                        int_buf;
-    std::vector< double >       dbl_buf;
-    std::vector< char >         char_buf;
+    int* int_buf;
+    std::vector< double > dbl_buf;
+    std::vector< char > char_buf;
 
     static ReaderIface* factory( Interface* );
 
@@ -297,9 +297,9 @@ class Tqdcfr : public ReaderIface
     ErrorCode read_group( const unsigned int gr_index, ModelEntry* model, GroupHeader* grouph );
     ErrorCode read_nodes( const unsigned int gindex, ModelEntry* model, GeomHeader* entity );
     ErrorCode read_elements( ModelEntry* model, GeomHeader* entity );
-    ErrorCode read_file_header( );
-    ErrorCode read_model_entries( );
-    int       find_model( const unsigned int model_type );
+    ErrorCode read_file_header();
+    ErrorCode read_model_entries();
+    int find_model( const unsigned int model_type );
     ErrorCode read_meta_data( const unsigned int metadata_offset, MetaDataContainer& mc );
     ErrorCode read_md_string( std::string& name );
 
@@ -312,7 +312,7 @@ class Tqdcfr : public ReaderIface
         exodusmesh
     };
     EntityType type_from_cub_type( const unsigned int cub_type, const unsigned int nodes_per_elem );
-    void       check_contiguous( const unsigned int num_ents, int& contig, unsigned int& min_id, unsigned int& max_id );
+    void check_contiguous( const unsigned int num_ents, int& contig, unsigned int& min_id, unsigned int& max_id );
 
     Tqdcfr( Interface* impl );
 
@@ -325,7 +325,7 @@ class Tqdcfr : public ReaderIface
 
     bool printedElemWarning;  // only print element #'s warning once
 
-    ErrorCode convert_nodesets_sidesets( );
+    ErrorCode convert_nodesets_sidesets();
 
     ErrorCode read_acis_records( const char* sat_file_name = 0 );
 
@@ -336,7 +336,7 @@ class Tqdcfr : public ReaderIface
 
     ErrorCode process_record( AcisRecord& this_record );
 
-    static const char geom_categories[][ CATEGORY_TAG_SIZE ];
+    static const char geom_categories[][CATEGORY_TAG_SIZE];
 
     FILE* acisDumpFile;
 
@@ -411,8 +411,8 @@ class Tqdcfr : public ReaderIface
         INVALID_ELEMENT_TYPE
     };
     static const EntityType block_type_to_mb_type[];
-    static const int        cub_elem_num_verts[];
-    static const int        cub_elem_num_verts_len;
+    static const int cub_elem_num_verts[];
+    static const int cub_elem_num_verts_len;
 
     //! mapping from mesh packet type to moab type
     static const EntityType mp_type_to_mb_type[];

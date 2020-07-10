@@ -44,7 +44,7 @@ class LinearTet
                                        const double* verts, const int nverts, const int ndim, const double iter_tol,
                                        const double inside_tol, double* work, double* params, int* inside );
 
-    static EvalSet eval_set( )
+    static EvalSet eval_set()
     {
         return EvalSet( evalFcn, reverseEvalFcn, normalFcn, jacobianFcn, integrateFcn, initFcn, insideFcn );
     }
@@ -53,7 +53,7 @@ class LinearTet
     {
         if( tp == MBTET && numv >= 4 )
         {
-            eset = eval_set( );
+            eset = eval_set();
             return true;
         }
         else
@@ -61,7 +61,7 @@ class LinearTet
     }
 
   protected:
-    static const double corner[ 4 ][ 3 ];
+    static const double corner[4][3];
 };  // class LinearTet
 
 }  // namespace moab

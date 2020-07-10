@@ -37,10 +37,10 @@
 namespace MBMesquite
 {
 
-AWMetricBarrier::~AWMetricBarrier( ) {}
+AWMetricBarrier::~AWMetricBarrier() {}
 
-AWMetricBarrier2D::~AWMetricBarrier2D( ) {}
-AWMetricBarrier3D::~AWMetricBarrier3D( ) {}
+AWMetricBarrier2D::~AWMetricBarrier2D() {}
+AWMetricBarrier3D::~AWMetricBarrier3D() {}
 
 bool AWMetricBarrier2D::evaluate( const MsqMatrix< 3, 3 >&, const MsqMatrix< 3, 3 >&, double&, MsqError& err )
 {

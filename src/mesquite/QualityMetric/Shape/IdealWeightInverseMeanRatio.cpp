@@ -51,24 +51,25 @@ namespace MBMesquite
 IdealWeightInverseMeanRatio::IdealWeightInverseMeanRatio( MsqError& err, double pow_dbl )
     : AveragingQM( QualityMetric::LINEAR )
 {
-    set_metric_power( pow_dbl, err );MSQ_ERRRTN( err );
+    set_metric_power( pow_dbl, err );
+    MSQ_ERRRTN( err );
 }
 
-IdealWeightInverseMeanRatio::IdealWeightInverseMeanRatio( ) : AveragingQM( QualityMetric::LINEAR )
+IdealWeightInverseMeanRatio::IdealWeightInverseMeanRatio() : AveragingQM( QualityMetric::LINEAR )
 {
     MsqError err;
     set_metric_power( 1.0, err );
     assert( !err );
 }
 
-std::string IdealWeightInverseMeanRatio::get_name( ) const
+std::string IdealWeightInverseMeanRatio::get_name() const
 {
     return "Inverse Mean Ratio";
 }
 
-int IdealWeightInverseMeanRatio::get_negate_flag( ) const
+int IdealWeightInverseMeanRatio::get_negate_flag() const
 {
-    return b2Con.value( ) < 0 ? -1 : 1;
+    return b2Con.value() < 0 ? -1 : 1;
 }
 
 //! Sets the power value in the metric computation.
@@ -90,35 +91,35 @@ void IdealWeightInverseMeanRatio::set_metric_power( double pow_dbl, MsqError& er
 bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double& m, MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
-    EntityTopology       topo = e->get_element_type( );
+    EntityTopology topo    = e->get_element_type();
 
     const MsqVertex* vertices = pd.get_vertex_array( err );
     MSQ_ERRZERO( err );
-    const size_t* v_i = e->get_vertex_index_array( );
+    const size_t* v_i = e->get_vertex_index_array();
 
     Vector3D n;  // Surface normal for 2D objects
 
     // Prism and Hex element descriptions
-    static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
-                                            { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
-                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_pri[6][4] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
+                                        { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
+    static const int locs_hex[8][4] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                        { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
     int i;
 
-    m = 0.0;
+    m                 = 0.0;
     bool metric_valid = false;
     switch( topo )
     {
         case TRIANGLE:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n = n / n.length( );  // Need unit normal
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
+            n            = n / n.length();  // Need unit normal
+            mCoords[0]   = vertices[v_i[0]];
+            mCoords[1]   = vertices[v_i[1]];
+            mCoords[2]   = vertices[v_i[2]];
             metric_valid = m_fcn_2e( m, mCoords, n, a2Con, b2Con, c2Con );
             if( !metric_valid ) return false;
             break;
@@ -126,23 +127,23 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
         case QUADRILATERAL:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n = n / n.length( );  // Need unit normal
+            n = n / n.length();  // Need unit normal
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                metric_valid = m_fcn_2i( mMetrics[ i ], mCoords, n, a2Con, b2Con, c2Con, d_con );
+                mCoords[0]   = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1]   = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2]   = vertices[v_i[locs_hex[i][2]]];
+                metric_valid = m_fcn_2i( mMetrics[i], mCoords, n, a2Con, b2Con, c2Con, d_con );
                 if( !metric_valid ) return false;
             }
             m = average_metrics( mMetrics, 4, err );
             break;
 
         case TETRAHEDRON:
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
-            mCoords[ 3 ] = vertices[ v_i[ 3 ] ];
+            mCoords[0]   = vertices[v_i[0]];
+            mCoords[1]   = vertices[v_i[1]];
+            mCoords[2]   = vertices[v_i[2]];
+            mCoords[3]   = vertices[v_i[3]];
             metric_valid = m_fcn_3e( m, mCoords, a3Con, b3Con, c3Con );
             if( !metric_valid ) return false;
             break;
@@ -150,11 +151,11 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
         case PYRAMID:
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ i ] ];
-                mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
-                mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
-                mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
-                metric_valid = m_fcn_3p( mMetrics[ i ], mCoords, a3Con, b3Con, c3Con );
+                mCoords[0]   = vertices[v_i[i]];
+                mCoords[1]   = vertices[v_i[( i + 1 ) % 4]];
+                mCoords[2]   = vertices[v_i[( i + 3 ) % 4]];
+                mCoords[3]   = vertices[v_i[4]];
+                metric_valid = m_fcn_3p( mMetrics[i], mCoords, a3Con, b3Con, c3Con );
                 if( !metric_valid ) return false;
             }
             m = average_metrics( mMetrics, 4, err );
@@ -164,11 +165,11 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
         case PRISM:
             for( i = 0; i < 6; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_pri[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                metric_valid = m_fcn_3w( mMetrics[ i ], mCoords, a3Con, b3Con, c3Con );
+                mCoords[0]   = vertices[v_i[locs_pri[i][0]]];
+                mCoords[1]   = vertices[v_i[locs_pri[i][1]]];
+                mCoords[2]   = vertices[v_i[locs_pri[i][2]]];
+                mCoords[3]   = vertices[v_i[locs_pri[i][3]]];
+                metric_valid = m_fcn_3w( mMetrics[i], mCoords, a3Con, b3Con, c3Con );
                 if( !metric_valid ) return false;
             }
             m = average_metrics( mMetrics, 6, err );
@@ -178,11 +179,11 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
         case HEXAHEDRON:
             for( i = 0; i < 8; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                metric_valid = m_fcn_3i( mMetrics[ i ], mCoords, a3Con, b3Con, c3Con, d_con );
+                mCoords[0]   = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1]   = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2]   = vertices[v_i[locs_hex[i][2]]];
+                mCoords[3]   = vertices[v_i[locs_hex[i][3]]];
+                metric_valid = m_fcn_3i( mMetrics[i], mCoords, a3Con, b3Con, c3Con, d_con );
                 if( !metric_valid ) return false;
             }
             m = average_metrics( mMetrics, 8, err );
@@ -203,9 +204,9 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
                                                           MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
-    EntityTopology       topo = e->get_element_type( );
+    EntityTopology topo    = e->get_element_type();
 
-    if( !analytical_average_gradient( ) && topo != TRIANGLE && topo != TETRAHEDRON )
+    if( !analytical_average_gradient() && topo != TRIANGLE && topo != TETRAHEDRON )
     {
         static bool print = true;
         if( print )
@@ -220,21 +221,21 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
 
     const MsqVertex* vertices = pd.get_vertex_array( err );
     MSQ_ERRZERO( err );
-    const size_t* v_i = e->get_vertex_index_array( );
+    const size_t* v_i = e->get_vertex_index_array();
 
     Vector3D n;  // Surface normal for 2D objects
 
     // Prism and Hex element descriptions
-    static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
-                                            { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
-                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_pri[6][4] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
+                                        { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
+    static const int locs_hex[8][4] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                        { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
     int i;
 
-    bool           metric_valid = false;
+    bool metric_valid = false;
     const uint32_t fm = fixed_vertex_bitmap( pd, e, indices );
 
     m = 0.0;
@@ -244,10 +245,10 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
         case TRIANGLE:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n /= n.length( );  // Need unit normal
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
+            n /= n.length();  // Need unit normal
+            mCoords[0] = vertices[v_i[0]];
+            mCoords[1] = vertices[v_i[1]];
+            mCoords[2] = vertices[v_i[2]];
             g.resize( 3 );
             if( !g_fcn_2e( m, arrptr( g ), mCoords, n, a2Con, b2Con, c2Con ) ) return false;
             break;
@@ -255,14 +256,13 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
         case QUADRILATERAL:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n /= n.length( );  // Need unit normal
+            n /= n.length();  // Need unit normal
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                if( !g_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mCoords, n, a2Con, b2Con, c2Con, d_con ) )
-                    return false;
+                mCoords[0] = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1] = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2] = vertices[v_i[locs_hex[i][2]]];
+                if( !g_fcn_2i( mMetrics[i], mGradients + 3 * i, mCoords, n, a2Con, b2Con, c2Con, d_con ) ) return false;
             }
 
             g.resize( 4 );
@@ -271,10 +271,10 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
             break;
 
         case TETRAHEDRON:
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
-            mCoords[ 3 ] = vertices[ v_i[ 3 ] ];
+            mCoords[0] = vertices[v_i[0]];
+            mCoords[1] = vertices[v_i[1]];
+            mCoords[2] = vertices[v_i[2]];
+            mCoords[3] = vertices[v_i[3]];
             g.resize( 4 );
             metric_valid = g_fcn_3e( m, arrptr( g ), mCoords, a3Con, b3Con, c3Con );
             if( !metric_valid ) return false;
@@ -283,11 +283,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
         case PYRAMID:
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ i ] ];
-                mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
-                mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
-                mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
-                metric_valid = g_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con );
+                mCoords[0]   = vertices[v_i[i]];
+                mCoords[1]   = vertices[v_i[( i + 1 ) % 4]];
+                mCoords[2]   = vertices[v_i[( i + 3 ) % 4]];
+                mCoords[3]   = vertices[v_i[4]];
+                metric_valid = g_fcn_3p( mMetrics[i], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con );
                 if( !metric_valid ) return false;
             }
 
@@ -299,11 +299,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
         case PRISM:
             for( i = 0; i < 6; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_pri[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                if( !g_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con ) ) return false;
+                mCoords[0] = vertices[v_i[locs_pri[i][0]]];
+                mCoords[1] = vertices[v_i[locs_pri[i][1]]];
+                mCoords[2] = vertices[v_i[locs_pri[i][2]]];
+                mCoords[3] = vertices[v_i[locs_pri[i][3]]];
+                if( !g_fcn_3w( mMetrics[i], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con ) ) return false;
             }
 
             g.resize( 6 );
@@ -314,11 +314,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
         case HEXAHEDRON:
             for( i = 0; i < 8; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                if( !g_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con, d_con ) ) return false;
+                mCoords[0] = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1] = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2] = vertices[v_i[locs_hex[i][2]]];
+                mCoords[3] = vertices[v_i[locs_hex[i][3]]];
+                if( !g_fcn_3i( mMetrics[i], mGradients + 4 * i, mCoords, a3Con, b3Con, c3Con, d_con ) ) return false;
             }
 
             g.resize( 8 );
@@ -338,14 +338,14 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
 }
 
 bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& m,
-                                                                  std::vector< size_t >&      indices,
-                                                                  std::vector< Vector3D >&    g,
+                                                                  std::vector< size_t >& indices,
+                                                                  std::vector< Vector3D >& g,
                                                                   std::vector< SymMatrix3D >& h, MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
-    EntityTopology       topo = e->get_element_type( );
+    EntityTopology topo    = e->get_element_type();
 
-    if( !analytical_average_hessian( ) && topo != TRIANGLE && topo != TETRAHEDRON )
+    if( !analytical_average_hessian() && topo != TRIANGLE && topo != TETRAHEDRON )
     {
         static bool print = true;
         if( print )
@@ -360,21 +360,21 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
 
     const MsqVertex* vertices = pd.get_vertex_array( err );
     MSQ_ERRZERO( err );
-    const size_t* v_i = e->get_vertex_index_array( );
+    const size_t* v_i = e->get_vertex_index_array();
 
     Vector3D n;  // Surface normal for 2D objects
 
     // Prism and Hex element descriptions
-    static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
-                                            { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
-                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_pri[6][4] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
+                                        { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
+    static const int locs_hex[8][4] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                        { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
     int i;
 
-    bool           metric_valid = false;
+    bool metric_valid = false;
     const uint32_t fm = fixed_vertex_bitmap( pd, e, indices );
 
     m = 0.0;
@@ -384,28 +384,28 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
         case TRIANGLE:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n /= n.length( );  // Need unit normal
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
+            n /= n.length();  // Need unit normal
+            mCoords[0] = vertices[v_i[0]];
+            mCoords[1] = vertices[v_i[1]];
+            mCoords[2] = vertices[v_i[2]];
             g.resize( 3 );
             h.resize( 3 );
             if( !h_fcn_2e( m, arrptr( g ), mHessians, mCoords, n, a2Con, b2Con, c2Con ) ) return false;
-            h[ 0 ] = mHessians[ 0 ].upper( );
-            h[ 1 ] = mHessians[ 3 ].upper( );
-            h[ 2 ] = mHessians[ 5 ].upper( );
+            h[0] = mHessians[0].upper();
+            h[1] = mHessians[3].upper();
+            h[2] = mHessians[5].upper();
             break;
 
         case QUADRILATERAL:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n /= n.length( );  // Need unit normal
+            n /= n.length();  // Need unit normal
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                if( !h_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mHessians + 6 * i, mCoords, n, a2Con, b2Con, c2Con,
+                mCoords[0] = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1] = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2] = vertices[v_i[locs_hex[i][2]]];
+                if( !h_fcn_2i( mMetrics[i], mGradients + 3 * i, mHessians + 6 * i, mCoords, n, a2Con, b2Con, c2Con,
                                d_con ) )
                     return false;
             }
@@ -418,29 +418,29 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
             break;
 
         case TETRAHEDRON:
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
-            mCoords[ 3 ] = vertices[ v_i[ 3 ] ];
+            mCoords[0] = vertices[v_i[0]];
+            mCoords[1] = vertices[v_i[1]];
+            mCoords[2] = vertices[v_i[2]];
+            mCoords[3] = vertices[v_i[3]];
             g.resize( 4 );
             h.resize( 4 );
             metric_valid = h_fcn_3e( m, arrptr( g ), mHessians, mCoords, a3Con, b3Con, c3Con );
             if( !metric_valid ) return false;
-            h[ 0 ] = mHessians[ 0 ].upper( );
-            h[ 1 ] = mHessians[ 4 ].upper( );
-            h[ 2 ] = mHessians[ 7 ].upper( );
-            h[ 3 ] = mHessians[ 9 ].upper( );
+            h[0] = mHessians[0].upper();
+            h[1] = mHessians[4].upper();
+            h[2] = mHessians[7].upper();
+            h[3] = mHessians[9].upper();
             break;
 
         case PYRAMID:
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ i ] ];
-                mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
-                mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
-                mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
+                mCoords[0] = vertices[v_i[i]];
+                mCoords[1] = vertices[v_i[( i + 1 ) % 4]];
+                mCoords[2] = vertices[v_i[( i + 3 ) % 4]];
+                mCoords[3] = vertices[v_i[4]];
                 metric_valid =
-                    h_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con );
+                    h_fcn_3p( mMetrics[i], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con );
 
                 if( !metric_valid ) return false;
             }
@@ -455,11 +455,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
         case PRISM:
             for( i = 0; i < 6; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_pri[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                if( !h_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con ) )
+                mCoords[0] = vertices[v_i[locs_pri[i][0]]];
+                mCoords[1] = vertices[v_i[locs_pri[i][1]]];
+                mCoords[2] = vertices[v_i[locs_pri[i][2]]];
+                mCoords[3] = vertices[v_i[locs_pri[i][3]]];
+                if( !h_fcn_3w( mMetrics[i], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con ) )
                     return false;
             }
 
@@ -473,11 +473,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
         case HEXAHEDRON:
             for( i = 0; i < 8; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                if( !h_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con,
+                mCoords[0] = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1] = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2] = vertices[v_i[locs_hex[i][2]]];
+                mCoords[3] = vertices[v_i[locs_hex[i][3]]];
+                if( !h_fcn_3i( mMetrics[i], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con,
                                d_con ) )
                     return false;
             }
@@ -505,9 +505,9 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
                                                          std::vector< Matrix3D >& h, MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
-    EntityTopology       topo = e->get_element_type( );
+    EntityTopology topo    = e->get_element_type();
 
-    if( !analytical_average_hessian( ) && topo != TRIANGLE && topo != TETRAHEDRON )
+    if( !analytical_average_hessian() && topo != TRIANGLE && topo != TETRAHEDRON )
     {
         static bool print = true;
         if( print )
@@ -522,21 +522,21 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
 
     const MsqVertex* vertices = pd.get_vertex_array( err );
     MSQ_ERRZERO( err );
-    const size_t* v_i = e->get_vertex_index_array( );
+    const size_t* v_i = e->get_vertex_index_array();
 
     Vector3D n;  // Surface normal for 2D objects
 
     // Prism and Hex element descriptions
-    static const int locs_pri[ 6 ][ 4 ] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
-                                            { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
-    static const int locs_hex[ 8 ][ 4 ] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
-                                            { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
+    static const int locs_pri[6][4] = { { 0, 1, 2, 3 }, { 1, 2, 0, 4 }, { 2, 0, 1, 5 },
+                                        { 3, 5, 4, 0 }, { 4, 3, 5, 1 }, { 5, 4, 3, 2 } };
+    static const int locs_hex[8][4] = { { 0, 1, 3, 4 }, { 1, 2, 0, 5 }, { 2, 3, 1, 6 }, { 3, 0, 2, 7 },
+                                        { 4, 7, 5, 0 }, { 5, 4, 6, 1 }, { 6, 5, 7, 2 }, { 7, 6, 4, 3 } };
 
     const Vector3D d_con( 1.0, 1.0, 1.0 );
 
     int i;
 
-    bool           metric_valid = false;
+    bool metric_valid = false;
     const uint32_t fm = fixed_vertex_bitmap( pd, e, indices );
 
     m = 0.0;
@@ -546,10 +546,10 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
         case TRIANGLE:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n /= n.length( );  // Need unit normal
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
+            n /= n.length();  // Need unit normal
+            mCoords[0] = vertices[v_i[0]];
+            mCoords[1] = vertices[v_i[1]];
+            mCoords[2] = vertices[v_i[2]];
             g.resize( 3 );
             h.resize( 6 );
             if( !h_fcn_2e( m, arrptr( g ), arrptr( h ), mCoords, n, a2Con, b2Con, c2Con ) ) return false;
@@ -558,13 +558,13 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
         case QUADRILATERAL:
             pd.get_domain_normal_at_element( e, n, err );
             MSQ_ERRZERO( err );
-            n /= n.length( );  // Need unit normal
+            n /= n.length();  // Need unit normal
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                if( !h_fcn_2i( mMetrics[ i ], mGradients + 3 * i, mHessians + 6 * i, mCoords, n, a2Con, b2Con, c2Con,
+                mCoords[0] = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1] = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2] = vertices[v_i[locs_hex[i][2]]];
+                if( !h_fcn_2i( mMetrics[i], mGradients + 3 * i, mHessians + 6 * i, mCoords, n, a2Con, b2Con, c2Con,
                                d_con ) )
                     return false;
             }
@@ -577,10 +577,10 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
             break;
 
         case TETRAHEDRON:
-            mCoords[ 0 ] = vertices[ v_i[ 0 ] ];
-            mCoords[ 1 ] = vertices[ v_i[ 1 ] ];
-            mCoords[ 2 ] = vertices[ v_i[ 2 ] ];
-            mCoords[ 3 ] = vertices[ v_i[ 3 ] ];
+            mCoords[0] = vertices[v_i[0]];
+            mCoords[1] = vertices[v_i[1]];
+            mCoords[2] = vertices[v_i[2]];
+            mCoords[3] = vertices[v_i[3]];
             g.resize( 4 );
             h.resize( 10 );
             metric_valid = h_fcn_3e( m, arrptr( g ), arrptr( h ), mCoords, a3Con, b3Con, c3Con );
@@ -590,12 +590,12 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
         case PYRAMID:
             for( i = 0; i < 4; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ i ] ];
-                mCoords[ 1 ] = vertices[ v_i[ ( i + 1 ) % 4 ] ];
-                mCoords[ 2 ] = vertices[ v_i[ ( i + 3 ) % 4 ] ];
-                mCoords[ 3 ] = vertices[ v_i[ 4 ] ];
+                mCoords[0] = vertices[v_i[i]];
+                mCoords[1] = vertices[v_i[( i + 1 ) % 4]];
+                mCoords[2] = vertices[v_i[( i + 3 ) % 4]];
+                mCoords[3] = vertices[v_i[4]];
                 metric_valid =
-                    h_fcn_3p( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con );
+                    h_fcn_3p( mMetrics[i], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con );
 
                 if( !metric_valid ) return false;
             }
@@ -610,11 +610,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
         case PRISM:
             for( i = 0; i < 6; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_pri[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_pri[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_pri[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_pri[ i ][ 3 ] ] ];
-                if( !h_fcn_3w( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con ) )
+                mCoords[0] = vertices[v_i[locs_pri[i][0]]];
+                mCoords[1] = vertices[v_i[locs_pri[i][1]]];
+                mCoords[2] = vertices[v_i[locs_pri[i][2]]];
+                mCoords[3] = vertices[v_i[locs_pri[i][3]]];
+                if( !h_fcn_3w( mMetrics[i], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con ) )
                     return false;
             }
 
@@ -627,11 +627,11 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t h
         case HEXAHEDRON:
             for( i = 0; i < 8; ++i )
             {
-                mCoords[ 0 ] = vertices[ v_i[ locs_hex[ i ][ 0 ] ] ];
-                mCoords[ 1 ] = vertices[ v_i[ locs_hex[ i ][ 1 ] ] ];
-                mCoords[ 2 ] = vertices[ v_i[ locs_hex[ i ][ 2 ] ] ];
-                mCoords[ 3 ] = vertices[ v_i[ locs_hex[ i ][ 3 ] ] ];
-                if( !h_fcn_3i( mMetrics[ i ], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con,
+                mCoords[0] = vertices[v_i[locs_hex[i][0]]];
+                mCoords[1] = vertices[v_i[locs_hex[i][1]]];
+                mCoords[2] = vertices[v_i[locs_hex[i][2]]];
+                mCoords[3] = vertices[v_i[locs_hex[i][3]]];
+                if( !h_fcn_3i( mMetrics[i], mGradients + 4 * i, mHessians + 10 * i, mCoords, a3Con, b3Con, c3Con,
                                d_con ) )
                     return false;
             }

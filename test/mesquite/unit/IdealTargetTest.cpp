@@ -55,16 +55,16 @@ class IdealTargetTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_hex_edge );
     CPPUNIT_TEST( test_hex_face );
     CPPUNIT_TEST( test_hex_center );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
-    void test_tri_corner( );
-    void test_tri_edge( );
-    void test_tri_center( );
-    void test_hex_corner( );
-    void test_hex_edge( );
-    void test_hex_face( );
-    void test_hex_center( );
+    void test_tri_corner();
+    void test_tri_edge();
+    void test_tri_center();
+    void test_hex_corner();
+    void test_hex_edge();
+    void test_hex_face();
+    void test_hex_center();
 
   private:
     void get_calc_target( EntityTopology type, Sample sample, MsqMatrix< 3, 3 >&, MsqMatrix< 2, 2 >& );
@@ -79,26 +79,26 @@ class IdealTargetTest : public CppUnit::TestFixture
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( IdealTargetTest, "IdealTargetTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( IdealTargetTest, "Unit" );
 
-void IdealTargetTest::test_tri_corner( )
+void IdealTargetTest::test_tri_corner()
 {
     do_test( TRIANGLE, Sample( 0, 0 ) );
     do_test( TRIANGLE, Sample( 0, 1 ) );
     do_test( TRIANGLE, Sample( 0, 2 ) );
 }
 
-void IdealTargetTest::test_tri_edge( )
+void IdealTargetTest::test_tri_edge()
 {
     do_test( TRIANGLE, Sample( 1, 0 ) );
     do_test( TRIANGLE, Sample( 1, 1 ) );
     do_test( TRIANGLE, Sample( 1, 2 ) );
 }
 
-void IdealTargetTest::test_tri_center( )
+void IdealTargetTest::test_tri_center()
 {
     do_test( TRIANGLE, Sample( 2, 0 ) );
 }
 
-void IdealTargetTest::test_hex_corner( )
+void IdealTargetTest::test_hex_corner()
 {
     do_test( HEXAHEDRON, Sample( 0, 0 ) );
     do_test( HEXAHEDRON, Sample( 0, 1 ) );
@@ -106,14 +106,14 @@ void IdealTargetTest::test_hex_corner( )
     do_test( HEXAHEDRON, Sample( 0, 7 ) );
 }
 
-void IdealTargetTest::test_hex_edge( )
+void IdealTargetTest::test_hex_edge()
 {
     do_test( HEXAHEDRON, Sample( 1, 1 ) );
     do_test( HEXAHEDRON, Sample( 1, 4 ) );
     do_test( HEXAHEDRON, Sample( 1, 11 ) );
 }
 
-void IdealTargetTest::test_hex_face( )
+void IdealTargetTest::test_hex_face()
 {
     do_test( HEXAHEDRON, Sample( 2, 0 ) );
     do_test( HEXAHEDRON, Sample( 2, 1 ) );
@@ -123,7 +123,7 @@ void IdealTargetTest::test_hex_face( )
     do_test( HEXAHEDRON, Sample( 2, 5 ) );
 }
 
-void IdealTargetTest::test_hex_center( )
+void IdealTargetTest::test_hex_center()
 {
     do_test( HEXAHEDRON, Sample( 3, 0 ) );
 }
@@ -132,12 +132,12 @@ void IdealTargetTest::get_calc_target( EntityTopology type, Sample location, Msq
                                        MsqMatrix< 2, 2 >& w2 )
 {
     MsqPrintError err( std::cout );
-    const int     elem_dim = TopologyInfo::dimension( type );
+    const int elem_dim = TopologyInfo::dimension( type );
 
     // create a patch -- actual coords and such don't really matter
     std::vector< double > coords( 24, 0.0 );
-    const size_t          conn[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-    PatchData             pd;
+    const size_t conn[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    PatchData pd;
     pd.fill( 8, arrptr( coords ), 1, type, conn, 0, err );
     CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
     pd.attach_settings( &settings );
@@ -153,46 +153,46 @@ void IdealTargetTest::get_calc_target( EntityTopology type, Sample location, Msq
 void IdealTargetTest::get_ideal_target( EntityTopology type, Sample location, MsqMatrix< 3, 3 >& w3,
                                         MsqMatrix< 2, 2 >& w2 )
 {
-    MsqPrintError  err( std::cout );
+    MsqPrintError err( std::cout );
     const unsigned elem_dim = TopologyInfo::dimension( type );
 
     // get the target matrix for an ideal element
-    size_t          indices[ 100 ];
-    size_t          num_vtx;
+    size_t indices[100];
+    size_t num_vtx;
     const Vector3D* coords = unit_element( type );
-    Vector3D        c[ 3 ];
+    Vector3D c[3];
     if( elem_dim == 2 )
     {
-        MsqVector< 2 >           derivs[ 100 ];
+        MsqVector< 2 > derivs[100];
         const MappingFunction2D* func = settings.get_mapping_function_2D( type );
-        func->derivatives( location, NodeSet( ), indices, derivs, num_vtx, err );
+        func->derivatives( location, NodeSet(), indices, derivs, num_vtx, err );
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
 
         MsqMatrix< 3, 2 > J;
         for( size_t i = 0; i < num_vtx; ++i )
             for( unsigned j = 0; j < 2; ++j )
-                c[ j ] += derivs[ i ][ j ] * coords[ indices[ i ] ];
+                c[j] += derivs[i][j] * coords[indices[i]];
 
         for( unsigned i = 0; i < 3; ++i )
             for( unsigned j = 0; j < 2; ++j )
-                J( i, j ) = c[ j ][ i ];
+                J( i, j ) = c[j][i];
 
         w2 = TargetCalculator::skew( J );
     }
     else
     {
-        MsqVector< 3 >           derivs[ 100 ];
+        MsqVector< 3 > derivs[100];
         const MappingFunction3D* func = settings.get_mapping_function_3D( type );
-        func->derivatives( location, NodeSet( ), indices, derivs, num_vtx, err );
+        func->derivatives( location, NodeSet(), indices, derivs, num_vtx, err );
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
 
         for( size_t i = 0; i < num_vtx; ++i )
             for( unsigned j = 0; j < 3; ++j )
-                c[ j ] += derivs[ i ][ j ] * coords[ indices[ i ] ];
+                c[j] += derivs[i][j] * coords[indices[i]];
 
         for( unsigned i = 0; i < 3; ++i )
             for( unsigned j = 0; j < 3; ++j )
-                w3( i, j ) = c[ j ][ i ];
+                w3( i, j ) = c[j][i];
 
         w3 = TargetCalculator::skew( w3 );
     }

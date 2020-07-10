@@ -47,19 +47,19 @@ class TempestRemapper : public Remapper
     {
     }
 
-    virtual ~TempestRemapper( );
+    virtual ~TempestRemapper();
 
     // Mesh type with a correspondence to Tempest/Climate formats
     enum TempestMeshType
     {
-        DEFAULT = -1,
-        CS = 0,
-        RLL = 1,
-        ICO = 2,
-        ICOD = 3,
-        OVERLAP_FILES = 4,
+        DEFAULT        = -1,
+        CS             = 0,
+        RLL            = 1,
+        ICO            = 2,
+        ICOD           = 3,
+        OVERLAP_FILES  = 4,
         OVERLAP_MEMORY = 5,
-        OVERLAP_MOAB = 6
+        OVERLAP_MOAB   = 6
     };
 
     friend class TempestOnlineMap;
@@ -74,7 +74,7 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///     Deallocate and clear any memory initialized in the TempestRemapper object
     /// </summary>
-    virtual ErrorCode clear( );
+    virtual ErrorCode clear();
 
     /// <summary>
     ///     Generate a mesh in memory of given type (CS/RLL/ICO/MPAS(structured)) and store it
@@ -132,7 +132,7 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///     Get the covering mesh (TempestRemap) object.
     /// </summary>
-    Mesh* GetCoveringMesh( );
+    Mesh* GetCoveringMesh();
 
     /// <summary>
     ///     Get the MOAB mesh set corresponding to the intersection context.
@@ -170,7 +170,7 @@ class TempestRemapper : public Remapper
     ///     Get access to the underlying source covering set if available. Else return the source
     ///     set.
     /// </summary>
-    moab::EntityHandle& GetCoveringSet( );
+    moab::EntityHandle& GetCoveringSet();
 
     /// <summary>
     ///     Set the mesh type corresponding to the intersection context
@@ -221,7 +221,7 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///     Compute the local and global IDs for elements in source/target/coverage meshes.
     /// </summary>
-    moab::ErrorCode ComputeGlobalLocalMaps( );
+    moab::ErrorCode ComputeGlobalLocalMaps();
 
     ///	<summary>
     ///		Get all the ghosted overlap entities that were accumulated to enable conservation in
@@ -229,7 +229,7 @@ class TempestRemapper : public Remapper
     ///	</summary>
     moab::ErrorCode GetOverlapAugmentedEntities( moab::Range& sharedGhostEntities );
 
-  public:  // public members
+  public:               // public members
     bool meshValidate;  // Validate the mesh after loading from file
 
     bool constructEdgeMap;  //  Construct the edge map within the TempestRemap datastructures
@@ -237,7 +237,7 @@ class TempestRemapper : public Remapper
     static const bool verbose = true;
 
   private:
-    moab::ErrorCode convert_overlap_mesh_sorted_by_source( );
+    moab::ErrorCode convert_overlap_mesh_sorted_by_source();
 
     // private methods
     moab::ErrorCode load_tempest_mesh_private( std::string inputFilename, Mesh** tempest_mesh );
@@ -248,41 +248,41 @@ class TempestRemapper : public Remapper
     moab::ErrorCode convert_tempest_mesh_private( TempestMeshType type, Mesh* mesh, moab::EntityHandle& meshset,
                                                   moab::Range& entities, moab::Range* vertices );
 
-    moab::ErrorCode augment_overlap_set( );
+    moab::ErrorCode augment_overlap_set();
 
     /* Source meshset, mesh and entity references */
-    Mesh*              m_source;
-    TempestMeshType    m_source_type;
-    moab::Range        m_source_entities;
-    moab::Range        m_source_vertices;
+    Mesh* m_source;
+    TempestMeshType m_source_type;
+    moab::Range m_source_entities;
+    moab::Range m_source_vertices;
     moab::EntityHandle m_source_set;
-    int                max_source_edges;
-    bool               point_cloud_source;
+    int max_source_edges;
+    bool point_cloud_source;
 
     /* Target meshset, mesh and entity references */
-    Mesh*              m_target;
-    TempestMeshType    m_target_type;
-    moab::Range        m_target_entities;
-    moab::Range        m_target_vertices;
+    Mesh* m_target;
+    TempestMeshType m_target_type;
+    moab::Range m_target_entities;
+    moab::Range m_target_vertices;
     moab::EntityHandle m_target_set;
-    int                max_target_edges;
-    bool               point_cloud_target;
+    int max_target_edges;
+    bool point_cloud_target;
 
     /* Overlap meshset, mesh and entity references */
-    Mesh*                                m_overlap;
-    TempestMeshType                      m_overlap_type;
-    moab::Range                          m_overlap_entities;
-    moab::EntityHandle                   m_overlap_set;
+    Mesh* m_overlap;
+    TempestMeshType m_overlap_type;
+    moab::Range m_overlap_entities;
+    moab::EntityHandle m_overlap_set;
     std::vector< std::pair< int, int > > m_sorted_overlap_order;
 
     /* Intersection context on a sphere */
     moab::Intx2MeshOnSphere* mbintx;
 
     /* Parallel - migrated mesh that is in the local view */
-    Mesh*              m_covering_source;
+    Mesh* m_covering_source;
     moab::EntityHandle m_covering_source_set;
-    moab::Range        m_covering_source_entities;
-    moab::Range        m_covering_source_vertices;
+    moab::Range m_covering_source_entities;
+    moab::Range m_covering_source_vertices;
 
     /* local to glboal and global to local ID maps */
     std::map< int, int > gid_to_lid_src, gid_to_lid_covsrc, gid_to_lid_tgt;
@@ -292,7 +292,7 @@ class TempestRemapper : public Remapper
 
     bool rrmgrids;
     bool is_parallel, is_root;
-    int  rank, size;
+    int rank, size;
 };
 
 // Inline functions
@@ -483,12 +483,12 @@ inline TempestRemapper::TempestMeshType TempestRemapper::GetMeshType( Remapper::
     }
 }
 
-inline Mesh* TempestRemapper::GetCoveringMesh( )
+inline Mesh* TempestRemapper::GetCoveringMesh()
 {
     return m_covering_source;
 }
 
-inline moab::EntityHandle& TempestRemapper::GetCoveringSet( )
+inline moab::EntityHandle& TempestRemapper::GetCoveringSet()
 {
     return m_covering_source_set;
 }
@@ -498,11 +498,11 @@ inline int TempestRemapper::GetGlobalID( Remapper::IntersectionContext ctx, int 
     switch( ctx )
     {
         case Remapper::SourceMesh:
-            return lid_to_gid_src[ localID ];
+            return lid_to_gid_src[localID];
         case Remapper::TargetMesh:
-            return lid_to_gid_tgt[ localID ];
+            return lid_to_gid_tgt[localID];
         case Remapper::CoveringMesh:
-            return lid_to_gid_covsrc[ localID ];
+            return lid_to_gid_covsrc[localID];
         case Remapper::OverlapMesh:
         case Remapper::DEFAULT:
         default:
@@ -515,11 +515,11 @@ inline int TempestRemapper::GetLocalID( Remapper::IntersectionContext ctx, int g
     switch( ctx )
     {
         case Remapper::SourceMesh:
-            return gid_to_lid_src[ globalID ];
+            return gid_to_lid_src[globalID];
         case Remapper::TargetMesh:
-            return gid_to_lid_tgt[ globalID ];
+            return gid_to_lid_tgt[globalID];
         case Remapper::CoveringMesh:
-            return gid_to_lid_covsrc[ globalID ];
+            return gid_to_lid_covsrc[globalID];
         case Remapper::DEFAULT:
         case Remapper::OverlapMesh:
         default:

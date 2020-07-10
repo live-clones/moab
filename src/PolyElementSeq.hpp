@@ -20,7 +20,7 @@ class PolyElementSeq : public UnstructuredElemSeq
     {
     }
 
-    virtual ~PolyElementSeq( );
+    virtual ~PolyElementSeq();
 
     virtual EntitySequence* split( EntityHandle here );
 

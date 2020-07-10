@@ -25,13 +25,13 @@ class NCHelperDomain : public ScdNCHelper
     ErrorCode create_mesh( Range& faces );
 
   private:
-    virtual ErrorCode   init_mesh_vals( );
-    virtual std::string get_mesh_type_name( )
+    virtual ErrorCode init_mesh_vals();
+    virtual std::string get_mesh_type_name()
     {
         return "DOMAIN";
     }
 
-    int nv;  // number of vertices per cell
+    int nv;     // number of vertices per cell
     int nvDim;  // index of nv dim
 };
 

@@ -59,19 +59,19 @@ class MESQUITE_EXPORT PlanarDomain : public MBMesquite::MeshDomain
     inline PlanarDomain( Plane orient, double offset = 0.0 )
     {
         Vector3D normal( 0, 0, 0 ), point( 0, 0, 0 );
-        normal[ orient ] = 1.0;
-        point[ orient ] = offset;
+        normal[orient] = 1.0;
+        point[orient]  = offset;
         set_plane( normal, point );
     }
 
-    PlanarDomain( ) {}
+    PlanarDomain() {}
 
     inline PlanarDomain( const Vector3D& normal, const Vector3D& point )
     {
         set_plane( normal, point );
     }
 
-    virtual ~PlanarDomain( );
+    virtual ~PlanarDomain();
 
     void fit_vertices( Mesh* mesh, MsqError& err, double epsilon = 0.0 );
 
@@ -80,19 +80,19 @@ class MESQUITE_EXPORT PlanarDomain : public MBMesquite::MeshDomain
 
     void set_plane( const Vector3D& normal, const Vector3D& point );
 
-    void flip( );
+    void flip();
 
-    const Vector3D& get_normal( ) const
+    const Vector3D& get_normal() const
     {
         return mNormal;
     }
 
-    double get_coeff( )
+    double get_coeff()
     {
         return mCoeff;
     }
 
-    Vector3D get_origin( ) const
+    Vector3D get_origin() const
     {
         return -mCoeff * mNormal;
     }
@@ -114,7 +114,7 @@ class MESQUITE_EXPORT PlanarDomain : public MBMesquite::MeshDomain
 
   private:
     Vector3D mNormal;
-    double   mCoeff;
+    double mCoeff;
 };
 }  // namespace MBMesquite
 

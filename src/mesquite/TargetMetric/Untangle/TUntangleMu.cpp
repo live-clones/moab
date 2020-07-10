@@ -39,25 +39,26 @@
 namespace MBMesquite
 {
 
-TUntangleMu::~TUntangleMu( ) {}
+TUntangleMu::~TUntangleMu() {}
 
-std::string TUntangleMu::get_name( ) const
+std::string TUntangleMu::get_name() const
 {
-    return "untangle(" + mBaseMetric->get_name( ) + ")";
+    return "untangle(" + mBaseMetric->get_name() + ")";
 }
 
-template< unsigned DIM > inline bool TUntangleMu::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
+template < unsigned DIM >
+inline bool TUntangleMu::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
     bool valid = mBaseMetric->evaluate( T, result, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
     const double d = mConstant - result;
     const double s = fabs( d ) - d;
-    result = 0.125 * s * s * s;
+    result         = 0.125 * s * s * s;
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TUntangleMu::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                                MsqError& err )
 {
@@ -67,19 +68,19 @@ inline bool TUntangleMu::grad( const MsqMatrix< DIM, DIM >& T, double& result, M
     if( mConstant < result )
     {
         const double s = result - mConstant;
-        result = s * s * s;
+        result         = s * s * s;
         deriv_wrt_T *= 3 * s * s;
     }
     else
     {
-        result = 0;
+        result      = 0;
         deriv_wrt_T = MsqMatrix< DIM, DIM >( 0.0 );
     }
 
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TUntangleMu::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                                MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
 {
@@ -89,14 +90,14 @@ inline bool TUntangleMu::hess( const MsqMatrix< DIM, DIM >& T, double& result, M
     if( mConstant < result )
     {
         const double s = result - mConstant;
-        result = s * s * s;
+        result         = s * s * s;
         hess_scale( second_wrt_T, 3 * s * s );
         pluseq_scaled_outer_product( second_wrt_T, 6 * s, deriv_wrt_T );
         deriv_wrt_T *= 3 * s * s;
     }
     else
     {
-        result = 0;
+        result      = 0;
         deriv_wrt_T = MsqMatrix< DIM, DIM >( 0.0 );
         set_scaled_I( second_wrt_T, 0.0 );  // zero everything
     }

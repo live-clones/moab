@@ -38,7 +38,7 @@ class MetisPartitioner : public PartitionerBase< idx_t >
   public:
     MetisPartitioner( Interface* impl = NULL, const bool use_coords = false );
 
-    virtual ~MetisPartitioner( );
+    virtual ~MetisPartitioner();
 
     virtual ErrorCode partition_mesh_and_geometry( const double part_geom_mesh_size, const idx_t nparts,
                                                    const char* zmethod, const char* other_method, double imbal_tol,
@@ -61,7 +61,7 @@ class MetisPartitioner : public PartitionerBase< idx_t >
                                               const bool write_as_sets, const bool write_as_tags );
 
     // put closure of entities in the part sets too
-    virtual ErrorCode include_closure( );
+    virtual ErrorCode include_closure();
 
     // virtual ErrorCode write_file(const char *filename, const char *out_file);
 
@@ -81,7 +81,7 @@ class MetisPartitioner : public PartitionerBase< idx_t >
 // Inline functions
 
 inline ErrorCode MetisPartitioner::partition_mesh_and_geometry( const double, const idx_t nparts, const char* zmethod,
-                                                                const char*, double, const int                part_dim,
+                                                                const char*, double, const int part_dim,
                                                                 const bool write_as_sets, const bool write_as_tags,
                                                                 const int, const int, const bool, const bool,
                                                                 const bool, const bool print_time )
@@ -90,7 +90,7 @@ inline ErrorCode MetisPartitioner::partition_mesh_and_geometry( const double, co
     return partition_mesh( nparts, zmethod, part_dim, write_as_sets, write_as_tags, false, false, NULL, print_time );
 }
 
-inline ErrorCode MetisPartitioner::include_closure( )
+inline ErrorCode MetisPartitioner::include_closure()
 {
     return MB_NOT_IMPLEMENTED;
 }

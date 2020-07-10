@@ -47,10 +47,11 @@ namespace MBMesquite
  * This class implements a fixed-size 2-dimensional matrix.
  * The actual size is specified with template parameters.
  */
-template< unsigned R, unsigned C > class MsqMatrix
+template < unsigned R, unsigned C >
+class MsqMatrix
 {
   protected:
-    double m[ R * C ];
+    double m[R * C];
 
   public:
     typedef MsqMatrix< R, C > my_type;
@@ -62,7 +63,7 @@ template< unsigned R, unsigned C > class MsqMatrix
     };
 
     /** Constructor for uninitialized matrix */
-    MsqMatrix( ) {}
+    MsqMatrix() {}
     /** Initialize diagonal values, zero others */
     MsqMatrix( double v )
     {
@@ -74,7 +75,7 @@ template< unsigned R, unsigned C > class MsqMatrix
         set( v );
     }
     /** Initialize from 2D array */
-    MsqMatrix( const double v[ R ][ C ] )
+    MsqMatrix( const double v[R][C] )
     {
         set( v );
     }
@@ -128,42 +129,42 @@ template< unsigned R, unsigned C > class MsqMatrix
         return *this;
     }
 
-    double& operator( )( unsigned r, unsigned c )
+    double& operator()( unsigned r, unsigned c )
     {
-        return m[ r * C + c ];
+        return m[r * C + c];
     }
-    double operator( )( unsigned r, unsigned c ) const
+    double operator()( unsigned r, unsigned c ) const
     {
-        return m[ r * C + c ];
+        return m[r * C + c];
     }
-    double* data( )
+    double* data()
     {
         return m;
     }
-    const double* data( ) const
+    const double* data() const
     {
         return m;
     }
 
-    void zero( )
+    void zero()
     {
         set( 0.0 );
     }
-    void identity( )
+    void identity()
     {
         diag( 1.0 );
     }
     void set( double v )
     {
         for( unsigned i = 0; i < R * C; ++i )
-            m[ i ] = v;
+            m[i] = v;
     }
     void set( const double* v )
     {
         for( unsigned i = 0; i < R * C; ++i )
-            m[ i ] = v[ i ];
+            m[i] = v[i];
     }
-    void set( const double v[ R ][ C ] );
+    void set( const double v[R][C] );
     void set( const char* s )
     {
         std::istringstream i( s );
@@ -171,7 +172,7 @@ template< unsigned R, unsigned C > class MsqMatrix
     }
     void set( const std::string& s )
     {
-        set( s.c_str( ) );
+        set( s.c_str() );
     }
     /** Set diagonal value to passed values, others to zero. */
     inline void diag( double v );
@@ -215,7 +216,8 @@ template< unsigned R, unsigned C > class MsqMatrix
     void set_columns( const MsqMatrix< R, 1 >* v );
 };
 
-template<> class MsqMatrix< 1, 1 >
+template <>
+class MsqMatrix< 1, 1 >
 {
   protected:
     double m;
@@ -230,7 +232,7 @@ template<> class MsqMatrix< 1, 1 >
     };
 
     /** Constructor for uninitialized matrix */
-    MsqMatrix( ) {}
+    MsqMatrix() {}
     /** Initialize diagonal values, zero others */
     MsqMatrix( double v ) : m( v ) {}
     /** Initialize to an array of values */
@@ -272,28 +274,28 @@ template<> class MsqMatrix< 1, 1 >
         return *this;
     }
 
-    double& operator( )( unsigned, unsigned )
+    double& operator()( unsigned, unsigned )
     {
         return m;
     }
-    double operator( )( unsigned, unsigned ) const
+    double operator()( unsigned, unsigned ) const
     {
         return m;
     }
-    double* data( )
+    double* data()
     {
         return &m;
     }
-    const double* data( ) const
+    const double* data() const
     {
         return &m;
     }
 
-    void zero( )
+    void zero()
     {
         m = 0.0;
     }
-    void identity( )
+    void identity()
     {
         m = 1.0;
     }
@@ -312,7 +314,7 @@ template<> class MsqMatrix< 1, 1 >
     }
     void set( const std::string& s )
     {
-        set( s.c_str( ) );
+        set( s.c_str() );
     }
     /** Set diagonal value to passed values, others to zero. */
     inline void diag( double v )
@@ -355,7 +357,7 @@ template<> class MsqMatrix< 1, 1 >
         return *this;
     }
 
-    operator double( ) const
+    operator double() const
     {
         return m;
     }
@@ -366,10 +368,11 @@ template<> class MsqMatrix< 1, 1 >
  * Define a Vector as a 1xL Matrix
  * Add single-index access operators
  */
-template< unsigned L > class MsqVector : public MsqMatrix< L, 1 >
+template < unsigned L >
+class MsqVector : public MsqMatrix< L, 1 >
 {
   public:
-    MsqVector( ) {}
+    MsqVector() {}
     MsqVector( double v )
     {
         MsqMatrix< L, 1 >::set( v );
@@ -390,19 +393,19 @@ template< unsigned L > class MsqVector : public MsqMatrix< L, 1 >
 
     double& operator[]( unsigned idx )
     {
-        return MsqMatrix< L, 1 >::operator( )( idx, 0 );
+        return MsqMatrix< L, 1 >::operator()( idx, 0 );
     }
     double operator[]( unsigned idx ) const
     {
-        return MsqMatrix< L, 1 >::operator( )( idx, 0 );
+        return MsqMatrix< L, 1 >::operator()( idx, 0 );
     }
-    double& operator( )( unsigned idx )
+    double& operator()( unsigned idx )
     {
-        return MsqMatrix< L, 1 >::operator( )( idx, 0 );
+        return MsqMatrix< L, 1 >::operator()( idx, 0 );
     }
-    double operator( )( unsigned idx ) const
+    double operator()( unsigned idx ) const
     {
-        return MsqMatrix< L, 1 >::operator( )( idx, 0 );
+        return MsqMatrix< L, 1 >::operator()( idx, 0 );
     }
 
     MsqVector< L >& operator=( const MsqMatrix< L, 1 >& p_m )
@@ -418,11 +421,12 @@ template< unsigned L > class MsqVector : public MsqMatrix< L, 1 >
  * * Constructors are different--be careful.
  * * Adds operator[] for c-array style access.
  */
-template< unsigned R, unsigned C > class MsqMatrixA : public MsqMatrix< R, C >
+template < unsigned R, unsigned C >
+class MsqMatrixA : public MsqMatrix< R, C >
 {
   public:
     /** Initialize all elements to zero */
-    MsqMatrixA( )
+    MsqMatrixA()
     {
         MsqMatrix< R, C >::set( 0 );
     }
@@ -465,14 +469,16 @@ template< unsigned R, unsigned C > class MsqMatrixA : public MsqMatrix< R, C >
     }
 };
 
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::set( const double v[ R ][ C ] )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::set( const double v[R][C] )
 {
     for( unsigned r = 0; r < R; ++r )
         for( unsigned c = 0; c < C; ++c )
-            operator( )( r, c ) = v[ r ][ c ];
+            operator()( r, c ) = v[r][c];
 }
 
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::diag( double v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::diag( double v )
 {
     // for (unsigned r = 0; r < R; ++r)
     //  for (unsigned c = 0; c < C; ++c)
@@ -486,80 +492,81 @@ template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::diag( double v
                 {
                     default:
                         for( unsigned k = 4; k < C; ++k )
-                            operator( )( r, k ) = r == k ? v : 0.0;
+                            operator()( r, k ) = r == k ? v : 0.0;
                     case 4:
-                        operator( )( r, 3 ) = 0.0;
+                        operator()( r, 3 ) = 0.0;
                     case 3:
-                        operator( )( r, 2 ) = 0.0;
+                        operator()( r, 2 ) = 0.0;
                     case 2:
-                        operator( )( r, 1 ) = 0.0;
+                        operator()( r, 1 ) = 0.0;
                     case 1:
-                        operator( )( r, 0 ) = 0.0;
+                        operator()( r, 0 ) = 0.0;
                 }
         case 4:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 3, k ) = 0.0;
+                        operator()( 3, k ) = 0.0;
                 case 4:
-                    operator( )( 3, 3 ) = v;
+                    operator()( 3, 3 ) = v;
                 case 3:
-                    operator( )( 3, 2 ) = 0.0;
+                    operator()( 3, 2 ) = 0.0;
                 case 2:
-                    operator( )( 3, 1 ) = 0.0;
+                    operator()( 3, 1 ) = 0.0;
                 case 1:
-                    operator( )( 3, 0 ) = 0.0;
+                    operator()( 3, 0 ) = 0.0;
             }
         case 3:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 2, k ) = 0.0;
+                        operator()( 2, k ) = 0.0;
                 case 4:
-                    operator( )( 2, 3 ) = 0.0;
+                    operator()( 2, 3 ) = 0.0;
                 case 3:
-                    operator( )( 2, 2 ) = v;
+                    operator()( 2, 2 ) = v;
                 case 2:
-                    operator( )( 2, 1 ) = 0.0;
+                    operator()( 2, 1 ) = 0.0;
                 case 1:
-                    operator( )( 2, 0 ) = 0.0;
+                    operator()( 2, 0 ) = 0.0;
             }
         case 2:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 1, k ) = 0.0;
+                        operator()( 1, k ) = 0.0;
                 case 4:
-                    operator( )( 1, 3 ) = 0.0;
+                    operator()( 1, 3 ) = 0.0;
                 case 3:
-                    operator( )( 1, 2 ) = 0.0;
+                    operator()( 1, 2 ) = 0.0;
                 case 2:
-                    operator( )( 1, 1 ) = v;
+                    operator()( 1, 1 ) = v;
                 case 1:
-                    operator( )( 1, 0 ) = 0.0;
+                    operator()( 1, 0 ) = 0.0;
             }
         case 1:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 0, k ) = 0.0;
+                        operator()( 0, k ) = 0.0;
                 case 4:
-                    operator( )( 0, 3 ) = 0.0;
+                    operator()( 0, 3 ) = 0.0;
                 case 3:
-                    operator( )( 0, 2 ) = 0.0;
+                    operator()( 0, 2 ) = 0.0;
                 case 2:
-                    operator( )( 0, 1 ) = 0.0;
+                    operator()( 0, 1 ) = 0.0;
                 case 1:
-                    operator( )( 0, 0 ) = v;
+                    operator()( 0, 0 ) = v;
             }
     }
 }
 
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::diag( const double* v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::diag( const double* v )
 {
     // for (unsigned r = 0; r < R; ++r)
     //  for (unsigned c = 0; c < C; ++c)
@@ -573,75 +580,75 @@ template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::diag( const do
                 {
                     default:
                         for( unsigned k = 4; k < C; ++k )
-                            operator( )( r, k ) = r == k ? v[ r ] : 0.0;
+                            operator()( r, k ) = r == k ? v[r] : 0.0;
                     case 4:
-                        operator( )( r, 3 ) = 0.0;
+                        operator()( r, 3 ) = 0.0;
                     case 3:
-                        operator( )( r, 2 ) = 0.0;
+                        operator()( r, 2 ) = 0.0;
                     case 2:
-                        operator( )( r, 1 ) = 0.0;
+                        operator()( r, 1 ) = 0.0;
                     case 1:
-                        operator( )( r, 0 ) = 0.0;
+                        operator()( r, 0 ) = 0.0;
                 }
         case 4:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 3, k ) = 0.0;
+                        operator()( 3, k ) = 0.0;
                 case 4:
-                    operator( )( 3, 3 ) = v[ 3 ];
+                    operator()( 3, 3 ) = v[3];
                 case 3:
-                    operator( )( 3, 2 ) = 0.0;
+                    operator()( 3, 2 ) = 0.0;
                 case 2:
-                    operator( )( 3, 1 ) = 0.0;
+                    operator()( 3, 1 ) = 0.0;
                 case 1:
-                    operator( )( 3, 0 ) = 0.0;
+                    operator()( 3, 0 ) = 0.0;
             }
         case 3:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 2, k ) = 0.0;
+                        operator()( 2, k ) = 0.0;
                 case 4:
-                    operator( )( 2, 3 ) = 0.0;
+                    operator()( 2, 3 ) = 0.0;
                 case 3:
-                    operator( )( 2, 2 ) = v[ 2 ];
+                    operator()( 2, 2 ) = v[2];
                 case 2:
-                    operator( )( 2, 1 ) = 0.0;
+                    operator()( 2, 1 ) = 0.0;
                 case 1:
-                    operator( )( 2, 0 ) = 0.0;
+                    operator()( 2, 0 ) = 0.0;
             }
         case 2:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 1, k ) = 0.0;
+                        operator()( 1, k ) = 0.0;
                 case 4:
-                    operator( )( 1, 3 ) = 0.0;
+                    operator()( 1, 3 ) = 0.0;
                 case 3:
-                    operator( )( 1, 2 ) = 0.0;
+                    operator()( 1, 2 ) = 0.0;
                 case 2:
-                    operator( )( 1, 1 ) = v[ 1 ];
+                    operator()( 1, 1 ) = v[1];
                 case 1:
-                    operator( )( 1, 0 ) = 0.0;
+                    operator()( 1, 0 ) = 0.0;
             }
         case 1:
             switch( C )
             {
                 default:
                     for( unsigned k = 4; k < C; ++k )
-                        operator( )( 0, k ) = 0.0;
+                        operator()( 0, k ) = 0.0;
                 case 4:
-                    operator( )( 0, 3 ) = 0.0;
+                    operator()( 0, 3 ) = 0.0;
                 case 3:
-                    operator( )( 0, 2 ) = 0.0;
+                    operator()( 0, 2 ) = 0.0;
                 case 2:
-                    operator( )( 0, 1 ) = 0.0;
+                    operator()( 0, 1 ) = 0.0;
                 case 1:
-                    operator( )( 0, 0 ) = v[ 0 ];
+                    operator()( 0, 0 ) = v[0];
             }
     }
 }
@@ -651,87 +658,95 @@ template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::diag( const do
  * Given a matrix m, a row r and an column c, set *this to
  * the matrix that is m with row r and column c deleted.
  */
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline void MsqMatrix< R, C >::make_minor( const MsqMatrix< R + 1, C + 1 >& M, unsigned r, unsigned c )
 {
     for( unsigned i = 0; i < r; ++i )
     {
         for( unsigned j = 0; j < c; ++j )
-            operator( )( i, j ) = M( i, j );
+            operator()( i, j ) = M( i, j );
         for( unsigned j = c; j < C; ++j )
-            operator( )( i, j ) = M( i, j + 1 );
+            operator()( i, j ) = M( i, j + 1 );
     }
     for( unsigned i = r; i < R; ++i )
     {
         for( unsigned j = 0; j < c; ++j )
-            operator( )( i, j ) = M( i + 1, j );
+            operator()( i, j ) = M( i + 1, j );
         for( unsigned j = c; j < C; ++j )
-            operator( )( i, j ) = M( i + 1, j + 1 );
+            operator()( i, j ) = M( i + 1, j + 1 );
     }
 }
 
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::set_row( unsigned r, const MsqMatrix< 1, C >& v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::set_row( unsigned r, const MsqMatrix< 1, C >& v )
 {
     for( unsigned i = 0; i < C; ++i )
-        operator( )( r, i ) = v( 0, i );
+        operator()( r, i ) = v( 0, i );
 }
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::add_row( unsigned r, const MsqMatrix< 1, C >& v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::add_row( unsigned r, const MsqMatrix< 1, C >& v )
 {
     for( unsigned i = 0; i < C; ++i )
-        operator( )( r, i ) += v( 0, i );
+        operator()( r, i ) += v( 0, i );
 }
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline void MsqMatrix< R, C >::set_row_transpose( unsigned r, const MsqMatrix< C, 1 >& v )
 {
     for( unsigned i = 0; i < C; ++i )
-        operator( )( r, i ) = v( i, 0 );
+        operator()( r, i ) = v( i, 0 );
 }
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::set_rows( const MsqMatrix< 1, C >* v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::set_rows( const MsqMatrix< 1, C >* v )
 {
     for( unsigned r = 0; r < R; ++r )
-        set_row( r, v[ r ] );
+        set_row( r, v[r] );
 }
 
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::set_column( unsigned c, const MsqMatrix< R, 1 >& v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::set_column( unsigned c, const MsqMatrix< R, 1 >& v )
 {
     for( unsigned i = 0; i < R; ++i )
-        operator( )( i, c ) = v( i, 0 );
+        operator()( i, c ) = v( i, 0 );
 }
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::add_column( unsigned c, const MsqMatrix< R, 1 >& v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::add_column( unsigned c, const MsqMatrix< R, 1 >& v )
 {
     for( unsigned i = 0; i < R; ++i )
-        operator( )( i, c ) += v( i, 0 );
+        operator()( i, c ) += v( i, 0 );
 }
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline void MsqMatrix< R, C >::set_column_transpose( unsigned c, const MsqMatrix< 1, R >& v )
 {
     for( unsigned i = 0; i < R; ++i )
-        operator( )( i, c ) = v( 0, i );
+        operator()( i, c ) = v( 0, i );
 }
-template< unsigned R, unsigned C > inline void MsqMatrix< R, C >::set_columns( const MsqMatrix< R, 1 >* v )
+template < unsigned R, unsigned C >
+inline void MsqMatrix< R, C >::set_columns( const MsqMatrix< R, 1 >* v )
 {
     for( unsigned c = 0; c < C; ++c )
-        set_column( c, v[ c ] );
+        set_column( c, v[c] );
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, 1 > MsqMatrix< R, C >::column( unsigned c ) const
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, 1 > MsqMatrix< R, C >::column( unsigned c ) const
 {
     MsqMatrix< R, 1 > result;
     for( unsigned i = 0; i < R; ++i )
-        result( i, 0 ) = operator( )( i, c );
+        result( i, 0 ) = operator()( i, c );
     return result;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< 1, R > MsqMatrix< R, C >::column_transpose( unsigned c ) const
+template < unsigned R, unsigned C >
+inline MsqMatrix< 1, R > MsqMatrix< R, C >::column_transpose( unsigned c ) const
 {
     MsqMatrix< 1, R > result;
     for( unsigned i = 0; i < R; ++i )
-        result( 0, i ) = operator( )( i, c );
+        result( 0, i ) = operator()( i, c );
     return result;
 }
 
 /**\brief Set a subset of this matrix to some other matrix */
-template< unsigned R1, unsigned C1, unsigned R2, unsigned C2 >
+template < unsigned R1, unsigned C1, unsigned R2, unsigned C2 >
 inline void set_region( MsqMatrix< R1, C1 >& d, unsigned r, unsigned c, MsqMatrix< R2, C2 >& s )
 {
     const unsigned rmax = r + R2 > R1 ? R1 : r + R2;
@@ -741,106 +756,113 @@ inline void set_region( MsqMatrix< R1, C1 >& d, unsigned r, unsigned c, MsqMatri
             d( i, j ) = s( i - r, j - c );
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C >& MsqMatrix< R, C >::assign_add_transpose( const MsqMatrix< C, R >& other )
 {
     for( unsigned r = 0; r < R; ++r )
         for( unsigned c = 0; c < C; ++c )
-            operator( )( r, c ) += other( c, r );
+            operator()( r, c ) += other( c, r );
     return *this;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C >& MsqMatrix< R, C >::assign_multiply_elements( const MsqMatrix< R, C >& other )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] *= other.data( )[ i ];
+        m[i] *= other.data()[i];
     return *this;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C >& MsqMatrix< R, C >::assign_product( double s, const MsqMatrix< R, C >& other )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] = s * other.data( )[ i ];
+        m[i] = s * other.data()[i];
     return *this;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C >& MsqMatrix< R, C >::assign_add_product( double s, const MsqMatrix< R, C >& other )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] += s * other.data( )[ i ];
+        m[i] += s * other.data()[i];
     return *this;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator+=( const MsqMatrix< R, C >& other )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] += other.data( )[ i ];
+        m[i] += other.data()[i];
     return *this;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator-=( const MsqMatrix< R, C >& other )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] -= other.data( )[ i ];
+        m[i] -= other.data()[i];
     return *this;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator+=( double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator+=( double s )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] += s;
+        m[i] += s;
     return *this;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator-=( double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator-=( double s )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] -= s;
+        m[i] -= s;
     return *this;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator*=( double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator*=( double s )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] *= s;
+        m[i] *= s;
     return *this;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator/=( double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C >& MsqMatrix< R, C >::operator/=( double s )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        m[ i ] /= s;
+        m[i] /= s;
     return *this;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator-( const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator-( const MsqMatrix< R, C >& m )
 {
     MsqMatrix< R, C > result;
     for( unsigned i = 0; i < R * C; ++i )
-        result.data( )[ i ] = -m.data( )[ i ];
+        result.data()[i] = -m.data()[i];
     return result;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator+( const MsqMatrix< R, C >& m, double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator+( const MsqMatrix< R, C >& m, double s )
 {
     MsqMatrix< R, C > tmp( m );
     tmp += s;
     return tmp;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator+( double s, const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator+( double s, const MsqMatrix< R, C >& m )
 {
     MsqMatrix< R, C > tmp( m );
     tmp += s;
     return tmp;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C > operator+( const MsqMatrix< R, C >& A, const MsqMatrix< R, C >& B )
 {
     MsqMatrix< R, C > tmp( A );
@@ -848,21 +870,23 @@ inline MsqMatrix< R, C > operator+( const MsqMatrix< R, C >& A, const MsqMatrix<
     return tmp;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator-( const MsqMatrix< R, C >& m, double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator-( const MsqMatrix< R, C >& m, double s )
 {
     MsqMatrix< R, C > tmp( m );
     tmp -= s;
     return tmp;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator-( double s, const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator-( double s, const MsqMatrix< R, C >& m )
 {
     MsqMatrix< R, C > tmp( m );
     tmp -= s;
     return tmp;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C > operator-( const MsqMatrix< R, C >& A, const MsqMatrix< R, C >& B )
 {
     MsqMatrix< R, C > tmp( A );
@@ -870,21 +894,23 @@ inline MsqMatrix< R, C > operator-( const MsqMatrix< R, C >& A, const MsqMatrix<
     return tmp;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator*( const MsqMatrix< R, C >& m, double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator*( const MsqMatrix< R, C >& m, double s )
 {
     MsqMatrix< R, C > tmp( m );
     tmp *= s;
     return tmp;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator*( double s, const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator*( double s, const MsqMatrix< R, C >& m )
 {
     MsqMatrix< R, C > tmp( m );
     tmp *= s;
     return tmp;
 }
 
-template< unsigned R, unsigned RC, unsigned C >
+template < unsigned R, unsigned RC, unsigned C >
 inline double multiply_helper_result_val( unsigned r, unsigned c, const MsqMatrix< R, RC >& A,
                                           const MsqMatrix< RC, C >& B )
 {
@@ -909,7 +935,7 @@ inline double multiply_helper_result_val( unsigned r, unsigned c, const MsqMatri
     return tmp;
 }
 
-template< unsigned R, unsigned RC, unsigned C >
+template < unsigned R, unsigned RC, unsigned C >
 inline MsqMatrix< R, C > operator*( const MsqMatrix< R, RC >& A, const MsqMatrix< RC, C >& B )
 {
     // MsqMatrix<R,C> result(0.0);
@@ -926,20 +952,23 @@ inline MsqMatrix< R, C > operator*( const MsqMatrix< R, RC >& A, const MsqMatrix
     return result;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > operator/( const MsqMatrix< R, C >& m, double s )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > operator/( const MsqMatrix< R, C >& m, double s )
 {
     MsqMatrix< R, C > tmp( m );
     tmp /= s;
     return tmp;
 }
 
-template< unsigned RC > inline double cofactor( const MsqMatrix< RC, RC >& m, unsigned r, unsigned c )
+template < unsigned RC >
+inline double cofactor( const MsqMatrix< RC, RC >& m, unsigned r, unsigned c )
 {
     const double sign[] = { 1.0, -1.0 };
-    return sign[ ( r + c ) % 2 ] * det( MsqMatrix< RC - 1, RC - 1 >( m, r, c ) );
+    return sign[( r + c ) % 2] * det( MsqMatrix< RC - 1, RC - 1 >( m, r, c ) );
 }
 
-template< unsigned RC > inline double det( const MsqMatrix< RC, RC >& m )
+template < unsigned RC >
+inline double det( const MsqMatrix< RC, RC >& m )
 {
     double result = 0.0;
     for( unsigned i = 0; i < RC; ++i )
@@ -1021,12 +1050,14 @@ inline MsqMatrix< 3, 3 > transpose_adj( const MsqMatrix< 3, 3 >& m )
     return result;
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > inverse( const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > inverse( const MsqMatrix< R, C >& m )
 {
     return adj( m ) * ( 1.0 / det( m ) );
 }
 
-template< unsigned R, unsigned C > inline MsqMatrix< R, C > transpose( const MsqMatrix< C, R >& m )
+template < unsigned R, unsigned C >
+inline MsqMatrix< R, C > transpose( const MsqMatrix< C, R >& m )
 {
     MsqMatrix< R, C > result;
     for( unsigned r = 0; r < R; ++r )
@@ -1043,7 +1074,8 @@ template <unsigned C> inline
 const MsqMatrix<1,C>& transpose( const MsqMatrix<C,1>& m )
   { return *reinterpret_cast<const MsqMatrix<1,C>*>(&m); }
 */
-template< unsigned RC > inline double trace( const MsqMatrix< RC, RC >& m )
+template < unsigned RC >
+inline double trace( const MsqMatrix< RC, RC >& m )
 {
     double result = m( 0, 0 );
     for( unsigned i = 1; i < RC; ++i )
@@ -1051,67 +1083,77 @@ template< unsigned RC > inline double trace( const MsqMatrix< RC, RC >& m )
     return result;
 }
 
-template< unsigned R, unsigned C > inline double sqr_Frobenius( const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline double sqr_Frobenius( const MsqMatrix< R, C >& m )
 {
-    double result = *m.data( ) * *m.data( );
+    double result = *m.data() * *m.data();
     for( unsigned i = 1; i < R * C; ++i )
-        result += m.data( )[ i ] * m.data( )[ i ];
+        result += m.data()[i] * m.data()[i];
     return result;
 }
 
-template< unsigned R, unsigned C > inline double Frobenius( const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline double Frobenius( const MsqMatrix< R, C >& m )
 {
     return std::sqrt( sqr_Frobenius< R, C >( m ) );
 }
 
-template< unsigned R, unsigned C > inline bool operator==( const MsqMatrix< R, C >& A, const MsqMatrix< R, C >& B )
+template < unsigned R, unsigned C >
+inline bool operator==( const MsqMatrix< R, C >& A, const MsqMatrix< R, C >& B )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        if( A.data( )[ i ] != B.data( )[ i ] ) return false;
+        if( A.data()[i] != B.data()[i] ) return false;
     return true;
 }
 
-template< unsigned R, unsigned C > inline bool operator!=( const MsqMatrix< R, C >& A, const MsqMatrix< R, C >& B )
+template < unsigned R, unsigned C >
+inline bool operator!=( const MsqMatrix< R, C >& A, const MsqMatrix< R, C >& B )
 {
     return !( A == B );
 }
 
-template< unsigned R, unsigned C > inline std::ostream& operator<<( std::ostream& str, const MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline std::ostream& operator<<( std::ostream& str, const MsqMatrix< R, C >& m )
 {
-    str << m.data( )[ 0 ];
+    str << m.data()[0];
     for( unsigned i = 1; i < R * C; ++i )
-        str << ' ' << m.data( )[ i ];
+        str << ' ' << m.data()[i];
     return str;
 }
 
-template< unsigned R, unsigned C > inline std::istream& operator>>( std::istream& str, MsqMatrix< R, C >& m )
+template < unsigned R, unsigned C >
+inline std::istream& operator>>( std::istream& str, MsqMatrix< R, C >& m )
 {
     for( unsigned i = 0; i < R * C; ++i )
-        str >> m.data( )[ i ];
+        str >> m.data()[i];
     return str;
 }
 
-template< unsigned R > inline double sqr_length( const MsqMatrix< R, 1 >& v )
+template < unsigned R >
+inline double sqr_length( const MsqMatrix< R, 1 >& v )
 {
     return sqr_Frobenius( v );
 }
 
-template< unsigned C > inline double sqr_length( const MsqMatrix< 1, C >& v )
+template < unsigned C >
+inline double sqr_length( const MsqMatrix< 1, C >& v )
 {
     return sqr_Frobenius( v );
 }
 
-template< unsigned R > inline double length( const MsqMatrix< R, 1 >& v )
+template < unsigned R >
+inline double length( const MsqMatrix< R, 1 >& v )
 {
     return Frobenius( v );
 }
 
-template< unsigned C > inline double length( const MsqMatrix< 1, C >& v )
+template < unsigned C >
+inline double length( const MsqMatrix< 1, C >& v )
 {
     return Frobenius( v );
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline double inner_product( const MsqMatrix< R, C >& m1, const MsqMatrix< R, C >& m2 )
 {
     double result = 0.0;
@@ -1121,7 +1163,7 @@ inline double inner_product( const MsqMatrix< R, C >& m1, const MsqMatrix< R, C 
     return result;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C > outer( const MsqMatrix< R, 1 >& v1, const MsqMatrix< C, 1 >& v2 )
 {
     MsqMatrix< R, C > result;
@@ -1131,7 +1173,7 @@ inline MsqMatrix< R, C > outer( const MsqMatrix< R, 1 >& v1, const MsqMatrix< C,
     return result;
 }
 
-template< unsigned R, unsigned C >
+template < unsigned R, unsigned C >
 inline MsqMatrix< R, C > outer( const MsqMatrix< 1, R >& v1, const MsqMatrix< 1, C >& v2 )
 {
     MsqMatrix< R, C > result;
@@ -1169,7 +1211,8 @@ inline MsqMatrix< 1, 3 > vector_product( const MsqMatrix< 1, 3 >& a, const MsqMa
     return result;
 }
 
-template< unsigned R, unsigned C > inline double operator%( const MsqMatrix< R, C >& v1, const MsqMatrix< R, C >& v2 )
+template < unsigned R, unsigned C >
+inline double operator%( const MsqMatrix< R, C >& v1, const MsqMatrix< R, C >& v2 )
 {
     return inner_product( v1, v2 );
 }
@@ -1199,10 +1242,10 @@ inline void QR( const MsqMatrix< 3, 3 >& A, MsqMatrix< 3, 3 >& Q, MsqMatrix< 3, 
 {
     Q = A;
 
-    R( 0, 0 ) = sqrt( Q( 0, 0 ) * Q( 0, 0 ) + Q( 1, 0 ) * Q( 1, 0 ) + Q( 2, 0 ) * Q( 2, 0 ) );
+    R( 0, 0 )       = sqrt( Q( 0, 0 ) * Q( 0, 0 ) + Q( 1, 0 ) * Q( 1, 0 ) + Q( 2, 0 ) * Q( 2, 0 ) );
     double temp_dbl = 1.0 / R( 0, 0 );
-    R( 1, 0 ) = 0.0;
-    R( 2, 0 ) = 0.0;
+    R( 1, 0 )       = 0.0;
+    R( 2, 0 )       = 0.0;
     Q( 0, 0 ) *= temp_dbl;
     Q( 1, 0 ) *= temp_dbl;
     Q( 2, 0 ) *= temp_dbl;
@@ -1218,7 +1261,7 @@ inline void QR( const MsqMatrix< 3, 3 >& A, MsqMatrix< 3, 3 >& Q, MsqMatrix< 3, 
     Q( 2, 2 ) -= Q( 2, 0 ) * R( 0, 2 );
 
     R( 1, 1 ) = sqrt( Q( 0, 1 ) * Q( 0, 1 ) + Q( 1, 1 ) * Q( 1, 1 ) + Q( 2, 1 ) * Q( 2, 1 ) );
-    temp_dbl = 1.0 / R( 1, 1 );
+    temp_dbl  = 1.0 / R( 1, 1 );
     R( 2, 1 ) = 0.0;
     Q( 0, 1 ) *= temp_dbl;
     Q( 1, 1 ) *= temp_dbl;
@@ -1230,7 +1273,7 @@ inline void QR( const MsqMatrix< 3, 3 >& A, MsqMatrix< 3, 3 >& Q, MsqMatrix< 3, 
     Q( 2, 2 ) -= Q( 2, 1 ) * R( 1, 2 );
 
     R( 2, 2 ) = sqrt( Q( 0, 2 ) * Q( 0, 2 ) + Q( 1, 2 ) * Q( 1, 2 ) + Q( 2, 2 ) * Q( 2, 2 ) );
-    temp_dbl = 1.0 / R( 2, 2 );
+    temp_dbl  = 1.0 / R( 2, 2 );
     Q( 0, 2 ) *= temp_dbl;
     Q( 1, 2 ) *= temp_dbl;
     Q( 2, 2 ) *= temp_dbl;
@@ -1239,14 +1282,14 @@ inline void QR( const MsqMatrix< 3, 3 >& A, MsqMatrix< 3, 3 >& Q, MsqMatrix< 3, 
 /** Compute QR factorization of A */
 inline void QR( const MsqMatrix< 2, 2 >& A, MsqMatrix< 2, 2 >& Q, MsqMatrix< 2, 2 >& R )
 {
-    R( 0, 0 ) = std::sqrt( A( 0, 0 ) * A( 0, 0 ) + A( 1, 0 ) * A( 1, 0 ) );
+    R( 0, 0 )          = std::sqrt( A( 0, 0 ) * A( 0, 0 ) + A( 1, 0 ) * A( 1, 0 ) );
     const double r0inv = 1.0 / R( 0, 0 );
     Q( 0, 0 ) = Q( 1, 1 ) = A( 0, 0 ) * r0inv;
-    Q( 1, 0 ) = A( 1, 0 ) * r0inv;
-    Q( 0, 1 ) = -Q( 1, 0 );
-    R( 0, 1 ) = r0inv * ( A( 0, 0 ) * A( 0, 1 ) + A( 1, 0 ) * A( 1, 1 ) );
-    R( 1, 1 ) = r0inv * ( A( 0, 0 ) * A( 1, 1 ) - A( 0, 1 ) * A( 1, 0 ) );
-    R( 1, 0 ) = 0.0;
+    Q( 1, 0 )             = A( 1, 0 ) * r0inv;
+    Q( 0, 1 )             = -Q( 1, 0 );
+    R( 0, 1 )             = r0inv * ( A( 0, 0 ) * A( 0, 1 ) + A( 1, 0 ) * A( 1, 1 ) );
+    R( 1, 1 )             = r0inv * ( A( 0, 0 ) * A( 1, 1 ) - A( 0, 1 ) * A( 1, 0 ) );
+    R( 1, 0 )             = 0.0;
 }
 
 }  // namespace MBMesquite

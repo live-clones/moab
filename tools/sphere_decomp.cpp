@@ -18,15 +18,15 @@ int main( int argc, char* argv[] )
 {
     if( argc < 3 )
     {
-        std::cout << "Usage: " << argv[ 0 ] << " <input_mesh> <output_mesh>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <input_mesh> <output_mesh>" << std::endl;
         return 0;
     }
 
     // create MOAB
-    moab::Interface* mbImpl = new moab::Core( );
+    moab::Interface* mbImpl = new moab::Core();
 
     // read in mesh
-    moab::ErrorCode result = mbImpl->load_mesh( argv[ 1 ] );
+    moab::ErrorCode result = mbImpl->load_mesh( argv[1] );
     if( moab::MB_SUCCESS != result )
     {
         std::cout << "Problems loading mesh." << std::endl;
@@ -34,7 +34,7 @@ int main( int argc, char* argv[] )
     }
 
     moab::Tag sphere_radii_tag = 0;
-    double    dum_val = 0.1;
+    double dum_val             = 0.1;
     result = mbImpl->tag_get_handle( SPHERE_RADII_TAG_NAME, 1, moab::MB_TYPE_DOUBLE, sphere_radii_tag,
                                      moab::MB_TAG_DENSE | moab::MB_TAG_CREAT, &dum_val );
     if( moab::MB_SUCCESS != result )
@@ -46,10 +46,10 @@ int main( int argc, char* argv[] )
     SphereDecomp sd( mbImpl );
 
     moab::EntityHandle this_set = 0;
-    result = sd.build_sphere_mesh( SPHERE_RADII_TAG_NAME, &this_set );RR;
+    result                      = sd.build_sphere_mesh( SPHERE_RADII_TAG_NAME, &this_set );RR;
 
     // write mesh
-    result = mbImpl->write_mesh( argv[ 2 ], &this_set, 1 );RR;
+    result = mbImpl->write_mesh( argv[2], &this_set, 1 );RR;
 
     return 0;
 }

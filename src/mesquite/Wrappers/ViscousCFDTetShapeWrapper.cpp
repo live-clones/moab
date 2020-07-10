@@ -62,53 +62,53 @@ void ViscousCFDTetShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, P
     InstructionQueue q;
 
     // Set up barrier metric to see if mesh contains inverted elements
-    TShapeB1         mu_b;
+    TShapeB1 mu_b;
     IdealShapeTarget w_ideal;
-    TQualityMetric   barrier( &w_ideal, &mu_b );
+    TQualityMetric barrier( &w_ideal, &mu_b );
 
     // Check for inverted elements in the mesh
     QualityAssessor inv_check( &barrier );
-    inv_check.disable_printing_results( );
+    inv_check.disable_printing_results();
     q.add_quality_assessor( &inv_check, err );MSQ_ERRRTN( err );
     q.run_common( mesh_and_domain, pmesh, settings, err );MSQ_ERRRTN( err );
     q.remove_quality_assessor( 0, err );MSQ_ERRRTN( err );
     const QualityAssessor::Assessor* inv_b = inv_check.get_results( &barrier );
-    const bool                       use_barrier = ( 0 == inv_b->get_invalid_element_count( ) );
+    const bool use_barrier                 = ( 0 == inv_b->get_invalid_element_count() );
 
     // Create remaining metric instances
-    TShapeNB1           mu;
+    TShapeNB1 mu;
     TShapeSizeOrientNB1 mu_o;
-    TShapeSizeOrientB1  mu_ob;
+    TShapeSizeOrientB1 mu_ob;
 
     // Select which target metrics to use
     TMetric *mu_p, *mu_op;
     if( use_barrier )
     {
-        mu_p = &mu_b;
+        mu_p  = &mu_b;
         mu_op = &mu_ob;
     }
     else
     {
-        mu_p = &mu;
+        mu_p  = &mu;
         mu_op = &mu_o;
     }
 
     // Set up target and weight calculators
-    Mesh*         mesh = mesh_and_domain->get_mesh( );
+    Mesh* mesh = mesh_and_domain->get_mesh();
     TagVertexMesh init_mesh( err, pmesh ? (Mesh*)pmesh : mesh );MSQ_ERRRTN( err );
-    ReferenceMesh           ref_mesh( &init_mesh );
+    ReferenceMesh ref_mesh( &init_mesh );
     RefMeshTargetCalculator w_init( &ref_mesh );
-    TetDihedralWeight       c_dihedral( &ref_mesh, dCutoff, aVal );
-    RemainingWeight         c_remaining( &c_dihedral );
+    TetDihedralWeight c_dihedral( &ref_mesh, dCutoff, aVal );
+    RemainingWeight c_remaining( &c_dihedral );
 
     // Create objective function
-    TQualityMetric   metric1( &w_ideal, &c_dihedral, mu_p );
-    TQualityMetric   metric2( &w_init, &c_remaining, mu_op );
+    TQualityMetric metric1( &w_ideal, &c_dihedral, mu_p );
+    TQualityMetric metric2( &w_init, &c_remaining, mu_op );
     AddQualityMetric of_metric( &metric1, &metric2, err );MSQ_ERRRTN( err );
     PMeanPTemplate obj_func( 1.0, &of_metric );
 
     // Create optimizer
-    TrustRegion          solver( &obj_func );
+    TrustRegion solver( &obj_func );
     TerminationCriterion term, ptc;
     term.add_iteration_limit( iterationLimit );
     term.add_absolute_vertex_movement( maxVtxMovement );

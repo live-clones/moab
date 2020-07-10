@@ -25,8 +25,8 @@
 // #define ENABLE_DEBUG
 
 // maximum number of edges on each convex polygon of interest
-#define MAXEDGES 10
-#define MAXEDGES2 20  // used for coordinates in plane
+#define MAXEDGES    10
+#define MAXEDGES2   20  // used for coordinates in plane
 #define CORRTAGNAME "__correspondent"
 
 namespace moab
@@ -57,7 +57,7 @@ class Intx2Mesh
   public:
     Intx2Mesh( Interface* mbimpl );
 
-    virtual ~Intx2Mesh( );
+    virtual ~Intx2Mesh();
 
     /*
      * computes intersection between 2 sets;
@@ -85,7 +85,7 @@ class Intx2Mesh
     // with 2*MAXEDGES, at most
     // will also return the number of nodes of tgt and src elements
     virtual ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP,
-                                                           double& area, int markb[ MAXEDGES ], int markr[ MAXEDGES ],
+                                                           double& area, int markb[MAXEDGES], int markr[MAXEDGES],
                                                            int& nsidesSrc, int& nsidesTgt,
                                                            bool check_boxes_first = false ) = 0;
 
@@ -106,13 +106,13 @@ class Intx2Mesh
                                     EntityHandle set2 );  // this needs to be called before any
                                                           // covering communication in parallel
 
-    virtual ErrorCode createTags( );
+    virtual ErrorCode createTags();
 
     ErrorCode DetermineOrderedNeighbors( EntityHandle inputSet, int max_edges, Tag& neighTag );
 
     void set_error_tolerance( double eps )
     {
-        epsilon_1 = eps;
+        epsilon_1    = eps;
         epsilon_area = eps * eps / 2;
     }
 
@@ -125,7 +125,7 @@ class Intx2Mesh
     // void SetEntityType (EntityType tp) { type=tp;}
 
     // clean some memory allocated
-    void clean( );
+    void clean();
 
     void set_box_error( double berror )
     {
@@ -168,14 +168,14 @@ class Intx2Mesh
     void correct_polygon( EntityHandle* foundIds, int& nP );
 #ifdef MOAB_HAVE_MPI
     // share vertices between the intersection target domains
-    ErrorCode resolve_intersection_sharing( );
+    ErrorCode resolve_intersection_sharing();
 #endif
 #ifdef ENABLE_DEBUG
-    void enable_debug( )
+    void enable_debug()
     {
         dbg_1 = 1;
     }
-    void disable_debug( )
+    void disable_debug()
     {
         dbg_1 = 0;
     }
@@ -190,11 +190,11 @@ class Intx2Mesh
 
     EntityHandle mbs1;
     EntityHandle mbs2;
-    Range        rs1;  // range set 1 (departure set, lagrange set, src set, manufactured set, target mesh)
-    Range        rs2;  // range set 2 (arrival set, euler set, tgt set, initial set, source mesh)
+    Range rs1;  // range set 1 (departure set, lagrange set, src set, manufactured set, target mesh)
+    Range rs2;  // range set 2 (arrival set, euler set, tgt set, initial set, source mesh)
 
     EntityHandle outSet;  // will contain intersection
-    Tag          gid;  // global id tag will be used to set the parents of the intersection cell
+    Tag gid;              // global id tag will be used to set the parents of the intersection cell
 
     // tags used in computation, advancing front
     Tag TgtFlagTag;  // to mark tgt quads already considered
@@ -220,14 +220,14 @@ class Intx2Mesh
 
     const EntityHandle* tgtConn;
     const EntityHandle* srcConn;
-    CartVect            tgtCoords[ MAXEDGES ];
-    CartVect            srcCoords[ MAXEDGES ];
-    double              tgtCoords2D[ MAXEDGES2 ];  // these are in plane
-    double              srcCoords2D[ MAXEDGES2 ];  // these are in plane
+    CartVect tgtCoords[MAXEDGES];
+    CartVect srcCoords[MAXEDGES];
+    double tgtCoords2D[MAXEDGES2];  // these are in plane
+    double srcCoords2D[MAXEDGES2];  // these are in plane
 
 #ifdef ENABLE_DEBUG
-    static int    dbg_1;
-    std::ofstream mout_1[ 6 ];  // some debug files
+    static int dbg_1;
+    std::ofstream mout_1[6];  // some debug files
 #endif
     // for each tgt edge, we keep a vector of extra nodes, coming from intersections
     // use the index in TgtEdges range
@@ -242,16 +242,16 @@ class Intx2Mesh
     double epsilon_area;
 
     std::vector< double > allBoxes;
-    double                box_error;
+    double box_error;
     /* \brief Local root of the kdtree */
     EntityHandle localRoot;
-    Range        localEnts;  // this range is for local elements of interest, euler cells, or "first mesh"
+    Range localEnts;  // this range is for local elements of interest, euler cells, or "first mesh"
     unsigned int my_rank;
 
 #ifdef MOAB_HAVE_MPI
     ParallelComm* parcomm;
-    TupleList*    remote_cells;  // not used anymore for communication, just a container
-    TupleList*    remote_cells_with_tracers;  // these will be used now to update tracers on remote procs
+    TupleList* remote_cells;                       // not used anymore for communication, just a container
+    TupleList* remote_cells_with_tracers;          // these will be used now to update tracers on remote procs
     std::map< int, EntityHandle > globalID_to_eh;  // needed for parallel, mostly
 #endif
     int max_edges_1;  // maximum number of edges in the lagrange set (first set, src)

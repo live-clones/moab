@@ -48,7 +48,7 @@ class WriteGmsh : public WriterIface
     WriteGmsh( Interface* impl );
 
     //! Destructor
-    virtual ~WriteGmsh( );
+    virtual ~WriteGmsh();
 
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
@@ -58,7 +58,7 @@ class WriteGmsh : public WriterIface
 
   private:
     //! interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 };
 

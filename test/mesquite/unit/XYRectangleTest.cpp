@@ -50,28 +50,28 @@ class XYRectangleTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_normal_at );
     CPPUNIT_TEST( test_closest_point );
     CPPUNIT_TEST( test_domain_DoF );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
-    vector< double >        vertCoords, invertCoords;
-    vector< int >           fixedFlags;
+    vector< double > vertCoords, invertCoords;
+    vector< int > fixedFlags;
     vector< unsigned long > triConn, invertConn;
 
-    ArrayMesh             myMesh;
-    XYRectangle           myDomain;
+    ArrayMesh myMesh;
+    XYRectangle myDomain;
     std::vector< double > mCoords;
-    std::vector< int >    mFlags;
+    std::vector< int > mFlags;
 
   public:
-    void setUp( );
-    void tearDown( );
+    void setUp();
+    void tearDown();
 
   public:
-    XYRectangleTest( ) : myDomain( WIDTH, HEIGHT, XMIN, YMIN ) {}
+    XYRectangleTest() : myDomain( WIDTH, HEIGHT, XMIN, YMIN ) {}
 
-    void test_snap_to( );
-    void test_normal_at( );
-    void test_closest_point( );
-    void test_domain_DoF( );
+    void test_snap_to();
+    void test_normal_at();
+    void test_closest_point();
+    void test_domain_DoF();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( XYRectangleTest, "Unit" );
@@ -89,7 +89,7 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( XYRectangleTest, "XYRectangleTest" );
  *    |/       \ /       \|
  *   (0)-------(1)-------(2)
  */
-double              TEST_MESH_COORDS[] = { XMIN,
+double TEST_MESH_COORDS[]            = { XMIN,
                               YMIN,
                               0,
                               XMIN + 0.5 * WIDTH,
@@ -119,17 +119,17 @@ double              TEST_MESH_COORDS[] = { XMIN,
                               XMIN + WIDTH,
                               YMIN + HEIGHT,
                               0 };
-const int           NUM_TEST_MESH_VERTS = sizeof( TEST_MESH_COORDS ) / sizeof( double ) / 3;
+const int NUM_TEST_MESH_VERTS        = sizeof( TEST_MESH_COORDS ) / sizeof( double ) / 3;
 const unsigned long TEST_MESH_CONN[] = { 0, 1, 4, 1, 2, 5, 0, 4, 3, 1, 5, 4, 2, 6, 5,
                                          3, 4, 7, 4, 5, 8, 5, 6, 9, 4, 8, 7, 5, 9, 8 };
-const int           NUM_TEST_MESH_TRIS = sizeof( TEST_MESH_CONN ) / sizeof( TEST_MESH_CONN[ 0 ] ) / 3;
+const int NUM_TEST_MESH_TRIS         = sizeof( TEST_MESH_CONN ) / sizeof( TEST_MESH_CONN[0] ) / 3;
 
-void XYRectangleTest::setUp( )
+void XYRectangleTest::setUp()
 {
     MsqError err;
     mCoords.resize( 3 * NUM_TEST_MESH_VERTS );
-    std::copy( TEST_MESH_COORDS, TEST_MESH_COORDS + 3 * NUM_TEST_MESH_VERTS, mCoords.begin( ) );
-    mFlags.clear( );
+    std::copy( TEST_MESH_COORDS, TEST_MESH_COORDS + 3 * NUM_TEST_MESH_VERTS, mCoords.begin() );
+    mFlags.clear();
     mFlags.resize( NUM_TEST_MESH_VERTS, 0 );
     myMesh.set_mesh( 3, NUM_TEST_MESH_VERTS, arrptr( mCoords ), arrptr( mFlags ), NUM_TEST_MESH_TRIS, TRIANGLE,
                      TEST_MESH_CONN );
@@ -137,31 +137,31 @@ void XYRectangleTest::setUp( )
     ASSERT_NO_ERROR( err );
 }
 
-void XYRectangleTest::tearDown( ) {}
+void XYRectangleTest::tearDown() {}
 
 Vector3D snap_to( const Vector3D& vertex, const Vector3D& point )
 {
     Vector3D result;
-    result[ 2 ] = 0.0;
+    result[2] = 0.0;
 
-    if( fabs( vertex[ 0 ] - XMIN ) < 1e-6 )
-        result[ 0 ] = XMIN;
-    else if( fabs( vertex[ 0 ] - XMIN - WIDTH ) < 1e-6 )
-        result[ 0 ] = XMIN + WIDTH;
+    if( fabs( vertex[0] - XMIN ) < 1e-6 )
+        result[0] = XMIN;
+    else if( fabs( vertex[0] - XMIN - WIDTH ) < 1e-6 )
+        result[0] = XMIN + WIDTH;
     else
-        result[ 0 ] = point[ 0 ];
+        result[0] = point[0];
 
-    if( fabs( vertex[ 1 ] - YMIN ) < 1e-6 )
-        result[ 1 ] = YMIN;
-    else if( fabs( vertex[ 1 ] - YMIN - HEIGHT ) < 1e-6 )
-        result[ 1 ] = YMIN + HEIGHT;
+    if( fabs( vertex[1] - YMIN ) < 1e-6 )
+        result[1] = YMIN;
+    else if( fabs( vertex[1] - YMIN - HEIGHT ) < 1e-6 )
+        result[1] = YMIN + HEIGHT;
     else
-        result[ 1 ] = point[ 1 ];
+        result[1] = point[1];
 
     return result;
 }
 
-void XYRectangleTest::test_snap_to( )
+void XYRectangleTest::test_snap_to()
 {
     MsqError err;
     Vector3D off, exp, act;
@@ -175,87 +175,87 @@ void XYRectangleTest::test_snap_to( )
     std::vector< Mesh::VertexHandle > verts;
     myMesh.get_all_vertices( verts, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !verts.empty( ) );
-    std::vector< MsqVertex > coords( verts.size( ) );
-    myMesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size( ), err );
+    CPPUNIT_ASSERT( !verts.empty() );
+    std::vector< MsqVertex > coords( verts.size() );
+    myMesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size(), err );
     ASSERT_NO_ERROR( err );
 
-    for( size_t i = 0; i < coords.size( ); ++i )
+    for( size_t i = 0; i < coords.size(); ++i )
     {
 
-        off = coords[ i ] + d1;
-        exp = snap_to( coords[ i ], off );
+        off = coords[i] + d1;
+        exp = snap_to( coords[i], off );
         act = off;
-        myDomain.snap_to( verts[ i ], act );
+        myDomain.snap_to( verts[i], act );
         CPPUNIT_ASSERT_VECTORS_EQUAL( exp, act, 1e-6 );
 
-        off = coords[ i ] + d2;
-        exp = snap_to( coords[ i ], off );
+        off = coords[i] + d2;
+        exp = snap_to( coords[i], off );
         act = off;
-        myDomain.snap_to( verts[ i ], act );
+        myDomain.snap_to( verts[i], act );
         CPPUNIT_ASSERT_VECTORS_EQUAL( exp, act, 1e-6 );
 
-        off = coords[ i ] + d3;
-        exp = snap_to( coords[ i ], off );
+        off = coords[i] + d3;
+        exp = snap_to( coords[i], off );
         act = off;
-        myDomain.snap_to( verts[ i ], act );
+        myDomain.snap_to( verts[i], act );
         CPPUNIT_ASSERT_VECTORS_EQUAL( exp, act, 1e-6 );
 
-        off = coords[ i ] + d4;
-        exp = snap_to( coords[ i ], off );
+        off = coords[i] + d4;
+        exp = snap_to( coords[i], off );
         act = off;
-        myDomain.snap_to( verts[ i ], act );
+        myDomain.snap_to( verts[i], act );
         CPPUNIT_ASSERT_VECTORS_EQUAL( exp, act, 1e-6 );
 
-        off = coords[ i ] + d5;
-        exp = snap_to( coords[ i ], off );
+        off = coords[i] + d5;
+        exp = snap_to( coords[i], off );
         act = off;
-        myDomain.snap_to( verts[ i ], act );
+        myDomain.snap_to( verts[i], act );
         CPPUNIT_ASSERT_VECTORS_EQUAL( exp, act, 1e-6 );
     }
 }
 
-void XYRectangleTest::test_normal_at( )
+void XYRectangleTest::test_normal_at()
 {
-    MsqError                          err;
+    MsqError err;
     std::vector< Mesh::VertexHandle > vertices;
     myMesh.get_all_vertices( vertices, err );
     ASSERT_NO_ERROR( err );
 
-    std::vector< MsqVertex > coords( vertices.size( ) );
-    myMesh.vertices_get_coordinates( arrptr( vertices ), arrptr( coords ), vertices.size( ), err );
+    std::vector< MsqVertex > coords( vertices.size() );
+    myMesh.vertices_get_coordinates( arrptr( vertices ), arrptr( coords ), vertices.size(), err );
     ASSERT_NO_ERROR( err );
 
-    std::vector< Vector3D > normals( vertices.size( ) );
-    std::copy( coords.begin( ), coords.end( ), normals.begin( ) );
-    myDomain.vertex_normal_at( arrptr( vertices ), arrptr( normals ), vertices.size( ), err );
+    std::vector< Vector3D > normals( vertices.size() );
+    std::copy( coords.begin(), coords.end(), normals.begin() );
+    myDomain.vertex_normal_at( arrptr( vertices ), arrptr( normals ), vertices.size(), err );
     ASSERT_NO_ERROR( err );
 
-    for( size_t i = 0; i < normals.size( ); ++i )
+    for( size_t i = 0; i < normals.size(); ++i )
     {
-        CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), normals[ i ], 1e-6 );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), normals[i], 1e-6 );
     }
 }
 
-void XYRectangleTest::test_closest_point( )
+void XYRectangleTest::test_closest_point()
 {
-    MsqError                           err;
+    MsqError err;
     std::vector< Mesh::ElementHandle > elems;
     myMesh.get_all_elements( elems, err );
     ASSERT_NO_ERROR( err );
 
-    for( size_t i = 0; i < elems.size( ); ++i )
+    for( size_t i = 0; i < elems.size(); ++i )
     {
         std::vector< Mesh::VertexHandle > verts;
-        std::vector< size_t >             junk;
-        MsqVertex                         coords;
-        myMesh.elements_get_attached_vertices( &elems[ i ], 1, verts, junk, err );
+        std::vector< size_t > junk;
+        MsqVertex coords;
+        myMesh.elements_get_attached_vertices( &elems[i], 1, verts, junk, err );
         ASSERT_NO_ERROR( err );
         myMesh.vertices_get_coordinates( arrptr( verts ), &coords, 1, err );
         ASSERT_NO_ERROR( err );
 
         Vector3D offset( coords + Vector3D( 0, 0, 3 ) ), closest, norm;
-        myDomain.closest_point( elems[ i ], offset, closest, norm, err );
+        myDomain.closest_point( elems[i], offset, closest, norm, err );
         ASSERT_NO_ERROR( err );
         CPPUNIT_ASSERT_VECTORS_EQUAL( coords, closest, 1e-6 );
         CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), norm, 1e-6 );
@@ -265,27 +265,27 @@ void XYRectangleTest::test_closest_point( )
 unsigned short dof( const Vector3D& point )
 {
     unsigned short result = 2;
-    if( ( fabs( point[ 0 ] - XMIN ) < 1e-6 ) || ( fabs( point[ 0 ] - XMIN - WIDTH ) < 1e-6 ) ) --result;
-    if( ( fabs( point[ 1 ] - YMIN ) < 1e-6 ) || ( fabs( point[ 1 ] - YMIN - HEIGHT ) < 1e-6 ) ) --result;
+    if( ( fabs( point[0] - XMIN ) < 1e-6 ) || ( fabs( point[0] - XMIN - WIDTH ) < 1e-6 ) ) --result;
+    if( ( fabs( point[1] - YMIN ) < 1e-6 ) || ( fabs( point[1] - YMIN - HEIGHT ) < 1e-6 ) ) --result;
     return result;
 }
 
-void XYRectangleTest::test_domain_DoF( )
+void XYRectangleTest::test_domain_DoF()
 {
     MsqError err;
 
     std::vector< Mesh::VertexHandle > verts;
     myMesh.get_all_vertices( verts, err );
     ASSERT_NO_ERROR( err );
-    std::vector< MsqVertex > coords( verts.size( ) );
-    myMesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size( ), err );
+    std::vector< MsqVertex > coords( verts.size() );
+    myMesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size(), err );
     ASSERT_NO_ERROR( err );
 
-    for( size_t i = 0; i < coords.size( ); ++i )
+    for( size_t i = 0; i < coords.size(); ++i )
     {
-        unsigned short exp = dof( coords[ i ] );
+        unsigned short exp = dof( coords[i] );
         unsigned short act = 100;
-        myDomain.domain_DoF( &verts[ i ], &act, 1, err );
+        myDomain.domain_DoF( &verts[i], &act, 1, err );
         ASSERT_NO_ERROR( err );
         CPPUNIT_ASSERT_EQUAL( exp, act );
     }

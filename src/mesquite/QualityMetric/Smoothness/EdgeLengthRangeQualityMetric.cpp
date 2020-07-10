@@ -50,14 +50,14 @@ EdgeLengthRangeQualityMetric::EdgeLengthRangeQualityMetric( double low_a, double
     if( lowVal > highVal ) std::swap( lowVal, highVal );
 }
 
-EdgeLengthRangeQualityMetric::~EdgeLengthRangeQualityMetric( ) {}
+EdgeLengthRangeQualityMetric::~EdgeLengthRangeQualityMetric() {}
 
-std::string EdgeLengthRangeQualityMetric::get_name( ) const
+std::string EdgeLengthRangeQualityMetric::get_name() const
 {
     return "Edge Length Range Metric";
 }
 
-int EdgeLengthRangeQualityMetric::get_negate_flag( ) const
+int EdgeLengthRangeQualityMetric::get_negate_flag() const
 {
     return 1;
 }
@@ -75,23 +75,23 @@ bool EdgeLengthRangeQualityMetric::evaluate_common( PatchData& pd, size_t this_v
     Vector3D edg;
     pd.get_adjacent_vertex_indices( this_vert, adj_verts, err );
     MSQ_ERRZERO( err );
-    int              num_sample_points = adj_verts.size( );
-    double*          metric_values = new double[ num_sample_points ];
+    int num_sample_points  = adj_verts.size();
+    double* metric_values  = new double[num_sample_points];
     const MsqVertex* verts = pd.get_vertex_array( err );
     MSQ_ERRZERO( err );
     // store the length of the edge, and the first and second component of
     // metric values, respectively.
     double temp_length = 0.0;
-    double temp_first = 0.0;
+    double temp_first  = 0.0;
     double temp_second = 0.0;
     // PRINT_INFO("INSIDE ELR, vertex =
     // %f,%f,%f\n",verts[this_vert][0],verts[this_vert][1],verts[this_vert][2]); loop while there are
     // still more adjacent vertices.
-    for( unsigned i = 0; i < adj_verts.size( ); ++i )
+    for( unsigned i = 0; i < adj_verts.size(); ++i )
     {
-        edg = verts[ this_vert ] - verts[ adj_verts[ i ] ];
+        edg = verts[this_vert] - verts[adj_verts[i]];
         // compute the edge length
-        temp_length = edg.length( );
+        temp_length = edg.length();
         // get the first component
         temp_first = temp_length - lowVal;
         temp_first = fabs( temp_first ) - ( temp_first );
@@ -101,7 +101,7 @@ bool EdgeLengthRangeQualityMetric::evaluate_common( PatchData& pd, size_t this_v
         temp_second = fabs( temp_second ) - ( temp_second );
         temp_second *= temp_second;
         // combine the two components
-        metric_values[ i ] = temp_first + temp_second;
+        metric_values[i] = temp_first + temp_second;
     }
     // average the metric values of the edges
     fval = average_metrics( metric_values, num_sample_points, err );
@@ -114,27 +114,27 @@ bool EdgeLengthRangeQualityMetric::evaluate_common( PatchData& pd, size_t this_v
 bool EdgeLengthRangeQualityMetric::evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err )
 {
     std::vector< size_t > verts;
-    bool                  rval = evaluate_common( pd, vertex, value, verts, err );
+    bool rval = evaluate_common( pd, vertex, value, verts, err );
     return !MSQ_CHKERR( err ) && rval;
 }
 
 bool EdgeLengthRangeQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
                                                           std::vector< size_t >& indices, MsqError& err )
 {
-    indices.clear( );
+    indices.clear();
     bool rval = evaluate_common( pd, vertex, value, indices, err );
 
     std::vector< size_t >::iterator r, w;
-    for( r = w = indices.begin( ); r != indices.end( ); ++r )
+    for( r = w = indices.begin(); r != indices.end(); ++r )
     {
-        if( *r < pd.num_free_vertices( ) )
+        if( *r < pd.num_free_vertices() )
         {
             *w = *r;
             ++w;
         }
     }
-    indices.erase( w, indices.end( ) );
-    if( vertex < pd.num_free_vertices( ) ) indices.push_back( vertex );
+    indices.erase( w, indices.end() );
+    if( vertex < pd.num_free_vertices() ) indices.push_back( vertex );
 
     return !MSQ_CHKERR( err ) && rval;
 }

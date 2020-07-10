@@ -48,9 +48,9 @@ class MESQUITE_EXPORT ObjectiveFunctionTemplate : public ObjectiveFunction
   public:
     ObjectiveFunctionTemplate( QualityMetric* qm = 0 ) : qualityMetric( qm ) {}
 
-    virtual ~ObjectiveFunctionTemplate( );
+    virtual ~ObjectiveFunctionTemplate();
 
-    QualityMetric* get_quality_metric( ) const
+    QualityMetric* get_quality_metric() const
     {
         return qualityMetric;
     }
@@ -63,7 +63,7 @@ class MESQUITE_EXPORT ObjectiveFunctionTemplate : public ObjectiveFunction
     virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                                       PatchSet* user_set, MsqError& err );
 
-    virtual int min_patch_layers( ) const;
+    virtual int min_patch_layers() const;
 
     //!\brief Called at start of instruction queue processing
     //!

@@ -44,14 +44,14 @@ namespace MBMesquite
 MaxTemplate::MaxTemplate( QualityMetric* qualitymetric ) : ObjectiveFunctionTemplate( qualitymetric ) {}
 
 // Lori:  need to clean up here
-MaxTemplate::~MaxTemplate( ) {}
+MaxTemplate::~MaxTemplate() {}
 
-ObjectiveFunction* MaxTemplate::clone( ) const
+ObjectiveFunction* MaxTemplate::clone() const
 {
-    return new MaxTemplate( get_quality_metric( ) );
+    return new MaxTemplate( get_quality_metric() );
 }
 
-void MaxTemplate::clear( ) {}
+void MaxTemplate::clear() {}
 
 bool MaxTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
@@ -62,16 +62,16 @@ bool MaxTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, boo
         return false;
     }
 
-    QualityMetric* qm = get_quality_metric( );
+    QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, free, err );
     MSQ_ERRFALSE( err );
-    const double sign = qm->get_negate_flag( );
+    const double sign = qm->get_negate_flag();
 
     // calculate OF value for just the patch
     std::vector< size_t >::const_iterator i;
-    double                                value;
+    double value;
     value_out = -HUGE_VAL;
-    for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
+    for( i = qmHandles.begin(); i != qmHandles.end(); ++i )
     {
         bool result = qm->evaluate( pd, *i, value, err );
         if( MSQ_CHKERR( err ) || !result ) return false;

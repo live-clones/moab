@@ -78,30 +78,30 @@ bool smooth_mixed_mesh( const char* filename );
 
 int main( int argc, char* argv[] )
 {
-    unsigned    i;
+    unsigned i;
     std::string input_file = TestDir + "/3D/vtk/mixed/tangled/mixed-hex-pyr-tet.vtk";
     if( argc == 2 )
-        input_file = argv[ 1 ];
+        input_file = argv[1];
     else if( argc != 1 )
     {
         std::cerr << "Invalid arguments.\n";
         return 2;
     }
 
-    MBMesquite::MsqPrintError    err( cout );
-    IdealWeightMeanRatio         m1;
-    IdealWeightInverseMeanRatio  m2( err );
+    MBMesquite::MsqPrintError err( cout );
+    IdealWeightMeanRatio m1;
+    IdealWeightInverseMeanRatio m2( err );
     ConditionNumberQualityMetric m3;
-    QualityMetric*               metrics[] = { &m1, &m2, &m3, 0 };
+    QualityMetric* metrics[] = { &m1, &m2, &m3, 0 };
 
     // Read Mesh
-    std::string          mesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
-    std::string          imesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
+    std::string mesh_file  = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
+    std::string imesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
     MBMesquite::MeshImpl mesh;
-    mesh.read_vtk( mesh_file.c_str( ), err );
+    mesh.read_vtk( mesh_file.c_str(), err );
     CPPUNIT_ASSERT( !err );
     MBMesquite::MeshImpl ideal_mesh;
-    ideal_mesh.read_vtk( imesh_file.c_str( ), err );
+    ideal_mesh.read_vtk( imesh_file.c_str(), err );
     CPPUNIT_ASSERT( !err );
 
     // Check that the mesh read correctly, and contains what is
@@ -110,68 +110,68 @@ int main( int argc, char* argv[] )
     // Get mesh data
     // Expecting file to contain 12 pyramid elements constructed
     // from 15 vertices.
-    std::vector< Mesh::VertexHandle >  vert_array;
+    std::vector< Mesh::VertexHandle > vert_array;
     std::vector< Mesh::ElementHandle > elem_array;
-    std::vector< size_t >              conn_offsets;
+    std::vector< size_t > conn_offsets;
     mesh.get_all_elements( elem_array, err );
     CPPUNIT_ASSERT( !err );
-    CPPUNIT_ASSERT( elem_array.size( ) == 12 );
-    mesh.elements_get_attached_vertices( arrptr( elem_array ), elem_array.size( ), vert_array, conn_offsets, err );
+    CPPUNIT_ASSERT( elem_array.size() == 12 );
+    mesh.elements_get_attached_vertices( arrptr( elem_array ), elem_array.size(), vert_array, conn_offsets, err );
     CPPUNIT_ASSERT( !err );
-    CPPUNIT_ASSERT( vert_array.size( ) == 60 );
-    CPPUNIT_ASSERT( conn_offsets.size( ) == 13 );
-    EntityTopology type_array[ 12 ];
+    CPPUNIT_ASSERT( vert_array.size() == 60 );
+    CPPUNIT_ASSERT( conn_offsets.size() == 13 );
+    EntityTopology type_array[12];
     mesh.elements_get_topologies( arrptr( elem_array ), type_array, 12, err );
     CPPUNIT_ASSERT( !err );
 
     // Verify element types and number of vertices
     for( i = 0; i < 12; ++i )
     {
-        CPPUNIT_ASSERT( type_array[ i ] == PYRAMID );
-        CPPUNIT_ASSERT( conn_offsets[ i ] == 5 * i );
+        CPPUNIT_ASSERT( type_array[i] == PYRAMID );
+        CPPUNIT_ASSERT( conn_offsets[i] == 5 * i );
     }
 
     // All pyramids should share a common apex, at the
     // center of the sphere
-    Mesh::VertexHandle apex_handle = vert_array[ 4 ];
+    Mesh::VertexHandle apex_handle = vert_array[4];
     for( i = 1; i < 12; ++i )
     {
-        CPPUNIT_ASSERT( vert_array[ 5 * i + 4 ] == apex_handle );
+        CPPUNIT_ASSERT( vert_array[5 * i + 4] == apex_handle );
     }
 
     // Verify that apex is at origin and all other vertices are
     // on unit sphere
-    MsqVertex vertices[ 60 ];
+    MsqVertex vertices[60];
     mesh.vertices_get_coordinates( arrptr( vert_array ), vertices, 60, err );
     CPPUNIT_ASSERT( !err );
     for( i = 0; i < 60; ++i )
     {
-        if( vert_array[ i ] == apex_handle )
-            CPPUNIT_ASSERT( vertices[ i ].within_tolerance_box( Vector3D( 0, 0, 0 ), 1e-6 ) );
+        if( vert_array[i] == apex_handle )
+            CPPUNIT_ASSERT( vertices[i].within_tolerance_box( Vector3D( 0, 0, 0 ), 1e-6 ) );
         else
-            CPPUNIT_ASSERT( fabs( 1.0 - vertices[ i ].length( ) ) < 1e-6 );
+            CPPUNIT_ASSERT( fabs( 1.0 - vertices[i].length() ) < 1e-6 );
     }
 
     // Try smoothing w/out moving the free vertex and verify that
     // the smoother didn't move the vertex
     Vector3D position( 0, 0, 0 );
-    for( i = 0; metrics[ i ] != NULL; ++i )
-        CPPUNIT_ASSERT( !smooth_mesh( &mesh, &ideal_mesh, apex_handle, position, metrics[ i ] ) );
+    for( i = 0; metrics[i] != NULL; ++i )
+        CPPUNIT_ASSERT( !smooth_mesh( &mesh, &ideal_mesh, apex_handle, position, metrics[i] ) );
 
     // Now try moving the vertex and see if the smoother moves it back
     // to the origin
     position.set( 0.1, 0.1, 0.1 );
-    for( i = 0; metrics[ i ] != NULL; ++i )
-        CPPUNIT_ASSERT( !smooth_mesh( &mesh, &ideal_mesh, apex_handle, position, metrics[ i ] ) );
+    for( i = 0; metrics[i] != NULL; ++i )
+        CPPUNIT_ASSERT( !smooth_mesh( &mesh, &ideal_mesh, apex_handle, position, metrics[i] ) );
 
     // Now try moving the vertex further and see if the smoother moves it back
     // to the origin
     position.set( 0.3, 0.3, 0.3 );
-    for( i = 0; metrics[ i ] != NULL; ++i )
-        CPPUNIT_ASSERT( !smooth_mesh( &mesh, &ideal_mesh, apex_handle, position, metrics[ i ] ) );
+    for( i = 0; metrics[i] != NULL; ++i )
+        CPPUNIT_ASSERT( !smooth_mesh( &mesh, &ideal_mesh, apex_handle, position, metrics[i] ) );
 
     // Now try smoothing a real mixed mesh
-    CPPUNIT_ASSERT( !smooth_mixed_mesh( input_file.c_str( ) ) );
+    CPPUNIT_ASSERT( !smooth_mixed_mesh( input_file.c_str() ) );
 
     return 0;
 }
@@ -180,12 +180,12 @@ bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin, V
                   QualityMetric* metric )
 {
     MBMesquite::MsqPrintError err( cout );
-    const Vector3D            origin( 0, 0, 0 );
+    const Vector3D origin( 0, 0, 0 );
 
     // print a little output so we know when we died
     std::cout << "**************************************************************************" << std::endl
               << "* Smoothing..." << std::endl
-              << "* Metric: " << metric->get_name( ) << std::endl
+              << "* Metric: " << metric->get_name() << std::endl
               << "* Apex position: " << initial_free_vertex_position
               << std::endl  //<<
               //"**************************************************************************"
@@ -205,7 +205,7 @@ bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin, V
     // Create solver
     FeasibleNewton solver( &obj_func );
     CPPUNIT_ASSERT( !err );
-    solver.use_global_patch( );
+    solver.use_global_patch();
     CPPUNIT_ASSERT( !err );
 
     // Set stoping criteria for solver
@@ -236,7 +236,7 @@ bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin, V
                //"**************************************************************************"
         << std::endl
         << "* Done Smoothing:" << std::endl
-        << "* Metric: " << metric->get_name( ) << std::endl
+        << "* Metric: " << metric->get_name() << std::endl
         << "* Apex position: " << position << std::endl
         << "**************************************************************************" << std::endl;
 
@@ -269,10 +269,10 @@ bool smooth_mixed_mesh( const char* filename )
     CPPUNIT_ASSERT( !err );
 
     // Set up a preconditioner
-    LInfTemplate      pre_obj_func( &un_metric );
+    LInfTemplate pre_obj_func( &un_metric );
     ConjugateGradient precond( &pre_obj_func, err );
     CPPUNIT_ASSERT( !err );
-    precond.use_element_on_vertex_patch( );
+    precond.use_element_on_vertex_patch();
     TerminationCriterion pre_term, pre_outer;
     // pre_term.add_relative_quality_improvement( 0.1 );
     pre_term.add_iteration_limit( 3 );
@@ -289,7 +289,7 @@ bool smooth_mixed_mesh( const char* filename )
     // Create solver
     FeasibleNewton solver( &obj_func );
     CPPUNIT_ASSERT( !err );
-    solver.use_global_patch( );
+    solver.use_global_patch();
     CPPUNIT_ASSERT( !err );
 
     // Set stoping criteria for solver

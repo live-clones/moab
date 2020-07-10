@@ -79,7 +79,7 @@ class RefinerTagManager;
 class EntityRefinerOutputFunctor
 {
   public:
-    virtual ~EntityRefinerOutputFunctor( ) {}
+    virtual ~EntityRefinerOutputFunctor() {}
     /// Map an input vertex to the output mesh. This should return the same value when given the
     /// same input across multiple calls.
     virtual EntityHandle map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags ) = 0;
@@ -91,12 +91,12 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the midpoint.
      * @retval    A handle for the midpoint on the output mesh.
      */
-    EntityHandle operator( )( EntityHandle h0, EntityHandle h1, const double* vcoords, const void* vtags )
+    EntityHandle operator()( EntityHandle h0, EntityHandle h1, const double* vcoords, const void* vtags )
     {
-        EntityHandle harr[ 2 ];
+        EntityHandle harr[2];
         // Cppcheck warning (false positive): variable harr is assigned a value that is never used
-        harr[ 0 ] = h0;
-        harr[ 1 ] = h1;
+        harr[0] = h0;
+        harr[1] = h1;
         return ( *this )( 2, harr, vcoords, vtags );
     }
     /**\brief Create a new vertex on a triangular face.
@@ -108,14 +108,14 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the mid-face point.
      * @retval    A handle for the mid-face point on the output mesh.
      */
-    virtual EntityHandle operator( )( EntityHandle h0, EntityHandle h1, EntityHandle h2, const double* vcoords,
-                                      const void* vtags )
+    virtual EntityHandle operator()( EntityHandle h0, EntityHandle h1, EntityHandle h2, const double* vcoords,
+                                     const void* vtags )
     {
-        EntityHandle harr[ 3 ];
+        EntityHandle harr[3];
         // Cppcheck warning (false positive): variable harr is assigned a value that is never used
-        harr[ 0 ] = h0;
-        harr[ 1 ] = h1;
-        harr[ 2 ] = h2;
+        harr[0] = h0;
+        harr[1] = h1;
+        harr[2] = h2;
         return ( *this )( 3, harr, vcoords, vtags );
     }
     /**\brief Create a new vertex along a \f$k\f$-facet.
@@ -126,69 +126,69 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the new point.
      * @retval    A handle for the new point on the output mesh.
      */
-    virtual EntityHandle operator( )( int nhash, EntityHandle* hash, const double* vcoords, const void* vtags ) = 0;
+    virtual EntityHandle operator()( int nhash, EntityHandle* hash, const double* vcoords, const void* vtags ) = 0;
     /**\brief Append an output vertex to the list of vertices defining a new entity.
      *
      * @param[in] vhash A vertex of the output mesh.
      */
-    virtual void operator( )( EntityHandle vhash ) = 0;
+    virtual void operator()( EntityHandle vhash ) = 0;
     /**\brief Create a new entity from all previously appended output vertices.
      *
      * This resets the list of appended vertices.
      * @param[in] etyp The type of entity to create.
      */
-    virtual void operator( )( EntityType etyp ) = 0;
+    virtual void operator()( EntityType etyp ) = 0;
 };
 
 class EntityRefiner
 {
   public:
-    EntityRefiner( );
-    virtual ~EntityRefiner( );
+    EntityRefiner();
+    virtual ~EntityRefiner();
 
-    virtual bool          prepare( RefinerTagManager* tmgr, EntityRefinerOutputFunctor* ofunc );
-    virtual bool          refine_entity( EntityType typ, EntityHandle ent ) = 0;
+    virtual bool prepare( RefinerTagManager* tmgr, EntityRefinerOutputFunctor* ofunc );
+    virtual bool refine_entity( EntityType typ, EntityHandle ent )        = 0;
     virtual unsigned long get_heap_size_bound( int max_recursions ) const = 0;
 
-    virtual bool       set_edge_size_evaluator( EdgeSizeEvaluator* );
-    EdgeSizeEvaluator* get_edge_size_evaluator( )
+    virtual bool set_edge_size_evaluator( EdgeSizeEvaluator* );
+    EdgeSizeEvaluator* get_edge_size_evaluator()
     {
         return this->edge_size_evaluator;
     }
 
-    virtual bool                set_output_functor( EntityRefinerOutputFunctor* func_obj );
-    EntityRefinerOutputFunctor* get_output_functor( )
+    virtual bool set_output_functor( EntityRefinerOutputFunctor* func_obj );
+    EntityRefinerOutputFunctor* get_output_functor()
     {
         return this->output_functor;
     }
 
     virtual bool set_minimum_number_of_subdivisions( int mn );
-    int          get_minimum_number_of_subdivisions( ) const
+    int get_minimum_number_of_subdivisions() const
     {
         return this->minimum_number_of_subdivisions;
     }
 
     virtual bool set_maximum_number_of_subdivisions( int mx );
-    int          get_maximum_number_of_subdivisions( ) const
+    int get_maximum_number_of_subdivisions() const
     {
         return this->maximum_number_of_subdivisions;
     }
 
   protected:
-    Interface*                      mesh_in;
-    EdgeSizeEvaluator*              edge_size_evaluator;
-    EntityRefinerOutputFunctor*     output_functor;
-    int                             minimum_number_of_subdivisions;
-    int                             maximum_number_of_subdivisions;
-    std::vector< double >           coord_heap;
+    Interface* mesh_in;
+    EdgeSizeEvaluator* edge_size_evaluator;
+    EntityRefinerOutputFunctor* output_functor;
+    int minimum_number_of_subdivisions;
+    int maximum_number_of_subdivisions;
+    std::vector< double > coord_heap;
     std::vector< double >::iterator current_coord;
-    std::vector< char >             tag_heap;
-    std::vector< char >::iterator   current_tag;
+    std::vector< char > tag_heap;
+    std::vector< char >::iterator current_tag;
 
-    void    update_heap_size( );
-    void    reset_heap_pointers( );
-    double* heap_coord_storage( );
-    void*   heap_tag_storage( );
+    void update_heap_size();
+    void reset_heap_pointers();
+    double* heap_coord_storage();
+    void* heap_tag_storage();
 };
 
 }  // namespace moab

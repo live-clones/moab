@@ -78,7 +78,7 @@ class ProgOptions
      *        when the help flag is detected
      */
     ProgOptions( const std::string& helptext = "", const std::string& briefdesc = "" );
-    ~ProgOptions( );
+    ~ProgOptions();
 
     /** Specify the program version
      *
@@ -110,7 +110,7 @@ class ProgOptions
      * @param flags Option behavior flags, which should come from static vars in the ProgOptions
      *        class
      */
-    template< typename T >
+    template < typename T >
     void addOpt( const std::string& namestring, const std::string& helpstring, T* value, int flags = 0 );
 
     /** Specify a new command-line option
@@ -118,7 +118,8 @@ class ProgOptions
      * This funtion is identical to the 4-arg version, but omits the value parameter, which
      * is assumed to be NULL
      */
-    template< typename T > void addOpt( const std::string& namestring, const std::string& helpstring, int flags = 0 )
+    template < typename T >
+    void addOpt( const std::string& namestring, const std::string& helpstring, int flags = 0 )
     {
         addOpt< T >( namestring, helpstring, NULL, flags );
     }
@@ -141,7 +142,7 @@ class ProgOptions
      * @param value Pointer to where parsed value from command line should be stored.
      *        If NULL, the value must be queried using getReqArg()
      */
-    template< typename T >
+    template < typename T >
     void addRequiredArg( const std::string& helpname, const std::string& helpstring, T* value = NULL, int flags = 0 );
 
     /** Add optional positional arguments
@@ -154,7 +155,7 @@ class ProgOptions
      * @param helpname The name to give the argument in the help text
      * @param helpstring The help text for the arguments
      */
-    template< typename T >
+    template < typename T >
     void addOptionalArgs( unsigned max_count, const std::string& helpname, const std::string& helpstring,
                           int flags = 0 );
 
@@ -187,7 +188,8 @@ class ProgOptions
      * @param value Pointer to location to store option argument, if any is found
      * @return True if the option was set and its argument was stored into value; false otherwise.
      */
-    template< typename T > bool getOpt( const std::string& namestring, T* value );
+    template < typename T >
+    bool getOpt( const std::string& namestring, T* value );
 
     /**
      * Get a list of values for the named option-- one value for each time it was
@@ -201,7 +203,8 @@ class ProgOptions
      * @param values Reference to list to store values into.  Will have as many entries
      *        as there were instances of this option on the command line
      */
-    template< typename T > void getOptAllArgs( const std::string& namestring, std::vector< T >& values );
+    template < typename T >
+    void getOptAllArgs( const std::string& namestring, std::vector< T >& values );
 
     /**
      * @param namestring See similar argument to getOpt()
@@ -214,14 +217,16 @@ class ProgOptions
      * @param namestring The helpname that was given to addRequiredArg when the
      *        desired argument was created
      */
-    template< typename T > T getReqArg( const std::string& namestring );
+    template < typename T >
+    T getReqArg( const std::string& namestring );
 
     /**
      * Append the values of any required or optional arguments
      * @param namestring The helpname that was given to addRequiredArg or
      *                   addOptionalArgs.
      */
-    template< typename T > void getArgs( const std::string& namestring, std::vector< T >& values );
+    template < typename T >
+    void getArgs( const std::string& namestring, std::vector< T >& values );
 
     /**
      * Prints an error message to std::cerr, along with a brief usage message,
@@ -253,12 +258,12 @@ class ProgOptions
     std::map< std::string, ProgOpt* > required_args;
 
     typedef std::pair< ProgOpt*, std::string > help_line;
-    std::vector< help_line >                   option_help_strings;
-    std::vector< help_line >                   arg_help_strings;
-    std::vector< std::string >                 main_help;
-    std::string                                brief_help;
+    std::vector< help_line > option_help_strings;
+    std::vector< help_line > arg_help_strings;
+    std::vector< std::string > main_help;
+    std::string brief_help;
 
-    bool     expect_optional_args;
+    bool expect_optional_args;
     unsigned optional_args_position, max_optional_args;
 
     std::string progname;

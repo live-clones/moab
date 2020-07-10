@@ -39,7 +39,7 @@ void iRel_getDescription( iRel_Instance instance, char* descr, int descr_len )
     {
         unsigned int len = std::min( strlen( LASSOI->lastErrorDescription ), static_cast< size_t >( descr_len ) );
         strncpy( descr, LASSOI->lastErrorDescription, len );
-        descr[ len ] = '\0';
+        descr[len] = '\0';
     }
 }
 
@@ -48,11 +48,11 @@ void iRel_create( /* in */ const char* /* options */, iRel_Instance* instance, i
     if( 0 != options_len )
     {
         *instance = NULL;
-        *err = iBase_NOT_SUPPORTED;
+        *err      = iBase_NOT_SUPPORTED;
     }
 
-    *instance = new Lasso( );
-    *err = iBase_SUCCESS;
+    *instance = new Lasso();
+    *err      = iBase_SUCCESS;
 }
 
 void iRel_destroy( iRel_Instance instance, int* err )
@@ -79,15 +79,15 @@ void iRel_getPairInfo( iRel_Instance instance, iRel_PairHandle pair, iBase_Insta
                        int* iface_type1, int* irel_status1, iBase_Instance* iface2, int* ent_or_set2, int* iface_type2,
                        int* irel_status2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
-    *iface1 = ASSOCPAIRI->iface_instance( 0 );
-    *ent_or_set1 = ASSOCPAIRI->relation_type( 0 );
-    *iface_type1 = ASSOCPAIRI->iface_type( 0 );
+    *iface1       = ASSOCPAIRI->iface_instance( 0 );
+    *ent_or_set1  = ASSOCPAIRI->relation_type( 0 );
+    *iface_type1  = ASSOCPAIRI->iface_type( 0 );
     *irel_status1 = ASSOCPAIRI->relation_status( 0 );
-    *iface2 = ASSOCPAIRI->iface_instance( 1 );
-    *iface_type2 = ASSOCPAIRI->iface_type( 1 );
-    *ent_or_set2 = ASSOCPAIRI->relation_type( 1 );
+    *iface2       = ASSOCPAIRI->iface_instance( 1 );
+    *iface_type2  = ASSOCPAIRI->iface_type( 1 );
+    *ent_or_set2  = ASSOCPAIRI->relation_type( 1 );
     *irel_status2 = ASSOCPAIRI->relation_status( 1 );
 
     RETURN( iBase_SUCCESS );
@@ -95,21 +95,21 @@ void iRel_getPairInfo( iRel_Instance instance, iRel_PairHandle pair, iBase_Insta
 
 void iRel_changePairType( iRel_Instance instance, iRel_PairHandle pair, int ent_or_set1, int ent_or_set2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     CHK_ERROR( ASSOCPAIRI->change_type( 0, static_cast< iRel_RelationType >( ent_or_set1 ) ) );CHK_ERROR( ASSOCPAIRI->change_type( 1, static_cast< iRel_RelationType >( ent_or_set2 ) ) );
 }
 
 void iRel_changePairStatus( iRel_Instance instance, iRel_PairHandle pair, int irel_status1, int irel_status2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     CHK_ERROR( ASSOCPAIRI->change_status( 0, static_cast< iRel_RelationStatus >( irel_status1 ) ) );CHK_ERROR( ASSOCPAIRI->change_status( 1, static_cast< iRel_RelationStatus >( irel_status2 ) ) );
 }
 
 void iRel_destroyPair( iRel_Instance instance, iRel_PairHandle pair, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     CHK_ERROR( LASSOI->erase_pair( ASSOCPAIRI ) );
 }
@@ -120,10 +120,10 @@ void iRel_findPairs( iRel_Instance instance, iBase_Instance iface, iRel_PairHand
     std::vector< AssocPair* > tmp_pairs;
     LASSOI->find_pairs( iface, tmp_pairs );
 
-    ALLOC_CHECK_ARRAY_NOFAIL( pairs, tmp_pairs.size( ) );
-    for( size_t i = 0; i < tmp_pairs.size( ); ++i )
+    ALLOC_CHECK_ARRAY_NOFAIL( pairs, tmp_pairs.size() );
+    for( size_t i = 0; i < tmp_pairs.size(); ++i )
     {
-        ( *pairs )[ i ] = reinterpret_cast< iRel_PairHandle >( tmp_pairs[ i ] );
+        ( *pairs )[i] = reinterpret_cast< iRel_PairHandle >( tmp_pairs[i] );
     }
 
     RETURN( iBase_SUCCESS );
@@ -132,41 +132,41 @@ void iRel_findPairs( iRel_Instance instance, iBase_Instance iface, iRel_PairHand
 void iRel_setEntEntRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle ent1,
                              iBase_EntityHandle ent2, int* err )
 {
-    CHK_PAIR( );CHK_ERROR( ASSOCPAIRI->set_relation( ent1, ent2 ) );
+    CHK_PAIR();CHK_ERROR( ASSOCPAIRI->set_relation( ent1, ent2 ) );
 }
 
 void iRel_setEntSetRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle ent1,
                              iBase_EntitySetHandle set2, int* err )
 {
-    CHK_PAIR( );CHK_ERROR( ASSOCPAIRI->set_relation( ent1, set2 ) );
+    CHK_PAIR();CHK_ERROR( ASSOCPAIRI->set_relation( ent1, set2 ) );
 }
 
 void iRel_setSetEntRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntitySetHandle set1,
                              iBase_EntityHandle ent2, int* err )
 {
-    CHK_PAIR( );CHK_ERROR( ASSOCPAIRI->set_relation( set1, ent2 ) );
+    CHK_PAIR();CHK_ERROR( ASSOCPAIRI->set_relation( set1, ent2 ) );
 }
 
 void iRel_setSetSetRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntitySetHandle set1,
                              iBase_EntitySetHandle set2, int* err )
 {
-    CHK_PAIR( );CHK_ERROR( ASSOCPAIRI->set_relation( set1, set2 ) );
+    CHK_PAIR();CHK_ERROR( ASSOCPAIRI->set_relation( set1, set2 ) );
 }
 
 void iRel_setEntArrEntArrRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle* ent_array_1,
                                    int num_entities1, iBase_EntityHandle* ent_array_2, int num_entities2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     if( num_entities1 != num_entities2 )
         ERROR( iBase_INVALID_ENTITY_COUNT, "setEntArrEntArrRelation doesn't support "
                                            "different #'s of entities." );
 
-    int  result = iBase_SUCCESS;
-    char descr[ 200 ];
+    int result = iBase_SUCCESS;
+    char descr[200];
     for( int i = 0; i < num_entities1; i++ )
     {
-        int tmp_result = ASSOCPAIRI->set_relation( ent_array_1[ i ], ent_array_2[ i ] );
+        int tmp_result = ASSOCPAIRI->set_relation( ent_array_1[i], ent_array_2[i] );
         if( result == iBase_SUCCESS && tmp_result != iBase_SUCCESS )
         {
             result = tmp_result;
@@ -181,17 +181,17 @@ void iRel_setEntArrEntArrRelation( iRel_Instance instance, iRel_PairHandle pair,
 void iRel_setEntArrSetArrRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle* ent_array_1,
                                    int num_entities1, iBase_EntitySetHandle* set_array_2, int num_sets2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     if( num_entities1 != num_sets2 )
         ERROR( iBase_INVALID_ENTITY_COUNT, "setEntArrSetArrRelation doesn't support "
                                            "different #'s of entities." );
 
-    int  result = iBase_SUCCESS;
-    char descr[ 200 ];
+    int result = iBase_SUCCESS;
+    char descr[200];
     for( int i = 0; i < num_entities1; i++ )
     {
-        int tmp_result = ASSOCPAIRI->set_relation( ent_array_1[ i ], set_array_2[ i ] );
+        int tmp_result = ASSOCPAIRI->set_relation( ent_array_1[i], set_array_2[i] );
         if( result == iBase_SUCCESS && tmp_result != iBase_SUCCESS )
         {
             result = tmp_result;
@@ -206,17 +206,17 @@ void iRel_setEntArrSetArrRelation( iRel_Instance instance, iRel_PairHandle pair,
 void iRel_setSetArrEntArrRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntitySetHandle* set_array_1,
                                    int num_sets1, iBase_EntityHandle* ent_array_2, int num_entities2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     if( num_sets1 != num_entities2 )
         ERROR( iBase_INVALID_ENTITY_COUNT, "setSetArrEntArrRelation doesn't support "
                                            "different #'s of entities." );
 
-    int  result = iBase_SUCCESS;
-    char descr[ 200 ];
+    int result = iBase_SUCCESS;
+    char descr[200];
     for( int i = 0; i < num_sets1; i++ )
     {
-        int tmp_result = ASSOCPAIRI->set_relation( set_array_1[ i ], ent_array_2[ i ] );
+        int tmp_result = ASSOCPAIRI->set_relation( set_array_1[i], ent_array_2[i] );
         if( result == iBase_SUCCESS && tmp_result != iBase_SUCCESS )
         {
             result = tmp_result;
@@ -231,17 +231,17 @@ void iRel_setSetArrEntArrRelation( iRel_Instance instance, iRel_PairHandle pair,
 void iRel_setSetArrSetArrRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntitySetHandle* set_array_1,
                                    int num_sets1, iBase_EntitySetHandle* set_array_2, int num_sets2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     if( num_sets1 != num_sets2 )
         ERROR( iBase_INVALID_ENTITY_COUNT, "setSetArrSetArrRelation doesn't support "
                                            "different #'s of entities." );
 
-    int  result = iBase_SUCCESS;
-    char descr[ 200 ];
+    int result = iBase_SUCCESS;
+    char descr[200];
     for( int i = 0; i < num_sets1; i++ )
     {
-        int tmp_result = ASSOCPAIRI->set_relation( set_array_1[ i ], set_array_2[ i ] );
+        int tmp_result = ASSOCPAIRI->set_relation( set_array_1[i], set_array_2[i] );
         if( result == iBase_SUCCESS && tmp_result != iBase_SUCCESS )
         {
             result = tmp_result;
@@ -256,7 +256,7 @@ void iRel_setSetArrSetArrRelation( iRel_Instance instance, iRel_PairHandle pair,
 void iRel_getEntEntRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle ent1, int switch_order,
                              iBase_EntityHandle* ent2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, &ent1, 1, ent2 ) );
 }
@@ -264,7 +264,7 @@ void iRel_getEntEntRelation( iRel_Instance instance, iRel_PairHandle pair, iBase
 void iRel_getEntSetRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle ent1, int switch_order,
                              iBase_EntitySetHandle* set2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, &ent1, 1, set2 ) );
 }
@@ -272,7 +272,7 @@ void iRel_getEntSetRelation( iRel_Instance instance, iRel_PairHandle pair, iBase
 void iRel_getSetEntRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntitySetHandle set1, int switch_order,
                              iBase_EntityHandle* ent2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, &set1, 1, ent2 ) );
 }
@@ -280,7 +280,7 @@ void iRel_getSetEntRelation( iRel_Instance instance, iRel_PairHandle pair, iBase
 void iRel_getSetSetRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntitySetHandle set1, int switch_order,
                              iBase_EntitySetHandle* set2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, &set1, 1, set2 ) );
 }
@@ -288,7 +288,7 @@ void iRel_getSetSetRelation( iRel_Instance instance, iRel_PairHandle pair, iBase
 void iRel_getEntSetIterRelation( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle ent1,
                                  int switch_order, iBase_EntityIterator* entset2, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, &ent1, 1, entset2 ) );
 }
@@ -297,7 +297,7 @@ void iRel_getEntArrEntArrRelation( iRel_Instance instance, iRel_PairHandle pair,
                                    int ent_array_1_size, int switch_order, iBase_EntityHandle** ent_array_2,
                                    int* ent_array_2_allocated, int* ent_array_2_size, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );
     ALLOC_CHECK_ARRAY( ent_array_2, ent_array_1_size );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, ent_array_1, ent_array_1_size, *ent_array_2 ) );
@@ -310,7 +310,7 @@ void iRel_getEntArrSetArrRelation( iRel_Instance instance, iRel_PairHandle pair,
                                    int ent_array_1_size, int switch_order, iBase_EntitySetHandle** set_array_2,
                                    int* set_array_2_allocated, int* set_array_2_size, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );
     ALLOC_CHECK_ARRAY( set_array_2, ent_array_1_size );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, ent_array_1, ent_array_1_size, *set_array_2 ) );
@@ -323,7 +323,7 @@ void iRel_getSetArrEntArrRelation( iRel_Instance instance, iRel_PairHandle pair,
                                    int set_array_1_size, int switch_order, iBase_EntityHandle** ent_array_2,
                                    int* ent_array_2_allocated, int* ent_array_2_size, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );
     ALLOC_CHECK_ARRAY( ent_array_2, set_array_1_size );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, set_array_1, set_array_1_size, *ent_array_2 ) );
@@ -336,7 +336,7 @@ void iRel_getSetArrSetArrRelation( iRel_Instance instance, iRel_PairHandle pair,
                                    int set_array_1_size, int switch_order, iBase_EntitySetHandle** set_array_2,
                                    int* set_array_2_allocated, int* set_array_2_size, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );
     ALLOC_CHECK_ARRAY( set_array_2, set_array_1_size );CHK_ERROR( ASSOCPAIRI->get_relation( iface_no, set_array_1, set_array_1_size, *set_array_2 ) );
@@ -349,7 +349,7 @@ void iRel_getEntArrSetIterArrRelation( iRel_Instance instance, iRel_PairHandle p
                                        int ent_array_1_size, int switch_order, iBase_EntityIterator** entiter,
                                        int* entiter_allocated, int* entiter_size, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );
     ;
@@ -359,48 +359,48 @@ void iRel_getEntArrSetIterArrRelation( iRel_Instance instance, iRel_PairHandle p
     RETURN( iBase_SUCCESS );
 }
 
-void iRel_rmvEntRelation( iRel_Instance             instance,
-                          /*in*/ iRel_PairHandle    pair,
+void iRel_rmvEntRelation( iRel_Instance instance,
+                          /*in*/ iRel_PairHandle pair,
                           /*in*/ iBase_EntityHandle ent,
-                          /*in*/ int                switch_order,
-                          /*out*/ int*              err )
+                          /*in*/ int switch_order,
+                          /*out*/ int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->rmv_relation( iface_no, &ent, 1 ) );
 }
 
-void iRel_rmvSetRelation( iRel_Instance                instance,
-                          /*in*/ iRel_PairHandle       pair,
+void iRel_rmvSetRelation( iRel_Instance instance,
+                          /*in*/ iRel_PairHandle pair,
                           /*in*/ iBase_EntitySetHandle entset,
-                          /*in*/ int                   switch_order,
-                          /*out*/ int*                 err )
+                          /*in*/ int switch_order,
+                          /*out*/ int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->rmv_relation( iface_no, &entset, 1 ) );
 }
 
-void iRel_rmvEntArrRelation( iRel_Instance              instance,
-                             /*in*/ iRel_PairHandle     pair,
+void iRel_rmvEntArrRelation( iRel_Instance instance,
+                             /*in*/ iRel_PairHandle pair,
                              /*in*/ iBase_EntityHandle* ent_array,
-                             /*in*/ int                 num_ent,
-                             /*in*/ int                 switch_order,
-                             /*out*/ int*               err )
+                             /*in*/ int num_ent,
+                             /*in*/ int switch_order,
+                             /*out*/ int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->rmv_relation( iface_no, ent_array, num_ent ) );
 }
 
-void iRel_rmvSetArrRelation( iRel_Instance                 instance,
-                             /*in*/ iRel_PairHandle        pair,
+void iRel_rmvSetArrRelation( iRel_Instance instance,
+                             /*in*/ iRel_PairHandle pair,
                              /*in*/ iBase_EntitySetHandle* entset_array,
-                             /*in*/ int                    num_ent,
-                             /*in*/ int                    switch_order,
-                             /*out*/ int*                  err )
+                             /*in*/ int num_ent,
+                             /*in*/ int switch_order,
+                             /*out*/ int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     int iface_no = ( switch_order ? 1 : 0 );CHK_ERROR( ASSOCPAIRI->rmv_relation( iface_no, entset_array, num_ent ) );
 }
@@ -408,28 +408,28 @@ void iRel_rmvSetArrRelation( iRel_Instance                 instance,
 static int get_gids_and_dims( iRel_PairHandle pair, int iface_no, iBase_EntityHandle* ents, int ents_size,
                               int ent_or_set, std::vector< int >& ents_gids, std::vector< int >& ents_dims )
 {
-    int                    result;
+    int result;
     iBase_EntitySetHandle* sets = reinterpret_cast< iBase_EntitySetHandle* >( ents );
 
     ents_gids.resize( ents_size );
     if( ent_or_set == iRel_ENTITY )
-        result = ASSOCPAIRI->get_gids( iface_no, ents, ents_size, &ents_gids[ 0 ] );
+        result = ASSOCPAIRI->get_gids( iface_no, ents, ents_size, &ents_gids[0] );
     else
-        result = ASSOCPAIRI->get_gids( iface_no, sets, ents_size, &ents_gids[ 0 ] );
+        result = ASSOCPAIRI->get_gids( iface_no, sets, ents_size, &ents_gids[0] );
 
     if( iBase_SUCCESS != result && iBase_TAG_NOT_FOUND != result ) return result;
 
     ents_dims.resize( ents_size, -1 );
     if( ent_or_set == iRel_ENTITY )
     {
-        int* ents_dims_ptr = &ents_dims[ 0 ];
-        int  ents_dims_alloc = ents_dims.size( ), ents_dims_size;
+        int* ents_dims_ptr  = &ents_dims[0];
+        int ents_dims_alloc = ents_dims.size(), ents_dims_size;
         result =
             ASSOCPAIRI->get_ents_dims( iface_no, ents, ents_size, &ents_dims_ptr, &ents_dims_alloc, &ents_dims_size );
     }
     else
     {
-        result = ASSOCPAIRI->get_dims( iface_no, sets, ents_size, &ents_dims[ 0 ] );
+        result = ASSOCPAIRI->get_dims( iface_no, sets, ents_size, &ents_dims[0] );
     }
 
     if( iBase_SUCCESS != result && iBase_TAG_NOT_FOUND != result ) return result;
@@ -443,45 +443,45 @@ static void iRel_inferArrArrRelations( iRel_Instance instance, iRel_PairHandle p
 {
     int result;
 
-    std::vector< int >                        ents_gids, ents_dims;
-    std::map< const int, iBase_EntityHandle > ents_gid_map[ 4 ];
+    std::vector< int > ents_gids, ents_dims;
+    std::map< const int, iBase_EntityHandle > ents_gid_map[4];
 
     get_gids_and_dims( pair, 0, ents1, ents1_size, ent_or_set1, ents_gids, ents_dims );
     for( int i = 0; i < ents1_size; i++ )
     {
-        int dim = ents_dims[ i ];
-        if( 0 <= dim && 3 >= dim ) ents_gid_map[ dim ][ ents_gids[ i ] ] = ents1[ i ];
+        int dim = ents_dims[i];
+        if( 0 <= dim && 3 >= dim ) ents_gid_map[dim][ents_gids[i]] = ents1[i];
     }
 
     get_gids_and_dims( pair, 1, ents2, ents2_size, ent_or_set2, ents_gids, ents_dims );
     for( int i = 0; i < ents2_size; i++ )
     {
-        int dim = ents_dims[ i ];
+        int dim = ents_dims[i];
 
         // only check entities for which the dimension entry is in a reasonable
         // range
         if( 0 > dim || 3 < dim ) continue;
 
         // there's a match if there's an entity with that dimension with matching id
-        std::map< const int, iBase_EntityHandle >::iterator iter = ents_gid_map[ dim ].find( ents_gids[ i ] );
+        std::map< const int, iBase_EntityHandle >::iterator iter = ents_gid_map[dim].find( ents_gids[i] );
 
         // if it matches, set the relation tags for those entities
-        if( iter != ents_gid_map[ dim ].end( ) )
+        if( iter != ents_gid_map[dim].end() )
         {
             if( ent_or_set1 == iRel_ENTITY && ent_or_set2 == iRel_ENTITY )
-            { result = ASSOCPAIRI->set_relation( ( *iter ).second, ents2[ i ] ); }
+            { result = ASSOCPAIRI->set_relation( ( *iter ).second, ents2[i] ); }
             else if( ent_or_set1 != iRel_ENTITY && ent_or_set2 == iRel_ENTITY )
             {
-                result = ASSOCPAIRI->set_relation( ( iBase_EntitySetHandle )( *iter ).second, ents2[ i ] );
+                result = ASSOCPAIRI->set_relation( ( iBase_EntitySetHandle )( *iter ).second, ents2[i] );
             }
             else if( ent_or_set1 == iRel_ENTITY && ent_or_set2 != iRel_ENTITY )
             {
-                result = ASSOCPAIRI->set_relation( ( *iter ).second, (iBase_EntitySetHandle)ents2[ i ] );
+                result = ASSOCPAIRI->set_relation( ( *iter ).second, (iBase_EntitySetHandle)ents2[i] );
             }
             else
             {  // ent_or_set1 != iRel_ENTITY && ent_or_set2 != iRel_ENTITY
                 result = ASSOCPAIRI->set_relation( ( iBase_EntitySetHandle )( *iter ).second,
-                                                   (iBase_EntitySetHandle)ents2[ i ] );
+                                                   (iBase_EntitySetHandle)ents2[i] );
             }
 
             CHK_ERROR( result );
@@ -521,20 +521,20 @@ void iRel_inferSetArrSetArrRelations( iRel_Instance instance, iRel_PairHandle pa
 
 void iRel_inferAllRelations( iRel_Instance instance, iRel_PairHandle pair, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     // get all entities in those interfaces
     int result;
 
     iBase_EntityHandle* ents1 = NULL;
-    int                 ents1_alloc = 0, ents1_size;
+    int ents1_alloc           = 0, ents1_size;
     if( ASSOCPAIRI->relation_type( 0 ) != iRel_ENTITY )
         result = ASSOCPAIRI->get_all_sets( 0, (iBase_EntitySetHandle**)&ents1, &ents1_alloc, &ents1_size );
     else
         result = ASSOCPAIRI->get_all_entities( 0, -1, &ents1, &ents1_alloc, &ents1_size );CHK_ERROR( result );
 
     iBase_EntityHandle* ents2 = NULL;
-    int                 ents2_alloc = 0, ents2_size;
+    int ents2_alloc           = 0, ents2_size;
     if( ASSOCPAIRI->relation_type( 1 ) != iRel_ENTITY )
         result = ASSOCPAIRI->get_all_sets( 1, (iBase_EntitySetHandle**)&ents2, &ents2_alloc, &ents2_size );
     else
@@ -567,7 +567,7 @@ void iRel_inferSetRelations( iRel_Instance instance, iRel_PairHandle pair, iBase
 static void iRel_inferArrRelations( iRel_Instance instance, iRel_PairHandle pair, iBase_EntityHandle* entities,
                                     int entities_size, bool is_set, int iface_no, int* err )
 {
-    CHK_PAIR( );
+    CHK_PAIR();
 
     if( 0 > iface_no || 1 < iface_no ) { ERROR( iBase_INVALID_ARGUMENT, "Interface number must be 0 or 1" ); }
     else if( ( is_set && ASSOCPAIRI->relation_type( iface_no ) == iRel_ENTITY ) ||
@@ -578,11 +578,11 @@ static void iRel_inferArrRelations( iRel_Instance instance, iRel_PairHandle pair
     }
 
     // get all entities in iface2
-    int                 result;
+    int result;
     iBase_EntityHandle* ents1 = entities;
-    int                 ents1_size = entities_size;
+    int ents1_size            = entities_size;
     iBase_EntityHandle* ents2 = NULL;
-    int                 ents2_alloc = 0, ents2_size;
+    int ents2_alloc           = 0, ents2_size;
     if( ASSOCPAIRI->relation_type( 1 - iface_no ) != iRel_ENTITY )
         result = ASSOCPAIRI->get_all_sets( !iface_no, (iBase_EntitySetHandle**)&ents2, &ents2_alloc, &ents2_size );
     else

@@ -54,8 +54,8 @@ class MsqMOAB : virtual public MBMesquite::Mesh
   public:
     //********* Functions that are NOT inherited ************
 
-    MsqMOAB( );
-    virtual ~MsqMOAB( );
+    MsqMOAB();
+    virtual ~MsqMOAB();
 
     /**\brief Create iMesh adaptor instance
      *\param imesh      The iMesh instance to interact with
@@ -146,15 +146,15 @@ class MsqMOAB : virtual public MBMesquite::Mesh
      */
     void set_active_set( moab::EntityHandle meshset, moab::EntityType element_dimension, MsqError& err );
 
-    void             set_fixed_tag( moab::Tag tag, MsqError& err );  //!< Set tag for vertex fixed flag
-    void             set_slaved_tag( moab::Tag tag, MsqError& err );  //!< Set tag for vertex slaved flag
-    void             clear_fixed_tag( );  //!< No tag for vertex fixed flag
-    void             clear_slaved_tag( );  //!< No tag for vertex fixed flag
-    const moab::Tag* get_fixed_tag( ) const;  //!< Get tag for vertex fixed flag
-    const moab::Tag* get_slaved_tag( ) const;  //!< Get tag for vertex slaved flag
+    void set_fixed_tag( moab::Tag tag, MsqError& err );   //!< Set tag for vertex fixed flag
+    void set_slaved_tag( moab::Tag tag, MsqError& err );  //!< Set tag for vertex slaved flag
+    void clear_fixed_tag();                               //!< No tag for vertex fixed flag
+    void clear_slaved_tag();                              //!< No tag for vertex fixed flag
+    const moab::Tag* get_fixed_tag() const;               //!< Get tag for vertex fixed flag
+    const moab::Tag* get_slaved_tag() const;              //!< Get tag for vertex slaved flag
 
-    virtual moab::Core*        get_interface( ) const;
-    virtual moab::EntityHandle get_entity_set( ) const;
+    virtual moab::Core* get_interface() const;
+    virtual moab::EntityHandle get_entity_set() const;
 
     //********* Functions that ARE inherited ************
 
@@ -215,7 +215,7 @@ class MsqMOAB : virtual public MBMesquite::Mesh
     // just call the destructor.  More sophisticated implementations
     // may want to keep the Mesh object to live longer than Mesquite
     // is using it.
-    virtual void release( );
+    virtual void release();
 
     //*************** Tags  ***********
 
@@ -386,7 +386,7 @@ class MsqMOAB : virtual public MBMesquite::Mesh
     /** Dimension is queried once during create and cached */
     int geometricDimension;
     /** Map iMesh_EntityTopology to MBMesquite::EntityTopology */
-    EntityTopology topologyMap[ moab::MBMAXTYPE + 1 ];
+    EntityTopology topologyMap[moab::MBMAXTYPE + 1];
 };
 
 }  // namespace MBMesquite

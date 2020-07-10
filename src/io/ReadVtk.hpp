@@ -44,7 +44,7 @@ class ReadVtk : public ReaderIface
     ReadVtk( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadVtk( );
+    virtual ~ReadVtk();
 
   protected:
     ErrorCode allocate_vertices( long num_vtx, EntityHandle& start_handle_out, double*& x_coord_array_out,

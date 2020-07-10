@@ -22,8 +22,8 @@
 
 using namespace MBMesquite;
 
-const char INVALID_FLAG = 'i';
-const char PERCENT_FLAG = 'p';
+const char INVALID_FLAG    = 'i';
+const char PERCENT_FLAG    = 'p';
 const char UNOPTIMIZE_FLAG = 'u';
 
 class UnOptimizer : public VertexMover
@@ -31,11 +31,11 @@ class UnOptimizer : public VertexMover
   public:
     UnOptimizer( ObjectiveFunction* of ) : objectiveFunction( of ) {}
 
-    virtual ~UnOptimizer( ) {}
+    virtual ~UnOptimizer() {}
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
-    virtual PatchSet* get_patch_set( );
+    virtual PatchSet* get_patch_set();
 
   protected:
     virtual void initialize( PatchData& pd, MsqError& err );
@@ -46,50 +46,54 @@ class UnOptimizer : public VertexMover
 
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
 
-    virtual void cleanup( );
+    virtual void cleanup();
 
   private:
     std::vector< size_t > adjVtxList;
-    VertexPatches         patchSet;
-    ObjectiveFunction*    objectiveFunction;
+    VertexPatches patchSet;
+    ObjectiveFunction* objectiveFunction;
 };
 
-std::string UnOptimizer::get_name( ) const
+std::string UnOptimizer::get_name() const
 {
     return "UnOptimize";
 }
-PatchSet* UnOptimizer::get_patch_set( )
+PatchSet* UnOptimizer::get_patch_set()
 {
     return &patchSet;
 }
 void UnOptimizer::initialize( PatchData&, MsqError& ) {}
 void UnOptimizer::initialize_mesh_iteration( PatchData&, MsqError& ) {}
 void UnOptimizer::terminate_mesh_iteration( PatchData&, MsqError& ) {}
-void UnOptimizer::cleanup( ) {}
+void UnOptimizer::cleanup() {}
 
 void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
 {
-    assert( pd.num_free_vertices( ) == 1 && pd.vertex_by_index( 0 ).is_free_vertex( ) );
+    assert( pd.num_free_vertices() == 1 && pd.vertex_by_index( 0 ).is_free_vertex() );
     std::vector< Vector3D > grad( 1 );
-    double                  val, junk, coeff;
-    bool                    state;
+    double val, junk, coeff;
+    bool state;
 
-    state = objectiveFunction->evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, val, grad, err );MSQ_ERRRTN( err );
+    state = objectiveFunction->evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, val, grad, err );
+    MSQ_ERRRTN( err );
     if( !state )
     {
         MSQ_SETERR( err )( MsqError::INVALID_MESH );
         return;
     }
-    grad[ 0 ] /= grad[ 0 ].length( );
+    grad[0] /= grad[0].length();
 
-    PatchDataVerticesMemento* memento = pd.create_vertices_memento( err );MSQ_ERRRTN( err );
+    PatchDataVerticesMemento* memento = pd.create_vertices_memento( err );
+    MSQ_ERRRTN( err );
     std::auto_ptr< PatchDataVerticesMemento > deleter( memento );
     pd.get_minmax_edge_length( junk, coeff );
 
     for( int i = 0; i < 100; ++i )
     {
-        pd.set_free_vertices_constrained( memento, arrptr( grad ), 1, coeff, err );MSQ_ERRRTN( err );
-        state = objectiveFunction->evaluate( ObjectiveFunction::CALCULATE, pd, val, true, err );MSQ_ERRRTN( err );
+        pd.set_free_vertices_constrained( memento, arrptr( grad ), 1, coeff, err );
+        MSQ_ERRRTN( err );
+        state = objectiveFunction->evaluate( ObjectiveFunction::CALCULATE, pd, val, true, err );
+        MSQ_ERRRTN( err );
         if( state ) break;
         coeff *= 0.5;
     }
@@ -98,12 +102,12 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
 
 int main( int argc, char* argv[] )
 {
-    const double           default_fraction = 0.05;
-    const double           zero = 0.0;
-    int                    one = 1;
-    CLArgs::ToggleArg      allow_invalid( false );
+    const double default_fraction = 0.05;
+    const double zero             = 0.0;
+    int one                       = 1;
+    CLArgs::ToggleArg allow_invalid( false );
     CLArgs::DoubleRangeArg rand_percent( default_fraction, &zero, 0 );
-    CLArgs::IntRangeArg    unoptimize( 0, &one, 0 );
+    CLArgs::IntRangeArg unoptimize( 0, &one, 0 );
 
     CLArgs args( "vtkrandom", "Randomize mesh vertex locations.",
                  "Read VTK file, randomize locations of containded vertices, and re-write file." );
@@ -120,12 +124,12 @@ int main( int argc, char* argv[] )
         args.print_usage( std::cerr );
         exit( 1 );
     }
-    std::string input_file = files[ 0 ];
-    std::string output_file = files[ 1 ];
+    std::string input_file  = files[0];
+    std::string output_file = files[1];
 
     MsqError err;
     MeshImpl mesh;
-    mesh.read_vtk( input_file.c_str( ), err );
+    mesh.read_vtk( input_file.c_str(), err );
     if( err )
     {
         std::cerr << "ERROR READING FILE: " << input_file << std::endl << err << std::endl;
@@ -133,16 +137,16 @@ int main( int argc, char* argv[] )
     }
     MeshDomain* domain = process_domain_args( &mesh );
 
-    TerminationCriterion        tc;
-    QualityAssessor             qa( false );
-    InstructionQueue            q;
-    Randomize                   op( rand_percent.value( ) );
+    TerminationCriterion tc;
+    QualityAssessor qa( false );
+    InstructionQueue q;
+    Randomize op( rand_percent.value() );
     IdealWeightInverseMeanRatio metric;
-    PMeanPTemplate              of( 1, &metric );
-    UnOptimizer                 op2( &of );
-    if( unoptimize.seen( ) )
+    PMeanPTemplate of( 1, &metric );
+    UnOptimizer op2( &of );
+    if( unoptimize.seen() )
     {
-        tc.add_iteration_limit( unoptimize.value( ) );
+        tc.add_iteration_limit( unoptimize.value() );
         op2.set_outer_termination_criterion( &tc );
         q.add_preconditioner( &op, err );
         q.set_master_quality_improver( &op2, err );
@@ -163,7 +167,7 @@ int main( int argc, char* argv[] )
     int inverted, junk;
     if( qa.get_inverted_element_count( inverted, junk, err ) && inverted )
     {
-        if( allow_invalid.value( ) )
+        if( allow_invalid.value() )
             std::cerr << "Warning: output mesh contains " << inverted << " inverted elements" << std::endl;
         else
         {
@@ -172,7 +176,7 @@ int main( int argc, char* argv[] )
         }
     }
 
-    mesh.write_vtk( output_file.c_str( ), err );
+    mesh.write_vtk( output_file.c_str(), err );
     if( err )
     {
         std::cerr << "ERROR WRITING FILE: " << output_file << std::endl << err << std::endl;

@@ -49,12 +49,12 @@ class ReadUtilIface;
 
 struct ReadBlockData
 {
-    int                         blockId;
-    int                         startExoId;
-    EntityHandle                startMBId;
-    int                         numElements;
-    bool                        reading_in;
-    ExoIIElementType            elemType;
+    int blockId;
+    int startExoId;
+    EntityHandle startMBId;
+    int numElements;
+    bool reading_in;
+    ExoIIElementType elemType;
     std::vector< EntityHandle > polys;  // used only if elem type is polyhedra or polygons
                                         // because the order has to be maintained
 };
@@ -62,9 +62,9 @@ struct ReadBlockData
 // these are for polyhedra only
 struct ReadFaceBlockData
 {
-    int  faceBlockId;
-    int  startExoId;
-    int  numElements;
+    int faceBlockId;
+    int startExoId;
+    int numElements;
     bool reading_in;
     // ExoIIElementType elemType; should be polygons
 };
@@ -89,7 +89,7 @@ class ReadNCDF : public ReaderIface
     ReadNCDF( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadNCDF( );
+    virtual ~ReadNCDF();
 
     // update the coords for deformed mesh according to FileOptions
     ErrorCode update( const char* exodus_file_name, const FileOptions& opts, const int num_blocks,
@@ -100,40 +100,40 @@ class ReadNCDF : public ReaderIface
 
     bool dimension_exists( const char* attrib_name );
 
-    void reset( );
+    void reset();
 
     //! read the header from the ExoII file
-    ErrorCode read_exodus_header( );
+    ErrorCode read_exodus_header();
 
     //! read the nodes
     ErrorCode read_nodes( const Tag* file_id_tag );
 
     // face blocks for polyhedra
-    ErrorCode read_face_blocks_headers( );  // all of them?
+    ErrorCode read_face_blocks_headers();  // all of them?
 
     //! read block headers, containing info about element type, number, etc.
     ErrorCode read_block_headers( const int* blocks_to_load, const int num_blocks );
 
     // these are needed only when polyhedra are present
-    ErrorCode read_polyhedra_faces( );
+    ErrorCode read_polyhedra_faces();
 
     //! read the element blocks
     ErrorCode read_elements( const Tag* file_id_tag );
 
     //! read in the global element ids
-    ErrorCode read_global_ids( );
+    ErrorCode read_global_ids();
 
     //! read the nodesets into meshsets
-    ErrorCode read_nodesets( );
+    ErrorCode read_nodesets();
 
     //! read the sidesets (does nothing for now)
-    ErrorCode read_sidesets( );
+    ErrorCode read_sidesets();
 
     //! exodus file bound to this object
-    int exodus_file( );
+    int exodus_file();
 
     //! number of dimensions in this exo file
-    int number_dimensions( );
+    int number_dimensions();
 
     //! map a character exodusII element type to a TSTT type & topology
     ErrorCode get_type( char* exo_element_type, EntityType& elem_type );
@@ -236,7 +236,7 @@ class ReadNCDF : public ReaderIface
 };
 
 // inline functions
-inline int ReadNCDF::number_dimensions( )
+inline int ReadNCDF::number_dimensions()
 {
     return numberDimensions_loading;
 }

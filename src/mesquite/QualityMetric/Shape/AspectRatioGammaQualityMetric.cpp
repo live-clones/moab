@@ -47,12 +47,12 @@ using namespace MBMesquite;
 const double fourDivRootThree = 4.0 / sqrt( 3.0 );
 const double twelveDivRootTwo = 12.0 / sqrt( 2.0 );
 
-std::string AspectRatioGammaQualityMetric::get_name( ) const
+std::string AspectRatioGammaQualityMetric::get_name() const
 {
     return "AspectRatioGamma";
 }
 
-int AspectRatioGammaQualityMetric::get_negate_flag( ) const
+int AspectRatioGammaQualityMetric::get_negate_flag() const
 {
     return 1;
 }
@@ -62,13 +62,13 @@ int AspectRatioGammaQualityMetric::get_negate_flag( ) const
 bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, double& fval, MsqError& err )
 {
     MsqMeshEntity& element = pd.element_by_index( elem_index );
-    EntityTopology entity = element.get_element_type( );
-    double         vol;
-    Vector3D       cross, normal( 0, 0, 0 );
+    EntityTopology entity  = element.get_element_type();
+    double vol;
+    Vector3D cross, normal( 0, 0, 0 );
     fval = MSQ_MAX_CAP;
 
     // get element's nodes
-    vert.clear( );
+    vert.clear();
     pd.get_element_vertex_coordinates( elem_index, vert, err );
     MSQ_ERRZERO( err );
 
@@ -76,11 +76,11 @@ bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, 
     {
         case TRIANGLE:
             // area
-            cross = ( vert[ 1 ] - vert[ 0 ] ) * ( vert[ 2 ] - vert[ 0 ] );
-            vol = cross.length( ) / 2.0;
+            cross = ( vert[1] - vert[0] ) * ( vert[2] - vert[0] );
+            vol   = cross.length() / 2.0;
             if( vol < MSQ_MIN ) return false;
 
-            if( pd.domain_set( ) )
+            if( pd.domain_set() )
             {  // need domain to check for inverted elements
                 pd.get_domain_normal_at_corner( elem_index, 0, normal, err );
                 MSQ_ERRZERO( err );
@@ -88,8 +88,8 @@ bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, 
             }
 
             // sum squares of edge lengths
-            fval = ( ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) + ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
-                     ( vert[ 1 ] - vert[ 2 ] ).length_squared( ) );
+            fval = ( ( vert[1] - vert[0] ).length_squared() + ( vert[2] - vert[0] ).length_squared() +
+                     ( vert[1] - vert[2] ).length_squared() );
             // average
             fval /= 3.0;
 
@@ -99,14 +99,14 @@ bool AspectRatioGammaQualityMetric::evaluate( PatchData& pd, size_t elem_index, 
             break;
 
         case TETRAHEDRON:
-            vol = ( vert[ 1 ] - vert[ 0 ] ) % ( ( vert[ 2 ] - vert[ 0 ] ) * ( vert[ 3 ] - vert[ 0 ] ) ) / 6.0;
+            vol = ( vert[1] - vert[0] ) % ( ( vert[2] - vert[0] ) * ( vert[3] - vert[0] ) ) / 6.0;
             if( vol < MSQ_MIN )  // zero for degenerate and negative for inverted
                 return false;
 
             // sum squares of edge lengths
-            fval = ( vert[ 1 ] - vert[ 0 ] ).length_squared( ) + ( vert[ 2 ] - vert[ 0 ] ).length_squared( ) +
-                   ( vert[ 3 ] - vert[ 0 ] ).length_squared( ) + ( vert[ 2 ] - vert[ 1 ] ).length_squared( ) +
-                   ( vert[ 3 ] - vert[ 1 ] ).length_squared( ) + ( vert[ 3 ] - vert[ 2 ] ).length_squared( );
+            fval = ( vert[1] - vert[0] ).length_squared() + ( vert[2] - vert[0] ).length_squared() +
+                   ( vert[3] - vert[0] ).length_squared() + ( vert[2] - vert[1] ).length_squared() +
+                   ( vert[3] - vert[1] ).length_squared() + ( vert[3] - vert[2] ).length_squared();
             // average
             fval /= 6.0;
 

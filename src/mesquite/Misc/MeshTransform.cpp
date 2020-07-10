@@ -42,23 +42,23 @@
 namespace MBMesquite
 {
 
-MeshTransform::~MeshTransform( ) {}
+MeshTransform::~MeshTransform() {}
 
 /*!
   Actually apply the affine transformation
   */
 double MeshTransform::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& err )
 {
-    Mesh* mesh = mesh_and_domain->get_mesh( );
+    Mesh* mesh = mesh_and_domain->get_mesh();
 
     std::vector< Mesh::VertexHandle > handle_list;
     mesh->get_all_vertices( handle_list, err );
     if( MSQ_CHKERR( err ) ) return 1.0;
 
-    std::vector< bool >                               fixed( 1 );
-    MsqVertex                                         vertex;
+    std::vector< bool > fixed( 1 );
+    MsqVertex vertex;
     std::vector< Mesh::VertexHandle >::const_iterator iter;
-    for( iter = handle_list.begin( ); iter != handle_list.end( ); ++iter )
+    for( iter = handle_list.begin(); iter != handle_list.end(); ++iter )
     {
         mesh->vertices_get_coordinates( &*iter, &vertex, 1, err );
         if( MSQ_CHKERR( err ) ) return 1.0;
@@ -67,7 +67,7 @@ double MeshTransform::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Se
         {
             mesh->vertices_get_fixed_flag( &*iter, fixed, 1, err );
             if( MSQ_CHKERR( err ) ) return 1.0;
-            if( fixed.front( ) ) continue;
+            if( fixed.front() ) continue;
         }
 
         vertex = mMat * vertex + mVec;
@@ -86,15 +86,15 @@ void MeshTransform::add_translation( const Vector3D& offset )
 
 void MeshTransform::add_rotation( const Vector3D& axis, double radians )
 {
-    const double   c = cos( radians );
-    const double   s = sin( radians );
-    const Vector3D a = axis / axis.length( );
-    const Matrix3D m1( c, -a[ 2 ] * s, a[ 1 ] * s, a[ 2 ] * s, c, -a[ 0 ] * s, -a[ 1 ] * s, a[ 0 ] * s, c );
-    Matrix3D       m2;
+    const double c   = cos( radians );
+    const double s   = sin( radians );
+    const Vector3D a = axis / axis.length();
+    const Matrix3D m1( c, -a[2] * s, a[1] * s, a[2] * s, c, -a[0] * s, -a[1] * s, a[0] * s, c );
+    Matrix3D m2;
     m2.outer_product( a, a );
     Matrix3D rot = m1 + ( 1.0 - c ) * m2;
-    mMat = rot * mMat;
-    mVec = rot * mVec;
+    mMat         = rot * mMat;
+    mVec         = rot * mVec;
 }
 
 void MeshTransform::add_scale( double factor )
@@ -106,10 +106,10 @@ void MeshTransform::add_scale( const Vector3D& f )
 {
     for( int i = 0; i < 3; ++i )
     {
-        mVec[ i ] *= f[ i ];
-        mMat[ i ][ 0 ] *= f[ i ];
-        mMat[ i ][ 1 ] *= f[ i ];
-        mMat[ i ][ 2 ] *= f[ i ];
+        mVec[i] *= f[i];
+        mMat[i][0] *= f[i];
+        mMat[i][1] *= f[i];
+        mMat[i][2] *= f[i];
     }
 }
 

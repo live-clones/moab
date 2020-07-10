@@ -20,7 +20,7 @@ bool internal_assert( bool c )
 
 bool handle_test( EntityType type, EntityID id, int proc, bool should_fail )
 {
-    int          err = 0;
+    int err             = 0;
     EntityHandle handle = CREATE_HANDLE( type, handleUtils.create_id( id, proc ), err );
     if( should_fail ) { handle_test_assert( err ) return true; }
     handle_test_assert( !err )
@@ -58,12 +58,12 @@ bool tag_test( TagId id, TagType prop )
 }
 
 //! Sample code on a 32-bit system.
-int main( )
+int main()
 {
     const unsigned cpus[] = { 1, 4, 16, 5, 20 };
-    const int      num_cpus = sizeof( cpus ) / sizeof( cpus[ 0 ] );
-    unsigned       errors = 0, tests = 0;
-    const int      num_prop = MB_TAG_LAST + 1;
+    const int num_cpus    = sizeof( cpus ) / sizeof( cpus[0] );
+    unsigned errors = 0, tests = 0;
+    const int num_prop = MB_TAG_LAST + 1;
 
     ++tests;
     if( MB_TAG_LAST > num_prop )
@@ -86,24 +86,24 @@ int main( )
     for( int num_cpu = 0; num_cpu < num_cpus; ++num_cpu )
     {
 
-        handleUtils = HandleUtils( 0, cpus[ num_cpu ] );
+        handleUtils = HandleUtils( 0, cpus[num_cpu] );
 
         // init these after setting num_cpu, because max id depends on num cpu.
-        const EntityID ids[] = { 0, 1, handleUtils.max_id( ) / 2, handleUtils.max_id( ) - 1, handleUtils.max_id( ) };
-        const TagId    tids[] = { 0, 1, MB_TAG_PROP_MASK / 2, MB_TAG_PROP_MASK - 1, MB_TAG_PROP_MASK };
-        const int      num_ids = sizeof( ids ) / sizeof( ids[ 0 ] );
-        const int      num_tids = sizeof( tids ) / sizeof( tids[ 0 ] );
+        const EntityID ids[] = { 0, 1, handleUtils.max_id() / 2, handleUtils.max_id() - 1, handleUtils.max_id() };
+        const TagId tids[]   = { 0, 1, MB_TAG_PROP_MASK / 2, MB_TAG_PROP_MASK - 1, MB_TAG_PROP_MASK };
+        const int num_ids    = sizeof( ids ) / sizeof( ids[0] );
+        const int num_tids   = sizeof( tids ) / sizeof( tids[0] );
 
-        for( unsigned cpu = 0; cpu < cpus[ num_cpu ]; ++cpu )
+        for( unsigned cpu = 0; cpu < cpus[num_cpu]; ++cpu )
         {
             for( EntityType type = MBVERTEX; type < MBMAXTYPE; ++type )
                 for( int id = 0; id < num_ids; ++id )
                 {
                     ++tests;
-                    if( !handle_test( type, ids[ id ], cpu, false ) )
+                    if( !handle_test( type, ids[id], cpu, false ) )
                     {
-                        cout << "Test of handle with type=" << type << ", id=" << ids[ id ] << ", proc=" << cpu
-                             << ", and numproc=" << cpus[ num_cpu ] << endl;
+                        cout << "Test of handle with type=" << type << ", id=" << ids[id] << ", proc=" << cpu
+                             << ", and numproc=" << cpus[num_cpu] << endl;
                         ++errors;
                     }
                 }
@@ -112,10 +112,10 @@ int main( )
                 for( int id = 0; id < num_tids; ++id )
                 {
                     ++tests;
-                    if( !tag_test( tids[ id ], (TagType)prop ) )
+                    if( !tag_test( tids[id], (TagType)prop ) )
                     {
-                        cout << "Test of tag handle with prop=" << prop << ", id=" << tids[ id ] << ", proc=" << cpu
-                             << ", and numproc=" << cpus[ num_cpu ] << endl;
+                        cout << "Test of tag handle with prop=" << prop << ", id=" << tids[id] << ", proc=" << cpu
+                             << ", and numproc=" << cpus[num_cpu] << endl;
                         ++errors;
                     }
                 }

@@ -5,24 +5,24 @@
 namespace moab
 {
 
-ProcessSet::ProcessSet( )
+ProcessSet::ProcessSet()
 {
-    this->clear( );
+    this->clear();
 }
 
 ProcessSet::ProcessSet( const unsigned char* psetbits )
 {
     for( int i = 0; i < SHARED_PROC_BYTES; ++i )
-        this->processes[ i ] = psetbits[ i ];
+        this->processes[i] = psetbits[i];
 }
 
-ProcessSet::~ProcessSet( ) {}
+ProcessSet::~ProcessSet() {}
 
 void ProcessSet::unite( const ProcessSet& other )
 {
     for( int i = 0; i < SHARED_PROC_BYTES; ++i )
     {
-        this->processes[ i ] |= other.processes[ i ];
+        this->processes[i] |= other.processes[i];
     }
 }
 
@@ -30,11 +30,11 @@ void ProcessSet::intersect( const ProcessSet& other )
 {
     for( int i = 0; i < SHARED_PROC_BYTES; ++i )
     {
-        this->processes[ i ] &= other.processes[ i ];
+        this->processes[i] &= other.processes[i];
     }
 }
 
-void ProcessSet::clear( )
+void ProcessSet::clear()
 {
     memset( this->processes, 0, SHARED_PROC_BYTES );
 }
@@ -46,9 +46,9 @@ void ProcessSet::clear( )
  */
 void ProcessSet::set_process_member( int proc )
 {
-    int byte = proc / 8;
+    int byte    = proc / 8;
     int bitmask = 1 << ( proc % 8 );
-    this->processes[ byte ] |= bitmask;
+    this->processes[byte] |= bitmask;
 }
 
 /**\brief Add each process in the input vector to this process set.
@@ -59,7 +59,7 @@ void ProcessSet::set_process_member( int proc )
  */
 void ProcessSet::set_process_members( const std::vector< int >& procs )
 {
-    for( std::vector< int >::const_iterator it = procs.begin( ); it != procs.end( ) && *it != -1; ++it )
+    for( std::vector< int >::const_iterator it = procs.begin(); it != procs.end() && *it != -1; ++it )
     {
         this->set_process_member( *it );
     }
@@ -76,12 +76,12 @@ bool ProcessSet::get_process_members( int rank, std::vector< int >& procs )
 {
     int i = 0;
     assert( rank >= 0 );
-    procs.clear( );
+    procs.clear();
     bool rank_owner = false;
     for( int byte = 0; byte < SHARED_PROC_BYTES; ++byte )
     {
         i = byte * 8;
-        for( unsigned char val = this->processes[ byte ]; val; ++i, val >>= 1 )
+        for( unsigned char val = this->processes[byte]; val; ++i, val >>= 1 )
         {
             if( val & 0x1 )
             {
@@ -90,14 +90,14 @@ bool ProcessSet::get_process_members( int rank, std::vector< int >& procs )
                     // std::cout << " " << i;
                     procs.push_back( i );
                 }
-                else if( !procs.size( ) )
+                else if( !procs.size() )
                 {
                     rank_owner = true;
                 }
             }
         }
     }
-    for( i = procs.size( ); i < MAX_SHARING_PROCS; ++i )
+    for( i = procs.size(); i < MAX_SHARING_PROCS; ++i )
     {
         procs.push_back( -1 );  // pad with invalid values
     }
@@ -106,12 +106,12 @@ bool ProcessSet::get_process_members( int rank, std::vector< int >& procs )
 
 bool ProcessSet::is_process_member( int i ) const
 {
-    int byte = i / 8;
+    int byte    = i / 8;
     int bitmask = 1 << ( i % 8 );
-    return ( this->processes[ byte ] & bitmask ) ? true : false;
+    return ( this->processes[byte] & bitmask ) ? true : false;
 }
 
-const unsigned char* ProcessSet::data( ) const
+const unsigned char* ProcessSet::data() const
 {
     return this->processes;
 }
@@ -120,9 +120,9 @@ bool ProcessSet::operator<( const ProcessSet& other ) const
 {
     for( int i = 0; i < SHARED_PROC_BYTES; ++i )
     {
-        if( this->processes[ i ] < other.processes[ i ] )
+        if( this->processes[i] < other.processes[i] )
             return true;
-        else if( this->processes[ i ] > other.processes[ i ] )
+        else if( this->processes[i] > other.processes[i] )
             return false;
     }
     return false;  // equality

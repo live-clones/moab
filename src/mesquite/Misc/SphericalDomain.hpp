@@ -50,9 +50,9 @@ class MESQUITE_EXPORT SphericalDomain : public MBMesquite::MeshDomain
   public:
     SphericalDomain( const Vector3D& p_center, double p_radius ) : mCenter( p_center ), mRadius( p_radius ) {}
 
-    SphericalDomain( ) {}
+    SphericalDomain() {}
 
-    virtual ~SphericalDomain( );
+    virtual ~SphericalDomain();
 
     void set_sphere( const Vector3D& p_center, double p_radius )
     {
@@ -80,18 +80,18 @@ class MESQUITE_EXPORT SphericalDomain : public MBMesquite::MeshDomain
     virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_vertices,
                              MsqError& err ) const;
 
-    Vector3D center( ) const
+    Vector3D center() const
     {
         return mCenter;
     }
-    double radius( ) const
+    double radius() const
     {
         return mRadius;
     }
 
   private:
     Vector3D mCenter;
-    double   mRadius;
+    double mRadius;
 };
 }  // namespace MBMesquite
 

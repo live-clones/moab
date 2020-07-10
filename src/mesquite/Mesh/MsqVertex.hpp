@@ -58,7 +58,7 @@ class MESQUITE_EXPORT MsqVertex : public Vector3D
     MsqVertex( const Vector3D& vec ) : Vector3D( vec ), vertexBitFlags( 0 ) {}
 
     //! Construct default vertex with coordinates (0.0,0.0,0.0)
-    MsqVertex( ) : Vector3D( 0, 0, 0 ), vertexBitFlags( 0 ) {}
+    MsqVertex() : Vector3D( 0, 0, 0 ), vertexBitFlags( 0 ) {}
 
     //! Construct default vertex with coordinates (0.0,0.0,0.0)
     MsqVertex( const MsqVertex& rhs ) : Vector3D( rhs ), vertexBitFlags( rhs.vertexBitFlags ) {}
@@ -81,30 +81,30 @@ class MESQUITE_EXPORT MsqVertex : public Vector3D
     //!               so they have to be 2-based (2,4,8,16,32, ...)
     enum FlagMaskID
     {
-        MSQ_HARD_FIXED = 1 << 0,  //!< vertex is always fixed. This can only be set on and never off.
-        MSQ_DEPENDENT = 1 << 1,  //!< higher-order node w/ position determined by mapping function
-        MSQ_CULLED = 1 << 2,  //!< vertex is fixed. This flag can be set on and off.
+        MSQ_HARD_FIXED  = 1 << 0,  //!< vertex is always fixed. This can only be set on and never off.
+        MSQ_DEPENDENT   = 1 << 1,  //!< higher-order node w/ position determined by mapping function
+        MSQ_CULLED      = 1 << 2,  //!< vertex is fixed. This flag can be set on and off.
         MSQ_PATCH_FIXED = 1 << 3,  //!< vertex is fixed only because it is on patch boundary (not by app request)
-        MSQ_MARK = 1 << 4,  //!< arbitrary mark for use by code - clear before using
-        MSQ_FIXED = ( MSQ_HARD_FIXED | MSQ_CULLED | MSQ_PATCH_FIXED )
+        MSQ_MARK        = 1 << 4,  //!< arbitrary mark for use by code - clear before using
+        MSQ_FIXED       = ( MSQ_HARD_FIXED | MSQ_CULLED | MSQ_PATCH_FIXED )
     };
     //! Returns true if vertex is ``free''.
-    bool is_free_vertex( ) const
+    bool is_free_vertex() const
     {
         return ( vertexBitFlags & ( MSQ_HARD_FIXED | MSQ_PATCH_FIXED ) ) == 0;
     }
 
-    void set_soft_fixed_flag( )
+    void set_soft_fixed_flag()
     {
         vertexBitFlags |= MSQ_CULLED;
     }
 
-    void remove_soft_fixed_flag( )
+    void remove_soft_fixed_flag()
     {
         vertexBitFlags &= ( ~MSQ_CULLED );
     }
 
-    void set_hard_fixed_flag( )
+    void set_hard_fixed_flag()
     {
         vertexBitFlags |= MSQ_HARD_FIXED;
     }
@@ -124,12 +124,12 @@ class MESQUITE_EXPORT MsqVertex : public Vector3D
         return ( vertexBitFlags & flag ) != 0;
     }
 
-    FlagMask get_flags( ) const
+    FlagMask get_flags() const
     {
         return vertexBitFlags;
     }
 
-    FlagMask& flags( )
+    FlagMask& flags()
     {
         return vertexBitFlags;
     }

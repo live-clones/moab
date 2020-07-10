@@ -52,7 +52,7 @@ class PMeanPMetric
   public:
     PMeanPMetric( double p ) : P( p ), P1( p - 1.0 ), P2( p - 2.0 ) {}
 
-    const Exponent& get_power( ) const
+    const Exponent& get_power() const
     {
         return P;
     }
@@ -77,14 +77,14 @@ class PMeanPMetric
                                std::vector< Matrix3D >& Hessian, MsqError& err );
 
   private:
-    Exponent                   P;
-    Exponent                   P1;
-    Exponent                   P2;
-    std::vector< size_t >      mIndices, mOffsets;
-    std::vector< Vector3D >    mGrad;
-    std::vector< Matrix3D >    mHess;
+    Exponent P;
+    Exponent P1;
+    Exponent P2;
+    std::vector< size_t > mIndices, mOffsets;
+    std::vector< Vector3D > mGrad;
+    std::vector< Matrix3D > mHess;
     std::vector< SymMatrix3D > mDiag;
-    std::vector< double >      mValues;
+    std::vector< double > mValues;
 };
 
 }  // namespace MBMesquite

@@ -16,7 +16,7 @@
                                   this_size, 1, err );                                                            \
     if( iBase_SUCCESS != *err ) return
 
-#define KEEP_ARRAY( array ) array##_manager.keep_array( )
+#define KEEP_ARRAY( array ) array##_manager.keep_array()
 
 // Check the array size, and allocate the array if necessary.
 // Do NOT free the array upon leaving scope.
@@ -35,7 +35,7 @@ class ArrayManager
     {
         if( !*array_ptr || !array_allocated_space )
         {
-            *array_ptr = std::malloc( val_size * count );
+            *array_ptr            = std::malloc( val_size * count );
             array_allocated_space = array_size = count;
             if( !*array_ptr )
             {
@@ -57,7 +57,7 @@ class ArrayManager
         *err = iBase_SUCCESS;
     }
 
-    ~ArrayManager( )
+    ~ArrayManager()
     {
         if( arrayPtr )
         {
@@ -66,7 +66,7 @@ class ArrayManager
         }
     }
 
-    void keep_array( )
+    void keep_array()
     {
         arrayPtr = 0;
     }

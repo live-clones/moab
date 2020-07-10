@@ -52,10 +52,10 @@ class MESQUITE_EXPORT PatchSet
   public:
     typedef void* PatchHandle;
 
-    inline PatchSet( ) {}
+    inline PatchSet() {}
 
     /**\brief Declare destructor virtual */
-    virtual ~PatchSet( );
+    virtual ~PatchSet();
 
     /**\brief Specify the working Mesh */
     inline void set_mesh( Mesh* mesh )
@@ -81,7 +81,7 @@ class MESQUITE_EXPORT PatchSet
                             std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err ) = 0;
 
     /**\brief get the Mesh object passed to set_mesh() */
-    inline Mesh* get_mesh( ) const
+    inline Mesh* get_mesh() const
     {
         return myMesh;
     }

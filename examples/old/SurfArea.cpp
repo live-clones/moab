@@ -23,21 +23,21 @@ int main( int argc, char** argv )
 {
     if( 1 == argc )
     {
-        std::cout << "Usage: " << argv[ 0 ] << " <filename>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <filename>" << std::endl;
         return 0;
     }
 
     // declare variables
-    Tag                         gtag, idtag;
-    ErrorCode                   rval;
-    const char*                 tag_geom = "GEOM_DIMENSION";
-    const char*                 tag_gid = "GLOBAL_ID";
-    Range                       sets;
+    Tag gtag, idtag;
+    ErrorCode rval;
+    const char* tag_geom = "GEOM_DIMENSION";
+    const char* tag_gid  = "GLOBAL_ID";
+    Range sets;
     std::vector< EntityHandle > ents;
 
     // load a file
-    mb = new Core( );
-    rval = mb->load_file( argv[ 1 ] );
+    mb   = new Core();
+    rval = mb->load_file( argv[1] );
     if( MB_SUCCESS != rval ) return 1;
 
     // get the tag handle for the tags
@@ -54,7 +54,7 @@ int main( int argc, char** argv )
     Range::iterator set_it;
 
     // loop thru all the geometric entity sets
-    for( set_it = sets.begin( ); set_it != sets.end( ); ++set_it )
+    for( set_it = sets.begin(); set_it != sets.end(); ++set_it )
     {
 
         EntityHandle this_set = *set_it;
@@ -73,7 +73,7 @@ int main( int argc, char** argv )
 
             // get the global id of this surface
             int gid = 0;
-            rval = mb->tag_get_data( idtag, &this_set, 1, &gid );
+            rval    = mb->tag_get_data( idtag, &this_set, 1, &gid );
             if( MB_SUCCESS != rval ) return 1;
 
             // get all entities with dimension 2 in ents
@@ -83,7 +83,7 @@ int main( int argc, char** argv )
             // compute the area
             total_area = compute_area( ents );
 
-            ents.clear( );
+            ents.clear();
 
             std::cout << "Total area of meshes in surface " << gid << " =  " << total_area << std::endl;
         }
@@ -96,37 +96,37 @@ double compute_area( std::vector< EntityHandle >& entities )
 {
 
     ErrorCode rval = MB_SUCCESS;
-    double    area = 0.0;
+    double area    = 0.0;
 
     // loop thro' all the elements
-    for( int i = 0; i < int( entities.size( ) ); i++ )
+    for( int i = 0; i < int( entities.size() ); i++ )
     {
         std::vector< EntityHandle > conn;
-        EntityHandle                handle = entities[ i ];
+        EntityHandle handle = entities[i];
 
         // get the connectivity of this element
         rval = mb->get_connectivity( &handle, 1, conn );
         if( MB_SUCCESS != rval ) return -1.0;
 
         // break polygon into triangles and sum the area - Limitation: Convex polygon
-        for( int j = 2; j <= int( conn.size( ) ); ++j )
+        for( int j = 2; j <= int( conn.size() ); ++j )
         {
 
-            EntityHandle vertices[ 3 ] = { conn[ 0 ], conn[ j - 1 ], conn[ j - 2 ] };
-            CartVect     coords[ 3 ];
+            EntityHandle vertices[3] = { conn[0], conn[j - 1], conn[j - 2] };
+            CartVect coords[3];
 
             // get 3 coordinates forming the triangle
-            rval = mb->get_coords( vertices, 3, coords[ 0 ].array( ) );
+            rval = mb->get_coords( vertices, 3, coords[0].array() );
             if( MB_SUCCESS != rval ) return -1.0;
 
-            CartVect edge0 = coords[ 1 ] - coords[ 0 ];
-            CartVect edge1 = coords[ 2 ] - coords[ 0 ];
+            CartVect edge0 = coords[1] - coords[0];
+            CartVect edge1 = coords[2] - coords[0];
 
             // using MBCarVect overloaded operators and computing triangle area
-            area += ( edge0 * edge1 ).length( ) / 2.0;
+            area += ( edge0 * edge1 ).length() / 2.0;
         }
     }
     // clear the entities, else old entities remain
-    entities.clear( );
+    entities.clear();
     return area;
 }

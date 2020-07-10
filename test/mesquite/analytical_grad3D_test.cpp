@@ -66,13 +66,13 @@ describe main.cpp here
 
 using namespace MBMesquite;
 
-int main( )
+int main()
 {
-    MsqPrintError        err( std::cout );
+    MsqPrintError err( std::cout );
     MBMesquite::MeshImpl mesh;
 
     std::string file_name = TestDir + "/3D/vtk/hexes/untangled/hexes_4by2by2.vtk";
-    mesh.read_vtk( file_name.c_str( ), err );
+    mesh.read_vtk( file_name.c_str(), err );
 
     // creates an intruction queue
     InstructionQueue queue1;
@@ -89,7 +89,7 @@ int main( )
     if( err ) return 1;
     // creates the steepest descent optimization procedures
     SteepestDescent pass1( &obj_func );
-    pass1.use_global_patch( );
+    pass1.use_global_patch();
     // if (err) return 1;
     // pass1.set_maximum_iteration(6);
 

@@ -42,7 +42,7 @@ using std::strncpy;
 namespace MBMesquite
 {
 
-const char* MsqError::error_message( ) const
+const char* MsqError::error_message() const
 {
     static const char* const error_messages[] = { "No Error",
                                                   "<unknown>",
@@ -71,18 +71,18 @@ const char* MsqError::error_message( ) const
        This asserts that all error codes have a string in the above list. */
     assert( sizeof( error_messages ) == sizeof( char* ) * ( LAST_ERROR_CODE + 1 ) );
 
-    if( !errorMessage.empty( ) ) return errorMessage.c_str( );
+    if( !errorMessage.empty() ) return errorMessage.c_str();
 
-    if( errorCode >= 0 && errorCode < LAST_ERROR_CODE ) return error_messages[ errorCode ];
+    if( errorCode >= 0 && errorCode < LAST_ERROR_CODE ) return error_messages[errorCode];
 
-    return error_messages[ LAST_ERROR_CODE ];
+    return error_messages[LAST_ERROR_CODE];
 }
 
-MsqError::~MsqError( ) {}
+MsqError::~MsqError() {}
 
 bool MsqError::Setter::set( const std::string& msg, ErrorCode num )
 {
-    return mErr.set_error( num, msg.c_str( ) ) && mErr.push( functionName, fileName, lineNumber );
+    return mErr.set_error( num, msg.c_str() ) && mErr.push( functionName, fileName, lineNumber );
 }
 
 bool MsqError::Setter::set( const char* msg, ErrorCode num )
@@ -97,7 +97,7 @@ bool MsqError::Setter::set( ErrorCode num )
 
 bool MsqError::Setter::set( ErrorCode num, const char* format, ... )
 {
-    char buffer[ 1024 ];
+    char buffer[1024];
 
 #if defined( HAVE_VSNPRINTF )
     va_list args;
@@ -116,7 +116,7 @@ bool MsqError::Setter::set( ErrorCode num, const char* format, ... )
     va_end( args );
 #else
     strncpy( buffer, format, sizeof( buffer ) );
-    buffer[ sizeof( buffer ) - 1 ] = '\0';
+    buffer[sizeof( buffer ) - 1] = '\0';
 #endif
 
     return mErr.set_error( num, buffer ) && mErr.push( functionName, fileName, lineNumber );
@@ -131,7 +131,7 @@ bool MsqError::push( const char* function, const char* file, int line )
 bool MsqError::set_error( ErrorCode num, const char* msg )
 {
     errorCode = num;
-    stackTrace.clear( );
+    stackTrace.clear();
 
     if( msg )
         errorMessage = msg;
@@ -142,12 +142,12 @@ bool MsqError::set_error( ErrorCode num, const char* msg )
     return num != NO_ERROR;
 }
 
-void MsqError::clear( )
+void MsqError::clear()
 {
     errorCode = NO_ERROR;
     // MS VC6 doesn't have string::clear()!
     errorMessage.resize( 0 );
-    stackTrace.clear( );
+    stackTrace.clear();
 }
 
 std::ostream& operator<<( std::ostream& str, const MsqError::Trace& tr )
@@ -157,10 +157,10 @@ std::ostream& operator<<( std::ostream& str, const MsqError::Trace& tr )
 
 std::ostream& operator<<( std::ostream& str, const MsqError& err )
 {
-    str << "MESQUITE ERROR " << (int)err.error_code( ) << " : " << err.error_message( ) << std::endl;
+    str << "MESQUITE ERROR " << (int)err.error_code() << " : " << err.error_message() << std::endl;
 
-    MsqError::StackTrace::const_iterator       iter = err.stack( ).begin( );
-    const MsqError::StackTrace::const_iterator end = err.stack( ).end( );
+    MsqError::StackTrace::const_iterator iter      = err.stack().begin();
+    const MsqError::StackTrace::const_iterator end = err.stack().end();
     if( iter != end )
     {
         str << "  at " << *iter << std::endl;
@@ -172,9 +172,9 @@ std::ostream& operator<<( std::ostream& str, const MsqError& err )
     return str;
 }
 
-MsqPrintError::~MsqPrintError( )
+MsqPrintError::~MsqPrintError()
 {
-    if( error( ) ) outputStream << *this << std::endl;
+    if( error() ) outputStream << *this << std::endl;
 }
 
 }  // namespace MBMesquite

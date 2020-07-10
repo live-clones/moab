@@ -39,28 +39,28 @@ MeshGeneration::MeshGeneration( Interface* impl, ParallelComm* comm, EntityHandl
 #endif
 }
 
-MeshGeneration::~MeshGeneration( ) {}
+MeshGeneration::~MeshGeneration() {}
 
 ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 {
-    int    A = opts.A, B = opts.B, C = opts.C, M = opts.M, N = opts.N, K = opts.K;
-    int    blockSize = opts.blockSize;
+    int A = opts.A, B = opts.B, C = opts.C, M = opts.M, N = opts.N, K = opts.K;
+    int blockSize = opts.blockSize;
     double xsize = opts.xsize, ysize = opts.ysize, zsize = opts.zsize;  // The size of the region
-    int    GL = opts.GL;  // number of ghost layers
+    int GL = opts.GL;                                                   // number of ghost layers
 
     bool newMergeMethod = opts.newMergeMethod;
-    bool quadratic = opts.quadratic;
-    bool keep_skins = opts.keep_skins;
-    bool tetra = opts.tetra;
-    bool adjEnts = opts.adjEnts;
-    bool parmerge = opts.parmerge;
+    bool quadratic      = opts.quadratic;
+    bool keep_skins     = opts.keep_skins;
+    bool tetra          = opts.tetra;
+    bool adjEnts        = opts.adjEnts;
+    bool parmerge       = opts.parmerge;
 
-    int     rank = 0, size = 1;
-    clock_t tt = clock( );
+    int rank = 0, size = 1;
+    clock_t tt = clock();
 
 #ifdef MOAB_HAVE_MPI
-    rank = pc->rank( );
-    size = pc->size( );
+    rank = pc->rank();
+    size = pc->size();
 #endif
 
     if( M * N * K != size )
@@ -71,10 +71,10 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     }
     // Determine m, n, k for processor rank
     int m, n, k;
-    k = rank / ( M * N );
+    k            = rank / ( M * N );
     int leftover = rank % ( M * N );
-    n = leftover / M;
-    m = leftover % M;
+    n            = leftover / M;
+    m            = leftover % M;
 
     // Used for nodes increments
     int q = ( quadratic ) ? 2 : 1;
@@ -85,12 +85,12 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     double dy = ysize / ( B * N * blockSize * q );  // Distance between 2 nodes in y direction
     double dz = zsize / ( C * K * blockSize * q );  // Distance between 2 nodes in z direction
 
-    int NX = ( q * M * A * blockSize + 1 );
-    int NY = ( q * N * B * blockSize + 1 );
+    int NX  = ( q * M * A * blockSize + 1 );
+    int NY  = ( q * N * B * blockSize + 1 );
     int nex = M * A * blockSize;  // Number of elements in x direction, used for global id on element
     int ney = N * B * blockSize;  // Number of elements in y direction ...
     // int NZ = (K * C * blockSize + 1); // Not used
-    int  blockSize1 = q * blockSize + 1;  // Used for vertices
+    int blockSize1       = q * blockSize + 1;  // Used for vertices
     long num_total_verts = (long)NX * NY * ( K * C * blockSize + 1 );
     if( 0 == rank )
     {
@@ -104,7 +104,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     // Generate the block at (a, b, c); it will represent a partition, it will get a partition tag
 
     ReadUtilIface* iface;
-    ErrorCode      rval = mb->query_interface( iface );MB_CHK_SET_ERR( rval, "Can't get reader interface" );
+    ErrorCode rval = mb->query_interface( iface );MB_CHK_SET_ERR( rval, "Can't get reader interface" );
 
     Tag global_id_tag;
     rval = mb->tag_get_handle( "GLOBAL_ID", 1, MB_TYPE_INTEGER, global_id_tag );MB_CHK_SET_ERR( rval, "Can't get global id tag" );
@@ -136,29 +136,29 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                 int num_nodes = blockSize1 * blockSize1 * blockSize1;
 
                 vector< double* > arrays;
-                EntityHandle      startv;
+                EntityHandle startv;
                 rval = iface->get_node_coords( 3, num_nodes, 0, startv, arrays );MB_CHK_SET_ERR( rval, "Can't get node coords" );
 
                 // Will start with the lower corner:
-                int            x = m * A * q * blockSize + a * q * blockSize;
-                int            y = n * B * q * blockSize + b * q * blockSize;
-                int            z = k * C * q * blockSize + c * q * blockSize;
-                int            ix = 0;
-                vector< int >  gids( num_nodes );
+                int x  = m * A * q * blockSize + a * q * blockSize;
+                int y  = n * B * q * blockSize + b * q * blockSize;
+                int z  = k * C * q * blockSize + c * q * blockSize;
+                int ix = 0;
+                vector< int > gids( num_nodes );
                 vector< long > lgids( num_nodes );
-                Range          verts( startv, startv + num_nodes - 1 );
+                Range verts( startv, startv + num_nodes - 1 );
                 for( int kk = 0; kk < blockSize1; kk++ )
                 {
                     for( int jj = 0; jj < blockSize1; jj++ )
                     {
                         for( int ii = 0; ii < blockSize1; ii++ )
                         {
-                            arrays[ 0 ][ ix ] = ( x + ii ) * dx;
-                            arrays[ 1 ][ ix ] = ( y + jj ) * dy;
-                            arrays[ 2 ][ ix ] = ( z + kk ) * dz;
-                            gids[ ix ] = 1 + ( x + ii ) + ( y + jj ) * NX + ( z + kk ) * ( NX * NY );
+                            arrays[0][ix] = ( x + ii ) * dx;
+                            arrays[1][ix] = ( y + jj ) * dy;
+                            arrays[2][ix] = ( z + kk ) * dz;
+                            gids[ix]      = 1 + ( x + ii ) + ( y + jj ) * NX + ( z + kk ) * ( NX * NY );
                             if( !parmerge )
-                                lgids[ ix ] = 1 + ( x + ii ) + ( y + jj ) * NX + (long)( z + kk ) * ( NX * NY );
+                                lgids[ix] = 1 + ( x + ii ) + ( y + jj ) * NX + (long)( z + kk ) * ( NX * NY );
                             // Set int tags, some nice values?
 
                             ix++;
@@ -166,27 +166,27 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                     }
                 }
 
-                rval = mb->tag_set_data( global_id_tag, verts, &gids[ 0 ] );MB_CHK_SET_ERR( rval, "Can't set global ids to vertices" );
+                rval = mb->tag_set_data( global_id_tag, verts, &gids[0] );MB_CHK_SET_ERR( rval, "Can't set global ids to vertices" );
                 if( !parmerge )
                 {
-                    rval = mb->tag_set_data( new_id_tag, verts, &lgids[ 0 ] );MB_CHK_SET_ERR( rval, "Can't set the new handle id tags" );
+                    rval = mb->tag_set_data( new_id_tag, verts, &lgids[0] );MB_CHK_SET_ERR( rval, "Can't set the new handle id tags" );
                 }
                 localVerts.merge( verts );
                 int num_hexas = blockSize * blockSize * blockSize;
-                int num_el = num_hexas * factor;
+                int num_el    = num_hexas * factor;
 
-                EntityHandle  starte;  // Connectivity
+                EntityHandle starte;  // Connectivity
                 EntityHandle* conn;
-                int           num_v_per_elem = 8;
+                int num_v_per_elem = 8;
                 if( quadratic )
                 {
                     num_v_per_elem = 27;
-                    rval = iface->get_element_connect( num_el, 27, MBHEX, 0, starte, conn );MB_CHK_SET_ERR( rval, "Can't get element connectivity" );
+                    rval           = iface->get_element_connect( num_el, 27, MBHEX, 0, starte, conn );MB_CHK_SET_ERR( rval, "Can't get element connectivity" );
                 }
                 else if( tetra )
                 {
                     num_v_per_elem = 4;
-                    rval = iface->get_element_connect( num_el, 4, MBTET, 0, starte, conn );MB_CHK_SET_ERR( rval, "Can't get element connectivity" );
+                    rval           = iface->get_element_connect( num_el, 4, MBTET, 0, starte, conn );MB_CHK_SET_ERR( rval, "Can't get element connectivity" );
                 }
                 else
                 {
@@ -211,10 +211,10 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                         {
                             EntityHandle corner = startv + q * ii + q * jj * ystride + q * kk * zstride;
                             // These could overflow for large numbers
-                            gids[ ie ] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex + ( ze + kk ) * ( nex * ney ) ) *
-                                                 factor;  // 6 more for tetra
-                            lgids[ ie ] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex + (long)( ze + kk ) * ( nex * ney ) ) *
-                                                  factor;  // 6 more for tetra
+                            gids[ie] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex + ( ze + kk ) * ( nex * ney ) ) *
+                                               factor;  // 6 more for tetra
+                            lgids[ie] = 1 + ( ( xe + ii ) + ( ye + jj ) * nex + (long)( ze + kk ) * ( nex * ney ) ) *
+                                                factor;  // 6 more for tetra
                             // EntityHandle eh = starte + ie;
 
                             ie++;
@@ -236,33 +236,33 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                                 //      |  .                  |  .
                                 //      1   -----  9   -----  2
                                 //
-                                conn[ ix ] = corner;
-                                conn[ ix + 1 ] = corner + 2;
-                                conn[ ix + 2 ] = corner + 2 + 2 * ystride;
-                                conn[ ix + 3 ] = corner + 2 * ystride;
-                                conn[ ix + 4 ] = corner + 2 * zstride;
-                                conn[ ix + 5 ] = corner + 2 + 2 * zstride;
-                                conn[ ix + 6 ] = corner + 2 + 2 * ystride + 2 * zstride;
-                                conn[ ix + 7 ] = corner + 2 * ystride + 2 * zstride;
-                                conn[ ix + 8 ] = corner + 1;  // 0-1
-                                conn[ ix + 9 ] = corner + 2 + ystride;  // 1-2
-                                conn[ ix + 10 ] = corner + 1 + 2 * ystride;  // 2-3
-                                conn[ ix + 11 ] = corner + ystride;  // 3-0
-                                conn[ ix + 12 ] = corner + zstride;  // 0-4
-                                conn[ ix + 13 ] = corner + 2 + zstride;  // 1-5
-                                conn[ ix + 14 ] = corner + 2 + 2 * ystride + zstride;  // 2-6
-                                conn[ ix + 15 ] = corner + 2 * ystride + zstride;  // 3-7
-                                conn[ ix + 16 ] = corner + 1 + 2 * zstride;  // 4-5
-                                conn[ ix + 17 ] = corner + 2 + ystride + 2 * zstride;  // 5-6
-                                conn[ ix + 18 ] = corner + 1 + 2 * ystride + 2 * zstride;  // 6-7
-                                conn[ ix + 19 ] = corner + ystride + 2 * zstride;  // 4-7
-                                conn[ ix + 20 ] = corner + 1 + zstride;  // 0154
-                                conn[ ix + 21 ] = corner + 2 + ystride + zstride;  // 1265
-                                conn[ ix + 22 ] = corner + 1 + 2 * ystride + zstride;  // 2376
-                                conn[ ix + 23 ] = corner + ystride + zstride;  // 0374
-                                conn[ ix + 24 ] = corner + 1 + ystride;  // 0123
-                                conn[ ix + 25 ] = corner + 1 + ystride + 2 * zstride;  // 4567
-                                conn[ ix + 26 ] = corner + 1 + ystride + zstride;  // center
+                                conn[ix]      = corner;
+                                conn[ix + 1]  = corner + 2;
+                                conn[ix + 2]  = corner + 2 + 2 * ystride;
+                                conn[ix + 3]  = corner + 2 * ystride;
+                                conn[ix + 4]  = corner + 2 * zstride;
+                                conn[ix + 5]  = corner + 2 + 2 * zstride;
+                                conn[ix + 6]  = corner + 2 + 2 * ystride + 2 * zstride;
+                                conn[ix + 7]  = corner + 2 * ystride + 2 * zstride;
+                                conn[ix + 8]  = corner + 1;                              // 0-1
+                                conn[ix + 9]  = corner + 2 + ystride;                    // 1-2
+                                conn[ix + 10] = corner + 1 + 2 * ystride;                // 2-3
+                                conn[ix + 11] = corner + ystride;                        // 3-0
+                                conn[ix + 12] = corner + zstride;                        // 0-4
+                                conn[ix + 13] = corner + 2 + zstride;                    // 1-5
+                                conn[ix + 14] = corner + 2 + 2 * ystride + zstride;      // 2-6
+                                conn[ix + 15] = corner + 2 * ystride + zstride;          // 3-7
+                                conn[ix + 16] = corner + 1 + 2 * zstride;                // 4-5
+                                conn[ix + 17] = corner + 2 + ystride + 2 * zstride;      // 5-6
+                                conn[ix + 18] = corner + 1 + 2 * ystride + 2 * zstride;  // 6-7
+                                conn[ix + 19] = corner + ystride + 2 * zstride;          // 4-7
+                                conn[ix + 20] = corner + 1 + zstride;                    // 0154
+                                conn[ix + 21] = corner + 2 + ystride + zstride;          // 1265
+                                conn[ix + 22] = corner + 1 + 2 * ystride + zstride;      // 2376
+                                conn[ix + 23] = corner + ystride + zstride;              // 0374
+                                conn[ix + 24] = corner + 1 + ystride;                    // 0123
+                                conn[ix + 25] = corner + 1 + ystride + 2 * zstride;      // 4567
+                                conn[ix + 26] = corner + 1 + ystride + zstride;          // center
                                 ix += 27;
                             }
                             else if( tetra )
@@ -275,51 +275,51 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                                 EntityHandle AA = corner;
                                 EntityHandle BB = corner + 1;
                                 EntityHandle CC = corner + 1 + ystride;
-                                EntityHandle D = corner + ystride;
-                                EntityHandle E = corner + zstride;
-                                EntityHandle F = corner + 1 + zstride;
-                                EntityHandle G = corner + 1 + ystride + zstride;
-                                EntityHandle H = corner + ystride + zstride;
+                                EntityHandle D  = corner + ystride;
+                                EntityHandle E  = corner + zstride;
+                                EntityHandle F  = corner + 1 + zstride;
+                                EntityHandle G  = corner + 1 + ystride + zstride;
+                                EntityHandle H  = corner + ystride + zstride;
 
                                 // tet EDHG
-                                conn[ ix ] = E;
-                                conn[ ix + 1 ] = D;
-                                conn[ ix + 2 ] = H;
-                                conn[ ix + 3 ] = G;
+                                conn[ix]     = E;
+                                conn[ix + 1] = D;
+                                conn[ix + 2] = H;
+                                conn[ix + 3] = G;
 
                                 // tet ABCF
-                                conn[ ix + 4 ] = AA;
-                                conn[ ix + 5 ] = BB;
-                                conn[ ix + 6 ] = CC;
-                                conn[ ix + 7 ] = F;
+                                conn[ix + 4] = AA;
+                                conn[ix + 5] = BB;
+                                conn[ix + 6] = CC;
+                                conn[ix + 7] = F;
 
                                 // tet ADEF
-                                conn[ ix + 8 ] = AA;
-                                conn[ ix + 9 ] = D;
-                                conn[ ix + 10 ] = E;
-                                conn[ ix + 11 ] = F;
+                                conn[ix + 8]  = AA;
+                                conn[ix + 9]  = D;
+                                conn[ix + 10] = E;
+                                conn[ix + 11] = F;
 
                                 // tet CGDF
-                                conn[ ix + 12 ] = CC;
-                                conn[ ix + 13 ] = G;
-                                conn[ ix + 14 ] = D;
-                                conn[ ix + 15 ] = F;
+                                conn[ix + 12] = CC;
+                                conn[ix + 13] = G;
+                                conn[ix + 14] = D;
+                                conn[ix + 15] = F;
 
                                 // tet ACDF
-                                conn[ ix + 16 ] = AA;
-                                conn[ ix + 17 ] = CC;
-                                conn[ ix + 18 ] = D;
-                                conn[ ix + 19 ] = F;
+                                conn[ix + 16] = AA;
+                                conn[ix + 17] = CC;
+                                conn[ix + 18] = D;
+                                conn[ix + 19] = F;
 
                                 // tet DGEF
-                                conn[ ix + 20 ] = D;
-                                conn[ ix + 21 ] = G;
-                                conn[ ix + 22 ] = E;
-                                conn[ ix + 23 ] = F;
+                                conn[ix + 20] = D;
+                                conn[ix + 21] = G;
+                                conn[ix + 22] = E;
+                                conn[ix + 23] = F;
                                 ix += 24;
                                 for( int ff = 0; ff < factor - 1; ff++ )
                                 {
-                                    gids[ ie ] = gids[ ie - 1 ] + 1;  // 6 more for tetra
+                                    gids[ie] = gids[ie - 1] + 1;  // 6 more for tetra
 
                                     // eh = starte + ie;
 
@@ -328,14 +328,14 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                             }
                             else
                             {  // Linear hex
-                                conn[ ix ] = corner;
-                                conn[ ix + 1 ] = corner + 1;
-                                conn[ ix + 2 ] = corner + 1 + ystride;
-                                conn[ ix + 3 ] = corner + ystride;
-                                conn[ ix + 4 ] = corner + zstride;
-                                conn[ ix + 5 ] = corner + 1 + zstride;
-                                conn[ ix + 6 ] = corner + 1 + ystride + zstride;
-                                conn[ ix + 7 ] = corner + ystride + zstride;
+                                conn[ix]     = corner;
+                                conn[ix + 1] = corner + 1;
+                                conn[ix + 2] = corner + 1 + ystride;
+                                conn[ix + 3] = corner + ystride;
+                                conn[ix + 4] = corner + zstride;
+                                conn[ix + 5] = corner + 1 + zstride;
+                                conn[ix + 6] = corner + 1 + ystride + zstride;
+                                conn[ix + 7] = corner + ystride + zstride;
                                 ix += 8;
                             }
                         }
@@ -360,13 +360,13 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                     // faces);MB_CHK_SET_ERR(rval, "Can't add faces to partition set");
                 }
 
-                rval = mb->tag_set_data( global_id_tag, cells, &gids[ 0 ] );MB_CHK_SET_ERR( rval, "Can't set global ids to elements" );
+                rval = mb->tag_set_data( global_id_tag, cells, &gids[0] );MB_CHK_SET_ERR( rval, "Can't set global ids to elements" );
                 if( !parmerge )
                 {
-                    rval = mb->tag_set_data( new_id_tag, cells, &lgids[ 0 ] );MB_CHK_SET_ERR( rval, "Can't set new ids to elements" );
+                    rval = mb->tag_set_data( new_id_tag, cells, &lgids[0] );MB_CHK_SET_ERR( rval, "Can't set new ids to elements" );
                 }
                 int part_num = a + m * A + ( b + n * B ) * ( M * A ) + ( c + k * C ) * ( M * A * N * B );
-                rval = mb->tag_set_data( part_tag, &part_set, 1, &part_num );MB_CHK_SET_ERR( rval, "Can't set part tag on set" );
+                rval         = mb->tag_set_data( part_tag, &part_set, 1, &part_num );MB_CHK_SET_ERR( rval, "Can't set part tag on set" );
                 wsets.insert( part_set );
             }
         }
@@ -375,7 +375,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     mb->add_entities( cset, all3dcells );
     rval = mb->add_entities( cset, wsets );MB_CHK_SET_ERR( rval, "Can't add entity sets" );
 #ifdef MOAB_HAVE_MPI
-    pc->partition_sets( ) = wsets;
+    pc->partition_sets() = wsets;
 #endif
 
     /*
@@ -391,10 +391,10 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
     if( 0 == rank )
     {
-        std::cout << "generate local mesh: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
-        tt = clock( );
-        std::cout << "number of elements on rank 0: " << all3dcells.size( ) << endl;
-        std::cout << "Total number of elements " << all3dcells.size( ) * size << endl;
+        std::cout << "generate local mesh: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+        tt = clock();
+        std::cout << "number of elements on rank 0: " << all3dcells.size() << endl;
+        std::cout << "Total number of elements " << all3dcells.size() * size << endl;
         std::cout << "Element type: " << ( tetra ? "MBTET" : "MBHEX" )
                   << " order:" << ( quadratic ? "quadratic" : "linear" ) << endl;
     }
@@ -412,17 +412,17 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
         if( 0 == rank )
         {
-            std::cout << "merge locally: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
-            tt = clock( );
+            std::cout << "merge locally: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+            tt = clock();
         }
     }
     // if adjEnts, add now to each set
     if( adjEnts )
     {
-        for( Range::iterator wsit = wsets.begin( ); wsit != wsets.end( ); ++wsit )
+        for( Range::iterator wsit = wsets.begin(); wsit != wsets.end(); ++wsit )
         {
             EntityHandle ws = *wsit;  // write set
-            Range        cells, edges, faces;
+            Range cells, edges, faces;
             rval = mb->get_entities_by_dimension( ws, 3, cells );MB_CHK_SET_ERR( rval, "Can't get cells" );
             rval = mb->get_adjacencies( cells, 1, false, edges, Interface::UNION );MB_CHK_SET_ERR( rval, "Can't get edges" );
             rval = mb->get_adjacencies( cells, 2, false, faces, Interface::UNION );MB_CHK_SET_ERR( rval, "Can't get faces" );
@@ -440,12 +440,11 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
         if( parmerge )
         {
             ParallelMergeMesh pm( pc, 0.00001 );
-            rval = pm.merge( );MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
+            rval = pm.merge();MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
             if( 0 == rank )
             {
-                std::cout << "parallel mesh merge: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
-                          << endl;
-                tt = clock( );
+                std::cout << "parallel mesh merge: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+                tt = clock();
             }
         }
         else
@@ -454,9 +453,9 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
             if( 0 == rank )
             {
-                std::cout << "resolve shared entities: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
+                std::cout << "resolve shared entities: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds"
                           << endl;
-                tt = clock( );
+                tt = clock();
             }
         }
         if( !keep_skins )
@@ -475,23 +474,23 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                 std::cout << "delete edges and faces \n";
                 toDelete.print( std::cout );
 
-                std::cout << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
-                tt = clock( );
+                std::cout << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+                tt = clock();
             }
         }
         // do some ghosting if required
         if( GL > 0 )
         {
-            rval = pc->exchange_ghost_cells( 3,  // int ghost_dim
-                                             0,  // int bridge_dim
+            rval = pc->exchange_ghost_cells( 3,   // int ghost_dim
+                                             0,   // int bridge_dim
                                              GL,  // int num_layers
-                                             0,  // int addl_ents
+                                             0,   // int addl_ents
                                              true );MB_CHK_ERR( rval );  // bool store_remote_handles
             if( 0 == rank )
             {
-                std::cout << "exchange  " << GL << " ghost layer(s) :" << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC
+                std::cout << "exchange  " << GL << " ghost layer(s) :" << ( clock() - tt ) / (double)CLOCKS_PER_SEC
                           << " seconds" << endl;
-                tt = clock( );
+                tt = clock();
             }
         }
     }

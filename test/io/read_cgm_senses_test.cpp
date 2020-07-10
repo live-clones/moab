@@ -59,9 +59,9 @@ void check_sense_data( Interface* moab, std::vector< EntityHandle > wrt_ents, st
 int geom_id_by_handle( Interface* moab, const EntityHandle set );
 
 // List of tests in this file
-void read_cylcube_curve_senses_test( );
-void read_cylcube_surf_senses_test( );
-void delete_mesh_test( );
+void read_cylcube_curve_senses_test();
+void read_cylcube_surf_senses_test();
+void delete_mesh_test();
 
 int main( int /* argc */, char** /* argv */ )
 {
@@ -75,34 +75,37 @@ int main( int /* argc */, char** /* argv */ )
 
 void read_file( Interface* moab, const char* input_file )
 {
-    InitCGMA::initialize_cgma( );
-    GeometryQueryTool::instance( )->delete_geometry( );
+    InitCGMA::initialize_cgma();
+    GeometryQueryTool::instance()->delete_geometry();
 
-    ErrorCode rval = moab->load_file( input_file );CHECK_ERR( rval );
+    ErrorCode rval = moab->load_file( input_file );
+    CHECK_ERR( rval );
 }
 
 // Gets the sense data for each curve from a file
 // containing a cube and a cylinder. It then checks
 // that this sense data matches the reference
 // sense data from prior file reads.
-void read_cylcube_curve_senses_test( )
+void read_cylcube_curve_senses_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cylcube.c_str( ) );
+    read_file( mb, input_cylcube.c_str() );
 
     // Get all curve handles
     Tag geom_tag;
     rval = mb->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                               moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );CHECK_ERR( rval );
+                               moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
+    CHECK_ERR( rval );
 
     // Check that the proper number of curves exist
-    int   dim = 1;
+    int dim     = 1;
     void* val[] = { &dim };
-    int   number_of_curves;
-    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_curves );CHECK_ERR( rval );
+    int number_of_curves;
+    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_curves );
+    CHECK_ERR( rval );
     // Step format adds a surface on the barrel of the cylinder.
     // This created 4 extra surfaces in comparison to the .sat format from Cubit.
     //(New surface breaks the barrel of the cylinder into two half-pipes)
@@ -114,39 +117,42 @@ void read_cylcube_curve_senses_test( )
 
     // Get curve handles
     Range curves;
-    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, curves );CHECK_ERR( rval );
+    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, curves );
+    CHECK_ERR( rval );
 
     // Establish GeomTopoTool instance needed to get curve data
     moab::GeomTopoTool gt( mb, false );
     // Initialize vectors for sense checking
     std::vector< EntityHandle > surfs;
-    std::vector< int >          senses;
-    std::vector< int >          known_surf_ids;
-    std::vector< int >          known_senses;
+    std::vector< int > senses;
+    std::vector< int > known_surf_ids;
+    std::vector< int > known_senses;
 
-    for( unsigned int i = 0; i < curves.size( ); i++ )
+    for( unsigned int i = 0; i < curves.size(); i++ )
     {
 
         // Clean data from previous curve
-        surfs.clear( );
-        senses.clear( );
+        surfs.clear();
+        senses.clear();
         // Get sense info for the current curve
-        rval = gt.get_senses( curves[ i ], surfs, senses );CHECK_ERR( rval );
+        rval = gt.get_senses( curves[i], surfs, senses );
+        CHECK_ERR( rval );
 
         // Clear reference data from previous curve
-        known_surf_ids.clear( );
-        known_senses.clear( );
+        known_surf_ids.clear();
+        known_senses.clear();
         // Load known curve-sense ID data
 #ifdef HAVE_OCC_STEP
         if( CGM_MAJOR_VERSION >= 14 )
-        { rval = load_stp_curve_sense_data( mb, curves[ i ], known_surf_ids, known_senses ); }
+        { rval = load_stp_curve_sense_data( mb, curves[i], known_surf_ids, known_senses ); }
         else
         {
-            rval = load_precgm14_stp_curve_sense_data( mb, curves[ i ], known_surf_ids, known_senses );
+            rval = load_precgm14_stp_curve_sense_data( mb, curves[i], known_surf_ids, known_senses );
         }
         CHECK_ERR( rval );
 #else
-        rval = load_sat_curve_sense_data( mb, curves[ i ], known_surf_ids, known_senses );CHECK_ERR( rval );
+        rval = load_sat_curve_sense_data( mb, curves[i], known_surf_ids, known_senses );
+        CHECK_ERR( rval );
 #endif
 
         // Check that each surf and sense has a match in the references
@@ -159,10 +165,11 @@ int geom_id_by_handle( Interface* moab, const EntityHandle set )
 
     ErrorCode rval;
     // Get the id_tag handle
-    Tag id_tag = moab->globalId_tag( );
+    Tag id_tag = moab->globalId_tag();
     // Load the ID for the EntHandle given to the function
     int id;
-    rval = moab->tag_get_data( id_tag, &set, 1, &id );CHECK_ERR( rval );
+    rval = moab->tag_get_data( id_tag, &set, 1, &id );
+    CHECK_ERR( rval );
     return id;
 }
 
@@ -172,24 +179,24 @@ void check_sense_data( Interface* moab, std::vector< EntityHandle > wrt_ents, st
 
     // Get ID's of the wrt entities
     std::vector< int > wrt_ent_ids;
-    for( unsigned int i = 0; i < wrt_ents.size( ); i++ )
+    for( unsigned int i = 0; i < wrt_ents.size(); i++ )
     {
-        wrt_ent_ids.push_back( geom_id_by_handle( moab, wrt_ents[ i ] ) );
+        wrt_ent_ids.push_back( geom_id_by_handle( moab, wrt_ents[i] ) );
     }
 
-    for( unsigned int i = 0; i < wrt_ent_ids.size( ); i++ )
+    for( unsigned int i = 0; i < wrt_ent_ids.size(); i++ )
     {
-        for( unsigned int j = 0; j < known_wrt_ids.size( ); j++ )
+        for( unsigned int j = 0; j < known_wrt_ids.size(); j++ )
         {
-            if( wrt_ent_ids[ i ] == known_wrt_ids[ j ] )
+            if( wrt_ent_ids[i] == known_wrt_ids[j] )
             {
                 // Make sure the senses of the matching wrt entities
                 // are correct
-                CHECK_EQUAL( senses[ i ], known_senses[ j ] );
+                CHECK_EQUAL( senses[i], known_senses[j] );
                 // Once a wrt entity is matched with a known entity,
                 // remove it from the list
-                wrt_ent_ids.erase( wrt_ent_ids.begin( ) + i );
-                senses.erase( senses.begin( ) + i );
+                wrt_ent_ids.erase( wrt_ent_ids.begin() + i );
+                senses.erase( senses.begin() + i );
                 --i;
                 break;
             }
@@ -197,7 +204,7 @@ void check_sense_data( Interface* moab, std::vector< EntityHandle > wrt_ents, st
     }
 
     // After both loops are complete, known_wrt_ents should be empty
-    int leftovers = wrt_ent_ids.size( );
+    int leftovers = wrt_ent_ids.size();
     CHECK_EQUAL( leftovers, 0 );
 }
 
@@ -586,24 +593,26 @@ ErrorCode load_precgm14_stp_curve_sense_data( Interface* moab, EntityHandle curv
 // containing a cube and a cylinder. It then checks
 // that this sense data matches the reference
 // sense data from prior file reads.
-void read_cylcube_surf_senses_test( )
+void read_cylcube_surf_senses_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cylcube.c_str( ) );
+    read_file( mb, input_cylcube.c_str() );
 
     // Get geometry tag for gathering surface information from the mesh
     Tag geom_tag;
     rval = mb->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
-                               moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );CHECK_ERR( rval );
+                               moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );
+    CHECK_ERR( rval );
 
     // Check that the proper number of surfaces exist
-    int   dim = 2;
+    int dim     = 2;
     void* val[] = { &dim };
-    int   number_of_surfs;
-    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_surfs );CHECK_ERR( rval );
+    int number_of_surfs;
+    rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_surfs );
+    CHECK_ERR( rval );
     // Step format adds a surface on barrel of the cylinder.
     // (Breaks it into two half-pipes)
 #ifdef HAVE_OCC_STEP
@@ -613,38 +622,40 @@ void read_cylcube_surf_senses_test( )
 #endif
     // Get surface handles
     Range surfs;
-    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, surfs );CHECK_ERR( rval );
+    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, surfs );
+    CHECK_ERR( rval );
 
     // Establish GeomTopoTool instance needed to get surf data
-    moab::GeomTopoTool          gt( mb, false );
+    moab::GeomTopoTool gt( mb, false );
     std::vector< EntityHandle > vols;
-    std::vector< int >          senses;
-    std::vector< int >          known_vol_ids;
-    std::vector< int >          known_senses;
+    std::vector< int > senses;
+    std::vector< int > known_vol_ids;
+    std::vector< int > known_senses;
 
-    for( unsigned int i = 0; i < surfs.size( ); i++ )
+    for( unsigned int i = 0; i < surfs.size(); i++ )
     {
         // Clean data from previous surface
-        vols.clear( );
-        senses.clear( );
+        vols.clear();
+        senses.clear();
         // Get sense information for the current
         // surface from the mesh
-        rval = gt.get_senses( surfs[ i ], vols, senses );CHECK_ERR( rval );
+        rval = gt.get_senses( surfs[i], vols, senses );
+        CHECK_ERR( rval );
         // Clear previous reverence data
-        known_vol_ids.clear( );
-        known_senses.clear( );
+        known_vol_ids.clear();
+        known_senses.clear();
         // Load known surface-volume data
         // for this surface and check that it's correct
 #ifdef HAVE_OCC_STEP
-        if( CGM_MAJOR_VERSION >= 14 )
-        { rval = load_stp_surf_sense_data( mb, surfs[ i ], known_vol_ids, known_senses ); }
+        if( CGM_MAJOR_VERSION >= 14 ) { rval = load_stp_surf_sense_data( mb, surfs[i], known_vol_ids, known_senses ); }
         else
         {
-            rval = load_precgm14_stp_surf_sense_data( mb, surfs[ i ], known_vol_ids, known_senses );
+            rval = load_precgm14_stp_surf_sense_data( mb, surfs[i], known_vol_ids, known_senses );
         }
         CHECK_ERR( rval );
 #else
-        rval = load_sat_surf_sense_data( mb, surfs[ i ], known_vol_ids, known_senses );CHECK_ERR( rval );
+        rval = load_sat_surf_sense_data( mb, surfs[i], known_vol_ids, known_senses );
+        CHECK_ERR( rval );
 #endif
         // Check sense information from the loaded mesh against
         // reference sense information

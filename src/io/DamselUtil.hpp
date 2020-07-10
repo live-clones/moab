@@ -41,15 +41,15 @@ class DamselUtil
     friend class ReadDamsel;
 
     //! Needs to be a constructor to initialize dtom_data_type
-    DamselUtil( );
+    DamselUtil();
 
-    static damsel_data_type mtod_data_type[ MB_MAX_DATA_TYPE + 1 ];
+    static damsel_data_type mtod_data_type[MB_MAX_DATA_TYPE + 1];
 
-    static enum DataType dtom_data_type[ DAMSEL_DATA_TYPE_PREDEFINED_WATERMARK + 1 ];
+    static enum DataType dtom_data_type[DAMSEL_DATA_TYPE_PREDEFINED_WATERMARK + 1];
 
-    static enum damsel_entity_type mtod_entity_type[ MBMAXTYPE + 1 ];
+    static enum damsel_entity_type mtod_entity_type[MBMAXTYPE + 1];
 
-    static enum EntityType dtom_entity_type[ DAMSEL_ENTITY_TYPE_ALL_TYPES + 1 ];
+    static enum EntityType dtom_entity_type[DAMSEL_ENTITY_TYPE_ALL_TYPES + 1];
 
     //! Convert handles in a container to a range; assumes EntityHandle and Damsel
     //! entity handles are the same size
@@ -60,35 +60,37 @@ class DamselUtil
     {
       public:
         tinfo( Tag mt, damsel_handle dt, TagType tt ) : mTagh( mt ), dTagh( dt ), tagType( tt ) {}
-        tinfo( ) : mTagh( 0 ), dTagh( 0 ), tagType( MB_TAG_ANY ) {}
+        tinfo() : mTagh( 0 ), dTagh( 0 ), tagType( MB_TAG_ANY ) {}
 
-        Tag           mTagh;
+        Tag mTagh;
         damsel_handle dTagh;
-        TagType       tagType;
+        TagType tagType;
     };
 
-    template< class T > struct MtagP : std::unary_function< T, bool >
+    template < class T >
+    struct MtagP : std::unary_function< T, bool >
     {
       public:
         MtagP( const Tag& th )
         {
             tH = th;
         }
-        bool operator( )( const T& tclass )
+        bool operator()( const T& tclass )
         {
             return tclass.mTagh == tH;
         }
         Tag tH;
     };
 
-    template< class T > struct DtagP : std::unary_function< T, bool >
+    template < class T >
+    struct DtagP : std::unary_function< T, bool >
     {
       public:
         DtagP( const damsel_handle& th )
         {
             tH = th;
         }
-        bool operator( )( const T& tclass )
+        bool operator()( const T& tclass )
         {
             return tclass.dTagh == tH;
         }

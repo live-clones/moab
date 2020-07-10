@@ -26,13 +26,13 @@ std::string input_file = TestDir + "/io/dum.sat";
 #endif
 
 // Checks that a file can be loaded twice without errors
-void read_multiple_test( )
+void read_multiple_test()
 {
     Core mb;
 
-    ErrorCode rval = mb.load_file( input_file.c_str( ) );CHECK_ERR( rval );
+    ErrorCode rval = mb.load_file( input_file.c_str() );CHECK_ERR( rval );
     // second load
-    rval = mb.load_file( input_file.c_str( ) );CHECK_ERR( rval );
+    rval = mb.load_file( input_file.c_str() );CHECK_ERR( rval );
 }
 
 int main( int /* argc */, char** /* argv */ )

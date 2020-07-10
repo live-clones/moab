@@ -47,7 +47,7 @@ using namespace std;
         if( 0 != CODE )          \
         {                        \
             cerr << MSG << endl; \
-            MPI_Finalize( );     \
+            MPI_Finalize();      \
         }                        \
     } while( false )
 
@@ -68,18 +68,18 @@ ErrorCode get_file_options( int argc, char** argv, string& filename, string& tag
 {
     // Get mesh filename
     if( argc > 1 )
-        filename = string( argv[ 1 ] );
+        filename = string( argv[1] );
     else
         filename = string( MESH_DIR ) + string( "/64bricks_1khex.h5m" );
 
     // Get tag selection options
     if( argc > 2 )
-        tagName = string( argv[ 2 ] );
+        tagName = string( argv[2] );
     else
         tagName = "USERTAG";
 
     if( argc > 3 )
-        tagValues = atof( argv[ 3 ] );
+        tagValues = atof( argv[3] );
     else
         tagValues = 1.0;
 
@@ -93,10 +93,10 @@ int main( int argc, char** argv )
 {
 #ifdef MOAB_HAVE_MPI
     ErrorCode err;
-    int       ierr, rank;
-    string    filename, tagName;
-    double    tagValue;
-    MPI_Comm  comm = MPI_COMM_WORLD;
+    int ierr, rank;
+    string filename, tagName;
+    double tagValue;
+    MPI_Comm comm = MPI_COMM_WORLD;
     /// Parallel Read options:
     ///   PARALLEL = type {READ_PART}
     ///   PARTITION = PARALLEL_PARTITION : Partition as you read
@@ -113,14 +113,14 @@ int main( int argc, char** argv )
     if( argc < 1 )
     {
         cerr << "Usage: ";
-        cerr << argv[ 0 ] << " <file_name> <tag_name> <tag_value>" << endl;
+        cerr << argv[0] << " <file_name> <tag_name> <tag_value>" << endl;
         cerr << "file_name    : mesh file name" << endl;
         cerr << "tag_name     : name of tag to add to mesh" << endl;
         cerr << "tag_value    : a double valued string to set for highest-dimensional entities in "
                 "the mesh for the named tag"
              << endl;
 
-        ierr = MPI_Finalize( );
+        ierr = MPI_Finalize();
         MPICHKERR( ierr, "MPI_Finalize failed; Aborting" );
 
         return 1;
@@ -157,7 +157,7 @@ int main( int argc, char** argv )
     ParallelComm* parallel_communicator = ParallelComm::get_pcomm( mbi, partnset, &comm );
 
     // Load the file from disk with given options
-    err = mbi->load_file( filename.c_str( ), &rootset, read_options.c_str( ) );MB_CHK_SET_ERR( err, "MOAB::load_file failed" );
+    err = mbi->load_file( filename.c_str(), &rootset, read_options.c_str() );MB_CHK_SET_ERR( err, "MOAB::load_file failed" );
 
     // Create two tag handles: Exchange and Reduction operations
     dbgprint( "-Creating tag handle " << tagName << "..." );
@@ -166,13 +166,13 @@ int main( int argc, char** argv )
         stringstream sstr;
         // Create the exchange tag: default name = USERTAG_EXC
         sstr << tagName << "_EXC";
-        err = mbi->tag_get_handle( sstr.str( ).c_str( ), 1, MB_TYPE_INTEGER, tagExchange, MB_TAG_CREAT | MB_TAG_DENSE,
+        err = mbi->tag_get_handle( sstr.str().c_str(), 1, MB_TYPE_INTEGER, tagExchange, MB_TAG_CREAT | MB_TAG_DENSE,
                                    &tagValue );MB_CHK_SET_ERR( err, "Retrieving tag handles failed" );
 
         // Create the exchange tag: default name = USERTAG_RED
         sstr.str( "" );
         sstr << tagName << "_RED";
-        err = mbi->tag_get_handle( sstr.str( ).c_str( ), 1, MB_TYPE_DOUBLE, tagReduce, MB_TAG_CREAT | MB_TAG_DENSE,
+        err = mbi->tag_get_handle( sstr.str().c_str(), 1, MB_TYPE_DOUBLE, tagReduce, MB_TAG_CREAT | MB_TAG_DENSE,
                                    &tagValue );MB_CHK_SET_ERR( err, "Retrieving tag handles failed" );
     }
 
@@ -185,9 +185,9 @@ int main( int argc, char** argv )
             // Get all entities of dimension = dim
             err = mbi->get_entities_by_dimension( rootset, dim, dimEnts, false );MB_CHK_ERR( err );
 
-            vector< int > tagValues( dimEnts.size( ), static_cast< int >( tagValue ) * ( rank + 1 ) * ( dim + 1 ) );
+            vector< int > tagValues( dimEnts.size(), static_cast< int >( tagValue ) * ( rank + 1 ) * ( dim + 1 ) );
             // Set local tag data for exchange
-            err = mbi->tag_set_data( tagExchange, dimEnts, &tagValues[ 0 ] );MB_CHK_SET_ERR( err, "Setting local tag data failed during exchange phase" );
+            err = mbi->tag_set_data( tagExchange, dimEnts, &tagValues[0] );MB_CHK_SET_ERR( err, "Setting local tag data failed during exchange phase" );
             // Merge entities into parent set
             partEnts.merge( dimEnts );
         }
@@ -204,12 +204,12 @@ int main( int argc, char** argv )
         err = parallel_communicator->get_part_entities( partEnts );MB_CHK_SET_ERR( err, "ParallelComm::get_part_entities failed" );
 
         // Output what is in current partition sets
-        dbgprintall( "Number of Partitioned entities: " << partEnts.size( ) );
+        dbgprintall( "Number of Partitioned entities: " << partEnts.size() );
         MPI_Barrier( comm );
 
         // Set local tag data for reduction
-        vector< double > tagValues( partEnts.size( ), tagValue * ( rank + 1 ) );
-        err = mbi->tag_set_data( tagReduce, partEnts, &tagValues[ 0 ] );MB_CHK_SET_ERR( err, "Setting local tag data failed during reduce phase" );
+        vector< double > tagValues( partEnts.size(), tagValue * ( rank + 1 ) );
+        err = mbi->tag_set_data( tagReduce, partEnts, &tagValues[0] );MB_CHK_SET_ERR( err, "Setting local tag data failed during reduce phase" );
 
         Range dummy;
         // Reduce tag data using MPI_SUM on the interface between partitions
@@ -223,7 +223,7 @@ int main( int argc, char** argv )
 
     dbgprint( "\n********** reduce_exchange_tags DONE! **********" );
 
-    MPI_Finalize( );
+    MPI_Finalize();
 #else
     std::cout << " compile with MPI and HDF5 for this example to work \n";
 #endif

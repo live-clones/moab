@@ -38,7 +38,7 @@
 namespace MBMesquite
 {
 
-EdgeQM::~EdgeQM( ) {}
+EdgeQM::~EdgeQM() {}
 
 void EdgeQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err )
 {
@@ -52,8 +52,8 @@ void EdgeQM::get_single_pass( PatchData& pd, std::vector< size_t >& handles, boo
 
 struct EdgeData
 {
-    size_t   endVtx;
-    size_t   adjElem;
+    size_t endVtx;
+    size_t adjElem;
     unsigned elemEdge;
 };
 
@@ -70,30 +70,30 @@ void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles
                                    bool single_pass_evaluate, MsqError& err )
 {
     std::vector< EdgeData > vtx_edges;
-    size_t                  n_verts = free_vertices_only ? pd.num_free_vertices( ) : pd.num_nodes( );
-    size_t                  n_cutoff = single_pass_evaluate ? pd.num_nodes( ) : n_verts;
-    handles.clear( );
+    size_t n_verts  = free_vertices_only ? pd.num_free_vertices() : pd.num_nodes();
+    size_t n_cutoff = single_pass_evaluate ? pd.num_nodes() : n_verts;
+    handles.clear();
 
     for( size_t i = 0; i < n_verts; ++i )
     {
         if( pd.vertex_by_index( i ).is_flag_set( MsqVertex::MSQ_PATCH_FIXED ) ) continue;
 
-        vtx_edges.clear( );
+        vtx_edges.clear();
 
-        size_t        n_elems;
+        size_t n_elems;
         const size_t* elems;
         elems = pd.get_vertex_element_adjacencies( i, n_elems, err );MSQ_ERRRTN( err );
 
         for( size_t j = 0; j < n_elems; ++j )
         {
-            MsqMeshEntity& elem = pd.element_by_index( elems[ j ] );
-            unsigned       n_edges = TopologyInfo::edges( elem.get_element_type( ) );
+            MsqMeshEntity& elem = pd.element_by_index( elems[j] );
+            unsigned n_edges    = TopologyInfo::edges( elem.get_element_type() );
             for( unsigned k = 0; k < n_edges; ++k )
             {
-                const unsigned* edge = TopologyInfo::edge_vertices( elem.get_element_type( ), k, err );MSQ_ERRRTN( err );
+                const unsigned* edge = TopologyInfo::edge_vertices( elem.get_element_type(), k, err );MSQ_ERRRTN( err );
 
-                size_t vtx1 = elem.get_vertex_index_array( )[ edge[ 0 ] ];
-                size_t vtx2 = elem.get_vertex_index_array( )[ edge[ 1 ] ];
+                size_t vtx1 = elem.get_vertex_index_array()[edge[0]];
+                size_t vtx2 = elem.get_vertex_index_array()[edge[1]];
                 size_t other;
                 if( vtx1 == i )
                     other = vtx2;
@@ -113,16 +113,16 @@ void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles
                 // this patch.
                 if( other > i || other > n_cutoff )
                 {
-                    EdgeData d = { other, elems[ j ], k };
+                    EdgeData d = { other, elems[j], k };
                     vtx_edges.push_back( d );
                 }
             }  // end for each edge in element
-        }  // end for each element adjacent to vertex
+        }      // end for each element adjacent to vertex
 
-        std::sort( vtx_edges.begin( ), vtx_edges.end( ) );
+        std::sort( vtx_edges.begin(), vtx_edges.end() );
         std::vector< EdgeData >::iterator it, end;
-        end = std::unique( vtx_edges.begin( ), vtx_edges.end( ) );
-        for( it = vtx_edges.begin( ); it != end; ++it )
+        end = std::unique( vtx_edges.begin(), vtx_edges.end() );
+        for( it = vtx_edges.begin(); it != end; ++it )
             handles.push_back( handle( it->elemEdge, it->adjElem ) );
     }  // end for each (free) vertex
 }
@@ -131,12 +131,12 @@ bool EdgeQM::evaluate_with_indices( PatchData& pd, size_t p_handle, double& valu
                                     MsqError& err )
 {
     const MsqMeshEntity& element = pd.element_by_index( elem( p_handle ) );
-    EntityTopology       type = element.get_element_type( );
-    const unsigned*      verts = TopologyInfo::edge_vertices( type, edge( p_handle ) );
-    const size_t*        conn = element.get_vertex_index_array( );
-    indices.clear( );
-    if( conn[ verts[ 0 ] ] < pd.num_free_vertices( ) ) indices.push_back( conn[ verts[ 0 ] ] );
-    if( conn[ verts[ 1 ] ] < pd.num_free_vertices( ) ) indices.push_back( conn[ verts[ 1 ] ] );
+    EntityTopology type          = element.get_element_type();
+    const unsigned* verts        = TopologyInfo::edge_vertices( type, edge( p_handle ) );
+    const size_t* conn           = element.get_vertex_index_array();
+    indices.clear();
+    if( conn[verts[0]] < pd.num_free_vertices() ) indices.push_back( conn[verts[0]] );
+    if( conn[verts[1]] < pd.num_free_vertices() ) indices.push_back( conn[verts[1]] );
     return evaluate( pd, p_handle, value, err );
 }
 

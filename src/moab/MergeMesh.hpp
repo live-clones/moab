@@ -18,7 +18,7 @@ class MergeMesh
 
     /* \brief Destructor
      */
-    virtual ~MergeMesh( );
+    virtual ~MergeMesh();
 
     /* \brief Merge vertices in elements passed in
      */

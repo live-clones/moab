@@ -55,7 +55,7 @@ class VertexPatches : public PatchSet
     }
 
     MESQUITE_EXPORT
-    ~VertexPatches( );
+    ~VertexPatches();
 
     /**\brief Set number of layers of elements adjacent to each vertex */
     inline void set_num_layers( unsigned num_layers )
@@ -64,7 +64,7 @@ class VertexPatches : public PatchSet
     }
 
     /**\brief Get number of layers of elements adjacent to each vertex */
-    inline unsigned get_num_layers( ) const
+    inline unsigned get_num_layers() const
     {
         return numLayers;
     }
@@ -76,7 +76,7 @@ class VertexPatches : public PatchSet
     }
 
     /**\brief Skip fixed vertices if true. */
-    inline bool free_vertices_only( ) const
+    inline bool free_vertices_only() const
     {
         return freeVertices;
     }
@@ -104,7 +104,7 @@ class VertexPatches : public PatchSet
     std::vector< size_t > junk;
 
     unsigned numLayers;  //!< number of layers of adjacent elements
-    bool     freeVertices;  //!< skip fixed vertices if true
+    bool freeVertices;   //!< skip fixed vertices if true
 };
 
 }  // namespace MBMesquite

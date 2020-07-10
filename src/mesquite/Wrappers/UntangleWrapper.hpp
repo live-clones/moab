@@ -46,8 +46,8 @@ class UntangleWrapper : public Wrapper
     /**\brief Which quality metric to use */
     enum UntangleMetric
     {
-        BETA,  //!< Use TMP UntangleBeta metric
-        SIZE,  //!< Use UntangleMu(TargetSize}
+        BETA,      //!< Use TMP UntangleBeta metric
+        SIZE,      //!< Use UntangleMu(TargetSize}
         SHAPESIZE  //!< Use UntangleMu(TargetShapeSize}
     };
 
@@ -73,16 +73,16 @@ class UntangleWrapper : public Wrapper
     void set_vertex_movement_limit_factor( double f );
 
     MESQUITE_EXPORT
-    UntangleWrapper( );
+    UntangleWrapper();
 
     MESQUITE_EXPORT
     UntangleWrapper( UntangleMetric m );
 
     MESQUITE_EXPORT
-    ~UntangleWrapper( );
+    ~UntangleWrapper();
 
     /**\brief Check if vertex culling will be used */
-    inline bool is_culling_enabled( ) const
+    inline bool is_culling_enabled() const
     {
         return doCulling;
     }
@@ -94,25 +94,25 @@ class UntangleWrapper : public Wrapper
     }
 
     /**\brief Check if a Jacobi optimization strategy will be used */
-    inline bool is_jacobi_optimization( ) const
+    inline bool is_jacobi_optimization() const
     {
         return doJacobi;
     }
 
     /**\brief Check if a Gauss optimization strategy will be used */
-    inline bool is_gauss_optimization( ) const
+    inline bool is_gauss_optimization() const
     {
         return !doJacobi;
     }
 
     /**\brief Use a Jacobi optimization strategy */
-    inline void do_jacobi_optimization( )
+    inline void do_jacobi_optimization()
     {
         doJacobi = true;
     }
 
     /**\brief Use a Gauss optimization strategy */
-    inline void do_gauss_optimization( )
+    inline void do_gauss_optimization()
     {
         doJacobi = false;
     }
@@ -124,9 +124,9 @@ class UntangleWrapper : public Wrapper
 
   private:
     UntangleMetric qualityMetric;
-    double         maxTime, movementFactor, metricConstant;
-    int            maxIterations;
-    bool           doCulling, doJacobi;
+    double maxTime, movementFactor, metricConstant;
+    int maxIterations;
+    bool doCulling, doJacobi;
 };
 
 }  // namespace MBMesquite

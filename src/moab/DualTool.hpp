@@ -55,53 +55,53 @@ class DualTool
     class GraphicsPoint
     {
       public:
-        GraphicsPoint( )
+        GraphicsPoint()
         {
-            xyz[ 0 ] = 0.0;
-            xyz[ 1 ] = 0.0;
-            xyz[ 2 ] = 0.0;
-            id = -1;
+            xyz[0] = 0.0;
+            xyz[1] = 0.0;
+            xyz[2] = 0.0;
+            id     = -1;
         }
 
         GraphicsPoint( float xi, float yi, float zi, int idi )
         {
-            xyz[ 0 ] = xi;
-            xyz[ 1 ] = yi;
-            xyz[ 2 ] = zi;
-            id = idi;
+            xyz[0] = xi;
+            xyz[1] = yi;
+            xyz[2] = zi;
+            id     = idi;
         }
 
-        GraphicsPoint( float xyzi[ 3 ], int idi )
+        GraphicsPoint( float xyzi[3], int idi )
         {
-            xyz[ 0 ] = xyzi[ 0 ];
-            xyz[ 1 ] = xyzi[ 1 ];
-            xyz[ 2 ] = xyzi[ 2 ];
-            id = idi;
+            xyz[0] = xyzi[0];
+            xyz[1] = xyzi[1];
+            xyz[2] = xyzi[2];
+            id     = idi;
         }
 
-        GraphicsPoint( double xyzi[ 3 ], int idi )
+        GraphicsPoint( double xyzi[3], int idi )
         {
-            xyz[ 0 ] = xyzi[ 0 ];
-            xyz[ 1 ] = xyzi[ 1 ];
-            xyz[ 2 ] = xyzi[ 2 ];
-            id = idi;
+            xyz[0] = xyzi[0];
+            xyz[1] = xyzi[1];
+            xyz[2] = xyzi[2];
+            id     = idi;
         }
 
         GraphicsPoint( const GraphicsPoint& gp )
         {
-            xyz[ 0 ] = gp.xyz[ 0 ];
-            xyz[ 1 ] = gp.xyz[ 1 ];
-            xyz[ 2 ] = gp.xyz[ 2 ];
-            id = gp.id;
+            xyz[0] = gp.xyz[0];
+            xyz[1] = gp.xyz[1];
+            xyz[2] = gp.xyz[2];
+            id     = gp.id;
         }
 
-        float xyz[ 3 ];
-        int   id;
+        float xyz[3];
+        int id;
     };
 
     DualTool( Interface* impl );
 
-    ~DualTool( );
+    ~DualTool();
 
     //! construct the dual entities for the entire mesh
     ErrorCode construct_dual( EntityHandle* entities, const int num_entities );
@@ -144,31 +144,31 @@ class DualTool
     EntityHandle next_loop_vertex( const EntityHandle last_v, const EntityHandle this_v, const EntityHandle dual_surf );
 
     //! get/set the tag for dual surfaces
-    Tag       dualSurface_tag( ) const;
+    Tag dualSurface_tag() const;
     ErrorCode dualSurface_tag( const Tag tag );
 
     //! get/set the tag for dual curves
-    Tag       dualCurve_tag( ) const;
+    Tag dualCurve_tag() const;
     ErrorCode dualCurve_tag( const Tag tag );
 
     //! get/set the tag for dual cells
-    Tag       isDualCell_tag( ) const;
+    Tag isDualCell_tag() const;
     ErrorCode isDualCell_tag( const Tag tag );
 
     //! get/set the tag for dual entities
-    Tag       dualEntity_tag( ) const;
+    Tag dualEntity_tag() const;
     ErrorCode dualEntity_tag( const Tag tag );
 
     //! get/set the tag for dual entities
-    Tag       extraDualEntity_tag( ) const;
+    Tag extraDualEntity_tag() const;
     ErrorCode extraDualEntity_tag( const Tag tag );
 
     //! get/set the tag for dual entities
-    Tag       dualGraphicsPoint_tag( ) const;
+    Tag dualGraphicsPoint_tag() const;
     ErrorCode dualGraphicsPoint_tag( const Tag tag );
 
     //! get/set the global id tag
-    Tag       globalId_tag( ) const;
+    Tag globalId_tag() const;
     ErrorCode globalId_tag( const Tag tag );
 
     //! given an entity, return any dual surface or curve it's in
@@ -215,10 +215,10 @@ class DualTool
     ErrorCode list_entities( const EntityHandle* entities, const int num_entities ) const;
 
     //! delete all the dual data
-    ErrorCode delete_whole_dual( );
+    ErrorCode delete_whole_dual();
 
     //! check dual-primal adjacencies
-    ErrorCode check_dual_adjs( );
+    ErrorCode check_dual_adjs();
 
   private:
     //! construct dual vertices for specified regions
@@ -251,7 +251,7 @@ class DualTool
     ErrorCode traverse_hyperplane( const Tag hp_tag, EntityHandle& this_hp, EntityHandle this_ent );
 
     //! connect dual surfaces with dual curves using parent/child connections
-    ErrorCode construct_hp_parent_child( );
+    ErrorCode construct_hp_parent_child();
 
     //! given an edge handle, return a list of dual vertices in radial order
     //! around the edge; also returns whether this edge is on the boundary
@@ -349,37 +349,37 @@ class DualTool
     int maxHexId;
 };
 
-inline Tag DualTool::dualSurface_tag( ) const
+inline Tag DualTool::dualSurface_tag() const
 {
     return dualSurfaceTag;
 }
 
-inline Tag DualTool::dualCurve_tag( ) const
+inline Tag DualTool::dualCurve_tag() const
 {
     return dualCurveTag;
 }
 
-inline Tag DualTool::isDualCell_tag( ) const
+inline Tag DualTool::isDualCell_tag() const
 {
     return isDualCellTag;
 }
 
-inline Tag DualTool::dualEntity_tag( ) const
+inline Tag DualTool::dualEntity_tag() const
 {
     return dualEntityTag;
 }
 
-inline Tag DualTool::extraDualEntity_tag( ) const
+inline Tag DualTool::extraDualEntity_tag() const
 {
     return extraDualEntityTag;
 }
 
-inline Tag DualTool::dualGraphicsPoint_tag( ) const
+inline Tag DualTool::dualGraphicsPoint_tag() const
 {
     return dualGraphicsPointTag;
 }
 
-inline Tag DualTool::globalId_tag( ) const
+inline Tag DualTool::globalId_tag() const
 {
     return globalIdTag;
 }
@@ -391,7 +391,7 @@ inline ErrorCode DualTool::dualSurface_tag( const Tag tag )
     if( ( 0 == dualSurfaceTag && tag ) || dualSurfaceTag != tag )
     {
         dualSurfaceTag = tag;
-        result = MB_SUCCESS;
+        result         = MB_SUCCESS;
     }
 
     return result;
@@ -404,7 +404,7 @@ inline ErrorCode DualTool::dualCurve_tag( const Tag tag )
     if( ( 0 == dualCurveTag && tag ) || dualCurveTag != tag )
     {
         dualCurveTag = tag;
-        result = MB_SUCCESS;
+        result       = MB_SUCCESS;
     }
 
     return result;
@@ -417,7 +417,7 @@ inline ErrorCode DualTool::isDualCell_tag( const Tag tag )
     if( ( 0 == isDualCellTag && tag ) || isDualCellTag != tag )
     {
         isDualCellTag = tag;
-        result = MB_SUCCESS;
+        result        = MB_SUCCESS;
     }
 
     return result;
@@ -430,7 +430,7 @@ inline ErrorCode DualTool::dualEntity_tag( const Tag tag )
     if( ( 0 == dualEntityTag && tag ) || dualEntityTag != tag )
     {
         dualEntityTag = tag;
-        result = MB_SUCCESS;
+        result        = MB_SUCCESS;
     }
 
     return result;
@@ -443,7 +443,7 @@ inline ErrorCode DualTool::extraDualEntity_tag( const Tag tag )
     if( ( 0 == extraDualEntityTag && tag ) || extraDualEntityTag != tag )
     {
         extraDualEntityTag = tag;
-        result = MB_SUCCESS;
+        result             = MB_SUCCESS;
     }
 
     return result;
@@ -456,7 +456,7 @@ inline ErrorCode DualTool::dualGraphicsPoint_tag( const Tag tag )
     if( ( 0 == dualGraphicsPointTag && tag ) || dualGraphicsPointTag != tag )
     {
         dualGraphicsPointTag = tag;
-        result = MB_SUCCESS;
+        result               = MB_SUCCESS;
     }
 
     return result;
@@ -469,7 +469,7 @@ inline ErrorCode DualTool::globalId_tag( const Tag tag )
     if( ( 0 == globalIdTag && tag ) || globalIdTag != tag )
     {
         globalIdTag = tag;
-        result = MB_SUCCESS;
+        result      = MB_SUCCESS;
     }
 
     return result;

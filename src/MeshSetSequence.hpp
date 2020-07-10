@@ -41,7 +41,7 @@ class MeshSetSequence : public EntitySequence
 
     MeshSetSequence( EntityHandle start, EntityID count, unsigned flags, EntityID sequence_size );
 
-    virtual ~MeshSetSequence( );
+    virtual ~MeshSetSequence();
 
     EntitySequence* split( EntityHandle here );
 
@@ -55,10 +55,10 @@ class MeshSetSequence : public EntitySequence
     ErrorCode push_back( EntityID count, const unsigned* flags );
     ErrorCode push_front( EntityID count, const unsigned* flags );
 
-    void          get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const;
+    void get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& size_of_sequence ) const;
     unsigned long get_per_entity_memory_use( EntityHandle first, EntityHandle last ) const;
 
-    inline MeshSet*       get_set( EntityHandle h );
+    inline MeshSet* get_set( EntityHandle h );
     inline const MeshSet* get_set( EntityHandle h ) const;
 
     ErrorCode get_entities( EntityHandle set, std::vector< EntityHandle >& entities ) const;
@@ -115,36 +115,36 @@ class MeshSetSequence : public EntitySequence
         SET_SIZE = sizeof( MeshSet )
     };
 
-    inline const unsigned char* array( ) const
+    inline const unsigned char* array() const
     {
-        return reinterpret_cast< const unsigned char* >( data( )->get_sequence_data( 0 ) );
+        return reinterpret_cast< const unsigned char* >( data()->get_sequence_data( 0 ) );
     }
 
-    inline unsigned char* array( )
+    inline unsigned char* array()
     {
-        return reinterpret_cast< unsigned char* >( data( )->get_sequence_data( 0 ) );
+        return reinterpret_cast< unsigned char* >( data()->get_sequence_data( 0 ) );
     }
 
     inline void allocate_set( unsigned flags, EntityID index )
     {
-        unsigned char* const ptr = array( ) + index * SET_SIZE;
+        unsigned char* const ptr = array() + index * SET_SIZE;
         new( ptr ) MeshSet( flags );
     }
 
     inline void deallocate_set( EntityID index )
     {
-        MeshSet* set = reinterpret_cast< MeshSet* >( array( ) + SET_SIZE * index );
-        set->~MeshSet( );
+        MeshSet* set = reinterpret_cast< MeshSet* >( array() + SET_SIZE * index );
+        set->~MeshSet();
     }
 };
 
 inline MeshSet* MeshSetSequence::get_set( EntityHandle h )
 {
-    return reinterpret_cast< MeshSet* >( array( ) + SET_SIZE * ( h - data( )->start_handle( ) ) );
+    return reinterpret_cast< MeshSet* >( array() + SET_SIZE * ( h - data()->start_handle() ) );
 }
 inline const MeshSet* MeshSetSequence::get_set( EntityHandle h ) const
 {
-    return reinterpret_cast< const MeshSet* >( array( ) + SET_SIZE * ( h - data( )->start_handle( ) ) );
+    return reinterpret_cast< const MeshSet* >( array() + SET_SIZE * ( h - data()->start_handle() ) );
 }
 
 }  // namespace moab

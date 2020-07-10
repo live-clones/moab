@@ -5,14 +5,14 @@
 namespace moab
 {
 
-bool HDF5_can_append_hyperslabs( )
+bool HDF5_can_append_hyperslabs()
 {
     hsize_t dim = 100;
-    hid_t   space = H5Screate_simple( 1, &dim, NULL );
-    bool    result = false;
+    hid_t space = H5Screate_simple( 1, &dim, NULL );
+    bool result = false;
 
     HDF5_Error_Func_Type fptr = 0;
-    void*                fdata = 0;
+    void* fdata               = 0;
 #if defined( H5Eget_auto_vers ) && H5Eget_auto_vers > 1
     if( 0 <= H5Eget_auto( H5E_DEFAULT, &fptr, &fdata ) ) H5Eset_auto( H5E_DEFAULT, 0, 0 );
 #else

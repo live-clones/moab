@@ -12,7 +12,7 @@ class SequenceData;
 class EntitySequence
 {
   private:
-    EntityHandle  startHandle, endHandle;
+    EntityHandle startHandle, endHandle;
     SequenceData* sequenceData;
 
   protected:
@@ -36,24 +36,24 @@ class EntitySequence
     {
     }
 
-    virtual ~EntitySequence( ) {}
+    virtual ~EntitySequence() {}
 
-    EntityType type( ) const
+    EntityType type() const
     {
-        return TYPE_FROM_HANDLE( start_handle( ) );
+        return TYPE_FROM_HANDLE( start_handle() );
     }
 
-    EntityHandle start_handle( ) const
+    EntityHandle start_handle() const
     {
         return startHandle;
     }
 
-    EntityHandle end_handle( ) const
+    EntityHandle end_handle() const
     {
         return endHandle;
     }
 
-    SequenceData* data( ) const
+    SequenceData* data() const
     {
         return sequenceData;
     }
@@ -63,14 +63,14 @@ class EntitySequence
         sequenceData = ptr;
     }
 
-    EntityID size( ) const
+    EntityID size() const
     {
         return endHandle - startHandle + 1;
     }
 
     /**\brief True if SequenceData has no holes and is used only
      *        by this EntitySequence */
-    bool using_entire_data( ) const;
+    bool using_entire_data() const;
 
     /**\brief Integer value used in finding appropriate SequenceData
      *
@@ -80,7 +80,7 @@ class EntitySequence
      * used to find a SequenceData with the appropriate number of vertices
      * per element when allocating elements.  The default value is zero.
      */
-    virtual int values_per_entity( ) const;
+    virtual int values_per_entity() const;
 
     /**\brief Split this sequence into two consecutive sequences
      *

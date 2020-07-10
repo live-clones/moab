@@ -35,15 +35,15 @@ using namespace moab;
 int is_any_proc_error( int is_my_error )
 {
     int result = 0;
-    int err = MPI_Allreduce( &is_my_error, &result, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD );
+    int err    = MPI_Allreduce( &is_my_error, &result, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD );
     return err || result;
 }
 
 int run_test( ErrorCode ( *func )( const char* ), const char* func_name, const char* file_name )
 {
     ErrorCode result = ( *func )( file_name );
-    int       is_err = is_any_proc_error( ( MB_SUCCESS != result ) );
-    int       rank;
+    int is_err       = is_any_proc_error( ( MB_SUCCESS != result ) );
+    int rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     if( rank == 0 )
     {
@@ -63,12 +63,12 @@ ErrorCode migrate_trivial( const char* filename );
 // some global variables, used by all tests
 int rank, size, ierr;
 
-int                compid1, compid2;  // component ids are unique over all pes, and established in advance;
-int                nghlay;  // number of ghost layers for loading the file
+int compid1, compid2;           // component ids are unique over all pes, and established in advance;
+int nghlay;                     // number of ghost layers for loading the file
 std::vector< int > groupTasks;  // at most 4 tasks
-int                startG1, startG2, endG1, endG2;
+int startG1, startG2, endG1, endG2;
 
-MPI_Comm  jcomm;  // will be a copy of the global
+MPI_Comm jcomm;  // will be a copy of the global
 MPI_Group jgroup;
 
 ErrorCode migrate_smart( const char* filename, const char* outfile, int partMethod )
@@ -76,24 +76,24 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     // first create MPI groups
 
     std::string filen( filename );
-    MPI_Group   group1, group2;
+    MPI_Group group1, group2;
     groupTasks.resize( endG1 - startG1 + 1 );
     for( int i = startG1; i <= endG1; i++ )
-        groupTasks[ i - startG1 ] = i;
+        groupTasks[i - startG1] = i;
 
-    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, &groupTasks[ 0 ], &group1 );
+    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, &groupTasks[0], &group1 );
     CHECKRC( ierr, "can't create group1" )
 
     groupTasks.resize( endG2 - startG2 + 1 );
     for( int i = startG2; i <= endG2; i++ )
-        groupTasks[ i - startG2 ] = i;
+        groupTasks[i - startG2] = i;
 
-    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, &groupTasks[ 0 ], &group2 );
+    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, &groupTasks[0], &group2 );
     CHECKRC( ierr, "can't create group2" )
 
     // create 2 communicators, one for each group
-    int      tagcomm1 = 1, tagcomm2 = 2;
-    int      context_id = -1;  // plain migrate, default context
+    int tagcomm1 = 1, tagcomm2 = 2;
+    int context_id = -1;  // plain migrate, default context
     MPI_Comm comm1, comm2;
     ierr = MPI_Comm_create_group( jcomm, group1, tagcomm1, &comm1 );
     CHECKRC( ierr, "can't create comm1" )
@@ -109,9 +109,9 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     compid1 = 4;
     compid2 = 7;
 
-    int         appID1;
+    int appID1;
     iMOAB_AppID pid1 = &appID1;
-    int         appID2;
+    int appID2;
     iMOAB_AppID pid2 = &appID2;
 
     if( comm1 != MPI_COMM_NULL )
@@ -132,14 +132,14 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 
         nghlay = 0;
 
-        ierr = iMOAB_LoadMesh( pid1, filen.c_str( ), readopts.c_str( ), &nghlay, filen.length( ),
-                               strlen( readopts.c_str( ) ) );
+        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay, filen.length(),
+                               strlen( readopts.c_str() ) );
         CHECKRC( ierr, "can't load mesh " )
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
 #ifdef GRAPH_INFO
         int is_sender = 1;
-        int context = -1;
+        int context   = -1;
         iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS", strlen( "MigrateS" ) );
 #endif
     }
@@ -151,11 +151,11 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
         ierr =
-            iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str( ), strlen( outfile ), strlen( wopts.c_str( ) ) );
+            iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str(), strlen( outfile ), strlen( wopts.c_str() ) );
         CHECKRC( ierr, "cannot write received mesh" )
 #ifdef GRAPH_INFO
         int is_sender = 0;
-        int context = -1;
+        int context   = -1;
         iMOAB_DumpCommGraph( pid2, &context, &is_sender, "MigrateR", strlen( "MigrateR" ) );
 #endif
     }
@@ -177,7 +177,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         CHECKRC( ierr, "cannot deregister app 1 sender" )
     }
 
-    ierr = iMOAB_Finalize( );
+    ierr = iMOAB_Finalize();
     CHECKRC( ierr, "did not finalize iMOAB" )
 
     if( MPI_COMM_NULL != comm1 ) MPI_Comm_free( &comm1 );
@@ -213,14 +213,14 @@ int main( int argc, char* argv[] )
     MPI_Comm_group( jcomm, &jgroup );
 
     ProgOptions opts;
-    int         typeTest = 3;
+    int typeTest = 3;
     // std::string inputfile, outfile("out.h5m"), netcdfFile, variable_name, sefile_name;
     std::string filename;
     filename = TestDir + "/field1.h5m";
-    startG1 = 0;
-    startG2 = 0;
-    endG1 = 0;
-    endG2 = 1;
+    startG1  = 0;
+    startG2  = 0;
+    endG1    = 0;
+    endG2    = 1;
 
     opts.addOpt< std::string >( "file,f", "source file", &filename );
 
@@ -244,9 +244,9 @@ int main( int argc, char* argv[] )
 
     int num_errors = 0;
 
-    if( 0 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str( ) );
-    if( 3 == typeTest || 1 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str( ) );
-    if( 3 == typeTest || 2 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str( ) );
+    if( 0 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+    if( 3 == typeTest || 1 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str() );
+    if( 3 == typeTest || 2 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str() );
 
     if( rank == 0 )
     {
@@ -258,7 +258,7 @@ int main( int argc, char* argv[] )
 
     MPI_Group_free( &jgroup );
     MPI_Comm_free( &jcomm );
-    MPI_Finalize( );
+    MPI_Finalize();
     return num_errors;
 }
 

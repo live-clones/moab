@@ -95,13 +95,13 @@ class PlanarGeometryTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_plane_tri_xz );
     // test fit plane
     CPPUNIT_TEST( test_fit_plane );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
     double qualTol;  // double used for double comparisons
-    int    pF;  // PRINT_FLAG
+    int pF;          // PRINT_FLAG
   public:
-    void setUp( )
+    void setUp()
     {
         // pF=1;//PRINT_FLAG IS ON
         pF = 0;  // PRINT_FLAG IS OFF
@@ -109,15 +109,15 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         qualTol = MSQ_MIN;
     }
 
-    void tearDown( ) {}
+    void tearDown() {}
 
   public:
-    PlanarGeometryTest( ) {}
+    PlanarGeometryTest() {}
 
-    void test_plane_tri_tangled( )
+    void test_plane_tri_tangled()
     {
         MBMesquite::MsqPrintError err( cout );
-        MBMesquite::MeshImpl      mesh;
+        MBMesquite::MeshImpl mesh;
 
         // This test doesn't use InstructionQueue, so
         // we need to set up trapping of floating-point
@@ -128,8 +128,8 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
 
         // create geometry: plane z=5, normal (0,0,1)
-        Vector3D                 pnt( 0, 0, 5 );
-        Vector3D                 s_norm( 0, 0, 1 );
+        Vector3D pnt( 0, 0, 5 );
+        Vector3D s_norm( 0, 0, 1 );
         MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
         // creates an intruction queue
@@ -137,26 +137,26 @@ class PlanarGeometryTest : public CppUnit::TestFixture
 
         // creates a mean ratio quality metric ...
         ConditionNumberQualityMetric shape;
-        UntangleBetaQualityMetric    untan( .1 );
+        UntangleBetaQualityMetric untan( .1 );
 
         // ... and builds an objective function with it (untangle)
-        LInfTemplate  untan_func( &untan );
+        LInfTemplate untan_func( &untan );
         LPtoPTemplate shape_func( &shape, 2, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         // creates the steepest descent optimization procedures
         SteepestDescent pass1( &untan_func );
         SteepestDescent pass2( &shape_func );
-        pass1.use_element_on_vertex_patch( );
-        pass2.use_global_patch( );
+        pass1.use_element_on_vertex_patch();
+        pass2.use_global_patch();
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         QualityAssessor stop_qa = QualityAssessor( &untan );
-        QualityAssessor qa = QualityAssessor( &shape );
+        QualityAssessor qa      = QualityAssessor( &shape );
         if( pF == 0 )
         {
-            stop_qa.disable_printing_results( );
-            qa.disable_printing_results( );
+            stop_qa.disable_printing_results();
+            qa.disable_printing_results();
         }
         //**********Set stopping criterion  untangle ver small ********
         // StoppingCriterion sc_qa(&stop_qa,-100,MSQ_MIN);
@@ -188,7 +188,7 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
         // launches optimization on mesh_set1
         MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
-        double          orig_qa_val = stop_qa.loop_over_mesh( &mesh_and_domain, 0, err );
+        double orig_qa_val              = stop_qa.loop_over_mesh( &mesh_and_domain, 0, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         queue1.run_instructions( &mesh_and_domain, err );
@@ -222,16 +222,16 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         print_timing_diagnostics( cout );
     }
 
-    void test_plane_quad_tangled( )
+    void test_plane_quad_tangled()
     {
         MBMesquite::MeshImpl mesh;
-        MsqPrintError        err( cout );
+        MsqPrintError err( cout );
         mesh.read_vtk( MESH_FILES_DIR "2D/vtk/quads/tangled/tangled_quad.vtk", err );
         CPPUNIT_ASSERT( !err );
 
         // create geometry: plane z=5, normal (0,0,1)
-        Vector3D                 pnt( 0, 0, 5 );
-        Vector3D                 s_norm( 0, 0, 1 );
+        Vector3D pnt( 0, 0, 5 );
+        Vector3D s_norm( 0, 0, 1 );
         MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
         // creates an intruction queue
@@ -239,27 +239,27 @@ class PlanarGeometryTest : public CppUnit::TestFixture
 
         // creates a mean ratio quality metric ...
         ConditionNumberQualityMetric shape;
-        UntangleBetaQualityMetric    untan( .1 );
+        UntangleBetaQualityMetric untan( .1 );
 
         // ... and builds an objective function with it (untangle)
-        LInfTemplate  untan_func( &untan );
+        LInfTemplate untan_func( &untan );
         LPtoPTemplate shape_func( &shape, 2, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         // creates the cg optimization procedures
         ConjugateGradient pass1( &untan_func, err );
         ConjugateGradient pass2( &shape_func, err );
-        pass1.use_element_on_vertex_patch( );
-        pass2.use_global_patch( );
+        pass1.use_element_on_vertex_patch();
+        pass2.use_global_patch();
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         QualityAssessor stop_qa = QualityAssessor( &untan );
-        QualityAssessor qa = QualityAssessor( &shape );
+        QualityAssessor qa      = QualityAssessor( &shape );
         // turn off printing if print flag not set.
         if( pF == 0 )
         {
-            stop_qa.disable_printing_results( );
-            qa.disable_printing_results( );
+            stop_qa.disable_printing_results();
+            qa.disable_printing_results();
         }
         //**********Set stopping criterion  untangle ver small ********
         // StoppingCriterion sc_qa(&stop_qa,-100,MSQ_MIN);
@@ -287,7 +287,7 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
         // launches optimization on mesh_set1
         MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
-        double          orig_qa_val = stop_qa.loop_over_mesh( &mesh_and_domain, 0, err );
+        double orig_qa_val              = stop_qa.loop_over_mesh( &mesh_and_domain, 0, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         queue1.run_instructions( &mesh_and_domain, err );
@@ -321,16 +321,16 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         print_timing_diagnostics( cout );
     }
 
-    void test_plane_tri_xz( )
+    void test_plane_tri_xz()
     {
-        MsqPrintError        err( cout );
+        MsqPrintError err( cout );
         MBMesquite::MeshImpl mesh;
         mesh.read_vtk( MESH_FILES_DIR "2D/vtk/tris/untangled/tri_5_xz.vtk", err );
         CPPUNIT_ASSERT( !err );
 
         // create geometry: plane y=5, normal (0,1,0)
-        Vector3D                 pnt( 0, -5, 0 );
-        Vector3D                 s_norm( 0, -1, 0 );
+        Vector3D pnt( 0, -5, 0 );
+        Vector3D s_norm( 0, -1, 0 );
         MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
         // creates an intruction queue
@@ -346,7 +346,7 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         // creates the cg optimization procedures
         ConjugateGradient pass1( &smooth_func, err );
         // pass1->set_patch_type(PatchData::ELEMENTS_ON_VERTEX_PATCH, err,1 ,1);
-        pass1.use_global_patch( );
+        pass1.use_global_patch();
         pass1.set_debugging_level( 1 );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
@@ -370,7 +370,7 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
         // launches optimization on mesh_set1
         MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
-        double          orig_qa_val = qa.loop_over_mesh( &mesh_and_domain, 0, err );
+        double orig_qa_val              = qa.loop_over_mesh( &mesh_and_domain, 0, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         queue1.run_instructions( &mesh_and_domain, err );
@@ -385,47 +385,47 @@ class PlanarGeometryTest : public CppUnit::TestFixture
         print_timing_diagnostics( cout );
     }
 
-    void test_fit_plane( );
+    void test_fit_plane();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PlanarGeometryTest, "PlanarGeometryTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PlanarGeometryTest, "Regression" );
 
-void PlanarGeometryTest::test_fit_plane( )
+void PlanarGeometryTest::test_fit_plane()
 {
     MsqPrintError err( std::cerr );
-    PlanarDomain  plane( PlanarDomain::XY, -1 );
-    const double  epsilon = 1e-8;
+    PlanarDomain plane( PlanarDomain::XY, -1 );
+    const double epsilon = 1e-8;
 
     MeshImpl mesh1;
     mesh1.read_vtk( MESH_FILES_DIR "2D/vtk/tris/untangled/bad_circle_tri.vtk", err );
     ASSERT_NO_ERROR( err );
     plane.fit_vertices( &mesh1, err, epsilon );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), plane.get_normal( ), epsilon );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5, plane.get_coeff( ), epsilon );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), plane.get_normal(), epsilon );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 5, plane.get_coeff(), epsilon );
 
     MeshImpl mesh2;
     mesh2.read_vtk( MESH_FILES_DIR "2D/vtk/tris/untangled/equil_tri.vtk", err );
     ASSERT_NO_ERROR( err );
     plane.fit_vertices( &mesh2, err, epsilon );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), plane.get_normal( ), epsilon );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, plane.get_coeff( ), epsilon );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), plane.get_normal(), epsilon );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0, plane.get_coeff(), epsilon );
 
     MeshImpl mesh3;
     mesh3.read_vtk( MESH_FILES_DIR "2D/vtk/quads/untangled/quads_4by2.vtk", err );
     ASSERT_NO_ERROR( err );
     plane.fit_vertices( &mesh3, err, epsilon );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), plane.get_normal( ), epsilon );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( -2, plane.get_coeff( ), epsilon );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, 0, 1 ), plane.get_normal(), epsilon );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( -2, plane.get_coeff(), epsilon );
 
     MeshImpl mesh4;
     mesh4.read_vtk( MESH_FILES_DIR "2D/vtk/tris/untangled/tri_5_xz.vtk", err );
     ASSERT_NO_ERROR( err );
     plane.fit_vertices( &mesh4, err, epsilon );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, -1, 0 ), plane.get_normal( ), epsilon );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( -5, plane.get_coeff( ), epsilon );
+    CPPUNIT_ASSERT_VECTORS_EQUAL( Vector3D( 0, -1, 0 ), plane.get_normal(), epsilon );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( -5, plane.get_coeff(), epsilon );
 }

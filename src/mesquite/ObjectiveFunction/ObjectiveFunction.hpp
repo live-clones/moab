@@ -120,7 +120,7 @@ class MESQUITE_EXPORT ObjectiveFunction
     };
 
     // virtual destructor ensures use of polymorphism during destruction
-    virtual ~ObjectiveFunction( );
+    virtual ~ObjectiveFunction();
 
     //!\brief Called at start of instruction queue processing
     //!
@@ -210,7 +210,7 @@ class MESQUITE_EXPORT ObjectiveFunction
      *        true otherwise.
      */
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< Vector3D >& grad_out,
                                                  std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     /**\brief Evaluate objective function and Hessian for specified patch.
@@ -241,16 +241,16 @@ class MESQUITE_EXPORT ObjectiveFunction
      * is a copy of the callee with the same accumulated
      * values, parameters, etc.
      */
-    virtual ObjectiveFunction* clone( ) const = 0;
+    virtual ObjectiveFunction* clone() const = 0;
 
     /** Clear any values accumulated for BCD-related eval calls */
-    virtual void clear( ) = 0;
+    virtual void clear() = 0;
 
     /** Get the minimum number of layers of adjacent elements required
      *  in a patch to evaluate the objective function for a single
      *  free vertex.
      */
-    virtual int min_patch_layers( ) const = 0;
+    virtual int min_patch_layers() const = 0;
 
   protected:
     /**\brief Returns eps used in the numerical gradient calculation.

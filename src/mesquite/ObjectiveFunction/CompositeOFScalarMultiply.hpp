@@ -55,7 +55,7 @@ class MESQUITE_EXPORT CompositeOFScalarMultiply : public ObjectiveFunction
 {
   public:
     CompositeOFScalarMultiply( double, ObjectiveFunction*, bool delete_OF = false );
-    virtual ~CompositeOFScalarMultiply( );
+    virtual ~CompositeOFScalarMultiply();
 
     //!\brief Called at start of instruction queue processing
     //!
@@ -72,22 +72,22 @@ class MESQUITE_EXPORT CompositeOFScalarMultiply : public ObjectiveFunction
                                          std::vector< Vector3D >& grad_out, MsqError& err );
 
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< Vector3D >& grad_out,
                                                  std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
                                         std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
-    virtual ObjectiveFunction* clone( ) const;
+    virtual ObjectiveFunction* clone() const;
 
-    virtual void clear( );
+    virtual void clear();
 
-    virtual int min_patch_layers( ) const;
+    virtual int min_patch_layers() const;
 
   private:
     ObjectiveFunction* objFunc;
-    double             mAlpha;
-    bool               deleteObjFunc;
+    double mAlpha;
+    bool deleteObjFunc;
 };
 }  // namespace MBMesquite
 #endif  //  CompositeOFScalarMultiply_hpp

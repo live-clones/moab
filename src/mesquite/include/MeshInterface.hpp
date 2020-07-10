@@ -139,7 +139,7 @@ class MESQUITE_EXPORT Mesh
 
     //! Get/set location of a vertex
     virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
-                                           MsqError& err ) = 0;
+                                           MsqError& err )                                                 = 0;
     virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err ) = 0;
 
     //! Each vertex has a byte-sized flag that can be used to store
@@ -148,14 +148,14 @@ class MESQUITE_EXPORT Mesh
     //! Until a vertex's byte has been explicitly set, its value is 0.
     virtual void vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqError& err ) = 0;
     virtual void vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
-                                    MsqError& err ) = 0;
+                                    MsqError& err )                                        = 0;
 
     //! Retrieve the byte value for the specified vertex or vertices.
     //! The byte value is 0 if it has not yet been set via one of the
     //! *_set_byte() functions.
     virtual void vertex_get_byte( const VertexHandle vertex, unsigned char* byte, MsqError& err ) = 0;
     virtual void vertices_get_byte( const VertexHandle* vertex, unsigned char* byte_array, size_t array_size,
-                                    MsqError& err ) = 0;
+                                    MsqError& err )                                               = 0;
 
     //**************** Vertex Topology *****************
     /** \brief get elements adjacent to vertices
@@ -319,9 +319,9 @@ class MESQUITE_EXPORT Mesh
     //! just call the destructor.  More sophisticated implementations
     //! may want to keep the Mesh object to live longer than Mesquite
     //! is using it.
-    virtual void release( ) = 0;
+    virtual void release() = 0;
 
-    virtual ~Mesh( ) {}
+    virtual ~Mesh() {}
 
   protected:
 };
@@ -335,24 +335,24 @@ the Mesh from which the iterator was obtained. */
 class EntityIterator
 {
   public:
-    virtual ~EntityIterator( ) {}
+    virtual ~EntityIterator() {}
 
     //! Moves the iterator back to the first
     //! entity in the list.
-    virtual void restart( ) = 0;
+    virtual void restart() = 0;
 
     //! *iterator.  Return the handle currently
     //! being pointed at by the iterator.
-    virtual Mesh::EntityHandle operator*( ) const = 0;
+    virtual Mesh::EntityHandle operator*() const = 0;
 
     //! ++iterator
-    virtual void operator++( ) = 0;
+    virtual void operator++() = 0;
 
     //! Returns false until the iterator has
     //! been advanced PAST the last entity.
     //! Once is_at_end() returns true, *iterator
     //! returns 0.
-    virtual bool is_at_end( ) const = 0;
+    virtual bool is_at_end() const = 0;
 };
 
 /*! \class MeshDomain
@@ -363,7 +363,7 @@ class EntityIterator
 class MESQUITE_EXPORT MeshDomain
 {
   public:
-    virtual ~MeshDomain( ) {}
+    virtual ~MeshDomain() {}
 
     //! Modifies "coordinate" so that it lies on the
     //! domain to which "entity_handle" is constrained.
@@ -384,7 +384,7 @@ class MESQUITE_EXPORT MeshDomain
     //!
     //! User should see also PatchData::get_domain_normal_at_vertex and
     //! PatchData::get_domain_normal_at_element .
-    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const = 0;
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const   = 0;
     virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const = 0;
 
     /**\brief evaluate surface normals
@@ -463,25 +463,25 @@ class MESQUITE_EXPORT MeshDomainAssoc
         if( mesh && domain && !skip_compatibility_check )
         {
             MsqError err;
-            double   tolerance = 1.0e-3;
+            double tolerance = 1.0e-3;
 
             std::vector< Mesh::VertexHandle > vert_handles;
             mMesh->get_all_vertices( vert_handles, err );
 
             MsqVertex mesh_vertex, domain_vertex;
-            Vector3D  normal;
+            Vector3D normal;
 
-            double                        distance;
+            double distance;
             std::vector< int >::size_type i, times_to_loop;
             if( full_compatibility_check )
-                times_to_loop = vert_handles.size( );
+                times_to_loop = vert_handles.size();
             else
                 times_to_loop = 1;
             mesh_and_domain_are_compatible = true;
             for( i = 0; i < times_to_loop; ++i )
             {
-                mMesh->vertices_get_coordinates( &vert_handles[ i ], &mesh_vertex, 1, err );
-                mMeshDomain->closest_point( vert_handles[ i ], Vector3D( mesh_vertex ), domain_vertex, normal, err );
+                mMesh->vertices_get_coordinates( &vert_handles[i], &mesh_vertex, 1, err );
+                mMeshDomain->closest_point( vert_handles[i], Vector3D( mesh_vertex ), domain_vertex, normal, err );
 
                 distance = Vector3D::distance_between( mesh_vertex, domain_vertex );
                 if( distance > tolerance )
@@ -499,13 +499,13 @@ class MESQUITE_EXPORT MeshDomainAssoc
         }
     }
 
-    ~MeshDomainAssoc( ){ };
+    ~MeshDomainAssoc(){};
 
     /**\brief get associated mesh
      *
      * Return the mesh associated with this instance.
      */
-    MBMesquite::Mesh* get_mesh( )
+    MBMesquite::Mesh* get_mesh()
     {
         return mMesh;
     };
@@ -514,18 +514,18 @@ class MESQUITE_EXPORT MeshDomainAssoc
      *
      * Return the domain associated with this instance.
      */
-    MBMesquite::MeshDomain* get_domain( )
+    MBMesquite::MeshDomain* get_domain()
     {
         return mMeshDomain;
     };
 
   private:
-    MBMesquite::Mesh*       mMesh;
+    MBMesquite::Mesh* mMesh;
     MBMesquite::MeshDomain* mMeshDomain;
-    bool                    mesh_and_domain_are_compatible;
+    bool mesh_and_domain_are_compatible;
 
   public:
-    bool are_compatible( )
+    bool are_compatible()
     {
         return mesh_and_domain_are_compatible;
     };

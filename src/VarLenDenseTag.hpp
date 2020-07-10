@@ -32,9 +32,9 @@ class VarLenDenseTag : public TagInfo
     static VarLenDenseTag* create_tag( SequenceManager* seqman, Error* error_handler, const char* name, DataType type,
                                        const void* default_value, int default_value_len );
 
-    virtual ~VarLenDenseTag( );
+    virtual ~VarLenDenseTag();
 
-    virtual TagType get_storage_type( ) const;
+    virtual TagType get_storage_type() const;
 
     /**\brief Remove/clear tag data for all entities
      *

@@ -213,31 +213,31 @@ namespace moab
 
 #define ABAQUS_SET_TYPE_TAG_NAME "abaqus_set_type"
 #define ABAQUS_SET_NAME_TAG_NAME "abaqus_set_name"
-#define ABAQUS_SET_NAME_LENGTH 100
+#define ABAQUS_SET_NAME_LENGTH   100
 #define ABAQUS_LOCAL_ID_TAG_NAME "abaqus_local_id"
 
 // Many sets should know who contains them
 #define ABAQUS_INSTANCE_HANDLE_TAG_NAME "abaqus_instance_handle"
 #define ABAQUS_ASSEMBLY_HANDLE_TAG_NAME "abaqus_assembly_handle"
-#define ABAQUS_PART_HANDLE_TAG_NAME "abaqus_part_handle"
+#define ABAQUS_PART_HANDLE_TAG_NAME     "abaqus_part_handle"
 
 // Instances should know things about themselves:
 //  * which part they derive from (see ABAQUS_PART_HANDLE_TAG_NAME above)
 //  * which instance of a part this is
 //  * which instance of an assembly this is
-#define ABAQUS_INSTANCE_PART_ID_TAG_NAME "abaqus_instance_part_id"
+#define ABAQUS_INSTANCE_PART_ID_TAG_NAME   "abaqus_instance_part_id"
 #define ABAQUS_INSTANCE_GLOBAL_ID_TAG_NAME "abaqus_instance_global_id"
 
 // Element sets have material name
 // Using MOAB's general MATERIAL_SET to store material id
 #define ABAQUS_MAT_NAME_TAG_NAME "abaqus_mat_name"
-#define ABAQUS_MAT_NAME_LENGTH 100
+#define ABAQUS_MAT_NAME_LENGTH   100
 
 #define ABQ_ASSEMBLY_SET 1
-#define ABQ_PART_SET 2
+#define ABQ_PART_SET     2
 #define ABQ_INSTANCE_SET 3
-#define ABQ_NODE_SET 4
-#define ABQ_ELEMENT_SET 5
+#define ABQ_NODE_SET     4
+#define ABQ_ELEMENT_SET  5
 
 enum abaqus_line_types
 {
@@ -364,10 +364,10 @@ class ReadABAQUS : public ReaderIface
     ReadABAQUS( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadABAQUS( );
+    virtual ~ReadABAQUS();
 
   private:
-    void reset( );
+    void reset();
 
     ErrorCode read_heading( EntityHandle file_set );
     ErrorCode read_part( EntityHandle file_set );
@@ -411,14 +411,15 @@ class ReadABAQUS : public ReaderIface
 
     void sph2rect( std::vector< double > coord_list );
 
-    abaqus_line_types   get_next_line_type( );
-    abaqus_keyword_type get_keyword( );
+    abaqus_line_types get_next_line_type();
+    abaqus_keyword_type get_keyword();
 
-    template< class T > std::string match( const std::string& token, std::map< std::string, T >& tokenList );
+    template < class T >
+    std::string match( const std::string& token, std::map< std::string, T >& tokenList );
 
     void stringToUpper( const std::string& toBeConverted, std::string& converted );
 
-    void extract_keyword_parameters( const std::vector< std::string >&     tokens,
+    void extract_keyword_parameters( const std::vector< std::string >& tokens,
                                      std::map< std::string, std::string >& params );
 
     //! Interface instance
@@ -456,8 +457,8 @@ class ReadABAQUS : public ReaderIface
 
     std::map< EntityHandle, unsigned int > num_part_instances;
     std::map< EntityHandle, unsigned int > num_assembly_instances;
-    std::map< std::string, unsigned int >  matIDmap;
-    unsigned                               mat_id;
+    std::map< std::string, unsigned int > matIDmap;
+    unsigned mat_id;
 };
 
 }  // namespace moab

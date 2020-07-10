@@ -41,7 +41,7 @@ namespace MBMesquite
 class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
 {
   public:
-    virtual ~IdealShapeTarget( );
+    virtual ~IdealShapeTarget();
 
     /**\brief Get a target matrix
      *
@@ -71,7 +71,7 @@ class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
      */
     virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-    virtual bool have_surface_orient( ) const;
+    virtual bool have_surface_orient() const;
 };
 
 }  // namespace MBMesquite

@@ -20,7 +20,7 @@ class SphereDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     SphereDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
@@ -31,10 +31,10 @@ class SphereDomainArg : public CLArgs::DoubleListArgI
 };
 bool SphereDomainArg::value( const std::vector< double >& list )
 {
-    double rad = list[ 0 ];
+    double rad = list[0];
     if( rad <= 0.0 ) return false;
     Vector3D center( 0, 0, 0 );
-    if( list.size( ) == 4 ) center.set( list[ 1 ], list[ 2 ], list[ 3 ] );
+    if( list.size() == 4 ) center.set( list[1], list[2], list[3] );
     domList.push_back( new SphericalDomain( center, rad ) );
     dimList.push_back( 2 );
     return true;
@@ -44,7 +44,7 @@ class ConicDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     ConicDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
@@ -55,21 +55,21 @@ class ConicDomainArg : public CLArgs::DoubleListArgI
 };
 bool ConicDomainArg::value( const std::vector< double >& vals )
 {
-    double   base_rad = vals[ 0 ];
-    double   height = vals[ 1 ];
+    double base_rad = vals[0];
+    double height   = vals[1];
     Vector3D axis( 0, 0, 1 );
-    if( vals.size( ) >= 5 )
+    if( vals.size() >= 5 )
     {
-        axis[ 0 ] = vals[ 2 ];
-        axis[ 1 ] = vals[ 3 ];
-        axis[ 2 ] = vals[ 4 ];
+        axis[0] = vals[2];
+        axis[1] = vals[3];
+        axis[2] = vals[4];
     }
     Vector3D point( 0, 0, 0 );
-    if( vals.size( ) == 8 )
+    if( vals.size() == 8 )
     {
-        axis[ 0 ] = vals[ 5 ];
-        axis[ 1 ] = vals[ 6 ];
-        axis[ 2 ] = vals[ 7 ];
+        axis[0] = vals[5];
+        axis[1] = vals[6];
+        axis[2] = vals[7];
     }
 
     domList.push_back( new ConicDomain( base_rad, height, axis, point ) );
@@ -81,7 +81,7 @@ class CylinderDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     CylinderDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
@@ -92,10 +92,10 @@ class CylinderDomainArg : public CLArgs::DoubleListArgI
 };
 bool CylinderDomainArg::value( const std::vector< double >& vals )
 {
-    double   rad = vals[ 0 ];
-    Vector3D normal( vals[ 1 ], vals[ 2 ], vals[ 3 ] );
+    double rad = vals[0];
+    Vector3D normal( vals[1], vals[2], vals[3] );
     Vector3D point( 0, 0, 0 );
-    if( vals.size( ) == 7 ) point.set( vals[ 4 ], vals[ 5 ], vals[ 6 ] );
+    if( vals.size() == 7 ) point.set( vals[4], vals[5], vals[6] );
     domList.push_back( new CylinderDomain( rad, normal, point ) );
     dimList.push_back( 2 );
     return true;
@@ -105,7 +105,7 @@ class PlanarDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     PlanarDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
@@ -116,9 +116,9 @@ class PlanarDomainArg : public CLArgs::DoubleListArgI
 };
 bool PlanarDomainArg::value( const std::vector< double >& list )
 {
-    Vector3D normal( list[ 0 ], list[ 1 ], list[ 2 ] );
+    Vector3D normal( list[0], list[1], list[2] );
     Vector3D point( 0, 0, 0 );
-    if( list.size( ) == 6 ) point.set( list[ 3 ], list[ 4 ], list[ 5 ] );
+    if( list.size() == 6 ) point.set( list[3], list[4], list[5] );
     domList.push_back( new PlanarDomain( normal, point ) );
     dimList.push_back( 2 );
     return true;
@@ -128,7 +128,7 @@ class LineDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     LineDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims ) : domList( domlist ), dimList( dims )
@@ -138,9 +138,9 @@ class LineDomainArg : public CLArgs::DoubleListArgI
 };
 bool LineDomainArg::value( const std::vector< double >& vals )
 {
-    Vector3D dir( vals[ 0 ], vals[ 1 ], vals[ 2 ] );
+    Vector3D dir( vals[0], vals[1], vals[2] );
     Vector3D point( 0, 0, 0 );
-    if( vals.size( ) == 6 ) point.set( vals[ 3 ], vals[ 4 ], vals[ 5 ] );
+    if( vals.size() == 6 ) point.set( vals[3], vals[4], vals[5] );
     LineDomain* pdom = new LineDomain( point, dir );
     domList.push_back( pdom );
     dimList.push_back( 1 );
@@ -151,7 +151,7 @@ class CircleDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     CircleDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
@@ -162,10 +162,10 @@ class CircleDomainArg : public CLArgs::DoubleListArgI
 };
 bool CircleDomainArg::value( const std::vector< double >& vals )
 {
-    double   rad = vals[ 0 ];
-    Vector3D normal( vals[ 1 ], vals[ 2 ], vals[ 3 ] );
+    double rad = vals[0];
+    Vector3D normal( vals[1], vals[2], vals[3] );
     Vector3D point( 0, 0, 0 );
-    if( vals.size( ) == 7 ) point.set( vals[ 4 ], vals[ 5 ], vals[ 6 ] );
+    if( vals.size() == 7 ) point.set( vals[4], vals[5], vals[6] );
     CircleDomain* pdom = new CircleDomain( point, normal, rad );
     domList.push_back( pdom );
     dimList.push_back( 1 );
@@ -176,7 +176,7 @@ class PointDomainArg : public CLArgs::DoubleListArgI
 {
   private:
     std::vector< MeshDomain* >& domList;
-    std::vector< int >&         dimList;
+    std::vector< int >& dimList;
 
   public:
     PointDomainArg( std::vector< MeshDomain* >& domlist, std::vector< int >& dims )
@@ -187,7 +187,7 @@ class PointDomainArg : public CLArgs::DoubleListArgI
 };
 bool PointDomainArg::value( const std::vector< double >& vals )
 {
-    Vector3D     point( vals[ 0 ], vals[ 1 ], vals[ 2 ] );
+    Vector3D point( vals[0], vals[1], vals[2] );
     PointDomain* pdom = new PointDomain( point );
     domList.push_back( pdom );
     dimList.push_back( 0 );
@@ -195,19 +195,19 @@ bool PointDomainArg::value( const std::vector< double >& vals )
 }
 
 std::vector< MeshDomain* > domains;
-std::vector< int >         domain_dims;
-SphereDomainArg            sphere_arg( domains, domain_dims );
-ConicDomainArg             conic_arg( domains, domain_dims );
-CylinderDomainArg          cylinder_arg( domains, domain_dims );
-PlanarDomainArg            plane_arg( domains, domain_dims );
-CircleDomainArg            circle_arg( domains, domain_dims );
-LineDomainArg              line_arg( domains, domain_dims );
-PointDomainArg             point_arg( domains, domain_dims );
-CLArgs::ToggleArg          skin_mesh( false );
+std::vector< int > domain_dims;
+SphereDomainArg sphere_arg( domains, domain_dims );
+ConicDomainArg conic_arg( domains, domain_dims );
+CylinderDomainArg cylinder_arg( domains, domain_dims );
+PlanarDomainArg plane_arg( domains, domain_dims );
+CircleDomainArg circle_arg( domains, domain_dims );
+LineDomainArg line_arg( domains, domain_dims );
+PointDomainArg point_arg( domains, domain_dims );
+CLArgs::ToggleArg skin_mesh( false );
 
-const char* SPHERE_VALUES[] = { "rad", "x", "y", "z" };
+const char* SPHERE_VALUES[]   = { "rad", "x", "y", "z" };
 const char* CYLINDER_VALUES[] = { "rad", "i", "j", "k", "x", "y", "z" };
-const char* CONE_VALUES[] = { "rad", "h", "i", "j", "k", "x", "y", "z" };
+const char* CONE_VALUES[]     = { "rad", "h", "i", "j", "k", "x", "y", "z" };
 
 void add_domain_args( CLArgs& args )
 {
@@ -238,36 +238,36 @@ void add_domain_args( CLArgs& args )
 MeshDomain* process_domain_args( MeshImpl* mesh )
 {
     MsqPrintError err( std::cerr );
-    MeshDomain*   rval = 0;
+    MeshDomain* rval = 0;
 
-    if( !domains.empty( ) )
+    if( !domains.empty() )
     {
-        int max_domain_dim = *std::max_element( domain_dims.begin( ), domain_dims.end( ) );
+        int max_domain_dim = *std::max_element( domain_dims.begin(), domain_dims.end() );
         std::vector< Mesh::ElementHandle > elems;
         mesh->get_all_elements( elems, err );
-        std::vector< EntityTopology > types( elems.size( ) );
-        mesh->elements_get_topologies( arrptr( elems ), arrptr( types ), elems.size( ), err );
-        EntityTopology max_type = *std::max_element( types.begin( ), types.end( ) );
-        int            max_elem_dim = TopologyInfo::dimension( max_type );
+        std::vector< EntityTopology > types( elems.size() );
+        mesh->elements_get_topologies( arrptr( elems ), arrptr( types ), elems.size(), err );
+        EntityTopology max_type = *std::max_element( types.begin(), types.end() );
+        int max_elem_dim        = TopologyInfo::dimension( max_type );
 
-        if( max_domain_dim == max_elem_dim && domains.size( ) == 1 ) { rval = domains.front( ); }
+        if( max_domain_dim == max_elem_dim && domains.size() == 1 ) { rval = domains.front(); }
         else
         {
-            DomainClassifier* result = new DomainClassifier( );
+            DomainClassifier* result = new DomainClassifier();
             if( max_domain_dim < max_elem_dim )
             {
                 DomainClassifier::classify_skin_geometrically( *result, mesh, 1e-4, arrptr( domains ),
-                                                               arrptr( domain_dims ), domains.size( ), err );
+                                                               arrptr( domain_dims ), domains.size(), err );
             }
             else
             {
                 DomainClassifier::classify_geometrically( *result, mesh, 1e-4, arrptr( domains ), arrptr( domain_dims ),
-                                                          domains.size( ), err );
+                                                          domains.size(), err );
             }
             rval = result;
         }
     }
-    if( skin_mesh.value( ) ) { mesh->mark_skin_fixed( err, false ); }
+    if( skin_mesh.value() ) { mesh->mark_skin_fixed( err, false ); }
     if( err )
     {
         std::cerr << err << std::endl;

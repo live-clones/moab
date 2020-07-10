@@ -36,14 +36,14 @@
 namespace MBMesquite
 {
 
-SizeMetric::~SizeMetric( ) {}
+SizeMetric::~SizeMetric() {}
 
-std::string SizeMetric::get_name( ) const
+std::string SizeMetric::get_name() const
 {
     return "Size";
 }
 
-int SizeMetric::get_negate_flag( ) const
+int SizeMetric::get_negate_flag() const
 {
     return 1;
 }

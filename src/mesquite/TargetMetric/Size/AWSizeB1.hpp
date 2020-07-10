@@ -43,9 +43,9 @@ namespace MBMesquite
 class AWSizeB1 : public AWMetricBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~AWSizeB1( );
+    MESQUITE_EXPORT virtual ~AWSizeB1();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                                            MsqError& err );

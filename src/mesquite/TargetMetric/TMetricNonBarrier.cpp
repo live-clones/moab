@@ -38,10 +38,10 @@
 namespace MBMesquite
 {
 
-TMetricNonBarrier::~TMetricNonBarrier( ) {}
+TMetricNonBarrier::~TMetricNonBarrier() {}
 
-TMetricNonBarrier2D::~TMetricNonBarrier2D( ) {}
-TMetricNonBarrier3D::~TMetricNonBarrier3D( ) {}
+TMetricNonBarrier2D::~TMetricNonBarrier2D() {}
+TMetricNonBarrier3D::~TMetricNonBarrier3D() {}
 
 bool TMetricNonBarrier2D::evaluate( const MsqMatrix< 3, 3 >&, double&, MsqError& err )
 {

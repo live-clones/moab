@@ -48,7 +48,7 @@ class MeshOutputFunctor : public EntityRefinerOutputFunctor
 {
   public:
     MeshOutputFunctor( RefinerTagManager* tag_mgr );
-    ~MeshOutputFunctor( );
+    ~MeshOutputFunctor();
 
     void print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash, const double* vcoords,
                           const void* vtags );
@@ -57,22 +57,22 @@ class MeshOutputFunctor : public EntityRefinerOutputFunctor
 
     void assign_tags( EntityHandle vhandle, const void* vtags );
 
-    virtual EntityHandle              map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags );
-    using EntityRefinerOutputFunctor::operator( );
-    virtual EntityHandle operator( )( int nvhash, EntityHandle* vhash, const double* vcoords, const void* vtags );
-    virtual void         operator( )( EntityHandle h );
-    virtual void         operator( )( EntityType etyp );
+    virtual EntityHandle map_vertex( EntityHandle vhash, const double* vcoords, const void* vtags );
+    using EntityRefinerOutputFunctor::operator();
+    virtual EntityHandle operator()( int nvhash, EntityHandle* vhash, const double* vcoords, const void* vtags );
+    virtual void operator()( EntityHandle h );
+    virtual void operator()( EntityType etyp );
 
-    Interface*                        mesh_in;
-    Interface*                        mesh_out;
-    bool                              input_is_output;
-    SplitVerticesBase*                vertex_map;
+    Interface* mesh_in;
+    Interface* mesh_out;
+    bool input_is_output;
+    SplitVerticesBase* vertex_map;
     std::vector< SplitVerticesBase* > split_vertices;
-    std::vector< EntitySource* >      new_entities;
-    std::vector< EntityHandle >       elem_vert;
-    RefinerTagManager*                tag_manager;
-    EntityHandle                      destination_set;
-    std::map< ProcessSet, int >       proc_partition_counts;
+    std::vector< EntitySource* > new_entities;
+    std::vector< EntityHandle > elem_vert;
+    RefinerTagManager* tag_manager;
+    EntityHandle destination_set;
+    std::map< ProcessSet, int > proc_partition_counts;
 };
 
 }  // namespace moab

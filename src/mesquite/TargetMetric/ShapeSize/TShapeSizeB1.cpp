@@ -37,12 +37,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeSizeB1::get_name( ) const
+std::string TShapeSizeB1::get_name() const
 {
     return "TShapeSizeB1";
 }
 
-TShapeSizeB1::~TShapeSizeB1( ) {}
+TShapeSizeB1::~TShapeSizeB1() {}
 
 bool TShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& /*err*/ )
 {
@@ -53,8 +53,8 @@ bool TShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqErro
     }
 
     const double nT = sqr_Frobenius( T );
-    const double f = 1 / ( tau * tau );
-    result = ( 1 + f ) * nT - 4;
+    const double f  = 1 / ( tau * tau );
+    result          = ( 1 + f ) * nT - 4;
     return true;
 }
 
@@ -66,10 +66,10 @@ bool TShapeSizeB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqErro
         return false;
     }
 
-    const double nT = sqr_Frobenius( T );
+    const double nT   = sqr_Frobenius( T );
     const double nadj = sqr_Frobenius( transpose_adj( T ) );
-    const double f = 1 / ( tau * tau );
-    result = nT + f * nadj - 6;
+    const double f    = 1 / ( tau * tau );
+    result            = nT + f * nadj - 6;
     return true;
 }
 
@@ -84,9 +84,9 @@ bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& resul
     }
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    const double            nT = sqr_Frobenius( T );
-    const double            f = 1 / ( tau * tau );
-    result = ( 1 + f ) * nT - 4;
+    const double nT              = sqr_Frobenius( T );
+    const double f               = 1 / ( tau * tau );
+    result                       = ( 1 + f ) * nT - 4;
 
     deriv_wrt_T = T;
     deriv_wrt_T *= 2 + 2 * f;
@@ -106,10 +106,10 @@ bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& resul
     }
 
     const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    const double            nT = sqr_Frobenius( T );
-    const double            nadj = sqr_Frobenius( adjt );
-    const double            f = 1 / ( tau * tau );
-    result = nT + f * nadj - 6;
+    const double nT              = sqr_Frobenius( T );
+    const double nadj            = sqr_Frobenius( adjt );
+    const double f               = 1 / ( tau * tau );
+    result                       = nT + f * nadj - 6;
 
     deriv_wrt_T = T;
     deriv_wrt_T *= ( 1 + f * nT );
@@ -121,7 +121,7 @@ bool TShapeSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& resul
 }
 
 bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                       MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                       MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -131,9 +131,9 @@ bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& resul
     }
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    const double            nT = sqr_Frobenius( T );
-    const double            f = 1 / ( tau * tau );
-    result = ( 1 + f ) * nT - 4;
+    const double nT              = sqr_Frobenius( T );
+    const double f               = 1 / ( tau * tau );
+    result                       = ( 1 + f ) * nT - 4;
 
     deriv_wrt_T = T;
     deriv_wrt_T *= 2 + 2 * f;
@@ -147,7 +147,7 @@ bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& resul
     return true;
 }
 bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                       MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                       MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -157,14 +157,14 @@ bool TShapeSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& resul
     }
 
     const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    const double            nT = sqr_Frobenius( T );
-    const double            nadj = sqr_Frobenius( adjt );
-    const double            f = 1 / ( tau * tau );
-    result = nT + f * nadj - 6;
+    const double nT              = sqr_Frobenius( T );
+    const double nadj            = sqr_Frobenius( adjt );
+    const double f               = 1 / ( tau * tau );
+    result                       = nT + f * nadj - 6;
 
     //! \f$ \frac{\partial}{\partial T} |adj T|^2 \f$
     const MsqMatrix< 3, 3 > dNadj_dT = 2 * ( nT * T - T * transpose( T ) * T );
-    deriv_wrt_T = T;
+    deriv_wrt_T                      = T;
     deriv_wrt_T -= f / tau * nadj * adjt;
     deriv_wrt_T *= 2;
     deriv_wrt_T += f * dNadj_dT;

@@ -64,7 +64,7 @@ class TetDihedralWeight : public WeightCalculator
 
   private:
     ReferenceMesh* refMesh;
-    double         mCutoff, mA;
+    double mCutoff, mA;
 };
 
 }  // namespace MBMesquite

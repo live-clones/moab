@@ -74,7 +74,7 @@ using namespace MBMesquite;
 
 std::string default_file_name = TestDir + "/3D/vtk/large_box_hex_1000.vtk";
 
-void usage( )
+void usage()
 {
     cout << "main [-N] [filename]" << endl;
     cout << "  -N : Use native representation instead of TSTT implementation\n";
@@ -100,26 +100,26 @@ int main( int argc, char* argv[] )
 
     // command line arguments
     const char* file_name = 0;
-    bool        use_native = false, opts_done = false;
+    bool use_native = false, opts_done = false;
     for( int arg = 1; arg < argc; ++arg )
     {
-        if( !opts_done && argv[ arg ][ 0 ] == '-' )
+        if( !opts_done && argv[arg][0] == '-' )
         {
-            if( !strcmp( argv[ arg ], "-N" ) )
+            if( !strcmp( argv[arg], "-N" ) )
                 use_native = true;
-            else if( !strcmp( argv[ arg ], "--" ) )
+            else if( !strcmp( argv[arg], "--" ) )
                 opts_done = true;
             else
-                usage( );
+                usage();
         }
         else if( !file_name )
-            file_name = argv[ arg ];
+            file_name = argv[arg];
         else
-            usage( );
+            usage();
     }
     if( !file_name )
     {
-        file_name = default_file_name.c_str( );
+        file_name = default_file_name.c_str();
         cout << "No file specified: using default: " << default_file_name << endl;
     }
 
@@ -170,7 +170,7 @@ int run_global_smoother( Mesh* mesh, MsqError& err )
 
     // creates the feas newt optimization procedures
     FeasibleNewton* pass1 = new FeasibleNewton( obj_func );
-    pass1->use_global_patch( );
+    pass1->use_global_patch();
     if( err ) return 1;
 
     QualityAssessor stop_qa( mean_ratio );
@@ -260,7 +260,7 @@ int run_local_smoother( Mesh* mesh, MsqError& err )
 
 Mesh* get_imesh_mesh( const char* file_name )
 {
-    int            ierr;
+    int ierr;
     iMesh_Instance imesh_mesh = 0;
     iMesh_newMesh( NULL, &imesh_mesh, &ierr, 0 );
     if( iBase_SUCCESS != ierr ) { return 0; }
@@ -290,7 +290,7 @@ Mesh* get_imesh_mesh( const char* file_name )
     }
 
     MsqError err;
-    Mesh*    result = new MBMesquite::MsqIMesh( imesh_mesh, root_set, iBase_REGION, err, &fixed_tag );
+    Mesh* result = new MBMesquite::MsqIMesh( imesh_mesh, root_set, iBase_REGION, err, &fixed_tag );
     if( MSQ_CHKERR( err ) )
     {
         delete result;
@@ -303,7 +303,7 @@ Mesh* get_imesh_mesh( const char* file_name )
 
 Mesh* get_native_mesh( const char* file_name )
 {
-    MsqError  err;
+    MsqError err;
     MeshImpl* mesh = new MeshImpl;
     mesh->read_vtk( file_name, err );
     if( err )

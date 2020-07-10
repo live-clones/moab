@@ -39,9 +39,9 @@
 
 using namespace MBMesquite;
 
-std::string ScalarMultiplyQualityMetric::get_name( ) const
+std::string ScalarMultiplyQualityMetric::get_name() const
 {
-    return std::string( "Scale(" ) + mMetric->get_name( ) + ")";
+    return std::string( "Scale(" ) + mMetric->get_name() + ")";
 }
 
 void ScalarMultiplyQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles,
@@ -66,26 +66,26 @@ bool ScalarMultiplyQualityMetric::evaluate_with_indices( PatchData& pd, size_t h
 }
 
 bool ScalarMultiplyQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                          std::vector< size_t >&   indices,
+                                                          std::vector< size_t >& indices,
                                                           std::vector< Vector3D >& gradient, MsqError& err )
 {
     bool rval = mMetric->evaluate_with_gradient( pd, handle, value, indices, gradient, err );
     value *= mScale;
-    for( std::vector< Vector3D >::iterator i = gradient.begin( ); i != gradient.end( ); ++i )
+    for( std::vector< Vector3D >::iterator i = gradient.begin(); i != gradient.end(); ++i )
         *i *= mScale;
     return !MSQ_CHKERR( err ) && rval;
 }
 
 bool ScalarMultiplyQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                         std::vector< size_t >&   indices,
+                                                         std::vector< size_t >& indices,
                                                          std::vector< Vector3D >& gradient,
                                                          std::vector< Matrix3D >& Hessian, MsqError& err )
 {
     bool rval = mMetric->evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
     value *= mScale;
-    for( std::vector< Vector3D >::iterator i = gradient.begin( ); i != gradient.end( ); ++i )
+    for( std::vector< Vector3D >::iterator i = gradient.begin(); i != gradient.end(); ++i )
         *i *= mScale;
-    for( std::vector< Matrix3D >::iterator j = Hessian.begin( ); j != Hessian.end( ); ++j )
+    for( std::vector< Matrix3D >::iterator j = Hessian.begin(); j != Hessian.end(); ++j )
         *j *= mScale;
     return !MSQ_CHKERR( err ) && rval;
 }

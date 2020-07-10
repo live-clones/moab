@@ -52,7 +52,7 @@ class RefMeshTargetCalculator : public TargetCalculator
     {
     }
 
-    MESQUITE_EXPORT virtual ~RefMeshTargetCalculator( );
+    MESQUITE_EXPORT virtual ~RefMeshTargetCalculator();
 
     /**\brief Get a target matrix
      *
@@ -84,14 +84,14 @@ class RefMeshTargetCalculator : public TargetCalculator
     MESQUITE_EXPORT virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
                                                      MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-    virtual bool have_surface_orient( ) const
+    virtual bool have_surface_orient() const
     {
         return orient2D;
     }
 
   private:
     ReferenceMeshInterface* refMesh;
-    bool                    orient2D;
+    bool orient2D;
 };
 
 }  // namespace MBMesquite

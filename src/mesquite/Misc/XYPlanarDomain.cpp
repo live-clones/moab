@@ -32,11 +32,11 @@
 
 #include <algorithm>
 
-MBMesquite::XYPlanarDomain::~XYPlanarDomain( ) {}
+MBMesquite::XYPlanarDomain::~XYPlanarDomain() {}
 
 void MBMesquite::XYPlanarDomain::snap_to( MBMesquite::Mesh::VertexHandle /*entity_handle*/, Vector3D& coordinate ) const
 {
-    coordinate[ 2 ] = 0.0;
+    coordinate[2] = 0.0;
 }
 
 void MBMesquite::XYPlanarDomain::vertex_normal_at( MBMesquite::Mesh::VertexHandle /*entity_handle*/,
@@ -55,14 +55,14 @@ void MBMesquite::XYPlanarDomain::vertex_normal_at( const MBMesquite::Mesh::Verte
                                                    unsigned count, MBMesquite::MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
-        coords[ i ] = Vector3D( 0.0, 0.0, 1.0 );
+        coords[i] = Vector3D( 0.0, 0.0, 1.0 );
 }
 
 void MBMesquite::XYPlanarDomain::closest_point( MBMesquite::Mesh::VertexHandle, const MBMesquite::Vector3D& position,
                                                 MBMesquite::Vector3D& closest, MBMesquite::Vector3D& /*normal*/,
                                                 MBMesquite::MsqError& ) const
 {
-    closest = Vector3D( position[ 0 ], position[ 1 ], 0.0 );
+    closest = Vector3D( position[0], position[1], 0.0 );
 }
 
 void MBMesquite::XYPlanarDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,

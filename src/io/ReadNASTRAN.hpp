@@ -59,7 +59,7 @@ class ReadNASTRAN : public ReaderIface
     ReadNASTRAN( Interface* impl = NULL );
 
     // destructor
-    virtual ~ReadNASTRAN( );
+    virtual ~ReadNASTRAN();
 
     ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
                                std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
@@ -89,7 +89,7 @@ class ReadNASTRAN : public ReaderIface
 
     ErrorCode get_real( const std::string&, double& real );
 
-    ErrorCode read_node( const std::vector< std::string >& tokens, const bool debug, double* coord_arrays[ 3 ],
+    ErrorCode read_node( const std::vector< std::string >& tokens, const bool debug, double* coord_arrays[3],
                          int& node_id );
 
     ErrorCode read_element( const std::vector< std::string >& tokens, std::vector< Range >& materials,

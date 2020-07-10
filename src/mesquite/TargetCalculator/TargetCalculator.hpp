@@ -51,7 +51,7 @@ class Settings;
 class MESQUITE_EXPORT TargetCalculator
 {
   public:
-    virtual ~TargetCalculator( );
+    virtual ~TargetCalculator();
 
     //!\brief Called at start of instruction queue processing
     //!
@@ -98,7 +98,7 @@ class MESQUITE_EXPORT TargetCalculator
      * 2D target for surface elements.  In this case, get_2D_target should
      * be used.
      */
-    virtual bool have_surface_orient( ) const = 0;
+    virtual bool have_surface_orient() const = 0;
 
     /**\brief Factor some existing target or Jacobian matrix
      *
@@ -225,12 +225,12 @@ class MESQUITE_EXPORT TargetCalculator
     static MsqMatrix< 2, 2 > new_aspect_2D( double rho );
 
     /**\brief Calculate the Jacobian given element vertex coordinates */
-    static void jacobian_3D( PatchData&     pd,  // for mapping function list
+    static void jacobian_3D( PatchData& pd,  // for mapping function list
                              EntityTopology element_type, int num_nodes, Sample location, const Vector3D* coords,
                              MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
     /**\brief Calculate the Jacobian given element vertex coordinates */
-    static void jacobian_2D( PatchData&     pd,  // for mapping function list
+    static void jacobian_2D( PatchData& pd,  // for mapping function list
                              EntityTopology element_type, int num_nodes, Sample location, const Vector3D* coords,
                              MsqMatrix< 3, 2 >& W_out, MsqError& err );
 

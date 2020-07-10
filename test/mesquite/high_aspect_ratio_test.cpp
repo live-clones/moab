@@ -64,23 +64,23 @@ std::ostream& operator<<( std::ostream& str, const MeshParams& p )
 }
 
 //! Default values for parameters.
-const char       default_out_file[] = "high_aspect.vtk";
+const char default_out_file[] = "high_aspect.vtk";
 const MeshParams default_mesh = { 0.6, 0.3, 2.0, 1.0 };
-const MeshParams default_ref = { 0.5, 0.5, 1.0, 1.0 };
+const MeshParams default_ref  = { 0.5, 0.5, 1.0, 1.0 };
 
 const int INNER_ITERATES = 1;
 const int OUTER_ITERATES = 10;
 
 enum ExitCodes
 {
-    NO_ERROR = 0,
-    USAGE_ERROR = 1,
-    NOT_AT_TARGET = 2,
-    FAR_FROM_TARGET = 3,
-    WRONG_DIRECTION = 4,
+    NO_ERROR           = 0,
+    USAGE_ERROR        = 1,
+    NOT_AT_TARGET      = 2,
+    FAR_FROM_TARGET    = 3,
+    WRONG_DIRECTION    = 4,
     DEGENERATE_ELEMENT = 5,
-    INVERTED_ELEMENT = 6,
-    LAST_EXIT_CODE = INVERTED_ELEMENT
+    INVERTED_ELEMENT   = 6,
+    LAST_EXIT_CODE     = INVERTED_ELEMENT
 };
 
 void usage( const char* argv0, bool brief = true )
@@ -116,7 +116,7 @@ void usage( const char* argv0, bool brief = true )
     if( err )                                                                                           \
     {                                                                                                   \
         std::cerr << "Internal error at line " << __LINE__ << ":" << std::endl << ( err ) << std::endl; \
-        std::exit( LAST_EXIT_CODE + ( err ).error_code( ) );                                            \
+        std::exit( LAST_EXIT_CODE + ( err ).error_code() );                                             \
     }
 
 /*    |<----- x ----->|
@@ -147,17 +147,17 @@ std::string base_name( std::string filename );
 
 int main( int argc, char* argv[] )
 {
-    MeshParams                             input_params, reference_params;
-    bool                                   fixed_boundary_vertices, feas_newt_solver;
+    MeshParams input_params, reference_params;
+    bool fixed_boundary_vertices, feas_newt_solver;
     TerminationCriterion::TimeStepFileType write_timestep_files;
-    std::string                            output_file_name;
-    int                                    num_iterations;
+    std::string output_file_name;
+    int num_iterations;
 
     parse_options( argv, argc, input_params, reference_params, output_file_name, fixed_boundary_vertices,
                    write_timestep_files, feas_newt_solver, num_iterations );
 
-    MsqError    err;
-    MeshImpl    mesh, refmesh;
+    MsqError err;
+    MeshImpl mesh, refmesh;
     XYRectangle domain( input_params.w, input_params.h );
     create_input_mesh( input_params, fixed_boundary_vertices, mesh, err );
     CHECKERR
@@ -166,27 +166,27 @@ int main( int argc, char* argv[] )
     domain.setup( &mesh, err );
     CHECKERR
 
-    ReferenceMesh           rmesh( &refmesh );
+    ReferenceMesh rmesh( &refmesh );
     RefMeshTargetCalculator tc( &rmesh );
-    TShapeB1                tm;
-    TQualityMetric          qm( &tc, &tm );
+    TShapeB1 tm;
+    TQualityMetric qm( &tc, &tm );
 
-    PMeanPTemplate    of( 1.0, &qm );
+    PMeanPTemplate of( 1.0, &qm );
     ConjugateGradient cg( &of );
-    cg.use_element_on_vertex_patch( );
+    cg.use_element_on_vertex_patch();
     FeasibleNewton fn( &of );
-    fn.use_element_on_vertex_patch( );
+    fn.use_element_on_vertex_patch();
     VertexMover* solver = feas_newt_solver ? (VertexMover*)&fn : (VertexMover*)&cg;
 
     TerminationCriterion inner, outer;
     inner.add_iteration_limit( INNER_ITERATES );
     outer.add_iteration_limit( num_iterations );
     if( write_timestep_files != TerminationCriterion::NOTYPE )
-        outer.write_mesh_steps( base_name( output_file_name ).c_str( ), write_timestep_files );
+        outer.write_mesh_steps( base_name( output_file_name ).c_str(), write_timestep_files );
     solver->set_inner_termination_criterion( &inner );
     solver->set_outer_termination_criterion( &outer );
 
-    QualityAssessor  qa( &qm );
+    QualityAssessor qa( &qm );
     InstructionQueue q;
     q.add_quality_assessor( &qa, err );
     q.set_master_quality_improver( solver, err );
@@ -196,7 +196,7 @@ int main( int argc, char* argv[] )
     q.run_instructions( &mesh_and_domain, err );
     CHECKERR
 
-    mesh.write_vtk( output_file_name.c_str( ), err );
+    mesh.write_vtk( output_file_name.c_str(), err );
     CHECKERR
 
     // check for inverted elements
@@ -216,55 +216,55 @@ int main( int argc, char* argv[] )
     // find the free vertex
     std::vector< Mesh::VertexHandle > vertices;
     mesh.get_all_vertices( vertices, err );
-    if( vertices.empty( ) )
+    if( vertices.empty() )
     {
         std::cerr << "Mesh contains no vertices" << std::endl;
         return USAGE_ERROR;
     }
-    std::vector< unsigned short > dof( vertices.size( ), 0 );
-    domain.domain_DoF( arrptr( vertices ), arrptr( dof ), vertices.size( ), err );
+    std::vector< unsigned short > dof( vertices.size(), 0 );
+    domain.domain_DoF( arrptr( vertices ), arrptr( dof ), vertices.size(), err );
     CHECKERR
-    int                      idx = std::find( dof.begin( ), dof.end( ), 2 ) - dof.begin( );
-    const Mesh::VertexHandle free_vertex = vertices[ idx ];
-    MsqVertex                coords;
+    int idx                              = std::find( dof.begin(), dof.end(), 2 ) - dof.begin();
+    const Mesh::VertexHandle free_vertex = vertices[idx];
+    MsqVertex coords;
     mesh.vertices_get_coordinates( &free_vertex, &coords, 1, err );
     CHECKERR
 
     // calculate optimal position for vertex
     const double xf = reference_params.x / reference_params.w;
     const double yf = reference_params.y / reference_params.h;
-    Vector3D     expect( xf * input_params.w, yf * input_params.h, 0 );
+    Vector3D expect( xf * input_params.w, yf * input_params.h, 0 );
 
     // Test that we aren't further from the expected location
     // than when we started.
     const Vector3D init( input_params.x, input_params.y, 0 );
-    if( ( coords - expect ).length( ) > ( init - expect ).length( ) )
+    if( ( coords - expect ).length() > ( init - expect ).length() )
     {
         std::cerr << "Vertex moved away from expected optimal position: "
-                  << "(" << coords[ 0 ] << ", " << coords[ 1 ] << std::endl;
+                  << "(" << coords[0] << ", " << coords[1] << std::endl;
         return WRONG_DIRECTION;
     }
 
     // check if vertex moved MIN_FRACT of the way from the original position
     // to the desired one in the allowed iterations
     const double MIN_FRACT = 0.2;  // 20% of the way in 10 iterations
-    const double fract = ( coords - init ).length( ) / ( expect - init ).length( );
+    const double fract     = ( coords - init ).length() / ( expect - init ).length();
     if( fract < MIN_FRACT )
     {
         std::cerr << "Vertex far from optimimal location" << std::endl
-                  << "  Expected: (" << expect[ 0 ] << ", " << expect[ 1 ] << ", " << expect[ 2 ] << ")" << std::endl
-                  << "  Actual:   (" << coords[ 0 ] << ", " << coords[ 1 ] << ", " << coords[ 2 ] << ")" << std::endl;
+                  << "  Expected: (" << expect[0] << ", " << expect[1] << ", " << expect[2] << ")" << std::endl
+                  << "  Actual:   (" << coords[0] << ", " << coords[1] << ", " << coords[2] << ")" << std::endl;
         return FAR_FROM_TARGET;
     }
 
     // check if vertex is at destired location
     const double EPS = 5e-2;  // allow a little leway
-    if( fabs( coords[ 0 ] - expect[ 0 ] ) > EPS * input_params.w ||
-        fabs( coords[ 1 ] - expect[ 1 ] ) > EPS * input_params.h || fabs( expect[ 2 ] ) > EPS )
+    if( fabs( coords[0] - expect[0] ) > EPS * input_params.w || fabs( coords[1] - expect[1] ) > EPS * input_params.h ||
+        fabs( expect[2] ) > EPS )
     {
         std::cerr << "Vertex not at optimimal location" << std::endl
-                  << "  Expected: (" << expect[ 0 ] << ", " << expect[ 1 ] << ", " << expect[ 2 ] << ")" << std::endl
-                  << "  Actual:   (" << coords[ 0 ] << ", " << coords[ 1 ] << ", " << coords[ 2 ] << ")" << std::endl;
+                  << "  Expected: (" << expect[0] << ", " << expect[1] << ", " << expect[2] << ")" << std::endl
+                  << "  Actual:   (" << coords[0] << ", " << coords[1] << ", " << coords[2] << ")" << std::endl;
         return NOT_AT_TARGET;
     }
 
@@ -294,13 +294,13 @@ void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, s
                     bool& feas_newt_solver, int& num_iterations )
 {
     // begin with defaults
-    mesh = default_mesh;
-    ref = default_ref;
-    output_file = default_out_file;
-    fixed_boundary = false;
-    write_timesteps = TerminationCriterion::NOTYPE;
+    mesh             = default_mesh;
+    ref              = default_ref;
+    output_file      = default_out_file;
+    fixed_boundary   = false;
+    write_timesteps  = TerminationCriterion::NOTYPE;
     feas_newt_solver = false;
-    num_iterations = OUTER_ITERATES;
+    num_iterations   = OUTER_ITERATES;
 
     // parse CLI args
     ParseState state = OPEN;
@@ -309,35 +309,35 @@ void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, s
         switch( state )
         {
             case EXPECTING_M:
-                parse_mesh_params( argv[ 0 ], argv[ i ], mesh );
+                parse_mesh_params( argv[0], argv[i], mesh );
                 state = OPEN;
                 break;
             case EXPECTING_R:
-                parse_mesh_params( argv[ 0 ], argv[ i ], ref );
+                parse_mesh_params( argv[0], argv[i], ref );
                 state = OPEN;
                 break;
             case EXPECTING_O:
-                output_file = argv[ i ];
-                state = OPEN;
+                output_file = argv[i];
+                state       = OPEN;
                 break;
             case EXPECTING_I:
-                num_iterations = atoi( argv[ i ] );
-                state = OPEN;
+                num_iterations = atoi( argv[i] );
+                state          = OPEN;
                 break;
             case OPEN:
-                if( argv[ i ][ 0 ] != '-' || argv[ i ][ 1 ] == '\0' || argv[ i ][ 2 ] != '\0' )
+                if( argv[i][0] != '-' || argv[i][1] == '\0' || argv[i][2] != '\0' )
                 {
-                    std::cerr << "Unexpected argument: \"" << argv[ i ] << '"' << std::endl;
-                    usage( argv[ 0 ] );
+                    std::cerr << "Unexpected argument: \"" << argv[i] << '"' << std::endl;
+                    usage( argv[0] );
                 }
 
-                switch( argv[ i ][ 1 ] )
+                switch( argv[i][1] )
                 {
                     default:
-                        usage( argv[ 0 ], true );
+                        usage( argv[0], true );
                         break;
                     case 'h':
-                        usage( argv[ 0 ], false );
+                        usage( argv[0], false );
                         break;
                     case 'o':
                         state = EXPECTING_O;
@@ -376,13 +376,13 @@ void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, s
 }
 
 const char* temp_file = "high_aspect_input.vtk";
-void        create_input_mesh( const MeshParams& p, bool all_fixed, MeshImpl& mesh, MsqError& err )
+void create_input_mesh( const MeshParams& p, bool all_fixed, MeshImpl& mesh, MsqError& err )
 {
-    const double  z = 0;
-    const int     F = all_fixed;
+    const double z = 0;
+    const int F    = all_fixed;
     std::ofstream vtkfile( temp_file );
-    double        bx = all_fixed ? 0.5 * p.w : p.x;
-    double        by = all_fixed ? 0.5 * p.h : p.y;
+    double bx = all_fixed ? 0.5 * p.w : p.x;
+    double by = all_fixed ? 0.5 * p.h : p.y;
     vtkfile << "# vtk DataFile Version 3.0" << std::endl
             << "Mesquite High Aspect Ratio test" << std::endl
             << "ASCII" << std::endl
@@ -410,7 +410,7 @@ void        create_input_mesh( const MeshParams& p, bool all_fixed, MeshImpl& me
             << "1 " << F << " 1" << std::endl
             << F << " 0 " << F << std::endl
             << "1 " << F << " 1" << std::endl;
-    vtkfile.close( );
+    vtkfile.close();
     mesh.read_vtk( temp_file, err );
     std::remove( temp_file );MSQ_CHKERR( err );
 }

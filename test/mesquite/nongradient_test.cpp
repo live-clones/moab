@@ -58,10 +58,10 @@
 
 using namespace MBMesquite;
 
-int main( )
+int main()
 {
     MsqPrintError err( std::cout );
-    PlanarDomain  xyPlane( PlanarDomain::XY, -5 );
+    PlanarDomain xyPlane( PlanarDomain::XY, -5 );
 
 #define FILE_NAME1 "bad_circle_tri.vtk"
 #define FILE_NAME2 "tangled_tri.vtk"
@@ -71,7 +71,7 @@ int main( )
     // Barrier / Max Objective Function Test
 
     MBMesquite::MeshImpl mesh_max;
-    mesh_max.read_vtk( file_name1.c_str( ), err );
+    mesh_max.read_vtk( file_name1.c_str(), err );
     if( err )
     {
         std::cerr << "NonGradient Barrier test: failed to read file." << std::endl;
@@ -80,28 +80,28 @@ int main( )
 
     IdealShapeTarget target_max;
 
-    TShapeB1       mu;
+    TShapeB1 mu;
     TQualityMetric tqMetric_max( &target_max, &mu );
-    ElemSampleQM*  sampleMetric( &tqMetric_max );
-    ElementMaxQM   maxMetric( &tqMetric_max );
-    ElementPMeanP  meanpMetric( 1.0, sampleMetric );
+    ElemSampleQM* sampleMetric( &tqMetric_max );
+    ElementMaxQM maxMetric( &tqMetric_max );
+    ElementPMeanP meanpMetric( 1.0, sampleMetric );
 
     MaxTemplate maxObjFunction( &maxMetric );  // max(max)
-    NonGradient max_opt( &maxObjFunction );  // optimization procedure
+    NonGradient max_opt( &maxObjFunction );    // optimization procedure
 
     PMeanPTemplate pmeanpObjFunction( 1.0, sampleMetric );
-    NonGradient    pmeanp_opt( &pmeanpObjFunction );
+    NonGradient pmeanp_opt( &pmeanpObjFunction );
 
     LPtoPTemplate PtoPObjMaxfunction( &maxMetric, (short int)1.0, err );  // max(max)
 
     // Processing for Max Objective Function
 
     max_opt.setSimplexDiameterScale( 0 );
-    max_opt.use_element_on_vertex_patch( );  // local patch
+    max_opt.use_element_on_vertex_patch();  // local patch
     max_opt.set_debugging_level( 0 );
 
     // Construct and register the Quality Assessor instances
-    QualityAssessor max_initial_qa = QualityAssessor( &maxMetric, 10 );
+    QualityAssessor max_initial_qa        = QualityAssessor( &maxMetric, 10 );
     QualityAssessor maxObj_max_optimal_qa = QualityAssessor( &maxMetric, 10 );
 
     //**************Set stopping criterion****************
@@ -113,9 +113,9 @@ int main( )
     max_opt.set_inner_termination_criterion( &innerTC );
 
     // test for barrier violation
-    PlanarDomain         xyPlane2( PlanarDomain::XY, 5 );
+    PlanarDomain xyPlane2( PlanarDomain::XY, 5 );
     MBMesquite::MeshImpl mesh_bv;
-    mesh_bv.read_vtk( file_name2.c_str( ), err );
+    mesh_bv.read_vtk( file_name2.c_str(), err );
     if( err )
     {
         std::cerr << "NonGradient Barrier Violation test: failed to read file." << std::endl;
@@ -139,28 +139,28 @@ int main( )
     // Non-Barrier / Ave Objective Function Test
 
     MBMesquite::MeshImpl mesh_mean;
-    mesh_mean.read_vtk( file_name1.c_str( ), err );
+    mesh_mean.read_vtk( file_name1.c_str(), err );
     if( err )
     {
         std::cerr << "NonGradient Non-barrier test: failed to read file." << std::endl;
         return 1;
     }
 
-    TShapeNB1         nonBarrier;
+    TShapeNB1 nonBarrier;
     TargetCalculator* target;
-    IdealShapeTarget  ident_target;
+    IdealShapeTarget ident_target;
 
     target = &ident_target;
 
     TQualityMetric tqMetric( target, &nonBarrier );
 
-    ElementPMeanP  mean_metric( 1.0, &tqMetric );
+    ElementPMeanP mean_metric( 1.0, &tqMetric );
     PMeanPTemplate meanObjfunction( 1.0, &mean_metric );  // ave(ave)
 
     // Processing for Mean Objective Function
-    NonGradient mean_opt( &meanObjfunction );  // optimization procedure
+    NonGradient mean_opt( &meanObjfunction );   // optimization procedure
     mean_opt.setExactPenaltyFunction( false );  // allow infeasible
-    mean_opt.use_element_on_vertex_patch( );  // local patch
+    mean_opt.use_element_on_vertex_patch();     // local patch
 
     // Set Termination Criteria
     TerminationCriterion innerTC_mean, outerTC_mean;
@@ -192,10 +192,10 @@ int main( )
     if( err ) return 1;
     MBMesquite::MeshDomainAssoc mesh_and_domain2 = MeshDomainAssoc( &mesh_bv, &xyPlane2 );
     queue3.run_instructions( &mesh_and_domain2, err );
-    if( err.error_code( ) == err.BARRIER_VIOLATED )
+    if( err.error_code() == err.BARRIER_VIOLATED )
     {
         std::cerr << std::endl << "MaxTemplate OF with inverted mesh test passed" << std::endl;
-        err.clear( );
+        err.clear();
     }
     else
         return 1;
@@ -205,10 +205,10 @@ int main( )
     queue4.set_master_quality_improver( &pmeanp_opt, err );
     if( err ) return 1;
     queue4.run_instructions( &mesh_and_domain2, err );
-    if( err.error_code( ) == err.BARRIER_VIOLATED )
+    if( err.error_code() == err.BARRIER_VIOLATED )
     {
         std::cerr << std::endl << "PMeanPTemplate OF with inverted mesh test passed" << std::endl << std::endl;
-        err.clear( );
+        err.clear();
     }
     else
         return 1;

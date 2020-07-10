@@ -53,21 +53,21 @@ class CompositeMetricTestBase : public CppUnit::TestFixture
 
   protected:
     QualityMetricTester tester;
-    QualityMetric*      mMetric;
-    virtual bool        evaluate( PatchData&, size_t, double&, MsqError& ) = 0;
+    QualityMetric* mMetric;
+    virtual bool evaluate( PatchData&, size_t, double&, MsqError& ) = 0;
 
   public:
-    CompositeMetricTestBase( ) : tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ), mMetric( 0 )
+    CompositeMetricTestBase() : tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ), mMetric( 0 )
     {
         tester.ideal_pyramid_base_equals_height( true );
     }
 
-    void test_supported_types( )
+    void test_supported_types()
     {
         tester.test_supported_element_types( mMetric );
     }
 
-    void test_ideal_element_eval( )
+    void test_ideal_element_eval()
     {
         test_evaluate( true, TRIANGLE );
         test_evaluate( true, QUADRILATERAL );
@@ -77,7 +77,7 @@ class CompositeMetricTestBase : public CppUnit::TestFixture
         test_evaluate( true, PYRAMID );
     }
 
-    void test_non_ideal_eval( )
+    void test_non_ideal_eval()
     {
         test_evaluate( false, TRIANGLE );
         test_evaluate( false, QUADRILATERAL );
@@ -87,93 +87,93 @@ class CompositeMetricTestBase : public CppUnit::TestFixture
         test_evaluate( false, PYRAMID );
     }
 
-    void test_ideal_element_grad( )
+    void test_ideal_element_grad()
     {
         tester.test_ideal_element_zero_gradient( mMetric, false );
     }
 
-    void test_ideal_element_hess( )
+    void test_ideal_element_hess()
     {
         tester.test_ideal_element_positive_definite_Hessian( mMetric, false );
     }
 
-    void test_valid_hessian( )
+    void test_valid_hessian()
     {
         tester.test_symmetric_Hessian_diagonal_blocks( mMetric );
     }
 
-    void test_measures_quality( )
+    void test_measures_quality()
     {
         tester.test_measures_quality( mMetric );
     }
 
-    void test_gradient_reflects_quality( )
+    void test_gradient_reflects_quality()
     {
         tester.test_gradient_reflects_quality( mMetric );
     }
 
-    void test_domain_deviation( )
+    void test_domain_deviation()
     {
         tester.test_domain_deviation_quality( mMetric );
         tester.test_domain_deviation_gradient( mMetric );
     }
 
-    void test_inverted_elements( )
+    void test_inverted_elements()
     {
         tester.test_evaluate_inverted_element( mMetric, false );
     }
 
-    void test_degenerate_elements( )
+    void test_degenerate_elements()
     {
         tester.test_evaluate_degenerate_element( mMetric, false );
     }
 
-    void test_get_evaluations( )
+    void test_get_evaluations()
     {
         tester.test_get_element_evaluations( mMetric );
     }
 
-    void test_get_element_indices( )
+    void test_get_element_indices()
     {
         tester.test_get_element_indices( mMetric );
     }
 
-    void test_get_fixed_indices( )
+    void test_get_fixed_indices()
     {
         tester.test_get_indices_fixed( mMetric );
     }
 
-    void test_eval_with_indices( )
+    void test_eval_with_indices()
     {
         tester.compare_eval_and_eval_with_indices( mMetric );
     }
 
-    void test_eval_with_gradient( )
+    void test_eval_with_gradient()
     {
         tester.compare_eval_with_indices_and_eval_with_gradient( mMetric );
         tester.compare_analytical_and_numerical_gradients( mMetric );
     }
 
-    void test_eval_with_hessian( )
+    void test_eval_with_hessian()
     {
         tester.compare_eval_with_indices_and_eval_with_hessian( mMetric );
         tester.compare_eval_with_grad_and_eval_with_hessian( mMetric );
         tester.compare_analytical_and_numerical_hessians( mMetric );
     }
 
-    void test_location_invariant( )
+    void test_location_invariant()
     {
         tester.test_location_invariant( mMetric );
         tester.test_grad_location_invariant( mMetric );
         tester.test_hessian_location_invariant( mMetric );
     }
 
-    void test_scale_invariant( )
+    void test_scale_invariant()
     {
         tester.test_scale_invariant( mMetric );
     }
 
-    void test_orient_invariant( )
+    void test_orient_invariant()
     {
         tester.test_orient_invariant( mMetric );
         tester.test_grad_orient_invariant( mMetric );
@@ -183,9 +183,9 @@ class CompositeMetricTestBase : public CppUnit::TestFixture
 void CompositeMetricTestBase::test_evaluate( bool ideal, EntityTopology type )
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
-    double        act, ex;
-    bool          rval;
+    PatchData pd;
+    double act, ex;
+    bool rval;
 
     if( ideal )
         tester.get_ideal_element( type, false, pd, false );
@@ -221,23 +221,23 @@ class AddQualityMetricTest : public CompositeMetricTestBase
     CPPUNIT_TEST( test_eval_with_indices );
     CPPUNIT_TEST( test_eval_with_gradient );
     CPPUNIT_TEST( test_eval_with_hessian );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
-    MsqError                    mErr;
+    MsqError mErr;
     IdealWeightInverseMeanRatio m1;
     IdealWeightInverseMeanRatio m2;
-    AddQualityMetric            m;
+    AddQualityMetric m;
 
   protected:
     virtual bool evaluate( PatchData&, size_t, double&, MsqError& );
 
   public:
-    AddQualityMetricTest( ) : m2( mErr, 2.0 ), m( &m1, &m2, mErr )
+    AddQualityMetricTest() : m2( mErr, 2.0 ), m( &m1, &m2, mErr )
     {
         mMetric = &m;
     }
-    void setUp( )
+    void setUp()
     {
         CPPUNIT_ASSERT( !mErr );
     }
@@ -246,7 +246,7 @@ class AddQualityMetricTest : public CompositeMetricTestBase
 bool AddQualityMetricTest::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     double v1, v2;
-    bool   rval = true, rval1;
+    bool rval = true, rval1;
 
     rval1 = m1.evaluate( pd, h, v1, err );
     MSQ_ERRFALSE( err );
@@ -282,22 +282,22 @@ class MultiplyQualityMetricTest : public CompositeMetricTestBase
     CPPUNIT_TEST( test_eval_with_indices );
     CPPUNIT_TEST( test_eval_with_gradient );
     CPPUNIT_TEST( test_eval_with_hessian );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
-    MsqError                    mErr;
+    MsqError mErr;
     IdealWeightInverseMeanRatio m1;
     IdealWeightInverseMeanRatio m2;
-    MultiplyQualityMetric       m;
+    MultiplyQualityMetric m;
 
   protected:
     virtual bool evaluate( PatchData&, size_t, double&, MsqError& );
 
   public:
-    MultiplyQualityMetricTest( ) : m2( mErr, 2.0 ), m( &m1, &m2, mErr )
+    MultiplyQualityMetricTest() : m2( mErr, 2.0 ), m( &m1, &m2, mErr )
     {
         mMetric = &m;
     }
-    void setUp( )
+    void setUp()
     {
         CPPUNIT_ASSERT( !mErr );
     }
@@ -306,7 +306,7 @@ class MultiplyQualityMetricTest : public CompositeMetricTestBase
 bool MultiplyQualityMetricTest::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     double v1, v2;
-    bool   rval = true, rval1;
+    bool rval = true, rval1;
 
     rval1 = m1.evaluate( pd, h, v1, err );
     MSQ_ERRFALSE( err );
@@ -324,7 +324,8 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MultiplyQualityMetricTest, "CompositeMetr
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MultiplyQualityMetricTest, "MultiplyQualityMetricTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MultiplyQualityMetricTest, "Unit" );
 
-template< int POWER > class PowerQualityMetricTest : public CompositeMetricTestBase
+template < int POWER >
+class PowerQualityMetricTest : public CompositeMetricTestBase
 {
   private:
     CPPUNIT_TEST_SUITE( PowerQualityMetricTest< POWER > );
@@ -342,22 +343,22 @@ template< int POWER > class PowerQualityMetricTest : public CompositeMetricTestB
     CPPUNIT_TEST( test_eval_with_indices );
     CPPUNIT_TEST( test_eval_with_gradient );
     CPPUNIT_TEST( test_eval_with_hessian );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     IdealWeightInverseMeanRatio m1;
-    PowerQualityMetric          m;
+    PowerQualityMetric m;
 
   protected:
     virtual bool evaluate( PatchData&, size_t, double&, MsqError& );
 
   public:
-    PowerQualityMetricTest( ) : m( &m1, POWER )
+    PowerQualityMetricTest() : m( &m1, POWER )
     {
         mMetric = &m;
     }
 };
 
-template< int POWER >
+template < int POWER >
 bool PowerQualityMetricTest< POWER >::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     bool rval = m1.evaluate( pd, h, val, err );
@@ -373,7 +374,8 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PowerQualityMetricTest< 2 >, "PowerQualit
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PowerQualityMetricTest< 1 >, "Unit" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PowerQualityMetricTest< 2 >, "Unit" );
 
-template< int OFFSET > class ScalarAddMetricTest : public CompositeMetricTestBase
+template < int OFFSET >
+class ScalarAddMetricTest : public CompositeMetricTestBase
 {
   private:
     CPPUNIT_TEST_SUITE( ScalarAddMetricTest< OFFSET > );
@@ -391,22 +393,22 @@ template< int OFFSET > class ScalarAddMetricTest : public CompositeMetricTestBas
     CPPUNIT_TEST( test_eval_with_indices );
     CPPUNIT_TEST( test_eval_with_gradient );
     CPPUNIT_TEST( test_eval_with_hessian );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     IdealWeightInverseMeanRatio m1;
-    ScalarAddQualityMetric      m;
+    ScalarAddQualityMetric m;
 
   protected:
     virtual bool evaluate( PatchData&, size_t, double&, MsqError& );
 
   public:
-    ScalarAddMetricTest( ) : m( &m1, OFFSET )
+    ScalarAddMetricTest() : m( &m1, OFFSET )
     {
         mMetric = &m;
     }
 };
 
-template< int OFFSET >
+template < int OFFSET >
 bool ScalarAddMetricTest< OFFSET >::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     bool rval = m1.evaluate( pd, h, val, err );
@@ -422,7 +424,8 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( ScalarAddMetricTest< 2 >, "ScalarAddMetri
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( ScalarAddMetricTest< 0 >, "Unit" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( ScalarAddMetricTest< 2 >, "Unit" );
 
-template< int SCALE > class ScalarMultiplyMetricTest : public CompositeMetricTestBase
+template < int SCALE >
+class ScalarMultiplyMetricTest : public CompositeMetricTestBase
 {
   private:
     CPPUNIT_TEST_SUITE( ScalarMultiplyMetricTest< SCALE > );
@@ -440,7 +443,7 @@ template< int SCALE > class ScalarMultiplyMetricTest : public CompositeMetricTes
     CPPUNIT_TEST( test_eval_with_indices );
     CPPUNIT_TEST( test_eval_with_gradient );
     CPPUNIT_TEST( test_eval_with_hessian );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     IdealWeightInverseMeanRatio m1;
     ScalarMultiplyQualityMetric m;
@@ -449,13 +452,13 @@ template< int SCALE > class ScalarMultiplyMetricTest : public CompositeMetricTes
     virtual bool evaluate( PatchData&, size_t, double&, MsqError& );
 
   public:
-    ScalarMultiplyMetricTest( ) : m( &m1, SCALE )
+    ScalarMultiplyMetricTest() : m( &m1, SCALE )
     {
         mMetric = &m;
     }
 };
 
-template< int SCALE >
+template < int SCALE >
 bool ScalarMultiplyMetricTest< SCALE >::evaluate( PatchData& pd, size_t h, double& val, MsqError& err )
 {
     bool rval = m1.evaluate( pd, h, val, err );

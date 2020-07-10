@@ -45,7 +45,7 @@ typedef unsigned __int32 uint32_t;
 #endif
 #else /* posix */
 #include <unistd.h>
-#define _S_IREAD ( S_IRUSR | S_IRGRP | S_IROTH )
+#define _S_IREAD  ( S_IRUSR | S_IRGRP | S_IROTH )
 #define _S_IWRITE ( S_IWUSR | S_IWGRP | S_IWOTH )
 #endif
 
@@ -61,7 +61,7 @@ WriteSTL::WriteSTL( Interface* impl ) : mbImpl( impl )
     impl->query_interface( mWriteIface );
 }
 
-WriteSTL::~WriteSTL( )
+WriteSTL::~WriteSTL()
 {
     mbImpl->release_interface( mWriteIface );
 }
@@ -71,8 +71,8 @@ ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite, con
                                 const std::vector< std::string >& qa_list, const Tag* tag_list, int num_tags,
                                 int /* export_dimension */ )
 {
-    char      header[ 81 ];
-    Range     triangles;
+    char header[81];
+    Range triangles;
     ErrorCode rval;
 
     if( tag_list && num_tags ) { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "STL file does not support tag data" ); }
@@ -83,7 +83,7 @@ ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite, con
     rval = get_triangles( ent_handles, num_sets, triangles );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( triangles.empty( ) ) { MB_SET_ERR( MB_ENTITY_NOT_FOUND, "No triangles to write" ); }
+    if( triangles.empty() ) { MB_SET_ERR( MB_ENTITY_NOT_FOUND, "No triangles to write" ); }
 
     bool is_ascii = false, is_binary = false;
     if( MB_SUCCESS == opts.get_null_option( "ASCII" ) ) is_ascii = true;
@@ -149,20 +149,20 @@ FILE* WriteSTL::open_file( const char* name, bool overwrite, bool binary )
     return result;
 }
 
-ErrorCode WriteSTL::make_header( char header[ 81 ], const std::vector< std::string >& qa_list )
+ErrorCode WriteSTL::make_header( char header[81], const std::vector< std::string >& qa_list )
 {
     memset( header, 0, 81 );
 
     std::string result;
-    for( std::vector< std::string >::const_iterator i = qa_list.begin( ); i != qa_list.end( ); ++i )
+    for( std::vector< std::string >::const_iterator i = qa_list.begin(); i != qa_list.end(); ++i )
     {
         result += " ";
         result += *i;
     }
 
-    size_t len = result.size( );
+    size_t len = result.size();
     if( len > 80 ) len = 80;
-    memcpy( header, result.c_str( ), len );
+    memcpy( header, result.c_str(), len );
 
     return MB_SUCCESS;
 }
@@ -172,10 +172,10 @@ ErrorCode WriteSTL::get_triangles( const EntityHandle* set_array, int set_array_
     if( !set_array || 0 == set_array_length ) return mbImpl->get_entities_by_type( 0, MBTRI, triangles );
 
     const EntityHandle* iter = set_array;
-    const EntityHandle* end = iter + set_array_length;
+    const EntityHandle* end  = iter + set_array_length;
     for( ; iter != end; ++iter )
     {
-        Range     r;
+        Range r;
         ErrorCode rval = mbImpl->get_entities_by_type( *iter, MBTRI, r, true );
         if( MB_SUCCESS != rval ) return rval;
         triangles.merge( r );
@@ -184,10 +184,9 @@ ErrorCode WriteSTL::get_triangles( const EntityHandle* set_array, int set_array_
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], float v1[ 3 ], float v2[ 3 ], float v3[ 3 ],
-                                       float n[ 3 ] )
+ErrorCode WriteSTL::get_triangle_data( const double coords[9], float v1[3], float v2[3], float v3[3], float n[3] )
 {
-    CartVect  cv1, cv2, cv3, cn;
+    CartVect cv1, cv2, cv3, cn;
     ErrorCode rval = get_triangle_data( coords, cv1, cv2, cv3, cn );
     if( MB_SUCCESS != rval ) return rval;
 
@@ -199,7 +198,7 @@ ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], float v1[ 3 ], 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], CartVect& v1, CartVect& v2, CartVect& v3, CartVect& n )
+ErrorCode WriteSTL::get_triangle_data( const double coords[9], CartVect& v1, CartVect& v2, CartVect& v3, CartVect& n )
 {
     v1 = coords;
     v2 = coords + 3;
@@ -207,28 +206,28 @@ ErrorCode WriteSTL::get_triangle_data( const double coords[ 9 ], CartVect& v1, C
 
     n = ( v2 - v1 ) * ( v3 - v1 );
 
-    n.normalize( );
+    n.normalize();
 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[ 81 ], const Range& triangles, int prec )
+ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[81], const Range& triangles, int prec )
 {
     const char solid_name[] = "MOAB";
 
-    char myheader[ 81 ] = "solid ";
+    char myheader[81] = "solid ";
     strcat( myheader, solid_name );
     strncat( myheader, header, 80 );
 
     if( EOF == fputs( myheader, file ) || EOF == fputs( "\n", file ) ) return MB_FILE_WRITE_ERROR;
 
     ErrorCode rval;
-    double    coords[ 9 ];
-    CartVect  v1, v2, v3, n;
-    for( Range::const_iterator iter = triangles.begin( ); iter != triangles.end( ); ++iter )
+    double coords[9];
+    CartVect v1, v2, v3, n;
+    for( Range::const_iterator iter = triangles.begin(); iter != triangles.end(); ++iter )
     {
         const EntityHandle* conn;
-        int                 num_vtx;
+        int num_vtx;
 
         rval = mbImpl->get_connectivity( *iter, conn, num_vtx );
         if( MB_SUCCESS != rval ) return rval;
@@ -240,11 +239,11 @@ ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[ 81 ], 
         rval = get_triangle_data( coords, v1, v2, v3, n );
         if( MB_SUCCESS != rval ) return rval;
 
-        fprintf( file, "facet normal %e %e %e\n", n[ 0 ], n[ 1 ], n[ 2 ] );
+        fprintf( file, "facet normal %e %e %e\n", n[0], n[1], n[2] );
         fprintf( file, "outer loop\n" );
-        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v1[ 0 ], prec, (float)v1[ 1 ], prec, (float)v1[ 2 ] );
-        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v2[ 0 ], prec, (float)v2[ 1 ], prec, (float)v2[ 2 ] );
-        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v3[ 0 ], prec, (float)v3[ 1 ], prec, (float)v3[ 2 ] );
+        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v1[0], prec, (float)v1[1], prec, (float)v1[2] );
+        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v2[0], prec, (float)v2[1], prec, (float)v2[2] );
+        fprintf( file, "vertex %.*e %.*e %.*e\n", prec, (float)v3[0], prec, (float)v3[1], prec, (float)v3[2] );
         fprintf( file, "endloop\n" );
         fprintf( file, "endfacet\n" );
     }
@@ -255,14 +254,14 @@ ErrorCode WriteSTL::ascii_write_triangles( FILE* file, const char header[ 81 ], 
 
 struct BinTri
 {
-    float normal[ 3 ];
-    float vertex1[ 3 ];
-    float vertex2[ 3 ];
-    float vertex3[ 3 ];
-    char  pad[ 2 ];
+    float normal[3];
+    float vertex1[3];
+    float vertex2[3];
+    float vertex3[3];
+    char pad[2];
 };
 
-ErrorCode WriteSTL::binary_write_triangles( FILE* file, const char header[ 81 ], ByteOrder byte_order,
+ErrorCode WriteSTL::binary_write_triangles( FILE* file, const char header[81], ByteOrder byte_order,
                                             const Range& triangles )
 {
     ErrorCode rval;
@@ -270,23 +269,23 @@ ErrorCode WriteSTL::binary_write_triangles( FILE* file, const char header[ 81 ],
 
     // Default to little endian if byte_order == UNKNOWN_BYTE_ORDER
     const bool want_big_endian = ( byte_order == STL_BIG_ENDIAN );
-    const bool am_big_endian = !SysUtil::little_endian( );
-    const bool swap_bytes = ( want_big_endian == am_big_endian );
+    const bool am_big_endian   = !SysUtil::little_endian();
+    const bool swap_bytes      = ( want_big_endian == am_big_endian );
 
-    if( triangles.size( ) > INT_MAX )  // Can't write that many triangles
+    if( triangles.size() > INT_MAX )  // Can't write that many triangles
         return MB_FAILURE;
 
-    uint32_t count = (uint32_t)triangles.size( );
+    uint32_t count = (uint32_t)triangles.size();
     if( swap_bytes ) SysUtil::byteswap( &count, 1 );
     if( 1 != fwrite( &count, 4, 1, file ) ) return MB_FILE_WRITE_ERROR;
 
-    double coords[ 9 ];
+    double coords[9];
     BinTri tri;
-    tri.pad[ 0 ] = tri.pad[ 1 ] = '\0';
-    for( Range::const_iterator iter = triangles.begin( ); iter != triangles.end( ); ++iter )
+    tri.pad[0] = tri.pad[1] = '\0';
+    for( Range::const_iterator iter = triangles.begin(); iter != triangles.end(); ++iter )
     {
         const EntityHandle* conn;
-        int                 num_vtx;
+        int num_vtx;
 
         rval = mbImpl->get_connectivity( *iter, conn, num_vtx );
         if( MB_SUCCESS != rval ) return rval;

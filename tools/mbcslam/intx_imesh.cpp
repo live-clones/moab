@@ -23,9 +23,9 @@ int main( int argc, char* argv[] )
 {
     MPI_Init( &argc, &argv );
 
-    iMesh_Instance         imesh;
+    iMesh_Instance imesh;
     iMeshP_PartitionHandle partn;
-    int                    ierr, num_sets;
+    int ierr, num_sets;
 
     iBase_EntitySetHandle root;
     imesh = IMESH_NULL;
@@ -60,8 +60,8 @@ int main( int argc, char* argv[] )
     IMESH_ASSERT( ierr );
 
     iBase_EntityHandle* cells = NULL;
-    int                 ents_alloc = 0;
-    int                 ents_size = 0;
+    int ents_alloc            = 0;
+    int ents_size             = 0;
 
     iMesh_getEntities( imesh, root, iBase_FACE, iMesh_ALL_TOPOLOGIES, &cells, &ents_alloc, &ents_size, &ierr );
     IMESH_ASSERT( ierr );
@@ -73,14 +73,14 @@ int main( int argc, char* argv[] )
     IMESH_ASSERT( ierr );
 
     // write everything
-    const char* out_name = "out.h5m";
-    const char  optionswrite[] = " moab:PARALLEL=WRITE_PART ";
+    const char* out_name      = "out.h5m";
+    const char optionswrite[] = " moab:PARALLEL=WRITE_PART ";
     iMeshP_saveAll( imesh, partn, euler_set, out_name, optionswrite, &ierr, strlen( out_name ),
                     strlen( optionswrite ) );
     IMESH_ASSERT( ierr );
 
     if( 0 == rank ) std::cout << "Done\n";
-    MPI_Finalize( );
+    MPI_Finalize();
 
     return 0;
 }

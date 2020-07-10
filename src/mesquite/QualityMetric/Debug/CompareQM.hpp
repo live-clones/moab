@@ -63,21 +63,21 @@ class CompareQM : public QualityMetric
     void abort_on_mismatch( double tolerance_factor = 1e-6 );
 
     MESQUITE_EXPORT
-    void do_not_abort( );
+    void do_not_abort();
 
     MESQUITE_EXPORT
-    bool will_abort_on_mismatch( ) const;
+    bool will_abort_on_mismatch() const;
 
     MESQUITE_EXPORT
-    void print_stats( ) const;
+    void print_stats() const;
 
-    MESQUITE_EXPORT virtual ~CompareQM( );
+    MESQUITE_EXPORT virtual ~CompareQM();
 
-    MESQUITE_EXPORT virtual MetricType get_metric_type( ) const;
+    MESQUITE_EXPORT virtual MetricType get_metric_type() const;
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                   bool free_vertices_only, MsqError& err );
@@ -88,17 +88,17 @@ class CompareQM : public QualityMetric
                                                         std::vector< size_t >& indices, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                         std::vector< size_t >&   indices,
+                                                         std::vector< size_t >& indices,
                                                          std::vector< Vector3D >& gradient, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                                 std::vector< size_t >&      indices,
-                                                                 std::vector< Vector3D >&    gradient,
+                                                                 std::vector< size_t >& indices,
+                                                                 std::vector< Vector3D >& gradient,
                                                                  std::vector< SymMatrix3D >& Hessian_diagonal,
-                                                                 MsqError&                   err );
+                                                                 MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >&   indices,
+                                                        std::vector< size_t >& indices,
                                                         std::vector< Vector3D >& gradient,
                                                         std::vector< Matrix3D >& Hessian, MsqError& err );
 
@@ -132,27 +132,27 @@ class CompareQM : public QualityMetric
     struct GradStat
     {
         SimpleStats x, y, z;
-        void        add( Vector3D grad );
-        void        add_diff( Vector3D grad1, Vector3D grad2 );
+        void add( Vector3D grad );
+        void add_diff( Vector3D grad1, Vector3D grad2 );
     };
     struct HessStat
     {
         SimpleStats xx, xy, xz, yy, yz, zz;
-        void        add_diag( Matrix3D hess );
-        void        add_diag( SymMatrix3D hess );
-        void        add_diag_diff( Matrix3D hess1, Matrix3D hess2 );
-        void        add_diag_diff( SymMatrix3D hess1, SymMatrix3D hess2 );
-        void        add_nondiag( Matrix3D hess );
-        void        add_nondiag_diff( Matrix3D hess1, Matrix3D hess2 );
+        void add_diag( Matrix3D hess );
+        void add_diag( SymMatrix3D hess );
+        void add_diag_diff( Matrix3D hess1, Matrix3D hess2 );
+        void add_diag_diff( SymMatrix3D hess1, SymMatrix3D hess2 );
+        void add_nondiag( Matrix3D hess );
+        void add_nondiag_diff( Matrix3D hess1, Matrix3D hess2 );
     };
 
-    std::string    primaryName, otherName;
+    std::string primaryName, otherName;
     QualityMetric *primaryMetric, *otherMetric;
-    bool           abortOnMismatch;
-    double         toleranceFactor;
-    SimpleStats    valPrimary, valOther, valDiff;
-    GradStat       gradPrimary, gradOther, gradDiff;
-    HessStat       hessPrimary, hessOther, hessDiff;
+    bool abortOnMismatch;
+    double toleranceFactor;
+    SimpleStats valPrimary, valOther, valDiff;
+    GradStat gradPrimary, gradOther, gradDiff;
+    HessStat hessPrimary, hessOther, hessDiff;
 };
 
 }  // namespace MBMesquite

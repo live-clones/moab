@@ -8,29 +8,29 @@
 #include "moab_mpi.h"
 #endif
 
-void test_flag_opt_short( );
-void test_flag_opt_long_short( );
-void test_flag_opt_long( );
-void test_flag_cancel( );
-void test_flag_store_false( );
+void test_flag_opt_short();
+void test_flag_opt_long_short();
+void test_flag_opt_long();
+void test_flag_cancel();
+void test_flag_store_false();
 
-void test_int_opt( );
-void test_int_arg( );
+void test_int_opt();
+void test_int_arg();
 
-void test_real_opt( );
-void test_real_arg( );
+void test_real_opt();
+void test_real_arg();
 
-void test_string_opt( );
-void test_string_arg( );
-void test_string_rank_subst( );
+void test_string_opt();
+void test_string_arg();
+void test_string_rank_subst();
 
-void test_int_vect_opt( );
-void test_int_vect_arg( );
-void test_optional_args( );
-void test_optional_arg( );
-void test_squashed_short( );
+void test_int_vect_opt();
+void test_int_vect_arg();
+void test_optional_args();
+void test_optional_arg();
+void test_squashed_short();
 
-#define ARGCV( A ) ( sizeof( A ) / sizeof( A[ 0 ] ) ), const_cast< char** >( A )
+#define ARGCV( A ) ( sizeof( A ) / sizeof( A[0] ) ), const_cast< char** >( A )
 
 int main( int argc, char* argv[] )
 {
@@ -67,15 +67,15 @@ int main( int argc, char* argv[] )
 #endif
     int result = RUN_TESTS( argc, argv );
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
     return result;
 }
 
-void test_flag_opt_short( )
+void test_flag_opt_short()
 {
     ProgOptions opts1;
-    bool        value1 = false;
+    bool value1 = false;
     opts1.addOpt< void >( ",s", "short opt", &value1 );
     const char* argv1[] = { "prog", "-s" };
     opts1.parseCommandLine( ARGCV( argv1 ) );
@@ -83,10 +83,10 @@ void test_flag_opt_short( )
     CHECK_EQUAL( 1, opts1.numOptSet( ",s" ) );
 }
 
-void test_flag_opt_long_short( )
+void test_flag_opt_long_short()
 {
     ProgOptions opts2;
-    bool        value = false;
+    bool value = false;
     opts2.addOpt< void >( "long,l", "long opt", &value );
     const char* argv2[] = { "prog", "-l", "-l" };
     opts2.parseCommandLine( ARGCV( argv2 ) );
@@ -96,10 +96,10 @@ void test_flag_opt_long_short( )
     CHECK_EQUAL( 2, opts2.numOptSet( "long" ) );
 }
 
-void test_flag_opt_long( )
+void test_flag_opt_long()
 {
     ProgOptions opts3;
-    bool        value = false;
+    bool value = false;
     opts3.addOpt< void >( "long,l", "long opt", &value );
     const char* argv3[] = { "prog", "--long", "--long" };
     opts3.parseCommandLine( ARGCV( argv3 ) );
@@ -109,10 +109,10 @@ void test_flag_opt_long( )
     CHECK_EQUAL( 2, opts3.numOptSet( "long" ) );
 }
 
-void test_flag_cancel( )
+void test_flag_cancel()
 {
     ProgOptions opts1;
-    bool        value = false;
+    bool value = false;
     opts1.addOpt< void >( "flag", "my flag", &value, ProgOptions::add_cancel_opt );
     const char* argv1[] = { "test", "--flag" };
     opts1.parseCommandLine( ARGCV( argv1 ) );
@@ -133,20 +133,20 @@ void test_flag_cancel( )
     CHECK( value );
 }
 
-void test_flag_store_false( )
+void test_flag_store_false()
 {
     ProgOptions opts1;
-    bool        value1 = true;
+    bool value1 = true;
     opts1.addOpt< void >( ",s", "short opt", &value1, ProgOptions::store_false );
     const char* argv1[] = { "prog", "-s" };
     opts1.parseCommandLine( ARGCV( argv1 ) );
     CHECK( !value1 );
 }
 
-void test_int_opt( )
+void test_int_opt()
 {
     ProgOptions opts;
-    int         val1 = -1;
+    int val1 = -1;
     opts.addOpt( "long,s", "my int opt", &val1 );
     const char* argv[] = { "test", "-s", "2", "--long", "-0xA", "--long=5" };
     opts.parseCommandLine( ARGCV( argv ) );
@@ -162,16 +162,16 @@ void test_int_opt( )
     CHECK_EQUAL( 5, val2 );
     std::vector< int > list;
     opts.getOptAllArgs( ",s", list );
-    CHECK_EQUAL( (size_t)3, list.size( ) );
-    CHECK_EQUAL( 2, list[ 0 ] );
-    CHECK_EQUAL( -10, list[ 1 ] );
-    CHECK_EQUAL( 5, list[ 2 ] );
+    CHECK_EQUAL( (size_t)3, list.size() );
+    CHECK_EQUAL( 2, list[0] );
+    CHECK_EQUAL( -10, list[1] );
+    CHECK_EQUAL( 5, list[2] );
 }
 
-void test_int_arg( )
+void test_int_arg()
 {
     ProgOptions opts;
-    int         val1 = 5;
+    int val1 = 5;
     opts.addRequiredArg( "arg", "my test arg", &val1 );
     opts.addRequiredArg< int >( "arg2", "my other test arg" );
     const char* argv[] = { "test", "--", "-1", "-010" };
@@ -181,11 +181,11 @@ void test_int_arg( )
     CHECK_EQUAL( -1, opts.getReqArg< int >( "arg" ) );
 }
 
-void test_real_opt( )
+void test_real_opt()
 {
-    const double EPS = std::numeric_limits< double >::epsilon( );
-    ProgOptions  opts;
-    double       val1 = -1;
+    const double EPS = std::numeric_limits< double >::epsilon();
+    ProgOptions opts;
+    double val1 = -1;
     opts.addOpt( "long,s", "my real opt", &val1 );
     const char* argv[] = { "test", "-s", "2", "--long", "2e5", "--long=-0.01" };
     opts.parseCommandLine( ARGCV( argv ) );
@@ -201,17 +201,17 @@ void test_real_opt( )
     CHECK_REAL_EQUAL( -0.01, val2, EPS );
     std::vector< double > list;
     opts.getOptAllArgs( ",s", list );
-    CHECK_EQUAL( (size_t)3, list.size( ) );
-    CHECK_REAL_EQUAL( 2, list[ 0 ], EPS );
-    CHECK_REAL_EQUAL( 2e5, list[ 1 ], EPS );
-    CHECK_REAL_EQUAL( -0.01, list[ 2 ], EPS );
+    CHECK_EQUAL( (size_t)3, list.size() );
+    CHECK_REAL_EQUAL( 2, list[0], EPS );
+    CHECK_REAL_EQUAL( 2e5, list[1], EPS );
+    CHECK_REAL_EQUAL( -0.01, list[2], EPS );
 }
 
-void test_real_arg( )
+void test_real_arg()
 {
-    const double EPS = std::numeric_limits< double >::epsilon( );
-    ProgOptions  opts;
-    double       val1 = 5;
+    const double EPS = std::numeric_limits< double >::epsilon();
+    ProgOptions opts;
+    double val1 = 5;
     opts.addRequiredArg( "arg", "my test arg", &val1 );
     opts.addRequiredArg< double >( "arg2", "my other test arg" );
     const char* argv[] = { "test", "--", "-1.2", "1.01e-3" };
@@ -221,7 +221,7 @@ void test_real_arg( )
     CHECK_REAL_EQUAL( -1.2, opts.getReqArg< double >( "arg" ), EPS );
 }
 
-void test_string_opt( )
+void test_string_opt()
 {
     ProgOptions opts;
     std::string val1;
@@ -235,37 +235,37 @@ void test_string_opt( )
     std::string val2;
     CHECK( opts.getOpt( ",s", &val2 ) );
     CHECK_EQUAL( "foobar", val2 );
-    val2.clear( );
+    val2.clear();
     CHECK( opts.getOpt( "long,s", &val2 ) );
     CHECK_EQUAL( "foobar", val2 );
-    val2.clear( );
+    val2.clear();
     CHECK( opts.getOpt( "long", &val2 ) );
     CHECK_EQUAL( "foobar", val2 );
 
-    val2.clear( );
+    val2.clear();
     CHECK( opts.getOpt( ",2", &val2 ) );
     CHECK_EQUAL( "testval", val2 );
-    val2.clear( );
+    val2.clear();
     CHECK( opts.getOpt( "second,2", &val2 ) );
     CHECK_EQUAL( "testval", val2 );
-    val2.clear( );
+    val2.clear();
     CHECK( opts.getOpt( "second", &val2 ) );
     CHECK_EQUAL( "testval", val2 );
 
     std::vector< std::string > list;
     opts.getOptAllArgs( "long", list );
-    CHECK_EQUAL( (size_t)2, list.size( ) );
-    CHECK_EQUAL( "2", list[ 0 ] );
-    CHECK_EQUAL( "foobar", list[ 1 ] );
+    CHECK_EQUAL( (size_t)2, list.size() );
+    CHECK_EQUAL( "2", list[0] );
+    CHECK_EQUAL( "foobar", list[1] );
 
-    list.clear( );
+    list.clear();
     opts.getOptAllArgs( ",2", list );
-    CHECK_EQUAL( (size_t)2, list.size( ) );
-    CHECK_EQUAL( "two", list[ 0 ] );
-    CHECK_EQUAL( "testval", list[ 1 ] );
+    CHECK_EQUAL( (size_t)2, list.size() );
+    CHECK_EQUAL( "two", list[0] );
+    CHECK_EQUAL( "testval", list[1] );
 }
 
-void test_string_arg( )
+void test_string_arg()
 {
     ProgOptions opts;
     std::string val2;
@@ -278,13 +278,13 @@ void test_string_arg( )
     CHECK_EQUAL( "with spaces", opts.getReqArg< std::string >( "arg2" ) );
 }
 
-void test_string_rank_subst( )
+void test_string_rank_subst()
 {
-    std::string exp1 = "ddd%";
-    std::string exp2 = "%";
+    std::string exp1  = "ddd%";
+    std::string exp2  = "%";
     std::string exp2b = "foo%bar";
-    std::string exp3 = "%string%";
-    std::string exp4 = "file.%";
+    std::string exp3  = "%string%";
+    std::string exp4  = "file.%";
 
     ProgOptions opts;
     std::string val1, val2, val3, val4;
@@ -294,25 +294,24 @@ void test_string_rank_subst( )
     opts.addRequiredArg( "sub", "subst arg", &val4, ProgOptions::rank_subst );
     std::string eqflg( "--dosub=" );
     eqflg += exp2;
-    const char* argv[] = { "test",         exp3.c_str( ), exp4.c_str( ), "-s",
-                           exp2b.c_str( ), "-n",          exp1.c_str( ), eqflg.c_str( ) };
+    const char* argv[] = { "test", exp3.c_str(), exp4.c_str(), "-s", exp2b.c_str(), "-n", exp1.c_str(), eqflg.c_str() };
     opts.parseCommandLine( ARGCV( argv ) );
 
 #ifdef MOAB_HAVE_MPI
     int rank, size;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &size );
-    char buffer[ 64 ];
-    int  width = 1;
+    char buffer[64];
+    int width = 1;
     while( size > 10 )
     {
         width++;
         size /= 10;
     }
     sprintf( buffer, "%0*d", width, rank );
-    exp2 = buffer;
+    exp2  = buffer;
     exp2b = std::string( "foo" ) + buffer + "bar";
-    exp4 = std::string( "file." ) + buffer;
+    exp4  = std::string( "file." ) + buffer;
 #endif
 
     CHECK_EQUAL( exp1, val1 );
@@ -320,8 +319,8 @@ void test_string_rank_subst( )
     CHECK_EQUAL( exp3, val3 );
     CHECK_EQUAL( exp4, val4 );
 
-    val1.clear( );
-    val2.clear( );
+    val1.clear();
+    val2.clear();
     CHECK( opts.getOpt( ",n", &val1 ) );
     CHECK( opts.getOpt( "dosub", &val2 ) );
 
@@ -332,24 +331,24 @@ void test_string_rank_subst( )
 
     std::vector< std::string > list;
     opts.getOptAllArgs( ",s", list );
-    CHECK_EQUAL( (size_t)2, list.size( ) );
-    CHECK_EQUAL( exp2b, list[ 0 ] );
-    CHECK_EQUAL( exp2, list[ 1 ] );
+    CHECK_EQUAL( (size_t)2, list.size() );
+    CHECK_EQUAL( exp2b, list[0] );
+    CHECK_EQUAL( exp2, list[1] );
 }
 
-void test_int_vect_opt( )
+void test_int_vect_opt()
 {
-    ProgOptions        opts;
+    ProgOptions opts;
     std::vector< int > list1, list2;
     opts.addOpt( "ids,d", "id list", &list1 );
     const char* argv[] = { "test", "--ids=1,2,3", "--ids", "4-10", "-d", "4-5,2" };
 
-    const int          exp1[] = { 1, 2, 3 };
-    const int          exp1_len = sizeof( exp1 ) / sizeof( exp1[ 0 ] );
-    const int          exp2[] = { 4, 5, 6, 7, 8, 9, 10 };
-    const int          exp2_len = sizeof( exp2 ) / sizeof( exp2[ 0 ] );
-    const int          exp3[] = { 4, 5, 2 };
-    const int          exp3_len = sizeof( exp3 ) / sizeof( exp3[ 0 ] );
+    const int exp1[]   = { 1, 2, 3 };
+    const int exp1_len = sizeof( exp1 ) / sizeof( exp1[0] );
+    const int exp2[]   = { 4, 5, 6, 7, 8, 9, 10 };
+    const int exp2_len = sizeof( exp2 ) / sizeof( exp2[0] );
+    const int exp3[]   = { 4, 5, 2 };
+    const int exp3_len = sizeof( exp3 ) / sizeof( exp3[0] );
     std::vector< int > all;
     std::copy( exp1, exp1 + exp1_len, std::back_inserter( all ) );
     std::copy( exp2, exp2 + exp2_len, std::back_inserter( all ) );
@@ -358,36 +357,36 @@ void test_int_vect_opt( )
     opts.parseCommandLine( ARGCV( argv ) );
     CHECK_EQUAL( all, list1 );
     CHECK( opts.getOpt( ",d", &list2 ) );
-    CHECK_ARRAYS_EQUAL( exp3, exp3_len, &list2[ 0 ], list2.size( ) );
+    CHECK_ARRAYS_EQUAL( exp3, exp3_len, &list2[0], list2.size() );
 
     std::vector< std::vector< int > > lists;
     opts.getOptAllArgs( "ids", lists );
-    CHECK_EQUAL( (size_t)3, lists.size( ) );
-    CHECK_ARRAYS_EQUAL( exp1, exp1_len, &lists[ 0 ][ 0 ], lists[ 0 ].size( ) );
-    CHECK_ARRAYS_EQUAL( exp2, exp2_len, &lists[ 1 ][ 0 ], lists[ 1 ].size( ) );
-    CHECK_ARRAYS_EQUAL( exp3, exp3_len, &lists[ 2 ][ 0 ], lists[ 2 ].size( ) );
+    CHECK_EQUAL( (size_t)3, lists.size() );
+    CHECK_ARRAYS_EQUAL( exp1, exp1_len, &lists[0][0], lists[0].size() );
+    CHECK_ARRAYS_EQUAL( exp2, exp2_len, &lists[1][0], lists[1].size() );
+    CHECK_ARRAYS_EQUAL( exp3, exp3_len, &lists[2][0], lists[2].size() );
 
-    list2.clear( );
+    list2.clear();
     opts.getOptAllArgs( "ids", list2 );
     CHECK_EQUAL( all, list2 );
 }
 
-void test_int_vect_arg( )
+void test_int_vect_arg()
 {
-    ProgOptions        opts;
+    ProgOptions opts;
     std::vector< int > list1;
     opts.addRequiredArg( "ints", "int list", &list1 );
     const char* argv[] = { "test", "5,6,-3--1,10" };
 
-    const int exp1[] = { 5, 6, -3, -2, -1, 10 };
-    const int exp1_len = sizeof( exp1 ) / sizeof( exp1[ 0 ] );
+    const int exp1[]   = { 5, 6, -3, -2, -1, 10 };
+    const int exp1_len = sizeof( exp1 ) / sizeof( exp1[0] );
 
     opts.parseCommandLine( ARGCV( argv ) );
-    CHECK_ARRAYS_EQUAL( exp1, exp1_len, &list1[ 0 ], list1.size( ) );
+    CHECK_ARRAYS_EQUAL( exp1, exp1_len, &list1[0], list1.size() );
     CHECK_EQUAL( list1, opts.getReqArg< std::vector< int > >( "ints" ) );
 }
 
-void test_optional_args( )
+void test_optional_args()
 {
     ProgOptions opts1;
     std::string arg;
@@ -398,23 +397,23 @@ void test_optional_args( )
     std::vector< std::string > list;
     CHECK_EQUAL( "arg", arg );
     opts1.getArgs( "opts", list );
-    CHECK( list.empty( ) );
+    CHECK( list.empty() );
 
     ProgOptions opts2;
-    arg.clear( );
+    arg.clear();
     opts2.addOptionalArgs< std::string >( 0, "opts", "optional arguments" );
     opts2.addRequiredArg( "req", "required final argument", &arg );
     const char* argv2[] = { "test", "arg1", "arg2", "arg" };
     opts2.parseCommandLine( ARGCV( argv2 ) );
     CHECK_EQUAL( "arg", arg );
-    list.clear( );
+    list.clear();
     opts2.getArgs( "opts", list );
-    CHECK_EQUAL( (size_t)2, list.size( ) );
-    CHECK_EQUAL( "arg1", list[ 0 ] );
-    CHECK_EQUAL( "arg2", list[ 1 ] );
+    CHECK_EQUAL( (size_t)2, list.size() );
+    CHECK_EQUAL( "arg1", list[0] );
+    CHECK_EQUAL( "arg2", list[1] );
 }
 
-void test_optional_arg( )
+void test_optional_arg()
 {
     ProgOptions opts1;
     std::string init, fini;
@@ -427,11 +426,11 @@ void test_optional_arg( )
     CHECK_EQUAL( "arg1", init );
     CHECK_EQUAL( "arg2", fini );
     opts1.getArgs( "mid", list );
-    CHECK( list.empty( ) );
+    CHECK( list.empty() );
 
     ProgOptions opts2;
-    init.clear( );
-    fini.clear( );
+    init.clear();
+    fini.clear();
     opts2.addRequiredArg( "init", "required initial argument", &init );
     opts2.addOptionalArgs< std::string >( 1, "mid", "optional arguments" );
     opts2.addRequiredArg( "fini", "required final argument", &fini );
@@ -439,18 +438,18 @@ void test_optional_arg( )
     opts2.parseCommandLine( ARGCV( argv2 ) );
     CHECK_EQUAL( "arg1", init );
     CHECK_EQUAL( "arg3", fini );
-    list.clear( );
+    list.clear();
     opts2.getArgs( "mid", list );
-    CHECK_EQUAL( (size_t)1, list.size( ) );
-    CHECK_EQUAL( "arg2", list[ 0 ] );
+    CHECK_EQUAL( (size_t)1, list.size() );
+    CHECK_EQUAL( "arg2", list[0] );
 }
 
-void test_squashed_short( )
+void test_squashed_short()
 {
     ProgOptions opts;
-    int         intval = 0;
-    double      realval = 0;
-    bool        flagval = false;
+    int intval     = 0;
+    double realval = 0;
+    bool flagval   = false;
     std::string strval;
     opts.addOpt< void >( ",f", "flag", &flagval );
     opts.addOpt( ",i", "int", &intval );

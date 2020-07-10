@@ -16,12 +16,13 @@
 namespace moab
 {
 
-template< typename _Tree, typename _Boxes > class Point_search
+template < typename _Tree, typename _Boxes >
+class Point_search
 {
 
     // public types
   public:
-    typedef _Tree  Tree;
+    typedef _Tree Tree;
     typedef _Boxes Boxes;
     //	typedef typename Tree::Elements::value_type Element;
     typedef int Error;
@@ -40,7 +41,8 @@ template< typename _Tree, typename _Boxes > class Point_search
     // private functionality
   private:
     // TODO: deprecate this
-    template< typename Point_map, typename List > void resolve_boxes( const Point_map& query_points, List& list )
+    template < typename Point_map, typename List >
+    void resolve_boxes( const Point_map& query_points, List& list )
     {
         /*
      typedef typename std::vector< bool> Bitmask;
@@ -74,7 +76,7 @@ template< typename _Tree, typename _Boxes > class Point_search
 
     // public functionality
   public:
-    template< typename Point_map, typename Entities, typename Communicator >
+    template < typename Point_map, typename Entities, typename Communicator >
     Error locate_points( Point_map& query_points, Entities& entities, Communicator& comm, double tol )
     {
         /*TODO: implement a parallel location algorithm here
@@ -96,14 +98,14 @@ template< typename _Tree, typename _Boxes > class Point_search
         return 0;
     }
 
-    template< typename Points, typename Entities >
+    template < typename Points, typename Entities >
     Error locate_points( const Points& query_points, Entities& entities, double tol ) const
     {
         typedef typename Points::const_iterator Point_iterator;
-        typedef typename Entities::value_type   Result;
-        Entities                                result;
-        result.reserve( query_points.size( ) );
-        for( Point_iterator i = query_points.begin( ); i != query_points.end( ); ++i )
+        typedef typename Entities::value_type Result;
+        Entities result;
+        result.reserve( query_points.size() );
+        for( Point_iterator i = query_points.begin(); i != query_points.end(); ++i )
         {
             Result h;
             tree_.find( *i, tol, h );
@@ -113,19 +115,19 @@ template< typename _Tree, typename _Boxes > class Point_search
         return 0;
     }
 
-    template< typename Points, typename Entities >
+    template < typename Points, typename Entities >
     Error bruteforce_locate_points( const Points& query_points, Entities& entities, double tol ) const
     {
         // TODO: this could be faster with caching, but of course this is
         // really just for testing
-        typedef typename Points::const_iterator           Point_iterator;
+        typedef typename Points::const_iterator Point_iterator;
         typedef typename Entities::value_type::first_type Entity_handle;
-        Entities                                          result;
-        result.reserve( query_points.size( ) );
-        std::size_t                 count = 0;
-        std::stringstream           ss;
-        typename Entities::iterator j = entities.begin( );
-        for( Point_iterator i = query_points.begin( ); i != query_points.end( ); ++i, ++j )
+        Entities result;
+        result.reserve( query_points.size() );
+        std::size_t count = 0;
+        std::stringstream ss;
+        typename Entities::iterator j = entities.begin();
+        for( Point_iterator i = query_points.begin(); i != query_points.end(); ++i, ++j )
         {
             if( j->first == 0 )
             {
@@ -135,7 +137,7 @@ template< typename _Tree, typename _Boxes > class Point_search
                     ++count;
                     for( int k = 0; k < 3; ++k )
                     {
-                        ss << ( *i )[ k ];
+                        ss << ( *i )[k];
                         if( k < 2 ) { ss << ", "; }
                         else
                         {
@@ -146,22 +148,22 @@ template< typename _Tree, typename _Boxes > class Point_search
             }
         }
         std::ofstream out( "unlocated_pts" );
-        out << ss.str( );
-        out.close( );
+        out << ss.str();
+        out.close();
         std::cout << count << " vertices are not contained in _any_ elements!" << std::endl;
         return 0;
     }
 
     // public accessor methods
   public:
-    Tree& tree( ) const
+    Tree& tree() const
     {
         return tree_;
     }
 
     // private data members
   private:
-    const Tree&  tree_;
+    const Tree& tree_;
     const Boxes& boxes;
 };  // class Point_search
 

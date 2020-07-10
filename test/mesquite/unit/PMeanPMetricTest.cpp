@@ -51,28 +51,28 @@ class PMeanPMetricTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_gradient );
     CPPUNIT_TEST( test_hessian );
     CPPUNIT_TEST( test_hessian_diagonal );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     PatchData pd;
 
   public:
-    void setUp( );
+    void setUp();
 
-    void test_get_metric_type( );
-    void test_get_element_evaluations( );
-    void test_get_vertex_evaluations( );
-    void test_element_evaluate( );
-    void test_vertex_evaluate( );
-    void test_indices( );
-    void test_gradient( );
-    void test_hessian( );
-    void test_hessian_diagonal( );
+    void test_get_metric_type();
+    void test_get_element_evaluations();
+    void test_get_vertex_evaluations();
+    void test_element_evaluate();
+    void test_vertex_evaluate();
+    void test_indices();
+    void test_gradient();
+    void test_hessian();
+    void test_hessian_diagonal();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PMeanPMetricTest, "PMeanPMetricTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PMeanPMetricTest, "Unit" );
 
-void PMeanPMetricTest::setUp( )
+void PMeanPMetricTest::setUp()
 {
     MsqError err;
     create_four_quads_patch( pd, err );
@@ -86,15 +86,15 @@ void PMeanPMetricTest::setUp( )
 class FauxMetric : public ElemSampleQM
 {
   public:
-    MetricType get_metric_type( ) const
+    MetricType get_metric_type() const
     {
         return ELEMENT_BASED;
     }
-    std::string get_name( ) const
+    std::string get_name() const
     {
         return "FauxMetrix";
     }
-    int get_negate_flag( ) const
+    int get_negate_flag() const
     {
         return 1;
     }
@@ -110,25 +110,25 @@ class FauxMetric : public ElemSampleQM
 
 void FauxMetric::get_evaluations( PatchData& pd, std::vector< size_t >& h, bool free, MsqError& err )
 {
-    h.clear( );
-    for( size_t i = 0; i < pd.num_elements( ); ++i )
+    h.clear();
+    for( size_t i = 0; i < pd.num_elements(); ++i )
         get_element_evaluations( pd, i, h, err );
 }
 
 void FauxMetric::get_element_evaluations( PatchData& pd, size_t h, std::vector< size_t >& list, MsqError& )
 {
     MsqMeshEntity& elem = pd.element_by_index( h );
-    for( unsigned i = 0; i < elem.corner_count( ); ++i )
+    for( unsigned i = 0; i < elem.corner_count(); ++i )
         list.push_back( handle( Sample( 0, i ), h ) );
 }
 
 bool FauxMetric::evaluate( PatchData& pd, size_t h, double& v, MsqError& )
 {
-    size_t  e = ElemSampleQM::elem( h );
-    Sample  s = ElemSampleQM::sample( h );
-    size_t* verts = pd.element_by_index( e ).get_vertex_index_array( );
+    size_t e      = ElemSampleQM::elem( h );
+    Sample s      = ElemSampleQM::sample( h );
+    size_t* verts = pd.element_by_index( e ).get_vertex_index_array();
     CPPUNIT_ASSERT_EQUAL( (unsigned short)0, s.dimension );
-    v = (double)( verts[ s.number ] );
+    v = (double)( verts[s.number] );
     return true;
 }
 
@@ -137,14 +137,14 @@ bool FauxMetric::evaluate_with_indices( PatchData& pd, size_t h, double& v, std:
 {
     evaluate( pd, h, v, err );
     indices.resize( 3 );
-    size_t  e = ElemSampleQM::elem( h );
-    Sample  s = ElemSampleQM::sample( h );
-    size_t* verts = pd.element_by_index( e ).get_vertex_index_array( );
-    size_t  n = pd.element_by_index( e ).vertex_count( );
+    size_t e      = ElemSampleQM::elem( h );
+    Sample s      = ElemSampleQM::sample( h );
+    size_t* verts = pd.element_by_index( e ).get_vertex_index_array();
+    size_t n      = pd.element_by_index( e ).vertex_count();
     CPPUNIT_ASSERT_EQUAL( (unsigned short)0, s.dimension );
-    indices[ 0 ] = verts[ s.number ];
-    indices[ 1 ] = verts[ ( s.number + 1 ) % n ];
-    indices[ 2 ] = verts[ ( s.number + n - 1 ) % n ];
+    indices[0] = verts[s.number];
+    indices[1] = verts[( s.number + 1 ) % n];
+    indices[2] = verts[( s.number + n - 1 ) % n];
     return true;
 }
 
@@ -152,9 +152,9 @@ bool FauxMetric::evaluate_with_gradient( PatchData& pd, size_t h, double& v, std
                                          std::vector< Vector3D >& grads, MsqError& err )
 {
     evaluate_with_indices( pd, h, v, indices, err );
-    grads.clear( );
-    for( unsigned i = 0; i < indices.size( ); ++i )
-        grads.push_back( Vector3D( (double)indices[ i ], 0, 1 ) );
+    grads.clear();
+    for( unsigned i = 0; i < indices.size(); ++i )
+        grads.push_back( Vector3D( (double)indices[i], 0, 1 ) );
     return true;
 }
 
@@ -162,67 +162,67 @@ bool FauxMetric::evaluate_with_Hessian( PatchData& pd, size_t h, double& v, std:
                                         std::vector< Vector3D >& grad, std::vector< Matrix3D >& hess, MsqError& err )
 {
     evaluate_with_gradient( pd, h, v, indices, grad, err );
-    hess.clear( );
-    for( unsigned r = 0; r < indices.size( ); ++r )
-        for( unsigned c = r; c < indices.size( ); ++c )
-            hess.push_back( Matrix3D( indices[ r ], indices[ c ], indices[ r ] + indices[ c ], indices[ r ], 1.0,
-                                      indices[ r ] + indices[ c ], 2 * indices[ r ], 2 * indices[ c ], indices[ c ] ) );
+    hess.clear();
+    for( unsigned r = 0; r < indices.size(); ++r )
+        for( unsigned c = r; c < indices.size(); ++c )
+            hess.push_back( Matrix3D( indices[r], indices[c], indices[r] + indices[c], indices[r], 1.0,
+                                      indices[r] + indices[c], 2 * indices[r], 2 * indices[c], indices[c] ) );
     return true;
 }
 
-void PMeanPMetricTest::test_get_metric_type( )
+void PMeanPMetricTest::test_get_metric_type()
 {
-    FauxMetric    m;
+    FauxMetric m;
     ElementPMeanP e( 1.0, &m );
-    VertexPMeanP  v( 1.0, &m );
-    CPPUNIT_ASSERT( QualityMetric::ELEMENT_BASED == e.get_metric_type( ) );
-    CPPUNIT_ASSERT( QualityMetric::VERTEX_BASED == v.get_metric_type( ) );
+    VertexPMeanP v( 1.0, &m );
+    CPPUNIT_ASSERT( QualityMetric::ELEMENT_BASED == e.get_metric_type() );
+    CPPUNIT_ASSERT( QualityMetric::VERTEX_BASED == v.get_metric_type() );
 }
 
-void PMeanPMetricTest::test_get_element_evaluations( )
+void PMeanPMetricTest::test_get_element_evaluations()
 {
-    MsqError              err;
-    FauxMetric            m;
-    ElementPMeanP         e( 1.0, &m );
+    MsqError err;
+    FauxMetric m;
+    ElementPMeanP e( 1.0, &m );
     std::vector< size_t > handles;
     // test that handles array contains all elements
     e.get_evaluations( pd, handles, false, err );
-    std::sort( handles.begin( ), handles.end( ) );
-    CPPUNIT_ASSERT_EQUAL( pd.num_elements( ), handles.size( ) );
-    for( unsigned i = 1; i < handles.size( ); ++i )
-        CPPUNIT_ASSERT_EQUAL( handles[ i - 1 ] + 1, handles[ i ] );
+    std::sort( handles.begin(), handles.end() );
+    CPPUNIT_ASSERT_EQUAL( pd.num_elements(), handles.size() );
+    for( unsigned i = 1; i < handles.size(); ++i )
+        CPPUNIT_ASSERT_EQUAL( handles[i - 1] + 1, handles[i] );
     // test that handles array contains all elements
     e.get_evaluations( pd, handles, true, err );
-    std::sort( handles.begin( ), handles.end( ) );
-    CPPUNIT_ASSERT_EQUAL( pd.num_elements( ), handles.size( ) );
-    for( unsigned i = 1; i < handles.size( ); ++i )
-        CPPUNIT_ASSERT_EQUAL( handles[ i - 1 ] + 1, handles[ i ] );
+    std::sort( handles.begin(), handles.end() );
+    CPPUNIT_ASSERT_EQUAL( pd.num_elements(), handles.size() );
+    for( unsigned i = 1; i < handles.size(); ++i )
+        CPPUNIT_ASSERT_EQUAL( handles[i - 1] + 1, handles[i] );
 }
 
-void PMeanPMetricTest::test_get_vertex_evaluations( )
+void PMeanPMetricTest::test_get_vertex_evaluations()
 {
-    MsqError              err;
-    FauxMetric            m;
-    VertexPMeanP          e( 1.0, &m );
+    MsqError err;
+    FauxMetric m;
+    VertexPMeanP e( 1.0, &m );
     std::vector< size_t > handles;
     // test that handles array contains all vertices
     e.get_evaluations( pd, handles, false, err );
-    std::sort( handles.begin( ), handles.end( ) );
-    CPPUNIT_ASSERT_EQUAL( pd.num_nodes( ), handles.size( ) );
-    for( unsigned i = 1; i < handles.size( ); ++i )
-        CPPUNIT_ASSERT_EQUAL( handles[ i - 1 ] + 1, handles[ i ] );
+    std::sort( handles.begin(), handles.end() );
+    CPPUNIT_ASSERT_EQUAL( pd.num_nodes(), handles.size() );
+    for( unsigned i = 1; i < handles.size(); ++i )
+        CPPUNIT_ASSERT_EQUAL( handles[i - 1] + 1, handles[i] );
     // test that handles array contains all vertices
     e.get_evaluations( pd, handles, true, err );
-    std::sort( handles.begin( ), handles.end( ) );
-    CPPUNIT_ASSERT_EQUAL( pd.num_nodes( ), handles.size( ) );
-    for( unsigned i = 1; i < handles.size( ); ++i )
-        CPPUNIT_ASSERT_EQUAL( handles[ i - 1 ] + 1, handles[ i ] );
+    std::sort( handles.begin(), handles.end() );
+    CPPUNIT_ASSERT_EQUAL( pd.num_nodes(), handles.size() );
+    for( unsigned i = 1; i < handles.size(); ++i )
+        CPPUNIT_ASSERT_EQUAL( handles[i - 1] + 1, handles[i] );
 }
 
-void PMeanPMetricTest::test_vertex_evaluate( )
+void PMeanPMetricTest::test_vertex_evaluate()
 {
-    MsqError     err;
-    FauxMetric   m;
+    MsqError err;
+    FauxMetric m;
     VertexPMeanP m1( 1.0, &m );
     VertexPMeanP m2( 2.0, &m );
 
@@ -234,7 +234,7 @@ void PMeanPMetricTest::test_vertex_evaluate( )
     CPPUNIT_ASSERT( !err );
 
     // get elements adjacent to vertex
-    size_t        num_elem;
+    size_t num_elem;
     const size_t* elems = pd.get_vertex_element_adjacencies( 0, num_elem, err );
     CPPUNIT_ASSERT( !err );
 
@@ -242,12 +242,12 @@ void PMeanPMetricTest::test_vertex_evaluate( )
     double ev1 = 0.0, ev2 = 0.0;
     for( unsigned i = 0; i < num_elem; ++i )
     {
-        const MsqMeshEntity& elem = pd.element_by_index( elems[ i ] );
-        const size_t*        verts = elem.get_vertex_index_array( );
-        const size_t*        end = verts + elem.node_count( );
-        const size_t*        p = std::find( verts, end, (size_t)0 );
+        const MsqMeshEntity& elem = pd.element_by_index( elems[i] );
+        const size_t* verts       = elem.get_vertex_index_array();
+        const size_t* end         = verts + elem.node_count();
+        const size_t* p           = std::find( verts, end, (size_t)0 );
         CPPUNIT_ASSERT( p < end );
-        size_t h = ElemSampleQM::handle( Sample( 0, p - verts ), elems[ i ] );
+        size_t h = ElemSampleQM::handle( Sample( 0, p - verts ), elems[i] );
 
         double v;
         m.evaluate( pd, h, v, err );
@@ -263,10 +263,10 @@ void PMeanPMetricTest::test_vertex_evaluate( )
     CPPUNIT_ASSERT_DOUBLES_EQUAL( ev2, v2, 1e-6 );
 }
 
-void PMeanPMetricTest::test_element_evaluate( )
+void PMeanPMetricTest::test_element_evaluate()
 {
-    MsqError      err;
-    FauxMetric    m;
+    MsqError err;
+    FauxMetric m;
     ElementPMeanP m1( 1.0, &m );
     ElementPMeanP m2( 2.0, &m );
 
@@ -284,28 +284,28 @@ void PMeanPMetricTest::test_element_evaluate( )
 
     // calculate expected values from underyling metric
     double ev1 = 0.0, ev2 = 0.0;
-    for( unsigned i = 0; i < handles.size( ); ++i )
+    for( unsigned i = 0; i < handles.size(); ++i )
     {
         double v;
-        m.evaluate( pd, handles[ i ], v, err );
+        m.evaluate( pd, handles[i], v, err );
         CPPUNIT_ASSERT( !err );
         ev1 += v;
         ev2 += v * v;
     }
-    ev1 /= handles.size( );
-    ev2 /= handles.size( );
+    ev1 /= handles.size();
+    ev2 /= handles.size();
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL( ev1, v1, 1e-6 );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( ev2, v2, 1e-6 );
 }
 
-void PMeanPMetricTest::test_indices( )
+void PMeanPMetricTest::test_indices()
 {
-    MsqError      err;
-    FauxMetric    m;
+    MsqError err;
+    FauxMetric m;
     ElementPMeanP m2( 2.0, &m );
 
-    double                v1, v2;
+    double v1, v2;
     std::vector< size_t > indices;
     m2.evaluate_with_indices( pd, 0, v1, indices, err );
     CPPUNIT_ASSERT( !err );
@@ -316,20 +316,21 @@ void PMeanPMetricTest::test_indices( )
     std::vector< size_t > vertices;
     pd.element_by_index( 0 ).get_vertex_indices( vertices );
 
-    std::sort( vertices.begin( ), vertices.end( ) );
-    std::sort( indices.begin( ), indices.end( ) );
+    std::sort( vertices.begin(), vertices.end() );
+    std::sort( indices.begin(), indices.end() );
     CPPUNIT_ASSERT( vertices == indices );
 }
 
-template< typename T > size_t index_of( const std::vector< T >& v, T a )
+template < typename T >
+size_t index_of( const std::vector< T >& v, T a )
 {
-    return std::find( v.begin( ), v.end( ), a ) - v.begin( );
+    return std::find( v.begin(), v.end(), a ) - v.begin();
 }
 
-void PMeanPMetricTest::test_gradient( )
+void PMeanPMetricTest::test_gradient()
 {
-    MsqError      err;
-    FauxMetric    m;
+    MsqError err;
+    FauxMetric m;
     ElementPMeanP m1( 1.0, &m );
     ElementPMeanP m2( 2.0, &m );
 
@@ -338,8 +339,8 @@ void PMeanPMetricTest::test_gradient( )
     pd.element_by_index( 0 ).get_vertex_indices( vertices );
 
     // evaluate without gradients
-    double                  v1, v2, v3, v4;
-    std::vector< size_t >   indices1, indices2, indices3, indices4;
+    double v1, v2, v3, v4;
+    std::vector< size_t > indices1, indices2, indices3, indices4;
     std::vector< Vector3D > grads1, grads2;
     m1.evaluate_with_indices( pd, 0, v1, indices1, err );
     CPPUNIT_ASSERT( !err );
@@ -355,13 +356,13 @@ void PMeanPMetricTest::test_gradient( )
     // compare value and indices to eval w/out gradient
     CPPUNIT_ASSERT_DOUBLES_EQUAL( v1, v3, 1e-6 );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( v2, v4, 1e-6 );
-    std::sort( indices1.begin( ), indices1.end( ) );
+    std::sort( indices1.begin(), indices1.end() );
     std::vector< size_t > tm( indices3 );
-    std::sort( tm.begin( ), tm.end( ) );
+    std::sort( tm.begin(), tm.end() );
     CPPUNIT_ASSERT( tm == indices1 );
-    std::sort( indices2.begin( ), indices2.end( ) );
+    std::sort( indices2.begin(), indices2.end() );
     tm = indices4;
-    std::sort( tm.begin( ), tm.end( ) );
+    std::sort( tm.begin(), tm.end() );
     CPPUNIT_ASSERT( tm == indices2 );
 
     // setup evaluation of underying metric
@@ -371,41 +372,41 @@ void PMeanPMetricTest::test_gradient( )
 
     // calculate expected gradients
     std::vector< Vector3D > expected1, expected2, temp;
-    expected1.resize( vertices.size( ), Vector3D( 0, 0, 0 ) );
-    expected2.resize( vertices.size( ), Vector3D( 0, 0, 0 ) );
-    for( unsigned i = 0; i < handles.size( ); ++i )
+    expected1.resize( vertices.size(), Vector3D( 0, 0, 0 ) );
+    expected2.resize( vertices.size(), Vector3D( 0, 0, 0 ) );
+    for( unsigned i = 0; i < handles.size(); ++i )
     {
         double v;
-        m.evaluate_with_gradient( pd, handles[ i ], v, indices3, temp, err );
+        m.evaluate_with_gradient( pd, handles[i], v, indices3, temp, err );
         CPPUNIT_ASSERT( !err );
-        for( unsigned k = 0; k < indices3.size( ); ++k )
+        for( unsigned k = 0; k < indices3.size(); ++k )
         {
-            unsigned idx = index_of( vertices, indices3[ k ] );
-            CPPUNIT_ASSERT( idx < vertices.size( ) );
-            expected1[ idx ] += temp[ k ];
-            expected2[ idx ] += 2 * v * temp[ k ];
+            unsigned idx = index_of( vertices, indices3[k] );
+            CPPUNIT_ASSERT( idx < vertices.size() );
+            expected1[idx] += temp[k];
+            expected2[idx] += 2 * v * temp[k];
         }
     }
-    for( unsigned i = 0; i < vertices.size( ); ++i )
+    for( unsigned i = 0; i < vertices.size(); ++i )
     {
-        expected1[ i ] /= handles.size( );
-        expected2[ i ] /= handles.size( );
+        expected1[i] /= handles.size();
+        expected2[i] /= handles.size();
     }
 
     // compare gradients
-    for( unsigned i = 0; i < indices1.size( ); ++i )
+    for( unsigned i = 0; i < indices1.size(); ++i )
     {
-        unsigned k = index_of( vertices, indices1[ i ] );
-        CPPUNIT_ASSERT( k < vertices.size( ) );
-        CPPUNIT_ASSERT_VECTORS_EQUAL( expected1[ k ], grads1[ i ], 1e-6 );
-        CPPUNIT_ASSERT_VECTORS_EQUAL( expected2[ k ], grads2[ i ], 1e-6 );
+        unsigned k = index_of( vertices, indices1[i] );
+        CPPUNIT_ASSERT( k < vertices.size() );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( expected1[k], grads1[i], 1e-6 );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( expected2[k], grads2[i], 1e-6 );
     }
 }
 
-void PMeanPMetricTest::test_hessian( )
+void PMeanPMetricTest::test_hessian()
 {
-    MsqError      err;
-    FauxMetric    m;
+    MsqError err;
+    FauxMetric m;
     ElementPMeanP m1( 1.0, &m );
     ElementPMeanP m2( 2.0, &m );
 
@@ -414,8 +415,8 @@ void PMeanPMetricTest::test_hessian( )
     pd.element_by_index( 0 ).get_vertex_indices( vertices );
 
     // evaluate gradient
-    double                  v1, v2, v3, v4;
-    std::vector< size_t >   indices1, indices2, indices3, indices4, tmpi;
+    double v1, v2, v3, v4;
+    std::vector< size_t > indices1, indices2, indices3, indices4, tmpi;
     std::vector< Vector3D > grad1, grad2, grad3, grad4;
     std::vector< Matrix3D > hess3, hess4;
     m1.evaluate_with_gradient( pd, 0, v1, indices1, grad1, err );
@@ -444,10 +445,10 @@ void PMeanPMetricTest::test_hessian( )
     CPPUNIT_ASSERT( indices1 == indices2 );
 
     // check that gradient values match
-    for( size_t i = 0; i < indices1.size( ); ++i )
+    for( size_t i = 0; i < indices1.size(); ++i )
     {
-        CPPUNIT_ASSERT_VECTORS_EQUAL( grad1[ i ], grad3[ i ], 1e-5 );
-        CPPUNIT_ASSERT_VECTORS_EQUAL( grad2[ i ], grad4[ i ], 1e-5 );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( grad1[i], grad3[i], 1e-5 );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( grad2[i], grad4[i], 1e-5 );
     }
 
     // setup evaluation of underying metric
@@ -456,42 +457,42 @@ void PMeanPMetricTest::test_hessian( )
     CPPUNIT_ASSERT( !err );
 
     // calculate expected Hessians
-    std::vector< Vector3D >           g;
-    std::vector< Matrix3D >           expected1, expected2, h;
+    std::vector< Vector3D > g;
+    std::vector< Matrix3D > expected1, expected2, h;
     std::vector< Matrix3D >::iterator h_iter;
-    const unsigned                    N = vertices.size( );
+    const unsigned N = vertices.size();
     expected1.resize( N * ( N + 1 ) / 2, Matrix3D( 0, 0, 0, 0, 0, 0, 0, 0, 0 ) );
     expected2 = expected1;
     Matrix3D outer;
-    for( unsigned i = 0; i < handles.size( ); ++i )
+    for( unsigned i = 0; i < handles.size(); ++i )
     {
         double v;
-        m.evaluate_with_Hessian( pd, handles[ i ], v, tmpi, g, h, err );
+        m.evaluate_with_Hessian( pd, handles[i], v, tmpi, g, h, err );
         CPPUNIT_ASSERT( !err );
-        h_iter = h.begin( );
-        for( unsigned r = 0; r < tmpi.size( ); ++r )
+        h_iter = h.begin();
+        for( unsigned r = 0; r < tmpi.size(); ++r )
         {
-            unsigned R = index_of( vertices, tmpi[ r ] );
+            unsigned R = index_of( vertices, tmpi[r] );
             CPPUNIT_ASSERT( R < N );
-            for( unsigned c = r; c < tmpi.size( ); ++c, ++h_iter )
+            for( unsigned c = r; c < tmpi.size(); ++c, ++h_iter )
             {
-                unsigned C = index_of( vertices, tmpi[ c ] );
+                unsigned C = index_of( vertices, tmpi[c] );
                 CPPUNIT_ASSERT( C < N );
                 if( R <= C )
                 {
                     unsigned idx = N * R - R * ( R + 1 ) / 2 + C;
-                    expected1[ idx ] += 1.0 / handles.size( ) * *h_iter;
-                    expected2[ idx ] += 2.0 * v / handles.size( ) * *h_iter;
-                    outer.outer_product( g[ r ], g[ c ] );
-                    expected2[ idx ] += 2.0 / handles.size( ) * outer;
+                    expected1[idx] += 1.0 / handles.size() * *h_iter;
+                    expected2[idx] += 2.0 * v / handles.size() * *h_iter;
+                    outer.outer_product( g[r], g[c] );
+                    expected2[idx] += 2.0 / handles.size() * outer;
                 }
                 else
                 {
                     unsigned idx = N * C - C * ( C + 1 ) / 2 + R;
-                    expected1[ idx ] += 1.0 / handles.size( ) * transpose( *h_iter );
-                    expected2[ idx ] += 2.0 * v / handles.size( ) * transpose( *h_iter );
-                    outer.outer_product( g[ c ], g[ r ] );
-                    expected2[ idx ] += 2.0 / handles.size( ) * outer;
+                    expected1[idx] += 1.0 / handles.size() * transpose( *h_iter );
+                    expected2[idx] += 2.0 * v / handles.size() * transpose( *h_iter );
+                    outer.outer_product( g[c], g[r] );
+                    expected2[idx] += 2.0 / handles.size() * outer;
                 }
             }
         }
@@ -499,47 +500,47 @@ void PMeanPMetricTest::test_hessian( )
 
     // compare Hessians
     unsigned H_idx = 0;
-    for( unsigned R = 0; R < vertices.size( ); ++R )
+    for( unsigned R = 0; R < vertices.size(); ++R )
     {
-        if( vertices[ R ] >= pd.num_free_vertices( ) ) continue;
-        unsigned r = index_of( indices3, vertices[ R ] );
-        CPPUNIT_ASSERT( r < indices3.size( ) );
-        for( unsigned C = R; C < vertices.size( ); ++C, ++H_idx )
+        if( vertices[R] >= pd.num_free_vertices() ) continue;
+        unsigned r = index_of( indices3, vertices[R] );
+        CPPUNIT_ASSERT( r < indices3.size() );
+        for( unsigned C = R; C < vertices.size(); ++C, ++H_idx )
         {
-            if( vertices[ C ] >= pd.num_free_vertices( ) ) continue;
-            unsigned c = index_of( indices3, vertices[ C ] );
-            CPPUNIT_ASSERT( c < indices3.size( ) );
+            if( vertices[C] >= pd.num_free_vertices() ) continue;
+            unsigned c = index_of( indices3, vertices[C] );
+            CPPUNIT_ASSERT( c < indices3.size() );
             if( r <= c )
             {
-                unsigned idx = indices3.size( ) * r - r * ( r + 1 ) / 2 + c;
-                CPPUNIT_ASSERT_MATRICES_EQUAL( expected1[ H_idx ], hess3[ idx ], 1e-5 );
-                CPPUNIT_ASSERT_MATRICES_EQUAL( expected2[ H_idx ], hess4[ idx ], 1e-5 );
+                unsigned idx = indices3.size() * r - r * ( r + 1 ) / 2 + c;
+                CPPUNIT_ASSERT_MATRICES_EQUAL( expected1[H_idx], hess3[idx], 1e-5 );
+                CPPUNIT_ASSERT_MATRICES_EQUAL( expected2[H_idx], hess4[idx], 1e-5 );
             }
             else
             {
-                unsigned idx = indices3.size( ) * c - c * ( c + 1 ) / 2 + r;
-                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected1[ H_idx ] ), hess3[ idx ], 1e-5 );
-                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected2[ H_idx ] ), hess4[ idx ], 1e-5 );
+                unsigned idx = indices3.size() * c - c * ( c + 1 ) / 2 + r;
+                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected1[H_idx] ), hess3[idx], 1e-5 );
+                CPPUNIT_ASSERT_MATRICES_EQUAL( transpose( expected2[H_idx] ), hess4[idx], 1e-5 );
             }
         }
     }
 }
 
-void PMeanPMetricTest::test_hessian_diagonal( )
+void PMeanPMetricTest::test_hessian_diagonal()
 {
-    MsqError      err;
-    FauxMetric    m;
+    MsqError err;
+    FauxMetric m;
     ElementPMeanP m1( 1.0, &m );
     ElementPMeanP m2( 2.0, &m );
 
     // we've already validated the Hessian results in the
     // previous test, so just check that the diagonal terms
     // match the terms for the full Hessian.
-    std::vector< size_t >      m1_indices_h, m1_indices_d, m2_indices_h, m2_indices_d;
-    std::vector< Vector3D >    m1_g_h, m1_g_d, m2_g_h, m2_g_d;
-    std::vector< Matrix3D >    m1_h_h, m2_h_h;
+    std::vector< size_t > m1_indices_h, m1_indices_d, m2_indices_h, m2_indices_d;
+    std::vector< Vector3D > m1_g_h, m1_g_d, m2_g_h, m2_g_d;
+    std::vector< Matrix3D > m1_h_h, m2_h_h;
     std::vector< SymMatrix3D > m1_h_d, m2_h_d;
-    double                     m1_v_h, m1_v_d, m2_v_h, m2_v_d;
+    double m1_v_h, m1_v_d, m2_v_h, m2_v_d;
     m1.evaluate_with_Hessian( pd, 0, m1_v_h, m1_indices_h, m1_g_h, m1_h_h, err );
     ASSERT_NO_ERROR( err );
     m2.evaluate_with_Hessian( pd, 0, m2_v_h, m2_indices_h, m2_g_h, m2_h_h, err );
@@ -559,26 +560,26 @@ void PMeanPMetricTest::test_hessian_diagonal( )
     CPPUNIT_ASSERT( m2_indices_h == m1_indices_d );
 
     // compare gradient values
-    CPPUNIT_ASSERT_EQUAL( m1_indices_h.size( ), m1_g_h.size( ) );
-    CPPUNIT_ASSERT_EQUAL( m2_indices_h.size( ), m2_g_h.size( ) );
-    CPPUNIT_ASSERT_EQUAL( m1_indices_d.size( ), m1_g_d.size( ) );
-    CPPUNIT_ASSERT_EQUAL( m2_indices_d.size( ), m2_g_d.size( ) );
-    for( unsigned i = 0; i < m1_indices_h.size( ); ++i )
+    CPPUNIT_ASSERT_EQUAL( m1_indices_h.size(), m1_g_h.size() );
+    CPPUNIT_ASSERT_EQUAL( m2_indices_h.size(), m2_g_h.size() );
+    CPPUNIT_ASSERT_EQUAL( m1_indices_d.size(), m1_g_d.size() );
+    CPPUNIT_ASSERT_EQUAL( m2_indices_d.size(), m2_g_d.size() );
+    for( unsigned i = 0; i < m1_indices_h.size(); ++i )
     {
-        CPPUNIT_ASSERT_VECTORS_EQUAL( m1_g_h[ i ], m1_g_d[ i ], 1e-6 );
-        CPPUNIT_ASSERT_VECTORS_EQUAL( m2_g_h[ i ], m2_g_d[ i ], 1e-6 );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( m1_g_h[i], m1_g_d[i], 1e-6 );
+        CPPUNIT_ASSERT_VECTORS_EQUAL( m2_g_h[i], m2_g_d[i], 1e-6 );
     }
 
     // compare hessian diagonal terms
-    CPPUNIT_ASSERT_EQUAL( m1_indices_h.size( ) * ( m1_indices_h.size( ) + 1 ) / 2, m1_h_h.size( ) );
-    CPPUNIT_ASSERT_EQUAL( m2_indices_h.size( ) * ( m2_indices_h.size( ) + 1 ) / 2, m2_h_h.size( ) );
-    CPPUNIT_ASSERT_EQUAL( m1_indices_d.size( ), m1_h_d.size( ) );
-    CPPUNIT_ASSERT_EQUAL( m2_indices_d.size( ), m2_h_d.size( ) );
+    CPPUNIT_ASSERT_EQUAL( m1_indices_h.size() * ( m1_indices_h.size() + 1 ) / 2, m1_h_h.size() );
+    CPPUNIT_ASSERT_EQUAL( m2_indices_h.size() * ( m2_indices_h.size() + 1 ) / 2, m2_h_h.size() );
+    CPPUNIT_ASSERT_EQUAL( m1_indices_d.size(), m1_h_d.size() );
+    CPPUNIT_ASSERT_EQUAL( m2_indices_d.size(), m2_h_d.size() );
     unsigned h = 0;
-    for( unsigned r = 0; r < m1_indices_h.size( ); ++r )
+    for( unsigned r = 0; r < m1_indices_h.size(); ++r )
     {
-        CPPUNIT_ASSERT_MATRICES_EQUAL( m1_h_h[ h ], m1_h_d[ r ], 1e-6 );
-        CPPUNIT_ASSERT_MATRICES_EQUAL( m2_h_h[ h ], m2_h_d[ r ], 1e-6 );
-        h += ( m1_indices_h.size( ) - r );
+        CPPUNIT_ASSERT_MATRICES_EQUAL( m1_h_h[h], m1_h_d[r], 1e-6 );
+        CPPUNIT_ASSERT_MATRICES_EQUAL( m2_h_h[h], m2_h_d[r], 1e-6 );
+        h += ( m1_indices_h.size() - r );
     }
 }

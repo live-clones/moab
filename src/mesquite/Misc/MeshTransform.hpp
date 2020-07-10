@@ -64,13 +64,13 @@ class MESQUITE_EXPORT MeshTransform : public Instruction
     }
 
     // virtual destructor ensures use of polymorphism during destruction
-    virtual ~MeshTransform( );
+    virtual ~MeshTransform();
 
     // virtual functions from PatchDataUser...
     //! Loop over the mesh and perform the affine transformation
     virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
     //! Return the name of this PatchDataUser:  Mesh Transform
-    virtual std::string get_name( ) const
+    virtual std::string get_name() const
     {
         return "Mesh Transform";
     }
@@ -82,7 +82,7 @@ class MESQUITE_EXPORT MeshTransform : public Instruction
     void add_scale( double factor );
     void add_scale( const Vector3D& factors );
 
-    bool skipping_fixed_vertices( ) const
+    bool skipping_fixed_vertices() const
     {
         return skipFixed;
     }
@@ -94,7 +94,7 @@ class MESQUITE_EXPORT MeshTransform : public Instruction
   private:
     Matrix3D mMat;  //! Matrix for the affine transformation
     Vector3D mVec;  //! Vector for the affine transformation
-    bool     skipFixed;
+    bool skipFixed;
 };
 
 }  // namespace MBMesquite

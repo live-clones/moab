@@ -67,13 +67,13 @@ using std::endl;
 #include "TestUtil.hpp"
 using namespace MBMesquite;
 
-int main( )
+int main()
 {
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
 
     std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
-    mesh.read_vtk( file_name.c_str( ), err );
+    mesh.read_vtk( file_name.c_str(), err );
     if( err ) return 1;
 
     // creates an intruction queue
@@ -91,7 +91,7 @@ int main( )
     FeasibleNewton pass1( &obj_func );
 
     // perform optimization globally
-    pass1.use_global_patch( );
+    pass1.use_global_patch();
     if( err ) return 1;
 
     QualityAssessor mean_qa = QualityAssessor( &mean );

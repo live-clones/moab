@@ -39,17 +39,18 @@
 namespace MBMesquite
 {
 
-std::string TSum::get_name( ) const
+std::string TSum::get_name() const
 {
-    return mu1->get_name( ) + '+' + mu2->get_name( );
+    return mu1->get_name() + '+' + mu2->get_name();
 }
 
-TSum::~TSum( ) {}
+TSum::~TSum() {}
 
-template< unsigned DIM > inline bool TSum::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
+template < unsigned DIM >
+inline bool TSum::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
     double val2;
-    bool   rval = mu1->evaluate( T, result, err );
+    bool rval = mu1->evaluate( T, result, err );
     MSQ_ERRZERO( err );
     bool rval2 = mu2->evaluate( T, val2, err );
     MSQ_ERRZERO( err );
@@ -57,12 +58,12 @@ template< unsigned DIM > inline bool TSum::eval( const MsqMatrix< DIM, DIM >& T,
     return rval && rval2;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TSum::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv, MsqError& err )
 {
-    double                val2;
+    double val2;
     MsqMatrix< DIM, DIM > grad2;
-    bool                  rval = mu1->evaluate_with_grad( T, result, deriv, err );
+    bool rval = mu1->evaluate_with_grad( T, result, deriv, err );
     MSQ_ERRZERO( err );
     bool rval2 = mu2->evaluate_with_grad( T, val2, grad2, err );
     MSQ_ERRZERO( err );
@@ -71,13 +72,13 @@ inline bool TSum::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatri
     return rval && rval2;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TSum::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                         MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
 {
-    const int             HL = ( DIM * ( DIM + 1 ) ) / 2;
-    double                val2;
-    MsqMatrix< DIM, DIM > grad2, hess2[ HL ];
+    const int HL = ( DIM * ( DIM + 1 ) ) / 2;
+    double val2;
+    MsqMatrix< DIM, DIM > grad2, hess2[HL];
 
     bool rval = mu1->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
     MSQ_ERRZERO( err );
@@ -86,7 +87,7 @@ inline bool TSum::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatri
     result += val2;
     deriv_wrt_T += grad2;
     for( int i = 0; i < HL; ++i )
-        second_wrt_T[ i ] += hess2[ i ];
+        second_wrt_T[i] += hess2[i];
     return rval && rval2;
 }
 

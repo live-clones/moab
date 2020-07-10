@@ -57,7 +57,7 @@ class AveragingQM
   public:
     MESQUITE_EXPORT AveragingQM( QualityMetric::AveragingMethod method ) : avgMethod( method ) {}
 
-    virtual ~AveragingQM( ) {}
+    virtual ~AveragingQM() {}
 
     /*!Set the averaging method for the quality metric. */
     MESQUITE_EXPORT inline void set_averaging_method( QualityMetric::AveragingMethod method )
@@ -70,21 +70,21 @@ class AveragingQM
         set_averaging_method( method );
     }
 
-    MESQUITE_EXPORT inline QualityMetric::AveragingMethod get_averaging_method( ) const
+    MESQUITE_EXPORT inline QualityMetric::AveragingMethod get_averaging_method() const
     {
         return avgMethod;
     }
 
     //! Return true if the requested averaging scheme is supported
     //! for analytical calculation of gradients.
-    inline bool analytical_average_gradient( )
+    inline bool analytical_average_gradient()
     {
         return avgMethod <= QualityMetric::LAST_WITH_GRADIENT;
     }
 
     //! Return true if the requested averaging scheme is supported
     //! for analytical calculation of Hessians.
-    inline bool analytical_average_hessian( )
+    inline bool analytical_average_hessian()
     {
         return avgMethod <= QualityMetric::LAST_WITH_HESSIAN;
     }

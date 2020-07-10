@@ -34,14 +34,14 @@ class FileOptions;
 class ReaderIface
 {
   public:
-    virtual ~ReaderIface( ) {}
+    virtual ~ReaderIface() {}
 
     /** Struct used to specify subset of file to read */
     struct IDTag
     {
-        const char* tag_name;  //!< Name of tag containing integer IDs
-        const int*  tag_values;  //!< Array of integer ID values
-        int         num_tag_values;  //!< Length of tag_values array
+        const char* tag_name;   //!< Name of tag containing integer IDs
+        const int* tag_values;  //!< Array of integer ID values
+        int num_tag_values;     //!< Length of tag_values array
     };
 
     struct SubsetList
@@ -52,9 +52,9 @@ class ReaderIface
          *  tags (intersection) should be read.
          */
         IDTag* tag_list;
-        int    tag_list_length;  //!< Length of tag_list array
-        int    num_parts;  //!< If non-zero, load 1/num_parts of the matching sets
-        int    part_number;  //!< If num_parts is non-zero, load part_number-th fraction of the sets
+        int tag_list_length;  //!< Length of tag_list array
+        int num_parts;        //!< If non-zero, load 1/num_parts of the matching sets
+        int part_number;      //!< If num_parts is non-zero, load part_number-th fraction of the sets
     };
 
     /**

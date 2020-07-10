@@ -77,23 +77,23 @@ void tet_dihedral_angle_ratios( Mesh& mesh, double& ratio_min, double& ratio_avg
 
 int main( int argc, char* argv[] )
 {
-    const char* input_file = DEFAULT_INPUT.c_str( );
+    const char* input_file  = DEFAULT_INPUT.c_str();
     const char* output_file = NULL;
     switch( argc )
     {
         default:
-            help( argv[ 0 ] );
+            help( argv[0] );
         case 3:
-            if( !strcmp( argv[ 2 ], "-h" ) ) help( argv[ 0 ] );
-            output_file = argv[ 2 ];
+            if( !strcmp( argv[2], "-h" ) ) help( argv[0] );
+            output_file = argv[2];
         case 2:
-            if( !strcmp( argv[ 1 ], "-h" ) ) help( argv[ 0 ] );
-            input_file = argv[ 1 ];
+            if( !strcmp( argv[1], "-h" ) ) help( argv[0] );
+            input_file = argv[1];
         case 1:;
     }
 
     /* Read a VTK Mesh file */
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( input_file, err );
     if( err )
@@ -147,37 +147,37 @@ static inline double da( double dot )
 
 void tet_dihedral_angle_ratios( Mesh& mesh, double& ratio_min, double& ratio_avg, double& ratio_max, MsqError& err )
 {
-    std::vector< Mesh::VertexHandle >  verts;
+    std::vector< Mesh::VertexHandle > verts;
     std::vector< Mesh::ElementHandle > tets;
-    std::vector< MsqVertex >           coords( 4 );
-    std::vector< size_t >              junk;
+    std::vector< MsqVertex > coords( 4 );
+    std::vector< size_t > junk;
     mesh.get_all_elements( tets, err );
 
-    ratio_min = HUGE_VAL;
-    ratio_max = -HUGE_VAL;
-    ratio_avg = 0;
+    ratio_min    = HUGE_VAL;
+    ratio_max    = -HUGE_VAL;
+    ratio_avg    = 0;
     size_t count = 0;
 
-    for( std::vector< Mesh::ElementHandle >::iterator i = tets.begin( ); i != tets.end( ); ++i )
+    for( std::vector< Mesh::ElementHandle >::iterator i = tets.begin(); i != tets.end(); ++i )
     {
 
         Mesh::ElementHandle e = *i;
-        EntityTopology      type;
+        EntityTopology type;
         mesh.elements_get_topologies( &e, &type, 1, err );
         assert( !err );
         if( type != TETRAHEDRON ) continue;
 
-        verts.clear( );
+        verts.clear();
         mesh.elements_get_attached_vertices( &e, 1, verts, junk, err );
         assert( !err );
-        assert( verts.size( ) == 4 );
+        assert( verts.size() == 4 );
         mesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), 4, err );
         assert( !err );
 
-        Vector3D v01 = coords[ 1 ] - coords[ 0 ];
-        Vector3D v02 = coords[ 2 ] - coords[ 0 ];
-        Vector3D v31 = coords[ 1 ] - coords[ 3 ];
-        Vector3D v32 = coords[ 2 ] - coords[ 3 ];
+        Vector3D v01 = coords[1] - coords[0];
+        Vector3D v02 = coords[2] - coords[0];
+        Vector3D v31 = coords[1] - coords[3];
+        Vector3D v32 = coords[2] - coords[3];
 
         Vector3D n012 = ~( v02 * v01 );
         Vector3D n013 = ~( v31 * v01 );

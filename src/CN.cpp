@@ -28,8 +28,8 @@ const char* CN::entityTypeNames[] = { "Vertex", "Edge",  "Tri", "Quad",       "P
 
 short int CN::numberBasis = 0;
 
-short int CN::permuteVec[ MBMAXTYPE ][ 3 ][ MAX_SUB_ENTITIES + 1 ];
-short int CN::revPermuteVec[ MBMAXTYPE ][ 3 ][ MAX_SUB_ENTITIES + 1 ];
+short int CN::permuteVec[MBMAXTYPE][3][MAX_SUB_ENTITIES + 1];
+short int CN::revPermuteVec[MBMAXTYPE][3][MAX_SUB_ENTITIES + 1];
 
 const DimensionPair CN::TypeDimensionMap[] = {
     DimensionPair( MBVERTEX, MBVERTEX ),       DimensionPair( MBEDGE, MBEDGE ),
@@ -49,7 +49,7 @@ void CN::SetBasis( const int in_basis )
 /// Get the dimension pair corresponding to a dimension
 DimensionPair CN::getDimPair( int entity_type )
 {
-    return TypeDimensionMap[ entity_type ];
+    return TypeDimensionMap[entity_type];
 }
 
 //! return a type for the given name
@@ -57,7 +57,7 @@ EntityType CN::EntityTypeFromName( const char* name )
 {
     for( EntityType i = MBVERTEX; i < MBMAXTYPE; i++ )
     {
-        if( 0 == strcmp( name, entityTypeNames[ i ] ) ) return i;
+        if( 0 == strcmp( name, entityTypeNames[i] ) ) return i;
     }
 
     return MBMAXTYPE;
@@ -71,19 +71,19 @@ void CN::SubEntityNodeIndices( const EntityType this_topo, const int num_nodes, 
     if( sub_dimension == 0 )
     {
         assert( sub_index < num_nodes );
-        subentity_topo = MBVERTEX;
+        subentity_topo       = MBVERTEX;
         num_sub_entity_nodes = 1;
-        sub_entity_conn[ 0 ] = sub_index;
+        sub_entity_conn[0]   = sub_index;
         return;
     }
 
-    const int ho_bits = HasMidNodes( this_topo, num_nodes );
-    subentity_topo = SubEntityType( this_topo, sub_dimension, sub_index );
+    const int ho_bits    = HasMidNodes( this_topo, num_nodes );
+    subentity_topo       = SubEntityType( this_topo, sub_dimension, sub_index );
     num_sub_entity_nodes = VerticesPerEntity( subentity_topo );
-    const short* corners = mConnectivityMap[ this_topo ][ sub_dimension - 1 ].conn[ sub_index ];
+    const short* corners = mConnectivityMap[this_topo][sub_dimension - 1].conn[sub_index];
     std::copy( corners, corners + num_sub_entity_nodes, sub_entity_conn );
 
-    int sub_sub_corners[ MAX_SUB_ENTITY_VERTICES ];
+    int sub_sub_corners[MAX_SUB_ENTITY_VERTICES];
     int side, sense, offset;
     for( int dim = 1; dim <= sub_dimension; ++dim )
     {
@@ -93,13 +93,13 @@ void CN::SubEntityNodeIndices( const EntityType this_topo, const int num_nodes, 
         for( int i = 0; i < num_mid; ++i )
         {
             const EntityType sub_sub_topo = SubEntityType( subentity_topo, dim, i );
-            const int        sub_sub_num_vert = VerticesPerEntity( sub_sub_topo );
+            const int sub_sub_num_vert    = VerticesPerEntity( sub_sub_topo );
             SubEntityVertexIndices( subentity_topo, dim, i, sub_sub_corners );
 
             for( int j = 0; j < sub_sub_num_vert; ++j )
-                sub_sub_corners[ j ] = corners[ sub_sub_corners[ j ] ];
+                sub_sub_corners[j] = corners[sub_sub_corners[j]];
             SideNumber( this_topo, sub_sub_corners, sub_sub_num_vert, dim, side, sense, offset );
-            sub_entity_conn[ num_sub_entity_nodes++ ] = HONodeIndex( this_topo, num_nodes, dim, side );
+            sub_entity_conn[num_sub_entity_nodes++] = HONodeIndex( this_topo, num_nodes, dim, side );
         }
     }
 }
@@ -115,15 +115,15 @@ void CN::SubEntityNodeIndices( const EntityType this_topo, const int num_nodes, 
 void CN::SubEntityConn( const void* parent_conn, const EntityType parent_type, const int sub_dimension,
                         const int sub_index, void* sub_entity_conn, int& num_sub_vertices )
 {
-    static int sub_indices[ MAX_SUB_ENTITY_VERTICES ];
+    static int sub_indices[MAX_SUB_ENTITY_VERTICES];
 
     SubEntityVertexIndices( parent_type, sub_dimension, sub_index, sub_indices );
 
-    num_sub_vertices = VerticesPerEntity( SubEntityType( parent_type, sub_dimension, sub_index ) );
+    num_sub_vertices       = VerticesPerEntity( SubEntityType( parent_type, sub_dimension, sub_index ) );
     void** parent_conn_ptr = static_cast< void** >( const_cast< void* >( parent_conn ) );
-    void** sub_conn_ptr = static_cast< void** >( sub_entity_conn );
+    void** sub_conn_ptr    = static_cast< void** >( sub_entity_conn );
     for( int i = 0; i < num_sub_vertices; i++ )
-        sub_conn_ptr[ i ] = parent_conn_ptr[ sub_indices[ i ] ];
+        sub_conn_ptr[i] = parent_conn_ptr[sub_indices[i]];
 }
 
 //! given an entity and a target dimension & side number, get that entity
@@ -133,17 +133,16 @@ short int CN::AdjacentSubEntities( const EntityType this_type, const int* source
 {
     // first get all the vertex indices
     std::vector< int > tmp_indices;
-    const int*         it1 = source_indices;
+    const int* it1 = source_indices;
 
-    assert(
-        source_dim <= 3 && target_dim >= 0 && target_dim <= 3 &&
-        // make sure we're not stepping off the end of the array;
-        ( ( source_dim > 0 && *it1 < mConnectivityMap[ this_type ][ source_dim - 1 ].num_sub_elements ) ||
-          ( source_dim == 0 &&
-            *it1 < mConnectivityMap[ this_type ][ Dimension( this_type ) - 1 ].num_corners_per_sub_element[ 0 ] ) ) &&
-        *it1 >= 0 );
+    assert( source_dim <= 3 && target_dim >= 0 && target_dim <= 3 &&
+            // make sure we're not stepping off the end of the array;
+            ( ( source_dim > 0 && *it1 < mConnectivityMap[this_type][source_dim - 1].num_sub_elements ) ||
+              ( source_dim == 0 &&
+                *it1 < mConnectivityMap[this_type][Dimension( this_type ) - 1].num_corners_per_sub_element[0] ) ) &&
+            *it1 >= 0 );
 
-#define MUC CN::mUpConnMap[ this_type ][ source_dim ][ target_dim ]
+#define MUC CN::mUpConnMap[this_type][source_dim][target_dim]
 
     // if we're looking for the vertices of a single side, return them in
     // the canonical ordering; otherwise, return them in sorted order
@@ -152,9 +151,9 @@ short int CN::AdjacentSubEntities( const EntityType this_type, const int* source
 
         // element of mConnectivityMap should be for this type and for one
         // less than source_dim, which should give the connectivity of that sub element
-        const ConnMap& cm = mConnectivityMap[ this_type ][ source_dim - 1 ];
-        std::copy( cm.conn[ source_indices[ 0 ] ],
-                   cm.conn[ source_indices[ 0 ] ] + cm.num_corners_per_sub_element[ source_indices[ 0 ] ],
+        const ConnMap& cm = mConnectivityMap[this_type][source_dim - 1];
+        std::copy( cm.conn[source_indices[0]],
+                   cm.conn[source_indices[0]] + cm.num_corners_per_sub_element[source_indices[0]],
                    std::back_inserter( index_list ) );
         return 0;
     }
@@ -166,20 +165,20 @@ short int CN::AdjacentSubEntities( const EntityType this_type, const int* source
         // at start of iteration, index_list has the target list
 
         // if a union, or first iteration and index list was empty, copy the list
-        if( operation_type == CN::UNION || ( it1 == source_indices && index_list.empty( ) ) )
+        if( operation_type == CN::UNION || ( it1 == source_indices && index_list.empty() ) )
         {
-            std::copy( MUC.targets_per_source_element[ *it1 ],
-                       MUC.targets_per_source_element[ *it1 ] + MUC.num_targets_per_source_element[ *it1 ],
+            std::copy( MUC.targets_per_source_element[*it1],
+                       MUC.targets_per_source_element[*it1] + MUC.num_targets_per_source_element[*it1],
                        std::back_inserter( index_list ) );
         }
         else
         {
             // else we're intersecting, and have a non-empty list; intersect with this target list
-            tmp_indices.clear( );
-            for( int i = MUC.num_targets_per_source_element[ *it1 ] - 1; i >= 0; i-- )
-                if( std::find( index_list.begin( ), index_list.end( ), MUC.targets_per_source_element[ *it1 ][ i ] ) !=
-                    index_list.end( ) )
-                    tmp_indices.push_back( MUC.targets_per_source_element[ *it1 ][ i ] );
+            tmp_indices.clear();
+            for( int i = MUC.num_targets_per_source_element[*it1] - 1; i >= 0; i-- )
+                if( std::find( index_list.begin(), index_list.end(), MUC.targets_per_source_element[*it1][i] ) !=
+                    index_list.end() )
+                    tmp_indices.push_back( MUC.targets_per_source_element[*it1][i] );
             //      std::set_intersection(MUC.targets_per_source_element[*it1],
             //                            MUC.targets_per_source_element[*it1]+
             //                            MUC.num_targets_per_source_element[*it1],
@@ -189,35 +188,35 @@ short int CN::AdjacentSubEntities( const EntityType this_type, const int* source
 
             // if we're at this point and the list is empty, the intersection will be NULL;
             // return if so
-            if( index_list.empty( ) ) return 0;
+            if( index_list.empty() ) return 0;
         }
     }
 
     if( operation_type == CN::UNION && num_source_indices != 1 )
     {
         // need to sort then unique the list
-        std::sort( index_list.begin( ), index_list.end( ) );
-        index_list.erase( std::unique( index_list.begin( ), index_list.end( ) ), index_list.end( ) );
+        std::sort( index_list.begin(), index_list.end() );
+        index_list.erase( std::unique( index_list.begin(), index_list.end() ), index_list.end() );
     }
 
     return 0;
 }
 
-template< typename T >
+template < typename T >
 static short int side_number( const T* parent_conn, const EntityType parent_type, const T* child_conn,
                               const int child_num_verts, const int child_dim, int& side_no, int& sense, int& offset )
 {
     int parent_num_verts = CN::VerticesPerEntity( parent_type );
-    int side_indices[ 8 ];
-    assert( sizeof( side_indices ) / sizeof( side_indices[ 0 ] ) >= (size_t)child_num_verts );
+    int side_indices[8];
+    assert( sizeof( side_indices ) / sizeof( side_indices[0] ) >= (size_t)child_num_verts );
 
     for( int i = 0; i < child_num_verts; i++ )
     {
-        side_indices[ i ] = std::find( parent_conn, parent_conn + parent_num_verts, child_conn[ i ] ) - parent_conn;
-        if( side_indices[ i ] == parent_num_verts ) return -1;
+        side_indices[i] = std::find( parent_conn, parent_conn + parent_num_verts, child_conn[i] ) - parent_conn;
+        if( side_indices[i] == parent_num_verts ) return -1;
     }
 
-    return CN::SideNumber( parent_type, &side_indices[ 0 ], child_num_verts, child_dim, side_no, sense, offset );
+    return CN::SideNumber( parent_type, &side_indices[0], child_num_verts, child_dim, side_no, sense, offset );
 }
 
 short int CN::SideNumber( const EntityType parent_type, const int* parent_conn, const int* child_conn,
@@ -260,7 +259,7 @@ short int CN::SideNumber( const EntityType parent_type, void* const* parent_conn
 short int CN::SideNumber( const EntityType parent_type, const int* child_conn_indices, const int child_num_verts,
                           const int child_dim, int& side_no, int& sense, int& offset )
 {
-    int parent_dim = Dimension( parent_type );
+    int parent_dim       = Dimension( parent_type );
     int parent_num_verts = VerticesPerEntity( parent_type );
 
     // degenerate case (vertex), output == input
@@ -280,12 +279,12 @@ short int CN::SideNumber( const EntityType parent_type, const int* child_conn_in
     if( parent_dim == child_dim && parent_num_verts != child_num_verts )
     {
         side_no = -1;
-        sense = 0;
+        sense   = 0;
         return 0;
     }
 
     // loop over the sub-elements, comparing to child connectivity
-    int sub_conn_indices[ 10 ];
+    int sub_conn_indices[10];
     for( int i = 0; i < NumSubEntities( parent_type, child_dim ); i++ )
     {
         int sub_size = VerticesPerEntity( SubEntityType( parent_type, child_dim, i ) );
@@ -337,11 +336,11 @@ short int CN::OppositeSide( const EntityType parent_type, const int child_index,
             switch( child_dim )
             {
                 case 0:
-                    opposite_dim = 1;
+                    opposite_dim   = 1;
                     opposite_index = ( child_index + 1 ) % 3;
                     break;
                 case 1:
-                    opposite_dim = 0;
+                    opposite_dim   = 0;
                     opposite_index = ( child_index + 2 ) % 3;
                     break;
                 default:
@@ -354,7 +353,7 @@ short int CN::OppositeSide( const EntityType parent_type, const int child_index,
             {
                 case 0:
                 case 1:
-                    opposite_dim = child_dim;
+                    opposite_dim   = child_dim;
                     opposite_index = ( child_index + 2 ) % 4;
                     break;
                 default:
@@ -366,15 +365,15 @@ short int CN::OppositeSide( const EntityType parent_type, const int child_index,
             switch( child_dim )
             {
                 case 0:
-                    opposite_dim = 2;
+                    opposite_dim   = 2;
                     opposite_index = ( child_index + 1 ) % 3 + 2 * ( child_index / 3 );
                     break;
                 case 1:
-                    opposite_dim = 1;
+                    opposite_dim   = 1;
                     opposite_index = child_index < 3 ? 3 + ( child_index + 2 ) % 3 : ( child_index + 1 ) % 3;
                     break;
                 case 2:
-                    opposite_dim = 0;
+                    opposite_dim   = 0;
                     opposite_index = ( child_index + 2 ) % 3 + child_index / 3;
                     break;
                 default:
@@ -406,7 +405,7 @@ short int CN::OppositeSide( const EntityType parent_type, const int child_index,
     return 0;
 }
 
-template< typename T >
+template < typename T >
 inline bool connectivity_match( const T* conn1_i, const T* conn2_i, const int num_vertices, int& direct, int& offset )
 {
 
@@ -417,25 +416,25 @@ inline bool connectivity_match( const T* conn1_i, const T* conn2_i, const int nu
     if( num_vertices == 2 )
     {
         they_match = false;
-        if( conn1_i[ 0 ] == conn2_i[ 0 ] && conn1_i[ 1 ] == conn2_i[ 1 ] )
+        if( conn1_i[0] == conn2_i[0] && conn1_i[1] == conn2_i[1] )
         {
-            direct = 1;
+            direct     = 1;
             they_match = true;
-            offset = 0;
+            offset     = 0;
         }
-        else if( conn1_i[ 0 ] == conn2_i[ 1 ] && conn1_i[ 1 ] == conn2_i[ 0 ] )
+        else if( conn1_i[0] == conn2_i[1] && conn1_i[1] == conn2_i[0] )
         {
             they_match = true;
-            direct = -1;
-            offset = 1;
+            direct     = -1;
+            offset     = 1;
         }
     }
 
     else
     {
         const T* iter;
-        iter = std::find( &conn2_i[ 0 ], &conn2_i[ num_vertices ], conn1_i[ 0 ] );
-        if( iter == &conn2_i[ num_vertices ] ) return false;
+        iter = std::find( &conn2_i[0], &conn2_i[num_vertices], conn1_i[0] );
+        if( iter == &conn2_i[num_vertices] ) return false;
 
         they_match = true;
 
@@ -445,7 +444,7 @@ inline bool connectivity_match( const T* conn1_i, const T* conn2_i, const int nu
         // first compare forward
         for( i = 1; i < num_vertices; ++i )
         {
-            if( conn1_i[ i ] != conn2_i[ ( offset + i ) % num_vertices ] )
+            if( conn1_i[i] != conn2_i[( offset + i ) % num_vertices] )
             {
                 they_match = false;
                 break;
@@ -463,7 +462,7 @@ inline bool connectivity_match( const T* conn1_i, const T* conn2_i, const int nu
         // then compare reverse
         for( i = 1; i < num_vertices; i++ )
         {
-            if( conn1_i[ i ] != conn2_i[ ( offset + num_vertices - i ) % num_vertices ] )
+            if( conn1_i[i] != conn2_i[( offset + num_vertices - i ) % num_vertices] )
             {
                 they_match = false;
                 break;
@@ -515,11 +514,11 @@ short int CN::HONodeIndex( const EntityType this_type, const int num_verts, cons
                            const int subfacet_index )
 {
     int i;
-    int has_mids[ 4 ];
+    int has_mids[4];
     HasMidNodes( this_type, num_verts, has_mids );
 
     // if we have no mid nodes on the subfacet_dim, we have no index
-    if( subfacet_index != -1 && !has_mids[ subfacet_dim ] ) return -1;
+    if( subfacet_index != -1 && !has_mids[subfacet_dim] ) return -1;
 
     // put start index at last index (one less than the number of vertices
     // plus the index basis)
@@ -528,14 +527,14 @@ short int CN::HONodeIndex( const EntityType this_type, const int num_verts, cons
     // for each subfacet dimension less than the target subfacet dim which has mid nodes,
     // add the number of subfacets of that dimension to the index
     for( i = 1; i < subfacet_dim; i++ )
-        if( has_mids[ i ] ) index += NumSubEntities( this_type, i );
+        if( has_mids[i] ) index += NumSubEntities( this_type, i );
 
     // now add the index of this subfacet, or one if we're asking about the entity as a whole
-    if( subfacet_index == -1 && has_mids[ subfacet_dim ] )
+    if( subfacet_index == -1 && has_mids[subfacet_dim] )
         // want the index of the last ho node on this subfacet
         index += NumSubEntities( this_type, subfacet_dim );
 
-    else if( subfacet_index != -1 && has_mids[ subfacet_dim ] )
+    else if( subfacet_index != -1 && has_mids[subfacet_dim] )
         index += subfacet_index + 1 - numberBasis;
 
     // that's it
@@ -552,23 +551,23 @@ void CN::HONodeParent( EntityType elem_type, int num_verts, int ho_index, int& p
     parent_dim = parent_index = -1;
 
     // given the number of verts and the element type, get the hasmidnodes solution
-    int has_mids[ 4 ];
+    int has_mids[4];
     HasMidNodes( elem_type, num_verts, has_mids );
 
-    int       index = VerticesPerEntity( elem_type ) - 1;
+    int index     = VerticesPerEntity( elem_type ) - 1;
     const int dim = Dimension( elem_type );
 
     // keep a running sum of the ho node indices for this type of element, and stop
     // when you get to the dimension which has the ho node
     for( int i = 1; i < dim; i++ )
     {
-        if( has_mids[ i ] )
+        if( has_mids[i] )
         {
             if( ho_index <= index + NumSubEntities( elem_type, i ) )
             {
                 // the ho_index resolves an entity of dimension i, so set the return values
                 // and break out of the loop
-                parent_dim = i;
+                parent_dim   = i;
                 parent_index = ho_index - index - 1;
                 return;
             }
@@ -580,16 +579,16 @@ void CN::HONodeParent( EntityType elem_type, int num_verts, int ho_index, int& p
     }
 
     // mid region node case
-    if( has_mids[ dim ] && ho_index == index + 1 )
+    if( has_mids[dim] && ho_index == index + 1 )
     {
-        parent_dim = dim;
+        parent_dim   = dim;
         parent_index = 0;
     }
 }
 
 const char* CN::EntityTypeName( const EntityType this_type )
 {
-    return entityTypeNames[ this_type ];
+    return entityTypeNames[this_type];
 }
 
 }  // namespace moab
@@ -600,7 +599,7 @@ using moab::EntityType;
 //! get the basis of the numbering system
 void MBCN_GetBasis( int* rval )
 {
-    *rval = CN::GetBasis( );
+    *rval = CN::GetBasis();
 }
 
 //! set the basis of the numbering system
@@ -613,8 +612,8 @@ void MBCN_SetBasis( const int in_basis )
 void MBCN_EntityTypeName( const int this_type, char* rval, int rval_len )
 {
     const char* rval_tmp = CN::EntityTypeName( (EntityType)this_type );
-    int         rval_len_tmp = strlen( rval_tmp );
-    rval_len_tmp = ( rval_len_tmp < rval_len ? rval_len_tmp : rval_len );
+    int rval_len_tmp     = strlen( rval_tmp );
+    rval_len_tmp         = ( rval_len_tmp < rval_len ? rval_len_tmp : rval_len );
     strncpy( rval, rval_tmp, rval_len_tmp );
 }
 
@@ -698,8 +697,8 @@ void MBCN_AdjacentSubEntities( const int this_type, const int* source_indices, c
     std::vector< int > tmp_index_list;
     *rval = CN::AdjacentSubEntities( (EntityType)this_type, source_indices, num_source_indices, source_dim, target_dim,
                                      tmp_index_list, operation_type );
-    std::copy( tmp_index_list.begin( ), tmp_index_list.end( ), index_list );
-    *num_indices = tmp_index_list.size( );
+    std::copy( tmp_index_list.begin(), tmp_index_list.end(), index_list );
+    *num_indices = tmp_index_list.size();
 }
 
 //! return the side index represented in the input sub-entity connectivity
@@ -842,7 +841,7 @@ void MBCN_HasMidRegionNodes( const int this_type, const int num_verts, int* rval
 //! \param num_verts Number of nodes defining entity
 //! \param mid_nodes If <em>mid_nodes[i], i=1..3</em> is true, indicates that mid-edge
 //!    (i=1), mid-face (i=2), and/or mid-region (i=3) nodes are likely
-void MBCN_HasMidNodes( const int this_type, const int num_verts, int mid_nodes[ 4 ] )
+void MBCN_HasMidNodes( const int this_type, const int num_verts, int mid_nodes[4] )
 {
     return CN::HasMidNodes( (EntityType)this_type, num_verts, mid_nodes );
 }
@@ -880,18 +879,18 @@ void MBCN_HONodeIndex( const int this_type, const int num_verts, const int subfa
 namespace moab
 {
 
-template< typename T >
+template < typename T >
 inline int permute_this( EntityType t, const int dim, T* conn, const int indices_per_ent, const int num_entries )
 {
-    T tmp_conn[ MAX_SUB_ENTITIES ];
-    assert( indices_per_ent <= CN::permuteVec[ t ][ dim ][ MAX_SUB_ENTITIES ] );
-    if( indices_per_ent > CN::permuteVec[ t ][ dim ][ MAX_SUB_ENTITIES ] ) return 1;
-    short int* tvec = CN::permuteVec[ t ][ dim ];
-    T*         pvec = conn;
+    T tmp_conn[MAX_SUB_ENTITIES];
+    assert( indices_per_ent <= CN::permuteVec[t][dim][MAX_SUB_ENTITIES] );
+    if( indices_per_ent > CN::permuteVec[t][dim][MAX_SUB_ENTITIES] ) return 1;
+    short int* tvec = CN::permuteVec[t][dim];
+    T* pvec         = conn;
     for( int j = 0; j < num_entries; j++ )
     {
         for( int i = 0; i < indices_per_ent; i++ )
-            tmp_conn[ tvec[ i ] ] = pvec[ i ];
+            tmp_conn[tvec[i]] = pvec[i];
         memcpy( pvec, tmp_conn, indices_per_ent * sizeof( T ) );
         pvec += indices_per_ent;
     }
@@ -899,18 +898,18 @@ inline int permute_this( EntityType t, const int dim, T* conn, const int indices
     return 0;
 }
 
-template< typename T >
+template < typename T >
 inline int rev_permute_this( EntityType t, const int dim, T* conn, const int indices_per_ent, const int num_entries )
 {
-    T tmp_conn[ MAX_SUB_ENTITIES ];
-    assert( indices_per_ent <= CN::revPermuteVec[ t ][ dim ][ MAX_SUB_ENTITIES ] );
-    if( indices_per_ent > CN::revPermuteVec[ t ][ dim ][ MAX_SUB_ENTITIES ] ) return 1;
-    short int* tvec = CN::revPermuteVec[ t ][ dim ];
-    T*         pvec = conn;
+    T tmp_conn[MAX_SUB_ENTITIES];
+    assert( indices_per_ent <= CN::revPermuteVec[t][dim][MAX_SUB_ENTITIES] );
+    if( indices_per_ent > CN::revPermuteVec[t][dim][MAX_SUB_ENTITIES] ) return 1;
+    short int* tvec = CN::revPermuteVec[t][dim];
+    T* pvec         = conn;
     for( int j = 0; j < num_entries; j++ )
     {
         for( int i = 0; i < indices_per_ent; i++ )
-            tmp_conn[ i ] = pvec[ tvec[ i ] ];
+            tmp_conn[i] = pvec[tvec[i]];
         memcpy( pvec, tmp_conn, indices_per_ent * sizeof( T ) );
         pvec += indices_per_ent;
     }
@@ -920,20 +919,19 @@ inline int rev_permute_this( EntityType t, const int dim, T* conn, const int ind
 
 short int CN::Dimension( const EntityType t )
 {
-    return mConnectivityMap[ t ][ 0 ].topo_dimension;
+    return mConnectivityMap[t][0].topo_dimension;
 }
 
 short int CN::VerticesPerEntity( const EntityType t )
 {
-    return (
-        MBVERTEX == t
-            ? (short int)1
-            : mConnectivityMap[ t ][ mConnectivityMap[ t ][ 0 ].topo_dimension - 1 ].num_corners_per_sub_element[ 0 ] );
+    return ( MBVERTEX == t
+                 ? (short int)1
+                 : mConnectivityMap[t][mConnectivityMap[t][0].topo_dimension - 1].num_corners_per_sub_element[0] );
 }
 
 short int CN::NumSubEntities( const EntityType t, const int d )
 {
-    return ( t != MBVERTEX && d > 0 ? mConnectivityMap[ t ][ d - 1 ].num_sub_elements
+    return ( t != MBVERTEX && d > 0 ? mConnectivityMap[t][d - 1].num_sub_elements
                                     : ( d ? (short int)-1 : VerticesPerEntity( t ) ) );
 }
 
@@ -943,7 +941,7 @@ EntityType CN::SubEntityType( const EntityType this_type, const int sub_dimensio
     return ( !sub_dimension ? MBVERTEX
                             : ( Dimension( this_type ) == sub_dimension && 0 == index
                                     ? this_type
-                                    : mConnectivityMap[ this_type ][ sub_dimension - 1 ].target_type[ index ] ) );
+                                    : mConnectivityMap[this_type][sub_dimension - 1].target_type[index] ) );
 }
 
 const short* CN::SubEntityVertexIndices( const EntityType this_type, const int sub_dimension, const int index,
@@ -951,16 +949,16 @@ const short* CN::SubEntityVertexIndices( const EntityType this_type, const int s
 {
     if( sub_dimension == 0 )
     {
-        n = 1;
+        n        = 1;
         sub_type = MBVERTEX;
         return increasingInts + index;
     }
     else
     {
-        const CN::ConnMap& map = mConnectivityMap[ this_type ][ sub_dimension - 1 ];
-        sub_type = map.target_type[ index ];
-        n = map.num_corners_per_sub_element[ index ];
-        return map.conn[ index ];
+        const CN::ConnMap& map = mConnectivityMap[this_type][sub_dimension - 1];
+        sub_type               = map.target_type[index];
+        n                      = map.num_corners_per_sub_element[index];
+        return map.conn[index];
     }
 }
 

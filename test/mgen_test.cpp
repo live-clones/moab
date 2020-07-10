@@ -20,21 +20,21 @@ int main( int argc, char* argv[] )
     MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
     MPI_Comm_size( MPI_COMM_WORLD, &size );
 #endif
-    Core                      mcore;
-    Interface*                mb = &mcore;
-    EntityHandle              fileset;
+    Core mcore;
+    Interface* mb = &mcore;
+    EntityHandle fileset;
     MeshGeneration::BrickOpts opts;
     // default options
     opts.A = opts.B = opts.C = 2;
     opts.M = opts.N = opts.K = 1;
-    opts.blockSize = 4;
+    opts.blockSize           = 4;
     opts.xsize = opts.ysize = opts.zsize = 1.;
-    opts.ui = CartVect( 1., 0, 0. );
-    opts.uj = CartVect( 0., 1., 0. );
-    opts.uk = CartVect( 0., 0., 1. );
+    opts.ui                              = CartVect( 1., 0, 0. );
+    opts.uj                              = CartVect( 0., 1., 0. );
+    opts.uk                              = CartVect( 0., 0., 1. );
     opts.newMergeMethod = opts.quadratic = opts.keep_skins = opts.tetra = false;
     opts.adjEnts = opts.parmerge = false;
-    opts.GL = 0;
+    opts.GL                      = 0;
 
     ProgOptions popts;
 
@@ -70,7 +70,7 @@ int main( int argc, char* argv[] )
     ErrorCode rval = mb->create_meshset( MESHSET_SET, fileset );MB_CHK_ERR( rval );
 
 #ifdef MOAB_HAVE_MPI
-    ParallelComm*   pc = new ParallelComm( mb, MPI_COMM_WORLD );
+    ParallelComm* pc     = new ParallelComm( mb, MPI_COMM_WORLD );
     MeshGeneration* mgen = new MeshGeneration( mb, pc, fileset );
 #else
     MeshGeneration* mgen = new MeshGeneration( mb, 0, fileset );

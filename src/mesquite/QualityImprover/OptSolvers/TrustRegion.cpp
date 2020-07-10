@@ -35,8 +35,8 @@
 #include "MsqError.hpp"
 #include "PatchData.hpp"
 
-#define USE_FN_PC1  // Use 1st preconditioner from Todd's code
-                    // (alternate is whatever is in MsqHessian already)
+#define USE_FN_PC1    // Use 1st preconditioner from Todd's code
+                      // (alternate is whatever is in MsqHessian already)
 #undef DO_STEEP_DESC  // Jason's apparently broken hack to fall back to
                       // steepest descent search direction
 
@@ -44,25 +44,26 @@ namespace MBMesquite
 {
 
 // Force std::vector to release allocated memory
-template< typename T > static inline void free_vector( std::vector< T >& v )
+template < typename T >
+static inline void free_vector( std::vector< T >& v )
 {
     std::vector< T > temp;
     temp.swap( v );
 }
 
-std::string TrustRegion::get_name( ) const
+std::string TrustRegion::get_name() const
 {
     return "TrustRegion";
 }
 
-PatchSet* TrustRegion::get_patch_set( )
+PatchSet* TrustRegion::get_patch_set()
 {
-    return PatchSetUser::get_patch_set( );
+    return PatchSetUser::get_patch_set();
 }
 
 TrustRegion::TrustRegion( ObjectiveFunction* of ) : VertexMover( of ), PatchSetUser( true ), mMemento( 0 ) {}
 
-TrustRegion::~TrustRegion( )
+TrustRegion::~TrustRegion()
 {
     delete mMemento;
     mMemento = 0;
@@ -77,13 +78,13 @@ void TrustRegion::initialize_mesh_iteration( PatchData& /*pd*/, MsqError& /*err*
 
 void TrustRegion::terminate_mesh_iteration( PatchData& /*pd*/, MsqError& /*err*/ ) {}
 
-void TrustRegion::cleanup( )
+void TrustRegion::cleanup()
 {
     // release Memento
     delete mMemento;
     mMemento = 0;
     // release temporary array memory
-    mHess.clear( );
+    mHess.clear();
     free_vector( mGrad );
     free_vector( wVect );
     free_vector( zVect );
@@ -96,7 +97,7 @@ void TrustRegion::cleanup( )
 static inline void negate( Vector3D* out, const Vector3D* in, size_t nn )
 {
     for( size_t i = 0; i < nn; ++i )
-        out[ i ] = -in[ i ];
+        out[i] = -in[i];
 }
 
 // Do v += s * x, where v and x are arrays of length n
@@ -128,12 +129,12 @@ void TrustRegion::compute_preconditioner( MsqError&
     mHessian.calculate_preconditioner( err );
 #else
     double dia;
-    preCond.resize( mHess.size( ) );
-    for( size_t i = 0; i < mHess.size( ); ++i )
+    preCond.resize( mHess.size() );
+    for( size_t i = 0; i < mHess.size(); ++i )
     {
         const Matrix3D& m = *mHess.get_block( i, i );
-        dia = m[ 0 ][ 0 ] + m[ 1 ][ 1 ] + m[ 2 ][ 2 ];
-        preCond[ i ] = dia < DBL_EPSILON ? 1.0 : 1.0 / dia;
+        dia               = m[0][0] + m[1][1] + m[2][2];
+        preCond[i]        = dia < DBL_EPSILON ? 1.0 : 1.0 / dia;
     }
 #endif
 }
@@ -148,28 +149,28 @@ void TrustRegion::apply_preconditioner( Vector3D* z, Vector3D* r,
 #ifndef USE_FN_PC1
     mHessian.apply_preconditioner( z, r, err );
 #else
-    for( size_t i = 0; i < preCond.size( ); ++i )
-        z[ i ] = preCond[ i ] * r[ i ];
+    for( size_t i = 0; i < preCond.size(); ++i )
+        z[i] = preCond[i] * r[i];
 #endif
 }
 
 void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
 {
-    TerminationCriterion& term = *get_inner_termination_criterion( );
-    OFEvaluator&          func = get_objective_function_evaluator( );
+    TerminationCriterion& term = *get_inner_termination_criterion();
+    OFEvaluator& func          = get_objective_function_evaluator();
 
-    const double cg_tol = 1e-2;
-    const double eta_1 = 0.01;
-    const double eta_2 = 0.90;
-    const double tr_incr = 10;
-    const double tr_decr_def = 0.25;
+    const double cg_tol        = 1e-2;
+    const double eta_1         = 0.01;
+    const double eta_2         = 0.90;
+    const double tr_incr       = 10;
+    const double tr_decr_def   = 0.25;
     const double tr_decr_undef = 0.25;
-    const double tr_num_tol = 1e-6;
-    const int    max_cg_iter = 10000;
+    const double tr_num_tol    = 1e-6;
+    const int max_cg_iter      = 10000;
 
     double radius = 1000; /* delta*delta */
 
-    const int nn = pd.num_free_vertices( );
+    const int nn = pd.num_free_vertices();
     wVect.resize( nn );
     Vector3D* w = arrptr( wVect );
     zVect.resize( nn );
@@ -187,7 +188,7 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
     double dMp, norm_d, norm_dp1, norm_p;
     double obj, objn;
 
-    int  cg_iter;
+    int cg_iter;
     bool valid;
 
     mHess.initialize( pd, err );  // hMesh(mesh);
@@ -200,7 +201,7 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
     compute_preconditioner( err );MSQ_ERRRTN( err );
     pd.recreate_vertices_memento( mMemento, err );MSQ_ERRRTN( err );
 
-    while( !term.terminate( ) && ( radius > 1e-20 ) )
+    while( !term.terminate() && ( radius > 1e-20 ) )
     {
 
         norm_r = length_squared( arrptr( mGrad ), nn );
@@ -215,7 +216,7 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
         negate( p, z, nn );
         rz = inner( r, z, nn );
 
-        dMp = 0;
+        dMp    = 0;
         norm_p = rz;
         norm_d = 0;
 
@@ -257,11 +258,11 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
             apply_preconditioner( z, r, err );MSQ_ERRRTN( err );  // prec->apply(z, r, prec, mesh);
 
             rzm1 = rz;
-            rz = inner( r, z, nn );
+            rz   = inner( r, z, nn );
             beta = rz / rzm1;
             times_eq_minus( p, beta, z, nn );
 
-            dMp = beta * ( dMp + alpha * norm_p );
+            dMp    = beta * ( dMp + alpha * norm_p );
             norm_p = rz + beta * beta * norm_p;
             norm_d = norm_dp1;
         }
@@ -269,12 +270,12 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
 #ifdef DO_STEEP_DESC
         if( norm_d <= tr_num_tol )
         {
-            norm_g = length( arrptr( mGrad ), nn );
+            norm_g    = length( arrptr( mGrad ), nn );
             double ll = 1.0;
             if( norm_g < tr_num_tol ) break;
             if( norm_g > radius ) ll = radius / nurm_g;
             for( int i = 0; i < nn; ++i )
-                d[ i ] = ll * mGrad[ i ];
+                d[i] = ll * mGrad[i];
         }
 #endif
 
@@ -283,15 +284,15 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
         memset( p, 0, 3 * sizeof( double ) * nn );
         // matmul(p, mHess, d); //matmul(p, mesh, d);
         mHess.product( p, d );
-        beta = 0.5 * inner( p, d, nn );
+        beta  = 0.5 * inner( p, d, nn );
         kappa = alpha + beta;
 
         /* Put the new point into the locations */
         pd.move_free_vertices_constrained( d, nn, 1.0, err );MSQ_ERRRTN( err );
 
         valid = func.evaluate( pd, objn, err );
-        if( err.error_code( ) == err.BARRIER_VIOLATED )
-            err.clear( );  // barrier violated does not represent an actual error here
+        if( err.error_code() == err.BARRIER_VIOLATED )
+            err.clear();  // barrier violated does not represent an actual error here
         MSQ_ERRRTN( err );
 
         if( !valid )

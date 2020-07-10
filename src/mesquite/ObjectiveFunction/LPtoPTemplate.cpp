@@ -56,27 +56,27 @@ LPtoPTemplate::LPtoPTemplate( QualityMetric* qualitymetric, short Pinput, MsqErr
 
     dividingByN = false;
 
-    clear( );
+    clear();
 }
 
 LPtoPTemplate::LPtoPTemplate( short P, QualityMetric* qm )
     : ObjectiveFunctionTemplate( qm ), pVal( P ), dividingByN( false )
 {
-    clear( );
+    clear();
 }
 
-void LPtoPTemplate::clear( )
+void LPtoPTemplate::clear()
 {
-    mCount = 0;
-    mPowSum = 0;
-    saveCount = 0;
+    mCount     = 0;
+    mPowSum    = 0;
+    saveCount  = 0;
     savePowSum = 0;
 }
 
 // Michael:  need to clean up here
-LPtoPTemplate::~LPtoPTemplate( ) {}
+LPtoPTemplate::~LPtoPTemplate() {}
 
-ObjectiveFunction* LPtoPTemplate::clone( ) const
+ObjectiveFunction* LPtoPTemplate::clone() const
 {
     return new LPtoPTemplate( *this );
 }
@@ -89,21 +89,21 @@ double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type, 
     {
         default:
         case CALCULATE:
-            result = power_sum;
+            result       = power_sum;
             global_count = count;
             break;
 
         case ACCUMULATE:
             mPowSum += power_sum;
             mCount += count;
-            result = mPowSum;
+            result       = mPowSum;
             global_count = mCount;
             break;
 
         case SAVE:
-            savePowSum = power_sum;
-            saveCount = count;
-            result = mPowSum;
+            savePowSum   = power_sum;
+            saveCount    = count;
+            result       = mPowSum;
             global_count = mCount;
             break;
 
@@ -111,15 +111,15 @@ double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type, 
             mPowSum -= savePowSum;
             mCount -= saveCount;
             savePowSum = power_sum;
-            saveCount = count;
+            saveCount  = count;
             mPowSum += savePowSum;
             mCount += saveCount;
-            result = mPowSum;
+            result       = mPowSum;
             global_count = mCount;
             break;
 
         case TEMPORARY:
-            result = mPowSum - savePowSum + power_sum;
+            result       = mPowSum - savePowSum + power_sum;
             global_count = mCount + count - saveCount;
             break;
     }
@@ -135,7 +135,7 @@ double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type, 
 
 bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
-    QualityMetric* qm = get_quality_metric( );
+    QualityMetric* qm = get_quality_metric();
     if( type == ObjectiveFunction::ACCUMULATE )
         qm->get_single_pass( pd, qmHandles, free, err );
     else
@@ -144,8 +144,8 @@ bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, b
 
     // calculate OF value for just the patch
     std::vector< size_t >::const_iterator i;
-    double                                value, working_sum = 0.0;
-    for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
+    double value, working_sum = 0.0;
+    for( i = qmHandles.begin(); i != qmHandles.end(); ++i )
     {
         bool result = qm->evaluate( pd, *i, value, err );
         if( MSQ_CHKERR( err ) || !result ) return false;
@@ -158,7 +158,7 @@ bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, b
 
     // get overall OF value, update member data, etc.
     size_t global_count;
-    value_out = qm->get_negate_flag( ) * get_value( working_sum, qmHandles.size( ), type, global_count, err );
+    value_out = qm->get_negate_flag() * get_value( working_sum, qmHandles.size(), type, global_count, err );
     //  if (!global_count)
     //    return false;  // invalid mesh
     //  else
@@ -168,28 +168,28 @@ bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, b
 bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double& OF_val,
                                             std::vector< Vector3D >& grad_out, MsqError& err )
 {
-    QualityMetric* qm = get_quality_metric( );
+    QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
     MSQ_ERRFALSE( err );
 
     // zero gradient
-    grad_out.clear( );
-    grad_out.resize( pd.num_free_vertices( ), Vector3D( 0.0, 0.0, 0.0 ) );
-    bool   qm_bool = true;
+    grad_out.clear();
+    grad_out.resize( pd.num_free_vertices(), Vector3D( 0.0, 0.0, 0.0 ) );
+    bool qm_bool = true;
     double QM_val;
     OF_val = 0.;
     int p1;
 
     // calculate OF value and gradient for just the patch
     std::vector< size_t >::const_iterator i;
-    for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
+    for( i = qmHandles.begin(); i != qmHandles.end(); ++i )
     {
         qm_bool = qm->evaluate_with_gradient( pd, *i, QM_val, mIndices, mGradient, err );
         if( MSQ_CHKERR( err ) || !qm_bool ) return false;
 
-        QM_val = fabs( QM_val );
+        QM_val        = fabs( QM_val );
         double QM_pow = 1.0;
-        double factor = qm->get_negate_flag( );
+        double factor = qm->get_negate_flag();
         if( pVal == 1 )
             QM_pow = 1.0;
         else
@@ -201,24 +201,24 @@ bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double
         }
 
         OF_val += QM_pow * QM_val;
-        for( size_t j = 0; j < mIndices.size( ); ++j )
+        for( size_t j = 0; j < mIndices.size(); ++j )
         {
-            mGradient[ j ] *= factor;
-            grad_out[ mIndices[ j ] ] += mGradient[ j ];
+            mGradient[j] *= factor;
+            grad_out[mIndices[j]] += mGradient[j];
         }
     }
 
     // get overall OF value, update member data, etc.
     size_t global_count;
-    OF_val = qm->get_negate_flag( ) * get_value( OF_val, qmHandles.size( ), type, global_count, err );
+    OF_val = qm->get_negate_flag() * get_value( OF_val, qmHandles.size(), type, global_count, err );
     //  if (!global_count)
     //    return false;  // invalid mesh
 
     if( dividingByN && global_count )
     {
-        const double                      inv_n = 1.0 / global_count;
+        const double inv_n = 1.0 / global_count;
         std::vector< Vector3D >::iterator g;
-        for( g = grad_out.begin( ); g != grad_out.end( ); ++g )
+        for( g = grad_out.begin(); g != grad_out.end(); ++g )
             *g *= inv_n;
     }
 
@@ -226,30 +226,30 @@ bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double
 }
 
 bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& OF_val,
-                                                    std::vector< Vector3D >&    grad,
+                                                    std::vector< Vector3D >& grad,
                                                     std::vector< SymMatrix3D >& hess_diag, MsqError& err )
 {
-    QualityMetric* qm = get_quality_metric( );
+    QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
     MSQ_ERRFALSE( err );
 
     // zero gradient and hessian
-    grad.clear( );
-    grad.resize( pd.num_free_vertices( ), 0.0 );
-    hess_diag.clear( );
-    hess_diag.resize( pd.num_free_vertices( ), 0.0 );
+    grad.clear();
+    grad.resize( pd.num_free_vertices(), 0.0 );
+    hess_diag.clear();
+    hess_diag.resize( pd.num_free_vertices(), 0.0 );
 
-    double       QM_val, QM_pow = 1.0;
-    double       fac1, fac2;
-    const double negate_flag = qm->get_negate_flag( );
-    bool         qm_bool;
-    size_t       i;
-    short        p;
+    double QM_val, QM_pow = 1.0;
+    double fac1, fac2;
+    const double negate_flag = qm->get_negate_flag();
+    bool qm_bool;
+    size_t i;
+    short p;
 
     // Loops over all elements in the patch.
     OF_val = 0.0;
     std::vector< size_t >::const_iterator k;
-    for( k = qmHandles.begin( ); k != qmHandles.end( ); ++k )
+    for( k = qmHandles.begin(); k != qmHandles.end(); ++k )
     {
         // Computes \nabla^2 Q(e). Only the free vertices will have non-zero entries.
         qm_bool = qm->evaluate_with_Hessian_diagonal( pd, *k, QM_val, mIndices, mGradient, mDiag, err );
@@ -257,14 +257,14 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
         QM_val = fabs( QM_val );
 
         // **** Computes Hessian ****
-        const size_t nve = mIndices.size( );
+        const size_t nve = mIndices.size();
         if( pVal == 1 )
         {
             QM_pow = 1.0;
             for( i = 0; i < nve; ++i )
             {
-                mDiag[ i ] *= negate_flag;
-                hess_diag[ mIndices[ i ] ] += mDiag[ i ];
+                mDiag[i] *= negate_flag;
+                hess_diag[mIndices[i]] += mDiag[i];
             }
             fac1 = 1;
         }
@@ -285,12 +285,12 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
 
             for( i = 0; i < nve; ++i )
             {
-                SymMatrix3D op( mGradient[ i ] );
+                SymMatrix3D op( mGradient[i] );
                 op *= fac2;
-                mDiag[ i ] *= fac1;
-                op += mDiag[ i ];
+                mDiag[i] *= fac1;
+                op += mDiag[i];
                 op *= negate_flag;
-                hess_diag[ mIndices[ i ] ] += op;
+                hess_diag[mIndices[i]] += op;
             }
         }
         else
@@ -305,11 +305,11 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
         for( i = 0; i < nve; ++i )
         {
             // ... computes p*q^{p-1}*grad(q) ...
-            mGradient[ i ] *= fac1 * negate_flag;
+            mGradient[i] *= fac1 * negate_flag;
             // ... and accumulates it in the objective function gradient.
             // also scale the gradient by the scaling factor
-            assert( mIndices[ i ] < pd.num_free_vertices( ) );
-            grad[ mIndices[ i ] ] += mGradient[ i ];
+            assert( mIndices[i] < pd.num_free_vertices() );
+            grad[mIndices[i]] += mGradient[i];
         }
 
         // **** computes Objective Function value \sum_{i=1}^{N_e} |q_i|^P ****
@@ -317,17 +317,17 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
     }
 
     size_t global_count;
-    OF_val = negate_flag * get_value( OF_val, qmHandles.size( ), type, global_count, err );
+    OF_val = negate_flag * get_value( OF_val, qmHandles.size(), type, global_count, err );
     //  if (!global_count)
     //    return false;  // invalid mesh
 
     if( dividingByN && global_count )
     {
         const double inv_n = 1.0 / global_count;
-        for( i = 0; i < pd.num_free_vertices( ); ++i )
+        for( i = 0; i < pd.num_free_vertices(); ++i )
         {
-            grad[ i ] *= inv_n;
-            hess_diag[ i ] *= inv_n;
+            grad[i] *= inv_n;
+            hess_diag[i] *= inv_n;
         }
     }
 
@@ -356,27 +356,27 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
 bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double& OF_val, std::vector< Vector3D >& grad,
                                            MsqHessian& hessian, MsqError& err )
 {
-    QualityMetric* qm = get_quality_metric( );
+    QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
     MSQ_ERRFALSE( err );
-    double negate_flag = qm->get_negate_flag( );
+    double negate_flag = qm->get_negate_flag();
 
     // zero gradient and hessian
-    grad.clear( );
-    grad.resize( pd.num_free_vertices( ), 0.0 );
-    hessian.zero_out( );
+    grad.clear();
+    grad.resize( pd.num_free_vertices(), 0.0 );
+    hessian.zero_out();
 
-    double   QM_val, QM_pow = 1.0;
-    double   fac1, fac2;
+    double QM_val, QM_pow = 1.0;
+    double fac1, fac2;
     Matrix3D elem_outer_product;
-    bool     qm_bool;
-    size_t   i, j, n;
-    short    p;
+    bool qm_bool;
+    size_t i, j, n;
+    short p;
 
     // Loops over all elements in the patch.
     OF_val = 0.0;
     std::vector< size_t >::const_iterator k;
-    for( k = qmHandles.begin( ); k != qmHandles.end( ); ++k )
+    for( k = qmHandles.begin(); k != qmHandles.end(); ++k )
     {
         // Computes \nabla^2 Q(e). Only the free vertices will have non-zero entries.
         qm_bool = qm->evaluate_with_Hessian( pd, *k, QM_val, mIndices, mGradient, mHessian, err );
@@ -384,18 +384,18 @@ bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double&
         QM_val = fabs( QM_val );
 
         // **** Computes Hessian ****
-        const size_t nve = mIndices.size( );
+        const size_t nve = mIndices.size();
         if( pVal == 1 )
         {
             QM_pow = 1.0;
-            n = 0;
+            n      = 0;
             for( i = 0; i < nve; ++i )
             {
                 for( j = i; j < nve; ++j )
                 {
                     // negate if necessary
-                    mHessian[ n ] *= negate_flag;
-                    hessian.add( mIndices[ i ], mIndices[ j ], mHessian[ n ], err );
+                    mHessian[n] *= negate_flag;
+                    hessian.add( mIndices[i], mIndices[j], mHessian[n], err );
                     MSQ_ERRFALSE( err );
                     ++n;
                 }
@@ -422,12 +422,12 @@ bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double&
             {
                 for( j = i; j < nve; ++j )
                 {
-                    elem_outer_product.outer_product( mGradient[ i ], mGradient[ j ] );
+                    elem_outer_product.outer_product( mGradient[i], mGradient[j] );
                     elem_outer_product *= fac2;
-                    mHessian[ n ] *= fac1;
-                    mHessian[ n ] += elem_outer_product;
-                    mHessian[ n ] *= negate_flag;
-                    hessian.add( mIndices[ i ], mIndices[ j ], mHessian[ n ], err );
+                    mHessian[n] *= fac1;
+                    mHessian[n] += elem_outer_product;
+                    mHessian[n] *= negate_flag;
+                    hessian.add( mIndices[i], mIndices[j], mHessian[n], err );
                     MSQ_ERRFALSE( err );
                     ++n;
                 }
@@ -445,11 +445,11 @@ bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double&
         for( i = 0; i < nve; ++i )
         {
             // ... computes p*q^{p-1}*grad(q) ...
-            mGradient[ i ] *= fac1 * negate_flag;
+            mGradient[i] *= fac1 * negate_flag;
             // ... and accumulates it in the objective function gradient.
             // also scale the gradient by the scaling factor
-            assert( mIndices[ i ] < pd.num_free_vertices( ) );
-            grad[ mIndices[ i ] ] += mGradient[ i ];
+            assert( mIndices[i] < pd.num_free_vertices() );
+            grad[mIndices[i]] += mGradient[i];
         }
 
         // **** computes Objective Function value \sum_{i=1}^{N_e} |q_i|^P ****
@@ -457,15 +457,15 @@ bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double&
     }
 
     size_t global_count;
-    OF_val = negate_flag * get_value( OF_val, qmHandles.size( ), type, global_count, err );
+    OF_val = negate_flag * get_value( OF_val, qmHandles.size(), type, global_count, err );
     //  if (!global_count)
     //    return false;  // invalid mesh
 
     if( dividingByN && global_count )
     {
-        const double                      inv_n = 1.0 / global_count;
+        const double inv_n = 1.0 / global_count;
         std::vector< Vector3D >::iterator g;
-        for( g = grad.begin( ); g != grad.end( ); ++g )
+        for( g = grad.begin(); g != grad.end(); ++g )
             *g *= inv_n;
         hessian.scale( inv_n );
     }

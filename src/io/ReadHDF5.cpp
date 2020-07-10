@@ -95,7 +95,7 @@ const bool DEFAULT_BCAST_DUPLICATE_READS = true;
 static herr_t handle_hdf5_error( hid_t stack, void* data )
 {
     ReadHDF5::HDF5ErrorHandler* h = reinterpret_cast< ReadHDF5::HDF5ErrorHandler* >( data );
-    herr_t                      result = 0;
+    herr_t result                 = 0;
     if( h->func ) result = ( *h->func )( stack, h->data );MB_CHK_ERR_CONT( MB_FAILURE );
     return result;
 }
@@ -103,7 +103,7 @@ static herr_t handle_hdf5_error( hid_t stack, void* data )
 static herr_t handle_hdf5_error( void* data )
 {
     ReadHDF5::HDF5ErrorHandler* h = reinterpret_cast< ReadHDF5::HDF5ErrorHandler* >( data );
-    herr_t                      result = 0;
+    herr_t result                 = 0;
     if( h->func ) result = ( *h->func )( h->data );MB_CHK_ERR_CONT( MB_FAILURE );
     return result;
 }
@@ -111,34 +111,34 @@ static herr_t handle_hdf5_error( void* data )
 
 static void copy_sorted_file_ids( const EntityHandle* sorted_ids, long num_ids, Range& results )
 {
-    Range::iterator hint = results.begin( );
-    long            i = 0;
+    Range::iterator hint = results.begin();
+    long i               = 0;
     while( i < num_ids )
     {
-        EntityHandle start = sorted_ids[ i ];
-        for( ++i; i < num_ids && sorted_ids[ i ] == 1 + sorted_ids[ i - 1 ]; ++i )
+        EntityHandle start = sorted_ids[i];
+        for( ++i; i < num_ids && sorted_ids[i] == 1 + sorted_ids[i - 1]; ++i )
             ;
-        hint = results.insert( hint, start, sorted_ids[ i - 1 ] );
+        hint = results.insert( hint, start, sorted_ids[i - 1] );
     }
 }
 
 static void intersect( const mhdf_EntDesc& group, const Range& range, Range& result )
 {
     Range::const_iterator s, e;
-    s = Range::lower_bound( range.begin( ), range.end( ), group.start_id );
-    e = Range::lower_bound( s, range.end( ), group.start_id + group.count );
+    s = Range::lower_bound( range.begin(), range.end(), group.start_id );
+    e = Range::lower_bound( s, range.end(), group.start_id + group.count );
     result.merge( s, e );
 }
 
-#define debug_barrier( ) debug_barrier_line( __LINE__ )
+#define debug_barrier() debug_barrier_line( __LINE__ )
 void ReadHDF5::debug_barrier_line( int lineno )
 {
 #ifdef MOAB_HAVE_MPI
     if( mpiComm )
     {
-        const unsigned       threshold = 2;
+        const unsigned threshold   = 2;
         static unsigned long count = 0;
-        if( dbgOut.get_verbosity( ) >= threshold )
+        if( dbgOut.get_verbosity() >= threshold )
         {
             dbgOut.printf( threshold, "*********** Debug Barrier %lu (@%d)***********\n", ++count, lineno );
             MPI_Barrier( *mpiComm );
@@ -151,16 +151,16 @@ void ReadHDF5::debug_barrier_line( int lineno )
 
 class CheckOpenReadHDF5Handles
 {
-    int             fileline;
+    int fileline;
     mhdf_FileHandle handle;
-    int             enter_count;
+    int enter_count;
 
   public:
     CheckOpenReadHDF5Handles( mhdf_FileHandle file, int line )
         : fileline( line ), handle( file ), enter_count( mhdf_countOpenHandles( file ) )
     {
     }
-    ~CheckOpenReadHDF5Handles( )
+    ~CheckOpenReadHDF5Handles()
     {
         int new_count = mhdf_countOpenHandles( handle );
         if( new_count != enter_count )
@@ -192,7 +192,7 @@ ReadHDF5::ReadHDF5( Interface* iface )
 {
 }
 
-ErrorCode ReadHDF5::init( )
+ErrorCode ReadHDF5::init()
 {
     ErrorCode rval;
 
@@ -217,15 +217,15 @@ ErrorCode ReadHDF5::init( )
         MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    idMap.clear( );
-    fileInfo = 0;
+    idMap.clear();
+    fileInfo   = 0;
     debugTrack = false;
-    myPcomm = 0;
+    myPcomm    = 0;
 
     return MB_SUCCESS;
 }
 
-ReadHDF5::~ReadHDF5( )
+ReadHDF5::~ReadHDF5()
 {
     if( !readUtil )  // init() failed.
         return;
@@ -238,12 +238,12 @@ ReadHDF5::~ReadHDF5( )
 
 ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
 {
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
     indepIO = collIO = H5P_DEFAULT;
-    mpiComm = 0;
+    mpiComm          = 0;
 
-    if( MB_SUCCESS != init( ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
+    if( MB_SUCCESS != init() ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
 #if defined( H5Eget_auto_vers ) && H5Eget_auto_vers > 1
     herr_t err = H5Eget_auto( H5E_DEFAULT, &errorHandler.func, &errorHandler.data );
@@ -260,7 +260,7 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
 #if defined( H5Eset_auto_vers ) && H5Eset_auto_vers > 1
         err = H5Eset_auto( H5E_DEFAULT, &handle_hdf5_error, &errorHandler );
 #else
-        err = H5Eset_auto( &handle_hdf5_error, &errorHandler );
+        err           = H5Eset_auto( &handle_hdf5_error, &errorHandler );
 #endif
         if( err < 0 )
         {
@@ -288,9 +288,9 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
     opts.get_toggle_option( "BCAST_DUPLICATE_READS", DEFAULT_BCAST_DUPLICATE_READS, bcastDuplicateReads );
 
     // Handle parallel options
-    bool use_mpio = ( MB_SUCCESS == opts.get_null_option( "USE_MPIO" ) );
-    rval = opts.match_option( "PARALLEL", "READ_PART" );
-    bool parallel = ( rval != MB_ENTITY_NOT_FOUND );
+    bool use_mpio  = ( MB_SUCCESS == opts.get_null_option( "USE_MPIO" ) );
+    rval           = opts.match_option( "PARALLEL", "READ_PART" );
+    bool parallel  = ( rval != MB_ENTITY_NOT_FOUND );
     nativeParallel = ( rval == MB_SUCCESS );
     if( use_mpio && !parallel )
     { MB_SET_ERR( MB_NOT_IMPLEMENTED, "'USE_MPIO' option specified w/out 'PARALLEL' option" ); }
@@ -317,24 +317,24 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
         dataBuffer = NULL;
         MB_SET_ERR( MB_NOT_IMPLEMENTED, "MOAB not configured with parallel HDF5 support" );
 #else
-        MPI_Info    info = MPI_INFO_NULL;
+        MPI_Info info = MPI_INFO_NULL;
         std::string cb_size;
         rval = opts.get_str_option( "CB_BUFFER_SIZE", cb_size );
         if( MB_SUCCESS == rval )
         {
             MPI_Info_create( &info );
-            MPI_Info_set( info, const_cast< char* >( "cb_buffer_size" ), const_cast< char* >( cb_size.c_str( ) ) );
+            MPI_Info_set( info, const_cast< char* >( "cb_buffer_size" ), const_cast< char* >( cb_size.c_str() ) );
         }
 
         int pcomm_no = 0;
-        rval = opts.get_int_option( "PARALLEL_COMM", pcomm_no );
+        rval         = opts.get_int_option( "PARALLEL_COMM", pcomm_no );
         if( rval == MB_TYPE_OUT_OF_RANGE ) { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
         myPcomm = ParallelComm::get_pcomm( iFace, pcomm_no );
         if( 0 == myPcomm ) { myPcomm = new ParallelComm( iFace, MPI_COMM_WORLD ); }
-        const int rank = myPcomm->proc_config( ).proc_rank( );
+        const int rank = myPcomm->proc_config().proc_rank();
         dbgOut.set_rank( rank );
         dbgOut.limit_output_to_first_N_procs( 32 );
-        mpiComm = new MPI_Comm( myPcomm->proc_config( ).proc_comm( ) );
+        mpiComm = new MPI_Comm( myPcomm->proc_config().proc_comm() );
 
 #ifndef H5_MPI_COMPLEX_DERIVED_DATATYPE_WORKS
         dbgOut.print( 1, "H5_MPI_COMPLEX_DERIVED_DATATYPE_WORKS is not defined\n" );
@@ -351,7 +351,7 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
             if( rank == 0 )
             {
                 file_prop = H5Pcreate( H5P_FILE_ACCESS );
-                err = H5Pset_fapl_mpio( file_prop, MPI_COMM_SELF, MPI_INFO_NULL );
+                err       = H5Pset_fapl_mpio( file_prop, MPI_COMM_SELF, MPI_INFO_NULL );
                 assert( file_prop >= 0 );
                 assert( err >= 0 );
                 filePtr = mhdf_openFileWithOpt( filename, 0, NULL, handleType, file_prop, &status );
@@ -363,7 +363,7 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
                                                     0 );  // no extra set info
                     if( !is_error( status ) )
                     {
-                        size = fileInfo->total_size;
+                        size             = fileInfo->total_size;
                         fileInfo->offset = (unsigned char*)fileInfo;
                     }
                 }
@@ -376,18 +376,18 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
             }
 
             dbgOut.tprint( 1, "Communicating file summary\n" );
-            int mpi_err = MPI_Bcast( &size, 1, MPI_UNSIGNED_LONG, 0, myPcomm->proc_config( ).proc_comm( ) );
+            int mpi_err = MPI_Bcast( &size, 1, MPI_UNSIGNED_LONG, 0, myPcomm->proc_config().proc_comm() );
             if( mpi_err || !size ) return MB_FAILURE;
 
             if( rank != 0 ) fileInfo = reinterpret_cast< mhdf_FileDesc* >( malloc( size ) );
 
-            MPI_Bcast( fileInfo, size, MPI_BYTE, 0, myPcomm->proc_config( ).proc_comm( ) );
+            MPI_Bcast( fileInfo, size, MPI_BYTE, 0, myPcomm->proc_config().proc_comm() );
 
             if( rank != 0 ) mhdf_fixFileDesc( fileInfo, reinterpret_cast< mhdf_FileDesc* >( fileInfo->offset ) );
         }
 
         file_prop = H5Pcreate( H5P_FILE_ACCESS );
-        err = H5Pset_fapl_mpio( file_prop, myPcomm->proc_config( ).proc_comm( ), info );
+        err       = H5Pset_fapl_mpio( file_prop, myPcomm->proc_config().proc_comm(), info );
         assert( file_prop >= 0 );
         assert( err >= 0 );
 
@@ -447,19 +447,19 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
         }
     }
 
-    ReadHDF5Dataset::default_hyperslab_selection_limit( );
+    ReadHDF5Dataset::default_hyperslab_selection_limit();
     int hslimit;
     rval = opts.get_int_option( "HYPERSLAB_SELECT_LIMIT", hslimit );
     if( MB_SUCCESS == rval && hslimit > 0 )
         ReadHDF5Dataset::set_hyperslab_selection_limit( hslimit );
     else
-        ReadHDF5Dataset::default_hyperslab_selection_limit( );
+        ReadHDF5Dataset::default_hyperslab_selection_limit();
     if( MB_SUCCESS != opts.get_null_option( "HYPERSLAB_OR" ) &&
-        ( MB_SUCCESS == opts.get_null_option( "HYPERSLAB_APPEND" ) || HDF5_can_append_hyperslabs( ) ) )
+        ( MB_SUCCESS == opts.get_null_option( "HYPERSLAB_APPEND" ) || HDF5_can_append_hyperslabs() ) )
     {
-        ReadHDF5Dataset::append_hyperslabs( );
+        ReadHDF5Dataset::append_hyperslabs();
         if( MB_SUCCESS != opts.get_int_option( "HYPERSLAB_SELECT_LIMIT", hslimit ) )
-            ReadHDF5Dataset::set_hyperslab_selection_limit( std::numeric_limits< int >::max( ) );
+            ReadHDF5Dataset::set_hyperslab_selection_limit( std::numeric_limits< int >::max() );
         dbgOut.print( 1, "Using H5S_APPEND for hyperslab selection\n" );
     }
 
@@ -521,16 +521,16 @@ ErrorCode ReadHDF5::load_file( const char* filename, const EntityHandle* file_se
     if( MB_SUCCESS == rval )
     {
         cputime = true;
-        timer = new CpuTimer;
+        timer   = new CpuTimer;
         for( int i = 0; i < NUM_TIMES; i++ )
-            _times[ i ] = 0;
+            _times[i] = 0;
     }
 
     // We read the entire set description table regardless of partial
     // or complete reads or serial vs parallel reads
-    rval = read_all_set_meta( );
+    rval = read_all_set_meta();
 
-    if( cputime ) _times[ SET_META_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[SET_META_TIME] = timer->time_elapsed();
     if( subset_list && MB_SUCCESS == rval )
         rval = load_file_partial( subset_list->tag_list, subset_list->tag_list_length, subset_list->num_parts,
                                   subset_list->part_number, opts );
@@ -545,11 +545,11 @@ ErrorCode ReadHDF5::load_file( const char* filename, const EntityHandle* file_se
     ErrorCode rval3 = opts.get_null_option( "STORE_SETS_FILEIDS" );
     if( MB_SUCCESS == rval3 )
     {
-        rval = store_sets_file_ids( );
+        rval = store_sets_file_ids();
         if( MB_SUCCESS != rval ) return rval;
     }
 
-    if( cputime ) _times[ STORE_FILE_IDS_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[STORE_FILE_IDS_TIME] = timer->time_elapsed();
 
     if( MB_SUCCESS == rval && 0 != file_set )
     {
@@ -557,7 +557,7 @@ ErrorCode ReadHDF5::load_file( const char* filename, const EntityHandle* file_se
         rval = read_qa( *file_set );
     }
 
-    if( cputime ) _times[ READ_QA_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[READ_QA_TIME] = timer->time_elapsed();
     dbgOut.tprint( 1, "Cleaning up\n" );
     ErrorCode rval2 = clean_up_read( opts );
     if( rval == MB_SUCCESS && rval2 != MB_SUCCESS ) rval = rval2;
@@ -568,13 +568,13 @@ ErrorCode ReadHDF5::load_file( const char* filename, const EntityHandle* file_se
     {
         std::string msg;
         iFace->get_last_error( msg );
-        dbgOut.tprintf( 1, "READ FAILED (ERROR CODE %s): %s\n", ErrorCodeStr[ rval ], msg.c_str( ) );
+        dbgOut.tprintf( 1, "READ FAILED (ERROR CODE %s): %s\n", ErrorCodeStr[rval], msg.c_str() );
     }
 
     if( cputime )
     {
-        _times[ TOTAL_TIME ] = timer->time_since_birth( );
-        print_times( );
+        _times[TOTAL_TIME] = timer->time_since_birth();
+        print_times();
         delete timer;
     }
     if( H5P_DEFAULT != collIO ) H5Pclose( collIO );
@@ -586,9 +586,9 @@ ErrorCode ReadHDF5::load_file( const char* filename, const EntityHandle* file_se
 
 ErrorCode ReadHDF5::load_file_impl( const FileOptions& )
 {
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
-    int         i;
+    int i;
 
     CHECK_OPEN_HANDLES;
 
@@ -605,7 +605,7 @@ ErrorCode ReadHDF5::load_file_impl( const FileOptions& )
     std::vector< int > polyhedra;  // Need to do these last so that faces are loaded
     for( i = 0; i < fileInfo->num_elem_desc; ++i )
     {
-        if( CN::EntityTypeFromName( fileInfo->elems[ i ].type ) == MBPOLYHEDRON )
+        if( CN::EntityTypeFromName( fileInfo->elems[i].type ) == MBPOLYHEDRON )
         {
             polyhedra.push_back( i );
             continue;
@@ -614,14 +614,14 @@ ErrorCode ReadHDF5::load_file_impl( const FileOptions& )
         rval = read_elems( i );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
-    for( std::vector< int >::iterator it = polyhedra.begin( ); it != polyhedra.end( ); ++it )
+    for( std::vector< int >::iterator it = polyhedra.begin(); it != polyhedra.end(); ++it )
     {
         rval = read_elems( *it );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
     dbgOut.tprint( 1, "Reading all sets...\n" );
-    ids.clear( );
+    ids.clear();
     if( fileInfo->sets.count )
     {
         ids.insert( fileInfo->sets.start_id, fileInfo->sets.start_id + fileInfo->sets.count - 1 );
@@ -632,10 +632,10 @@ ErrorCode ReadHDF5::load_file_impl( const FileOptions& )
     dbgOut.tprint( 1, "Reading all adjacencies...\n" );
     for( i = 0; i < fileInfo->num_elem_desc; ++i )
     {
-        if( !fileInfo->elems[ i ].have_adj ) continue;
+        if( !fileInfo->elems[i].have_adj ) continue;
 
-        long  table_len;
-        hid_t table = mhdf_openAdjacency( filePtr, fileInfo->elems[ i ].handle, &table_len, &status );
+        long table_len;
+        hid_t table = mhdf_openAdjacency( filePtr, fileInfo->elems[i].handle, &table_len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
         rval = read_adjacencies( table, table_len );
@@ -658,12 +658,12 @@ ErrorCode ReadHDF5::load_file_impl( const FileOptions& )
 ErrorCode ReadHDF5::find_int_tag( const char* name, int& index )
 {
     for( index = 0; index < fileInfo->num_tag_desc; ++index )
-        if( !strcmp( name, fileInfo->tags[ index ].name ) ) break;
+        if( !strcmp( name, fileInfo->tags[index].name ) ) break;
 
     if( index == fileInfo->num_tag_desc )
     { MB_SET_ERR( MB_TAG_NOT_FOUND, "File does not contain subset tag '" << name << "'" ); }
 
-    if( fileInfo->tags[ index ].type != mhdf_INTEGER || fileInfo->tags[ index ].size != 1 )
+    if( fileInfo->tags[index].type != mhdf_INTEGER || fileInfo->tags[index].size != 1 )
     { MB_SET_ERR( MB_TAG_NOT_FOUND, "Tag ' " << name << "' does not contain single integer value" ); }
 
     return MB_SUCCESS;
@@ -676,21 +676,21 @@ ErrorCode ReadHDF5::get_subset_ids( const ReaderIface::IDTag* subset_list, int s
     for( int i = 0; i < subset_list_length; ++i )
     {
         int tag_index;
-        rval = find_int_tag( subset_list[ i ].tag_name, tag_index );
+        rval = find_int_tag( subset_list[i].tag_name, tag_index );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
         Range tmp_file_ids;
-        if( !subset_list[ i ].num_tag_values ) { rval = get_tagged_entities( tag_index, tmp_file_ids ); }
+        if( !subset_list[i].num_tag_values ) { rval = get_tagged_entities( tag_index, tmp_file_ids ); }
         else
         {
-            std::vector< int > ids( subset_list[ i ].tag_values,
-                                    subset_list[ i ].tag_values + subset_list[ i ].num_tag_values );
-            std::sort( ids.begin( ), ids.end( ) );
+            std::vector< int > ids( subset_list[i].tag_values,
+                                    subset_list[i].tag_values + subset_list[i].num_tag_values );
+            std::sort( ids.begin(), ids.end() );
             rval = search_tag_values( tag_index, ids, tmp_file_ids );
             if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
         }
 
-        if( tmp_file_ids.empty( ) ) MB_CHK_ERR( MB_ENTITY_NOT_FOUND );
+        if( tmp_file_ids.empty() ) MB_CHK_ERR( MB_ENTITY_NOT_FOUND );
 
         if( i == 0 )
             file_ids.swap( tmp_file_ids );
@@ -706,21 +706,21 @@ ErrorCode ReadHDF5::get_partition( Range& tmp_file_ids, int num_parts, int part_
     CHECK_OPEN_HANDLES;
 
     // Check that the tag only identified sets
-    if( (unsigned long)fileInfo->sets.start_id > tmp_file_ids.front( ) )
+    if( (unsigned long)fileInfo->sets.start_id > tmp_file_ids.front() )
     {
         dbgOut.print( 2, "Ignoring non-set entities with partition set tag\n" );
-        tmp_file_ids.erase( tmp_file_ids.begin( ), tmp_file_ids.lower_bound( (EntityHandle)fileInfo->sets.start_id ) );
+        tmp_file_ids.erase( tmp_file_ids.begin(), tmp_file_ids.lower_bound( (EntityHandle)fileInfo->sets.start_id ) );
     }
     unsigned long set_end = (unsigned long)fileInfo->sets.start_id + fileInfo->sets.count;
-    if( tmp_file_ids.back( ) >= set_end )
+    if( tmp_file_ids.back() >= set_end )
     {
         dbgOut.print( 2, "Ignoring non-set entities with partition set tag\n" );
-        tmp_file_ids.erase( tmp_file_ids.upper_bound( (EntityHandle)set_end ), tmp_file_ids.end( ) );
+        tmp_file_ids.erase( tmp_file_ids.upper_bound( (EntityHandle)set_end ), tmp_file_ids.end() );
     }
 
-    Range::iterator s = tmp_file_ids.begin( );
-    size_t          num_per_proc = tmp_file_ids.size( ) / num_parts;
-    size_t          num_extra = tmp_file_ids.size( ) % num_parts;
+    Range::iterator s   = tmp_file_ids.begin();
+    size_t num_per_proc = tmp_file_ids.size() / num_parts;
+    size_t num_extra    = tmp_file_ids.size() % num_parts;
     Range::iterator e;
     if( part_number < (long)num_extra )
     {
@@ -734,8 +734,8 @@ ErrorCode ReadHDF5::get_partition( Range& tmp_file_ids, int num_parts, int part_
         e = s;
         e += num_per_proc;
     }
-    tmp_file_ids.erase( e, tmp_file_ids.end( ) );
-    tmp_file_ids.erase( tmp_file_ids.begin( ), s );
+    tmp_file_ids.erase( e, tmp_file_ids.end() );
+    tmp_file_ids.erase( tmp_file_ids.begin(), s );
 
     return MB_SUCCESS;
 }
@@ -753,14 +753,14 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
 
     for( int i = 0; i < subset_list_length; ++i )
     {
-        dbgOut.printf( 2, "Select by \"%s\" with num_tag_values = %d\n", subset_list[ i ].tag_name,
-                       subset_list[ i ].num_tag_values );
-        if( subset_list[ i ].num_tag_values )
+        dbgOut.printf( 2, "Select by \"%s\" with num_tag_values = %d\n", subset_list[i].tag_name,
+                       subset_list[i].num_tag_values );
+        if( subset_list[i].num_tag_values )
         {
-            assert( 0 != subset_list[ i ].tag_values );
-            dbgOut.printf( 2, "  \"%s\" values = { %d", subset_list[ i ].tag_name, subset_list[ i ].tag_values[ 0 ] );
-            for( int j = 1; j < subset_list[ i ].num_tag_values; ++j )
-                dbgOut.printf( 2, ", %d", subset_list[ i ].tag_values[ j ] );
+            assert( 0 != subset_list[i].tag_values );
+            dbgOut.printf( 2, "  \"%s\" values = { %d", subset_list[i].tag_name, subset_list[i].tag_values[0] );
+            for( int j = 1; j < subset_list[i].num_tag_values; ++j )
+                dbgOut.printf( 2, ", %d", subset_list[i].tag_values[j] );
             dbgOut.printf( 2, " }\n" );
         }
     }
@@ -768,11 +768,11 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
 
     dbgOut.tprint( 1, "RETRIEVING TAGGED ENTITIES\n" );
 
-    Range     file_ids;
+    Range file_ids;
     ErrorCode rval = get_subset_ids( subset_list, subset_list_length, file_ids );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( cputime ) _times[ SUBSET_IDS_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[SUBSET_IDS_TIME] = timer->time_elapsed();
 
     if( num_parts )
     {
@@ -785,10 +785,10 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    if( cputime ) _times[ GET_PARTITION_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[GET_PARTITION_TIME] = timer->time_elapsed();
 
     dbgOut.print_ints( 4, "Set file IDs for partial read: ", file_ids );
-    mpe_event.end( );
+    mpe_event.end();
     mpe_event.start( "gather related sets" );
     dbgOut.tprint( 1, "GATHERING ADDITIONAL ENTITIES\n" );
 
@@ -799,7 +799,7 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         RSM_CONTENTS
     };
     const char* const set_opts[] = { "NONE", "SETS", "CONTENTS", NULL };
-    int               child_mode;
+    int child_mode;
     rval = opts.match_option( "CHILDREN", set_opts, child_mode );
     if( MB_ENTITY_NOT_FOUND == rval )
         child_mode = RSM_CONTENTS;
@@ -828,37 +828,37 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    if( cputime ) _times[ GET_SET_IDS_TIME ] = timer->time_elapsed( );
-    debug_barrier( );
+    if( cputime ) _times[GET_SET_IDS_TIME] = timer->time_elapsed();
+    debug_barrier();
 
     // Get elements and vertices contained in sets
     dbgOut.tprint( 1, "  doing get_set_contents\n" );
     rval = get_set_contents( sets, file_ids );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( cputime ) _times[ GET_SET_CONTENTS_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[GET_SET_CONTENTS_TIME] = timer->time_elapsed();
 
     dbgOut.print_ints( 5, "File IDs for partial read: ", file_ids );
-    debug_barrier( );
-    mpe_event.end( );
+    debug_barrier();
+    mpe_event.end();
     dbgOut.tprint( 1, "GATHERING NODE IDS\n" );
 
     // Figure out the maximum dimension of entity to be read
     int max_dim = 0;
     for( int i = 0; i < fileInfo->num_elem_desc; ++i )
     {
-        EntityType type = CN::EntityTypeFromName( fileInfo->elems[ i ].type );
+        EntityType type = CN::EntityTypeFromName( fileInfo->elems[i].type );
         if( type <= MBVERTEX || type >= MBENTITYSET )
         {
             assert( false );  // For debug code die for unknown element types
-            continue;  // For release code, skip unknown element types
+            continue;         // For release code, skip unknown element types
         }
         int dim = CN::Dimension( type );
         if( dim > max_dim )
         {
             Range subset;
-            intersect( fileInfo->elems[ i ].desc, file_ids, subset );
-            if( !subset.empty( ) ) max_dim = dim;
+            intersect( fileInfo->elems[i].desc, file_ids, subset );
+            if( !subset.empty() ) max_dim = dim;
         }
     }
 #ifdef MOAB_HAVE_MPI
@@ -874,40 +874,40 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
     // read said faces in that loop.
     for( int i = 0; i < fileInfo->num_elem_desc; ++i )
     {
-        EntityType type = CN::EntityTypeFromName( fileInfo->elems[ i ].type );
+        EntityType type = CN::EntityTypeFromName( fileInfo->elems[i].type );
         if( type != MBPOLYHEDRON ) continue;
 
-        debug_barrier( );
+        debug_barrier();
         dbgOut.print( 2, "    Getting polyhedra faces\n" );
-        mpe_event.start( "reading connectivity for ", fileInfo->elems[ i ].handle );
+        mpe_event.start( "reading connectivity for ", fileInfo->elems[i].handle );
 
         Range polyhedra;
-        intersect( fileInfo->elems[ i ].desc, file_ids, polyhedra );
+        intersect( fileInfo->elems[i].desc, file_ids, polyhedra );
         rval = read_elems( i, polyhedra, &file_ids );
         mpe_event.end( rval );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    if( cputime ) _times[ GET_POLYHEDRA_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[GET_POLYHEDRA_TIME] = timer->time_elapsed();
     // Get node file ids for all elements
     Range nodes;
     intersect( fileInfo->nodes, file_ids, nodes );
     for( int i = 0; i < fileInfo->num_elem_desc; ++i )
     {
-        EntityType type = CN::EntityTypeFromName( fileInfo->elems[ i ].type );
+        EntityType type = CN::EntityTypeFromName( fileInfo->elems[i].type );
         if( type <= MBVERTEX || type >= MBENTITYSET )
         {
             assert( false );  // For debug code die for unknown element types
-            continue;  // For release code, skip unknown element types
+            continue;         // For release code, skip unknown element types
         }
         if( MBPOLYHEDRON == type ) continue;
 
-        debug_barrier( );
-        dbgOut.printf( 2, "    Getting element node IDs for: %s\n", fileInfo->elems[ i ].handle );
+        debug_barrier();
+        dbgOut.printf( 2, "    Getting element node IDs for: %s\n", fileInfo->elems[i].handle );
 
         Range subset;
-        intersect( fileInfo->elems[ i ].desc, file_ids, subset );
-        mpe_event.start( "reading connectivity for ", fileInfo->elems[ i ].handle );
+        intersect( fileInfo->elems[i].desc, file_ids, subset );
+        mpe_event.start( "reading connectivity for ", fileInfo->elems[i].handle );
 
         // If dimension is max_dim, then we can create the elements now
         // so we don't have to read the table again later (connectivity
@@ -923,11 +923,11 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         mpe_event.end( rval );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
-    if( cputime ) _times[ GET_ELEMENTS_TIME ] = timer->time_elapsed( );
-    debug_barrier( );
+    if( cputime ) _times[GET_ELEMENTS_TIME] = timer->time_elapsed();
+    debug_barrier();
     mpe_event.start( "read coords" );
-    dbgOut.tprintf( 1, "READING NODE COORDINATES (%lu nodes in %lu selects)\n", (unsigned long)nodes.size( ),
-                    (unsigned long)nodes.psize( ) );
+    dbgOut.tprintf( 1, "READING NODE COORDINATES (%lu nodes in %lu selects)\n", (unsigned long)nodes.size(),
+                    (unsigned long)nodes.psize() );
 
     // Read node coordinates and create vertices in MOAB
     // NOTE: This populates the RangeMap with node file ids,
@@ -936,9 +936,9 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
     mpe_event.end( rval );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( cputime ) _times[ GET_NODES_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[GET_NODES_TIME] = timer->time_elapsed();
 
-    debug_barrier( );
+    debug_barrier();
     dbgOut.tprint( 1, "READING ELEMENTS\n" );
 
     // Decide if we need to read additional elements
@@ -948,9 +948,9 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         SM_NODES,
         SM_SIDES
     };
-    int               side_mode;
+    int side_mode;
     const char* const options[] = { "EXPLICIT", "NODES", "SIDES", 0 };
-    rval = opts.match_option( "ELEMENTS", options, side_mode );
+    rval                        = opts.match_option( "ELEMENTS", options, side_mode );
     if( MB_ENTITY_NOT_FOUND == rval )
     {
         // If only nodes were specified, then default to "NODES", otherwise
@@ -975,23 +975,23 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         {
             for( int i = 0; i < fileInfo->num_elem_desc; ++i )
             {
-                EntityType type = CN::EntityTypeFromName( fileInfo->elems[ i ].type );
+                EntityType type = CN::EntityTypeFromName( fileInfo->elems[i].type );
                 if( CN::Dimension( type ) == dim )
                 {
-                    debug_barrier( );
-                    dbgOut.tprintf( 2, "    Reading node-adjacent elements for: %s\n", fileInfo->elems[ i ].handle );
-                    mpe_event.start( "reading connectivity for ", fileInfo->elems[ i ].handle );
+                    debug_barrier();
+                    dbgOut.tprintf( 2, "    Reading node-adjacent elements for: %s\n", fileInfo->elems[i].handle );
+                    mpe_event.start( "reading connectivity for ", fileInfo->elems[i].handle );
                     Range ents;
-                    rval = read_node_adj_elems( fileInfo->elems[ i ] );
+                    rval = read_node_adj_elems( fileInfo->elems[i] );
                     mpe_event.end( rval );
                     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
-                    if( !ents.empty( ) ) max_dim = 3;
+                    if( !ents.empty() ) max_dim = 3;
                 }
             }
         }
     }
 
-    if( cputime ) _times[ GET_NODEADJ_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[GET_NODEADJ_TIME] = timer->time_elapsed();
     Range side_entities;
     if( side_mode != SM_EXPLICIT /*ELEMENTS=NODES || ELEMENTS=SIDES*/ )
     {
@@ -1002,13 +1002,13 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         {
             for( int i = 0; i < fileInfo->num_elem_desc; ++i )
             {
-                EntityType type = CN::EntityTypeFromName( fileInfo->elems[ i ].type );
+                EntityType type = CN::EntityTypeFromName( fileInfo->elems[i].type );
                 if( CN::Dimension( type ) == dim )
                 {
-                    debug_barrier( );
-                    dbgOut.tprintf( 2, "    Reading node-adjacent elements for: %s\n", fileInfo->elems[ i ].handle );
-                    mpe_event.start( "reading connectivity for ", fileInfo->elems[ i ].handle );
-                    rval = read_node_adj_elems( fileInfo->elems[ i ], &side_entities );
+                    debug_barrier();
+                    dbgOut.tprintf( 2, "    Reading node-adjacent elements for: %s\n", fileInfo->elems[i].handle );
+                    mpe_event.start( "reading connectivity for ", fileInfo->elems[i].handle );
+                    rval = read_node_adj_elems( fileInfo->elems[i], &side_entities );
                     mpe_event.end( rval );
                     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
                 }
@@ -1020,16 +1020,16 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
     // We have to wait until the faces are read in the above code block,
     // but need to create the connectivity before doing update_connectivity,
     // which might otherwise delete polyhedra faces.
-    if( cputime ) _times[ GET_SIDEELEM_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[GET_SIDEELEM_TIME] = timer->time_elapsed();
 
-    debug_barrier( );
+    debug_barrier();
     dbgOut.tprint( 1, "UPDATING CONNECTIVITY ARRAYS FOR READ ELEMENTS\n" );
     mpe_event.start( "updating connectivity for elements read before vertices" );
-    rval = update_connectivity( );
-    mpe_event.end( );
+    rval = update_connectivity();
+    mpe_event.end();
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( cputime ) _times[ UPDATECONN_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[UPDATECONN_TIME] = timer->time_elapsed();
 
     dbgOut.tprint( 1, "READING ADJACENCIES\n" );
     for( int i = 0; i < fileInfo->num_elem_desc; ++i )
@@ -1037,9 +1037,9 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         if (fileInfo->elems[i].have_adj  /*&&
         idMap.intersects(fileInfo->elems[i].desc.start_id, fileInfo->elems[i].desc.count) */)
         {
-            mpe_event.start( "reading adjacencies for ", fileInfo->elems[ i ].handle );
-            long  len;
-            hid_t th = mhdf_openAdjacency( filePtr, fileInfo->elems[ i ].handle, &len, &status );
+            mpe_event.start( "reading adjacencies for ", fileInfo->elems[i].handle );
+            long len;
+            hid_t th = mhdf_openAdjacency( filePtr, fileInfo->elems[i].handle, &len, &status );
             if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
             rval = read_adjacencies( th, len );
@@ -1049,7 +1049,7 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         }
     }
 
-    if( cputime ) _times[ ADJACENCY_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[ADJACENCY_TIME] = timer->time_elapsed();
 
     // If doing ELEMENTS=SIDES then we need to delete any entities
     // that we read that aren't actually sides (e.g. an interior face
@@ -1058,7 +1058,7 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
     // happen before this.
     if( side_mode == SM_SIDES )
     {
-        debug_barrier( );
+        debug_barrier();
         mpe_event.start( "cleaning up non-side lower-dim elements" );
         dbgOut.tprint( 1, "CHECKING FOR AND DELETING NON-SIDE ELEMENTS\n" );
         rval = delete_non_side_elements( side_entities );
@@ -1066,9 +1066,9 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    if( cputime ) _times[ DELETE_NON_SIDEELEM_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[DELETE_NON_SIDEELEM_TIME] = timer->time_elapsed();
 
-    debug_barrier( );
+    debug_barrier();
     dbgOut.tprint( 1, "READING SETS\n" );
 
     // If reading contained/child sets but not their contents then find
@@ -1083,13 +1083,13 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    if( cputime ) _times[ READ_SET_IDS_RECURS_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[READ_SET_IDS_RECURS_TIME] = timer->time_elapsed();
 
     dbgOut.tprint( 1, "  doing find_sets_containing\n" );
     mpe_event.start( "finding sets containing any read entities" );
 
     // Decide whether to read set-containing parents
-    bool        read_set_containing_parents = true;
+    bool read_set_containing_parents = true;
     std::string tmp_opt;
     rval = opts.get_option( "NO_SET_CONTAINING_PARENTS", tmp_opt );
     if( MB_SUCCESS == rval ) read_set_containing_parents = false;
@@ -1100,7 +1100,7 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
     mpe_event.end( rval );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( cputime ) _times[ FIND_SETS_CONTAINING_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[FIND_SETS_CONTAINING_TIME] = timer->time_elapsed();
 
     // Now actually read all set data and instantiate sets in MOAB.
     // Get any contained sets out of file_ids.
@@ -1112,18 +1112,18 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
     mpe_event.end( rval );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( cputime ) _times[ READ_SETS_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[READ_SETS_TIME] = timer->time_elapsed();
 
     dbgOut.tprint( 1, "READING TAGS\n" );
 
     for( int i = 0; i < fileInfo->num_tag_desc; ++i )
     {
-        mpe_event.start( "reading tag: ", fileInfo->tags[ i ].name );
+        mpe_event.start( "reading tag: ", fileInfo->tags[i].name );
         rval = read_tag( i );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
 
-    if( cputime ) _times[ READ_TAGS_TIME ] = timer->time_elapsed( );
+    if( cputime ) _times[READ_TAGS_TIME] = timer->time_elapsed();
 
     dbgOut.tprint( 1, "PARTIAL READ COMPLETE.\n" );
 
@@ -1133,31 +1133,31 @@ ErrorCode ReadHDF5::load_file_partial( const ReaderIface::IDTag* subset_list, in
 ErrorCode ReadHDF5::search_tag_values( int tag_index, const std::vector< int >& sorted_values, Range& file_ids,
                                        bool sets_only )
 {
-    ErrorCode                             rval;
-    mhdf_Status                           status;
+    ErrorCode rval;
+    mhdf_Status status;
     std::vector< EntityHandle >::iterator iter;
-    const mhdf_TagDesc&                   tag = fileInfo->tags[ tag_index ];
-    long                                  size;
-    long                                  start_id;
+    const mhdf_TagDesc& tag = fileInfo->tags[tag_index];
+    long size;
+    long start_id;
 
     CHECK_OPEN_HANDLES;
 
-    debug_barrier( );
+    debug_barrier();
 
     // Do dense data
 
-    hid_t                       table;
-    const char*                 name;
+    hid_t table;
+    const char* name;
     std::vector< EntityHandle > indices;
     // These are probably in order of dimension, so iterate
     // in reverse order to make Range insertions more efficient.
     std::vector< int > grp_indices( tag.dense_elem_indices, tag.dense_elem_indices + tag.num_dense_indices );
-    for( std::vector< int >::reverse_iterator i = grp_indices.rbegin( ); i != grp_indices.rend( ); ++i )
+    for( std::vector< int >::reverse_iterator i = grp_indices.rbegin(); i != grp_indices.rend(); ++i )
     {
         int idx = *i;
         if( idx == -2 )
         {
-            name = mhdf_set_type_handle( );
+            name     = mhdf_set_type_handle();
             start_id = fileInfo->sets.start_id;
         }
         else if( sets_only )
@@ -1166,14 +1166,14 @@ ErrorCode ReadHDF5::search_tag_values( int tag_index, const std::vector< int >& 
         }
         else if( idx == -1 )
         {
-            name = mhdf_node_type_handle( );
+            name     = mhdf_node_type_handle();
             start_id = fileInfo->nodes.start_id;
         }
         else
         {
             if( idx < 0 || idx >= fileInfo->num_elem_desc ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
-            name = fileInfo->elems[ idx ].handle;
-            start_id = fileInfo->elems[ idx ].desc.start_id;
+            name     = fileInfo->elems[idx].handle;
+            start_id = fileInfo->elems[idx].desc.start_id;
         }
         table = mhdf_openDenseTagData( filePtr, tag.name, name, &size, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
@@ -1181,87 +1181,87 @@ ErrorCode ReadHDF5::search_tag_values( int tag_index, const std::vector< int >& 
         mhdf_closeData( filePtr, table, &status );
         if( MB_SUCCESS != rval || is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         // Convert from table indices to file IDs and add to result list
-        std::sort( indices.begin( ), indices.end( ), std::greater< EntityHandle >( ) );
-        std::transform( indices.begin( ), indices.end( ), range_inserter( file_ids ),
+        std::sort( indices.begin(), indices.end(), std::greater< EntityHandle >() );
+        std::transform( indices.begin(), indices.end(), range_inserter( file_ids ),
                         // std::bind1st(std::plus<long>(), start_id));
-                        std::bind( std::plus< long >( ), start_id, std::placeholders::_1 ) );
-        indices.clear( );
+                        std::bind( std::plus< long >(), start_id, std::placeholders::_1 ) );
+        indices.clear();
     }
 
     if( !tag.have_sparse ) return MB_SUCCESS;
 
     // Do sparse data
 
-    hid_t tables[ 2 ];
-    long  junk;  // Redundant value for non-variable-length tags
+    hid_t tables[2];
+    long junk;  // Redundant value for non-variable-length tags
     mhdf_openSparseTagData( filePtr, tag.name, &size, &junk, tables, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
-    rval = search_tag_values( tables[ 1 ], size, sorted_values, indices );
-    mhdf_closeData( filePtr, tables[ 1 ], &status );
+    rval = search_tag_values( tables[1], size, sorted_values, indices );
+    mhdf_closeData( filePtr, tables[1], &status );
     if( MB_SUCCESS != rval || is_error( status ) )
     {
-        mhdf_closeData( filePtr, tables[ 0 ], &status );
+        mhdf_closeData( filePtr, tables[0], &status );
         MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
     }
     // Convert to ranges
-    std::sort( indices.begin( ), indices.end( ) );
+    std::sort( indices.begin(), indices.end() );
     std::vector< EntityHandle > ranges;
-    iter = indices.begin( );
-    while( iter != indices.end( ) )
+    iter = indices.begin();
+    while( iter != indices.end() )
     {
         ranges.push_back( *iter );
         EntityHandle last = *iter;
-        for( ++iter; iter != indices.end( ) && ( last + 1 ) == *iter; ++iter, ++last )
+        for( ++iter; iter != indices.end() && ( last + 1 ) == *iter; ++iter, ++last )
             ;
         ranges.push_back( last );
     }
     // Read file ids
-    iter = ranges.begin( );
+    iter                 = ranges.begin();
     unsigned long offset = 0;
-    while( iter != ranges.end( ) )
+    while( iter != ranges.end() )
     {
         long begin = *iter;
         ++iter;
         long end = *iter;
         ++iter;
-        mhdf_readSparseTagEntitiesWithOpt( tables[ 0 ], begin, end - begin + 1, handleType, &indices[ offset ], indepIO,
+        mhdf_readSparseTagEntitiesWithOpt( tables[0], begin, end - begin + 1, handleType, &indices[offset], indepIO,
                                            &status );
         if( is_error( status ) )
         {
-            mhdf_closeData( filePtr, tables[ 0 ], &status );
+            mhdf_closeData( filePtr, tables[0], &status );
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
         offset += end - begin + 1;
     }
-    mhdf_closeData( filePtr, tables[ 0 ], &status );
+    mhdf_closeData( filePtr, tables[0], &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
-    assert( offset == indices.size( ) );
-    std::sort( indices.begin( ), indices.end( ) );
+    assert( offset == indices.size() );
+    std::sort( indices.begin(), indices.end() );
 
     if( sets_only )
     {
-        iter = std::lower_bound( indices.begin( ), indices.end( ),
+        iter = std::lower_bound( indices.begin(), indices.end(),
                                  ( EntityHandle )( fileInfo->sets.start_id + fileInfo->sets.count ) );
-        indices.erase( iter, indices.end( ) );
-        iter = std::lower_bound( indices.begin( ), indices.end( ), fileInfo->sets.start_id );
-        indices.erase( indices.begin( ), iter );
+        indices.erase( iter, indices.end() );
+        iter = std::lower_bound( indices.begin(), indices.end(), fileInfo->sets.start_id );
+        indices.erase( indices.begin(), iter );
     }
-    copy_sorted_file_ids( &indices[ 0 ], indices.size( ), file_ids );
+    copy_sorted_file_ids( &indices[0], indices.size(), file_ids );
 
     return MB_SUCCESS;
 }
 
 ErrorCode ReadHDF5::get_tagged_entities( int tag_index, Range& file_ids )
 {
-    const mhdf_TagDesc& tag = fileInfo->tags[ tag_index ];
+    const mhdf_TagDesc& tag = fileInfo->tags[tag_index];
 
     CHECK_OPEN_HANDLES;
 
     // Do dense data
-    Range::iterator hint = file_ids.begin( );
+    Range::iterator hint = file_ids.begin();
     for( int i = 0; i < tag.num_dense_indices; ++i )
     {
-        int           idx = tag.dense_elem_indices[ i ];
+        int idx = tag.dense_elem_indices[i];
         mhdf_EntDesc* ents;
         if( idx == -2 )
             ents = &fileInfo->sets;
@@ -1270,11 +1270,11 @@ ErrorCode ReadHDF5::get_tagged_entities( int tag_index, Range& file_ids )
         else
         {
             if( idx < 0 || idx >= fileInfo->num_elem_desc ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
-            ents = &( fileInfo->elems[ idx ].desc );
+            ents = &( fileInfo->elems[idx].desc );
         }
 
         EntityHandle h = (EntityHandle)ents->start_id;
-        hint = file_ids.insert( hint, h, h + ents->count - 1 );
+        hint           = file_ids.insert( hint, h, h + ents->count - 1 );
     }
 
     if( !tag.have_sparse ) return MB_SUCCESS;
@@ -1282,24 +1282,24 @@ ErrorCode ReadHDF5::get_tagged_entities( int tag_index, Range& file_ids )
     // Do sparse data
 
     mhdf_Status status;
-    hid_t       tables[ 2 ];
-    long        size, junk;
+    hid_t tables[2];
+    long size, junk;
     mhdf_openSparseTagData( filePtr, tag.name, &size, &junk, tables, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
-    mhdf_closeData( filePtr, tables[ 1 ], &status );
+    mhdf_closeData( filePtr, tables[1], &status );
     if( is_error( status ) )
     {
-        mhdf_closeData( filePtr, tables[ 0 ], &status );
+        mhdf_closeData( filePtr, tables[0], &status );
         MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
     }
 
-    hid_t file_type = H5Dget_type( tables[ 0 ] );
+    hid_t file_type = H5Dget_type( tables[0] );
     if( file_type < 0 ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
-    hint = file_ids.begin( );
-    EntityHandle* buffer = reinterpret_cast< EntityHandle* >( dataBuffer );
-    const long    buffer_size = bufferSize / std::max( sizeof( EntityHandle ), H5Tget_size( file_type ) );
-    long          remaining = size, offset = 0;
+    hint                   = file_ids.begin();
+    EntityHandle* buffer   = reinterpret_cast< EntityHandle* >( dataBuffer );
+    const long buffer_size = bufferSize / std::max( sizeof( EntityHandle ), H5Tget_size( file_type ) );
+    long remaining = size, offset = 0;
     while( remaining )
     {
         long count = std::min( buffer_size, remaining );
@@ -1315,7 +1315,7 @@ ErrorCode ReadHDF5::get_tagged_entities( int tag_index, Range& file_ids )
 
         std::sort( buffer, buffer + count );
         for( long i = 0; i < count; ++i )
-            hint = file_ids.insert( hint, buffer[ i ], buffer[ i ] );
+            hint = file_ids.insert( hint, buffer[i], buffer[i] );
 
         remaining -= count;
         offset += count;
@@ -1329,17 +1329,17 @@ ErrorCode ReadHDF5::get_tagged_entities( int tag_index, Range& file_ids )
 }
 
 ErrorCode ReadHDF5::search_tag_values( hid_t tag_table, unsigned long table_size,
-                                       const std::vector< int >&    sorted_values,
+                                       const std::vector< int >& sorted_values,
                                        std::vector< EntityHandle >& value_indices )
 {
-    debug_barrier( );
+    debug_barrier();
 
     CHECK_OPEN_HANDLES;
 
     mhdf_Status status;
-    size_t      chunk_size = bufferSize / sizeof( int );
-    int*        buffer = reinterpret_cast< int* >( dataBuffer );
-    size_t      remaining = table_size, offset = 0;
+    size_t chunk_size = bufferSize / sizeof( int );
+    int* buffer       = reinterpret_cast< int* >( dataBuffer );
+    size_t remaining = table_size, offset = 0;
     while( remaining )
     {
         // Get a block of tag values
@@ -1350,7 +1350,7 @@ ErrorCode ReadHDF5::search_tag_values( hid_t tag_table, unsigned long table_size
 
         // Search tag values
         for( size_t i = 0; i < count; ++i )
-            if( std::binary_search( sorted_values.begin( ), sorted_values.end( ), (int)buffer[ i ] ) )
+            if( std::binary_search( sorted_values.begin(), sorted_values.end(), (int)buffer[i] ) )
                 value_indices.push_back( i + offset );
 
         offset += count;
@@ -1362,14 +1362,14 @@ ErrorCode ReadHDF5::search_tag_values( hid_t tag_table, unsigned long table_size
 
 ErrorCode ReadHDF5::read_nodes( const Range& node_file_ids )
 {
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
-    const int   dim = fileInfo->nodes.vals_per_ent;
-    Range       range;
+    const int dim = fileInfo->nodes.vals_per_ent;
+    Range range;
 
     CHECK_OPEN_HANDLES;
 
-    if( node_file_ids.empty( ) && !nativeParallel ) return MB_SUCCESS;
+    if( node_file_ids.empty() && !nativeParallel ) return MB_SUCCESS;
 
     int cdim;
     rval = iFace->get_dimension( cdim );
@@ -1384,9 +1384,9 @@ ErrorCode ReadHDF5::read_nodes( const Range& node_file_ids )
     hid_t data_id = mhdf_openNodeCoordsSimple( filePtr, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
-    EntityHandle           handle;
+    EntityHandle handle;
     std::vector< double* > arrays( dim );
-    const size_t           num_nodes = node_file_ids.size( );
+    const size_t num_nodes = node_file_ids.size();
     if( num_nodes > 0 )
     {
         rval = readUtil->get_node_coords( dim, (int)num_nodes, 0, handle, arrays );
@@ -1406,15 +1406,15 @@ ErrorCode ReadHDF5::read_nodes( const Range& node_file_ids )
                 ReadHDF5Dataset reader( "blocked coords", data_id, nativeParallel, mpiComm, false );
                 reader.set_column( d );
                 reader.set_file_ids( node_file_ids, fileInfo->nodes.start_id, num_nodes, H5T_NATIVE_DOUBLE );
-                dbgOut.printf( 3, "Reading %lu chunks for coordinate dimension %d\n", reader.get_read_count( ), d );
+                dbgOut.printf( 3, "Reading %lu chunks for coordinate dimension %d\n", reader.get_read_count(), d );
                 // Should normally only have one read call, unless sparse nature
                 // of file_ids caused reader to do something strange
                 size_t count, offset = 0;
-                int    nn = 0;
-                while( !reader.done( ) )
+                int nn = 0;
+                while( !reader.done() )
                 {
                     dbgOut.printf( 3, "Reading chunk %d for dimension %d\n", ++nn, d );
-                    reader.read( arrays[ d ] + offset, count );
+                    reader.read( arrays[d] + offset, count );
                     offset += count;
                 }
                 if( offset != num_nodes )
@@ -1433,16 +1433,16 @@ ErrorCode ReadHDF5::read_nodes( const Range& node_file_ids )
     }
     else
     {  // !blockedCoordinateIO
-        double* buffer = (double*)dataBuffer;
-        long    chunk_size = bufferSize / ( 3 * sizeof( double ) );
-        long    coffset = 0;
-        int     nn = 0;
+        double* buffer  = (double*)dataBuffer;
+        long chunk_size = bufferSize / ( 3 * sizeof( double ) );
+        long coffset    = 0;
+        int nn          = 0;
         try
         {
             ReadHDF5Dataset reader( "interleaved coords", data_id, nativeParallel, mpiComm, false );
             reader.set_file_ids( node_file_ids, fileInfo->nodes.start_id, chunk_size, H5T_NATIVE_DOUBLE );
-            dbgOut.printf( 3, "Reading %lu chunks for coordinate coordinates\n", reader.get_read_count( ) );
-            while( !reader.done( ) )
+            dbgOut.printf( 3, "Reading %lu chunks for coordinate coordinates\n", reader.get_read_count() );
+            while( !reader.done() )
             {
                 dbgOut.tprintf( 3, "Reading chunk %d of node coords\n", ++nn );
 
@@ -1451,7 +1451,7 @@ ErrorCode ReadHDF5::read_nodes( const Range& node_file_ids )
 
                 for( size_t i = 0; i < count; ++i )
                     for( int d = 0; d < dim; ++d )
-                        arrays[ d ][ coffset + i ] = buffer[ dim * i + d ];
+                        arrays[d][coffset + i] = buffer[dim * i + d];
                 coffset += count;
             }
         }
@@ -1465,67 +1465,67 @@ ErrorCode ReadHDF5::read_nodes( const Range& node_file_ids )
     dbgOut.print( 3, "Closing node coordinate table\n" );
     mhdf_closeData( filePtr, data_id, &status );
     for( int d = dim; d < cdim; ++d )
-        memset( arrays[ d ], 0, num_nodes * sizeof( double ) );
+        memset( arrays[d], 0, num_nodes * sizeof( double ) );
 
-    dbgOut.printf( 3, "Updating ID to handle map for %lu nodes\n", (unsigned long)node_file_ids.size( ) );
+    dbgOut.printf( 3, "Updating ID to handle map for %lu nodes\n", (unsigned long)node_file_ids.size() );
     return insert_in_id_map( node_file_ids, handle );
 }
 
 ErrorCode ReadHDF5::read_elems( int i )
 {
     Range ids;
-    ids.insert( fileInfo->elems[ i ].desc.start_id,
-                fileInfo->elems[ i ].desc.start_id + fileInfo->elems[ i ].desc.count - 1 );
+    ids.insert( fileInfo->elems[i].desc.start_id,
+                fileInfo->elems[i].desc.start_id + fileInfo->elems[i].desc.count - 1 );
     return read_elems( i, ids );
 }
 
 ErrorCode ReadHDF5::read_elems( int i, const Range& file_ids, Range* node_ids )
 {
-    if( fileInfo->elems[ i ].desc.vals_per_ent < 0 )
+    if( fileInfo->elems[i].desc.vals_per_ent < 0 )
     {
         if( node_ids != 0 )  // Not implemented for version 3 format of poly data
             MB_CHK_ERR( MB_TYPE_OUT_OF_RANGE );
-        return read_poly( fileInfo->elems[ i ], file_ids );
+        return read_poly( fileInfo->elems[i], file_ids );
     }
     else
-        return read_elems( fileInfo->elems[ i ], file_ids, node_ids );
+        return read_elems( fileInfo->elems[i], file_ids, node_ids );
 }
 
 ErrorCode ReadHDF5::read_elems( const mhdf_ElemDesc& elems, const Range& file_ids, Range* node_ids )
 {
     CHECK_OPEN_HANDLES;
 
-    debug_barrier( );
+    debug_barrier();
     dbgOut.tprintf( 1, "READING %s CONNECTIVITY (%lu elems in %lu selects)\n", elems.handle,
-                    (unsigned long)file_ids.size( ), (unsigned long)file_ids.psize( ) );
+                    (unsigned long)file_ids.size(), (unsigned long)file_ids.psize() );
 
-    ErrorCode   rval = MB_SUCCESS;
+    ErrorCode rval = MB_SUCCESS;
     mhdf_Status status;
 
     EntityType type = CN::EntityTypeFromName( elems.type );
     if( type == MBMAXTYPE ) { MB_SET_ERR( MB_FAILURE, "Unknown element type: \"" << elems.type << "\"" ); }
 
-    const int    nodes_per_elem = elems.desc.vals_per_ent;
-    const size_t count = file_ids.size( );
-    hid_t        data_id = mhdf_openConnectivitySimple( filePtr, elems.handle, &status );
+    const int nodes_per_elem = elems.desc.vals_per_ent;
+    const size_t count       = file_ids.size();
+    hid_t data_id            = mhdf_openConnectivitySimple( filePtr, elems.handle, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
-    EntityHandle  handle;
+    EntityHandle handle;
     EntityHandle* array = 0;
     if( count > 0 ) rval = readUtil->get_element_connect( count, nodes_per_elem, type, 0, handle, array );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
     try
     {
-        EntityHandle*   buffer = reinterpret_cast< EntityHandle* >( dataBuffer );
-        const size_t    buffer_size = bufferSize / ( sizeof( EntityHandle ) * nodes_per_elem );
+        EntityHandle* buffer     = reinterpret_cast< EntityHandle* >( dataBuffer );
+        const size_t buffer_size = bufferSize / ( sizeof( EntityHandle ) * nodes_per_elem );
         ReadHDF5Dataset reader( elems.handle, data_id, nativeParallel, mpiComm );
         reader.set_file_ids( file_ids, elems.desc.start_id, buffer_size, handleType );
-        dbgOut.printf( 3, "Reading connectivity in %lu chunks for element group \"%s\"\n", reader.get_read_count( ),
+        dbgOut.printf( 3, "Reading connectivity in %lu chunks for element group \"%s\"\n", reader.get_read_count(),
                        elems.handle );
         EntityHandle* iter = array;
-        int           nn = 0;
-        while( !reader.done( ) )
+        int nn             = 0;
+        while( !reader.done() )
         {
             dbgOut.printf( 3, "Reading chunk %d for \"%s\"\n", ++nn, elems.handle );
 
@@ -1558,21 +1558,21 @@ ErrorCode ReadHDF5::read_elems( const mhdf_ElemDesc& elems, const Range& file_id
     else
     {
         IDConnectivity t;
-        t.handle = handle;
-        t.count = count;
+        t.handle         = handle;
+        t.count          = count;
         t.nodes_per_elem = nodes_per_elem;
-        t.array = array;
+        t.array          = array;
         idConnectivityList.push_back( t );
     }
 
     return insert_in_id_map( file_ids, handle );
 }
 
-ErrorCode ReadHDF5::update_connectivity( )
+ErrorCode ReadHDF5::update_connectivity()
 {
-    ErrorCode                               rval;
+    ErrorCode rval;
     std::vector< IDConnectivity >::iterator i;
-    for( i = idConnectivityList.begin( ); i != idConnectivityList.end( ); ++i )
+    for( i = idConnectivityList.begin(); i != idConnectivityList.end(); ++i )
     {
         rval = convert_id_to_handle( i->array, i->count * i->nodes_per_elem );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
@@ -1580,7 +1580,7 @@ ErrorCode ReadHDF5::update_connectivity( )
         rval = readUtil->update_adjacencies( i->handle, i->count, i->nodes_per_elem, i->array );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
-    idConnectivityList.clear( );
+    idConnectivityList.clear();
 
     return MB_SUCCESS;
 }
@@ -1588,7 +1588,7 @@ ErrorCode ReadHDF5::update_connectivity( )
 ErrorCode ReadHDF5::read_node_adj_elems( const mhdf_ElemDesc& group, Range* handles_out )
 {
     mhdf_Status status;
-    ErrorCode   rval;
+    ErrorCode rval;
 
     CHECK_OPEN_HANDLES;
 
@@ -1607,28 +1607,28 @@ ErrorCode ReadHDF5::read_node_adj_elems( const mhdf_ElemDesc& group, hid_t table
 {
     CHECK_OPEN_HANDLES;
 
-    debug_barrier( );
+    debug_barrier();
 
-    mhdf_Status  status;
-    ErrorCode    rval;
+    mhdf_Status status;
+    ErrorCode rval;
     IODebugTrack debug_track( debugTrack, std::string( group.handle ) );
 
     // Copy data to local variables (makes other code clearer)
-    const int        node_per_elem = group.desc.vals_per_ent;
-    long             start_id = group.desc.start_id;
-    long             remaining = group.desc.count;
-    const EntityType type = CN::EntityTypeFromName( group.type );
+    const int node_per_elem = group.desc.vals_per_ent;
+    long start_id           = group.desc.start_id;
+    long remaining          = group.desc.count;
+    const EntityType type   = CN::EntityTypeFromName( group.type );
 
     // Figure out how many elements we can read in each pass
-    long* const buffer = reinterpret_cast< long* >( dataBuffer );
-    const long  buffer_size = bufferSize / ( node_per_elem * sizeof( buffer[ 0 ] ) );
+    long* const buffer     = reinterpret_cast< long* >( dataBuffer );
+    const long buffer_size = bufferSize / ( node_per_elem * sizeof( buffer[0] ) );
     // Read all element connectivity in buffer_size blocks
     long offset = 0;
     dbgOut.printf( 3, "Reading node-adjacent elements from \"%s\" in %ld chunks\n", group.handle,
                    ( remaining + buffer_size - 1 ) / buffer_size );
-    int             nn = 0;
+    int nn = 0;
     Range::iterator hint;
-    if( handles_out ) hint = handles_out->begin( );
+    if( handles_out ) hint = handles_out->begin();
     while( remaining )
     {
         dbgOut.printf( 3, "Reading chunk %d of connectivity data for \"%s\"\n", ++nn, group.handle );
@@ -1644,20 +1644,20 @@ ErrorCode ReadHDF5::read_node_adj_elems( const mhdf_ElemDesc& group, hid_t table
 
         // Count the number of elements in the block that we want,
         // zero connectivity for other elements
-        long  num_elem = 0;
-        long* iter = buffer;
+        long num_elem = 0;
+        long* iter    = buffer;
         for( long i = 0; i < count; ++i )
         {
             for( int j = 0; j < node_per_elem; ++j )
             {
-                iter[ j ] = (long)idMap.find( iter[ j ] );
-                if( !iter[ j ] )
+                iter[j] = (long)idMap.find( iter[j] );
+                if( !iter[j] )
                 {
-                    iter[ 0 ] = 0;
+                    iter[0] = 0;
                     break;
                 }
             }
-            if( iter[ 0 ] ) ++num_elem;
+            if( iter[0] ) ++num_elem;
             iter += node_per_elem;
         }
 
@@ -1668,15 +1668,15 @@ ErrorCode ReadHDF5::read_node_adj_elems( const mhdf_ElemDesc& group, hid_t table
         }
 
         // Create elements
-        EntityHandle  handle;
+        EntityHandle handle;
         EntityHandle* array;
         rval = readUtil->get_element_connect( (int)num_elem, node_per_elem, type, 0, handle, array );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
         // Copy all non-zero connectivity values
-        iter = buffer;
+        iter                = buffer;
         EntityHandle* iter2 = array;
-        EntityHandle  h = handle;
+        EntityHandle h      = handle;
         for( long i = 0; i < count; ++i )
         {
             if( !*iter )
@@ -1698,7 +1698,7 @@ ErrorCode ReadHDF5::read_node_adj_elems( const mhdf_ElemDesc& group, hid_t table
         if( handles_out ) hint = handles_out->insert( hint, handle, handle + num_elem - 1 );
     }
 
-    debug_track.all_reduce( );
+    debug_track.all_reduce();
     return MB_SUCCESS;
 }
 
@@ -1706,36 +1706,36 @@ ErrorCode ReadHDF5::read_elems( int i, const Range& elems_in, Range& nodes )
 {
     CHECK_OPEN_HANDLES;
 
-    debug_barrier( );
-    dbgOut.tprintf( 1, "READING %s CONNECTIVITY (%lu elems in %lu selects)\n", fileInfo->elems[ i ].handle,
-                    (unsigned long)elems_in.size( ), (unsigned long)elems_in.psize( ) );
+    debug_barrier();
+    dbgOut.tprintf( 1, "READING %s CONNECTIVITY (%lu elems in %lu selects)\n", fileInfo->elems[i].handle,
+                    (unsigned long)elems_in.size(), (unsigned long)elems_in.psize() );
 
     EntityHandle* const buffer = reinterpret_cast< EntityHandle* >( dataBuffer );
-    const int           node_per_elem = fileInfo->elems[ i ].desc.vals_per_ent;
-    const size_t        buffer_size = bufferSize / ( node_per_elem * sizeof( EntityHandle ) );
+    const int node_per_elem    = fileInfo->elems[i].desc.vals_per_ent;
+    const size_t buffer_size   = bufferSize / ( node_per_elem * sizeof( EntityHandle ) );
 
-    if( elems_in.empty( ) ) return MB_SUCCESS;
+    if( elems_in.empty() ) return MB_SUCCESS;
 
-    assert( (long)elems_in.front( ) >= fileInfo->elems[ i ].desc.start_id );
-    assert( (long)elems_in.back( ) - fileInfo->elems[ i ].desc.start_id < fileInfo->elems[ i ].desc.count );
+    assert( (long)elems_in.front() >= fileInfo->elems[i].desc.start_id );
+    assert( (long)elems_in.back() - fileInfo->elems[i].desc.start_id < fileInfo->elems[i].desc.count );
 
     // We don't support version 3 style poly element data
-    if( fileInfo->elems[ i ].desc.vals_per_ent <= 0 ) MB_CHK_ERR( MB_TYPE_OUT_OF_RANGE );
+    if( fileInfo->elems[i].desc.vals_per_ent <= 0 ) MB_CHK_ERR( MB_TYPE_OUT_OF_RANGE );
 
     mhdf_Status status;
-    hid_t       table = mhdf_openConnectivitySimple( filePtr, fileInfo->elems[ i ].handle, &status );
+    hid_t table = mhdf_openConnectivitySimple( filePtr, fileInfo->elems[i].handle, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
     try
     {
-        ReadHDF5Dataset reader( fileInfo->elems[ i ].handle, table, nativeParallel, mpiComm );
-        reader.set_file_ids( elems_in, fileInfo->elems[ i ].desc.start_id, buffer_size, handleType );
-        dbgOut.printf( 3, "Reading node list in %lu chunks for \"%s\"\n", reader.get_read_count( ),
-                       fileInfo->elems[ i ].handle );
+        ReadHDF5Dataset reader( fileInfo->elems[i].handle, table, nativeParallel, mpiComm );
+        reader.set_file_ids( elems_in, fileInfo->elems[i].desc.start_id, buffer_size, handleType );
+        dbgOut.printf( 3, "Reading node list in %lu chunks for \"%s\"\n", reader.get_read_count(),
+                       fileInfo->elems[i].handle );
         int nn = 0;
-        while( !reader.done( ) )
+        while( !reader.done() )
         {
-            dbgOut.printf( 3, "Reading chunk %d of \"%s\" connectivity\n", ++nn, fileInfo->elems[ i ].handle );
+            dbgOut.printf( 3, "Reading chunk %d of \"%s\" connectivity\n", ++nn, fileInfo->elems[i].handle );
             size_t num_read;
             reader.read( buffer, num_read );
             std::sort( buffer, buffer + num_read * node_per_elem );
@@ -1757,22 +1757,22 @@ ErrorCode ReadHDF5::read_poly( const mhdf_ElemDesc& elems, const Range& file_ids
     {
       private:
         const EntityType type;
-        ReadHDF5*        readHDF5;
+        ReadHDF5* readHDF5;
 
       public:
         PolyReader( EntityType elem_type, void* buffer, size_t buffer_size, ReadHDF5* owner, DebugOutput& dbg )
             : ReadHDF5VarLen( dbg, buffer, buffer_size ), type( elem_type ), readHDF5( owner )
         {
         }
-        virtual ~PolyReader( ) {}
+        virtual ~PolyReader() {}
         ErrorCode store_data( EntityHandle file_id, void* data, long len, bool )
         {
-            size_t        valid;
+            size_t valid;
             EntityHandle* conn = reinterpret_cast< EntityHandle* >( data );
             readHDF5->convert_id_to_handle( conn, len, valid );
             if( valid != (size_t)len ) MB_CHK_ERR( MB_ENTITY_NOT_FOUND );
             EntityHandle handle;
-            ErrorCode    rval = readHDF5->moab( )->create_element( type, conn, len, handle );
+            ErrorCode rval = readHDF5->moab()->create_element( type, conn, len, handle );
             if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
             rval = readHDF5->insert_in_id_map( file_id, handle );
@@ -1782,20 +1782,20 @@ ErrorCode ReadHDF5::read_poly( const mhdf_ElemDesc& elems, const Range& file_ids
 
     CHECK_OPEN_HANDLES;
 
-    debug_barrier( );
+    debug_barrier();
 
     EntityType type = CN::EntityTypeFromName( elems.type );
     if( type == MBMAXTYPE ) { MB_SET_ERR( MB_FAILURE, "Unknown element type: \"" << elems.type << "\"" ); }
 
-    hid_t       handles[ 2 ];
+    hid_t handles[2];
     mhdf_Status status;
-    long        num_poly, num_conn, first_id;
+    long num_poly, num_conn, first_id;
     mhdf_openPolyConnectivity( filePtr, elems.handle, &num_poly, &num_conn, &first_id, handles, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
-    std::string     nm( elems.handle );
-    ReadHDF5Dataset offset_reader( ( nm + " offsets" ).c_str( ), handles[ 0 ], nativeParallel, mpiComm, true );
-    ReadHDF5Dataset connect_reader( ( nm + " data" ).c_str( ), handles[ 1 ], nativeParallel, mpiComm, true );
+    std::string nm( elems.handle );
+    ReadHDF5Dataset offset_reader( ( nm + " offsets" ).c_str(), handles[0], nativeParallel, mpiComm, true );
+    ReadHDF5Dataset connect_reader( ( nm + " data" ).c_str(), handles[1], nativeParallel, mpiComm, true );
 
     PolyReader tool( type, dataBuffer, bufferSize, this, dbgOut );
     return tool.read( offset_reader, connect_reader, file_ids, first_id, handleType );
@@ -1806,68 +1806,68 @@ ErrorCode ReadHDF5::delete_non_side_elements( const Range& side_ents )
     ErrorCode rval;
 
     // Build list of entities that we need to find the sides of
-    Range           explicit_ents;
-    Range::iterator hint = explicit_ents.begin( );
-    for( IDMap::iterator i = idMap.begin( ); i != idMap.end( ); ++i )
+    Range explicit_ents;
+    Range::iterator hint = explicit_ents.begin();
+    for( IDMap::iterator i = idMap.begin(); i != idMap.end(); ++i )
     {
         EntityHandle start = i->value;
-        EntityHandle end = i->value + i->count - 1;
-        EntityType   type = TYPE_FROM_HANDLE( start );
+        EntityHandle end   = i->value + i->count - 1;
+        EntityType type    = TYPE_FROM_HANDLE( start );
         assert( type == TYPE_FROM_HANDLE( end ) );  // Otherwise handle space entirely full!!
         if( type != MBVERTEX && type != MBENTITYSET ) hint = explicit_ents.insert( hint, start, end );
     }
     explicit_ents = subtract( explicit_ents, side_ents );
 
     // Figure out which entities we want to delete
-    Range           dead_ents( side_ents );
+    Range dead_ents( side_ents );
     Range::iterator ds, de, es;
-    ds = dead_ents.lower_bound( CN::TypeDimensionMap[ 1 ].first );
-    de = dead_ents.lower_bound( CN::TypeDimensionMap[ 2 ].first, ds );
+    ds = dead_ents.lower_bound( CN::TypeDimensionMap[1].first );
+    de = dead_ents.lower_bound( CN::TypeDimensionMap[2].first, ds );
     if( ds != de )
     {
         // Get subset of explicit ents of dimension greater than 1
-        es = explicit_ents.lower_bound( CN::TypeDimensionMap[ 2 ].first );
+        es = explicit_ents.lower_bound( CN::TypeDimensionMap[2].first );
         Range subset, adj;
-        subset.insert( es, explicit_ents.end( ) );
+        subset.insert( es, explicit_ents.end() );
         rval = iFace->get_adjacencies( subset, 1, false, adj, Interface::UNION );
         if( MB_SUCCESS != rval ) return rval;
         dead_ents = subtract( dead_ents, adj );
     }
-    ds = dead_ents.lower_bound( CN::TypeDimensionMap[ 2 ].first );
-    de = dead_ents.lower_bound( CN::TypeDimensionMap[ 3 ].first, ds );
-    assert( de == dead_ents.end( ) );
+    ds = dead_ents.lower_bound( CN::TypeDimensionMap[2].first );
+    de = dead_ents.lower_bound( CN::TypeDimensionMap[3].first, ds );
+    assert( de == dead_ents.end() );
     if( ds != de )
     {
         // Get subset of explicit ents of dimension 3
-        es = explicit_ents.lower_bound( CN::TypeDimensionMap[ 3 ].first );
+        es = explicit_ents.lower_bound( CN::TypeDimensionMap[3].first );
         Range subset, adj;
-        subset.insert( es, explicit_ents.end( ) );
+        subset.insert( es, explicit_ents.end() );
         rval = iFace->get_adjacencies( subset, 2, false, adj, Interface::UNION );
         if( MB_SUCCESS != rval ) return rval;
         dead_ents = subtract( dead_ents, adj );
     }
 
     // Now delete anything remaining in dead_ents
-    dbgOut.printf( 2, "Deleting %lu elements\n", (unsigned long)dead_ents.size( ) );
+    dbgOut.printf( 2, "Deleting %lu elements\n", (unsigned long)dead_ents.size() );
     dbgOut.print( 4, "\tDead entities: ", dead_ents );
     rval = iFace->delete_entities( dead_ents );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
     // Remove dead entities from ID map
-    while( !dead_ents.empty( ) )
+    while( !dead_ents.empty() )
     {
-        EntityHandle    start = dead_ents.front( );
-        EntityID        count = dead_ents.const_pair_begin( )->second - start + 1;
+        EntityHandle start = dead_ents.front();
+        EntityID count     = dead_ents.const_pair_begin()->second - start + 1;
         IDMap::iterator rit;
-        for( rit = idMap.begin( ); rit != idMap.end( ); ++rit )
+        for( rit = idMap.begin(); rit != idMap.end(); ++rit )
             if( rit->value <= start && ( EntityID )( start - rit->value ) < rit->count ) break;
-        if( rit == idMap.end( ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
+        if( rit == idMap.end() ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
         EntityID offset = start - rit->value;
-        EntityID avail = rit->count - offset;
+        EntityID avail  = rit->count - offset;
         if( avail < count ) count = avail;
 
-        dead_ents.erase( dead_ents.begin( ), dead_ents.begin( ) + count );
+        dead_ents.erase( dead_ents.begin(), dead_ents.begin() + count );
         idMap.erase( rit->begin + offset, count );
     }
 
@@ -1878,25 +1878,25 @@ ErrorCode ReadHDF5::read_sets( const Range& file_ids )
 {
     CHECK_OPEN_HANDLES;
 
-    debug_barrier( );
+    debug_barrier();
 
     mhdf_Status status;
-    ErrorCode   rval;
+    ErrorCode rval;
 
     const size_t num_sets = fileInfo->sets.count;
     if( !num_sets )  // If no sets at all!
         return MB_SUCCESS;
 
     // Create sets
-    std::vector< unsigned > flags( file_ids.size( ) );
-    Range::iterator         si = file_ids.begin( );
-    for( size_t i = 0; i < flags.size( ); ++i, ++si )
-        flags[ i ] = setMeta[ *si - fileInfo->sets.start_id ][ 3 ] & ~(long)mhdf_SET_RANGE_BIT;
+    std::vector< unsigned > flags( file_ids.size() );
+    Range::iterator si = file_ids.begin();
+    for( size_t i = 0; i < flags.size(); ++i, ++si )
+        flags[i] = setMeta[*si - fileInfo->sets.start_id][3] & ~(long)mhdf_SET_RANGE_BIT;
     EntityHandle start_handle;
     // the files ids could be empty, for empty partitions
-    if( !file_ids.empty( ) )
+    if( !file_ids.empty() )
     {
-        rval = readUtil->create_entity_sets( flags.size( ), &flags[ 0 ], 0, start_handle );
+        rval = readUtil->create_entity_sets( flags.size(), &flags[0], 0, start_handle );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
         rval = insert_in_id_map( file_ids, start_handle );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
@@ -1905,7 +1905,7 @@ ErrorCode ReadHDF5::read_sets( const Range& file_ids )
     // Read contents
     if( fileInfo->have_set_contents )
     {
-        long  len = 0;
+        long len     = 0;
         hid_t handle = mhdf_openSetData( filePtr, &len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
@@ -1917,7 +1917,7 @@ ErrorCode ReadHDF5::read_sets( const Range& file_ids )
     // Read set child lists
     if( fileInfo->have_set_children )
     {
-        long  len = 0;
+        long len     = 0;
         hid_t handle = mhdf_openSetChildren( filePtr, &len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
@@ -1929,7 +1929,7 @@ ErrorCode ReadHDF5::read_sets( const Range& file_ids )
     // Read set parent lists
     if( fileInfo->have_set_parents )
     {
-        long  len = 0;
+        long len     = 0;
         hid_t handle = mhdf_openSetParents( filePtr, &len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
@@ -1941,7 +1941,7 @@ ErrorCode ReadHDF5::read_sets( const Range& file_ids )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadHDF5::read_all_set_meta( )
+ErrorCode ReadHDF5::read_all_set_meta()
 {
     CHECK_OPEN_HANDLES;
 
@@ -1950,28 +1950,28 @@ ErrorCode ReadHDF5::read_all_set_meta( )
     if( !num_sets ) return MB_SUCCESS;
 
     mhdf_Status status;
-    hid_t       handle = mhdf_openSetMetaSimple( filePtr, &status );
+    hid_t handle = mhdf_openSetMetaSimple( filePtr, &status );
     if( is_error( status ) ) { MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" ); }
 
     // Allocate extra space if we need it for data conversion
-    hid_t  meta_type = H5Dget_type( handle );
-    size_t size = H5Tget_size( meta_type );
+    hid_t meta_type = H5Dget_type( handle );
+    size_t size     = H5Tget_size( meta_type );
     if( size > sizeof( long ) )
-        setMeta = new long[ ( num_sets * size + ( sizeof( long ) - 1 ) ) / sizeof( long ) ][ 4 ];
+        setMeta = new long[( num_sets * size + ( sizeof( long ) - 1 ) ) / sizeof( long )][4];
     else
-        setMeta = new long[ num_sets ][ 4 ];
+        setMeta = new long[num_sets][4];
 
     // Set some parameters based on whether or not each proc reads the
     // table or only the root reads it and bcasts it to the others
-    int   rank = 0;
-    bool  bcast = false;
+    int rank     = 0;
+    bool bcast   = false;
     hid_t ioprop = H5P_DEFAULT;
 #ifdef MOAB_HAVE_MPI
     MPI_Comm comm = 0;
     if( nativeParallel )
     {
-        rank = myPcomm->proc_config( ).proc_rank( );
-        comm = myPcomm->proc_config( ).proc_comm( );
+        rank  = myPcomm->proc_config().proc_rank();
+        comm  = myPcomm->proc_config().proc_comm();
         bcast = bcastDuplicateReads;
         if( !bcast ) ioprop = collIO;
     }
@@ -1999,7 +1999,7 @@ ErrorCode ReadHDF5::read_all_set_meta( )
         int ierr = MPI_Bcast( (void*)setMeta, num_sets * 4, MPI_LONG, 0, comm );
         if( MPI_SUCCESS != ierr ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 #else
-        assert( rank == 0 );  // If not MPI, then only one proc
+        assert( rank == 0 );              // If not MPI, then only one proc
 #endif
     }
 
@@ -2018,7 +2018,7 @@ ErrorCode ReadHDF5::read_set_ids_recursive( Range& sets_in_out, bool contained_s
     // Open data tables
     if( fileInfo->sets.count == 0 )
     {
-        assert( sets_in_out.empty( ) );
+        assert( sets_in_out.empty() );
         return MB_SUCCESS;
     }
 
@@ -2029,7 +2029,7 @@ ErrorCode ReadHDF5::read_set_ids_recursive( Range& sets_in_out, bool contained_s
 
     if( contained_sets )
     {
-        long  content_len = 0;
+        long content_len     = 0;
         hid_t content_handle = mhdf_openSetData( filePtr, &content_len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         try
@@ -2044,7 +2044,7 @@ ErrorCode ReadHDF5::read_set_ids_recursive( Range& sets_in_out, bool contained_s
 
     if( child_sets )
     {
-        long  child_len = 0;
+        long child_len     = 0;
         hid_t child_handle = mhdf_openSetChildren( filePtr, &child_len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         try
@@ -2058,13 +2058,13 @@ ErrorCode ReadHDF5::read_set_ids_recursive( Range& sets_in_out, bool contained_s
     }
 
     ErrorCode rval = MB_SUCCESS;
-    Range     children, new_children( sets_in_out );
-    int       iteration_count = 0;
+    Range children, new_children( sets_in_out );
+    int iteration_count = 0;
     do
     {
         ++iteration_count;
         dbgOut.tprintf( 2, "Iteration %d of read_set_ids_recursive\n", iteration_count );
-        children.clear( );
+        children.clear();
         if( child_sets )
         {
             rval = read_set_data( new_children, 0, child, CHILD, &children );
@@ -2075,22 +2075,22 @@ ErrorCode ReadHDF5::read_set_ids_recursive( Range& sets_in_out, bool contained_s
             rval = read_set_data( new_children, 0, cont, CONTENT, &children );
             // Remove any non-set values
             Range::iterator it = children.lower_bound( fileInfo->sets.start_id );
-            children.erase( children.begin( ), it );
+            children.erase( children.begin(), it );
             it = children.lower_bound( fileInfo->sets.start_id + fileInfo->sets.count );
-            children.erase( it, children.end( ) );
+            children.erase( it, children.end() );
             if( MB_SUCCESS != rval ) break;
         }
         new_children = subtract( children, sets_in_out );
         dbgOut.print_ints( 2, "Adding additional contained/child sets", new_children );
         sets_in_out.merge( new_children );
-    } while( !new_children.empty( ) );
+    } while( !new_children.empty() );
 
     return MB_SUCCESS;
 }
 
 ErrorCode ReadHDF5::find_sets_containing( Range& sets_out, bool read_set_containing_parents )
 {
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
 
     CHECK_OPEN_HANDLES;
@@ -2099,7 +2099,7 @@ ErrorCode ReadHDF5::find_sets_containing( Range& sets_out, bool read_set_contain
     assert( fileInfo->sets.count );
 
     // Open data tables
-    long  content_len = 0;
+    long content_len     = 0;
     hid_t content_handle = mhdf_openSetData( filePtr, &content_len, &status );
     if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
@@ -2120,9 +2120,9 @@ static bool set_map_intersect( bool ranged, const long* contents, int content_le
 {
     if( ranged )
     {
-        if( !content_len || id_map.empty( ) ) return false;
+        if( !content_len || id_map.empty() ) return false;
 
-        const long*       j = contents;
+        const long* j         = contents;
         const long* const end = contents + content_len;
         assert( content_len % 2 == 0 );
         while( j != end )
@@ -2144,9 +2144,9 @@ static bool set_map_intersect( bool ranged, const long* contents, int content_le
 
 struct SetContOffComp
 {
-    bool operator( )( const long a1[ 4 ], const long a2[ 4 ] )
+    bool operator()( const long a1[4], const long a2[4] )
     {
-        return a1[ ReadHDF5::CONTENT ] < a2[ 0 ];
+        return a1[ReadHDF5::CONTENT] < a2[0];
     }
 };
 
@@ -2158,18 +2158,18 @@ ErrorCode ReadHDF5::find_sets_containing( hid_t contents_handle, hid_t content_t
     // Scan all set contents data
 
     const size_t content_size = H5Tget_size( content_type );
-    const long   num_sets = fileInfo->sets.count;
+    const long num_sets       = fileInfo->sets.count;
     dbgOut.printf( 2, "Searching contents of %ld\n", num_sets );
     mhdf_Status status;
 
-    int  rank = 0;
+    int rank   = 0;
     bool bcast = false;
 #ifdef MOAB_HAVE_MPI
     MPI_Comm comm = 0;
     if( nativeParallel )
     {
-        rank = myPcomm->proc_config( ).proc_rank( );
-        comm = myPcomm->proc_config( ).proc_comm( );
+        rank  = myPcomm->proc_config().proc_rank();
+        comm  = myPcomm->proc_config().proc_comm();
         bcast = bcastDuplicateReads;
     }
 #endif
@@ -2179,45 +2179,45 @@ ErrorCode ReadHDF5::find_sets_containing( hid_t contents_handle, hid_t content_t
     long prev = -1;
     for( long i = 0; i < num_sets; ++i )
     {
-        if( setMeta[ i ][ CONTENT ] < prev )
+        if( setMeta[i][CONTENT] < prev )
         {
-            std::cerr << "Invalid data in set contents offsets at position " << i << ": index "
-                      << setMeta[ i ][ CONTENT ] << " is less than previous index " << prev << std::endl;
-            std::cerr.flush( );
+            std::cerr << "Invalid data in set contents offsets at position " << i << ": index " << setMeta[i][CONTENT]
+                      << " is less than previous index " << prev << std::endl;
+            std::cerr.flush();
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
-        prev = setMeta[ i ][ CONTENT ];
+        prev = setMeta[i][CONTENT];
     }
-    if( setMeta[ num_sets - 1 ][ CONTENT ] >= contents_len )
+    if( setMeta[num_sets - 1][CONTENT] >= contents_len )
     {
-        std::cerr << "Maximum set content index " << setMeta[ num_sets - 1 ][ CONTENT ]
+        std::cerr << "Maximum set content index " << setMeta[num_sets - 1][CONTENT]
                   << " exceeds contents table length of " << contents_len << std::endl;
-        std::cerr.flush( );
+        std::cerr.flush();
         MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
     }
 
     // Set up buffer for reading set contents
     long* const content_buffer = (long*)dataBuffer;
-    const long  content_len = bufferSize / std::max( content_size, sizeof( long ) );
+    const long content_len     = bufferSize / std::max( content_size, sizeof( long ) );
 
     // Scan set table
-    Range::iterator hint = file_ids.begin( );
-    Range           tmp_range;
-    long            prev_idx = -1;
-    int             mm = 0;
-    long            sets_offset = 0;
-    long            temp_content[ 4 ];
+    Range::iterator hint = file_ids.begin();
+    Range tmp_range;
+    long prev_idx    = -1;
+    int mm           = 0;
+    long sets_offset = 0;
+    long temp_content[4];
     while( sets_offset < num_sets )
     {
-        temp_content[ 0 ] = content_len + prev_idx;
+        temp_content[0] = content_len + prev_idx;
         long sets_count =
-            std::lower_bound( setMeta + sets_offset, setMeta + num_sets, temp_content, SetContOffComp( ) ) - setMeta -
+            std::lower_bound( setMeta + sets_offset, setMeta + num_sets, temp_content, SetContOffComp() ) - setMeta -
             sets_offset;
         assert( sets_count >= 0 && sets_offset + sets_count <= num_sets );
         if( !sets_count )
         {  // Contents of single set don't fit in buffer
-            long content_remaining = setMeta[ sets_offset ][ CONTENT ] - prev_idx;
-            long content_offset = prev_idx + 1;
+            long content_remaining = setMeta[sets_offset][CONTENT] - prev_idx;
+            long content_offset    = prev_idx + 1;
             while( content_remaining )
             {
                 long content_count = content_len < content_remaining ? 2 * ( content_len / 2 ) : content_remaining;
@@ -2247,19 +2247,19 @@ ErrorCode ReadHDF5::find_sets_containing( hid_t contents_handle, hid_t content_t
 
                 if( read_set_containing_parents )
                 {
-                    tmp_range.clear( );
-                    if( setMeta[ sets_offset ][ 3 ] & mhdf_SET_RANGE_BIT )
+                    tmp_range.clear();
+                    if( setMeta[sets_offset][3] & mhdf_SET_RANGE_BIT )
                         tmp_range.insert( *content_buffer, *( content_buffer + 1 ) );
                     else
                         std::copy( content_buffer, content_buffer + content_count, range_inserter( tmp_range ) );
                     tmp_range = intersect( tmp_range, file_ids );
                 }
 
-                if( !tmp_range.empty( ) || set_map_intersect( setMeta[ sets_offset ][ 3 ] & mhdf_SET_RANGE_BIT,
-                                                              content_buffer, content_count, idMap ) )
+                if( !tmp_range.empty() || set_map_intersect( setMeta[sets_offset][3] & mhdf_SET_RANGE_BIT,
+                                                             content_buffer, content_count, idMap ) )
                 {
                     long id = fileInfo->sets.start_id + sets_offset;
-                    hint = file_ids.insert( hint, id, id );
+                    hint    = file_ids.insert( hint, id, id );
                     if( !nativeParallel )  // Don't stop if doing READ_PART because we need to read
                                            // collectively
                         break;
@@ -2267,10 +2267,10 @@ ErrorCode ReadHDF5::find_sets_containing( hid_t contents_handle, hid_t content_t
                 content_remaining -= content_count;
                 content_offset += content_count;
             }
-            prev_idx = setMeta[ sets_offset ][ CONTENT ];
+            prev_idx   = setMeta[sets_offset][CONTENT];
             sets_count = 1;
         }
-        else if( long read_num = setMeta[ sets_offset + sets_count - 1 ][ CONTENT ] - prev_idx )
+        else if( long read_num = setMeta[sets_offset + sets_count - 1][CONTENT] - prev_idx )
         {
             assert( sets_count > 0 );
             assert_range( content_buffer, read_num );
@@ -2292,25 +2292,25 @@ ErrorCode ReadHDF5::find_sets_containing( hid_t contents_handle, hid_t content_t
                 int ierr = MPI_Bcast( content_buffer, read_num, MPI_LONG, 0, comm );
                 if( MPI_SUCCESS != ierr ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 #else
-                assert( rank == 0 );  // If not MPI, then only one proc
+                assert( rank == 0 );      // If not MPI, then only one proc
 #endif
             }
 
             long* buff_iter = content_buffer;
             for( long i = 0; i < sets_count; ++i )
             {
-                long set_size = setMeta[ i + sets_offset ][ CONTENT ] - prev_idx;
+                long set_size = setMeta[i + sets_offset][CONTENT] - prev_idx;
                 prev_idx += set_size;
 
                 // Check whether contents include set already being loaded
                 if( read_set_containing_parents )
                 {
-                    tmp_range.clear( );
-                    if( setMeta[ sets_offset + i ][ 3 ] & mhdf_SET_RANGE_BIT )
+                    tmp_range.clear();
+                    if( setMeta[sets_offset + i][3] & mhdf_SET_RANGE_BIT )
                     {
                         // put in tmp_range the contents on the set
                         // file_ids contain at this points only other sets
-                        const long*       j = buff_iter;
+                        const long* j         = buff_iter;
                         const long* const end = buff_iter + set_size;
                         assert( set_size % 2 == 0 );
                         while( j != end )
@@ -2325,11 +2325,11 @@ ErrorCode ReadHDF5::find_sets_containing( hid_t contents_handle, hid_t content_t
                     tmp_range = intersect( tmp_range, file_ids );
                 }
 
-                if( !tmp_range.empty( ) || set_map_intersect( setMeta[ sets_offset + i ][ 3 ] & mhdf_SET_RANGE_BIT,
-                                                              buff_iter, set_size, idMap ) )
+                if( !tmp_range.empty() ||
+                    set_map_intersect( setMeta[sets_offset + i][3] & mhdf_SET_RANGE_BIT, buff_iter, set_size, idMap ) )
                 {
                     long id = fileInfo->sets.start_id + sets_offset + i;
-                    hint = file_ids.insert( hint, id, id );
+                    hint    = file_ids.insert( hint, id, id );
                 }
                 buff_iter += set_size;
             }
@@ -2348,13 +2348,13 @@ static Range::iterator copy_set_contents( Range::iterator hint, int ranged, Enti
     {
         assert( length % 2 == 0 );
         for( long i = 0; i < length; i += 2 )
-            hint = results.insert( hint, contents[ i ], contents[ i ] + contents[ i + 1 ] - 1 );
+            hint = results.insert( hint, contents[i], contents[i] + contents[i + 1] - 1 );
     }
     else
     {
         std::sort( contents, contents + length );
         for( long i = 0; i < length; ++i )
-            hint = results.insert( hint, contents[ i ] );
+            hint = results.insert( hint, contents[i] );
     }
     return hint;
 }
@@ -2362,31 +2362,30 @@ static Range::iterator copy_set_contents( Range::iterator hint, int ranged, Enti
 ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start_handle, ReadHDF5Dataset& data,
                                    SetMode mode, Range* file_ids_out )
 {
-    ErrorCode                  rval;
+    ErrorCode rval;
     Range::const_pair_iterator pi;
-    Range::iterator            out_hint;
-    if( file_ids_out ) out_hint = file_ids_out->begin( );
+    Range::iterator out_hint;
+    if( file_ids_out ) out_hint = file_ids_out->begin();
 
     // Construct range of offsets into data table at which to read
     // Note: all offsets are incremented by TWEAK because Range cannot
     // store zeros.
-    const long      TWEAK = 1;
-    Range           data_offsets;
-    Range::iterator hint = data_offsets.begin( );
-    pi = set_file_ids.const_pair_begin( );
+    const long TWEAK = 1;
+    Range data_offsets;
+    Range::iterator hint = data_offsets.begin();
+    pi                   = set_file_ids.const_pair_begin();
     if( (long)pi->first == fileInfo->sets.start_id )
     {
         long second = pi->second - fileInfo->sets.start_id;
-        if( setMeta[ second ][ mode ] >= 0 )
-            hint = data_offsets.insert( hint, TWEAK, setMeta[ second ][ mode ] + TWEAK );
+        if( setMeta[second][mode] >= 0 ) hint = data_offsets.insert( hint, TWEAK, setMeta[second][mode] + TWEAK );
         ++pi;
     }
-    for( ; pi != set_file_ids.const_pair_end( ); ++pi )
+    for( ; pi != set_file_ids.const_pair_end(); ++pi )
     {
-        long first = pi->first - fileInfo->sets.start_id;
+        long first  = pi->first - fileInfo->sets.start_id;
         long second = pi->second - fileInfo->sets.start_id;
-        long idx1 = setMeta[ first - 1 ][ mode ] + 1;
-        long idx2 = setMeta[ second ][ mode ];
+        long idx1   = setMeta[first - 1][mode] + 1;
+        long idx2   = setMeta[second][mode];
         if( idx2 >= idx1 ) hint = data_offsets.insert( hint, idx1 + TWEAK, idx2 + TWEAK );
     }
     try
@@ -2405,9 +2404,9 @@ ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start
     const long ranged_flag = ( mode == CONTENT ) ? mhdf_SET_RANGE_BIT : 0;
 
     std::vector< EntityHandle > partial;  // For when we read only part of the contents of a set/entity
-    Range::const_iterator       fileid_iter = set_file_ids.begin( );
-    EntityHandle*               buffer = reinterpret_cast< EntityHandle* >( dataBuffer );
-    size_t                      count, offset;
+    Range::const_iterator fileid_iter = set_file_ids.begin();
+    EntityHandle* buffer              = reinterpret_cast< EntityHandle* >( dataBuffer );
+    size_t count, offset;
 
     int nn = 0;
     /*
@@ -2421,13 +2420,13 @@ ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start
       }
     #endif
     */
-    if( ( 1 >= set_file_ids.size( ) ) && ( data.done( ) ) && moab::ReadHDF5::CONTENT == mode )
+    if( ( 1 >= set_file_ids.size() ) && ( data.done() ) && moab::ReadHDF5::CONTENT == mode )
         // do at least one null read, it is needed in parallel
-        data.null_read( );
+        data.null_read();
 
-    while( !data.done( ) )
+    while( !data.done() )
     {
-        dbgOut.printf( 3, "Reading chunk %d of %s\n", ++nn, data.get_debug_desc( ) );
+        dbgOut.printf( 3, "Reading chunk %d of %s\n", ++nn, data.get_debug_desc() );
         try
         {
             data.read( buffer, count );
@@ -2444,24 +2443,24 @@ ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start
         // Handle 'special' case where we read some, but not all
         // of the data for an entity during the last iteration.
         offset = 0;
-        if( !partial.empty( ) )
+        if( !partial.empty() )
         {  // Didn't read all of previous entity
-            assert( fileid_iter != set_file_ids.end( ) );
-            size_t num_prev = partial.size( );
-            size_t idx = *fileid_iter - fileInfo->sets.start_id;
-            size_t len = idx ? setMeta[ idx ][ mode ] - setMeta[ idx - 1 ][ mode ] : setMeta[ idx ][ mode ] + 1;
-            offset = len - num_prev;
+            assert( fileid_iter != set_file_ids.end() );
+            size_t num_prev = partial.size();
+            size_t idx      = *fileid_iter - fileInfo->sets.start_id;
+            size_t len      = idx ? setMeta[idx][mode] - setMeta[idx - 1][mode] : setMeta[idx][mode] + 1;
+            offset          = len - num_prev;
             if( offset > count )
             {  // Still don't have all
-                partial.insert( partial.end( ), buffer, buffer + count );
+                partial.insert( partial.end(), buffer, buffer + count );
                 continue;
             }
 
-            partial.insert( partial.end( ), buffer, buffer + offset );
+            partial.insert( partial.end(), buffer, buffer + offset );
             if( file_ids_out )
             {
-                out_hint = copy_set_contents( out_hint, setMeta[ idx ][ 3 ] & ranged_flag, &partial[ 0 ],
-                                              partial.size( ), *file_ids_out );
+                out_hint = copy_set_contents( out_hint, setMeta[idx][3] & ranged_flag, &partial[0], partial.size(),
+                                              *file_ids_out );
             }
             else
             {
@@ -2469,26 +2468,26 @@ ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start
                 {
                     size_t valid;
                     case CONTENT:
-                        if( setMeta[ idx ][ 3 ] & ranged_flag )
+                        if( setMeta[idx][3] & ranged_flag )
                         {
                             if( len % 2 ) MB_CHK_ERR( MB_INDEX_OUT_OF_RANGE );
                             Range range;
-                            convert_range_to_handle( &partial[ 0 ], len / 2, range );
-                            rval = moab( )->add_entities( h, range );
+                            convert_range_to_handle( &partial[0], len / 2, range );
+                            rval = moab()->add_entities( h, range );
                         }
                         else
                         {
-                            convert_id_to_handle( &partial[ 0 ], len, valid );
-                            rval = moab( )->add_entities( h, &partial[ 0 ], valid );
+                            convert_id_to_handle( &partial[0], len, valid );
+                            rval = moab()->add_entities( h, &partial[0], valid );
                         }
                         break;
                     case CHILD:
-                        convert_id_to_handle( &partial[ 0 ], len, valid );
-                        rval = moab( )->add_child_meshsets( h, &partial[ 0 ], valid );
+                        convert_id_to_handle( &partial[0], len, valid );
+                        rval = moab()->add_child_meshsets( h, &partial[0], valid );
                         break;
                     case PARENT:
-                        convert_id_to_handle( &partial[ 0 ], len, valid );
-                        rval = moab( )->add_parent_meshsets( h, &partial[ 0 ], valid );
+                        convert_id_to_handle( &partial[0], len, valid );
+                        rval = moab()->add_parent_meshsets( h, &partial[0], valid );
                         break;
                     default:
                         break;
@@ -2498,29 +2497,29 @@ ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start
 
             ++fileid_iter;
             ++h;
-            partial.clear( );
+            partial.clear();
         }
 
         // Process contents for all entities for which we
         // have read the complete list
         while( offset < count )
         {
-            assert( fileid_iter != set_file_ids.end( ) );
+            assert( fileid_iter != set_file_ids.end() );
             size_t idx = *fileid_iter - fileInfo->sets.start_id;
-            size_t len = idx ? setMeta[ idx ][ mode ] - setMeta[ idx - 1 ][ mode ] : setMeta[ idx ][ mode ] + 1;
+            size_t len = idx ? setMeta[idx][mode] - setMeta[idx - 1][mode] : setMeta[idx][mode] + 1;
             // If we did not read all of the final entity,
             // store what we did read to be processed in the
             // next iteration
             if( offset + len > count )
             {
-                partial.insert( partial.end( ), buffer + offset, buffer + count );
+                partial.insert( partial.end(), buffer + offset, buffer + count );
                 break;
             }
 
             if( file_ids_out )
             {
-                out_hint = copy_set_contents( out_hint, setMeta[ idx ][ 3 ] & ranged_flag, buffer + offset, len,
-                                              *file_ids_out );
+                out_hint =
+                    copy_set_contents( out_hint, setMeta[idx][3] & ranged_flag, buffer + offset, len, *file_ids_out );
             }
             else
             {
@@ -2528,26 +2527,26 @@ ErrorCode ReadHDF5::read_set_data( const Range& set_file_ids, EntityHandle start
                 {
                     size_t valid;
                     case CONTENT:
-                        if( setMeta[ idx ][ 3 ] & ranged_flag )
+                        if( setMeta[idx][3] & ranged_flag )
                         {
                             if( len % 2 ) MB_CHK_ERR( MB_INDEX_OUT_OF_RANGE );
                             Range range;
                             convert_range_to_handle( buffer + offset, len / 2, range );
-                            rval = moab( )->add_entities( h, range );
+                            rval = moab()->add_entities( h, range );
                         }
                         else
                         {
                             convert_id_to_handle( buffer + offset, len, valid );
-                            rval = moab( )->add_entities( h, buffer + offset, valid );
+                            rval = moab()->add_entities( h, buffer + offset, valid );
                         }
                         break;
                     case CHILD:
                         convert_id_to_handle( buffer + offset, len, valid );
-                        rval = moab( )->add_child_meshsets( h, buffer + offset, valid );
+                        rval = moab()->add_child_meshsets( h, buffer + offset, valid );
                         break;
                     case PARENT:
                         convert_id_to_handle( buffer + offset, len, valid );
-                        rval = moab( )->add_parent_meshsets( h, buffer + offset, valid );
+                        rval = moab()->add_parent_meshsets( h, buffer + offset, valid );
                         break;
                     default:
                         break;
@@ -2573,8 +2572,8 @@ ErrorCode ReadHDF5::get_set_contents( const Range& sets, Range& file_ids )
     try
     {
         mhdf_Status status;
-        long        content_len;
-        hid_t       contents = mhdf_openSetData( filePtr, &content_len, &status );
+        long content_len;
+        hid_t contents = mhdf_openSetData( filePtr, &content_len, &status );
         if( is_error( status ) ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         ReadHDF5Dataset data( "set contents", contents, nativeParallel, mpiComm, true );
 
@@ -2590,20 +2589,20 @@ ErrorCode ReadHDF5::read_adjacencies( hid_t table, long table_len )
 {
     CHECK_OPEN_HANDLES;
 
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
 
-    debug_barrier( );
+    debug_barrier();
 
     hid_t read_type = H5Dget_type( table );
     if( read_type < 0 ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
     const bool convert = !H5Tequal( read_type, handleType );
 
     EntityHandle* buffer = (EntityHandle*)dataBuffer;
-    size_t        chunk_size = bufferSize / H5Tget_size( read_type );
-    size_t        remaining = table_len;
-    size_t        left_over = 0;
-    size_t        offset = 0;
+    size_t chunk_size    = bufferSize / H5Tget_size( read_type );
+    size_t remaining     = table_len;
+    size_t left_over     = 0;
+    size_t offset        = 0;
     dbgOut.printf( 3, "Reading adjacency list in %lu chunks\n",
                    (unsigned long)( remaining + chunk_size - 1 ) / chunk_size );
     int nn = 0;
@@ -2626,10 +2625,10 @@ ErrorCode ReadHDF5::read_adjacencies( hid_t table, long table_len )
         }
 
         EntityHandle* iter = buffer;
-        EntityHandle* end = buffer + count + left_over;
+        EntityHandle* end  = buffer + count + left_over;
         while( end - iter >= 3 )
         {
-            EntityHandle h = idMap.find( *iter++ );
+            EntityHandle h      = idMap.find( *iter++ );
             EntityHandle count2 = *iter++;
             if( !h )
             {
@@ -2668,23 +2667,23 @@ ErrorCode ReadHDF5::read_tag( int tag_index )
 {
     CHECK_OPEN_HANDLES;
 
-    dbgOut.tprintf( 2, "Reading tag \"%s\"\n", fileInfo->tags[ tag_index ].name );
+    dbgOut.tprintf( 2, "Reading tag \"%s\"\n", fileInfo->tags[tag_index].name );
 
-    debug_barrier( );
+    debug_barrier();
 
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
-    Tag         tag = 0;
-    hid_t       read_type = -1;
-    bool        table_type;
-    rval = create_tag( fileInfo->tags[ tag_index ], tag, read_type );
+    Tag tag         = 0;
+    hid_t read_type = -1;
+    bool table_type;
+    rval = create_tag( fileInfo->tags[tag_index], tag, read_type );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
-    if( fileInfo->tags[ tag_index ].have_sparse )
+    if( fileInfo->tags[tag_index].have_sparse )
     {
-        hid_t handles[ 3 ];
-        long  num_ent, num_val;
-        mhdf_openSparseTagData( filePtr, fileInfo->tags[ tag_index ].name, &num_ent, &num_val, handles, &status );
+        hid_t handles[3];
+        long num_ent, num_val;
+        mhdf_openSparseTagData( filePtr, fileInfo->tags[tag_index].name, &num_ent, &num_val, handles, &status );
         if( is_error( status ) )
         {
             if( read_type ) H5Tclose( read_type );
@@ -2694,26 +2693,26 @@ ErrorCode ReadHDF5::read_tag( int tag_index )
         table_type = false;
         if( read_type == 0 )
         {
-            read_type = H5Dget_type( handles[ 1 ] );
+            read_type = H5Dget_type( handles[1] );
             if( read_type == 0 )
             {
-                mhdf_closeData( filePtr, handles[ 0 ], &status );
-                mhdf_closeData( filePtr, handles[ 0 ], &status );
-                if( fileInfo->tags[ tag_index ].size <= 0 ) mhdf_closeData( filePtr, handles[ 2 ], &status );
+                mhdf_closeData( filePtr, handles[0], &status );
+                mhdf_closeData( filePtr, handles[0], &status );
+                if( fileInfo->tags[tag_index].size <= 0 ) mhdf_closeData( filePtr, handles[2], &status );
                 MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
             }
             table_type = true;
         }
 
-        if( fileInfo->tags[ tag_index ].size > 0 )
+        if( fileInfo->tags[tag_index].size > 0 )
         {
-            dbgOut.printf( 2, "Reading sparse data for tag \"%s\"\n", fileInfo->tags[ tag_index ].name );
-            rval = read_sparse_tag( tag, read_type, handles[ 0 ], handles[ 1 ], num_ent );
+            dbgOut.printf( 2, "Reading sparse data for tag \"%s\"\n", fileInfo->tags[tag_index].name );
+            rval = read_sparse_tag( tag, read_type, handles[0], handles[1], num_ent );
         }
         else
         {
-            dbgOut.printf( 2, "Reading var-len sparse data for tag \"%s\"\n", fileInfo->tags[ tag_index ].name );
-            rval = read_var_len_tag( tag, read_type, handles[ 0 ], handles[ 1 ], handles[ 2 ], num_ent, num_val );
+            dbgOut.printf( 2, "Reading var-len sparse data for tag \"%s\"\n", fileInfo->tags[tag_index].name );
+            rval = read_var_len_tag( tag, read_type, handles[0], handles[1], handles[2], num_ent, num_val );
         }
 
         if( table_type )
@@ -2722,13 +2721,13 @@ ErrorCode ReadHDF5::read_tag( int tag_index )
             read_type = 0;
         }
 
-        mhdf_closeData( filePtr, handles[ 0 ], &status );
+        mhdf_closeData( filePtr, handles[0], &status );
         if( MB_SUCCESS == rval && is_error( status ) ) rval = MB_FAILURE;
-        mhdf_closeData( filePtr, handles[ 1 ], &status );
+        mhdf_closeData( filePtr, handles[1], &status );
         if( MB_SUCCESS == rval && is_error( status ) ) rval = MB_FAILURE;
-        if( fileInfo->tags[ tag_index ].size <= 0 )
+        if( fileInfo->tags[tag_index].size <= 0 )
         {
-            mhdf_closeData( filePtr, handles[ 2 ], &status );
+            mhdf_closeData( filePtr, handles[2], &status );
             if( MB_SUCCESS == rval && is_error( status ) ) rval = MB_FAILURE;
         }
         if( MB_SUCCESS != rval )
@@ -2738,35 +2737,35 @@ ErrorCode ReadHDF5::read_tag( int tag_index )
         }
     }
 
-    for( int j = 0; j < fileInfo->tags[ tag_index ].num_dense_indices; ++j )
+    for( int j = 0; j < fileInfo->tags[tag_index].num_dense_indices; ++j )
     {
-        long          count;
-        const char*   name = 0;
+        long count;
+        const char* name = 0;
         mhdf_EntDesc* desc;
-        int           elem_idx = fileInfo->tags[ tag_index ].dense_elem_indices[ j ];
+        int elem_idx = fileInfo->tags[tag_index].dense_elem_indices[j];
         if( elem_idx == -2 )
         {
             desc = &fileInfo->sets;
-            name = mhdf_set_type_handle( );
+            name = mhdf_set_type_handle();
         }
         else if( elem_idx == -1 )
         {
             desc = &fileInfo->nodes;
-            name = mhdf_node_type_handle( );
+            name = mhdf_node_type_handle();
         }
         else if( elem_idx >= 0 && elem_idx < fileInfo->num_elem_desc )
         {
-            desc = &fileInfo->elems[ elem_idx ].desc;
-            name = fileInfo->elems[ elem_idx ].handle;
+            desc = &fileInfo->elems[elem_idx].desc;
+            name = fileInfo->elems[elem_idx].handle;
         }
         else
         {
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
 
-        dbgOut.printf( 2, "Read dense data block for tag \"%s\" on \"%s\"\n", fileInfo->tags[ tag_index ].name, name );
+        dbgOut.printf( 2, "Read dense data block for tag \"%s\" on \"%s\"\n", fileInfo->tags[tag_index].name, name );
 
-        hid_t handle = mhdf_openDenseTagData( filePtr, fileInfo->tags[ tag_index ].name, name, &count, &status );
+        hid_t handle = mhdf_openDenseTagData( filePtr, fileInfo->tags[tag_index].name, name, &count, &status );
         if( is_error( status ) )
         {
             rval = MB_FAILURE;  // rval = error(MB_FAILURE);
@@ -2777,7 +2776,7 @@ ErrorCode ReadHDF5::read_tag( int tag_index )
         {
             mhdf_closeData( filePtr, handle, &status );
             MB_SET_ERR( MB_FAILURE,
-                        "Invalid data length for dense tag data: " << name << "/" << fileInfo->tags[ tag_index ].name );
+                        "Invalid data length for dense tag data: " << name << "/" << fileInfo->tags[tag_index].name );
         }
 
         table_type = false;
@@ -2817,11 +2816,11 @@ ErrorCode ReadHDF5::create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& hd
 {
     CHECK_OPEN_HANDLES;
 
-    ErrorCode   rval;
+    ErrorCode rval;
     mhdf_Status status;
-    TagType     storage;
-    DataType    mb_type;
-    bool        re_read_default = false;
+    TagType storage;
+    DataType mb_type;
+    bool re_read_default = false;
 
     switch( info.storage )
     {
@@ -2847,7 +2846,7 @@ ErrorCode ReadHDF5::create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& hd
         if( info.size < 1 || info.size > 8 )
         { MB_SET_ERR( MB_FAILURE, "Invalid bit tag: class is MB_TAG_BIT, num bits = " << info.size ); }
         hdf_type = H5Tcopy( H5T_NATIVE_B8 );
-        mb_type = MB_TYPE_BIT;
+        mb_type  = MB_TYPE_BIT;
         if( hdf_type < 0 ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
     }
     else if( info.type == mhdf_OPAQUE )
@@ -2855,16 +2854,16 @@ ErrorCode ReadHDF5::create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& hd
         mb_type = MB_TYPE_OPAQUE;
 
         // Check for user-provided type
-        Tag         type_handle;
+        Tag type_handle;
         std::string tag_type_name = "__hdf5_tag_type_";
         tag_type_name += info.name;
-        rval = iFace->tag_get_handle( tag_type_name.c_str( ), sizeof( hid_t ), MB_TYPE_OPAQUE, type_handle );
+        rval = iFace->tag_get_handle( tag_type_name.c_str(), sizeof( hid_t ), MB_TYPE_OPAQUE, type_handle );
         if( MB_SUCCESS == rval )
         {
             EntityHandle root = 0;
-            rval = iFace->tag_get_data( type_handle, &root, 1, &hdf_type );
+            rval              = iFace->tag_get_data( type_handle, &root, 1, &hdf_type );
             if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
-            hdf_type = H5Tcopy( hdf_type );
+            hdf_type        = H5Tcopy( hdf_type );
             re_read_default = true;
         }
         else if( MB_TAG_NOT_FOUND == rval )
@@ -2882,19 +2881,19 @@ ErrorCode ReadHDF5::create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& hd
         {
             case mhdf_INTEGER:
                 hdf_type = H5T_NATIVE_INT;
-                mb_type = MB_TYPE_INTEGER;
+                mb_type  = MB_TYPE_INTEGER;
                 break;
             case mhdf_FLOAT:
                 hdf_type = H5T_NATIVE_DOUBLE;
-                mb_type = MB_TYPE_DOUBLE;
+                mb_type  = MB_TYPE_DOUBLE;
                 break;
             case mhdf_BOOLEAN:
                 hdf_type = H5T_NATIVE_UINT;
-                mb_type = MB_TYPE_INTEGER;
+                mb_type  = MB_TYPE_INTEGER;
                 break;
             case mhdf_ENTITY_ID:
                 hdf_type = handleType;
-                mb_type = MB_TYPE_HANDLE;
+                mb_type  = MB_TYPE_HANDLE;
                 break;
             default:
                 MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
@@ -2975,7 +2974,7 @@ ErrorCode ReadHDF5::create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& hd
         else
         {
             int tag_size = info.global_value_size;
-            rval = iFace->tag_set_by_ptr( handle, &root, 1, &info.global_value, &tag_size );
+            rval         = iFace->tag_set_by_ptr( handle, &root, 1, &info.global_value, &tag_size );
         }
         if( MB_SUCCESS != rval )
         {
@@ -2993,7 +2992,7 @@ ErrorCode ReadHDF5::read_dense_tag( Tag tag_handle, const char* ent_name, hid_t 
     CHECK_OPEN_HANDLES;
 
     ErrorCode rval;
-    DataType  mb_type;
+    DataType mb_type;
 
     rval = iFace->tag_get_data_type( tag_handle, mb_type );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
@@ -3012,35 +3011,35 @@ ErrorCode ReadHDF5::read_dense_tag( Tag tag_handle, const char* ent_name, hid_t 
     }
 
     // Get actual entities read from file
-    Range           file_ids, handles;
-    Range::iterator f_ins = file_ids.begin( ), h_ins = handles.begin( );
+    Range file_ids, handles;
+    Range::iterator f_ins = file_ids.begin(), h_ins = handles.begin();
     IDMap::iterator l, u;
     l = idMap.lower_bound( start_id );
     u = idMap.lower_bound( start_id + num_values - 1 );
-    if( l != idMap.end( ) && start_id + num_values > l->begin )
+    if( l != idMap.end() && start_id + num_values > l->begin )
     {
         if( l == u )
         {
             size_t beg = std::max( start_id, l->begin );
             size_t end = std::min( start_id + num_values, u->begin + u->count ) - 1;
-            f_ins = file_ids.insert( f_ins, beg, end );
-            h_ins = handles.insert( h_ins, l->value + ( beg - l->begin ), l->value + ( end - l->begin ) );
+            f_ins      = file_ids.insert( f_ins, beg, end );
+            h_ins      = handles.insert( h_ins, l->value + ( beg - l->begin ), l->value + ( end - l->begin ) );
         }
         else
         {
             size_t beg = std::max( start_id, l->begin );
-            f_ins = file_ids.insert( f_ins, beg, l->begin + l->count - 1 );
-            h_ins = handles.insert( h_ins, l->value + ( beg - l->begin ), l->value + l->count - 1 );
+            f_ins      = file_ids.insert( f_ins, beg, l->begin + l->count - 1 );
+            h_ins      = handles.insert( h_ins, l->value + ( beg - l->begin ), l->value + l->count - 1 );
             for( ++l; l != u; ++l )
             {
                 f_ins = file_ids.insert( f_ins, l->begin, l->begin + l->count - 1 );
                 h_ins = handles.insert( h_ins, l->value, l->value + l->count - 1 );
             }
-            if( u != idMap.end( ) && u->begin < start_id + num_values )
+            if( u != idMap.end() && u->begin < start_id + num_values )
             {
                 size_t end = std::min( start_id + num_values, u->begin + u->count - 1 );
-                f_ins = file_ids.insert( f_ins, u->begin, end );
-                h_ins = handles.insert( h_ins, u->value, u->value + end - u->begin );
+                f_ins      = file_ids.insert( f_ins, u->begin, end );
+                h_ins      = handles.insert( h_ins, u->value, u->value + end - u->begin );
             }
         }
     }
@@ -3058,16 +3057,16 @@ ErrorCode ReadHDF5::read_dense_tag( Tag tag_handle, const char* ent_name, hid_t 
     tn += ent_name;
     try
     {
-        h_ins = handles.begin( );
-        ReadHDF5Dataset reader( tn.c_str( ), data, nativeParallel, mpiComm, false );
-        long            buffer_size = bufferSize / read_size;
+        h_ins = handles.begin();
+        ReadHDF5Dataset reader( tn.c_str(), data, nativeParallel, mpiComm, false );
+        long buffer_size = bufferSize / read_size;
         reader.set_file_ids( file_ids, start_id, buffer_size, hdf_read_type );
-        dbgOut.printf( 3, "Reading dense data for tag \"%s\" and group \"%s\" in %lu chunks\n", tn.c_str( ), ent_name,
-                       reader.get_read_count( ) );
+        dbgOut.printf( 3, "Reading dense data for tag \"%s\" and group \"%s\" in %lu chunks\n", tn.c_str(), ent_name,
+                       reader.get_read_count() );
         int nn = 0;
-        while( !reader.done( ) )
+        while( !reader.done() )
         {
-            dbgOut.printf( 3, "Reading chunk %d of \"%s\" data\n", ++nn, tn.c_str( ) );
+            dbgOut.printf( 3, "Reading chunk %d of \"%s\" data\n", ++nn, tn.c_str() );
 
             size_t count;
             reader.read( dataBuffer, count );
@@ -3078,7 +3077,7 @@ ErrorCode ReadHDF5::read_dense_tag( Tag tag_handle, const char* ent_name, hid_t 
                 if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
             }
 
-            Range           ents;
+            Range ents;
             Range::iterator end = h_ins;
             end += count;
             ents.insert( h_ins, end );
@@ -3087,14 +3086,14 @@ ErrorCode ReadHDF5::read_dense_tag( Tag tag_handle, const char* ent_name, hid_t 
             rval = iFace->tag_set_data( tag_handle, ents, dataBuffer );
             if( MB_SUCCESS != rval )
             {
-                dbgOut.printf( 1, "Internal error setting data for tag \"%s\"\n", tn.c_str( ) );
+                dbgOut.printf( 1, "Internal error setting data for tag \"%s\"\n", tn.c_str() );
                 MB_SET_ERR( rval, "ReadHDF5 Failure" );
             }
         }
     }
     catch( ReadHDF5Dataset::Exception )
     {
-        dbgOut.printf( 1, "Internal error reading dense data for tag \"%s\"\n", tn.c_str( ) );
+        dbgOut.printf( 1, "Internal error reading dense data for tag \"%s\"\n", tn.c_str() );
         MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
     }
 
@@ -3112,16 +3111,16 @@ ErrorCode ReadHDF5::read_sparse_tag_indices( const char* name, hid_t id_table,
 {
     CHECK_OPEN_HANDLES;
 
-    offset_range.clear( );
-    handle_range.clear( );
-    handle_vect.clear( );
+    offset_range.clear();
+    handle_range.clear();
+    handle_vect.clear();
 
-    ErrorCode       rval;
-    Range::iterator handle_hint = handle_range.begin( );
-    Range::iterator offset_hint = offset_range.begin( );
+    ErrorCode rval;
+    Range::iterator handle_hint = handle_range.begin();
+    Range::iterator offset_hint = offset_range.begin();
 
     EntityHandle* idbuf = (EntityHandle*)dataBuffer;
-    size_t        idbuf_size = bufferSize / sizeof( EntityHandle );
+    size_t idbuf_size   = bufferSize / sizeof( EntityHandle );
 
     std::string tn( name );
     tn += " indices";
@@ -3129,12 +3128,12 @@ ErrorCode ReadHDF5::read_sparse_tag_indices( const char* name, hid_t id_table,
     assert( start_offset > 0 );  // Can't put zero in a Range
     try
     {
-        ReadHDF5Dataset id_reader( tn.c_str( ), id_table, nativeParallel, mpiComm, false );
+        ReadHDF5Dataset id_reader( tn.c_str(), id_table, nativeParallel, mpiComm, false );
         id_reader.set_all_file_ids( idbuf_size, handleType );
         size_t offset = start_offset;
-        dbgOut.printf( 3, "Reading file ids for sparse tag \"%s\" in %lu chunks\n", name, id_reader.get_read_count( ) );
+        dbgOut.printf( 3, "Reading file ids for sparse tag \"%s\" in %lu chunks\n", name, id_reader.get_read_count() );
         int nn = 0;
-        while( !id_reader.done( ) )
+        while( !id_reader.done() )
         {
             dbgOut.printf( 3, "Reading chunk %d of \"%s\" IDs\n", ++nn, name );
             size_t count;
@@ -3148,20 +3147,20 @@ ErrorCode ReadHDF5::read_sparse_tag_indices( const char* name, hid_t id_table,
             // from the file.
             for( size_t i = 0; i < count; ++i )
             {
-                if( idbuf[ i ] )
+                if( idbuf[i] )
                 {
                     offset_hint = offset_range.insert( offset_hint, offset + i );
-                    if( !handle_vect.empty( ) ) { handle_vect.push_back( idbuf[ i ] ); }
-                    else if( handle_range.empty( ) || idbuf[ i ] > handle_range.back( ) )
+                    if( !handle_vect.empty() ) { handle_vect.push_back( idbuf[i] ); }
+                    else if( handle_range.empty() || idbuf[i] > handle_range.back() )
                     {
-                        handle_hint = handle_range.insert( handle_hint, idbuf[ i ] );
+                        handle_hint = handle_range.insert( handle_hint, idbuf[i] );
                     }
                     else
                     {
-                        handle_vect.resize( handle_range.size( ) );
-                        std::copy( handle_range.begin( ), handle_range.end( ), handle_vect.begin( ) );
-                        handle_range.clear( );
-                        handle_vect.push_back( idbuf[ i ] );
+                        handle_vect.resize( handle_range.size() );
+                        std::copy( handle_range.begin(), handle_range.end(), handle_vect.begin() );
+                        handle_range.clear();
+                        handle_vect.push_back( idbuf[i] );
                         dbgOut.print( 2, "Switching to unordered list for tag handle list\n" );
                     }
                 }
@@ -3187,13 +3186,13 @@ ErrorCode ReadHDF5::read_sparse_tag( Tag tag_handle, hid_t hdf_read_type, hid_t 
     // to entities that we have read from the file add both the
     // offset into the offset range and the handle into the handle
     // range.  If handles are not ordered, switch to using a vector.
-    const EntityHandle          base_offset = 1;  // Can't put zero in a Range
+    const EntityHandle base_offset = 1;  // Can't put zero in a Range
     std::vector< EntityHandle > handle_vect;
-    Range                       handle_range, offset_range;
-    std::string                 tn( "<error>" );
+    Range handle_range, offset_range;
+    std::string tn( "<error>" );
     iFace->tag_get_name( tag_handle, tn );
     ErrorCode rval =
-        read_sparse_tag_indices( tn.c_str( ), id_table, base_offset, offset_range, handle_range, handle_vect );
+        read_sparse_tag_indices( tn.c_str(), id_table, base_offset, offset_range, handle_range, handle_vect );
     if( MB_SUCCESS != rval ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
 
     DataType mbtype;
@@ -3219,15 +3218,15 @@ ErrorCode ReadHDF5::read_sparse_tag( Tag tag_handle, hid_t hdf_read_type, hid_t 
     size_t chunk_size = bufferSize / read_size;
     try
     {
-        ReadHDF5Dataset val_reader( ( tn + " values" ).c_str( ), value_table, nativeParallel, mpiComm, false );
+        ReadHDF5Dataset val_reader( ( tn + " values" ).c_str(), value_table, nativeParallel, mpiComm, false );
         val_reader.set_file_ids( offset_range, base_offset, chunk_size, hdf_read_type );
-        dbgOut.printf( 3, "Reading sparse values for tag \"%s\" in %lu chunks\n", tn.c_str( ),
-                       val_reader.get_read_count( ) );
-        int    nn = 0;
+        dbgOut.printf( 3, "Reading sparse values for tag \"%s\" in %lu chunks\n", tn.c_str(),
+                       val_reader.get_read_count() );
+        int nn        = 0;
         size_t offset = 0;
-        while( !val_reader.done( ) )
+        while( !val_reader.done() )
         {
-            dbgOut.printf( 3, "Reading chunk %d of \"%s\" values\n", ++nn, tn.c_str( ) );
+            dbgOut.printf( 3, "Reading chunk %d of \"%s\" values\n", ++nn, tn.c_str() );
             size_t count;
             val_reader.read( dataBuffer, count );
             if( MB_TYPE_HANDLE == mbtype )
@@ -3236,16 +3235,16 @@ ErrorCode ReadHDF5::read_sparse_tag( Tag tag_handle, hid_t hdf_read_type, hid_t 
                 if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
             }
 
-            if( !handle_vect.empty( ) )
+            if( !handle_vect.empty() )
             {
-                rval = iFace->tag_set_data( tag_handle, &handle_vect[ offset ], count, dataBuffer );
+                rval = iFace->tag_set_data( tag_handle, &handle_vect[offset], count, dataBuffer );
                 offset += count;
             }
             else
             {
                 Range r;
-                r.merge( handle_range.begin( ), handle_range.begin( ) + count );
-                handle_range.erase( handle_range.begin( ), handle_range.begin( ) + count );
+                r.merge( handle_range.begin(), handle_range.begin() + count );
+                handle_range.erase( handle_range.begin(), handle_range.begin() + count );
                 rval = iFace->tag_set_data( tag_handle, r, dataBuffer );
             }
             if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
@@ -3265,7 +3264,7 @@ ErrorCode ReadHDF5::read_var_len_tag( Tag tag_handle, hid_t hdf_read_type, hid_t
     CHECK_OPEN_HANDLES;
 
     ErrorCode rval;
-    DataType  mbtype;
+    DataType mbtype;
 
     rval = iFace->tag_get_data_type( tag_handle, mbtype );
     if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
@@ -3300,23 +3299,22 @@ ErrorCode ReadHDF5::read_var_len_tag( Tag tag_handle, hid_t hdf_read_type, hid_t
     // to entities that we have read from the file add both the
     // offset into the offset range and the handle into the handle
     // range. If handles are not ordered, switch to using a vector.
-    const EntityHandle          base_offset = 1;  // Can't put zero in a Range
+    const EntityHandle base_offset = 1;  // Can't put zero in a Range
     std::vector< EntityHandle > handle_vect;
-    Range                       handle_range, offset_range;
-    rval = read_sparse_tag_indices( tn.c_str( ), ent_table, base_offset, offset_range, handle_range, handle_vect );
+    Range handle_range, offset_range;
+    rval = read_sparse_tag_indices( tn.c_str(), ent_table, base_offset, offset_range, handle_range, handle_vect );
 
     // This code only works if the id_table is an ordered list.
     // This assumption was also true for the previous iteration
     // of this code, but wasn't checked. MOAB's file writer
     // always writes an ordered list for id_table.
-    if( !handle_vect.empty( ) )
-    { MB_SET_ERR( MB_FAILURE, "Unordered file ids for variable length tag not supported" ); }
+    if( !handle_vect.empty() ) { MB_SET_ERR( MB_FAILURE, "Unordered file ids for variable length tag not supported" ); }
 
     class VTReader : public ReadHDF5VarLen
     {
-        Tag       tagHandle;
-        bool      isHandle;
-        size_t    readSize;
+        Tag tagHandle;
+        bool isHandle;
+        size_t readSize;
         ReadHDF5* readHDF5;
 
       public:
@@ -3329,7 +3327,7 @@ ErrorCode ReadHDF5::read_var_len_tag( Tag tag_handle, hid_t hdf_read_type, hid_t
                 rval1 = readHDF5->convert_id_to_handle( (EntityHandle*)data, count );MB_CHK_ERR( rval1 );
             }
             int n = count;
-            return readHDF5->moab( )->tag_set_by_ptr( tagHandle, &file_id, 1, &data, &n );
+            return readHDF5->moab()->tag_set_by_ptr( tagHandle, &file_id, 1, &data, &n );
         }
         VTReader( DebugOutput& debug_output, void* buffer, size_t buffer_size, Tag tag, bool is_handle_tag,
                   size_t read_size1, ReadHDF5* owner )
@@ -3344,14 +3342,14 @@ ErrorCode ReadHDF5::read_var_len_tag( Tag tag_handle, hid_t hdf_read_type, hid_t
     {
         // Read offsets into value table.
         std::vector< unsigned > counts;
-        Range                   offsets;
-        ReadHDF5Dataset         off_reader( ( tn + " offsets" ).c_str( ), off_table, nativeParallel, mpiComm, false );
+        Range offsets;
+        ReadHDF5Dataset off_reader( ( tn + " offsets" ).c_str(), off_table, nativeParallel, mpiComm, false );
         rval = tool.read_offsets( off_reader, offset_range, base_offset, base_offset, offsets, counts );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
 
         // Read tag values
-        Range           empty;
-        ReadHDF5Dataset val_reader( ( tn + " values" ).c_str( ), val_table, nativeParallel, mpiComm, false );
+        Range empty;
+        ReadHDF5Dataset val_reader( ( tn + " values" ).c_str(), val_table, nativeParallel, mpiComm, false );
         rval = tool.read_data( val_reader, offsets, base_offset, hdf_read_type, handle_range, counts, empty );
         if( MB_SUCCESS != rval ) MB_SET_ERR( rval, "ReadHDF5 Failure" );
     }
@@ -3382,31 +3380,31 @@ void ReadHDF5::convert_id_to_handle( EntityHandle* array, size_t size, size_t& n
     new_size = 0;
     for( size_t i = 0; i < size; ++i )
     {
-        it = id_map.lower_bound( array[ i ] );
-        if( it != id_map.end( ) && it->begin <= (long)array[ i ] )
-            array[ new_size++ ] = it->value + ( array[ i ] - it->begin );
+        it = id_map.lower_bound( array[i] );
+        if( it != id_map.end() && it->begin <= (long)array[i] )
+            array[new_size++] = it->value + ( array[i] - it->begin );
     }
 }
 
 void ReadHDF5::convert_range_to_handle( const EntityHandle* ranges, size_t num_ranges,
                                         const RangeMap< long, EntityHandle >& id_map, Range& merge )
 {
-    RangeMap< long, EntityHandle >::iterator it = id_map.begin( );
-    Range::iterator                          hint = merge.begin( );
+    RangeMap< long, EntityHandle >::iterator it = id_map.begin();
+    Range::iterator hint                        = merge.begin();
     for( size_t i = 0; i < num_ranges; ++i )
     {
-        long       id = ranges[ 2 * i ];
-        const long end = id + ranges[ 2 * i + 1 ];
+        long id        = ranges[2 * i];
+        const long end = id + ranges[2 * i + 1];
         // We assume that 'ranges' is sorted, but check just in case it isn't.
-        if( it == id_map.end( ) || it->begin > id ) it = id_map.begin( );
-        it = id_map.lower_bound( it, id_map.end( ), id );
-        if( it == id_map.end( ) ) continue;
+        if( it == id_map.end() || it->begin > id ) it = id_map.begin();
+        it = id_map.lower_bound( it, id_map.end(), id );
+        if( it == id_map.end() ) continue;
         if( id < it->begin ) id = it->begin;
         while( id < end )
         {
             if( id < it->begin ) id = it->begin;
             const long off = id - it->begin;
-            long       count = std::min( it->count - off, end - id );
+            long count     = std::min( it->count - off, end - id );
             // It is possible that this new subrange is starting after the end
             // It will result in negative count, which does not make sense
             // We are done with this range, go to the next one
@@ -3415,7 +3413,7 @@ void ReadHDF5::convert_range_to_handle( const EntityHandle* ranges, size_t num_r
             id += count;
             if( id < end )
             {
-                if( ++it == id_map.end( ) ) break;
+                if( ++it == id_map.end() ) break;
                 if( it->begin > end ) break;
             }
         }
@@ -3430,11 +3428,11 @@ ErrorCode ReadHDF5::convert_range_to_handle( const EntityHandle* array, size_t n
 
 ErrorCode ReadHDF5::insert_in_id_map( const Range& file_ids, EntityHandle start_id )
 {
-    IDMap  tmp_map;
-    bool   merge = !idMap.empty( ) && !file_ids.empty( ) && idMap.back( ).begin > (long)file_ids.front( );
+    IDMap tmp_map;
+    bool merge = !idMap.empty() && !file_ids.empty() && idMap.back().begin > (long)file_ids.front();
     IDMap& map = merge ? tmp_map : idMap;
     Range::const_pair_iterator p;
-    for( p = file_ids.const_pair_begin( ); p != file_ids.const_pair_end( ); ++p )
+    for( p = file_ids.const_pair_begin(); p != file_ids.const_pair_end(); ++p )
     {
         size_t count = p->second - p->first + 1;
         if( !map.insert( p->first, start_id, count ).second ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
@@ -3458,14 +3456,14 @@ ErrorCode ReadHDF5::read_qa( EntityHandle )
     mhdf_Status status;
     // std::vector<std::string> qa_list;
 
-    int    qa_len;
+    int qa_len;
     char** qa = mhdf_readHistory( filePtr, &qa_len, &status );
     if( mhdf_isError( &status ) ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
     // qa_list.resize(qa_len);
     for( int i = 0; i < qa_len; i++ )
     {
         // qa_list[i] = qa[i];
-        free( qa[ i ] );
+        free( qa[i] );
     }
     free( qa );
 
@@ -3482,15 +3480,15 @@ ErrorCode ReadHDF5::store_file_ids( Tag tag )
     typedef long tag_type;
     // change it to be able to read much bigger files (long is 64 bits ...)
 
-    tag_type*  buffer = reinterpret_cast< tag_type* >( dataBuffer );
+    tag_type* buffer       = reinterpret_cast< tag_type* >( dataBuffer );
     const long buffer_size = bufferSize / sizeof( tag_type );
-    for( IDMap::iterator i = idMap.begin( ); i != idMap.end( ); ++i )
+    for( IDMap::iterator i = idMap.begin(); i != idMap.end(); ++i )
     {
         IDMap::Range range = *i;
 
         // Make sure the values will fit in the tag type
         IDMap::key_type rv = range.begin + ( range.count - 1 );
-        tag_type        tv = (tag_type)rv;
+        tag_type tv        = (tag_type)rv;
         if( (IDMap::key_type)tv != rv )
         {
             assert( false );
@@ -3506,7 +3504,7 @@ ErrorCode ReadHDF5::store_file_ids( Tag tag )
             range.value += count;
             range.count -= count;
             for( long j = 0; j < count; ++j )
-                buffer[ j ] = (tag_type)range.begin++;
+                buffer[j] = (tag_type)range.begin++;
 
             ErrorCode rval = iFace->tag_set_data( tag, handles, buffer );
             if( MB_SUCCESS != rval ) return rval;
@@ -3516,16 +3514,16 @@ ErrorCode ReadHDF5::store_file_ids( Tag tag )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadHDF5::store_sets_file_ids( )
+ErrorCode ReadHDF5::store_sets_file_ids()
 {
     CHECK_OPEN_HANDLES;
 
     // create a tag that will not be saved, but it will be
     // used by visit plugin to match the sets and their file ids
     // it is the same type as the tag defined in ReadParallelcpp, for file id
-    Tag       setFileIdTag;
-    long      default_val = 0;
-    ErrorCode rval = iFace->tag_get_handle( "__FILE_ID_FOR_SETS", sizeof( long ), MB_TYPE_OPAQUE, setFileIdTag,
+    Tag setFileIdTag;
+    long default_val = 0;
+    ErrorCode rval   = iFace->tag_get_handle( "__FILE_ID_FOR_SETS", sizeof( long ), MB_TYPE_OPAQUE, setFileIdTag,
                                             ( MB_TAG_DENSE | MB_TAG_CREAT ), &default_val );
 
     if( MB_SUCCESS != rval || 0 == setFileIdTag ) return rval;
@@ -3533,17 +3531,17 @@ ErrorCode ReadHDF5::store_sets_file_ids( )
     typedef long tag_type;
     // change it to be able to read much bigger files (long is 64 bits ...)
 
-    tag_type*  buffer = reinterpret_cast< tag_type* >( dataBuffer );
+    tag_type* buffer       = reinterpret_cast< tag_type* >( dataBuffer );
     const long buffer_size = bufferSize / sizeof( tag_type );
-    for( IDMap::iterator i = idMap.begin( ); i != idMap.end( ); ++i )
+    for( IDMap::iterator i = idMap.begin(); i != idMap.end(); ++i )
     {
         IDMap::Range range = *i;
-        EntityType   htype = iFace->type_from_handle( range.value );
+        EntityType htype   = iFace->type_from_handle( range.value );
         if( MBENTITYSET != htype ) continue;
         // work only with entity sets
         // Make sure the values will fit in the tag type
         IDMap::key_type rv = range.begin + ( range.count - 1 );
-        tag_type        tv = (tag_type)rv;
+        tag_type tv        = (tag_type)rv;
         if( (IDMap::key_type)tv != rv )
         {
             assert( false );
@@ -3559,7 +3557,7 @@ ErrorCode ReadHDF5::store_sets_file_ids( )
             range.value += count;
             range.count -= count;
             for( long j = 0; j < count; ++j )
-                buffer[ j ] = (tag_type)range.begin++;
+                buffer[j] = (tag_type)range.begin++;
 
             rval = iFace->tag_set_data( setFileIdTag, handles, buffer );
             if( MB_SUCCESS != rval ) return rval;
@@ -3618,16 +3616,16 @@ ErrorCode ReadHDF5::read_tag_values_partial( int tag_index, const Range& file_id
 {
     CHECK_OPEN_HANDLES;
 
-    mhdf_Status         status;
-    const mhdf_TagDesc& tag = fileInfo->tags[ tag_index ];
-    long                num_ent, num_val;
-    size_t              count;
-    std::string         tn( tag.name );
+    mhdf_Status status;
+    const mhdf_TagDesc& tag = fileInfo->tags[tag_index];
+    long num_ent, num_val;
+    size_t count;
+    std::string tn( tag.name );
 
     // Read sparse values
     if( tag.have_sparse )
     {
-        hid_t handles[ 3 ];
+        hid_t handles[3];
         mhdf_openSparseTagData( filePtr, tag.name, &num_ent, &num_val, handles, &status );
         if( mhdf_isError( &status ) ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
 
@@ -3635,49 +3633,48 @@ ErrorCode ReadHDF5::read_tag_values_partial( int tag_index, const Range& file_id
         {
             // Read all entity handles and fill 'offsets' with ranges of
             // offsets into the data table for entities that we want.
-            Range           offsets;
-            long*           buffer = reinterpret_cast< long* >( dataBuffer );
-            const long      buffer_size = bufferSize / sizeof( long );
-            ReadHDF5Dataset ids( ( tn + " ids" ).c_str( ), handles[ 0 ], nativeParallel, mpiComm );
+            Range offsets;
+            long* buffer           = reinterpret_cast< long* >( dataBuffer );
+            const long buffer_size = bufferSize / sizeof( long );
+            ReadHDF5Dataset ids( ( tn + " ids" ).c_str(), handles[0], nativeParallel, mpiComm );
             ids.set_all_file_ids( buffer_size, H5T_NATIVE_LONG );
             size_t offset = 0;
-            dbgOut.printf( 3, "Reading sparse IDs for tag \"%s\" in %lu chunks\n", tag.name, ids.get_read_count( ) );
+            dbgOut.printf( 3, "Reading sparse IDs for tag \"%s\" in %lu chunks\n", tag.name, ids.get_read_count() );
             int nn = 0;
-            while( !ids.done( ) )
+            while( !ids.done() )
             {
                 dbgOut.printf( 3, "Reading chunk %d of IDs for \"%s\"\n", ++nn, tag.name );
                 ids.read( buffer, count );
 
                 std::sort( buffer, buffer + count );
-                Range::iterator       ins = offsets.begin( );
-                Range::const_iterator i = file_ids.begin( );
+                Range::iterator ins     = offsets.begin();
+                Range::const_iterator i = file_ids.begin();
                 for( size_t j = 0; j < count; ++j )
                 {
-                    while( i != file_ids.end( ) && (long)*i < buffer[ j ] )
+                    while( i != file_ids.end() && (long)*i < buffer[j] )
                         ++i;
-                    if( i == file_ids.end( ) ) break;
-                    if( (long)*i == buffer[ j ] ) { ins = offsets.insert( ins, j + offset, j + offset ); }
+                    if( i == file_ids.end() ) break;
+                    if( (long)*i == buffer[j] ) { ins = offsets.insert( ins, j + offset, j + offset ); }
                 }
 
                 offset += count;
             }
 
-            tag_values.clear( );
-            tag_values.reserve( offsets.size( ) );
-            const size_t    data_buffer_size = bufferSize / sizeof( int );
-            int*            data_buffer = reinterpret_cast< int* >( dataBuffer );
-            ReadHDF5Dataset vals( ( tn + " sparse vals" ).c_str( ), handles[ 1 ], nativeParallel, mpiComm );
+            tag_values.clear();
+            tag_values.reserve( offsets.size() );
+            const size_t data_buffer_size = bufferSize / sizeof( int );
+            int* data_buffer              = reinterpret_cast< int* >( dataBuffer );
+            ReadHDF5Dataset vals( ( tn + " sparse vals" ).c_str(), handles[1], nativeParallel, mpiComm );
             vals.set_file_ids( offsets, 0, data_buffer_size, H5T_NATIVE_INT );
-            dbgOut.printf( 3, "Reading sparse values for tag \"%s\" in %lu chunks\n", tag.name,
-                           vals.get_read_count( ) );
+            dbgOut.printf( 3, "Reading sparse values for tag \"%s\" in %lu chunks\n", tag.name, vals.get_read_count() );
             nn = 0;
             // Should normally only have one read call, unless sparse nature
             // of file_ids caused reader to do something strange
-            while( !vals.done( ) )
+            while( !vals.done() )
             {
                 dbgOut.printf( 3, "Reading chunk %d of values for \"%s\"\n", ++nn, tag.name );
                 vals.read( data_buffer, count );
-                tag_values.insert( tag_values.end( ), data_buffer, data_buffer + count );
+                tag_values.insert( tag_values.end(), data_buffer, data_buffer + count );
             }
         }
         catch( ReadHDF5Dataset::Exception )
@@ -3686,36 +3683,36 @@ ErrorCode ReadHDF5::read_tag_values_partial( int tag_index, const Range& file_id
         }
     }
 
-    std::sort( tag_values.begin( ), tag_values.end( ) );
-    tag_values.erase( std::unique( tag_values.begin( ), tag_values.end( ) ), tag_values.end( ) );
+    std::sort( tag_values.begin(), tag_values.end() );
+    tag_values.erase( std::unique( tag_values.begin(), tag_values.end() ), tag_values.end() );
 
     // Read dense values
     std::vector< int > prev_data, curr_data;
     for( int i = 0; i < tag.num_dense_indices; ++i )
     {
-        int           grp = tag.dense_elem_indices[ i ];
-        const char*   gname = 0;
+        int grp            = tag.dense_elem_indices[i];
+        const char* gname  = 0;
         mhdf_EntDesc* desc = 0;
         if( grp == -1 )
         {
-            gname = mhdf_node_type_handle( );
-            desc = &fileInfo->nodes;
+            gname = mhdf_node_type_handle();
+            desc  = &fileInfo->nodes;
         }
         else if( grp == -2 )
         {
-            gname = mhdf_set_type_handle( );
-            desc = &fileInfo->sets;
+            gname = mhdf_set_type_handle();
+            desc  = &fileInfo->sets;
         }
         else
         {
             assert( grp >= 0 && grp < fileInfo->num_elem_desc );
-            gname = fileInfo->elems[ grp ].handle;
-            desc = &fileInfo->elems[ grp ].desc;
+            gname = fileInfo->elems[grp].handle;
+            desc  = &fileInfo->elems[grp].desc;
         }
 
         Range::iterator s = file_ids.lower_bound( ( EntityHandle )( desc->start_id ) );
-        Range::iterator e = Range::lower_bound( s, file_ids.end( ), ( EntityHandle )( desc->start_id ) + desc->count );
-        Range           subset;
+        Range::iterator e = Range::lower_bound( s, file_ids.end(), ( EntityHandle )( desc->start_id ) + desc->count );
+        Range subset;
         subset.merge( s, e );
 
         hid_t handle = mhdf_openDenseTagData( filePtr, tag.name, gname, &num_val, &status );
@@ -3723,24 +3720,23 @@ ErrorCode ReadHDF5::read_tag_values_partial( int tag_index, const Range& file_id
 
         try
         {
-            curr_data.clear( );
-            tag_values.reserve( subset.size( ) );
+            curr_data.clear();
+            tag_values.reserve( subset.size() );
             const size_t data_buffer_size = bufferSize / sizeof( int );
-            int*         data_buffer = reinterpret_cast< int* >( dataBuffer );
+            int* data_buffer              = reinterpret_cast< int* >( dataBuffer );
 
-            ReadHDF5Dataset reader( ( tn + " dense vals" ).c_str( ), handle, nativeParallel, mpiComm );
+            ReadHDF5Dataset reader( ( tn + " dense vals" ).c_str(), handle, nativeParallel, mpiComm );
             reader.set_file_ids( subset, desc->start_id, data_buffer_size, H5T_NATIVE_INT );
             dbgOut.printf( 3, "Reading dense data for tag \"%s\" and group \"%s\" in %lu chunks\n", tag.name,
-                           fileInfo->elems[ grp ].handle, reader.get_read_count( ) );
+                           fileInfo->elems[grp].handle, reader.get_read_count() );
             int nn = 0;
             // Should normally only have one read call, unless sparse nature
             // of file_ids caused reader to do something strange
-            while( !reader.done( ) )
+            while( !reader.done() )
             {
-                dbgOut.printf( 3, "Reading chunk %d of \"%s\"/\"%s\"\n", ++nn, tag.name,
-                               fileInfo->elems[ grp ].handle );
+                dbgOut.printf( 3, "Reading chunk %d of \"%s\"/\"%s\"\n", ++nn, tag.name, fileInfo->elems[grp].handle );
                 reader.read( data_buffer, count );
-                curr_data.insert( curr_data.end( ), data_buffer, data_buffer + count );
+                curr_data.insert( curr_data.end(), data_buffer, data_buffer + count );
             }
         }
         catch( ReadHDF5Dataset::Exception )
@@ -3748,11 +3744,11 @@ ErrorCode ReadHDF5::read_tag_values_partial( int tag_index, const Range& file_id
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
 
-        std::sort( curr_data.begin( ), curr_data.end( ) );
-        curr_data.erase( std::unique( curr_data.begin( ), curr_data.end( ) ), curr_data.end( ) );
-        prev_data.clear( );
+        std::sort( curr_data.begin(), curr_data.end() );
+        curr_data.erase( std::unique( curr_data.begin(), curr_data.end() ), curr_data.end() );
+        prev_data.clear();
         tag_values.swap( prev_data );
-        std::set_union( prev_data.begin( ), prev_data.end( ), curr_data.begin( ), curr_data.end( ),
+        std::set_union( prev_data.begin(), prev_data.end(), curr_data.begin(), curr_data.end(),
                         std::back_inserter( tag_values ) );
     }
 
@@ -3763,63 +3759,63 @@ ErrorCode ReadHDF5::read_tag_values_all( int tag_index, std::vector< int >& tag_
 {
     CHECK_OPEN_HANDLES;
 
-    mhdf_Status         status;
-    const mhdf_TagDesc& tag = fileInfo->tags[ tag_index ];
-    long                junk, num_val;
+    mhdf_Status status;
+    const mhdf_TagDesc& tag = fileInfo->tags[tag_index];
+    long junk, num_val;
 
     // Read sparse values
     if( tag.have_sparse )
     {
-        hid_t handles[ 3 ];
+        hid_t handles[3];
         mhdf_openSparseTagData( filePtr, tag.name, &junk, &num_val, handles, &status );
         if( mhdf_isError( &status ) ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
 
-        mhdf_closeData( filePtr, handles[ 0 ], &status );
+        mhdf_closeData( filePtr, handles[0], &status );
         if( mhdf_isError( &status ) )
         {
             MB_SET_ERR_CONT( mhdf_message( &status ) );
-            mhdf_closeData( filePtr, handles[ 1 ], &status );
+            mhdf_closeData( filePtr, handles[1], &status );
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
 
-        hid_t file_type = H5Dget_type( handles[ 1 ] );
+        hid_t file_type = H5Dget_type( handles[1] );
         tag_values.resize( num_val );
-        mhdf_readTagValuesWithOpt( handles[ 1 ], 0, num_val, file_type, &tag_values[ 0 ], collIO, &status );
+        mhdf_readTagValuesWithOpt( handles[1], 0, num_val, file_type, &tag_values[0], collIO, &status );
         if( mhdf_isError( &status ) )
         {
             MB_SET_ERR_CONT( mhdf_message( &status ) );
             H5Tclose( file_type );
-            mhdf_closeData( filePtr, handles[ 1 ], &status );
+            mhdf_closeData( filePtr, handles[1], &status );
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
-        H5Tconvert( file_type, H5T_NATIVE_INT, num_val, &tag_values[ 0 ], 0, H5P_DEFAULT );
+        H5Tconvert( file_type, H5T_NATIVE_INT, num_val, &tag_values[0], 0, H5P_DEFAULT );
         H5Tclose( file_type );
 
-        mhdf_closeData( filePtr, handles[ 1 ], &status );
+        mhdf_closeData( filePtr, handles[1], &status );
         if( mhdf_isError( &status ) ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
     }
 
-    std::sort( tag_values.begin( ), tag_values.end( ) );
-    tag_values.erase( std::unique( tag_values.begin( ), tag_values.end( ) ), tag_values.end( ) );
+    std::sort( tag_values.begin(), tag_values.end() );
+    tag_values.erase( std::unique( tag_values.begin(), tag_values.end() ), tag_values.end() );
 
     // Read dense values
     std::vector< int > prev_data, curr_data;
     for( int i = 0; i < tag.num_dense_indices; ++i )
     {
-        int         grp = tag.dense_elem_indices[ i ];
+        int grp           = tag.dense_elem_indices[i];
         const char* gname = 0;
         if( grp == -1 )
-            gname = mhdf_node_type_handle( );
+            gname = mhdf_node_type_handle();
         else if( grp == -2 )
-            gname = mhdf_set_type_handle( );
+            gname = mhdf_set_type_handle();
         else
-            gname = fileInfo->elems[ grp ].handle;
+            gname = fileInfo->elems[grp].handle;
         hid_t handle = mhdf_openDenseTagData( filePtr, tag.name, gname, &num_val, &status );
         if( mhdf_isError( &status ) ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
 
         hid_t file_type = H5Dget_type( handle );
         curr_data.resize( num_val );
-        mhdf_readTagValuesWithOpt( handle, 0, num_val, file_type, &curr_data[ 0 ], collIO, &status );
+        mhdf_readTagValuesWithOpt( handle, 0, num_val, file_type, &curr_data[0], collIO, &status );
         if( mhdf_isError( &status ) )
         {
             MB_SET_ERR_CONT( mhdf_message( &status ) );
@@ -3828,56 +3824,56 @@ ErrorCode ReadHDF5::read_tag_values_all( int tag_index, std::vector< int >& tag_
             MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );
         }
 
-        H5Tconvert( file_type, H5T_NATIVE_INT, num_val, &curr_data[ 0 ], 0, H5P_DEFAULT );
+        H5Tconvert( file_type, H5T_NATIVE_INT, num_val, &curr_data[0], 0, H5P_DEFAULT );
         H5Tclose( file_type );
         mhdf_closeData( filePtr, handle, &status );
         if( mhdf_isError( &status ) ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
 
-        std::sort( curr_data.begin( ), curr_data.end( ) );
-        curr_data.erase( std::unique( curr_data.begin( ), curr_data.end( ) ), curr_data.end( ) );
+        std::sort( curr_data.begin(), curr_data.end() );
+        curr_data.erase( std::unique( curr_data.begin(), curr_data.end() ), curr_data.end() );
 
-        prev_data.clear( );
+        prev_data.clear();
         tag_values.swap( prev_data );
-        std::set_union( prev_data.begin( ), prev_data.end( ), curr_data.begin( ), curr_data.end( ),
+        std::set_union( prev_data.begin(), prev_data.end(), curr_data.begin(), curr_data.end(),
                         std::back_inserter( tag_values ) );
     }
 
     return MB_SUCCESS;
 }
-void ReadHDF5::print_times( )
+void ReadHDF5::print_times()
 {
 #ifdef MOAB_HAVE_MPI
     if( !myPcomm )
     {
-        double recv[ NUM_TIMES ];
-        MPI_Reduce( (void*)_times, recv, NUM_TIMES, MPI_DOUBLE, MPI_MAX, 0, myPcomm->proc_config( ).proc_comm( ) );
+        double recv[NUM_TIMES];
+        MPI_Reduce( (void*)_times, recv, NUM_TIMES, MPI_DOUBLE, MPI_MAX, 0, myPcomm->proc_config().proc_comm() );
         for( int i = 0; i < NUM_TIMES; i++ )
-            _times[ i ] = recv[ i ];  // just get the max from all of them
+            _times[i] = recv[i];  // just get the max from all of them
     }
-    if( 0 == myPcomm->proc_config( ).proc_rank( ) )
+    if( 0 == myPcomm->proc_config().proc_rank() )
     {
 #endif
 
-        std::cout << "ReadHDF5:             " << _times[ TOTAL_TIME ] << std::endl
-                  << "  get set meta        " << _times[ SET_META_TIME ] << std::endl
-                  << "  partial subsets     " << _times[ SUBSET_IDS_TIME ] << std::endl
-                  << "  partition time      " << _times[ GET_PARTITION_TIME ] << std::endl
-                  << "  get set ids         " << _times[ GET_SET_IDS_TIME ] << std::endl
-                  << "  set contents        " << _times[ GET_SET_CONTENTS_TIME ] << std::endl
-                  << "  polyhedra           " << _times[ GET_POLYHEDRA_TIME ] << std::endl
-                  << "  elements            " << _times[ GET_ELEMENTS_TIME ] << std::endl
-                  << "  nodes               " << _times[ GET_NODES_TIME ] << std::endl
-                  << "  node adjacency      " << _times[ GET_NODEADJ_TIME ] << std::endl
-                  << "  side elements       " << _times[ GET_SIDEELEM_TIME ] << std::endl
-                  << "  update connectivity " << _times[ UPDATECONN_TIME ] << std::endl
-                  << "  adjacency           " << _times[ ADJACENCY_TIME ] << std::endl
-                  << "  delete non_adj      " << _times[ DELETE_NON_SIDEELEM_TIME ] << std::endl
-                  << "  recursive sets      " << _times[ READ_SET_IDS_RECURS_TIME ] << std::endl
-                  << "  find contain_sets   " << _times[ FIND_SETS_CONTAINING_TIME ] << std::endl
-                  << "  read sets           " << _times[ READ_SETS_TIME ] << std::endl
-                  << "  read tags           " << _times[ READ_TAGS_TIME ] << std::endl
-                  << "  store file ids      " << _times[ STORE_FILE_IDS_TIME ] << std::endl
-                  << "  read qa records     " << _times[ READ_QA_TIME ] << std::endl;
+        std::cout << "ReadHDF5:             " << _times[TOTAL_TIME] << std::endl
+                  << "  get set meta        " << _times[SET_META_TIME] << std::endl
+                  << "  partial subsets     " << _times[SUBSET_IDS_TIME] << std::endl
+                  << "  partition time      " << _times[GET_PARTITION_TIME] << std::endl
+                  << "  get set ids         " << _times[GET_SET_IDS_TIME] << std::endl
+                  << "  set contents        " << _times[GET_SET_CONTENTS_TIME] << std::endl
+                  << "  polyhedra           " << _times[GET_POLYHEDRA_TIME] << std::endl
+                  << "  elements            " << _times[GET_ELEMENTS_TIME] << std::endl
+                  << "  nodes               " << _times[GET_NODES_TIME] << std::endl
+                  << "  node adjacency      " << _times[GET_NODEADJ_TIME] << std::endl
+                  << "  side elements       " << _times[GET_SIDEELEM_TIME] << std::endl
+                  << "  update connectivity " << _times[UPDATECONN_TIME] << std::endl
+                  << "  adjacency           " << _times[ADJACENCY_TIME] << std::endl
+                  << "  delete non_adj      " << _times[DELETE_NON_SIDEELEM_TIME] << std::endl
+                  << "  recursive sets      " << _times[READ_SET_IDS_RECURS_TIME] << std::endl
+                  << "  find contain_sets   " << _times[FIND_SETS_CONTAINING_TIME] << std::endl
+                  << "  read sets           " << _times[READ_SETS_TIME] << std::endl
+                  << "  read tags           " << _times[READ_TAGS_TIME] << std::endl
+                  << "  store file ids      " << _times[STORE_FILE_IDS_TIME] << std::endl
+                  << "  read qa records     " << _times[READ_QA_TIME] << std::endl;
 
 #ifdef MOAB_HAVE_MPI
     }

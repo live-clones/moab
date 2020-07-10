@@ -17,20 +17,20 @@
 
 int main( int argc, char* argv[] )
 {
-    iMesh_Instance          mesh;
-    iBase_EntitySetHandle   root_set;
-    int                     err;
-    const char*             filename;
+    iMesh_Instance mesh;
+    iBase_EntitySetHandle root_set;
+    int err;
+    const char* filename;
     iBase_EntityArrIterator iter;
-    iBase_TagHandle         tagh;
-    int                     count, atend;
-    double*                 tag_data;
-    int                     num_regions;
+    iBase_TagHandle tagh;
+    int count, atend;
+    double* tag_data;
+    int num_regions;
 
-    if( argc == 2 ) { filename = argv[ 1 ]; }
+    if( argc == 2 ) { filename = argv[1]; }
     else
     {
-        printf( "Usage: %s <mesh_filename>\n", argv[ 0 ] );
+        printf( "Usage: %s <mesh_filename>\n", argv[0] );
         return 0;
     }
 

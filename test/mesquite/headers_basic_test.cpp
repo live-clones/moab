@@ -1,6 +1,6 @@
 #include "Mesquite_all_headers.hpp"
 
-int main( )
+int main()
 {
     return 0;
 }

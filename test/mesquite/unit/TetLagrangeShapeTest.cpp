@@ -57,11 +57,11 @@ static inline CppUnit::Message value_message( unsigned location, NodeSet bits, d
 
     std::ostringstream buffer1;
     buffer1 << "Expected : " << v1;
-    m.addDetail( buffer1.str( ) );
+    m.addDetail( buffer1.str() );
 
     std::ostringstream buffer2;
     buffer2 << "Actual   : " << v2;
-    m.addDetail( buffer2.str( ) );
+    m.addDetail( buffer2.str() );
 
     std::ostringstream buffer3;
     buffer3 << "Location : ";
@@ -75,11 +75,11 @@ static inline CppUnit::Message value_message( unsigned location, NodeSet bits, d
         buffer3 << "Mid-element";
     else
         buffer3 << "INVALID!!";
-    m.addDetail( buffer3.str( ) );
+    m.addDetail( buffer3.str() );
 
     std::ostringstream buffer4;
     buffer4 << "Node Bits: " << bits;
-    m.addDetail( buffer4.str( ) );
+    m.addDetail( buffer4.str() );
     return m;
 }
 
@@ -105,7 +105,7 @@ class TetLagrangeShapeTest : public CppUnit::TestFixture
 
     CPPUNIT_TEST( test_ideal_jacobian );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     TetLagrangeShape sf;
 
@@ -123,22 +123,22 @@ class TetLagrangeShapeTest : public CppUnit::TestFixture
     void test_invalid_nodebits_deriv( NodeSet nodeset );
 
   public:
-    void test_coeff_corners( );
-    void test_coeff_edges( );
-    void test_coeff_faces( );
-    void test_coeff_center( );
+    void test_coeff_corners();
+    void test_coeff_edges();
+    void test_coeff_faces();
+    void test_coeff_center();
 
-    void test_deriv_corners( );
-    void test_deriv_edges( );
-    void test_deriv_faces( );
-    void test_deriv_center( );
+    void test_deriv_corners();
+    void test_deriv_edges();
+    void test_deriv_faces();
+    void test_deriv_center();
 
-    void test_mid_elem_node_coeff( );
-    void test_mid_elem_node_deriv( );
-    void test_mid_face_node_coeff( );
-    void test_mid_face_node_deriv( );
+    void test_mid_elem_node_coeff();
+    void test_mid_elem_node_deriv();
+    void test_mid_face_node_coeff();
+    void test_mid_face_node_deriv();
 
-    void test_ideal_jacobian( );
+    void test_ideal_jacobian();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TetLagrangeShapeTest, "TetLagrangeShapeTest" );
@@ -326,32 +326,32 @@ static double dN9dt( double, double s, double )
 }
 
 typedef double ( *N_t )( double, double, double );
-static const N_t N[] = { &N0, &N1, &N2, &N3, &N4, &N5, &N6, &N7, &N8, &N9 };
+static const N_t N[]    = { &N0, &N1, &N2, &N3, &N4, &N5, &N6, &N7, &N8, &N9 };
 static const N_t dNdr[] = { &dN0dr, &dN1dr, &dN2dr, &dN3dr, &dN4dr, &dN5dr, &dN6dr, &dN7dr, &dN8dr, &dN9dr };
 static const N_t dNds[] = { &dN0ds, &dN1ds, &dN2ds, &dN3ds, &dN4ds, &dN5ds, &dN6ds, &dN7ds, &dN8ds, &dN9ds };
 static const N_t dNdt[] = { &dN0dt, &dN1dt, &dN2dt, &dN3dt, &dN4dt, &dN5dt, &dN6dt, &dN7dt, &dN8dt, &dN9dt };
 
-static const double rst_corner[][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
-static const double rst_edge[][ 3 ] = { { 0.5, 0.0, 0.0 }, { 0.5, 0.5, 0.0 }, { 0.0, 0.5, 0.0 },
-                                        { 0.0, 0.0, 0.5 }, { 0.5, 0.0, 0.5 }, { 0.0, 0.5, 0.5 } };
-static const double rst_face[][ 3 ] = { { 1. / 3, 0.00, 1. / 3 },
-                                        { 1. / 3, 1. / 3, 1. / 3 },
-                                        { 0.00, 1. / 3, 1. / 3 },
-                                        { 1. / 3, 1. / 3, 0.00 } };
-static const double rst_mid[ 3 ] = { 0.25, 0.25, 0.25 };
+static const double rst_corner[][3] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+static const double rst_edge[][3]   = { { 0.5, 0.0, 0.0 }, { 0.5, 0.5, 0.0 }, { 0.0, 0.5, 0.0 },
+                                      { 0.0, 0.0, 0.5 }, { 0.5, 0.0, 0.5 }, { 0.0, 0.5, 0.5 } };
+static const double rst_face[][3]   = { { 1. / 3, 0.00, 1. / 3 },
+                                      { 1. / 3, 1. / 3, 1. / 3 },
+                                      { 0.00, 1. / 3, 1. / 3 },
+                                      { 1. / 3, 1. / 3, 0.00 } };
+static const double rst_mid[3]      = { 0.25, 0.25, 0.25 };
 
-static unsigned edges[][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
+static unsigned edges[][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
 
 static void get_coeff( NodeSet nodeset, const double* rst, double* coeffs )
 {
     for( int i = 0; i < 10; ++i )
-        coeffs[ i ] = ( *N[ i ] )( rst[ 0 ], rst[ 1 ], rst[ 2 ] );
+        coeffs[i] = ( *N[i] )( rst[0], rst[1], rst[2] );
     for( int i = 0; i < 6; ++i )
         if( !nodeset.mid_edge_node( i ) )
         {
-            coeffs[ edges[ i ][ 0 ] ] += 0.5 * coeffs[ i + 4 ];
-            coeffs[ edges[ i ][ 1 ] ] += 0.5 * coeffs[ i + 4 ];
-            coeffs[ i + 4 ] = 0;
+            coeffs[edges[i][0]] += 0.5 * coeffs[i + 4];
+            coeffs[edges[i][1]] += 0.5 * coeffs[i + 4];
+            coeffs[i + 4] = 0;
         }
 }
 
@@ -359,24 +359,24 @@ static void get_derivs( NodeSet nodeset, const double* rst, MsqVector< 3 >* deri
 {
     for( int i = 0; i < 10; ++i )
     {
-        derivs[ i ][ 0 ] = ( *dNdr[ i ] )( rst[ 0 ], rst[ 1 ], rst[ 2 ] );
-        derivs[ i ][ 1 ] = ( *dNds[ i ] )( rst[ 0 ], rst[ 1 ], rst[ 2 ] );
-        derivs[ i ][ 2 ] = ( *dNdt[ i ] )( rst[ 0 ], rst[ 1 ], rst[ 2 ] );
+        derivs[i][0] = ( *dNdr[i] )( rst[0], rst[1], rst[2] );
+        derivs[i][1] = ( *dNds[i] )( rst[0], rst[1], rst[2] );
+        derivs[i][2] = ( *dNdt[i] )( rst[0], rst[1], rst[2] );
     }
     for( int i = 0; i < 6; ++i )
         if( !nodeset.mid_edge_node( i ) )
         {
-            int j = edges[ i ][ 0 ];
-            derivs[ j ][ 0 ] += 0.5 * derivs[ i + 4 ][ 0 ];
-            derivs[ j ][ 1 ] += 0.5 * derivs[ i + 4 ][ 1 ];
-            derivs[ j ][ 2 ] += 0.5 * derivs[ i + 4 ][ 2 ];
-            j = edges[ i ][ 1 ];
-            derivs[ j ][ 0 ] += 0.5 * derivs[ i + 4 ][ 0 ];
-            derivs[ j ][ 1 ] += 0.5 * derivs[ i + 4 ][ 1 ];
-            derivs[ j ][ 2 ] += 0.5 * derivs[ i + 4 ][ 2 ];
-            derivs[ i + 4 ][ 0 ] = 0.0;
-            derivs[ i + 4 ][ 1 ] = 0.0;
-            derivs[ i + 4 ][ 2 ] = 0.0;
+            int j = edges[i][0];
+            derivs[j][0] += 0.5 * derivs[i + 4][0];
+            derivs[j][1] += 0.5 * derivs[i + 4][1];
+            derivs[j][2] += 0.5 * derivs[i + 4][2];
+            j = edges[i][1];
+            derivs[j][0] += 0.5 * derivs[i + 4][0];
+            derivs[j][1] += 0.5 * derivs[i + 4][1];
+            derivs[j][2] += 0.5 * derivs[i + 4][2];
+            derivs[i + 4][0] = 0.0;
+            derivs[i + 4][1] = 0.0;
+            derivs[i + 4][2] = 0.0;
         }
 }
 
@@ -384,13 +384,13 @@ static void check_valid_indices( const size_t* vertices, size_t num_vtx )
 {
     CPPUNIT_ASSERT( num_vtx < 11 );
     CPPUNIT_ASSERT( num_vtx > 3 );
-    size_t vtxcopy[ 10 ];
+    size_t vtxcopy[10];
     std::copy( vertices, vertices + num_vtx, vtxcopy );
     std::sort( vtxcopy, vtxcopy + num_vtx );
     for( unsigned i = 1; i < num_vtx; ++i )
     {
-        CPPUNIT_ASSERT( vtxcopy[ i ] != vtxcopy[ i - 1 ] );
-        CPPUNIT_ASSERT( vtxcopy[ i ] < 10 );
+        CPPUNIT_ASSERT( vtxcopy[i] != vtxcopy[i - 1] );
+        CPPUNIT_ASSERT( vtxcopy[i] < 10 );
     }
 }
 
@@ -398,9 +398,9 @@ static void check_no_zeros( const MsqVector< 3 >* derivs, size_t num_vtx )
 {
     for( unsigned i = 0; i < num_vtx; ++i )
     {
-        double dr = derivs[ i ][ 0 ];
-        double ds = derivs[ i ][ 1 ];
-        double dt = derivs[ i ][ 2 ];
+        double dr = derivs[i][0];
+        double ds = derivs[i][1];
+        double dt = derivs[i][2];
         CPPUNIT_ASSERT( ( fabs( dr ) > 1e-6 ) || ( fabs( ds ) > 1e-6 ) || ( fabs( dt ) > 1e-6 ) );
     }
 }
@@ -409,34 +409,34 @@ static void compare_coefficients( const double* coeffs, const size_t* indices, c
                                   size_t num_coeff, unsigned loc, NodeSet bits )
 {
     // find the location in the returned list for each node
-    size_t revidx[ 10 ];
-    double test_vals[ 10 ];
+    size_t revidx[10];
+    double test_vals[10];
     for( size_t i = 0; i < 10; ++i )
     {
-        revidx[ i ] = std::find( indices, indices + num_coeff, i ) - indices;
-        test_vals[ i ] = ( revidx[ i ] == num_coeff ) ? 0.0 : coeffs[ revidx[ i ] ];
+        revidx[i]    = std::find( indices, indices + num_coeff, i ) - indices;
+        test_vals[i] = ( revidx[i] == num_coeff ) ? 0.0 : coeffs[revidx[i]];
     }
 
     // Check that index list doesn't contain any nodes not actually
     // present in the element.
-    CPPUNIT_ASSERT( bits.mid_edge_node( 0 ) || ( revidx[ 4 ] == num_coeff ) );
-    CPPUNIT_ASSERT( bits.mid_edge_node( 1 ) || ( revidx[ 5 ] == num_coeff ) );
-    CPPUNIT_ASSERT( bits.mid_edge_node( 2 ) || ( revidx[ 6 ] == num_coeff ) );
-    CPPUNIT_ASSERT( bits.mid_edge_node( 3 ) || ( revidx[ 7 ] == num_coeff ) );
-    CPPUNIT_ASSERT( bits.mid_edge_node( 4 ) || ( revidx[ 8 ] == num_coeff ) );
-    CPPUNIT_ASSERT( bits.mid_edge_node( 5 ) || ( revidx[ 9 ] == num_coeff ) );
+    CPPUNIT_ASSERT( bits.mid_edge_node( 0 ) || ( revidx[4] == num_coeff ) );
+    CPPUNIT_ASSERT( bits.mid_edge_node( 1 ) || ( revidx[5] == num_coeff ) );
+    CPPUNIT_ASSERT( bits.mid_edge_node( 2 ) || ( revidx[6] == num_coeff ) );
+    CPPUNIT_ASSERT( bits.mid_edge_node( 3 ) || ( revidx[7] == num_coeff ) );
+    CPPUNIT_ASSERT( bits.mid_edge_node( 4 ) || ( revidx[8] == num_coeff ) );
+    CPPUNIT_ASSERT( bits.mid_edge_node( 5 ) || ( revidx[9] == num_coeff ) );
 
     // compare expected and actual coefficient values
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 0 ], test_vals[ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 1 ], test_vals[ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 2 ], test_vals[ 2 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 3 ], test_vals[ 3 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 4 ], test_vals[ 4 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 5 ], test_vals[ 5 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 6 ], test_vals[ 6 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 7 ], test_vals[ 7 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 8 ], test_vals[ 8 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_coeffs[ 9 ], test_vals[ 9 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[0], test_vals[0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[1], test_vals[1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[2], test_vals[2], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[3], test_vals[3], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[4], test_vals[4], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[5], test_vals[5], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[6], test_vals[6], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[7], test_vals[7], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[8], test_vals[8], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_coeffs[9], test_vals[9], loc, bits );
 }
 
 static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 3 >* derivs,
@@ -444,61 +444,61 @@ static void compare_derivatives( const size_t* vertices, size_t num_vtx, const M
 {
     check_valid_indices( vertices, num_vtx );
     check_no_zeros( derivs, num_vtx );
-    MsqVector< 3 > expanded_derivs[ 30 ];
+    MsqVector< 3 > expanded_derivs[30];
     memset( expanded_derivs, 0, sizeof( expanded_derivs ) );
     for( unsigned i = 0; i < num_vtx; ++i )
-        expanded_derivs[ vertices[ i ] ] = derivs[ i ];
+        expanded_derivs[vertices[i]] = derivs[i];
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 0 ][ 0 ], expanded_derivs[ 0 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 0 ][ 1 ], expanded_derivs[ 0 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 0 ][ 2 ], expanded_derivs[ 0 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[0][0], expanded_derivs[0][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[0][1], expanded_derivs[0][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[0][2], expanded_derivs[0][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 1 ][ 0 ], expanded_derivs[ 1 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 1 ][ 1 ], expanded_derivs[ 1 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 1 ][ 2 ], expanded_derivs[ 1 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[1][0], expanded_derivs[1][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[1][1], expanded_derivs[1][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[1][2], expanded_derivs[1][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 2 ][ 0 ], expanded_derivs[ 2 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 2 ][ 1 ], expanded_derivs[ 2 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 2 ][ 2 ], expanded_derivs[ 2 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[2][0], expanded_derivs[2][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[2][1], expanded_derivs[2][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[2][2], expanded_derivs[2][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 3 ][ 0 ], expanded_derivs[ 3 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 3 ][ 1 ], expanded_derivs[ 3 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 3 ][ 2 ], expanded_derivs[ 3 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[3][0], expanded_derivs[3][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[3][1], expanded_derivs[3][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[3][2], expanded_derivs[3][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 4 ][ 0 ], expanded_derivs[ 4 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 4 ][ 1 ], expanded_derivs[ 4 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 4 ][ 2 ], expanded_derivs[ 4 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[4][0], expanded_derivs[4][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[4][1], expanded_derivs[4][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[4][2], expanded_derivs[4][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 5 ][ 0 ], expanded_derivs[ 5 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 5 ][ 1 ], expanded_derivs[ 5 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 5 ][ 2 ], expanded_derivs[ 5 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[5][0], expanded_derivs[5][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[5][1], expanded_derivs[5][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[5][2], expanded_derivs[5][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 6 ][ 0 ], expanded_derivs[ 6 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 6 ][ 1 ], expanded_derivs[ 6 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 6 ][ 2 ], expanded_derivs[ 6 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[6][0], expanded_derivs[6][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[6][1], expanded_derivs[6][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[6][2], expanded_derivs[6][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 7 ][ 0 ], expanded_derivs[ 7 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 7 ][ 1 ], expanded_derivs[ 7 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 7 ][ 2 ], expanded_derivs[ 7 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[7][0], expanded_derivs[7][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[7][1], expanded_derivs[7][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[7][2], expanded_derivs[7][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 8 ][ 0 ], expanded_derivs[ 8 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 8 ][ 1 ], expanded_derivs[ 8 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 8 ][ 2 ], expanded_derivs[ 8 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[8][0], expanded_derivs[8][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[8][1], expanded_derivs[8][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[8][2], expanded_derivs[8][2], loc, bits );
 
-    ASSERT_VALUES_EQUAL( expected_derivs[ 9 ][ 0 ], expanded_derivs[ 9 ][ 0 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 9 ][ 1 ], expanded_derivs[ 9 ][ 1 ], loc, bits );
-    ASSERT_VALUES_EQUAL( expected_derivs[ 9 ][ 2 ], expanded_derivs[ 9 ][ 2 ], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[9][0], expanded_derivs[9][0], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[9][1], expanded_derivs[9][1], loc, bits );
+    ASSERT_VALUES_EQUAL( expected_derivs[9][2], expanded_derivs[9][2], loc, bits );
 }
 
 void TetLagrangeShapeTest::test_corner_coeff( int corner, NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    double expected[ 10 ];
-    get_coeff( nodebits, rst_corner[ corner ], expected );
+    double expected[10];
+    get_coeff( nodebits, rst_corner[corner], expected );
 
-    double coeff[ 100 ];
-    size_t n = 29, indices[ 100 ];
+    double coeff[100];
+    size_t n = 29, indices[100];
     sf.coefficients( Sample( 0, corner ), nodebits, coeff, indices, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -509,11 +509,11 @@ void TetLagrangeShapeTest::test_edge_coeff( int edge, NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    double expected[ 10 ];
-    get_coeff( nodebits, rst_edge[ edge ], expected );
+    double expected[10];
+    get_coeff( nodebits, rst_edge[edge], expected );
 
-    double coeff[ 100 ];
-    size_t n = 29, indices[ 100 ];
+    double coeff[100];
+    size_t n = 29, indices[100];
     sf.coefficients( Sample( 1, edge ), nodebits, coeff, indices, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -524,11 +524,11 @@ void TetLagrangeShapeTest::test_face_coeff( int face, NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    double expected[ 10 ];
-    get_coeff( nodebits, rst_face[ face ], expected );
+    double expected[10];
+    get_coeff( nodebits, rst_face[face], expected );
 
-    double coeff[ 100 ];
-    size_t n = 29, indices[ 100 ];
+    double coeff[100];
+    size_t n = 29, indices[100];
     sf.coefficients( Sample( 2, face ), nodebits, coeff, indices, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -539,11 +539,11 @@ void TetLagrangeShapeTest::test_mid_coeff( NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    double expected[ 10 ];
+    double expected[10];
     get_coeff( nodebits, rst_mid, expected );
 
-    double coeff[ 100 ];
-    size_t n = 29, indices[ 100 ];
+    double coeff[100];
+    size_t n = 29, indices[100];
     sf.coefficients( Sample( 3, 0 ), nodebits, coeff, indices, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -554,11 +554,11 @@ void TetLagrangeShapeTest::test_corner_derivs( int corner, NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    MsqVector< 3 > expected[ 10 ];
-    get_derivs( nodebits, rst_corner[ corner ], expected );
+    MsqVector< 3 > expected[10];
+    get_derivs( nodebits, rst_corner[corner], expected );
 
-    MsqVector< 3 > derivs[ 100 ];
-    size_t         vertices[ 100 ], n = 29;
+    MsqVector< 3 > derivs[100];
+    size_t vertices[100], n = 29;
     sf.derivatives( Sample( 0, corner ), nodebits, vertices, derivs, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -569,11 +569,11 @@ void TetLagrangeShapeTest::test_edge_derivs( int edge, NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    MsqVector< 3 > expected[ 10 ];
-    get_derivs( nodebits, rst_edge[ edge ], expected );
+    MsqVector< 3 > expected[10];
+    get_derivs( nodebits, rst_edge[edge], expected );
 
-    MsqVector< 3 > derivs[ 100 ];
-    size_t         vertices[ 100 ], n = 29;
+    MsqVector< 3 > derivs[100];
+    size_t vertices[100], n = 29;
     sf.derivatives( Sample( 1, edge ), nodebits, vertices, derivs, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -584,11 +584,11 @@ void TetLagrangeShapeTest::test_face_derivs( int face, NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    MsqVector< 3 > expected[ 10 ];
-    get_derivs( nodebits, rst_face[ face ], expected );
+    MsqVector< 3 > expected[10];
+    get_derivs( nodebits, rst_face[face], expected );
 
-    MsqVector< 3 > derivs[ 100 ];
-    size_t         vertices[ 100 ], n = 29;
+    MsqVector< 3 > derivs[100];
+    size_t vertices[100], n = 29;
     sf.derivatives( Sample( 2, face ), nodebits, vertices, derivs, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -599,11 +599,11 @@ void TetLagrangeShapeTest::test_mid_derivs( NodeSet nodebits )
 {
     MsqPrintError err( std::cout );
 
-    MsqVector< 3 > expected[ 10 ];
+    MsqVector< 3 > expected[10];
     get_derivs( nodebits, rst_mid, expected );
 
-    MsqVector< 3 > derivs[ 100 ];
-    size_t         vertices[ 100 ], n = 29;
+    MsqVector< 3 > derivs[100];
+    size_t vertices[100], n = 29;
     sf.derivatives( Sample( 3, 0 ), nodebits, vertices, derivs, n, err );
     CPPUNIT_ASSERT( !err );
 
@@ -617,11 +617,11 @@ static NodeSet nodeset_from_bits( unsigned bits )
         if( bits & ( 1 << i ) ) result.set_mid_edge_node( i );
     for( unsigned i = 6; i < 10; ++i )
         if( bits & ( 1 << i ) ) result.set_mid_face_node( i - 6 );
-    if( bits & ( 1 << 10 ) ) result.set_mid_region_node( );
+    if( bits & ( 1 << 10 ) ) result.set_mid_region_node();
     return result;
 }
 
-void TetLagrangeShapeTest::test_coeff_corners( )
+void TetLagrangeShapeTest::test_coeff_corners()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -632,7 +632,7 @@ void TetLagrangeShapeTest::test_coeff_corners( )
     }
 }
 
-void TetLagrangeShapeTest::test_coeff_edges( )
+void TetLagrangeShapeTest::test_coeff_edges()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -645,7 +645,7 @@ void TetLagrangeShapeTest::test_coeff_edges( )
     }
 }
 
-void TetLagrangeShapeTest::test_coeff_faces( )
+void TetLagrangeShapeTest::test_coeff_faces()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -656,7 +656,7 @@ void TetLagrangeShapeTest::test_coeff_faces( )
     }
 }
 
-void TetLagrangeShapeTest::test_coeff_center( )
+void TetLagrangeShapeTest::test_coeff_center()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -664,7 +664,7 @@ void TetLagrangeShapeTest::test_coeff_center( )
     }
 }
 
-void TetLagrangeShapeTest::test_deriv_corners( )
+void TetLagrangeShapeTest::test_deriv_corners()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -675,7 +675,7 @@ void TetLagrangeShapeTest::test_deriv_corners( )
     }
 }
 
-void TetLagrangeShapeTest::test_deriv_edges( )
+void TetLagrangeShapeTest::test_deriv_edges()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -688,7 +688,7 @@ void TetLagrangeShapeTest::test_deriv_edges( )
     }
 }
 
-void TetLagrangeShapeTest::test_deriv_faces( )
+void TetLagrangeShapeTest::test_deriv_faces()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -699,7 +699,7 @@ void TetLagrangeShapeTest::test_deriv_faces( )
     }
 }
 
-void TetLagrangeShapeTest::test_deriv_center( )
+void TetLagrangeShapeTest::test_deriv_center()
 {
     for( unsigned i = 0; i < 0x40; ++i )
     {
@@ -710,8 +710,8 @@ void TetLagrangeShapeTest::test_deriv_center( )
 void TetLagrangeShapeTest::test_invalid_nodebits_coeff( NodeSet bits )
 {
     MsqError err;
-    double   coeff[ 100 ];
-    size_t   n, indices[ 100 ];
+    double coeff[100];
+    size_t n, indices[100];
 
     sf.coefficients( Sample( 0, 0 ), bits, coeff, indices, n, err );
     CPPUNIT_ASSERT( err );
@@ -750,9 +750,9 @@ void TetLagrangeShapeTest::test_invalid_nodebits_coeff( NodeSet bits )
 
 void TetLagrangeShapeTest::test_invalid_nodebits_deriv( NodeSet bits )
 {
-    MsqError       err;
-    size_t         verts[ 100 ], n;
-    MsqVector< 3 > derivs[ 100 ];
+    MsqError err;
+    size_t verts[100], n;
+    MsqVector< 3 > derivs[100];
 
     sf.derivatives( Sample( 0, 0 ), bits, verts, derivs, n, err );
     CPPUNIT_ASSERT( err );
@@ -789,21 +789,21 @@ void TetLagrangeShapeTest::test_invalid_nodebits_deriv( NodeSet bits )
     CPPUNIT_ASSERT( err );
 }
 
-void TetLagrangeShapeTest::test_mid_elem_node_coeff( )
+void TetLagrangeShapeTest::test_mid_elem_node_coeff()
 {
     NodeSet nodeset;
-    nodeset.set_mid_region_node( );
+    nodeset.set_mid_region_node();
     test_invalid_nodebits_coeff( nodeset );
 }
 
-void TetLagrangeShapeTest::test_mid_elem_node_deriv( )
+void TetLagrangeShapeTest::test_mid_elem_node_deriv()
 {
     NodeSet nodeset;
-    nodeset.set_mid_region_node( );
+    nodeset.set_mid_region_node();
     test_invalid_nodebits_deriv( nodeset );
 }
 
-void TetLagrangeShapeTest::test_mid_face_node_coeff( )
+void TetLagrangeShapeTest::test_mid_face_node_coeff()
 {
     NodeSet nodeset1, nodeset2;
     nodeset1.set_mid_face_node( 0 );
@@ -812,7 +812,7 @@ void TetLagrangeShapeTest::test_mid_face_node_coeff( )
     test_invalid_nodebits_coeff( nodeset2 );
 }
 
-void TetLagrangeShapeTest::test_mid_face_node_deriv( )
+void TetLagrangeShapeTest::test_mid_face_node_deriv()
 {
     NodeSet nodeset1, nodeset2;
     nodeset1.set_mid_face_node( 0 );
@@ -821,9 +821,9 @@ void TetLagrangeShapeTest::test_mid_face_node_deriv( )
     test_invalid_nodebits_deriv( nodeset2 );
 }
 
-void TetLagrangeShapeTest::test_ideal_jacobian( )
+void TetLagrangeShapeTest::test_ideal_jacobian()
 {
-    MsqError          err;
+    MsqError err;
     MsqMatrix< 3, 3 > J_act, J_exp;
     sf.ideal( Sample( 3, 0 ), J_act, err );
     ASSERT_NO_ERROR( err );
@@ -833,7 +833,7 @@ void TetLagrangeShapeTest::test_ideal_jacobian( )
     CPPUNIT_ASSERT( verts );
 
     JacobianCalculator jc;
-    jc.get_Jacobian_3D( &sf, NodeSet( ), Sample( 2, 0 ), verts, 4, J_exp, err );
+    jc.get_Jacobian_3D( &sf, NodeSet(), Sample( 2, 0 ), verts, 4, J_exp, err );
     ASSERT_NO_ERROR( err );
     J_exp /= MBMesquite::cbrt( det( J_exp ) );
 
@@ -841,6 +841,6 @@ void TetLagrangeShapeTest::test_ideal_jacobian( )
     // First, calculate tentative rotation matrix
     MsqMatrix< 3, 3 > R = inverse( J_exp ) * J_act;
     // next check that it is a rotation
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0, det( R ), 1e-6 );  // no scaling
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0, det( R ), 1e-6 );          // no scaling
     ASSERT_MATRICES_EQUAL( transpose( R ), inverse( R ), 1e-6 );  // orthogonal
 }

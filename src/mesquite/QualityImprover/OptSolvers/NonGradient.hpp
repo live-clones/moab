@@ -58,14 +58,14 @@ class NonGradient : public VertexMover, public PatchSetUser
     MESQUITE_EXPORT
     NonGradient( ObjectiveFunction* of, MsqError& err );
 
-    MESQUITE_EXPORT virtual ~NonGradient( ) {}
+    MESQUITE_EXPORT virtual ~NonGradient() {}
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual PatchSet* get_patch_set( );
+    MESQUITE_EXPORT virtual PatchSet* get_patch_set();
 
     MESQUITE_EXPORT
-    bool project_gradient( ) const
+    bool project_gradient() const
     {
         return projectGradient;
     }
@@ -76,11 +76,11 @@ class NonGradient : public VertexMover, public PatchSetUser
         projectGradient = yesno;
     }
 
-    int getDimension( )
+    int getDimension()
     {
         return ( mDimension );
     }
-    double getThreshold( )
+    double getThreshold()
     {
         return ( mThreshold );
     }
@@ -88,11 +88,11 @@ class NonGradient : public VertexMover, public PatchSetUser
     //    {
     //      return(mTolerance);
     //    }
-    int getMaxNumEval( )
+    int getMaxNumEval()
     {
         return ( mMaxNumEval );
     }
-    double getSimplexDiameterScale( )
+    double getSimplexDiameterScale()
     {
         return ( mScaleDiameter );
     }
@@ -120,8 +120,8 @@ class NonGradient : public VertexMover, public PatchSetUser
     {
         mScaleDiameter = newScaleDiameter;
     }
-    void   getRowSum( int numRow, int numCol, std::vector< double >& matrix, std::vector< double >& rowSum );
-    bool   testRowSum( int numRow, int numCol, double* matrix, double* rowSum );
+    void getRowSum( int numRow, int numCol, std::vector< double >& matrix, std::vector< double >& rowSum );
+    bool testRowSum( int numRow, int numCol, double* matrix, double* rowSum );
     double evaluate( double localArray[], PatchData& pd, MsqError& err );
     //! edgeLenght is a length scale for the initial polytope.
     int initSimplex( double edgeLength );
@@ -144,22 +144,22 @@ class NonGradient : public VertexMover, public PatchSetUser
     MESQUITE_EXPORT virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     MESQUITE_EXPORT virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
     MESQUITE_EXPORT virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
-    MESQUITE_EXPORT virtual void cleanup( );
+    MESQUITE_EXPORT virtual void cleanup();
 
   private:
-    bool   projectGradient;
-    int    mDimension;
+    bool projectGradient;
+    int mDimension;
     double mThreshold;  // stop if       2(heightMax-heightMin)
     double mTolerance;  //          ---------------------------------- < mTolerance
-    int    mMaxNumEval;  //          |heightMax|+|heightMin|+mThreshold
-                      //      or numEval >= mMaxNumEval
+    int mMaxNumEval;    //          |heightMax|+|heightMin|+mThreshold
+                        //      or numEval >= mMaxNumEval
     double amotry( std::vector< double >&, std::vector< double >&, double*, int, double, PatchData&, MsqError& err );
-    int    mNonGradDebug;
-    bool   mUseExactPenaltyFunction;
+    int mNonGradDebug;
+    bool mUseExactPenaltyFunction;
     double mScaleDiameter;
-    void   printSimplex( std::vector< double >&, std::vector< double >& );
+    void printSimplex( std::vector< double >&, std::vector< double >& );
 
-    NonGradient( const NonGradient& pd );  // disable copying
+    NonGradient( const NonGradient& pd );             // disable copying
     NonGradient& operator=( const NonGradient& pd );  // disable assignment
 };
 

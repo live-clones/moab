@@ -169,25 +169,25 @@ class MESQUITE_EXPORT OFEvaluator
     bool update( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqHessian& Hessian, MsqError& err );
 
     /**\brief Check if doing Nash game algorithm.*/
-    bool is_nash_game( ) const
+    bool is_nash_game() const
     {
         return !doBCD;
     }
 
     /**\brief Do Nash game algorithm.*/
-    void do_nash_game( )
+    void do_nash_game()
     {
         doBCD = false;
     }
 
     /**\brief Check if doing block coordinate descent algorithm */
-    bool is_block_coordinate_descent( ) const
+    bool is_block_coordinate_descent() const
     {
         return doBCD;
     }
 
     /**\brief Do block coordinate descent algorithm.*/
-    void do_block_coordinate_descent( )
+    void do_block_coordinate_descent()
     {
         doBCD = true;
     }
@@ -271,18 +271,18 @@ class MESQUITE_EXPORT OFEvaluator
      * updated for the correct behavior of the first call to
      * the update() method for block coordinate descent algorithms.
      */
-    bool reset( );
+    bool reset();
 
     /**\brief Get ObjectiveFunction pointer */
-    inline ObjectiveFunction* get_objective_function( ) const
+    inline ObjectiveFunction* get_objective_function() const
     {
         return this->OF;
     }
 
     /**\brief Check if we have an objective function */
-    inline bool have_objective_function( ) const
+    inline bool have_objective_function() const
     {
-        return 0 != get_objective_function( );
+        return 0 != get_objective_function();
     }
 
   private:

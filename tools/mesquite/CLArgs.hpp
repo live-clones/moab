@@ -70,107 +70,110 @@ class CLArgs
       private:
         bool wasSeen;  //!< Keep track of whether or not this flag was encountered
       public:
-        ArgIBase( ) : wasSeen( false ) {}  //!< constructor
-        virtual ~ArgIBase( ) {}  //!< virtual destructor for proper cleanup
+        ArgIBase() : wasSeen( false ) {}  //!< constructor
+        virtual ~ArgIBase() {}            //!< virtual destructor for proper cleanup
         /**\brief Get short description string for usage output or empty string for default*/
-        virtual std::string brief( ) const
+        virtual std::string brief() const
         {
-            return std::string( );
+            return std::string();
         }
         /**\brief Get short description string for UNIX man page output or empty string for default
          */
-        virtual std::string manstr( ) const
+        virtual std::string manstr() const
         {
-            return std::string( );
+            return std::string();
         }
         /**\brief Get optional additional info to print with flag description */
-        virtual std::string desc_append( ) const
+        virtual std::string desc_append() const
         {
-            return std::string( );
+            return std::string();
         }
         /**\brief Get optional string containing default value for option if not specified by user
          */
-        virtual std::string default_str( ) const
+        virtual std::string default_str() const
         {
-            return std::string( );
+            return std::string();
         }
         /**\brief Mark this flag as having been specified by the user */
-        void set_seen( )
+        void set_seen()
         {
             wasSeen = true;
         }
         /**\brief Test if the user specified this flag */
-        bool seen( ) const
+        bool seen() const
         {
             return wasSeen;
         }
     };
 
     /**\brief Interface for type-specific callback classes */
-    template< typename T > class ArgTemplateI : public ArgIBase
+    template < typename T >
+    class ArgTemplateI : public ArgIBase
     {
       public:
         virtual bool value( const T& val ) = 0;
     };
     /**\brief Trivial implementation for type-specific classes */
-    template< typename T > class ArgTemplate : public ArgTemplateI< T >
+    template < typename T >
+    class ArgTemplate : public ArgTemplateI< T >
     {
       private:
-        T    mValue;  //!< The default or user-specified value for an option.
+        T mValue;          //!< The default or user-specified value for an option.
         bool haveDefault;  //!< True if app. provided default value.
       public:
-        virtual ~ArgTemplate( ) {}
+        virtual ~ArgTemplate() {}
         virtual bool value( const T& val )  //!< Set value
         {
             mValue = val;
-            ArgTemplateI< T >::set_seen( );
+            ArgTemplateI< T >::set_seen();
             return true;
         }
-        const T& value( ) const
+        const T& value() const
         {
             return mValue;
         }  //!< get value
         /**\brief Initialize with default value */
         ArgTemplate( const T& initial_value ) : mValue( initial_value ), haveDefault( true ) {}
         /**\brief Initialize without default value */
-        ArgTemplate( ) : mValue( T( ) ), haveDefault( false ) {}
+        ArgTemplate() : mValue( T() ), haveDefault( false ) {}
         /**\brief Get string representation of default value, or empty string of no default value */
-        virtual std::string default_str( ) const
+        virtual std::string default_str() const
         {
             std::ostringstream ss;
             if( haveDefault ) ss << mValue;
-            return ss.str( );
+            return ss.str();
         }
     };
 
     /**\brief Trivial implementation for type-specific classes */
-    template< typename T > class ArgListTemplate : public ArgTemplateI< std::vector< T > >
+    template < typename T >
+    class ArgListTemplate : public ArgTemplateI< std::vector< T > >
     {
       private:
         std::vector< T > mValue;  //!< The default or user-specified value for an option.
-        bool             haveDefault;  //!< True if app. provided default value.
+        bool haveDefault;         //!< True if app. provided default value.
       public:
-        virtual ~ArgListTemplate( ) {}
+        virtual ~ArgListTemplate() {}
         virtual bool value( const std::vector< T >& val )  //!< Set value
         {
             mValue = val;
-            ArgTemplateI< std::vector< T > >::set_seen( );
+            ArgTemplateI< std::vector< T > >::set_seen();
             return true;
         }
-        const std::vector< T >& value( ) const
+        const std::vector< T >& value() const
         {
             return mValue;
         }  //!< get value
         /**\brief Initialize with default value */
         ArgListTemplate( const std::vector< T >& initial_value ) : mValue( initial_value ), haveDefault( true ) {}
         /**\brief Initialize without default value */
-        ArgListTemplate( ) : haveDefault( false ) {}
+        ArgListTemplate() : haveDefault( false ) {}
         /**\brief Get string representation of default value, or empty string of no default value */
-        virtual std::string default_str( ) const
+        virtual std::string default_str() const
         {
             std::ostringstream ss;
-            std::copy( mValue.begin( ), mValue.end( ), std::ostream_iterator< T >( ss, ", " ) );
-            return ss.str( );
+            std::copy( mValue.begin(), mValue.end(), std::ostream_iterator< T >( ss, ", " ) );
+            return ss.str();
         }
     };
 
@@ -216,7 +219,7 @@ class CLArgs
     {
       private:
         std::vector< std::string > mKeyWords;
-        void                       initialize( const char* keyword_list[], int list_length );
+        void initialize( const char* keyword_list[], int list_length );
 
       public:
         KeyWordArg( const char* keyword_list[], int list_length )
@@ -227,10 +230,10 @@ class CLArgs
         {
             initialize( keyword_list, list_length );
         }
-        virtual bool        value( const std::string& val );
-        virtual std::string brief( ) const;
-        virtual std::string manstr( ) const;
-        static bool         compare_no_case( const char* s1, const char* s2 );
+        virtual bool value( const std::string& val );
+        virtual std::string brief() const;
+        virtual std::string manstr() const;
+        static bool compare_no_case( const char* s1, const char* s2 );
     };
 
     class IntRange
@@ -240,8 +243,8 @@ class CLArgs
 
       public:
         IntRange( const int* min, const int* max );
-        bool        is_valid( int val ) const;
-        std::string desc_append( ) const;
+        bool is_valid( int val ) const;
+        std::string desc_append() const;
     };
 
     /**\brief Integer argument constrained to a range of valid values. */
@@ -253,14 +256,14 @@ class CLArgs
       public:
         IntRangeArg( const int* min = 0, const int* max = 0 ) : mRange( min, max ) {}
         IntRangeArg( int default_val, const int* min, const int* max ) : IntArg( default_val ), mRange( min, max ) {}
-        bool       value( const int& val );
-        const int& value( ) const
+        bool value( const int& val );
+        const int& value() const
         {
-            return IntArg::value( );
+            return IntArg::value();
         }
-        std::string desc_append( ) const
+        std::string desc_append() const
         {
-            return mRange.desc_append( );
+            return mRange.desc_append();
         }
     };
 
@@ -272,27 +275,27 @@ class CLArgs
 
       public:
         IntListRangeArg( const int* min = 0, const int* max = 0 ) : mRange( min, max ) {}
-        bool                      value( const std::vector< int >& val );
-        const std::vector< int >& value( ) const
+        bool value( const std::vector< int >& val );
+        const std::vector< int >& value() const
         {
-            return IntListArg::value( );
+            return IntListArg::value();
         }
-        std::string desc_append( ) const
+        std::string desc_append() const
         {
-            return mRange.desc_append( );
+            return mRange.desc_append();
         }
     };
 
     class DoubleRange
     {
       private:
-        bool   haveMin, haveMax, mInclusive;
+        bool haveMin, haveMax, mInclusive;
         double mMin, mMax;
 
       public:
         DoubleRange( const double* min, const double* max, bool inclusive );
-        bool        is_valid( double value ) const;
-        std::string desc_append( ) const;
+        bool is_valid( double value ) const;
+        std::string desc_append() const;
     };
 
     /**\brief Double argument constrained to a range of valid values. */
@@ -310,14 +313,14 @@ class CLArgs
             : DoubleArg( default_val ), mRange( min, max, inclusive )
         {
         }
-        bool          value( const double& val );
-        const double& value( ) const
+        bool value( const double& val );
+        const double& value() const
         {
-            return DoubleArg::value( );
+            return DoubleArg::value();
         }
-        std::string desc_append( ) const
+        std::string desc_append() const
         {
-            return mRange.desc_append( );
+            return mRange.desc_append();
         }
     };
 
@@ -332,14 +335,14 @@ class CLArgs
             : mRange( min, max, inclusive )
         {
         }
-        bool                         value( const std::vector< double >& val );
-        const std::vector< double >& value( ) const
+        bool value( const std::vector< double >& val );
+        const std::vector< double >& value() const
         {
-            return DoubleListArg::value( );
+            return DoubleListArg::value();
         }
-        std::string desc_append( ) const
+        std::string desc_append() const
         {
-            return mRange.desc_append( );
+            return mRange.desc_append();
         }
     };
 
@@ -352,7 +355,7 @@ class CLArgs
      */
     CLArgs( const char* progname, const char* brief_desc, const char* desc );
 
-    ~CLArgs( );
+    ~CLArgs();
 
     /**\brief Check if flag is undefined */
     bool is_flag_available( char fl ) const;
@@ -541,13 +544,14 @@ class CLArgs
     CLArgImpl* impl;
 };
 
-template< typename T > std::ostream& operator<<( std::ostream& str, const std::vector< T >& list )
+template < typename T >
+std::ostream& operator<<( std::ostream& str, const std::vector< T >& list )
 {
-    typename std::vector< T >::const_iterator i = list.begin( );
-    if( i != list.end( ) )
+    typename std::vector< T >::const_iterator i = list.begin();
+    if( i != list.end() )
     {
         str << *i;
-        for( ++i; i != list.end( ); ++i )
+        for( ++i; i != list.end(); ++i )
             str << ',' << *i;
     }
     return str;

@@ -32,7 +32,7 @@ class MeshTopoUtil
   public:
     MeshTopoUtil( Interface* impl ) : mbImpl( impl ) {}
 
-    ~MeshTopoUtil( ) {}
+    ~MeshTopoUtil() {}
 
     //! generate all the AEntities bounding the vertices
     ErrorCode construct_aentities( const Range& vertices );
@@ -59,15 +59,15 @@ class MeshTopoUtil
     ErrorCode star_entities( const EntityHandle star_center, std::vector< EntityHandle >& star_entities,
                              bool& bdy_entity, const EntityHandle starting_star_entity = 0,
                              std::vector< EntityHandle >* star_entities_dp1 = NULL,
-                             Range*                       star_entities_candidates_dp1 = NULL );
+                             Range* star_entities_candidates_dp1            = NULL );
 
     //! Get a series of (d+1)-dimensional stars around a d-dimensional entity, such that
     //! each star is on a (d+2)-manifold containing the d-dimensional entity; each star
     //! is either open or closed, and also defines a (d+2)-star whose entities are bounded by
     //! (d+1)-entities on the star and on the (d+2)-manifold
-    ErrorCode star_entities_nonmanifold( const EntityHandle                          star_entity,
+    ErrorCode star_entities_nonmanifold( const EntityHandle star_entity,
                                          std::vector< std::vector< EntityHandle > >& stars,
-                                         std::vector< bool >*                        bdy_flags = NULL,
+                                         std::vector< bool >* bdy_flags                        = NULL,
                                          std::vector< std::vector< EntityHandle > >* dp2_stars = NULL );
 
     //! given a star_center, a last_entity (whose dimension should be 1 greater than center)

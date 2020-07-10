@@ -28,9 +28,9 @@ const char* tag_nms[] = { MATERIAL_SET_TAG_NAME, DIRICHLET_SET_TAG_NAME, NEUMANN
 int main( int argc, char** argv )
 {
     // Get the material set tag handle
-    Tag       mtag;
+    Tag mtag;
     ErrorCode rval;
-    Range     sets, set_ents;
+    Range sets, set_ents;
 
     // Get MOAB instance
     Interface* mb = new( std::nothrow ) Core;
@@ -40,26 +40,26 @@ int main( int argc, char** argv )
     if( argc > 1 )
     {
         // User has input a mesh file
-        test_file_name = argv[ 1 ];
+        test_file_name = argv[1];
     }
 
     // Load a file
-    rval = mb->load_file( test_file_name.c_str( ) );MB_CHK_ERR( rval );
+    rval = mb->load_file( test_file_name.c_str() );MB_CHK_ERR( rval );
 
     // Loop over set types
     for( int i = 0; i < 3; i++ )
     {
         // Get the tag handle for this tag name; tag should already exist (it was created during
         // file read)
-        rval = mb->tag_get_handle( tag_nms[ i ], 1, MB_TYPE_INTEGER, mtag );MB_CHK_ERR( rval );
+        rval = mb->tag_get_handle( tag_nms[i], 1, MB_TYPE_INTEGER, mtag );MB_CHK_ERR( rval );
 
         // Get all the sets having that tag (with any value for that tag)
-        sets.clear( );
+        sets.clear();
         rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &mtag, NULL, 1, sets );MB_CHK_ERR( rval );
 
         // Iterate over each set, getting the entities and printing them
         Range::iterator set_it;
-        for( set_it = sets.begin( ); set_it != sets.end( ); ++set_it )
+        for( set_it = sets.begin(); set_it != sets.end(); ++set_it )
         {
             // Get the id for this set
             int set_id;
@@ -68,9 +68,9 @@ int main( int argc, char** argv )
             // Get the entities in the set, recursively
             rval = mb->get_entities_by_handle( *set_it, set_ents, true );MB_CHK_ERR( rval );
 
-            cout << tag_nms[ i ] << " " << set_id << " has " << set_ents.size( ) << " entities:" << endl;
+            cout << tag_nms[i] << " " << set_id << " has " << set_ents.size() << " entities:" << endl;
             set_ents.print( "   " );
-            set_ents.clear( );
+            set_ents.clear();
         }
     }
 

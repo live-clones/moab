@@ -51,9 +51,9 @@ class TShapeSize3DNB1 : public TMetricNonBarrier3D
   public:
     TShapeSize3DNB1( double gamma = 2.0 ) : mGamma( gamma ) {}
 
-    MESQUITE_EXPORT virtual ~TShapeSize3DNB1( );
+    MESQUITE_EXPORT virtual ~TShapeSize3DNB1();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 
@@ -61,8 +61,8 @@ class TShapeSize3DNB1 : public TMetricNonBarrier3D
                                                      MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                                     MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err );
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > second_wrt_T[6],
+                                                     MsqError& err );
 };
 
 }  // namespace MBMesquite

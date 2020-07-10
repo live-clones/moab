@@ -37,12 +37,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeSize3DB2::get_name( ) const
+std::string TShapeSize3DB2::get_name() const
 {
     return "TShapeSize3DB2";
 }
 
-TShapeSize3DB2::~TShapeSize3DB2( ) {}
+TShapeSize3DB2::~TShapeSize3DB2() {}
 
 bool TShapeSize3DB2::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err )
 {
@@ -55,7 +55,7 @@ bool TShapeSize3DB2::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqEr
 
     const double f = sqr_Frobenius( T );
     const double g = sqr_Frobenius( adj( T ) );
-    result = ( f + g ) / ( 6 * tau ) - 1;
+    result         = ( f + g ) / ( 6 * tau ) - 1;
     return true;
 }
 
@@ -71,7 +71,7 @@ bool TShapeSize3DB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& res
 
     const double f = sqr_Frobenius( T );
     const double g = sqr_Frobenius( adj( T ) );
-    result = ( f + g ) / ( 6 * tau );
+    result         = ( f + g ) / ( 6 * tau );
 
     deriv_wrt_T = -transpose( T ) * T;
     deriv_wrt_T( 0, 0 ) += 1 + f;
@@ -86,7 +86,7 @@ bool TShapeSize3DB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& res
 }
 
 bool TShapeSize3DB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T,
-                                         MsqMatrix< 3, 3 > second[ 6 ], MsqError& err )
+                                         MsqMatrix< 3, 3 > second[6], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -97,10 +97,10 @@ bool TShapeSize3DB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& res
 
     const double f = sqr_Frobenius( T );
     const double g = sqr_Frobenius( adj( T ) );
-    result = ( f + g ) / ( 6 * tau );
+    result         = ( f + g ) / ( 6 * tau );
 
     MsqMatrix< 3, 3 > dtau = transpose_adj( T );
-    MsqMatrix< 3, 3 > dg = -transpose( T ) * T;
+    MsqMatrix< 3, 3 > dg   = -transpose( T ) * T;
     dg( 0, 0 ) += f;
     dg( 1, 1 ) += f;
     dg( 2, 2 ) += f;

@@ -7,7 +7,7 @@
 namespace moab
 {
 
-const double LinearTri::corner[ 3 ][ 2 ] = { { 0, 0 }, { 1, 0 }, { 0, 1 } };
+const double LinearTri::corner[3][2] = { { 0, 0 }, { 1, 0 }, { 0, 1 } };
 
 ErrorCode LinearTri::initFcn( const double* verts, const int nverts, double*& work )
 {
@@ -17,17 +17,17 @@ ErrorCode LinearTri::initFcn( const double* verts, const int nverts, double*& wo
     // work[18] = detT
     // work[19] = detTinv
     assert( nverts == 3 && verts );
-    if( !work ) work = new double[ 20 ];
+    if( !work ) work = new double[20];
 
-    Matrix3 J( verts[ 1 * 3 + 0 ] - verts[ 0 * 3 + 0 ], verts[ 2 * 3 + 0 ] - verts[ 0 * 3 + 0 ], 0.0,
-               verts[ 1 * 3 + 1 ] - verts[ 0 * 3 + 1 ], verts[ 2 * 3 + 1 ] - verts[ 0 * 3 + 1 ], 0.0,
-               verts[ 1 * 3 + 2 ] - verts[ 0 * 3 + 2 ], verts[ 2 * 3 + 2 ] - verts[ 0 * 3 + 2 ], 1.0 );
+    Matrix3 J( verts[1 * 3 + 0] - verts[0 * 3 + 0], verts[2 * 3 + 0] - verts[0 * 3 + 0], 0.0,
+               verts[1 * 3 + 1] - verts[0 * 3 + 1], verts[2 * 3 + 1] - verts[0 * 3 + 1], 0.0,
+               verts[1 * 3 + 2] - verts[0 * 3 + 2], verts[2 * 3 + 2] - verts[0 * 3 + 2], 1.0 );
     J *= 0.5;
 
     J.copyto( work );
-    J.inverse( ).copyto( work + Matrix3::size );
-    work[ 18 ] = J.determinant( );
-    work[ 19 ] = ( work[ 18 ] < 1e-12 ? std::numeric_limits< double >::max( ) : 1.0 / work[ 18 ] );
+    J.inverse().copyto( work + Matrix3::size );
+    work[18] = J.determinant();
+    work[19] = ( work[18] < 1e-12 ? std::numeric_limits< double >::max() : 1.0 / work[18] );
 
     return MB_SUCCESS;
 }
@@ -37,11 +37,10 @@ ErrorCode LinearTri::evalFcn( const double* params, const double* field, const i
 {
     assert( params && field && num_tuples > 0 );
     // convert to [0,1]
-    double p1 = 0.5 * ( 1.0 + params[ 0 ] ), p2 = 0.5 * ( 1.0 + params[ 1 ] ), p0 = 1.0 - p1 - p2;
+    double p1 = 0.5 * ( 1.0 + params[0] ), p2 = 0.5 * ( 1.0 + params[1] ), p0 = 1.0 - p1 - p2;
 
     for( int j = 0; j < num_tuples; j++ )
-        result[ j ] =
-            p0 * field[ 0 * num_tuples + j ] + p1 * field[ 1 * num_tuples + j ] + p2 * field[ 2 * num_tuples + j ];
+        result[j] = p0 * field[0 * num_tuples + j] + p1 * field[1 * num_tuples + j] + p2 * field[2 * num_tuples + j];
 
     return MB_SUCCESS;
 }
@@ -54,11 +53,11 @@ ErrorCode LinearTri::integrateFcn( const double* field, const double* /*verts*/,
     for( int i = 0; i < nverts; ++i )
     {
         for( int j = 0; j < num_tuples; j++ )
-            result[ j ] += field[ i * num_tuples + j ];
+            result[j] += field[i * num_tuples + j];
     }
-    double tmp = work[ 18 ] / 6.0;
+    double tmp = work[18] / 6.0;
     for( int i = 0; i < num_tuples; i++ )
-        result[ i ] *= tmp;
+        result[i] *= tmp;
 
     return MB_SUCCESS;
 }
@@ -82,7 +81,7 @@ ErrorCode LinearTri::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn 
 
 int LinearTri::insideFcn( const double* params, const int, const double tol )
 {
-    return ( params[ 0 ] >= -1.0 - tol && params[ 1 ] >= -1.0 - tol && params[ 0 ] + params[ 1 ] <= 1.0 + tol );
+    return ( params[0] >= -1.0 - tol && params[1] >= -1.0 - tol && params[0] + params[1] <= 1.0 + tol );
 }
 
 ErrorCode LinearTri::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f, const double* posn,
@@ -92,37 +91,37 @@ ErrorCode LinearTri::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
     // TODO: should differentiate between epsilons used for
     // Newton Raphson iteration, and epsilons used for curved boundary geometry errors
     // right now, fix the tolerance used for NR
-    const double    error_tol_sqr = iter_tol * iter_tol;
-    CartVect*       cvparams = reinterpret_cast< CartVect* >( params );
-    const CartVect* cvposn = reinterpret_cast< const CartVect* >( posn );
+    const double error_tol_sqr = iter_tol * iter_tol;
+    CartVect* cvparams         = reinterpret_cast< CartVect* >( params );
+    const CartVect* cvposn     = reinterpret_cast< const CartVect* >( posn );
 
     // find best initial guess to improve convergence
-    CartVect  tmp_params[] = { CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( -1, 1, -1 ) };
-    double    resl = std::numeric_limits< double >::max( );
-    CartVect  new_pos, tmp_pos;
+    CartVect tmp_params[] = { CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( -1, 1, -1 ) };
+    double resl           = std::numeric_limits< double >::max();
+    CartVect new_pos, tmp_pos;
     ErrorCode rval;
     for( unsigned int i = 0; i < 3; i++ )
     {
-        rval = ( *eval )( tmp_params[ i ].array( ), verts, ndim, 3, work, tmp_pos.array( ) );
+        rval = ( *eval )( tmp_params[i].array(), verts, ndim, 3, work, tmp_pos.array() );
         if( MB_SUCCESS != rval ) return rval;
-        double tmp_resl = ( tmp_pos - *cvposn ).length_squared( );
+        double tmp_resl = ( tmp_pos - *cvposn ).length_squared();
         if( tmp_resl < resl )
         {
-            *cvparams = tmp_params[ i ];
-            new_pos = tmp_pos;
-            resl = tmp_resl;
+            *cvparams = tmp_params[i];
+            new_pos   = tmp_pos;
+            resl      = tmp_resl;
         }
     }
 
     // residual is diff between old and new pos; need to minimize that
     CartVect res = new_pos - *cvposn;
-    Matrix3  J;
-    rval = ( *jacob )( cvparams->array( ), verts, nverts, ndim, work, J[ 0 ] );
+    Matrix3 J;
+    rval = ( *jacob )( cvparams->array(), verts, nverts, ndim, work, J[0] );
 #ifndef NDEBUG
-    double det = J.determinant( );
-    assert( det > std::numeric_limits< double >::epsilon( ) );
+    double det = J.determinant();
+    assert( det > std::numeric_limits< double >::epsilon() );
 #endif
-    Matrix3 Ji = J.inverse( );
+    Matrix3 Ji = J.inverse();
 
     int iters = 0;
     // while |res| larger than tol
@@ -134,7 +133,7 @@ ErrorCode LinearTri::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
         *cvparams -= Ji * res;
 
         // get the new forward-evaluated position, and its difference from the target pt
-        rval = ( *eval )( params, verts, ndim, 3, work, new_pos.array( ) );
+        rval = ( *eval )( params, verts, ndim, 3, work, new_pos.array() );
         if( MB_SUCCESS != rval ) return rval;
         res = new_pos - *cvposn;
     }
@@ -158,7 +157,7 @@ ErrorCode LinearTri::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
   }*/
 
 ErrorCode LinearTri::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
-                                double normal[ 3 ] )
+                                double normal[3] )
 {
     // assert(facet < 3 && ientDim == 1 && nverts==3);
     if( nverts != 3 ) MB_SET_ERR( MB_FAILURE, "Incorrect vertex count for passed triangle :: expected value = 3 " );
@@ -166,38 +165,38 @@ ErrorCode LinearTri::normalFcn( const int ientDim, const int facet, const int nv
     if( facet > 3 || facet < 0 ) MB_SET_ERR( MB_FAILURE, "Incorrect local edge id :: expected value = one of 0-2" );
 
     // Get the local vertex ids of  local edge
-    int id0 = CN::mConnectivityMap[ MBTRI ][ ientDim - 1 ].conn[ facet ][ 0 ];
-    int id1 = CN::mConnectivityMap[ MBTRI ][ ientDim - 1 ].conn[ facet ][ 1 ];
+    int id0 = CN::mConnectivityMap[MBTRI][ientDim - 1].conn[facet][0];
+    int id1 = CN::mConnectivityMap[MBTRI][ientDim - 1].conn[facet][1];
 
     // Find a vector along the edge
-    double edge[ 3 ];
+    double edge[3];
     for( int i = 0; i < 3; i++ )
     {
-        edge[ i ] = verts[ 3 * id1 + i ] - verts[ 3 * id0 + i ];
+        edge[i] = verts[3 * id1 + i] - verts[3 * id0 + i];
     }
     // Find the normal of the face
-    double x0[ 3 ], x1[ 3 ], fnrm[ 3 ];
+    double x0[3], x1[3], fnrm[3];
     for( int i = 0; i < 3; i++ )
     {
-        x0[ i ] = verts[ 3 * 1 + i ] - verts[ 3 * 0 + i ];
-        x1[ i ] = verts[ 3 * 2 + i ] - verts[ 3 * 0 + i ];
+        x0[i] = verts[3 * 1 + i] - verts[3 * 0 + i];
+        x1[i] = verts[3 * 2 + i] - verts[3 * 0 + i];
     }
-    fnrm[ 0 ] = x0[ 1 ] * x1[ 2 ] - x1[ 1 ] * x0[ 2 ];
-    fnrm[ 1 ] = x1[ 0 ] * x0[ 2 ] - x0[ 0 ] * x1[ 2 ];
-    fnrm[ 2 ] = x0[ 0 ] * x1[ 1 ] - x1[ 0 ] * x0[ 1 ];
+    fnrm[0] = x0[1] * x1[2] - x1[1] * x0[2];
+    fnrm[1] = x1[0] * x0[2] - x0[0] * x1[2];
+    fnrm[2] = x0[0] * x1[1] - x1[0] * x0[1];
 
     // Find the normal of the edge as the cross product of edge and face normal
 
-    double a = edge[ 1 ] * fnrm[ 2 ] - fnrm[ 1 ] * edge[ 2 ];
-    double b = edge[ 2 ] * fnrm[ 0 ] - fnrm[ 2 ] * edge[ 0 ];
-    double c = edge[ 0 ] * fnrm[ 1 ] - fnrm[ 0 ] * edge[ 1 ];
+    double a   = edge[1] * fnrm[2] - fnrm[1] * edge[2];
+    double b   = edge[2] * fnrm[0] - fnrm[2] * edge[0];
+    double c   = edge[0] * fnrm[1] - fnrm[0] * edge[1];
     double nrm = sqrt( a * a + b * b + c * c );
 
-    if( nrm > std::numeric_limits< double >::epsilon( ) )
+    if( nrm > std::numeric_limits< double >::epsilon() )
     {
-        normal[ 0 ] = a / nrm;
-        normal[ 1 ] = b / nrm;
-        normal[ 2 ] = c / nrm;
+        normal[0] = a / nrm;
+        normal[1] = b / nrm;
+        normal[2] = c / nrm;
     }
     return MB_SUCCESS;
 }

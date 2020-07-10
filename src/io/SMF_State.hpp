@@ -19,8 +19,8 @@ class SMF_State
   private:
     //
     // Standard state variables
-    int         first_vertex;
-    int         vertex_correction;
+    int first_vertex;
+    int vertex_correction;
     AffineXform xform;
 
   public:
@@ -33,8 +33,8 @@ class SMF_State
     void mmult( const AffineXform& );
     void mload( const AffineXform& );
 
-    void vertex( double v[ 3 ] );
-    void normal( double n[ 3 ] );
+    void vertex( double v[3] );
+    void normal( double n[3] );
     void face( int*, const SMF_ivars& ivar );
 };
 

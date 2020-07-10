@@ -60,42 +60,42 @@ class ExodusTest : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE( ExodusTest );
     CPPUNIT_TEST( test_read );
     CPPUNIT_TEST( test_write );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
     /* Automatically called by CppUnit before each test function. */
-    void setUp( ) {}
+    void setUp() {}
 
     // Automatically called by CppUnit after each test function.
-    void tearDown( ) {}
+    void tearDown() {}
 
-    ExodusTest( ) {}
+    ExodusTest() {}
 
-    void test_read( );
+    void test_read();
 
-    void test_write( );
+    void test_write();
 
     void check_mesh( const char* filaname );
 };
 
-void ExodusTest::test_read( )
+void ExodusTest::test_read()
 {
     // Create a mesh file to read
     char filename[] = "MsqExoTestTemp.g";
-    bool havefile = create_exodus_file( filename );
+    bool havefile   = create_exodus_file( filename );
     CPPUNIT_ASSERT( havefile );
 
     check_mesh( filename );
 }
 
-void ExodusTest::test_write( )
+void ExodusTest::test_write()
 {
-    MBMesquite::MeshImpl*     mMesh;
+    MBMesquite::MeshImpl* mMesh;
     MBMesquite::MsqPrintError err( std::cout );
 
     // Create a mesh file
     char filename[] = "MsqExoTestTemp.g";
-    bool havefile = create_exodus_file( filename );
+    bool havefile   = create_exodus_file( filename );
     CPPUNIT_ASSERT( havefile );
 
     // Read in test file
@@ -116,12 +116,12 @@ void ExodusTest::test_write( )
 
 void ExodusTest::check_mesh( const char* filename )
 {
-    MBMesquite::MeshImpl*     mMesh;
+    MBMesquite::MeshImpl* mMesh;
     MBMesquite::MsqPrintError err( std::cout );
-    int                       i;
-    const unsigned            NUM_HEXES = 115;
-    const unsigned            NUM_QUADS = 0;
-    const unsigned            NUM_NODES = 216;
+    int i;
+    const unsigned NUM_HEXES = 115;
+    const unsigned NUM_QUADS = 0;
+    const unsigned NUM_NODES = 216;
 
     // Read a Exodus Mesh file
     mMesh = new MBMesquite::MeshImpl;
@@ -133,85 +133,85 @@ void ExodusTest::check_mesh( const char* filename )
     std::vector< MBMesquite::Mesh::ElementHandle > elem_handle_vect;
     mMesh->get_all_elements( elem_handle_vect, err );
     CPPUNIT_ASSERT( !err );
-    CPPUNIT_ASSERT( elem_handle_vect.size( ) == NUM_QUADS + NUM_HEXES );
+    CPPUNIT_ASSERT( elem_handle_vect.size() == NUM_QUADS + NUM_HEXES );
     std::vector< MBMesquite::Mesh::VertexHandle > vert_handle_vect;
-    std::vector< size_t >                         offset_vect;
-    mMesh->elements_get_attached_vertices( arrptr( elem_handle_vect ), elem_handle_vect.size( ), vert_handle_vect,
+    std::vector< size_t > offset_vect;
+    mMesh->elements_get_attached_vertices( arrptr( elem_handle_vect ), elem_handle_vect.size(), vert_handle_vect,
                                            offset_vect, err );
     CPPUNIT_ASSERT( !err );
-    CPPUNIT_ASSERT( vert_handle_vect.size( ) == 8 * NUM_HEXES + 4 * NUM_QUADS );
-    std::sort( vert_handle_vect.begin( ), vert_handle_vect.end( ) );
+    CPPUNIT_ASSERT( vert_handle_vect.size() == 8 * NUM_HEXES + 4 * NUM_QUADS );
+    std::sort( vert_handle_vect.begin(), vert_handle_vect.end() );
     std::vector< MBMesquite::Mesh::VertexHandle >::iterator new_end =
-        std::unique( vert_handle_vect.begin( ), vert_handle_vect.end( ) );
-    vert_handle_vect.resize( new_end - vert_handle_vect.begin( ) );
-    CPPUNIT_ASSERT( vert_handle_vect.size( ) == NUM_NODES );
+        std::unique( vert_handle_vect.begin(), vert_handle_vect.end() );
+    vert_handle_vect.resize( new_end - vert_handle_vect.begin() );
+    CPPUNIT_ASSERT( vert_handle_vect.size() == NUM_NODES );
 
     // Array of names of expected element types
-    const char* names[ Mesquite::MIXED ];
+    const char* names[Mesquite::MIXED];
     memset( names, 0, sizeof( names ) );
-    names[ Mesquite::QUADRILATERAL ] = "quad";
-    names[ Mesquite::TRIANGLE ] = "tri";
-    names[ Mesquite::TETRAHEDRON ] = "tet";
-    names[ Mesquite::HEXAHEDRON ] = "hex";
-    names[ Mesquite::PRISM ] = "wedge";
-    names[ Mesquite::PYRAMID ] = "pyr";
+    names[Mesquite::QUADRILATERAL] = "quad";
+    names[Mesquite::TRIANGLE]      = "tri";
+    names[Mesquite::TETRAHEDRON]   = "tet";
+    names[Mesquite::HEXAHEDRON]    = "hex";
+    names[Mesquite::PRISM]         = "wedge";
+    names[Mesquite::PYRAMID]       = "pyr";
 
     // Count elements by type
-    unsigned counts[ Mesquite::MIXED ];
+    unsigned counts[Mesquite::MIXED];
     memset( counts, 0, sizeof( counts ) );
     MBMesquite::ElementIterator* iter = mMesh->element_iterator( err );
     CPPUNIT_ASSERT( !err );
-    while( !iter->is_at_end( ) )
+    while( !iter->is_at_end() )
     {
-        MBMesquite::EntityTopology      type;
-        MBMesquite::Mesh::ElementHandle handle = iter->operator*( );
+        MBMesquite::EntityTopology type;
+        MBMesquite::Mesh::ElementHandle handle = iter->operator*();
         mMesh->elements_get_topologies( &handle, &type, 1, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( type < Mesquite::MIXED && names[ type ] != NULL );
-        ++counts[ type ];
-        iter->operator++( );
+        CPPUNIT_ASSERT( type < Mesquite::MIXED && names[type] != NULL );
+        ++counts[type];
+        iter->operator++();
     }
 
     // Print counts
     printf( "TYPE   COUNT\n-----  -----\n" );
     for( i = 0; i < MBMesquite::MIXED; ++i )
-        if( counts[ i ] ) printf( "%5s  %5d\n", names[ i ], counts[ i ] );
+        if( counts[i] ) printf( "%5s  %5d\n", names[i], counts[i] );
 
-    CPPUNIT_ASSERT( counts[ Mesquite::TRIANGLE ] == 0 );
-    CPPUNIT_ASSERT( counts[ Mesquite::QUADRILATERAL ] == NUM_QUADS );
-    CPPUNIT_ASSERT( counts[ Mesquite::TETRAHEDRON ] == 0 );
-    CPPUNIT_ASSERT( counts[ Mesquite::HEXAHEDRON ] = NUM_HEXES );
-    CPPUNIT_ASSERT( counts[ Mesquite::PRISM ] == 0 );
-    CPPUNIT_ASSERT( counts[ Mesquite::PYRAMID ] == 0 );
+    CPPUNIT_ASSERT( counts[Mesquite::TRIANGLE] == 0 );
+    CPPUNIT_ASSERT( counts[Mesquite::QUADRILATERAL] == NUM_QUADS );
+    CPPUNIT_ASSERT( counts[Mesquite::TETRAHEDRON] == 0 );
+    CPPUNIT_ASSERT( counts[Mesquite::HEXAHEDRON] = NUM_HEXES );
+    CPPUNIT_ASSERT( counts[Mesquite::PRISM] == 0 );
+    CPPUNIT_ASSERT( counts[Mesquite::PYRAMID] == 0 );
 
     // Check a few hexes and nodes for correctness
     const unsigned num_to_check = 6;
-    unsigned       j;
-    char           buffer[ 64 ];
+    unsigned j;
+    char buffer[64];
 
     // Check connectivity of first six hexes
-    static const unsigned expected_hex_connectivity[ num_to_check ][ 8 ] = {
+    static const unsigned expected_hex_connectivity[num_to_check][8] = {
         { 64, 63, 168, 167, 4, 5, 28, 27 }, { 63, 62, 132, 133, 5, 6, 24, 25 },   { 62, 169, 131, 132, 6, 29, 23, 24 },
         { 62, 46, 170, 169, 6, 1, 30, 29 }, { 46, 152, 153, 170, 1, 10, 11, 30 }, { 46, 66, 171, 152, 1, 2, 31, 10 } };
     for( j = 0; j < num_to_check; ++j )
     {
         sprintf( buffer, "bad hex: %d\n", j );
-        vert_handle_vect.clear( );
-        offset_vect.clear( );
+        vert_handle_vect.clear();
+        offset_vect.clear();
         MBMesquite::Mesh::ElementHandle handle = (MBMesquite::Mesh::ElementHandle)j;
         mMesh->elements_get_attached_vertices( &handle, 1, vert_handle_vect, offset_vect, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( vert_handle_vect.size( ) == 8 );
+        CPPUNIT_ASSERT( vert_handle_vect.size() == 8 );
         for( i = 0; i < 8; ++i )
         {
-            size_t mesh = (size_t)vert_handle_vect[ i ] + 1;
-            size_t exp = expected_hex_connectivity[ j ][ i ];
+            size_t mesh = (size_t)vert_handle_vect[i] + 1;
+            size_t exp  = expected_hex_connectivity[j][i];
             CPPUNIT_ASSERT_MESSAGE( buffer, mesh == exp );
         }
     }
 
     // Check locations of first six vertices
-    static const double expected_node_coords[ num_to_check ][ 3 ] = {
+    static const double expected_node_coords[num_to_check][3] = {
         { 2.000000, 0.000000, 5.000000 },   { 1.000000, -1.732051, 5.000000 }, { -1.000000, -1.732051, 5.000000 },
         { -2.000000, -0.000000, 5.000000 }, { -1.000000, 1.732051, 5.000000 }, { 1.000000, 1.732051, 5.000000 } };
     MBMesquite::MsqVertex vert;
@@ -223,7 +223,7 @@ void ExodusTest::check_mesh( const char* filename )
         CPPUNIT_ASSERT( !err );
         for( i = 0; i < 3; ++i )
         {
-            CPPUNIT_ASSERT_MESSAGE( buffer, fabs( expected_node_coords[ j ][ i ] - vert[ i ] ) < 1e-6 );
+            CPPUNIT_ASSERT_MESSAGE( buffer, fabs( expected_node_coords[j][i] - vert[i] ) < 1e-6 );
         }
     }
 }
@@ -236,7 +236,7 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( ExodusTest, "Unit" );
 int main( int argc, char* argv[] )
 {
     const char* filename = "dump.g";
-    if( argc > 1 ) filename = argv[ 1 ];
+    if( argc > 1 ) filename = argv[1];
 
     bool result = create_exodus_file( filename );
     if( result )

@@ -107,20 +107,20 @@ using namespace MBMesquite;
      (12)-----(37)-----(13)-----(38)-----(14)-----(39)-----(15)
 */
 
-std::string    LINEAR_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/linear_input.vtk";
-std::string    QUADRATIC_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/quadratic_input.vtk";
-std::string    EXPECTED_LINAR_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/expected_linear_output.vtk";
-std::string    EXPECTED_QUADRATIC_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/expected_quadratic_output.vtk";
-std::string    HOUR_INPUT_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/hour-quad8.vtk";
-std::string    OUTPUT_FILE_NAME = "smoothed_qudratic_mesh.vtk";
-const unsigned NUM_CORNER_VERTICES = 16;
-const unsigned NUM_MID_NODES = 24;
-const double   SPATIAL_COMPARE_TOLERANCE = 4e-6;
+std::string LINEAR_INPUT_FILE_NAME       = std::string( STRINGIFY( SRCDIR ) ) + "/linear_input.vtk";
+std::string QUADRATIC_INPUT_FILE_NAME    = std::string( STRINGIFY( SRCDIR ) ) + "/quadratic_input.vtk";
+std::string EXPECTED_LINAR_FILE_NAME     = std::string( STRINGIFY( SRCDIR ) ) + "/expected_linear_output.vtk";
+std::string EXPECTED_QUADRATIC_FILE_NAME = std::string( STRINGIFY( SRCDIR ) ) + "/expected_quadratic_output.vtk";
+std::string HOUR_INPUT_FILE_NAME         = std::string( STRINGIFY( SRCDIR ) ) + "/hour-quad8.vtk";
+std::string OUTPUT_FILE_NAME             = "smoothed_qudratic_mesh.vtk";
+const unsigned NUM_CORNER_VERTICES       = 16;
+const unsigned NUM_MID_NODES             = 24;
+const double SPATIAL_COMPARE_TOLERANCE   = 4e-6;
 
 void compare_nodes( size_t start_index, size_t end_index, Mesh* mesh1, Mesh* mesh2, MsqError& err )
 {
-    size_t                            i, num_verts = end_index - start_index;
-    std::vector< MsqVertex >          verts1( num_verts ), verts2( num_verts );
+    size_t i, num_verts = end_index - start_index;
+    std::vector< MsqVertex > verts1( num_verts ), verts2( num_verts );
     std::vector< Mesh::VertexHandle > handles1( num_verts ), handles2( num_verts );
 
     /* VertexIterator skips higher-order nodes.
@@ -172,7 +172,7 @@ void compare_nodes( size_t start_index, size_t end_index, Mesh* mesh1, Mesh* mes
       }
     */
     for( i = start_index; i < end_index; ++i )
-        handles1[ i - start_index ] = handles2[ i - start_index ] = (void*)i;
+        handles1[i - start_index] = handles2[i - start_index] = (void*)i;
 
     // Get coordinates from handles
     mesh1->vertices_get_coordinates( arrptr( handles1 ), arrptr( verts1 ), num_verts, err );MSQ_ERRRTN( err );
@@ -181,13 +181,13 @@ void compare_nodes( size_t start_index, size_t end_index, Mesh* mesh1, Mesh* mes
     // Compare coordinates
     for( i = 0; i < num_verts; ++i )
     {
-        const double diff = ( verts1[ i ] - verts2[ i ] ).length( );
+        const double diff = ( verts1[i] - verts2[i] ).length();
         if( diff > SPATIAL_COMPARE_TOLERANCE )
         {
             MSQ_SETERR( err )
             ( MsqError::INTERNAL_ERROR, "%u%s vertices differ. (%f,%f,%f) vs (%f,%f,%f)", (unsigned)( 1 + i ),
-              i % 10 == 0 ? "st" : i % 10 == 1 ? "nd" : i % 10 == 2 ? "rd" : "th", verts1[ i ][ 0 ], verts1[ i ][ 1 ],
-              verts1[ i ][ 2 ], verts2[ i ][ 0 ], verts2[ i ][ 1 ], verts2[ i ][ 2 ] );
+              i % 10 == 0 ? "st" : i % 10 == 1 ? "nd" : i % 10 == 2 ? "rd" : "th", verts1[i][0], verts1[i][1],
+              verts1[i][2], verts2[i][0], verts2[i][1], verts2[i][2] );
             return;
         }
     }
@@ -202,7 +202,7 @@ InstructionQueue* create_instruction_queue( MsqError& err )
     // creates a mean ratio quality metric ...
     // IdealWeightInverseMeanRatio* mean = new IdealWeightInverseMeanRatio(err); MSQ_ERRZERO(err);
     TargetCalculator* tc = new IdealShapeTarget;
-    TQualityMetric*   mean = new TQualityMetric( tc, 0, new TInverseMeanRatio );
+    TQualityMetric* mean = new TQualityMetric( tc, 0, new TInverseMeanRatio );
 
     LPtoPTemplate* obj_func = new LPtoPTemplate( mean, 1, err );
     MSQ_ERRZERO( err );
@@ -212,7 +212,7 @@ InstructionQueue* create_instruction_queue( MsqError& err )
     SteepestDescent* pass1 = new SteepestDescent( obj_func );
 
     // perform optimization globally
-    pass1->use_global_patch( );
+    pass1->use_global_patch();
 
     // QualityAssessor* mean_qa = new QualityAssessor(mean);
 
@@ -246,31 +246,31 @@ int do_test( bool slave )
     //  QuadLagrangeShape quad9;
 
     // Create geometry
-    Vector3D     z( 0, 0, 1 ), o( 0, 0, 0 );
+    Vector3D z( 0, 0, 1 ), o( 0, 0, 0 );
     PlanarDomain geom( z, o );
 
     // Read in linear input mesh
     cout << "Reading " << LINEAR_INPUT_FILE_NAME << endl;
     MeshImpl* linear_in = new MeshImpl;
-    linear_in->read_vtk( LINEAR_INPUT_FILE_NAME.c_str( ), err );
+    linear_in->read_vtk( LINEAR_INPUT_FILE_NAME.c_str(), err );
     if( MSQ_CHKERR( err ) ) return 1;
 
     // Read in expected linear results
     cout << "Reading " << EXPECTED_LINAR_FILE_NAME << endl;
     MeshImpl* linear_ex = new MeshImpl;
-    linear_ex->read_vtk( EXPECTED_LINAR_FILE_NAME.c_str( ), err );
+    linear_ex->read_vtk( EXPECTED_LINAR_FILE_NAME.c_str(), err );
     if( MSQ_CHKERR( err ) ) return 1;
 
     // Read in second copy of quadratic input mesh
     cout << "Reading " << QUADRATIC_INPUT_FILE_NAME << " again" << endl;
     MeshImpl* quadratic_in_2 = new MeshImpl;
-    quadratic_in_2->read_vtk( QUADRATIC_INPUT_FILE_NAME.c_str( ), err );
+    quadratic_in_2->read_vtk( QUADRATIC_INPUT_FILE_NAME.c_str(), err );
     if( MSQ_CHKERR( err ) ) return 1;
 
     // Read in expected quadratic results
     cout << "Reading " << EXPECTED_QUADRATIC_FILE_NAME << endl;
     MeshImpl* quadratic_ex = new MeshImpl;
-    quadratic_ex->read_vtk( EXPECTED_QUADRATIC_FILE_NAME.c_str( ), err );
+    quadratic_ex->read_vtk( EXPECTED_QUADRATIC_FILE_NAME.c_str(), err );
     if( MSQ_CHKERR( err ) ) return 1;
 
     // Smooth linear mesh and check results
@@ -324,7 +324,7 @@ int do_test( bool slave )
     return 0;
 }
 
-int do_smooth_ho( )
+int do_smooth_ho()
 {
     MsqPrintError err( cout );
     //  QuadLagrangeShape quad9;
@@ -335,7 +335,7 @@ int do_smooth_ho( )
     // Read in one copy of quadratic input mesh
     cout << "Reading " << HOUR_INPUT_FILE_NAME << endl;
     MeshImpl* quadratic_in = new MeshImpl;
-    quadratic_in->read_vtk( HOUR_INPUT_FILE_NAME.c_str( ), err );
+    quadratic_in->read_vtk( HOUR_INPUT_FILE_NAME.c_str(), err );
     if( MSQ_CHKERR( err ) ) return 1;
 
     // Read in expected results
@@ -370,13 +370,13 @@ int do_smooth_ho( )
     return 0;
 }
 
-int main( )
+int main()
 {
     cout << "Running test with all higher-order nodes slaved." << endl;
     int result1 = do_test( true );
     cout << "Running test with no higher-order nodes slaved." << endl;
     int result2 = do_test( false );
     cout << "Running test with only ho-nodes free." << endl;
-    int result3 = do_smooth_ho( );
+    int result3 = do_smooth_ho();
     return result1 + result2 + result3;
 }

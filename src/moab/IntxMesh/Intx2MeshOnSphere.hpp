@@ -18,7 +18,7 @@ class Intx2MeshOnSphere : public moab::Intx2Mesh
   public:
     Intx2MeshOnSphere( Interface* mbimpl, IntxAreaUtils::AreaMethod amethod = IntxAreaUtils::lHuiller );
 
-    virtual ~Intx2MeshOnSphere( );
+    virtual ~Intx2MeshOnSphere();
 
     void set_radius_source_mesh( double radius )
     {
@@ -34,7 +34,7 @@ class Intx2MeshOnSphere : public moab::Intx2Mesh
     // main method to intersect meshes on a sphere
 
     ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP, double& area,
-                                                   int markb[ MAXEDGES ], int markr[ MAXEDGES ], int& nsSrc, int& nsTgt,
+                                                   int markb[MAXEDGES], int markr[MAXEDGES], int& nsSrc, int& nsTgt,
                                                    bool check_boxes_first = false );
 
     ErrorCode findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double* iP, int nP );
@@ -49,7 +49,7 @@ class Intx2MeshOnSphere : public moab::Intx2Mesh
     const IntxAreaUtils::AreaMethod areaMethod;
 
   private:
-    int    plane;  // current gnomonic plane
+    int plane;           // current gnomonic plane
     double Rsrc, Rdest;  // radius of the sphere
 };
 

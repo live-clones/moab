@@ -12,7 +12,7 @@ namespace moab
 //! that tag name, otherwise uses PARALLEL_PARTITION tag
 ErrorCode ParallelData::get_partition_sets( Range& part_sets, const char* tag_name )
 {
-    Tag       part_tag = 0;
+    Tag part_tag = 0;
     ErrorCode result;
 
     if( NULL != tag_name )
@@ -38,14 +38,14 @@ ErrorCode ParallelData::get_interface_sets( std::vector< EntityHandle >& iface_s
         result = tmp_result; \
         continue;            \
     }
-    iface_sets.clear( );
-    iface_procs.clear( );
+    iface_sets.clear();
+    iface_procs.clear();
 
-    Tag       proc_tag = 0, procs_tag = 0;
+    Tag proc_tag = 0, procs_tag = 0;
     ErrorCode result = MB_SUCCESS;
-    int       my_rank;
+    int my_rank;
     if( parallelComm )
-        my_rank = parallelComm->proc_config( ).proc_rank( );
+        my_rank = parallelComm->proc_config().proc_rank();
     else
         return MB_FAILURE;
 
@@ -71,27 +71,27 @@ ErrorCode ParallelData::get_interface_sets( std::vector< EntityHandle >& iface_s
             mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &proc_tag, NULL, 1, proc_sets, Interface::UNION );
         if( MB_SUCCESS != tmp_result ) CONTINUE;
 
-        if( proc_sets.empty( ) ) CONTINUE;
+        if( proc_sets.empty() ) CONTINUE;
 
-        std::vector< int > proc_tags( proc_sets.size( ) * tsize );
-        tmp_result = mbImpl->tag_get_data( procs_tag, proc_sets, &proc_tags[ 0 ] );
+        std::vector< int > proc_tags( proc_sets.size() * tsize );
+        tmp_result = mbImpl->tag_get_data( procs_tag, proc_sets, &proc_tags[0] );
         if( MB_SUCCESS != tmp_result ) CONTINUE;
-        int             k;
+        int k;
         Range::iterator rit;
 
-        for( k = 0, rit = proc_sets.begin( ); rit != proc_sets.end( ); ++rit, k++ )
+        for( k = 0, rit = proc_sets.begin(); rit != proc_sets.end(); ++rit, k++ )
         {
             for( int j = 0; j < tsize; j++ )
             {
-                if( my_rank != proc_tags[ 2 * k + j ] && proc_tags[ 2 * k + j ] >= 0 )
-                    iface_data.insert( std::pair< int, EntityHandle >( proc_tags[ 2 * k + j ], *rit ) );
+                if( my_rank != proc_tags[2 * k + j] && proc_tags[2 * k + j] >= 0 )
+                    iface_data.insert( std::pair< int, EntityHandle >( proc_tags[2 * k + j], *rit ) );
             }
         }
     }
 
     // now get the results in sorted order
     std::multimap< int, EntityHandle >::iterator mit;
-    for( mit = iface_data.begin( ); mit != iface_data.end( ); ++mit )
+    for( mit = iface_data.begin(); mit != iface_data.end(); ++mit )
         iface_procs.push_back( ( *mit ).first ), iface_sets.push_back( ( *mit ).second );
 
     return result;

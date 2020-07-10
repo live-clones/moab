@@ -48,7 +48,7 @@ class FileOptions
     FileOptions( const FileOptions& copy );
     FileOptions& operator=( const FileOptions& copy );
 
-    ~FileOptions( );
+    ~FileOptions();
 
     /**\brief Check for option with no value
      *
@@ -203,25 +203,25 @@ class FileOptions
     ErrorCode get_strs_option( const char* name, std::vector< std::string >& values ) const;
 
     /** number of options */
-    inline unsigned size( ) const
+    inline unsigned size() const
     {
-        return mOptions.size( );
+        return mOptions.size();
     }
 
     /** true if no options */
-    inline bool empty( ) const
+    inline bool empty() const
     {
-        return mOptions.empty( );
+        return mOptions.empty();
     }
 
     /** Get list of options */
     void get_options( std::vector< std::string >& list ) const;
 
     /** Check if all options have been looked at */
-    bool all_seen( ) const;
+    bool all_seen() const;
 
     /** Mark all options as seen.  USed for non-root procs during bcast-delete read */
-    void mark_all_seen( ) const;
+    void mark_all_seen() const;
 
     /** Get first unseen option */
     ErrorCode get_unseen_option( std::string& value ) const;
@@ -236,8 +236,8 @@ class FileOptions
      */
     ErrorCode get_option( const char* name, const char*& value ) const;
 
-    char*                       mData;
-    std::vector< const char* >  mOptions;
+    char* mData;
+    std::vector< const char* > mOptions;
     mutable std::vector< bool > mSeen;
 
     /** Case-insensitive compare of name with option value. */

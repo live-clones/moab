@@ -75,7 +75,7 @@ class ReadHDF5Dataset
     ReadHDF5Dataset( const char* debug_desc, bool parallel, const Comm* communicator = 0 );
     void init( hid_t data_set_handle, bool close_data_set_on_destruct = true );
 
-    bool will_close_data_set( ) const
+    bool will_close_data_set() const
     {
         return closeDataSet;
     }
@@ -84,7 +84,7 @@ class ReadHDF5Dataset
         closeDataSet = val;
     }
 
-    ~ReadHDF5Dataset( );
+    ~ReadHDF5Dataset();
 
     /**\brief Change file ids to read from.
      *
@@ -110,7 +110,7 @@ class ReadHDF5Dataset
      *
      * Test if the iterative read has reached the end.
      */
-    bool done( ) const
+    bool done() const
     {
         return ( currOffset == rangeEnd ) && ( readCount == 0 );
     }
@@ -126,7 +126,7 @@ class ReadHDF5Dataset
 
     /**\brief Return position in \c Range of file IDs at which next read will start
      */
-    Range::const_iterator next_file_id( ) const
+    Range::const_iterator next_file_id() const
     {
         return currOffset;
     }
@@ -139,33 +139,33 @@ class ReadHDF5Dataset
      * that have finished their necessary read calls can call this function
      * so that all processes are calling the read method collectively.
      */
-    void null_read( );
+    void null_read();
 
-    unsigned columns( ) const;
-    void     set_column( unsigned c );
+    unsigned columns() const;
+    void set_column( unsigned c );
 
-    unsigned long get_read_count( ) const
+    unsigned long get_read_count() const
     {
         return readCount;
     }
-    const char* get_debug_desc( ) const
+    const char* get_debug_desc() const
     {
-        return mpeDesc.c_str( );
+        return mpeDesc.c_str();
     }
 
     static void set_hyperslab_selection_limit( size_t val )
     {
         hyperslabSelectionLimit = val;
     }
-    static void default_hyperslab_selection_limit( );
+    static void default_hyperslab_selection_limit();
 
     /** Use non-standard 'APPEND' operation for hyperslab selection */
-    static void append_hyperslabs( )
+    static void append_hyperslabs()
     {
         hyperslabSelectOp = H5S_SELECT_APPEND;
     }
     /** Revert to default select behavior for standard HDF5 library */
-    static void or_hyperslabs( )
+    static void or_hyperslabs()
     {
         hyperslabSelectOp = H5S_SELECT_OR;
     }
@@ -175,31 +175,31 @@ class ReadHDF5Dataset
 
     Range internalRange;  //!< used when reading entire dataset
 
-    bool    closeDataSet;  //!< close dataset in destructor
-    hsize_t dataSetOffset[ 64 ], dataSetCount[ 64 ];
-    hid_t   dataSet;  //!< Handle for HDF5 data set
-    hid_t   dataSpace;  //!< Data space for data set
-    hid_t   dataType;  //!< Data type client code wants for data
-    hid_t   fileType;  //!< Data type as stored in data set
-    hid_t   ioProp;  //!< Used to specify collective IO
-    int     dataSpaceRank;  //!< Rank of data set
+    bool closeDataSet;  //!< close dataset in destructor
+    hsize_t dataSetOffset[64], dataSetCount[64];
+    hid_t dataSet;        //!< Handle for HDF5 data set
+    hid_t dataSpace;      //!< Data space for data set
+    hid_t dataType;       //!< Data type client code wants for data
+    hid_t fileType;       //!< Data type as stored in data set
+    hid_t ioProp;         //!< Used to specify collective IO
+    int dataSpaceRank;    //!< Rank of data set
     hsize_t rowsInTable;  //!< Total number of rows in dataset
-    bool    doConversion;  //!< True if dataType != fileType
-    bool    nativeParallel;  //!< If true then reading different data on different procs
+    bool doConversion;    //!< True if dataType != fileType
+    bool nativeParallel;  //!< If true then reading different data on different procs
 
-    hsize_t     readCount;  //!< Number of actual reads to do
-    hsize_t     bufferSize;  //!< size of buffer passed to \c read, in number of rows
+    hsize_t readCount;   //!< Number of actual reads to do
+    hsize_t bufferSize;  //!< size of buffer passed to \c read, in number of rows
     const Comm* mpiComm;
 
     Range::const_iterator currOffset, rangeEnd;
-    EntityHandle          startID;
+    EntityHandle startID;
 
-    static bool                  haveMPEEvents;
+    static bool haveMPEEvents;
     static std::pair< int, int > mpeReadEvent;
     static std::pair< int, int > mpeReduceEvent;
-    std::string                  mpeDesc;
+    std::string mpeDesc;
 
-    static size_t        hyperslabSelectionLimit;
+    static size_t hyperslabSelectionLimit;
     static H5S_seloper_t hyperslabSelectOp;
 };
 

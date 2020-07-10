@@ -38,32 +38,33 @@
 namespace MBMesquite
 {
 
-std::string TSquared::get_name( ) const
+std::string TSquared::get_name() const
 {
     return "TSquared";
 }
 
-TSquared::~TSquared( ) {}
+TSquared::~TSquared() {}
 
-template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
     result = sqr_Frobenius( T );
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& wrt_T )
 {
     result = sqr_Frobenius( T );
-    wrt_T = 2 * T;
+    wrt_T  = 2 * T;
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                          MsqMatrix< DIM, DIM >* second_wrt_T )
 {
-    result = sqr_Frobenius( T );
+    result      = sqr_Frobenius( T );
     deriv_wrt_T = 2 * T;
     set_scaled_I( second_wrt_T, 2.0 );
     return true;

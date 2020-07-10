@@ -52,7 +52,7 @@ namespace MBMesquite
 {
 
 const double DEF_UNT_BETA = 1e-8;
-const double DEF_SUC_EPS = 1e-4;
+const double DEF_SUC_EPS  = 1e-4;
 
 /*! The consturctor allows for two values.  The first is a
   time bound (in seconds) used as a termination criterion.  If
@@ -78,10 +78,10 @@ void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Par
 {
     // Define an untangler
     UntangleBetaQualityMetric untangle_metric( untBeta );
-    LPtoPTemplate             untangle_func( 2, &untangle_metric );
-    ConjugateGradient         untangle_global( &untangle_func );
-    TerminationCriterion      untangle_inner, untangle_outer;
-    untangle_global.use_global_patch( );
+    LPtoPTemplate untangle_func( 2, &untangle_metric );
+    ConjugateGradient untangle_global( &untangle_func );
+    TerminationCriterion untangle_inner, untangle_outer;
+    untangle_global.use_global_patch();
     untangle_inner.add_absolute_quality_improvement( 0.0 );
     untangle_inner.add_absolute_successive_improvement( successiveEps );
     untangle_outer.add_iteration_limit( 1 );
@@ -91,10 +91,10 @@ void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Par
     // define shape improver
     IdealWeightInverseMeanRatio inverse_mean_ratio;
     inverse_mean_ratio.set_averaging_method( QualityMetric::LINEAR );
-    LPtoPTemplate        obj_func( 2, &inverse_mean_ratio );
-    FeasibleNewton       feas_newt( &obj_func );
+    LPtoPTemplate obj_func( 2, &inverse_mean_ratio );
+    FeasibleNewton feas_newt( &obj_func );
     TerminationCriterion term_inner, term_outer;
-    feas_newt.use_global_patch( );
+    feas_newt.use_global_patch();
     qa->add_quality_assessment( &inverse_mean_ratio );
     term_inner.add_absolute_gradient_L2_norm( gradNorm );
     term_inner.add_relative_successive_improvement( successiveEps );
@@ -107,7 +107,7 @@ void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Par
 
     // Run untangler
     InstructionQueue q1;
-    Timer            totalTimer;
+    Timer totalTimer;
     q1.set_master_quality_improver( &untangle_global, err );MSQ_ERRRTN( err );
     q1.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
     q1.run_common( mesh_and_domain, pmesh, settings, err );MSQ_ERRRTN( err );
@@ -115,7 +115,7 @@ void ShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Par
     // If limited by CPU time, limit next step to remaning time
     if( maxTime > 0.0 )
     {
-        double remaining = maxTime - totalTimer.since_birth( );
+        double remaining = maxTime - totalTimer.since_birth();
         if( remaining <= 0.0 )
         {
             MSQ_DBGOUT( 2 ) << "Optimization is terminating without perfoming shape improvement." << std::endl;

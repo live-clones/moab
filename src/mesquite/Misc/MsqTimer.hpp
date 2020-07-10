@@ -44,21 +44,21 @@ namespace MBMesquite
 class MESQUITE_EXPORT Timer
 {
   public:
-    Timer( );
+    Timer();
 
-    void reset( );  // resets the timer as if it were just created
+    void reset();  // resets the timer as if it were just created
 
-    double since_last_check( );  //- return time in seconds since last
-                                 //- call to since_last_check().  Note that
-                                 //- calling since_birth() doesn't count
-                                 //- as a check.  The first time this function
-                                 //- is called, it returns the time since birth.
+    double since_last_check();  //- return time in seconds since last
+                                //- call to since_last_check().  Note that
+                                //- calling since_birth() doesn't count
+                                //- as a check.  The first time this function
+                                //- is called, it returns the time since birth.
 
-    double since_birth( ) const;  //- return time in seconds since
-                                  //- object was created.
+    double since_birth() const;  //- return time in seconds since
+                                 //- object was created.
 
   private:
-    double atBirth;  //- Time at birth
+    double atBirth;      //- Time at birth
     double atLastCheck;  //- Time at last call to since_last_check()
 };
 
@@ -67,36 +67,36 @@ class MESQUITE_EXPORT StopWatch
   public:
     // Creates the stopwatch.  The stopwatch is stopped
     // until start() is called.
-    StopWatch( ) : isRunning( false ), totalTime( 0.0 ), numStarts( 0 ) {}
+    StopWatch() : isRunning( false ), totalTime( 0.0 ), numStarts( 0 ) {}
 
     // Starts the stopwatch.  If it was already running,
     // this function does nothing.
-    void start( );
+    void start();
 
     // Stops the stopwatch.  If it was not already running,
     // this function does nothing
-    void stop( );
+    void stop();
 
     // Stops the stopwatch and resets the total_time() to zero.
-    void reset( );
+    void reset();
 
     // Returns the total accumulated time.  If the stopwatch
     // is currently running, the time between the last start()
     // and the current time IS included in total_time().
-    double total_time( ) const;
+    double total_time() const;
 
     /*! \brief Returns the number of times this StopWatch has
       been started.*/
-    int number_of_starts( ) const
+    int number_of_starts() const
     {
         return numStarts;
     }
 
   private:
-    bool   isRunning;
+    bool isRunning;
     double timeAtLastStart;
     double totalTime;
-    int    numStarts;
+    int numStarts;
 };
 
 class StopWatchCollection
@@ -105,7 +105,7 @@ class StopWatchCollection
     typedef size_t Key;
 
     // Create a new collection
-    MESQUITE_EXPORT StopWatchCollection( ) {}
+    MESQUITE_EXPORT StopWatchCollection() {}
 
     // Add a stopwatch to the collection.  Returns a non-zero
     // StopWatchCollection::Key if it succeeds, zero if it fails.
@@ -122,12 +122,12 @@ class StopWatchCollection
     //! Gets the string associated with a key
     MESQUITE_EXPORT std::string get_string( const Key key )
     {
-        return mEntries[ key - 1 ].first;
+        return mEntries[key - 1].first;
     }
     //! Gets the string associated with a key
     MESQUITE_EXPORT void get_string( const Key key, std::string& new_string )
     {
-        new_string = mEntries[ key - 1 ].first;
+        new_string = mEntries[key - 1].first;
     }
 
     // Remove a specific stopwatch.
@@ -173,9 +173,9 @@ class StopWatchCollection
     }
 
     // Gets the number of stop watches in the collection
-    MESQUITE_EXPORT int number_of_stop_watches( )
+    MESQUITE_EXPORT int number_of_stop_watches()
     {
-        return (int)mEntries.size( );
+        return (int)mEntries.size();
     }
 
     MESQUITE_EXPORT void get_keys_sorted_by_time( std::vector< Key >& sorted_keys );
@@ -203,11 +203,11 @@ class FunctionTimer
 {
   public:
     inline FunctionTimer( StopWatchCollection::Key key ) : mKey( key ) {}
-    inline void start( )
+    inline void start()
     {
         GlobalStopWatches.start( mKey );
     }
-    inline ~FunctionTimer( )
+    inline ~FunctionTimer()
     {
         GlobalStopWatches.stop( mKey );
     }
@@ -225,7 +225,7 @@ class FunctionTimer
     static MBMesquite::StopWatchCollection::Key _mesquite_timer_key = \
         MBMesquite::GlobalStopWatches.add( NAME, false );             \
     FunctionTimer _mesquite_timer( _mesquite_timer_key );             \
-    _mesquite_timer.start( )
+    _mesquite_timer.start()
 #else
 #define MSQ_FUNCTION_TIMER( NAME )
 #endif

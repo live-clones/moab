@@ -9,7 +9,7 @@
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
 #include "moab_mpi.h"
-#else  // MOAB_HAVE_MPI
+#else   // MOAB_HAVE_MPI
 typedef int MPI_Comm;
 #endif  // MOAB_HAVE_MPI
 
@@ -24,12 +24,12 @@ namespace moab
  */
 MeshRefiner::MeshRefiner( Interface* imesh, Interface* omesh )
 {
-    this->mesh_in = imesh;
-    this->mesh_out = omesh;
-    this->tag_manager = new RefinerTagManager( this->mesh_in, this->mesh_out );
+    this->mesh_in        = imesh;
+    this->mesh_out       = omesh;
+    this->tag_manager    = new RefinerTagManager( this->mesh_in, this->mesh_out );
     this->output_functor = new MeshOutputFunctor( this->tag_manager );
     this->entity_refiner = 0;
-    this->comm = ParallelComm::get_pcomm( this->mesh_out, 0 );
+    this->comm           = ParallelComm::get_pcomm( this->mesh_out, 0 );
 }
 
 /**\brief Destroy a mesh refiner.
@@ -37,7 +37,7 @@ MeshRefiner::MeshRefiner( Interface* imesh, Interface* omesh )
  * Note that any EntityRefiner object associated with the mesh refiner will be deleted inside this
  * destructor. Destruction is virtual so subclasses may clean up after refinement.
  */
-MeshRefiner::~MeshRefiner( )
+MeshRefiner::~MeshRefiner()
 {
     delete this->tag_manager;
     delete this->output_functor;
@@ -60,9 +60,9 @@ bool MeshRefiner::set_entity_refiner( EntityRefiner* er )
 /**\brief A convenience method to reset the list of tags to be copied to output vertices.
  * This simply calls the method of the same name on the tag manager.
  */
-void MeshRefiner::reset_vertex_tags( )
+void MeshRefiner::reset_vertex_tags()
 {
-    this->tag_manager->reset_vertex_tags( );
+    this->tag_manager->reset_vertex_tags();
 }
 
 /**\brief A convenience method to add a tag to be copied/interpolated from input vertices to output
@@ -75,7 +75,7 @@ int MeshRefiner::add_vertex_tag( Tag tag_handle )
 
 struct MeshRefinerIterator
 {
-    Range        subset;
+    Range subset;
     EntityHandle destination_set;
 };
 
@@ -87,25 +87,25 @@ struct MeshRefinerIterator
  */
 bool MeshRefiner::refine( Range& range )
 {
-    this->tag_manager->create_output_tags( );
+    this->tag_manager->create_output_tags();
     if( !this->entity_refiner->prepare( this->tag_manager, this->output_functor ) )
     {  // Oops, perhaps the edge_size_evaluator was not set?
         return false;
     }
 
-    MeshRefinerIterator                entry;
+    MeshRefinerIterator entry;
     std::vector< MeshRefinerIterator > work;
 
-    entry.subset = range;
+    entry.subset          = range;
     entry.destination_set = 0;
     work.push_back( entry );
 
-    while( !work.empty( ) )
+    while( !work.empty() )
     {
-        entry = work.back( );
-        work.pop_back( );
+        entry = work.back();
+        work.pop_back();
         this->output_functor->destination_set = entry.destination_set;
-        for( Range::const_iterator it = entry.subset.begin( ); it != entry.subset.end( ); ++it )
+        for( Range::const_iterator it = entry.subset.begin(); it != entry.subset.end(); ++it )
         {
             EntityType etyp = this->mesh_in->type_from_handle( *it );
             if( etyp == MBENTITYSET )
@@ -115,7 +115,7 @@ bool MeshRefiner::refine( Range& range )
                 {
                     // Create a matching set on the output mesh.
                     MeshRefinerIterator set_work;
-                    unsigned int        set_work_opts;
+                    unsigned int set_work_opts;
                     this->mesh_in->get_meshset_options( *it, set_work_opts );
                     this->mesh_out->create_meshset( set_work_opts, set_work.destination_set );
                     set_work.subset = set_ents;

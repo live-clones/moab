@@ -79,19 +79,19 @@ class ReadSTL : public ReaderIface
     ReadSTL( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadSTL( );
+    virtual ~ReadSTL();
 
     // An object to hold vertex coordinates, and an operator
     // for storing them in a STL tree-based container.
     struct Point
     {
-        float coords[ 3 ];
-        bool  operator<( const Point& ) const;
+        float coords[3];
+        bool operator<( const Point& ) const;
     };
     // Data returned by read_triangles.
     struct Triangle
     {
-        Point points[ 3 ];
+        Point points[3];
     };
 
     enum ByteOrder

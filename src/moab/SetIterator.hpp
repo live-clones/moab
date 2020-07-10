@@ -17,28 +17,28 @@ class SetIterator
     friend class Core;
 
     //! destructor
-    virtual ~SetIterator( );
+    virtual ~SetIterator();
 
     //! get the ent set for this iterator
-    inline EntityHandle ent_set( ) const
+    inline EntityHandle ent_set() const
     {
         return entSet;
     };
 
     //! get the chunk size of this iterator
-    inline unsigned int chunk_size( ) const
+    inline unsigned int chunk_size() const
     {
         return chunkSize;
     };
 
     //! get the entity type for this iterator
-    inline EntityType ent_type( ) const
+    inline EntityType ent_type() const
     {
         return entType;
     };
 
     //! get the dimension for this iterator
-    inline int ent_dimension( ) const
+    inline int ent_dimension() const
     {
         return entDimension;
     };
@@ -51,7 +51,7 @@ class SetIterator
     virtual ErrorCode get_next_arr( std::vector< EntityHandle >& arr, bool& atend ) = 0;
 
     //! reset the iterator to the beginning of the set
-    virtual ErrorCode reset( ) = 0;
+    virtual ErrorCode reset() = 0;
 
   protected:
     /** \brief Constructor
@@ -64,7 +64,7 @@ class SetIterator
     inline SetIterator( Core* core, EntityHandle eset, unsigned int chunk_sz, EntityType ent_tp, int ent_dim,
                         bool check_valid = false )
         : myCore( core ), entSet( eset ), chunkSize( chunk_sz ), entType( ent_tp ), entDimension( ent_dim ),
-          checkValid( check_valid ){ };
+          checkValid( check_valid ){};
 
     //! Core instance
     Core* myCore;
@@ -95,7 +95,7 @@ class RangeSetIterator : public SetIterator
 
     /** \brief Destructor
      */
-    virtual ~RangeSetIterator( );
+    virtual ~RangeSetIterator();
 
     /** \brief get the next chunkSize entities
      * Return the next chunkSize entities.
@@ -105,7 +105,7 @@ class RangeSetIterator : public SetIterator
     virtual ErrorCode get_next_arr( std::vector< EntityHandle >& arr, bool& atend );
 
     //! reset the iterator to the beginning of the set
-    virtual ErrorCode reset( );
+    virtual ErrorCode reset();
 
   protected:
     /** \brief Constructor
@@ -125,7 +125,7 @@ class RangeSetIterator : public SetIterator
                                      bool& atend );
 
     //! Build the special pair vector for the root set
-    ErrorCode build_pair_vec( );
+    ErrorCode build_pair_vec();
 
     //! Current iterator position, 0 if at beginning
     EntityHandle iterPos;
@@ -153,7 +153,7 @@ class VectorSetIterator : public SetIterator
     virtual ErrorCode get_next_arr( std::vector< EntityHandle >& arr, bool& atend );
 
     //! reset the iterator to the beginning of the set
-    virtual ErrorCode reset( );
+    virtual ErrorCode reset();
 
     //! decrement the position by the specified number; returns MB_FAILURE if resulting index is < 0
     inline ErrorCode decrement( int num );

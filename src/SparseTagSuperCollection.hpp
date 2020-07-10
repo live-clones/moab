@@ -44,7 +44,7 @@
 #include "moab/Range.hpp"
 #include "TagInfo.hpp"
 
-#define get_collection( A ) ( ( A ) < mDataTags.size( ) ? mDataTags[ ( A ) ] : 0 )
+#define get_collection( A ) ( ( A ) < mDataTags.size() ? mDataTags[( A )] : 0 )
 
 namespace moab
 {
@@ -56,12 +56,12 @@ class SparseTagSuperCollection
 {
   public:
     //! constructor
-    SparseTagSuperCollection( ) {}
+    SparseTagSuperCollection() {}
 
     //! destructor
-    virtual ~SparseTagSuperCollection( );
+    virtual ~SparseTagSuperCollection();
 
-    void reset_data( );
+    void reset_data();
 
     //! allocate new tag id
     ErrorCode reserve_tag_id( int data_size, TagId tag_id );

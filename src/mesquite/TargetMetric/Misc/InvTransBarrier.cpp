@@ -37,12 +37,12 @@
 namespace MBMesquite
 {
 
-std::string InvTransBarrier::get_name( ) const
+std::string InvTransBarrier::get_name() const
 {
     return "InvTransBarrier";
 }
 
-InvTransBarrier::~InvTransBarrier( ) {}
+InvTransBarrier::~InvTransBarrier() {}
 
 bool InvTransBarrier::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {

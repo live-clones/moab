@@ -79,10 +79,10 @@ class PatchData;
 class MESQUITE_EXPORT MappingFunction
 {
   public:
-    virtual ~MappingFunction( ) {}
+    virtual ~MappingFunction() {}
 
     /**\brief Get MBMesquite::EntityTopology handled by this mapping function */
-    virtual EntityTopology element_topology( ) const = 0;
+    virtual EntityTopology element_topology() const = 0;
 
     /**\brief Get number of nodes in the element type
      *
@@ -91,7 +91,7 @@ class MESQUITE_EXPORT MappingFunction
      * function, in combination with the element topology, is sufficient
      * to determine the element type.
      */
-    virtual int num_nodes( ) const = 0;
+    virtual int num_nodes() const = 0;
 
     /**\brief Get sample points at which to evaluate mapping function
      *
@@ -144,7 +144,7 @@ class MESQUITE_EXPORT MappingFunction
     inline void convert_connectivity_indices( int num_nodes_in_output_element_type, size_t* index_list,
                                               unsigned num_indices, MsqError& err ) const
     {
-        convert_connectivity_indices( element_topology( ), num_nodes( ), num_nodes_in_output_element_type, index_list,
+        convert_connectivity_indices( element_topology(), num_nodes(), num_nodes_in_output_element_type, index_list,
                                       num_indices, err );
     }
 
@@ -158,7 +158,7 @@ class MESQUITE_EXPORT MappingFunction
 class MESQUITE_EXPORT MappingFunction2D : public MappingFunction
 {
   public:
-    virtual ~MappingFunction2D( ) {}
+    virtual ~MappingFunction2D() {}
 
     /**\brief Mapping Function Derivatives
      *
@@ -321,7 +321,7 @@ class MESQUITE_EXPORT MappingFunction2D : public MappingFunction
 class MESQUITE_EXPORT MappingFunction3D : public MappingFunction
 {
   public:
-    virtual ~MappingFunction3D( ) {}
+    virtual ~MappingFunction3D() {}
 
     /**\brief Mapping Function Derivatives
      *

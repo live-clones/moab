@@ -42,9 +42,9 @@ namespace MBMesquite
 class AWShapeSizeOrientNB1 : public AWMetricNonBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~AWShapeSizeOrientNB1( );
+    MESQUITE_EXPORT virtual ~AWShapeSizeOrientNB1();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                                            MsqError& err );
@@ -54,7 +54,7 @@ class AWShapeSizeOrientNB1 : public AWMetricNonBarrier
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
                                                      double& result, MsqMatrix< 2, 2 >& deriv_wrt_A,
-                                                     MsqMatrix< 2, 2 > second_wrt_A[ 3 ], MsqError& err );
+                                                     MsqMatrix< 2, 2 > second_wrt_A[3], MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
                                            MsqError& err );
@@ -64,7 +64,7 @@ class AWShapeSizeOrientNB1 : public AWMetricNonBarrier
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
                                                      double& result, MsqMatrix< 3, 3 >& deriv_wrt_A,
-                                                     MsqMatrix< 3, 3 > second_wrt_A[ 6 ], MsqError& err );
+                                                     MsqMatrix< 3, 3 > second_wrt_A[6], MsqError& err );
 };
 
 }  // namespace MBMesquite

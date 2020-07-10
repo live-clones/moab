@@ -42,18 +42,18 @@ void BoundedCylinderDomain::domain_DoF( const Mesh::VertexHandle* handle_array, 
 {
     double t;
     for( size_t i = 0; i < count; ++i )
-        if( find_curve( handle_array[ i ], t ) )
-            dof_array[ i ] = 1;
+        if( find_curve( handle_array[i], t ) )
+            dof_array[i] = 1;
         else
-            dof_array[ i ] = 2;
+            dof_array[i] = 2;
 }
 
 void BoundedCylinderDomain::create_curve( double distance, const std::vector< Mesh::VertexHandle >& handles )
 {
     Curve c;
-    c.t = distance;
+    c.t       = distance;
     c.handles = handles;
-    std::sort( c.handles.begin( ), c.handles.end( ) );
+    std::sort( c.handles.begin(), c.handles.end() );
     curveList.push_back( c );
 }
 
@@ -61,24 +61,24 @@ void BoundedCylinderDomain::create_curve( double distance, Mesh* mesh, double to
 {
     std::vector< Mesh::VertexHandle > handles;
     mesh->get_all_vertices( handles, err );MSQ_ERRRTN( err );
-    if( handles.empty( ) )
+    if( handles.empty() )
     {
         MSQ_SETERR( err )( "No vertices in mesh.\n", MsqError::INVALID_ARG );
         return;
     }
 
-    std::vector< MsqVertex > coords( handles.size( ) );
-    mesh->vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ), err );MSQ_ERRRTN( err );
+    std::vector< MsqVertex > coords( handles.size() );
+    mesh->vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size(), err );MSQ_ERRRTN( err );
 
     std::vector< Mesh::EntityHandle > list;
-    Vector3D                          close, normal;
-    for( size_t i = 0; i < handles.size( ); ++i )
+    Vector3D close, normal;
+    for( size_t i = 0; i < handles.size(); ++i )
     {
-        evaluate( distance, coords[ i ], close, normal );
-        if( ( coords[ i ] - close ).length( ) < tolerance ) list.push_back( handles[ i ] );
+        evaluate( distance, coords[i], close, normal );
+        if( ( coords[i] - close ).length() < tolerance ) list.push_back( handles[i] );
     }
 
-    if( list.empty( ) )
+    if( list.empty() )
     {
         MSQ_SETERR( err )( "No vertices within specified tolerance.\n", MsqError::INVALID_ARG );
         return;
@@ -89,18 +89,18 @@ void BoundedCylinderDomain::create_curve( double distance, Mesh* mesh, double to
 
 void BoundedCylinderDomain::evaluate( double t, const Vector3D& point, Vector3D& closest, Vector3D& normal ) const
 {
-    const double   EPSILON = std::numeric_limits< double >::epsilon( );
-    double         t2 = axis( ) % ( point - center( ) );
-    const Vector3D circ_center = center( ) + t * axis( );
-    const Vector3D axis_point = center( ) + t2 * axis( );
+    const double EPSILON       = std::numeric_limits< double >::epsilon();
+    double t2                  = axis() % ( point - center() );
+    const Vector3D circ_center = center() + t * axis();
+    const Vector3D axis_point  = center() + t2 * axis();
 
-    normal = point - axis_point;
-    const double len = normal.length( );
+    normal           = point - axis_point;
+    const double len = normal.length();
     if( len < EPSILON ) { this->CylinderDomain::evaluate( 0, axis_point, closest, normal ); }
     else
     {
         normal /= len;
-        closest = circ_center + radius( ) * normal;
+        closest = circ_center + radius() * normal;
     }
 }
 
@@ -116,8 +116,8 @@ void BoundedCylinderDomain::evaluate( Mesh::VertexHandle handle, const Vector3D&
 
 bool BoundedCylinderDomain::find_curve( Mesh::VertexHandle handle, double& t ) const
 {
-    for( std::list< Curve >::const_iterator i = curveList.begin( ); i != curveList.end( ); ++i )
-        if( std::binary_search( i->handles.begin( ), i->handles.end( ), handle ) )
+    for( std::list< Curve >::const_iterator i = curveList.begin(); i != curveList.end(); ++i )
+        if( std::binary_search( i->handles.begin(), i->handles.end(), handle ) )
         {
             t = i->t;
             return true;

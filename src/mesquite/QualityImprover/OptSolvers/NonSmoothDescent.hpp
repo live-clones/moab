@@ -58,22 +58,22 @@ class NonSmoothDescent : public VertexMover
     MESQUITE_EXPORT
     NonSmoothDescent( QualityMetric* qm );
 
-    MESQUITE_EXPORT virtual ~NonSmoothDescent( ) {}
+    MESQUITE_EXPORT virtual ~NonSmoothDescent() {}
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual PatchSet* get_patch_set( );
+    MESQUITE_EXPORT virtual PatchSet* get_patch_set();
 
   protected:
     struct ActiveSet
     {
-        int                num_equal;
-        double             true_active_value;
+        int num_equal;
+        double true_active_value;
         std::vector< int > active_ind;
 
         void set( int index )
         {
-            active_ind.clear( );
+            active_ind.clear();
             active_ind.push_back( index );
             num_equal = 0;
         }
@@ -87,23 +87,23 @@ class NonSmoothDescent : public VertexMover
     class SymmetricMatrix
     {
         double* storage;
-        size_t  size;
-        size_t  index( size_t r, size_t c ) const
+        size_t size;
+        size_t index( size_t r, size_t c ) const
         {
             return ( r <= c ) ? size * r - r * ( r + 1 ) / 2 + c : size * c - c * ( c + 1 ) / 2 + r;
         }
 
       public:
-        SymmetricMatrix( ) : storage( 0 ), size( 0 ) {}
+        SymmetricMatrix() : storage( 0 ), size( 0 ) {}
 
-        ~SymmetricMatrix( )
+        ~SymmetricMatrix()
         {
             free( storage );
         }
 
         void resize( size_t new_size )
         {
-            size = new_size;
+            size    = new_size;
             storage = (double*)realloc( storage, sizeof( double ) * size * ( size + 1 ) / 2 );
         }
 
@@ -112,17 +112,17 @@ class NonSmoothDescent : public VertexMover
             std::fill( storage, storage + ( size * ( size + 1 ) / 2 ), value );
         }
 
-        double& operator( )( size_t r, size_t c )
+        double& operator()( size_t r, size_t c )
         {
-            return storage[ index( r, c ) ];
+            return storage[index( r, c )];
         }
 
-        double operator( )( size_t r, size_t c ) const
+        double operator()( size_t r, size_t c ) const
         {
-            return storage[ index( r, c ) ];
+            return storage[index( r, c )];
         }
 
-        double condition3x3( ) const;
+        double condition3x3() const;
     };
 
     MESQUITE_EXPORT virtual void initialize( PatchData& pd, MsqError& err );
@@ -133,12 +133,12 @@ class NonSmoothDescent : public VertexMover
 
     MESQUITE_EXPORT virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
 
-    MESQUITE_EXPORT virtual void cleanup( );
+    MESQUITE_EXPORT virtual void cleanup();
 
   private:
     enum OptStatus
     {
-        MSQ_NO_STATUS = 0,
+        MSQ_NO_STATUS     = 0,
         MSQ_STEP_ACCEPTED = 100,
         MSQ_IMP_TOO_SMALL,
         MSQ_FLAT_NO_IMP,
@@ -177,22 +177,22 @@ class NonSmoothDescent : public VertexMover
     double minStepSize;
 
     /* optimization data */
-    VertexPatches           patchSet;
-    QualityMetric*          currentQM;
-    double                  originalValue;
-    std::vector< double >   mFunction, testFunction, originalFunction;
-    std::vector< double >   mGS;
-    SymmetricMatrix         mG;
-    Matrix3D                mPDG;
-    std::vector< double >   prevActiveValues;
+    VertexPatches patchSet;
+    QualityMetric* currentQM;
+    double originalValue;
+    std::vector< double > mFunction, testFunction, originalFunction;
+    std::vector< double > mGS;
+    SymmetricMatrix mG;
+    Matrix3D mPDG;
+    std::vector< double > prevActiveValues;
     std::vector< Vector3D > mGradient, tmpGrad;
-    std::vector< size_t >   tmpIdx, qmHandles;
-    OptStatus               optStatus;
-    size_t                  mSteepest;
-    double                  mAlpha;
-    double                  maxAlpha;
-    int                     pdgInd[ 3 ];
-    ActiveSet               mActive, testActive, originalActive;
+    std::vector< size_t > tmpIdx, qmHandles;
+    OptStatus optStatus;
+    size_t mSteepest;
+    double mAlpha;
+    double maxAlpha;
+    int pdgInd[3];
+    ActiveSet mActive, testActive, originalActive;
 
     /* functions */
     void init_opt( PatchData& pd, MsqError& err );
@@ -228,14 +228,14 @@ class NonSmoothDescent : public VertexMover
     void form_grammian( const std::vector< Vector3D >& vec, MsqError& err );
     void form_PD_grammian( MsqError& err );
     void singular_test( int n, const Matrix3D& A, bool& singular, MsqError& err );
-    bool solve2x2( double a11, double a12, double a21, double a22, double b1, double b2, double x[ 2 ], MsqError& err );
+    bool solve2x2( double a11, double a12, double a21, double a22, double b1, double b2, double x[2], MsqError& err );
     void form_reduced_matrix( SymmetricMatrix& P );
 
     /* search direction */
     void search_direction( PatchData& pd, Vector3D& search_dir_out, MsqError& err );
     void search_edges_faces( const Vector3D* dir, Vector3D& search, MsqError& err );
     void get_active_directions( const std::vector< Vector3D >& gradient, std::vector< Vector3D >& dir, MsqError& err );
-    NonSmoothDescent( const NonSmoothDescent& pd );  // disable copying
+    NonSmoothDescent( const NonSmoothDescent& pd );             // disable copying
     NonSmoothDescent& operator=( const NonSmoothDescent& pd );  // disable assignment
 };
 
@@ -244,8 +244,8 @@ inline void NonSmoothDescent::find_plane_normal( const Vector3D& pt1, const Vect
 {
     Vector3D vecA = pt2 - pt1;
     Vector3D vecB = pt3 - pt1;
-    cross = vecA * vecB;
-    cross /= cross.length( );
+    cross         = vecA * vecB;
+    cross /= cross.length();
 }
 
 inline bool NonSmoothDescent::improvement_check( MsqError& /*err*/ )

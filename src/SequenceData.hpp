@@ -21,21 +21,21 @@ class SequenceData
      */
     inline SequenceData( int num_sequence_arrays, EntityHandle start, EntityHandle end );
 
-    virtual ~SequenceData( );
+    virtual ~SequenceData();
 
     /**\return first handle in this sequence data */
-    EntityHandle start_handle( ) const
+    EntityHandle start_handle() const
     {
         return startHandle;
     }
 
     /**\return last handle in this sequence data */
-    EntityHandle end_handle( ) const
+    EntityHandle end_handle() const
     {
         return endHandle;
     }
 
-    EntityID size( ) const
+    EntityID size() const
     {
         return endHandle + 1 - startHandle;
     }
@@ -43,34 +43,34 @@ class SequenceData
     /**\return ith array of EnitySequence-specific data */
     void* get_sequence_data( int array_num )
     {
-        return arraySet[ -1 - array_num ];
+        return arraySet[-1 - array_num];
     }
     /**\return ith array of EnitySequence-specific data */
     void const* get_sequence_data( int array_num ) const
     {
-        return arraySet[ -1 - array_num ];
+        return arraySet[-1 - array_num];
     }
 
     /**\return array of adjacency data, or NULL if none. */
-    AdjacencyDataType* get_adjacency_data( )
+    AdjacencyDataType* get_adjacency_data()
     {
-        return reinterpret_cast< AdjacencyDataType* >( arraySet[ 0 ] );
+        return reinterpret_cast< AdjacencyDataType* >( arraySet[0] );
     }
     /**\return array of adjacency data, or NULL if none. */
-    AdjacencyDataType const* get_adjacency_data( ) const
+    AdjacencyDataType const* get_adjacency_data() const
     {
-        return reinterpret_cast< AdjacencyDataType const* >( arraySet[ 0 ] );
+        return reinterpret_cast< AdjacencyDataType const* >( arraySet[0] );
     }
 
     /**\return array of dense tag data, or NULL if none. */
     void* get_tag_data( unsigned tag_num )
     {
-        return tag_num < numTagData ? arraySet[ tag_num + 1 ] : 0;
+        return tag_num < numTagData ? arraySet[tag_num + 1] : 0;
     }
     /**\return array of dense tag data, or NULL if none. */
     void const* get_tag_data( unsigned tag_num ) const
     {
-        return tag_num < numTagData ? arraySet[ tag_num + 1 ] : 0;
+        return tag_num < numTagData ? arraySet[tag_num + 1] : 0;
     }
 
     /**\brief Allocate array of sequence-specific data
@@ -101,7 +101,7 @@ class SequenceData
      * Allocate array for storing adjacency data.
      *\return The newly allocated array, or NULL if already allocated.
      */
-    AdjacencyDataType* allocate_adjacency_data( );
+    AdjacencyDataType* allocate_adjacency_data();
 
     /**\brief Allocate array of dense tag data
      *
@@ -144,11 +144,11 @@ class SequenceData
     void increase_tag_count( unsigned by_this_many );
 
     void* create_data( int index, int bytes_per_ent, const void* initial_val = 0 );
-    void  copy_data_subset( int index, int size_per_ent, const void* source, size_t offset, size_t count );
+    void copy_data_subset( int index, int size_per_ent, const void* source, size_t offset, size_t count );
 
-    const int    numSequenceData;
-    unsigned     numTagData;
-    void**       arraySet;
+    const int numSequenceData;
+    unsigned numTagData;
+    void** arraySet;
     EntityHandle startHandle, endHandle;
 };
 
@@ -156,7 +156,7 @@ inline SequenceData::SequenceData( int num_sequence_arrays, EntityHandle start, 
     : numSequenceData( num_sequence_arrays ), numTagData( 0 ), startHandle( start ), endHandle( end )
 {
     const size_t sz = sizeof( void* ) * ( num_sequence_arrays + 1 );
-    void**       data = (void**)malloc( sz );
+    void** data     = (void**)malloc( sz );
     memset( data, 0, sz );
     arraySet = data + num_sequence_arrays;
 }

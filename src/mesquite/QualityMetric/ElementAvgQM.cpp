@@ -39,36 +39,36 @@ namespace MBMesquite
 
 ElementAvgQM::ElementAvgQM( ElemSampleQM* metric ) : mMetric( metric ) {}
 
-ElementAvgQM::~ElementAvgQM( ) {}
+ElementAvgQM::~ElementAvgQM() {}
 
-std::string ElementAvgQM::get_name( ) const
+std::string ElementAvgQM::get_name() const
 {
     std::string result( "ElementAvgQM(" );
-    result += mMetric->get_name( );
+    result += mMetric->get_name();
     result += ")";
     return result;
 }
 
-int ElementAvgQM::get_negate_flag( ) const
+int ElementAvgQM::get_negate_flag() const
 {
-    return get_quality_metric( )->get_negate_flag( );
+    return get_quality_metric()->get_negate_flag();
 }
 
 bool ElementAvgQM::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
-    ElemSampleQM* qm = get_quality_metric( );
-    mHandles.clear( );
+    ElemSampleQM* qm = get_quality_metric();
+    mHandles.clear();
     qm->get_element_evaluations( pd, handle, mHandles, err );
     MSQ_ERRFALSE( err );
 
-    bool   valid = true;
+    bool valid = true;
     double tmpval;
     double accumulate = 0.0;
-    int    num_values = 0;
-    bool   tmpvalid;
+    int num_values    = 0;
+    bool tmpvalid;
 
-    value = -std::numeric_limits< double >::infinity( );
-    for( std::vector< size_t >::iterator h = mHandles.begin( ); h != mHandles.end( ); ++h )
+    value = -std::numeric_limits< double >::infinity();
+    for( std::vector< size_t >::iterator h = mHandles.begin(); h != mHandles.end(); ++h )
     {
         tmpvalid = qm->evaluate( pd, *h, tmpval, err );
         MSQ_ERRZERO( err );

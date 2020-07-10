@@ -22,7 +22,7 @@ class NCWriteEuler : public ScdNCWriteHelper
     {
     }
 
-    virtual ~NCWriteEuler( );
+    virtual ~NCWriteEuler();
 };
 
 }  // namespace moab

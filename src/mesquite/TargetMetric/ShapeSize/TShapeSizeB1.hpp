@@ -42,9 +42,9 @@ namespace MBMesquite
 class TShapeSizeB1 : public TMetricBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~TShapeSizeB1( );
+    MESQUITE_EXPORT virtual ~TShapeSizeB1();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 
@@ -52,8 +52,8 @@ class TShapeSizeB1 : public TMetricBarrier
                                                      MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                                     MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err );
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T, MsqMatrix< 2, 2 > second_wrt_T[3],
+                                                     MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 
@@ -61,8 +61,8 @@ class TShapeSizeB1 : public TMetricBarrier
                                                      MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                                     MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err );
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > second_wrt_T[6],
+                                                     MsqError& err );
 };
 
 }  // namespace MBMesquite

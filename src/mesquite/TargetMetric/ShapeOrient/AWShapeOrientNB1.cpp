@@ -38,14 +38,14 @@
 namespace MBMesquite
 {
 
-std::string AWShapeOrientNB1::get_name( ) const
+std::string AWShapeOrientNB1::get_name() const
 {
     return "AWShapeOrientNB1";
 }
 
-AWShapeOrientNB1::~AWShapeOrientNB1( ) {}
+AWShapeOrientNB1::~AWShapeOrientNB1() {}
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
     result = std::sqrt( sqr_Frobenius( A ) * sqr_Frobenius( W ) );
@@ -54,16 +54,16 @@ static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, D
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
                          MsqMatrix< DIM, DIM >& deriv )
 {
     const double nsW = sqr_Frobenius( W );
     const double nsA = sqr_Frobenius( A );
-    const double nW = std::sqrt( nsW );
-    const double nA = std::sqrt( nsA );
+    const double nW  = std::sqrt( nsW );
+    const double nA  = std::sqrt( nsA );
     const double dot = A % W;
-    result = nA * nW - dot;
+    result           = nA * nW - dot;
     result *= result;
 
     deriv = nA * W;

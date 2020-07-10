@@ -11,11 +11,11 @@
 struct iBase_EntityArrIterator_Private
 {
   protected:
-    iBase_EntityType     entType;
+    iBase_EntityType entType;
     iMesh_EntityTopology entTopo;
-    EntityHandle         entSet;
-    int                  arrSize;
-    bool                 isRecursive;
+    EntityHandle entSet;
+    int arrSize;
+    bool isRecursive;
 
   public:
     iBase_EntityArrIterator_Private( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set,
@@ -24,9 +24,9 @@ struct iBase_EntityArrIterator_Private
     {
     }
 
-    virtual ~iBase_EntityArrIterator_Private( ) {}
+    virtual ~iBase_EntityArrIterator_Private() {}
 
-    int array_size( ) const
+    int array_size() const
     {
         return arrSize;
     }
@@ -45,7 +45,7 @@ struct iBase_EntityArrIterator_Private
 
       public:
         IsType( EntityType t ) : type( t ) {}
-        bool operator( )( EntityHandle h )
+        bool operator()( EntityHandle h )
         {
             return TYPE_FROM_HANDLE( h ) == type;
         }
@@ -53,7 +53,7 @@ struct iBase_EntityArrIterator_Private
 
     void remove_type( std::vector< EntityHandle >& vect, EntityType t )
     {
-        vect.erase( std::remove_if( vect.begin( ), vect.end( ), IsType( t ) ), vect.end( ) );
+        vect.erase( std::remove_if( vect.begin(), vect.end(), IsType( t ) ), vect.end() );
     }
 
     void remove_type( Range& range, EntityType t )
@@ -66,7 +66,8 @@ struct iBase_EntityArrIterator_Private
 // step_iterator will safely step forward N steps in a iterator. We specialize
 // for random-access iterators (vectors and Ranges) so that they perform better.
 
-template< typename T > inline ErrorCode step_iterator( T& curr, const T& end, int num_steps, bool& at_end )
+template < typename T >
+inline ErrorCode step_iterator( T& curr, const T& end, int num_steps, bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
 
@@ -79,8 +80,8 @@ template< typename T > inline ErrorCode step_iterator( T& curr, const T& end, in
     return MB_SUCCESS;
 }
 
-template< typename T >
-inline ErrorCode step_iterator( typename std::vector< T >::const_iterator&       curr,
+template < typename T >
+inline ErrorCode step_iterator( typename std::vector< T >::const_iterator& curr,
                                 const typename std::vector< T >::const_iterator& end, int num_steps, bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
@@ -109,52 +110,53 @@ inline ErrorCode step_iterator( Range::const_iterator& curr, const Range::const_
     return MB_SUCCESS;
 }
 
-template< class Container > class MBIter : public iBase_EntityArrIterator_Private
+template < class Container >
+class MBIter : public iBase_EntityArrIterator_Private
 {
   protected:
-    Container                          iterData;
+    Container iterData;
     typename Container::const_iterator iterPos;
 
   public:
     MBIter( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set, int arr_size,
             bool recursive = false )
-        : iBase_EntityArrIterator_Private( type, topology, set, arr_size, recursive ), iterPos( iterData.end( ) )
+        : iBase_EntityArrIterator_Private( type, topology, set, arr_size, recursive ), iterPos( iterData.end() )
     {
     }
 
-    ~MBIter( ) {}
+    ~MBIter() {}
 
-    typename Container::const_iterator position( ) const
+    typename Container::const_iterator position() const
     {
         return iterPos;
     };
 
-    typename Container::const_iterator end( ) const
+    typename Container::const_iterator end() const
     {
-        return iterData.end( );
+        return iterData.end();
     };
 
     ErrorCode step( int num_steps, bool& at_end )
     {
-        return step_iterator( iterPos, end( ), num_steps, at_end );
+        return step_iterator( iterPos, end(), num_steps, at_end );
     }
 
     void get_entities( Core* mb, EntityHandle* array, int& count )
     {
-        for( count = 0; count < arrSize && iterPos != iterData.end( ); ++iterPos )
-            if( mb->is_valid( *iterPos ) ) array[ count++ ] = *iterPos;
+        for( count = 0; count < arrSize && iterPos != iterData.end(); ++iterPos )
+            if( mb->is_valid( *iterPos ) ) array[count++] = *iterPos;
     }
 
     virtual ErrorCode reset( Interface* mb )
     {
         ErrorCode result;
-        iterData.clear( );
+        iterData.clear();
         if( entTopo != iMesh_ALL_TOPOLOGIES )
         {
             if( entTopo == iMesh_SEPTAHEDRON )
                 result = MB_SUCCESS;
             else
-                result = mb->get_entities_by_type( entSet, mb_topology_table[ entTopo ], iterData, isRecursive );
+                result = mb->get_entities_by_type( entSet, mb_topology_table[entTopo], iterData, isRecursive );
         }
         else if( entType != iBase_ALL_TYPES )
         {
@@ -167,12 +169,12 @@ template< class Container > class MBIter : public iBase_EntityArrIterator_Privat
             remove_type( iterData, MBENTITYSET );
             remove_type( iterData, MBKNIFE );
         }
-        iterPos = iterData.begin( );
+        iterPos = iterData.begin();
         return result;
     }
 };
 
 typedef MBIter< std::vector< EntityHandle > > MBListIter;
-typedef MBIter< moab::Range >                 MBRangeIter;
+typedef MBIter< moab::Range > MBRangeIter;
 
 #endif

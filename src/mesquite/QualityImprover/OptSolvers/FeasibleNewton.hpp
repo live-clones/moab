@@ -97,7 +97,7 @@ class FeasibleNewton : public VertexMover, public PatchSetUser
   public:
     MESQUITE_EXPORT FeasibleNewton( ObjectiveFunction* of );
 
-    MESQUITE_EXPORT virtual ~FeasibleNewton( )
+    MESQUITE_EXPORT virtual ~FeasibleNewton()
     {
         delete coordsMem;
     }
@@ -109,22 +109,22 @@ class FeasibleNewton : public VertexMover, public PatchSetUser
         convTol = gradc;
     }
 
-    PatchSet* get_patch_set( );
+    PatchSet* get_patch_set();
 
-    MESQUITE_EXPORT std::string get_name( ) const;
+    MESQUITE_EXPORT std::string get_name() const;
 
   protected:
     virtual void initialize( PatchData& pd, MsqError& err );
     virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
-    virtual void cleanup( );
+    virtual void cleanup();
 
   private:
-    double                    convTol;
-    MsqHessian                mHessian;
+    double convTol;
+    MsqHessian mHessian;
     PatchDataVerticesMemento* coordsMem;
-    bool                      havePrintedDirectionMessage;
+    bool havePrintedDirectionMessage;
 };
 
 }  // namespace MBMesquite

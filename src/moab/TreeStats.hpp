@@ -27,9 +27,9 @@ class TreeStats
 {
   public:
     //! constructor
-    TreeStats( )
+    TreeStats()
     {
-        reset( );
+        reset();
     }
 
     /** \brief Given a root node, compute the stats for a tree
@@ -39,13 +39,13 @@ class TreeStats
     ErrorCode compute_stats( Interface* impl, EntityHandle root_node );
 
     //! reset traversal counters
-    void reset_trav_stats( );
+    void reset_trav_stats();
 
     //! reset all counters
-    void reset( );
+    void reset();
 
     //! print the contents of this structure
-    void print( ) const;
+    void print() const;
 
     //! output all the contents of this structure on a single line
     void output_all_stats( const bool with_endl = true ) const;
@@ -60,19 +60,19 @@ class TreeStats
     unsigned int maxDepth;
     unsigned int numNodes;
     unsigned int numLeaves;
-    double       avgObjPerLeaf;
+    double avgObjPerLeaf;
     unsigned int minObjPerLeaf;
     unsigned int maxObjPerLeaf;
 
     // traversal statistics
-    unsigned int nodesVisited;  // number of tree nodes visited since last reset
-    unsigned int leavesVisited;  // number of tree leaves visited since last reset
-    unsigned int numTraversals;  // number of tree traversals since last reset
+    unsigned int nodesVisited;              // number of tree nodes visited since last reset
+    unsigned int leavesVisited;             // number of tree leaves visited since last reset
+    unsigned int numTraversals;             // number of tree traversals since last reset
     unsigned int constructLeafObjectTests;  // during construction, number of tests of objects (e.g.
                                             // elements)
     unsigned int traversalLeafObjectTests;  // during traversals, number of tests of objects (e.g. elements)
-    unsigned int boxElemTests;  // during construction, number of calls to
-                                // GeomUtil::box_elem_overlap (KD tree only)
+    unsigned int boxElemTests;              // during construction, number of calls to
+                                            // GeomUtil::box_elem_overlap (KD tree only)
 
   private:
     ErrorCode traverse( Interface* impl, EntityHandle node, unsigned int& depth );
@@ -80,15 +80,15 @@ class TreeStats
 
 inline ErrorCode TreeStats::compute_stats( Interface* impl, EntityHandle root_node )
 {
-    maxDepth = 0;
-    numNodes = 0;
-    numLeaves = 0;
+    maxDepth      = 0;
+    numNodes      = 0;
+    numLeaves     = 0;
     avgObjPerLeaf = 0.0;
     minObjPerLeaf = 0;
     maxObjPerLeaf = 0;
 
     ErrorCode rval = traverse( impl, root_node, maxDepth );
-    avgObjPerLeaf = ( avgObjPerLeaf > 0 ? avgObjPerLeaf / (double)numLeaves : 0.0 );
+    avgObjPerLeaf  = ( avgObjPerLeaf > 0 ? avgObjPerLeaf / (double)numLeaves : 0.0 );
     return rval;
 }
 
@@ -100,53 +100,53 @@ inline ErrorCode TreeStats::traverse( Interface* impl, EntityHandle node, unsign
     children.reserve( 2 );
     ErrorCode rval = impl->get_child_meshsets( node, children );
     if( MB_SUCCESS != rval ) return rval;
-    if( children.empty( ) )
+    if( children.empty() )
     {
         numLeaves++;
         rval = impl->get_entities_by_handle( node, children );
         if( MB_SUCCESS != rval ) return rval;
-        avgObjPerLeaf += children.size( );
-        minObjPerLeaf = std::min( (unsigned int)children.size( ), minObjPerLeaf );
-        maxObjPerLeaf = std::max( (unsigned int)children.size( ), maxObjPerLeaf );
+        avgObjPerLeaf += children.size();
+        minObjPerLeaf = std::min( (unsigned int)children.size(), minObjPerLeaf );
+        maxObjPerLeaf = std::max( (unsigned int)children.size(), maxObjPerLeaf );
         return MB_SUCCESS;
     }
     else
     {
         unsigned int right_depth = depth, left_depth = depth;
-        rval = traverse( impl, children[ 0 ], left_depth );
+        rval = traverse( impl, children[0], left_depth );
         if( MB_SUCCESS != rval ) return rval;
-        rval = traverse( impl, children[ 1 ], right_depth );
+        rval = traverse( impl, children[1], right_depth );
         if( MB_SUCCESS != rval ) return rval;
         depth = std::max( left_depth, right_depth );
         return MB_SUCCESS;
     }
 }
 
-inline void TreeStats::reset( )
+inline void TreeStats::reset()
 {
     initTime = 0.0;
 
-    maxDepth = 0;
-    numNodes = 0;
-    numLeaves = 0;
+    maxDepth                 = 0;
+    numNodes                 = 0;
+    numLeaves                = 0;
     constructLeafObjectTests = 0;
-    boxElemTests = 0;
-    avgObjPerLeaf = 0.0;
-    minObjPerLeaf = 0.0;
-    maxObjPerLeaf = 0.0;
+    boxElemTests             = 0;
+    avgObjPerLeaf            = 0.0;
+    minObjPerLeaf            = 0.0;
+    maxObjPerLeaf            = 0.0;
 
-    reset_trav_stats( );
+    reset_trav_stats();
 }
 
-inline void TreeStats::reset_trav_stats( )
+inline void TreeStats::reset_trav_stats()
 {
-    nodesVisited = 0;
-    leavesVisited = 0;
-    numTraversals = 0;
+    nodesVisited             = 0;
+    leavesVisited            = 0;
+    numTraversals            = 0;
     traversalLeafObjectTests = 0;
 }
 
-inline void TreeStats::print( ) const
+inline void TreeStats::print() const
 {
     std::cout << "Tree initialization time = " << initTime << " seconds" << std::endl;
 

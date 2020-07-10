@@ -15,7 +15,7 @@
 namespace moab
 {
 
-const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = {
+const NestedRefine::refPatterns NestedRefine::refTemplates[9][MAX_DEGREE] = {
 
     // EDGE
     { // Deg 2
@@ -34,10 +34,10 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 1, 0 }, { 2, 1 }, { 2, 0 } },
         { { 0, 0, 2, 0 }, { 1, 1, 0, 0 } },
 
-        { { } },
-        { { } },
+        { {} },
+        { {} },
         { { 1, 1 }, { 1, 2 } },
-        { { } } },
+        { {} } },
 
       // Deg 3
       /*    0------2------3------1    */
@@ -55,10 +55,10 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 1, 0 }, { 3, 1 }, { 2, 0 }, { 3, 0 } },
         { { 0, 0, 2, 0 }, { 1, 1, 3, 0 }, { 2, 1, 0, 0 } },
 
-        { { } },
-        { { } },
+        { {} },
+        { {} },
         { { 1, 1 }, { 1, 3 } },
-        { { } } },
+        { {} } },
 
       // Deg 5
       /*    0------2------3------4------5------1    */
@@ -76,10 +76,10 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 1, 0 }, { 5, 1 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } },
         { { 0, 0, 2, 0 }, { 1, 1, 3, 0 }, { 2, 1, 4, 0 }, { 3, 1, 5, 0 }, { 4, 1, 0, 0 } },
 
-        { { } },
-        { { } },
+        { {} },
+        { {} },
         { { 1, 1 }, { 1, 5 } },
-        { { } } } },
+        { {} } } },
 
     // TRI
     { // Deg 2
@@ -102,9 +102,9 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 0, 0, 2, 2, 0, 0 }, { 3, 2, 4, 0, 1, 1 }, { 0, 0, 0, 0, 2, 0 }, { 2, 1, 0, 0, 0, 0 } },
 
         { { 3 }, { 4 }, { 5 } },
-        { { } },
+        { {} },
         { { 2, 1, 3 }, { 2, 3, 4 }, { 2, 4, 1 } },
-        { { } } },
+        { {} } },
 
       // Deg 3
       /*  2
@@ -153,7 +153,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 3, 4 }, { 5, 6 }, { 7, 8 } },
         { { 9 } },
         { { 3, 1, 3, 5 }, { 3, 5, 8, 9 }, { 3, 9, 6, 1 } },
-        { { } } },
+        { {} } },
 
       // Deg 5
       /*    2
@@ -214,7 +214,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 3, 4, 5, 6 }, { 7, 8, 9, 10 }, { 11, 12, 13, 14 } },
         { { 15, 16, 17, 18, 19, 20 } },
         { { 5, 1, 3, 5, 7, 9 }, { 5, 9, 16, 21, 24, 25 }, { 5, 25, 22, 17, 10, 1 } },
-        { { } } }
+        { {} } }
 
     },
 
@@ -246,7 +246,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 4 }, { 5 }, { 6 }, { 7 } },
         { { 8 } },
         { { 2, 1, 2 }, { 2, 2, 3 }, { 2, 3, 4 }, { 2, 4, 1 } },
-        { { } } },
+        { {} } },
 
       // Deg 3
       /*
@@ -316,7 +316,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 4, 5 }, { 6, 7 }, { 8, 9 }, { 10, 11 } },
         { { 12, 13, 14, 15 } },
         { { 3, 1, 2, 3 }, { 3, 3, 6, 9 }, { 3, 9, 8, 7 }, { 3, 7, 4, 1 } },
-        { { } } },
+        { {} } },
 
       // Deg 5
       /*
@@ -370,7 +370,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
         { { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 }, { 16, 17, 18, 19 } },
         { { 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35 } },
         { { 5, 1, 2, 3, 4, 5 }, { 5, 5, 10, 15, 20, 25 }, { 5, 25, 24, 23, 22, 21 }, { 5, 21, 16, 11, 6, 1 } },
-        { { } } } },
+        { {} } } },
 
     // TET_Combination1
     { // Degree 2
@@ -401,7 +401,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
           { 0, 0, 0, 0, 0, 0, 5, 1 } },
 
         { { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 } },
-        { { } },
+        { {} },
         { { 4, 1, 2, 6, 8 }, { 4, 6, 4, 7, 8 }, { 4, 7, 5, 1, 8 }, { 4, 1, 3, 7, 6 } },
         { { 6, 0, 0 }, { 7, 1, 1 }, { 1, 2, 2 }, { 8, 0, 0 }, { 8, 1, 1 }, { 8, 2, 2 } } },
 
@@ -490,7 +490,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
           { 0, 0, 0, 0, 0, 0, 2, 1 } },
 
         { { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 } },
-        { { } },
+        { {} },
         { { 4, 1, 2, 6, 8 }, { 4, 6, 3, 7, 8 }, { 4, 7, 5, 1, 8 }, { 4, 1, 4, 7, 6 } },
         { { 6, 0, 0 }, { 7, 1, 1 }, { 1, 2, 2 }, { 8, 0, 0 }, { 8, 1, 1 }, { 8, 2, 2 } } },
 
@@ -579,7 +579,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
           { 0, 0, 0, 0, 0, 0, 3, 0 } },
 
         { { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 } },
-        { { } },
+        { {} },
         { { 4, 1, 2, 6, 8 }, { 4, 6, 3, 7, 8 }, { 4, 7, 4, 1, 8 }, { 4, 1, 5, 7, 6 } },
         { { 6, 0, 0 }, { 7, 1, 1 }, { 1, 2, 2 }, { 8, 0, 0 }, { 8, 1, 1 }, { 8, 2, 2 } } },
 
@@ -641,14 +641,14 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
 
     // PRISM
     {
-        { 0, 0, 0, 0, 0, { }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } } },  // deg 2
+        { 0, 0, 0, 0, 0, {}, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },  // deg 2
 
-        { 0, 0, 0, 0, 0, { }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } } }  // deg3
+        { 0, 0, 0, 0, 0, {}, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } }  // deg3
     },
 
     // KNIFE
-    { { 0, 0, 0, 0, 0, { }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } } },
-      { 0, 0, 0, 0, 0, { }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } }, { { } } } },
+    { { 0, 0, 0, 0, 0, {}, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } },
+      { 0, 0, 0, 0, 0, {}, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} }, { {} } } },
 
     // HEX
     { // Deg 2
@@ -856,7 +856,7 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[ 9 ][ MAX_DEGREE ] = 
           { 26, 2, 6, 25, 2, 6 },
           { 22, 3, 7, 19, 3, 7 } } } } };
 
-const NestedRefine::pmat NestedRefine::permutation[ 2 ] = {
+const NestedRefine::pmat NestedRefine::permutation[2] = {
     // MBTRI
     { 6,
       { { 0, 1, 2 }, { 1, 0, 2 }, { 2, 1, 0 }, { 0, 2, 1 }, { 2, 0, 1 }, { 1, 2, 0 } },
@@ -906,7 +906,7 @@ const NestedRefine::pmat NestedRefine::permutation[ 2 ] = {
         { 9, 8, 7, 6, 5, 4, 3, 2, 1 },
         { 3, 6, 9, 2, 5, 8, 1, 4, 7 } } } };
 
-const NestedRefine::intFEdge NestedRefine::intFacEdg[ 2 ][ 2 ] = {
+const NestedRefine::intFEdge NestedRefine::intFacEdg[2][2] = {
     // MBTRI
     { { 3, { { 3, 4 }, { 4, 5 }, { 5, 3 } } },
       { 9, { { 8, 3 }, { 3, 9 }, { 9, 4 }, { 4, 5 }, { 5, 9 }, { 9, 8 }, { 7, 9 }, { 9, 6 }, { 6, 7 } } } },

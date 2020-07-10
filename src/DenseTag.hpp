@@ -30,9 +30,9 @@ class DenseTag : public TagInfo
     static DenseTag* create_tag( SequenceManager* seqman, Error* error, const char* name, int bytes, DataType type,
                                  const void* default_value );
 
-    virtual ~DenseTag( );
+    virtual ~DenseTag();
 
-    virtual TagType get_storage_type( ) const;
+    virtual TagType get_storage_type() const;
 
     /**\brief Remove/clear tag data for all entities
      *
@@ -288,7 +288,7 @@ class DenseTag : public TagInfo
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
                                                 Range& output_entities, const void* value, int value_bytes = 0,
-                                                EntityType   type = MBMAXTYPE,
+                                                EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */

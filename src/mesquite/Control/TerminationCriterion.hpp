@@ -201,9 +201,9 @@ class TerminationCriterion
     //! Terminates when the mesh is detected to be untangled.
     //! Uses the same approach as QualityAssessor,
     //! checks the tau values at all the sample points.
-    MESQUITE_EXPORT void add_untangled_mesh( );
+    MESQUITE_EXPORT void add_untangled_mesh();
 
-    MESQUITE_EXPORT void remove_all_criteria( );
+    MESQUITE_EXPORT void remove_all_criteria();
 
     //! Cull when the objective function value is smaller than
     //! the given scalar value.
@@ -247,9 +247,9 @@ class TerminationCriterion
     //! Cull when the mesh is detected to be untangled.
     //! Uses the same approach as QualityAssessor,
     //! checks the tau values at all the sample points.
-    MESQUITE_EXPORT void cull_untangled_mesh( );
+    MESQUITE_EXPORT void cull_untangled_mesh();
 
-    MESQUITE_EXPORT void remove_culling( );
+    MESQUITE_EXPORT void remove_culling();
 
     enum InnerOuterType
     {
@@ -262,14 +262,14 @@ class TerminationCriterion
     MESQUITE_EXPORT TerminationCriterion( std::string name = "", InnerOuterType innerOuterType = TYPE_UNKNOWN );
 
     //! Destructor
-    MESQUITE_EXPORT ~TerminationCriterion( ){ };
+    MESQUITE_EXPORT ~TerminationCriterion(){};
 
     //! This function returns the current function value.
     /*! \todo Michael:  this function is not reliable.  It
       needs to be more robust.  How do we know whether
       currentOFValue got updated or not?  We may want to
       make sure that all the criteria get checked.*/
-    MESQUITE_EXPORT double get_current_function_value( )
+    MESQUITE_EXPORT double get_current_function_value()
     {
         return currentOFValue;
     }
@@ -313,7 +313,7 @@ class TerminationCriterion
      */
     MESQUITE_EXPORT void write_iterations( const char* filename, MsqError& err );
 
-    MESQUITE_EXPORT int get_iteration_count( ) const
+    MESQUITE_EXPORT int get_iteration_count() const
     {
         return iterationCounter;
     }
@@ -340,10 +340,10 @@ class TerminationCriterion
     void accumulate_outer( Mesh* ms, MeshDomain* dm, OFEvaluator& eval, const Settings* settings, MsqError& err );
 
     //! Check if termination criterion has been met
-    MESQUITE_EXPORT bool terminate( );
+    MESQUITE_EXPORT bool terminate();
 
     //! Check if at least one termination criterion is set
-    MESQUITE_EXPORT bool criterion_is_set( );
+    MESQUITE_EXPORT bool criterion_is_set();
 
     //! Function which determines whether this patch should be 'culled'
     bool cull_vertices( PatchData& pd, OFEvaluator& obj_ptr, MsqError& err );
@@ -364,12 +364,12 @@ class TerminationCriterion
 
     static size_t count_inverted( PatchData& pd, MsqError& err );
 
-    std::string par_string( );  // for debug print of parallel rank
+    std::string par_string();  // for debug print of parallel rank
 
   private:
     // PRIVATE DATA MEMBERS
     long unsigned int terminationCriterionFlag;  //!< Bit flag of termination crit
-    long unsigned int cullingMethodFlag; /*!<Bit flag of criterion for culling*/
+    long unsigned int cullingMethodFlag;         /*!<Bit flag of criterion for culling*/
     // epsiloon used in culling methods.
     double cullingEps;
 
@@ -383,14 +383,14 @@ class TerminationCriterion
 
     // Data specific to termination criterion 1 (gradient bounds)
     std::vector< Vector3D > mGrad;
-    double                  initialGradL2NormSquared;
-    double                  currentGradL2NormSquared;
-    double                  gradL2NormAbsoluteEpsSquared;
-    double                  gradL2NormRelativeEpsSquared;
-    double                  initialGradInfNorm;
-    double                  currentGradInfNorm;
-    double                  gradInfNormAbsoluteEps;
-    double                  gradInfNormRelativeEps;
+    double initialGradL2NormSquared;
+    double currentGradL2NormSquared;
+    double gradL2NormAbsoluteEpsSquared;
+    double gradL2NormRelativeEpsSquared;
+    double initialGradInfNorm;
+    double currentGradInfNorm;
+    double gradInfNormAbsoluteEps;
+    double gradInfNormRelativeEps;
     // Data specific to termination criterion 2 (KKT)
     //???????????????????????????????????????????
     // Data specific to termination criterion 3 (Quality Improvement)
@@ -400,14 +400,14 @@ class TerminationCriterion
     int iterationBound;
     int iterationCounter;
     // Data specific to termination criterion 5 (cpu time)
-    Timer  mTimer;
+    Timer mTimer;
     double timeBound;
     // Data specific to termination criterion 6 (vertex movement)
     PatchDataVerticesMemento* initialVerticesMemento;
     PatchDataVerticesMemento* previousVerticesMemento;  // if we want relative
-    double                    vertexMovementAbsoluteEps;
-    double                    vertexMovementRelativeEps;
-    double vertexMovementAvgBeta;  //!< input beta value used to calculate \c vertexMovementAbsoluteAvg
+    double vertexMovementAbsoluteEps;
+    double vertexMovementRelativeEps;
+    double vertexMovementAvgBeta;          //!< input beta value used to calculate \c vertexMovementAbsoluteAvg
     double vertexMovementAbsoluteAvgEdge;  //!< calculated constant for \c
                                            //!< VERTEX_MOVEMENT_ABS_EDGE_LENGTH
     double maxSquaredInitialMovement;
@@ -418,11 +418,11 @@ class TerminationCriterion
     double successiveImprovementsRelativeEps;
     // crit 8
     double boundedVertexMovementEps;
-    int    vertexMovementExceedsBound;
+    int vertexMovementExceedsBound;
 
     // Data for untangled criterion
     size_t globalInvertedCount;  //!< number of inverted elements in entire mesh
-    size_t patchInvertedCount;  //!< number of inverted elements in previously tested patch
+    size_t patchInvertedCount;   //!< number of inverted elements in previously tested patch
 
     int debugLevel;
 
@@ -430,10 +430,10 @@ class TerminationCriterion
     std::ofstream plotFile;
 
     //! Base name for timestep files
-    std::string      timeStepFileName;
+    std::string timeStepFileName;
     TimeStepFileType timeStepFileType;
-    std::string      moniker;
-    InnerOuterType   innerOuterType;
+    std::string moniker;
+    InnerOuterType innerOuterType;
 };
 
 }  // namespace MBMesquite

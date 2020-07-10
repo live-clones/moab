@@ -52,27 +52,27 @@ class TagVertexMeshTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_cleanup );
     CPPUNIT_TEST( test_alternate_name );
     CPPUNIT_TEST( test_reference_mesh );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     MeshImpl* realMesh;
 
   public:
-    TagVertexMeshTest( ) : realMesh( 0 ) {}
+    TagVertexMeshTest() : realMesh( 0 ) {}
 
-    void setUp( );
-    void tearDown( );
+    void setUp();
+    void tearDown();
 
-    void test_vertex_coordinates( );
-    void test_save_coordinates( );
-    void test_cleanup( );
-    void test_alternate_name( );
-    void test_reference_mesh( );
+    void test_vertex_coordinates();
+    void test_save_coordinates();
+    void test_cleanup();
+    void test_alternate_name();
+    void test_reference_mesh();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TagVertexMeshTest, "TagVertexMeshTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TagVertexMeshTest, "Unit" );
 
-void TagVertexMeshTest::setUp( )
+void TagVertexMeshTest::setUp()
 {
     const char vtk_data[] = "# vtk DataFile Version 2.0\n"
                             "test mesh\n"
@@ -100,13 +100,13 @@ void TagVertexMeshTest::setUp( )
     ASSERT_NO_ERROR( err );
 }
 
-void TagVertexMeshTest::tearDown( )
+void TagVertexMeshTest::tearDown()
 {
     delete realMesh;
     realMesh = 0;
 }
 
-void TagVertexMeshTest::test_vertex_coordinates( )
+void TagVertexMeshTest::test_vertex_coordinates()
 {
     MsqPrintError err( std::cerr );
     TagVertexMesh tag_mesh( err, realMesh, true );
@@ -117,9 +117,9 @@ void TagVertexMeshTest::test_vertex_coordinates( )
     ASSERT_NO_ERROR( err );
 
     // Check that initial position for vertex matches that of real mesh
-    Mesh::VertexHandle vertex = vertices[ 0 ];
-    MsqVertex          get_coords;
-    Vector3D           orig_coords, real_coords, tag_coords;
+    Mesh::VertexHandle vertex = vertices[0];
+    MsqVertex get_coords;
+    Vector3D orig_coords, real_coords, tag_coords;
     realMesh->vertices_get_coordinates( &vertex, &get_coords, 1, err );
     ASSERT_NO_ERROR( err );
     orig_coords = get_coords;
@@ -143,16 +143,16 @@ void TagVertexMeshTest::test_vertex_coordinates( )
     CPPUNIT_ASSERT_VECTORS_EQUAL( orig_coords, real_coords, DBL_EPSILON );
 }
 
-void TagVertexMeshTest::test_save_coordinates( )
+void TagVertexMeshTest::test_save_coordinates()
 {
     MsqPrintError err( std::cerr );
-    Vector3D      new_coords( 5, 5, 5 );
-    MsqVertex     get_coords;
+    Vector3D new_coords( 5, 5, 5 );
+    MsqVertex get_coords;
 
     std::vector< Mesh::VertexHandle > vertices;
     realMesh->get_all_vertices( vertices, err );
     ASSERT_NO_ERROR( err );
-    Mesh::VertexHandle vertex = vertices[ 0 ];
+    Mesh::VertexHandle vertex = vertices[0];
 
     realMesh->vertices_get_coordinates( &vertex, &get_coords, 1, err );
     ASSERT_NO_ERROR( err );
@@ -176,16 +176,16 @@ void TagVertexMeshTest::test_save_coordinates( )
     }
 }
 
-void TagVertexMeshTest::test_cleanup( )
+void TagVertexMeshTest::test_cleanup()
 {
     MsqPrintError err( std::cerr );
-    Vector3D      new_coords( 5, 5, 5 );
-    MsqVertex     get_coords;
+    Vector3D new_coords( 5, 5, 5 );
+    MsqVertex get_coords;
 
     std::vector< Mesh::VertexHandle > vertices;
     realMesh->get_all_vertices( vertices, err );
     ASSERT_NO_ERROR( err );
-    Mesh::VertexHandle vertex = vertices[ 0 ];
+    Mesh::VertexHandle vertex = vertices[0];
 
     realMesh->vertices_get_coordinates( &vertex, &get_coords, 1, err );
     ASSERT_NO_ERROR( err );
@@ -209,16 +209,16 @@ void TagVertexMeshTest::test_cleanup( )
     }
 }
 
-void TagVertexMeshTest::test_alternate_name( )
+void TagVertexMeshTest::test_alternate_name()
 {
     MsqPrintError err( std::cerr );
-    Vector3D      new_coords( 5, 5, 5 );
-    MsqVertex     get_coords;
+    Vector3D new_coords( 5, 5, 5 );
+    MsqVertex get_coords;
 
     std::vector< Mesh::VertexHandle > vertices;
     realMesh->get_all_vertices( vertices, err );
     ASSERT_NO_ERROR( err );
-    Mesh::VertexHandle vertex = vertices[ 0 ];
+    Mesh::VertexHandle vertex = vertices[0];
 
     realMesh->vertices_get_coordinates( &vertex, &get_coords, 1, err );
     ASSERT_NO_ERROR( err );
@@ -242,7 +242,7 @@ void TagVertexMeshTest::test_alternate_name( )
     }
 }
 
-void TagVertexMeshTest::test_reference_mesh( )
+void TagVertexMeshTest::test_reference_mesh()
 {
     MsqPrintError err( std::cerr );
     TagVertexMesh tag_mesh( err, realMesh, true );
@@ -260,9 +260,9 @@ void TagVertexMeshTest::test_reference_mesh( )
     ASSERT_NO_ERROR( err );
 
     // Check that initial position for vertex matches that of real mesh
-    Mesh::VertexHandle vertex = vertices[ 0 ];
-    MsqVertex          get_coords;
-    Vector3D           orig_coords, real_coords, tag_coords;
+    Mesh::VertexHandle vertex = vertices[0];
+    MsqVertex get_coords;
+    Vector3D orig_coords, real_coords, tag_coords;
     realMesh->vertices_get_coordinates( &vertex, &get_coords, 1, err );
     ASSERT_NO_ERROR( err );
     orig_coords = get_coords;

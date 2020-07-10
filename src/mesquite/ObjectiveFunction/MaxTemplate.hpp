@@ -53,10 +53,10 @@ class MaxTemplate : public ObjectiveFunctionTemplate
 {
   public:
     MaxTemplate( QualityMetric* );
-    virtual ~MaxTemplate( );
-    virtual bool               evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
-    virtual ObjectiveFunction* clone( ) const;
-    virtual void               clear( );
+    virtual ~MaxTemplate();
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
+    virtual ObjectiveFunction* clone() const;
+    virtual void clear();
 
   private:
     /** Temporary storage for qm sample handles */

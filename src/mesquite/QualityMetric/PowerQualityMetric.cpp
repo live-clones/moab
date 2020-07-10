@@ -39,16 +39,16 @@ using namespace MBMesquite;
 
 PowerQualityMetric::PowerQualityMetric( QualityMetric* qm, double pow_factor ) : mMetric( *qm ), mPower( pow_factor ) {}
 
-PowerQualityMetric::~PowerQualityMetric( ) {}
+PowerQualityMetric::~PowerQualityMetric() {}
 
-std::string PowerQualityMetric::get_name( ) const
+std::string PowerQualityMetric::get_name() const
 {
-    return std::string( "pow(" ) + mMetric.get_name( ) + ")";
+    return std::string( "pow(" ) + mMetric.get_name() + ")";
 }
 
-int PowerQualityMetric::get_negate_flag( ) const
+int PowerQualityMetric::get_negate_flag() const
 {
-    return mPower.value( ) < 0 ? mMetric.get_negate_flag( ) : -mMetric.get_negate_flag( );
+    return mPower.value() < 0 ? mMetric.get_negate_flag() : -mMetric.get_negate_flag();
 }
 
 void PowerQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only, MsqError& err )
@@ -59,7 +59,7 @@ void PowerQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& 
 bool PowerQualityMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
     bool rval = mMetric.evaluate( pd, handle, value, err );
-    value = mPower.raise( value );
+    value     = mPower.raise( value );
     return !MSQ_CHKERR( err ) && rval;
 }
 
@@ -67,7 +67,7 @@ bool PowerQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, do
                                                 std::vector< size_t >& indices, MsqError& err )
 {
     bool rval = mMetric.evaluate_with_indices( pd, handle, value, indices, err );
-    value = mPower.raise( value );
+    value     = mPower.raise( value );
     return !MSQ_CHKERR( err ) && rval;
 }
 
@@ -75,11 +75,11 @@ bool PowerQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, d
                                                  std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
                                                  MsqError& err )
 {
-    bool         rval = mMetric.evaluate_with_gradient( pd, handle, value, indices, gradient, err );
+    bool rval      = mMetric.evaluate_with_gradient( pd, handle, value, indices, gradient, err );
     const double v = mPower.raise( value );
-    const double g = fabs( value ) > DBL_EPSILON ? mPower.value( ) * v / value : 0;
-    value = v;
-    for( std::vector< Vector3D >::iterator i = gradient.begin( ); i != gradient.end( ); ++i )
+    const double g = fabs( value ) > DBL_EPSILON ? mPower.value() * v / value : 0;
+    value          = v;
+    for( std::vector< Vector3D >::iterator i = gradient.begin(); i != gradient.end(); ++i )
         *i *= g;
     return !MSQ_CHKERR( err ) && rval;
 }
@@ -88,26 +88,26 @@ bool PowerQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, do
                                                 std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
                                                 std::vector< Matrix3D >& Hessian, MsqError& err )
 {
-    indices.clear( );
-    bool         rval = mMetric.evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
+    indices.clear();
+    bool rval      = mMetric.evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
     const double v = mPower.raise( value );
-    const double g = fabs( value ) > DBL_EPSILON ? mPower.value( ) * v / value : 0.0;
-    const double h = fabs( value ) > DBL_EPSILON ? g * ( mPower.value( ) - 1 ) / value : 0.0;
-    value = v;
+    const double g = fabs( value ) > DBL_EPSILON ? mPower.value() * v / value : 0.0;
+    const double h = fabs( value ) > DBL_EPSILON ? g * ( mPower.value() - 1 ) / value : 0.0;
+    value          = v;
     Matrix3D op;
     unsigned idx = 0;
-    unsigned n = indices.size( );
+    unsigned n   = indices.size();
     for( unsigned r = 0; r < n; ++r )
     {
         for( unsigned c = r; c < n; ++c )
         {
-            Hessian[ idx ] *= g;
-            op.outer_product( gradient[ r ], gradient[ c ] );
+            Hessian[idx] *= g;
+            op.outer_product( gradient[r], gradient[c] );
             op *= h;
-            Hessian[ idx ] += op;
+            Hessian[idx] += op;
             ++idx;
         }
-        gradient[ r ] *= g;
+        gradient[r] *= g;
     }
     return !MSQ_CHKERR( err ) && rval;
 }

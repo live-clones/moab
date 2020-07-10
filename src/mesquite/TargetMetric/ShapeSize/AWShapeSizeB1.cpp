@@ -39,12 +39,12 @@
 namespace MBMesquite
 {
 
-std::string AWShapeSizeB1::get_name( ) const
+std::string AWShapeSizeB1::get_name() const
 {
     return "AWShapeSizeB1";
 }
 
-AWShapeSizeB1::~AWShapeSizeB1( ) {}
+AWShapeSizeB1::~AWShapeSizeB1() {}
 
 bool AWShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {

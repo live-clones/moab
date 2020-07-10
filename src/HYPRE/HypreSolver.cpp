@@ -39,14 +39,14 @@ namespace moab
 
 HypreSolver::HypreSolver( bool iterative ) : AbstractSolver( iterative )
 {
-    A = NULL;
+    A            = NULL;
     setup_called = 0;
     B = X = NULL;
 }
 
 HypreSolver::HypreSolver( HypreParMatrix* _A, bool iterative ) : AbstractSolver( iterative )
 {
-    A = _A;
+    A            = _A;
     setup_called = 0;
     B = X = NULL;
 }
@@ -59,17 +59,17 @@ HYPRE_Int HypreSolver::Solve( const HypreParVector& b, HypreParVector& x ) const
 
     if( !setup_called )
     {
-        err = SetupFcn( )( *this, *A, b.x_par, x.x_par );
+        err          = SetupFcn()( *this, *A, b.x_par, x.x_par );
         setup_called = 1;
     }
 
     if( !iterative_mode ) { x = 0.0; }
 
-    err = SolveFcn( )( *this, *A, b.x_par, x.x_par );
+    err = SolveFcn()( *this, *A, b.x_par, x.x_par );
     return err;
 }
 
-HypreSolver::~HypreSolver( )
+HypreSolver::~HypreSolver()
 {
     if( B ) { delete B; }
 
@@ -79,7 +79,7 @@ HypreSolver::~HypreSolver( )
 HyprePCG::HyprePCG( HypreParMatrix& _A ) : HypreSolver( &_A, true )
 {
     iterative_mode = true;
-    HYPRE_ParCSRPCGCreate( A->GetParallelCommunicator( )->comm( ), &pcg_solver );
+    HYPRE_ParCSRPCGCreate( A->GetParallelCommunicator()->comm(), &pcg_solver );
 }
 
 void HyprePCG::SetTol( double tol )
@@ -104,7 +104,7 @@ void HyprePCG::Verbosity( int print_lvl )
 
 void HyprePCG::SetPreconditioner( HypreSolver& precond )
 {
-    HYPRE_ParCSRPCGSetPrecond( pcg_solver, precond.SolveFcn( ), precond.SetupFcn( ), precond );
+    HYPRE_ParCSRPCGSetPrecond( pcg_solver, precond.SolveFcn(), precond.SetupFcn(), precond );
 }
 
 void HyprePCG::SetResidualConvergenceOptions( int res_frequency, double rtol )
@@ -118,15 +118,15 @@ void HyprePCG::SetResidualConvergenceOptions( int res_frequency, double rtol )
 
 HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
 {
-    HYPRE_Int           err;
-    int                 myid;
-    HYPRE_Int           time_index = 0;
-    HYPRE_Int           num_iterations;
-    double              final_res_norm;
+    HYPRE_Int err;
+    int myid;
+    HYPRE_Int time_index = 0;
+    HYPRE_Int num_iterations;
+    double final_res_norm;
     moab::ParallelComm* pcomm;
-    HYPRE_Int           print_level;
+    HYPRE_Int print_level;
     HYPRE_PCGGetPrintLevel( pcg_solver, &print_level );
-    pcomm = A->GetParallelCommunicator( );
+    pcomm = A->GetParallelCommunicator();
 
     if( !setup_called )
     {
@@ -138,7 +138,7 @@ HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
 #endif
         }
 
-        err = HYPRE_ParCSRPCGSetup( pcg_solver, *A, (HYPRE_ParVector)b, (HYPRE_ParVector)x );
+        err          = HYPRE_ParCSRPCGSetup( pcg_solver, *A, (HYPRE_ParVector)b, (HYPRE_ParVector)x );
         setup_called = 1;
 
         if( err != 0 )
@@ -151,9 +151,9 @@ HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
         {
 #ifdef HYPRE_TIMING
             hypre_EndTiming( time_index );
-            hypre_PrintTiming( "Setup phase times", pcomm->comm( ) );
+            hypre_PrintTiming( "Setup phase times", pcomm->comm() );
             hypre_FinalizeTiming( time_index );
-            hypre_ClearTiming( );
+            hypre_ClearTiming();
 #endif
         }
     }
@@ -174,13 +174,13 @@ HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
     {
 #ifdef HYPRE_TIMING
         hypre_EndTiming( time_index );
-        hypre_PrintTiming( "Solve phase times", pcomm->comm( ) );
+        hypre_PrintTiming( "Solve phase times", pcomm->comm() );
         hypre_FinalizeTiming( time_index );
-        hypre_ClearTiming( );
+        hypre_ClearTiming();
 #endif
         HYPRE_ParCSRPCGGetNumIterations( pcg_solver, &num_iterations );
         HYPRE_ParCSRPCGGetFinalRelativeResidualNorm( pcg_solver, &final_res_norm );
-        MPI_Comm_rank( pcomm->comm( ), &myid );
+        MPI_Comm_rank( pcomm->comm(), &myid );
 
         if( myid == 0 )
         {
@@ -192,7 +192,7 @@ HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
     return err;
 }
 
-HyprePCG::~HyprePCG( )
+HyprePCG::~HyprePCG()
 {
     HYPRE_ParCSRPCGDestroy( pcg_solver );
 }
@@ -200,9 +200,9 @@ HyprePCG::~HyprePCG( )
 HypreGMRES::HypreGMRES( HypreParMatrix& _A ) : HypreSolver( &_A, true )
 {
     MPI_Comm comm;
-    int      k_dim = 50;
-    int      max_iter = 100;
-    double   tol = 1e-6;
+    int k_dim      = 50;
+    int max_iter   = 100;
+    double tol     = 1e-6;
     iterative_mode = true;
     HYPRE_ParCSRMatrixGetComm( *A, &comm );
     HYPRE_ParCSRGMRESCreate( comm, &gmres_solver );
@@ -239,17 +239,17 @@ void HypreGMRES::Verbosity( int print_lvl )
 
 void HypreGMRES::SetPreconditioner( HypreSolver& precond )
 {
-    HYPRE_ParCSRGMRESSetPrecond( gmres_solver, precond.SolveFcn( ), precond.SetupFcn( ), precond );
+    HYPRE_ParCSRGMRESSetPrecond( gmres_solver, precond.SolveFcn(), precond.SetupFcn(), precond );
 }
 
 HYPRE_Int HypreGMRES::Solve( const HypreParVector& b, HypreParVector& x ) const
 {
     HYPRE_Int err;
-    int       myid;
+    int myid;
     HYPRE_Int time_index = 0;
     HYPRE_Int num_iterations;
-    double    final_res_norm;
-    MPI_Comm  comm;
+    double final_res_norm;
+    MPI_Comm comm;
     HYPRE_Int print_level;
     HYPRE_GMRESGetPrintLevel( gmres_solver, &print_level );
     HYPRE_ParCSRMatrixGetComm( *A, &comm );
@@ -264,7 +264,7 @@ HYPRE_Int HypreGMRES::Solve( const HypreParVector& b, HypreParVector& x ) const
 #endif
         }
 
-        err = HYPRE_ParCSRGMRESSetup( gmres_solver, *A, b, x );
+        err          = HYPRE_ParCSRGMRESSetup( gmres_solver, *A, b, x );
         setup_called = 1;
 
         if( err != 0 )
@@ -279,7 +279,7 @@ HYPRE_Int HypreGMRES::Solve( const HypreParVector& b, HypreParVector& x ) const
             hypre_EndTiming( time_index );
             hypre_PrintTiming( "Setup phase times", comm );
             hypre_FinalizeTiming( time_index );
-            hypre_ClearTiming( );
+            hypre_ClearTiming();
 #endif
         }
     }
@@ -302,7 +302,7 @@ HYPRE_Int HypreGMRES::Solve( const HypreParVector& b, HypreParVector& x ) const
         hypre_EndTiming( time_index );
         hypre_PrintTiming( "Solve phase times", comm );
         hypre_FinalizeTiming( time_index );
-        hypre_ClearTiming( );
+        hypre_ClearTiming();
 #endif
         HYPRE_ParCSRGMRESGetNumIterations( gmres_solver, &num_iterations );
         HYPRE_ParCSRGMRESGetFinalRelativeResidualNorm( gmres_solver, &final_res_norm );
@@ -318,7 +318,7 @@ HYPRE_Int HypreGMRES::Solve( const HypreParVector& b, HypreParVector& x ) const
     return err;
 }
 
-HypreGMRES::~HypreGMRES( )
+HypreGMRES::~HypreGMRES()
 {
     HYPRE_ParCSRGMRESDestroy( gmres_solver );
 }
@@ -326,13 +326,13 @@ HypreGMRES::~HypreGMRES( )
 HypreParaSails::HypreParaSails( HypreParMatrix& A ) : HypreSolver( &A )
 {
     MPI_Comm comm;
-    int      sai_max_levels = 1;
-    double   sai_threshold = 0.1;
-    double   sai_filter = 0.1;
-    int      sai_sym = 0;
-    double   sai_loadbal = 0.0;
-    int      sai_reuse = 0;
-    int      sai_logging = 1;
+    int sai_max_levels   = 1;
+    double sai_threshold = 0.1;
+    double sai_filter    = 0.1;
+    int sai_sym          = 0;
+    double sai_loadbal   = 0.0;
+    int sai_reuse        = 0;
+    int sai_logging      = 1;
     HYPRE_ParCSRMatrixGetComm( A, &comm );
     HYPRE_ParaSailsCreate( comm, &sai_precond );
     HYPRE_ParaSailsSetParams( sai_precond, sai_threshold, sai_max_levels );
@@ -348,38 +348,38 @@ void HypreParaSails::SetSymmetry( int sym )
     HYPRE_ParaSailsSetSym( sai_precond, sym );
 }
 
-HypreParaSails::~HypreParaSails( )
+HypreParaSails::~HypreParaSails()
 {
     HYPRE_ParaSailsDestroy( sai_precond );
 }
 
-HypreBoomerAMG::HypreBoomerAMG( )
+HypreBoomerAMG::HypreBoomerAMG()
 {
     HYPRE_BoomerAMGCreate( &amg_precond );
-    SetDefaultOptions( );
+    SetDefaultOptions();
 }
 
 HypreBoomerAMG::HypreBoomerAMG( HypreParMatrix& A ) : HypreSolver( &A )
 {
     HYPRE_BoomerAMGCreate( &amg_precond );
-    SetDefaultOptions( );
+    SetDefaultOptions();
 }
 
-void HypreBoomerAMG::SetDefaultOptions( )
+void HypreBoomerAMG::SetDefaultOptions()
 {
     // AMG coarsening options:
-    int    coarsen_type = 10;  // 10 = HMIS, 8 = PMIS, 6 = Falgout, 0 = CLJP
-    int    agg_levels = 2;  // number of aggressive coarsening levels
-    double theta = 0.25;  // strength threshold: 0.25, 0.5, 0.8
+    int coarsen_type = 10;    // 10 = HMIS, 8 = PMIS, 6 = Falgout, 0 = CLJP
+    int agg_levels   = 2;     // number of aggressive coarsening levels
+    double theta     = 0.25;  // strength threshold: 0.25, 0.5, 0.8
     // AMG interpolation options:
     int interp_type = 6;  // 6 = extended+i, 0 = classical
-    int Pmax = 4;  // max number of elements per row in P
+    int Pmax        = 4;  // max number of elements per row in P
     // AMG relaxation options:
-    int relax_type = 10;  // 8 = l1-GS, 6 = symm. GS, 3 = GS, 18 = l1-Jacobi
-    int relax_sweeps = 1;  // relaxation sweeps on each level
+    int relax_type   = 10;  // 8 = l1-GS, 6 = symm. GS, 3 = GS, 18 = l1-Jacobi
+    int relax_sweeps = 1;   // relaxation sweeps on each level
     // Additional options:
-    int print_level = 1;  // print AMG iterations? 1 = no, 2 = yes
-    int max_levels = 25;  // max number of levels in AMG hierarchy
+    int print_level = 1;   // print AMG iterations? 1 = no, 2 = yes
+    int max_levels  = 25;  // max number of levels in AMG hierarchy
     HYPRE_BoomerAMGSetCoarsenType( amg_precond, coarsen_type );
     HYPRE_BoomerAMGSetAggNumLevels( amg_precond, agg_levels );
     HYPRE_BoomerAMGSetRelaxType( amg_precond, relax_type );
@@ -394,22 +394,22 @@ void HypreBoomerAMG::SetDefaultOptions( )
     HYPRE_BoomerAMGSetTol( amg_precond, 0.0 );
 }
 
-void HypreBoomerAMG::ResetAMGPrecond( )
+void HypreBoomerAMG::ResetAMGPrecond()
 {
-    HYPRE_Int         coarsen_type;
-    HYPRE_Int         agg_levels;
-    HYPRE_Int         relax_type;
-    HYPRE_Int         relax_sweeps;
-    HYPRE_Real        theta;
-    HYPRE_Int         interp_type;
-    HYPRE_Int         Pmax;
-    HYPRE_Int         print_level;
-    HYPRE_Int         dim;
+    HYPRE_Int coarsen_type;
+    HYPRE_Int agg_levels;
+    HYPRE_Int relax_type;
+    HYPRE_Int relax_sweeps;
+    HYPRE_Real theta;
+    HYPRE_Int interp_type;
+    HYPRE_Int Pmax;
+    HYPRE_Int print_level;
+    HYPRE_Int dim;
     hypre_ParAMGData* amg_data = (hypre_ParAMGData*)amg_precond;
     // read options from amg_precond
     HYPRE_BoomerAMGGetCoarsenType( amg_precond, &coarsen_type );
-    agg_levels = hypre_ParAMGDataAggNumLevels( amg_data );
-    relax_type = hypre_ParAMGDataUserRelaxType( amg_data );
+    agg_levels   = hypre_ParAMGDataAggNumLevels( amg_data );
+    relax_type   = hypre_ParAMGDataUserRelaxType( amg_data );
     relax_sweeps = hypre_ParAMGDataUserNumSweeps( amg_data );
     HYPRE_BoomerAMGGetStrongThreshold( amg_precond, &theta );
     hypre_BoomerAMGGetInterpType( amg_precond, &interp_type );
@@ -434,10 +434,10 @@ void HypreBoomerAMG::ResetAMGPrecond( )
 
 void HypreBoomerAMG::SetOperator( const HypreParMatrix& op )
 {
-    if( A ) { ResetAMGPrecond( ); }
+    if( A ) { ResetAMGPrecond(); }
 
     // update base classes: Operator, Solver, HypreSolver
-    A = const_cast< HypreParMatrix* >( &op );
+    A            = const_cast< HypreParMatrix* >( &op );
     setup_called = 0;
     delete X;
     delete B;
@@ -452,7 +452,7 @@ void HypreBoomerAMG::SetSystemsOptions( int dim )
     HYPRE_BoomerAMGSetStrongThreshold( amg_precond, dim * 0.25 );
 }
 
-HypreBoomerAMG::~HypreBoomerAMG( )
+HypreBoomerAMG::~HypreBoomerAMG()
 {
     HYPRE_BoomerAMGDestroy( amg_precond );
 }

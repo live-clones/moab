@@ -53,16 +53,16 @@ class RefSizeTargetCalculator : public TargetCalculator
     virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
                                      MsqError& err );
 
-    virtual bool have_surface_orient( ) const
+    virtual bool have_surface_orient() const
     {
-        return scaledTargets->have_surface_orient( );
+        return scaledTargets->have_surface_orient();
     }
 
   private:
     double average_edge_length( PatchData& pd, size_t element, MsqError& err );
 
-    ReferenceMesh*    refMesh;
-    IdealShapeTarget  defaultTargets;
+    ReferenceMesh* refMesh;
+    IdealShapeTarget defaultTargets;
     TargetCalculator* scaledTargets;
 
     /** Amount to scale average edge length by to achive correctly sized

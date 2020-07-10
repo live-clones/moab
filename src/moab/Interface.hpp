@@ -34,13 +34,13 @@
  * <a href="pages.html">Full List of Documents</a>
  */
 
-#ifdef WIN32 /* windows */
+#ifdef WIN32               /* windows */
 #define _USE_MATH_DEFINES  // For M_PI
 #endif
 #ifndef MOAB_INTERFACE_HPP
 #define MOAB_INTERFACE_HPP
 
-#define MOAB_API_VERSION 1.01
+#define MOAB_API_VERSION        1.01
 #define MOAB_API_VERSION_STRING "1.01"
 
 #include "moab/MOABConfig.h"
@@ -107,13 +107,13 @@ class Interface : public UnknownInterface
     /**@{*/
 
     //! constructor
-    Interface( ) {}
+    Interface() {}
 
     //! destructor
-    virtual ~Interface( ) {}
+    virtual ~Interface() {}
 
     //! return the entity set representing the whole mesh
-    virtual EntityHandle get_root_set( ) = 0;
+    virtual EntityHandle get_root_set() = 0;
 
     //! Get a pointer to an internal MOAB interface
     //!\return NULL if not found, iterface pointer otherwise
@@ -121,18 +121,20 @@ class Interface : public UnknownInterface
 
     //! Get a pointer to an internal MOAB interface
     //!\return NULL if not found, iterface pointer otherwise
-    template< class IFace > ErrorCode query_interface( IFace*& ptr )
+    template < class IFace >
+    ErrorCode query_interface( IFace*& ptr )
     {
-        void*     tmp_ptr;
+        void* tmp_ptr;
         ErrorCode result = query_interface_type( typeid( IFace ), tmp_ptr );
-        ptr = reinterpret_cast< IFace* >( tmp_ptr );
+        ptr              = reinterpret_cast< IFace* >( tmp_ptr );
         return result;
     }
 
     //! Release reference to MB interface
     virtual ErrorCode release_interface_type( const std::type_info& iface_type, void* iface ) = 0;
 
-    template< class IFace > ErrorCode release_interface( IFace* interface )
+    template < class IFace >
+    ErrorCode release_interface( IFace* interface )
     {
         return release_interface_type( typeid( IFace ), interface );
     }
@@ -345,7 +347,7 @@ class Interface : public UnknownInterface
                                   const Range& output_sets, const Tag* tag_list = 0, int num_tags = 0 ) = 0;
 
     //! Deletes all mesh entities from this MB instance
-    virtual ErrorCode delete_mesh( ) = 0;
+    virtual ErrorCode delete_mesh() = 0;
 
     /**@}*/
 
@@ -601,7 +603,7 @@ class Interface : public UnknownInterface
     virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
                                        const int to_dimension, const bool create_if_missing,
                                        std::vector< EntityHandle >& adj_entities,
-                                       const int                    operation_type = Interface::INTERSECT ) = 0;
+                                       const int operation_type = Interface::INTERSECT ) = 0;
 
     //! Get the adjacencies associated with a vector of entities to entities of a specfied
     //! dimension.
@@ -701,7 +703,7 @@ class Interface : public UnknownInterface
     */
     virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset, const int dimension,
                                                  std::vector< EntityHandle >& entities,
-                                                 const bool                   recursive = false ) const = 0;
+                                                 const bool recursive = false ) const = 0;
 
     //! Retrieve all entities of a given type in the database or meshset.
     /** Appends entities to list passed in.
@@ -740,7 +742,7 @@ class Interface : public UnknownInterface
     */
     virtual ErrorCode get_entities_by_type( const EntityHandle meshset, const EntityType type,
                                             std::vector< EntityHandle >& entities,
-                                            const bool                   recursive = false ) const = 0;
+                                            const bool recursive = false ) const = 0;
 
     //! Retrieve entities in the database or meshset which have any or all of the tag(s) and
     //! (optionally) value(s) specified.
@@ -776,7 +778,7 @@ class Interface : public UnknownInterface
     virtual ErrorCode get_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
                                                     const Tag* tag_handles, const void* const* values,
                                                     const int num_tags, Range& entities,
-                                                    const int  condition = Interface::INTERSECT,
+                                                    const int condition  = Interface::INTERSECT,
                                                     const bool recursive = false ) const = 0;
 
     //! Returns all entities in the data base or meshset, in a range (order not preserved)
@@ -850,7 +852,7 @@ class Interface : public UnknownInterface
     virtual ErrorCode get_number_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
                                                            const Tag* tag_handles, const void* const* values,
                                                            const int num_tags, int& num_entities,
-                                                           const int  condition = Interface::INTERSECT,
+                                                           const int condition  = Interface::INTERSECT,
                                                            const bool recursive = false ) const = 0;
 
     //! Returns number of entities in the data base or meshset
@@ -897,7 +899,7 @@ class Interface : public UnknownInterface
        EntityHandle new_handle = 0;
        create_vertex( coordinates, entity_handle ); \endcode
     */
-    virtual ErrorCode create_vertex( const double coordinates[ 3 ], EntityHandle& entity_handle ) = 0;
+    virtual ErrorCode create_vertex( const double coordinates[3], EntityHandle& entity_handle ) = 0;
 
     //! Create a set of vertices with the specified coordinates
     /**
@@ -1046,10 +1048,10 @@ class Interface : public UnknownInterface
      *                   for all tags.
      */
     virtual void estimated_memory_use( const Range& ents, unsigned long long* total_storage = 0,
-                                       unsigned long long* total_amortized_storage = 0,
-                                       unsigned long long* entity_storage = 0,
-                                       unsigned long long* amortized_entity_storage = 0,
-                                       unsigned long long* adjacency_storage = 0,
+                                       unsigned long long* total_amortized_storage     = 0,
+                                       unsigned long long* entity_storage              = 0,
+                                       unsigned long long* amortized_entity_storage    = 0,
+                                       unsigned long long* adjacency_storage           = 0,
                                        unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0,
                                        unsigned num_tags = 0, unsigned long long* tag_storage = 0,
                                        unsigned long long* amortized_tag_storage = 0 ) = 0;
@@ -1064,10 +1066,10 @@ class Interface : public UnknownInterface
     {
       public:
         //! Constructor
-        HONodeAddedRemoved( ) {}
+        HONodeAddedRemoved() {}
 
         //! Destructor
-        virtual ~HONodeAddedRemoved( ) {}
+        virtual ~HONodeAddedRemoved() {}
 
         //! node_added called when a node was added to an element's connectivity array
         //! note: connectivity array of element may be incomplete (corner nodes will exist always)
@@ -1279,7 +1281,7 @@ class Interface : public UnknownInterface
                 - MB_FAILURE          If <code>def_val</code> is NULL.
                 - MB_TAG_NOT_FOUND    If <code>tag_handle</code> is invalid.
     */
-    virtual ErrorCode tag_get_default_value( const Tag tag, void* def_val ) const = 0;
+    virtual ErrorCode tag_get_default_value( const Tag tag, void* def_val ) const             = 0;
     virtual ErrorCode tag_get_default_value( Tag tag, const void*& def_val, int& size ) const = 0;
 
     //! Get handles for all tags defined in the mesh instance
@@ -1806,7 +1808,7 @@ class Interface : public UnknownInterface
     virtual ErrorCode remove_child_meshset( EntityHandle parent_meshset, const EntityHandle child_meshset ) = 0;
 
     // ! Returns the global id tag; default value is -1
-    virtual Tag globalId_tag( ) = 0;
+    virtual Tag globalId_tag() = 0;
 
     /**@}*/
 
@@ -1849,7 +1851,7 @@ class Interface : public UnknownInterface
      * The default factor is 1.0 but this can be appropriately updated at runtime so that we do not
      * have broken sequences.
      */
-    virtual double get_sequence_multiplier( ) const = 0;
+    virtual double get_sequence_multiplier() const = 0;
 
     /** \brief Interface to control memory allocation for sequences
      * Provide a factor that controls the size of the sequence that gets allocated.
@@ -1882,7 +1884,7 @@ class type_equals : public std::unary_function< EntityHandle, bool >
     type_equals( Interface* mdb, const EntityType type ) : meshDB( mdb ), test_type( type ) {}
 
     //! operator predicate
-    bool operator( )( EntityHandle handle ) const
+    bool operator()( EntityHandle handle ) const
     {
         return ( meshDB->type_from_handle( handle ) == test_type );
     }
@@ -1905,7 +1907,7 @@ class type_not_equals : public std::unary_function< EntityHandle, bool >
     type_not_equals( Interface* mdb, const EntityType type ) : meshDB( mdb ), test_type( type ) {}
 
     //! operator predicate
-    bool operator( )( EntityHandle handle ) const
+    bool operator()( EntityHandle handle ) const
     {
         return ( meshDB->type_from_handle( handle ) != test_type );
     }

@@ -59,16 +59,16 @@ class MsqFPE
     MsqFPE( bool enabled );
 
     /**\brief Restore FPE state */
-    ~MsqFPE( );
+    ~MsqFPE();
 
     /**\brief Check if FPE state manipulation is supported on this platform */
-    static bool fpe_trap_supported( );
+    static bool fpe_trap_supported();
     /**\return An integer representing the current FPE flags */
-    static int get_current_fpe_state( );
+    static int get_current_fpe_state();
     /**\return Set the FPE flags on the processor */
     static void set_current_fpe_state( int state );
     /**\return Enable trapping of INVALID, DIVBYZERO, and OVERFLOW */
-    static void enable_trap_fpe( );
+    static void enable_trap_fpe();
 
   private:
     /**\brief dummy declaration preventing heap allocation */

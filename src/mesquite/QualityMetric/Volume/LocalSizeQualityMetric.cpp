@@ -41,10 +41,10 @@ using namespace MBMesquite;
 static inline double compute_corner_area( PatchData& pd, size_t vert_1, size_t vert_2, size_t vert_3, MsqError& err )
 {
     const MsqVertex* verts = pd.get_vertex_array( err );
-    Vector3D         vec_1 = verts[ vert_2 ] - verts[ vert_1 ];
-    Vector3D         vec_2 = verts[ vert_3 ] - verts[ vert_1 ];
-    Vector3D         cross_vec = vec_1 * vec_2;
-    return ( cross_vec.length( ) / 2.0 );
+    Vector3D vec_1         = verts[vert_2] - verts[vert_1];
+    Vector3D vec_2         = verts[vert_3] - verts[vert_1];
+    Vector3D cross_vec     = vec_1 * vec_2;
+    return ( cross_vec.length() / 2.0 );
 }
 
 //! Calculate the volume of the tetrahedron formed by the four vertices.
@@ -52,20 +52,20 @@ static inline double compute_corner_volume( PatchData& pd, size_t vert_1, size_t
                                             MsqError& err )
 {
     const MsqVertex* verts = pd.get_vertex_array( err );
-    Vector3D         vec_1 = verts[ vert_2 ] - verts[ vert_1 ];
-    Vector3D         vec_2 = verts[ vert_3 ] - verts[ vert_1 ];
-    Vector3D         vec_3 = verts[ vert_4 ] - verts[ vert_1 ];
+    Vector3D vec_1         = verts[vert_2] - verts[vert_1];
+    Vector3D vec_2         = verts[vert_3] - verts[vert_1];
+    Vector3D vec_3         = verts[vert_4] - verts[vert_1];
     return fabs( ( vec_3 % ( vec_1 * vec_2 ) ) / 6.0 );
 }
 
-LocalSizeQualityMetric::~LocalSizeQualityMetric( ) {}
+LocalSizeQualityMetric::~LocalSizeQualityMetric() {}
 
-std::string LocalSizeQualityMetric::get_name( ) const
+std::string LocalSizeQualityMetric::get_name() const
 {
     return "Local Size";
 }
 
-int LocalSizeQualityMetric::get_negate_flag( ) const
+int LocalSizeQualityMetric::get_negate_flag() const
 {
     return 1;
 }
@@ -93,7 +93,7 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
     // first entry in the vertex to element array)
     // size_t num_elems = v_to_e_array[this_offset];
     // PRINT_INFO("\nIN LOCAL SIZE CPP, num_elements = %i",num_elems);
-    size_t        num_elems;
+    size_t num_elems;
     const size_t* v_to_e_array = pd.get_vertex_element_adjacencies( this_vert, num_elems, err );
     MSQ_ERRZERO( err );
 
@@ -101,32 +101,32 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
 
     // create an array to store the local metric values before averaging
     // Can we remove this dynamic allocatio?
-    double* met_vals = new double[ num_elems ];
+    double* met_vals = new double[num_elems];
     // vector to hold the other verts which form a corner.
     std::vector< size_t > other_vertices;
     other_vertices.reserve( 4 );
     double total_val = 0.0;
-    size_t i = 0;
+    size_t i         = 0;
     // loop over the elements attached to this vertex
     for( i = 0; i < num_elems; ++i )
     {
         // get the vertices which (with this_vert) form the corner of
         // the ith element.
-        elems[ v_to_e_array[ i ] ].get_connected_vertices( this_vert, other_vertices, err );
+        elems[v_to_e_array[i]].get_connected_vertices( this_vert, other_vertices, err );
         MSQ_ERRZERO( err );
         ////PRINT_INFO("\nINSIDE LOCAL SIZE CPP other_vertices size = %i",other_vertices.size());
 
-        switch( other_vertices.size( ) )
+        switch( other_vertices.size() )
         {
                 // if a surface element, compute the corner area
             case 2:
-                met_vals[ i ] = compute_corner_area( pd, this_vert, other_vertices[ 0 ], other_vertices[ 1 ], err );
+                met_vals[i] = compute_corner_area( pd, this_vert, other_vertices[0], other_vertices[1], err );
                 MSQ_ERRZERO( err );
                 break;
                 // if a volume element, compute the corner volume
             case 3:
-                met_vals[ i ] = compute_corner_volume( pd, this_vert, other_vertices[ 0 ], other_vertices[ 1 ],
-                                                       other_vertices[ 2 ], err );
+                met_vals[i] = compute_corner_volume( pd, this_vert, other_vertices[0], other_vertices[1],
+                                                     other_vertices[2], err );
                 MSQ_ERRZERO( err );
                 break;
             default:
@@ -134,7 +134,7 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
                 // of vertices were returned fom get_connected_vertices or
                 // the element does not have the correct number of edges
                 // connected to this vertex (possibly a pyramid element).
-                met_vals[ i ] = 0.0;
+                met_vals[i] = 0.0;
                 MSQ_SETERR( err )
                 ( "Incorrect number of vertices returned from "
                   "get_connected_vertices.",
@@ -142,10 +142,10 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
                 return false;
         };
         // keep track of total so that we can compute the linear average
-        total_val += met_vals[ i ];
+        total_val += met_vals[i];
         // PRINT_INFO("\nIN LOCAL SIZE CPP, total_val = %f, i = %i",total_val,i);
         // clear the vector of other_vertices for re-use.
-        other_vertices.clear( );
+        other_vertices.clear();
         // PRINT_INFO("\nIN LOCAL SIZE CPP, after clean size = %f",other_vertices.size());
     }
     // calculate the linear average... num_elems is non-zero here.
@@ -157,7 +157,7 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
     {
         for( i = 0; i < num_elems; ++i )
         {
-            met_vals[ i ] /= total_val;
+            met_vals[i] /= total_val;
         }
         // calculate fval by averaging the corner values
         fval = average_metrics( met_vals, num_elems, err );
@@ -174,21 +174,21 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
 bool LocalSizeQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
                                                     std::vector< size_t >& indices, MsqError& err )
 {
-    indices.clear( );
+    indices.clear();
     pd.get_adjacent_vertex_indices( vertex, indices, err );
     MSQ_ERRZERO( err );
 
     std::vector< size_t >::iterator r, w;
-    for( r = w = indices.begin( ); r != indices.end( ); ++r )
+    for( r = w = indices.begin(); r != indices.end(); ++r )
     {
-        if( *r < pd.num_free_vertices( ) )
+        if( *r < pd.num_free_vertices() )
         {
             *w = *r;
             ++w;
         }
     }
-    indices.erase( w, indices.end( ) );
-    if( vertex < pd.num_free_vertices( ) ) indices.push_back( vertex );
+    indices.erase( w, indices.end() );
+    if( vertex < pd.num_free_vertices() ) indices.push_back( vertex );
 
     bool rval = evaluate( pd, vertex, value, err );
     return !MSQ_CHKERR( err ) && rval;

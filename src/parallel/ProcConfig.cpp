@@ -43,12 +43,12 @@ gs_data::crystal_data* ProcConfig::crystal_router( bool construct_if_missing )
     return crystalData;
 }
 
-ProcConfig::~ProcConfig( )
+ProcConfig::~ProcConfig()
 {
     if( crystalData )
     {
 #ifdef MOAB_HAVE_MPI
-        crystalData->reset( );
+        crystalData->reset();
 #endif
         delete crystalData;
         crystalData = 0;

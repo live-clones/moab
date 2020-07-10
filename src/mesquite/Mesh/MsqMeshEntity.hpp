@@ -61,32 +61,32 @@ class MsqVertex;
 class MESQUITE_EXPORT MsqMeshEntity
 {
   public:
-    MsqMeshEntity( ) : mType( MIXED ), vertexIndices( 0 ), numVertexIndices( 0 ) {}
+    MsqMeshEntity() : mType( MIXED ), vertexIndices( 0 ), numVertexIndices( 0 ) {}
 
     //! Returns element type
-    inline EntityTopology get_element_type( ) const
+    inline EntityTopology get_element_type() const
     {
         return mType;
     }
 
     //! Returns the number of vertices in this element,
     //! based on its element type.
-    inline std::size_t vertex_count( ) const;
+    inline std::size_t vertex_count() const;
     //! Return number of nodes in element (number of corner
     //! vertices + number of higher-order nodes).
-    inline std::size_t node_count( ) const
+    inline std::size_t node_count() const
     {
         return numVertexIndices;
     }
     //! Returns number of target matrices for this element type
-    inline std::size_t corner_count( ) const
+    inline std::size_t corner_count() const
     {
-        return mType == PYRAMID ? 4 : vertex_count( );
+        return mType == PYRAMID ? 4 : vertex_count();
     }
 
     //! gets the vertices of the mesh entity
-    void   get_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
-    void   append_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
+    void get_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
+    void append_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
     size_t get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert, size_t local_map_size, int* local_map,
                                               MsqError& err ) const;
     //! gets the vertices of the mesh entity
@@ -94,8 +94,8 @@ class MESQUITE_EXPORT MsqMeshEntity
     void append_node_indices( std::vector< std::size_t >& vertex_list ) const;
     //! Very efficient retrieval of vertices indexes
     //! (corresponding to the PatchData vertex array).
-    inline const std::size_t* get_vertex_index_array( ) const;
-    inline std::size_t*       get_vertex_index_array( );
+    inline const std::size_t* get_vertex_index_array() const;
+    inline std::size_t* get_vertex_index_array();
 
     //! Sets element data
     void set_element_type( EntityTopology type )
@@ -164,7 +164,7 @@ class MESQUITE_EXPORT MsqMeshEntity
      *        to delete/resize/etc. this array directly!
      */
     size_t* vertexIndices;
-    size_t  numVertexIndices;
+    size_t numVertexIndices;
 
     // output operator for debugging.
     friend std::ostream& operator<<( std::ostream& stream, const MsqMeshEntity& entity );
@@ -172,23 +172,23 @@ class MESQUITE_EXPORT MsqMeshEntity
 
 // Returns the number of vertices in this type
 // of element, or 0 if a variable number.
-inline size_t MsqMeshEntity::vertex_count( ) const
+inline size_t MsqMeshEntity::vertex_count() const
 {
-    return mType == POLYGON || mType == POLYHEDRON ? node_count( ) : TopologyInfo::corners( mType );
+    return mType == POLYGON || mType == POLYHEDRON ? node_count() : TopologyInfo::corners( mType );
 }
 
 inline void MsqMeshEntity::set_connectivity( std::size_t* indices, size_t num_vertices )
 {
-    vertexIndices = indices;
+    vertexIndices    = indices;
     numVertexIndices = num_vertices;
 }
 
-inline const std::size_t* MsqMeshEntity::get_vertex_index_array( ) const
+inline const std::size_t* MsqMeshEntity::get_vertex_index_array() const
 {
     return vertexIndices;
 }
 
-inline std::size_t* MsqMeshEntity::get_vertex_index_array( )
+inline std::size_t* MsqMeshEntity::get_vertex_index_array()
 {
     return vertexIndices;
 }
@@ -196,9 +196,9 @@ inline std::size_t* MsqMeshEntity::get_vertex_index_array( )
 inline std::size_t MsqMeshEntity::get_vertex_index( std::size_t vertex_in_element ) const
 {
     // Make sure we're in range
-    assert( vertex_in_element < vertex_count( ) );
+    assert( vertex_in_element < vertex_count() );
     // Return the index
-    return vertexIndices[ vertex_in_element ];
+    return vertexIndices[vertex_in_element];
 }
 }  // namespace MBMesquite
 

@@ -8,12 +8,12 @@
 
 iGeom_Instance geom;
 iMesh_Instance mesh;
-iRel_Instance  rel;
+iRel_Instance rel;
 using namespace moab;
 
-void test_initial_inactive( )
+void test_initial_inactive()
 {
-    int             err;
+    int err;
     iRel_PairHandle pair;
 
     iRel_createPair( rel, geom, iRel_SET, iRel_IGEOM_IFACE, iRel_INACTIVE, mesh, iRel_SET, iRel_IMESH_IFACE,
@@ -40,9 +40,9 @@ void test_initial_inactive( )
     CHECK_EQUAL( related_set, mesh_set );
 }
 
-void test_initial_notexist( )
+void test_initial_notexist()
 {
-    int             err;
+    int err;
     iRel_PairHandle pair;
 
     iRel_createPair( rel, geom, iRel_SET, iRel_IGEOM_IFACE, iRel_NOTEXIST, mesh, iRel_SET, iRel_IMESH_IFACE,
@@ -69,7 +69,7 @@ void test_initial_notexist( )
     CHECK_EQUAL( related_set, mesh_set );
 }
 
-int main( )
+int main()
 {
     int err;
     int num_fail = 0;

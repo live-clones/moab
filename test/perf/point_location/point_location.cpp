@@ -26,14 +26,14 @@ enum TreeType
     UseDefaultTree = UseKDTree
 };
 
-const char*        default_str = "(default)";
-const char*        empty_str = "";
+const char* default_str = "(default)";
+const char* empty_str   = "";
 inline const char* is_default_tree( TreeType type )
 {
     return type == UseDefaultTree ? default_str : empty_str;
 }
 
-const long DEFAULT_NUM_TEST = 100000;
+const long DEFAULT_NUM_TEST       = 100000;
 const long HARD_MAX_UNIQUE_POINTS = 100000;
 const long HARD_MIN_UNIQUE_POINTS = 1000;
 const long FRACTION_UNIQUE_POINTS = 100;
@@ -74,11 +74,11 @@ int main( int argc, char* argv[] )
 {
 
     const char* input_file = 0;
-    long        tree_depth = -1;
-    long        elem_per_leaf = -1;
-    long        num_points = DEFAULT_NUM_TEST;
-    TreeType    type = UseDefaultTree;
-    char*       endptr;
+    long tree_depth        = -1;
+    long elem_per_leaf     = -1;
+    long num_points        = DEFAULT_NUM_TEST;
+    TreeType type          = UseDefaultTree;
+    char* endptr;
 
     // PARSE ARGUMENTS
 
@@ -87,20 +87,20 @@ int main( int argc, char* argv[] )
     {
         if( valptr )
         {
-            *valptr = strtol( argv[ i ], &endptr, 0 );
+            *valptr = strtol( argv[i], &endptr, 0 );
             if( *valptr < 1 || *endptr )
             {
-                std::cerr << "Invalid value for '" << argv[ i - 1 ] << "' flag: " << argv[ i ] << std::endl;
+                std::cerr << "Invalid value for '" << argv[i - 1] << "' flag: " << argv[i] << std::endl;
                 exit( 1 );
             }
             valptr = 0;
         }
-        else if( argv[ i ][ 0 ] == '-' && argv[ i ][ 1 ] && !argv[ i ][ 2 ] )
+        else if( argv[i][0] == '-' && argv[i][1] && !argv[i][2] )
         {
-            switch( argv[ i ][ 1 ] )
+            switch( argv[i][1] )
             {
                 case 'h':
-                    usage( argv[ 0 ], true );
+                    usage( argv[0], true );
                     break;
                 case 'k':
                     type = UseKDTree;
@@ -118,37 +118,37 @@ int main( int argc, char* argv[] )
                     valptr = &num_points;
                     break;
                 default:
-                    std::cerr << "Invalid flag: " << argv[ i ] << std::endl;
-                    usage( argv[ 0 ] );
+                    std::cerr << "Invalid flag: " << argv[i] << std::endl;
+                    usage( argv[0] );
                     break;
             }
         }
         else if( !input_file )
         {
-            input_file = argv[ i ];
+            input_file = argv[i];
         }
         else
         {
-            std::cerr << "Unexpected argument: " << argv[ i ] << std::endl;
-            usage( argv[ 0 ] );
+            std::cerr << "Unexpected argument: " << argv[i] << std::endl;
+            usage( argv[0] );
         }
     }
     if( valptr )
     {
-        std::cerr << "Expected value following '" << argv[ argc - 1 ] << "' flag" << std::endl;
-        usage( argv[ 0 ] );
+        std::cerr << "Expected value following '" << argv[argc - 1] << "' flag" << std::endl;
+        usage( argv[0] );
     }
     if( !input_file )
     {
         std::cerr << "No input file specified." << std::endl;
-        usage( argv[ 0 ] );
+        usage( argv[0] );
     }
 
     // LOAD MESH
 
-    Core        moab;
-    Interface&  mb = moab;
-    ErrorCode   rval;
+    Core moab;
+    Interface& mb = moab;
+    ErrorCode rval;
     std::string init_msg, msg;
     mb.get_last_error( init_msg );
     rval = mb.load_file( input_file );
@@ -166,7 +166,7 @@ int main( int argc, char* argv[] )
         num_unique = HARD_MAX_UNIQUE_POINTS;
     else if( num_unique < HARD_MIN_UNIQUE_POINTS )
         num_unique = num_points;
-    std::vector< CartVect >     points;
+    std::vector< CartVect > points;
     std::vector< EntityHandle > elems;
     generate_random_points( mb, num_unique, points, elems );
 
@@ -176,9 +176,9 @@ int main( int argc, char* argv[] )
     mb.estimated_memory_use( 0, 0, &init_total_storage );
 
     // RUN TIMING TEST
-    clock_t                     build_time, test_time;
-    size_t                      actual_depth = 0;
-    std::vector< EntityHandle > results( points.size( ) );
+    clock_t build_time, test_time;
+    size_t actual_depth = 0;
+    std::vector< EntityHandle > results( points.size() );
     switch( type )
     {
         default:
@@ -222,25 +222,25 @@ int main( int argc, char* argv[] )
 void fail( ErrorCode error_code, const char* file, int line )
 {
     std::cerr << "Internal error (error code " << error_code << ") at " << file << ":" << line << std::endl;
-    abort( );
+    abort();
 }
 
-const int HexSign[ 8 ][ 3 ] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -1, 1, -1 },
-                                { -1, -1, 1 },  { 1, -1, 1 },  { 1, 1, 1 },  { -1, 1, 1 } };
+const int HexSign[8][3] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 }, { -1, 1, -1 },
+                            { -1, -1, 1 },  { 1, -1, 1 },  { 1, 1, 1 },  { -1, 1, 1 } };
 
 static CartVect random_point_in_hex( Interface& mb, EntityHandle hex )
 {
-    const double        f = RAND_MAX / 2;
-    CartVect            xi( ( (double)rand( ) - f ) / f, ( (double)rand( ) - f ) / f, ( (double)rand( ) - f ) / f );
-    CartVect            coords[ 8 ];
+    const double f = RAND_MAX / 2;
+    CartVect xi( ( (double)rand() - f ) / f, ( (double)rand() - f ) / f, ( (double)rand() - f ) / f );
+    CartVect coords[8];
     const EntityHandle* conn;
-    int                 len;
-    ErrorCode           rval = mb.get_connectivity( hex, conn, len, true );
+    int len;
+    ErrorCode rval = mb.get_connectivity( hex, conn, len, true );
     if( len != 8 && MB_SUCCESS != rval )
     {
         std::cerr << "Invalid element" << std::endl;
         assert( false );
-        abort( );
+        abort();
     }
     rval = mb.get_coords( conn, 8, reinterpret_cast< double* >( coords ) );
     CHK( rval );
@@ -250,8 +250,8 @@ static CartVect random_point_in_hex( Interface& mb, EntityHandle hex )
     {
         double coeff = 0.125;
         for( unsigned j = 0; j < 3; ++j )
-            coeff *= 1 + HexSign[ i ][ j ] * xi[ j ];
-        point += coeff * coords[ i ];
+            coeff *= 1 + HexSign[i][j] * xi[j];
+        point += coeff * coords[i];
     }
 
     return point;
@@ -260,7 +260,7 @@ static CartVect random_point_in_hex( Interface& mb, EntityHandle hex )
 void generate_random_points( Interface& mb, size_t num_points, std::vector< CartVect >& points,
                              std::vector< EntityHandle >& point_elems )
 {
-    Range     elems;
+    Range elems;
     ErrorCode rval;
     rval = mb.get_entities_by_dimension( 0, 3, elems );
     CHK( rval );
@@ -268,10 +268,10 @@ void generate_random_points( Interface& mb, size_t num_points, std::vector< Cart
     {
         std::cerr << "Warning: ignoring non-hexahedral elements." << std::endl;
         std::pair< Range::iterator, Range::iterator > p = elems.equal_range( MBHEX );
-        elems.erase( p.second, elems.end( ) );
-        elems.erase( elems.begin( ), p.first );
+        elems.erase( p.second, elems.end() );
+        elems.erase( elems.begin(), p.first );
     }
-    if( elems.empty( ) )
+    if( elems.empty() )
     {
         std::cerr << "Input file contains no hexahedral elements." << std::endl;
         exit( 1 );
@@ -279,15 +279,15 @@ void generate_random_points( Interface& mb, size_t num_points, std::vector< Cart
 
     points.resize( num_points );
     point_elems.resize( num_points );
-    const size_t num_elem = elems.size( );
+    const size_t num_elem = elems.size();
     for( size_t i = 0; i < num_points; ++i )
     {
         size_t offset = 0;
         for( size_t x = num_elem; x > 0; x /= RAND_MAX )
-            offset += rand( );
+            offset += rand();
         offset %= num_elem;
-        point_elems[ i ] = elems[ offset ];
-        points[ i ] = random_point_in_hex( mb, point_elems[ i ] );
+        point_elems[i] = elems[offset];
+        points[i]      = random_point_in_hex( mb, point_elems[i] );
     }
 }
 
@@ -295,53 +295,53 @@ void do_kdtree_test( Interface& mb, int tree_depth, int elem_per_leaf, long num_
                      const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
                      clock_t& build_time, clock_t& test_time, size_t& depth )
 {
-    ErrorCode          rval;
-    clock_t            init = clock( );
-    AdaptiveKDTree     tool( &mb );
-    EntityHandle       root;
+    ErrorCode rval;
+    clock_t init = clock();
+    AdaptiveKDTree tool( &mb );
+    EntityHandle root;
     std::ostringstream options;
     if( tree_depth > 0 ) options << "MAX_DEPTH=" << tree_depth << ";";
     if( elem_per_leaf > 0 ) options << "MAX_PER_LEAF=" << elem_per_leaf << ";";
     Range all_hexes;
     rval = mb.get_entities_by_type( 0, MBHEX, all_hexes );
     CHK( rval );
-    FileOptions opt( options.str( ).c_str( ) );
+    FileOptions opt( options.str().c_str() );
     rval = tool.build_tree( all_hexes, &root, &opt );
     CHK( rval );
-    all_hexes.clear( );
-    build_time = clock( ) - init;
+    all_hexes.clear();
+    build_time = clock() - init;
 
-    EntityHandle                          leaf;
-    std::vector< EntityHandle >           hexes;
+    EntityHandle leaf;
+    std::vector< EntityHandle > hexes;
     std::vector< EntityHandle >::iterator j;
-    CartVect                              coords[ 8 ];
-    const EntityHandle*                   conn;
-    int                                   len;
+    CartVect coords[8];
+    const EntityHandle* conn;
+    int len;
     for( long i = 0; i < num_test; ++i )
     {
-        const size_t idx = (size_t)i % points.size( );
-        rval = tool.point_search( points[ idx ].array( ), leaf, 1.0e-10, 1.0e-6, NULL, &root );
+        const size_t idx = (size_t)i % points.size();
+        rval             = tool.point_search( points[idx].array(), leaf, 1.0e-10, 1.0e-6, NULL, &root );
         CHK( rval );
-        hexes.clear( );
+        hexes.clear();
         rval = mb.get_entities_by_handle( leaf, hexes );
         CHK( rval );
-        for( j = hexes.begin( ); j != hexes.end( ); ++j )
+        for( j = hexes.begin(); j != hexes.end(); ++j )
         {
             rval = mb.get_connectivity( *j, conn, len, true );
             CHK( rval );
             rval = mb.get_coords( conn, 8, reinterpret_cast< double* >( coords ) );
             CHK( rval );
-            if( GeomUtil::point_in_trilinear_hex( coords, points[ idx ], 1e-12 ) )
+            if( GeomUtil::point_in_trilinear_hex( coords, points[idx], 1e-12 ) )
             {
-                point_elems[ idx ] = *j;
+                point_elems[idx] = *j;
                 break;
             }
         }
-        if( j == hexes.end( ) ) point_elems[ idx ] = 0;
+        if( j == hexes.end() ) point_elems[idx] = 0;
     }
 
-    test_time = clock( ) - build_time;
-    double   tmp_box[ 3 ];
+    test_time = clock() - build_time;
+    double tmp_box[3];
     unsigned max_d;
     tool.get_info( root, tmp_box, tmp_box, max_d );
     depth = max_d;
@@ -350,33 +350,33 @@ void do_kdtree_test( Interface& mb, int tree_depth, int elem_per_leaf, long num_
 void do_linear_test( Interface& mb, int, int, long num_test, const std::vector< CartVect >& points,
                      std::vector< EntityHandle >& point_elems, clock_t& build_time, clock_t& test_time, size_t& depth )
 {
-    clock_t   init = clock( );
-    Range     hexes;
+    clock_t init = clock();
+    Range hexes;
     ErrorCode rval = mb.get_entities_by_type( 0, MBHEX, hexes );
     CHK( rval );
     depth = 0;
-    point_elems.resize( points.size( ) );
-    build_time = clock( ) - init;
+    point_elems.resize( points.size() );
+    build_time = clock() - init;
 
-    CartVect            coords[ 8 ];
+    CartVect coords[8];
     const EntityHandle* conn;
-    int                 len;
+    int len;
     for( long i = 0; i < num_test; ++i )
     {
-        const size_t idx = (size_t)i % points.size( );
-        for( Range::iterator h = hexes.begin( ); h != hexes.end( ); ++h )
+        const size_t idx = (size_t)i % points.size();
+        for( Range::iterator h = hexes.begin(); h != hexes.end(); ++h )
         {
             rval = mb.get_connectivity( *h, conn, len, true );
             CHK( rval );
             rval = mb.get_coords( conn, 8, reinterpret_cast< double* >( coords ) );
             CHK( rval );
-            if( GeomUtil::point_in_trilinear_hex( coords, points[ idx ], 1e-12 ) )
+            if( GeomUtil::point_in_trilinear_hex( coords, points[idx], 1e-12 ) )
             {
-                point_elems[ idx ] = *h;
+                point_elems[idx] = *h;
                 break;
             }
         }
     }
 
-    test_time = clock( ) - build_time;
+    test_time = clock() - build_time;
 }

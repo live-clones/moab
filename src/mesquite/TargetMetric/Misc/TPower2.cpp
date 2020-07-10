@@ -40,14 +40,15 @@
 namespace MBMesquite
 {
 
-std::string TPower2::get_name( ) const
+std::string TPower2::get_name() const
 {
-    return "sqr(" + mMetric->get_name( ) + ')';
+    return "sqr(" + mMetric->get_name() + ')';
 }
 
-TPower2::~TPower2( ) {}
+TPower2::~TPower2() {}
 
-template< unsigned DIM > inline bool TPower2::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
+template < unsigned DIM >
+inline bool TPower2::eval( const MsqMatrix< DIM, DIM >& T, double& result, MsqError& err )
 {
     bool rval = mMetric->evaluate( T, result, err );
     MSQ_ERRZERO( err );
@@ -55,7 +56,7 @@ template< unsigned DIM > inline bool TPower2::eval( const MsqMatrix< DIM, DIM >&
     return rval;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TPower2::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                            MsqError& err )
 {
@@ -66,7 +67,7 @@ inline bool TPower2::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMa
     return rval;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TPower2::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                            MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
 {

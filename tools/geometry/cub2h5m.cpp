@@ -13,9 +13,9 @@
 #include <sstream>
 #include <time.h>
 
-#define GF_CUBIT_FILE_TYPE "CUBIT"
-#define GF_STEP_FILE_TYPE "STEP"
-#define GF_IGES_FILE_TYPE "IGES"
+#define GF_CUBIT_FILE_TYPE    "CUBIT"
+#define GF_STEP_FILE_TYPE     "STEP"
+#define GF_IGES_FILE_TYPE     "IGES"
 #define GF_ACIS_TXT_FILE_TYPE "ACIS_SAT"
 #define GF_ACIS_BIN_FILE_TYPE "ACIS_SAB"
 #define GF_OCC_BREP_FILE_TYPE "OCC"
@@ -25,7 +25,7 @@ using namespace moab;
 void tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters )
 {
     std::string::size_type last = str.find_first_not_of( delimiters, 0 );
-    std::string::size_type pos = str.find_first_of( delimiters, last );
+    std::string::size_type pos  = str.find_first_of( delimiters, last );
     if( std::string::npos == pos )
         tokens.push_back( str );
     else
@@ -33,8 +33,8 @@ void tokenize( const std::string& str, std::vector< std::string >& tokens, const
         {
             tokens.push_back( str.substr( last, pos - last ) );
             last = str.find_first_not_of( delimiters, pos );
-            pos = str.find_first_of( delimiters, last );
-            if( std::string::npos == pos ) pos = str.size( );
+            pos  = str.find_first_of( delimiters, last );
+            if( std::string::npos == pos ) pos = str.size();
         }
 }
 
@@ -42,7 +42,7 @@ ErrorCode get_group_names( Interface* MBI, const EntityHandle group_set, const T
                            std::vector< std::string >& grp_names )
 {
     // get names
-    char name0[ NAME_TAG_SIZE ];
+    char name0[NAME_TAG_SIZE];
     std::fill( name0, name0 + NAME_TAG_SIZE, '\0' );
     ErrorCode result = MBI->tag_get_data( nameTag, &group_set, 1, &name0 );
     if( MB_SUCCESS != result && MB_TAG_NOT_FOUND != result ) return MB_FAILURE;
@@ -59,17 +59,17 @@ ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_f
                                         const bool conserve_mass, const bool debug )
 {
     // get groups
-    ErrorCode         rval;
-    const char        group_category[ CATEGORY_TAG_SIZE ] = { "Group\0" };
-    const void* const group_val[] = { &group_category };
-    Range             groups;
+    ErrorCode rval;
+    const char group_category[CATEGORY_TAG_SIZE] = { "Group\0" };
+    const void* const group_val[]                = { &group_category };
+    Range groups;
     rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &categoryTag, group_val, 1, groups );
     if( MB_SUCCESS != rval ) return rval;
 
     // Get the maximum group id. This is so that new groups do not have
     // duplicate ids.
     int max_grp_id = -1;
-    for( Range::const_iterator i = groups.begin( ); i != groups.end( ); ++i )
+    for( Range::const_iterator i = groups.begin(); i != groups.end(); ++i )
     {
         int grp_id;
         rval = MBI->tag_get_data( idTag, &( *i ), 1, &grp_id );
@@ -82,7 +82,7 @@ ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_f
         std::cout << "    maximum group id=" << max_grp_id << std::endl;
     }
 
-    for( Range::const_iterator i = groups.begin( ); i != groups.end( ); ++i )
+    for( Range::const_iterator i = groups.begin(); i != groups.end(); ++i )
     {
         // get group names
         std::vector< std::string > grp_names;
@@ -90,10 +90,10 @@ ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_f
         if( MB_SUCCESS != rval ) return MB_FAILURE;
 
         // determine if it is a material group
-        bool   material_grp = false;
-        int    mat_id = -1;
-        double rho = 0;
-        for( std::vector< std::string >::const_iterator j = grp_names.begin( ); j != grp_names.end( ); ++j )
+        bool material_grp = false;
+        int mat_id        = -1;
+        double rho        = 0;
+        for( std::vector< std::string >::const_iterator j = grp_names.begin(); j != grp_names.end(); ++j )
         {
             if( std::string::npos != ( *j ).find( "mat" ) && std::string::npos != ( *j ).find( "rho" ) )
             {
@@ -103,25 +103,25 @@ ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_f
                 // get the density and material id
                 std::vector< std::string > tokens;
                 tokenize( *j, tokens, "_" );
-                mat_id = atoi( tokens[ 1 ].c_str( ) );
-                rho = atof( tokens[ 3 ].c_str( ) );
+                mat_id = atoi( tokens[1].c_str() );
+                rho    = atof( tokens[3].c_str() );
             }
         }
         if( !material_grp ) continue;
 
         // get the volume sets of the material group
-        const int         three = 3;
+        const int three               = 3;
         const void* const three_val[] = { &three };
-        Range             vols;
+        Range vols;
         rval = MBI->get_entities_by_type_and_tag( *i, MBENTITYSET, &dimTag, three_val, 1, vols );
         if( MB_SUCCESS != rval ) return rval;
 
         // for each volume, sum predeformed and deformed volume
         double orig_grp_volume = 0, defo_grp_volume = 0;
 
-        moab::GeomTopoTool  gtt = moab::GeomTopoTool( MBI, false );
+        moab::GeomTopoTool gtt  = moab::GeomTopoTool( MBI, false );
         moab::GeomQueryTool gqt = moab::GeomQueryTool( &gtt );
-        for( Range::const_iterator j = vols.begin( ); j != vols.end( ); ++j )
+        for( Range::const_iterator j = vols.begin(); j != vols.end(); ++j )
         {
             double defo_size = 0, orig_size = 0;
             rval = gqt.measure_volume( *j, defo_size );
@@ -143,12 +143,12 @@ ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_f
             new_name_ss << "mat_" << mat_id << "_rho_" << new_rho << "\0";
             std::string new_name;
             new_name_ss >> new_name;
-            rval = MBI->tag_set_data( nameTag, &new_grp, 1, new_name.c_str( ) );
+            rval = MBI->tag_set_data( nameTag, &new_grp, 1, new_name.c_str() );
             if( MB_SUCCESS != rval ) return rval;
             max_grp_id++;
             rval = MBI->tag_set_data( idTag, &new_grp, 1, &max_grp_id );
             if( MB_SUCCESS != rval ) return rval;
-            const char group_category2[ CATEGORY_TAG_SIZE ] = "Group\0";
+            const char group_category2[CATEGORY_TAG_SIZE] = "Group\0";
             rval = MBI->tag_set_data( categoryTag, &new_grp, 1, group_category2 );
             if( MB_SUCCESS != rval ) return rval;
 
@@ -181,14 +181,14 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
                                            const Tag dimTag, const bool /*debug */ )
 {
 
-    ErrorCode         result;
-    const int         two = 2;
+    ErrorCode result;
+    const int two               = 2;
     const void* const two_val[] = { &two };
-    Range             cgm_surfs;
+    Range cgm_surfs;
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, two_val, 1, cgm_surfs );
     if( MB_SUCCESS != result ) return result;
 
-    for( Range::iterator i = cgm_surfs.begin( ); i != cgm_surfs.end( ); ++i )
+    for( Range::iterator i = cgm_surfs.begin(); i != cgm_surfs.end(); ++i )
     {
         int n_tris;
         result = MBI->get_number_entities_by_type( *i, MBTRI, n_tris );
@@ -203,7 +203,7 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
             Range parent_vols;
             result = MBI->get_parent_meshsets( *i, parent_vols );
             assert( MB_SUCCESS == result );
-            for( Range::iterator j = parent_vols.begin( ); j != parent_vols.end( ); ++j )
+            for( Range::iterator j = parent_vols.begin(); j != parent_vols.end(); ++j )
             {
                 result = MBI->remove_parent_child( *j, *i );
                 assert( MB_SUCCESS == result );
@@ -211,7 +211,7 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
             Range child_curves;
             result = MBI->get_child_meshsets( *i, child_curves );
             assert( MB_SUCCESS == result );
-            for( Range::iterator j = child_curves.begin( ); j != child_curves.end( ); ++j )
+            for( Range::iterator j = child_curves.begin(); j != child_curves.end(); ++j )
             {
                 result = MBI->remove_parent_child( *i, *j );
                 assert( MB_SUCCESS == result );
@@ -225,7 +225,7 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
             Range all_sets;
             result = MBI->get_entities_by_type( 0, MBENTITYSET, all_sets );
             assert( MB_SUCCESS == result );
-            for( Range::iterator j = all_sets.begin( ); j != all_sets.end( ); ++j )
+            for( Range::iterator j = all_sets.begin(); j != all_sets.end(); ++j )
             {
                 if( MBI->contains_entities( *j, &( *i ), 1 ) )
                 {
@@ -242,13 +242,13 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
     }
 
     // get all volumes
-    const int         three = 3;
+    const int three               = 3;
     const void* const three_val[] = { &three };
-    Range             cgm_vols;
+    Range cgm_vols;
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, three_val, 1, cgm_vols );
     if( MB_SUCCESS != result ) return result;
 
-    for( Range::iterator i = cgm_vols.begin( ); i != cgm_vols.end( ); ++i )
+    for( Range::iterator i = cgm_vols.begin(); i != cgm_vols.end(); ++i )
     {
         // get the volume's number of surfaces
         int n_surfs;
@@ -267,7 +267,7 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
             Range all_sets;
             result = MBI->get_entities_by_type( 0, MBENTITYSET, all_sets );
             assert( MB_SUCCESS == result );
-            for( Range::iterator j = all_sets.begin( ); j != all_sets.end( ); ++j )
+            for( Range::iterator j = all_sets.begin(); j != all_sets.end(); ++j )
             {
                 if( MBI->contains_entities( *j, &( *i ), 1 ) )
                 {
@@ -305,15 +305,15 @@ ErrorCode build_new_surface( Interface* MBI, EntityHandle& new_surf, const Entit
         if( MB_SUCCESS != result ) return result;
     }
     const int two = 2;
-    result = MBI->tag_set_data( dimTag, &new_surf, 1, &two );
+    result        = MBI->tag_set_data( dimTag, &new_surf, 1, &two );
     if( MB_SUCCESS != result ) return result;
     result = MBI->tag_set_data( idTag, &new_surf, 1, &new_surf_id );
     if( MB_SUCCESS != result ) return result;
-    const char geom_category[ CATEGORY_TAG_SIZE ] = { "Surface\0" };
-    result = MBI->tag_set_data( categoryTag, &new_surf, 1, &geom_category );
+    const char geom_category[CATEGORY_TAG_SIZE] = { "Surface\0" };
+    result                                      = MBI->tag_set_data( categoryTag, &new_surf, 1, &geom_category );
     if( MB_SUCCESS != result ) return result;
-    EntityHandle vols[ 2 ] = { forward_parent_vol, reverse_parent_vol };
-    result = MBI->tag_set_data( senseTag, &new_surf, 1, vols );
+    EntityHandle vols[2] = { forward_parent_vol, reverse_parent_vol };
+    result               = MBI->tag_set_data( senseTag, &new_surf, 1, vols );
     if( MB_SUCCESS != result ) return result;
 
     return MB_SUCCESS;
@@ -325,37 +325,37 @@ ErrorCode orient_faces_outward( Interface* MBI, const Range faces, const bool /*
 {
 
     ErrorCode result;
-    for( Range::const_iterator i = faces.begin( ); i != faces.end( ); ++i )
+    for( Range::const_iterator i = faces.begin(); i != faces.end(); ++i )
     {
         Range adj_elem;
         result = MBI->get_adjacencies( &( *i ), 1, 3, false, adj_elem );
         if( MB_SUCCESS != result ) return result;
-        if( 1 != adj_elem.size( ) ) return MB_INVALID_SIZE;
+        if( 1 != adj_elem.size() ) return MB_INVALID_SIZE;
 
         // get connectivity for element and face
         const EntityHandle* elem_conn;
-        int                 elem_n_nodes;
-        result = MBI->get_connectivity( adj_elem.front( ), elem_conn, elem_n_nodes );
+        int elem_n_nodes;
+        result = MBI->get_connectivity( adj_elem.front(), elem_conn, elem_n_nodes );
         if( MB_SUCCESS != result ) return result;
         const EntityHandle* face_conn;
-        int                 face_n_nodes;
+        int face_n_nodes;
         result = MBI->get_connectivity( *i, face_conn, face_n_nodes );
         if( MB_SUCCESS != result ) return result;
 
         // Get the sense of the face wrt the element
-        EntityType elem_type = MBI->type_from_handle( adj_elem.front( ) );
+        EntityType elem_type = MBI->type_from_handle( adj_elem.front() );
         EntityType face_type = MBI->type_from_handle( *i );
-        int        face_num, offset;
-        int        sense = 0;
-        const int  face_dim = CN::Dimension( face_type );
+        int face_num, offset;
+        int sense          = 0;
+        const int face_dim = CN::Dimension( face_type );
         int rval = CN::SideNumber( elem_type, elem_conn, face_conn, face_n_nodes, face_dim, face_num, sense, offset );
         if( 0 != rval ) return MB_FAILURE;
 
         // If the face is not oriented outward wrt the element, reverse it
         if( -1 == sense )
         {
-            EntityHandle new_face_conn[ 4 ] = { face_conn[ 3 ], face_conn[ 2 ], face_conn[ 1 ], face_conn[ 0 ] };
-            result = MBI->set_connectivity( *i, new_face_conn, 4 );
+            EntityHandle new_face_conn[4] = { face_conn[3], face_conn[2], face_conn[1], face_conn[0] };
+            result                        = MBI->set_connectivity( *i, new_face_conn, 4 );
             if( MB_SUCCESS != result ) return result;
         }
     }
@@ -484,42 +484,42 @@ void plot_histogram( const std::string& title, const std::string& x_axis_label, 
                      const int n_bins, const double data[], const int n_data )
 {
     // find max and min
-    double min = std::numeric_limits< double >::max( );
-    double max = -std::numeric_limits< double >::max( );
+    double min = std::numeric_limits< double >::max();
+    double max = -std::numeric_limits< double >::max();
     for( int i = 0; i < n_data; ++i )
     {
-        if( min > data[ i ] ) min = data[ i ];
-        if( max < data[ i ] ) max = data[ i ];
+        if( min > data[i] ) min = data[i];
+        if( max < data[i] ) max = data[i];
     }
 
     // make bins for histogram
-    double             bin_width = ( max - min ) / n_bins;
+    double bin_width = ( max - min ) / n_bins;
     std::vector< int > bins( n_bins );
     for( int i = 0; i < n_bins; ++i )
-        bins[ i ] = 0;
+        bins[i] = 0;
 
     // fill the bins
     for( int i = 0; i < n_data; ++i )
     {
-        double diff = data[ i ] - min;
-        int    bin = diff / bin_width;
+        double diff = data[i] - min;
+        int bin     = diff / bin_width;
         if( 9 < bin ) bin = 9;  // cheap fix for numerical precision error
         if( 0 > bin ) bin = 0;  // cheap fix for numerical precision error
-        ++bins[ bin ];
+        ++bins[bin];
     }
 
     // create bars
     int max_bin = 0;
     for( int i = 0; i < n_bins; ++i )
-        if( max_bin < bins[ i ] ) max_bin = bins[ i ];
-    int                        bar_height;
-    int                        max_bar_chars = 72;
+        if( max_bin < bins[i] ) max_bin = bins[i];
+    int bar_height;
+    int max_bar_chars = 72;
     std::vector< std::string > bars( n_bins );
     for( int i = 0; i < n_bins; ++i )
     {
-        bar_height = ( max_bar_chars * bins[ i ] ) / max_bin;
+        bar_height = ( max_bar_chars * bins[i] ) / max_bin;
         for( int j = 0; j < bar_height; ++j )
-            bars[ i ] += "*";
+            bars[i] += "*";
     }
 
     // print histogram header
@@ -534,7 +534,7 @@ void plot_histogram( const std::string& title, const std::string& x_axis_label, 
         std::cout.width( 15 );
         std::cout << min + ( ( i + 1 ) * bin_width );
         std::cout.width( max_bar_chars );
-        std::cout << bars[ i ] << bins[ i ] << std::endl;
+        std::cout << bars[i] << bins[i] << std::endl;
     }
 
     // print histogram footer
@@ -550,9 +550,9 @@ void generate_plots( const double orig[], const double defo[], const int n_elems
 {
 
     // find volume ratio then max and min
-    double* ratio = new double[ n_elems ];
+    double* ratio = new double[n_elems];
     for( int i = 0; i < n_elems; ++i )
-        ratio[ i ] = ( defo[ i ] - orig[ i ] ) / orig[ i ];
+        ratio[i] = ( defo[i] - orig[i] ) / orig[i];
 
     plot_histogram( "Predeformed Element Volume", "Num_Elems", "Volume [cc]", 10, orig, n_elems );
     std::string title = "Element Volume Change Ratio at Time Step " + time_step;
@@ -572,51 +572,51 @@ double measure( Interface* MBI, const EntityHandle element )
     EntityType type = MBI->type_from_handle( element );
 
     const EntityHandle* conn;
-    int                 num_vertices;
-    ErrorCode           result = MBI->get_connectivity( element, conn, num_vertices );
+    int num_vertices;
+    ErrorCode result = MBI->get_connectivity( element, conn, num_vertices );
     if( MB_SUCCESS != result ) return result;
 
     std::vector< CartVect > coords( num_vertices );
-    result = MBI->get_coords( conn, num_vertices, coords[ 0 ].array( ) );
+    result = MBI->get_coords( conn, num_vertices, coords[0].array() );
     if( MB_SUCCESS != result ) return result;
 
     switch( type )
     {
         case MBEDGE:
-            return ( coords[ 0 ] - coords[ 1 ] ).length( );
+            return ( coords[0] - coords[1] ).length();
         case MBTRI:
-            return 0.5 * ( ( coords[ 1 ] - coords[ 0 ] ) * ( coords[ 2 ] - coords[ 0 ] ) ).length( );
+            return 0.5 * ( ( coords[1] - coords[0] ) * ( coords[2] - coords[0] ) ).length();
         case MBQUAD:
             num_vertices = 4;
         case MBPOLYGON: {
             CartVect mid( 0, 0, 0 );
             for( int i = 0; i < num_vertices; ++i )
-                mid += coords[ i ];
+                mid += coords[i];
             mid /= num_vertices;
 
             double sum = 0.0;
             for( int i = 0; i < num_vertices; ++i )
             {
                 int j = ( i + 1 ) % num_vertices;
-                sum += ( ( mid - coords[ i ] ) * ( mid - coords[ j ] ) ).length( );
+                sum += ( ( mid - coords[i] ) * ( mid - coords[j] ) ).length();
             }
             return 0.5 * sum;
         }
         case MBTET:
-            return tet_volume( coords[ 0 ], coords[ 1 ], coords[ 2 ], coords[ 3 ] );
+            return tet_volume( coords[0], coords[1], coords[2], coords[3] );
         case MBPYRAMID:
-            return tet_volume( coords[ 0 ], coords[ 1 ], coords[ 2 ], coords[ 4 ] ) +
-                   tet_volume( coords[ 0 ], coords[ 2 ], coords[ 3 ], coords[ 4 ] );
+            return tet_volume( coords[0], coords[1], coords[2], coords[4] ) +
+                   tet_volume( coords[0], coords[2], coords[3], coords[4] );
         case MBPRISM:
-            return tet_volume( coords[ 0 ], coords[ 1 ], coords[ 2 ], coords[ 5 ] ) +
-                   tet_volume( coords[ 3 ], coords[ 5 ], coords[ 4 ], coords[ 0 ] ) +
-                   tet_volume( coords[ 1 ], coords[ 4 ], coords[ 5 ], coords[ 0 ] );
+            return tet_volume( coords[0], coords[1], coords[2], coords[5] ) +
+                   tet_volume( coords[3], coords[5], coords[4], coords[0] ) +
+                   tet_volume( coords[1], coords[4], coords[5], coords[0] );
         case MBHEX:
-            return tet_volume( coords[ 0 ], coords[ 1 ], coords[ 3 ], coords[ 4 ] ) +
-                   tet_volume( coords[ 7 ], coords[ 3 ], coords[ 6 ], coords[ 4 ] ) +
-                   tet_volume( coords[ 4 ], coords[ 5 ], coords[ 1 ], coords[ 6 ] ) +
-                   tet_volume( coords[ 1 ], coords[ 6 ], coords[ 3 ], coords[ 4 ] ) +
-                   tet_volume( coords[ 2 ], coords[ 6 ], coords[ 3 ], coords[ 1 ] );
+            return tet_volume( coords[0], coords[1], coords[3], coords[4] ) +
+                   tet_volume( coords[7], coords[3], coords[6], coords[4] ) +
+                   tet_volume( coords[4], coords[5], coords[1], coords[6] ) +
+                   tet_volume( coords[1], coords[6], coords[3], coords[4] ) +
+                   tet_volume( coords[2], coords[6], coords[3], coords[1] );
         default:
             return 0.0;
     }
@@ -633,33 +633,33 @@ ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set, const 
                              double& signed_volume )
 {
     ErrorCode rval;
-    Range     tris;
+    Range tris;
     rval = MBI->get_entities_by_type( surf_set, MBTRI, tris );
     if( MB_SUCCESS != rval ) return rval;
     signed_volume = 0.0;
     const EntityHandle* conn;
-    int                 len;
-    CartVect            coords[ 3 ];
-    for( Range::iterator j = tris.begin( ); j != tris.end( ); ++j )
+    int len;
+    CartVect coords[3];
+    for( Range::iterator j = tris.begin(); j != tris.end(); ++j )
     {
         rval = MBI->get_connectivity( *j, conn, len, true );
         if( MB_SUCCESS != rval ) return rval;
         if( 3 != len ) return MB_INVALID_SIZE;
-        rval = MBI->get_coords( conn, 3, coords[ 0 ].array( ) );
+        rval = MBI->get_coords( conn, 3, coords[0].array() );
         if( MB_SUCCESS != rval ) return rval;
 
         // Apply offset to avoid calculating 0 for cases when the origin is in the
         // plane of the surface.
         for( unsigned int k = 0; k < 3; ++k )
         {
-            coords[ k ][ 0 ] += offset[ 0 ];
-            coords[ k ][ 1 ] += offset[ 1 ];
-            coords[ k ][ 2 ] += offset[ 2 ];
+            coords[k][0] += offset[0];
+            coords[k][1] += offset[1];
+            coords[k][2] += offset[2];
         }
 
-        coords[ 1 ] -= coords[ 0 ];
-        coords[ 2 ] -= coords[ 0 ];
-        signed_volume += ( coords[ 0 ] % ( coords[ 1 ] * coords[ 2 ] ) );
+        coords[1] -= coords[0];
+        coords[2] -= coords[0];
+        signed_volume += ( coords[0] % ( coords[1] * coords[2] ) );
     }
     return MB_SUCCESS;
 }
@@ -671,25 +671,25 @@ ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set, const 
 ErrorCode fix_surface_senses( Interface* MBI, const EntityHandle cgm_file_set, const EntityHandle cub_file_set,
                               const Tag idTag, const Tag dimTag, const Tag senseTag, const bool debug )
 {
-    ErrorCode         result;
-    const int         two = 2;
+    ErrorCode result;
+    const int two               = 2;
     const void* const two_val[] = { &two };
-    Range             cgm_surfs;
+    Range cgm_surfs;
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, two_val, 1, cgm_surfs );
     if( MB_SUCCESS != result ) return result;
-    for( Range::iterator i = cgm_surfs.begin( ); i != cgm_surfs.end( ); ++i )
+    for( Range::iterator i = cgm_surfs.begin(); i != cgm_surfs.end(); ++i )
     {
         int surf_id;
         result = MBI->tag_get_data( idTag, &( *i ), 1, &surf_id );
         if( MB_SUCCESS != result ) return result;
 
         // Find the meshed surface set with the same id
-        Range             cub_surf;
-        const Tag         tags[] = { idTag, dimTag };
+        Range cub_surf;
+        const Tag tags[]             = { idTag, dimTag };
         const void* const tag_vals[] = { &surf_id, &two };
         result = MBI->get_entities_by_type_and_tag( cub_file_set, MBENTITYSET, tags, tag_vals, 2, cub_surf );
         if( MB_SUCCESS != result ) return result;
-        if( 1 != cub_surf.size( ) )
+        if( 1 != cub_surf.size() )
         {
             std::cout << "  Surface " << surf_id << ": no meshed representation found, using CAD representation instead"
                       << std::endl;
@@ -698,32 +698,32 @@ ErrorCode fix_surface_senses( Interface* MBI, const EntityHandle cgm_file_set, c
 
         // Get tris that represent the quads of the cub surf
         Range quads;
-        result = MBI->get_entities_by_type( cub_surf.front( ), MBQUAD, quads );
+        result = MBI->get_entities_by_type( cub_surf.front(), MBQUAD, quads );
         if( MB_SUCCESS != result ) return result;
         Range cub_tris;
         result = make_tris_from_quads( MBI, quads, cub_tris );
         if( MB_SUCCESS != result ) return result;
 
         // Add the tris to the same surface meshset as the quads are inside.
-        result = MBI->add_entities( cub_surf.front( ), cub_tris );
+        result = MBI->add_entities( cub_surf.front(), cub_tris );
         if( MB_SUCCESS != result ) return result;
 
         // get the signed volume for each surface representation. Keep trying until
         // The signed volumes are much greater than numerical precision. Planar
         // surfaces will have a signed volume of zero if the plane goes through the
         // origin, unless we apply an offset.
-        const int    n_attempts = 100;
-        const int    max_random = 10;
+        const int n_attempts        = 100;
+        const int max_random        = 10;
         const double min_signed_vol = 0.1;
-        double       cgm_signed_vol, cub_signed_vol;
+        double cgm_signed_vol, cub_signed_vol;
         for( int j = 0; j < n_attempts; ++j )
         {
             cgm_signed_vol = 0;
             cub_signed_vol = 0;
-            CartVect offset( std::rand( ) % max_random, std::rand( ) % max_random, std::rand( ) % max_random );
+            CartVect offset( std::rand() % max_random, std::rand() % max_random, std::rand() % max_random );
             result = get_signed_volume( MBI, *i, offset, cgm_signed_vol );
             if( MB_SUCCESS != result ) return result;
-            result = get_signed_volume( MBI, cub_surf.front( ), offset, cub_signed_vol );
+            result = get_signed_volume( MBI, cub_surf.front(), offset, cub_signed_vol );
             if( MB_SUCCESS != result ) return result;
             if( debug )
                 std::cout << "  surf_id=" << surf_id << " cgm_signed_vol=" << cgm_signed_vol
@@ -740,13 +740,13 @@ ErrorCode fix_surface_senses( Interface* MBI, const EntityHandle cgm_file_set, c
         // representations have the same signed volume.
         if( ( cgm_signed_vol < 0 && cub_signed_vol > 0 ) || ( cgm_signed_vol > 0 && cub_signed_vol < 0 ) )
         {
-            EntityHandle cgm_surf_volumes[ 2 ], reversed_cgm_surf_volumes[ 2 ];
+            EntityHandle cgm_surf_volumes[2], reversed_cgm_surf_volumes[2];
             result = MBI->tag_get_data( senseTag, &( *i ), 1, cgm_surf_volumes );
             if( MB_SUCCESS != result ) return result;
             if( MB_SUCCESS != result ) return result;
 
-            reversed_cgm_surf_volumes[ 0 ] = cgm_surf_volumes[ 1 ];
-            reversed_cgm_surf_volumes[ 1 ] = cgm_surf_volumes[ 0 ];
+            reversed_cgm_surf_volumes[0] = cgm_surf_volumes[1];
+            reversed_cgm_surf_volumes[1] = cgm_surf_volumes[0];
 
             result = MBI->tag_set_data( senseTag, &( *i ), 1, reversed_cgm_surf_volumes );
             if( MB_SUCCESS != result ) return result;
@@ -763,14 +763,14 @@ ErrorCode fix_surface_senses( Interface* MBI, const EntityHandle cgm_file_set, c
 ErrorCode replace_faceted_cgm_surfs( Interface* MBI, const EntityHandle cgm_file_set, const EntityHandle cub_file_set,
                                      const Tag idTag, const Tag dimTag, const bool debug )
 {
-    ErrorCode         result;
-    const int         two = 2;
+    ErrorCode result;
+    const int two               = 2;
     const void* const two_val[] = { &two };
-    Range             cgm_surfs;
+    Range cgm_surfs;
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, two_val, 1, cgm_surfs );
     if( MB_SUCCESS != result ) return result;
 
-    for( Range::iterator i = cgm_surfs.begin( ); i != cgm_surfs.end( ); ++i )
+    for( Range::iterator i = cgm_surfs.begin(); i != cgm_surfs.end(); ++i )
     {
         int surf_id;
         result = MBI->tag_get_data( idTag, &( *i ), 1, &surf_id );
@@ -778,12 +778,12 @@ ErrorCode replace_faceted_cgm_surfs( Interface* MBI, const EntityHandle cgm_file
         if( debug ) std::cout << "surf_id=" << surf_id << std::endl;
 
         // Find the meshed surface set with the same id
-        Range             cub_surf;
-        const Tag         tags[] = { idTag, dimTag };
+        Range cub_surf;
+        const Tag tags[]             = { idTag, dimTag };
         const void* const tag_vals[] = { &surf_id, &two };
         result = MBI->get_entities_by_type_and_tag( cub_file_set, MBENTITYSET, tags, tag_vals, 2, cub_surf );
         if( MB_SUCCESS != result ) return result;
-        if( 1 != cub_surf.size( ) )
+        if( 1 != cub_surf.size() )
         {
             std::cout << "  Surface " << surf_id << ": no meshed representation found, using CAD representation instead"
                       << std::endl;
@@ -792,7 +792,7 @@ ErrorCode replace_faceted_cgm_surfs( Interface* MBI, const EntityHandle cgm_file
 
         // Get tris that represent the quads of the cub surf
         Range quads;
-        result = MBI->get_entities_by_type( cub_surf.front( ), MBQUAD, quads );
+        result = MBI->get_entities_by_type( cub_surf.front(), MBQUAD, quads );
         if( MB_SUCCESS != result ) return result;
 
         Range cub_tris;
@@ -831,17 +831,17 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
 {
 
     // Get the cgm surfaces
-    ErrorCode         result;
-    const int         two = 2;
+    ErrorCode result;
+    const int two               = 2;
     const void* const two_val[] = { &two };
-    Range             cgm_surfs;
+    Range cgm_surfs;
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, two_val, 1, cgm_surfs );
     if( MB_SUCCESS != result ) return result;
 
     // Get the maximum surface id. This is so that new surfaces do not have
     // duplicate ids.
     int max_surf_id = -1;
-    for( Range::const_iterator i = cgm_surfs.begin( ); i != cgm_surfs.end( ); ++i )
+    for( Range::const_iterator i = cgm_surfs.begin(); i != cgm_surfs.end(); ++i )
     {
         int surf_id;
         result = MBI->tag_get_data( idTag, &( *i ), 1, &surf_id );
@@ -851,14 +851,14 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
     std::cout << "  Maximum surface id=" << max_surf_id << std::endl;
 
     // For each cgm volume, does a cub volume with the same id exist?
-    const int         three = 3;
+    const int three               = 3;
     const void* const three_val[] = { &three };
-    Range             cgm_vols;
+    Range cgm_vols;
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, three_val, 1, cgm_vols );
     if( MB_SUCCESS != result ) return result;
 
     // get the corresponding cub volume
-    for( Range::iterator i = cgm_vols.begin( ); i != cgm_vols.end( ); ++i )
+    for( Range::iterator i = cgm_vols.begin(); i != cgm_vols.end(); ++i )
     {
         int vol_id;
         result = MBI->tag_get_data( idTag, &( *i ), 1, &vol_id );
@@ -867,13 +867,13 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
         std::cout << "  Volume " << vol_id;
 
         // Find the meshed vol set with the same id
-        Range             cub_vol;
-        const Tag         tags[] = { idTag, dimTag };
+        Range cub_vol;
+        const Tag tags[]             = { idTag, dimTag };
         const void* const tag_vals[] = { &vol_id, &three };
         result = MBI->get_entities_by_type_and_tag( cub_file_set, MBENTITYSET, tags, tag_vals, 2, cub_vol );
         assert( MB_SUCCESS == result );
         if( MB_SUCCESS != result ) return result;
-        if( 1 != cub_vol.size( ) )
+        if( 1 != cub_vol.size() )
         {
             std::cout << ": no meshed representation found" << std::endl;
             continue;
@@ -885,14 +885,14 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
 
         // get the mesh elements of the volume.
         Range elems;
-        result = MBI->get_entities_by_type( cub_vol.front( ), MBHEX, elems );
+        result = MBI->get_entities_by_type( cub_vol.front(), MBHEX, elems );
         assert( MB_SUCCESS == result );
         if( MB_SUCCESS != result ) return result;
-        if( debug ) std::cout << "    found " << elems.size( ) << " hex elems" << std::endl;
+        if( debug ) std::cout << "    found " << elems.size() << " hex elems" << std::endl;
 
         // skin the volumes
         Skinner tool( MBI );
-        Range   skin_faces;
+        Range skin_faces;
         result = tool.find_skin( 0, elems, 2, skin_faces, true );
         assert( MB_SUCCESS == result );
         if( MB_SUCCESS != result ) return result;
@@ -911,10 +911,10 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
 
         // get cub child surfaces.
         Range cub_surfs;
-        result = MBI->get_child_meshsets( cub_vol.front( ), cub_surfs );
+        result = MBI->get_child_meshsets( cub_vol.front(), cub_surfs );
         assert( MB_SUCCESS == result );
         if( MB_SUCCESS != result ) return result;
-        for( Range::iterator j = cub_surfs.begin( ); j != cub_surfs.end( ); ++j )
+        for( Range::iterator j = cub_surfs.begin(); j != cub_surfs.end(); ++j )
         {
             int surf_id;
             result = MBI->tag_get_data( idTag, &( *j ), 1, &surf_id );
@@ -926,7 +926,7 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
             // Meshed volumes must have meshed surfaces
-            if( cub_faces.empty( ) )
+            if( cub_faces.empty() )
             {
                 std::cout << "    Surface " << surf_id << ": contains no meshed faces" << std::endl;
                 // return MB_ENTITY_NOT_FOUND;
@@ -935,29 +935,29 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
             Range common_faces = intersect( cub_faces, skin_faces );
             // find the surface faces not on the skin - these are old and need removed
             Range old_faces = subtract( cub_faces, common_faces );
-            result = MBI->remove_entities( *j, old_faces );
+            result          = MBI->remove_entities( *j, old_faces );
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
 
             // remove the common faces from the skin faces
             skin_faces = subtract( skin_faces, common_faces );
             // If no old faces exist we are done
-            if( old_faces.empty( ) ) continue;
-            std::cout << "    Surface " << surf_id << ": " << old_faces.size( ) << " old faces removed" << std::endl;
+            if( old_faces.empty() ) continue;
+            std::cout << "    Surface " << surf_id << ": " << old_faces.size() << " old faces removed" << std::endl;
             // Place the old faces in a new surface, because they may still be adjacent
             // to 3D mesh in another volume. Get the parent vols of the surface.
-            Range             cgm_surf;
-            const Tag         tags2[] = { idTag, dimTag };
+            Range cgm_surf;
+            const Tag tags2[]             = { idTag, dimTag };
             const void* const tag_vals2[] = { &surf_id, &two };
             result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, tags2, tag_vals2, 2, cgm_surf );
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
-            if( 1 != cgm_surf.size( ) )
+            if( 1 != cgm_surf.size() )
             {
                 std::cout << "invalid size" << std::endl;
                 return MB_INVALID_SIZE;
             }
-            EntityHandle cgm_vols2[ 2 ], cub_vols[ 2 ];
+            EntityHandle cgm_vols2[2], cub_vols[2];
             result = MBI->tag_get_data( senseTag, cgm_surf, &cgm_vols2 );
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
@@ -967,18 +967,18 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
             // for the new surf, replace the current volume with the impl compl vol.
             // This is because the faces that no longer exist will become adjacent to
             // the impl compl
-            if( *i == cgm_vols2[ 0 ] )
+            if( *i == cgm_vols2[0] )
             {
-                cgm_vols2[ 0 ] = 0;
-                cub_vols[ 0 ] = 0;
+                cgm_vols2[0] = 0;
+                cub_vols[0]  = 0;
             }
-            if( *i == cgm_vols2[ 1 ] )
+            if( *i == cgm_vols2[1] )
             {
-                cgm_vols2[ 1 ] = 0;
-                cub_vols[ 1 ] = 0;
+                cgm_vols2[1] = 0;
+                cub_vols[1]  = 0;
             }
             // If both sides of the surface are the impl comp, do not create the surface.
-            if( 0 == cgm_vols2[ 0 ] && 0 == cgm_vols2[ 1 ] )
+            if( 0 == cgm_vols2[0] && 0 == cgm_vols2[1] )
             {
                 std::cout << "    New surface was not created for old faces because both parents "
                              "are impl_compl volume "
@@ -988,11 +988,11 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
             // build the new surface.
             EntityHandle new_cgm_surf, new_cub_surf;
             ++max_surf_id;
-            result = build_new_surface( MBI, new_cgm_surf, cgm_vols2[ 0 ], cgm_vols2[ 1 ], max_surf_id, dimTag, idTag,
+            result = build_new_surface( MBI, new_cgm_surf, cgm_vols2[0], cgm_vols2[1], max_surf_id, dimTag, idTag,
                                         categoryTag, senseTag );
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
-            result = build_new_surface( MBI, new_cub_surf, cub_vols[ 0 ], cub_vols[ 1 ], max_surf_id, dimTag, idTag,
+            result = build_new_surface( MBI, new_cub_surf, cub_vols[0], cub_vols[1], max_surf_id, dimTag, idTag,
                                         categoryTag, senseTag );
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
@@ -1008,7 +1008,7 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
             assert( MB_SUCCESS == result );
             if( MB_SUCCESS != result ) return result;
 
-            std::cout << "    Surface " << max_surf_id << ": created for " << old_faces.size( ) << " old faces"
+            std::cout << "    Surface " << max_surf_id << ": created for " << old_faces.size() << " old faces"
                       << std::endl;
         }
 
@@ -1016,8 +1016,8 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
         Range new_faces = skin_faces;
 
         // new skin faces must be assigned to a surface
-        if( new_faces.empty( ) ) continue;
-        std::cout << "    Surface " << max_surf_id + 1 << ": created for " << new_faces.size( ) << " new faces"
+        if( new_faces.empty() ) continue;
+        std::cout << "    Surface " << max_surf_id + 1 << ": created for " << new_faces.size() << " new faces"
                   << std::endl;
 
         // Ensure that faces are oriented outwards
@@ -1031,7 +1031,7 @@ ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_f
         result = build_new_surface( MBI, new_cgm_surf, *i, 0, max_surf_id, dimTag, idTag, categoryTag, senseTag );
         assert( MB_SUCCESS == result );
         if( MB_SUCCESS != result ) return result;
-        result = build_new_surface( MBI, new_cub_surf, cub_vol.front( ), 0, max_surf_id, dimTag, idTag, categoryTag,
+        result = build_new_surface( MBI, new_cub_surf, cub_vol.front(), 0, max_surf_id, dimTag, idTag, categoryTag,
                                     senseTag );
         assert( MB_SUCCESS == result );
         if( MB_SUCCESS != result ) return result;
@@ -1064,8 +1064,8 @@ int is_acis_bin_file( FILE* file );
 int is_occ_brep_file( FILE* file );
 
 double DEFAULT_DISTANCE = 0.001;
-double DEFAULT_LEN = 0.0;
-int    DEFAULT_NORM = 5;
+double DEFAULT_LEN      = 0.0;
+int DEFAULT_NORM        = 5;
 
 // load cub file
 // load cgm file
@@ -1091,18 +1091,18 @@ int    DEFAULT_NORM = 5;
 // remove empty surfaces and volumes due to dead elements
 int main( int argc, char* argv[] )
 {
-    clock_t start_time = clock( );
+    clock_t start_time = clock();
 
-    const bool  debug = false;
+    const bool debug      = false;
     const char* file_type = NULL;
 
-    const char* cub_name = 0;
-    const char* exo_name = 0;
-    const char* out_name = 0;
+    const char* cub_name  = 0;
+    const char* exo_name  = 0;
+    const char* out_name  = 0;
     const char* time_step = 0;
-    const char* sat_name = 0;
-    double      dist_tol = 0.001, len_tol = 0.0;
-    int         norm_tol = 5;
+    const char* sat_name  = 0;
+    double dist_tol = 0.001, len_tol = 0.0;
+    int norm_tol = 5;
 
     if( 6 != argc && 9 != argc )
     {
@@ -1117,21 +1117,21 @@ int main( int argc, char* argv[] )
 
     // check filenames for proper suffix
     std::string temp;
-    cub_name = argv[ 1 ];
+    cub_name = argv[1];
     temp.assign( cub_name );
     if( std::string::npos == temp.find( ".cub" ) )
     {
         std::cerr << "cub_file does not have correct suffix" << std::endl;
         return 1;
     }
-    sat_name = argv[ 2 ];  // needed because the cub file's embedded sat file does not have groups
+    sat_name = argv[2];  // needed because the cub file's embedded sat file does not have groups
     temp.assign( sat_name );
     if( std::string::npos == temp.find( ".sat" ) )
     {
         std::cerr << "sat_file does not have correct suffix" << std::endl;
         return 1;
     }
-    out_name = argv[ 4 ];
+    out_name = argv[4];
     temp.assign( out_name );
     if( std::string::npos == temp.find( ".h5m" ) )
     {
@@ -1140,7 +1140,7 @@ int main( int argc, char* argv[] )
     }
 
     // get the facet tolerance
-    dist_tol = atof( argv[ 3 ] );
+    dist_tol = atof( argv[3] );
     if( 0 > dist_tol || 1 < dist_tol )
     {
         std::cout << "error: facet_tolerance=" << dist_tol << std::endl;
@@ -1151,14 +1151,14 @@ int main( int argc, char* argv[] )
     bool update_coords = false;
     if( 9 == argc )
     {
-        exo_name = argv[ 5 ];
+        exo_name = argv[5];
         temp.assign( exo_name );
         if( std::string::npos == temp.find( ".e" ) )
         {
             std::cerr << "e_file does not have correct suffix" << std::endl;
             return 1;
         }
-        time_step = argv[ 6 ];
+        time_step     = argv[6];
         update_coords = true;
     }
 
@@ -1166,7 +1166,7 @@ int main( int argc, char* argv[] )
     bool determine_volume_change = false;
     if( 9 == argc )
     {
-        temp.assign( argv[ 7 ] );
+        temp.assign( argv[7] );
         if( std::string::npos != temp.find( "true" ) ) determine_volume_change = true;
     }
 
@@ -1174,12 +1174,12 @@ int main( int argc, char* argv[] )
     bool conserve_mass = false;
     if( 9 == argc )
     {
-        temp.assign( argv[ 8 ] );
+        temp.assign( argv[8] );
         if( std::string::npos != temp.find( "true" ) ) conserve_mass = true;
     }
     else if( 6 == argc )
     {
-        temp.assign( argv[ 5 ] );
+        temp.assign( argv[5] );
         if( std::string::npos != temp.find( "true" ) ) conserve_mass = true;
     }
 
@@ -1195,8 +1195,8 @@ int main( int argc, char* argv[] )
     }
 
     // Read the mesh from the cub file with Tqcdfr
-    Core*        MBI = new Core( );
-    ErrorCode    result;
+    Core* MBI = new Core();
+    ErrorCode result;
     EntityHandle cub_file_set;
     result = MBI->create_meshset( 0, cub_file_set );
     if( MB_SUCCESS != result ) return result;
@@ -1214,7 +1214,7 @@ int main( int argc, char* argv[] )
     std::cout << "Mesh file read." << std::endl;
 
     // Read the ACIS file with ReadCGM
-    char cgm_options[ 256 ];
+    char cgm_options[256];
     std::cout << "  facet tolerance=" << dist_tol << std::endl;
     sprintf( cgm_options,
              "CGM_ATTRIBS=yes;FACET_DISTANCE_TOLERANCE=%g;FACET_NORMAL_TOLERANCE=%d;MAX_FACET_EDGE_"
@@ -1235,7 +1235,7 @@ int main( int argc, char* argv[] )
     Tag dimTag, idTag, categoryTag, senseTag, sizeTag, nameTag;
     result = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dimTag, MB_TAG_SPARSE | MB_TAG_CREAT );
     if( MB_SUCCESS != result ) return result;
-    idTag = MBI->globalId_tag( );
+    idTag  = MBI->globalId_tag();
     result = MBI->tag_get_handle( CATEGORY_TAG_NAME, CATEGORY_TAG_SIZE, MB_TYPE_OPAQUE, categoryTag,
                                   MB_TAG_SPARSE | MB_TAG_CREAT );
     if( MB_SUCCESS != result ) return result;
@@ -1255,27 +1255,27 @@ int main( int argc, char* argv[] )
     std::cout << "Fixed CAD surface senses to match meshed surface senses." << std::endl;
 
     // Get the 3D elements in the cub file and measure their volume.
-    Range                 orig_elems;
+    Range orig_elems;
     std::vector< double > orig_size;
     if( determine_volume_change )
     {
         result = MBI->get_entities_by_dimension( 0, 3, orig_elems );
         if( MB_SUCCESS != result ) return result;
-        orig_size.resize( orig_elems.size( ) );
-        for( unsigned int i = 0; i < orig_elems.size( ); ++i )
+        orig_size.resize( orig_elems.size() );
+        for( unsigned int i = 0; i < orig_elems.size(); ++i )
         {
-            orig_size[ i ] = measure( MBI, orig_elems[ i ] );
+            orig_size[i] = measure( MBI, orig_elems[i] );
         }
     }
 
     // Before updating the nodes and removing dead elements, force the cub volume
     // sets to track ownership so that dead elements will be deleted from the sets.
-    const int         three = 3;
+    const int three               = 3;
     const void* const three_val[] = { &three };
-    Range             cub_vols;
+    Range cub_vols;
     result = MBI->get_entities_by_type_and_tag( cub_file_set, MBENTITYSET, &dimTag, three_val, 1, cub_vols );
     if( MB_SUCCESS != result ) return result;
-    for( Range::const_iterator i = cub_vols.begin( ); i != cub_vols.end( ); ++i )
+    for( Range::const_iterator i = cub_vols.begin(); i != cub_vols.end(); ++i )
     {
         result = MBI->set_meshset_options( *i, MESHSET_TRACK_OWNER );
         if( MB_SUCCESS != result ) return result;
@@ -1286,10 +1286,10 @@ int main( int argc, char* argv[] )
     result = MBI->get_entities_by_type_and_tag( cgm_file_set, MBENTITYSET, &dimTag, three_val, 1, vol_sets );
     if( MB_SUCCESS != result ) return result;
 
-    moab::GeomTopoTool  gtt = moab::GeomTopoTool( MBI, false );
+    moab::GeomTopoTool gtt  = moab::GeomTopoTool( MBI, false );
     moab::GeomQueryTool gqt = moab::GeomQueryTool( &gtt );
 
-    for( Range::const_iterator i = vol_sets.begin( ); i != vol_sets.end( ); ++i )
+    for( Range::const_iterator i = vol_sets.begin(); i != vol_sets.end(); ++i )
     {
         double size;
         result = gqt.measure_volume( *i, size );
@@ -1310,7 +1310,7 @@ int main( int argc, char* argv[] )
     if( update_coords )
     {
         // ReadNCDF my_ex_reader(MBI);
-        char exo_options[ 120 ] = "tdata=coord,";
+        char exo_options[120] = "tdata=coord,";
         strcat( exo_options, time_step );
         strcat( exo_options, ",set" );
         // FileOptions exo_opts(exo_options)  ;
@@ -1339,19 +1339,19 @@ int main( int argc, char* argv[] )
 
         // Determine the volume of the elements now that a deformation has been
         // applied. Condense the original array by removing dead elements.
-        double* orig_size_condensed = new double[ defo_elems.size( ) ];
-        double* defo_size_condensed = new double[ defo_elems.size( ) ];
-        int     j = 0;
-        for( unsigned int i = 0; i < orig_elems.size( ); ++i )
+        double* orig_size_condensed = new double[defo_elems.size()];
+        double* defo_size_condensed = new double[defo_elems.size()];
+        int j                       = 0;
+        for( unsigned int i = 0; i < orig_elems.size(); ++i )
         {
-            if( orig_elems[ i ] == defo_elems[ j ] )
+            if( orig_elems[i] == defo_elems[j] )
             {
-                orig_size_condensed[ j ] = orig_size[ i ];
-                defo_size_condensed[ j ] = measure( MBI, defo_elems[ j ] );
+                orig_size_condensed[j] = orig_size[i];
+                defo_size_condensed[j] = measure( MBI, defo_elems[j] );
                 ++j;
             }
         }
-        generate_plots( orig_size_condensed, defo_size_condensed, defo_elems.size( ), std::string( time_step ) );
+        generate_plots( orig_size_condensed, defo_size_condensed, defo_elems.size(), std::string( time_step ) );
         delete[] orig_size_condensed;  // can't use the same delete[] for both
         delete[] defo_size_condensed;
     }
@@ -1393,7 +1393,7 @@ int main( int argc, char* argv[] )
     }
     std::cout << "Saved output file for mesh-based analysis." << std::endl;
 
-    clock_t end_time = clock( );
+    clock_t end_time = clock();
     std::cout << "  " << (double)( end_time - start_time ) / CLOCKS_PER_SEC << " seconds" << std::endl;
     std::cout << std::endl;
 
@@ -1402,7 +1402,7 @@ int main( int argc, char* argv[] )
 
 const char* get_geom_file_type( const char* name )
 {
-    FILE*       file;
+    FILE* file;
     const char* result = 0;
 
     file = fopen( name, "r" );
@@ -1418,11 +1418,11 @@ const char* get_geom_file_type( const char* name )
 const char* get_geom_fptr_type( FILE* file )
 {
     static const char* CUBIT_NAME = GF_CUBIT_FILE_TYPE;
-    static const char* STEP_NAME = GF_STEP_FILE_TYPE;
-    static const char* IGES_NAME = GF_IGES_FILE_TYPE;
-    static const char* SAT_NAME = GF_ACIS_TXT_FILE_TYPE;
-    static const char* SAB_NAME = GF_ACIS_BIN_FILE_TYPE;
-    static const char* BREP_NAME = GF_OCC_BREP_FILE_TYPE;
+    static const char* STEP_NAME  = GF_STEP_FILE_TYPE;
+    static const char* IGES_NAME  = GF_IGES_FILE_TYPE;
+    static const char* SAT_NAME   = GF_ACIS_TXT_FILE_TYPE;
+    static const char* SAB_NAME   = GF_ACIS_BIN_FILE_TYPE;
+    static const char* BREP_NAME  = GF_OCC_BREP_FILE_TYPE;
 
     if( is_cubit_file( file ) )
         return CUBIT_NAME;
@@ -1442,32 +1442,32 @@ const char* get_geom_fptr_type( FILE* file )
 
 int is_cubit_file( FILE* file )
 {
-    unsigned char buffer[ 4 ];
+    unsigned char buffer[4];
     return !fseek( file, 0, SEEK_SET ) && fread( buffer, 4, 1, file ) && !memcmp( buffer, "CUBE", 4 );
 }
 
 int is_step_file( FILE* file )
 {
-    unsigned char buffer[ 9 ];
+    unsigned char buffer[9];
     return !fseek( file, 0, SEEK_SET ) && fread( buffer, 9, 1, file ) && !memcmp( buffer, "ISO-10303", 9 );
 }
 
 int is_iges_file( FILE* file )
 {
-    unsigned char buffer[ 10 ];
+    unsigned char buffer[10];
     return !fseek( file, 72, SEEK_SET ) && fread( buffer, 10, 1, file ) && !memcmp( buffer, "S      1\r\n", 10 );
 }
 
 int is_acis_bin_file( FILE* file )
 {
-    char buffer[ 15 ];
+    char buffer[15];
     return !fseek( file, 0, SEEK_SET ) && fread( buffer, 15, 1, file ) && !memcmp( buffer, "ACIS BinaryFile", 9 );
 }
 
 int is_acis_txt_file( FILE* file )
 {
-    char buffer[ 5 ];
-    int  version, length;
+    char buffer[5];
+    int version, length;
 
     if( fseek( file, 0, SEEK_SET ) || 2 != fscanf( file, "%d %*d %*d %*d %d ", &version, &length ) ) return 0;
 
@@ -1484,6 +1484,6 @@ int is_acis_txt_file( FILE* file )
 
 int is_occ_brep_file( FILE* file )
 {
-    unsigned char buffer[ 6 ];
+    unsigned char buffer[6];
     return !fseek( file, 0, SEEK_SET ) && fread( buffer, 6, 1, file ) && !memcmp( buffer, "DBRep_", 6 );
 }

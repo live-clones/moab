@@ -33,14 +33,14 @@
 
 #include <ieeefp.h>
 
-bool MBMesquite::MsqFPE::fpe_trap_supported( )
+bool MBMesquite::MsqFPE::fpe_trap_supported()
 {
     return true;
 }
 
-int MBMesquite::MsqFPE::get_current_fpe_state( )
+int MBMesquite::MsqFPE::get_current_fpe_state()
 {
-    return fpgetmask( );
+    return fpgetmask();
 }
 
 void MBMesquite::MsqFPE::set_current_fpe_state( int state )
@@ -48,9 +48,9 @@ void MBMesquite::MsqFPE::set_current_fpe_state( int state )
     fpsetmask( state );
 }
 
-void MBMesquite::MsqFPE::enable_trap_fpe( )
+void MBMesquite::MsqFPE::enable_trap_fpe()
 {
-    fpsetmask( fpgetmask( ) | FP_X_INV | FP_X_OFL | FP_X_DZ );
+    fpsetmask( fpgetmask() | FP_X_INV | FP_X_OFL | FP_X_DZ );
 }
 
 /* Next try GNU-C feenableexcept mechanism */
@@ -67,14 +67,14 @@ void MBMesquite::MsqFPE::enable_trap_fpe( )
 #undef MSQ_SET_GNU_SOURCE
 #endif
 
-bool MBMesquite::MsqFPE::fpe_trap_supported( )
+bool MBMesquite::MsqFPE::fpe_trap_supported()
 {
     return true;
 }
 
-int MBMesquite::MsqFPE::get_current_fpe_state( )
+int MBMesquite::MsqFPE::get_current_fpe_state()
 {
-    return fegetexcept( );
+    return fegetexcept();
 }
 
 void MBMesquite::MsqFPE::set_current_fpe_state( int state )
@@ -82,7 +82,7 @@ void MBMesquite::MsqFPE::set_current_fpe_state( int state )
     feenableexcept( state );
 }
 
-void MBMesquite::MsqFPE::enable_trap_fpe( )
+void MBMesquite::MsqFPE::enable_trap_fpe()
 {
     const int flags = FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW;
     feclearexcept( flags );
@@ -95,12 +95,12 @@ void MBMesquite::MsqFPE::enable_trap_fpe( )
 
 #include <float.h>
 
-bool MBMesquite::MsqFPE::fpe_trap_supported( )
+bool MBMesquite::MsqFPE::fpe_trap_supported()
 {
     return true;
 }
 
-int MBMesquite::MsqFPE::get_current_fpe_state( )
+int MBMesquite::MsqFPE::get_current_fpe_state()
 {
     return _controlfp( 0, 0 );
 }
@@ -110,7 +110,7 @@ void MBMesquite::MsqFPE::set_current_fpe_state( int state )
     _controlfp( state, _MCW_EM );
 }
 
-void MBMesquite::MsqFPE::enable_trap_fpe( )
+void MBMesquite::MsqFPE::enable_trap_fpe()
 {
     const int flags = _EM_ZERODIVIDE | _EM_INVALID | _EM_OVERFLOW;
     _controlfp( ~flags, _MCW_EM );
@@ -119,19 +119,19 @@ void MBMesquite::MsqFPE::enable_trap_fpe( )
 /* Unsupported platform */
 #else
 
-bool MBMesquite::MsqFPE::fpe_trap_supported( )
+bool MBMesquite::MsqFPE::fpe_trap_supported()
 {
     return false;
 }
 
-int MBMesquite::MsqFPE::get_current_fpe_state( )
+int MBMesquite::MsqFPE::get_current_fpe_state()
 {
     return 0;
 }
 
 void MBMesquite::MsqFPE::set_current_fpe_state( int ) {}
 
-void MBMesquite::MsqFPE::enable_trap_fpe( ) {}
+void MBMesquite::MsqFPE::enable_trap_fpe() {}
 
 #endif
 
@@ -139,12 +139,12 @@ MBMesquite::MsqFPE::MsqFPE( bool enabled ) : isEnabled( enabled )
 {
     if( isEnabled )
     {
-        prevState = get_current_fpe_state( );
-        enable_trap_fpe( );
+        prevState = get_current_fpe_state();
+        enable_trap_fpe();
     }
 }
 
-MBMesquite::MsqFPE::~MsqFPE( )
+MBMesquite::MsqFPE::~MsqFPE()
 {
     if( isEnabled ) { set_current_fpe_state( prevState ); }
 }

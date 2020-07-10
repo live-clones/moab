@@ -58,9 +58,9 @@ using namespace MBMesquite;
 
 static int print_iGeom_error( const char* desc, int err, iGeom_Instance geom, const char* file, int line )
 {
-    char buffer[ 1024 ];
+    char buffer[1024];
     iGeom_getDescription( geom, buffer, sizeof( buffer ) );
-    buffer[ sizeof( buffer ) - 1 ] = '\0';
+    buffer[sizeof( buffer ) - 1] = '\0';
 
     std::cerr << "ERROR: " << desc << std::endl
               << "  Error code: " << err << std::endl
@@ -72,9 +72,9 @@ static int print_iGeom_error( const char* desc, int err, iGeom_Instance geom, co
 
 static int print_iMesh_error( const char* desc, int err, iMesh_Instance mesh, const char* file, int line )
 {
-    char buffer[ 1024 ];
+    char buffer[1024];
     iMesh_getDescription( mesh, buffer, sizeof( buffer ) );
-    buffer[ sizeof( buffer ) - 1 ] = '\0';
+    buffer[sizeof( buffer ) - 1] = '\0';
 
     std::cerr << "ERROR: " << desc << std::endl
               << "  Error code: " << err << std::endl
@@ -90,7 +90,7 @@ static int print_iMesh_error( const char* desc, int err, iMesh_Instance mesh, co
 #define CHECK_IMESH( STR ) \
     if( err != iBase_SUCCESS ) return print_iMesh_error( STR, err, instance, __FILE__, __LINE__ )
 
-const std::string default_file_name = std::string( MESH_DIR ) + std::string( "/surfrandomtris-4part.h5m" );
+const std::string default_file_name          = std::string( MESH_DIR ) + std::string( "/surfrandomtris-4part.h5m" );
 const std::string default_geometry_file_name = std::string( MESH_DIR ) + std::string( "/surfrandom.facet" );
 
 std::vector< double > solution_indicator;
@@ -120,7 +120,7 @@ int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err
 bool file_exists( const std::string& name )
 {
     struct stat buffer;
-    return ( stat( name.c_str( ), &buffer ) == 0 );
+    return ( stat( name.c_str(), &buffer ) == 0 );
 }
 
 int main( int argc, char* argv[] )
@@ -128,8 +128,8 @@ int main( int argc, char* argv[] )
     MBMesquite::MsqPrintError err( cout );
     // command line arguments
     std::string file_name, geometry_file_name;
-    bool        use_native = false;
-    int         dimension = 2;
+    bool use_native = false;
+    int dimension   = 2;
 
 #ifdef MOAB_HAVE_MPI
 //  MPI_Init(&argc, &argv);
@@ -148,9 +148,9 @@ int main( int argc, char* argv[] )
 
     opts.parseCommandLine( argc, argv );
 
-    if( !geometry_file_name.length( ) )
+    if( !geometry_file_name.length() )
     {
-        file_name = default_file_name;
+        file_name          = default_file_name;
         geometry_file_name = default_geometry_file_name;
         cout << "No file specified: Using defaults.\n";
     }
@@ -163,19 +163,19 @@ int main( int argc, char* argv[] )
 
     //  PlanarDomain plane( PlanarDomain::XY );
     MeshDomain* plane;
-    int         ierr;
+    int ierr;
     if( !file_exists( geometry_file_name ) ) geometry_file_name = "";
-    ierr = get_itaps_domain( &plane, geometry_file_name.c_str( ) );  // MB_CHK_ERR(ierr);
+    ierr = get_itaps_domain( &plane, geometry_file_name.c_str() );  // MB_CHK_ERR(ierr);
 
     // Try running a global smoother on the mesh
     Mesh* mesh = 0;
     if( use_native )
     {
-        ierr = get_native_mesh( &mesh, file_name.c_str( ), dimension );  // MB_CHK_ERR(ierr);
+        ierr = get_native_mesh( &mesh, file_name.c_str(), dimension );  // MB_CHK_ERR(ierr);
     }
     else
     {
-        ierr = get_imesh_mesh( &mesh, file_name.c_str( ), dimension );  // MB_CHK_ERR(ierr);
+        ierr = get_imesh_mesh( &mesh, file_name.c_str(), dimension );  // MB_CHK_ERR(ierr);
     }
 
     if( !mesh )
@@ -253,8 +253,8 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
 {
     // double OF_value = 1e-6;
 
-    Mesh*       mesh = mesh_and_domain.get_mesh( );
-    MeshDomain* domain = mesh_and_domain.get_domain( );
+    Mesh* mesh         = mesh_and_domain.get_mesh();
+    MeshDomain* domain = mesh_and_domain.get_domain();
 
     // creates an intruction queue
     InstructionQueue queue1;
@@ -278,9 +278,9 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
     // ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
     // FeasibleNewton* pass1 = new FeasibleNewton( obj_func );
     SteepestDescent* pass1 = new SteepestDescent( obj_func );
-    pass1->use_element_on_vertex_patch( );
-    pass1->do_block_coordinate_descent_optimization( );
-    pass1->use_global_patch( );
+    pass1->use_element_on_vertex_patch();
+    pass1->do_block_coordinate_descent_optimization();
+    pass1->use_global_patch();
     if( err ) return 1;
 
     QualityAssessor stop_qa( mean_ratio );
@@ -329,7 +329,7 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
 int write_vtk_mesh( Mesh* mesh, const char* filename )
 {
     moab::Interface* mbi =
-        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance( ) )->mbImpl;
+        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance() )->mbImpl;
 
     mbi->write_file( filename );
 
@@ -339,18 +339,18 @@ int write_vtk_mesh( Mesh* mesh, const char* filename )
 int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value );
 int run_local_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double OF_value )
 {
-    Mesh*            mesh = mesh_and_domain.get_mesh( );
+    Mesh* mesh = mesh_and_domain.get_mesh();
     moab::Interface* mbi =
-        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance( ) )->mbImpl;
+        reinterpret_cast< MBiMesh* >( dynamic_cast< MsqIMesh* >( mesh )->get_imesh_instance() )->mbImpl;
 
-    moab::Tag       fixed;
+    moab::Tag fixed;
     moab::ErrorCode rval = mbi->tag_get_handle( "fixed", 1, moab::MB_TYPE_INTEGER, fixed );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
     moab::Range cells;
     rval = mbi->get_entities_by_dimension( 0, 2, cells );MB_CHK_SET_ERR( rval, "Querying elements failed" );
 
     moab::LloydSmoother lloyd( mbi, 0, cells, 0, 0 /*fixed*/ );
 
-    lloyd.perform_smooth( );
+    lloyd.perform_smooth();
 
     // run_local_smoother2(mesh_and_domain, err, OF_value);
 
@@ -367,15 +367,15 @@ int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
 {
     // double OF_value = 1e-5;
 
-    Mesh*       mesh = mesh_and_domain.get_mesh( );
-    MeshDomain* domain = mesh_and_domain.get_domain( );
+    Mesh* mesh         = mesh_and_domain.get_mesh();
+    MeshDomain* domain = mesh_and_domain.get_domain();
 
     // creates an intruction queue
     InstructionQueue queue1;
 
     // creates a mean ratio quality metric ...
     // IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
-    ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric( );
+    ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric();
     // VertexConditionNumberQualityMetric* mean_ratio = new VertexConditionNumberQualityMetric();
     if( err ) return 1;
     //  mean_ratio->set_gradient_type(QualityMetric::NUMERICAL_GRADIENT);
@@ -389,8 +389,8 @@ int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
 
     if( false )
     {
-        InstructionQueue     qtmp;
-        Randomize            rand( -0.005 );
+        InstructionQueue qtmp;
+        Randomize rand( -0.005 );
         TerminationCriterion sc_rand;
         sc_rand.add_iteration_limit( 2 );
         rand.set_outer_termination_criterion( &sc_rand );
@@ -449,22 +449,22 @@ int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
 
 int run_quality_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err )
 {
-    Mesh*       mesh = mesh_and_domain.get_mesh( );
-    MeshDomain* domain = mesh_and_domain.get_domain( );
+    Mesh* mesh         = mesh_and_domain.get_mesh();
+    MeshDomain* domain = mesh_and_domain.get_domain();
 
     // creates an intruction queue
     InstructionQueue q;
 
     // do optimization
-    const double     eps = 0.01;
+    const double eps = 0.01;
     IdealShapeTarget w;
-    TShapeB1         mu;
-    TQualityMetric   metric( &w, &mu );
-    PMeanPTemplate   func( 1.0, &metric );
+    TShapeB1 mu;
+    TQualityMetric metric( &w, &mu );
+    PMeanPTemplate func( 1.0, &metric );
 
     SteepestDescent solver( &func );
-    solver.use_element_on_vertex_patch( );
-    solver.do_jacobi_optimization( );
+    solver.use_element_on_vertex_patch();
+    solver.do_jacobi_optimization();
 
     TerminationCriterion inner, outer;
     inner.add_absolute_vertex_movement( 0.5 * eps );
@@ -502,15 +502,15 @@ int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err
 {
     double OF_value = 0.01;
 
-    Mesh*       mesh = mesh_and_domain.get_mesh( );
-    MeshDomain* domain = mesh_and_domain.get_domain( );
+    Mesh* mesh         = mesh_and_domain.get_mesh();
+    MeshDomain* domain = mesh_and_domain.get_domain();
 
     // creates an intruction queue
     InstructionQueue queue1;
 
     // creates a mean ratio quality metric ...
     // IdealWeightInverseMeanRatio* mean_ratio = new IdealWeightInverseMeanRatio(err);
-    ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric( );
+    ConditionNumberQualityMetric* mean_ratio = new ConditionNumberQualityMetric();
     // VertexConditionNumberQualityMetric* mean_ratio = new VertexConditionNumberQualityMetric();
     // AspectRatioGammaQualityMetric* mean_ratio = new AspectRatioGammaQualityMetric();
 
@@ -532,7 +532,7 @@ int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err
     ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
     // QuasiNewton* pass1 = new QuasiNewton( obj_func );
     // FeasibleNewton* pass1 = new FeasibleNewton( obj_func );
-    pass1->use_global_patch( );
+    pass1->use_global_patch();
 
     QualityAssessor stop_qa( mean_ratio );
 
@@ -578,7 +578,7 @@ int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err
 
 int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimension )
 {
-    int            err;
+    int err;
     iMesh_Instance instance = 0;
     iMesh_newMesh( NULL, &instance, &err, 0 );
     CHECK_IMESH( "Creation of mesh instance failed" );
@@ -602,26 +602,26 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
         // get all vertices and cells
         // make tag to specify fixed vertices, since it's input to the algorithm; use a default
         // value of non-fixed so we only need to set the fixed tag for skin vertices
-        moab::Interface*   mbi = reinterpret_cast< MBiMesh* >( instance )->mbImpl;
+        moab::Interface* mbi       = reinterpret_cast< MBiMesh* >( instance )->mbImpl;
         moab::EntityHandle currset = 0;
-        moab::Tag          fixed;
-        int                def_val = 0;
-        err = 0;
+        moab::Tag fixed;
+        int def_val          = 0;
+        err                  = 0;
         moab::ErrorCode rval = mbi->tag_get_handle( "fixed", 1, moab::MB_TYPE_INTEGER, fixed,
                                                     moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
         moab::Range verts, cells, skin_verts;
         rval = mbi->get_entities_by_type( currset, moab::MBVERTEX, verts );MB_CHK_SET_ERR( rval, "Querying vertices failed" );
         rval = mbi->get_entities_by_dimension( currset, dimension, cells );MB_CHK_SET_ERR( rval, "Querying elements failed" );
-        std::cout << "Found " << verts.size( ) << " vertices and " << cells.size( ) << " elements" << std::endl;
+        std::cout << "Found " << verts.size() << " vertices and " << cells.size() << " elements" << std::endl;
 
         moab::Skinner skinner( mbi );
         rval = skinner.find_skin( currset, cells, true, skin_verts );MB_CHK_SET_ERR( rval,
                         "Finding the skin of the mesh failed" );  // 'true' param indicates we want
                                                                   // vertices back, not cells
 
-        std::vector< int > fix_tag( skin_verts.size( ), 1 );  // initialized to 1 to indicate fixed
-        rval = mbi->tag_set_data( fixed, skin_verts, &fix_tag[ 0 ] );MB_CHK_SET_ERR( rval, "Setting tag data failed" );
-        std::cout << "Found " << skin_verts.size( ) << " vertices on the skin of the domain." << std::endl;
+        std::vector< int > fix_tag( skin_verts.size(), 1 );  // initialized to 1 to indicate fixed
+        rval = mbi->tag_set_data( fixed, skin_verts, &fix_tag[0] );MB_CHK_SET_ERR( rval, "Setting tag data failed" );
+        std::cout << "Found " << skin_verts.size() << " vertices on the skin of the domain." << std::endl;
 
         // fix_tag.resize(verts.size(),0);
         // rval = mbi->tag_get_data(fixed, verts, &fix_tag[0]); MB_CHK_SET_ERR(rval, "Getting tag
@@ -632,25 +632,26 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
 
         // Set some arbitrary solution indicator
         moab::Tag solindTag;
-        double    def_val_dbl = 0.0;
-        rval = mbi->tag_get_handle( "solution_indicator", 1, moab::MB_TYPE_DOUBLE, solindTag,
+        double def_val_dbl = 0.0;
+        rval               = mbi->tag_get_handle( "solution_indicator", 1, moab::MB_TYPE_DOUBLE, solindTag,
                                     moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val_dbl );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
-        solution_indicator.resize( cells.size( ), 0.01 );
-        for( unsigned i = 0; i < cells.size( ) / 4; i++ )
-            solution_indicator[ i ] = 0.1;
-        for( unsigned i = cells.size( ) / 4; i < 2 * cells.size( ) / 4; i++ )
-            solution_indicator[ i ] = 0.5;
-        for( unsigned i = 2 * cells.size( ) / 4; i < 3 * cells.size( ) / 4; i++ )
-            solution_indicator[ i ] = 0.5;
-        for( unsigned i = 3 * cells.size( ) / 4; i < cells.size( ); i++ )
-            solution_indicator[ i ] = 0.5;
+        solution_indicator.resize( cells.size(), 0.01 );
+        for( unsigned i = 0; i < cells.size() / 4; i++ )
+            solution_indicator[i] = 0.1;
+        for( unsigned i = cells.size() / 4; i < 2 * cells.size() / 4; i++ )
+            solution_indicator[i] = 0.5;
+        for( unsigned i = 2 * cells.size() / 4; i < 3 * cells.size() / 4; i++ )
+            solution_indicator[i] = 0.5;
+        for( unsigned i = 3 * cells.size() / 4; i < cells.size(); i++ )
+            solution_indicator[i] = 0.5;
 
-        rval = mbi->tag_set_data( solindTag, cells, &solution_indicator[ 0 ] );MB_CHK_SET_ERR( rval, "Setting tag data failed" );
+        rval = mbi->tag_set_data( solindTag, cells, &solution_indicator[0] );MB_CHK_SET_ERR( rval, "Setting tag data failed" );
     }
 
-    MsqError              ierr;
-    MBMesquite::MsqIMesh* imesh = new MBMesquite::MsqIMesh(
-        instance, root_set, ( dimension == 3 ? iBase_REGION : iBase_FACE ), ierr, &fixed_tag );
+    MsqError ierr;
+    MBMesquite::MsqIMesh* imesh =
+        new MBMesquite::MsqIMesh( instance, root_set, ( dimension == 3 ? iBase_REGION : iBase_FACE ), ierr,
+                                  &fixed_tag );
     if( MSQ_CHKERR( ierr ) )
     {
         delete imesh;
@@ -666,8 +667,8 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
 
 int get_native_mesh( MBMesquite::Mesh** mesh, const char* file_name, int )
 {
-    MsqError              err;
-    MBMesquite::MeshImpl* imesh = new MBMesquite::MeshImpl( );
+    MsqError err;
+    MBMesquite::MeshImpl* imesh = new MBMesquite::MeshImpl();
     imesh->read_vtk( file_name, err );
     if( err )
     {
@@ -688,7 +689,7 @@ int get_itaps_domain( MeshDomain** odomain, const char* filename )
         return 0;
     }
 
-    int            err;
+    int err;
     iGeom_Instance geom;
     iGeom_newGeom( "", &geom, &err, 0 );
     CHECK_IGEOM( "ERROR: iGeom creation failed" );
@@ -707,30 +708,30 @@ int get_itaps_domain( MeshDomain** odomain, const char* filename )
     // print out the number of entities
     std::cout << "Model contents: " << std::endl;
     const char* gtype[] = { "vertices: ", "edges: ", "faces: ", "regions: " };
-    int         nents[ 4 ];
+    int nents[4];
     for( int i = 0; i <= 3; ++i )
     {
-        iGeom_getNumOfType( geom, root_set, i, &nents[ i ], &err );
+        iGeom_getNumOfType( geom, root_set, i, &nents[i], &err );
         CHECK_IGEOM( "Error: problem getting entities after gLoad." );
-        std::cout << gtype[ i ] << nents[ i ] << std::endl;
+        std::cout << gtype[i] << nents[i] << std::endl;
     }
 
     iBase_EntityHandle* hd_geom_ents;
-    int                 csize = 0, sizealloc = 0;
-    if( nents[ 3 ] > 0 )
+    int csize = 0, sizealloc = 0;
+    if( nents[3] > 0 )
     {
-        hd_geom_ents = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * nents[ 2 ] );
-        csize = nents[ 2 ];
+        hd_geom_ents = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * nents[2] );
+        csize        = nents[2];
         iGeom_getEntities( geom, root_set, 2, &hd_geom_ents, &csize, &sizealloc, &err );
     }
     else
     {
-        hd_geom_ents = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * nents[ 1 ] );
-        csize = nents[ 1 ];
+        hd_geom_ents = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * nents[1] );
+        csize        = nents[1];
         iGeom_getEntities( geom, root_set, 1, &hd_geom_ents, &csize, &sizealloc, &err );
     }
     CHECK_IGEOM( "ERROR: Could not get entities" );
 
-    *odomain = new MsqIGeom( geom, hd_geom_ents[ 0 ] );
+    *odomain = new MsqIGeom( geom, hd_geom_ents[0] );
     return iBase_SUCCESS;
 }

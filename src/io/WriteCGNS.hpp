@@ -54,24 +54,24 @@ class WriteCGNS : public WriterIface
     WriteCGNS( Interface* impl );
 
     //! Destructor
-    virtual ~WriteCGNS( );
+    virtual ~WriteCGNS();
 
     // A structure to store Set information.
     class SetStruct
     {
       public:
         std::string TagName;  // Tag name
-        cgsize_t    IdSet;  // Id of the Set
-        cgsize_t    NbEdges;  // Number of Edges in the Set
-        cgsize_t    NbFaces;  // Number of Faces in the Set
-        cgsize_t    NbCells;  // Number of Cells in the Set
+        cgsize_t IdSet;       // Id of the Set
+        cgsize_t NbEdges;     // Number of Edges in the Set
+        cgsize_t NbFaces;     // Number of Faces in the Set
+        cgsize_t NbCells;     // Number of Cells in the Set
         // vector with the number of entities in the Sets
         // 0-MBEDGE | 1-MBTRI | 2-MBQUAD | 3-MBTET | 4-MBPYRAMID | 5-MBPRISM  | 6-MBHEX
         std::vector< cgsize_t > NbEntities;
-        ElementType_t           CGNSType;
+        ElementType_t CGNSType;
 
-        SetStruct( ) : IdSet( -1 ), NbEdges( 0 ), NbFaces( 0 ), NbCells( 0 ){ };
-        ~SetStruct( ){ };
+        SetStruct() : IdSet( -1 ), NbEdges( 0 ), NbFaces( 0 ), NbCells( 0 ){};
+        ~SetStruct(){};
     };
 
     //! writes out a file
@@ -110,7 +110,7 @@ class WriteCGNS : public WriterIface
     // Get the connectivity table
     ErrorCode get_conn_table( std::vector< moab::EntityHandle >& Elements, std::vector< int >& Begin,
                               std::vector< int >& End, std::vector< moab::Tag >& TagHandles,
-                              std::vector< WriteCGNS::SetStruct >&    Sets,
+                              std::vector< WriteCGNS::SetStruct >& Sets,
                               std::vector< std::vector< cgsize_t > >& ConnTable );
 
     // Read the Moab type and return CGNS type
@@ -118,31 +118,31 @@ class WriteCGNS : public WriterIface
 
   private:
     // interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 
     // File var
     const char* fileName;
-    int         IndexFile;
+    int IndexFile;
 
     // Base var
     const char* BaseName;
-    int         IndexBase;
+    int IndexBase;
 
     // Zone var
     const char* ZoneName;
-    int         IndexZone;
+    int IndexZone;
 
     // Section var
     int IndexSection;
 
     // Coordinates var
-    int IndexCoord[ 3 ];
+    int IndexCoord[3];
 
     // Mesh dimension
-    int      celldim;
-    int      physdim;
-    cgsize_t isize[ 3 ];
+    int celldim;
+    int physdim;
+    cgsize_t isize[3];
 
     // Entities of mesh
     std::vector< moab::EntityHandle > Nodes;

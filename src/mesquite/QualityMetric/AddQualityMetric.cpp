@@ -41,25 +41,25 @@ namespace MBMesquite
 AddQualityMetric::AddQualityMetric( QualityMetric* qm1, QualityMetric* qm2, MsqError& err )
     : metric1( *qm1 ), metric2( *qm2 )
 {
-    if( qm1->get_metric_type( ) != qm2->get_metric_type( ) || qm1->get_negate_flag( ) != qm2->get_negate_flag( ) )
+    if( qm1->get_metric_type() != qm2->get_metric_type() || qm1->get_negate_flag() != qm2->get_negate_flag() )
     { MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_ARG ); }
 }
 
-AddQualityMetric::~AddQualityMetric( ) {}
+AddQualityMetric::~AddQualityMetric() {}
 
-QualityMetric::MetricType AddQualityMetric::get_metric_type( ) const
+QualityMetric::MetricType AddQualityMetric::get_metric_type() const
 {
-    return metric1.get_metric_type( );
+    return metric1.get_metric_type();
 }
 
-std::string AddQualityMetric::get_name( ) const
+std::string AddQualityMetric::get_name() const
 {
-    return std::string( "Sum(" ) + metric1.get_name( ) + ", " + metric2.get_name( ) + ")";
+    return std::string( "Sum(" ) + metric1.get_name() + ", " + metric2.get_name() + ")";
 }
 
-int AddQualityMetric::get_negate_flag( ) const
+int AddQualityMetric::get_negate_flag() const
 {
-    return metric1.get_negate_flag( );
+    return metric1.get_negate_flag();
 }
 
 void AddQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only, MsqError& err )
@@ -72,7 +72,7 @@ void AddQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& ha
 bool AddQualityMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
     double val1, val2;
-    bool   rval1, rval2;
+    bool rval1, rval2;
     rval1 = metric1.evaluate( pd, handle, val1, err );
     MSQ_ERRZERO( err );
     rval2 = metric2.evaluate( pd, handle, val2, err );
@@ -85,17 +85,16 @@ bool AddQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, doub
                                               std::vector< size_t >& indices, MsqError& err )
 {
     double val1, val2;
-    bool   rval1, rval2;
+    bool rval1, rval2;
     rval1 = metric1.evaluate_with_indices( pd, handle, val1, indices1, err );
     MSQ_ERRZERO( err );
     rval2 = metric2.evaluate_with_indices( pd, handle, val2, indices2, err );
     MSQ_ERRZERO( err );
 
-    indices.clear( );
-    std::sort( indices1.begin( ), indices1.end( ) );
-    std::sort( indices2.begin( ), indices2.end( ) );
-    std::set_union( indices1.begin( ), indices1.end( ), indices2.begin( ), indices2.end( ),
-                    std::back_inserter( indices ) );
+    indices.clear();
+    std::sort( indices1.begin(), indices1.end() );
+    std::sort( indices2.begin(), indices2.end() );
+    std::set_union( indices1.begin(), indices1.end(), indices2.begin(), indices2.end(), std::back_inserter( indices ) );
 
     value = val1 + val2;
     return rval1 && rval2;
@@ -106,33 +105,33 @@ bool AddQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, dou
                                                MsqError& err )
 {
     std::vector< size_t >::iterator i;
-    size_t                          j;
-    double                          val1, val2;
-    bool                            rval1, rval2;
+    size_t j;
+    double val1, val2;
+    bool rval1, rval2;
     rval1 = metric1.evaluate_with_gradient( pd, handle, val1, indices1, grad1, err );
     MSQ_ERRZERO( err );
     rval2 = metric2.evaluate_with_gradient( pd, handle, val2, indices2, grad2, err );
     MSQ_ERRZERO( err );
 
-    indices.resize( indices1.size( ) + indices2.size( ) );
-    i = std::copy( indices1.begin( ), indices1.end( ), indices.begin( ) );
-    std::copy( indices2.begin( ), indices2.end( ), i );
-    std::sort( indices.begin( ), indices.end( ) );
-    indices.erase( std::unique( indices.begin( ), indices.end( ) ), indices.end( ) );
+    indices.resize( indices1.size() + indices2.size() );
+    i = std::copy( indices1.begin(), indices1.end(), indices.begin() );
+    std::copy( indices2.begin(), indices2.end(), i );
+    std::sort( indices.begin(), indices.end() );
+    indices.erase( std::unique( indices.begin(), indices.end() ), indices.end() );
 
-    gradient.clear( );
-    gradient.resize( indices.size( ), Vector3D( 0.0 ) );
-    for( j = 0; j < indices1.size( ); ++j )
+    gradient.clear();
+    gradient.resize( indices.size(), Vector3D( 0.0 ) );
+    for( j = 0; j < indices1.size(); ++j )
     {
-        i = std::lower_bound( indices.begin( ), indices.end( ), indices1[ j ] );
-        size_t k = i - indices.begin( );
-        gradient[ k ] += grad1[ j ];
+        i        = std::lower_bound( indices.begin(), indices.end(), indices1[j] );
+        size_t k = i - indices.begin();
+        gradient[k] += grad1[j];
     }
-    for( j = 0; j < indices2.size( ); ++j )
+    for( j = 0; j < indices2.size(); ++j )
     {
-        i = std::lower_bound( indices.begin( ), indices.end( ), indices2[ j ] );
-        size_t k = i - indices.begin( );
-        gradient[ k ] += grad2[ j ];
+        i        = std::lower_bound( indices.begin(), indices.end(), indices2[j] );
+        size_t k = i - indices.begin();
+        gradient[k] += grad2[j];
     }
 
     value = val1 + val2;
@@ -144,66 +143,66 @@ bool AddQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, doub
                                               std::vector< Matrix3D >& Hessian, MsqError& err )
 {
     std::vector< size_t >::iterator i;
-    size_t                          j, r, c, n, h;
-    double                          val1, val2;
-    bool                            rval1, rval2;
+    size_t j, r, c, n, h;
+    double val1, val2;
+    bool rval1, rval2;
     rval1 = metric1.evaluate_with_Hessian( pd, handle, val1, indices1, grad1, Hess1, err );
     MSQ_ERRZERO( err );
     rval2 = metric2.evaluate_with_Hessian( pd, handle, val2, indices2, grad2, Hess2, err );
     MSQ_ERRZERO( err );
 
-    indices.resize( indices1.size( ) + indices2.size( ) );
-    i = std::copy( indices1.begin( ), indices1.end( ), indices.begin( ) );
-    std::copy( indices2.begin( ), indices2.end( ), i );
-    std::sort( indices.begin( ), indices.end( ) );
-    indices.erase( std::unique( indices.begin( ), indices.end( ) ), indices.end( ) );
+    indices.resize( indices1.size() + indices2.size() );
+    i = std::copy( indices1.begin(), indices1.end(), indices.begin() );
+    std::copy( indices2.begin(), indices2.end(), i );
+    std::sort( indices.begin(), indices.end() );
+    indices.erase( std::unique( indices.begin(), indices.end() ), indices.end() );
 
-    gradient.clear( );
-    gradient.resize( indices.size( ), Vector3D( 0.0 ) );
-    for( j = 0; j < indices1.size( ); ++j )
+    gradient.clear();
+    gradient.resize( indices.size(), Vector3D( 0.0 ) );
+    for( j = 0; j < indices1.size(); ++j )
     {
-        i = std::lower_bound( indices.begin( ), indices.end( ), indices1[ j ] );
-        indices1[ j ] = i - indices.begin( );
-        gradient[ indices1[ j ] ] += grad1[ j ];
+        i           = std::lower_bound( indices.begin(), indices.end(), indices1[j] );
+        indices1[j] = i - indices.begin();
+        gradient[indices1[j]] += grad1[j];
     }
-    for( j = 0; j < indices2.size( ); ++j )
+    for( j = 0; j < indices2.size(); ++j )
     {
-        i = std::lower_bound( indices.begin( ), indices.end( ), indices2[ j ] );
-        indices2[ j ] = i - indices.begin( );
-        gradient[ indices2[ j ] ] += grad2[ j ];
+        i           = std::lower_bound( indices.begin(), indices.end(), indices2[j] );
+        indices2[j] = i - indices.begin();
+        gradient[indices2[j]] += grad2[j];
     }
 
-    const size_t N = indices.size( );
-    Hessian.clear( );
+    const size_t N = indices.size();
+    Hessian.clear();
     Hessian.resize( N * ( N + 1 ) / 2, Matrix3D( 0.0 ) );
 
-    n = indices1.size( );
+    n = indices1.size();
     h = 0;
     for( r = 0; r < n; ++r )
     {
-        const size_t nr = indices1[ r ];
+        const size_t nr = indices1[r];
         for( c = r; c < n; ++c )
         {
-            const size_t nc = indices1[ c ];
+            const size_t nc = indices1[c];
             if( nr <= nc )
-                Hessian[ N * nr - nr * ( nr + 1 ) / 2 + nc ] += Hess1[ h++ ];
+                Hessian[N * nr - nr * ( nr + 1 ) / 2 + nc] += Hess1[h++];
             else
-                Hessian[ N * nc - nc * ( nc + 1 ) / 2 + nr ].plus_transpose_equal( Hess1[ h++ ] );
+                Hessian[N * nc - nc * ( nc + 1 ) / 2 + nr].plus_transpose_equal( Hess1[h++] );
         }
     }
 
-    n = indices2.size( );
+    n = indices2.size();
     h = 0;
     for( r = 0; r < n; ++r )
     {
-        const size_t nr = indices2[ r ];
+        const size_t nr = indices2[r];
         for( c = r; c < n; ++c )
         {
-            const size_t nc = indices2[ c ];
+            const size_t nc = indices2[c];
             if( nr <= nc )
-                Hessian[ N * nr - nr * ( nr + 1 ) / 2 + nc ] += Hess2[ h++ ];
+                Hessian[N * nr - nr * ( nr + 1 ) / 2 + nc] += Hess2[h++];
             else
-                Hessian[ N * nc - nc * ( nc + 1 ) / 2 + nr ].plus_transpose_equal( Hess2[ h++ ] );
+                Hessian[N * nc - nc * ( nc + 1 ) / 2 + nr].plus_transpose_equal( Hess2[h++] );
         }
     }
 

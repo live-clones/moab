@@ -56,7 +56,7 @@ class ReadHDF5 : public ReaderIface
 
     ReadHDF5( Interface* iface );
 
-    virtual ~ReadHDF5( );
+    virtual ~ReadHDF5();
 
     /** Export specified meshsets to file
      * \param filename     The filename to export. Must end in <em>.mhdf</em>
@@ -66,9 +66,9 @@ class ReadHDF5 : public ReaderIface
     ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
                          const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
 
-    ErrorCode  read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                                std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
-    Interface* moab( ) const
+    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
+                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    Interface* moab() const
     {
         return iFace;
     }
@@ -77,7 +77,7 @@ class ReadHDF5 : public ReaderIface
     struct HDF5ErrorHandler
     {
         HDF5_Error_Func_Type func;
-        void*                data;
+        void* data;
     };
 
   protected:
@@ -114,10 +114,10 @@ class ReadHDF5 : public ReaderIface
         NUM_TIMES
     };
 
-    void print_times( );
+    void print_times();
 
   private:
-    ErrorCode init( );
+    ErrorCode init();
 
     inline int is_error( mhdf_Status& status )
     {
@@ -142,7 +142,7 @@ class ReadHDF5 : public ReaderIface
 
     //! Map from File ID to MOAB handle
     typedef RangeMap< long, EntityHandle > IDMap;
-    IDMap                                  idMap;
+    IDMap idMap;
 
     //! Cache pointer to read util
     ReadUtilIface* readUtil;
@@ -154,9 +154,9 @@ class ReadHDF5 : public ReaderIface
     //! to handle was deferred until later.
     struct IDConnectivity
     {
-        EntityHandle  handle;  // Start_handle
-        size_t        count;  // Num entities
-        int           nodes_per_elem;  // Per-element connectivity length
+        EntityHandle handle;  // Start_handle
+        size_t count;         // Num entities
+        int nodes_per_elem;   // Per-element connectivity length
         EntityHandle* array;  // Connectivity array
     };
     //! List of connectivity arrays for which conversion from file ID
@@ -191,12 +191,12 @@ class ReadHDF5 : public ReaderIface
     //! Store old HDF5 error handling function
     HDF5ErrorHandler errorHandler;
 
-    long ( *setMeta )[ 4 ];
+    long ( *setMeta )[4];
 
-    double    _times[ NUM_TIMES ];
+    double _times[NUM_TIMES];
     CpuTimer* timer;
-    bool      cputime;
-    ErrorCode read_all_set_meta( );
+    bool cputime;
+    ErrorCode read_all_set_meta();
 
     ErrorCode set_up_read( const char* file_name, const FileOptions& opts );
     ErrorCode clean_up_read( const FileOptions& opts );
@@ -234,7 +234,7 @@ class ReadHDF5 : public ReaderIface
 
     //! Update connectivity data for all element groups for which read_elems
     //! was called with a non-null \c node_ids argument.
-    ErrorCode update_connectivity( );
+    ErrorCode update_connectivity();
 
     // Read connectivity data for a list of element file ids.
     // passing back the file IDs for the element connectivity
@@ -414,8 +414,8 @@ class ReadHDF5 : public ReaderIface
     enum SetMode
     {
         CONTENT = 0,
-        CHILD = 1,
-        PARENT = 2
+        CHILD   = 1,
+        PARENT  = 2
     };
 
   private:
@@ -442,7 +442,7 @@ class ReadHDF5 : public ReaderIface
      *  into a custom tag on the sets
      *  needed now for the VisIt plugin, to identify sets read
      */
-    ErrorCode store_sets_file_ids( );
+    ErrorCode store_sets_file_ids();
 
     /**\brief Find index in mhdf_FileDesc* fileInfo for specified tag name
      *

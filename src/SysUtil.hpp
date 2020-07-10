@@ -47,7 +47,7 @@ namespace SysUtil
      * Check if platform is little-endian (least significant
      * byte at highest memory address.)
      */
-    inline bool little_endian( )
+    inline bool little_endian()
     {
         const unsigned one = 1;
         return !*( (char*)&one );
@@ -58,10 +58,10 @@ namespace SysUtil
      * Check if platform is big-endian (least significant
      * byte at lowest memory address.)
      */
-    inline bool big_endian( )
+    inline bool big_endian()
     {
         const unsigned one = 1;
-        return !( ( (char*)&one )[ sizeof( unsigned ) - 1 ] );
+        return !( ( (char*)&one )[sizeof( unsigned ) - 1] );
     }
 
     /**\brief Swap byte order (e.g. change from big-endian to little-endian)
@@ -81,7 +81,8 @@ namespace SysUtil
     void byteswap8( void* data, size_t num_elem );
 
     /**\brief Type-specific byte swap */
-    template< typename T > inline void byteswap( T* data, size_t num_elem )
+    template < typename T >
+    inline void byteswap( T* data, size_t num_elem )
     {
         switch( sizeof( T ) )
         {

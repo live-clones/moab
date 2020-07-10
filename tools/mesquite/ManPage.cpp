@@ -39,10 +39,10 @@ std::ostream& ManPage::write_text( std::ostream& str, bool hanging_indent, const
         begin_hanging_paragraph( str );
     else
         begin_paragraph( str );
-    const std::string::size_type n = text.size( );
+    const std::string::size_type n = text.size();
     while( i != n )
     {
-        if( text[ i ] == '\n' )
+        if( text[i] == '\n' )
         {
             begin_paragraph( str );
             ++i;
@@ -50,7 +50,7 @@ std::ostream& ManPage::write_text( std::ostream& str, bool hanging_indent, const
         }
         j = text.find( "\n", i );
         if( j == std::string::npos ) j = n;
-        if( text[ i ] == '.' ) str << '\\';
+        if( text[i] == '.' ) str << '\\';
         str << text.substr( i, j - i );
         i = j;
     }

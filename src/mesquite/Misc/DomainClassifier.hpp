@@ -122,9 +122,9 @@ class DomainClassifier : public MeshDomain
 
     struct DomainSet
     {
-        MESQUITE_EXPORT      DomainSet( MeshDomain* dom ) : domain( dom ) {}
-        MESQUITE_EXPORT      DomainSet( ) : domain( 0 ) {}
-        MeshDomain*          domain;
+        MESQUITE_EXPORT DomainSet( MeshDomain* dom ) : domain( dom ) {}
+        MESQUITE_EXPORT DomainSet() : domain( 0 ) {}
+        MeshDomain* domain;
         MESQUITE_EXPORT void set_vertices( const std::vector< Mesh::VertexHandle >& verts )
         {
             vertices = verts;
@@ -141,7 +141,7 @@ class DomainClassifier : public MeshDomain
         {
             elems = elements;
         }
-        std::vector< Mesh::VertexHandle >  vertices;
+        std::vector< Mesh::VertexHandle > vertices;
         std::vector< Mesh::ElementHandle > elements;
     };
 
@@ -161,9 +161,9 @@ class DomainClassifier : public MeshDomain
     MESQUITE_EXPORT static void classify_by_handle( DomainClassifier& result, Mesh* mesh, DomainSet* domain_set_array,
                                                     unsigned array_length, MsqError& err );
 
-    MESQUITE_EXPORT DomainClassifier( ) : deleteSubDomains( false ) {}
+    MESQUITE_EXPORT DomainClassifier() : deleteSubDomains( false ) {}
 
-    MESQUITE_EXPORT virtual ~DomainClassifier( );
+    MESQUITE_EXPORT virtual ~DomainClassifier();
 
     MESQUITE_EXPORT
     virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
@@ -187,17 +187,17 @@ class DomainClassifier : public MeshDomain
 
     /**\brief Clear all data, including MeshDomain list */
     MESQUITE_EXPORT
-    void clear( )
+    void clear()
     {
-        vertexList.clear( );
-        elementList.clear( );
+        vertexList.clear();
+        elementList.clear();
     }
 
     struct DomainBlock
     {
         Mesh::EntityHandle firstHandle;
         Mesh::EntityHandle lastHandle;
-        MeshDomain*        domain;
+        MeshDomain* domain;
     };
 
     MESQUITE_EXPORT
@@ -218,7 +218,7 @@ class DomainClassifier : public MeshDomain
     }
 
     MESQUITE_EXPORT
-    void delete_all_sub_domains( );
+    void delete_all_sub_domains();
 
   private:
     bool deleteSubDomains;

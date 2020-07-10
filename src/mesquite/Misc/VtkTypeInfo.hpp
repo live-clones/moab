@@ -43,9 +43,9 @@ struct MESQUITE_EXPORT VtkTypeInfo
 
     const char* name;
 
-    unsigned        vtkType;  //!< The VTK type number
-    EntityTopology  msqType;  //!< The Mesquite element topology for the VTK type
-    unsigned        numNodes;  //!< The number of nodes in the VTK type.
+    unsigned vtkType;             //!< The VTK type number
+    EntityTopology msqType;       //!< The Mesquite element topology for the VTK type
+    unsigned numNodes;            //!< The number of nodes in the VTK type.
     const unsigned* vtkConnOrder; /**< NULL if VTK node ordering is the same as
                                    *   Mesquite's internal ordering.  If non-null,
                                    *   an array of length VtkTypeInfo::numNodes, indexed

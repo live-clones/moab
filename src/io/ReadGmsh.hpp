@@ -47,7 +47,7 @@ class ReadGmsh : public ReaderIface
     ReadGmsh( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadGmsh( );
+    virtual ~ReadGmsh();
 
   private:
     ErrorCode create_elements( const GmshElemType& type, const std::vector< int >& elem_ids,
@@ -58,14 +58,14 @@ class ReadGmsh : public ReaderIface
     ErrorCode create_sets( EntityType element_type, const Range& elements, const std::vector< int >& set_ids,
                            int set_type );
 
-    ErrorCode create_geometric_topology( );
+    ErrorCode create_geometric_topology();
 
     ReadUtilIface* readMeshIface;
 
     //! interface instance
     Interface* mdbImpl;
 
-    Tag   globalId;
+    Tag globalId;
     Range geomSets;
 };
 

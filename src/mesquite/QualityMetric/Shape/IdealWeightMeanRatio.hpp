@@ -62,19 +62,19 @@ namespace MBMesquite
 class IdealWeightMeanRatio : public ElementQM, public AveragingQM
 {
   public:
-    MESQUITE_EXPORT IdealWeightMeanRatio( )
+    MESQUITE_EXPORT IdealWeightMeanRatio()
         : AveragingQM( QualityMetric::LINEAR ), a2Con( 2.0 ), b2Con( -1.0 ), c2Con( 1.0 ), a3Con( 3.0 ), b3Con( -1.0 ),
           c3Con( 2.0 / 3.0 )
     {
     }
 
     //! virtual destructor ensures use of polymorphism during destruction
-    MESQUITE_EXPORT virtual ~IdealWeightMeanRatio( ) {}
+    MESQUITE_EXPORT virtual ~IdealWeightMeanRatio() {}
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
     //! 1 if metric should be minimized, -1 if metric should be maximized.
-    virtual int get_negate_flag( ) const;
+    virtual int get_negate_flag() const;
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
@@ -93,16 +93,16 @@ class IdealWeightMeanRatio : public ElementQM, public AveragingQM
     // arrays used in Hessian computations
     // We allocate them here, so that one allocation only is done.
     // This gives a big computation speed increase.
-    Vector3D mCoords[ 4 ];  // Vertex coordinates for the (decomposed) elements
-    Vector3D mGradients[ 32 ];  // Gradient of metric with respect to the coords
-    Matrix3D mHessians[ 80 ];  // Hessian of metric with respect to the coords
-    double   mMetrics[ 8 ];  // Metric values for the (decomposed) elements
+    Vector3D mCoords[4];      // Vertex coordinates for the (decomposed) elements
+    Vector3D mGradients[32];  // Gradient of metric with respect to the coords
+    Matrix3D mHessians[80];   // Hessian of metric with respect to the coords
+    double mMetrics[8];       // Metric values for the (decomposed) elements
 
-    const double   a2Con;
+    const double a2Con;
     const Exponent b2Con;
     const Exponent c2Con;
 
-    const double   a3Con;
+    const double a3Con;
     const Exponent b3Con;
     const Exponent c3Con;
 };

@@ -43,33 +43,33 @@ namespace MBMesquite
 
 VertexMaxQM::VertexMaxQM( ElemSampleQM* metric ) : mMetric( metric ) {}
 
-VertexMaxQM::~VertexMaxQM( ) {}
+VertexMaxQM::~VertexMaxQM() {}
 
-std::string VertexMaxQM::get_name( ) const
+std::string VertexMaxQM::get_name() const
 {
     std::string result( "VertexMaxQM(" );
-    result += mMetric->get_name( );
+    result += mMetric->get_name();
     result += ")";
     return result;
 }
 
-int VertexMaxQM::get_negate_flag( ) const
+int VertexMaxQM::get_negate_flag() const
 {
-    return mMetric->get_negate_flag( );
+    return mMetric->get_negate_flag();
 }
 
 bool VertexMaxQM::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
-    ElemSampleQM* qm = get_quality_metric( );
+    ElemSampleQM* qm = get_quality_metric();
     get_vertex_corner_handles( pd, handle, mHandles, err );
     MSQ_ERRFALSE( err );
 
-    bool   valid = true;
+    bool valid = true;
     double tmpval;
-    bool   tmpvalid;
+    bool tmpvalid;
 
-    value = -std::numeric_limits< double >::infinity( );
-    for( std::vector< size_t >::iterator h = mHandles.begin( ); h != mHandles.end( ); ++h )
+    value = -std::numeric_limits< double >::infinity();
+    for( std::vector< size_t >::iterator h = mHandles.begin(); h != mHandles.end(); ++h )
     {
         tmpvalid = qm->evaluate( pd, *h, tmpval, err );
         MSQ_ERRZERO( err );
@@ -85,19 +85,19 @@ bool VertexMaxQM::evaluate( PatchData& pd, size_t handle, double& value, MsqErro
 bool VertexMaxQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
                                          MsqError& err )
 {
-    ElemSampleQM* qm = get_quality_metric( );
+    ElemSampleQM* qm = get_quality_metric();
     get_vertex_corner_handles( pd, handle, mHandles, err );
     MSQ_ERRFALSE( err );
 
-    bool                            valid = true;
-    double                          tmpval;
-    bool                            tmpvalid;
+    bool valid = true;
+    double tmpval;
+    bool tmpvalid;
     std::vector< size_t >::iterator i, e, h;
 
-    value = -std::numeric_limits< double >::infinity( );
-    for( h = mHandles.begin( ); h != mHandles.end( ); ++h )
+    value = -std::numeric_limits< double >::infinity();
+    for( h = mHandles.begin(); h != mHandles.end(); ++h )
     {
-        mIndices.clear( );
+        mIndices.clear();
         tmpvalid = qm->evaluate_with_indices( pd, *h, tmpval, mIndices, err );
         MSQ_ERRZERO( err );
         if( !tmpvalid )
@@ -105,14 +105,14 @@ bool VertexMaxQM::evaluate_with_indices( PatchData& pd, size_t handle, double& v
         else if( tmpval > value )
             value = tmpval;
 
-        size_t size = indices.size( );
-        e = indices.begin( ) + size;
-        for( i = mIndices.begin( ); i != mIndices.end( ); ++i )
+        size_t size = indices.size();
+        e           = indices.begin() + size;
+        for( i = mIndices.begin(); i != mIndices.end(); ++i )
         {
-            if( std::find( indices.begin( ), e, *i ) == e )
+            if( std::find( indices.begin(), e, *i ) == e )
             {
                 indices.push_back( *i );
-                e = indices.begin( ) + size;
+                e = indices.begin() + size;
             }
         }
     }

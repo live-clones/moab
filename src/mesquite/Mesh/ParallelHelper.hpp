@@ -47,12 +47,12 @@ namespace MBMesquite
 typedef struct VertexIdMapKey
 {
     size_t glob_id;
-    int    proc_id;
+    int proc_id;
 } VertexIdMapKey;
 
 struct VertexIdLessFunc
 {
-    bool operator( )( const VertexIdMapKey& that1, const VertexIdMapKey& that2 ) const
+    bool operator()( const VertexIdMapKey& that1, const VertexIdMapKey& that2 ) const
     {
         return ( ( that1.proc_id < that2.proc_id ) ||
                  ( ( that1.proc_id == that2.proc_id ) && ( that1.glob_id < that2.glob_id ) ) );
@@ -61,10 +61,10 @@ struct VertexIdLessFunc
 
 typedef std::map< VertexIdMapKey, int, VertexIdLessFunc > VertexIdMap;
 
-int    get_parallel_rank( );
-int    get_parallel_size( );
+int get_parallel_rank();
+int get_parallel_size();
 double reduce_parallel_max( double value );
-void   parallel_barrier( );
+void parallel_barrier();
 
 class ParallelHelperImpl : public ParallelHelper
 {
@@ -79,8 +79,8 @@ class ParallelHelperImpl : public ParallelHelper
         BlockingAvoidAllReduce
     };
 
-    ParallelHelperImpl( );
-    ~ParallelHelperImpl( );
+    ParallelHelperImpl();
+    ~ParallelHelperImpl();
 
     // function called by application during set-up
     void set_parallel_mesh( ParallelMesh* mesh );
@@ -98,7 +98,7 @@ class ParallelHelperImpl : public ParallelHelper
     void smoothing_init( MsqError& err );
     void compute_first_independent_set( std::vector< Mesh::VertexHandle >& fixed_vertices );
     void communicate_first_independent_set( MsqError& err );
-    bool compute_next_independent_set( );
+    bool compute_next_independent_set();
     bool get_next_partition_boundary_vertex( MBMesquite::Mesh::VertexHandle& vertex_handle );
     void communicate_next_independent_set( MsqError& err );
     void smoothing_close( MsqError& err );
@@ -106,8 +106,8 @@ class ParallelHelperImpl : public ParallelHelper
   protected:
     friend class QualityAssessor;
     // functions called by QualityAssessor::loop_over_mesh()
-    int  get_rank( ) const;
-    int  get_nprocs( ) const;
+    int get_rank() const;
+    int get_nprocs() const;
     bool is_our_element( Mesh::ElementHandle element_handle, MsqError& err ) const;
     bool is_our_vertex( Mesh::VertexHandle vertex_handle, MsqError& err ) const;
     void communicate_min_max_to_all( double* minimum, double* maximum, MsqError& ) const;
@@ -124,65 +124,65 @@ class ParallelHelperImpl : public ParallelHelper
     ParallelMesh* mesh;
 
     size_t communicator;
-    int    communication_model;
+    int communication_model;
 
     int rank;
     int nprocs;
 
     // variables for VertexMover::loop_over_mesh()
-    int                                           generate_random_numbers;
+    int generate_random_numbers;
     std::vector< MBMesquite::Mesh::VertexHandle > vertices;
-    int                                           num_vertex;
-    std::vector< char >                           vtx_in_partition_boundary;
-    int                                           num_vtx_partition_boundary;
-    int                                           num_vtx_partition_boundary_local;
-    int                                           num_vtx_partition_boundary_remote;
+    int num_vertex;
+    std::vector< char > vtx_in_partition_boundary;
+    int num_vtx_partition_boundary;
+    int num_vtx_partition_boundary_local;
+    int num_vtx_partition_boundary_remote;
     std::vector< MBMesquite::Mesh::VertexHandle > part_vertices;
-    std::vector< int >                            part_proc_owner;
-    std::vector< size_t >                         part_gid;
-    std::vector< int >                            part_smoothed_flag;
-    std::vector< double >                         part_rand_number;
-    int                                           num_exportVtx;
-    std::vector< size_t >                         exportVtxGIDs;
-    std::vector< int >                            exportVtxLIDs;
-    std::vector< int >                            exportProc;
-    std::vector< bool >                           in_independent_set;
-    VertexIdMap                                   vid_map;
-    int                                           total_num_vertices_to_smooth;
-    int                                           total_num_vertices_to_recv;
-    std::vector< int >                            neighbourProcSend;
-    std::vector< int >                            neighbourProcRecv;
-    std::vector< int >                            neighbourProcSendRemain;
-    std::vector< int >                            neighbourProcRecvRemain;
-    int                                           num_already_smoothed_vertices;
-    int                                           num_already_recv_vertices;
-    std::vector< std::vector< int > >             vtx_off_proc_list;
-    std::vector< int >                            neighbourProc;
-    int                                           iteration;
-    int                                           global_work_remains;
-    int                                           next_vtx_partition_boundary;
+    std::vector< int > part_proc_owner;
+    std::vector< size_t > part_gid;
+    std::vector< int > part_smoothed_flag;
+    std::vector< double > part_rand_number;
+    int num_exportVtx;
+    std::vector< size_t > exportVtxGIDs;
+    std::vector< int > exportVtxLIDs;
+    std::vector< int > exportProc;
+    std::vector< bool > in_independent_set;
+    VertexIdMap vid_map;
+    int total_num_vertices_to_smooth;
+    int total_num_vertices_to_recv;
+    std::vector< int > neighbourProcSend;
+    std::vector< int > neighbourProcRecv;
+    std::vector< int > neighbourProcSendRemain;
+    std::vector< int > neighbourProcRecvRemain;
+    int num_already_smoothed_vertices;
+    int num_already_recv_vertices;
+    std::vector< std::vector< int > > vtx_off_proc_list;
+    std::vector< int > neighbourProc;
+    int iteration;
+    int global_work_remains;
+    int next_vtx_partition_boundary;
     /* for exchanging unused ghost node information */
-    int                                           unghost_num_vtx;
+    int unghost_num_vtx;
     std::vector< MBMesquite::Mesh::VertexHandle > unghost_vertices;
-    int                                           unghost_num_procs;
-    std::vector< int >                            unghost_procs;
-    std::vector< int >                            unghost_procs_num_vtx;
-    std::vector< int >                            unghost_procs_offset;
-    int                                           update_num_vtx;
-    std::vector< size_t >                         update_gid;
-    int                                           update_num_procs;
-    std::vector< int >                            update_procs;
-    std::vector< int >                            update_procs_num_vtx;
-    std::vector< int >                            update_procs_offset;
+    int unghost_num_procs;
+    std::vector< int > unghost_procs;
+    std::vector< int > unghost_procs_num_vtx;
+    std::vector< int > unghost_procs_offset;
+    int update_num_vtx;
+    std::vector< size_t > update_gid;
+    int update_num_procs;
+    std::vector< int > update_procs;
+    std::vector< int > update_procs_num_vtx;
+    std::vector< int > update_procs_offset;
 
     // functions for VertexMover::loop_over_mesh()
-    void compute_independent_set( );
-    int  comm_smoothed_vtx_b( MsqError& err );
-    int  comm_smoothed_vtx_b_no_all( MsqError& err );
-    int  comm_smoothed_vtx_nb( MsqError& err );
-    int  comm_smoothed_vtx_nb_no_all( MsqError& err );
-    int  comm_smoothed_vtx_tnb( MsqError& err );
-    int  comm_smoothed_vtx_tnb_no_all( MsqError& err );
+    void compute_independent_set();
+    int comm_smoothed_vtx_b( MsqError& err );
+    int comm_smoothed_vtx_b_no_all( MsqError& err );
+    int comm_smoothed_vtx_nb( MsqError& err );
+    int comm_smoothed_vtx_nb_no_all( MsqError& err );
+    int comm_smoothed_vtx_tnb( MsqError& err );
+    int comm_smoothed_vtx_tnb_no_all( MsqError& err );
 };
 
 }  // namespace MBMesquite

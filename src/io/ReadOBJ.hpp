@@ -86,8 +86,8 @@
 */
 struct vertex
 {
-    int    vertex_id;
-    double coord[ 3 ];
+    int vertex_id;
+    double coord[3];
 };
 
 /* struct face is a structure that stores connectivity.
@@ -95,8 +95,8 @@ struct vertex
 */
 struct face
 {
-    int                face_id;
-    moab::EntityHandle conn[ 3 ];
+    int face_id;
+    moab::EntityHandle conn[3];
 };
 namespace moab
 {
@@ -133,7 +133,7 @@ class ReadOBJ : public ReaderIface
     ReadOBJ( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadOBJ( );
+    virtual ~ReadOBJ();
 
   private:
     ReadUtilIface* readMeshIface;
@@ -152,7 +152,8 @@ class ReadOBJ : public ReaderIface
 
     /*  The match function searches a list of map keys for a match with the token
      */
-    template< typename T > std::string match( const std::string& token, std::map< std::string, T >& tokenList );
+    template < typename T >
+    std::string match( const std::string& token, std::map< std::string, T >& tokenList );
 
     /* The tokenize function takes a string as input and splits it into
      * a vector of strings based on the delimiter

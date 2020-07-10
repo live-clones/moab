@@ -25,19 +25,19 @@ namespace moab
 {
 
 static ErrorOutput* errorOutput = NULL;
-static std::string  lastError = "No error";
+static std::string lastError    = "No error";
 
-void MBErrorHandler_Init( )
+void MBErrorHandler_Init()
 {
     if( NULL == errorOutput )
     {
         errorOutput = new( std::nothrow ) ErrorOutput( stderr );
         assert( NULL != errorOutput );
-        errorOutput->use_world_rank( );
+        errorOutput->use_world_rank();
     }
 }
 
-void MBErrorHandler_Finalize( )
+void MBErrorHandler_Finalize()
 {
     if( NULL != errorOutput )
     {
@@ -46,7 +46,7 @@ void MBErrorHandler_Finalize( )
     }
 }
 
-bool MBErrorHandler_Initialized( )
+bool MBErrorHandler_Initialized()
 {
     return ( NULL != errorOutput );
 }
@@ -65,7 +65,7 @@ void MBTraceBackErrorHandler( int line, const char* func, const char* file, cons
     // from processor 0 For a per-processor relevant error, set rank of current processor to 0, so
     // that it is always printed
     int rank = 0;
-    if( MB_ERROR_TYPE_NEW_GLOBAL == err_type && errorOutput->have_rank( ) ) rank = errorOutput->get_rank( );
+    if( MB_ERROR_TYPE_NEW_GLOBAL == err_type && errorOutput->have_rank() ) rank = errorOutput->get_rank();
 
     if( 0 == rank )
     {
@@ -85,7 +85,7 @@ void MBTraceBackErrorHandler( int line, const char* func, const char* file, cons
         // Do not print the error message or stack trace, since processor 0 will print them
         // Sleep 10 seconds before aborting so it will not accidently kill process 0
         sleep( 10 );
-        abort( );
+        abort();
     }
 }
 

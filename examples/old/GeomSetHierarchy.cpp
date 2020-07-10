@@ -12,45 +12,45 @@ int main( int argc, char** argv )
 {
     if( 1 == argc )
     {
-        std::cout << "Usage: " << argv[ 0 ] << " <filename>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <filename>" << std::endl;
         return 0;
     }
 
     // instantiate & load a file
-    moab::Interface* mb = new moab::Core( );
-    moab::ErrorCode  rval = mb->load_file( argv[ 1 ] );
+    moab::Interface* mb  = new moab::Core();
+    moab::ErrorCode rval = mb->load_file( argv[1] );
     assert( moab::MB_SUCCESS == rval );
 
     // get the geometric topology tag handle
     moab::Tag geom_tag, gid_tag;
     rval = mb->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, moab::MB_TYPE_INTEGER, geom_tag );
     assert( moab::MB_SUCCESS == rval );
-    gid_tag = mb->globalId_tag( );
+    gid_tag = mb->globalId_tag();
     assert( NULL != gid_tag );
 
     // traverse the model, from dimension 3 downward
-    moab::Range                       psets, chsets;
+    moab::Range psets, chsets;
     std::vector< moab::EntityHandle > sense_ents;
-    std::vector< int >                senses;
-    int                               dim, pgid, chgid;
-    void*                             dim_ptr = &dim;
-    int                               sense;
+    std::vector< int > senses;
+    int dim, pgid, chgid;
+    void* dim_ptr = &dim;
+    int sense;
 
     moab::GeomTopoTool gt( mb, true );
 
     for( dim = 3; dim >= 0; dim-- )
     {
         // get parents at this dimension
-        chsets.clear( );
+        chsets.clear();
         rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, &dim_ptr, 1, chsets, 1, false );
         assert( moab::MB_SUCCESS == rval );
 
         // for each child, get parents and do something with them
         moab::Range::iterator ch_it, p_it;
-        for( ch_it = chsets.begin( ); ch_it != chsets.end( ); ++ch_it )
+        for( ch_it = chsets.begin(); ch_it != chsets.end(); ++ch_it )
         {
             // get the children and put in child set list
-            psets.clear( );
+            psets.clear();
             rval = mb->get_parent_meshsets( *ch_it, psets );
             assert( moab::MB_SUCCESS == rval );
 
@@ -58,17 +58,17 @@ int main( int argc, char** argv )
             assert( moab::MB_SUCCESS == rval );
 
             // print # parents
-            std::cout << ent_names[ dim ] << " " << chgid << " has " << psets.size( ) << " parents." << std::endl;
+            std::cout << ent_names[dim] << " " << chgid << " has " << psets.size() << " parents." << std::endl;
 
             if( 2 == dim )
             {
-                for( p_it = psets.begin( ); p_it != psets.end( ); ++p_it )
+                for( p_it = psets.begin(); p_it != psets.end(); ++p_it )
                 {
                     rval = mb->tag_get_data( gid_tag, &( *p_it ), 1, &pgid );
                     assert( moab::MB_SUCCESS == rval );
                     rval = gt.get_sense( *ch_it, *p_it, sense );
                     if( moab::MB_SUCCESS != rval ) continue;
-                    std::cout << ent_names[ dim + 1 ] << " " << pgid << ", " << ent_names[ dim ] << " " << chgid
+                    std::cout << ent_names[dim + 1] << " " << pgid << ", " << ent_names[dim] << " " << chgid
                               << " sense is: ";
                     if( 1 == sense )
                         std::cout << "FORWARD" << std::endl;
@@ -78,21 +78,21 @@ int main( int argc, char** argv )
             }
             else if( 1 == dim )
             {
-                sense_ents.clear( );
-                senses.clear( );
+                sense_ents.clear();
+                senses.clear();
                 rval = gt.get_senses( *ch_it, sense_ents, senses );
                 if( moab::MB_SUCCESS != rval ) continue;
-                for( unsigned int i = 0; i < sense_ents.size( ); i++ )
+                for( unsigned int i = 0; i < sense_ents.size(); i++ )
                 {
-                    rval = mb->tag_get_data( gid_tag, &sense_ents[ i ], 1, &pgid );
+                    rval = mb->tag_get_data( gid_tag, &sense_ents[i], 1, &pgid );
                     assert( moab::MB_SUCCESS == rval );
-                    std::cout << ent_names[ dim + 1 ] << " " << pgid << ", " << ent_names[ dim ] << " " << chgid
+                    std::cout << ent_names[dim + 1] << " " << pgid << ", " << ent_names[dim] << " " << chgid
                               << " sense is: ";
-                    if( -1 == senses[ i ] )
+                    if( -1 == senses[i] )
                         std::cout << "REVERSED" << std::endl;
-                    else if( 0 == senses[ i ] )
+                    else if( 0 == senses[i] )
                         std::cout << "BOTH" << std::endl;
-                    else if( 1 == senses[ i ] )
+                    else if( 1 == senses[i] )
                         std::cout << "FORWARD" << std::endl;
                     else
                         std::cout << "(invalid)" << std::endl;

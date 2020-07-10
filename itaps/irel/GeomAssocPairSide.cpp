@@ -12,7 +12,7 @@
     {                                                           \
         if( iBase_SUCCESS != result )                           \
         {                                                       \
-            char this_descr[ 120 ];                             \
+            char this_descr[120];                               \
             iGeom_getDescription( instance_, this_descr, 120 ); \
             ERRORR( result, this_descr );                       \
         }                                                       \
@@ -23,14 +23,14 @@
 #define LASSOI lasso_instance( relation )
 
 static const char* GLOBAL_ID_TAG_NAME = "GLOBAL_ID";
-static const char* RELATION_TAG_NAME = "__GEOM_ASSOCIATION";
+static const char* RELATION_TAG_NAME  = "__GEOM_ASSOCIATION";
 
 GeomAssocPairSide::GeomAssocPairSide( iRel_Instance p_relation, iBase_Instance p_instance, int p_id )
     : relation( p_relation ), instance_( reinterpret_cast< iGeom_Instance >( p_instance ) ), id( p_id )
 {
     int result;
 
-    create_relation_side( );
+    create_relation_side();
 
     iGeom_getTagHandle( instance_, GLOBAL_ID_TAG_NAME, &gid_tag, &result, strlen( GLOBAL_ID_TAG_NAME ) );
     if( result == iBase_TAG_NOT_FOUND )
@@ -40,40 +40,40 @@ GeomAssocPairSide::GeomAssocPairSide( iRel_Instance p_relation, iBase_Instance p
     }
 }
 
-GeomAssocPairSide::~GeomAssocPairSide( )
+GeomAssocPairSide::~GeomAssocPairSide()
 {
-    destroy_relation_side( );
+    destroy_relation_side();
 }
 
-iBase_Instance GeomAssocPairSide::instance( ) const
+iBase_Instance GeomAssocPairSide::instance() const
 {
     return instance_;
 }
 
-iRel_IfaceType GeomAssocPairSide::type( ) const
+iRel_IfaceType GeomAssocPairSide::type() const
 {
     return iRel_IGEOM_IFACE;
 }
 
-int GeomAssocPairSide::create_relation_side( )
+int GeomAssocPairSide::create_relation_side()
 {
-    int               result;
+    int result;
     std::stringstream ss;
     ss << RELATION_TAG_NAME << id;
-    std::string rel_tag_name( ss.str( ) );
+    std::string rel_tag_name( ss.str() );
 
-    iGeom_getTagHandle( instance_, rel_tag_name.c_str( ), &relation_tag, &result, rel_tag_name.size( ) );
+    iGeom_getTagHandle( instance_, rel_tag_name.c_str(), &relation_tag, &result, rel_tag_name.size() );
     if( result == iBase_TAG_NOT_FOUND )
     {
-        iGeom_createTag( instance_, rel_tag_name.c_str( ), 1, iBase_ENTITY_HANDLE, &relation_tag, &result,
-                         rel_tag_name.size( ) );
+        iGeom_createTag( instance_, rel_tag_name.c_str(), 1, iBase_ENTITY_HANDLE, &relation_tag, &result,
+                         rel_tag_name.size() );
     }
 
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
 
-int GeomAssocPairSide::destroy_relation_side( )
+int GeomAssocPairSide::destroy_relation_side()
 {
     if( relation_tag )
     {
@@ -152,14 +152,14 @@ int GeomAssocPairSide::get_relation_side( iBase_EntityHandle* entities, int num_
 
 int GeomAssocPairSide::get_relation_side( iBase_EntitySetHandle* sets, int num_sets, void* values )
 {
-    char* data = static_cast< char* >( values );
-    int   values_alloc = sizeof( iBase_EntityHandle );
-    int   values_size;
-    int   result;
+    char* data       = static_cast< char* >( values );
+    int values_alloc = sizeof( iBase_EntityHandle );
+    int values_size;
+    int result;
 
     for( int i = 0; i < num_sets; i++ )
     {
-        iGeom_getEntSetData( instance_, sets[ i ], relation_tag, reinterpret_cast< void** >( &data ), &values_alloc,
+        iGeom_getEntSetData( instance_, sets[i], relation_tag, reinterpret_cast< void** >( &data ), &values_alloc,
                              &values_size, &result );
         data += values_size;
         PROCESS_ERROR;
@@ -180,12 +180,12 @@ int GeomAssocPairSide::set_relation_side( iBase_EntityHandle* entities, int num_
 int GeomAssocPairSide::set_relation_side( iBase_EntitySetHandle* sets, int num_sets, const void* values )
 {
     const char* data = static_cast< const char* >( values );
-    int         size = sizeof( iBase_EntityHandle );
-    int         result;
+    int size         = sizeof( iBase_EntityHandle );
+    int result;
 
     for( int i = 0; i < num_sets; i++ )
     {
-        iGeom_setEntSetData( instance_, sets[ i ], relation_tag, data, size, &result );
+        iGeom_setEntSetData( instance_, sets[i], relation_tag, data, size, &result );
         data += size;
         PROCESS_ERROR;
     }
@@ -207,7 +207,7 @@ int GeomAssocPairSide::rmv_relation_side( iBase_EntitySetHandle* sets, int num_s
 
     for( int i = 0; i < num_sets; i++ )
     {
-        iGeom_rmvEntSetTag( instance_, sets[ i ], relation_tag, &result );
+        iGeom_rmvEntSetTag( instance_, sets[i], relation_tag, &result );
         PROCESS_ERROR;
     }
 
@@ -235,14 +235,14 @@ int GeomAssocPairSide::get_gids( iBase_EntityHandle* entities, int num_entities,
 
 int GeomAssocPairSide::get_gids( iBase_EntitySetHandle* sets, int num_sets, int* values )
 {
-    char* data = reinterpret_cast< char* >( values );
-    int   values_alloc = sizeof( int );
-    int   values_size;
-    int   result;
+    char* data       = reinterpret_cast< char* >( values );
+    int values_alloc = sizeof( int );
+    int values_size;
+    int result;
 
     for( int i = 0; i < num_sets; i++ )
     {
-        iGeom_getEntSetData( instance_, sets[ i ], gid_tag, reinterpret_cast< void** >( &data ), &values_alloc,
+        iGeom_getEntSetData( instance_, sets[i], gid_tag, reinterpret_cast< void** >( &data ), &values_alloc,
                              &values_size, &result );
         data += values_size;
         PROCESS_ERROR;

@@ -77,16 +77,16 @@ std::string DEFAULT_MESH = TestDir + "/2D/vtk/quads/tangled/tangled_quad.vtk";
 const bool brief_output = true;
 const bool write_output = false;
 
-int main( )
+int main()
 {
     MBMesquite::MeshImpl mesh;
-    MsqPrintError        err( cout );
-    mesh.read_vtk( DEFAULT_MESH.c_str( ), err );
+    MsqPrintError err( cout );
+    mesh.read_vtk( DEFAULT_MESH.c_str(), err );
     if( err ) return 1;
 
     // Set Domain Constraint
-    Vector3D     pnt( 0, 0, 5 );
-    Vector3D     s_norm( 0, 0, 1 );
+    Vector3D pnt( 0, 0, 5 );
+    Vector3D s_norm( 0, 0, 1 );
     PlanarDomain msq_geom( s_norm, pnt );
 
     // creates an intruction queue
@@ -94,11 +94,11 @@ int main( )
 
     // creates a mean ratio quality metric ...
     ConditionNumberQualityMetric shape_metric;
-    UntangleBetaQualityMetric    untangle( 2 );
-    Randomize                    pass0( .05 );
+    UntangleBetaQualityMetric untangle( 2 );
+    Randomize pass0( .05 );
     // ... and builds an objective function with it
     // LInfTemplate* obj_func = new LInfTemplate(shape_metric);
-    LInfTemplate  obj_func( &untangle );
+    LInfTemplate obj_func( &untangle );
     LPtoPTemplate obj_func2( &shape_metric, 2, err );
     if( err ) return 1;
     // creates the steepest descent optimization procedures
@@ -108,16 +108,16 @@ int main( )
     // SteepestDescent* pass2 = new SteepestDescent( obj_func2 );
     ConjugateGradient pass2( &obj_func2, err );
     if( err ) return 1;
-    pass2.use_element_on_vertex_patch( );
+    pass2.use_element_on_vertex_patch();
     if( err ) return 1;
-    pass2.use_global_patch( );
+    pass2.use_global_patch();
     if( err ) return 1;
-    QualityAssessor stop_qa = QualityAssessor( &shape_metric );
+    QualityAssessor stop_qa  = QualityAssessor( &shape_metric );
     QualityAssessor stop_qa2 = QualityAssessor( &shape_metric );
     if( brief_output )
     {
-        stop_qa.disable_printing_results( );
-        stop_qa2.disable_printing_results( );
+        stop_qa.disable_printing_results();
+        stop_qa2.disable_printing_results();
     }
 
     stop_qa.add_quality_assessment( &untangle );

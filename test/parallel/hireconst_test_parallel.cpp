@@ -39,7 +39,7 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
 
 void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals, double* linearcoords );
 
-void usage( )
+void usage()
 {
     std::cout << "usage: mpirun -np <number of processors> ./hireconst_test_parallel <mesh file> "
                  "-degree <degree> -interp <0=least square, 1=interpolation> -dim <mesh dimension>"
@@ -54,8 +54,8 @@ int main( int argc, char* argv[] )
     MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 #endif
-    int       degree = 3, dim = 2;
-    bool      interp = false;
+    int degree = 3, dim = 2;
+    bool interp = false;
     ErrorCode error;
 
 #ifdef MOAB_HAVE_HDF5
@@ -66,38 +66,38 @@ int main( int argc, char* argv[] )
 
     if( argc == 1 )
     {
-        usage( );
+        usage();
         std::cout << "Using default arguments: ./hireconst_test_parallel " << infile << " -degree 3 -interp 0 -dim 2"
                   << std::endl;
     }
     else
     {
-        infile = argv[ 1 ];
+        infile      = argv[1];
         bool hasdim = false;
 
         for( int i = 2; i < argc; ++i )
         {
             if( i + 1 != argc )
             {
-                if( std::string( argv[ i ] ) == "-degree" ) { degree = atoi( argv[ ++i ] ); }
-                else if( std::string( argv[ i ] ) == "-interp" )
+                if( std::string( argv[i] ) == "-degree" ) { degree = atoi( argv[++i] ); }
+                else if( std::string( argv[i] ) == "-interp" )
                 {
-                    interp = atoi( argv[ ++i ] );
+                    interp = atoi( argv[++i] );
                 }
-                else if( std::string( argv[ i ] ) == "-dim" )
+                else if( std::string( argv[i] ) == "-dim" )
                 {
-                    dim = atoi( argv[ ++i ] );
+                    dim    = atoi( argv[++i] );
                     hasdim = true;
                 }
                 else
                 {
 #ifdef MOAB_HAVE_MPI
 
-                    if( 0 == rank ) { usage( ); }
+                    if( 0 == rank ) { usage(); }
 
-                    MPI_Finalize( );
+                    MPI_Finalize();
 #else
-                    usage( );
+                    usage();
 #endif
                     return 0;
                 }
@@ -150,10 +150,11 @@ int main( int argc, char* argv[] )
 #endif
     }
 
-    error = test_mesh( infile.c_str( ), degree, interp, dim );MB_CHK_ERR( error );
+    error = test_mesh( infile.c_str(), degree, interp, dim );
+    MB_CHK_ERR( error );
 
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
 }
 
@@ -161,20 +162,22 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
                               const int degree, const int dim )
 {
     ErrorCode error;
-    error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
+    error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );
+    MB_CHK_ERR( error );
 #ifdef MOAB_HAVE_MPI
-    int      nprocs, rank;
+    int nprocs, rank;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Comm_size( comm, &nprocs );
     MPI_Comm_rank( comm, &rank );
     EntityHandle partnset;
-    error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );MB_CHK_ERR( error );
+    error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );
+    MB_CHK_ERR( error );
 
     if( nprocs > 1 ) { pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm ); }
 
     if( nprocs > 1 )
     {
-        int         nghlayers = degree > 0 ? HiReconstruction::estimate_num_ghost_layers( degree, true ) : 0;
+        int nghlayers           = degree > 0 ? HiReconstruction::estimate_num_ghost_layers( degree, true ) : 0;
         std::string part_method = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;";
 #ifndef MOAB_HAVE_HDF5
         part_method = "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;";
@@ -200,28 +203,31 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
             read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;";
         }
 
-        error = mbimpl->load_file( infile, &meshset, read_options.c_str( ) );MB_CHK_ERR( error );
+        error = mbimpl->load_file( infile, &meshset, read_options.c_str() );
+        MB_CHK_ERR( error );
     }
     else
     {
-        error = mbimpl->load_file( infile, &meshset );MB_CHK_ERR( error );
+        error = mbimpl->load_file( infile, &meshset );
+        MB_CHK_ERR( error );
     }
 
 #else
     assert( !pc && degree && dim );
-    error = mbimpl->load_file( infile, &meshset );MB_CHK_ERR( error );
+    error = mbimpl->load_file( infile, &meshset );
+    MB_CHK_ERR( error );
 #endif
     return error;
 }
 
 ErrorCode test_mesh( const char* infile, const int degree, const bool interp, const int dim )
 {
-    Core          moab;
-    Interface*    mbimpl = &moab;
-    ParallelComm* pc = NULL;
-    EntityHandle  meshset;
+    Core moab;
+    Interface* mbimpl = &moab;
+    ParallelComm* pc  = NULL;
+    EntityHandle meshset;
 #ifdef MOAB_HAVE_MPI
-    int      nprocs, rank;
+    int nprocs, rank;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Comm_size( comm, &nprocs );
     MPI_Comm_rank( comm, &rank );
@@ -229,18 +235,21 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
 
     ErrorCode error;
     // mesh will be loaded and communicator pc will be updated
-    error = load_meshset_hirec( infile, mbimpl, meshset, pc, degree, dim );MB_CHK_ERR( error );
+    error = load_meshset_hirec( infile, mbimpl, meshset, pc, degree, dim );
+    MB_CHK_ERR( error );
     // initialize
     HiReconstruction hirec( dynamic_cast< Core* >( mbimpl ), pc, meshset );
-    Range            elems, elems_owned;
-    error = mbimpl->get_entities_by_dimension( meshset, dim, elems );MB_CHK_ERR( error );
-    int nelems = elems.size( );
+    Range elems, elems_owned;
+    error = mbimpl->get_entities_by_dimension( meshset, dim, elems );
+    MB_CHK_ERR( error );
+    int nelems = elems.size();
 
 #ifdef MOAB_HAVE_MPI
 
     if( pc )
     {
-        error = pc->filter_pstatus( elems, PSTATUS_GHOST, PSTATUS_NOT, -1, &elems_owned );MB_CHK_ERR( error );
+        error = pc->filter_pstatus( elems, PSTATUS_GHOST, PSTATUS_NOT, -1, &elems_owned );
+        MB_CHK_ERR( error );
     }
     else
     {
@@ -251,7 +260,7 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
 
 #ifdef MOAB_HAVE_MPI
     std::cout << "Mesh has " << nelems << " elements on Processor " << rank << " in total;";
-    std::cout << elems_owned.size( ) << " of which are locally owned elements" << std::endl;
+    std::cout << elems_owned.size() << " of which are locally owned elements" << std::endl;
 #else
     std::cout << "Mesh has " << nelems << " elements" << std::endl;
 #endif
@@ -259,11 +268,13 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
     // reconstruction
     if( dim == 2 )
     {
-        error = hirec.reconstruct3D_surf_geom( degree, interp, false );MB_CHK_ERR( error );
+        error = hirec.reconstruct3D_surf_geom( degree, interp, false );
+        MB_CHK_ERR( error );
     }
     else if( dim == 1 )
     {
-        error = hirec.reconstruct3D_curve_geom( degree, interp, false );MB_CHK_ERR( error );
+        error = hirec.reconstruct3D_curve_geom( degree, interp, false );
+        MB_CHK_ERR( error );
     }
 
 #ifdef MOAB_HAVE_MPI
@@ -274,23 +285,25 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
     // fitting
     double mxdist = 0;
 
-    for( Range::iterator ielem = elems_owned.begin( ); ielem != elems_owned.end( ); ++ielem )
+    for( Range::iterator ielem = elems_owned.begin(); ielem != elems_owned.end(); ++ielem )
     {
-        int                 nvpe;
+        int nvpe;
         const EntityHandle* conn;
-        error = mbimpl->get_connectivity( *ielem, conn, nvpe );MB_CHK_ERR( error );
-        double                w = 1.0 / (double)nvpe;
+        error = mbimpl->get_connectivity( *ielem, conn, nvpe );
+        MB_CHK_ERR( error );
+        double w = 1.0 / (double)nvpe;
         std::vector< double > naturalcoords2fit( nvpe, w );
-        CartVect              newcoords, linearcoords;
-        error = hirec.hiproj_walf_in_element( *ielem, nvpe, 1, &( naturalcoords2fit[ 0 ] ), newcoords.array( ) );
+        CartVect newcoords, linearcoords;
+        error = hirec.hiproj_walf_in_element( *ielem, nvpe, 1, &( naturalcoords2fit[0] ), newcoords.array() );
 
         if( MB_FAILURE == error ) { continue; }
 
         std::vector< double > coords( 3 * nvpe );
-        error = mbimpl->get_coords( conn, nvpe, &( coords[ 0 ] ) );MB_CHK_ERR( error );
-        compute_linear_coords( nvpe, &( coords[ 0 ] ), &( naturalcoords2fit[ 0 ] ), linearcoords.array( ) );
+        error = mbimpl->get_coords( conn, nvpe, &( coords[0] ) );
+        MB_CHK_ERR( error );
+        compute_linear_coords( nvpe, &( coords[0] ), &( naturalcoords2fit[0] ), linearcoords.array() );
         CartVect nlcoords = newcoords - linearcoords;
-        mxdist = std::max( mxdist, nlcoords.length( ) );
+        mxdist            = std::max( mxdist, nlcoords.length() );
         /*#ifdef MOAB_HAVE_MPI
             std::cout << "Error on element " << *ielem << " is " << nlcoords.length() << "on
         Processor " << rank << std::endl; #else std::cout << "Error on element " << *ielem << " is "
@@ -311,11 +324,11 @@ void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals
 
     for( int i = 0; i < 3; ++i )
     {
-        linearcoords[ i ] = 0;
+        linearcoords[i] = 0;
 
         for( int j = 0; j < nvpe; ++j )
         {
-            linearcoords[ i ] += naturals[ j ] * elemcoords[ 3 * j + i ];
+            linearcoords[i] += naturals[j] * elemcoords[3 * j + i];
         }
     }
 }

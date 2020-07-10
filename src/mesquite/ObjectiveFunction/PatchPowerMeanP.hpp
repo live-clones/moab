@@ -62,7 +62,7 @@ class PatchPowerMeanP : public PMeanPTemplate
     PatchPowerMeanP( const PatchPowerMeanP& copy ) : PMeanPTemplate( copy ) {}
 
     MESQUITE_EXPORT
-    virtual ~PatchPowerMeanP( ) {}
+    virtual ~PatchPowerMeanP() {}
 
     MESQUITE_EXPORT virtual bool initialize_block_coordinate_descent( Mesh* mesh, MeshDomain* domain,
                                                                       const Settings* settings, PatchSet* user_set,
@@ -77,7 +77,7 @@ class PatchPowerMeanP : public PMeanPTemplate
                                                         std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
                                                         MsqError& err );
 
-    MESQUITE_EXPORT virtual ObjectiveFunction* clone( ) const;
+    MESQUITE_EXPORT virtual ObjectiveFunction* clone() const;
 };
 
 }  // namespace MBMesquite

@@ -41,12 +41,12 @@ FileOptions::FileOptions( const char* str ) : mData( 0 )
     if( !str ) return;
 
     // check if alternate separator is specified
-    char separator[ 2 ] = { DEFAULT_SEPARATOR, '\0' };
+    char separator[2] = { DEFAULT_SEPARATOR, '\0' };
     if( *str == DEFAULT_SEPARATOR )
     {
         ++str;
         if( strempty( str ) ) return;
-        separator[ 0 ] = *str;
+        separator[0] = *str;
         ++str;
     }
 
@@ -61,20 +61,20 @@ FileOptions::FileOptions( const char* str ) : mData( 0 )
                 mOptions.push_back( i );
     }
 
-    mSeen.resize( mOptions.size( ), false );
+    mSeen.resize( mOptions.size(), false );
 }
 
-FileOptions::FileOptions( const FileOptions& copy ) : mData( 0 ), mOptions( copy.mOptions.size( ) )
+FileOptions::FileOptions( const FileOptions& copy ) : mData( 0 ), mOptions( copy.mOptions.size() )
 {
-    if( !copy.mOptions.empty( ) )
+    if( !copy.mOptions.empty() )
     {
-        const char* last = copy.mOptions.back( );
+        const char* last   = copy.mOptions.back();
         const char* endptr = last + strlen( last ) + 1;
-        size_t      len = endptr - copy.mData;
-        mData = (char*)malloc( len );
+        size_t len         = endptr - copy.mData;
+        mData              = (char*)malloc( len );
         memcpy( mData, copy.mData, len );
-        for( size_t i = 0; i < mOptions.size( ); ++i )
-            mOptions[ i ] = mData + ( copy.mOptions[ i ] - copy.mData );
+        for( size_t i = 0; i < mOptions.size(); ++i )
+            mOptions[i] = mData + ( copy.mOptions[i] - copy.mData );
     }
     mSeen = copy.mSeen;
 }
@@ -86,24 +86,24 @@ FileOptions& FileOptions::operator=( const FileOptions& copy )
 
     free( mData );
     mData = 0;
-    mOptions.resize( copy.mOptions.size( ) );
+    mOptions.resize( copy.mOptions.size() );
 
-    if( !copy.mOptions.empty( ) )
+    if( !copy.mOptions.empty() )
     {
-        const char* last = copy.mOptions.back( );
+        const char* last   = copy.mOptions.back();
         const char* endptr = last + strlen( last ) + 1;
-        size_t      len = endptr - copy.mData;
-        mData = (char*)malloc( len );
+        size_t len         = endptr - copy.mData;
+        mData              = (char*)malloc( len );
         memcpy( mData, copy.mData, len );
-        for( size_t i = 0; i < mOptions.size( ); ++i )
-            mOptions[ i ] = mData + ( copy.mOptions[ i ] - copy.mData );
+        for( size_t i = 0; i < mOptions.size(); ++i )
+            mOptions[i] = mData + ( copy.mOptions[i] - copy.mData );
     }
 
     mSeen = copy.mSeen;
     return *this;
 }
 
-FileOptions::~FileOptions( )
+FileOptions::~FileOptions()
 {
     free( mData );
 }
@@ -111,7 +111,7 @@ FileOptions::~FileOptions( )
 ErrorCode FileOptions::get_null_option( const char* name ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
     return strempty( s ) ? MB_SUCCESS : MB_TYPE_OUT_OF_RANGE;
 }
@@ -119,14 +119,14 @@ ErrorCode FileOptions::get_null_option( const char* name ) const
 ErrorCode FileOptions::get_int_option( const char* name, int& value ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     // empty string
     if( strempty( s ) ) return MB_TYPE_OUT_OF_RANGE;
 
     // parse value
-    char*    endptr;
+    char* endptr;
     long int pval = strtol( s, &endptr, 0 );
     if( !strempty( endptr ) )  // syntax error
         return MB_TYPE_OUT_OF_RANGE;
@@ -141,7 +141,7 @@ ErrorCode FileOptions::get_int_option( const char* name, int& value ) const
 ErrorCode FileOptions::get_int_option( const char* name, int default_val, int& value ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     // empty string
@@ -152,7 +152,7 @@ ErrorCode FileOptions::get_int_option( const char* name, int default_val, int& v
     }
 
     // parse value
-    char*    endptr;
+    char* endptr;
     long int pval = strtol( s, &endptr, 0 );
     if( !strempty( endptr ) )  // syntax error
         return MB_TYPE_OUT_OF_RANGE;
@@ -167,7 +167,7 @@ ErrorCode FileOptions::get_int_option( const char* name, int default_val, int& v
 ErrorCode FileOptions::get_ints_option( const char* name, std::vector< int >& values ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     // empty string
@@ -176,7 +176,7 @@ ErrorCode FileOptions::get_ints_option( const char* name, std::vector< int >& va
     // parse values
     while( !strempty( s ) )
     {
-        char*    endptr;
+        char* endptr;
         long int sval = strtol( s, &endptr, 0 );
 
 #define EATSPACE( a )                                     \
@@ -187,7 +187,7 @@ ErrorCode FileOptions::get_ints_option( const char* name, std::vector< int >& va
         if( *endptr == '-' )
         {
             endptr++;
-            s = endptr;
+            s    = endptr;
             eval = strtol( s, &endptr, 0 );
             EATSPACE( endptr );
         }
@@ -210,7 +210,7 @@ ErrorCode FileOptions::get_ints_option( const char* name, std::vector< int >& va
 ErrorCode FileOptions::get_reals_option( const char* name, std::vector< double >& values ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     // empty string
@@ -219,7 +219,7 @@ ErrorCode FileOptions::get_reals_option( const char* name, std::vector< double >
     // parse values
     while( !strempty( s ) )
     {
-        char*  endptr;
+        char* endptr;
         double sval = strtod( s, &endptr );
 
         EATSPACE( endptr );
@@ -234,7 +234,7 @@ ErrorCode FileOptions::get_reals_option( const char* name, std::vector< double >
 ErrorCode FileOptions::get_real_option( const char* name, double& value ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     // empty string
@@ -252,15 +252,15 @@ ErrorCode FileOptions::get_real_option( const char* name, double& value ) const
 ErrorCode FileOptions::get_strs_option( const char* name, std::vector< std::string >& values ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     // empty string
     if( strempty( s ) ) return MB_TYPE_OUT_OF_RANGE;
 
     // parse values
-    char  separator[ 3 ] = { ' ', ',', '\0' };
-    char* tmp_str = strdup( s );
+    char separator[3] = { ' ', ',', '\0' };
+    char* tmp_str     = strdup( s );
     for( char* i = strtok( tmp_str, separator ); i; i = strtok( 0, separator ) )
         if( !strempty( i ) )  // skip empty strings
             values.push_back( std::string( i ) );
@@ -272,7 +272,7 @@ ErrorCode FileOptions::get_strs_option( const char* name, std::vector< std::stri
 ErrorCode FileOptions::get_str_option( const char* name, std::string& value ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
     if( strempty( s ) ) return MB_TYPE_OUT_OF_RANGE;
     value = s;
@@ -282,7 +282,7 @@ ErrorCode FileOptions::get_str_option( const char* name, std::string& value ) co
 ErrorCode FileOptions::get_option( const char* name, std::string& value ) const
 {
     const char* s;
-    ErrorCode   rval = get_option( name, s );
+    ErrorCode rval = get_option( name, s );
     if( MB_SUCCESS != rval ) return rval;
 
     value = s;
@@ -292,7 +292,7 @@ ErrorCode FileOptions::get_option( const char* name, std::string& value ) const
 ErrorCode FileOptions::get_option( const char* name, const char*& value ) const
 {
     std::vector< const char* >::const_iterator i;
-    for( i = mOptions.begin( ); i != mOptions.end( ); ++i )
+    for( i = mOptions.begin(); i != mOptions.end(); ++i )
     {
         const char* opt = *i;
         if( compare( name, opt ) )
@@ -302,7 +302,7 @@ ErrorCode FileOptions::get_option( const char* name, const char*& value ) const
             // name must be either the null char or an equals symbol.
             if( *value == '=' ) ++value;
 
-            mSeen[ i - mOptions.begin( ) ] = true;
+            mSeen[i - mOptions.begin()] = true;
             return MB_SUCCESS;
         }
     }
@@ -312,7 +312,7 @@ ErrorCode FileOptions::get_option( const char* name, const char*& value ) const
 
 ErrorCode FileOptions::match_option( const char* name, const char* value ) const
 {
-    int         idx;
+    int idx;
     const char* array[] = { value, NULL };
     return match_option( name, array, idx );
 }
@@ -320,11 +320,11 @@ ErrorCode FileOptions::match_option( const char* name, const char* value ) const
 ErrorCode FileOptions::match_option( const char* name, const char* const* values, int& index ) const
 {
     const char* optval;
-    ErrorCode   rval = get_option( name, optval );
+    ErrorCode rval = get_option( name, optval );
     if( MB_SUCCESS != rval ) return rval;
 
-    for( index = 0; values[ index ]; ++index )
-        if( compare( optval, values[ index ] ) ) return MB_SUCCESS;
+    for( index = 0; values[index]; ++index )
+        if( compare( optval, values[index] ) ) return MB_SUCCESS;
 
     index = -1;
     return MB_FAILURE;
@@ -333,14 +333,14 @@ ErrorCode FileOptions::match_option( const char* name, const char* const* values
 ErrorCode FileOptions::get_toggle_option( const char* name, bool default_value, bool& value ) const
 {
     static const char* values[] = { "true", "yes", "1", "on", "false", "no", "0", "off", 0 };
-    const int          num_true = 4;
+    const int num_true          = 4;
 
-    int       index;
+    int index;
     ErrorCode result = match_option( name, values, index );
     if( result == MB_SUCCESS ) { value = index < num_true; }
     else if( result == MB_ENTITY_NOT_FOUND )
     {
-        value = default_value;
+        value  = default_value;
         result = MB_SUCCESS;
     }
     else
@@ -366,34 +366,34 @@ bool FileOptions::compare( const char* name, const char* option )
 
 void FileOptions::get_options( std::vector< std::string >& list ) const
 {
-    list.clear( );
-    list.resize( mOptions.size( ) );
-    std::copy( mOptions.begin( ), mOptions.end( ), list.begin( ) );
+    list.clear();
+    list.resize( mOptions.size() );
+    std::copy( mOptions.begin(), mOptions.end(), list.begin() );
 }
 
-bool FileOptions::all_seen( ) const
+bool FileOptions::all_seen() const
 {
-    return std::find( mSeen.begin( ), mSeen.end( ), false ) == mSeen.end( );
+    return std::find( mSeen.begin(), mSeen.end(), false ) == mSeen.end();
 }
 
-void FileOptions::mark_all_seen( ) const
+void FileOptions::mark_all_seen() const
 {
-    mSeen.clear( );
-    mSeen.resize( mOptions.size( ), true );
+    mSeen.clear();
+    mSeen.resize( mOptions.size(), true );
 }
 
 ErrorCode FileOptions::get_unseen_option( std::string& name ) const
 {
-    std::vector< bool >::iterator i = std::find( mSeen.begin( ), mSeen.end( ), false );
-    if( i == mSeen.end( ) )
+    std::vector< bool >::iterator i = std::find( mSeen.begin(), mSeen.end(), false );
+    if( i == mSeen.end() )
     {
-        name.clear( );
+        name.clear();
         return MB_ENTITY_NOT_FOUND;
     }
 
-    const char* opt = mOptions[ i - mSeen.begin( ) ];
+    const char* opt = mOptions[i - mSeen.begin()];
     const char* end = strchr( opt, '=' );
-    name = end ? std::string( opt, end - opt ) : std::string( opt );
+    name            = end ? std::string( opt, end - opt ) : std::string( opt );
     return MB_SUCCESS;
 }
 
@@ -419,15 +419,15 @@ using namespace moab;
         return 2;                                                                                                   \
     }
 
-int main( )
+int main()
 {
     FileOptions tool( "INT1=1;NUL1;STR1=ABC;DBL1=1.0;dbl2=2.0;DBL3=3.0;INT2=2;nul2;NUL3;INT3=3;str2=once upon a "
                       "time;str3==fubar=;;INTS=1-3,5,6;DBLS=1.0,2.0, 3.0;STRS=var1, var2_var2;STRS2=" );
 
     std::string s;
-    int         i;
-    double      d;
-    ErrorCode   rval;
+    int i;
+    double d;
+    ErrorCode rval;
 
     // test basic get_option method without deleting entry
     rval = tool.get_option( "STR1", s );
@@ -442,7 +442,7 @@ int main( )
     // test basig get_option method with a null option
     rval = tool.get_option( "NUL2", s );
     CHECK( rval );
-    EQUAL( s.empty( ), true );
+    EQUAL( s.empty(), true );
 
     // test null option
     rval = tool.get_null_option( "nul1" );
@@ -505,7 +505,7 @@ int main( )
     EQUAL( rval, MB_TYPE_OUT_OF_RANGE );
 
     // We haven't looked at all of the options yet
-    EQUAL( false, tool.all_seen( ) );
+    EQUAL( false, tool.all_seen() );
     rval = tool.get_unseen_option( s );
     CHECK( rval );
     EQUAL( s, "str3" );
@@ -514,61 +514,61 @@ int main( )
 
     rval = tool.get_option( "NUL3", s );
     CHECK( rval );
-    EQUAL( s.empty( ), true );
+    EQUAL( s.empty(), true );
 
     rval = tool.get_option( "STR3", s );
     CHECK( rval );
     EQUAL( s, "=fubar=" );
 
     // test size of options string
-    unsigned l = tool.size( );
+    unsigned l = tool.size();
     EQUAL( l, 16u );
 
     // test ints option
     std::vector< int > ivals;
     rval = tool.get_ints_option( "INTS", ivals );
     CHECK( rval );
-    EQUAL( 5, ivals.size( ) );
-    EQUAL( 1, ivals[ 0 ] );
-    EQUAL( 2, ivals[ 1 ] );
-    EQUAL( 3, ivals[ 2 ] );
-    EQUAL( 5, ivals[ 3 ] );
-    EQUAL( 6, ivals[ 4 ] );
+    EQUAL( 5, ivals.size() );
+    EQUAL( 1, ivals[0] );
+    EQUAL( 2, ivals[1] );
+    EQUAL( 3, ivals[2] );
+    EQUAL( 5, ivals[3] );
+    EQUAL( 6, ivals[4] );
 
     // test dbls option
     std::vector< double > vals;
     rval = tool.get_reals_option( "DBLS", vals );
     CHECK( rval );
-    EQUAL( 3, vals.size( ) );
-    EQUAL( 1.0, vals[ 0 ] );
-    EQUAL( 2.0, vals[ 1 ] );
-    EQUAL( 3.0, vals[ 2 ] );
+    EQUAL( 3, vals.size() );
+    EQUAL( 1.0, vals[0] );
+    EQUAL( 2.0, vals[1] );
+    EQUAL( 3.0, vals[2] );
 
     // test strs option
     std::vector< std::string > svals;
     rval = tool.get_strs_option( "STRS", svals );
     CHECK( rval );
-    EQUAL( 2, svals.size( ) );
-    EQUAL( "var1", svals[ 0 ] );
-    EQUAL( "var2_var2", svals[ 1 ] );
+    EQUAL( 2, svals.size() );
+    EQUAL( "var1", svals[0] );
+    EQUAL( "var2_var2", svals[1] );
 
-    svals.clear( );
+    svals.clear();
     rval = tool.get_strs_option( "STRS2", svals );
     EQUAL( MB_TYPE_OUT_OF_RANGE, rval );
 
     // We requested every option
-    EQUAL( true, tool.all_seen( ) );
+    EQUAL( true, tool.all_seen() );
     rval = tool.get_unseen_option( s );
     EQUAL( MB_ENTITY_NOT_FOUND, rval );
 
     // test alternate separator
 
     FileOptions tool2( ";+OPT1=ABC+OPT2=" );
-    l = tool2.size( );
+    l = tool2.size();
     EQUAL( l, 2 );
 
     // We haven't looked at all of the options yet
-    EQUAL( false, tool2.all_seen( ) );
+    EQUAL( false, tool2.all_seen() );
     rval = tool2.get_unseen_option( s );
     CHECK( rval );
     EQUAL( s, "OPT1" );
@@ -579,39 +579,39 @@ int main( )
 
     rval = tool2.get_option( "opt2", s );
     CHECK( rval );
-    bool e = s.empty( );
+    bool e = s.empty();
     EQUAL( e, true );
 
-    l = tool2.size( );
+    l = tool2.size();
     EQUAL( l, 2 );
 
     // We requested every option
-    EQUAL( true, tool2.all_seen( ) );
+    EQUAL( true, tool2.all_seen() );
     rval = tool2.get_unseen_option( s );
     EQUAL( MB_ENTITY_NOT_FOUND, rval );
 
     // test empty options string
 
     FileOptions tool3( ";;;;" );
-    e = tool3.empty( );
+    e = tool3.empty();
     EQUAL( e, true );
-    l = tool3.size( );
+    l = tool3.size();
     EQUAL( l, 0 );
-    EQUAL( true, tool3.all_seen( ) );
+    EQUAL( true, tool3.all_seen() );
 
     FileOptions tool4( NULL );
-    e = tool4.empty( );
+    e = tool4.empty();
     EQUAL( e, true );
-    l = tool4.size( );
+    l = tool4.size();
     EQUAL( l, 0 );
-    EQUAL( true, tool4.all_seen( ) );
+    EQUAL( true, tool4.all_seen() );
 
     FileOptions tool5( ";+" );
-    e = tool5.empty( );
+    e = tool5.empty();
     EQUAL( e, true );
-    l = tool5.size( );
+    l = tool5.size();
     EQUAL( l, 0 );
-    EQUAL( true, tool5.all_seen( ) );
+    EQUAL( true, tool5.all_seen() );
 
     // test copy constructor
 
@@ -623,23 +623,23 @@ int main( )
 
     rval = tool6.get_option( "opt2", s );
     CHECK( rval );
-    e = s.empty( );
+    e = s.empty();
     EQUAL( e, true );
 
-    l = tool6.size( );
+    l = tool6.size();
     EQUAL( l, 2 );
 
     FileOptions tool7( tool5 );
-    e = tool7.empty( );
+    e = tool7.empty();
     EQUAL( e, true );
-    l = tool7.size( );
+    l = tool7.size();
     EQUAL( l, 0 );
 
     // test assignment operator
 
     FileOptions tool8( tool2 );
     tool8 = tool;
-    EQUAL( tool8.size( ), tool.size( ) );
+    EQUAL( tool8.size(), tool.size() );
 
     return 0;
 }

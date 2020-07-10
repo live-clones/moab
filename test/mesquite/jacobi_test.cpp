@@ -41,9 +41,9 @@ using namespace MBMesquite;
 
 double dist( double* p1, double* p2 )
 {
-    double d1 = p1[ 0 ] - p2[ 0 ];
-    double d2 = p1[ 1 ] - p2[ 1 ];
-    double d3 = p1[ 2 ] - p2[ 2 ];
+    double d1 = p1[0] - p2[0];
+    double d2 = p1[1] - p2[1];
+    double d3 = p1[2] - p2[2];
     return sqrt( d1 * d2 * d3 );
 }
 
@@ -56,73 +56,73 @@ void usage( const char* argv0 )
 int main( int argc, char* argv[] )
 {
     const char* initial_mesh_file = 0;
-    const char* final_mesh_file = 0;
+    const char* final_mesh_file   = 0;
     for( int i = 1; i < argc; ++i )
     {
-        if( !strcmp( argv[ i ], "-f" ) )
+        if( !strcmp( argv[i], "-f" ) )
         {
             ++i;
-            if( i == argc ) usage( argv[ 0 ] );
-            final_mesh_file = argv[ i ];
+            if( i == argc ) usage( argv[0] );
+            final_mesh_file = argv[i];
         }
-        else if( !strcmp( argv[ i ], "-i" ) )
+        else if( !strcmp( argv[i], "-i" ) )
         {
             ++i;
-            if( i == argc ) usage( argv[ 0 ] );
-            initial_mesh_file = argv[ i ];
+            if( i == argc ) usage( argv[0] );
+            initial_mesh_file = argv[i];
         }
         else
-            usage( argv[ i ] );
+            usage( argv[i] );
     }
 
     // create mesh
-    const int    intervals = 3;
+    const int intervals  = 3;
     const double perturb = 0.3;
-    const int    nvtx = ( intervals + 1 ) * ( intervals + 1 );
-    double       coords[ nvtx * 3 ];
-    double       exp_coords[ nvtx * 3 ];
-    int          fixed[ nvtx ];
+    const int nvtx       = ( intervals + 1 ) * ( intervals + 1 );
+    double coords[nvtx * 3];
+    double exp_coords[nvtx * 3];
+    int fixed[nvtx];
     for( int i = 0; i < nvtx; ++i )
     {
         double* c = coords + 3 * i;
         double* e = exp_coords + 3 * i;
-        int     row = i / ( intervals + 1 );
-        int     col = i % ( intervals + 1 );
-        double  xdelta, ydelta;
+        int row   = i / ( intervals + 1 );
+        int col   = i % ( intervals + 1 );
+        double xdelta, ydelta;
         if( row > 0 && row < intervals && col > 0 && col < intervals )
         {
-            fixed[ i ] = 0;
-            xdelta = row % 2 ? -perturb : 0;
-            ydelta = col % 2 ? perturb : -perturb;
+            fixed[i] = 0;
+            xdelta   = row % 2 ? -perturb : 0;
+            ydelta   = col % 2 ? perturb : -perturb;
         }
         else
         {
-            fixed[ i ] = 1;
+            fixed[i] = 1;
             xdelta = ydelta = 0.0;
         }
-        c[ 0 ] = col + xdelta;
-        c[ 1 ] = row + ydelta;
-        c[ 2 ] = 0.0;
-        e[ 0 ] = col;
-        e[ 1 ] = row;
-        e[ 2 ] = 0.0;
+        c[0] = col + xdelta;
+        c[1] = row + ydelta;
+        c[2] = 0.0;
+        e[0] = col;
+        e[1] = row;
+        e[2] = 0.0;
     }
-    const int     nquad = intervals * intervals;
-    unsigned long conn[ nquad * 4 ];
+    const int nquad = intervals * intervals;
+    unsigned long conn[nquad * 4];
     for( int i = 0; i < nquad; ++i )
     {
         unsigned long* c = conn + 4 * i;
-        int            row = i / intervals;
-        int            col = i % intervals;
-        int            n0 = ( intervals + 1 ) * row + col;
-        c[ 0 ] = n0;
-        c[ 1 ] = n0 + 1;
-        c[ 2 ] = n0 + intervals + 2;
-        c[ 3 ] = n0 + intervals + 1;
+        int row          = i / intervals;
+        int col          = i % intervals;
+        int n0           = ( intervals + 1 ) * row + col;
+        c[0]             = n0;
+        c[1]             = n0 + 1;
+        c[2]             = n0 + intervals + 2;
+        c[3]             = n0 + intervals + 1;
     }
     MsqPrintError err( std::cerr );
-    ArrayMesh     mesh( 3, nvtx, coords, fixed, nquad, QUADRILATERAL, conn );
-    PlanarDomain  zplane( PlanarDomain::XY );
+    ArrayMesh mesh( 3, nvtx, coords, fixed, nquad, QUADRILATERAL, conn );
+    PlanarDomain zplane( PlanarDomain::XY );
     if( initial_mesh_file )
     {
         MeshWriter::write_vtk( &mesh, initial_mesh_file, err );
@@ -134,18 +134,18 @@ int main( int argc, char* argv[] )
     }
 
     // do optimization
-    const double     eps = 0.01;
+    const double eps = 0.01;
     IdealShapeTarget w;
-    TShapeB1         mu;
-    TQualityMetric   metric( &w, &mu );
-    PMeanPTemplate   func( 1.0, &metric );
-    SteepestDescent  solver( &func );
-    solver.use_element_on_vertex_patch( );
-    solver.do_jacobi_optimization( );
+    TShapeB1 mu;
+    TQualityMetric metric( &w, &mu );
+    PMeanPTemplate func( 1.0, &metric );
+    SteepestDescent solver( &func );
+    solver.use_element_on_vertex_patch();
+    solver.do_jacobi_optimization();
     TerminationCriterion inner, outer;
     inner.add_absolute_vertex_movement( 0.5 * eps );
     outer.add_absolute_vertex_movement( 0.5 * eps );
-    QualityAssessor  qa( &metric );
+    QualityAssessor qa( &metric );
     InstructionQueue q;
     q.add_quality_assessor( &qa, err );
     q.set_master_quality_improver( &solver, err );
@@ -170,8 +170,8 @@ int main( int argc, char* argv[] )
         if( dist( coords + 3 * i, exp_coords + 3 * i ) > eps )
         {
             ++invalid;
-            printf( "Vertex %d at (%f,%f,%f), expected at (%f,%f,%f)\n", i, coords[ 3 * i ], coords[ 3 * i + 1 ],
-                    coords[ 3 * i + 2 ], exp_coords[ 3 * i ], exp_coords[ 3 * i + 1 ], exp_coords[ 3 * i + 2 ] );
+            printf( "Vertex %d at (%f,%f,%f), expected at (%f,%f,%f)\n", i, coords[3 * i], coords[3 * i + 1],
+                    coords[3 * i + 2], exp_coords[3 * i], exp_coords[3 * i + 1], exp_coords[3 * i + 2] );
         }
     }
 

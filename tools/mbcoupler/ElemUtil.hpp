@@ -25,7 +25,7 @@ namespace ElemUtil
     // wrapper to hex_findpt
     void nat_coords_trilinear_hex2( const CartVect* hex_corners, const CartVect& x, CartVect& xi, double til );
 
-    void hex_findpt( double* xm[ 3 ], int n, CartVect xyz, CartVect& rst, double& dist );
+    void hex_findpt( double* xm[3], int n, CartVect xyz, CartVect& rst, double& dist );
 
     void hex_eval( double* field, int n, CartVect rst, double& value );
 
@@ -51,7 +51,7 @@ namespace Element
         /**\brief Construct a Map defined by the given std::vector of vertices. */
         Map( const std::vector< CartVect >& v )
         {
-            this->vertex.resize( v.size( ) );
+            this->vertex.resize( v.size() );
             this->set_vertices( v );
         };
         /**\brief Construct a Map defined by n vertices. */
@@ -59,7 +59,7 @@ namespace Element
         {
             this->vertex = std::vector< CartVect >( n );
         };
-        virtual ~Map( );
+        virtual ~Map();
         /**\brief Evaluate the map on \f$x_i\f$ (calculate \f$\vec x = F($\vec \xi)\f$ )*/
         virtual CartVect evaluate( const CartVect& xi ) const = 0;
         /**\brief Evaluate the inverse map (calculate \f$\vec \xi = F^-1($\vec x)\f$ to given
@@ -75,20 +75,20 @@ namespace Element
         /**\brief Evaluate the inverse of the Jacobi matrix. */
         virtual Matrix3 ijacobian( const CartVect& xi ) const
         {
-            return this->jacobian( xi ).inverse( );
+            return this->jacobian( xi ).inverse();
         };
         /* det_jacobian and det_ijacobian should be overridden for efficiency. */
         /**\brief Evaluate the determinate of the Jacobi matrix. */
         virtual double det_jacobian( const CartVect& xi ) const
         {
-            return this->jacobian( xi ).determinant( );
+            return this->jacobian( xi ).determinant();
         };
         /* FIX: should this be evaluated in real coordinates and be obtained as part of a Newton
          * solve? */
         /**\brief Evaluate the determinate of the inverse Jacobi matrix. */
         virtual double det_ijacobian( const CartVect& xi ) const
         {
-            return this->jacobian( xi ).inverse( ).determinant( );
+            return this->jacobian( xi ).inverse().determinant();
         };
 
         /**\brief Evaluate a scalar field at a point given field values at the vertices. */
@@ -97,12 +97,12 @@ namespace Element
         virtual double integrate_scalar_field( const double* field_vertex_values ) const = 0;
 
         /**\brief Size of the vertices vector. */
-        unsigned int size( )
+        unsigned int size()
         {
-            return this->vertex.size( );
+            return this->vertex.size();
         }
         /**\brief Retrieve vertices. */
-        const std::vector< CartVect >& get_vertices( );
+        const std::vector< CartVect >& get_vertices();
         /**\brief Set vertices.      */
         virtual void set_vertices( const std::vector< CartVect >& v );
 
@@ -117,14 +117,14 @@ namespace Element
             EvaluationError( const CartVect& x, const std::vector< CartVect >& verts ) : p( x ), vertices( verts )
             {
 #ifndef NDEBUG
-                std::cout << "p:" << p << "\n vertices.size() " << vertices.size( ) << "\n";
-                for( size_t i = 0; i < vertices.size( ); i++ )
-                    std::cout << vertices[ i ] << "\n";
+                std::cout << "p:" << p << "\n vertices.size() " << vertices.size() << "\n";
+                for( size_t i = 0; i < vertices.size(); i++ )
+                    std::cout << vertices[i] << "\n";
 #endif
             };
 
           private:
-            CartVect                p;
+            CartVect p;
             std::vector< CartVect > vertices;
         };  // class EvaluationError
 
@@ -132,7 +132,7 @@ namespace Element
         class ArgError
         {
           public:
-            ArgError( ){ };
+            ArgError(){};
         };  // class ArgError
       protected:
         std::vector< CartVect > vertex;
@@ -143,24 +143,24 @@ namespace Element
     class LinearHex : public Map
     {
       public:
-        LinearHex( const std::vector< CartVect >& vertices ) : Map( vertices ){ };
-        LinearHex( );
-        virtual ~LinearHex( );
+        LinearHex( const std::vector< CartVect >& vertices ) : Map( vertices ){};
+        LinearHex();
+        virtual ~LinearHex();
 
         virtual CartVect evaluate( const CartVect& xi ) const;
         // virtual CartVect ievaluate(const CartVect& x, double tol) const ;
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        virtual double integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
         /* Preimages of the vertices -- "canonical vertices" -- are known as "corners". */
-        static const double       corner[ 8 ][ 3 ];
-        static const double       gauss[ 2 ][ 2 ];
+        static const double corner[8][3];
+        static const double gauss[2][2];
         static const unsigned int corner_count = 8;
-        static const unsigned int gauss_count = 2;
+        static const unsigned int gauss_count  = 2;
 
     };  // class LinearHex
 
@@ -169,24 +169,24 @@ namespace Element
     class QuadraticHex : public Map
     {
       public:
-        QuadraticHex( const std::vector< CartVect >& vertices ) : Map( vertices ){ };
-        QuadraticHex( );
-        virtual ~QuadraticHex( );
+        QuadraticHex( const std::vector< CartVect >& vertices ) : Map( vertices ){};
+        QuadraticHex();
+        virtual ~QuadraticHex();
         virtual CartVect evaluate( const CartVect& xi ) const;
         // virtual CartVect ievaluate(const CartVect& x, double tol) const ;
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        virtual double integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
         /* Preimages of the vertices -- "canonical vertices" -- are known as "corners".
          * there are 27 vertices for a tri-quadratic xes*/
-        static const int          corner[ 27 ][ 3 ];
-        static const double       gauss[ 8 ][ 2 ];  // TODO fix me
+        static const int corner[27][3];
+        static const double gauss[8][2];  // TODO fix me
         static const unsigned int corner_count = 27;
-        static const unsigned int gauss_count = 2;  // TODO fix me
+        static const unsigned int gauss_count  = 2;  // TODO fix me
 
     };  // class QuadraticHex
     /**\brief Shape function space for a linear tetrahedron, obtained by a pushforward of the
@@ -198,15 +198,15 @@ namespace Element
         {
             set_vertices( vertex );
         };
-        LinearTet( );
-        virtual ~LinearTet( );
+        LinearTet();
+        virtual ~LinearTet();
         /* Override the evaluation routines to take advantage of the properties of P1. */
         virtual CartVect evaluate( const CartVect& xi ) const
         {
-            return this->vertex[ 0 ] + this->T * xi;
+            return this->vertex[0] + this->T * xi;
         };
         virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
-        virtual Matrix3  jacobian( const CartVect& ) const
+        virtual Matrix3 jacobian( const CartVect& ) const
         {
             return this->T;
         };
@@ -232,9 +232,9 @@ namespace Element
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
       protected:
-        static const double corner[ 4 ][ 3 ];
-        Matrix3             T, T_inverse;
-        double              det_T, det_T_inverse;
+        static const double corner[4][3];
+        Matrix3 T, T_inverse;
+        double det_T, det_T_inverse;
     };  // class LinearTet
 
     class SpectralHex : public Map
@@ -242,37 +242,37 @@ namespace Element
       public:
         SpectralHex( const std::vector< CartVect >& vertices ) : Map( vertices )
         {
-            _xyz[ 0 ] = _xyz[ 1 ] = _xyz[ 2 ] = NULL;
+            _xyz[0] = _xyz[1] = _xyz[2] = NULL;
         };
         SpectralHex( int order, double* x, double* y, double* z );
         SpectralHex( int order );
-        SpectralHex( );
-        virtual ~SpectralHex( );
-        void             set_gl_points( double* x, double* y, double* z );
+        SpectralHex();
+        virtual ~SpectralHex();
+        void set_gl_points( double* x, double* y, double* z );
         virtual CartVect evaluate( const CartVect& xi ) const;
         virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
-        virtual Matrix3  jacobian( const CartVect& xi ) const;
-        double           evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        double           integrate_scalar_field( const double* field_vertex_values ) const;
-        bool             inside_nat_space( const CartVect& xi, double& tol ) const;
+        virtual Matrix3 jacobian( const CartVect& xi ) const;
+        double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        double integrate_scalar_field( const double* field_vertex_values ) const;
+        bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         // to compute the values that need to be cached for each element of order n
         void Init( int order );
-        void freedata( );
+        void freedata();
 
       protected:
         /* values that depend only on the order of the element , cached */
         /*  the order in 3 directions */
-        static int           _n;
-        static realType*     _z[ 3 ];
-        static lagrange_data _ld[ 3 ];
-        static opt_data_3    _data;
-        static realType*     _odwork;  // work area
+        static int _n;
+        static realType* _z[3];
+        static lagrange_data _ld[3];
+        static opt_data_3 _data;
+        static realType* _odwork;  // work area
 
         // flag for initialization of data
         static bool _init;
 
-        realType* _xyz[ 3 ];
+        realType* _xyz[3];
 
     };  // class SpectralHex
 
@@ -281,23 +281,23 @@ namespace Element
     class LinearQuad : public Map
     {
       public:
-        LinearQuad( const std::vector< CartVect >& vertices ) : Map( vertices ){ };
-        LinearQuad( );
-        virtual ~LinearQuad( );
+        LinearQuad( const std::vector< CartVect >& vertices ) : Map( vertices ){};
+        LinearQuad();
+        virtual ~LinearQuad();
         virtual CartVect evaluate( const CartVect& xi ) const;
         // virtual CartVect ievaluate(const CartVect& x, double tol) const ;
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        virtual double integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
         /* Preimages of the vertices -- "canonical vertices" -- are known as "corners". */
-        static const double       corner[ 4 ][ 3 ];
-        static const double       gauss[ 1 ][ 2 ];
+        static const double corner[4][3];
+        static const double gauss[1][2];
         static const unsigned int corner_count = 4;
-        static const unsigned int gauss_count = 1;
+        static const unsigned int gauss_count  = 1;
 
     };  // class LinearQuad
 
@@ -310,13 +310,13 @@ namespace Element
     {
       public:
         SphericalQuad( const std::vector< CartVect >& vertices );
-        virtual ~SphericalQuad( ){ };
+        virtual ~SphericalQuad(){};
         virtual bool inside_box( const CartVect& pos, double& tol ) const;
-        CartVect     ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
+        CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
 
       protected:
         CartVect v1;
-        Matrix3  transf;  // so will have a lot of stuff, including the transf to a coordinate system
+        Matrix3 transf;  // so will have a lot of stuff, including the transf to a coordinate system
         // double tangent_plane; // at first vertex; normal to the plane is first vertex
 
     };  // class SphericalQuad
@@ -329,16 +329,16 @@ namespace Element
         {
             set_vertices( vertex );
         };
-        LinearTri( );
-        virtual ~LinearTri( );
+        LinearTri();
+        virtual ~LinearTri();
         /* Override the evaluation routines to take advantage of the properties of P1. */
         /* similar to tets */
         virtual CartVect evaluate( const CartVect& xi ) const
         {
-            return this->vertex[ 0 ] + this->T * xi;
+            return this->vertex[0] + this->T * xi;
         };
         virtual CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
-        virtual Matrix3  jacobian( const CartVect& ) const
+        virtual Matrix3 jacobian( const CartVect& ) const
         {
             return this->T;
         };
@@ -365,9 +365,9 @@ namespace Element
 
       protected:
         /* Preimages of the vertices -- "canonical vertices" -- are known as "corners". */
-        static const double corner[ 3 ][ 3 ];
-        Matrix3             T, T_inverse;
-        double              det_T, det_T_inverse;
+        static const double corner[3][3];
+        Matrix3 T, T_inverse;
+        double det_T, det_T_inverse;
 
     };  // class LinearTri
 
@@ -380,13 +380,13 @@ namespace Element
     {
       public:
         SphericalTri( const std::vector< CartVect >& vertices );
-        virtual ~SphericalTri( ){ };
+        virtual ~SphericalTri(){};
         virtual bool inside_box( const CartVect& pos, double& tol ) const;
-        CartVect     ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
+        CartVect ievaluate( const CartVect& x, double tol = 1e-6, const CartVect& x0 = CartVect( 0.0 ) ) const;
 
       protected:
         CartVect v1;
-        Matrix3  transf;  // so will have a lot of stuff, including the transf to a coordinate system
+        Matrix3 transf;  // so will have a lot of stuff, including the transf to a coordinate system
         // double tangent_plane; // at first vertex; normal to the plane is first vertex
 
     };  // class SphericalTri
@@ -396,22 +396,22 @@ namespace Element
     class LinearEdge : public Map
     {
       public:
-        LinearEdge( const std::vector< CartVect >& vertices ) : Map( vertices ){ };
-        LinearEdge( );
+        LinearEdge( const std::vector< CartVect >& vertices ) : Map( vertices ){};
+        LinearEdge();
         virtual CartVect evaluate( const CartVect& xi ) const;
         // virtual CartVect ievaluate(const CartVect& x, double tol) const ;
         virtual bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        virtual double  evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        virtual double  integrate_scalar_field( const double* field_vertex_values ) const;
+        virtual double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        virtual double integrate_scalar_field( const double* field_vertex_values ) const;
 
       protected:
         /* Preimages of the vertices -- "canonical vertices" -- are known as "corners". */
-        static const double       corner[ 2 ][ 3 ];
-        static const double       gauss[ 1 ][ 2 ];
+        static const double corner[2][3];
+        static const double gauss[1][2];
         static const unsigned int corner_count = 2;
-        static const unsigned int gauss_count = 1;
+        static const unsigned int gauss_count  = 1;
 
     };  // class LinearEdge
 
@@ -420,46 +420,46 @@ namespace Element
       public:
         SpectralQuad( const std::vector< CartVect >& vertices ) : Map( vertices )
         {
-            _xyz[ 0 ] = _xyz[ 1 ] = _xyz[ 2 ] = NULL;
+            _xyz[0] = _xyz[1] = _xyz[2] = NULL;
         };
         SpectralQuad( int order, double* x, double* y, double* z );
         SpectralQuad( int order );
-        SpectralQuad( );
-        virtual ~SpectralQuad( );
-        void             set_gl_points( double* x, double* y, double* z );
+        SpectralQuad();
+        virtual ~SpectralQuad();
+        void set_gl_points( double* x, double* y, double* z );
         virtual CartVect evaluate( const CartVect& xi ) const;  // a 2d, so 3rd component is 0, always
-        virtual CartVect
-                        ievaluate( const CartVect& x, double tol = 1e-6,
-                                   const CartVect& x0 = CartVect( 0.0 ) ) const;  // a 2d, so 3rd component is 0, always
+        virtual CartVect ievaluate(
+            const CartVect& x, double tol = 1e-6,
+            const CartVect& x0 = CartVect( 0.0 ) ) const;  // a 2d, so 3rd component is 0, always
         virtual Matrix3 jacobian( const CartVect& xi ) const;
-        double          evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
-        double          integrate_scalar_field( const double* field_vertex_values ) const;
-        bool            inside_nat_space( const CartVect& xi, double& tol ) const;
+        double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;
+        double integrate_scalar_field( const double* field_vertex_values ) const;
+        bool inside_nat_space( const CartVect& xi, double& tol ) const;
 
         // to compute the values that need to be cached for each element of order n
         void Init( int order );
-        void freedata( );
+        void freedata();
         // this will take node, vertex positions and compute the gl points
-        void compute_gl_positions( );
+        void compute_gl_positions();
         void get_gl_points( double*& x, double*& y, double*& z, int& size );
 
       protected:
         /* values that depend only on the order of the element , cached */
         /*  the order in all 3 directions ; it is also np in HOMME lingo*/
-        static int           _n;
-        static realType*     _z[ 2 ];
-        static lagrange_data _ld[ 2 ];
-        static opt_data_2    _data;  // we should use only 2nd component
-        static realType*     _odwork;  // work area
+        static int _n;
+        static realType* _z[2];
+        static lagrange_data _ld[2];
+        static opt_data_2 _data;   // we should use only 2nd component
+        static realType* _odwork;  // work area
 
         // flag for initialization of data
-        static bool      _init;
+        static bool _init;
         static realType* _glpoints;  // it is a space we can use to store gl positions for elements
         // on the fly; we do not have a tag yet for them, as in Nek5000 application
         // also, these positions might need to be moved on the sphere, for HOMME grids
         // do we project them or how do we move them on the sphere?
 
-        realType* _xyz[ 3 ];  // these are gl points; position?
+        realType* _xyz[3];  // these are gl points; position?
 
     };  // class SpectralQuad
 

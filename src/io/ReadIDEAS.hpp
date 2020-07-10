@@ -13,7 +13,7 @@
 #include "moab/Interface.hpp"
 #include "moab/RangeMap.hpp"
 
-#define MAT_PROP_TABLE_TAG "mat_prop_table"
+#define MAT_PROP_TABLE_TAG  "mat_prop_table"
 #define PHYS_PROP_TABLE_TAG "phys_prop_table"
 
 namespace moab
@@ -37,15 +37,15 @@ class ReadIDEAS : public ReaderIface
     ReadIDEAS( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadIDEAS( ) {}
+    virtual ~ReadIDEAS() {}
 
   protected:
-    ErrorCode skip_header( );
+    ErrorCode skip_header();
     ErrorCode create_vertices( EntityHandle& first_vertex, const Tag* file_id_tag );
     ErrorCode create_elements( EntityHandle first_vertex, const Tag* file_id_tag );
 
   private:
-    std::ifstream                 file;
+    std::ifstream file;
     RangeMap< int, EntityHandle > nodeIdMap;
 
     // Read mesh interface
@@ -90,15 +90,15 @@ class ReadIDEAS : public ReaderIface
        includes the finite element id that describes the element type. These are
        used in the OpenFOAM IDEAS reader. The canonical node ordering matches that
        of MBCN, as suggested by the Gmsh 2.2.3 source code.*/
-    static const int ROD0 = 11;
-    static const int ROD1 = 171;
-    static const int TRI0 = 41;
-    static const int TRI1 = 91;
+    static const int ROD0  = 11;
+    static const int ROD1  = 171;
+    static const int TRI0  = 41;
+    static const int TRI1  = 91;
     static const int QUAD0 = 44;
     static const int QUAD1 = 94;
-    static const int TET = 111;
+    static const int TET   = 111;
     static const int WEDGE = 112;
-    static const int HEX = 115;
+    static const int HEX   = 115;
 };
 
 }  // namespace moab

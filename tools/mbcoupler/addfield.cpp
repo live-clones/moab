@@ -34,24 +34,24 @@ void putElementField( Interface* mbi, const char* tagname, double factor )
     mbi->get_entities_by_dimension( 0, 3, elems );
 
     const double defVal = 0.;
-    Tag          fieldTag;
+    Tag fieldTag;
     ErrorCode rval = mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
     assert( MB_SUCCESS == rval );
 #ifdef NDEBUG
     if( MB_SUCCESS == rval ) {};  // Line to avoid compiler warning about unused variable
 #endif
 
-    int numElems = elems.size( );
+    int numElems = elems.size();
 
     for( int i = 0; i < numElems; i++ )
     {
         // cout << elems[i] << endl;
-        EntityHandle elem = elems[ i ];
+        EntityHandle elem = elems[i];
 
-        double xyz[ 3 ];
+        double xyz[3];
         mbi->get_coords( &elem, 1, xyz );
 
-        double fieldValue = physField( xyz[ 0 ], xyz[ 1 ], xyz[ 2 ], factor );
+        double fieldValue = physField( xyz[0], xyz[1], xyz[2], factor );
 
         mbi->tag_set_data( fieldTag, &elem, 1, &fieldValue );
     }
@@ -64,8 +64,8 @@ void putSpectralElementField( Interface* mbi, int dim, int np, const char* tagna
     mbi->get_entities_by_dimension( 0, dim, elems );
 
     const int ndofperE = np * np;
-    double*   defDouble = new double[ ndofperE ];
-    Tag       fieldTag;
+    double* defDouble  = new double[ndofperE];
+    Tag fieldTag;
     ErrorCode rval =
         mbi->tag_get_handle( tagname, ndofperE, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defDouble );
     std::cout << "rval = " << rval << std::endl;
@@ -75,26 +75,26 @@ void putSpectralElementField( Interface* mbi, int dim, int np, const char* tagna
     };  // Line to avoid compiler warning about unused variable
 #endif
 
-    int                   numElems = elems.size( );
+    int numElems = elems.size();
     std::vector< double > tData( ndofperE, 0.0 );
 
     for( int i = 0; i < numElems; i++ )
     {
-        EntityHandle elem = elems[ i ];
+        EntityHandle elem = elems[i];
 
-        double xyz[ 3 ];
+        double xyz[3];
         mbi->get_coords( &elem, 1, xyz );
 
-        double fieldValue = physField( xyz[ 0 ], xyz[ 1 ], xyz[ 2 ], factor );
+        double fieldValue = physField( xyz[0], xyz[1], xyz[2], factor );
         for( int j = 0; j < ndofperE; ++j )
-            tData[ j ] = fieldValue;  // same value evaluated at the center; could modify it to use
-                                      // GLL points ?
+            tData[j] = fieldValue;  // same value evaluated at the center; could modify it to use
+                                    // GLL points ?
 
-        mbi->tag_set_data( fieldTag, &elem, 1, &tData[ 0 ] );
+        mbi->tag_set_data( fieldTag, &elem, 1, &tData[0] );
     }
 
     delete[] defDouble;
-    tData.clear( );
+    tData.clear();
 }
 
 void putVertexField( Interface* mbi, const char* tagname, double factor )
@@ -104,18 +104,18 @@ void putVertexField( Interface* mbi, const char* tagname, double factor )
     mbi->get_entities_by_type( 0, MBVERTEX, verts );
 
     const double defVal = 0.;
-    Tag          fieldTag;
+    Tag fieldTag;
     mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
 
-    int numVerts = verts.size( );
+    int numVerts = verts.size();
     for( int i = 0; i < numVerts; i++ )
     {
-        EntityHandle vert = verts[ i ];  //?
+        EntityHandle vert = verts[i];  //?
 
-        double vertPos[ 3 ];
+        double vertPos[3];
         mbi->get_coords( &vert, 1, vertPos );
 
-        double fieldValue = physField( vertPos[ 0 ], vertPos[ 1 ], vertPos[ 2 ], factor );
+        double fieldValue = physField( vertPos[0], vertPos[1], vertPos[2], factor );
 
         mbi->tag_set_data( fieldTag, &vert, 1, &fieldValue );
     }
@@ -129,30 +129,30 @@ int main( int argc, char** argv )
 
     using namespace moab;
 
-    Interface* mbi = new Core( );
+    Interface* mbi = new Core();
 
     if( argc < 3 )
     {
-        cout << "Usage: " << argv[ 0 ] << " <infile> <outfile> [factor]\n"
+        cout << "Usage: " << argv[0] << " <infile> <outfile> [factor]\n"
              << "Writes both vertex and element fields.\n";
         return 0;
     }
 
-    mbi->load_mesh( argv[ 1 ] );
+    mbi->load_mesh( argv[1] );
 
     double factor = 1.0;
-    if( argc == 4 ) factor = atof( argv[ 3 ] );
+    if( argc == 4 ) factor = atof( argv[3] );
 
     putVertexField( mbi, "vertex_field", factor );
     putElementField( mbi, "element_field", factor );
     // putSpectralElementField(mbi, 2, 4, "spectral_element_field", factor);
     putSpectralElementField( mbi, 2, 4, "a2oTAG", factor );
 
-    ErrorCode result = mbi->write_mesh( argv[ 2 ] );
+    ErrorCode result = mbi->write_mesh( argv[2] );
     if( MB_SUCCESS == result )
-        cout << "wrote " << argv[ 2 ] << endl;
+        cout << "wrote " << argv[2] << endl;
     else
-        cout << "Failed to write " << argv[ 2 ] << endl;
+        cout << "Failed to write " << argv[2] << endl;
 
     //  vector<double> coords;
     //  mbi->get_vertex_coordinates(coords);

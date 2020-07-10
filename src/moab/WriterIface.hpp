@@ -34,7 +34,7 @@ class FileOptions;
 class WriterIface
 {
   public:
-    virtual ~WriterIface( ) {}
+    virtual ~WriterIface() {}
 
     /**
      *\brief Export mesh to a file.

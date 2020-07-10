@@ -53,7 +53,7 @@
 namespace MBMesquite
 {
 
-int TMPQualityMetric::get_negate_flag( ) const
+int TMPQualityMetric::get_negate_flag() const
 {
     return 1;
 }
@@ -77,7 +77,7 @@ void TMPQualityMetric::get_element_evaluations( PatchData& pd, size_t p_elem, st
 bool TMPQualityMetric::evaluate( PatchData& pd, size_t p_handle, double& value, MsqError& err )
 {
     size_t num_idx;
-    bool   valid = evaluate_internal( pd, p_handle, value, mIndices, num_idx, err );
+    bool valid = evaluate_internal( pd, p_handle, value, mIndices, num_idx, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
     // apply target weight to value
@@ -85,7 +85,7 @@ bool TMPQualityMetric::evaluate( PatchData& pd, size_t p_handle, double& value, 
     {
         const Sample s = ElemSampleQM::sample( p_handle );
         const size_t e = ElemSampleQM::elem( p_handle );
-        double       ck = weightCalc->get_weight( pd, e, s, err );
+        double ck      = weightCalc->get_weight( pd, e, s, err );
         MSQ_ERRZERO( err );
         value *= ck;
     }
@@ -97,7 +97,7 @@ bool TMPQualityMetric::evaluate_with_indices( PatchData& pd, size_t p_handle, do
 {
     indices.resize( MAX_ELEM_NODES );
     size_t num_idx = 0;
-    bool   result = evaluate_internal( pd, p_handle, value, arrptr( indices ), num_idx, err );
+    bool result    = evaluate_internal( pd, p_handle, value, arrptr( indices ), num_idx, err );
     if( MSQ_CHKERR( err ) || !result ) return false;
 
     indices.resize( num_idx );
@@ -107,7 +107,7 @@ bool TMPQualityMetric::evaluate_with_indices( PatchData& pd, size_t p_handle, do
     {
         const Sample s = ElemSampleQM::sample( p_handle );
         const size_t e = ElemSampleQM::elem( p_handle );
-        double       ck = weightCalc->get_weight( pd, e, s, err );
+        double ck      = weightCalc->get_weight( pd, e, s, err );
         MSQ_ERRZERO( err );
         value *= ck;
     }
@@ -117,18 +117,18 @@ bool TMPQualityMetric::evaluate_with_indices( PatchData& pd, size_t p_handle, do
 
 static void get_u_perp( const MsqVector< 3 >& u, MsqVector< 3 >& u_perp )
 {
-    double a = sqrt( u[ 0 ] * u[ 0 ] + u[ 1 ] * u[ 1 ] );
+    double a = sqrt( u[0] * u[0] + u[1] * u[1] );
     if( a < 1e-10 )
     {
-        u_perp[ 0 ] = 1.0;
-        u_perp[ 1 ] = u_perp[ 2 ] = 0.0;
+        u_perp[0] = 1.0;
+        u_perp[1] = u_perp[2] = 0.0;
     }
     else
     {
-        double b = -u[ 2 ] / a;
-        u_perp[ 0 ] = u[ 0 ] * b;
-        u_perp[ 1 ] = u[ 1 ] * b;
-        u_perp[ 2 ] = a;
+        double b  = -u[2] / a;
+        u_perp[0] = u[0] * b;
+        u_perp[1] = u[1] * b;
+        u_perp[2] = a;
     }
 }
 
@@ -140,14 +140,14 @@ static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 
                                           MsqMatrix< 2, 2 >& A, MsqMatrix< 3, 2 >& S_a_transpose_Theta )
 {
     MsqVector< 3 > n_a = J.column( 0 ) * J.column( 1 );
-    double         sc, len = length( n_a );
+    double sc, len = length( n_a );
     if( !divide( 1.0, len, sc ) ) return false;
     n_a *= sc;
-    double         ndot = n_a % u;
-    double         sigma = ( ndot < 0.0 ) ? -1 : 1;
-    double         cosphi = sigma * ndot;
+    double ndot          = n_a % u;
+    double sigma         = ( ndot < 0.0 ) ? -1 : 1;
+    double cosphi        = sigma * ndot;
     MsqVector< 3 > cross = n_a * u;
-    double         sinphi = length( cross );
+    double sinphi        = length( cross );
 
     MsqMatrix< 3, 2 > Theta;
     Theta.set_column( 0, u_perp );
@@ -157,14 +157,14 @@ static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 
     // rotate J such that they are.
     if( sinphi > 1e-12 )
     {
-        MsqVector< 3 >    m = sigma * cross;
-        MsqVector< 3 >    n = ( 1 / sinphi ) * m;
-        MsqVector< 3 >    p = ( 1 - cosphi ) * n;
-        double            s_a[] = { p[ 0 ] * n[ 0 ] + cosphi, p[ 0 ] * n[ 1 ] - m[ 2 ], p[ 0 ] * n[ 2 ] + m[ 1 ],
-                         p[ 1 ] * n[ 0 ] + m[ 2 ], p[ 1 ] * n[ 1 ] + cosphi, p[ 1 ] * n[ 2 ] - m[ 0 ],
-                         p[ 2 ] * n[ 0 ] - m[ 1 ], p[ 2 ] * n[ 1 ] + m[ 0 ], p[ 2 ] * n[ 2 ] + cosphi };
+        MsqVector< 3 > m = sigma * cross;
+        MsqVector< 3 > n = ( 1 / sinphi ) * m;
+        MsqVector< 3 > p = ( 1 - cosphi ) * n;
+        double s_a[]     = { p[0] * n[0] + cosphi, p[0] * n[1] - m[2],   p[0] * n[2] + m[1],
+                         p[1] * n[0] + m[2],   p[1] * n[1] + cosphi, p[1] * n[2] - m[0],
+                         p[2] * n[0] - m[1],   p[2] * n[1] + m[0],   p[2] * n[2] + cosphi };
         MsqMatrix< 3, 3 > S_a( s_a );
-        J = S_a * J;
+        J                   = S_a * J;
         S_a_transpose_Theta = transpose( S_a ) * Theta;
     }
     else
@@ -189,26 +189,26 @@ static inline bool project_to_perp_plane( MsqMatrix< 3, 2 > J, const MsqVector< 
 static inline void project_to_matrix_plane( const MsqMatrix< 3, 2 >& M_in, MsqMatrix< 2, 2 >& M_out, MsqVector< 3 >& u,
                                             MsqVector< 3 >& u_perp )
 {
-    u = M_in.column( 0 ) * M_in.column( 1 );
-    u_perp = M_in.column( 0 );
-    double len0 = length( u_perp );
+    u            = M_in.column( 0 ) * M_in.column( 1 );
+    u_perp       = M_in.column( 0 );
+    double len0  = length( u_perp );
     double u_len = length( u );
     double d_perp, d_u;
     if( !divide( 1.0, len0, d_perp ) )
     {
         // try the other column
         u_perp = M_in.column( 1 );
-        len0 = length( u_perp );
+        len0   = length( u_perp );
         if( !divide( 1.0, len0, d_perp ) )
         {
             // matrix is all zeros
-            u[ 0 ] = 0;
-            u[ 1 ] = 0;
-            u[ 2 ] = 1;
-            u_perp[ 0 ] = 1;
-            u_perp[ 1 ] = 0;
-            u_perp[ 2 ] = 0;
-            M_out = MsqMatrix< 2, 2 >( 0.0 );
+            u[0]      = 0;
+            u[1]      = 0;
+            u[2]      = 1;
+            u_perp[0] = 1;
+            u_perp[1] = 0;
+            u_perp[2] = 0;
+            M_out     = MsqMatrix< 2, 2 >( 0.0 );
         }
         else
         {
@@ -241,7 +241,7 @@ bool TMPQualityMetric::evaluate_surface_common( PatchData& pd, Sample s, size_t 
                                                 MsqMatrix< 2, 2 >& A, MsqMatrix< 3, 2 >& S_a_transpose_Theta,
                                                 MsqError& err )
 {
-    EntityTopology type = pd.element_by_index( e ).get_element_type( );
+    EntityTopology type = pd.element_by_index( e ).get_element_type();
 
     const MappingFunction2D* mf = pd.get_mapping_function_2D( type );
     if( !mf )
@@ -254,9 +254,9 @@ bool TMPQualityMetric::evaluate_surface_common( PatchData& pd, Sample s, size_t 
     mf->jacobian( pd, e, bits, s, indices, derivs, num_indices, J, err );
 
     // If we have a 3x2 target matrix
-    if( targetCalc->have_surface_orient( ) )
+    if( targetCalc->have_surface_orient() )
     {
-        MsqVector< 3 >    u, u_perp;
+        MsqVector< 3 > u, u_perp;
         MsqMatrix< 3, 2 > W_hat;
         targetCalc->get_surface_target( pd, e, s, W_hat, err );
         MSQ_ERRZERO( err );
@@ -283,13 +283,13 @@ bool TMPQualityMetric::evaluate_surface_common( PatchData& pd, Sample s, size_t 
         // If the domain is set, adjust the sign of things correctly
         // for the case where the element is inverted with respect
         // to the domain.
-        if( pd.domain_set( ) )
+        if( pd.domain_set() )
         {
             Vector3D n;
             pd.get_domain_normal_at_sample( e, s, n, err );
             MSQ_ERRZERO( err );
             // if sigma == -1
-            if( Vector3D( u.data( ) ) % n < 0.0 )
+            if( Vector3D( u.data() ) % n < 0.0 )
             {
                 // flip u
                 u = -u;
@@ -316,18 +316,18 @@ void TMPQualityMetric::weight( PatchData& pd, Sample p_sample, size_t p_elem, in
     if( grad )
     {
         for( int i = 0; i < num_idx; ++i )
-            grad[ i ] *= ck;
+            grad[i] *= ck;
     }
     if( diag )
     {
         for( int i = 0; i < num_idx; ++i )
-            diag[ i ] *= ck;
+            diag[i] *= ck;
     }
     if( hess )
     {
         const int n = num_idx * ( num_idx + 1 ) / 2;
         for( int i = 0; i < n; ++i )
-            hess[ i ] *= ck;
+            hess[i] *= ck;
     }
 }
 

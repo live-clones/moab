@@ -53,15 +53,15 @@ namespace MBMesquite
 class VertexConditionNumberQualityMetric : public VertexQM, public AveragingQM
 {
   public:
-    VertexConditionNumberQualityMetric( );
+    VertexConditionNumberQualityMetric();
 
     //! virtual destructor ensures use of polymorphism during destruction
-    virtual ~VertexConditionNumberQualityMetric( ) {}
+    virtual ~VertexConditionNumberQualityMetric() {}
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
     //! 1 if metric should be minimized, -1 if metric should be maximized.
-    virtual int get_negate_flag( ) const;
+    virtual int get_negate_flag() const;
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 

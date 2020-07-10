@@ -27,11 +27,11 @@ namespace moab
 //! elements maps to a VTK type.
 struct GmshElemType
 {
-    const char* name;  //!< String name for use in error messages
-    unsigned    gmsh_type;  //!< GMsh integer type
-    EntityType  mb_type;  //!< MOAB type
-    unsigned    num_nodes;  //!< Number of nodes (0 for polygon)
-    const int*  node_order;  //!< Gmsh element node ordering, indexed by
+    const char* name;       //!< String name for use in error messages
+    unsigned gmsh_type;     //!< GMsh integer type
+    EntityType mb_type;     //!< MOAB type
+    unsigned num_nodes;     //!< Number of nodes (0 for polygon)
+    const int* node_order;  //!< Gmsh element node ordering, indexed by
                             //!< the Gmsh node position and containing
                             //!< the corresponding MOAB node position.
                             //!< NOTE: This field is NULL if MOAB and Gmsh

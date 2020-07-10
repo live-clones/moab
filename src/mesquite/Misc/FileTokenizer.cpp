@@ -38,12 +38,12 @@ FileTokenizer::FileTokenizer( std::FILE* file_ptr )
 {
 }
 
-FileTokenizer::~FileTokenizer( )
+FileTokenizer::~FileTokenizer()
 {
     fclose( filePtr );
 }
 
-bool FileTokenizer::eof( ) const
+bool FileTokenizer::eof() const
 {
     return nextToken == bufferEnd && feof( filePtr );
 }
@@ -100,7 +100,7 @@ const char* FileTokenizer::get_string( MsqError& err )
         // Shift the (possibly) partial token to the start of the buffer.
         size_t remaining = bufferEnd - result;
         memmove( buffer, result, remaining );
-        result = buffer;
+        result    = buffer;
         nextToken = result + remaining;
 
         // Fill the remainder of the buffer after the token.
@@ -142,10 +142,10 @@ bool FileTokenizer::get_double_internal( double& result, MsqError& err )
     // Check for hex value -- on some platforms (e.g. Linux), strtod
     // will accept hex values, on others (e.g. Sun) it wil not.  Force
     // failure on hex numbers for consistancy.
-    if( token[ 0 ] && token[ 1 ] && token[ 0 ] == '0' && toupper( token[ 1 ] ) == 'X' )
+    if( token[0] && token[1] && token[0] == '0' && toupper( token[1] ) == 'X' )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"", line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"", line_number(), token );
         return false;
     }
 
@@ -158,7 +158,7 @@ bool FileTokenizer::get_double_internal( double& result, MsqError& err )
     if( *token_end )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"", line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected number, got \"%s\"", line_number(), token );
         return false;
     }
 
@@ -174,7 +174,7 @@ bool FileTokenizer::get_float_internal( float& result, MsqError& err )
     result = (float)d;
     if( d != (double)result )
     {
-        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number( ) );
+        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number() );
         return false;
     }
 
@@ -196,7 +196,7 @@ bool FileTokenizer::get_long_int_internal( long& result, MsqError& err )
     if( *token_end )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected integer, got \"%s\"", line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected integer, got \"%s\"", line_number(), token );
         return false;
     }
 
@@ -212,7 +212,7 @@ bool FileTokenizer::get_byte_internal( unsigned char& result, MsqError& err )
     result = (unsigned char)i;
     if( i != (long)result )
     {
-        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number( ) );
+        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number() );
         return false;
     }
 
@@ -228,7 +228,7 @@ bool FileTokenizer::get_short_int_internal( short& result, MsqError& err )
     result = (short)i;
     if( i != (long)result )
     {
-        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number( ) );
+        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number() );
         return false;
     }
 
@@ -244,7 +244,7 @@ bool FileTokenizer::get_integer_internal( int& result, MsqError& err )
     result = (int)i;
     if( i != (long)result )
     {
-        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number( ) );
+        MSQ_SETERR( err )( MsqError::PARSE_ERROR, "Numberic overflow at line %d.", line_number() );
         return false;
     }
 
@@ -257,14 +257,14 @@ bool FileTokenizer::get_boolean_internal( bool& result, MsqError& err )
     const char* token = get_string( err );
     if( MSQ_CHKERR( err ) ) return false;
 
-    if( token[ 1 ] || ( token[ 0 ] != '0' && token[ 0 ] != '1' ) )
+    if( token[1] || ( token[0] != '0' && token[0] != '1' ) )
     {
         MSQ_SETERR( err )
-        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected 0 or 1, got \"%s\"", line_number( ), token );
+        ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected 0 or 1, got \"%s\"", line_number(), token );
         return false;
     }
 
-    result = token[ 0 ] == '1';
+    result = token[0] == '1';
     return true;
 }
 
@@ -344,7 +344,7 @@ bool FileTokenizer::get_booleans( size_t count, bool* array, MsqError& err )
     return true;
 }
 
-void FileTokenizer::unget_token( )
+void FileTokenizer::unget_token()
 {
     if( nextToken - buffer < 2 ) return;
 
@@ -370,7 +370,7 @@ bool FileTokenizer::match_token( const char* str, MsqError& err )
 
     // Construct error message
     MSQ_SETERR( err )
-    ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected \"%s\", got \"%s\"", line_number( ), str, token );
+    ( MsqError::PARSE_ERROR, "Syntax error at line %d: expected \"%s\", got \"%s\"", line_number(), str, token );
     return false;
 }  // namespace MBMesquite
 
@@ -387,8 +387,8 @@ int FileTokenizer::match_token( const char* const* list, MsqError& err )
 
     // No match, constuct error message
     std::string message( "Parsing error at line " );
-    char        lineno[ 16 ];
-    sprintf( lineno, "%d", line_number( ) );
+    char lineno[16];
+    sprintf( lineno, "%d", line_number() );
     message += lineno;
     message += ": expected one of {";
     for( ptr = list; *ptr; ++ptr )
@@ -422,7 +422,7 @@ bool FileTokenizer::get_newline( MsqError& err )
             size_t count = fread( buffer, 1, sizeof( buffer ), filePtr );
             if( !count )
             {
-                if( eof( ) )
+                if( eof() )
                     MSQ_SETERR( err )( "File truncated.", MsqError::PARSE_ERROR );
                 else
                     MSQ_SETERR( err )( MsqError::IO_ERROR );
@@ -437,7 +437,7 @@ bool FileTokenizer::get_newline( MsqError& err )
         if( !isspace( *nextToken ) )
         {
             MSQ_SETERR( err )
-            ( MsqError::PARSE_ERROR, "Expected newline at line %d.", line_number( ) );
+            ( MsqError::PARSE_ERROR, "Expected newline at line %d.", line_number() );
             return false;
         }
 

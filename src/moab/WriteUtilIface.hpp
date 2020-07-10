@@ -28,10 +28,10 @@ class WriteUtilIface
 {
   public:
     //! Constructor
-    WriteUtilIface( ) {}
+    WriteUtilIface() {}
 
     //! Destructor
-    virtual ~WriteUtilIface( ) {}
+    virtual ~WriteUtilIface() {}
 
     //! Check if the specified file already exists.
     //! Returns MB_SUCCESS if file does not exist, MB_ALREADY_ALLOCATED
@@ -39,10 +39,10 @@ class WriteUtilIface
     virtual ErrorCode check_doesnt_exist( const char* file_name ) = 0;
 
     //! Gather all entities in the mesh, or in the sets specified
-    virtual ErrorCode
-        gather_entities( Range&              all_ents, /**< range in which entities are returned */
-                         const EntityHandle* ent_sets = NULL, /**< entity sets whose contents are to be gathered */
-                         int                 num_sets = 0 /**< number of sets in list */ ) = 0;
+    virtual ErrorCode gather_entities(
+        Range& all_ents,                     /**< range in which entities are returned */
+        const EntityHandle* ent_sets = NULL, /**< entity sets whose contents are to be gathered */
+        int num_sets                 = 0 /**< number of sets in list */ ) = 0;
 
     //! Given information about the nodes to be written, and pointers to memory
     //! to which coordinates will be written, writes coordinate data there, and
@@ -253,7 +253,8 @@ class WriteUtilIface
      *\param num_elem  The number of elements in the connectivity array
      *\param node_per_elem The number of nodes in each element's connectivity list.
      */
-    template< typename T > static inline void reorder( const int* order, T* conn, int num_elem, int node_per_elem );
+    template < typename T >
+    static inline void reorder( const int* order, T* conn, int num_elem, int node_per_elem );
 
     /**\brief Get list of tags to write.
      *
@@ -279,9 +280,9 @@ class WriteUtilIface
 
     enum EntityListType
     {
-        CONTENTS = 0,
-        CHILDREN = 1,
-        PARENTS = 2,
+        CONTENTS    = 0,
+        CHILDREN    = 1,
+        PARENTS     = 2,
         TOPOLOGICAL = 1
     };
 
@@ -340,15 +341,16 @@ class WriteUtilIface
                                                 unsigned char* flags = 0 ) = 0;
 };
 
-template< typename T > inline void WriteUtilIface::reorder( const int* order, T* conn, int num_elem, int node_per_elem )
+template < typename T >
+inline void WriteUtilIface::reorder( const int* order, T* conn, int num_elem, int node_per_elem )
 {
     std::vector< T > elem( node_per_elem );
-    T* const         end = conn + num_elem * node_per_elem;
+    T* const end = conn + num_elem * node_per_elem;
     while( conn != end )
     {
-        std::copy( conn, conn + node_per_elem, elem.begin( ) );
+        std::copy( conn, conn + node_per_elem, elem.begin() );
         for( int j = 0; j < node_per_elem; ++j, ++conn )
-            *conn = elem[ order[ j ] ];
+            *conn = elem[order[j]];
     }
 }
 

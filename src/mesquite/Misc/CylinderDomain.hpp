@@ -46,12 +46,12 @@ class MESQUITE_EXPORT CylinderDomain : public MBMesquite::MeshDomain
      */
     inline CylinderDomain( double p_radius, Vector3D axis_direction = Vector3D( 0, 0, 1 ),
                            Vector3D axis_point = Vector3D( 0, 0, 0 ), bool outward_normal = true )
-        : mAxis( axis_direction / axis_direction.length( ) ), mCenter( axis_point ), mRadius( p_radius ),
+        : mAxis( axis_direction / axis_direction.length() ), mCenter( axis_point ), mRadius( p_radius ),
           outwardSign( outward_normal ? 1.0 : -1.0 )
     {
     }
 
-    virtual ~CylinderDomain( );
+    virtual ~CylinderDomain();
 
     virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
@@ -68,15 +68,15 @@ class MESQUITE_EXPORT CylinderDomain : public MBMesquite::MeshDomain
     virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
                              MsqError& err ) const;
 
-    const Vector3D& axis( ) const
+    const Vector3D& axis() const
     {
         return mAxis;
     }
-    const Vector3D& center( ) const
+    const Vector3D& center() const
     {
         return mCenter;
     }
-    double radius( ) const
+    double radius() const
     {
         return mRadius;
     }
@@ -88,8 +88,8 @@ class MESQUITE_EXPORT CylinderDomain : public MBMesquite::MeshDomain
   private:
     Vector3D mAxis;
     Vector3D mCenter;
-    double   mRadius;
-    double   outwardSign;
+    double mRadius;
+    double outwardSign;
 };
 
 }  // namespace MBMesquite

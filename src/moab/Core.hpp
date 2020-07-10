@@ -53,10 +53,10 @@ class Core : public Interface
     friend class SetIterator;
 
     //! constructor
-    Core( );
+    Core();
 
     //! destructor
-    ~Core( );
+    ~Core();
 
     //! Get a pointer to an internal MOAB interface
     //!\return NULL if not found, iterface pointer otherwise
@@ -114,7 +114,7 @@ class Core : public Interface
                                   const Range& output_sets, const Tag* tag_list = 0, int num_tags = 0 );
 
     //! deletes all mesh entities from this datastore
-    virtual ErrorCode delete_mesh( );
+    virtual ErrorCode delete_mesh();
 
     //! get overall geometric dimension
     virtual ErrorCode get_dimension( int& dim ) const;
@@ -255,7 +255,7 @@ class Core : public Interface
     virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
                                        const int to_dimension, const bool create_if_missing,
                                        std::vector< EntityHandle >& adj_entities,
-                                       const int                    operation_type = Interface::INTERSECT );
+                                       const int operation_type = Interface::INTERSECT );
 
     virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
                                        const int to_dimension, const bool create_if_missing, Range& adj_entities,
@@ -323,7 +323,7 @@ class Core : public Interface
 
     virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset, const int dimension,
                                                  std::vector< EntityHandle >& entities,
-                                                 const bool                   recursive = false ) const;
+                                                 const bool recursive = false ) const;
 
     //! Retrieves all entities in the data base of given type.
     /** \param type EntityType of entities desired (ie, MBHEX, MBEDGE, MBTRI, etc )
@@ -352,7 +352,7 @@ class Core : public Interface
     virtual ErrorCode get_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
                                                     const Tag* tag_handles, const void* const* values,
                                                     const int num_tags, Range& entities,
-                                                    const int  condition = Interface::INTERSECT,
+                                                    const int condition  = Interface::INTERSECT,
                                                     const bool recursive = false ) const;
 
     //! Retrieves all entities in the data base
@@ -402,7 +402,7 @@ class Core : public Interface
     virtual ErrorCode get_number_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
                                                            const Tag* tag_handles, const void* const* values,
                                                            const int num_tags, int& num_entities,
-                                                           const int  condition = Interface::INTERSECT,
+                                                           const int condition  = Interface::INTERSECT,
                                                            const bool recursive = false ) const;
 
     //! Retrieves all entities in the data base
@@ -446,7 +446,7 @@ class Core : public Interface
        coordinates[2] = -0.432;
        EntityHandle entity_handle = 0;
        create_vertex( coordinates, entity_handle ); \endcode */
-    virtual ErrorCode create_vertex( const double coordinates[ 3 ], EntityHandle& entity_handle );
+    virtual ErrorCode create_vertex( const double coordinates[3], EntityHandle& entity_handle );
 
     //! Create a set of vertices with the specified coordinates
     /**
@@ -490,8 +490,8 @@ class Core : public Interface
     class HONodeAddedRemoved
     {
       public:
-        HONodeAddedRemoved( ) {}
-        virtual ~HONodeAddedRemoved( ) {}
+        HONodeAddedRemoved() {}
+        virtual ~HONodeAddedRemoved() {}
         //! node_added called when a node was added to an element's connectivity array
         //! note: connectivity array of element may be incomplete (corner nodes will exist always)
         virtual void node_added( EntityHandle node, EntityHandle element );
@@ -899,11 +899,11 @@ class Core : public Interface
     // ************************  tag  information ***************
 
     //! return various specific tag handles
-    Tag material_tag( );
-    Tag neumannBC_tag( );
-    Tag dirichletBC_tag( );
-    Tag globalId_tag( );
-    Tag geom_dimension_tag( );
+    Tag material_tag();
+    Tag neumannBC_tag();
+    Tag dirichletBC_tag();
+    Tag globalId_tag();
+    Tag geom_dimension_tag();
 
     //! get/set the number of nodes
     // int total_num_nodes() const;
@@ -916,11 +916,11 @@ class Core : public Interface
     // ************************  structured sequence  information ***************
 
     //! return a reference to the sequence manager
-    SequenceManager* sequence_manager( )
+    SequenceManager* sequence_manager()
     {
         return sequenceManager;
     }
-    const SequenceManager* sequence_manager( ) const
+    const SequenceManager* sequence_manager() const
     {
         return sequenceManager;
     }
@@ -935,28 +935,28 @@ class Core : public Interface
                              bool bb_input = false, const HomCoord* bb_min = NULL, const HomCoord* bb_max = NULL );
 
     //! return the a_entity_factory pointer
-    AEntityFactory* a_entity_factory( )
+    AEntityFactory* a_entity_factory()
     {
         return aEntityFactory;
     }
-    const AEntityFactory* a_entity_factory( ) const
+    const AEntityFactory* a_entity_factory() const
     {
         return aEntityFactory;
     }
 
 #ifdef MOAB_HAVE_AHF
-    HalfFacetRep* a_half_facet_rep( )
+    HalfFacetRep* a_half_facet_rep()
     {
         return ahfRep;
     }
-    const HalfFacetRep* a_half_facet_rep( ) const
+    const HalfFacetRep* a_half_facet_rep() const
     {
         return ahfRep;
     }
 #endif
 
     //! return set of registered IO tools
-    ReaderWriterSet* reader_writer_set( )
+    ReaderWriterSet* reader_writer_set()
     {
         return readerWriterSet;
     }
@@ -972,7 +972,7 @@ class Core : public Interface
     virtual std::string get_error_string( const ErrorCode code ) const;
 
     //! check all adjacencies for consistency
-    ErrorCode check_adjacencies( );
+    ErrorCode check_adjacencies();
 
     //! check some adjacencies for consistency
     ErrorCode check_adjacencies( const EntityHandle* ents, int num_ents );
@@ -1048,7 +1048,7 @@ class Core : public Interface
     void estimated_memory_use( const EntityHandle* ent_array = 0, unsigned long num_ents = 0,
                                unsigned long long* total_storage = 0, unsigned long long* total_amortized_storage = 0,
                                unsigned long long* entity_storage = 0, unsigned long long* amortized_entity_storage = 0,
-                               unsigned long long* adjacency_storage = 0,
+                               unsigned long long* adjacency_storage           = 0,
                                unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0,
                                unsigned num_tags = 0, unsigned long long* tag_storage = 0,
                                unsigned long long* amortized_tag_storage = 0 );
@@ -1081,13 +1081,13 @@ class Core : public Interface
      */
     void estimated_memory_use( const Range& ents, unsigned long long* total_storage = 0,
                                unsigned long long* total_amortized_storage = 0, unsigned long long* entity_storage = 0,
-                               unsigned long long* amortized_entity_storage = 0,
-                               unsigned long long* adjacency_storage = 0,
+                               unsigned long long* amortized_entity_storage    = 0,
+                               unsigned long long* adjacency_storage           = 0,
                                unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0,
                                unsigned num_tags = 0, unsigned long long* tag_storage = 0,
                                unsigned long long* amortized_tag_storage = 0 );
 
-    void print_database( ) const;
+    void print_database() const;
 
     /** \name Sequence Option controllers */
 
@@ -1100,7 +1100,7 @@ class Core : public Interface
      * The default factor is 1.0 but this can be appropriately updated at runtime so that we do not
      * have broken sequences.
      */
-    virtual double get_sequence_multiplier( ) const;
+    virtual double get_sequence_multiplier() const;
 
     /** \brief Interface to control memory allocation for sequences
      * Provide a factor that controls the size of the sequence that gets allocated.
@@ -1130,11 +1130,11 @@ class Core : public Interface
                                         unsigned long long* amortized_tag_storage );
 
     //! database init and de-init routines
-    ErrorCode initialize( );
-    void      deinitialize( );
+    ErrorCode initialize();
+    void deinitialize();
 
     //! return the entity set representing the whole mesh
-    EntityHandle get_root_set( );
+    EntityHandle get_root_set();
 
     //!\brief Clean up after a file reader returns failure.
     //!
@@ -1143,8 +1143,8 @@ class Core : public Interface
     void clean_up_failed_read( const Range& initial_entities, std::vector< Tag > initial_tags );
 
     // other interfaces for MB
-    WriteUtil*    mMBWriteUtil;
-    ReadUtil*     mMBReadUtil;
+    WriteUtil* mMBWriteUtil;
+    ReadUtil* mMBReadUtil;
     ScdInterface* scdInterface;
 
     //! store the total number of elements defined in this interface
@@ -1164,9 +1164,9 @@ class Core : public Interface
 
     //! tag server for this interface
     std::list< TagInfo* > tagList;
-    inline bool           valid_tag_handle( const TagInfo* t ) const
+    inline bool valid_tag_handle( const TagInfo* t ) const
     {
-        return std::find( tagList.begin( ), tagList.end( ), t ) != tagList.end( );
+        return std::find( tagList.begin(), tagList.end(), t ) != tagList.end();
     }
 
     SequenceManager* sequenceManager;
@@ -1176,16 +1176,16 @@ class Core : public Interface
     ReaderWriterSet* readerWriterSet;
 
     Error* mError;
-    bool   mpiFinalize;
-    int    writeMPELog;
-    bool   initErrorHandlerInCore;
+    bool mpiFinalize;
+    int writeMPELog;
+    bool initErrorHandlerInCore;
 
     //! list of iterators
     std::vector< SetIterator* > setIterators;
 
 #ifdef MOAB_HAVE_AHF
     HalfFacetRep* ahfRep;
-    bool          mesh_modified;
+    bool mesh_modified;
 #endif
 };
 

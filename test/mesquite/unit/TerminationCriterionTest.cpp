@@ -59,9 +59,9 @@ using namespace MBMesquite;
 class DummyOF : public ObjectiveFunction
 {
   public:
-    double   mValue;  //!< Objectve fuction value returned
+    double mValue;   //!< Objectve fuction value returned
     Vector3D mGrad;  //!< Gradient values for all vertices
-    bool     mValid;
+    bool mValid;
 
     DummyOF( double of_value = 0.0, Vector3D grad_values = Vector3D( 0, 0, 0 ) )
         : mValue( 0.0 ), mGrad( grad_values ), mValid( true )
@@ -78,12 +78,12 @@ class DummyOF : public ObjectiveFunction
     bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out, std::vector< Vector3D >& grad_out,
                                  MsqError& err );
 
-    ObjectiveFunction* clone( ) const
+    ObjectiveFunction* clone() const
     {
         return new DummyOF( *this );
     }
-    void clear( ) {}
-    int  min_patch_layers( ) const
+    void clear() {}
+    int min_patch_layers() const
     {
         return 1;
     }
@@ -117,9 +117,9 @@ class TerminationCriterionTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_untangled_mesh );
     CPPUNIT_TEST( test_abs_vtx_movement_culling );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
-    DummyOF     objFunc;
+    DummyOF objFunc;
     OFEvaluator ofEval;
 
     void test_gradient_common( bool absolute, bool L2 );
@@ -128,95 +128,95 @@ class TerminationCriterionTest : public CppUnit::TestFixture
     void test_cpu_time_common( bool inner );
 
   public:
-    TerminationCriterionTest( ) : ofEval( &objFunc ) {}
+    TerminationCriterionTest() : ofEval( &objFunc ) {}
 
     // NUMBER OF ITERATES
-    void test_number_of_iterates_inner( );
-    void test_number_of_iterates_outer( );
+    void test_number_of_iterates_inner();
+    void test_number_of_iterates_outer();
 
     // CPU TIME
-    void test_cpu_time_inner( )
+    void test_cpu_time_inner()
     {
         test_cpu_time_common( true );
     }
-    void test_cpu_time_outer( )
+    void test_cpu_time_outer()
     {
         test_cpu_time_common( false );
     }
 
     // VERTEX MOVEMENT
-    void test_absolute_vertex_movement( )
+    void test_absolute_vertex_movement()
     {
         test_vertex_movement_common( true );
     }
-    void test_relative_vertex_movement( )
+    void test_relative_vertex_movement()
     {
         test_vertex_movement_common( false );
     }
-    void test_absolute_vertex_movement_edge_length( );
+    void test_absolute_vertex_movement_edge_length();
 
     // GRADIENT NORM ABSOLUTE
-    void test_gradient_L2_norm_absolute( )
+    void test_gradient_L2_norm_absolute()
     {
         test_gradient_common( true, true );
     }
-    void test_gradient_Linf_norm_absolute( )
+    void test_gradient_Linf_norm_absolute()
     {
         test_gradient_common( true, false );
     }
 
     // GRADIENT NORM RELATIVE
-    void test_gradient_L2_norm_relative( )
+    void test_gradient_L2_norm_relative()
     {
         test_gradient_common( false, true );
     }
-    void test_gradient_Linf_norm_relative( )
+    void test_gradient_Linf_norm_relative()
     {
         test_gradient_common( false, false );
     }
 
     // QUALITY IMPROVEMENT ABSOLUTE
-    void test_quality_improvement_absolute( )
+    void test_quality_improvement_absolute()
     {
         test_quality_common( true, false );
     }
 
     // QUALITY IMPROVEMENT RELATIVE
-    void test_quality_improvement_relative( )
+    void test_quality_improvement_relative()
     {
         test_quality_common( false, false );
     }
 
     // SUCCESSIVE IMPROVEMENTS ABSOLUTE
-    void test_successive_improvements_absolute( )
+    void test_successive_improvements_absolute()
     {
         test_quality_common( true, true );
     }
 
     // SUCCESSIVE IMPROVEMENTS RELATIVE
-    void test_successive_improvements_relative( )
+    void test_successive_improvements_relative()
     {
         test_quality_common( false, true );
     }
 
     // VERTEX BOUND
-    void test_vertex_bound( );
+    void test_vertex_bound();
 
-    void test_untangled_mesh( );
+    void test_untangled_mesh();
 
     // test culling on ABSOLUTE_VERTEX_MOVEMENT
-    void test_abs_vtx_movement_culling( );
+    void test_abs_vtx_movement_culling();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TerminationCriterionTest, "TerminationCriterionTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TerminationCriterionTest, "Unit" );
 
 // NUMBER OF ITERATES
-void TerminationCriterionTest::test_number_of_iterates_inner( )
+void TerminationCriterionTest::test_number_of_iterates_inner()
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
-    const int     LIMIT = 2;
+    PatchData pd;
+    const int LIMIT = 2;
 
     TerminationCriterion tc;
     tc.add_iteration_limit( LIMIT );
@@ -226,22 +226,22 @@ void TerminationCriterionTest::test_number_of_iterates_inner( )
     ASSERT_NO_ERROR( err );
     for( int i = 0; i < LIMIT; ++i )
     {
-        CPPUNIT_ASSERT( !tc.terminate( ) );
-        CPPUNIT_ASSERT_EQUAL( i, tc.get_iteration_count( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
+        CPPUNIT_ASSERT_EQUAL( i, tc.get_iteration_count() );
         tc.accumulate_patch( pd, err );
         ASSERT_NO_ERROR( err );
         tc.accumulate_inner( pd, 0, 0, err );
         ASSERT_NO_ERROR( err );
     }
-    CPPUNIT_ASSERT_EQUAL( 2, tc.get_iteration_count( ) );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT_EQUAL( 2, tc.get_iteration_count() );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
-void TerminationCriterionTest::test_number_of_iterates_outer( )
+void TerminationCriterionTest::test_number_of_iterates_outer()
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
-    const int     LIMIT = 2;
+    PatchData pd;
+    const int LIMIT = 2;
 
     TerminationCriterion tc;
     tc.add_iteration_limit( LIMIT );
@@ -251,23 +251,23 @@ void TerminationCriterionTest::test_number_of_iterates_outer( )
     ASSERT_NO_ERROR( err );
     for( int i = 0; i < LIMIT; ++i )
     {
-        CPPUNIT_ASSERT( !tc.terminate( ) );
-        CPPUNIT_ASSERT_EQUAL( i, tc.get_iteration_count( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
+        CPPUNIT_ASSERT_EQUAL( i, tc.get_iteration_count() );
         tc.accumulate_patch( pd, err );
         ASSERT_NO_ERROR( err );
         tc.accumulate_outer( 0, 0, ofEval, 0, err );
         ASSERT_NO_ERROR( err );
     }
-    CPPUNIT_ASSERT_EQUAL( 2, tc.get_iteration_count( ) );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT_EQUAL( 2, tc.get_iteration_count() );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 // CPU TIME
 void TerminationCriterionTest::test_cpu_time_common( bool inner )
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
-    double        LIMIT = 0.5;
+    PatchData pd;
+    double LIMIT = 0.5;
 
     TerminationCriterion tc;
     tc.add_cpu_time( LIMIT );
@@ -280,9 +280,9 @@ void TerminationCriterionTest::test_cpu_time_common( bool inner )
     ASSERT_NO_ERROR( err );
 
     Timer timer;
-    while( timer.since_birth( ) < 0.5 * LIMIT )
+    while( timer.since_birth() < 0.5 * LIMIT )
     {
-        CPPUNIT_ASSERT( !tc.terminate( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
         tc.accumulate_patch( pd, err );
         ASSERT_NO_ERROR( err );
         if( inner )
@@ -292,7 +292,7 @@ void TerminationCriterionTest::test_cpu_time_common( bool inner )
         ASSERT_NO_ERROR( err );
     }
 
-    while( timer.since_birth( ) < 1.1 * LIMIT )
+    while( timer.since_birth() < 1.1 * LIMIT )
         ;
 
     tc.accumulate_patch( pd, err );
@@ -302,17 +302,17 @@ void TerminationCriterionTest::test_cpu_time_common( bool inner )
     else
         tc.accumulate_outer( 0, 0, ofEval, 0, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 void TerminationCriterionTest::test_vertex_movement_common( bool absolute )
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
+    PatchData pd;
     create_twelve_hex_patch( pd, err );
     ASSERT_NO_ERROR( err );
 
-    const double         LIMIT = 1e-4;
+    const double LIMIT = 1e-4;
     TerminationCriterion tc;
     if( absolute )
         tc.add_absolute_vertex_movement( LIMIT );
@@ -323,7 +323,7 @@ void TerminationCriterionTest::test_vertex_movement_common( bool absolute )
     ASSERT_NO_ERROR( err );
     tc.reset_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !tc.terminate( ) );
+    CPPUNIT_ASSERT( !tc.terminate() );
 
     const double FIRST_STEP = 10.0;
     // move a vertex by 10 units and check that it did not meet criterion
@@ -333,7 +333,7 @@ void TerminationCriterionTest::test_vertex_movement_common( bool absolute )
     ASSERT_NO_ERROR( err );
     tc.accumulate_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !tc.terminate( ) );
+    CPPUNIT_ASSERT( !tc.terminate() );
 
     double test_limit = LIMIT;
     if( !absolute ) test_limit *= FIRST_STEP;
@@ -341,7 +341,7 @@ void TerminationCriterionTest::test_vertex_movement_common( bool absolute )
     int idx = 0;
     for( double step = FIRST_STEP; step > test_limit; step *= 0.09 )
     {
-        idx = ( idx + 1 ) % pd.num_free_vertices( );
+        idx = ( idx + 1 ) % pd.num_free_vertices();
         pd.move_vertex( Vector3D( step, 0, 0 ), idx, err );
         ASSERT_NO_ERROR( err );
 
@@ -349,10 +349,10 @@ void TerminationCriterionTest::test_vertex_movement_common( bool absolute )
         ASSERT_NO_ERROR( err );
         tc.accumulate_patch( pd, err );
         ASSERT_NO_ERROR( err );
-        CPPUNIT_ASSERT( !tc.terminate( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
     }
 
-    idx = ( idx + 1 ) % pd.num_free_vertices( );
+    idx = ( idx + 1 ) % pd.num_free_vertices();
     pd.move_vertex( Vector3D( 0.5 * test_limit, 0, 0 ), idx, err );
     ASSERT_NO_ERROR( err );
 
@@ -360,26 +360,26 @@ void TerminationCriterionTest::test_vertex_movement_common( bool absolute )
     ASSERT_NO_ERROR( err );
     tc.accumulate_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
-void TerminationCriterionTest::test_absolute_vertex_movement_edge_length( )
+void TerminationCriterionTest::test_absolute_vertex_movement_edge_length()
 {
     MsqPrintError err( std::cout );
 
     // define two-tet mesh where tets share a face
-    double              coords[] = { 0, -5, 0, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 };
+    double coords[]            = { 0, -5, 0, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 };
     const unsigned long conn[] = { 4, 3, 2, 0, 2, 3, 4, 1 };
-    int                 fixed[ 5 ] = { 0 };
-    ArrayMesh           mesh( 3, 5, coords, fixed, 2, TETRAHEDRON, conn );
+    int fixed[5]               = { 0 };
+    ArrayMesh mesh( 3, 5, coords, fixed, 2, TETRAHEDRON, conn );
 
     // calculate beta
     const double LIMIT = 1e-4;  // desired absolute limit
-    MeshUtil     tool( &mesh );
-    SimpleStats  len;
+    MeshUtil tool( &mesh );
+    SimpleStats len;
     tool.edge_length_distribution( len, err );
     ASSERT_NO_ERROR( err );
-    const double beta = LIMIT / ( len.average( ) - len.standard_deviation( ) );
+    const double beta = LIMIT / ( len.average() - len.standard_deviation() );
 
     // initialize termination criterion
     TerminationCriterion tc;
@@ -399,7 +399,7 @@ void TerminationCriterionTest::test_absolute_vertex_movement_edge_length( )
     ASSERT_NO_ERROR( err );
     tc.reset_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !tc.terminate( ) );
+    CPPUNIT_ASSERT( !tc.terminate() );
 
     const double FIRST_STEP = 10.0;
     // move a vertex by 10 units and check that it did not meet criterion
@@ -409,14 +409,14 @@ void TerminationCriterionTest::test_absolute_vertex_movement_edge_length( )
     ASSERT_NO_ERROR( err );
     tc.accumulate_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !tc.terminate( ) );
+    CPPUNIT_ASSERT( !tc.terminate() );
 
     double test_limit = LIMIT;
 
     int idx = 0;
     for( double step = FIRST_STEP; step > test_limit; step *= 0.09 )
     {
-        idx = ( idx + 1 ) % pd.num_free_vertices( );
+        idx = ( idx + 1 ) % pd.num_free_vertices();
         pd.move_vertex( Vector3D( step, 0, 0 ), idx, err );
         ASSERT_NO_ERROR( err );
 
@@ -424,10 +424,10 @@ void TerminationCriterionTest::test_absolute_vertex_movement_edge_length( )
         ASSERT_NO_ERROR( err );
         tc.accumulate_patch( pd, err );
         ASSERT_NO_ERROR( err );
-        CPPUNIT_ASSERT( !tc.terminate( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
     }
 
-    idx = ( idx + 1 ) % pd.num_free_vertices( );
+    idx = ( idx + 1 ) % pd.num_free_vertices();
     pd.move_vertex( Vector3D( 0.5 * test_limit, 0, 0 ), idx, err );
     ASSERT_NO_ERROR( err );
 
@@ -435,7 +435,7 @@ void TerminationCriterionTest::test_absolute_vertex_movement_edge_length( )
     ASSERT_NO_ERROR( err );
     tc.accumulate_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 static double lenfunc( const Vector3D* vect, int len )
@@ -450,11 +450,11 @@ static double maxfunc( const Vector3D* vect, int len )
 void TerminationCriterionTest::test_gradient_common( bool absolute, bool L2 )
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
+    PatchData pd;
     create_twelve_hex_patch( pd, err );
     ASSERT_NO_ERROR( err );
 
-    const double         LIMIT = 1e-4;
+    const double LIMIT = 1e-4;
     TerminationCriterion tc;
     if( absolute )
     {
@@ -485,11 +485,11 @@ void TerminationCriterionTest::test_gradient_common( bool absolute, bool L2 )
     ASSERT_NO_ERROR( err );
 
     double limit = LIMIT;
-    if( !absolute ) limit *= func_ptr( arrptr( grad ), pd.num_free_vertices( ) );
+    if( !absolute ) limit *= func_ptr( arrptr( grad ), pd.num_free_vertices() );
 
-    while( func_ptr( arrptr( grad ), pd.num_free_vertices( ) ) > limit )
+    while( func_ptr( arrptr( grad ), pd.num_free_vertices() ) > limit )
     {
-        CPPUNIT_ASSERT( !tc.terminate( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
 
         value *= 0.1;
         objFunc.mGrad = Vector3D( value, value, value );
@@ -502,7 +502,7 @@ void TerminationCriterionTest::test_gradient_common( bool absolute, bool L2 )
         ASSERT_NO_ERROR( err );
     }
 
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 static bool limit_absolute_quality( double, double, double curr_value, double epsilon )
@@ -525,10 +525,10 @@ static bool limit_relative_sucessive( double init_value, double prev_value, doub
 void TerminationCriterionTest::test_quality_common( bool absolute, bool successive )
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
+    PatchData pd;
     ASSERT_NO_ERROR( err );
 
-    const double         LIMIT = 1e-4;
+    const double LIMIT = 1e-4;
     TerminationCriterion tc;
     bool ( *func_ptr )( double, double, double, double );
     if( absolute )
@@ -559,7 +559,7 @@ void TerminationCriterionTest::test_quality_common( bool absolute, bool successi
     }
 
     const double INIT_VALUE = 10.0;
-    objFunc.mValue = INIT_VALUE;
+    objFunc.mValue          = INIT_VALUE;
     tc.reset_inner( pd, ofEval, err );
     ASSERT_NO_ERROR( err );
     tc.reset_patch( pd, err );
@@ -568,7 +568,7 @@ void TerminationCriterionTest::test_quality_common( bool absolute, bool successi
 
     while( !func_ptr( INIT_VALUE, prev, objFunc.mValue, LIMIT ) )
     {
-        CPPUNIT_ASSERT( !tc.terminate( ) );
+        CPPUNIT_ASSERT( !tc.terminate() );
 
         prev = objFunc.mValue;
         objFunc.mValue *= 0.1;
@@ -578,22 +578,22 @@ void TerminationCriterionTest::test_quality_common( bool absolute, bool successi
         ASSERT_NO_ERROR( err );
     }
 
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 // VERTEX BOUND
-void TerminationCriterionTest::test_vertex_bound( )
+void TerminationCriterionTest::test_vertex_bound()
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
+    PatchData pd;
     create_twelve_hex_patch( pd, err );
     ASSERT_NO_ERROR( err );
 
     // get bounding dimension for patch
     double maxcoord = 0.0;
-    for( size_t i = 0; i < pd.num_nodes( ); ++i )
+    for( size_t i = 0; i < pd.num_nodes(); ++i )
         for( int d = 0; d < 3; ++d )
-            if( fabs( pd.vertex_by_index( i )[ d ] ) > maxcoord ) maxcoord = fabs( pd.vertex_by_index( i )[ d ] );
+            if( fabs( pd.vertex_by_index( i )[d] ) > maxcoord ) maxcoord = fabs( pd.vertex_by_index( i )[d] );
     // add a little bit for rounding error
     maxcoord += 1e-5;
 
@@ -603,32 +603,32 @@ void TerminationCriterionTest::test_vertex_bound( )
     ASSERT_NO_ERROR( err );
     tc.reset_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !tc.terminate( ) );
+    CPPUNIT_ASSERT( !tc.terminate() );
 
-    int      idx = pd.num_free_vertices( ) - 1;
+    int idx      = pd.num_free_vertices() - 1;
     Vector3D pos = pd.vertex_by_index( idx );
-    pos[ 0 ] = 2 * maxcoord;
+    pos[0]       = 2 * maxcoord;
     pd.set_vertex_coordinates( pos, idx, err );
     ASSERT_NO_ERROR( err );
     tc.accumulate_inner( pd, 0.0, 0, err );
     ASSERT_NO_ERROR( err );
     tc.accumulate_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 // UNTANGLED
-void TerminationCriterionTest::test_untangled_mesh( )
+void TerminationCriterionTest::test_untangled_mesh()
 {
     MsqPrintError err( std::cout );
-    PatchData     pd;
+    PatchData pd;
     create_twelve_hex_patch( pd, err );
     ASSERT_NO_ERROR( err );
 
     // get two opposite vertices in first hexahedral element
-    int      vtx1 = pd.element_by_index( 0 ).get_vertex_index_array( )[ 0 ];
-    int      vtx2 = pd.element_by_index( 0 ).get_vertex_index_array( )[ 7 ];
-    Vector3D saved_coords = pd.vertex_by_index( vtx2 );
+    int vtx1                 = pd.element_by_index( 0 ).get_vertex_index_array()[0];
+    int vtx2                 = pd.element_by_index( 0 ).get_vertex_index_array()[7];
+    Vector3D saved_coords    = pd.vertex_by_index( vtx2 );
     Vector3D opposite_coords = pd.vertex_by_index( vtx1 );
 
     // invert the element
@@ -641,12 +641,12 @@ void TerminationCriterionTest::test_untangled_mesh( )
 
     // check initial termination criterion
     TerminationCriterion tc;
-    tc.add_untangled_mesh( );
+    tc.add_untangled_mesh();
     tc.reset_inner( pd, ofEval, err );
     ASSERT_NO_ERROR( err );
     tc.reset_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( !tc.terminate( ) );
+    CPPUNIT_ASSERT( !tc.terminate() );
 
     // fix the element
     pd.set_vertex_coordinates( saved_coords, vtx2, err );
@@ -660,19 +660,19 @@ void TerminationCriterionTest::test_untangled_mesh( )
     ASSERT_NO_ERROR( err );
     tc.accumulate_patch( pd, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( tc.terminate( ) );
+    CPPUNIT_ASSERT( tc.terminate() );
 }
 
 class TCTFauxOptimizer : public VertexMover
 {
   public:
     TCTFauxOptimizer( double pertubation_amount ) : mDelta( pertubation_amount ) {}
-    virtual ~TCTFauxOptimizer( ){ };
-    virtual std::string get_name( ) const
+    virtual ~TCTFauxOptimizer(){};
+    virtual std::string get_name() const
     {
         return "Optimizer for TerminationCriterionTest";
     }
-    virtual PatchSet* get_patch_set( )
+    virtual PatchSet* get_patch_set()
     {
         return &mPatchSet;
     }
@@ -680,41 +680,41 @@ class TCTFauxOptimizer : public VertexMover
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err ) {}
     virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err ) {}
-    virtual void cleanup( )
+    virtual void cleanup()
     {
-        all.clear( );
+        all.clear();
     }
-    int num_passes( ) const
+    int num_passes() const
     {
         return numPasses;
     }
-    bool should_have_terminated( ) const
+    bool should_have_terminated() const
     {
-        return perturbFrac > (int)all.size( );
+        return perturbFrac > (int)all.size();
     }
 
   private:
-    std::set< Mesh::VertexHandle >    culled, visited;
+    std::set< Mesh::VertexHandle > culled, visited;
     std::vector< Mesh::VertexHandle > all;
-    VertexPatches                     mPatchSet;
-    int                               numPasses;  //!< count number of outer iterations
-    int                               perturbFrac;  //!< perturb 1/perturbFrac of the free vertices
-    double                            mDelta;  //!< distance to perturb vertices
+    VertexPatches mPatchSet;
+    int numPasses;    //!< count number of outer iterations
+    int perturbFrac;  //!< perturb 1/perturbFrac of the free vertices
+    double mDelta;    //!< distance to perturb vertices
 };
 
 void TCTFauxOptimizer::initialize( PatchData& pd, MsqError& err )
 {
-    CPPUNIT_ASSERT( all.empty( ) );
-    culled.clear( );
-    visited.clear( );
+    CPPUNIT_ASSERT( all.empty() );
+    culled.clear();
+    visited.clear();
     numPasses = 1;
 
-    pd.get_mesh( )->get_all_vertices( all, err );MSQ_ERRRTN( err );
+    pd.get_mesh()->get_all_vertices( all, err );MSQ_ERRRTN( err );
     std::vector< bool > fixed;
-    pd.get_mesh( )->vertices_get_fixed_flag( &all[ 0 ], fixed, all.size( ), err );
+    pd.get_mesh()->vertices_get_fixed_flag( &all[0], fixed, all.size(), err );
     size_t w = 0;
-    for( size_t r = 0; r < all.size( ); ++r )
-        if( !fixed[ r ] ) all[ w++ ] = all[ r ];
+    for( size_t r = 0; r < all.size(); ++r )
+        if( !fixed[r] ) all[w++] = all[r];
     all.resize( w );MSQ_ERRRTN( err );
 
     perturbFrac = 1;
@@ -722,7 +722,7 @@ void TCTFauxOptimizer::initialize( PatchData& pd, MsqError& err )
 
 void TCTFauxOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
 {
-    Mesh::VertexHandle free_vtx = pd.get_vertex_handles_array( )[ 0 ];
+    Mesh::VertexHandle free_vtx = pd.get_vertex_handles_array()[0];
     if( visited.insert( free_vtx ).second == false )
     {  // already visited this one
         // The inner termination criterion should include an iteration limit of 1.
@@ -731,45 +731,45 @@ void TCTFauxOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
 
         // We are presumably starting a new pass over the mesh.
         // Verify that we visisted all of the free, non-culled vertices
-        for( size_t i = 0; i < all.size( ); ++i )
+        for( size_t i = 0; i < all.size(); ++i )
         {
-            if( culled.find( all[ i ] ) == culled.end( ) )
+            if( culled.find( all[i] ) == culled.end() )
             {
-                if( visited.find( all[ i ] ) == visited.end( ) )
+                if( visited.find( all[i] ) == visited.end() )
                 {
                     std::ostringstream str;
-                    str << "Did not visit vertex " << i << " (handle " << all[ i ] << ") in pass " << numPasses
+                    str << "Did not visit vertex " << i << " (handle " << all[i] << ") in pass " << numPasses
                         << std::endl;
-                    CPPUNIT_FAIL( str.str( ) );
+                    CPPUNIT_FAIL( str.str() );
                 }
             }
         }
-        visited.clear( );
+        visited.clear();
         visited.insert( free_vtx );
         ++numPasses;
 
         // Check that we terminate when expected
-        CPPUNIT_ASSERT( !should_have_terminated( ) );
+        CPPUNIT_ASSERT( !should_have_terminated() );
 
         perturbFrac *= 2;  // for each pass, perturb half as many vertices
     }
 
     // check that we are not visiting a culled vertex
-    CPPUNIT_ASSERT( culled.find( free_vtx ) == culled.end( ) );
+    CPPUNIT_ASSERT( culled.find( free_vtx ) == culled.end() );
 
     // for each pass, perturb half as many vertices
-    size_t idx = std::find( all.begin( ), all.end( ), free_vtx ) - all.begin( );
-    CPPUNIT_ASSERT( idx < all.size( ) );  // not a free vertex????
+    size_t idx = std::find( all.begin(), all.end(), free_vtx ) - all.begin();
+    CPPUNIT_ASSERT( idx < all.size() );  // not a free vertex????
     if( 0 == ( ( idx + 1 ) % perturbFrac ) )
     {
         // perturb vertex
-        double   sign = numPasses % 2 == 0 ? 1 : -1;
+        double sign = numPasses % 2 == 0 ? 1 : -1;
         Vector3D delta( sign * mDelta, 0, 0 );
         pd.move_vertex( delta, 0, err );
         ASSERT_NO_ERROR( err );
         // any adjacent vertices should not be culled
-        for( size_t i = 0; i < pd.num_nodes( ); ++i )
-            culled.erase( pd.get_vertex_handles_array( )[ i ] );
+        for( size_t i = 0; i < pd.num_nodes(); ++i )
+            culled.erase( pd.get_vertex_handles_array()[i] );
     }
     else
     {
@@ -778,7 +778,7 @@ void TCTFauxOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
     }
 }
 
-void TerminationCriterionTest::test_abs_vtx_movement_culling( )
+void TerminationCriterionTest::test_abs_vtx_movement_culling()
 {
     /* define a quad mesh like the following
       16--17--18--19--20--21--22--23
@@ -789,46 +789,46 @@ void TerminationCriterionTest::test_abs_vtx_movement_culling( )
     */
 
     const int nvtx = 24;
-    int       fixed[ nvtx ];
-    double    coords[ 3 * nvtx ];
+    int fixed[nvtx];
+    double coords[3 * nvtx];
     for( int i = 0; i < nvtx; ++i )
     {
-        coords[ 3 * i ] = i / 8;
-        coords[ 3 * i + 1 ] = i % 8;
-        coords[ 3 * i + 2 ] = 0;
-        fixed[ i ] = i < 9 || i > 14;
+        coords[3 * i]     = i / 8;
+        coords[3 * i + 1] = i % 8;
+        coords[3 * i + 2] = 0;
+        fixed[i]          = i < 9 || i > 14;
     }
 
-    const int     nquad = 14;
-    unsigned long conn[ 4 * nquad ];
+    const int nquad = 14;
+    unsigned long conn[4 * nquad];
     for( int i = 0; i < nquad; ++i )
     {
-        int row = i / 7;
-        int idx = i % 7;
-        int n0 = 8 * row + idx;
-        conn[ 4 * i ] = n0;
-        conn[ 4 * i + 1 ] = n0 + 1;
-        conn[ 4 * i + 2 ] = n0 + 9;
-        conn[ 4 * i + 3 ] = n0 + 8;
+        int row         = i / 7;
+        int idx         = i % 7;
+        int n0          = 8 * row + idx;
+        conn[4 * i]     = n0;
+        conn[4 * i + 1] = n0 + 1;
+        conn[4 * i + 2] = n0 + 9;
+        conn[4 * i + 3] = n0 + 8;
     }
 
     const double tol = 0.05;
     PlanarDomain zplane( PlanarDomain::XY, 0.0 );
-    ArrayMesh    mesh( 3, nvtx, coords, fixed, nquad, QUADRILATERAL, conn );
+    ArrayMesh mesh( 3, nvtx, coords, fixed, nquad, QUADRILATERAL, conn );
 
     // fill vertex byte with garbage to make sure that quality improver
     // is initializing correctly.
-    MsqError                          err;
-    std::vector< unsigned char >      junk( nvtx, 255 );
+    MsqError err;
+    std::vector< unsigned char > junk( nvtx, 255 );
     std::vector< Mesh::VertexHandle > vertices;
     mesh.get_all_vertices( vertices, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( junk.size( ), vertices.size( ) );
-    mesh.vertices_set_byte( &vertices[ 0 ], &junk[ 0 ], vertices.size( ), err );
+    CPPUNIT_ASSERT_EQUAL( junk.size(), vertices.size() );
+    mesh.vertices_set_byte( &vertices[0], &junk[0], vertices.size(), err );
     ASSERT_NO_ERROR( err );
 
     // Define optimizer
-    TCTFauxOptimizer     smoother( 2 * tol );
+    TCTFauxOptimizer smoother( 2 * tol );
     TerminationCriterion outer, inner;
     outer.add_absolute_vertex_movement( tol );
     inner.cull_on_absolute_vertex_movement( tol );
@@ -842,8 +842,8 @@ void TerminationCriterionTest::test_abs_vtx_movement_culling( )
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &zplane );
     q.run_instructions( &mesh_and_domain, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT( smoother.should_have_terminated( ) );
-    CPPUNIT_ASSERT( smoother.num_passes( ) > 1 );
+    CPPUNIT_ASSERT( smoother.should_have_terminated() );
+    CPPUNIT_ASSERT( smoother.num_passes() > 1 );
 }
 
 bool DummyOF::initialize_block_coordinate_descent( MeshDomainAssoc*, const Settings*, PatchSet*, MsqError& err )
@@ -862,7 +862,7 @@ bool DummyOF::evaluate_with_gradient( EvalType, PatchData& pd, double& value_out
                                       MsqError& )
 {
     value_out = mValue;
-    grad_out.clear( );
-    grad_out.resize( pd.num_free_vertices( ), mGrad );
+    grad_out.clear();
+    grad_out.resize( pd.num_free_vertices(), mGrad );
     return mValid;
 }

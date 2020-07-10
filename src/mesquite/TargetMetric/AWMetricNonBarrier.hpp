@@ -40,7 +40,8 @@ namespace MBMesquite
 {
 
 class MsqError;
-template< unsigned R, unsigned C > class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 /**\brief The parent class for all AWMetricNonBarrier sub-classes
  *
@@ -48,9 +49,9 @@ template< unsigned R, unsigned C > class MsqMatrix;
 class AWMetricNonBarrier : public AWMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~AWMetricNonBarrier( );
+    MESQUITE_EXPORT virtual ~AWMetricNonBarrier();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const
+    MESQUITE_EXPORT virtual std::string get_name() const
     {
         return "AWMetricNonBarrier";
     }
@@ -64,7 +65,7 @@ class AWMetricNonBarrier : public AWMetric
 class AWMetricNonBarrier2D : public AWMetricNonBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~AWMetricNonBarrier2D( );
+    MESQUITE_EXPORT virtual ~AWMetricNonBarrier2D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
@@ -77,7 +78,7 @@ class AWMetricNonBarrier2D : public AWMetricNonBarrier
 class AWMetricNonBarrier3D : public AWMetricNonBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~AWMetricNonBarrier3D( );
+    MESQUITE_EXPORT virtual ~AWMetricNonBarrier3D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *

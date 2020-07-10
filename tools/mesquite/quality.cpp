@@ -21,10 +21,10 @@ using namespace MBMesquite;
 
 int main( int argc, char* argv[] )
 {
-    int                 two;
-    CLArgs::ToggleArg   freeonly;
+    int two;
+    CLArgs::ToggleArg freeonly;
     CLArgs::IntRangeArg histogram( &two );
-    CLArgs              args( "msqquality", "Assess mesh quality",
+    CLArgs args( "msqquality", "Assess mesh quality",
                  "Caculate various quality metrics for a mesh,"
                  "and optinally export a VTK file for which quality "
                  "values are stored as attribute data." );
@@ -42,24 +42,24 @@ int main( int argc, char* argv[] )
 
     MsqError err;
     MeshImpl mesh;
-    mesh.read_vtk( files.front( ).c_str( ), err );
+    mesh.read_vtk( files.front().c_str(), err );
     if( err )
     {
-        std::cerr << err << std::endl << "Failed to read file: " << files.front( ) << std::endl;
+        std::cerr << err << std::endl << "Failed to read file: " << files.front() << std::endl;
         return 2;
     }
 
     MeshDomain* domain = process_domain_args( &mesh );
 
-    QualityAssessor             qa( true, freeonly.value( ), "INVERTED" );
+    QualityAssessor qa( true, freeonly.value(), "INVERTED" );
     IdealWeightInverseMeanRatio imr;
-    SizeMetric                  size;
-    IdealShapeTarget            tc;
-    TShapeNB1                   tm;
-    TQualityMetric              tmp( &tc, &tm );
-    ElementMaxQM                max_tmp( &tmp );
+    SizeMetric size;
+    IdealShapeTarget tc;
+    TShapeNB1 tm;
+    TQualityMetric tmp( &tc, &tm );
+    ElementMaxQM max_tmp( &tmp );
 
-    int intervals = histogram.seen( ) ? histogram.value( ) : 0;
+    int intervals = histogram.seen() ? histogram.value() : 0;
     qa.add_quality_assessment( &imr, intervals, 0.0, "InverseMeanRatio" );
     qa.add_quality_assessment( &size, intervals, 0.0, "Size" );
     qa.add_quality_assessment( &max_tmp, intervals, 0.0, "TMP_Shape" );
@@ -83,12 +83,12 @@ int main( int argc, char* argv[] )
         return 3;
     }
 
-    if( files.size( ) > 1 )
+    if( files.size() > 1 )
     {
-        mesh.write_vtk( files[ 1 ].c_str( ), err );
+        mesh.write_vtk( files[1].c_str(), err );
         if( err )
         {
-            std::cerr << err << std::endl << "Failed to write file: " << files[ 1 ] << std::endl;
+            std::cerr << err << std::endl << "Failed to write file: " << files[1] << std::endl;
             return 2;
         }
     }

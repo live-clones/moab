@@ -74,7 +74,7 @@ class RangeSeqIntersectIter
      *again
      *        - MB_FAILURE : at end.
      */
-    ErrorCode step( );
+    ErrorCode step();
 
     /**\brief Check if next call to step() will return MB_FAILURE.
      *
@@ -82,7 +82,7 @@ class RangeSeqIntersectIter
      * If this method returns true, then the *next* call to step()
      * will return MB_FAILURE.
      */
-    bool is_at_end( ) const
+    bool is_at_end() const
     {
         return mEndHandle == mLastHandle;
     }
@@ -90,25 +90,25 @@ class RangeSeqIntersectIter
     /** Get the EntitySequence for the current block.
      *  May be NULL for invaild handles.
      */
-    EntitySequence* get_sequence( ) const
+    EntitySequence* get_sequence() const
     {
         return mSequence;
     }
 
     /** Get first handle in block */
-    EntityHandle get_start_handle( ) const
+    EntityHandle get_start_handle() const
     {
         return mStartHandle;
     }
 
     /** Get last handle in block */
-    EntityHandle get_end_handle( ) const
+    EntityHandle get_end_handle() const
     {
         return mEndHandle;
     }
 
 #if MB_RANGE_SEQ_INTERSECT_ITER_STATS
-    static double fragmentation( )
+    static double fragmentation()
     {
         return ( doubleNumCalls + intNumCalls ) / ( doubleEntCount + intEntCount );
     }
@@ -121,25 +121,25 @@ class RangeSeqIntersectIter
      *  in the Range.  This method handles iterating over the set of
      *  EntitySequences that intersect the pair.
      */
-    ErrorCode update_entity_sequence( );
+    ErrorCode update_entity_sequence();
 
     /** Handle error case where we encountered an EntityHandle w/out
      *  a corresponding EntitySequence.  Trim mEndHandle such that it
      *  is before the next valid EntityHandle of the same type.
      *\return Always returns MB_ENTITY_NOT_FOUND
      */
-    ErrorCode find_invalid_range( );
+    ErrorCode find_invalid_range();
 
-    SequenceManager*           mSequenceManager;  //!< THE EntitySequenceManager
-    EntitySequence*            mSequence;  //!< EntitySequence corresponding to current location
-    Range::const_pair_iterator rangeIter;  //!< Current position in Range.
-    EntityHandle               mStartHandle, mEndHandle;  //!< Subset of current EntitySequence
-    EntityHandle               mLastHandle;  //!< The last of the list of all handles in the Range
+    SequenceManager* mSequenceManager;      //!< THE EntitySequenceManager
+    EntitySequence* mSequence;              //!< EntitySequence corresponding to current location
+    Range::const_pair_iterator rangeIter;   //!< Current position in Range.
+    EntityHandle mStartHandle, mEndHandle;  //!< Subset of current EntitySequence
+    EntityHandle mLastHandle;               //!< The last of the list of all handles in the Range
 
 #if MB_RANGE_SEQ_INTERSECT_ITER_STATS
-    static double        doubleNumCalls, doubleEntCount;
+    static double doubleNumCalls, doubleEntCount;
     static unsigned long intNumCalls, intEntCount;
-    static void          update_stats( unsigned long num_ents );
+    static void update_stats( unsigned long num_ents );
 #endif
 };
 

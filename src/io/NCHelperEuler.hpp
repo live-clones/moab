@@ -32,8 +32,8 @@ class NCHelperEuler : public ScdNCHelper
     static bool can_read_file( ReadNC* readNC, int fileId );
 
   private:
-    virtual ErrorCode   init_mesh_vals( );
-    virtual std::string get_mesh_type_name( )
+    virtual ErrorCode init_mesh_vals();
+    virtual std::string get_mesh_type_name()
     {
         return "CAM_EUL";
     }

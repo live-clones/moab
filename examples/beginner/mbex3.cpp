@@ -32,10 +32,10 @@
 // *     main     *
 // *              *
 // ****************
-int main( )
+int main()
 {
     moab::ErrorCode rval;
-    moab::Core      mbint;
+    moab::Core mbint;
 
     // **********************************
     // *   Create the Structured Mesh   *
@@ -43,8 +43,8 @@ int main( )
 
     // As before, we have to create an array defining the coordinate of
     // each vertex:
-    const unsigned NUMVTX = 27;
-    const double   vertex_coords[ 3 * NUMVTX ] = {
+    const unsigned NUMVTX                  = 27;
+    const double vertex_coords[3 * NUMVTX] = {
         0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0,
 
         0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1,

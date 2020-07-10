@@ -26,7 +26,7 @@ VarLenTagData
     {
         struct
         {
-            unsigned       size;
+            unsigned size;
             unsigned char* array;
         } mPointer;
     } mData;
@@ -52,12 +52,12 @@ class VarLenTagData
         struct
         {
             unsigned char* array;
-            unsigned       size;
+            unsigned size;
         } mPointer;
         struct
         {
-            unsigned char array[ INLINE_COUNT ];
-            unsigned      size;
+            unsigned char array[INLINE_COUNT];
+            unsigned size;
         } mInline;
     } mData;
 };
@@ -80,15 +80,16 @@ class VarLenTagData
  *   NOTE: GCC allows zero-length arrays, but Sun's compiler
  *   (and most others) do not.
  */
-template< unsigned > class VarLenTagDataTemplate
+template < unsigned >
+class VarLenTagDataTemplate
 {
   public:
-    inline VarLenTagDataTemplate( ) {}
+    inline VarLenTagDataTemplate() {}
 
     struct MallocData
     {
         unsigned char* array;
-        unsigned       size;
+        unsigned size;
     };
 
     enum
@@ -101,21 +102,22 @@ template< unsigned > class VarLenTagDataTemplate
         struct
         {
             unsigned char* array;
-            unsigned char  pad[ INLINE_COUNT - sizeof( unsigned char* ) ];
-            unsigned       size;
+            unsigned char pad[INLINE_COUNT - sizeof( unsigned char* )];
+            unsigned size;
         } mPointer;
         struct
         {
-            unsigned char array[ INLINE_COUNT ];
-            unsigned      size;
+            unsigned char array[INLINE_COUNT];
+            unsigned size;
         } mInline;
     } mData;
 };
 
-template<> class VarLenTagDataTemplate< 0u >
+template <>
+class VarLenTagDataTemplate< 0u >
 {
   public:
-    inline VarLenTagDataTemplate< 0u >( ) {}
+    inline VarLenTagDataTemplate< 0u >() {}
 
     enum
     {
@@ -127,12 +129,12 @@ template<> class VarLenTagDataTemplate< 0u >
         struct
         {
             unsigned char* array;
-            unsigned       size;
+            unsigned size;
         } mPointer;
         struct
         {
-            unsigned char array[ INLINE_COUNT ];
-            unsigned      size;
+            unsigned char array[INLINE_COUNT];
+            unsigned size;
         } mInline;
     } mData;
 };
@@ -153,27 +155,27 @@ class VarLenTag
     VarLenTagData mData;
 
   public:
-    inline VarLenTag( )
+    inline VarLenTag()
     {
         mData.mData.mPointer.size = 0;
     }
     inline VarLenTag( unsigned size );
-    inline ~VarLenTag( )
+    inline ~VarLenTag()
     {
-        clear( );
+        clear();
     }
     inline VarLenTag( const VarLenTag& copy );
     inline VarLenTag( unsigned size, const void* data );
 
-    inline unsigned size( ) const
+    inline unsigned size() const
     {
         return mData.mData.mPointer.size;
     }
 
-    inline unsigned char* data( )
+    inline unsigned char* data()
 #ifdef VAR_LEN_TAG_ELIDE_DATA
     {
-        return size( ) <= VarLenTagData::INLINE_COUNT ? mData.mData.mInline.array : mData.mData.mPointer.array;
+        return size() <= VarLenTagData::INLINE_COUNT ? mData.mData.mInline.array : mData.mData.mPointer.array;
     }
 #else
     {
@@ -181,25 +183,25 @@ class VarLenTag
     }
 #endif
 
-    inline unsigned long mem( ) const
+    inline unsigned long mem() const
 #ifdef VAR_LEN_TAG_ELIDE_DATA
     {
-        return size( ) <= VarLenTagData::INLINE_COUNT ? 0 : size( );
+        return size() <= VarLenTagData::INLINE_COUNT ? 0 : size();
     }
 #else
     {
-        return size( );
+        return size();
     }
 #endif
 
-    inline const unsigned char* data( ) const
+    inline const unsigned char* data() const
     {
-        return const_cast< VarLenTag* >( this )->data( );
+        return const_cast< VarLenTag* >( this )->data();
     }
 
     inline unsigned char* resize( unsigned size );
 
-    inline void clear( );
+    inline void clear();
 
     inline void set( const void* dat, unsigned sz )
     {
@@ -208,7 +210,7 @@ class VarLenTag
 
     inline VarLenTag& operator=( const VarLenTag& other )
     {
-        set( other.data( ), other.size( ) );
+        set( other.data(), other.size() );
         return *this;
     }
 };
@@ -218,7 +220,7 @@ inline unsigned char* VarLenTag::resize( unsigned s )
 #ifdef VAR_LEN_TAG_ELIDE_DATA
     if( s <= VarLenTagData::INLINE_COUNT )
     {
-        if( size( ) > VarLenTagData::INLINE_COUNT )
+        if( size() > VarLenTagData::INLINE_COUNT )
         {
             unsigned char* tmp_ptr = mData.mData.mPointer.array;
             memcpy( mData.mData.mInline.array, tmp_ptr, s );
@@ -227,17 +229,17 @@ inline unsigned char* VarLenTag::resize( unsigned s )
         mData.mData.mInline.size = s;
         return mData.mData.mInline.array;
     }
-    else if( size( ) <= VarLenTagData::INLINE_COUNT )
+    else if( size() <= VarLenTagData::INLINE_COUNT )
     {
         void* tmp_ptr = malloc( s );
-        memcpy( tmp_ptr, mData.mData.mInline.array, size( ) );
+        memcpy( tmp_ptr, mData.mData.mInline.array, size() );
         mData.mData.mPointer.array = reinterpret_cast< unsigned char* >( tmp_ptr );
     }
     else
 #endif
-        if( size( ) < s )
+        if( size() < s )
     {
-        void* tmp_ptr = size( ) ? realloc( mData.mData.mPointer.array, s ) : malloc( s );
+        void* tmp_ptr              = size() ? realloc( mData.mData.mPointer.array, s ) : malloc( s );
         mData.mData.mPointer.array = reinterpret_cast< unsigned char* >( tmp_ptr );
     }
     mData.mData.mPointer.size = s;
@@ -253,12 +255,12 @@ inline VarLenTag::VarLenTag( unsigned sz )
     mData.mData.mPointer.size = sz;
 }
 
-inline void VarLenTag::clear( )
+inline void VarLenTag::clear()
 {
 #ifdef VAR_LEN_TAG_ELIDE_DATA
-    if( size( ) > VarLenTagData::INLINE_COUNT )
+    if( size() > VarLenTagData::INLINE_COUNT )
 #else
-    if( size( ) )
+    if( size() )
 #endif
         free( mData.mData.mPointer.array );
     mData.mData.mPointer.size = 0;
@@ -267,11 +269,11 @@ inline void VarLenTag::clear( )
 inline VarLenTag::VarLenTag( const VarLenTag& copy ) : mData( copy.mData )
 {
 #ifdef VAR_LEN_TAG_ELIDE_DATA
-    if( size( ) > VarLenTagData::INLINE_COUNT )
+    if( size() > VarLenTagData::INLINE_COUNT )
 #endif
     {
-        mData.mData.mPointer.array = reinterpret_cast< unsigned char* >( malloc( size( ) ) );
-        memcpy( mData.mData.mPointer.array, copy.mData.mData.mPointer.array, size( ) );
+        mData.mData.mPointer.array = reinterpret_cast< unsigned char* >( malloc( size() ) );
+        memcpy( mData.mData.mPointer.array, copy.mData.mData.mPointer.array, size() );
     }
 }
 

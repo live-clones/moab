@@ -43,31 +43,31 @@ void Util::normal( Interface* MB, EntityHandle handle, double& x, double& y, dou
 {
     // get connectivity
     const EntityHandle* connectivity = NULL;
-    int                 number_nodes = 0;
+    int number_nodes                 = 0;
     // TODO make the return value nonvoid
     ErrorCode rval = MB->get_connectivity( handle, connectivity, number_nodes, true );MB_CHK_SET_ERR_RET( rval, "can't get_connectivity" );
     assert( number_nodes >= 3 );
 
     // get_coordinates
-    double coords[ 3 ][ 3 ];
-    MB->get_coords( &( connectivity[ 0 ] ), 1, coords[ 0 ] );
-    MB->get_coords( &( connectivity[ 1 ] ), 1, coords[ 1 ] );
-    MB->get_coords( &( connectivity[ 2 ] ), 1, coords[ 2 ] );
+    double coords[3][3];
+    MB->get_coords( &( connectivity[0] ), 1, coords[0] );
+    MB->get_coords( &( connectivity[1] ), 1, coords[1] );
+    MB->get_coords( &( connectivity[2] ), 1, coords[2] );
 
-    double vecs[ 2 ][ 3 ];
-    vecs[ 0 ][ 0 ] = coords[ 1 ][ 0 ] - coords[ 0 ][ 0 ];
-    vecs[ 0 ][ 1 ] = coords[ 1 ][ 1 ] - coords[ 0 ][ 1 ];
-    vecs[ 0 ][ 2 ] = coords[ 1 ][ 2 ] - coords[ 0 ][ 2 ];
-    vecs[ 1 ][ 0 ] = coords[ 2 ][ 0 ] - coords[ 0 ][ 0 ];
-    vecs[ 1 ][ 1 ] = coords[ 2 ][ 1 ] - coords[ 0 ][ 1 ];
-    vecs[ 1 ][ 2 ] = coords[ 2 ][ 2 ] - coords[ 0 ][ 2 ];
+    double vecs[2][3];
+    vecs[0][0] = coords[1][0] - coords[0][0];
+    vecs[0][1] = coords[1][1] - coords[0][1];
+    vecs[0][2] = coords[1][2] - coords[0][2];
+    vecs[1][0] = coords[2][0] - coords[0][0];
+    vecs[1][1] = coords[2][1] - coords[0][1];
+    vecs[1][2] = coords[2][2] - coords[0][2];
 
-    x = vecs[ 0 ][ 1 ] * vecs[ 1 ][ 2 ] - vecs[ 0 ][ 2 ] * vecs[ 1 ][ 1 ];
-    y = vecs[ 0 ][ 2 ] * vecs[ 1 ][ 0 ] - vecs[ 0 ][ 0 ] * vecs[ 1 ][ 2 ];
-    z = vecs[ 0 ][ 0 ] * vecs[ 1 ][ 1 ] - vecs[ 0 ][ 1 ] * vecs[ 1 ][ 0 ];
+    x = vecs[0][1] * vecs[1][2] - vecs[0][2] * vecs[1][1];
+    y = vecs[0][2] * vecs[1][0] - vecs[0][0] * vecs[1][2];
+    z = vecs[0][0] * vecs[1][1] - vecs[0][1] * vecs[1][0];
 
     double mag = sqrt( x * x + y * y + z * z );
-    if( mag > std::numeric_limits< double >::epsilon( ) )
+    if( mag > std::numeric_limits< double >::epsilon() )
     {
         x /= mag;
         y /= mag;
@@ -78,25 +78,25 @@ void Util::normal( Interface* MB, EntityHandle handle, double& x, double& y, dou
 void Util::centroid( Interface* MB, EntityHandle handle, CartVect& coord )
 {
     const EntityHandle* connectivity = NULL;
-    int                 number_nodes = 0;
+    int number_nodes                 = 0;
     // TODO make the return value nonvoid
     ErrorCode rval = MB->get_connectivity( handle, connectivity, number_nodes, true );MB_CHK_SET_ERR_RET( rval, "can't get_connectivity" );
 
-    coord[ 0 ] = coord[ 1 ] = coord[ 2 ] = 0.0;
+    coord[0] = coord[1] = coord[2] = 0.0;
 
     for( int i = 0; i < number_nodes; i++ )
     {
-        double node_coords[ 3 ];
-        MB->get_coords( &( connectivity[ i ] ), 1, node_coords );
+        double node_coords[3];
+        MB->get_coords( &( connectivity[i] ), 1, node_coords );
 
-        coord[ 0 ] += node_coords[ 0 ];
-        coord[ 1 ] += node_coords[ 1 ];
-        coord[ 2 ] += node_coords[ 2 ];
+        coord[0] += node_coords[0];
+        coord[1] += node_coords[1];
+        coord[2] += node_coords[2];
     }
 
-    coord[ 0 ] /= (double)number_nodes;
-    coord[ 1 ] /= (double)number_nodes;
-    coord[ 2 ] /= (double)number_nodes;
+    coord[0] /= (double)number_nodes;
+    coord[1] /= (double)number_nodes;
+    coord[2] /= (double)number_nodes;
 }
 
 /*//This function calculates the coordinates for the centers of each edges of the entity specified

@@ -55,14 +55,14 @@ namespace MBMesquite
 class EdgeLengthQualityMetric : public VertexQM, public AveragingQM
 {
   public:
-    MESQUITE_EXPORT EdgeLengthQualityMetric( ) : AveragingQM( SUM ) {}
+    MESQUITE_EXPORT EdgeLengthQualityMetric() : AveragingQM( SUM ) {}
 
     // virtual destructor ensures use of polymorphism during destruction
-    MESQUITE_EXPORT virtual ~EdgeLengthQualityMetric( ) {}
+    MESQUITE_EXPORT virtual ~EdgeLengthQualityMetric() {}
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err );
 

@@ -28,8 +28,8 @@
 namespace MBMesquite
 {
 
-unsigned                    MsqInterrupt::instanceCount = 0;
-bool                        MsqInterrupt::sawInterrupt = false;
+unsigned MsqInterrupt::instanceCount                    = 0;
+bool MsqInterrupt::sawInterrupt                         = false;
 MsqInterrupt::InterruptMode MsqInterrupt::interruptMode = MsqInterrupt::AUTO;
 
 extern "C" {
@@ -39,12 +39,12 @@ msq_sig_handler_t oldHandler = SIG_ERR;
 
 extern "C" void msq_sigint_handler( int )
 {
-    MsqInterrupt::set_interrupt( );
+    MsqInterrupt::set_interrupt();
     if( oldHandler != SIG_DFL && oldHandler != SIG_IGN ) oldHandler( SIGINT );
-    MsqInterrupt::set_handler( );
+    MsqInterrupt::set_handler();
 }
 
-void MsqInterrupt::set_handler( )
+void MsqInterrupt::set_handler()
 {
     oldHandler = signal( SIGINT, &msq_sigint_handler );
     if( MsqInterrupt::interruptMode == MsqInterrupt::AUTO && ( oldHandler == SIG_DFL || oldHandler == SIG_IGN ) )
@@ -67,29 +67,29 @@ void MsqInterrupt::disable( MsqError& /*err*/ )
 
 void MsqInterrupt::enable( MsqError& /*err*/ )
 {
-    sawInterrupt = false;
+    sawInterrupt  = false;
     interruptMode = CATCH;
-    if( instanceCount && SIG_ERR == oldHandler ) set_handler( );
+    if( instanceCount && SIG_ERR == oldHandler ) set_handler();
 }
 
 void MsqInterrupt::allow( MsqError& /*err*/ )
 {
-    sawInterrupt = false;
+    sawInterrupt  = false;
     interruptMode = AUTO;
-    if( instanceCount && SIG_ERR == oldHandler ) set_handler( );
+    if( instanceCount && SIG_ERR == oldHandler ) set_handler();
 }
 
-MsqInterrupt::MsqInterrupt( )
+MsqInterrupt::MsqInterrupt()
 {
     if( !instanceCount )
     {
-        if( IGNORE != interruptMode ) set_handler( );
+        if( IGNORE != interruptMode ) set_handler();
         sawInterrupt = false;
     }
     ++instanceCount;
 }
 
-MsqInterrupt::~MsqInterrupt( )
+MsqInterrupt::~MsqInterrupt()
 {
     if( !--instanceCount && SIG_ERR != oldHandler )
     {

@@ -38,28 +38,28 @@
 namespace MBMesquite
 {
 
-template< unsigned Dim >
+template < unsigned Dim >
 static inline double do_finite_difference( int r, int c, AWMetric* metric, MsqMatrix< Dim, Dim > A,
                                            const MsqMatrix< Dim, Dim >& W, double value, MsqError& err )
 {
     const double INITAL_STEP = std::max( 1e-6, fabs( 1e-14 * value ) );
-    const double init = A( r, c );
-    bool         valid;
-    double       diff_value;
-    for( double step = INITAL_STEP; step > std::numeric_limits< double >::epsilon( ); step *= 0.1 )
+    const double init        = A( r, c );
+    bool valid;
+    double diff_value;
+    for( double step = INITAL_STEP; step > std::numeric_limits< double >::epsilon(); step *= 0.1 )
     {
         A( r, c ) = init + step;
-        valid = metric->evaluate( A, W, diff_value, err );
+        valid     = metric->evaluate( A, W, diff_value, err );
         MSQ_ERRZERO( err );
         if( valid ) return ( diff_value - value ) / step;
     }
 
     // If we couldn't find a valid step, try stepping in the other
     // direciton
-    for( double step = INITAL_STEP; step > std::numeric_limits< double >::epsilon( ); step *= 0.1 )
+    for( double step = INITAL_STEP; step > std::numeric_limits< double >::epsilon(); step *= 0.1 )
     {
         A( r, c ) = init - step;
-        valid = metric->evaluate( A, W, diff_value, err );
+        valid     = metric->evaluate( A, W, diff_value, err );
         MSQ_ERRZERO( err );
         if( valid ) return ( value - diff_value ) / step;
     }
@@ -70,7 +70,7 @@ static inline double do_finite_difference( int r, int c, AWMetric* metric, MsqMa
     return 0.0;
 }
 
-template< unsigned Dim >
+template < unsigned Dim >
 static inline bool do_numerical_gradient( AWMetric* mu, MsqMatrix< Dim, Dim > A, const MsqMatrix< Dim, Dim >& W,
                                           double& result, MsqMatrix< Dim, Dim >& wrt_A, MsqError& err )
 {
@@ -109,7 +109,7 @@ static inline bool do_numerical_gradient( AWMetric* mu, MsqMatrix< Dim, Dim > A,
     return true;
 }
 
-template< unsigned Dim >
+template < unsigned Dim >
 static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim > A, const MsqMatrix< Dim, Dim >& W,
                                          double& value, MsqMatrix< Dim, Dim >& grad, MsqMatrix< Dim, Dim >* Hess,
                                          MsqError& err )
@@ -117,7 +117,7 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
     // zero hessian data
     const int num_block = Dim * ( Dim + 1 ) / 2;
     for( int i = 0; i < num_block; ++i )
-        Hess[ i ].zero( );
+        Hess[i].zero();
 
     // evaluate gradient for input values
     bool valid;
@@ -125,19 +125,19 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
     // do finite difference for each term of A
-    const double          INITAL_STEP = std::max( 1e-6, fabs( 1e-14 * value ) );
-    double                value2;
+    const double INITAL_STEP = std::max( 1e-6, fabs( 1e-14 * value ) );
+    double value2;
     MsqMatrix< Dim, Dim > grad2;
     for( unsigned r = 0; r < Dim; ++r )
     {  // for each row of A
         for( unsigned c = 0; c < Dim; ++c )
         {  // for each column of A
             const double in_val = A( r, c );
-            double       step;
-            for( step = INITAL_STEP; step > std::numeric_limits< double >::epsilon( ); step *= 0.1 )
+            double step;
+            for( step = INITAL_STEP; step > std::numeric_limits< double >::epsilon(); step *= 0.1 )
             {
                 A( r, c ) = in_val + step;
-                valid = metric->evaluate_with_grad( A, W, value2, grad2, err );
+                valid     = metric->evaluate_with_grad( A, W, value2, grad2, err );
                 MSQ_ERRZERO( err );
                 if( valid ) break;
             }
@@ -145,10 +145,10 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
             // if no valid step size, try step in other direction
             if( !valid )
             {
-                for( step = -INITAL_STEP; step < -std::numeric_limits< double >::epsilon( ); step *= 0.1 )
+                for( step = -INITAL_STEP; step < -std::numeric_limits< double >::epsilon(); step *= 0.1 )
                 {
                     A( r, c ) = in_val + step;
-                    valid = metric->evaluate_with_grad( A, W, value2, grad2, err );
+                    valid     = metric->evaluate_with_grad( A, W, value2, grad2, err );
                     MSQ_ERRZERO( err );
                     if( valid ) break;
                 }
@@ -172,25 +172,25 @@ static inline bool do_numerical_hessian( AWMetric* metric, MsqMatrix< Dim, Dim >
             for( unsigned b = 0; b < r; ++b )
             {
                 const int idx = Dim * b - b * ( b + 1 ) / 2 + r;
-                Hess[ idx ].add_column( c, transpose( grad2.row( b ) ) );
+                Hess[idx].add_column( c, transpose( grad2.row( b ) ) );
             }
             for( unsigned b = r; b < Dim; ++b )
             {
                 const int idx = Dim * r - r * ( r + 1 ) / 2 + b;
-                Hess[ idx ].add_row( c, grad2.row( b ) );
+                Hess[idx].add_row( c, grad2.row( b ) );
             }
         }  // for (c)
-    }  // for (r)
+    }      // for (r)
 
     // Values in non-diagonal blocks were added twice.
     for( unsigned r = 0, h = 1; r < Dim - 1; ++r, ++h )
         for( unsigned c = r + 1; c < Dim; ++c, ++h )
-            Hess[ h ] *= 0.5;
+            Hess[h] *= 0.5;
 
     return true;
 }
 
-AWMetric::~AWMetric( ) {}
+AWMetric::~AWMetric() {}
 
 bool AWMetric::evaluate( const MsqMatrix< 2, 2 >& /*A*/, const MsqMatrix< 2, 2 >& /*W*/, double& /*result*/,
                          MsqError& /*err*/ )
@@ -217,19 +217,19 @@ bool AWMetric::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 
 }
 
 bool AWMetric::evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                                   MsqMatrix< 2, 2 >& deriv_wrt_A, MsqMatrix< 2, 2 > hess_wrt_A[ 3 ], MsqError& err )
+                                   MsqMatrix< 2, 2 >& deriv_wrt_A, MsqMatrix< 2, 2 > hess_wrt_A[3], MsqError& err )
 {
     return do_numerical_hessian( this, A, W, result, deriv_wrt_A, hess_wrt_A, err );
 }
 
 bool AWMetric::evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
-                                   MsqMatrix< 3, 3 >& deriv_wrt_A, MsqMatrix< 3, 3 > hess_wrt_A[ 6 ], MsqError& err )
+                                   MsqMatrix< 3, 3 >& deriv_wrt_A, MsqMatrix< 3, 3 > hess_wrt_A[6], MsqError& err )
 {
     return do_numerical_hessian( this, A, W, result, deriv_wrt_A, hess_wrt_A, err );
 }
 
-AWMetric2D::~AWMetric2D( ) {}
-AWMetric3D::~AWMetric3D( ) {}
+AWMetric2D::~AWMetric2D() {}
+AWMetric3D::~AWMetric3D() {}
 
 bool AWMetric2D::evaluate( const MsqMatrix< 3, 3 >&, const MsqMatrix< 3, 3 >&, double&, MsqError& err )
 {

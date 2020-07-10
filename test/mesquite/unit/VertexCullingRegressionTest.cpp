@@ -79,50 +79,50 @@ class VertexCullingRegressionTest : public CppUnit::TestFixture
   private:
     CPPUNIT_TEST_SUITE( VertexCullingRegressionTest );
     CPPUNIT_TEST( test_laplacian_smoothing_with_cull );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
     int pF;  // PRINT_FLAG
   public:
-    void setUp( )
+    void setUp()
     {
         // pF=1;//PRINT_FLAG IS ON
         pF = 0;  // PRINT_FLAG IS OFF
     }
 
-    void tearDown( ) {}
+    void tearDown() {}
 
   public:
-    VertexCullingRegressionTest( ) {}
+    VertexCullingRegressionTest() {}
 
-    void test_laplacian_smoothing_with_cull( )
+    void test_laplacian_smoothing_with_cull()
     {
         /* Read a VTK Mesh file */
-        MsqPrintError        err( cout );
+        MsqPrintError err( cout );
         MBMesquite::MeshImpl mesh;
         mesh.read_vtk( MESH_FILES_DIR "2D/vtk/quads/untangled/square_quad_10_rand.vtk", err );
         CPPUNIT_ASSERT( !err );
 
-        Vector3D                 pnt( 0, 0, 5 );
-        Vector3D                 s_norm( 0, 0, 1 );
+        Vector3D pnt( 0, 0, 5 );
+        Vector3D s_norm( 0, 0, 1 );
         MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
         // create an objective function for use in termination criteria
         IdealWeightInverseMeanRatio metric;
-        LPtoPTemplate               of( 2, &metric );
+        LPtoPTemplate of( 2, &metric );
 
         // creates an intruction queue
         InstructionQueue queue1;
 
         // creates a mean ratio quality metric ...
         ConditionNumberQualityMetric shape_metric;
-        EdgeLengthQualityMetric      lapl_met;
+        EdgeLengthQualityMetric lapl_met;
         lapl_met.set_averaging_method( QualityMetric::RMS );
 
         // creates the laplacian smoother  procedures
         LaplacianSmoother lapl1( &of );
         LaplacianSmoother lapl2( &of );
-        QualityAssessor   stop_qa = QualityAssessor( &shape_metric );
+        QualityAssessor stop_qa = QualityAssessor( &shape_metric );
         stop_qa.add_quality_assessment( &lapl_met );
 
         //**************Set termination criterion****************

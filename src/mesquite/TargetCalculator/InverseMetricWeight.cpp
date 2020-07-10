@@ -37,13 +37,13 @@
 namespace MBMesquite
 {
 
-InverseMetricWeight::~InverseMetricWeight( ) {}
+InverseMetricWeight::~InverseMetricWeight() {}
 
 double InverseMetricWeight::get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err )
 {
     size_t h = ElemSampleQM::handle( sample, element );
     double value;
-    bool   flag = mMetric->evaluate( pd, h, value, err );
+    bool flag = mMetric->evaluate( pd, h, value, err );
     MSQ_ERRZERO( err );
     if( !flag )
     {

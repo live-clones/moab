@@ -28,16 +28,16 @@ ScdVertexData::ScdVertexData( const EntityHandle start_vertex, const int imin, c
     // need to have meaningful parameters
     assert( imax >= imin && jmax >= jmin && kmax >= kmin );
 
-    vertexParams[ 0 ] = HomCoord( imin, jmin, kmin );
-    vertexParams[ 1 ] = HomCoord( imax, jmax, kmax );
-    vertexParams[ 2 ] = HomCoord( 1, 1, 1 );
+    vertexParams[0] = HomCoord( imin, jmin, kmin );
+    vertexParams[1] = HomCoord( imax, jmax, kmax );
+    vertexParams[2] = HomCoord( 1, 1, 1 );
 
-    dIJK[ 0 ] = imax - imin + 1;
-    dIJK[ 1 ] = jmax - jmin + 1;
-    dIJK[ 2 ] = kmax - kmin + 1;
-    dIJKm1[ 0 ] = dIJK[ 0 ] - 1;
-    dIJKm1[ 1 ] = dIJK[ 1 ] - 1;
-    dIJKm1[ 2 ] = dIJK[ 2 ] - 1;
+    dIJK[0]   = imax - imin + 1;
+    dIJK[1]   = jmax - jmin + 1;
+    dIJK[2]   = kmax - kmin + 1;
+    dIJKm1[0] = dIJK[0] - 1;
+    dIJKm1[1] = dIJK[1] - 1;
+    dIJKm1[2] = dIJK[2] - 1;
 
     create_sequence_data( 0, sizeof( double ) );
     create_sequence_data( 1, sizeof( double ) );

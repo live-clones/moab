@@ -66,20 +66,20 @@ void usage( const char* argv0, bool help = false )
 
 int main( int argc, char* argv[] )
 {
-    const char* input_file = 0;
+    const char* input_file  = 0;
     const char* output_file = 0;
     for( int i = 1; i < argc; ++i )
     {
-        if( !strcmp( "-h", argv[ i ] ) )
-            usage( argv[ 0 ], true );
+        if( !strcmp( "-h", argv[i] ) )
+            usage( argv[0], true );
         else if( !input_file )
-            input_file = argv[ i ];
+            input_file = argv[i];
         else if( !output_file )
-            output_file = argv[ i ];
+            output_file = argv[i];
         else
-            usage( argv[ 0 ] );
+            usage( argv[0] );
     }
-    if( !input_file ) input_file = DEFAULT_INPUT.c_str( );
+    if( !input_file ) input_file = DEFAULT_INPUT.c_str();
 
     MsqError err;
     MeshImpl mesh;
@@ -97,7 +97,7 @@ int main( int argc, char* argv[] )
     ShapeImprover smoother;
 #endif
     IdealWeightInverseMeanRatio extra_metric;
-    smoother.quality_assessor( ).add_quality_assessment( &extra_metric );
+    smoother.quality_assessor().add_quality_assessment( &extra_metric );
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &plane );
     smoother.run_instructions( &mesh_and_domain, err );
     if( err )
@@ -116,26 +116,26 @@ int main( int argc, char* argv[] )
         }
     }
 
-    if( smoother.quality_assessor( ).invalid_elements( ) )
+    if( smoother.quality_assessor().invalid_elements() )
     {
         std::cerr << "Resulting mesh contains invalid elements: untangler did not succeed" << std::endl;
         return 4;
     }
 
-    const QualityAssessor::Assessor* quality = smoother.quality_assessor( ).get_results( &extra_metric );
+    const QualityAssessor::Assessor* quality = smoother.quality_assessor().get_results( &extra_metric );
     if( !quality )
     {
         std::cerr << "Failed to get quality stats for IMR metric" << std::endl;
         return 2;
     }
 
-    if( fabs( 1 - quality->get_average( ) ) > 1e-3 )
+    if( fabs( 1 - quality->get_average() ) > 1e-3 )
     {
         std::cerr << "Average quality is not optimal." << std::endl;
         return 4;
     }
 
-    if( quality->get_stddev( ) > 1e-3 )
+    if( quality->get_stddev() > 1e-3 )
     {
         std::cerr << "Not all elements have optimal quality." << std::endl;
         return 4;

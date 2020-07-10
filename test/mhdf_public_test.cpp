@@ -8,35 +8,35 @@ static int print_file_summary( MHDF_FileDesc* data );
 
 int main( int argc, char* argv[] )
 {
-    int             result;
+    int result;
     MHDF_FileHandle file;
-    MHDF_Status     status;
-    unsigned long   max_id;
-    MHDF_FileDesc*  data;
+    MHDF_Status status;
+    unsigned long max_id;
+    MHDF_FileDesc* data;
 
     if( argc != 2 )
     {
-        fprintf( stderr, "Usage: %s <filename>\n", argv[ 0 ] );
+        fprintf( stderr, "Usage: %s <filename>\n", argv[0] );
         return 0;
     }
 
-    file = mhdf_openFile( argv[ 1 ], 0, &max_id, -1, &status );
+    file = mhdf_openFile( argv[1], 0, &max_id, -1, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "%s: %s\n", argv[ 1 ], mhdf_message( &status ) );
+        fprintf( stderr, "%s: %s\n", argv[1], mhdf_message( &status ) );
         return 1;
     }
 
     data = mhdf_getFileSummary( file, H5T_NATIVE_ULONG, &status, 1 );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "%s: %s\n", argv[ 1 ], mhdf_message( &status ) );
+        fprintf( stderr, "%s: %s\n", argv[1], mhdf_message( &status ) );
         return 1;
     }
 
     mhdf_closeFile( file, &status );
 
-    printf( "%s:\n", argv[ 1 ] );
+    printf( "%s:\n", argv[1] );
     result = print_file_summary( data );
     free( data );
     return result;
@@ -64,9 +64,9 @@ static void print_ent_desc( const char* name, const char* subname, MHDF_EntDesc*
 
     if( !data->num_dense_tags ) return;
 
-    printf( "      %-*s: \"%s\"", len, "dense tags", all->tags[ data->dense_tag_indices[ 0 ] ].name );
+    printf( "      %-*s: \"%s\"", len, "dense tags", all->tags[data->dense_tag_indices[0]].name );
     for( i = 1; i < data->num_dense_tags; ++i )
-        printf( ", \"%s\"", all->tags[ data->dense_tag_indices[ i ] ].name );
+        printf( ", \"%s\"", all->tags[data->dense_tag_indices[i]].name );
     printf( "\n" );
 }
 
@@ -78,12 +78,12 @@ static void print_elem_desc( MHDF_ElemDesc* data, MHDF_FileDesc* all )
 
 static const char* tag_type_name( MHDF_TagDataType type )
 {
-    static const char opaque[] = "opaque";
+    static const char opaque[]  = "opaque";
     static const char integer[] = "integer";
-    static const char real[] = "real";
-    static const char bits[] = "bit field";
+    static const char real[]    = "real";
+    static const char bits[]    = "bit field";
     static const char boolean[] = "boolean";
-    static const char id[] = "entity id";
+    static const char id[]      = "entity id";
     static const char unknown[] = "(UNKNOWN TYPE ID)";
     switch( type )
     {
@@ -105,12 +105,12 @@ static const char* tag_type_name( MHDF_TagDataType type )
 
 static const char* string_tag_value( const void* value, MHDF_TagDataType type, int size )
 {
-    static char          buffer[ 1024 ];
-    const char*          data = (const char*)value;
-    char*                offset = buffer;
-    int                  print, i;
-    const int*           intptr = (const int*)value;
-    const double*        dblptr = (const double*)value;
+    static char buffer[1024];
+    const char* data = (const char*)value;
+    char* offset     = buffer;
+    int print, i;
+    const int* intptr          = (const int*)value;
+    const double* dblptr       = (const double*)value;
     const unsigned long* idptr = (const unsigned long*)value;
 
     if( size <= 0 )
@@ -124,13 +124,13 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
         case mhdf_OPAQUE:
             print = 1;
             for( i = 0; i < size; ++i )
-                if( !isprint( data[ i ] ) ) print = 0;
+                if( !isprint( data[i] ) ) print = 0;
             if( print )
             {
-                offset[ 0 ] = '"';
+                offset[0] = '"';
                 memcpy( offset + 1, data, size );
-                offset[ size + 1 ] = '"';
-                offset[ size + 2 ] = '\0';
+                offset[size + 1] = '"';
+                offset[size + 2] = '\0';
                 offset += size + 2;
             }
             else
@@ -138,26 +138,26 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
                 strcpy( offset, "0x" );
                 offset += 2;
                 for( i = 0; i < size; ++i )
-                    offset += sprintf( offset, "%02x", (unsigned int)data[ i ] );
+                    offset += sprintf( offset, "%02x", (unsigned int)data[i] );
             }
             break;
         case mhdf_INTEGER:
-            if( size == 1 ) { offset += sprintf( offset, "%d", intptr[ 0 ] ); }
+            if( size == 1 ) { offset += sprintf( offset, "%d", intptr[0] ); }
             else
             {
-                offset += sprintf( offset, "{%d", intptr[ 0 ] );
+                offset += sprintf( offset, "{%d", intptr[0] );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%d", intptr[ i ] );
+                    offset += sprintf( offset, ",%d", intptr[i] );
                 offset += sprintf( offset, "}" );
             }
             break;
         case mhdf_FLOAT:
-            if( size == 1 ) { offset += sprintf( offset, "%g", dblptr[ 0 ] ); }
+            if( size == 1 ) { offset += sprintf( offset, "%g", dblptr[0] ); }
             else
             {
-                offset += sprintf( offset, "{%g", dblptr[ 0 ] );
+                offset += sprintf( offset, "{%g", dblptr[0] );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%g", dblptr[ i ] );
+                    offset += sprintf( offset, ",%g", dblptr[i] );
                 offset += sprintf( offset, "}" );
             }
             break;
@@ -172,22 +172,22 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
             }
             break;
         case mhdf_BOOLEAN:
-            if( size == 1 ) { offset += sprintf( offset, "%s", data[ 0 ] ? "true" : "false" ); }
+            if( size == 1 ) { offset += sprintf( offset, "%s", data[0] ? "true" : "false" ); }
             else
             {
-                offset += sprintf( offset, "{%s", data[ 0 ] ? "true" : "false" );
+                offset += sprintf( offset, "{%s", data[0] ? "true" : "false" );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%s", data[ i ] ? "true" : "false" );
+                    offset += sprintf( offset, ",%s", data[i] ? "true" : "false" );
                 offset += sprintf( offset, "}" );
             }
             break;
         case mhdf_ENTITY_ID:
-            if( size == 1 ) { offset += sprintf( offset, "%lu", idptr[ 0 ] ); }
+            if( size == 1 ) { offset += sprintf( offset, "%lu", idptr[0] ); }
             else
             {
-                offset += sprintf( offset, "{%lu", idptr[ 0 ] );
+                offset += sprintf( offset, "{%lu", idptr[0] );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%lu", idptr[ i ] );
+                    offset += sprintf( offset, ",%lu", idptr[i] );
                 offset += sprintf( offset, "}" );
             }
             break;
@@ -201,13 +201,13 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
 
 static const char* ent_desc_name( MHDF_FileDesc* all, int idx )
 {
-    static const char nodes[] = "Nodes";
-    static const char sets[] = "Sets";
+    static const char nodes[]   = "Nodes";
+    static const char sets[]    = "Sets";
     static const char invalid[] = "<INVALID INDEX!>";
     if( idx == -2 ) return sets;
     if( idx == -1 ) return nodes;
     if( idx >= all->num_elem_desc || idx < -2 ) return invalid;
-    return all->elems[ idx ].handle;
+    return all->elems[idx].handle;
 }
 
 static void print_tag_desc( MHDF_TagDesc* data, MHDF_FileDesc* all )
@@ -231,13 +231,13 @@ static void print_tag_desc( MHDF_TagDesc* data, MHDF_FileDesc* all )
     {
         printf( "      %-*s: (sparse)", width, "tables" );
         for( i = 0; i < data->num_dense_indices; ++i )
-            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[ i ] ) );
+            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[i] ) );
     }
     else if( data->num_dense_indices )
     {
-        printf( "      %-*s: %s", width, "tables", ent_desc_name( all, data->dense_elem_indices[ 0 ] ) );
+        printf( "      %-*s: %s", width, "tables", ent_desc_name( all, data->dense_elem_indices[0] ) );
         for( i = 1; i < data->num_dense_indices; ++i )
-            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[ i ] ) );
+            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[i] ) );
     }
     else
     {
@@ -260,21 +260,21 @@ static int print_file_summary( MHDF_FileDesc* data )
     for( i = 0; i < data->num_tag_desc; ++i )
         print_tag_desc( data->tags + i, data );
 
-    printf( "   Number partitions: %d\n", data->numEntSets[ 0 ] );
-    for( i = 0; i < data->numEntSets[ 0 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 0 ][ i ], data->defTagsVals[ 0 ][ i ] );
-    printf( "\n   Number material sets: %d\n", data->numEntSets[ 1 ] );
-    for( i = 0; i < data->numEntSets[ 1 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 1 ][ i ], data->defTagsVals[ 1 ][ i ] );
-    printf( "\n   Number neumann sets: %d\n", data->numEntSets[ 2 ] );
-    for( i = 0; i < data->numEntSets[ 2 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 2 ][ i ], data->defTagsVals[ 2 ][ i ] );
-    printf( "\n   Number dirichlet sets: %d\n", data->numEntSets[ 3 ] );
-    for( i = 0; i < data->numEntSets[ 3 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 3 ][ i ], data->defTagsVals[ 3 ][ i ] );
-    printf( "\n   Number geometry sets: %d\n", data->numEntSets[ 4 ] );
-    for( i = 0; i < data->numEntSets[ 4 ]; i++ )
-        printf( " set id %d value %d \n", data->defTagsEntSets[ 4 ][ i ], data->defTagsVals[ 4 ][ i ] );
+    printf( "   Number partitions: %d\n", data->numEntSets[0] );
+    for( i = 0; i < data->numEntSets[0]; i++ )
+        printf( " set id %d value %d \n", data->defTagsEntSets[0][i], data->defTagsVals[0][i] );
+    printf( "\n   Number material sets: %d\n", data->numEntSets[1] );
+    for( i = 0; i < data->numEntSets[1]; i++ )
+        printf( " set id %d value %d \n", data->defTagsEntSets[1][i], data->defTagsVals[1][i] );
+    printf( "\n   Number neumann sets: %d\n", data->numEntSets[2] );
+    for( i = 0; i < data->numEntSets[2]; i++ )
+        printf( " set id %d value %d \n", data->defTagsEntSets[2][i], data->defTagsVals[2][i] );
+    printf( "\n   Number dirichlet sets: %d\n", data->numEntSets[3] );
+    for( i = 0; i < data->numEntSets[3]; i++ )
+        printf( " set id %d value %d \n", data->defTagsEntSets[3][i], data->defTagsVals[3][i] );
+    printf( "\n   Number geometry sets: %d\n", data->numEntSets[4] );
+    for( i = 0; i < data->numEntSets[4]; i++ )
+        printf( " set id %d value %d \n", data->defTagsEntSets[4][i], data->defTagsVals[4][i] );
 
     return 0;
 }

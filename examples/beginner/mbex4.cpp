@@ -39,10 +39,10 @@
 // *     main     *
 // *              *
 // ****************
-int main( )
+int main()
 {
     moab::ErrorCode rval;
-    moab::Core      mbint;
+    moab::Core mbint;
 
     // ***********************
     // *   Create the Mesh   *
@@ -91,7 +91,7 @@ int main( )
             moab::EntityHandle handle = scdbox->get_vertex( i, j );
 
             // Compute the coordinate:
-            double coord[ 3 ] = { DX * i, DY * j, 0.0 };
+            double coord[3] = { DX * i, DY * j, 0.0 };
 
             // Change the coordinate of the vertex:
             mbint.set_coords( &handle, 1, coord );
@@ -113,12 +113,12 @@ int main( )
 
     // Create the tags:
     moab::Tag temp_tag;
-    double    temp_default_value = 0.0;
-    rval = mbint.tag_get_handle( "temperature", 1, moab::MB_TYPE_DOUBLE, temp_tag,
+    double temp_default_value = 0.0;
+    rval                      = mbint.tag_get_handle( "temperature", 1, moab::MB_TYPE_DOUBLE, temp_tag,
                                  moab::MB_TAG_DENSE | moab::MB_TAG_CREAT, &temp_default_value );MB_CHK_SET_ERR( rval, "mbint.tag_get_handle(temperature) failed" );
 
     moab::Tag vel_tag;
-    double    vel_default_value[ 2 ] = { 0.0, 0.0 };
+    double vel_default_value[2] = { 0.0, 0.0 };
     rval = mbint.tag_get_handle( "velocity", 2, moab::MB_TYPE_DOUBLE, vel_tag, moab::MB_TAG_DENSE | moab::MB_TAG_CREAT,
                                  vel_default_value );MB_CHK_SET_ERR( rval, "mbint.tag_get_handle(velocity) failed" );
 
@@ -150,9 +150,9 @@ int main( )
             moab::EntityHandle handle = scdbox->get_element( i, j );
 
             // Compute the temperature...
-            double xc = DX * ( i + 0.5 );
-            double yc = DY * ( j + 0.5 );
-            double r = std::sqrt( xc * xc + yc * yc );
+            double xc          = DX * ( i + 0.5 );
+            double yc          = DY * ( j + 0.5 );
+            double r           = std::sqrt( xc * xc + yc * yc );
             double temperature = std::exp( -0.5 * r );
 
             // Set the temperature on a single quad:
@@ -165,7 +165,7 @@ int main( )
         {
             // Get the handle for this vertex:
             moab::EntityHandle handle = scdbox->get_vertex( i, j );
-            double             velocity[ 2 ] = { i, j };
+            double velocity[2]        = { i, j };
 
             // Set the velocity on a vertex:
             rval = mbint.tag_set_data( vel_tag, &handle, 1, velocity );MB_CHK_SET_ERR( rval, "mbint.tag_set_data(vel_tag) failed" );

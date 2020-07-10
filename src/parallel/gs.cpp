@@ -122,7 +122,7 @@ namespace moab
         sint i, j;                       \
         while( ( i = *cm++ ) != -1 )     \
             while( ( j = *cm++ ) != -1 ) \
-                op( u[ i ], u[ j ] );    \
+                op( u[i], u[j] );        \
     } while( 0 )
 
 static void local_condense( realType* u, int op, const sint* cm )
@@ -211,28 +211,28 @@ static void local_uncondense_vec( realType* u, uint n, const sint* cm )
 
 void gs_data::nonlocal_info::initialize( uint np, uint count, uint nlabels, uint nulabels, uint maxv )
 {
-    _target = NULL;
+    _target  = NULL;
     _nshared = NULL;
-    _sh_ind = NULL;
+    _sh_ind  = NULL;
     _slabels = NULL;
     _ulabels = NULL;
-    _reqs = NULL;
-    _buf = NULL;
-    _np = np;
-    _target = (uint*)malloc( ( 2 * np + count ) * sizeof( uint ) );
+    _reqs    = NULL;
+    _buf     = NULL;
+    _np      = np;
+    _target  = (uint*)malloc( ( 2 * np + count ) * sizeof( uint ) );
     _nshared = _target + np;
-    _sh_ind = _nshared + np;
+    _sh_ind  = _nshared + np;
     if( 1 < nlabels )
         _slabels = (slong*)malloc( ( ( nlabels - 1 ) * count ) * sizeof( slong ) );
     else
         _slabels = NULL;
     _ulabels = (Ulong*)malloc( ( nulabels * count ) * sizeof( Ulong ) );
-    _reqs = (MPI_Request*)malloc( 2 * np * sizeof( MPI_Request ) );
-    _buf = (realType*)malloc( ( 2 * count * maxv ) * sizeof( realType ) );
-    _maxv = maxv;
+    _reqs    = (MPI_Request*)malloc( 2 * np * sizeof( MPI_Request ) );
+    _buf     = (realType*)malloc( ( 2 * count * maxv ) * sizeof( realType ) );
+    _maxv    = maxv;
 }
 
-void gs_data::nonlocal_info::nlinfo_free( )
+void gs_data::nonlocal_info::nlinfo_free()
 {
     // Free the ptrs
     free( _buf );
@@ -242,24 +242,24 @@ void gs_data::nonlocal_info::nlinfo_free( )
     free( _ulabels );
     // Set to null
     _ulabels = NULL;
-    _buf = NULL;
-    _reqs = NULL;
-    _target = NULL;
+    _buf     = NULL;
+    _reqs    = NULL;
+    _target  = NULL;
     _slabels = NULL;
     _nshared = NULL;
-    _sh_ind = NULL;
+    _sh_ind  = NULL;
 }
 
 void gs_data::nonlocal_info::nonlocal( realType* u, int op, MPI_Comm comm )
 {
-    MPI_Status   status;
-    uint         np = this->_np;
+    MPI_Status status;
+    uint np           = this->_np;
     MPI_Request* reqs = this->_reqs;
-    uint*        targ = this->_target;
-    uint*        nshared = this->_nshared;
-    uint*        sh_ind = this->_sh_ind;
-    uint         id;
-    realType *   buf = this->_buf, *start;
+    uint* targ        = this->_target;
+    uint* nshared     = this->_nshared;
+    uint* sh_ind      = this->_sh_ind;
+    uint id;
+    realType *buf = this->_buf, *start;
     unsigned int i;
     {
         MPI_Comm_rank( comm, (int*)&i );
@@ -267,34 +267,33 @@ void gs_data::nonlocal_info::nonlocal( realType* u, int op, MPI_Comm comm )
     }
     for( i = 0; i < np; ++i )
     {
-        uint c = nshared[ i ];
-        start = buf;
+        uint c = nshared[i];
+        start  = buf;
         for( ; c; --c )
-            *buf++ = u[ *sh_ind++ ];
-        MPI_Isend( (void*)start, nshared[ i ] * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[ i ], id, comm, reqs++ );
+            *buf++ = u[*sh_ind++];
+        MPI_Isend( (void*)start, nshared[i] * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[i], id, comm, reqs++ );
     }
     start = buf;
     for( i = 0; i < np; ++i )
     {
-        MPI_Irecv( (void*)start, nshared[ i ] * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[ i ], targ[ i ], comm,
-                   reqs++ );
-        start += nshared[ i ];
+        MPI_Irecv( (void*)start, nshared[i] * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[i], targ[i], comm, reqs++ );
+        start += nshared[i];
     }
     for( reqs = this->_reqs, i = np * 2; i; --i )
         MPI_Wait( reqs++, &status );
     sh_ind = this->_sh_ind;
-#define LOOP( OP )                          \
-    do                                      \
-    {                                       \
-        for( i = 0; i < np; ++i )           \
-        {                                   \
-            uint c;                         \
-            for( c = nshared[ i ]; c; --c ) \
-            {                               \
-                OP( u[ *sh_ind ], *buf );   \
-                ++sh_ind, ++buf;            \
-            }                               \
-        }                                   \
+#define LOOP( OP )                        \
+    do                                    \
+    {                                     \
+        for( i = 0; i < np; ++i )         \
+        {                                 \
+            uint c;                       \
+            for( c = nshared[i]; c; --c ) \
+            {                             \
+                OP( u[*sh_ind], *buf );   \
+                ++sh_ind, ++buf;          \
+            }                             \
+        }                                 \
     } while( 0 )
     switch( op )
     {
@@ -319,15 +318,15 @@ void gs_data::nonlocal_info::nonlocal( realType* u, int op, MPI_Comm comm )
 
 void gs_data::nonlocal_info::nonlocal_vec( realType* u, uint n, int op, MPI_Comm comm )
 {
-    MPI_Status   status;
-    uint         np = this->_np;
+    MPI_Status status;
+    uint np           = this->_np;
     MPI_Request* reqs = this->_reqs;
-    uint*        targ = this->_target;
-    uint*        nshared = this->_nshared;
-    uint*        sh_ind = this->_sh_ind;
-    uint         id;
-    realType *   buf = this->_buf, *start;
-    uint         size = n * sizeof( realType );
+    uint* targ        = this->_target;
+    uint* nshared     = this->_nshared;
+    uint* sh_ind      = this->_sh_ind;
+    uint id;
+    realType *buf = this->_buf, *start;
+    uint size     = n * sizeof( realType );
     unsigned int i;
     {
         MPI_Comm_rank( comm, (int*)&i );
@@ -335,20 +334,20 @@ void gs_data::nonlocal_info::nonlocal_vec( realType* u, uint n, int op, MPI_Comm
     }
     for( i = 0; i < np; ++i )
     {
-        uint ns = nshared[ i ], c = ns;
+        uint ns = nshared[i], c = ns;
         start = buf;
         for( ; c; --c )
         {
             memcpy( buf, u + n * ( *sh_ind++ ), size );
             buf += n;
         }
-        MPI_Isend( (void*)start, ns * size, MPI_UNSIGNED_CHAR, targ[ i ], id, comm, reqs++ );
+        MPI_Isend( (void*)start, ns * size, MPI_UNSIGNED_CHAR, targ[i], id, comm, reqs++ );
     }
     start = buf;
     for( i = 0; i < np; ++i )
     {
-        int nsn = n * nshared[ i ];
-        MPI_Irecv( (void*)start, nsn * size, MPI_UNSIGNED_CHAR, targ[ i ], targ[ i ], comm, reqs++ );
+        int nsn = n * nshared[i];
+        MPI_Irecv( (void*)start, nsn * size, MPI_UNSIGNED_CHAR, targ[i], targ[i], comm, reqs++ );
         start += nsn;
     }
     for( reqs = this->_reqs, i = np * 2; i; --i )
@@ -360,7 +359,7 @@ void gs_data::nonlocal_info::nonlocal_vec( realType* u, uint n, int op, MPI_Comm
         for( i = 0; i < np; ++i )                     \
         {                                             \
             uint c, j;                                \
-            for( c = nshared[ i ]; c; --c )           \
+            for( c = nshared[i]; c; --c )             \
             {                                         \
                 realType* uu = u + n * ( *sh_ind++ ); \
                 for( j = n; j; --j )                  \
@@ -395,14 +394,14 @@ void gs_data::nonlocal_info::nonlocal_vec( realType* u, uint n, int op, MPI_Comm
 
 void gs_data::nonlocal_info::nonlocal_many( realType** u, uint n, int op, MPI_Comm comm )
 {
-    MPI_Status   status;
-    uint         np = this->_np;
+    MPI_Status status;
+    uint np           = this->_np;
     MPI_Request* reqs = this->_reqs;
-    uint*        targ = this->_target;
-    uint*        nshared = this->_nshared;
-    uint*        sh_ind = this->_sh_ind;
-    uint         id;
-    realType *   buf = this->_buf, *start;
+    uint* targ        = this->_target;
+    uint* nshared     = this->_nshared;
+    uint* sh_ind      = this->_sh_ind;
+    uint id;
+    realType *buf = this->_buf, *start;
     unsigned int i;
     {
         MPI_Comm_rank( comm, (int*)&i );
@@ -410,44 +409,44 @@ void gs_data::nonlocal_info::nonlocal_many( realType** u, uint n, int op, MPI_Co
     }
     for( i = 0; i < np; ++i )
     {
-        uint c, j, ns = nshared[ i ];
+        uint c, j, ns = nshared[i];
         start = buf;
         for( j = 0; j < n; ++j )
         {
-            realType* uu = u[ j ];
+            realType* uu = u[j];
             for( c = 0; c < ns; ++c )
-                *buf++ = uu[ sh_ind[ c ] ];
+                *buf++ = uu[sh_ind[c]];
         }
         sh_ind += ns;
-        MPI_Isend( (void*)start, n * ns * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[ i ], id, comm, reqs++ );
+        MPI_Isend( (void*)start, n * ns * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[i], id, comm, reqs++ );
     }
     start = buf;
     for( i = 0; i < np; ++i )
     {
-        int nsn = n * nshared[ i ];
-        MPI_Irecv( (void*)start, nsn * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[ i ], targ[ i ], comm, reqs++ );
+        int nsn = n * nshared[i];
+        MPI_Irecv( (void*)start, nsn * sizeof( realType ), MPI_UNSIGNED_CHAR, targ[i], targ[i], comm, reqs++ );
         start += nsn;
     }
     for( reqs = this->_reqs, i = np * 2; i; --i )
         MPI_Wait( reqs++, &status );
     sh_ind = this->_sh_ind;
-#define LOOP( OP )                                 \
-    do                                             \
-    {                                              \
-        for( i = 0; i < np; ++i )                  \
-        {                                          \
-            uint c, j, ns = nshared[ i ];          \
-            for( j = 0; j < n; ++j )               \
-            {                                      \
-                realType* uu = u[ j ];             \
-                for( c = 0; c < ns; ++c )          \
-                {                                  \
-                    OP( uu[ sh_ind[ c ] ], *buf ); \
-                    ++buf;                         \
-                }                                  \
-            }                                      \
-            sh_ind += ns;                          \
-        }                                          \
+#define LOOP( OP )                             \
+    do                                         \
+    {                                          \
+        for( i = 0; i < np; ++i )              \
+        {                                      \
+            uint c, j, ns = nshared[i];        \
+            for( j = 0; j < n; ++j )           \
+            {                                  \
+                realType* uu = u[j];           \
+                for( c = 0; c < ns; ++c )      \
+                {                              \
+                    OP( uu[sh_ind[c]], *buf ); \
+                    ++buf;                     \
+                }                              \
+            }                                  \
+            sh_ind += ns;                      \
+        }                                      \
     } while( 0 )
     switch( op )
     {
@@ -473,17 +472,17 @@ void gs_data::nonlocal_info::nonlocal_many( realType** u, uint n, int op, MPI_Co
 /*---------------------------------------------------------------------------
  MOAB Crystal Router
  ---------------------------------------------------------------------------*/
-gs_data::crystal_data::crystal_data( ) {}
+gs_data::crystal_data::crystal_data() {}
 
 void gs_data::crystal_data::initialize( MPI_Comm comm )
 {
     int num, id;
-    buffers[ 0 ].buf.buffer_init( 1024 );
-    buffers[ 1 ].buf.buffer_init( 1024 );
-    buffers[ 2 ].buf.buffer_init( 1024 );
-    all = &buffers[ 0 ];
-    keep = &buffers[ 1 ];
-    send = &buffers[ 2 ];
+    buffers[0].buf.buffer_init( 1024 );
+    buffers[1].buf.buffer_init( 1024 );
+    buffers[2].buf.buffer_init( 1024 );
+    all  = &buffers[0];
+    keep = &buffers[1];
+    send = &buffers[2];
     memcpy( &( this->_comm ), &comm, sizeof( MPI_Comm ) );
     MPI_Comm_rank( comm, &id );
     this->_id = id;
@@ -491,13 +490,13 @@ void gs_data::crystal_data::initialize( MPI_Comm comm )
     this->_num = num;
 }
 
-void gs_data::crystal_data::reset( )
+void gs_data::crystal_data::reset()
 {
-    buffers[ 0 ].buf.reset( );
-    buffers[ 1 ].buf.reset( );
-    buffers[ 2 ].buf.reset( );
+    buffers[0].buf.reset();
+    buffers[1].buf.reset();
+    buffers[2].buf.reset();
     keep = NULL;
-    all = NULL;
+    all  = NULL;
     send = NULL;
 }
 
@@ -506,7 +505,7 @@ void gs_data::crystal_data::partition( uint cutoff, crystal_buf* lo, crystal_buf
 {
     const uint* src = (uint*)all->buf.ptr;
     const uint* end = (uint*)src + all->n;
-    uint *      target, *lop, *hip;
+    uint *target, *lop, *hip;
     lo->n = hi->n = 0;
     lo->buf.buffer_reserve( all->n * sizeof( uint ) );
     hi->buf.buffer_reserve( all->n * sizeof( uint ) );
@@ -514,8 +513,8 @@ void gs_data::crystal_data::partition( uint cutoff, crystal_buf* lo, crystal_buf
     hip = (uint*)hi->buf.ptr;
     while( src != end )
     {
-        uint chunk_len = 3 + src[ 2 ];
-        if( src[ 0 ] < cutoff )
+        uint chunk_len = 3 + src[2];
+        if( src[0] < cutoff )
         {
             target = lop;
             lo->n += chunk_len;
@@ -535,47 +534,46 @@ void gs_data::crystal_data::partition( uint cutoff, crystal_buf* lo, crystal_buf
 // Send message to target process
 void gs_data::crystal_data::send_( uint target, int recvn )
 {
-    MPI_Request  req[ 3 ] = { MPI_REQUEST_NULL, MPI_REQUEST_NULL, MPI_REQUEST_NULL };
-    MPI_Status   status[ 3 ];
-    uint         count[ 2 ] = { 0, 0 }, sum, *recv[ 2 ];
+    MPI_Request req[3] = { MPI_REQUEST_NULL, MPI_REQUEST_NULL, MPI_REQUEST_NULL };
+    MPI_Status status[3];
+    uint count[2] = { 0, 0 }, sum, *recv[2];
     crystal_buf* t;
-    int          i;
+    int i;
 
     (void)VALGRIND_CHECK_MEM_IS_DEFINED( &send->n, sizeof( uint ) );
-    MPI_Isend( (void*)&send->n, sizeof( uint ), MPI_UNSIGNED_CHAR, target, _id, _comm, &req[ 0 ] );
+    MPI_Isend( (void*)&send->n, sizeof( uint ), MPI_UNSIGNED_CHAR, target, _id, _comm, &req[0] );
     for( i = 0; i < recvn; ++i )
-        MPI_Irecv( (void*)&count[ i ], sizeof( uint ), MPI_UNSIGNED_CHAR, target + i, target + i, _comm,
-                   &req[ i + 1 ] );
+        MPI_Irecv( (void*)&count[i], sizeof( uint ), MPI_UNSIGNED_CHAR, target + i, target + i, _comm, &req[i + 1] );
     MPI_Waitall( recvn + 1, req, status );
     sum = keep->n;
     for( i = 0; i < recvn; ++i )
-        sum += count[ i ];
+        sum += count[i];
     keep->buf.buffer_reserve( sum * sizeof( uint ) );
-    recv[ 0 ] = (uint*)keep->buf.ptr;
-    recv[ 0 ] += keep->n;
-    recv[ 1 ] = recv[ 0 ] + count[ 0 ];
+    recv[0] = (uint*)keep->buf.ptr;
+    recv[0] += keep->n;
+    recv[1] = recv[0] + count[0];
     keep->n = sum;
 
     (void)VALGRIND_CHECK_MEM_IS_DEFINED( send->buf.ptr, send->n * sizeof( uint ) );
-    MPI_Isend( (void*)send->buf.ptr, send->n * sizeof( uint ), MPI_UNSIGNED_CHAR, target, _id, _comm, &req[ 0 ] );
+    MPI_Isend( (void*)send->buf.ptr, send->n * sizeof( uint ), MPI_UNSIGNED_CHAR, target, _id, _comm, &req[0] );
     if( recvn )
     {
-        MPI_Irecv( (void*)recv[ 0 ], count[ 0 ] * sizeof( uint ), MPI_UNSIGNED_CHAR, target, target, _comm, &req[ 1 ] );
+        MPI_Irecv( (void*)recv[0], count[0] * sizeof( uint ), MPI_UNSIGNED_CHAR, target, target, _comm, &req[1] );
         if( recvn == 2 )
-            MPI_Irecv( (void*)recv[ 1 ], count[ 1 ] * sizeof( uint ), MPI_UNSIGNED_CHAR, target + 1, target + 1, _comm,
-                       &req[ 2 ] );
+            MPI_Irecv( (void*)recv[1], count[1] * sizeof( uint ), MPI_UNSIGNED_CHAR, target + 1, target + 1, _comm,
+                       &req[2] );
     }
     MPI_Waitall( recvn + 1, req, status );
 
-    t = all;
-    all = keep;
+    t    = all;
+    all  = keep;
     keep = t;
 }
 
-void gs_data::crystal_data::crystal_router( )
+void gs_data::crystal_data::crystal_router()
 {
-    uint         bl = 0, bh, n = _num, nl, target;
-    int          recvn;
+    uint bl = 0, bh, n = _num, nl, target;
+    int recvn;
     crystal_buf *lo, *hi;
     while( n > 1 )
     {
@@ -583,16 +581,16 @@ void gs_data::crystal_data::crystal_router( )
         if( _id < bh )
         {
             target = _id + nl;
-            recvn = ( n & 1 && _id == bh - 1 ) ? 2 : 1;
-            lo = keep;
-            hi = send;
+            recvn  = ( n & 1 && _id == bh - 1 ) ? 2 : 1;
+            lo     = keep;
+            hi     = send;
         }
         else
         {
             target = _id - nl;
-            recvn = ( target == bh ) ? ( --target, 0 ) : 1;
-            hi = keep;
-            lo = send;
+            recvn  = ( target == bh ) ? ( --target, 0 ) : 1;
+            hi     = keep;
+            lo     = send;
         }
         partition( bh, lo, hi );
         send_( target, recvn );
@@ -607,9 +605,9 @@ void gs_data::crystal_data::crystal_router( )
 }
 
 #define UINT_PER_X( X ) ( ( sizeof( X ) + sizeof( uint ) - 1 ) / sizeof( uint ) )
-#define UINT_PER_REAL UINT_PER_X( realType )
-#define UINT_PER_LONG UINT_PER_X( slong )
-#define UINT_PER_ULONG UINT_PER_X( Ulong )
+#define UINT_PER_REAL   UINT_PER_X( realType )
+#define UINT_PER_LONG   UINT_PER_X( slong )
+#define UINT_PER_ULONG  UINT_PER_X( Ulong )
 
 /*-------------------------------------------------------------------------
  Transfer
@@ -621,12 +619,12 @@ ErrorCode gs_data::crystal_data::gs_transfer( int dynamic, moab::TupleList& tl, 
     tl.getTupleSize( mi, ml, mul, mr );
 
     const unsigned tsize = ( mi - 1 ) + ml * UINT_PER_LONG + mul * UINT_PER_ULONG + mr * UINT_PER_REAL;
-    sint           p, lp = -1;
-    sint*          ri;
-    slong*         rl;
-    Ulong*         rul;
-    realType*      rr;
-    uint           i, j, *buf, *len = 0, *buf_end;
+    sint p, lp = -1;
+    sint* ri;
+    slong* rl;
+    Ulong* rul;
+    realType* rr;
+    uint i, j, *buf, *len = 0, *buf_end;
 
     /* sort to group by target proc */
     if( pf >= mi ) return moab::MB_MEMORY_ALLOCATION_FAILED;
@@ -634,28 +632,28 @@ ErrorCode gs_data::crystal_data::gs_transfer( int dynamic, moab::TupleList& tl, 
     tl.sort( pf, &all->buf );
 
     /* pack into buffer for crystal router */
-    all->buf.buffer_reserve( ( tl.get_n( ) * ( 3 + tsize ) ) * sizeof( uint ) );
+    all->buf.buffer_reserve( ( tl.get_n() * ( 3 + tsize ) ) * sizeof( uint ) );
     all->n = 0;
-    buf = (uint*)all->buf.ptr;
+    buf    = (uint*)all->buf.ptr;
 
-    bool canWrite = tl.get_writeEnabled( );
-    if( !canWrite ) tl.enableWriteAccess( );
+    bool canWrite = tl.get_writeEnabled();
+    if( !canWrite ) tl.enableWriteAccess();
 
-    ri = tl.vi_wr;
-    rl = tl.vl_wr;
+    ri  = tl.vi_wr;
+    rl  = tl.vl_wr;
     rul = tl.vul_wr;
-    rr = tl.vr_wr;
+    rr  = tl.vr_wr;
 
-    for( i = tl.get_n( ); i; --i )
+    for( i = tl.get_n(); i; --i )
     {
-        p = ri[ pf ];
+        p = ri[pf];
         if( p != lp )
         {
-            lp = p;
-            *buf++ = p; /* target */
+            lp     = p;
+            *buf++ = p;   /* target */
             *buf++ = _id; /* source */
-            len = buf++;
-            *len = 0; /* length */
+            len    = buf++;
+            *len   = 0; /* length */
             all->n += 3;
         }
         for( j = 0; j < mi; ++j, ++ri )
@@ -678,45 +676,45 @@ ErrorCode gs_data::crystal_data::gs_transfer( int dynamic, moab::TupleList& tl, 
         *len += tsize, all->n += tsize;
     }
 
-    crystal_router( );
+    crystal_router();
 
     /* unpack */
-    buf = (uint*)all->buf.ptr;
+    buf     = (uint*)all->buf.ptr;
     buf_end = buf + all->n;
     tl.set_n( 0 );
-    ri = tl.vi_wr;
-    rl = tl.vl_wr;
+    ri  = tl.vi_wr;
+    rl  = tl.vl_wr;
     rul = tl.vul_wr;
-    rr = tl.vr_wr;
+    rr  = tl.vr_wr;
 
     while( buf != buf_end )
     {
         sint llen;
-        buf++; /* target ( == this proc ) */
-        p = *buf++; /* source */
+        buf++;         /* target ( == this proc ) */
+        p    = *buf++; /* source */
         llen = *buf++; /* length */
         while( llen > 0 )
         {
-            if( tl.get_n( ) == tl.get_max( ) )
+            if( tl.get_n() == tl.get_max() )
             {
                 if( !dynamic )
                 {
-                    tl.set_n( tl.get_max( ) + 1 );
-                    if( !canWrite ) tl.disableWriteAccess( );
+                    tl.set_n( tl.get_max() + 1 );
+                    if( !canWrite ) tl.disableWriteAccess();
                     return moab::MB_SUCCESS;
                 }
-                ErrorCode rval = tl.resize( tl.get_max( ) + ( 1 + tl.get_max( ) ) / 2 + 1 );
+                ErrorCode rval = tl.resize( tl.get_max() + ( 1 + tl.get_max() ) / 2 + 1 );
                 if( rval != moab::MB_SUCCESS )
                 {
-                    if( !canWrite ) tl.disableWriteAccess( );
+                    if( !canWrite ) tl.disableWriteAccess();
                     return rval;
                 }
-                ri = tl.vi_wr + mi * tl.get_n( );
-                rl = tl.vl_wr + ml * tl.get_n( );
-                rul = tl.vul_wr + mul * tl.get_n( );
-                rr = tl.vr_wr + mr * tl.get_n( );
+                ri  = tl.vi_wr + mi * tl.get_n();
+                rl  = tl.vl_wr + ml * tl.get_n();
+                rul = tl.vul_wr + mul * tl.get_n();
+                rr  = tl.vr_wr + mr * tl.get_n();
             }
-            tl.inc_n( );
+            tl.inc_n();
             for( j = 0; j < mi; ++j )
                 if( j != pf )
                     *ri++ = *buf++;
@@ -741,7 +739,7 @@ ErrorCode gs_data::crystal_data::gs_transfer( int dynamic, moab::TupleList& tl, 
         }
     }
 
-    if( !canWrite ) tl.disableWriteAccess( );
+    if( !canWrite ) tl.disableWriteAccess();
     return moab::MB_SUCCESS;
 }
 #endif
@@ -784,7 +782,7 @@ void gs_data::gs_data_op_many( realType** u, uint n, int op )
                     __FILE__, nlinfo->_maxv, n );
 #endif
     for( i = 0; i < n; ++i )
-        local_condense( u[ i ], op, local_cm );
+        local_condense( u[i], op, local_cm );
 
     moab::fail( "%s: initialized with max vec size = %d,"
                 " but called with vec size = %d\n",
@@ -794,7 +792,7 @@ void gs_data::gs_data_op_many( realType** u, uint n, int op )
     this->nlinfo->nonlocal_many( u, n, op, _comm );
 #endif
     for( i = 0; i < n; ++i )
-        local_uncondense( u[ i ], local_cm );
+        local_uncondense( u[i], local_cm );
 }
 
 /*--------------------------------------------------------------------------
@@ -806,8 +804,8 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
 {
     nlinfo = NULL;
     unsigned int j;
-    TupleList    nonzero, primary;
-    ErrorCode    rval;
+    TupleList nonzero, primary;
+    ErrorCode rval;
 #ifdef MOAB_HAVE_MPI
     TupleList shared;
 #else
@@ -823,27 +821,27 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
 
     /* construct list of nonzeros: (index ^, label) */
     nonzero.initialize( 1, nlabels, nulabels, 0, n );
-    nonzero.enableWriteAccess( );
+    nonzero.enableWriteAccess();
     {
-        uint   i;
-        sint*  nzi;
-        long*  nzl;
+        uint i;
+        sint* nzi;
+        long* nzl;
         Ulong* nzul;
-        nzi = nonzero.vi_wr;
-        nzl = nonzero.vl_wr;
+        nzi  = nonzero.vi_wr;
+        nzl  = nonzero.vl_wr;
         nzul = nonzero.vul_wr;
         for( i = 0; i < n; ++i )
-            if( label[ nlabels * i ] != 0 )
+            if( label[nlabels * i] != 0 )
             {
-                nzi[ 0 ] = i;
+                nzi[0] = i;
                 for( j = 0; j < nlabels; j++ )
-                    nzl[ j ] = label[ nlabels * i + j ];
+                    nzl[j] = label[nlabels * i + j];
                 for( j = 0; j < nulabels; j++ )
-                    nzul[ j ] = ulabel[ nulabels * i + j ];
+                    nzul[j] = ulabel[nulabels * i + j];
                 nzi++;
                 nzl += nlabels;
                 nzul += nulabels;
-                nonzero.inc_n( );
+                nonzero.inc_n();
             }
     }
 
@@ -857,41 +855,41 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
     /* build list of unique labels w/ lowest associated index:
      (index in nonzero ^, primary (lowest) index in label, count, label(s),
      ulabel(s)) */
-    primary.initialize( 3, nlabels, nulabels, 0, nonzero.get_n( ) );
-    primary.enableWriteAccess( );
+    primary.initialize( 3, nlabels, nulabels, 0, nonzero.get_n() );
+    primary.enableWriteAccess();
     {
-        uint   i;
-        sint * nzi = nonzero.vi_wr, *pi = primary.vi_wr;
+        uint i;
+        sint *nzi = nonzero.vi_wr, *pi = primary.vi_wr;
         slong *nzl = nonzero.vl_wr, *pl = primary.vl_wr;
         Ulong *nzul = nonzero.vul_wr, *pul = primary.vul_wr;
-        slong  last = -1;
-        for( i = 0; i < nonzero.get_n( ); ++i, nzi += 1, nzl += nlabels, nzul += nulabels )
+        slong last = -1;
+        for( i = 0; i < nonzero.get_n(); ++i, nzi += 1, nzl += nlabels, nzul += nulabels )
         {
-            if( nzl[ 0 ] == last )
+            if( nzl[0] == last )
             {
-                ++pi[ -1 ];
+                ++pi[-1];
                 continue;
             }
-            last = nzl[ 0 ];
-            pi[ 0 ] = i;
-            pi[ 1 ] = nzi[ 0 ];
+            last  = nzl[0];
+            pi[0] = i;
+            pi[1] = nzi[0];
             for( j = 0; j < nlabels; j++ )
-                pl[ j ] = nzl[ j ];
+                pl[j] = nzl[j];
             for( j = 0; j < nulabels; j++ )
-                pul[ j ] = nzul[ j ];
-            pi[ 2 ] = 1;
+                pul[j] = nzul[j];
+            pi[2] = 1;
             pi += 3, pl += nlabels;
             pul += nulabels;
-            primary.inc_n( );
+            primary.inc_n();
         }
     }
 
     /* calculate size of local condense map */
     {
-        uint  i, count = 1;
+        uint i, count = 1;
         sint* pi = primary.vi_wr;
-        for( i = primary.get_n( ); i; --i, pi += 3 )
-            if( pi[ 2 ] > 1 ) count += pi[ 2 ] + 1;
+        for( i = primary.get_n(); i; --i, pi += 3 )
+            if( pi[2] > 1 ) count += pi[2] + 1;
         this->local_cm = (sint*)malloc( count * sizeof( sint ) );
     }
 
@@ -899,7 +897,7 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
      (nonzero index ^2, primary index ^1, count, label ^2) */
 #ifndef MOAB_HAVE_MPI
     primary.sort( 0, &buf );
-    buf.reset( );
+    buf.reset();
     // buffer_free(&buf);
 #else
     primary.sort( 0, &crystal->all->buf );
@@ -907,30 +905,30 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
 
     /* construct local condense map */
     {
-        uint  i, ln;
+        uint i, ln;
         sint* pi = primary.vi_wr;
         sint* cm = this->local_cm;
-        for( i = primary.get_n( ); i > 0; --i, pi += 3 )
-            if( ( ln = pi[ 2 ] ) > 1 )
+        for( i = primary.get_n(); i > 0; --i, pi += 3 )
+            if( ( ln = pi[2] ) > 1 )
             {
-                sint* nzi = nonzero.vi_wr + 1 * pi[ 0 ];
+                sint* nzi = nonzero.vi_wr + 1 * pi[0];
                 for( j = ln; j > 0; --j, nzi += 1 )
-                    *cm++ = nzi[ 0 ];
+                    *cm++ = nzi[0];
                 *cm++ = -1;
             }
         *cm++ = -1;
     }
-    nonzero.reset( );
+    nonzero.reset();
 #ifndef MOAB_HAVE_MPI
-    primary.reset( );
+    primary.reset();
 #else
     /* assign work proc by label modulo np */
     {
-        uint   i;
-        sint*  pi = primary.vi_wr;
+        uint i;
+        sint* pi  = primary.vi_wr;
         slong* pl = primary.vl_wr;
-        for( i = primary.get_n( ); i; --i, pi += 3, pl += nlabels )
-            pi[ 0 ] = pl[ 0 ] % crystal->_num;
+        for( i = primary.get_n(); i; --i, pi += 3, pl += nlabels )
+            pi[0] = pl[0] % crystal->_num;
     }
     rval = crystal->gs_transfer( 1, primary, 0 ); /* transfer to work procs */
     if( rval != MB_SUCCESS ) return rval;
@@ -938,56 +936,56 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
     /* sort by label */
     primary.sort( 3, &crystal->all->buf );
     /* add sentinel to primary list */
-    if( primary.get_n( ) == primary.get_max( ) )
-        primary.resize( ( primary.get_max( ) ? primary.get_max( ) + ( primary.get_max( ) + 1 ) / 2 + 1 : 2 ) );
-    primary.vl_wr[ nlabels * primary.get_n( ) ] = -1;
+    if( primary.get_n() == primary.get_max() )
+        primary.resize( ( primary.get_max() ? primary.get_max() + ( primary.get_max() + 1 ) / 2 + 1 : 2 ) );
+    primary.vl_wr[nlabels * primary.get_n()] = -1;
     /* construct shared list: (proc1, proc2, index1, label) */
 #ifdef MOAB_HAVE_MPI
-    shared.initialize( 3, nlabels, nulabels, 0, primary.get_n( ) );
-    shared.enableWriteAccess( );
+    shared.initialize( 3, nlabels, nulabels, 0, primary.get_n() );
+    shared.enableWriteAccess();
 #endif
     {
-        sint * pi1 = primary.vi_wr, *si = shared.vi_wr;
-        slong  lbl, *pl1 = primary.vl_wr, *sl = shared.vl_wr;
+        sint *pi1 = primary.vi_wr, *si = shared.vi_wr;
+        slong lbl, *pl1 = primary.vl_wr, *sl = shared.vl_wr;
         Ulong *pul1 = primary.vul_wr, *sul = shared.vul_wr;
-        for( ; ( lbl = pl1[ 0 ] ) != -1; pi1 += 3, pl1 += nlabels, pul1 += nulabels )
+        for( ; ( lbl = pl1[0] ) != -1; pi1 += 3, pl1 += nlabels, pul1 += nulabels )
         {
-            sint*  pi2 = pi1 + 3;
-            slong* pl2 = pl1 + nlabels;
+            sint* pi2   = pi1 + 3;
+            slong* pl2  = pl1 + nlabels;
             Ulong* pul2 = pul1 + nulabels;
-            for( ; pl2[ 0 ] == lbl; pi2 += 3, pl2 += nlabels, pul2 += nulabels )
+            for( ; pl2[0] == lbl; pi2 += 3, pl2 += nlabels, pul2 += nulabels )
             {
-                if( shared.get_n( ) + 2 > shared.get_max( ) )
-                    shared.resize( ( shared.get_max( ) ? shared.get_max( ) + ( shared.get_max( ) + 1 ) / 2 + 1 : 2 ) ),
-                        si = shared.vi_wr + shared.get_n( ) * 3;
-                sl = shared.vl_wr + shared.get_n( ) * nlabels;
-                sul = shared.vul_wr + shared.get_n( ) * nulabels;
-                si[ 0 ] = pi1[ 0 ];
-                si[ 1 ] = pi2[ 0 ];
-                si[ 2 ] = pi1[ 1 ];
+                if( shared.get_n() + 2 > shared.get_max() )
+                    shared.resize( ( shared.get_max() ? shared.get_max() + ( shared.get_max() + 1 ) / 2 + 1 : 2 ) ),
+                        si = shared.vi_wr + shared.get_n() * 3;
+                sl    = shared.vl_wr + shared.get_n() * nlabels;
+                sul   = shared.vul_wr + shared.get_n() * nulabels;
+                si[0] = pi1[0];
+                si[1] = pi2[0];
+                si[2] = pi1[1];
                 for( j = 0; j < nlabels; j++ )
-                    sl[ j ] = pl2[ j ];
+                    sl[j] = pl2[j];
                 for( j = 0; j < nulabels; j++ )
-                    sul[ j ] = pul2[ j ];
+                    sul[j] = pul2[j];
                 si += 3;
                 sl += nlabels;
                 sul += nulabels;
-                shared.inc_n( );
-                si[ 0 ] = pi2[ 0 ];
-                si[ 1 ] = pi1[ 0 ];
-                si[ 2 ] = pi2[ 1 ];
+                shared.inc_n();
+                si[0] = pi2[0];
+                si[1] = pi1[0];
+                si[2] = pi2[1];
                 for( j = 0; j < nlabels; j++ )
-                    sl[ j ] = pl1[ j ];
+                    sl[j] = pl1[j];
                 for( j = 0; j < nulabels; j++ )
-                    sul[ j ] = pul1[ j ];
+                    sul[j] = pul1[j];
                 si += 3;
                 sl += nlabels;
                 sul += nulabels;
-                shared.inc_n( );
+                shared.inc_n();
             }
         }
     }
-    primary.reset( );
+    primary.reset();
     rval = crystal->gs_transfer( 1, shared, 0 ); /* segfaulting transfer to dest procs */
     if( rval != MB_SUCCESS ) return rval;
     /* shared list: (useless, proc2, index, label) */
@@ -999,63 +997,63 @@ ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, u
     {
         uint i, count = 0;
         sint proc = -1, *si = shared.vi_wr;
-        for( i = shared.get_n( ); i; --i, si += 3 )
-            if( si[ 1 ] != proc )
+        for( i = shared.get_n(); i; --i, si += 3 )
+            if( si[1] != proc )
             {
                 ++count;
-                proc = si[ 1 ];
+                proc = si[1];
             }
         // this->nlinfo = new nonlocal_info();
         // this->nlinfo->initialize(count,shared.get_n(),
         //                          nlabels, nulabels, maxv);
-        this->nlinfo = new nonlocal_info( count, shared.get_n( ), nlabels, nulabels, maxv );
+        this->nlinfo = new nonlocal_info( count, shared.get_n(), nlabels, nulabels, maxv );
     }
     /* construct non-local info */
     {
-        uint   i;
-        sint   proc = -1, *si = shared.vi_wr;
-        slong* sl = shared.vl_wr;
-        Ulong* ul = shared.vul_wr;
-        uint*  target = this->nlinfo->_target;
-        uint*  nshared = this->nlinfo->_nshared;
-        uint*  sh_ind = this->nlinfo->_sh_ind;
+        uint i;
+        sint proc = -1, *si = shared.vi_wr;
+        slong* sl      = shared.vl_wr;
+        Ulong* ul      = shared.vul_wr;
+        uint* target   = this->nlinfo->_target;
+        uint* nshared  = this->nlinfo->_nshared;
+        uint* sh_ind   = this->nlinfo->_sh_ind;
         slong* slabels = this->nlinfo->_slabels;
         Ulong* ulabels = this->nlinfo->_ulabels;
-        for( i = shared.get_n( ); i; --i, si += 3 )
+        for( i = shared.get_n(); i; --i, si += 3 )
         {
-            if( si[ 1 ] != proc )
+            if( si[1] != proc )
             {
-                proc = si[ 1 ];
-                *target++ = proc;
+                proc       = si[1];
+                *target++  = proc;
                 *nshared++ = 0;
             }
-            ++nshared[ -1 ];
-            *sh_ind++ = si[ 2 ];
+            ++nshared[-1];
+            *sh_ind++ = si[2];
             // don't store 1st slabel
             sl++;
             for( j = 0; j < nlabels - 1; j++ )
-                slabels[ j ] = sl[ j ];
+                slabels[j] = sl[j];
             for( j = 0; j < nulabels; j++ )
-                ulabels[ j ] = ul[ j ];
+                ulabels[j] = ul[j];
             slabels += nlabels - 1;
             ulabels += nulabels;
             sl += nlabels - 1;
             ul += nulabels;
         }
     }
-    shared.reset( );
+    shared.reset();
 #endif
     return MB_SUCCESS;
 }
 
-void gs_data::reset( )
+void gs_data::reset()
 {
     free( local_cm );
     local_cm = NULL;
 #ifdef MOAB_HAVE_MPI
     if( nlinfo != NULL )
     {
-        nlinfo->nlinfo_free( );
+        nlinfo->nlinfo_free();
         delete this->nlinfo;
         MPI_Comm_free( &_comm );
         nlinfo = NULL;

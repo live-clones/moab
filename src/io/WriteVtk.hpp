@@ -35,7 +35,7 @@ class WriteVtk : public WriterIface
     WriteVtk( Interface* impl );
 
     //! Destructor
-    virtual ~WriteVtk( );
+    virtual ~WriteVtk();
 
     static WriterIface* factory( Interface* );
 
@@ -66,19 +66,20 @@ class WriteVtk : public WriterIface
     ErrorCode write_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged_entities );
 
     //! Write tag data
-    template< typename T >
+    template < typename T >
     ErrorCode write_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged_entities,
                          const int );
 
     ErrorCode write_bit_tag( std::ostream& stream, Tag tag, const Range& entities, const Range& tagged_entities );
     //! Write a list of values
-    template< typename T > void write_data( std::ostream& stream, const std::vector< T >& data, unsigned vals_per_tag );
+    template < typename T >
+    void write_data( std::ostream& stream, const std::vector< T >& data, unsigned vals_per_tag );
 
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* writeTool;
 
     bool mStrict;  // If true, do not write data that cannot fit in strict VTK file format.
-    int  freeNodes;
+    int freeNodes;
     bool createOneNodeCells;
 };
 

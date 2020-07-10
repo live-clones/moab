@@ -7,7 +7,7 @@
 namespace moab
 {
 
-const double LinearTet::corner[ 4 ][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+const double LinearTet::corner[4][3] = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
 ErrorCode LinearTet::initFcn( const double* verts, const int nverts, double*& work )
 {
@@ -17,17 +17,17 @@ ErrorCode LinearTet::initFcn( const double* verts, const int nverts, double*& wo
     // work[18] = detT
     // work[19] = detTinv
     assert( nverts == 4 && verts );
-    if( !work ) work = new double[ 20 ];
+    if( !work ) work = new double[20];
 
-    Matrix3 J( verts[ 1 * 3 + 0 ] - verts[ 0 * 3 + 0 ], verts[ 2 * 3 + 0 ] - verts[ 0 * 3 + 0 ],
-               verts[ 3 * 3 + 0 ] - verts[ 0 * 3 + 0 ], verts[ 1 * 3 + 1 ] - verts[ 0 * 3 + 1 ],
-               verts[ 2 * 3 + 1 ] - verts[ 0 * 3 + 1 ], verts[ 3 * 3 + 1 ] - verts[ 0 * 3 + 1 ],
-               verts[ 1 * 3 + 2 ] - verts[ 0 * 3 + 2 ], verts[ 2 * 3 + 2 ] - verts[ 0 * 3 + 2 ],
-               verts[ 3 * 3 + 2 ] - verts[ 0 * 3 + 2 ] );
+    Matrix3 J( verts[1 * 3 + 0] - verts[0 * 3 + 0], verts[2 * 3 + 0] - verts[0 * 3 + 0],
+               verts[3 * 3 + 0] - verts[0 * 3 + 0], verts[1 * 3 + 1] - verts[0 * 3 + 1],
+               verts[2 * 3 + 1] - verts[0 * 3 + 1], verts[3 * 3 + 1] - verts[0 * 3 + 1],
+               verts[1 * 3 + 2] - verts[0 * 3 + 2], verts[2 * 3 + 2] - verts[0 * 3 + 2],
+               verts[3 * 3 + 2] - verts[0 * 3 + 2] );
     J.copyto( work );
-    J.inverse( ).copyto( work + Matrix3::size );
-    work[ 18 ] = J.determinant( );
-    work[ 19 ] = ( work[ 18 ] < 1e-12 ? std::numeric_limits< double >::max( ) : 1.0 / work[ 18 ] );
+    J.inverse().copyto( work + Matrix3::size );
+    work[18] = J.determinant();
+    work[19] = ( work[18] < 1e-12 ? std::numeric_limits< double >::max() : 1.0 / work[18] );
 
     return MB_SUCCESS;
 }
@@ -37,14 +37,14 @@ ErrorCode LinearTet::evalFcn( const double* params, const double* field, const i
 {
     assert( params && field && num_tuples > 0 );
     std::vector< double > f0( num_tuples );
-    std::copy( field, field + num_tuples, f0.begin( ) );
+    std::copy( field, field + num_tuples, f0.begin() );
     std::copy( field, field + num_tuples, result );
 
     for( unsigned i = 1; i < 4; ++i )
     {
-        double p = 0.5 * ( params[ i - 1 ] + 1 );  // transform from -1 <= p <= 1 to 0 <= p <= 1
+        double p = 0.5 * ( params[i - 1] + 1 );  // transform from -1 <= p <= 1 to 0 <= p <= 1
         for( int j = 0; j < num_tuples; j++ )
-            result[ j ] += ( field[ i * num_tuples + j ] - f0[ j ] ) * p;
+            result[j] += ( field[i * num_tuples + j] - f0[j] ) * p;
     }
 
     return MB_SUCCESS;
@@ -58,11 +58,11 @@ ErrorCode LinearTet::integrateFcn( const double* field, const double* /*verts*/,
     for( int i = 0; i < nverts; ++i )
     {
         for( int j = 0; j < num_tuples; j++ )
-            result[ j ] += field[ i * num_tuples + j ];
+            result[j] += field[i * num_tuples + j];
     }
-    double tmp = work[ 18 ] / 24.0;
+    double tmp = work[18] / 24.0;
     for( int i = 0; i < num_tuples; i++ )
-        result[ i ] *= tmp;
+        result[i] *= tmp;
 
     return MB_SUCCESS;
 }
@@ -86,8 +86,8 @@ ErrorCode LinearTet::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn 
 
 int LinearTet::insideFcn( const double* params, const int, const double tol )
 {
-    return ( params[ 0 ] >= -1.0 - tol && params[ 1 ] >= -1.0 - tol && params[ 2 ] >= -1.0 - tol &&
-             params[ 0 ] + params[ 1 ] + params[ 2 ] <= 1.0 + tol );
+    return ( params[0] >= -1.0 - tol && params[1] >= -1.0 - tol && params[2] >= -1.0 - tol &&
+             params[0] + params[1] + params[2] <= 1.0 + tol );
 }
 
 ErrorCode LinearTet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f, const double* posn,
@@ -97,38 +97,38 @@ ErrorCode LinearTet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
     // TODO: should differentiate between epsilons used for
     // Newton Raphson iteration, and epsilons used for curved boundary geometry errors
     // right now, fix the tolerance used for NR
-    const double    error_tol_sqr = iter_tol * iter_tol;
-    CartVect*       cvparams = reinterpret_cast< CartVect* >( params );
-    const CartVect* cvposn = reinterpret_cast< const CartVect* >( posn );
+    const double error_tol_sqr = iter_tol * iter_tol;
+    CartVect* cvparams         = reinterpret_cast< CartVect* >( params );
+    const CartVect* cvposn     = reinterpret_cast< const CartVect* >( posn );
 
     // find best initial guess to improve convergence
-    CartVect  tmp_params[] = { CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( -1, 1, -1 ),
+    CartVect tmp_params[] = { CartVect( -1, -1, -1 ), CartVect( 1, -1, -1 ), CartVect( -1, 1, -1 ),
                               CartVect( -1, -1, 1 ) };
-    double    resl = std::numeric_limits< double >::max( );
-    CartVect  new_pos, tmp_pos;
+    double resl           = std::numeric_limits< double >::max();
+    CartVect new_pos, tmp_pos;
     ErrorCode rval;
     for( unsigned int i = 0; i < 4; i++ )
     {
-        rval = ( *eval )( tmp_params[ i ].array( ), verts, ndim, ndim, work, tmp_pos.array( ) );
+        rval = ( *eval )( tmp_params[i].array(), verts, ndim, ndim, work, tmp_pos.array() );
         if( MB_SUCCESS != rval ) return rval;
-        double tmp_resl = ( tmp_pos - *cvposn ).length_squared( );
+        double tmp_resl = ( tmp_pos - *cvposn ).length_squared();
         if( tmp_resl < resl )
         {
-            *cvparams = tmp_params[ i ];
-            new_pos = tmp_pos;
-            resl = tmp_resl;
+            *cvparams = tmp_params[i];
+            new_pos   = tmp_pos;
+            resl      = tmp_resl;
         }
     }
 
     // residual is diff between old and new pos; need to minimize that
     CartVect res = new_pos - *cvposn;
-    Matrix3  J;
-    rval = ( *jacob )( cvparams->array( ), verts, nverts, ndim, work, J.array( ) );
+    Matrix3 J;
+    rval = ( *jacob )( cvparams->array(), verts, nverts, ndim, work, J.array() );
 #ifndef NDEBUG
-    double det = J.determinant( );
-    assert( det > std::numeric_limits< double >::epsilon( ) );
+    double det = J.determinant();
+    assert( det > std::numeric_limits< double >::epsilon() );
 #endif
-    Matrix3 Ji = J.inverse( );
+    Matrix3 Ji = J.inverse();
 
     int iters = 0;
     // while |res| larger than tol
@@ -149,7 +149,7 @@ ErrorCode LinearTet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
         *cvparams -= Ji * res;
 
         // get the new forward-evaluated position, and its difference from the target pt
-        rval = ( *eval )( params, verts, ndim, ndim, work, new_pos.array( ) );
+        rval = ( *eval )( params, verts, ndim, ndim, work, new_pos.array() );
         if( MB_SUCCESS != rval ) return rval;
         res = new_pos - *cvposn;
     }
@@ -160,35 +160,35 @@ ErrorCode LinearTet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
 }  // Map::evaluate_reverse()
 
 ErrorCode LinearTet::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
-                                double normal[ 3 ] )
+                                double normal[3] )
 {
     // assert(facet < 4 && ientDim == 2 && nverts == 4);
     if( nverts != 4 ) MB_SET_ERR( MB_FAILURE, "Incorrect vertex count for passed tet :: expected value = 4 " );
     if( ientDim != 2 ) MB_SET_ERR( MB_FAILURE, "Requesting normal for unsupported dimension :: expected value = 2 " );
     if( facet > 4 || facet < 0 ) MB_SET_ERR( MB_FAILURE, "Incorrect local face id :: expected value = one of 0-3" );
 
-    int id0 = CN::mConnectivityMap[ MBTET ][ ientDim - 1 ].conn[ facet ][ 0 ];
-    int id1 = CN::mConnectivityMap[ MBTET ][ ientDim - 1 ].conn[ facet ][ 1 ];
-    int id2 = CN::mConnectivityMap[ MBTET ][ ientDim - 1 ].conn[ facet ][ 2 ];
+    int id0 = CN::mConnectivityMap[MBTET][ientDim - 1].conn[facet][0];
+    int id1 = CN::mConnectivityMap[MBTET][ientDim - 1].conn[facet][1];
+    int id2 = CN::mConnectivityMap[MBTET][ientDim - 1].conn[facet][2];
 
-    double x0[ 3 ], x1[ 3 ];
+    double x0[3], x1[3];
 
     for( int i = 0; i < 3; i++ )
     {
-        x0[ i ] = verts[ 3 * id1 + i ] - verts[ 3 * id0 + i ];
-        x1[ i ] = verts[ 3 * id2 + i ] - verts[ 3 * id0 + i ];
+        x0[i] = verts[3 * id1 + i] - verts[3 * id0 + i];
+        x1[i] = verts[3 * id2 + i] - verts[3 * id0 + i];
     }
 
-    double a = x0[ 1 ] * x1[ 2 ] - x1[ 1 ] * x0[ 2 ];
-    double b = x1[ 0 ] * x0[ 2 ] - x0[ 0 ] * x1[ 2 ];
-    double c = x0[ 0 ] * x1[ 1 ] - x1[ 0 ] * x0[ 1 ];
+    double a   = x0[1] * x1[2] - x1[1] * x0[2];
+    double b   = x1[0] * x0[2] - x0[0] * x1[2];
+    double c   = x0[0] * x1[1] - x1[0] * x0[1];
     double nrm = sqrt( a * a + b * b + c * c );
 
-    if( nrm > std::numeric_limits< double >::epsilon( ) )
+    if( nrm > std::numeric_limits< double >::epsilon() )
     {
-        normal[ 0 ] = a / nrm;
-        normal[ 1 ] = b / nrm;
-        normal[ 2 ] = c / nrm;
+        normal[0] = a / nrm;
+        normal[1] = b / nrm;
+        normal[2] = c / nrm;
     }
     return MB_SUCCESS;
 }

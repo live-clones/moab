@@ -62,9 +62,9 @@ namespace MBMesquite
 class MESQUITE_EXPORT TriLagrangeShape : public MappingFunction2D
 {
   public:
-    virtual EntityTopology element_topology( ) const;
+    virtual EntityTopology element_topology() const;
 
-    virtual int num_nodes( ) const;
+    virtual int num_nodes() const;
 
     virtual NodeSet sample_points( NodeSet higher_order_nodes ) const;
 

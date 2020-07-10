@@ -46,7 +46,7 @@ class MESQUITE_EXPORT InverseMetricWeight : public WeightCalculator
   public:
     InverseMetricWeight( ElemSampleQM* metric ) : mMetric( metric ) {}
 
-    virtual ~InverseMetricWeight( );
+    virtual ~InverseMetricWeight();
 
     virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 

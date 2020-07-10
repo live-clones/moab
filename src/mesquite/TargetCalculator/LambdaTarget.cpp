@@ -42,7 +42,7 @@ LambdaTarget::LambdaTarget( TargetCalculator* lambda_source, TargetCalculator* c
 {
 }
 
-LambdaTarget::~LambdaTarget( ) {}
+LambdaTarget::~LambdaTarget() {}
 
 bool LambdaTarget::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
                                   MsqError& err )
@@ -84,11 +84,11 @@ bool LambdaTarget::get_surface_target( PatchData& pd, size_t element, Sample sam
     bool valid = lambdaSource->get_surface_target( pd, element, sample, W_out, err );
     if( MSQ_CHKERR( err ) && !valid ) return false;
     MsqVector< 3 > cross = W_out.column( 0 ) * W_out.column( 1 );
-    double         det1 = cross % cross;  // length squared
+    double det1          = cross % cross;  // length squared
 
     valid = compositeSource->get_surface_target( pd, element, sample, W_out, err );
     if( MSQ_CHKERR( err ) && !valid ) return false;
-    cross = W_out.column( 0 ) * W_out.column( 1 );
+    cross       = W_out.column( 0 ) * W_out.column( 1 );
     double det2 = cross % cross;  // length squared
 
     if( det2 < 1e-15 ) return false;

@@ -23,9 +23,9 @@ class MeshTag : public TagInfo
     //! constructor that takes all parameters
     MeshTag( const char* name, int size, DataType type, const void* default_value, int default_value_size );
 
-    virtual ~MeshTag( );
+    virtual ~MeshTag();
 
-    virtual TagType get_storage_type( ) const;
+    virtual TagType get_storage_type() const;
 
     /**\brief Remove/clear tag data for all entities
      *
@@ -282,7 +282,7 @@ class MeshTag : public TagInfo
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
                                                 Range& output_entities, const void* value, int value_bytes = 0,
-                                                EntityType   type = MBMAXTYPE,
+                                                EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */
@@ -296,7 +296,7 @@ class MeshTag : public TagInfo
 
   private:
     MeshTag( const MeshTag& );
-    MeshTag&                     operator=( const MeshTag& );
+    MeshTag& operator=( const MeshTag& );
     std::vector< unsigned char > mValue;
 };
 

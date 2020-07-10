@@ -39,12 +39,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeSizeOrientB1::get_name( ) const
+std::string TShapeSizeOrientB1::get_name() const
 {
     return "TShapeSizeOrientB1";
 }
 
-TShapeSizeOrientB1::~TShapeSizeOrientB1( ) {}
+TShapeSizeOrientB1::~TShapeSizeOrientB1() {}
 
 bool TShapeSizeOrientB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -74,7 +74,7 @@ bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double&
     deriv_wrt_T = T;
     pluseq_scaled_I( deriv_wrt_T, -1 );
     double inv_d = 1.0 / d;
-    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
+    result       = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
 
     deriv_wrt_T -= result * transpose_adj( T );
     deriv_wrt_T *= inv_d;
@@ -83,7 +83,7 @@ bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double&
 }
 
 bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                             MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                             MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
     const double d = det( T );
     if( TMetric::invalid_determinant( d ) )
@@ -95,7 +95,7 @@ bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double&
     deriv_wrt_T = T;
     pluseq_scaled_I( deriv_wrt_T, -1.0 );
     double inv_d = 1.0 / d;
-    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
+    result       = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
 
     MsqMatrix< 2, 2 > adjt = transpose_adj( T );
     set_scaled_outer_product( second_wrt_T, 2 * result * inv_d * inv_d, adjt );
@@ -137,7 +137,7 @@ bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double&
     deriv_wrt_T = T;
     pluseq_scaled_I( deriv_wrt_T, -1 );
     double inv_d = 1.0 / d;
-    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
+    result       = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
 
     deriv_wrt_T -= result * transpose_adj( T );
     deriv_wrt_T *= inv_d;
@@ -146,7 +146,7 @@ bool TShapeSizeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double&
 }
 
 bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                             MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                             MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
     const double d = det( T );
     if( TMetric::invalid_determinant( d ) )
@@ -158,7 +158,7 @@ bool TShapeSizeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double&
     deriv_wrt_T = T;
     pluseq_scaled_I( deriv_wrt_T, -1.0 );
     double inv_d = 1.0 / d;
-    result = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
+    result       = 0.5 * sqr_Frobenius( deriv_wrt_T ) * inv_d;
 
     MsqMatrix< 3, 3 > adjt = transpose_adj( T );
     set_scaled_outer_product( second_wrt_T, 2 * result * inv_d * inv_d, adjt );

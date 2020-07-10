@@ -35,7 +35,7 @@ namespace moab
 // some tolerances for ray tracing and geometry intersections
 // these are involved in ray tracing, at least
 
-double tolerance = 0.01;  // TODO: how is this used ????
+double tolerance         = 0.01;  // TODO: how is this used ????
 double tolerance_segment = 0.01;  // for segments intersection, points collapse, area coordinates for triangles
 // it should be a relative, not an absolute value
 // as this splitting operation can create small edges, it should be relatively high
@@ -43,7 +43,7 @@ double tolerance_segment = 0.01;  // for segments intersection, points collapse,
 // we really just want to preserve the integrity of the mesh, we should avoid creating small edges
 // or angles
 const bool Debug_surf_eval = false;
-bool       debug_splits = false;
+bool debug_splits          = false;
 
 // will compute intersection between a segment and slice of a plane
 // output is the intersection point
@@ -52,14 +52,14 @@ bool intersect_segment_and_plane_slice( CartVect& from, CartVect& to, CartVect& 
 {
     //
     // plane eq is normPlane % r + d = 0, or normPlane % r - normPlane%p1 = 0
-    double dd = -normPlane % p1;
+    double dd      = -normPlane % p1;
     double valFrom = normPlane % from + dd;
-    double valTo = normPlane % to + dd;
+    double valTo   = normPlane % to + dd;
 
     if( fabs( valFrom ) < tolerance_segment )
     {
-        intx_point = from;
-        parPos = 0.;
+        intx_point   = from;
+        parPos       = 0.;
         double proj1 = ( intx_point - p1 ) % ( p2 - p1 );
         double proj2 = ( intx_point - p2 ) % ( p1 - p2 );
         if( proj1 <= -tolerance_segment || proj2 <= -tolerance_segment ) return false;
@@ -68,8 +68,8 @@ bool intersect_segment_and_plane_slice( CartVect& from, CartVect& to, CartVect& 
     }
     if( fabs( valTo ) < tolerance_segment )
     {
-        intx_point = to;
-        parPos = 1;
+        intx_point   = to;
+        parPos       = 1;
         double proj1 = ( intx_point - p1 ) % ( p2 - p1 );
         double proj2 = ( intx_point - p2 ) % ( p1 - p2 );
         if( proj1 <= -tolerance_segment || proj2 <= -tolerance_segment ) return false;
@@ -78,7 +78,7 @@ bool intersect_segment_and_plane_slice( CartVect& from, CartVect& to, CartVect& 
     }
     if( valFrom * valTo > 0 ) return false;  // no intersection, although it could be very close
     // else, it could intersect the plane; check for the slice too.
-    parPos = valFrom / ( valFrom - valTo );  // this is 0 for valFrom 0, 1 for valTo 0
+    parPos     = valFrom / ( valFrom - valTo );  // this is 0 for valFrom 0, 1 for valTo 0
     intx_point = from + ( to - from ) * parPos;
     // now check if the intx_point is indeed between p1 and p2 in the slice.
     double proj1 = ( intx_point - p1 ) % ( p2 - p1 );
@@ -93,84 +93,84 @@ ErrorCode area_coordinates( Interface* mbi, EntityHandle tri, CartVect& pnt, dou
                             EntityHandle& boundary_handle )
 {
 
-    int                 nnodes;
+    int nnodes;
     const EntityHandle* conn3;
-    ErrorCode           rval = mbi->get_connectivity( tri, conn3, nnodes );
+    ErrorCode rval = mbi->get_connectivity( tri, conn3, nnodes );
     MBERRORR( rval, "Failed to get connectivity" );
     assert( 3 == nnodes );
-    CartVect P[ 3 ];
-    rval = mbi->get_coords( conn3, nnodes, (double*)&P[ 0 ] );
+    CartVect P[3];
+    rval = mbi->get_coords( conn3, nnodes, (double*)&P[0] );
     MBERRORR( rval, "Failed to get coordinates" );
 
-    CartVect r0( P[ 0 ] - pnt );
-    CartVect r1( P[ 1 ] - pnt );
-    CartVect r2( P[ 2 ] - pnt );
+    CartVect r0( P[0] - pnt );
+    CartVect r1( P[1] - pnt );
+    CartVect r2( P[2] - pnt );
     if( debug_splits )
     {
-        std::cout << " nodes:" << conn3[ 0 ] << " " << conn3[ 1 ] << " " << conn3[ 2 ] << "\n";
-        std::cout << " distances: " << r0.length( ) << " " << r1.length( ) << " " << r2.length( ) << "\n";
+        std::cout << " nodes:" << conn3[0] << " " << conn3[1] << " " << conn3[2] << "\n";
+        std::cout << " distances: " << r0.length() << " " << r1.length() << " " << r2.length() << "\n";
     }
-    if( r0.length( ) < tolerance_segment )
+    if( r0.length() < tolerance_segment )
     {
-        area_coord[ 0 ] = 1.;
-        area_coord[ 1 ] = 0.;
-        area_coord[ 2 ] = 0.;
-        boundary_handle = conn3[ 0 ];
+        area_coord[0]   = 1.;
+        area_coord[1]   = 0.;
+        area_coord[2]   = 0.;
+        boundary_handle = conn3[0];
         return MB_SUCCESS;
     }
-    if( r1.length( ) < tolerance_segment )
+    if( r1.length() < tolerance_segment )
     {
-        area_coord[ 0 ] = 0.;
-        area_coord[ 1 ] = 1.;
-        area_coord[ 2 ] = 0.;
-        boundary_handle = conn3[ 1 ];
+        area_coord[0]   = 0.;
+        area_coord[1]   = 1.;
+        area_coord[2]   = 0.;
+        boundary_handle = conn3[1];
         return MB_SUCCESS;
     }
-    if( r2.length( ) < tolerance_segment )
+    if( r2.length() < tolerance_segment )
     {
-        area_coord[ 0 ] = 0.;
-        area_coord[ 1 ] = 0.;
-        area_coord[ 2 ] = 1.;
-        boundary_handle = conn3[ 2 ];
+        area_coord[0]   = 0.;
+        area_coord[1]   = 0.;
+        area_coord[2]   = 1.;
+        boundary_handle = conn3[2];
         return MB_SUCCESS;
     }
 
-    CartVect v1( P[ 1 ] - P[ 0 ] );
-    CartVect v2( P[ 2 ] - P[ 0 ] );
+    CartVect v1( P[1] - P[0] );
+    CartVect v2( P[2] - P[0] );
 
-    double areaDouble = ( v1 * v2 ).length( );  // the same for CartVect
+    double areaDouble = ( v1 * v2 ).length();  // the same for CartVect
     if( areaDouble < tolerance_segment * tolerance_segment ) { MBERRORR( MB_FAILURE, "area of triangle too small" ); }
-    area_coord[ 0 ] = ( r1 * r2 ).length( ) / areaDouble;
-    area_coord[ 1 ] = ( r2 * r0 ).length( ) / areaDouble;
-    area_coord[ 2 ] = ( r0 * r1 ).length( ) / areaDouble;
+    area_coord[0] = ( r1 * r2 ).length() / areaDouble;
+    area_coord[1] = ( r2 * r0 ).length() / areaDouble;
+    area_coord[2] = ( r0 * r1 ).length() / areaDouble;
 
-    if( fabs( area_coord[ 0 ] + area_coord[ 1 ] + area_coord[ 2 ] - 1 ) > tolerance_segment )
+    if( fabs( area_coord[0] + area_coord[1] + area_coord[2] - 1 ) > tolerance_segment )
     { MBERRORR( MB_FAILURE, "point outside triangle" ); }
     // the tolerance is used here for area coordinates (0 to 1), and in other
     // parts it is used as an absolute distance; pretty inconsistent.
-    bool side0 = ( area_coord[ 0 ] < tolerance_segment );
-    bool side1 = ( area_coord[ 1 ] < tolerance_segment );
-    bool side2 = ( area_coord[ 2 ] < tolerance_segment );
+    bool side0 = ( area_coord[0] < tolerance_segment );
+    bool side1 = ( area_coord[1] < tolerance_segment );
+    bool side2 = ( area_coord[2] < tolerance_segment );
     if( !side0 && !side1 && !side2 ) return MB_SUCCESS;  // interior point
     // now, find out what boundary is in question
     // first, get all edges, in order
     std::vector< EntityHandle > edges;
-    EntityHandle                nn2[ 2 ];
+    EntityHandle nn2[2];
     for( int i = 0; i < 3; i++ )
     {
-        nn2[ 0 ] = conn3[ ( i + 1 ) % 3 ];
-        nn2[ 1 ] = conn3[ ( i + 2 ) % 3 ];
+        nn2[0] = conn3[( i + 1 ) % 3];
+        nn2[1] = conn3[( i + 2 ) % 3];
         std::vector< EntityHandle > adjacent;
         rval = mbi->get_adjacencies( nn2, 2, 1, false, adjacent, Interface::INTERSECT );
         MBERRORR( rval, "Failed to get edges" );
-        if( adjacent.size( ) != 1 ) MBERRORR( MB_FAILURE, "Failed to get adjacent edges" );
+        if( adjacent.size() != 1 ) MBERRORR( MB_FAILURE, "Failed to get adjacent edges" );
         // should be only one edge here
-        edges.push_back( adjacent[ 0 ] );
+        edges.push_back( adjacent[0] );
     }
 
-    if( side0 ) boundary_handle = edges[ 0 ];
-    if( side1 ) boundary_handle = edges[ 1 ];
-    if( side2 ) boundary_handle = edges[ 2 ];
+    if( side0 ) boundary_handle = edges[0];
+    if( side1 ) boundary_handle = edges[1];
+    if( side2 ) boundary_handle = edges[2];
 
     return MB_SUCCESS;
 }
@@ -182,45 +182,45 @@ FBEngine::FBEngine( Interface* impl, GeomTopoTool* topoTool, const bool smooth )
     if( !_my_geomTopoTool )
     {
         _my_geomTopoTool = new GeomTopoTool( _mbImpl );
-        _t_created = true;
+        _t_created       = true;
     }
     // should this be part of the constructor or not?
     // Init();
 }
-FBEngine::~FBEngine( )
+FBEngine::~FBEngine()
 {
-    clean( );
+    clean();
     _smooth = false;
 }
 
-void FBEngine::clean( )
+void FBEngine::clean()
 {
     if( _smooth )
     {
-        _faces.clear( );
-        _edges.clear( );
-        int size1 = _my_gsets[ 1 ].size( );
-        int i = 0;
+        _faces.clear();
+        _edges.clear();
+        int size1 = _my_gsets[1].size();
+        int i     = 0;
         for( i = 0; i < size1; i++ )
-            delete _smthCurve[ i ];
+            delete _smthCurve[i];
         delete[] _smthCurve;
         _smthCurve = NULL;
-        size1 = _my_gsets[ 2 ].size( );
+        size1      = _my_gsets[2].size();
         for( i = 0; i < size1; i++ )
-            delete _smthFace[ i ];
+            delete _smthFace[i];
         delete[] _smthFace;
         _smthFace = NULL;
         //_smooth = false;
     }
 
     for( int j = 0; j < 5; j++ )
-        _my_gsets[ j ].clear( );
+        _my_gsets[j].clear();
     if( _t_created ) delete _my_geomTopoTool;
     _my_geomTopoTool = NULL;
-    _t_created = false;
+    _t_created       = false;
 }
 
-ErrorCode FBEngine::Init( )
+ErrorCode FBEngine::Init()
 {
     if( !_initialized )
     {
@@ -230,20 +230,20 @@ ErrorCode FBEngine::Init( )
         assert( rval == MB_SUCCESS );
         if( MB_SUCCESS != rval ) { return rval; }
 
-        rval = split_quads( );
+        rval = split_quads();
         assert( rval == MB_SUCCESS );
 
-        rval = _my_geomTopoTool->construct_obb_trees( );
+        rval = _my_geomTopoTool->construct_obb_trees();
         assert( rval == MB_SUCCESS );
 
-        if( _smooth ) rval = initializeSmoothing( );
+        if( _smooth ) rval = initializeSmoothing();
         assert( rval == MB_SUCCESS );
 
         _initialized = true;
     }
     return MB_SUCCESS;
 }
-ErrorCode FBEngine::initializeSmoothing( )
+ErrorCode FBEngine::initializeSmoothing()
 {
     //
     /*ErrorCode rval = Init();
@@ -251,46 +251,46 @@ ErrorCode FBEngine::initializeSmoothing( )
     // first of all, we need to retrieve all the surfaces from the (root) set
     // in icesheet_test we use iGeom, but maybe that is a stretch
     // get directly the sets with geom dim 2, and from there create the SmoothFace
-    Tag       geom_tag;
+    Tag geom_tag;
     ErrorCode rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );
     MBERRORR( rval, "can't get geom tag" );
 
-    int numSurfaces = _my_gsets[ 2 ].size( );
+    int numSurfaces = _my_gsets[2].size();
     // SmoothFace ** smthFace = new SmoothFace *[numSurfaces];
-    _smthFace = new SmoothFace*[ numSurfaces ];
+    _smthFace = new SmoothFace*[numSurfaces];
 
     // there should also be a map from surfaces to evaluators
     // std::map<MBEntityHandle, SmoothFace*> mapSurfaces;
 
-    int             i = 0;
+    int i = 0;
     Range::iterator it;
-    for( it = _my_gsets[ 2 ].begin( ); it != _my_gsets[ 2 ].end( ); ++it, i++ )
+    for( it = _my_gsets[2].begin(); it != _my_gsets[2].end(); ++it, i++ )
     {
         EntityHandle face = *it;
-        _smthFace[ i ] = new SmoothFace( MBI, face, _my_geomTopoTool );  // geom topo tool will be used for searching,
+        _smthFace[i] = new SmoothFace( MBI, face, _my_geomTopoTool );  // geom topo tool will be used for searching,
         // among other things; also for senses in edge sets...
-        _faces[ face ] = _smthFace[ i ];
+        _faces[face] = _smthFace[i];
     }
 
-    int numCurves = _my_gsets[ 1 ].size( );  // csets.size();
+    int numCurves = _my_gsets[1].size();  // csets.size();
     // SmoothCurve ** smthCurve = new SmoothCurve *[numCurves];
-    _smthCurve = new SmoothCurve*[ numCurves ];
+    _smthCurve = new SmoothCurve*[numCurves];
     // there should also be a map from surfaces to evaluators
     // std::map<MBEntityHandle, SmoothCurve*> mapCurves;
 
     i = 0;
-    for( it = _my_gsets[ 1 ].begin( ); it != _my_gsets[ 1 ].end( ); ++it, i++ )
+    for( it = _my_gsets[1].begin(); it != _my_gsets[1].end(); ++it, i++ )
     {
         EntityHandle curve = *it;
-        _smthCurve[ i ] = new SmoothCurve( MBI, curve, _my_geomTopoTool );
-        _edges[ curve ] = _smthCurve[ i ];
+        _smthCurve[i]      = new SmoothCurve( MBI, curve, _my_geomTopoTool );
+        _edges[curve]      = _smthCurve[i];
     }
 
     for( i = 0; i < numSurfaces; i++ )
     {
-        _smthFace[ i ]->init_gradient( );  // this will also retrieve the triangles in each surface
-        _smthFace[ i ]->compute_tangents_for_each_edge( );  // this one will consider all edges
-                                                            // internal, so the
+        _smthFace[i]->init_gradient();                   // this will also retrieve the triangles in each surface
+        _smthFace[i]->compute_tangents_for_each_edge();  // this one will consider all edges
+                                                         // internal, so the
         // tangents are all in the direction of the edge; a little bit of waste, as we store
         // one tangent for each edge node , even though they are equal here...
         // no loops are considered
@@ -309,21 +309,21 @@ ErrorCode FBEngine::initializeSmoothing( )
     assert( rval == MB_SUCCESS );
 
     // create the tag also for control points on the edges
-    double defCtrlPoints[ 9 ] = { 0., 0., 0., 0., 0., 0., 0., 0., 0. };
-    Tag    edgeCtrlTag;
+    double defCtrlPoints[9] = { 0., 0., 0., 0., 0., 0., 0., 0., 0. };
+    Tag edgeCtrlTag;
     rval = MBI->tag_get_handle( "CONTROLEDGE", 9, MB_TYPE_DOUBLE, edgeCtrlTag, MB_TAG_DENSE | MB_TAG_CREAT,
                                 &defCtrlPoints );
     assert( rval == MB_SUCCESS );
 
-    Tag    facetCtrlTag;
-    double defControls[ 18 ] = { 0. };
+    Tag facetCtrlTag;
+    double defControls[18] = { 0. };
     rval = MBI->tag_get_handle( "CONTROLFACE", 18, MB_TYPE_DOUBLE, facetCtrlTag, MB_TAG_CREAT | MB_TAG_DENSE,
                                 &defControls );
     assert( rval == MB_SUCCESS );
 
-    Tag    facetEdgeCtrlTag;
-    double defControls2[ 27 ] = { 0. };  // corresponding to 9 control points on edges, in order
-                                         // from edge 0, 1, 2 ( 1-2, 2-0, 0-1 )
+    Tag facetEdgeCtrlTag;
+    double defControls2[27] = { 0. };  // corresponding to 9 control points on edges, in order
+                                       // from edge 0, 1, 2 ( 1-2, 2-0, 0-1 )
     rval = MBI->tag_get_handle( "CONTROLEDGEFACE", 27, MB_TYPE_DOUBLE, facetEdgeCtrlTag, MB_TAG_CREAT | MB_TAG_DENSE,
                                 &defControls2 );
     assert( rval == MB_SUCCESS );
@@ -331,10 +331,10 @@ ErrorCode FBEngine::initializeSmoothing( )
     double min_dot = -1.0;  // depends on _angle, but now we ignore it, for the time being
     for( i = 0; i < numCurves; i++ )
     {
-        _smthCurve[ i ]->compute_tangents_for_each_edge( );  // do we need surfaces now? or just the chains?
+        _smthCurve[i]->compute_tangents_for_each_edge();  // do we need surfaces now? or just the chains?
         // the computed edges will be marked accordingly; later one, only internal edges to surfaces
         // are left
-        _smthCurve[ i ]->compute_control_points_on_boundary_edges( min_dot, _faces, edgeCtrlTag, markTag );
+        _smthCurve[i]->compute_control_points_on_boundary_edges( min_dot, _faces, edgeCtrlTag, markTag );
     }
 
     // when done with boundary edges, compute the control points on all edges in the surfaces
@@ -342,7 +342,7 @@ ErrorCode FBEngine::initializeSmoothing( )
     for( i = 0; i < numSurfaces; i++ )
     {
         // also pass the tags for
-        _smthFace[ i ]->compute_control_points_on_edges( min_dot, edgeCtrlTag, markTag );
+        _smthFace[i]->compute_control_points_on_edges( min_dot, edgeCtrlTag, markTag );
     }
 
     // now we should be able to compute the control points for the facets
@@ -350,7 +350,7 @@ ErrorCode FBEngine::initializeSmoothing( )
     for( i = 0; i < numSurfaces; i++ )
     {
         // also pass the tags for edge and facet control points
-        _smthFace[ i ]->compute_internal_control_points_on_facets( min_dot, facetCtrlTag, facetEdgeCtrlTag );
+        _smthFace[i]->compute_internal_control_points_on_facets( min_dot, facetCtrlTag, facetEdgeCtrlTag );
     }
     // we will need to compute the tangents for all edges in the model
     // they will be needed for control points for each edge
@@ -361,7 +361,7 @@ ErrorCode FBEngine::initializeSmoothing( )
     // some control points
     if( Debug_surf_eval )
         for( i = 0; i < numSurfaces; i++ )
-            _smthFace[ i ]->DumpModelControlPoints( );
+            _smthFace[i]->DumpModelControlPoints();
 
     return MB_SUCCESS;
 }
@@ -369,22 +369,22 @@ ErrorCode FBEngine::initializeSmoothing( )
 // clean up the smooth tags data if created, so the files will be smaller
 // if saved
 // also, recompute the tags if topology is modified
-void FBEngine::delete_smooth_tags( )
+void FBEngine::delete_smooth_tags()
 {
     // get all tags from database that are created for smooth data, and
     // delete them; it will delete all data associated with them
     // first tags from faces, edges:
     std::vector< Tag > smoothTags;
-    int                size1 = (int)_my_gsets[ 2 ].size( );
+    int size1 = (int)_my_gsets[2].size();
 
     for( int i = 0; i < size1; i++ )
     {
         // these 2 will append gradient tag and plane tag
-        _smthFace[ i ]->append_smooth_tags( smoothTags );
+        _smthFace[i]->append_smooth_tags( smoothTags );
     }
     // then , get other tags:
     // "TANGENTS", "MARKER", "CONTROLEDGE", "CONTROLFACE", "CONTROLEDGEFACE"
-    Tag       tag_handle;
+    Tag tag_handle;
     ErrorCode rval = _mbImpl->tag_get_handle( "TANGENTS", 6, MB_TYPE_DOUBLE, tag_handle );
     if( rval != MB_TAG_NOT_FOUND ) smoothTags.push_back( tag_handle );
 
@@ -401,10 +401,10 @@ void FBEngine::delete_smooth_tags( )
     if( rval != MB_TAG_NOT_FOUND ) smoothTags.push_back( tag_handle );
 
     // a lot of tags, delete them
-    for( unsigned int k = 0; k < smoothTags.size( ); k++ )
+    for( unsigned int k = 0; k < smoothTags.size(); k++ )
     {
         // could be a lot of data
-        _mbImpl->tag_delete( smoothTags[ k ] );
+        _mbImpl->tag_delete( smoothTags[k] );
     }
 }
 /*
@@ -418,7 +418,7 @@ void FBEngine::delete_smooth_tags( )
 
 ErrorCode FBEngine::getRootSet( EntityHandle* root_set )
 {
-    *root_set = _my_geomTopoTool->get_root_model_set( );
+    *root_set = _my_geomTopoTool->get_root_model_set();
     return MB_SUCCESS;
 }
 
@@ -445,15 +445,15 @@ ErrorCode FBEngine::getEntities( EntityHandle set_handle, int entity_type, Range
     int i;
     if( 0 > entity_type || 4 < entity_type ) { return MB_FAILURE; }
     else if( entity_type < 4 )
-    {  // 4 means all entities
-        gentities = _my_geomTopoTool->geoRanges( )[ entity_type ];  // all from root set!
+    {                                                            // 4 means all entities
+        gentities = _my_geomTopoTool->geoRanges()[entity_type];  // all from root set!
     }
     else
     {
-        gentities.clear( );
+        gentities.clear();
         for( i = 0; i < 4; i++ )
         {
-            gentities.merge( _my_geomTopoTool->geoRanges( )[ i ] );
+            gentities.merge( _my_geomTopoTool->geoRanges()[i] );
         }
     }
     Range sets;
@@ -486,8 +486,8 @@ ErrorCode FBEngine::getNumOfType( EntityHandle set, int ent_type, int* pNum )
     // ranges
 
     // get the geom dimensions sets in the set (AKA gentities)
-    Range     geom_sets;
-    Tag       geom_tag;
+    Range geom_sets;
+    Tag geom_tag;
     ErrorCode rval =
         _mbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_SPARSE | MB_TAG_CREAT );
     MBERRORR( rval, "Failed to get geom tag." );
@@ -499,14 +499,14 @@ ErrorCode FBEngine::getNumOfType( EntityHandle set, int ent_type, int* pNum )
         *pNum = 0;
         for( int k = 0; k <= 3; k++ )
         {
-            Range gEntsOfTypeK = intersect( geom_sets, _my_geomTopoTool->geoRanges( )[ k ] );
-            *pNum += (int)gEntsOfTypeK.size( );
+            Range gEntsOfTypeK = intersect( geom_sets, _my_geomTopoTool->geoRanges()[k] );
+            *pNum += (int)gEntsOfTypeK.size();
         }
     }
     else
     {
-        Range gEntsOfType = intersect( geom_sets, _my_geomTopoTool->geoRanges( )[ ent_type ] );
-        *pNum = (int)gEntsOfType.size( );
+        Range gEntsOfType = intersect( geom_sets, _my_geomTopoTool->geoRanges()[ent_type] );
+        *pNum             = (int)gEntsOfType.size();
     }
     // we do not really check if it is in the set or not;
     // _my_gsets[i].find(gent) != _my_gsets[i].end()
@@ -517,7 +517,7 @@ ErrorCode FBEngine::getEntType( EntityHandle gent, int* type )
 {
     for( int i = 0; i < 4; i++ )
     {
-        if( _my_geomTopoTool->geoRanges( )[ i ].find( gent ) != _my_geomTopoTool->geoRanges( )[ i ].end( ) )
+        if( _my_geomTopoTool->geoRanges()[i].find( gent ) != _my_geomTopoTool->geoRanges()[i].end() )
         {
             *type = i;
             return MB_SUCCESS;
@@ -530,7 +530,7 @@ ErrorCode FBEngine::getEntBoundBox( EntityHandle gent, double* min_x, double* mi
                                     double* max_y, double* max_z )
 {
     ErrorCode rval;
-    int       type;
+    int type;
     rval = getEntType( gent, &type );
     MBERRORR( rval, "Failed to get entity type." );
 
@@ -550,27 +550,27 @@ ErrorCode FBEngine::getEntBoundBox( EntityHandle gent, double* min_x, double* mi
     {
 
         EntityHandle root;
-        CartVect     center, axis[ 3 ];
+        CartVect center, axis[3];
         rval = _my_geomTopoTool->get_root( gent, root );
         MBERRORR( rval, "Failed to get tree root in iGeom_getEntBoundBox." );
-        rval = _my_geomTopoTool->obb_tree( )->box( root, center.array( ), axis[ 0 ].array( ), axis[ 1 ].array( ),
-                                                   axis[ 2 ].array( ) );
+        rval = _my_geomTopoTool->obb_tree()->box( root, center.array(), axis[0].array(), axis[1].array(),
+                                                  axis[2].array() );
         MBERRORR( rval, "Failed to get closest point in iGeom_getEntBoundBox." );
 
-        CartVect absv[ 3 ];
+        CartVect absv[3];
         for( int i = 0; i < 3; i++ )
         {
-            absv[ i ] = CartVect( fabs( axis[ i ][ 0 ] ), fabs( axis[ i ][ 1 ] ), fabs( axis[ i ][ 2 ] ) );
+            absv[i] = CartVect( fabs( axis[i][0] ), fabs( axis[i][1] ), fabs( axis[i][2] ) );
         }
         CartVect min, max;
-        min = center - absv[ 0 ] - absv[ 1 ] - absv[ 2 ];
-        max = center + absv[ 0 ] + absv[ 1 ] + absv[ 2 ];
-        *min_x = min[ 0 ];
-        *min_y = min[ 1 ];
-        *min_z = min[ 2 ];
-        *max_x = max[ 0 ];
-        *max_y = max[ 1 ];
-        *max_z = max[ 2 ];
+        min    = center - absv[0] - absv[1] - absv[2];
+        max    = center + absv[0] + absv[1] + absv[2];
+        *min_x = min[0];
+        *min_y = min[1];
+        *min_z = min[2];
+        *max_x = max[0];
+        *max_y = max[1];
+        *max_z = max[2];
     }
     else
         return MB_FAILURE;
@@ -581,7 +581,7 @@ ErrorCode FBEngine::getEntClosestPt( EntityHandle this_gent, double near_x, doub
                                      double* on_y, double* on_z )
 {
     ErrorCode rval;
-    int       type;
+    int type;
     rval = getEntType( this_gent, &type );
     MBERRORR( rval, "Failed to get entity type." );
 
@@ -592,36 +592,36 @@ ErrorCode FBEngine::getEntClosestPt( EntityHandle this_gent, double near_x, doub
     }
     else if( _smooth && type == 1 )
     {
-        *on_x = near_x;
-        *on_y = near_y;
-        *on_z = near_z;
-        SmoothCurve* smthcurve = _edges[ this_gent ];
+        *on_x                  = near_x;
+        *on_y                  = near_y;
+        *on_z                  = near_z;
+        SmoothCurve* smthcurve = _edges[this_gent];
         // call the new method from smooth edge
         smthcurve->move_to_curve( *on_x, *on_y, *on_z );
     }
     else if( type == 2 || type == 3 )
     {
-        double       point[ 3 ] = { near_x, near_y, near_z };
-        double       point_out[ 3 ];
+        double point[3] = { near_x, near_y, near_z };
+        double point_out[3];
         EntityHandle root, facet_out;
         if( _smooth && 2 == type )
         {
-            SmoothFace* smthFace = _faces[ this_gent ];
-            *on_x = near_x;
-            *on_y = near_y;
-            *on_z = near_z;
+            SmoothFace* smthFace = _faces[this_gent];
+            *on_x                = near_x;
+            *on_y                = near_y;
+            *on_z                = near_z;
             smthFace->move_to_surface( *on_x, *on_y, *on_z );
         }
         else
         {
             rval = _my_geomTopoTool->get_root( this_gent, root );
             MBERRORR( rval, "Failed to get tree root in iGeom_getEntClosestPt." );
-            rval = _my_geomTopoTool->obb_tree( )->closest_to_location( point, root, point_out, facet_out );
+            rval = _my_geomTopoTool->obb_tree()->closest_to_location( point, root, point_out, facet_out );
             MBERRORR( rval, "Failed to get closest point in iGeom_getEntClosestPt." );
 
-            *on_x = point_out[ 0 ];
-            *on_y = point_out[ 1 ];
-            *on_z = point_out[ 2 ];
+            *on_x = point_out[0];
+            *on_y = point_out[1];
+            *on_z = point_out[2];
         }
     }
     else
@@ -632,7 +632,7 @@ ErrorCode FBEngine::getEntClosestPt( EntityHandle this_gent, double near_x, doub
 
 ErrorCode FBEngine::getVtxCoord( EntityHandle vertex_handle, double* x0, double* y0, double* z0 )
 {
-    int       type;
+    int type;
     ErrorCode rval = getEntType( vertex_handle, &type );
     MBERRORR( rval, "Failed to get entity type in getVtxCoord." );
 
@@ -642,14 +642,14 @@ ErrorCode FBEngine::getVtxCoord( EntityHandle vertex_handle, double* x0, double*
     rval = MBI->get_entities_by_type( vertex_handle, MBVERTEX, entities );
     MBERRORR( rval, "can't get nodes in vertex set." );
 
-    if( entities.size( ) != 1 ) { MBERRORR( MB_FAILURE, "Vertex has multiple points." ); }
-    double       coords[ 3 ];
-    EntityHandle node = entities[ 0 ];
-    rval = MBI->get_coords( &node, 1, coords );
+    if( entities.size() != 1 ) { MBERRORR( MB_FAILURE, "Vertex has multiple points." ); }
+    double coords[3];
+    EntityHandle node = entities[0];
+    rval              = MBI->get_coords( &node, 1, coords );
     MBERRORR( rval, "can't get coordinates." );
-    *x0 = coords[ 0 ];
-    *y0 = coords[ 1 ];
-    *z0 = coords[ 2 ];
+    *x0 = coords[0];
+    *y0 = coords[1];
+    *z0 = coords[2];
 
     return MB_SUCCESS;
 }
@@ -657,7 +657,7 @@ ErrorCode FBEngine::getVtxCoord( EntityHandle vertex_handle, double* x0, double*
 ErrorCode FBEngine::gsubtract( EntityHandle entity_set_1, EntityHandle entity_set_2, EntityHandle result_entity_set )
 {
     /*result_entity_set = subtract(entity_set_1, entity_set_2);*/
-    Range     ents1, ents2;
+    Range ents1, ents2;
     ErrorCode rval = MBI->get_entities_by_type( entity_set_1, MBENTITYSET, ents1 );
     MBERRORR( rval, "can't get entities from set 1." );
 
@@ -665,7 +665,7 @@ ErrorCode FBEngine::gsubtract( EntityHandle entity_set_1, EntityHandle entity_se
     MBERRORR( rval, "can't get entities from set 2." );
 
     ents1 = subtract( ents1, ents2 );
-    rval = MBI->clear_meshset( &result_entity_set, 1 );
+    rval  = MBI->clear_meshset( &result_entity_set, 1 );
     MBERRORR( rval, "can't empty set." );
 
     rval = MBI->add_entities( result_entity_set, ents1 );
@@ -678,7 +678,7 @@ ErrorCode FBEngine::getEntNrmlXYZ( EntityHandle entity_handle, double x, double 
                                    double* nrml_j, double* nrml_k )
 {
     // just do for surface and volume
-    int       type;
+    int type;
     ErrorCode rval = getEntType( entity_handle, &type );
     MBERRORR( rval, "Failed to get entity type in iGeom_getEntNrmlXYZ." );
 
@@ -687,38 +687,38 @@ ErrorCode FBEngine::getEntNrmlXYZ( EntityHandle entity_handle, double x, double 
 
     if( _smooth && 2 == type )
     {
-        SmoothFace* smthFace = _faces[ entity_handle ];
+        SmoothFace* smthFace = _faces[entity_handle];
         //*on_x = near_x; *on_y = near_y; *on_z = near_z;
         smthFace->normal_at( x, y, z, *nrml_i, *nrml_j, *nrml_k );
     }
     else
     {
         // get closest location and facet
-        double       point[ 3 ] = { x, y, z };
-        double       point_out[ 3 ];
+        double point[3] = { x, y, z };
+        double point_out[3];
         EntityHandle root, facet_out;
         _my_geomTopoTool->get_root( entity_handle, root );
-        rval = _my_geomTopoTool->obb_tree( )->closest_to_location( point, root, point_out, facet_out );
+        rval = _my_geomTopoTool->obb_tree()->closest_to_location( point, root, point_out, facet_out );
         MBERRORR( rval, "Failed to get closest location in iGeom_getEntNrmlXYZ." );
 
         // get facet normal
         const EntityHandle* conn;
-        int                 len;
-        CartVect            coords[ 3 ], normal;
+        int len;
+        CartVect coords[3], normal;
         rval = MBI->get_connectivity( facet_out, conn, len );
         MBERRORR( rval, "Failed to get triangle connectivity in iGeom_getEntNrmlXYZ." );
         if( len != 3 ) MBERRORR( MB_FAILURE, " not a triangle, error " );
 
-        rval = MBI->get_coords( conn, len, coords[ 0 ].array( ) );
+        rval = MBI->get_coords( conn, len, coords[0].array() );
         MBERRORR( rval, "Failed to get triangle coordinates in iGeom_getEntNrmlXYZ." );
 
-        coords[ 1 ] -= coords[ 0 ];
-        coords[ 2 ] -= coords[ 0 ];
-        normal = coords[ 1 ] * coords[ 2 ];
-        normal.normalize( );
-        *nrml_i = normal[ 0 ];
-        *nrml_j = normal[ 1 ];
-        *nrml_k = normal[ 2 ];
+        coords[1] -= coords[0];
+        coords[2] -= coords[0];
+        normal = coords[1] * coords[2];
+        normal.normalize();
+        *nrml_i = normal[0];
+        *nrml_j = normal[1];
+        *nrml_k = normal[2];
     }
     return MB_SUCCESS;
 }
@@ -733,12 +733,12 @@ ErrorCode FBEngine::getPntRayIntsct( double x, double y, double z, double dir_x,
     //
     ErrorCode rval;
 
-    unsigned int numfaces = _my_gsets[ 2 ].size( );
+    unsigned int numfaces = _my_gsets[2].size();
     // do ray fire
     const double point[] = { x, y, z };
-    const double dir[] = { dir_x, dir_y, dir_z };
-    CartVect     P( point );
-    CartVect     V( dir );
+    const double dir[]   = { dir_x, dir_y, dir_z };
+    CartVect P( point );
+    CartVect V( dir );
 
     // std::vector<double> distances;
     std::vector< EntityHandle > facets;
@@ -746,53 +746,53 @@ ErrorCode FBEngine::getPntRayIntsct( double x, double y, double z, double dir_x,
     unsigned int i;
     for( i = 0; i < numfaces; i++ )
     {
-        EntityHandle face = _my_gsets[ 2 ][ i ];
+        EntityHandle face = _my_gsets[2][i];
         EntityHandle rootForFace;
         rval = _my_geomTopoTool->get_root( face, rootForFace );
         MBERRORR( rval, "Failed to get root of face." );
-        std::vector< double >       distances_out;
+        std::vector< double > distances_out;
         std::vector< EntityHandle > sets_out;
         std::vector< EntityHandle > facets_out;
-        rval = _my_geomTopoTool->obb_tree( )->ray_intersect_sets( distances_out, sets_out, facets_out, rootForFace,
-                                                                  tolerance, point, dir );
+        rval = _my_geomTopoTool->obb_tree()->ray_intersect_sets( distances_out, sets_out, facets_out, rootForFace,
+                                                                 tolerance, point, dir );
         unsigned int j;
-        for( j = 0; j < distances_out.size( ); j++ )
-            param_coords.push_back( distances_out[ j ] );
-        for( j = 0; j < sets_out.size( ); j++ )
-            intersect_entity_handles.push_back( sets_out[ j ] );
-        for( j = 0; j < facets_out.size( ); j++ )
-            facets.push_back( facets_out[ j ] );
+        for( j = 0; j < distances_out.size(); j++ )
+            param_coords.push_back( distances_out[j] );
+        for( j = 0; j < sets_out.size(); j++ )
+            intersect_entity_handles.push_back( sets_out[j] );
+        for( j = 0; j < facets_out.size(); j++ )
+            facets.push_back( facets_out[j] );
 
         MBERRORR( rval, "Failed to get ray intersections." );
     }
     // facets.size == distances.size()!!
-    for( i = 0; i < param_coords.size( ); i++ )
+    for( i = 0; i < param_coords.size(); i++ )
     {
-        CartVect intx = P + param_coords[ i ] * V;
+        CartVect intx = P + param_coords[i] * V;
         for( int j = 0; j < 3; j++ )
-            intersect_coords.push_back( intx[ j ] );
+            intersect_coords.push_back( intx[j] );
     }
     if( _smooth )
     {
         // correct the intersection point and the distance for smooth surfaces
-        for( i = 0; i < intersect_entity_handles.size( ); i++ )
+        for( i = 0; i < intersect_entity_handles.size(); i++ )
         {
             // EntityHandle geoSet = MBH_cast(sets[i]);
-            SmoothFace* sFace = _faces[ intersect_entity_handles[ i ] ];
+            SmoothFace* sFace = _faces[intersect_entity_handles[i]];
             // correct coordinates and distance from point
             /*moab::ErrorCode ray_intersection_correct(moab::EntityHandle facet, // (IN) the facet
              where the patch is defined moab::CartVect &pt, // (IN) shoot from moab::CartVect &ray,
              // (IN) ray direction moab::CartVect &eval_pt, // (INOUT) The intersection point double
              & distance, // (IN OUT) the new distance bool &outside);*/
-            CartVect pos( &( intersect_coords[ 3 * i ] ) );
-            double   dist = param_coords[ i ];
-            bool     outside = false;
-            rval = sFace->ray_intersection_correct( facets[ i ], P, V, pos, dist, outside );
+            CartVect pos( &( intersect_coords[3 * i] ) );
+            double dist  = param_coords[i];
+            bool outside = false;
+            rval         = sFace->ray_intersection_correct( facets[i], P, V, pos, dist, outside );
             MBERRORR( rval, "Failed to get better point on ray." );
-            param_coords[ i ] = dist;
+            param_coords[i] = dist;
 
             for( int j = 0; j < 3; j++ )
-                intersect_coords[ 3 * i + j ] = pos[ j ];
+                intersect_coords[3 * i + j] = pos[j];
         }
     }
     return MB_SUCCESS;
@@ -803,7 +803,7 @@ ErrorCode FBEngine::getAdjacentEntities( const EntityHandle from, const int to_d
     int this_dim = -1;
     for( int i = 0; i < 4; i++ )
     {
-        if( _my_geomTopoTool->geoRanges( )[ i ].find( from ) != _my_geomTopoTool->geoRanges( )[ i ].end( ) )
+        if( _my_geomTopoTool->geoRanges()[i].find( from ) != _my_geomTopoTool->geoRanges()[i].end() )
         {
             this_dim = i;
             break;
@@ -829,11 +829,11 @@ ErrorCode FBEngine::getAdjacentEntities( const EntityHandle from, const int to_d
     }
 
     ErrorCode rval = MB_SUCCESS;
-    adjs.clear( );
+    adjs.clear();
     if( to_dim > this_dim )
     {
         int diffDim = to_dim - this_dim;
-        rval = MBI->get_parent_meshsets( from, adjs, diffDim );
+        rval        = MBI->get_parent_meshsets( from, adjs, diffDim );
         if( MB_SUCCESS != rval ) return rval;
         if( diffDim > 1 )
         {
@@ -847,7 +847,7 @@ ErrorCode FBEngine::getAdjacentEntities( const EntityHandle from, const int to_d
     else
     {
         int diffDim = this_dim - to_dim;
-        rval = MBI->get_child_meshsets( from, adjs, diffDim );
+        rval        = MBI->get_child_meshsets( from, adjs, diffDim );
         if( MB_SUCCESS != rval ) return rval;
         if( diffDim > 1 )
         {
@@ -872,13 +872,13 @@ ErrorCode FBEngine::createTag( const char* tag_name, int tag_size, int tag_type,
     // also, we do not want to depend on iMesh.h...
     // iMesh is more complicated, because of the options passed
 
-    DataType      mb_data_type_table2[] = { MB_TYPE_OPAQUE, MB_TYPE_INTEGER, MB_TYPE_DOUBLE, MB_TYPE_HANDLE,
+    DataType mb_data_type_table2[] = { MB_TYPE_OPAQUE, MB_TYPE_INTEGER, MB_TYPE_DOUBLE, MB_TYPE_HANDLE,
                                        MB_TYPE_HANDLE };
-    moab::TagType storage = MB_TAG_SPARSE;
-    ErrorCode     result;
+    moab::TagType storage          = MB_TAG_SPARSE;
+    ErrorCode result;
 
-    result = MBI->tag_get_handle( tag_name, tag_size, mb_data_type_table2[ tag_type ], tag_handle_out,
-                                  storage | MB_TAG_EXCL );
+    result =
+        MBI->tag_get_handle( tag_name, tag_size, mb_data_type_table2[tag_type], tag_handle_out, storage | MB_TAG_EXCL );
 
     if( MB_SUCCESS != result )
     {
@@ -927,15 +927,15 @@ ErrorCode FBEngine::getEgFcSense( EntityHandle mbedge, EntityHandle mbface, int&
     // this one is important, for establishing the orientation of the edges in faces
     // use senses
     std::vector< EntityHandle > faces;
-    std::vector< int >          senses;  // 0 is forward and 1 is backward
-    ErrorCode                   rval = _my_geomTopoTool->get_senses( mbedge, faces, senses );
+    std::vector< int > senses;  // 0 is forward and 1 is backward
+    ErrorCode rval = _my_geomTopoTool->get_senses( mbedge, faces, senses );
     if( MB_SUCCESS != rval ) return rval;
 
-    for( unsigned int i = 0; i < faces.size( ); i++ )
+    for( unsigned int i = 0; i < faces.size(); i++ )
     {
-        if( faces[ i ] == mbface )
+        if( faces[i] == mbface )
         {
-            sense_out = senses[ i ];
+            sense_out = senses[i];
             return MB_SUCCESS;
         }
     }
@@ -947,11 +947,11 @@ ErrorCode FBEngine::measure( const EntityHandle* moab_entities, int entities_siz
     ErrorCode rval;
     for( int i = 0; i < entities_size; i++ )
     {
-        measures[ i ] = 0.;
+        measures[i] = 0.;
 
-        int          type;
-        EntityHandle gset = moab_entities[ i ];
-        rval = getEntType( gset, &type );
+        int type;
+        EntityHandle gset = moab_entities[i];
+        rval              = getEntType( gset, &type );
         if( MB_SUCCESS != rval ) return rval;
         if( type == 1 )
         {  // edge: get all edges part of the edge set
@@ -959,19 +959,19 @@ ErrorCode FBEngine::measure( const EntityHandle* moab_entities, int entities_siz
             rval = MBI->get_entities_by_type( gset, MBEDGE, entities );
             if( MB_SUCCESS != rval ) return rval;
 
-            for( Range::iterator it = entities.begin( ); it != entities.end( ); ++it )
+            for( Range::iterator it = entities.begin(); it != entities.end(); ++it )
             {
-                EntityHandle        edge = *it;
-                CartVect            vv[ 2 ];
+                EntityHandle edge = *it;
+                CartVect vv[2];
                 const EntityHandle* conn2 = NULL;
-                int                 num_nodes;
+                int num_nodes;
                 rval = MBI->get_connectivity( edge, conn2, num_nodes );
                 if( MB_SUCCESS != rval || num_nodes != 2 ) return MB_FAILURE;
-                rval = MBI->get_coords( conn2, 2, (double*)&( vv[ 0 ][ 0 ] ) );
+                rval = MBI->get_coords( conn2, 2, (double*)&( vv[0][0] ) );
                 if( MB_SUCCESS != rval ) return rval;
 
-                vv[ 0 ] = vv[ 1 ] - vv[ 0 ];
-                measures[ i ] += vv[ 0 ].length( );
+                vv[0] = vv[1] - vv[0];
+                measures[i] += vv[0].length();
             }
         }
         if( type == 2 )
@@ -981,21 +981,21 @@ ErrorCode FBEngine::measure( const EntityHandle* moab_entities, int entities_siz
             rval = MBI->get_entities_by_type( gset, MBTRI, entities );
             if( MB_SUCCESS != rval ) return rval;
 
-            for( Range::iterator it = entities.begin( ); it != entities.end( ); ++it )
+            for( Range::iterator it = entities.begin(); it != entities.end(); ++it )
             {
-                EntityHandle        tri = *it;
-                CartVect            vv[ 3 ];
+                EntityHandle tri = *it;
+                CartVect vv[3];
                 const EntityHandle* conn3 = NULL;
-                int                 num_nodes;
+                int num_nodes;
                 rval = MBI->get_connectivity( tri, conn3, num_nodes );
                 if( MB_SUCCESS != rval || num_nodes != 3 ) return MB_FAILURE;
-                rval = MBI->get_coords( conn3, 3, (double*)&( vv[ 0 ][ 0 ] ) );
+                rval = MBI->get_coords( conn3, 3, (double*)&( vv[0][0] ) );
                 if( MB_SUCCESS != rval ) return rval;
 
-                vv[ 1 ] = vv[ 1 ] - vv[ 0 ];
-                vv[ 2 ] = vv[ 2 ] - vv[ 0 ];
-                vv[ 0 ] = vv[ 1 ] * vv[ 2 ];
-                measures[ i ] += vv[ 0 ].length( ) / 2;  // area of triangle
+                vv[1] = vv[1] - vv[0];
+                vv[2] = vv[2] - vv[0];
+                vv[0] = vv[1] * vv[2];
+                measures[i] += vv[0].length() / 2;  // area of triangle
             }
         }
     }
@@ -1028,41 +1028,41 @@ ErrorCode FBEngine::getEgVtxSense( EntityHandle edge, EntityHandle vtx1, EntityH
     int type;
 
     EntityHandle v1, v2;
-    ErrorCode    rval = getEntType( vtx1, &type );
+    ErrorCode rval = getEntType( vtx1, &type );
     if( MB_SUCCESS != rval || type != 0 ) return MB_FAILURE;
     // edge: get one vertex as part of the vertex set
     Range entities;
     rval = MBI->get_entities_by_type( vtx1, MBVERTEX, entities );
     if( MB_SUCCESS != rval ) return rval;
-    if( entities.size( ) < 1 ) return MB_FAILURE;
-    v1 = entities[ 0 ];  // the first vertex
-    entities.clear( );
+    if( entities.size() < 1 ) return MB_FAILURE;
+    v1 = entities[0];  // the first vertex
+    entities.clear();
     rval = getEntType( vtx2, &type );
     if( MB_SUCCESS != rval || type != 0 ) return MB_FAILURE;
     rval = MBI->get_entities_by_type( vtx2, MBVERTEX, entities );
     if( MB_SUCCESS != rval ) return rval;
-    if( entities.size( ) < 1 ) return MB_FAILURE;
-    v2 = entities[ 0 ];  // the first vertex
-    entities.clear( );
+    if( entities.size() < 1 ) return MB_FAILURE;
+    v2 = entities[0];  // the first vertex
+    entities.clear();
     // now get the edges, and get the first node and the last node in sequence of edges
     // the order is important...
     // these are ordered sets !!
     std::vector< EntityHandle > ents;
     rval = MBI->get_entities_by_type( edge, MBEDGE, ents );
     if( MB_SUCCESS != rval ) return rval;
-    if( ents.size( ) < 1 ) return MB_FAILURE;
+    if( ents.size() < 1 ) return MB_FAILURE;
 
     const EntityHandle* conn = NULL;
-    int                 len;
-    EntityHandle        startNode, endNode;
-    rval = MBI->get_connectivity( ents[ 0 ], conn, len );
+    int len;
+    EntityHandle startNode, endNode;
+    rval = MBI->get_connectivity( ents[0], conn, len );
     if( MB_SUCCESS != rval ) return rval;
-    startNode = conn[ 0 ];
-    rval = MBI->get_connectivity( ents[ ents.size( ) - 1 ], conn, len );
+    startNode = conn[0];
+    rval      = MBI->get_connectivity( ents[ents.size() - 1], conn, len );
     if( MB_SUCCESS != rval ) return rval;
 
-    endNode = conn[ 1 ];
-    sense = 1;  //
+    endNode = conn[1];
+    sense   = 1;  //
     if( ( startNode == endNode ) && ( v1 == startNode ) )
     {
         sense = 0;  // periodic
@@ -1080,7 +1080,7 @@ ErrorCode FBEngine::getEgVtxSense( EntityHandle edge, EntityHandle vtx1, EntityH
 
 ErrorCode FBEngine::getEntURange( EntityHandle edge, double& u_min, double& u_max )
 {
-    SmoothCurve* smoothCurve = _edges[ edge ];  // this is a map
+    SmoothCurve* smoothCurve = _edges[edge];  // this is a map
     // now, call smoothCurve methods
     smoothCurve->get_param_range( u_min, u_max );
     return MB_SUCCESS;
@@ -1088,7 +1088,7 @@ ErrorCode FBEngine::getEntURange( EntityHandle edge, double& u_min, double& u_ma
 
 ErrorCode FBEngine::getEntUtoXYZ( EntityHandle edge, double u, double& x, double& y, double& z )
 {
-    SmoothCurve* smoothCurve = _edges[ edge ];  // this is a map
+    SmoothCurve* smoothCurve = _edges[edge];  // this is a map
     // now, call smoothCurve methods
     smoothCurve->position_from_u( u, x, y, z );
     return MB_SUCCESS;
@@ -1096,19 +1096,19 @@ ErrorCode FBEngine::getEntUtoXYZ( EntityHandle edge, double u, double& x, double
 
 ErrorCode FBEngine::getEntTgntU( EntityHandle edge, double u, double& i, double& j, double& k )
 {
-    SmoothCurve* smoothCurve = _edges[ edge ];  // this is a map
+    SmoothCurve* smoothCurve = _edges[edge];  // this is a map
     // now, call smoothCurve methods
-    double tg[ 3 ];
+    double tg[3];
     double x, y, z;
     smoothCurve->position_from_u( u, x, y, z, tg );
-    i = tg[ 0 ];
-    j = tg[ 1 ];
-    k = tg[ 2 ];
+    i = tg[0];
+    j = tg[1];
+    k = tg[2];
     return MB_SUCCESS;
 }
 ErrorCode FBEngine::isEntAdj( EntityHandle entity1, EntityHandle entity2, bool& adjacent_out )
 {
-    int       type1, type2;
+    int type1, type2;
     ErrorCode rval = getEntType( entity1, &type1 );
     if( MB_SUCCESS != rval ) return rval;
     rval = getEntType( entity2, &type2 );
@@ -1129,7 +1129,7 @@ ErrorCode FBEngine::isEntAdj( EntityHandle entity1, EntityHandle entity2, bool& 
 
     // adjacent_out = adjs.find(entity2) != _my_gsets[type2].end();
     // hmmm, possible bug here; is this called?
-    adjacent_out = adjs.find( entity2 ) != adjs.end( );
+    adjacent_out = adjs.find( entity2 ) != adjs.end();
 
     return MB_SUCCESS;
 }
@@ -1146,7 +1146,7 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
     ErrorCode rval;
 
     // then find the position
-    int numIniPoints = (int)xyz.size( ) / 3;
+    int numIniPoints = (int)xyz.size() / 3;
     if( ( closed && numIniPoints < 3 ) || ( !closed && numIniPoints < 2 ) )
         MBERRORR( MB_FAILURE, "not enough polyline points " );
     EntityHandle rootForFace;
@@ -1154,37 +1154,36 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
     rval = _my_geomTopoTool->get_root( face, rootForFace );
     MBERRORR( rval, "Failed to get root of face." );
 
-    const double                dir[] = { direction[ 0 ], direction[ 1 ], direction[ 2 ] };
+    const double dir[] = { direction[0], direction[1], direction[2] };
     std::vector< EntityHandle > nodes;  // get the nodes closest to the ray traces of interest
 
     // these are nodes on the boundary of original face;
     // if the cutting line is not closed, the starting - ending vertices of the
     // polygonal line must come from this list
 
-    std::vector< CartVect >     b_pos;
+    std::vector< CartVect > b_pos;
     std::vector< EntityHandle > boundary_nodes;
     std::vector< EntityHandle > splittingNodes;
-    Range                       boundary_mesh_edges;
+    Range boundary_mesh_edges;
     if( !closed )
     {
         rval = boundary_nodes_on_face( face, boundary_nodes );
         MBERRORR( rval, "Failed to get boundary nodes." );
-        b_pos.resize( boundary_nodes.size( ) );
-        rval = _mbImpl->get_coords( &( boundary_nodes[ 0 ] ), boundary_nodes.size( ), (double*)( &b_pos[ 0 ][ 0 ] ) );
+        b_pos.resize( boundary_nodes.size() );
+        rval = _mbImpl->get_coords( &( boundary_nodes[0] ), boundary_nodes.size(), (double*)( &b_pos[0][0] ) );
         MBERRORR( rval, "Failed to get coordinates for boundary nodes." );
         rval = boundary_mesh_edges_on_face( face, boundary_mesh_edges );
         MBERRORR( rval, "Failed to get mesh boundary edges for face." );
     }
     //
-    int      i = 0;
+    int i = 0;
     CartVect dirct( direction );
-    dirct.normalize( );  // maybe an overkill?
+    dirct.normalize();  // maybe an overkill?
     for( ; i < numIniPoints; i++ )
     {
 
-        const double point[] = { xyz[ 3 * i ], xyz[ 3 * i + 1 ],
-                                 xyz[ 3 * i + 2 ] };  // or even point( &(xyz[3*i]) ); //
-        CartVect     p1( point );
+        const double point[] = { xyz[3 * i], xyz[3 * i + 1], xyz[3 * i + 2] };  // or even point( &(xyz[3*i]) ); //
+        CartVect p1( point );
         if( !closed && ( ( 0 == i ) || ( numIniPoints - 1 == i ) ) )
         {
 
@@ -1194,41 +1193,41 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
             int i1 = i + 1;
             if( i == numIniPoints - 1 ) i1 = i - 1;  // previous point if the last
             // the direction is from point to point1
-            const double point1[] = { xyz[ 3 * i1 ], xyz[ 3 * i1 + 1 ], xyz[ 3 * i1 + 2 ] };
-            CartVect     p2( point1 );
-            CartVect     normPlane = ( p2 - p1 ) * dirct;
-            normPlane.normalize( );
+            const double point1[] = { xyz[3 * i1], xyz[3 * i1 + 1], xyz[3 * i1 + 2] };
+            CartVect p2( point1 );
+            CartVect normPlane = ( p2 - p1 ) * dirct;
+            normPlane.normalize();
             //(roughly, from p1 to p2, perpendicular to dirct, in the "xy" plane
             // if the intx point is "outside" p1 - p2, skip if the intx point is closer to p2
-            CartVect        perpDir = dirct * normPlane;
-            Range::iterator ite = boundary_mesh_edges.begin( );
+            CartVect perpDir    = dirct * normPlane;
+            Range::iterator ite = boundary_mesh_edges.begin();
             // do a linear search for the best intersection point position (on a boundary edge)
             if( debug_splits )
             {
                 std::cout << " p1:" << p1 << "\n";
                 std::cout << " p2:" << p2 << "\n";
                 std::cout << " perpDir:" << perpDir << "\n";
-                std::cout << " boundary edges size:" << boundary_mesh_edges.size( ) << "\n";
+                std::cout << " boundary edges size:" << boundary_mesh_edges.size() << "\n";
             }
-            for( ; ite != boundary_mesh_edges.end( ); ++ite )
+            for( ; ite != boundary_mesh_edges.end(); ++ite )
             {
-                EntityHandle        candidateEdge = *ite;
+                EntityHandle candidateEdge = *ite;
                 const EntityHandle* conn2;
-                int                 nno;
+                int nno;
                 rval = _mbImpl->get_connectivity( candidateEdge, conn2, nno );
                 MBERRORR( rval, "Failed to get conn for boundary edge" );
-                CartVect pts[ 2 ];
-                rval = _mbImpl->get_coords( conn2, 2, &( pts[ 0 ][ 0 ] ) );
+                CartVect pts[2];
+                rval = _mbImpl->get_coords( conn2, 2, &( pts[0][0] ) );
                 MBERRORR( rval, "Failed to get coords of nodes for boundary edge" );
                 CartVect intx_point;
-                double   parPos;
-                bool     intersect = intersect_segment_and_plane_slice( pts[ 0 ], pts[ 1 ], p1, p2, dirct, normPlane,
-                                                                    intx_point, parPos );
+                double parPos;
+                bool intersect =
+                    intersect_segment_and_plane_slice( pts[0], pts[1], p1, p2, dirct, normPlane, intx_point, parPos );
                 if( debug_splits )
                 {
                     std::cout << "   Edge:" << _mbImpl->id_from_handle( candidateEdge ) << "\n";
-                    std::cout << "   Node 1:" << _mbImpl->id_from_handle( conn2[ 0 ] ) << pts[ 0 ] << "\n";
-                    std::cout << "   Node 2:" << _mbImpl->id_from_handle( conn2[ 1 ] ) << pts[ 1 ] << "\n";
+                    std::cout << "   Node 1:" << _mbImpl->id_from_handle( conn2[0] ) << pts[0] << "\n";
+                    std::cout << "   Node 2:" << _mbImpl->id_from_handle( conn2[1] ) << pts[1] << "\n";
                     std::cout << "    Intersect bool:" << intersect << "\n";
                 }
                 if( intersect )
@@ -1243,26 +1242,26 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
                     if( parPos == 0 )
                     {
                         // close to vertex 1, nothing to do
-                        nodes.push_back( conn2[ 0 ] );
-                        splittingNodes.push_back( conn2[ 0 ] );
+                        nodes.push_back( conn2[0] );
+                        splittingNodes.push_back( conn2[0] );
                     }
                     else if( parPos == 1. )
                     {
                         // close to vertex 2, nothing to do
-                        nodes.push_back( conn2[ 1 ] );
-                        splittingNodes.push_back( conn2[ 1 ] );
+                        nodes.push_back( conn2[1] );
+                        splittingNodes.push_back( conn2[1] );
                     }
                     else
                     {
                         // break the edge, create a new node at intersection point (will be smoothed
                         // out)
                         EntityHandle newVertex;
-                        rval = _mbImpl->create_vertex( &( intx_point[ 0 ] ), newVertex );
+                        rval = _mbImpl->create_vertex( &( intx_point[0] ), newVertex );
                         MBERRORR( rval, "can't create vertex" );
                         nodes.push_back( newVertex );
                         split_internal_edge( candidateEdge, newVertex );
                         splittingNodes.push_back( newVertex );
-                        _brokenEdges[ newVertex ] = candidateEdge;
+                        _brokenEdges[newVertex] = candidateEdge;
                         _piercedEdges.insert( candidateEdge );
                     }
                     break;  // break from the loop over boundary edges, we are interested in the
@@ -1270,43 +1269,43 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
                             //      split (hopefully, the only split)
                 }
             }
-            if( ite == boundary_mesh_edges.end( ) )
+            if( ite == boundary_mesh_edges.end() )
                 MBERRORR( MB_FAILURE, "Failed to find boundary intersection edge. Bail out" );
         }
         else
         {
-            std::vector< double >       distances_out;
+            std::vector< double > distances_out;
             std::vector< EntityHandle > sets_out;
             std::vector< EntityHandle > facets_out;
-            rval = _my_geomTopoTool->obb_tree( )->ray_intersect_sets( distances_out, sets_out, facets_out, rootForFace,
-                                                                      tolerance, point, dir );
+            rval = _my_geomTopoTool->obb_tree()->ray_intersect_sets( distances_out, sets_out, facets_out, rootForFace,
+                                                                     tolerance, point, dir );
             MBERRORR( rval, "Failed to get ray intersections." );
-            if( distances_out.size( ) < 1 )
+            if( distances_out.size() < 1 )
                 MBERRORR( MB_FAILURE, "Failed to get one intersection point, bad direction." );
 
-            if( distances_out.size( ) > 1 )
+            if( distances_out.size() > 1 )
             { std::cout << " too many intersection points. Only the first one considered\n"; }
-            std::vector< EntityHandle >::iterator pFace = std::find( sets_out.begin( ), sets_out.end( ), face );
+            std::vector< EntityHandle >::iterator pFace = std::find( sets_out.begin(), sets_out.end(), face );
 
-            if( pFace == sets_out.end( ) ) MBERRORR( MB_FAILURE, "Failed to intersect given face, bad direction." );
-            unsigned int index = pFace - sets_out.begin( );
+            if( pFace == sets_out.end() ) MBERRORR( MB_FAILURE, "Failed to intersect given face, bad direction." );
+            unsigned int index = pFace - sets_out.begin();
             // get the closest node of the triangle, and modify locally the triangle(s), so the
             // intersection point is at a new vertex, if needed
             CartVect P( point );
             CartVect Dir( dir );
-            CartVect newPoint = P + distances_out[ index ] * Dir;
+            CartVect newPoint = P + distances_out[index] * Dir;
             // get the triangle coordinates
 
-            double       area_coord[ 3 ];
+            double area_coord[3];
             EntityHandle boundary_handle = 0;  // if 0, not on a boundary
-            rval = area_coordinates( _mbImpl, facets_out[ index ], newPoint, area_coord, boundary_handle );
+            rval = area_coordinates( _mbImpl, facets_out[index], newPoint, area_coord, boundary_handle );
             MBERRORR( rval, "Failed to get area coordinates" );
 
             if( debug_splits )
             {
-                std::cout << " int point:" << newPoint << " area coord " << area_coord[ 0 ] << " " << area_coord[ 1 ]
-                          << " " << area_coord[ 2 ] << "\n";
-                std::cout << " triangle: " << _mbImpl->id_from_handle( facets_out[ index ] )
+                std::cout << " int point:" << newPoint << " area coord " << area_coord[0] << " " << area_coord[1] << " "
+                          << area_coord[2] << "\n";
+                std::cout << " triangle: " << _mbImpl->id_from_handle( facets_out[index] )
                           << " boundary:" << boundary_handle << "\n";
             }
             EntityType type;
@@ -1322,14 +1321,14 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
                 // for interior point, we will create 3 triangles out of one
                 // create a new vertex
                 EntityHandle newVertex;
-                rval = _mbImpl->create_vertex( &( newPoint[ 0 ] ), newVertex );
+                rval = _mbImpl->create_vertex( &( newPoint[0] ), newVertex );
                 if( boundary_handle )  // this is edge
                 {
                     split_internal_edge( boundary_handle, newVertex );
                     _piercedEdges.insert( boundary_handle );  // to be removed at the end
                 }
                 else
-                    divide_triangle( facets_out[ index ], newVertex );
+                    divide_triangle( facets_out[index], newVertex );
 
                 nodes.push_back( newVertex );
             }
@@ -1342,37 +1341,36 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
     // gentity , original face ( moab set)
     // int closed = 1;// closed = 0 if the polyline is not closed
 
-    CartVect                    Dir( direction );
+    CartVect Dir( direction );
     std::vector< EntityHandle > chainedEdges;
 
     for( i = 0; i < numIniPoints - 1 + closed; i++ )
     {
-        int                         nextIndex = ( i + 1 ) % numIniPoints;
+        int nextIndex = ( i + 1 ) % numIniPoints;
         std::vector< EntityHandle > trianglesAlong;
-        std::vector< CartVect >     points;
+        std::vector< CartVect > points;
         // otherwise to edges or even nodes
         std::vector< EntityHandle > entities;
         // start with initial points, intersect along the direction, find the facets
-        rval =
-            compute_intersection_points( face, nodes[ i ], nodes[ nextIndex ], Dir, points, entities, trianglesAlong );
+        rval = compute_intersection_points( face, nodes[i], nodes[nextIndex], Dir, points, entities, trianglesAlong );
         MBERRORR( rval, "can't get intersection points along a line" );
         std::vector< EntityHandle > nodesAlongPolyline;
         // refactor code; move some edge creation for each 2 intersection points
-        nodesAlongPolyline.push_back( entities[ 0 ] );  // it is for sure a node
-        int num_points = (int)points.size( );  // it should be num_triangles + 1
+        nodesAlongPolyline.push_back( entities[0] );  // it is for sure a node
+        int num_points = (int)points.size();          // it should be num_triangles + 1
         for( int j = 0; j < num_points - 1; j++ )
         {
-            EntityHandle tri = trianglesAlong[ j ];  // this is happening in trianglesAlong i
-            EntityHandle e1 = entities[ j ];
-            EntityHandle e2 = entities[ j + 1 ];
-            EntityType   et1 = _mbImpl->type_from_handle( e1 );
+            EntityHandle tri = trianglesAlong[j];  // this is happening in trianglesAlong i
+            EntityHandle e1  = entities[j];
+            EntityHandle e2  = entities[j + 1];
+            EntityType et1   = _mbImpl->type_from_handle( e1 );
             // EntityHandle vertex1 = nodesAlongPolyline[i];// irrespective of the entity type i,
             // we already have the vertex there
             EntityType et2 = _mbImpl->type_from_handle( e2 );
             if( et2 == MBVERTEX ) { nodesAlongPolyline.push_back( e2 ); }
             else  // if (et2==MBEDGE)
             {
-                CartVect     coord_vert = points[ j + 1 ];
+                CartVect coord_vert = points[j + 1];
                 EntityHandle newVertex;
                 rval = _mbImpl->create_vertex( (double*)&coord_vert, newVertex );
                 MBERRORR( rval, "can't create vertex" );
@@ -1393,7 +1391,7 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
                           << " id:" << _mbImpl->id_from_handle( e2 ) << "\n";
             }
             // here, at least one is an edge
-            rval = BreakTriangle2( tri, e1, e2, nodesAlongPolyline[ j ], nodesAlongPolyline[ j + 1 ] );
+            rval = BreakTriangle2( tri, e1, e2, nodesAlongPolyline[j], nodesAlongPolyline[j + 1] );
             MBERRORR( rval, "can't break triangle 2" );
             if( et2 == MBEDGE ) _piercedEdges.insert( e2 );
             _piercedTriangles.insert( tri );
@@ -1401,7 +1399,7 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
         // nodesAlongPolyline will define a new geometric edge
         if( debug_splits )
         {
-            std::cout << "nodesAlongPolyline: " << nodesAlongPolyline.size( ) << "\n";
+            std::cout << "nodesAlongPolyline: " << nodesAlongPolyline.size() << "\n";
             std::cout << "points: " << num_points << "\n";
         }
         // if needed, create edges along polyline, or revert the existing ones, to
@@ -1436,7 +1434,7 @@ ErrorCode FBEngine::split_surface( EntityHandle face, std::vector< EntityHandle 
     // points on the polyline will be moved to the closest point location, with some constraints
     // then the sets will be reset, geometry recomputed. new vertices, new edges, etc.
 
-    Range     iniTris;
+    Range iniTris;
     ErrorCode rval;
     rval = _mbImpl->get_entities_by_type( face, MBTRI, iniTris );
     MBERRORR( rval, "can't get initial triangles" );
@@ -1444,17 +1442,17 @@ ErrorCode FBEngine::split_surface( EntityHandle face, std::vector< EntityHandle 
     // start from a triangle that is not in the triangles to delete
     // flood fill
 
-    bool closed = splittingNodes.size( ) == 0;
+    bool closed = splittingNodes.size() == 0;
     if( !closed )
     {
         //
-        if( splittingNodes.size( ) != 2 ) MBERRORR( MB_FAILURE, "need to have exactly 2 nodes for splitting" );
+        if( splittingNodes.size() != 2 ) MBERRORR( MB_FAILURE, "need to have exactly 2 nodes for splitting" );
         // we will have to split the boundary edges
         // first, find the actual boundary, and try to split with the 2 end points (nodes)
         // get the adjacent edges, and see which one has the end nodes
-        rval = split_boundary( face, splittingNodes[ 0 ] );
+        rval = split_boundary( face, splittingNodes[0] );
         MBERRORR( rval, "can't split with first node" );
-        rval = split_boundary( face, splittingNodes[ 1 ] );
+        rval = split_boundary( face, splittingNodes[1] );
         MBERRORR( rval, "can't split with second node)" );
     }
     // we will separate triangles to delete, unaffected, new_triangles,
@@ -1480,9 +1478,9 @@ ErrorCode FBEngine::split_surface( EntityHandle face, std::vector< EntityHandle 
     rval = _mbImpl->add_entities( newFace, first );
     MBERRORR( rval, "can't add first range triangles to new face" );
 
-    for( unsigned int j = 0; j < chainedEdges.size( ); j++ )
+    for( unsigned int j = 0; j < chainedEdges.size(); j++ )
     {
-        EntityHandle new_geo_edge = chainedEdges[ j ];
+        EntityHandle new_geo_edge = chainedEdges[j];
         // both faces will have the edge now
         rval = _mbImpl->add_parent_child( face, new_geo_edge );
         MBERRORR( rval, "can't add parent child relations for new edge" );
@@ -1525,11 +1523,11 @@ ErrorCode FBEngine::split_surface( EntityHandle face, std::vector< EntityHandle 
     rval = _mbImpl->delete_entities( _piercedTriangles );
 
     MBERRORR( rval, "can't delete triangles" );
-    _piercedTriangles.clear( );
+    _piercedTriangles.clear();
     // delete edges that are broke up in 2
     rval = _mbImpl->delete_entities( _piercedEdges );
     MBERRORR( rval, "can't delete edges" );
-    _piercedEdges.clear( );
+    _piercedEdges.clear();
 
     if( debug_splits )
     {
@@ -1545,7 +1543,7 @@ ErrorCode FBEngine::smooth_new_intx_points( EntityHandle face, std::vector< Enti
     // do not move nodes from the original face
     // first get all triangles, and then all nodes from those triangles
 
-    Range     tris;
+    Range tris;
     ErrorCode rval = _mbImpl->get_entities_by_type( face, MBTRI, tris );
     MBERRORR( rval, "can't get triangles" );
 
@@ -1553,14 +1551,14 @@ ErrorCode FBEngine::smooth_new_intx_points( EntityHandle face, std::vector< Enti
     rval = _mbImpl->get_connectivity( tris, ini_nodes );
     MBERRORR( rval, "can't get connectivities" );
 
-    SmoothFace* smthFace = _faces[ face ];
+    SmoothFace* smthFace = _faces[face];
 
     // get all nodes from chained edges
     Range mesh_edges;
-    for( unsigned int j = 0; j < chainedEdges.size( ); j++ )
+    for( unsigned int j = 0; j < chainedEdges.size(); j++ )
     {
         // keep adding to the range of mesh edges
-        rval = _mbImpl->get_entities_by_dimension( chainedEdges[ j ], 1, mesh_edges );
+        rval = _mbImpl->get_entities_by_dimension( chainedEdges[j], 1, mesh_edges );
         MBERRORR( rval, "can't get mesh edges" );
     }
     // nodes along polyline
@@ -1571,21 +1569,21 @@ ErrorCode FBEngine::smooth_new_intx_points( EntityHandle face, std::vector< Enti
     Range new_intx_nodes = subtract( nodes_on_polyline, ini_nodes );
 
     std::vector< double > ini_coords;
-    int                   num_points = (int)new_intx_nodes.size( );
+    int num_points = (int)new_intx_nodes.size();
     ini_coords.resize( 3 * num_points );
-    rval = _mbImpl->get_coords( new_intx_nodes, &( ini_coords[ 0 ] ) );
+    rval = _mbImpl->get_coords( new_intx_nodes, &( ini_coords[0] ) );
     MBERRORR( rval, "can't get coordinates" );
 
     int i = 0;
-    for( Range::iterator it = new_intx_nodes.begin( ); it != new_intx_nodes.end( ); ++it )
+    for( Range::iterator it = new_intx_nodes.begin(); it != new_intx_nodes.end(); ++it )
     {
         /*EntityHandle node = *it;*/
         int i3 = 3 * i;
-        smthFace->move_to_surface( ini_coords[ i3 ], ini_coords[ i3 + 1 ], ini_coords[ i3 + 2 ] );
+        smthFace->move_to_surface( ini_coords[i3], ini_coords[i3 + 1], ini_coords[i3 + 2] );
         // reset the coordinates of this node
         ++i;
     }
-    rval = _mbImpl->set_coords( new_intx_nodes, &( ini_coords[ 0 ] ) );
+    rval = _mbImpl->set_coords( new_intx_nodes, &( ini_coords[0] ) );
     MBERRORR( rval, "can't set smoothed coordinates for the new nodes" );
 
     return MB_SUCCESS;
@@ -1609,19 +1607,19 @@ ErrorCode FBEngine::separate( EntityHandle face, std::vector< EntityHandle >& ch
     // new face will have the new edge oriented positively
     // get mesh edges from geo edge (splitting gedge);
 
-    Range     mesh_edges;
+    Range mesh_edges;
     ErrorCode rval;
     // mesh_edges
-    for( unsigned int j = 0; j < chainedEdges.size( ); j++ )
+    for( unsigned int j = 0; j < chainedEdges.size(); j++ )
     {
         // this will keep adding edges to the mesh_edges range
         // when we get out, the mesh_edges will be in this range, but not ordered
-        rval = _mbImpl->get_entities_by_type( chainedEdges[ j ], MBEDGE, mesh_edges );
+        rval = _mbImpl->get_entities_by_type( chainedEdges[j], MBEDGE, mesh_edges );
         MBERRORR( rval, "can't get new polyline edges" );
         if( debug_splits )
         {
-            std::cout << " At chained edge " << j << " " << _mbImpl->id_from_handle( chainedEdges[ j ] )
-                      << " mesh_edges Range size:" << mesh_edges.size( ) << "\n";
+            std::cout << " At chained edge " << j << " " << _mbImpl->id_from_handle( chainedEdges[j] )
+                      << " mesh_edges Range size:" << mesh_edges.size() << "\n";
         }
     }
 
@@ -1640,26 +1638,26 @@ ErrorCode FBEngine::separate( EntityHandle face, std::vector< EntityHandle >& ch
     MBERRORR( rval, "can't create temp tag for separation" );
     // the deleted triangles will get a value 3, from start
     int delVal = 3;
-    for( Range::iterator it1 = this->_piercedTriangles.begin( ); it1 != _piercedTriangles.end( ); ++it1 )
+    for( Range::iterator it1 = this->_piercedTriangles.begin(); it1 != _piercedTriangles.end(); ++it1 )
     {
         EntityHandle trToDelete = *it1;
-        rval = _mbImpl->tag_set_data( separateTag, &trToDelete, 1, &delVal );
+        rval                    = _mbImpl->tag_set_data( separateTag, &trToDelete, 1, &delVal );
         MBERRORR( rval, "can't set delete tag value" );
     }
 
     // find a triangle that will be in the first range, positively oriented about the splitting edge
     EntityHandle seed1 = 0;
-    for( Range::iterator it = mesh_edges.begin( ); it != mesh_edges.end( ) && !seed1; ++it )
+    for( Range::iterator it = mesh_edges.begin(); it != mesh_edges.end() && !seed1; ++it )
     {
         EntityHandle meshEdge = *it;
-        Range        adj_tri;
+        Range adj_tri;
         rval = _mbImpl->get_adjacencies( &meshEdge, 1, 2, false, adj_tri );
         MBERRORR( rval, "can't get adj_tris to mesh edge" );
 
-        for( Range::iterator it2 = adj_tri.begin( ); it2 != adj_tri.end( ); ++it2 )
+        for( Range::iterator it2 = adj_tri.begin(); it2 != adj_tri.end(); ++it2 )
         {
             EntityHandle tr = *it2;
-            if( _piercedTriangles.find( tr ) != _piercedTriangles.end( ) )
+            if( _piercedTriangles.find( tr ) != _piercedTriangles.end() )
                 continue;  // do not attach pierced triangles, they are not good
             int num1, sense, offset;
             rval = _mbImpl->side_number( tr, meshEdge, num1, sense, offset );
@@ -1687,10 +1685,10 @@ ErrorCode FBEngine::separate( EntityHandle face, std::vector< EntityHandle >& ch
 
     // add to the do not cross edges range, all edges from initial boundary
     Range initialBoundaryEdges;
-    for( Range::iterator it = bound_edges.begin( ); it != bound_edges.end( ); ++it )
+    for( Range::iterator it = bound_edges.begin(); it != bound_edges.end(); ++it )
     {
         EntityHandle bound_edge = *it;
-        rval = _mbImpl->get_entities_by_dimension( bound_edge, 1, initialBoundaryEdges );
+        rval                    = _mbImpl->get_entities_by_dimension( bound_edge, 1, initialBoundaryEdges );
     }
 
     Range doNotCrossEdges = unite( initialBoundaryEdges, mesh_edges );  // add the splitting edges !
@@ -1700,47 +1698,47 @@ ErrorCode FBEngine::separate( EntityHandle face, std::vector< EntityHandle >& ch
     std::queue< EntityHandle > queue1;
     queue1.push( seed1 );
     std::vector< EntityHandle > arr1;
-    while( !queue1.empty( ) )
+    while( !queue1.empty() )
     {
         // start copy
-        EntityHandle currentTriangle = queue1.front( );
-        queue1.pop( );
+        EntityHandle currentTriangle = queue1.front();
+        queue1.pop();
         arr1.push_back( currentTriangle );
         // add new triangles that share an edge
         Range currentEdges;
         rval = _mbImpl->get_adjacencies( &currentTriangle, 1, 1, true, currentEdges, Interface::UNION );
         MBERRORR( rval, "can't get adjacencies" );
-        for( Range::iterator it = currentEdges.begin( ); it != currentEdges.end( ); ++it )
+        for( Range::iterator it = currentEdges.begin(); it != currentEdges.end(); ++it )
         {
             EntityHandle frontEdge = *it;
-            if( doNotCrossEdges.find( frontEdge ) == doNotCrossEdges.end( ) )
+            if( doNotCrossEdges.find( frontEdge ) == doNotCrossEdges.end() )
             {
                 // this is an edge that can be crossed
                 Range adj_tri;
                 rval = _mbImpl->get_adjacencies( &frontEdge, 1, 2, false, adj_tri, Interface::UNION );
                 MBERRORR( rval, "can't get adj_tris" );
                 // if the triangle is not in first range, add it to the queue
-                for( Range::iterator it2 = adj_tri.begin( ); it2 != adj_tri.end( ); ++it2 )
+                for( Range::iterator it2 = adj_tri.begin(); it2 != adj_tri.end(); ++it2 )
                 {
                     EntityHandle tri2 = *it2;
-                    int          val = 0;
-                    rval = _mbImpl->tag_get_data( separateTag, &tri2, 1, &val );
+                    int val           = 0;
+                    rval              = _mbImpl->tag_get_data( separateTag, &tri2, 1, &val );
                     MBERRORR( rval, "can't get tag value" );
                     if( val ) continue;
                     // else, set it to 1
-                    val = 1;
+                    val  = 1;
                     rval = _mbImpl->tag_set_data( separateTag, &tri2, 1, &val );
                     MBERRORR( rval, "can't get tag value" );
 
                     queue1.push( tri2 );
                 }
             }  // end edge do not cross
-        }  // end while
+        }      // end while
     }
 
-    std::sort( arr1.begin( ), arr1.end( ) );
+    std::sort( arr1.begin(), arr1.end() );
     // Range first1;
-    std::copy( arr1.rbegin( ), arr1.rend( ), range_inserter( first ) );
+    std::copy( arr1.rbegin(), arr1.rend(), range_inserter( first ) );
 
     // std::cout<< "\n first1.size() " << first1.size() << " first.size(): " << first.size() <<
     // "\n";
@@ -1756,13 +1754,13 @@ ErrorCode FBEngine::separate( EntityHandle face, std::vector< EntityHandle >& ch
     Range initr;
     rval = _mbImpl->get_entities_by_type( face, MBTRI, initr );
     MBERRORR( rval, "can't get tris " );
-    second = unite( initr, _newTriangles );
+    second        = unite( initr, _newTriangles );
     Range second2 = subtract( second, _piercedTriangles );
-    second = subtract( second2, first );
-    _newTriangles.clear( );
+    second        = subtract( second2, first );
+    _newTriangles.clear();
     if( debug_splits )
     {
-        std::cout << "\n second.size() " << second.size( ) << " first.size(): " << first.size( ) << "\n";
+        std::cout << "\n second.size() " << second.size() << " first.size(): " << first.size() << "\n";
         // debugging code
         EntityHandle tmpSet2;
         _mbImpl->create_meshset( MESHSET_SET, tmpSet2 );
@@ -1791,34 +1789,34 @@ ErrorCode FBEngine::create_new_gedge( std::vector< EntityHandle >& nodesAlongPol
 
     // now, get the edges, or create if not existing
     std::vector< EntityHandle > mesh_edges;
-    for( unsigned int i = 0; i < nodesAlongPolyline.size( ) - 1; i++ )
+    for( unsigned int i = 0; i < nodesAlongPolyline.size() - 1; i++ )
     {
-        EntityHandle n1 = nodesAlongPolyline[ i ], n2 = nodesAlongPolyline[ i + 1 ];
+        EntityHandle n1 = nodesAlongPolyline[i], n2 = nodesAlongPolyline[i + 1];
 
-        EntityHandle nn2[ 2 ];
-        nn2[ 0 ] = n1;
-        nn2[ 1 ] = n2;
+        EntityHandle nn2[2];
+        nn2[0] = n1;
+        nn2[1] = n2;
 
         std::vector< EntityHandle > adjacent;
         rval = _mbImpl->get_adjacencies( nn2, 2, 1, false, adjacent, Interface::INTERSECT );
         // see if there is an edge between those 2 already, and if it is oriented as we like
         bool new_edge = true;
-        if( adjacent.size( ) >= 1 )
+        if( adjacent.size() >= 1 )
         {
             // check the orientation
             const EntityHandle* conn2 = NULL;
-            int                 nnodes = 0;
-            rval = _mbImpl->get_connectivity( adjacent[ 0 ], conn2, nnodes );
+            int nnodes                = 0;
+            rval                      = _mbImpl->get_connectivity( adjacent[0], conn2, nnodes );
             MBERRORR( rval, "can't get connectivity" );
-            if( conn2[ 0 ] == nn2[ 0 ] && conn2[ 1 ] == nn2[ 1 ] )
+            if( conn2[0] == nn2[0] && conn2[1] == nn2[1] )
             {
                 // everything is fine
-                mesh_edges.push_back( adjacent[ 0 ] );
+                mesh_edges.push_back( adjacent[0] );
                 new_edge = false;  // we found one that's good, no need to create a new one
             }
             else
             {
-                _piercedEdges.insert( adjacent[ 0 ] );  // we want to remove this one, it will be not needed
+                _piercedEdges.insert( adjacent[0] );  // we want to remove this one, it will be not needed
             }
         }
         if( new_edge )
@@ -1832,21 +1830,21 @@ ErrorCode FBEngine::create_new_gedge( std::vector< EntityHandle >& nodesAlongPol
     }
 
     // add loops edges to the edge set
-    rval = _mbImpl->add_entities( new_geo_edge, &mesh_edges[ 0 ],
-                                  mesh_edges.size( ) );  // only one edge
+    rval = _mbImpl->add_entities( new_geo_edge, &mesh_edges[0],
+                                  mesh_edges.size() );  // only one edge
     MBERRORR( rval, "can't add edges to new_geo_set" );
     // check vertex sets for vertex 1 and vertex 2?
     // get all sets of dimension 0 from database, and see if our ends are here or not
 
     Range ends_geo_edge;
-    ends_geo_edge.insert( nodesAlongPolyline[ 0 ] );
-    ends_geo_edge.insert( nodesAlongPolyline[ nodesAlongPolyline.size( ) - 1 ] );
+    ends_geo_edge.insert( nodesAlongPolyline[0] );
+    ends_geo_edge.insert( nodesAlongPolyline[nodesAlongPolyline.size() - 1] );
 
-    for( unsigned int k = 0; k < ends_geo_edge.size( ); k++ )
+    for( unsigned int k = 0; k < ends_geo_edge.size(); k++ )
     {
-        EntityHandle node = ends_geo_edge[ k ];
+        EntityHandle node = ends_geo_edge[k];
         EntityHandle nodeSet;
-        bool         found = find_vertex_set_for_node( node, nodeSet );
+        bool found = find_vertex_set_for_node( node, nodeSet );
 
         if( !found )
         {
@@ -1882,20 +1880,20 @@ void FBEngine::print_debug_triangle( EntityHandle t )
 {
     std::cout << " triangle id:" << _mbImpl->id_from_handle( t ) << "\n";
     const EntityHandle* conn3 = NULL;
-    int                 nnodes = 0;
+    int nnodes                = 0;
     _mbImpl->get_connectivity( t, conn3, nnodes );
     // get coords
-    CartVect P[ 3 ];
-    _mbImpl->get_coords( conn3, 3, (double*)&P[ 0 ] );
-    std::cout << "  nodes:" << conn3[ 0 ] << " " << conn3[ 1 ] << " " << conn3[ 2 ] << "\n";
-    CartVect PP[ 3 ];
-    PP[ 0 ] = P[ 1 ] - P[ 0 ];
-    PP[ 1 ] = P[ 2 ] - P[ 1 ];
-    PP[ 2 ] = P[ 0 ] - P[ 2 ];
+    CartVect P[3];
+    _mbImpl->get_coords( conn3, 3, (double*)&P[0] );
+    std::cout << "  nodes:" << conn3[0] << " " << conn3[1] << " " << conn3[2] << "\n";
+    CartVect PP[3];
+    PP[0] = P[1] - P[0];
+    PP[1] = P[2] - P[1];
+    PP[2] = P[0] - P[2];
 
-    std::cout << "  pos:" << P[ 0 ] << " " << P[ 1 ] << " " << P[ 2 ] << "\n";
-    std::cout << "   x,y diffs " << PP[ 0 ][ 0 ] << " " << PP[ 0 ][ 1 ] << ",  " << PP[ 1 ][ 0 ] << " " << PP[ 1 ][ 1 ]
-              << ",  " << PP[ 2 ][ 0 ] << " " << PP[ 2 ][ 1 ] << "\n";
+    std::cout << "  pos:" << P[0] << " " << P[1] << " " << P[2] << "\n";
+    std::cout << "   x,y diffs " << PP[0][0] << " " << PP[0][1] << ",  " << PP[1][0] << " " << PP[1][1] << ",  "
+              << PP[2][0] << " " << PP[2][1] << "\n";
     return;
 }
 // actual breaking of triangles
@@ -1910,10 +1908,10 @@ ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHan
                                     EntityHandle n2 )  // nodesAlongPolyline are on entities!
 {
     // we have the nodes, we just need to reconnect to form new triangles
-    ErrorCode           rval;
+    ErrorCode rval;
     const EntityHandle* conn3 = NULL;
-    int                 nnodes = 0;
-    rval = _mbImpl->get_connectivity( tri, conn3, nnodes );
+    int nnodes                = 0;
+    rval                      = _mbImpl->get_connectivity( tri, conn3, nnodes );
     MBERRORR( rval, "Failed to get connectivity" );
     assert( 3 == nnodes );
 
@@ -1926,12 +1924,12 @@ ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHan
         int index = -1;
         for( index = 0; index < 3; index++ )
         {
-            if( conn3[ index ] == e1 )  // also n1
+            if( conn3[index] == e1 )  // also n1
                 break;
         }
         if( index == 3 ) return MB_FAILURE;
         // 2 triangles: n1, index+1, n2, and n1, n2, index+2
-        EntityHandle conn[ 6 ] = { n1, conn3[ ( index + 1 ) % 3 ], n2, n1, n2, conn3[ ( index + 2 ) % 3 ] };
+        EntityHandle conn[6] = { n1, conn3[( index + 1 ) % 3], n2, n1, n2, conn3[( index + 2 ) % 3] };
         EntityHandle newTriangle;
         rval = _mbImpl->create_element( MBTRI, conn, 3, newTriangle );
         MBERRORR( rval, "Failed to create a new triangle" );
@@ -1947,12 +1945,12 @@ ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHan
         int index = -1;
         for( index = 0; index < 3; index++ )
         {
-            if( conn3[ index ] == e2 )  // also n2
+            if( conn3[index] == e2 )  // also n2
                 break;
         }
         if( index == 3 ) return MB_FAILURE;
         // 2 triangles: n1, index+1, n2, and n1, n2, index+2
-        EntityHandle conn[ 6 ] = { n2, conn3[ ( index + 1 ) % 3 ], n1, n2, n1, conn3[ ( index + 2 ) % 3 ] };
+        EntityHandle conn[6] = { n2, conn3[( index + 1 ) % 3], n1, n2, n1, conn3[( index + 2 ) % 3] };
         EntityHandle newTriangle;
         rval = _mbImpl->create_element( MBTRI, conn, 3, newTriangle );
         MBERRORR( rval, "Failed to create a new triangle" );
@@ -1986,12 +1984,12 @@ ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHan
         // now, having the side number, work through
         if( debug_splits )
         {
-            std::cout << "tri conn3:" << conn3[ 0 ] << " " << conn3[ 1 ] << " " << conn3[ 2 ] << "\n";
-            std::cout << " edge1: conn12:" << conn12[ 0 ] << " " << conn12[ 1 ] << "  side: " << num1 << "\n";
-            std::cout << " edge2: conn22:" << conn22[ 0 ] << " " << conn22[ 1 ] << "  side: " << num2 << "\n";
+            std::cout << "tri conn3:" << conn3[0] << " " << conn3[1] << " " << conn3[2] << "\n";
+            std::cout << " edge1: conn12:" << conn12[0] << " " << conn12[1] << "  side: " << num1 << "\n";
+            std::cout << " edge2: conn22:" << conn22[0] << " " << conn22[1] << "  side: " << num2 << "\n";
         }
         int unaffectedSide = 3 - num1 - num2;
-        int i3 = ( unaffectedSide + 2 ) % 3;  // to 0 is 2, to 1 is 0, to 2 is 1
+        int i3             = ( unaffectedSide + 2 ) % 3;  // to 0 is 2, to 1 is 0, to 2 is 1
         // triangles will be formed with triVertexIndex , n1, n2 (in what order?)
         EntityHandle v1, v2;  // to hold the 2 nodes on edges
         if( num1 == i3 )
@@ -2008,7 +2006,7 @@ ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHan
         int i1 = ( i3 + 1 ) % 3;
         int i2 = ( i3 + 2 ) % 3;
         // we could break the surface differently
-        EntityHandle conn[ 9 ] = { conn3[ i3 ], v1, v2, v1, conn3[ i1 ], conn3[ i2 ], v2, v1, conn3[ i2 ] };
+        EntityHandle conn[9] = { conn3[i3], v1, v2, v1, conn3[i1], conn3[i2], v2, v1, conn3[i2] };
         EntityHandle newTriangle;
         if( debug_splits ) std::cout << "Split 2 edges :\n";
         rval = _mbImpl->create_element( MBTRI, conn, 3, newTriangle );
@@ -2039,25 +2037,25 @@ ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle fro
     // keep a stack of triangles to process, and do not add those already processed
     // either mark them, or maybe keep them in a local set?
     // from and to are now nodes, start from them
-    CartVect  p1, p2;  // the position of from and to
+    CartVect p1, p2;  // the position of from and to
     ErrorCode rval = _mbImpl->get_coords( &from, 1, (double*)&p1 );
     MBERRORR( rval, "failed to get 'from' coordinates" );
     rval = _mbImpl->get_coords( &to, 1, (double*)&p2 );
     MBERRORR( rval, "failed to get 'from' coordinates" );
 
     CartVect vect( p2 - p1 );
-    double   dist2 = vect.length( );
+    double dist2 = vect.length();
     if( dist2 < tolerance_segment )
     {
         // we are done, return
         return MB_SUCCESS;
     }
     CartVect normPlane = Dir * vect;
-    normPlane.normalize( );
+    normPlane.normalize();
     std::set< EntityHandle > visitedTriangles;
-    CartVect                 currentPoint = p1;
+    CartVect currentPoint = p1;
     // push the current point if it is empty
-    if( points.size( ) == 0 )
+    if( points.size() == 0 )
     {
         points.push_back( p1 );
         entities.push_back( from );  // this is a node now
@@ -2065,72 +2063,71 @@ ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle fro
 
     // these will be used in many loops
     CartVect intx = p1;  // somewhere to start
-    double   param = -1.;
+    double param  = -1.;
 
     // first intersection
     EntityHandle currentBoundary = from;  // it is a node, in the beginning
 
     vect = p2 - currentPoint;
-    while( vect.length( ) > 0. )
+    while( vect.length() > 0. )
     {
         // advance towards "to" node, from boundary handle
         EntityType etype = _mbImpl->type_from_handle( currentBoundary );
         // if vertex, look for other triangles connected which intersect our plane (defined by p1,
         // p2, dir)
         std::vector< EntityHandle > adj_tri;
-        rval = _mbImpl->get_adjacencies( &currentBoundary, 1, 2, false, adj_tri );
+        rval           = _mbImpl->get_adjacencies( &currentBoundary, 1, 2, false, adj_tri );
         unsigned int j = 0;
         EntityHandle tri;
-        for( ; j < adj_tri.size( ); j++ )
+        for( ; j < adj_tri.size(); j++ )
         {
-            tri = adj_tri[ j ];
-            if( visitedTriangles.find( tri ) != visitedTriangles.end( ) )
+            tri = adj_tri[j];
+            if( visitedTriangles.find( tri ) != visitedTriangles.end() )
                 continue;  // get another triangle, this one was already visited
             // check if it is one of the triangles that was pierced already
-            if( _piercedTriangles.find( tri ) != _piercedTriangles.end( ) ) continue;
+            if( _piercedTriangles.find( tri ) != _piercedTriangles.end() ) continue;
             // if vertex, look for opposite edge
             // if edge, look for 2 opposite edges
             // get vertices
-            int                 nnodes;
+            int nnodes;
             const EntityHandle* conn3;
             rval = _mbImpl->get_connectivity( tri, conn3, nnodes );
             MBERRORR( rval, "Failed to get connectivity" );
             // if one of the nodes is to, stop right there
             {
-                if( conn3[ 0 ] == to || conn3[ 1 ] == to || conn3[ 2 ] == to )
+                if( conn3[0] == to || conn3[1] == to || conn3[2] == to )
                 {
                     visitedTriangles.insert( tri );
                     triangles.push_back( tri );
                     currentPoint = p2;
                     points.push_back( p2 );
                     entities.push_back( to );  // we are done
-                    break;  // this is break from for loop, we still need to get out of while
+                    break;                     // this is break from for loop, we still need to get out of while
                     // we will get out, because vect will become 0, (p2-p2)
                 }
             }
-            EntityHandle nn2[ 2 ];
+            EntityHandle nn2[2];
             if( MBVERTEX == etype )
             {
-                nn2[ 0 ] = conn3[ 0 ];
-                nn2[ 1 ] = conn3[ 1 ];
-                if( nn2[ 0 ] == currentBoundary ) nn2[ 0 ] = conn3[ 2 ];
-                if( nn2[ 1 ] == currentBoundary ) nn2[ 1 ] = conn3[ 2 ];
+                nn2[0] = conn3[0];
+                nn2[1] = conn3[1];
+                if( nn2[0] == currentBoundary ) nn2[0] = conn3[2];
+                if( nn2[1] == currentBoundary ) nn2[1] = conn3[2];
                 // get coordinates
-                CartVect Pt[ 2 ];
+                CartVect Pt[2];
 
-                rval = _mbImpl->get_coords( nn2, 2, (double*)&Pt[ 0 ] );
+                rval = _mbImpl->get_coords( nn2, 2, (double*)&Pt[0] );
                 MBERRORR( rval, "Failed to get coordinates" );
                 // see the intersection
-                if( intersect_segment_and_plane_slice( Pt[ 0 ], Pt[ 1 ], currentPoint, p2, Dir, normPlane, intx,
-                                                       param ) )
+                if( intersect_segment_and_plane_slice( Pt[0], Pt[1], currentPoint, p2, Dir, normPlane, intx, param ) )
                 {
                     // we should stop for loop, and decide if it is edge or vertex
                     if( param == 0. )
-                        currentBoundary = nn2[ 0 ];
+                        currentBoundary = nn2[0];
                     else
                     {
                         if( param == 1. )
-                            currentBoundary = nn2[ 1 ];
+                            currentBoundary = nn2[1];
                         else  // param between 0 and 1, so edge
                         {
                             // find the edge between vertices
@@ -2140,8 +2137,8 @@ ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle fro
                             // triangle!!
                             rval = _mbImpl->get_adjacencies( nn2, 2, 1, true, edges1, Interface::INTERSECT );
                             MBERRORR( rval, "Failed to get edges" );
-                            if( edges1.size( ) != 1 ) MBERRORR( MB_FAILURE, "Failed to get adjacent edges to 2 nodes" );
-                            currentBoundary = edges1[ 0 ];
+                            if( edges1.size() != 1 ) MBERRORR( MB_FAILURE, "Failed to get adjacent edges to 2 nodes" );
+                            currentBoundary = edges1[0];
                         }
                     }
                     visitedTriangles.insert( tri );
@@ -2158,39 +2155,39 @@ ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle fro
             else  // this is MBEDGE, we have the other triangle to try out
             {
                 // first find the nodes from existing boundary
-                int                 nnodes2;
+                int nnodes2;
                 const EntityHandle* conn2;
                 rval = _mbImpl->get_connectivity( currentBoundary, conn2, nnodes2 );
                 MBERRORR( rval, "Failed to get connectivity" );
                 int thirdIndex = -1;
                 for( int tj = 0; tj < 3; tj++ )
                 {
-                    if( ( conn3[ tj ] != conn2[ 0 ] ) && ( conn3[ tj ] != conn2[ 1 ] ) )
+                    if( ( conn3[tj] != conn2[0] ) && ( conn3[tj] != conn2[1] ) )
                     {
                         thirdIndex = tj;
                         break;
                     }
                 }
                 if( -1 == thirdIndex ) MBERRORR( MB_FAILURE, " can't get third node" );
-                CartVect Pt[ 3 ];
-                rval = _mbImpl->get_coords( conn3, 3, (double*)&Pt[ 0 ] );
+                CartVect Pt[3];
+                rval = _mbImpl->get_coords( conn3, 3, (double*)&Pt[0] );
                 MBERRORR( rval, "Failed to get coords" );
-                int indexFirst = ( thirdIndex + 1 ) % 3;
+                int indexFirst  = ( thirdIndex + 1 ) % 3;
                 int indexSecond = ( thirdIndex + 2 ) % 3;
-                int index[ 2 ] = { indexFirst, indexSecond };
+                int index[2]    = { indexFirst, indexSecond };
                 for( int k = 0; k < 2; k++ )
                 {
-                    nn2[ 0 ] = conn3[ index[ k ] ], nn2[ 1 ] = conn3[ thirdIndex ];
-                    if( intersect_segment_and_plane_slice( Pt[ index[ k ] ], Pt[ thirdIndex ], currentPoint, p2, Dir,
+                    nn2[0] = conn3[index[k]], nn2[1] = conn3[thirdIndex];
+                    if( intersect_segment_and_plane_slice( Pt[index[k]], Pt[thirdIndex], currentPoint, p2, Dir,
                                                            normPlane, intx, param ) )
                     {
                         // we should stop for loop, and decide if it is edge or vertex
                         if( param == 0. )
-                            currentBoundary = conn3[ index[ k ] ];  // it is not really possible
+                            currentBoundary = conn3[index[k]];  // it is not really possible
                         else
                         {
                             if( param == 1. )
-                                currentBoundary = conn3[ thirdIndex ];
+                                currentBoundary = conn3[thirdIndex];
                             else  // param between 0 and 1, so edge is fine
                             {
                                 // find the edge between vertices
@@ -2200,9 +2197,9 @@ ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle fro
                                 // current triangle!!
                                 rval = _mbImpl->get_adjacencies( nn2, 2, 1, true, edges1, Interface::INTERSECT );
                                 MBERRORR( rval, "Failed to get edges" );
-                                if( edges1.size( ) != 1 )
+                                if( edges1.size() != 1 )
                                     MBERRORR( MB_FAILURE, "Failed to get adjacent edges to 2 nodes" );
-                                currentBoundary = edges1[ 0 ];
+                                currentBoundary = edges1[0];
                             }
                         }
                         visitedTriangles.insert( tri );
@@ -2231,8 +2228,8 @@ ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle fro
     }
 
     if( debug_splits )
-        std::cout << "nb entities: " << entities.size( ) << " triangles:" << triangles.size( )
-                  << " points.size(): " << points.size( ) << "\n";
+        std::cout << "nb entities: " << entities.size() << " triangles:" << triangles.size()
+                  << " points.size(): " << points.size() << "\n";
 
     return MB_SUCCESS;
 }
@@ -2257,10 +2254,10 @@ ErrorCode FBEngine::split_edge_at_point( EntityHandle edge, CartVect& point, Ent
     if( !_smooth ) return MB_FAILURE;  // call it only for smooth option...
     // maybe we should do something for linear too
 
-    SmoothCurve* curve = this->_edges[ edge ];
+    SmoothCurve* curve = this->_edges[edge];
     EntityHandle closeNode;
-    int          edgeIndex;
-    double       u = curve->u_from_position( point[ 0 ], point[ 1 ], point[ 2 ], closeNode, edgeIndex );
+    int edgeIndex;
+    double u = curve->u_from_position( point[0], point[1], point[2], closeNode, edgeIndex );
     if( 0 == closeNode )
     {
         // we really need to split an existing edge
@@ -2294,33 +2291,33 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     // the order is important...
     // these are ordered sets !!
     std::vector< EntityHandle > ents;
-    ErrorCode                   rval = _mbImpl->get_entities_by_type( edge, MBEDGE, ents );
+    ErrorCode rval = _mbImpl->get_entities_by_type( edge, MBEDGE, ents );
     if( MB_SUCCESS != rval ) return rval;
-    if( ents.size( ) < 1 ) return MB_FAILURE;  // no edges
+    if( ents.size() < 1 ) return MB_FAILURE;  // no edges
 
     const EntityHandle* conn = NULL;
-    int                 len;
+    int len;
     // find the edge connected to the splitting node
-    int          num_mesh_edges = (int)ents.size( );
-    int          index_edge;
+    int num_mesh_edges = (int)ents.size();
+    int index_edge;
     EntityHandle firstNode = 0;
     for( index_edge = 0; index_edge < num_mesh_edges; index_edge++ )
     {
-        rval = MBI->get_connectivity( ents[ index_edge ], conn, len );
+        rval = MBI->get_connectivity( ents[index_edge], conn, len );
         if( MB_SUCCESS != rval ) return rval;
-        if( index_edge == 0 ) firstNode = conn[ 0 ];  // will be used to decide vertex sets adjacencies
-        if( conn[ 0 ] == node )
+        if( index_edge == 0 ) firstNode = conn[0];  // will be used to decide vertex sets adjacencies
+        if( conn[0] == node )
         {
             if( index_edge == 0 )
             {
-                new_edge = 0;  // no need to split, it is the first node
+                new_edge = 0;       // no need to split, it is the first node
                 return MB_SUCCESS;  // no split
             }
             else
                 return MB_FAILURE;  // we should have found the node already , wrong
                                     // connectivity
         }
-        else if( conn[ 1 ] == node )
+        else if( conn[1] == node )
         {
             // we found the index of interest
             break;
@@ -2328,7 +2325,7 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     }
     if( index_edge == num_mesh_edges - 1 )
     {
-        new_edge = 0;  // no need to split, it is the last node
+        new_edge = 0;       // no need to split, it is the last node
         return MB_SUCCESS;  // no split
     }
 
@@ -2340,7 +2337,7 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
 
     // at this moment, the node set should have been already created in new_geo_edge
     EntityHandle nodeSet;  // the node set that has the node (find it!)
-    bool         found = find_vertex_set_for_node( node, nodeSet );
+    bool found = find_vertex_set_for_node( node, nodeSet );
 
     if( !found )
     {
@@ -2373,13 +2370,13 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     int remaining = num_mesh_edges - 1 - index_edge;
 
     // add edges to the edge set
-    rval = _mbImpl->add_entities( new_edge, &ents[ index_edge + 1 ], remaining );
+    rval = _mbImpl->add_entities( new_edge, &ents[index_edge + 1], remaining );
     MBERRORR( rval, "can't add edges to the new edge" );
 
     // also, remove the second node set from old edge
     // remove the edges index_edge+1 and up
 
-    rval = _mbImpl->remove_entities( edge, &ents[ index_edge + 1 ], remaining );
+    rval = _mbImpl->remove_entities( edge, &ents[index_edge + 1], remaining );
     MBERRORR( rval, "can't remove edges from the old edge" );
 
     // need to find the adjacent vertex sets
@@ -2387,27 +2384,27 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     rval = getAdjacentEntities( edge, 0, vertexRange );
 
     EntityHandle secondSet;
-    if( vertexRange.size( ) == 1 )
+    if( vertexRange.size() == 1 )
     {
         // initially a periodic edge, OK to add the new set to both edges, and the
         // second set
-        secondSet = vertexRange[ 0 ];
+        secondSet = vertexRange[0];
     }
     else
     {
-        if( vertexRange.size( ) > 2 ) return MB_FAILURE;  // something must be wrong with too many vertices
+        if( vertexRange.size() > 2 ) return MB_FAILURE;  // something must be wrong with too many vertices
         // find first node
         int k;
         for( k = 0; k < 2; k++ )
         {
             Range verts;
-            rval = _mbImpl->get_entities_by_type( vertexRange[ k ], MBVERTEX, verts );
+            rval = _mbImpl->get_entities_by_type( vertexRange[k], MBVERTEX, verts );
 
             MBERRORR( rval, "can't get vertices from vertex set" );
-            if( verts.size( ) != 1 ) MBERRORR( MB_FAILURE, " node set not defined well" );
-            if( firstNode == verts[ 0 ] )
+            if( verts.size() != 1 ) MBERRORR( MB_FAILURE, " node set not defined well" );
+            if( firstNode == verts[0] )
             {
-                secondSet = vertexRange[ 1 - k ];  // the other set; it is 1 or 0
+                secondSet = vertexRange[1 - k];  // the other set; it is 1 or 0
                 break;
             }
         }
@@ -2450,10 +2447,10 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     // these faces will be adjacent to the new edge too!
     // need to set the senses of new edge within faces
 
-    for( Range::iterator it = faceRange.begin( ); it != faceRange.end( ); ++it )
+    for( Range::iterator it = faceRange.begin(); it != faceRange.end(); ++it )
     {
         EntityHandle face = *it;
-        rval = _mbImpl->add_parent_child( face, new_edge );
+        rval              = _mbImpl->add_parent_child( face, new_edge );
         MBERRORR( rval, " can't add new edge - face parent relation" );
         int sense;
         rval = _my_geomTopoTool->get_sense( edge, face, sense );
@@ -2486,12 +2483,12 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
     // the order is important...
     // these are ordered sets !!
     std::vector< EntityHandle > ents;
-    ErrorCode                   rval = _mbImpl->get_entities_by_type( edge, MBEDGE, ents );
+    ErrorCode rval = _mbImpl->get_entities_by_type( edge, MBEDGE, ents );
     if( MB_SUCCESS != rval ) return rval;
-    if( ents.size( ) < 1 ) return MB_FAILURE;  // no edges
+    if( ents.size() < 1 ) return MB_FAILURE;  // no edges
 
     const EntityHandle* conn = NULL;
-    int                 len;
+    int len;
     // the edge connected to the splitting node is brokenEdge
     // find the small edges it is broken into, which are connected to
     // new vertex (node) and its ends; also, if necessary, reorient these small edges
@@ -2500,48 +2497,48 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
     MBERRORR( rval, "Failed to get connectivity of broken edge" );
 
     // we already created the new edges, make sure they are oriented fine; if not, revert them
-    EntityHandle conn02[] = { conn[ 0 ], node };  // first node and new node
+    EntityHandle conn02[] = { conn[0], node };  // first node and new node
     // default, intersect
     std::vector< EntityHandle > adj_edges;
     rval = _mbImpl->get_adjacencies( conn02, 2, 1, false, adj_edges );
-    if( adj_edges.size( ) < 1 || rval != MB_SUCCESS ) MBERRORR( MB_FAILURE, " Can't find small split edge" );
+    if( adj_edges.size() < 1 || rval != MB_SUCCESS ) MBERRORR( MB_FAILURE, " Can't find small split edge" );
 
     // get this edge connectivity;
-    EntityHandle        firstEdge = adj_edges[ 0 ];
+    EntityHandle firstEdge         = adj_edges[0];
     const EntityHandle* connActual = NULL;
-    rval = _mbImpl->get_connectivity( firstEdge, connActual, len );
+    rval                           = _mbImpl->get_connectivity( firstEdge, connActual, len );
     MBERRORR( rval, "Failed to get connectivity of first split edge" );
     // if it is the same as conn02, we are happy
-    if( conn02[ 0 ] != connActual[ 0 ] )
+    if( conn02[0] != connActual[0] )
     {
         // reset connectivity of edge
         rval = _mbImpl->set_connectivity( firstEdge, conn02, 2 );
         MBERRORR( rval, "Failed to reset connectivity of first split edge" );
     }
     //  now treat the second edge
-    adj_edges.clear( );  //
-    EntityHandle conn21[] = { node, conn[ 1 ] };  //  new node and second node
-    rval = _mbImpl->get_adjacencies( conn21, 2, 1, false, adj_edges );
-    if( adj_edges.size( ) < 1 || rval != MB_SUCCESS ) MBERRORR( MB_FAILURE, " Can't find second small split edge" );
+    adj_edges.clear();                          //
+    EntityHandle conn21[] = { node, conn[1] };  //  new node and second node
+    rval                  = _mbImpl->get_adjacencies( conn21, 2, 1, false, adj_edges );
+    if( adj_edges.size() < 1 || rval != MB_SUCCESS ) MBERRORR( MB_FAILURE, " Can't find second small split edge" );
 
     // get this edge connectivity;
-    EntityHandle secondEdge = adj_edges[ 0 ];
-    rval = _mbImpl->get_connectivity( firstEdge, connActual, len );
+    EntityHandle secondEdge = adj_edges[0];
+    rval                    = _mbImpl->get_connectivity( firstEdge, connActual, len );
     MBERRORR( rval, "Failed to get connectivity of first split edge" );
     // if it is the same as conn21, we are happy
-    if( conn21[ 0 ] != connActual[ 0 ] )
+    if( conn21[0] != connActual[0] )
     {
         // reset connectivity of edge
         rval = _mbImpl->set_connectivity( secondEdge, conn21, 2 );
         MBERRORR( rval, "Failed to reset connectivity of first split edge" );
     }
 
-    int num_mesh_edges = (int)ents.size( );
+    int num_mesh_edges = (int)ents.size();
     int index_edge;  // this is the index of the edge that will be removed (because it is split)
     // the rest of edges will be put in order in the (remaining) edge and new edge
 
     for( index_edge = 0; index_edge < num_mesh_edges; index_edge++ )
-        if( brokenEdge == ents[ index_edge ] ) break;
+        if( brokenEdge == ents[index_edge] ) break;
     if( index_edge >= num_mesh_edges ) MBERRORR( MB_FAILURE, "can't find the broken edge" );
 
     // so the edges up to index_edge and firstEdge, will form the "old" edge
@@ -2555,7 +2552,7 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
 
     // at this moment, the node set should have been already created in new_geo_edge
     EntityHandle nodeSet;  // the node set that has the node (find it!)
-    bool         found = find_vertex_set_for_node( node, nodeSet );
+    bool found = find_vertex_set_for_node( node, nodeSet );
 
     if( !found )
     {
@@ -2591,13 +2588,13 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
     rval = _mbImpl->add_entities( new_edge, &secondEdge, 1 );  // add the second split edge to new edge
     MBERRORR( rval, "can't add second split edge to the new edge" );
     // then add the rest
-    rval = _mbImpl->add_entities( new_edge, &ents[ index_edge + 1 ], remaining );
+    rval = _mbImpl->add_entities( new_edge, &ents[index_edge + 1], remaining );
     MBERRORR( rval, "can't add edges to the new edge" );
 
     // also, remove the second node set from old edge
     // remove the edges index_edge and up
 
-    rval = _mbImpl->remove_entities( edge, &ents[ index_edge ], remaining + 1 );  // include the
+    rval = _mbImpl->remove_entities( edge, &ents[index_edge], remaining + 1 );  // include the
     MBERRORR( rval, "can't remove edges from the old edge" );
     // add the firstEdge too
     rval = _mbImpl->add_entities( edge, &firstEdge, 1 );  // add the second split edge to new edge
@@ -2608,33 +2605,33 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
     rval = getAdjacentEntities( edge, 0, vertexRange );
 
     EntityHandle secondSet;
-    if( vertexRange.size( ) == 1 )
+    if( vertexRange.size() == 1 )
     {
         // initially a periodic edge, OK to add the new set to both edges, and the
         // second set
-        secondSet = vertexRange[ 0 ];
+        secondSet = vertexRange[0];
     }
     else
     {
-        if( vertexRange.size( ) > 2 ) return MB_FAILURE;  // something must be wrong with too many vertices
+        if( vertexRange.size() > 2 ) return MB_FAILURE;  // something must be wrong with too many vertices
         // find first node
         EntityHandle firstNode;
 
-        rval = MBI->get_connectivity( ents[ 0 ], conn, len );
+        rval = MBI->get_connectivity( ents[0], conn, len );
         if( MB_SUCCESS != rval ) return rval;
-        firstNode = conn[ 0 ];  // this is the first node of the initial edge
-                                // we will use it to identify the vertex set associated with it
+        firstNode = conn[0];  // this is the first node of the initial edge
+                              // we will use it to identify the vertex set associated with it
         int k;
         for( k = 0; k < 2; k++ )
         {
             Range verts;
-            rval = _mbImpl->get_entities_by_type( vertexRange[ k ], MBVERTEX, verts );
+            rval = _mbImpl->get_entities_by_type( vertexRange[k], MBVERTEX, verts );
 
             MBERRORR( rval, "can't get vertices from vertex set" );
-            if( verts.size( ) != 1 ) MBERRORR( MB_FAILURE, " node set not defined well" );
-            if( firstNode == verts[ 0 ] )
+            if( verts.size() != 1 ) MBERRORR( MB_FAILURE, " node set not defined well" );
+            if( firstNode == verts[0] )
             {
-                secondSet = vertexRange[ 1 - k ];  // the other set; it is 1 or 0
+                secondSet = vertexRange[1 - k];  // the other set; it is 1 or 0
                 break;
             }
         }
@@ -2677,10 +2674,10 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
     // these faces will be adjacent to the new edge too!
     // need to set the senses of new edge within faces
 
-    for( Range::iterator it = faceRange.begin( ); it != faceRange.end( ); ++it )
+    for( Range::iterator it = faceRange.begin(); it != faceRange.end(); ++it )
     {
         EntityHandle face = *it;
-        rval = _mbImpl->add_parent_child( face, new_edge );
+        rval              = _mbImpl->add_parent_child( face, new_edge );
         MBERRORR( rval, " can't add new edge - face parent relation" );
         int sense;
         rval = _my_geomTopoTool->get_sense( edge, face, sense );
@@ -2701,12 +2698,12 @@ ErrorCode FBEngine::split_boundary( EntityHandle face, EntityHandle atNode )
         std::cout << "Split face " << _mbImpl->id_from_handle( face )
                   << " at node:" << _mbImpl->id_from_handle( atNode ) << "\n";
     }
-    Range     bound_edges;
+    Range bound_edges;
     ErrorCode rval = getAdjacentEntities( face, 1, bound_edges );
     MBERRORR( rval, " can't get boundary edges" );
-    bool brokEdge = _brokenEdges.find( atNode ) != _brokenEdges.end( );
+    bool brokEdge = _brokenEdges.find( atNode ) != _brokenEdges.end();
 
-    for( Range::iterator it = bound_edges.begin( ); it != bound_edges.end( ); ++it )
+    for( Range::iterator it = bound_edges.begin(); it != bound_edges.end(); ++it )
     {
         EntityHandle b_edge = *it;
         // get all edges in range
@@ -2715,8 +2712,8 @@ ErrorCode FBEngine::split_boundary( EntityHandle face, EntityHandle atNode )
         MBERRORR( rval, " can't get mesh edges" );
         if( brokEdge )
         {
-            EntityHandle brokenEdge = _brokenEdges[ atNode ];
-            if( mesh_edges.find( brokenEdge ) != mesh_edges.end( ) )
+            EntityHandle brokenEdge = _brokenEdges[atNode];
+            if( mesh_edges.find( brokenEdge ) != mesh_edges.end() )
             {
                 EntityHandle new_edge;
                 rval = split_bedge_at_new_mesh_node( b_edge, atNode, brokenEdge, new_edge );
@@ -2729,7 +2726,7 @@ ErrorCode FBEngine::split_boundary( EntityHandle face, EntityHandle atNode )
             rval = _mbImpl->get_connectivity( mesh_edges, nodes );
             MBERRORR( rval, " can't get nodes from mesh edges" );
 
-            if( nodes.find( atNode ) != nodes.end( ) )
+            if( nodes.find( atNode ) != nodes.end() )
             {
                 // we found our boundary edge candidate
                 EntityHandle new_edge;
@@ -2746,27 +2743,27 @@ ErrorCode FBEngine::split_boundary( EntityHandle face, EntityHandle atNode )
 
 bool FBEngine::find_vertex_set_for_node( EntityHandle iNode, EntityHandle& oVertexSet )
 {
-    bool  found = false;
+    bool found = false;
     Range vertex_sets;
 
-    const int         zero = 0;
+    const int zero               = 0;
     const void* const zero_val[] = { &zero };
-    Tag               geom_tag;
-    ErrorCode         rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );
+    Tag geom_tag;
+    ErrorCode rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag );
     if( MB_SUCCESS != rval ) return false;
     rval = _mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, zero_val, 1, vertex_sets );
     if( MB_SUCCESS != rval ) return false;
     // local _gsets, as we might have not updated the local lists
     // see if ends of geo edge generated is in a geo set 0 or not
 
-    for( Range::iterator vsit = vertex_sets.begin( ); vsit != vertex_sets.end( ); ++vsit )
+    for( Range::iterator vsit = vertex_sets.begin(); vsit != vertex_sets.end(); ++vsit )
     {
         EntityHandle vset = *vsit;
         // is the node part of this set?
         if( _mbImpl->contains_entities( vset, &iNode, 1 ) )
         {
 
-            found = true;
+            found      = true;
             oVertexSet = vset;
             break;
         }
@@ -2780,8 +2777,8 @@ ErrorCode FBEngine::redistribute_boundary_edges_to_faces( EntityHandle face, Ent
     // so far, original boundary edges are all parent/child relations for face
     // we should get them all, and see if they are truly adjacent to face or newFace
     // decide also on the orientation/sense with respect to the triangles
-    Range     r1;  // range in old face
-    Range     r2;  // range of tris in new face
+    Range r1;  // range in old face
+    Range r2;  // range of tris in new face
     ErrorCode rval = _mbImpl->get_entities_by_dimension( face, 2, r1 );
     MBERRORR( rval, " can't get triangles from old face" );
     rval = _mbImpl->get_entities_by_dimension( newFace, 2, r2 );
@@ -2792,34 +2789,34 @@ ErrorCode FBEngine::redistribute_boundary_edges_to_faces( EntityHandle face, Ent
     rval = _mbImpl->get_child_meshsets( face, children );  // only direct children are of interest
     MBERRORR( rval, " can't get children sets from face" );
 
-    for( Range::iterator it = children.begin( ); it != children.end( ); ++it )
+    for( Range::iterator it = children.begin(); it != children.end(); ++it )
     {
         EntityHandle edge = *it;
-        if( std::find( chainedEdges.begin( ), chainedEdges.end( ), edge ) != chainedEdges.end( ) )
+        if( std::find( chainedEdges.begin(), chainedEdges.end(), edge ) != chainedEdges.end() )
             continue;  // we already set this one fine
         // get one mesh edge from the edge; we have to get all of them!!
         if( _my_geomTopoTool->dimension( edge ) != 1 ) continue;  // not an edge
         Range mesh_edges;
         rval = _mbImpl->get_entities_by_handle( edge, mesh_edges );
         MBERRORR( rval, " can't get mesh edges from edge" );
-        if( mesh_edges.empty( ) ) MBERRORR( MB_FAILURE, " no mesh edges" );
-        EntityHandle mesh_edge = mesh_edges[ 0 ];  // first one is enough
+        if( mesh_edges.empty() ) MBERRORR( MB_FAILURE, " no mesh edges" );
+        EntityHandle mesh_edge = mesh_edges[0];  // first one is enough
         // get its triangles; see which one is in r1 or r2; it should not be in both
         Range triangles;
         rval = _mbImpl->get_adjacencies( &mesh_edge, 1, 2, false, triangles );
         MBERRORR( rval, " can't get adjacent triangles" );
         Range intx1 = intersect( triangles, r1 );
         Range intx2 = intersect( triangles, r2 );
-        if( !intx1.empty( ) && !intx2.empty( ) ) MBERRORR( MB_FAILURE, " at least one should be empty" );
+        if( !intx1.empty() && !intx2.empty() ) MBERRORR( MB_FAILURE, " at least one should be empty" );
 
-        if( intx2.empty( ) )
+        if( intx2.empty() )
         {
             // it means it is in the range r1; the sense should be fine, no need to reset
             // the sense should have been fine, also
             continue;
         }
         // so it must be a triangle in r2;
-        EntityHandle triangle = intx2[ 0 ];  // one triangle only
+        EntityHandle triangle = intx2[0];  // one triangle only
         // remove the edge from boundary of face, and add it to the boundary of newFace
         // remove_parent_child( EntityHandle parent,  EntityHandle child )
         rval = _mbImpl->remove_parent_child( face, edge );
@@ -2844,7 +2841,7 @@ ErrorCode FBEngine::set_neumann_tags( EntityHandle face, EntityHandle newFace )
 {
     // these are for debugging purposes only
     // check the initial tag, then
-    Tag       ntag;
+    Tag ntag;
     ErrorCode rval = _mbImpl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, ntag );
     MBERRORR( rval, "can't get tag handle" );
     // check the value for face
@@ -2866,15 +2863,15 @@ ErrorCode FBEngine::set_neumann_tags( EntityHandle face, EntityHandle newFace )
 
 // split the quads if needed; it will create a new gtt, which will
 // contain triangles instead of quads
-ErrorCode FBEngine::split_quads( )
+ErrorCode FBEngine::split_quads()
 {
     // first see if we have any quads in the 2d faces
     //  _my_gsets[2] is a range of surfaces (moab sets of dimension 2)
     int num_quads = 0;
-    for( Range::iterator it = _my_gsets[ 2 ].begin( ); it != _my_gsets[ 2 ].end( ); ++it )
+    for( Range::iterator it = _my_gsets[2].begin(); it != _my_gsets[2].end(); ++it )
     {
         EntityHandle surface = *it;
-        int          num_q = 0;
+        int num_q            = 0;
         _mbImpl->get_number_entities_by_type( surface, MBQUAD, num_q );
         num_quads += num_q;
     }
@@ -2882,7 +2879,7 @@ ErrorCode FBEngine::split_quads( )
     if( num_quads == 0 ) return MB_SUCCESS;  // nothing to do
 
     GeomTopoTool* new_gtt = NULL;
-    ErrorCode     rval = _my_geomTopoTool->duplicate_model( new_gtt );
+    ErrorCode rval        = _my_geomTopoTool->duplicate_model( new_gtt );
     MBERRORR( rval, "can't duplicate model" );
     if( this->_t_created ) delete _my_geomTopoTool;
 
@@ -2900,38 +2897,38 @@ ErrorCode FBEngine::split_quads( )
     // maybe we will come up with a better criteria, but for the time being, it should be fine.
     // what we will do: we will remove all quads from the surface sets, and split them
 
-    for( Range::iterator it2 = _my_gsets[ 2 ].begin( ); it2 != _my_gsets[ 2 ].end( ); ++it2 )
+    for( Range::iterator it2 = _my_gsets[2].begin(); it2 != _my_gsets[2].end(); ++it2 )
     {
         EntityHandle surface = *it2;
-        Range        quads;
+        Range quads;
         rval = _mbImpl->get_entities_by_type( surface, MBQUAD, quads );
         MBERRORR( rval, "can't get quads from the surface set" );
         rval = _mbImpl->remove_entities( surface, quads );
         MBERRORR( rval, "can't remove quads from the surface set" );  // they are not deleted, just
                                                                       // removed from the set
-        for( Range::iterator it = quads.begin( ); it != quads.end( ); ++it )
+        for( Range::iterator it = quads.begin(); it != quads.end(); ++it )
         {
-            EntityHandle        quad = *it;
-            int                 nnodes;
+            EntityHandle quad = *it;
+            int nnodes;
             const EntityHandle* conn;
             rval = _mbImpl->get_connectivity( quad, conn, nnodes );
             MBERRORR( rval, "can't get quad connectivity" );
             // get all vertices position, to see which one is the shortest diagonal
-            CartVect pos[ 4 ];
-            rval = _mbImpl->get_coords( conn, 4, (double*)&pos[ 0 ] );
+            CartVect pos[4];
+            rval = _mbImpl->get_coords( conn, 4, (double*)&pos[0] );
             MBERRORR( rval, "can't get node coordinates" );
-            bool diag1 = ( ( pos[ 2 ] - pos[ 0 ] ).length_squared( ) < ( pos[ 3 ] - pos[ 1 ] ).length_squared( ) );
-            EntityHandle newTris[ 2 ];
-            EntityHandle tri1[ 3 ] = { conn[ 0 ], conn[ 1 ], conn[ 2 ] };
-            EntityHandle tri2[ 3 ] = { conn[ 0 ], conn[ 2 ], conn[ 3 ] };
+            bool diag1 = ( ( pos[2] - pos[0] ).length_squared() < ( pos[3] - pos[1] ).length_squared() );
+            EntityHandle newTris[2];
+            EntityHandle tri1[3] = { conn[0], conn[1], conn[2] };
+            EntityHandle tri2[3] = { conn[0], conn[2], conn[3] };
             if( !diag1 )
             {
-                tri1[ 2 ] = conn[ 3 ];
-                tri2[ 0 ] = conn[ 1 ];
+                tri1[2] = conn[3];
+                tri2[0] = conn[1];
             }
-            rval = _mbImpl->create_element( MBTRI, tri1, 3, newTris[ 0 ] );
+            rval = _mbImpl->create_element( MBTRI, tri1, 3, newTris[0] );
             MBERRORR( rval, "can't create triangle 1" );
-            rval = _mbImpl->create_element( MBTRI, tri2, 3, newTris[ 1 ] );
+            rval = _mbImpl->create_element( MBTRI, tri2, 3, newTris[1] );
             MBERRORR( rval, "can't create triangle 2" );
             rval = _mbImpl->add_entities( surface, newTris, 2 );
             MBERRORR( rval, "can't add triangles to the set" );
@@ -2944,10 +2941,10 @@ ErrorCode FBEngine::boundary_mesh_edges_on_face( EntityHandle face, Range& bound
 {
     // this list is used only for finding the intersecting mesh edge for starting the
     // polygonal cutting line at boundary (if !closed)
-    Range     bound_edges;
+    Range bound_edges;
     ErrorCode rval = getAdjacentEntities( face, 1, bound_edges );
     MBERRORR( rval, " can't get boundary edges" );
-    for( Range::iterator it = bound_edges.begin( ); it != bound_edges.end( ); ++it )
+    for( Range::iterator it = bound_edges.begin(); it != bound_edges.end(); ++it )
     {
         EntityHandle b_edge = *it;
         // get all edges in range
@@ -2962,11 +2959,11 @@ ErrorCode FBEngine::boundary_nodes_on_face( EntityHandle face, std::vector< Enti
     // even if we repeat some nodes, it is OK
     // this list is used only for finding the closest boundary node for starting the
     // polygonal cutting line at boundary (if !closed)
-    Range     bound_edges;
+    Range bound_edges;
     ErrorCode rval = getAdjacentEntities( face, 1, bound_edges );
     MBERRORR( rval, " can't get boundary edges" );
     Range b_nodes;
-    for( Range::iterator it = bound_edges.begin( ); it != bound_edges.end( ); ++it )
+    for( Range::iterator it = bound_edges.begin(); it != bound_edges.end(); ++it )
     {
         EntityHandle b_edge = *it;
         // get all edges in range
@@ -2977,8 +2974,8 @@ ErrorCode FBEngine::boundary_nodes_on_face( EntityHandle face, std::vector< Enti
         MBERRORR( rval, " can't get nodes from mesh edges" );
     }
     // create now a vector based on Range of nodes
-    boundary_nodes.resize( b_nodes.size( ) );
-    std::copy( b_nodes.begin( ), b_nodes.end( ), boundary_nodes.begin( ) );
+    boundary_nodes.resize( b_nodes.size() );
+    std::copy( b_nodes.begin(), b_nodes.end(), boundary_nodes.begin() );
     return MB_SUCCESS;
 }
 // used for splitting an edge
@@ -2986,17 +2983,17 @@ ErrorCode FBEngine::split_internal_edge( EntityHandle& edge, EntityHandle& newVe
 {
     // split the edge, and form 4 new triangles and 2 edges
     // get 2 triangles adjacent to edge
-    Range     adj_tri;
+    Range adj_tri;
     ErrorCode rval = _mbImpl->get_adjacencies( &edge, 1, 2, false, adj_tri );
     MBERRORR( rval, "can't get adj_tris" );
     adj_tri = subtract( adj_tri, _piercedTriangles );
-    if( adj_tri.size( ) >= 3 ) { std::cout << "WARNING: non manifold geometry. Are you sure?"; }
-    for( Range::iterator it = adj_tri.begin( ); it != adj_tri.end( ); ++it )
+    if( adj_tri.size() >= 3 ) { std::cout << "WARNING: non manifold geometry. Are you sure?"; }
+    for( Range::iterator it = adj_tri.begin(); it != adj_tri.end(); ++it )
     {
         EntityHandle tri = *it;
         _piercedTriangles.insert( tri );
         const EntityHandle* conn3;
-        int                 nnodes;
+        int nnodes;
         rval = _mbImpl->get_connectivity( tri, conn3, nnodes );
         MBERRORR( rval, "can't get nodes" );
         int num1, sense, offset;
@@ -3007,8 +3004,8 @@ ErrorCode FBEngine::split_internal_edge( EntityHandle& edge, EntityHandle& newVe
         int num2 = ( num1 + 1 ) % 3;
         int num3 = ( num2 + 1 ) % 3;
         // the edge from num1 to num2 is split into 2 edges
-        EntityHandle t1[] = { conn3[ num2 ], conn3[ num3 ], newVertex };
-        EntityHandle t2[] = { conn3[ num1 ], newVertex, conn3[ num3 ] };
+        EntityHandle t1[] = { conn3[num2], conn3[num3], newVertex };
+        EntityHandle t2[] = { conn3[num1], newVertex, conn3[num3] };
         EntityHandle newTriangle, newTriangle2;
         rval = _mbImpl->create_element( MBTRI, t1, 3, newTriangle );
         MBERRORR( rval, "can't create triangle" );
@@ -3020,7 +3017,7 @@ ErrorCode FBEngine::split_internal_edge( EntityHandle& edge, EntityHandle& newVe
         std::vector< EntityHandle > edges0;
         rval = _mbImpl->get_adjacencies( &newTriangle, 1, 1, true, edges0 );
         MBERRORR( rval, "can't get new edges" );
-        edges0.clear( );
+        edges0.clear();
         rval = _mbImpl->get_adjacencies( &newTriangle2, 1, 1, true, edges0 );
         MBERRORR( rval, "can't get new edges" );
         if( debug_splits )
@@ -3039,13 +3036,13 @@ ErrorCode FBEngine::divide_triangle( EntityHandle triangle, EntityHandle& newVer
 {
     //
     _piercedTriangles.insert( triangle );
-    int                 nnodes = 0;
+    int nnodes                = 0;
     const EntityHandle* conn3 = NULL;
-    ErrorCode           rval = _mbImpl->get_connectivity( triangle, conn3, nnodes );
+    ErrorCode rval            = _mbImpl->get_connectivity( triangle, conn3, nnodes );
     MBERRORR( rval, "can't get nodes" );
-    EntityHandle t1[] = { conn3[ 0 ], conn3[ 1 ], newVertex };
-    EntityHandle t2[] = { conn3[ 1 ], conn3[ 2 ], newVertex };
-    EntityHandle t3[] = { conn3[ 2 ], conn3[ 0 ], newVertex };
+    EntityHandle t1[] = { conn3[0], conn3[1], newVertex };
+    EntityHandle t2[] = { conn3[1], conn3[2], newVertex };
+    EntityHandle t3[] = { conn3[2], conn3[0], newVertex };
     EntityHandle newTriangle, newTriangle2, newTriangle3;
     rval = _mbImpl->create_element( MBTRI, t1, 3, newTriangle );
     MBERRORR( rval, "can't create triangle" );
@@ -3061,7 +3058,7 @@ ErrorCode FBEngine::divide_triangle( EntityHandle triangle, EntityHandle& newVer
     std::vector< EntityHandle > edges0;
     rval = _mbImpl->get_adjacencies( &newTriangle, 1, 1, true, edges0 );
     MBERRORR( rval, "can't get new edges" );
-    edges0.clear( );
+    edges0.clear();
     rval = _mbImpl->get_adjacencies( &newTriangle2, 1, 1, true, edges0 );
     MBERRORR( rval, "can't get new edges" );
     if( debug_splits )
@@ -3074,9 +3071,9 @@ ErrorCode FBEngine::divide_triangle( EntityHandle triangle, EntityHandle& newVer
         _mbImpl->list_entity( newTriangle2 );
         print_debug_triangle( newTriangle2 );
         std::cout << "original nodes in tri:\n";
-        _mbImpl->list_entity( conn3[ 0 ] );
-        _mbImpl->list_entity( conn3[ 1 ] );
-        _mbImpl->list_entity( conn3[ 2 ] );
+        _mbImpl->list_entity( conn3[0] );
+        _mbImpl->list_entity( conn3[1] );
+        _mbImpl->list_entity( conn3[2] );
     }
     return MB_SUCCESS;
 }
@@ -3130,12 +3127,12 @@ ErrorCode FBEngine::create_volume_with_direction( EntityHandle newFace1, EntityH
     rval = _mbImpl->get_child_meshsets( newFace2, edges2 );  // no hops
     MBERRORR( rval, "can't get children edges for second face, top" );
 
-    if( edges1.size( ) != edges2.size( ) ) MBERRORR( MB_FAILURE, "wrong correspondence " );
+    if( edges1.size() != edges2.size() ) MBERRORR( MB_FAILURE, "wrong correspondence " );
 
-    for( unsigned int i = 0; i < edges1.size( ); ++i )
+    for( unsigned int i = 0; i < edges1.size(); ++i )
     {
         EntityHandle newLatFace;
-        rval = weave_lateral_face_from_edges( edges1[ i ], edges2[ i ], direction, newLatFace );
+        rval = weave_lateral_face_from_edges( edges1[i], edges2[i], direction, newLatFace );
         MBERRORR( rval, "can't weave lateral face" );
         rval = _mbImpl->add_parent_child( volume, newLatFace );
         MBERRORR( rval, "can't add lateral face to volume" );
@@ -3145,7 +3142,7 @@ ErrorCode FBEngine::create_volume_with_direction( EntityHandle newFace1, EntityH
         MBERRORR( rval, "can't set lateral face sense to the volume" );
     }
 
-    rval = set_default_neumann_tags( );
+    rval = set_default_neumann_tags();
     MBERRORR( rval, "can't set new neumann tags" );
 
     return MB_SUCCESS;
@@ -3154,21 +3151,21 @@ ErrorCode FBEngine::create_volume_with_direction( EntityHandle newFace1, EntityH
 ErrorCode FBEngine::get_nodes_from_edge( EntityHandle gedge, std::vector< EntityHandle >& nodes )
 {
     std::vector< EntityHandle > ents;
-    ErrorCode                   rval = _mbImpl->get_entities_by_type( gedge, MBEDGE, ents );
+    ErrorCode rval = _mbImpl->get_entities_by_type( gedge, MBEDGE, ents );
     if( MB_SUCCESS != rval ) return rval;
-    if( ents.size( ) < 1 ) return MB_FAILURE;
+    if( ents.size() < 1 ) return MB_FAILURE;
 
-    nodes.resize( ents.size( ) + 1 );
+    nodes.resize( ents.size() + 1 );
     const EntityHandle* conn = NULL;
-    int                 len;
-    for( unsigned int i = 0; i < ents.size( ); ++i )
+    int len;
+    for( unsigned int i = 0; i < ents.size(); ++i )
     {
-        rval = _mbImpl->get_connectivity( ents[ i ], conn, len );
+        rval = _mbImpl->get_connectivity( ents[i], conn, len );
         MBERRORR( rval, "can't get edge connectivity" );
-        nodes[ i ] = conn[ 0 ];
+        nodes[i] = conn[0];
     }
     // the last one is conn[1]
-    nodes[ ents.size( ) ] = conn[ 1 ];
+    nodes[ents.size()] = conn[1];
     return MB_SUCCESS;
 }
 ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHandle tEdge, double* direction,
@@ -3180,7 +3177,7 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     ErrorCode rval = _mbImpl->create_meshset( MESHSET_SET, newLatFace );
     MBERRORR( rval, "can't create new lateral face" );
 
-    EntityHandle v[ 4 ];  // vertex sets
+    EntityHandle v[4];  // vertex sets
     // bot edge will be v1->v2
     // top edge will be v3->v4
     // we need to create edges from v1 to v3 and from v2 to v4
@@ -3188,37 +3185,37 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     rval = _mbImpl->get_child_meshsets( bEdge, adj );
     MBERRORR( rval, "can't get children nodes" );
     bool periodic = false;
-    if( adj.size( ) == 1 )
+    if( adj.size() == 1 )
     {
-        v[ 0 ] = v[ 1 ] = adj[ 0 ];
-        periodic = true;
+        v[0] = v[1] = adj[0];
+        periodic    = true;
     }
     else
     {
-        v[ 0 ] = adj[ 0 ];
-        v[ 1 ] = adj[ 1 ];
+        v[0] = adj[0];
+        v[1] = adj[1];
     }
     int senseB;
-    rval = getEgVtxSense( bEdge, v[ 0 ], v[ 1 ], senseB );
+    rval = getEgVtxSense( bEdge, v[0], v[1], senseB );
     MBERRORR( rval, "can't get bottom edge sense" );
     if( -1 == senseB )
     {
-        v[ 1 ] = adj[ 0 ];  // so , bEdge will be oriented from v[0] to v[1], and will start at
-                            // nodes1, coords1..
-        v[ 0 ] = adj[ 1 ];
+        v[1] = adj[0];  // so , bEdge will be oriented from v[0] to v[1], and will start at
+                        // nodes1, coords1..
+        v[0] = adj[1];
     }
-    adj.clear( );
+    adj.clear();
     rval = _mbImpl->get_child_meshsets( tEdge, adj );
     MBERRORR( rval, "can't get children nodes" );
-    if( adj.size( ) == 1 )
+    if( adj.size() == 1 )
     {
-        v[ 2 ] = v[ 3 ] = adj[ 0 ];
+        v[2] = v[3] = adj[0];
         if( !periodic ) MBERRORR( MB_FAILURE, "top edge is periodic, but bottom edge is not" );
     }
     else
     {
-        v[ 2 ] = adj[ 0 ];
-        v[ 3 ] = adj[ 1 ];
+        v[2] = adj[0];
+        v[3] = adj[1];
         if( periodic ) MBERRORR( MB_FAILURE, "top edge is not periodic, but bottom edge is" );
     }
 
@@ -3233,63 +3230,63 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     MBERRORR( rval, "can't get nodes from top edge" );
 
     std::vector< CartVect > coords1, coords2;
-    coords1.resize( nodes1.size( ) );
-    coords2.resize( nodes2.size( ) );
+    coords1.resize( nodes1.size() );
+    coords2.resize( nodes2.size() );
 
-    int N1 = (int)nodes1.size( );
-    int N2 = (int)nodes2.size( );
+    int N1 = (int)nodes1.size();
+    int N2 = (int)nodes2.size();
 
-    rval = _mbImpl->get_coords( &( nodes1[ 0 ] ), nodes1.size( ), (double*)&( coords1[ 0 ] ) );
+    rval = _mbImpl->get_coords( &( nodes1[0] ), nodes1.size(), (double*)&( coords1[0] ) );
     MBERRORR( rval, "can't get coords of nodes from bott edge" );
 
-    rval = _mbImpl->get_coords( &( nodes2[ 0 ] ), nodes2.size( ), (double*)&( coords2[ 0 ] ) );
+    rval = _mbImpl->get_coords( &( nodes2[0] ), nodes2.size(), (double*)&( coords2[0] ) );
     MBERRORR( rval, "can't get coords of nodes from top edge" );
     CartVect up( direction );
 
     // see if the start and end coordinates are matching, if not, reverse edge 2 nodes and
     // coordinates
-    CartVect v1 = ( coords1[ 0 ] - coords2[ 0 ] ) * up;
-    CartVect v2 = ( coords1[ 0 ] - coords2[ N2 - 1 ] ) * up;
-    if( v1.length_squared( ) > v2.length_squared( ) )
+    CartVect v1 = ( coords1[0] - coords2[0] ) * up;
+    CartVect v2 = ( coords1[0] - coords2[N2 - 1] ) * up;
+    if( v1.length_squared() > v2.length_squared() )
     {
         // we need to reverse coords2 and node2, as nodes are not above each other
         // the edges need to be found between v0 and v3, v1 and v2!
-        for( unsigned int k = 0; k < nodes2.size( ) / 2; k++ )
+        for( unsigned int k = 0; k < nodes2.size() / 2; k++ )
         {
-            EntityHandle tmp = nodes2[ k ];
-            nodes2[ k ] = nodes2[ N2 - 1 - k ];
-            nodes2[ N2 - 1 - k ] = tmp;
-            CartVect tv = coords2[ k ];
-            coords2[ k ] = coords2[ N2 - 1 - k ];
-            coords2[ N2 - 1 - k ] = tv;
+            EntityHandle tmp    = nodes2[k];
+            nodes2[k]           = nodes2[N2 - 1 - k];
+            nodes2[N2 - 1 - k]  = tmp;
+            CartVect tv         = coords2[k];
+            coords2[k]          = coords2[N2 - 1 - k];
+            coords2[N2 - 1 - k] = tv;
         }
     }
     // make sure v[2] has nodes2[0], if not, reverse v[2] and v[3]
-    if( !_mbImpl->contains_entities( v[ 2 ], &( nodes2[ 0 ] ), 1 ) )
+    if( !_mbImpl->contains_entities( v[2], &( nodes2[0] ), 1 ) )
     {
         // reverse v[2] and v[3], so v[2] will be above v[0]
-        EntityHandle tmp = v[ 2 ];
-        v[ 2 ] = v[ 3 ];
-        v[ 3 ] = tmp;
+        EntityHandle tmp = v[2];
+        v[2]             = v[3];
+        v[3]             = tmp;
     }
     // now we know that v[0]--v[3] will be vertex sets in the order we want
-    EntityHandle nd[ 4 ] = { nodes1[ 0 ], nodes1[ N1 - 1 ], nodes2[ 0 ], nodes2[ N2 - 1 ] };
+    EntityHandle nd[4] = { nodes1[0], nodes1[N1 - 1], nodes2[0], nodes2[N2 - 1] };
 
-    adj.clear( );
+    adj.clear();
     EntityHandle e1, e2;
     // find edge 1 between v[0] and v[2], and e2 between v[1] and v[3]
-    rval = _mbImpl->get_parent_meshsets( v[ 0 ], adj );
+    rval = _mbImpl->get_parent_meshsets( v[0], adj );
     MBERRORR( rval, "can't get edges connected to vertex set 1" );
     bool found = false;
-    for( unsigned int j = 0; j < adj.size( ); j++ )
+    for( unsigned int j = 0; j < adj.size(); j++ )
     {
-        EntityHandle ed = adj[ j ];
-        Range        vertices;
+        EntityHandle ed = adj[j];
+        Range vertices;
         rval = _mbImpl->get_child_meshsets( ed, vertices );
-        if( vertices.find( v[ 2 ] ) != vertices.end( ) )
+        if( vertices.find( v[2] ) != vertices.end() )
         {
             found = true;
-            e1 = ed;
+            e1    = ed;
             break;
         }
     }
@@ -3299,13 +3296,13 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
         rval = _mbImpl->create_meshset( MESHSET_SET, e1 );
         MBERRORR( rval, "can't create edge 1" );
 
-        rval = _mbImpl->add_parent_child( e1, v[ 0 ] );
+        rval = _mbImpl->add_parent_child( e1, v[0] );
         MBERRORR( rval, "can't add parent - child relation" );
 
-        rval = _mbImpl->add_parent_child( e1, v[ 2 ] );
+        rval = _mbImpl->add_parent_child( e1, v[2] );
         MBERRORR( rval, "can't add parent - child relation" );
 
-        EntityHandle nn2[ 2 ] = { nd[ 0 ], nd[ 2 ] };
+        EntityHandle nn2[2] = { nd[0], nd[2] };
         EntityHandle medge;
         rval = _mbImpl->create_element( MBEDGE, nn2, 2, medge );
         MBERRORR( rval, "can't create mesh edge" );
@@ -3318,18 +3315,18 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     }
 
     // find the edge from v2 to v4 (if not, create one)
-    rval = _mbImpl->get_parent_meshsets( v[ 1 ], adj );
+    rval = _mbImpl->get_parent_meshsets( v[1], adj );
     MBERRORR( rval, "can't get edges connected to vertex set 2" );
     found = false;
-    for( unsigned int i = 0; i < adj.size( ); i++ )
+    for( unsigned int i = 0; i < adj.size(); i++ )
     {
-        EntityHandle ed = adj[ i ];
-        Range        vertices;
+        EntityHandle ed = adj[i];
+        Range vertices;
         rval = _mbImpl->get_child_meshsets( ed, vertices );
-        if( vertices.find( v[ 3 ] ) != vertices.end( ) )
+        if( vertices.find( v[3] ) != vertices.end() )
         {
             found = true;
-            e2 = ed;
+            e2    = ed;
             break;
         }
     }
@@ -3339,13 +3336,13 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
         rval = _mbImpl->create_meshset( MESHSET_SET, e2 );
         MBERRORR( rval, "can't create edge 1" );
 
-        rval = _mbImpl->add_parent_child( e2, v[ 1 ] );
+        rval = _mbImpl->add_parent_child( e2, v[1] );
         MBERRORR( rval, "can't add parent - child relation" );
 
-        rval = _mbImpl->add_parent_child( e2, v[ 3 ] );
+        rval = _mbImpl->add_parent_child( e2, v[3] );
         MBERRORR( rval, "can't add parent - child relation" );
 
-        EntityHandle nn2[ 2 ] = { nd[ 1 ], nd[ 3 ] };
+        EntityHandle nn2[2] = { nd[1], nd[3] };
         EntityHandle medge;
         rval = _mbImpl->create_element( MBEDGE, nn2, 2, medge );
         MBERRORR( rval, "can't create mesh edge" );
@@ -3380,7 +3377,7 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     MBERRORR( rval, "can't set bottom edge sense to the lateral face" );
 
     int Tsense;
-    rval = getEgVtxSense( tEdge, v[ 3 ], v[ 2 ], Tsense );
+    rval = getEgVtxSense( tEdge, v[3], v[2], Tsense );
     MBERRORR( rval, "can't get top edge sense" );
     // we need to see what sense has topEdge in face
     rval = _my_geomTopoTool->set_sense( tEdge, newLatFace, Tsense );
@@ -3412,15 +3409,15 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     // the top and bottom curves should follow the same path in the "xy" plane (better to say
     // the plane perpendicular to the direction of weaving)
     // in this logic, the vector dir1 varies along the curve !!!
-    CartVect dir1 = coords1[ 1 ] - coords1[ 0 ];  // we should have at least 2 nodes, N1>=2!!
+    CartVect dir1 = coords1[1] - coords1[0];  // we should have at least 2 nodes, N1>=2!!
 
     CartVect planeNormal = dir1 * up;
-    dir1 = up * planeNormal;
-    dir1.normalize( );
+    dir1                 = up * planeNormal;
+    dir1.normalize();
     // this direction will be updated constantly with the direction of last edge added
     bool weaveDown = true;
 
-    CartVect startP = coords1[ 0 ];  // used for origin of comparisons
+    CartVect startP = coords1[0];  // used for origin of comparisons
     while( 1 )
     {
         if( ( indexB == N1 - 1 ) && ( indexT == N2 - 1 ) ) break;  // we cannot advance anymore
@@ -3433,23 +3430,23 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
         {
             // none are at the end, we have to decide which way to go, based on which  index + 1 is
             // closer
-            double proj1 = ( coords1[ indexB + 1 ] - startP ) % dir1;
-            double proj2 = ( coords2[ indexT + 1 ] - startP ) % dir1;
+            double proj1 = ( coords1[indexB + 1] - startP ) % dir1;
+            double proj2 = ( coords2[indexT + 1] - startP ) % dir1;
             if( proj1 < proj2 )
                 weaveDown = true;
             else
                 weaveDown = false;
         }
-        EntityHandle nTri[ 3 ] = { nodes1[ indexB ], 0, nodes2[ indexT ] };
+        EntityHandle nTri[3] = { nodes1[indexB], 0, nodes2[indexT] };
         if( weaveDown )
         {
-            nTri[ 1 ] = nodes1[ indexB + 1 ];
-            nTri[ 2 ] = nodes2[ indexT ];
+            nTri[1] = nodes1[indexB + 1];
+            nTri[2] = nodes2[indexT];
             indexB++;
         }
         else
         {
-            nTri[ 1 ] = nodes2[ indexT + 1 ];
+            nTri[1] = nodes2[indexT + 1];
             indexT++;
         }
         EntityHandle triangle;
@@ -3461,14 +3458,14 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
         if( weaveDown )
         {
             // increase was from nodes1[indexB-1] to nodes1[indexb]
-            dir1 = coords1[ indexB ] - coords1[ indexB - 1 ];  // we should have at least 2 nodes, N1>=2!!
+            dir1 = coords1[indexB] - coords1[indexB - 1];  // we should have at least 2 nodes, N1>=2!!
         }
         else
         {
-            dir1 = coords2[ indexT ] - coords2[ indexT - 1 ];
+            dir1 = coords2[indexT] - coords2[indexT - 1];
         }
         dir1 = up * ( dir1 * up );
-        dir1.normalize( );
+        dir1.normalize();
     }
     // we do not check yet if the triangles are inverted
     // if yes, we should correct them. HOW?
@@ -3485,24 +3482,24 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
 // tags on all surfaces
 // it is changing original tags, so do not use it if you want to preserve
 // initial neumann tags
-ErrorCode FBEngine::set_default_neumann_tags( )
+ErrorCode FBEngine::set_default_neumann_tags()
 {
     // these are for debugging purposes only
     // check the initial tag, then
-    Tag       ntag;
+    Tag ntag;
     ErrorCode rval = _mbImpl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, ntag );
     MBERRORR( rval, "can't get tag handle" );
     // get all surfaces in the model now
-    Range sets[ 5 ];
+    Range sets[5];
     rval = _my_geomTopoTool->find_geomsets( sets );
     MBERRORR( rval, "can't get geo sets" );
-    int  nfaces = (int)sets[ 2 ].size( );
-    int* vals = new int[ nfaces ];
+    int nfaces = (int)sets[2].size();
+    int* vals  = new int[nfaces];
     for( int i = 0; i < nfaces; i++ )
     {
-        vals[ i ] = i + 1;
+        vals[i] = i + 1;
     }
-    rval = _mbImpl->tag_set_data( ntag, sets[ 2 ], (void*)vals );
+    rval = _mbImpl->tag_set_data( ntag, sets[2], (void*)vals );
     MBERRORR( rval, "can't set tag values for neumann sets" );
 
     delete[] vals;
@@ -3512,7 +3509,7 @@ ErrorCode FBEngine::set_default_neumann_tags( )
 // a reverse operation for splitting an gedge at a mesh node
 ErrorCode FBEngine::chain_edges( double min_dot )
 {
-    Range     sets[ 5 ];
+    Range sets[5];
     ErrorCode rval;
     while( 1 )  // break out only if no edges are chained
     {
@@ -3520,15 +3517,15 @@ ErrorCode FBEngine::chain_edges( double min_dot )
         MBERRORR( rval, "can't get geo sets" );
         // these gentities are "always" current, while the ones in this-> _my_gsets[0:4] are
         // the "originals" before FBEngine modifications
-        int nedges = (int)sets[ 1 ].size( );
+        int nedges = (int)sets[1].size();
         // as long as we have chainable edges, continue;
         bool chain = false;
         for( int i = 0; i < nedges; i++ )
         {
-            EntityHandle edge = sets[ 1 ][ i ];
+            EntityHandle edge = sets[1][i];
             EntityHandle next_edge;
-            bool         chainable = false;
-            rval = chain_able_edge( edge, min_dot, next_edge, chainable );
+            bool chainable = false;
+            rval           = chain_able_edge( edge, min_dot, next_edge, chainable );
             MBERRORR( rval, "can't determine chain-ability" );
             if( chainable )
             {
@@ -3554,7 +3551,7 @@ ErrorCode FBEngine::chain_able_edge( EntityHandle edge, double min_dot, EntityHa
     // see if some are the starts of
     chainable = false;
     EntityHandle v1, v2;
-    ErrorCode    rval = get_vert_edges( edge, v1, v2 );
+    ErrorCode rval = get_vert_edges( edge, v1, v2 );
     MBERRORR( rval, "can't get vertices" );
     if( v1 == v2 ) return MB_SUCCESS;  // it is periodic, can't chain it with another edge!
 
@@ -3570,20 +3567,20 @@ ErrorCode FBEngine::chain_able_edge( EntityHandle edge, double min_dot, EntityHa
     std::vector< EntityHandle > mesh_edges;
     rval = _mbImpl->get_entities_by_type( edge, MBEDGE, mesh_edges );
     MBERRORR( rval, "can't get mesh edges from edge set" );
-    EntityHandle        lastMeshEdge = mesh_edges[ mesh_edges.size( ) - 1 ];
+    EntityHandle lastMeshEdge = mesh_edges[mesh_edges.size() - 1];
     const EntityHandle* conn2 = NULL;
-    int                 len = 0;
-    rval = _mbImpl->get_connectivity( lastMeshEdge, conn2, len );
+    int len                   = 0;
+    rval                      = _mbImpl->get_connectivity( lastMeshEdge, conn2, len );
     MBERRORR( rval, "can't connectivity of last mesh edge" );
     // get the coordinates of last edge
     if( len != 2 ) MBERRORR( MB_FAILURE, "bad number of vertices" );
-    CartVect P[ 2 ];
-    rval = _mbImpl->get_coords( conn2, len, (double*)&P[ 0 ] );
+    CartVect P[2];
+    rval = _mbImpl->get_coords( conn2, len, (double*)&P[0] );
     MBERRORR( rval, "Failed to get coordinates" );
 
-    CartVect vec1( P[ 1 ] - P[ 0 ] );
-    vec1.normalize( );
-    for( Range::iterator edgeIter = edges.begin( ); edgeIter != edges.end( ); ++edgeIter )
+    CartVect vec1( P[1] - P[0] );
+    vec1.normalize();
+    for( Range::iterator edgeIter = edges.begin(); edgeIter != edges.end(); ++edgeIter )
     {
         EntityHandle otherEdge = *edgeIter;
         if( edge == otherEdge ) continue;
@@ -3596,19 +3593,19 @@ ErrorCode FBEngine::chain_able_edge( EntityHandle edge, double min_dot, EntityHa
         std::vector< EntityHandle > mesh_edges2;
         rval = _mbImpl->get_entities_by_type( otherEdge, MBEDGE, mesh_edges2 );
         MBERRORR( rval, "can't get mesh edges from other edge set" );
-        EntityHandle        firstMeshEdge = mesh_edges2[ 0 ];
+        EntityHandle firstMeshEdge = mesh_edges2[0];
         const EntityHandle* conn22;
-        int                 len2;
+        int len2;
         rval = _mbImpl->get_connectivity( firstMeshEdge, conn22, len2 );
         MBERRORR( rval, "can't connectivity of first mesh edge" );
         if( len2 != 2 ) MBERRORR( MB_FAILURE, "bad number of vertices" );
-        if( conn2[ 1 ] != conn22[ 0 ] ) continue;  // the mesh edges are not one after the other
+        if( conn2[1] != conn22[0] ) continue;  // the mesh edges are not one after the other
         // get the coordinates of first edge
 
         // CartVect P2[2];
-        rval = _mbImpl->get_coords( conn22, len, (double*)&P[ 0 ] );
-        CartVect vec2( P[ 1 ] - P[ 0 ] );
-        vec2.normalize( );
+        rval = _mbImpl->get_coords( conn22, len, (double*)&P[0] );
+        CartVect vec2( P[1] - P[0] );
+        vec2.normalize();
         if( vec1 % vec2 < min_dot ) continue;
         // we found our edge, victory! we can get out
         next_edge = otherEdge;
@@ -3624,7 +3621,7 @@ ErrorCode FBEngine::chain_two_edges( EntityHandle edge, EntityHandle next_edge )
     // they should be correct :)
     // get the vertex sets
     EntityHandle v11, v12, v21, v22;
-    ErrorCode    rval = get_vert_edges( edge, v11, v12 );
+    ErrorCode rval = get_vert_edges( edge, v11, v12 );
     MBERRORR( rval, "can't get vert sets" );
     rval = get_vert_edges( next_edge, v21, v22 );
     MBERRORR( rval, "can't get vert sets" );
@@ -3633,7 +3630,7 @@ ErrorCode FBEngine::chain_two_edges( EntityHandle edge, EntityHandle next_edge )
     rval = MBI->get_entities_by_type( next_edge, MBEDGE, mesh_edges );
     MBERRORR( rval, "can't get mesh edges" );
 
-    rval = _mbImpl->add_entities( edge, &mesh_edges[ 0 ], (int)mesh_edges.size( ) );
+    rval = _mbImpl->add_entities( edge, &mesh_edges[0], (int)mesh_edges.size() );
     MBERRORR( rval, "can't add new mesh edges" );
     // remove the child - parent relation for second vertex of first edge
     rval = _mbImpl->remove_parent_child( edge, v12 );
@@ -3656,10 +3653,10 @@ ErrorCode FBEngine::chain_two_edges( EntityHandle edge, EntityHandle next_edge )
     rval = _mbImpl->get_parent_meshsets( next_edge, faces );
     MBERRORR( rval, "can't get parent faces " );
 
-    for( Range::iterator it = faces.begin( ); it != faces.end( ); ++it )
+    for( Range::iterator it = faces.begin(); it != faces.end(); ++it )
     {
         EntityHandle ff = *it;
-        rval = _mbImpl->remove_parent_child( ff, next_edge );
+        rval            = _mbImpl->remove_parent_child( ff, next_edge );
         MBERRORR( rval, "can't remove parent-edge rel " );
     }
 
@@ -3680,22 +3677,22 @@ ErrorCode FBEngine::get_vert_edges( EntityHandle edge, EntityHandle& v1, EntityH
     // EntityHandle v1, v2;
     ErrorCode rval = _mbImpl->get_child_meshsets( edge, children );
     MBERRORR( rval, "can't get child meshsets" );
-    if( children.size( ) == 1 )
+    if( children.size() == 1 )
     {
         // this is periodic edge, get out early
-        v1 = children[ 0 ];
+        v1 = children[0];
         v2 = v1;
         return MB_SUCCESS;
     }
-    else if( children.size( ) > 2 )
+    else if( children.size() > 2 )
         MBERRORR( MB_FAILURE, "too many vertices in one edge" );
     // edge: get one vertex as part of the vertex set
     Range entities;
-    rval = MBI->get_entities_by_type( children[ 0 ], MBVERTEX, entities );
+    rval = MBI->get_entities_by_type( children[0], MBVERTEX, entities );
     MBERRORR( rval, "can't get entities from vertex set" );
-    if( entities.size( ) < 1 ) MBERRORR( MB_FAILURE, "no mesh nodes in vertex set" );
-    EntityHandle node0 = entities[ 0 ];  // the first vertex
-    entities.clear( );
+    if( entities.size() < 1 ) MBERRORR( MB_FAILURE, "no mesh nodes in vertex set" );
+    EntityHandle node0 = entities[0];  // the first vertex
+    entities.clear();
 
     // now get the edges, and get the first node and the last node in sequence of edges
     // the order is important...
@@ -3703,22 +3700,22 @@ ErrorCode FBEngine::get_vert_edges( EntityHandle edge, EntityHandle& v1, EntityH
     std::vector< EntityHandle > ents;
     rval = MBI->get_entities_by_type( edge, MBEDGE, ents );
     MBERRORR( rval, "can't get mesh edges" );
-    if( ents.size( ) < 1 ) MBERRORR( MB_FAILURE, "no mesh edges in edge set" );
+    if( ents.size() < 1 ) MBERRORR( MB_FAILURE, "no mesh edges in edge set" );
 
     const EntityHandle* conn = NULL;
-    int                 len;
-    rval = MBI->get_connectivity( ents[ 0 ], conn, len );
+    int len;
+    rval = MBI->get_connectivity( ents[0], conn, len );
     MBERRORR( rval, "can't connectivity of first mesh edge" );
 
-    if( conn[ 0 ] == node0 )
+    if( conn[0] == node0 )
     {
-        v1 = children[ 0 ];
-        v2 = children[ 1 ];
+        v1 = children[0];
+        v2 = children[1];
     }
     else  // the other way around, although we should check (we are paranoid)
     {
-        v2 = children[ 0 ];
-        v1 = children[ 1 ];
+        v2 = children[0];
+        v1 = children[1];
     }
 
     return MB_SUCCESS;

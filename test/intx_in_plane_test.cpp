@@ -23,26 +23,26 @@ int main( int argc, char* argv[] )
     // check command line arg
     const char* filename_mesh1 = STRINGIFY( MESHDIR ) "/mbcslam/m1.vtk";
     const char* filename_mesh2 = STRINGIFY( MESHDIR ) "/mbcslam/m2.vtk";
-    const char* newFile = "intx1.vtk";
-    const char* edgesFile = "polyWithEdges.vtk";
+    const char* newFile        = "intx1.vtk";
+    const char* edgesFile      = "polyWithEdges.vtk";
     if( argc == 4 )
     {
-        filename_mesh1 = argv[ 1 ];
-        filename_mesh2 = argv[ 2 ];
-        newFile = argv[ 3 ];
+        filename_mesh1 = argv[1];
+        filename_mesh2 = argv[2];
+        newFile        = argv[3];
     }
     else
     {
-        printf( "Usage: %s <mesh_filename1> <mesh_filename2>  <newFile>\n", argv[ 0 ] );
+        printf( "Usage: %s <mesh_filename1> <mesh_filename2>  <newFile>\n", argv[0] );
         if( argc != 1 ) return 1;
         printf( "No files specified.  Defaulting to: %s  %s  %s\n", filename_mesh1, filename_mesh2, newFile );
     }
 
     // read meshes in 2 file sets
-    Core         moab;
-    Interface*   mb = &moab;  // global
+    Core moab;
+    Interface* mb = &moab;  // global
     EntityHandle sf1, sf2;
-    ErrorCode    rval = mb->create_meshset( MESHSET_SET, sf1 );
+    ErrorCode rval = mb->create_meshset( MESHSET_SET, sf1 );
     if( MB_SUCCESS != rval ) return 1;
     rval = mb->create_meshset( MESHSET_SET, sf2 );
     if( MB_SUCCESS != rval ) return 1;
@@ -56,7 +56,7 @@ int main( int argc, char* argv[] )
     if( MB_SUCCESS != rval ) return 1;
 
     Intx2MeshInPlane worker( mb );
-    IntxAreaUtils    areaAdaptor;
+    IntxAreaUtils areaAdaptor;
     rval = areaAdaptor.positive_orientation( mb, sf1, -1 );MB_CHK_ERR( rval );
     rval = areaAdaptor.positive_orientation( mb, sf2, -1 );MB_CHK_ERR( rval );
 
@@ -77,7 +77,7 @@ int main( int argc, char* argv[] )
     rval = mb->get_adjacencies( polygons, 1, true, edges, Interface::UNION );
     if( MB_SUCCESS != rval ) return 1;
 
-    std::cout << "number of edges:" << edges.size( ) << "\n";
+    std::cout << "number of edges:" << edges.size() << "\n";
     // add edges to the output set
     rval = mb->add_entities( outputSet, edges );
     if( MB_SUCCESS != rval ) return 1;

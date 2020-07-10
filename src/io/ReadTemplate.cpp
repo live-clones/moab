@@ -26,7 +26,7 @@ ReadTemplate::ReadTemplate( Interface* impl ) : mbImpl( impl ), fileName( NULL )
     mbImpl->query_interface( readMeshIface );
 }
 
-ReadTemplate::~ReadTemplate( )
+ReadTemplate::~ReadTemplate()
 {
     if( readMeshIface )
     {
@@ -59,7 +59,8 @@ ErrorCode ReadTemplate::load_file( const char* filename, const EntityHandle* fil
     // Process options; see src/FileOptions.hpp for API for FileOptions class, and
     // doc/metadata_info.doc for a description of various options used by some of the readers in
     // MOAB
-    ErrorCode result = process_options( opts );MB_CHK_SET_ERR( result, fileName << ": problem reading options" );
+    ErrorCode result = process_options( opts );
+    MB_CHK_SET_ERR( result, fileName << ": problem reading options" );
 
     // Open file; filePtr is member of ReadTemplate, change to whatever mechanism is used to
     // identify file
@@ -128,10 +129,11 @@ ErrorCode ReadTemplate::read_vertices( int num_verts, EntityHandle& start_vertex
     // start_handle, and the reader is passed back double*'s pointing to MOAB's native storage for
     // vertex coordinates for those verts
     std::vector< double* > coord_arrays;
-    ErrorCode              result = readMeshIface->get_node_coords( 3, num_verts, 1, start_vertex, coord_arrays );MB_CHK_SET_ERR( result, fileName << ": Trouble reading vertices" );
+    ErrorCode result = readMeshIface->get_node_coords( 3, num_verts, 1, start_vertex, coord_arrays );
+    MB_CHK_SET_ERR( result, fileName << ": Trouble reading vertices" );
 
     // Fill in vertex coordinate arrays
-    double *x = coord_arrays[ 0 ], *y = coord_arrays[ 1 ], *z = coord_arrays[ 2 ];
+    double *x = coord_arrays[0], *y = coord_arrays[1], *z = coord_arrays[2];
     for( long i = 0; i < num_verts; ++i )
     {
         // Read x/y/z; do something with them for now to avoid warning
@@ -156,8 +158,9 @@ ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
     // Create the element sequence; passes back a pointer to the internal storage for connectivity
     // and the starting entity handle
     EntityHandle* conn_array;
-    ErrorCode     result =
-        readMeshIface->get_element_connect( num_elems, verts_per_elem, ent_type, 1, start_elem, conn_array );MB_CHK_SET_ERR( result, fileName << ": Trouble reading elements" );
+    ErrorCode result =
+        readMeshIface->get_element_connect( num_elems, verts_per_elem, ent_type, 1, start_elem, conn_array );
+    MB_CHK_SET_ERR( result, fileName << ": Trouble reading elements" );
 
     // Read connectivity into conn_array directly
     for( long i = 0; i < num_elems; i++ )
@@ -176,10 +179,10 @@ ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
     int OFFSET = 1;
     for( long i = num_elems * verts_per_elem - 1; i >= 0; i-- )
     {
-        conn_array[ i ] = ind_array[ i ] + start_vertex + OFFSET;
+        conn_array[i] = ind_array[i] + start_vertex + OFFSET;
 
         // This assert assumes last handle in read_ents is highest vertex handle in this file
-        assert( conn_array[ i ] >= start_vertex && conn_array[ i ] <= *read_ents.rbegin( ) );
+        assert( conn_array[i] >= start_vertex && conn_array[i] <= *read_ents.rbegin() );
     }
 
     // Notify MOAB of the new elements
@@ -196,19 +199,21 @@ ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
 ErrorCode ReadTemplate::create_sets( int num_sets, EntityHandle /*start_vertex*/, int /*num_verts*/,
                                      EntityHandle /*start_elem*/, int /*num_elems*/, Range& read_ents )
 {
-    ErrorCode    result = MB_SUCCESS;
+    ErrorCode result = MB_SUCCESS;
     EntityHandle this_set;
 
     for( int i = 0; i < num_sets; i++ )
     {
         // Create set
-        result = mbImpl->create_meshset( MESHSET_SET, this_set );MB_CHK_SET_ERR( result, fileName << ": Trouble creating set" );
+        result = mbImpl->create_meshset( MESHSET_SET, this_set );
+        MB_CHK_SET_ERR( result, fileName << ": Trouble creating set" );
 
         Range set_ents;
         // Read/compute what's in this set; REMEMBER TO CONVERT THESE TO MOAB HANDLES
 
         // Add them to the set
-        result = mbImpl->add_entities( this_set, set_ents );MB_CHK_SET_ERR( result, fileName << ": Trouble putting entities in set" );
+        result = mbImpl->add_entities( this_set, set_ents );
+        MB_CHK_SET_ERR( result, fileName << ": Trouble putting entities in set" );
 
         // Add the new set to read_ents
         read_ents.insert( this_set );
@@ -220,7 +225,7 @@ ErrorCode ReadTemplate::create_sets( int num_sets, EntityHandle /*start_vertex*/
 ErrorCode ReadTemplate::process_options( const FileOptions& opts )
 {
     // Mark all options seen, to avoid compile warning on unused variable
-    opts.mark_all_seen( );
+    opts.mark_all_seen();
     return MB_SUCCESS;
 }
 

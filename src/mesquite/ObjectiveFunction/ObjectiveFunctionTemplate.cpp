@@ -43,7 +43,7 @@
 namespace MBMesquite
 {
 
-ObjectiveFunctionTemplate::~ObjectiveFunctionTemplate( ) {}
+ObjectiveFunctionTemplate::~ObjectiveFunctionTemplate() {}
 
 void ObjectiveFunctionTemplate::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
                                                   MsqError& err )
@@ -52,11 +52,11 @@ void ObjectiveFunctionTemplate::initialize_queue( MeshDomainAssoc* mesh_and_doma
 }
 
 bool ObjectiveFunctionTemplate::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                                     const Settings*  settings, PatchSet*,
-                                                                     MsqError&        err )
+                                                                     const Settings* settings, PatchSet*,
+                                                                     MsqError& err )
 {
     std::auto_ptr< PatchSet > patch_set;
-    switch( get_quality_metric( )->get_metric_type( ) )
+    switch( get_quality_metric()->get_metric_type() )
     {
         case QualityMetric::VERTEX_BASED:
             patch_set = std::auto_ptr< PatchSet >( new VertexPatches( 1, false ) );
@@ -70,12 +70,12 @@ bool ObjectiveFunctionTemplate::initialize_block_coordinate_descent( MeshDomainA
             return false;
     }
 
-    Mesh*       mesh = mesh_and_domain->get_mesh( );
-    MeshDomain* domain = mesh_and_domain->get_domain( );
+    Mesh* mesh         = mesh_and_domain->get_mesh();
+    MeshDomain* domain = mesh_and_domain->get_domain();
 
-    clear( );
+    clear();
     patch_set->set_mesh( mesh );
-    PatchIterator patches( patch_set.get( ) );
+    PatchIterator patches( patch_set.get() );
 
     PatchData pd;
     pd.set_mesh( mesh );
@@ -86,18 +86,18 @@ bool ObjectiveFunctionTemplate::initialize_block_coordinate_descent( MeshDomainA
     while( patches.get_next_patch( pd, err ) && !MSQ_CHKERR( err ) )
     {
         double value;
-        bool   b = evaluate( ObjectiveFunction::ACCUMULATE, pd, value, false, err );
+        bool b = evaluate( ObjectiveFunction::ACCUMULATE, pd, value, false, err );
         MSQ_ERRZERO( err );
         result = result && b;
     }
     return result;
 }
 
-int ObjectiveFunctionTemplate::min_patch_layers( ) const
+int ObjectiveFunctionTemplate::min_patch_layers() const
 {
-    if( !get_quality_metric( ) )
+    if( !get_quality_metric() )
         return 0;
-    else if( get_quality_metric( )->get_metric_type( ) == QualityMetric::VERTEX_BASED )
+    else if( get_quality_metric()->get_metric_type() == QualityMetric::VERTEX_BASED )
         return 2;
     else
         return 1;

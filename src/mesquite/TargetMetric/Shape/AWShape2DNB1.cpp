@@ -37,12 +37,12 @@
 namespace MBMesquite
 {
 
-std::string AWShape2DNB1::get_name( ) const
+std::string AWShape2DNB1::get_name() const
 {
     return "AWShape2DNB1";
 }
 
-AWShape2DNB1::~AWShape2DNB1( ) {}
+AWShape2DNB1::~AWShape2DNB1() {}
 
 bool AWShape2DNB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& )
 {
@@ -55,15 +55,15 @@ bool AWShape2DNB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >
 bool AWShape2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                                        MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& )
 {
-    const double            alpha = det( A );
-    const double            omega = det( W );
+    const double alpha          = det( A );
+    const double omega          = det( W );
     const MsqMatrix< 2, 2 > AtA = transpose( A ) * A;
     const MsqMatrix< 2, 2 > WtW = transpose( W ) * W;
     const MsqMatrix< 2, 2 > AWt = A * transpose( W );
-    const double            alphaWtW = alpha * sqr_Frobenius( WtW );
-    const double            omegaAtA = omega * sqr_Frobenius( AtA );
-    const double            omegaAWt = omega * sqr_Frobenius( AWt );
-    result = omega * omegaAtA;
+    const double alphaWtW       = alpha * sqr_Frobenius( WtW );
+    const double omegaAtA       = omega * sqr_Frobenius( AtA );
+    const double omegaAWt       = omega * sqr_Frobenius( AWt );
+    result                      = omega * omegaAtA;
     result += alpha * alphaWtW;
     result -= 2 * alpha * omegaAWt;
 

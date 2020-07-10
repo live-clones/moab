@@ -29,7 +29,7 @@ typedef ErrorCode ( *ReverseEvalFcn )( EvalFcn eval, JacobianFcn jacob, InsideFc
                                        const double inside_tol, double* work, double* params, int* is_inside );
 
 typedef ErrorCode ( *NormalFcn )( const int ientDim, const int facet, const int nverts, const double* verts,
-                                  double normal[ 3 ] );
+                                  double normal[3] );
 
 class EvalSet
 {
@@ -57,7 +57,7 @@ class EvalSet
     InsideFcn insideFcn;
 
     /** \brief Bare constructor */
-    EvalSet( )
+    EvalSet()
         : evalFcn( NULL ), reverseEvalFcn( NULL ), normalFcn( NULL ), jacobianFcn( NULL ), integrateFcn( NULL ),
           initFcn( NULL ), insideFcn( NULL )
     {
@@ -80,13 +80,13 @@ class EvalSet
     /** \brief Operator= */
     EvalSet& operator=( const EvalSet& eval )
     {
-        evalFcn = eval.evalFcn;
+        evalFcn        = eval.evalFcn;
         reverseEvalFcn = eval.reverseEvalFcn;
-        normalFcn = eval.normalFcn;
-        jacobianFcn = eval.jacobianFcn;
-        integrateFcn = eval.integrateFcn;
-        initFcn = eval.initFcn;
-        insideFcn = eval.insideFcn;
+        normalFcn      = eval.normalFcn;
+        jacobianFcn    = eval.jacobianFcn;
+        integrateFcn   = eval.integrateFcn;
+        initFcn        = eval.initFcn;
+        insideFcn      = eval.insideFcn;
         return *this;
     }
 
@@ -102,11 +102,11 @@ class EvalSet
 /** \brief Given an entity handle, get an appropriate eval set, based on type & #vertices */
 inline ErrorCode EvalSet::get_eval_set( Interface* mb, EntityHandle eh, EvalSet& eval_set )
 {
-    int                         nv;
-    EntityType                  tp = mb->type_from_handle( eh );
-    const EntityHandle*         connect;
+    int nv;
+    EntityType tp = mb->type_from_handle( eh );
+    const EntityHandle* connect;
     std::vector< EntityHandle > dum_vec;
-    ErrorCode                   rval = mb->get_connectivity( eh, connect, nv, false, &dum_vec );
+    ErrorCode rval = mb->get_connectivity( eh, connect, nv, false, &dum_vec );
     if( MB_SUCCESS != rval ) return rval;
 
     return get_eval_set( tp, nv, eval_set );
@@ -141,7 +141,7 @@ class ElemEvaluator
      * to be tagged to cache on the evaluator
      */
     ElemEvaluator( Interface* impl, EntityHandle ent = 0, Tag tag = 0, int tagged_ent_dim = -1 );
-    ~ElemEvaluator( );
+    ~ElemEvaluator();
 
     /** \brief Evaluate cached tag at a given parametric location within the cached entity
      * If evaluating coordinates, call set_tag(0, 0), which indicates coords instead of a tag.
@@ -168,7 +168,7 @@ class ElemEvaluator
      * \param facet Local id of the facet w.r.t the entity
      * \param normal Returns the normal.
      */
-    ErrorCode get_normal( const int ientDim, const int facet, double normal[ 3 ] ) const;
+    ErrorCode get_normal( const int ientDim, const int facet, double normal[3] ) const;
 
     /** \brief Evaluate the jacobian of the cached entity at a given parametric location
      * \param params Parameters at which to evaluate jacobian
@@ -242,39 +242,39 @@ class ElemEvaluator
     /** \brief Get the eval set for a given type entity */
     inline EvalSet get_eval_set( EntityType tp )
     {
-        return evalSets[ tp ];
+        return evalSets[tp];
     }
 
     /** \brief Set entity handle & cache connectivty & vertex positions */
     inline ErrorCode set_ent_handle( EntityHandle ent );
 
     /** \brief Get entity handle for this ElemEval */
-    inline EntityHandle get_ent_handle( ) const
+    inline EntityHandle get_ent_handle() const
     {
         return entHandle;
     }
 
     /* \brief Get vertex positions cached on this EE
      */
-    inline double* get_vert_pos( )
+    inline double* get_vert_pos()
     {
-        return vertPos[ 0 ].array( );
+        return vertPos[0].array();
     }
 
     /* \brief Get the vertex handles cached here */
-    inline const EntityHandle* get_vert_handles( ) const
+    inline const EntityHandle* get_vert_handles() const
     {
         return vertHandles;
     }
 
     /* \brief Get the number of vertices for the cached entity */
-    inline int get_num_verts( ) const
+    inline int get_num_verts() const
     {
         return numVerts;
     }
 
     /* \brief Get the tag handle cached on this entity */
-    inline Tag get_tag_handle( ) const
+    inline Tag get_tag_handle() const
     {
         return tagHandle;
     };
@@ -296,7 +296,7 @@ class ElemEvaluator
     inline ErrorCode set_tag( const char* tag_name, int tagged_ent_dim = -1 );
 
     /* \brief Get the dimension of the entities on which tag is set */
-    inline int get_tagged_ent_dim( ) const
+    inline int get_tagged_ent_dim() const
     {
         return taggedEntDim;
     };
@@ -308,13 +308,13 @@ class ElemEvaluator
      * tags on entities Can't be const because most of the functions (evaluate, integrate, etc.)
      * take non-const work space *'s
      */
-    inline double* get_work_space( )
+    inline double* get_work_space()
     {
         return workSpace;
     }
 
     /* \brief MOAB interface cached on this evaluator */
-    inline Interface* get_moab( )
+    inline Interface* get_moab()
     {
         return mbImpl;
     }
@@ -339,7 +339,7 @@ class ElemEvaluator
     const EntityHandle* vertHandles;
 
     /** \brief Cached copy of vertex positions */
-    CartVect vertPos[ CN::MAX_NODES_PER_ELEMENT ];
+    CartVect vertPos[CN::MAX_NODES_PER_ELEMENT];
 
     /** \brief Tag being evaluated */
     Tag tagHandle;
@@ -357,7 +357,7 @@ class ElemEvaluator
     std::vector< unsigned char > tagSpace;
 
     /** \brief Evaluation methods for elements of various topologies */
-    EvalSet evalSets[ MBMAXTYPE ];
+    EvalSet evalSets[MBMAXTYPE];
 
     /** \brief Work space for element-specific data */
     double* workSpace;
@@ -372,7 +372,7 @@ inline ElemEvaluator::ElemEvaluator( Interface* impl, EntityHandle ent, Tag tag,
     if( tag ) set_tag_handle( tag, tagged_ent_dim );
 }
 
-inline ElemEvaluator::~ElemEvaluator( )
+inline ElemEvaluator::~ElemEvaluator()
 {
     if( workSpace ) delete[] workSpace;
 }
@@ -387,15 +387,15 @@ inline ErrorCode ElemEvaluator::set_ent_handle( EntityHandle ent )
     }
 
     entType = mbImpl->type_from_handle( ent );
-    entDim = mbImpl->dimension_from_handle( ent );
+    entDim  = mbImpl->dimension_from_handle( ent );
 
     std::vector< EntityHandle > dum_vec;
-    ErrorCode                   rval = mbImpl->get_connectivity( ent, vertHandles, numVerts, false, &dum_vec );
+    ErrorCode rval = mbImpl->get_connectivity( ent, vertHandles, numVerts, false, &dum_vec );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( !evalSets[ entType ].evalFcn ) EvalSet::get_eval_set( entType, numVerts, evalSets[ entType ] );
+    if( !evalSets[entType].evalFcn ) EvalSet::get_eval_set( entType, numVerts, evalSets[entType] );
 
-    rval = mbImpl->get_coords( vertHandles, numVerts, vertPos[ 0 ].array( ) );
+    rval = mbImpl->get_coords( vertHandles, numVerts, vertPos[0].array() );
     if( MB_SUCCESS != rval ) return rval;
 
     if( tagHandle )
@@ -403,8 +403,7 @@ inline ErrorCode ElemEvaluator::set_ent_handle( EntityHandle ent )
         rval = set_tag_handle( tagHandle );
         if( MB_SUCCESS != rval ) return rval;
     }
-    if( evalSets[ entType ].initFcn )
-        return ( *evalSets[ entType ].initFcn )( vertPos[ 0 ].array( ), numVerts, workSpace );
+    if( evalSets[entType].initFcn ) return ( *evalSets[entType].initFcn )( vertPos[0].array(), numVerts, workSpace );
     return MB_SUCCESS;
 }
 
@@ -413,16 +412,16 @@ inline ErrorCode ElemEvaluator::set_tag_handle( Tag tag, int tagged_ent_dim )
     ErrorCode rval = MB_SUCCESS;
     if( !tag && !tagged_ent_dim )
     {
-        tagCoords = true;
-        numTuples = 3;
+        tagCoords    = true;
+        numTuples    = 3;
         taggedEntDim = 0;
-        tagHandle = 0;
+        tagHandle    = 0;
         return rval;
     }
     else if( tagHandle != tag )
     {
         tagHandle = tag;
-        rval = mbImpl->tag_get_length( tagHandle, numTuples );
+        rval      = mbImpl->tag_get_length( tagHandle, numTuples );
         if( MB_SUCCESS != rval ) return rval;
         int sz;
         rval = mbImpl->tag_get_bytes( tag, sz );
@@ -437,12 +436,12 @@ inline ErrorCode ElemEvaluator::set_tag_handle( Tag tag, int tagged_ent_dim )
     {
         if( 0 == taggedEntDim )
         {
-            rval = mbImpl->tag_get_data( tagHandle, vertHandles, numVerts, &tagSpace[ 0 ] );
+            rval = mbImpl->tag_get_data( tagHandle, vertHandles, numVerts, &tagSpace[0] );
             if( MB_SUCCESS != rval ) return rval;
         }
         else if( taggedEntDim == entDim )
         {
-            rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, &tagSpace[ 0 ] );
+            rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, &tagSpace[0] );
             if( MB_SUCCESS != rval ) return rval;
         }
     }
@@ -457,10 +456,10 @@ inline ErrorCode ElemEvaluator::set_tag( const char* tag_name, int tagged_ent_di
     Tag tag;
     if( !strcmp( tag_name, "COORDS" ) )
     {
-        tagCoords = true;
+        tagCoords    = true;
         taggedEntDim = 0;
-        numTuples = 3;
-        tagHandle = 0;
+        numTuples    = 3;
+        tagHandle    = 0;
         // can return here, because vertex coords already cached when entity handle set
         return rval;
     }
@@ -472,7 +471,7 @@ inline ErrorCode ElemEvaluator::set_tag( const char* tag_name, int tagged_ent_di
         if( tagHandle != tag )
         {
             tagHandle = tag;
-            rval = mbImpl->tag_get_length( tagHandle, numTuples );
+            rval      = mbImpl->tag_get_length( tagHandle, numTuples );
             if( MB_SUCCESS != rval ) return rval;
             int sz;
             rval = mbImpl->tag_get_bytes( tag, sz );
@@ -488,12 +487,12 @@ inline ErrorCode ElemEvaluator::set_tag( const char* tag_name, int tagged_ent_di
     {
         if( 0 == taggedEntDim )
         {
-            rval = mbImpl->tag_get_data( tagHandle, vertHandles, numVerts, &tagSpace[ 0 ] );
+            rval = mbImpl->tag_get_data( tagHandle, vertHandles, numVerts, &tagSpace[0] );
             if( MB_SUCCESS != rval ) return rval;
         }
         else if( taggedEntDim == entDim )
         {
-            rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, &tagSpace[ 0 ] );
+            rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, &tagSpace[0] );
             if( MB_SUCCESS != rval ) return rval;
         }
     }
@@ -503,10 +502,10 @@ inline ErrorCode ElemEvaluator::set_tag( const char* tag_name, int tagged_ent_di
 
 inline ErrorCode ElemEvaluator::set_eval_set( EntityType tp, const EvalSet& eval_set )
 {
-    evalSets[ tp ] = eval_set;
-    if( entHandle && evalSets[ entType ].initFcn )
+    evalSets[tp] = eval_set;
+    if( entHandle && evalSets[entType].initFcn )
     {
-        ErrorCode rval = ( *evalSets[ entType ].initFcn )( vertPos[ 0 ].array( ), numVerts, workSpace );
+        ErrorCode rval = ( *evalSets[entType].initFcn )( vertPos[0].array(), numVerts, workSpace );
         if( MB_SUCCESS != rval ) return rval;
     }
     return MB_SUCCESS;
@@ -515,8 +514,8 @@ inline ErrorCode ElemEvaluator::set_eval_set( EntityType tp, const EvalSet& eval
 inline ErrorCode ElemEvaluator::eval( const double* params, double* result, int num_tuples ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].evalFcn )(
-        params, ( tagCoords ? (const double*)vertPos[ 0 ].array( ) : (const double*)&tagSpace[ 0 ] ), entDim,
+    return ( *evalSets[entType].evalFcn )(
+        params, ( tagCoords ? (const double*)vertPos[0].array() : (const double*)&tagSpace[0] ), entDim,
         ( -1 == num_tuples ? numTuples : num_tuples ), workSpace, result );
 }
 
@@ -524,23 +523,23 @@ inline ErrorCode ElemEvaluator::reverse_eval( const double* posn, const double i
                                               double* params, int* ins ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].reverseEvalFcn )( evalSets[ entType ].evalFcn, evalSets[ entType ].jacobianFcn,
-                                                    evalSets[ entType ].insideFcn, posn, vertPos[ 0 ].array( ),
-                                                    numVerts, entDim, iter_tol, inside_tol, workSpace, params, ins );
+    return ( *evalSets[entType].reverseEvalFcn )( evalSets[entType].evalFcn, evalSets[entType].jacobianFcn,
+                                                  evalSets[entType].insideFcn, posn, vertPos[0].array(), numVerts,
+                                                  entDim, iter_tol, inside_tol, workSpace, params, ins );
 }
 
 /** \brief Evaluate the normal of the cached entity at a given facet */
 inline ErrorCode ElemEvaluator::get_normal( const int ientDim, const int facet, double normal[] ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].normalFcn )( ientDim, facet, numVerts, vertPos[ 0 ].array( ), normal );
+    return ( *evalSets[entType].normalFcn )( ientDim, facet, numVerts, vertPos[0].array(), normal );
 }
 
 /** \brief Evaluate the jacobian of the cached entity at a given parametric location */
 inline ErrorCode ElemEvaluator::jacobian( const double* params, double* result ) const
 {
     assert( entHandle && MBMAXTYPE != entType );
-    return ( *evalSets[ entType ].jacobianFcn )( params, vertPos[ 0 ].array( ), numVerts, entDim, workSpace, result );
+    return ( *evalSets[entType].jacobianFcn )( params, vertPos[0].array(), numVerts, entDim, workSpace, result );
 }
 
 /** \brief Integrate the cached tag over the cached entity */
@@ -551,14 +550,13 @@ inline ErrorCode ElemEvaluator::integrate( double* result ) const
     if( !tagCoords )
     {
         if( 0 == taggedEntDim )
-            rval = mbImpl->tag_get_data( tagHandle, vertHandles, numVerts, (void*)&tagSpace[ 0 ] );
+            rval = mbImpl->tag_get_data( tagHandle, vertHandles, numVerts, (void*)&tagSpace[0] );
         else
-            rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, (void*)&tagSpace[ 0 ] );
+            rval = mbImpl->tag_get_data( tagHandle, &entHandle, 1, (void*)&tagSpace[0] );
         if( MB_SUCCESS != rval ) return rval;
     }
-    return ( *evalSets[ entType ].integrateFcn )( ( tagCoords ? vertPos[ 0 ].array( ) : (const double*)&tagSpace[ 0 ] ),
-                                                  vertPos[ 0 ].array( ), numVerts, entDim, numTuples, workSpace,
-                                                  result );
+    return ( *evalSets[entType].integrateFcn )( ( tagCoords ? vertPos[0].array() : (const double*)&tagSpace[0] ),
+                                                vertPos[0].array(), numVerts, entDim, numTuples, workSpace, result );
 }
 
 inline ErrorCode ElemEvaluator::find_containing_entity( EntityHandle ent_set, const double* point,
@@ -567,7 +565,7 @@ inline ErrorCode ElemEvaluator::find_containing_entity( EntityHandle ent_set, co
                                                         unsigned int* num_evals )
 {
     assert( mbImpl->type_from_handle( ent_set ) == MBENTITYSET );
-    Range     entities;
+    Range entities;
     ErrorCode rval = mbImpl->get_entities_by_handle( ent_set, entities );
     if( MB_SUCCESS != rval )
         return rval;
@@ -577,13 +575,13 @@ inline ErrorCode ElemEvaluator::find_containing_entity( EntityHandle ent_set, co
 
 inline int ElemEvaluator::inside( const double* params, const double tol ) const
 {
-    return ( *evalSets[ entType ].insideFcn )( params, entDim, tol );
+    return ( *evalSets[entType].insideFcn )( params, entDim, tol );
 }
 
 inline ErrorCode ElemEvaluator::set_eval_set( const EntityHandle eh )
 {
-    EvalSet   eset;
-    ErrorCode rval = EvalSet::get_eval_set( mbImpl, eh, evalSets[ mbImpl->type_from_handle( eh ) ] );
+    EvalSet eset;
+    ErrorCode rval = EvalSet::get_eval_set( mbImpl, eh, evalSets[mbImpl->type_from_handle( eh )] );
     return rval;
 }
 

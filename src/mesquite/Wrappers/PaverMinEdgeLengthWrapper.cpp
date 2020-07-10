@@ -61,23 +61,23 @@ void PaverMinEdgeLengthWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, P
                                              QualityAssessor* qa, MsqError& err )
 {
     InstructionQueue q;
-    Mesh*            mesh = mesh_and_domain->get_mesh( );
+    Mesh* mesh = mesh_and_domain->get_mesh();
 
     // calculate average lambda for mesh
-    ReferenceMesh           ref_mesh( mesh );
+    ReferenceMesh ref_mesh( mesh );
     RefMeshTargetCalculator W_0( &ref_mesh );
-    SimpleStats             lambda_stats;
-    MeshUtil                tool( mesh, settings );
+    SimpleStats lambda_stats;
+    MeshUtil tool( mesh, settings );
     tool.lambda_distribution( lambda_stats, err );MSQ_ERRRTN( err );
-    double lambda = lambda_stats.average( );
+    double lambda = lambda_stats.average();
 
     // create objective function
     IdealShapeTarget W_i;
-    LambdaConstant   W( lambda, &W_i );
-    TShapeSizeB1     tm;
-    TQualityMetric   mu_0( &W, &tm );
-    ElementPMeanP    mu( 1.0, &mu_0 );
-    PMeanPTemplate   of( 1.0, &mu );
+    LambdaConstant W( lambda, &W_i );
+    TShapeSizeB1 tm;
+    TQualityMetric mu_0( &W, &tm );
+    ElementPMeanP mu( 1.0, &mu_0 );
+    PMeanPTemplate of( 1.0, &mu );
 
     // create quality assessor
     EdgeLengthMetric len( 0.0 );
@@ -86,7 +86,7 @@ void PaverMinEdgeLengthWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, P
     q.add_quality_assessor( qa, err );
 
     // create solver
-    TrustRegion          solver( &of );
+    TrustRegion solver( &of );
     TerminationCriterion tc, ptc;
     tc.add_absolute_vertex_movement( maxVtxMovement );
     tc.add_iteration_limit( iterationLimit );

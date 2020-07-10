@@ -81,23 +81,23 @@ class MESQUITE_EXPORT SlaveBoundaryVertices : public VertexSlaver
 
     virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
     virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-    unsigned get_num_boundary_layers( ) const
+    unsigned get_num_boundary_layers() const
     {
         return elemDepth;
     }
-    bool boundary_is_fixed_vertices( ) const
+    bool boundary_is_fixed_vertices() const
     {
         return domainDoF >= 4;
     }
-    bool boundary_is_mesh_domain( ) const
+    bool boundary_is_mesh_domain() const
     {
         return domainDoF < 4;
     }
-    unsigned boundary_mesh_domain_dimension( ) const
+    unsigned boundary_mesh_domain_dimension() const
     {
         return domainDoF;
     }

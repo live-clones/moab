@@ -36,9 +36,9 @@
 namespace MBMesquite
 {
 
-TTau::~TTau( ) {}
+TTau::~TTau() {}
 
-std::string TTau::get_name( ) const
+std::string TTau::get_name() const
 {
     return "Tau";
 }

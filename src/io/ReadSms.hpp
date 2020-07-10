@@ -29,7 +29,7 @@ class ReadSms : public ReaderIface
     ReadSms( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadSms( );
+    virtual ~ReadSms();
 
   private:
     ErrorCode add_entities( EntityHandle start, EntityHandle count, const Tag* file_id_tag );

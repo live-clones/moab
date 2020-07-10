@@ -16,8 +16,8 @@ int comment( string& line )
     // eat white space characters
     size_t found = line.find_first_not_of( " \t" );
     if( found == string::npos ) return 1;  // empty line
-    if( '#' == line[ found ] ) return 1;  // a comment indeed
-    return 0;  // a line with some data in it, then
+    if( '#' == line[found] ) return 1;     // a comment indeed
+    return 0;                              // a line with some data in it, then
 }
 ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
 {
@@ -25,7 +25,7 @@ ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
     //
     // get the read interface from moab
     ReadUtilIface* iface;
-    ErrorCode      rval = mb->query_interface( iface );
+    ErrorCode rval = mb->query_interface( iface );
     //
     if( MB_SUCCESS != rval )
     {
@@ -33,23 +33,23 @@ ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
         return MB_FAILURE;
     }
     // Triangle default <name>.node
-    string   nodeFileName = fileBase + ".node";
-    ifstream nodeFile( nodeFileName.c_str( ) );
-    if( !nodeFile.is_open( ) )
+    string nodeFileName = fileBase + ".node";
+    ifstream nodeFile( nodeFileName.c_str() );
+    if( !nodeFile.is_open() )
     {
         cout << "can't open node file .\n";
         return MB_FILE_DOES_NOT_EXIST;
     }
-    cout << "reading nodes from file " << nodeFileName.c_str( ) << endl;
+    cout << "reading nodes from file " << nodeFileName.c_str() << endl;
 
-    string   eleFileName = fileBase + ".ele";
-    ifstream eleFile( eleFileName.c_str( ) );
-    if( !eleFile.is_open( ) )
+    string eleFileName = fileBase + ".ele";
+    ifstream eleFile( eleFileName.c_str() );
+    if( !eleFile.is_open() )
     {
         cout << "can't open element file .\n";
         return MB_FILE_DOES_NOT_EXIST;
     }
-    cout << "reading elements from file " << eleFileName.c_str( ) << endl;
+    cout << "reading elements from file " << eleFileName.c_str() << endl;
 
     string line;
 
@@ -71,7 +71,7 @@ ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
     //   needed arrays, coordinate arrays
     //   also, it will return a starting handle for the node sequence
     vector< double* > arrays;
-    EntityHandle      startv;
+    EntityHandle startv;
     rval = iface->get_node_coords( 2, num_nodes, 0, startv, arrays );
     for( int i = 0; i < num_nodes; i++ )
     {
@@ -82,8 +82,8 @@ ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
             continue;
         }
         stringstream tokens( line );
-        int          nodeId;
-        tokens >> nodeId >> arrays[ 0 ][ i ] >> arrays[ 1 ][ i ];
+        int nodeId;
+        tokens >> nodeId >> arrays[0][i] >> arrays[1][i];
     }
 
     // now read the element data from a different file
@@ -98,7 +98,7 @@ ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
         cout << "num triangles:" << num_triangles << endl;
     }
 
-    EntityHandle  starte;
+    EntityHandle starte;
     EntityHandle* starth;  // the connectivity array that will get populated
                            // with triangle data
     // allocate block of triangle handles and read connectivity into them
@@ -113,14 +113,14 @@ ErrorCode ReadTriangleOutput( Interface* mb, string fileBase )
             continue;
         }
         stringstream tokens( line );
-        int          eleId;
+        int eleId;
         unsigned int node;
         tokens >> eleId;
         for( int k = 0; k < 3; k++ )
         {
             tokens >> node;
             // vertex handles start at startv
-            starth[ 3 * j + k ] = startv + node - 1;
+            starth[3 * j + k] = startv + node - 1;
         }
     }
 
@@ -138,18 +138,18 @@ int main( int argc, char** argv )
 {
     if( 3 != argc )
     {
-        cout << "Usage: " << argv[ 0 ] << " <filename>  <outFile> " << endl;
+        cout << "Usage: " << argv[0] << " <filename>  <outFile> " << endl;
         cout << "       <filename>  is the base file name; *.ele and *.node file are read; outFile "
                 "is a file with an extension recognized by MOAB "
              << endl;
         return 0;
     }
 
-    string filename = argv[ 1 ];
-    char*  outfile = argv[ 2 ];
+    string filename = argv[1];
+    char* outfile   = argv[2];
 
     // get MOAB instance and read the file
-    Core* mb = new Core( );
+    Core* mb = new Core();
 
     ErrorCode rval = ReadTriangleOutput( mb, filename );
 

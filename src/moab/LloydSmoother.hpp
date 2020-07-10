@@ -48,22 +48,22 @@ class LloydSmoother
 
     /* \brief Destructor
      */
-    ~LloydSmoother( );
+    ~LloydSmoother();
 
     /* \brief perform smoothing operation
      */
-    ErrorCode perform_smooth( );
+    ErrorCode perform_smooth();
 
     /* \brief get instance
      */
-    Interface* mb_impl( )
+    Interface* mb_impl()
     {
         return mbImpl;
     }
 
     /* \brief get/set ParallelComm
      */
-    ParallelComm* pcomm( )
+    ParallelComm* pcomm()
     {
         return myPcomm;
     }
@@ -77,21 +77,21 @@ class LloydSmoother
 
     /* \brief get/set elements
      */
-    Range& elems( )
+    Range& elems()
     {
         return myElems;
     }
 
     /* \brief get/set elements
      */
-    const Range& elems( ) const
+    const Range& elems() const
     {
         return myElems;
     }
 
     /* \brief get/set fixed tag
      */
-    Tag fixed_tag( )
+    Tag fixed_tag()
     {
         return fixedTag;
     }
@@ -105,7 +105,7 @@ class LloydSmoother
 
     /* \brief get/set coords tag
      */
-    Tag coords_tag( )
+    Tag coords_tag()
     {
         return coordsTag;
     }
@@ -119,7 +119,7 @@ class LloydSmoother
 
     /* \brief get/set tolerance
      */
-    double abs_tol( )
+    double abs_tol()
     {
         return absTol;
     }
@@ -133,7 +133,7 @@ class LloydSmoother
 
     /* \brief get/set tolerance
      */
-    double rel_tol( )
+    double rel_tol()
     {
         return relTol;
     }
@@ -147,7 +147,7 @@ class LloydSmoother
 
     /* \brief get/set numIts
      */
-    int num_its( )
+    int num_its()
     {
         return numIts;
     }
@@ -158,7 +158,7 @@ class LloydSmoother
 
     /* \brief get/set reportIts
      */
-    int report_its( )
+    int report_its()
     {
         return reportIts;
     }
@@ -169,7 +169,7 @@ class LloydSmoother
 
   private:
     //- initialize some things in certain cases
-    ErrorCode initialize( );
+    ErrorCode initialize();
 
     //- MOAB instance
     Interface* mbImpl;

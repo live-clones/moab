@@ -52,11 +52,11 @@ class MsqError;
  */
 struct TargetReaderData
 {
-    std::vector< TagHandle >         handles2D, handles3D;  //< tag handles, indexed by #tags/elem
-    std::vector< MsqMatrix< 3, 3 > > targets3D;  //< cached values for last element
-    std::vector< MsqMatrix< 2, 2 > > targets2D;  //< cached values for last element
+    std::vector< TagHandle > handles2D, handles3D;    //< tag handles, indexed by #tags/elem
+    std::vector< MsqMatrix< 3, 3 > > targets3D;       //< cached values for last element
+    std::vector< MsqMatrix< 2, 2 > > targets2D;       //< cached values for last element
     std::vector< MsqMatrix< 3, 2 > > targetsSurface;  //< cached values for last element
-    size_t                           elementIndex;  //< element for which values are cached.
+    size_t elementIndex;                              //< element for which values are cached.
 };
 
 /**\brief Read targets from tag data */
@@ -66,7 +66,7 @@ class TargetReader : public TargetCalculator, private ExtraDataUser< TargetReade
     MESQUITE_EXPORT
     TargetReader( bool oriented_2D_targets, std::string tag_base_name = "MSQ_TARGET_MATRIX" );
 
-    MESQUITE_EXPORT virtual ~TargetReader( );
+    MESQUITE_EXPORT virtual ~TargetReader();
 
     MESQUITE_EXPORT virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
                                                 MsqError& err );
@@ -77,7 +77,7 @@ class TargetReader : public TargetCalculator, private ExtraDataUser< TargetReade
     MESQUITE_EXPORT virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample,
                                                      MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-    MESQUITE_EXPORT virtual bool have_surface_orient( ) const
+    MESQUITE_EXPORT virtual bool have_surface_orient() const
     {
         return orient2D;
     }
@@ -89,7 +89,7 @@ class TargetReader : public TargetCalculator, private ExtraDataUser< TargetReade
                                    const size_t* elem_map, MsqError& err );
 
     std::string tagBaseName;  //!< Base name for tags used to store targets
-    bool        orient2D;  //!< 2D targets included orientation (3x2 rather than 2x2)
+    bool orient2D;            //!< 2D targets included orientation (3x2 rather than 2x2)
 };
 
 }  // namespace MBMesquite

@@ -39,11 +39,11 @@
 namespace MBMesquite
 {
 
-std::string ScalarAddQualityMetric::get_name( ) const
+std::string ScalarAddQualityMetric::get_name() const
 {
     std::ostringstream str;
-    str << mMetric->get_name( ) << "+" << mOffset;
-    return str.str( );
+    str << mMetric->get_name() << "+" << mOffset;
+    return str.str();
 }
 
 void ScalarAddQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,

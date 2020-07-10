@@ -39,7 +39,7 @@ class ReadUtil : public ReadUtilIface
     ReadUtil( Core* mdb, Error* error_handler );
 
     //! Destructor
-    ~ReadUtil( ) {}
+    ~ReadUtil() {}
 
     //! Get arrays for coordinate data from the MB
     ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const int preferred_start_id,

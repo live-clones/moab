@@ -61,9 +61,9 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
 {
   private:
     std::string tagName;  //< Name of tag storing vertex coordinates
-    TagHandle   tagHandle;  //< Handle of tag storing vertex coordinates
-    bool        haveTagHandle;  //< True if tagHandle is set
-    bool        cleanUpTag;  //< If true, destroy tag in destructor
+    TagHandle tagHandle;  //< Handle of tag storing vertex coordinates
+    bool haveTagHandle;   //< True if tagHandle is set
+    bool cleanUpTag;      //< If true, destroy tag in destructor
 
     /**\brief common code for constructor, set_mesh, and set_tag_name */
     void initialize( Mesh* mesh, std::string name, MsqError& );
@@ -87,7 +87,7 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
     /** Destroy tag data for alternate coordinates if
      *  clean_up_tag_data is true.
      */
-    virtual ~TagVertexMesh( );
+    virtual ~TagVertexMesh();
 
     /**\brief Change the Mesh instance used as the real mesh.
      *
@@ -114,13 +114,13 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
     }
 
     /**\brief Will tag storing alternate coordinates be destroyed. */
-    bool will_clean_up_tag_data( ) const
+    bool will_clean_up_tag_data() const
     {
         return cleanUpTag;
     }
 
     /**\brief Get name of tag used to store alternate vertex coordinates. */
-    std::string get_tag_name( ) const
+    std::string get_tag_name() const
     {
         return tagName;
     }
@@ -163,13 +163,13 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
 
     //**************** Memory Management ****************
 
-    virtual void release( );
+    virtual void release();
 
     //**************** Instruction ****************
 
     virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
     //!\brief Called at start of instruction queue processing
     //!

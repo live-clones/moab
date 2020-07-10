@@ -38,10 +38,10 @@ ErrorCode AEntityFactory::get_vertices( EntityHandle h, const EntityHandle*& vec
     ErrorCode result;
     if( MBPOLYHEDRON == TYPE_FROM_HANDLE( h ) )
     {
-        storage.clear( );
-        result = thisMB->get_adjacencies( &h, 1, 0, false, storage );
-        vect_out = &storage[ 0 ];
-        count_out = storage.size( );
+        storage.clear();
+        result    = thisMB->get_adjacencies( &h, 1, 0, false, storage );
+        vect_out  = &storage[0];
+        count_out = storage.size();
     }
     else
     {
@@ -53,11 +53,11 @@ ErrorCode AEntityFactory::get_vertices( EntityHandle h, const EntityHandle*& vec
 AEntityFactory::AEntityFactory( Core* mdb )
 {
     assert( NULL != mdb );
-    thisMB = mdb;
+    thisMB       = mdb;
     mVertElemAdj = false;
 }
 
-AEntityFactory::~AEntityFactory( )
+AEntityFactory::~AEntityFactory()
 {
     // clean up all the adjacency information that was created
     EntityType ent_type;
@@ -66,17 +66,17 @@ AEntityFactory::~AEntityFactory( )
     for( ent_type = MBVERTEX; ent_type <= MBENTITYSET; ent_type++ )
     {
         TypeSequenceManager::iterator i;
-        TypeSequenceManager&          seqman = thisMB->sequence_manager( )->entity_map( ent_type );
-        for( i = seqman.begin( ); i != seqman.end( ); ++i )
+        TypeSequenceManager& seqman = thisMB->sequence_manager()->entity_map( ent_type );
+        for( i = seqman.begin(); i != seqman.end(); ++i )
         {
-            std::vector< EntityHandle >** adj_list = ( *i )->data( )->get_adjacency_data( );
+            std::vector< EntityHandle >** adj_list = ( *i )->data()->get_adjacency_data();
             if( !adj_list ) continue;
-            adj_list += ( *i )->start_handle( ) - ( *i )->data( )->start_handle( );
+            adj_list += ( *i )->start_handle() - ( *i )->data()->start_handle();
 
-            for( EntityID j = 0; j < ( *i )->size( ); ++j )
+            for( EntityID j = 0; j < ( *i )->size(); ++j )
             {
-                delete adj_list[ j ];
-                adj_list[ j ] = 0;
+                delete adj_list[j];
+                adj_list[j] = 0;
             }
         }
     }
@@ -92,8 +92,8 @@ ErrorCode AEntityFactory::get_elements( EntityHandle source_entity, const unsign
                                         const int create_adjacency_option )
 {
     // check for trivial case first
-    const EntityType source_type = TYPE_FROM_HANDLE( source_entity );
-    const unsigned   source_dimension = CN::Dimension( source_type );
+    const EntityType source_type    = TYPE_FROM_HANDLE( source_entity );
+    const unsigned source_dimension = CN::Dimension( source_type );
 
     if( source_type >= MBENTITYSET || target_dimension < 1 || target_dimension > 3 ) { return MB_TYPE_OUT_OF_RANGE; }
     else if( source_dimension == target_dimension )
@@ -105,7 +105,7 @@ ErrorCode AEntityFactory::get_elements( EntityHandle source_entity, const unsign
     ErrorCode result;
     if( mVertElemAdj == false )
     {
-        result = create_vert_elem_adjacencies( );
+        result = create_vert_elem_adjacencies();
         if( MB_SUCCESS != result ) return result;
     }
 
@@ -128,13 +128,13 @@ ErrorCode AEntityFactory::get_elements( EntityHandle source_entity, const unsign
     return result;
 }
 
-ErrorCode AEntityFactory::get_polyhedron_vertices( const EntityHandle           source_entity,
+ErrorCode AEntityFactory::get_polyhedron_vertices( const EntityHandle source_entity,
                                                    std::vector< EntityHandle >& target_entities )
 {
     // get the connectivity array pointer
     const EntityHandle* connect = NULL;
-    int                 num_connect = 0;
-    ErrorCode           result = thisMB->get_connectivity( source_entity, connect, num_connect );
+    int num_connect             = 0;
+    ErrorCode result            = thisMB->get_connectivity( source_entity, connect, num_connect );
     if( MB_SUCCESS != result ) return result;
 
     // now get the union of those polygons' vertices
@@ -142,27 +142,27 @@ ErrorCode AEntityFactory::get_polyhedron_vertices( const EntityHandle           
     return result;
 }
 
-ErrorCode AEntityFactory::get_associated_meshsets( EntityHandle                 source_entity,
+ErrorCode AEntityFactory::get_associated_meshsets( EntityHandle source_entity,
                                                    std::vector< EntityHandle >& target_entities )
 {
 
     ErrorCode result;
 
     const EntityHandle* adj_vec;
-    int                 num_adj;
+    int num_adj;
     result = get_adjacencies( source_entity, adj_vec, num_adj );
     if( result != MB_SUCCESS || adj_vec == NULL ) return result;
 
     // find the meshsets in this vector
-    DimensionPair       dim_pair = CN::TypeDimensionMap[ 4 ];
-    int                 dum;
+    DimensionPair dim_pair = CN::TypeDimensionMap[4];
+    int dum;
     const EntityHandle* start_ent =
         std::lower_bound( adj_vec, adj_vec + num_adj, CREATE_HANDLE( dim_pair.first, MB_START_ID, dum ) );
     const EntityHandle* end_ent =
         std::lower_bound( start_ent, adj_vec + num_adj, CREATE_HANDLE( dim_pair.second, MB_END_ID, dum ) );
 
     // copy the the meshsets
-    target_entities.insert( target_entities.end( ), start_ent, end_ent );
+    target_entities.insert( target_entities.end(), start_ent, end_ent );
 
     return result;
 }
@@ -181,33 +181,33 @@ ErrorCode AEntityFactory::get_element( const EntityHandle* vertex_list, const in
 
     // look over nodes to see if this entity already exists
     target_entity = 0;
-    ErrorCode           result;
+    ErrorCode result;
     const EntityHandle *i_adj, *end_adj;
 
     // need vertex adjacencies, so create if necessary
-    if( mVertElemAdj == false ) create_vert_elem_adjacencies( );
+    if( mVertElemAdj == false ) create_vert_elem_adjacencies();
 
     // get the adjacency list
     const EntityHandle* adj_vec;
-    int                 num_adj;
-    result = get_adjacencies( vertex_list[ 0 ], adj_vec, num_adj );
+    int num_adj;
+    result = get_adjacencies( vertex_list[0], adj_vec, num_adj );
     if( result != MB_SUCCESS || adj_vec == NULL ) return result;
 
     // check to see if any of these are equivalent to the vertex list
     int dum;
 
     // use a fixed-size array, for speed; there should never be more than 5 equivalent entities
-    EntityHandle temp_vec[ 15 ];
-    int          temp_vec_size = 0;
+    EntityHandle temp_vec[15];
+    int temp_vec_size = 0;
 
-    i_adj = std::lower_bound( adj_vec, adj_vec + num_adj, CREATE_HANDLE( target_type, MB_START_ID, dum ) );
+    i_adj   = std::lower_bound( adj_vec, adj_vec + num_adj, CREATE_HANDLE( target_type, MB_START_ID, dum ) );
     end_adj = std::lower_bound( i_adj, adj_vec + num_adj, CREATE_HANDLE( target_type, MB_END_ID, dum ) );
     for( ; i_adj != end_adj; ++i_adj )
     {
         if( TYPE_FROM_HANDLE( *i_adj ) != target_type ) continue;
 
         if( true == entities_equivalent( *i_adj, vertex_list, vertex_list_size, target_type ) )
-        { temp_vec[ temp_vec_size++ ] = *i_adj; }
+        { temp_vec[temp_vec_size++] = *i_adj; }
     }
 
     if( temp_vec_size == 0 && !create_if_missing ) return result;
@@ -226,7 +226,7 @@ ErrorCode AEntityFactory::get_element( const EntityHandle* vertex_list, const in
 
     // next most likely is one entity
     else if( temp_vec_size == 1 )
-        target_entity = temp_vec[ 0 ];
+        target_entity = temp_vec[0];
 
     // least likely, most work - leave for last test
     else
@@ -238,11 +238,11 @@ ErrorCode AEntityFactory::get_element( const EntityHandle* vertex_list, const in
             int num_adjs;
             for( dum = 0; dum < temp_vec_size; dum++ )
             {
-                result = get_adjacencies( temp_vec[ dum ], adj_vec, num_adjs );
+                result = get_adjacencies( temp_vec[dum], adj_vec, num_adjs );
                 if( std::find( adj_vec, ( adj_vec + num_adjs ), source_entity ) != ( adj_vec + num_adjs ) )
                 {
                     // found it, return it
-                    target_entity = temp_vec[ dum ];
+                    target_entity = temp_vec[dum];
                     break;
                 }
             }
@@ -254,12 +254,12 @@ ErrorCode AEntityFactory::get_element( const EntityHandle* vertex_list, const in
                 // so there may not be any explicit adjacencies between the two; look for common
                 // entities of the intermediate dimension
                 MeshTopoUtil mtu( thisMB );
-                int          intermed_dim = CN::Dimension( target_type ) + 1;
+                int intermed_dim = CN::Dimension( target_type ) + 1;
                 for( dum = 0; dum < temp_vec_size; dum++ )
                 {
-                    if( 0 != mtu.common_entity( temp_vec[ dum ], source_entity, intermed_dim ) )
+                    if( 0 != mtu.common_entity( temp_vec[dum], source_entity, intermed_dim ) )
                     {
-                        target_entity = temp_vec[ dum ];
+                        target_entity = temp_vec[dum];
                         break;
                     }
                 }
@@ -270,8 +270,8 @@ ErrorCode AEntityFactory::get_element( const EntityHandle* vertex_list, const in
         {
             // if we get here, we didn't find a matching adjacency; just take the first one, but
             // return a non-success result
-            target_entity = temp_vec[ 0 ];
-            result = MB_MULTIPLE_ENTITIES_FOUND;
+            target_entity = temp_vec[0];
+            result        = MB_MULTIPLE_ENTITIES_FOUND;
         }
     }
 
@@ -288,12 +288,12 @@ bool AEntityFactory::entities_equivalent( const EntityHandle this_entity, const 
     if( this_type != target_type )
         return false;
 
-    else if( this_type == MBVERTEX && ( vertex_list_size > 1 || vertex_list[ 0 ] != this_entity ) )
+    else if( this_type == MBVERTEX && ( vertex_list_size > 1 || vertex_list[0] != this_entity ) )
         return false;
 
     // need to compare the actual vertices
-    const EntityHandle*         this_vertices = NULL;
-    int                         num_this_vertices = 0;
+    const EntityHandle* this_vertices = NULL;
+    int num_this_vertices             = 0;
     std::vector< EntityHandle > storage;
     thisMB->get_connectivity( this_entity, this_vertices, num_this_vertices, false, &storage );
 
@@ -302,7 +302,7 @@ bool AEntityFactory::entities_equivalent( const EntityHandle this_entity, const 
     int num_corner_verts =
         ( ( this_type == MBPOLYGON || this_type == MBPOLYHEDRON ) ? num_this_vertices
                                                                   : CN::VerticesPerEntity( target_type ) );
-    const EntityHandle* iter = std::find( this_vertices, ( this_vertices + num_corner_verts ), vertex_list[ 0 ] );
+    const EntityHandle* iter = std::find( this_vertices, ( this_vertices + num_corner_verts ), vertex_list[0] );
     if( iter == ( this_vertices + num_corner_verts ) ) return false;
 
     // now lets do connectivity matching
@@ -321,7 +321,7 @@ bool AEntityFactory::entities_equivalent( const EntityHandle this_entity, const 
             break;
         }
 
-        if( vertex_list[ i ] != this_vertices[ ( offset + i ) % num_corner_verts ] )
+        if( vertex_list[i] != this_vertices[( offset + i ) % num_corner_verts] )
         {
             they_match = false;
             break;
@@ -338,7 +338,7 @@ bool AEntityFactory::entities_equivalent( const EntityHandle this_entity, const 
     offset += num_corner_verts;
     for( i = 1; i < num_corner_verts; i++ )
     {
-        if( vertex_list[ i ] != this_vertices[ ( offset - i ) % num_corner_verts ] )
+        if( vertex_list[i] != this_vertices[( offset - i ) % num_corner_verts] )
         {
             they_match = false;
             break;
@@ -358,16 +358,16 @@ ErrorCode AEntityFactory::add_adjacency( EntityHandle from_ent, EntityHandle to_
     if( to_type == MBVERTEX ) return MB_ALREADY_ALLOCATED;
 
     AdjacencyVector* adj_list_ptr = NULL;
-    ErrorCode        result = get_adjacencies( from_ent, adj_list_ptr, true );
+    ErrorCode result              = get_adjacencies( from_ent, adj_list_ptr, true );
     if( MB_SUCCESS != result ) return result;
 
     // get an iterator to the right spot in this sorted vector
     AdjacencyVector::iterator adj_iter;
-    if( !adj_list_ptr->empty( ) )
+    if( !adj_list_ptr->empty() )
     {
-        adj_iter = std::lower_bound( adj_list_ptr->begin( ), adj_list_ptr->end( ), to_ent );
+        adj_iter = std::lower_bound( adj_list_ptr->begin(), adj_list_ptr->end(), to_ent );
 
-        if( adj_iter == adj_list_ptr->end( ) || to_ent != *adj_iter ) { adj_list_ptr->insert( adj_iter, to_ent ); }
+        if( adj_iter == adj_list_ptr->end() || to_ent != *adj_iter ) { adj_list_ptr->insert( adj_iter, to_ent ); }
     }
     else
         adj_list_ptr->push_back( to_ent );
@@ -388,12 +388,12 @@ ErrorCode AEntityFactory::remove_adjacency( EntityHandle base_entity, EntityHand
 
     // get the adjacency tag
     AdjacencyVector* adj_list = NULL;
-    result = get_adjacencies( base_entity, adj_list );
+    result                    = get_adjacencies( base_entity, adj_list );
     if( adj_list == NULL || MB_SUCCESS != result ) return result;
 
     // remove the specified entity from the adjacency list and truncate
     // the list to the new length
-    adj_list->erase( std::remove( adj_list->begin( ), adj_list->end( ), adj_to_remove ), adj_list->end( ) );
+    adj_list->erase( std::remove( adj_list->begin(), adj_list->end(), adj_to_remove ), adj_list->end() );
 
     return result;
 }
@@ -401,7 +401,7 @@ ErrorCode AEntityFactory::remove_adjacency( EntityHandle base_entity, EntityHand
 //! remove all adjacencies from from the base_entity.
 ErrorCode AEntityFactory::remove_all_adjacencies( EntityHandle base_entity, const bool delete_adj_list )
 {
-    ErrorCode  result;
+    ErrorCode result;
     EntityType base_type = TYPE_FROM_HANDLE( base_entity );
 
     if( base_type == MBENTITYSET ) return thisMB->clear_meshset( &base_entity, 1 );
@@ -411,80 +411,80 @@ ErrorCode AEntityFactory::remove_all_adjacencies( EntityHandle base_entity, cons
     // this element.  Also check any elements adjacent
     // to the vertex and of higher dimension than this
     // element for downward adjacencies to this element.
-    if( vert_elem_adjacencies( ) && base_type != MBVERTEX )
+    if( vert_elem_adjacencies() && base_type != MBVERTEX )
     {
-        EntityHandle const *        connvect = 0, *adjvect = 0;
-        int                         numconn = 0, numadj = 0;
+        EntityHandle const *connvect = 0, *adjvect = 0;
+        int numconn = 0, numadj = 0;
         std::vector< EntityHandle > connstorage;
         result = get_vertices( base_entity, connvect, numconn, connstorage );
         if( MB_SUCCESS != result ) return result;
 
         for( int i = 0; i < numconn; ++i )
         {
-            result = get_adjacencies( connvect[ i ], adjvect, numadj );
+            result = get_adjacencies( connvect[i], adjvect, numadj );
             if( MB_SUCCESS != result ) return result;
 
             bool remove_this = false;
             for( int j = 0; j < numadj; ++j )
             {
-                if( adjvect[ j ] == base_entity ) remove_this = true;
+                if( adjvect[j] == base_entity ) remove_this = true;
 
-                if( CN::Dimension( TYPE_FROM_HANDLE( adjvect[ j ] ) ) != base_ent_dim &&
-                    explicitly_adjacent( adjvect[ j ], base_entity ) )
-                    remove_adjacency( adjvect[ j ], base_entity );
+                if( CN::Dimension( TYPE_FROM_HANDLE( adjvect[j] ) ) != base_ent_dim &&
+                    explicitly_adjacent( adjvect[j], base_entity ) )
+                    remove_adjacency( adjvect[j], base_entity );
             }
 
-            if( remove_this ) remove_adjacency( connvect[ i ], base_entity );
+            if( remove_this ) remove_adjacency( connvect[i], base_entity );
         }
     }
 
     // get the adjacency tag
     AdjacencyVector* adj_list = 0;
-    result = get_adjacencies( base_entity, adj_list );
+    result                    = get_adjacencies( base_entity, adj_list );
     if( MB_SUCCESS != result || !adj_list ) return result;
 
     // check adjacent entities for references back to this entity
-    for( AdjacencyVector::reverse_iterator it = adj_list->rbegin( ); it != adj_list->rend( ); ++it )
+    for( AdjacencyVector::reverse_iterator it = adj_list->rbegin(); it != adj_list->rend(); ++it )
         remove_adjacency( *it, base_entity );
 
     if( delete_adj_list )
         result = set_adjacency_ptr( base_entity, NULL );
     else
-        adj_list->clear( );
+        adj_list->clear();
 
     return MB_SUCCESS;
 }
 
-ErrorCode AEntityFactory::create_vert_elem_adjacencies( )
+ErrorCode AEntityFactory::create_vert_elem_adjacencies()
 {
 
     mVertElemAdj = true;
 
-    EntityType                  ent_type;
-    Range::iterator             i_range;
-    const EntityHandle*         connectivity;
+    EntityType ent_type;
+    Range::iterator i_range;
+    const EntityHandle* connectivity;
     std::vector< EntityHandle > aux_connect;
-    int                         number_nodes;
-    ErrorCode                   result;
-    Range                       handle_range;
+    int number_nodes;
+    ErrorCode result;
+    Range handle_range;
 
     // 1. over all element types, for each element, create vertex-element adjacencies
     for( ent_type = MBEDGE; ent_type != MBENTITYSET; ent_type++ )
     {
-        handle_range.clear( );
+        handle_range.clear();
 
         // get this type of entity
         result = thisMB->get_entities_by_type( 0, ent_type, handle_range );
         if( result != MB_SUCCESS ) return result;
 
-        for( i_range = handle_range.begin( ); i_range != handle_range.end( ); ++i_range )
+        for( i_range = handle_range.begin(); i_range != handle_range.end(); ++i_range )
         {
             result = get_vertices( *i_range, connectivity, number_nodes, aux_connect );
             if( MB_SUCCESS != result ) return result;
 
             // add the adjacency
             for( int k = 0; k < number_nodes; k++ )
-                if( ( result = add_adjacency( connectivity[ k ], *i_range ) ) != MB_SUCCESS ) return result;
+                if( ( result = add_adjacency( connectivity[k], *i_range ) ) != MB_SUCCESS ) return result;
         }
     }
 
@@ -495,26 +495,26 @@ ErrorCode AEntityFactory::get_adjacencies( EntityHandle entity, const EntityHand
                                            int& num_entities ) const
 {
     AdjacencyVector const* vec_ptr = 0;
-    ErrorCode              result = get_adjacency_ptr( entity, vec_ptr );
+    ErrorCode result               = get_adjacency_ptr( entity, vec_ptr );
     if( MB_SUCCESS != result || !vec_ptr )
     {
         adjacent_entities = 0;
-        num_entities = 0;
+        num_entities      = 0;
         return result;
     }
 
-    num_entities = vec_ptr->size( );
-    adjacent_entities = ( vec_ptr->empty( ) ) ? NULL : &( ( *vec_ptr )[ 0 ] );
+    num_entities      = vec_ptr->size();
+    adjacent_entities = ( vec_ptr->empty() ) ? NULL : &( ( *vec_ptr )[0] );
     return MB_SUCCESS;
 }
 
 ErrorCode AEntityFactory::get_adjacencies( EntityHandle entity, std::vector< EntityHandle >& adjacent_entities ) const
 {
     AdjacencyVector const* vec_ptr = 0;
-    ErrorCode              result = get_adjacency_ptr( entity, vec_ptr );
+    ErrorCode result               = get_adjacency_ptr( entity, vec_ptr );
     if( MB_SUCCESS != result || !vec_ptr )
     {
-        adjacent_entities.clear( );
+        adjacent_entities.clear();
         return result;
     }
 
@@ -524,12 +524,12 @@ ErrorCode AEntityFactory::get_adjacencies( EntityHandle entity, std::vector< Ent
 
 ErrorCode AEntityFactory::get_adjacencies( EntityHandle entity, std::vector< EntityHandle >*& adj_vec, bool create )
 {
-    adj_vec = 0;
+    adj_vec          = 0;
     ErrorCode result = get_adjacency_ptr( entity, adj_vec );
     if( MB_SUCCESS == result && !adj_vec && create )
     {
         adj_vec = new AdjacencyVector;
-        result = set_adjacency_ptr( entity, adj_vec );
+        result  = set_adjacency_ptr( entity, adj_vec );
         if( MB_SUCCESS != result )
         {
             delete adj_vec;
@@ -542,8 +542,8 @@ ErrorCode AEntityFactory::get_adjacencies( EntityHandle entity, std::vector< Ent
 ErrorCode AEntityFactory::get_adjacencies( const EntityHandle source_entity, const unsigned int target_dimension,
                                            bool create_if_missing, std::vector< EntityHandle >& target_entities )
 {
-    const EntityType source_type = TYPE_FROM_HANDLE( source_entity );
-    const unsigned   source_dimension = CN::Dimension( source_type );
+    const EntityType source_type    = TYPE_FROM_HANDLE( source_entity );
+    const unsigned source_dimension = CN::Dimension( source_type );
 
     ErrorCode result;
     if( target_dimension == 4 )
@@ -553,10 +553,10 @@ ErrorCode AEntityFactory::get_adjacencies( const EntityHandle source_entity, con
     else if( target_dimension == ( source_type != MBPOLYHEDRON ? 0 : 2 ) )
     {
         std::vector< EntityHandle > tmp_storage;
-        const EntityHandle*         conn = NULL;
-        int                         len = 0;
-        result = thisMB->get_connectivity( source_entity, conn, len, false, &tmp_storage );
-        target_entities.insert( target_entities.end( ), conn, conn + len );
+        const EntityHandle* conn = NULL;
+        int len                  = 0;
+        result                   = thisMB->get_connectivity( source_entity, conn, len, false, &tmp_storage );
+        target_entities.insert( target_entities.end(), conn, conn + len );
     }
     else if( target_dimension == 0 && source_type == MBPOLYHEDRON )
     {
@@ -571,7 +571,7 @@ ErrorCode AEntityFactory::get_adjacencies( const EntityHandle source_entity, con
     {
         if( mVertElemAdj == false )
         {
-            result = create_vert_elem_adjacencies( );
+            result = create_vert_elem_adjacencies();
             if( MB_SUCCESS != result ) return result;
         }
 
@@ -594,7 +594,7 @@ ErrorCode AEntityFactory::notify_create_entity( const EntityHandle entity, const
                                                 const int number_nodes )
 {
     ErrorCode result = MB_SUCCESS, tmp_result;
-    if( vert_elem_adjacencies( ) )
+    if( vert_elem_adjacencies() )
     {
         // iterate through nodes and add adjacency information
         if( TYPE_FROM_HANDLE( entity ) == MBPOLYHEDRON )
@@ -603,7 +603,7 @@ ErrorCode AEntityFactory::notify_create_entity( const EntityHandle entity, const
             std::vector< EntityHandle > verts;
             tmp_result = get_adjacencies( entity, 0, false, verts );
             if( MB_SUCCESS != tmp_result ) return tmp_result;
-            for( std::vector< EntityHandle >::iterator vit = verts.begin( ); vit != verts.end( ); ++vit )
+            for( std::vector< EntityHandle >::iterator vit = verts.begin(); vit != verts.end(); ++vit )
             {
                 tmp_result = add_adjacency( *vit, entity );
                 if( MB_SUCCESS != tmp_result ) result = tmp_result;
@@ -613,7 +613,7 @@ ErrorCode AEntityFactory::notify_create_entity( const EntityHandle entity, const
         {
             for( unsigned int i = number_nodes; i--; )
             {
-                tmp_result = add_adjacency( node_array[ i ], entity );
+                tmp_result = add_adjacency( node_array[i], entity );
                 if( MB_SUCCESS != tmp_result ) result = tmp_result;
             }
         }
@@ -624,39 +624,39 @@ ErrorCode AEntityFactory::notify_create_entity( const EntityHandle entity, const
 
 ErrorCode AEntityFactory::get_zero_to_n_elements( EntityHandle source_entity, const unsigned int target_dimension,
                                                   std::vector< EntityHandle >& target_entities,
-                                                  const bool                   create_if_missing,
+                                                  const bool create_if_missing,
                                                   const int /*create_adjacency_option = -1*/ )
 {
     AdjacencyVector::iterator start_ent, end_ent;
 
     // get the adjacency vector
     AdjacencyVector* adj_vec = NULL;
-    ErrorCode        result = get_adjacencies( source_entity, adj_vec );
+    ErrorCode result         = get_adjacencies( source_entity, adj_vec );
     if( result != MB_SUCCESS || adj_vec == NULL ) return result;
 
     if( target_dimension < 3 && create_if_missing )
     {
         std::vector< EntityHandle > tmp_ents;
 
-        start_ent = std::lower_bound( adj_vec->begin( ), adj_vec->end( ),
-                                      FIRST_HANDLE( CN::TypeDimensionMap[ target_dimension + 1 ].first ) );
+        start_ent = std::lower_bound( adj_vec->begin(), adj_vec->end(),
+                                      FIRST_HANDLE( CN::TypeDimensionMap[target_dimension + 1].first ) );
 
-        end_ent = std::lower_bound( start_ent, adj_vec->end( ), LAST_HANDLE( CN::TypeDimensionMap[ 3 ].second ) );
+        end_ent = std::lower_bound( start_ent, adj_vec->end(), LAST_HANDLE( CN::TypeDimensionMap[3].second ) );
 
         std::vector< EntityHandle > elems( start_ent, end_ent );
 
         // make target_dimension elements from all adjacient higher-dimension elements
-        for( start_ent = elems.begin( ); start_ent != elems.end( ); ++start_ent )
+        for( start_ent = elems.begin(); start_ent != elems.end(); ++start_ent )
         {
-            tmp_ents.clear( );
+            tmp_ents.clear();
             get_down_adjacency_elements( *start_ent, target_dimension, tmp_ents, create_if_missing, 0 );
         }
     }
 
-    DimensionPair dim_pair = CN::TypeDimensionMap[ target_dimension ];
-    start_ent = std::lower_bound( adj_vec->begin( ), adj_vec->end( ), FIRST_HANDLE( dim_pair.first ) );
-    end_ent = std::lower_bound( start_ent, adj_vec->end( ), LAST_HANDLE( dim_pair.second ) );
-    target_entities.insert( target_entities.end( ), start_ent, end_ent );
+    DimensionPair dim_pair = CN::TypeDimensionMap[target_dimension];
+    start_ent              = std::lower_bound( adj_vec->begin(), adj_vec->end(), FIRST_HANDLE( dim_pair.first ) );
+    end_ent                = std::lower_bound( start_ent, adj_vec->end(), LAST_HANDLE( dim_pair.second ) );
+    target_entities.insert( target_entities.end(), start_ent, end_ent );
     return MB_SUCCESS;
 }
 
@@ -672,11 +672,11 @@ ErrorCode AEntityFactory::get_down_adjacency_elements( EntityHandle source_entit
                                                  create_adjacency_option );
 
     // make this a fixed size to avoid cost of working with STL vectors
-    EntityHandle vertex_array[ 27 ] = { };
-    ErrorCode    temp_result;
+    EntityHandle vertex_array[27] = {};
+    ErrorCode temp_result;
 
     const EntityHandle* vertices = NULL;
-    int                 num_verts = 0;
+    int num_verts                = 0;
 
     // I know there are already vertex adjacencies for this - call
     // another function to get them
@@ -684,50 +684,50 @@ ErrorCode AEntityFactory::get_down_adjacency_elements( EntityHandle source_entit
     ErrorCode result = thisMB->get_connectivity( source_entity, vertices, num_verts, false, &storage );
     if( MB_SUCCESS != result ) return result;
 
-    int has_mid_nodes[ 4 ];
+    int has_mid_nodes[4];
     CN::HasMidNodes( source_type, num_verts, has_mid_nodes );
 
     std::vector< int > index_list;
-    int                num_sub_ents = CN::NumSubEntities( source_type, target_dimension );
+    int num_sub_ents = CN::NumSubEntities( source_type, target_dimension );
 
     for( int j = 0; j < num_sub_ents; j++ )
     {
-        const CN::ConnMap& cmap = CN::mConnectivityMap[ source_type ][ target_dimension - 1 ];
+        const CN::ConnMap& cmap = CN::mConnectivityMap[source_type][target_dimension - 1];
 
-        int verts_per_sub = cmap.num_corners_per_sub_element[ j ];
+        int verts_per_sub = cmap.num_corners_per_sub_element[j];
 
         // get the corner vertices
         for( int i = 0; i < verts_per_sub; i++ )
-            vertex_array[ i ] = vertices[ cmap.conn[ j ][ i ] ];
+            vertex_array[i] = vertices[cmap.conn[j][i]];
 
         // get the ho nodes for sub-subfacets
-        if( has_mid_nodes[ 1 ] && target_dimension > 1 )
+        if( has_mid_nodes[1] && target_dimension > 1 )
         {
             // has edge mid-nodes; for each edge, get the right mid-node and put in vertices
             // first get the edge indices
-            index_list.clear( );
+            index_list.clear();
             int int_result = CN::AdjacentSubEntities( source_type, &j, 1, target_dimension, 1, index_list );
             if( 0 != int_result ) return MB_FAILURE;
-            for( unsigned int k = 0; k < index_list.size( ); k++ )
+            for( unsigned int k = 0; k < index_list.size(); k++ )
             {
-                int tmp_index = CN::HONodeIndex( source_type, num_verts, 1, index_list[ k ] );
+                int tmp_index = CN::HONodeIndex( source_type, num_verts, 1, index_list[k] );
                 if( tmp_index >= (int)num_verts ) return MB_INDEX_OUT_OF_RANGE;
 
                 // put this vertex on the end; reuse verts_per_sub as an index
-                vertex_array[ verts_per_sub++ ] = vertices[ tmp_index ];
+                vertex_array[verts_per_sub++] = vertices[tmp_index];
             }
         }
         // get the ho nodes for the target dimension
-        if( has_mid_nodes[ target_dimension ] )
+        if( has_mid_nodes[target_dimension] )
         {
             // get the ho node index for this subfacet
             int tmp_index = CN::HONodeIndex( source_type, num_verts, target_dimension, j );
             if( tmp_index >= num_verts ) return MB_INDEX_OUT_OF_RANGE;
-            vertex_array[ verts_per_sub++ ] = vertices[ tmp_index ];
+            vertex_array[verts_per_sub++] = vertices[tmp_index];
         }
 
         EntityHandle tmp_target = 0;
-        temp_result = get_element( vertex_array, verts_per_sub, cmap.target_type[ j ], tmp_target, create_if_missing,
+        temp_result = get_element( vertex_array, verts_per_sub, cmap.target_type[j], tmp_target, create_if_missing,
                                    source_entity, create_adjacency_option );
 
         if( temp_result != MB_SUCCESS )
@@ -742,10 +742,10 @@ ErrorCode AEntityFactory::get_down_adjacency_elements( EntityHandle source_entit
     return result;
 }
 
-ErrorCode AEntityFactory::get_down_adjacency_elements_poly( EntityHandle                 source_entity,
-                                                            const unsigned int           target_dimension,
+ErrorCode AEntityFactory::get_down_adjacency_elements_poly( EntityHandle source_entity,
+                                                            const unsigned int target_dimension,
                                                             std::vector< EntityHandle >& target_entities,
-                                                            const bool                   create_if_missing,
+                                                            const bool create_if_missing,
                                                             const int /*create_adjacency_option*/ )
 {
 
@@ -768,28 +768,28 @@ ErrorCode AEntityFactory::get_down_adjacency_elements_poly( EntityHandle        
     {
         result = MB_SUCCESS;
         // put the first vertex on the end so we have a ring
-        vertex_array.push_back( *vertex_array.begin( ) );
-        for( unsigned int i = 0; i < vertex_array.size( ) - 1; i++ )
+        vertex_array.push_back( *vertex_array.begin() );
+        for( unsigned int i = 0; i < vertex_array.size() - 1; i++ )
         {
             Range vrange, adj_edges;
-            vrange.insert( vertex_array[ i ] );
-            vrange.insert( vertex_array[ i + 1 ] );
+            vrange.insert( vertex_array[i] );
+            vrange.insert( vertex_array[i + 1] );
             // account for padded polygons; if the vertices are the same, skip
-            if( vrange.size( ) == 1 ) continue;
+            if( vrange.size() == 1 ) continue;
             tmp_result = thisMB->get_adjacencies( vrange, 1, false, adj_edges );
             if( MB_SUCCESS != tmp_result ) result = tmp_result;
-            if( adj_edges.size( ) == 1 )
+            if( adj_edges.size() == 1 )
             {
                 // single edge - don't check adjacencies
-                target_entities.push_back( *adj_edges.begin( ) );
+                target_entities.push_back( *adj_edges.begin() );
             }
-            else if( adj_edges.size( ) != 0 )
+            else if( adj_edges.size() != 0 )
             {
                 // multiple ones - need to check for explicit adjacencies
-                unsigned int        start_sz = target_entities.size( );
+                unsigned int start_sz = target_entities.size();
                 const EntityHandle* explicit_adjs;
-                int                 num_exp;
-                for( Range::iterator rit = adj_edges.begin( ); rit != adj_edges.end( ); ++rit )
+                int num_exp;
+                for( Range::iterator rit = adj_edges.begin(); rit != adj_edges.end(); ++rit )
                 {
                     // TODO check return value
                     this->get_adjacencies( *rit, explicit_adjs, num_exp );
@@ -797,10 +797,10 @@ ErrorCode AEntityFactory::get_down_adjacency_elements_poly( EntityHandle        
                         std::find( explicit_adjs, explicit_adjs + num_exp, source_entity ) != explicit_adjs + num_exp )
                         target_entities.push_back( *rit );
                 }
-                if( target_entities.size( ) == start_sz )
+                if( target_entities.size() == start_sz )
                 {
                     result = MB_MULTIPLE_ENTITIES_FOUND;
-                    target_entities.push_back( *adj_edges.begin( ) );
+                    target_entities.push_back( *adj_edges.begin() );
                 }
             }
             else
@@ -810,17 +810,17 @@ ErrorCode AEntityFactory::get_down_adjacency_elements_poly( EntityHandle        
                 if( create_if_missing )
                 {
                     EntityHandle newEdge;
-                    EntityHandle v[ 2 ] = { vertex_array[ i ], vertex_array[ i + 1 ] };
-                    result = thisMB->create_element( MBEDGE, v, 2, newEdge );
+                    EntityHandle v[2] = { vertex_array[i], vertex_array[i + 1] };
+                    result            = thisMB->create_element( MBEDGE, v, 2, newEdge );
                     if( MB_SUCCESS != result ) return result;
                     // we also need to add explicit adjacency, so next time we do not
                     // create again (because we do not find the edge if it is not adjacent to the
                     // vertices
                     // if (create_adjacency_option >= 0)
                     //{
-                    result = add_adjacency( v[ 0 ], newEdge );
+                    result = add_adjacency( v[0], newEdge );
                     if( MB_SUCCESS != result ) return result;
-                    result = add_adjacency( v[ 1 ], newEdge );
+                    result = add_adjacency( v[1], newEdge );
                     if( MB_SUCCESS != result ) return result;
                     target_entities.push_back( newEdge );
                     //}
@@ -838,7 +838,7 @@ ErrorCode AEntityFactory::get_down_adjacency_elements_poly( EntityHandle        
             std::vector< EntityHandle > dum_vec;
             result = thisMB->get_connectivity( &source_entity, 1, dum_vec );
             if( MB_SUCCESS != result ) return result;
-            result = thisMB->get_adjacencies( &dum_vec[ 0 ], dum_vec.size( ), 1, create_if_missing, target_entities,
+            result = thisMB->get_adjacencies( &dum_vec[0], dum_vec.size(), 1, create_if_missing, target_entities,
                                               Interface::UNION );
             return result;
         }
@@ -1049,14 +1049,14 @@ ErrorCode AEntityFactory::get_up_adjacency_elements(
 #else
 ErrorCode AEntityFactory::get_up_adjacency_elements( EntityHandle source_entity, const unsigned int target_dimension,
                                                      std::vector< EntityHandle >& target_entities,
-                                                     const bool                   create_if_missing,
+                                                     const bool create_if_missing,
                                                      const int /*create_adjacency_option = -1*/ )
 {
 
     EntityType source_type = TYPE_FROM_HANDLE( source_entity );
 
-    const EntityHandle*         source_vertices = NULL;
-    int                         num_source_vertices = 0;
+    const EntityHandle* source_vertices = NULL;
+    int num_source_vertices             = 0;
     std::vector< EntityHandle > conn_storage;
 
     // check to see whether there are any equivalent entities (same verts, different entity);
@@ -1078,32 +1078,32 @@ ErrorCode AEntityFactory::get_up_adjacency_elements( EntityHandle source_entity,
     {
         // get elems adjacent to each node
         std::vector< std::vector< EntityHandle > > elems( num_source_vertices );
-        int                                        i;
+        int i;
         for( i = 0; i < num_source_vertices; i++ )
         {
             // get elements
             // see comment above pertaining to source_vertices; these are corner vertices only
-            get_zero_to_n_elements( source_vertices[ i ], target_dimension, elems[ i ], create_if_missing, 0 );
+            get_zero_to_n_elements( source_vertices[i], target_dimension, elems[i], create_if_missing, 0 );
             // sort this element list
-            std::sort( elems[ i ].begin( ), elems[ i ].end( ) );
+            std::sort( elems[i].begin(), elems[i].end() );
         }
 
         // perform an intersection between all the element lists
         // see comment above pertaining to source_vertices; these are corner vertices only
         for( i = 1; i < num_source_vertices; i++ )
         {
-            tmp_vec.clear( );
+            tmp_vec.clear();
 
             // intersection between first list and ith list, put result in tmp
-            std::set_intersection( elems[ 0 ].begin( ), elems[ 0 ].end( ), elems[ i ].begin( ), elems[ i ].end( ),
+            std::set_intersection( elems[0].begin(), elems[0].end(), elems[i].begin(), elems[i].end(),
                                    std::back_insert_iterator< std::vector< EntityHandle > >( tmp_vec ) );
             // tmp has elems[0] contents and elems[0] contents has tmp's contents
             // so that elems[0] always has the intersection of previous operations
-            elems[ 0 ].swap( tmp_vec );
+            elems[0].swap( tmp_vec );
         }
 
         // elems[0] contains the intersection, swap with target_entities
-        target_entities.insert( target_entities.end( ), elems[ 0 ].begin( ), elems[ 0 ].end( ) );
+        target_entities.insert( target_entities.end(), elems[0].begin(), elems[0].end() );
     }
     else if( source_type == MBPOLYGON )
     {
@@ -1113,15 +1113,15 @@ ErrorCode AEntityFactory::get_up_adjacency_elements( EntityHandle source_entity,
         if( MB_SUCCESS != result ) return result;
 
         // now filter according to whether each is adjacent to the polygon
-        const EntityHandle*         connect = NULL;
-        int                         num_connect = 0;
+        const EntityHandle* connect = NULL;
+        int num_connect             = 0;
         std::vector< EntityHandle > storage;
-        for( unsigned int i = 0; i < tmp_vec.size( ); i++ )
+        for( unsigned int i = 0; i < tmp_vec.size(); i++ )
         {
-            result = thisMB->get_connectivity( tmp_vec[ i ], connect, num_connect, false, &storage );
+            result = thisMB->get_connectivity( tmp_vec[i], connect, num_connect, false, &storage );
             if( MB_SUCCESS != result ) return result;
             if( std::find( connect, connect + num_connect, source_entity ) != connect + num_connect )
-                target_entities.push_back( tmp_vec[ i ] );
+                target_entities.push_back( tmp_vec[i] );
         }
     }
 
@@ -1131,15 +1131,15 @@ ErrorCode AEntityFactory::get_up_adjacency_elements( EntityHandle source_entity,
 
         // get the adjacency vector
         AdjacencyVector* adj_vec = NULL;
-        result = get_adjacencies( source_entity, adj_vec );
+        result                   = get_adjacencies( source_entity, adj_vec );
 
         if( result != MB_SUCCESS )
             return result;
         else if( adj_vec == NULL )
             return MB_SUCCESS;
 
-        DimensionPair dim_pair_dp1 = CN::TypeDimensionMap[ CN::Dimension( source_type ) + 1 ],
-                      dim_pair_td = CN::TypeDimensionMap[ target_dimension ];
+        DimensionPair dim_pair_dp1 = CN::TypeDimensionMap[CN::Dimension( source_type ) + 1],
+                      dim_pair_td  = CN::TypeDimensionMap[target_dimension];
         int dum;
 
         Range tmp_ents, target_ents;
@@ -1147,14 +1147,14 @@ ErrorCode AEntityFactory::get_up_adjacency_elements( EntityHandle source_entity,
         // get iterators for start handle of source_dim+1 and target_dim, and end handle
         // of target_dim
         AdjacencyVector::iterator start_ent_dp1 =
-                                      std::lower_bound( adj_vec->begin( ), adj_vec->end( ),
+                                      std::lower_bound( adj_vec->begin(), adj_vec->end(),
                                                         CREATE_HANDLE( dim_pair_dp1.first, MB_START_ID, dum ) ),
 
                                   start_ent_td =
-                                      std::lower_bound( adj_vec->begin( ), adj_vec->end( ),
+                                      std::lower_bound( adj_vec->begin(), adj_vec->end(),
                                                         CREATE_HANDLE( dim_pair_td.first, MB_START_ID, dum ) ),
 
-                                  end_ent_td = std::lower_bound( adj_vec->begin( ), adj_vec->end( ),
+                                  end_ent_td = std::lower_bound( adj_vec->begin(), adj_vec->end(),
                                                                  CREATE_HANDLE( dim_pair_td.second, MB_END_ID, dum ) );
 
         // get the adjacencies for source_dim+1 to target_dim-1, and the adjacencies from
@@ -1168,9 +1168,9 @@ ErrorCode AEntityFactory::get_up_adjacency_elements( EntityHandle source_entity,
 
         // now insert the whole thing into the argument vector
 #ifdef MOAB_NO_VECTOR_TEMPLATE_INSERT
-        std::copy( target_ents.begin( ), target_ents.end( ), std::back_inserter( target_entities ) );
+        std::copy( target_ents.begin(), target_ents.end(), std::back_inserter( target_entities ) );
 #else
-        target_entities.insert( target_entities.end( ), target_ents.begin( ), target_ents.end( ) );
+        target_entities.insert( target_entities.end(), target_ents.begin(), target_ents.end() );
 #endif
     }
 
@@ -1186,13 +1186,13 @@ ErrorCode AEntityFactory::notify_change_connectivity( EntityHandle entity, const
 
     // find out which ones to add and which to remove
     std::vector< EntityHandle > old_verts, new_verts;
-    int                         i;
+    int i;
     for( i = 0; i < number_verts; i++ )
     {
-        if( old_array[ i ] != new_array[ i ] )
+        if( old_array[i] != new_array[i] )
         {
-            old_verts.push_back( old_array[ i ] );
-            new_verts.push_back( new_array[ i ] );
+            old_verts.push_back( old_array[i] );
+            new_verts.push_back( new_array[i] );
         }
     }
 
@@ -1202,17 +1202,17 @@ ErrorCode AEntityFactory::notify_change_connectivity( EntityHandle entity, const
     {
         // update the vertex-entity adjacencies
         std::vector< EntityHandle >::iterator adj_iter;
-        for( adj_iter = old_verts.begin( ); adj_iter != old_verts.end( ); ++adj_iter )
+        for( adj_iter = old_verts.begin(); adj_iter != old_verts.end(); ++adj_iter )
         {
-            if( std::find( new_verts.begin( ), new_verts.end( ), *adj_iter ) == new_verts.end( ) )
+            if( std::find( new_verts.begin(), new_verts.end(), *adj_iter ) == new_verts.end() )
             {
                 result = remove_adjacency( *adj_iter, entity );
                 if( MB_SUCCESS != result ) return result;
             }
         }
-        for( adj_iter = new_verts.begin( ); adj_iter != new_verts.end( ); ++adj_iter )
+        for( adj_iter = new_verts.begin(); adj_iter != new_verts.end(); ++adj_iter )
         {
-            if( std::find( old_verts.begin( ), old_verts.end( ), *adj_iter ) == old_verts.end( ) )
+            if( std::find( old_verts.begin(), old_verts.end(), *adj_iter ) == old_verts.end() )
             {
                 result = add_adjacency( *adj_iter, entity );
                 if( MB_SUCCESS != result ) return result;
@@ -1227,7 +1227,7 @@ ErrorCode AEntityFactory::notify_change_connectivity( EntityHandle entity, const
 bool AEntityFactory::explicitly_adjacent( const EntityHandle ent1, const EntityHandle ent2 )
 {
     const EntityHandle* explicit_adjs;
-    int                 num_exp;
+    int num_exp;
     get_adjacencies( ent1, explicit_adjs, num_exp );
     if( std::find( explicit_adjs, explicit_adjs + num_exp, ent2 ) != explicit_adjs + num_exp )
         return true;
@@ -1237,7 +1237,7 @@ bool AEntityFactory::explicitly_adjacent( const EntityHandle ent1, const EntityH
 
 ErrorCode AEntityFactory::merge_adjust_adjacencies( EntityHandle entity_to_keep, EntityHandle entity_to_remove )
 {
-    int       ent_dim = CN::Dimension( TYPE_FROM_HANDLE( entity_to_keep ) );
+    int ent_dim = CN::Dimension( TYPE_FROM_HANDLE( entity_to_keep ) );
     ErrorCode result;
 
     // check for newly-formed equivalent entities, and create explicit adjacencies
@@ -1256,7 +1256,7 @@ ErrorCode AEntityFactory::merge_adjust_adjacencies( EntityHandle entity_to_keep,
         result = thisMB->get_adjacencies( &entity_to_remove, 1, dim, false, adjs );
         if( result != MB_SUCCESS ) return result;
         // for any explicit ones, make them adjacent to keeper
-        for( Range::iterator rit = adjs.begin( ); rit != adjs.end( ); ++rit )
+        for( Range::iterator rit = adjs.begin(); rit != adjs.end(); ++rit )
         {
             if( this->explicitly_adjacent( *rit, entity_to_remove ) )
             {
@@ -1271,26 +1271,26 @@ ErrorCode AEntityFactory::merge_adjust_adjacencies( EntityHandle entity_to_keep,
     result = this->get_adjacencies( entity_to_remove, adjs );
     if( result != MB_SUCCESS ) return result;
     // set them all, and if to_entity is a set, add to that one too
-    for( unsigned int i = 0; i < adjs.size( ); i++ )
+    for( unsigned int i = 0; i < adjs.size(); i++ )
     {
-        if( TYPE_FROM_HANDLE( adjs[ i ] ) == MBENTITYSET )
+        if( TYPE_FROM_HANDLE( adjs[i] ) == MBENTITYSET )
         {
             // result = this->add_adjacency(entity_to_keep, adjs[i]);
             // if(result != MB_SUCCESS) return result;
             // result = thisMB->add_entities(adjs[i], &entity_to_keep, 1);
             // if(result != MB_SUCCESS) return result;
-            result = thisMB->replace_entities( adjs[ i ], &entity_to_remove, &entity_to_keep, 1 );
+            result = thisMB->replace_entities( adjs[i], &entity_to_remove, &entity_to_keep, 1 );
             if( MB_SUCCESS != result ) return result;
         }
         else if( ent_dim == 0 )
         {
-            conn.clear( );
-            result = thisMB->get_connectivity( &adjs[ i ], 1, conn );
+            conn.clear();
+            result = thisMB->get_connectivity( &adjs[i], 1, conn );
 
             if( result == MB_SUCCESS )
             {
-                std::replace( conn.begin( ), conn.end( ), entity_to_remove, entity_to_keep );
-                result = thisMB->set_connectivity( adjs[ i ], &conn[ 0 ], conn.size( ) );
+                std::replace( conn.begin(), conn.end(), entity_to_remove, entity_to_keep );
+                result = thisMB->set_connectivity( adjs[i], &conn[0], conn.size() );
                 if( MB_SUCCESS != result ) return result;
             }
             else
@@ -1298,7 +1298,7 @@ ErrorCode AEntityFactory::merge_adjust_adjacencies( EntityHandle entity_to_keep,
         }
         else
         {
-            result = this->add_adjacency( entity_to_keep, adjs[ i ] );
+            result = this->add_adjacency( entity_to_keep, adjs[i] );
             if( result != MB_SUCCESS ) return result;
         }
     }
@@ -1313,7 +1313,7 @@ ErrorCode AEntityFactory::check_equiv_entities( EntityHandle entity_to_keep, Ent
     if( thisMB->dimension_from_handle( entity_to_keep ) > 0 ) return MB_SUCCESS;
 
     // get all the adjacencies for both entities for all dimensions > 0
-    Range     adjs_keep, adjs_remove;
+    Range adjs_keep, adjs_remove;
     ErrorCode result;
 
     for( int dim = 1; dim <= 3; dim++ )
@@ -1327,27 +1327,27 @@ ErrorCode AEntityFactory::check_equiv_entities( EntityHandle entity_to_keep, Ent
     // now look for equiv entities which will be formed
     // algorithm:
     // for each entity adjacent to removed entity:
-    EntityHandle two_ents[ 2 ];
-    for( Range::iterator rit_rm = adjs_remove.begin( ); rit_rm != adjs_remove.end( ); ++rit_rm )
+    EntityHandle two_ents[2];
+    for( Range::iterator rit_rm = adjs_remove.begin(); rit_rm != adjs_remove.end(); ++rit_rm )
     {
-        two_ents[ 0 ] = *rit_rm;
+        two_ents[0] = *rit_rm;
 
         // - for each entity of same dimension adjacent to kept entity:
-        for( Range::iterator rit_kp = adjs_keep.begin( ); rit_kp != adjs_keep.end( ); ++rit_kp )
+        for( Range::iterator rit_kp = adjs_keep.begin(); rit_kp != adjs_keep.end(); ++rit_kp )
         {
             if( TYPE_FROM_HANDLE( *rit_kp ) != TYPE_FROM_HANDLE( *rit_rm ) ) continue;
 
             Range all_verts;
-            two_ents[ 1 ] = *rit_kp;
+            two_ents[1] = *rit_kp;
             //   . get union of adjacent vertices to two entities
             result = thisMB->get_adjacencies( two_ents, 2, 0, false, all_verts, Interface::UNION );
             if( MB_SUCCESS != result ) return result;
 
-            assert( all_verts.find( entity_to_keep ) != all_verts.end( ) &&
-                    all_verts.find( entity_to_remove ) != all_verts.end( ) );
+            assert( all_verts.find( entity_to_keep ) != all_verts.end() &&
+                    all_verts.find( entity_to_remove ) != all_verts.end() );
 
             //   . if # vertices != number of corner vertices + 1, continue
-            if( CN::VerticesPerEntity( TYPE_FROM_HANDLE( *rit_rm ) ) + 1 != (int)all_verts.size( ) ) continue;
+            if( CN::VerticesPerEntity( TYPE_FROM_HANDLE( *rit_rm ) ) + 1 != (int)all_verts.size() ) continue;
 
             //   . for the two entities adjacent to kept & removed entity:
             result = create_explicit_adjs( *rit_rm );
@@ -1365,14 +1365,14 @@ ErrorCode AEntityFactory::check_equiv_entities( EntityHandle entity_to_keep, Ent
 ErrorCode AEntityFactory::create_explicit_adjs( EntityHandle this_ent )
 {
     //     - get adjacent entities of next higher dimension
-    Range     all_adjs;
+    Range all_adjs;
     ErrorCode result;
     result = thisMB->get_adjacencies( &this_ent, 1, thisMB->dimension_from_handle( this_ent ) + 1, false, all_adjs,
                                       Interface::UNION );
     if( MB_SUCCESS != result ) return result;
 
     //     - create explicit adjacency to these entities
-    for( Range::iterator rit = all_adjs.begin( ); rit != all_adjs.end( ); ++rit )
+    for( Range::iterator rit = all_adjs.begin(); rit != all_adjs.end(); ++rit )
     {
         result = add_adjacency( this_ent, *rit );
         if( MB_SUCCESS != result ) return result;
@@ -1386,10 +1386,10 @@ ErrorCode AEntityFactory::get_adjacency_ptr( EntityHandle entity, std::vector< E
     ptr = 0;
 
     EntitySequence* seq;
-    ErrorCode       rval = thisMB->sequence_manager( )->find( entity, seq );
-    if( MB_SUCCESS != rval || !seq->data( )->get_adjacency_data( ) ) return rval;
+    ErrorCode rval = thisMB->sequence_manager()->find( entity, seq );
+    if( MB_SUCCESS != rval || !seq->data()->get_adjacency_data() ) return rval;
 
-    ptr = seq->data( )->get_adjacency_data( )[ entity - seq->data( )->start_handle( ) ];
+    ptr = seq->data()->get_adjacency_data()[entity - seq->data()->start_handle()];
     return MB_SUCCESS;
 }
 
@@ -1398,24 +1398,24 @@ ErrorCode AEntityFactory::get_adjacency_ptr( EntityHandle entity, const std::vec
     ptr = 0;
 
     EntitySequence* seq;
-    ErrorCode       rval = thisMB->sequence_manager( )->find( entity, seq );
-    if( MB_SUCCESS != rval || !seq->data( )->get_adjacency_data( ) ) return rval;
+    ErrorCode rval = thisMB->sequence_manager()->find( entity, seq );
+    if( MB_SUCCESS != rval || !seq->data()->get_adjacency_data() ) return rval;
 
-    ptr = seq->data( )->get_adjacency_data( )[ entity - seq->data( )->start_handle( ) ];
+    ptr = seq->data()->get_adjacency_data()[entity - seq->data()->start_handle()];
     return MB_SUCCESS;
 }
 
 ErrorCode AEntityFactory::set_adjacency_ptr( EntityHandle entity, std::vector< EntityHandle >* ptr )
 {
     EntitySequence* seq;
-    ErrorCode       rval = thisMB->sequence_manager( )->find( entity, seq );
+    ErrorCode rval = thisMB->sequence_manager()->find( entity, seq );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( !seq->data( )->get_adjacency_data( ) && !seq->data( )->allocate_adjacency_data( ) )
+    if( !seq->data()->get_adjacency_data() && !seq->data()->allocate_adjacency_data() )
         return MB_MEMORY_ALLOCATION_FAILED;
 
-    const EntityHandle            index = entity - seq->data( )->start_handle( );
-    std::vector< EntityHandle >*& ref = seq->data( )->get_adjacency_data( )[ index ];
+    const EntityHandle index          = entity - seq->data()->start_handle();
+    std::vector< EntityHandle >*& ref = seq->data()->get_adjacency_data()[index];
     delete ref;
     ref = ptr;
     return MB_SUCCESS;
@@ -1430,22 +1430,22 @@ void AEntityFactory::get_memory_use( unsigned long long& entity_total, unsigned 
     for( EntityType t = MBVERTEX; t != MBENTITYSET; t++ )
     {
         TypeSequenceManager::iterator i;
-        TypeSequenceManager&          seqman = thisMB->sequence_manager( )->entity_map( t );
-        for( i = seqman.begin( ); i != seqman.end( ); ++i )
+        TypeSequenceManager& seqman = thisMB->sequence_manager()->entity_map( t );
+        for( i = seqman.begin(); i != seqman.end(); ++i )
         {
-            if( !( *i )->data( )->get_adjacency_data( ) ) continue;
+            if( !( *i )->data()->get_adjacency_data() ) continue;
 
-            if( prev_data != ( *i )->data( ) )
+            if( prev_data != ( *i )->data() )
             {
-                prev_data = ( *i )->data( );
-                memory_total += prev_data->size( ) * sizeof( AdjacencyVector* );
+                prev_data = ( *i )->data();
+                memory_total += prev_data->size() * sizeof( AdjacencyVector* );
             }
 
             const AdjacencyVector* vec;
-            for( EntityHandle h = ( *i )->start_handle( ); h <= ( *i )->end_handle( ); ++h )
+            for( EntityHandle h = ( *i )->start_handle(); h <= ( *i )->end_handle(); ++h )
             {
                 get_adjacency_ptr( h, vec );
-                if( vec ) entity_total += vec->capacity( ) * sizeof( EntityHandle ) + sizeof( AdjacencyVector );
+                if( vec ) entity_total += vec->capacity() * sizeof( EntityHandle ) + sizeof( AdjacencyVector );
             }
         }
     }
@@ -1457,34 +1457,33 @@ ErrorCode AEntityFactory::get_memory_use( const Range& ents_in, unsigned long lo
                                           unsigned long long& amortized )
 {
     min_per_ent = amortized = 0;
-    SequenceData*         prev_data = 0;
-    RangeSeqIntersectIter iter( thisMB->sequence_manager( ) );
-    ErrorCode             rval = iter.init( ents_in.begin( ), ents_in.end( ) );
+    SequenceData* prev_data = 0;
+    RangeSeqIntersectIter iter( thisMB->sequence_manager() );
+    ErrorCode rval = iter.init( ents_in.begin(), ents_in.end() );
     if( MB_SUCCESS != rval ) return rval;
 
     do
     {
-        AdjacencyVector** array = iter.get_sequence( )->data( )->get_adjacency_data( );
+        AdjacencyVector** array = iter.get_sequence()->data()->get_adjacency_data();
         if( !array ) continue;
 
-        EntityID count = iter.get_end_handle( ) - iter.get_start_handle( ) + 1;
-        EntityID data_occ = thisMB->sequence_manager( )
-                                ->entity_map( iter.get_sequence( )->type( ) )
-                                .get_occupied_size( iter.get_sequence( )->data( ) );
+        EntityID count    = iter.get_end_handle() - iter.get_start_handle() + 1;
+        EntityID data_occ = thisMB->sequence_manager()
+                                ->entity_map( iter.get_sequence()->type() )
+                                .get_occupied_size( iter.get_sequence()->data() );
 
-        if( iter.get_sequence( )->data( ) != prev_data )
+        if( iter.get_sequence()->data() != prev_data )
         {
-            prev_data = iter.get_sequence( )->data( );
-            amortized += sizeof( AdjacencyVector* ) * iter.get_sequence( )->data( )->size( ) * count / data_occ;
+            prev_data = iter.get_sequence()->data();
+            amortized += sizeof( AdjacencyVector* ) * iter.get_sequence()->data()->size() * count / data_occ;
         }
 
-        array += iter.get_start_handle( ) - iter.get_sequence( )->data( )->start_handle( );
+        array += iter.get_start_handle() - iter.get_sequence()->data()->start_handle();
         for( EntityID i = 0; i < count; ++i )
         {
-            if( array[ i ] )
-                min_per_ent += sizeof( EntityHandle ) * array[ i ]->capacity( ) + sizeof( AdjacencyVector );
+            if( array[i] ) min_per_ent += sizeof( EntityHandle ) * array[i]->capacity() + sizeof( AdjacencyVector );
         }
-    } while( MB_SUCCESS == ( rval = iter.step( ) ) );
+    } while( MB_SUCCESS == ( rval = iter.step() ) );
 
     amortized += min_per_ent;
     return ( rval == MB_FAILURE ) ? MB_SUCCESS : rval;
@@ -1503,7 +1502,7 @@ ErrorCode AEntityFactory::notify_delete_entity( EntityHandle entity )
         {
             ErrorCode rval = get_adjacencies( entity, dim, false, adj_entities );
             if( rval != MB_SUCCESS && rval != MB_ENTITY_NOT_FOUND ) return rval;
-            if( !adj_entities.empty( ) ) return MB_FAILURE;
+            if( !adj_entities.empty() ) return MB_FAILURE;
         }
     }
 

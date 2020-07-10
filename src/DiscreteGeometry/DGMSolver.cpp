@@ -25,7 +25,7 @@ unsigned int DGMSolver::nchoosek( unsigned int n, unsigned int k )
     {
         ans *= n--;
         ans /= i;
-        if( ans > std::numeric_limits< unsigned int >::max( ) ) { return 0; }
+        if( ans > std::numeric_limits< unsigned int >::max() ) { return 0; }
     }
     return ans;
 }
@@ -50,10 +50,10 @@ void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars
                                              std::vector< double >& basis )
 {
     unsigned int len = compute_numcols_vander_multivar( kvars, degree );
-    basis.reserve( len - basis.capacity( ) + basis.size( ) );
-    size_t iend = basis.size( );
+    basis.reserve( len - basis.capacity() + basis.size() );
+    size_t iend = basis.size();
 #ifndef NDEBUG
-    size_t istr = basis.size( );
+    size_t istr = basis.size();
 #endif
     basis.push_back( 1 );
     ++iend;
@@ -62,8 +62,8 @@ void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars
     // degree 1
     for( int ivar = 0; ivar < kvars; ++ivar )
     {
-        basis.push_back( vars[ ivar ] );
-        varspos[ ivar ] = iend++;
+        basis.push_back( vars[ivar] );
+        varspos[ivar] = iend++;
     }
     // degree 2 to degree
     for( int ideg = 2; ideg <= degree; ++ideg )
@@ -72,12 +72,12 @@ void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars
         for( int ivar = 0; ivar < kvars; ++ivar )
         {
             size_t varpreend = iend;
-            for( size_t ilast = varspos[ ivar ]; ilast < preend; ++ilast )
+            for( size_t ilast = varspos[ivar]; ilast < preend; ++ilast )
             {
-                basis.push_back( vars[ ivar ] * basis[ ilast ] );
+                basis.push_back( vars[ivar] * basis[ilast] );
                 ++iend;
             }
-            varspos[ ivar ] = varpreend;
+            varspos[ivar] = varpreend;
         }
     }
     assert( len == iend - istr );
@@ -87,8 +87,8 @@ void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const dou
                                      std::vector< double >& V )
 {
     unsigned int ncols = compute_numcols_vander_multivar( kvars, degree );
-    V.reserve( mrows * ncols - V.capacity( ) + V.size( ) );
-    size_t istr = V.size( ), icol = 0;
+    V.reserve( mrows * ncols - V.capacity() + V.size() );
+    size_t istr = V.size(), icol = 0;
     // add ones, V is stored in an single array, elements placed in columnwise order
     for( int irow = 0; irow < mrows; ++irow )
     {
@@ -102,9 +102,9 @@ void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const dou
     {
         for( int irow = 0; irow < mrows; ++irow )
         {
-            V.push_back( us[ irow * kvars + ivar ] );  // us stored in row-wise
+            V.push_back( us[irow * kvars + ivar] );  // us stored in row-wise
         }
-        varspos[ ivar ] = icol++;
+        varspos[ivar] = icol++;
     }
     // from 2 to degree
     for( int ideg = 2; ideg <= degree; ++ideg )
@@ -113,15 +113,15 @@ void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const dou
         for( int ivar = 0; ivar < kvars; ++ivar )
         {
             size_t varpreend = icol;
-            for( size_t ilast = varspos[ ivar ]; ilast < preendcol; ++ilast )
+            for( size_t ilast = varspos[ivar]; ilast < preendcol; ++ilast )
             {
                 for( int irow = 0; irow < mrows; ++irow )
                 {
-                    V.push_back( us[ irow * kvars + ivar ] * V[ istr + irow + ilast * mrows ] );
+                    V.push_back( us[irow * kvars + ivar] * V[istr + irow + ilast * mrows] );
                 }
                 ++icol;
             }
-            varspos[ ivar ] = varpreend;
+            varspos[ivar] = varpreend;
         }
     }
     assert( icol == ncols );
@@ -130,22 +130,22 @@ void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const dou
 void DGMSolver::rescale_matrix( int mrows, int ncols, double* V, double* ts )
 {
     // This function rescales the input matrix using the norm of each column.
-    double* v = new double[ mrows ];
+    double* v = new double[mrows];
     for( int i = 0; i < ncols; i++ )
     {
         for( int j = 0; j < mrows; j++ )
-            v[ j ] = V[ mrows * i + j ];
+            v[j] = V[mrows * i + j];
 
         // Compute norm of the column vector
         double w = vec_2norm( mrows, v );
 
         if( fabs( w ) == 0 )
-            ts[ i ] = 1;
+            ts[i] = 1;
         else
         {
-            ts[ i ] = w;
+            ts[i] = w;
             for( int j = 0; j < mrows; j++ )
-                V[ mrows * i + j ] = V[ mrows * i + j ] / ts[ i ];
+                V[mrows * i + j] = V[mrows * i + j] / ts[i];
         }
     }
     delete[] v;
@@ -159,11 +159,11 @@ void DGMSolver::compute_qtransposeB( int mrows, int ncols, const double* Q, int 
         {
             double t2 = 0;
             for( int i = k; i < mrows; i++ )
-                t2 += Q[ mrows * k + i ] * bs[ mrows * j + i ];
+                t2 += Q[mrows * k + i] * bs[mrows * j + i];
             t2 = t2 + t2;
 
             for( int i = k; i < mrows; i++ )
-                bs[ mrows * j + i ] -= t2 * Q[ mrows * k + i ];
+                bs[mrows * j + i] -= t2 * Q[mrows * k + i];
         }
     }
 }
@@ -171,59 +171,59 @@ void DGMSolver::compute_qtransposeB( int mrows, int ncols, const double* Q, int 
 void DGMSolver::qr_polyfit_safeguarded( const int mrows, const int ncols, double* V, double* D, int* rank )
 {
     double tol = 1e-8;
-    *rank = ncols;
-    double* v = new double[ mrows ];
+    *rank      = ncols;
+    double* v  = new double[mrows];
 
     for( int k = 0; k < ncols; k++ )
     {
         int nv = mrows - k;
 
         for( int j = 0; j < nv; j++ )
-            v[ j ] = V[ mrows * k + ( j + k ) ];
+            v[j] = V[mrows * k + ( j + k )];
 
         double t2 = 0;
 
         for( int j = 0; j < nv; j++ )
-            t2 = t2 + v[ j ] * v[ j ];
+            t2 = t2 + v[j] * v[j];
 
-        double t = sqrt( t2 );
+        double t    = sqrt( t2 );
         double vnrm = 0;
 
-        if( v[ 0 ] >= 0 )
+        if( v[0] >= 0 )
         {
-            vnrm = sqrt( 2 * ( t2 + v[ 0 ] * t ) );
-            v[ 0 ] = v[ 0 ] + t;
+            vnrm = sqrt( 2 * ( t2 + v[0] * t ) );
+            v[0] = v[0] + t;
         }
         else
         {
-            vnrm = sqrt( 2 * ( t2 - v[ 0 ] * t ) );
-            v[ 0 ] = v[ 0 ] - t;
+            vnrm = sqrt( 2 * ( t2 - v[0] * t ) );
+            v[0] = v[0] - t;
         }
 
         if( vnrm > 0 )
         {
             for( int j = 0; j < nv; j++ )
-                v[ j ] = v[ j ] / vnrm;
+                v[j] = v[j] / vnrm;
         }
 
         for( int j = k; j < ncols; j++ )
         {
             t2 = 0;
             for( int i = 0; i < nv; i++ )
-                t2 = t2 + v[ i ] * V[ mrows * j + ( i + k ) ];
+                t2 = t2 + v[i] * V[mrows * j + ( i + k )];
 
             t2 = t2 + t2;
 
             for( int i = 0; i < nv; i++ )
-                V[ mrows * j + ( i + k ) ] = V[ mrows * j + ( i + k ) ] - t2 * v[ i ];
+                V[mrows * j + ( i + k )] = V[mrows * j + ( i + k )] - t2 * v[i];
         }
 
-        D[ k ] = V[ mrows * k + k ];
+        D[k] = V[mrows * k + k];
 
         for( int i = 0; i < nv; i++ )
-            V[ mrows * k + ( i + k ) ] = v[ i ];
+            V[mrows * k + ( i + k )] = v[i];
 
-        if( ( fabs( D[ k ] ) ) < tol && ( *rank == ncols ) )
+        if( ( fabs( D[k] ) ) < tol && ( *rank == ncols ) )
         {
             *rank = k;
             break;
@@ -263,17 +263,17 @@ void DGMSolver::backsolve( int mrows, int ncols, double* R, int bncols, double* 
         for( int j = ncols - 1; j >= 0; j-- )
         {
             for( int i = j + 1; i < ncols; ++i )
-                bs[ mrows * k + j ] = bs[ mrows * k + j ] - R[ mrows * i + j ] * bs[ mrows * k + i ];
+                bs[mrows * k + j] = bs[mrows * k + j] - R[mrows * i + j] * bs[mrows * k + i];
 
-            assert( R[ mrows * j + j ] != 0 );
-            bs[ mrows * k + j ] = bs[ mrows * k + j ] / R[ mrows * j + j ];
+            assert( R[mrows * j + j] != 0 );
+            bs[mrows * k + j] = bs[mrows * k + j] / R[mrows * j + j];
         }
     }
 
     for( int k = 0; k < bncols; k++ )
     {
         for( int j = 0; j < ncols; ++j )
-            bs[ mrows * k + j ] = bs[ mrows * k + j ] / ws[ j ];
+            bs[mrows * k + j] = bs[mrows * k + j] / ws[j];
     }
 }
 
@@ -336,13 +336,13 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
             for( int i = 0; i < numcols; i++ )
             {
                 assert( mrows * k + i < mrows * bncols );
-                bs_bak.at( i ) = bs[ mrows * k + i ];
+                bs_bak.at( i ) = bs[mrows * k + i];
             }
         }
 
         while( deg >= 1 )
         {
-            int  cend = numcols - 1;
+            int cend       = numcols - 1;
             bool downgrade = false;
 
             // The reconstruction can be applied only on edges (2-d) or faces (3-d)
@@ -367,10 +367,10 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
                     {
                         assert( mrows * k + i < mrows * bncols );
                         assert( mrows * i + j < mrows * ncols );  // check R
-                        bs[ mrows * k + j ] = bs[ mrows * k + j ] - R[ mrows * i + j ] * bs[ mrows * k + i ];
+                        bs[mrows * k + j] = bs[mrows * k + j] - R[mrows * i + j] * bs[mrows * k + i];
                     }
                     assert( mrows * j + j < mrows * ncols );  // check R
-                    bs[ mrows * k + j ] = bs[ mrows * k + j ] / R[ mrows * j + j ];
+                    bs[mrows * k + j] = bs[mrows * k + j] / R[mrows * j + j];
                 }
 
                 // Checking for change in the coefficient
@@ -382,9 +382,9 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
                     {
                         tol = 1e-06;
                         assert( mrows * cstart + cstart < mrows * ncols );  // check R
-                        double tb = bs_bak.at( cstart ) / R[ mrows * cstart + cstart ];
+                        double tb = bs_bak.at( cstart ) / R[mrows * cstart + cstart];
                         assert( mrows * k + cstart < mrows * bncols );
-                        if( fabs( bs[ mrows * k + cstart ] - tb ) > ( 1 + tol ) * fabs( tb ) )
+                        if( fabs( bs[mrows * k + cstart] - tb ) > ( 1 + tol ) * fabs( tb ) )
                         {
                             downgrade = true;
                             break;
@@ -408,12 +408,12 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
                             for( int i = j + 1; i <= cend; ++i )
                             {
                                 assert( mrows * i + j < mrows * ncols );  // check R
-                                tb.at( jind ) = tb.at( jind ) - R[ mrows * i + j ] * tb.at( i - cstart );
+                                tb.at( jind ) = tb.at( jind ) - R[mrows * i + j] * tb.at( i - cstart );
                             }
                             assert( mrows * j + j < mrows * ncols );  // check R
-                            tb.at( jind ) = tb.at( jind ) / R[ mrows * j + j ];
+                            tb.at( jind ) = tb.at( jind ) / R[mrows * j + j];
                             assert( mrows * k + j < mrows * bncols );
-                            double err = fabs( bs[ mrows * k + j ] - tb.at( jind ) );
+                            double err = fabs( bs[mrows * k + j] - tb.at( jind ) );
 
                             if( ( err > tol ) && ( err >= ( 1 + tol ) * fabs( tb.at( jind ) ) ) )
                             {
@@ -442,24 +442,24 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
                 for( int i = 0; i < numcols; i++ )
                 {
                     assert( mrows * k + i < mrows * bncols );
-                    bs[ mrows * k + i ] = bs_bak.at( i );
+                    bs[mrows * k + i] = bs_bak.at( i );
                 }
             }
         }
         assert( k < bncols );
-        degree_out[ k ] = deg;
+        degree_out[k] = deg;
 
         for( int i = 0; i < numcols; i++ )
         {
             // assert(mrows*k+i < mrows*bncols);
             // assert(i < ncols);
-            bs[ mrows * k + i ] = bs[ mrows * k + i ] / ws[ i ];
+            bs[mrows * k + i] = bs[mrows * k + i] / ws[i];
         }
 
         for( int i = numcols; i < mrows; i++ )
         {
             // assert(mrows*k+i < mrows*bncols);
-            bs[ mrows * k + i ] = 0;
+            bs[mrows * k + i] = 0;
         }
     }
 }
@@ -469,7 +469,7 @@ void DGMSolver::vec_dotprod( const int len, const double* a, const double* b, do
     if( !a || !b || !c ) { MB_SET_ERR_RET( "NULL Pointer" ); }
     for( int i = 0; i < len; ++i )
     {
-        c[ i ] = a[ i ] * b[ i ];
+        c[i] = a[i] * b[i];
     }
 }
 
@@ -478,15 +478,15 @@ void DGMSolver::vec_scalarprod( const int len, const double* a, const double c, 
     if( !a || !b ) { MB_SET_ERR_RET( "NULL Pointer" ); }
     for( int i = 0; i < len; ++i )
     {
-        b[ i ] = c * a[ i ];
+        b[i] = c * a[i];
     }
 }
 
-void DGMSolver::vec_crossprod( const double a[ 3 ], const double b[ 3 ], double ( &c )[ 3 ] )
+void DGMSolver::vec_crossprod( const double a[3], const double b[3], double ( &c )[3] )
 {
-    c[ 0 ] = a[ 1 ] * b[ 2 ] - a[ 2 ] * b[ 1 ];
-    c[ 1 ] = a[ 2 ] * b[ 0 ] - a[ 0 ] * b[ 2 ];
-    c[ 2 ] = a[ 0 ] * b[ 1 ] - a[ 1 ] * b[ 0 ];
+    c[0] = a[1] * b[2] - a[2] * b[1];
+    c[1] = a[2] * b[0] - a[0] * b[2];
+    c[2] = a[0] * b[1] - a[1] * b[0];
 }
 
 double DGMSolver::vec_innerprod( const int len, const double* a, const double* b )
@@ -495,7 +495,7 @@ double DGMSolver::vec_innerprod( const int len, const double* a, const double* b
     double ans = 0;
     for( int i = 0; i < len; ++i )
     {
-        ans += a[ i ] * b[ i ];
+        ans += a[i] * b[i];
     }
     return ans;
 }
@@ -505,14 +505,14 @@ double DGMSolver::vec_2norm( const int len, const double* a )
     if( !a ) { MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 ); }
     double w = 0, s = 0;
     for( int k = 0; k < len; k++ )
-        w = std::max( w, fabs( a[ k ] ) );
+        w = std::max( w, fabs( a[k] ) );
 
     if( w == 0 ) { return 0; }
     else
     {
         for( int k = 0; k < len; k++ )
         {
-            s += ( a[ k ] / w ) * ( a[ k ] / w );
+            s += ( a[k] / w ) * ( a[k] / w );
         }
         s = w * sqrt( s );
     }
@@ -525,25 +525,25 @@ double DGMSolver::vec_normalize( const int len, const double* a, double* b )
     double nrm = 0, mx = 0;
     for( int i = 0; i < len; ++i )
     {
-        mx = std::max( fabs( a[ i ] ), mx );
+        mx = std::max( fabs( a[i] ), mx );
     }
     if( mx == 0 )
     {
         for( int i = 0; i < len; ++i )
         {
-            b[ i ] = 0;
+            b[i] = 0;
         }
         return 0;
     }
     for( int i = 0; i < len; ++i )
     {
-        nrm += ( a[ i ] / mx ) * ( a[ i ] / mx );
+        nrm += ( a[i] / mx ) * ( a[i] / mx );
     }
     nrm = mx * sqrt( nrm );
     if( nrm == 0 ) { return nrm; }
     for( int i = 0; i < len; ++i )
     {
-        b[ i ] = a[ i ] / nrm;
+        b[i] = a[i] / nrm;
     }
     return nrm;
 }
@@ -553,7 +553,7 @@ double DGMSolver::vec_distance( const int len, const double* a, const double* b 
     double res = 0;
     for( int i = 0; i < len; ++i )
     {
-        res += ( a[ i ] - b[ i ] ) * ( a[ i ] - b[ i ] );
+        res += ( a[i] - b[i] ) * ( a[i] - b[i] );
     }
     return sqrt( res );
 }
@@ -567,7 +567,7 @@ void DGMSolver::vec_projoff( const int len, const double* a, const double* b, do
     {
         for( int i = 0; i < len; ++i )
         {
-            c[ i ] = a[ i ];
+            c[i] = a[i];
         }
         return;
     }
@@ -579,7 +579,7 @@ void DGMSolver::vec_projoff( const int len, const double* a, const double* b, do
         {
             for( int i = 0; i < len; ++i )
             {
-                c[ i ] = a[ i ];
+                c[i] = a[i];
             }
         }
         return;
@@ -587,7 +587,7 @@ void DGMSolver::vec_projoff( const int len, const double* a, const double* b, do
 
     for( int i = 0; i < len; ++i )
     {
-        c[ i ] = a[ i ] - innerp * b[ i ] / bnrm;
+        c[i] = a[i] - innerp * b[i] / bnrm;
     }
 }
 
@@ -597,7 +597,7 @@ void DGMSolver::vec_linear_operation( const int len, const double mu, const doub
     if( !a || !b || !c ) { MB_SET_ERR_RET( "NULL Pointer" ); }
     for( int i = 0; i < len; ++i )
     {
-        c[ i ] = mu * a[ i ] + psi * b[ i ];
+        c[i] = mu * a[i] + psi * b[i];
     }
 }
 
@@ -608,9 +608,9 @@ void DGMSolver::get_tri_natural_coords( const int dim, const double* cornercoord
     double a = 0, b = 0, d = 0, tol = 1e-12;
     for( int i = 0; i < dim; ++i )
     {
-        a += ( cornercoords[ dim + i ] - cornercoords[ i ] ) * ( cornercoords[ dim + i ] - cornercoords[ i ] );
-        b += ( cornercoords[ dim + i ] - cornercoords[ i ] ) * ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] );
-        d += ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] ) * ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] );
+        a += ( cornercoords[dim + i] - cornercoords[i] ) * ( cornercoords[dim + i] - cornercoords[i] );
+        b += ( cornercoords[dim + i] - cornercoords[i] ) * ( cornercoords[2 * dim + i] - cornercoords[i] );
+        d += ( cornercoords[2 * dim + i] - cornercoords[i] ) * ( cornercoords[2 * dim + i] - cornercoords[i] );
     }
     double det = a * d - b * b;
     assert( det > 0 );
@@ -619,33 +619,29 @@ void DGMSolver::get_tri_natural_coords( const int dim, const double* cornercoord
         double e = 0, f = 0;
         for( int i = 0; i < dim; ++i )
         {
-            e += ( cornercoords[ dim + i ] - cornercoords[ i ] ) * ( currcoords[ ipt * dim + i ] - cornercoords[ i ] );
-            f += ( cornercoords[ 2 * dim + i ] - cornercoords[ i ] ) *
-                 ( currcoords[ ipt * dim + i ] - cornercoords[ i ] );
+            e += ( cornercoords[dim + i] - cornercoords[i] ) * ( currcoords[ipt * dim + i] - cornercoords[i] );
+            f += ( cornercoords[2 * dim + i] - cornercoords[i] ) * ( currcoords[ipt * dim + i] - cornercoords[i] );
         }
-        naturalcoords[ ipt * 3 + 1 ] = ( e * d - b * f ) / det;
-        naturalcoords[ ipt * 3 + 2 ] = ( a * f - b * e ) / det;
-        naturalcoords[ ipt * 3 ] = 1 - naturalcoords[ ipt * 3 + 1 ] - naturalcoords[ ipt * 3 + 2 ];
-        if( naturalcoords[ ipt * 3 ] < -tol || naturalcoords[ ipt * 3 + 1 ] < -tol ||
-            naturalcoords[ ipt * 3 + 2 ] < -tol )
+        naturalcoords[ipt * 3 + 1] = ( e * d - b * f ) / det;
+        naturalcoords[ipt * 3 + 2] = ( a * f - b * e ) / det;
+        naturalcoords[ipt * 3]     = 1 - naturalcoords[ipt * 3 + 1] - naturalcoords[ipt * 3 + 2];
+        if( naturalcoords[ipt * 3] < -tol || naturalcoords[ipt * 3 + 1] < -tol || naturalcoords[ipt * 3 + 2] < -tol )
         {
             std::cout << "Corners: \n";
-            std::cout << cornercoords[ 0 ] << "\t" << cornercoords[ 1 ] << "\t" << cornercoords[ 3 ] << std::endl;
-            std::cout << cornercoords[ 3 ] << "\t" << cornercoords[ 4 ] << "\t" << cornercoords[ 5 ] << std::endl;
-            std::cout << cornercoords[ 6 ] << "\t" << cornercoords[ 7 ] << "\t" << cornercoords[ 8 ] << std::endl;
+            std::cout << cornercoords[0] << "\t" << cornercoords[1] << "\t" << cornercoords[3] << std::endl;
+            std::cout << cornercoords[3] << "\t" << cornercoords[4] << "\t" << cornercoords[5] << std::endl;
+            std::cout << cornercoords[6] << "\t" << cornercoords[7] << "\t" << cornercoords[8] << std::endl;
             std::cout << "Candidate: \n";
-            std::cout << currcoords[ ipt * dim ] << "\t" << currcoords[ ipt * dim + 1 ] << "\t"
-                      << currcoords[ ipt * dim + 2 ] << std::endl;
+            std::cout << currcoords[ipt * dim] << "\t" << currcoords[ipt * dim + 1] << "\t" << currcoords[ipt * dim + 2]
+                      << std::endl;
             exit( 0 );
         }
-        assert( fabs( naturalcoords[ ipt * 3 ] + naturalcoords[ ipt * 3 + 1 ] + naturalcoords[ ipt * 3 + 2 ] - 1 ) <
-                tol );
+        assert( fabs( naturalcoords[ipt * 3] + naturalcoords[ipt * 3 + 1] + naturalcoords[ipt * 3 + 2] - 1 ) < tol );
         for( int i = 0; i < dim; ++i )
         {
-            assert( fabs( naturalcoords[ ipt * 3 ] * cornercoords[ i ] +
-                          naturalcoords[ ipt * 3 + 1 ] * cornercoords[ dim + i ] +
-                          naturalcoords[ ipt * 3 + 2 ] * cornercoords[ 2 * dim + i ] - currcoords[ ipt * dim + i ] ) <
-                    tol );
+            assert( fabs( naturalcoords[ipt * 3] * cornercoords[i] +
+                          naturalcoords[ipt * 3 + 1] * cornercoords[dim + i] +
+                          naturalcoords[ipt * 3 + 2] * cornercoords[2 * dim + i] - currcoords[ipt * dim + i] ) < tol );
         }
     }
 }

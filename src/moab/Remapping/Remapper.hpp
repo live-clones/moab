@@ -46,7 +46,7 @@ class Remapper
     {
     }
 
-    virtual ~Remapper( )
+    virtual ~Remapper()
     {
 #ifdef MOAB_HAVE_MPI
         m_pcomm = NULL;
@@ -56,20 +56,20 @@ class Remapper
 
     enum IntersectionContext
     {
-        DEFAULT = -1,
-        SourceMesh = 0,
-        TargetMesh = 1,
-        OverlapMesh = 2,
+        DEFAULT      = -1,
+        SourceMesh   = 0,
+        TargetMesh   = 1,
+        OverlapMesh  = 2,
         CoveringMesh = 3
     };
 
-    moab::Interface* get_interface( )
+    moab::Interface* get_interface()
     {
         return m_interface;
     }
 
 #ifdef MOAB_HAVE_MPI
-    moab::ParallelComm* get_parallel_communicator( )
+    moab::ParallelComm* get_parallel_communicator()
     {
         return m_pcomm;
     }
@@ -78,10 +78,10 @@ class Remapper
     ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, const char* readopts = 0 )
     {
 #ifdef MOAB_HAVE_MPI
-        size_t      lastindex = filename.find_last_of( "." );
-        std::string extension = filename.substr( lastindex + 1, filename.size( ) );
-        std::string opts = "";
-        if( m_pcomm->size( ) > 1 )
+        size_t lastindex      = filename.find_last_of( "." );
+        std::string extension = filename.substr( lastindex + 1, filename.size() );
+        std::string opts      = "";
+        if( m_pcomm->size() > 1 )
         {
             if( extension != "h5m" )
                 opts = std::string( "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARALLEL_RESOLVE_SHARED_ENTS" );
@@ -92,18 +92,18 @@ class Remapper
 
         if( readopts )
         {
-            if( opts.size( ) )
+            if( opts.size() )
                 opts = opts + ";" + std::string( readopts );
             else
                 opts = std::string( readopts );
         }
 
-        if( !m_pcomm->rank( ) ) std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
+        if( !m_pcomm->rank() ) std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #else
         const std::string opts = std::string( ( readopts ? readopts : "" ) );
         std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #endif
-        return m_interface->load_file( filename.c_str( ), &meshset, opts.c_str( ) );
+        return m_interface->load_file( filename.c_str(), &meshset, opts.c_str() );
     }
 
   protected:

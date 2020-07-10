@@ -35,7 +35,7 @@
 namespace MBMesquite
 {
 
-RemainingWeight::~RemainingWeight( ) {}
+RemainingWeight::~RemainingWeight() {}
 
 double RemainingWeight::get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err )
 {

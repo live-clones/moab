@@ -134,7 +134,7 @@ ReaderWriterSet::ReaderWriterSet( Core* mdb ) : mbCore( mdb )
     register_factory( ReadCGM::factory, NULL, "Facet Engine Solid Model", facet_sufxs, "facet" );
 #endif
 #ifdef MOAB_HAVE_CGM_OCC
-    const char* occ_sufxs[] = { "brep", "occ", NULL };
+    const char* occ_sufxs[]  = { "brep", "occ", NULL };
     const char* step_sufxs[] = { "step", "stp", NULL };
     const char* iges_sufxs[] = { "iges", "igs", NULL };
     register_factory( ReadCGM::factory, NULL, "OpenCascade solid model", occ_sufxs, "OCC" );
@@ -173,7 +173,7 @@ ReaderWriterSet::ReaderWriterSet( Core* mdb ) : mbCore( mdb )
                       "TEMPLATE" );
 }
 
-ReaderWriterSet::~ReaderWriterSet( ) {}
+ReaderWriterSet::~ReaderWriterSet() {}
 
 ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer, const char* description,
                                              const char* const* extensions, const char* name )
@@ -182,22 +182,22 @@ ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_fac
 
     // check for duplicate names
     iterator h = handler_by_name( name );
-    if( h != end( ) ) { MB_SET_ERR( MB_FAILURE, "Conflicting string name for file formats: \"" << name << "\"" ); }
+    if( h != end() ) { MB_SET_ERR( MB_FAILURE, "Conflicting string name for file formats: \"" << name << "\"" ); }
 
     // count extensions and check for duplicates
     const char* const* iter;
     for( iter = extensions; *iter; ++iter )
     {
         h = handler_from_extension( *iter );
-        if( h != end( ) )
+        if( h != end() )
         {
-            if( NULL != reader && h->have_reader( ) )
+            if( NULL != reader && h->have_reader() )
                 MB_SET_ERR( MB_FAILURE, "Conflicting readers for file extension \""
-                                            << *iter << "\": \"" << h->description( ) << "\" and \"" << description
+                                            << *iter << "\": \"" << h->description() << "\" and \"" << description
                                             << "\"." );
-            else if( NULL != writer && h->have_writer( ) )
+            else if( NULL != writer && h->have_writer() )
                 MB_SET_ERR( MB_FAILURE, "Conflicting writers for file extension \""
-                                            << *iter << "\": \"" << h->description( ) << "\" and \"" << description
+                                            << *iter << "\": \"" << h->description() << "\" and \"" << description
                                             << "\"." );
         }
     }
@@ -208,27 +208,27 @@ ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_fac
 ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer, const char* description,
                                              const char* extension, const char* name )
 {
-    const char* extensions[ 2 ] = { extension, NULL };
+    const char* extensions[2] = { extension, NULL };
     return register_factory( reader, writer, description, extensions, name );
 }
 
 ReaderIface* ReaderWriterSet::get_file_extension_reader( const std::string& filename ) const
 {
-    std::string ext = extension_from_filename( filename );
-    iterator    handler = handler_from_extension( ext, true, false );
-    return handler == end( ) ? NULL : handler->make_reader( mbCore );
+    std::string ext  = extension_from_filename( filename );
+    iterator handler = handler_from_extension( ext, true, false );
+    return handler == end() ? NULL : handler->make_reader( mbCore );
 }
 
 WriterIface* ReaderWriterSet::get_file_extension_writer( const std::string& filename ) const
 {
-    std::string ext = extension_from_filename( filename );
-    iterator    handler = handler_from_extension( ext, false, true );
-    return handler == end( ) ? NULL : handler->make_writer( mbCore );
+    std::string ext  = extension_from_filename( filename );
+    iterator handler = handler_from_extension( ext, false, true );
+    return handler == end() ? NULL : handler->make_writer( mbCore );
 }
 
 std::string ReaderWriterSet::extension_from_filename( const std::string& filename )
 {
-    std::string::size_type idx = filename.find_last_of( "." );
+    std::string::size_type idx   = filename.find_last_of( "." );
     std::string::size_type idirx = filename.find_last_of( "\\/" );
 
     if( idx == std::string::npos ) return std::string( "" );
@@ -241,7 +241,7 @@ ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t wri
     : mReader( read_f ), mWriter( write_f ), mName( nm ), mDescription( desc ), mExtensions( num_ext )
 {
     for( int i = 0; i < num_ext; ++i )
-        mExtensions[ i ] = ext[ i ];
+        mExtensions[i] = ext[i];
 }
 
 #ifdef WIN32
@@ -251,39 +251,39 @@ ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t wri
 ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::string& ext, bool with_reader,
                                                                    bool with_writer ) const
 {
-    iterator                                   iter;
+    iterator iter;
     std::vector< std::string >::const_iterator siter;
 
     // try case-sensitive compare
-    for( iter = begin( ); iter != end( ); ++iter )
+    for( iter = begin(); iter != end(); ++iter )
     {
-        if( ( with_reader && !iter->have_reader( ) ) || ( with_writer && !iter->have_writer( ) ) ) continue;
+        if( ( with_reader && !iter->have_reader() ) || ( with_writer && !iter->have_writer() ) ) continue;
 
-        for( siter = iter->mExtensions.begin( ); siter != iter->mExtensions.end( ); ++siter )
+        for( siter = iter->mExtensions.begin(); siter != iter->mExtensions.end(); ++siter )
             if( *siter == ext ) return iter;
     }
 
     // try case-insensitive compare
-    for( iter = begin( ); iter != end( ); ++iter )
+    for( iter = begin(); iter != end(); ++iter )
     {
-        if( ( with_reader && !iter->have_reader( ) ) || ( with_writer && !iter->have_writer( ) ) ) continue;
+        if( ( with_reader && !iter->have_reader() ) || ( with_writer && !iter->have_writer() ) ) continue;
 
-        for( siter = iter->mExtensions.begin( ); siter != iter->mExtensions.end( ); ++siter )
-            if( 0 == strcasecmp( siter->c_str( ), ext.c_str( ) ) ) return iter;
+        for( siter = iter->mExtensions.begin(); siter != iter->mExtensions.end(); ++siter )
+            if( 0 == strcasecmp( siter->c_str(), ext.c_str() ) ) return iter;
     }
 
-    return end( );
+    return end();
 }
 
 bool ReaderWriterSet::Handler::reads_extension( const char* ext ) const
 {
-    if( !have_reader( ) ) return false;
+    if( !have_reader() ) return false;
 
     std::vector< std::string >::const_iterator siter;
-    for( siter = mExtensions.begin( ); siter != mExtensions.end( ); ++siter )
+    for( siter = mExtensions.begin(); siter != mExtensions.end(); ++siter )
         if( !( *siter ).compare( ext ) )
             return true;
-        else if( 0 == strcasecmp( siter->c_str( ), ext ) )
+        else if( 0 == strcasecmp( siter->c_str(), ext ) )
             return true;
 
     return false;
@@ -291,13 +291,13 @@ bool ReaderWriterSet::Handler::reads_extension( const char* ext ) const
 
 bool ReaderWriterSet::Handler::writes_extension( const char* ext ) const
 {
-    if( !have_writer( ) ) return false;
+    if( !have_writer() ) return false;
 
     std::vector< std::string >::const_iterator siter;
-    for( siter = mExtensions.begin( ); siter != mExtensions.end( ); ++siter )
+    for( siter = mExtensions.begin(); siter != mExtensions.end(); ++siter )
         if( !( *siter ).compare( ext ) )
             return true;
-        else if( 0 == strcasecmp( siter->c_str( ), ext ) )
+        else if( 0 == strcasecmp( siter->c_str(), ext ) )
             return true;
 
     return false;
@@ -305,15 +305,15 @@ bool ReaderWriterSet::Handler::writes_extension( const char* ext ) const
 
 ReaderWriterSet::iterator ReaderWriterSet::handler_by_name( const char* nm ) const
 {
-    return std::find( begin( ), end( ), nm );
+    return std::find( begin(), end(), nm );
 }
 
 bool ReaderWriterSet::Handler::operator==( const char* nm ) const
 {
     // do case-insensitive comparison
-    std::string::const_iterator siter = mName.begin( );
+    std::string::const_iterator siter = mName.begin();
     for( ; *nm; ++nm, ++siter )
-        if( siter == mName.end( ) || tolower( *nm ) != tolower( *siter ) ) return false;
+        if( siter == mName.end() || tolower( *nm ) != tolower( *siter ) ) return false;
     return *nm == '\0';
 }
 

@@ -40,14 +40,15 @@ namespace MBMesquite
 {
 
 class MsqError;
-template< unsigned R, unsigned C > class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 class TMetricNonBarrier : public TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetricNonBarrier( );
+    MESQUITE_EXPORT virtual ~TMetricNonBarrier();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const
+    MESQUITE_EXPORT virtual std::string get_name() const
     {
         return "TMetricNonBarrier";
     }
@@ -61,7 +62,7 @@ class TMetricNonBarrier : public TMetric
 class TMetricNonBarrier2D : public TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetricNonBarrier2D( );
+    MESQUITE_EXPORT virtual ~TMetricNonBarrier2D();
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
@@ -73,7 +74,7 @@ class TMetricNonBarrier2D : public TMetric
 class TMetricNonBarrier3D : public TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetricNonBarrier3D( );
+    MESQUITE_EXPORT virtual ~TMetricNonBarrier3D();
 
     /**\brief Evaluate \f$\mu(T)\f$
      *

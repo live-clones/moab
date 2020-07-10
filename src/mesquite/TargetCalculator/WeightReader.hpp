@@ -53,8 +53,8 @@ class MsqError;
 struct WeightReaderData
 {
     std::vector< TagHandle > handles;  //< tag handles, indexed by #tags/elem
-    std::vector< double >    weights;  //< cached values for last element
-    size_t                   elementIndex;  //< element for which values are cached.
+    std::vector< double > weights;     //< cached values for last element
+    size_t elementIndex;               //< element for which values are cached.
 };
 
 /**\brief Read targets from tag data */
@@ -64,7 +64,7 @@ class WeightReader : public WeightCalculator, private ExtraDataUser< WeightReade
     MESQUITE_EXPORT
     WeightReader( std::string tag_base_name = "MSQ_TARGET_WEIGHT" );
 
-    MESQUITE_EXPORT virtual ~WeightReader( );
+    MESQUITE_EXPORT virtual ~WeightReader();
 
     MESQUITE_EXPORT virtual double get_weight( PatchData& pd, size_t element, Sample Sample, MsqError& err );
 

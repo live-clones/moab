@@ -81,23 +81,23 @@ void help( const char* argv0 )
 
 int main( int argc, char* argv[] )
 {
-    const char* input_file = DEFAULT_INPUT.c_str( );
+    const char* input_file  = DEFAULT_INPUT.c_str();
     const char* output_file = NULL;
     switch( argc )
     {
         default:
-            help( argv[ 0 ] );
+            help( argv[0] );
         case 3:
-            if( !strcmp( argv[ 2 ], "-h" ) ) help( argv[ 0 ] );
-            output_file = argv[ 2 ];
+            if( !strcmp( argv[2], "-h" ) ) help( argv[0] );
+            output_file = argv[2];
         case 2:
-            if( !strcmp( argv[ 1 ], "-h" ) ) help( argv[ 0 ] );
-            input_file = argv[ 1 ];
+            if( !strcmp( argv[1], "-h" ) ) help( argv[0] );
+            input_file = argv[1];
         case 1:;
     }
 
     /* Read a VTK Mesh file */
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( input_file, err );
     if( err ) return 1;
@@ -107,12 +107,12 @@ int main( int argc, char* argv[] )
 
     // creates a mean ratio quality metric ...
     ConditionNumberQualityMetric shape_metric;
-    EdgeLengthQualityMetric      lapl_met;
+    EdgeLengthQualityMetric lapl_met;
     lapl_met.set_averaging_method( QualityMetric::RMS );
 
     // creates the laplacian smoother  procedures
     LaplacianSmoother lapl1;
-    QualityAssessor   stop_qa = QualityAssessor( &shape_metric );
+    QualityAssessor stop_qa = QualityAssessor( &shape_metric );
     stop_qa.add_quality_assessment( &lapl_met );
 
     //**************Set stopping criterion****************
@@ -133,10 +133,10 @@ int main( int argc, char* argv[] )
 
     // launches optimization on mesh_set1
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &plane );
-    Timer           t;
+    Timer t;
     queue1.run_instructions( &mesh_and_domain, err );
     if( err ) return 1;
-    double secs = t.since_birth( );
+    double secs = t.since_birth();
     std::cout << "Optimization completed in " << secs << " seconds" << std::endl;
 
     if( output_file )

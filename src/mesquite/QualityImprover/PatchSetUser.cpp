@@ -34,6 +34,6 @@
 namespace MBMesquite
 {
 
-PatchSetUser::~PatchSetUser( ) {}
+PatchSetUser::~PatchSetUser() {}
 
 }  // namespace MBMesquite

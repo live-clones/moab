@@ -40,7 +40,7 @@ ErrorCode AxisBox::get_tag( Tag& tag_out, Interface* interface, const char* tagn
 
 ErrorCode AxisBox::calculate( AxisBox& box, EntityHandle set, Interface* interface )
 {
-    Range     range;
+    Range range;
     ErrorCode rval = interface->get_entities_by_handle( set, range );
     if( MB_SUCCESS != rval ) return rval;
 
@@ -50,22 +50,22 @@ ErrorCode AxisBox::calculate( AxisBox& box, EntityHandle set, Interface* interfa
 ErrorCode AxisBox::calculate( AxisBox& box, const Range& entities, Interface* interface )
 {
     ErrorCode rval;
-    Range     vertices;
-    Range     elements;
+    Range vertices;
+    Range elements;
 
     elements.merge( entities.upper_bound( MBVERTEX ), entities.lower_bound( MBENTITYSET ) );
     rval = interface->get_adjacencies( elements, 0, false, vertices );
     if( MB_SUCCESS != rval ) return rval;
 
-    vertices.merge( entities.begin( ), entities.upper_bound( MBVERTEX ) );
+    vertices.merge( entities.begin(), entities.upper_bound( MBVERTEX ) );
 
-    std::vector< double > coords( 3 * vertices.size( ) );
-    rval = interface->get_coords( vertices, &coords[ 0 ] );
+    std::vector< double > coords( 3 * vertices.size() );
+    rval = interface->get_coords( vertices, &coords[0] );
     if( MB_SUCCESS != rval ) return rval;
 
-    box = AxisBox( );
-    std::vector< double >::const_iterator i = coords.begin( );
-    for( ; i != coords.end( ); i += 3 )
+    box                                     = AxisBox();
+    std::vector< double >::const_iterator i = coords.begin();
+    for( ; i != coords.end(); i += 3 )
         box |= &*i;
 
     return MB_SUCCESS;

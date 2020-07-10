@@ -54,8 +54,8 @@ class MsqIMesh : virtual public MBMesquite::Mesh
   public:
     //********* Functions that are NOT inherited ************
 
-    MsqIMesh( );
-    virtual ~MsqIMesh( );
+    MsqIMesh();
+    virtual ~MsqIMesh();
 
     /**\brief Create iMesh adaptor instance
      *\param imesh      The iMesh instance to interact with
@@ -146,15 +146,15 @@ class MsqIMesh : virtual public MBMesquite::Mesh
      */
     void set_active_set( iBase_EntitySetHandle meshset, iBase_EntityType element_dimension, MsqError& err );
 
-    void                   set_fixed_tag( iBase_TagHandle tag, MsqError& err );  //!< Set tag for vertex fixed flag
-    void                   set_slaved_tag( iBase_TagHandle tag, MsqError& err );  //!< Set tag for vertex slaved flag
-    void                   clear_fixed_tag( );  //!< No tag for vertex fixed flag
-    void                   clear_slaved_tag( );  //!< No tag for vertex fixed flag
-    const iBase_TagHandle* get_fixed_tag( ) const;  //!< Get tag for vertex fixed flag
-    const iBase_TagHandle* get_slaved_tag( ) const;  //!< Get tag for vertex slaved flag
+    void set_fixed_tag( iBase_TagHandle tag, MsqError& err );   //!< Set tag for vertex fixed flag
+    void set_slaved_tag( iBase_TagHandle tag, MsqError& err );  //!< Set tag for vertex slaved flag
+    void clear_fixed_tag();                                     //!< No tag for vertex fixed flag
+    void clear_slaved_tag();                                    //!< No tag for vertex fixed flag
+    const iBase_TagHandle* get_fixed_tag() const;               //!< Get tag for vertex fixed flag
+    const iBase_TagHandle* get_slaved_tag() const;              //!< Get tag for vertex slaved flag
 
-    virtual iMesh_Instance        get_imesh_instance( ) const;
-    virtual iBase_EntitySetHandle get_entity_set( ) const;
+    virtual iMesh_Instance get_imesh_instance() const;
+    virtual iBase_EntitySetHandle get_entity_set() const;
 
     //********* Functions that ARE inherited ************
 
@@ -215,7 +215,7 @@ class MsqIMesh : virtual public MBMesquite::Mesh
     // just call the destructor.  More sophisticated implementations
     // may want to keep the Mesh object to live longer than Mesquite
     // is using it.
-    virtual void release( );
+    virtual void release();
 
     //*************** Tags  ***********
 
@@ -387,7 +387,7 @@ class MsqIMesh : virtual public MBMesquite::Mesh
     /** Dimension is queried once during create and cached */
     int geometricDimension;
     /** Map iMesh_EntityTopology to MBMesquite::EntityTopology */
-    EntityTopology topologyMap[ iMesh_ALL_TOPOLOGIES + 1 ];
+    EntityTopology topologyMap[iMesh_ALL_TOPOLOGIES + 1];
 };
 
 }  // namespace MBMesquite

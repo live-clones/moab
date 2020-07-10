@@ -42,7 +42,7 @@ class ReaderWriterSet
 
     ReaderWriterSet( Core* mdb );
 
-    ~ReaderWriterSet( );
+    ~ReaderWriterSet();
 
     /**
      * Regiseter a reader and/or writer
@@ -103,11 +103,11 @@ class ReaderWriterSet
         Handler( reader_factory_t read_f, writer_factory_t write_f, const char* name, const char* desc,
                  const char* const* ext, int num_ext );
 
-        inline const std::string& name( ) const
+        inline const std::string& name() const
         {
             return mName;
         }
-        inline const std::string& description( ) const
+        inline const std::string& description() const
         {
             return mDescription;
         }
@@ -116,23 +116,23 @@ class ReaderWriterSet
             list_out = mExtensions;
         }
 
-        inline bool have_reader( ) const
+        inline bool have_reader() const
         {
             return NULL != mReader;
         }
-        inline bool have_writer( ) const
+        inline bool have_writer() const
         {
             return NULL != mWriter;
         }
 
         inline ReaderIface* make_reader( Interface* iface ) const
         {
-            return have_reader( ) ? mReader( iface ) : NULL;
+            return have_reader() ? mReader( iface ) : NULL;
         }
 
         inline WriterIface* make_writer( Interface* iface ) const
         {
-            return have_writer( ) ? mWriter( iface ) : NULL;
+            return have_writer() ? mWriter( iface ) : NULL;
         }
 
         bool reads_extension( const char* ext ) const;
@@ -144,20 +144,20 @@ class ReaderWriterSet
         reader_factory_t mReader;
         writer_factory_t mWriter;
 
-        std::string                mName, mDescription;
+        std::string mName, mDescription;
         std::vector< std::string > mExtensions;
     };
 
     typedef std::list< Handler >::const_iterator iterator;
 
-    inline iterator begin( ) const
+    inline iterator begin() const
     {
-        return handlerList.begin( );
+        return handlerList.begin();
     }
 
-    inline iterator end( ) const
+    inline iterator end() const
     {
-        return handlerList.end( );
+        return handlerList.end();
     }
 
     iterator handler_from_extension( const std::string& extension, bool with_reader = false,

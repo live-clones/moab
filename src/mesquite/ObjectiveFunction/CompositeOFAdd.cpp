@@ -58,19 +58,19 @@ CompositeOFAdd::CompositeOFAdd( ObjectiveFunction* Obj1, ObjectiveFunction* Obj2
     objFunc2 = Obj2;
 }
 
-ObjectiveFunction* CompositeOFAdd::clone( ) const
+ObjectiveFunction* CompositeOFAdd::clone() const
 {
-    return new CompositeOFAdd( objFunc1->clone( ), objFunc2->clone( ), true );
+    return new CompositeOFAdd( objFunc1->clone(), objFunc2->clone(), true );
 }
 
-void CompositeOFAdd::clear( )
+void CompositeOFAdd::clear()
 {
-    objFunc1->clear( );
-    objFunc2->clear( );
+    objFunc1->clear();
+    objFunc2->clear();
 }
 
 // Michael:  need to clean up here
-CompositeOFAdd::~CompositeOFAdd( )
+CompositeOFAdd::~CompositeOFAdd()
 {
     if( deleteObjFuncs )
     {
@@ -81,8 +81,10 @@ CompositeOFAdd::~CompositeOFAdd( )
 
 void CompositeOFAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-    objFunc1->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
-    objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+    objFunc1->initialize_queue( mesh_and_domain, settings, err );
+    MSQ_ERRRTN( err );
+    objFunc2->initialize_queue( mesh_and_domain, settings, err );
+    MSQ_ERRRTN( err );
 }
 
 bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
@@ -98,7 +100,7 @@ bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_
 bool CompositeOFAdd::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     double value_2;
-    bool   ok;
+    bool ok;
 
     ok = objFunc1->evaluate( type, pd, value_out, free, err );
     if( MSQ_CHKERR( err ) || !ok ) return false;
@@ -113,18 +115,18 @@ bool CompositeOFAdd::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
                                              std::vector< Vector3D >& grad_out, MsqError& err )
 {
     double value_2;
-    bool   ok;
+    bool ok;
 
     ok = objFunc1->evaluate_with_gradient( type, pd, value_out, grad_out, err );
     if( MSQ_CHKERR( err ) || !ok ) return false;
     ok = objFunc2->evaluate_with_gradient( type, pd, value_2, mGradient, err );
     if( MSQ_CHKERR( err ) || !ok ) return false;
 
-    assert( grad_out.size( ) == pd.num_free_vertices( ) );
-    assert( mGradient.size( ) == pd.num_free_vertices( ) );
+    assert( grad_out.size() == pd.num_free_vertices() );
+    assert( mGradient.size() == pd.num_free_vertices() );
 
-    std::vector< Vector3D >::iterator i = grad_out.begin( ), j = mGradient.begin( );
-    while( i != grad_out.end( ) )
+    std::vector< Vector3D >::iterator i = grad_out.begin(), j = mGradient.begin();
+    while( i != grad_out.end() )
     {
         *i += *j;
         ++i;
@@ -135,21 +137,21 @@ bool CompositeOFAdd::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
 }
 
 bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                     std::vector< Vector3D >&    grad_out,
+                                                     std::vector< Vector3D >& grad_out,
                                                      std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
     double value_2;
-    bool   valid;
+    bool valid;
 
     valid = objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
     valid = objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
-    for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
+    for( size_t i = 0; i < pd.num_free_vertices(); ++i )
     {
-        grad_out[ i ] += mGradient[ i ];
-        diag_out[ i ] += mDiagonal[ i ];
+        grad_out[i] += mGradient[i];
+        diag_out[i] += mDiagonal[i];
     }
 
     value_out += value_2;
@@ -160,7 +162,7 @@ bool CompositeOFAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, double
                                             std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
 {
     double value_2;
-    bool   ok;
+    bool ok;
 
     mHessian.initialize( Hessian_out );
 
@@ -171,19 +173,19 @@ bool CompositeOFAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, double
 
     value_out += value_2;
 
-    assert( grad_out.size( ) == pd.num_free_vertices( ) );
-    assert( mGradient.size( ) == pd.num_free_vertices( ) );
+    assert( grad_out.size() == pd.num_free_vertices() );
+    assert( mGradient.size() == pd.num_free_vertices() );
 
-    for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
-        grad_out[ i ] += mGradient[ i ];
+    for( size_t i = 0; i < pd.num_free_vertices(); ++i )
+        grad_out[i] += mGradient[i];
     Hessian_out.add( mHessian );
     return true;
 }
 
-int CompositeOFAdd::min_patch_layers( ) const
+int CompositeOFAdd::min_patch_layers() const
 {
-    const int v1 = objFunc1->min_patch_layers( );
-    const int v2 = objFunc2->min_patch_layers( );
+    const int v1 = objFunc1->min_patch_layers();
+    const int v2 = objFunc2->min_patch_layers();
     return v1 > v2 ? v1 : v2;
 }
 

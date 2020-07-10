@@ -68,19 +68,19 @@ class ReadCGM : public ReaderIface
     ReadCGM( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadCGM( );
+    virtual ~ReadCGM();
 
     // access private vars
-    int get_failed_curve_count( );
-    int get_failed_surface_count( );
+    int get_failed_curve_count();
+    int get_failed_surface_count();
 
   private:
     ErrorCode set_options( const FileOptions& opts, int& norm_tol, double& faceting_tol, double& len_tol, bool& act_att,
                            bool& verbose_warnings, bool& fatal_on_curves );
 
-    ErrorCode create_entity_sets( std::map< RefEntity*, EntityHandle > ( &entmap )[ 5 ] );
+    ErrorCode create_entity_sets( std::map< RefEntity*, EntityHandle > ( &entmap )[5] );
 
-    ErrorCode create_topology( std::map< RefEntity*, EntityHandle > ( &entitymap )[ 5 ] );
+    ErrorCode create_topology( std::map< RefEntity*, EntityHandle > ( &entitymap )[5] );
 
     ErrorCode store_surface_senses( std::map< RefEntity*, EntityHandle >& surface_map,
                                     std::map< RefEntity*, EntityHandle >& volume_map );
@@ -88,11 +88,11 @@ class ReadCGM : public ReaderIface
     ErrorCode store_curve_senses( std::map< RefEntity*, EntityHandle >& curve_map,
                                   std::map< RefEntity*, EntityHandle >& surface_map );
 
-    ErrorCode store_groups( std::map< RefEntity*, EntityHandle > ( &entitymap )[ 5 ] );
+    ErrorCode store_groups( std::map< RefEntity*, EntityHandle > ( &entitymap )[5] );
 
     ErrorCode create_group_entsets( std::map< RefEntity*, EntityHandle >& group_map );
 
-    ErrorCode store_group_content( std::map< RefEntity*, EntityHandle > ( &entitymap )[ 5 ] );
+    ErrorCode store_group_content( std::map< RefEntity*, EntityHandle > ( &entitymap )[5] );
 
     void set_cgm_attributes( bool const act_attributes, bool const verbose );
 
@@ -108,7 +108,7 @@ class ReadCGM : public ReaderIface
     /**
      * Dumps the failed faceting information to screen
      */
-    void dump_fail_counts( );
+    void dump_fail_counts();
 
     ReadUtilIface* readUtilIface;
 
@@ -130,10 +130,10 @@ class ReadCGM : public ReaderIface
 
     Tag geom_tag, id_tag, name_tag, category_tag, faceting_tol_tag, geometry_resabs_tag;
 
-    int                failed_curve_count;  // the number of curves that failed to facet
+    int failed_curve_count;            // the number of curves that failed to facet
     std::vector< int > failed_curves;  // the curve ids of the curves that failed to facet
 
-    int                failed_surface_count;  // the number of surfaces that have 0 facets
+    int failed_surface_count;            // the number of surfaces that have 0 facets
     std::vector< int > failed_surfaces;  // the surface ids of the surfaces that have 0 facets
 };
 

@@ -41,16 +41,16 @@ namespace MBMesquite
 {
 
 const double DEFAULT_MOVEMENT_FACTOR = 0.001;
-const bool   CULLING_DEFAULT = true;
-const int    DEFAULT_ITERATION_LIMIT = 100;
+const bool CULLING_DEFAULT           = true;
+const int DEFAULT_ITERATION_LIMIT    = 100;
 
-LaplaceWrapper::LaplaceWrapper( )
+LaplaceWrapper::LaplaceWrapper()
     : maxTime( -1.0 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), iterationLimit( DEFAULT_ITERATION_LIMIT ),
       doCulling( CULLING_DEFAULT )
 {
 }
 
-LaplaceWrapper::~LaplaceWrapper( ) {}
+LaplaceWrapper::~LaplaceWrapper() {}
 
 void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
                                   QualityAssessor* qa, MsqError& err )
@@ -67,7 +67,7 @@ void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh
     IdealWeightInverseMeanRatio qa_metric;
     qa->add_quality_assessment( &qa_metric );
 
-    LaplacianSmoother    smoother;
+    LaplacianSmoother smoother;
     TerminationCriterion outer( "<type:laplace_outer>" ), inner( "<type:laplace_inner>" );
     if( maxTime > 0.0 ) outer.add_cpu_time( maxTime );
     if( iterationLimit > 0 ) outer.add_iteration_limit( iterationLimit );

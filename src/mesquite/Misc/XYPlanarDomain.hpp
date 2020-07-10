@@ -51,9 +51,9 @@ namespace MBMesquite
 class MESQUITE_EXPORT XYPlanarDomain : public MBMesquite::MeshDomain
 {
   public:
-    XYPlanarDomain( ){ };
+    XYPlanarDomain(){};
 
-    virtual ~XYPlanarDomain( );
+    virtual ~XYPlanarDomain();
 
     virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 

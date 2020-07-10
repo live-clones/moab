@@ -17,20 +17,20 @@ class TriCounter : public OrientedBoxTreeTool::Op
 {
 
   public:
-    int                  count;
-    Interface*           mbi;
+    int count;
+    Interface* mbi;
     OrientedBoxTreeTool* tool;
-    const CartVect&      pt;
+    const CartVect& pt;
 
     TriCounter( Interface* mbi_p, OrientedBoxTreeTool* tool_p, const CartVect& p )
-        : OrientedBoxTreeTool::Op( ), count( 0 ), mbi( mbi_p ), tool( tool_p ), pt( p )
+        : OrientedBoxTreeTool::Op(), count( 0 ), mbi( mbi_p ), tool( tool_p ), pt( p )
     {
     }
 
     virtual ErrorCode visit( EntityHandle node, int, bool& descend )
     {
         OrientedBox box;
-        ErrorCode   rval = tool->box( node, box );
+        ErrorCode rval = tool->box( node, box );
 
         descend = box.contained( pt, 1e-6 );
 
@@ -40,8 +40,8 @@ class TriCounter : public OrientedBoxTreeTool::Op
     virtual ErrorCode leaf( EntityHandle node )
     {
 
-        int       numtris;
-        ErrorCode rval = tool->get_moab_instance( )->get_number_entities_by_type( node, MBTRI, numtris );
+        int numtris;
+        ErrorCode rval = tool->get_moab_instance()->get_number_entities_by_type( node, MBTRI, numtris );
         count += numtris;
         return rval;
     }
@@ -49,41 +49,41 @@ class TriCounter : public OrientedBoxTreeTool::Op
 
 ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int grid, std::string& filename )
 {
-    OrientedBoxTreeTool& obbtool = *gtt.obb_tree( );
+    OrientedBoxTreeTool& obbtool = *gtt.obb_tree();
 
-    CartVect     min, max;
-    EntityHandle vol = gtt.entity_by_id( 3, volumes.front( ) );
-    double       middle[ 3 ];
-    double       axis1[ 3 ], axis2[ 3 ], axis3[ 3 ];
-    double       minPt[ 3 ], maxPt[ 3 ];
-    ErrorCode    rval = gtt.get_obb( vol, middle, axis1, axis2, axis3 );
+    CartVect min, max;
+    EntityHandle vol = gtt.entity_by_id( 3, volumes.front() );
+    double middle[3];
+    double axis1[3], axis2[3], axis3[3];
+    double minPt[3], maxPt[3];
+    ErrorCode rval = gtt.get_obb( vol, middle, axis1, axis2, axis3 );
     // compute min and max verticies
     for( int i = 0; i < 3; i++ )
     {
-        double sum = fabs( axis1[ i ] ) + fabs( axis2[ i ] ) + fabs( axis3[ i ] );
-        minPt[ i ] = middle[ i ] - sum;
-        maxPt[ i ] = middle[ i ] + sum;
+        double sum = fabs( axis1[i] ) + fabs( axis2[i] ) + fabs( axis3[i] );
+        minPt[i]   = middle[i] - sum;
+        maxPt[i]   = middle[i] + sum;
     }
     CHECKERR( gtt, rval );
 
     /* Compute an axis-aligned bounding box of all the requested volumes */
-    for( std::vector< int >::iterator i = volumes.begin( ) + 1; i != volumes.end( ); ++i )
+    for( std::vector< int >::iterator i = volumes.begin() + 1; i != volumes.end(); ++i )
     {
         CartVect i_min, i_max;
-        vol = gtt.entity_by_id( 3, *i );
+        vol  = gtt.entity_by_id( 3, *i );
         rval = gtt.get_obb( vol, middle, axis1, axis2, axis3 );
         // compute min and max verticies
         for( int j = 0; j < 3; j++ )
         {
-            double sum = fabs( axis1[ j ] ) + fabs( axis2[ j ] ) + fabs( axis3[ j ] );
-            minPt[ j ] = middle[ j ] - sum;
-            maxPt[ j ] = middle[ j ] + sum;
+            double sum = fabs( axis1[j] ) + fabs( axis2[j] ) + fabs( axis3[j] );
+            minPt[j]   = middle[j] - sum;
+            maxPt[j]   = middle[j] + sum;
         }
 
         for( int j = 0; j < 3; ++j )
         {
-            min[ j ] = std::min( min[ j ], i_min[ j ] );
-            max[ j ] = std::max( max[ j ], i_max[ j ] );
+            min[j] = std::min( min[j], i_min[j] );
+            max[j] = std::max( max[j], i_max[j] );
         }
     }
 
@@ -95,12 +95,12 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
 
     /* Compute the vertices of the visualization grid.  Calculation points are at the center
        of each cell in this grid, so make grid+1 vertices in each direction. */
-    int     numpoints = pow( (double)( grid + 1 ), 3 );
-    double* pgrid = new double[ numpoints * 3 ];
-    int     idx = 0;
+    int numpoints = pow( (double)( grid + 1 ), 3 );
+    double* pgrid = new double[numpoints * 3];
+    int idx       = 0;
 
     for( int i = 0; i < numpoints * 3; ++i )
-        pgrid[ i ] = 0.0;
+        pgrid[i] = 0.0;
 
     for( int i = 0; i <= grid; ++i )
     {
@@ -117,14 +117,14 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
                 CartVect p = center + x + y + z;
                 for( int d = 0; d < 3; ++d )
                 {
-                    pgrid[ idx++ ] = p[ d ];
+                    pgrid[idx++] = p[d];
                 }
             }
         }
     }
 
     /* Create a new MOAB to use for output, and build the vertex grid */
-    Core  mb2;
+    Core mb2;
     Range r;
     rval = mb2.create_vertices( pgrid, numpoints, r );
     CHECKERR( mb2, rval );
@@ -134,9 +134,9 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
                                MB_TAG_EXCL | MB_TAG_CREAT | MB_TAG_BYTES | MB_TAG_DENSE, 0 );
     CHECKERR( mb2, rval );
 
-    int          row = grid + 1;
-    int          side = row * row;
-    EntityHandle connect[ 8 ];
+    int row  = grid + 1;
+    int side = row * row;
+    EntityHandle connect[8];
     EntityHandle hex;
 
     // offset from grid corner to grid center
@@ -145,16 +145,16 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
     // collect all the surfaces from the requested volumes to iterate over --
     // this prevents checking a shared surface more than once.
     Range surfs;
-    for( std::vector< int >::iterator it = volumes.begin( ); it != volumes.end( ); ++it )
+    for( std::vector< int >::iterator it = volumes.begin(); it != volumes.end(); ++it )
     {
 
         vol = gtt.entity_by_id( 3, *it );
         Range it_surfs;
-        rval = gtt.get_moab_instance( )->get_child_meshsets( vol, it_surfs );
+        rval = gtt.get_moab_instance()->get_child_meshsets( vol, it_surfs );
         CHECKERR( gtt, rval );
         surfs.merge( it_surfs );
     }
-    std::cout << "visualizing " << surfs.size( ) << " surfaces." << std::endl;
+    std::cout << "visualizing " << surfs.size() << " surfaces." << std::endl;
 
     /* Build hexes for any point with 1 or more leaftris */
     for( int i = 0; i < grid; ++i )
@@ -167,10 +167,10 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
                 idx = ( side * k ) + ( row * j ) + i;
                 assert( idx + 1 + row + side > numpoints - 1 );
 
-                CartVect   loc = CartVect( ( pgrid + ( idx * 3 ) ) ) + grid_hex_center_offset;
-                TriCounter tc( gtt.get_moab_instance( ), &obbtool, loc );
+                CartVect loc = CartVect( ( pgrid + ( idx * 3 ) ) ) + grid_hex_center_offset;
+                TriCounter tc( gtt.get_moab_instance(), &obbtool, loc );
 
-                for( Range::iterator it = surfs.begin( ); it != surfs.end( ); ++it )
+                for( Range::iterator it = surfs.begin(); it != surfs.end(); ++it )
                 {
 
                     EntityHandle surf_tree;
@@ -183,14 +183,14 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
 
                 if( tc.count == 0 ) continue;
 
-                connect[ 0 ] = r[ idx ];
-                connect[ 1 ] = r[ idx + 1 ];
-                connect[ 2 ] = r[ idx + 1 + row ];
-                connect[ 3 ] = r[ idx + row ];
-                connect[ 4 ] = r[ idx + side ];
-                connect[ 5 ] = r[ idx + 1 + side ];
-                connect[ 6 ] = r[ idx + 1 + row + side ];
-                connect[ 7 ] = r[ idx + row + side ];
+                connect[0] = r[idx];
+                connect[1] = r[idx + 1];
+                connect[2] = r[idx + 1 + row];
+                connect[3] = r[idx + row];
+                connect[4] = r[idx + side];
+                connect[5] = r[idx + 1 + side];
+                connect[6] = r[idx + 1 + row + side];
+                connect[7] = r[idx + row + side];
 
                 rval = mb2.create_element( MBHEX, connect, 8, hex );
                 CHECKERR( mb2, rval );
@@ -202,7 +202,7 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
     }
 
     if( verbose ) { std::cout << "Writing " << filename << std::endl; }
-    rval = mb2.write_file( filename.c_str( ) );
+    rval = mb2.write_file( filename.c_str() );
     CHECKERR( mb2, rval );
 
     return rval;
@@ -221,33 +221,33 @@ class TriStats : public OrientedBoxTreeTool::Op
 
   public:
     unsigned min, max, sum, leaves;
-    double   sqr;
+    double sqr;
 
     const static unsigned ten_buckets_max = 5;
-    unsigned              ten_buckets[ ten_buckets_max ];
-    double                ten_buckets_vol[ ten_buckets_max ];
+    unsigned ten_buckets[ten_buckets_max];
+    double ten_buckets_vol[ten_buckets_max];
 
-    Interface*           mbi;
+    Interface* mbi;
     OrientedBoxTreeTool* tool;
 
     double tot_vol;
 
     TriStats( Interface* mbi_p, OrientedBoxTreeTool* tool_p, EntityHandle root )
-        : OrientedBoxTreeTool::Op( ), sum( 0 ), leaves( 0 ), sqr( 0 ), mbi( mbi_p ), tool( tool_p )
+        : OrientedBoxTreeTool::Op(), sum( 0 ), leaves( 0 ), sqr( 0 ), mbi( mbi_p ), tool( tool_p )
     {
-        min = std::numeric_limits< unsigned >::max( );
-        max = std::numeric_limits< unsigned >::min( );
+        min = std::numeric_limits< unsigned >::max();
+        max = std::numeric_limits< unsigned >::min();
 
         for( unsigned i = 0; i < ten_buckets_max; ++i )
         {
-            ten_buckets[ i ] = 0;
-            ten_buckets_vol[ i ] = 0.;
+            ten_buckets[i]     = 0;
+            ten_buckets_vol[i] = 0.;
         }
 
         OrientedBox box;
-        ErrorCode   rval = tool->box( root, box );
+        ErrorCode rval = tool->box( root, box );
         CHECKERR( mbi, rval );
-        tot_vol = box.volume( );
+        tot_vol = box.volume();
     }
 
     virtual ErrorCode visit( EntityHandle, int, bool& descend )
@@ -260,9 +260,9 @@ class TriStats : public OrientedBoxTreeTool::Op
     virtual ErrorCode leaf( EntityHandle node )
     {
 
-        Range     tris;
-        ErrorCode rval = tool->get_moab_instance( )->get_entities_by_type( node, MBTRI, tris );
-        unsigned  count = tris.size( );
+        Range tris;
+        ErrorCode rval = tool->get_moab_instance()->get_entities_by_type( node, MBTRI, tris );
+        unsigned count = tris.size();
 
         sum += count;
         sqr += ( count * count );
@@ -273,11 +273,11 @@ class TriStats : public OrientedBoxTreeTool::Op
         {
             if( count > std::pow( (double)10, (int)( i + 1 ) ) )
             {
-                ten_buckets[ i ] += 1;
+                ten_buckets[i] += 1;
                 OrientedBox box;
                 rval = tool->box( node, box );
                 CHECKERR( mbi, rval );
-                ten_buckets_vol[ i ] += box.volume( );
+                ten_buckets_vol[i] += box.volume();
             }
         }
 
@@ -290,9 +290,9 @@ class TriStats : public OrientedBoxTreeTool::Op
     {
         std::stringstream str;
         str << num;
-        std::string s = str.str( );
+        std::string s = str.str();
 
-        int n = s.size( );
+        int n = s.size();
         for( int i = n - 3; i >= 1; i -= 3 )
         {
             s.insert( i, 1, ',' );
@@ -307,20 +307,20 @@ class TriStats : public OrientedBoxTreeTool::Op
 
         out << commafy( sum ) << " triangles in " << commafy( leaves ) << " leaves." << std::endl;
 
-        double avg = sum / (double)leaves;
+        double avg    = sum / (double)leaves;
         double stddev = std_dev( sqr, sum, leaves );
 
         out << "Tris per leaf: Min " << min << ", Max " << max << ", avg " << avg << ", stddev " << stddev << std::endl;
 
         for( unsigned i = 0; i < ten_buckets_max; ++i )
         {
-            if( ten_buckets[ i ] )
+            if( ten_buckets[i] )
             {
                 out << "Leaves exceeding " << std::pow( (double)10, (int)( i + 1 ) )
-                    << " triangles: " << ten_buckets[ i ];
+                    << " triangles: " << ten_buckets[i];
 
-                double frac_total_vol = ten_buckets_vol[ i ] / tot_vol;
-                double avg_ftv = frac_total_vol / ten_buckets[ i ];
+                double frac_total_vol = ten_buckets_vol[i] / tot_vol;
+                double avg_ftv        = frac_total_vol / ten_buckets[i];
 
                 out << " (avg " << avg_ftv * 100.0 << "% of OBB volume)" << std::endl;
             }
@@ -372,11 +372,11 @@ ErrorCode obbstat_write( GeomTopoTool& gtt, std::vector< int >& volumes, std::ve
                          std::ostream& out )
 {
 
-    ErrorCode            ret = MB_SUCCESS;
-    OrientedBoxTreeTool& obbtool = *gtt.obb_tree( );
+    ErrorCode ret                = MB_SUCCESS;
+    OrientedBoxTreeTool& obbtool = *gtt.obb_tree();
 
     // can assume that volume numbers are valid.
-    for( std::vector< int >::iterator i = volumes.begin( ); i != volumes.end( ); ++i )
+    for( std::vector< int >::iterator i = volumes.begin(); i != volumes.end(); ++i )
     {
         EntityHandle vol_root;
         EntityHandle vol = gtt.entity_by_id( 3, *i );
@@ -398,12 +398,12 @@ ErrorCode obbstat_write( GeomTopoTool& gtt, std::vector< int >& volumes, std::ve
 
         // get all surfaces in volume
         Range surfs;
-        ret = gtt.get_moab_instance( )->get_child_meshsets( vol, surfs );
+        ret = gtt.get_moab_instance()->get_child_meshsets( vol, surfs );
         CHECKERR( gtt, ret );
 
-        out << "   with " << surfs.size( ) << " surfaces" << std::endl;
+        out << "   with " << surfs.size() << " surfaces" << std::endl;
 
-        TriStats ts( gtt.get_moab_instance( ), &obbtool, vol_root );
+        TriStats ts( gtt.get_moab_instance(), &obbtool, vol_root );
         ret = obbtool.preorder_traverse( vol_root, ts );
         CHECKERR( gtt, ret );
         ts.write_results( out );
@@ -411,10 +411,10 @@ ErrorCode obbstat_write( GeomTopoTool& gtt, std::vector< int >& volumes, std::ve
         if( verbose )
         {
             out << "Surface list: " << std::flush;
-            for( Range::iterator j = surfs.begin( ); j != surfs.end( ); ++j )
+            for( Range::iterator j = surfs.begin(); j != surfs.end(); ++j )
             {
                 out << gtt.global_id( *j );
-                if( j + 1 != surfs.end( ) ) out << ",";
+                if( j + 1 != surfs.end() ) out << ",";
             }
             out << std::endl;
             ret = obbtool.stats( vol_root, out );

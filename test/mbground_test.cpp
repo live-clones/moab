@@ -31,15 +31,15 @@
 std::string filename;
 std::string filename_out;
 std::string polyline_file_name;
-double      min_dot = 0.8;
-bool        keep_output;
-int         number_tests_successful = 0;
-int         number_tests_failed = 0;
+double min_dot = 0.8;
+bool keep_output;
+int number_tests_successful = 0;
+int number_tests_failed     = 0;
 
 using namespace moab;
 
-ErrorCode split_test_across( );
-ErrorCode verify_split( );
+ErrorCode split_test_across();
+ErrorCode verify_split();
 
 void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful )
 {
@@ -57,10 +57,10 @@ void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful
 
 int main( int argc, char* argv[] )
 {
-    filename = TestDir + "/PB.h5m";
+    filename           = TestDir + "/PB.h5m";
     polyline_file_name = TestDir + "/polyline.txt";
-    filename_out = "PB_ground.h5m";
-    min_dot = 0.8;
+    filename_out       = "PB_ground.h5m";
+    min_dot            = 0.8;
 
     keep_output = false;
 
@@ -72,22 +72,23 @@ int main( int argc, char* argv[] )
     }
     else if( argc == 5 )
     {
-        filename = argv[ 1 ];
-        polyline_file_name = argv[ 2 ];
-        min_dot = atof( argv[ 3 ] );
-        filename_out = argv[ 4 ];
-        keep_output = true;
+        filename           = argv[1];
+        polyline_file_name = argv[2];
+        min_dot            = atof( argv[3] );
+        filename_out       = argv[4];
+        keep_output        = true;
     }
     else
     {
-        std::cerr << "Usage: " << argv[ 0 ] << " [geom_filename] [polygon_file] [min_dot] [output_file]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " [geom_filename] [polygon_file] [min_dot] [output_file]" << std::endl;
         return 1;
     }
 
-    Core       mbcore;
+    Core mbcore;
     Interface* mb = &mbcore;
 
-    ErrorCode rval = mb->load_file( filename.c_str( ) );MB_CHK_SET_ERR( rval, "failed to load input file" );
+    ErrorCode rval = mb->load_file( filename.c_str() );
+    MB_CHK_SET_ERR( rval, "failed to load input file" );
 
     FBEngine* pFacet = new FBEngine( mb, NULL, true );  // smooth facetting, no OBB tree passed
 
@@ -95,68 +96,73 @@ int main( int argc, char* argv[] )
 
     // should the init be part of constructor or not?
     // this is where the obb tree is constructed, and smooth faceting initialized, too.
-    rval = pFacet->Init( );MB_CHK_SET_ERR( rval, "failed to initialize smoothing" );
+    rval = pFacet->Init();
+    MB_CHK_SET_ERR( rval, "failed to initialize smoothing" );
 
     delete pFacet;
     pFacet = NULL;
 
     // split_test_across
     std::cout << " split across test: ";
-    rval = split_test_across( );
+    rval = split_test_across();
     handle_error_code( rval, number_tests_failed, number_tests_successful );
     std::cout << "\n";
 
     std::cout << " verify split ";
-    rval = verify_split( );
+    rval = verify_split();
     handle_error_code( rval, number_tests_failed, number_tests_successful );
     std::cout << "\n";
     // when we are done, remove modified file if we want to
-    if( !keep_output ) { remove( filename_out.c_str( ) ); }
+    if( !keep_output ) { remove( filename_out.c_str() ); }
     return number_tests_failed;
 }
 
 // this test will test a split like the one for grounding line
 // the first and last point of the polyline should be close to the
 // initial boundary of the face to be split
-ErrorCode split_test_across( )
+ErrorCode split_test_across()
 {
-    Core       mbcore;
+    Core mbcore;
     Interface* mb = &mbcore;
 
-    ErrorCode rval = mb->load_file( filename.c_str( ) );MB_CHK_SET_ERR( rval, "failed to load already modified file" );
+    ErrorCode rval = mb->load_file( filename.c_str() );
+    MB_CHK_SET_ERR( rval, "failed to load already modified file" );
 
     FBEngine* pFacet = new FBEngine( mb, NULL, true );
 
-    rval = pFacet->Init( );MB_CHK_SET_ERR( rval, "failed to initialize smoothing" );
+    rval = pFacet->Init();
+    MB_CHK_SET_ERR( rval, "failed to initialize smoothing" );
 
     EntityHandle root_set;
-    rval = pFacet->getRootSet( &root_set );MB_CHK_SET_ERR( rval, "ERROR : getRootSet failed!" );
+    rval = pFacet->getRootSet( &root_set );
+    MB_CHK_SET_ERR( rval, "ERROR : getRootSet failed!" );
     int top = 2;  //  iBase_FACE;
 
     Range faces;
-    rval = pFacet->getEntities( root_set, top, faces );MB_CHK_SET_ERR( rval, "Failed to get faces in split_test." );
+    rval = pFacet->getEntities( root_set, top, faces );
+    MB_CHK_SET_ERR( rval, "Failed to get faces in split_test." );
 
-    if( faces.size( ) != 1 )
+    if( faces.size() != 1 )
     {
-        std::cout << "num faces model:" << faces.size( ) << "\n";
+        std::cout << "num faces model:" << faces.size() << "\n";
         return MB_FAILURE;  //
     }
     // check only the second face
 
-    EntityHandle second_face = faces[ 0 ];
+    EntityHandle second_face = faces[0];
     // use the polyPB.txt file to get the trimming polygon
     ;
     // read the file with the polygon user data
 
-    std::ifstream datafile( polyline_file_name.c_str( ), std::ifstream::in );
+    std::ifstream datafile( polyline_file_name.c_str(), std::ifstream::in );
     if( !datafile )
     {
         std::cout << "can't read file\n";
         return MB_FAILURE;
     }
     //
-    char   temp[ 100 ];
-    double direction[ 3 ];  // normalized
+    char temp[100];
+    double direction[3];  // normalized
     double gridSize;
     datafile.getline( temp, 100 );  // first line
 
@@ -165,12 +171,12 @@ ErrorCode split_test_across( )
     // NORMALIZE(direction);// just to be sure
 
     std::vector< double > xyz;
-    while( !datafile.eof( ) )
+    while( !datafile.eof() )
     {
         datafile.getline( temp, 100 );
         // int id = 0;
         double x, y, z;
-        int    nr = sscanf( temp, "%lf %lf %lf", &x, &y, &z );
+        int nr = sscanf( temp, "%lf %lf %lf", &x, &y, &z );
         if( nr == 3 )
         {
             xyz.push_back( x );
@@ -178,7 +184,7 @@ ErrorCode split_test_across( )
             xyz.push_back( z );
         }
     }
-    int sizePolygon = (int)xyz.size( ) / 3;
+    int sizePolygon = (int)xyz.size() / 3;
     if( sizePolygon < 2 )
     {
         std::cerr << " Not enough points in the polygon" << std::endl;
@@ -188,27 +194,30 @@ ErrorCode split_test_across( )
     EntityHandle newFace;  // this test is with a "grounding" line
     // the second face should be the one that we want for test
     rval = pFacet->split_surface_with_direction( second_face, xyz, direction, /*closed*/ 0,
-                                                 /*min_dot */ 0.8, newFace );MB_CHK_ERR( rval );
+                                                 /*min_dot */ 0.8, newFace );
+    MB_CHK_ERR( rval );
 
     // save a new database, with 3 faces, eventually
-    pFacet->delete_smooth_tags( );
+    pFacet->delete_smooth_tags();
     delete pFacet;
     pFacet = NULL;  // try not to write the obb tree
 
-    rval = mb->write_file( filename_out.c_str( ) );MB_CHK_SET_ERR( rval, "Writing mesh file failed\n" );
+    rval = mb->write_file( filename_out.c_str() );
+    MB_CHK_SET_ERR( rval, "Writing mesh file failed\n" );
 
     return rval;
 }
 
-ErrorCode verify_split( )
+ErrorCode verify_split()
 {
-    Interface* mb = new Core( );
+    Interface* mb = new Core();
 
-    ErrorCode rval = mb->load_file( filename_out.c_str( ) );MB_CHK_SET_ERR( rval, "Loading mesh file failed\n" );
+    ErrorCode rval = mb->load_file( filename_out.c_str() );
+    MB_CHK_SET_ERR( rval, "Loading mesh file failed\n" );
 
     moab::GeomTopoTool gTopoTool( mb, true, 0, true, false );
 
-    if( !gTopoTool.check_model( ) ) return MB_FAILURE;
+    if( !gTopoTool.check_model() ) return MB_FAILURE;
 
     delete mb;
     return MB_SUCCESS;

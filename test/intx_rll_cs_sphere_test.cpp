@@ -14,30 +14,30 @@ int main( int argc, char* argv[] )
     // will will keep the
     const char* filename_mesh1 = STRINGIFY( MESHDIR ) "/mbcslam/outRLLMesh.g";
     const char* filename_mesh2 = STRINGIFY( MESHDIR ) "/mbcslam/outCSMesh.g";
-    double      R = 1.;  // input
-    double      epsrel = 1.e-8;
-    const char* newFile = "intx.vtk";
+    double R                   = 1.;  // input
+    double epsrel              = 1.e-8;
+    const char* newFile        = "intx.vtk";
     if( argc == 6 )
     {
-        filename_mesh1 = argv[ 1 ];
-        filename_mesh2 = argv[ 2 ];
-        R = atof( argv[ 3 ] );
-        epsrel = atof( argv[ 4 ] );
-        newFile = argv[ 5 ];
+        filename_mesh1 = argv[1];
+        filename_mesh2 = argv[2];
+        R              = atof( argv[3] );
+        epsrel         = atof( argv[4] );
+        newFile        = argv[5];
     }
     else
     {
-        printf( "Usage: %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile>\n", argv[ 0 ] );
+        printf( "Usage: %s <mesh_filename1> <mesh_filename2> <radius> <epsrel> <newFile>\n", argv[0] );
         if( argc != 1 ) return 1;
         printf( "No files specified.  Defaulting to: %s  %s  %f %g %s\n", filename_mesh1, filename_mesh2, R, epsrel,
                 newFile );
     }
 
     // read meshes in 2 file sets
-    Core         moab;
-    Interface*   mb = &moab;  // global
+    Core moab;
+    Interface* mb = &moab;  // global
     EntityHandle sf1, sf2;
-    ErrorCode    rval = mb->create_meshset( MESHSET_SET, sf1 );
+    ErrorCode rval = mb->create_meshset( MESHSET_SET, sf1 );
     if( MB_SUCCESS != rval ) return 1;
     rval = mb->create_meshset( MESHSET_SET, sf2 );
     if( MB_SUCCESS != rval ) return 1;

@@ -46,16 +46,16 @@ class VertexPMeanP : public VertexQM, public PMeanPMetric
   public:
     MESQUITE_EXPORT VertexPMeanP( double p, ElemSampleQM* metric );
 
-    MESQUITE_EXPORT virtual ~VertexPMeanP( );
+    MESQUITE_EXPORT virtual ~VertexPMeanP();
 
-    MESQUITE_EXPORT ElemSampleQM* get_quality_metric( ) const
+    MESQUITE_EXPORT ElemSampleQM* get_quality_metric() const
     {
         return mMetric;
     }
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
@@ -63,22 +63,22 @@ class VertexPMeanP : public VertexQM, public PMeanPMetric
                                                         std::vector< size_t >& indices, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                         std::vector< size_t >&   indices,
+                                                         std::vector< size_t >& indices,
                                                          std::vector< Vector3D >& gradient, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >&   indices,
+                                                        std::vector< size_t >& indices,
                                                         std::vector< Vector3D >& gradient,
                                                         std::vector< Matrix3D >& Hessian, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                                 std::vector< size_t >&      indices,
-                                                                 std::vector< Vector3D >&    gradient,
+                                                                 std::vector< size_t >& indices,
+                                                                 std::vector< Vector3D >& gradient,
                                                                  std::vector< SymMatrix3D >& Hessian_diagonal,
-                                                                 MsqError&                   err );
+                                                                 MsqError& err );
 
   private:
-    ElemSampleQM*                 mMetric;
+    ElemSampleQM* mMetric;
     mutable std::vector< size_t > mHandles;
 };
 

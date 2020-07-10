@@ -42,9 +42,9 @@ namespace MBMesquite
 class AWShape2DNB2 : public AWMetricNonBarrier2D
 {
   public:
-    MESQUITE_EXPORT virtual ~AWShape2DNB2( );
+    MESQUITE_EXPORT virtual ~AWShape2DNB2();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                                            MsqError& err );

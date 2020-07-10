@@ -34,6 +34,6 @@
 namespace MBMesquite
 {
 
-ElemSampleQM::~ElemSampleQM( ) {}
+ElemSampleQM::~ElemSampleQM() {}
 
 }  // namespace MBMesquite

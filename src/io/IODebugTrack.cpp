@@ -40,12 +40,12 @@ IODebugTrack::IODebugTrack( bool enabled, const std::string& name, unsigned long
 #endif
 }
 
-IODebugTrack::~IODebugTrack( )
+IODebugTrack::~IODebugTrack()
 {
     if( !enableOutput || mpiRank )  // only root prints gap summary
         return;
 
-    if( dataSet.empty( ) )
+    if( dataSet.empty() )
     {
         ostr << PFX << tableName << " : No Data Written!!!!" << std::endl;
         return;
@@ -54,13 +54,13 @@ IODebugTrack::~IODebugTrack( )
     std::list< DRange >::const_iterator i;
     if( !maxSize )
     {
-        for( i = dataSet.begin( ); i != dataSet.end( ); ++i )
+        for( i = dataSet.begin(); i != dataSet.end(); ++i )
             if( i->end >= maxSize ) maxSize = i->end + 1;
     }
-    Range           processed;
-    Range::iterator h = processed.begin( );
-    bool            wrote_zero = false;
-    for( i = dataSet.begin( ); i != dataSet.end( ); ++i )
+    Range processed;
+    Range::iterator h = processed.begin();
+    bool wrote_zero   = false;
+    for( i = dataSet.begin(); i != dataSet.end(); ++i )
     {
         // ranges cannot contain zero
         assert( i->begin <= i->end );
@@ -77,17 +77,17 @@ IODebugTrack::~IODebugTrack( )
     Range unprocessed;
     if( maxSize > 1 ) unprocessed.insert( 1, maxSize - 1 );
     unprocessed = subtract( unprocessed, processed );
-    if( unprocessed.empty( ) ) return;
+    if( unprocessed.empty() ) return;
 
     Range::const_pair_iterator j;
-    for( j = unprocessed.const_pair_begin( ); j != unprocessed.const_pair_end( ); ++j )
+    for( j = unprocessed.const_pair_begin(); j != unprocessed.const_pair_end(); ++j )
     {
         unsigned long b = j->first;
         unsigned long e = j->second;
         if( b == 1 && !wrote_zero ) b = 0;
 
         ostr << PFX << tableName << " : range not read/written: [" << b << "," << e << "]" << std::endl;
-        ostr.flush( );
+        ostr.flush();
     }
 }
 
@@ -115,7 +115,7 @@ void IODebugTrack::record_io( DRange ins )
 
     // test for overlap with all existing ranges
     std::list< DRange >::iterator i;
-    for( i = dataSet.begin( ); i != dataSet.end( ); ++i )
+    for( i = dataSet.begin(); i != dataSet.end(); ++i )
     {
         if( i->end >= ins.begin && i->begin <= ins.end )
         {  // if overlap
@@ -130,42 +130,42 @@ void IODebugTrack::record_io( DRange ins )
                 ostr << ": Conflicting write for ranks " << i->rank << " and " << ins.rank;
 
             ostr << ": [" << i->begin << "," << i->end << "] and [" << ins.begin << "," << ins.end << "]" << std::endl;
-            ostr.flush( );
+            ostr.flush();
         }
     }
 
     dataSet.push_back( ins );
 }
 
-void IODebugTrack::all_reduce( )
+void IODebugTrack::all_reduce()
 {
 #ifdef MOAB_HAVE_MPI
     if( !enableOutput || !haveMPI ) return;
 
     int commsize;
     MPI_Comm_size( MPI_COMM_WORLD, &commsize );
-    int                count = 3 * dataSet.size( );
+    int count = 3 * dataSet.size();
     std::vector< int > displs( commsize ), counts( commsize );
-    MPI_Gather( &count, 1, MPI_INT, &counts[ 0 ], 1, MPI_INT, 0, MPI_COMM_WORLD );
-    displs[ 0 ] = 0;
+    MPI_Gather( &count, 1, MPI_INT, &counts[0], 1, MPI_INT, 0, MPI_COMM_WORLD );
+    displs[0] = 0;
     for( int i = 1; i < commsize; ++i )
-        displs[ i ] = displs[ i - 1 ] + counts[ i - 1 ];
-    int total = ( displs.back( ) + counts.back( ) ) / 3;
+        displs[i] = displs[i - 1] + counts[i - 1];
+    int total = ( displs.back() + counts.back() ) / 3;
     count /= 3;
 
-    std::vector< DRange > send( dataSet.size( ) ), recv( total );
-    std::copy( dataSet.begin( ), dataSet.end( ), send.begin( ) );
-    MPI_Gatherv( (void*)&send[ 0 ], 3 * send.size( ), MPI_UNSIGNED_LONG, (void*)&recv[ 0 ], &counts[ 0 ], &displs[ 0 ],
+    std::vector< DRange > send( dataSet.size() ), recv( total );
+    std::copy( dataSet.begin(), dataSet.end(), send.begin() );
+    MPI_Gatherv( (void*)&send[0], 3 * send.size(), MPI_UNSIGNED_LONG, (void*)&recv[0], &counts[0], &displs[0],
                  MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD );
 
     if( 0 == mpiRank )
     {
         for( int i = count; i < total; ++i )
-            record_io( recv[ i ] );
+            record_io( recv[i] );
     }
     else
     {
-        dataSet.clear( );
+        dataSet.clear();
     }
 #endif
 }

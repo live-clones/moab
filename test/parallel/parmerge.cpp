@@ -50,12 +50,12 @@ int main( int argc, char* argv[] )
     // Check argument count
     if( argc != 4 )
     {
-        std::cerr << "Usage: " << argv[ 0 ] << " <inputfile> <outputfile> <tolerance>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <inputfile> <outputfile> <tolerance>" << std::endl;
         return 1;
     }
     // Check the output file extension
-    std::string outfile( argv[ 2 ] );
-    if( outfile.compare( outfile.size( ) - 4, 4, ".h5m" ) != 0 )
+    std::string outfile( argv[2] );
+    if( outfile.compare( outfile.size() - 4, 4, ".h5m" ) != 0 )
     {
         std::cerr << "Invalid Parallel Output File" << std::endl;
         return 1;
@@ -63,7 +63,7 @@ int main( int argc, char* argv[] )
 
     // Read in tolerance
     double epsilon;
-    if( !( std::istringstream( argv[ 3 ] ) >> epsilon ) )
+    if( !( std::istringstream( argv[3] ) >> epsilon ) )
     {
         std::cerr << "Unable to parse tolerance" << std::endl;
         return 1;
@@ -77,36 +77,36 @@ int main( int argc, char* argv[] )
 
     // Read in files from input files
     // Round robin distribution of reading meshes
-    moab::Core*     mb = new moab::Core( );
+    moab::Core* mb = new moab::Core();
     moab::ErrorCode rval;
-    std::ifstream   file( argv[ 1 ] );
-    if( file.is_open( ) )
+    std::ifstream file( argv[1] );
+    if( file.is_open() )
     {
         std::string line;
-        int         count = 0;
+        int count = 0;
         // Read each line
-        while( file.good( ) )
+        while( file.good() )
         {
             getline( file, line );
             if( myID == count && line != "" )
             {
                 // Read in the file
-                rval = mb->load_mesh( line.c_str( ) );
+                rval = mb->load_mesh( line.c_str() );
                 if( rval != moab::MB_SUCCESS )
                 {
                     std::cerr << "Error Opening Mesh File " << line << std::endl;
                     MPI_Abort( MPI_COMM_WORLD, 1 );
-                    file.close( );
+                    file.close();
                     return 1;
                 }
             }
             count = ( count + 1 ) % numprocs;
         }
-        file.close( );
+        file.close();
     }
     else
     {
-        std::cerr << "Error Opening Input File " << argv[ 1 ] << std::endl;
+        std::cerr << "Error Opening Input File " << argv[1] << std::endl;
         MPI_Abort( MPI_COMM_WORLD, 1 );
         return 1;
     }
@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 
     // Call the resolve parallel function
     moab::ParallelMergeMesh pm( pc, epsilon );
-    rval = pm.merge( );
+    rval = pm.merge();
     if( rval != moab::MB_SUCCESS )
     {
         std::cerr << "Merge Failed" << std::endl;
@@ -127,7 +127,7 @@ int main( int argc, char* argv[] )
     print_output( pc, mb, myID, numprocs, PrintInfo );
 
     // Write out the file
-    rval = mb->write_file( outfile.c_str( ), 0, "PARALLEL=WRITE_PART" );
+    rval = mb->write_file( outfile.c_str(), 0, "PARALLEL=WRITE_PART" );
     if( rval != moab::MB_SUCCESS )
     {
         std::cerr << "Writing output file failed. Code:";
@@ -145,7 +145,7 @@ int main( int argc, char* argv[] )
 
     delete pc;
     delete mb;
-    MPI_Finalize( );
+    MPI_Finalize();
 
     return 0;
 }
@@ -155,13 +155,13 @@ int main( int argc, char* argv[] )
 void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* numprocs */, bool perform )
 {
     moab::Range ents, skin;
-    int         o_ct = 0, no_ct = 0, tmp = 0, o_tot = 0, no_tot = 0;
+    int o_ct = 0, no_ct = 0, tmp = 0, o_tot = 0, no_tot = 0;
     if( perform )
     {
         if( myID == 0 ) std::cout << "------------------------------------------" << std::endl;
         // Check the count of total vertices
         mb->get_entities_by_dimension( 0, 0, ents );
-        for( moab::Range::iterator rit = ents.begin( ); rit != ents.end( ); ++rit )
+        for( moab::Range::iterator rit = ents.begin(); rit != ents.end(); ++rit )
         {
             pc->get_owner( *rit, tmp );
             if( tmp == myID ) { o_ct++; }
@@ -175,15 +175,15 @@ void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* nump
         // Check the count of owned and not owned skin faces.
         // owned-not owned == total skin faces
         moab::Skinner skinner( mb );
-        o_ct = 0;
-        no_ct = 0;
-        o_tot = 0;
+        o_ct   = 0;
+        no_ct  = 0;
+        o_tot  = 0;
         no_tot = 0;
-        skin.clear( );
-        ents.clear( );
+        skin.clear();
+        ents.clear();
         mb->get_entities_by_dimension( 0, 3, ents );
         skinner.find_skin( 0, ents, 2, skin );
-        for( moab::Range::iterator s_rit = skin.begin( ); s_rit != skin.end( ); ++s_rit )
+        for( moab::Range::iterator s_rit = skin.begin(); s_rit != skin.end(); ++s_rit )
         {
             pc->get_owner( *s_rit, tmp );
             if( tmp == myID ) { o_ct++; }

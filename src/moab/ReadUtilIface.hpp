@@ -31,10 +31,10 @@ class ReadUtilIface
 {
   public:
     //! Constructor
-    ReadUtilIface( ) {}
+    ReadUtilIface() {}
 
     //! Destructor
-    virtual ~ReadUtilIface( ) {}
+    virtual ~ReadUtilIface() {}
 
     //! Given a requested number of vertices and number of coordinates, returns
     //! memory space which will be used to store vertex coordinates and information
@@ -133,12 +133,12 @@ class ReadUtilIface
 inline void ReadUtilIface::reorder( const int* order, EntityHandle* conn, int num_elem, int node_per_elem )
 {
     std::vector< EntityHandle > elem( node_per_elem );
-    EntityHandle* const         end = conn + num_elem * node_per_elem;
+    EntityHandle* const end = conn + num_elem * node_per_elem;
     while( conn != end )
     {
-        std::copy( conn, conn + node_per_elem, elem.begin( ) );
+        std::copy( conn, conn + node_per_elem, elem.begin() );
         for( int j = 0; j < node_per_elem; ++j )
-            conn[ order[ j ] ] = elem[ j ];
+            conn[order[j]] = elem[j];
         conn += node_per_elem;
     }
 }

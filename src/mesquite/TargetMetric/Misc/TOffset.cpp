@@ -38,12 +38,12 @@
 namespace MBMesquite
 {
 
-std::string TOffset::get_name( ) const
+std::string TOffset::get_name() const
 {
-    return "offset(" + mMetric->get_name( ) + ')';
+    return "offset(" + mMetric->get_name() + ')';
 }
 
-TOffset::~TOffset( ) {}
+TOffset::~TOffset() {}
 
 bool TOffset::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -63,7 +63,7 @@ bool TOffset::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, Ms
 }
 
 bool TOffset::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                  MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                  MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
     bool rval = mMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
     MSQ_ERRZERO( err );
@@ -89,7 +89,7 @@ bool TOffset::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, Ms
 }
 
 bool TOffset::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                  MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                  MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
     bool rval = mMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
     MSQ_ERRZERO( err );

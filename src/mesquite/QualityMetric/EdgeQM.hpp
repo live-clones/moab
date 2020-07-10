@@ -42,9 +42,9 @@ namespace MBMesquite
 class EdgeQM : public QualityMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~EdgeQM( );
+    MESQUITE_EXPORT virtual ~EdgeQM();
 
-    MESQUITE_EXPORT virtual MetricType get_metric_type( ) const
+    MESQUITE_EXPORT virtual MetricType get_metric_type() const
     {
         return VERTEX_BASED;
     }
@@ -88,9 +88,9 @@ class EdgeQM : public QualityMetric
 
     enum
     {
-        ELEM_EDGE_BITS = 4,
+        ELEM_EDGE_BITS  = 4,
         ELEM_INDEX_BITS = 8 * sizeof( size_t ) - ELEM_EDGE_BITS,
-        ELEM_EDGE_MASK = ( ( (size_t)1 ) << ELEM_INDEX_BITS ) - 1
+        ELEM_EDGE_MASK  = ( ( (size_t)1 ) << ELEM_INDEX_BITS ) - 1
     };
 
     inline static size_t handle( unsigned edge_no, size_t elem_idx )

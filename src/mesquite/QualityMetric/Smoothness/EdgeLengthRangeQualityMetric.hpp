@@ -62,11 +62,11 @@ class EdgeLengthRangeQualityMetric : public VertexQM, public AveragingQM
   public:
     EdgeLengthRangeQualityMetric( double low_a, double high_a );
 
-    virtual ~EdgeLengthRangeQualityMetric( );
+    virtual ~EdgeLengthRangeQualityMetric();
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
-    virtual int get_negate_flag( ) const;
+    virtual int get_negate_flag() const;
 
     virtual bool evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err );
 

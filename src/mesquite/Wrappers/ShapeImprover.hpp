@@ -45,7 +45,7 @@ class ShapeImprover : public Wrapper
 
   public:
     MESQUITE_EXPORT
-    ShapeImprover( );
+    ShapeImprover();
 
     /*\brief Set limit on seconds of CPU time
      *
@@ -78,7 +78,7 @@ class ShapeImprover : public Wrapper
 
   private:
     double maxTime, mBeta;
-    int    parallelIterations;
+    int parallelIterations;
 };
 
 }  // namespace MBMesquite

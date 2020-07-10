@@ -65,30 +65,30 @@ RefSizeTargetCalculator::RefSizeTargetCalculator( ReferenceMesh* reference_mesh 
 
 double RefSizeTargetCalculator::average_edge_length( PatchData& pd, size_t element, MsqError& err )
 {
-    Vector3D       coords[ 8 ];
+    Vector3D coords[8];
     MsqMeshEntity& elem = pd.element_by_index( element );
-    const size_t*  conn = elem.get_vertex_index_array( );
-    size_t         nvtx = elem.vertex_count( );
-    if( nvtx > ( sizeof( coords ) / sizeof( coords[ 0 ] ) ) )
+    const size_t* conn  = elem.get_vertex_index_array();
+    size_t nvtx         = elem.vertex_count();
+    if( nvtx > ( sizeof( coords ) / sizeof( coords[0] ) ) )
     {
         MSQ_SETERR( err )( "Invalid element type", MsqError::UNSUPPORTED_ELEMENT );
         return false;
     }
 
-    Mesh::VertexHandle handles[ 8 ];
+    Mesh::VertexHandle handles[8];
     for( unsigned i = 0; i < nvtx; ++i )
-        handles[ i ] = pd.get_vertex_handles_array( )[ conn[ i ] ];
+        handles[i] = pd.get_vertex_handles_array()[conn[i]];
 
     refMesh->get_reference_vertex_coordinates( handles, nvtx, coords, err );
     MSQ_ERRZERO( err );
 
-    EntityTopology type = elem.get_element_type( );
-    unsigned       num_edges = TopologyInfo::edges( type );
-    double         len_sum = 0.0;
+    EntityTopology type = elem.get_element_type();
+    unsigned num_edges  = TopologyInfo::edges( type );
+    double len_sum      = 0.0;
     for( unsigned i = 0; i < num_edges; ++i )
     {
         const unsigned* edge = TopologyInfo::edge_vertices( type, i );
-        len_sum += ( coords[ edge[ 0 ] ] - coords[ edge[ 1 ] ] ).length( );
+        len_sum += ( coords[edge[0]] - coords[edge[1]] ).length();
     }
     return len_sum * ( 1.0 / num_edges );  // scaleFactor[type];
 }

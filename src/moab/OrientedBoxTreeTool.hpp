@@ -88,9 +88,9 @@ class OrientedBoxTreeTool
     struct Settings
     {
       public:
-        Settings( );  //!< set defaults
+        Settings();             //!< set defaults
         int max_leaf_entities;  //!< Average number of entities per leaf
-        int max_depth;  //!< Maximum tree depth - 0->no limit
+        int max_depth;          //!< Maximum tree depth - 0->no limit
         //! Must be in [best_split_ratio,1.0]
         //! A tree node will not be split if the ratio of children
         //! in the child nodes is greater than this value.
@@ -103,12 +103,12 @@ class OrientedBoxTreeTool
         //! Flags used to create entity sets representing tree nodes
         unsigned int set_options;
         //! Check if settings are valid.
-        bool valid( ) const;
+        bool valid() const;
     };
 
     OrientedBoxTreeTool( Interface* i, const char* tag_name = 0, bool destroy_created_trees = false );
 
-    ~OrientedBoxTreeTool( );
+    ~OrientedBoxTreeTool();
 
     /**\brief Build oriented bounding box tree
      *
@@ -153,38 +153,38 @@ class OrientedBoxTreeTool
       public:
         //! return counts of nodes visited, indexed by tree depth.
         //! the counts include both leaves and interior nodes
-        const std::vector< unsigned >& nodes_visited( ) const
+        const std::vector< unsigned >& nodes_visited() const
         {
             return nodes_visited_count;
         }
         //! return counts of tree leaves visited, indexed by tree depth
-        const std::vector< unsigned >& leaves_visited( ) const
+        const std::vector< unsigned >& leaves_visited() const
         {
             return leaves_visited_count;
         }
         //! return counts of traversals ended, indexed by tree depth
-        const std::vector< unsigned >& traversals_ended( ) const
+        const std::vector< unsigned >& traversals_ended() const
         {
             return traversals_ended_count;
         }
         //! return total number of ray-triangle intersection tests performed
         //! in calls made with this TrvStats
-        unsigned int ray_tri_tests( ) const
+        unsigned int ray_tri_tests() const
         {
             return ray_tri_tests_count;
         }
         //! reset all counters on this structure
-        void reset( );
+        void reset();
         //! print the contents of this structure to given stream
         void print( std::ostream& str ) const;
 
-        TrvStats( ) : ray_tri_tests_count( 0 ) {}
+        TrvStats() : ray_tri_tests_count( 0 ) {}
 
       private:
         std::vector< unsigned > nodes_visited_count;
         std::vector< unsigned > leaves_visited_count;
         std::vector< unsigned > traversals_ended_count;
-        unsigned int            ray_tri_tests_count;
+        unsigned int ray_tri_tests_count;
 
         void increment( unsigned depth );
         void increment_leaf( unsigned depth );
@@ -217,7 +217,7 @@ class OrientedBoxTreeTool
     {
 
       protected:
-        std::vector< double >       intersections;
+        std::vector< double > intersections;
         std::vector< EntityHandle > sets;
         std::vector< EntityHandle > facets;
 
@@ -243,20 +243,20 @@ class OrientedBoxTreeTool
         };
 
         /* determine whether or not a preferred orientation is established  */
-        virtual const int* getDesiredOrient( )
+        virtual const int* getDesiredOrient()
         {
             return NULL;
         };
 
-        std::vector< double > get_intersections( )
+        std::vector< double > get_intersections()
         {
             return intersections;
         };
-        std::vector< EntityHandle > get_facets( )
+        std::vector< EntityHandle > get_facets()
         {
             return facets;
         };
-        std::vector< EntityHandle > get_sets( )
+        std::vector< EntityHandle > get_sets()
         {
             return sets;
         };
@@ -275,8 +275,8 @@ class OrientedBoxTreeTool
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
     ErrorCode ray_intersect_triangles( std::vector< double >& distances_out, std::vector< EntityHandle >& facets_out,
-                                       EntityHandle root_set, double tolerance, const double ray_point[ 3 ],
-                                       const double unit_ray_dir[ 3 ], const double* ray_length = 0,
+                                       EntityHandle root_set, double tolerance, const double ray_point[3],
+                                       const double unit_ray_dir[3], const double* ray_length = 0,
                                        TrvStats* accum = 0 );
 
     /**\brief Intersect ray with tree
@@ -289,19 +289,18 @@ class OrientedBoxTreeTool
      *\param unit_ray_dir  The ray direction vector (must be unit length)
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
-    ErrorCode ray_intersect_boxes( Range& boxes_out, EntityHandle root_set, double tolerance,
-                                   const double ray_point[ 3 ], const double unit_ray_dir[ 3 ],
-                                   const double* ray_length = 0, TrvStats* accum = 0 );
+    ErrorCode ray_intersect_boxes( Range& boxes_out, EntityHandle root_set, double tolerance, const double ray_point[3],
+                                   const double unit_ray_dir[3], const double* ray_length = 0, TrvStats* accum = 0 );
 
     /**\brief Intersect ray with triangles contained in passed MBENTITYSETs
      *
      * \param raytri_test_count    If non-NULL, count of ray-triangle intersect tests
      *                             will be added to the value at which this points.
      */
-    ErrorCode ray_intersect_triangles( std::vector< double >&       intersection_distances_out,
+    ErrorCode ray_intersect_triangles( std::vector< double >& intersection_distances_out,
                                        std::vector< EntityHandle >& intersection_facets_out,
                                        const Range& leaf_boxes_containing_tris, double tolerance,
-                                       const double ray_point[ 3 ], const double unit_ray_dir[ 3 ],
+                                       const double ray_point[3], const double unit_ray_dir[3],
                                        const double* ray_length = 0, unsigned int* raytri_test_count = 0 );
 
     /**\brief Intersect a ray with the triangles contained within the tree
@@ -327,7 +326,7 @@ class OrientedBoxTreeTool
 
     ErrorCode ray_intersect_sets( std::vector< double >& distances_out, std::vector< EntityHandle >& sets_out,
                                   std::vector< EntityHandle >& facets_out, EntityHandle root_set, double tolerance,
-                                  const double ray_point[ 3 ], const double unit_ray_dir[ 3 ],
+                                  const double ray_point[3], const double unit_ray_dir[3],
                                   IntersectSearchWindow& search_win, IntRegCtxt& register_intersection,
                                   TrvStats* accum = 0 );
 
@@ -337,11 +336,11 @@ class OrientedBoxTreeTool
      */
     ErrorCode ray_intersect_sets( std::vector< double >& distances_out, std::vector< EntityHandle >& sets_out,
                                   std::vector< EntityHandle >& facets_out, EntityHandle root_set, double tolerance,
-                                  const double ray_point[ 3 ], const double unit_ray_dir[ 3 ],
-                                  const double* ray_length = 0, TrvStats* accum = 0 );
+                                  const double ray_point[3], const double unit_ray_dir[3], const double* ray_length = 0,
+                                  TrvStats* accum = 0 );
 
-    ErrorCode ray_intersect_sets( EntityHandle root_set, double tolerance, const double ray_point[ 3 ],
-                                  const double unit_ray_dir[ 3 ], IntersectSearchWindow& search_win,
+    ErrorCode ray_intersect_sets( EntityHandle root_set, double tolerance, const double ray_point[3],
+                                  const double unit_ray_dir[3], IntersectSearchWindow& search_win,
                                   IntRegCtxt& register_intersection, TrvStats* accum = 0 );
 
     /**\brief Find closest surface, facet in surface, and location on facet
@@ -390,7 +389,7 @@ class OrientedBoxTreeTool
      *
      * Get the oriented box for a node in an oriented bounding box tree.
      */
-    ErrorCode box( EntityHandle node_set, double center[ 3 ], double axis1[ 3 ], double axis2[ 3 ], double axis3[ 3 ] );
+    ErrorCode box( EntityHandle node_set, double center[3], double axis1[3], double axis2[3], double axis3[3] );
 
     ErrorCode delete_tree( EntityHandle root_set );
 
@@ -458,9 +457,9 @@ class OrientedBoxTreeTool
         /**\brief Process a leaf node during tree traversal */
         virtual ErrorCode leaf( EntityHandle node ) = 0;
 
-        virtual ~Op( );  // probably isn't necessary in this case, and
-                         // does nothing, but lots of compilers warn if
-                         // virtual function but no virtual destructor.
+        virtual ~Op();  // probably isn't necessary in this case, and
+                        // does nothing, but lots of compilers warn if
+                        // virtual function but no virtual destructor.
     };
 
     /**\brief Visitor pattern - do operation for each tree node
@@ -473,7 +472,7 @@ class OrientedBoxTreeTool
      */
     ErrorCode preorder_traverse( EntityHandle root_set, Op& operation, TrvStats* accum = 0 );
 
-    Interface* get_moab_instance( ) const
+    Interface* get_moab_instance() const
     {
         return instance;
     }
@@ -499,9 +498,9 @@ class OrientedBoxTreeTool
                                StatData& data, unsigned& count_out, CartVect& dimensions_out );
 
     Interface* instance;
-    Tag        tagHandle;
+    Tag tagHandle;
 
-    bool                        cleanUpTrees;
+    bool cleanUpTrees;
     std::vector< EntityHandle > createdTrees;
 };
 

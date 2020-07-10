@@ -71,7 +71,7 @@ class HypreParMatrix
 {
   private:
     /// The actual object
-    HYPRE_IJMatrix      A;
+    HYPRE_IJMatrix A;
     hypre_ParCSRMatrix* A_parcsr;
 
     mv_InterfaceInterpreter* interpreter;
@@ -84,18 +84,18 @@ class HypreParMatrix
     int width, gncols;
 
     moab::ParallelComm* pcomm;
-    char                initialized;
+    char initialized;
 
     // Initialize with defaults. Does not initialize inherited members.
-    void Init( );
+    void Init();
 
     // Delete all owned data. Does not perform re-initialization with defaults.
-    void Destroy( );
+    void Destroy();
 
     friend class HypreSolver;
 
   public:
-    typedef Eigen::VectorXd                                Vector;
+    typedef Eigen::VectorXd Vector;
     typedef Eigen::SparseMatrix< double, Eigen::RowMajor > MOABSparseMatrix;
     // typedef template Eigen::ArrayXX<T> Array2D<T>;
 
@@ -106,10 +106,10 @@ class HypreParMatrix
     /// Converts hypre's format to HypreParMatrix
     HypreParMatrix( HYPRE_IJMatrix a )
     {
-        Init( );
-        A = a;
-        height = GetNumRows( );
-        width = GetNumCols( );
+        Init();
+        A      = a;
+        height = GetNumRows();
+        width  = GetNumCols();
     }
 
     /** Creates block-diagonal square parallel matrix. Diagonal is given by diag
@@ -136,24 +136,24 @@ class HypreParMatrix
     void MakeRef( const HypreParMatrix& master );
 
     /// MPI communicator
-    moab::ParallelComm* GetParallelCommunicator( ) const
+    moab::ParallelComm* GetParallelCommunicator() const
     {
         return pcomm;
     }
 
     /// Typecasting to hypre's HYPRE_IJMatrix*
-    operator HYPRE_IJMatrix( )
+    operator HYPRE_IJMatrix()
     {
         return A;
     }
     /// Typecasting to hypre's HYPRE_ParCSRMatrix, a.k.a. void *
-    operator HYPRE_ParCSRMatrix( )
+    operator HYPRE_ParCSRMatrix()
     {
         return (HYPRE_ParCSRMatrix)A_parcsr;
     }
 
     /// Changes the ownership of the matrix
-    HYPRE_IJMatrix StealData( );
+    HYPRE_IJMatrix StealData();
     /// Changes the ownership of the matrix to A
     void StealData( HypreParMatrix& A );
 
@@ -167,37 +167,37 @@ class HypreParMatrix
     // void CopyColStarts();
 
     /// Returns the global number of nonzeros
-    inline HYPRE_Int NNZ( )
+    inline HYPRE_Int NNZ()
     {
         return A_parcsr->num_nonzeros;
     }
     /// Returns the row partitioning
-    inline HYPRE_Int* RowPart( )
+    inline HYPRE_Int* RowPart()
     {
         return A->row_partitioning;
     }
     /// Returns the column partitioning
-    inline HYPRE_Int* ColPart( )
+    inline HYPRE_Int* ColPart()
     {
         return A->col_partitioning;
     }
     /// Returns the global number of rows
-    inline HYPRE_Int M( )
+    inline HYPRE_Int M()
     {
         return A->global_num_rows;
     }
     /// Returns the global number of columns
-    inline HYPRE_Int N( )
+    inline HYPRE_Int N()
     {
         return A->global_num_cols;
     }
     /// Returns the global number of rows
-    inline HYPRE_Int FirstRow( )
+    inline HYPRE_Int FirstRow()
     {
         return A->global_first_row;
     }
     /// Returns the global number of columns
-    inline HYPRE_Int FirstCol( )
+    inline HYPRE_Int FirstCol()
     {
         return A->global_first_col;
     }
@@ -230,13 +230,13 @@ class HypreParMatrix
                  HYPRE_Int* nnz_pr_diag = NULL, HYPRE_Int* onz_pr_diag = NULL, HYPRE_Int nnz_pr_offdiag = 0 );
 
     /// Returns the number of rows in the diagonal block of the ParCSRMatrix
-    int GetNumRows( ) const
+    int GetNumRows() const
     {
         return internal::to_int( hypre_CSRMatrixNumRows( hypre_ParCSRMatrixDiag( A_parcsr ) ) );
     }
 
     /// Returns the number of columns in the diagonal block of the ParCSRMatrix
-    int GetNumCols( ) const
+    int GetNumCols() const
     {
         return internal::to_int( hypre_CSRMatrixNumCols( hypre_ParCSRMatrixDiag( A_parcsr ) ) );
     }
@@ -284,7 +284,7 @@ class HypreParMatrix
     void Threshold( double threshold = 0.0 );
 
     /// If a row contains only zeros, set its diagonal to 1.
-    void EliminateZeroRows( )
+    void EliminateZeroRows()
     {
         hypre_ParCSRMatrixFixZeroRows( A_parcsr );
     }
@@ -305,7 +305,7 @@ class HypreParMatrix
     HYPRE_Int AddToValues( const HYPRE_Int nrows, HYPRE_Int* ncols, const HYPRE_Int* rows, const HYPRE_Int* cols,
                            const HYPRE_Complex* values );
 
-    HYPRE_Int FinalizeAssembly( );
+    HYPRE_Int FinalizeAssembly();
 
     HYPRE_Int verbosity( const HYPRE_Int level );
 
@@ -315,9 +315,9 @@ class HypreParMatrix
     void Read( const char* fname );
 
     /// Calls hypre's destroy function
-    virtual ~HypreParMatrix( )
+    virtual ~HypreParMatrix()
     {
-        Destroy( );
+        Destroy();
     }
 
     /// Returns the matrix A * B

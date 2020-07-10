@@ -54,7 +54,7 @@ class TargetWriter : public Instruction
     TargetWriter( TargetCalculator* tc, WeightCalculator* wc = 0, std::string target_base_name = "MSQ_TARGET_MATRIX",
                   std::string weight_base_name = "MSQ_TARGET_WEIGHT" );
 
-    MESQUITE_EXPORT virtual ~TargetWriter( );
+    MESQUITE_EXPORT virtual ~TargetWriter();
 
     MESQUITE_EXPORT
     double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& );
@@ -63,7 +63,7 @@ class TargetWriter : public Instruction
     void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     MESQUITE_EXPORT
-    std::string get_name( ) const;
+    std::string get_name() const;
 
   private:
     TagHandle get_target_tag( unsigned dimension, unsigned count, Mesh* mesh, MsqError& err );
@@ -73,7 +73,7 @@ class TargetWriter : public Instruction
     TargetCalculator* targetCalc;
     WeightCalculator* weightCalc;
 
-    std::string              targetName, weightName;
+    std::string targetName, weightName;
     std::vector< TagHandle > targetTags, weightTags;
 };
 

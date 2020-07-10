@@ -68,21 +68,21 @@ class MsqFreeVertexIndexIterator
     }
     //! Resets the iterator.
     //! The next call to next() will set the iterator on the first free vertex.
-    void reset( )
+    void reset()
     {
         iterCurrentIndex = (size_t)-1;
     }
     //! Increments the iterator. returns false if there is no more free vertex.
-    inline bool next( );
+    inline bool next();
     //! Returns an index corresponding to a free vertex.
-    std::size_t value( )
+    std::size_t value()
     {
         return iterCurrentIndex;
     }
 
   private:
     const PatchData& iterOriginator;
-    std::size_t      iterCurrentIndex;
+    std::size_t iterCurrentIndex;
 };
 
 /** \brief Advance iterator
@@ -90,10 +90,10 @@ class MsqFreeVertexIndexIterator
  * Advance iterator to next free vertex
  *\return false if at end, true otherwise
  */
-inline bool MsqFreeVertexIndexIterator::next( )
+inline bool MsqFreeVertexIndexIterator::next()
 {
     ++iterCurrentIndex;
-    while( iterCurrentIndex < iterOriginator.num_free_vertices( ) )
+    while( iterCurrentIndex < iterOriginator.num_free_vertices() )
     {
         if( !iterOriginator.vertex_by_index( iterCurrentIndex ).is_flag_set( MsqVertex::MSQ_CULLED ) ) return true;
         ++iterCurrentIndex;

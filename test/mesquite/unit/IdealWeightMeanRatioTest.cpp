@@ -62,23 +62,23 @@ class IdealWeightMeanRatioTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_scale_invariant );
     CPPUNIT_TEST( test_orient_invariant );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     IdealWeightMeanRatio mMetric;
-    QualityMetricTester  tester;
+    QualityMetricTester tester;
 
   public:
-    IdealWeightMeanRatioTest( ) : tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON )
+    IdealWeightMeanRatioTest() : tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON )
     {
         tester.ideal_pyramid_base_equals_height( true );
     }
 
-    void test_supported_types( )
+    void test_supported_types()
     {
         tester.test_supported_element_types( &mMetric );
     }
 
-    void test_ideal_element_eval( )
+    void test_ideal_element_eval()
     {
         tester.test_evaluate_unit_edge_element( &mMetric, TRIANGLE, 1.0 );
         tester.test_evaluate_unit_edge_element( &mMetric, QUADRILATERAL, 1.0 );
@@ -88,98 +88,98 @@ class IdealWeightMeanRatioTest : public CppUnit::TestFixture
         tester.test_evaluate_unit_edge_element( &mMetric, PYRAMID, 1.0 );
     }
 
-    void test_ideal_element_grad( )
+    void test_ideal_element_grad()
     {
         tester.test_ideal_element_zero_gradient( &mMetric, false );
     }
 
-    void test_ideal_element_hess( )
+    void test_ideal_element_hess()
     {
         tester.test_ideal_element_positive_definite_Hessian( &mMetric, false );
     }
 
-    void test_valid_hessian( )
+    void test_valid_hessian()
     {
         tester.test_symmetric_Hessian_diagonal_blocks( &mMetric );
     }
 
-    void test_measures_quality( )
+    void test_measures_quality()
     {
         tester.test_measures_quality( &mMetric );
     }
 
-    void test_gradient_reflects_quality( )
+    void test_gradient_reflects_quality()
     {
         tester.test_gradient_reflects_quality( &mMetric );
     }
 
-    void test_domain_deviation( )
+    void test_domain_deviation()
     {
         tester.test_domain_deviation_quality( &mMetric );
         tester.test_domain_deviation_gradient( &mMetric );
     }
 
-    void test_inverted_elements( )
+    void test_inverted_elements()
     {
         tester.test_evaluate_inverted_element( &mMetric, false );
     }
 
-    void test_degenerate_elements( )
+    void test_degenerate_elements()
     {
         tester.test_evaluate_degenerate_element( &mMetric, false );
     }
 
-    void test_get_evaluations( )
+    void test_get_evaluations()
     {
         tester.test_get_element_evaluations( &mMetric );
     }
 
-    void test_get_element_indices( )
+    void test_get_element_indices()
     {
         tester.test_get_element_indices( &mMetric );
     }
 
-    void test_get_fixed_indices( )
+    void test_get_fixed_indices()
     {
         tester.test_get_indices_fixed( &mMetric );
     }
 
-    void test_eval_with_indices( )
+    void test_eval_with_indices()
     {
         tester.compare_eval_and_eval_with_indices( &mMetric );
     }
 
-    void test_eval_with_gradient( )
+    void test_eval_with_gradient()
     {
         tester.compare_eval_with_indices_and_eval_with_gradient( &mMetric );
         tester.compare_analytical_and_numerical_gradients( &mMetric );
     }
 
-    void test_eval_with_hessian( )
+    void test_eval_with_hessian()
     {
         tester.compare_eval_with_indices_and_eval_with_hessian( &mMetric );
         tester.compare_eval_with_grad_and_eval_with_hessian( &mMetric );
         tester.compare_analytical_and_numerical_hessians( &mMetric );
     }
 
-    void test_eval_with_hessian_diagonal( )
+    void test_eval_with_hessian_diagonal()
     {
         tester.compare_eval_with_diag_and_eval_with_hessian( &mMetric );
     }
 
-    void test_location_invariant( )
+    void test_location_invariant()
     {
         tester.test_location_invariant( &mMetric );
         tester.test_grad_location_invariant( &mMetric );
         tester.test_hessian_location_invariant( &mMetric );
     }
 
-    void test_scale_invariant( )
+    void test_scale_invariant()
     {
         tester.test_scale_invariant( &mMetric );
     }
 
-    void test_orient_invariant( )
+    void test_orient_invariant()
     {
         tester.test_orient_invariant( &mMetric );
         tester.test_grad_orient_invariant( &mMetric );

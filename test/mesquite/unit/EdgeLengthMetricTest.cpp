@@ -51,20 +51,20 @@ class EdgeLengthMetricTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_location_invariant );
     CPPUNIT_TEST( test_orient_invariant );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
-    EdgeLengthMetric    mMetric;
+    EdgeLengthMetric mMetric;
     QualityMetricTester tester;
 
   public:
-    EdgeLengthMetricTest( ) : mMetric( 0.0 ), tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ) {}
+    EdgeLengthMetricTest() : mMetric( 0.0 ), tester( QualityMetricTester::ALL_FE_EXCEPT_SEPTAHEDRON ) {}
 
-    void test_supported_types( )
+    void test_supported_types()
     {
         tester.test_supported_element_types( &mMetric );
     }
 
-    void test_ideal_element_eval( )
+    void test_ideal_element_eval()
     {
         tester.test_evaluate_unit_edge_element( &mMetric, TRIANGLE, 1.0 );
         tester.test_evaluate_unit_edge_element( &mMetric, QUADRILATERAL, 1.0 );
@@ -74,39 +74,39 @@ class EdgeLengthMetricTest : public CppUnit::TestFixture
         tester.test_evaluate_unit_edge_element( &mMetric, HEXAHEDRON, 1.0 );
     }
 
-    void test_valid_hessian( )
+    void test_valid_hessian()
     {
         tester.test_symmetric_Hessian_diagonal_blocks( &mMetric );
     }
 
-    void test_get_evaluations( )
+    void test_get_evaluations()
     {
         tester.test_get_edge_evaluations( &mMetric );
     }
 
-    void test_get_edge_indices( )
+    void test_get_edge_indices()
     {
         tester.test_get_edge_indices( &mMetric );
     }
 
-    void test_eval_with_indices( )
+    void test_eval_with_indices()
     {
         tester.compare_eval_and_eval_with_indices( &mMetric );
     }
 
-    void test_eval_with_gradient( )
+    void test_eval_with_gradient()
     {
         tester.compare_eval_with_indices_and_eval_with_gradient( &mMetric );
         tester.compare_analytical_and_numerical_gradients( &mMetric );
     }
 
-    void test_location_invariant( )
+    void test_location_invariant()
     {
         tester.test_location_invariant( &mMetric );
         tester.test_grad_location_invariant( &mMetric );
     }
 
-    void test_orient_invariant( )
+    void test_orient_invariant()
     {
         tester.test_orient_invariant( &mMetric );
         tester.test_grad_orient_invariant( &mMetric );

@@ -37,7 +37,7 @@ class ExoIIUtil : public ExoIIInterface
 
   public:
     ExoIIUtil( Interface* mdb ) : mMB( mdb ) {}
-    ~ExoIIUtil( ) {}
+    ~ExoIIUtil() {}
 
     //! given the element name, return the type
     virtual ExoIIElementType element_name_to_type( const char* name )
@@ -56,25 +56,25 @@ class ExoIIUtil : public ExoIIInterface
 
     virtual void has_mid_nodes( ExoIIElementType elem_type, int* array )
     {
-        array[ 0 ] = HasMidNodes[ elem_type ][ 0 ];
-        array[ 1 ] = HasMidNodes[ elem_type ][ 1 ];
-        array[ 2 ] = HasMidNodes[ elem_type ][ 2 ];
-        array[ 3 ] = HasMidNodes[ elem_type ][ 3 ];
+        array[0] = HasMidNodes[elem_type][0];
+        array[1] = HasMidNodes[elem_type][1];
+        array[2] = HasMidNodes[elem_type][2];
+        array[3] = HasMidNodes[elem_type][3];
     }
 
     virtual int has_mid_nodes( ExoIIElementType elem_type, int dimension )
     {
-        return HasMidNodes[ elem_type ][ dimension ];
+        return HasMidNodes[elem_type][dimension];
     }
 
     virtual int geometric_dimension( const ExoIIElementType elem_type )
     {
-        return ElementGeometricDimension[ elem_type ];
+        return ElementGeometricDimension[elem_type];
     }
 
     virtual const char* element_type_name( ExoIIElementType type )
     {
-        return ElementTypeNames[ type ];
+        return ElementTypeNames[type];
     }
 
     //! given the element name, return the type
@@ -92,9 +92,9 @@ class ExoIIUtil : public ExoIIInterface
     //! given the number of vertices in an entity, and optionally the entity type and
     //! geometric dimension, return the corresponding exodusII element type; dimension defaults
     //! to 3 following TSTT convention
-    static ExoIIElementType get_element_type_from_num_verts( const int        num_verts,
+    static ExoIIElementType get_element_type_from_num_verts( const int num_verts,
                                                              const EntityType entity_type = MBMAXTYPE,
-                                                             const int        dimension = 3 );
+                                                             const int dimension          = 3 );
 
     //! the MB entity type used for each element type
     static const EntityType ExoIIElementMBEntity[];
@@ -107,7 +107,7 @@ class ExoIIUtil : public ExoIIInterface
 
     //! HasMidNode[elem_type][dim] = 1 denotes that elem_type has mid-nodes
     //! on sub-entities of dimension dim
-    static const int HasMidNodes[][ 4 ];
+    static const int HasMidNodes[][4];
 
     //! geometric dimension of each element
     static const int ElementGeometricDimension[];

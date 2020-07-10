@@ -8,11 +8,11 @@
 #include <math.h>
 
 /* Exit values */
-#define USAGE_ERROR 1
-#define READ_ERROR 2
-#define WRITE_ERROR 3
+#define USAGE_ERROR       1
+#define READ_ERROR        2
+#define WRITE_ERROR       3
 #define SURFACE_NOT_FOUND 4
-#define OTHER_ERROR 5
+#define OTHER_ERROR       5
 
 static void usage_error( const char* name )
 {
@@ -34,7 +34,7 @@ struct CartVect3D
 
     double x, y, z;
 
-    CartVect3D( ) : x( 0.0 ), y( 0.0 ), z( 0.0 ) {}
+    CartVect3D() : x( 0.0 ), y( 0.0 ), z( 0.0 ) {}
 
     CartVect3D( double x_, double y_, double z_ ) : x( x_ ), y( y_ ), z( z_ ) {}
 
@@ -88,7 +88,7 @@ struct CartVect3D
         return *this;
     }
 
-    double len( ) const
+    double len() const
     {
         return sqrt( x * x + y * y + z * z );
     }
@@ -125,32 +125,32 @@ CartVect3D& CartVect3D::operator*=( const CartVect3D& o )
     return *this;
 }
 
-static void find_rotation( CartVect3D plane_normal, double matrix[ 3 ][ 3 ] )
+static void find_rotation( CartVect3D plane_normal, double matrix[3][3] )
 {
     // normalize
-    plane_normal /= plane_normal.len( );
+    plane_normal /= plane_normal.len();
     if( fabs( plane_normal.x ) < 0.1 ) plane_normal.x = 0.0;
     if( fabs( plane_normal.y ) < 0.1 ) plane_normal.y = 0.0;
     if( fabs( plane_normal.z ) < 0.1 ) plane_normal.z = 0.0;
 
     // calculate vector to rotate about
     const CartVect3D Z( 0, 0, 1 );
-    CartVect3D       vector = plane_normal * Z;
-    const double     len = vector.len( );
+    CartVect3D vector = plane_normal * Z;
+    const double len  = vector.len();
 
     // If vector is zero, no rotation
     if( len < 1e-2 )
     {
-        matrix[ 0 ][ 0 ] = matrix[ 1 ][ 1 ] = matrix[ 2 ][ 2 ] = 1.0;
-        matrix[ 0 ][ 1 ] = matrix[ 1 ][ 0 ] = 0.0;
-        matrix[ 0 ][ 2 ] = matrix[ 2 ][ 0 ] = 0.0;
-        matrix[ 1 ][ 2 ] = matrix[ 2 ][ 1 ] = 0.0;
+        matrix[0][0] = matrix[1][1] = matrix[2][2] = 1.0;
+        matrix[0][1] = matrix[1][0] = 0.0;
+        matrix[0][2] = matrix[2][0] = 0.0;
+        matrix[1][2] = matrix[2][1] = 0.0;
         return;
     }
     vector /= len;
 
     const double cosine = plane_normal % Z;
-    const double sine = sqrt( 1 - cosine * cosine );
+    const double sine   = sqrt( 1 - cosine * cosine );
 
     std::cerr << "Rotation: " << acos( cosine ) << " [" << vector.x << ' ' << vector.y << ' ' << vector.z << ']'
               << std::endl;
@@ -162,28 +162,28 @@ static void find_rotation( CartVect3D plane_normal, double matrix[ 3 ][ 3 ] )
     const double s = sine;
     const double o = 1.0 - cosine;
 
-    matrix[ 0 ][ 0 ] = c + x * x * o;
-    matrix[ 0 ][ 1 ] = -z * s + x * y * o;
-    matrix[ 0 ][ 2 ] = y * s + x * z * o;
+    matrix[0][0] = c + x * x * o;
+    matrix[0][1] = -z * s + x * y * o;
+    matrix[0][2] = y * s + x * z * o;
 
-    matrix[ 1 ][ 0 ] = z * s + x * z * o;
-    matrix[ 1 ][ 1 ] = c + y * y * o;
-    matrix[ 1 ][ 2 ] = -x * s + y * z * o;
+    matrix[1][0] = z * s + x * z * o;
+    matrix[1][1] = c + y * y * o;
+    matrix[1][2] = -x * s + y * z * o;
 
-    matrix[ 2 ][ 0 ] = -y * s + x * z * o;
-    matrix[ 2 ][ 1 ] = x * s + y * z * o;
-    matrix[ 2 ][ 2 ] = c + z * z * o;
+    matrix[2][0] = -y * s + x * z * o;
+    matrix[2][1] = x * s + y * z * o;
+    matrix[2][2] = c + z * z * o;
 }
 
-static void transform_point( CartVect3D& point, double matrix[ 3 ][ 3 ] )
+static void transform_point( CartVect3D& point, double matrix[3][3] )
 {
     const double x = point.x;
     const double y = point.y;
     const double z = point.z;
 
-    point.x = x * matrix[ 0 ][ 0 ] + y * matrix[ 0 ][ 1 ] + z * matrix[ 0 ][ 2 ];
-    point.y = x * matrix[ 1 ][ 0 ] + y * matrix[ 1 ][ 1 ] + z * matrix[ 1 ][ 2 ];
-    point.z = x * matrix[ 2 ][ 0 ] + y * matrix[ 2 ][ 1 ] + z * matrix[ 2 ][ 2 ];
+    point.x = x * matrix[0][0] + y * matrix[0][1] + z * matrix[0][2];
+    point.y = x * matrix[1][0] + y * matrix[1][1] + z * matrix[1][2];
+    point.z = x * matrix[2][0] + y * matrix[2][1] + z * matrix[2][2];
 }
 
 static void write_gnuplot( std::ostream& stream, const std::vector< CartVect3D >& list );
@@ -203,68 +203,68 @@ using namespace moab;
 
 int main( int argc, char* argv[] )
 {
-    Interface*                          moab = new Core( );
-    ErrorCode                           result;
+    Interface* moab = new Core();
+    ErrorCode result;
     std::vector< CartVect3D >::iterator iter;
-    FileType                            type = GNUPLOT;
+    FileType type = GNUPLOT;
 
     int idx = 1;
     if( argc == 4 )
     {
-        if( !strcmp( argv[ idx ], "-p" ) )
+        if( !strcmp( argv[idx], "-p" ) )
             type = POSTSCRIPT;
-        else if( !strcmp( argv[ idx ], "-g" ) )
+        else if( !strcmp( argv[idx], "-g" ) )
             type = GNUPLOT;
-        else if( !strcmp( argv[ idx ], "-s" ) )
+        else if( !strcmp( argv[idx], "-s" ) )
             type = SVG;
         else
-            usage_error( argv[ 0 ] );
+            usage_error( argv[0] );
         ++idx;
     }
 
     // scan CL args
     int surface_id;
-    if( argc - idx != 2 ) usage_error( argv[ 0 ] );
+    if( argc - idx != 2 ) usage_error( argv[0] );
     char* endptr;
-    surface_id = strtol( argv[ idx ], &endptr, 0 );
-    if( !endptr || *endptr ) usage_error( argv[ 0 ] );
+    surface_id = strtol( argv[idx], &endptr, 0 );
+    if( !endptr || *endptr ) usage_error( argv[0] );
     ++idx;
 
     // Load mesh
-    result = moab->load_mesh( argv[ idx ] );
+    result = moab->load_mesh( argv[idx] );
     if( MB_SUCCESS != result )
     {
         if( MB_FILE_DOES_NOT_EXIST == result )
-            std::cerr << argv[ idx ] << " : open failed.\n";
+            std::cerr << argv[idx] << " : open failed.\n";
         else
-            std::cerr << argv[ idx ] << " : error reading file.\n";
+            std::cerr << argv[idx] << " : error reading file.\n";
         return READ_ERROR;
     }
 
     // Get tag handles
     EntityHandle surface;
-    const int    dimension = 2;  // surface
+    const int dimension = 2;  // surface
     if( surface_id )
     {
-        Tag tags[ 2 ];
-        result = moab->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tags[ 0 ] );
+        Tag tags[2];
+        result = moab->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, tags[0] );
         if( MB_SUCCESS != result )
         {
             std::cerr << "No geometry tag.\n";
             return OTHER_ERROR;
         }
-        tags[ 1 ] = moab->globalId_tag( );
+        tags[1] = moab->globalId_tag();
 
         // Find entityset for surface.
         const void* tag_values[] = { &dimension, &surface_id };
-        Range       surfaces;
+        Range surfaces;
         moab->get_entities_by_type_and_tag( 0, MBENTITYSET, tags, tag_values, 2, surfaces );
-        if( surfaces.size( ) != 1 )
+        if( surfaces.size() != 1 )
         {
-            std::cerr << "Found " << surfaces.size( ) << " surfaces with ID " << surface_id << std::endl;
+            std::cerr << "Found " << surfaces.size() << " surfaces with ID " << surface_id << std::endl;
             return SURFACE_NOT_FOUND;
         }
-        surface = *surfaces.begin( );
+        surface = *surfaces.begin();
     }
     else
     {
@@ -281,35 +281,35 @@ int main( int argc, char* argv[] )
     }
 
     // Calculate average corner normal in surface mesh
-    CartVect3D                  normal( 0, 0, 0 );
+    CartVect3D normal( 0, 0, 0 );
     std::vector< EntityHandle > vertices;
-    std::vector< CartVect3D >   coords;
-    for( Range::iterator i = elements.begin( ); i != elements.end( ); ++i )
+    std::vector< CartVect3D > coords;
+    for( Range::iterator i = elements.begin(); i != elements.end(); ++i )
     {
-        vertices.clear( );
+        vertices.clear();
         result = moab->get_connectivity( &*i, 1, vertices, true );
         if( MB_SUCCESS != result )
         {
             std::cerr << "Internal error\n";
             return OTHER_ERROR;
         }
-        coords.clear( );
-        coords.resize( vertices.size( ) );
-        result = moab->get_coords( &vertices[ 0 ], vertices.size( ), reinterpret_cast< double* >( &coords[ 0 ] ) );
+        coords.clear();
+        coords.resize( vertices.size() );
+        result = moab->get_coords( &vertices[0], vertices.size(), reinterpret_cast< double* >( &coords[0] ) );
         if( MB_SUCCESS != result )
         {
             std::cerr << "Internal error\n";
             return OTHER_ERROR;
         }
 
-        for( size_t j = 0; j < coords.size( ); ++j )
+        for( size_t j = 0; j < coords.size(); ++j )
         {
-            CartVect3D v1 = coords[ ( j + 1 ) % coords.size( ) ] - coords[ j ];
-            CartVect3D v2 = coords[ ( j + 1 ) % coords.size( ) ] - coords[ ( j + 2 ) % coords.size( ) ];
+            CartVect3D v1 = coords[( j + 1 ) % coords.size()] - coords[j];
+            CartVect3D v2 = coords[( j + 1 ) % coords.size()] - coords[( j + 2 ) % coords.size()];
             normal += ( v1 * v2 );
         }
     }
-    normal /= normal.len( );
+    normal /= normal.len();
 
     // Get edges from elements
     Range edge_range;
@@ -321,18 +321,18 @@ int main( int argc, char* argv[] )
     }
 
     // Get vertex coordinates for each edge
-    std::vector< EntityHandle > edges( edge_range.size( ) );
-    std::copy( edge_range.begin( ), edge_range.end( ), edges.begin( ) );
-    vertices.clear( );
-    result = moab->get_connectivity( &edges[ 0 ], edges.size( ), vertices, true );
+    std::vector< EntityHandle > edges( edge_range.size() );
+    std::copy( edge_range.begin(), edge_range.end(), edges.begin() );
+    vertices.clear();
+    result = moab->get_connectivity( &edges[0], edges.size(), vertices, true );
     if( MB_SUCCESS != result )
     {
         std::cerr << "Internal error\n";
         return OTHER_ERROR;
     }
-    coords.clear( );
-    coords.resize( vertices.size( ) );
-    result = moab->get_coords( &vertices[ 0 ], vertices.size( ), reinterpret_cast< double* >( &coords[ 0 ] ) );
+    coords.clear();
+    coords.resize( vertices.size() );
+    result = moab->get_coords( &vertices[0], vertices.size(), reinterpret_cast< double* >( &coords[0] ) );
     if( MB_SUCCESS != result )
     {
         std::cerr << "Internal error\n";
@@ -344,10 +344,10 @@ int main( int argc, char* argv[] )
     // point.
 
     std::cerr << "Plane normal: [" << normal.x << ' ' << normal.y << ' ' << normal.z << ']' << std::endl;
-    double transform[ 3 ][ 3 ];
+    double transform[3][3];
     find_rotation( normal, transform );
 
-    for( iter = coords.begin( ); iter != coords.end( ); ++iter )
+    for( iter = coords.begin(); iter != coords.end(); ++iter )
         transform_point( *iter, transform );
 
     // Write the file.
@@ -372,11 +372,11 @@ void write_gnuplot( std::ostream& stream, const std::vector< CartVect3D >& coord
     std::vector< CartVect3D >::const_iterator iter;
 
     stream << std::endl;
-    for( iter = coords.begin( ); iter != coords.end( ); ++iter )
+    for( iter = coords.begin(); iter != coords.end(); ++iter )
     {
         stream << iter->x << ' ' << iter->y << std::endl;
         ++iter;
-        if( iter == coords.end( ) )
+        if( iter == coords.end() )
         {
             stream << std::endl;
             break;
@@ -412,10 +412,10 @@ void write_eps( std::ostream& s, const std::vector< CartVect3D >& coords, int id
     std::vector< CartVect3D >::const_iterator iter;
 
     // Get bounding box
-    const double D_MAX = std::numeric_limits< double >::max( );
-    CartVect3D   min( D_MAX, D_MAX, 0 );
-    CartVect3D   max( -D_MAX, -D_MAX, 0 );
-    for( iter = coords.begin( ); iter != coords.end( ); ++iter )
+    const double D_MAX = std::numeric_limits< double >::max();
+    CartVect3D min( D_MAX, D_MAX, 0 );
+    CartVect3D max( -D_MAX, -D_MAX, 0 );
+    for( iter = coords.begin(); iter != coords.end(); ++iter )
     {
         box_max( max, *iter );
         box_min( min, *iter );
@@ -423,9 +423,9 @@ void write_eps( std::ostream& s, const std::vector< CartVect3D >& coords, int id
 
     // Calculate translation to page coordinates
     CartVect3D offset = CartVect3D( 0, 0, 0 ) - min;
-    CartVect3D scale = max - min;
-    scale.x = X_MAX / scale.x;
-    scale.y = Y_MAX / scale.y;
+    CartVect3D scale  = max - min;
+    scale.x           = X_MAX / scale.x;
+    scale.y           = Y_MAX / scale.y;
     if( scale.x > scale.y )  // keep proportions
         scale.x = scale.y;
     else
@@ -460,11 +460,11 @@ void write_eps( std::ostream& s, const std::vector< CartVect3D >& coords, int id
     s << "1 setlinewidth" << std::endl;
     s << "0.0 setgray" << std::endl;
 
-    for( iter = coords.begin( ); iter != coords.end( ); ++iter )
+    for( iter = coords.begin(); iter != coords.end(); ++iter )
     {
         double x1 = ( iter->x + offset.x ) * scale.x;
         double y1 = ( iter->y + offset.y ) * scale.y;
-        if( ++iter == coords.end( ) ) break;
+        if( ++iter == coords.end() ) break;
         double x2 = ( iter->x + offset.x ) * scale.x;
         double y2 = ( iter->y + offset.y ) * scale.y;
 
@@ -488,10 +488,10 @@ void write_svg( std::ostream& file, const std::vector< CartVect3D >& coords )
     std::vector< CartVect3D >::const_iterator iter;
 
     // Get bounding box
-    const double D_MAX = std::numeric_limits< double >::max( );
-    CartVect3D   min( D_MAX, D_MAX, 0 );
-    CartVect3D   max( -D_MAX, -D_MAX, 0 );
-    for( iter = coords.begin( ); iter != coords.end( ); ++iter )
+    const double D_MAX = std::numeric_limits< double >::max();
+    CartVect3D min( D_MAX, D_MAX, 0 );
+    CartVect3D max( -D_MAX, -D_MAX, 0 );
+    for( iter = coords.begin(); iter != coords.end(); ++iter )
     {
         box_max( max, *iter );
         box_min( min, *iter );
@@ -510,9 +510,9 @@ void write_svg( std::ostream& file, const std::vector< CartVect3D >& coords )
          << "\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" << std::endl;
 
     int left = (int)( min.x * scale );
-    int top = (int)( min.y * scale );
-    iter = coords.begin( );
-    while( iter != coords.end( ) )
+    int top  = (int)( min.y * scale );
+    iter     = coords.begin();
+    while( iter != coords.end() )
     {
         file << "<line "
              << "x1=\"" << (int)( scale * iter->x ) - left << "\" "

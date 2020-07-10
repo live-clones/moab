@@ -20,7 +20,7 @@
  * \date August, 2006
  */
 
-#ifdef WIN32 /* windows */
+#ifdef WIN32               /* windows */
 #define _USE_MATH_DEFINES  // For M_PI
 #endif
 
@@ -50,20 +50,20 @@ AffineXform AffineXform::rotation( const double* from_vec, const double* to_vec 
     CartVect from( from_vec );
     CartVect to( to_vec );
     CartVect a = from * to;
-    double   len = a.length( );
+    double len = a.length();
 
     // If input vectors are not parallel (the normal case)
-    if( len >= std::numeric_limits< double >::epsilon( ) )
+    if( len >= std::numeric_limits< double >::epsilon() )
     {
-        from.normalize( );
-        to.normalize( );
-        return rotation( from % to, ( from * to ).length( ), a / len );
+        from.normalize();
+        to.normalize();
+        return rotation( from % to, ( from * to ).length(), a / len );
     }
 
     // Vectors are parallel:
     //
     // If vectors are in same direction then rotation is identity (no transform)
-    if( from % to >= 0.0 ) return AffineXform( );
+    if( from % to >= 0.0 ) return AffineXform();
 
     // Parallel vectors in opposite directions:
     //
@@ -72,9 +72,9 @@ AffineXform AffineXform::rotation( const double* from_vec, const double* to_vec 
     // of rotation is 180 degrees, but the axis of rotation may
     // be any unit vector orthogonal to the input vectors.
     //
-    from.normalize( );
-    double   lenxy = std::sqrt( from[ 0 ] * from[ 0 ] + from[ 1 ] * from[ 1 ] );
-    CartVect axis( -from[ 0 ] * from[ 2 ] / lenxy, -from[ 1 ] * from[ 2 ] / lenxy, lenxy );
+    from.normalize();
+    double lenxy = std::sqrt( from[0] * from[0] + from[1] * from[1] );
+    CartVect axis( -from[0] * from[2] / lenxy, -from[1] * from[2] / lenxy, lenxy );
     return rotation( -1, 0, axis );
 }
 

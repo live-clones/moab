@@ -35,7 +35,7 @@ class ReadHDF5VarLen
     DebugOutput& dbgOut;
 
   private:
-    void* const  dataBuffer;
+    void* const dataBuffer;
     const size_t bufferSize;
 
     /**\brief Test if passed file_id is value pointed to by ranged_iter,
@@ -70,7 +70,7 @@ class ReadHDF5VarLen
     {
     }
 
-    virtual ~ReadHDF5VarLen( ) {}
+    virtual ~ReadHDF5VarLen() {}
 
     /**\brief Do actual read of data set
      *\param data_set         The data set to read.
@@ -127,9 +127,9 @@ class ReadHDF5VarLen
     ErrorCode read( ReadHDF5Dataset& offset_data, ReadHDF5Dataset& value_data, const Range& file_ids,
                     EntityHandle start_file_id, hid_t data_type, const Range* ranged = 0 )
     {
-        ErrorCode               rval;
-        const EntityHandle      nudge = 1;
-        Range                   offsets;
+        ErrorCode rval;
+        const EntityHandle nudge = 1;
+        Range offsets;
         std::vector< unsigned > counts;
         rval = read_offsets( offset_data, file_ids, start_file_id, nudge, offsets, counts );
         if( MB_SUCCESS != rval ) return rval;

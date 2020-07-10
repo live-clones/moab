@@ -48,9 +48,9 @@ class AWUntangleBeta : public AWMetric
     MESQUITE_EXPORT
     AWUntangleBeta( double gamma = 0.5 ) : mGamma( gamma ) {}
 
-    MESQUITE_EXPORT virtual ~AWUntangleBeta( );
+    MESQUITE_EXPORT virtual ~AWUntangleBeta();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                                            MsqError& err );
@@ -82,8 +82,9 @@ class AWUntangleBeta : public AWMetric
     */
 
   private:
-    template< unsigned D > inline bool eval( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result );
-    template< unsigned D >
+    template < unsigned D >
+    inline bool eval( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result );
+    template < unsigned D >
     inline bool grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result,
                       MsqMatrix< D, D >& first );
     //  template <unsigned D> inline

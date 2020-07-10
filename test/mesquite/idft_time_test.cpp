@@ -63,8 +63,8 @@ std::string DEFAULT_INPUT = TestDir + "/2D/vtk/tris/untangled/equil_tri2.vtk";
 /* Print usage or help information: exits if err == true */
 void usage( const char* argv0 = 0, bool err = true )
 {
-    std::ostream& s = err ? cerr : cout;
-    const char*   defname = "main";
+    std::ostream& s     = err ? cerr : cout;
+    const char* defname = "main";
     if( !argv0 ) argv0 = defname;
 
     s << "Usage: " << defname << " [-n|-c|-q] [-e] [-t] [-a] [-N] [{-v|-g|-p} <output_file>] [<input_file>]" << endl
@@ -88,9 +88,9 @@ void usage( const char* argv0 = 0, bool err = true )
       << "Default input file: " << DEFAULT_INPUT << endl;
 }
 
-const char* vtk_file = 0; /* vtk output file name */
-const char* eps_file = 0; /* eps output file name */
-const char* gpt_file = 0; /* GNUPlot output file name */
+const char* vtk_file  = 0; /* vtk output file name */
+const char* eps_file  = 0; /* eps output file name */
+const char* gpt_file  = 0; /* GNUPlot output file name */
 const char* plot_file = 0; /* Time-dependent plot of solver data */
 
 enum Solver
@@ -112,22 +112,22 @@ class NumericQM : public QualityMetric
 
   public:
     NumericQM( QualityMetric* real_metric ) : realMetric( real_metric ) {}
-    virtual MetricType  get_metric_type( ) const;
-    virtual std::string get_name( ) const;
-    virtual int         get_negate_flag( ) const;
-    virtual void        get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
-                                         MsqError& err );
-    virtual bool        evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
+    virtual MetricType get_metric_type() const;
+    virtual std::string get_name() const;
+    virtual int get_negate_flag() const;
+    virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+                                  MsqError& err );
+    virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
     virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
                                         MsqError& err );
 };
-QualityMetric::MetricType NumericQM::get_metric_type( ) const
+QualityMetric::MetricType NumericQM::get_metric_type() const
 {
-    return realMetric->get_metric_type( );
+    return realMetric->get_metric_type();
 }
-std::string NumericQM::get_name( ) const
+std::string NumericQM::get_name() const
 {
-    std::string r = realMetric->get_name( );
+    std::string r = realMetric->get_name();
     r += " (FD)";
     return r;
 }
@@ -138,14 +138,14 @@ std::string NumericQM::get_name( ) const
 class CompareMetric : public QualityMetric
 {
   private:
-    QualityMetric *            metric1, *metric2;
-    bool                       maskPlane;
-    int                        maskAxis;
-    std::vector< size_t >      m2Handles;
-    std::vector< Vector3D >    m2Grad;
+    QualityMetric *metric1, *metric2;
+    bool maskPlane;
+    int maskAxis;
+    std::vector< size_t > m2Handles;
+    std::vector< Vector3D > m2Grad;
     std::vector< SymMatrix3D > m2Diag;
-    std::vector< Matrix3D >    m2Hess;
-    static const double        epsilon;
+    std::vector< Matrix3D > m2Hess;
+    static const double epsilon;
 
   public:
     CompareMetric( QualityMetric* qm1, QualityMetric* qm2, bool mask_qm2_coord = false )
@@ -153,11 +153,11 @@ class CompareMetric : public QualityMetric
     {
     }
 
-    MetricType get_metric_type( ) const;
+    MetricType get_metric_type() const;
 
-    std::string get_name( ) const;
+    std::string get_name() const;
 
-    int get_negate_flag( ) const;
+    int get_negate_flag() const;
 
     void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err );
 
@@ -170,7 +170,7 @@ class CompareMetric : public QualityMetric
                                  std::vector< Vector3D >& gradient, MsqError& err );
 
     bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                         std::vector< Vector3D >&    gradient,
+                                         std::vector< Vector3D >& gradient,
                                          std::vector< SymMatrix3D >& Hessian_diagonal, MsqError& err );
 
     bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
@@ -186,23 +186,23 @@ const double CompareMetric::epsilon = 5e-2;
 /* Parse command line options and call 'run' */
 int main( int argc, char* argv[] )
 {
-    Solver      solver = STEEP_DESCENT;
-    bool        do_non_target_metric = false;
-    bool        do_new_target_metric = false;
-    bool        do_new_target_average = false;
-    bool        do_new_target_numeric = false;
-    bool        do_compare_metric = false;
-    const char* input_file = DEFAULT_INPUT.c_str( );
-    bool        no_more_flags = false;
+    Solver solver              = STEEP_DESCENT;
+    bool do_non_target_metric  = false;
+    bool do_new_target_metric  = false;
+    bool do_new_target_average = false;
+    bool do_new_target_numeric = false;
+    bool do_compare_metric     = false;
+    const char* input_file     = DEFAULT_INPUT.c_str();
+    bool no_more_flags         = false;
 
     std::list< const char** > exp_list;
     for( int i = 1; i < argc; ++i )
     {
-        if( argv[ i ][ 0 ] == '-' && !no_more_flags )
+        if( argv[i][0] == '-' && !no_more_flags )
         {
-            for( int k = 1; argv[ i ][ k ]; ++k )
+            for( int k = 1; argv[i][k]; ++k )
             {
-                switch( argv[ i ][ k ] )
+                switch( argv[i][k] )
                 {
                     case 'n':
                         solver = STEEP_DESCENT;
@@ -241,31 +241,31 @@ int main( int argc, char* argv[] )
                         exp_list.push_back( &plot_file );
                         break;
                     case 'h':
-                        usage( argv[ 0 ], false );
+                        usage( argv[0], false );
                         return 0;
                     case '-':
                         no_more_flags = true;
                         break;
                     default:
-                        cerr << "Invalid flag: '" << argv[ i ][ k ] << "'" << endl;
-                        usage( argv[ 0 ] );
+                        cerr << "Invalid flag: '" << argv[i][k] << "'" << endl;
+                        usage( argv[0] );
                 }
             }
         }
-        else if( !exp_list.empty( ) )
+        else if( !exp_list.empty() )
         {
-            const char** ptr = exp_list.front( );
-            exp_list.pop_front( );
-            *ptr = argv[ i ];
+            const char** ptr = exp_list.front();
+            exp_list.pop_front();
+            *ptr = argv[i];
         }
         else
         {
             if( !DEFAULT_INPUT.compare( input_file ) )
             {
-                cerr << "Unexpected argument: \"" << argv[ i ] << '"' << endl;
-                usage( argv[ 0 ] );
+                cerr << "Unexpected argument: \"" << argv[i] << '"' << endl;
+                usage( argv[0] );
             }
-            input_file = argv[ i ];
+            input_file = argv[i];
         }
     }
 
@@ -279,7 +279,7 @@ int main( int argc, char* argv[] )
     if( !count )
     {
         do_compare_metric = true;
-        count = 1;
+        count             = 1;
     }
 
     if( ( vtk_file || gpt_file || eps_file ) && count != 1 )
@@ -289,16 +289,16 @@ int main( int argc, char* argv[] )
     }
 
     IdealWeightInverseMeanRatio non_target_metric;
-    IdealShapeTarget            new_target;
-    TInverseMeanRatio           tmp;
-    TOffset                     tmp_off( 1.0, &tmp );  // target metrics are zero-based
-    TQualityMetric              new_target_metric( &new_target, &tmp_off );
-    ElementPMeanP               new_target_average( 1.0, &new_target_metric );
-    NumericQM                   new_target_numeric( &new_target_metric );
-    CompareMetric               comp_metric( &non_target_metric, &new_target_average, true );
+    IdealShapeTarget new_target;
+    TInverseMeanRatio tmp;
+    TOffset tmp_off( 1.0, &tmp );  // target metrics are zero-based
+    TQualityMetric new_target_metric( &new_target, &tmp_off );
+    ElementPMeanP new_target_average( 1.0, &new_target_metric );
+    NumericQM new_target_numeric( &new_target_metric );
+    CompareMetric comp_metric( &non_target_metric, &new_target_average, true );
 
     std::ostringstream os;
-    double             secs, qual;
+    double secs, qual;
     if( do_non_target_metric )
     {
         qual = run( &non_target_metric, solver, input_file, secs, count );
@@ -330,27 +330,27 @@ int main( int argc, char* argv[] )
            << endl;
     }
 
-    cout << endl << os.str( ) << endl;
+    cout << endl << os.str() << endl;
     return 0;
 }
 
 double run( QualityMetric* metric, Solver solver_type, const char* input_file, double& seconds_out,
             int& iterations_out )
 {
-    MsqPrintError               err( cerr );
+    MsqPrintError err( cerr );
     IdealWeightInverseMeanRatio qa_metric;
-    TerminationCriterion        inner, outer;
+    TerminationCriterion inner, outer;
     outer.add_iteration_limit( 1 );
     inner.add_absolute_vertex_movement( 1e-4 );
     inner.add_iteration_limit( 100 );
-    PMeanPTemplate  of( 1.0, metric );
+    PMeanPTemplate of( 1.0, metric );
     QualityAssessor qa( &qa_metric );
     qa.add_quality_assessment( metric );
-    InstructionQueue  q;
-    SteepestDescent   steep( &of );
-    QuasiNewton       quasi( &of );
+    InstructionQueue q;
+    SteepestDescent steep( &of );
+    QuasiNewton quasi( &of );
     ConjugateGradient conj( &of );
-    VertexMover*      solver = 0;
+    VertexMover* solver = 0;
     switch( solver_type )
     {
         case STEEP_DESCENT:
@@ -380,40 +380,40 @@ double run( QualityMetric* metric, Solver solver_type, const char* input_file, d
 
     std::vector< Mesh::VertexHandle > handles;
     mesh.get_all_vertices( handles, err );
-    if( handles.empty( ) )
+    if( handles.empty() )
     {
         cerr << "no veritces in mesh" << endl;
         exit( 1 );
     }
-    std::vector< MsqVertex > coords( handles.size( ) );
-    mesh.vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ), err );
+    std::vector< MsqVertex > coords( handles.size() );
+    mesh.vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size(), err );
     Vector3D min( HUGE_VAL ), max( -HUGE_VAL );
-    for( size_t i = 0; i < coords.size( ); ++i )
+    for( size_t i = 0; i < coords.size(); ++i )
     {
         for( int j = 0; j < 3; ++j )
         {
-            if( coords[ i ][ j ] < min[ j ] ) min[ j ] = coords[ i ][ j ];
-            if( coords[ i ][ j ] > max[ j ] ) max[ j ] = coords[ i ][ j ];
+            if( coords[i][j] < min[j] ) min[j] = coords[i][j];
+            if( coords[i][j] > max[j] ) max[j] = coords[i][j];
         }
     }
 
-    Vector3D      size = max - min;
+    Vector3D size        = max - min;
     PlanarDomain* domain = 0;
-    if( size[ 0 ] < 1e-4 )
-        domain = new PlanarDomain( PlanarDomain::YZ, min[ 0 ] );
-    else if( size[ 1 ] < 1e-4 )
-        domain = new PlanarDomain( PlanarDomain::XZ, min[ 1 ] );
-    else if( size[ 2 ] < 1e-4 )
-        domain = new PlanarDomain( PlanarDomain::XY, min[ 2 ] );
+    if( size[0] < 1e-4 )
+        domain = new PlanarDomain( PlanarDomain::YZ, min[0] );
+    else if( size[1] < 1e-4 )
+        domain = new PlanarDomain( PlanarDomain::XZ, min[1] );
+    else if( size[2] < 1e-4 )
+        domain = new PlanarDomain( PlanarDomain::XY, min[2] );
 
-    Timer           timer;
+    Timer timer;
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, domain );
     q.run_instructions( &mesh_and_domain, err );
-    seconds_out = timer.since_birth( );
+    seconds_out = timer.since_birth();
     if( err )
     {
         cerr << "Optimization failed." << endl << err << endl;
-        abort( );
+        abort();
     }
 
     if( vtk_file )
@@ -428,22 +428,22 @@ double run( QualityMetric* metric, Solver solver_type, const char* input_file, d
     }
     if( eps_file )
     {
-        PlanarDomain           xy( PlanarDomain::XY );
+        PlanarDomain xy( PlanarDomain::XY );
         MeshWriter::Projection proj( domain ? domain : &xy );
         MeshWriter::write_eps( &mesh, eps_file, proj, err );
         if( err ) cerr << eps_file << ": failed to write file." << endl;
     }
     delete domain;
 
-    iterations_out = inner.get_iteration_count( );
+    iterations_out = inner.get_iteration_count();
 
     const QualityAssessor::Assessor* a = qa.get_results( &qa_metric );
-    return a->get_average( );
+    return a->get_average();
 }
 
-int NumericQM::get_negate_flag( ) const
+int NumericQM::get_negate_flag() const
 {
-    return realMetric->get_negate_flag( );
+    return realMetric->get_negate_flag();
 }
 
 void NumericQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err )
@@ -462,25 +462,25 @@ bool NumericQM::evaluate_with_indices( PatchData& pd, size_t handle, double& val
     return realMetric->evaluate_with_indices( pd, handle, value, indices, err );
 }
 
-QualityMetric::MetricType CompareMetric::get_metric_type( ) const
+QualityMetric::MetricType CompareMetric::get_metric_type() const
 {
-    MetricType t1 = metric1->get_metric_type( );
-    assert( metric2->get_metric_type( ) == t1 );
+    MetricType t1 = metric1->get_metric_type();
+    assert( metric2->get_metric_type() == t1 );
     return t1;
 }
 
-std::string CompareMetric::get_name( ) const
+std::string CompareMetric::get_name() const
 {
-    std::string n = metric1->get_name( );
+    std::string n = metric1->get_name();
     n += " =? ";
-    n += metric2->get_name( );
+    n += metric2->get_name();
     return n;
 }
 
-int CompareMetric::get_negate_flag( ) const
+int CompareMetric::get_negate_flag() const
 {
-    assert( metric1->get_negate_flag( ) == metric2->get_negate_flag( ) );
-    return metric1->get_negate_flag( );
+    assert( metric1->get_negate_flag() == metric2->get_negate_flag() );
+    return metric1->get_negate_flag();
 }
 
 void CompareMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
@@ -488,13 +488,15 @@ void CompareMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handl
 {
     if( maskPlane ) get_mask_axis( pd );
 
-    m2Handles.clear( );
-    metric1->get_evaluations( pd, handles, free_vertices_only, err );MSQ_ERRRTN( err );
-    metric2->get_evaluations( pd, m2Handles, free_vertices_only, err );MSQ_ERRRTN( err );
-    bool same = ( handles.size( ) == m2Handles.size( ) );
-    std::sort( m2Handles.begin( ), m2Handles.end( ) );
-    for( std::vector< size_t >::iterator i = handles.begin( ); i != handles.end( ); ++i )
-        if( !std::binary_search( m2Handles.begin( ), m2Handles.end( ), *i ) ) same = false;
+    m2Handles.clear();
+    metric1->get_evaluations( pd, handles, free_vertices_only, err );
+    MSQ_ERRRTN( err );
+    metric2->get_evaluations( pd, m2Handles, free_vertices_only, err );
+    MSQ_ERRRTN( err );
+    bool same = ( handles.size() == m2Handles.size() );
+    std::sort( m2Handles.begin(), m2Handles.end() );
+    for( std::vector< size_t >::iterator i = handles.begin(); i != handles.end(); ++i )
+        if( !std::binary_search( m2Handles.begin(), m2Handles.end(), *i ) ) same = false;
     if( !same )
     {
         MSQ_SETERR( err )
@@ -505,7 +507,7 @@ void CompareMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handl
 bool CompareMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
     double m2val;
-    bool   r1, r2;
+    bool r1, r2;
     r1 = metric1->evaluate( pd, handle, value, err );
     MSQ_ERRZERO( err );
     r2 = metric2->evaluate( pd, handle, m2val, err );
@@ -527,8 +529,8 @@ bool CompareMetric::evaluate_with_indices( PatchData& pd, size_t handle, double&
                                            MsqError& err )
 {
     double m2val;
-    bool   r1, r2;
-    m2Handles.clear( );
+    bool r1, r2;
+    m2Handles.clear();
     r1 = metric1->evaluate_with_indices( pd, handle, value, indices, err );
     MSQ_ERRZERO( err );
     r2 = metric2->evaluate_with_indices( pd, handle, m2val, m2Handles, err );
@@ -544,10 +546,10 @@ bool CompareMetric::evaluate_with_indices( PatchData& pd, size_t handle, double&
     }
     else
     {
-        bool same = ( indices.size( ) == m2Handles.size( ) );
-        std::sort( m2Handles.begin( ), m2Handles.end( ) );
-        for( std::vector< size_t >::iterator i = indices.begin( ); i != indices.end( ); ++i )
-            if( !std::binary_search( m2Handles.begin( ), m2Handles.end( ), *i ) ) same = false;
+        bool same = ( indices.size() == m2Handles.size() );
+        std::sort( m2Handles.begin(), m2Handles.end() );
+        for( std::vector< size_t >::iterator i = indices.begin(); i != indices.end(); ++i )
+            if( !std::binary_search( m2Handles.begin(), m2Handles.end(), *i ) ) same = false;
         if( !same )
         {
             MSQ_SETERR( err )
@@ -565,9 +567,9 @@ bool CompareMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double
                                             std::vector< Vector3D >& gradient, MsqError& err )
 {
     double m2val;
-    bool   r1, r2;
-    m2Handles.clear( );
-    m2Grad.clear( );
+    bool r1, r2;
+    m2Handles.clear();
+    m2Grad.clear();
     r1 = metric1->evaluate_with_gradient( pd, handle, value, indices, gradient, err );
     MSQ_ERRZERO( err );
     r2 = metric2->evaluate_with_gradient( pd, handle, m2val, m2Handles, m2Grad, err );
@@ -583,22 +585,22 @@ bool CompareMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double
     }
     else
     {
-        std::vector< size_t >::const_iterator   i, j;
+        std::vector< size_t >::const_iterator i, j;
         std::vector< Vector3D >::const_iterator r, s;
-        int                                     grad_diff = 0;
-        bool                                    same = ( indices.size( ) == m2Handles.size( ) );
-        std::sort( m2Handles.begin( ), m2Handles.end( ) );
-        for( i = indices.begin( ); i != indices.end( ); ++i )
+        int grad_diff = 0;
+        bool same     = ( indices.size() == m2Handles.size() );
+        std::sort( m2Handles.begin(), m2Handles.end() );
+        for( i = indices.begin(); i != indices.end(); ++i )
         {
-            j = std::lower_bound( m2Handles.begin( ), m2Handles.end( ), *i );
-            if( j == m2Handles.end( ) || *j != *i )
+            j = std::lower_bound( m2Handles.begin(), m2Handles.end(), *i );
+            if( j == m2Handles.end() || *j != *i )
             {
                 same = false;
                 continue;
             }
 
-            r = gradient.begin( ) + ( i - indices.begin( ) );
-            s = m2Grad.begin( ) + ( j - m2Handles.begin( ) );
+            r = gradient.begin() + ( i - indices.begin() );
+            s = m2Grad.begin() + ( j - m2Handles.begin() );
             if( !equal( *r, *s ) ) ++grad_diff;
         }
 
@@ -617,7 +619,7 @@ bool CompareMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double
               "Metrics returned different gradient vectors for "
               " %d of %u vertices for handle %lu in "
               "evaluate_with_gradient\n.",
-              grad_diff, (unsigned)gradient.size( ), (unsigned long)handle );
+              grad_diff, (unsigned)gradient.size(), (unsigned long)handle );
         }
     }
 
@@ -629,10 +631,10 @@ bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle
                                                     std::vector< SymMatrix3D >& diagonal, MsqError& err )
 {
     double m2val;
-    bool   r1, r2;
-    m2Handles.clear( );
-    m2Grad.clear( );
-    m2Diag.clear( );
+    bool r1, r2;
+    m2Handles.clear();
+    m2Grad.clear();
+    m2Diag.clear();
     r1 = metric1->evaluate_with_Hessian_diagonal( pd, handle, value, indices, gradient, diagonal, err );
     MSQ_ERRZERO( err );
     r2 = metric2->evaluate_with_Hessian_diagonal( pd, handle, m2val, m2Handles, m2Grad, m2Diag, err );
@@ -648,27 +650,27 @@ bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle
     }
     else
     {
-        std::vector< size_t >::const_iterator      i, j;
-        std::vector< Vector3D >::const_iterator    r, s;
+        std::vector< size_t >::const_iterator i, j;
+        std::vector< Vector3D >::const_iterator r, s;
         std::vector< SymMatrix3D >::const_iterator u, v;
-        int                                        grad_diff = 0, hess_diff = 0;
-        bool                                       same = ( indices.size( ) == m2Handles.size( ) );
-        std::sort( m2Handles.begin( ), m2Handles.end( ) );
-        for( i = indices.begin( ); i != indices.end( ); ++i )
+        int grad_diff = 0, hess_diff = 0;
+        bool same = ( indices.size() == m2Handles.size() );
+        std::sort( m2Handles.begin(), m2Handles.end() );
+        for( i = indices.begin(); i != indices.end(); ++i )
         {
-            j = std::lower_bound( m2Handles.begin( ), m2Handles.end( ), *i );
-            if( j == m2Handles.end( ) || *j != *i )
+            j = std::lower_bound( m2Handles.begin(), m2Handles.end(), *i );
+            if( j == m2Handles.end() || *j != *i )
             {
                 same = false;
                 continue;
             }
 
-            r = gradient.begin( ) + ( i - indices.begin( ) );
-            s = m2Grad.begin( ) + ( j - m2Handles.begin( ) );
+            r = gradient.begin() + ( i - indices.begin() );
+            s = m2Grad.begin() + ( j - m2Handles.begin() );
             if( !equal( *r, *s ) ) ++grad_diff;
 
-            u = diagonal.begin( ) + ( i - indices.begin( ) );
-            v = m2Diag.begin( ) + ( j - m2Handles.begin( ) );
+            u = diagonal.begin() + ( i - indices.begin() );
+            v = m2Diag.begin() + ( j - m2Handles.begin() );
             if( !equal( *u, *v ) ) ++hess_diff;
         }
 
@@ -687,7 +689,7 @@ bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle
               "Metrics returned different gradient vectors for "
               " %d of %u vertices for handle %lu in "
               "evaluate_with_Hessian_diagonal\n.",
-              grad_diff, (unsigned)gradient.size( ), (unsigned long)handle );
+              grad_diff, (unsigned)gradient.size(), (unsigned long)handle );
         }
         else if( hess_diff )
         {
@@ -696,7 +698,7 @@ bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle
               "Metrics returned different Hessian blocks for "
               " %d of %u vertices for handle %lu in "
               "evaluate_with_Hessian_diagonal\n.",
-              hess_diff, (unsigned)diagonal.size( ), (unsigned long)handle );
+              hess_diff, (unsigned)diagonal.size(), (unsigned long)handle );
         }
     }
 
@@ -708,10 +710,10 @@ bool CompareMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
                                            MsqError& err )
 {
     double m2val;
-    bool   r1, r2;
-    m2Handles.clear( );
-    m2Grad.clear( );
-    m2Hess.clear( );
+    bool r1, r2;
+    m2Handles.clear();
+    m2Grad.clear();
+    m2Hess.clear();
     r1 = metric1->evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
     MSQ_ERRZERO( err );
     r2 = metric2->evaluate_with_Hessian( pd, handle, m2val, m2Handles, m2Grad, m2Hess, err );
@@ -727,27 +729,27 @@ bool CompareMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
     }
     else
     {
-        std::vector< size_t >::const_iterator   i, j;
+        std::vector< size_t >::const_iterator i, j;
         std::vector< Vector3D >::const_iterator r, s;
-        int                                     grad_diff = 0, hess_diff = 0;
-        bool                                    same = ( indices.size( ) == m2Handles.size( ) );
-        std::sort( m2Handles.begin( ), m2Handles.end( ) );
-        for( i = indices.begin( ); i != indices.end( ); ++i )
+        int grad_diff = 0, hess_diff = 0;
+        bool same = ( indices.size() == m2Handles.size() );
+        std::sort( m2Handles.begin(), m2Handles.end() );
+        for( i = indices.begin(); i != indices.end(); ++i )
         {
-            j = std::lower_bound( m2Handles.begin( ), m2Handles.end( ), *i );
-            if( j == m2Handles.end( ) || *j != *i )
+            j = std::lower_bound( m2Handles.begin(), m2Handles.end(), *i );
+            if( j == m2Handles.end() || *j != *i )
             {
                 same = false;
                 continue;
             }
 
-            r = gradient.begin( ) + ( i - indices.begin( ) );
-            s = m2Grad.begin( ) + ( j - m2Handles.begin( ) );
+            r = gradient.begin() + ( i - indices.begin() );
+            s = m2Grad.begin() + ( j - m2Handles.begin() );
             if( !equal( *r, *s ) )
             {
                 ++grad_diff;
                 // call again for so debugger can step into it after failure is found
-                std::vector< size_t >   i2;
+                std::vector< size_t > i2;
                 std::vector< Vector3D > g2;
                 std::vector< Matrix3D > h2;
                 metric2->evaluate_with_Hessian( pd, handle, m2val, i2, g2, h2, err );
@@ -769,27 +771,26 @@ bool CompareMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
               "Metrics returned different gradient vectors for "
               " %d of %u vertices for handle %lu in "
               "evaluate_with_Hessian\n.",
-              grad_diff, (unsigned)gradient.size( ), (unsigned long)handle );
+              grad_diff, (unsigned)gradient.size(), (unsigned long)handle );
         }
         else
         {
             size_t row, col, row2, col2, idx, idx2;
-            for( row = idx = 0; row < indices.size( ); ++row )
+            for( row = idx = 0; row < indices.size(); ++row )
             {
-                row2 = std::lower_bound( m2Handles.begin( ), m2Handles.end( ), indices[ row ] ) - m2Handles.begin( );
-                for( col = row; col < indices.size( ); ++col, ++idx )
+                row2 = std::lower_bound( m2Handles.begin(), m2Handles.end(), indices[row] ) - m2Handles.begin();
+                for( col = row; col < indices.size(); ++col, ++idx )
                 {
-                    col2 =
-                        std::lower_bound( m2Handles.begin( ), m2Handles.end( ), indices[ col ] ) - m2Handles.begin( );
+                    col2 = std::lower_bound( m2Handles.begin(), m2Handles.end(), indices[col] ) - m2Handles.begin();
                     if( row2 <= col2 )
                     {
-                        idx2 = indices.size( ) * row2 - row2 * ( row2 + 1 ) / 2 + col2;
-                        if( !equal( Hessian[ idx ], m2Hess[ idx2 ] ) ) ++hess_diff;
+                        idx2 = indices.size() * row2 - row2 * ( row2 + 1 ) / 2 + col2;
+                        if( !equal( Hessian[idx], m2Hess[idx2] ) ) ++hess_diff;
                     }
                     else
                     {
-                        idx2 = indices.size( ) * col2 - col2 * ( col2 + 1 ) / 2 + row2;
-                        if( !equal( Hessian[ idx ], transpose( m2Hess[ idx2 ] ) ) ) ++hess_diff;
+                        idx2 = indices.size() * col2 - col2 * ( col2 + 1 ) / 2 + row2;
+                        if( !equal( Hessian[idx], transpose( m2Hess[idx2] ) ) ) ++hess_diff;
                     }
                 }
             }
@@ -801,7 +802,7 @@ bool CompareMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
                   "Metrics returned different Hessian blocks for "
                   " %d of %u vertices for handle %lu in "
                   "evaluate_with_Hessian\n.",
-                  hess_diff, (unsigned)Hessian.size( ), (unsigned long)handle );
+                  hess_diff, (unsigned)Hessian.size(), (unsigned long)handle );
             }
         }
     }
@@ -811,14 +812,14 @@ bool CompareMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
 
 void CompareMetric::get_mask_axis( PatchData& pd )
 {
-    maskAxis = -1;
-    PlanarDomain* dom = reinterpret_cast< PlanarDomain* >( pd.get_domain( ) );
-    int           bits = 0;
+    maskAxis          = -1;
+    PlanarDomain* dom = reinterpret_cast< PlanarDomain* >( pd.get_domain() );
+    int bits          = 0;
     if( dom )
     {
-        Vector3D n = dom->get_normal( );
+        Vector3D n = dom->get_normal();
         for( int i = 0; i < 3; ++i )
-            if( fabs( n[ i ] ) < epsilon ) bits |= ( 1 << i );
+            if( fabs( n[i] ) < epsilon ) bits |= ( 1 << i );
         switch( bits )
         {
             case 3:
@@ -836,8 +837,8 @@ void CompareMetric::get_mask_axis( PatchData& pd )
 
 bool CompareMetric::equal( Vector3D grad1, const Vector3D& grad2 ) const
 {
-    if( maskAxis >= 0 ) grad1[ maskAxis ] = grad2[ maskAxis ];
-    return ( grad1 - grad2 ).length_squared( ) <= epsilon * epsilon;
+    if( maskAxis >= 0 ) grad1[maskAxis] = grad2[maskAxis];
+    return ( grad1 - grad2 ).length_squared() <= epsilon * epsilon;
 }
 
 bool CompareMetric::equal( SymMatrix3D hess1, const SymMatrix3D& hess2 ) const
@@ -859,8 +860,8 @@ bool CompareMetric::equal( Matrix3D hess1, const Matrix3D& hess2 ) const
     {
         for( unsigned i = 0; i < 3; ++i )
         {
-            hess1[ maskAxis ][ i ] = hess2[ maskAxis ][ i ];
-            hess1[ i ][ maskAxis ] = hess2[ i ][ maskAxis ];
+            hess1[maskAxis][i] = hess2[maskAxis][i];
+            hess1[i][maskAxis] = hess2[i][maskAxis];
         }
     }
     return Frobenius_2( hess1 - hess2 ) <= epsilon * epsilon;

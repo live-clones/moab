@@ -48,8 +48,8 @@ class PatchData;
 class MeshUtil
 {
   private:
-    Mesh*      myMesh;
-    Settings*  mySettings;
+    Mesh* myMesh;
+    Settings* mySettings;
     PatchData* globalPatch;
 
   protected:
@@ -58,7 +58,7 @@ class MeshUtil
   public:
     MeshUtil( Mesh* mesh, Settings* settings = 0 ) : myMesh( mesh ), mySettings( settings ), globalPatch( 0 ) {}
 
-    ~MeshUtil( );
+    ~MeshUtil();
 
     /**\brief Calcluate statistics for mesh edge lengths
      */

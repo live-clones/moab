@@ -47,7 +47,7 @@ class Exponent
     typedef double ( Exponent::*constMemberPtr )( double ) const;
     static constMemberPtr get_func_ptr( double exponent );
 
-    Exponent( ) : funcPointer( 0 ) {}
+    Exponent() : funcPointer( 0 ) {}
 
     explicit Exponent( double exponent ) : mExponent( exponent ), funcPointer( get_func_ptr( exponent ) ) {}
 
@@ -66,7 +66,7 @@ class Exponent
 
     // inline operator double () const
     //  { return mExponent; }
-    inline double value( ) const
+    inline double value() const
     {
         return mExponent;
     }
@@ -88,7 +88,7 @@ class Exponent
     double powNegativeInt( double x ) const;
 
   private:
-    double         mExponent;
+    double mExponent;
     constMemberPtr funcPointer;
 };
 

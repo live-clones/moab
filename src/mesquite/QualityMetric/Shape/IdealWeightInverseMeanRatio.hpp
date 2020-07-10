@@ -73,15 +73,15 @@ class IdealWeightInverseMeanRatio : public ElementQM, public AveragingQM
 {
   public:
     MESQUITE_EXPORT IdealWeightInverseMeanRatio( MsqError& err, double power = 1.0 );
-    MESQUITE_EXPORT IdealWeightInverseMeanRatio( );
+    MESQUITE_EXPORT IdealWeightInverseMeanRatio();
 
     //! virtual destructor ensures use of polymorphism during destruction
-    MESQUITE_EXPORT virtual ~IdealWeightInverseMeanRatio( ) {}
+    MESQUITE_EXPORT virtual ~IdealWeightInverseMeanRatio() {}
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
     //! 1 if metric should be minimized, -1 if metric should be maximized.
-    virtual int get_negate_flag( ) const;
+    virtual int get_negate_flag() const;
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
@@ -103,16 +103,16 @@ class IdealWeightInverseMeanRatio : public ElementQM, public AveragingQM
     // arrays used in Hessian computations
     // We allocate them here, so that one allocation only is done.
     // This gives a big computation speed increase.
-    Vector3D mCoords[ 4 ];  // Vertex coordinates for the (decomposed) elements
-    Vector3D mGradients[ 32 ];  // Gradient of metric with respect to the coords
-    Matrix3D mHessians[ 80 ];  // Hessian of metric with respect to the coords
-    double   mMetrics[ 8 ];  // Metric values for the (decomposed) elements
-                           // variables used in the definition of the metric (2d and 3d)
-    double   a2Con;
+    Vector3D mCoords[4];      // Vertex coordinates for the (decomposed) elements
+    Vector3D mGradients[32];  // Gradient of metric with respect to the coords
+    Matrix3D mHessians[80];   // Hessian of metric with respect to the coords
+    double mMetrics[8];       // Metric values for the (decomposed) elements
+                              // variables used in the definition of the metric (2d and 3d)
+    double a2Con;
     Exponent b2Con;
     Exponent c2Con;
 
-    double   a3Con;
+    double a3Con;
     Exponent b3Con;
     Exponent c3Con;
 };

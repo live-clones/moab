@@ -42,14 +42,14 @@ class EdgeLengthMetric : public EdgeQM
   public:
     MESQUITE_EXPORT EdgeLengthMetric( double gamma = 0.0 );
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     //! 1 if metric should be minimized, -1 if metric should be maximized.
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
     MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                         std::vector< size_t >&   indices,
+                                                         std::vector< size_t >& indices,
                                                          std::vector< Vector3D >& gradient, MsqError& err );
 
   private:

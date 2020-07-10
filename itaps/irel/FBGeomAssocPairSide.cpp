@@ -12,7 +12,7 @@
     {                                                             \
         if( iBase_SUCCESS != result )                             \
         {                                                         \
-            char this_descr[ 120 ];                               \
+            char this_descr[120];                                 \
             FBiGeom_getDescription( instance_, this_descr, 120 ); \
             ERRORR( result, this_descr );                         \
         }                                                         \
@@ -23,14 +23,14 @@
 #define LASSOI lasso_instance( relation )
 
 static const char* GLOBAL_ID_TAG_NAME = "GLOBAL_ID";
-static const char* RELATION_TAG_NAME = "__FBGEOM_ASSOCIATION";
+static const char* RELATION_TAG_NAME  = "__FBGEOM_ASSOCIATION";
 
 FBGeomAssocPairSide::FBGeomAssocPairSide( iRel_Instance p_relation, iBase_Instance p_instance, int p_id )
     : relation( p_relation ), instance_( reinterpret_cast< FBiGeom_Instance >( p_instance ) ), id( p_id )
 {
     int result;
 
-    create_relation_side( );
+    create_relation_side();
 
     FBiGeom_getTagHandle( instance_, GLOBAL_ID_TAG_NAME, &gid_tag, &result, strlen( GLOBAL_ID_TAG_NAME ) );
     if( result == iBase_TAG_NOT_FOUND )
@@ -40,40 +40,40 @@ FBGeomAssocPairSide::FBGeomAssocPairSide( iRel_Instance p_relation, iBase_Instan
     }
 }
 
-FBGeomAssocPairSide::~FBGeomAssocPairSide( )
+FBGeomAssocPairSide::~FBGeomAssocPairSide()
 {
-    destroy_relation_side( );
+    destroy_relation_side();
 }
 
-iBase_Instance FBGeomAssocPairSide::instance( ) const
+iBase_Instance FBGeomAssocPairSide::instance() const
 {
     return instance_;
 }
 
-iRel_IfaceType FBGeomAssocPairSide::type( ) const
+iRel_IfaceType FBGeomAssocPairSide::type() const
 {
     return iRel_FBIGEOM_IFACE;
 }
 
-int FBGeomAssocPairSide::create_relation_side( )
+int FBGeomAssocPairSide::create_relation_side()
 {
-    int               result;
+    int result;
     std::stringstream ss;
     ss << RELATION_TAG_NAME << id;
-    std::string rel_tag_name( ss.str( ) );
+    std::string rel_tag_name( ss.str() );
 
-    FBiGeom_getTagHandle( instance_, rel_tag_name.c_str( ), &relation_tag, &result, rel_tag_name.size( ) );
+    FBiGeom_getTagHandle( instance_, rel_tag_name.c_str(), &relation_tag, &result, rel_tag_name.size() );
     if( result == iBase_TAG_NOT_FOUND )
     {
-        FBiGeom_createTag( instance_, rel_tag_name.c_str( ), 1, iBase_ENTITY_HANDLE, &relation_tag, &result,
-                           rel_tag_name.size( ) );
+        FBiGeom_createTag( instance_, rel_tag_name.c_str(), 1, iBase_ENTITY_HANDLE, &relation_tag, &result,
+                           rel_tag_name.size() );
     }
 
     PROCESS_ERROR;
     RETURNR( iBase_SUCCESS );
 }
 
-int FBGeomAssocPairSide::destroy_relation_side( )
+int FBGeomAssocPairSide::destroy_relation_side()
 {
     if( relation_tag )
     {
@@ -153,14 +153,14 @@ int FBGeomAssocPairSide::get_relation_side( iBase_EntityHandle* entities, int nu
 
 int FBGeomAssocPairSide::get_relation_side( iBase_EntitySetHandle* sets, int num_sets, void* values )
 {
-    char* data = static_cast< char* >( values );
-    int   values_alloc = sizeof( iBase_EntityHandle );
-    int   values_size;
-    int   result;
+    char* data       = static_cast< char* >( values );
+    int values_alloc = sizeof( iBase_EntityHandle );
+    int values_size;
+    int result;
 
     for( int i = 0; i < num_sets; i++ )
     {
-        FBiGeom_getEntSetData( instance_, sets[ i ], relation_tag, reinterpret_cast< void** >( &data ), &values_alloc,
+        FBiGeom_getEntSetData( instance_, sets[i], relation_tag, reinterpret_cast< void** >( &data ), &values_alloc,
                                &values_size, &result );
         data += values_size;
         PROCESS_ERROR;
@@ -181,12 +181,12 @@ int FBGeomAssocPairSide::set_relation_side( iBase_EntityHandle* entities, int nu
 int FBGeomAssocPairSide::set_relation_side( iBase_EntitySetHandle* sets, int num_sets, const void* values )
 {
     const char* data = static_cast< const char* >( values );
-    int         size = sizeof( iBase_EntityHandle );
-    int         result;
+    int size         = sizeof( iBase_EntityHandle );
+    int result;
 
     for( int i = 0; i < num_sets; i++ )
     {
-        FBiGeom_setEntSetData( instance_, sets[ i ], relation_tag, data, size, &result );
+        FBiGeom_setEntSetData( instance_, sets[i], relation_tag, data, size, &result );
         data += size;
         PROCESS_ERROR;
     }
@@ -208,7 +208,7 @@ int FBGeomAssocPairSide::rmv_relation_side( iBase_EntitySetHandle* sets, int num
 
     for( int i = 0; i < num_sets; i++ )
     {
-        FBiGeom_rmvEntSetTag( instance_, sets[ i ], relation_tag, &result );
+        FBiGeom_rmvEntSetTag( instance_, sets[i], relation_tag, &result );
         PROCESS_ERROR;
     }
 
@@ -236,14 +236,14 @@ int FBGeomAssocPairSide::get_gids( iBase_EntityHandle* entities, int num_entitie
 
 int FBGeomAssocPairSide::get_gids( iBase_EntitySetHandle* sets, int num_sets, int* values )
 {
-    char* data = reinterpret_cast< char* >( values );
-    int   values_alloc = sizeof( int );
-    int   values_size;
-    int   result;
+    char* data       = reinterpret_cast< char* >( values );
+    int values_alloc = sizeof( int );
+    int values_size;
+    int result;
 
     for( int i = 0; i < num_sets; i++ )
     {
-        FBiGeom_getEntSetData( instance_, sets[ i ], gid_tag, reinterpret_cast< void** >( &data ), &values_alloc,
+        FBiGeom_getEntSetData( instance_, sets[i], gid_tag, reinterpret_cast< void** >( &data ), &values_alloc,
                                &values_size, &result );
         data += values_size;
         PROCESS_ERROR;

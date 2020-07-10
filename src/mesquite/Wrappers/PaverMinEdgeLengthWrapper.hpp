@@ -41,8 +41,8 @@ namespace MBMesquite
 class MESQUITE_EXPORT PaverMinEdgeLengthWrapper : public Wrapper
 {
   private:
-    int    iterationLimit;
-    int    parallelIterations;
+    int iterationLimit;
+    int parallelIterations;
     double maxVtxMovement;
 
     void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,

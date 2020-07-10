@@ -82,23 +82,23 @@ void help( const char* argv0 )
 
 int main( int argc, char* argv[] )
 {
-    const char* input_file = DEFAULT_INPUT.c_str( );
+    const char* input_file  = DEFAULT_INPUT.c_str();
     const char* output_file = NULL;
     switch( argc )
     {
         default:
-            help( argv[ 0 ] );
+            help( argv[0] );
         case 3:
-            if( !strcmp( argv[ 2 ], "-h" ) ) help( argv[ 0 ] );
-            output_file = argv[ 2 ];
+            if( !strcmp( argv[2], "-h" ) ) help( argv[0] );
+            output_file = argv[2];
         case 2:
-            if( !strcmp( argv[ 1 ], "-h" ) ) help( argv[ 0 ] );
-            input_file = argv[ 1 ];
+            if( !strcmp( argv[1], "-h" ) ) help( argv[0] );
+            input_file = argv[1];
         case 1:;
     }
 
     /* Read a VTK Mesh file */
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( input_file, err );
     if( err ) return 1;
@@ -108,12 +108,12 @@ int main( int argc, char* argv[] )
 
     // creates a mean ratio quality metric ...
     ConditionNumberQualityMetric shape_metric;
-    EdgeLengthQualityMetric      lapl_met;
+    EdgeLengthQualityMetric lapl_met;
     lapl_met.set_averaging_method( QualityMetric::RMS );
 
     // creates the laplacian smoother  procedures
     LaplacianSmoother lapl1;
-    QualityAssessor   stop_qa = QualityAssessor( &shape_metric );
+    QualityAssessor stop_qa = QualityAssessor( &shape_metric );
     stop_qa.add_quality_assessment( &lapl_met );
 
     //**************Set stopping criterion****************
@@ -138,10 +138,10 @@ int main( int argc, char* argv[] )
 
     // launches optimization on mesh_set1
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &plane );
-    Timer           t;
+    Timer t;
     queue1.run_instructions( &mesh_and_domain, err );
     if( err ) return 1;
-    double secs = t.since_birth( );
+    double secs = t.since_birth();
     std::cout << "Optimization completed in " << secs << " seconds" << std::endl;
 
     if( output_file )
@@ -160,14 +160,14 @@ int main( int argc, char* argv[] )
         if( err ) return 1;
 
         std::vector< bool > fixed_flags;
-        mesh.vertices_get_fixed_flag( arrptr( vertices ), fixed_flags, vertices.size( ), err );
+        mesh.vertices_get_fixed_flag( arrptr( vertices ), fixed_flags, vertices.size(), err );
         if( err ) return 1;
 
         // find one free vertex
         int idx = -1;
-        for( unsigned i = 0; i < vertices.size( ); ++i )
+        for( unsigned i = 0; i < vertices.size(); ++i )
         {
-            if( fixed_flags[ i ] == true ) continue;
+            if( fixed_flags[i] == true ) continue;
             if( idx != -1 )
             {
                 std::cerr << "Multiple free vertices in mesh." << std::endl;
@@ -182,18 +182,18 @@ int main( int argc, char* argv[] )
             return 1;
         }
 
-        Mesh::VertexHandle vertex = vertices[ idx ];
-        MsqVertex          coords;
+        Mesh::VertexHandle vertex = vertices[idx];
+        MsqVertex coords;
         mesh.vertices_get_coordinates( &vertex, &coords, 1, err );
         if( err ) return 1;
 
         // calculate distance from origin
-        double dist = sqrt( coords[ 0 ] * coords[ 0 ] + coords[ 1 ] * coords[ 1 ] );
+        double dist = sqrt( coords[0] * coords[0] + coords[1] * coords[1] );
         if( dist > 1e-8 )
         {
             std::cerr << "Free vertex not at origin after Laplace smooth." << std::endl
                       << "Expected location: (0,0)" << std::endl
-                      << "Actual location: (" << coords[ 0 ] << "," << coords[ 1 ] << ")" << std::endl;
+                      << "Actual location: (" << coords[0] << "," << coords[1] << ")" << std::endl;
             return 2;
         }
     }

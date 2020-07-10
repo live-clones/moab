@@ -16,57 +16,57 @@ void usage( const char* argv0 )
 
 void print_file_stats( Interface& moab )
 {
-    ErrorCode          rval;
-    int                num_tri;
-    Range              sets;
+    ErrorCode rval;
+    int num_tri;
+    Range sets;
     unsigned long long set_mem, set_am, tag_mem, tag_am;
 
     rval = moab.get_number_entities_by_type( 0, MBTRI, num_tri );
     if( MB_SUCCESS != rval ) num_tri = -1;
     rval = moab.get_entities_by_type( 0, MBENTITYSET, sets );
-    if( MB_SUCCESS != rval ) sets.clear( );
+    if( MB_SUCCESS != rval ) sets.clear();
 
     moab.estimated_memory_use( sets, 0, 0, &set_mem, &set_am, 0, 0, 0, 0, &tag_mem, &tag_am );
     printf( "Triangles:   %d\n", num_tri );
-    printf( "Sets:        %lu\n", (unsigned long)sets.size( ) );
+    printf( "Sets:        %lu\n", (unsigned long)sets.size() );
     printf( "Set storage: %llu (%llu)\n", set_mem, set_am );
     printf( "Tag storage: %llu (%llu)\n", tag_mem, tag_am );
 }
 
 int main( int argc, char* argv[] )
 {
-    double*       values;
+    double* values;
     unsigned long length;
-    FILE *        file, *rfile = 0;
+    FILE *file, *rfile = 0;
     unsigned long count = 0;
-    clock_t       t;
+    clock_t t;
 
-    const char* tree_file = 0;
-    const char* point_file = 0;
+    const char* tree_file   = 0;
+    const char* point_file  = 0;
     const char* result_file = 0;
-    bool        query_triangles = false;
+    bool query_triangles    = false;
 
-    if( argc < 3 || argc > 7 ) usage( argv[ 0 ] );
+    if( argc < 3 || argc > 7 ) usage( argv[0] );
 
     for( int i = 1; i < argc; ++i )
     {
-        if( !strcmp( "-t", argv[ i ] ) )
+        if( !strcmp( "-t", argv[i] ) )
             query_triangles = true;
-        else if( !strcmp( "-d", argv[ i ] ) )
+        else if( !strcmp( "-d", argv[i] ) )
         {
             ++i;
-            if( i == argc ) usage( argv[ 0 ] );
-            result_file = argv[ i ];
+            if( i == argc ) usage( argv[0] );
+            result_file = argv[i];
         }
         else if( !tree_file )
-            tree_file = argv[ i ];
+            tree_file = argv[i];
         else if( !point_file )
-            point_file = argv[ i ];
+            point_file = argv[i];
         else
         {
             char* endptr;
-            count = strtol( argv[ i ], &endptr, 0 );
-            if( *endptr || count < 1 ) usage( argv[ 0 ] );
+            count = strtol( argv[i], &endptr, 0 );
+            if( *endptr || count < 1 ) usage( argv[0] );
         }
     }
 
@@ -79,10 +79,10 @@ int main( int argc, char* argv[] )
     fseek( file, 0, SEEK_END );
     length = ftell( file ) / ( 3 * sizeof( double ) );
     fseek( file, 0, SEEK_SET );
-    values = new double[ 3 * length ];
+    values = new double[3 * length];
     if( length != fread( values, 3 * sizeof( double ), length, file ) )
     {
-        fprintf( stderr, "Error reading %lu points from file \"%s\"\n", length, argv[ 2 ] );
+        fprintf( stderr, "Error reading %lu points from file \"%s\"\n", length, argv[2] );
         delete[] values;
         return 2;
     }
@@ -103,8 +103,8 @@ int main( int argc, char* argv[] )
 
     printf( "Loading tree..." );
     fflush( stdout );
-    t = clock( );
-    Core      moab;
+    t = clock();
+    Core moab;
     ErrorCode rval = moab.load_mesh( tree_file, 0, 0 );
     if( MB_SUCCESS != rval )
     {
@@ -112,27 +112,27 @@ int main( int argc, char* argv[] )
         delete[] values;
         return 2;
     }
-    printf( "%0.2f seconds\n", ( clock( ) - t ) / (double)CLOCKS_PER_SEC );
+    printf( "%0.2f seconds\n", ( clock() - t ) / (double)CLOCKS_PER_SEC );
     fflush( stdout );
 
-    Range          range;
+    Range range;
     AdaptiveKDTree tool( &moab );
     tool.find_all_trees( range );
-    if( range.size( ) != 1 )
+    if( range.size() != 1 )
     {
-        fprintf( stderr, "%s : found %d kd-trees\n", argv[ 1 ], (int)range.size( ) );
+        fprintf( stderr, "%s : found %d kd-trees\n", argv[1], (int)range.size() );
         delete[] values;
         return 3;
     }
-    EntityHandle root = range.front( );
+    EntityHandle root = range.front();
 
     print_file_stats( moab );
 
     printf( "Running point queries..." );
     fflush( stdout );
-    t = clock( );
+    t = clock();
     EntityHandle leaf;
-    double       pt[ 3 ];
+    double pt[3];
     for( unsigned long i = 0; i < count; ++i )
     {
         const double* coords = values + 3 * ( i % length );
@@ -143,18 +143,18 @@ int main( int argc, char* argv[] )
         if( MB_SUCCESS != rval )
         {
             fprintf( stderr, "Failure (ErrorCode == %d) for point %d (%f, %f, %f)\n", (int)rval,
-                     (int)( count % length ), coords[ 0 ], coords[ 1 ], coords[ 2 ] );
+                     (int)( count % length ), coords[0], coords[1], coords[2] );
         }
         else if( rfile )
         {
             if( query_triangles )
-                fprintf( rfile, "%f %f %f %f %f %f %lu\n", coords[ 0 ], coords[ 1 ], coords[ 2 ], pt[ 0 ], pt[ 1 ],
-                         pt[ 2 ], (unsigned long)leaf );
+                fprintf( rfile, "%f %f %f %f %f %f %lu\n", coords[0], coords[1], coords[2], pt[0], pt[1], pt[2],
+                         (unsigned long)leaf );
             else
-                fprintf( rfile, "%f %f %f %lu\n", coords[ 0 ], coords[ 1 ], coords[ 2 ], (unsigned long)leaf );
+                fprintf( rfile, "%f %f %f %lu\n", coords[0], coords[1], coords[2], (unsigned long)leaf );
         }
     }
-    printf( "%0.2f seconds\n", ( clock( ) - t ) / (double)CLOCKS_PER_SEC );
+    printf( "%0.2f seconds\n", ( clock() - t ) / (double)CLOCKS_PER_SEC );
     fflush( stdout );
     delete[] values;
 

@@ -26,7 +26,7 @@
 
 #include "moab/MOABConfig.h"
 #define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
+#define STRINGIFY( X )  STRINGIFY_( X )
 #ifdef MOAB_HAVE_UNORDERED_MAP
 #include STRINGIFY( MOAB_HAVE_UNORDERED_MAP )
 #else
@@ -47,9 +47,9 @@ class VarLenSparseTag : public TagInfo
   public:
     VarLenSparseTag( const char* name, DataType type, const void* default_value, int default_value_bytes );
 
-    ~VarLenSparseTag( );
+    ~VarLenSparseTag();
 
-    virtual TagType get_storage_type( ) const;
+    virtual TagType get_storage_type() const;
 
     /**\brief Remove/clear tag data for all entities
      *
@@ -305,7 +305,7 @@ class VarLenSparseTag : public TagInfo
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
                                                 Range& output_entities, const void* value, int value_bytes = 0,
-                                                EntityType   type = MBMAXTYPE,
+                                                EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */
@@ -318,9 +318,9 @@ class VarLenSparseTag : public TagInfo
                                       unsigned long& per_entity ) const;
 
     //! get number of entities
-    unsigned long get_number_entities( )
+    unsigned long get_number_entities()
     {
-        return mData.size( );
+        return mData.size();
     }
 
     //! map of entity id and tag data

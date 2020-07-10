@@ -37,13 +37,13 @@
 namespace MBMesquite
 {
 
-IdealShapeTarget::~IdealShapeTarget( ) {}
+IdealShapeTarget::~IdealShapeTarget() {}
 
 bool IdealShapeTarget::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
                                       MsqError& err )
 {
     MsqMeshEntity& elem = pd.element_by_index( element );
-    ideal_shape_3D( elem.get_element_type( ), sample, pd, W_out, err );
+    ideal_shape_3D( elem.get_element_type(), sample, pd, W_out, err );
     return !MSQ_CHKERR( err );
 }
 
@@ -51,7 +51,7 @@ bool IdealShapeTarget::get_surface_target( PatchData& pd, size_t element, Sample
                                            MsqError& err )
 {
     MsqMatrix< 2, 2 > W_2d;
-    bool              rval = get_2D_target( pd, element, sample, W_2d, err );
+    bool rval = get_2D_target( pd, element, sample, W_2d, err );
     if( MSQ_CHKERR( err ) || !rval ) return false;
 
     W_out( 0, 0 ) = W_2d( 0, 0 );
@@ -67,11 +67,11 @@ bool IdealShapeTarget::get_2D_target( PatchData& pd, size_t element, Sample samp
                                       MsqError& err )
 {
     MsqMeshEntity& elem = pd.element_by_index( element );
-    ideal_shape_2D( elem.get_element_type( ), sample, pd, W_out, err );
+    ideal_shape_2D( elem.get_element_type(), sample, pd, W_out, err );
     return !MSQ_CHKERR( err );
 }
 
-bool IdealShapeTarget::have_surface_orient( ) const
+bool IdealShapeTarget::have_surface_orient() const
 {
     return false;
 }

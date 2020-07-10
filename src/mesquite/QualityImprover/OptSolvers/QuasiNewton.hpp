@@ -47,18 +47,18 @@ class QuasiNewton : public VertexMover, public PatchSetUser
   public:
     MESQUITE_EXPORT QuasiNewton( ObjectiveFunction* of );
 
-    MESQUITE_EXPORT virtual ~QuasiNewton( );
+    MESQUITE_EXPORT virtual ~QuasiNewton();
 
-    PatchSet* get_patch_set( );
+    PatchSet* get_patch_set();
 
-    MESQUITE_EXPORT std::string get_name( ) const;
+    MESQUITE_EXPORT std::string get_name() const;
 
   protected:
     virtual void initialize( PatchData& pd, MsqError& err );
     virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
-    virtual void cleanup( );
+    virtual void cleanup();
 
     void solve( Vector3D* z, const Vector3D* v ) const;
 
@@ -68,8 +68,8 @@ class QuasiNewton : public VertexMover, public PatchSetUser
         QNVEC = 5
     };
 
-    PatchDataVerticesMemento*  mMemento;
-    std::vector< Vector3D >    x, v[ QNVEC + 1 ], w[ QNVEC + 1 ], d;
+    PatchDataVerticesMemento* mMemento;
+    std::vector< Vector3D > x, v[QNVEC + 1], w[QNVEC + 1], d;
     std::vector< SymMatrix3D > mHess;
 };
 

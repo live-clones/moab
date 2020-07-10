@@ -16,17 +16,17 @@ class SequenceManager
   public:
     SequenceManager( double default_seq_multiplier = 1.0 ) : sequence_multiplier( default_seq_multiplier ) {}
 
-    ~SequenceManager( );
+    ~SequenceManager();
 
     /** Delete all contained data */
-    void clear( );
+    void clear();
 
     /** Find entity sequence containing specified handle.
      *\return MB_SUCCESS or MB_ENTITY_NOT_FOUND
      */
     ErrorCode find( EntityHandle handle, EntitySequence*& sequence_out )
     {
-        return typeData[ TYPE_FROM_HANDLE( handle ) ].find( handle, sequence_out );
+        return typeData[TYPE_FROM_HANDLE( handle )].find( handle, sequence_out );
     }
 
     /** Find entity sequence containing specified handle.
@@ -34,7 +34,7 @@ class SequenceManager
      */
     ErrorCode find( EntityHandle handle, const EntitySequence*& sequence_out ) const
     {
-        return typeData[ TYPE_FROM_HANDLE( handle ) ].find( handle, sequence_out );
+        return typeData[TYPE_FROM_HANDLE( handle )].find( handle, sequence_out );
     }
 
     /** Get all entities of a given EntityType, return all entities
@@ -44,7 +44,7 @@ class SequenceManager
         if( type == MBMAXTYPE )
             get_entities( entities_out );
         else
-            typeData[ type ].get_entities( entities_out );
+            typeData[type].get_entities( entities_out );
     }
 
     void get_entities( Range& entities_out ) const;
@@ -56,7 +56,7 @@ class SequenceManager
         if( type == MBMAXTYPE )
             get_entities( entities_out );
         else
-            typeData[ type ].get_entities( entities_out );
+            typeData[type].get_entities( entities_out );
     }
 
     void get_entities( std::vector< EntityHandle >& entities_out ) const;
@@ -64,16 +64,16 @@ class SequenceManager
     /** Count entities of a given EntityType */
     EntityID get_number_entities( EntityType type ) const
     {
-        return type == MBMAXTYPE ? get_number_entities( ) : typeData[ type ].get_number_entities( );
+        return type == MBMAXTYPE ? get_number_entities() : typeData[type].get_number_entities();
     }
 
     /** Count entities of a given EntityType */
-    EntityID get_number_entities( ) const;
+    EntityID get_number_entities() const;
 
     /** Get most recently accessed sequence for a given type */
     const EntitySequence* get_last_accessed_sequence( EntityType type ) const
     {
-        return typeData[ type ].get_last_accessed( );
+        return typeData[type].get_last_accessed();
     }
 
     /**\brief Replace subset of existing sequence with new
@@ -105,7 +105,7 @@ class SequenceManager
     /** Allocate a vertex (possibly in an existing sequence) and
      *  assign it the passed coordinate values.
      */
-    ErrorCode create_vertex( const double coords[ 3 ], EntityHandle& handle_out );
+    ErrorCode create_vertex( const double coords[3], EntityHandle& handle_out );
 
     /** Allocate a element (possibly in an existing sequence) and
      *  assign it the passed connectivity.
@@ -199,13 +199,13 @@ class SequenceManager
     /** Get data for a specific EntityType */
     TypeSequenceManager& entity_map( EntityType type )
     {
-        return typeData[ type ];
+        return typeData[type];
     }
 
     /** Get data for a specific EntityType */
     const TypeSequenceManager& entity_map( EntityType type ) const
     {
-        return typeData[ type ];
+        return typeData[type];
     }
 
     void get_memory_use( unsigned long long& total_entity_storage, unsigned long long& total_storage ) const;
@@ -245,7 +245,7 @@ class SequenceManager
      * The default factor is 1.0 but this can be appropriately updated at runtime so that we do not
      * have broken sequences.
      */
-    double get_sequence_multiplier( ) const
+    double get_sequence_multiplier() const
     {
         return sequence_multiplier;
     }
@@ -301,7 +301,7 @@ class SequenceManager
     EntityHandle sequence_start_handle( EntityType type, EntityID entity_count, int values_per_entity,
                                         EntityID start_id_hint, SequenceData*& data_out, EntityID& data_size );
 
-    TypeSequenceManager typeData[ MBMAXTYPE ];
+    TypeSequenceManager typeData[MBMAXTYPE];
 
     std::vector< int > tagSizes;
 

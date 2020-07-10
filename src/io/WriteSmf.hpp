@@ -34,7 +34,7 @@ class WriteSmf : public WriterIface
     WriteSmf( Interface* impl );
 
     //! Destructor
-    virtual ~WriteSmf( );
+    virtual ~WriteSmf();
 
     static WriterIface* factory( Interface* );
 
@@ -45,7 +45,7 @@ class WriteSmf : public WriterIface
                           int export_dimension = 3 );
 
   private:
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* writeTool;
 };
 

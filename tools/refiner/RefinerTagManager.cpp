@@ -21,10 +21,10 @@ RefinerTagManager::RefinerTagManager( Interface* in_mesh, Interface* out_mesh )
     assert( in_mesh );
     if( !out_mesh ) out_mesh = in_mesh;
 
-    this->input_mesh = in_mesh;
+    this->input_mesh  = in_mesh;
     this->output_mesh = out_mesh;
-    this->reset_vertex_tags( );
-    this->reset_element_tags( );
+    this->reset_vertex_tags();
+    this->reset_element_tags();
     ParallelComm* ipcomm = ParallelComm::get_pcomm( this->input_mesh, 0 );
     ParallelComm* opcomm = 0;
     if( this->output_mesh != this->input_mesh )
@@ -52,7 +52,7 @@ RefinerTagManager::RefinerTagManager( Interface* in_mesh, Interface* out_mesh )
     {
         this->tag_ipsproc = this->tag_ipsprocs = 0;
         this->tag_ipshand = this->tag_ipshands = 0;
-        this->tag_ipstatus = 0;
+        this->tag_ipstatus                     = 0;
     }
 
     if( opcomm )
@@ -64,17 +64,17 @@ RefinerTagManager::RefinerTagManager( Interface* in_mesh, Interface* out_mesh )
     {
         this->tag_opsproc = this->tag_opsprocs = 0;
         this->tag_opshand = this->tag_opshands = 0;
-        this->tag_opstatus = 0;
+        this->tag_opstatus                     = 0;
     }
 
-    this->rank = ipcomm ? ipcomm->proc_config( ).proc_rank( ) : ( opcomm ? opcomm->proc_config( ).proc_rank( ) : 0 );
+    this->rank = ipcomm ? ipcomm->proc_config().proc_rank() : ( opcomm ? opcomm->proc_config().proc_rank() : 0 );
 
     // Create the mesh global ID tags if they aren't already there.
 
-    this->tag_igid = this->input_mesh->globalId_tag( );
+    this->tag_igid = this->input_mesh->globalId_tag();
     if( this->tag_igid == 0 )
     { throw new std::logic_error( "Unable to find input mesh global ID tag \"" GLOBAL_ID_TAG_NAME "\"" ); }
-    this->tag_ogid = this->output_mesh->globalId_tag( );
+    this->tag_ogid = this->output_mesh->globalId_tag();
     if( this->tag_ogid == 0 )
     { throw new std::logic_error( "Unable to find/create output mesh global ID tag \"" GLOBAL_ID_TAG_NAME "\"" ); }
 
@@ -89,7 +89,7 @@ RefinerTagManager::RefinerTagManager( Interface* in_mesh, Interface* out_mesh )
 }
 
 /// Destruction is virtual so subclasses may clean up after refinement.
-RefinerTagManager::~RefinerTagManager( ) {}
+RefinerTagManager::~RefinerTagManager() {}
 
 /**\fn bool RefinerTagManager::evaluate_edge( \
  *         const double* p0, const void* t0, double* p1, void* t1, const double* p2, const void* t2
@@ -116,11 +116,11 @@ RefinerTagManager::~RefinerTagManager( ) {}
 
 /// Clear the list of tag values that will appear past the vertex coordinates in \a p0, \a p1, and
 /// \a p2.
-void RefinerTagManager::reset_vertex_tags( )
+void RefinerTagManager::reset_vertex_tags()
 {
     this->vertex_size = 0;
-    this->input_vertex_tags.clear( );
-    this->output_vertex_tags.clear( );
+    this->input_vertex_tags.clear();
+    this->output_vertex_tags.clear();
 }
 
 /** Add a tag to the list of tag values that will appear past the vertex coordinates.
@@ -129,8 +129,8 @@ void RefinerTagManager::reset_vertex_tags( )
  */
 int RefinerTagManager::add_vertex_tag( Tag tag_handle )
 {
-    int     offset = this->vertex_size;  // old size is offset of tag being added
-    int     tag_size;
+    int offset = this->vertex_size;  // old size is offset of tag being added
+    int tag_size;
     TagType tagType;
     if( this->input_mesh->tag_get_bytes( tag_handle, tag_size ) != MB_SUCCESS ) return -1;
 
@@ -162,12 +162,12 @@ int RefinerTagManager::add_vertex_tag( Tag tag_handle )
 
 /// Clear the list of tag values that will appear past the element coordinates in \a p0, \a p1, and
 /// \a p2.
-void RefinerTagManager::reset_element_tags( )
+void RefinerTagManager::reset_element_tags()
 {
     this->element_size = 0;
-    this->input_element_tags.clear( );
-    this->output_element_tags.clear( );
-    this->element_tag_data.clear( );
+    this->input_element_tags.clear();
+    this->output_element_tags.clear();
+    this->element_tag_data.clear();
 }
 
 /** Add a tag to the list of tag values that will appear past the element coordinates.
@@ -176,8 +176,8 @@ void RefinerTagManager::reset_element_tags( )
  */
 int RefinerTagManager::add_element_tag( Tag tag_handle )
 {
-    int     offset = this->element_size;  // old size is offset of tag being added
-    int     tag_size;
+    int offset = this->element_size;  // old size is offset of tag being added
+    int tag_size;
     TagType tagType;
     if( this->input_mesh->tag_get_bytes( tag_handle, tag_size ) != MB_SUCCESS ) return -1;
 
@@ -213,17 +213,17 @@ int RefinerTagManager::add_element_tag( Tag tag_handle )
  * When the input mesh and output mesh pointers are identical, this simply copies the list of input
  * tags. When the two meshes are distinct, the corresponding tags are created on the output mesh.
  */
-void RefinerTagManager::create_output_tags( )
+void RefinerTagManager::create_output_tags()
 {
     if( this->input_mesh == this->output_mesh )
     {
-        this->output_vertex_tags = this->input_vertex_tags;
+        this->output_vertex_tags  = this->input_vertex_tags;
         this->output_element_tags = this->input_element_tags;
         return;
     }
 
     std::vector< std::pair< Tag, int > >::iterator it;
-    for( it = this->input_vertex_tags.begin( ); it != this->input_vertex_tags.end( ); ++it )
+    for( it = this->input_vertex_tags.begin(); it != this->input_vertex_tags.end(); ++it )
     {
         this->create_tag_internal( it->first, it->second );
     }
@@ -238,9 +238,9 @@ void RefinerTagManager::create_output_tags( )
  */
 void RefinerTagManager::get_input_vertex_tag( int i, Tag& tag, int& byte_offset )
 {
-    std::vector< std::pair< Tag, int > >::iterator it = this->input_vertex_tags.begin( ) + i;
-    tag = it->first;
-    byte_offset = it->second;
+    std::vector< std::pair< Tag, int > >::iterator it = this->input_vertex_tags.begin() + i;
+    tag                                               = it->first;
+    byte_offset                                       = it->second;
 }
 
 /**\brief Return the tag handle and its offset in the array of tag data of each vertex.
@@ -252,9 +252,9 @@ void RefinerTagManager::get_input_vertex_tag( int i, Tag& tag, int& byte_offset 
  */
 void RefinerTagManager::get_output_vertex_tag( int i, Tag& tag, int& byte_offset )
 {
-    std::vector< std::pair< Tag, int > >::iterator it = this->output_vertex_tags.begin( ) + i;
-    tag = it->first;
-    byte_offset = it->second;
+    std::vector< std::pair< Tag, int > >::iterator it = this->output_vertex_tags.begin() + i;
+    tag                                               = it->first;
+    byte_offset                                       = it->second;
 }
 
 /**\brief Retrieve the global ID of each input entity and push it onto the output vector.
@@ -271,7 +271,7 @@ void RefinerTagManager::get_output_vertex_tag( int i, Tag& tag, int& byte_offset
 int RefinerTagManager::get_input_gids( int n, const EntityHandle* ents, std::vector< int >& gids )
 {
     int stat = 0;
-    gids.clear( );
+    gids.clear();
     for( int i = 0; i < n; ++i )
     {
         int gid = -1;
@@ -300,7 +300,7 @@ int RefinerTagManager::get_input_gids( int n, const EntityHandle* ents, std::vec
 int RefinerTagManager::get_output_gids( int n, const EntityHandle* ents, std::vector< int >& gids )
 {
     int stat = 0;
-    gids.clear( );
+    gids.clear();
     for( int i = 0; i < n; ++i )
     {
         int gid = -1;
@@ -353,20 +353,20 @@ void RefinerTagManager::set_sharing( EntityHandle ent_handle, ProcessSet& procs 
         pstat = PSTATUS_SHARED | PSTATUS_INTERFACE;
     else
         pstat = PSTATUS_SHARED | PSTATUS_INTERFACE | PSTATUS_NOT_OWNED;
-    if( this->shared_procs_out[ 0 ] >= 0 )
+    if( this->shared_procs_out[0] >= 0 )
     {
         // assert( MAX_SHARING_PROCS > 1 );
         // Since get_process_members pads to MAX_SHARING_PROCS, this will be work:
-        if( this->shared_procs_out[ 1 ] <= 0 )
+        if( this->shared_procs_out[1] <= 0 )
         {
             // std::cout << "  (proc )";
-            this->output_mesh->tag_set_data( this->tag_opsproc, &ent_handle, 1, &this->shared_procs_out[ 0 ] );
+            this->output_mesh->tag_set_data( this->tag_opsproc, &ent_handle, 1, &this->shared_procs_out[0] );
             this->output_mesh->tag_set_data( this->tag_opstatus, &ent_handle, 1, &pstat );
         }
         else
         {
             // std::cout << "  (procS)";
-            this->output_mesh->tag_set_data( this->tag_opsprocs, &ent_handle, 1, &this->shared_procs_out[ 0 ] );
+            this->output_mesh->tag_set_data( this->tag_opsprocs, &ent_handle, 1, &this->shared_procs_out[0] );
             this->output_mesh->tag_set_data( this->tag_opstatus, &ent_handle, 1, &pstat );
         }
     }
@@ -386,38 +386,38 @@ void RefinerTagManager::get_common_processes( int num, const EntityHandle* src, 
                                               bool on_output_mesh )
 {
     Interface* mesh;
-    Tag        psproc;
-    Tag        psprocs;
+    Tag psproc;
+    Tag psprocs;
     if( on_output_mesh )
     {
-        mesh = this->output_mesh;
-        psproc = this->tag_opsproc;
+        mesh    = this->output_mesh;
+        psproc  = this->tag_opsproc;
         psprocs = this->tag_opsprocs;
     }
     else
     {
-        mesh = this->input_mesh;
-        psproc = this->tag_ipsproc;
+        mesh    = this->input_mesh;
+        psproc  = this->tag_ipsproc;
         psprocs = this->tag_ipsprocs;
     }
     bool first_ent = true;
-    common_shared_procs.clear( );
+    common_shared_procs.clear();
     for( int i = 0; i < num; ++i )
     {
-        EntityHandle ent_in = src[ i ];
+        EntityHandle ent_in = src[i];
         // std::cout << "<(" << ent_in << ")>";
-        int  stat;
+        int stat;
         bool got = false;
-        this->current_shared_procs.clear( );
-        stat = mesh->tag_get_data( psproc, &ent_in, 1, &this->shared_procs_in[ 0 ] );
-        if( stat == MB_SUCCESS && this->shared_procs_in[ 0 ] != -1 )
+        this->current_shared_procs.clear();
+        stat = mesh->tag_get_data( psproc, &ent_in, 1, &this->shared_procs_in[0] );
+        if( stat == MB_SUCCESS && this->shared_procs_in[0] != -1 )
         {
             got = true;
             // std::cout << " s" << this->rank << " s" << this->shared_procs_in[0] << " | ";
-            this->shared_procs_in[ 1 ] = -1;
+            this->shared_procs_in[1] = -1;
         }
-        stat = mesh->tag_get_data( psprocs, &ent_in, 1, &this->shared_procs_in[ 0 ] );
-        if( stat == MB_SUCCESS && this->shared_procs_in[ 0 ] != -1 )
+        stat = mesh->tag_get_data( psprocs, &ent_in, 1, &this->shared_procs_in[0] );
+        if( stat == MB_SUCCESS && this->shared_procs_in[0] != -1 )
         {
             got = true;
             /*
@@ -456,28 +456,28 @@ void RefinerTagManager::get_common_processes( int num, const EntityHandle* src, 
 void RefinerTagManager::create_tag_internal( Tag tag_in, int offset )
 {
     std::pair< Tag, int > tag_rec;
-    std::vector< char >   tag_default;
-    std::string           tag_name;
-    TagType               tag_type;
-    DataType              tag_data_type;
-    int                   tag_size;
+    std::vector< char > tag_default;
+    std::string tag_name;
+    TagType tag_type;
+    DataType tag_data_type;
+    int tag_size;
 
     tag_rec.second = offset;
     this->input_mesh->tag_get_name( tag_in, tag_name );
     this->input_mesh->tag_get_bytes( tag_in, tag_size );
     this->input_mesh->tag_get_type( tag_in, tag_type );
     this->input_mesh->tag_get_data_type( tag_in, tag_data_type );
-    this->input_mesh->tag_get_default_value( tag_in, (void*)&tag_default[ 0 ] );
+    this->input_mesh->tag_get_default_value( tag_in, (void*)&tag_default[0] );
     tag_default.resize( tag_size );
-    ErrorCode res = this->output_mesh->tag_get_handle( tag_name.c_str( ), tag_size, tag_data_type, tag_rec.first,
-                                                       tag_type | MB_TAG_BYTES | MB_TAG_EXCL, &tag_default[ 0 ] );
+    ErrorCode res = this->output_mesh->tag_get_handle( tag_name.c_str(), tag_size, tag_data_type, tag_rec.first,
+                                                       tag_type | MB_TAG_BYTES | MB_TAG_EXCL, &tag_default[0] );
 #ifdef MB_DEBUG
-    std::cout << "Creating output tag: \"" << tag_name.c_str( ) << "\" handle: " << tag_rec.first
+    std::cout << "Creating output tag: \"" << tag_name.c_str() << "\" handle: " << tag_rec.first
               << " input handle: " << tag_in << "\n";
 #endif  // MB_DEBUG
     if( res == MB_FAILURE )
     {
-        std::cerr << "Could not create output tag name: \"" << tag_name.c_str( ) << "\" type: " << tag_type
+        std::cerr << "Could not create output tag name: \"" << tag_name.c_str() << "\" type: " << tag_type
                   << " data type: " << tag_data_type << "\n";
     }
     else
@@ -489,18 +489,18 @@ void RefinerTagManager::create_tag_internal( Tag tag_in, int offset )
 void RefinerTagManager::set_element_tags_from_ent( EntityHandle ent_input )
 {
     std::vector< std::pair< Tag, int > >::iterator it;
-    for( it = this->input_element_tags.begin( ); it != this->input_element_tags.end( ); ++it )
+    for( it = this->input_element_tags.begin(); it != this->input_element_tags.end(); ++it )
     {
-        this->input_mesh->tag_get_data( it->first, &ent_input, 1, &this->element_tag_data[ it->second ] );
+        this->input_mesh->tag_get_data( it->first, &ent_input, 1, &this->element_tag_data[it->second] );
     }
 }
 
 void RefinerTagManager::assign_element_tags( EntityHandle ent_output )
 {
     std::vector< std::pair< Tag, int > >::iterator it;
-    for( it = this->output_element_tags.begin( ); it != this->output_element_tags.end( ); ++it )
+    for( it = this->output_element_tags.begin(); it != this->output_element_tags.end(); ++it )
     {
-        this->output_mesh->tag_set_data( it->first, &ent_output, 1, &this->element_tag_data[ it->second ] );
+        this->output_mesh->tag_set_data( it->first, &ent_output, 1, &this->element_tag_data[it->second] );
     }
 }
 

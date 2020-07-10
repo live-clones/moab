@@ -47,9 +47,9 @@ namespace MBMesquite
 class TShape3DB2 : public TMetricBarrier3D
 {
   public:
-    MESQUITE_EXPORT virtual ~TShape3DB2( );
+    MESQUITE_EXPORT virtual ~TShape3DB2();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 
@@ -57,8 +57,8 @@ class TShape3DB2 : public TMetricBarrier3D
                                                      MsqMatrix< 3, 3 >& wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                                     MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err );
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > second_wrt_T[6],
+                                                     MsqError& err );
 };
 
 }  // namespace MBMesquite

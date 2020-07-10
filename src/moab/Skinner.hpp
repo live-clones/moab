@@ -55,7 +55,7 @@ class Skinner
     Skinner( Interface* mdb ) : thisMB( mdb ), mDeletableMBTag( 0 ), mAdjTag( 0 ), mTargetDim( 0 ) {}
 
     //! destructor
-    ~Skinner( );
+    ~Skinner();
 
     ErrorCode find_geometric_skin( const EntityHandle meshset, Range& forward_target_entities );
 
@@ -121,9 +121,9 @@ class Skinner
                                     int& number_boundary_nodes );
 
   protected:
-    ErrorCode initialize( );
+    ErrorCode initialize();
 
-    ErrorCode deinitialize( );
+    ErrorCode deinitialize();
 
     ErrorCode find_skin_noadj( const Range& source_entities, Range& forward_target_entities,
                                Range& reverse_target_entities );
@@ -221,7 +221,7 @@ class Skinner
     ErrorCode create_side( const EntityHandle this_set, EntityHandle element, EntityType side_type,
                            const EntityHandle* side_corners, EntityHandle& side_elem_handle_out );
 
-    bool edge_reversed( EntityHandle face, const EntityHandle edge_ends[ 2 ] );
+    bool edge_reversed( EntityHandle face, const EntityHandle edge_ends[2] );
     bool face_reversed( EntityHandle region, const EntityHandle* face_conn, EntityType face_type );
 
     //! look for structured box comprising source_entities, and if one is found use

@@ -56,13 +56,13 @@ class MESQUITE_EXPORT MeshDecorator : public Mesh
     void set_mesh( Mesh* mesh );
 
   public:
-    MeshDecorator( );
+    MeshDecorator();
     MeshDecorator( Mesh* real_mesh );
 
-    virtual ~MeshDecorator( );
+    virtual ~MeshDecorator();
 
     /**\brief Get the real Mesh instance */
-    Mesh* get_mesh( ) const
+    Mesh* get_mesh() const
     {
         return myMesh;
     }
@@ -141,7 +141,7 @@ class MESQUITE_EXPORT MeshDecorator : public Mesh
 
     virtual void release_entity_handles( const EntityHandle* handle_array, size_t num_handles, MsqError& err );
 
-    virtual void release( );
+    virtual void release();
 };
 
 }  // namespace MBMesquite

@@ -7,18 +7,18 @@ namespace moab
 {
 
 /// Construct an entity refiner.
-EntityRefiner::EntityRefiner( )
+EntityRefiner::EntityRefiner()
 {
-    this->mesh_in = 0;
+    this->mesh_in             = 0;
     this->edge_size_evaluator = 0;
-    this->output_functor = 0;
+    this->output_functor      = 0;
     // By default, allow at most one subdivision per edge
     this->minimum_number_of_subdivisions = 0;
     this->maximum_number_of_subdivisions = 1;
 }
 
 /// Destruction is virtual so subclasses may clean up after refinement.
-EntityRefiner::~EntityRefiner( )
+EntityRefiner::~EntityRefiner()
 {
     if( this->edge_size_evaluator ) delete this->edge_size_evaluator;
 }
@@ -40,8 +40,8 @@ bool EntityRefiner::prepare( RefinerTagManager* tmgr, EntityRefinerOutputFunctor
         rval = false;
     }
     this->set_output_functor( ofunc );
-    this->mesh_in = tmgr->get_input_mesh( );
-    this->update_heap_size( );
+    this->mesh_in = tmgr->get_input_mesh();
+    this->update_heap_size();
     return rval;
 }
 
@@ -144,7 +144,7 @@ bool EntityRefiner::set_maximum_number_of_subdivisions( int mx )
     if( mx < 0 || mx == this->maximum_number_of_subdivisions ) { return false; }
 
     this->maximum_number_of_subdivisions = mx;
-    this->update_heap_size( );
+    this->update_heap_size();
     return true;
 }
 
@@ -163,13 +163,13 @@ bool EntityRefiner::set_maximum_number_of_subdivisions( int mx )
  *
  * Tag heap size cannot be computed if the edge_size_evaluator is NULL.
  */
-void EntityRefiner::update_heap_size( )
+void EntityRefiner::update_heap_size()
 {
     unsigned long n = this->get_heap_size_bound( this->maximum_number_of_subdivisions );
     this->coord_heap.resize( 6 * n );
     if( this->edge_size_evaluator )
     {
-        unsigned long m = this->edge_size_evaluator->get_tag_manager( )->get_vertex_tag_size( );
+        unsigned long m = this->edge_size_evaluator->get_tag_manager()->get_vertex_tag_size();
         this->tag_heap.resize( m * n );
     }
 }
@@ -179,10 +179,10 @@ void EntityRefiner::update_heap_size( )
  * When called, future calls to heap_coord_storage() and heap_tag_storage() will
  * re-use the allocated storage starting from the beginning.
  */
-void EntityRefiner::reset_heap_pointers( )
+void EntityRefiner::reset_heap_pointers()
 {
-    this->current_coord = this->coord_heap.begin( );
-    this->current_tag = this->tag_heap.begin( );
+    this->current_coord = this->coord_heap.begin();
+    this->current_tag   = this->tag_heap.begin();
 }
 
 /**\brief Return a pointer to temporary storage for edge midpoint vertex coordinates inside
@@ -191,10 +191,10 @@ void EntityRefiner::reset_heap_pointers( )
  * The returned pointer references 6 uninitialized double values to hold parametric coordinates and
  * world coordinates.
  */
-double* EntityRefiner::heap_coord_storage( )
+double* EntityRefiner::heap_coord_storage()
 {
     double* rval;
-    if( this->current_coord != this->coord_heap.end( ) )
+    if( this->current_coord != this->coord_heap.end() )
     {
         rval = &( *this->current_coord );
         this->current_coord += 6;
@@ -212,13 +212,13 @@ double* EntityRefiner::heap_coord_storage( )
  * The returned pointer references enough bytes to store all the tags for a vertex as reported by
  * the current edge size evaluator's EdgeSizeEvaluator::get_vertex_tag_size().
  */
-void* EntityRefiner::heap_tag_storage( )
+void* EntityRefiner::heap_tag_storage()
 {
     void* rval;
-    if( this->edge_size_evaluator && this->current_tag != this->tag_heap.end( ) )
+    if( this->edge_size_evaluator && this->current_tag != this->tag_heap.end() )
     {
         rval = (void*)&( *this->current_tag );
-        this->current_tag += this->edge_size_evaluator->get_tag_manager( )->get_vertex_tag_size( );
+        this->current_tag += this->edge_size_evaluator->get_tag_manager()->get_vertex_tag_size();
     }
     else
     {

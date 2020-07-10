@@ -154,27 +154,30 @@ namespace MBMesquite
  *
  * In optimized code these should reduce to literal constants.
  */
-template< unsigned D > struct DimConst
+template < unsigned D >
+struct DimConst
 {
 };
-template<> struct DimConst< 2 >
+template <>
+struct DimConst< 2 >
 {
-    static inline double sqrt( )
+    static inline double sqrt()
     {
         return MSQ_SQRT_TWO;
     }
-    static inline double inv( )
+    static inline double inv()
     {
         return 0.5;
     }
 };
-template<> struct DimConst< 3 >
+template <>
+struct DimConst< 3 >
 {
-    static inline double sqrt( )
+    static inline double sqrt()
     {
         return MSQ_SQRT_THREE;
     }
-    static inline double inv( )
+    static inline double inv()
     {
         return MSQ_ONE_THIRD;
     }

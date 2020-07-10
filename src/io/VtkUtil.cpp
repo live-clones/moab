@@ -20,9 +20,9 @@ namespace moab
 
 const char* VtkUtil::vtkTypeNames[] = {
     "unsigned_char",  // MB_TYPE_OPAQUE
-    "int",  // MB_TYPE_INTEGER
-    "double",  // MB_TYPE_DOUBLE
-    "bit",  // MB_TYPE_BIT
+    "int",            // MB_TYPE_INTEGER
+    "double",         // MB_TYPE_DOUBLE
+    "bit",            // MB_TYPE_BIT
     "unsigned_long",  // MB_TYPE_HANDLE
 };
 
@@ -43,14 +43,14 @@ const unsigned VtkUtil::typeSizes[] = {
 // connectivity indices.
 const unsigned pixel[] = { 0, 1, 3, 2 };
 const unsigned voxel[] = { 0, 1, 3, 2, 4, 5, 7, 6 };
-const unsigned wedge[] = { 0,  2,  1,  // bottom corners
-                           3,  5,  4,  // top corners
-                           8,  7,  6,  // bottom edges
-                           14, 13, 12,  // top edges
-                           9,  11, 10,  // lateral edges
-                           17, 16, 15 };  // quadrilateral faces
-const unsigned qhex[] = { 0,  1,  2,  3,  // corners (same)
-                          4,  5,  6,  7,  8,  9,  10, 11,  // mid-edge (top before lateral)
+const unsigned wedge[] = { 0,  2,  1,                                       // bottom corners
+                           3,  5,  4,                                       // top corners
+                           8,  7,  6,                                       // bottom edges
+                           14, 13, 12,                                      // top edges
+                           9,  11, 10,                                      // lateral edges
+                           17, 16, 15 };                                    // quadrilateral faces
+const unsigned qhex[]  = { 0,  1,  2,  3,                                   // corners (same)
+                          4,  5,  6,  7,  8,  9,  10, 11,                  // mid-edge (top before lateral)
                           16, 17, 18, 19, 12, 13, 14, 15, 23, 21, 20, 22,  // mid-face (mixed up) & mid-region (same)
                           24, 25, 26 };
 
@@ -72,7 +72,7 @@ const VtkElemType VtkUtil::vtkElemTypes[] = {
     { "wedge", 13, MBPRISM, 6, wedge },
     { "pyramid", 14, MBPYRAMID, 5, 0 },
     { "pentagonal prism", 15, MBMAXTYPE, 10, 0 },  // not supported
-    { "hexagonal prism", 16, MBMAXTYPE, 12, 0 },  // not supported
+    { "hexagonal prism", 16, MBMAXTYPE, 12, 0 },   // not supported
     { 0, 17, MBMAXTYPE, 0, 0 },
     { 0, 18, MBMAXTYPE, 0, 0 },
     { 0, 19, MBMAXTYPE, 0, 0 },
@@ -86,10 +86,10 @@ const VtkElemType VtkUtil::vtkElemTypes[] = {
     { "quadratic pyramid", 27, MBPYRAMID, 13, 0 },
     { "bi-quadratic quad", 28, MBQUAD, 9, 0 },
     { "tri-quadratic hex", 29, MBHEX, 27, qhex },
-    { "quadratic-linear quad", 30, MBMAXTYPE, 6, 0 },  // not supported
+    { "quadratic-linear quad", 30, MBMAXTYPE, 6, 0 },        // not supported
     { "quadratic-linear wedge", 31, MBMAXTYPE, 12, wedge },  // not supported
-    { "bi-quadratic wedge", 32, MBMAXTYPE, 18, wedge },  // not supported
-    { "bi-quadratic hex", 33, MBMAXTYPE, 24, qhex },  // not supported
+    { "bi-quadratic wedge", 32, MBMAXTYPE, 18, wedge },      // not supported
+    { "bi-quadratic hex", 33, MBMAXTYPE, 24, qhex },         // not supported
     { "bi-quadratic triangle", 34, MBMAXTYPE, 0, 0 },
     { "cubic line", 35, MBMAXTYPE, 0, 0 },  // VTK_CUBIC_LINE not supported
     { 0, 36, MBMAXTYPE, 0, 0 },
@@ -98,48 +98,48 @@ const VtkElemType VtkUtil::vtkElemTypes[] = {
     { 0, 39, MBMAXTYPE, 0, 0 },
     { 0, 40, MBMAXTYPE, 0, 0 },
     { "convex point set", 41, MBMAXTYPE, 0, 0 },  //  VTK_CONVEX_POINT_SET = 41, not supported
-    { "polyhedron", 42, MBPOLYHEDRON, 0, 0 }  //
+    { "polyhedron", 42, MBPOLYHEDRON, 0, 0 }      //
 };
 
-const unsigned VtkUtil::numVtkElemType = sizeof( VtkUtil::vtkElemTypes ) / sizeof( VtkUtil::vtkElemTypes[ 0 ] );
+const unsigned VtkUtil::numVtkElemType = sizeof( VtkUtil::vtkElemTypes ) / sizeof( VtkUtil::vtkElemTypes[0] );
 
 // Define an array, indexed by EntityType containing the corresponding
 // VTK element type numbers for the linear, quadratic (mid-edge),
 // and full (mid-face & mid-region node) elements.
 // Zero is used to indicate an invalid type (not supported by VTK.)  The
 // VTK element type number may be used as an index into vtkElemTypes[].
-const int mb_to_vtk_type[][ 3 ] = { { 1, 0, 0 },  // MBVERTEX
-                                    { 3, 21, 0 },  // MBEDGE
-                                    { 5, 22, 0 },  // MBTRI
-                                    { 9, 23, 28 },  // MBQUAD
-                                    { 7, 0, 0 },  // MBPOLYGON
-                                    { 10, 24, 0 },  // MBTET
-                                    { 14, 27, 0 },  // MBPYRAMID
-                                    { 13, 26, 0 },  // MBWEDGE
-                                    { 0, 0, 0 },  // MBKNIFE
-                                    { 12, 25, 29 },  // MBHEX
-                                    { 42, 0, 0 },  // MBPOLYHEDRON
-                                    { 0, 0, 0 },  // MBENTITYSET
-                                    { 0, 0, 0 } };  // MBMAXTYPE
+const int mb_to_vtk_type[][3] = { { 1, 0, 0 },     // MBVERTEX
+                                  { 3, 21, 0 },    // MBEDGE
+                                  { 5, 22, 0 },    // MBTRI
+                                  { 9, 23, 28 },   // MBQUAD
+                                  { 7, 0, 0 },     // MBPOLYGON
+                                  { 10, 24, 0 },   // MBTET
+                                  { 14, 27, 0 },   // MBPYRAMID
+                                  { 13, 26, 0 },   // MBWEDGE
+                                  { 0, 0, 0 },     // MBKNIFE
+                                  { 12, 25, 29 },  // MBHEX
+                                  { 42, 0, 0 },    // MBPOLYHEDRON
+                                  { 0, 0, 0 },     // MBENTITYSET
+                                  { 0, 0, 0 } };   // MBMAXTYPE
 
 const VtkElemType* VtkUtil::get_vtk_type( EntityType type, unsigned num_nodes )
 {
-    const int i = mb_to_vtk_type[ type ][ 0 ];  // Index for linear type
-    const int j = mb_to_vtk_type[ type ][ 1 ];  // Index for quadratic type
-    const int k = mb_to_vtk_type[ type ][ 2 ];  // Index for full quadratic type
+    const int i = mb_to_vtk_type[type][0];  // Index for linear type
+    const int j = mb_to_vtk_type[type][1];  // Index for quadratic type
+    const int k = mb_to_vtk_type[type][2];  // Index for full quadratic type
     if( i )  // If element type is supported at all (if not linear then not quadratic either)
     {
         // If the linear type is requested (all polygons are linear
         // irrespective of the number of nodes), return that.
-        if( type == MBPOLYGON || type == MBPOLYHEDRON || vtkElemTypes[ i ].num_nodes == num_nodes )
+        if( type == MBPOLYGON || type == MBPOLYHEDRON || vtkElemTypes[i].num_nodes == num_nodes )
             return vtkElemTypes + i;
         // Otherwise if there is a quadratic type and the number of
         // nodes specified corresponds to the quadratic type, return that.
-        else if( j && vtkElemTypes[ j ].num_nodes == num_nodes )
+        else if( j && vtkElemTypes[j].num_nodes == num_nodes )
             return vtkElemTypes + j;
         // Otherwise if there is a full quadratic type and the number of
         // nodes specified corresponds to the quadratic type, return that.
-        else if( k && vtkElemTypes[ k ].num_nodes == num_nodes )
+        else if( k && vtkElemTypes[k].num_nodes == num_nodes )
             return vtkElemTypes + k;
     }
 

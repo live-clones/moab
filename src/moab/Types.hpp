@@ -66,29 +66,29 @@ enum Constants
 /** Specify storage type for tags.  See MOAB users guide for more information. */
 enum TagType
 {
-    MB_TAG_BIT = 0, /**< Tag size specified in bits, tag value is 8 bits or less */
+    MB_TAG_BIT    = 0,      /**< Tag size specified in bits, tag value is 8 bits or less */
     MB_TAG_SPARSE = 1 << 0, /**< Storage optimized for tags on a few entities */
-    MB_TAG_DENSE = 1 << 1, /**< Storage optimized for tags on most entities of a type */
-    MB_TAG_MESH = 1 << 2, /**< Storage for tags on no entities, only the root set/whole mesh. */
-    MB_TAG_BYTES = 1 << 3, /**< Size is in number of bytes rather than number of values of \c DataType */
+    MB_TAG_DENSE  = 1 << 1, /**< Storage optimized for tags on most entities of a type */
+    MB_TAG_MESH   = 1 << 2, /**< Storage for tags on no entities, only the root set/whole mesh. */
+    MB_TAG_BYTES  = 1 << 3, /**< Size is in number of bytes rather than number of values of \c DataType */
     MB_TAG_VARLEN = 1 << 4, /**< Create variable-length tag */
-    MB_TAG_CREAT = 1 << 5, /**< Create tag if it does not already exist */
-    MB_TAG_EXCL = 1 << 6, /**< Fail if TAG_CREATE and tag already exists */
-    MB_TAG_STORE = 1 << 7, /**< Fail if tag exists and has different storage type */
-    MB_TAG_ANY = 1 << 8, /**< Do not fail if size, type, or default value do not match. */
-    MB_TAG_NOOPQ = 1 << 9, /**< Do not accept MB_TYPE_OPAQUE as a match for any type. */
-    MB_TAG_DFTOK = 1 << 10 /**< Do not fail for mismatched default values */
+    MB_TAG_CREAT  = 1 << 5, /**< Create tag if it does not already exist */
+    MB_TAG_EXCL   = 1 << 6, /**< Fail if TAG_CREATE and tag already exists */
+    MB_TAG_STORE  = 1 << 7, /**< Fail if tag exists and has different storage type */
+    MB_TAG_ANY    = 1 << 8, /**< Do not fail if size, type, or default value do not match. */
+    MB_TAG_NOOPQ  = 1 << 9, /**< Do not accept MB_TYPE_OPAQUE as a match for any type. */
+    MB_TAG_DFTOK  = 1 << 10 /**< Do not fail for mismatched default values */
     /**<  MB_TAG_CNVRT = 1<<11,  Convert storage type if it does not match */
 };
 
 /** Specify data type for tags. */
 enum DataType
 {
-    MB_TYPE_OPAQUE = 0, /**< byte array */
-    MB_TYPE_INTEGER = 1, /**< native 'int' type */
-    MB_TYPE_DOUBLE = 2, /**< native 'double' type */
-    MB_TYPE_BIT = 3, /**< mandatory type for tags with MB_TAG_BIT storage */
-    MB_TYPE_HANDLE = 4, /**< EntityHandle */
+    MB_TYPE_OPAQUE   = 0, /**< byte array */
+    MB_TYPE_INTEGER  = 1, /**< native 'int' type */
+    MB_TYPE_DOUBLE   = 2, /**< native 'double' type */
+    MB_TYPE_BIT      = 3, /**< mandatory type for tags with MB_TAG_BIT storage */
+    MB_TYPE_HANDLE   = 4, /**< EntityHandle */
     MB_MAX_DATA_TYPE = MB_TYPE_HANDLE
 };
 
@@ -114,16 +114,16 @@ typedef struct TagInfo* Tag;
 enum EntitySetProperty
 {
     MESHSET_TRACK_OWNER = 0x1, /**< create entity to meshset adjacencies */
-    MESHSET_SET = 0x2, /**< set contents are unique */
-    MESHSET_ORDERED = 0x4 /**< order of set contents is preserved */
+    MESHSET_SET         = 0x2, /**< set contents are unique */
+    MESHSET_ORDERED     = 0x4  /**< order of set contents is preserved */
 };
 
 enum SenseType
 {
     SENSE_INVALID = -2, /**< default, invalid, not defined */
     SENSE_REVERSE = -1, /**< reversed */
-    SENSE_BOTH = 0, /**< both senses valid  */
-    SENSE_FORWARD = 1 /**< forward  */
+    SENSE_BOTH    = 0,  /**< both senses valid  */
+    SENSE_FORWARD = 1   /**< forward  */
 };
 
 #ifdef __cplusplus

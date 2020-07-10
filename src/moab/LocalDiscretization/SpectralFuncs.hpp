@@ -31,51 +31,51 @@
 #if defined( USE_FLOAT )
 typedef float real;
 #define floorr floorf
-#define ceilr ceilf
-#define sqrtr sqrtf
-#define fabsr fabsf
-#define cosr cosf
-#define sinr sinf
-#define EPS ( 128 * FLT_EPSILON )
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923F
+#define ceilr  ceilf
+#define sqrtr  sqrtf
+#define fabsr  fabsf
+#define cosr   cosf
+#define sinr   sinf
+#define EPS    ( 128 * FLT_EPSILON )
+#define PI     3.1415926535897932384626433832795028841971693993751058209749445923F
 #elif defined( USE_LONG_DOUBLE )
 typedef long double real;
 #define floorr floorl
-#define ceilr ceill
-#define sqrtr sqrtl
-#define fabsr fabsl
-#define cosr cosl
-#define sinr sinl
-#define EPS ( 128 * LDBL_EPSILON )
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923L
+#define ceilr  ceill
+#define sqrtr  sqrtl
+#define fabsr  fabsl
+#define cosr   cosl
+#define sinr   sinl
+#define EPS    ( 128 * LDBL_EPSILON )
+#define PI     3.1415926535897932384626433832795028841971693993751058209749445923L
 #else
 typedef double real;
 #define floorr floor
-#define ceilr ceil
-#define sqrtr sqrt
-#define fabsr fabs
-#define cosr cos
-#define sinr sin
-#define EPS ( 128 * DBL_EPSILON )
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
+#define ceilr  ceil
+#define sqrtr  sqrt
+#define fabsr  fabs
+#define cosr   cos
+#define sinr   sin
+#define EPS    ( 128 * DBL_EPSILON )
+#define PI     3.1415926535897932384626433832795028841971693993751058209749445923
 #endif
 
 /* apparently uint and ulong can be defined already in standard headers */
-#define uint uint_
+#define uint  uint_
 #define ulong ulong_
-#define sint sint_
+#define sint  sint_
 #define slong slong_
 
-typedef signed INTEGER   sint;
+typedef signed INTEGER sint;
 typedef unsigned INTEGER uint;
 #undef INTEGER
 
 #ifdef GLOBAL_INT
-typedef signed GLOBAL_INT   slong;
+typedef signed GLOBAL_INT slong;
 typedef unsigned GLOBAL_INT ulong;
 #else
-typedef sint        slong;
-typedef uint        ulong;
+typedef sint slong;
+typedef uint ulong;
 #endif
 
 //======================================================
@@ -121,7 +121,7 @@ void legendre_row( real x, real* P, int n );
    call the _nodes function before calling the _weights function
   --------------------------------------------------------------------------*/
 
-void gauss_nodes( real* z, int n ); /* n nodes (order = 2n-1) */
+void gauss_nodes( real* z, int n );   /* n nodes (order = 2n-1) */
 void lobatto_nodes( real* z, int n ); /* n nodes (order = 2n-3) */
 
 void gauss_weights( const real* z, real* w, int n );
@@ -207,12 +207,12 @@ void lagrange_weights_deriv( const real* z, unsigned n, const real* x, unsigned 
 
 typedef struct
 {
-    unsigned    n; /* number of Lagrange nodes            */
-    const real* z; /* Lagrange nodes (user-supplied)      */
-    real *      J, *D, *D2; /* weights for 0th,1st,2nd derivatives */
-    real *      J_z0, *D_z0, *D2_z0; /* ditto at z[0]   (computed at setup) */
-    real *      J_zn, *D_zn, *D2_zn; /* ditto at z[n-1] (computed at setup) */
-    real *      w, *d, *u0, *v0, *u1, *v1, *u2, *v2; /* work data           */
+    unsigned n;                                /* number of Lagrange nodes            */
+    const real* z;                             /* Lagrange nodes (user-supplied)      */
+    real *J, *D, *D2;                          /* weights for 0th,1st,2nd derivatives */
+    real *J_z0, *D_z0, *D2_z0;                 /* ditto at z[0]   (computed at setup) */
+    real *J_zn, *D_zn, *D2_zn;                 /* ditto at z[n-1] (computed at setup) */
+    real *w, *d, *u0, *v0, *u1, *v1, *u2, *v2; /* work data           */
 } lagrange_data;
 
 void lagrange_setup( lagrange_data* p, const real* z, unsigned n );
@@ -308,39 +308,39 @@ real tensor_ig3( const real* Jr, const real* Dr, unsigned nr, const real* Js, co
 
 typedef struct
 {
-    const real*                xw[ 2 ]; /* geometry data */
-    real*                      z[ 2 ]; /* lobatto nodes */
-    lagrange_data              ld[ 2 ]; /* interpolation, derivative weights & data */
-    unsigned                   nptel; /* nodes per element */
+    const real* xw[2];               /* geometry data */
+    real* z[2];                      /* lobatto nodes */
+    lagrange_data ld[2];             /* interpolation, derivative weights & data */
+    unsigned nptel;                  /* nodes per element */
     struct findpt_hash_data_2* hash; /* geometric hashing data */
-    struct findpt_listel *     list, **sorted, **end;
+    struct findpt_listel *list, **sorted, **end;
     /* pre-allocated list of elements to
        check (found by hashing), and
        pre-allocated list of pointers into
        the first list for sorting */
     struct findpt_opt_data_2* od; /* data for the optimization algorithm */
-    real*                     od_work;
+    real* od_work;
 } findpt_data_2;
 
 typedef struct
 {
-    const real*                xw[ 3 ]; /* geometry data */
-    real*                      z[ 3 ]; /* lobatto nodes */
-    lagrange_data              ld[ 3 ]; /* interpolation, derivative weights & data */
-    unsigned                   nptel; /* nodes per element */
+    const real* xw[3];               /* geometry data */
+    real* z[3];                      /* lobatto nodes */
+    lagrange_data ld[3];             /* interpolation, derivative weights & data */
+    unsigned nptel;                  /* nodes per element */
     struct findpt_hash_data_3* hash; /* geometric hashing data */
-    struct findpt_listel *     list, **sorted, **end;
+    struct findpt_listel *list, **sorted, **end;
     /* pre-allocated list of elements to
        check (found by hashing), and
        pre-allocated list of pointers into
        the first list for sorting */
     struct findpt_opt_data_3* od; /* data for the optimization algorithm */
-    real*                     od_work;
+    real* od_work;
 } findpt_data_3;
 
-findpt_data_2* findpt_setup_2( const real* const xw[ 2 ], const unsigned n[ 2 ], uint nel, uint max_hash_size,
+findpt_data_2* findpt_setup_2( const real* const xw[2], const unsigned n[2], uint nel, uint max_hash_size,
                                real bbox_tol );
-findpt_data_3* findpt_setup_3( const real* const xw[ 3 ], const unsigned n[ 3 ], uint nel, uint max_hash_size,
+findpt_data_3* findpt_setup_3( const real* const xw[3], const unsigned n[3], uint nel, uint max_hash_size,
                                real bbox_tol );
 
 void findpt_free_2( findpt_data_2* p );
@@ -350,31 +350,30 @@ const real* findpt_allbnd_2( const findpt_data_2* p );
 const real* findpt_allbnd_3( const findpt_data_3* p );
 
 typedef int ( *findpt_func )( void*, const real*, int, uint*, real*, real* );
-int findpt_2( findpt_data_2* p, const real x[ 2 ], int guess, uint* el, real r[ 2 ], real* dist );
-int findpt_3( findpt_data_3* p, const real x[ 3 ], int guess, uint* el, real r[ 3 ], real* dist );
+int findpt_2( findpt_data_2* p, const real x[2], int guess, uint* el, real r[2], real* dist );
+int findpt_3( findpt_data_3* p, const real x[3], int guess, uint* el, real r[3], real* dist );
 
-inline void findpt_weights_2( findpt_data_2* p, const real r[ 2 ] )
+inline void findpt_weights_2( findpt_data_2* p, const real r[2] )
 {
-    lagrange_0( &p->ld[ 0 ], r[ 0 ] );
-    lagrange_0( &p->ld[ 1 ], r[ 1 ] );
+    lagrange_0( &p->ld[0], r[0] );
+    lagrange_0( &p->ld[1], r[1] );
 }
 
-inline void findpt_weights_3( findpt_data_3* p, const real r[ 3 ] )
+inline void findpt_weights_3( findpt_data_3* p, const real r[3] )
 {
-    lagrange_0( &p->ld[ 0 ], r[ 0 ] );
-    lagrange_0( &p->ld[ 1 ], r[ 1 ] );
-    lagrange_0( &p->ld[ 2 ], r[ 2 ] );
+    lagrange_0( &p->ld[0], r[0] );
+    lagrange_0( &p->ld[1], r[1] );
+    lagrange_0( &p->ld[2], r[2] );
 }
 
 inline double findpt_eval_2( findpt_data_2* p, const real* u )
 {
-    return tensor_i2( p->ld[ 0 ].J, p->ld[ 0 ].n, p->ld[ 1 ].J, p->ld[ 1 ].n, u, p->od_work );
+    return tensor_i2( p->ld[0].J, p->ld[0].n, p->ld[1].J, p->ld[1].n, u, p->od_work );
 }
 
 inline double findpt_eval_3( findpt_data_3* p, const real* u )
 {
-    return tensor_i3( p->ld[ 0 ].J, p->ld[ 0 ].n, p->ld[ 1 ].J, p->ld[ 1 ].n, p->ld[ 2 ].J, p->ld[ 2 ].n, u,
-                      p->od_work );
+    return tensor_i3( p->ld[0].J, p->ld[0].n, p->ld[1].J, p->ld[1].n, p->ld[2].J, p->ld[2].n, u, p->od_work );
 }
 
 //======================================================
@@ -385,38 +384,38 @@ typedef struct
 {
     unsigned constraints;
     unsigned dn, d1, d2;
-    real *   x[ 3 ], *fdn[ 3 ];
+    real *x[3], *fdn[3];
 } opt_face_data_3;
 
 typedef struct
 {
     unsigned constraints;
     unsigned de, d1, d2;
-    real *   x[ 3 ], *fd1[ 3 ], *fd2[ 3 ];
+    real *x[3], *fd1[3], *fd2[3];
 } opt_edge_data_3;
 
 typedef struct
 {
     unsigned constraints;
-    real     x[ 3 ], jac[ 9 ];
+    real x[3], jac[9];
 } opt_point_data_3;
 
 typedef struct
 {
-    lagrange_data*   ld;
-    unsigned         size[ 4 ];
-    const real*      elx[ 3 ];
-    opt_face_data_3  fd;
-    opt_edge_data_3  ed;
+    lagrange_data* ld;
+    unsigned size[4];
+    const real* elx[3];
+    opt_face_data_3 fd;
+    opt_edge_data_3 ed;
     opt_point_data_3 pd;
-    real*            work;
-    real             x[ 3 ], jac[ 9 ];
+    real* work;
+    real x[3], jac[9];
 } opt_data_3;
 
-void   opt_alloc_3( opt_data_3* p, lagrange_data* ld );
-void   opt_free_3( opt_data_3* p );
-double opt_findpt_3( opt_data_3* p, const real* const elx[ 3 ], const real xstar[ 3 ], real r[ 3 ], unsigned* constr );
-void   opt_vol_set_intp_3( opt_data_3* p, const real r[ 3 ] );
+void opt_alloc_3( opt_data_3* p, lagrange_data* ld );
+void opt_free_3( opt_data_3* p );
+double opt_findpt_3( opt_data_3* p, const real* const elx[3], const real xstar[3], real r[3], unsigned* constr );
+void opt_vol_set_intp_3( opt_data_3* p, const real r[3] );
 
 const unsigned opt_no_constraints_2 = 3 + 1;
 const unsigned opt_no_constraints_3 = 9 + 3 + 1;
@@ -432,27 +431,27 @@ typedef struct
 {
     unsigned constraints;
     unsigned de, d1;
-    real *   x[ 2 ], *fd1[ 2 ];
+    real *x[2], *fd1[2];
 } opt_edge_data_2;
 
 typedef struct
 {
     unsigned constraints;
-    real     x[ 2 ], jac[ 4 ];
+    real x[2], jac[4];
 } opt_point_data_2;
 
 typedef struct
 {
-    lagrange_data*   ld;
-    unsigned         size[ 3 ];
-    const real*      elx[ 2 ];
-    opt_edge_data_2  ed;
+    lagrange_data* ld;
+    unsigned size[3];
+    const real* elx[2];
+    opt_edge_data_2 ed;
     opt_point_data_2 pd;
-    real*            work;
-    real             x[ 2 ], jac[ 4 ];
+    real* work;
+    real x[2], jac[4];
 } opt_data_2;
-void   opt_alloc_2( opt_data_2* p, lagrange_data* ld );
-void   opt_free_2( opt_data_2* p );
-double opt_findpt_2( opt_data_2* p, const real* const elx[ 2 ], const real xstar[ 2 ], real r[ 2 ], unsigned* constr );
+void opt_alloc_2( opt_data_2* p, lagrange_data* ld );
+void opt_free_2( opt_data_2* p );
+double opt_findpt_2( opt_data_2* p, const real* const elx[2], const real xstar[2], real r[2], unsigned* constr );
 
 #endif

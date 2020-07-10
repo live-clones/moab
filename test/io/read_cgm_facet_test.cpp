@@ -29,22 +29,22 @@ std::string input_cone = TestDir + "/io/cone.sat";
 void read_file( Interface* moab, const char* input_file );
 
 // List of tests in this file
-void test_cube_curve_facet( );
-void test_cone_curve_facet( );
+void test_cube_curve_facet();
+void test_cone_curve_facet();
 
 void read_file( Interface* moab, bool curve_fatal, const char* input_file, ErrorCode check_val, int& curve_fail,
                 int& surface_fail )
 {
-    InitCGMA::initialize_cgma( );
-    GeometryQueryTool::instance( )->delete_geometry( );
+    InitCGMA::initialize_cgma();
+    GeometryQueryTool::instance()->delete_geometry();
     EntityHandle fs = 0;
 
     // set the options
     std::string options;
-#define OPTION_APPEND( X )                      \
-    {                                           \
-        if( options.length( ) ) options += ";"; \
-        options += ( X );                       \
+#define OPTION_APPEND( X )                     \
+    {                                          \
+        if( options.length() ) options += ";"; \
+        options += ( X );                      \
     }
 
     OPTION_APPEND( "CGM_ATTRIBS=no" );
@@ -52,14 +52,14 @@ void read_file( Interface* moab, bool curve_fatal, const char* input_file, Error
     OPTION_APPEND( "VERBOSE_CGM_WARNINGS" );
 
     // set the file options
-    FileOptions opts( options.c_str( ) );
+    FileOptions opts( options.c_str() );
 
     // new ReadCGM instance
-    ReadCGM*  RCGM = new ReadCGM( moab );
+    ReadCGM* RCGM  = new ReadCGM( moab );
     ErrorCode rval = RCGM->load_file( input_file, &fs, opts );
     //  CHKERR(rval);
-    curve_fail = RCGM->get_failed_curve_count( );
-    surface_fail = RCGM->get_failed_surface_count( );
+    curve_fail   = RCGM->get_failed_curve_count();
+    surface_fail = RCGM->get_failed_surface_count();
     //  std::cout << curve_fail << " " << surface_fail << std::endl;
 
     CHECK_EQUAL( rval, check_val );
@@ -69,28 +69,28 @@ void read_file( Interface* moab, bool curve_fatal, const char* input_file, Error
 
 // Gets the vertex entities from a simple cube file load and checks that the
 // correct number of them exist.
-void test_cube_curve_facet( )
+void test_cube_curve_facet()
 {
     // Open the test file
-    Core       moab;
-    Interface* mb = &moab;
-    int        curve_fail = 0;
-    int        surface_fail = 0;
+    Core moab;
+    Interface* mb    = &moab;
+    int curve_fail   = 0;
+    int surface_fail = 0;
     // should succeed since we are not fatal error on curves
-    read_file( mb, false, input_cube.c_str( ), MB_SUCCESS, curve_fail, surface_fail );
+    read_file( mb, false, input_cube.c_str(), MB_SUCCESS, curve_fail, surface_fail );
 }
 
 // Gets the vertex entities from a simple cube file load and checks that the
 // correct number of them exist.
-void test_cone_curve_facet( )
+void test_cone_curve_facet()
 {
     // Open the test file
-    Core       moab;
-    Interface* mb = &moab;
-    int        curve_fail = 0;
-    int        surface_fail = 0;
+    Core moab;
+    Interface* mb    = &moab;
+    int curve_fail   = 0;
+    int surface_fail = 0;
     // should expect MB_FAILURE since we fail on curves
-    read_file( mb, true, input_cone.c_str( ), MB_FAILURE, curve_fail, surface_fail );
+    read_file( mb, true, input_cone.c_str(), MB_FAILURE, curve_fail, surface_fail );
 }
 
 // void delete_mesh_test();

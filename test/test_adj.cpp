@@ -34,7 +34,7 @@
 
 using namespace moab;
 
-int main( )
+int main()
 {
     Interface* iface = new Core;
 
@@ -47,53 +47,53 @@ int main( )
 #endif
 
     ErrorCode err;
-    err = iface->load_mesh( filename.c_str( ) );CHECK_ERR( err );
+    err = iface->load_mesh( filename.c_str() );CHECK_ERR( err );
 
     Range quads, verts;
     err = iface->get_entities_by_dimension( 0, 0, verts );CHECK_ERR( err );
     err = iface->get_entities_by_dimension( 0, 2, quads );CHECK_ERR( err );
 
-    for( Range::iterator it = verts.begin( ); it != verts.end( ); it++ )
-        std::cout << "verts[" << ( *it - *verts.begin( ) ) << "] = " << *it << std::endl;
+    for( Range::iterator it = verts.begin(); it != verts.end(); it++ )
+        std::cout << "verts[" << ( *it - *verts.begin() ) << "] = " << *it << std::endl;
 
     std::vector< EntityHandle > conn;
-    for( Range::iterator it = quads.begin( ); it != quads.end( ); it++ )
+    for( Range::iterator it = quads.begin(); it != quads.end(); it++ )
     {
-        conn.clear( );
+        conn.clear();
         err = iface->get_connectivity( &*it, 1, conn );CHECK_ERR( err );
-        std::cout << "quads[" << ( *it - *quads.begin( ) ) << "] = " << *it << " :: conn = [" << conn[ 0 ] << ", "
-                  << conn[ 1 ] << ", " << conn[ 2 ] << ", " << conn[ 3 ] << "]" << std::endl;
+        std::cout << "quads[" << ( *it - *quads.begin() ) << "] = " << *it << " :: conn = [" << conn[0] << ", "
+                  << conn[1] << ", " << conn[2] << ", " << conn[3] << "]" << std::endl;
     }
 
     std::vector< EntityHandle > nodes;
-    int                         error;
-    EntityHandle                h = CREATE_HANDLE( MBQUAD, MB_START_ID, error );
+    int error;
+    EntityHandle h = CREATE_HANDLE( MBQUAD, MB_START_ID, error );
     CHECK_EQUAL( 0, error );
     std::cout << "h = " << h << std::endl;
 
     err = iface->get_adjacencies( &h, 1, 0, true, nodes );CHECK_ERR( err );
 
-    for( int i = 0; i < (int)nodes.size( ); i++ )
-        std::cout << "nodes[" << i << "] = " << nodes[ i ] << " ";
+    for( int i = 0; i < (int)nodes.size(); i++ )
+        std::cout << "nodes[" << i << "] = " << nodes[i] << " ";
     std::cout << std::endl;
 
     std::vector< EntityHandle > edgs;
     err = iface->get_adjacencies( &h, 1, 1, true, edgs );CHECK_ERR( err );
 
-    for( int i = 0; i < (int)edgs.size( ); i++ )
-        std::cout << "edgs[" << i << "] = " << edgs[ i ] << " ";
+    for( int i = 0; i < (int)edgs.size(); i++ )
+        std::cout << "edgs[" << i << "] = " << edgs[i] << " ";
     std::cout << std::endl;
 
     // faces to nodes
 
-    for( unsigned int i = 0; i < edgs.size( ); i++ )
+    for( unsigned int i = 0; i < edgs.size(); i++ )
     {
-        nodes.clear( );
-        err = iface->get_adjacencies( &edgs[ i ], 1, 0, true, nodes );CHECK_ERR( err );
-        std::cout << "edge " << ID_FROM_HANDLE( edgs[ i ] ) << std::endl;
+        nodes.clear();
+        err = iface->get_adjacencies( &edgs[i], 1, 0, true, nodes );CHECK_ERR( err );
+        std::cout << "edge " << ID_FROM_HANDLE( edgs[i] ) << std::endl;
         std::cout << "nodes = ";
-        for( unsigned int j = 0; j < nodes.size( ); j++ )
-            std::cout << nodes[ j ] << " ";
+        for( unsigned int j = 0; j < nodes.size(); j++ )
+            std::cout << nodes[j] << " ";
         std::cout << std::endl;
     }
 

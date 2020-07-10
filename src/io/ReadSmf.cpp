@@ -19,7 +19,7 @@
  * \author Michael Garland
  */
 
-#ifdef _WIN32 /* windows */
+#ifdef _WIN32              /* windows */
 #define _USE_MATH_DEFINES  // For M_PI
 #endif
 
@@ -66,7 +66,7 @@ ReadSmf::cmd_entry ReadSmf::read_cmds[] = { { "v", &ReadSmf::vertex },
 
 ErrorCode ReadSmf::parse_mat( const std::vector< std::string >& argv, AffineXform& mat )
 {
-    double    values[ 12 ];
+    double values[12];
     ErrorCode err = parse_doubles( 12, argv, values );
     if( MB_SUCCESS != err ) return err;
 
@@ -89,12 +89,12 @@ ReadSmf::ReadSmf( Interface* impl )
 {
     mdbImpl->query_interface( readMeshIface );
     ivar.next_vertex = 0;
-    ivar.next_face = 0;
+    ivar.next_face   = 0;
     _numNodes = _numFaces = 0;
     _numNodesInFile = _numElementsInFile = 0;
 }
 
-ReadSmf::~ReadSmf( )
+ReadSmf::~ReadSmf()
 {
     if( readMeshIface )
     {
@@ -114,8 +114,8 @@ ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_
                               const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
 {
     ErrorCode result;
-    lineNo = 0;
-    commandNo = 0;
+    lineNo       = 0;
+    commandNo    = 0;
     versionMajor = 0;
     versionMinor = 0;
 
@@ -130,18 +130,18 @@ ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_
     std::ifstream smfFile( filename );
     if( !smfFile ) return MB_FILE_DOES_NOT_EXIST;
 
-    ivar.next_face = 1;
+    ivar.next_face   = 1;
     ivar.next_vertex = 1;
     state.push_back( SMF_State( ivar ) );
 
-    while( smfFile.getline( line, SMF_MAXLINE, '\n' ).good( ) )
+    while( smfFile.getline( line, SMF_MAXLINE, '\n' ).good() )
     {
         ++lineNo;
         result = parse_line( line );
         if( MB_SUCCESS != result ) return result;
     }
 
-    if( !smfFile.eof( ) )
+    if( !smfFile.eof() )
     {
         // Parsing terminated for a reason other than EOF: signal failure.
         return MB_FILE_WRITE_ERROR;
@@ -154,9 +154,9 @@ ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_
 
     // Create vertices
     std::vector< double* > arrays;
-    EntityHandle           start_handle_out;
+    EntityHandle start_handle_out;
     start_handle_out = 0;
-    result = readMeshIface->get_node_coords( 3, _numNodesInFile, MB_START_ID, start_handle_out, arrays );
+    result           = readMeshIface->get_node_coords( 3, _numNodesInFile, MB_START_ID, start_handle_out, arrays );
 
     if( MB_SUCCESS != result ) return result;
 
@@ -164,10 +164,10 @@ ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_
     // Cppcheck warning (false positive): variable arrays is assigned a value that is never used
     for( int i = 0; i < _numNodesInFile; i++ )
     {
-        int i3 = 3 * i;
-        arrays[ 0 ][ i ] = _coords[ i3 ];
-        arrays[ 1 ][ i ] = _coords[ i3 + 1 ];
-        arrays[ 2 ][ i ] = _coords[ i3 + 2 ];
+        int i3       = 3 * i;
+        arrays[0][i] = _coords[i3];
+        arrays[1][i] = _coords[i3 + 1];
+        arrays[2][i] = _coords[i3 + 2];
     }
     // Elements
 
@@ -179,7 +179,7 @@ ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_
                                                  MB_START_ID, start_handle_elem_out, conn_array_out );
     if( MB_SUCCESS != result ) return result;
     for( int j = 0; j < _numElementsInFile * 3; j++ )
-        conn_array_out[ j ] = _connec[ j ];
+        conn_array_out[j] = _connec[j];
 
     // Notify MOAB of the new elements
     result = readMeshIface->update_adjacencies( start_handle_elem_out, _numElementsInFile, 3, conn_array_out );
@@ -208,7 +208,7 @@ ErrorCode ReadSmf::annotation( char* cmd, std::vector< std::string >& argv )
         // thing specified in the file.
         if( commandNo > 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "SMF file version specified at line " << lineNo ); }
 
-        if( 2 == sscanf( argv[ 0 ].c_str( ), "%d.%d", &versionMajor, &versionMinor ) )
+        if( 2 == sscanf( argv[0].c_str(), "%d.%d", &versionMajor, &versionMinor ) )
         {
             if( versionMajor != 1 || versionMinor != 0 )
             {
@@ -223,15 +223,15 @@ ErrorCode ReadSmf::annotation( char* cmd, std::vector< std::string >& argv )
     }
     else if( streq( cmd, "vertices" ) )
     {
-        if( argv.size( ) == 1 )
-            _numNodes = atoi( argv[ 0 ].c_str( ) );
+        if( argv.size() == 1 )
+            _numNodes = atoi( argv[0].c_str() );
         else
             bad_annotation( cmd );
     }
     else if( streq( cmd, "faces" ) )
     {
-        if( argv.size( ) == 1 )
-            _numFaces = atoi( argv[ 0 ].c_str( ) );
+        if( argv.size() == 1 )
+            _numFaces = atoi( argv[0].c_str() );
         else
             bad_annotation( cmd );
     }
@@ -243,7 +243,7 @@ ErrorCode ReadSmf::annotation( char* cmd, std::vector< std::string >& argv )
     }
     else if( streq( cmd, "PXform" ) )
     {
-        if( argv.size( ) == 16 )
+        if( argv.size() == 16 )
         {
             // parse_mat(argv);
         }
@@ -252,7 +252,7 @@ ErrorCode ReadSmf::annotation( char* cmd, std::vector< std::string >& argv )
     }
     else if( streq( cmd, "MXform" ) )
     {
-        if( argv.size( ) == 16 )
+        if( argv.size() == 16 )
         {
             // parse_mat(argv);
         }
@@ -265,18 +265,18 @@ ErrorCode ReadSmf::annotation( char* cmd, std::vector< std::string >& argv )
 
 ErrorCode ReadSmf::parse_line( char* ln )
 {
-    char *                     cmd, *s;
+    char *cmd, *s;
     std::vector< std::string > argv;
-    ErrorCode                  err;
+    ErrorCode err;
 
     while( *ln == ' ' || *ln == '\t' )
         ln++;  // Skip initial white space
 
     // Ignore empty lines
-    if( ln[ 0 ] == '\n' || ln[ 0 ] == '\0' ) return MB_SUCCESS;
+    if( ln[0] == '\n' || ln[0] == '\0' ) return MB_SUCCESS;
 
     // Ignore comments
-    if( ln[ 0 ] == '#' && ln[ 1 ] != '$' ) return MB_SUCCESS;
+    if( ln[0] == '#' && ln[1] != '$' ) return MB_SUCCESS;
 
     // First, split the line into tokens
     cmd = strtok( ln, " \t\n" );
@@ -288,15 +288,15 @@ ErrorCode ReadSmf::parse_line( char* ln )
     }
 
     // Figure out what command it is and execute it
-    if( cmd[ 0 ] == '#' && cmd[ 1 ] == '$' )
+    if( cmd[0] == '#' && cmd[1] == '$' )
     {
         err = annotation( cmd, argv );
         if( MB_SUCCESS != err ) return err;
     }
     else
     {
-        cmd_entry* entry = &read_cmds[ 0 ];
-        bool       handled = 0;
+        cmd_entry* entry = &read_cmds[0];
+        bool handled     = 0;
 
         while( entry->name && !handled )
         {
@@ -329,7 +329,7 @@ ErrorCode ReadSmf::parse_line( char* ln )
 
 ErrorCode ReadSmf::check_length( int count, const std::vector< std::string >& argv )
 {
-    if( ( argv.size( ) < (unsigned)count ) || ( argv.size( ) > (unsigned)count && argv[ count ][ 0 ] != '#' ) )
+    if( ( argv.size() < (unsigned)count ) || ( argv.size() > (unsigned)count && argv[count][0] != '#' ) )
     { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Expect " << count << " arguments at line " << lineNo ); }
 
     return MB_SUCCESS;
@@ -343,7 +343,7 @@ ErrorCode ReadSmf::parse_doubles( int count, const std::vector< std::string >& a
     char* endptr;
     for( int i = 0; i < count; i++ )
     {
-        results[ i ] = strtod( argv[ i ].c_str( ), &endptr );
+        results[i] = strtod( argv[i].c_str(), &endptr );
         if( *endptr ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid vertex coordinates at line " << lineNo ); }
     }
 
@@ -352,15 +352,15 @@ ErrorCode ReadSmf::parse_doubles( int count, const std::vector< std::string >& a
 
 ErrorCode ReadSmf::vertex( std::vector< std::string >& argv )
 {
-    double    v[ 3 ];
+    double v[3];
     ErrorCode err = parse_doubles( 3, argv, v );
     if( MB_SUCCESS != err ) return err;
 
-    state.back( ).vertex( v );
+    state.back().vertex( v );
     ivar.next_vertex++;
     _numNodesInFile++;
     for( int j = 0; j < 3; j++ )
-        _coords.push_back( v[ j ] );
+        _coords.push_back( v[j] );
     // model->in_Vertex(v);
     return MB_SUCCESS;
 }
@@ -385,18 +385,18 @@ ErrorCode ReadSmf::face( std::vector< std::string >& argv )
     ErrorCode err = check_length( 3, argv );
     if( MB_SUCCESS != err ) return err;
 
-    int   vert[ 3 ] = { };
+    int vert[3] = {};
     char* endptr;
-    for( unsigned int i = 0; i < argv.size( ); i++ )
+    for( unsigned int i = 0; i < argv.size(); i++ )
     {
-        vert[ i ] = strtol( argv[ i ].c_str( ), &endptr, 0 );
+        vert[i] = strtol( argv[i].c_str(), &endptr, 0 );
         if( *endptr ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid face spec at line " << lineNo ); }
     }
 
-    state.back( ).face( vert, ivar );
+    state.back().face( vert, ivar );
     ivar.next_face++;
     for( int j = 0; j < 3; j++ )
-        _connec.push_back( vert[ j ] );
+        _connec.push_back( vert[j] );
     _numElementsInFile++;
 
     return MB_SUCCESS;
@@ -404,7 +404,7 @@ ErrorCode ReadSmf::face( std::vector< std::string >& argv )
 
 ErrorCode ReadSmf::begin( std::vector< std::string >& /*argv*/ )
 {
-    state.push_back( SMF_State( ivar, &state.back( ) ) );
+    state.push_back( SMF_State( ivar, &state.back() ) );
 
     return MB_SUCCESS;
 }
@@ -414,22 +414,22 @@ ErrorCode ReadSmf::end( std::vector< std::string >& /*argv*/ )
     // There must always be at least one state on the stack.
     // Don't let mismatched begin/end statements cause us
     // to read from an empty vector.
-    if( state.size( ) == 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "End w/out Begin at line " << lineNo ); }
+    if( state.size() == 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "End w/out Begin at line " << lineNo ); }
 
-    state.pop_back( );
+    state.pop_back();
 
     return MB_SUCCESS;
 }
 
 ErrorCode ReadSmf::set( std::vector< std::string >& argv )
 {
-    if( argv.size( ) < 2 || argv[ 0 ] != "vertex_coorection" ) return MB_SUCCESS;
+    if( argv.size() < 2 || argv[0] != "vertex_coorection" ) return MB_SUCCESS;
 
     char* endptr;
-    int   val = strtol( argv[ 1 ].c_str( ), &endptr, 0 );
+    int val = strtol( argv[1].c_str(), &endptr, 0 );
     if( *endptr ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid value at line " << lineNo ); }
 
-    state.back( ).set_vertex_correction( val );
+    state.back().set_vertex_correction( val );
 
     return MB_SUCCESS;
 }
@@ -448,26 +448,26 @@ ErrorCode ReadSmf::dec( std::vector< std::string >& )
 
 ErrorCode ReadSmf::trans( std::vector< std::string >& argv )
 {
-    double    v3[ 3 ];
+    double v3[3];
     ErrorCode err = parse_doubles( 3, argv, v3 );
     if( MB_SUCCESS != err ) return err;
 
     AffineXform M = AffineXform::translation( v3 );
     // Mat4 M = Mat4::trans(atof(argv(0)), atof(argv(1)), atof(argv(2)));
-    state.back( ).mmult( M );
+    state.back().mmult( M );
 
     return MB_SUCCESS;
 }
 
 ErrorCode ReadSmf::scale( std::vector< std::string >& argv )
 {
-    double    v3[ 3 ];
+    double v3[3];
     ErrorCode err = parse_doubles( 3, argv, v3 );
     if( MB_SUCCESS != err ) return err;
 
     AffineXform M = AffineXform::scale( v3 );
     // Mat4 M = Mat4::scale(atof(argv(0)), atof(argv(1)), atof(argv(2)));
-    state.back( ).mmult( M );
+    state.back().mmult( M );
 
     return MB_SUCCESS;
 }
@@ -477,20 +477,20 @@ ErrorCode ReadSmf::rot( std::vector< std::string >& argv )
     ErrorCode err = check_length( 2, argv );
     if( MB_SUCCESS != err ) return err;
 
-    double      axis[ 3 ] = { 0., 0., 0. };
-    std::string axisname = argv.front( );
-    argv.erase( argv.begin( ) );
-    if( axisname.size( ) != 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Malformed rotation command at line " << lineNo ); }
-    switch( axisname[ 0 ] )
+    double axis[3]       = { 0., 0., 0. };
+    std::string axisname = argv.front();
+    argv.erase( argv.begin() );
+    if( axisname.size() != 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Malformed rotation command at line " << lineNo ); }
+    switch( axisname[0] )
     {
         case 'x':
-            axis[ 0 ] = 1.;
+            axis[0] = 1.;
             break;
         case 'y':
-            axis[ 1 ] = 1.;
+            axis[1] = 1.;
             break;
         case 'z':
-            axis[ 2 ] = 1.;
+            axis[2] = 1.;
             break;
         default:
             MB_SET_ERR( MB_FILE_WRITE_ERROR, "Malformed rotation command at line " << lineNo );
@@ -502,7 +502,7 @@ ErrorCode ReadSmf::rot( std::vector< std::string >& argv )
     angle *= M_PI / 180.0;
 
     AffineXform M = AffineXform::rotation( angle, axis );
-    state.back( ).mmult( M );
+    state.back().mmult( M );
 
     return MB_SUCCESS;
 }
@@ -510,10 +510,10 @@ ErrorCode ReadSmf::rot( std::vector< std::string >& argv )
 ErrorCode ReadSmf::mmult( std::vector< std::string >& argv )
 {
     AffineXform mat;
-    ErrorCode   rval = parse_mat( argv, mat );
+    ErrorCode rval = parse_mat( argv, mat );
     if( MB_SUCCESS != rval ) return rval;
 
-    state.back( ).mmult( mat );
+    state.back().mmult( mat );
 
     return MB_SUCCESS;
 }
@@ -521,10 +521,10 @@ ErrorCode ReadSmf::mmult( std::vector< std::string >& argv )
 ErrorCode ReadSmf::mload( std::vector< std::string >& argv )
 {
     AffineXform mat;
-    ErrorCode   rval = parse_mat( argv, mat );
+    ErrorCode rval = parse_mat( argv, mat );
     if( MB_SUCCESS != rval ) return rval;
 
-    state.back( ).mload( mat );
+    state.back().mload( mat );
 
     return MB_SUCCESS;
 }

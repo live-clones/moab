@@ -11,8 +11,8 @@ using namespace MBMesquite;
 
 int main( int argc, char* argv[] )
 {
-    const double           zero = 0.0, one = 1.0;
-    double                 default_cpu_time = 0.0;
+    const double zero = 0.0, one = 1.0;
+    double default_cpu_time = 0.0;
     CLArgs::DoubleRangeArg movement_beta( &zero, &one ), cpu_time( default_cpu_time, &zero, 0 );
 
     CLArgs args( "msqshape", "Run Shape Improvement smoother for input mesh.",
@@ -32,12 +32,12 @@ int main( int argc, char* argv[] )
         args.print_usage( std::cerr );
         exit( 1 );
     }
-    std::string input_file = files[ 0 ];
-    std::string output_file = files[ 1 ];
+    std::string input_file  = files[0];
+    std::string output_file = files[1];
 
     MsqError err;
     MeshImpl mesh;
-    mesh.read_vtk( input_file.c_str( ), err );
+    mesh.read_vtk( input_file.c_str(), err );
     if( err )
     {
         std::cerr << "ERROR READING FILE: " << input_file << std::endl << err << std::endl;
@@ -46,8 +46,8 @@ int main( int argc, char* argv[] )
     MeshDomain* domain = process_domain_args( &mesh );
 
     ShapeImprover smoother;
-    if( movement_beta.seen( ) ) smoother.set_vertex_movement_limit_factor( movement_beta.value( ) );
-    if( cpu_time.seen( ) ) smoother.set_cpu_time_limit( cpu_time.value( ) );
+    if( movement_beta.seen() ) smoother.set_vertex_movement_limit_factor( movement_beta.value() );
+    if( cpu_time.seen() ) smoother.set_cpu_time_limit( cpu_time.value() );
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, domain );
     smoother.run_instructions( &mesh_and_domain, err );
     if( err )
@@ -56,7 +56,7 @@ int main( int argc, char* argv[] )
         return 3;
     }
 
-    mesh.write_vtk( output_file.c_str( ), err );
+    mesh.write_vtk( output_file.c_str(), err );
     if( err )
     {
         std::cerr << "ERROR WRITING FILE: " << output_file << std::endl << err << std::endl;

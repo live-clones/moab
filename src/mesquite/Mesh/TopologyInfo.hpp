@@ -42,17 +42,17 @@ class MESQUITE_EXPORT TopologyInfo
   public:
     static const char* name( EntityTopology topo )
     {
-        return topo > MIXED ? 0 : instance.longNames[ topo ];
+        return topo > MIXED ? 0 : instance.longNames[topo];
     }
     static const char* short_name( EntityTopology topo )
     {
-        return topo > MIXED ? 0 : instance.shortNames[ topo ];
+        return topo > MIXED ? 0 : instance.shortNames[topo];
     }
 
     /** \brief Dimension of element topology */
     static unsigned dimension( EntityTopology topo )
     {
-        return topo >= MIXED ? 0 : instance.dimMap[ topo ];
+        return topo >= MIXED ? 0 : instance.dimMap[topo];
     }
 
     /** \brief Number of adjacent entities of a specified dimension
@@ -62,7 +62,7 @@ class MESQUITE_EXPORT TopologyInfo
      */
     static unsigned adjacent( EntityTopology topo, unsigned dimension )
     {
-        return ( topo >= MIXED ) ? 0 : instance.adjMap[ topo ][ dimension ];
+        return ( topo >= MIXED ) ? 0 : instance.adjMap[topo][dimension];
     }
 
     /** \brief Get number of sides a given topology type has
@@ -74,9 +74,7 @@ class MESQUITE_EXPORT TopologyInfo
      */
     static unsigned sides( EntityTopology topo )
     {
-        return ( topo >= MIXED || instance.dimMap[ topo ] < 1 )
-                   ? 0
-                   : instance.adjMap[ topo ][ instance.dimMap[ topo ] - 1 ];
+        return ( topo >= MIXED || instance.dimMap[topo] < 1 ) ? 0 : instance.adjMap[topo][instance.dimMap[topo] - 1];
     }
 
     /** \brief Get the number of defining vertices for a given element topology
@@ -351,32 +349,32 @@ class MESQUITE_EXPORT TopologyInfo
   private:
     enum
     {
-        MAX_CORNER = 8,
-        MAX_EDGES = 12,
-        MAX_FACES = 6,
+        MAX_CORNER    = 8,
+        MAX_EDGES     = 12,
+        MAX_FACES     = 6,
         MAX_FACE_CONN = 5,
-        MAX_VERT_ADJ = 4,
-        FIRST_FACE = TRIANGLE,
-        LAST_FACE = QUADRILATERAL,
-        FIRST_VOL = TETRAHEDRON,
-        LAST_VOL = PYRAMID
+        MAX_VERT_ADJ  = 4,
+        FIRST_FACE    = TRIANGLE,
+        LAST_FACE     = QUADRILATERAL,
+        FIRST_VOL     = TETRAHEDRON,
+        LAST_VOL      = PYRAMID
     };
 
-    unsigned char dimMap[ MIXED ]; /**< Get dimension of entity given topology */
-    unsigned char adjMap[ MIXED ][ 4 ]; /**< Get number of adj entities of dimension 0, 1 and dimension 2 */
+    unsigned char dimMap[MIXED];    /**< Get dimension of entity given topology */
+    unsigned char adjMap[MIXED][4]; /**< Get number of adj entities of dimension 0, 1 and dimension 2 */
     /** Vertex indices for element edges */
-    unsigned edgeMap[ LAST_VOL - FIRST_FACE + 1 ][ MAX_EDGES ][ 2 ];
+    unsigned edgeMap[LAST_VOL - FIRST_FACE + 1][MAX_EDGES][2];
     /** Vertex indices for element faces */
-    unsigned faceMap[ LAST_VOL - FIRST_VOL + 1 ][ MAX_FACES ][ MAX_FACE_CONN ];
+    unsigned faceMap[LAST_VOL - FIRST_VOL + 1][MAX_FACES][MAX_FACE_CONN];
     /** Vertex-Vertex adjacency map */
-    unsigned vertAdjMap[ LAST_VOL - FIRST_FACE + 1 ][ MAX_CORNER ][ MAX_VERT_ADJ + 1 ];
+    unsigned vertAdjMap[LAST_VOL - FIRST_FACE + 1][MAX_CORNER][MAX_VERT_ADJ + 1];
     /** Reverse Vertex-Vertex adjacency index map */
-    unsigned revVertAdjIdx[ LAST_VOL - FIRST_FACE + 1 ][ MAX_CORNER ][ MAX_VERT_ADJ + 1 ];
+    unsigned revVertAdjIdx[LAST_VOL - FIRST_FACE + 1][MAX_CORNER][MAX_VERT_ADJ + 1];
 
-    const char* longNames[ MIXED + 1 ];
-    const char* shortNames[ MIXED + 1 ];
+    const char* longNames[MIXED + 1];
+    const char* shortNames[MIXED + 1];
 
-    TopologyInfo( );
+    TopologyInfo();
 
     static TopologyInfo instance;
 };

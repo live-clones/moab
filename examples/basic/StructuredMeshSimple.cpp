@@ -53,7 +53,7 @@ int main( int argc, char** argv )
     Interface* mb = new( std::nothrow ) Core;
     if( NULL == mb ) return 1;
     ScdInterface* scdiface;
-    ErrorCode     rval = mb->query_interface( scdiface );MB_CHK_ERR( rval );  // Get a ScdInterface object through moab instance
+    ErrorCode rval = mb->query_interface( scdiface );MB_CHK_ERR( rval );  // Get a ScdInterface object through moab instance
 
     // 1. Decide what the local parameters of the mesh will be, based on parallel/serial and rank.
 #ifdef MOAB_HAVE_MPI
@@ -86,19 +86,19 @@ int main( int argc, char** argv )
 #define MYSTREAM( a ) \
     if( !rank ) cout << a << endl
 
-    if( pow( N, dim ) == (int)elems.size( ) && pow( N + 1, dim ) == (int)verts.size( ) )
+    if( pow( N, dim ) == (int)elems.size() && pow( N + 1, dim ) == (int)verts.size() )
     {  // Expected #e and #v are N^d and (N+1)^d, resp.
 #ifdef MOAB_HAVE_MPI
         MYSTREAM( "Proc 0: " );
 #endif
-        MYSTREAM( "Created " << elems.size( ) << " " << CN::EntityTypeName( mb->type_from_handle( *elems.begin( ) ) )
-                             << " elements and " << verts.size( ) << " vertices." << endl );
+        MYSTREAM( "Created " << elems.size() << " " << CN::EntityTypeName( mb->type_from_handle( *elems.begin() ) )
+                             << " elements and " << verts.size() << " vertices." << endl );
     }
     else
         cout << "Created the wrong number of vertices or hexes!" << endl;
 
     // 4. Loop over elements in 3 nested loops over i, j, k; for each (i,j,k):
-    vector< double >       coords( 3 * pow( N + 1, dim ) );
+    vector< double > coords( 3 * pow( N + 1, dim ) );
     vector< EntityHandle > connect;
     for( int k = 0; k < ( dim > 2 ? N : 1 ); k++ )
     {
@@ -112,7 +112,7 @@ int main( int argc, char** argv )
                 // 4b. Get the connectivity of the element
                 rval = mb->get_connectivity( &ehandle, 1, connect );MB_CHK_ERR( rval );  // Get the connectivity, in canonical order
                 // 4c. Get the coordinates of the vertices comprising that element
-                rval = mb->get_coords( &connect[ 0 ], connect.size( ), &coords[ 0 ] );MB_CHK_ERR( rval );  // Get the coordinates of those vertices
+                rval = mb->get_coords( &connect[0], connect.size(), &coords[0] );MB_CHK_ERR( rval );  // Get the coordinates of those vertices
             }
         }
     }
@@ -121,7 +121,7 @@ int main( int argc, char** argv )
     mb->release_interface( scdiface );  // Tell MOAB we're done with the ScdInterface
 
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
 
     return 0;

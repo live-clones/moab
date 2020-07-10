@@ -53,18 +53,18 @@ struct TagDescription
         FIELD
     };
 
-    std::string   name;  //!< Tag name
+    std::string name;    //!< Tag name
     Mesh::TagType type;  //!< Tag data type
-    VtkType       vtkType;  //!< Attribute type from VTK file
-    size_t        size;  //!< Size of tag data (sizeof(type)*array_length)
-    std::string   member;  //!< Field member name for 1-member fields.
+    VtkType vtkType;     //!< Attribute type from VTK file
+    size_t size;         //!< Size of tag data (sizeof(type)*array_length)
+    std::string member;  //!< Field member name for 1-member fields.
 
     inline TagDescription( std::string n, Mesh::TagType t, VtkType v, size_t s, std::string m )
         : name( n ), type( t ), vtkType( v ), size( s ), member( m )
     {
     }
 
-    inline TagDescription( ) : type( Mesh::BYTE ), vtkType( NONE ), size( 0 ) {}
+    inline TagDescription() : type( Mesh::BYTE ), vtkType( NONE ), size( 0 ) {}
 
     inline bool operator==( const TagDescription& o ) const
     {
@@ -86,9 +86,9 @@ struct TagDescription
 class MeshImplTags
 {
   public:
-    ~MeshImplTags( )
+    ~MeshImplTags()
     {
-        clear( );
+        clear();
     }
 
     /** \class TagData
@@ -137,14 +137,14 @@ class MeshImplTags
         {
         }
 
-        ~TagData( );
+        ~TagData();
     };
 
     /** \brief Get the size of the passed data type */
     static size_t size_from_tag_type( Mesh::TagType type );
 
     /** \brief Clear all data */
-    void clear( );
+    void clear();
 
     /** \brief Get tag index from name */
     size_t handle( const std::string& name, MsqError& err ) const;
@@ -194,17 +194,17 @@ class MeshImplTags
     class TagIterator
     {
       public:
-        TagIterator( ) : tags( 0 ), index( 0 ) {}
+        TagIterator() : tags( 0 ), index( 0 ) {}
         TagIterator( MeshImplTags* d, size_t i ) : tags( d ), index( i ) {}
-        size_t operator*( ) const
+        size_t operator*() const
         {
             return index + 1;
         }
-        TagIterator operator++( );
-        TagIterator operator--( );
+        TagIterator operator++();
+        TagIterator operator--();
         TagIterator operator++( int );
         TagIterator operator--( int );
-        bool        operator==( TagIterator other ) const
+        bool operator==( TagIterator other ) const
         {
             return index == other.index;
         }
@@ -215,12 +215,12 @@ class MeshImplTags
 
       private:
         MeshImplTags* tags;
-        size_t        index;
+        size_t index;
     };
-    TagIterator tag_begin( );
-    TagIterator tag_end( )
+    TagIterator tag_begin();
+    TagIterator tag_end()
     {
-        return TagIterator( this, tagList.size( ) );
+        return TagIterator( this, tagList.size() );
     }
 
     /**\brief Check if any vertices have tag */

@@ -69,7 +69,7 @@ class MESQUITE_EXPORT ParallelMesh : virtual public Mesh
 
     /*! Get parallel helper
      */
-    virtual ParallelHelper* get_parallel_helper( )
+    virtual ParallelHelper* get_parallel_helper()
     {
         return helper;
     }
@@ -77,7 +77,7 @@ class MESQUITE_EXPORT ParallelMesh : virtual public Mesh
   protected:
     ParallelHelper* helper;
     //! Don't allow a ParallelMesh to be deleted directly.
-    virtual ~ParallelMesh( ) {}
+    virtual ~ParallelMesh() {}
 };
 }  // namespace MBMesquite
 

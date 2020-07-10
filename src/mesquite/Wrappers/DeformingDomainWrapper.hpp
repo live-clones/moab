@@ -82,9 +82,9 @@ class DeformingDomainWrapper : public Wrapper
 {
   public:
     MESQUITE_EXPORT
-    DeformingDomainWrapper( );
+    DeformingDomainWrapper();
 
-    MESQUITE_EXPORT virtual ~DeformingDomainWrapper( );
+    MESQUITE_EXPORT virtual ~DeformingDomainWrapper();
 
     /**\brief Specify tag used to get/set cached initial mesh vertex coordinates
      *
@@ -114,7 +114,7 @@ class DeformingDomainWrapper : public Wrapper
      * \c store_initial_mesh has been called, the the tag created by
      * \c store_initial_mesh .
      */
-    inline std::string get_initial_coord_tag( ) const
+    inline std::string get_initial_coord_tag() const
     {
         return initVertexCoords;
     }
@@ -138,9 +138,9 @@ class DeformingDomainWrapper : public Wrapper
     /**\brief Mesh characteristics to attempt to preserve */
     enum MeshCharacteristic
     {
-        SHAPE,  //!< Attempt to preserve element shape (TShapeNB1 metric)
-        SHAPE_SIZE,  //!< Attempt to preserve element shape and size (TShapeSize2DNB1 &
-                     //!< TShapeSize3DNB1)
+        SHAPE,             //!< Attempt to preserve element shape (TShapeNB1 metric)
+        SHAPE_SIZE,        //!< Attempt to preserve element shape and size (TShapeSize2DNB1 &
+                           //!< TShapeSize3DNB1)
         SHAPE_SIZE_ORIENT  //!< Attempt to preserve element shape, size, and orientation
                            //!< (TShapeSizeOrientNB1)
     };
@@ -160,13 +160,13 @@ class DeformingDomainWrapper : public Wrapper
         metricType = t;
     }
 
-    inline MeshCharacteristic get_mesh_characteristic( ) const
+    inline MeshCharacteristic get_mesh_characteristic() const
     {
         return metricType;
     }
 
     /**\brief Check if vertex culling will be used */
-    inline bool is_culling_enabled( ) const
+    inline bool is_culling_enabled() const
     {
         return doCulling;
     }
@@ -187,7 +187,7 @@ class DeformingDomainWrapper : public Wrapper
     }
 
     /**\brief No timeout */
-    inline void clear_cpu_time_limit( )
+    inline void clear_cpu_time_limit()
     {
         cpuTime = 0.0;
     }
@@ -212,7 +212,7 @@ class DeformingDomainWrapper : public Wrapper
     MESQUITE_EXPORT
     void set_vertex_movement_limit_factor( double f );
 
-    inline double get_vertex_movement_limit_factor( ) const
+    inline double get_vertex_movement_limit_factor() const
     {
         return movementFactor;
     }
@@ -227,9 +227,9 @@ class DeformingDomainWrapper : public Wrapper
 
   private:
     MeshCharacteristic metricType;
-    std::string        initVertexCoords;  //!< name of tag used to store coordinates of initial mesh
-    bool               doCulling;
-    double             cpuTime, movementFactor;
+    std::string initVertexCoords;  //!< name of tag used to store coordinates of initial mesh
+    bool doCulling;
+    double cpuTime, movementFactor;
 };
 
 /**\brief Utility to do curve smoothing
@@ -248,15 +248,15 @@ class DeformingCurveSmoother
 {
   public:
     MESQUITE_EXPORT
-    DeformingCurveSmoother( );
+    DeformingCurveSmoother();
 
     MESQUITE_EXPORT
-    ~DeformingCurveSmoother( );
+    ~DeformingCurveSmoother();
 
     /**\brief Mesh characteristics to attempt to preserve */
     enum Scheme
     {
-        EQUAL,  //!< space curve vertices equally
+        EQUAL,        //!< space curve vertices equally
         PROPORTIONAL  //!< preserve relative spacing from initial mesh
     };
 
@@ -279,7 +279,7 @@ class DeformingCurveSmoother
      * Return the tag handle passed to \c set_initial_fraction_tag or if
      * \c store_initial_mesh, the the tag created by in.
      */
-    inline std::string get_initial_fraction_tag( ) const
+    inline std::string get_initial_fraction_tag() const
     {
         return initFractTag;
     }
@@ -290,7 +290,7 @@ class DeformingCurveSmoother
         metricType = t;
     }
 
-    inline Scheme get_mesh_characteristic( ) const
+    inline Scheme get_mesh_characteristic() const
     {
         return metricType;
     }
@@ -351,9 +351,9 @@ class DeformingCurveSmoother
                        CurveDomain* geometry, Scheme type, MsqError& err );
 
   private:
-    Scheme      metricType;
+    Scheme metricType;
     std::string initFractTag;  //!< name of tag used to store arc length fractions
-    TagHandle   get_tag( Mesh* mesh, MsqError& err );
+    TagHandle get_tag( Mesh* mesh, MsqError& err );
 };
 
 }  // namespace MBMesquite

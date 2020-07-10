@@ -22,11 +22,11 @@ class NCWriteHOMME : public UcdNCWriteHelper
     {
     }
 
-    virtual ~NCWriteHOMME( );
+    virtual ~NCWriteHOMME();
 
   private:
     //! Implementation of NCWriteHelper::collect_mesh_info()
-    virtual ErrorCode collect_mesh_info( );
+    virtual ErrorCode collect_mesh_info();
 
     //! Collect data for specified variables
     virtual ErrorCode collect_variable_data( std::vector< std::string >& var_names, std::vector< int >& tstep_nums );

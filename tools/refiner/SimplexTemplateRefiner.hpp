@@ -42,17 +42,17 @@ class RefinerTagManager;
 class SimplexTemplateRefiner : public EntityRefiner
 {
   public:
-    SimplexTemplateRefiner( );
-    virtual ~SimplexTemplateRefiner( );
+    SimplexTemplateRefiner();
+    virtual ~SimplexTemplateRefiner();
 
-    virtual bool          refine_entity( EntityType etyp, EntityHandle entity );
+    virtual bool refine_entity( EntityType etyp, EntityHandle entity );
     virtual unsigned long get_heap_size_bound( int max_recursions ) const
     {
         return 48 * 4 * ( 1 << max_recursions ) + 8;
     }
 
-    virtual bool                set_tag_assigner( SimplexTemplateTagAssigner* ta );
-    SimplexTemplateTagAssigner* get_tag_assigner( ) const
+    virtual bool set_tag_assigner( SimplexTemplateTagAssigner* ta );
+    SimplexTemplateTagAssigner* get_tag_assigner() const
     {
         return this->tag_assigner;
     }
@@ -61,14 +61,14 @@ class SimplexTemplateRefiner : public EntityRefiner
 
   protected:
     SimplexTemplateTagAssigner* tag_assigner;
-    RefinerTagManager*          tag_manager;
-    std::vector< double >       corner_coords;
-    std::vector< void* >        corner_tags;
+    RefinerTagManager* tag_manager;
+    std::vector< double > corner_coords;
+    std::vector< void* > corner_tags;
     std::vector< EntityHandle > corner_handles;
-    bool                        input_is_output;
+    bool input_is_output;
 
-    static int template_index[ 64 ][ 2 ];
-    static int permutations_from_index[ 24 ][ 14 ];
+    static int template_index[64][2];
+    static int permutations_from_index[24][14];
     static int templates[];
 
     void refine_0_simplex( const double* v0, const void* t0, EntityHandle h0 );
@@ -81,9 +81,9 @@ class SimplexTemplateRefiner : public EntityRefiner
 
     int best_tets( int* alternates, double* [14], int, int )
     {
-        return alternates[ 0 ];
+        return alternates[0];
     }
-    void        assign_parametric_coordinates( int num_nodes, const double* src, double* tgt );
+    void assign_parametric_coordinates( int num_nodes, const double* src, double* tgt );
     static bool compare_Hopf_cross_string_dist( const double* v00, const double* v01, const double* v10,
                                                 const double* v11 );
 };

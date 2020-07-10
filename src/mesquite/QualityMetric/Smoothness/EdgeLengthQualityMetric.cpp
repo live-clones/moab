@@ -42,12 +42,12 @@
 
 using namespace MBMesquite;
 
-std::string EdgeLengthQualityMetric::get_name( ) const
+std::string EdgeLengthQualityMetric::get_name() const
 {
     return "Edge Length";
 }
 
-int EdgeLengthQualityMetric::get_negate_flag( ) const
+int EdgeLengthQualityMetric::get_negate_flag() const
 {
     return 1;
 }
@@ -58,12 +58,12 @@ bool EdgeLengthQualityMetric::evaluate_common( PatchData& pd, size_t this_vert, 
     fval = 0.0;
     pd.get_adjacent_vertex_indices( this_vert, adj_verts, err );
     MSQ_ERRZERO( err );
-    const unsigned   num_sample_points = adj_verts.size( );
-    double*          metric_values = new double[ num_sample_points ];
-    const MsqVertex* verts = pd.get_vertex_array( err );
+    const unsigned num_sample_points = adj_verts.size();
+    double* metric_values            = new double[num_sample_points];
+    const MsqVertex* verts           = pd.get_vertex_array( err );
     MSQ_ERRZERO( err );
     for( unsigned i = 0; i < num_sample_points; ++i )
-        metric_values[ i ] = ( verts[ this_vert ] - verts[ adj_verts[ i ] ] ).length( );
+        metric_values[i] = ( verts[this_vert] - verts[adj_verts[i]] ).length();
     fval = average_metrics( metric_values, num_sample_points, err );
     delete[] metric_values;
     return !MSQ_CHKERR( err );
@@ -72,27 +72,27 @@ bool EdgeLengthQualityMetric::evaluate_common( PatchData& pd, size_t this_vert, 
 bool EdgeLengthQualityMetric::evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err )
 {
     std::vector< size_t > verts;
-    bool                  rval = evaluate_common( pd, vertex, value, verts, err );
+    bool rval = evaluate_common( pd, vertex, value, verts, err );
     return !MSQ_CHKERR( err ) && rval;
 }
 
 bool EdgeLengthQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
                                                      std::vector< size_t >& indices, MsqError& err )
 {
-    indices.clear( );
+    indices.clear();
     bool rval = evaluate_common( pd, vertex, value, indices, err );
 
     std::vector< size_t >::iterator r, w;
-    for( r = w = indices.begin( ); r != indices.end( ); ++r )
+    for( r = w = indices.begin(); r != indices.end(); ++r )
     {
-        if( *r < pd.num_free_vertices( ) )
+        if( *r < pd.num_free_vertices() )
         {
             *w = *r;
             ++w;
         }
     }
-    indices.erase( w, indices.end( ) );
-    if( vertex < pd.num_free_vertices( ) ) indices.push_back( vertex );
+    indices.erase( w, indices.end() );
+    if( vertex < pd.num_free_vertices() ) indices.push_back( vertex );
 
     return !MSQ_CHKERR( err ) && rval;
 }

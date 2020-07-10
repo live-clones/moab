@@ -10,7 +10,7 @@ namespace moab
 // Return true if one is found.  False otherwise.
 bool check_for_flag( const char* str )
 {
-    if( str[ 0 ] == '-' )
+    if( str[0] == '-' )
         return true;
     else
         return false;
@@ -24,23 +24,23 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 {
     // Initialize some of the outputs to null values indicating not present
     // in the argument list.
-    gNormTag = "";
+    gNormTag  = "";
     ssNormTag = "";
-    readOpts = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;PARALLEL_"
+    readOpts  = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;PARALLEL_"
                "RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME";
-    outFile = "";
-    writeOpts = "PARALLEL=WRITE_PART;CPUTIME";
-    dbgFile = "";
-    std::string defaultDbgFile = argv[ 0 ];  // The executable name will be the default debug output file.
+    outFile                    = "";
+    writeOpts                  = "PARALLEL=WRITE_PART;CPUTIME";
+    dbgFile                    = "";
+    std::string defaultDbgFile = argv[0];  // The executable name will be the default debug output file.
 
     // These will indicate if we've gotten our required parameters at the end of parsing.
-    bool haveMeshes = false;
+    bool haveMeshes    = false;
     bool haveInterpTag = false;
 
     // Loop over the values in argv pulling out an parsing each one
     int npos = 1;
 
-    if( argc > 1 && argv[ 1 ] == std::string( "-h" ) )
+    if( argc > 1 && argv[1] == std::string( "-h" ) )
     {
         help = true;
         return MB_SUCCESS;
@@ -48,7 +48,7 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
     while( npos < argc )
     {
-        if( argv[ npos ] == std::string( "-meshes" ) )
+        if( argv[npos] == std::string( "-meshes" ) )
         {
             // Parse out the mesh filenames
             npos++;
@@ -56,8 +56,8 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
             meshFiles.resize( numFiles );
             for( int i = 0; i < numFiles; i++ )
             {
-                if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                    meshFiles[ i ] = argv[ npos++ ];
+                if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                    meshFiles[i] = argv[npos++];
                 else
                 {
                     std::cerr << "    ERROR - missing correct number of mesh filenames" << std::endl;
@@ -67,12 +67,12 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
             haveMeshes = true;
         }
-        else if( argv[ npos ] == std::string( "-itag" ) )
+        else if( argv[npos] == std::string( "-itag" ) )
         {
             // Parse out the interpolation tag
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                interpTag = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                interpTag = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <interp_tag>" << std::endl;
@@ -81,36 +81,36 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
             haveInterpTag = true;
         }
-        else if( argv[ npos ] == std::string( "-gnorm" ) )
+        else if( argv[npos] == std::string( "-gnorm" ) )
         {
             // Parse out the global normalization tag
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                gNormTag = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                gNormTag = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <gnorm_tag>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-ssnorm" ) )
+        else if( argv[npos] == std::string( "-ssnorm" ) )
         {
             // Parse out the subset normalization tag and selection criteria
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                ssNormTag = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                ssNormTag = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <ssnorm_tag>" << std::endl;
                 return MB_FAILURE;
             }
 
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
             {
-                char*                opts = argv[ npos++ ];
-                char                 sep1[ 1 ] = { ';' };
-                char                 sep2[ 1 ] = { '=' };
-                bool                 end_vals_seen = false;
+                char* opts         = argv[npos++];
+                char sep1[1]       = { ';' };
+                char sep2[1]       = { '=' };
+                bool end_vals_seen = false;
                 std::vector< char* > tmpTagOpts;
 
                 // first get the options
@@ -120,9 +120,9 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                 }
 
                 // parse out the name and val or just name.
-                for( unsigned int j = 0; j < tmpTagOpts.size( ); j++ )
+                for( unsigned int j = 0; j < tmpTagOpts.size(); j++ )
                 {
-                    char* e = strtok( tmpTagOpts[ j ], sep2 );
+                    char* e = strtok( tmpTagOpts[j], sep2 );
                     ssTagNames.push_back( e );
                     e = strtok( 0, sep2 );
                     if( e != NULL )
@@ -138,7 +138,7 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                         }
                         // Otherwise get the value string from e and convert it to an int
                         int* valp = new int;
-                        *valp = atoi( e );
+                        *valp     = atoi( e );
                         ssTagValues.push_back( (const char*)valp );
                     }
                     else
@@ -155,56 +155,56 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-ropts" ) )
+        else if( argv[npos] == std::string( "-ropts" ) )
         {
             // Parse out the mesh file read options
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                readOpts = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                readOpts = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <roptions>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-outfile" ) )
+        else if( argv[npos] == std::string( "-outfile" ) )
         {
             // Parse out the output file name
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                outFile = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                outFile = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <out_file>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-wopts" ) )
+        else if( argv[npos] == std::string( "-wopts" ) )
         {
             // Parse out the output file write options
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                writeOpts = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                writeOpts = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <woptions>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-dbgout" ) )
+        else if( argv[npos] == std::string( "-dbgout" ) )
         {
             // Parse out the debug output file name.
             // If no name then use the default.
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                dbgFile = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                dbgFile = argv[npos++];
             else
                 dbgFile = defaultDbgFile;
         }
         else
         {
             // Unrecognized parameter.  Skip it and move along.
-            std::cerr << "    ERROR - Unrecognized parameter:" << argv[ npos ] << std::endl;
+            std::cerr << "    ERROR - Unrecognized parameter:" << argv[npos] << std::endl;
             std::cerr << "            Skipping..." << std::endl;
             npos++;
         }
@@ -213,9 +213,9 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
     if( !haveMeshes )
     {
         meshFiles.resize( 2 );
-        meshFiles[ 0 ] = std::string( TestDir + "/64bricks_1khex.h5m" );
-        meshFiles[ 1 ] = std::string( TestDir + "/64bricks_12ktet.h5m" );
-        std::cout << "Mesh files not entered; using default files " << meshFiles[ 0 ] << " and " << meshFiles[ 1 ]
+        meshFiles[0] = std::string( TestDir + "/64bricks_1khex.h5m" );
+        meshFiles[1] = std::string( TestDir + "/64bricks_12ktet.h5m" );
+        std::cout << "Mesh files not entered; using default files " << meshFiles[0] << " and " << meshFiles[1]
                   << std::endl;
     }
 

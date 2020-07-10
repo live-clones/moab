@@ -19,7 +19,7 @@ namespace moab
 /*Get Merge Data and tolerance*/
 ParallelMergeMesh::ParallelMergeMesh( ParallelComm* pc, const double epsilon ) : myPcomm( pc ), myEps( epsilon )
 {
-    myMB = pc->get_moab( );
+    myMB = pc->get_moab();
     mySkinEnts.resize( 4 );
 }
 
@@ -27,8 +27,9 @@ ParallelMergeMesh::ParallelMergeMesh( ParallelComm* pc, const double epsilon ) :
 // Merges elements within a proximity of epsilon
 ErrorCode ParallelMergeMesh::merge( EntityHandle levelset, bool skip_local_merge, int dim )
 {
-    ErrorCode rval = PerformMerge( levelset, skip_local_merge, dim );MB_CHK_ERR( rval );
-    CleanUp( );
+    ErrorCode rval = PerformMerge( levelset, skip_local_merge, dim );
+    MB_CHK_ERR( rval );
+    CleanUp();
     return rval;
 }
 
@@ -39,26 +40,29 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
     ErrorCode rval;
     if( dim < 0 )
     {
-        rval = myMB->get_dimension( dim );MB_CHK_ERR( rval );
+        rval = myMB->get_dimension( dim );
+        MB_CHK_ERR( rval );
     }
 
     // Get the local skin elements
     rval = PopulateMySkinEnts( levelset, dim, skip_local_merge );
     // If there is only 1 proc, we can return now
-    if( rval != MB_SUCCESS || myPcomm->size( ) == 1 ) { return rval; }
+    if( rval != MB_SUCCESS || myPcomm->size() == 1 ) { return rval; }
 
     // Determine the global bounding box
-    double gbox[ 6 ];
-    rval = GetGlobalBox( gbox );MB_CHK_ERR( rval );
+    double gbox[6];
+    rval = GetGlobalBox( gbox );
+    MB_CHK_ERR( rval );
 
     /* Assemble The Destination Tuples */
     // Get a list of tuples which contain (toProc, handle, x,y,z)
-    myTup.initialize( 1, 0, 1, 3, mySkinEnts[ 0 ].size( ) );
-    rval = PopulateMyTup( gbox );MB_CHK_ERR( rval );
+    myTup.initialize( 1, 0, 1, 3, mySkinEnts[0].size() );
+    rval = PopulateMyTup( gbox );
+    MB_CHK_ERR( rval );
 
     /* Gather-Scatter Tuple
        -tup comes out as (remoteProc,handle,x,y,z) */
-    myCD.initialize( myPcomm->comm( ) );
+    myCD.initialize( myPcomm->comm() );
 
     // 1 represents dynamic tuple, 0 represents index of the processor to send to
     myCD.gs_transfer( 1, myTup, 0 );
@@ -68,28 +72,30 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
     SortTuplesByReal( myTup, myEps );
 
     // Initialize another tuple list for matches
-    myMatches.initialize( 2, 0, 2, 0, mySkinEnts[ 0 ].size( ) );
+    myMatches.initialize( 2, 0, 2, 0, mySkinEnts[0].size() );
 
     // ID the matching tuples
-    rval = PopulateMyMatches( );MB_CHK_ERR( rval );
+    rval = PopulateMyMatches();
+    MB_CHK_ERR( rval );
 
     // We can free up the tuple myTup now
-    myTup.reset( );
+    myTup.reset();
 
     /*Gather-Scatter Again*/
     // 1 represents dynamic list, 0 represents proc index to send tuple to
     myCD.gs_transfer( 1, myMatches, 0 );
     // We can free up the crystal router now
-    myCD.reset( );
+    myCD.reset();
 
     // Sort the matches tuple list
-    SortMyMatches( );
+    SortMyMatches();
 
     // Tag the shared elements
-    rval = TagSharedElements( dim );MB_CHK_ERR( rval );
+    rval = TagSharedElements( dim );
+    MB_CHK_ERR( rval );
 
     // Free up the matches tuples
-    myMatches.reset( );
+    myMatches.reset();
     return rval;
 }
 
@@ -98,13 +104,15 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
 {
     /*Merge Mesh Locally*/
     // Get all dim dimensional entities
-    Range     ents;
-    ErrorCode rval = myMB->get_entities_by_dimension( meshset, dim, ents );MB_CHK_ERR( rval );
+    Range ents;
+    ErrorCode rval = myMB->get_entities_by_dimension( meshset, dim, ents );
+    MB_CHK_ERR( rval );
 
-    if( ents.empty( ) && dim == 3 )
+    if( ents.empty() && dim == 3 )
     {
         dim--;
-        rval = myMB->get_entities_by_dimension( meshset, dim, ents );MB_CHK_ERR( rval );  // maybe dimension 2
+        rval = myMB->get_entities_by_dimension( meshset, dim, ents );
+        MB_CHK_ERR( rval );  // maybe dimension 2
     }
 
     // Merge Mesh Locally
@@ -113,11 +121,12 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
         MergeMesh merger( myMB, false );
         merger.merge_entities( ents, myEps );
         // We can return if there is only 1 proc
-        if( rval != MB_SUCCESS || myPcomm->size( ) == 1 ) { return rval; }
+        if( rval != MB_SUCCESS || myPcomm->size() == 1 ) { return rval; }
 
         // Rebuild the ents range
-        ents.clear( );
-        rval = myMB->get_entities_by_dimension( meshset, dim, ents );MB_CHK_ERR( rval );
+        ents.clear();
+        rval = myMB->get_entities_by_dimension( meshset, dim, ents );
+        MB_CHK_ERR( rval );
     }
 
     /*Get Skin
@@ -126,7 +135,8 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
     Skinner skinner( myMB );
     for( int skin_dim = dim; skin_dim >= 0; skin_dim-- )
     {
-        rval = skinner.find_skin( meshset, ents, skin_dim, mySkinEnts[ skin_dim ] );MB_CHK_ERR( rval );
+        rval = skinner.find_skin( meshset, ents, skin_dim, mySkinEnts[skin_dim] );
+        MB_CHK_ERR( rval );
     }
     return MB_SUCCESS;
 }
@@ -138,9 +148,10 @@ ErrorCode ParallelMergeMesh::GetGlobalBox( double* gbox )
 
     /*Get Bounding Box*/
     BoundBox box;
-    if( mySkinEnts[ 0 ].size( ) != 0 )
+    if( mySkinEnts[0].size() != 0 )
     {
-        rval = box.update( *myMB, mySkinEnts[ 0 ] );MB_CHK_ERR( rval );
+        rval = box.update( *myMB, mySkinEnts[0] );
+        MB_CHK_ERR( rval );
     }
 
     // Invert the max
@@ -153,7 +164,7 @@ ErrorCode ParallelMergeMesh::GetGlobalBox( double* gbox )
     // Flip the max back
     for( int i = 3; i < 6; i++ )
     {
-        gbox[ i ] *= -1;
+        gbox[i] *= -1;
     }
     return MB_SUCCESS;
 }
@@ -162,15 +173,16 @@ ErrorCode ParallelMergeMesh::GetGlobalBox( double* gbox )
 ErrorCode ParallelMergeMesh::PopulateMyTup( double* gbox )
 {
     /*Figure out how do partition the global box*/
-    double    lengths[ 3 ];
-    int       parts[ 3 ];
-    ErrorCode rval = PartitionGlobalBox( gbox, lengths, parts );MB_CHK_ERR( rval );
+    double lengths[3];
+    int parts[3];
+    ErrorCode rval = PartitionGlobalBox( gbox, lengths, parts );
+    MB_CHK_ERR( rval );
 
     /* Get Skin Coordinates, Vertices */
-    double* x = new double[ mySkinEnts[ 0 ].size( ) ];
-    double* y = new double[ mySkinEnts[ 0 ].size( ) ];
-    double* z = new double[ mySkinEnts[ 0 ].size( ) ];
-    rval = myMB->get_coords( mySkinEnts[ 0 ], x, y, z );
+    double* x = new double[mySkinEnts[0].size()];
+    double* y = new double[mySkinEnts[0].size()];
+    double* z = new double[mySkinEnts[0].size()];
+    rval      = myMB->get_coords( mySkinEnts[0], x, y, z );
     if( rval != MB_SUCCESS )
     {
         // Prevent Memory Leak
@@ -182,40 +194,40 @@ ErrorCode ParallelMergeMesh::PopulateMyTup( double* gbox )
 
     // Initialize variable to be used in the loops
     std::vector< int > toProcs;
-    int                xPart, yPart, zPart, xEps, yEps, zEps, baseProc;
+    int xPart, yPart, zPart, xEps, yEps, zEps, baseProc;
     unsigned long long tup_i = 0, tup_ul = 0, tup_r = 0, count = 0;
     // These are boolean to determine if the vertex is on close enough to a given border
     bool xDup, yDup, zDup;
-    bool canWrite = myTup.get_writeEnabled( );
-    if( !canWrite ) myTup.enableWriteAccess( );
+    bool canWrite = myTup.get_writeEnabled();
+    if( !canWrite ) myTup.enableWriteAccess();
     // Go through each vertex
-    for( Range::iterator it = mySkinEnts[ 0 ].begin( ); it != mySkinEnts[ 0 ].end( ); ++it )
+    for( Range::iterator it = mySkinEnts[0].begin(); it != mySkinEnts[0].end(); ++it )
     {
         xDup = false;
         yDup = false;
         zDup = false;
         // Figure out which x,y,z partition the element is in.
-        xPart = static_cast< int >( floor( ( x[ count ] - gbox[ 0 ] ) / lengths[ 0 ] ) );
-        xPart = ( xPart < parts[ 0 ] ? xPart : parts[ 0 ] - 1 );  // Make sure it stays within the bounds
+        xPart = static_cast< int >( floor( ( x[count] - gbox[0] ) / lengths[0] ) );
+        xPart = ( xPart < parts[0] ? xPart : parts[0] - 1 );  // Make sure it stays within the bounds
 
-        yPart = static_cast< int >( floor( ( y[ count ] - gbox[ 1 ] ) / lengths[ 1 ] ) );
-        yPart = ( yPart < parts[ 1 ] ? yPart : parts[ 1 ] - 1 );  // Make sure it stays within the bounds
+        yPart = static_cast< int >( floor( ( y[count] - gbox[1] ) / lengths[1] ) );
+        yPart = ( yPart < parts[1] ? yPart : parts[1] - 1 );  // Make sure it stays within the bounds
 
-        zPart = static_cast< int >( floor( ( z[ count ] - gbox[ 2 ] ) / lengths[ 2 ] ) );
-        zPart = ( zPart < parts[ 2 ] ? zPart : parts[ 2 ] - 1 );  // Make sure it stays within the bounds
+        zPart = static_cast< int >( floor( ( z[count] - gbox[2] ) / lengths[2] ) );
+        zPart = ( zPart < parts[2] ? zPart : parts[2] - 1 );  // Make sure it stays within the bounds
 
         // Figure out the partition with the addition of Epsilon
-        xEps = static_cast< int >( floor( ( x[ count ] - gbox[ 0 ] + myEps ) / lengths[ 0 ] ) );
-        yEps = static_cast< int >( floor( ( y[ count ] - gbox[ 1 ] + myEps ) / lengths[ 1 ] ) );
-        zEps = static_cast< int >( floor( ( z[ count ] - gbox[ 2 ] + myEps ) / lengths[ 2 ] ) );
+        xEps = static_cast< int >( floor( ( x[count] - gbox[0] + myEps ) / lengths[0] ) );
+        yEps = static_cast< int >( floor( ( y[count] - gbox[1] + myEps ) / lengths[1] ) );
+        zEps = static_cast< int >( floor( ( z[count] - gbox[2] + myEps ) / lengths[2] ) );
 
         // Figure out if the vertex needs to be sent to multiple procs
-        xDup = ( xPart != xEps && xEps < parts[ 0 ] );
-        yDup = ( yPart != yEps && yEps < parts[ 1 ] );
-        zDup = ( zPart != zEps && zEps < parts[ 2 ] );
+        xDup = ( xPart != xEps && xEps < parts[0] );
+        yDup = ( yPart != yEps && yEps < parts[1] );
+        zDup = ( zPart != zEps && zEps < parts[2] );
 
         // Add appropriate processors to the vector
-        baseProc = xPart + yPart * parts[ 0 ] + zPart * parts[ 0 ] * parts[ 1 ];
+        baseProc = xPart + yPart * parts[0] + zPart * parts[0] * parts[1];
         toProcs.push_back( baseProc );
         if( xDup )
         {
@@ -224,56 +236,56 @@ ErrorCode ParallelMergeMesh::PopulateMyTup( double* gbox )
         if( yDup )
         {
             // Partition up 1
-            toProcs.push_back( baseProc + parts[ 0 ] );
+            toProcs.push_back( baseProc + parts[0] );
         }
         if( zDup )
         {
             // Partition above 1
-            toProcs.push_back( baseProc + parts[ 0 ] * parts[ 1 ] );
+            toProcs.push_back( baseProc + parts[0] * parts[1] );
         }
         if( xDup && yDup )
         {
             // Partition up 1 and right 1
-            toProcs.push_back( baseProc + parts[ 0 ] + 1 );
+            toProcs.push_back( baseProc + parts[0] + 1 );
         }
         if( xDup && zDup )
         {
             // Partition right 1 and above 1
-            toProcs.push_back( baseProc + parts[ 0 ] * parts[ 1 ] + 1 );
+            toProcs.push_back( baseProc + parts[0] * parts[1] + 1 );
         }
         if( yDup && zDup )
         {
             // Partition up 1 and above 1
-            toProcs.push_back( baseProc + parts[ 0 ] * parts[ 1 ] + parts[ 0 ] );
+            toProcs.push_back( baseProc + parts[0] * parts[1] + parts[0] );
         }
         if( xDup && yDup && zDup )
         {
             // Partition right 1, up 1, and above 1
-            toProcs.push_back( baseProc + parts[ 0 ] * parts[ 1 ] + parts[ 0 ] + 1 );
+            toProcs.push_back( baseProc + parts[0] * parts[1] + parts[0] + 1 );
         }
         // Grow the tuple list if necessary
-        while( myTup.get_n( ) + toProcs.size( ) >= myTup.get_max( ) )
+        while( myTup.get_n() + toProcs.size() >= myTup.get_max() )
         {
-            myTup.resize( myTup.get_max( ) ? myTup.get_max( ) + myTup.get_max( ) / 2 + 1 : 2 );
+            myTup.resize( myTup.get_max() ? myTup.get_max() + myTup.get_max() / 2 + 1 : 2 );
         }
 
         // Add each proc as a tuple
-        for( std::vector< int >::iterator proc = toProcs.begin( ); proc != toProcs.end( ); ++proc )
+        for( std::vector< int >::iterator proc = toProcs.begin(); proc != toProcs.end(); ++proc )
         {
-            myTup.vi_wr[ tup_i++ ] = *proc;
-            myTup.vul_wr[ tup_ul++ ] = *it;
-            myTup.vr_wr[ tup_r++ ] = x[ count ];
-            myTup.vr_wr[ tup_r++ ] = y[ count ];
-            myTup.vr_wr[ tup_r++ ] = z[ count ];
-            myTup.inc_n( );
+            myTup.vi_wr[tup_i++]   = *proc;
+            myTup.vul_wr[tup_ul++] = *it;
+            myTup.vr_wr[tup_r++]   = x[count];
+            myTup.vr_wr[tup_r++]   = y[count];
+            myTup.vr_wr[tup_r++]   = z[count];
+            myTup.inc_n();
         }
         count++;
-        toProcs.clear( );
+        toProcs.clear();
     }
     delete[] x;
     delete[] y;
     delete[] z;
-    if( !canWrite ) myTup.disableWriteAccess( );
+    if( !canWrite ) myTup.disableWriteAccess();
     return MB_SUCCESS;
 }
 
@@ -281,71 +293,71 @@ ErrorCode ParallelMergeMesh::PopulateMyTup( double* gbox )
 ErrorCode ParallelMergeMesh::PartitionGlobalBox( double* gbox, double* lengths, int* parts )
 {
     // Determine the length of each side
-    double   xLen = gbox[ 3 ] - gbox[ 0 ];
-    double   yLen = gbox[ 4 ] - gbox[ 1 ];
-    double   zLen = gbox[ 5 ] - gbox[ 2 ];
-    unsigned numProcs = myPcomm->size( );
+    double xLen       = gbox[3] - gbox[0];
+    double yLen       = gbox[4] - gbox[1];
+    double zLen       = gbox[5] - gbox[2];
+    unsigned numProcs = myPcomm->size();
 
     // Partition sides from the longest to shortest lengths
     // If x is the longest side
     if( xLen >= yLen && xLen >= zLen )
     {
-        parts[ 0 ] = PartitionSide( xLen, yLen * zLen, numProcs, true );
-        numProcs /= parts[ 0 ];
+        parts[0] = PartitionSide( xLen, yLen * zLen, numProcs, true );
+        numProcs /= parts[0];
         // If y is second longest
         if( yLen >= zLen )
         {
-            parts[ 1 ] = PartitionSide( yLen, zLen, numProcs, false );
-            parts[ 2 ] = numProcs / parts[ 1 ];
+            parts[1] = PartitionSide( yLen, zLen, numProcs, false );
+            parts[2] = numProcs / parts[1];
         }
         // If z is the longer
         else
         {
-            parts[ 2 ] = PartitionSide( zLen, yLen, numProcs, false );
-            parts[ 1 ] = numProcs / parts[ 2 ];
+            parts[2] = PartitionSide( zLen, yLen, numProcs, false );
+            parts[1] = numProcs / parts[2];
         }
     }
     // If y is the longest side
     else if( yLen >= zLen )
     {
-        parts[ 1 ] = PartitionSide( yLen, xLen * zLen, numProcs, true );
-        numProcs /= parts[ 1 ];
+        parts[1] = PartitionSide( yLen, xLen * zLen, numProcs, true );
+        numProcs /= parts[1];
         // If x is the second longest
         if( xLen >= zLen )
         {
-            parts[ 0 ] = PartitionSide( xLen, zLen, numProcs, false );
-            parts[ 2 ] = numProcs / parts[ 0 ];
+            parts[0] = PartitionSide( xLen, zLen, numProcs, false );
+            parts[2] = numProcs / parts[0];
         }
         // If z is the second longest
         else
         {
-            parts[ 2 ] = PartitionSide( zLen, xLen, numProcs, false );
-            parts[ 0 ] = numProcs / parts[ 2 ];
+            parts[2] = PartitionSide( zLen, xLen, numProcs, false );
+            parts[0] = numProcs / parts[2];
         }
     }
     // If z is the longest side
     else
     {
-        parts[ 2 ] = PartitionSide( zLen, xLen * yLen, numProcs, true );
-        numProcs /= parts[ 2 ];
+        parts[2] = PartitionSide( zLen, xLen * yLen, numProcs, true );
+        numProcs /= parts[2];
         // If x is the second longest
         if( xLen >= yLen )
         {
-            parts[ 0 ] = PartitionSide( xLen, yLen, numProcs, false );
-            parts[ 1 ] = numProcs / parts[ 0 ];
+            parts[0] = PartitionSide( xLen, yLen, numProcs, false );
+            parts[1] = numProcs / parts[0];
         }
         // If y is the second longest
         else
         {
-            parts[ 1 ] = PartitionSide( yLen, xLen, numProcs, false );
-            parts[ 0 ] = numProcs / parts[ 1 ];
+            parts[1] = PartitionSide( yLen, xLen, numProcs, false );
+            parts[0] = numProcs / parts[1];
         }
     }
 
     // Divide up each side to give the lengths
-    lengths[ 0 ] = xLen / (double)parts[ 0 ];
-    lengths[ 1 ] = yLen / (double)parts[ 1 ];
-    lengths[ 2 ] = zLen / (double)parts[ 2 ];
+    lengths[0] = xLen / (double)parts[0];
+    lengths[1] = yLen / (double)parts[1];
+    lengths[2] = zLen / (double)parts[2];
     return MB_SUCCESS;
 }
 
@@ -355,10 +367,10 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
     // If theres only 1 processor, then just return 1
     if( numProcs == 1 ) { return 1; }
     // Initialize with the ratio of 1 proc
-    double   ratio = -DBL_MAX;
+    double ratio    = -DBL_MAX;
     unsigned factor = 1;
     // We need to be able to save the last ratio and factor (for comparison)
-    double oldRatio = ratio;
+    double oldRatio  = ratio;
     double oldFactor = 1;
 
     // This is the ratio were shooting for
@@ -370,12 +382,12 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
     if( altRatio )
     {
         divisor = (double)numProcs * sideLen;
-        p = 3;
+        p       = 3;
     }
     else
     {
         divisor = (double)numProcs;
-        p = 2;
+        p       = 2;
     }
 
     // Find each possible factor
@@ -385,7 +397,7 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
         if( numProcs % i == 0 )
         {
             // We need to save the past factor
-            oldRatio = ratio;
+            oldRatio  = ratio;
             oldFactor = factor;
             // There are 2 different ways to calculate the ratio:
             // Comparing 1 side to 2 sides: (i*i*i)/(numProcs*x)
@@ -394,7 +406,7 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
             // x/(yz) == (kx)/(kyz) == (kx)/(kykz(1/k)) == a/(bc(x/a)) == a/((n/a)(x/a)) == a^3/(nx).
             // Comparing 1 side to 1 side: (i*i)/numprocs
             // Justification: i/(n/i) == i^2/n
-            ratio = pow( (double)i, p ) / divisor;
+            ratio  = pow( (double)i, p ) / divisor;
             factor = i;
             // Once we have passed the goal ratio, we can break since we'll only move away from the
             // goal ratio
@@ -404,10 +416,10 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
     // If we haven't reached the goal ratio yet, check out factor = numProcs
     if( ratio < goalRatio )
     {
-        oldRatio = ratio;
+        oldRatio  = ratio;
         oldFactor = factor;
-        factor = numProcs;
-        ratio = pow( (double)numProcs, p ) / divisor;
+        factor    = numProcs;
+        ratio     = pow( (double)numProcs, p ) / divisor;
     }
 
     // Figure out if our oldRatio is better than ratio
@@ -417,36 +429,36 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
 }
 
 // Id the tuples that are matching
-ErrorCode ParallelMergeMesh::PopulateMyMatches( )
+ErrorCode ParallelMergeMesh::PopulateMyMatches()
 {
     // Counters for accessing tuples more efficiently
     unsigned long i = 0, mat_i = 0, mat_ul = 0, j = 0, tup_r = 0;
-    double        eps2 = myEps * myEps;
+    double eps2 = myEps * myEps;
 
     uint tup_mi, tup_ml, tup_mul, tup_mr;
     myTup.getTupleSize( tup_mi, tup_ml, tup_mul, tup_mr );
 
-    bool canWrite = myMatches.get_writeEnabled( );
-    if( !canWrite ) myMatches.enableWriteAccess( );
+    bool canWrite = myMatches.get_writeEnabled();
+    if( !canWrite ) myMatches.enableWriteAccess();
 
-    while( ( i + 1 ) < myTup.get_n( ) )
+    while( ( i + 1 ) < myTup.get_n() )
     {
         // Proximity Comparison
-        double xi = myTup.vr_rd[ tup_r ], yi = myTup.vr_rd[ tup_r + 1 ], zi = myTup.vr_rd[ tup_r + 2 ];
+        double xi = myTup.vr_rd[tup_r], yi = myTup.vr_rd[tup_r + 1], zi = myTup.vr_rd[tup_r + 2];
 
         bool done = false;
         while( !done )
         {
             j++;
             tup_r += tup_mr;
-            if( j >= myTup.get_n( ) ) { break; }
-            CartVect cv( myTup.vr_rd[ tup_r ] - xi, myTup.vr_rd[ tup_r + 1 ] - yi, myTup.vr_rd[ tup_r + 2 ] - zi );
-            if( cv.length_squared( ) > eps2 ) { done = true; }
+            if( j >= myTup.get_n() ) { break; }
+            CartVect cv( myTup.vr_rd[tup_r] - xi, myTup.vr_rd[tup_r + 1] - yi, myTup.vr_rd[tup_r + 2] - zi );
+            if( cv.length_squared() > eps2 ) { done = true; }
         }
         // Allocate the tuple list before adding matches
-        while( myMatches.get_n( ) + ( j - i ) * ( j - i - 1 ) >= myMatches.get_max( ) )
+        while( myMatches.get_n() + ( j - i ) * ( j - i - 1 ) >= myMatches.get_max() )
         {
-            myMatches.resize( myMatches.get_max( ) ? myMatches.get_max( ) + myMatches.get_max( ) / 2 + 1 : 2 );
+            myMatches.resize( myMatches.get_max() ? myMatches.get_max() + myMatches.get_max() / 2 + 1 : 2 );
         }
 
         // We now know that tuples [i to j) exclusive match.
@@ -454,25 +466,25 @@ ErrorCode ParallelMergeMesh::PopulateMyMatches( )
         // tuples are of the form (proc1,proc2,handle1,handle2)
         if( i + 1 < j )
         {
-            int           kproc = i * tup_mi;
+            int kproc           = i * tup_mi;
             unsigned long khand = i * tup_mul;
             for( unsigned long k = i; k < j; k++ )
             {
-                int           lproc = kproc + tup_mi;
+                int lproc           = kproc + tup_mi;
                 unsigned long lhand = khand + tup_mul;
                 for( unsigned long l = k + 1; l < j; l++ )
                 {
-                    myMatches.vi_wr[ mat_i++ ] = myTup.vi_rd[ kproc ];  // proc1
-                    myMatches.vi_wr[ mat_i++ ] = myTup.vi_rd[ lproc ];  // proc2
-                    myMatches.vul_wr[ mat_ul++ ] = myTup.vul_rd[ khand ];  // handle1
-                    myMatches.vul_wr[ mat_ul++ ] = myTup.vul_rd[ lhand ];  // handle2
-                    myMatches.inc_n( );
+                    myMatches.vi_wr[mat_i++]   = myTup.vi_rd[kproc];   // proc1
+                    myMatches.vi_wr[mat_i++]   = myTup.vi_rd[lproc];   // proc2
+                    myMatches.vul_wr[mat_ul++] = myTup.vul_rd[khand];  // handle1
+                    myMatches.vul_wr[mat_ul++] = myTup.vul_rd[lhand];  // handle2
+                    myMatches.inc_n();
 
-                    myMatches.vi_wr[ mat_i++ ] = myTup.vi_rd[ lproc ];  // proc1
-                    myMatches.vi_wr[ mat_i++ ] = myTup.vi_rd[ kproc ];  // proc2
-                    myMatches.vul_wr[ mat_ul++ ] = myTup.vul_rd[ lhand ];  // handle1
-                    myMatches.vul_wr[ mat_ul++ ] = myTup.vul_rd[ khand ];  // handle2
-                    myMatches.inc_n( );
+                    myMatches.vi_wr[mat_i++]   = myTup.vi_rd[lproc];   // proc1
+                    myMatches.vi_wr[mat_i++]   = myTup.vi_rd[kproc];   // proc2
+                    myMatches.vul_wr[mat_ul++] = myTup.vul_rd[lhand];  // handle1
+                    myMatches.vul_wr[mat_ul++] = myTup.vul_rd[khand];  // handle2
+                    myMatches.inc_n();
                     lproc += tup_mi;
                     lhand += tup_mul;
                 }
@@ -483,14 +495,14 @@ ErrorCode ParallelMergeMesh::PopulateMyMatches( )
         i = j;
     }  // End while(i+1<tup.n)
 
-    if( !canWrite ) myMatches.disableWriteAccess( );
+    if( !canWrite ) myMatches.disableWriteAccess();
     return MB_SUCCESS;
 }
 
 // Sort the matching tuples so that vertices can be tagged accurately
-ErrorCode ParallelMergeMesh::SortMyMatches( )
+ErrorCode ParallelMergeMesh::SortMyMatches()
 {
-    TupleList::buffer buf( mySkinEnts[ 0 ].size( ) );
+    TupleList::buffer buf( mySkinEnts[0].size() );
     // Sorts are necessary to check for doubles
     // Sort by remote handle
     myMatches.sort( 3, &buf );
@@ -498,7 +510,7 @@ ErrorCode ParallelMergeMesh::SortMyMatches( )
     myMatches.sort( 1, &buf );
     // Sort by local handle
     myMatches.sort( 2, &buf );
-    buf.reset( );
+    buf.reset();
     return MB_SUCCESS;
 }
 
@@ -507,32 +519,32 @@ ErrorCode ParallelMergeMesh::TagSharedElements( int dim )
 {
     // Manipulate the matches list to tag vertices and entities
     // Set up proc ents
-    Range     proc_ents;
+    Range proc_ents;
     ErrorCode rval;
 
     // get the entities in the partition sets
-    for( Range::iterator rit = myPcomm->partitionSets.begin( ); rit != myPcomm->partitionSets.end( ); ++rit )
+    for( Range::iterator rit = myPcomm->partitionSets.begin(); rit != myPcomm->partitionSets.end(); ++rit )
     {
         Range tmp_ents;
         rval = myMB->get_entities_by_handle( *rit, tmp_ents, true );
         if( MB_SUCCESS != rval ) { return rval; }
         proc_ents.merge( tmp_ents );
     }
-    if( myMB->dimension_from_handle( *proc_ents.rbegin( ) ) != myMB->dimension_from_handle( *proc_ents.begin( ) ) )
+    if( myMB->dimension_from_handle( *proc_ents.rbegin() ) != myMB->dimension_from_handle( *proc_ents.begin() ) )
     {
-        Range::iterator lower = proc_ents.lower_bound( CN::TypeDimensionMap[ 0 ].first ),
-                        upper = proc_ents.upper_bound( CN::TypeDimensionMap[ dim - 1 ].second );
+        Range::iterator lower = proc_ents.lower_bound( CN::TypeDimensionMap[0].first ),
+                        upper = proc_ents.upper_bound( CN::TypeDimensionMap[dim - 1].second );
         proc_ents.erase( lower, upper );
     }
 
     // This vector doesn't appear to be used but its in resolve_shared_ents
-    int                maxp = -1;
+    int maxp = -1;
     std::vector< int > sharing_procs( MAX_SHARING_PROCS );
-    std::fill( sharing_procs.begin( ), sharing_procs.end( ), maxp );
+    std::fill( sharing_procs.begin(), sharing_procs.end(), maxp );
 
     // get ents shared by 1 or n procs
     std::map< std::vector< int >, std::vector< EntityHandle > > proc_nranges;
-    Range                                                       proc_verts;
+    Range proc_verts;
     rval = myMB->get_adjacencies( proc_ents, 0, false, proc_verts, Interface::UNION );
     if( rval != MB_SUCCESS ) { return rval; }
 
@@ -540,7 +552,7 @@ ErrorCode ParallelMergeMesh::TagSharedElements( int dim )
     if( rval != MB_SUCCESS ) { return rval; }
 
     // get entities shared by 1 or n procs
-    rval = myPcomm->get_proc_nvecs( dim, dim - 1, &mySkinEnts[ 0 ], proc_nranges );
+    rval = myPcomm->get_proc_nvecs( dim, dim - 1, &mySkinEnts[0], proc_nranges );
     if( rval != MB_SUCCESS ) { return rval; }
 
     // create the sets for each interface; store them as tags on
@@ -558,31 +570,31 @@ ErrorCode ParallelMergeMesh::TagSharedElements( int dim )
     rval = myPcomm->exchange_ghost_cells( -1, -1, 0, true, true );
     if( rval != MB_SUCCESS ) { return rval; }
     // now build parent/child links for interface sets
-    rval = myPcomm->create_iface_pc_links( );
+    rval = myPcomm->create_iface_pc_links();
     return rval;
 }
 
 // Make sure to free up any allocated data
 // Need to avoid a double free
-void ParallelMergeMesh::CleanUp( )
+void ParallelMergeMesh::CleanUp()
 {
     // The reset operation is now safe and avoids a double free()
-    myMatches.reset( );
-    myTup.reset( );
-    myCD.reset( );
+    myMatches.reset();
+    myTup.reset();
+    myCD.reset();
 }
 
 // Simple quick  sort to real
 void ParallelMergeMesh::SortTuplesByReal( TupleList& tup, double eps )
 {
-    bool canWrite = tup.get_writeEnabled( );
-    if( !canWrite ) tup.enableWriteAccess( );
+    bool canWrite = tup.get_writeEnabled();
+    if( !canWrite ) tup.enableWriteAccess();
 
     uint mi, ml, mul, mr;
     tup.getTupleSize( mi, ml, mul, mr );
-    PerformRealSort( tup, 0, tup.get_n( ), eps, mr );
+    PerformRealSort( tup, 0, tup.get_n(), eps, mr );
 
-    if( !canWrite ) tup.disableWriteAccess( );
+    if( !canWrite ) tup.disableWriteAccess();
 }
 
 // Swap around tuples
@@ -597,9 +609,9 @@ void ParallelMergeMesh::SwapTuples( TupleList& tup, unsigned long a, unsigned lo
     unsigned long a_val = a * mi, b_val = b * mi;
     for( unsigned long i = 0; i < mi; i++ )
     {
-        sint t = tup.vi_rd[ a_val ];
-        tup.vi_wr[ a_val ] = tup.vi_rd[ b_val ];
-        tup.vi_wr[ b_val ] = t;
+        sint t           = tup.vi_rd[a_val];
+        tup.vi_wr[a_val] = tup.vi_rd[b_val];
+        tup.vi_wr[b_val] = t;
         a_val++;
         b_val++;
     }
@@ -608,9 +620,9 @@ void ParallelMergeMesh::SwapTuples( TupleList& tup, unsigned long a, unsigned lo
     b_val = b * ml;
     for( unsigned long i = 0; i < ml; i++ )
     {
-        slong t = tup.vl_rd[ a_val ];
-        tup.vl_wr[ a_val ] = tup.vl_rd[ b_val ];
-        tup.vl_wr[ b_val ] = t;
+        slong t          = tup.vl_rd[a_val];
+        tup.vl_wr[a_val] = tup.vl_rd[b_val];
+        tup.vl_wr[b_val] = t;
         a_val++;
         b_val++;
     }
@@ -619,9 +631,9 @@ void ParallelMergeMesh::SwapTuples( TupleList& tup, unsigned long a, unsigned lo
     b_val = b * mul;
     for( unsigned long i = 0; i < mul; i++ )
     {
-        Ulong t = tup.vul_rd[ a_val ];
-        tup.vul_wr[ a_val ] = tup.vul_rd[ b_val ];
-        tup.vul_wr[ b_val ] = t;
+        Ulong t           = tup.vul_rd[a_val];
+        tup.vul_wr[a_val] = tup.vul_rd[b_val];
+        tup.vul_wr[b_val] = t;
         a_val++;
         b_val++;
     }
@@ -630,9 +642,9 @@ void ParallelMergeMesh::SwapTuples( TupleList& tup, unsigned long a, unsigned lo
     b_val = b * mr;
     for( unsigned long i = 0; i < mr; i++ )
     {
-        realType t = tup.vr_rd[ a_val ];
-        tup.vr_wr[ a_val ] = tup.vr_rd[ b_val ];
-        tup.vr_wr[ b_val ] = t;
+        realType t       = tup.vr_rd[a_val];
+        tup.vr_wr[a_val] = tup.vr_rd[b_val];
+        tup.vr_wr[b_val] = t;
         a_val++;
         b_val++;
     }
@@ -678,13 +690,13 @@ bool ParallelMergeMesh::TupleGreaterThan( TupleList& tup, unsigned long vrI, uns
     while( check < tup_mr )
     {
         // If the values are the same
-        if( fabs( tup.vr_rd[ vrI + check ] - tup.vr_rd[ vrJ + check ] ) <= eps )
+        if( fabs( tup.vr_rd[vrI + check] - tup.vr_rd[vrJ + check] ) <= eps )
         {
             check++;
             continue;
         }
         // If I greater than J
-        else if( tup.vr_rd[ vrI + check ] > tup.vr_rd[ vrJ + check ] )
+        else if( tup.vr_rd[vrI + check] > tup.vr_rd[vrJ + check] )
         {
             return true;
         }

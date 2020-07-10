@@ -270,7 +270,7 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
     // just call the destructor.  More sophisticated implementations
     // may want to keep the Mesh object to live longer than Mesquite
     // is using it.
-    virtual void release( );
+    virtual void release();
 
   private:
     Mesh* myMesh;

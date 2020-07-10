@@ -22,8 +22,8 @@
 
 using namespace moab;
 // some input data
-double gtol = 0.0001;  // this is for geometry tolerance
-double CubeSide = 6.;  // the above file starts with cube side 6; radius depends on cube side
+double gtol     = 0.0001;        // this is for geometry tolerance
+double CubeSide = 6.;            // the above file starts with cube side 6; radius depends on cube side
 double t = 0.1, delta_t = 0.43;  // check the script
 
 ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler_set, EntityHandle& lagr_set )
@@ -37,8 +37,8 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
      *   circumscribed sphere radius
      *   radius = length * math.sqrt(3) /2
      */
-    double    radius = CubeSide / 2 * sqrt( 3. );  // our value depends on cube side
-    Range     quads;
+    double radius = CubeSide / 2 * sqrt( 3. );  // our value depends on cube side
+    Range quads;
     ErrorCode rval = mb->get_entities_by_type( euler_set, MBQUAD, quads );
     if( MB_SUCCESS != rval ) return rval;
 
@@ -57,33 +57,33 @@ ErrorCode manufacture_lagrange_mesh_on_sphere( Interface* mb, EntityHandle euler
     // first create departure points (vertices in the lagrange mesh)
     // then connect them in quads
     std::map< EntityHandle, EntityHandle > newNodes;
-    for( Range::iterator vit = connecVerts.begin( ); vit != connecVerts.end( ); ++vit )
+    for( Range::iterator vit = connecVerts.begin(); vit != connecVerts.end(); ++vit )
     {
         EntityHandle oldV = *vit;
-        CartVect     posi;
-        rval = mb->get_coords( &oldV, 1, &( posi[ 0 ] ) );
+        CartVect posi;
+        rval = mb->get_coords( &oldV, 1, &( posi[0] ) );
         if( MB_SUCCESS != rval ) return rval;
         // Intx utils, case 1
         CartVect newPos;
         IntxUtilsCSLAM::departure_point_case1( posi, t, delta_t, newPos );
         newPos = radius * newPos;
         EntityHandle new_vert;
-        rval = mb->create_vertex( &( newPos[ 0 ] ), new_vert );
+        rval = mb->create_vertex( &( newPos[0] ), new_vert );
         if( MB_SUCCESS != rval ) return rval;
-        newNodes[ oldV ] = new_vert;
+        newNodes[oldV] = new_vert;
     }
-    for( Range::iterator it = quads.begin( ); it != quads.end( ); ++it )
+    for( Range::iterator it = quads.begin(); it != quads.end(); ++it )
     {
-        EntityHandle        q = *it;
-        int                 nnodes;
+        EntityHandle q = *it;
+        int nnodes;
         const EntityHandle* conn4;
         rval = mb->get_connectivity( q, conn4, nnodes );
         if( MB_SUCCESS != rval ) return rval;
-        EntityHandle new_conn[ 4 ];
+        EntityHandle new_conn[4];
         for( int i = 0; i < nnodes; i++ )
         {
-            EntityHandle v1 = conn4[ i ];
-            new_conn[ i ] = newNodes[ v1 ];
+            EntityHandle v1 = conn4[i];
+            new_conn[i]     = newNodes[v1];
         }
         EntityHandle new_quad;
         rval = mb->create_element( MBQUAD, new_conn, 4, new_quad );
@@ -103,21 +103,21 @@ int main( int argc, char** argv )
         int index = 1;
         while( index < argc )
         {
-            if( !strcmp( argv[ index ], "-gtol" ) )  // this is for geometry tolerance
-            { gtol = atof( argv[ ++index ] ); }
-            if( !strcmp( argv[ index ], "-cube" ) ) { CubeSide = atof( argv[ ++index ] ); }
-            if( !strcmp( argv[ index ], "-dt" ) ) { delta_t = atof( argv[ ++index ] ); }
-            if( !strcmp( argv[ index ], "-input" ) ) { filename_mesh1 = argv[ ++index ]; }
+            if( !strcmp( argv[index], "-gtol" ) )  // this is for geometry tolerance
+            { gtol = atof( argv[++index] ); }
+            if( !strcmp( argv[index], "-cube" ) ) { CubeSide = atof( argv[++index] ); }
+            if( !strcmp( argv[index], "-dt" ) ) { delta_t = atof( argv[++index] ); }
+            if( !strcmp( argv[index], "-input" ) ) { filename_mesh1 = argv[++index]; }
             index++;
         }
     }
     std::cout << " case 1: use -gtol " << gtol << " -dt " << delta_t << " -cube " << CubeSide << " -input "
               << filename_mesh1 << "\n";
 
-    Core         moab;
-    Interface&   mb = moab;
+    Core moab;
+    Interface& mb = moab;
     EntityHandle euler_set;
-    ErrorCode    rval;
+    ErrorCode rval;
     rval = mb.create_meshset( MESHSET_SET, euler_set );
     if( MB_SUCCESS != rval ) return 1;
 
@@ -163,12 +163,12 @@ int main( int argc, char** argv )
     std::stringstream outf;
     outf << "intersect1"
          << ".h5m";
-    rval = mb.write_file( outf.str( ).c_str( ), 0, 0, &outputSet, 1 );
+    rval = mb.write_file( outf.str().c_str(), 0, 0, &outputSet, 1 );
     if( MB_SUCCESS != rval ) std::cout << "can't write output\n";
 
     moab::IntxAreaUtils sphAreaUtils;
-    double              intx_area = sphAreaUtils.area_on_sphere( &mb, outputSet, radius );
-    double              arrival_area = sphAreaUtils.area_on_sphere( &mb, euler_set, radius );
+    double intx_area    = sphAreaUtils.area_on_sphere( &mb, outputSet, radius );
+    double arrival_area = sphAreaUtils.area_on_sphere( &mb, euler_set, radius );
     std::cout << " Arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
     if( MB_SUCCESS != rval ) return 1;

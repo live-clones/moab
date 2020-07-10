@@ -25,7 +25,7 @@ const int NK = 1;
 // const double DSIZE = 10.0;
 
 // MOAB objects:
-Interface*    mbint = NULL;
+Interface* mbint   = NULL;
 ParallelComm* mbpc = NULL;
 
 // Local domain starting and ending hex indexes:
@@ -36,9 +36,9 @@ int ie, je, ke;
 int rank;
 int size;
 
-void set_local_domain_bounds( );
-void create_hexes_and_verts( );
-void resolve_and_exchange( );
+void set_local_domain_bounds();
+void create_hexes_and_verts();
+void resolve_and_exchange();
 void error( ErrorCode err );
 
 int main( int argc, char* argv[] )
@@ -49,25 +49,25 @@ int main( int argc, char* argv[] )
     if( size != 4 && size != 2 )
     {
         std::cerr << "Run this with 2 or 4 processes\n";
-        MPI_Finalize( );
+        MPI_Finalize();
         exit( 1 );
     }
 
-    mbint = new Core( );
-    mbpc = new ParallelComm( mbint, MPI_COMM_WORLD );
+    mbint = new Core();
+    mbpc  = new ParallelComm( mbint, MPI_COMM_WORLD );
 
-    set_local_domain_bounds( );
-    create_hexes_and_verts( );
-    resolve_and_exchange( );
+    set_local_domain_bounds();
+    create_hexes_and_verts();
+    resolve_and_exchange();
 
     delete mbpc;  // ParallelComm instance should be deleted before MOAB instance is deleted
     delete mbint;
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return 0;
 }
 
-void set_local_domain_bounds( )
+void set_local_domain_bounds()
 {
     switch( size )
     {
@@ -137,14 +137,14 @@ void set_local_domain_bounds( )
     }
 }
 
-void create_hexes_and_verts( )
+void create_hexes_and_verts()
 {
-    Core*           mbcore = dynamic_cast< Core* >( mbint );
-    HomCoord        coord_min( 0, 0, 0 );
-    HomCoord        coord_max( ie - is, je - js, ke - ks );
+    Core* mbcore = dynamic_cast< Core* >( mbint );
+    HomCoord coord_min( 0, 0, 0 );
+    HomCoord coord_max( ie - is, je - js, ke - ks );
     EntitySequence* vertex_seq = NULL;
-    EntitySequence* cell_seq = NULL;
-    EntityHandle    vs, cs;
+    EntitySequence* cell_seq   = NULL;
+    EntityHandle vs, cs;
 
     error( mbcore->create_scd_sequence( coord_min, coord_max, MBVERTEX, 1, vs, vertex_seq ) );
     error( mbcore->create_scd_sequence( coord_min, coord_max, MBHEX, 1, cs, cell_seq ) );
@@ -156,10 +156,10 @@ void create_hexes_and_verts( )
     error( mbcore->add_vsequence( vertex_seq, cell_seq, p1, p1, p2, p2, p3, p3 ) );
 
     // Set global id's:
-    int          gid;
-    Tag          global_id_tag = mbint->globalId_tag( );
+    int gid;
+    Tag global_id_tag   = mbint->globalId_tag();
     EntityHandle handle = vs;
-    int          i, j, k;
+    int i, j, k;
 
     ErrorCode err;
 
@@ -184,7 +184,7 @@ void create_hexes_and_verts( )
             }
 }
 
-void resolve_and_exchange( )
+void resolve_and_exchange()
 {
     EntityHandle entity_set;
 
@@ -205,7 +205,7 @@ void resolve_and_exchange( )
 
     // Set up partition sets. This is where MOAB is actually told what
     // entities each process owns:
-    error( mbint->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, NULL, 1, mbpc->partition_sets( ) ) );
+    error( mbint->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, NULL, 1, mbpc->partition_sets() ) );
 
     // Finally, determine which entites are shared and exchange the
     // ghosted entities:

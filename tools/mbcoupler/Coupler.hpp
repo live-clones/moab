@@ -70,12 +70,12 @@ class Coupler
 
     /* Destructor
      */
-    virtual ~Coupler( );
+    virtual ~Coupler();
 
     /**
      *  \brief Initialize the kdtree, locally and across communicator
      */
-    ErrorCode initialize_tree( );
+    ErrorCode initialize_tree();
 
     /* \brief Locate points on the source mesh
      * This function finds the element/processor/natural coordinates for the
@@ -374,43 +374,43 @@ class Coupler
 
     /* Get functions */
 
-    inline Interface* mb_impl( ) const
+    inline Interface* mb_impl() const
     {
         return mbImpl;
     }
-    inline AdaptiveKDTree* my_tree( ) const
+    inline AdaptiveKDTree* my_tree() const
     {
         return myTree;
     }
-    inline EntityHandle local_root( ) const
+    inline EntityHandle local_root() const
     {
         return localRoot;
     }
-    inline const std::vector< double >& all_boxes( ) const
+    inline const std::vector< double >& all_boxes() const
     {
         return allBoxes;
     }
-    inline ParallelComm* my_pc( ) const
+    inline ParallelComm* my_pc() const
     {
         return myPc;
     }
-    inline const Range& target_ents( ) const
+    inline const Range& target_ents() const
     {
         return targetEnts;
     }
-    inline int my_id( ) const
+    inline int my_id() const
     {
         return myId;
     }
-    inline const Range& my_range( ) const
+    inline const Range& my_range() const
     {
         return myRange;
     }
-    inline TupleList* mapped_pts( ) const
+    inline TupleList* mapped_pts() const
     {
         return mappedPts;
     }
-    inline int num_its( ) const
+    inline int num_its() const
     {
         return numIts;
     }
@@ -423,7 +423,7 @@ class Coupler
   private:
     // Given a coordinate position, find all entities containing
     // the point and the natural coords in those ents
-    ErrorCode nat_param( double xyz[ 3 ], std::vector< EntityHandle >& entities, std::vector< CartVect >& nat_coords,
+    ErrorCode nat_param( double xyz[3], std::vector< EntityHandle >& entities, std::vector< CartVect >& nat_coords,
                          double epsilon = 0.0 );
 
     ErrorCode interp_field( EntityHandle elem, CartVect nat_coord, Tag tag, double& field );
@@ -493,10 +493,10 @@ class Coupler
     // A cached spectral element for source and target, separate
     // Assume that their number of GL points (order + 1) does not change
     // If it does change, we need to reinitialize it
-    void*     _spectralSource;
-    void*     _spectralTarget;
+    void* _spectralSource;
+    void* _spectralTarget;
     moab::Tag _xm1Tag, _ym1Tag, _zm1Tag;
-    int       _ntot;
+    int _ntot;
 
     // spherical coupling
     bool spherical;
@@ -505,7 +505,7 @@ class Coupler
 inline ErrorCode Coupler::interpolate( Coupler::Method method, Tag tag, double* interp_vals, TupleList* tl,
                                        bool normalize )
 {
-    int num_pts = ( tl ? tl->get_n( ) : targetPts->get_n( ) );
+    int num_pts = ( tl ? tl->get_n() : targetPts->get_n() );
     return interpolate( &method, &tag, &num_pts, 1, interp_vals, tl, normalize );
 }
 

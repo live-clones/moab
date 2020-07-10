@@ -39,7 +39,7 @@
 namespace MBMesquite
 {
 
-RefMeshTargetCalculator::~RefMeshTargetCalculator( ) {}
+RefMeshTargetCalculator::~RefMeshTargetCalculator() {}
 
 bool RefMeshTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
                                              MsqError& err )
@@ -59,12 +59,12 @@ bool RefMeshTargetCalculator::get_2D_target( PatchData& pd, size_t element, Samp
                                              MsqError& err )
 {
     MsqMatrix< 3, 2 > W_orient;
-    bool              valid = get_surface_target( pd, element, sample, W_orient, err );
+    bool valid = get_surface_target( pd, element, sample, W_orient, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
     MsqMatrix< 3, 2 > V;
     MsqMatrix< 2, 2 > Q, delta;
-    double            lambda;
+    double lambda;
     valid = factor_surface( W_orient, lambda, V, Q, delta, err );
     W_out = lambda * Q * delta;
     return !MSQ_CHKERR( err ) && valid;

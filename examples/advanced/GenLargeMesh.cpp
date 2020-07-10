@@ -96,14 +96,14 @@ int main( int argc, char** argv )
     // default options
     bopts.A = bopts.B = bopts.C = 2;
     bopts.M = bopts.N = bopts.K = 1;
-    bopts.blockSize = 4;
+    bopts.blockSize             = 4;
     bopts.xsize = bopts.ysize = bopts.zsize = 1.;
-    bopts.ui = CartVect( 1., 0, 0. );
-    bopts.uj = CartVect( 0., 1., 0. );
-    bopts.uk = CartVect( 0., 0., 1. );
+    bopts.ui                                = CartVect( 1., 0, 0. );
+    bopts.uj                                = CartVect( 0., 1., 0. );
+    bopts.uk                                = CartVect( 0., 0., 1. );
     bopts.newMergeMethod = bopts.quadratic = bopts.keep_skins = bopts.tetra = false;
     bopts.adjEnts = bopts.parmerge = false;
-    bopts.GL = 0;
+    bopts.GL                       = 0;
 
     ProgOptions opts;
 
@@ -133,11 +133,11 @@ int main( int argc, char** argv )
     opts.addOpt< int >( string( "ghost_layers,g" ), string( "Number of ghost layers (default=0)" ), &bopts.GL );
 
     vector< string > intTagNames;
-    string           firstIntTag;
+    string firstIntTag;
     opts.addOpt< string >( "int_tag_vert,i", "add integer tag on vertices", &firstIntTag );
 
     vector< string > doubleTagNames;
-    string           firstDoubleTag;
+    string firstDoubleTag;
     opts.addOpt< string >( "double_tag_cell,d", "add double tag on cells", &firstDoubleTag );
 
     string outFileName = "GenLargeMesh.h5m";
@@ -167,7 +167,7 @@ int main( int argc, char** argv )
     if( NULL == mb )
     {
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
@@ -180,15 +180,15 @@ int main( int argc, char** argv )
 #endif
 
     EntityHandle fileset;
-    ErrorCode    rval = mb->create_meshset( MESHSET_SET, fileset );MB_CHK_ERR( rval );
+    ErrorCode rval = mb->create_meshset( MESHSET_SET, fileset );MB_CHK_ERR( rval );
 #ifdef MOAB_HAVE_MPI
-    ParallelComm*   pc = new ParallelComm( mb, MPI_COMM_WORLD );
+    ParallelComm* pc     = new ParallelComm( mb, MPI_COMM_WORLD );
     MeshGeneration* mgen = new MeshGeneration( mb, pc, fileset );
 #else
     MeshGeneration* mgen = new MeshGeneration( mb, 0, fileset );
 #endif
 
-    clock_t tt = clock( );
+    clock_t tt = clock();
 
     rval = mgen->BrickInstance( bopts );MB_CHK_ERR( rval );
 
@@ -197,10 +197,10 @@ int main( int argc, char** argv )
 
     if( 0 == rank )
     {
-        cout << "generate local mesh: " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
-        tt = clock( );
-        cout << "number of elements on rank 0: " << all3dcells.size( ) << endl;
-        cout << "Total number of elements " << all3dcells.size( ) * size << endl;
+        cout << "generate local mesh: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+        tt = clock();
+        cout << "number of elements on rank 0: " << all3dcells.size() << endl;
+        cout << "Total number of elements " << all3dcells.size() * size << endl;
         cout << "Element type: " << ( bopts.tetra ? "MBTET" : "MBHEX" )
              << " order:" << ( bopts.quadratic ? "quadratic" : "linear" ) << endl;
     }
@@ -210,38 +210,38 @@ int main( int argc, char** argv )
     if( !nosave )
     {
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-        rval = mb->write_file( outFileName.c_str( ), 0, ";;PARALLEL=WRITE_PART;CPUTIME;", &fileset, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel" );
+        rval = mb->write_file( outFileName.c_str(), 0, ";;PARALLEL=WRITE_PART;CPUTIME;", &fileset, 1 );MB_CHK_SET_ERR( rval, "Can't write in parallel" );
 #else
         // should be a vtk file, actually, maybe make sure of that
-        rval = mb->write_file( outFileName.c_str( ), 0, "", &fileset, 1 );MB_CHK_SET_ERR( rval, "Can't write in serial" );
+        rval = mb->write_file( outFileName.c_str(), 0, "", &fileset, 1 );MB_CHK_SET_ERR( rval, "Can't write in serial" );
 #endif
         if( 0 == rank )
         {
-            cout << "write file " << outFileName << " in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds"
+            cout << "write file " << outFileName << " in " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds"
                  << endl;
-            tt = clock( );
+            tt = clock();
         }
     }
     // delete the mesh that we already have in-memory
-    size_t nLocalVerts = verts.size( );
-    size_t nLocalCells = all3dcells.size( );
+    size_t nLocalVerts = verts.size();
+    size_t nLocalCells = all3dcells.size();
 
-    mb->delete_mesh( );
+    mb->delete_mesh();
 
 #ifdef MOAB_HAVE_HDF5_PARALLEL
     if( !nosave && readb )
     {
         // now recreate a core instance and load the file we just wrote out to verify
-        Core        mb2;
+        Core mb2;
         std::string read_opts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_"
                                "SHARED_ENTS;CPUTIME;" );
         if( readAndGhost ) read_opts += "PARALLEL_GHOSTS=3.0.1;";
-        rval = mb2.load_file( outFileName.c_str( ), 0, read_opts.c_str( ) );MB_CHK_SET_ERR( rval, "Can't read in parallel" );
+        rval = mb2.load_file( outFileName.c_str(), 0, read_opts.c_str() );MB_CHK_SET_ERR( rval, "Can't read in parallel" );
         if( 0 == rank )
         {
             cout << "read back file " << outFileName << " with options: \n"
-                 << read_opts << " in " << ( clock( ) - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
-            tt = clock( );
+                 << read_opts << " in " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
+            tt = clock();
         }
         moab::Range nverts, ncells;
         rval = mb2.get_entities_by_dimension( 0, 0, nverts );MB_CHK_SET_ERR( rval, "Can't get all vertices" );
@@ -256,16 +256,16 @@ int main( int argc, char** argv )
             rval = pcomm2->filter_pstatus( nverts, PSTATUS_GHOST, PSTATUS_NOT );MB_CHK_SET_ERR( rval, "Can't filter ghost vertices" );
             rval = pcomm2->filter_pstatus( ncells, PSTATUS_GHOST, PSTATUS_NOT );MB_CHK_SET_ERR( rval, "Can't filter ghost cells" );
         }
-        if( nverts.size( ) != nLocalVerts && ncells.size( ) != nLocalCells )
+        if( nverts.size() != nLocalVerts && ncells.size() != nLocalCells )
         { MB_SET_ERR( MB_FAILURE, "Reading back the output file led to inconsistent number of entities." ); }
 
         // delete the mesh that we already have in-memory
-        mb2.delete_mesh( );
+        mb2.delete_mesh();
     }
 #endif
 
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
     return 0;
 }

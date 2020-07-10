@@ -44,7 +44,7 @@ class LinearTri
                                        const double* verts, const int nverts, const int ndim, const double iter_tol,
                                        const double inside_tol, double* work, double* params, int* inside );
 
-    static EvalSet eval_set( )
+    static EvalSet eval_set()
     {
         return EvalSet( evalFcn, reverseEvalFcn, normalFcn, jacobianFcn, integrateFcn, initFcn, insideFcn );
     }
@@ -53,7 +53,7 @@ class LinearTri
     {
         if( tp == MBTRI && numv >= 3 )
         {
-            eset = eval_set( );
+            eset = eval_set();
             return true;
         }
         else
@@ -61,7 +61,7 @@ class LinearTri
     }
 
   protected:
-    static const double corner[ 3 ][ 2 ];
+    static const double corner[3][2];
 };  // class LinearTri
 
 }  // namespace moab

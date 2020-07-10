@@ -60,17 +60,17 @@ using std::endl;
 
 using namespace MBMesquite;
 
-int main( )
+int main()
 {
     MBMesquite::MeshImpl mesh;
-    MsqPrintError        err( cout );
-    std::string          file_name = TestDir + "/2D/vtk/quads/untangled/square_quad_2.vtk";
-    mesh.read_vtk( file_name.c_str( ), err );
+    MsqPrintError err( cout );
+    std::string file_name = TestDir + "/2D/vtk/quads/untangled/square_quad_2.vtk";
+    mesh.read_vtk( file_name.c_str(), err );
     if( err ) return 1;
 
     // create geometry: plane z=0, normal (0,0,1)
-    Vector3D                 pnt( 0, 0, 5 );
-    Vector3D                 s_norm( 0, 0, 1 );
+    Vector3D pnt( 0, 0, 5 );
+    Vector3D s_norm( 0, 0, 1 );
     MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
     // creates an intruction queue

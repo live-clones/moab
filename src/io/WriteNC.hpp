@@ -51,11 +51,11 @@
 #define NCDF_DIFF MPI_Offset
 #else
 #include "netcdf.h"
-#define NCFUNC( func ) nc_##func
+#define NCFUNC( func )   nc_##func
 #define NCFUNCAP( func ) nc_put##func
-#define NCFUNCP( func ) nc_put##func
-#define NCDF_SIZE size_t
-#define NCDF_DIFF ptrdiff_t
+#define NCFUNCP( func )  nc_put##func
+#define NCDF_SIZE        size_t
+#define NCDF_DIFF        ptrdiff_t
 #endif
 
 namespace moab
@@ -86,7 +86,7 @@ class WriteNC : public WriterIface
     WriteNC( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~WriteNC( );
+    virtual ~WriteNC();
 
     //! Writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
@@ -111,32 +111,32 @@ class WriteNC : public WriterIface
     class AttData
     {
       public:
-        AttData( ) : attId( -1 ), attLen( 0 ), attVarId( -2 ), attDataType( NC_NAT ) {}
-        int         attId;
-        NCDF_SIZE   attLen;
-        int         attVarId;
-        nc_type     attDataType;
+        AttData() : attId( -1 ), attLen( 0 ), attVarId( -2 ), attDataType( NC_NAT ) {}
+        int attId;
+        NCDF_SIZE attLen;
+        int attVarId;
+        nc_type attDataType;
         std::string attValue;
     };
 
     class VarData
     {
       public:
-        VarData( ) : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ), has_tsteps( false ) {}
-        int                              varId;
-        int                              numAtts;
-        nc_type                          varDataType;
-        std::vector< int >               varDims;  // The dimension indices making up this multi-dimensional variable
+        VarData() : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ), has_tsteps( false ) {}
+        int varId;
+        int numAtts;
+        nc_type varDataType;
+        std::vector< int > varDims;  // The dimension indices making up this multi-dimensional variable
         std::map< std::string, AttData > varAtts;
-        std::string                      varName;
-        std::vector< Tag >               varTags;  // Tags created for this variable, e.g. one tag per timestep
-        std::vector< void* >             memoryHogs;  // These will point to the real data; fill before writing the data
-        std::vector< NCDF_SIZE >         writeStarts;  // Starting index for writing data values along each dimension
-        std::vector< NCDF_SIZE >         writeCounts;  // Number of data values to be written along each dimension
-        int                              entLoc;
-        int                              numLev;
-        int                              sz;
-        bool                             has_tsteps;  // Indicate whether timestep numbers are appended to tag names
+        std::string varName;
+        std::vector< Tag > varTags;            // Tags created for this variable, e.g. one tag per timestep
+        std::vector< void* > memoryHogs;       // These will point to the real data; fill before writing the data
+        std::vector< NCDF_SIZE > writeStarts;  // Starting index for writing data values along each dimension
+        std::vector< NCDF_SIZE > writeCounts;  // Number of data values to be written along each dimension
+        int entLoc;
+        int numLev;
+        int sz;
+        bool has_tsteps;  // Indicate whether timestep numbers are appended to tag names
     };
 
     //! This info will be reconstructed from metadata stored on conventional fileSet tags
@@ -171,7 +171,7 @@ class WriteNC : public WriterIface
                                               std::map< std::string, AttData >& attributes );
 
     //! Interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 
     //! File var

@@ -43,19 +43,19 @@ class AddQualityMetric : public QualityMetric
   public:
     AddQualityMetric( QualityMetric* qm1, QualityMetric* qm2, MsqError& err );
 
-    ~AddQualityMetric( );
+    ~AddQualityMetric();
 
-    MetricType get_metric_type( ) const;
+    MetricType get_metric_type() const;
 
-    std::string get_name( ) const;
+    std::string get_name() const;
 
-    int get_negate_flag( ) const;
+    int get_negate_flag() const;
 
-    QualityMetric* get_first_metric( ) const
+    QualityMetric* get_first_metric() const
     {
         return &metric1;
     }
-    QualityMetric* get_second_metric( ) const
+    QualityMetric* get_second_metric() const
     {
         return &metric2;
     }
@@ -76,9 +76,9 @@ class AddQualityMetric : public QualityMetric
                                         MsqError& err );
 
   private:
-    QualityMetric &                 metric1, &metric2;
-    mutable std::vector< size_t >   mHandles;
-    mutable std::vector< size_t >   indices1, indices2;
+    QualityMetric &metric1, &metric2;
+    mutable std::vector< size_t > mHandles;
+    mutable std::vector< size_t > indices1, indices2;
     mutable std::vector< Vector3D > grad1, grad2;
     mutable std::vector< Matrix3D > Hess1, Hess2;
 };

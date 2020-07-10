@@ -56,36 +56,36 @@
   2 tets and summing the volumes of the 2 tets.
 */
 
-C_FUNC_DEF double v_pyramid_volume( int num_nodes, double coordinates[][ 3 ] )
+C_FUNC_DEF double v_pyramid_volume( int num_nodes, double coordinates[][3] )
 {
 
-    double        volume = 0;
+    double volume = 0;
     VerdictVector side1, side2, side3;
 
     if( num_nodes == 5 )
     {
         // divide the pyramid into 2 tets and calculate each
 
-        side1.set( coordinates[ 1 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 0 ][ 1 ],
-                   coordinates[ 1 ][ 2 ] - coordinates[ 0 ][ 2 ] );
+        side1.set( coordinates[1][0] - coordinates[0][0], coordinates[1][1] - coordinates[0][1],
+                   coordinates[1][2] - coordinates[0][2] );
 
-        side2.set( coordinates[ 3 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 0 ][ 1 ],
-                   coordinates[ 3 ][ 2 ] - coordinates[ 0 ][ 2 ] );
+        side2.set( coordinates[3][0] - coordinates[0][0], coordinates[3][1] - coordinates[0][1],
+                   coordinates[3][2] - coordinates[0][2] );
 
-        side3.set( coordinates[ 4 ][ 0 ] - coordinates[ 0 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 0 ][ 1 ],
-                   coordinates[ 4 ][ 2 ] - coordinates[ 0 ][ 2 ] );
+        side3.set( coordinates[4][0] - coordinates[0][0], coordinates[4][1] - coordinates[0][1],
+                   coordinates[4][2] - coordinates[0][2] );
 
         // volume of the first tet
         volume = ( side3 % ( side1 * side2 ) ) / 6.0;
 
-        side1.set( coordinates[ 3 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 3 ][ 1 ] - coordinates[ 2 ][ 1 ],
-                   coordinates[ 3 ][ 2 ] - coordinates[ 2 ][ 2 ] );
+        side1.set( coordinates[3][0] - coordinates[2][0], coordinates[3][1] - coordinates[2][1],
+                   coordinates[3][2] - coordinates[2][2] );
 
-        side2.set( coordinates[ 1 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 1 ][ 1 ] - coordinates[ 2 ][ 1 ],
-                   coordinates[ 1 ][ 2 ] - coordinates[ 2 ][ 2 ] );
+        side2.set( coordinates[1][0] - coordinates[2][0], coordinates[1][1] - coordinates[2][1],
+                   coordinates[1][2] - coordinates[2][2] );
 
-        side3.set( coordinates[ 4 ][ 0 ] - coordinates[ 2 ][ 0 ], coordinates[ 4 ][ 1 ] - coordinates[ 2 ][ 1 ],
-                   coordinates[ 4 ][ 2 ] - coordinates[ 2 ][ 2 ] );
+        side3.set( coordinates[4][0] - coordinates[2][0], coordinates[4][1] - coordinates[2][1],
+                   coordinates[4][2] - coordinates[2][2] );
 
         // volume of the second tet
         volume += ( side3 % ( side1 * side2 ) ) / 6.0;
@@ -93,7 +93,7 @@ C_FUNC_DEF double v_pyramid_volume( int num_nodes, double coordinates[][ 3 ] )
     return (double)volume;
 }
 
-C_FUNC_DEF void v_pyramid_quality( int num_nodes, double coordinates[][ 3 ], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_pyramid_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
                                    PyramidMetricVals* metric_vals )
 {
     memset( metric_vals, 0, sizeof( PyramidMetricVals ) );

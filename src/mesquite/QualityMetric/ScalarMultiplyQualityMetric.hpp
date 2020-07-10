@@ -51,18 +51,18 @@ class ScalarMultiplyQualityMetric : public QualityMetric
   public:
     ScalarMultiplyQualityMetric( QualityMetric* metric, double scale ) : mMetric( metric ), mScale( scale ) {}
 
-    ~ScalarMultiplyQualityMetric( ) {}
+    ~ScalarMultiplyQualityMetric() {}
 
-    MetricType get_metric_type( ) const
+    MetricType get_metric_type() const
     {
-        return mMetric->get_metric_type( );
+        return mMetric->get_metric_type();
     }
 
-    std::string get_name( ) const;
+    std::string get_name() const;
 
-    int get_negate_flag( ) const
+    int get_negate_flag() const
     {
-        return mMetric->get_negate_flag( );
+        return mMetric->get_negate_flag();
     }
 
     void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err );
@@ -80,7 +80,7 @@ class ScalarMultiplyQualityMetric : public QualityMetric
 
   private:
     QualityMetric* mMetric;
-    double         mScale;
+    double mScale;
 };
 
 }  // namespace MBMesquite

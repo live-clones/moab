@@ -18,11 +18,11 @@ using namespace std;
 SimplexTemplateTagAssigner::SimplexTemplateTagAssigner( SimplexTemplateRefiner* r )
 {
     this->mesh_refiner = r;
-    this->tag_manager = 0;
+    this->tag_manager  = 0;
 }
 
 /// Empty destructor for good form.
-SimplexTemplateTagAssigner::~SimplexTemplateTagAssigner( ) {}
+SimplexTemplateTagAssigner::~SimplexTemplateTagAssigner() {}
 
 /**\brief Given endpoint coordinates and tag values plus midpoint coordinates, compute midpoint tag
  * values.
@@ -42,42 +42,42 @@ SimplexTemplateTagAssigner::~SimplexTemplateTagAssigner( ) {}
  * world coordinates (3).
  * @param[in] t1 Pointer to endpoint 1 tag values.
  */
-void SimplexTemplateTagAssigner::operator( )( const double* c0, const void* t0, EntityHandle h0, const double* cm,
-                                              void* tm, const double* c1, const void* t1, EntityHandle h1 )
+void SimplexTemplateTagAssigner::operator()( const double* c0, const void* t0, EntityHandle h0, const double* cm,
+                                             void* tm, const double* c1, const void* t1, EntityHandle h1 )
 {
     double c0m_squared = 0.;
     double c01_squared = 0.;
     for( int i = 0; i < 3; ++i )
     {
-        double tmp = cm[ i ] - c0[ i ];
+        double tmp = cm[i] - c0[i];
         c0m_squared += tmp * tmp;
-        tmp = c1[ i ] - c0[ i ];
+        tmp = c1[i] - c0[i];
         c01_squared += tmp * tmp;
     }
-    double lambda = sqrt( c0m_squared / c01_squared );
+    double lambda           = sqrt( c0m_squared / c01_squared );
     double one_minus_lambda = 1. - lambda;
 
     DataType data_type;
-    int      tag_size;
-    int      num_components;
-    int      num_tags = this->tag_manager->get_number_of_vertex_tags( );
-    Tag      tag_handle;
-    int      tag_offset;
+    int tag_size;
+    int num_components;
+    int num_tags = this->tag_manager->get_number_of_vertex_tags();
+    Tag tag_handle;
+    int tag_offset;
     for( int i = 0; i < num_tags; ++i )
     {
         this->tag_manager->get_input_vertex_tag( i, tag_handle, tag_offset );
-        this->tag_manager->get_input_mesh( )->tag_get_data_type( tag_handle, data_type );
-        this->tag_manager->get_input_mesh( )->tag_get_bytes( tag_handle, tag_size );
+        this->tag_manager->get_input_mesh()->tag_get_data_type( tag_handle, data_type );
+        this->tag_manager->get_input_mesh()->tag_get_bytes( tag_handle, tag_size );
 
         switch( data_type )
         {
             case MB_TYPE_DOUBLE: {
                 num_components = tag_size / sizeof( double );
-                double* t0i = (double*)( (char*)t0 + tag_offset );
-                double* tmi = (double*)( (char*)tm + tag_offset );
-                double* t1i = (double*)( (char*)t1 + tag_offset );
+                double* t0i    = (double*)( (char*)t0 + tag_offset );
+                double* tmi    = (double*)( (char*)tm + tag_offset );
+                double* t1i    = (double*)( (char*)t1 + tag_offset );
                 for( int j = 0; j < num_components; ++j )
-                    tmi[ j ] = one_minus_lambda * t0i[ j ] + lambda * t1i[ j ];
+                    tmi[j] = one_minus_lambda * t0i[j] + lambda * t1i[j];
             }
             break;
             default:
@@ -87,7 +87,7 @@ void SimplexTemplateTagAssigner::operator( )( const double* c0, const void* t0, 
     }
 }
 
-void SimplexTemplateTagAssigner::operator( )( const void* t0, const void* t1, const void* t2, void* tp )
+void SimplexTemplateTagAssigner::operator()( const void* t0, const void* t1, const void* t2, void* tp )
 {
     (void)t0;
     (void)t1;

@@ -42,7 +42,7 @@ ReadSTL::ReadSTL( Interface* impl ) : mdbImpl( impl )
     mdbImpl->query_interface( readMeshIface );
 }
 
-ReadSTL::~ReadSTL( )
+ReadSTL::~ReadSTL()
 {
     if( readMeshIface )
     {
@@ -104,61 +104,61 @@ ErrorCode ReadSTL::load_file( const char* filename, const EntityHandle* /* file_
     // Create a std::map from position->handle, and such
     // that all positions are specified, and handles are zero.
     std::map< Point, EntityHandle > vertex_map;
-    for( std::vector< Triangle >::iterator i = triangles.begin( ); i != triangles.end( ); ++i )
+    for( std::vector< Triangle >::iterator i = triangles.begin(); i != triangles.end(); ++i )
     {
-        vertex_map[ i->points[ 0 ] ] = 0;
-        vertex_map[ i->points[ 1 ] ] = 0;
-        vertex_map[ i->points[ 2 ] ] = 0;
+        vertex_map[i->points[0]] = 0;
+        vertex_map[i->points[1]] = 0;
+        vertex_map[i->points[2]] = 0;
     }
 
     // Create vertices
     std::vector< double* > coord_arrays;
-    EntityHandle           vtx_handle = 0;
-    result = readMeshIface->get_node_coords( 3, vertex_map.size( ), MB_START_ID, vtx_handle, coord_arrays );
+    EntityHandle vtx_handle = 0;
+    result = readMeshIface->get_node_coords( 3, vertex_map.size(), MB_START_ID, vtx_handle, coord_arrays );
     if( MB_SUCCESS != result ) return result;
 
     // Copy vertex coordinates into entity sequence coordinate arrays
     // and copy handle into vertex_map.
-    double *x = coord_arrays[ 0 ], *y = coord_arrays[ 1 ], *z = coord_arrays[ 2 ];
-    for( std::map< Point, EntityHandle >::iterator i = vertex_map.begin( ); i != vertex_map.end( ); ++i )
+    double *x = coord_arrays[0], *y = coord_arrays[1], *z = coord_arrays[2];
+    for( std::map< Point, EntityHandle >::iterator i = vertex_map.begin(); i != vertex_map.end(); ++i )
     {
         i->second = vtx_handle;
         ++vtx_handle;
-        *x = i->first.coords[ 0 ];
+        *x = i->first.coords[0];
         ++x;
-        *y = i->first.coords[ 1 ];
+        *y = i->first.coords[1];
         ++y;
-        *z = i->first.coords[ 2 ];
+        *z = i->first.coords[2];
         ++z;
     }
 
     // Allocate triangles
-    EntityHandle  elm_handle = 0;
+    EntityHandle elm_handle = 0;
     EntityHandle* connectivity;
-    result = readMeshIface->get_element_connect( triangles.size( ), 3, MBTRI, MB_START_ID, elm_handle, connectivity );
+    result = readMeshIface->get_element_connect( triangles.size(), 3, MBTRI, MB_START_ID, elm_handle, connectivity );
     if( MB_SUCCESS != result ) return result;
 
     // Use vertex_map to recover triangle connectivity from
     // vertex coordinates.
     EntityHandle* conn_sav = connectivity;
-    for( std::vector< Triangle >::iterator i = triangles.begin( ); i != triangles.end( ); ++i )
+    for( std::vector< Triangle >::iterator i = triangles.begin(); i != triangles.end(); ++i )
     {
-        *connectivity = vertex_map[ i->points[ 0 ] ];
+        *connectivity = vertex_map[i->points[0]];
         ++connectivity;
-        *connectivity = vertex_map[ i->points[ 1 ] ];
+        *connectivity = vertex_map[i->points[1]];
         ++connectivity;
-        *connectivity = vertex_map[ i->points[ 2 ] ];
+        *connectivity = vertex_map[i->points[2]];
         ++connectivity;
     }
 
     // Notify MOAB of the new elements
-    result = readMeshIface->update_adjacencies( elm_handle, triangles.size( ), 3, conn_sav );
+    result = readMeshIface->update_adjacencies( elm_handle, triangles.size(), 3, conn_sav );
     if( MB_SUCCESS != result ) return result;
 
     if( file_id_tag )
     {
-        Range vertices( vtx_handle, vtx_handle + vertex_map.size( ) - 1 );
-        Range elements( elm_handle, elm_handle + triangles.size( ) - 1 );
+        Range vertices( vtx_handle, vtx_handle + vertex_map.size() - 1 );
+        Range elements( elm_handle, elm_handle + triangles.size() - 1 );
         readMeshIface->assign_ids( *file_id_tag, vertices );
         readMeshIface->assign_ids( *file_id_tag, elements );
     }
@@ -172,12 +172,12 @@ ErrorCode ReadSTL::ascii_read_triangles( const char* name, std::vector< ReadSTL:
     FILE* file = fopen( name, "r" );
     if( !file ) { return MB_FILE_DOES_NOT_EXIST; }
 
-    char header[ 81 ];
+    char header[81];
     if( !fgets( header, sizeof( header ), file ) ||  // Read header line
-        strlen( header ) < 6 ||  // Must be at least 6 chars
-        header[ strlen( header ) - 1 ] != '\n' ||  // Cannot exceed 80 chars
-        memcmp( header, "solid", 5 ) ||  // Must begin with "solid"
-        !isspace( header[ 5 ] ) )
+        strlen( header ) < 6 ||                      // Must be at least 6 chars
+        header[strlen( header ) - 1] != '\n' ||      // Cannot exceed 80 chars
+        memcmp( header, "solid", 5 ) ||              // Must begin with "solid"
+        !isspace( header[5] ) )
     {  // Followed by a whitespace char
         fclose( file );
         return MB_FILE_WRITE_ERROR;
@@ -187,7 +187,7 @@ ErrorCode ReadSTL::ascii_read_triangles( const char* name, std::vector< ReadSTL:
     FileTokenizer tokens( file, readMeshIface );
 
     Triangle tri;
-    float    norm[ 3 ];
+    float norm[3];
 
     // Read until end of file. If we reach "endsolid", read
     // was successful. If EOF before "endsolid", return error.
@@ -206,15 +206,15 @@ ErrorCode ReadSTL::ascii_read_triangles( const char* name, std::vector< ReadSTL:
         }
 
         if( !tokens.match_token( "normal" ) ||  // Expect "normal" keyword
-            !tokens.get_floats( 3, norm ) ||  // Followed by normal vector
-            !tokens.match_token( "outer" ) ||  // Followed by "outer loop"
+            !tokens.get_floats( 3, norm ) ||    // Followed by normal vector
+            !tokens.match_token( "outer" ) ||   // Followed by "outer loop"
             !tokens.match_token( "loop" ) )
             return MB_FILE_WRITE_ERROR;
 
         // For each of three triangle vertices
         for( int i = 0; i < 3; i++ )
         {
-            if( !tokens.match_token( "vertex" ) || !tokens.get_floats( 3, tri.points[ i ].coords ) )
+            if( !tokens.match_token( "vertex" ) || !tokens.get_floats( 3, tri.points[i].coords ) )
                 return MB_FILE_WRITE_ERROR;
         }
 
@@ -232,16 +232,16 @@ ErrorCode ReadSTL::ascii_read_triangles( const char* name, std::vector< ReadSTL:
 // Header block from binary STL file (84 bytes long)
 struct BinaryHeader
 {
-    char     comment[ 80 ];  // 80 byte comment string (null terminated?)
-    uint32_t count;  // Number of triangles - 4 byte integer
+    char comment[80];  // 80 byte comment string (null terminated?)
+    uint32_t count;    // Number of triangles - 4 byte integer
 };
 
 // Triangle spec from file (50 bytes)
 struct BinaryTri
 {
-    float normal[ 3 ];  // Normal as 3 4-byte little-endian IEEE floats
-    float coords[ 9 ];  // Vertex coords as 9 4-byte little-endian IEEE floats
-    char  pad[ 2 ];
+    float normal[3];  // Normal as 3 4-byte little-endian IEEE floats
+    float coords[9];  // Vertex coords as 9 4-byte little-endian IEEE floats
+    char pad[2];
 };
 
 // Read a binary STL file
@@ -261,8 +261,8 @@ ErrorCode ReadSTL::binary_read_triangles( const char* name, ReadSTL::ByteOrder b
 
     // Allow user setting for byte order, default to little endian
     const bool want_big_endian = ( byte_order == STL_BIG_ENDIAN );
-    const bool am_big_endian = !SysUtil::little_endian( );
-    bool       swap_bytes = ( want_big_endian == am_big_endian );
+    const bool am_big_endian   = !SysUtil::little_endian();
+    bool swap_bytes            = ( want_big_endian == am_big_endian );
 
     // Compare the number of triangles to the length of the file.
     // The file must contain an 80-byte description, a 4-byte
@@ -294,14 +294,14 @@ ErrorCode ReadSTL::binary_read_triangles( const char* name, ReadSTL::ByteOrder b
             SysUtil::byteswap( &num_tri_tmp, 1 );
             unsigned long num_tri_swap = num_tri_tmp;
             if( byte_order != STL_UNKNOWN_BYTE_ORDER ||  // If byte order was specified, fail now
-                ULONG_MAX / 50 - 84 < num_tri_swap ||  // Watch for overflow in next line
+                ULONG_MAX / 50 - 84 < num_tri_swap ||    // Watch for overflow in next line
                 84 + 50 * num_tri_swap != (unsigned long)filesize )
             {
                 fclose( file );
                 return MB_FILE_WRITE_ERROR;
             }
             swap_bytes = !swap_bytes;
-            num_tri = num_tri_swap;
+            num_tri    = num_tri_swap;
         }
     }
 
@@ -310,7 +310,7 @@ ErrorCode ReadSTL::binary_read_triangles( const char* name, ReadSTL::ByteOrder b
 
     // Read each triangle
     BinaryTri tri;  // Binary block read from file
-    for( std::vector< Triangle >::iterator i = tris.begin( ); i != tris.end( ); ++i )
+    for( std::vector< Triangle >::iterator i = tris.begin(); i != tris.end(); ++i )
     {
         if( fread( &tri, 50, 1, file ) != 1 )
         {
@@ -321,7 +321,7 @@ ErrorCode ReadSTL::binary_read_triangles( const char* name, ReadSTL::ByteOrder b
         if( swap_bytes ) SysUtil::byteswap( tri.coords, 9 );
 
         for( unsigned j = 0; j < 9; ++j )
-            i->points[ j / 3 ].coords[ j % 3 ] = tri.coords[ j ];
+            i->points[j / 3].coords[j % 3] = tri.coords[j];
     }
 
     fclose( file );

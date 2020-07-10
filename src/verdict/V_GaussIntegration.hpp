@@ -26,10 +26,10 @@
 #include "moab/verdict.h"
 
 #define maxTotalNumberGaussPoints 27
-#define maxNumberNodes 20
-#define maxNumberGaussPoints 3
-#define maxNumberGaussPointsTri 6
-#define maxNumberGaussPointsTet 4
+#define maxNumberNodes            20
+#define maxNumberGaussPoints      3
+#define maxNumberGaussPointsTri   6
+#define maxNumberGaussPointsTet   4
 
 namespace GaussIntegration
 {
@@ -41,17 +41,17 @@ void get_signs_for_node_local_coord_hex( int node_id, double& sign_y1, double& s
 void initialize( int n = 2, int m = 4, int dim = 2, int tri = 0 );
 
 // manipulators
-void get_gauss_pts_and_weight( );
+void get_gauss_pts_and_weight();
 //- get gauss point locations and weights
 
-void get_tri_rule_pts_and_weight( );
+void get_tri_rule_pts_and_weight();
 //- get integration points and weights for triangular rules
 
-void calculate_shape_function_2d_tri( );
+void calculate_shape_function_2d_tri();
 //- calculate the shape functions and derivatives of shape functions
 //- at integration points for 2D triangular elements
 
-void calculate_shape_function_2d_quad( );
+void calculate_shape_function_2d_quad();
 //- calculate the shape functions and derivatives of shape functions
 //- at gaussian points for 2D quad elements
 
@@ -63,33 +63,31 @@ void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[], doubl
                      double dndy3_at_gauss_pts[], double gauss_weight[] );
 //- get shape functions and the derivatives for 3D elements
 
-void calculate_derivative_at_nodes( double dndy1_at_nodes[][ maxNumberNodes ],
-                                    double dndy2_at_nodes[][ maxNumberNodes ] );
+void calculate_derivative_at_nodes( double dndy1_at_nodes[][maxNumberNodes], double dndy2_at_nodes[][maxNumberNodes] );
 //- calculate shape function derivatives at nodes
 
-void calculate_shape_function_3d_hex( );
+void calculate_shape_function_3d_hex();
 //- calculate shape functions and derivatives of shape functions
 //- at gaussian points for 3D hex elements
 
-void calculate_derivative_at_nodes_3d( double dndy1_at_nodes[][ maxNumberNodes ],
-                                       double dndy2_at_nodes[][ maxNumberNodes ],
-                                       double dndy3_at_nodes[][ maxNumberNodes ] );
+void calculate_derivative_at_nodes_3d( double dndy1_at_nodes[][maxNumberNodes], double dndy2_at_nodes[][maxNumberNodes],
+                                       double dndy3_at_nodes[][maxNumberNodes] );
 //- calculate shape function derivatives at nodes for hex elements
 
-void calculate_derivative_at_nodes_2d_tri( double dndy1_at_nodes[][ maxNumberNodes ],
-                                           double dndy2_at_nodes[][ maxNumberNodes ] );
+void calculate_derivative_at_nodes_2d_tri( double dndy1_at_nodes[][maxNumberNodes],
+                                           double dndy2_at_nodes[][maxNumberNodes] );
 //- calculate shape function derivatives at nodes for triangular elements
 
-void calculate_shape_function_3d_tet( );
+void calculate_shape_function_3d_tet();
 //- calculate shape functions and derivatives of shape functions
 //- at integration points for 3D tet elements
 
-void get_tet_rule_pts_and_weight( );
+void get_tet_rule_pts_and_weight();
 //- get integration points and weights for tetrhedron rules
 
-void calculate_derivative_at_nodes_3d_tet( double dndy1_at_nodes[][ maxNumberNodes ],
-                                           double dndy2_at_nodes[][ maxNumberNodes ],
-                                           double dndy3_at_nodes[][ maxNumberNodes ] );
+void calculate_derivative_at_nodes_3d_tet( double dndy1_at_nodes[][maxNumberNodes],
+                                           double dndy2_at_nodes[][maxNumberNodes],
+                                           double dndy3_at_nodes[][maxNumberNodes] );
 //- calculate shape function derivatives at nodes for tetrahedron elements
 
 void get_node_local_coord_tet( int node_id, double& y1, double& y2, double& y3, double& y4 );

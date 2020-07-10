@@ -40,10 +40,10 @@ class ElemSampleQMTest : public CppUnit::TestFixture
   private:
     CPPUNIT_TEST_SUITE( ElemSampleQMTest );
     CPPUNIT_TEST( test_handle_from_sample );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
-    void test_handle_from_sample( );
+    void test_handle_from_sample();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( ElemSampleQMTest, "ElemSampleQMTest" );
@@ -57,7 +57,7 @@ void test_handle( Sample sample, size_t elem )
     CPPUNIT_ASSERT_EQUAL( elem, (size_t)ElemSampleQM::elem( handle ) );
 }
 
-void ElemSampleQMTest::test_handle_from_sample( )
+void ElemSampleQMTest::test_handle_from_sample()
 {
     Sample min_sample_no( 0, 0 );
     Sample max_sample_no( Sample::SIDE_DIMENSON_MASK, Sample::SIDE_NUMBER_MASK );

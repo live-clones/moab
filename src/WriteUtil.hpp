@@ -38,7 +38,7 @@ class WriteUtil : public WriteUtilIface
     WriteUtil( Core* mdb );
 
     //! Destructor
-    ~WriteUtil( ) {}
+    ~WriteUtil() {}
 
     //! Check if the specified file already exists.
     //! Returns MB_SUCCESS if file does not exist, MB_ALREADY_ALLOCATED
@@ -46,10 +46,10 @@ class WriteUtil : public WriteUtilIface
     virtual ErrorCode check_doesnt_exist( const char* file_name );
 
     //! Gather all entities in the mesh, or in the sets specified
-    virtual ErrorCode
-        gather_entities( Range&              all_ents, /**< range in which entities are returned */
-                         const EntityHandle* ent_sets = NULL, /**< entity sets whose contents are to be gathered */
-                         const int           num_sets = 0 /**< number of sets in list */ );
+    virtual ErrorCode gather_entities(
+        Range& all_ents,                     /**< range in which entities are returned */
+        const EntityHandle* ent_sets = NULL, /**< entity sets whose contents are to be gathered */
+        const int num_sets           = 0 /**< number of sets in list */ );
 
     //! Gets arrays for coordinate data from the MB
     ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const Range& entities, Tag node_id_tag,

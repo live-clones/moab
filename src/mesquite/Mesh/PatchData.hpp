@@ -71,14 +71,14 @@ class PatchData
 {
   public:
     // Constructor/Destructor
-    MESQUITE_EXPORT PatchData( );
-    MESQUITE_EXPORT ~PatchData( );
+    MESQUITE_EXPORT PatchData();
+    MESQUITE_EXPORT ~PatchData();
 
     MESQUITE_EXPORT void attach_settings( const Settings* p_settings )
     {
         mSettings = p_settings;
     }
-    MESQUITE_EXPORT const Settings* settings( ) const
+    MESQUITE_EXPORT const Settings* settings() const
     {
         return mSettings;
     }
@@ -161,19 +161,19 @@ class PatchData
     enum ComputedInfo
     {
         MIN_UNSIGNED_AREA = 0,  //!< minimum volume or area out of all elements in the patch
-        MAX_UNSIGNED_AREA,  //!< maximum volume or area out of all elements in the patch
-        MIN_EDGE_LENGTH,  //!< minimum edge length in the patch
-        MAX_EDGE_LENGTH,  //!< maximum edge length in the patch
-        MINMAX_SIGNED_DET2D,  //!< minimum and maximum corner area out of all elements in the patch
-        MINMAX_SIGNED_DET3D,  //!< minimum and maximum corner volume out of all elements in the
-                              //!< patch
-        AVERAGE_DET3D,  //!< average corner determinant out of all elements in the patch
+        MAX_UNSIGNED_AREA,      //!< maximum volume or area out of all elements in the patch
+        MIN_EDGE_LENGTH,        //!< minimum edge length in the patch
+        MAX_EDGE_LENGTH,        //!< maximum edge length in the patch
+        MINMAX_SIGNED_DET2D,    //!< minimum and maximum corner area out of all elements in the patch
+        MINMAX_SIGNED_DET3D,    //!< minimum and maximum corner volume out of all elements in the
+                                //!< patch
+        AVERAGE_DET3D,          //!< average corner determinant out of all elements in the patch
         MAX_COMPUTED_INFO_ENUM
     };
 
     //! This function clears the patch information such as maximum volume, etc ...
     MESQUITE_EXPORT
-    void clear_computed_info( )
+    void clear_computed_info()
     {
         haveComputedInfos = 0;
     }
@@ -200,32 +200,32 @@ class PatchData
 
     //! Removes data
     MESQUITE_EXPORT
-    void clear( );
+    void clear();
     //! Reorders the mesh data
     MESQUITE_EXPORT
-    void reorder( );
+    void reorder();
 
     //! number of vertices in the patch.
-    MESQUITE_EXPORT size_t num_nodes( ) const
+    MESQUITE_EXPORT size_t num_nodes() const
     {
-        return vertexArray.size( );
+        return vertexArray.size();
     }
-    MESQUITE_EXPORT size_t num_free_vertices( ) const
+    MESQUITE_EXPORT size_t num_free_vertices() const
     {
         return numFreeVertices;
     }
-    MESQUITE_EXPORT size_t num_slave_vertices( ) const
+    MESQUITE_EXPORT size_t num_slave_vertices() const
     {
         return numSlaveVertices;
     }
-    MESQUITE_EXPORT size_t num_fixed_vertices( ) const
+    MESQUITE_EXPORT size_t num_fixed_vertices() const
     {
-        return num_nodes( ) - num_free_vertices( ) - num_slave_vertices( );
+        return num_nodes() - num_free_vertices() - num_slave_vertices();
     }
     //! number of elements in the Patch.
-    MESQUITE_EXPORT size_t num_elements( ) const
+    MESQUITE_EXPORT size_t num_elements() const
     {
-        return elementArray.size( );
+        return elementArray.size();
     }
 
     MESQUITE_EXPORT bool is_vertex_free( size_t index ) const
@@ -246,12 +246,12 @@ class PatchData
     }
 
     //! number of element corners (number of vertex uses) in patch
-    MESQUITE_EXPORT size_t num_corners( ) const;
+    MESQUITE_EXPORT size_t num_corners() const;
 
     //! Returns a pointer to the start of the vertex array.
     MESQUITE_EXPORT const MsqVertex* get_vertex_array( MsqError& err ) const;
     // MsqVertex* get_vertex_array(MsqError &err);
-    MESQUITE_EXPORT const MsqVertex* get_vertex_array( ) const
+    MESQUITE_EXPORT const MsqVertex* get_vertex_array() const
     {
         return arrptr( vertexArray );
     }
@@ -261,17 +261,17 @@ class PatchData
     MESQUITE_EXPORT const MsqMeshEntity* get_element_array( MsqError& err ) const;
     MESQUITE_EXPORT MsqMeshEntity* get_element_array( MsqError& err );
 
-    MESQUITE_EXPORT size_t* get_connectivity_array( )
+    MESQUITE_EXPORT size_t* get_connectivity_array()
     {
         return arrptr( elemConnectivityArray );
     }
 
-    MESQUITE_EXPORT Mesh::ElementHandle* get_element_handles_array( )
+    MESQUITE_EXPORT Mesh::ElementHandle* get_element_handles_array()
     {
         return arrptr( elementHandlesArray );
     }
 
-    MESQUITE_EXPORT Mesh::VertexHandle* get_vertex_handles_array( )
+    MESQUITE_EXPORT Mesh::VertexHandle* get_vertex_handles_array()
     {
         return arrptr( vertexHandlesArray );
     }
@@ -294,8 +294,8 @@ class PatchData
     MESQUITE_EXPORT const MsqVertex& vertex_by_index( size_t index ) const;
     MESQUITE_EXPORT MsqMeshEntity& element_by_index( size_t index );
     MESQUITE_EXPORT const MsqMeshEntity& element_by_index( size_t index ) const;
-    MESQUITE_EXPORT size_t               get_vertex_index( MsqVertex* vertex );
-    MESQUITE_EXPORT size_t               get_element_index( MsqMeshEntity* element );
+    MESQUITE_EXPORT size_t get_vertex_index( MsqVertex* vertex );
+    MESQUITE_EXPORT size_t get_element_index( MsqMeshEntity* element );
 
     //! Get the coordinates of vertices attached to the specified element
     MESQUITE_EXPORT
@@ -337,7 +337,7 @@ class PatchData
       pass it in.  Otherwise the PatchData will calculate that number.
     */
     MESQUITE_EXPORT
-    void generate_vertex_to_element_data( );
+    void generate_vertex_to_element_data();
 
     /*!
      */
@@ -359,7 +359,7 @@ class PatchData
         the Patch originates.
         If false, you cannot ask for a surface normal. */
     MESQUITE_EXPORT
-    bool domain_set( ) const
+    bool domain_set() const
     {
         return 0 != myDomain;
     }
@@ -406,7 +406,7 @@ class PatchData
     MESQUITE_EXPORT
     void get_domain_normal_at_element( const MsqMeshEntity* elem_ptr, Vector3D& surf_norm, MsqError& err )
     {
-        get_domain_normal_at_element( size_t( elem_ptr - &( elementArray[ 0 ] ) ), surf_norm, err );
+        get_domain_normal_at_element( size_t( elem_ptr - &( elementArray[0] ) ), surf_norm, err );
     }
 
     MESQUITE_EXPORT
@@ -488,19 +488,19 @@ class PatchData
     MESQUITE_EXPORT
     void set_vertex_culled( size_t vtx_index )
     {
-        vertexArray[ vtx_index ].flags( ) |= MsqVertex::MSQ_CULLED;
+        vertexArray[vtx_index].flags() |= MsqVertex::MSQ_CULLED;
     }
     //! Mark vertex as culled (soft fixed)
     MESQUITE_EXPORT
     void clear_vertex_culled( size_t vtx_index )
     {
-        vertexArray[ vtx_index ].flags( ) &= ~MsqVertex::MSQ_CULLED;
+        vertexArray[vtx_index].flags() &= ~MsqVertex::MSQ_CULLED;
     }
     //! check if vertex is culled
     MESQUITE_EXPORT
     int check_vertex_culled( size_t vtx_index ) const
     {
-        return vertexArray[ vtx_index ].get_flags( ) | MsqVertex::MSQ_CULLED;
+        return vertexArray[vtx_index].get_flags() | MsqVertex::MSQ_CULLED;
     }
 
     //! Fills a PatchData with the elements attached to a center vertex.
@@ -537,7 +537,7 @@ class PatchData
 
     //! Returns the originating meshSet.
     MESQUITE_EXPORT
-    Mesh* get_mesh( ) const
+    Mesh* get_mesh() const
     {
         return myMesh;
     }
@@ -546,13 +546,13 @@ class PatchData
     void set_domain( MeshDomain* dm );
 
     MESQUITE_EXPORT
-    MeshDomain* get_domain( ) const
+    MeshDomain* get_domain() const
     {
         return myDomain;
     }
 
     MESQUITE_EXPORT
-    const Settings* get_settings( ) const
+    const Settings* get_settings() const
     {
         return mSettings;
     }
@@ -585,7 +585,7 @@ class PatchData
     NodeSet get_samples( size_t element, NodeSet non_slave_nodes ) const
     {
         // If we have a mapping function, use it
-        const EntityTopology   type = element_by_index( element ).get_element_type( );
+        const EntityTopology type = element_by_index( element ).get_element_type();
         const MappingFunction* f;
         if( mSettings && ( f = mSettings->get_mapping_function( type ) ) ) return f->sample_points( non_slave_nodes );
         // Otherwise default to sampling at all non-slave nodes
@@ -614,7 +614,7 @@ class PatchData
     bool remove_extra_data( ExtraData* data );
 
     /**\brief notify all attached ExtraData instances that patch contents have changed */
-    void notify_new_patch( );
+    void notify_new_patch();
     /**\brief notify all attached ExtraData instances that a subpatch is being initalized
      *\param sub_patch  The new, already populated subpatch
      *\param vertex_index_map For the i-th vertex in the subpatch, the
@@ -627,7 +627,7 @@ class PatchData
     void notify_sub_patch( PatchData& sub_patch, const size_t* vertex_index_map, const size_t* element_index_map,
                            MsqError& err );
     /**\brief notify all attached ExtraData instances that this patch is being destroyed */
-    void notify_patch_destroyed( );
+    void notify_patch_destroyed();
 
     /** Call before initialize_data to change vertex_flags for
      *  higher-order nodes to MSQ_DEPENDENT.
@@ -681,7 +681,7 @@ class PatchData
     /*\brief Update cached domain normal data */
     void update_cached_normals( MsqError& );
 
-    Mesh*       myMesh;  //!< The Mesh used to fill this PatchData [may be NULL]
+    Mesh* myMesh;          //!< The Mesh used to fill this PatchData [may be NULL]
     MeshDomain* myDomain;  //!< The geometric domain of the mesh [may be NULL]
 
     //! Cached data for vertices in PatchData::vertexHandlesArray,
@@ -739,19 +739,19 @@ class PatchData
 
     // Arrays in which to store temporary data
     // (avoids reallocation of temp space)
-    std::vector< size_t >        offsetArray;
+    std::vector< size_t > offsetArray;
     std::vector< unsigned char > byteArray;
-    mutable std::vector< bool >  bitMap;
+    mutable std::vector< bool > bitMap;
 
     // Patch Computed Information (maxs, mins, etc ... )
-    double computedInfos[ MAX_COMPUTED_INFO_ENUM ];
+    double computedInfos[MAX_COMPUTED_INFO_ENUM];
     // Bit map indicating which values in PatchData::computedInfos
     // are valud (which values have been calculated.)
     unsigned haveComputedInfos;
 
     ExtraData* dataList;
 
-    const Settings*       mSettings;
+    const Settings* mSettings;
     static const Settings defaultSettings;
 };
 
@@ -766,47 +766,47 @@ void print_patch_data( const PatchData& pd );
 class PatchDataVerticesMemento
 {
   public:
-    void clear( )
+    void clear()
     {
         originator = 0;
-        vertices.clear( );
-        normalData.clear( );
+        vertices.clear();
+        normalData.clear();
     }
 
   private:
     // Constructor accessible only to originator (i.e. PatchData)
     friend class PatchData;
-    PatchDataVerticesMemento( ) : originator( 0 ) {}
+    PatchDataVerticesMemento() : originator( 0 ) {}
 
-    PatchData*               originator;  //!< PatchData whose state is kept
+    PatchData* originator;  //!< PatchData whose state is kept
     std::vector< MsqVertex > vertices;
-    std::vector< Vector3D >  normalData;
+    std::vector< Vector3D > normalData;
 };
 
-inline void PatchData::clear( )
+inline void PatchData::clear()
 {
-    vertexArray.clear( );
-    vertexHandlesArray.clear( );
-    elementArray.clear( );
-    elementHandlesArray.clear( );
-    elemConnectivityArray.clear( );
-    vertAdjacencyArray.clear( );
-    vertAdjacencyOffsets.clear( );
-    vertexNormalIndices.clear( );
-    normalData.clear( );
+    vertexArray.clear();
+    vertexHandlesArray.clear();
+    elementArray.clear();
+    elementHandlesArray.clear();
+    elemConnectivityArray.clear();
+    vertAdjacencyArray.clear();
+    vertAdjacencyOffsets.clear();
+    vertexNormalIndices.clear();
+    normalData.clear();
     // vertexDomainDOF.clear();
-    numFreeVertices = 0;
-    numSlaveVertices = 0;
+    numFreeVertices   = 0;
+    numSlaveVertices  = 0;
     haveComputedInfos = 0;
-    myMesh = 0;
-    myDomain = 0;
+    myMesh            = 0;
+    myDomain          = 0;
 }
 
 /*! \brief Returns an array of all vertices in the PatchData.
  */
 inline const MsqVertex* PatchData::get_vertex_array( MsqError& err ) const
 {
-    if( vertexArray.empty( ) ) MSQ_SETERR( err )( "No vertex array defined", MsqError::INVALID_STATE );
+    if( vertexArray.empty() ) MSQ_SETERR( err )( "No vertex array defined", MsqError::INVALID_STATE );
     return arrptr( vertexArray );
 }
 
@@ -814,12 +814,12 @@ inline const MsqVertex* PatchData::get_vertex_array( MsqError& err ) const
  */
 inline const MsqMeshEntity* PatchData::get_element_array( MsqError& err ) const
 {
-    if( elementArray.empty( ) ) MSQ_SETERR( err )( "No element array defined", MsqError::INVALID_STATE );
+    if( elementArray.empty() ) MSQ_SETERR( err )( "No element array defined", MsqError::INVALID_STATE );
     return arrptr( elementArray );
 }
 inline MsqMeshEntity* PatchData::get_element_array( MsqError& err )
 {
-    if( elementArray.empty( ) ) MSQ_SETERR( err )( "No element array defined", MsqError::INVALID_STATE );
+    if( elementArray.empty() ) MSQ_SETERR( err )( "No element array defined", MsqError::INVALID_STATE );
     return arrptr( elementArray );
 }
 
@@ -827,17 +827,17 @@ inline MsqMeshEntity* PatchData::get_element_array( MsqError& err )
  */
 inline void PatchData::set_vertex_coordinates( const Vector3D& coords, size_t index, MsqError& err )
 {
-    if( index >= vertexArray.size( ) )
+    if( index >= vertexArray.size() )
     {
         MSQ_SETERR( err )( "Index bigger than numVertices.", MsqError::INVALID_ARG );
         return;
     }
 
-    vertexArray[ index ] = coords;
+    vertexArray[index] = coords;
 
     if( numSlaveVertices )
     {
-        size_t        num_elem;
+        size_t num_elem;
         const size_t* indices;
         indices = get_vertex_element_adjacencies( index, num_elem, err );MSQ_ERRRTN( err );
         update_slave_node_coordinates( indices, num_elem, err );MSQ_ERRRTN( err );
@@ -847,17 +847,17 @@ inline void PatchData::set_vertex_coordinates( const Vector3D& coords, size_t in
  */
 inline void PatchData::move_vertex( const Vector3D& delta, size_t index, MsqError& err )
 {
-    if( index >= vertexArray.size( ) )
+    if( index >= vertexArray.size() )
     {
         MSQ_SETERR( err )( "Index bigger than numVertices.", MsqError::INVALID_ARG );
         return;
     }
 
-    vertexArray[ index ] += delta;
+    vertexArray[index] += delta;
 
     if( numSlaveVertices )
     {
-        size_t        num_elem;
+        size_t num_elem;
         const size_t* indices;
         indices = get_vertex_element_adjacencies( index, num_elem, err );MSQ_ERRRTN( err );
         update_slave_node_coordinates( indices, num_elem, err );MSQ_ERRRTN( err );
@@ -871,20 +871,20 @@ inline void PatchData::move_vertex( const Vector3D& delta, size_t index, MsqErro
 
 inline const MsqVertex& PatchData::vertex_by_index( size_t index ) const
 {
-    assert( index < vertexArray.size( ) );
-    return vertexArray[ index ];
+    assert( index < vertexArray.size() );
+    return vertexArray[index];
 }
 
 inline MsqMeshEntity& PatchData::element_by_index( size_t index )
 {
-    assert( index < elementArray.size( ) );
-    return elementArray[ index ];
+    assert( index < elementArray.size() );
+    return elementArray[index];
 }
 
 inline const MsqMeshEntity& PatchData::element_by_index( size_t index ) const
 {
-    assert( index < elementArray.size( ) );
-    return elementArray[ index ];
+    assert( index < elementArray.size() );
+    return elementArray[index];
 }
 
 /*! gets the index of a vertex in the PatchData vertex array,
@@ -901,8 +901,8 @@ inline size_t PatchData::get_element_index( MsqMeshEntity* element )
 
 inline void PatchData::get_free_vertex_coordinates( std::vector< Vector3D >& coords_out ) const
 {
-    coords_out.resize( num_free_vertices( ) );
-    std::copy( vertexArray.begin( ), vertexArray.begin( ) + num_free_vertices( ), coords_out.begin( ) );
+    coords_out.resize( num_free_vertices() );
+    std::copy( vertexArray.begin(), vertexArray.begin() + num_free_vertices(), coords_out.begin() );
 }
 
 /*!
@@ -937,31 +937,31 @@ inline void PatchData::recreate_vertices_memento( PatchDataVerticesMemento* meme
 {
     memento->originator = this;
 
-    size_t num_vtx = num_free_vertices( ) + num_slave_vertices( );
+    size_t num_vtx = num_free_vertices() + num_slave_vertices();
 
     memento->vertices.resize( num_vtx );
-    std::copy( vertexArray.begin( ), vertexArray.begin( ) + num_vtx, memento->vertices.begin( ) );
+    std::copy( vertexArray.begin(), vertexArray.begin() + num_vtx, memento->vertices.begin() );
 
     int num_normal;
-    if( normalData.empty( ) )
+    if( normalData.empty() )
         num_normal = 0;
-    else if( vertexNormalIndices.empty( ) )
+    else if( vertexNormalIndices.empty() )
         num_normal = num_vtx;
     else
     {
         num_normal = num_vtx;
-        while( num_normal != 0 && vertexNormalIndices[ --num_normal ] >= normalData.size( ) )
+        while( num_normal != 0 && vertexNormalIndices[--num_normal] >= normalData.size() )
             ;
         if( num_normal == 0 )
         {
-            if( vertexNormalIndices[ 0 ] < normalData.size( ) ) num_normal = vertexNormalIndices[ 0 ] + 1;
+            if( vertexNormalIndices[0] < normalData.size() ) num_normal = vertexNormalIndices[0] + 1;
         }
         else
-            num_normal = vertexNormalIndices[ num_normal ] + 1;
+            num_normal = vertexNormalIndices[num_normal] + 1;
     }
 
     memento->normalData.resize( num_normal );
-    std::copy( normalData.begin( ), normalData.begin( ) + num_normal, memento->normalData.begin( ) );
+    std::copy( normalData.begin(), normalData.begin() + num_normal, memento->normalData.begin() );
 }
 
 /*!
@@ -982,7 +982,7 @@ inline void PatchData::set_to_vertices_memento( PatchDataVerticesMemento* mement
         return;
     }
 
-    if( memento->vertices.size( ) != num_free_vertices( ) + num_slave_vertices( ) )
+    if( memento->vertices.size() != num_free_vertices() + num_slave_vertices() )
     {
         MSQ_SETERR( err )
         ( "Unable to restore patch coordinates.  Number of "
@@ -992,8 +992,8 @@ inline void PatchData::set_to_vertices_memento( PatchDataVerticesMemento* mement
     }
 
     // copies the memento array into the PatchData array.
-    std::copy( memento->vertices.begin( ), memento->vertices.end( ), vertexArray.begin( ) );
-    std::copy( memento->normalData.begin( ), memento->normalData.end( ), normalData.begin( ) );
+    std::copy( memento->vertices.begin(), memento->vertices.end(), vertexArray.begin() );
+    std::copy( memento->normalData.begin(), memento->normalData.end(), normalData.begin() );
 }
 
 }  // namespace MBMesquite

@@ -68,20 +68,20 @@ void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean,
 
 int main( int argc, char* argv[] )
 {
-    const char* input_file = DEFAULT_INPUT.c_str( );
+    const char* input_file  = DEFAULT_INPUT.c_str();
     const char* output_file = NULL;
     switch( argc )
     {
         default:
-            help( argv[ 0 ] );
+            help( argv[0] );
         case 2:
-            if( !strcmp( argv[ 1 ], "-h" ) ) help( argv[ 0 ] );
-            output_file = argv[ 1 ];
+            if( !strcmp( argv[1], "-h" ) ) help( argv[0] );
+            output_file = argv[1];
         case 1:;
     }
 
     /* Read a VTK Mesh file */
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( input_file, err );
     if( err )
@@ -101,9 +101,9 @@ int main( int argc, char* argv[] )
     if( err ) return 1;
 
     /* Run optimizer */
-    SphericalDomain       geom( Vector3D( 0, 0, 0 ), 10.0 );
+    SphericalDomain geom( Vector3D( 0, 0, 0 ), 10.0 );
     SizeAdaptShapeWrapper smoother( 1e-2 );
-    MeshDomainAssoc       mesh_and_domain = MeshDomainAssoc( &mesh, &geom );
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &geom );
     smoother.run_instructions( &mesh_and_domain, err );
     if( err ) return 1;
 
@@ -127,11 +127,11 @@ int main( int argc, char* argv[] )
     elem_areas( mesh, equatorial, eq2_min, eq2_mean, eq2_max, err );
     if( err ) return 1;
 
-    double eq_min_pct = 100 * fabs( eq_min - eq2_min ) / eq_min;
-    double eq_max_pct = 100 * fabs( eq_max - eq2_max ) / eq_max;
-    double eq_mean_pct = 100 * fabs( eq_mean - eq2_mean ) / eq_mean;
-    double pol_min_pct = 100 * fabs( pol_min - pol2_min ) / pol_min;
-    double pol_max_pct = 100 * fabs( pol_max - pol2_max ) / pol_max;
+    double eq_min_pct   = 100 * fabs( eq_min - eq2_min ) / eq_min;
+    double eq_max_pct   = 100 * fabs( eq_max - eq2_max ) / eq_max;
+    double eq_mean_pct  = 100 * fabs( eq_mean - eq2_mean ) / eq_mean;
+    double pol_min_pct  = 100 * fabs( pol_min - pol2_min ) / pol_min;
+    double pol_max_pct  = 100 * fabs( pol_max - pol2_max ) / pol_max;
     double pol_mean_pct = 100 * fabs( pol_mean - pol2_mean ) / pol_mean;
 
     std::printf( "\n\n" );
@@ -156,19 +156,19 @@ void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t&
     mesh.get_all_elements( elems, err );MSQ_ERRRTN( err );
 
     std::vector< Mesh::VertexHandle > verts;
-    std::vector< MsqVertex >          coords;
-    std::vector< size_t >             junk;
-    for( elem_vec_t::iterator i = elems.begin( ); i != elems.end( ); ++i )
+    std::vector< MsqVertex > coords;
+    std::vector< size_t > junk;
+    for( elem_vec_t::iterator i = elems.begin(); i != elems.end(); ++i )
     {
-        verts.clear( );
-        junk.clear( );
+        verts.clear();
+        junk.clear();
         mesh.elements_get_attached_vertices( &*i, 1, verts, junk, err );MSQ_ERRRTN( err );
-        coords.resize( verts.size( ) );
-        mesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size( ), err );MSQ_ERRRTN( err );
+        coords.resize( verts.size() );
+        mesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size(), err );MSQ_ERRRTN( err );
 
-        for( std::vector< MsqVertex >::iterator j = coords.begin( ); j != coords.end( ); ++j )
+        for( std::vector< MsqVertex >::iterator j = coords.begin(); j != coords.end(); ++j )
         {
-            double z = ( *j )[ 2 ];
+            double z = ( *j )[2];
             if( fabs( z ) < 1e-6 )
             {
                 equatorial_elems.push_back( *i );
@@ -185,39 +185,39 @@ void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t&
 
 void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max, MsqError& err )
 {
-    min = HUGE_VAL;
-    max = -1;
+    min  = HUGE_VAL;
+    max  = -1;
     mean = 0.0;
 
-    std::vector< EntityTopology > types( elems.size( ) );
-    mesh.elements_get_topologies( arrptr( elems ), arrptr( types ), elems.size( ), err );MSQ_ERRRTN( err );
+    std::vector< EntityTopology > types( elems.size() );
+    mesh.elements_get_topologies( arrptr( elems ), arrptr( types ), elems.size(), err );MSQ_ERRRTN( err );
 
     std::vector< Mesh::VertexHandle > verts;
-    std::vector< MsqVertex >          coords;
-    std::vector< size_t >             junk;
-    for( size_t i = 0; i < elems.size( ); ++i )
+    std::vector< MsqVertex > coords;
+    std::vector< size_t > junk;
+    for( size_t i = 0; i < elems.size(); ++i )
     {
-        verts.clear( );
-        junk.clear( );
-        mesh.elements_get_attached_vertices( &elems[ i ], 1, verts, junk, err );MSQ_ERRRTN( err );
-        coords.resize( verts.size( ) );
-        mesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size( ), err );MSQ_ERRRTN( err );
+        verts.clear();
+        junk.clear();
+        mesh.elements_get_attached_vertices( &elems[i], 1, verts, junk, err );MSQ_ERRRTN( err );
+        coords.resize( verts.size() );
+        mesh.vertices_get_coordinates( arrptr( verts ), arrptr( coords ), verts.size(), err );MSQ_ERRRTN( err );
 
         Vector3D v1, v2;
-        double   area;
-        if( types[ i ] == TRIANGLE )
+        double area;
+        if( types[i] == TRIANGLE )
         {
-            assert( coords.size( ) == 3 );
-            v1 = coords[ 1 ] - coords[ 0 ];
-            v2 = coords[ 2 ] - coords[ 0 ];
-            area = 0.5 * ( v1 * v2 ).length( );
+            assert( coords.size() == 3 );
+            v1   = coords[1] - coords[0];
+            v2   = coords[2] - coords[0];
+            area = 0.5 * ( v1 * v2 ).length();
         }
-        else if( types[ i ] == QUADRILATERAL )
+        else if( types[i] == QUADRILATERAL )
         {
-            assert( coords.size( ) == 4 );
-            v1 = coords[ 0 ] + coords[ 1 ] - coords[ 2 ] - coords[ 3 ];
-            v2 = coords[ 0 ] + coords[ 3 ] - coords[ 1 ] - coords[ 2 ];
-            area = 0.25 * ( v1 * v2 ).length( );
+            assert( coords.size() == 4 );
+            v1   = coords[0] + coords[1] - coords[2] - coords[3];
+            v2   = coords[0] + coords[3] - coords[1] - coords[2];
+            area = 0.25 * ( v1 * v2 ).length();
         }
         else
         {
@@ -231,5 +231,5 @@ void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean,
         mean += area;
     }
 
-    mean /= elems.size( );
+    mean /= elems.size();
 }

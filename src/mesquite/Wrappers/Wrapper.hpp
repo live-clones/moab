@@ -49,18 +49,18 @@ class QualityAssessor;
 class MESQUITE_EXPORT Wrapper : public IQInterface
 {
   public:
-    Wrapper( );
+    Wrapper();
 
-    virtual ~Wrapper( );
+    virtual ~Wrapper();
 
     /** Get the quality assessor associated with this wrapper */
-    inline QualityAssessor& quality_assessor( )
+    inline QualityAssessor& quality_assessor()
     {
         return *qualAssessor;
     }
 
     /** Get the quality assessor associated with this wrapper */
-    inline const QualityAssessor& quality_asssessor( ) const
+    inline const QualityAssessor& quality_asssessor() const
     {
         return *qualAssessor;
     }

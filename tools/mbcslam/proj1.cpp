@@ -23,17 +23,17 @@ int main( int argc, char** argv )
 
     if( argc < 3 ) return 1;
 
-    int   index = 1;
-    char* input_mesh1 = argv[ 1 ];
-    char* output = argv[ 2 ];
+    int index         = 1;
+    char* input_mesh1 = argv[1];
+    char* output      = argv[2];
     while( index < argc )
     {
-        if( !strcmp( argv[ index ], "-R" ) )  // this is for radius to project
-        { radius = atof( argv[ ++index ] ); }
-        if( !strcmp( argv[ index ], "-DS" ) )  // delete partition sets
+        if( !strcmp( argv[index], "-R" ) )  // this is for radius to project
+        { radius = atof( argv[++index] ); }
+        if( !strcmp( argv[index], "-DS" ) )  // delete partition sets
         { delete_partition_sets = true; }
 
-        if( !strcmp( argv[ index ], "-h" ) )
+        if( !strcmp( argv[index], "-h" ) )
         {
             std::cout << " usage: proj1 <input> <output> -R <value>  -DS (delete partition sets)\n";
             return 1;
@@ -41,7 +41,7 @@ int main( int argc, char** argv )
         index++;
     }
 
-    Core       moab;
+    Core moab;
     Interface& mb = moab;
 
     ErrorCode rval = mb.load_mesh( input_mesh1 );
@@ -53,20 +53,20 @@ int main( int argc, char** argv )
     if( MB_SUCCESS != rval ) return 1;
 
     double *x_ptr, *y_ptr, *z_ptr;
-    int     count;
-    rval = mb.coords_iterate( verts.begin( ), verts.end( ), x_ptr, y_ptr, z_ptr, count );
+    int count;
+    rval = mb.coords_iterate( verts.begin(), verts.end(), x_ptr, y_ptr, z_ptr, count );
     if( MB_SUCCESS != rval ) return 1;
-    assert( count == (int)verts.size( ) );  // should end up with just one contiguous chunk of vertices
+    assert( count == (int)verts.size() );  // should end up with just one contiguous chunk of vertices
 
     for( int v = 0; v < count; v++ )
     {
         // EntityHandle v = verts[v];
-        CartVect pos( x_ptr[ v ], y_ptr[ v ], z_ptr[ v ] );
-        pos = pos / pos.length( );
-        pos = radius * pos;
-        x_ptr[ v ] = pos[ 0 ];
-        y_ptr[ v ] = pos[ 1 ];
-        z_ptr[ v ] = pos[ 2 ];
+        CartVect pos( x_ptr[v], y_ptr[v], z_ptr[v] );
+        pos      = pos / pos.length();
+        pos      = radius * pos;
+        x_ptr[v] = pos[0];
+        y_ptr[v] = pos[1];
+        z_ptr[v] = pos[2];
     }
 
     Range edges;
@@ -95,7 +95,7 @@ int main( int argc, char** argv )
             Range par_sets;
             rval =
                 mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &par_tag, NULL, 1, par_sets, moab::Interface::UNION );
-            if( !par_sets.empty( ) ) mb.delete_entities( par_sets );
+            if( !par_sets.empty() ) mb.delete_entities( par_sets );
             mb.tag_delete( par_tag );
         }
     }

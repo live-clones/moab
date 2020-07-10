@@ -58,20 +58,20 @@
 namespace MBMesquite
 {
 
-std::string TQualityMetric::get_name( ) const
+std::string TQualityMetric::get_name() const
 {
-    return targetMetric->get_name( );
+    return targetMetric->get_name();
 }
 
 bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& value, size_t* indices,
                                         size_t& num_indices, MsqError& err )
 {
-    const Sample   s = ElemSampleQM::sample( p_handle );
-    const size_t   e = ElemSampleQM::elem( p_handle );
+    const Sample s        = ElemSampleQM::sample( p_handle );
+    const size_t e        = ElemSampleQM::elem( p_handle );
     MsqMeshEntity& p_elem = pd.element_by_index( e );
-    EntityTopology type = p_elem.get_element_type( );
-    unsigned       edim = TopologyInfo::dimension( type );
-    const NodeSet  bits = pd.non_slave_node_set( e );
+    EntityTopology type   = p_elem.get_element_type();
+    unsigned edim         = TopologyInfo::dimension( type );
+    const NodeSet bits    = pd.non_slave_node_set( e );
 
     bool rval;
     if( edim == 3 )
@@ -90,8 +90,8 @@ bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& 
         targetCalc->get_3D_target( pd, e, s, W, err );
         MSQ_ERRZERO( err );
         const MsqMatrix< 3, 3 > Winv = inverse( W );
-        const MsqMatrix< 3, 3 > T = A * Winv;
-        rval = targetMetric->evaluate( T, value, err );
+        const MsqMatrix< 3, 3 > T    = A * Winv;
+        rval                         = targetMetric->evaluate( T, value, err );
         MSQ_ERRZERO( err );
 #ifdef PRINT_INFO
         print_info< 3 >( e, s, A, W, A * inverse( W ) );
@@ -105,8 +105,8 @@ bool TQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& 
             evaluate_surface_common( pd, s, e, bits, indices, num_indices, mDerivs2D, W, A, S_a_transpose_Theta, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
-        const MsqMatrix< 2, 2 > T = A * Winv;
-        rval = targetMetric->evaluate( T, value, err );
+        const MsqMatrix< 2, 2 > T    = A * Winv;
+        rval                         = targetMetric->evaluate( T, value, err );
         MSQ_ERRZERO( err );
 
 #ifdef PRINT_INFO
@@ -126,13 +126,13 @@ bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, dou
                                              std::vector< size_t >& indices, std::vector< Vector3D >& grad,
                                              MsqError& err )
 {
-    const Sample   s = ElemSampleQM::sample( p_handle );
-    const size_t   e = ElemSampleQM::elem( p_handle );
+    const Sample s        = ElemSampleQM::sample( p_handle );
+    const size_t e        = ElemSampleQM::elem( p_handle );
     MsqMeshEntity& p_elem = pd.element_by_index( e );
-    EntityTopology type = p_elem.get_element_type( );
-    unsigned       edim = TopologyInfo::dimension( type );
-    size_t         num_idx = 0;
-    const NodeSet  bits = pd.non_slave_node_set( e );
+    EntityTopology type   = p_elem.get_element_type();
+    unsigned edim         = TopologyInfo::dimension( type );
+    size_t num_idx        = 0;
+    const NodeSet bits    = pd.non_slave_node_set( e );
 
     bool rval;
     if( edim == 3 )
@@ -151,8 +151,8 @@ bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, dou
         targetCalc->get_3D_target( pd, e, s, W, err );
         MSQ_ERRZERO( err );
         const MsqMatrix< 3, 3 > Winv = inverse( W );
-        const MsqMatrix< 3, 3 > T = A * Winv;
-        rval = targetMetric->evaluate_with_grad( T, value, dmdT, err );
+        const MsqMatrix< 3, 3 > T    = A * Winv;
+        rval                         = targetMetric->evaluate_with_grad( T, value, dmdT, err );
         MSQ_ERRZERO( err );
         gradient< 3 >( num_idx, mDerivs3D, dmdT * transpose( Winv ), grad );
 #ifdef PRINT_INFO
@@ -166,8 +166,8 @@ bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, dou
         rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, S_a_transpose_Theta, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
-        const MsqMatrix< 2, 2 > T = A * Winv;
-        rval = targetMetric->evaluate_with_grad( T, value, dmdT, err );
+        const MsqMatrix< 2, 2 > T    = A * Winv;
+        rval                         = targetMetric->evaluate_with_grad( T, value, dmdT, err );
         MSQ_ERRZERO( err );
         gradient< 2 >( num_idx, mDerivs2D, S_a_transpose_Theta * dmdT * transpose( Winv ), grad );
 #ifdef PRINT_INFO
@@ -182,10 +182,10 @@ bool TQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, dou
 
     // pass back index list
     indices.resize( num_idx );
-    std::copy( mIndices, mIndices + num_idx, indices.begin( ) );
+    std::copy( mIndices, mIndices + num_idx, indices.begin() );
 
     // apply target weight to value
-    weight( pd, s, e, num_idx, value, grad.empty( ) ? 0 : arrptr( grad ), 0, 0, err );
+    weight( pd, s, e, num_idx, value, grad.empty() ? 0 : arrptr( grad ), 0, 0, err );
     MSQ_ERRZERO( err );
     return rval;
 }
@@ -194,13 +194,13 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
                                             std::vector< size_t >& indices, std::vector< Vector3D >& grad,
                                             std::vector< Matrix3D >& Hessian, MsqError& err )
 {
-    const Sample   s = ElemSampleQM::sample( p_handle );
-    const size_t   e = ElemSampleQM::elem( p_handle );
+    const Sample s        = ElemSampleQM::sample( p_handle );
+    const size_t e        = ElemSampleQM::elem( p_handle );
     MsqMeshEntity& p_elem = pd.element_by_index( e );
-    EntityTopology type = p_elem.get_element_type( );
-    unsigned       edim = TopologyInfo::dimension( type );
-    size_t         num_idx = 0;
-    const NodeSet  bits = pd.non_slave_node_set( e );
+    EntityTopology type   = p_elem.get_element_type();
+    unsigned edim         = TopologyInfo::dimension( type );
+    size_t num_idx        = 0;
+    const NodeSet bits    = pd.non_slave_node_set( e );
 
     bool rval;
     if( edim == 3 )
@@ -213,14 +213,14 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
             return false;
         }
 
-        MsqMatrix< 3, 3 > A, W, dmdT, d2mdT2[ 6 ];
+        MsqMatrix< 3, 3 > A, W, dmdT, d2mdT2[6];
         mf->jacobian( pd, e, bits, s, mIndices, mDerivs3D, num_idx, A, err );
         MSQ_ERRZERO( err );
         targetCalc->get_3D_target( pd, e, s, W, err );
         MSQ_ERRZERO( err );
         const MsqMatrix< 3, 3 > Winv = inverse( W );
-        const MsqMatrix< 3, 3 > T = A * Winv;
-        rval = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
+        const MsqMatrix< 3, 3 > T    = A * Winv;
+        rval                         = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
         MSQ_ERRZERO( err );
         gradient< 3 >( num_idx, mDerivs3D, dmdT * transpose( Winv ), grad );
         second_deriv_wrt_product_factor( d2mdT2, Winv );
@@ -238,13 +238,13 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
 
         return QualityMetric::evaluate_with_Hessian( pd, p_handle, value, indices, grad, Hessian, err );
 #else
-        MsqMatrix< 2, 2 > W, A, dmdT, d2mdT2[ 3 ];
+        MsqMatrix< 2, 2 > W, A, dmdT, d2mdT2[3];
         MsqMatrix< 3, 2 > M;
         rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
-        const MsqMatrix< 2, 2 > T = A * Winv;
-        rval = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
+        const MsqMatrix< 2, 2 > T    = A * Winv;
+        rval                         = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
         MSQ_ERRZERO( err );
         gradient< 2 >( num_idx, mDerivs2D, M * dmdT * transpose( Winv ), grad );
         // calculate 2D hessian
@@ -255,7 +255,7 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
         // calculate surface hessian as transform of 2D hessian
         Hessian.resize( n );
         for( size_t i = 0; i < n; ++i )
-            Hessian[ i ] = Matrix3D( ( M * hess2d[ i ] * transpose( M ) ).data( ) );
+            Hessian[i] = Matrix3D( ( M * hess2d[i] * transpose( M ) ).data() );
 #ifdef PRINT_INFO
         print_info< 2 >( e, s, J, Wp, A * inverse( W ) );
 #endif
@@ -269,7 +269,7 @@ bool TQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, doub
 
     // pass back index list
     indices.resize( num_idx );
-    std::copy( mIndices, mIndices + num_idx, indices.begin( ) );
+    std::copy( mIndices, mIndices + num_idx, indices.begin() );
 
     // apply target weight to value
     if( !num_idx )
@@ -284,13 +284,13 @@ bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_han
                                                      std::vector< size_t >& indices, std::vector< Vector3D >& grad,
                                                      std::vector< SymMatrix3D >& diagonal, MsqError& err )
 {
-    const Sample   s = ElemSampleQM::sample( p_handle );
-    const size_t   e = ElemSampleQM::elem( p_handle );
+    const Sample s        = ElemSampleQM::sample( p_handle );
+    const size_t e        = ElemSampleQM::elem( p_handle );
     MsqMeshEntity& p_elem = pd.element_by_index( e );
-    EntityTopology type = p_elem.get_element_type( );
-    unsigned       edim = TopologyInfo::dimension( type );
-    size_t         num_idx = 0;
-    const NodeSet  bits = pd.non_slave_node_set( e );
+    EntityTopology type   = p_elem.get_element_type();
+    unsigned edim         = TopologyInfo::dimension( type );
+    size_t num_idx        = 0;
+    const NodeSet bits    = pd.non_slave_node_set( e );
 
     bool rval;
     if( edim == 3 )
@@ -303,14 +303,14 @@ bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_han
             return false;
         }
 
-        MsqMatrix< 3, 3 > A, W, dmdT, d2mdT2[ 6 ];
+        MsqMatrix< 3, 3 > A, W, dmdT, d2mdT2[6];
         mf->jacobian( pd, e, bits, s, mIndices, mDerivs3D, num_idx, A, err );
         MSQ_ERRZERO( err );
         targetCalc->get_3D_target( pd, e, s, W, err );
         MSQ_ERRZERO( err );
         const MsqMatrix< 3, 3 > Winv = inverse( W );
-        const MsqMatrix< 3, 3 > T = A * Winv;
-        rval = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
+        const MsqMatrix< 3, 3 > T    = A * Winv;
+        rval                         = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
         MSQ_ERRZERO( err );
         gradient< 3 >( num_idx, mDerivs3D, dmdT * transpose( Winv ), grad );
         second_deriv_wrt_product_factor( d2mdT2, Winv );
@@ -327,13 +327,13 @@ bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_han
         // use finite diference approximation for now
         return QualityMetric::evaluate_with_Hessian_diagonal( pd, p_handle, value, indices, grad, diagonal, err );
 #else
-        MsqMatrix< 2, 2 > W, A, dmdT, d2mdT2[ 3 ];
+        MsqMatrix< 2, 2 > W, A, dmdT, d2mdT2[3];
         MsqMatrix< 3, 2 > M;
         rval = evaluate_surface_common( pd, s, e, bits, mIndices, num_idx, mDerivs2D, W, A, M, err );
         if( MSQ_CHKERR( err ) || !rval ) return false;
         const MsqMatrix< 2, 2 > Winv = inverse( W );
-        const MsqMatrix< 2, 2 > T = A * Winv;
-        rval = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
+        const MsqMatrix< 2, 2 > T    = A * Winv;
+        rval                         = targetMetric->evaluate_with_hess( T, value, dmdT, d2mdT2, err );
         MSQ_ERRZERO( err );
         gradient< 2 >( num_idx, mDerivs2D, M * dmdT * transpose( Winv ), grad );
         second_deriv_wrt_product_factor( d2mdT2, Winv );
@@ -342,19 +342,19 @@ bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_han
         for( size_t i = 0; i < num_idx; ++i )
         {
             MsqMatrix< 2, 2 > block2d;
-            block2d( 0, 0 ) = transpose( mDerivs2D[ i ] ) * d2mdT2[ 0 ] * mDerivs2D[ i ];
-            block2d( 0, 1 ) = transpose( mDerivs2D[ i ] ) * d2mdT2[ 1 ] * mDerivs2D[ i ];
-            block2d( 1, 0 ) = block2d( 0, 1 );
-            block2d( 1, 1 ) = transpose( mDerivs2D[ i ] ) * d2mdT2[ 2 ] * mDerivs2D[ i ];
+            block2d( 0, 0 )     = transpose( mDerivs2D[i] ) * d2mdT2[0] * mDerivs2D[i];
+            block2d( 0, 1 )     = transpose( mDerivs2D[i] ) * d2mdT2[1] * mDerivs2D[i];
+            block2d( 1, 0 )     = block2d( 0, 1 );
+            block2d( 1, 1 )     = transpose( mDerivs2D[i] ) * d2mdT2[2] * mDerivs2D[i];
             MsqMatrix< 3, 2 > p = M * block2d;
 
-            SymMatrix3D& H = diagonal[ i ];
-            H[ 0 ] = p.row( 0 ) * transpose( M.row( 0 ) );
-            H[ 1 ] = p.row( 0 ) * transpose( M.row( 1 ) );
-            H[ 2 ] = p.row( 0 ) * transpose( M.row( 2 ) );
-            H[ 3 ] = p.row( 1 ) * transpose( M.row( 1 ) );
-            H[ 4 ] = p.row( 1 ) * transpose( M.row( 2 ) );
-            H[ 5 ] = p.row( 2 ) * transpose( M.row( 2 ) );
+            SymMatrix3D& H = diagonal[i];
+            H[0]           = p.row( 0 ) * transpose( M.row( 0 ) );
+            H[1]           = p.row( 0 ) * transpose( M.row( 1 ) );
+            H[2]           = p.row( 0 ) * transpose( M.row( 2 ) );
+            H[3]           = p.row( 1 ) * transpose( M.row( 1 ) );
+            H[4]           = p.row( 1 ) * transpose( M.row( 2 ) );
+            H[5]           = p.row( 2 ) * transpose( M.row( 2 ) );
         }
 #ifdef PRINT_INFO
         print_info< 2 >( e, s, J, Wp, A * inverse( W ) );
@@ -369,7 +369,7 @@ bool TQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_han
 
     // pass back index list
     indices.resize( num_idx );
-    std::copy( mIndices, mIndices + num_idx, indices.begin( ) );
+    std::copy( mIndices, mIndices + num_idx, indices.begin() );
 
     // apply target weight to value
     if( !num_idx )

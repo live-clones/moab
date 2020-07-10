@@ -78,13 +78,13 @@ class InstructionQueue : public IQInterface
 
   public:
     MESQUITE_EXPORT
-    InstructionQueue( );
+    InstructionQueue();
 
     MESQUITE_EXPORT
     InstructionQueue( const Settings& settings );
 
     MESQUITE_EXPORT
-    virtual ~InstructionQueue( );
+    virtual ~InstructionQueue();
 
     MESQUITE_EXPORT
     void add_target_calculator( TargetWriter* tc, MsqError& err );
@@ -121,12 +121,12 @@ class InstructionQueue : public IQInterface
     void set_master_quality_improver( QualityImprover* instr, MsqError& err );
 
     MESQUITE_EXPORT
-    void disable_automatic_quality_assessment( )
+    void disable_automatic_quality_assessment()
     {
         autoQualAssess = false;
     }
     MESQUITE_EXPORT
-    void enable_automatic_quality_assessment( )
+    void enable_automatic_quality_assessment()
     {
         autoQualAssess = true;
     }
@@ -142,7 +142,7 @@ class InstructionQueue : public IQInterface
     virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, MsqError& err );
 
     MESQUITE_EXPORT
-    void clear( );
+    void clear();
 
   protected:
   private:
@@ -152,9 +152,9 @@ class InstructionQueue : public IQInterface
 
     bool autoQualAssess;
 
-    int    vertexSlaverCount;
+    int vertexSlaverCount;
     size_t nbPreConditionners;
-    bool   isMasterSet;
+    bool isMasterSet;
     size_t masterInstrIndex;  //!< 0-based. Keeping an index instead of an iterator
                               //!< in case list is reallocated
 };

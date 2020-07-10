@@ -49,7 +49,7 @@ class CurveDomain
      *
      * Get the length along a curve between two points on the curve.
      */
-    virtual double arc_length( const double position1[ 3 ], const double position2[ 3 ], MsqError& err ) = 0;
+    virtual double arc_length( const double position1[3], const double position2[3], MsqError& err ) = 0;
     /**\brief Get a position on the curve given an arc length
      *
      * Measure a specified arc length along a curve.
@@ -59,7 +59,7 @@ class CurveDomain
      *                 from the point \c from_here in the forward
      *                 direction along the curve.
      */
-    virtual void position_from_length( const double from_here[ 3 ], double length, double result_point[ 3 ],
+    virtual void position_from_length( const double from_here[3], double length, double result_point[3],
                                        MsqError& err ) = 0;
 };
 

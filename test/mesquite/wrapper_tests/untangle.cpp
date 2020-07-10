@@ -51,10 +51,10 @@ std::string VTK_2D_DIR = TestDir + "/2D/vtk/";
 int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_file,
          int expected_number_of_remaining_inverted_elems, bool flip_domain = false );
 
-bool   brief_output = false;
-bool   write_output = false;
-double mu_sigma = -1;
-double beta = -1;
+bool brief_output = false;
+bool write_output = false;
+double mu_sigma   = -1;
+double beta       = -1;
 
 void usage( const char* argv0 )
 {
@@ -80,34 +80,34 @@ void help( const char* argv0 )
 
 int main( int argc, char* argv[] )
 {
-    bool                 skip_beta = false;
-    bool                 skip_size = false;
-    bool                 skip_shape = false;
-    bool                 skip_horse = false;
-    bool                 skip_hole = false;
-    bool                 skip_invrt = false;
-    bool                 skip_shest = false;
+    bool skip_beta  = false;
+    bool skip_size  = false;
+    bool skip_shape = false;
+    bool skip_horse = false;
+    bool skip_hole  = false;
+    bool skip_invrt = false;
+    bool skip_shest = false;
     std::list< double* > expected;
 
     for( int i = 1; i < argc; ++i )
     {
-        if( !expected.empty( ) )
+        if( !expected.empty() )
         {
             char* endptr;
-            *expected.front( ) = strtod( argv[ i ], &endptr );
-            if( *endptr || *expected.front( ) <= 0 )
+            *expected.front() = strtod( argv[i], &endptr );
+            if( *endptr || *expected.front() <= 0 )
             {
-                std::cerr << "Expected positive number, found \"" << argv[ i ] << '"' << std::endl;
-                usage( argv[ 0 ] );
+                std::cerr << "Expected positive number, found \"" << argv[i] << '"' << std::endl;
+                usage( argv[0] );
                 return 1;
             }
-            expected.pop_front( );
+            expected.pop_front();
         }
-        else if( argv[ i ][ 0 ] == '-' && argv[ i ][ 1 ] )
+        else if( argv[i][0] == '-' && argv[i][1] )
         {
-            for( int j = 1; argv[ i ][ j ]; ++j )
+            for( int j = 1; argv[i][j]; ++j )
             {
-                switch( argv[ i ][ j ] )
+                switch( argv[i][j] )
                 {
                     case 'q':
                         brief_output = true;
@@ -143,19 +143,19 @@ int main( int argc, char* argv[] )
                         expected.push_back( &beta );
                         break;
                     case 'h':
-                        help( argv[ 0 ] );
+                        help( argv[0] );
                         return 0;
                     default:
-                        std::cerr << "Invalid flag: -" << argv[ i ][ j ] << std::endl;
-                        usage( argv[ 0 ] );
+                        std::cerr << "Invalid flag: -" << argv[i][j] << std::endl;
+                        usage( argv[0] );
                         return 1;
                 }
             }
         }
         else
         {
-            std::cerr << "Unexpected argument: \"" << argv[ i ] << '"' << std::endl;
-            usage( argv[ 0 ] );
+            std::cerr << "Unexpected argument: \"" << argv[i] << '"' << std::endl;
+            usage( argv[0] );
             return 1;
         }
     }
@@ -183,8 +183,8 @@ int main( int argc, char* argv[] )
 
 const char* tostr( UntangleWrapper::UntangleMetric m )
 {
-    static const char BETA[] = "BETA";
-    static const char SIZE[] = "SIZE";
+    static const char BETA[]      = "BETA";
+    static const char SIZE[]      = "SIZE";
     static const char SHAPESIZE[] = "SHAPESIZE";
     switch( m )
     {
@@ -208,11 +208,11 @@ int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_fi
     if( !brief_output ) std::cout << "**********************************************" << std::endl << std::endl;
 
     // get mesh
-    MsqError    err;
-    MeshImpl    mesh;
+    MsqError err;
+    MeshImpl mesh;
     std::string input_file( VTK_2D_DIR );
     input_file += input_file_base;
-    mesh.read_vtk( input_file.c_str( ), err );
+    mesh.read_vtk( input_file.c_str(), err );
     if( err )
     {
         std::cerr << err << std::endl;
@@ -222,18 +222,18 @@ int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_fi
     // get domain
     std::vector< Mesh::VertexHandle > verts;
     mesh.get_all_vertices( verts, err );
-    if( err || verts.empty( ) ) abort( );
+    if( err || verts.empty() ) abort();
     MsqVertex coords;
     mesh.vertices_get_coordinates( arrptr( verts ), &coords, 1, err );
-    if( err ) abort( );
-    Vector3D     norm( 0, 0, flip_domain ? -1 : 1 );
+    if( err ) abort();
+    Vector3D norm( 0, 0, flip_domain ? -1 : 1 );
     PlanarDomain domain( norm, coords );
     // run wrapper
     UntangleWrapper wrapper( metric );
     wrapper.set_vertex_movement_limit_factor( 0.005 );
     double constant = ( metric == UntangleWrapper::BETA ) ? beta : mu_sigma;
     if( constant > 0 ) wrapper.set_metric_constant( constant );
-    if( brief_output ) wrapper.quality_assessor( ).disable_printing_results( );
+    if( brief_output ) wrapper.quality_assessor().disable_printing_results();
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &domain );
     wrapper.run_instructions( &mesh_and_domain, err );
     if( err )
@@ -248,12 +248,12 @@ int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_fi
         std::string result_file( tostr( metric ) );
         result_file += "-";
         result_file += input_file_base;
-        mesh.write_vtk( result_file.c_str( ), err );
+        mesh.write_vtk( result_file.c_str(), err );
         if( err )
         {
             std::cerr << err << std::endl;
             std::cerr << "ERROR: " << result_file << " : failed to write file" << std::endl;
-            err.clear( );
+            err.clear();
         }
         else
         {
@@ -263,8 +263,8 @@ int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_fi
 
     // test number of inverted elements
     int count, junk;
-    wrapper.quality_assessor( ).get_inverted_element_count( count, junk, err );
-    if( err ) abort( );
+    wrapper.quality_assessor().get_inverted_element_count( count, junk, err );
+    if( err ) abort();
     if( count < expected )
     {
         std::cout << "WARNING: expected " << expected << " inverted elements but finished with only " << count

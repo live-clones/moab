@@ -60,19 +60,19 @@ class SpatialLocator
     SpatialLocator( Interface* impl, Range& elems, Tree* tree = NULL, ElemEvaluator* eval = NULL );
 
     /* destructor */
-    virtual ~SpatialLocator( );
+    virtual ~SpatialLocator();
 
     /* add elements to be searched */
     ErrorCode add_elems( Range& elems );
 
     /* get bounding box of this locator */
-    BoundBox& local_box( )
+    BoundBox& local_box()
     {
         return localBox;
     }
 
     /* get bounding box of this locator */
-    const BoundBox& local_box( ) const
+    const BoundBox& local_box() const
     {
         return localBox;
     }
@@ -106,14 +106,14 @@ class SpatialLocator
      * represents the number of points in targetEnts that were inside one element in sourceEnts
      *
      */
-    int local_num_located( );
+    int local_num_located();
 
     /* Count the number of located points in parLocTable
      * Return the number of entries in parLocTable that have a non-negative index in on a remote
      * proc in parLocTable, which gives the number of points located in at least one element in a
      * remote proc's sourceEnts.
      */
-    int remote_num_located( );
+    int remote_num_located();
 
 #ifdef MOAB_HAVE_MPI
     /* locate a set of vertices or entity centroids, storing results on TupleList in this class
@@ -136,7 +136,7 @@ class SpatialLocator
 
     /** \brief Return the MOAB interface associated with this locator
      */
-    Interface* moab( )
+    Interface* moab()
     {
         return mbImpl;
     }
@@ -147,47 +147,47 @@ class SpatialLocator
                             const double inside_tol = 1.0e-6 );
 
     /* return the tree */
-    Tree* get_tree( )
+    Tree* get_tree()
     {
         return myTree;
     }
 
     /* get the locTable
      */
-    TupleList& loc_table( )
+    TupleList& loc_table()
     {
         return locTable;
     }
 
     /* get the locTable
      */
-    const TupleList& loc_table( ) const
+    const TupleList& loc_table() const
     {
         return locTable;
     }
 
     /* get the parLocTable
      */
-    TupleList& par_loc_table( )
+    TupleList& par_loc_table()
     {
         return parLocTable;
     }
 
     /* get the parLocTable
      */
-    const TupleList& par_loc_table( ) const
+    const TupleList& par_loc_table() const
     {
         return parLocTable;
     }
 
     /* get elemEval */
-    ElemEvaluator* elem_eval( )
+    ElemEvaluator* elem_eval()
     {
         return elemEval;
     }
 
     /* get elemEval */
-    const ElemEvaluator* elem_eval( ) const
+    const ElemEvaluator* elem_eval() const
     {
         return elemEval;
     }
@@ -200,13 +200,13 @@ class SpatialLocator
     }
 
     /** \brief Get spatial locator times object */
-    SpatialLocatorTimes& sl_times( )
+    SpatialLocatorTimes& sl_times()
     {
         return myTimes;
     }
 
     /** \brief Get spatial locator times object */
-    const SpatialLocatorTimes& sl_times( ) const
+    const SpatialLocatorTimes& sl_times() const
     {
         return myTimes;
     }
@@ -243,7 +243,7 @@ class SpatialLocator
      * Tree type depends on what's in myElems: if empty or all vertices, creates a kdtree,
      * otherwise creates a BVHTree.
      */
-    void create_tree( );
+    void create_tree();
 
     /* MOAB instance */
     Interface* mbImpl;
@@ -299,7 +299,7 @@ class SpatialLocator
 
     /* \brief Number of regions in each of 3 directions
      */
-    int regNums[ 3 ];
+    int regNums[3];
 
     /* \brief Map from source processor to bounding box of that proc's source mesh
      *
@@ -319,7 +319,7 @@ class SpatialLocator
     bool timerInitialized;
 };
 
-inline SpatialLocator::~SpatialLocator( )
+inline SpatialLocator::~SpatialLocator()
 {
     if( iCreatedTree && myTree ) delete myTree;
 }
@@ -336,17 +336,16 @@ inline ErrorCode SpatialLocator::get_point_ijk( const CartVect& point, const dou
 {
     for( int i = 0; i < 3; i++ )
     {
-        if( point[ i ] < globalBox.bMin[ i ] - abs_iter_tol || point[ i ] > globalBox.bMax[ i ] + abs_iter_tol )
-            ijk[ i ] = -1;
+        if( point[i] < globalBox.bMin[i] - abs_iter_tol || point[i] > globalBox.bMax[i] + abs_iter_tol )
+            ijk[i] = -1;
         else
         {
-            ijk[ i ] = point[ i ] - globalBox.bMin[ i ] / regDeltaXYZ[ i ];
-            if( ijk[ i ] >= regNums[ i ] && point[ i ] <= globalBox.bMax[ i ] + abs_iter_tol )
-                ijk[ i ] = regNums[ i ] - 1;
+            ijk[i] = point[i] - globalBox.bMin[i] / regDeltaXYZ[i];
+            if( ijk[i] >= regNums[i] && point[i] <= globalBox.bMax[i] + abs_iter_tol ) ijk[i] = regNums[i] - 1;
         }
     }
 
-    return ( ijk[ 0 ] >= 0 && ijk[ 1 ] >= 0 && ijk[ 2 ] >= 0 ? MB_SUCCESS : MB_FAILURE );
+    return ( ijk[0] >= 0 && ijk[1] >= 0 && ijk[2] >= 0 ? MB_SUCCESS : MB_FAILURE );
     ;
 }
 
@@ -359,11 +358,11 @@ inline ErrorCode SpatialLocator::get_point_ijk( const CartVect& point, const dou
 
 inline int SpatialLocator::proc_from_point( const double* pos, const double abs_iter_tol ) const
 {
-    int       ijk[ 3 ];
+    int ijk[3];
     ErrorCode rval = get_point_ijk( CartVect( pos ), abs_iter_tol, ijk );
     if( MB_SUCCESS != rval ) return -1;
 
-    return ijk[ 2 ] * regNums[ 0 ] * regNums[ 1 ] + ijk[ 1 ] * regNums[ 0 ] + ijk[ 0 ];
+    return ijk[2] * regNums[0] * regNums[1] + ijk[1] * regNums[0] + ijk[0];
 }
 #endif
 

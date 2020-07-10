@@ -23,24 +23,24 @@ ErrorCode EvalSet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn 
     // TODO: should differentiate between epsilons used for
     // Newton Raphson iteration, and epsilons used for curved boundary geometry errors
     // right now, fix the tolerance used for NR
-    const double    error_tol_sqr = iter_tol * iter_tol;
-    CartVect*       cvparams = reinterpret_cast< CartVect* >( params );
-    const CartVect* cvposn = reinterpret_cast< const CartVect* >( posn );
+    const double error_tol_sqr = iter_tol * iter_tol;
+    CartVect* cvparams         = reinterpret_cast< CartVect* >( params );
+    const CartVect* cvposn     = reinterpret_cast< const CartVect* >( posn );
 
     // initialize to center of element
     *cvparams = CartVect( -.4 );
 
     CartVect new_pos;
     // evaluate that first guess to get a new position
-    ErrorCode rval = ( *eval )( cvparams->array( ), verts, ndim,
+    ErrorCode rval = ( *eval )( cvparams->array(), verts, ndim,
                                 3,  // hardwire to num_tuples to 3 since the field is coords
-                                work, new_pos.array( ) );
+                                work, new_pos.array() );
     if( MB_SUCCESS != rval ) return rval;
 
     // residual is diff between old and new pos; need to minimize that
     CartVect res = new_pos - *cvposn;
-    Matrix3  J;
-    int      dum, *tmp_inside = ( inside ? inside : &dum );
+    Matrix3 J;
+    int dum, *tmp_inside = ( inside ? inside : &dum );
 
     int iters = 0;
     // while |res| larger than tol
@@ -57,9 +57,9 @@ ErrorCode EvalSet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn 
         }
 
         // get jacobian at current params
-        rval = ( *jacob )( cvparams->array( ), verts, nverts, ndim, work, J.array( ) );
-        double det = J.determinant( );
-        if( det < std::numeric_limits< double >::epsilon( ) )
+        rval       = ( *jacob )( cvparams->array(), verts, nverts, ndim, work, J.array() );
+        double det = J.determinant();
+        if( det < std::numeric_limits< double >::epsilon() )
         {
             *tmp_inside = ( *inside_f )( params, ndim, inside_tol );
             if( !( *tmp_inside ) )
@@ -69,12 +69,12 @@ ErrorCode EvalSet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn 
         }
 
         // new params tries to eliminate residual
-        *cvparams -= J.inverse( ) * res;
+        *cvparams -= J.inverse() * res;
 
         // get the new forward-evaluated position, and its difference from the target pt
         rval = ( *eval )( params, verts, ndim,
                           3,  // hardwire to num_tuples to 3 since the field is coords
-                          work, new_pos.array( ) );
+                          work, new_pos.array() );
         if( MB_SUCCESS != rval ) return rval;
         res = new_pos - *cvposn;
     }
@@ -86,9 +86,9 @@ ErrorCode EvalSet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn 
 
 int EvalSet::inside_function( const double* params, const int ndims, const double tol )
 {
-    if( params[ 0 ] >= -1 - tol && params[ 0 ] <= 1 + tol &&
-        ( ndims < 2 || ( params[ 1 ] >= -1 - tol && params[ 1 ] <= 1 + tol ) ) &&
-        ( ndims < 3 || ( params[ 2 ] >= -1 - tol && params[ 2 ] <= 1 + tol ) ) )
+    if( params[0] >= -1 - tol && params[0] <= 1 + tol &&
+        ( ndims < 2 || ( params[1] >= -1 - tol && params[1] <= 1 + tol ) ) &&
+        ( ndims < 3 || ( params[2] >= -1 - tol && params[2] <= 1 + tol ) ) )
         return true;
     else
         return false;
@@ -129,11 +129,11 @@ ErrorCode ElemEvaluator::find_containing_entity( Range& entities, const double* 
                                                  const double inside_tol, EntityHandle& containing_ent, double* params,
                                                  unsigned int* num_evals )
 {
-    int             is_inside;
-    ErrorCode       rval = MB_SUCCESS;
-    unsigned int    nevals = 0;
+    int is_inside;
+    ErrorCode rval      = MB_SUCCESS;
+    unsigned int nevals = 0;
     Range::iterator i;
-    for( i = entities.begin( ); i != entities.end( ); ++i )
+    for( i = entities.begin(); i != entities.end(); ++i )
     {
         nevals++;
         set_ent_handle( *i );
@@ -141,7 +141,7 @@ ErrorCode ElemEvaluator::find_containing_entity( Range& entities, const double* 
         if( MB_SUCCESS != rval ) return rval;
         if( is_inside ) break;
     }
-    containing_ent = ( i == entities.end( ) ? 0 : *i );
+    containing_ent = ( i == entities.end() ? 0 : *i );
     if( num_evals ) *num_evals += nevals;
     return MB_SUCCESS;
 }

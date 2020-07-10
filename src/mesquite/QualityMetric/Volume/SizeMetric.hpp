@@ -46,11 +46,11 @@ namespace MBMesquite
 class SizeMetric : public ElementQM
 {
   public:
-    MESQUITE_EXPORT virtual ~SizeMetric( );
+    MESQUITE_EXPORT virtual ~SizeMetric();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 };

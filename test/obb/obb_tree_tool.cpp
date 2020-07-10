@@ -23,18 +23,18 @@ using namespace moab;
 std::string clock_to_string( clock_t t );
 std::string mem_to_string( unsigned long mem );
 
-const int         MAX_TAG_VALUE = 20;
+const int MAX_TAG_VALUE    = 20;
 const char* const TAG_NAME = "OBB_ID";
 const char* const TREE_TAG = "OBB_ROOT";
-const char*       root_tag = TREE_TAG;
+const char* root_tag       = TREE_TAG;
 
-ErrorCode    get_root( Interface* moab, EntityHandle& root );
+ErrorCode get_root( Interface* moab, EntityHandle& root );
 EntityHandle build_tree( Interface* interface, OrientedBoxTreeTool::Settings settings );
-void         delete_existing_tree( Interface* interface );
-void         print_stats( Interface* interface );
-void         tag_triangles( Interface* interface );
-void         tag_vertices( Interface* interface );
-void         write_tree_blocks( Interface* interface, const char* file );
+void delete_existing_tree( Interface* interface );
+void print_stats( Interface* interface );
+void tag_triangles( Interface* interface );
+void tag_vertices( Interface* interface );
+void write_tree_blocks( Interface* interface, const char* file );
 
 static void usage( bool err = true )
 {
@@ -67,27 +67,27 @@ static void memory_use( unsigned long long& vsize, unsigned long long& rss )
 #else
 static void memory_use( unsigned long long& vsize, unsigned long long& rss )
 {
-    char          buffer[ 512 ];
+    char buffer[512];
     unsigned long lvsize;
-    long          lrss;
-    int           filp = open( "/proc/self/stat", O_RDONLY );
-    ssize_t       r = read( filp, buffer, sizeof( buffer ) - 1 );
+    long lrss;
+    int filp  = open( "/proc/self/stat", O_RDONLY );
+    ssize_t r = read( filp, buffer, sizeof( buffer ) - 1 );
     close( filp );
     if( r < 0 ) r = 0;
     lvsize = lrss = 0;
-    buffer[ r ] = '\0';
+    buffer[r]     = '\0';
     sscanf( buffer,
-            "%*d %*s %*c "  // pid command state
-            "%*d %*d "  // ppid pgrp
-            "%*d %*d %*d "  // session tty_nr tpgid
-            "%*u "  // flags
+            "%*d %*s %*c "      // pid command state
+            "%*d %*d "          // ppid pgrp
+            "%*d %*d %*d "      // session tty_nr tpgid
+            "%*u "              // flags
             "%*u %*u %*u %*u "  // minflt cminflt majflt cmajflt
             "%*u %*u %*d %*d "  // utime stime cutime cstime
-            "%*d %*d %*d "  // priority nice (unused)
-            "%*d %*u "  // itrealval starttime
+            "%*d %*d %*d "      // priority nice (unused)
+            "%*d %*u "          // itrealval starttime
             "%lu %ld",
             &lvsize, &lrss );
-    rss = lrss * getpagesize( );
+    rss   = lrss * getpagesize();
     vsize = lvsize;
 }
 #endif
@@ -98,15 +98,15 @@ static int parseint( int& i, int argc, char* argv[] )
     ++i;
     if( i == argc )
     {
-        std::cerr << "Expected value following '" << argv[ i - 1 ] << "'" << std::endl;
-        usage( );
+        std::cerr << "Expected value following '" << argv[i - 1] << "'" << std::endl;
+        usage();
     }
 
-    int result = strtol( argv[ i ], &end, 0 );
+    int result = strtol( argv[i], &end, 0 );
     if( result < 0 || *end )
     {
-        std::cerr << "Expected positive integer following '" << argv[ i - 1 ] << "'" << std::endl;
-        usage( );
+        std::cerr << "Expected positive integer following '" << argv[i - 1] << "'" << std::endl;
+        usage();
     }
 
     return result;
@@ -118,15 +118,15 @@ static double parsedouble( int& i, int argc, char* argv[] )
     ++i;
     if( i == argc )
     {
-        std::cerr << "Expected value following '" << argv[ i - 1 ] << "'" << std::endl;
-        usage( );
+        std::cerr << "Expected value following '" << argv[i - 1] << "'" << std::endl;
+        usage();
     }
 
-    double result = strtod( argv[ i ], &end );
+    double result = strtod( argv[i], &end );
     if( result < 0 || *end )
     {
-        std::cerr << "Expected positive real number following '" << argv[ i - 1 ] << "'" << std::endl;
-        usage( );
+        std::cerr << "Expected positive real number following '" << argv[i - 1] << "'" << std::endl;
+        usage();
     }
 
     return result;
@@ -134,29 +134,29 @@ static double parsedouble( int& i, int argc, char* argv[] )
 
 int main( int argc, char* argv[] )
 {
-    const char*                   input_file = 0;
-    const char*                   output_file = 0;
-    const char*                   tree_file = 0;
+    const char* input_file  = 0;
+    const char* output_file = 0;
+    const char* tree_file   = 0;
     OrientedBoxTreeTool::Settings settings;
-    bool                          tag_tris = false;
-    clock_t                       load_time, build_time, stat_time, tag_time, write_time, block_time;
+    bool tag_tris = false;
+    clock_t load_time, build_time, stat_time, tag_time, write_time, block_time;
 
     for( int i = 1; i < argc; ++i )
     {
-        if( argv[ i ][ 0 ] != '-' )
+        if( argv[i][0] != '-' )
         {
             if( !input_file )
-                input_file = argv[ i ];
+                input_file = argv[i];
             else if( !output_file )
-                output_file = argv[ i ];
+                output_file = argv[i];
             else
-                usage( );
+                usage();
             continue;
         }
 
-        if( !argv[ i ][ 1 ] || argv[ i ][ 2 ] ) usage( );
+        if( !argv[i][1] || argv[i][2] ) usage();
 
-        switch( argv[ i ][ 1 ] )
+        switch( argv[i][1] )
         {
             case 's':
                 settings.set_options = MESHSET_SET;
@@ -180,45 +180,45 @@ int main( int argc, char* argv[] )
                 tag_tris = true;
                 break;
             case 'T':
-                if( ++i == argc ) usage( );
-                tree_file = argv[ i ];
+                if( ++i == argc ) usage();
+                tree_file = argv[i];
                 break;
             case 'N':
-                if( ++i == argc ) usage( );
-                root_tag = argv[ i ];
+                if( ++i == argc ) usage();
+                root_tag = argv[i];
                 break;
             case 'h':
                 usage( false );
             default:
-                usage( );
+                usage();
         }
     }
 
-    if( !output_file ) usage( );
+    if( !output_file ) usage();
 
-    ErrorCode  rval;
-    Core       moab_core;
+    ErrorCode rval;
+    Core moab_core;
     Interface* interface = &moab_core;
 
-    load_time = clock( );
-    rval = interface->load_mesh( input_file );
+    load_time = clock();
+    rval      = interface->load_mesh( input_file );
     if( MB_SUCCESS != rval )
     {
         std::cerr << "Error reading file: " << input_file << std::endl;
         exit( 2 );
     }
-    load_time = clock( ) - load_time;
+    load_time = clock() - load_time;
 
     delete_existing_tree( interface );
 
     std::cout << "Building tree..." << std::endl;
-    build_time = clock( );
+    build_time = clock();
     build_tree( interface, settings );
-    build_time = clock( ) - build_time;
+    build_time = clock() - build_time;
 
     std::cout << "Calculating stats..." << std::endl;
     print_stats( interface );
-    stat_time = clock( ) - build_time;
+    stat_time = clock() - build_time;
 
     if( tag_tris )
     {
@@ -226,27 +226,27 @@ int main( int argc, char* argv[] )
         tag_triangles( interface );
         tag_vertices( interface );
     }
-    tag_time = clock( ) - stat_time;
+    tag_time = clock() - stat_time;
 
     std::cout << "Writing file... ";
-    std::cout.flush( );
+    std::cout.flush();
     rval = interface->write_mesh( output_file );
     if( MB_SUCCESS != rval )
     {
         std::cerr << "Error writing file: " << output_file << std::endl;
         exit( 3 );
     }
-    write_time = clock( ) - tag_time;
+    write_time = clock() - tag_time;
     std::cout << "Wrote " << output_file << std::endl;
 
     if( tree_file )
     {
         std::cout << "Writing tree block rep...";
-        std::cout.flush( );
+        std::cout.flush();
         write_tree_blocks( interface, tree_file );
         std::cout << "Wrote " << tree_file << std::endl;
     }
-    block_time = clock( ) - write_time;
+    block_time = clock() - write_time;
 
     std::cout << "Times:  "
               << "    Load"
@@ -269,7 +269,7 @@ int main( int argc, char* argv[] )
 
 ErrorCode get_root( Interface* moab, EntityHandle& root )
 {
-    Tag       tag;
+    Tag tag;
     ErrorCode rval;
 
     rval = moab->tag_get_handle( root_tag, 1, MB_TYPE_HANDLE, tag );
@@ -282,7 +282,7 @@ ErrorCode get_root( Interface* moab, EntityHandle& root )
 void delete_existing_tree( Interface* interface )
 {
     EntityHandle root;
-    ErrorCode    rval = get_root( interface, root );
+    ErrorCode rval = get_root( interface, root );
     if( MB_SUCCESS == rval )
     {
         OrientedBoxTreeTool tool( interface );
@@ -297,12 +297,12 @@ void delete_existing_tree( Interface* interface )
 
 EntityHandle build_tree( Interface* interface, OrientedBoxTreeTool::Settings settings )
 {
-    ErrorCode    rval;
+    ErrorCode rval;
     EntityHandle root = 0;
-    Range        triangles;
+    Range triangles;
 
     rval = interface->get_entities_by_type( 0, MBTRI, triangles );
-    if( MB_SUCCESS != rval || triangles.empty( ) )
+    if( MB_SUCCESS != rval || triangles.empty() )
     {
         std::cerr << "No triangles from which to build tree." << std::endl;
         exit( 4 );
@@ -325,7 +325,7 @@ EntityHandle build_tree( Interface* interface, OrientedBoxTreeTool::Settings set
         exit( 2 );
     }
     const EntityHandle mesh = 0;
-    rval = interface->tag_set_data( roottag, &mesh, 1, &root );
+    rval                    = interface->tag_set_data( roottag, &mesh, 1, &root );
     if( MB_SUCCESS != rval )
     {
         std::cout << "Failed to set root tag: \"" << root_tag << '"' << std::endl;
@@ -337,8 +337,8 @@ EntityHandle build_tree( Interface* interface, OrientedBoxTreeTool::Settings set
 
 std::string clock_to_string( clock_t t )
 {
-    char   unit[ 5 ] = "s";
-    char   buffer[ 256 ];
+    char unit[5] = "s";
+    char buffer[256];
     double dt = t / (double)CLOCKS_PER_SEC;
     // if (dt > 300) {
     //  dt /= 60;
@@ -358,7 +358,7 @@ std::string clock_to_string( clock_t t )
 
 std::string mem_to_string( unsigned long mem )
 {
-    char unit[ 3 ] = "B";
+    char unit[3] = "B";
     if( mem > 9 * 1024 )
     {
         mem = ( mem + 512 ) / 1024;
@@ -374,42 +374,43 @@ std::string mem_to_string( unsigned long mem )
         mem = ( mem + 512 ) / 1024;
         strcpy( unit, "GB" );
     }
-    char buffer[ 256 ];
+    char buffer[256];
     sprintf( buffer, "%lu %s", mem, unit );
     return buffer;
 }
 
-template< typename T > struct SimpleStat
+template < typename T >
+struct SimpleStat
 {
-    T      min, max, sum, sqr;
+    T min, max, sum, sqr;
     size_t count;
-    SimpleStat( );
-    void   add( T value );
-    double avg( ) const
+    SimpleStat();
+    void add( T value );
+    double avg() const
     {
         return (double)sum / count;
     }
-    double rms( ) const
+    double rms() const
     {
         return sqrt( (double)sqr / count );
     }
-    double dev( ) const
+    double dev() const
     {
         return sqrt( ( count * (double)sqr - (double)sum * (double)sum ) / ( (double)count * ( count - 1 ) ) );
     }
 };
 
-template< typename T >
-SimpleStat< T >::SimpleStat( )
-    : min( std::numeric_limits< T >::max( ) ), max( std::numeric_limits< T >::min( ) ), sum( 0 ), sqr( 0 ), count( 0 )
+template < typename T >
+SimpleStat< T >::SimpleStat()
+    : min( std::numeric_limits< T >::max() ), max( std::numeric_limits< T >::min() ), sum( 0 ), sqr( 0 ), count( 0 )
 {
 }
 
 void print_stats( Interface* interface )
 {
     EntityHandle root;
-    Range        range;
-    ErrorCode    rval;
+    Range range;
+    ErrorCode rval;
     rval = get_root( interface, root );
     if( MB_SUCCESS != rval )
     {
@@ -421,7 +422,7 @@ void print_stats( Interface* interface )
     Range tree_sets, triangles, verts;
     // interface->get_child_meshsets( root, tree_sets, 0 );
     interface->get_entities_by_type( 0, MBENTITYSET, tree_sets );
-    tree_sets.erase( tree_sets.begin( ), Range::lower_bound( tree_sets.begin( ), tree_sets.end( ), root ) );
+    tree_sets.erase( tree_sets.begin(), Range::lower_bound( tree_sets.begin(), tree_sets.end(), root ) );
     interface->get_entities_by_type( 0, MBTRI, triangles );
     interface->get_entities_by_type( 0, MBVERTEX, verts );
     triangles.merge( verts );
@@ -443,13 +444,13 @@ void print_stats( Interface* interface )
     printf( "------------------------------------------------------------------\n" );
     printf( "\nmemory:           used  amortized\n" );
     printf( "            ---------- ----------\n" );
-    printf( "triangles   %10s %10s\n", mem_to_string( tri_used ).c_str( ), mem_to_string( tri_amortized ).c_str( ) );
-    printf( "sets (total)%10s %10s\n", mem_to_string( set_used ).c_str( ), mem_to_string( set_amortized ).c_str( ) );
-    printf( "sets        %10s %10s\n", mem_to_string( set_store_used ).c_str( ),
-            mem_to_string( set_store_amortized ).c_str( ) );
-    printf( "set tags    %10s %10s\n", mem_to_string( set_tag_used ).c_str( ),
-            mem_to_string( set_tag_amortized ).c_str( ) );
-    printf( "total real  %10s %10s\n", mem_to_string( real_rss ).c_str( ), mem_to_string( real_vsize ).c_str( ) );
+    printf( "triangles   %10s %10s\n", mem_to_string( tri_used ).c_str(), mem_to_string( tri_amortized ).c_str() );
+    printf( "sets (total)%10s %10s\n", mem_to_string( set_used ).c_str(), mem_to_string( set_amortized ).c_str() );
+    printf( "sets        %10s %10s\n", mem_to_string( set_store_used ).c_str(),
+            mem_to_string( set_store_amortized ).c_str() );
+    printf( "set tags    %10s %10s\n", mem_to_string( set_tag_used ).c_str(),
+            mem_to_string( set_tag_amortized ).c_str() );
+    printf( "total real  %10s %10s\n", mem_to_string( real_rss ).c_str(), mem_to_string( real_vsize ).c_str() );
     printf( "------------------------------------------------------------------\n" );
 }
 
@@ -462,10 +463,10 @@ static int hash_handle( EntityHandle handle )
 class TriTagger : public OrientedBoxTreeTool::Op
 {
   private:
-    Interface*                  mMB;
-    Tag                         mTag;
+    Interface* mMB;
+    Tag mTag;
     std::vector< EntityHandle > mHandles;
-    std::vector< int >          mTagData;
+    std::vector< int > mTagData;
 
   public:
     TriTagger( Tag tag, Interface* moab ) : mMB( moab ), mTag( tag ) {}
@@ -478,11 +479,11 @@ class TriTagger : public OrientedBoxTreeTool::Op
 
     ErrorCode leaf( EntityHandle node )
     {
-        mHandles.clear( );
+        mHandles.clear();
         mMB->get_entities_by_handle( node, mHandles );
-        mTagData.clear( );
-        mTagData.resize( mHandles.size( ), hash_handle( node ) );
-        mMB->tag_set_data( mTag, &mHandles[ 0 ], mHandles.size( ), &mTagData[ 0 ] );
+        mTagData.clear();
+        mTagData.resize( mHandles.size(), hash_handle( node ) );
+        mMB->tag_set_data( mTag, &mHandles[0], mHandles.size(), &mTagData[0] );
         return MB_SUCCESS;
     }
 };
@@ -490,7 +491,7 @@ class TriTagger : public OrientedBoxTreeTool::Op
 void tag_triangles( Interface* moab )
 {
     EntityHandle root;
-    ErrorCode    rval = get_root( moab, root );
+    ErrorCode rval = get_root( moab, root );
     if( MB_SUCCESS != rval )
     {
         std::cerr << "Internal error: Failed to retrieve tree." << std::endl;
@@ -514,11 +515,11 @@ void tag_triangles( Interface* moab )
 class VtxTagger : public OrientedBoxTreeTool::Op
 {
   private:
-    Interface*                  mMB;
-    Tag                         mTag;
+    Interface* mMB;
+    Tag mTag;
     std::vector< EntityHandle > mHandles;
     std::vector< EntityHandle > mConn;
-    std::vector< int >          mTagData;
+    std::vector< int > mTagData;
 
   public:
     VtxTagger( Tag tag, Interface* moab ) : mMB( moab ), mTag( tag ) {}
@@ -531,13 +532,13 @@ class VtxTagger : public OrientedBoxTreeTool::Op
 
     ErrorCode leaf( EntityHandle node )
     {
-        mHandles.clear( );
+        mHandles.clear();
         mMB->get_entities_by_handle( node, mHandles );
-        mConn.clear( );
-        mMB->get_connectivity( &mHandles[ 0 ], mHandles.size( ), mConn );
-        mTagData.clear( );
-        mTagData.resize( mConn.size( ), hash_handle( node ) );
-        mMB->tag_set_data( mTag, &mConn[ 0 ], mConn.size( ), &mTagData[ 0 ] );
+        mConn.clear();
+        mMB->get_connectivity( &mHandles[0], mHandles.size(), mConn );
+        mTagData.clear();
+        mTagData.resize( mConn.size(), hash_handle( node ) );
+        mMB->tag_set_data( mTag, &mConn[0], mConn.size(), &mTagData[0] );
         return MB_SUCCESS;
     }
 };
@@ -545,7 +546,7 @@ class VtxTagger : public OrientedBoxTreeTool::Op
 void tag_vertices( Interface* moab )
 {
     EntityHandle root;
-    ErrorCode    rval = get_root( moab, root );
+    ErrorCode rval = get_root( moab, root );
     if( MB_SUCCESS != rval )
     {
         std::cerr << "Internal error: Failed to retrieve tree." << std::endl;
@@ -569,12 +570,12 @@ void tag_vertices( Interface* moab )
 class LeafHexer : public OrientedBoxTreeTool::Op
 {
   private:
-    OrientedBoxTreeTool*        mTool;
-    Interface*                  mOut;
-    Tag                         mTag;
+    OrientedBoxTreeTool* mTool;
+    Interface* mOut;
+    Tag mTag;
     std::vector< EntityHandle > mHandles;
     std::vector< EntityHandle > mConn;
-    std::vector< int >          mTagData;
+    std::vector< int > mTagData;
 
   public:
     LeafHexer( OrientedBoxTreeTool* tool, Interface* mb2, Tag tag ) : mTool( tool ), mOut( mb2 ), mTag( tag ) {}
@@ -588,7 +589,7 @@ class LeafHexer : public OrientedBoxTreeTool::Op
     ErrorCode leaf( EntityHandle node )
     {
         OrientedBox box;
-        ErrorCode   rval = mTool->box( node, box );
+        ErrorCode rval = mTool->box( node, box );
         if( MB_SUCCESS != rval ) return rval;
         EntityHandle h;
         rval = box.make_hex( h, mOut );
@@ -601,7 +602,7 @@ class LeafHexer : public OrientedBoxTreeTool::Op
 void write_tree_blocks( Interface* interface, const char* file )
 {
     EntityHandle root;
-    ErrorCode    rval = get_root( interface, root );
+    ErrorCode rval = get_root( interface, root );
     if( MB_SUCCESS != rval )
     {
         std::cerr << "Internal error: Failed to retrieve tree." << std::endl;
@@ -609,12 +610,12 @@ void write_tree_blocks( Interface* interface, const char* file )
     }
 
     Core moab2;
-    Tag  tag;
-    int  zero = 0;
+    Tag tag;
+    int zero = 0;
     moab2.tag_get_handle( TAG_NAME, 1, MB_TYPE_INTEGER, tag, MB_TAG_DENSE | MB_TAG_CREAT, &zero );
 
     OrientedBoxTreeTool tool( interface );
-    LeafHexer           op( &tool, &moab2, tag );
+    LeafHexer op( &tool, &moab2, tag );
     rval = tool.preorder_traverse( root, op );
     if( MB_SUCCESS != rval )
     {

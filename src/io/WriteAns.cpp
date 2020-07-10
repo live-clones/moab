@@ -69,7 +69,7 @@ WriteAns::WriteAns( Interface* impl ) : mbImpl( impl ), mCurrentMeshHandle( 0 ),
                           &negone );
 }
 
-WriteAns::~WriteAns( )
+WriteAns::~WriteAns()
 {
     // mbImpl->release_interface(mWriteIface);
 }
@@ -105,13 +105,13 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
 
     // open node file for writing
     temp_string = base_string + ".node";
-    node_file.open( temp_string.c_str( ) );
+    node_file.open( temp_string.c_str() );
     node_file.setf( std::ios::scientific, std::ios::floatfield );
     node_file.precision( 13 );
 
     // open elem file for writing
     temp_string = base_string + ".elem";
-    elem_file.open( temp_string.c_str( ) );
+    elem_file.open( temp_string.c_str() );
 
     // open ans file for writing
     ans_file.open( file_name );
@@ -124,7 +124,7 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
         for( int i = 0; i < num_sets; i++ )
         {
             // from template, maybe can be removed
-            result = mbImpl->unite_meshset( output_set, ent_handles[ i ] );
+            result = mbImpl->unite_meshset( output_set, ent_handles[i] );
             if( result != MB_SUCCESS ) return result;
         }
     }
@@ -143,8 +143,8 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
     // node_range.merge(missing_range);
 
     // write the nodes
-    double coord[ 3 ];
-    for( Range::iterator it = node_range.begin( ); it != node_range.end( ); ++it )
+    double coord[3];
+    for( Range::iterator it = node_range.begin(); it != node_range.end(); ++it )
     {
         EntityHandle node_handle = *it;
 
@@ -154,11 +154,11 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
         node_file.width( 8 );
         node_file << mbImpl->id_from_handle( node_handle );
         node_file.width( 20 );
-        node_file << coord[ 0 ];
+        node_file << coord[0];
         node_file.width( 20 );
-        node_file << coord[ 1 ];
+        node_file << coord[1];
         node_file.width( 20 );
-        node_file << coord[ 2 ] << std::endl;
+        node_file << coord[2] << std::endl;
     }
 
     // update header to load nodes
@@ -166,11 +166,11 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
 
     // search for all node sets (Dirichlet Sets)
     Range node_mesh_sets;
-    int   ns_id;
+    int ns_id;
     result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1, node_mesh_sets );
     if( result != MB_SUCCESS ) return result;
 
-    for( Range::iterator ns_it = node_mesh_sets.begin( ); ns_it != node_mesh_sets.end( ); ++ns_it )
+    for( Range::iterator ns_it = node_mesh_sets.begin(); ns_it != node_mesh_sets.end(); ++ns_it )
     {
         result = mbImpl->tag_get_data( mDirichletSetTag, &( *ns_it ), 1, &ns_id );
         if( result != MB_SUCCESS ) return result;
@@ -178,11 +178,11 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
         result = mbImpl->get_entities_by_handle( *ns_it, node_vector, true );
         if( result != MB_SUCCESS ) return result;
         // for every nodeset found, cycle through nodes in set:
-        for( std::vector< EntityHandle >::iterator node_it = node_vector.begin( ); node_it != node_vector.end( );
+        for( std::vector< EntityHandle >::iterator node_it = node_vector.begin(); node_it != node_vector.end();
              ++node_it )
         {
             int ns_node_id = mbImpl->id_from_handle( *node_it );
-            if( node_it == node_vector.begin( ) )
+            if( node_it == node_vector.begin() )
             {
                 // select first node in new list
                 ans_file << "nsel,s,node,," << std::setw( 8 ) << ns_node_id << std::endl;
@@ -212,26 +212,26 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
     Range tet_range;
     result = mbImpl->get_entities_by_type( output_set, MBTET, tet_range, true );
     if( result != MB_SUCCESS ) return result;
-    for( Range::iterator elem_it = tet_range.begin( ); elem_it != tet_range.end( ); ++elem_it )
+    for( Range::iterator elem_it = tet_range.begin(); elem_it != tet_range.end(); ++elem_it )
     {
-        EntityHandle                elem_handle = *elem_it;
-        int                         elem_id = mbImpl->id_from_handle( elem_handle );
+        EntityHandle elem_handle = *elem_it;
+        int elem_id              = mbImpl->id_from_handle( elem_handle );
         std::vector< EntityHandle > conn;
         result = mbImpl->get_connectivity( &elem_handle, 1, conn, false );
         if( result != MB_SUCCESS ) return result;
         // make sure 4 or 10 node tet
-        if( conn.size( ) != 4 && conn.size( ) != 10 )
+        if( conn.size() != 4 && conn.size() != 10 )
         {
             std::cout << "Support not added for element type. \n";
             return MB_FAILURE;
         }
         // write information for 4 node tet
-        if( conn.size( ) == 4 )
+        if( conn.size() == 4 )
         {
-            elem_file << std::setw( 8 ) << conn[ 0 ] << std::setw( 8 ) << conn[ 1 ];
-            elem_file << std::setw( 8 ) << conn[ 2 ] << std::setw( 8 ) << conn[ 2 ];
-            elem_file << std::setw( 8 ) << conn[ 3 ] << std::setw( 8 ) << conn[ 3 ];
-            elem_file << std::setw( 8 ) << conn[ 3 ] << std::setw( 8 ) << conn[ 3 ];
+            elem_file << std::setw( 8 ) << conn[0] << std::setw( 8 ) << conn[1];
+            elem_file << std::setw( 8 ) << conn[2] << std::setw( 8 ) << conn[2];
+            elem_file << std::setw( 8 ) << conn[3] << std::setw( 8 ) << conn[3];
+            elem_file << std::setw( 8 ) << conn[3] << std::setw( 8 ) << conn[3];
 
             elem_file << std::setw( 8 ) << MATDefault << std::setw( 8 ) << ETSolid45;
             elem_file << std::setw( 8 ) << "1" << std::setw( 8 ) << "1";
@@ -240,19 +240,19 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
         }
 
         // write information for 10 node tet
-        if( conn.size( ) == 10 )
+        if( conn.size() == 10 )
         {
-            elem_file << std::setw( 8 ) << conn[ 0 ] << std::setw( 8 ) << conn[ 1 ];
-            elem_file << std::setw( 8 ) << conn[ 2 ] << std::setw( 8 ) << conn[ 3 ];
-            elem_file << std::setw( 8 ) << conn[ 4 ] << std::setw( 8 ) << conn[ 5 ];
-            elem_file << std::setw( 8 ) << conn[ 6 ] << std::setw( 8 ) << conn[ 7 ];
+            elem_file << std::setw( 8 ) << conn[0] << std::setw( 8 ) << conn[1];
+            elem_file << std::setw( 8 ) << conn[2] << std::setw( 8 ) << conn[3];
+            elem_file << std::setw( 8 ) << conn[4] << std::setw( 8 ) << conn[5];
+            elem_file << std::setw( 8 ) << conn[6] << std::setw( 8 ) << conn[7];
 
             elem_file << std::setw( 8 ) << MATDefault << std::setw( 8 ) << ETSolid92;
             elem_file << std::setw( 8 ) << "1" << std::setw( 8 ) << "1";
             elem_file << std::setw( 8 ) << "0" << std::setw( 8 ) << elem_id;
             elem_file << std::endl;
 
-            elem_file << std::setw( 8 ) << conn[ 8 ] << std::setw( 8 ) << conn[ 9 ];
+            elem_file << std::setw( 8 ) << conn[8] << std::setw( 8 ) << conn[9];
             elem_file << std::endl;
         }
     }
@@ -261,27 +261,27 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
     Range hex_range;
     result = mbImpl->get_entities_by_type( output_set, MBHEX, hex_range, true );
     if( result != MB_SUCCESS ) return result;
-    for( Range::iterator elem_it = hex_range.begin( ); elem_it != hex_range.end( ); ++elem_it )
+    for( Range::iterator elem_it = hex_range.begin(); elem_it != hex_range.end(); ++elem_it )
     {
-        EntityHandle                elem_handle = *elem_it;
-        int                         elem_id = mbImpl->id_from_handle( elem_handle );
+        EntityHandle elem_handle = *elem_it;
+        int elem_id              = mbImpl->id_from_handle( elem_handle );
         std::vector< EntityHandle > conn;
         result = mbImpl->get_connectivity( &elem_handle, 1, conn, false );
         if( result != MB_SUCCESS ) return result;
         // make sure supported hex type
-        if( conn.size( ) != 8 && conn.size( ) != 20 )
+        if( conn.size() != 8 && conn.size() != 20 )
         {
             std::cout << "Support not added for element type. \n";
             return MB_FAILURE;
         }
 
         // write information for 8 node hex
-        if( conn.size( ) == 8 )
+        if( conn.size() == 8 )
         {
-            elem_file << std::setw( 8 ) << conn[ 0 ] << std::setw( 8 ) << conn[ 1 ];
-            elem_file << std::setw( 8 ) << conn[ 2 ] << std::setw( 8 ) << conn[ 3 ];
-            elem_file << std::setw( 8 ) << conn[ 4 ] << std::setw( 8 ) << conn[ 5 ];
-            elem_file << std::setw( 8 ) << conn[ 6 ] << std::setw( 8 ) << conn[ 7 ];
+            elem_file << std::setw( 8 ) << conn[0] << std::setw( 8 ) << conn[1];
+            elem_file << std::setw( 8 ) << conn[2] << std::setw( 8 ) << conn[3];
+            elem_file << std::setw( 8 ) << conn[4] << std::setw( 8 ) << conn[5];
+            elem_file << std::setw( 8 ) << conn[6] << std::setw( 8 ) << conn[7];
 
             elem_file << std::setw( 8 ) << MATDefault << std::setw( 8 ) << ETSolid45;
             elem_file << std::setw( 8 ) << "1" << std::setw( 8 ) << "1";
@@ -290,25 +290,25 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
         }
 
         // write information for 20 node hex
-        if( conn.size( ) == 20 )
+        if( conn.size() == 20 )
         {
 
-            elem_file << std::setw( 8 ) << conn[ 4 ] << std::setw( 8 ) << conn[ 5 ];
-            elem_file << std::setw( 8 ) << conn[ 1 ] << std::setw( 8 ) << conn[ 0 ];
-            elem_file << std::setw( 8 ) << conn[ 7 ] << std::setw( 8 ) << conn[ 6 ];
-            elem_file << std::setw( 8 ) << conn[ 2 ] << std::setw( 8 ) << conn[ 3 ];
+            elem_file << std::setw( 8 ) << conn[4] << std::setw( 8 ) << conn[5];
+            elem_file << std::setw( 8 ) << conn[1] << std::setw( 8 ) << conn[0];
+            elem_file << std::setw( 8 ) << conn[7] << std::setw( 8 ) << conn[6];
+            elem_file << std::setw( 8 ) << conn[2] << std::setw( 8 ) << conn[3];
 
             elem_file << std::setw( 8 ) << MATDefault << std::setw( 8 ) << ETSolid95;
             elem_file << std::setw( 8 ) << "1" << std::setw( 8 ) << "1";
             elem_file << std::setw( 8 ) << "0" << std::setw( 8 ) << elem_id;
             elem_file << std::endl;
 
-            elem_file << std::setw( 8 ) << conn[ 16 ] << std::setw( 8 ) << conn[ 13 ];
-            elem_file << std::setw( 8 ) << conn[ 8 ] << std::setw( 8 ) << conn[ 12 ];
-            elem_file << std::setw( 8 ) << conn[ 18 ] << std::setw( 8 ) << conn[ 14 ];
-            elem_file << std::setw( 8 ) << conn[ 10 ] << std::setw( 8 ) << conn[ 15 ];
-            elem_file << std::setw( 8 ) << conn[ 19 ] << std::setw( 8 ) << conn[ 17 ];
-            elem_file << std::setw( 8 ) << conn[ 9 ] << std::setw( 8 ) << conn[ 11 ];
+            elem_file << std::setw( 8 ) << conn[16] << std::setw( 8 ) << conn[13];
+            elem_file << std::setw( 8 ) << conn[8] << std::setw( 8 ) << conn[12];
+            elem_file << std::setw( 8 ) << conn[18] << std::setw( 8 ) << conn[14];
+            elem_file << std::setw( 8 ) << conn[10] << std::setw( 8 ) << conn[15];
+            elem_file << std::setw( 8 ) << conn[19] << std::setw( 8 ) << conn[17];
+            elem_file << std::setw( 8 ) << conn[9] << std::setw( 8 ) << conn[11];
             elem_file << std::endl;
         }
     }
@@ -316,27 +316,27 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
     Range prism_range;
     result = mbImpl->get_entities_by_type( output_set, MBPRISM, prism_range, true );
     if( result != MB_SUCCESS ) return result;
-    for( Range::iterator elem_it = prism_range.begin( ); elem_it != prism_range.end( ); ++elem_it )
+    for( Range::iterator elem_it = prism_range.begin(); elem_it != prism_range.end(); ++elem_it )
     {
-        EntityHandle                elem_handle = *elem_it;
-        int                         elem_id = mbImpl->id_from_handle( elem_handle );
+        EntityHandle elem_handle = *elem_it;
+        int elem_id              = mbImpl->id_from_handle( elem_handle );
         std::vector< EntityHandle > conn;
         result = mbImpl->get_connectivity( &elem_handle, 1, conn, false );
         if( result != MB_SUCCESS ) return result;
         // make sure supported prism type
-        if( conn.size( ) != 6 )
+        if( conn.size() != 6 )
         {
             std::cout << "Support not added for element type. \n";
             return MB_FAILURE;
         }
 
         // write information for 6 node prism
-        if( conn.size( ) == 6 )
+        if( conn.size() == 6 )
         {
-            elem_file << std::setw( 8 ) << conn[ 0 ] << std::setw( 8 ) << conn[ 3 ];
-            elem_file << std::setw( 8 ) << conn[ 4 ] << std::setw( 8 ) << conn[ 4 ];
-            elem_file << std::setw( 8 ) << conn[ 1 ] << std::setw( 8 ) << conn[ 2 ];
-            elem_file << std::setw( 8 ) << conn[ 5 ] << std::setw( 8 ) << conn[ 5 ];
+            elem_file << std::setw( 8 ) << conn[0] << std::setw( 8 ) << conn[3];
+            elem_file << std::setw( 8 ) << conn[4] << std::setw( 8 ) << conn[4];
+            elem_file << std::setw( 8 ) << conn[1] << std::setw( 8 ) << conn[2];
+            elem_file << std::setw( 8 ) << conn[5] << std::setw( 8 ) << conn[5];
 
             elem_file << std::setw( 8 ) << MATDefault << std::setw( 8 ) << ETSolid45;
             elem_file << std::setw( 8 ) << "1" << std::setw( 8 ) << "1";
@@ -357,11 +357,11 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
 
     // search for all side sets (Neumann)
     Range side_mesh_sets;
-    int   ss_id;
+    int ss_id;
     result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1, side_mesh_sets );
     if( result != MB_SUCCESS ) return result;
     // cycle through all sets found
-    for( Range::iterator ss_it = side_mesh_sets.begin( ); ss_it != side_mesh_sets.end( ); ++ss_it )
+    for( Range::iterator ss_it = side_mesh_sets.begin(); ss_it != side_mesh_sets.end(); ++ss_it )
     {
         result = mbImpl->tag_get_data( mNeumannSetTag, &( *ss_it ), 1, &ss_id );
         if( result != MB_SUCCESS ) return result;
@@ -370,7 +370,7 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
         if( result != MB_SUCCESS ) return result;
 
         // cycle through elements in current side set
-        for( std::vector< EntityHandle >::iterator elem_it = elem_vector.begin( ); elem_it != elem_vector.end( );
+        for( std::vector< EntityHandle >::iterator elem_it = elem_vector.begin(); elem_it != elem_vector.end();
              ++elem_it )
         {
             EntityHandle elem_handle = *elem_it;
@@ -379,19 +379,19 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
             std::vector< EntityHandle > conn;
             result = mbImpl->get_connectivity( &elem_handle, 1, conn );
             if( result != MB_SUCCESS ) return result;
-            if( elem_it == elem_vector.begin( ) )
+            if( elem_it == elem_vector.begin() )
             {
-                ans_file << "nsel,s,node,," << std::setw( 8 ) << conn[ 0 ] << std::endl;
-                for( unsigned int i = 1; i < conn.size( ); i++ )
+                ans_file << "nsel,s,node,," << std::setw( 8 ) << conn[0] << std::endl;
+                for( unsigned int i = 1; i < conn.size(); i++ )
                 {
-                    ans_file << "nsel,a,node,," << std::setw( 8 ) << conn[ i ] << std::endl;
+                    ans_file << "nsel,a,node,," << std::setw( 8 ) << conn[i] << std::endl;
                 }
             }
             else
             {
-                for( unsigned int i = 0; i < conn.size( ); i++ )
+                for( unsigned int i = 0; i < conn.size(); i++ )
                 {
-                    ans_file << "nsel,a,node,," << std::setw( 8 ) << conn[ i ] << std::endl;
+                    ans_file << "nsel,a,node,," << std::setw( 8 ) << conn[i] << std::endl;
                 }
             }
         }
@@ -401,25 +401,25 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
 
     // Gather all element blocks
     Range matset;
-    int   mat_id;
+    int mat_id;
     result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1, matset );
     if( result != MB_SUCCESS ) return result;
     // cycle through all elem blocks
-    for( Range::iterator mat_it = matset.begin( ); mat_it != matset.end( ); ++mat_it )
+    for( Range::iterator mat_it = matset.begin(); mat_it != matset.end(); ++mat_it )
     {
         EntityHandle matset_handle = *mat_it;
-        result = mbImpl->tag_get_data( mMaterialSetTag, &matset_handle, 1, &mat_id );
+        result                     = mbImpl->tag_get_data( mMaterialSetTag, &matset_handle, 1, &mat_id );
         if( result != MB_SUCCESS ) return result;
         std::vector< EntityHandle > mat_vector;
         result = mbImpl->get_entities_by_handle( *mat_it, mat_vector, true );
         if( result != MB_SUCCESS ) return result;
         // cycle through elements in current mat set
-        for( std::vector< EntityHandle >::iterator elem_it = mat_vector.begin( ); elem_it != mat_vector.end( );
+        for( std::vector< EntityHandle >::iterator elem_it = mat_vector.begin(); elem_it != mat_vector.end();
              ++elem_it )
         {
             EntityHandle elem_handle = *elem_it;
-            int          elem_id = mbImpl->id_from_handle( elem_handle );
-            if( elem_it == mat_vector.begin( ) )
+            int elem_id              = mbImpl->id_from_handle( elem_handle );
+            if( elem_it == mat_vector.begin() )
             { ans_file << "esel,s,elem,," << std::setw( 8 ) << elem_id << std::endl; }
             else
             {
@@ -431,9 +431,9 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
     }
 
     // close all file streams
-    node_file.close( );
-    elem_file.close( );
-    ans_file.close( );
+    node_file.close();
+    elem_file.close();
+    ans_file.close();
 
     return MB_SUCCESS;
 }

@@ -5,18 +5,18 @@
 
 #define IMESH_ASSERT( ierr ) \
     if( ierr != 0 ) printf( "imesh assert\n" );
-#define IMESH_NULL 0
+#define IMESH_NULL      0
 #define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
+#define STRINGIFY( X )  STRINGIFY_( X )
 
 int main( int argc, char* argv[] )
 {
     MPI_Init( &argc, &argv );
     printf( "Hello\n" );
 
-    iMesh_Instance         imesh;
+    iMesh_Instance imesh;
     iMeshP_PartitionHandle partn;
-    int                    ierr, num_sets;
+    int ierr, num_sets;
 
     iBase_EntitySetHandle root;
     imesh = IMESH_NULL;
@@ -46,5 +46,5 @@ int main( int argc, char* argv[] )
     IMESH_ASSERT( ierr );
 
     printf( "Done\n" );
-    MPI_Finalize( );  // probably the 4th time this is called.. no big deal
+    MPI_Finalize();  // probably the 4th time this is called.. no big deal
 }

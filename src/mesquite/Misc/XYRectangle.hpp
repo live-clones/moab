@@ -104,7 +104,7 @@ class XYRectangle : public MBMesquite::MeshDomain
                      MBMesquite::MsqError& err ) const;
 
   private:
-    double    minCoords[ 3 ], maxCoords[ 3 ];  //!< corner coords
+    double minCoords[3], maxCoords[3];  //!< corner coords
     const int normalDir, widthDir, heightDir;
 
     //! Single constraint on a vertex (reduces degrees of freedom by 1)
@@ -118,12 +118,12 @@ class XYRectangle : public MBMesquite::MeshDomain
         };
         VertexConstraint( int a, double c ) : axis( (Constraint)a ), coord( c ) {}
         Constraint axis;
-        double     coord;
+        double coord;
     };
 
     //! Map vertex handles to constraints
     typedef std::multimap< Mesh::VertexHandle, VertexConstraint > constraint_t;
-    constraint_t                                                  mConstraints;
+    constraint_t mConstraints;
 };
 
 }  // namespace MBMesquite

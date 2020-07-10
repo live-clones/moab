@@ -67,17 +67,17 @@ using std::endl;
 
 using namespace MBMesquite;
 
-int main( )
+int main()
 {
     MBMesquite::MeshImpl mesh;
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     // create geometry: plane z=0, normal (0,0,1)
-    Vector3D                 pnt( 0, 0, 0 );
-    Vector3D                 s_norm( 0, 0, 1 );
+    Vector3D pnt( 0, 0, 0 );
+    Vector3D s_norm( 0, 0, 1 );
     MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
     std::string default_file_name = TestDir + "/2D/vtk/mixed/untangled/hybrid_3quad_1tri.vtk";
-    mesh.read_vtk( default_file_name.c_str( ), err );
+    mesh.read_vtk( default_file_name.c_str(), err );
     if( err ) return 1;
 
     // creates an intruction queue
@@ -99,7 +99,7 @@ int main( )
     // creates the steepest descent, feas newt optimization procedures
     // ConjugateGradient* pass1 = new ConjugateGradient( &obj_func, err );
     SteepestDescent pass1( &obj_func );
-    pass1.use_global_patch( );
+    pass1.use_global_patch();
     if( err ) return 1;
     ;
 

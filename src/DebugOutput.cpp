@@ -12,7 +12,7 @@
 namespace moab
 {
 
-DebugOutputStream::~DebugOutputStream( ) {}
+DebugOutputStream::~DebugOutputStream() {}
 
 class FILEDebugStream : public DebugOutputStream
 {
@@ -51,12 +51,12 @@ void CxxDebugStream::println( int rank, const char* pfx, const char* str )
 {
     outStr.width( 3 );
     outStr << rank << "  " << pfx << str << std::endl;
-    outStr.flush( );
+    outStr.flush();
 }
 void CxxDebugStream::println( const char* pfx, const char* str )
 {
     outStr << pfx << str << std::endl;
-    outStr.flush( );
+    outStr.flush();
 }
 
 DebugOutput::DebugOutput( DebugOutputStream* impl, unsigned verbosity )
@@ -126,21 +126,21 @@ DebugOutput::DebugOutput( const DebugOutput& copy )
 
 DebugOutput& DebugOutput::operator=( const DebugOutput& copy )
 {
-    linePfx = copy.linePfx;
-    outputImpl = copy.outputImpl;
-    mpiRank = copy.mpiRank;
+    linePfx        = copy.linePfx;
+    outputImpl     = copy.outputImpl;
+    mpiRank        = copy.mpiRank;
     verbosityLimit = copy.verbosityLimit;
     outputImpl->referenceCount++;
     assert( outputImpl->referenceCount > 1 );
     return *this;
 }
 
-DebugOutput::~DebugOutput( )
+DebugOutput::~DebugOutput()
 {
-    if( !lineBuffer.empty( ) )
+    if( !lineBuffer.empty() )
     {
         lineBuffer.push_back( '\n' );
-        process_line_buffer( );
+        process_line_buffer();
     }
     if( outputImpl )
     {
@@ -150,7 +150,7 @@ DebugOutput::~DebugOutput( )
     }
 }
 
-void DebugOutput::use_world_rank( )
+void DebugOutput::use_world_rank()
 {
     mpiRank = 0;
 #ifdef MOAB_HAVE_MPI
@@ -161,41 +161,41 @@ void DebugOutput::use_world_rank( )
 
 void DebugOutput::print_real( const char* buffer )
 {
-    lineBuffer.insert( lineBuffer.end( ), buffer, buffer + strlen( buffer ) );
-    process_line_buffer( );
+    lineBuffer.insert( lineBuffer.end(), buffer, buffer + strlen( buffer ) );
+    process_line_buffer();
 }
 
 void DebugOutput::tprint_real( const char* buffer )
 {
-    tprint( );
+    tprint();
     print_real( buffer );
 }
 
 void DebugOutput::print_real( const std::string& str )
 {
-    lineBuffer.insert( lineBuffer.end( ), str.begin( ), str.end( ) );
-    process_line_buffer( );
+    lineBuffer.insert( lineBuffer.end(), str.begin(), str.end() );
+    process_line_buffer();
 }
 
 void DebugOutput::tprint_real( const std::string& str )
 {
-    tprint( );
+    tprint();
     print_real( str );
 }
 
 void DebugOutput::print_real( const char* fmt, va_list args1, va_list args2 )
 {
-    size_t idx = lineBuffer.size( );
+    size_t idx = lineBuffer.size();
 #ifdef MOAB_HAVE_VSNPRINTF
     // try once with remaining space in buffer
-    lineBuffer.resize( lineBuffer.capacity( ) );
-    unsigned size = vsnprintf( &lineBuffer[ idx ], lineBuffer.size( ) - idx, fmt, args1 );
+    lineBuffer.resize( lineBuffer.capacity() );
+    unsigned size = vsnprintf( &lineBuffer[idx], lineBuffer.size() - idx, fmt, args1 );
     ++size;  // trailing null
              // if necessary, increase buffer size and retry
-    if( size > ( lineBuffer.size( ) - idx ) )
+    if( size > ( lineBuffer.size() - idx ) )
     {
         lineBuffer.resize( idx + size );
-        size = vsnprintf( &lineBuffer[ idx ], lineBuffer.size( ) - idx, fmt, args2 );
+        size = vsnprintf( &lineBuffer[idx], lineBuffer.size() - idx, fmt, args2 );
         ++size;  // trailing null
     }
 #else
@@ -203,9 +203,9 @@ void DebugOutput::print_real( const char* fmt, va_list args1, va_list args2 )
     // If every character is a format code then there are len/3 format codes.
     // Guess a random large value of num_chars characters per formatted argument.
     const unsigned num_chars = 180;
-    unsigned       exp_size = ( num_chars / 3 ) * strlen( fmt );
+    unsigned exp_size        = ( num_chars / 3 ) * strlen( fmt );
     lineBuffer.resize( idx + exp_size );
-    unsigned size = vsprintf( &lineBuffer[ idx ], fmt, args1 );
+    unsigned size = vsprintf( &lineBuffer[idx], fmt, args1 );
     ++size;  // trailing null
              // check if we overflowed the buffer
     if( size > exp_size )
@@ -213,19 +213,19 @@ void DebugOutput::print_real( const char* fmt, va_list args1, va_list args2 )
         // crap!
         fprintf( stderr, "ERROR: Buffer overflow at %s:%d\n", __FILE__, __LINE__ );
         lineBuffer.resize( idx + exp_size );
-        size = vsprintf( &lineBuffer[ idx ], fmt, args2 );
+        size = vsprintf( &lineBuffer[idx], fmt, args2 );
         ++size;  // trailing null
     }
 #endif
 
     // less one because we don't want the trailing '\0'
     lineBuffer.resize( idx + size - 1 );
-    process_line_buffer( );
+    process_line_buffer();
 }
 
 void DebugOutput::tprint_real( const char* fmt, va_list args1, va_list args2 )
 {
-    tprint( );
+    tprint();
     print_real( fmt, args1, args2 );
 }
 
@@ -233,11 +233,11 @@ static void print_range( char* buffer, unsigned long begin, unsigned long end )
 {
     assert( end > begin );
     // begin with a space
-    *buffer = ' ';
+    *buffer  = ' ';
     char* b1 = buffer + 1;
     // print begin-end, but keep track of where each peice is written
     char* e1 = b1 + sprintf( b1, "%lu", begin );
-    *e1 = '-';
+    *e1      = '-';
     char* b2 = e1 + 1;
     char* e2 = b2 + sprintf( b2, "%lu", end );
     // if the printed strings for both numbers don't contain the same
@@ -274,41 +274,41 @@ void DebugOutput::list_range_real( const char* pfx, const Range& range )
 {
     if( pfx )
     {
-        lineBuffer.insert( lineBuffer.end( ), pfx, pfx + strlen( pfx ) );
+        lineBuffer.insert( lineBuffer.end(), pfx, pfx + strlen( pfx ) );
         lineBuffer.push_back( ' ' );
     }
 
-    if( range.empty( ) )
+    if( range.empty() )
     {
         print_real( "<empty>\n" );
         return;
     }
 
-    char                       numbuf[ 48 ];  // unsigned 64 bit integer can't have more than 20 decimal digits
+    char numbuf[48];  // unsigned 64 bit integer can't have more than 20 decimal digits
     Range::const_pair_iterator i;
-    EntityType                 type = MBMAXTYPE;
-    for( i = range.const_pair_begin( ); i != range.const_pair_end( ); ++i )
+    EntityType type = MBMAXTYPE;
+    for( i = range.const_pair_begin(); i != range.const_pair_end(); ++i )
     {
         if( TYPE_FROM_HANDLE( i->first ) != type )
         {
-            type = TYPE_FROM_HANDLE( i->first );
+            type             = TYPE_FROM_HANDLE( i->first );
             const char* name = CN::EntityTypeName( type );
-            lineBuffer.insert( lineBuffer.end( ), name, name + strlen( name ) );
+            lineBuffer.insert( lineBuffer.end(), name, name + strlen( name ) );
         }
         if( i->first == i->second )
             sprintf( numbuf, " %lu,", (unsigned long)( ID_FROM_HANDLE( i->first ) ) );
         else
             print_range( numbuf, ID_FROM_HANDLE( i->first ), ID_FROM_HANDLE( i->second ) );
-        lineBuffer.insert( lineBuffer.end( ), numbuf, numbuf + strlen( numbuf ) );
+        lineBuffer.insert( lineBuffer.end(), numbuf, numbuf + strlen( numbuf ) );
     }
 
     lineBuffer.push_back( '\n' );
-    process_line_buffer( );
+    process_line_buffer();
 }
 
 void DebugOutput::list_ints_real( const char* pfx, const Range& range )
 {
-    if( range.empty( ) )
+    if( range.empty() )
     {
         print_real( "<empty>\n" );
         return;
@@ -316,53 +316,53 @@ void DebugOutput::list_ints_real( const char* pfx, const Range& range )
 
     if( pfx )
     {
-        lineBuffer.insert( lineBuffer.end( ), pfx, pfx + strlen( pfx ) );
+        lineBuffer.insert( lineBuffer.end(), pfx, pfx + strlen( pfx ) );
         lineBuffer.push_back( ' ' );
     }
 
-    char                       numbuf[ 48 ];  // unsigned 64 bit integer can't have more than 20 decimal digits
+    char numbuf[48];  // unsigned 64 bit integer can't have more than 20 decimal digits
     Range::const_pair_iterator i;
-    for( i = range.const_pair_begin( ); i != range.const_pair_end( ); ++i )
+    for( i = range.const_pair_begin(); i != range.const_pair_end(); ++i )
     {
         if( i->first == i->second )
             sprintf( numbuf, " %lu,", (unsigned long)( i->first ) );
         else
             print_range( numbuf, (unsigned long)( i->first ), (unsigned long)( i->second ) );
-        lineBuffer.insert( lineBuffer.end( ), numbuf, numbuf + strlen( numbuf ) );
+        lineBuffer.insert( lineBuffer.end(), numbuf, numbuf + strlen( numbuf ) );
     }
 
     lineBuffer.push_back( '\n' );
-    process_line_buffer( );
+    process_line_buffer();
 }
 
-void DebugOutput::process_line_buffer( )
+void DebugOutput::process_line_buffer()
 {
-    size_t                        last_idx = 0;
+    size_t last_idx = 0;
     std::vector< char >::iterator i;
-    for( i = std::find( lineBuffer.begin( ), lineBuffer.end( ), '\n' ); i != lineBuffer.end( );
-         i = std::find( i, lineBuffer.end( ), '\n' ) )
+    for( i = std::find( lineBuffer.begin(), lineBuffer.end(), '\n' ); i != lineBuffer.end();
+         i = std::find( i, lineBuffer.end(), '\n' ) )
     {
         *i = '\0';
-        if( have_rank( ) )
-            outputImpl->println( get_rank( ), linePfx.c_str( ), &lineBuffer[ last_idx ] );
+        if( have_rank() )
+            outputImpl->println( get_rank(), linePfx.c_str(), &lineBuffer[last_idx] );
         else
-            outputImpl->println( linePfx.c_str( ), &lineBuffer[ last_idx ] );
+            outputImpl->println( linePfx.c_str(), &lineBuffer[last_idx] );
         ++i;
-        last_idx = i - lineBuffer.begin( );
+        last_idx = i - lineBuffer.begin();
     }
 
     if( last_idx )
     {
-        i = std::copy( lineBuffer.begin( ) + last_idx, lineBuffer.end( ), lineBuffer.begin( ) );
-        lineBuffer.erase( i, lineBuffer.end( ) );
+        i = std::copy( lineBuffer.begin() + last_idx, lineBuffer.end(), lineBuffer.begin() );
+        lineBuffer.erase( i, lineBuffer.end() );
     }
 }
 
-void DebugOutput::tprint( )
+void DebugOutput::tprint()
 {
-    size_t s = lineBuffer.size( );
+    size_t s = lineBuffer.size();
     lineBuffer.resize( s + 64 );
-    size_t ss = sprintf( &lineBuffer[ s ], "(%.2f s) ", cpuTi.time_since_birth( ) );
+    size_t ss = sprintf( &lineBuffer[s], "(%.2f s) ", cpuTi.time_since_birth() );
     lineBuffer.resize( s + ss );
 }
 

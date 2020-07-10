@@ -62,20 +62,20 @@ class GeomQueryTool
          * Clear this entire history-- logically equivalent to creating a new history,
          * but probably more efficient.
          */
-        void reset( );
+        void reset();
 
         /**
          * Clear the history up to the most recent intersection.  This should be
          * called when a ray changes direction at the site of a surface crossing,
          * a situation that most commonly occurs at a reflecting boundary.
          */
-        void reset_to_last_intersection( );
+        void reset_to_last_intersection();
 
         /**
          * Remove the most recent intersection.  This allows a subsequent call
          * along the same ray to return the same intersection.
          */
-        void rollback_last_intersection( );
+        void rollback_last_intersection();
 
         /**
          * Get the last intersection in the RayHistory. This will return a null
@@ -86,9 +86,9 @@ class GeomQueryTool
         /**
          * @return the number of surface crossings currently represented by this ray history
          */
-        int size( ) const
+        int size() const
         {
-            return prev_facets.size( );
+            return prev_facets.size();
         }
 
         /**
@@ -117,9 +117,9 @@ class GeomQueryTool
                    double numerical_precision = 0.001 );
 
     // Destructor
-    ~GeomQueryTool( );
+    ~GeomQueryTool();
 
-    ErrorCode initialize( );
+    ErrorCode initialize();
 
     /**\brief find the next surface crossing from a given point in a given direction
      *
@@ -160,7 +160,7 @@ class GeomQueryTool
      *              ray-firing query.  See OrientedBoxTreeTool.hpp for details.
      *
      */
-    ErrorCode ray_fire( const EntityHandle volume, const double ray_start[ 3 ], const double ray_dir[ 3 ],
+    ErrorCode ray_fire( const EntityHandle volume, const double ray_start[3], const double ray_dir[3],
                         EntityHandle& next_surf, double& next_surf_dist, RayHistory* history = NULL,
                         double dist_limit = 0, int ray_orientation = 1, OrientedBoxTreeTool::TrvStats* stats = NULL );
 
@@ -179,7 +179,7 @@ class GeomQueryTool
      * @param history Optional RayHistory object to pass to underlying ray fire query.
      *        The history is not modified by this call.
      */
-    ErrorCode point_in_volume( const EntityHandle volume, const double xyz[ 3 ], int& result, const double* uvw = NULL,
+    ErrorCode point_in_volume( const EntityHandle volume, const double xyz[3], int& result, const double* uvw = NULL,
                                const RayHistory* history = NULL );
 
     /**\brief Robust test if a point is inside or outside a volume using unit sphere area method
@@ -190,7 +190,7 @@ class GeomQueryTool
      * @param xyz The location to test for volume containment
      * @param result Set to 0 if xyz it outside volume, 1 if inside.
      */
-    ErrorCode point_in_volume_slow( const EntityHandle volume, const double xyz[ 3 ], int& result );
+    ErrorCode point_in_volume_slow( const EntityHandle volume, const double xyz[3], int& result );
 
     /**\brief Find volume for a given location.
      *
@@ -202,7 +202,7 @@ class GeomQueryTool
      *        consistent results when a ray direction is known.  If NULL or {0,0,0} is
      *        given, a random direction will be used.
      */
-    ErrorCode find_volume( const double xyz[ 3 ], EntityHandle& volume, const double* dir = NULL );
+    ErrorCode find_volume( const double xyz[3], EntityHandle& volume, const double* dir = NULL );
 
     /**\brief Find volume for a given location using loop. (slow)
      *
@@ -213,7 +213,7 @@ class GeomQueryTool
      *        consistent results when a ray direction is known.  If NULL or {0,0,0} is
      *        given, a random direction will be used.
      */
-    ErrorCode find_volume_slow( const double xyz[ 3 ], EntityHandle& volume, const double* dir = NULL );
+    ErrorCode find_volume_slow( const double xyz[3], EntityHandle& volume, const double* dir = NULL );
 
     /**\brief Test if a point is inside or outsize a volume's axis-aligned bounding box
      *
@@ -223,7 +223,7 @@ class GeomQueryTool
      * @param point The location to test for bounding box containment
      * @param inside set to 0 if point is outside the box, 1 if inside
      */
-    ErrorCode point_in_box( const EntityHandle volume, const double point[ 3 ], int& inside );
+    ErrorCode point_in_box( const EntityHandle volume, const double point[3], int& inside );
 
     /** \brief Given a ray starting at a surface of a volume, check whether the ray enters or exits
      * the volume
@@ -242,8 +242,8 @@ class GeomQueryTool
      * a history, the facet nearest to xyz will be looked up.  The history should always be provided
      * if available, as it avoids the computational expense of a nearest-facet query.
      */
-    ErrorCode test_volume_boundary( const EntityHandle volume, const EntityHandle surface, const double xyz[ 3 ],
-                                    const double uvw[ 3 ], int& result, const RayHistory* history = NULL );
+    ErrorCode test_volume_boundary( const EntityHandle volume, const EntityHandle surface, const double xyz[3],
+                                    const double uvw[3], int& result, const RayHistory* history = NULL );
 
     /**\brief Find the distance to the point on the boundary of the volume closest to the test point
      *
@@ -251,7 +251,7 @@ class GeomQueryTool
      * @param point Coordinates of test point
      * @param result Set to the minimum distance from point to a surface in volume
      */
-    ErrorCode closest_to_location( EntityHandle volume, const double point[ 3 ], double& result,
+    ErrorCode closest_to_location( EntityHandle volume, const double point[3], double& result,
                                    EntityHandle* closest_surface = 0 );
 
     /** Calculate the volume contained in a 'volume' */
@@ -275,8 +275,7 @@ class GeomQueryTool
      *        If present and non-empty, return the normal
      *        of the most recently intersected facet, ignoring xyz.
      */
-    ErrorCode get_normal( EntityHandle surf, const double xyz[ 3 ], double angle[ 3 ],
-                          const RayHistory* history = NULL );
+    ErrorCode get_normal( EntityHandle surf, const double xyz[3], double angle[3], const RayHistory* history = NULL );
 
   private:
     /**\brief determine the point membership when the point is effectively on the boundary
@@ -333,36 +332,36 @@ class GeomQueryTool
      */
     void set_numerical_precision( double new_precision );
 
-    double get_numerical_precision( )
+    double get_numerical_precision()
     {
         return numericalPrecision;
     }
 
-    double get_overlap_thickness( )
+    double get_overlap_thickness()
     {
         return overlapThickness;
     }
 
-    GeomTopoTool* gttool( )
+    GeomTopoTool* gttool()
     {
         return geomTopoTool;
     }
 
-    Interface* moab_instance( )
+    Interface* moab_instance()
     {
         return MBI;
     }
 
   private:
-    GeomTopoTool*        geomTopoTool;
-    bool                 owns_gtt;
-    Interface*           MBI;
+    GeomTopoTool* geomTopoTool;
+    bool owns_gtt;
+    Interface* MBI;
     OrientedBoxTreeTool* obbTreeTool;
-    bool                 counting;
-    long long int        n_pt_in_vol_calls;
-    long long int        n_ray_fire_calls;
-    double               overlapThickness, numericalPrecision;
-    Tag                  senseTag;
+    bool counting;
+    long long int n_pt_in_vol_calls;
+    long long int n_ray_fire_calls;
+    double overlapThickness, numericalPrecision;
+    Tag senseTag;
 };
 
 }  // namespace moab

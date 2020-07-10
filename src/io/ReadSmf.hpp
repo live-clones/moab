@@ -53,19 +53,19 @@ class ReadSmf : public ReaderIface
     ReadSmf( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadSmf( );
+    virtual ~ReadSmf();
 
     typedef ErrorCode ( ReadSmf::*read_cmd )( std::vector< std::string >& argv );
     struct cmd_entry
     {
         const char* name;
-        read_cmd    cmd;
+        read_cmd cmd;
     };
-    void init( );
+    void init();
 
   protected:
     ErrorCode annotation( char* cmd, std::vector< std::string >& argv );
-    void      bad_annotation( const char* cmd );
+    void bad_annotation( const char* cmd );
 
     ErrorCode vertex( std::vector< std::string >& );
     ErrorCode v_normal( std::vector< std::string >& );
@@ -108,19 +108,19 @@ class ReadSmf : public ReaderIface
     std::string mPartitionTagName;
 
     // these are from SMF_reader from qslim/gfx/SMF/smf.h
-    static cmd_entry         read_cmds[];
-    char                     line[ SMF_MAXLINE ];
+    static cmd_entry read_cmds[];
+    char line[SMF_MAXLINE];
     std::vector< SMF_State > state;
-    SMF_ivars                ivar;
-    int                      _numNodes;
-    int                      _numFaces;
-    std::vector< double >    _coords;  // 3*numNodes; we might not know the number of nodes
-    std::vector< int >       _connec;  // 3*num of elements; we might not know them;
-    int                      _numNodesInFile;
-    int                      _numElementsInFile;
-    size_t                   lineNo;
-    size_t                   commandNo;
-    int                      versionMajor, versionMinor;
+    SMF_ivars ivar;
+    int _numNodes;
+    int _numFaces;
+    std::vector< double > _coords;  // 3*numNodes; we might not know the number of nodes
+    std::vector< int > _connec;     // 3*num of elements; we might not know them;
+    int _numNodesInFile;
+    int _numElementsInFile;
+    size_t lineNo;
+    size_t commandNo;
+    int versionMajor, versionMinor;
 };
 
 }  // namespace moab

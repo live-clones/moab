@@ -46,7 +46,7 @@ void check_group_data( std::vector< int >& group_ids, std::vector< std::string >
 void load_group_references( std::vector< int >& ids, std::vector< std::string >& names, std::vector< int >& ent_ids );
 
 // List of tests in this file
-void read_cylcube_groups_test( );
+void read_cylcube_groups_test();
 
 int main( int /* argc */, char** /* argv */ )
 {
@@ -59,8 +59,8 @@ int main( int /* argc */, char** /* argv */ )
 
 void read_file( Interface* moab, const char* input_file )
 {
-    InitCGMA::initialize_cgma( );
-    GeometryQueryTool::instance( )->delete_geometry( );
+    InitCGMA::initialize_cgma();
+    GeometryQueryTool::instance()->delete_geometry();
 
     ErrorCode rval = moab->load_file( input_file );CHECK_ERR( rval );
 }
@@ -69,14 +69,14 @@ void read_file( Interface* moab, const char* input_file )
 // being build with CGM. If MOAB is built with OCC, it makes sure
 // no erroneous group data is loaded as STEP files do not hold
 // information about groups.
-void read_cylcube_groups_test( )
+void read_cylcube_groups_test()
 {
 
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cylcube.c_str( ) );
+    read_file( mb, input_cylcube.c_str() );
 
     // Get (or create) the name and category tags
     Tag name_tag, category_tag;
@@ -89,21 +89,21 @@ void read_cylcube_groups_test( )
 
     // Get the group entity handles
     Range group_sets;
-    char  query[ CATEGORY_TAG_SIZE ] = "Group\0";
+    char query[CATEGORY_TAG_SIZE] = "Group\0";
     // Has to be this way because of the way tags are created
     void* val[] = { &query };
-    rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &category_tag, val, 1, group_sets );CHECK_ERR( rval );
+    rval        = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &category_tag, val, 1, group_sets );CHECK_ERR( rval );
     // Get group names and IDs
-    std::vector< int >         g_ids;
+    std::vector< int > g_ids;
     std::vector< std::string > g_names;
-    std::vector< int >         g_ent_ids;
+    std::vector< int > g_ent_ids;
 
-    for( Range::iterator i = group_sets.begin( ); i != group_sets.end( ); ++i )
+    for( Range::iterator i = group_sets.begin(); i != group_sets.end(); ++i )
     {
         int group_id = geom_id_by_handle( mb, *i );
         g_ids.push_back( group_id );
         // Get the group name
-        char group_name[ NAME_TAG_SIZE + 1 ];
+        char group_name[NAME_TAG_SIZE + 1];
         rval = mb->tag_get_data( name_tag, &( *i ), 1, &group_name );CHECK_ERR( rval );
         // Store group name
         std::string temp( group_name );
@@ -111,8 +111,8 @@ void read_cylcube_groups_test( )
         // Get all entities in the group
         Range group_ents;
         rval = mb->get_entities_by_type( *i, MBENTITYSET, group_ents, false );CHECK_ERR( rval );
-        if( group_ents.size( ) != 1 ) CHECK( false );
-        int grp_ent_id = geom_id_by_handle( mb, group_ents[ 0 ] );
+        if( group_ents.size() != 1 ) CHECK( false );
+        int grp_ent_id = geom_id_by_handle( mb, group_ents[0] );
         g_ent_ids.push_back( grp_ent_id );
     }
     check_group_data( g_ids, g_names, g_ent_ids );
@@ -128,35 +128,35 @@ void check_group_data( std::vector< int >& group_ids, std::vector< std::string >
     // Step files do not contain group data, MOAB shouldn't return errors when trying to access
     // this data but there shouldn't be any found.
 #ifdef HAVE_OCC_STEP
-    int num_g_ids = group_ids.size( );
-    int num_g_names = group_names.size( );
+    int num_g_ids   = group_ids.size();
+    int num_g_names = group_names.size();
 
     CHECK_EQUAL( 0, num_g_ids );
     CHECK_EQUAL( 0, num_g_names );
 #else
 
     // Initialize reference data
-    std::vector< int >         group_ref_ids;
+    std::vector< int > group_ref_ids;
     std::vector< std::string > group_ref_names;
-    std::vector< int >         group_ref_ent_ids;
+    std::vector< int > group_ref_ent_ids;
     load_group_references( group_ref_ids, group_ref_names, group_ref_ent_ids );
 
     // check that the correct number of entities were found
-    CHECK_EQUAL( group_ref_ids.size( ), group_ids.size( ) );
-    CHECK_EQUAL( group_ref_names.size( ), group_names.size( ) );
-    CHECK_EQUAL( group_ref_ent_ids.size( ), group_ent_ids.size( ) );
+    CHECK_EQUAL( group_ref_ids.size(), group_ids.size() );
+    CHECK_EQUAL( group_ref_names.size(), group_names.size() );
+    CHECK_EQUAL( group_ref_ent_ids.size(), group_ent_ids.size() );
 
     // now make sure that each group has a matching group
-    for( unsigned int i = 0; i < group_ids.size( ); i++ )
+    for( unsigned int i = 0; i < group_ids.size(); i++ )
     {
-        for( unsigned int j = 0; j < group_ref_ids.size( ); j++ )
+        for( unsigned int j = 0; j < group_ref_ids.size(); j++ )
         {
-            if( group_ids[ i ] == group_ref_ids[ j ] && group_names[ i ] == group_ref_names[ j ] &&
-                group_ent_ids[ i ] == group_ref_ent_ids[ j ] )
+            if( group_ids[i] == group_ref_ids[j] && group_names[i] == group_ref_names[j] &&
+                group_ent_ids[i] == group_ref_ent_ids[j] )
             {
-                group_ref_ids.erase( group_ref_ids.begin( ) + j );
-                group_ref_names.erase( group_ref_names.begin( ) + j );
-                group_ref_ent_ids.erase( group_ref_ent_ids.begin( ) + j );
+                group_ref_ids.erase( group_ref_ids.begin() + j );
+                group_ref_names.erase( group_ref_names.begin() + j );
+                group_ref_ent_ids.erase( group_ref_ent_ids.begin() + j );
                 continue;
             }
         }
@@ -164,11 +164,11 @@ void check_group_data( std::vector< int >& group_ids, std::vector< std::string >
 
     // Check sizes of reference vectors after matching
     // (all should be zero)
-    int leftovers = group_ref_ids.size( );
+    int leftovers = group_ref_ids.size();
     CHECK_EQUAL( 0, leftovers );
-    leftovers = group_ref_names.size( );
+    leftovers = group_ref_names.size();
     CHECK_EQUAL( 0, leftovers );
-    leftovers = group_ref_ent_ids.size( );
+    leftovers = group_ref_ent_ids.size();
     CHECK_EQUAL( 0, leftovers );
 #endif
 }
@@ -190,7 +190,7 @@ int geom_id_by_handle( Interface* moab, const EntityHandle set )
 {
     ErrorCode rval;
     // Get the id_tag handle
-    Tag id_tag = moab->globalId_tag( );
+    Tag id_tag = moab->globalId_tag();
     // Load the ID for the EntHandle given to the function
     int id;
     rval = moab->tag_get_data( id_tag, &set, 1, &id );CHECK_ERR( rval );

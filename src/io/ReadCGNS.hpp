@@ -34,7 +34,7 @@ class ReadCGNS : public ReaderIface
     ReadCGNS( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadCGNS( );
+    virtual ~ReadCGNS();
 
   private:
     ErrorCode create_elements( char* sectionName, const Tag* file_id_tag, const EntityType& ent_type,
@@ -44,7 +44,7 @@ class ReadCGNS : public ReaderIface
     ErrorCode create_sets( char* sectionName, const Tag* file_id_tag, EntityType element_type, const Range& elements,
                            const std::vector< int >& set_ids, int set_type );
 
-    ErrorCode create_geometric_topology( );
+    ErrorCode create_geometric_topology();
 
     /** \brief Process options passed into the reader
      * \param opts Options passed into this read
@@ -60,8 +60,8 @@ class ReadCGNS : public ReaderIface
     //! interface instance
     Interface* mbImpl;
 
-    Tag   globalId;
-    Tag   boundary;
+    Tag globalId;
+    Tag boundary;
     Range geomSets;
 };
 

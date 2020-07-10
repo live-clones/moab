@@ -53,21 +53,21 @@ const int MAXSIZE = 200;
 //! ENUM for the type of input mesh.
 enum MESHTYPE
 {
-    CURVE = 0,  // Homogeneous curve mesh
-    SURFACE,  // Homogeneous surface mesh
-    SURFACE_MIXED,  // Mixed surface with embedded curves
-    VOLUME,  // Homogeneous volume mesh
+    CURVE = 0,       // Homogeneous curve mesh
+    SURFACE,         // Homogeneous surface mesh
+    SURFACE_MIXED,   // Mixed surface with embedded curves
+    VOLUME,          // Homogeneous volume mesh
     VOLUME_MIXED_1,  // Volume mesh with embedded curves
     VOLUME_MIXED_2,  // Volume mesh with embedded surface
-    VOLUME_MIXED  // Volume mesh with embedded curves and surfaces
+    VOLUME_MIXED     // Volume mesh with embedded curves and surfaces
 };
 
 enum
 {
-    MAX_VERTICES = 8,
-    MAX_EDGES = 12,
-    MAX_FACES = 6,
-    MAX_VERTS_HF = 4,
+    MAX_VERTICES    = 8,
+    MAX_EDGES       = 12,
+    MAX_FACES       = 6,
+    MAX_VERTS_HF    = 4,
     MAX_INCIDENT_HF = 4
 };
 
@@ -79,18 +79,18 @@ class HalfFacetRep
   public:
     HalfFacetRep( Core* impl, ParallelComm* comm = 0, moab::EntityHandle rset = 0, bool filter_ghosts = true );
 
-    ~HalfFacetRep( );
+    ~HalfFacetRep();
 
-    bool check_mixed_entity_type( );
+    bool check_mixed_entity_type();
 
     // User interface functions
 
     //! Constructs the sibling-half-facet and vertex-to-incident-half-facet maps for each dimension
     //! present in the input. This routine should be called before any calls for adjacency is made.
-    ErrorCode initialize( );
+    ErrorCode initialize();
 
     //! Deinitialize
-    ErrorCode deinitialize( );
+    ErrorCode deinitialize();
 
     //! Prints the tag values.
     ErrorCode print_tags( int dim );
@@ -349,7 +349,7 @@ class HalfFacetRep
                                          std::vector< int >* leids = NULL, std::vector< int >* adj_orients = NULL );
 
     ErrorCode get_up_adjacencies_edg_3d_comp( EntityHandle cid, int leid, std::vector< EntityHandle >& adjents,
-                                              std::vector< int >* leids = NULL,
+                                              std::vector< int >* leids       = NULL,
                                               std::vector< int >* adj_orients = NULL );
 
     //! Given an face, finds the cells incident on it.
@@ -459,11 +459,11 @@ class HalfFacetRep
         //! Number of vertices in a face
         short int num_verts_in_face;
         //! Local ids of the next half-edge
-        int next[ MAX_INCIDENT_HF ];
+        int next[MAX_INCIDENT_HF];
         //! Local ids of the previous half-edge
-        int prev[ MAX_INCIDENT_HF ];
+        int prev[MAX_INCIDENT_HF];
     };
-    static const LocalMaps2D lConnMap2D[ 2 ];
+    static const LocalMaps2D lConnMap2D[2];
 
     //! 3D local maps
     struct LocalMaps3D
@@ -475,48 +475,48 @@ class HalfFacetRep
         // Number of faces in cell
         short int num_faces_in_cell;
         //! Number of vertices in each half-face
-        int hf2v_num[ MAX_FACES ];
+        int hf2v_num[MAX_FACES];
         //! Map: Half-face to local vertex ids
-        int hf2v[ MAX_FACES ][ MAX_VERTS_HF ];
+        int hf2v[MAX_FACES][MAX_VERTS_HF];
         //! Number of incident half-faces on each vertex
-        int v2hf_num[ MAX_VERTICES ];
+        int v2hf_num[MAX_VERTICES];
         //! Map: Local vertices to incident half-facets
-        int v2hf[ MAX_VERTICES ][ MAX_INCIDENT_HF ];
+        int v2hf[MAX_VERTICES][MAX_INCIDENT_HF];
         //!  Map: Local edges to local vertices
-        int e2v[ MAX_EDGES ][ 2 ];
+        int e2v[MAX_EDGES][2];
         //! Map: Local edges to incident half-faces
-        int e2hf[ MAX_EDGES ][ 2 ];
+        int e2hf[MAX_EDGES][2];
         //! Map: Half-faces to local edges
-        int f2leid[ MAX_FACES ][ MAX_VERTS_HF ];
+        int f2leid[MAX_FACES][MAX_VERTS_HF];
         //! Map: local vertices to local edges
-        int lookup_leids[ MAX_VERTICES ][ MAX_VERTICES ];
+        int lookup_leids[MAX_VERTICES][MAX_VERTICES];
         //! Search edge verts:
-        int search_everts[ 5 ];
-        int search_fverts[ 2 ];
-        int v2le[ 4 ][ 5 ];
+        int search_everts[5];
+        int search_fverts[2];
+        int v2le[4][5];
     };
-    static const LocalMaps3D lConnMap3D[ 4 ];
-    MESHTYPE                 thismeshtype;
+    static const LocalMaps3D lConnMap3D[4];
+    MESHTYPE thismeshtype;
 
     std::map< EntityType, int > cell_index;
 
-    int       get_index_in_lmap( EntityHandle cid );
+    int get_index_in_lmap( EntityHandle cid );
     ErrorCode get_entity_ranges( Range& verts, Range& edges, Range& faces, Range& cells );
-    MESHTYPE  get_mesh_type( int nverts, int nedges, int nfaces, int ncells );
+    MESHTYPE get_mesh_type( int nverts, int nedges, int nfaces, int ncells );
 
-    EntityHandle* get_rset( )
+    EntityHandle* get_rset()
     {
         return &_rset;
     }
 
   protected:
-    HalfFacetRep( );
+    HalfFacetRep();
 
-    Core*         mb;
+    Core* mb;
     ParallelComm* pcomm;
-    EntityHandle  _rset;
-    bool          _filterghost;
-    bool          mInitAHFmaps;
+    EntityHandle _rset;
+    bool _filterghost;
+    bool mInitAHFmaps;
 
     Range _verts, _edges, _faces, _cells;
 
@@ -529,25 +529,25 @@ class HalfFacetRep
     std::multimap< EntityHandle, HFacet > v2hes, v2hfs;
 
     // Auxiliary storage for local searches.
-    EntityHandle queue_fid[ MAXSIZE ], Stkcells[ MAXSIZE ], cellq[ MAXSIZE ];
-    EntityHandle trackfaces[ MAXSIZE ], trackcells[ MAXSIZE ];
-    int          queue_lid[ MAXSIZE ];
+    EntityHandle queue_fid[MAXSIZE], Stkcells[MAXSIZE], cellq[MAXSIZE];
+    EntityHandle trackfaces[MAXSIZE], trackcells[MAXSIZE];
+    int queue_lid[MAXSIZE];
 
     struct adj_matrix
     {
-        int val[ 4 ][ 4 ];
+        int val[4][4];
     };
 
-    static const adj_matrix adjMatrix[ 7 ];
-    int                     get_index_for_meshtype( MESHTYPE mesh_type );
+    static const adj_matrix adjMatrix[7];
+    int get_index_for_meshtype( MESHTYPE mesh_type );
 
     // These two flags are for checking mixed entity type meshes
     bool is_mixed;
     bool chk_mixed;
 
-    ErrorCode init_curve( );
-    ErrorCode init_surface( );
-    ErrorCode init_volume( );
+    ErrorCode init_curve();
+    ErrorCode init_surface();
+    ErrorCode init_volume();
 
     //! Contains the local information for 2D entities
     /** Given a face, find the face type specific information
@@ -625,8 +625,8 @@ class HalfFacetRep
 
     ErrorCode add_cells_of_single_component( EntityHandle vid, EntityHandle curcid, int curlid,
                                              std::multimap< EntityHandle, EntityHandle >& comps, HFacet& hf );
-    bool      find_cell_in_component( EntityHandle vid, EntityHandle cell,
-                                      std::multimap< EntityHandle, EntityHandle >& comps );
+    bool find_cell_in_component( EntityHandle vid, EntityHandle cell,
+                                 std::multimap< EntityHandle, EntityHandle >& comps );
 
     //! Given an edge, finds a matching local edge in an incident cell.
     /** Find a local edge with the same connectivity as the input edge, belonging to an incident

@@ -11,11 +11,11 @@ using namespace moab;
 
 double find_angle( const moab::CartVect& A, const moab::CartVect& B )
 {
-    const double lA = A.length( ), lB = B.length( );
+    const double lA = A.length(), lB = B.length();
     assert( lA > 0.0 );
     assert( lB > 0.0 );
     const double dPI = 3.14159265;
-    const double dot = ( A[ 0 ] * B[ 0 ] + A[ 1 ] * B[ 1 ] + A[ 2 ] * B[ 2 ] );
+    const double dot = ( A[0] * B[0] + A[1] * B[1] + A[2] * B[2] );
     return ACOS( dot / ( lA * lB ) ) * 180.0 / dPI;
 }
 
@@ -24,13 +24,13 @@ double find_angle( const moab::CartVect& A, const moab::CartVect& B )
 void check_equal_eigvect( const moab::CartVect& A, const moab::CartVect& B, double eps, const char* sA, const char* sB,
                           int line, const char* file )
 {
-    check_equal( A.length( ), B.length( ), eps, sA, sB, line, file );
+    check_equal( A.length(), B.length(), eps, sA, sB, line, file );
 
     double angle = find_angle( A, B );
 
-    if( ( fabs( A[ 0 ] - B[ 0 ] ) <= eps || fabs( A[ 0 ] + B[ 0 ] ) <= eps ) &&
-        ( fabs( A[ 1 ] - B[ 1 ] ) <= eps || fabs( A[ 1 ] + B[ 1 ] ) <= eps ) &&
-        ( fabs( A[ 2 ] - B[ 2 ] ) <= eps || fabs( A[ 2 ] + B[ 2 ] ) <= eps ) &&
+    if( ( fabs( A[0] - B[0] ) <= eps || fabs( A[0] + B[0] ) <= eps ) &&
+        ( fabs( A[1] - B[1] ) <= eps || fabs( A[1] + B[1] ) <= eps ) &&
+        ( fabs( A[2] - B[2] ) <= eps || fabs( A[2] + B[2] ) <= eps ) &&
         ( angle <= eps || fabs( angle - 180.0 ) <= eps ) )
         return;
 
@@ -45,12 +45,12 @@ void check_equal_eigvect( const moab::CartVect& A, const moab::CartVect& B, doub
 
     std::cout << "Angle between vectors := " << angle << std::endl;
 
-    flag_error( );
+    flag_error();
 }
 
-void test_EigenDecomp( );
+void test_EigenDecomp();
 
-int main( )
+int main()
 {
 
     int result = 0;
@@ -62,7 +62,7 @@ int main( )
 
 // test to ensure the Eigenvalues/vectors are calculated correctly and returned properly
 // from the Matrix3 class for a simple case
-void test_EigenDecomp( )
+void test_EigenDecomp()
 {
     // Create a matrix
     moab::Matrix3 mat;
@@ -79,17 +79,18 @@ void test_EigenDecomp( )
 
     // now do the Eigen Decomposition of this Matrix
 
-    CartVect        lamda;
-    Matrix3         vectors;
-    moab::ErrorCode rval = mat.eigen_decomposition( lamda, vectors );CHECK_ERR( rval );
+    CartVect lamda;
+    Matrix3 vectors;
+    moab::ErrorCode rval = mat.eigen_decomposition( lamda, vectors );
+    CHECK_ERR( rval );
     for( int i = 0; i < 3; ++i )
-        vectors.col( i ).normalize( );
+        vectors.col( i ).normalize();
 
     // Hardcoded check values for the results
-    double lamda_check[ 3 ];
-    lamda_check[ 0 ] = 0.585786;
-    lamda_check[ 1 ] = 2.0;
-    lamda_check[ 2 ] = 3.41421;
+    double lamda_check[3];
+    lamda_check[0] = 0.585786;
+    lamda_check[1] = 2.0;
+    lamda_check[2] = 3.41421;
 
     moab::CartVect vec0_check( 0.5, 0.707107, 0.5 );
     moab::CartVect vec1_check( 0.707107, 3.37748e-17, -0.707107 );
@@ -102,14 +103,14 @@ void test_EigenDecomp( )
     Matrix3 mat3( CartVect( 2, -1, 0 ), CartVect( -1, 2, -1 ), CartVect( 0, -1, 2 ), true );
     CHECK_REAL_EQUAL( mat( 1 ), mat3( 1 ), tol );
 
-    vec0_check.normalize( );
-    vec1_check.normalize( );
-    vec2_check.normalize( );
+    vec0_check.normalize();
+    vec1_check.normalize();
+    vec2_check.normalize();
 
     // check that the correct Eigenvalues are returned correctly (in order)
-    CHECK_REAL_EQUAL( lamda[ 0 ], lamda_check[ 0 ], tol );
-    CHECK_REAL_EQUAL( lamda[ 1 ], lamda_check[ 1 ], tol );
-    CHECK_REAL_EQUAL( lamda[ 2 ], lamda_check[ 2 ], tol );
+    CHECK_REAL_EQUAL( lamda[0], lamda_check[0], tol );
+    CHECK_REAL_EQUAL( lamda[1], lamda_check[1], tol );
+    CHECK_REAL_EQUAL( lamda[2], lamda_check[2], tol );
 
     // check the Eigenvector values (order should correspond to the Eigenvalues)
     // first vector
@@ -124,8 +125,8 @@ void test_EigenDecomp( )
     // another check to ensure the result is valid (AM-kM = 0)
     for( unsigned i = 0; i < 3; ++i )
     {
-        moab::CartVect v = moab::Matrix::matrix_vector( mat, vectors.col( i ) ) - lamda[ i ] * vectors.col( i );
-        CHECK_REAL_EQUAL( v.length( ), 0, tol );
+        moab::CartVect v = moab::Matrix::matrix_vector( mat, vectors.col( i ) ) - lamda[i] * vectors.col( i );
+        CHECK_REAL_EQUAL( v.length(), 0, tol );
     }
 
     // for a real, symmetric matrix the Eigenvectors should be orthogonal

@@ -50,7 +50,7 @@ class WriteSTL : public WriterIface
     WriteSTL( Interface* impl );
 
     //! Destructor
-    virtual ~WriteSTL( );
+    virtual ~WriteSTL();
 
     //! writes out a file
     ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
@@ -67,27 +67,25 @@ class WriteSTL : public WriterIface
     };
 
     //! Write list of triangles to an STL file.
-    ErrorCode ascii_write_triangles( FILE* file, const char header[ 81 ], const Range& triangles, int precision );
+    ErrorCode ascii_write_triangles( FILE* file, const char header[81], const Range& triangles, int precision );
     //! Write list of triangles to an STL file.
-    ErrorCode binary_write_triangles( FILE* file, const char header[ 81 ], ByteOrder byte_order,
-                                      const Range& triangles );
+    ErrorCode binary_write_triangles( FILE* file, const char header[81], ByteOrder byte_order, const Range& triangles );
 
     //! Given an array of vertex coordinates for a triangle,
     //! pass back individual point coordinates as floats and
     //! calculate triangle normal.
-    ErrorCode get_triangle_data( const double vtx_coords[ 9 ], float v1[ 3 ], float v2[ 3 ], float v3[ 3 ],
-                                 float n[ 3 ] );
+    ErrorCode get_triangle_data( const double vtx_coords[9], float v1[3], float v2[3], float v3[3], float n[3] );
 
-    ErrorCode get_triangle_data( const double vtx_coords[ 9 ], CartVect& v1, CartVect& v2, CartVect& v3, CartVect& n );
+    ErrorCode get_triangle_data( const double vtx_coords[9], CartVect& v1, CartVect& v2, CartVect& v3, CartVect& n );
 
     //! interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 
   private:
     //! Construct 80-byte, null-terminated description string from
     //! qa_list.  Unused space in header will be null-char padded.
-    ErrorCode make_header( char header[ 81 ], const std::vector< std::string >& qa_list );
+    ErrorCode make_header( char header[81], const std::vector< std::string >& qa_list );
 
     //! Get triangles to write from input array of entity sets.  If
     //! no sets, gets all triangles.

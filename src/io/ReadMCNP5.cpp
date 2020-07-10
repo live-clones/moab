@@ -33,9 +33,9 @@ namespace moab
 {
 
 // Parameters
-const double ReadMCNP5::PI = 3.141592653589793;
+const double ReadMCNP5::PI   = 3.141592653589793;
 const double ReadMCNP5::C2PI = 0.1591549430918954;
-const double ReadMCNP5::CPI = 0.3183098861837907;
+const double ReadMCNP5::CPI  = 0.3183098861837907;
 
 ReaderIface* ReadMCNP5::factory( Interface* iface )
 {
@@ -51,7 +51,7 @@ ReadMCNP5::ReadMCNP5( Interface* impl ) : MBI( impl ), fileIDTag( NULL ), nodeId
 }
 
 // Destructor
-ReadMCNP5::~ReadMCNP5( )
+ReadMCNP5::~ReadMCNP5()
 {
     if( readMeshIface )
     {
@@ -75,15 +75,15 @@ ErrorCode ReadMCNP5::load_file( const char* filename, const EntityHandle* input_
     if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for meshtal" ); }
 
     nodeId = elemId = 0;
-    fileIDTag = file_id_tag;
+    fileIDTag       = file_id_tag;
 
     // Average several meshtal files if the AVERAGE_TALLY option is given.
     // In this case, the integer value is the number of files to average.
     // If averaging, the filename passed to load_file is assumed to be the
     // root filename. The files are indexed as "root_filename""index".meshtal.
     // Indices start with 1.
-    int       n_files;
-    bool      average = false;
+    int n_files;
+    bool average = false;
     ErrorCode result;
     if( MB_SUCCESS == options.get_int_option( "AVERAGE_TALLY", n_files ) )
     {
@@ -93,7 +93,7 @@ ErrorCode ReadMCNP5::load_file( const char* filename, const EntityHandle* input_
 
         // Get the root filename
         std::string root_filename( filename );
-        int         length = root_filename.length( );
+        int length = root_filename.length();
         root_filename.erase( length - sizeof( ".meshtal" ) );
 
         // Average the first file with the rest of the files
@@ -102,8 +102,8 @@ ErrorCode ReadMCNP5::load_file( const char* filename, const EntityHandle* input_
         {
             std::stringstream index;
             index << i;
-            std::string subsequent_filename = root_filename + index.str( ) + ".meshtal";
-            result = load_one_file( subsequent_filename.c_str( ), input_meshset, options, average );
+            std::string subsequent_filename = root_filename + index.str() + ".meshtal";
+            result = load_one_file( subsequent_filename.c_str(), input_meshset, options, average );
             if( MB_SUCCESS != result ) return result;
         }
 
@@ -126,10 +126,10 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
     bool debug = false;
     if( debug ) std::cout << "begin ReadMCNP5::load_one_file" << std::endl;
 
-    ErrorCode    result;
+    ErrorCode result;
     std::fstream file;
     file.open( fname, std::fstream::in );
-    char line[ 10000 ];
+    char line[10000];
 
     // Create tags
     Tag date_and_time_tag, title_tag, nps_tag, tally_number_tag, tally_comment_tag, tally_particle_tag,
@@ -144,8 +144,8 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
     // ******************************************************************
 
     // Define characteristics of the entire file
-    char date_and_time[ 100 ] = "";
-    char title[ 100 ] = "";
+    char date_and_time[100] = "";
+    char title[100]         = "";
     // This file's number of particles
     unsigned long int nps;
     // Sum of this file's and existing file's nps for averaging
@@ -171,16 +171,16 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
     // ******************************************************************
 
     // If averaging, nps will hold the sum of particles simulated in both tallies.
-    while( !file.eof( ) )
+    while( !file.eof() )
     {
         // Define characteristics of this tally
-        unsigned int          tally_number;
-        char                  tally_comment[ 100 ] = "";
-        particle              tally_particle;
-        coordinate_system     tally_coord_sys;
-        std::vector< double > planes[ 3 ];
-        unsigned int          n_chopped_x0_planes;
-        unsigned int          n_chopped_x2_planes;
+        unsigned int tally_number;
+        char tally_comment[100] = "";
+        particle tally_particle;
+        coordinate_system tally_coord_sys;
+        std::vector< double > planes[3];
+        unsigned int n_chopped_x0_planes;
+        unsigned int n_chopped_x2_planes;
 
         // Read tally header
         result = read_tally_header( file, debug, tally_number, tally_comment, tally_particle );
@@ -216,7 +216,7 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
         // that the cylindrical mesh must span 360 degrees.
         if( CYLINDRICAL == tally_coord_sys && MB_SUCCESS == options.get_null_option( "REMOVE_LAST_AZIMUTHAL_PLANE" ) )
         {
-            planes[ 2 ].pop_back( );
+            planes[2].pop_back();
             n_chopped_x2_planes = 1;
             if( debug ) std::cout << "remove last cylindrical plane option found" << std::endl;
         }
@@ -231,8 +231,8 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
         // 0-390 and serve as incorrect source elements for interpolation.
         if( CYLINDRICAL == tally_coord_sys && MB_SUCCESS == options.get_null_option( "REMOVE_FIRST_RADIAL_PLANE" ) )
         {
-            std::vector< double >::iterator front = planes[ 0 ].begin( );
-            planes[ 0 ].erase( front );
+            std::vector< double >::iterator front = planes[0].begin();
+            planes[0].erase( front );
             n_chopped_x0_planes = 1;
             if( debug ) std::cout << "remove first radial plane option found" << std::endl;
         }
@@ -243,10 +243,9 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
 
         // Read the values and errors of each element from the file.
         // Do not read values that are chopped off.
-        unsigned int n_elements =
-            ( planes[ 0 ].size( ) - 1 ) * ( planes[ 1 ].size( ) - 1 ) * ( planes[ 2 ].size( ) - 1 );
-        double* values = new double[ n_elements ];
-        double* errors = new double[ n_elements ];
+        unsigned int n_elements = ( planes[0].size() - 1 ) * ( planes[1].size() - 1 ) * ( planes[2].size() - 1 );
+        double* values          = new double[n_elements];
+        double* errors          = new double[n_elements];
         result = read_element_values_and_errors( file, debug, planes, n_chopped_x0_planes, n_chopped_x2_planes,
                                                  tally_particle, values, errors );
         if( MB_SUCCESS != result ) return result;
@@ -273,7 +272,7 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
             // The only info needed to build elements is the mesh plane boundaries.
             // Build vertices...
             EntityHandle start_vert = 0;
-            result = create_vertices( planes, debug, start_vert, tally_coord_sys, tally_meshset );
+            result                  = create_vertices( planes, debug, start_vert, tally_coord_sys, tally_meshset );
             if( MB_SUCCESS != result ) return result;
 
             // Build elements and tag them with tally values and errors, then add
@@ -308,15 +307,15 @@ ErrorCode ReadMCNP5::load_one_file( const char* fname, const EntityHandle* input
         Range matching_nps_sets;
         result = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &nps_tag, 0, 1, matching_nps_sets );
         if( MB_SUCCESS != result ) return result;
-        if( debug ) std::cout << "number of matching nps meshsets=" << matching_nps_sets.size( ) << std::endl;
-        assert( 1 == matching_nps_sets.size( ) );
+        if( debug ) std::cout << "number of matching nps meshsets=" << matching_nps_sets.size() << std::endl;
+        assert( 1 == matching_nps_sets.size() );
         result = MBI->tag_set_data( nps_tag, matching_nps_sets, &new_nps );
         if( MB_SUCCESS != result ) return result;
 
         // If this file is not being averaged, return the output meshset.
     }
 
-    file.close( );
+    file.close();
     return MB_SUCCESS;
 }
 
@@ -354,12 +353,12 @@ ErrorCode ReadMCNP5::create_tags( Tag& date_and_time_tag, Tag& title_tag, Tag& n
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::read_file_header( std::fstream& file, bool debug, char date_and_time[ 100 ], char title[ 100 ],
+ErrorCode ReadMCNP5::read_file_header( std::fstream& file, bool debug, char date_and_time[100], char title[100],
                                        unsigned long int& nps )
 {
     // Get simulation date and time
     // mcnp   version 5     ld=11242008  probid =  03/23/09 13:38:56
-    char line[ 100 ];
+    char line[100];
     file.getline( line, 100 );
     date_and_time = line;
     if( debug ) std::cout << "date_and_time=| " << date_and_time << std::endl;
@@ -373,7 +372,7 @@ ErrorCode ReadMCNP5::read_file_header( std::fstream& file, bool debug, char date
     // Get number of histories
     // Number of histories used for normalizing tallies =      50000000.00
     file.getline( line, 100 );
-    std::string            a = line;
+    std::string a            = line;
     std::string::size_type b = a.find( "Number of histories used for normalizing tallies =" );
     if( std::string::npos != b )
     {
@@ -388,7 +387,7 @@ ErrorCode ReadMCNP5::read_file_header( std::fstream& file, bool debug, char date
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::set_header_tags( EntityHandle output_meshset, char date_and_time[ 100 ], char title[ 100 ],
+ErrorCode ReadMCNP5::set_header_tags( EntityHandle output_meshset, char date_and_time[100], char title[100],
                                       unsigned long int nps, Tag data_and_time_tag, Tag title_tag, Tag nps_tag )
 {
     ErrorCode result;
@@ -403,14 +402,14 @@ ErrorCode ReadMCNP5::set_header_tags( EntityHandle output_meshset, char date_and
 }
 
 ErrorCode ReadMCNP5::read_tally_header( std::fstream& file, bool debug, unsigned int& tally_number,
-                                        char tally_comment[ 100 ], particle& tally_particle )
+                                        char tally_comment[100], particle& tally_particle )
 {
     // Get tally number
     // Mesh Tally Number 104
     ErrorCode result;
-    char      line[ 100 ];
+    char line[100];
     file.getline( line, 100 );
-    std::string            a = line;
+    std::string a            = line;
     std::string::size_type b = a.find( "Mesh Tally Number" );
     if( std::string::npos != b )
     {
@@ -431,7 +430,7 @@ ErrorCode ReadMCNP5::read_tally_header( std::fstream& file, bool debug, unsigned
 
     // Get tally particle
     file.getline( line, 100 );
-    a = line;
+    a      = line;
     result = get_tally_particle( a, debug, tally_particle );
     if( MB_FAILURE == result )
     {
@@ -439,7 +438,7 @@ ErrorCode ReadMCNP5::read_tally_header( std::fstream& file, bool debug, unsigned
         // Get the comment, then get the particle type from the next line.
         tally_comment = line;
         file.getline( line, 100 );
-        a = line;
+        a      = line;
         result = get_tally_particle( a, debug, tally_particle );
         if( MB_SUCCESS != result ) return result;
     }
@@ -467,12 +466,12 @@ ErrorCode ReadMCNP5::get_tally_particle( std::string a, bool debug, particle& ta
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vector< double > planes[ 3 ],
+ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vector< double > planes[3],
                                        coordinate_system& coord_sys )
 {
     // Tally bin boundaries:
     ErrorCode result;
-    char      line[ 10000 ];
+    char line[10000];
     file.getline( line, 10000 );
     std::string a = line;
     if( std::string::npos == a.find( "Tally bin boundaries:" ) ) return MB_FAILURE;
@@ -480,7 +479,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
     // Decide what coordinate system the tally is using
     // first check for Cylindrical coordinates:
     file.getline( line, 10000 );
-    a = line;
+    a                        = line;
     std::string::size_type b = a.find( "Cylinder origin at" );
     if( std::string::npos != b )
     {
@@ -493,12 +492,12 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         // get origin (not used)
         // Cylinder origin at   0.00E+00  0.00E+00  0.00E+00,
         // axis in  0.000E+00 0.000E+00 1.000E+00 direction
-        double origin[ 3 ];
+        double origin[3];
         if( debug ) std::cout << "origin=| ";
         for( int i = 0; i < 3; i++ )
         {
-            ss >> origin[ i ];
-            if( debug ) std::cout << origin[ i ] << " ";
+            ss >> origin[i];
+            if( debug ) std::cout << origin[i] << " ";
         }
         if( debug ) std::cout << std::endl;
         int length_of_string = 10;
@@ -506,12 +505,12 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         ss.ignore( length_of_string, ' ' );
         ss.ignore( length_of_string, ' ' );
         // Get axis (not used)
-        double axis[ 3 ];
+        double axis[3];
         if( debug ) std::cout << "axis=| ";
         for( int i = 0; i < 3; i++ )
         {
-            ss >> axis[ i ];
-            if( debug ) std::cout << axis[ i ] << " ";
+            ss >> axis[i];
+            if( debug ) std::cout << axis[i] << " ";
         }
         if( debug ) std::cout << std::endl;
         file.getline( line, 10000 );
@@ -523,7 +522,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         if( std::string::npos != b )
         {
             std::istringstream ss2( a.substr( b + sizeof( "R direction" ), 10000 ) );
-            result = get_mesh_plane( ss2, debug, planes[ 0 ] );
+            result = get_mesh_plane( ss2, debug, planes[0] );
             if( MB_SUCCESS != result ) return result;
         }
         else
@@ -537,7 +536,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         if( std::string::npos != b )
         {
             std::istringstream ss2( a.substr( b + sizeof( "Z direction" ), 10000 ) );
-            result = get_mesh_plane( ss2, debug, planes[ 1 ] );
+            result = get_mesh_plane( ss2, debug, planes[1] );
             if( MB_SUCCESS != result ) return result;
         }
         else
@@ -551,7 +550,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         if( std::string::npos != b )
         {
             std::istringstream ss2( a.substr( b + sizeof( "Theta direction (revolutions):" ), 10000 ) );
-            result = get_mesh_plane( ss2, debug, planes[ 2 ] );
+            result = get_mesh_plane( ss2, debug, planes[2] );
             if( MB_SUCCESS != result ) return result;
         }
         else
@@ -568,7 +567,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         if( std::string::npos != b )
         {
             std::istringstream ss2( a.substr( b + sizeof( "X direction" ), 10000 ) );
-            result = get_mesh_plane( ss2, debug, planes[ 0 ] );
+            result = get_mesh_plane( ss2, debug, planes[0] );
             if( MB_SUCCESS != result ) return result;
         }
         else
@@ -582,7 +581,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         if( std::string::npos != b )
         {
             std::istringstream ss2( a.substr( b + sizeof( "Y direction" ), 10000 ) );
-            result = get_mesh_plane( ss2, debug, planes[ 1 ] );
+            result = get_mesh_plane( ss2, debug, planes[1] );
             if( MB_SUCCESS != result ) return result;
         }
         else
@@ -596,7 +595,7 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
         if( std::string::npos != b )
         {
             std::istringstream ss2( a.substr( b + sizeof( "Z direction" ), 10000 ) );
-            result = get_mesh_plane( ss2, debug, planes[ 2 ] );
+            result = get_mesh_plane( ss2, debug, planes[2] );
             if( MB_SUCCESS != result ) return result;
         }
         else
@@ -614,8 +613,8 @@ ErrorCode ReadMCNP5::read_mesh_planes( std::fstream& file, bool debug, std::vect
 ErrorCode ReadMCNP5::get_mesh_plane( std::istringstream& ss, bool debug, std::vector< double >& plane )
 {
     double value;
-    plane.clear( );
-    while( !ss.eof( ) )
+    plane.clear();
+    while( !ss.eof() )
     {
         ss >> value;
         plane.push_back( value );
@@ -626,48 +625,48 @@ ErrorCode ReadMCNP5::get_mesh_plane( std::istringstream& ss, bool debug, std::ve
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::read_element_values_and_errors( std::fstream&         file, bool /* debug */,
-                                                     std::vector< double > planes[ 3 ],
-                                                     unsigned int n_chopped_x0_planes, unsigned int n_chopped_x2_planes,
-                                                     particle tally_particle, double values[], double errors[] )
+ErrorCode ReadMCNP5::read_element_values_and_errors( std::fstream& file, bool /* debug */,
+                                                     std::vector< double > planes[3], unsigned int n_chopped_x0_planes,
+                                                     unsigned int n_chopped_x2_planes, particle tally_particle,
+                                                     double values[], double errors[] )
 {
     unsigned int index = 0;
     // Need to read every line in the file, even if we chop off some elements
-    for( unsigned int i = 0; i < planes[ 0 ].size( ) - 1 + n_chopped_x0_planes; i++ )
+    for( unsigned int i = 0; i < planes[0].size() - 1 + n_chopped_x0_planes; i++ )
     {
-        for( unsigned int j = 0; j < planes[ 1 ].size( ) - 1; j++ )
+        for( unsigned int j = 0; j < planes[1].size() - 1; j++ )
         {
-            for( unsigned int k = 0; k < planes[ 2 ].size( ) - 1 + n_chopped_x2_planes; k++ )
+            for( unsigned int k = 0; k < planes[2].size() - 1 + n_chopped_x2_planes; k++ )
             {
-                char line[ 100 ];
+                char line[100];
                 file.getline( line, 100 );
                 // If this element has been chopped off, skip it
                 if( i < n_chopped_x0_planes ) continue;
-                if( k >= planes[ 2 ].size( ) - 1 && k < planes[ 2 ].size( ) - 1 + n_chopped_x2_planes ) continue;
-                std::string       a = line;
+                if( k >= planes[2].size() - 1 && k < planes[2].size() - 1 + n_chopped_x2_planes ) continue;
+                std::string a = line;
                 std::stringstream ss( a );
-                double            centroid[ 3 ];
-                double            energy;
+                double centroid[3];
+                double energy;
                 // For some reason, photon tallies print the energy in the first column
                 if( PHOTON == tally_particle ) ss >> energy;
                 // The centroid is not used in this reader
-                ss >> centroid[ 0 ];
-                ss >> centroid[ 1 ];
-                ss >> centroid[ 2 ];
+                ss >> centroid[0];
+                ss >> centroid[1];
+                ss >> centroid[2];
                 // Only the tally values and errors are used
-                ss >> values[ index ];
-                ss >> errors[ index ];
+                ss >> values[index];
+                ss >> errors[index];
 
                 // Make sure that input data is good
-                if( !Util::is_finite( errors[ index ] ) )
+                if( !Util::is_finite( errors[index] ) )
                 {
                     std::cerr << "found nan error while reading file" << std::endl;
-                    errors[ index ] = 1.0;
+                    errors[index] = 1.0;
                 }
-                if( !Util::is_finite( values[ index ] ) )
+                if( !Util::is_finite( values[index] ) )
                 {
                     std::cerr << "found nan value while reading file" << std::endl;
-                    values[ index ] = 0.0;
+                    values[index] = 0.0;
                 }
 
                 index++;
@@ -678,7 +677,7 @@ ErrorCode ReadMCNP5::read_element_values_and_errors( std::fstream&         file,
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::set_tally_tags( EntityHandle tally_meshset, unsigned int tally_number, char tally_comment[ 100 ],
+ErrorCode ReadMCNP5::set_tally_tags( EntityHandle tally_meshset, unsigned int tally_number, char tally_comment[100],
                                      particle tally_particle, coordinate_system tally_coord_sys, Tag tally_number_tag,
                                      Tag tally_comment_tag, Tag tally_particle_tag, Tag tally_coord_sys_tag )
 {
@@ -695,38 +694,38 @@ ErrorCode ReadMCNP5::set_tally_tags( EntityHandle tally_meshset, unsigned int ta
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::create_vertices( std::vector< double > planes[ 3 ], bool debug, EntityHandle& start_vert,
+ErrorCode ReadMCNP5::create_vertices( std::vector< double > planes[3], bool debug, EntityHandle& start_vert,
                                       coordinate_system coord_sys, EntityHandle tally_meshset )
 {
     // The only info needed to build elements is the mesh plane boundaries.
     ErrorCode result;
-    int       n_verts = planes[ 0 ].size( ) * planes[ 1 ].size( ) * planes[ 2 ].size( );
+    int n_verts = planes[0].size() * planes[1].size() * planes[2].size();
     if( debug ) std::cout << "n_verts=" << n_verts << std::endl;
     std::vector< double* > coord_arrays( 3 );
     result = readMeshIface->get_node_coords( 3, n_verts, MB_START_ID, start_vert, coord_arrays );
     if( MB_SUCCESS != result ) return result;
     assert( 0 != start_vert );  // Check for NULL
 
-    for( unsigned int k = 0; k < planes[ 2 ].size( ); k++ )
+    for( unsigned int k = 0; k < planes[2].size(); k++ )
     {
-        for( unsigned int j = 0; j < planes[ 1 ].size( ); j++ )
+        for( unsigned int j = 0; j < planes[1].size(); j++ )
         {
-            for( unsigned int i = 0; i < planes[ 0 ].size( ); i++ )
+            for( unsigned int i = 0; i < planes[0].size(); i++ )
             {
-                unsigned int idx = ( k * planes[ 0 ].size( ) * planes[ 1 ].size( ) + j * planes[ 0 ].size( ) + i );
-                double       in[ 3 ], out[ 3 ];
+                unsigned int idx = ( k * planes[0].size() * planes[1].size() + j * planes[0].size() + i );
+                double in[3], out[3];
 
-                in[ 0 ] = planes[ 0 ][ i ];
-                in[ 1 ] = planes[ 1 ][ j ];
-                in[ 2 ] = planes[ 2 ][ k ];
+                in[0]  = planes[0][i];
+                in[1]  = planes[1][j];
+                in[2]  = planes[2][k];
                 result = transform_point_to_cartesian( in, out, coord_sys );
                 if( MB_SUCCESS != result ) return result;
 
                 // Cppcheck warning (false positive): variable coord_arrays is assigned a value that
                 // is never used
-                coord_arrays[ 0 ][ idx ] = out[ 0 ];
-                coord_arrays[ 1 ][ idx ] = out[ 1 ];
-                coord_arrays[ 2 ][ idx ] = out[ 2 ];
+                coord_arrays[0][idx] = out[0];
+                coord_arrays[1][idx] = out[1];
+                coord_arrays[2][idx] = out[2];
             }
         }
     }
@@ -738,61 +737,61 @@ ErrorCode ReadMCNP5::create_vertices( std::vector< double > planes[ 3 ], bool de
     {
         result = readMeshIface->assign_ids( *fileIDTag, vert_range, nodeId );
         if( MB_SUCCESS != result ) return result;
-        nodeId += vert_range.size( );
+        nodeId += vert_range.size();
     }
 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadMCNP5::create_elements( bool debug, std::vector< double > planes[ 3 ],
-                                      unsigned int /*n_chopped_x0_planes*/, unsigned int /*n_chopped_x2_planes*/,
-                                      EntityHandle start_vert, double* values, double* errors, Tag tally_tag,
-                                      Tag error_tag, EntityHandle tally_meshset, coordinate_system tally_coord_sys )
+ErrorCode ReadMCNP5::create_elements( bool debug, std::vector< double > planes[3], unsigned int /*n_chopped_x0_planes*/,
+                                      unsigned int /*n_chopped_x2_planes*/, EntityHandle start_vert, double* values,
+                                      double* errors, Tag tally_tag, Tag error_tag, EntityHandle tally_meshset,
+                                      coordinate_system tally_coord_sys )
 {
-    ErrorCode     result;
-    unsigned int  index;
-    EntityHandle  start_element = 0;
-    unsigned int  n_elements = ( planes[ 0 ].size( ) - 1 ) * ( planes[ 1 ].size( ) - 1 ) * ( planes[ 2 ].size( ) - 1 );
+    ErrorCode result;
+    unsigned int index;
+    EntityHandle start_element = 0;
+    unsigned int n_elements    = ( planes[0].size() - 1 ) * ( planes[1].size() - 1 ) * ( planes[2].size() - 1 );
     EntityHandle* connect;
     result = readMeshIface->get_element_connect( n_elements, 8, MBHEX, MB_START_ID, start_element, connect );
     if( MB_SUCCESS != result ) return result;
     assert( 0 != start_element );  // Check for NULL
 
     unsigned int counter = 0;
-    for( unsigned int i = 0; i < planes[ 0 ].size( ) - 1; i++ )
+    for( unsigned int i = 0; i < planes[0].size() - 1; i++ )
     {
-        for( unsigned int j = 0; j < planes[ 1 ].size( ) - 1; j++ )
+        for( unsigned int j = 0; j < planes[1].size() - 1; j++ )
         {
-            for( unsigned int k = 0; k < planes[ 2 ].size( ) - 1; k++ )
+            for( unsigned int k = 0; k < planes[2].size() - 1; k++ )
             {
-                index = start_vert + i + j * planes[ 0 ].size( ) + k * planes[ 0 ].size( ) * planes[ 1 ].size( );
+                index = start_vert + i + j * planes[0].size() + k * planes[0].size() * planes[1].size();
                 // For rectangular mesh, the file prints: x y z
                 // z changes the fastest and x changes the slowest.
                 // This means that the connectivity ordering is not consistent between
                 // rectangular and cylindrical mesh.
                 if( CARTESIAN == tally_coord_sys )
                 {
-                    connect[ 0 ] = index;
-                    connect[ 1 ] = index + 1;
-                    connect[ 2 ] = index + 1 + planes[ 0 ].size( );
-                    connect[ 3 ] = index + planes[ 0 ].size( );
-                    connect[ 4 ] = index + planes[ 0 ].size( ) * planes[ 1 ].size( );
-                    connect[ 5 ] = index + 1 + planes[ 0 ].size( ) * planes[ 1 ].size( );
-                    connect[ 6 ] = index + 1 + planes[ 0 ].size( ) + planes[ 0 ].size( ) * planes[ 1 ].size( );
-                    connect[ 7 ] = index + planes[ 0 ].size( ) + planes[ 0 ].size( ) * planes[ 1 ].size( );
+                    connect[0] = index;
+                    connect[1] = index + 1;
+                    connect[2] = index + 1 + planes[0].size();
+                    connect[3] = index + planes[0].size();
+                    connect[4] = index + planes[0].size() * planes[1].size();
+                    connect[5] = index + 1 + planes[0].size() * planes[1].size();
+                    connect[6] = index + 1 + planes[0].size() + planes[0].size() * planes[1].size();
+                    connect[7] = index + planes[0].size() + planes[0].size() * planes[1].size();
                     // For cylindrical mesh, the file prints: r z theta
                     // Theta changes the fastest and r changes the slowest.
                 }
                 else if( CYLINDRICAL == tally_coord_sys )
                 {
-                    connect[ 0 ] = index;
-                    connect[ 1 ] = index + 1;
-                    connect[ 2 ] = index + 1 + planes[ 0 ].size( ) * planes[ 1 ].size( );
-                    connect[ 3 ] = index + planes[ 0 ].size( ) * planes[ 1 ].size( );
-                    connect[ 4 ] = index + planes[ 0 ].size( );
-                    connect[ 5 ] = index + 1 + planes[ 0 ].size( );
-                    connect[ 6 ] = index + 1 + planes[ 0 ].size( ) + planes[ 0 ].size( ) * planes[ 1 ].size( );
-                    connect[ 7 ] = index + planes[ 0 ].size( ) + planes[ 0 ].size( ) * planes[ 1 ].size( );
+                    connect[0] = index;
+                    connect[1] = index + 1;
+                    connect[2] = index + 1 + planes[0].size() * planes[1].size();
+                    connect[3] = index + planes[0].size() * planes[1].size();
+                    connect[4] = index + planes[0].size();
+                    connect[5] = index + 1 + planes[0].size();
+                    connect[6] = index + 1 + planes[0].size() + planes[0].size() * planes[1].size();
+                    connect[7] = index + planes[0].size() + planes[0].size() * planes[1].size();
                 }
                 else
                     return MB_NOT_IMPLEMENTED;
@@ -819,7 +818,7 @@ ErrorCode ReadMCNP5::create_elements( bool debug, std::vector< double > planes[ 
     {
         result = readMeshIface->assign_ids( *fileIDTag, element_range, elemId );
         if( MB_SUCCESS != result ) return result;
-        elemId += element_range.size( );
+        elemId += element_range.size();
     }
 
     return MB_SUCCESS;
@@ -836,40 +835,40 @@ ErrorCode ReadMCNP5::average_with_existing_tally( bool debug, unsigned long int&
     ErrorCode result;
 
     // Match the tally number with one from the existing meshtal file
-    Range             matching_tally_number_sets;
+    Range matching_tally_number_sets;
     const void* const tally_number_val[] = { &tally_number };
     result = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &tally_number_tag, tally_number_val, 1,
                                                 matching_tally_number_sets );
     if( MB_SUCCESS != result ) return result;
-    if( debug ) std::cout << "number of matching meshsets=" << matching_tally_number_sets.size( ) << std::endl;
-    assert( 1 == matching_tally_number_sets.size( ) );
+    if( debug ) std::cout << "number of matching meshsets=" << matching_tally_number_sets.size() << std::endl;
+    assert( 1 == matching_tally_number_sets.size() );
 
     // Identify which of the meshsets is existing
     EntityHandle existing_meshset;
-    existing_meshset = matching_tally_number_sets.front( );
+    existing_meshset = matching_tally_number_sets.front();
 
     // Get the existing elements from the set
     Range existing_elements;
     result = MBI->get_entities_by_type( existing_meshset, MBHEX, existing_elements );
     if( MB_SUCCESS != result ) return result;
-    assert( existing_elements.size( ) == n_elements );
+    assert( existing_elements.size() == n_elements );
 
     // Get the nps of the existing and new tally
     unsigned long int nps0;
-    Range             sets_with_this_tag;
+    Range sets_with_this_tag;
     result = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &nps_tag, 0, 1, sets_with_this_tag );
     if( MB_SUCCESS != result ) return result;
-    if( debug ) std::cout << "number of nps sets=" << sets_with_this_tag.size( ) << std::endl;
-    assert( 1 == sets_with_this_tag.size( ) );
-    result = MBI->tag_get_data( nps_tag, &sets_with_this_tag.front( ), 1, &nps0 );
+    if( debug ) std::cout << "number of nps sets=" << sets_with_this_tag.size() << std::endl;
+    assert( 1 == sets_with_this_tag.size() );
+    result = MBI->tag_get_data( nps_tag, &sets_with_this_tag.front(), 1, &nps0 );
     if( MB_SUCCESS != result ) return result;
     if( debug ) std::cout << "nps0=" << nps0 << " nps1=" << nps1 << std::endl;
     new_nps = nps0 + nps1;
 
     // Get tally values from the existing elements
-    double* values0 = new double[ existing_elements.size( ) ];
-    double* errors0 = new double[ existing_elements.size( ) ];
-    result = MBI->tag_get_data( tally_tag, existing_elements, values0 );
+    double* values0 = new double[existing_elements.size()];
+    double* errors0 = new double[existing_elements.size()];
+    result          = MBI->tag_get_data( tally_tag, existing_elements, values0 );
     if( MB_SUCCESS != result )
     {
         delete[] values0;
@@ -922,15 +921,15 @@ ErrorCode ReadMCNP5::transform_point_to_cartesian( double* in, double* out, coor
     switch( coord_sys )
     {
         case CARTESIAN:
-            out[ 0 ] = in[ 0 ];  // x
-            out[ 1 ] = in[ 1 ];  // y
-            out[ 2 ] = in[ 2 ];  // z
+            out[0] = in[0];  // x
+            out[1] = in[1];  // y
+            out[2] = in[2];  // z
             break;
         // theta is in rotations
         case CYLINDRICAL:
-            out[ 0 ] = in[ 0 ] * cos( 2 * PI * in[ 2 ] );  // x
-            out[ 1 ] = in[ 0 ] * sin( 2 * PI * in[ 2 ] );  // y
-            out[ 2 ] = in[ 1 ];  // z
+            out[0] = in[0] * cos( 2 * PI * in[2] );  // x
+            out[1] = in[0] * sin( 2 * PI * in[2] );  // y
+            out[2] = in[1];                          // z
             break;
         case SPHERICAL:
             return MB_NOT_IMPLEMENTED;
@@ -952,14 +951,13 @@ ErrorCode ReadMCNP5::average_tally_values( const unsigned long int nps0, const u
         // std::cout << " values0=" << values0[i] << " values1=" << values1[i]
         //          << " errors0=" << errors0[i] << " errors1=" << errors1[i]
         //          << " nps0=" << nps0 << " nps1=" << nps1 << std::endl;
-        errors0[ i ] =
-            sqrt( pow( values0[ i ] * errors0[ i ] * nps0, 2 ) + pow( values1[ i ] * errors1[ i ] * nps1, 2 ) ) /
-            ( values0[ i ] * nps0 + values1[ i ] * nps1 );
+        errors0[i] = sqrt( pow( values0[i] * errors0[i] * nps0, 2 ) + pow( values1[i] * errors1[i] * nps1, 2 ) ) /
+                     ( values0[i] * nps0 + values1[i] * nps1 );
 
         // It is possible to introduce nans if the values are zero.
-        if( !Util::is_finite( errors0[ i ] ) ) errors0[ i ] = 1.0;
+        if( !Util::is_finite( errors0[i] ) ) errors0[i] = 1.0;
 
-        values0[ i ] = ( values0[ i ] * nps0 + values1[ i ] * nps1 ) / ( nps0 + nps1 );
+        values0[i] = ( values0[i] * nps0 + values1[i] * nps1 ) / ( nps0 + nps1 );
 
         // std::cout << " values0=" << values0[i] << " errors0=" << errors0[i] << std::endl;
     }

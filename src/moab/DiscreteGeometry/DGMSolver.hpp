@@ -7,8 +7,8 @@ namespace moab
 
 class DGMSolver
 {
-    DGMSolver( ){ };
-    ~DGMSolver( ){ };
+    DGMSolver(){};
+    ~DGMSolver(){};
 
   public:
     //! \brief compute combinational number, n choose k, maximum output is
@@ -74,7 +74,7 @@ class DGMSolver
 
     static void vec_scalarprod( const int len, const double* a, const double c, double* b );
 
-    static void vec_crossprod( const double a[ 3 ], const double b[ 3 ], double ( &c )[ 3 ] );
+    static void vec_crossprod( const double a[3], const double b[3], double ( &c )[3] );
 
     static double vec_innerprod( const int len, const double* a, const double* b );
 

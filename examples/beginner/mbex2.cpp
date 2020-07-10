@@ -24,10 +24,10 @@
 // *     main     *
 // *              *
 // ****************
-int main( )
+int main()
 {
-    moab::ErrorCode  rval;
-    moab::Core       mbcore;
+    moab::ErrorCode rval;
+    moab::Core mbcore;
     moab::Interface& mbint = mbcore;
 
     // First, lets load the file from the previous example. Note that
@@ -48,7 +48,7 @@ int main( )
     std::cout << "Loaded a mesh containing: " << hex_range << std::endl;
 
     // Let's analyze one of the hexes (in this case, I picked hex three):
-    moab::EntityHandle handle = hex_range[ 3 ];
+    moab::EntityHandle handle = hex_range[3];
 
     // Find out the eight vertexes that define this particular hex:
     moab::Range connectivity;
@@ -58,20 +58,20 @@ int main( )
     // vertexes of interest. Lets print the handle and coordinate of
     // each vertex. Note how we iterate through the range just like with
     // STL containers...
-    double                coord[ 3 ];
+    double coord[3];
     moab::Range::iterator iter;
 
     std::cout << std::setw( 6 ) << "Handle" << std::setw( 10 ) << "X" << std::setw( 10 ) << "Y" << std::setw( 10 )
               << "Z" << std::endl;
 
-    for( iter = connectivity.begin( ); iter != connectivity.end( ); ++iter )
+    for( iter = connectivity.begin(); iter != connectivity.end(); ++iter )
     {
         rval = mbint.get_coords( &( *iter ), 1, coord );MB_CHK_SET_ERR( rval, "get_coords" );
 
         // Print the entity handle followed by the x, y, z coordinate of
         // the vertex:
-        std::cout << std::setw( 6 ) << *iter << std::setw( 10 ) << coord[ 0 ] << std::setw( 10 ) << coord[ 1 ]
-                  << std::setw( 10 ) << coord[ 2 ] << std::endl;
+        std::cout << std::setw( 6 ) << *iter << std::setw( 10 ) << coord[0] << std::setw( 10 ) << coord[1]
+                  << std::setw( 10 ) << coord[2] << std::endl;
     }
 
     // ***********************
@@ -86,30 +86,30 @@ int main( )
     rval = mbint.get_entities_by_type( 0, moab::MBVERTEX, vertex_range );MB_CHK_SET_ERR( rval, "get_entities_by_type(VERTEX) failed" );
 
     // Get the coordinates of all of the vertexes:
-    std::vector< double > vertex_coords( 3 * vertex_range.size( ) );
-    rval = mbint.get_coords( vertex_range, vertex_coords.data( ) );MB_CHK_SET_ERR( rval, "get_coords" );
+    std::vector< double > vertex_coords( 3 * vertex_range.size() );
+    rval = mbint.get_coords( vertex_range, vertex_coords.data() );MB_CHK_SET_ERR( rval, "get_coords" );
 
-    unsigned     count = 0;
-    const double PI = 3.14159265359;
+    unsigned count     = 0;
+    const double PI    = 3.14159265359;
     const double ANGLE = PI / 4;
-    for( iter = vertex_range.begin( ); iter != vertex_range.end( ); ++iter )
+    for( iter = vertex_range.begin(); iter != vertex_range.end(); ++iter )
     {
 
         // Save the old coordinates:
-        double x = vertex_coords[ count + 0 ];
-        double y = vertex_coords[ count + 1 ];
+        double x = vertex_coords[count + 0];
+        double y = vertex_coords[count + 1];
         // double z = vertex_coords[count+2];
 
         // Apply the rotation:
-        vertex_coords[ count + 0 ] = x * std::cos( ANGLE ) - y * std::sin( ANGLE );
-        vertex_coords[ count + 1 ] = x * std::sin( ANGLE ) + y * std::cos( ANGLE );
+        vertex_coords[count + 0] = x * std::cos( ANGLE ) - y * std::sin( ANGLE );
+        vertex_coords[count + 1] = x * std::sin( ANGLE ) + y * std::cos( ANGLE );
 
         count += 3;
     }
 
     // Now, the vertex_coords vector contains all of the updated
     // coordinates. Let's push these back into MOAB:
-    mbint.set_coords( vertex_range, vertex_coords.data( ) );MB_CHK_SET_ERR( rval, "set_coords" );
+    mbint.set_coords( vertex_range, vertex_coords.data() );MB_CHK_SET_ERR( rval, "set_coords" );
 
     // **************************
     // *   Write Mesh to File   *

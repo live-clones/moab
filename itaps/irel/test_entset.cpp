@@ -7,7 +7,7 @@
 #include "string.h"
 
 #define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
+#define STRINGIFY( X )  STRINGIFY_( X )
 #ifdef MESHDIR
 #ifdef HAVE_OCC
 #define DEFAULT_GEOM STRINGIFY( MESHDIR / irel / brick.stp )
@@ -23,7 +23,7 @@
 #define CHECK_SIZE_C( type, array, allocated_size, size )            \
     if( NULL == *array || *allocated_size == 0 )                     \
     {                                                                \
-        *array = (type*)malloc( sizeof( type ) * size );             \
+        *array          = (type*)malloc( sizeof( type ) * size );    \
         *allocated_size = size;                                      \
     }                                                                \
     else if( *allocated_size < size )                                \
@@ -53,8 +53,8 @@ void handle_error_code( const int result, int* number_failed, int* /*number_not_
 int print_geom_info( iGeom_Instance geom, iBase_EntityHandle gent )
 {
     /* print information about this entity */
-    int         ent_type;
-    int         result;
+    int ent_type;
+    int result;
     const char* type_names[] = { "Vertex", "Edge", "Face", "Region" };
 
     iGeom_getEntType( geom, gent, &ent_type, &result );
@@ -65,7 +65,7 @@ int print_geom_info( iGeom_Instance geom, iBase_EntityHandle gent )
         return 0;
     }
 
-    printf( "%s 0x%lx\n", type_names[ ent_type ], (unsigned long)gent );
+    printf( "%s 0x%lx\n", type_names[ent_type], (unsigned long)gent );
 
     return 1;
 }
@@ -75,16 +75,16 @@ int print_mesh_info( iMesh_Instance mesh, iBase_EntityHandle ment )
     /* print information about this entity */
 
     /* get adjacencies first; assume not more than 50 */
-    iBase_EntityHandle adj_ents[ 50 ], *adj_ents_ptr = adj_ents;
-    int                ent_types[ 50 ], *ent_types_ptr = ent_types;
-    int                adj_ents_alloc = 50, adj_ents_size, ent_types_size, ent_types_allocated = 50;
-    int                result;
+    iBase_EntityHandle adj_ents[50], *adj_ents_ptr = adj_ents;
+    int ent_types[50], *ent_types_ptr              = ent_types;
+    int adj_ents_alloc = 50, adj_ents_size, ent_types_size, ent_types_allocated = 50;
+    int result;
 
     iBase_TagHandle* ment_tags = NULL;
-    int              ment_tags_size, ment_tags_alloc;
+    int ment_tags_size, ment_tags_alloc;
 
     char** tag_names;
-    int    i;
+    int i;
 
     const char* type_names[] = { "Vertex", "Edge", "Face", "Region" };
 
@@ -93,7 +93,7 @@ int print_mesh_info( iMesh_Instance mesh, iBase_EntityHandle ment )
     if( iBase_SUCCESS != result ) return 0;
 
     /* put this ent on the end, then get types */
-    adj_ents[ adj_ents_size ] = ment;
+    adj_ents[adj_ents_size] = ment;
     iMesh_getEntArrType( mesh, adj_ents, adj_ents_size + 1, &ent_types_ptr, &ent_types_allocated, &ent_types_size,
                          &result );
     if( iBase_SUCCESS != result )
@@ -113,53 +113,53 @@ int print_mesh_info( iMesh_Instance mesh, iBase_EntityHandle ment )
 
     for( i = 0; i < ment_tags_size; i++ )
     {
-        tag_names[ i ] = (char*)malloc( 120 * sizeof( char ) );
-        iMesh_getTagName( mesh, ment_tags[ i ], tag_names[ i ], &result, 120 );
+        tag_names[i] = (char*)malloc( 120 * sizeof( char ) );
+        iMesh_getTagName( mesh, ment_tags[i], tag_names[i], &result, 120 );
     }
 
     /* now print the information */
-    printf( "%s %ld:\n", type_names[ ent_types[ ent_types_size - 1 ] ], (long)ment );
+    printf( "%s %ld:\n", type_names[ent_types[ent_types_size - 1]], (long)ment );
     printf( "Adjacencies:" );
     for( i = 0; i < adj_ents_size; i++ )
     {
         if( i > 0 ) printf( ", " );
-        printf( "%s %ld", type_names[ ent_types[ i ] ], (long)adj_ents[ i ] );
+        printf( "%s %ld", type_names[ent_types[i]], (long)adj_ents[i] );
     }
     printf( "\nTags: \n" );
     for( i = 0; i < ment_tags_size; i++ )
     {
         int tag_type;
 
-        printf( "%s ", tag_names[ i ] );
-        iMesh_getTagType( mesh, ment_tags[ i ], &tag_type, &result );
+        printf( "%s ", tag_names[i] );
+        iMesh_getTagType( mesh, ment_tags[i], &tag_type, &result );
         if( iBase_SUCCESS != result )
             printf( "(trouble getting type...)\n" );
         else
         {
-            char*              dum_handle = NULL;
-            int                dum_handle_alloc = 0, dum_handle_size = 0;
-            int                int_data;
-            double             dbl_data;
+            char* dum_handle     = NULL;
+            int dum_handle_alloc = 0, dum_handle_size = 0;
+            int int_data;
+            double dbl_data;
             iBase_EntityHandle eh_data;
 
             switch( tag_type )
             {
                 case iBase_INTEGER:
-                    iMesh_getIntData( mesh, ment, ment_tags[ i ], &int_data, &result );
+                    iMesh_getIntData( mesh, ment, ment_tags[i], &int_data, &result );
                     printf( "(Int value=%d)", int_data );
                     break;
                 case iBase_DOUBLE:
-                    iMesh_getDblData( mesh, ment, ment_tags[ i ], &dbl_data, &result );
+                    iMesh_getDblData( mesh, ment, ment_tags[i], &dbl_data, &result );
                     printf( "(Dbl value=%f)", dbl_data );
                     break;
                 case iBase_ENTITY_HANDLE:
-                    iMesh_getEHData( mesh, ment, ment_tags[ i ], &eh_data, &result );
+                    iMesh_getEHData( mesh, ment, ment_tags[i], &eh_data, &result );
                     printf( "(EH value=%ld)", (long)eh_data );
                     break;
                 case iBase_BYTES:
-                    iMesh_getData( mesh, ment, ment_tags[ i ], (void**)&dum_handle, &dum_handle_alloc, &dum_handle_size,
+                    iMesh_getData( mesh, ment, ment_tags[i], (void**)&dum_handle, &dum_handle_alloc, &dum_handle_size,
                                    &result );
-                    if( NULL != dum_handle && dum_handle_size > 0 ) printf( "(Opaque value=%c)", dum_handle[ 0 ] );
+                    if( NULL != dum_handle && dum_handle_size > 0 ) printf( "(Opaque value=%c)", dum_handle[0] );
                     break;
             }
         }
@@ -207,15 +207,15 @@ int load_geom_mesh_test( const char* geom_filename, const char* mesh_filename, i
 */
 int create_relation_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Instance mesh, iRel_PairHandle* pair )
 {
-    int            result;
+    int result;
     iBase_Instance iface1, iface2;
-    int            type1, type2;
-    int            ent_or_set1, ent_or_set2;
-    int            status1, status2;
+    int type1, type2;
+    int ent_or_set1, ent_or_set2;
+    int status1, status2;
 
-    iRel_PairHandle  tmp_pair;
+    iRel_PairHandle tmp_pair;
     iRel_PairHandle* pair_ptr = &tmp_pair;
-    int              pairs_alloc = 1, pairs_size;
+    int pairs_alloc           = 1, pairs_size;
 
     /* create an relation, entity to set */
     iRel_createPair( assoc, geom, iRel_ENTITY, iRel_IGEOM_IFACE, iRel_ACTIVE, mesh, iRel_SET, iRel_IMESH_IFACE,
@@ -277,26 +277,26 @@ int relate_geom_mesh_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Insta
     int result;
 
     iBase_EntityHandle* gentities = NULL;
-    int                 gentities_size = 0, gentities_alloc = 0;
+    int gentities_size = 0, gentities_alloc = 0;
 
     iBase_EntitySetHandle* mentity_handles = NULL;
-    int                    mentity_handles_size = 0, mentity_handles_alloc = 0;
+    int mentity_handles_size = 0, mentity_handles_alloc = 0;
 
-    const char*     dim_tag_name = "GEOM_DIMENSION";
+    const char* dim_tag_name = "GEOM_DIMENSION";
     iBase_TagHandle dim_tag_mesh;
 
     iBase_EntitySetHandle* mentities_vec;
-    int                    mentities_vec_size = 0;
-    int                    i;
+    int mentities_vec_size = 0;
+    int i;
 
     iBase_EntitySetHandle* out_mentities = NULL;
-    int                    out_mentities_size = 0, out_mentities_alloc = 0;
+    int out_mentities_size = 0, out_mentities_alloc = 0;
 
     iBase_EntitySetHandle* out_mentities2 = NULL;
-    int                    out_mentities2_size = 0, out_mentities2_alloc = 0;
+    int out_mentities2_size = 0, out_mentities2_alloc = 0;
 
     iBase_EntityHandle* out_gentities = NULL;
-    int                 out_gentities_size = 0, out_gentities_alloc = 0;
+    int out_gentities_size = 0, out_gentities_alloc = 0;
 
     /* relate geometry entities with coresponding mesh entity sets */
     iGeom_getEntities( geom, NULL, iBase_VERTEX, &gentities, &gentities_alloc, &gentities_size, &result );
@@ -335,10 +335,10 @@ int relate_geom_mesh_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Insta
     for( i = 0; i < mentity_handles_size; i++ )
     { /* test */
         int dim;
-        iMesh_getEntSetIntData( mesh, mentity_handles[ i ], dim_tag_mesh, &dim, &result );
+        iMesh_getEntSetIntData( mesh, mentity_handles[i], dim_tag_mesh, &dim, &result );
         if( iBase_SUCCESS != result ) continue;
 
-        if( dim == 1 ) mentities_vec[ mentities_vec_size++ ] = mentity_handles[ i ];
+        if( dim == 1 ) mentities_vec[mentities_vec_size++] = mentity_handles[i];
     }
 
     iRel_inferSetArrRelations( assoc, pair, mentities_vec, mentities_vec_size, 1, &result );
@@ -359,7 +359,7 @@ int relate_geom_mesh_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Insta
     /* reset geom entities list and get all geom entities (prev
        only vertices) */
     free( gentities );
-    gentities = NULL;
+    gentities       = NULL;
     gentities_alloc = 0;
     iGeom_getEntities( geom, NULL, iBase_ALL_TYPES, &gentities, &gentities_alloc, &gentities_size, &result );
     if( iBase_SUCCESS != result )
@@ -447,13 +447,13 @@ int query_relations_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Instan
     int i;
 
     iBase_EntityHandle* gentities = NULL;
-    int                 gentities_size = 0, gentities_alloc = 0;
+    int gentities_size = 0, gentities_alloc = 0;
 
     iBase_EntitySetHandle* out_mentities = NULL;
-    int                    out_mentities_size, out_mentities_alloc = 0;
+    int out_mentities_size, out_mentities_alloc = 0;
 
     iBase_EntityHandle* out_gentities = NULL;
-    int                 out_gentities_size, out_gentities_alloc = 0;
+    int out_gentities_size, out_gentities_alloc = 0;
 
     /* get all the geom entities, and find relation to some mesh entity */
     iGeom_getEntities( geom, NULL, iBase_ALL_TYPES, &gentities, &gentities_alloc, &gentities_size, &result );
@@ -468,7 +468,7 @@ int query_relations_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Instan
     /* might not all be */
     if( iBase_SUCCESS != result )
     {
-        char descr[ 120 ];
+        char descr[120];
 
         printf( "Failed to get mesh entities related to geom entities in query_relations_test.\n" );
 
@@ -477,7 +477,7 @@ int query_relations_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Instan
 
         for( i = 0; i < gentities_size; i++ )
         {
-            print_geom_info( geom, gentities[ i ] );
+            print_geom_info( geom, gentities[i] );
         }
 
         return 0;
@@ -494,7 +494,7 @@ int query_relations_test( iRel_Instance assoc, iGeom_Instance geom, iMesh_Instan
     for( i = 0; i < out_mentities_size; i++ )
     {
         int is_list;
-        iMesh_isList( mesh, (iBase_EntitySetHandle)out_mentities[ i ], &is_list, &result );
+        iMesh_isList( mesh, (iBase_EntitySetHandle)out_mentities[i], &is_list, &result );
         if( iBase_SUCCESS != result )
         {
             printf( "Entity set returned from classification wasn't valid.\n" );
@@ -535,32 +535,32 @@ int main( int argc, char* argv[] )
     const char* mesh_filename = DEFAULT_MESH;
 
     int result;
-    int number_tests = 0;
-    int number_tests_successful = 0;
+    int number_tests                 = 0;
+    int number_tests_successful      = 0;
     int number_tests_not_implemented = 0;
-    int number_tests_failed = 0;
+    int number_tests_failed          = 0;
 
-    iGeom_Instance  geom;
-    iMesh_Instance  mesh;
-    iRel_Instance   assoc;
+    iGeom_Instance geom;
+    iMesh_Instance mesh;
+    iRel_Instance assoc;
     iRel_PairHandle pair;
 
     printf( "Usage: %s %s\n", geom_filename, mesh_filename );
 
-    if( argc == 2 && !strcmp( argv[ 1 ], "-h" ) )
+    if( argc == 2 && !strcmp( argv[1], "-h" ) )
     {
-        printf( "Usage: %s <geom_filename> <mesh_filename>\n", argv[ 0 ] );
+        printf( "Usage: %s <geom_filename> <mesh_filename>\n", argv[0] );
         return 1;
     }
     else if( argc == 2 )
     {
-        geom_filename = argv[ 1 ];
-        mesh_filename = argv[ 1 ];
+        geom_filename = argv[1];
+        mesh_filename = argv[1];
     }
     else if( argc == 3 )
     {
-        geom_filename = argv[ 1 ];
-        mesh_filename = argv[ 2 ];
+        geom_filename = argv[1];
+        mesh_filename = argv[2];
     }
 
     /* initialize the Geometry */

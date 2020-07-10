@@ -9,13 +9,13 @@ namespace moab
 {
 
 /// Construct an evaluator.
-EdgeSizeEvaluator::EdgeSizeEvaluator( )
+EdgeSizeEvaluator::EdgeSizeEvaluator()
 {
     this->tag_manager = 0;
 }
 
 /// Destruction is virtual so subclasses may clean up after refinement.
-EdgeSizeEvaluator::~EdgeSizeEvaluator( ) {}
+EdgeSizeEvaluator::~EdgeSizeEvaluator() {}
 
 /**\fn bool EdgeSizeEvaluator::evaluate_edge( \
  *         const double* p0, const void* t0, double* p1, void* t1, const double* p2, const void* t2

@@ -29,13 +29,13 @@ class ReadCCMIO : public ReaderIface
 
   public:
     typedef std::map< int, std::vector< EntityHandle > > TupleList;
-    typedef std::map< int, std::vector< int > >          SenseList;
+    typedef std::map< int, std::vector< int > > SenseList;
 
     //! Constructor
     ReadCCMIO( Interface* impl );
 
     //! Destructor
-    virtual ~ReadCCMIO( );
+    virtual ~ReadCCMIO();
 
     static ReaderIface* factory( Interface* );
 

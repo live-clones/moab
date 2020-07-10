@@ -32,12 +32,12 @@ SweptElementSeq::SweptElementSeq( EntityHandle shandle, const int imin, const in
 {
 }
 
-SweptElementSeq::~SweptElementSeq( ) {}
+SweptElementSeq::~SweptElementSeq() {}
 
 ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
                                              bool /*topological*/ ) const
 {
-    int       i, j, k;
+    int i, j, k;
     ErrorCode rval = get_params( handle, i, j, k );
     if( MB_SUCCESS == rval ) rval = get_params_connectivity( i, j, k, connect );
     return rval;
@@ -48,15 +48,15 @@ ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle, EntityHandle c
 {
     if( !storage )
     {
-        connect = 0;
+        connect        = 0;
         connect_length = 0;
         return MB_NOT_IMPLEMENTED;
     }
 
-    storage->clear( );
+    storage->clear();
     ErrorCode rval = get_connectivity( handle, *storage, topo );
-    connect = &( *storage )[ 0 ];
-    connect_length = storage->size( );
+    connect        = &( *storage )[0];
+    connect_length = storage->size();
     return rval;
 }
 
@@ -65,12 +65,12 @@ ErrorCode SweptElementSeq::set_connectivity( EntityHandle, EntityHandle const*, 
     return MB_NOT_IMPLEMENTED;
 }
 
-EntityHandle* SweptElementSeq::get_connectivity_array( )
+EntityHandle* SweptElementSeq::get_connectivity_array()
 {
     return 0;
 }
 
-int SweptElementSeq::values_per_entity( ) const
+int SweptElementSeq::values_per_entity() const
 {
     return -1;
 }  // never reuse freed handles for swept elements
@@ -87,8 +87,8 @@ SequenceData* SweptElementSeq::create_data_subset( EntityHandle, EntityHandle ) 
 
 void SweptElementSeq::get_const_memory_use( unsigned long& bytes_per_entity, unsigned long& sequence_size ) const
 {
-    sequence_size = sizeof( *this );
-    bytes_per_entity = sdata( )->get_memory_use( ) / sdata( )->size( );
+    sequence_size    = sizeof( *this );
+    bytes_per_entity = sdata()->get_memory_use() / sdata()->size();
 }
 
 }  // namespace moab

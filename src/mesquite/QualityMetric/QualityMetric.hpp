@@ -71,7 +71,7 @@ class Settings;
 class QualityMetric
 {
   protected:
-    QualityMetric( ) : keepFiniteDiffEps( false ), haveFiniteDiffEps( false ) {}
+    QualityMetric() : keepFiniteDiffEps( false ), haveFiniteDiffEps( false ) {}
 
   public:
     enum MetricType
@@ -80,14 +80,14 @@ class QualityMetric
         ELEMENT_BASED /**< Iterate over elements to evaluate metric. */
     };
 
-    MESQUITE_EXPORT virtual ~QualityMetric( ) {}
+    MESQUITE_EXPORT virtual ~QualityMetric() {}
 
-    MESQUITE_EXPORT virtual MetricType get_metric_type( ) const = 0;
+    MESQUITE_EXPORT virtual MetricType get_metric_type() const = 0;
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const = 0;
+    MESQUITE_EXPORT virtual std::string get_name() const = 0;
 
     //! 1 if metric should be minimized, -1 if metric should be maximized.
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const = 0;
+    MESQUITE_EXPORT virtual int get_negate_flag() const = 0;
 
     /**\brief Get locations at which metric can be evaluated
      *
@@ -160,7 +160,7 @@ class QualityMetric
      *               the indices list.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                         std::vector< size_t >&   indices,
+                                                         std::vector< size_t >& indices,
                                                          std::vector< Vector3D >& gradient, MsqError& err );
 
     /**\brief Get metric value and gradient at a logical location in the patch.
@@ -178,10 +178,10 @@ class QualityMetric
      *               the Hessian matrix.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                                 std::vector< size_t >&      indices,
-                                                                 std::vector< Vector3D >&    gradient,
+                                                                 std::vector< size_t >& indices,
+                                                                 std::vector< Vector3D >& gradient,
                                                                  std::vector< SymMatrix3D >& Hessian_diagonal,
-                                                                 MsqError&                   err );
+                                                                 MsqError& err );
 
     /**\brief Get metric value and deravitives at a logical location in the patch.
      *
@@ -202,7 +202,7 @@ class QualityMetric
      *               corresponding positions in the indices list.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >&   indices,
+                                                        std::vector< size_t >& indices,
                                                         std::vector< Vector3D >& gradient,
                                                         std::vector< Matrix3D >& Hessian, MsqError& err );
 
@@ -240,7 +240,7 @@ class QualityMetric
      */
     MESQUITE_EXPORT
     static void remove_fixed_diagonals( EntityTopology type, uint32_t fixed_vertices,
-                                        std::vector< Vector3D >&    gradients,
+                                        std::vector< Vector3D >& gradients,
                                         std::vector< SymMatrix3D >& hess_diagonal_blocks );
 
     /** \brief Remove from vector any Hessian blocks corresponding
@@ -281,20 +281,20 @@ class QualityMetric
     */
     enum AveragingMethod
     {
-        LINEAR,  //!< the linear average
-        RMS,  //!< the root-mean-squared average
-        HMS,  //!< the harmonic-mean-squared average
-        SUM,  //!< the sum of the values
+        LINEAR,       //!< the linear average
+        RMS,          //!< the root-mean-squared average
+        HMS,          //!< the harmonic-mean-squared average
+        SUM,          //!< the sum of the values
         SUM_SQUARED,  //!< the sum of the squares of the values
-        HARMONIC,  //!< the harmonic average
+        HARMONIC,     //!< the harmonic average
         LAST_WITH_HESSIAN = HARMONIC,
-        MINIMUM,  //!< the minimum value
-        MAXIMUM,  //!< the maximum value
+        MINIMUM,    //!< the minimum value
+        MAXIMUM,    //!< the maximum value
         GEOMETRIC,  //!< the geometric average
         LAST_WITH_GRADIENT = GEOMETRIC,
-        STANDARD_DEVIATION,  //!< the standard deviation squared of the values
-        MAX_OVER_MIN,  //!< the maximum value minus the minum value
-        MAX_MINUS_MIN,  //!< the maximum value divided by the minimum value
+        STANDARD_DEVIATION,    //!< the standard deviation squared of the values
+        MAX_OVER_MIN,          //!< the maximum value minus the minum value
+        MAX_MINUS_MIN,         //!< the maximum value divided by the minimum value
         SUM_OF_RATIOS_SQUARED  //!< (1/(N^2))*(SUM (SUM (v_i/v_j)^2))
     };
 
@@ -309,14 +309,14 @@ class QualityMetric
     int feasible;
 
     std::vector< Matrix3D > tmpHess;
-    bool                    keepFiniteDiffEps;  //!< True if gradient finite difference
+    bool keepFiniteDiffEps;  //!< True if gradient finite difference
                              //!< calculation should set \c finiteDiffEps
     bool haveFiniteDiffEps;  //!< True if finite difference Hessian code
                              //!< has calculated \c finiteDiffEps
-    double finiteDiffEps;  //!< Location for finite difference Hessian code
-                           //!< to store this value so that it doesn't need
-                           //!< to be recalculated if the gradient calculation
-                           //!< is also finite difference
+    double finiteDiffEps;    //!< Location for finite difference Hessian code
+                             //!< to store this value so that it doesn't need
+                             //!< to be recalculated if the gradient calculation
+                             //!< is also finite difference
 };
 
 }  // namespace MBMesquite

@@ -36,7 +36,7 @@ class SpectralHex
      * the element */
     static int insideFcn( const double* params, const int ndim, const double tol );
 
-    static EvalSet eval_set( )
+    static EvalSet eval_set()
     {
         return EvalSet( evalFcn, reverseEvalFcn, jacobianFcn, integrateFcn, initFcn );
     }
@@ -48,17 +48,17 @@ class SpectralHex
         for( i = 3; i * i * i == numv || i * i * i > numv; i++ )
             ;
         if( i * i * i != numv ) return false;
-        eset = eval_set( );
+        eset = eval_set();
         return true;
     }
 
   protected:
-    static int           _n;
-    static double*       _z[ 3 ];
-    static lagrange_data _ld[ 3 ];
-    static opt_data_3    _data;
-    static double*       _odwork;  // work area
-    static bool          init_;
+    static int _n;
+    static double* _z[3];
+    static lagrange_data _ld[3];
+    static opt_data_3 _data;
+    static double* _odwork;  // work area
+    static bool init_;
 };  // class SpectralHex
 
 }  // namespace moab

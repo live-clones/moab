@@ -57,7 +57,7 @@ namespace MBMesquite
 /*! The default constructor initialises a few member variables
     to default values.
     This can be reused by concrete class constructor. */
-QualityImprover::QualityImprover( )
+QualityImprover::QualityImprover()
 {
     defaultOuterCriterion = new TerminationCriterion;
     defaultInnerCriterion = new TerminationCriterion;
@@ -66,7 +66,7 @@ QualityImprover::QualityImprover( )
     innerTerminationCriterion = defaultInnerCriterion;
 }
 
-QualityImprover::~QualityImprover( )
+QualityImprover::~QualityImprover()
 {
     delete defaultOuterCriterion;
     delete defaultInnerCriterion;

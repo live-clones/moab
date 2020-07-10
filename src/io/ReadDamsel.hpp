@@ -46,7 +46,7 @@ class ReadDamsel : public ReaderIface
     ReadDamsel( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadDamsel( );
+    virtual ~ReadDamsel();
 
     virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
                                        std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
@@ -60,7 +60,7 @@ class ReadDamsel : public ReaderIface
     //! handles ents argument should point to already-allocated space
     ErrorCode get_contents( damsel_model m, damsel_container c, EntityHandle* ents );
 
-    ErrorCode init( );
+    ErrorCode init();
 
     ErrorCode parse_options( const FileOptions& opts, bool& parallel );
 
@@ -86,8 +86,8 @@ class ReadDamsel : public ReaderIface
       public:
         subrange( damsel_handle ch, EntityHandle s, int c ) : collh( ch ), seth( s ), count( c ) {}
         damsel_handle collh;
-        EntityHandle  seth;
-        int           count;
+        EntityHandle seth;
+        int count;
     };
 
     //------------member variables ------------//

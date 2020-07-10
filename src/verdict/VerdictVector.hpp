@@ -36,12 +36,12 @@ class VerdictVector
 {
   public:
     //- Heading: Constructors and Destructor
-    VerdictVector( );  //- Default constructor.
+    VerdictVector();  //- Default constructor.
 
     VerdictVector( const double x, const double y, const double z );
     //- Constructor: create vector from three components
 
-    VerdictVector( const double xyz[ 3 ] );
+    VerdictVector( const double xyz[3] );
     //- Constructor: create vector from tuple
 
     VerdictVector( const VerdictVector& tail, const VerdictVector& head );
@@ -54,7 +54,7 @@ class VerdictVector
     void set( const double xv, const double yv, const double zv );
     //- Change vector components to {x}, {y}, and {z}
 
-    void set( const double xyz[ 3 ] );
+    void set( const double xyz[3] );
     //- Change vector components to xyz[0], xyz[1], xyz[2]
 
     void set( const VerdictVector& tail, const VerdictVector& head );
@@ -63,18 +63,18 @@ class VerdictVector
     void set( const VerdictVector& to_copy );
     //- Same as operator=(const VerdictVector&)
 
-    double x( ) const;  //- Return x component of vector
+    double x() const;  //- Return x component of vector
 
-    double y( ) const;  //- Return y component of vector
+    double y() const;  //- Return y component of vector
 
-    double z( ) const;  //- Return z component of vector
+    double z() const;  //- Return z component of vector
 
     void get_xyz( double& x, double& y, double& z );  //- Get x, y, z components
-    void get_xyz( double xyz[ 3 ] );  //- Get xyz tuple
+    void get_xyz( double xyz[3] );                    //- Get xyz tuple
 
-    double& r( );  //- Return r component of vector, if (r,theta) format
+    double& r();  //- Return r component of vector, if (r,theta) format
 
-    double& theta( );  //- Return theta component of vector, if (r,theta) format
+    double& theta();  //- Return theta component of vector, if (r,theta) format
 
     void x( const double xv );  //- Set x component of vector
 
@@ -86,11 +86,11 @@ class VerdictVector
 
     void theta( const double yv );  //- Set theta component of vector, if (r,theta) format
 
-    void xy_to_rtheta( );
+    void xy_to_rtheta();
     //- convert from cartesian to polar coordinates, just 2d for now
     //- theta is in [0,2 PI)
 
-    void rtheta_to_xy( );
+    void rtheta_to_xy();
     //- convert from  polar to cartesian coordinates, just 2d for now
 
     void scale_angle( double gamma, double );
@@ -109,7 +109,7 @@ class VerdictVector
     void reflect_about_xaxis( double dummy, double );
     //- dummy argument to make it a transform function
 
-    double normalize( );
+    double normalize();
     //- Normalize (set magnitude equal to 1) vector - return the magnitude
 
     VerdictVector& length( const double new_length );
@@ -117,7 +117,7 @@ class VerdictVector
     //- location a specified distance from the origin in the current
     //- orientation.
 
-    double length( ) const;
+    double length() const;
     //- Calculate the length of the vector.
     //- Use {length_squared()} if only comparing lengths, not adding.
 
@@ -125,7 +125,7 @@ class VerdictVector
     //- Calculate the distance from the head of one vector
     //  to the head of the test_vector.
 
-    double length_squared( ) const;
+    double length_squared() const;
     //- Calculate the squared length of the vector.
     //- Faster than {length()} since it eliminates the square root if
     //- only comparing other lengths.
@@ -145,11 +145,11 @@ class VerdictVector
     //- onto the plane defined by *this. The angle is the
     //- right-hand angle, in radians, about *this from {vector1} to {vector2}.
 
-    void perpendicular_z( );
+    void perpendicular_z();
     //- Transform this vector to a perpendicular one, leaving
     //- z-component alone. Rotates clockwise about the z-axis by pi/2.
 
-    void print_me( );
+    void print_me();
     //- Prints out the coordinates of this vector.
 
     void orthogonal_vectors( VerdictVector& vector2, VerdictVector& vector3 );
@@ -182,7 +182,7 @@ class VerdictVector
     VerdictVector& operator/=( const double scalar );
     //- Compound Assignment: division: {this = this / scalar}
 
-    VerdictVector operator-( ) const;
+    VerdictVector operator-() const;
     //- unary negation.
 
     friend VerdictVector operator~( const VerdictVector& vec );
@@ -237,23 +237,23 @@ VerdictVector vectorRotate( const double angle, const VerdictVector& normalAxis,
 //- distance from the global origin in the tangent plane.
 //- {angle} is in radians.
 
-inline double VerdictVector::x( ) const
+inline double VerdictVector::x() const
 {
     return xVal;
 }
-inline double VerdictVector::y( ) const
+inline double VerdictVector::y() const
 {
     return yVal;
 }
-inline double VerdictVector::z( ) const
+inline double VerdictVector::z() const
 {
     return zVal;
 }
-inline void VerdictVector::get_xyz( double xyz[ 3 ] )
+inline void VerdictVector::get_xyz( double xyz[3] )
 {
-    xyz[ 0 ] = xVal;
-    xyz[ 1 ] = yVal;
-    xyz[ 2 ] = zVal;
+    xyz[0] = xVal;
+    xyz[1] = yVal;
+    xyz[2] = zVal;
 }
 inline void VerdictVector::get_xyz( double& xv, double& yv, double& zv )
 {
@@ -261,11 +261,11 @@ inline void VerdictVector::get_xyz( double& xv, double& yv, double& zv )
     yv = yVal;
     zv = zVal;
 }
-inline double& VerdictVector::r( )
+inline double& VerdictVector::r()
 {
     return xVal;
 }
-inline double& VerdictVector::theta( )
+inline double& VerdictVector::theta()
 {
     return yVal;
 }
@@ -291,29 +291,29 @@ inline void VerdictVector::theta( const double yv )
 }
 inline VerdictVector& VerdictVector::operator+=( const VerdictVector& vector )
 {
-    xVal += vector.x( );
-    yVal += vector.y( );
-    zVal += vector.z( );
+    xVal += vector.x();
+    yVal += vector.y();
+    zVal += vector.z();
     return *this;
 }
 
 inline VerdictVector& VerdictVector::operator-=( const VerdictVector& vector )
 {
-    xVal -= vector.x( );
-    yVal -= vector.y( );
-    zVal -= vector.z( );
+    xVal -= vector.x();
+    yVal -= vector.y();
+    zVal -= vector.z();
     return *this;
 }
 
 inline VerdictVector& VerdictVector::operator*=( const VerdictVector& vector )
 {
     double xcross, ycross, zcross;
-    xcross = yVal * vector.z( ) - zVal * vector.y( );
-    ycross = zVal * vector.x( ) - xVal * vector.z( );
-    zcross = xVal * vector.y( ) - yVal * vector.x( );
-    xVal = xcross;
-    yVal = ycross;
-    zVal = zcross;
+    xcross = yVal * vector.z() - zVal * vector.y();
+    ycross = zVal * vector.x() - xVal * vector.z();
+    zcross = xVal * vector.y() - yVal * vector.x();
+    xVal   = xcross;
+    yVal   = ycross;
+    zVal   = zcross;
     return *this;
 }
 
@@ -322,7 +322,7 @@ inline VerdictVector::VerdictVector( const VerdictVector& copy_from )
 {
 }
 
-inline VerdictVector::VerdictVector( ) : xVal( 0 ), yVal( 0 ), zVal( 0 ) {}
+inline VerdictVector::VerdictVector() : xVal( 0 ), yVal( 0 ), zVal( 0 ) {}
 
 inline VerdictVector::VerdictVector( const VerdictVector& tail, const VerdictVector& head )
     : xVal( head.xVal - tail.xVal ), yVal( head.yVal - tail.yVal ), zVal( head.zVal - tail.zVal )
@@ -337,10 +337,10 @@ inline VerdictVector::VerdictVector( const double xIn, const double yIn, const d
 // This sets the vector to be perpendicular to it's current direction.
 // NOTE:
 //      This is a 2D function.  It only works in the XY Plane.
-inline void VerdictVector::perpendicular_z( )
+inline void VerdictVector::perpendicular_z()
 {
-    double temp = x( );
-    x( y( ) );
+    double temp = x();
+    x( y() );
     y( -temp );
 }
 
@@ -351,11 +351,11 @@ inline void VerdictVector::set( const double xv, const double yv, const double z
     zVal = zv;
 }
 
-inline void VerdictVector::set( const double xyz[ 3 ] )
+inline void VerdictVector::set( const double xyz[3] )
 {
-    xVal = xyz[ 0 ];
-    yVal = xyz[ 1 ];
-    zVal = xyz[ 2 ];
+    xVal = xyz[0];
+    yVal = xyz[1];
+    zVal = xyz[2];
 }
 
 inline void VerdictVector::set( const VerdictVector& tail, const VerdictVector& head )
@@ -408,25 +408,25 @@ inline VerdictVector operator~( const VerdictVector& vec )
 }
 
 // Unary minus.  Negates all values in vector.
-inline VerdictVector VerdictVector::operator-( ) const
+inline VerdictVector VerdictVector::operator-() const
 {
     return VerdictVector( -xVal, -yVal, -zVal );
 }
 
 inline VerdictVector operator+( const VerdictVector& vector1, const VerdictVector& vector2 )
 {
-    double xv = vector1.x( ) + vector2.x( );
-    double yv = vector1.y( ) + vector2.y( );
-    double zv = vector1.z( ) + vector2.z( );
+    double xv = vector1.x() + vector2.x();
+    double yv = vector1.y() + vector2.y();
+    double zv = vector1.z() + vector2.z();
     return VerdictVector( xv, yv, zv );
     //  return VerdictVector(vector1) += vector2;
 }
 
 inline VerdictVector operator-( const VerdictVector& vector1, const VerdictVector& vector2 )
 {
-    double xv = vector1.x( ) - vector2.x( );
-    double yv = vector1.y( ) - vector2.y( );
-    double zv = vector1.z( ) - vector2.z( );
+    double xv = vector1.x() - vector2.x();
+    double yv = vector1.y() - vector2.y();
+    double zv = vector1.z() - vector2.z();
     return VerdictVector( xv, yv, zv );
     //  return VerdictVector(vector1) -= vector2;
 }
@@ -466,19 +466,19 @@ inline int operator!=( const VerdictVector& v1, const VerdictVector& v2 )
     return ( v1.xVal != v2.xVal || v1.yVal != v2.yVal || v1.zVal != v2.zVal );
 }
 
-inline double VerdictVector::length_squared( ) const
+inline double VerdictVector::length_squared() const
 {
     return ( xVal * xVal + yVal * yVal + zVal * zVal );
 }
 
-inline double VerdictVector::length( ) const
+inline double VerdictVector::length() const
 {
     return ( sqrt( xVal * xVal + yVal * yVal + zVal * zVal ) );
 }
 
-inline double VerdictVector::normalize( )
+inline double VerdictVector::normalize()
 {
-    double mag = length( );
+    double mag = length();
     if( mag != 0 )
     {
         xVal = xVal / mag;
@@ -491,7 +491,7 @@ inline double VerdictVector::normalize( )
 // Dot Product.
 inline double operator%( const VerdictVector& vector1, const VerdictVector& vector2 )
 {
-    return ( vector1.x( ) * vector2.x( ) + vector1.y( ) * vector2.y( ) + vector1.z( ) * vector2.z( ) );
+    return ( vector1.x() * vector2.x() + vector1.y() * vector2.y() + vector1.z() * vector2.z() );
 }
 
 #endif

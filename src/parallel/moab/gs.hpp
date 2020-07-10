@@ -19,15 +19,15 @@ class gs_data
     class nonlocal_info
     {
       public:
-        uint         _np; /* number of processors to communicate with          */
-        uint*        _target; /* int target[np]: array of processor ids to comm w/ */
-        uint*        _nshared; /* nshared[i] = number of points shared w/ target[i] */
-        uint*        _sh_ind; /* list of shared point indices                      */
-        slong*       _slabels; /* list of signed long labels (not including gid)    */
-        Ulong*       _ulabels; /* list of unsigned long labels                      */
+        uint _np;           /* number of processors to communicate with          */
+        uint* _target;      /* int target[np]: array of processor ids to comm w/ */
+        uint* _nshared;     /* nshared[i] = number of points shared w/ target[i] */
+        uint* _sh_ind;      /* list of shared point indices                      */
+        slong* _slabels;    /* list of signed long labels (not including gid)    */
+        Ulong* _ulabels;    /* list of unsigned long labels                      */
         MPI_Request* _reqs; /* pre-allocated for MPI calls                       */
-        realType*    _buf; /* pre-allocated buffer to receive data              */
-        uint         _maxv; /* maximum vector size                               */
+        realType* _buf;     /* pre-allocated buffer to receive data              */
+        uint _maxv;         /* maximum vector size                               */
 
         /**Constructor for nonlocal_info; takes all arguments and initializes
          * nonlocal_info
@@ -47,15 +47,15 @@ class gs_data
          */
         void initialize( uint np, uint count, uint nlabels, uint nulabels, uint maxv );
 
-        ~nonlocal_info( )
+        ~nonlocal_info()
         {
-            nlinfo_free( );
+            nlinfo_free();
         };
 
         void nonlocal( realType* u, int op, MPI_Comm comm );
         void nonlocal_vec( realType* u, uint n, int op, MPI_Comm comm );
         void nonlocal_many( realType** u, uint n, int op, MPI_Comm comm );
-        void nlinfo_free( );
+        void nlinfo_free();
     };
 
   public:
@@ -111,19 +111,19 @@ class gs_data
         // moab_crystal_data member variables & data
         typedef struct
         {
-            uint                    n;
+            uint n;
             moab::TupleList::buffer buf;
         } crystal_buf;
-        crystal_buf buffers[ 3 ];
+        crystal_buf buffers[3];
         // crystal_buf provides buffer space for communications
         crystal_buf *all, *keep, *send;
-        MPI_Comm     _comm;
-        uint         _num, _id;
+        MPI_Comm _comm;
+        uint _num, _id;
 
         /**Default constructor (Note:  moab_crystal_data must be initialized
          * before use!)
          */
-        crystal_data( );
+        crystal_data();
 
         /**Constructor takes an MPI_Comm and initializes the moab_data_crystal
          */
@@ -132,9 +132,9 @@ class gs_data
             initialize( cm );
         };
 
-        ~crystal_data( )
+        ~crystal_data()
         {
-            reset( );
+            reset();
         };
 
         /**Initializes crystal_data members according to MPI_Comm passed in
@@ -146,12 +146,12 @@ class gs_data
 
         /**Frees buffers used by moab_crystal_data
          */
-        void reset( );
+        void reset();
 
         /**Communicates messages with other processors; see class description for
          * more info and usage
          */
-        void crystal_router( );
+        void crystal_router();
 
         /**Treats one integer (not long) member of the TupleList as a target proc;
          * Sends out tuples accordingly, using the crystal router.
@@ -180,7 +180,7 @@ class gs_data
     sint* local_cm; /* local condense map */
 #ifdef MOAB_HAVE_MPI
     nonlocal_info* nlinfo;
-    MPI_Comm       _comm;
+    MPI_Comm _comm;
 #endif
 
     /**Constructor for moab_gs_data:  takes all arguments and initializes
@@ -205,11 +205,11 @@ class gs_data
     /**Default constructor (Note:  moab_gs_data must be initialized
      * before use!)
      */
-    gs_data( ){ };
+    gs_data(){};
 
-    ~gs_data( )
+    ~gs_data()
     {
-        reset( );
+        reset();
     }
 
     /**Sets up the moab_gs_data; see constructor for parameter documentation
@@ -217,7 +217,7 @@ class gs_data
     ErrorCode initialize( uint n, const long* label, const Ulong* ulabel, uint maxv, const unsigned int nlabels,
                           const unsigned int nulabels, crystal_data* crystal );
 
-    void reset( );
+    void reset();
 
     void gs_data_op( realType* u, int op );
     void gs_data_op_vec( realType* u, uint n, int op );

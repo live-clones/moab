@@ -45,10 +45,10 @@ class MeshRefiner
 {
   public:
     MeshRefiner( Interface* imesh, Interface* omesh );
-    virtual ~MeshRefiner( );
+    virtual ~MeshRefiner();
 
-    bool           set_entity_refiner( EntityRefiner* );
-    EntityRefiner* get_entity_refiner( )
+    bool set_entity_refiner( EntityRefiner* );
+    EntityRefiner* get_entity_refiner()
     {
         return this->entity_refiner;
     }
@@ -59,31 +59,31 @@ class MeshRefiner
         this->comm = c;
         return true;
     }
-    ParallelComm* get_comm( )
+    ParallelComm* get_comm()
     {
         return this->comm;
     }
 
-    RefinerTagManager* get_tag_manager( )
+    RefinerTagManager* get_tag_manager()
     {
         return this->tag_manager;
     }
-    const RefinerTagManager* get_tag_manager( ) const
+    const RefinerTagManager* get_tag_manager() const
     {
         return this->tag_manager;
     }
-    void reset_vertex_tags( );
-    int  add_vertex_tag( Tag tag_handle );
+    void reset_vertex_tags();
+    int add_vertex_tag( Tag tag_handle );
 
     virtual bool refine( Range& );
 
   protected:
-    Interface*         mesh_in;
-    Interface*         mesh_out;
-    EntityRefiner*     entity_refiner;
+    Interface* mesh_in;
+    Interface* mesh_out;
+    EntityRefiner* entity_refiner;
     RefinerTagManager* tag_manager;
     MeshOutputFunctor* output_functor;
-    ParallelComm*      comm;
+    ParallelComm* comm;
 };
 
 }  // namespace moab

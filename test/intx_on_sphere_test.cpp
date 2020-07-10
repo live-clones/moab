@@ -27,7 +27,7 @@ int main( int argc, char* argv[] )
 
     std::string firstModel, secondModel, outputFile;
 
-    firstModel = TestDir + "/mbcslam/lagrangeHomme.vtk";
+    firstModel  = TestDir + "/mbcslam/lagrangeHomme.vtk";
     secondModel = TestDir + "/mbcslam/eulerHomme.vtk";
 
     ProgOptions opts;
@@ -35,17 +35,17 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "second,m", "second mesh filename (target)", &secondModel );
     opts.addOpt< std::string >( "outputFile,o", "output intersection file", &outputFile );
 
-    double R = 1.;  // input
+    double R      = 1.;  // input
     double epsrel = 1.e-12;
     double boxeps = 1.e-4;
-    outputFile = "intx.h5m";
+    outputFile    = "intx.h5m";
     opts.addOpt< double >( "radius,R", "radius for model intx", &R );
     opts.addOpt< double >( "epsilon,e", "relative error in intx", &epsrel );
     opts.addOpt< double >( "boxerror,b", "relative error for box boundaries", &boxeps );
 
-    int output_fraction = 0;
+    int output_fraction  = 0;
     int write_files_rank = 0;
-    int brute_force = 0;
+    int brute_force      = 0;
 
     opts.addOpt< int >( "outputFraction,f", "output fraction of areas", &output_fraction );
     opts.addOpt< int >( "writeFiles,w", "write files of interest", &write_files_rank );
@@ -66,9 +66,9 @@ int main( int argc, char* argv[] )
                                              std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
 
     // read meshes in 2 file sets
-    ErrorCode    rval;
-    Core         moab;
-    Interface*   mb = &moab;  // global
+    ErrorCode rval;
+    Core moab;
+    Interface* mb = &moab;  // global
     EntityHandle sf1, sf2, outputSet;
 
     // create meshsets and load files
@@ -76,9 +76,9 @@ int main( int argc, char* argv[] )
     rval = mb->create_meshset( MESHSET_SET, sf1 );MB_CHK_ERR( rval );
     rval = mb->create_meshset( MESHSET_SET, sf2 );MB_CHK_ERR( rval );
     if( 0 == rank ) std::cout << "Loading mesh file " << firstModel << "\n";
-    rval = mb->load_file( firstModel.c_str( ), &sf1, optsRead.c_str( ) );MB_CHK_ERR( rval );
+    rval = mb->load_file( firstModel.c_str(), &sf1, optsRead.c_str() );MB_CHK_ERR( rval );
     if( 0 == rank ) std::cout << "Loading mesh file " << secondModel << "\n";
-    rval = mb->load_file( secondModel.c_str( ), &sf2, optsRead.c_str( ) );MB_CHK_ERR( rval );
+    rval = mb->load_file( secondModel.c_str(), &sf2, optsRead.c_str() );MB_CHK_ERR( rval );
 
     if( 0 == rank )
     {
@@ -107,7 +107,7 @@ int main( int argc, char* argv[] )
     ParallelComm* pcomm = ParallelComm::get_pcomm( mb, 0 );
 #endif
     Intx2MeshOnSphere worker( mb );
-    IntxAreaUtils     areaAdaptor;
+    IntxAreaUtils areaAdaptor;
 
     worker.set_error_tolerance( R * epsrel );
     worker.set_box_error( boxeps );
@@ -131,15 +131,15 @@ int main( int argc, char* argv[] )
         {
             std::stringstream outf;
             outf << "second_mesh" << rank << ".h5m";
-            rval = mb->write_file( outf.str( ).c_str( ), 0, 0, &sf2, 1 );MB_CHK_ERR( rval );
+            rval = mb->write_file( outf.str().c_str(), 0, 0, &sf2, 1 );MB_CHK_ERR( rval );
         }
     }
     if( size > 1 )
     {
-        double elapsed = MPI_Wtime( );
-        rval = mb->create_meshset( moab::MESHSET_SET, covering_set );MB_CHK_SET_ERR( rval, "Can't create new set" );
+        double elapsed = MPI_Wtime();
+        rval           = mb->create_meshset( moab::MESHSET_SET, covering_set );MB_CHK_SET_ERR( rval, "Can't create new set" );
         rval = worker.construct_covering_set( sf1, covering_set );MB_CHK_ERR( rval );  // lots of communication if mesh is distributed very differently
-        elapsed = MPI_Wtime( ) - elapsed;
+        elapsed = MPI_Wtime() - elapsed;
         if( 0 == rank ) std::cout << "\nTime to communicate the mesh = " << elapsed << std::endl;
         // area fraction of the covering set that needed to be communicated from other processors
         // number of elements in the covering set communicated, compared to total number of elements
@@ -186,7 +186,7 @@ int main( int argc, char* argv[] )
         {
             std::stringstream cof;
             cof << "covering_mesh" << rank << ".h5m";
-            rval = mb->write_file( cof.str( ).c_str( ), 0, 0, &covering_set, 1 );MB_CHK_ERR( rval );
+            rval = mb->write_file( cof.str().c_str(), 0, 0, &covering_set, 1 );MB_CHK_ERR( rval );
         }
     }
     else
@@ -195,7 +195,7 @@ int main( int argc, char* argv[] )
 
     if( 0 == rank ) std::cout << "Computing intersections ..\n";
 #ifdef MOAB_HAVE_MPI
-    double elapsed = MPI_Wtime( );
+    double elapsed = MPI_Wtime();
 #endif
     if( brute_force )
     {
@@ -206,7 +206,7 @@ int main( int argc, char* argv[] )
         rval = worker.intersect_meshes( covering_set, sf2, outputSet );MB_CHK_SET_ERR( rval, "failed to intersect meshes" );
     }
 #ifdef MOAB_HAVE_MPI
-    elapsed = MPI_Wtime( ) - elapsed;
+    elapsed = MPI_Wtime() - elapsed;
     if( 0 == rank ) std::cout << "\nTime to compute the intersection between meshes = " << elapsed << std::endl;
 #endif
     // the output set does not have the intx vertices on the boundary shared, so they will be
@@ -227,26 +227,26 @@ int main( int argc, char* argv[] )
     {
         std::stringstream outf;
         outf << "intersect" << rank << ".h5m";
-        rval = mb->write_file( outf.str( ).c_str( ), 0, 0, &outputSet, 1 );
+        rval = mb->write_file( outf.str().c_str(), 0, 0, &outputSet, 1 );
     }
-    double intx_area = areaAdaptor.area_on_sphere( mb, outputSet, R );
+    double intx_area    = areaAdaptor.area_on_sphere( mb, outputSet, R );
     double arrival_area = areaAdaptor.area_on_sphere( mb, sf2, R );
     std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
 
 #ifdef MOAB_HAVE_MPI
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-    rval = mb->write_file( outputFile.c_str( ), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
+    rval = mb->write_file( outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
 #else
     // write intx set on rank 0, in serial; we cannot write in parallel
     if( 0 == rank )
     {
-        rval = mb->write_file( outputFile.c_str( ), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
+        rval = mb->write_file( outputFile.c_str(), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
     }
 #endif
-    MPI_Finalize( );
+    MPI_Finalize();
 #else
-    rval = mb->write_file( outputFile.c_str( ), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
+    rval = mb->write_file( outputFile.c_str(), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
 #endif
     return 0;
 }

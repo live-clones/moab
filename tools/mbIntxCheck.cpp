@@ -46,10 +46,10 @@ int main( int argc, char* argv[] )
 
     std::string sourceFile, targetFile, intxFile;
     std::string source_verif( "outS.h5m" ), target_verif( "outt.h5m" );
-    int         sphere = 1;
-    int         oldNamesParents = 1;
-    double      areaErrSource = -1;
-    double      areaErrTarget = -1;
+    int sphere           = 1;
+    int oldNamesParents  = 1;
+    double areaErrSource = -1;
+    double areaErrTarget = -1;
     ProgOptions opts;
 
     opts.addOpt< std::string >( "source,s", "source file ", &sourceFile );
@@ -70,9 +70,9 @@ int main( int argc, char* argv[] )
                                               std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
 
     // read meshes in 3 file sets
-    ErrorCode    rval;
-    Core         moab;
-    Interface*   mb = &moab;  // global
+    ErrorCode rval;
+    Core moab;
+    Interface* mb = &moab;  // global
     EntityHandle sset, tset, ixset;
 
     // create meshsets and load files
@@ -80,12 +80,12 @@ int main( int argc, char* argv[] )
     rval = mb->create_meshset( MESHSET_SET, tset );MB_CHK_ERR( rval );
     rval = mb->create_meshset( MESHSET_SET, ixset );MB_CHK_ERR( rval );
     if( 0 == rank ) std::cout << "Loading source file " << sourceFile << "\n";
-    rval = mb->load_file( sourceFile.c_str( ), &sset, opts_read.c_str( ) );MB_CHK_SET_ERR( rval, "failed reading source file" );
+    rval = mb->load_file( sourceFile.c_str(), &sset, opts_read.c_str() );MB_CHK_SET_ERR( rval, "failed reading source file" );
     if( 0 == rank ) std::cout << "Loading target file " << targetFile << "\n";
-    rval = mb->load_file( targetFile.c_str( ), &tset, opts_read.c_str( ) );MB_CHK_SET_ERR( rval, "failed reading target file" );
+    rval = mb->load_file( targetFile.c_str(), &tset, opts_read.c_str() );MB_CHK_SET_ERR( rval, "failed reading target file" );
 
     if( 0 == rank ) std::cout << "Loading intersection file " << intxFile << "\n";
-    rval = mb->load_file( intxFile.c_str( ), &ixset, opts_read.c_str( ) );MB_CHK_SET_ERR( rval, "failed reading intersection file" );
+    rval = mb->load_file( intxFile.c_str(), &ixset, opts_read.c_str() );MB_CHK_SET_ERR( rval, "failed reading intersection file" );
     double R = 1.;
     if( sphere )
     {
@@ -133,63 +133,63 @@ int main( int argc, char* argv[] )
     std::map< int, EntityHandle > sourceMap;
     std::map< int, EntityHandle > targetMap;
 
-    Tag gidTag = mb->globalId_tag( );
+    Tag gidTag = mb->globalId_tag();
 
     Tag areaTag;
     rval = mb->tag_get_handle( "OrigArea", 1, MB_TYPE_DOUBLE, areaTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
     moab::IntxAreaUtils areaAdaptor( areaMethod );
-    Range               non_convex_intx_cells;
-    for( Range::iterator eit = sourceCells.begin( ); eit != sourceCells.end( ); ++eit )
+    Range non_convex_intx_cells;
+    for( Range::iterator eit = sourceCells.begin(); eit != sourceCells.end(); ++eit )
     {
-        EntityHandle        cell = *eit;
+        EntityHandle cell = *eit;
         const EntityHandle* verts;
-        int                 num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( cell, verts, num_nodes );MB_CHK_ERR( rval );
         if( MB_SUCCESS != rval ) return -1;
         std::vector< double > coords( 3 * num_nodes );
         // get coordinates
-        rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );
+        rval = mb->get_coords( verts, num_nodes, &coords[0] );
         if( MB_SUCCESS != rval ) return -1;
-        double area = areaAdaptor.area_spherical_polygon( &coords[ 0 ], num_nodes, R );
-        int    sourceID;
+        double area = areaAdaptor.area_spherical_polygon( &coords[0], num_nodes, R );
+        int sourceID;
         rval = mb->tag_get_data( gidTag, &cell, 1, &sourceID );MB_CHK_ERR( rval );
-        sourceAreas[ sourceID ] = area;
-        rval = mb->tag_set_data( areaTag, &cell, 1, &area );MB_CHK_ERR( rval );
-        sourceMap[ sourceID ] = cell;
+        sourceAreas[sourceID] = area;
+        rval                  = mb->tag_set_data( areaTag, &cell, 1, &area );MB_CHK_ERR( rval );
+        sourceMap[sourceID] = cell;
     }
-    for( Range::iterator eit = targetCells.begin( ); eit != targetCells.end( ); ++eit )
+    for( Range::iterator eit = targetCells.begin(); eit != targetCells.end(); ++eit )
     {
-        EntityHandle        cell = *eit;
+        EntityHandle cell = *eit;
         const EntityHandle* verts;
-        int                 num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( cell, verts, num_nodes );MB_CHK_ERR( rval );
         if( MB_SUCCESS != rval ) return -1;
         std::vector< double > coords( 3 * num_nodes );
         // get coordinates
-        rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );
+        rval = mb->get_coords( verts, num_nodes, &coords[0] );
         if( MB_SUCCESS != rval ) return -1;
-        double area = areaAdaptor.area_spherical_polygon( &coords[ 0 ], num_nodes, R );
-        int    targetID;
+        double area = areaAdaptor.area_spherical_polygon( &coords[0], num_nodes, R );
+        int targetID;
         rval = mb->tag_get_data( gidTag, &cell, 1, &targetID );MB_CHK_ERR( rval );
-        targetAreas[ targetID ] = area;
-        rval = mb->tag_set_data( areaTag, &cell, 1, &area );MB_CHK_ERR( rval );
-        targetMap[ targetID ] = cell;
+        targetAreas[targetID] = area;
+        rval                  = mb->tag_set_data( areaTag, &cell, 1, &area );MB_CHK_ERR( rval );
+        targetMap[targetID] = cell;
     }
 
-    for( Range::iterator eit = intxCells.begin( ); eit != intxCells.end( ); ++eit )
+    for( Range::iterator eit = intxCells.begin(); eit != intxCells.end(); ++eit )
     {
-        EntityHandle        cell = *eit;
+        EntityHandle cell = *eit;
         const EntityHandle* verts;
-        int                 num_nodes;
+        int num_nodes;
         rval = mb->get_connectivity( cell, verts, num_nodes );MB_CHK_ERR( rval );
         if( MB_SUCCESS != rval ) return -1;
         std::vector< double > coords( 3 * num_nodes );
         // get coordinates
-        rval = mb->get_coords( verts, num_nodes, &coords[ 0 ] );
+        rval = mb->get_coords( verts, num_nodes, &coords[0] );
         if( MB_SUCCESS != rval ) return -1;
-        int    check_sign = 1;
-        double intx_area = areaAdaptor.area_spherical_polygon( &coords[ 0 ], num_nodes, R, &check_sign );
+        int check_sign   = 1;
+        double intx_area = areaAdaptor.area_spherical_polygon( &coords[0], num_nodes, R, &check_sign );
 
         rval = mb->tag_set_data( areaTag, &cell, 1, &intx_area );
         ;MB_CHK_ERR( rval );
@@ -198,27 +198,27 @@ int main( int argc, char* argv[] )
         rval = mb->tag_get_data( targetParentTag, &cell, 1, &targetID );MB_CHK_ERR( rval );
 
         std::map< int, double >::iterator sit = sourceAreasIntx.find( sourceID );
-        if( sit == sourceAreasIntx.end( ) )
+        if( sit == sourceAreasIntx.end() )
         {
-            sourceAreasIntx[ sourceID ] = intx_area;
-            sourceNbIntx[ sourceID ] = 1;
+            sourceAreasIntx[sourceID] = intx_area;
+            sourceNbIntx[sourceID]    = 1;
         }
         else
         {
-            sourceAreasIntx[ sourceID ] += intx_area;
-            sourceNbIntx[ sourceID ]++;
+            sourceAreasIntx[sourceID] += intx_area;
+            sourceNbIntx[sourceID]++;
         }
 
         std::map< int, double >::iterator tit = targetAreasIntx.find( targetID );
-        if( tit == targetAreasIntx.end( ) )
+        if( tit == targetAreasIntx.end() )
         {
-            targetAreasIntx[ targetID ] = intx_area;
-            targetNbIntx[ targetID ] = 1;
+            targetAreasIntx[targetID] = intx_area;
+            targetNbIntx[targetID]    = 1;
         }
         else
         {
-            targetAreasIntx[ targetID ] += intx_area;
-            targetNbIntx[ targetID ]++;
+            targetAreasIntx[targetID] += intx_area;
+            targetNbIntx[targetID]++;
         }
         if( intx_area < 0 )
         {
@@ -238,19 +238,19 @@ int main( int argc, char* argv[] )
     Tag countIntxCellsTag;
     rval = mb->tag_get_handle( "CountIntx", 1, MB_TYPE_INTEGER, countIntxCellsTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
 
-    for( Range::iterator eit = sourceCells.begin( ); eit != sourceCells.end( ); ++eit )
+    for( Range::iterator eit = sourceCells.begin(); eit != sourceCells.end(); ++eit )
     {
         EntityHandle cell = *eit;
 
         int sourceID;
         rval = mb->tag_get_data( gidTag, &cell, 1, &sourceID );MB_CHK_ERR( rval );
-        double                            areaDiff = sourceAreas[ sourceID ];
+        double areaDiff                       = sourceAreas[sourceID];
         std::map< int, double >::iterator sit = sourceAreasIntx.find( sourceID );
-        int                               countIntxCells = 0;
-        if( sit != sourceAreasIntx.end( ) )
+        int countIntxCells                    = 0;
+        if( sit != sourceAreasIntx.end() )
         {
-            areaDiff -= sourceAreasIntx[ sourceID ];
-            countIntxCells = sourceNbIntx[ sourceID ];
+            areaDiff -= sourceAreasIntx[sourceID];
+            countIntxCells = sourceNbIntx[sourceID];
         }
         rval = mb->tag_set_data( diffTag, &cell, 1, &areaDiff );
         rval = mb->tag_set_data( countIntxCellsTag, &cell, 1, &countIntxCells );
@@ -261,52 +261,52 @@ int main( int argc, char* argv[] )
         }
     }
     if( 0 == rank ) std::cout << "write source verification file " << source_verif << "\n";
-    rval = mb->write_file( source_verif.c_str( ), 0, 0, &sset, 1 );MB_CHK_ERR( rval );
+    rval = mb->write_file( source_verif.c_str(), 0, 0, &sset, 1 );MB_CHK_ERR( rval );
     if( areaErrSource > 0 )
     {
         Range sourceErrorCells;
         rval = mb->get_entities_by_handle( errorSourceSet, sourceErrorCells );MB_CHK_ERR( rval );
         EntityHandle errorSourceIntxSet;
         rval = mb->create_meshset( MESHSET_SET, errorSourceIntxSet );MB_CHK_ERR( rval );
-        if( !sourceErrorCells.empty( ) )
+        if( !sourceErrorCells.empty() )
         {
             // add the intx cells that have these as source parent
             std::vector< int > sourceIDs;
-            sourceIDs.resize( sourceErrorCells.size( ) );
-            rval = mb->tag_get_data( gidTag, sourceErrorCells, &sourceIDs[ 0 ] );MB_CHK_SET_ERR( rval, "can't get source IDs" );
-            std::sort( sourceIDs.begin( ), sourceIDs.end( ) );
-            for( Range::iterator eit = intxCells.begin( ); eit != intxCells.end( ); ++eit )
+            sourceIDs.resize( sourceErrorCells.size() );
+            rval = mb->tag_get_data( gidTag, sourceErrorCells, &sourceIDs[0] );MB_CHK_SET_ERR( rval, "can't get source IDs" );
+            std::sort( sourceIDs.begin(), sourceIDs.end() );
+            for( Range::iterator eit = intxCells.begin(); eit != intxCells.end(); ++eit )
             {
                 EntityHandle cell = *eit;
-                int          sourceID;
+                int sourceID;
                 rval = mb->tag_get_data( sourceParentTag, &cell, 1, &sourceID );MB_CHK_ERR( rval );
-                std::vector< int >::iterator j = std::lower_bound( sourceIDs.begin( ), sourceIDs.end( ), sourceID );
-                if( ( j != sourceIDs.end( ) ) && ( *j == sourceID ) )
+                std::vector< int >::iterator j = std::lower_bound( sourceIDs.begin(), sourceIDs.end(), sourceID );
+                if( ( j != sourceIDs.end() ) && ( *j == sourceID ) )
                 {
                     rval = mb->add_entities( errorSourceIntxSet, &cell, 1 );
                     ;MB_CHK_ERR( rval );
                 }
             }
-            std::string filtersource = std::string( "filt_" ) + source_verif;
-            rval = mb->write_file( filtersource.c_str( ), 0, 0, &errorSourceSet, 1 );
+            std::string filtersource     = std::string( "filt_" ) + source_verif;
+            rval                         = mb->write_file( filtersource.c_str(), 0, 0, &errorSourceSet, 1 );
             std::string filterIntxsource = std::string( "filtIntx_" ) + source_verif;
-            rval = mb->write_file( filterIntxsource.c_str( ), 0, 0, &errorSourceIntxSet, 1 );
+            rval                         = mb->write_file( filterIntxsource.c_str(), 0, 0, &errorSourceIntxSet, 1 );
         }
     }
 
-    for( Range::iterator eit = targetCells.begin( ); eit != targetCells.end( ); ++eit )
+    for( Range::iterator eit = targetCells.begin(); eit != targetCells.end(); ++eit )
     {
         EntityHandle cell = *eit;
 
         int targetID;
         rval = mb->tag_get_data( gidTag, &cell, 1, &targetID );MB_CHK_ERR( rval );
-        double                            areaDiff = targetAreas[ targetID ];
-        int                               countIntxCells = 0;
+        double areaDiff                       = targetAreas[targetID];
+        int countIntxCells                    = 0;
         std::map< int, double >::iterator sit = targetAreasIntx.find( targetID );
-        if( sit != targetAreasIntx.end( ) )
+        if( sit != targetAreasIntx.end() )
         {
-            areaDiff -= targetAreasIntx[ targetID ];
-            countIntxCells = targetNbIntx[ targetID ];
+            areaDiff -= targetAreasIntx[targetID];
+            countIntxCells = targetNbIntx[targetID];
         }
 
         rval = mb->tag_set_data( diffTag, &cell, 1, &areaDiff );
@@ -318,52 +318,52 @@ int main( int argc, char* argv[] )
         }
     }
     if( 0 == rank ) std::cout << "write target verification file " << target_verif << "\n";
-    rval = mb->write_file( target_verif.c_str( ), 0, 0, &tset, 1 );MB_CHK_ERR( rval );
+    rval = mb->write_file( target_verif.c_str(), 0, 0, &tset, 1 );MB_CHK_ERR( rval );
     if( areaErrTarget > 0 )
     {
         Range targetErrorCells;
         rval = mb->get_entities_by_handle( errorTargetSet, targetErrorCells );MB_CHK_ERR( rval );
-        if( !targetErrorCells.empty( ) )
+        if( !targetErrorCells.empty() )
         {
             EntityHandle errorTargetIntxSet;
             rval = mb->create_meshset( MESHSET_SET, errorTargetIntxSet );MB_CHK_ERR( rval );
             // add the intx cells that have these as target parent
             std::vector< int > targetIDs;
-            targetIDs.resize( targetErrorCells.size( ) );
-            rval = mb->tag_get_data( gidTag, targetErrorCells, &targetIDs[ 0 ] );MB_CHK_SET_ERR( rval, "can't get target IDs" );
-            std::sort( targetIDs.begin( ), targetIDs.end( ) );
-            for( Range::iterator eit = intxCells.begin( ); eit != intxCells.end( ); ++eit )
+            targetIDs.resize( targetErrorCells.size() );
+            rval = mb->tag_get_data( gidTag, targetErrorCells, &targetIDs[0] );MB_CHK_SET_ERR( rval, "can't get target IDs" );
+            std::sort( targetIDs.begin(), targetIDs.end() );
+            for( Range::iterator eit = intxCells.begin(); eit != intxCells.end(); ++eit )
             {
                 EntityHandle cell = *eit;
-                int          targetID;
+                int targetID;
                 rval = mb->tag_get_data( targetParentTag, &cell, 1, &targetID );MB_CHK_ERR( rval );
-                std::vector< int >::iterator j = std::lower_bound( targetIDs.begin( ), targetIDs.end( ), targetID );
-                if( ( j != targetIDs.end( ) ) && ( *j == targetID ) )
+                std::vector< int >::iterator j = std::lower_bound( targetIDs.begin(), targetIDs.end(), targetID );
+                if( ( j != targetIDs.end() ) && ( *j == targetID ) )
                 {
                     rval = mb->add_entities( errorTargetIntxSet, &cell, 1 );
                     ;MB_CHK_ERR( rval );
                 }
             }
-            std::string filterTarget = std::string( "filt_" ) + target_verif;
-            rval = mb->write_file( filterTarget.c_str( ), 0, 0, &errorTargetSet, 1 );
+            std::string filterTarget     = std::string( "filt_" ) + target_verif;
+            rval                         = mb->write_file( filterTarget.c_str(), 0, 0, &errorTargetSet, 1 );
             std::string filterIntxtarget = std::string( "filtIntx_" ) + target_verif;
-            rval = mb->write_file( filterIntxtarget.c_str( ), 0, 0, &errorTargetIntxSet, 1 );
+            rval                         = mb->write_file( filterIntxtarget.c_str(), 0, 0, &errorTargetIntxSet, 1 );
         }
     }
 
-    if( !non_convex_intx_cells.empty( ) )
+    if( !non_convex_intx_cells.empty() )
     {
 
         Range sourceCells;
         Range targetCells;
-        for( Range::iterator it = non_convex_intx_cells.begin( ); it != non_convex_intx_cells.end( ); it++ )
+        for( Range::iterator it = non_convex_intx_cells.begin(); it != non_convex_intx_cells.end(); it++ )
         {
             EntityHandle cellIntx = *it;
-            int          sourceID, targetID;
+            int sourceID, targetID;
             rval = mb->tag_get_data( sourceParentTag, &cellIntx, 1, &sourceID );MB_CHK_ERR( rval );
             rval = mb->tag_get_data( targetParentTag, &cellIntx, 1, &targetID );MB_CHK_ERR( rval );
-            sourceCells.insert( sourceMap[ sourceID ] );
-            targetCells.insert( targetMap[ targetID ] );
+            sourceCells.insert( sourceMap[sourceID] );
+            targetCells.insert( targetMap[targetID] );
         }
         EntityHandle nonConvexSet;
         rval = mb->create_meshset( MESHSET_SET, nonConvexSet );MB_CHK_ERR( rval );

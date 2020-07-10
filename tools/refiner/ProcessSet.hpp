@@ -40,14 +40,14 @@ class ProcessSet
         SHARED_PROC_BYTES = ( MAX_SHARING_PROCS / 8 + ( MAX_SHARING_PROCS % 8 ? 1 : 0 ) )
     };
 
-    ProcessSet( );
+    ProcessSet();
     ProcessSet( const unsigned char* psetbits );
-    ~ProcessSet( );
+    ~ProcessSet();
 
     void unite( const ProcessSet& other );
     void intersect( const ProcessSet& other );
 
-    void clear( );
+    void clear();
 
     void set_process_member( int i );
     void set_process_members( const std::vector< int >& procs );
@@ -55,14 +55,14 @@ class ProcessSet
     bool get_process_members( int rank, std::vector< int >& procs );
     bool is_process_member( int i ) const;
 
-    const unsigned char* data( ) const;
+    const unsigned char* data() const;
 
     bool operator<( const ProcessSet& other ) const;
 
     friend std::ostream& operator<<( std::ostream& os, const ProcessSet& pset );
 
   protected:
-    unsigned char processes[ SHARED_PROC_BYTES ];
+    unsigned char processes[SHARED_PROC_BYTES];
 };
 
 }  // namespace moab

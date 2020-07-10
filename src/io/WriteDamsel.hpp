@@ -48,7 +48,7 @@ class WriteDamsel : public WriterIface
     WriteDamsel( Interface* impl );
 
     //! Destructor
-    virtual ~WriteDamsel( );
+    virtual ~WriteDamsel();
 
     //! Primary interface function
     //! \param file_name Filename being written
@@ -73,7 +73,7 @@ class WriteDamsel : public WriterIface
   private:
     //! Initialize global information about dense/sparse/conventional tags, once for entire
     //! write_file call
-    ErrorCode init_tag_info( );
+    ErrorCode init_tag_info();
 
     //! Write a subrange of entities/sets; just a wrapper to write_[vertices, entities, sets]
     ErrorCode write_subrange( RangeSeqIntersectIter& rsi );
@@ -94,7 +94,7 @@ class WriteDamsel : public WriterIface
     ErrorCode map_dense_tags( RangeSeqIntersectIter& rsi, damsel_container& ent_cont );
 
     //! Map sparse tags for all entities
-    ErrorCode map_sparse_tags( );
+    ErrorCode map_sparse_tags();
 
     //! Interface instance
     Interface* mbImpl;
@@ -116,9 +116,9 @@ inline ErrorCode WriteDamsel::write_subrange( RangeSeqIntersectIter& rsi )
 {
     ErrorCode rval = MB_SUCCESS;
 
-    if( MBVERTEX == mbImpl->type_from_handle( rsi.get_start_handle( ) ) )
+    if( MBVERTEX == mbImpl->type_from_handle( rsi.get_start_handle() ) )
         rval = write_vertices( rsi );
-    else if( MBENTITYSET > mbImpl->type_from_handle( rsi.get_start_handle( ) ) )
+    else if( MBENTITYSET > mbImpl->type_from_handle( rsi.get_start_handle() ) )
         rval = write_entities( rsi );
     // else
     //  rval = write_sets(rsi);

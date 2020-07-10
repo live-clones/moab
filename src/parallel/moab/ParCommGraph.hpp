@@ -61,7 +61,7 @@ class ParCommGraph
         COVERAGE,
         DOF_BASED
     };
-    virtual ~ParCommGraph( );
+    virtual ~ParCommGraph();
 
     /**
      * \brief collective constructor, will be called on all sender tasks and receiver tasks
@@ -130,36 +130,36 @@ class ParCommGraph
     ErrorCode pack_receivers_graph( std::vector< int >& packed_recv_array );
 
     // get methods for private data
-    bool is_root_sender( )
+    bool is_root_sender()
     {
         return rootSender;
     }
 
-    bool is_root_receiver( )
+    bool is_root_receiver()
     {
         return rootReceiver;
     }
 
     int sender( int index )
     {
-        return senderTasks[ index ];
+        return senderTasks[index];
     }
 
     int receiver( int index )
     {
-        return receiverTasks[ index ];
+        return receiverTasks[index];
     }
 
-    int get_component_id1( )
+    int get_component_id1()
     {
         return compid1;
     }
-    int get_component_id2( )
+    int get_component_id2()
     {
         return compid2;
     }
 
-    int get_context_id( )
+    int get_context_id()
     {
         return context_id;
     }
@@ -168,7 +168,7 @@ class ParCommGraph
         context_id = other_id;
     }
 
-    EntityHandle get_cover_set( )
+    EntityHandle get_cover_set()
     {
         return cover_set;
     }
@@ -194,18 +194,18 @@ class ParCommGraph
     ErrorCode receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityHandle local_set,
                             std::vector< int >& senders_local );
 
-    ErrorCode release_send_buffers( );
+    ErrorCode release_send_buffers();
 
     ErrorCode send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned, std::vector< Tag >& tag_handles );
 
     ErrorCode receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned, std::vector< Tag >& tag_handles );
 
     // getter method
-    const std::vector< int >& senders( )
+    const std::vector< int >& senders()
     {
         return senderTasks;
     }  // reference copy; refers to sender tasks in joint comm
-    const std::vector< int >& receivers( )
+    const std::vector< int >& receivers()
     {
         return receiverTasks;
     }
@@ -238,16 +238,16 @@ class ParCommGraph
   */
     void find_group_ranks( MPI_Group group, MPI_Comm join, std::vector< int >& ranks );
 
-    MPI_Comm           comm;
-    std::vector< int > senderTasks;  // these are the sender tasks in joint comm
+    MPI_Comm comm;
+    std::vector< int > senderTasks;    // these are the sender tasks in joint comm
     std::vector< int > receiverTasks;  // these are all the receiver tasks in joint comm
-    bool               rootSender;
-    bool               rootReceiver;
-    int                rankInGroup1, rankInGroup2;  // group 1 is sender, 2 is receiver
-    int                rankInJoin, joinSize;
-    int                compid1, compid2;
-    int                context_id;  // used to identify the other comp for intersection
-    EntityHandle       cover_set;  // will be initialized only if it is the receiver parcomm graph, in
+    bool rootSender;
+    bool rootReceiver;
+    int rankInGroup1, rankInGroup2;  // group 1 is sender, 2 is receiver
+    int rankInJoin, joinSize;
+    int compid1, compid2;
+    int context_id;          // used to identify the other comp for intersection
+    EntityHandle cover_set;  // will be initialized only if it is the receiver parcomm graph, in
                              // CoverageGraph
 
     // communication graph from group1 to group2;
@@ -287,7 +287,7 @@ class ParCommGraph
     std::map< int, std::vector< int > > involved_IDs_map;  // replace send and recv IDs_mapp with involved_IDs_map
     // used only for third method: DOF_BASED
     std::map< int, std::vector< int > >
-                                        map_index;  // from index in involved[] to index in values[] of tag, for each corr task
+        map_index;  // from index in involved[] to index in values[] of tag, for each corr task
     std::map< int, std::vector< int > > map_ptr;  //  lmap[ie], lmap[ie+1], pointer into map_index[corrTask]
 };
 

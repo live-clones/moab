@@ -56,9 +56,9 @@ namespace MBMesquite
 class MESQUITE_EXPORT LinearQuadrilateral : public MappingFunction2D
 {
   public:
-    virtual EntityTopology element_topology( ) const;
+    virtual EntityTopology element_topology() const;
 
-    virtual int num_nodes( ) const;
+    virtual int num_nodes() const;
 
     virtual void coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
                                size_t& num_coeff_out, MsqError& err ) const;

@@ -34,6 +34,6 @@
 namespace MBMesquite
 {
 
-IQInterface::~IQInterface( ) {}
+IQInterface::~IQInterface() {}
 
 }  // namespace MBMesquite

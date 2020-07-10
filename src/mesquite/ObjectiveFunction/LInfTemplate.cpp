@@ -44,14 +44,14 @@ namespace MBMesquite
 LInfTemplate::LInfTemplate( QualityMetric* qualitymetric ) : ObjectiveFunctionTemplate( qualitymetric ) {}
 
 // Michael:  need to clean up here
-LInfTemplate::~LInfTemplate( ) {}
+LInfTemplate::~LInfTemplate() {}
 
-ObjectiveFunction* LInfTemplate::clone( ) const
+ObjectiveFunction* LInfTemplate::clone() const
 {
-    return new LInfTemplate( get_quality_metric( ) );
+    return new LInfTemplate( get_quality_metric() );
 }
 
-void LInfTemplate::clear( ) {}
+void LInfTemplate::clear() {}
 
 bool LInfTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
@@ -62,16 +62,16 @@ bool LInfTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, bo
         return false;
     }
 
-    QualityMetric* qm = get_quality_metric( );
+    QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, free, err );
     MSQ_ERRFALSE( err );
-    const double negate = qm->get_negate_flag( );
+    const double negate = qm->get_negate_flag();
 
     // calculate OF value for just the patch
     std::vector< size_t >::const_iterator i;
-    double                                value;
+    double value;
     value_out = -HUGE_VAL;
-    for( i = qmHandles.begin( ); i != qmHandles.end( ); ++i )
+    for( i = qmHandles.begin(); i != qmHandles.end(); ++i )
     {
         bool result = qm->evaluate( pd, *i, value, err );
         if( MSQ_CHKERR( err ) || !result ) return false;

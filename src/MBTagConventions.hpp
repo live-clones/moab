@@ -143,7 +143,7 @@
  * this tag.  The value of the tag is an integer "part identifier".
  */
 #define PARALLEL_PARTITION_TAG_NAME "PARALLEL_PARTITION"
-#define PARALLEL_PART_TAG_NAME PARALLEL_PARTITION_TAG_NAME
+#define PARALLEL_PART_TAG_NAME      PARALLEL_PARTITION_TAG_NAME
 
 /** \brief Tag that groups the set of parts/partitions that are
  *         a covering of the mesh.
@@ -202,15 +202,15 @@
  */
 #define PARALLEL_STATUS_TAG_NAME "__PARALLEL_STATUS"
 
-#define PSTATUS_NOT_OWNED 0x1
-#define PSTATUS_SHARED 0x2
+#define PSTATUS_NOT_OWNED   0x1
+#define PSTATUS_SHARED      0x2
 #define PSTATUS_MULTISHARED 0x4
-#define PSTATUS_INTERFACE 0x8
+#define PSTATUS_INTERFACE   0x8
 // note, these numbers are in hex, so 0x10 is the 4th bit, or 2^4.
 #define PSTATUS_GHOST 0x10
 
 #define PSTATUS_AND 0x1
-#define PSTATUS_OR 0x2
+#define PSTATUS_OR  0x2
 #define PSTATUS_NOT 0x3
 #endif
 

@@ -58,9 +58,9 @@ using namespace MBMesquite;
 int main( int argc, char* argv[] )
 {
     MBMesquite::MsqPrintError err( cout );
-    char                      in_file_name[ 256 ];
-    char                      out_file_name[ 256 ];
-    double                    OF_value = 1.;
+    char in_file_name[256];
+    char out_file_name[256];
+    double OF_value = 1.;
 
     // command line arguments
     if( argc != 3 )
@@ -73,8 +73,8 @@ int main( int argc, char* argv[] )
     else
     {
         cout << " given 2 command line arguments.\n";
-        strcpy( in_file_name, argv[ 1 ] );
-        strcpy( out_file_name, argv[ 2 ] );
+        strcpy( in_file_name, argv[1] );
+        strcpy( out_file_name, argv[2] );
     }
 
     MBMesquite::MeshImpl* mesh = new MBMesquite::MeshImpl;

@@ -5,8 +5,8 @@
 #include "moab/Core.hpp"
 #include <algorithm>
 
-void test_tag_iterate( );
-void test_step_iter( );
+void test_tag_iterate();
+void test_step_iter();
 
 int main( int argc, char* argv[] )
 {
@@ -16,10 +16,10 @@ int main( int argc, char* argv[] )
     return RUN_TESTS( argc, argv );
 }
 
-void test_tag_iterate( )
+void test_tag_iterate()
 {
     iMesh_Instance mesh;
-    int            err;
+    int err;
     iMesh_newMesh( "", &mesh, &err, 0 );
     CHECK_EQUAL( iBase_SUCCESS, err );
 
@@ -28,8 +28,8 @@ void test_tag_iterate( )
     CHECK_EQUAL( iBase_SUCCESS, err );
 
     iBase_EntityHandle* verts = 0;
-    int                 verts_alloc = 0, verts_size = 0;
-    double              coords[] = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
+    int verts_alloc = 0, verts_size = 0;
+    double coords[] = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
     iMesh_createVtxArr( mesh, 6, iBase_INTERLEAVED, coords, 18, &verts, &verts_alloc, &verts_size, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
 
@@ -38,7 +38,7 @@ void test_tag_iterate( )
     CHECK_EQUAL( iBase_SUCCESS, err );
     iMesh_addEntArrToSet( mesh, verts, 2, entset, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
-    iMesh_addEntArrToSet( mesh, &verts[ 3 ], 3, entset, &err );
+    iMesh_addEntArrToSet( mesh, &verts[3], 3, entset, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
 
     /* create a dbl tag and set vertices */
@@ -50,8 +50,8 @@ void test_tag_iterate( )
 
     /* get an iterator over the root set, and check tag iterator for that */
     iBase_EntityArrIterator iter;
-    int                     count, atend;
-    double*                 data;
+    int count, atend;
+    double* data;
     iMesh_initEntArrIter( mesh, root_set, iBase_ALL_TYPES, iMesh_ALL_TOPOLOGIES, 6, 0, &iter, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     iMesh_tagIterate( mesh, tagh, iter, &data, &count, &err );
@@ -60,7 +60,7 @@ void test_tag_iterate( )
 
     for( int i = 0; i < 6; i++ )
     {
-        if( data[ i ] != coords[ i + 3 ] ) CHECK_EQUAL( iBase_SUCCESS, iBase_FAILURE );
+        if( data[i] != coords[i + 3] ) CHECK_EQUAL( iBase_SUCCESS, iBase_FAILURE );
     }
     iMesh_endEntArrIter( mesh, iter, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
@@ -71,8 +71,7 @@ void test_tag_iterate( )
     CHECK_EQUAL( iBase_SUCCESS, err );
     iMesh_tagIterate( mesh, tagh, iter, &data, &count, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
-    if( count != 2 || data[ 0 ] != coords[ 3 ] || data[ 1 ] != coords[ 4 ] )
-        CHECK_EQUAL( iBase_SUCCESS, iBase_FAILURE );
+    if( count != 2 || data[0] != coords[3] || data[1] != coords[4] ) CHECK_EQUAL( iBase_SUCCESS, iBase_FAILURE );
     iMesh_stepEntArrIter( mesh, iter, 2, &atend, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     /* shouldn't be at end yet */
@@ -80,8 +79,7 @@ void test_tag_iterate( )
 
     iMesh_tagIterate( mesh, tagh, iter, &data, &count, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
-    if( count != 3 || data[ 0 ] != coords[ 6 ] || data[ 1 ] != coords[ 7 ] )
-        CHECK_EQUAL( iBase_SUCCESS, iBase_FAILURE );
+    if( count != 3 || data[0] != coords[6] || data[1] != coords[7] ) CHECK_EQUAL( iBase_SUCCESS, iBase_FAILURE );
     iMesh_stepEntArrIter( mesh, iter, 3, &atend, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     /* should be at end now */
@@ -95,10 +93,10 @@ void test_tag_iterate( )
     free( verts );
 }
 
-void test_step_iter( )
+void test_step_iter()
 {
     iMesh_Instance mesh;
-    int            err;
+    int err;
     iMesh_newMesh( "", &mesh, &err, 0 );
     CHECK_EQUAL( iBase_SUCCESS, err );
 
@@ -107,14 +105,14 @@ void test_step_iter( )
     CHECK_EQUAL( iBase_SUCCESS, err );
 
     iBase_EntityHandle* verts = 0;
-    int                 verts_alloc = 0, verts_size = 0;
-    double              coords[] = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
+    int verts_alloc = 0, verts_size = 0;
+    double coords[] = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
     iMesh_createVtxArr( mesh, 6, iBase_INTERLEAVED, coords, 18, &verts, &verts_alloc, &verts_size, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
 
     /* make a non-array iterator and test stepping over it */
     iBase_EntityIterator iter;
-    int                  atend;
+    int atend;
     iMesh_initEntIter( mesh, root_set, iBase_ALL_TYPES, iMesh_ALL_TOPOLOGIES, 0, &iter, &err );
     CHECK_EQUAL( iBase_SUCCESS, err );
     iMesh_stepEntIter( mesh, iter, 2, &atend, &err );

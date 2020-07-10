@@ -55,7 +55,7 @@ class WriteSLAC : public WriterIface
     WriteSLAC( Interface* impl );
 
     //! Destructor
-    virtual ~WriteSLAC( );
+    virtual ~WriteSLAC();
 
     static WriterIface* factory( Interface* );
 
@@ -69,34 +69,34 @@ class WriteSLAC : public WriterIface
     //! initialize_file to initialize the file header for increased speed
     struct MaterialSetData
     {
-        int              id;
-        int              number_elements;
-        int              number_nodes_per_element;
-        int              number_attributes;
+        int id;
+        int number_elements;
+        int number_nodes_per_element;
+        int number_attributes;
         ExoIIElementType element_type;
-        EntityType       moab_type;
-        Range*           elements;
+        EntityType moab_type;
+        Range* elements;
     };
 
     //! struct used to hold data for each nodeset to be output; used by
     //! initialize_file to initialize the file header for increased speed
     struct DirichletSetData
     {
-        int                         id;
-        int                         number_nodes;
+        int id;
+        int number_nodes;
         std::vector< EntityHandle > nodes;
-        std::vector< double >       node_dist_factors;
+        std::vector< double > node_dist_factors;
     };
 
     //! struct used to hold data for each sideset to be output; used by
     //! initialize_file to initialize the file header for increased speed
     struct NeumannSetData
     {
-        int                         id;
-        int                         number_elements;
+        int id;
+        int number_elements;
         std::vector< EntityHandle > elements;
-        std::vector< int >          side_numbers;
-        EntityHandle                mesh_set_handle;
+        std::vector< int > side_numbers;
+        EntityHandle mesh_set_handle;
     };
 
   protected:
@@ -116,10 +116,10 @@ class WriteSLAC : public WriterIface
         unsigned int num_matsets;
         unsigned int num_int_hexes;
         unsigned int num_int_tets;
-        Range        bdy_hexes, bdy_tets;
-        Range        nodes;
+        Range bdy_hexes, bdy_tets;
+        Range nodes;
 
-        MeshInfo( )
+        MeshInfo()
             : num_dim( 0 ), num_nodes( 0 ), num_elements( 0 ), num_matsets( 0 ), num_int_hexes( 0 ), num_int_tets( 0 )
         {
         }
@@ -127,12 +127,12 @@ class WriteSLAC : public WriterIface
 
   private:
     //! interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 
     //! file name
     std::string fileName;
-    int         ncFile;
+    int ncFile;
 
     //! Cached tags for reading.  Note that all these tags are defined when the
     //! core is initialized.
@@ -145,7 +145,7 @@ class WriteSLAC : public WriterIface
     Tag mEntityMark;  // used to say whether an entity will be exported
 
     ErrorCode gather_mesh_information( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_info,
-                                       std::vector< NeumannSetData >&   neuset_info,
+                                       std::vector< NeumannSetData >& neuset_info,
                                        std::vector< DirichletSetData >& dirset_info,
                                        std::vector< EntityHandle >& matsets, std::vector< EntityHandle >& neusets,
                                        std::vector< EntityHandle >& dirsets );

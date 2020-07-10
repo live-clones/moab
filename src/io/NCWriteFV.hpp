@@ -22,7 +22,7 @@ class NCWriteFV : public ScdNCWriteHelper
     {
     }
 
-    virtual ~NCWriteFV( );
+    virtual ~NCWriteFV();
 };
 
 }  // namespace moab

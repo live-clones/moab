@@ -46,7 +46,7 @@ class MsqIRel : public MsqCommonIGeom
   public:
     MsqIRel( iGeom_Instance geom, iRel_Instance irel_iface, iRel_PairHandle irel_instance );
 
-    virtual ~MsqIRel( );
+    virtual ~MsqIRel();
 
     void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinat ) const;
 
@@ -73,7 +73,7 @@ class MsqIRel : public MsqCommonIGeom
 
   private:
     /** ITAPS interface implementation for mesh->geometry association */
-    iRel_Instance   relateIface;
+    iRel_Instance relateIface;
     iRel_PairHandle relateInstance;
 
     /** temporary storage of geometry entity handles */

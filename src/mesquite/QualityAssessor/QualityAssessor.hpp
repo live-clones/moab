@@ -107,7 +107,7 @@ class QualityAssessor : public Instruction
      */
     MESQUITE_EXPORT
     QualityAssessor( bool print_summary_to_std_out = true, bool free_elements_only = true,
-                     const char* inverted_element_tag_name = 0, std::string name = std::string( ) );
+                     const char* inverted_element_tag_name = 0, std::string name = std::string() );
 
     /**\brief Simple consturctor.  Metrics registered separately.
      *\param output_stream IO stream to which to write a summary of the
@@ -123,7 +123,7 @@ class QualityAssessor : public Instruction
      */
     MESQUITE_EXPORT
     QualityAssessor( std::ostream& output_stream, bool free_elements_only = true,
-                     const char* inverted_element_tag_name = 0, std::string name = std::string( ) );
+                     const char* inverted_element_tag_name = 0, std::string name = std::string() );
 
     /**\brief Construct and register a QualityMetric
      *\param output_stream IO stream to which to write a summary of the
@@ -155,7 +155,7 @@ class QualityAssessor : public Instruction
     MESQUITE_EXPORT
     QualityAssessor( std::ostream& output_stream, QualityMetric* metric, int histogram_intervals = 0,
                      double power_mean = 0.0, bool free_elements_only = true, const char* metric_value_tag_name = 0,
-                     const char* inverted_element_tag_name = 0, std::string name = std::string( ) );
+                     const char* inverted_element_tag_name = 0, std::string name = std::string() );
 
     /**\brief Construct and register a QualityMetric
      *\param print_summary_to_std_out If true, summary of mesh quality
@@ -190,9 +190,9 @@ class QualityAssessor : public Instruction
     QualityAssessor( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
                      bool free_elements_only = true, const char* metric_value_tag_name = 0,
                      bool print_summary_to_std_out = true, const char* inverted_element_tag_name = 0,
-                     std::string name = std::string( ) );
+                     std::string name = std::string() );
 
-    MESQUITE_EXPORT virtual ~QualityAssessor( );
+    MESQUITE_EXPORT virtual ~QualityAssessor();
 
     //! Provides a name to the QualityAssessor (use it for default name in constructor).
     MESQUITE_EXPORT void set_name( std::string name )
@@ -200,7 +200,7 @@ class QualityAssessor : public Instruction
         qualityAssessorName = name;
     };
     //! Retrieves the QualityAssessor name. A default name should be set in the constructor.
-    MESQUITE_EXPORT virtual std::string get_name( ) const
+    MESQUITE_EXPORT virtual std::string get_name() const
     {
         return qualityAssessorName;
     }
@@ -232,7 +232,7 @@ class QualityAssessor : public Instruction
      *
      * If set to false, quality for all elements will be assessed.
      */
-    MESQUITE_EXPORT bool measuring_free_samples_only( ) const
+    MESQUITE_EXPORT bool measuring_free_samples_only() const
     {
         return skipFixedSamples;
     }
@@ -316,7 +316,7 @@ class QualityAssessor : public Instruction
                                                    MsqError& err );
 
     //! Do not print results of assessment.
-    MESQUITE_EXPORT void disable_printing_results( )
+    MESQUITE_EXPORT void disable_printing_results()
     {
         printSummary = false;
     }
@@ -326,7 +326,7 @@ class QualityAssessor : public Instruction
 
     //! True if any metric evaluated to an invalid value
     //! for any element
-    MESQUITE_EXPORT bool invalid_elements( ) const;
+    MESQUITE_EXPORT bool invalid_elements() const;
 
     //! Provides the number of inverted elements, inverted_elmes,
     //!  and the number of elements whose orientation can not be
@@ -336,7 +336,7 @@ class QualityAssessor : public Instruction
     MESQUITE_EXPORT bool get_inverted_element_count( int& inverted_elems, int& inverted_samples, MsqError& err );
 
     //! Reset calculated data
-    MESQUITE_EXPORT void reset_data( );
+    MESQUITE_EXPORT void reset_data();
 
     //! Produces two historgrams on a single scale from a before
     //! optimization histogram and an after optimization histogram.
@@ -352,26 +352,26 @@ class QualityAssessor : public Instruction
     {
         invertedTagName = tagname;
     }
-    MESQUITE_EXPORT void dont_tag_inverted_elements( )
+    MESQUITE_EXPORT void dont_tag_inverted_elements()
     {
-        invertedTagName.clear( );
+        invertedTagName.clear();
     }
-    MESQUITE_EXPORT bool tagging_inverted_elements( ) const
+    MESQUITE_EXPORT bool tagging_inverted_elements() const
     {
-        return !invertedTagName.empty( );
+        return !invertedTagName.empty();
     }
 
     MESQUITE_EXPORT void tag_fixed_elements( std::string tagname )
     {
         fixedTagName = tagname;
     }
-    MESQUITE_EXPORT void dont_tag_fixed_elements( )
+    MESQUITE_EXPORT void dont_tag_fixed_elements()
     {
-        fixedTagName.clear( );
+        fixedTagName.clear();
     }
-    MESQUITE_EXPORT bool tagging_fixed_elements( ) const
+    MESQUITE_EXPORT bool tagging_fixed_elements() const
     {
-        return !fixedTagName.empty( );
+        return !fixedTagName.empty();
     }
 
     /** \brief Per-metric QualityAssessor data
@@ -390,33 +390,33 @@ class QualityAssessor : public Instruction
       public:
         MESQUITE_EXPORT Assessor( QualityMetric* metric, const char* name = 0 );
 
-        MESQUITE_EXPORT double get_average( ) const;
-        MESQUITE_EXPORT double get_maximum( ) const
+        MESQUITE_EXPORT double get_average() const;
+        MESQUITE_EXPORT double get_maximum() const
         {
             return maximum;
         }
-        MESQUITE_EXPORT double get_minimum( ) const
+        MESQUITE_EXPORT double get_minimum() const
         {
             return minimum;
         }
-        MESQUITE_EXPORT double get_rms( ) const;
-        MESQUITE_EXPORT double get_stddev( ) const;
-        MESQUITE_EXPORT double get_power_mean( ) const;
-        MESQUITE_EXPORT double get_power( ) const
+        MESQUITE_EXPORT double get_rms() const;
+        MESQUITE_EXPORT double get_stddev() const;
+        MESQUITE_EXPORT double get_power_mean() const;
+        MESQUITE_EXPORT double get_power() const
         {
             return pMean;
         }
-        MESQUITE_EXPORT int get_count( ) const
+        MESQUITE_EXPORT int get_count() const
         {
             return count;
         }
 
-        MESQUITE_EXPORT bool have_power_mean( ) const
+        MESQUITE_EXPORT bool have_power_mean() const
         {
             return 0.0 != pMean;
         }
 
-        MESQUITE_EXPORT int get_invalid_element_count( ) const
+        MESQUITE_EXPORT int get_invalid_element_count() const
         {
             return numInvalid;
         }
@@ -437,18 +437,18 @@ class QualityAssessor : public Instruction
                             MsqError& err ) const;
 
         /** Reset all calculated data */
-        MESQUITE_EXPORT void reset_data( );
+        MESQUITE_EXPORT void reset_data();
 
         /** Print the histogram */
         MESQUITE_EXPORT void print_histogram( std::ostream&, int width = 0 ) const;
 
         /** Get the QualityMetric */
-        MESQUITE_EXPORT QualityMetric* get_metric( ) const
+        MESQUITE_EXPORT QualityMetric* get_metric() const
         {
             return qualMetric;
         }
 
-        MESQUITE_EXPORT const std::string& get_label( ) const
+        MESQUITE_EXPORT const std::string& get_label() const
         {
             return mLabel;
         }
@@ -460,21 +460,21 @@ class QualityAssessor : public Instruction
         MESQUITE_EXPORT void add_hist_value( double metric_value );
 
         /** Note invalid result */
-        MESQUITE_EXPORT void add_invalid_value( );
+        MESQUITE_EXPORT void add_invalid_value();
 
-        MESQUITE_EXPORT bool have_histogram( ) const
+        MESQUITE_EXPORT bool have_histogram() const
         {
-            return !histogram.empty( );
+            return !histogram.empty();
         }
 
         /** If range of histogram has not yet been determined,
          * calculate it from the min/max values.
          */
-        MESQUITE_EXPORT void calculate_histogram_range( );
+        MESQUITE_EXPORT void calculate_histogram_range();
 
-        MESQUITE_EXPORT bool write_to_tag( ) const
+        MESQUITE_EXPORT bool write_to_tag() const
         {
-            return !tagName.empty( );
+            return !tagName.empty();
         }
 
         MESQUITE_EXPORT void set_stopping_function( bool value )
@@ -482,26 +482,26 @@ class QualityAssessor : public Instruction
             stoppingFunction = value;
         }
 
-        MESQUITE_EXPORT bool stopping_function( ) const
+        MESQUITE_EXPORT bool stopping_function() const
         {
             return stoppingFunction;
         }
 
-        MESQUITE_EXPORT double stopping_function_value( ) const;
+        MESQUITE_EXPORT double stopping_function_value() const;
 
       private:
         friend class QualityAssessor;
 
         QualityMetric* const qualMetric;  //< The quality metric
-        std::string          mLabel;
+        std::string mLabel;
 
         unsigned long count;  //< The total number of times the metric was evaluated
 
-        double        sum;  //< The sum of the metric over all elements
-        double        maximum;  //< The maximum of the metric
-        double        minimum;  //< The minimum value of the metric
-        double        sqrSum;  //< The sum of the square of the metric values
-        double        pSum;  //< The sum of the metric values raised to the pMean power
+        double sum;                //< The sum of the metric over all elements
+        double maximum;            //< The maximum of the metric
+        double minimum;            //< The minimum value of the metric
+        double sqrSum;             //< The sum of the square of the metric values
+        double pSum;               //< The sum of the metric values raised to the pMean power
         unsigned long numInvalid;  //< Count of invalid metric values
 
         double pMean;  //< Power for general power-mean.
@@ -511,9 +511,9 @@ class QualityAssessor : public Instruction
          * bound, respectively.  The remaining values are the histogram
          * counts.
          */
-        bool               haveHistRange;
-        double             histMin;  //< Lower bound of histogram
-        double             histMax;  //< Upper bound of histogram
+        bool haveHistRange;
+        double histMin;  //< Lower bound of histogram
+        double histMax;  //< Upper bound of histogram
         std::vector< int > histogram;
 
         std::string tagName;  //< Tag to which to write metric values.
@@ -552,7 +552,7 @@ class QualityAssessor : public Instruction
      *  Return a const reference to the internal list of
      *  calculated data.
      */
-    const list_type& get_all_results( ) const
+    const list_type& get_all_results() const
     {
         return assessList;
     }
@@ -583,12 +583,12 @@ class QualityAssessor : public Instruction
 
         int referenceCount;
 
-        Data( ) : referenceCount( 1 )
+        Data() : referenceCount( 1 )
         {
-            clear( );
+            clear();
         }
 
-        void clear( )
+        void clear()
         {
             invertedElementCount = invertedSampleCount = -1;
             elementCount = sampleCount = freeElementCount = 0;
@@ -611,7 +611,7 @@ class QualityAssessor : public Instruction
      *  QualityMetric, or create it if is not found in
      *  the list.
      */
-    list_type::iterator find_stopping_assessment( );
+    list_type::iterator find_stopping_assessment();
 
     /** Find or create tag */
     TagHandle get_tag( Mesh* mesh, std::string name, Mesh::TagType type, unsigned size, MsqError& err );
@@ -619,7 +619,7 @@ class QualityAssessor : public Instruction
     /** Try to determine if output stream is a terminal and if so,
         the width of that terminal.  Returns zero if width cannot
         be determined. */
-    int get_terminal_width( ) const;
+    int get_terminal_width() const;
 
     static std::string element_name_as_string( int enum_name );
 
@@ -640,7 +640,7 @@ class QualityAssessor : public Instruction
 
     bool skipFixedSamples;
 
-    int elementTypeCount[ MIXED - POLYGON + 1 ];
+    int elementTypeCount[MIXED - POLYGON + 1];
 
     bool invalid_values;  // set to true when a target metric contains inverted elements
 };

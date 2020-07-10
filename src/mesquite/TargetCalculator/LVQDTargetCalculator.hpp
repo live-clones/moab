@@ -56,7 +56,7 @@ class LVQDTargetCalculator : public TargetCalculator
     LVQDTargetCalculator( TargetCalculator* lambda_source, TargetCalculator* V_source, TargetCalculator* Q_source,
                           TargetCalculator* delta_source );
 
-    ~LVQDTargetCalculator( );
+    ~LVQDTargetCalculator();
 
     bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
@@ -64,7 +64,7 @@ class LVQDTargetCalculator : public TargetCalculator
 
     bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-    bool have_surface_orient( ) const;
+    bool have_surface_orient() const;
 
   private:
     int add_source( TargetCalculator* source );
@@ -72,9 +72,9 @@ class LVQDTargetCalculator : public TargetCalculator
     bool evaluate_guide_2D( PatchData& pd, size_t element, Sample sample, int idx, double& lambda, MsqMatrix< 3, 2 >& V,
                             MsqMatrix< 2, 2 >& Q, MsqMatrix< 2, 2 >& delta, MsqError& err );
 
-    TargetCalculator* uniqueGuides[ 4 ];  //!< Up to 4 unique target sources
-    int               numUniqueGuides;  //!< Number of unique target sources
-    int               lambdaIdx, vIdx, qIdx, deltaIdx;  //!< Index into uniqueGuides for respective source,
+    TargetCalculator* uniqueGuides[4];    //!< Up to 4 unique target sources
+    int numUniqueGuides;                  //!< Number of unique target sources
+    int lambdaIdx, vIdx, qIdx, deltaIdx;  //!< Index into uniqueGuides for respective source,
                                           //!< or -1 for no source.
 };
 

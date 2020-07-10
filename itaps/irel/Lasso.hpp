@@ -12,12 +12,12 @@ class AssocPair;
 class Lasso
 {
   public:
-    Lasso( ) : lastErrorType( iBase_SUCCESS )
+    Lasso() : lastErrorType( iBase_SUCCESS )
     {
-        lastErrorDescription[ 0 ] = '\0';
+        lastErrorDescription[0] = '\0';
     }
 
-    virtual ~Lasso( );
+    virtual ~Lasso();
 
     //! find a pair equivalent to these ifaces, passed as pointer to
     //! SIDL interface or interface instance
@@ -32,8 +32,8 @@ class Lasso
 
     inline int set_last_error( int, const char* );
 
-    int  lastErrorType;
-    char lastErrorDescription[ 120 ];
+    int lastErrorType;
+    char lastErrorDescription[120];
 
   private:
     std::set< AssocPair* > assocPairs;
@@ -48,7 +48,7 @@ static inline Lasso* lasso_instance( iRel_Instance instance )
 int Lasso::set_last_error( int code, const char* msg )
 {
     std::strncpy( lastErrorDescription, msg, sizeof( lastErrorDescription ) );
-    lastErrorDescription[ sizeof( lastErrorDescription ) - 1 ] = '\0';
+    lastErrorDescription[sizeof( lastErrorDescription ) - 1] = '\0';
     return ( lastErrorType = static_cast< iBase_ErrorType >( code ) );
 }
 

@@ -50,14 +50,14 @@ namespace MBMesquite
 class AspectRatioGammaQualityMetric : public ElementQM
 {
   public:
-    AspectRatioGammaQualityMetric( ) {}
+    AspectRatioGammaQualityMetric() {}
 
     //! virtual destructor ensures use of polymorphism during destruction
-    virtual ~AspectRatioGammaQualityMetric( ) {}
+    virtual ~AspectRatioGammaQualityMetric() {}
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
-    int get_negate_flag( ) const;
+    int get_negate_flag() const;
 
     bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 

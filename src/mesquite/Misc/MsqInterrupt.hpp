@@ -60,29 +60,29 @@ class MsqInterrupt
     static void enable( MsqError& err );
 
     /**\brief Check if an interrupt was seen */
-    static bool interrupt( )
+    static bool interrupt()
     {
         return sawInterrupt;
     }
     /**\brief Clear the interrupt flag */
-    static void clear( )
+    static void clear()
     {
         sawInterrupt = false;
     }
     /**\brief Set the interrupt flag */
-    static void set_interrupt( )
+    static void set_interrupt()
     {
         sawInterrupt = true;
     }
 
     /** Constructor, increment instance count. If
      * instance count was zero, register SIGINT handler */
-    MsqInterrupt( );
+    MsqInterrupt();
     /** Constructor, decrement instance count. If
      * instance count goes to zero, remove SIGINT handler */
-    ~MsqInterrupt( );
+    ~MsqInterrupt();
 
-    static void set_handler( );
+    static void set_handler();
 
   private:
     enum InterruptMode
@@ -93,8 +93,8 @@ class MsqInterrupt
     };
 
     static InterruptMode interruptMode;
-    static unsigned      instanceCount;
-    static bool          sawInterrupt;
+    static unsigned instanceCount;
+    static bool sawInterrupt;
 
     // Don't allow any of this stuff (make them private)
     void* operator new( size_t size );

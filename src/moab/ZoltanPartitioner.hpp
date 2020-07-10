@@ -83,7 +83,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
 #endif
     );
 
-    virtual ~ZoltanPartitioner( );
+    virtual ~ZoltanPartitioner();
 
     ErrorCode balance_mesh( const char* zmethod, const char* other_method, const bool write_as_sets = true,
                             const bool write_as_tags = false );
@@ -132,7 +132,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
 #endif
 
     // put closure of entities in the part sets too
-    ErrorCode include_closure( );
+    ErrorCode include_closure();
 
     // virtual ErrorCode write_file(const char *filename, const char *out_file);
 
@@ -142,11 +142,11 @@ class ZoltanPartitioner : public PartitionerBase< int >
 
     void SetHypergraph_Parameters( const char* phg_method );
 
-    void SetHSFC_Parameters( );
+    void SetHSFC_Parameters();
 
-    void SetRIB_Parameters( );
+    void SetRIB_Parameters();
 
-    void SetRCB_Parameters( );
+    void SetRCB_Parameters();
 
   private:
     Zoltan* myZZ;

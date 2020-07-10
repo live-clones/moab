@@ -35,18 +35,18 @@
 namespace MBMesquite
 {
 
-SimpleStats::SimpleStats( )
-    : valueSum( 0 ), valueSqrSum( 0 ), valueMin( std::numeric_limits< double >::infinity( ) ),
-      valueMax( -std::numeric_limits< double >::infinity( ) ), valueCount( 0 )
+SimpleStats::SimpleStats()
+    : valueSum( 0 ), valueSqrSum( 0 ), valueMin( std::numeric_limits< double >::infinity() ),
+      valueMax( -std::numeric_limits< double >::infinity() ), valueCount( 0 )
 {
 }
 
-void SimpleStats::clear( )
+void SimpleStats::clear()
 {
     valueSum = valueSqrSum = 0;
-    valueMin = std::numeric_limits< double >::infinity( );
-    valueMax = -valueMin;
-    valueCount = 0;
+    valueMin               = std::numeric_limits< double >::infinity();
+    valueMax               = -valueMin;
+    valueCount             = 0;
 }
 
 }  // namespace MBMesquite

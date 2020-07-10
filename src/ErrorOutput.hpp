@@ -42,15 +42,15 @@ class ErrorOutput
      * Destructor flushes any remaining output that wasn't followed
      * by a newline character.
      */
-    ~ErrorOutput( );
+    ~ErrorOutput();
 
     //!\brief Check if MPI rank has been set.
-    bool have_rank( ) const
+    bool have_rank() const
     {
         return mpiRank >= 0;
     }
     //!\brief Get MPI rank.
-    int get_rank( ) const
+    int get_rank() const
     {
         return mpiRank;
     }
@@ -61,7 +61,7 @@ class ErrorOutput
     }
     //!\brief Set MPI rank to the rank of this process in MPI_COMM_WORLD,
     //!       if MOAB is built with MPI and MPI_Init has been called
-    void use_world_rank( );
+    void use_world_rank();
 
     //!\brief Output the specified string
     void print( const char* str )
@@ -80,7 +80,7 @@ class ErrorOutput
 
   private:
     ErrorOutputStream* outputImpl;
-    int                mpiRank;
+    int mpiRank;
 
     void print_real( const char* buffer );
     void print_real( const std::string& str );
@@ -90,7 +90,7 @@ class ErrorOutput
     // the va_list such that it cannot be reused, and c) va_copy is not
     // (yet) portable (c99, no c++ standard).
     void print_real( const char* buffer, va_list args1, va_list args2 );
-    void process_line_buffer( );
+    void process_line_buffer();
 
     std::vector< char > lineBuffer;
 };
@@ -108,9 +108,9 @@ inline void ErrorOutput::printf( const char* fmt, ... )
 class ErrorOutputStream
 {
   public:
-    ErrorOutputStream( ) {}
-    virtual ~ErrorOutputStream( ) {}
-    virtual void println( const char* str ) = 0;
+    ErrorOutputStream() {}
+    virtual ~ErrorOutputStream() {}
+    virtual void println( const char* str )           = 0;
     virtual void println( int rank, const char* str ) = 0;
 };
 

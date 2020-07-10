@@ -29,23 +29,23 @@ class NCHelper
           tDim( -1 ), levDim( -1 )
     {
     }
-    virtual ~NCHelper( ) {}
+    virtual ~NCHelper() {}
 
     //! Get appropriate helper instance for ReadNC class
     static NCHelper* get_nc_helper( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet );
 
     //! Interfaces to be implemented in child classes
-    virtual ErrorCode   init_mesh_vals( ) = 0;
-    virtual ErrorCode   check_existing_mesh( ) = 0;
-    virtual ErrorCode   create_mesh( Range& faces ) = 0;
-    virtual ErrorCode   read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums ) = 0;
-    virtual std::string get_mesh_type_name( ) = 0;
+    virtual ErrorCode init_mesh_vals()                                                                        = 0;
+    virtual ErrorCode check_existing_mesh()                                                                   = 0;
+    virtual ErrorCode create_mesh( Range& faces )                                                             = 0;
+    virtual ErrorCode read_variables( std::vector< std::string >& var_names, std::vector< int >& tstep_nums ) = 0;
+    virtual std::string get_mesh_type_name()                                                                  = 0;
 
     //! Create NC conventional tags
     ErrorCode create_conventional_tags( const std::vector< int >& tstep_nums );
 
     //! Update time tag values if timesteps spread across files
-    ErrorCode update_time_tag_vals( );
+    ErrorCode update_time_tag_vals();
 
   protected:
     //! Separate set and non-set variables (common to scd mesh and ucd mesh)
@@ -71,7 +71,7 @@ class NCHelper
 
     //! For a dimension that does not have a corresponding coordinate variable (e.g. ncol for
     //! HOMME), create a dummy variable with a sparse tag to store the dimension length
-    ErrorCode create_dummy_variables( );
+    ErrorCode create_dummy_variables();
 
   private:
     //! Used by read_variables_to_set()
@@ -82,9 +82,9 @@ class NCHelper
     ReadNC* _readNC;
 
     //! Cache some information from ReadNC
-    int                _fileId;
+    int _fileId;
     const FileOptions& _opts;
-    EntityHandle       _fileSet;
+    EntityHandle _fileSet;
 
     //! Dimensions of time and level
     int nTimeSteps, nLevels;
@@ -111,20 +111,20 @@ class ScdNCHelper : public NCHelper
     {
         for( unsigned int i = 0; i < 6; i++ )
         {
-            gDims[ i ] = -1;
-            lDims[ i ] = -1;
-            gCDims[ i ] = -1;
-            lCDims[ i ] = -1;
+            gDims[i]  = -1;
+            lDims[i]  = -1;
+            gCDims[i] = -1;
+            lCDims[i] = -1;
         }
 
-        locallyPeriodic[ 0 ] = locallyPeriodic[ 1 ] = locallyPeriodic[ 2 ] = 0;
-        globallyPeriodic[ 0 ] = globallyPeriodic[ 1 ] = globallyPeriodic[ 2 ] = 0;
+        locallyPeriodic[0] = locallyPeriodic[1] = locallyPeriodic[2] = 0;
+        globallyPeriodic[0] = globallyPeriodic[1] = globallyPeriodic[2] = 0;
     }
-    virtual ~ScdNCHelper( ) {}
+    virtual ~ScdNCHelper() {}
 
   private:
     //! Implementation of NCHelper::check_existing_mesh()
-    virtual ErrorCode check_existing_mesh( );
+    virtual ErrorCode check_existing_mesh();
     //! Implementation of NCHelper::create_mesh()
     virtual ErrorCode create_mesh( Range& faces );
     //! Implementation of NCHelper::read_variables()
@@ -132,34 +132,35 @@ class ScdNCHelper : public NCHelper
 
     //! Read non-set variables for scd mesh
     ErrorCode read_scd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                     std::vector< int >&             tstep_nums );
+                                                     std::vector< int >& tstep_nums );
     ErrorCode read_scd_variables_to_nonset( std::vector< ReadNC::VarData >& vdatas, std::vector< int >& tstep_nums );
 
     //! Create COORDS tag for quads coordinate
-    ErrorCode create_quad_coordinate_tag( );
+    ErrorCode create_quad_coordinate_tag();
 
-    template< typename T > void kji_to_jik( size_t ni, size_t nj, size_t nk, void* dest, T* source )
+    template < typename T >
+    void kji_to_jik( size_t ni, size_t nj, size_t nk, void* dest, T* source )
     {
         size_t nik = ni * nk, nij = ni * nj;
-        T*     tmp_data = reinterpret_cast< T* >( dest );
+        T* tmp_data = reinterpret_cast< T* >( dest );
         for( std::size_t j = 0; j != nj; j++ )
             for( std::size_t i = 0; i != ni; i++ )
                 for( std::size_t k = 0; k != nk; k++ )
-                    tmp_data[ j * nik + i * nk + k ] = source[ k * nij + j * ni + i ];
+                    tmp_data[j * nik + i * nk + k] = source[k * nij + j * ni + i];
     }
 
   protected:
     //! Dimensions of global grid in file
-    int gDims[ 6 ];
+    int gDims[6];
 
     //! Dimensions of my local part of grid
-    int lDims[ 6 ];
+    int lDims[6];
 
     //! Center dimensions of global grid in file
-    int gCDims[ 6 ];
+    int gCDims[6];
 
     //! Center dimensions of my local part of grid
-    int lCDims[ 6 ];
+    int lCDims[6];
 
     //! Values for i/j
     std::vector< double > ilVals, jlVals;
@@ -174,10 +175,10 @@ class ScdNCHelper : public NCHelper
     int iCDim, jCDim;
 
     //! Whether mesh is locally periodic in i or j or k
-    int locallyPeriodic[ 3 ];
+    int locallyPeriodic[3];
 
     //! Whether mesh is globally periodic in i or j or k
-    int globallyPeriodic[ 3 ];
+    int globallyPeriodic[3];
 };
 
 //! Child helper class for ucd mesh, e.g. CAM_SE (HOMME) or MPAS
@@ -189,7 +190,7 @@ class UcdNCHelper : public NCHelper
           nLocalEdges( 0 ), nLocalVertices( 0 ), cDim( -1 ), eDim( -1 ), vDim( -1 )
     {
     }
-    virtual ~UcdNCHelper( ) {}
+    virtual ~UcdNCHelper() {}
 
   private:
     //! Implementation of NCHelper::read_variables()
@@ -197,34 +198,34 @@ class UcdNCHelper : public NCHelper
 
     //! Read non-set variables for ucd mesh (implemented differently in child classes)
     virtual ErrorCode read_ucd_variables_to_nonset_allocate( std::vector< ReadNC::VarData >& vdatas,
-                                                             std::vector< int >&             tstep_nums ) = 0;
+                                                             std::vector< int >& tstep_nums ) = 0;
 #ifdef MOAB_HAVE_PNETCDF
     virtual ErrorCode read_ucd_variables_to_nonset_async( std::vector< ReadNC::VarData >& vdatas,
-                                                          std::vector< int >&             tstep_nums ) = 0;
+                                                          std::vector< int >& tstep_nums ) = 0;
 #else
     virtual ErrorCode read_ucd_variables_to_nonset( std::vector< ReadNC::VarData >& vdatas,
-                                                    std::vector< int >&             tstep_nums ) = 0;
+                                                    std::vector< int >& tstep_nums ) = 0;
 #endif
 
   protected:
     //! This version takes as input the moab range, from which we actually need just the
     //! size of each sequence, for a proper transpose of the data
-    template< typename T >
+    template < typename T >
     void kji_to_jik_stride( size_t, size_t nj, size_t nk, void* dest, T* source, Range& localGid )
     {
         std::size_t idxInSource = 0;  // Position of the start of the stride
         // For each subrange, we will transpose a matrix of size
         // subrange*nj*nk (subrange takes the role of ni)
         T* tmp_data = reinterpret_cast< T* >( dest );
-        for( Range::pair_iterator pair_iter = localGid.pair_begin( ); pair_iter != localGid.pair_end( ); ++pair_iter )
+        for( Range::pair_iterator pair_iter = localGid.pair_begin(); pair_iter != localGid.pair_end(); ++pair_iter )
         {
             std::size_t size_range = pair_iter->second - pair_iter->first + 1;
             std::size_t nik = size_range * nk, nij = size_range * nj;
             for( std::size_t j = 0; j != nj; j++ )
                 for( std::size_t i = 0; i != size_range; i++ )
                     for( std::size_t k = 0; k != nk; k++ )
-                        tmp_data[ idxInSource + j * nik + i * nk + k ] =
-                            source[ idxInSource + k * nij + j * size_range + i ];
+                        tmp_data[idxInSource + j * nik + i * nk + k] =
+                            source[idxInSource + k * nij + j * size_range + i];
             idxInSource += ( size_range * nj * nk );
         }
     }

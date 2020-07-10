@@ -59,7 +59,7 @@ class MESQUITE_EXPORT VertexMover : public QualityImprover
 
   public:
     // virtual destructor ensures use of polymorphism during destruction
-    virtual ~VertexMover( );
+    virtual ~VertexMover();
 
     virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
@@ -71,43 +71,43 @@ class MESQUITE_EXPORT VertexMover : public QualityImprover
      *
      * Default, opposite of \c do_block_coordinate_descent().
      */
-    inline void do_nash_game_optimization( )
+    inline void do_nash_game_optimization()
     {
-        objFuncEval.do_nash_game( );
+        objFuncEval.do_nash_game();
     }
 
     /**\brief Check if optmizer will do Nash-game type optimization
      *
      * Default, opposite of \c is_block_coordinate_descent_optimization().
      */
-    inline bool is_nash_game_optimization( ) const
+    inline bool is_nash_game_optimization() const
     {
-        return objFuncEval.is_nash_game( );
+        return objFuncEval.is_nash_game();
     }
 
     /**\brief Do block coordinate descent optimization
      *
      * Opposite of \c do_nash_game().
      */
-    inline void do_block_coordinate_descent_optimization( )
+    inline void do_block_coordinate_descent_optimization()
     {
-        objFuncEval.do_block_coordinate_descent( );
+        objFuncEval.do_block_coordinate_descent();
     }
 
     /**\brief Check if optmizer will do block coordinate descent type optimization
      *
      * Default, opposite of \c is_nash_game_optimization().
      */
-    inline bool is_block_coordinate_descent_optimization( ) const
+    inline bool is_block_coordinate_descent_optimization() const
     {
-        return objFuncEval.is_block_coordinate_descent( );
+        return objFuncEval.is_block_coordinate_descent();
     }
 
     /**\brief Use Jacobi iteration for optimization
      *
      * Opposite of \c do_gauss_optimization()
      */
-    inline void do_jacobi_optimization( )
+    inline void do_jacobi_optimization()
     {
         jacobiOpt = true;
     }
@@ -116,7 +116,7 @@ class MESQUITE_EXPORT VertexMover : public QualityImprover
      *
      * Opposite of \c is_gauss_optimization()
      */
-    inline bool is_jacobi_optimization( ) const
+    inline bool is_jacobi_optimization() const
     {
         return jacobiOpt;
     }
@@ -125,7 +125,7 @@ class MESQUITE_EXPORT VertexMover : public QualityImprover
      *
      * Default, opposite of \c do_jacobi_optimization()
      */
-    inline void do_gauss_optimization( )
+    inline void do_gauss_optimization()
     {
         jacobiOpt = false;
     }
@@ -134,31 +134,31 @@ class MESQUITE_EXPORT VertexMover : public QualityImprover
      *
      * Default, opposite of \c is_jacobi_optimization()
      */
-    inline bool is_gauss_optimization( ) const
+    inline bool is_gauss_optimization() const
     {
         return !jacobiOpt;
     }
 
   protected:
     virtual void initialize( PatchData& pd, MsqError& err ) = 0;
-    virtual void cleanup( ) = 0;
+    virtual void cleanup()                                  = 0;
     virtual void optimize_vertex_positions( PatchData& pd,
-                                            MsqError&  err ) = 0;  // modifies the PatchData object
+                                            MsqError& err ) = 0;  // modifies the PatchData object
 
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err ) = 0;
-    virtual void terminate_mesh_iteration( PatchData&, MsqError& err ) = 0;
+    virtual void terminate_mesh_iteration( PatchData&, MsqError& err )     = 0;
 
-    OFEvaluator& get_objective_function_evaluator( )
+    OFEvaluator& get_objective_function_evaluator()
     {
         return objFuncEval;
     }
 
     static TagHandle get_jacobi_coord_tag( Mesh* mesh, MsqError& err );
-    static void      commit_jacobi_coords( TagHandle tag, Mesh* mesh, MsqError& err );
+    static void commit_jacobi_coords( TagHandle tag, Mesh* mesh, MsqError& err );
 
   private:
     OFEvaluator objFuncEval;
-    bool        jacobiOpt;
+    bool jacobiOpt;
 };
 
 }  // namespace MBMesquite

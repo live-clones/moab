@@ -9,7 +9,7 @@
 namespace moab
 {
 
-NCWriteEuler::~NCWriteEuler( )
+NCWriteEuler::~NCWriteEuler()
 {
     // TODO Auto-generated destructor stub
 }

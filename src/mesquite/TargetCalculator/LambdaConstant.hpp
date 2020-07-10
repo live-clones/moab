@@ -54,7 +54,7 @@ class LambdaConstant : public TargetCalculator
      */
     LambdaConstant( double lambda, TargetCalculator* target );
 
-    ~LambdaConstant( );
+    ~LambdaConstant();
 
     bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
@@ -62,13 +62,13 @@ class LambdaConstant : public TargetCalculator
 
     bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-    bool have_surface_orient( ) const
+    bool have_surface_orient() const
     {
-        return mTarget->have_surface_orient( );
+        return mTarget->have_surface_orient();
     }
 
   private:
-    double            mLambda;
+    double mLambda;
     TargetCalculator* mTarget;
 };
 

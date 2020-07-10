@@ -32,17 +32,17 @@ FileTokenizer::FileTokenizer( FILE* file_ptr, ReadUtilIface* )
 {
 }
 
-FileTokenizer::~FileTokenizer( )
+FileTokenizer::~FileTokenizer()
 {
     fclose( filePtr );
 }
 
-bool FileTokenizer::eof( ) const
+bool FileTokenizer::eof() const
 {
     return nextToken == bufferEnd && feof( filePtr );
 }
 
-const char* FileTokenizer::get_string( )
+const char* FileTokenizer::get_string()
 {
     // If the whitespace character marking the end of the
     // last token was a newline, increment the line count.
@@ -93,7 +93,7 @@ const char* FileTokenizer::get_string( )
         // Shift the (possibly) partial token to the start of the buffer.
         size_t remaining = bufferEnd - result;
         memmove( buffer, result, remaining );
-        result = buffer;
+        result    = buffer;
         nextToken = result + remaining;
 
         // Fill the remainder of the buffer after the token.
@@ -126,14 +126,14 @@ const char* FileTokenizer::get_string( )
 bool FileTokenizer::get_double_internal( double& result )
 {
     // Get a token
-    const char *token_end, *token = get_string( );
+    const char *token_end, *token = get_string();
     if( !token ) return false;
 
     // Check for hex value -- on some platforms (e.g. Linux), strtod
     // will accept hex values, on others (e.g. Sun) it will not.  Force
     // failure on hex numbers for consistency.
-    if( token[ 0 ] && token[ 1 ] && token[ 0 ] == '0' && toupper( token[ 1 ] ) == 'X' )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \"" << token << "\"",
+    if( token[0] && token[1] && token[0] == '0' && toupper( token[1] ) == 'X' )
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number() << ": expected number, got \"" << token << "\"",
                             false );
 
     // Parse token as double
@@ -143,7 +143,7 @@ bool FileTokenizer::get_double_internal( double& result )
     // not the NULL character terminating the string,
     // then parse failed.
     if( *token_end )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \"" << token << "\"",
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number() << ": expected number, got \"" << token << "\"",
                             false );
 
     return true;
@@ -162,7 +162,7 @@ bool FileTokenizer::get_float_internal( float& result )
 bool FileTokenizer::get_long_int_internal( long& result )
 {
     // Get a token
-    const char *token_end, *token = get_string( );
+    const char *token_end, *token = get_string();
     if( !token ) return false;
 
     // Parse token as long
@@ -172,7 +172,7 @@ bool FileTokenizer::get_long_int_internal( long& result )
     // not the NULL character terminating the string,
     // then parse failed.
     if( *token_end )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected number, got \"" << token << "\"",
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number() << ": expected number, got \"" << token << "\"",
                             false );
 
     return true;
@@ -184,7 +184,7 @@ bool FileTokenizer::get_byte_internal( unsigned char& result )
     if( !get_long_int_internal( i ) ) return false;
 
     result = (unsigned char)i;
-    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
+    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number(), false );
 
     return true;
 }
@@ -195,7 +195,7 @@ bool FileTokenizer::get_short_int_internal( short& result )
     if( !get_long_int_internal( i ) ) return false;
 
     result = (short)i;
-    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
+    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number(), false );
 
     return true;
 }
@@ -206,7 +206,7 @@ bool FileTokenizer::get_integer_internal( int& result )
     if( !get_long_int_internal( i ) ) return false;
 
     result = (int)i;
-    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number( ), false );
+    if( i != (long)result ) MB_SET_ERR_RET_VAL( "Numeric overflow at line " << line_number(), false );
 
     return true;
 }
@@ -214,14 +214,14 @@ bool FileTokenizer::get_integer_internal( int& result )
 bool FileTokenizer::get_boolean_internal( bool& result )
 {
     // Get a token
-    const char* token = get_string( );
+    const char* token = get_string();
     if( !token ) return false;
 
-    if( token[ 1 ] || ( token[ 0 ] != '0' && token[ 0 ] != '1' ) )
-        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number( ) << ": expected 0 or 1, got \"" << token << "\"",
+    if( token[1] || ( token[0] != '0' && token[0] != '1' ) )
+        MB_SET_ERR_RET_VAL( "Syntax error at line " << line_number() << ": expected 0 or 1, got \"" << token << "\"",
                             false );
 
-    result = token[ 0 ] == '1';
+    result = token[0] == '1';
 
     return true;
 }
@@ -303,7 +303,7 @@ bool FileTokenizer::get_booleans( size_t count, bool* array )
     return true;
 }
 
-void FileTokenizer::unget_token( )
+void FileTokenizer::unget_token()
 {
     if( nextToken - buffer < 2 ) return;
 
@@ -321,7 +321,7 @@ void FileTokenizer::unget_token( )
 bool FileTokenizer::match_token( const char* str, bool print_error )
 {
     // Get a token
-    const char* token = get_string( );
+    const char* token = get_string();
     if( !token ) return false;
 
     // Check if it matches
@@ -329,7 +329,7 @@ bool FileTokenizer::match_token( const char* str, bool print_error )
 
     // Construct error message
     if( print_error )
-        MB_SET_ERR_CONT( "Syntax error at line " << line_number( ) << ": expected \"" << str << "\", got \"" << token
+        MB_SET_ERR_CONT( "Syntax error at line " << line_number() << ": expected \"" << str << "\", got \"" << token
                                                  << "\"" );
 
     return false;
@@ -338,7 +338,7 @@ bool FileTokenizer::match_token( const char* str, bool print_error )
 int FileTokenizer::match_token( const char* const* list, bool print_error )
 {
     // Get a token
-    const char* token = get_string( );
+    const char* token = get_string();
     if( !token ) return 0;
 
     // Check if it matches any input string
@@ -352,8 +352,8 @@ int FileTokenizer::match_token( const char* const* list, bool print_error )
 
     // No match, constuct error message
     std::string message( "Parsing error at line " );
-    char        lineno[ 16 ];
-    sprintf( lineno, "%d", line_number( ) );
+    char lineno[16];
+    sprintf( lineno, "%d", line_number() );
     message += lineno;
     message += ": expected one of {";
     for( ptr = list; *ptr; ++ptr )
@@ -364,7 +364,7 @@ int FileTokenizer::match_token( const char* const* list, bool print_error )
     message += " } got \"";
     message += token;
     message += "\"";
-    MB_SET_ERR_CONT( message.c_str( ) );
+    MB_SET_ERR_CONT( message.c_str() );
 
     return 0;
 }
@@ -388,8 +388,8 @@ bool FileTokenizer::get_newline( bool report_error )
             size_t count = fread( buffer, 1, sizeof( buffer ), filePtr );
             if( 0 == count )
             {
-                if( eof( ) )
-                    MB_SET_ERR_RET_VAL( "File truncated at line " << line_number( ), false );
+                if( eof() )
+                    MB_SET_ERR_RET_VAL( "File truncated at line " << line_number(), false );
                 else
                     MB_SET_ERR_RET_VAL( "I/O Error", false );
             }
@@ -400,7 +400,7 @@ bool FileTokenizer::get_newline( bool report_error )
 
         // If the current character is not a space, the we've failed.
         if( !isspace( *nextToken ) )
-            if( report_error ) MB_SET_ERR_RET_VAL( "Expected newline at line " << line_number( ), false );
+            if( report_error ) MB_SET_ERR_RET_VAL( "Expected newline at line " << line_number(), false );
 
         // If the current space character is a newline,
         // increment the line number count.
@@ -434,7 +434,7 @@ bool FileTokenizer::get_binary( size_t size, void* mem )
         // Copy buffer contents into memory and clear buffer
         memcpy( mem, nextToken, bufferEnd - nextToken );
         size -= bufferEnd - nextToken;
-        mem = reinterpret_cast< char* >( mem ) + ( bufferEnd - nextToken );
+        mem       = reinterpret_cast< char* >( mem ) + ( bufferEnd - nextToken );
         nextToken = bufferEnd;
     }
 

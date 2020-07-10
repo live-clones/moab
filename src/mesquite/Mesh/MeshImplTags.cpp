@@ -32,19 +32,19 @@
 namespace MBMesquite
 {
 
-MeshImplTags::TagData::~TagData( )
+MeshImplTags::TagData::~TagData()
 {
     if( elementData ) free( elementData );
     if( vertexData ) free( vertexData );
     if( defaultValue ) free( defaultValue );
 }
 
-void MeshImplTags::clear( )
+void MeshImplTags::clear()
 {
-    for( std::vector< TagData* >::iterator iter = tagList.begin( ); iter != tagList.end( ); ++iter )
+    for( std::vector< TagData* >::iterator iter = tagList.begin(); iter != tagList.end(); ++iter )
         if( *iter ) delete *iter;
 
-    tagList.clear( );
+    tagList.clear();
 }
 
 size_t MeshImplTags::size_from_tag_type( Mesh::TagType type )
@@ -84,7 +84,7 @@ size_t MeshImplTags::create( const std::string& name, Mesh::TagType type, unsign
     }
 
     TagData* tag = new TagData( name, type, length );
-    h = tagList.size( );
+    h            = tagList.size();
     tagList.push_back( tag );
 
     if( defval )
@@ -98,14 +98,14 @@ size_t MeshImplTags::create( const std::string& name, Mesh::TagType type, unsign
 
 size_t MeshImplTags::create( const TagDescription& desc, const void* defval, MsqError& err )
 {
-    size_t h = handle( desc.name.c_str( ), err );
+    size_t h = handle( desc.name.c_str(), err );
     if( h )
     {
-        MSQ_SETERR( err )( desc.name.c_str( ), MsqError::TAG_ALREADY_EXISTS );
+        MSQ_SETERR( err )( desc.name.c_str(), MsqError::TAG_ALREADY_EXISTS );
         return 0;
     }
 
-    err.clear( );
+    err.clear();
     if( desc.size == 0 || ( desc.size % size_from_tag_type( desc.type ) ) != 0 )
     {
         MSQ_SETERR( err )( MsqError::INVALID_ARG );
@@ -113,7 +113,7 @@ size_t MeshImplTags::create( const TagDescription& desc, const void* defval, Msq
     }
 
     TagData* tag = new TagData( desc );
-    h = tagList.size( );
+    h            = tagList.size();
     tagList.push_back( tag );
 
     if( defval )
@@ -128,20 +128,20 @@ size_t MeshImplTags::create( const TagDescription& desc, const void* defval, Msq
 void MeshImplTags::destroy( size_t tag_index, MsqError& err )
 {
     --tag_index;
-    if( tag_index >= tagList.size( ) || 0 == tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || 0 == tagList[tag_index] )
     {
         MSQ_SETERR( err )( MsqError::TAG_NOT_FOUND );
         return;
     }
 
-    delete tagList[ tag_index ];
-    tagList[ tag_index ] = 0;
+    delete tagList[tag_index];
+    tagList[tag_index] = 0;
 }
 
 size_t MeshImplTags::handle( const std::string& name, MsqError& ) const
 {
-    for( size_t i = 0; i < tagList.size( ); ++i )
-        if( tagList[ i ] && tagList[ i ]->desc.name == name ) return i + 1;
+    for( size_t i = 0; i < tagList.size(); ++i )
+        if( tagList[i] && tagList[i]->desc.name == name ) return i + 1;
 
     return 0;
 }
@@ -151,33 +151,33 @@ const TagDescription& MeshImplTags::properties( size_t tag_index, MsqError& err 
     static TagDescription dummy_desc;
     --tag_index;
 
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return dummy_desc;
     }
 
-    return tagList[ tag_index ]->desc;
+    return tagList[tag_index]->desc;
 }
 
 void MeshImplTags::set_element_data( size_t tag_index, size_t num_indices, const size_t* index_array,
                                      const void* values, MsqError& err )
 {
     size_t i;
-    char*  data;
+    char* data;
     --tag_index;
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return;
     }
 
-    TagData* tag = tagList[ tag_index ];
+    TagData* tag = tagList[tag_index];
 
     // Get highest element index
     size_t total = tag->elementCount;
     for( i = 0; i < num_indices; ++i )
-        if( index_array[ i ] >= total ) total = index_array[ i ] + 1;
+        if( index_array[i] >= total ) total = index_array[i] + 1;
 
     // If need more space
     if( total > tag->elementCount )
@@ -203,11 +203,11 @@ void MeshImplTags::set_element_data( size_t tag_index, size_t num_indices, const
     }
 
     // Store passed tag values
-    data = (char*)tag->elementData;
+    data             = (char*)tag->elementData;
     const char* iter = (const char*)values;
     for( i = 0; i < num_indices; ++i )
     {
-        memcpy( data + index_array[ i ] * tag->desc.size, iter, tag->desc.size );
+        memcpy( data + index_array[i] * tag->desc.size, iter, tag->desc.size );
         iter += tag->desc.size;
     }
 }
@@ -216,21 +216,21 @@ void MeshImplTags::get_element_data( size_t tag_index, size_t num_indices, const
                                      MsqError& err ) const
 {
     --tag_index;
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return;
     }
 
-    TagData* tag = tagList[ tag_index ];
+    TagData* tag = tagList[tag_index];
 
-    char*       iter = (char*)values;
+    char* iter       = (char*)values;
     const char* data = (const char*)tag->elementData;
 
     for( size_t i = 0; i < num_indices; ++i )
     {
         const void* ptr;
-        size_t      index = index_array[ i ];
+        size_t index = index_array[i];
         if( index >= tag->elementCount )
         {
             ptr = tag->defaultValue;
@@ -254,20 +254,20 @@ void MeshImplTags::set_vertex_data( size_t tag_index, size_t num_indices, const 
                                     MsqError& err )
 {
     size_t i;
-    char*  data;
+    char* data;
     --tag_index;
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return;
     }
 
-    TagData* tag = tagList[ tag_index ];
+    TagData* tag = tagList[tag_index];
 
     // Get highest element index
     size_t total = tag->vertexCount;
     for( i = 0; i < num_indices; ++i )
-        if( index_array[ i ] >= total ) total = index_array[ i ] + 1;
+        if( index_array[i] >= total ) total = index_array[i] + 1;
 
     // If need more space
     if( total > tag->vertexCount )
@@ -293,11 +293,11 @@ void MeshImplTags::set_vertex_data( size_t tag_index, size_t num_indices, const 
     }
 
     // Store passed tag values
-    data = (char*)tag->vertexData;
+    data             = (char*)tag->vertexData;
     const char* iter = (const char*)values;
     for( i = 0; i < num_indices; ++i )
     {
-        memcpy( data + index_array[ i ] * tag->desc.size, iter, tag->desc.size );
+        memcpy( data + index_array[i] * tag->desc.size, iter, tag->desc.size );
         iter += tag->desc.size;
     }
 }
@@ -306,21 +306,21 @@ void MeshImplTags::get_vertex_data( size_t tag_index, size_t num_indices, const 
                                     MsqError& err ) const
 {
     --tag_index;
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return;
     }
 
-    TagData* tag = tagList[ tag_index ];
+    TagData* tag = tagList[tag_index];
 
-    char*       iter = (char*)values;
+    char* iter       = (char*)values;
     const char* data = (const char*)tag->vertexData;
 
     for( size_t i = 0; i < num_indices; ++i )
     {
         const void* ptr;
-        size_t      index = index_array[ i ];
+        size_t index = index_array[i];
         if( index >= tag->vertexCount )
         {
             ptr = tag->defaultValue;
@@ -343,49 +343,49 @@ void MeshImplTags::get_vertex_data( size_t tag_index, size_t num_indices, const 
 bool MeshImplTags::tag_has_vertex_data( size_t tag_index, MsqError& err )
 {
     --tag_index;
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return false;
     }
 
-    TagData* tag = tagList[ tag_index ];
+    TagData* tag = tagList[tag_index];
     return 0 != tag->vertexData || tag->defaultValue;
 }
 
 bool MeshImplTags::tag_has_element_data( size_t tag_index, MsqError& err )
 {
     --tag_index;
-    if( tag_index >= tagList.size( ) || !tagList[ tag_index ] )
+    if( tag_index >= tagList.size() || !tagList[tag_index] )
     {
         MSQ_SETERR( err )( "Invalid tag handle", MsqError::INVALID_ARG );
         return false;
     }
 
-    TagData* tag = tagList[ tag_index ];
+    TagData* tag = tagList[tag_index];
     return 0 != tag->elementData || tag->defaultValue;
 }
 
-MeshImplTags::TagIterator MeshImplTags::tag_begin( )
+MeshImplTags::TagIterator MeshImplTags::tag_begin()
 {
     size_t index = 0;
-    while( index < tagList.size( ) && tagList[ index ] == NULL )
+    while( index < tagList.size() && tagList[index] == NULL )
         ++index;
     return TagIterator( this, index );
 }
 
-MeshImplTags::TagIterator MeshImplTags::TagIterator::operator++( )
+MeshImplTags::TagIterator MeshImplTags::TagIterator::operator++()
 {
     ++index;
-    while( index < tags->tagList.size( ) && NULL == tags->tagList[ index ] )
+    while( index < tags->tagList.size() && NULL == tags->tagList[index] )
         ++index;
     return TagIterator( tags, index );
 }
 
-MeshImplTags::TagIterator MeshImplTags::TagIterator::operator--( )
+MeshImplTags::TagIterator MeshImplTags::TagIterator::operator--()
 {
     --index;
-    while( index < tags->tagList.size( ) && NULL == tags->tagList[ index ] )
+    while( index < tags->tagList.size() && NULL == tags->tagList[index] )
         --index;
     return TagIterator( tags, index );
 }
@@ -394,7 +394,7 @@ MeshImplTags::TagIterator MeshImplTags::TagIterator::operator++( int )
 {
     size_t old = index;
     ++index;
-    while( index < tags->tagList.size( ) && NULL == tags->tagList[ index ] )
+    while( index < tags->tagList.size() && NULL == tags->tagList[index] )
         ++index;
     return TagIterator( tags, old );
 }
@@ -403,7 +403,7 @@ MeshImplTags::TagIterator MeshImplTags::TagIterator::operator--( int )
 {
     size_t old = index;
     --index;
-    while( index < tags->tagList.size( ) && NULL == tags->tagList[ index ] )
+    while( index < tags->tagList.size() && NULL == tags->tagList[index] )
         --index;
     return TagIterator( tags, old );
 }

@@ -62,7 +62,7 @@ class MESQUITE_EXPORT QualityImprover : public Instruction
     // Constructor is protected ... see below.
 
     // virtual destructor ensures use of polymorphism during destruction
-    virtual ~QualityImprover( );
+    virtual ~QualityImprover();
 
     //! Sets in the termination criterion for the concrete solver's
     //! optimization.
@@ -77,7 +77,7 @@ class MESQUITE_EXPORT QualityImprover : public Instruction
         outerTerminationCriterion = crit;
     }
 
-    virtual PatchSet* get_patch_set( ) = 0;
+    virtual PatchSet* get_patch_set() = 0;
 
     virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
@@ -85,15 +85,15 @@ class MESQUITE_EXPORT QualityImprover : public Instruction
     /*! The default constructor initialises a few member variables
         to default values.
         This can be reused by concrete class constructor. */
-    QualityImprover( );
+    QualityImprover();
 
     //! return the outer termination criterion pointer
-    TerminationCriterion* get_outer_termination_criterion( )
+    TerminationCriterion* get_outer_termination_criterion()
     {
         return outerTerminationCriterion;
     }
     //! return the inner termination criterion pointer
-    TerminationCriterion* get_inner_termination_criterion( )
+    TerminationCriterion* get_inner_termination_criterion()
     {
         return innerTerminationCriterion;
     }

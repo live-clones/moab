@@ -42,15 +42,15 @@ using namespace moab;
         return 2;                                                                                                   \
     }
 
-int main( )
+int main()
 {
     FileOptions tool( "INT1=1;NUL1;STR1=ABC;DBL1=1.0;dbl2=2.0;DBL3=3.0;INT2=2;nul2;NUL3;INT3=3;str2=once upon a "
                       "time;str3==fubar=;;INTS=1-3,5,6;DBLS=1.0,2.0, 3.0;STRS=var1, var2_var2;STRS2=" );
 
     std::string s;
-    int         i;
-    double      d;
-    ErrorCode   rval;
+    int i;
+    double d;
+    ErrorCode rval;
 
     // test basic get_option method without deleting entry
     rval = tool.get_option( "STR1", s );
@@ -65,7 +65,7 @@ int main( )
     // test basig get_option method with a null option
     rval = tool.get_option( "NUL2", s );
     CHECK( rval );
-    EQUAL( s.empty( ), true );
+    EQUAL( s.empty(), true );
 
     // test null option
     rval = tool.get_null_option( "nul1" );
@@ -128,7 +128,7 @@ int main( )
     EQUAL( rval, MB_TYPE_OUT_OF_RANGE );
 
     // We haven't looked at all of the options yet
-    EQUAL( false, tool.all_seen( ) );
+    EQUAL( false, tool.all_seen() );
     rval = tool.get_unseen_option( s );
     CHECK( rval );
     EQUAL( s, "str3" );
@@ -137,61 +137,61 @@ int main( )
 
     rval = tool.get_option( "NUL3", s );
     CHECK( rval );
-    EQUAL( s.empty( ), true );
+    EQUAL( s.empty(), true );
 
     rval = tool.get_option( "STR3", s );
     CHECK( rval );
     EQUAL( s, "=fubar=" );
 
     // test size of options string
-    unsigned l = tool.size( );
+    unsigned l = tool.size();
     EQUAL( l, 16u );
 
     // test ints option
     std::vector< int > ivals;
     rval = tool.get_ints_option( "INTS", ivals );
     CHECK( rval );
-    EQUAL( 5, ivals.size( ) );
-    EQUAL( 1, ivals[ 0 ] );
-    EQUAL( 2, ivals[ 1 ] );
-    EQUAL( 3, ivals[ 2 ] );
-    EQUAL( 5, ivals[ 3 ] );
-    EQUAL( 6, ivals[ 4 ] );
+    EQUAL( 5, ivals.size() );
+    EQUAL( 1, ivals[0] );
+    EQUAL( 2, ivals[1] );
+    EQUAL( 3, ivals[2] );
+    EQUAL( 5, ivals[3] );
+    EQUAL( 6, ivals[4] );
 
     // test dbls option
     std::vector< double > vals;
     rval = tool.get_reals_option( "DBLS", vals );
     CHECK( rval );
-    EQUAL( 3, vals.size( ) );
-    EQUAL( 1.0, vals[ 0 ] );
-    EQUAL( 2.0, vals[ 1 ] );
-    EQUAL( 3.0, vals[ 2 ] );
+    EQUAL( 3, vals.size() );
+    EQUAL( 1.0, vals[0] );
+    EQUAL( 2.0, vals[1] );
+    EQUAL( 3.0, vals[2] );
 
     // test strs option
     std::vector< std::string > svals;
     rval = tool.get_strs_option( "STRS", svals );
     CHECK( rval );
-    EQUAL( 2, svals.size( ) );
-    EQUAL( "var1", svals[ 0 ] );
-    EQUAL( "var2_var2", svals[ 1 ] );
+    EQUAL( 2, svals.size() );
+    EQUAL( "var1", svals[0] );
+    EQUAL( "var2_var2", svals[1] );
 
-    svals.clear( );
+    svals.clear();
     rval = tool.get_strs_option( "STRS2", svals );
     EQUAL( MB_TYPE_OUT_OF_RANGE, rval );
 
     // We requested every option
-    EQUAL( true, tool.all_seen( ) );
+    EQUAL( true, tool.all_seen() );
     rval = tool.get_unseen_option( s );
     EQUAL( MB_ENTITY_NOT_FOUND, rval );
 
     // test alternate separator
 
     FileOptions tool2( ";+OPT1=ABC+OPT2=" );
-    l = tool2.size( );
+    l = tool2.size();
     EQUAL( l, 2 );
 
     // We haven't looked at all of the options yet
-    EQUAL( false, tool2.all_seen( ) );
+    EQUAL( false, tool2.all_seen() );
     rval = tool2.get_unseen_option( s );
     CHECK( rval );
     EQUAL( s, "OPT1" );
@@ -202,39 +202,39 @@ int main( )
 
     rval = tool2.get_option( "opt2", s );
     CHECK( rval );
-    bool e = s.empty( );
+    bool e = s.empty();
     EQUAL( e, true );
 
-    l = tool2.size( );
+    l = tool2.size();
     EQUAL( l, 2 );
 
     // We requested every option
-    EQUAL( true, tool2.all_seen( ) );
+    EQUAL( true, tool2.all_seen() );
     rval = tool2.get_unseen_option( s );
     EQUAL( MB_ENTITY_NOT_FOUND, rval );
 
     // test empty options string
 
     FileOptions tool3( ";;;;" );
-    e = tool3.empty( );
+    e = tool3.empty();
     EQUAL( e, true );
-    l = tool3.size( );
+    l = tool3.size();
     EQUAL( l, 0 );
-    EQUAL( true, tool3.all_seen( ) );
+    EQUAL( true, tool3.all_seen() );
 
     FileOptions tool4( NULL );
-    e = tool4.empty( );
+    e = tool4.empty();
     EQUAL( e, true );
-    l = tool4.size( );
+    l = tool4.size();
     EQUAL( l, 0 );
-    EQUAL( true, tool4.all_seen( ) );
+    EQUAL( true, tool4.all_seen() );
 
     FileOptions tool5( ";+" );
-    e = tool5.empty( );
+    e = tool5.empty();
     EQUAL( e, true );
-    l = tool5.size( );
+    l = tool5.size();
     EQUAL( l, 0 );
-    EQUAL( true, tool5.all_seen( ) );
+    EQUAL( true, tool5.all_seen() );
 
     // test copy constructor
 
@@ -246,23 +246,23 @@ int main( )
 
     rval = tool6.get_option( "opt2", s );
     CHECK( rval );
-    e = s.empty( );
+    e = s.empty();
     EQUAL( e, true );
 
-    l = tool6.size( );
+    l = tool6.size();
     EQUAL( l, 2 );
 
     FileOptions tool7( tool5 );
-    e = tool7.empty( );
+    e = tool7.empty();
     EQUAL( e, true );
-    l = tool7.size( );
+    l = tool7.size();
     EQUAL( l, 0 );
 
     // test assignment operator
 
     FileOptions tool8( tool2 );
     tool8 = tool;
-    EQUAL( tool8.size( ), tool.size( ) );
+    EQUAL( tool8.size(), tool.size() );
 
     return 0;
 }

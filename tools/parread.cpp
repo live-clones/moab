@@ -33,67 +33,67 @@ int main( int argc, char* argv[] )
 {
     MPI_Init( &argc, &argv );
 
-    const char         BCAST_MODE[] = "BCAST_DELETE";
-    const char         DELETE_MODE[] = "READ_DELETE";
-    const char         PART_MODE[] = "READ_PART";
-    const char*        read_mode = PART_MODE;
-    const char*        partition_tag_name = DEFAULT_PARTITION_TAG;
-    bool               assign_by_id = false;
-    bool               resolve_shared = true;
-    int                debug_level = 0;
-    int                pause_rank = -1;
-    const char*        filename = 0;
+    const char BCAST_MODE[]        = "BCAST_DELETE";
+    const char DELETE_MODE[]       = "READ_DELETE";
+    const char PART_MODE[]         = "READ_PART";
+    const char* read_mode          = PART_MODE;
+    const char* partition_tag_name = DEFAULT_PARTITION_TAG;
+    bool assign_by_id              = false;
+    bool resolve_shared            = true;
+    int debug_level                = 0;
+    int pause_rank                 = -1;
+    const char* filename           = 0;
     std::ostringstream options;
     options << ";";
 
     int rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
-    int  expect_tag = 0;
-    int  expect_level = 0;
-    int  expect_opt = 0;
-    int  expect_rank = 0;
+    int expect_tag     = 0;
+    int expect_level   = 0;
+    int expect_opt     = 0;
+    int expect_rank    = 0;
     bool no_more_flags = false;
     for( int i = 1; i < argc; ++i )
     {
         int arg_pos = i;
         if( expect_tag == i )
         {
-            partition_tag_name = argv[ i ];
-            expect_tag = 0;
+            partition_tag_name = argv[i];
+            expect_tag         = 0;
         }
         else if( expect_level == i )
         {
             char* endptr;
-            debug_level = (int)strtol( argv[ i ], &endptr, 0 );
-            if( *endptr || endptr == argv[ i ] || debug_level < 0 )
+            debug_level = (int)strtol( argv[i], &endptr, 0 );
+            if( *endptr || endptr == argv[i] || debug_level < 0 )
             {
                 std::cerr << "Expected positive integer value following '-g' flag" << std::endl;
-                error( argv[ 0 ] );
+                error( argv[0] );
             }
             expect_level = 0;
         }
         else if( expect_opt == i )
         {
-            options << ";" << argv[ i ];
+            options << ";" << argv[i];
             expect_opt = 0;
         }
         else if( expect_rank == i )
         {
             char* endptr;
-            pause_rank = (int)strtol( argv[ i ], &endptr, 0 );
-            if( *endptr || endptr == argv[ i ] || pause_rank < 0 )
+            pause_rank = (int)strtol( argv[i], &endptr, 0 );
+            if( *endptr || endptr == argv[i] || pause_rank < 0 )
             {
                 std::cerr << "Expected positive integer value following '-P' flag" << std::endl;
-                error( argv[ 0 ] );
+                error( argv[0] );
             }
             expect_rank = 0;
         }
-        else if( argv[ i ][ 0 ] == '-' && !no_more_flags )
+        else if( argv[i][0] == '-' && !no_more_flags )
         {
-            for( int j = 1; argv[ i ][ j ]; ++j )
+            for( int j = 1; argv[i][j]; ++j )
             {
-                switch( argv[ i ][ j ] )
+                switch( argv[i][j] )
                 {
                     case '-':
                         no_more_flags = true;
@@ -126,49 +126,49 @@ int main( int argc, char* argv[] )
                         expect_opt = ++arg_pos;
                         break;
                     case 'h':
-                        help( argv[ 0 ] );
+                        help( argv[0] );
                         break;
                     default:
-                        std::cerr << "Unknown flag: -" << argv[ i ][ j ] << std::endl;
-                        error( argv[ 0 ] );
+                        std::cerr << "Unknown flag: -" << argv[i][j] << std::endl;
+                        error( argv[0] );
                 }
             }
         }
         else if( filename )
         {
-            std::cerr << "Unexpected argument: \"" << argv[ i ] << "\"" << std::endl;
-            error( argv[ 0 ] );
+            std::cerr << "Unexpected argument: \"" << argv[i] << "\"" << std::endl;
+            error( argv[0] );
         }
         else
         {
-            filename = argv[ i ];
+            filename = argv[i];
         }
     }
 
     if( expect_tag )
     {
         std::cerr << "Expected value following -p flag" << std::endl;
-        error( argv[ 0 ] );
+        error( argv[0] );
     }
     if( expect_level )
     {
         std::cerr << "Expected value following -g flag" << std::endl;
-        error( argv[ 0 ] );
+        error( argv[0] );
     }
     if( expect_opt )
     {
         std::cerr << "Expected value following -O flag" << std::endl;
-        error( argv[ 0 ] );
+        error( argv[0] );
     }
     if( expect_rank )
     {
         std::cerr << "Expected rank following -P flag" << std::endl;
-        error( argv[ 0 ] );
+        error( argv[0] );
     }
     if( !filename )
     {
         std::cerr << "No file name specified" << std::endl;
-        error( argv[ 0 ] );
+        error( argv[0] );
     }
 
     options << ";PARTITION=" << partition_tag_name << ";PARALLEL=" << read_mode;
@@ -176,14 +176,14 @@ int main( int argc, char* argv[] )
     if( assign_by_id ) options << ";PARTITION_BY_RANK";
     if( debug_level ) options << ";DEBUG_IO=" << debug_level;
 
-    moab::Core       core;
+    moab::Core core;
     moab::Interface& mb = core;
 
     if( pause_rank >= 0 )
     {
         if( pause_rank == rank )
         {
-            std::cout << "Process " << rank << " with PID " << getpid( ) << " waiting for debugger" << std::endl
+            std::cout << "Process " << rank << " with PID " << getpid() << " waiting for debugger" << std::endl
                       << "Set local variable 'do_wait' to zero to continue" << std::endl;
 
             volatile int do_wait = 1;
@@ -195,17 +195,17 @@ int main( int argc, char* argv[] )
         MPI_Barrier( MPI_COMM_WORLD );
     }
 
-    std::string opts = options.str( );
+    std::string opts = options.str();
     if( rank == 0 ) std::cout << "Reading \"" << filename << "\" with options=\"" << opts << "\"." << std::endl;
 
-    double          init_time = MPI_Wtime( );
-    moab::ErrorCode rval = mb.load_file( filename, 0, opts.c_str( ) );
-    double          fini_time = MPI_Wtime( );
+    double init_time     = MPI_Wtime();
+    moab::ErrorCode rval = mb.load_file( filename, 0, opts.c_str() );
+    double fini_time     = MPI_Wtime();
 
-    long send_data[ 2 ] = { (long)( 100 * ( fini_time - init_time ) ), rval };
-    long recv_data[ 2 ];
+    long send_data[2] = { (long)( 100 * ( fini_time - init_time ) ), rval };
+    long recv_data[2];
     MPI_Allreduce( send_data, recv_data, 2, MPI_LONG, MPI_MAX, MPI_COMM_WORLD );
-    double time = recv_data[ 0 ] / 100.0;
+    double time = recv_data[0] / 100.0;
 
     if( moab::MB_SUCCESS != rval )
     {
@@ -214,15 +214,15 @@ int main( int argc, char* argv[] )
         mb.get_last_error( msg );
         std::cout << "Read failed for proccess " << rank << " with error code " << rval << " (" << estr << ")"
                   << std::endl;
-        if( !msg.empty( ) ) std::cerr << '"' << msg << '"' << std::endl;
+        if( !msg.empty() ) std::cerr << '"' << msg << '"' << std::endl;
     }
 
     if( rank == 0 )
     {
-        if( recv_data[ 1 ] == moab::MB_SUCCESS ) std::cout << "Success!" << std::endl;
+        if( recv_data[1] == moab::MB_SUCCESS ) std::cout << "Success!" << std::endl;
         std::cout << "Read returned in " << time << " seconds" << std::endl;
     }
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return ( moab::MB_SUCCESS != rval );
 }

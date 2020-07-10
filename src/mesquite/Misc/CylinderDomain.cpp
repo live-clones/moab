@@ -34,22 +34,22 @@
 namespace MBMesquite
 {
 
-CylinderDomain::~CylinderDomain( ) {}
+CylinderDomain::~CylinderDomain() {}
 
 void CylinderDomain::evaluate( Mesh::VertexHandle, const Vector3D& point, Vector3D& closest, Vector3D& normal ) const
 {
-    const double   EPSILON = std::numeric_limits< double >::epsilon( );
-    double         t = mAxis % ( point - mCenter );
+    const double EPSILON      = std::numeric_limits< double >::epsilon();
+    double t                  = mAxis % ( point - mCenter );
     const Vector3D axis_point = mCenter + t * mAxis;
 
-    normal = point - axis_point;
-    const double len = normal.length( );
+    normal           = point - axis_point;
+    const double len = normal.length();
     if( len < EPSILON )
     {
         Vector3D v( 1, 0, 0 );
-        if( ( v * mAxis ).length( ) < EPSILON ) v.set( 0, 1, 0 );
+        if( ( v * mAxis ).length() < EPSILON ) v.set( 0, 1, 0 );
         normal = v * mAxis;
-        normal.normalize( );
+        normal.normalize();
     }
     else
     {
@@ -83,7 +83,7 @@ void CylinderDomain::element_normal_at( Mesh::ElementHandle h, Vector3D& v ) con
 void CylinderDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coords[], unsigned count, MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
-        vertex_normal_at( h[ i ], coords[ i ] );
+        vertex_normal_at( h[i], coords[i] );
 }
 
 void CylinderDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,

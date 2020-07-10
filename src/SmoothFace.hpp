@@ -32,11 +32,11 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     SmoothFace( Interface* mb, EntityHandle surface_set,
                 GeomTopoTool* gTool );  // entity or entity set
 
-    virtual ~SmoothFace( );
+    virtual ~SmoothFace();
 
-    virtual double area( );
+    virtual double area();
 
-    virtual void bounding_box( double box_min[ 3 ], double box_max[ 3 ] );
+    virtual void bounding_box( double box_min[3], double box_max[3] );
 
     virtual void move_to_surface( double& x, double& y, double& z );
     /*
@@ -46,7 +46,7 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     virtual bool normal_at( double x, double y, double z, double& nx, double& ny, double& nz );
 
     // initialize normals// they will be stored as tags on nodes
-    int init_gradient( );
+    int init_gradient();
 
     // some functions for edge evaluations
     ErrorCode evaluate_smooth_edge( EntityHandle eh, double& t, CartVect& outv );
@@ -59,7 +59,7 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
 
     ErrorCode project_to_facets_main( CartVect& this_point, bool trim, bool& outside,
                                       CartVect* closest_point_ptr = NULL,  // interested only in normal
-                                      CartVect* normal_ptr = NULL );  // interested only in closest point
+                                      CartVect* normal_ptr        = NULL );       // interested only in closest point
 
     ErrorCode project_to_facets( std::vector< EntityHandle >& facet_list, EntityHandle& lastFacet, int interpOrder,
                                  double compareTol, CartVect& this_point, bool trim, bool& outside,
@@ -68,30 +68,30 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     ErrorCode project_to_facet( EntityHandle facet, CartVect& pt, CartVect& areacoord, CartVect& close_point,
                                 bool& outside_facet, double compare_tol );
 
-    bool is_at_vertex( EntityHandle facet,  // (IN) facet we are evaluating
-                       CartVect&    pt,  // (IN) the point
-                       CartVect&    ac,  // (IN) the ac of the point on the facet plane
-                       double       compare_tol,  // (IN) return TRUE of closer than this
-                       CartVect&    eval_pt,  // (OUT) location at vertex if TRUE
-                       CartVect*    eval_norm_ptr );  // (OUT) normal at vertex if TRUE
+    bool is_at_vertex( EntityHandle facet,         // (IN) facet we are evaluating
+                       CartVect& pt,               // (IN) the point
+                       CartVect& ac,               // (IN) the ac of the point on the facet plane
+                       double compare_tol,         // (IN) return TRUE of closer than this
+                       CartVect& eval_pt,          // (OUT) location at vertex if TRUE
+                       CartVect* eval_norm_ptr );  // (OUT) normal at vertex if TRUE
 
-    ErrorCode project_to_patch( EntityHandle facet,  // (IN) the facet where the patch is defined
-                                CartVect&    ac,  // (IN) area coordinate initial guess (from linear facet)
-                                CartVect&    pt,  // (IN) point we are projecting to patch
-                                CartVect&    eval_pt,  // (OUT) The projected point
-                                CartVect*    eval_norm,  // (OUT) normal at evaluated point
-                                bool&        outside,  // (OUT) the closest point on patch to pt is on an edge
-                                double       compare_tol,  // (IN) comparison tolerance
-                                int          edge_id );  // (IN) only used if this is to be projected to one
+    ErrorCode project_to_patch( EntityHandle facet,   // (IN) the facet where the patch is defined
+                                CartVect& ac,         // (IN) area coordinate initial guess (from linear facet)
+                                CartVect& pt,         // (IN) point we are projecting to patch
+                                CartVect& eval_pt,    // (OUT) The projected point
+                                CartVect* eval_norm,  // (OUT) normal at evaluated point
+                                bool& outside,        // (OUT) the closest point on patch to pt is on an edge
+                                double compare_tol,   // (IN) comparison tolerance
+                                int edge_id );        // (IN) only used if this is to be projected to one
     //      of the edges.  Otherwise, should be -1
 
     ErrorCode eval_bezier_patch_normal( EntityHandle facet, CartVect& areacoord, CartVect& normal );
 
     // this will be called now from driver...
-    ErrorCode compute_tangents_for_each_edge( );  // they will be used for control points
+    ErrorCode compute_tangents_for_each_edge();  // they will be used for control points
 
     ErrorCode get_normals_for_vertices( const EntityHandle* conn2,
-                                        CartVect            N[ 2 ] );  // here we need the gradient tag
+                                        CartVect N[2] );  // here we need the gradient tag
 
     // make this one public, will be called during initialization !!!
     ErrorCode init_edge_control_points( CartVect& P0, CartVect& P3, CartVect& N0, CartVect& N3, CartVect& T0,
@@ -103,20 +103,20 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     ErrorCode compute_internal_control_points_on_facets( double min_dot, Tag facetCtrlTag, Tag facetEdgeCtrlTag );
 
     // move from private too
-    void DumpModelControlPoints( );
+    void DumpModelControlPoints();
 
-    int eval_counter( )
+    int eval_counter()
     {
         return _evaluationsCounter;
     }
 
     // new method for ray intersection correction
     ErrorCode ray_intersection_correct( EntityHandle facet,  // (IN) the facet where the patch is defined
-                                        CartVect&    pt,  // (IN) shoot from
-                                        CartVect&    ray,  // (IN) ray direction
-                                        CartVect&    eval_pt,  // (INOUT) The intersection point
-                                        double&      distance,  // (IN OUT) the new distance
-                                        bool&        outside );  // (OUT) the closest point on patch to pt is on an edge
+                                        CartVect& pt,        // (IN) shoot from
+                                        CartVect& ray,       // (IN) ray direction
+                                        CartVect& eval_pt,   // (INOUT) The intersection point
+                                        double& distance,    // (IN OUT) the new distance
+                                        bool& outside );     // (OUT) the closest point on patch to pt is on an edge
 
     void append_smooth_tags( std::vector< Tag >& smoothTags );
     //      of the edges.  Otherwise, should be -1)
@@ -139,22 +139,22 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     //===========================================================================
     void ac_at_edge( CartVect& fac,  // facet area coordinate
                      CartVect& eac,  // edge area coordinate
-                     int       edge_id );  // id of edge
+                     int edge_id );  // id of edge
 
     // some local functions that do not need to be public
     ErrorCode init_bezier_edge( EntityHandle edge, double min_dot );
     //
 
-    ErrorCode find_edges_orientations( EntityHandle edges[ 3 ], const EntityHandle* conn3,
-                                       int orient[ 3 ] );  // maybe we will set it?
+    ErrorCode find_edges_orientations( EntityHandle edges[3], const EntityHandle* conn3,
+                                       int orient[3] );  // maybe we will set it?
 
-    ErrorCode init_facet_control_points( CartVect N[ 6 ],  // vertex normals (per edge)
-                                         CartVect P[ 3 ][ 5 ],  // edge control points
-                                         CartVect G[ 6 ] );  // return internal control points
+    ErrorCode init_facet_control_points( CartVect N[6],     // vertex normals (per edge)
+                                         CartVect P[3][5],  // edge control points
+                                         CartVect G[6] );   // return internal control points
 
     // those are the bounding box limits;
     // they are adjusted for the control points too in each triangle
-    void     adjust_bounding_box( CartVect& vect );
+    void adjust_bounding_box( CartVect& vect );
     CartVect _minim;
     CartVect _maxim;
 
@@ -211,10 +211,10 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     // MB_TAG_DENSE, _planeTag, &defPlane);
     Tag _planeTag;
 
-    Interface*    _mb;
-    EntityHandle  _set;
+    Interface* _mb;
+    EntityHandle _set;
     GeomTopoTool* _my_geomTopoTool;
-    EntityHandle  _obb_root;
+    EntityHandle _obb_root;
     // counter for calls
     long _evaluationsCounter;
 };

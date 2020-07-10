@@ -16,7 +16,7 @@ class IntxRllCssphere : public moab::Intx2Mesh
   public:
     IntxRllCssphere( Interface* mbimpl );
 
-    virtual ~IntxRllCssphere( );
+    virtual ~IntxRllCssphere();
 
     void set_radius( double radius )
     {
@@ -32,15 +32,15 @@ class IntxRllCssphere : public moab::Intx2Mesh
     // main method to intersect meshes on a sphere
 
     ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP, double& area,
-                                                   int markb[ MAXEDGES ], int markr[ MAXEDGES ], int& nsSrc, int& nsTgt,
+                                                   int markb[MAXEDGES], int markr[MAXEDGES], int& nsSrc, int& nsTgt,
                                                    bool check_boxes_first = false );
 
     ErrorCode findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double* iP, int nP );
 
   private:
-    double R;  // radius of the sphere
-    int    plane;  // current gnomonic plane, will still be used for projection
-    int    srcEdgeType[ 4 ];  // at most 4
+    double R;            // radius of the sphere
+    int plane;           // current gnomonic plane, will still be used for projection
+    int srcEdgeType[4];  // at most 4
     // these could be from [-PI/2, +PI/2] and [0 to 2*PI]
 };
 

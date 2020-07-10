@@ -37,7 +37,7 @@ class LinearQuad
      * the element */
     static int insideFcn( const double* params, const int ndim, const double tol );
 
-    static EvalSet eval_set( )
+    static EvalSet eval_set()
     {
         return EvalSet( evalFcn, reverseEvalFcn, normalFcn, jacobianFcn, integrateFcn, NULL, insideFcn );
     }
@@ -46,7 +46,7 @@ class LinearQuad
     {
         if( tp == MBQUAD && numv == 4 )
         {
-            eset = eval_set( );
+            eset = eval_set();
             return true;
         }
         else
@@ -55,10 +55,10 @@ class LinearQuad
 
   protected:
     /* Preimages of the vertices -- "canonical vertices" -- are known as "corners". */
-    static const double       corner[ 4 ][ 2 ];
-    static const double       gauss[ 1 ][ 2 ];
+    static const double corner[4][2];
+    static const double gauss[1][2];
     static const unsigned int corner_count = 4;
-    static const unsigned int gauss_count = 1;
+    static const unsigned int gauss_count  = 1;
 
 };  // class LinearQuad
 

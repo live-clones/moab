@@ -15,23 +15,23 @@ class VertexSequence : public EntitySequence
     VertexSequence( EntityHandle start, EntityID count, EntityID data_size )
         : EntitySequence( start, count, new SequenceData( 3, start, start + data_size - 1 ) )
     {
-        data( )->create_sequence_data( X, sizeof( double ) );
-        data( )->create_sequence_data( Y, sizeof( double ) );
-        data( )->create_sequence_data( Z, sizeof( double ) );
+        data()->create_sequence_data( X, sizeof( double ) );
+        data()->create_sequence_data( Y, sizeof( double ) );
+        data()->create_sequence_data( Z, sizeof( double ) );
     }
 
-    virtual ~VertexSequence( );
+    virtual ~VertexSequence();
 
     inline ErrorCode get_coordinates( EntityHandle handle, double& x, double& y, double& z ) const;
 
-    inline ErrorCode get_coordinates( EntityHandle handle, double coords[ 3 ] ) const;
+    inline ErrorCode get_coordinates( EntityHandle handle, double coords[3] ) const;
 
     inline ErrorCode get_coordinates_ref( EntityHandle handle, const double*& x, const double*& y,
                                           const double*& z ) const;
 
     inline ErrorCode set_coordinates( EntityHandle entity, double x, double y, double z );
 
-    inline ErrorCode set_coordinates( EntityHandle entity, const double xyz[ 3 ] );
+    inline ErrorCode set_coordinates( EntityHandle entity, const double xyz[3] );
 
     inline ErrorCode get_coordinate_arrays( double*& x, double*& y, double*& z );
 
@@ -56,36 +56,36 @@ class VertexSequence : public EntitySequence
 
     inline double* array( Coord coord )
     {
-        return reinterpret_cast< double* >( data( )->get_sequence_data( coord ) );
+        return reinterpret_cast< double* >( data()->get_sequence_data( coord ) );
     }
 
     inline const double* array( Coord coord ) const
     {
-        return reinterpret_cast< const double* >( data( )->get_sequence_data( coord ) );
+        return reinterpret_cast< const double* >( data()->get_sequence_data( coord ) );
     }
 
-    inline double* x_array( )
+    inline double* x_array()
     {
         return array( X );
     }
-    inline double* y_array( )
+    inline double* y_array()
     {
         return array( Y );
     }
-    inline double* z_array( )
+    inline double* z_array()
     {
         return array( Z );
     }
 
-    inline const double* x_array( ) const
+    inline const double* x_array() const
     {
         return array( X );
     }
-    inline const double* y_array( ) const
+    inline const double* y_array() const
     {
         return array( Y );
     }
-    inline const double* z_array( ) const
+    inline const double* z_array() const
     {
         return array( Z );
     }
@@ -95,62 +95,62 @@ class VertexSequence : public EntitySequence
 
 ErrorCode VertexSequence::get_coordinates( EntityHandle handle, double& x, double& y, double& z ) const
 {
-    EntityID offset = handle - data( )->start_handle( );
-    x = x_array( )[ offset ];
-    y = y_array( )[ offset ];
-    z = z_array( )[ offset ];
+    EntityID offset = handle - data()->start_handle();
+    x               = x_array()[offset];
+    y               = y_array()[offset];
+    z               = z_array()[offset];
     return MB_SUCCESS;
 }
 
-ErrorCode VertexSequence::get_coordinates( EntityHandle handle, double coords[ 3 ] ) const
+ErrorCode VertexSequence::get_coordinates( EntityHandle handle, double coords[3] ) const
 {
-    EntityID offset = handle - data( )->start_handle( );
-    coords[ X ] = x_array( )[ offset ];
-    coords[ Y ] = y_array( )[ offset ];
-    coords[ Z ] = z_array( )[ offset ];
+    EntityID offset = handle - data()->start_handle();
+    coords[X]       = x_array()[offset];
+    coords[Y]       = y_array()[offset];
+    coords[Z]       = z_array()[offset];
     return MB_SUCCESS;
 }
 
 ErrorCode VertexSequence::get_coordinates_ref( EntityHandle handle, const double*& x, const double*& y,
                                                const double*& z ) const
 {
-    EntityID offset = handle - data( )->start_handle( );
-    x = x_array( ) + offset;
-    y = y_array( ) + offset;
-    z = z_array( ) + offset;
+    EntityID offset = handle - data()->start_handle();
+    x               = x_array() + offset;
+    y               = y_array() + offset;
+    z               = z_array() + offset;
     return MB_SUCCESS;
 }
 
 ErrorCode VertexSequence::set_coordinates( EntityHandle entity, double x, double y, double z )
 {
-    EntityID offset = entity - data( )->start_handle( );
-    x_array( )[ offset ] = x;
-    y_array( )[ offset ] = y;
-    z_array( )[ offset ] = z;
+    EntityID offset   = entity - data()->start_handle();
+    x_array()[offset] = x;
+    y_array()[offset] = y;
+    z_array()[offset] = z;
     return MB_SUCCESS;
 }
 
 ErrorCode VertexSequence::set_coordinates( EntityHandle entity, const double* xyz )
 {
-    EntityID offset = entity - data( )->start_handle( );
-    x_array( )[ offset ] = xyz[ 0 ];
-    y_array( )[ offset ] = xyz[ 1 ];
-    z_array( )[ offset ] = xyz[ 2 ];
+    EntityID offset   = entity - data()->start_handle();
+    x_array()[offset] = xyz[0];
+    y_array()[offset] = xyz[1];
+    z_array()[offset] = xyz[2];
     return MB_SUCCESS;
 }
 
 ErrorCode VertexSequence::get_coordinate_arrays( double*& x, double*& y, double*& z )
 {
-    EntityID offset = start_handle( ) - data( )->start_handle( );
-    x = x_array( ) + offset;
-    y = y_array( ) + offset;
-    z = z_array( ) + offset;
+    EntityID offset = start_handle() - data()->start_handle();
+    x               = x_array() + offset;
+    y               = y_array() + offset;
+    z               = z_array() + offset;
     return MB_SUCCESS;
 }
 
 ErrorCode VertexSequence::get_coordinate_arrays( const double*& x, const double*& y, const double*& z ) const
 {
-    return get_coordinates_ref( start_handle( ), x, y, z );
+    return get_coordinates_ref( start_handle(), x, y, z );
 }
 
 }  // namespace moab

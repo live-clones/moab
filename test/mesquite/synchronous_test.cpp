@@ -52,7 +52,7 @@ const double min_y = 0.0, mid_y = 1.0, max_y = 2.0;
 const double z = 0.0;
 
 const char default_out_file[] = "synchronous.vtk";
-double     default_x = 0.25;
+double default_x              = 0.25;
 
 void create_input_mesh( double mid_x, MBMesquite::MeshImpl& mesh, MBMesquite::MsqError& );
 
@@ -80,9 +80,9 @@ void usage( const char* argv0, bool brief = true )
     std::exit( 0 );
 }
 
-char        mSolver = '\0', mMetric = '\0';
+char mSolver = '\0', mMetric = '\0';
 const char* outputFile = default_out_file;
-double      input_x = default_x;
+double input_x         = default_x;
 
 void parse_options( char* argv[], int argc )
 {
@@ -92,20 +92,20 @@ void parse_options( char* argv[], int argc )
         if( next_arg_is_x )
         {
             next_arg_is_x = false;
-            char* endptr = 0;
-            input_x = std::strtod( argv[ i ], &endptr );
-            if( endptr && *endptr ) usage( argv[ 0 ] );
+            char* endptr  = 0;
+            input_x       = std::strtod( argv[i], &endptr );
+            if( endptr && *endptr ) usage( argv[0] );
             continue;
         }
 
-        if( argv[ i ][ 0 ] != '-' )
+        if( argv[i][0] != '-' )
         {
-            if( outputFile != default_out_file ) usage( argv[ 0 ] );
-            outputFile = argv[ i ];
+            if( outputFile != default_out_file ) usage( argv[0] );
+            outputFile = argv[i];
             continue;
         }
 
-        for( const char* p = argv[ i ] + 1; *p; ++p )
+        for( const char* p = argv[i] + 1; *p; ++p )
         {
             switch( *p )
             {
@@ -115,24 +115,24 @@ void parse_options( char* argv[], int argc )
 
                 case 'j':
                 case 'n':
-                    if( mSolver ) usage( argv[ 0 ] );
+                    if( mSolver ) usage( argv[0] );
                     mSolver = *p;
                     break;
 
                 case 'r':
                 case 'c':
-                    if( mMetric ) usage( argv[ 0 ] );
+                    if( mMetric ) usage( argv[0] );
                     mMetric = *p;
                     break;
 
                 default:
-                    usage( argv[ 0 ], *p != 'h' );
+                    usage( argv[0], *p != 'h' );
                     break;
             }
         }
     }
 
-    if( next_arg_is_x ) usage( argv[ 0 ] );
+    if( next_arg_is_x ) usage( argv[0] );
 
     // default values
     if( !mMetric ) mMetric = 'c';
@@ -143,9 +143,9 @@ int main( int argc, char* argv[] )
 {
     parse_options( argv, argc );
 
-    MeshImpl    mesh;
+    MeshImpl mesh;
     XYRectangle domain( max_x - min_x, max_y - min_y, min_x, min_y );
-    MsqError    err;
+    MsqError err;
 
     create_input_mesh( input_x, mesh, err );
     if( MSQ_CHKERR( err ) )
@@ -175,7 +175,7 @@ int main( int argc, char* argv[] )
     else
         solver = new FeasibleNewton( &function );
 
-    if( PatchSetUser* psu = dynamic_cast< PatchSetUser* >( solver ) ) psu->use_global_patch( );
+    if( PatchSetUser* psu = dynamic_cast< PatchSetUser* >( solver ) ) psu->use_global_patch();
 
     TerminationCriterion inner;
     inner.add_absolute_vertex_movement( 1e-4 );
@@ -183,7 +183,7 @@ int main( int argc, char* argv[] )
     solver->set_inner_termination_criterion( &inner );
 
     InstructionQueue q;
-    QualityAssessor  qa( metric, 10 );
+    QualityAssessor qa( metric, 10 );
     q.add_quality_assessor( &qa, err );
     q.set_master_quality_improver( solver, err );
     q.add_quality_assessor( &qa, err );
@@ -209,7 +209,7 @@ int main( int argc, char* argv[] )
 }
 
 const char* temp_file = "syncrononous_input.vtk";
-void        create_input_mesh( double mid_x, MeshImpl& mesh, MsqError& err )
+void create_input_mesh( double mid_x, MeshImpl& mesh, MsqError& err )
 {
     std::ofstream vtkfile( temp_file );
     vtkfile << "# vtk DataFile Version 3.0" << std::endl
@@ -239,7 +239,7 @@ void        create_input_mesh( double mid_x, MeshImpl& mesh, MsqError& err )
             << "1 0 1" << std::endl
             << "1 0 1" << std::endl
             << "1 0 1" << std::endl;
-    vtkfile.close( );
+    vtkfile.close();
 
     mesh.read_vtk( temp_file, err );
     remove( temp_file );

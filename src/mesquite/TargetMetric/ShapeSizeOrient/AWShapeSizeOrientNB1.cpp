@@ -38,35 +38,35 @@
 namespace MBMesquite
 {
 
-std::string AWShapeSizeOrientNB1::get_name( ) const
+std::string AWShapeSizeOrientNB1::get_name() const
 {
     return "AWShapeSizeOrientNB1";
 }
 
-AWShapeSizeOrientNB1::~AWShapeSizeOrientNB1( ) {}
+AWShapeSizeOrientNB1::~AWShapeSizeOrientNB1() {}
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
     result = sqr_Frobenius( A - W );
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
                          MsqMatrix< DIM, DIM >& deriv )
 {
-    deriv = A - W;
+    deriv  = A - W;
     result = sqr_Frobenius( deriv );
     deriv *= 2.0;
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
                          MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
 {
-    deriv = A - W;
+    deriv  = A - W;
     result = sqr_Frobenius( deriv );
     deriv *= 2.0;
     set_scaled_I( second, 2.0 );

@@ -56,15 +56,15 @@
 
 #include <memory>
 
-const int    NUM_INNER_ITERATIONS = 1;
+const int NUM_INNER_ITERATIONS       = 1;
 const double DEFAULT_MOVEMENT_FACTOR = 0.001;
-const bool   CULLING_DEFAULT = true;
-const bool   JACOBI_DEFAULT = false;
+const bool CULLING_DEFAULT           = true;
+const bool JACOBI_DEFAULT            = false;
 
 namespace MBMesquite
 {
 
-UntangleWrapper::UntangleWrapper( )
+UntangleWrapper::UntangleWrapper()
     : qualityMetric( SIZE ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), metricConstant( -1 ),
       maxIterations( -1 ), doCulling( CULLING_DEFAULT ), doJacobi( JACOBI_DEFAULT )
 {
@@ -76,7 +76,7 @@ UntangleWrapper::UntangleWrapper( UntangleMetric m )
 {
 }
 
-UntangleWrapper::~UntangleWrapper( ) {}
+UntangleWrapper::~UntangleWrapper() {}
 
 void UntangleWrapper::set_untangle_metric( UntangleMetric metric )
 {
@@ -108,25 +108,25 @@ void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMes
 {
     Instruction::initialize_vertex_byte( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 
-    Mesh* mesh = mesh_and_domain->get_mesh( );
+    Mesh* mesh = mesh_and_domain->get_mesh();
 
     // get some global mesh properties
-    SimpleStats               edge_len, lambda;
+    SimpleStats edge_len, lambda;
     std::auto_ptr< MeshUtil > tool( new MeshUtil( mesh, settings ) );
     tool->edge_length_distribution( edge_len, err );MSQ_ERRRTN( err );
     tool->lambda_distribution( lambda, err );MSQ_ERRRTN( err );
     tool.reset( 0 );
 
     // get target metrics from user perferences
-    TSizeNB1                 mu_size;
-    TShapeSize2DNB1          mu_shape_2d;
-    TShapeSize3DNB1          mu_shape_3d;
-    TMixed                   mu_shape( &mu_shape_2d, &mu_shape_3d );
+    TSizeNB1 mu_size;
+    TShapeSize2DNB1 mu_shape_2d;
+    TShapeSize3DNB1 mu_shape_3d;
+    TMixed mu_shape( &mu_shape_2d, &mu_shape_3d );
     std::auto_ptr< TMetric > mu;
     if( qualityMetric == BETA )
     {
         double beta = metricConstant;
-        if( beta < 0 ) beta = ( lambda.average( ) * lambda.average( ) ) / 20;
+        if( beta < 0 ) beta = ( lambda.average() * lambda.average() ) / 20;
         // std::cout << "beta= " << beta << std::endl;
         mu.reset( new TUntangleBeta( beta ) );
     }
@@ -145,16 +145,16 @@ void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMes
 
     // define objective function
     IdealShapeTarget base_target;
-    LambdaConstant   target( lambda.average( ), &base_target );
-    TQualityMetric   metric_0( &target, mu.get( ) );
-    ElementPMeanP    metric( 1.0, &metric_0 );
-    PMeanPTemplate   objfunc( 1.0, &metric );
+    LambdaConstant target( lambda.average(), &base_target );
+    TQualityMetric metric_0( &target, mu.get() );
+    ElementPMeanP metric( 1.0, &metric_0 );
+    PMeanPTemplate objfunc( 1.0, &metric );
 
     // define termination criterion
-    double               eps = movementFactor * ( edge_len.average( ) - edge_len.standard_deviation( ) );
+    double eps = movementFactor * ( edge_len.average() - edge_len.standard_deviation() );
     TerminationCriterion inner( "<type:untangle_inner>", TerminationCriterion::TYPE_INNER ),
         outer( "<type:untangle_outer>", TerminationCriterion::TYPE_OUTER );
-    outer.add_untangled_mesh( );
+    outer.add_untangled_mesh();
     if( doCulling )
         inner.cull_on_absolute_vertex_movement( eps );
     else
@@ -165,13 +165,13 @@ void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMes
 
     // construct solver
     SteepestDescent solver( &objfunc );
-    solver.use_element_on_vertex_patch( );
+    solver.use_element_on_vertex_patch();
     solver.set_inner_termination_criterion( &inner );
     solver.set_outer_termination_criterion( &outer );
     if( doJacobi )
-        solver.do_jacobi_optimization( );
+        solver.do_jacobi_optimization();
     else
-        solver.do_gauss_optimization( );
+        solver.do_gauss_optimization();
 
     // Run
     qa->add_quality_assessment( &metric );

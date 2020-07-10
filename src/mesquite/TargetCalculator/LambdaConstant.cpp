@@ -39,7 +39,7 @@ namespace MBMesquite
 
 LambdaConstant::LambdaConstant( double lambda, TargetCalculator* W ) : mLambda( lambda ), mTarget( W ) {}
 
-LambdaConstant::~LambdaConstant( ) {}
+LambdaConstant::~LambdaConstant() {}
 
 bool LambdaConstant::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
                                     MsqError& err )

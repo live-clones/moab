@@ -36,7 +36,7 @@ class AdaptiveKDTree : public Tree
     AdaptiveKDTree( Interface* iface, const Range& entities, EntityHandle* tree_root_set = NULL,
                     FileOptions* opts = NULL );
 
-    ~AdaptiveKDTree( );
+    ~AdaptiveKDTree();
 
     /** \brief Parse options for tree creation
      * \param options Options passed in by application
@@ -62,7 +62,7 @@ class AdaptiveKDTree : public Tree
                                   FileOptions* options = NULL );
 
     //! Reset the tree, optionally checking we have the right root
-    virtual ErrorCode reset_tree( );
+    virtual ErrorCode reset_tree();
 
     /** \brief Get leaf containing input position.
      *
@@ -128,7 +128,7 @@ class AdaptiveKDTree : public Tree
                                        const double inside_tol = 1.0e-6, std::vector< double >* dists_out = NULL,
                                        std::vector< CartVect >* params_out = NULL, EntityHandle* start_node = NULL );
 
-    ErrorCode get_info( EntityHandle root, double min[ 3 ], double max[ 3 ], unsigned int& dep );
+    ErrorCode get_info( EntityHandle root, double min[3], double max[3], unsigned int& dep );
 
     //! Enumeriate split plane directions
     enum Axis
@@ -142,22 +142,22 @@ class AdaptiveKDTree : public Tree
     struct Plane
     {
         double coord;  //!< Location of plane as coordinate on normal axis
-        int    norm;  //!< The principal axis that is the normal of the plane;
+        int norm;      //!< The principal axis that is the normal of the plane;
 
         /** return true if point is below/to the left of the split plane */
-        bool left_side( const double point[ 3 ] )
+        bool left_side( const double point[3] )
         {
-            return point[ norm ] < coord;
+            return point[norm] < coord;
         }
         /** return true if point is above/to the right of the split plane */
-        bool right_side( const double point[ 3 ] )
+        bool right_side( const double point[3] )
         {
-            return point[ norm ] > coord;
+            return point[norm] > coord;
         }
         /** return distance from point to plane */
-        double distance( const double point[ 3 ] ) const
+        double distance( const double point[3] ) const
         {
-            return fabs( point[ norm ] - coord );
+            return fabs( point[norm] - coord );
         }
     };
 
@@ -174,7 +174,7 @@ class AdaptiveKDTree : public Tree
     ErrorCode get_last_iterator( EntityHandle tree_root, AdaptiveKDTreeIter& result );
 
     //! Get iterator for tree or subtree
-    ErrorCode get_sub_tree_iterator( EntityHandle tree_root, const double box_min[ 3 ], const double box_max[ 3 ],
+    ErrorCode get_sub_tree_iterator( EntityHandle tree_root, const double box_min[3], const double box_max[3],
                                      AdaptiveKDTreeIter& result );
 
     //! Split leaf of tree
@@ -203,14 +203,14 @@ class AdaptiveKDTree : public Tree
     //!\param from_coords  The input position to test against
     //!\param closest_point_out  The closest point on the set of triangles in the tree
     //!\param triangle_out The triangle closest to the input position
-    ErrorCode closest_triangle( EntityHandle tree_root, const double from_coords[ 3 ], double closest_point_out[ 3 ],
+    ErrorCode closest_triangle( EntityHandle tree_root, const double from_coords[3], double closest_point_out[3],
                                 EntityHandle& triangle_out );
 
-    ErrorCode sphere_intersect_triangles( EntityHandle tree_root, const double center[ 3 ], double radius,
+    ErrorCode sphere_intersect_triangles( EntityHandle tree_root, const double center[3], double radius,
                                           std::vector< EntityHandle >& triangles );
 
-    ErrorCode ray_intersect_triangles( EntityHandle tree_root, const double tolerance, const double ray_unit_dir[ 3 ],
-                                       const double ray_base_pt[ 3 ], std::vector< EntityHandle >& triangles_out,
+    ErrorCode ray_intersect_triangles( EntityHandle tree_root, const double tolerance, const double ray_unit_dir[3],
+                                       const double ray_base_pt[3], std::vector< EntityHandle >& triangles_out,
                                        std::vector< double >& distance_out, int result_count_limit = 0,
                                        double distance_limit = -1.0 );
 
@@ -224,21 +224,21 @@ class AdaptiveKDTree : public Tree
         //! Like SUBDIVISION, except snap to closest vertex coordinate
         SUBDIVISION_SNAP,  // = 1
                            //! Median vertex coodinate values
-        VERTEX_MEDIAN,  // = 2
-                        //! Random sampling of vertex coordinate values
-        VERTEX_SAMPLE  // = 3
+        VERTEX_MEDIAN,     // = 2
+                           //! Random sampling of vertex coordinate values
+        VERTEX_SAMPLE      // = 3
     };
 
     //! print various things about this tree
-    virtual ErrorCode print( );
+    virtual ErrorCode print();
 
   private:
     friend class AdaptiveKDTreeIter;
 
-    ErrorCode init( );
+    ErrorCode init();
 
     /**\brief find a triangle near the input point */
-    ErrorCode find_close_triangle( EntityHandle root, const double from_point[ 3 ], double pt[ 3 ],
+    ErrorCode find_close_triangle( EntityHandle root, const double from_point[3], double pt[3],
                                    EntityHandle& triangle );
 
     ErrorCode make_tag( Interface* iface, std::string name, TagType storage, DataType type, int count,
@@ -273,7 +273,7 @@ class AdaptiveKDTree : public Tree
 
     CandidatePlaneSet planeSet;
 
-    bool   spherical;
+    bool spherical;
     double radius;
 };
 
@@ -283,7 +283,7 @@ class AdaptiveKDTreeIter
   public:
     enum Direction
     {
-        LEFT = 0,
+        LEFT  = 0,
         RIGHT = 1
     };
 
@@ -291,9 +291,9 @@ class AdaptiveKDTreeIter
     struct StackObj
     {
         StackObj( EntityHandle e, double c ) : entity( e ), coord( c ) {}
-        StackObj( ) : entity( 0 ), coord( 0.0 ) {}
+        StackObj() : entity( 0 ), coord( 0.0 ) {}
         EntityHandle entity;  //!< handle for tree node
-        double       coord;  //!< box coordinate of parent
+        double coord;         //!< box coordinate of parent
     };
 
     enum
@@ -302,9 +302,9 @@ class AdaptiveKDTreeIter
         BMAX = 1
     };  //!< indices into mBox and child list
 
-    CartVect                            mBox[ 2 ];  //!< min and max corners of bounding box
-    AdaptiveKDTree*                     treeTool;  //!< tool for tree
-    std::vector< StackObj >             mStack;  //!< stack storing path through tree
+    CartVect mBox[2];                               //!< min and max corners of bounding box
+    AdaptiveKDTree* treeTool;                       //!< tool for tree
+    std::vector< StackObj > mStack;                 //!< stack storing path through tree
     mutable std::vector< EntityHandle > childVect;  //!< temporary storage of child handles
 
     //! Descend tree to left most leaf from current position
@@ -314,50 +314,50 @@ class AdaptiveKDTreeIter
     friend class AdaptiveKDTree;
 
   public:
-    AdaptiveKDTreeIter( ) : treeTool( 0 ), childVect( 2 ) {}
+    AdaptiveKDTreeIter() : treeTool( 0 ), childVect( 2 ) {}
 
-    ErrorCode initialize( AdaptiveKDTree* tool, EntityHandle root, const double box_min[ 3 ], const double box_max[ 3 ],
+    ErrorCode initialize( AdaptiveKDTree* tool, EntityHandle root, const double box_min[3], const double box_max[3],
                           Direction direction );
 
-    AdaptiveKDTree* tool( ) const
+    AdaptiveKDTree* tool() const
     {
         return treeTool;
     }
 
     //! Get handle for current leaf
-    EntityHandle handle( ) const
+    EntityHandle handle() const
     {
-        return mStack.back( ).entity;
+        return mStack.back().entity;
     }
 
     //! Get min corner of axis-aligned box for current leaf
-    const double* box_min( ) const
+    const double* box_min() const
     {
-        return mBox[ BMIN ].array( );
+        return mBox[BMIN].array();
     }
 
     //! Get max corner of axis-aligned box for current leaf
-    const double* box_max( ) const
+    const double* box_max() const
     {
-        return mBox[ BMAX ].array( );
+        return mBox[BMAX].array();
     }
 
-    double volume( ) const
+    double volume() const
     {
-        return ( mBox[ BMAX ][ 0 ] - mBox[ BMIN ][ 0 ] ) * ( mBox[ BMAX ][ 1 ] - mBox[ BMIN ][ 1 ] ) *
-               ( mBox[ BMAX ][ 2 ] - mBox[ BMIN ][ 2 ] );
+        return ( mBox[BMAX][0] - mBox[BMIN][0] ) * ( mBox[BMAX][1] - mBox[BMIN][1] ) *
+               ( mBox[BMAX][2] - mBox[BMIN][2] );
     }
 
     //! test if a plane intersects the leaf box
     bool intersects( const AdaptiveKDTree::Plane& plane ) const
     {
-        return mBox[ BMIN ][ plane.norm ] <= plane.coord && mBox[ BMAX ][ plane.norm ] >= plane.coord;
+        return mBox[BMIN][plane.norm] <= plane.coord && mBox[BMAX][plane.norm] >= plane.coord;
     }
 
     //! Get depth in tree. root is at depth of 1.
-    unsigned depth( ) const
+    unsigned depth() const
     {
-        return mStack.size( );
+        return mStack.size();
     }
 
     //! Advance the iterator either left or right in the tree
@@ -370,7 +370,7 @@ class AdaptiveKDTreeIter
     //! Returns MB_ENTITY_NOT_FOUND if at end.
     //! Note: steping past the end of the tree will invalidate
     //!       the iterator. Calling back() will not work.
-    ErrorCode step( )
+    ErrorCode step()
     {
         return step( RIGHT );
     }
@@ -379,7 +379,7 @@ class AdaptiveKDTreeIter
     //! Returns MB_ENTITY_NOT_FOUND if at beginning.
     //! Note: steping past the start of the tree will invalidate
     //!       the iterator. Calling step() will not work.
-    ErrorCode back( )
+    ErrorCode back()
     {
         return step( LEFT );
     }
@@ -439,7 +439,7 @@ class AdaptiveKDTreeIter
     //! immediate sibling of the current node.  Returns false
     //! if current node is root or back() will move to the
     //! immediate sibling.
-    bool sibling_is_forward( ) const;
+    bool sibling_is_forward() const;
 
     //! Find range of overlap between ray and leaf.
     //!
@@ -456,13 +456,12 @@ class AdaptiveKDTreeIter
     //!                 the ray exited the leaf.  If return value is false,
     //!                 then this value is undefined.
     //!\return true if ray intersects leaf, false otherwise.
-    bool intersect_ray( const double ray_point[ 3 ], const double ray_vect[ 3 ], double& t_enter,
-                        double& t_exit ) const;
+    bool intersect_ray( const double ray_point[3], const double ray_vect[3], double& t_enter, double& t_exit ) const;
 };
 
-inline ErrorCode AdaptiveKDTree::reset_tree( )
+inline ErrorCode AdaptiveKDTree::reset_tree()
 {
-    return delete_tree_sets( );
+    return delete_tree_sets();
 }
 
 }  // namespace moab

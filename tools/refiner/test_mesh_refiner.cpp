@@ -27,28 +27,28 @@ int TestMeshRefiner( int argc, char* argv[] )
     MPI_Init( &argc, &argv );
     MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-#else  // MOAB_HAVE_MPI
+#else   // MOAB_HAVE_MPI
     nprocs = 1;
-    rank = 0;
+    rank   = 0;
 #endif  // MOAB_HAVE_MPI
     // sleep(20);
 
     // Create the input mesh and, if -new-mesh is specified, an output mesh
-    std::string ifname = argc > 1 ? argv[ 1 ] : TestDir + "fourVolsBare.cub";
-    bool        input_is_output = false, do_output = false;
+    std::string ifname   = argc > 1 ? argv[1] : TestDir + "fourVolsBare.cub";
+    bool input_is_output = false, do_output = false;
     std::string output_filename;
     if( argc > 2 )
     {
-        if( !strcmp( argv[ 2 ], "-new-mesh" ) )
+        if( !strcmp( argv[2], "-new-mesh" ) )
             input_is_output = true;
         else
         {
-            do_output = true;
-            output_filename = std::string( argv[ 2 ] );
+            do_output       = true;
+            output_filename = std::string( argv[2] );
         }
     }
 
-    Interface* imesh = new Core;  // ( rank, nprocs );
+    Interface* imesh = new Core;                            // ( rank, nprocs );
     Interface* omesh = input_is_output ? imesh : new Core;  // ( rank, nprocs );
 
 #ifdef MOAB_HAVE_MPI
@@ -57,7 +57,7 @@ int TestMeshRefiner( int argc, char* argv[] )
     // ReadParallel* readpar = new ReadParallel( imesh, ipcomm );
 #endif  // MOAB_HAVE_MPI
 
-    EntityHandle       set_handle;
+    EntityHandle set_handle;
     std::ostringstream parallel_options;
 #ifdef MOAB_HAVE_MPI
     if( nprocs > 1 )
@@ -81,7 +81,7 @@ int TestMeshRefiner( int argc, char* argv[] )
         return 1;
     }
 
-    rval = imesh->load_file( ifname.c_str( ), &set_handle, parallel_options.str( ).c_str( ) );
+    rval = imesh->load_file( ifname.c_str(), &set_handle, parallel_options.str().c_str() );
     if( MB_SUCCESS != rval )
     {
         std::cout << "Trouble reading mesh file " << ifname << ", exiting." << std::endl;
@@ -103,10 +103,10 @@ int TestMeshRefiner( int argc, char* argv[] )
 
     // The refiner will need an implicit function to be used as an indicator function for
     // subdivision:
-    EdgeSizeSimpleImplicit* eval = new EdgeSizeSimpleImplicit( );
+    EdgeSizeSimpleImplicit* eval = new EdgeSizeSimpleImplicit();
     eval->set_ratio( 2. );
     // Refine the mesh
-    MeshRefiner*            mref = new MeshRefiner( imesh, omesh );
+    MeshRefiner* mref            = new MeshRefiner( imesh, omesh );
     SimplexTemplateRefiner* eref = new SimplexTemplateRefiner;
     mref->set_entity_refiner( eref );
     // mref->add_vertex_tag( tag_floatular );
@@ -128,9 +128,9 @@ int TestMeshRefiner( int argc, char* argv[] )
 
     if( do_output )
     {
-        parallel_options.clear( );
+        parallel_options.clear();
         if( nprocs > 1 ) parallel_options << "PARALLEL=WRITE_PART";
-        omesh->write_file( output_filename.c_str( ), NULL, parallel_options.str( ).c_str( ) );
+        omesh->write_file( output_filename.c_str(), NULL, parallel_options.str().c_str() );
     }
 
     // Print out the results, one process at a time
@@ -146,7 +146,7 @@ int TestMeshRefiner( int argc, char* argv[] )
         }
         MPI_Barrier( MPI_COMM_WORLD );
     }
-#else  // MOAB_HAVE_MPI
+#else   // MOAB_HAVE_MPI
     omesh->list_entities( 0, 1 );
 #endif  // MOAB_HAVE_MPI
 
@@ -161,7 +161,7 @@ int TestMeshRefiner( int argc, char* argv[] )
 
 #ifdef MOAB_HAVE_MPI
     MPI_Barrier( MPI_COMM_WORLD );
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif  // MOAB_HAVE_MPI
 
     return 0;

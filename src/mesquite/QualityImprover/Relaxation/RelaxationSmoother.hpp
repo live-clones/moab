@@ -20,10 +20,10 @@ class RelaxationSmoother : public VertexMover
     RelaxationSmoother( ObjectiveFunction* OF = NULL ) : VertexMover( OF ) {}
 
     MESQUITE_EXPORT
-    virtual ~RelaxationSmoother( );
+    virtual ~RelaxationSmoother();
 
     MESQUITE_EXPORT
-    PatchSet* get_patch_set( )
+    PatchSet* get_patch_set()
     {
         return &patchSet;
     }
@@ -42,7 +42,7 @@ class RelaxationSmoother : public VertexMover
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual void cleanup( );
+    virtual void cleanup();
 
   private:
     VertexPatches patchSet;

@@ -106,14 +106,14 @@ class TopologyInfoTest : public CppUnit::TestFixture
     CPPUNIT_TEST( find_side );
     CPPUNIT_TEST( compare_sides );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
-    void setUp( ) {}
+    void setUp() {}
 
-    void tearDown( ) {}
+    void tearDown() {}
 
-    TopologyInfoTest( ) {}
+    TopologyInfoTest() {}
 
     bool compare_edge( const unsigned* a, const unsigned* b );
 
@@ -128,91 +128,91 @@ class TopologyInfoTest : public CppUnit::TestFixture
 
     void test_poly( EntityTopology topo );
 
-    void tri( );
-    void tri3( );
-    void tri4( );
-    void tri6( );
-    void tri7( );
+    void tri();
+    void tri3();
+    void tri4();
+    void tri6();
+    void tri7();
 
-    void quad( );
-    void quad4( );
-    void quad5( );
-    void quad8( );
-    void quad9( );
+    void quad();
+    void quad4();
+    void quad5();
+    void quad8();
+    void quad9();
 
-    void tet( );
-    void tet4( );
-    void tet5( );
-    void tet8( );
-    void tet9( );
-    void tet10( );
-    void tet11( );
-    void tet14( );
-    void tet15( );
+    void tet();
+    void tet4();
+    void tet5();
+    void tet8();
+    void tet9();
+    void tet10();
+    void tet11();
+    void tet14();
+    void tet15();
 
-    void hex( );
-    void hex8( );
-    void hex9( );
-    void hex14( );
-    void hex15( );
-    void hex20( );
-    void hex21( );
-    void hex26( );
-    void hex27( );
+    void hex();
+    void hex8();
+    void hex9();
+    void hex14();
+    void hex15();
+    void hex20();
+    void hex21();
+    void hex26();
+    void hex27();
 
-    void pyramid( );
-    void pyramid5( );
-    void pyramid13( );
+    void pyramid();
+    void pyramid5();
+    void pyramid13();
 
-    void wedge( );
-    void wedge6( );
-    void wedge15( );
+    void wedge();
+    void wedge6();
+    void wedge15();
 
-    void polygon( );
-    void polyhedron( );
+    void polygon();
+    void polyhedron();
 
-    void bad_type( );
+    void bad_type();
 
-    void tri_adj_vert( );
-    void quad_adj_vert( );
-    void tet_adj_vert( );
-    void hex_adj_vert( );
-    void pyr_adj_vert( );
-    void wdg_adj_vert( );
-    void test_adj( MBMesquite::EntityTopology, const unsigned expected[][ 5 ] );
+    void tri_adj_vert();
+    void quad_adj_vert();
+    void tet_adj_vert();
+    void hex_adj_vert();
+    void pyr_adj_vert();
+    void wdg_adj_vert();
+    void test_adj( MBMesquite::EntityTopology, const unsigned expected[][5] );
 
-    void tri_rev_adj_vert( )
+    void tri_rev_adj_vert()
     {
         test_rev_adj( MBMesquite::TRIANGLE );
     }
-    void quad_rev_adj_vert( )
+    void quad_rev_adj_vert()
     {
         test_rev_adj( MBMesquite::QUADRILATERAL );
     }
-    void tet_rev_adj_vert( )
+    void tet_rev_adj_vert()
     {
         test_rev_adj( MBMesquite::TETRAHEDRON );
     }
-    void hex_rev_adj_vert( )
+    void hex_rev_adj_vert()
     {
         test_rev_adj( MBMesquite::HEXAHEDRON );
     }
-    void pyr_rev_adj_vert( )
+    void pyr_rev_adj_vert()
     {
         test_rev_adj( MBMesquite::PYRAMID );
     }
-    void wdg_rev_adj_vert( )
+    void wdg_rev_adj_vert()
     {
         test_rev_adj( MBMesquite::PRISM );
     }
     void test_rev_adj( MBMesquite::EntityTopology type );
 
-    void higher_order_from_side( );
-    void side_from_higher_order( );
-    void find_edge( );
-    void find_face( );
-    void find_side( );
-    void compare_sides( );
+    void higher_order_from_side();
+    void side_from_higher_order();
+    void find_edge();
+    void find_face();
+    void find_side();
+    void compare_sides();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TopologyInfoTest, "TopologyInfoTest" );
@@ -220,7 +220,7 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( TopologyInfoTest, "Unit" );
 
 bool TopologyInfoTest::compare_edge( const unsigned* a, const unsigned* b )
 {
-    return ( a[ 0 ] == b[ 0 ] && a[ 1 ] == b[ 1 ] ) || ( a[ 0 ] == b[ 1 ] && a[ 1 ] == b[ 0 ] );
+    return ( a[0] == b[0] && a[1] == b[1] ) || ( a[0] == b[1] && a[1] == b[0] );
 }
 
 bool TopologyInfoTest::compare_face( unsigned len, const unsigned* a, const unsigned* b )
@@ -230,7 +230,7 @@ bool TopologyInfoTest::compare_face( unsigned len, const unsigned* a, const unsi
     {
         for( j = 0; j < len; ++j )
         {
-            if( a[ j ] != b[ ( i + j ) % len ] ) break;
+            if( a[j] != b[( i + j ) % len] ) break;
         }
         if( j == len ) return true;
     }
@@ -240,15 +240,15 @@ bool TopologyInfoTest::compare_face( unsigned len, const unsigned* a, const unsi
 bool TopologyInfoTest::compare_vol( unsigned len, const unsigned* a, const unsigned* b )
 {
     for( unsigned i = 0; i < len; ++i )
-        if( a[ i ] != b[ i ] ) return false;
+        if( a[i] != b[i] ) return false;
     return true;
 }
 
 void TopologyInfoTest::test_face_elem( EntityTopology topo, unsigned num_nodes, unsigned num_sides )
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    unsigned      index = 0;
+    bool edge, face, vol;
+    unsigned index = 0;
     TopologyInfo::higher_order( topo, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( !vol );
@@ -285,8 +285,8 @@ void TopologyInfoTest::test_vol_elem( EntityTopology topo, unsigned num_nodes, u
                                       unsigned num_faces )
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    unsigned      index = 0;
+    bool edge, face, vol;
+    unsigned index = 0;
     TopologyInfo::higher_order( topo, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
 
@@ -327,7 +327,7 @@ void TopologyInfoTest::test_vol_elem( EntityTopology topo, unsigned num_nodes, u
     }
 }
 
-void TopologyInfoTest::tri( )
+void TopologyInfoTest::tri()
 {
     MsqPrintError err( cout );
 
@@ -342,22 +342,22 @@ void TopologyInfoTest::tri( )
     CPPUNIT_ASSERT( 3 == TopologyInfo::edges( TRIANGLE ) );
     CPPUNIT_ASSERT( 1 == TopologyInfo::faces( TRIANGLE ) );
 
-    const unsigned  num_edges = 3;
+    const unsigned num_edges = 3;
     const unsigned* side;
-    const unsigned  edges[ num_edges ][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
-    unsigned        count;
-    const unsigned  face[] = { 0, 1, 2 };
+    const unsigned edges[num_edges][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 } };
+    unsigned count;
+    const unsigned face[] = { 0, 1, 2 };
 
     for( unsigned i = 0; i < num_edges; ++i )
     {
         side = TopologyInfo::edge_vertices( TRIANGLE, i, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
 
         side = TopologyInfo::side_vertices( TRIANGLE, 1, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( 2 == count );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
     }
 
     side = TopologyInfo::side_vertices( TRIANGLE, 2, 0, count, err );
@@ -366,11 +366,11 @@ void TopologyInfoTest::tri( )
     CPPUNIT_ASSERT( compare_face( 3, side, face ) );
 }
 
-void TopologyInfoTest::tri3( )
+void TopologyInfoTest::tri3()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 3;
+    bool edge, face, vol;
+    const int num_nodes = 3;
 
     TopologyInfo::higher_order( TRIANGLE, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -380,11 +380,11 @@ void TopologyInfoTest::tri3( )
     test_face_elem( TRIANGLE, num_nodes, 3 );
 }
 
-void TopologyInfoTest::tri4( )
+void TopologyInfoTest::tri4()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 4;
+    bool edge, face, vol;
+    const int num_nodes = 4;
 
     TopologyInfo::higher_order( TRIANGLE, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -395,11 +395,11 @@ void TopologyInfoTest::tri4( )
     test_face_elem( TRIANGLE, num_nodes, 3 );
 }
 
-void TopologyInfoTest::tri6( )
+void TopologyInfoTest::tri6()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 6;
+    bool edge, face, vol;
+    const int num_nodes = 6;
 
     TopologyInfo::higher_order( TRIANGLE, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -410,11 +410,11 @@ void TopologyInfoTest::tri6( )
     test_face_elem( TRIANGLE, num_nodes, 3 );
 }
 
-void TopologyInfoTest::tri7( )
+void TopologyInfoTest::tri7()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 7;
+    bool edge, face, vol;
+    const int num_nodes = 7;
 
     TopologyInfo::higher_order( TRIANGLE, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -425,7 +425,7 @@ void TopologyInfoTest::tri7( )
     test_face_elem( TRIANGLE, num_nodes, 3 );
 }
 
-void TopologyInfoTest::quad( )
+void TopologyInfoTest::quad()
 {
     MsqPrintError err( cout );
 
@@ -440,22 +440,22 @@ void TopologyInfoTest::quad( )
     CPPUNIT_ASSERT( 4 == TopologyInfo::edges( QUADRILATERAL ) );
     CPPUNIT_ASSERT( 1 == TopologyInfo::faces( QUADRILATERAL ) );
 
-    const unsigned  num_edges = 4;
+    const unsigned num_edges = 4;
     const unsigned* side;
-    const unsigned  edges[ num_edges ][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 } };
-    unsigned        count;
-    const unsigned  face[] = { 0, 1, 2, 3 };
+    const unsigned edges[num_edges][2] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 } };
+    unsigned count;
+    const unsigned face[] = { 0, 1, 2, 3 };
 
     for( unsigned i = 0; i < num_edges; ++i )
     {
         side = TopologyInfo::edge_vertices( QUADRILATERAL, i, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
 
         side = TopologyInfo::side_vertices( QUADRILATERAL, 1, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( 2 == count );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
     }
 
     side = TopologyInfo::side_vertices( QUADRILATERAL, 2, 0, count, err );
@@ -464,11 +464,11 @@ void TopologyInfoTest::quad( )
     CPPUNIT_ASSERT( compare_face( 4, side, face ) );
 }
 
-void TopologyInfoTest::quad4( )
+void TopologyInfoTest::quad4()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 4;
+    bool edge, face, vol;
+    const int num_nodes = 4;
 
     TopologyInfo::higher_order( QUADRILATERAL, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -479,11 +479,11 @@ void TopologyInfoTest::quad4( )
     test_face_elem( QUADRILATERAL, num_nodes, 4 );
 }
 
-void TopologyInfoTest::quad5( )
+void TopologyInfoTest::quad5()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 5;
+    bool edge, face, vol;
+    const int num_nodes = 5;
 
     TopologyInfo::higher_order( QUADRILATERAL, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -494,11 +494,11 @@ void TopologyInfoTest::quad5( )
     test_face_elem( QUADRILATERAL, num_nodes, 4 );
 }
 
-void TopologyInfoTest::quad8( )
+void TopologyInfoTest::quad8()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 8;
+    bool edge, face, vol;
+    const int num_nodes = 8;
 
     TopologyInfo::higher_order( QUADRILATERAL, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -509,11 +509,11 @@ void TopologyInfoTest::quad8( )
     test_face_elem( QUADRILATERAL, num_nodes, 4 );
 }
 
-void TopologyInfoTest::quad9( )
+void TopologyInfoTest::quad9()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 9;
+    bool edge, face, vol;
+    const int num_nodes = 9;
 
     TopologyInfo::higher_order( QUADRILATERAL, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -524,7 +524,7 @@ void TopologyInfoTest::quad9( )
     test_face_elem( QUADRILATERAL, num_nodes, 4 );
 }
 
-void TopologyInfoTest::tet( )
+void TopologyInfoTest::tet()
 {
     MsqPrintError err( cout );
 
@@ -543,21 +543,21 @@ void TopologyInfoTest::tet( )
     CPPUNIT_ASSERT( num_faces == TopologyInfo::faces( TETRAHEDRON ) );
 
     const unsigned* side;
-    unsigned        i, count;
-    const unsigned  vert_per_face = 3;
-    unsigned        edges[ num_edges ][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
-    unsigned        faces[ num_faces ][ vert_per_face ] = { { 0, 1, 3 }, { 1, 2, 3 }, { 2, 0, 3 }, { 2, 1, 0 } };
+    unsigned i, count;
+    const unsigned vert_per_face             = 3;
+    unsigned edges[num_edges][2]             = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
+    unsigned faces[num_faces][vert_per_face] = { { 0, 1, 3 }, { 1, 2, 3 }, { 2, 0, 3 }, { 2, 1, 0 } };
 
     for( i = 0; i < num_edges; ++i )
     {
         side = TopologyInfo::edge_vertices( TETRAHEDRON, i, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
 
         side = TopologyInfo::side_vertices( TETRAHEDRON, 1, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( 2 == count );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
     }
 
     for( i = 0; i < num_faces; ++i )
@@ -565,26 +565,26 @@ void TopologyInfoTest::tet( )
         side = TopologyInfo::face_vertices( TETRAHEDRON, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == vert_per_face );
-        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[i] ) );
 
         side = TopologyInfo::side_vertices( TETRAHEDRON, 2, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == vert_per_face );
-        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[i] ) );
     }
 
     side = TopologyInfo::side_vertices( TETRAHEDRON, 3, 0, count, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( count == num_verts );
     for( i = 0; i < num_verts; ++i )
-        CPPUNIT_ASSERT( side[ i ] == i );
+        CPPUNIT_ASSERT( side[i] == i );
 }
 
-void TopologyInfoTest::tet4( )
+void TopologyInfoTest::tet4()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 4;
+    bool edge, face, vol;
+    const int num_nodes = 4;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -595,11 +595,11 @@ void TopologyInfoTest::tet4( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet5( )
+void TopologyInfoTest::tet5()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 5;
+    bool edge, face, vol;
+    const int num_nodes = 5;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -610,11 +610,11 @@ void TopologyInfoTest::tet5( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet8( )
+void TopologyInfoTest::tet8()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 8;
+    bool edge, face, vol;
+    const int num_nodes = 8;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -625,11 +625,11 @@ void TopologyInfoTest::tet8( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet9( )
+void TopologyInfoTest::tet9()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 9;
+    bool edge, face, vol;
+    const int num_nodes = 9;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -640,11 +640,11 @@ void TopologyInfoTest::tet9( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet10( )
+void TopologyInfoTest::tet10()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 10;
+    bool edge, face, vol;
+    const int num_nodes = 10;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -655,11 +655,11 @@ void TopologyInfoTest::tet10( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet11( )
+void TopologyInfoTest::tet11()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 11;
+    bool edge, face, vol;
+    const int num_nodes = 11;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -670,11 +670,11 @@ void TopologyInfoTest::tet11( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet14( )
+void TopologyInfoTest::tet14()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 14;
+    bool edge, face, vol;
+    const int num_nodes = 14;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -685,11 +685,11 @@ void TopologyInfoTest::tet14( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::tet15( )
+void TopologyInfoTest::tet15()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 15;
+    bool edge, face, vol;
+    const int num_nodes = 15;
 
     TopologyInfo::higher_order( TETRAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -700,7 +700,7 @@ void TopologyInfoTest::tet15( )
     test_vol_elem( TETRAHEDRON, num_nodes, 4, 6, 4 );
 }
 
-void TopologyInfoTest::hex( )
+void TopologyInfoTest::hex()
 {
     MsqPrintError err( cout );
 
@@ -719,23 +719,23 @@ void TopologyInfoTest::hex( )
     CPPUNIT_ASSERT( num_faces == TopologyInfo::faces( HEXAHEDRON ) );
 
     const unsigned* side;
-    unsigned        i, count;
-    const unsigned  vert_per_face = 4;
-    unsigned        edges[ num_edges ][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 5 },
-                                         { 2, 6 }, { 3, 7 }, { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 } };
-    unsigned        faces[ num_faces ][ vert_per_face ] = { { 0, 1, 5, 4 }, { 1, 2, 6, 5 }, { 2, 3, 7, 6 },
-                                                     { 3, 0, 4, 7 }, { 3, 2, 1, 0 }, { 4, 5, 6, 7 } };
+    unsigned i, count;
+    const unsigned vert_per_face             = 4;
+    unsigned edges[num_edges][2]             = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 5 },
+                                     { 2, 6 }, { 3, 7 }, { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 } };
+    unsigned faces[num_faces][vert_per_face] = { { 0, 1, 5, 4 }, { 1, 2, 6, 5 }, { 2, 3, 7, 6 },
+                                                 { 3, 0, 4, 7 }, { 3, 2, 1, 0 }, { 4, 5, 6, 7 } };
 
     for( i = 0; i < num_edges; ++i )
     {
         side = TopologyInfo::edge_vertices( HEXAHEDRON, i, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
 
         side = TopologyInfo::side_vertices( HEXAHEDRON, 1, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( 2 == count );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
     }
 
     for( i = 0; i < num_faces; ++i )
@@ -743,26 +743,26 @@ void TopologyInfoTest::hex( )
         side = TopologyInfo::face_vertices( HEXAHEDRON, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == vert_per_face );
-        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[i] ) );
 
         side = TopologyInfo::side_vertices( HEXAHEDRON, 2, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == vert_per_face );
-        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( vert_per_face, side, faces[i] ) );
     }
 
     side = TopologyInfo::side_vertices( HEXAHEDRON, 3, 0, count, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( count == num_verts );
     for( i = 0; i < num_verts; ++i )
-        CPPUNIT_ASSERT( side[ i ] == i );
+        CPPUNIT_ASSERT( side[i] == i );
 }
 
-void TopologyInfoTest::hex8( )
+void TopologyInfoTest::hex8()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 8;
+    bool edge, face, vol;
+    const int num_nodes = 8;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -773,11 +773,11 @@ void TopologyInfoTest::hex8( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex9( )
+void TopologyInfoTest::hex9()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 9;
+    bool edge, face, vol;
+    const int num_nodes = 9;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -788,11 +788,11 @@ void TopologyInfoTest::hex9( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex14( )
+void TopologyInfoTest::hex14()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 14;
+    bool edge, face, vol;
+    const int num_nodes = 14;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -803,11 +803,11 @@ void TopologyInfoTest::hex14( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex15( )
+void TopologyInfoTest::hex15()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 15;
+    bool edge, face, vol;
+    const int num_nodes = 15;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -818,11 +818,11 @@ void TopologyInfoTest::hex15( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex20( )
+void TopologyInfoTest::hex20()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 20;
+    bool edge, face, vol;
+    const int num_nodes = 20;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -833,11 +833,11 @@ void TopologyInfoTest::hex20( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex21( )
+void TopologyInfoTest::hex21()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 21;
+    bool edge, face, vol;
+    const int num_nodes = 21;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -848,11 +848,11 @@ void TopologyInfoTest::hex21( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex26( )
+void TopologyInfoTest::hex26()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 26;
+    bool edge, face, vol;
+    const int num_nodes = 26;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -863,11 +863,11 @@ void TopologyInfoTest::hex26( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::hex27( )
+void TopologyInfoTest::hex27()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 27;
+    bool edge, face, vol;
+    const int num_nodes = 27;
 
     TopologyInfo::higher_order( HEXAHEDRON, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -878,7 +878,7 @@ void TopologyInfoTest::hex27( )
     test_vol_elem( HEXAHEDRON, num_nodes, 8, 12, 6 );
 }
 
-void TopologyInfoTest::pyramid( )
+void TopologyInfoTest::pyramid()
 {
     MsqPrintError err( cout );
 
@@ -897,26 +897,25 @@ void TopologyInfoTest::pyramid( )
     CPPUNIT_ASSERT( num_faces == TopologyInfo::faces( PYRAMID ) );
 
     const unsigned* side;
-    unsigned        i, count;
-    const unsigned  num_tri_faces = 4;
-    const unsigned  num_quad_faces = 1;
-    const bool      tri_before_quad = true;
+    unsigned i, count;
+    const unsigned num_tri_faces  = 4;
+    const unsigned num_quad_faces = 1;
+    const bool tri_before_quad    = true;
     CPPUNIT_ASSERT( num_tri_faces + num_quad_faces == num_faces );
-    unsigned edges[ num_edges ][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
-                                         { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } };
-    unsigned tris[ num_tri_faces ][ 3 ] = { { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 3, 0, 4 } };
-    unsigned quads[ num_quad_faces ][ 4 ] = { { 3, 2, 1, 0 } };
+    unsigned edges[num_edges][2] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } };
+    unsigned tris[num_tri_faces][3]   = { { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 3, 0, 4 } };
+    unsigned quads[num_quad_faces][4] = { { 3, 2, 1, 0 } };
 
     for( i = 0; i < num_edges; ++i )
     {
         side = TopologyInfo::edge_vertices( PYRAMID, i, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
 
         side = TopologyInfo::side_vertices( PYRAMID, 1, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( 2 == count );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
     }
 
     const unsigned tri_off = num_quad_faces * !tri_before_quad;
@@ -925,12 +924,12 @@ void TopologyInfoTest::pyramid( )
         side = TopologyInfo::face_vertices( PYRAMID, i + tri_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 3 );
-        CPPUNIT_ASSERT( compare_face( 3, side, tris[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 3, side, tris[i] ) );
 
         side = TopologyInfo::side_vertices( PYRAMID, 2, i + tri_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 3 );
-        CPPUNIT_ASSERT( compare_face( 3, side, tris[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 3, side, tris[i] ) );
     }
 
     const unsigned quad_off = num_tri_faces * tri_before_quad;
@@ -939,26 +938,26 @@ void TopologyInfoTest::pyramid( )
         side = TopologyInfo::face_vertices( PYRAMID, i + quad_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 4 );
-        CPPUNIT_ASSERT( compare_face( 4, side, quads[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 4, side, quads[i] ) );
 
         side = TopologyInfo::side_vertices( PYRAMID, 2, i + quad_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 4 );
-        CPPUNIT_ASSERT( compare_face( 4, side, quads[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 4, side, quads[i] ) );
     }
 
     side = TopologyInfo::side_vertices( PYRAMID, 3, 0, count, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( count == num_verts );
     for( i = 0; i < num_verts; ++i )
-        CPPUNIT_ASSERT( side[ i ] == i );
+        CPPUNIT_ASSERT( side[i] == i );
 }
 
-void TopologyInfoTest::pyramid5( )
+void TopologyInfoTest::pyramid5()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 5;
+    bool edge, face, vol;
+    const int num_nodes = 5;
 
     TopologyInfo::higher_order( PYRAMID, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -969,11 +968,11 @@ void TopologyInfoTest::pyramid5( )
     test_vol_elem( PYRAMID, num_nodes, 5, 8, 5 );
 }
 
-void TopologyInfoTest::pyramid13( )
+void TopologyInfoTest::pyramid13()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 13;
+    bool edge, face, vol;
+    const int num_nodes = 13;
 
     TopologyInfo::higher_order( PYRAMID, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -984,7 +983,7 @@ void TopologyInfoTest::pyramid13( )
     test_vol_elem( PYRAMID, num_nodes, 5, 8, 5 );
 }
 
-void TopologyInfoTest::wedge( )
+void TopologyInfoTest::wedge()
 {
     MsqPrintError err( cout );
 
@@ -1003,26 +1002,26 @@ void TopologyInfoTest::wedge( )
     CPPUNIT_ASSERT( num_faces == TopologyInfo::faces( PRISM ) );
 
     const unsigned* side;
-    unsigned        i, count;
-    const unsigned  num_tri_faces = 2;
-    const unsigned  num_quad_faces = 3;
-    const bool      tri_before_quad = false;
+    unsigned i, count;
+    const unsigned num_tri_faces  = 2;
+    const unsigned num_quad_faces = 3;
+    const bool tri_before_quad    = false;
     CPPUNIT_ASSERT( num_tri_faces + num_quad_faces == num_faces );
-    unsigned edges[ num_edges ][ 2 ] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 4 },
-                                         { 2, 5 }, { 3, 4 }, { 4, 5 }, { 5, 3 } };
-    unsigned tris[ num_tri_faces ][ 3 ] = { { 2, 1, 0 }, { 3, 4, 5 } };
-    unsigned quads[ num_quad_faces ][ 4 ] = { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 2, 0, 3, 5 } };
+    unsigned edges[num_edges][2]      = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 4 },
+                                     { 2, 5 }, { 3, 4 }, { 4, 5 }, { 5, 3 } };
+    unsigned tris[num_tri_faces][3]   = { { 2, 1, 0 }, { 3, 4, 5 } };
+    unsigned quads[num_quad_faces][4] = { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 2, 0, 3, 5 } };
 
     for( i = 0; i < num_edges; ++i )
     {
         side = TopologyInfo::edge_vertices( PRISM, i, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
 
         side = TopologyInfo::side_vertices( PRISM, 1, i, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( 2 == count );
-        CPPUNIT_ASSERT( compare_edge( side, edges[ i ] ) );
+        CPPUNIT_ASSERT( compare_edge( side, edges[i] ) );
     }
 
     const unsigned tri_off = num_quad_faces * !tri_before_quad;
@@ -1031,12 +1030,12 @@ void TopologyInfoTest::wedge( )
         side = TopologyInfo::face_vertices( PRISM, i + tri_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 3 );
-        CPPUNIT_ASSERT( compare_face( 3, side, tris[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 3, side, tris[i] ) );
 
         side = TopologyInfo::side_vertices( PRISM, 2, i + tri_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 3 );
-        CPPUNIT_ASSERT( compare_face( 3, side, tris[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 3, side, tris[i] ) );
     }
 
     const unsigned quad_off = num_tri_faces * tri_before_quad;
@@ -1045,26 +1044,26 @@ void TopologyInfoTest::wedge( )
         side = TopologyInfo::face_vertices( PRISM, i + quad_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 4 );
-        CPPUNIT_ASSERT( compare_face( 4, side, quads[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 4, side, quads[i] ) );
 
         side = TopologyInfo::side_vertices( PRISM, 2, i + quad_off, count, err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( count == 4 );
-        CPPUNIT_ASSERT( compare_face( 4, side, quads[ i ] ) );
+        CPPUNIT_ASSERT( compare_face( 4, side, quads[i] ) );
     }
 
     side = TopologyInfo::side_vertices( PRISM, 3, 0, count, err );
     CPPUNIT_ASSERT( !err );
     CPPUNIT_ASSERT( count == num_verts );
     for( i = 0; i < num_verts; ++i )
-        CPPUNIT_ASSERT( side[ i ] == i );
+        CPPUNIT_ASSERT( side[i] == i );
 }
 
-void TopologyInfoTest::wedge6( )
+void TopologyInfoTest::wedge6()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 6;
+    bool edge, face, vol;
+    const int num_nodes = 6;
 
     TopologyInfo::higher_order( PRISM, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -1075,11 +1074,11 @@ void TopologyInfoTest::wedge6( )
     test_vol_elem( PRISM, num_nodes, 6, 9, 5 );
 }
 
-void TopologyInfoTest::wedge15( )
+void TopologyInfoTest::wedge15()
 {
     MsqPrintError err( cout );
-    bool          edge, face, vol;
-    const int     num_nodes = 15;
+    bool edge, face, vol;
+    const int num_nodes = 15;
 
     TopologyInfo::higher_order( PRISM, num_nodes, edge, face, vol, err );
     CPPUNIT_ASSERT( !err );
@@ -1099,99 +1098,99 @@ void TopologyInfoTest::test_poly( EntityTopology topo )
     CPPUNIT_ASSERT( TopologyInfo::faces( topo ) == 0 );
 }
 
-void TopologyInfoTest::polygon( )
+void TopologyInfoTest::polygon()
 {
     CPPUNIT_ASSERT( TopologyInfo::dimension( POLYGON ) == 2 );
     test_poly( POLYGON );
 }
 
-void TopologyInfoTest::polyhedron( )
+void TopologyInfoTest::polyhedron()
 {
     CPPUNIT_ASSERT( TopologyInfo::dimension( POLYHEDRON ) == 3 );
     test_poly( POLYHEDRON );
 }
 
-void TopologyInfoTest::bad_type( )
+void TopologyInfoTest::bad_type()
 {
     MBMesquite::MsqError err;
-    EntityTopology       bad_types[] = { (EntityTopology)0, (EntityTopology)1, MIXED, ( EntityTopology )( MIXED + 1 ) };
+    EntityTopology bad_types[] = { (EntityTopology)0, (EntityTopology)1, MIXED, ( EntityTopology )( MIXED + 1 ) };
 
     for( unsigned i = 0; i < ( sizeof( bad_types ) / sizeof( EntityTopology ) ); ++i )
     {
-        CPPUNIT_ASSERT( TopologyInfo::dimension( bad_types[ i ] ) == 0 );
-        CPPUNIT_ASSERT( TopologyInfo::adjacent( bad_types[ i ], 1 ) == 0 );
-        CPPUNIT_ASSERT( TopologyInfo::sides( bad_types[ i ] ) == 0 );
-        CPPUNIT_ASSERT( TopologyInfo::corners( bad_types[ i ] ) == 0 );
-        CPPUNIT_ASSERT( TopologyInfo::edges( bad_types[ i ] ) == 0 );
-        CPPUNIT_ASSERT( TopologyInfo::faces( bad_types[ i ] ) == 0 );
+        CPPUNIT_ASSERT( TopologyInfo::dimension( bad_types[i] ) == 0 );
+        CPPUNIT_ASSERT( TopologyInfo::adjacent( bad_types[i], 1 ) == 0 );
+        CPPUNIT_ASSERT( TopologyInfo::sides( bad_types[i] ) == 0 );
+        CPPUNIT_ASSERT( TopologyInfo::corners( bad_types[i] ) == 0 );
+        CPPUNIT_ASSERT( TopologyInfo::edges( bad_types[i] ) == 0 );
+        CPPUNIT_ASSERT( TopologyInfo::faces( bad_types[i] ) == 0 );
 
         bool a, b, c;
-        TopologyInfo::higher_order( bad_types[ i ], 20, a, b, c, err );
+        TopologyInfo::higher_order( bad_types[i], 20, a, b, c, err );
         CPPUNIT_ASSERT( err );
 
         const unsigned* ptr;
-        ptr = TopologyInfo::edge_vertices( bad_types[ i ], 0, err );
+        ptr = TopologyInfo::edge_vertices( bad_types[i], 0, err );
         CPPUNIT_ASSERT( err );
 
         unsigned count;
-        ptr = TopologyInfo::face_vertices( bad_types[ i ], 0, count, err );
+        ptr = TopologyInfo::face_vertices( bad_types[i], 0, count, err );
         CPPUNIT_ASSERT( err );
 
         for( unsigned j = 0; j < 4; ++j )
         {
-            ptr = TopologyInfo::side_vertices( bad_types[ i ], j, 0, count, err );
+            ptr = TopologyInfo::side_vertices( bad_types[i], j, 0, count, err );
             CPPUNIT_ASSERT( err );
         }
 
         unsigned dim, side;
         for( unsigned idx = 0; idx < 20; ++idx )
         {
-            TopologyInfo::side_number( bad_types[ i ], idx, idx / 2, dim, side, err );
+            TopologyInfo::side_number( bad_types[i], idx, idx / 2, dim, side, err );
             CPPUNIT_ASSERT( err );
         }
     }
 }
 
-void TopologyInfoTest::tri_adj_vert( )
+void TopologyInfoTest::tri_adj_vert()
 {
-    unsigned data[][ 5 ] = { { 2, 1, 2, 0, 0 }, { 2, 2, 0, 0, 0 }, { 2, 0, 1, 0, 0 } };
+    unsigned data[][5] = { { 2, 1, 2, 0, 0 }, { 2, 2, 0, 0, 0 }, { 2, 0, 1, 0, 0 } };
     test_adj( MBMesquite::TRIANGLE, data );
 }
 
-void TopologyInfoTest::quad_adj_vert( )
+void TopologyInfoTest::quad_adj_vert()
 {
-    unsigned data[][ 5 ] = { { 2, 1, 3, 0, 0 }, { 2, 2, 0, 0, 0 }, { 2, 3, 1, 0, 0 }, { 2, 0, 2, 0, 0 } };
+    unsigned data[][5] = { { 2, 1, 3, 0, 0 }, { 2, 2, 0, 0, 0 }, { 2, 3, 1, 0, 0 }, { 2, 0, 2, 0, 0 } };
     test_adj( MBMesquite::QUADRILATERAL, data );
 }
 
-void TopologyInfoTest::tet_adj_vert( )
+void TopologyInfoTest::tet_adj_vert()
 {
-    unsigned data[][ 5 ] = { { 3, 1, 2, 3, 0 }, { 3, 2, 0, 3, 0 }, { 3, 0, 1, 3, 0 }, { 3, 2, 1, 0, 0 } };
+    unsigned data[][5] = { { 3, 1, 2, 3, 0 }, { 3, 2, 0, 3, 0 }, { 3, 0, 1, 3, 0 }, { 3, 2, 1, 0, 0 } };
     test_adj( MBMesquite::TETRAHEDRON, data );
 }
 
-void TopologyInfoTest::hex_adj_vert( )
+void TopologyInfoTest::hex_adj_vert()
 {
-    unsigned data[][ 5 ] = { { 3, 1, 3, 4, 0 }, { 3, 2, 0, 5, 0 }, { 3, 3, 1, 6, 0 }, { 3, 0, 2, 7, 0 },
-                             { 3, 7, 5, 0, 0 }, { 3, 4, 6, 1, 0 }, { 3, 5, 7, 2, 0 }, { 3, 6, 4, 3, 0 } };
+    unsigned data[][5] = { { 3, 1, 3, 4, 0 }, { 3, 2, 0, 5, 0 }, { 3, 3, 1, 6, 0 }, { 3, 0, 2, 7, 0 },
+                           { 3, 7, 5, 0, 0 }, { 3, 4, 6, 1, 0 }, { 3, 5, 7, 2, 0 }, { 3, 6, 4, 3, 0 } };
     test_adj( MBMesquite::HEXAHEDRON, data );
 }
 
-void TopologyInfoTest::pyr_adj_vert( )
+void TopologyInfoTest::pyr_adj_vert()
 {
-    unsigned data[][ 5 ] = {
+    unsigned data[][5] = {
         { 3, 1, 3, 4, 0 }, { 3, 2, 0, 4, 0 }, { 3, 3, 1, 4, 0 }, { 3, 0, 2, 4, 0 }, { 4, 3, 2, 1, 0 } };
     test_adj( MBMesquite::PYRAMID, data );
 }
 
-void TopologyInfoTest::wdg_adj_vert( )
+void TopologyInfoTest::wdg_adj_vert()
 {
-    unsigned data[][ 5 ] = { { 3, 1, 2, 3, 0 }, { 3, 2, 0, 4, 0 }, { 3, 0, 1, 5, 0 },
-                             { 3, 5, 4, 0, 0 }, { 3, 3, 5, 1, 0 }, { 3, 4, 3, 2, 0 } };
+    unsigned data[][5] = { { 3, 1, 2, 3, 0 }, { 3, 2, 0, 4, 0 }, { 3, 0, 1, 5, 0 },
+                           { 3, 5, 4, 0, 0 }, { 3, 3, 5, 1, 0 }, { 3, 4, 3, 2, 0 } };
     test_adj( MBMesquite::PRISM, data );
 }
 
-void TopologyInfoTest::test_adj( MBMesquite::EntityTopology type, const unsigned data[][ 5 ] )
+void TopologyInfoTest::test_adj( MBMesquite::EntityTopology type, const unsigned data[][5] )
 {
     // Get num vertices from type
     unsigned n = TopologyInfo::corners( type );
@@ -1206,10 +1205,10 @@ void TopologyInfoTest::test_adj( MBMesquite::EntityTopology type, const unsigned
     for( unsigned i = 0; i < n; ++i )
     {
         // Get the data corresponding to this vertex of the element
-        unsigned const* corner = data[ i ];
-        unsigned        expected_count = corner[ 0 ];
+        unsigned const* corner  = data[i];
+        unsigned expected_count = corner[0];
         // Query TopologyInfo for the same data
-        unsigned        actual_count;
+        unsigned actual_count;
         unsigned const* actual_adj = TopologyInfo::adjacent_vertices( type, i, actual_count );
         // Check result is valid and counts match
         CPPUNIT_ASSERT( actual_adj != NULL );
@@ -1225,13 +1224,13 @@ void TopologyInfoTest::test_adj( MBMesquite::EntityTopology type, const unsigned
         // vertex in the expected list occurs.
         unsigned j;
         for( j = 0; j < actual_count; ++j )
-            if( corner[ 1 ] == actual_adj[ j ] ) break;
+            if( corner[1] == actual_adj[j] ) break;
         // Asssert that the first expected vertex was somewhere in
         // the result list.
         CPPUNIT_ASSERT( j < actual_count );
         // Compare the remaining vertices, enforcing the order.
         for( unsigned k = 1; k < actual_count; ++k )
-            CPPUNIT_ASSERT( corner[ k + 1 ] == actual_adj[ ( k + j ) % actual_count ] );
+            CPPUNIT_ASSERT( corner[k + 1] == actual_adj[( k + j ) % actual_count] );
     }
 }
 
@@ -1245,21 +1244,21 @@ void TopologyInfoTest::test_rev_adj( MBMesquite::EntityTopology type )
     for( unsigned i = 0; i < n; ++i )
     {
         // get adjacent vertex list
-        unsigned        num_adj_idx;
+        unsigned num_adj_idx;
         unsigned const* adj_idx = TopologyInfo::adjacent_vertices( type, i, num_adj_idx );
         CPPUNIT_ASSERT( adj_idx != NULL );
         CPPUNIT_ASSERT( num_adj_idx > 1 );
 
         // make sure adjacent vertex list is unique
         std::vector< unsigned > adj_idx_copy( num_adj_idx );
-        std::copy( adj_idx, adj_idx + num_adj_idx, adj_idx_copy.begin( ) );
-        std::sort( adj_idx_copy.begin( ), adj_idx_copy.end( ) );
+        std::copy( adj_idx, adj_idx + num_adj_idx, adj_idx_copy.begin() );
+        std::sort( adj_idx_copy.begin(), adj_idx_copy.end() );
         std::vector< unsigned >::iterator iter;
-        iter = std::unique( adj_idx_copy.begin( ), adj_idx_copy.end( ) );
-        CPPUNIT_ASSERT( iter == adj_idx_copy.end( ) );
+        iter = std::unique( adj_idx_copy.begin(), adj_idx_copy.end() );
+        CPPUNIT_ASSERT( iter == adj_idx_copy.end() );
 
         // Get reverse mapping indices
-        unsigned        num_rev_idx;
+        unsigned num_rev_idx;
         unsigned const* rev_idx = TopologyInfo::reverse_vertex_adjacency_offsets( type, i, num_rev_idx );
         CPPUNIT_ASSERT( rev_idx != NULL );
         CPPUNIT_ASSERT( num_rev_idx == num_adj_idx );
@@ -1267,11 +1266,11 @@ void TopologyInfoTest::test_rev_adj( MBMesquite::EntityTopology type )
         // for each adjacent vertex, test reverse mapping
         for( unsigned j = 0; j < num_adj_idx; ++j )
         {
-            unsigned        num_adj_adj_idx;
-            unsigned const* adj_adj_idx = TopologyInfo::adjacent_vertices( type, adj_idx[ j ], num_adj_adj_idx );
+            unsigned num_adj_adj_idx;
+            unsigned const* adj_adj_idx = TopologyInfo::adjacent_vertices( type, adj_idx[j], num_adj_adj_idx );
 
-            CPPUNIT_ASSERT( rev_idx[ j ] < num_adj_adj_idx );
-            CPPUNIT_ASSERT( adj_adj_idx[ rev_idx[ j ] ] == i );
+            CPPUNIT_ASSERT( rev_idx[j] < num_adj_adj_idx );
+            CPPUNIT_ASSERT( adj_adj_idx[rev_idx[j]] == i );
         }
     }
 }
@@ -1298,118 +1297,118 @@ const ho_result* const HEX14 = HEX15;
 
 const ho_result HEX9[] = { { 3, 0, 8 } };
 
-void TopologyInfoTest::higher_order_from_side( )
+void TopologyInfoTest::higher_order_from_side()
 {
     MsqPrintError err( std::cerr );
     // HEX-27
     for( unsigned i = 0; i < 19; ++i )
     {
-        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 27, HEX27[ i ].dim, HEX27[ i ].num, err );
+        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 27, HEX27[i].dim, HEX27[i].num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX27[ i ].idx, result );
+        CPPUNIT_ASSERT_EQUAL( HEX27[i].idx, result );
     }
     // HEX-26
     for( unsigned i = 0; i < 18; ++i )
     {
-        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 26, HEX26[ i ].dim, HEX26[ i ].num, err );
+        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 26, HEX26[i].dim, HEX26[i].num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX26[ i ].idx, result );
+        CPPUNIT_ASSERT_EQUAL( HEX26[i].idx, result );
     }
     // HEX-20
     for( unsigned i = 0; i < 12; ++i )
     {
-        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 20, HEX20[ i ].dim, HEX20[ i ].num, err );
+        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 20, HEX20[i].dim, HEX20[i].num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX20[ i ].idx, result );
+        CPPUNIT_ASSERT_EQUAL( HEX20[i].idx, result );
     }
     // HEX-15
     for( unsigned i = 0; i < 7; ++i )
     {
-        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 15, HEX15[ i ].dim, HEX15[ i ].num, err );
+        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 15, HEX15[i].dim, HEX15[i].num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX15[ i ].idx, result );
+        CPPUNIT_ASSERT_EQUAL( HEX15[i].idx, result );
     }
     // HEX-14
     for( unsigned i = 0; i < 6; ++i )
     {
-        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 14, HEX14[ i ].dim, HEX14[ i ].num, err );
+        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 14, HEX14[i].dim, HEX14[i].num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX14[ i ].idx, result );
+        CPPUNIT_ASSERT_EQUAL( HEX14[i].idx, result );
     }
     // HEX-9
     for( unsigned i = 0; i < 1; ++i )
     {
-        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 9, HEX9[ i ].dim, HEX9[ i ].num, err );
+        unsigned result = TopologyInfo::higher_order_from_side( HEXAHEDRON, 9, HEX9[i].dim, HEX9[i].num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX9[ i ].idx, result );
+        CPPUNIT_ASSERT_EQUAL( HEX9[i].idx, result );
     }
 }
 
-void TopologyInfoTest::side_from_higher_order( )
+void TopologyInfoTest::side_from_higher_order()
 {
     MsqPrintError err( std::cerr );
-    unsigned      dim, num;
+    unsigned dim, num;
     // HEX-27
     for( unsigned i = 0; i < 19; ++i )
     {
-        TopologyInfo::side_from_higher_order( HEXAHEDRON, 27, HEX27[ i ].idx, dim, num, err );
+        TopologyInfo::side_from_higher_order( HEXAHEDRON, 27, HEX27[i].idx, dim, num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX27[ i ].dim, dim );
-        CPPUNIT_ASSERT_EQUAL( HEX27[ i ].num, num );
+        CPPUNIT_ASSERT_EQUAL( HEX27[i].dim, dim );
+        CPPUNIT_ASSERT_EQUAL( HEX27[i].num, num );
     }
     // HEX-26
     for( unsigned i = 0; i < 18; ++i )
     {
-        TopologyInfo::side_from_higher_order( HEXAHEDRON, 26, HEX26[ i ].idx, dim, num, err );
+        TopologyInfo::side_from_higher_order( HEXAHEDRON, 26, HEX26[i].idx, dim, num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX26[ i ].dim, dim );
-        CPPUNIT_ASSERT_EQUAL( HEX26[ i ].num, num );
+        CPPUNIT_ASSERT_EQUAL( HEX26[i].dim, dim );
+        CPPUNIT_ASSERT_EQUAL( HEX26[i].num, num );
     }
     // HEX-20
     for( unsigned i = 0; i < 12; ++i )
     {
-        TopologyInfo::side_from_higher_order( HEXAHEDRON, 20, HEX20[ i ].idx, dim, num, err );
+        TopologyInfo::side_from_higher_order( HEXAHEDRON, 20, HEX20[i].idx, dim, num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX20[ i ].dim, dim );
-        CPPUNIT_ASSERT_EQUAL( HEX20[ i ].num, num );
+        CPPUNIT_ASSERT_EQUAL( HEX20[i].dim, dim );
+        CPPUNIT_ASSERT_EQUAL( HEX20[i].num, num );
     }
     // HEX-15
     for( unsigned i = 0; i < 7; ++i )
     {
-        TopologyInfo::side_from_higher_order( HEXAHEDRON, 15, HEX15[ i ].idx, dim, num, err );
+        TopologyInfo::side_from_higher_order( HEXAHEDRON, 15, HEX15[i].idx, dim, num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX15[ i ].dim, dim );
-        CPPUNIT_ASSERT_EQUAL( HEX15[ i ].num, num );
+        CPPUNIT_ASSERT_EQUAL( HEX15[i].dim, dim );
+        CPPUNIT_ASSERT_EQUAL( HEX15[i].num, num );
     }
     // HEX-14
     for( unsigned i = 0; i < 6; ++i )
     {
-        TopologyInfo::side_from_higher_order( HEXAHEDRON, 14, HEX14[ i ].idx, dim, num, err );
+        TopologyInfo::side_from_higher_order( HEXAHEDRON, 14, HEX14[i].idx, dim, num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX14[ i ].dim, dim );
-        CPPUNIT_ASSERT_EQUAL( HEX14[ i ].num, num );
+        CPPUNIT_ASSERT_EQUAL( HEX14[i].dim, dim );
+        CPPUNIT_ASSERT_EQUAL( HEX14[i].num, num );
     }
     // HEX-9
     for( unsigned i = 0; i < 1; ++i )
     {
-        TopologyInfo::side_from_higher_order( HEXAHEDRON, 9, HEX9[ i ].idx, dim, num, err );
+        TopologyInfo::side_from_higher_order( HEXAHEDRON, 9, HEX9[i].idx, dim, num, err );
         CPPUNIT_ASSERT( !err );
-        CPPUNIT_ASSERT_EQUAL( HEX9[ i ].dim, dim );
-        CPPUNIT_ASSERT_EQUAL( HEX9[ i ].num, num );
+        CPPUNIT_ASSERT_EQUAL( HEX9[i].dim, dim );
+        CPPUNIT_ASSERT_EQUAL( HEX9[i].num, num );
     }
 }
 
-void TopologyInfoTest::find_edge( )
+void TopologyInfoTest::find_edge()
 {
     MsqPrintError err( std::cerr );
-    bool          reversed;
+    bool reversed;
 
-    EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
-    const unsigned num_types = sizeof( types ) / sizeof( types[ 0 ] );
-    unsigned       idx;
+    EntityTopology types[]   = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
+    const unsigned num_types = sizeof( types ) / sizeof( types[0] );
+    unsigned idx;
     for( unsigned t = 0; t < num_types; ++t )
     {
-        const EntityTopology type = types[ t ];
+        const EntityTopology type = types[t];
 
         for( unsigned e = 0; e < TopologyInfo::edges( type ); ++e )
         {
@@ -1421,8 +1420,8 @@ void TopologyInfoTest::find_edge( )
             CPPUNIT_ASSERT_EQUAL( e, idx );
             CPPUNIT_ASSERT( !reversed );
 
-            const unsigned switched[ 2 ] = { v[ 1 ], v[ 0 ] };
-            idx = TopologyInfo::find_edge( type, switched, reversed, err );
+            const unsigned switched[2] = { v[1], v[0] };
+            idx                        = TopologyInfo::find_edge( type, switched, reversed, err );
             CPPUNIT_ASSERT( !err );
             CPPUNIT_ASSERT_EQUAL( e, idx );
             CPPUNIT_ASSERT( reversed );
@@ -1433,31 +1432,31 @@ void TopologyInfoTest::find_edge( )
 static void shift( const unsigned* in, unsigned* out, unsigned size, unsigned offset )
 {
     for( unsigned i = 0; i < size; ++i )
-        out[ i ] = in[ ( i + offset ) % size ];
+        out[i] = in[( i + offset ) % size];
 }
 
 static void reverse( const unsigned* in, unsigned* out, unsigned size, unsigned offset )
 {
     for( unsigned i = 0; i < size; ++i )
-        out[ i ] = in[ ( offset + size - i - 1 ) % size ];
+        out[i] = in[( offset + size - i - 1 ) % size];
 }
 
-void TopologyInfoTest::find_face( )
+void TopologyInfoTest::find_face()
 {
     MsqPrintError err( std::cerr );
-    bool          reversed;
-    unsigned      switched[ 4 ], idx;
+    bool reversed;
+    unsigned switched[4], idx;
 
-    EntityTopology types[] = { TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
-    const unsigned num_types = sizeof( types ) / sizeof( types[ 0 ] );
+    EntityTopology types[]   = { TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
+    const unsigned num_types = sizeof( types ) / sizeof( types[0] );
     for( unsigned t = 0; t < num_types; ++t )
     {
-        const EntityTopology type = types[ t ];
+        const EntityTopology type = types[t];
 
         for( unsigned f = 0; f < TopologyInfo::faces( type ); ++f )
         {
 
-            unsigned              n;
+            unsigned n;
             const unsigned* const v = TopologyInfo::face_vertices( type, f, n, err );
             CPPUNIT_ASSERT( !err );
             CPPUNIT_ASSERT( n == 3 || n == 4 );
@@ -1519,17 +1518,17 @@ void TopologyInfoTest::find_face( )
     }
 }
 
-void TopologyInfoTest::find_side( )
+void TopologyInfoTest::find_side()
 {
     MsqPrintError err( std::cerr );
-    bool          reversed;
-    unsigned      i, dim, switched[ 4 ];
+    bool reversed;
+    unsigned i, dim, switched[4];
 
-    EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
-    const unsigned num_types = sizeof( types ) / sizeof( types[ 0 ] );
+    EntityTopology types[]   = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
+    const unsigned num_types = sizeof( types ) / sizeof( types[0] );
     for( unsigned t = 0; t < num_types; ++t )
     {
-        const EntityTopology type = types[ t ];
+        const EntityTopology type = types[t];
 
         for( unsigned e = 0; e < TopologyInfo::edges( type ); ++e )
         {
@@ -1542,8 +1541,8 @@ void TopologyInfoTest::find_side( )
             CPPUNIT_ASSERT_EQUAL( 1u, dim );
             CPPUNIT_ASSERT( !reversed );
 
-            switched[ 0 ] = v[ 1 ];
-            switched[ 1 ] = v[ 0 ];
+            switched[0] = v[1];
+            switched[1] = v[0];
             TopologyInfo::find_side( type, switched, 2, dim, i, reversed, err );
             CPPUNIT_ASSERT( !err );
             CPPUNIT_ASSERT_EQUAL( e, i );
@@ -1554,12 +1553,12 @@ void TopologyInfoTest::find_side( )
 
     for( unsigned t = 2; t < num_types; ++t )
     {
-        const EntityTopology type = types[ t ];
+        const EntityTopology type = types[t];
 
         for( unsigned f = 0; f < TopologyInfo::faces( type ); ++f )
         {
 
-            unsigned              n;
+            unsigned n;
             const unsigned* const v = TopologyInfo::face_vertices( type, f, n, err );
             CPPUNIT_ASSERT( !err );
             CPPUNIT_ASSERT( n == 3 || n == 4 );
@@ -1581,7 +1580,7 @@ void TopologyInfoTest::find_side( )
     }
 }
 
-void TopologyInfoTest::compare_sides( )
+void TopologyInfoTest::compare_sides()
 {
     // define two hexes sharing a face:
     //    6-------7-------8
@@ -1595,11 +1594,11 @@ void TopologyInfoTest::compare_sides( )
     const size_t hex1[] = { 3, 4, 10, 9, 0, 1, 7, 6 };
     const size_t hex2[] = { 4, 5, 11, 10, 1, 2, 8, 7 };
     // shared edges: { hex1_edge, hex2_edge }
-    const unsigned edges[][ 2 ] = { { 1, 3 }, { 5, 4 }, { 6, 7 }, { 9, 11 } };
-    const unsigned num_edges = sizeof( edges ) / sizeof( edges[ 0 ] );
+    const unsigned edges[][2] = { { 1, 3 }, { 5, 4 }, { 6, 7 }, { 9, 11 } };
+    const unsigned num_edges  = sizeof( edges ) / sizeof( edges[0] );
     // shared faces: { hex1_face, hex2_face }
-    const unsigned faces[][ 2 ] = { { 1, 3 } };
-    const unsigned num_faces = sizeof( faces ) / sizeof( faces[ 0 ] );
+    const unsigned faces[][2] = { { 1, 3 } };
+    const unsigned num_faces  = sizeof( faces ) / sizeof( faces[0] );
 
     MsqPrintError err( std::cerr );
 
@@ -1608,11 +1607,11 @@ void TopologyInfoTest::compare_sides( )
     {
         unsigned match;
         for( match = 0; match < num_edges; ++match )
-            if( edges[ match ][ 0 ] == e1 ) break;
+            if( edges[match][0] == e1 ) break;
 
         for( unsigned e2 = 0; e2 < 12; ++e2 )
         {
-            const bool expected = ( match < num_edges ) && ( edges[ match ][ 1 ] == e2 );
+            const bool expected = ( match < num_edges ) && ( edges[match][1] == e2 );
 
             const bool result = TopologyInfo::compare_sides( hex1, HEXAHEDRON, e1, hex2, HEXAHEDRON, e2, 1, err );
 
@@ -1626,11 +1625,11 @@ void TopologyInfoTest::compare_sides( )
     {
         unsigned match;
         for( match = 0; match < num_faces; ++match )
-            if( faces[ match ][ 0 ] == f1 ) break;
+            if( faces[match][0] == f1 ) break;
 
         for( unsigned f2 = 0; f2 < 6; ++f2 )
         {
-            const bool expected = ( match < num_faces ) && ( faces[ match ][ 1 ] == f2 );
+            const bool expected = ( match < num_faces ) && ( faces[match][1] == f2 );
 
             const bool result = TopologyInfo::compare_sides( hex1, HEXAHEDRON, f1, hex2, HEXAHEDRON, f2, 2, err );
 

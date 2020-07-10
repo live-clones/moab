@@ -41,7 +41,7 @@ namespace MBMesquite
 class GlobalPatch : public PatchSet
 {
   public:
-    ~GlobalPatch( );
+    ~GlobalPatch();
 
     /**\brief Get a list of handles, one for each patch */
     virtual void get_patch_handles( std::vector< PatchHandle >& patch_handles_out, MsqError& err );

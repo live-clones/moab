@@ -33,10 +33,10 @@ NS_GENERIC_FACTORY_CONSTRUCTOR( moab::Core )
 // support for nsIClassInfo
 NS_DECL_CLASSINFO( moab::Core )
 
-MB_EXPORT const char* MoabVersion( );
-MB_EXPORT void        GetInterface( MBuuid& interface_requested, UnknownInterface** iface );
-MB_EXPORT void        DeInitialize( );
-MB_EXPORT void        ReleaseInterface( UnknownInterface* iface );
+MB_EXPORT const char* MoabVersion();
+MB_EXPORT void GetInterface( MBuuid& interface_requested, UnknownInterface** iface );
+MB_EXPORT void DeInitialize();
+MB_EXPORT void ReleaseInterface( UnknownInterface* iface );
 
 static const nsModuleComponentInfo components[] = {
     { "MOAB Interface", CORE_CID, CORE_CONTRACTID, CoreConstructor, NULL /* NULL if you dont need one */,
@@ -62,8 +62,8 @@ namespace moab
 class ComponentFactory : public UnknownInterface
 {
   public:
-    ComponentFactory( ) {}
-    virtual ~ComponentFactory( ) {}
+    ComponentFactory() {}
+    virtual ~ComponentFactory() {}
     // returns the interface requested from an object
     virtual int QueryInterface( const MBuuid&, UnknownInterface** );
     // keep track of the objects this component factory creates
@@ -105,7 +105,7 @@ int ComponentFactory::QueryInterface( const MBuuid& uuid, UnknownInterface** ifa
 }
 
 // returns the interface version
-MB_EXPORT const char* MoabVersion( )
+MB_EXPORT const char* MoabVersion()
 {
     return MB_INTERFACE_VERSION;
 }
@@ -124,13 +124,13 @@ MB_EXPORT void GetInterface( MBuuid& interface_requested, UnknownInterface** ifa
 // DeInitialize function is accessed by the MBClient when disconnecting from this library
 // this will clean everything up prior to a disconnection
 // from this library
-MB_EXPORT void DeInitialize( )
+MB_EXPORT void DeInitialize()
 {
     // delete all instances of objects
-    while( ComponentFactory::objects_in_use.size( ) )
+    while( ComponentFactory::objects_in_use.size() )
     {
-        UnknownInterface* iface = ComponentFactory::objects_in_use.front( );
-        ComponentFactory::objects_in_use.pop_front( );
+        UnknownInterface* iface = ComponentFactory::objects_in_use.front();
+        ComponentFactory::objects_in_use.pop_front();
         if( iface ) delete iface;
     }
 }

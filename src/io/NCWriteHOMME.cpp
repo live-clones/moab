@@ -10,70 +10,70 @@
 namespace moab
 {
 
-NCWriteHOMME::~NCWriteHOMME( )
+NCWriteHOMME::~NCWriteHOMME()
 {
     // TODO Auto-generated destructor stub
 }
 
-ErrorCode NCWriteHOMME::collect_mesh_info( )
+ErrorCode NCWriteHOMME::collect_mesh_info()
 {
-    Interface*&                 mbImpl = _writeNC->mbImpl;
+    Interface*& mbImpl                   = _writeNC->mbImpl;
     std::vector< std::string >& dimNames = _writeNC->dimNames;
-    std::vector< int >&         dimLens = _writeNC->dimLens;
-    Tag&                        mGlobalIdTag = _writeNC->mGlobalIdTag;
+    std::vector< int >& dimLens          = _writeNC->dimLens;
+    Tag& mGlobalIdTag                    = _writeNC->mGlobalIdTag;
 
     ErrorCode rval;
 
     // Look for time dimension
     std::vector< std::string >::iterator vecIt;
-    if( ( vecIt = std::find( dimNames.begin( ), dimNames.end( ), "time" ) ) != dimNames.end( ) )
-        tDim = vecIt - dimNames.begin( );
+    if( ( vecIt = std::find( dimNames.begin(), dimNames.end(), "time" ) ) != dimNames.end() )
+        tDim = vecIt - dimNames.begin();
     else
     {
         MB_SET_ERR( MB_FAILURE, "Couldn't find 'time' dimension" );
     }
-    nTimeSteps = dimLens[ tDim ];
+    nTimeSteps = dimLens[tDim];
 
     // Get number of levels
-    if( ( vecIt = std::find( dimNames.begin( ), dimNames.end( ), "lev" ) ) != dimNames.end( ) )
-        levDim = vecIt - dimNames.begin( );
+    if( ( vecIt = std::find( dimNames.begin(), dimNames.end(), "lev" ) ) != dimNames.end() )
+        levDim = vecIt - dimNames.begin();
     else
     {
         MB_SET_ERR( MB_FAILURE, "Couldn't find 'lev' dimension" );
     }
-    nLevels = dimLens[ levDim ];
+    nLevels = dimLens[levDim];
 
     // Get local vertices
     rval = mbImpl->get_entities_by_dimension( _fileSet, 0, localVertsOwned );MB_CHK_SET_ERR( rval, "Trouble getting local vertices in current file set" );
-    assert( !localVertsOwned.empty( ) );
+    assert( !localVertsOwned.empty() );
 
 #ifdef MOAB_HAVE_MPI
     bool& isParallel = _writeNC->isParallel;
     if( isParallel )
     {
         ParallelComm*& myPcomm = _writeNC->myPcomm;
-        int            rank = myPcomm->proc_config( ).proc_rank( );
-        int            procs = myPcomm->proc_config( ).proc_size( );
+        int rank               = myPcomm->proc_config().proc_rank();
+        int procs              = myPcomm->proc_config().proc_size();
         if( procs > 1 )
         {
 #ifndef NDEBUG
-            unsigned int num_local_verts = localVertsOwned.size( );
+            unsigned int num_local_verts = localVertsOwned.size();
 #endif
             rval = myPcomm->filter_pstatus( localVertsOwned, PSTATUS_NOT_OWNED, PSTATUS_NOT );MB_CHK_SET_ERR( rval, "Trouble getting owned vertices in current set" );
 
             // Assume that PARALLEL_RESOLVE_SHARED_ENTS option is set
             // Verify that not all local vertices are owned by the last processor
             if( procs - 1 == rank )
-                assert( "PARALLEL_RESOLVE_SHARED_ENTS option is set" && localVertsOwned.size( ) < num_local_verts );
+                assert( "PARALLEL_RESOLVE_SHARED_ENTS option is set" && localVertsOwned.size() < num_local_verts );
         }
     }
 #endif
 
-    std::vector< int > gids( localVertsOwned.size( ) );
-    rval = mbImpl->tag_get_data( mGlobalIdTag, localVertsOwned, &gids[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting global IDs on local vertices" );
+    std::vector< int > gids( localVertsOwned.size() );
+    rval = mbImpl->tag_get_data( mGlobalIdTag, localVertsOwned, &gids[0] );MB_CHK_SET_ERR( rval, "Trouble getting global IDs on local vertices" );
 
     // Get localGidVertsOwned
-    std::copy( gids.rbegin( ), gids.rend( ), range_inserter( localGidVertsOwned ) );
+    std::copy( gids.rbegin(), gids.rend(), range_inserter( localGidVertsOwned ) );
 
     return MB_SUCCESS;
 }
@@ -84,11 +84,11 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
 
     std::map< std::string, WriteNC::VarData >& varInfo = _writeNC->varInfo;
 
-    for( size_t i = 0; i < var_names.size( ); i++ )
+    for( size_t i = 0; i < var_names.size(); i++ )
     {
-        std::string                                         varname = var_names[ i ];
+        std::string varname                                     = var_names[i];
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( varname );
-        if( vit == varInfo.end( ) ) MB_SET_ERR( MB_FAILURE, "Can't find variable " << varname );
+        if( vit == varInfo.end() ) MB_SET_ERR( MB_FAILURE, "Can't find variable " << varname );
         ;
 
         WriteNC::VarData& currentVarData = vit->second;
@@ -111,13 +111,13 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
             // Non-set variables with timesteps
             // 3 dimensions like (time, lev, ncol)
             // 2 dimensions like (time, ncol)
-            assert( 3 == varDims.size( ) || 2 == varDims.size( ) );
+            assert( 3 == varDims.size() || 2 == varDims.size() );
 
             // Time should be the first dimension
-            assert( tDim == varDims[ 0 ] );
+            assert( tDim == varDims[0] );
 
-            currentVarData.writeStarts[ dim_idx ] = 0;  // This value is timestep dependent, will be set later
-            currentVarData.writeCounts[ dim_idx ] = 1;
+            currentVarData.writeStarts[dim_idx] = 0;  // This value is timestep dependent, will be set later
+            currentVarData.writeCounts[dim_idx] = 1;
             dim_idx++;
         }
         else
@@ -125,7 +125,7 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
             // Non-set variables without timesteps
             // 2 dimensions like (lev, ncol)
             // 1 dimension like (ncol)
-            assert( 2 == varDims.size( ) || 1 == varDims.size( ) );
+            assert( 2 == varDims.size() || 1 == varDims.size() );
         }
 
         // Next: lev
@@ -134,10 +134,10 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
             // Non-set variables with levels
             // 3 dimensions like (time, lev, ncol)
             // 2 dimensions like (lev, ncol)
-            assert( 3 == varDims.size( ) || 2 == varDims.size( ) );
+            assert( 3 == varDims.size() || 2 == varDims.size() );
 
-            currentVarData.writeStarts[ dim_idx ] = 0;
-            currentVarData.writeCounts[ dim_idx ] = currentVarData.numLev;
+            currentVarData.writeStarts[dim_idx] = 0;
+            currentVarData.writeCounts[dim_idx] = currentVarData.numLev;
             dim_idx++;
         }
         else
@@ -145,7 +145,7 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
             // Non-set variables without levels
             // 2 dimensions like (time, ncol)
             // 1 dimension like (ncol)
-            assert( 2 == varDims.size( ) || 1 == varDims.size( ) );
+            assert( 2 == varDims.size() || 1 == varDims.size() );
         }
 
         // Finally: ncol
@@ -155,8 +155,8 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
                 // Vertices
                 // Start from the first localGidVerts
                 // Actually, this will be reset later for writing
-                currentVarData.writeStarts[ dim_idx ] = localGidVertsOwned[ 0 ] - 1;
-                currentVarData.writeCounts[ dim_idx ] = localGidVertsOwned.size( );
+                currentVarData.writeStarts[dim_idx] = localGidVertsOwned[0] - 1;
+                currentVarData.writeCounts[dim_idx] = localGidVertsOwned.size();
                 break;
             default:
                 MB_SET_ERR( MB_FAILURE, "Unexpected entity location type for variable " << varname );
@@ -166,24 +166,24 @@ ErrorCode NCWriteHOMME::collect_variable_data( std::vector< std::string >& var_n
         // Get variable size
         currentVarData.sz = 1;
         for( std::size_t idx = 0; idx < dim_idx; idx++ )
-            currentVarData.sz *= currentVarData.writeCounts[ idx ];
+            currentVarData.sz *= currentVarData.writeCounts[idx];
     }
 
     return MB_SUCCESS;
 }
 
 ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >& vdatas,
-                                                std::vector< int >&              tstep_nums )
+                                                std::vector< int >& tstep_nums )
 {
     Interface*& mbImpl = _writeNC->mbImpl;
 
     int success;
-    int num_local_verts_owned = localVertsOwned.size( );
+    int num_local_verts_owned = localVertsOwned.size();
 
     // For each indexed variable tag, write a time step data
-    for( unsigned int i = 0; i < vdatas.size( ); i++ )
+    for( unsigned int i = 0; i < vdatas.size(); i++ )
     {
-        WriteNC::VarData& variableData = vdatas[ i ];
+        WriteNC::VarData& variableData = vdatas[i];
 
         // Assume this variable is on vertices for the time being
         switch( variableData.entLoc )
@@ -202,7 +202,7 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
             // Non-set variables with timesteps
             // 3 dimensions like (time, lev, ncol)
             // 2 dimensions like (time, ncol)
-            num_timesteps = tstep_nums.size( );
+            num_timesteps = tstep_nums.size();
             ncol_idx++;
         }
         else
@@ -238,14 +238,14 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
             // Use tag_get_data instead of tag_iterate to copy tag data, as localVertsOwned
             // might not be contiguous. We should also transpose for level so that means
             // deep copy for transpose
-            if( tDim == variableData.varDims[ 0 ] ) variableData.writeStarts[ 0 ] = t;  // This is start for time
+            if( tDim == variableData.varDims[0] ) variableData.writeStarts[0] = t;  // This is start for time
             std::vector< double > tag_data( num_local_verts_owned * num_lev );
-            ErrorCode rval = mbImpl->tag_get_data( variableData.varTags[ t ], localVertsOwned, &tag_data[ 0 ] );MB_CHK_SET_ERR( rval, "Trouble getting tag data on owned vertices" );
+            ErrorCode rval = mbImpl->tag_get_data( variableData.varTags[t], localVertsOwned, &tag_data[0] );MB_CHK_SET_ERR( rval, "Trouble getting tag data on owned vertices" );
 
 #ifdef MOAB_HAVE_PNETCDF
-            size_t             nb_writes = localGidVertsOwned.psize( );
+            size_t nb_writes = localGidVertsOwned.psize();
             std::vector< int > requests( nb_writes ), statuss( nb_writes );
-            size_t             idxReq = 0;
+            size_t idxReq = 0;
 #endif
 
             // Now transpose and write copied tag data
@@ -258,31 +258,31 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
                     {
                         // Transpose (ncol, lev) back to (lev, ncol)
                         // Note, num_local_verts_owned is not used by jik_to_kji_stride()
-                        jik_to_kji_stride( num_local_verts_owned, 1, num_lev, &tmpdoubledata[ 0 ], &tag_data[ 0 ],
+                        jik_to_kji_stride( num_local_verts_owned, 1, num_lev, &tmpdoubledata[0], &tag_data[0],
                                            localGidVertsOwned );
                     }
 
                     size_t indexInDoubleArray = 0;
-                    size_t ic = 0;
-                    for( Range::pair_iterator pair_iter = localGidVertsOwned.pair_begin( );
-                         pair_iter != localGidVertsOwned.pair_end( ); ++pair_iter, ic++ )
+                    size_t ic                 = 0;
+                    for( Range::pair_iterator pair_iter = localGidVertsOwned.pair_begin();
+                         pair_iter != localGidVertsOwned.pair_end(); ++pair_iter, ic++ )
                     {
-                        EntityHandle starth = pair_iter->first;
-                        EntityHandle endh = pair_iter->second;
-                        variableData.writeStarts[ ncol_idx ] = ( NCDF_SIZE )( starth - 1 );
-                        variableData.writeCounts[ ncol_idx ] = ( NCDF_SIZE )( endh - starth + 1 );
+                        EntityHandle starth                = pair_iter->first;
+                        EntityHandle endh                  = pair_iter->second;
+                        variableData.writeStarts[ncol_idx] = ( NCDF_SIZE )( starth - 1 );
+                        variableData.writeCounts[ncol_idx] = ( NCDF_SIZE )( endh - starth + 1 );
 
                         // Do a partial write, in each subrange
 #ifdef MOAB_HAVE_PNETCDF
                         // Wait outside this loop
-                        success = NCFUNCREQP( _vara_double )(
-                            _fileId, variableData.varId, &( variableData.writeStarts[ 0 ] ),
-                            &( variableData.writeCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ),
-                            &requests[ idxReq++ ] );
+                        success =
+                            NCFUNCREQP( _vara_double )( _fileId, variableData.varId, &( variableData.writeStarts[0] ),
+                                                        &( variableData.writeCounts[0] ),
+                                                        &( tmpdoubledata[indexInDoubleArray] ), &requests[idxReq++] );
 #else
-                        success = NCFUNCAP( _vara_double )(
-                            _fileId, variableData.varId, &( variableData.writeStarts[ 0 ] ),
-                            &( variableData.writeCounts[ 0 ] ), &( tmpdoubledata[ indexInDoubleArray ] ) );
+                        success = NCFUNCAP(
+                            _vara_double )( _fileId, variableData.varId, &( variableData.writeStarts[0] ),
+                                            &( variableData.writeCounts[0] ), &( tmpdoubledata[indexInDoubleArray] ) );
 #endif
                         if( success )
                             MB_SET_ERR( MB_FAILURE,
@@ -291,9 +291,9 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
                         // next subrange
                         indexInDoubleArray += ( endh - starth + 1 ) * num_lev;
                     }
-                    assert( ic == localGidVertsOwned.psize( ) );
+                    assert( ic == localGidVertsOwned.psize() );
 #ifdef MOAB_HAVE_PNETCDF
-                    success = ncmpi_wait_all( _fileId, requests.size( ), &requests[ 0 ], &statuss[ 0 ] );
+                    success = ncmpi_wait_all( _fileId, requests.size(), &requests[0], &statuss[0] );
                     if( success ) MB_SET_ERR( MB_FAILURE, "Failed on wait_all" );
 #endif
                     break;

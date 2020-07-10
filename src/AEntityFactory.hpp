@@ -37,7 +37,7 @@ class AEntityFactory
     AEntityFactory( Core* mdb );
 
     //! destructor
-    ~AEntityFactory( );
+    ~AEntityFactory();
 
     //! add an adjacency from from_ent to to_ent; if both_ways is true, add one
     //! in reverse too
@@ -113,10 +113,10 @@ class AEntityFactory
     ErrorCode get_adjacencies( EntityHandle entity, std::vector< EntityHandle >& adjacent_entities ) const;
 
     //! creates vertex to element adjacency information
-    ErrorCode create_vert_elem_adjacencies( );
+    ErrorCode create_vert_elem_adjacencies();
 
     //! returns whether vertex to element adjacencies are being stored
-    bool vert_elem_adjacencies( ) const
+    bool vert_elem_adjacencies() const
     {
         return mVertElemAdj;
     }
@@ -140,7 +140,7 @@ class AEntityFactory
     //! creates explicit adjacencies accordingly)
     ErrorCode merge_adjust_adjacencies( EntityHandle entity_to_keep, EntityHandle entity_to_remove );
 
-    void      get_memory_use( unsigned long long& total_entity_storage, unsigned long long& total_storage );
+    void get_memory_use( unsigned long long& total_entity_storage, unsigned long long& total_storage );
     ErrorCode get_memory_use( const Range& entities, unsigned long long& total_entity_storage,
                               unsigned long long& total_amortized_storage );
 
@@ -153,7 +153,7 @@ class AEntityFactory
                             std::vector< EntityHandle >& storage );
 
     //! private constructor to prevent the construction of a default one
-    AEntityFactory( );
+    AEntityFactory();
 
     //! interface associated with this tool
     Core* thisMB;

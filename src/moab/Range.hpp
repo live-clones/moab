@@ -179,10 +179,10 @@ struct range_iter_tag : public std::bidirectional_iterator_tag
 struct range_base_iter
 {
     typedef range_iter_tag iterator_category;
-    typedef EntityID       difference_type;
-    typedef EntityHandle   value_type;
-    typedef EntityHandle*  pointer;
-    typedef EntityHandle&  reference;
+    typedef EntityID difference_type;
+    typedef EntityHandle value_type;
+    typedef EntityHandle* pointer;
+    typedef EntityHandle& reference;
 };
 
 //! the class Range
@@ -192,7 +192,7 @@ class Range
     // forward declare the iterators
     class const_iterator;
     class const_reverse_iterator;
-    typedef const_iterator         iterator;
+    typedef const_iterator iterator;
     typedef const_reverse_iterator reverse_iterator;
 
     friend Range intersect( const Range&, const Range& );
@@ -206,7 +206,7 @@ class Range
     typedef EntityHandle value_type;
 
     //! default constructor
-    Range( );
+    Range();
 
     //! copy constructor
     Range( const Range& copy );
@@ -218,36 +218,36 @@ class Range
     Range& operator=( const Range& copy );
 
     //! destructor
-    inline ~Range( );
+    inline ~Range();
 
     //! return the beginning const iterator of this range
-    inline const_iterator begin( ) const;
+    inline const_iterator begin() const;
 
     //! return the beginning const reverse iterator of this range
-    inline const_reverse_iterator rbegin( ) const;
+    inline const_reverse_iterator rbegin() const;
 
     //! return the ending const iterator for this range
-    inline const_iterator end( ) const;
+    inline const_iterator end() const;
 
     //! return the ending const reverse iterator for this range
-    inline const_reverse_iterator rend( ) const;
+    inline const_reverse_iterator rend() const;
 
     //! return the number of values this Ranges represents
-    size_t size( ) const;
+    size_t size() const;
 
     //! return the number of range pairs in the list
-    size_t psize( ) const;
+    size_t psize() const;
 
     //! return whether empty or not
     //! always use "if(!Ranges::empty())" instead of "if(Ranges::size())"
-    inline bool empty( ) const;
+    inline bool empty() const;
 
     iterator insert( iterator hint, EntityHandle val );
 
     //! insert an item into the list and return the iterator for the inserted item
     iterator insert( EntityHandle val )
     {
-        return insert( begin( ), val );
+        return insert( begin(), val );
     }
 
     //! insert a range of items into this list and return the iterator for the first
@@ -258,17 +258,20 @@ class Range
     //! inserted item
     iterator insert( EntityHandle val1, EntityHandle val2 )
     {
-        return insert( begin( ), val1, val2 );
+        return insert( begin(), val1, val2 );
     }
 
-    template< typename T > iterator insert_list( T begin_iter, T end_iter );
+    template < typename T >
+    iterator insert_list( T begin_iter, T end_iter );
 
-    template< class T > iterator insert( typename T::const_iterator begin_iter, typename T::const_iterator end_iter )
+    template < class T >
+    iterator insert( typename T::const_iterator begin_iter, typename T::const_iterator end_iter )
     {
         return insert_list( begin_iter, end_iter );
     }
 
-    template< typename T > iterator insert( const T* begin_iter, const T* end_iter )
+    template < typename T >
+    iterator insert( const T* begin_iter, const T* end_iter )
     {
         return insert_list( begin_iter, end_iter );
     }
@@ -283,13 +286,13 @@ class Range
     inline iterator erase( EntityHandle val );
 
     //! get first entity in range
-    inline const EntityHandle& front( ) const;
+    inline const EntityHandle& front() const;
     //! get last entity in range
-    inline const EntityHandle& back( ) const;
+    inline const EntityHandle& back() const;
     //! remove first entity from range
-    EntityHandle pop_front( );
+    EntityHandle pop_front();
     //! remove last entity from range
-    EntityHandle pop_back( );
+    EntityHandle pop_back();
 
     //! find an item int the list and return an iterator at that value
     const_iterator find( EntityHandle val ) const;
@@ -300,17 +303,17 @@ class Range
 
     const_iterator lower_bound( EntityHandle val ) const
     {
-        return lower_bound( begin( ), end( ), val );
+        return lower_bound( begin(), end(), val );
     }
     const_iterator upper_bound( EntityHandle val ) const
     {
-        return upper_bound( begin( ), end( ), val );
+        return upper_bound( begin(), end(), val );
     }
-    const_iterator                              lower_bound( EntityType type ) const;
-    const_iterator                              upper_bound( EntityType type ) const;
+    const_iterator lower_bound( EntityType type ) const;
+    const_iterator upper_bound( EntityType type ) const;
     std::pair< const_iterator, const_iterator > equal_range( EntityType type ) const;
-    const_iterator                              lower_bound( EntityType type, const_iterator first ) const;
-    const_iterator                              upper_bound( EntityType type, const_iterator first ) const;
+    const_iterator lower_bound( EntityType type, const_iterator first ) const;
+    const_iterator upper_bound( EntityType type, const_iterator first ) const;
 
     //! True if all entities in range are of passed type
     //! (also true if range is empty)
@@ -323,7 +326,7 @@ class Range
     unsigned num_of_dimension( int dim ) const;
 
     //! clears the contents of the list
-    void clear( );
+    void clear();
 
     //! for debugging
     const std::string str_rep( const char* indent_prefix = NULL ) const;
@@ -331,16 +334,16 @@ class Range
     void print( const char* indent_prefix = NULL ) const;
     void print( std::ostream& s, const char* indent_prefix = NULL ) const;
 
-    unsigned long get_memory_use( ) const;
+    unsigned long get_memory_use() const;
 
-    double compactness( ) const;
+    double compactness() const;
 
     void insert( Range::const_iterator begin, Range::const_iterator end );
 
     //! merges this Range with another range
     void merge( const Range& range )
     {
-        insert( range.begin( ), range.end( ) );
+        insert( range.begin(), range.end() );
     }
 
     //! merge a subset of some other range
@@ -353,7 +356,7 @@ class Range
     void swap( Range& range );
 
     //! check for internal consistency
-    void sanity_check( ) const;
+    void sanity_check() const;
 
     //! Check if this range is a non-strict superset of some other range
     bool contains( const Range& other ) const;
@@ -367,7 +370,7 @@ class Range
     struct PairNode : public std::pair< EntityHandle, EntityHandle >
     {
 
-        PairNode( ) : std::pair< EntityHandle, EntityHandle >( 0, 0 ), mNext( NULL ), mPrev( NULL ) {}
+        PairNode() : std::pair< EntityHandle, EntityHandle >( 0, 0 ), mNext( NULL ), mPrev( NULL ) {}
         PairNode( PairNode* next, PairNode* prev, EntityHandle _first, EntityHandle _second )
             : std::pair< EntityHandle, EntityHandle >( _first, _second ), mNext( next ), mPrev( prev )
         {
@@ -396,17 +399,17 @@ class Range
         friend class Range;
 
       public:
-        pair_iterator( ) : mNode( NULL ) {}
+        pair_iterator() : mNode( NULL ) {}
         pair_iterator( PairNode* nodep ) : mNode( nodep ) {}
         pair_iterator( const pair_iterator& copy ) : mNode( copy.mNode ) {}
         pair_iterator( const const_iterator& copy ) : mNode( copy.mNode ) {}
 
-        std::pair< EntityHandle, EntityHandle >* operator->( )
+        std::pair< EntityHandle, EntityHandle >* operator->()
         {
             return mNode;
         }
 
-        pair_iterator& operator++( )
+        pair_iterator& operator++()
         {
             mNode = mNode->mNext;
             return *this;
@@ -414,11 +417,11 @@ class Range
         pair_iterator operator++( int )
         {
             pair_iterator tmp( *this );
-            this->        operator++( );
+            this->operator++();
             return tmp;
         }
 
-        pair_iterator& operator--( )
+        pair_iterator& operator--()
         {
             mNode = mNode->mPrev;
             return *this;
@@ -426,7 +429,7 @@ class Range
         pair_iterator operator--( int )
         {
             pair_iterator tmp( *this );
-            this->        operator--( );
+            this->operator--();
             return tmp;
         }
         bool operator==( const pair_iterator& other ) const
@@ -439,7 +442,7 @@ class Range
             return mNode != other.mNode;
         }
 
-        PairNode* node( )
+        PairNode* node()
         {
             return mNode;
         }
@@ -460,7 +463,7 @@ class Range
 
       public:
         //! default constructor - intialize base default constructor
-        const_iterator( ) : mNode( NULL ), mValue( 0 ) {}
+        const_iterator() : mNode( NULL ), mValue( 0 ) {}
 
         //! constructor used by Range
         const_iterator( const PairNode* iter, const EntityHandle val )
@@ -470,18 +473,18 @@ class Range
 
         //! dereference that value this iterator points to
         //! returns a const reference
-        const EntityHandle& operator*( ) const
+        const EntityHandle& operator*() const
         {
             return mValue;
         }
 
         //! prefix incrementer
-        const_iterator& operator++( )
+        const_iterator& operator++()
         {
             // see if we need to increment the base iterator
             if( mValue == mNode->second )
             {
-                mNode = mNode->mNext;
+                mNode  = mNode->mNext;
                 mValue = mNode->first;
             }
             // if not, just increment the value in the range
@@ -496,13 +499,13 @@ class Range
             // make a temporary copy
             const_iterator tmp( *this );
             // increment self
-            this->operator++( );
+            this->operator++();
             // return the copy
             return tmp;
         }
 
         //! prefix decrementer
-        const_iterator& operator--( )
+        const_iterator& operator--()
         {
             // see if we need to decrement the base iterator
             if( mValue == mNode->first )
@@ -523,7 +526,7 @@ class Range
             // make a copy of this
             const_iterator tmp( *this );
             // decrement self
-            this->operator--( );
+            this->operator--();
             // return the copy
             return tmp;
         }
@@ -566,7 +569,7 @@ class Range
          * at begin() or end().  May return the same location as
          * this iterator.
          */
-        inline const_iterator end_of_block( ) const;
+        inline const_iterator end_of_block() const;
 
         /**\brief get an iterator at the start of the block
          *
@@ -581,7 +584,7 @@ class Range
          * at end().  May return the same location as
          * this iterator.
          */
-        inline const_iterator start_of_block( ) const;
+        inline const_iterator start_of_block() const;
 
       protected:
         //! the node we are pointing at
@@ -598,7 +601,7 @@ class Range
 
       public:
         //! default constructor - intialize base default constructor
-        const_reverse_iterator( ) {}
+        const_reverse_iterator() {}
 
         const_reverse_iterator( const_iterator fwd_iter ) : myIter( fwd_iter ) {}
 
@@ -607,13 +610,13 @@ class Range
 
         //! dereference that value this iterator points to
         //! returns a const reference
-        const EntityHandle& operator*( ) const
+        const EntityHandle& operator*() const
         {
             return *myIter;
         }
 
         //! prefix incrementer
-        const_reverse_iterator& operator++( )
+        const_reverse_iterator& operator++()
         {
             --myIter;
             return *this;
@@ -626,7 +629,7 @@ class Range
         }
 
         //! prefix decrementer
-        const_reverse_iterator& operator--( )
+        const_reverse_iterator& operator--()
         {
             ++myIter;
             return *this;
@@ -677,27 +680,27 @@ class Range
     class const_pair_iterator
     {
       public:
-        const_pair_iterator( ) : myNode( NULL ) {}
+        const_pair_iterator() : myNode( NULL ) {}
         const_pair_iterator( const PairNode* node ) : myNode( node ) {}
         const_pair_iterator( const const_iterator& i ) : myNode( i.mNode ) {}
 
-        const PairNode& operator*( ) const
+        const PairNode& operator*() const
         {
             return *myNode;
         }
 
-        const PairNode* operator->( ) const
+        const PairNode* operator->() const
         {
             return myNode;
         }
 
-        const_pair_iterator& operator--( )
+        const_pair_iterator& operator--()
         {
             myNode = myNode->mPrev;
             return *this;
         }
 
-        const_pair_iterator& operator++( )
+        const_pair_iterator& operator++()
         {
             myNode = myNode->mNext;
             return *this;
@@ -706,14 +709,14 @@ class Range
         const_pair_iterator operator--( int )
         {
             const_pair_iterator rval( *this );
-            this->              operator--( );
+            this->operator--();
             return rval;
         }
 
         const_pair_iterator operator++( int )
         {
             const_pair_iterator rval( *this );
-            this->              operator++( );
+            this->operator++();
             return rval;
         }
 
@@ -731,28 +734,28 @@ class Range
         const PairNode* myNode;
     };
 
-    pair_iterator pair_begin( )
+    pair_iterator pair_begin()
     {
         return pair_iterator( mHead.mNext );
     }
-    pair_iterator pair_end( )
+    pair_iterator pair_end()
     {
         return pair_iterator( &mHead );
     }
 
-    const_pair_iterator const_pair_begin( ) const
+    const_pair_iterator const_pair_begin() const
     {
         return const_pair_iterator( mHead.mNext );
     }
-    const_pair_iterator const_pair_end( ) const
+    const_pair_iterator const_pair_end() const
     {
         return const_pair_iterator( &mHead );
     }
-    const_pair_iterator pair_begin( ) const
+    const_pair_iterator pair_begin() const
     {
         return const_pair_iterator( mHead.mNext );
     }
-    const_pair_iterator pair_end( ) const
+    const_pair_iterator pair_end() const
     {
         return const_pair_iterator( &mHead );
     }
@@ -768,7 +771,7 @@ Range subtract( const Range& from, const Range& );
 inline Range unite( const Range& r1, const Range& r2 )
 {
     Range r( r1 );
-    r.insert( r2.begin( ), r2.end( ) );
+    r.insert( r2.begin(), r2.end() );
     return r;
 }
 
@@ -818,11 +821,11 @@ class range_inserter
         return *this;
     }
 
-    range_inserter& operator*( )
+    range_inserter& operator*()
     {
         return *this;
     }
-    range_inserter& operator++( )
+    range_inserter& operator++()
     {
         return *this;
     }
@@ -831,14 +834,14 @@ class range_inserter
         return *this;
     }
 
-    typedef EntityHandle             value_type;
-    typedef EntityID                 difference_type;
+    typedef EntityHandle value_type;
+    typedef EntityID difference_type;
     typedef std::output_iterator_tag iterator_category;
-    typedef EntityHandle*            pointer;
-    typedef EntityHandle&            reference;
+    typedef EntityHandle* pointer;
+    typedef EntityHandle& reference;
 };
 
-inline Range::Range( )
+inline Range::Range()
 {
     // set the head node to point to itself
     mHead.mNext = mHead.mPrev = &mHead;
@@ -846,38 +849,38 @@ inline Range::Range( )
 }
 
 //! destructor
-inline Range::~Range( )
+inline Range::~Range()
 {
-    clear( );
+    clear();
 }
 
 //! return the beginning const iterator of this range
-inline Range::const_iterator Range::begin( ) const
+inline Range::const_iterator Range::begin() const
 {
     return const_iterator( mHead.mNext, mHead.mNext->first );
 }
 
 //! return the beginning const reverse iterator of this range
-inline Range::const_reverse_iterator Range::rbegin( ) const
+inline Range::const_reverse_iterator Range::rbegin() const
 {
     return const_reverse_iterator( mHead.mPrev, mHead.mPrev->second );
 }
 
 //! return the ending const iterator for this range
-inline Range::const_iterator Range::end( ) const
+inline Range::const_iterator Range::end() const
 {
     return const_iterator( &mHead, mHead.first );
 }
 
 //! return the ending const reverse iterator for this range
-inline Range::const_reverse_iterator Range::rend( ) const
+inline Range::const_reverse_iterator Range::rend() const
 {
     return const_reverse_iterator( &mHead, mHead.second );
 }
 
 //! return whether empty or not
 //! always use "if(!Ranges::empty())" instead of "if(Ranges::size())"
-inline bool Range::empty( ) const
+inline bool Range::empty() const
 {
     return ( mHead.mNext == &mHead );
 }
@@ -888,23 +891,23 @@ inline Range::iterator Range::erase( EntityHandle val )
     return erase( find( val ) );
 }
 
-inline Range::const_iterator Range::const_iterator::end_of_block( ) const
+inline Range::const_iterator Range::const_iterator::end_of_block() const
 {
     return Range::const_iterator( mNode, mNode->second );
 }
 
-inline Range::const_iterator Range::const_iterator::start_of_block( ) const
+inline Range::const_iterator Range::const_iterator::start_of_block() const
 {
     return Range::const_iterator( mNode, mNode->first );
 }
 
 //! get first entity in range
-inline const EntityHandle& Range::front( ) const
+inline const EntityHandle& Range::front() const
 {
     return mHead.mNext->first;
 }
 //! get last entity in range
-inline const EntityHandle& Range::back( ) const
+inline const EntityHandle& Range::back() const
 {
     return mHead.mPrev->second;
 }
@@ -915,7 +918,7 @@ inline std::ostream& operator<<( std::ostream& s, const Range& r )
     return s;
 }
 
-bool        operator==( const Range& r1, const Range& r2 );
+bool operator==( const Range& r1, const Range& r2 );
 inline bool operator!=( const Range& r1, const Range& r2 )
 {
     return !( r1 == r2 );
@@ -923,58 +926,59 @@ inline bool operator!=( const Range& r1, const Range& r2 )
 
 inline EntityHandle Range::operator[]( EntityID indexp ) const
 {
-    Range::const_iterator i = begin( );
+    Range::const_iterator i = begin();
     i += indexp;
     return *i;
 }
 
 inline int Range::index( EntityHandle handle ) const
 {
-    if( handle < *begin( ) || handle > *rbegin( ) ) return -1;
+    if( handle < *begin() || handle > *rbegin() ) return -1;
 
-    unsigned int               i = 0;
-    Range::const_pair_iterator pit = const_pair_begin( );
-    while( handle > ( *pit ).second && pit != const_pair_end( ) )
+    unsigned int i                 = 0;
+    Range::const_pair_iterator pit = const_pair_begin();
+    while( handle > ( *pit ).second && pit != const_pair_end() )
     {
         i += ( *pit ).second - ( *pit ).first + 1;
         ++pit;
     }
-    if( handle < ( *pit ).first || pit == const_pair_end( ) ) return -1;
+    if( handle < ( *pit ).first || pit == const_pair_end() ) return -1;
 
     return i + handle - ( *pit ).first;
 }
 
-inline double Range::compactness( ) const
+inline double Range::compactness() const
 {
-    unsigned int num_ents = size( );
-    return ( num_ents ? ( (double)get_memory_use( ) / (double)( num_ents * sizeof( EntityHandle ) ) ) : -1 );
+    unsigned int num_ents = size();
+    return ( num_ents ? ( (double)get_memory_use() / (double)( num_ents * sizeof( EntityHandle ) ) ) : -1 );
 }
 
-template< typename Iterator > Range::iterator Range::insert_list( Iterator begin_iter, Iterator end_iter )
+template < typename Iterator >
+Range::iterator Range::insert_list( Iterator begin_iter, Iterator end_iter )
 {
-    size_t        n = std::distance( begin_iter, end_iter );
-    EntityHandle* sorted = new EntityHandle[ n ];
+    size_t n             = std::distance( begin_iter, end_iter );
+    EntityHandle* sorted = new EntityHandle[n];
     std::copy( begin_iter, end_iter, sorted );
     std::sort( sorted, sorted + n );
-    iterator hint = begin( );
-    size_t   i = 0;
+    iterator hint = begin();
+    size_t i      = 0;
     while( i < n )
     {
         size_t j = i + 1;
-        while( j < n && sorted[ j ] == 1 + sorted[ j - 1 ] )
+        while( j < n && sorted[j] == 1 + sorted[j - 1] )
             ++j;
-        hint = insert( hint, sorted[ i ], sorted[ i ] + ( ( j - i ) - 1 ) );
-        i = j;
+        hint = insert( hint, sorted[i], sorted[i] + ( ( j - i ) - 1 ) );
+        i    = j;
     }
     delete[] sorted;
     return hint;
 }
 
-inline size_t Range::psize( ) const
+inline size_t Range::psize() const
 {
-    size_t                     i = 0;
+    size_t i = 0;
     Range::const_pair_iterator pit;
-    for( pit = const_pair_begin( ), i = 0; pit != const_pair_end( ); ++pit, i++ )
+    for( pit = const_pair_begin(), i = 0; pit != const_pair_end(); ++pit, i++ )
         ;
 
     return i;

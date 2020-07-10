@@ -106,11 +106,11 @@ using namespace MBMesquite;
 using namespace std;
 
 const double DEF_UNT_BETA = 1e-8;
-const double DEF_SUC_EPS = 1e-4;
+const double DEF_SUC_EPS  = 1e-4;
 
 class ParShapeImprover
 {
-    int    innerIter;
+    int innerIter;
     double gradNorm;
 
   public:
@@ -136,12 +136,12 @@ class ParShapeImprover
                           QualityAssessor* qa, MsqError& err );
 
       private:
-        int    innerIter;
+        int innerIter;
         double maxTime, gradNorm;
         // constants
         const double untBeta;
         const double successiveEps;
-        int          parallelIterations;
+        int parallelIterations;
 
       public:
         bool m_do_untangle_only;
@@ -169,20 +169,21 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
         std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric before... "
                   << std::endl;
         InstructionQueue q1;
-        QualityAssessor  qa_untangle( &untangle_metric );
-        q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
+        QualityAssessor qa_untangle( &untangle_metric );
+        q1.add_quality_assessor( &qa_untangle, err );
+        MSQ_ERRRTN( err );
         q1.run_common( mesh_and_domain, pmesh, settings, err );
         std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric... before... done "
                   << std::endl;
     }
 
-    LPtoPTemplate     untangle_func( 2, &untangle_metric );
+    LPtoPTemplate untangle_func( 2, &untangle_metric );
     ConjugateGradient untangle_solver( &untangle_func );
     // untangle_solver.set_debugging_level(3);
 
     // SteepestDescent untangle_solver( &untangle_func );
     TerminationCriterion untangle_inner( "<type:untangle_inner>" ), untangle_outer( "<type:untangle_outer>" );
-    untangle_solver.use_global_patch( );
+    untangle_solver.use_global_patch();
 
     // untangle_inner.add_absolute_gradient_L2_norm( gradNorm );
     // untangle_inner.add_absolute_successive_improvement( successiveEps );
@@ -207,11 +208,11 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
     inverse_mean_ratio.set_averaging_method( QualityMetric::LINEAR );
     LPtoPTemplate obj_func( 2, &inverse_mean_ratio );
 
-    ConjugateGradient    shape_solver( &obj_func );
+    ConjugateGradient shape_solver( &obj_func );
     TerminationCriterion term_inner( "<type:shape_inner>" ), term_outer( "<type:shape_outer>" );
     term_inner.write_iterations( "shape.gpt", err );
 
-    shape_solver.use_global_patch( );
+    shape_solver.use_global_patch();
     qa->add_quality_assessment( &inverse_mean_ratio );
 
     // For parallel runs, we generally need to have the inner and outer TerminationCriterion
@@ -248,10 +249,13 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
     else
     {
         InstructionQueue q1;
-        QualityAssessor  qa_untangle( &untangle_metric );
-        q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
-        q1.set_master_quality_improver( &untangle_solver, err );MSQ_ERRRTN( err );
-        q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
+        QualityAssessor qa_untangle( &untangle_metric );
+        q1.add_quality_assessor( &qa_untangle, err );
+        MSQ_ERRRTN( err );
+        q1.set_master_quality_improver( &untangle_solver, err );
+        MSQ_ERRRTN( err );
+        q1.add_quality_assessor( &qa_untangle, err );
+        MSQ_ERRRTN( err );
         q1.run_common( mesh_and_domain, pmesh, settings, err );
     }
     std::cout << "\nP[" << rank << "] "
@@ -262,9 +266,9 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
     bool check_quality_after_untangler = true;
     if( check_quality_after_untangler )
     {
-        Mesh*       mesh = mesh_and_domain->get_mesh( );
-        MeshDomain* domain = mesh_and_domain->get_domain( );
-        int         num_invalid = count_invalid_elements( *mesh, domain );
+        Mesh* mesh         = mesh_and_domain->get_mesh();
+        MeshDomain* domain = mesh_and_domain->get_domain();
+        int num_invalid    = count_invalid_elements( *mesh, domain );
         std::cout << "\nP[" << rank << "] "
                   << " ParShapeImprover num_invalid after untangler= " << num_invalid << " "
                   << ( num_invalid ? " ERROR still have invalid elements after MBMesquite untangle"
@@ -275,8 +279,9 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
         {
             std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric " << std::endl;
             InstructionQueue q1;
-            QualityAssessor  qa_untangle( &untangle_metric );
-            q1.add_quality_assessor( &qa_untangle, err );MSQ_ERRRTN( err );
+            QualityAssessor qa_untangle( &untangle_metric );
+            q1.add_quality_assessor( &qa_untangle, err );
+            MSQ_ERRRTN( err );
             q1.run_common( mesh_and_domain, pmesh, settings, err );
             std::cout << "\nP[" << rank << "]  ParShapeImprover.... running QA with untangle_metric... done "
                       << std::endl;
@@ -284,12 +289,13 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
 
         if( num_invalid ) return;
     }
-    if( m_do_untangle_only ) return;MSQ_ERRRTN( err );
+    if( m_do_untangle_only ) return;
+    MSQ_ERRRTN( err );
 
     // If limited by CPU time, limit next step to remaning time
     if( maxTime > 0.0 )
     {
-        double remaining = maxTime - totalTimer.since_birth( );
+        double remaining = maxTime - totalTimer.since_birth();
         if( remaining <= 0.0 )
         {
             MSQ_DBGOUT( 2 ) << "Optimization is terminating without perfoming shape improvement." << std::endl;
@@ -303,18 +309,22 @@ void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc*
     std::cout << "\nP[" << rank << "] "
               << " ParShapeImprovementWrapper: running shape improver... \n"
               << std::endl;
-    q2.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
-    q2.set_master_quality_improver( &shape_solver, err );MSQ_ERRRTN( err );
-    q2.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
+    q2.add_quality_assessor( qa, err );
+    MSQ_ERRRTN( err );
+    q2.set_master_quality_improver( &shape_solver, err );
+    MSQ_ERRRTN( err );
+    q2.add_quality_assessor( qa, err );
+    MSQ_ERRRTN( err );
     q2.run_common( mesh_and_domain, pmesh, settings, err );
     std::cout << "\nP[" << rank << "] "
               << " ParShapeImprovementWrapper: running shape improver... done \n"
-              << std::endl;MSQ_ERRRTN( err );
+              << std::endl;
+    MSQ_ERRRTN( err );
 }
 
 int ParShapeImprover::count_invalid_elements( Mesh& mesh, MeshDomain* domain )
 {
-    MsqError         err;
+    MsqError err;
     InstructionQueue q;
 
     IdealWeightInverseMeanRatio metric;
@@ -327,12 +337,12 @@ int ParShapeImprover::count_invalid_elements( Mesh& mesh, MeshDomain* domain )
     MSQ_ERRZERO( err );
     Settings settings;
     // bug?  should we pass in pmesh?
-    Mesh*           mesh_ptr = &mesh;
+    Mesh* mesh_ptr                  = &mesh;
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( mesh_ptr, domain );
     q.run_common( &mesh_and_domain, 0, &settings, err );
     MSQ_ERRZERO( err );
     const QualityAssessor::Assessor* inv_b = inv_check.get_results( &metric );
-    int                              num_invalid = inv_b->get_invalid_element_count( );
+    int num_invalid                        = inv_b->get_invalid_element_count();
     return num_invalid;
 }
 
@@ -354,8 +364,8 @@ void ParShapeImprover::run( Mesh& mesh, MeshDomain* domain, MsqError&, bool alwa
               << " ParShapeImprover::run: pmesh= " << pmesh << std::endl;
 
     MsqError mErr;
-    int      num_invalid = 0;
-    bool     check_quality = true;
+    int num_invalid    = 0;
+    bool check_quality = true;
     if( check_quality )
     {
         num_invalid = count_invalid_elements( mesh, domain );
@@ -386,7 +396,7 @@ void ParShapeImprover::run( Mesh& mesh, MeshDomain* domain, MsqError&, bool alwa
             // int  msq_debug             = debug; // 1,2,3 for more debug info
             // bool always_smooth_local   = false;
 
-            bool                                         do_untangle_only = false;
+            bool do_untangle_only = false;
             ParShapeImprover::ParShapeImprovementWrapper siw( innerIter, 0.0, gradNorm, 100 );
             siw.m_do_untangle_only = do_untangle_only;
             if( pmesh )
@@ -436,13 +446,13 @@ static int test( std::string filename_prefix, std::string mesh_topology_name, Me
               << ".vtk";
     out_name << "par_untangle_smoothed_" << mesh_topology_name << "_mesh." << nprocs << "." << rank << ".vtk";
 
-    cout << "in_name= " << in_name.str( ) << " gold_name= " << gold_name.str( ) << " out_name= " << out_name.str( )
+    cout << "in_name= " << in_name.str() << " gold_name= " << gold_name.str() << " out_name= " << out_name.str()
          << std::endl;
 
     /* load different mesh files on each processor */
     MsqError err;
     MeshImpl mesh;
-    mesh.read_vtk( in_name.str( ).c_str( ), err );
+    mesh.read_vtk( in_name.str().c_str(), err );
     if( err )
     {
         cerr << err << endl;
@@ -451,7 +461,7 @@ static int test( std::string filename_prefix, std::string mesh_topology_name, Me
 
     /* create parallel mesh instance, specifying tags
      * containing parallel data */
-    ParallelMeshImpl   parallel_mesh( &mesh, "GLOBAL_ID", "PROCESSOR_ID" );
+    ParallelMeshImpl parallel_mesh( &mesh, "GLOBAL_ID", "PROCESSOR_ID" );
     ParallelHelperImpl helper;
     helper.set_communicator( MPI_COMM_WORLD );
     helper.set_parallel_mesh( &parallel_mesh );
@@ -461,10 +471,10 @@ static int test( std::string filename_prefix, std::string mesh_topology_name, Me
     // LaplaceWrapper optimizer;
     // optimizer.run_instructions(&parallel_mesh, err);
 
-    int    msq_debug = 0;  // 1,2,3 for more debug info
-    bool   always_smooth = true;
-    int    innerIter = 100;
-    double gradNorm = 1.e-9;
+    int msq_debug      = 0;  // 1,2,3 for more debug info
+    bool always_smooth = true;
+    int innerIter      = 100;
+    double gradNorm    = 1.e-9;
 
     ParShapeImprover si( innerIter, gradNorm );
     // Mesh *pmesh = &parallel_mesh;
@@ -476,7 +486,7 @@ static int test( std::string filename_prefix, std::string mesh_topology_name, Me
     }
 
     /* write mesh */
-    mesh.write_vtk( out_name.str( ).c_str( ), err );
+    mesh.write_vtk( out_name.str().c_str(), err );
     if( err )
     {
         cerr << err << endl;
@@ -487,7 +497,7 @@ static int test( std::string filename_prefix, std::string mesh_topology_name, Me
 
     /* compare mesh with gold copy */
     MeshImpl gold;
-    gold.read_vtk( gold_name.str( ).c_str( ), err );
+    gold.read_vtk( gold_name.str().c_str(), err );
     if( err )
     {
         cerr << err << endl;
@@ -495,9 +505,9 @@ static int test( std::string filename_prefix, std::string mesh_topology_name, Me
     }
 
     // std::cout << "P[ " << rank <<"] read gold, checking mesh diff..." << std::endl;
-    bool   do_print = true;
-    double tol = 1.e-4;
-    bool   diff = MeshUtil::meshes_are_different( mesh, gold, err, tol, do_print );
+    bool do_print = true;
+    double tol    = 1.e-4;
+    bool diff     = MeshUtil::meshes_are_different( mesh, gold, err, tol, do_print );
     if( err )
     {
         cerr << err << endl;
@@ -525,8 +535,8 @@ int main( int argc, char* argv[] )
         return 2;
     }
 
-    Vector3D     pnt( 0, 0, 0 );
-    Vector3D     s_norm( 0, 0, 1 );
+    Vector3D pnt( 0, 0, 0 );
+    Vector3D s_norm( 0, 0, 1 );
     PlanarDomain msq_geom( s_norm, pnt );
 
     int t1 = test( VTK_2D_DIR, "quad", &msq_geom );
@@ -534,6 +544,6 @@ int main( int argc, char* argv[] )
     t1 = test( VTK_3D_DIR, "hex" );
     if( t1 ) return t1;
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return 0;
 }

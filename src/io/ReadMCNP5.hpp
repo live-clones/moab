@@ -66,7 +66,7 @@ class ReadMCNP5 : public ReaderIface
     ReadMCNP5( Interface* impl = NULL );
 
     // destructor
-    virtual ~ReadMCNP5( );
+    virtual ~ReadMCNP5();
 
   protected:
   private:
@@ -96,7 +96,7 @@ class ReadMCNP5 : public ReaderIface
     Interface* MBI;
 
     const Tag* fileIDTag;
-    int        nodeId, elemId;
+    int nodeId, elemId;
 
     // reads the meshtal file
     ErrorCode load_one_file( const char* fname, const EntityHandle* input_meshset, const FileOptions& options,
@@ -106,34 +106,34 @@ class ReadMCNP5 : public ReaderIface
                            Tag& tally_comment_tag, Tag& tally_particle_tag, Tag& tally_coord_sys_tag, Tag& tally_tag,
                            Tag& error_tag );
 
-    ErrorCode read_file_header( std::fstream& file, bool debug, char date_and_time[ 100 ], char title[ 100 ],
+    ErrorCode read_file_header( std::fstream& file, bool debug, char date_and_time[100], char title[100],
                                 unsigned long int& nps );
 
-    ErrorCode set_header_tags( EntityHandle output_meshset, char date_and_time[ 100 ], char title[ 100 ],
+    ErrorCode set_header_tags( EntityHandle output_meshset, char date_and_time[100], char title[100],
                                unsigned long int nps, Tag data_and_time_tag, Tag title_tag, Tag nps_tag );
 
-    ErrorCode read_tally_header( std::fstream& file, bool debug, unsigned int& tally_number, char tally_comment[ 100 ],
+    ErrorCode read_tally_header( std::fstream& file, bool debug, unsigned int& tally_number, char tally_comment[100],
                                  particle& tally_particle );
 
     ErrorCode get_tally_particle( std::string a, bool debug, particle& tally_particle );
 
-    ErrorCode read_mesh_planes( std::fstream& file, bool debug, std::vector< double > planes[ 3 ],
+    ErrorCode read_mesh_planes( std::fstream& file, bool debug, std::vector< double > planes[3],
                                 coordinate_system& coord_sys );
 
     ErrorCode get_mesh_plane( std::istringstream& ss, bool debug, std::vector< double >& plane );
 
-    ErrorCode read_element_values_and_errors( std::fstream& file, bool debug, std::vector< double > planes[ 3 ],
+    ErrorCode read_element_values_and_errors( std::fstream& file, bool debug, std::vector< double > planes[3],
                                               unsigned int n_chopped_x0_planes, unsigned int n_chopped_x2_planes,
                                               particle tally_particle, double values[], double errors[] );
 
-    ErrorCode set_tally_tags( EntityHandle tally_meshset, unsigned int tally_number, char tally_comment[ 100 ],
+    ErrorCode set_tally_tags( EntityHandle tally_meshset, unsigned int tally_number, char tally_comment[100],
                               particle tally_particle, coordinate_system tally_coord_sys, Tag tally_number_tag,
                               Tag tally_comment_tag, Tag tally_particle_tag, Tag tally_coord_sys_tag );
 
-    ErrorCode create_vertices( std::vector< double > planes[ 3 ], bool debug, EntityHandle& start_vert,
+    ErrorCode create_vertices( std::vector< double > planes[3], bool debug, EntityHandle& start_vert,
                                coordinate_system coord_sys, EntityHandle tally_meshset );
 
-    ErrorCode create_elements( bool debug, std::vector< double > planes[ 3 ], unsigned int n_chopped_x0_planes,
+    ErrorCode create_elements( bool debug, std::vector< double > planes[3], unsigned int n_chopped_x0_planes,
                                unsigned int n_chopped_x2_planes, EntityHandle start_vert, double values[],
                                double errors[], Tag tally_tag, Tag error_tag, EntityHandle tally_meshset,
                                coordinate_system tally_coord_sys );

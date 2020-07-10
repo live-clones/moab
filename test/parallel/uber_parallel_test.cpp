@@ -44,16 +44,16 @@ ErrorCode test_read( const char* filename, const char* option );
 int is_any_proc_error( int is_my_error )
 {
     int result = 0;
-    int err = MPI_Allreduce( &is_my_error, &result, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD );
+    int err    = MPI_Allreduce( &is_my_error, &result, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD );
     return err || result;
 }
 
 int run_test( ErrorCode ( *func )( const char*, const char* ), const char* func_name, const std::string file_name,
               const char* option )
 {
-    ErrorCode result = ( *func )( file_name.c_str( ), option );
-    int       is_err = is_any_proc_error( ( MB_SUCCESS != result ) );
-    int       rank;
+    ErrorCode result = ( *func )( file_name.c_str(), option );
+    int is_err       = is_any_proc_error( ( MB_SUCCESS != result ) );
+    int rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     if( rank == 0 )
     {
@@ -77,10 +77,10 @@ int main( int argc, char* argv[] )
     const char* option;
     std::string filename, filename2;
     if( 1 < argc )
-        filename = std::string( argv[ 1 ] );
+        filename = std::string( argv[1] );
     else
     {
-        filename = TestDir + "/64bricks_512hex.h5m";
+        filename  = TestDir + "/64bricks_512hex.h5m";
         filename2 = TestDir + "/hex_2048.vtk";
     }
 #ifdef MOAB_HAVE_HDF5
@@ -124,7 +124,7 @@ int main( int argc, char* argv[] )
              "SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;";
     num_errors += RUN_TEST_ARG3( test_read, filename, option );
 #endif
-    if( filename2.size( ) )
+    if( filename2.size() )
     {
         //=========== bcast_delete, trivial, resolve_shared
         option = "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARTITION_DISTRIBUTE;PARALLEL_RESOLVE_"
@@ -135,22 +135,24 @@ int main( int argc, char* argv[] )
                  "SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;";
         num_errors += RUN_TEST_ARG3( test_read, filename2, option );
     }
-    MPI_Finalize( );
+    MPI_Finalize();
 
     return num_errors;
 }
 
 ErrorCode test_read( const char* filename, const char* option )
 {
-    Core       mb_instance;
+    Core mb_instance;
     Interface& moab = mb_instance;
-    ErrorCode  rval;
+    ErrorCode rval;
 
-    rval = moab.load_file( filename, 0, option );CHKERR( rval );
+    rval = moab.load_file( filename, 0, option );
+    CHKERR( rval );
 
     ParallelComm* pcomm = ParallelComm::get_pcomm( &moab, 0 );
 
-    rval = pcomm->check_all_shared_handles( );CHKERR( rval );
+    rval = pcomm->check_all_shared_handles();
+    CHKERR( rval );
 
     return MB_SUCCESS;
 }

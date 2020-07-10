@@ -27,11 +27,11 @@ class MeshSet
 {
   public:
     //! create an empty meshset
-    inline MeshSet( );
+    inline MeshSet();
     inline MeshSet( unsigned flags );
 
     //! destructor
-    inline ~MeshSet( );
+    inline ~MeshSet();
 
     inline ErrorCode set_flags( unsigned flags, EntityHandle my_handle, AEntityFactory* adjacencies );
 
@@ -42,10 +42,10 @@ class MeshSet
     inline const EntityHandle* get_parents( int& count_out ) const;
 
     //! return the number of children pointed to by this meshset
-    inline int num_children( ) const;
+    inline int num_children() const;
 
     //! return the number of parents pointed to by this meshset
-    inline int num_parents( ) const;
+    inline int num_parents() const;
 
     //! add a parent to this meshset; returns true if parent was added, 0 if it was
     //! already a parent of this meshset
@@ -63,26 +63,26 @@ class MeshSet
     //! not a child of this meshset
     int remove_child( EntityHandle child );
 
-    unsigned flags( ) const
+    unsigned flags() const
     {
         return mFlags;
     }
     //! returns whether entities of meshsets know this meshset
-    int tracking( ) const
+    int tracking() const
     {
         return mFlags & MESHSET_TRACK_OWNER;
     }
-    int set( ) const
+    int set() const
     {
         return mFlags & MESHSET_SET;
     }
-    int ordered( ) const
+    int ordered() const
     {
         return mFlags & MESHSET_ORDERED;
     }
-    int vector_based( ) const
+    int vector_based() const
     {
-        return ordered( );
+        return ordered();
     }
 
     //! replace one entity with another in the set (contents and parent/child
@@ -155,14 +155,14 @@ class MeshSet
                                       AEntityFactory* adjacencies );
 
     //! return the number of entities contained in this meshset
-    inline unsigned int num_entities( ) const;
+    inline unsigned int num_entities() const;
 
-    inline bool empty( ) const
+    inline bool empty() const
     {
         return mContentCount == ZERO;
     }
 
-    unsigned long get_memory_use( ) const;
+    unsigned long get_memory_use() const;
 
   protected:
     /** Convert for changing flag values */
@@ -200,8 +200,8 @@ class MeshSet
     enum Count
     {
         ZERO = 0,
-        ONE = 1,
-        TWO = 2,
+        ONE  = 1,
+        TWO  = 2,
         MANY = 3
     };
     //! If the number of entities is less than 3, store
@@ -210,8 +210,8 @@ class MeshSet
     //! of a dynamically allocated array.
     union CompactList
     {
-        EntityHandle  hnd[ 2 ];  //!< Two handles
-        EntityHandle* ptr[ 2 ];  //!< begin and end pointers for array
+        EntityHandle hnd[2];   //!< Two handles
+        EntityHandle* ptr[2];  //!< begin and end pointers for array
     };
 
   private:
@@ -245,21 +245,21 @@ class MeshSet
      * dimension) */
     static inline EntityHandle FIRST_OF_DIM( int dim )
     {
-        return FIRST_HANDLE( CN::TypeDimensionMap[ dim ].first );
+        return FIRST_HANDLE( CN::TypeDimensionMap[dim].first );
     }
 
     /** Get largest possible handle with specified dimension (largest handle for last type of
      * dimension) */
     static inline EntityHandle LAST_OF_DIM( int dim )
     {
-        return LAST_HANDLE( CN::TypeDimensionMap[ dim ].second );
+        return LAST_HANDLE( CN::TypeDimensionMap[dim].second );
     }
 
     /** functor: test if handle is not of type */
     struct not_type_test
     {
         inline not_type_test( EntityType type ) : mType( type ) {}
-        inline bool operator( )( EntityHandle handle )
+        inline bool operator()( EntityHandle handle )
         {
             return TYPE_FROM_HANDLE( handle ) != mType;
         }
@@ -270,7 +270,7 @@ class MeshSet
     struct type_test
     {
         inline type_test( EntityType type ) : mType( type ) {}
-        inline bool operator( )( EntityHandle handle )
+        inline bool operator()( EntityHandle handle )
         {
             return TYPE_FROM_HANDLE( handle ) == mType;
         }
@@ -281,7 +281,7 @@ class MeshSet
     struct not_dim_test
     {
         inline not_dim_test( int dimension ) : mDim( dimension ) {}
-        inline bool operator( )( EntityHandle handle ) const
+        inline bool operator()( EntityHandle handle ) const
         {
             return DIM_FROM_HANDLE( handle ) != mDim;
         }
@@ -292,7 +292,7 @@ class MeshSet
     struct dim_test
     {
         inline dim_test( int dimension ) : mDim( dimension ) {}
-        inline bool operator( )( EntityHandle handle ) const
+        inline bool operator()( EntityHandle handle ) const
         {
             return DIM_FROM_HANDLE( handle ) == mDim;
         }
@@ -306,12 +306,12 @@ class MeshSet
     {
         EntityHandle h;
         hdl_iter( EntityHandle val ) : h( val ) {}
-        hdl_iter& operator++( )
+        hdl_iter& operator++()
         {
             ++h;
             return *this;
         }
-        hdl_iter& operator--( )
+        hdl_iter& operator--()
         {
             --h;
             return *this;
@@ -334,7 +334,7 @@ class MeshSet
             h -= s;
             return *this;
         }
-        EntityHandle operator*( ) const
+        EntityHandle operator*() const
         {
             return h;
         }
@@ -366,8 +366,8 @@ class MeshSet
         struct iterator_category : public std::random_access_iterator_tag
         {
         };
-        typedef EntityID      difference_type;
-        typedef EntityHandle  value_type;
+        typedef EntityID difference_type;
+        typedef EntityHandle value_type;
         typedef EntityHandle* pointer;
         typedef EntityHandle& reference;
     };
@@ -379,7 +379,7 @@ inline MeshSet::hdl_iter::difference_type operator-( const MeshSet::hdl_iter& a,
 }
 
 //! create an empty meshset
-MeshSet::MeshSet( ) : mFlags( 0 ), mParentCount( ZERO ), mChildCount( ZERO ), mContentCount( ZERO ) {}
+MeshSet::MeshSet() : mFlags( 0 ), mParentCount( ZERO ), mChildCount( ZERO ), mContentCount( ZERO ) {}
 
 //! create an empty meshset
 MeshSet::MeshSet( unsigned flg )
@@ -388,11 +388,11 @@ MeshSet::MeshSet( unsigned flg )
 }
 
 //! destructor
-MeshSet::~MeshSet( )
+MeshSet::~MeshSet()
 {
-    if( mChildCount == MANY ) free( childMeshSets.ptr[ 0 ] );
-    if( mParentCount == MANY ) free( parentMeshSets.ptr[ 0 ] );
-    if( mContentCount == MANY ) free( contentList.ptr[ 0 ] );
+    if( mChildCount == MANY ) free( childMeshSets.ptr[0] );
+    if( mParentCount == MANY ) free( parentMeshSets.ptr[0] );
+    if( mContentCount == MANY ) free( contentList.ptr[0] );
     mChildCount = mParentCount = mContentCount = ZERO;
 }
 
@@ -413,8 +413,8 @@ const EntityHandle* MeshSet::get_children( int& count_out ) const
     count_out = mChildCount;
     if( count_out < MANY ) return childMeshSets.hnd;
 
-    count_out = childMeshSets.ptr[ 1 ] - childMeshSets.ptr[ 0 ];
-    return childMeshSets.ptr[ 0 ];
+    count_out = childMeshSets.ptr[1] - childMeshSets.ptr[0];
+    return childMeshSets.ptr[0];
 }
 
 //! get all parents pointed to by this meshset
@@ -423,32 +423,32 @@ const EntityHandle* MeshSet::get_parents( int& count_out ) const
     count_out = mParentCount;
     if( count_out < MANY ) return parentMeshSets.hnd;
 
-    count_out = parentMeshSets.ptr[ 1 ] - parentMeshSets.ptr[ 0 ];
-    return parentMeshSets.ptr[ 0 ];
+    count_out = parentMeshSets.ptr[1] - parentMeshSets.ptr[0];
+    return parentMeshSets.ptr[0];
 }
 
 //! return the number of children pointed to by this meshset
-int MeshSet::num_children( ) const
+int MeshSet::num_children() const
 {
     if( mChildCount < MANY )
         return mChildCount;
     else
-        return childMeshSets.ptr[ 1 ] - childMeshSets.ptr[ 0 ];
+        return childMeshSets.ptr[1] - childMeshSets.ptr[0];
 }
 
 //! return the number of parents pointed to by this meshset
-int MeshSet::num_parents( ) const
+int MeshSet::num_parents() const
 {
     if( mParentCount < MANY )
         return mParentCount;
     else
-        return parentMeshSets.ptr[ 1 ] - parentMeshSets.ptr[ 0 ];
+        return parentMeshSets.ptr[1] - parentMeshSets.ptr[0];
 }
 
 inline ErrorCode MeshSet::clear( EntityHandle myhandle, AEntityFactory* adjacencies )
 {
-    if( tracking( ) ) remove_adjacencies( myhandle, adjacencies );
-    if( mContentCount == MANY ) free( contentList.ptr[ 0 ] );
+    if( tracking() ) remove_adjacencies( myhandle, adjacencies );
+    if( mContentCount == MANY ) free( contentList.ptr[0] );
     mContentCount = ZERO;
     return MB_SUCCESS;
 }
@@ -456,9 +456,9 @@ inline ErrorCode MeshSet::clear( EntityHandle myhandle, AEntityFactory* adjacenc
 inline ErrorCode MeshSet::clear_all( EntityHandle myhandle, AEntityFactory* adjacencies )
 {
     ErrorCode rval = clear( myhandle, adjacencies );
-    if( mChildCount == MANY ) free( childMeshSets.ptr[ 0 ] );
+    if( mChildCount == MANY ) free( childMeshSets.ptr[0] );
     mChildCount = ZERO;
-    if( mParentCount == MANY ) free( parentMeshSets.ptr[ 0 ] );
+    if( mParentCount == MANY ) free( parentMeshSets.ptr[0] );
     mParentCount = ZERO;
     return rval;
 }
@@ -467,8 +467,8 @@ inline const EntityHandle* MeshSet::get_contents( size_t& count_out ) const
 {
     if( mContentCount == MANY )
     {
-        count_out = contentList.ptr[ 1 ] - contentList.ptr[ 0 ];
-        return contentList.ptr[ 0 ];
+        count_out = contentList.ptr[1] - contentList.ptr[0];
+        return contentList.ptr[0];
     }
     else
     {
@@ -481,8 +481,8 @@ inline EntityHandle* MeshSet::get_contents( size_t& count_out )
 {
     if( mContentCount == MANY )
     {
-        count_out = contentList.ptr[ 1 ] - contentList.ptr[ 0 ];
-        return contentList.ptr[ 0 ];
+        count_out = contentList.ptr[1] - contentList.ptr[0];
+        return contentList.ptr[0];
     }
     else
     {
@@ -493,34 +493,34 @@ inline EntityHandle* MeshSet::get_contents( size_t& count_out )
 
 inline ErrorCode MeshSet::get_entities( std::vector< EntityHandle >& entities ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based( ) )
+    if( vector_based() )
     {
-        size_t old_size = entities.size( );
+        size_t old_size = entities.size();
         entities.resize( count + old_size );
-        std::copy( ptr, ptr + count, entities.begin( ) + old_size );
+        std::copy( ptr, ptr + count, entities.begin() + old_size );
     }
     else
     {
         assert( count % 2 == 0 );
         for( size_t i = 0; i < count; i += 2 )
-            std::copy( hdl_iter( ptr[ i ] ), hdl_iter( ptr[ i + 1 ] + 1 ), std::back_inserter( entities ) );
+            std::copy( hdl_iter( ptr[i] ), hdl_iter( ptr[i + 1] + 1 ), std::back_inserter( entities ) );
     }
     return MB_SUCCESS;
 }
 
 inline ErrorCode MeshSet::get_entities( Range& entities ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based( ) ) { std::copy( ptr, ptr + count, range_inserter( entities ) ); }
+    if( vector_based() ) { std::copy( ptr, ptr + count, range_inserter( entities ) ); }
     else
     {
         assert( count % 2 == 0 );
-        Range::iterator in = entities.begin( );
+        Range::iterator in = entities.begin();
         for( size_t i = 0; i < count; i += 2 )
-            in = entities.insert( in, ptr[ i ], ptr[ i + 1 ] );
+            in = entities.insert( in, ptr[i], ptr[i + 1] );
     }
     return MB_SUCCESS;
 }
@@ -528,33 +528,32 @@ inline ErrorCode MeshSet::get_entities( Range& entities ) const
 //! get all entities in this MeshSet with the specified type
 inline ErrorCode MeshSet::get_entities_by_type( EntityType type, std::vector< EntityHandle >& entity_list ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
     if( MBMAXTYPE == type ) { return get_entities( entity_list ); }
-    else if( vector_based( ) )
+    else if( vector_based() )
     {
         std::remove_copy_if( ptr, ptr + count, std::back_inserter( entity_list ), not_type_test( type ) );
     }
     else
     {
         size_t idx = std::lower_bound( ptr, ptr + count, FIRST_HANDLE( type ) ) - ptr;
-        if( idx < count && TYPE_FROM_HANDLE( ptr[ idx ] ) == type )
+        if( idx < count && TYPE_FROM_HANDLE( ptr[idx] ) == type )
         {
             if( idx % 2 )
             {  // only part of first block is of type
-                std::copy( hdl_iter( FIRST_HANDLE( type ) ), hdl_iter( ptr[ idx ] + 1 ),
+                std::copy( hdl_iter( FIRST_HANDLE( type ) ), hdl_iter( ptr[idx] + 1 ),
                            std::back_inserter( entity_list ) );
                 ++idx;
             }
             for( ; idx < count; idx += 2 )
             {
-                if( TYPE_FROM_HANDLE( ptr[ idx + 1 ] ) == type )  // whole block is of type
-                    std::copy( hdl_iter( ptr[ idx ] ), hdl_iter( ptr[ idx + 1 ] + 1 ),
-                               std::back_inserter( entity_list ) );
+                if( TYPE_FROM_HANDLE( ptr[idx + 1] ) == type )  // whole block is of type
+                    std::copy( hdl_iter( ptr[idx] ), hdl_iter( ptr[idx + 1] + 1 ), std::back_inserter( entity_list ) );
                 else
                 {
-                    if( TYPE_FROM_HANDLE( ptr[ idx ] ) == type )  // part of last block is of type
-                        std::copy( hdl_iter( ptr[ idx ] ), hdl_iter( LAST_HANDLE( type ) ),
+                    if( TYPE_FROM_HANDLE( ptr[idx] ) == type )  // part of last block is of type
+                        std::copy( hdl_iter( ptr[idx] ), hdl_iter( LAST_HANDLE( type ) ),
                                    std::back_inserter( entity_list ) );
                     break;
                 }
@@ -567,32 +566,32 @@ inline ErrorCode MeshSet::get_entities_by_type( EntityType type, std::vector< En
 
 inline ErrorCode MeshSet::get_entities_by_type( EntityType type, Range& entity_list ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
     if( MBMAXTYPE == type ) { return get_entities( entity_list ); }
-    else if( vector_based( ) )
+    else if( vector_based() )
     {
         std::remove_copy_if( ptr, ptr + count, range_inserter( entity_list ), not_type_test( type ) );
     }
     else
     {
-        size_t          idx = std::lower_bound( ptr, ptr + count, FIRST_HANDLE( type ) ) - ptr;
-        Range::iterator in = entity_list.begin( );
-        if( idx < count && TYPE_FROM_HANDLE( ptr[ idx ] ) == type )
+        size_t idx         = std::lower_bound( ptr, ptr + count, FIRST_HANDLE( type ) ) - ptr;
+        Range::iterator in = entity_list.begin();
+        if( idx < count && TYPE_FROM_HANDLE( ptr[idx] ) == type )
         {
             if( idx % 2 )
             {  // only part of first block is of type
-                in = entity_list.insert( in, FIRST_HANDLE( type ), ptr[ idx ] );
+                in = entity_list.insert( in, FIRST_HANDLE( type ), ptr[idx] );
                 ++idx;
             }
             for( ; idx < count; idx += 2 )
             {
-                if( TYPE_FROM_HANDLE( ptr[ idx + 1 ] ) == type )  // whole block is of type
-                    in = entity_list.insert( in, ptr[ idx ], ptr[ idx + 1 ] );
+                if( TYPE_FROM_HANDLE( ptr[idx + 1] ) == type )  // whole block is of type
+                    in = entity_list.insert( in, ptr[idx], ptr[idx + 1] );
                 else
                 {
-                    if( TYPE_FROM_HANDLE( ptr[ idx ] ) == type )  // part of last block is of type
-                        entity_list.insert( in, ptr[ idx ], LAST_HANDLE( type ) );
+                    if( TYPE_FROM_HANDLE( ptr[idx] ) == type )  // part of last block is of type
+                        entity_list.insert( in, ptr[idx], LAST_HANDLE( type ) );
                     break;
                 }
             }
@@ -605,11 +604,11 @@ inline ErrorCode MeshSet::get_entities_by_type( EntityType type, Range& entity_l
 //! return the number of entities with the given type contained in this meshset
 inline unsigned int MeshSet::num_entities_by_type( EntityType type ) const
 {
-    unsigned int        result;
-    size_t              count;
+    unsigned int result;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( MBMAXTYPE == type ) { return num_entities( ); }
-    else if( vector_based( ) )
+    if( MBMAXTYPE == type ) { return num_entities(); }
+    else if( vector_based() )
     {
 #ifndef __SUNPRO_CC
         result = std::count_if( ptr, ptr + count, type_test( type ) );
@@ -619,23 +618,23 @@ inline unsigned int MeshSet::num_entities_by_type( EntityType type ) const
     }
     else
     {
-        result = 0;
+        result     = 0;
         size_t idx = std::lower_bound( ptr, ptr + count, FIRST_HANDLE( type ) ) - ptr;
-        if( idx < count && TYPE_FROM_HANDLE( ptr[ idx ] ) == type )
+        if( idx < count && TYPE_FROM_HANDLE( ptr[idx] ) == type )
         {
             if( idx % 2 )
             {  // only part of first block is of type
-                result += ptr[ idx ] - FIRST_HANDLE( type ) + 1;
+                result += ptr[idx] - FIRST_HANDLE( type ) + 1;
                 ++idx;
             }
             for( ; idx < count; idx += 2 )
             {
-                if( TYPE_FROM_HANDLE( ptr[ idx + 1 ] ) == type )  // whole block is of type
-                    result += ptr[ idx + 1 ] - ptr[ idx ] + 1;
+                if( TYPE_FROM_HANDLE( ptr[idx + 1] ) == type )  // whole block is of type
+                    result += ptr[idx + 1] - ptr[idx] + 1;
                 else
                 {
-                    if( TYPE_FROM_HANDLE( ptr[ idx ] ) == type )  // part of last block is of type
-                        result += LAST_HANDLE( type ) - ptr[ idx ] + 1;
+                    if( TYPE_FROM_HANDLE( ptr[idx] ) == type )  // part of last block is of type
+                        result += LAST_HANDLE( type ) - ptr[idx] + 1;
                     break;
                 }
             }
@@ -647,30 +646,29 @@ inline unsigned int MeshSet::num_entities_by_type( EntityType type ) const
 
 inline ErrorCode MeshSet::get_entities_by_dimension( int dimension, std::vector< EntityHandle >& entity_list ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based( ) )
+    if( vector_based() )
     { std::remove_copy_if( ptr, ptr + count, std::back_inserter( entity_list ), not_dim_test( dimension ) ); }
     else
     {
         size_t idx = std::lower_bound( ptr, ptr + count, FIRST_OF_DIM( dimension ) ) - ptr;
-        if( idx < count && DIM_FROM_HANDLE( ptr[ idx ] ) == dimension )
+        if( idx < count && DIM_FROM_HANDLE( ptr[idx] ) == dimension )
         {
             if( idx % 2 )
             {  // only part of first block is of type
-                std::copy( hdl_iter( FIRST_OF_DIM( dimension ) ), hdl_iter( ptr[ idx ] + 1 ),
+                std::copy( hdl_iter( FIRST_OF_DIM( dimension ) ), hdl_iter( ptr[idx] + 1 ),
                            std::back_inserter( entity_list ) );
                 ++idx;
             }
             for( ; idx < count; idx += 2 )
             {
-                if( DIM_FROM_HANDLE( ptr[ idx + 1 ] ) == dimension )  // whole block is of type
-                    std::copy( hdl_iter( ptr[ idx ] ), hdl_iter( ptr[ idx + 1 ] + 1 ),
-                               std::back_inserter( entity_list ) );
+                if( DIM_FROM_HANDLE( ptr[idx + 1] ) == dimension )  // whole block is of type
+                    std::copy( hdl_iter( ptr[idx] ), hdl_iter( ptr[idx + 1] + 1 ), std::back_inserter( entity_list ) );
                 else
                 {
-                    if( DIM_FROM_HANDLE( ptr[ idx ] ) == dimension )  // part of last block is of type
-                        std::copy( hdl_iter( ptr[ idx ] ), hdl_iter( LAST_OF_DIM( dimension ) ),
+                    if( DIM_FROM_HANDLE( ptr[idx] ) == dimension )  // part of last block is of type
+                        std::copy( hdl_iter( ptr[idx] ), hdl_iter( LAST_OF_DIM( dimension ) ),
                                    std::back_inserter( entity_list ) );
                     break;
                 }
@@ -683,29 +681,29 @@ inline ErrorCode MeshSet::get_entities_by_dimension( int dimension, std::vector<
 
 inline ErrorCode MeshSet::get_entities_by_dimension( int dimension, Range& entity_list ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based( ) )
+    if( vector_based() )
     { std::remove_copy_if( ptr, ptr + count, range_inserter( entity_list ), not_dim_test( dimension ) ); }
     else
     {
-        size_t          idx = std::lower_bound( ptr, ptr + count, FIRST_OF_DIM( dimension ) ) - ptr;
-        Range::iterator in = entity_list.begin( );
-        if( idx < count && DIM_FROM_HANDLE( ptr[ idx ] ) == dimension )
+        size_t idx         = std::lower_bound( ptr, ptr + count, FIRST_OF_DIM( dimension ) ) - ptr;
+        Range::iterator in = entity_list.begin();
+        if( idx < count && DIM_FROM_HANDLE( ptr[idx] ) == dimension )
         {
             if( idx % 2 )
             {  // only part of first block is of type
-                in = entity_list.insert( in, FIRST_OF_DIM( dimension ), ptr[ idx ] );
+                in = entity_list.insert( in, FIRST_OF_DIM( dimension ), ptr[idx] );
                 ++idx;
             }
             for( ; idx < count; idx += 2 )
             {
-                if( DIM_FROM_HANDLE( ptr[ idx + 1 ] ) == dimension )  // whole block is of type
-                    in = entity_list.insert( in, ptr[ idx ], ptr[ idx + 1 ] );
+                if( DIM_FROM_HANDLE( ptr[idx + 1] ) == dimension )  // whole block is of type
+                    in = entity_list.insert( in, ptr[idx], ptr[idx + 1] );
                 else
                 {
-                    if( DIM_FROM_HANDLE( ptr[ idx ] ) == dimension )  // part of last block is of type
-                        entity_list.insert( in, ptr[ idx ], LAST_OF_DIM( dimension ) );
+                    if( DIM_FROM_HANDLE( ptr[idx] ) == dimension )  // part of last block is of type
+                        entity_list.insert( in, ptr[idx], LAST_OF_DIM( dimension ) );
                     break;
                 }
             }
@@ -718,10 +716,10 @@ inline ErrorCode MeshSet::get_entities_by_dimension( int dimension, Range& entit
 //! return the number of entities with the given type contained in this meshset
 inline unsigned int MeshSet::num_entities_by_dimension( int dimension ) const
 {
-    unsigned int        result;
-    size_t              count;
+    unsigned int result;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based( ) )
+    if( vector_based() )
     {
 #ifndef __SUNPRO_CC
         result = std::count_if( ptr, ptr + count, dim_test( dimension ) );
@@ -731,23 +729,23 @@ inline unsigned int MeshSet::num_entities_by_dimension( int dimension ) const
     }
     else
     {
-        result = 0;
+        result     = 0;
         size_t idx = std::lower_bound( ptr, ptr + count, FIRST_OF_DIM( dimension ) ) - ptr;
-        if( idx < count && DIM_FROM_HANDLE( ptr[ idx ] ) == dimension )
+        if( idx < count && DIM_FROM_HANDLE( ptr[idx] ) == dimension )
         {
             if( idx % 2 )
             {  // only part of first block is of type
-                result += ptr[ idx ] - FIRST_OF_DIM( dimension ) + 1;
+                result += ptr[idx] - FIRST_OF_DIM( dimension ) + 1;
                 ++idx;
             }
             for( ; idx < count; idx += 2 )
             {
-                if( DIM_FROM_HANDLE( ptr[ idx + 1 ] ) == dimension )  // whole block is of type
-                    result += ptr[ idx + 1 ] - ptr[ idx ] + 1;
+                if( DIM_FROM_HANDLE( ptr[idx + 1] ) == dimension )  // whole block is of type
+                    result += ptr[idx + 1] - ptr[idx] + 1;
                 else
                 {
-                    if( DIM_FROM_HANDLE( ptr[ idx ] ) == dimension )  // part of last block is of type
-                        result += LAST_OF_DIM( dimension ) - ptr[ idx ] + 1;
+                    if( DIM_FROM_HANDLE( ptr[idx] ) == dimension )  // part of last block is of type
+                        result += LAST_OF_DIM( dimension ) - ptr[idx] + 1;
                     break;
                 }
             }
@@ -759,21 +757,20 @@ inline unsigned int MeshSet::num_entities_by_dimension( int dimension ) const
 
 inline ErrorCode MeshSet::get_non_set_entities( Range& range ) const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based( ) )
-    { std::remove_copy_if( ptr, ptr + count, range_inserter( range ), type_test( MBENTITYSET ) ); }
+    if( vector_based() ) { std::remove_copy_if( ptr, ptr + count, range_inserter( range ), type_test( MBENTITYSET ) ); }
     else
     {
-        Range::iterator in = range.begin( );
+        Range::iterator in = range.begin();
         for( size_t idx = 0; idx < count; idx += 2 )
         {
-            if( TYPE_FROM_HANDLE( ptr[ idx + 1 ] ) != MBENTITYSET )
-                in = range.insert( in, ptr[ idx ], ptr[ idx + 1 ] );
+            if( TYPE_FROM_HANDLE( ptr[idx + 1] ) != MBENTITYSET )
+                in = range.insert( in, ptr[idx], ptr[idx + 1] );
             else
             {
-                if( TYPE_FROM_HANDLE( ptr[ idx ] ) != MBENTITYSET )
-                    in = range.insert( in, ptr[ idx ], LAST_HANDLE( MBENTITYSET - 1 ) );
+                if( TYPE_FROM_HANDLE( ptr[idx] ) != MBENTITYSET )
+                    in = range.insert( in, ptr[idx], LAST_HANDLE( MBENTITYSET - 1 ) );
                 break;
             }
         }
@@ -784,22 +781,22 @@ inline ErrorCode MeshSet::get_non_set_entities( Range& range ) const
 
 inline bool MeshSet::contains_entities( const EntityHandle* entities, int num_ents, const int op ) const
 {
-    size_t                    count;
+    size_t count;
     const EntityHandle* const ptr = get_contents( count );
     const EntityHandle* const end = ptr + count;
-    size_t                    found_count = 0;
-    if( vector_based( ) )
+    size_t found_count            = 0;
+    if( vector_based() )
     {
         for( int i = 0; i < num_ents; ++i )
-            if( std::find( ptr, end, entities[ i ] ) < end ) ++found_count;
+            if( std::find( ptr, end, entities[i] ) < end ) ++found_count;
     }
     else
     {
         assert( 0 == count % 2 );
         for( int i = 0; i < num_ents; ++i )
         {
-            const unsigned long idx = std::lower_bound( ptr, end, entities[ i ] ) - ptr;
-            if( idx < count && ( idx % 2 != 0 || ptr[ idx ] == entities[ i ] ) ) ++found_count;
+            const unsigned long idx = std::lower_bound( ptr, end, entities[i] ) - ptr;
+            if( idx < count && ( idx % 2 != 0 || ptr[idx] == entities[i] ) ) ++found_count;
         }
     }
 
@@ -809,9 +806,9 @@ inline bool MeshSet::contains_entities( const EntityHandle* entities, int num_en
 //! subtract/intersect/unite meshset_2 from/with/into meshset_1; modifies meshset_1
 inline ErrorCode MeshSet::subtract( const MeshSet* meshset_2, EntityHandle my_handle, AEntityFactory* adjacencies )
 {
-    size_t                    count;
+    size_t count;
     const EntityHandle* const ptr = meshset_2->get_contents( count );
-    if( meshset_2->vector_based( ) )
+    if( meshset_2->vector_based() )
         return remove_entity_vector( ptr, count, my_handle, adjacencies );
     else
         return remove_entity_ranges( ptr, count, my_handle, adjacencies );
@@ -819,9 +816,9 @@ inline ErrorCode MeshSet::subtract( const MeshSet* meshset_2, EntityHandle my_ha
 
 inline ErrorCode MeshSet::unite( const MeshSet* meshset_2, EntityHandle my_handle, AEntityFactory* adjacencies )
 {
-    size_t                    count;
+    size_t count;
     const EntityHandle* const ptr = meshset_2->get_contents( count );
-    if( meshset_2->vector_based( ) )
+    if( meshset_2->vector_based() )
         return insert_entity_vector( ptr, count, my_handle, adjacencies );
     else
         return insert_entity_ranges( ptr, count, my_handle, adjacencies );
@@ -854,16 +851,16 @@ inline ErrorCode MeshSet::remove_entities( const EntityHandle* entities, const i
 }
 
 //! return the number of entities contained in this meshset
-unsigned int MeshSet::num_entities( ) const
+unsigned int MeshSet::num_entities() const
 {
-    size_t              count;
+    size_t count;
     const EntityHandle* list = get_contents( count );
-    if( vector_based( ) ) return count;
+    if( vector_based() ) return count;
 
-    int                       result = 0;
+    int result                    = 0;
     const EntityHandle* const end = list + count;
     for( ; list < end; list += 2 )
-        result += list[ 1 ] - list[ 0 ] + 1;
+        result += list[1] - list[0] + 1;
     return result;
 }
 

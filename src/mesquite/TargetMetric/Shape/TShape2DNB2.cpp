@@ -37,16 +37,16 @@
 namespace MBMesquite
 {
 
-std::string TShape2DNB2::get_name( ) const
+std::string TShape2DNB2::get_name() const
 {
     return "TShape2DNB2";
 }
 
-TShape2DNB2::~TShape2DNB2( ) {}
+TShape2DNB2::~TShape2DNB2() {}
 
 bool TShape2DNB2::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& )
 {
-    const double      tau = det( T );
+    const double tau     = det( T );
     MsqMatrix< 2, 2 > TT = transpose( T ) * T;
     TT( 0, 0 ) -= tau;
     TT( 1, 1 ) -= tau;
@@ -58,10 +58,10 @@ bool TShape2DNB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result
                                       MsqError& /*err*/ )
 {
     const MsqMatrix< 2, 2 > TtT = transpose( T ) * T;
-    const double            tau = det( T );
-    const double            nTtT = sqr_Frobenius( TtT );
-    const double            nT = sqr_Frobenius( T );
-    result = nTtT + 2 * tau * ( tau - nT );
+    const double tau            = det( T );
+    const double nTtT           = sqr_Frobenius( TtT );
+    const double nT             = sqr_Frobenius( T );
+    result                      = nTtT + 2 * tau * ( tau - nT );
 
     deriv_wrt_T = T * TtT;
     deriv_wrt_T -= tau * T;
@@ -72,31 +72,31 @@ bool TShape2DNB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result
 }
 
 bool TShape2DNB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                      MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& /*err*/ )
+                                      MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& /*err*/ )
 {
     const MsqMatrix< 2, 2 > TtT = transpose( T ) * T;
-    const double            tau = det( T );
-    const double            nTtT = sqr_Frobenius( TtT );
-    const double            nT = sqr_Frobenius( T );
-    result = nTtT + 2 * tau * ( tau - nT );
+    const double tau            = det( T );
+    const double nTtT           = sqr_Frobenius( TtT );
+    const double nT             = sqr_Frobenius( T );
+    result                      = nTtT + 2 * tau * ( tau - nT );
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    deriv_wrt_T = T * TtT;
+    deriv_wrt_T                  = T * TtT;
     deriv_wrt_T -= tau * T;
     deriv_wrt_T += ( tau - 0.5 * nT ) * adjt;
     deriv_wrt_T *= 4;
 
     set_scaled_outer_product( second_wrt_T, 1, T );
-    second_wrt_T[ 1 ] = transpose( second_wrt_T[ 1 ] );
-    second_wrt_T[ 0 ] += TtT;
-    second_wrt_T[ 2 ] += TtT;
+    second_wrt_T[1] = transpose( second_wrt_T[1] );
+    second_wrt_T[0] += TtT;
+    second_wrt_T[2] += TtT;
     const MsqMatrix< 2, 2 > TTt = T * transpose( T );
-    second_wrt_T[ 0 ]( 0, 0 ) += TTt( 0, 0 );
-    second_wrt_T[ 0 ]( 1, 1 ) += TTt( 0, 0 );
-    second_wrt_T[ 1 ]( 0, 0 ) += TTt( 0, 1 );
-    second_wrt_T[ 1 ]( 1, 1 ) += TTt( 0, 1 );
-    second_wrt_T[ 2 ]( 0, 0 ) += TTt( 1, 1 );
-    second_wrt_T[ 2 ]( 1, 1 ) += TTt( 1, 1 );
+    second_wrt_T[0]( 0, 0 ) += TTt( 0, 0 );
+    second_wrt_T[0]( 1, 1 ) += TTt( 0, 0 );
+    second_wrt_T[1]( 0, 0 ) += TTt( 0, 1 );
+    second_wrt_T[1]( 1, 1 ) += TTt( 0, 1 );
+    second_wrt_T[2]( 0, 0 ) += TTt( 1, 1 );
+    second_wrt_T[2]( 1, 1 ) += TTt( 1, 1 );
 
     pluseq_scaled_I( second_wrt_T, -tau );
     pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -0.5 * nT );
@@ -105,9 +105,9 @@ bool TShape2DNB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result
     pluseq_scaled_2nd_deriv_of_det( second_wrt_T, tau );
     pluseq_scaled_outer_product( second_wrt_T, 1, adjt );
 
-    second_wrt_T[ 1 ] *= 4;
-    second_wrt_T[ 0 ] *= 4;
-    second_wrt_T[ 2 ] *= 4;
+    second_wrt_T[1] *= 4;
+    second_wrt_T[0] *= 4;
+    second_wrt_T[2] *= 4;
 
     return true;
 }

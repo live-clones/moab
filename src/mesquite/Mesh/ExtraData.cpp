@@ -46,7 +46,7 @@ ExtraData::ExtraData( PatchData& patch ) : patchNext( 0 ), patchPtr( &patch )
     }
 }
 
-ExtraData::~ExtraData( )
+ExtraData::~ExtraData()
 {
     if( patchPtr && !patchPtr->remove_extra_data( this ) ) assert( false );
 }

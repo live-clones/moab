@@ -41,7 +41,7 @@ class LaplaceWrapper : public Wrapper
 {
   public:
     MESQUITE_EXPORT
-    LaplaceWrapper( );
+    LaplaceWrapper();
 
     /**\brief Specify timeout after which untangler will exit
      *
@@ -51,7 +51,7 @@ class LaplaceWrapper : public Wrapper
     {
         maxTime = seconds;
     }
-    double get_cpu_time_limit( ) const
+    double get_cpu_time_limit() const
     {
         return maxTime;
     }
@@ -66,7 +66,7 @@ class LaplaceWrapper : public Wrapper
     {
         movementFactor = f;
     }
-    double get_vertex_movement_limit_factor( ) const
+    double get_vertex_movement_limit_factor() const
     {
         return movementFactor;
     }
@@ -79,7 +79,7 @@ class LaplaceWrapper : public Wrapper
     {
         iterationLimit = limit;
     }
-    int get_iteration_limit( ) const
+    int get_iteration_limit() const
     {
         return iterationLimit;
     }
@@ -89,13 +89,13 @@ class LaplaceWrapper : public Wrapper
     {
         doCulling = yesno;
     }
-    inline bool is_culling_enabled( ) const
+    inline bool is_culling_enabled() const
     {
         return doCulling;
     }
 
     MESQUITE_EXPORT
-    ~LaplaceWrapper( );
+    ~LaplaceWrapper();
 
   protected:
     MESQUITE_EXPORT
@@ -104,8 +104,8 @@ class LaplaceWrapper : public Wrapper
 
   private:
     double maxTime, movementFactor;
-    int    iterationLimit;
-    bool   doCulling;
+    int iterationLimit;
+    bool doCulling;
 };
 
 }  // namespace MBMesquite

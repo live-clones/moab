@@ -54,20 +54,20 @@
 
 using namespace MBMesquite;
 
-std::string FeasibleNewton::get_name( ) const
+std::string FeasibleNewton::get_name() const
 {
     return "FeasibleNewton";
 }
 
-PatchSet* FeasibleNewton::get_patch_set( )
+PatchSet* FeasibleNewton::get_patch_set()
 {
-    return PatchSetUser::get_patch_set( );
+    return PatchSetUser::get_patch_set();
 }
 
 FeasibleNewton::FeasibleNewton( ObjectiveFunction* of )
     : VertexMover( of ), PatchSetUser( true ), convTol( 1e-6 ), coordsMem( 0 ), havePrintedDirectionMessage( false )
 {
-    TerminationCriterion* default_crit = get_inner_termination_criterion( );
+    TerminationCriterion* default_crit = get_inner_termination_criterion();
     default_crit->add_absolute_gradient_L2_norm( 5e-5 );
 }
 
@@ -81,7 +81,7 @@ void FeasibleNewton::initialize( PatchData& pd, MsqError& err )
 
 void FeasibleNewton::initialize_mesh_iteration( PatchData& pd, MsqError& /*err*/ )
 {
-    pd.reorder( );
+    pd.reorder();
 }
 
 void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
@@ -94,24 +94,24 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
     // lie in the X-Y coordinate plane.
     //
 
-    XYPlanarDomain* xyPlanarDomainPtr = dynamic_cast< XYPlanarDomain* >( pd.get_domain( ) );
+    XYPlanarDomain* xyPlanarDomainPtr = dynamic_cast< XYPlanarDomain* >( pd.get_domain() );
     // only optimize if input mesh is a volume or an XYPlanarDomain
-    if( !pd.domain_set( ) || xyPlanarDomainPtr != NULL )
+    if( !pd.domain_set() || xyPlanarDomainPtr != NULL )
     {
-        const double sigma = 1e-4;
-        const double beta0 = 0.25;
-        const double beta1 = 0.80;
-        const double tol1 = 1e-8;
-        const double tol2 = 1e-12;
+        const double sigma   = 1e-4;
+        const double beta0   = 0.25;
+        const double beta1   = 0.80;
+        const double tol1    = 1e-8;
+        const double tol2    = 1e-12;
         const double epsilon = 1e-10;
-        double       original_value, new_value;
-        double       beta;
+        double original_value, new_value;
+        double beta;
 
-        int                     nv = pd.num_free_vertices( );
+        int nv = pd.num_free_vertices();
         std::vector< Vector3D > grad( nv ), d( nv );
-        bool                    fn_bool = true;  // bool used for determining validity of patch
+        bool fn_bool = true;  // bool used for determining validity of patch
 
-        OFEvaluator& objFunc = get_objective_function_evaluator( );
+        OFEvaluator& objFunc = get_objective_function_evaluator();
 
         int i;
 
@@ -128,8 +128,8 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
         // Terminate when inner termination criterion signals.
 
         /* Computes the value of the stopping criterion*/
-        TerminationCriterion* term_crit = get_inner_termination_criterion( );
-        while( !term_crit->terminate( ) )
+        TerminationCriterion* term_crit = get_inner_termination_criterion();
+        while( !term_crit->terminate() )
         {
             fn_bool = objFunc.update( pd, original_value, grad, mHessian, err );MSQ_ERRRTN( err );
             if( !fn_bool )
@@ -143,7 +143,7 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
             {  // avoid expensive norm calculations if debug flag is off
                 MSQ_DBGOUT( 3 ) << "  o  objective function: " << original_value << std::endl;
                 MSQ_DBGOUT( 3 ) << "  o  gradient norm: " << length( grad ) << std::endl;
-                MSQ_DBGOUT( 3 ) << "  o  Hessian norm: " << mHessian.norm( ) << std::endl;
+                MSQ_DBGOUT( 3 ) << "  o  Hessian norm: " << mHessian.norm() << std::endl;
             }
 
             // Prints out free vertices coordinates.
@@ -245,8 +245,8 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
 
             pd.move_free_vertices_constrained( arrptr( d ), nv, beta, err );MSQ_ERRRTN( err );
             fn_bool = objFunc.evaluate( pd, new_value, grad, err );
-            if( err.error_code( ) == err.BARRIER_VIOLATED )
-                err.clear( );  // barrier violated does not represent an actual error here
+            if( err.error_code() == err.BARRIER_VIOLATED )
+                err.clear();  // barrier violated does not represent an actual error here
             MSQ_ERRRTN( err );
 
             if( ( fn_bool && ( original_value - new_value >= -alpha * beta - epsilon ) ) ||
@@ -282,8 +282,8 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
                     pd.move_free_vertices_constrained( arrptr( d ), nv, beta, err );MSQ_ERRRTN( err );
                     //    (b) function evaluation
                     fn_bool = objFunc.evaluate( pd, new_value, err );
-                    if( err.error_code( ) == err.BARRIER_VIOLATED )
-                        err.clear( );  // barrier violated does not represent an actual error here
+                    if( err.error_code() == err.BARRIER_VIOLATED )
+                        err.clear();  // barrier violated does not represent an actual error here
                     MSQ_ERRRTN( err );
 
                     //    (c) check for sufficient decrease and stop
@@ -330,14 +330,14 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
                     ( "Sufficient decrease not obtained in linesearch; switching to gradient.\n" );
 
                     alpha = inner( arrptr( grad ), arrptr( grad ),
-                                   nv );  // compute norm squared of gradient
+                                   nv );        // compute norm squared of gradient
                     if( alpha < 1 ) alpha = 1;  // take max with constant
                     for( i = 0; i < nv; ++i )
                     {
-                        d[ i ] = -grad[ i ] / alpha;  // compute scaled gradient
+                        d[i] = -grad[i] / alpha;  // compute scaled gradient
                     }
                     alpha = inner( arrptr( grad ), arrptr( d ), nv );  // recompute alpha
-                    alpha *= sigma;  // equal to one for large gradient
+                    alpha *= sigma;                                    // equal to one for large gradient
                     beta = 1.0;
 
                     // Standard Armijo linesearch rules
@@ -348,9 +348,9 @@ void FeasibleNewton::optimize_vertex_positions( PatchData& pd, MsqError& err )
                         pd.move_free_vertices_constrained( arrptr( d ), nv, beta, err );MSQ_ERRRTN( err );
                         //    (b) function evaluation
                         fn_bool = objFunc.evaluate( pd, new_value, err );
-                        if( err.error_code( ) == err.BARRIER_VIOLATED )
-                            err.clear( );  // barrier violated does not represent an actual error
-                                           // here
+                        if( err.error_code() == err.BARRIER_VIOLATED )
+                            err.clear();  // barrier violated does not represent an actual error
+                                          // here
                         MSQ_ERRRTN( err );
 
                         //    (c) check for sufficient decrease and stop
@@ -427,7 +427,7 @@ void FeasibleNewton::terminate_mesh_iteration( PatchData& /*pd*/, MsqError& /*er
     //  cout << "- Executing FeasibleNewton::iteration_complete()\n";
 }
 
-void FeasibleNewton::cleanup( )
+void FeasibleNewton::cleanup()
 {
     delete coordsMem;
     coordsMem = NULL;

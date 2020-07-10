@@ -52,8 +52,8 @@ class MsqIMeshP : public MsqIMesh, virtual public ParallelMesh
   public:
     //********* Functions that are NOT inherited ************
 
-    MsqIMeshP( );
-    virtual ~MsqIMeshP( );
+    MsqIMeshP();
+    virtual ~MsqIMeshP();
 
     MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition, iBase_EntitySetHandle meshset,
                iBase_EntityType element_dimension, MsqError& err, const iBase_TagHandle* fixed_tag = 0,

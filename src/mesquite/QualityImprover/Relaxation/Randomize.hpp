@@ -53,28 +53,28 @@ class Randomize : public VertexMover
 {
   public:
     //! Constructor defaulting mPercent to .05.
-    MESQUITE_EXPORT Randomize( );
+    MESQUITE_EXPORT Randomize();
     //! Constructor allowing user to set mPercent
     MESQUITE_EXPORT Randomize( double percent );
 
-    MESQUITE_EXPORT virtual ~Randomize( );
+    MESQUITE_EXPORT virtual ~Randomize();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual PatchSet* get_patch_set( );
+    MESQUITE_EXPORT virtual PatchSet* get_patch_set();
 
   protected:
     virtual void initialize( PatchData& pd, MsqError& err );
     virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
-    virtual void cleanup( );
+    virtual void cleanup();
 
   private:
     //! \param The percentage of the scale factor each vertex will be moved.
-    double                mPercent;
+    double mPercent;
     std::vector< size_t > adjVtxList;
-    VertexPatches         patchSet;
+    VertexPatches patchSet;
 };
 
 }  // namespace MBMesquite

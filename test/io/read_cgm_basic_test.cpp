@@ -32,12 +32,12 @@ const std::string input_cube = TestDir + "/io/cube.sat";
 void read_file( Interface* moab, const char* input_file );
 
 // List of tests in this file
-void read_cube_verts_test( );
-void read_cube_curves_test( );
-void read_cube_tris_test( );
-void read_cube_surfs_test( );
-void read_cube_vols_test( );
-void read_cube_vertex_pos_test( );
+void read_cube_verts_test();
+void read_cube_curves_test();
+void read_cube_tris_test();
+void read_cube_surfs_test();
+void read_cube_vols_test();
+void read_cube_vertex_pos_test();
 // void delete_mesh_test();
 
 int main( int /* argc */, char** /* argv */ )
@@ -56,21 +56,21 @@ int main( int /* argc */, char** /* argv */ )
 
 void read_file( Interface* moab, const char* input_file )
 {
-    InitCGMA::initialize_cgma( );
-    GeometryQueryTool::instance( )->delete_geometry( );
+    InitCGMA::initialize_cgma();
+    GeometryQueryTool::instance()->delete_geometry();
 
     ErrorCode rval = moab->load_file( input_file );CHECK_ERR( rval );
 }
 
 // Gets the vertex entities from a simple cube file load and checks that the
 // correct number of them exist.
-void read_cube_verts_test( )
+void read_cube_verts_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cube.c_str( ) );
+    read_file( mb, input_cube.c_str() );
 
     int number_of_vertices;
     rval = mb->get_number_entities_by_type( 0, MBVERTEX, number_of_vertices );CHECK_ERR( rval );
@@ -80,13 +80,13 @@ void read_cube_verts_test( )
 
 // Gets the triangle entities from a simple cube file load and checks that the
 // correct number of them exist.
-void read_cube_tris_test( )
+void read_cube_tris_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cube.c_str( ) );
+    read_file( mb, input_cube.c_str() );
 
     int number_of_tris;
 
@@ -98,21 +98,21 @@ void read_cube_tris_test( )
 
 // Gets the curve entities from a simple cube file load and checks that the
 // correct number of them exist.
-void read_cube_curves_test( )
+void read_cube_curves_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cube.c_str( ) );
+    read_file( mb, input_cube.c_str() );
     // Get the geometry tag handle from the mesh
     Tag geom_tag;
     rval = mb->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag,
                                moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );CHECK_ERR( rval );
     // Get the curves from the mesh
-    int   dim = 1;
+    int dim     = 1;
     void* val[] = { &dim };
-    int   number_of_curves;
+    int number_of_curves;
     rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_curves );CHECK_ERR( rval );
     // For a cube, there should be exactly 12 curves loaded from the file
     CHECK_EQUAL( 12, number_of_curves );
@@ -120,13 +120,13 @@ void read_cube_curves_test( )
 
 // Gets the surface entities from a simple cube file load and checks that the
 // correct number of them exist.
-void read_cube_surfs_test( )
+void read_cube_surfs_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cube.c_str( ) );
+    read_file( mb, input_cube.c_str() );
 
     // Get geometry tag for pulling curve data from the mesh
     Tag geom_tag;
@@ -134,21 +134,21 @@ void read_cube_surfs_test( )
                                moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );CHECK_ERR( rval );
 
     // Get the number of surface from the mesh geometry data
-    int   dim = 2;
+    int dim     = 2;
     void* val[] = { &dim };
-    int   number_of_surfs;
+    int number_of_surfs;
     rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_surfs );CHECK_ERR( rval );
     // For a cube, there should be exactly 6 surfaces
     CHECK_EQUAL( 6, number_of_surfs );
 }
 
-void read_cube_vols_test( )
+void read_cube_vols_test()
 {
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cube.c_str( ) );
+    read_file( mb, input_cube.c_str() );
 
     // Get geometry tag for pulling curve data from the mesh
     Tag geom_tag;
@@ -156,35 +156,35 @@ void read_cube_vols_test( )
                                moab::MB_TAG_DENSE | moab::MB_TAG_CREAT );CHECK_ERR( rval );
 
     // Get the number of volumes from the mesh geometry data
-    int   dim = 3;
+    int dim     = 3;
     void* val[] = { &dim };
-    int   number_of_vols;
+    int number_of_vols;
     rval = mb->get_number_entities_by_type_and_tag( 0, MBENTITYSET, &geom_tag, val, 1, number_of_vols );CHECK_ERR( rval );
     CHECK_EQUAL( 1, number_of_vols );
 }
 
 // Gets the vertex eitities from a simple cube file load and checks that
 // they are in the correct locations.
-void read_cube_vertex_pos_test( )
+void read_cube_vertex_pos_test()
 {
 
     ErrorCode rval;
     // Open the test file
-    Core       moab;
+    Core moab;
     Interface* mb = &moab;
-    read_file( mb, input_cube.c_str( ) );
+    read_file( mb, input_cube.c_str() );
 
     // Retrieve all vertex handles from the mesh
     Range verts;
     rval = mb->get_entities_by_type( 0, MBVERTEX, verts );CHECK_ERR( rval );
 
-    int number_of_verts = verts.size( );
+    int number_of_verts = verts.size();
     CHECK_EQUAL( 8, number_of_verts );
     // Get the vertex coordinates
-    double x[ 8 ];
-    double y[ 8 ];
-    double z[ 8 ];
-    rval = mb->get_coords( verts, &x[ 0 ], &y[ 0 ], &z[ 0 ] );CHECK_ERR( rval );
+    double x[8];
+    double y[8];
+    double z[8];
+    rval = mb->get_coords( verts, &x[0], &y[0], &z[0] );CHECK_ERR( rval );
 
     // Check against known locations of the vertices
 
@@ -232,25 +232,25 @@ void read_cube_vertex_pos_test( )
     y_ref.push_back( 5 );
     z_ref.push_back( -5 );
 
-    std::cout << verts.size( ) << std::endl;
-    std::cout << x_ref.size( ) << std::endl;
+    std::cout << verts.size() << std::endl;
+    std::cout << x_ref.size() << std::endl;
 
-    for( unsigned int i = 0; i < verts.size( ); i++ )
+    for( unsigned int i = 0; i < verts.size(); i++ )
     {
-        for( unsigned int j = 0; j < x_ref.size( ); j++ )
+        for( unsigned int j = 0; j < x_ref.size(); j++ )
         {
-            if( x[ i ] == x_ref[ j ] && y[ i ] == y_ref[ j ] && z[ i ] == z_ref[ j ] )
+            if( x[i] == x_ref[j] && y[i] == y_ref[j] && z[i] == z_ref[j] )
             {
-                x_ref.erase( x_ref.begin( ) + j );
-                y_ref.erase( y_ref.begin( ) + j );
-                z_ref.erase( z_ref.begin( ) + j );
+                x_ref.erase( x_ref.begin() + j );
+                y_ref.erase( y_ref.begin() + j );
+                z_ref.erase( z_ref.begin() + j );
             }
         }
     }
 
     // After looping through each vertex loaded from the mesh
     // there should be no entities left in the reference vector
-    int leftovers = x_ref.size( );
+    int leftovers = x_ref.size();
     CHECK_EQUAL( 0, leftovers );
 }
 

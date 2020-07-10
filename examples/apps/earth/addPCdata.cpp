@@ -31,7 +31,7 @@ int main( int argc, char* argv[] )
     ProgOptions opts;
 
     std::string inputfile, outfile( "out.h5m" ), sourcefile, variable_name;
-    int         dual_mesh = 0;
+    int dual_mesh = 0;
     opts.addOpt< std::string >( "input,i", "input mesh filename", &inputfile );
     opts.addOpt< std::string >( "source,s", "h5m file aligned with the mesh input file", &sourcefile );
     opts.addOpt< std::string >( "output,o", "output mesh filename", &outfile );
@@ -46,30 +46,30 @@ int main( int argc, char* argv[] )
     std::cout << "variable to copy: " << variable_name << "\n";
     std::cout << "output file: " << outfile << "\n";
 
-    if( inputfile.empty( ) )
+    if( inputfile.empty() )
     {
-        opts.printHelp( );
+        opts.printHelp();
         return 0;
     }
     ErrorCode rval;
-    Core*     mb = new Core( );
+    Core* mb = new Core();
 
-    rval = mb->load_file( inputfile.c_str( ) );MB_CHK_SET_ERR( rval, "can't load input file" );
+    rval = mb->load_file( inputfile.c_str() );MB_CHK_SET_ERR( rval, "can't load input file" );
 
-    Core* mb2 = new Core( );
-    rval = mb2->load_file( sourcefile.c_str( ) );MB_CHK_SET_ERR( rval, "can't load source file" );
+    Core* mb2 = new Core();
+    rval      = mb2->load_file( sourcefile.c_str() );MB_CHK_SET_ERR( rval, "can't load source file" );
 
     Tag sourceTag;
-    rval = mb2->tag_get_handle( variable_name.c_str( ), sourceTag );MB_CHK_SET_ERR( rval, "can't get tag from file" );
+    rval = mb2->tag_get_handle( variable_name.c_str(), sourceTag );MB_CHK_SET_ERR( rval, "can't get tag from file" );
 
     int sizeTag = 0;
-    rval = mb2->tag_get_length( sourceTag, sizeTag );MB_CHK_SET_ERR( rval, "can't get size of tag " );
+    rval        = mb2->tag_get_length( sourceTag, sizeTag );MB_CHK_SET_ERR( rval, "can't get size of tag " );
 
     DataType type;
     rval = mb2->tag_get_data_type( sourceTag, type );MB_CHK_SET_ERR( rval, "can't get type of tag " );
 
     int sizeInBytes = 0;
-    rval = mb2->tag_get_bytes( sourceTag, sizeInBytes );MB_CHK_SET_ERR( rval, "can't get size in bytes of tag " );
+    rval            = mb2->tag_get_bytes( sourceTag, sizeInBytes );MB_CHK_SET_ERR( rval, "can't get size in bytes of tag " );
 
     Tag newTag;
     /*
@@ -80,8 +80,8 @@ int main( int argc, char* argv[] )
                                       unsigned flags = 0,
                                       const void* default_value = 0 )
      */
-    void*  defVal;
-    int    defInt = -100000;
+    void* defVal;
+    int defInt       = -100000;
     double defDouble = -1.e10;
     if( type == MB_TYPE_INTEGER ) { defVal = (void*)( &defInt ); }
     else if( type == MB_TYPE_DOUBLE )
@@ -89,7 +89,7 @@ int main( int argc, char* argv[] )
         defVal = (void*)( &defDouble );
     }
 
-    rval = mb->tag_get_handle( variable_name.c_str( ), sizeTag, type, newTag, MB_TAG_DENSE | MB_TAG_CREAT, defVal );MB_CHK_SET_ERR( rval, "can't create new tag " );
+    rval = mb->tag_get_handle( variable_name.c_str(), sizeTag, type, newTag, MB_TAG_DENSE | MB_TAG_CREAT, defVal );MB_CHK_SET_ERR( rval, "can't create new tag " );
 
     // get vertices on ini mesh; get global id on ini mesh
     // get global id on source mesh
@@ -107,29 +107,29 @@ int main( int argc, char* argv[] )
         rval = mb->get_entities_by_dimension( 0, 2, iniVerts );MB_CHK_SET_ERR( rval, "can't get polygons on initial mesh " );
     }
     std::vector< int > gids;
-    gids.resize( iniVerts.size( ) );
-    rval = mb->tag_get_data( gid, iniVerts, &( gids[ 0 ] ) );MB_CHK_SET_ERR( rval, "can't get gid on initial verts " );
+    gids.resize( iniVerts.size() );
+    rval = mb->tag_get_data( gid, iniVerts, &( gids[0] ) );MB_CHK_SET_ERR( rval, "can't get gid on initial verts " );
     // build now the map
     std::map< int, EntityHandle > fromGidToEh;
-    int                           i = 0;
-    for( Range::iterator vit = iniVerts.begin( ); vit != iniVerts.end( ); vit++, i++ )
+    int i = 0;
+    for( Range::iterator vit = iniVerts.begin(); vit != iniVerts.end(); vit++, i++ )
     {
-        fromGidToEh[ gids[ i ] ] = *vit;
+        fromGidToEh[gids[i]] = *vit;
     }
     // now get the source verts, and tags, and set it on new mesh
 
-    char* valTag = new char[ sizeInBytes ];
+    char* valTag = new char[sizeInBytes];
 
     std::cout << " size of tag in bytes:" << sizeInBytes << "\n";
     Range sourceVerts;
     rval = mb2->get_entities_by_dimension( 0, 0, sourceVerts );MB_CHK_SET_ERR( rval, "can't get verts on source mesh " );
-    for( Range::iterator sit = sourceVerts.begin( ); sit != sourceVerts.end( ); sit++ )
+    for( Range::iterator sit = sourceVerts.begin(); sit != sourceVerts.end(); sit++ )
     {
-        int          globalId = 0;
+        int globalId              = 0;
         EntityHandle sourceHandle = *sit;
-        rval = mb2->tag_get_data( gid2, &sourceHandle, 1, &globalId );MB_CHK_SET_ERR( rval, "can't get id on source mesh " );
+        rval                      = mb2->tag_get_data( gid2, &sourceHandle, 1, &globalId );MB_CHK_SET_ERR( rval, "can't get id on source mesh " );
         // iniVert could be a polygon, actually
-        EntityHandle iniVert = fromGidToEh[ globalId ];
+        EntityHandle iniVert = fromGidToEh[globalId];
         // find the value of source tag
         rval = mb2->tag_get_data( sourceTag, &sourceHandle, 1, (void*)valTag );MB_CHK_SET_ERR( rval, "can't get value on source tag " );
 
@@ -137,7 +137,7 @@ int main( int argc, char* argv[] )
     }
 
     // save file
-    rval = mb->write_file( outfile.c_str( ) );MB_CHK_SET_ERR( rval, "can't write file" );
+    rval = mb->write_file( outfile.c_str() );MB_CHK_SET_ERR( rval, "can't write file" );
 
     delete[] valTag;
     delete mb;

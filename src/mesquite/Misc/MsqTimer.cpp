@@ -53,7 +53,7 @@ MBMesquite::StopWatchCollection MBMesquite::GlobalStopWatches;
 #endif
 
 #ifdef MOAB_HAVE_TIMES
-static inline double now( )
+static inline double now()
 {
     tms t;
     times( &t );
@@ -61,71 +61,71 @@ static inline double now( )
 }
 #elif defined( MOAB_HAVE_CLOCK )
 #include <ctime>
-static inline double now( )
+static inline double now()
 {
-    return (double)std::clock( ) / CLOCKS_PER_SEC;
+    return (double)std::clock() / CLOCKS_PER_SEC;
 }
 #endif
 
-MBMesquite::Timer::Timer( ) : atBirth( now( ) )
+MBMesquite::Timer::Timer() : atBirth( now() )
 {
     atLastCheck = atBirth;
 }
 
-void MBMesquite::Timer::reset( )
+void MBMesquite::Timer::reset()
 {
-    atBirth = now( );
+    atBirth     = now();
     atLastCheck = atBirth;
 }
 
-double MBMesquite::Timer::since_last_check( )
+double MBMesquite::Timer::since_last_check()
 {
-    double right_now = now( );
-    double rv = right_now - atLastCheck;
-    atLastCheck = right_now;
+    double right_now = now();
+    double rv        = right_now - atLastCheck;
+    atLastCheck      = right_now;
     return rv;
 }
 
-double MBMesquite::Timer::since_birth( ) const
+double MBMesquite::Timer::since_birth() const
 {
-    return now( ) - atBirth;
+    return now() - atBirth;
 }
 
-void MBMesquite::StopWatch::start( )
+void MBMesquite::StopWatch::start()
 {
     if( !isRunning )
     {
-        isRunning = true;
-        timeAtLastStart = now( );
+        isRunning       = true;
+        timeAtLastStart = now();
         ++numStarts;
     }
 }
 
-void MBMesquite::StopWatch::stop( )
+void MBMesquite::StopWatch::stop()
 {
     if( isRunning )
     {
         isRunning = false;
-        totalTime += now( ) - timeAtLastStart;
+        totalTime += now() - timeAtLastStart;
     }
 }
 
-void MBMesquite::StopWatch::reset( )
+void MBMesquite::StopWatch::reset()
 {
     isRunning = false;
     totalTime = 0;
     numStarts = 0;
 }
 
-double MBMesquite::StopWatch::total_time( ) const
+double MBMesquite::StopWatch::total_time() const
 {
     double rv = totalTime;
-    if( isRunning ) rv += now( ) - timeAtLastStart;
+    if( isRunning ) rv += now() - timeAtLastStart;
     return rv;
 }
 
 MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::add( const std::string& name,
-                                                                           bool               fail_if_exists )
+                                                                           bool fail_if_exists )
 {
     // Don't allow empty name
     if( name == "" ) return 0;
@@ -137,17 +137,17 @@ MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::add( const
     {
         // See if there is an unused existing stopwatch
         size_t i;
-        for( i = 0; i < mEntries.size( ); i++ )
+        for( i = 0; i < mEntries.size(); i++ )
         {
-            if( mEntries[ i ].first == "" )
+            if( mEntries[i].first == "" )
             {
-                mEntries[ i ].first = name;
-                mEntries[ i ].second.reset( );
+                mEntries[i].first = name;
+                mEntries[i].second.reset();
                 break;
             }
         }
         // If not, create a new one
-        if( i == mEntries.size( ) ) { mEntries.push_back( std::pair< std::string, StopWatch >( name, StopWatch( ) ) ); }
+        if( i == mEntries.size() ) { mEntries.push_back( std::pair< std::string, StopWatch >( name, StopWatch() ) ); }
         key = i + 1;
     }
     // If it already existed...
@@ -161,9 +161,9 @@ MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::get_key( c
 {
     Key key = 0;
 
-    for( size_t i = 0; i < mEntries.size( ); i++ )
+    for( size_t i = 0; i < mEntries.size(); i++ )
     {
-        if( mEntries[ i ].first == name )
+        if( mEntries[i].first == name )
         {
             key = i + 1;
             break;
@@ -176,49 +176,49 @@ MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::get_key( c
 void MBMesquite::StopWatchCollection::remove( const MBMesquite::StopWatchCollection::Key key )
 {
     // Get rid of anything at the end of the list
-    if( key == mEntries.size( ) )
+    if( key == mEntries.size() )
     {
-        mEntries.pop_back( );
-        while( !mEntries.empty( ) && mEntries.back( ).first == "" )
+        mEntries.pop_back();
+        while( !mEntries.empty() && mEntries.back().first == "" )
         {
-            mEntries.pop_back( );
+            mEntries.pop_back();
         }
     }
 
-    else if( key > 0 && key < mEntries.size( ) )
+    else if( key > 0 && key < mEntries.size() )
     {
         // If in the middle of the list, set its name to ""
-        mEntries[ key - 1 ].first = "";
+        mEntries[key - 1].first = "";
     }
 }
 
 void MBMesquite::StopWatchCollection::start( const MBMesquite::StopWatchCollection::Key key )
 {
-    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" ) mEntries[ key - 1 ].second.start( );
+    if( key > 0 && key <= mEntries.size() && mEntries[key - 1].first != "" ) mEntries[key - 1].second.start();
 }
 
 void MBMesquite::StopWatchCollection::stop( const MBMesquite::StopWatchCollection::Key key )
 {
-    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" ) mEntries[ key - 1 ].second.stop( );
+    if( key > 0 && key <= mEntries.size() && mEntries[key - 1].first != "" ) mEntries[key - 1].second.stop();
 }
 
 void MBMesquite::StopWatchCollection::reset( const MBMesquite::StopWatchCollection::Key key )
 {
-    if( key > 0 && key <= mEntries.size( ) ) mEntries[ key - 1 ].second.reset( );
+    if( key > 0 && key <= mEntries.size() ) mEntries[key - 1].second.reset();
 }
 
 double MBMesquite::StopWatchCollection::total_time( const MBMesquite::StopWatchCollection::Key key ) const
 {
-    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" )
-        return mEntries[ key - 1 ].second.total_time( );
+    if( key > 0 && key <= mEntries.size() && mEntries[key - 1].first != "" )
+        return mEntries[key - 1].second.total_time();
     else
         return 0.0;
 }
 
 int MBMesquite::StopWatchCollection::number_of_starts( const MBMesquite::StopWatchCollection::Key key ) const
 {
-    if( key > 0 && key <= mEntries.size( ) && mEntries[ key - 1 ].first != "" )
-        return mEntries[ key - 1 ].second.number_of_starts( );
+    if( key > 0 && key <= mEntries.size() && mEntries[key - 1].first != "" )
+        return mEntries[key - 1].second.number_of_starts();
     else
         return 0;
 }
@@ -229,27 +229,27 @@ int MBMesquite::StopWatchCollection::number_of_starts( const MBMesquite::StopWat
   position of the vector.*/
 void MBMesquite::StopWatchCollection::get_keys_sorted_by_time( std::vector< Key >& sorted_keys )
 {
-    int  num_watches = mEntries.size( );
-    int* sorted_indices = new int[ num_watches ];
-    int  i = 0;
-    int  counter = 0;
+    int num_watches     = mEntries.size();
+    int* sorted_indices = new int[num_watches];
+    int i               = 0;
+    int counter         = 0;
     for( i = 0; i < num_watches; ++i )
     {
-        sorted_indices[ i ] = 0;
+        sorted_indices[i] = 0;
     }
     double current_max;
-    int    index_to_max;
+    int index_to_max;
     // While we haven't added all of the Keys to the vector
     while( counter < num_watches )
     {
-        current_max = -1;
+        current_max  = -1;
         index_to_max = -1;
         // loop over the times and find the largest remaining
         for( i = 0; i < num_watches; ++i )
         {
-            if( mEntries[ i ].second.total_time( ) > current_max && sorted_indices[ i ] == 0 )
+            if( mEntries[i].second.total_time() > current_max && sorted_indices[i] == 0 )
             {
-                current_max = mEntries[ i ].second.total_time( );
+                current_max  = mEntries[i].second.total_time();
                 index_to_max = i;
             }
         }
@@ -258,10 +258,10 @@ void MBMesquite::StopWatchCollection::get_keys_sorted_by_time( std::vector< Key 
         // time equal to current_max;
         for( i = index_to_max; i < num_watches; ++i )
         {
-            if( mEntries[ i ].second.total_time( ) >= current_max && sorted_indices[ i ] == 0 )
+            if( mEntries[i].second.total_time() >= current_max && sorted_indices[i] == 0 )
             {
                 counter++;
-                sorted_indices[ i ] = counter;
+                sorted_indices[i] = counter;
                 sorted_keys.push_back( i + 1 );
             }
         }
@@ -277,15 +277,15 @@ std::ostream& MBMesquite::operator<<( std::ostream& str, MBMesquite::StopWatchCo
 {
     std::vector< MBMesquite::StopWatchCollection::Key > sorted_keys;
     MBMesquite::GlobalStopWatches.get_keys_sorted_by_time( sorted_keys );
-    int number_of_keys = sorted_keys.size( );
-    int i = 0;
+    int number_of_keys = sorted_keys.size();
+    int i              = 0;
     str << "\nTIME        | NUM. STARTS | TIMER NAME (" << number_of_keys << " timers)\n";
     for( i = 0; i < number_of_keys; ++i )
     {
         str << std::setiosflags( std::ios::left ) << std::setw( 13 )
-            << MBMesquite::GlobalStopWatches.total_time( sorted_keys[ i ] ) << " " << std::setw( 13 )
-            << MBMesquite::GlobalStopWatches.number_of_starts( sorted_keys[ i ] ) << " "
-            << MBMesquite::GlobalStopWatches.get_string( sorted_keys[ i ] ) << std::endl;
+            << MBMesquite::GlobalStopWatches.total_time( sorted_keys[i] ) << " " << std::setw( 13 )
+            << MBMesquite::GlobalStopWatches.number_of_starts( sorted_keys[i] ) << " "
+            << MBMesquite::GlobalStopWatches.get_string( sorted_keys[i] ) << std::endl;
     }
     return str;
 }

@@ -53,7 +53,7 @@
 #include <iostream>
 #include <sstream>
 
-const char         BRIEF_DESC[] = "Example of gather scatter with tuple lists \n";
+const char BRIEF_DESC[] = "Example of gather scatter with tuple lists \n";
 std::ostringstream LONG_DESC;
 
 using namespace moab;
@@ -65,11 +65,11 @@ int main( int argc, char** argv )
     MPI_Init( &argc, &argv );
 
     // Initialize error handler, required for this example (not using a moab instance)
-    MBErrorHandler_Init( );
+    MBErrorHandler_Init();
 
     ProcConfig pc( MPI_COMM_WORLD );
-    int        size = pc.proc_size( );
-    int        rank = pc.proc_rank( );
+    int size = pc.proc_size();
+    int rank = pc.proc_rank();
 
     // Start copy
     LONG_DESC << "This program does a gather scatter with a list of tuples. \n"
@@ -79,7 +79,7 @@ int main( int argc, char** argv )
               << "The number of tuples and how many tasks to communicate to are controlled by "
                  "input parameters.\n"
               << "After communication, we verify locally if we received what we expected. \n";
-    ProgOptions opts( LONG_DESC.str( ), BRIEF_DESC );
+    ProgOptions opts( LONG_DESC.str(), BRIEF_DESC );
 
     // How many procs communicate to current proc, on average (we will vary that too)
     int num_comms = 2;
@@ -107,7 +107,7 @@ int main( int argc, char** argv )
 
     // Send some data from proc i to i + n/2, also to i + n/2 + 1 modulo n, where n is num procs
 
-    gs_data::crystal_data* cd = pc.crystal_router( );
+    gs_data::crystal_data* cd = pc.crystal_router();
 
     long total_n_tuples = num_comms * num_tuples;
 
@@ -129,21 +129,21 @@ int main( int argc, char** argv )
     // might grow more than others. By doing these logP sends/receives, we do not grow local memory
     // too much.
     tl.initialize( 1, 1, 0, 1, num_tuples * num_comms );
-    tl.enableWriteAccess( );
+    tl.enableWriteAccess();
     // Form num_tuples*num_comms tuples, send to various ranks
-    unsigned int n = tl.get_n( );
+    unsigned int n = tl.get_n();
     for( int i = 0; i < num_comms; i++ )
     {
-        int sendTo = rank + i * size / 2 + 1;  // Spread out the send to, for a stress-like test
-        sendTo = sendTo % size;  //
+        int sendTo     = rank + i * size / 2 + 1;  // Spread out the send to, for a stress-like test
+        sendTo         = sendTo % size;            //
         long intToSend = 1000 * rank + 100000 * sendTo;
         for( int j = 0; j < num_tuples; j++ )
         {
-            n = tl.get_n( );
-            tl.vi_wr[ n ] = sendTo;
-            tl.vl_wr[ n ] = intToSend + j;
-            tl.vr_wr[ n ] = 10000. * rank + j;
-            tl.inc_n( );
+            n           = tl.get_n();
+            tl.vi_wr[n] = sendTo;
+            tl.vl_wr[n] = intToSend + j;
+            tl.vr_wr[n] = 10000. * rank + j;
+            tl.inc_n();
         }
     }
 
@@ -153,13 +153,13 @@ int main( int argc, char** argv )
         tl.print( " before sending" );
     }
 
-    clock_t tt = clock( );
+    clock_t tt = clock();
     // All communication happens here; no mpi calls for the user
     ErrorCode rval = cd->gs_transfer( 1, tl, 0 );MB_CHK_SET_ERR( rval, "Error in tuple transfer" );
 
     double secs = 0;
     if( rank == reportrank || ( reportrank >= size && 0 == rank ) )
-    { secs = ( clock( ) - tt ) / (double)CLOCKS_PER_SEC; }
+    { secs = ( clock() - tt ) / (double)CLOCKS_PER_SEC; }
     if( rank == reportrank )
     {
         cout << "rank " << rank << "\n";
@@ -167,12 +167,12 @@ int main( int argc, char** argv )
     }
 
     // Check that all tuples received have the form 10000*rank + 100*from
-    unsigned int received = tl.get_n( );
+    unsigned int received = tl.get_n();
     for( int i = 0; i < (int)received; i++ )
     {
-        int  from = tl.vi_rd[ i ];
-        long valrec = tl.vl_rd[ i ];
-        int  remainder = valrec - 100000 * rank - 1000 * from;
+        int from      = tl.vi_rd[i];
+        long valrec   = tl.vl_rd[i];
+        int remainder = valrec - 100000 * rank - 1000 * from;
         if( remainder < 0 || remainder >= num_tuples * 4 )
             cout << " error: tuple " << i << " received at proc rank " << rank << " from proc " << from << " has value "
                  << valrec << " remainder " << remainder << "\n";
@@ -182,13 +182,13 @@ int main( int argc, char** argv )
     {
         cout << "communication of about " << total_n_tuples << " tuples/per proc took " << secs << " seconds"
              << "\n";
-        tt = clock( );
+        tt = clock();
     }
 
     // Finalize error handler, required for this example (not using a moab instance)
-    MBErrorHandler_Finalize( );
+    MBErrorHandler_Finalize();
 
-    MPI_Finalize( );
+    MPI_Finalize();
 #else
     std::cout << " Build with MPI for this example to work\n";
 #endif

@@ -39,7 +39,7 @@ class HigherOrderFactory
 {
   public:
     HigherOrderFactory( Core*, Interface::HONodeAddedRemoved* function_object );
-    ~HigherOrderFactory( );
+    ~HigherOrderFactory();
 
     ErrorCode convert( const EntityHandle meshset, const bool mid_edge_nodes, const bool mid_face_nodes,
                        const bool mid_volume_nodes );
@@ -47,13 +47,13 @@ class HigherOrderFactory
     ErrorCode convert( const Range& entities, const bool mid_edge_nodes, const bool mid_face_nodes,
                        const bool mid_volume_nodes );
 
-    unsigned char mNodeMap[ MBMAXTYPE ][ 8 ][ 8 ];
+    unsigned char mNodeMap[MBMAXTYPE][8][8];
 
   private:
     // static bool mMapInitialized;
-    void initialize_map( );
+    void initialize_map();
 
-    Core*                          mMB;
+    Core* mMB;
     Interface::HONodeAddedRemoved* mHONodeAddedRemoved;
 
     ErrorCode convert_sequence( ElementSequence* sequence, EntityHandle sequence_subset_start,
@@ -75,7 +75,7 @@ class HigherOrderFactory
     //! returns zero if none found
     //! entities that share those corner nodes and have space allocated for mid face nodes are
     //! returned in a vector
-    EntityHandle center_node_exist( EntityHandle corners[ 4 ], std::vector< EntityHandle >& adj_entities );
+    EntityHandle center_node_exist( EntityHandle corners[4], std::vector< EntityHandle >& adj_entities );
 
     //! adds a center node to element between corner nodes, returns success
     bool add_center_node( EntityType type, EntityHandle* element_conn, int conn_size, EntityHandle corner_node1,
@@ -100,8 +100,8 @@ class HigherOrderFactory
     ErrorCode remove_ho_nodes( ElementSequence* sequence, EntityHandle subset_start_handle,
                                EntityHandle subset_end_handle, int nodes_per_elem_to_remove,
                                int elem_conn_offset_to_remove, Tag deletable_nodes );
-    bool      tag_for_deletion( EntityHandle element_with_node, int node_index_in_elem_connectivity,
-                                ElementSequence* sequence );
+    bool tag_for_deletion( EntityHandle element_with_node, int node_index_in_elem_connectivity,
+                           ElementSequence* sequence );
 };
 
 }  // namespace moab

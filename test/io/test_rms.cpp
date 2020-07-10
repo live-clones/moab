@@ -24,7 +24,7 @@ int compare_connect( int* connect1, int* connect2, const int num_comps );
 
 #include <iostream>
 
-int main( )
+int main()
 {
     // very basic test of RMBSet
     // The test: instantiate a mesh with 2 tet elements sharing a face;
@@ -60,7 +60,7 @@ int main( )
     double nodex[] = { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 };
     double nodey[] = { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 };
     double nodez[] = { 0.0, 0.0, 0.0, 1.0, -1.0, -2.0, -2.0, -2.0, -3.0 };
-    int    connect[] = { 1, 2, 3, 4, 3, 2, 1, 5, 6, 7, 8, 5, 8, 7, 6, 9 };
+    int connect[]  = { 1, 2, 3, 4, 3, 2, 1, 5, 6, 7, 8, 5, 8, 7, 6, 9 };
 
     const int NUM_NODES = 9;
 
@@ -69,26 +69,26 @@ int main( )
 
     // construct two RMS's holding each pair of elements
     MB_RMBSet elem_rms1( 2, connect, 1, TSTT_REGION, TSTT_TETRAHEDRON );
-    MB_RMBSet elem_rms2( 2, &connect[ 8 ], 3, TSTT_REGION, TSTT_TETRAHEDRON );
+    MB_RMBSet elem_rms2( 2, &connect[8], 3, TSTT_REGION, TSTT_TETRAHEDRON );
 
     // now do some querying on this mesh
 
     // INFO FUNCTIONS
-    int entity_type1 = node_rms.entity_type( );
-    int entity_type2 = elem_rms1.entity_type( );
+    int entity_type1 = node_rms.entity_type();
+    int entity_type2 = elem_rms1.entity_type();
     if( entity_type1 != TSTT_VERTEX || entity_type2 != TSTT_REGION )
         std::cout << "entity_type() function failed." << std::endl;
 
-    int entity_topo = elem_rms1.entity_topology( );
+    int entity_topo = elem_rms1.entity_topology();
     if( entity_topo != TSTT_TETRAHEDRON ) std::cout << "entity_topology() function failed." << std::endl;
 
-    int num_ents1 = node_rms.num_entities( );
-    int num_ents2 = elem_rms1.num_entities( );
+    int num_ents1 = node_rms.num_entities();
+    int num_ents2 = elem_rms1.num_entities();
     if( num_ents1 != NUM_NODES || num_ents2 != 2 )
         std::cout << "num_entities() function failed for" << ( num_ents1 != NUM_NODES ? "(nodes)" : "" )
                   << ( num_ents2 != 2 ? "(elems)" : "" ) << std::endl;
 
-    int vpe = elem_rms1.vertices_per_element( );
+    int vpe = elem_rms1.vertices_per_element();
     if( vpe != 4 ) std::cout << "vertices_per_element() failed." << std::endl;
 
     // NODES
@@ -105,9 +105,9 @@ int main( )
       else std::cout << "get_coordinates didn't work; result = " << result << "." << std::endl;
     */
     // node_x, node_y, node_z
-    int     num_nodes = NUM_NODES;
-    double  xval[ NUM_NODES ], yval[ NUM_NODES ], zval[ NUM_NODES ];
-    double *xvalp = &xval[ 0 ], *yvalp = &yval[ 0 ], *zvalp = &zval[ 0 ];
+    int num_nodes = NUM_NODES;
+    double xval[NUM_NODES], yval[NUM_NODES], zval[NUM_NODES];
+    double *xvalp = &xval[0], *yvalp = &yval[0], *zvalp = &zval[0];
     node_rms.node_x( 1, NUM_NODES, &xvalp, &num_nodes );
     node_rms.node_y( 1, NUM_NODES, &yvalp, &num_nodes );
     node_rms.node_z( 1, NUM_NODES, &zvalp, &num_nodes );
@@ -118,9 +118,9 @@ int main( )
     int i;
     for( i = 1; i <= NUM_NODES; i++ )
     {
-        nodex[ i - 1 ] = (double)i;
-        nodey[ i - 1 ] = (double)i;
-        nodez[ i - 1 ] = (double)i;
+        nodex[i - 1] = (double)i;
+        nodey[i - 1] = (double)i;
+        nodez[i - 1] = (double)i;
     }
     node_rms.set_node_x( 1, NUM_NODES, nodex, NUM_NODES );
     node_rms.set_node_y( 1, NUM_NODES, nodey, NUM_NODES );
@@ -133,9 +133,9 @@ int main( )
 
     // ELEMENTS
     // elem_connectivity
-    int* connect2 = NULL;
-    int  size_connect2 = 0;
-    bool status = elem_rms1.elem_connectivity( 1, 2, &connect2, &size_connect2 );
+    int* connect2     = NULL;
+    int size_connect2 = 0;
+    bool status       = elem_rms1.elem_connectivity( 1, 2, &connect2, &size_connect2 );
     if( status != true ) std::cout << "elem_connectivity() RETURN VALUE failed." << std::endl;
     if( 8 != size_connect2 ) std::cout << "re-sizing of connect2 vector failed." << std::endl;
 
@@ -145,7 +145,7 @@ int main( )
     // set_elem_connectivity
     // reverse the connectivity
     for( i = 1; i <= 8; i++ )
-        connect2[ i - 1 ] = connect[ 8 - i ];
+        connect2[i - 1] = connect[8 - i];
     elem_rms1.set_elem_connectivity( 1, 2, connect2, size_connect2 );
     status = elem_rms1.elem_connectivity( 1, 2, &connect2, &size_connect2 );
     if( status != true ) std::cout << "set_elem_connectivity() RETURN VALUE failed." << std::endl;
@@ -192,8 +192,8 @@ int compare_coords( double* xval, double* yval, double* zval, double* nodex, dou
     int i, result = 0;
     for( i = 0; i < num_nodes; i++ )
     {
-        if( xval[ i ] != nodex[ i ] || yval[ i ] != nodey[ i ] || zval[ i ] != nodez[ i ] ) result++;
-        xval[ i ] = yval[ i ] = zval[ i ] = -2.0;
+        if( xval[i] != nodex[i] || yval[i] != nodey[i] || zval[i] != nodez[i] ) result++;
+        xval[i] = yval[i] = zval[i] = -2.0;
     }
     return result;
 }
@@ -203,8 +203,8 @@ int compare_connect( int* connect1, int* connect2, const int num_comps )
     int i, result = 0;
     for( i = 0; i < num_comps; i++ )
     {
-        if( connect1[ i ] != connect2[ i ] ) result++;
-        connect2[ i ] = -1;
+        if( connect1[i] != connect2[i] ) result++;
+        connect2[i] = -1;
     }
 
     return result;

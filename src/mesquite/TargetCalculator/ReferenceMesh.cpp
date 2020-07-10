@@ -38,16 +38,16 @@
 namespace MBMesquite
 {
 
-ReferenceMeshInterface::~ReferenceMeshInterface( ) {}
+ReferenceMeshInterface::~ReferenceMeshInterface() {}
 
-ReferenceMesh::~ReferenceMesh( ) {}
+ReferenceMesh::~ReferenceMesh() {}
 
 void ReferenceMesh::get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices, size_t num_vertices,
                                                       Vector3D* coordinates_out, MsqError& err )
 {
     tmpStorage.resize( num_vertices );
     mMesh->vertices_get_coordinates( vertices, arrptr( tmpStorage ), num_vertices, err );MSQ_ERRRTN( err );
-    std::copy( tmpStorage.begin( ), tmpStorage.end( ), coordinates_out );
+    std::copy( tmpStorage.begin(), tmpStorage.end(), coordinates_out );
 }
 
 }  // namespace MBMesquite

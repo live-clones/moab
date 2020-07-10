@@ -31,7 +31,7 @@ using namespace moab;
 void print_usage( char** argv )
 {
     std::cerr << "Usage: ";
-    std::cerr << argv[ 0 ]
+    std::cerr << argv[0]
               << " -meshes <source_mesh> <target_mesh> -itag <interp_tag> [-gnorm <gnorm_tag>] "
                  "[-ssnorm <ssnorm_tag> <ssnorm_selection>] [-ropts <roptions>] [-outfile "
                  "<out_file> [-wopts <woptions>]] [-dbgout [<dbg_file>]]"
@@ -110,12 +110,12 @@ int main( int argc, char** argv )
 
     std::vector< const char* > ssTagNames, ssTagValues;
     std::vector< std::string > meshFiles;
-    std::string                interpTag, gNormTag, ssNormTag, readOpts, outFile, writeOpts, dbgFile;
-    DataCoupler::Method        method = DataCoupler::CONSTANT;
+    std::string interpTag, gNormTag, ssNormTag, readOpts, outFile, writeOpts, dbgFile;
+    DataCoupler::Method method = DataCoupler::CONSTANT;
 
     ErrorCode result = MB_SUCCESS;
-    bool      help = false;
-    double    toler = 5.e-10;
+    bool help        = false;
+    double toler     = 5.e-10;
     result = get_file_options( argc, argv, meshFiles, method, interpTag, gNormTag, ssNormTag, ssTagNames, ssTagValues,
                                readOpts, outFile, writeOpts, dbgFile, help, toler );
 
@@ -123,7 +123,7 @@ int main( int argc, char** argv )
     {
         print_usage( argv );
 #ifdef MOAB_HAVE_MPI
-        err = MPI_Finalize( );
+        err = MPI_Finalize();
         if( err != 0 )
         {
             std::cout << "MPI Initialization did not succeed.\n";
@@ -138,41 +138,41 @@ int main( int argc, char** argv )
 #ifdef MOAB_HAVE_MPI
     err = MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
     err = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-    std::vector< ParallelComm* > pcs( meshFiles.size( ) );
+    std::vector< ParallelComm* > pcs( meshFiles.size() );
 #endif
 
     // Redirect stdout and stderr if dbgFile is not null
-    if( !dbgFile.empty( ) )
+    if( !dbgFile.empty() )
     {
         std::stringstream dfname;
         dfname << dbgFile << rank << ".txt";
-        if( !std::freopen( dfname.str( ).c_str( ), "a", stdout ) ) return 2;
-        if( !std::freopen( dfname.str( ).c_str( ), "a", stderr ) ) return 2;
+        if( !std::freopen( dfname.str().c_str(), "a", stdout ) ) return 2;
+        if( !std::freopen( dfname.str().c_str(), "a", stderr ) ) return 2;
     }
 
     // Create MOAB instance based on that
-    Interface* mbImpl = new( std::nothrow ) Core( );
+    Interface* mbImpl = new( std::nothrow ) Core();
     if( NULL == mbImpl ) return 1;
 
     // Read in mesh(es)
 
     // Create root sets for each mesh using moab
-    std::vector< EntityHandle > roots( meshFiles.size( ) );
+    std::vector< EntityHandle > roots( meshFiles.size() );
 
-    for( unsigned int i = 0; i < meshFiles.size( ); i++ )
+    for( unsigned int i = 0; i < meshFiles.size(); i++ )
     {
-        std::string        newReadopts;
+        std::string newReadopts;
         std::ostringstream extraOpt;
 #ifdef MOAB_HAVE_MPI
-        pcs[ i ] = new ParallelComm( mbImpl, MPI_COMM_WORLD );
-        int index = pcs[ i ]->get_id( );
+        pcs[i]    = new ParallelComm( mbImpl, MPI_COMM_WORLD );
+        int index = pcs[i]->get_id();
         extraOpt << ";PARALLEL_COMM=" << index;
-        newReadopts = readOpts + extraOpt.str( );
+        newReadopts = readOpts + extraOpt.str();
 #endif
 
-        result = mbImpl->create_meshset( MESHSET_SET, roots[ i ] );
+        result = mbImpl->create_meshset( MESHSET_SET, roots[i] );
         PRINT_LAST_ERROR;
-        result = mbImpl->load_file( meshFiles[ i ].c_str( ), &roots[ i ], newReadopts.c_str( ) );
+        result = mbImpl->load_file( meshFiles[i].c_str(), &roots[i], newReadopts.c_str() );
         PRINT_LAST_ERROR;
     }
 
@@ -197,33 +197,33 @@ int main( int argc, char** argv )
                 nprocs );
 
     // Output mesh
-    if( !outFile.empty( ) )
+    if( !outFile.empty() )
     {
         Range partSets;
         // Only save the target mesh
-        partSets.insert( (EntityHandle)roots[ 1 ] );
-        std::string        newwriteOpts = writeOpts;
+        partSets.insert( (EntityHandle)roots[1] );
+        std::string newwriteOpts = writeOpts;
         std::ostringstream extraOpt;
 #ifdef MOAB_HAVE_MPI
         extraOpt << ";PARALLEL_COMM=" << 1;
-        newwriteOpts += extraOpt.str( );
+        newwriteOpts += extraOpt.str();
 #endif
-        result = mbImpl->write_file( outFile.c_str( ), NULL, newwriteOpts.c_str( ), partSets );
+        result = mbImpl->write_file( outFile.c_str(), NULL, newwriteOpts.c_str(), partSets );
         PRINT_LAST_ERROR;
         std::cout << "Wrote " << outFile << std::endl;
         std::cout << "mbcoupler_test complete." << std::endl;
     }
 
 #ifdef MOAB_HAVE_MPI
-    for( unsigned int i = 0; i < meshFiles.size( ); i++ )
-        delete pcs[ i ];
+    for( unsigned int i = 0; i < meshFiles.size(); i++ )
+        delete pcs[i];
 #endif
 
     delete mbImpl;
     // May be leaking iMeshInst, don't care since it's end of program. Remove above deletes?
 
 #ifdef MOAB_HAVE_MPI
-    err = MPI_Finalize( );
+    err = MPI_Finalize();
 #endif
 
     return 0;
@@ -232,44 +232,44 @@ int main( int argc, char** argv )
 #ifdef MOAB_HAVE_MPI
 ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs, const bool print_results )
 {
-    Range     iface_ents[ 6 ];
+    Range iface_ents[6];
     ErrorCode result = MB_SUCCESS, tmp_result;
 
     // Now figure out which vertices are shared
-    for( unsigned int p = 0; p < pcs.size( ); p++ )
+    for( unsigned int p = 0; p < pcs.size(); p++ )
     {
         for( int i = 0; i < 4; i++ )
         {
-            tmp_result = pcs[ p ]->get_iface_entities( -1, i, iface_ents[ i ] );
+            tmp_result = pcs[p]->get_iface_entities( -1, i, iface_ents[i] );
 
             if( MB_SUCCESS != tmp_result )
             {
-                std::cerr << "get_iface_entities returned error on proc " << pcs[ p ]->proc_config( ).proc_rank( )
+                std::cerr << "get_iface_entities returned error on proc " << pcs[p]->proc_config().proc_rank()
                           << "; message: " << std::endl;
                 std::string last_error;
                 result = mbImpl->get_last_error( last_error );
-                if( last_error.empty( ) )
+                if( last_error.empty() )
                     std::cerr << "(none)" << std::endl;
                 else
                     std::cerr << last_error << std::endl;
                 result = tmp_result;
             }
-            if( 0 != i ) iface_ents[ 4 ].merge( iface_ents[ i ] );
+            if( 0 != i ) iface_ents[4].merge( iface_ents[i] );
         }
     }
 
     // Report # iface entities
-    result = mbImpl->get_adjacencies( iface_ents[ 4 ], 0, false, iface_ents[ 5 ], Interface::UNION );
+    result = mbImpl->get_adjacencies( iface_ents[4], 0, false, iface_ents[5], Interface::UNION );
 
     int rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
-    if( print_results || iface_ents[ 0 ].size( ) != iface_ents[ 5 ].size( ) )
+    if( print_results || iface_ents[0].size() != iface_ents[5].size() )
     {
         std::cerr << "Proc " << rank << " iface entities: " << std::endl;
         for( int i = 0; i < 4; i++ )
-            std::cerr << "    " << iface_ents[ i ].size( ) << " " << i << "d iface entities." << std::endl;
-        std::cerr << "    (" << iface_ents[ 5 ].size( ) << " verts adj to other iface ents)" << std::endl;
+            std::cerr << "    " << iface_ents[i].size() << " " << i << "d iface entities." << std::endl;
+        std::cerr << "    (" << iface_ents[5].size() << " verts adj to other iface ents)" << std::endl;
     }
 
     return result;
@@ -280,7 +280,7 @@ ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pc
 // Return true if one is found. False otherwise.
 bool check_for_flag( const char* str )
 {
-    if( '-' == str[ 0 ] )
+    if( '-' == str[0] )
         return true;
     else
         return false;
@@ -295,23 +295,23 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 {
     // Initialize some of the outputs to null values indicating not present
     // in the argument list.
-    gNormTag = "";
+    gNormTag  = "";
     ssNormTag = "";
-    readOpts = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;PARALLEL_"
+    readOpts  = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;PARALLEL_"
                "RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME";
-    outFile = "";
-    writeOpts = "PARALLEL=WRITE_PART;CPUTIME";
-    dbgFile = "";
-    std::string defaultDbgFile = argv[ 0 ];  // The executable name will be the default debug output file.
+    outFile                    = "";
+    writeOpts                  = "PARALLEL=WRITE_PART;CPUTIME";
+    dbgFile                    = "";
+    std::string defaultDbgFile = argv[0];  // The executable name will be the default debug output file.
 
     // These will indicate if we've gotten our required parameters at the end of parsing.
-    bool haveMeshes = false;
+    bool haveMeshes    = false;
     bool haveInterpTag = false;
 
     // Loop over the values in argv pulling out an parsing each one
     int npos = 1;
 
-    if( argc > 1 && argv[ 1 ] == std::string( "-h" ) )
+    if( argc > 1 && argv[1] == std::string( "-h" ) )
     {
         help = true;
         return MB_SUCCESS;
@@ -319,7 +319,7 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
     while( npos < argc )
     {
-        if( argv[ npos ] == std::string( "-meshes" ) )
+        if( argv[npos] == std::string( "-meshes" ) )
         {
             // Parse out the mesh filenames
             npos++;
@@ -327,8 +327,8 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
             meshFiles.resize( numFiles );
             for( int i = 0; i < numFiles; i++ )
             {
-                if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                    meshFiles[ i ] = argv[ npos++ ];
+                if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                    meshFiles[i] = argv[npos++];
                 else
                 {
                     std::cerr << "    ERROR - missing correct number of mesh filenames" << std::endl;
@@ -338,12 +338,12 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
             haveMeshes = true;
         }
-        else if( argv[ npos ] == std::string( "-itag" ) )
+        else if( argv[npos] == std::string( "-itag" ) )
         {
             // Parse out the interpolation tag
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                interpTag = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                interpTag = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <interp_tag>" << std::endl;
@@ -352,17 +352,17 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
             haveInterpTag = true;
         }
-        else if( argv[ npos ] == std::string( "-meth" ) )
+        else if( argv[npos] == std::string( "-meth" ) )
         {
             // Parse out the interpolation tag
             npos++;
-            if( argv[ npos ][ 0 ] == '0' )
+            if( argv[npos][0] == '0' )
                 method = DataCoupler::CONSTANT;
-            else if( argv[ npos ][ 0 ] == '1' )
+            else if( argv[npos][0] == '1' )
                 method = DataCoupler::LINEAR_FE;
-            else if( argv[ npos ][ 0 ] == '2' )
+            else if( argv[npos][0] == '2' )
                 method = DataCoupler::QUADRATIC_FE;
-            else if( argv[ npos ][ 0 ] == '3' )
+            else if( argv[npos][0] == '3' )
                 method = DataCoupler::SPECTRAL;
             else
             {
@@ -371,48 +371,48 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
             }
             npos++;
         }
-        else if( argv[ npos ] == std::string( "-eps" ) )
+        else if( argv[npos] == std::string( "-eps" ) )
         {
             // Parse out the tolerance
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                epsilon = atof( argv[ npos++ ] );
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                epsilon = atof( argv[npos++] );
             else
             {
                 std::cerr << "    ERROR - missing <epsilon>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-gnorm" ) )
+        else if( argv[npos] == std::string( "-gnorm" ) )
         {
             // Parse out the global normalization tag
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                gNormTag = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                gNormTag = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <gnorm_tag>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-ssnorm" ) )
+        else if( argv[npos] == std::string( "-ssnorm" ) )
         {
             // Parse out the subset normalization tag and selection criteria
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                ssNormTag = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                ssNormTag = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <ssnorm_tag>" << std::endl;
                 return MB_FAILURE;
             }
 
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
             {
-                char*                opts = argv[ npos++ ];
-                char                 sep1[ 1 ] = { ';' };
-                char                 sep2[ 1 ] = { '=' };
-                bool                 end_vals_seen = false;
+                char* opts         = argv[npos++];
+                char sep1[1]       = { ';' };
+                char sep2[1]       = { '=' };
+                bool end_vals_seen = false;
                 std::vector< char* > tmpTagOpts;
 
                 // First get the options
@@ -420,9 +420,9 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                     tmpTagOpts.push_back( i );
 
                 // Parse out the name and val or just name.
-                for( unsigned int j = 0; j < tmpTagOpts.size( ); j++ )
+                for( unsigned int j = 0; j < tmpTagOpts.size(); j++ )
                 {
-                    char* e = strtok( tmpTagOpts[ j ], sep2 );
+                    char* e = strtok( tmpTagOpts[j], sep2 );
                     ssTagNames.push_back( e );
                     e = strtok( 0, sep2 );
                     if( e != NULL )
@@ -438,7 +438,7 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                         }
                         // Otherwise get the value string from e and convert it to an int
                         int* valp = new int;
-                        *valp = atoi( e );
+                        *valp     = atoi( e );
                         ssTagValues.push_back( (const char*)valp );
                     }
                     else
@@ -455,56 +455,56 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-ropts" ) )
+        else if( argv[npos] == std::string( "-ropts" ) )
         {
             // Parse out the mesh file read options
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                readOpts = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                readOpts = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <roptions>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-outfile" ) )
+        else if( argv[npos] == std::string( "-outfile" ) )
         {
             // Parse out the output file name
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                outFile = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                outFile = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <out_file>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-wopts" ) )
+        else if( argv[npos] == std::string( "-wopts" ) )
         {
             // Parse out the output file write options
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                writeOpts = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                writeOpts = argv[npos++];
             else
             {
                 std::cerr << "    ERROR - missing <woptions>" << std::endl;
                 return MB_FAILURE;
             }
         }
-        else if( argv[ npos ] == std::string( "-dbgout" ) )
+        else if( argv[npos] == std::string( "-dbgout" ) )
         {
             // Parse out the debug output file name.
             // If no name then use the default.
             npos++;
-            if( ( npos < argc ) && ( !check_for_flag( argv[ npos ] ) ) )
-                dbgFile = argv[ npos++ ];
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                dbgFile = argv[npos++];
             else
                 dbgFile = defaultDbgFile;
         }
         else
         {
             // Unrecognized parameter.  Skip it and move along.
-            std::cerr << "    ERROR - Unrecognized parameter:" << argv[ npos ] << std::endl;
+            std::cerr << "    ERROR - Unrecognized parameter:" << argv[npos] << std::endl;
             std::cerr << "            Skipping..." << std::endl;
             npos++;
         }
@@ -513,9 +513,9 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
     if( !haveMeshes )
     {
         meshFiles.resize( 2 );
-        meshFiles[ 0 ] = std::string( TestDir + "/64bricks_1khex.h5m" );
-        meshFiles[ 1 ] = std::string( TestDir + "/64bricks_12ktet.h5m" );
-        std::cout << "Mesh files not entered; using default files " << meshFiles[ 0 ] << " and " << meshFiles[ 1 ]
+        meshFiles[0] = std::string( TestDir + "/64bricks_1khex.h5m" );
+        meshFiles[1] = std::string( TestDir + "/64bricks_12ktet.h5m" );
+        std::cout << "Mesh files not entered; using default files " << meshFiles[0] << " and " << meshFiles[1]
                   << std::endl;
     }
 
@@ -542,35 +542,35 @@ ErrorCode test_interpolation( Interface* mbImpl, DataCoupler::Method method, std
                               std::string& /* gNormTag */, std::string& /* ssNormTag */,
                               std::vector< const char* >& /* ssTagNames */,
                               std::vector< const char* >& /* ssTagValues */, std::vector< ParallelComm* >& pcs,
-                              double& instant_time, double& pointloc_time, double&         interp_time,
+                              double& instant_time, double& pointloc_time, double& interp_time,
                               double& /* gnorm_time */, double& /* ssnorm_time */, double& toler )
 {
     assert( method >= DataCoupler::CONSTANT && method <= DataCoupler::SPECTRAL );
 
     // Source is 1st mesh, target is 2nd
-    Range     src_elems, targ_elems, targ_verts;
-    ErrorCode result = pcs[ 0 ]->get_part_entities( src_elems, 3 );
+    Range src_elems, targ_elems, targ_verts;
+    ErrorCode result = pcs[0]->get_part_entities( src_elems, 3 );
     PRINT_LAST_ERROR;
 
     CpuTimer timer;
 
     // Instantiate a coupler, which also initializes the tree
-    DataCoupler dc( mbImpl, src_elems, 0, pcs[ 0 ] );
+    DataCoupler dc( mbImpl, src_elems, 0, pcs[0] );
 
     // Initialize spectral elements, if they exist
     // bool specSou = false, specTar = false;
     // result = mbc.initialize_spectral_elements((EntityHandle)roots[0], (EntityHandle)roots[1],
     // specSou, specTar);
 
-    instant_time = timer.time_since_birth( );
+    instant_time = timer.time_since_birth();
 
     // Get points from the target mesh to interpolate
     // We have to treat differently the case when the target is a spectral mesh
     // In that case, the points of interest are the GL points, not the vertex nodes
     std::vector< double > vpos;  // This will have the positions we are interested in
-    int                   numPointsOfInterest = 0;
+    int numPointsOfInterest = 0;
 #ifdef MOAB_HAVE_MPI
-    result = pcs[ 1 ]->get_part_entities( targ_elems, 3 );
+    result = pcs[1]->get_part_entities( targ_elems, 3 );
 #endif
     PRINT_LAST_ERROR;
 
@@ -584,40 +584,40 @@ ErrorCode test_interpolation( Interface* mbImpl, DataCoupler::Method method, std
 #ifdef MOAB_HAVE_MPI
     // Then get non-owned verts and subtract
     Range tmp_verts;
-    result = pcs[ 1 ]->get_pstatus_entities( 0, PSTATUS_NOT_OWNED, tmp_verts );
+    result = pcs[1]->get_pstatus_entities( 0, PSTATUS_NOT_OWNED, tmp_verts );
     PRINT_LAST_ERROR;
     targ_verts = subtract( targ_verts, tmp_verts );
 #endif
     // Get position of these entities; these are the target points
-    numPointsOfInterest = (int)targ_verts.size( );
-    vpos.resize( 3 * targ_verts.size( ) );
-    result = mbImpl->get_coords( targ_verts, &vpos[ 0 ] );
+    numPointsOfInterest = (int)targ_verts.size();
+    vpos.resize( 3 * targ_verts.size() );
+    result = mbImpl->get_coords( targ_verts, &vpos[0] );
     PRINT_LAST_ERROR;
 
     // Locate those points in the source mesh
 #ifdef MOAB_HAVE_MPI
-    std::cout << "rank " << pcs[ 0 ]->proc_config( ).proc_rank( );
+    std::cout << "rank " << pcs[0]->proc_config().proc_rank();
 #endif
     std::cout << " points of interest: " << numPointsOfInterest << "\n";
-    result = dc.locate_points( &vpos[ 0 ], numPointsOfInterest, toler );
+    result = dc.locate_points( &vpos[0], numPointsOfInterest, toler );
     PRINT_LAST_ERROR;
 
-    pointloc_time = timer.time_elapsed( );
+    pointloc_time = timer.time_elapsed();
 
     // Now interpolate tag onto target points
     std::vector< double > field( numPointsOfInterest );
 
-    result = dc.interpolate( method, interpTag, &field[ 0 ] );
+    result = dc.interpolate( method, interpTag, &field[0] );
     PRINT_LAST_ERROR;
 
-    interp_time = timer.time_elapsed( );
+    interp_time = timer.time_elapsed();
 
     // Set field values as tag on target vertices
     // Use original tag
     Tag tag;
-    result = mbImpl->tag_get_handle( interpTag.c_str( ), 1, MB_TYPE_DOUBLE, tag );
+    result = mbImpl->tag_get_handle( interpTag.c_str(), 1, MB_TYPE_DOUBLE, tag );
     PRINT_LAST_ERROR;
-    result = mbImpl->tag_set_data( tag, targ_verts, &field[ 0 ] );
+    result = mbImpl->tag_set_data( tag, targ_verts, &field[0] );
     PRINT_LAST_ERROR;
 
     // Done

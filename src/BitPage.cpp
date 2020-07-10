@@ -9,8 +9,8 @@ namespace moab
 void BitPage::search( unsigned char value, int offset, int count, int per_ent, Range& results,
                       EntityHandle start ) const
 {
-    const int       end = offset + count;
-    Range::iterator hint = results.begin( );
+    const int end        = offset + count;
+    Range::iterator hint = results.begin();
     while( offset != end )
     {
         if( get_bits( offset, per_ent ) == value ) hint = results.insert( hint, start );
@@ -27,7 +27,7 @@ BitPage::BitPage( int per_ent, unsigned char init_val )
     {
         default:
             assert( false );
-            abort( );
+            abort();
             break;  // must be power of two
             // Note: no breaks. fall through such that all bits in init_val are set
         case 1:

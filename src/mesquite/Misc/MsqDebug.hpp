@@ -96,7 +96,7 @@ class MsqDebug
     static bool get( unsigned flag );
 
     /**\brief Disable all debug streams */
-    static void disable_all( );
+    static void disable_all();
 
     /**\brief Get the output stream to be used for a given debug flag */
     static std::ostream& get_stream( unsigned flag );
@@ -124,13 +124,13 @@ class MsqDebug
     class InitializeFlags
     {
       public:
-        InitializeFlags( );
+        InitializeFlags();
     };
 
   private:
     static std::vector< std::ostream* > streams;
-    static std::vector< bool >          flags;
-    static InitializeFlags              init;
+    static std::vector< bool > flags;
+    static InitializeFlags init;
 };
 
 /** \brief Check if a debug flag is activated - evaluates to a bool.

@@ -22,7 +22,7 @@
 // *     main     *
 // *              *
 // ****************
-int main( )
+int main()
 {
     moab::ErrorCode rval;
     // MOAB functionality is accessed through an instance of the
@@ -38,10 +38,10 @@ int main( )
     // coordinates of each vertex.
 
     const unsigned NUMVTX = 27;  // The number of vertexes
-    const unsigned NUMHEX = 8;  // The number of hexahedrons
+    const unsigned NUMHEX = 8;   // The number of hexahedrons
 
     // This double array stores the x, y, z coordinate of each vertex.
-    const double vertex_coords[ 3 * NUMVTX ] = {
+    const double vertex_coords[3 * NUMVTX] = {
         0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 2, 0, 1, 2, 0, 2, 2, 0,
 
         0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1,
@@ -78,15 +78,15 @@ int main( )
     // conn are actual entity handles. This only works because MOAB
     // guarantees that entities (such as our vertexes) created at once
     // have adjacent entity handles.
-    moab::EntityHandle conn[ NUMHEX ][ 8 ] = { { 0, 1, 4, 3, 9, 10, 13, 12 },      { 1, 2, 5, 4, 10, 11, 14, 13 },
-                                               { 3, 4, 7, 6, 12, 13, 16, 15 },     { 4, 5, 8, 7, 13, 14, 17, 16 },
-                                               { 9, 10, 13, 12, 18, 19, 22, 21 },  { 10, 11, 14, 13, 19, 20, 23, 22 },
-                                               { 12, 13, 16, 15, 21, 22, 25, 24 }, { 13, 14, 17, 16, 22, 23, 26, 25 } };
+    moab::EntityHandle conn[NUMHEX][8] = { { 0, 1, 4, 3, 9, 10, 13, 12 },      { 1, 2, 5, 4, 10, 11, 14, 13 },
+                                           { 3, 4, 7, 6, 12, 13, 16, 15 },     { 4, 5, 8, 7, 13, 14, 17, 16 },
+                                           { 9, 10, 13, 12, 18, 19, 22, 21 },  { 10, 11, 14, 13, 19, 20, 23, 22 },
+                                           { 12, 13, 16, 15, 21, 22, 25, 24 }, { 13, 14, 17, 16, 22, 23, 26, 25 } };
 
     // Lets get the handle for the first vertex. Note that we can use
     // the square brackets operator on ranges just like vectors or
     // arrays:
-    moab::EntityHandle first_vertex_handle = vertex_handles[ 0 ];
+    moab::EntityHandle first_vertex_handle = vertex_handles[0];
 
     for( unsigned i = 0; i < NUMHEX; ++i )
     {
@@ -95,7 +95,7 @@ int main( )
             // Add first_vertex_handle to each element of conn. This ensures
             // that the handles are specified properly (i.e. when
             // first_vertex_handle > 0)
-            conn[ i ][ j ] = conn[ i ][ j ] + first_vertex_handle;
+            conn[i][j] = conn[i][j] + first_vertex_handle;
         }
     }
 
@@ -103,11 +103,11 @@ int main( )
     // create each hex using a call to the create_element method which
     // gives back an entity handle for the hex that was created. We'll
     // then insert that entity into a range:
-    moab::Range        hexahedron_handles;
+    moab::Range hexahedron_handles;
     moab::EntityHandle element;
     for( unsigned i = 0; i < NUMHEX; ++i )
     {
-        rval = mbcore.create_element( moab::MBHEX, conn[ i ], 8, element );MB_CHK_SET_ERR( rval, "create_element failed" );
+        rval = mbcore.create_element( moab::MBHEX, conn[i], 8, element );MB_CHK_SET_ERR( rval, "create_element failed" );
 
         hexahedron_handles.insert( element );
     }

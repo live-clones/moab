@@ -45,14 +45,15 @@ static const std::string& barrier_violated_msg =
         If a Barrier metric is used, you can only use untangled initial meshes.\n";
 
 class MsqError;
-template< unsigned R, unsigned C > class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 class TMetricBarrier : public TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetricBarrier( );
+    MESQUITE_EXPORT virtual ~TMetricBarrier();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const
+    MESQUITE_EXPORT virtual std::string get_name() const
     {
         return "TMetricBarrier";
     }
@@ -66,7 +67,7 @@ class TMetricBarrier : public TMetric
 class TMetricBarrier2D : public TMetricBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetricBarrier2D( );
+    MESQUITE_EXPORT virtual ~TMetricBarrier2D();
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
@@ -78,7 +79,7 @@ class TMetricBarrier2D : public TMetricBarrier
 class TMetricBarrier3D : public TMetricBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetricBarrier3D( );
+    MESQUITE_EXPORT virtual ~TMetricBarrier3D();
 
     /**\brief Evaluate \f$\mu(T)\f$
      *

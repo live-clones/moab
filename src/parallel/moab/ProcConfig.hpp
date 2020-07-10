@@ -33,16 +33,16 @@ class ProcConfig
   public:
     ProcConfig( MPI_Comm proc_comm );
 
-    ~ProcConfig( );
+    ~ProcConfig();
 
     //! Get the current processor number
-    unsigned proc_rank( ) const
+    unsigned proc_rank() const
     {
         return procRank;
     }
 
     //! Get the number of processors
-    unsigned proc_size( ) const
+    unsigned proc_size() const
     {
         return procSize;
     }
@@ -51,7 +51,7 @@ class ProcConfig
     gs_data::crystal_data* crystal_router( bool construct_if_missing = true );
 
     //! get/set the communicator for this proc config
-    MPI_Comm proc_comm( ) const
+    MPI_Comm proc_comm() const
     {
         return procComm;
     }

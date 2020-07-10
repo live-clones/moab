@@ -20,10 +20,10 @@ class SmartLaplacianSmoother : public RelaxationSmoother
     SmartLaplacianSmoother( ObjectiveFunction* OF = NULL ) : RelaxationSmoother( OF ) {}
 
     MESQUITE_EXPORT
-    ~SmartLaplacianSmoother( );
+    ~SmartLaplacianSmoother();
 
     MESQUITE_EXPORT
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
     MESQUITE_EXPORT
     static size_t num_inverted( PatchData& pd, MsqError& err );

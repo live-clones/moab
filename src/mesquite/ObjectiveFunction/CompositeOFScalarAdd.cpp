@@ -50,28 +50,29 @@ CompositeOFScalarAdd::CompositeOFScalarAdd( double alp, ObjectiveFunction* Obj1,
     : deleteObjFunc( delete_OF )
 {
     objFunc = Obj1;
-    mAlpha = alp;
+    mAlpha  = alp;
 }
 
 // Michael:  need to clean up here
-CompositeOFScalarAdd::~CompositeOFScalarAdd( )
+CompositeOFScalarAdd::~CompositeOFScalarAdd()
 {
     if( deleteObjFunc ) delete objFunc;
 }
 
-ObjectiveFunction* CompositeOFScalarAdd::clone( ) const
+ObjectiveFunction* CompositeOFScalarAdd::clone() const
 {
-    return new CompositeOFScalarAdd( mAlpha, objFunc->clone( ), true );
+    return new CompositeOFScalarAdd( mAlpha, objFunc->clone(), true );
 }
 
-void CompositeOFScalarAdd::clear( )
+void CompositeOFScalarAdd::clear()
 {
-    objFunc->clear( );
+    objFunc->clear();
 }
 
 void CompositeOFScalarAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-    objFunc->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+    objFunc->initialize_queue( mesh_and_domain, settings, err );
+    MSQ_ERRRTN( err );
 }
 
 bool CompositeOFScalarAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
@@ -98,7 +99,7 @@ bool CompositeOFScalarAdd::evaluate_with_gradient( EvalType type, PatchData& pd,
 }
 
 bool CompositeOFScalarAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                           std::vector< Vector3D >&    grad_out,
+                                                           std::vector< Vector3D >& grad_out,
                                                            std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
     bool ok = objFunc->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
@@ -115,7 +116,7 @@ bool CompositeOFScalarAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, 
     return !MSQ_CHKERR( err ) && ok;
 }
 
-int CompositeOFScalarAdd::min_patch_layers( ) const
+int CompositeOFScalarAdd::min_patch_layers() const
 {
-    return objFunc->min_patch_layers( );
+    return objFunc->min_patch_layers();
 }

@@ -48,10 +48,10 @@
 #include <stdio.h>
 
 /* Exit values */
-#define USAGE_ERROR 1
-#define READ_ERROR 2
-#define WRITE_ERROR 3
-#define OTHER_ERROR 4
+#define USAGE_ERROR   1
+#define READ_ERROR    2
+#define WRITE_ERROR   3
+#define OTHER_ERROR   4
 #define ENT_NOT_FOUND 5
 
 using namespace moab;
@@ -137,19 +137,19 @@ static void usage_error( const char* name )
 {
     print_usage( name, std::cerr );
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
     exit( USAGE_ERROR );
 }
 
-static void        list_formats( Interface* );
-static bool        parse_id_list( const char* string, std::set< int >& );
-static void        print_id_list( const char*, std::ostream& stream, const std::set< int >& list );
-static void        reset_times( );
-static void        write_times( std::ostream& stream );
-static void        remove_entities_from_sets( Interface* gMB, Range& dead_entities, Range& empty_sets );
-static void        remove_from_vector( std::vector< EntityHandle >& vect, const Range& ents_to_remove );
-static bool        make_opts_string( std::vector< std::string > options, std::string& result );
+static void list_formats( Interface* );
+static bool parse_id_list( const char* string, std::set< int >& );
+static void print_id_list( const char*, std::ostream& stream, const std::set< int >& list );
+static void reset_times();
+static void write_times( std::ostream& stream );
+static void remove_entities_from_sets( Interface* gMB, Range& dead_entities, Range& empty_sets );
+static void remove_from_vector( std::vector< EntityHandle >& vect, const Range& ents_to_remove );
+static bool make_opts_string( std::vector< std::string > options, std::string& result );
 static std::string percent_subst( const std::string& s, int val );
 
 static int process_partition_file( Interface* gMB, std::string& metis_partition_file );
@@ -166,52 +166,52 @@ int main( int argc, char* argv[] )
     bool tempestin = false, tempestout = false;
 #endif
 
-    Core       core;
+    Core core;
     Interface* gMB = &core;
-    ErrorCode  result;
-    Range      range;
+    ErrorCode result;
+    Range range;
 
 #if( defined( MOAB_HAVE_MPI ) && defined( MOAB_HAVE_TEMPESTREMAP ) )
     moab::ParallelComm* pcomm = new moab::ParallelComm( gMB, MPI_COMM_WORLD, 0 );
 #endif
 
-    bool                               append_rank = false;
-    bool                               percent_rank_subst = false;
-    int                                i, dim;
+    bool append_rank        = false;
+    bool percent_rank_subst = false;
+    int i, dim;
     std::list< std::string >::iterator j;
-    bool                               dims[ 4 ] = { false, false, false, false };
-    const char*                        format = NULL;  // output file format
-    std::list< std::string >           in;  // input file name list
-    std::string                        out;  // output file name
-    bool                               verbose = false;
-    std::set< int >                    geom[ 4 ], mesh[ 4 ];  // user-specified IDs
-    std::vector< EntityHandle >        set_list;  // list of user-specified sets to write
-    std::vector< std::string >         write_opts, read_opts;
-    std::string                        metis_partition_file;
+    bool dims[4]       = { false, false, false, false };
+    const char* format = NULL;    // output file format
+    std::list< std::string > in;  // input file name list
+    std::string out;              // output file name
+    bool verbose = false;
+    std::set< int > geom[4], mesh[4];      // user-specified IDs
+    std::vector< EntityHandle > set_list;  // list of user-specified sets to write
+    std::vector< std::string > write_opts, read_opts;
+    std::string metis_partition_file;
 #ifdef MOAB_HAVE_TEMPESTREMAP
     std::string globalid_tag_name;
-    int         spectral_order = 1;
+    int spectral_order = 1;
 #endif
 
     const char* const mesh_tag_names[] = { DIRICHLET_SET_TAG_NAME, NEUMANN_SET_TAG_NAME, MATERIAL_SET_TAG_NAME,
                                            PARALLEL_PARTITION_TAG_NAME };
-    const char* const geom_names[] = { "VERTEX", "CURVE", "SURFACE", "VOLUME" };
+    const char* const geom_names[]     = { "VERTEX", "CURVE", "SURFACE", "VOLUME" };
 
     // scan arguments
-    bool do_flag = true;
+    bool do_flag     = true;
     bool print_times = false;
-    bool generate[] = { false, false, false };
+    bool generate[]  = { false, false, false };
     bool pval;
     bool parallel = false, resolve_shared = false, exchange_ghosts = false;
     for( i = 1; i < argc; i++ )
     {
-        if( !argv[ i ][ 0 ] ) usage_error( argv[ 0 ] );
+        if( !argv[i][0] ) usage_error( argv[0] );
 
-        if( do_flag && argv[ i ][ 0 ] == '-' )
+        if( do_flag && argv[i][0] == '-' )
         {
-            if( !argv[ i ][ 1 ] || ( argv[ i ][ 1 ] != 'M' && argv[ i ][ 2 ] ) ) usage_error( argv[ 0 ] );
+            if( !argv[i][1] || ( argv[i][1] != 'M' && argv[i][2] ) ) usage_error( argv[0] );
 
-            switch( argv[ i ][ 1 ] )
+            switch( argv[i][1] )
             {
                     // do flag arguments:
                 case '-':
@@ -227,7 +227,7 @@ int main( int argc, char* argv[] )
                     break;
                 case 'h':
                 case 'H':
-                    print_help( argv[ 0 ] );
+                    print_help( argv[0] );
                     break;
                 case 'l':
                     list_formats( gMB );
@@ -241,8 +241,8 @@ int main( int argc, char* argv[] )
                     break;
                 case 'M':
                     parallel = true;
-                    if( argv[ i ][ 2 ] == '1' || argv[ i ][ 2 ] == '2' ) resolve_shared = true;
-                    if( argv[ i ][ 2 ] == '2' ) exchange_ghosts = true;
+                    if( argv[i][2] == '1' || argv[i][2] == '2' ) resolve_shared = true;
+                    if( argv[i][2] == '2' ) exchange_ghosts = true;
 #endif
 #ifdef MOAB_HAVE_TEMPESTREMAP
                 case 'B':
@@ -255,120 +255,120 @@ int main( int argc, char* argv[] )
                 case '1':
                 case '2':
                 case '3':
-                    dims[ argv[ i ][ 1 ] - '0' ] = true;
+                    dims[argv[i][1] - '0'] = true;
                     break;
                     // do options that require additional args:
                 default:
                     ++i;
-                    if( i == argc || argv[ i ][ 0 ] == '-' )
+                    if( i == argc || argv[i][0] == '-' )
                     {
-                        std::cerr << "Expected argument following " << argv[ i - 1 ] << std::endl;
-                        usage_error( argv[ 0 ] );
+                        std::cerr << "Expected argument following " << argv[i - 1] << std::endl;
+                        usage_error( argv[0] );
                     }
-                    if( argv[ i - 1 ][ 1 ] == 'I' )
+                    if( argv[i - 1][1] == 'I' )
                     {
-                        dim = atoi( argv[ i ] );
+                        dim = atoi( argv[i] );
                         if( dim < 1 || dim > 2 )
                         {
                             std::cerr << "Invalid dimension value following -I" << std::endl;
-                            usage_error( argv[ 0 ] );
+                            usage_error( argv[0] );
                         }
-                        generate[ dim ] = true;
+                        generate[dim] = true;
                         continue;
                     }
                     pval = false;
-                    switch( argv[ i - 1 ][ 1 ] )
+                    switch( argv[i - 1][1] )
                     {
                         case 'a':
-                            read_opts.push_back( std::string( "SAT_FILE=" ) + argv[ i ] );
+                            read_opts.push_back( std::string( "SAT_FILE=" ) + argv[i] );
                             pval = true;
                             break;
                         case 'f':
-                            format = argv[ i ];
-                            pval = true;
+                            format = argv[i];
+                            pval   = true;
                             break;
                         case 'o':
-                            write_opts.push_back( argv[ i ] );
+                            write_opts.push_back( argv[i] );
                             pval = true;
                             break;
                         case 'O':
-                            read_opts.push_back( argv[ i ] );
+                            read_opts.push_back( argv[i] );
                             pval = true;
                             break;
 #ifdef MOAB_HAVE_TEMPESTREMAP
                         case 'i':
-                            globalid_tag_name = std::string( argv[ i ] );
-                            pval = true;
+                            globalid_tag_name = std::string( argv[i] );
+                            pval              = true;
                             break;
                         case 'r':
-                            spectral_order = atoi( argv[ i ] );
-                            pval = true;
+                            spectral_order = atoi( argv[i] );
+                            pval           = true;
                             break;
 #endif
                         case 'v':
-                            pval = parse_id_list( argv[ i ], geom[ 3 ] );
+                            pval = parse_id_list( argv[i], geom[3] );
                             break;
                         case 's':
-                            pval = parse_id_list( argv[ i ], geom[ 2 ] );
+                            pval = parse_id_list( argv[i], geom[2] );
                             break;
                         case 'c':
-                            pval = parse_id_list( argv[ i ], geom[ 1 ] );
+                            pval = parse_id_list( argv[i], geom[1] );
                             break;
                         case 'V':
-                            pval = parse_id_list( argv[ i ], geom[ 0 ] );
+                            pval = parse_id_list( argv[i], geom[0] );
                             break;
                         case 'D':
-                            pval = parse_id_list( argv[ i ], mesh[ 3 ] );
+                            pval = parse_id_list( argv[i], mesh[3] );
                             break;
                         case 'm':
-                            pval = parse_id_list( argv[ i ], mesh[ 2 ] );
+                            pval = parse_id_list( argv[i], mesh[2] );
                             break;
                         case 'n':
-                            pval = parse_id_list( argv[ i ], mesh[ 1 ] );
+                            pval = parse_id_list( argv[i], mesh[1] );
                             break;
                         case 'd':
-                            pval = parse_id_list( argv[ i ], mesh[ 0 ] );
+                            pval = parse_id_list( argv[i], mesh[0] );
                             break;
                         case 'z':
-                            metis_partition_file = argv[ i ];
-                            pval = true;
+                            metis_partition_file = argv[i];
+                            pval                 = true;
                             break;
                         default:
-                            std::cerr << "Invalid option: " << argv[ i ] << std::endl;
+                            std::cerr << "Invalid option: " << argv[i] << std::endl;
                     }
 
                     if( !pval )
                     {
-                        std::cerr << "Invalid flag or flag value: " << argv[ i - 1 ] << " " << argv[ i ] << std::endl;
-                        usage_error( argv[ 0 ] );
+                        std::cerr << "Invalid flag or flag value: " << argv[i - 1] << " " << argv[i] << std::endl;
+                        usage_error( argv[0] );
                     }
             }
         }
         // do file names
         else
         {
-            in.push_back( argv[ i ] );
+            in.push_back( argv[i] );
         }
     }
-    if( in.size( ) < 2 )
+    if( in.size() < 2 )
     {
         std::cerr << "No output file name specified." << std::endl;
-        usage_error( argv[ 0 ] );
+        usage_error( argv[0] );
     }
     // output file name is the last one specified
-    out = in.back( );
-    in.pop_back( );
+    out = in.back();
+    in.pop_back();
 
     if( append_rank )
     {
         std::ostringstream mod;
         mod << out << "." << proc_id;
-        out = mod.str( );
+        out = mod.str();
     }
 
     if( percent_rank_subst )
     {
-        for( j = in.begin( ); j != in.end( ); ++j )
+        for( j = in.begin(); j != in.end(); ++j )
             *j = percent_subst( *j, proc_id );
         out = percent_subst( out, proc_id );
     }
@@ -387,32 +387,32 @@ int main( int argc, char* argv[] )
     if( !make_opts_string( read_opts, read_options ) || !make_opts_string( write_opts, write_options ) )
     {
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return USAGE_ERROR;
     }
 
-    if( !metis_partition_file.empty( ) )
+    if( !metis_partition_file.empty() )
     {
-        if( ( in.size( ) != 1 ) || ( proc_id != 0 ) )
+        if( ( in.size() != 1 ) || ( proc_id != 0 ) )
         {
             std::cerr << " mpas partition allows only one input file, in serial conversion\n";
 #ifdef MOAB_HAVE_MPI
-            MPI_Finalize( );
+            MPI_Finalize();
 #endif
             return USAGE_ERROR;
         }
     }
 
-    Tag id_tag = gMB->globalId_tag( );
+    Tag id_tag = gMB->globalId_tag();
 
     // Read the input file.
 #ifdef MOAB_HAVE_TEMPESTREMAP
-    if( tempestin && in.size( ) > 1 )
+    if( tempestin && in.size() > 1 )
     {
         std::cerr << " we can read only one tempest files at a time\n";
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return USAGE_ERROR;
     }
@@ -424,18 +424,18 @@ int main( int argc, char* argv[] )
 #endif
 
     bool use_overlap_context = false;
-    Tag  srcParentTag, tgtParentTag;
+    Tag srcParentTag, tgtParentTag;
 
 #endif
-    for( j = in.begin( ); j != in.end( ); ++j )
+    for( j = in.begin(); j != in.end(); ++j )
     {
-        reset_times( );
+        reset_times();
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
         remapper->meshValidate = false;
         // remapper->constructEdgeMap = true;
-        remapper->initialize( );
+        remapper->initialize();
 
         if( tempestin )
         {
@@ -443,17 +443,17 @@ int main( int argc, char* argv[] )
             result = remapper->LoadMesh( moab::Remapper::SourceMesh, *j, moab::TempestRemapper::DEFAULT );MB_CHK_ERR( result );
 
             Mesh* tempestMesh = remapper->GetMesh( moab::Remapper::SourceMesh );
-            tempestMesh->RemoveZeroEdges( );
-            tempestMesh->RemoveCoincidentNodes( );
+            tempestMesh->RemoveZeroEdges();
+            tempestMesh->RemoveCoincidentNodes();
 
             // Load the meshes and validate
             result = remapper->ConvertTempestMesh( moab::Remapper::SourceMesh );
 
-            const size_t nOverlapFaces = tempestMesh->faces.size( );
-            if( tempestMesh->vecSourceFaceIx.size( ) == nOverlapFaces &&
-                tempestMesh->vecSourceFaceIx.size( ) == nOverlapFaces )
+            const size_t nOverlapFaces = tempestMesh->faces.size();
+            if( tempestMesh->vecSourceFaceIx.size() == nOverlapFaces &&
+                tempestMesh->vecSourceFaceIx.size() == nOverlapFaces )
             {
-                int defaultInt = -1;
+                int defaultInt      = -1;
                 use_overlap_context = true;
                 // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are
                 // converting an overlap grid
@@ -465,27 +465,27 @@ int main( int argc, char* argv[] )
 
                 const Range& faces = remapper->GetMeshEntities( moab::Remapper::SourceMesh );
 
-                std::vector< int > gids( faces.size( ) ), srcpar( faces.size( ) ), tgtpar( faces.size( ) );
-                result = gMB->tag_get_data( id_tag, faces, &gids[ 0 ] );MB_CHK_ERR( result );
+                std::vector< int > gids( faces.size() ), srcpar( faces.size() ), tgtpar( faces.size() );
+                result = gMB->tag_get_data( id_tag, faces, &gids[0] );MB_CHK_ERR( result );
 
-                for( unsigned ii = 0; ii < faces.size( ); ++ii )
+                for( unsigned ii = 0; ii < faces.size(); ++ii )
                 {
-                    srcpar[ ii ] = tempestMesh->vecSourceFaceIx[ gids[ ii ] - 1 ];
-                    tgtpar[ ii ] = tempestMesh->vecTargetFaceIx[ gids[ ii ] - 1 ];
+                    srcpar[ii] = tempestMesh->vecSourceFaceIx[gids[ii] - 1];
+                    tgtpar[ii] = tempestMesh->vecTargetFaceIx[gids[ii] - 1];
                 }
 
-                result = gMB->tag_set_data( srcParentTag, faces, &srcpar[ 0 ] );MB_CHK_ERR( result );
-                result = gMB->tag_set_data( tgtParentTag, faces, &tgtpar[ 0 ] );MB_CHK_ERR( result );
+                result = gMB->tag_set_data( srcParentTag, faces, &srcpar[0] );MB_CHK_ERR( result );
+                result = gMB->tag_set_data( tgtParentTag, faces, &tgtpar[0] );MB_CHK_ERR( result );
 
-                srcpar.clear( );
-                tgtpar.clear( );
-                gids.clear( );
+                srcpar.clear();
+                tgtpar.clear();
+                gids.clear();
             }
         }
         else if( tempestout )
         {
             moab::EntityHandle& srcmesh = remapper->GetMeshSet( moab::Remapper::SourceMesh );
-            moab::EntityHandle& ovmesh = remapper->GetMeshSet( moab::Remapper::OverlapMesh );
+            moab::EntityHandle& ovmesh  = remapper->GetMeshSet( moab::Remapper::OverlapMesh );
 
             // load the mesh in MOAB format
             result = remapper->LoadNativeMesh( *j, srcmesh, 0 );MB_CHK_ERR( result );
@@ -497,14 +497,14 @@ int main( int argc, char* argv[] )
             if( rval1 == MB_SUCCESS && rval2 == MB_SUCCESS )
             {
                 use_overlap_context = true;
-                ovmesh = srcmesh;
+                ovmesh              = srcmesh;
 
                 Tag countTag;
                 result = gMB->tag_get_handle( "Counting", countTag );
                 // std::vector<int> count_ids()
 
                 // Load the meshes and validate
-                Tag         order;
+                Tag order;
                 ReorderTool reorder_tool( &core );
                 result = reorder_tool.handle_order_from_int_tag( srcParentTag, -1, order );MB_CHK_ERR( result );
                 result = reorder_tool.reorder_entities( order );MB_CHK_ERR( result );
@@ -518,19 +518,19 @@ int main( int argc, char* argv[] )
             }
         }
         else
-            result = gMB->load_file( j->c_str( ), 0, read_options.c_str( ) );
+            result = gMB->load_file( j->c_str(), 0, read_options.c_str() );
 #else
-        result = gMB->load_file( j->c_str( ), 0, read_options.c_str( ) );
+        result = gMB->load_file( j->c_str(), 0, read_options.c_str() );
 #endif
         if( MB_SUCCESS != result )
         {
             std::cerr << "Failed to load \"" << *j << "\"." << std::endl;
             std::cerr << "Error code: " << gMB->get_error_string( result ) << " (" << result << ")" << std::endl;
             std::string message;
-            if( MB_SUCCESS == gMB->get_last_error( message ) && !message.empty( ) )
+            if( MB_SUCCESS == gMB->get_last_error( message ) && !message.empty() )
                 std::cerr << "Error message: " << message << std::endl;
 #ifdef MOAB_HAVE_MPI
-            MPI_Finalize( );
+            MPI_Finalize();
 #endif
             return READ_ERROR;
         }
@@ -542,8 +542,8 @@ int main( int argc, char* argv[] )
     bool have_geom = false;
     for( dim = 0; dim <= 3; ++dim )
     {
-        if( !geom[ dim ].empty( ) ) have_geom = true;
-        if( verbose ) print_id_list( geom_names[ dim ], std::cout, geom[ dim ] );
+        if( !geom[dim].empty() ) have_geom = true;
+        if( verbose ) print_id_list( geom_names[dim], std::cout, geom[dim] );
     }
 
     // True if the user has specified any sets to write
@@ -569,27 +569,27 @@ int main( int argc, char* argv[] )
     // Get geometry sets
     if( have_geom )
     {
-        int         id_val;
-        Tag         tags[] = { id_tag, dim_tag };
+        int id_val;
+        Tag tags[]         = { id_tag, dim_tag };
         const void* vals[] = { &id_val, &dim };
         for( dim = 0; dim <= 3; ++dim )
         {
-            int init_count = set_list.size( );
-            for( std::set< int >::iterator iter = geom[ dim ].begin( ); iter != geom[ dim ].end( ); ++iter )
+            int init_count = set_list.size();
+            for( std::set< int >::iterator iter = geom[dim].begin(); iter != geom[dim].end(); ++iter )
             {
                 id_val = *iter;
-                range.clear( );
+                range.clear();
                 result = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, tags, vals, 2, range );
-                if( MB_SUCCESS != result || range.empty( ) )
+                if( MB_SUCCESS != result || range.empty() )
                 {
-                    range.clear( );
-                    std::cerr << geom_names[ dim ] << " " << id_val << " not found.\n";
+                    range.clear();
+                    std::cerr << geom_names[dim] << " " << id_val << " not found.\n";
                 }
-                std::copy( range.begin( ), range.end( ), std::back_inserter( set_list ) );
+                std::copy( range.begin(), range.end(), std::back_inserter( set_list ) );
             }
 
             if( verbose )
-                std::cout << "Found " << ( set_list.size( ) - init_count ) << ' ' << geom_names[ dim ] << " sets"
+                std::cout << "Found " << ( set_list.size() - init_count ) << ' ' << geom_names[dim] << " sets"
                           << std::endl;
         }
     }
@@ -597,83 +597,83 @@ int main( int argc, char* argv[] )
     // Get mesh groupings
     for( i = 0; i < 4; ++i )
     {
-        if( verbose ) print_id_list( mesh_tag_names[ i ], std::cout, mesh[ i ] );
+        if( verbose ) print_id_list( mesh_tag_names[i], std::cout, mesh[i] );
 
-        if( mesh[ i ].empty( ) ) continue;
+        if( mesh[i].empty() ) continue;
         have_sets = true;
 
         // Get tag
         Tag tag;
-        result = gMB->tag_get_handle( mesh_tag_names[ i ], 1, MB_TYPE_INTEGER, tag );
+        result = gMB->tag_get_handle( mesh_tag_names[i], 1, MB_TYPE_INTEGER, tag );
         if( MB_SUCCESS != result )
         {
-            std::cerr << "Tag not found: " << mesh_tag_names[ i ] << std::endl;
+            std::cerr << "Tag not found: " << mesh_tag_names[i] << std::endl;
             continue;
         }
 
         // get entity sets
-        int init_count = set_list.size( );
-        for( std::set< int >::iterator iter = mesh[ i ].begin( ); iter != mesh[ i ].end( ); ++iter )
+        int init_count = set_list.size();
+        for( std::set< int >::iterator iter = mesh[i].begin(); iter != mesh[i].end(); ++iter )
         {
-            range.clear( );
+            range.clear();
             const void* vals[] = { &*iter };
-            result = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, vals, 1, range );
-            if( MB_SUCCESS != result || range.empty( ) )
+            result             = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, vals, 1, range );
+            if( MB_SUCCESS != result || range.empty() )
             {
-                range.clear( );
-                std::cerr << mesh_tag_names[ i ] << " " << *iter << " not found.\n";
+                range.clear();
+                std::cerr << mesh_tag_names[i] << " " << *iter << " not found.\n";
             }
-            std::copy( range.begin( ), range.end( ), std::back_inserter( set_list ) );
+            std::copy( range.begin(), range.end(), std::back_inserter( set_list ) );
         }
 
         if( verbose )
-            std::cout << "Found " << ( set_list.size( ) - init_count ) << ' ' << mesh_tag_names[ i ] << " sets"
+            std::cout << "Found " << ( set_list.size() - init_count ) << ' ' << mesh_tag_names[i] << " sets"
                       << std::endl;
     }
 
     // Check if output is limited to certain dimensions of elements
     bool bydim = false;
     for( dim = 1; dim < 4; ++dim )
-        if( dims[ dim ] ) bydim = true;
+        if( dims[dim] ) bydim = true;
 
     // Check conflicting input
     if( bydim )
     {
-        if( generate[ 1 ] && !dims[ 1 ] )
+        if( generate[1] && !dims[1] )
         {
             std::cerr << "Warning: Request to generate 1D internal entities but not export them." << std::endl;
-            generate[ 1 ] = false;
+            generate[1] = false;
         }
-        if( generate[ 2 ] && !dims[ 2 ] )
+        if( generate[2] && !dims[2] )
         {
             std::cerr << "Warning: Request to generate 2D internal entities but not export them." << std::endl;
-            generate[ 2 ] = false;
+            generate[2] = false;
         }
     }
 
     // Generate any internal entities
-    if( generate[ 1 ] || generate[ 2 ] )
+    if( generate[1] || generate[2] )
     {
-        EntityHandle        all_mesh = 0;
+        EntityHandle all_mesh    = 0;
         const EntityHandle* sets = &all_mesh;
-        int                 num_sets = 1;
+        int num_sets             = 1;
         if( have_sets )
         {
-            num_sets = set_list.size( );
-            sets = &set_list[ 0 ];
+            num_sets = set_list.size();
+            sets     = &set_list[0];
         }
         for( i = 0; i < num_sets; ++i )
         {
             Range dim3, dim2, adj;
-            gMB->get_entities_by_dimension( sets[ i ], 3, dim3, true );
-            if( generate[ 1 ] )
+            gMB->get_entities_by_dimension( sets[i], 3, dim3, true );
+            if( generate[1] )
             {
-                gMB->get_entities_by_dimension( sets[ i ], 2, dim2, true );
+                gMB->get_entities_by_dimension( sets[i], 2, dim2, true );
                 gMB->get_adjacencies( dim3, 1, true, adj, Interface::UNION );
                 gMB->get_adjacencies( dim2, 1, true, adj, Interface::UNION );
             }
-            if( generate[ 2 ] ) { gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION ); }
-            if( sets[ i ] ) gMB->add_entities( sets[ i ], adj );
+            if( generate[2] ) { gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION ); }
+            if( sets[i] ) gMB->add_entities( sets[i], adj );
         }
     }
 
@@ -684,7 +684,7 @@ int main( int argc, char* argv[] )
         Range dead_entities, tmp_range;
         for( dim = 1; dim <= 3; ++dim )
         {
-            if( dims[ dim ] ) continue;
+            if( dims[dim] ) continue;
             gMB->get_entities_by_dimension( 0, dim, tmp_range );
             dead_entities.merge( tmp_range );
         }
@@ -692,11 +692,11 @@ int main( int argc, char* argv[] )
         // empty sets to list of dead entities.
         Range empty_sets;
         remove_entities_from_sets( gMB, dead_entities, empty_sets );
-        while( !empty_sets.empty( ) )
+        while( !empty_sets.empty() )
         {
-            if( !set_list.empty( ) ) remove_from_vector( set_list, empty_sets );
+            if( !set_list.empty() ) remove_from_vector( set_list, empty_sets );
             dead_entities.merge( empty_sets );
-            tmp_range.clear( );
+            tmp_range.clear();
             remove_entities_from_sets( gMB, empty_sets, tmp_range );
             empty_sets = subtract( tmp_range, dead_entities );
         }
@@ -705,24 +705,24 @@ int main( int argc, char* argv[] )
     }
 
     // If user specified sets to write, but none were found, exit.
-    if( have_sets && set_list.empty( ) )
+    if( have_sets && set_list.empty() )
     {
         std::cerr << "Nothing to write." << std::endl;
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return ENT_NOT_FOUND;
     }
 
     // interpret the mpas partition file created by gpmetis
-    if( !metis_partition_file.empty( ) )
+    if( !metis_partition_file.empty() )
     {
         int err = process_partition_file( gMB, metis_partition_file );
         if( err )
         {
             std::cerr << "Failed to process partition file \"" << metis_partition_file << "\"." << std::endl;
 #ifdef MOAB_HAVE_MPI
-            MPI_Finalize( );
+            MPI_Finalize();
 #endif
             return WRITE_ERROR;
         }
@@ -730,13 +730,13 @@ int main( int argc, char* argv[] )
     if( verbose )
     {
         if( have_sets )
-            std::cout << "Found " << set_list.size( ) << " specified sets to write (total)." << std::endl;
+            std::cout << "Found " << set_list.size() << " specified sets to write (total)." << std::endl;
         else
             std::cout << "No sets specifed.  Writing entire mesh." << std::endl;
     }
 
     // Write the output file
-    reset_times( );
+    reset_times();
 #ifdef MOAB_HAVE_TEMPESTREMAP
     Range faces;
     Mesh* tempestMesh =
@@ -744,19 +744,19 @@ int main( int argc, char* argv[] )
     moab::EntityHandle& srcmesh =
         remapper->GetMeshSet( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
     result = gMB->get_entities_by_dimension( srcmesh, 2, faces );MB_CHK_ERR( result );
-    int ntot_elements = 0, nelements = faces.size( );
+    int ntot_elements = 0, nelements = faces.size();
 #ifdef MOAB_HAVE_MPI
-    int ierr = MPI_Allreduce( &nelements, &ntot_elements, 1, MPI_INT, MPI_SUM, pcomm->comm( ) );
+    int ierr = MPI_Allreduce( &nelements, &ntot_elements, 1, MPI_INT, MPI_SUM, pcomm->comm() );
     if( ierr != 0 ) MB_CHK_SET_ERR( MB_FAILURE, "MPI_Allreduce failed to get total source elements" );
 #else
-    ntot_elements = nelements;
+    ntot_elements             = nelements;
 #endif
 
-    Tag                gidTag = gMB->globalId_tag( );
-    std::vector< int > gids( faces.size( ) );
-    result = gMB->tag_get_data( gidTag, faces, &gids[ 0 ] );MB_CHK_ERR( result );
+    Tag gidTag = gMB->globalId_tag();
+    std::vector< int > gids( faces.size() );
+    result = gMB->tag_get_data( gidTag, faces, &gids[0] );MB_CHK_ERR( result );
 
-    if( faces.size( ) > 1 && gids[ 0 ] == gids[ 1 ] && !use_overlap_context )
+    if( faces.size() > 1 && gids[0] == gids[1] && !use_overlap_context )
     {
 #ifdef MOAB_HAVE_MPI
         result = pcomm->assign_global_ids( srcmesh, 2, 1, false );MB_CHK_ERR( result );
@@ -769,7 +769,7 @@ int main( int argc, char* argv[] )
     // VSM: If user requested explicitly for some metadata, we need to generate the DoF ID tag
     // and set the appropriate numbering based on specified discretization order
     // Useful only for SE meshes with GLL DoFs
-    if( spectral_order > 1 && globalid_tag_name.size( ) > 1 )
+    if( spectral_order > 1 && globalid_tag_name.size() > 1 )
     {
         result = remapper->GenerateMeshMetadata( *tempestMesh, ntot_elements, faces, NULL, globalid_tag_name,
                                                  spectral_order );MB_CHK_ERR( result );
@@ -781,12 +781,12 @@ int main( int argc, char* argv[] )
         // overlap grid
         if( use_overlap_context && false )
         {
-            const int nOverlapFaces = faces.size( );
+            const int nOverlapFaces = faces.size();
             // Overlap mesh: resize the source and target connection arrays
             tempestMesh->vecSourceFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to source mesh
             tempestMesh->vecTargetFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to target mesh
-            result = gMB->tag_get_data( srcParentTag, faces, &tempestMesh->vecSourceFaceIx[ 0 ] );MB_CHK_ERR( result );
-            result = gMB->tag_get_data( tgtParentTag, faces, &tempestMesh->vecTargetFaceIx[ 0 ] );MB_CHK_ERR( result );
+            result = gMB->tag_get_data( srcParentTag, faces, &tempestMesh->vecSourceFaceIx[0] );MB_CHK_ERR( result );
+            result = gMB->tag_get_data( tgtParentTag, faces, &tempestMesh->vecTargetFaceIx[0] );MB_CHK_ERR( result );
         }
         // Write out the mesh using TempestRemap
         tempestMesh->Write( out, NcFile::Netcdf4 );
@@ -796,18 +796,18 @@ int main( int argc, char* argv[] )
 #endif
 
         if( have_sets )
-            result = gMB->write_file( out.c_str( ), format, write_options.c_str( ), &set_list[ 0 ], set_list.size( ) );
+            result = gMB->write_file( out.c_str(), format, write_options.c_str(), &set_list[0], set_list.size() );
         else
-            result = gMB->write_file( out.c_str( ), format, write_options.c_str( ) );
+            result = gMB->write_file( out.c_str(), format, write_options.c_str() );
         if( MB_SUCCESS != result )
         {
             std::cerr << "Failed to write \"" << out << "\"." << std::endl;
             std::cerr << "Error code: " << gMB->get_error_string( result ) << " (" << result << ")" << std::endl;
             std::string message;
-            if( MB_SUCCESS == gMB->get_last_error( message ) && !message.empty( ) )
+            if( MB_SUCCESS == gMB->get_last_error( message ) && !message.empty() )
                 std::cerr << "Error message: " << message << std::endl;
 #ifdef MOAB_HAVE_MPI
-            MPI_Finalize( );
+            MPI_Finalize();
 #endif
             return WRITE_ERROR;
         }
@@ -820,19 +820,19 @@ int main( int argc, char* argv[] )
     if( print_times && !proc_id ) write_times( std::cout );
 
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
     return 0;
 }
 
 bool parse_id_list( const char* string, std::set< int >& results )
 {
-    bool  okay = true;
+    bool okay   = true;
     char* mystr = strdup( string );
     for( const char* ptr = strtok( mystr, "," ); ptr; ptr = strtok( 0, "," ) )
     {
         char* endptr;
-        long  val = strtol( ptr, &endptr, 0 );
+        long val = strtol( ptr, &endptr, 0 );
         if( endptr == ptr || val <= 0 )
         {
             std::cerr << "Not a valid id: " << ptr << std::endl;
@@ -844,7 +844,7 @@ bool parse_id_list( const char* string, std::set< int >& results )
         if( *endptr == '-' )
         {
             const char* sptr = endptr + 1;
-            val2 = strtol( sptr, &endptr, 0 );
+            val2             = strtol( sptr, &endptr, 0 );
             if( endptr == sptr || val2 <= 0 )
             {
                 std::cerr << "Not a valid id: " << sptr << std::endl;
@@ -878,22 +878,22 @@ void print_id_list( const char* head, std::ostream& stream, const std::set< int 
 {
     stream << head << ": ";
 
-    if( list.empty( ) )
+    if( list.empty() )
     {
         stream << "(none)" << std::endl;
         return;
     }
 
-    int                             start, prev;
-    std::set< int >::const_iterator iter = list.begin( );
+    int start, prev;
+    std::set< int >::const_iterator iter = list.begin();
     start = prev = *( iter++ );
     for( ;; )
     {
-        if( iter == list.end( ) || *iter != 1 + prev )
+        if( iter == list.end() || *iter != 1 + prev )
         {
             stream << start;
             if( prev != start ) stream << '-' << prev;
-            if( iter == list.end( ) ) break;
+            if( iter == list.end() ) break;
             stream << ", ";
             start = *iter;
         }
@@ -906,14 +906,14 @@ void print_id_list( const char* head, std::ostream& stream, const std::set< int 
 static void print_time( int clk_per_sec, const char* prefix, clock_t ticks, std::ostream& stream )
 {
     ticks *= clk_per_sec / 100;
-    clock_t centi = ticks % 100;
+    clock_t centi   = ticks % 100;
     clock_t seconds = ticks / 100;
     stream << prefix;
     if( seconds < 120 ) { stream << ( ticks / 100 ) << "." << centi << "s" << std::endl; }
     else
     {
         clock_t minutes = ( seconds / 60 ) % 60;
-        clock_t hours = ( seconds / 3600 );
+        clock_t hours   = ( seconds / 3600 );
         seconds %= 60;
         if( hours ) stream << hours << "h";
         if( minutes ) stream << minutes << "m";
@@ -926,21 +926,21 @@ clock_t usr_time, sys_time, abs_time;
 
 #ifdef WIN32
 
-void reset_times( )
+void reset_times()
 {
-    abs_time = clock( );
+    abs_time = clock();
 }
 
 void write_times( std::ostream& stream )
 {
-    clock_t abs_tm = clock( );
+    clock_t abs_tm = clock();
     print_time( CLOCKS_PER_SEC, "  ", abs_tm - abs_time, stream );
     abs_time = abs_tm;
 }
 
 #else
 
-void reset_times( )
+void reset_times()
 {
     tms timebuf;
     abs_time = times( &timebuf );
@@ -967,17 +967,17 @@ void write_times( std::ostream& stream )
 
 bool make_opts_string( std::vector< std::string > options, std::string& opts )
 {
-    opts.clear( );
-    if( options.empty( ) ) return true;
+    opts.clear();
+    if( options.empty() ) return true;
 
     // choose a separator character
     std::vector< std::string >::const_iterator i;
-    char                                       separator = '\0';
-    const char*                                alt_separators = ";+,:\t\n";
+    char separator             = '\0';
+    const char* alt_separators = ";+,:\t\n";
     for( const char* sep_ptr = alt_separators; *sep_ptr; ++sep_ptr )
     {
         bool seen = false;
-        for( i = options.begin( ); i != options.end( ); ++i )
+        for( i = options.begin(); i != options.end(); ++i )
             if( i->find( *sep_ptr, 0 ) != std::string::npos )
             {
                 seen = true;
@@ -1001,9 +1001,9 @@ bool make_opts_string( std::vector< std::string > options, std::string& opts )
     }
 
     // concatenate options
-    i = options.begin( );
+    i = options.begin();
     opts += *i;
-    for( ++i; i != options.end( ); ++i )
+    for( ++i; i != options.end(); ++i )
     {
         opts += separator;
         opts += *i;
@@ -1014,11 +1014,11 @@ bool make_opts_string( std::vector< std::string > options, std::string& opts )
 
 void list_formats( Interface* gMB )
 {
-    const char                iface_name[] = "ReaderWriterSet";
-    ErrorCode                 err;
-    ReaderWriterSet*          set = 0;
+    const char iface_name[] = "ReaderWriterSet";
+    ErrorCode err;
+    ReaderWriterSet* set = 0;
     ReaderWriterSet::iterator i;
-    std::ostream&             str = std::cout;
+    std::ostream& str = std::cout;
 
     // get ReaderWriterSet
     err = gMB->query_interface( set );
@@ -1030,8 +1030,8 @@ void list_formats( Interface* gMB )
 
     // get field width for format description
     size_t w = 0;
-    for( i = set->begin( ); i != set->end( ); ++i )
-        if( i->description( ).length( ) > w ) w = i->description( ).length( );
+    for( i = set->begin(); i != set->end(); ++i )
+        if( i->description().length() > w ) w = i->description().length();
 
     // write table header
     str << "Format  " << std::setw( w ) << std::left << "Description"
@@ -1040,13 +1040,13 @@ void list_formats( Interface* gMB )
         << "  ----  -----  ------------------\n";
 
     // write table data
-    for( i = set->begin( ); i != set->end( ); ++i )
+    for( i = set->begin(); i != set->end(); ++i )
     {
         std::vector< std::string > ext;
         i->get_extensions( ext );
-        str << std::setw( 6 ) << i->name( ) << "  " << std::setw( w ) << std::left << i->description( ) << "  "
-            << ( i->have_reader( ) ? " yes" : "  no" ) << "  " << ( i->have_writer( ) ? "  yes" : "   no" ) << " ";
-        for( std::vector< std::string >::iterator j = ext.begin( ); j != ext.end( ); ++j )
+        str << std::setw( 6 ) << i->name() << "  " << std::setw( w ) << std::left << i->description() << "  "
+            << ( i->have_reader() ? " yes" : "  no" ) << "  " << ( i->have_writer() ? "  yes" : "   no" ) << " ";
+        for( std::vector< std::string >::iterator j = ext.begin(); j != ext.end(); ++j )
             str << " " << *j;
         str << std::endl;
     }
@@ -1058,35 +1058,35 @@ void list_formats( Interface* gMB )
 
 void remove_entities_from_sets( Interface* gMB, Range& dead_entities, Range& empty_sets )
 {
-    empty_sets.clear( );
+    empty_sets.clear();
     Range sets;
     gMB->get_entities_by_type( 0, MBENTITYSET, sets );
-    for( Range::iterator i = sets.begin( ); i != sets.end( ); ++i )
+    for( Range::iterator i = sets.begin(); i != sets.end(); ++i )
     {
         Range set_contents;
         gMB->get_entities_by_handle( *i, set_contents, false );
         set_contents = intersect( set_contents, dead_entities );
         gMB->remove_entities( *i, set_contents );
-        set_contents.clear( );
+        set_contents.clear();
         gMB->get_entities_by_handle( *i, set_contents, false );
-        if( set_contents.empty( ) ) empty_sets.insert( *i );
+        if( set_contents.empty() ) empty_sets.insert( *i );
     }
 }
 
 void remove_from_vector( std::vector< EntityHandle >& vect, const Range& ents_to_remove )
 {
-    Range::const_iterator                 i;
+    Range::const_iterator i;
     std::vector< EntityHandle >::iterator j;
-    for( i = ents_to_remove.begin( ); i != ents_to_remove.end( ); ++i )
+    for( i = ents_to_remove.begin(); i != ents_to_remove.end(); ++i )
     {
-        j = std::find( vect.begin( ), vect.end( ), *i );
-        if( j != vect.end( ) ) vect.erase( j );
+        j = std::find( vect.begin(), vect.end(), *i );
+        if( j != vect.end() ) vect.erase( j );
     }
 }
 
 std::string percent_subst( const std::string& s, int val )
 {
-    if( s.empty( ) ) return s;
+    if( s.empty() ) return s;
 
     size_t j = s.find( '%' );
     if( j == std::string::npos ) return s;
@@ -1103,7 +1103,7 @@ std::string percent_subst( const std::string& s, int val )
         j = i;
     }
     st << s.substr( j + 1 );
-    return st.str( );
+    return st.str();
 }
 
 int process_partition_file( Interface* mb, std::string& metis_partition_file )
@@ -1111,33 +1111,33 @@ int process_partition_file( Interface* mb, std::string& metis_partition_file )
     // how many faces in the file ? how do we make sure it is an mpas file?
     // mpas atmosphere files can be downloaded from here
     // https://mpas-dev.github.io/atmosphere/atmosphere_meshes.html
-    Range     faces;
+    Range faces;
     ErrorCode rval = mb->get_entities_by_dimension( 0, 2, faces );MB_CHK_ERR( rval );
-    std::cout << " MPAS model has " << faces.size( ) << " polygons\n";
+    std::cout << " MPAS model has " << faces.size() << " polygons\n";
 
     // read the partition file
     std::ifstream partfile;
-    partfile.open( metis_partition_file.c_str( ) );
-    std::string        line;
+    partfile.open( metis_partition_file.c_str() );
+    std::string line;
     std::vector< int > parts;
-    parts.resize( faces.size( ), -1 );
+    parts.resize( faces.size(), -1 );
     int i = 0;
-    if( partfile.is_open( ) )
+    if( partfile.is_open() )
     {
         while( getline( partfile, line ) )
         {
             // cout << line << '\n';
-            parts[ i++ ] = atoi( line.c_str( ) );
-            if( i > (int)faces.size( ) )
+            parts[i++] = atoi( line.c_str() );
+            if( i > (int)faces.size() )
             {
                 std::cerr << " too many lines in partition file \n. bail out \n";
                 return 1;
             }
         }
-        partfile.close( );
+        partfile.close();
     }
-    std::vector< int >::iterator pmax = max_element( parts.begin( ), parts.end( ) );
-    std::vector< int >::iterator pmin = min_element( parts.begin( ), parts.end( ) );
+    std::vector< int >::iterator pmax = max_element( parts.begin(), parts.end() );
+    std::vector< int >::iterator pmin = min_element( parts.begin(), parts.end() );
     if( *pmin <= -1 )
     {
         std::cerr << " partition file is incomplete, *pmin is -1 !! \n";
@@ -1153,7 +1153,7 @@ int process_partition_file( Interface* mb, std::string& metis_partition_file )
     // remove the parallel partition sets if they exist
     Range tagged_sets;
     rval = mb->get_entities_by_type_and_tag( 0, MBENTITYSET, &part_set_tag, NULL, 1, tagged_sets, Interface::UNION );MB_CHK_ERR( rval );
-    if( !tagged_sets.empty( ) )
+    if( !tagged_sets.empty() )
     {
         rval = mb->clear_meshset( tagged_sets );MB_CHK_ERR( rval );
         rval = mb->tag_delete_data( part_set_tag, tagged_sets );MB_CHK_ERR( rval );
@@ -1172,29 +1172,29 @@ int process_partition_file( Interface* mb, std::string& metis_partition_file )
         rval = mb->create_meshset( MESHSET_SET, new_set );MB_CHK_ERR( rval );
         tagged_sets.insert( new_set );
     }
-    int* dum_ids = new int[ num_sets ];
+    int* dum_ids = new int[num_sets];
     for( i = 0; i < num_sets; i++ )
-        dum_ids[ i ] = i;
+        dum_ids[i] = i;
 
     rval = mb->tag_set_data( part_set_tag, tagged_sets, dum_ids );MB_CHK_ERR( rval );
     delete[] dum_ids;
 
     std::vector< int > gids;
-    int                num_faces = (int)faces.size( );
+    int num_faces = (int)faces.size();
     gids.resize( num_faces );
-    rval = mb->tag_get_data( gid, faces, &gids[ 0 ] );MB_CHK_ERR( rval );
+    rval = mb->tag_get_data( gid, faces, &gids[0] );MB_CHK_ERR( rval );
 
     for( int j = 0; j < num_faces; j++ )
     {
-        int          eid = gids[ j ];
-        EntityHandle eh = faces[ j ];
-        int          partition = parts[ eid - 1 ];
+        int eid         = gids[j];
+        EntityHandle eh = faces[j];
+        int partition   = parts[eid - 1];
         if( partition < 0 || partition >= num_sets )
         {
             std::cout << " wrong partition number \n";
             return 1;
         }
-        rval = mb->add_entities( tagged_sets[ partition ], &eh, 1 );MB_CHK_ERR( rval );
+        rval = mb->add_entities( tagged_sets[partition], &eh, 1 );MB_CHK_ERR( rval );
     }
     return 0;
 }

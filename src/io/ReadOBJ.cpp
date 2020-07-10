@@ -45,10 +45,10 @@ ReaderIface* ReadOBJ::factory( Interface* iface )
 
 // Subset of starting tokens currently supported
 const char* ReadOBJ::delimiters = " ";
-const char* object_start_token = "o";
-const char* group_start_token = "g";
-const char* vertex_start_token = "v";
-const char* face_start_token = "f";
+const char* object_start_token  = "o";
+const char* group_start_token   = "g";
+const char* vertex_start_token  = "v";
+const char* face_start_token    = "f";
 
 #define OBJ_AMBIGUOUS "AMBIGUOUS"
 #define OBJ_UNDEFINED "UNDEFINED"
@@ -57,7 +57,7 @@ const char* face_start_token = "f";
 const char* const geom_name[] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0" };
 
 // Geometric Categories
-const char geom_category[][ CATEGORY_TAG_SIZE ] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
+const char geom_category[][CATEGORY_TAG_SIZE] = { "Vertex\0", "Curve\0", "Surface\0", "Volume\0", "Group\0" };
 
 // Constructor
 ReadOBJ::ReadOBJ( Interface* impl )
@@ -70,12 +70,12 @@ ReadOBJ::ReadOBJ( Interface* impl )
     assert( NULL != readMeshIface );
 
     // Get all handles
-    int       negone = -1;
+    int negone = -1;
     ErrorCode rval;
     rval = MBI->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
                                 &negone );MB_CHK_ERR_RET( rval );
 
-    id_tag = MBI->globalId_tag( );
+    id_tag = MBI->globalId_tag();
 
     rval = MBI->tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, name_tag, MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_ERR_RET( rval );
 
@@ -91,7 +91,7 @@ ReadOBJ::ReadOBJ( Interface* impl )
 }
 
 // Destructor
-ReadOBJ::~ReadOBJ( )
+ReadOBJ::~ReadOBJ()
 {
     if( readMeshIface )
     {
@@ -109,18 +109,18 @@ ErrorCode ReadOBJ::read_tag_values( const char* /*file_name*/, const char* /*tag
 }
 
 // Load the file as called by the Interface function
-ErrorCode ReadOBJ::load_file( const char*                    filename, const EntityHandle*, const FileOptions&,
+ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const FileOptions&,
                               const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
 {
-    ErrorCode                   rval;
-    int                         ignored = 0;  // Number of lines not beginning with o, v, or f
-    std::string                 line;  // The current line being read
-    EntityHandle                vert_meshset;
-    EntityHandle                curr_meshset;  // Current object meshset
-    std::string                 object_name;
+    ErrorCode rval;
+    int ignored = 0;   // Number of lines not beginning with o, v, or f
+    std::string line;  // The current line being read
+    EntityHandle vert_meshset;
+    EntityHandle curr_meshset;  // Current object meshset
+    std::string object_name;
     std::vector< EntityHandle > vertex_list;
-    int                         object_id = 0, group_id = 0;  // ID number for each volume/surface
-    int                         num_groups;
+    int object_id = 0, group_id = 0;  // ID number for each volume/surface
+    int num_groups;
 
     // At this time, there is no support for reading a subset of the file
     if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for OBJ." ); }
@@ -128,14 +128,14 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
     std::ifstream input_file( filename );  // Filestream for OBJ file
 
     // Check that the file can be read
-    if( !input_file.good( ) )
+    if( !input_file.good() )
     {
         std::cout << "Problems reading file = " << filename << std::endl;
         return MB_FILE_DOES_NOT_EXIST;
     }
 
     // If the file can be read
-    if( input_file.is_open( ) )
+    if( input_file.is_open() )
     {
 
         // create meshset for global vertices
@@ -144,7 +144,7 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
         while( std::getline( input_file, line ) )
         {
             // Skip blank lines in file
-            if( line.length( ) == 0 ) continue;
+            if( line.length() == 0 ) continue;
 
             // Tokenize the line
             std::vector< std::string > tokens;
@@ -152,14 +152,14 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
 
             // Each group and object line must have a name, token size is at least 2
             // Each vertex and face line should have token size of at least 4
-            if( tokens.size( ) < 2 ) continue;
+            if( tokens.size() < 2 ) continue;
 
             switch( get_keyword( tokens ) )
             {
                 // Object line
                 case object_start: {
                     object_id++;
-                    object_name = tokens[ 1 ];  // Get name of object
+                    object_name = tokens[1];  // Get name of object
 
                     // Create new meshset for object
                     rval = create_new_object( object_name, object_id, curr_meshset );MB_CHK_ERR( rval );
@@ -169,11 +169,11 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
                 // Group line
                 case group_start: {
                     group_id++;
-                    num_groups = tokens.size( ) - 1;
+                    num_groups             = tokens.size() - 1;
                     std::string group_name = "Group";
                     for( int i = 0; i < num_groups; i++ )
                     {
-                        group_name = group_name + '_' + tokens[ i + 1 ];
+                        group_name = group_name + '_' + tokens[i + 1];
                     }
 
                     // Create new meshset for group
@@ -202,7 +202,7 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
                     // If 4, face is split into triangles.  Anything else is ignored.
                     EntityHandle new_face_eh;
 
-                    if( tokens.size( ) == 4 )
+                    if( tokens.size() == 4 )
                     {
                         rval = create_new_face( tokens, vertex_list, new_face_eh );MB_CHK_ERR( rval );
 
@@ -213,7 +213,7 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
                         }
                     }
 
-                    else if( tokens.size( ) == 5 )
+                    else if( tokens.size() == 5 )
                     {
                         // Split_quad fxn will create 2 new triangles from 1 quad
                         Range new_faces_eh;
@@ -249,7 +249,7 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
 
     std::cout << "There were " << ignored << " ignored lines in this file." << std::endl;
 
-    input_file.close( );
+    input_file.close();
 
     return MB_SUCCESS;
 }
@@ -259,7 +259,7 @@ ErrorCode ReadOBJ::load_file( const char*                    filename, const Ent
  */
 void ReadOBJ::tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters2 )
 {
-    tokens.clear( );
+    tokens.clear();
 
     std::string::size_type next_token_end, next_token_start = str.find_first_not_of( delimiters2, 0 );
 
@@ -284,54 +284,55 @@ keyword_type ReadOBJ::get_keyword( std::vector< std::string > tokens )
     std::map< std::string, keyword_type > keywords;
 
     // currently supported
-    keywords[ "o" ] = object_start;
-    keywords[ "g" ] = group_start;
-    keywords[ "f" ] = face_start;
-    keywords[ "v" ] = vertex_start;
+    keywords["o"] = object_start;
+    keywords["g"] = group_start;
+    keywords["f"] = face_start;
+    keywords["v"] = vertex_start;
 
     // not currently supported, will be ignored
-    keywords[ "vn" ] = valid_unsupported;
-    keywords[ "vt" ] = valid_unsupported;
-    keywords[ "vp" ] = valid_unsupported;
-    keywords[ "s" ] = valid_unsupported;
-    keywords[ "mtllib" ] = valid_unsupported;
-    keywords[ "usemtl" ] = valid_unsupported;
-    keywords[ "#" ] = valid_unsupported;
-    keywords[ "cstype" ] = valid_unsupported;
-    keywords[ "deg" ] = valid_unsupported;
-    keywords[ "bmat" ] = valid_unsupported;
-    keywords[ "step" ] = valid_unsupported;
-    keywords[ "p" ] = valid_unsupported;
-    keywords[ "l" ] = valid_unsupported;
-    keywords[ "curv" ] = valid_unsupported;
-    keywords[ "curv2" ] = valid_unsupported;
-    keywords[ "surf" ] = valid_unsupported;
-    keywords[ "parm" ] = valid_unsupported;
-    keywords[ "trim" ] = valid_unsupported;
-    keywords[ "hole" ] = valid_unsupported;
-    keywords[ "scrv" ] = valid_unsupported;
-    keywords[ "sp" ] = valid_unsupported;
-    keywords[ "end" ] = valid_unsupported;
-    keywords[ "mg" ] = valid_unsupported;
-    keywords[ "bevel" ] = valid_unsupported;
-    keywords[ "c_interp" ] = valid_unsupported;
-    keywords[ "d_interp" ] = valid_unsupported;
-    keywords[ "lod" ] = valid_unsupported;
-    keywords[ "shadow_obj" ] = valid_unsupported;
-    keywords[ "trace_obj" ] = valid_unsupported;
-    keywords[ "ctech" ] = valid_unsupported;
-    keywords[ "stech" ] = valid_unsupported;
+    keywords["vn"]         = valid_unsupported;
+    keywords["vt"]         = valid_unsupported;
+    keywords["vp"]         = valid_unsupported;
+    keywords["s"]          = valid_unsupported;
+    keywords["mtllib"]     = valid_unsupported;
+    keywords["usemtl"]     = valid_unsupported;
+    keywords["#"]          = valid_unsupported;
+    keywords["cstype"]     = valid_unsupported;
+    keywords["deg"]        = valid_unsupported;
+    keywords["bmat"]       = valid_unsupported;
+    keywords["step"]       = valid_unsupported;
+    keywords["p"]          = valid_unsupported;
+    keywords["l"]          = valid_unsupported;
+    keywords["curv"]       = valid_unsupported;
+    keywords["curv2"]      = valid_unsupported;
+    keywords["surf"]       = valid_unsupported;
+    keywords["parm"]       = valid_unsupported;
+    keywords["trim"]       = valid_unsupported;
+    keywords["hole"]       = valid_unsupported;
+    keywords["scrv"]       = valid_unsupported;
+    keywords["sp"]         = valid_unsupported;
+    keywords["end"]        = valid_unsupported;
+    keywords["mg"]         = valid_unsupported;
+    keywords["bevel"]      = valid_unsupported;
+    keywords["c_interp"]   = valid_unsupported;
+    keywords["d_interp"]   = valid_unsupported;
+    keywords["lod"]        = valid_unsupported;
+    keywords["shadow_obj"] = valid_unsupported;
+    keywords["trace_obj"]  = valid_unsupported;
+    keywords["ctech"]      = valid_unsupported;
+    keywords["stech"]      = valid_unsupported;
 
-    return keywords[ match( tokens[ 0 ], keywords ) ];
+    return keywords[match( tokens[0], keywords )];
 }
 
-template< typename T > std::string ReadOBJ::match( const std::string& token, std::map< std::string, T >& tokenList )
+template < typename T >
+std::string ReadOBJ::match( const std::string& token, std::map< std::string, T >& tokenList )
 {
     // Initialize with no match and obj_undefined as return string
     std::string best_match = OBJ_UNDEFINED;
 
     // Search the map
-    for( typename std::map< std::string, T >::iterator thisToken = tokenList.begin( ); thisToken != tokenList.end( );
+    for( typename std::map< std::string, T >::iterator thisToken = tokenList.begin(); thisToken != tokenList.end();
          ++thisToken )
     {
         // If a perfect match break the loop (assume keyword list is unambiguous)
@@ -359,14 +360,14 @@ ErrorCode ReadOBJ::create_new_object( std::string object_name, int curr_object, 
     rval = MBI->create_meshset( MESHSET_SET, object_meshset );MB_CHK_SET_ERR( rval, "Failed to generate object mesh set." );
 
     // Set surface meshset tags
-    rval = MBI->tag_set_data( name_tag, &object_meshset, 1, object_name.c_str( ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
+    rval = MBI->tag_set_data( name_tag, &object_meshset, 1, object_name.c_str() );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
 
     rval = MBI->tag_set_data( id_tag, &object_meshset, 1, &( curr_object ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set ID tag." );
 
     int dim = 2;
-    rval = MBI->tag_set_data( geom_tag, &object_meshset, 1, &( dim ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set dim tag." );
+    rval    = MBI->tag_set_data( geom_tag, &object_meshset, 1, &( dim ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set dim tag." );
 
-    rval = MBI->tag_set_data( category_tag, &object_meshset, 1, geom_category[ 2 ] );MB_CHK_SET_ERR( rval, "Failed to set mesh set category tag." );
+    rval = MBI->tag_set_data( category_tag, &object_meshset, 1, geom_category[2] );MB_CHK_SET_ERR( rval, "Failed to set mesh set category tag." );
 
     /* Create volume entity set corresponding to surface
        The volume meshset will have one child--
@@ -381,16 +382,16 @@ ErrorCode ReadOBJ::create_new_object( std::string object_name, int curr_object, 
        The volume meshset is tagged with the same name as the surface meshset
        for each object because of the direct relation between these entities.
      */
-    rval = MBI->tag_set_data( obj_name_tag, &vol_meshset, 1, object_name.c_str( ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
+    rval = MBI->tag_set_data( obj_name_tag, &vol_meshset, 1, object_name.c_str() );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
 
     rval = MBI->tag_set_data( id_tag, &vol_meshset, 1, &( curr_object ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set ID tag." );
 
-    dim = 3;
+    dim  = 3;
     rval = MBI->tag_set_data( geom_tag, &vol_meshset, 1, &( dim ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set dim tag." );
 
-    rval = MBI->tag_set_data( name_tag, &vol_meshset, 1, geom_name[ 3 ] );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
+    rval = MBI->tag_set_data( name_tag, &vol_meshset, 1, geom_name[3] );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
 
-    rval = MBI->tag_set_data( category_tag, &vol_meshset, 1, geom_category[ 3 ] );MB_CHK_SET_ERR( rval, "Failed to set mesh set category tag." );
+    rval = MBI->tag_set_data( category_tag, &vol_meshset, 1, geom_category[3] );MB_CHK_SET_ERR( rval, "Failed to set mesh set category tag." );
 
     rval = myGeomTool->set_sense( object_meshset, vol_meshset, SENSE_FORWARD );MB_CHK_SET_ERR( rval, "Failed to set surface sense." );
 
@@ -409,7 +410,7 @@ ErrorCode ReadOBJ::create_new_group( std::string group_name, int curr_group, Ent
     rval = MBI->create_meshset( MESHSET_SET, group_meshset );MB_CHK_SET_ERR( rval, "Failed to generate group mesh set." );
 
     // Set meshset tags
-    rval = MBI->tag_set_data( name_tag, &group_meshset, 1, group_name.c_str( ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
+    rval = MBI->tag_set_data( name_tag, &group_meshset, 1, group_name.c_str() );MB_CHK_SET_ERR( rval, "Failed to set mesh set name tag." );
 
     rval = MBI->tag_set_data( id_tag, &group_meshset, 1, &( curr_group ) );MB_CHK_SET_ERR( rval, "Failed to set mesh set ID tag." );
 
@@ -424,10 +425,10 @@ ErrorCode ReadOBJ::create_new_group( std::string group_name, int curr_group, Ent
 ErrorCode ReadOBJ::create_new_vertex( std::vector< std::string > v_tokens, EntityHandle& vertex_eh )
 {
     ErrorCode rval;
-    vertex    next_vertex;
+    vertex next_vertex;
 
     for( int i = 1; i < 4; i++ )
-        next_vertex.coord[ i - 1 ] = atof( v_tokens[ i ].c_str( ) );
+        next_vertex.coord[i - 1] = atof( v_tokens[i].c_str() );
 
     rval = MBI->create_vertex( next_vertex.coord, vertex_eh );MB_CHK_SET_ERR( rval, "Unbale to create vertex." );
 
@@ -442,23 +443,23 @@ ErrorCode ReadOBJ::create_new_vertex( std::vector< std::string > v_tokens, Entit
 ErrorCode ReadOBJ::create_new_face( std::vector< std::string > f_tokens, const std::vector< EntityHandle >& vertex_list,
                                     EntityHandle& face_eh )
 {
-    face      next_face;
+    face next_face;
     ErrorCode rval;
 
     for( int i = 1; i < 4; i++ )
     {
-        int vertex_id = atoi( f_tokens[ i ].c_str( ) );
+        int vertex_id = atoi( f_tokens[i].c_str() );
 
         // Some faces contain format 'vertex/texture'
         // Remove the '/texture' and add the vertex to the list
-        std::size_t slash = f_tokens[ i ].find( '/' );
+        std::size_t slash = f_tokens[i].find( '/' );
         if( slash != std::string::npos )
         {
-            std::string face = f_tokens[ i ].substr( 0, slash );
-            vertex_id = atoi( face.c_str( ) );
+            std::string face = f_tokens[i].substr( 0, slash );
+            vertex_id        = atoi( face.c_str() );
         }
 
-        next_face.conn[ i - 1 ] = vertex_list[ vertex_id - 1 ];
+        next_face.conn[i - 1] = vertex_list[vertex_id - 1];
     }
 
     rval = MBI->create_element( MBTRI, next_face.conn, 3, face_eh );MB_CHK_SET_ERR( rval, "Unable to create new face." );
@@ -470,21 +471,21 @@ ErrorCode ReadOBJ::create_new_face( std::vector< std::string > f_tokens, const s
 ErrorCode ReadOBJ::split_quad( std::vector< std::string > f_tokens, std::vector< EntityHandle >& vertex_list,
                                Range& face_eh )
 {
-    ErrorCode                   rval;
+    ErrorCode rval;
     std::vector< EntityHandle > quad_vert_eh;
 
     // Loop over quad connectivity getting vertex EHs
     for( int i = 1; i < 5; i++ )
     {
-        int         vertex_id = atoi( f_tokens[ i ].c_str( ) );
-        std::size_t slash = f_tokens[ i ].find( '/' );
+        int vertex_id     = atoi( f_tokens[i].c_str() );
+        std::size_t slash = f_tokens[i].find( '/' );
         if( slash != std::string::npos )
         {
-            std::string face = f_tokens[ i ].substr( 0, slash );
-            vertex_id = atoi( face.c_str( ) );
+            std::string face = f_tokens[i].substr( 0, slash );
+            vertex_id        = atoi( face.c_str() );
         }
 
-        quad_vert_eh.push_back( vertex_list[ vertex_id - 1 ] );
+        quad_vert_eh.push_back( vertex_list[vertex_id - 1] );
     }
 
     // Create new tri faces
@@ -497,20 +498,20 @@ ErrorCode ReadOBJ::create_tri_faces( std::vector< EntityHandle > quad_vert_eh,
                                      //				       EntityHandle center_vertex_eh,
                                      Range& face_eh )
 {
-    ErrorCode    rval;
-    EntityHandle connectivity[ 3 ];
+    ErrorCode rval;
+    EntityHandle connectivity[3];
     EntityHandle new_face;
 
-    connectivity[ 0 ] = quad_vert_eh[ 0 ];
-    connectivity[ 1 ] = quad_vert_eh[ 1 ];
-    connectivity[ 2 ] = quad_vert_eh[ 2 ];
-    rval = MBI->create_element( MBTRI, connectivity, 3, new_face );
+    connectivity[0] = quad_vert_eh[0];
+    connectivity[1] = quad_vert_eh[1];
+    connectivity[2] = quad_vert_eh[2];
+    rval            = MBI->create_element( MBTRI, connectivity, 3, new_face );
     face_eh.insert( new_face );
 
-    connectivity[ 0 ] = quad_vert_eh[ 2 ];
-    connectivity[ 1 ] = quad_vert_eh[ 3 ];
-    connectivity[ 2 ] = quad_vert_eh[ 0 ];
-    rval = MBI->create_element( MBTRI, connectivity, 3, new_face );
+    connectivity[0] = quad_vert_eh[2];
+    connectivity[1] = quad_vert_eh[3];
+    connectivity[2] = quad_vert_eh[0];
+    rval            = MBI->create_element( MBTRI, connectivity, 3, new_face );
     face_eh.insert( new_face );
 
     return rval;

@@ -26,7 +26,7 @@
 
 #include "moab/MOABConfig.h"
 #define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
+#define STRINGIFY( X )  STRINGIFY_( X )
 #ifdef MOAB_HAVE_UNORDERED_MAP
 #include STRINGIFY( MOAB_HAVE_UNORDERED_MAP )
 #else
@@ -45,9 +45,9 @@ class SparseTagDataAllocator
 {
   public:
     //! constructor
-    SparseTagDataAllocator( ) {}
+    SparseTagDataAllocator() {}
     //! destructor
-    ~SparseTagDataAllocator( ) {}
+    ~SparseTagDataAllocator() {}
     //! allocates memory of size and returns pointer
     void* allocate( size_t data_size )
     {
@@ -66,9 +66,9 @@ class SparseTag : public TagInfo
   public:
     SparseTag( const char* name, int size, DataType type, const void* default_value );
 
-    ~SparseTag( );
+    ~SparseTag();
 
-    virtual TagType get_storage_type( ) const;
+    virtual TagType get_storage_type() const;
 
     /**\brief Remove/clear tag data for all entities
      *
@@ -325,7 +325,7 @@ class SparseTag : public TagInfo
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
                                                 Range& output_entities, const void* value, int value_bytes = 0,
-                                                EntityType   type = MBMAXTYPE,
+                                                EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const;
 
     /**\brief Check if entity is tagged */
@@ -338,9 +338,9 @@ class SparseTag : public TagInfo
                                       unsigned long& per_entity ) const;
 
     //! get number of entities
-    unsigned long get_number_entities( )
+    unsigned long get_number_entities()
     {
-        return mData.size( );
+        return mData.size();
     }
 
     //! map of entity id and tag data
@@ -387,13 +387,13 @@ inline void* SparseTag::allocate_data( EntityHandle h,
 #endif
                                        bool copy_default )
 {
-    void* new_data = mAllocator.allocate( get_size( ) );
+    void* new_data = mAllocator.allocate( get_size() );
 #ifdef MOAB_HAVE_UNORDERED_MAP
     mData.insert( iter, std::pair< const EntityHandle, void* >( h, new_data ) );
 #else
-    mData[ h ] = new_data;
+    mData[h] = new_data;
 #endif
-    if( copy_default ) memcpy( new_data, get_default_value( ), get_size( ) );
+    if( copy_default ) memcpy( new_data, get_default_value(), get_size() );
     return new_data;
 }
 

@@ -12,27 +12,27 @@
 
 using namespace moab;
 
-Core*          MBI;
-GeomTopoTool*  GTT;
+Core* MBI;
+GeomTopoTool* GTT;
 GeomQueryTool* GQT;
 
 Tag id_tag = 0;
 
 const std::string input_file = TestDir + "/find_vol_test_geom.h5m";
 
-void find_volume_tests( );
+void find_volume_tests();
 
-int main( )
+int main()
 {
 
-    MBI = new Core( );
-    ErrorCode rval = MBI->load_file( input_file.c_str( ) );MB_CHK_SET_ERR( rval, "Failed to load test file" );
+    MBI            = new Core();
+    ErrorCode rval = MBI->load_file( input_file.c_str() );MB_CHK_SET_ERR( rval, "Failed to load test file" );
 
     GTT = new GeomTopoTool( MBI );
     GQT = new GeomQueryTool( GTT );
 
     // initialize the rest of the GQT
-    GQT->initialize( );
+    GQT->initialize();
 
     int result = 0;
 
@@ -51,7 +51,7 @@ int main( )
 ErrorCode id_lookup( EntityHandle eh, int& id )
 {
     ErrorCode rval;
-    if( !id_tag ) { id_tag = MBI->globalId_tag( ); }
+    if( !id_tag ) { id_tag = MBI->globalId_tag(); }
 
     rval = MBI->tag_get_data( id_tag, &eh, 1, (void*)&id );MB_CHK_SET_ERR( rval, "Failed to lookup volume id" );
 
@@ -65,10 +65,10 @@ ErrorCode id_lookup( EntityHandle eh, int& id )
 
 struct FindVolTestResult
 {
-    double pnt[ 3 ];
-    double dir[ 3 ];
-    int    resultA;
-    int    resultB;
+    double pnt[3];
+    double dir[3];
+    int resultA;
+    int resultB;
 };
 
 // Test Geometry \\
@@ -95,7 +95,7 @@ struct FindVolTestResult
 // #                         #     Vol 4 (IC)    #                           #
 // ###########################                   #############################
 
-void find_volume_tests( )
+void find_volume_tests()
 {
 
     ErrorCode rval;
@@ -103,39 +103,39 @@ void find_volume_tests( )
     const struct FindVolTestResult tests[] = {
         // one point unambiguously placed in each volume
         // and the implicit complement
-        { { -0.1, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 2, 4 },  // 1
-        { { 0.6, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 3, 4 },  // 2
-        { { 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 1, -1 },  // 3
+        { { -0.1, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 2, 4 },   // 1
+        { { 0.6, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 3, 4 },    // 2
+        { { 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 1, -1 },   // 3
         { { -5.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 0, -1 },  // 4
         // Point on the negative side of the geometry
-        { { -5.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 0, -1 },  // 5
+        { { -5.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 0, -1 },   // 5
         { { -5.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 0, -1 },  // 6
         // Point on the positive side of the geometry
-        { { 10.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 0, -1 },  // 7
+        { { 10.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 0, -1 },   // 7
         { { 10.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 0, -1 },  // 8
-        { { 10.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 0, -1 },  // 9
+        { { 10.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 0, -1 },   // 9
         // Point between the volumes
-        { { 1.5, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 0, 4 },  // 10
+        { { 1.5, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 0, 4 },    // 10
         { { 1.5, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 4, -1 },  // 11
-        { { 1.5, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 4, -1 },  // 12
-        { { 1.5, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, 0, -1 },  // 13
+        { { 1.5, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 4, -1 },   // 12
+        { { 1.5, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, 0, -1 },   // 13
         // Point in the overlap of vols 2 & 3
-        { { 0.4, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 2, 3 },  // 14
+        { { 0.4, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 2, 3 },   // 14
         { { 0.4, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 2, 3 },  // 15
-        { { 0.4, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 2, 3 },  // 16
+        { { 0.4, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 2, 3 },   // 16
         // Point in Vol 3 w/ different directions applied
-        { { 0.6, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 3, 4 },  // 17
+        { { 0.6, 0.0, 0.0 }, { 0.0, 0.0, 0.0 }, 3, 4 },   // 17
         { { 0.6, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 3, 4 },  // 18
-        { { 0.6, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 3, 4 },  // 19
+        { { 0.6, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 3, 4 },   // 19
         // Point on surface of volume 1 w/ tangent direction
-        { { 3.0, 0.5, 0.0 }, { 1.0, 0.0, 0.0 }, 1, -1 },  // 20
+        { { 3.0, 0.5, 0.0 }, { 1.0, 0.0, 0.0 }, 1, -1 },   // 20
         { { 3.0, 0.5, 0.0 }, { -1.0, 0.0, 0.0 }, 1, -1 },  // 21
         // Point on surface of volume 1 w/ non-tangent direction
-        { { 3.0, 0.5, 0.0 }, { 0.0, 1.0, 0.0 }, 1, -1 },  // 22
+        { { 3.0, 0.5, 0.0 }, { 0.0, 1.0, 0.0 }, 1, -1 },   // 22
         { { 3.0, 0.5, 0.0 }, { 0.0, -1.0, 0.0 }, 4, -1 },  // 23
         // Checks that the neg ray distance doesn't affect results
         // Location: Positive Y Surface of Volume 2
-        { { 0.6, 0.25000000000001, 0.0 }, { 0.0, 1.0, 0.0 }, 4, 0 },  // 24
+        { { 0.6, 0.25000000000001, 0.0 }, { 0.0, 1.0, 0.0 }, 4, 0 },    // 24
         { { 0.6, 0.25000000000001, 0.0 }, { 0.0, -1.0, 0.0 }, 4, -1 },  // 25
         /// ON-SURFACE POINT TESTS (not checked using PIV loop) \\\
     // Point on surface of volume 1 w/ random directions
@@ -147,9 +147,9 @@ void find_volume_tests( )
     int num_tests = sizeof( tests ) / sizeof( FindVolTestResult );
 
     EntityHandle volume_found;
-    int          vol_id;
+    int vol_id;
 
-    bool using_find_volume_slow = GTT->get_one_vol_root( ) == 0;
+    bool using_find_volume_slow = GTT->get_one_vol_root() == 0;
 
     // Skip the last two tests
     if( using_find_volume_slow )
@@ -162,10 +162,10 @@ void find_volume_tests( )
     for( int i = 1; i < num_tests + 1; i++ )
     {
 
-        const FindVolTestResult& test = tests[ i - 1 ];
+        const FindVolTestResult& test = tests[i - 1];
 
         const double* direction = NULL;
-        if( test.dir[ 0 ] != 0.0 || test.dir[ 1 ] != 0.0 || test.dir[ 2 ] != 0.0 ) { direction = test.dir; }
+        if( test.dir[0] != 0.0 || test.dir[1] != 0.0 || test.dir[2] != 0.0 ) { direction = test.dir; }
 
         // if we're testing a random direction, run the test many times
         int num_repeats = direction ? 1 : 100;
@@ -183,7 +183,7 @@ void find_volume_tests( )
 
             // reset result and id for safety
             volume_found = 0;
-            vol_id = -1;
+            vol_id       = -1;
         }  // repeat loop
-    }  // test loop
+    }      // test loop
 }

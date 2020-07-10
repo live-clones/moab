@@ -49,15 +49,15 @@ static inline bool condition_number_2d( const Vector3D temp_vec[], size_t e_ind,
                                         MsqError& err )
 {
     // norm squared of J
-    double term1 = temp_vec[ 0 ] % temp_vec[ 0 ] + temp_vec[ 1 ] % temp_vec[ 1 ];
+    double term1 = temp_vec[0] % temp_vec[0] + temp_vec[1] % temp_vec[1];
 
     Vector3D unit_surf_norm;
     pd.get_domain_normal_at_element( e_ind, unit_surf_norm, err );
     MSQ_ERRZERO( err );
-    unit_surf_norm.normalize( );
+    unit_surf_norm.normalize();
 
     // det J
-    double temp_var = unit_surf_norm % ( temp_vec[ 0 ] * temp_vec[ 1 ] );
+    double temp_var = unit_surf_norm % ( temp_vec[0] * temp_vec[1] );
 
     // revert to old, non-barrier form
     if( temp_var <= 0.0 ) return false;
@@ -124,13 +124,13 @@ static inline bool condition_number_2d( const Vector3D temp_vec[], size_t e_ind,
 static inline bool condition_number_3d( const Vector3D temp_vec[], PatchData& /*pd*/, double& fval, MsqError& /*err*/ )
 {
     // norm squared of J
-    double term1 = temp_vec[ 0 ] % temp_vec[ 0 ] + temp_vec[ 1 ] % temp_vec[ 1 ] + temp_vec[ 2 ] % temp_vec[ 2 ];
+    double term1 = temp_vec[0] % temp_vec[0] + temp_vec[1] % temp_vec[1] + temp_vec[2] % temp_vec[2];
     // norm squared of adjoint of J
-    double term2 = ( temp_vec[ 0 ] * temp_vec[ 1 ] ) % ( temp_vec[ 0 ] * temp_vec[ 1 ] ) +
-                   ( temp_vec[ 1 ] * temp_vec[ 2 ] ) % ( temp_vec[ 1 ] * temp_vec[ 2 ] ) +
-                   ( temp_vec[ 2 ] * temp_vec[ 0 ] ) % ( temp_vec[ 2 ] * temp_vec[ 0 ] );
+    double term2 = ( temp_vec[0] * temp_vec[1] ) % ( temp_vec[0] * temp_vec[1] ) +
+                   ( temp_vec[1] * temp_vec[2] ) % ( temp_vec[1] * temp_vec[2] ) +
+                   ( temp_vec[2] * temp_vec[0] ) % ( temp_vec[2] * temp_vec[0] );
     // det of J
-    double temp_var = temp_vec[ 0 ] % ( temp_vec[ 1 ] * temp_vec[ 2 ] );
+    double temp_var = temp_vec[0] % ( temp_vec[1] * temp_vec[2] );
 
     // revert to old, non-barrier formulation
     if( temp_var <= 0.0 ) return false;

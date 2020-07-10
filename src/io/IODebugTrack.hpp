@@ -27,13 +27,13 @@ class IODebugTrack
         unsigned long rank;
     };
 
-    bool                enableOutput;
-    std::string         tableName;
+    bool enableOutput;
+    std::string tableName;
     std::list< DRange > dataSet;
-    std::ostream&       ostr;
-    unsigned long       maxSize;
-    int                 mpiRank;
-    bool                haveMPI;
+    std::ostream& ostr;
+    unsigned long maxSize;
+    int mpiRank;
+    bool haveMPI;
 
     void record_io( DRange data );
 
@@ -53,7 +53,7 @@ class IODebugTrack
     IODebugTrack( bool enable, const std::string& table_name, unsigned long table_size = 0 );
 
     /**\brief Destructor prints errors about unaccessed ranges */
-    ~IODebugTrack( );
+    ~IODebugTrack();
 
     /**\brief Notify of IO request
      *\param begin  First table row being read/written
@@ -65,7 +65,7 @@ class IODebugTrack
      *
      * Does nothing if MPI support is not enabled
      */
-    void all_reduce( );
+    void all_reduce();
 };
 
 }  // namespace moab

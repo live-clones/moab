@@ -36,12 +36,12 @@ namespace MBMesquite
  *LAST* as it will access the other static data. */
 
 std::vector< std::ostream* > MsqDebug::streams;
-std::vector< bool >          MsqDebug::flags;
+std::vector< bool > MsqDebug::flags;
 
 #ifdef MSQ_ENABLE_DEBUG
 static void parse_flag_string( const char* str, bool flag_val )
 {
-    char*      s = strdup( str );
+    char* s            = strdup( str );
     const char delim[] = ";,";
     for( const char* p = strtok( s, delim ); p; p = strtok( 0, delim ) )
     {
@@ -60,12 +60,12 @@ static void parse_flag_string( const char* str, bool flag_val )
     free( s );
 }
 
-MsqDebug::InitializeFlags::InitializeFlags( )
+MsqDebug::InitializeFlags::InitializeFlags()
 {
     const unsigned flag_array[] = { MSQ_ENABLE_DEBUG, 0 };
-    size_t         length = sizeof( flag_array ) / sizeof( unsigned ) - 1;
+    size_t length               = sizeof( flag_array ) / sizeof( unsigned ) - 1;
     while( length > 0 )
-        MsqDebug::set( flag_array[ --length ], true );
+        MsqDebug::set( flag_array[--length], true );
 
     const char* envstr = getenv( "MESQUITE_DEBUG" );
     if( envstr ) parse_flag_string( envstr, true );
@@ -73,59 +73,59 @@ MsqDebug::InitializeFlags::InitializeFlags( )
     if( envstr ) parse_flag_string( envstr, false );
 }
 #else
-MsqDebug::InitializeFlags::InitializeFlags( ) {}
+MsqDebug::InitializeFlags::InitializeFlags() {}
 #endif
 
 MsqDebug::InitializeFlags MsqDebug::init;
 
 bool MsqDebug::get( unsigned flag )
 {
-    return flag < flags.size( ) && flags[ flag ];
+    return flag < flags.size() && flags[flag];
 }
 
 void MsqDebug::set( unsigned flag, bool state )
 {
     if( state )
     {
-        if( flag >= flags.size( ) ) { flags.resize( flag + 1 ); }
-        flags[ flag ] = true;
+        if( flag >= flags.size() ) { flags.resize( flag + 1 ); }
+        flags[flag] = true;
     }
     else
     {
-        if( flag < flags.size( ) ) flags[ flag ] = false;
+        if( flag < flags.size() ) flags[flag] = false;
     }
 }
 
-void MsqDebug::disable_all( )
+void MsqDebug::disable_all()
 {
-    flags.clear( );
+    flags.clear();
 }
 
 std::ostream& MsqDebug::get_stream( unsigned flag )
 {
-    if( flag < streams.size( ) )
-        return *streams[ flag ];
+    if( flag < streams.size() )
+        return *streams[flag];
     else
         return std::cout;
 }
 
 void MsqDebug::set_stream( unsigned flag, std::ostream& stream )
 {
-    if( flag >= streams.size( ) )
+    if( flag >= streams.size() )
     {
-        size_t old_size = streams.size( );
+        size_t old_size = streams.size();
         streams.resize( flag );
         for( unsigned i = old_size; i < flag; ++i )
-            streams[ i ] = &std::cout;
+            streams[i] = &std::cout;
     }
-    streams[ flag ] = &stream;
+    streams[flag] = &stream;
 }
 
 void MsqDebug::FormatPrinter::print( const char* format, ... ) const
 {
     if( !MsqDebug::get( myFlag ) ) return;
 
-    char buffer[ 512 ];
+    char buffer[512];
 
 #if defined( HAVE_VSNPRINTF )
     va_list args;
@@ -144,7 +144,7 @@ void MsqDebug::FormatPrinter::print( const char* format, ... ) const
     va_end( args );
 #else
     strncpy( buffer, format, sizeof( buffer ) );
-    buffer[ sizeof( buffer ) - 1 ] = '\0';
+    buffer[sizeof( buffer ) - 1] = '\0';
 #endif
 
     MsqDebug::get_stream( myFlag ) << buffer;

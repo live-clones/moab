@@ -14,23 +14,23 @@ using namespace moab;
 
 #include "TestUtil.hpp"
 
-std::string poly_example = TestDir + "/io/poly8-10.vtk";
+std::string poly_example      = TestDir + "/io/poly8-10.vtk";
 std::string polyhedra_example = TestDir + "/io/polyhedra.vtk";
 
 #define DECLARE_TEST( A ) \
-    bool test_##A( );     \
-    int  A##_reg_var = register_test( &test_##A, #A );
+    bool test_##A();      \
+    int A##_reg_var = register_test( &test_##A, #A );
 
-typedef bool ( *test_ptr )( );
+typedef bool ( *test_ptr )();
 struct test_data
 {
-    test_ptr    test;
+    test_ptr test;
     const char* name;
-    bool        result;
+    bool result;
 };
-size_t     num_tests = 0;
+size_t num_tests      = 0;
 test_data* test_array = 0;
-int        register_test( test_ptr test, const char* name )
+int register_test( test_ptr test, const char* name )
 {
     test_data* new_test_array = (test_data*)realloc( test_array, sizeof( test_data ) * ( num_tests + 1 ) );
     if( !new_test_array )
@@ -38,14 +38,14 @@ int        register_test( test_ptr test, const char* name )
         fprintf( stderr, "VtkTest.cpp::regeister_test(): reallocation of test array failed\n" );
         free( test_array );
         test_array = NULL;
-        num_tests = 0;
+        num_tests  = 0;
         return -1;
     }
     else
         test_array = new_test_array;
-    test_array[ num_tests ].test = test;
-    test_array[ num_tests ].name = name;
-    test_array[ num_tests ].result = true;
+    test_array[num_tests].test   = test;
+    test_array[num_tests].name   = name;
+    test_array[num_tests].result = true;
     ++num_tests;
     return 0;
 }
@@ -135,12 +135,12 @@ DECLARE_TEST( unstructured_field )
 int main( int argc, char* argv[] )
 {
     int* test_indices = (int*)malloc( sizeof( int ) * num_tests );
-    int  test_count;
+    int test_count;
     // if no arguments, do all tests
     if( argc == 1 )
     {
         for( unsigned i = 0; i < num_tests; ++i )
-            test_indices[ i ] = i;
+            test_indices[i] = i;
         test_count = num_tests;
     }
     // otherwise run only specified tests
@@ -149,15 +149,15 @@ int main( int argc, char* argv[] )
         test_count = 0;
         for( int i = 1; i < argc; ++i )
             for( unsigned j = 0; j < num_tests; ++j )
-                if( !strcmp( test_array[ j ].name, argv[ i ] ) ) test_indices[ test_count++ ] = j;
+                if( !strcmp( test_array[j].name, argv[i] ) ) test_indices[test_count++] = j;
     }
 
     int fail_count = 0;
     for( int i = 0; i < test_count; ++i )
     {
-        test_data& test = test_array[ test_indices[ i ] ];
+        test_data& test = test_array[test_indices[i]];
         printf( "Testing %s...\n", test.name );
-        if( !( test.result = test.test( ) ) ) ++fail_count;
+        if( !( test.result = test.test() ) ) ++fail_count;
     }
 
     printf( "\n\n" );
@@ -166,7 +166,7 @@ int main( int argc, char* argv[] )
         printf( "FAILED TESTS:\n" );
         for( int i = 0; i < test_count; ++i )
         {
-            test_data& test = test_array[ test_indices[ i ] ];
+            test_data& test = test_array[test_indices[i]];
             if( !test.result ) printf( "\t%s\n", test.name );
         }
     }
@@ -216,35 +216,35 @@ bool write_and_read( Interface* iface1, Interface* iface2 );
 bool test_read_write_element( const double* coords, unsigned num_coords, const int* vtk_conn, const int* moab_conn,
                               unsigned num_conn, unsigned num_elem, unsigned vtk_type, EntityType moab_type );
 
-bool test_edge2( )
+bool test_edge2()
 {
     const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1 };
-    const int    conn[] = { 0, 1, 1, 2, 2, 3, 3, 4, 0, 4 };
+    const int conn[]      = { 0, 1, 1, 2, 2, 3, 3, 4, 0, 4 };
 
     return test_read_write_element( coords, 5, conn, conn, 10, 5, 3, MBEDGE );
 }
 
-bool test_edge3( )
+bool test_edge3()
 {
     const double coords[] = { -1,    -1,     2, 1,     -1,    2, 1,     1,     2, -1,     1,     2,
                               0.000, -0.707, 2, 0.707, 0.000, 2, 0.000, 0.707, 2, -0.707, 0.000, 2 };
-    const int    conn[] = { 0, 1, 4, 1, 2, 5, 2, 3, 6, 3, 0, 7 };
+    const int conn[]      = { 0, 1, 4, 1, 2, 5, 2, 3, 6, 3, 0, 7 };
 
     return test_read_write_element( coords, 8, conn, conn, 12, 4, 21, MBEDGE );
 }
 
-bool test_tri3( )
+bool test_tri3()
 {
     const double coords[] = { 0, 0, 0, 5, 0, 0, 0, 5, 0, -5, 0, 0, 0, -5, 0 };
-    const int    conn[] = { 0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1 };
+    const int conn[]      = { 0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1 };
 
     return test_read_write_element( coords, 5, conn, conn, 12, 4, 5, MBTRI );
 }
 
-bool test_tri6( )
+bool test_tri6()
 {
     const double coords[] = { 0, 2, 0, 0, 0, 2, 0, -2, 0, 0, 0, -2, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0, 0, 0 };
-    const int    conn[] = { 0, 1, 3, 4, 5, 8, 1, 2, 3, 6, 7, 8 };
+    const int conn[]      = { 0, 1, 3, 4, 5, 8, 1, 2, 3, 6, 7, 8 };
 
     return test_read_write_element( coords, 9, conn, conn, 12, 2, 22, MBTRI );
 }
@@ -255,7 +255,7 @@ const double grid_3x3[] = { 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 0, 1, 0, 1, 1, 0
 const int quad_structured_conn[] = { 0,  1, 5, 4, 1,  2,  6, 5, 2,  3,  7, 6,  4,  5,  9,  8,  5,  6,
                                      10, 9, 6, 7, 11, 10, 8, 9, 13, 12, 9, 10, 14, 13, 10, 11, 15, 14 };
 
-bool test_quad4( )
+bool test_quad4()
 {
     // test read as quads
     bool rval1 = test_read_write_element( grid_3x3, 16, quad_structured_conn, quad_structured_conn, 36, 9, 9, MBQUAD );
@@ -263,77 +263,77 @@ bool test_quad4( )
     // test read as pixels
     const int conn2[] = { 0, 1,  4, 5, 1,  2,  5, 6, 2,  3,  6, 7,  4,  5,  8,  9,  5,  6,
                           9, 10, 6, 7, 10, 11, 8, 9, 12, 13, 9, 10, 13, 14, 10, 11, 14, 15 };
-    bool      rval2 = test_read_write_element( grid_3x3, 16, conn2, quad_structured_conn, 36, 9, 8, MBQUAD );
+    bool rval2        = test_read_write_element( grid_3x3, 16, conn2, quad_structured_conn, 36, 9, 8, MBQUAD );
 
     return rval1 && rval2;
 }
 
-bool test_quad8( )
+bool test_quad8()
 {
     const double coords[] = { 0, 0, 0, 0, 2, 0, 0, 4, 0, 0, 0, 4, 0, 2, 4, 0, 4, 4, 4, 0,
                               0, 4, 2, 0, 4, 4, 0, 2, 0, 0, 2, 4, 0, 0, 0, 2, 0, 4, 2 };
-    const int    conn[] = { 0, 2, 5, 3, 1, 12, 4, 11, 2, 0, 6, 8, 1, 9, 7, 10 };
+    const int conn[]      = { 0, 2, 5, 3, 1, 12, 4, 11, 2, 0, 6, 8, 1, 9, 7, 10 };
 
     return test_read_write_element( coords, 13, conn, conn, 16, 2, 23, MBQUAD );
 }
 
-bool test_quad9( )
+bool test_quad9()
 {
     const double coords[] = { 0, 0, 0, 0, 2, 0, 0, 4, 0, 0, 0, 4, 0, 2, 4, 0, 4, 4, 4, 0, 0, 4, 2,
                               0, 4, 4, 0, 2, 0, 0, 2, 2, 0, 2, 4, 0, 0, 0, 2, 0, 2, 2, 0, 4, 2 };
-    const int    conn[] = { 0, 2, 5, 3, 1, 14, 4, 12, 12, 2, 0, 6, 8, 1, 9, 7, 11, 10 };
+    const int conn[]      = { 0, 2, 5, 3, 1, 14, 4, 12, 12, 2, 0, 6, 8, 1, 9, 7, 11, 10 };
 
     return test_read_write_element( coords, 15, conn, conn, 18, 2, 28, MBQUAD );
 }
 
-bool test_polygon( )
+bool test_polygon()
 {
     const double coords[] = { 0, 0, 0, 0, 2, 0, 0, 4, 0, 0, 0, 4, 0, 2, 4, 0, 4, 4, 4, 0,
                               0, 4, 2, 0, 4, 4, 0, 2, 0, 0, 2, 4, 0, 0, 0, 2, 0, 4, 2 };
-    const int    conn[] = { 0, 1, 2, 12, 5, 4, 3, 11, 2, 1, 0, 9, 6, 7, 8, 10 };
+    const int conn[]      = { 0, 1, 2, 12, 5, 4, 3, 11, 2, 1, 0, 9, 6, 7, 8, 10 };
 
     return test_read_write_element( coords, 13, conn, conn, 16, 2, 7, MBPOLYGON );
 }
 
-bool test_polygon_mix( )
+bool test_polygon_mix()
 {
     // just read the polygon file with mixed sequences
-    Core       moab;
+    Core moab;
     Interface& mb = moab;
 
-    ErrorCode rval = mb.load_file( poly_example.c_str( ) );
+    ErrorCode rval = mb.load_file( poly_example.c_str() );
     if( MB_SUCCESS != rval ) return false;
 
     return true;
 }
-bool test_polyhedra( )
+bool test_polyhedra()
 {
     // just read the polyhedra file
-    Core       moab;
+    Core moab;
     Interface& mb = moab;
 
-    ErrorCode rval = mb.load_file( polyhedra_example.c_str( ) );
+    ErrorCode rval = mb.load_file( polyhedra_example.c_str() );
     if( MB_SUCCESS != rval ) return false;
     Range polyhedras;
     rval = mb.get_entities_by_type( 0, MBPOLYHEDRON, polyhedras );
     if( MB_SUCCESS != rval ) return false;
 
-    if( 10 != polyhedras.size( ) ) return false;
+    if( 10 != polyhedras.size() ) return false;
     return true;
 }
-bool test_tet4( )
+bool test_tet4()
 {
     const double coords[] = { 1, -1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, 0, 0, -1, 0, 0, 1 };
-    const int    conn[] = { 0, 1, 3, 5, 1, 2, 3, 5, 0, 1, 4, 3, 1, 2, 4, 3 };
+    const int conn[]      = { 0, 1, 3, 5, 1, 2, 3, 5, 0, 1, 4, 3, 1, 2, 4, 3 };
 
     return test_read_write_element( coords, 6, conn, conn, 16, 4, 10, MBTET );
 }
 
-bool test_tet10( )
+bool test_tet10()
 {
     const double coords[] = { 4, 0,  0, 0, 2, 0, 0, -2, 0, 0, 0,  -2, 0, 0, 2,  0, 1,  1,  2, 0, 1,
                               0, -1, 1, 0, 0, 0, 2, 1,  0, 2, -1, 0,  2, 0, -1, 0, -1, -1, 0, 1, -1 };
-    const int    conn[] = { 0, 1, 2, 4, 9, 8, 10, 6, 5, 7, 2, 1, 0, 3, 8, 9, 10, 12, 13, 11 };
+    const int conn[]      = { 0, 1, 2, 4, 9, 8, 10, 6, 5, 7, 2, 1, 0, 3, 8, 9, 10, 12, 13, 11 };
 
     return test_read_write_element( coords, 14, conn, conn, 20, 2, 24, MBTET );
 }
@@ -347,7 +347,7 @@ const int hex_structured_conn[] = { 0,  1,  4,  3,  9,  10, 13, 12, 1,  2,  5,  
                                     9,  10, 13, 12, 18, 19, 22, 21, 10, 11, 14, 13, 19, 20, 23, 22,
                                     12, 13, 16, 15, 21, 22, 25, 24, 13, 14, 17, 16, 22, 23, 26, 25 };
 
-bool test_hex8( )
+bool test_hex8()
 {
     // check vtk hexes
     bool rval1 = test_read_write_element( grid_2x2x2, 27, hex_structured_conn, hex_structured_conn, 64, 8, 12, MBHEX );
@@ -364,7 +364,7 @@ bool test_hex8( )
     return true;
 }
 
-bool test_hex20( )
+bool test_hex20()
 {
     const int vtk_conn[] = { 0, 2, 8, 6, 18, 20, 26, 24, 1, 5, 7, 3, 19, 23, 25, 21, 9, 11, 17, 15 };
     const int exo_conn[] = { 0, 2, 8, 6, 18, 20, 26, 24, 1, 5, 7, 3, 9, 11, 17, 15, 19, 23, 25, 21 };
@@ -372,9 +372,9 @@ bool test_hex20( )
     return test_read_write_element( grid_2x2x2, 27, vtk_conn, exo_conn, 20, 1, 25, MBHEX );
 }
 
-bool test_hex27( )
+bool test_hex27()
 {
-    const int vtk_conn[] = { 0,  2,  8, 6,  18, 20, 26, 24, 1,  5,  7, 3,  19, 23,
+    const int vtk_conn[]  = { 0,  2,  8, 6,  18, 20, 26, 24, 1,  5,  7, 3,  19, 23,
                              25, 21, 9, 11, 17, 15, 10, 16, 14, 12, 4, 22, 13 };
     const int moab_conn[] = { 0,  2,  8,  6,  18, 20, 26, 24, 1,  5,  7, 3,  9, 11,
                               17, 15, 19, 23, 25, 21, 14, 16, 12, 10, 4, 22, 13 };
@@ -382,40 +382,40 @@ bool test_hex27( )
     return test_read_write_element( grid_2x2x2, 27, vtk_conn, moab_conn, 27, 1, 29, MBHEX );
 }
 
-bool test_wedge( )
+bool test_wedge()
 {
     const double coords[] = { 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1 };
-    const int    exo_conn[] = { 0, 1, 3, 4, 5, 7, 1, 2, 3, 5, 6, 7 };
-    const int    vtk_conn[] = { 0, 3, 1, 4, 7, 5, 1, 3, 2, 5, 7, 6 };
+    const int exo_conn[]  = { 0, 1, 3, 4, 5, 7, 1, 2, 3, 5, 6, 7 };
+    const int vtk_conn[]  = { 0, 3, 1, 4, 7, 5, 1, 3, 2, 5, 7, 6 };
     return test_read_write_element( coords, 8, vtk_conn, exo_conn, 12, 2, 13, MBPRISM );
 }
 
-bool test_wedge15( )
+bool test_wedge15()
 {
     const double coords[] = { 2, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 0, 2, 0, 2, 2, 2, 2, 0, 2, 2, 0,
                               0, 2, 2, 1, 0, 1, 2, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 2, 1, 2, 1, 2,
                               2, 0, 1, 2, 1, 0, 2, 1, 1, 2, 2, 0, 1, 2, 2, 1, 0, 2, 1, 0, 0, 1 };
-    const int    exo_conn[] = { 0, 1, 3, 4, 5, 7, 8, 12, 11, 18, 19, 21, 13, 17, 16,
+    const int exo_conn[]  = { 0, 1, 3, 4, 5, 7, 8, 12, 11, 18, 19, 21, 13, 17, 16,
                              1, 2, 3, 5, 6, 7, 9, 10, 12, 19, 20, 21, 14, 15, 17 };
-    const int    vtk_conn[] = { 0, 3, 1, 4, 7, 5, 11, 12, 8, 16, 17, 13, 18, 21, 19,
+    const int vtk_conn[]  = { 0, 3, 1, 4, 7, 5, 11, 12, 8, 16, 17, 13, 18, 21, 19,
                              1, 3, 2, 5, 7, 6, 12, 10, 9, 17, 15, 14, 19, 21, 20 };
     return test_read_write_element( coords, 22, vtk_conn, exo_conn, 30, 2, 26, MBPRISM );
 }
 
-bool test_pyramid( )
+bool test_pyramid()
 {
     const double coords[] = { 1, -1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, 0, 0, -1, 0, 0, 1 };
-    const int    conn[] = { 0, 1, 2, 3, 5, 3, 2, 1, 0, 4 };
+    const int conn[]      = { 0, 1, 2, 3, 5, 3, 2, 1, 0, 4 };
 
     return test_read_write_element( coords, 6, conn, conn, 10, 2, 14, MBPYRAMID );
 }
 
-bool test_pyramid13( )
+bool test_pyramid13()
 {
     const double coords[] = { 2,  -2, 0,  2,  2,  0,  -2, 2,  0, -2, -2, 0, 0,  0,  -2, 0,  0,  2,
                               2,  0,  0,  0,  2,  0,  -2, 0,  0, 0,  -2, 0, 1,  -1, -1, 1,  1,  -1,
                               -1, 1,  -1, -1, -1, -1, 1,  -1, 1, 1,  1,  1, -1, 1,  1,  -1, -1, 1 };
-    const int    conn[] = { 0, 1, 2, 3, 5, 6, 7, 8, 9, 14, 15, 16, 17, 3, 2, 1, 0, 4, 8, 7, 6, 9, 13, 12, 11, 10 };
+    const int conn[]      = { 0, 1, 2, 3, 5, 6, 7, 8, 9, 14, 15, 16, 17, 3, 2, 1, 0, 4, 8, 7, 6, 9, 13, 12, 11, 10 };
 
     return test_read_write_element( coords, 18, conn, conn, 26, 2, 27, MBPYRAMID );
 }
@@ -423,7 +423,7 @@ bool test_pyramid13( )
 bool test_structured_2d( const char* file );
 bool test_structured_3d( const char* file );
 
-bool test_structured_points_2d( )
+bool test_structured_points_2d()
 {
     const char file[] = "# vtk DataFile Version 3.0\n"
                         "MOAB Version 1.00\n"
@@ -455,7 +455,7 @@ bool test_free_vertices( const char* file )
     return true;
 }
 
-bool test_free_nodes( )
+bool test_free_nodes()
 {
     const char file1[] = "# vtk DataFile Version 3.0\n"
                          "MOAB Version 1.00\n"
@@ -495,22 +495,22 @@ bool test_free_nodes( )
     bool rval2 = test_free_vertices( file2 );
     return rval1 && rval2;
 }
-bool test_structured_grid_2d( )
+bool test_structured_grid_2d()
 {
-    char file[ 4096 ] = "# vtk DataFile Version 3.0\n"
-                        "MOAB Version 1.00\n"
-                        "ASCII\n"
-                        "DATASET STRUCTURED_GRID\n"
-                        "DIMENSIONS 4 4 1\n"
-                        "POINTS 16 double\n";
+    char file[4096] = "# vtk DataFile Version 3.0\n"
+                      "MOAB Version 1.00\n"
+                      "ASCII\n"
+                      "DATASET STRUCTURED_GRID\n"
+                      "DIMENSIONS 4 4 1\n"
+                      "POINTS 16 double\n";
     int len = strlen( file );
     for( unsigned i = 0; i < 16; ++i )
-        len += sprintf( file + len, "%f %f %f\n", grid_3x3[ 3 * i ], grid_3x3[ 3 * i + 1 ], grid_3x3[ 3 * i + 2 ] );
+        len += sprintf( file + len, "%f %f %f\n", grid_3x3[3 * i], grid_3x3[3 * i + 1], grid_3x3[3 * i + 2] );
 
     return test_structured_2d( file );
 }
 
-bool test_rectilinear_grid_2d( )
+bool test_rectilinear_grid_2d()
 {
     const char file[] = "# vtk DataFile Version 3.0\n"
                         "MOAB Version 1.00\n"
@@ -524,7 +524,7 @@ bool test_rectilinear_grid_2d( )
     return test_structured_2d( file );
 }
 
-bool test_structured_points_3d( )
+bool test_structured_points_3d()
 {
     const char file[] = "# vtk DataFile Version 3.0\n"
                         "MOAB Version 1.00\n"
@@ -536,24 +536,23 @@ bool test_structured_points_3d( )
     return test_structured_3d( file );
 }
 
-bool test_structured_grid_3d( )
+bool test_structured_grid_3d()
 {
-    char file[ 4096 ] = "# vtk DataFile Version 3.0\n"
-                        "MOAB Version 1.00\n"
-                        "ASCII\n"
-                        "DATASET STRUCTURED_GRID\n"
-                        "DIMENSIONS 3 3 3\n"
-                        "POINTS 27 double\n";
+    char file[4096] = "# vtk DataFile Version 3.0\n"
+                      "MOAB Version 1.00\n"
+                      "ASCII\n"
+                      "DATASET STRUCTURED_GRID\n"
+                      "DIMENSIONS 3 3 3\n"
+                      "POINTS 27 double\n";
 
     int len = strlen( file );
     for( unsigned i = 0; i < 27; ++i )
-        len +=
-            sprintf( file + len, "%f %f %f\n", grid_2x2x2[ 3 * i ], grid_2x2x2[ 3 * i + 1 ], grid_2x2x2[ 3 * i + 2 ] );
+        len += sprintf( file + len, "%f %f %f\n", grid_2x2x2[3 * i], grid_2x2x2[3 * i + 1], grid_2x2x2[3 * i + 2] );
 
     return test_structured_3d( file );
 }
 
-bool test_rectilinear_grid_3d( )
+bool test_rectilinear_grid_3d()
 {
     const char file[] = "# vtk DataFile Version 3.0\n"
                         "MOAB Version 1.00\n"
@@ -571,225 +570,225 @@ bool test_scalar_attrib( const char* vtk_type, DataType mb_type, int count );
 bool test_vector_attrib( const char* vtk_type, DataType mb_type );
 bool test_tensor_attrib( const char* vtk_type, DataType mb_type );
 
-bool test_scalar_attrib_1_bit( )
+bool test_scalar_attrib_1_bit()
 {
     return test_scalar_attrib( "bit", MB_TYPE_BIT, 1 );
 }
 
-bool test_scalar_attrib_1_uchar( )
+bool test_scalar_attrib_1_uchar()
 {
     return test_scalar_attrib( "unsigned_char", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_char( )
+bool test_scalar_attrib_1_char()
 {
     return test_scalar_attrib( "char", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_ushort( )
+bool test_scalar_attrib_1_ushort()
 {
     return test_scalar_attrib( "unsigned_short", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_short( )
+bool test_scalar_attrib_1_short()
 {
     return test_scalar_attrib( "short", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_uint( )
+bool test_scalar_attrib_1_uint()
 {
     return test_scalar_attrib( "unsigned_int", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_int( )
+bool test_scalar_attrib_1_int()
 {
     return test_scalar_attrib( "int", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_ulong( )
+bool test_scalar_attrib_1_ulong()
 {
     return test_scalar_attrib( "unsigned_long", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_long( )
+bool test_scalar_attrib_1_long()
 {
     return test_scalar_attrib( "long", MB_TYPE_INTEGER, 1 );
 }
 
-bool test_scalar_attrib_1_float( )
+bool test_scalar_attrib_1_float()
 {
     return test_scalar_attrib( "float", MB_TYPE_DOUBLE, 1 );
 }
 
-bool test_scalar_attrib_1_double( )
+bool test_scalar_attrib_1_double()
 {
     return test_scalar_attrib( "double", MB_TYPE_DOUBLE, 1 );
 }
 
-bool test_scalar_attrib_4_bit( )
+bool test_scalar_attrib_4_bit()
 {
     return test_scalar_attrib( "bit", MB_TYPE_BIT, 4 );
 }
 
-bool test_scalar_attrib_4_uchar( )
+bool test_scalar_attrib_4_uchar()
 {
     return test_scalar_attrib( "unsigned_char", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_char( )
+bool test_scalar_attrib_4_char()
 {
     return test_scalar_attrib( "char", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_ushort( )
+bool test_scalar_attrib_4_ushort()
 {
     return test_scalar_attrib( "unsigned_short", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_short( )
+bool test_scalar_attrib_4_short()
 {
     return test_scalar_attrib( "short", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_uint( )
+bool test_scalar_attrib_4_uint()
 {
     return test_scalar_attrib( "unsigned_int", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_int( )
+bool test_scalar_attrib_4_int()
 {
     return test_scalar_attrib( "int", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_ulong( )
+bool test_scalar_attrib_4_ulong()
 {
     return test_scalar_attrib( "unsigned_long", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_long( )
+bool test_scalar_attrib_4_long()
 {
     return test_scalar_attrib( "long", MB_TYPE_INTEGER, 4 );
 }
 
-bool test_scalar_attrib_4_float( )
+bool test_scalar_attrib_4_float()
 {
     return test_scalar_attrib( "float", MB_TYPE_DOUBLE, 4 );
 }
 
-bool test_scalar_attrib_4_double( )
+bool test_scalar_attrib_4_double()
 {
     return test_scalar_attrib( "double", MB_TYPE_DOUBLE, 4 );
 }
 
-bool test_vector_attrib_bit( )
+bool test_vector_attrib_bit()
 {
     return test_vector_attrib( "bit", MB_TYPE_BIT );
 }
 
-bool test_vector_attrib_uchar( )
+bool test_vector_attrib_uchar()
 {
     return test_vector_attrib( "unsigned_char", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_char( )
+bool test_vector_attrib_char()
 {
     return test_vector_attrib( "char", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_ushort( )
+bool test_vector_attrib_ushort()
 {
     return test_vector_attrib( "unsigned_short", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_short( )
+bool test_vector_attrib_short()
 {
     return test_vector_attrib( "short", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_uint( )
+bool test_vector_attrib_uint()
 {
     return test_vector_attrib( "unsigned_int", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_int( )
+bool test_vector_attrib_int()
 {
     return test_vector_attrib( "int", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_ulong( )
+bool test_vector_attrib_ulong()
 {
     return test_vector_attrib( "unsigned_long", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_long( )
+bool test_vector_attrib_long()
 {
     return test_vector_attrib( "long", MB_TYPE_INTEGER );
 }
 
-bool test_vector_attrib_float( )
+bool test_vector_attrib_float()
 {
     return test_vector_attrib( "float", MB_TYPE_DOUBLE );
 }
 
-bool test_vector_attrib_double( )
+bool test_vector_attrib_double()
 {
     return test_vector_attrib( "double", MB_TYPE_DOUBLE );
 }
 
-bool test_tensor_attrib_uchar( )
+bool test_tensor_attrib_uchar()
 {
     return test_tensor_attrib( "unsigned_char", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_char( )
+bool test_tensor_attrib_char()
 {
     return test_tensor_attrib( "char", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_ushort( )
+bool test_tensor_attrib_ushort()
 {
     return test_tensor_attrib( "unsigned_short", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_short( )
+bool test_tensor_attrib_short()
 {
     return test_tensor_attrib( "short", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_uint( )
+bool test_tensor_attrib_uint()
 {
     return test_tensor_attrib( "unsigned_int", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_int( )
+bool test_tensor_attrib_int()
 {
     return test_tensor_attrib( "int", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_ulong( )
+bool test_tensor_attrib_ulong()
 {
     return test_tensor_attrib( "unsigned_long", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_long( )
+bool test_tensor_attrib_long()
 {
     return test_tensor_attrib( "long", MB_TYPE_INTEGER );
 }
 
-bool test_tensor_attrib_float( )
+bool test_tensor_attrib_float()
 {
     return test_tensor_attrib( "float", MB_TYPE_DOUBLE );
 }
 
-bool test_tensor_attrib_double( )
+bool test_tensor_attrib_double()
 {
     return test_tensor_attrib( "double", MB_TYPE_DOUBLE );
 }
 
 bool read_file( Interface* iface, const char* file )
 {
-    char  fname[] = "tmp_file.vtk";
-    FILE* fptr = fopen( fname, "w" );
+    char fname[] = "tmp_file.vtk";
+    FILE* fptr   = fopen( fname, "w" );
     fputs( file, fptr );
     fclose( fptr );
 
@@ -802,8 +801,8 @@ bool read_file( Interface* iface, const char* file )
 bool write_and_read( Interface* iface1, Interface* iface2 )
 {
     const char fname[] = "tmp_file.vtk";
-    ErrorCode  rval1 = iface1->write_mesh( fname );
-    ErrorCode  rval2 = iface2->load_mesh( fname );
+    ErrorCode rval1    = iface1->write_mesh( fname );
+    ErrorCode rval2    = iface2->load_mesh( fname );
     remove( fname );
     CHECK( rval1 );
     CHECK( rval2 );
@@ -813,7 +812,7 @@ bool write_and_read( Interface* iface1, Interface* iface2 )
 bool compare_connectivity( EntityType, const int* conn1, const int* conn2, unsigned len )
 {
     for( unsigned i = 0; i < len; ++i )
-        if( conn1[ i ] != conn2[ i ] ) return false;
+        if( conn1[i] != conn2[i] ) return false;
     return true;
 }
 
@@ -827,44 +826,44 @@ bool match_vertices_and_elements( Interface* iface, EntityType moab_type, unsign
     Range verts;
     rval = iface->get_entities_by_type( 0, MBVERTEX, verts );
     CHECK( rval );
-    CHECK( verts.size( ) == num_vert );
+    CHECK( verts.size() == num_vert );
 
     // get elements and check count
     Range elems;
     rval = iface->get_entities_by_type( 0, moab_type, elems );
     CHECK( rval );
-    CHECK( elems.size( ) == num_elem );
+    CHECK( elems.size() == num_elem );
 
     // get vertex coordinates
     std::vector< EntityHandle > vert_array( num_vert );
-    std::copy( verts.begin( ), verts.end( ), vert_array.begin( ) );
+    std::copy( verts.begin(), verts.end(), vert_array.begin() );
     std::vector< double > mb_coords( 3 * num_vert );
-    rval = iface->get_coords( &vert_array[ 0 ], num_vert, &mb_coords[ 0 ] );
+    rval = iface->get_coords( &vert_array[0], num_vert, &mb_coords[0] );
     CHECK( rval );
 
     // compare vertex coordinates to construct map from
     // EntityHandle to index in input coordinate list
     std::map< EntityHandle, int > vert_map;
-    std::vector< bool >           seen( num_vert, false );
+    std::vector< bool > seen( num_vert, false );
     for( unsigned i = 0; i < num_vert; ++i )
     {
-        double* vert_coords = &mb_coords[ 3 * i ];
-        bool    found = false;
+        double* vert_coords = &mb_coords[3 * i];
+        bool found          = false;
         for( unsigned j = 0; j < num_vert; ++j )
         {
-            const double* file_coords = &coords[ 3 * j ];
-            double        dsqr = 0;
+            const double* file_coords = &coords[3 * j];
+            double dsqr               = 0;
             for( unsigned k = 0; k < 3; ++k )
             {
-                double diff = vert_coords[ k ] - file_coords[ k ];
+                double diff = vert_coords[k] - file_coords[k];
                 dsqr += diff * diff;
             }
             if( dsqr < 1e-6 )
             {
-                CHECK( !seen[ j ] );  // duplicate vertex
-                seen[ j ] = found = true;
-                vert_map[ vert_array[ i ] ] = j;
-                vert_handles[ j ] = vert_array[ i ];
+                CHECK( !seen[j] );  // duplicate vertex
+                seen[j] = found         = true;
+                vert_map[vert_array[i]] = j;
+                vert_handles[j]         = vert_array[i];
                 break;
             }
         }
@@ -872,9 +871,9 @@ bool match_vertices_and_elements( Interface* iface, EntityType moab_type, unsign
     }
 
     // check element connectivity
-    seen.clear( );
+    seen.clear();
     seen.resize( num_elem, false );
-    Range::iterator iter = elems.begin( );
+    Range::iterator iter = elems.begin();
     for( unsigned i = 0; i < num_elem; ++i )
     {
         // get element connectivity
@@ -883,15 +882,15 @@ bool match_vertices_and_elements( Interface* iface, EntityType moab_type, unsign
         std::vector< EntityHandle > elem_conn;
         rval = iface->get_connectivity( &elem, 1, elem_conn );
         CHECK( rval );
-        CHECK( elem_conn.size( ) == vert_per_elem );
+        CHECK( elem_conn.size() == vert_per_elem );
 
         // convert to input vertex ordering
         std::vector< int > elem_conn2( vert_per_elem );
         for( unsigned j = 0; j < vert_per_elem; ++j )
         {
-            std::map< EntityHandle, int >::iterator k = vert_map.find( elem_conn[ j ] );
-            CHECK( k != vert_map.end( ) );
-            elem_conn2[ j ] = k->second;
+            std::map< EntityHandle, int >::iterator k = vert_map.find( elem_conn[j] );
+            CHECK( k != vert_map.end() );
+            elem_conn2[j] = k->second;
         }
 
         // search input list for matching element
@@ -899,10 +898,10 @@ bool match_vertices_and_elements( Interface* iface, EntityType moab_type, unsign
         for( unsigned j = 0; j < num_elem; ++j )
         {
             const int* conn_arr = connectivity + j * vert_per_elem;
-            if( !seen[ j ] && compare_connectivity( moab_type, conn_arr, &elem_conn2[ 0 ], vert_per_elem ) )
+            if( !seen[j] && compare_connectivity( moab_type, conn_arr, &elem_conn2[0], vert_per_elem ) )
             {
-                seen[ j ] = found = true;
-                elem_handles[ j ] = elem;
+                seen[j] = found = true;
+                elem_handles[j] = elem;
                 break;
             }
         }
@@ -917,7 +916,7 @@ bool check_elements( Interface* iface, EntityType moab_type, unsigned num_elem, 
 {
     std::vector< EntityHandle > junk1( num_vert ), junk2( num_elem );
     bool rval = match_vertices_and_elements( iface, moab_type, num_vert, num_elem, vert_per_elem, coords, connectivity,
-                                             &junk1[ 0 ], &junk2[ 0 ] );
+                                             &junk1[0], &junk2[0] );
     CHECK( rval );
     return true;
 }
@@ -927,15 +926,15 @@ bool test_read_write_element( const double* coords, unsigned num_verts, const in
 
 {
     // construct VTK file
-    char file[ 4096 ] = "# vtk DataFile Version 3.0\n"
-                        "MOAB Version 1.00\n"
-                        "ASCII\n"
-                        "DATASET UNSTRUCTURED_GRID\n";
+    char file[4096] = "# vtk DataFile Version 3.0\n"
+                      "MOAB Version 1.00\n"
+                      "ASCII\n"
+                      "DATASET UNSTRUCTURED_GRID\n";
     size_t len = strlen( file );
 
     len += sprintf( file + len, "POINTS %u double\n", num_verts );
     for( unsigned i = 0; i < num_verts; ++i )
-        len += sprintf( file + len, "%f %f %f\n", coords[ 3 * i ], coords[ 3 * i + 1 ], coords[ 3 * i + 2 ] );
+        len += sprintf( file + len, "%f %f %f\n", coords[3 * i], coords[3 * i + 1], coords[3 * i + 2] );
 
     len += sprintf( file + len, "CELLS %u %u\n", num_elem, num_conn + num_elem );
     assert( num_conn % num_elem == 0 );
@@ -944,7 +943,7 @@ bool test_read_write_element( const double* coords, unsigned num_verts, const in
     {
         len += sprintf( file + len, "%u", conn_len );
         for( unsigned j = 0; j < conn_len; ++j )
-            len += sprintf( file + len, " %u", vtk_conn[ conn_len * i + j ] );
+            len += sprintf( file + len, " %u", vtk_conn[conn_len * i + j] );
         len += sprintf( file + len, "\n" );
     }
 
@@ -1010,9 +1009,9 @@ const char two_quad_mesh[] = "# vtk DataFile Version 3.0\n"
                              "9 9\n";
 
 const double two_quad_mesh_coords[] = { -1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 1, 0, 0, 1, 0, 1, 1, 0 };
-const int    two_quad_mesh_conn[] = { 0, 1, 4, 3, 1, 2, 5, 4 };
+const int two_quad_mesh_conn[]      = { 0, 1, 4, 3, 1, 2, 5, 4 };
 
-const int vertex_values[] = { 9, 3, 8, 2, 0, 6, 4, 1, 4, 1, 0, 3, 8, 6, 6, 4, 0, 2, 1, 2, 3, 4, 5, 6, 6, 5, 4,
+const int vertex_values[]  = { 9, 3, 8, 2, 0, 6, 4, 1, 4, 1, 0, 3, 8, 6, 6, 4, 0, 2, 1, 2, 3, 4, 5, 6, 6, 5, 4,
                               3, 2, 1, 0, 6, 1, 5, 2, 4, 3, 6, 9, 2, 5, 8, 1, 3, 5, 7, 1, 3, 5, 8, 1, 9, 7, 4 };
 const int element_values[] = { 1001, 1002, 1004, 1003, 50, 60, 51, 61, 1, 2, 3, 4, 5, 6,
                                7,    8,    9,    0,    0,  9,  8,  7,  6, 5, 4, 3, 2, 1 };
@@ -1023,19 +1022,19 @@ void write_data( char* file, size_t& len, DataType type, unsigned count, const i
     {
         case MB_TYPE_BIT:
             for( unsigned i = 0; i < count; ++i )
-                len += sprintf( file + len, "%d\n", abs( vals[ i ] ) % 2 );
+                len += sprintf( file + len, "%d\n", abs( vals[i] ) % 2 );
             break;
         case MB_TYPE_INTEGER:
             for( unsigned i = 0; i < count; ++i )
-                len += sprintf( file + len, "%d\n", vals[ i ] );
+                len += sprintf( file + len, "%d\n", vals[i] );
             break;
         case MB_TYPE_DOUBLE:
             for( unsigned i = 0; i < count; ++i )
-                len += sprintf( file + len, "%f\n", (double)vals[ i ] );
+                len += sprintf( file + len, "%f\n", (double)vals[i] );
             break;
         case MB_TYPE_OPAQUE:
             for( unsigned i = 0; i < count; ++i )
-                len += sprintf( file + len, "%d\n", abs( vals[ i ] % 256 ) );
+                len += sprintf( file + len, "%d\n", abs( vals[i] % 256 ) );
             break;
         default:
             assert( false /* VTK files cannot handle this type */ );
@@ -1045,11 +1044,11 @@ void write_data( char* file, size_t& len, DataType type, unsigned count, const i
 bool check_tag_values( Interface* iface, DataType tag_type, int tag_length, int num_entities,
                        const EntityHandle* entities, const int* values )
 {
-    Tag       tag;
+    Tag tag;
     ErrorCode rval = iface->tag_get_handle( "data", tag_length, tag_type, tag );
     CHECK( rval );
 
-    int     size, *intptr;
+    int size, *intptr;
     double* dblptr;
     rval = iface->tag_get_bytes( tag, size );
     CHECK( rval );
@@ -1076,30 +1075,30 @@ bool check_tag_values( Interface* iface, DataType tag_type, int tag_length, int 
             }
             break;
         case MB_TYPE_OPAQUE:
-            rval = iface->tag_get_data( tag, entities, num_entities, &data[ 0 ] );
+            rval = iface->tag_get_data( tag, entities, num_entities, &data[0] );
             CHECK( rval );
             CHECK( tag_length == size );
             for( int i = 0; i < num_entities; ++i )
                 for( int j = 0; j < tag_length; ++j, ++values )
-                    CHECK( (unsigned)( *values % 256 ) == data[ i * tag_length + j ] );
+                    CHECK( (unsigned)( *values % 256 ) == data[i * tag_length + j] );
             break;
         case MB_TYPE_INTEGER:
-            rval = iface->tag_get_data( tag, entities, num_entities, &data[ 0 ] );
+            rval = iface->tag_get_data( tag, entities, num_entities, &data[0] );
             CHECK( rval );
             CHECK( tag_length * sizeof( int ) == (unsigned)size );
-            intptr = reinterpret_cast< int* >( &data[ 0 ] );
+            intptr = reinterpret_cast< int* >( &data[0] );
             for( int i = 0; i < num_entities; ++i )
                 for( int j = 0; j < tag_length; ++j, ++values )
-                    CHECK( *values == intptr[ i * tag_length + j ] );
+                    CHECK( *values == intptr[i * tag_length + j] );
             break;
         case MB_TYPE_DOUBLE:
-            rval = iface->tag_get_data( tag, entities, num_entities, &data[ 0 ] );
+            rval = iface->tag_get_data( tag, entities, num_entities, &data[0] );
             CHECK( rval );
             CHECK( tag_length * sizeof( double ) == (unsigned)size );
-            dblptr = reinterpret_cast< double* >( &data[ 0 ] );
+            dblptr = reinterpret_cast< double* >( &data[0] );
             for( int i = 0; i < num_entities; ++i )
                 for( int j = 0; j < tag_length; ++j, ++values )
-                    CHECK( *values == dblptr[ i * tag_length + j ] );
+                    CHECK( *values == dblptr[i * tag_length + j] );
             break;
         default:
             assert( false );
@@ -1110,8 +1109,8 @@ bool check_tag_values( Interface* iface, DataType tag_type, int tag_length, int 
 
 bool check_tag_values( Interface* iface, DataType type, int vals_per_ent )
 {
-    EntityHandle vert_handles[ 6 ], elem_handles[ 2 ];
-    bool         rval = match_vertices_and_elements( iface, MBQUAD, 6, 2, 4, two_quad_mesh_coords, two_quad_mesh_conn,
+    EntityHandle vert_handles[6], elem_handles[2];
+    bool rval = match_vertices_and_elements( iface, MBQUAD, 6, 2, 4, two_quad_mesh_coords, two_quad_mesh_conn,
                                              vert_handles, elem_handles );
     CHECK( rval );
 
@@ -1140,7 +1139,7 @@ bool check_tag_data( const char* file, DataType type, int vals_per_ent )
 
 bool test_scalar_attrib( const char* vtk_type, DataType mb_type, int count )
 {
-    char file[ 4096 ];
+    char file[4096];
     strcpy( file, two_quad_mesh );
     size_t len = strlen( file );
     len += sprintf( file + len, "POINT_DATA 6\n" );
@@ -1157,7 +1156,7 @@ bool test_scalar_attrib( const char* vtk_type, DataType mb_type, int count )
 
 bool test_vector_attrib( const char* vtk_type, DataType mb_type )
 {
-    char file[ 4096 ];
+    char file[4096];
     strcpy( file, two_quad_mesh );
     size_t len = strlen( file );
     len += sprintf( file + len, "POINT_DATA 6\n" );
@@ -1172,7 +1171,7 @@ bool test_vector_attrib( const char* vtk_type, DataType mb_type )
 
 bool test_tensor_attrib( const char* vtk_type, DataType mb_type )
 {
-    char file[ 4096 ];
+    char file[4096];
     strcpy( file, two_quad_mesh );
     size_t len = strlen( file );
     len += sprintf( file + len, "POINT_DATA 6\n" );
@@ -1185,56 +1184,56 @@ bool test_tensor_attrib( const char* vtk_type, DataType mb_type )
     return check_tag_data( file, mb_type, 9 );
 }
 
-bool test_subset( )
+bool test_subset()
 {
-    Core       moab_inst;
+    Core moab_inst;
     Interface& moab = moab_inst;
-    ErrorCode  rval;
+    ErrorCode rval;
 
     // create 9 nodes in grid pattern
-    EntityHandle verts[ 9 ];
-    const double coords[][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 2, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 },
-                                   { 2, 1, 0 }, { 0, 2, 0 }, { 1, 2, 0 }, { 2, 2, 0 } };
+    EntityHandle verts[9];
+    const double coords[][3] = { { 0, 0, 0 }, { 1, 0, 0 }, { 2, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 },
+                                 { 2, 1, 0 }, { 0, 2, 0 }, { 1, 2, 0 }, { 2, 2, 0 } };
     for( unsigned i = 0; i < 9; ++i )
     {
-        rval = moab.create_vertex( coords[ i ], verts[ i ] );
+        rval = moab.create_vertex( coords[i], verts[i] );
         assert( MB_SUCCESS == rval );
     }
 
     // create 4 quad elements in grid pattern
-    const int    conn[][ 4 ] = { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 3, 4, 7, 6 }, { 4, 5, 8, 7 } };
-    EntityHandle econn[ 4 ], elems[ 4 ];
+    const int conn[][4] = { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 3, 4, 7, 6 }, { 4, 5, 8, 7 } };
+    EntityHandle econn[4], elems[4];
     for( unsigned i = 0; i < 4; ++i )
     {
         for( unsigned j = 0; j < 4; ++j )
-            econn[ j ] = verts[ conn[ i ][ j ] ];
-        rval = moab.create_element( MBQUAD, econn, 4, elems[ i ] );
+            econn[j] = verts[conn[i][j]];
+        rval = moab.create_element( MBQUAD, econn, 4, elems[i] );
         assert( MB_SUCCESS == rval );
     }
 
     // create 3 meshsets
-    EntityHandle sets[ 3 ];
+    EntityHandle sets[3];
     for( unsigned i = 0; i < 3; ++i )
     {
-        rval = moab.create_meshset( 0, sets[ i ] );
+        rval = moab.create_meshset( 0, sets[i] );
         assert( MB_SUCCESS == rval );
     }
 
     // add element 3 to set 0
-    rval = moab.add_entities( sets[ 0 ], elems + 3, 1 );
+    rval = moab.add_entities( sets[0], elems + 3, 1 );
     assert( MB_SUCCESS == rval );
     // add node 2 to set 1
-    rval = moab.add_entities( sets[ 1 ], verts + 2, 1 );
+    rval = moab.add_entities( sets[1], verts + 2, 1 );
     assert( MB_SUCCESS == rval );
     // add element 2 and 3 to set 2
-    rval = moab.add_entities( sets[ 2 ], elems + 2, 2 );
+    rval = moab.add_entities( sets[2], elems + 2, 2 );
     assert( MB_SUCCESS == rval );
 
     // make set 2 a child of set 1
-    rval = moab.add_child_meshset( sets[ 1 ], sets[ 2 ] );
+    rval = moab.add_child_meshset( sets[1], sets[2] );
     assert( MB_SUCCESS == rval );
     // put set 1 in set 0
-    rval = moab.add_entities( sets[ 0 ], sets + 1, 1 );
+    rval = moab.add_entities( sets[0], sets + 1, 1 );
     assert( MB_SUCCESS == rval );
 
     // write sets[0] to vtk file
@@ -1242,7 +1241,7 @@ bool test_subset( )
     CHECK( rval );
 
     // read data back in
-    moab.delete_mesh( );
+    moab.delete_mesh();
     rval = moab.load_mesh( "tmp_file.vtk" );
     remove( "tmp_file.vtk" );
     CHECK( rval );
@@ -1253,58 +1252,58 @@ bool test_subset( )
     Range new_elems, new_verts;
     rval = moab.get_entities_by_type( 0, MBQUAD, new_elems );
     CHECK( rval );
-    CHECK( new_elems.size( ) == 2 );
+    CHECK( new_elems.size() == 2 );
     rval = moab.get_entities_by_type( 0, MBVERTEX, new_verts );
     CHECK( rval );
-    CHECK( new_verts.size( ) == 7 );
+    CHECK( new_verts.size() == 7 );
 
     // vertex not in element closure should have coords of 2,0,0
     Range elem_verts;
     rval = moab.get_adjacencies( new_elems, 0, false, elem_verts, Interface::UNION );
     CHECK( rval );
-    CHECK( elem_verts.size( ) == 6 );
+    CHECK( elem_verts.size() == 6 );
     Range free_verts( subtract( new_verts, elem_verts ) );
-    CHECK( free_verts.size( ) == 1 );
-    double vcoords[ 3 ];
+    CHECK( free_verts.size() == 1 );
+    double vcoords[3];
     rval = moab.get_coords( free_verts, vcoords );
-    CHECK( vcoords[ 0 ] == 2 );
-    CHECK( vcoords[ 1 ] == 0 );
-    CHECK( vcoords[ 2 ] == 0 );
+    CHECK( vcoords[0] == 2 );
+    CHECK( vcoords[1] == 0 );
+    CHECK( vcoords[2] == 0 );
 
     return true;
 }
 
-bool test_write_free_nodes( )
+bool test_write_free_nodes()
 {
-    Core       moab_inst;
+    Core moab_inst;
     Interface& moab = moab_inst;
-    ErrorCode  rval;
+    ErrorCode rval;
 
     // create 9 nodes in grid pattern
-    EntityHandle verts[ 9 ];
-    const double coords[][ 3 ] = { { 0, 0, 0 }, { 1, 0, 0 }, { 2, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 },
-                                   { 2, 1, 0 }, { 0, 2, 0 }, { 1, 2, 0 }, { 2, 2, 0 } };
+    EntityHandle verts[9];
+    const double coords[][3] = { { 0, 0, 0 }, { 1, 0, 0 }, { 2, 0, 0 }, { 0, 1, 0 }, { 1, 1, 0 },
+                                 { 2, 1, 0 }, { 0, 2, 0 }, { 1, 2, 0 }, { 2, 2, 0 } };
     for( unsigned i = 0; i < 9; ++i )
     {
-        rval = moab.create_vertex( coords[ i ], verts[ i ] );
+        rval = moab.create_vertex( coords[i], verts[i] );
         assert( MB_SUCCESS == rval );
     }
 
     // create 3 quad elements, one node (8) not used
-    const int conn[][ 4 ] = { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 3, 4, 7, 6 } };
+    const int conn[][4] = { { 0, 1, 4, 3 }, { 1, 2, 5, 4 }, { 3, 4, 7, 6 } };
 
     Tag gid;
     rval = moab.tag_get_handle( "GLOBAL_ID", 1, moab::MB_TYPE_INTEGER, gid );
     assert( MB_SUCCESS == rval );
-    EntityHandle econn[ 4 ], elems[ 3 ];
+    EntityHandle econn[4], elems[3];
     for( unsigned i = 0; i < 3; ++i )
     {
         for( unsigned j = 0; j < 4; ++j )
-            econn[ j ] = verts[ conn[ i ][ j ] ];
-        rval = moab.create_element( MBQUAD, econn, 4, elems[ i ] );
+            econn[j] = verts[conn[i][j]];
+        rval = moab.create_element( MBQUAD, econn, 4, elems[i] );
         assert( MB_SUCCESS == rval );
         int id = i + 1;
-        rval = moab.tag_set_data( gid, &elems[ i ], 1, &id );
+        rval   = moab.tag_set_data( gid, &elems[i], 1, &id );
         assert( MB_SUCCESS == rval );
     }
 
@@ -1315,7 +1314,7 @@ bool test_write_free_nodes( )
     CHECK( rval );
 
     // read data back in
-    moab.delete_mesh( );
+    moab.delete_mesh();
     rval = moab.load_file( "tmp_file.vtk" );
     remove( "tmp_file.vtk" );
     remove( "tmp_file2.vtk" );
@@ -1326,13 +1325,13 @@ bool test_write_free_nodes( )
 
 // Test technically invalid but somewhat common insertion of
 // FIELD blocks within an UNSTRUCTURED_GRID dataset
-bool test_unstructured_field( )
+bool test_unstructured_field()
 {
     // Use existing file defined in 'two_quad_mesh', but
     // insert a few field data blocks
     std::istringstream base_data( two_quad_mesh );
     std::ostringstream file_data;
-    std::string        line;
+    std::string line;
     while( getline( base_data, line ) )
     {
         if( 0 == line.find( "POINTS" ) )
@@ -1357,12 +1356,12 @@ bool test_unstructured_field( )
         file_data << line << std::endl;
     }
 
-    Core       core;
+    Core core;
     Interface& mb = core;
-    bool       rval = read_file( &mb, file_data.str( ).c_str( ) );
+    bool rval     = read_file( &mb, file_data.str().c_str() );
     CHECK( rval );
 
-    EntityHandle vert_handles[ 6 ], elem_handles[ 2 ];
+    EntityHandle vert_handles[6], elem_handles[2];
     rval = match_vertices_and_elements( &mb, MBQUAD, 6, 2, 4, two_quad_mesh_coords, two_quad_mesh_conn, vert_handles,
                                         elem_handles );
     CHECK( rval );

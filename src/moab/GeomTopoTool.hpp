@@ -56,10 +56,10 @@ class GeomTopoTool
     GeomTopoTool( Interface* impl, bool find_geoments = false, EntityHandle modelRootSet = 0,
                   bool p_rootSets_vector = true, bool restore_rootSets = true );
 
-    ~GeomTopoTool( );
+    ~GeomTopoTool();
 
     //! Restore parent/child links between GEOM_TOPO mesh sets
-    ErrorCode restore_topology_from_adjacency( );
+    ErrorCode restore_topology_from_adjacency();
     //! Store sense of entity relative to wrt_entity.
     //!\return MB_MULTIPLE_ENTITIES_FOUND if surface already has a forward volume.
     //!        MB_SUCCESS if successful
@@ -105,7 +105,7 @@ class GeomTopoTool
      * @param minPt Location of the min xyz corner of the volume's axis-aligned bounding box
      * @param maxPt Location of the max xyz corner of the volume's axis-aligned bounding box
      */
-    ErrorCode get_bounding_coords( EntityHandle volume, double minPt[ 3 ], double maxPt[ 3 ] );
+    ErrorCode get_bounding_coords( EntityHandle volume, double minPt[3], double maxPt[3] );
 
     /** \brief Get the center point and three vectors for the OBB of a given volume
      *
@@ -115,8 +115,7 @@ class GeomTopoTool
      * @param axis2 scaled axis two of the oriented bounding box
      * @param axis3 scaled axis three of the oriented bounding box
      */
-    ErrorCode get_obb( EntityHandle volume, double center[ 3 ], double axis1[ 3 ], double axis2[ 3 ],
-                       double axis3[ 3 ] );
+    ErrorCode get_obb( EntityHandle volume, double center[3], double axis1[3], double axis2[3], double axis3[3] );
 
     /** \brief Get the other (d-1)-dimensional entity bounding a set across a (d-2)-dimensional
      * entity
@@ -155,7 +154,7 @@ class GeomTopoTool
     //  is frequent, a faster lookup capability is enabled through data structures
     //  in GeomTopoTool (i.e. rootSets or mapRootSets).  This data structure
     //  needs to be populated upon file read.
-    ErrorCode restore_obb_index( );
+    ErrorCode restore_obb_index();
 
     //! Build obb trees for all surfaces and volumes in model set.
     //  If make_one_vol true, joins trees from all surfaces in model into single
@@ -171,7 +170,7 @@ class GeomTopoTool
     //  along with all child surface OBB trees.
     ErrorCode delete_obb_tree( EntityHandle gset, bool vol_only = false );
 
-    ErrorCode delete_all_obb_trees( );
+    ErrorCode delete_all_obb_trees();
 
     //! Delete the root of the obb tree from the set of all roots
     ErrorCode remove_root( EntityHandle vol_or_surf );
@@ -181,10 +180,10 @@ class GeomTopoTool
 
     //! If constructing one volume obb tree by joining all surface trees,
     //  get the root of that tree
-    EntityHandle get_one_vol_root( );
+    EntityHandle get_one_vol_root();
 
     //! Pointer to Oriented Box Tree Tool class
-    OrientedBoxTreeTool* obb_tree( )
+    OrientedBoxTreeTool* obb_tree()
     {
         return obbTree;
     }
@@ -210,43 +209,43 @@ class GeomTopoTool
     ErrorCode duplicate_model( GeomTopoTool*& duplicate, std::vector< EntityHandle >* pvGEnts = NULL );
 
     //! Return the model set handle (this is the full geometry)
-    EntityHandle get_root_model_set( )
+    EntityHandle get_root_model_set()
     {
         return modelSet;
     }
 
     //! Checks that all geometric entities were created properly
-    bool check_model( );
+    bool check_model();
 
     //! Should be used instead of keeping multiple ranges, for example in FBEngine
-    const Range* geoRanges( )
+    const Range* geoRanges()
     {
         return geomRanges;
     }
 
     //! Return pointer to moab instance
-    Interface* get_moab_instance( )
+    Interface* get_moab_instance()
     {
         return mdbImpl;
     }
 
     //! Returns the sense tag (sense2Tag) from check_face_sense_tag
-    Tag get_sense_tag( );
+    Tag get_sense_tag();
 
     //! Returns the global ID tag (gidTag) from check_gid_tag
-    Tag get_gid_tag( );
+    Tag get_gid_tag();
 
     //! Returns the geometry dimension tag (geomTag) from check_geom_tag
-    Tag get_geom_tag( );
+    Tag get_geom_tag();
 
     //! Returns true if obb trees have been added to the rootset
-    bool have_obb_tree( );
+    bool have_obb_tree();
 
     //! returns the number of entities in the modelSet with specified geometric dimension
     int num_ents_of_dim( int dim );
 
     //! sets the implicit complement handle for this tool
-    ErrorCode setup_implicit_complement( );
+    ErrorCode setup_implicit_complement();
 
     //! Get (or optionally, create) the implicit complement handle
     ErrorCode get_implicit_complement( EntityHandle& implicit_complement );
@@ -280,30 +279,30 @@ class GeomTopoTool
 
   private:
     Interface* mdbImpl;
-    Tag        sense2Tag;
-    Tag        senseNEntsTag, senseNSensesTag;
-    Tag        geomTag;
-    Tag        gidTag;
-    Tag        nameTag;
-    Tag        obbRootTag;
-    Tag        obbGsetTag;
+    Tag sense2Tag;
+    Tag senseNEntsTag, senseNSensesTag;
+    Tag geomTag;
+    Tag gidTag;
+    Tag nameTag;
+    Tag obbRootTag;
+    Tag obbGsetTag;
     // the model set encompasses a full topological model
     EntityHandle modelSet;
     // implicit complement handle cache
     EntityHandle impl_compl_handle;
 
-    Range geomRanges[ 5 ];  // add one more dimension, for set of gentities; by default, they will
-                            // have geom_dimension 4
-    int  maxGlobalId[ 5 ];  // one max global id for each dimension
+    Range geomRanges[5];  // add one more dimension, for set of gentities; by default, they will
+                          // have geom_dimension 4
+    int maxGlobalId[5];   // one max global id for each dimension
     bool updated;
 
-    OrientedBoxTreeTool*        obbTree;
-    EntityHandle                setOffset;
+    OrientedBoxTreeTool* obbTree;
+    EntityHandle setOffset;
     std::vector< EntityHandle > rootSets;
 
-    bool                                   m_rootSets_vector;
+    bool m_rootSets_vector;
     std::map< EntityHandle, EntityHandle > mapRootSets;
-    EntityHandle                           oneVolRootSet;
+    EntityHandle oneVolRootSet;
 
     //! Creates a volume for undefined space in the model
     // The implicit complement is composed of all surfaces that only
@@ -329,7 +328,7 @@ class GeomTopoTool
     //! Verify sense edge tags
     ErrorCode check_edge_sense_tags( bool create = false );
 
-    ErrorCode resize_rootSets( );
+    ErrorCode resize_rootSets();
 
     ErrorCode set_root_set( EntityHandle vol_or_surf, EntityHandle root );
 
@@ -350,7 +349,7 @@ class GeomTopoTool
 inline int GeomTopoTool::num_ents_of_dim( int dim )
 {
     assert( 0 <= dim && 3 >= dim );
-    return geomRanges[ dim ].size( );
+    return geomRanges[dim].size();
 }
 
 // get the root of the obbtree for a given entity
@@ -359,31 +358,31 @@ inline ErrorCode GeomTopoTool::get_root( EntityHandle vol_or_surf, EntityHandle&
     if( m_rootSets_vector )
     {
         unsigned int index = vol_or_surf - setOffset;
-        root = ( index < rootSets.size( ) ? rootSets[ index ] : 0 );
+        root               = ( index < rootSets.size() ? rootSets[index] : 0 );
     }
     else
-        root = mapRootSets[ vol_or_surf ];
+        root = mapRootSets[vol_or_surf];
     return ( root ? MB_SUCCESS : MB_INDEX_OUT_OF_RANGE );
 }
 
-inline EntityHandle GeomTopoTool::get_one_vol_root( )
+inline EntityHandle GeomTopoTool::get_one_vol_root()
 {
     return oneVolRootSet;
 }
 
-inline Tag GeomTopoTool::get_sense_tag( )
+inline Tag GeomTopoTool::get_sense_tag()
 {
     check_face_sense_tag( true );
     return sense2Tag;
 }
 
-inline Tag GeomTopoTool::get_gid_tag( )
+inline Tag GeomTopoTool::get_gid_tag()
 {
     check_gid_tag( true );
     return gidTag;
 }
 
-inline Tag GeomTopoTool::get_geom_tag( )
+inline Tag GeomTopoTool::get_geom_tag()
 {
     check_geom_tag( true );
     return geomTag;

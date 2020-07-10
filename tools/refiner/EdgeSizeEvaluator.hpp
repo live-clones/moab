@@ -34,8 +34,8 @@ namespace moab
 class EdgeSizeEvaluator
 {
   public:
-    EdgeSizeEvaluator( );
-    virtual ~EdgeSizeEvaluator( );
+    EdgeSizeEvaluator();
+    virtual ~EdgeSizeEvaluator();
 
     virtual bool evaluate_edge( const double* p0, const void* t0, double* p1, void* t1, const double* p2,
                                 const void* t2 ) = 0;
@@ -44,7 +44,7 @@ class EdgeSizeEvaluator
     {
         this->tag_manager = tmgr;
     }
-    RefinerTagManager* get_tag_manager( )
+    RefinerTagManager* get_tag_manager()
     {
         return this->tag_manager;
     }

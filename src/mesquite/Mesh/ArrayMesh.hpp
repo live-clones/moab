@@ -124,11 +124,11 @@ class ArrayMesh : public Mesh
                const unsigned long* element_connectivity_offsets = NULL, bool one_based_conn_indices = false,
                const int* vertex_slaved_flags = 0 );
 
-    ArrayMesh( );
+    ArrayMesh();
 
-    ~ArrayMesh( );
+    ~ArrayMesh();
 
-    void clear_mesh( );
+    void clear_mesh();
     void set_mesh( int coords_per_vertex, unsigned long num_vertices, double* interleaved_vertex_coords,
                    const int* vertex_fixed_flags, unsigned long num_elements, EntityTopology element_type,
                    const unsigned long* element_connectivity_array, bool one_based_conn_indices = false,
@@ -196,7 +196,7 @@ class ArrayMesh : public Mesh
     virtual void get_all_elements( std::vector< ElementHandle >& elements, MsqError& err );
     virtual void get_all_vertices( std::vector< VertexHandle >& vertices, MsqError& err );
 
-    virtual VertexIterator*  vertex_iterator( MsqError& err );
+    virtual VertexIterator* vertex_iterator( MsqError& err );
     virtual ElementIterator* element_iterator( MsqError& err );
 
     virtual void vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& fixed_flag_array,
@@ -250,34 +250,34 @@ class ArrayMesh : public Mesh
 
     virtual void release_entity_handles( const EntityHandle* handle_array, size_t num_handles, MsqError& err );
 
-    virtual void release( );
+    virtual void release();
 
   private:
     inline const unsigned long* elem_verts( size_t elem_index, int& num_vertex ) const;
 
-    void build_vertex_adjacency_list( );
+    void build_vertex_adjacency_list();
 
-    int            mDimension;  //!< Coordinates per vertex
-    unsigned long  vertexCount;  //!< Number of vertices
-    double*        coordArray;  //!< Interleaved vertex coordinates
-    const int*     fixedFlags;  //!< Vertex fixed flags
-    const int*     slavedFlags;  //!< Vertex slaved flags
+    int mDimension;                  //!< Coordinates per vertex
+    unsigned long vertexCount;       //!< Number of vertices
+    double* coordArray;              //!< Interleaved vertex coordinates
+    const int* fixedFlags;           //!< Vertex fixed flags
+    const int* slavedFlags;          //!< Vertex slaved flags
     unsigned char* vertexByteArray;  //!< Vertex bytes
 
-    unsigned long        elementCount;  //!< Number of elements
-    const unsigned long* connArray;  //!< Element connectivity
-    const unsigned long* connOffsets;  //!< Offsets into connectivity array
-                                       //!< for each element.  If NULL, then
-                                       //!< all elements are of the same type
-                                       //!< and have the same number of vertices.
-    unsigned long* allocConnOffsets;  //!< Same as connOffsets if allocated
-                                      //!< by constructor.  NULL if connOffsets
-                                      //!< is either NULL or application-provided
-                                      //!< data.
-    EntityTopology        elementType;  //!< Type for all elements if connOffsets is NULL
+    unsigned long elementCount;          //!< Number of elements
+    const unsigned long* connArray;      //!< Element connectivity
+    const unsigned long* connOffsets;    //!< Offsets into connectivity array
+                                         //!< for each element.  If NULL, then
+                                         //!< all elements are of the same type
+                                         //!< and have the same number of vertices.
+    unsigned long* allocConnOffsets;     //!< Same as connOffsets if allocated
+                                         //!< by constructor.  NULL if connOffsets
+                                         //!< is either NULL or application-provided
+                                         //!< data.
+    EntityTopology elementType;          //!< Type for all elements if connOffsets is NULL
     const EntityTopology* elementTypes;  //!< Type for each element type if connOffsets is not NULL
-    unsigned              nodesPerElement;  //!< Nodes per element if connOffsets is NULL
-    bool                  oneBasedArrays;  //!< FORTRAN-style array indexing
+    unsigned nodesPerElement;            //!< Nodes per element if connOffsets is NULL
+    bool oneBasedArrays;                 //!< FORTRAN-style array indexing
 
     unsigned long* vertexAdjacencyList;
     unsigned long* vertexAdjacencyOffsets;
@@ -288,16 +288,16 @@ class ArrayMesh : public Mesh
 
     struct Tag
     {
-        char*                name;  //!< Tag name (null-terminated string)
-        TagType              type;  //!< tag data type
-        unsigned             size;  //!< number of *bytes* per entity
-        bool                 owned;  //!< true if memory for tag storage is owned by this class
-        unsigned char*       vtxWritePtr;  //!< pointer to writable tag data (NULL if read-only)
+        char* name;                       //!< Tag name (null-terminated string)
+        TagType type;                     //!< tag data type
+        unsigned size;                    //!< number of *bytes* per entity
+        bool owned;                       //!< true if memory for tag storage is owned by this class
+        unsigned char* vtxWritePtr;       //!< pointer to writable tag data (NULL if read-only)
         const unsigned char* vtxReadPtr;  //!< pointer to tag data
-        unsigned char*       eleWritePtr;  //!< pointer to writable tag data (NULL if read-only)
+        unsigned char* eleWritePtr;       //!< pointer to writable tag data (NULL if read-only)
         const unsigned char* eleReadPtr;  //!< pointer to tag data
-        unsigned char*       defaultValue;  //!< Default value
-        Tag*                 next;  //!< Linked-list next pointer
+        unsigned char* defaultValue;      //!< Default value
+        Tag* next;                        //!< Linked-list next pointer
     };
 
     Tag* allocate_tag( const char* name, bool owned, TagType type, unsigned size, const void* vertex_ro_data,
@@ -306,7 +306,7 @@ class ArrayMesh : public Mesh
 
     Tag* tagList;
 
-    bool valid( ) const;
+    bool valid() const;
 };
 
 }  // namespace MBMesquite

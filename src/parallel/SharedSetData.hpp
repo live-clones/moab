@@ -10,7 +10,7 @@
 #include "moab/RangeMap.hpp"
 
 #define STRINGIFY_( X ) #X
-#define STRINGIFY( X ) STRINGIFY_( X )
+#define STRINGIFY( X )  STRINGIFY_( X )
 #ifdef MOAB_HAVE_UNORDERED_MAP
 #include STRINGIFY( MOAB_HAVE_UNORDERED_MAP )
 #include STRINGIFY( MOAB_HAVE_UNORDERED_SET )
@@ -32,7 +32,7 @@ class SharedSetData
   public:
     SharedSetData( Interface& moab, int pcID, unsigned rank );
 
-    ~SharedSetData( );
+    ~SharedSetData();
 
     /**\brief Get ranks of sharing procs
      *
@@ -88,8 +88,8 @@ class SharedSetData
     /**\brief per-set tag data */
     struct SharedSetTagData
     {
-        unsigned                       ownerRank;
-        EntityHandle                   ownerHandle;
+        unsigned ownerRank;
+        EntityHandle ownerHandle;
         const std::vector< unsigned >* sharingProcs;
     };
 
@@ -106,41 +106,43 @@ class SharedSetData
     struct hash_vect
     {
         // Copied (more or less) from Boost
-        template< typename T > static void hash_combine( size_t& seed, T val )
+        template < typename T >
+        static void hash_combine( size_t& seed, T val )
         {
-            seed ^= MOAB_UNORDERED_MAP_NS::hash< T >( ).operator( )( val ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
+            seed ^= MOAB_UNORDERED_MAP_NS::hash< T >().operator()( val ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
         }
-        template< typename IT > static size_t hash_range( IT it, IT last )
+        template < typename IT >
+        static size_t hash_range( IT it, IT last )
         {
             size_t seed = 0;
             for( ; it != last; ++it )
                 hash_combine( seed, *it );
             return seed;
         }
-        size_t operator( )( const std::vector< unsigned >& v ) const
+        size_t operator()( const std::vector< unsigned >& v ) const
         {
-            return hash_range( v.begin( ), v.end( ) );
+            return hash_range( v.begin(), v.end() );
         }
     };
 
-    typedef MOAB_UNORDERED_MAP_NS::unordered_map< unsigned, ProcHandleMapType >        RHMap;
+    typedef MOAB_UNORDERED_MAP_NS::unordered_map< unsigned, ProcHandleMapType > RHMap;
     typedef MOAB_UNORDERED_MAP_NS::unordered_set< std::vector< unsigned >, hash_vect > RProcMap;
 #else
     struct less_vect
     {
-        bool operator( )( const std::vector< unsigned >& a, const std::vector< unsigned >& b ) const
+        bool operator()( const std::vector< unsigned >& a, const std::vector< unsigned >& b ) const
         {
             // sort by size first
-            if( a.size( ) != b.size( ) ) return a.size( ) < b.size( );
+            if( a.size() != b.size() ) return a.size() < b.size();
             // if same size, sort by first non-equal value
             size_t i = 0;
-            while( i != a.size( ) && a[ i ] == b[ i ] )
+            while( i != a.size() && a[i] == b[i] )
                 ++i;
-            return i != a.size( ) && a[ i ] < b[ i ];
+            return i != a.size() && a[i] < b[i];
         }
     };
 
-    typedef std::map< unsigned, ProcHandleMapType >        RHMap;
+    typedef std::map< unsigned, ProcHandleMapType > RHMap;
     typedef std::set< std::vector< unsigned >, less_vect > RProcMap;
 #endif
 

@@ -37,7 +37,7 @@
 namespace MBMesquite
 {
 
-std::string TagVertexMesh::get_name( ) const
+std::string TagVertexMesh::get_name() const
 {
     std::string result( "TagVertexMesh(\"" );
     result += tagName;
@@ -50,24 +50,24 @@ void TagVertexMesh::initialize( Mesh* mesh, std::string name, MsqError& err )
     MeshDecorator::set_mesh( mesh );
     tagName = name;
 
-    tagHandle = get_mesh( )->tag_get( tagName, err );
+    tagHandle = get_mesh()->tag_get( tagName, err );
     // If tag isn't defined yet, we're done for now.
-    if( err.error_code( ) == MsqError::TAG_NOT_FOUND )
+    if( err.error_code() == MsqError::TAG_NOT_FOUND )
     {
-        err.clear( );
+        err.clear();
         return;
     }
     else if( MSQ_CHKERR( err ) )
         return;
 
     // If tag is already defined, make sure it is the correct type.
-    std::string   t_name;
+    std::string t_name;
     Mesh::TagType type;
-    unsigned      length;
+    unsigned length;
     tag_properties( tagHandle, t_name, type, length, err );MSQ_ERRRTN( err );
     if( !( type == Mesh::DOUBLE && length == 3 ) && !( type == Mesh::BYTE && length == 3 * sizeof( double ) ) )
         MSQ_SETERR( err )
-    ( MsqError::TAG_ALREADY_EXISTS, "Tag \"%s\" has invalid type or size.", tagName.c_str( ) );
+    ( MsqError::TAG_ALREADY_EXISTS, "Tag \"%s\" has invalid type or size.", tagName.c_str() );
 
     // If tag is already defined and init was true, reset tag
     // values.
@@ -76,8 +76,8 @@ void TagVertexMesh::initialize( Mesh* mesh, std::string name, MsqError& err )
 
 double TagVertexMesh::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings*, MsqError& err )
 {
-    Mesh* mesh = mesh_and_domain->get_mesh( );
-    if( mesh != get_mesh( ) )
+    Mesh* mesh = mesh_and_domain->get_mesh();
+    if( mesh != get_mesh() )
     {
         MSQ_SETERR( err )
         ( "InstructionQueue and TagVertexMesh have different "
@@ -95,28 +95,28 @@ void TagVertexMesh::copy_all_coordinates( MsqError& err )
 {
     if( !haveTagHandle )
     {
-        tagHandle = get_mesh( )->tag_create( tagName, Mesh::DOUBLE, 3, 0, err );MSQ_ERRRTN( err );
+        tagHandle = get_mesh()->tag_create( tagName, Mesh::DOUBLE, 3, 0, err );MSQ_ERRRTN( err );
         haveTagHandle = true;
     }
 
     std::vector< Mesh::VertexHandle > handles;
     get_all_vertices( handles, err );MSQ_ERRRTN( err );
-    if( handles.empty( ) ) return;
+    if( handles.empty() ) return;
 
-    std::vector< MsqVertex > coords( handles.size( ) );
-    get_mesh( )->vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ), err );MSQ_ERRRTN( err );
+    std::vector< MsqVertex > coords( handles.size() );
+    get_mesh()->vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size(), err );MSQ_ERRRTN( err );
 
-    std::vector< double >                    data( 3 * handles.size( ) );
-    std::vector< double >::iterator          j = data.begin( );
-    std::vector< MsqVertex >::const_iterator i = coords.begin( );
-    while( i != coords.end( ) )
+    std::vector< double > data( 3 * handles.size() );
+    std::vector< double >::iterator j          = data.begin();
+    std::vector< MsqVertex >::const_iterator i = coords.begin();
+    while( i != coords.end() )
     {
         i->get_coordinates( &*j );
         ++i;
         j += 3;
     }
 
-    tag_set_vertex_data( tagHandle, handles.size( ), arrptr( handles ), arrptr( data ), err );MSQ_ERRRTN( err );
+    tag_set_vertex_data( tagHandle, handles.size(), arrptr( handles ), arrptr( data ), err );MSQ_ERRRTN( err );
 }
 
 void TagVertexMesh::check_remove_tag( MsqError& err )
@@ -131,11 +131,11 @@ void TagVertexMesh::check_remove_tag( MsqError& err )
 TagVertexMesh::TagVertexMesh( MsqError& err, Mesh* real_mesh, bool clean_up, std::string name )
     : tagHandle( 0 ), haveTagHandle( false ), cleanUpTag( clean_up )
 {
-    if( name.size( ) == 0 ) name = "MsqAltCoords";
+    if( name.size() == 0 ) name = "MsqAltCoords";
     initialize( real_mesh, name, err );MSQ_CHKERR( err );
 }
 
-TagVertexMesh::~TagVertexMesh( )
+TagVertexMesh::~TagVertexMesh()
 {
     MsqError err;
     check_remove_tag( err );
@@ -150,7 +150,7 @@ void TagVertexMesh::set_mesh( Mesh* mesh, MsqError& err )
 void TagVertexMesh::set_tag_name( std::string name, MsqError& err )
 {
     check_remove_tag( err );MSQ_ERRRTN( err );
-    initialize( get_mesh( ), name, err );MSQ_ERRRTN( err );
+    initialize( get_mesh(), name, err );MSQ_ERRRTN( err );
 }
 
 void TagVertexMesh::clear( MsqError& err )
@@ -167,14 +167,14 @@ void TagVertexMesh::vertices_get_coordinates( const VertexHandle vert_array[], M
     if( !num_vtx ) return;
     if( !haveTagHandle )
     {
-        get_mesh( )->vertices_get_coordinates( vert_array, coordinates, num_vtx, err );MSQ_ERRRTN( err );
+        get_mesh()->vertices_get_coordinates( vert_array, coordinates, num_vtx, err );MSQ_ERRRTN( err );
     }
     else
     {
         std::vector< double > coords( num_vtx * 3 );
-        get_mesh( )->tag_get_vertex_data( tagHandle, num_vtx, vert_array, arrptr( coords ), err );MSQ_ERRRTN( err );
-        MsqVertex*                            coordinates_end = coordinates + num_vtx;
-        std::vector< double >::const_iterator i = coords.begin( );
+        get_mesh()->tag_get_vertex_data( tagHandle, num_vtx, vert_array, arrptr( coords ), err );MSQ_ERRRTN( err );
+        MsqVertex* coordinates_end              = coordinates + num_vtx;
+        std::vector< double >::const_iterator i = coords.begin();
         while( coordinates != coordinates_end )
         {
             coordinates->set( &*i );
@@ -188,12 +188,12 @@ void TagVertexMesh::vertex_set_coordinates( VertexHandle vertex, const Vector3D&
 {
     if( !haveTagHandle )
     {
-        tagHandle = get_mesh( )->tag_create( tagName, Mesh::DOUBLE, 3, 0, err );MSQ_ERRRTN( err );
+        tagHandle = get_mesh()->tag_create( tagName, Mesh::DOUBLE, 3, 0, err );MSQ_ERRRTN( err );
         haveTagHandle = true;
         copy_all_coordinates( err );MSQ_ERRRTN( err );
     }
 
-    get_mesh( )->tag_set_vertex_data( tagHandle, 1, &vertex, coordinates.to_array( ), err );MSQ_ERRRTN( err );
+    get_mesh()->tag_set_vertex_data( tagHandle, 1, &vertex, coordinates.to_array(), err );MSQ_ERRRTN( err );
 }
 
 //***************  Tags  ***********
@@ -211,7 +211,7 @@ TagHandle TagVertexMesh::tag_create( const std::string& tag_name, TagType type, 
         return (TagHandle)0;
     }
 
-    return get_mesh( )->tag_create( tag_name, type, length, default_value, err );
+    return get_mesh()->tag_create( tag_name, type, length, default_value, err );
 }
 
 TagHandle TagVertexMesh::tag_get( const std::string& name, MsqError& err )
@@ -226,16 +226,16 @@ TagHandle TagVertexMesh::tag_get( const std::string& name, MsqError& err )
         return (TagHandle)0;
     }
 
-    return get_mesh( )->tag_get( name, err );
+    return get_mesh()->tag_get( name, err );
 }
 
-void TagVertexMesh::release( )
+void TagVertexMesh::release()
 {
     MsqError err;
     clear( err );
     check_remove_tag( err );
     haveTagHandle = false;
-    MeshDecorator::release( );
+    MeshDecorator::release();
 }
 
 void TagVertexMesh::initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}

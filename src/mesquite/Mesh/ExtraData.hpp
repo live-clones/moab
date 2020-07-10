@@ -47,9 +47,9 @@ class ExtraData
   public:
     ExtraData( PatchData& patch );
 
-    virtual ~ExtraData( );
+    virtual ~ExtraData();
 
-    PatchData* get_patch_data( ) const
+    PatchData* get_patch_data() const
     {
         return patchPtr;
     }
@@ -65,14 +65,14 @@ class ExtraData
      * and removed and removed from the PatchData if the attached
      * MBMesquite::Mesh or MBMesquite::MeshDomain instance is changed.
      */
-    virtual void notify_patch_destroyed( ) = 0;
+    virtual void notify_patch_destroyed() = 0;
 
     /**\brief Notify that the patch (mesh) in the PatchData is changing
      *
      * Notify attached ExtraData that the PatchData is being changed
      * to contain an new patch (set of mesh entities.)
      */
-    virtual void notify_new_patch( ) = 0;
+    virtual void notify_new_patch() = 0;
 
     /**\brief Nofity that a subpatch is being created from this patch.
      *\param sub_patch The new, populated subpatch

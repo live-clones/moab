@@ -58,7 +58,7 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
     MESQUITE_EXPORT
     PMeanPTemplate( double power, QualityMetric* qm = 0 ) : ObjectiveFunctionTemplate( qm )
     {
-        clear( );
+        clear();
         set_power( power );
     }
 
@@ -77,18 +77,18 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
     }
 
     MESQUITE_EXPORT
-    virtual ~PMeanPTemplate( ) {}
+    virtual ~PMeanPTemplate() {}
 
     MESQUITE_EXPORT
-    double get_power( ) const
+    double get_power() const
     {
-        return mPower.value( );
+        return mPower.value();
     }
 
     MESQUITE_EXPORT
     void set_power( double p )
     {
-        mPower = p;
+        mPower       = p;
         mPowerMinus1 = p - 1;
         mPowerMinus2 = p - 2;
     }
@@ -102,7 +102,7 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< Vector3D >& grad_out,
                                                  std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
@@ -110,10 +110,10 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
                                         std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual ObjectiveFunction* clone( ) const;
+    virtual ObjectiveFunction* clone() const;
 
     MESQUITE_EXPORT
-    virtual void clear( );
+    virtual void clear();
 
   protected:
     /**\brief Handle EvalType for all eval functions, return OF value
@@ -131,14 +131,14 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
      */
     double get_value( double power_sum, size_t count, EvalType type, size_t& global_count );
 
-    Exponent mPower; /**< The power to use */
+    Exponent mPower;       /**< The power to use */
     Exponent mPowerMinus1; /**< mPower - 1.0 */
     Exponent mPowerMinus2; /**< mPower - 2.0 */
 
   private:
-    size_t mCount; /**< The number of accumulated entires */
-    double mPowSum; /**< The accumulated sum of values to the mPower */
-    size_t saveCount; /**< Saved count from previous patch */
+    size_t mCount;     /**< The number of accumulated entires */
+    double mPowSum;    /**< The accumulated sum of values to the mPower */
+    size_t saveCount;  /**< Saved count from previous patch */
     double savePowSum; /**< Saved sum from previous patch */
 
   protected:

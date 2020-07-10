@@ -51,41 +51,41 @@ static void print_memory_stats( moab::Interface& mb, bool per_type = true, bool 
                                 bool sysstats = true );
 
 // Generate a series of meshes for testing
-static void do_test_mode( );
+static void do_test_mode();
 
 // main routine: read any specified files and call print_memory_stats
 int main( int argc, char* argv[] )
 {
-    moab::ErrorCode    rval;
-    bool               no_more_flags = false;
-    bool               test_mode = false;
+    moab::ErrorCode rval;
+    bool no_more_flags = false;
+    bool test_mode     = false;
     std::vector< int > input_file_list;
 
     // load each file specified on command line
     for( int i = 1; i < argc; ++i )
     {
-        if( !no_more_flags && argv[ i ][ 0 ] == '-' )
+        if( !no_more_flags && argv[i][0] == '-' )
         {
-            if( !strcmp( argv[ i ], "-H" ) )
+            if( !strcmp( argv[i], "-H" ) )
                 UNITS = HUMAN;
-            else if( !strcmp( argv[ i ], "-b" ) )
+            else if( !strcmp( argv[i], "-b" ) )
                 UNITS = BYTES;
-            else if( !strcmp( argv[ i ], "-k" ) )
+            else if( !strcmp( argv[i], "-k" ) )
                 UNITS = KILOBYTES;
-            else if( !strcmp( argv[ i ], "-m" ) )
+            else if( !strcmp( argv[i], "-m" ) )
                 UNITS = MEGABYTES;
-            else if( !strcmp( argv[ i ], "-g" ) )
+            else if( !strcmp( argv[i], "-g" ) )
                 UNITS = GIGABYTES;
-            else if( !strcmp( argv[ i ], "-T" ) )
+            else if( !strcmp( argv[i], "-T" ) )
                 test_mode = true;
-            else if( !strcmp( argv[ i ], "-h" ) )
-                usage( argv[ 0 ], true );
-            else if( !strcmp( argv[ i ], "--" ) )
+            else if( !strcmp( argv[i], "-h" ) )
+                usage( argv[0], true );
+            else if( !strcmp( argv[i], "--" ) )
                 no_more_flags = true;
             else
             {
-                std::cerr << argv[ 0 ] << ": Invalid flag: \"" << argv[ i ] << "\"." << std::endl << std::endl;
-                usage( argv[ 0 ] );
+                std::cerr << argv[0] << ": Invalid flag: \"" << argv[i] << "\"." << std::endl << std::endl;
+                usage( argv[0] );
             }
         }
         else
@@ -96,15 +96,15 @@ int main( int argc, char* argv[] )
 
     if( test_mode )
     {
-        do_test_mode( );
-        if( input_file_list.empty( ) ) return 0;
+        do_test_mode();
+        if( input_file_list.empty() ) return 0;
     }
 
-    moab::Core       mbcore;
+    moab::Core mbcore;
     moab::Interface& mb = mbcore;
-    for( std::vector< int >::iterator it = input_file_list.begin( ); it != input_file_list.end( ); ++it )
+    for( std::vector< int >::iterator it = input_file_list.begin(); it != input_file_list.end(); ++it )
     {
-        rval = mb.load_file( argv[ *it ] );
+        rval = mb.load_file( argv[*it] );
 
         // if file load failed, print some info and exit
         if( moab::MB_SUCCESS != rval )
@@ -112,11 +112,11 @@ int main( int argc, char* argv[] )
             std::string message;
             mb.get_last_error( message );
             std::cerr << mb.get_error_string( rval ) << ": " << message << std::endl
-                      << argv[ *it ] << ": Failed to read file." << std::endl;
+                      << argv[*it] << ": Failed to read file." << std::endl;
             return 1;
         }
 
-        std::cout << "Loaded file: " << argv[ *it ] << std::endl;
+        std::cout << "Loaded file: " << argv[*it] << std::endl;
     }
 
     // print summary of MOAB's memory use
@@ -159,13 +159,13 @@ static std::string center( const char* str, size_t width );
 void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool totals, bool sysstats )
 {
     moab::ErrorCode rval;
-    const char      ANON_TAG_NAME[] = "(anonymous)";
-    const int       TYPE_WIDTH = 10;
-    const int       MEM_WIDTH = 7;
-    const int       MEM2_WIDTH = 2 * MEM_WIDTH + 1;
-    const int       MIN_TAG_NAME_WIDTH = strlen( ANON_TAG_NAME );
-    const int       DTYPE_WIDTH = 12;
-    const int       STORAGE_WIDTH = 8;
+    const char ANON_TAG_NAME[]   = "(anonymous)";
+    const int TYPE_WIDTH         = 10;
+    const int MEM_WIDTH          = 7;
+    const int MEM2_WIDTH         = 2 * MEM_WIDTH + 1;
+    const int MIN_TAG_NAME_WIDTH = strlen( ANON_TAG_NAME );
+    const int DTYPE_WIDTH        = 12;
+    const int STORAGE_WIDTH      = 8;
 
     // per-entity-type table header
     MemStats stats;
@@ -210,22 +210,22 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
     if( per_tag )
     {
         // get list of tags
-        std::vector< moab::Tag >                 tags;
+        std::vector< moab::Tag > tags;
         std::vector< moab::Tag >::const_iterator ti;
         mb.tag_get_tags( tags );
 
         // figure out required field with to fit longest tag name
         unsigned maxlen = MIN_TAG_NAME_WIDTH;
-        for( ti = tags.begin( ); ti != tags.end( ); ++ti )
+        for( ti = tags.begin(); ti != tags.end(); ++ti )
         {
             std::string name;
             rval = mb.tag_get_name( *ti, name );
             if( moab::MB_SUCCESS != rval ) continue;
-            if( name.size( ) > maxlen ) maxlen = name.size( );
+            if( name.size() > maxlen ) maxlen = name.size();
         }
 
         // print header for per-tag data
-        if( !tags.empty( ) )
+        if( !tags.empty() )
         {
             std::cout.fill( ' ' );
             std::cout << std::endl
@@ -241,11 +241,11 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
         }
 
         // print per-tag memory use
-        for( ti = tags.begin( ); ti != tags.end( ); ++ti )
+        for( ti = tags.begin(); ti != tags.end(); ++ti )
         {
             std::string name;
             rval = mb.tag_get_name( *ti, name );
-            if( moab::MB_SUCCESS != rval || name.empty( ) ) name = ANON_TAG_NAME;
+            if( moab::MB_SUCCESS != rval || name.empty() ) name = ANON_TAG_NAME;
 
             unsigned long long occupied, allocated;
             mb.estimated_memory_use( 0, 0, 0, 0, 0, 0, 0, 0, &*ti, 1, &occupied, &allocated );
@@ -277,38 +277,38 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
 
     if( sysstats )
     {
-        std::FILE*         filp = std::fopen( "/proc/self/stat", "r" );
+        std::FILE* filp = std::fopen( "/proc/self/stat", "r" );
         unsigned long long vsize;
-        long               rss;
+        long rss;
         if( filp && 2 == std::fscanf( filp,
-                                      "%*d "  // pid
-                                      "%*s "  // comm
-                                      "%*c "  // state
-                                      "%*d "  // ppid
-                                      "%*d "  // pgrp
-                                      "%*d "  // session
-                                      "%*d "  // tty_nr
-                                      "%*d "  // tpgid
-                                      "%*u "  // flags
-                                      "%*u "  // minflt
-                                      "%*u "  // cminflt
-                                      "%*u "  // majflt
-                                      "%*u "  // cmajflt
-                                      "%*u "  // utime
-                                      "%*u "  // stime
-                                      "%*d "  // cutime
-                                      "%*d "  // cstime
-                                      "%*d "  // priority
-                                      "%*d "  // nice
-                                      "%*d "  // num_threads
-                                      "%*d "  // itrealvalue
-                                      "%*u "  // starttime
+                                      "%*d "   // pid
+                                      "%*s "   // comm
+                                      "%*c "   // state
+                                      "%*d "   // ppid
+                                      "%*d "   // pgrp
+                                      "%*d "   // session
+                                      "%*d "   // tty_nr
+                                      "%*d "   // tpgid
+                                      "%*u "   // flags
+                                      "%*u "   // minflt
+                                      "%*u "   // cminflt
+                                      "%*u "   // majflt
+                                      "%*u "   // cmajflt
+                                      "%*u "   // utime
+                                      "%*u "   // stime
+                                      "%*d "   // cutime
+                                      "%*d "   // cstime
+                                      "%*d "   // priority
+                                      "%*d "   // nice
+                                      "%*d "   // num_threads
+                                      "%*d "   // itrealvalue
+                                      "%*u "   // starttime
                                       "%llu "  // vsize
-                                      "%ld",  // rss
+                                      "%ld",   // rss
                                       &vsize, &rss ) )
         {
 #ifndef _WIN32
-            long long tmprss = rss * getpagesize( );
+            long long tmprss = rss * getpagesize();
 #endif
             std::cout << std::endl
                       << "SYSTEM:" << std::endl
@@ -326,8 +326,8 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
             if( getrusage( RUSAGE_SELF, &sysdata ) ) { std::cerr << "getrusage failed" << std::endl; }
             else
             {
-                rss = sysdata.ru_maxrss;
-                long long tmprss = rss * getpagesize( );
+                rss              = sysdata.ru_maxrss;
+                long long tmprss = rss * getpagesize();
                 std::cerr << std::endl
                           << "SYSTEM:" << std::endl
                           << "Resident set size: " << memstr( tmprss ) << std::endl;
@@ -413,45 +413,45 @@ std::string memstr( unsigned long long val )
 
         s << rdiv( val, den );
     }
-    return s.str( );
+    return s.str();
 }
 
 std::string tag_type_string( moab::Interface& mb, moab::Tag tag )
 {
-    moab::ErrorCode    rval;
+    moab::ErrorCode rval;
     std::ostringstream s;
 
     moab::DataType type;
     rval = mb.tag_get_data_type( tag, type );
-    if( moab::MB_SUCCESS != rval ) return std::string( );
+    if( moab::MB_SUCCESS != rval ) return std::string();
 
-    int         typesize;
+    int typesize;
     std::string typestr;
     switch( type )
     {
         case moab::MB_TYPE_INTEGER:
-            typestr = "int";
+            typestr  = "int";
             typesize = sizeof( int );
             break;
         case moab::MB_TYPE_DOUBLE:
-            typestr = "double";
+            typestr  = "double";
             typesize = sizeof( double );
             break;
         case moab::MB_TYPE_HANDLE:
-            typestr = "handle";
+            typestr  = "handle";
             typesize = sizeof( moab::EntityHandle );
             break;
         case moab::MB_TYPE_BIT:
             typesize = 1;
-            typestr = "bits";
+            typestr  = "bits";
             break;
         case moab::MB_TYPE_OPAQUE:
             typesize = 1;
-            typestr = "bytes";
+            typestr  = "bytes";
             break;
         default:
             typesize = 1;
-            typestr = "???";
+            typestr  = "???";
             break;
     }
 
@@ -463,15 +463,15 @@ std::string tag_type_string( moab::Interface& mb, moab::Tag tag )
         s << size / typesize << " " << typestr;
     // else do nothing
 
-    return s.str( );
+    return s.str();
 }
 
 std::string tag_storage_string( moab::Interface& mb, moab::Tag tag )
 {
     moab::ErrorCode rval;
-    moab::TagType   type;
+    moab::TagType type;
     rval = mb.tag_get_type( tag, type );
-    if( moab::MB_SUCCESS != rval ) return std::string( );
+    if( moab::MB_SUCCESS != rval ) return std::string();
 
     switch( type )
     {
@@ -489,9 +489,9 @@ std::string tag_storage_string( moab::Interface& mb, moab::Tag tag )
 std::string center( const char* str, size_t width )
 {
     std::string text( str );
-    if( text.size( ) >= width ) return text;
+    if( text.size() >= width ) return text;
 
-    width -= text.size( );
+    width -= text.size();
     if( 1u == width )
     {
         text += " ";
@@ -500,22 +500,22 @@ std::string center( const char* str, size_t width )
 
     std::ostringstream s;
     s << std::setw( width / 2 ) << ' ' << text << std::setw( width / 2 + width % 2 ) << ' ';
-    return s.str( );
+    return s.str();
 }
 
-void do_test_mode( )
+void do_test_mode()
 {
-    const char            prefix[] = "****************";
-    moab::Core            mbcore;
-    moab::Interface&      mb = mbcore;
-    moab::ErrorCode       rval;
-    moab::Range           handles;
-    moab::EntityHandle    h;
+    const char prefix[] = "****************";
+    moab::Core mbcore;
+    moab::Interface& mb = mbcore;
+    moab::ErrorCode rval;
+    moab::Range handles;
+    moab::EntityHandle h;
     moab::Range::iterator jt, it;
-    const unsigned        N = 1000;
+    const unsigned N = 1000;
 
     // creating some vertices
-    double coords[ 3 ] = { 1, 2, 3 };
+    double coords[3] = { 1, 2, 3 };
     for( unsigned i = 0; i < N; ++i )
         mb.create_vertex( coords, h );
     std::cout << std::endl << prefix << "Created " << N << " vertices" << std::endl;
@@ -535,36 +535,36 @@ void do_test_mode( )
     print_memory_stats( mb, true, false, true, true );
 
     // create some elements
-    handles.clear( );
+    handles.clear();
     mb.get_entities_by_type( 0, moab::MBVERTEX, handles );
-    it = handles.begin( );
+    it = handles.begin();
     for( unsigned i = 0; i < N - 2; ++i, ++it )
     {
         jt = it;
-        moab::EntityHandle conn[ 3 ];
-        conn[ 0 ] = *jt;
+        moab::EntityHandle conn[3];
+        conn[0] = *jt;
         ++jt;
-        conn[ 1 ] = *jt;
+        conn[1] = *jt;
         ++jt;
-        conn[ 2 ] = *jt;
+        conn[2] = *jt;
         ++jt;
         mb.create_element( moab::MBTRI, conn, 3, h );
     }
     std::cout << std::endl << prefix << "Created " << N - 2 << " triangles" << std::endl;
     print_memory_stats( mb, true, false, true, true );
 
-    it = handles.begin( );
+    it = handles.begin();
     for( unsigned i = 0; i < N - 3; ++i, ++it )
     {
         jt = it;
-        moab::EntityHandle conn[ 4 ];
-        conn[ 0 ] = *jt;
+        moab::EntityHandle conn[4];
+        conn[0] = *jt;
         ++jt;
-        conn[ 1 ] = *jt;
+        conn[1] = *jt;
         ++jt;
-        conn[ 2 ] = *jt;
+        conn[2] = *jt;
         ++jt;
-        conn[ 3 ] = *jt;
+        conn[3] = *jt;
         ++jt;
         mb.create_element( moab::MBQUAD, conn, 4, h );
     }
@@ -573,18 +573,18 @@ void do_test_mode( )
 
     for( int i = 0; i < 100; ++i )
     {
-        it = handles.begin( );
+        it = handles.begin();
         for( unsigned j = 0; j < N - 3; ++j, ++it )
         {
             jt = it;
-            moab::EntityHandle conn[ 4 ];
-            conn[ 0 ] = *jt;
+            moab::EntityHandle conn[4];
+            conn[0] = *jt;
             ++jt;
-            conn[ 1 ] = *jt;
+            conn[1] = *jt;
             ++jt;
-            conn[ 2 ] = *jt;
+            conn[2] = *jt;
             ++jt;
-            conn[ 3 ] = *jt;
+            conn[3] = *jt;
             ++jt;
             mb.create_element( moab::MBQUAD, conn, 4, h );
         }
@@ -600,58 +600,58 @@ void do_test_mode( )
         std::cerr << "Failed to get GLOBAL_ID tag handle" << std::endl;
         return;
     }
-    handles.clear( );
+    handles.clear();
     mb.get_entities_by_type( 0, moab::MBVERTEX, handles );
     int id = 1;
-    for( it = handles.begin( ); it != handles.end( ); ++it )
+    for( it = handles.begin(); it != handles.end(); ++it )
     {
         mb.tag_set_data( tag, &*it, 1, &id );
         ++id;
     }
-    std::cout << std::endl << prefix << "Set global ID tag on " << handles.size( ) << " vertices" << std::endl;
+    std::cout << std::endl << prefix << "Set global ID tag on " << handles.size() << " vertices" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
-    handles.clear( );
+    handles.clear();
     mb.get_entities_by_type( 0, moab::MBQUAD, handles );
     id = 1;
-    for( it = handles.begin( ); it != handles.end( ); ++it )
+    for( it = handles.begin(); it != handles.end(); ++it )
     {
         mb.tag_set_data( tag, &*it, 1, &id );
         ++id;
     }
-    std::cout << std::endl << prefix << "Set global ID tag on " << handles.size( ) << " quads" << std::endl;
+    std::cout << std::endl << prefix << "Set global ID tag on " << handles.size() << " quads" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     // create and set a sparse tag
     mb.tag_get_handle( "mem_test_tag", 3, moab::MB_TYPE_DOUBLE, tag, moab::MB_TAG_SPARSE | moab::MB_TAG_CREAT );
-    handles.clear( );
+    handles.clear();
     mb.get_entities_by_type( 0, moab::MBVERTEX, handles );
-    for( it = handles.begin( ); it != handles.end( ); ++it )
+    for( it = handles.begin(); it != handles.end(); ++it )
     {
         mb.get_coords( &*it, 1, coords );
         mb.tag_set_data( tag, &*it, 1, coords );
     }
     std::cout << std::endl
-              << prefix << "Copied vertex coords to sparse tag for " << handles.size( ) << " vertices" << std::endl;
+              << prefix << "Copied vertex coords to sparse tag for " << handles.size() << " vertices" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     // create and set bit tag
     mb.tag_get_handle( "mem_test_bit", 1, moab::MB_TYPE_BIT, tag, moab::MB_TAG_CREAT );
-    handles.clear( );
+    handles.clear();
     mb.get_entities_by_type( 0, moab::MBTRI, handles );
-    for( it = handles.begin( ); it != handles.end( ); ++it )
+    for( it = handles.begin(); it != handles.end(); ++it )
     {
         char byte = '\001';
         mb.tag_set_data( tag, &*it, 1, &byte );
     }
-    std::cout << std::endl << prefix << "Set 1-bit tag for " << handles.size( ) << " triangles" << std::endl;
+    std::cout << std::endl << prefix << "Set 1-bit tag for " << handles.size() << " triangles" << std::endl;
     print_memory_stats( mb, true, true, true, true );
 
     // create vertex to element adjacency data
-    handles.clear( );
+    handles.clear();
     mb.get_entities_by_type( 0, moab::MBVERTEX, handles );
     std::vector< moab::EntityHandle > adj_vec;
-    mb.get_adjacencies( &*handles.begin( ), 1, 2, false, adj_vec );
+    mb.get_adjacencies( &*handles.begin(), 1, 2, false, adj_vec );
     std::cout << std::endl << prefix << "Created vertex-to-element adjacencies" << std::endl;
     print_memory_stats( mb, true, false, true, true );
     std::cout << std::endl;

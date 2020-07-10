@@ -57,7 +57,7 @@ WriteSmf::WriteSmf( Interface* impl ) : mbImpl( impl ), writeTool( 0 )
     impl->query_interface( writeTool );
 }
 
-WriteSmf::~WriteSmf( )
+WriteSmf::~WriteSmf()
 {
     mbImpl->release_interface( writeTool );
 }
@@ -98,19 +98,19 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, con
     {
         // Get all triangles from output sets
         for( int i = 0; i < num_sets; i++ )
-            rval = mbImpl->get_entities_by_type( output_list[ i ], MBTRI, triangles, false );
+            rval = mbImpl->get_entities_by_type( output_list[i], MBTRI, triangles, false );
     }
     // Use an array with all the connectivities in the triangles; it will be converted later to ints
-    int           numTriangles = triangles.size( );
-    int           array_alloc = 3 * numTriangles;  // Allocated size of 'array'
-    EntityHandle* array = new EntityHandle[ array_alloc ];  // ptr to working array of result handles
+    int numTriangles    = triangles.size();
+    int array_alloc     = 3 * numTriangles;               // Allocated size of 'array'
+    EntityHandle* array = new EntityHandle[array_alloc];  // ptr to working array of result handles
     // Fill up array with node handles; reorder and uniquify
     if( !array ) return MB_MEMORY_ALLOCATION_FAILED;
     int fillA = 0;
-    for( Range::const_iterator e = triangles.begin( ); e != triangles.end( ); ++e )
+    for( Range::const_iterator e = triangles.begin(); e != triangles.end(); ++e )
     {
         const EntityHandle* conn;
-        int                 conn_len;
+        int conn_len;
         rval = mbImpl->get_connectivity( *e, conn, conn_len );
         if( MB_SUCCESS != rval )
         {
@@ -124,7 +124,7 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, con
         }
 
         for( int i = 0; i < conn_len; ++i )
-            array[ fillA++ ] = conn[ i ];
+            array[fillA++] = conn[i];
     }
     if( fillA != array_alloc )
     {
@@ -145,10 +145,10 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, con
     // Output first the nodes
     // num nodes??
     // Write the nodes
-    double coord[ 3 ];
+    double coord[3];
     for( int i = 0; i < numNodes; i++ )
     {
-        EntityHandle node_handle = array[ i ];
+        EntityHandle node_handle = array[i];
 
         rval = mbImpl->get_coords( &node_handle, 1, coord );
         if( rval != MB_SUCCESS )
@@ -157,15 +157,15 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, con
             return rval;
         }
 
-        file << "v " << coord[ 0 ] << " " << coord[ 1 ] << " " << coord[ 2 ] << std::endl;
+        file << "v " << coord[0] << " " << coord[1] << " " << coord[2] << std::endl;
     }
     // Write faces now
     // Leave a blank line for cosmetics
     file << " \n";
-    for( Range::const_iterator e = triangles.begin( ); e != triangles.end( ); ++e )
+    for( Range::const_iterator e = triangles.begin(); e != triangles.end(); ++e )
     {
         const EntityHandle* conn;
-        int                 conn_len;
+        int conn_len;
         rval = mbImpl->get_connectivity( *e, conn, conn_len );
         if( MB_SUCCESS != rval )
         {
@@ -180,13 +180,13 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, con
         file << "f ";
         for( int i = 0; i < conn_len; ++i )
         {
-            int indexInArray = std::lower_bound( array, array + numNodes, conn[ i ] ) - array;
+            int indexInArray = std::lower_bound( array, array + numNodes, conn[i] ) - array;
             file << indexInArray + 1 << " ";
         }
         file << std::endl;
     }
 
-    file.close( );
+    file.close();
     delete[] array;
     return MB_SUCCESS;
 }

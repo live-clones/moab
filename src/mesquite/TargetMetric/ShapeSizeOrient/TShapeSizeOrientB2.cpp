@@ -38,12 +38,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeSizeOrientB2::get_name( ) const
+std::string TShapeSizeOrientB2::get_name() const
 {
     return "TShapeSizeOrientB2";
 }
 
-TShapeSizeOrientB2::~TShapeSizeOrientB2( ) {}
+TShapeSizeOrientB2::~TShapeSizeOrientB2() {}
 
 bool TShapeSizeOrientB2::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -85,9 +85,9 @@ bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double&
     }
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    const double            it = 1.0 / tau;
-    result = it * ( it * sqr_Frobenius( T ) - 2.0 * trace( T ) ) + 2.0;
-    deriv_wrt_T = T;
+    const double it              = 1.0 / tau;
+    result                       = it * ( it * sqr_Frobenius( T ) - 2.0 * trace( T ) ) + 2.0;
+    deriv_wrt_T                  = T;
     deriv_wrt_T *= it * it;
     deriv_wrt_T( 0, 0 ) -= it;
     deriv_wrt_T( 1, 1 ) -= it;
@@ -108,8 +108,8 @@ bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double&
     }
 
     const MsqMatrix< 3, 3 > adjt = adj( T );
-    const double            it = 1.0 / tau;
-    result = it * ( it * sqr_Frobenius( adjt ) - 2.0 * trace( adjt ) ) + 3.0;
+    const double it              = 1.0 / tau;
+    result                       = it * ( it * sqr_Frobenius( adjt ) - 2.0 * trace( adjt ) ) + 3.0;
 
     deriv_wrt_T = T;
     deriv_wrt_T *= sqr_Frobenius( T );
@@ -130,7 +130,7 @@ bool TShapeSizeOrientB2::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double&
 }
 
 bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                             MsqMatrix< 2, 2 > second[ 3 ], MsqError& err )
+                                             MsqMatrix< 2, 2 > second[3], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -140,9 +140,9 @@ bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double&
     }
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    const double            it = 1.0 / tau;
-    result = it * ( it * sqr_Frobenius( T ) - 2.0 * trace( T ) ) + 2.0;
-    deriv_wrt_T = T;
+    const double it              = 1.0 / tau;
+    result                       = it * ( it * sqr_Frobenius( T ) - 2.0 * trace( T ) ) + 2.0;
+    deriv_wrt_T                  = T;
     deriv_wrt_T *= it * it;
     deriv_wrt_T( 0, 0 ) -= it;
     deriv_wrt_T( 1, 1 ) -= it;
@@ -159,7 +159,7 @@ bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double&
 }
 
 bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                             MsqMatrix< 3, 3 > second[ 6 ], MsqError& err )
+                                             MsqMatrix< 3, 3 > second[6], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -169,14 +169,14 @@ bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double&
     }
 
     const MsqMatrix< 3, 3 > adjt = adj( T );
-    const double            it = 1.0 / tau;
-    const double            nadjt = sqr_Frobenius( adjt );
-    const double            nT = sqr_Frobenius( T );
-    const double            tadjT = trace( adjt );
-    result = it * ( it * nadjt - 2.0 * tadjT ) + 3.0;
+    const double it              = 1.0 / tau;
+    const double nadjt           = sqr_Frobenius( adjt );
+    const double nT              = sqr_Frobenius( T );
+    const double tadjT           = trace( adjt );
+    result                       = it * ( it * nadjt - 2.0 * tadjT ) + 3.0;
 
     const MsqMatrix< 3, 3 > TTtT = T * transpose( T ) * T;
-    deriv_wrt_T = T;
+    deriv_wrt_T                  = T;
     deriv_wrt_T *= nT;
     deriv_wrt_T -= TTtT;
     deriv_wrt_T *= it * it;
@@ -184,7 +184,7 @@ bool TShapeSizeOrientB2::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double&
     deriv_wrt_T += it * it * ( tadjT - it * nadjt ) * transpose( adjt );
 
     const double tT = trace( T );
-    double       f = tT * it;
+    double f        = tT * it;
     deriv_wrt_T( 0, 0 ) -= f;
     deriv_wrt_T( 1, 1 ) -= f;
     deriv_wrt_T( 2, 2 ) -= f;

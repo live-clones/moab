@@ -2,7 +2,7 @@
 #define SPECTRALMESHTOOL_HPP
 
 #include "moab/Interface.hpp"  // needs to be here to support inline query_interface
-#include "moab/Error.hpp"  // needs to be here to support inline query_interface
+#include "moab/Error.hpp"      // needs to be here to support inline query_interface
 #include <vector>
 
 namespace moab
@@ -30,7 +30,7 @@ class SpectralMeshTool
 
     /** \brief Destructor
      */
-    ~SpectralMeshTool( );
+    ~SpectralMeshTool();
 
     /** \brief Return tag used to store lexicographically-ordered vertex array
      * NOTE: If creating this tag with this call, this SpectralMeshTool instance must already have
@@ -74,7 +74,7 @@ class SpectralMeshTool
      * \param start_idx Starting index in conn (for parallel support)
      * \param local_gids If non-null, will insert all fine vertices into this range
      */
-    template< class T >
+    template < class T >
     ErrorCode create_spectral_elems( const T* conn, int num_fine_elems, int dim, Range& output_range, int start_idx = 0,
                                      Range* local_gids = NULL );
 
@@ -83,14 +83,14 @@ class SpectralMeshTool
      */
     void spectral_order( int order )
     {
-        spectralOrder = order;
+        spectralOrder   = order;
         spectralOrderp1 = order + 1;
     }
 
     /** \brief Get spectral order for this instance
      * \return order Order set on this instance
      */
-    int spectral_order( )
+    int spectral_order()
     {
         return spectralOrder;
     }
@@ -130,7 +130,7 @@ inline SpectralMeshTool::SpectralMeshTool( Interface* impl, int order )
     impl->query_interface( mError );
 }
 
-inline SpectralMeshTool::~SpectralMeshTool( ) {}
+inline SpectralMeshTool::~SpectralMeshTool() {}
 
 }  // namespace moab
 

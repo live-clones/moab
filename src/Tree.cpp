@@ -9,7 +9,7 @@ namespace moab
 ErrorCode Tree::parse_common_options( FileOptions& options )
 {
     double tmp_dbl;
-    int    tmp_int;
+    int tmp_int;
     // MAX_PER_LEAF: max entities per leaf; default = 6
     ErrorCode rval = options.get_int_option( "MAX_PER_LEAF", tmp_int );
     if( MB_SUCCESS == rval ) maxPerLeaf = std::max( tmp_int, 1 );
@@ -17,7 +17,7 @@ ErrorCode Tree::parse_common_options( FileOptions& options )
     // MAX_DEPTH: max depth of the tree; default = 30
     rval = options.get_int_option( "MAX_DEPTH", tmp_int );
     if( MB_SUCCESS == rval ) maxDepth = tmp_int;
-    if( maxDepth < 1 ) maxDepth = std::numeric_limits< unsigned >::max( );
+    if( maxDepth < 1 ) maxDepth = std::numeric_limits< unsigned >::max();
 
     // MIN_WIDTH: minimum width of box, used like a tolerance; default = 1.0e-10
     rval = options.get_real_option( "MIN_WIDTH", tmp_dbl );
@@ -46,34 +46,34 @@ ErrorCode Tree::parse_common_options( FileOptions& options )
 
 ErrorCode Tree::find_all_trees( Range& results )
 {
-    Tag       tag = get_box_tag( );
-    ErrorCode rval = moab( )->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, 0, 1, results );
-    if( MB_SUCCESS != rval || results.empty( ) ) return rval;
-    std::vector< BoundBox > boxes( results.size( ) );
-    rval = moab( )->tag_get_data( tag, results, &boxes[ 0 ] );
+    Tag tag        = get_box_tag();
+    ErrorCode rval = moab()->get_entities_by_type_and_tag( 0, MBENTITYSET, &tag, 0, 1, results );
+    if( MB_SUCCESS != rval || results.empty() ) return rval;
+    std::vector< BoundBox > boxes( results.size() );
+    rval = moab()->tag_get_data( tag, results, &boxes[0] );
     if( MB_SUCCESS != rval ) return rval;
-    for( std::vector< BoundBox >::iterator vit = boxes.begin( ); vit != boxes.end( ); ++vit )
+    for( std::vector< BoundBox >::iterator vit = boxes.begin(); vit != boxes.end(); ++vit )
         boundBox.update( *vit );
 
-    if( results.size( ) == 1 ) myRoot = *results.begin( );
+    if( results.size() == 1 ) myRoot = *results.begin();
 
     return MB_SUCCESS;
 }
 
-ErrorCode Tree::create_root( const double box_min[ 3 ], const double box_max[ 3 ], EntityHandle& root_handle )
+ErrorCode Tree::create_root( const double box_min[3], const double box_max[3], EntityHandle& root_handle )
 {
     ErrorCode rval = mbImpl->create_meshset( meshsetFlags, root_handle );
     if( MB_SUCCESS != rval ) return rval;
 
     myRoot = root_handle;
 
-    double box_tag[ 6 ];
+    double box_tag[6];
     for( int i = 0; i < 3; i++ )
     {
-        box_tag[ i ] = box_min[ i ];
-        box_tag[ 3 + i ] = box_max[ i ];
+        box_tag[i]     = box_min[i];
+        box_tag[3 + i] = box_max[i];
     }
-    rval = mbImpl->tag_set_data( get_box_tag( ), &root_handle, 1, box_tag );
+    rval = mbImpl->tag_set_data( get_box_tag(), &root_handle, 1, box_tag );
     if( MB_SUCCESS != rval ) return rval;
 
     boundBox.bMin = box_min;
@@ -82,28 +82,28 @@ ErrorCode Tree::create_root( const double box_min[ 3 ], const double box_max[ 3 
     return MB_SUCCESS;
 }
 
-ErrorCode Tree::delete_tree_sets( )
+ErrorCode Tree::delete_tree_sets()
 {
     if( !myRoot ) return MB_SUCCESS;
 
-    ErrorCode                   rval;
+    ErrorCode rval;
     std::vector< EntityHandle > children, dead_sets, current_sets;
     current_sets.push_back( myRoot );
-    while( !current_sets.empty( ) )
+    while( !current_sets.empty() )
     {
-        EntityHandle set = current_sets.back( );
-        current_sets.pop_back( );
+        EntityHandle set = current_sets.back();
+        current_sets.pop_back();
         dead_sets.push_back( set );
         rval = mbImpl->get_child_meshsets( set, children );
         if( MB_SUCCESS != rval ) return rval;
-        std::copy( children.begin( ), children.end( ), std::back_inserter( current_sets ) );
-        children.clear( );
+        std::copy( children.begin(), children.end(), std::back_inserter( current_sets ) );
+        children.clear();
     }
 
     rval = mbImpl->tag_delete_data( boxTag, &myRoot, 1 );
     if( MB_SUCCESS != rval ) return rval;
 
-    rval = mbImpl->delete_entities( &dead_sets[ 0 ], dead_sets.size( ) );
+    rval = mbImpl->delete_entities( &dead_sets[0], dead_sets.size() );
     if( MB_SUCCESS != rval ) return rval;
 
     myRoot = 0;

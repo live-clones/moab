@@ -8,13 +8,13 @@ class GeomAssocPairSide : public AssocPairSide
 {
   public:
     GeomAssocPairSide( iRel_Instance relation, iBase_Instance instance, int id );
-    virtual ~GeomAssocPairSide( );
+    virtual ~GeomAssocPairSide();
 
-    virtual iBase_Instance instance( ) const;
-    virtual iRel_IfaceType type( ) const;
+    virtual iBase_Instance instance() const;
+    virtual iRel_IfaceType type() const;
 
-    virtual int create_relation_side( );
-    virtual int destroy_relation_side( );
+    virtual int create_relation_side();
+    virtual int destroy_relation_side();
 
     virtual int get_all_entities( int dimension, iBase_EntityHandle** entities, int* entities_alloc,
                                   int* entities_size );
@@ -48,9 +48,9 @@ class GeomAssocPairSide : public AssocPairSide
     virtual int get_dims( iBase_EntitySetHandle* sets, int num_sets, int* values );
 
   private:
-    iRel_Instance  relation;
+    iRel_Instance relation;
     iGeom_Instance instance_;
-    int            id;
+    int id;
 
     iBase_TagHandle relation_tag;
     iBase_TagHandle gid_tag;

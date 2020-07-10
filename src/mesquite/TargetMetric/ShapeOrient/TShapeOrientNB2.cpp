@@ -38,44 +38,45 @@
 namespace MBMesquite
 {
 
-std::string TShapeOrientNB2::get_name( ) const
+std::string TShapeOrientNB2::get_name() const
 {
     return "TShapeOrientNB2";
 }
 
-TShapeOrientNB2::~TShapeOrientNB2( ) {}
+TShapeOrientNB2::~TShapeOrientNB2() {}
 
-template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
     const double tr = trace( T );
-    result = sqr_Frobenius( T ) - DimConst< DIM >::inv( ) * tr * fabs( tr );
+    result          = sqr_Frobenius( T ) - DimConst< DIM >::inv() * tr * fabs( tr );
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T )
 {
     const double tr = trace( T );
-    const double f = DimConst< DIM >::inv( ) * fabs( tr );
-    result = sqr_Frobenius( T ) - f * tr;
-    deriv_wrt_T = T;
+    const double f  = DimConst< DIM >::inv() * fabs( tr );
+    result          = sqr_Frobenius( T ) - f * tr;
+    deriv_wrt_T     = T;
     pluseq_scaled_I( deriv_wrt_T, -f );
     deriv_wrt_T *= 2;
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                          MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     const double tr = trace( T );
-    const double f = DimConst< DIM >::inv( ) * fabs( tr );
-    result = sqr_Frobenius( T ) - f * tr;
-    deriv_wrt_T = T;
+    const double f  = DimConst< DIM >::inv() * fabs( tr );
+    result          = sqr_Frobenius( T ) - f * tr;
+    deriv_wrt_T     = T;
     pluseq_scaled_I( deriv_wrt_T, -f );
     deriv_wrt_T *= 2;
     set_scaled_I( second_wrt_T, 2.0 );
-    pluseq_scaled_outer_product_I_I( second_wrt_T, DimConst< DIM >::inv( ) * ( tr < 0 ? 2 : -2 ) );
+    pluseq_scaled_outer_product_I_I( second_wrt_T, DimConst< DIM >::inv() * ( tr < 0 ? 2 : -2 ) );
     return true;
 }
 

@@ -85,7 +85,7 @@ class BoundedCylinderDomain : public CylinderDomain
   private:
     struct Curve
     {
-        double                            t;
+        double t;
         std::vector< Mesh::EntityHandle > handles;
     };
 

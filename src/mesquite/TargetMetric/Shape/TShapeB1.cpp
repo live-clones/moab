@@ -38,12 +38,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeB1::get_name( ) const
+std::string TShapeB1::get_name() const
 {
     return "TShapeB1";
 }
 
-TShapeB1::~TShapeB1( ) {}
+TShapeB1::~TShapeB1() {}
 
 bool TShapeB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -69,8 +69,8 @@ bool TShapeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, M
     }
 
     double inv_d = 1.0 / d;
-    result = 0.5 * sqr_Frobenius( T ) * inv_d;
-    deriv_wrt_T = T;
+    result       = 0.5 * sqr_Frobenius( T ) * inv_d;
+    deriv_wrt_T  = T;
     deriv_wrt_T -= result * transpose_adj( T );
     deriv_wrt_T *= inv_d;
 
@@ -87,7 +87,7 @@ bool TShapeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, M
       - \frac{|T|^2}{2 \tau^3} \frac{\partial^2 \tau}{\partial T^2} \f$
   */
 bool TShapeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                   MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                   MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -96,11 +96,11 @@ bool TShapeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, M
         return false;
     }
 
-    double inv_d = 1.0 / d;
-    double f1 = sqr_Frobenius( T ) * inv_d;
-    result = 0.5 * f1;
+    double inv_d                 = 1.0 / d;
+    double f1                    = sqr_Frobenius( T ) * inv_d;
+    result                       = 0.5 * f1;
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    deriv_wrt_T = T;
+    deriv_wrt_T                  = T;
     deriv_wrt_T -= result * adjt;
     deriv_wrt_T *= inv_d;
 
@@ -115,8 +115,8 @@ bool TShapeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, M
 
 bool TShapeB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err )
 {
-    double f = Frobenius( T );
-    double d = det( T );
+    double f   = Frobenius( T );
+    double d   = det( T );
     double den = 3 * MSQ_SQRT_THREE * d;
 
     if( invalid_determinant( d ) )
@@ -137,18 +137,18 @@ bool TShapeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, M
         return false;
     }
 
-    double norm = Frobenius( T );
-    double den = 1.0 / ( 3 * MSQ_SQRT_THREE * d );
+    double norm      = Frobenius( T );
+    double den       = 1.0 / ( 3 * MSQ_SQRT_THREE * d );
     double norm_cube = norm * norm * norm;
-    result = norm_cube * den - 1.0;
-    wrt_T = T;
+    result           = norm_cube * den - 1.0;
+    wrt_T            = T;
     wrt_T *= 3 * norm * den;
     wrt_T -= norm_cube * den / d * transpose_adj( T );
     return true;
 }
 
 bool TShapeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                   MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                   MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
     double d = det( T );
     if( invalid_determinant( d ) )
@@ -157,13 +157,13 @@ bool TShapeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, M
         return false;
     }
 
-    double id = 1.0 / d;
-    double norm = Frobenius( T );
-    double den = 1.0 / ( 3 * MSQ_SQRT_THREE * d );
-    double norm_cube = norm * norm * norm;
-    result = norm_cube * den - 1.0;
+    double id              = 1.0 / d;
+    double norm            = Frobenius( T );
+    double den             = 1.0 / ( 3 * MSQ_SQRT_THREE * d );
+    double norm_cube       = norm * norm * norm;
+    result                 = norm_cube * den - 1.0;
     MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    deriv_wrt_T = T;
+    deriv_wrt_T            = T;
     deriv_wrt_T *= 3 * norm * den;
     deriv_wrt_T -= norm_cube * den * id * transpose_adj( T );
 

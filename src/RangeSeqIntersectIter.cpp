@@ -42,22 +42,22 @@ ErrorCode RangeSeqIntersectIter::init( Range::const_iterator start, Range::const
     mStartHandle = *start;
     --end;
     mLastHandle = *end;
-    mEndHandle = ( *rangeIter ).second;
+    mEndHandle  = ( *rangeIter ).second;
     if( mEndHandle > mLastHandle ) mEndHandle = mLastHandle;
 
 #if MB_RANGE_SEQ_INTERSECT_ITER_STATS
-    ErrorCode result = update_entity_sequence( );
+    ErrorCode result = update_entity_sequence();
     update_stats( mEndHandle - mStartHandle + 1 );
     return result;
 #else
-    return update_entity_sequence( );
+    return update_entity_sequence();
 #endif
 }
 
-ErrorCode RangeSeqIntersectIter::step( )
+ErrorCode RangeSeqIntersectIter::step()
 {
     // If at end, return MB_FAILURE
-    if( is_at_end( ) ) return MB_FAILURE;
+    if( is_at_end() ) return MB_FAILURE;
     // If the last block was at the end of the rangeIter pair,
     // then advance the iterator and set the next block
     else if( mEndHandle == ( *rangeIter ).second )
@@ -78,38 +78,38 @@ ErrorCode RangeSeqIntersectIter::step( )
         // Now trim up the range (decrease mEndHandle) as necessary
         // for the corresponding EntitySquence
 #if MB_RANGE_SEQ_INTERSECT_ITER_STATS
-    ErrorCode result = update_entity_sequence( );
+    ErrorCode result = update_entity_sequence();
     update_stats( mEndHandle - mStartHandle + 1 );
     return result;
 #else
-    return update_entity_sequence( );
+    return update_entity_sequence();
 #endif
 }
 
-ErrorCode RangeSeqIntersectIter::update_entity_sequence( )
+ErrorCode RangeSeqIntersectIter::update_entity_sequence()
 {
     // mStartHandle to mEndHandle is a subset of the Range.
     // Update sequence data as necessary and trim that subset
     // (reduce mEndHandle) for the current EntitySequence.
 
     // Need to update the sequence pointer?
-    if( !mSequence || mStartHandle > mSequence->end_handle( ) )
+    if( !mSequence || mStartHandle > mSequence->end_handle() )
     {
 
         // Check that the mStartHandle is valid
         if( TYPE_FROM_HANDLE( mStartHandle ) >= MBMAXTYPE ) return MB_TYPE_OUT_OF_RANGE;
 
-        if( MB_SUCCESS != mSequenceManager->find( mStartHandle, mSequence ) ) return find_invalid_range( );
+        if( MB_SUCCESS != mSequenceManager->find( mStartHandle, mSequence ) ) return find_invalid_range();
     }
 
     // if mEndHandle is past end of sequence or block of used
     // handles within sequence, shorten it.
-    if( mEndHandle > mSequence->end_handle( ) ) mEndHandle = mSequence->end_handle( );
+    if( mEndHandle > mSequence->end_handle() ) mEndHandle = mSequence->end_handle();
 
     return MB_SUCCESS;
 }
 
-ErrorCode RangeSeqIntersectIter::find_invalid_range( )
+ErrorCode RangeSeqIntersectIter::find_invalid_range()
 {
     assert( !mSequence );
 
@@ -117,11 +117,11 @@ ErrorCode RangeSeqIntersectIter::find_invalid_range( )
     if( mStartHandle == mEndHandle ) return MB_ENTITY_NOT_FOUND;
 
     // Find the next EntitySequence
-    EntityType                          type = TYPE_FROM_HANDLE( mStartHandle );
-    const TypeSequenceManager&          map = mSequenceManager->entity_map( type );
+    EntityType type                          = TYPE_FROM_HANDLE( mStartHandle );
+    const TypeSequenceManager& map           = mSequenceManager->entity_map( type );
     TypeSequenceManager::const_iterator iter = map.upper_bound( mStartHandle );
     // If no next sequence of the same type
-    if( iter == map.end( ) )
+    if( iter == map.end() )
     {
         // If end type not the same as start type, split on type
         if( type != TYPE_FROM_HANDLE( mEndHandle ) )
@@ -131,30 +131,30 @@ ErrorCode RangeSeqIntersectIter::find_invalid_range( )
         }
     }
     // otherwise invalid range ends at min(mEndHandle, sequence start handle - 1)
-    else if( ( *iter )->start_handle( ) <= mEndHandle )
+    else if( ( *iter )->start_handle() <= mEndHandle )
     {
-        mEndHandle = ( *iter )->start_handle( ) - 1;
+        mEndHandle = ( *iter )->start_handle() - 1;
     }
 
     return MB_ENTITY_NOT_FOUND;
 }
 
 #if MB_RANGE_SEQ_INTERSECT_ITER_STATS
-double        RangeSeqIntersectIter::doubleNumCalls = 0;
-double        RangeSeqIntersectIter::doubleEntCount = 0;
+double RangeSeqIntersectIter::doubleNumCalls     = 0;
+double RangeSeqIntersectIter::doubleEntCount     = 0;
 unsigned long RangeSeqIntersectIter::intNumCalls = 0;
 unsigned long RangeSeqIntersectIter::intEntCount = 0;
 
 void RangeSeqIntersectIter::update_stats( unsigned long num_ents )
 {
-    if( std::numeric_limits< unsigned long >::max( ) == intNumCalls )
+    if( std::numeric_limits< unsigned long >::max() == intNumCalls )
     {
         doubleNumCalls += intNumCalls;
         intNumCalls = 0;
     }
     ++intNumCalls;
 
-    if( std::numeric_limits< unsigned long >::max( ) - intEntCount > num_ents )
+    if( std::numeric_limits< unsigned long >::max() - intEntCount > num_ents )
     {
         doubleNumCalls += intEntCount;
         intEntCount = num_ents;

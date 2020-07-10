@@ -43,7 +43,7 @@
 using namespace MBMesquite;
 
 // characteristics of geometry
-const double   SPHERE_RADIUS = 3.0;
+const double SPHERE_RADIUS = 3.0;
 const Vector3D SPHERE_CENTER( 2.0, 2.0, 0.0 );
 
 #define CHKIGEOM \
@@ -59,7 +59,7 @@ bool chk_igeom_error( int ierr, const char* file, int line )
 
 std::string default_file_name = TestDir + "/2D/vtk/quads/untangled/quads_on_sphere_529.vtk";
 
-void usage( )
+void usage()
 {
     std::cout << "main [-N] [filename] [-o <output_file>]" << std::endl;
     std::cout << "  -N : Use native representation instead of iGeom implementation\n" << std::endl;
@@ -67,38 +67,38 @@ void usage( )
     exit( 1 );
 }
 
-void        run_smoother( Mesh& mesh, MeshDomain* domain, MsqError& err );
-bool        check_results( Mesh& mesh, MeshDomain* domain, MsqError& err );
-MeshDomain* get_itaps_domain( );
-MeshDomain* get_mesquite_domain( );
+void run_smoother( Mesh& mesh, MeshDomain* domain, MsqError& err );
+bool check_results( Mesh& mesh, MeshDomain* domain, MsqError& err );
+MeshDomain* get_itaps_domain();
+MeshDomain* get_mesquite_domain();
 
 int main( int argc, char* argv[] )
 {
     // command line arguments
-    const char* file_name = 0;
+    const char* file_name   = 0;
     const char* output_file = 0;
-    bool        use_native = false, opts_done = false;
+    bool use_native = false, opts_done = false;
     for( int arg = 1; arg < argc; ++arg )
     {
-        if( !opts_done && argv[ arg ][ 0 ] == '-' )
+        if( !opts_done && argv[arg][0] == '-' )
         {
-            if( !strcmp( argv[ arg ], "-N" ) )
+            if( !strcmp( argv[arg], "-N" ) )
                 use_native = true;
-            else if( !strcmp( argv[ arg ], "-o" ) )
-                output_file = argv[ arg++ ];
-            else if( !strcmp( argv[ arg ], "--" ) )
+            else if( !strcmp( argv[arg], "-o" ) )
+                output_file = argv[arg++];
+            else if( !strcmp( argv[arg], "--" ) )
                 opts_done = true;
             else
-                usage( );
+                usage();
         }
         else if( !file_name )
-            file_name = argv[ arg ];
+            file_name = argv[arg];
         else
-            usage( );
+            usage();
     }
     if( !file_name )
     {
-        file_name = default_file_name.c_str( );
+        file_name = default_file_name.c_str();
         std::cout << "No file specified: using default: " << default_file_name << std::endl;
     }
 
@@ -112,16 +112,16 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    std::auto_ptr< MeshDomain > dom( use_native ? get_mesquite_domain( ) : get_itaps_domain( ) );
+    std::auto_ptr< MeshDomain > dom( use_native ? get_mesquite_domain() : get_itaps_domain() );
 
-    if( !dom.get( ) )
+    if( !dom.get() )
     {
         MSQ_SETERR( err )( "Domain creation failed", MsqError::INTERNAL_ERROR );
         std::cerr << err << std::endl;
         return 1;
     }
 
-    run_smoother( mesh, dom.get( ), err );
+    run_smoother( mesh, dom.get(), err );
     if( MSQ_CHKERR( err ) )
     {
         std::cerr << err << std::endl;
@@ -140,7 +140,7 @@ int main( int argc, char* argv[] )
         }
     }
 
-    bool valid = check_results( mesh, dom.get( ), err );
+    bool valid = check_results( mesh, dom.get(), err );
     if( MSQ_CHKERR( err ) )
     {
         std::cerr << err << std::endl;
@@ -154,10 +154,10 @@ int main( int argc, char* argv[] )
 void run_smoother( Mesh& mesh, MeshDomain* dom, MsqError& err )
 {
     ShapeImprovementWrapper smoother;
-    MeshDomainAssoc         mesh_and_domain = MeshDomainAssoc( &mesh, dom );
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, dom );
     smoother.run_instructions( &mesh_and_domain, err );MSQ_CHKERR( err );
 
-    if( smoother.quality_assessor( ).invalid_elements( ) )
+    if( smoother.quality_assessor().invalid_elements() )
     {
         MSQ_SETERR( err )( "Smoothing produced invalid elements", MsqError::INVALID_MESH );
         return;
@@ -171,15 +171,15 @@ bool check_results( Mesh& mesh, MeshDomain* dom, MsqError& err )
     std::vector< Mesh::VertexHandle > handles;
     mesh.get_all_vertices( handles, err );
     MSQ_ERRZERO( err );
-    std::vector< MsqVertex > coords( handles.size( ) );
-    mesh.vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size( ), err );
+    std::vector< MsqVertex > coords( handles.size() );
+    mesh.vertices_get_coordinates( arrptr( handles ), arrptr( coords ), handles.size(), err );
     MSQ_ERRZERO( err );
 
-    bool   valid = true;
-    size_t c = 0;
-    for( size_t i = 0; i < coords.size( ); ++i )
+    bool valid = true;
+    size_t c   = 0;
+    for( size_t i = 0; i < coords.size(); ++i )
     {
-        double d = ( coords[ i ] - SPHERE_CENTER ).length( );
+        double d = ( coords[i] - SPHERE_CENTER ).length();
         if( fabs( d - SPHERE_RADIUS ) > EPS ) ++c;
     }
     if( c )
@@ -188,8 +188,8 @@ bool check_results( Mesh& mesh, MeshDomain* dom, MsqError& err )
         valid = false;
     }
 
-    std::vector< unsigned short > dof( handles.size( ) ), exp_dof( handles.size( ), 2 );
-    dom->domain_DoF( arrptr( handles ), arrptr( dof ), handles.size( ), err );
+    std::vector< unsigned short > dof( handles.size() ), exp_dof( handles.size(), 2 );
+    dom->domain_DoF( arrptr( handles ), arrptr( dof ), handles.size(), err );
     MSQ_ERRZERO( err );
     if( dof != exp_dof )
     {
@@ -198,15 +198,15 @@ bool check_results( Mesh& mesh, MeshDomain* dom, MsqError& err )
     }
 
     c = 0;
-    std::vector< Vector3D > normals( coords.begin( ), coords.end( ) );
-    dom->vertex_normal_at( arrptr( handles ), arrptr( normals ), handles.size( ), err );
+    std::vector< Vector3D > normals( coords.begin(), coords.end() );
+    dom->vertex_normal_at( arrptr( handles ), arrptr( normals ), handles.size(), err );
     MSQ_ERRZERO( err );
-    for( size_t i = 0; i < handles.size( ); ++i )
+    for( size_t i = 0; i < handles.size(); ++i )
     {
-        Vector3D exp_norm = ~( coords[ i ] - SPHERE_CENTER );
-        Vector3D act_norm = ~normals[ i ];
-        Vector3D diff = exp_norm - act_norm;
-        if( diff.length( ) > EPS ) ++c;
+        Vector3D exp_norm = ~( coords[i] - SPHERE_CENTER );
+        Vector3D act_norm = ~normals[i];
+        Vector3D diff     = exp_norm - act_norm;
+        if( diff.length() > EPS ) ++c;
     }
     if( c )
     {
@@ -217,10 +217,10 @@ bool check_results( Mesh& mesh, MeshDomain* dom, MsqError& err )
     return valid;
 }
 
-MeshDomain* get_itaps_domain( )
+MeshDomain* get_itaps_domain()
 {
-    const double   EPS = 1e-2;
-    int            ierr;
+    const double EPS = 1e-2;
+    int ierr;
     iGeom_Instance igeom;
     iGeom_newGeom( "", &igeom, &ierr, 0 );
     CHKIGEOM;
@@ -232,12 +232,12 @@ MeshDomain* get_itaps_domain( )
     iBase_EntityHandle sphere_vol;
     iGeom_createSphere( igeom, SPHERE_RADIUS, &sphere_vol, &ierr );
     CHKIGEOM;
-    iGeom_moveEnt( igeom, sphere_vol, SPHERE_CENTER[ 0 ], SPHERE_CENTER[ 1 ], SPHERE_CENTER[ 2 ], &ierr );
+    iGeom_moveEnt( igeom, sphere_vol, SPHERE_CENTER[0], SPHERE_CENTER[1], SPHERE_CENTER[2], &ierr );
     CHKIGEOM;
 
-    iBase_EntityHandle  sphere_surf;
+    iBase_EntityHandle sphere_surf;
     iBase_EntityHandle* ptr = &sphere_surf;
-    int                 size = 0, alloc = 1;
+    int size = 0, alloc = 1;
     iGeom_getEntAdj( igeom, sphere_vol, iBase_FACE, &ptr, &alloc, &size, &ierr );
     CHKIGEOM;
     if( size != 1 )
@@ -247,13 +247,12 @@ MeshDomain* get_itaps_domain( )
     }
 
     Vector3D bmin, bmax;
-    iGeom_getEntBoundBox( igeom, sphere_surf, &bmin[ 0 ], &bmin[ 1 ], &bmin[ 2 ], &bmax[ 0 ], &bmax[ 1 ], &bmax[ 2 ],
-                          &ierr );
+    iGeom_getEntBoundBox( igeom, sphere_surf, &bmin[0], &bmin[1], &bmin[2], &bmax[0], &bmax[1], &bmax[2], &ierr );
     CHKIGEOM;
     Vector3D center = 0.5 * ( bmin + bmax );
-    Vector3D rad = 0.5 * ( bmax - bmin );
-    if( ( center - SPHERE_CENTER ).length( ) > EPS || fabs( rad[ 0 ] - SPHERE_RADIUS ) > EPS ||
-        fabs( rad[ 1 ] - SPHERE_RADIUS ) > EPS || fabs( rad[ 2 ] - SPHERE_RADIUS ) > EPS )
+    Vector3D rad    = 0.5 * ( bmax - bmin );
+    if( ( center - SPHERE_CENTER ).length() > EPS || fabs( rad[0] - SPHERE_RADIUS ) > EPS ||
+        fabs( rad[1] - SPHERE_RADIUS ) > EPS || fabs( rad[2] - SPHERE_RADIUS ) > EPS )
     {
         std::cerr << "iGeom implementation returned invalid box for sphere" << std::endl
                   << "  Expected Sphere Center: " << SPHERE_CENTER << std::endl
@@ -266,7 +265,7 @@ MeshDomain* get_itaps_domain( )
     return new MsqIGeom( igeom, sphere_surf );
 }
 
-MeshDomain* get_mesquite_domain( )
+MeshDomain* get_mesquite_domain()
 {
     return new SphericalDomain( SPHERE_CENTER, SPHERE_RADIUS );
 }

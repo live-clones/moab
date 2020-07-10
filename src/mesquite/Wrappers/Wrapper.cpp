@@ -34,8 +34,8 @@
 #include "MsqError.hpp"
 #include "QualityAssessor.hpp"
 
-MBMesquite::Wrapper::Wrapper( ) : qualAssessor( new QualityAssessor ) {}
-MBMesquite::Wrapper::~Wrapper( )
+MBMesquite::Wrapper::Wrapper() : qualAssessor( new QualityAssessor ) {}
+MBMesquite::Wrapper::~Wrapper()
 {
     delete qualAssessor;
 }

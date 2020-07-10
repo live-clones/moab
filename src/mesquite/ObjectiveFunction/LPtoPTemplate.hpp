@@ -73,10 +73,10 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
     LPtoPTemplate( short, QualityMetric* );
 
     MESQUITE_EXPORT
-    virtual ~LPtoPTemplate( );
+    virtual ~LPtoPTemplate();
 
     MESQUITE_EXPORT
-    virtual void clear( );
+    virtual void clear();
 
     MESQUITE_EXPORT
     virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
@@ -87,7 +87,7 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< Vector3D >& grad_out,
                                                  std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
@@ -95,7 +95,7 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
                                         std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual ObjectiveFunction* clone( ) const;
+    virtual ObjectiveFunction* clone() const;
 
     /*!Use set_dividing_by_n to control whether this objective
       function divides it's final value by the number of
@@ -122,9 +122,9 @@ class LPtoPTemplate : public ObjectiveFunctionTemplate
     //! by the number of metric values.
     bool dividingByN;
 
-    size_t mCount; /**< The number of accumulated entires */
-    double mPowSum; /**< The accumulated sum of values */
-    size_t saveCount; /**< Saved count from previous patch */
+    size_t mCount;     /**< The number of accumulated entires */
+    double mPowSum;    /**< The accumulated sum of values */
+    size_t saveCount;  /**< Saved count from previous patch */
     double savePowSum; /**< Saved sum from previous patch */
 
     /** Temporary storage for qm sample handles */

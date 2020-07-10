@@ -35,7 +35,7 @@ const double TWO_VERDICT_PI = 2.0 * VERDICT_PI;
 
 VerdictVector& VerdictVector::length( const double new_length )
 {
-    double len = this->length( );
+    double len = this->length();
     xVal *= new_length / len;
     yVal *= new_length / len;
     zVal *= new_length / len;
@@ -44,9 +44,9 @@ VerdictVector& VerdictVector::length( const double new_length )
 
 double VerdictVector::distance_between( const VerdictVector& test_vector )
 {
-    double xv = xVal - test_vector.x( );
-    double yv = yVal - test_vector.y( );
-    double zv = zVal - test_vector.z( );
+    double xv = xVal - test_vector.x();
+    double yv = yVal - test_vector.y();
+    double zv = zVal - test_vector.z();
 
     return ( sqrt( xv * xv + yv * yv + zv * zv ) );
 }
@@ -65,7 +65,7 @@ double VerdictVector::interior_angle( const VerdictVector& otherVector )
 {
     double cosAngle = 0., angleRad = 0., len1, len2 = 0.;
 
-    if( ( ( len1 = this->length( ) ) > 0 ) && ( ( len2 = otherVector.length( ) ) > 0 ) )
+    if( ( ( len1 = this->length() ) > 0 ) && ( ( len2 = otherVector.length() ) > 0 ) )
         cosAngle = ( *this % otherVector ) / ( len1 * len2 );
     else
     {
@@ -102,22 +102,22 @@ VerdictVector interpolate( const double param, const VerdictVector& v1, const Ve
     return temp;
 }
 
-void VerdictVector::xy_to_rtheta( )
+void VerdictVector::xy_to_rtheta()
 {
     // careful about overwriting
-    double r_ = length( );
-    double theta_ = atan2( y( ), x( ) );
+    double r_     = length();
+    double theta_ = atan2( y(), x() );
     if( theta_ < 0.0 ) theta_ += TWO_VERDICT_PI;
 
     r( r_ );
     theta( theta_ );
 }
 
-void VerdictVector::rtheta_to_xy( )
+void VerdictVector::rtheta_to_xy()
 {
     // careful about overwriting
-    double x_ = r( ) * cos( theta( ) );
-    double y_ = r( ) * sin( theta( ) );
+    double x_ = r() * cos( theta() );
+    double y_ = r() * sin( theta() );
 
     x( x_ );
     y( y_ );
@@ -125,9 +125,9 @@ void VerdictVector::rtheta_to_xy( )
 
 void VerdictVector::rotate( double angle, double )
 {
-    xy_to_rtheta( );
-    theta( ) += angle;
-    rtheta_to_xy( );
+    xy_to_rtheta();
+    theta() += angle;
+    rtheta_to_xy();
 }
 
 void VerdictVector::blow_out( double gamma, double rmin )
@@ -136,12 +136,12 @@ void VerdictVector::blow_out( double gamma, double rmin )
     // map on a circle : r'^2 = sqrt( 1 - (1-r)^2 )
     // if gamma ==0, then map back to itself
     // in between, linearly interpolate
-    xy_to_rtheta( );
+    xy_to_rtheta();
     //  r() = sqrt( (2. - r()) * r() ) * gamma  + r() * (1-gamma);
     assert( gamma > 0.0 );
     // the following limits should really be roundoff-based
-    if( r( ) > rmin * 1.001 && r( ) < 1.001 ) { r( ) = rmin + pow( r( ), gamma ) * ( 1.0 - rmin ); }
-    rtheta_to_xy( );
+    if( r() > rmin * 1.001 && r() < 1.001 ) { r() = rmin + pow( r(), gamma ) * ( 1.0 - rmin ); }
+    rtheta_to_xy();
 }
 
 void VerdictVector::reflect_about_xaxis( double, double )
@@ -151,35 +151,35 @@ void VerdictVector::reflect_about_xaxis( double, double )
 
 void VerdictVector::scale_angle( double gamma, double )
 {
-    const double r_factor = 0.3;
+    const double r_factor     = 0.3;
     const double theta_factor = 0.6;
 
-    xy_to_rtheta( );
+    xy_to_rtheta();
 
     // if neary 2pi, treat as zero
     // some near zero stuff strays due to roundoff
-    if( theta( ) > TWO_VERDICT_PI - 0.02 ) theta( ) = 0;
+    if( theta() > TWO_VERDICT_PI - 0.02 ) theta() = 0;
     // the above screws up on big sheets - need to overhaul at the sheet level
 
     if( gamma < 1 )
     {
         // squeeze together points of short radius so that
         // long chords won't cross them
-        theta( ) += ( VERDICT_PI - theta( ) ) * ( 1 - gamma ) * theta_factor * ( 1 - r( ) );
+        theta() += ( VERDICT_PI - theta() ) * ( 1 - gamma ) * theta_factor * ( 1 - r() );
 
         // push away from center of circle, again so long chords won't cross
-        r( ( r_factor + r( ) ) / ( 1 + r_factor ) );
+        r( ( r_factor + r() ) / ( 1 + r_factor ) );
 
         // scale angle by gamma
-        theta( ) *= gamma;
+        theta() *= gamma;
     }
     else
     {
         // scale angle by gamma, making sure points nearly 2pi are treated as zero
-        double new_theta = theta( ) * gamma;
-        if( new_theta < 2.5 * VERDICT_PI || r( ) < 0.2 ) theta( new_theta );
+        double new_theta = theta() * gamma;
+        if( new_theta < 2.5 * VERDICT_PI || r() < 0.2 ) theta( new_theta );
     }
-    rtheta_to_xy( );
+    rtheta_to_xy();
 }
 
 double VerdictVector::vector_angle_quick( const VerdictVector& vec1, const VerdictVector& vec2 )
@@ -232,8 +232,8 @@ VerdictVector vectorRotate( const double angle, const VerdictVector& normalAxis,
 
     VerdictVector yAxis = normalAxis * referenceAxis;
     VerdictVector xAxis = yAxis * normalAxis;
-    yAxis.normalize( );
-    xAxis.normalize( );
+    yAxis.normalize();
+    xAxis.normalize();
 
     x = cos( angle );
     y = sin( angle );
@@ -258,15 +258,15 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
 
     // Check for zero length normal vector
     VerdictVector normal = *this;
-    double        normal_lensq = normal.length_squared( );
-    double        len_tol = 0.0000001;
+    double normal_lensq  = normal.length_squared();
+    double len_tol       = 0.0000001;
     if( normal_lensq <= len_tol )
     {
         // null normal - make it the normal to the plane defined by vector1
         // and vector2. If still null, the vectors are colinear so check
         // for zero or 180 angle.
-        normal = vector1 * vector2;
-        normal_lensq = normal.length_squared( );
+        normal       = vector1 * vector2;
+        normal_lensq = normal.length_squared();
         if( normal_lensq <= len_tol )
         {
             double cosine = vector1 % vector2;
@@ -280,11 +280,11 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
     // Trap for normal vector colinear to one of the other vectors. If so,
     // use a normal defined by the two vectors.
     double dot_tol = 0.985;
-    double dot = vector1 % normal;
-    if( dot * dot >= vector1.length_squared( ) * normal_lensq * dot_tol )
+    double dot     = vector1 % normal;
+    if( dot * dot >= vector1.length_squared() * normal_lensq * dot_tol )
     {
-        normal = vector1 * vector2;
-        normal_lensq = normal.length_squared( );
+        normal       = vector1 * vector2;
+        normal_lensq = normal.length_squared();
 
         // Still problems if all three vectors were colinear
         if( normal_lensq <= len_tol )
@@ -300,7 +300,7 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
     {
         // The normal and vector1 are not colinear, now check for vector2
         dot = vector2 % normal;
-        if( dot * dot >= vector2.length_squared( ) * normal_lensq * dot_tol ) { normal = vector1 * vector2; }
+        if( dot * dot >= vector2.length_squared() * normal_lensq * dot_tol ) { normal = vector1 * vector2; }
     }
 
     // Assume a plane such that the normal vector is the plane's normal.
@@ -309,7 +309,7 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
     // the normal. xAxis is in the plane and is the projection of vector1
     // into the plane.
 
-    normal.normalize( );
+    normal.normalize();
     VerdictVector yAxis = normal;
     yAxis *= vector1;
     double yv = vector2 % yAxis;
@@ -327,8 +327,8 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
 
 bool VerdictVector::within_tolerance( const VerdictVector& vectorPtr2, double tolerance ) const
 {
-    if( ( fabs( this->x( ) - vectorPtr2.x( ) ) < tolerance ) && ( fabs( this->y( ) - vectorPtr2.y( ) ) < tolerance ) &&
-        ( fabs( this->z( ) - vectorPtr2.z( ) ) < tolerance ) )
+    if( ( fabs( this->x() - vectorPtr2.x() ) < tolerance ) && ( fabs( this->y() - vectorPtr2.y() ) < tolerance ) &&
+        ( fabs( this->z() - vectorPtr2.z() ) < tolerance ) )
     { return true; }
 
     return false;
@@ -336,65 +336,65 @@ bool VerdictVector::within_tolerance( const VerdictVector& vectorPtr2, double to
 
 void VerdictVector::orthogonal_vectors( VerdictVector& vector2, VerdictVector& vector3 )
 {
-    double         xv[ 3 ];
-    unsigned short i = 0;
+    double xv[3];
+    unsigned short i    = 0;
     unsigned short imin = 0;
-    double         rmin = 1.0E20;
-    unsigned short iperm1[ 3 ];
-    unsigned short iperm2[ 3 ];
+    double rmin         = 1.0E20;
+    unsigned short iperm1[3];
+    unsigned short iperm2[3];
     unsigned short cont_flag = 1;
-    double         vec1[ 3 ], vec2[ 3 ];
-    double         rmag;
+    double vec1[3], vec2[3];
+    double rmag;
 
     // Copy the input vector and normalize it
     VerdictVector vector1 = *this;
-    vector1.normalize( );
+    vector1.normalize();
 
     // Initialize perm flags
-    iperm1[ 0 ] = 1;
-    iperm1[ 1 ] = 2;
-    iperm1[ 2 ] = 0;
-    iperm2[ 0 ] = 2;
-    iperm2[ 1 ] = 0;
-    iperm2[ 2 ] = 1;
+    iperm1[0] = 1;
+    iperm1[1] = 2;
+    iperm1[2] = 0;
+    iperm2[0] = 2;
+    iperm2[1] = 0;
+    iperm2[2] = 1;
 
     // Get into the array format we can work with
     vector1.get_xyz( vec1 );
 
     while( i < 3 && cont_flag )
     {
-        if( fabs( vec1[ i ] ) < 1e-6 )
+        if( fabs( vec1[i] ) < 1e-6 )
         {
-            vec2[ i ] = 1.0;
-            vec2[ iperm1[ i ] ] = 0.0;
-            vec2[ iperm2[ i ] ] = 0.0;
-            cont_flag = 0;
+            vec2[i]         = 1.0;
+            vec2[iperm1[i]] = 0.0;
+            vec2[iperm2[i]] = 0.0;
+            cont_flag       = 0;
         }
 
-        if( fabs( vec1[ i ] ) < rmin )
+        if( fabs( vec1[i] ) < rmin )
         {
             imin = i;
-            rmin = fabs( vec1[ i ] );
+            rmin = fabs( vec1[i] );
         }
         ++i;
     }
 
     if( cont_flag )
     {
-        xv[ imin ] = 1.0;
-        xv[ iperm1[ imin ] ] = 0.0;
-        xv[ iperm2[ imin ] ] = 0.0;
+        xv[imin]         = 1.0;
+        xv[iperm1[imin]] = 0.0;
+        xv[iperm2[imin]] = 0.0;
 
         // Determine cross product
-        vec2[ 0 ] = vec1[ 1 ] * xv[ 2 ] - vec1[ 2 ] * xv[ 1 ];
-        vec2[ 1 ] = vec1[ 2 ] * xv[ 0 ] - vec1[ 0 ] * xv[ 2 ];
-        vec2[ 2 ] = vec1[ 0 ] * xv[ 1 ] - vec1[ 1 ] * xv[ 0 ];
+        vec2[0] = vec1[1] * xv[2] - vec1[2] * xv[1];
+        vec2[1] = vec1[2] * xv[0] - vec1[0] * xv[2];
+        vec2[2] = vec1[0] * xv[1] - vec1[1] * xv[0];
 
         // Unitize
-        rmag = sqrt( vec2[ 0 ] * vec2[ 0 ] + vec2[ 1 ] * vec2[ 1 ] + vec2[ 2 ] * vec2[ 2 ] );
-        vec2[ 0 ] /= rmag;
-        vec2[ 1 ] /= rmag;
-        vec2[ 2 ] /= rmag;
+        rmag = sqrt( vec2[0] * vec2[0] + vec2[1] * vec2[1] + vec2[2] * vec2[2] );
+        vec2[0] /= rmag;
+        vec2[1] /= rmag;
+        vec2[2] /= rmag;
     }
 
     // Copy 1st orthogonal vector into VerdictVector vector2
@@ -408,14 +408,14 @@ void VerdictVector::orthogonal_vectors( VerdictVector& vector2, VerdictVector& v
 void VerdictVector::next_point( const VerdictVector& direction, double distance, VerdictVector& out_point )
 {
     VerdictVector my_direction = direction;
-    my_direction.normalize( );
+    my_direction.normalize();
 
     // Determine next point in space
-    out_point.x( xVal + ( distance * my_direction.x( ) ) );
-    out_point.y( yVal + ( distance * my_direction.y( ) ) );
-    out_point.z( zVal + ( distance * my_direction.z( ) ) );
+    out_point.x( xVal + ( distance * my_direction.x() ) );
+    out_point.y( yVal + ( distance * my_direction.y() ) );
+    out_point.z( zVal + ( distance * my_direction.z() ) );
 
     return;
 }
 
-VerdictVector::VerdictVector( const double xyz[ 3 ] ) : xVal( xyz[ 0 ] ), yVal( xyz[ 1 ] ), zVal( xyz[ 2 ] ) {}
+VerdictVector::VerdictVector( const double xyz[3] ) : xVal( xyz[0] ), yVal( xyz[1] ), zVal( xyz[2] ) {}

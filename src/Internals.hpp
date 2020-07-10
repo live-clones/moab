@@ -43,13 +43,13 @@ namespace moab
  *  required for the entity type and the id space can be increased to over 2B.
  */
 #define MB_TYPE_WIDTH 4
-#define MB_ID_WIDTH ( 8 * sizeof( EntityHandle ) - MB_TYPE_WIDTH )
-#define MB_TYPE_MASK ( (EntityHandle)0xF << MB_ID_WIDTH )
+#define MB_ID_WIDTH   ( 8 * sizeof( EntityHandle ) - MB_TYPE_WIDTH )
+#define MB_TYPE_MASK  ( (EntityHandle)0xF << MB_ID_WIDTH )
 //             2^MB_TYPE_WIDTH-1 ------^
 
-#define MB_START_ID ( (EntityID)1 )  //!< All entity id's currently start at 1
-#define MB_END_ID ( (EntityID)MB_ID_MASK )  //!< Last id is the complement of the MASK
-#define MB_ID_MASK ( ~MB_TYPE_MASK )
+#define MB_START_ID ( (EntityID)1 )           //!< All entity id's currently start at 1
+#define MB_END_ID   ( (EntityID)MB_ID_MASK )  //!< Last id is the complement of the MASK
+#define MB_ID_MASK  ( ~MB_TYPE_MASK )
 
 //! Given a type and an id create a handle.
 inline EntityHandle CREATE_HANDLE( const unsigned type, const EntityID id, int& err )
@@ -58,7 +58,7 @@ inline EntityHandle CREATE_HANDLE( const unsigned type, const EntityID id, int& 
 
     if( id > MB_END_ID || type > MBMAXTYPE )
     {
-        err = 1;  //< Assume that there is a real error value defined somewhere
+        err = 1;   //< Assume that there is a real error value defined somewhere
         return 1;  //<You've got to return something.  What do you return?
     }
 

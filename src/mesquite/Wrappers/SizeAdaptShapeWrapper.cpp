@@ -57,21 +57,21 @@ void SizeAdaptShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Paral
                                          QualityAssessor* qa, MsqError& err )
 {
     InstructionQueue q;
-    Mesh*            mesh = mesh_and_domain->get_mesh( );
+    Mesh* mesh = mesh_and_domain->get_mesh();
 
     // calculate average lambda for mesh
     TagVertexMesh init_mesh( err, mesh );MSQ_ERRRTN( err );
-    ReferenceMesh           ref_mesh( &init_mesh );
+    ReferenceMesh ref_mesh( &init_mesh );
     RefMeshTargetCalculator W_0( &ref_mesh );
     q.add_tag_vertex_mesh( &init_mesh, err );MSQ_ERRRTN( err );
 
     // create objective function
     IdealShapeTarget W_i;
-    LambdaTarget     W( &W_0, &W_i );
-    TShapeSizeB1     tm;
-    TQualityMetric   mu_0( &W, &tm );
-    ElementPMeanP    mu( 1.0, &mu_0 );
-    PMeanPTemplate   of( 1.0, &mu );
+    LambdaTarget W( &W_0, &W_i );
+    TShapeSizeB1 tm;
+    TQualityMetric mu_0( &W, &tm );
+    ElementPMeanP mu( 1.0, &mu_0 );
+    PMeanPTemplate of( 1.0, &mu );
 
     // create quality assessor
     EdgeLengthMetric len( 0.0 );
@@ -80,7 +80,7 @@ void SizeAdaptShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, Paral
     q.add_quality_assessor( qa, err );
 
     // create solver
-    TrustRegion          solver( &of );
+    TrustRegion solver( &of );
     TerminationCriterion tc, ptc;
     tc.add_absolute_vertex_movement( maxVtxMovement );
     tc.add_iteration_limit( iterationLimit );

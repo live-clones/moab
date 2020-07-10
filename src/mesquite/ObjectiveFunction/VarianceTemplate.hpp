@@ -50,7 +50,7 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
     MESQUITE_EXPORT
     VarianceTemplate( QualityMetric* qm = 0 ) : ObjectiveFunctionTemplate( qm )
     {
-        clear( );
+        clear();
     }
 
     /**\brief copy constructor
@@ -67,7 +67,7 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
     }
 
     MESQUITE_EXPORT
-    virtual ~VarianceTemplate( ) {}
+    virtual ~VarianceTemplate() {}
 
     MESQUITE_EXPORT
     virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
@@ -78,14 +78,14 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< Vector3D >& grad_out,
                                                  std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual ObjectiveFunction* clone( ) const;
+    virtual ObjectiveFunction* clone() const;
 
     MESQUITE_EXPORT
-    virtual void clear( );
+    virtual void clear();
 
   private:
     /**\brief Handle EvalType for all eval functions, return OF value
@@ -106,11 +106,11 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
     void accumulate( double sum, double sqr_sum, size_t count, EvalType type, double& result_sum, double& result_sqr,
                      size_t& global_count );
 
-    size_t mCount; /**< The number of accumulated entires */
-    double mSum; /**< The runnnig sum of the qualtiy metric valuse */
-    double mSqrSum; /**< The running sum of the square of QM values */
-    size_t saveCount; /**< Saved count from previous patch */
-    double saveSum; /**< Saved sum from previous patch */
+    size_t mCount;     /**< The number of accumulated entires */
+    double mSum;       /**< The runnnig sum of the qualtiy metric valuse */
+    double mSqrSum;    /**< The running sum of the square of QM values */
+    size_t saveCount;  /**< Saved count from previous patch */
+    double saveSum;    /**< Saved sum from previous patch */
     double saveSqrSum; /**< Saved sum from previous patch */
 
     /** Temporary storage for qm sample handles */

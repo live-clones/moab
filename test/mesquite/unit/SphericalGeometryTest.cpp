@@ -93,13 +93,13 @@ class SphericalGeometryTest : public CppUnit::TestFixture
     // run laplacian smoothing on the geo tri mesh
     CPPUNIT_TEST( test_lapl_geo_sphere );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
     double qualTol;  // double used for double comparisons
-    int    pF;  // PRINT_FLAG
+    int pF;          // PRINT_FLAG
   public:
-    void setUp( )
+    void setUp()
     {
         // pF=1;//PRINT_FLAG IS ON
         pF = 0;  // PRINT_FLAG IS OFF
@@ -107,20 +107,20 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         qualTol = MSQ_MIN;
     }
 
-    void tearDown( ) {}
+    void tearDown() {}
 
   public:
-    SphericalGeometryTest( ) {}
+    SphericalGeometryTest() {}
 
-    void test_cg_mesh_cond_sphere( )
+    void test_cg_mesh_cond_sphere()
     {
-        MBMesquite::MeshImpl      mesh;
+        MBMesquite::MeshImpl mesh;
         MBMesquite::MsqPrintError err( cout );
         mesh.read_vtk( MESH_FILES_DIR "2D/vtk/quads/untangled/quads_on_sphere_529.vtk", err );
         CPPUNIT_ASSERT( !err );
 
         // create geometry: sphere, center (2,2,0), radius 3
-        Vector3D        center( 2, 2, 0 );
+        Vector3D center( 2, 2, 0 );
         SphericalDomain msq_geom( center, 3.0 );
 
         // creates an intruction queue
@@ -128,7 +128,7 @@ class SphericalGeometryTest : public CppUnit::TestFixture
 
         // creates a mean ratio quality metric ...
         ConditionNumberQualityMetric shape;
-        UntangleBetaQualityMetric    untan;
+        UntangleBetaQualityMetric untan;
 
         // ... and builds an objective function with it
         LPtoPTemplate obj_func( &shape, 2, err );
@@ -137,7 +137,7 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         // creates the steepest descent optimization procedures
         ConjugateGradient pass1( &obj_func, err );
         // SteepestDescent* pass2 = new SteepestDescent( obj_func );
-        pass1.use_global_patch( );
+        pass1.use_global_patch();
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         QualityAssessor qa = QualityAssessor( &shape );
@@ -158,7 +158,7 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
         // launches optimization on mesh_set1
         MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
-        double          orig_qa_val = qa.loop_over_mesh( &mesh_and_domain, 0, err );
+        double orig_qa_val              = qa.loop_over_mesh( &mesh_and_domain, 0, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         queue1.run_instructions( &mesh_and_domain, err );
@@ -171,14 +171,14 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         // make sure 'quality' improved
         CPPUNIT_ASSERT( fin_qa_val <= orig_qa_val );
     }
-    void test_smart_lapl_sphere( )
+    void test_smart_lapl_sphere()
     {
-        MBMesquite::MeshImpl      mesh;
+        MBMesquite::MeshImpl mesh;
         MBMesquite::MsqPrintError err( cout );
         mesh.read_vtk( MESH_FILES_DIR "2D/vtk/quads/untangled/quads_on_sphere_529.vtk", err );
 
         // create geometry sphere:  ratius 1, centered at (0,0,0)
-        Vector3D        center( 2, 2, 0 );
+        Vector3D center( 2, 2, 0 );
         SphericalDomain msq_geom( center, 3.0 );
 
         // creates an intruction queue
@@ -186,7 +186,7 @@ class SphericalGeometryTest : public CppUnit::TestFixture
 
         // creates an edge length metric ...
         IdealWeightInverseMeanRatio shape_metric( err );
-        LInfTemplate                shape_func( &shape_metric );
+        LInfTemplate shape_func( &shape_metric );
 
         // create the smart laplacian smoother
         SmartLaplacianSmoother s_lapl( &shape_func );
@@ -203,9 +203,9 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         // launches optimization on mesh_set1
-        QualityAssessor qa = QualityAssessor( &shape_metric );
+        QualityAssessor qa              = QualityAssessor( &shape_metric );
         MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
-        double          orig_val = qa.loop_over_mesh( &mesh_and_domain, 0, err );
+        double orig_val                 = qa.loop_over_mesh( &mesh_and_domain, 0, err );
 
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
@@ -222,15 +222,15 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( final_val < orig_val );
     }
 
-    void test_lapl_geo_sphere( )
+    void test_lapl_geo_sphere()
     {
-        MBMesquite::MeshImpl      mesh;
+        MBMesquite::MeshImpl mesh;
         MBMesquite::MsqPrintError err( cout );
 
         mesh.read_vtk( MESH_FILES_DIR "2D/vtk/tris/untangled/Mesquite_geo_10242.vtk", err );
 
         // create geometry sphere:  ratius 1, centered at (0,0,0)
-        Vector3D                    center( 0, 0, 0 );
+        Vector3D center( 0, 0, 0 );
         MBMesquite::SphericalDomain msq_geom( center, 1.0 );
 
         // creates an intruction queue
@@ -259,7 +259,7 @@ class SphericalGeometryTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
         // launches optimization on mesh_set1
         MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
-        double          orig_qa_val = qa.loop_over_mesh( &mesh_and_domain, 0, err );
+        double orig_qa_val              = qa.loop_over_mesh( &mesh_and_domain, 0, err );
         // Make sure no errors
         CPPUNIT_ASSERT( !err );
         queue1.run_instructions( &mesh_and_domain, err );

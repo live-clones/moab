@@ -34,14 +34,14 @@ class SmoothCurve
                  GeomTopoTool* gTool );  // the new constructor, which will use
     // sense entities to establish the control points on feature edges (geo edges, sets of mesh
     // edges)
-    virtual ~SmoothCurve( );
+    virtual ~SmoothCurve();
 
-    virtual double arc_length( );
+    virtual double arc_length();
 
     //! \brief Get the parametric status of the curve.
     //!
     //! \return \a true if curve is parametric, \a false otherwise.
-    virtual bool is_parametric( );
+    virtual bool is_parametric();
 
     //! \brief Get the periodic status of the curve.
     //!
@@ -115,7 +115,7 @@ class SmoothCurve
     virtual void end_coordinates( double& x, double& y, double& z );
 
     // this will recompute the 2 tangents for each edge, considering the geo edge they are into
-    void compute_tangents_for_each_edge( );
+    void compute_tangents_for_each_edge();
 
     void compute_control_points_on_boundary_edges( double min_dot, std::map< EntityHandle, SmoothFace* >& mapSurfaces,
                                                    Tag controlPointsTag, Tag markTag );
@@ -124,15 +124,15 @@ class SmoothCurve
 
   private:
     std::vector< EntityHandle > _entities;  // the mesh edges are stored here for fast access
-    double                      _leng;
-    std::vector< double >       _fractions;  // they are increasing from 0. to 1., do we need these?
+    double _leng;
+    std::vector< double > _fractions;  // they are increasing from 0. to 1., do we need these?
     // this will be decided apriori, and eventually reset for paver
     // fractions will be from 0.0.. to 1.0, they will be decided upon the length of the geo edge
 
     Tag _edgeTag;
 
-    Interface*    _mb;
-    EntityHandle  _set;
+    Interface* _mb;
+    EntityHandle _set;
     GeomTopoTool* _gtt;
 };
 

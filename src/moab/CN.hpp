@@ -60,7 +60,7 @@ class CN
     static MOAB_EXPORT const char* entityTypeNames[];
 
     //! declare private constructor, since we don't want to create any of these
-    CN( );
+    CN();
 
     //! the basis of the numbering system (normally 0 or 1, 0 by default)
     static MOAB_EXPORT short int numberBasis;
@@ -77,8 +77,8 @@ class CN
     };
     enum
     {
-        MID_EDGE_BIT = 1 << 1,
-        MID_FACE_BIT = 1 << 2,
+        MID_EDGE_BIT   = 1 << 1,
+        MID_FACE_BIT   = 1 << 2,
         MID_REGION_BIT = 1 << 3
     };
 
@@ -101,13 +101,13 @@ class CN
         short int num_sub_elements;
 
         // Number of nodes in each sub-element of this dimension
-        short int num_corners_per_sub_element[ MAX_SUB_ENTITIES ];
+        short int num_corners_per_sub_element[MAX_SUB_ENTITIES];
 
         // Type of each sub-element
-        EntityType target_type[ MAX_SUB_ENTITIES ];
+        EntityType target_type[MAX_SUB_ENTITIES];
 
         // Connectivity of each of the sub-elements
-        short int conn[ MAX_SUB_ENTITIES ][ MAX_SUB_ENTITY_VERTICES ];
+        short int conn[MAX_SUB_ENTITIES][MAX_SUB_ENTITY_VERTICES];
     };
 
     // mConnectivityMap[i=entity type][j=0,1,2]:
@@ -119,31 +119,31 @@ class CN
     //  sub-facet k,
     //    with respect to entity i's canonical vertex ordering, or self (j=2)
     // (not documented with Doxygen)
-    static MOAB_EXPORT const ConnMap mConnectivityMap[ MBMAXTYPE ][ 3 ];
+    static MOAB_EXPORT const ConnMap mConnectivityMap[MBMAXTYPE][3];
 
     // structure used to define reverse canonical ordering information
     // (not documented with Doxygen)
     struct UpConnMap
     {
         // Number of higher-dimensional entities using each sub-entity
-        short int num_targets_per_source_element[ MAX_SUB_ENTITIES ];
+        short int num_targets_per_source_element[MAX_SUB_ENTITIES];
 
         // Higher-dimensional entities using each sub-entity
-        short int targets_per_source_element[ MAX_SUB_ENTITIES ][ MAX_SUB_ENTITIES ];
+        short int targets_per_source_element[MAX_SUB_ENTITIES][MAX_SUB_ENTITIES];
     };
 
     // Reverse canonical numbering, duplicates data in mConnectivityMap, but
     // connectivity data in this table must be in ascending order (used for
     // efficient sorting)
     // (not documented with Doxygen)
-    static const UpConnMap mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ];
+    static const UpConnMap mUpConnMap[MBMAXTYPE][4][4];
 
     // Mid-node bits indexed by number of nodes in element
-    static MOAB_EXPORT const unsigned char midNodesPerType[ MBMAXTYPE ][ MAX_NODES_PER_ELEMENT + 1 ];
+    static MOAB_EXPORT const unsigned char midNodesPerType[MBMAXTYPE][MAX_NODES_PER_ELEMENT + 1];
 
     //! Permutation and reverse permutation vectors
-    static short int permuteVec[ MBMAXTYPE ][ 3 ][ MAX_SUB_ENTITIES + 1 ];
-    static short int revPermuteVec[ MBMAXTYPE ][ 3 ][ MAX_SUB_ENTITIES + 1 ];
+    static short int permuteVec[MBMAXTYPE][3][MAX_SUB_ENTITIES + 1];
+    static short int revPermuteVec[MBMAXTYPE][3][MAX_SUB_ENTITIES + 1];
 
     //! this const vector defines the starting and ending EntityType for
     //! each dimension, e.g. TypeDimensionMap[2] returns a pair of EntityTypes
@@ -154,7 +154,7 @@ class CN
     static DimensionPair getDimPair( int entity_type );
 
     //! get the basis of the numbering system
-    static short int GetBasis( );
+    static short int GetBasis();
 
     //! set the basis of the numbering system
     static void SetBasis( const int in_basis );
@@ -391,7 +391,7 @@ class CN
     //! \param num_verts Number of nodes defining entity
     //! \param mid_nodes If <em>mid_nodes[i], i=1..2</em> is non-zero, indicates that mid-edge
     //!    (i=1), mid-face (i=2), and/or mid-region (i=3) nodes are likely
-    static inline void HasMidNodes( const EntityType this_type, const int num_verts, int mid_nodes[ 4 ] );
+    static inline void HasMidNodes( const EntityType this_type, const int num_verts, int mid_nodes[4] );
 
     //! Same as above, except returns a single integer with the bits, from
     //! least significant to most significant set to one if the corresponding
@@ -424,7 +424,7 @@ class CN
 };
 
 //! get the basis of the numbering system
-inline short int CN::GetBasis( )
+inline short int CN::GetBasis()
 {
     return numberBasis;
 }
@@ -433,8 +433,8 @@ inline short int CN::GetBasis( )
 inline void CN::SubEntityVertexIndices( const EntityType this_type, const int sub_dimension, const int index,
                                         int sub_entity_conn[] )
 {
-    EntityType   type;
-    int          n;
+    EntityType type;
+    int n;
     const short* indices = SubEntityVertexIndices( this_type, sub_dimension, index, type, n );
     std::copy( indices, indices + n, sub_entity_conn );
 }
@@ -460,36 +460,36 @@ inline bool CN::HasMidRegionNodes( const EntityType this_type, const int num_nod
 inline int CN::HasMidNodes( const EntityType this_type, const int num_nodes )
 {
     assert( (unsigned)num_nodes <= (unsigned)MAX_NODES_PER_ELEMENT );
-    return midNodesPerType[ this_type ][ num_nodes ];
+    return midNodesPerType[this_type][num_nodes];
 }
 
-inline void CN::HasMidNodes( const EntityType this_type, const int num_nodes, int mid_nodes[ 4 ] )
+inline void CN::HasMidNodes( const EntityType this_type, const int num_nodes, int mid_nodes[4] )
 {
     const int bits = HasMidNodes( this_type, num_nodes );
-    mid_nodes[ 0 ] = 0;
-    mid_nodes[ 1 ] = ( bits & ( 1 << 1 ) ) >> 1;
-    mid_nodes[ 2 ] = ( bits & ( 1 << 2 ) ) >> 2;
-    mid_nodes[ 3 ] = ( bits & ( 1 << 3 ) ) >> 3;
+    mid_nodes[0]   = 0;
+    mid_nodes[1]   = ( bits & ( 1 << 1 ) ) >> 1;
+    mid_nodes[2]   = ( bits & ( 1 << 2 ) ) >> 2;
+    mid_nodes[3]   = ( bits & ( 1 << 3 ) ) >> 3;
 }
 
 //! Set permutation or reverse permutation vector
 inline void CN::setPermutation( const EntityType t, const int dim, short int* pvec, const int num_entries,
                                 const bool is_reverse )
 {
-    short int *this_vec = permuteVec[ t ][ dim ], *that_vec = revPermuteVec[ t ][ dim ];
+    short int *this_vec = permuteVec[t][dim], *that_vec = revPermuteVec[t][dim];
     if( is_reverse )
     {
-        this_vec = revPermuteVec[ t ][ dim ];
-        that_vec = permuteVec[ t ][ dim ];
+        this_vec = revPermuteVec[t][dim];
+        that_vec = permuteVec[t][dim];
     }
 
     for( short int i = 0; i < num_entries; i++ )
     {
-        this_vec[ i ] = pvec[ i ];
-        that_vec[ pvec[ i ] ] = i;
+        this_vec[i]       = pvec[i];
+        that_vec[pvec[i]] = i;
     }
 
-    this_vec[ MAX_SUB_ENTITIES ] = that_vec[ MAX_SUB_ENTITIES ] = (short)num_entries;
+    this_vec[MAX_SUB_ENTITIES] = that_vec[MAX_SUB_ENTITIES] = (short)num_entries;
 }
 
 //! Reset permutation or reverse permutation vector
@@ -504,10 +504,10 @@ inline void CN::resetPermutation( const EntityType t, const int dim )
 
     for( short unsigned int i = 0; i < MAX_SUB_ENTITIES; i++ )
     {
-        revPermuteVec[ t ][ dim ][ i ] = permuteVec[ t ][ dim ][ i ] = i;
+        revPermuteVec[t][dim][i] = permuteVec[t][dim][i] = i;
     }
 
-    revPermuteVec[ t ][ dim ][ MAX_SUB_ENTITIES ] = permuteVec[ t ][ dim ][ MAX_SUB_ENTITIES ] = MAX_SUB_ENTITIES + 1;
+    revPermuteVec[t][dim][MAX_SUB_ENTITIES] = permuteVec[t][dim][MAX_SUB_ENTITIES] = MAX_SUB_ENTITIES + 1;
 }
 
 }  // namespace moab

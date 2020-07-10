@@ -66,7 +66,7 @@ class DataCoupler
 
     /* Destructor
      */
-    virtual ~DataCoupler( );
+    virtual ~DataCoupler();
 
     /* \brief Locate points on the source mesh
      * This is a pass-through function to SpatialLocator::locate_points
@@ -194,23 +194,23 @@ class DataCoupler
                            bool normalize = true );
 
     /* Get functions */
-    inline SpatialLocator* spatial_locator( )
+    inline SpatialLocator* spatial_locator()
     {
         return myLocator;
     }
-    inline int my_id( ) const
+    inline int my_id() const
     {
         return myId;
     }
-    inline const Range& target_ents( ) const
+    inline const Range& target_ents() const
     {
         return targetEnts;
     }
-    inline Range& target_ents( )
+    inline Range& target_ents()
     {
         return targetEnts;
     }
-    inline int get_dim( ) const
+    inline int get_dim() const
     {
         return myDim;
     }
@@ -244,7 +244,7 @@ inline ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int method, T
                                            std::vector< int >* point_indices, bool normalize )
 {
     // No point indices input,
-    int num_pts = ( point_indices ? point_indices->size( ) : targetEnts.size( ) );
+    int num_pts = ( point_indices ? point_indices->size() : targetEnts.size() );
     return interpolate( &method, &tag, &num_pts, 1, interp_vals, point_indices, normalize );
 }
 

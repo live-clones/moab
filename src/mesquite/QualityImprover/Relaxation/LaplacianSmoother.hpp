@@ -55,8 +55,8 @@ class LaplacianSmoother : public RelaxationSmoother
      */
     MESQUITE_EXPORT LaplacianSmoother( ObjectiveFunction* OF = NULL ) : RelaxationSmoother( OF ) {}
 
-    MESQUITE_EXPORT virtual ~LaplacianSmoother( );
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual ~LaplacianSmoother();
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
   protected:
     MESQUITE_EXPORT virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );

@@ -56,7 +56,7 @@ class WriteCCMIO : public WriterIface
     WriteCCMIO( Interface* impl );
 
     //! Destructor
-    virtual ~WriteCCMIO( );
+    virtual ~WriteCCMIO();
 
     static WriterIface* factory( Interface* );
 
@@ -83,9 +83,9 @@ class WriteCCMIO : public WriterIface
         unsigned int num_matsets;
         unsigned int num_dirsets;
         unsigned int num_neusets;
-        Range        nodes;
+        Range nodes;
 
-        MeshInfo( )
+        MeshInfo()
             : num_dim( 0 ), num_nodes( 0 ), num_elements( 0 ), num_matsets( 0 ), num_dirsets( 0 ), num_neusets( 0 )
         {
         }
@@ -95,16 +95,16 @@ class WriteCCMIO : public WriterIface
     class MaterialSetData
     {
       public:
-        Range        elems;  // elements in material set
-        EntityHandle setHandle;  // handle of the material set
-        EntityType   entityType;  // entity type of these elements
-        int          verts_per_element;  // number of vertices in each element
-        int          matsetId;  // id of this matset, from MATERIAL_SET tag
-        int          materialId;  // materialid, if any (from CCMIO)
-        std::string  setName;  // name for this matset, if any
-        std::string  materialType;  // material type for this matset, if any
+        Range elems;               // elements in material set
+        EntityHandle setHandle;    // handle of the material set
+        EntityType entityType;     // entity type of these elements
+        int verts_per_element;     // number of vertices in each element
+        int matsetId;              // id of this matset, from MATERIAL_SET tag
+        int materialId;            // materialid, if any (from CCMIO)
+        std::string setName;       // name for this matset, if any
+        std::string materialType;  // material type for this matset, if any
 
-        MaterialSetData( )
+        MaterialSetData()
             : setHandle( 0 ), entityType( MBMAXTYPE ), verts_per_element( 0 ), matsetId( -1 ), materialId( -1 )
 
         {
@@ -115,19 +115,19 @@ class WriteCCMIO : public WriterIface
     class NeumannSetData
     {
       public:
-        Range        elems;  // elements in neumann set
+        Range elems;             // elements in neumann set
         EntityHandle setHandle;  // handle of the neumann set
-        EntityType   entityType;  // entity type of these elements
-        int          verts_per_element;  // number of vertices in each element
-        int          neusetId;  // id of this matset, from NEUMANN_SET tag
-        std::string  setName;  // name for this neuset, if any
+        EntityType entityType;   // entity type of these elements
+        int verts_per_element;   // number of vertices in each element
+        int neusetId;            // id of this matset, from NEUMANN_SET tag
+        std::string setName;     // name for this neuset, if any
 
-        NeumannSetData( ) : setHandle( 0 ), entityType( MBMAXTYPE ), verts_per_element( 0 ), neusetId( -1 ) {}
+        NeumannSetData() : setHandle( 0 ), entityType( MBMAXTYPE ), verts_per_element( 0 ), neusetId( -1 ) {}
     };
 
   private:
     //! interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 
     //! file name
@@ -195,7 +195,7 @@ class WriteCCMIO : public WriterIface
 
     ErrorCode write_problem_description( CCMIOID rootID, CCMIOID stateID, CCMIOID& problemID, CCMIOID processorID,
                                          std::vector< MaterialSetData >& matset_data,
-                                         std::vector< NeumannSetData >&  neuset_data );
+                                         std::vector< NeumannSetData >& neuset_data );
 
     // get the material, dirichlet, neumann, and partition sets to be written,
     // either from input sets or in the whole mesh
@@ -207,7 +207,7 @@ class WriteCCMIO : public WriterIface
     ErrorCode create_ccmio_structure( CCMIOID rootID, CCMIOID& stateID, CCMIOID& processorID );
 
     //! write solution (tag) data
-    ErrorCode write_solution_data( );
+    ErrorCode write_solution_data();
 
     //! finalize processor
     ErrorCode write_processor( CCMIOID processorID, CCMIOID verticesID, CCMIOID topologyID );

@@ -45,7 +45,7 @@ class Settings;
 class MESQUITE_EXPORT Instruction
 {
   public:
-    virtual ~Instruction( );
+    virtual ~Instruction();
 
     //! Called for all instructions in queue before loop_over_mesh
     //! is called for any insetruction in queue.  Default behavior
@@ -61,7 +61,7 @@ class MESQUITE_EXPORT Instruction
     virtual double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings, MsqError& err );
 
     //! Get string name for use in diagnostic and status output
-    virtual std::string get_name( ) const = 0;
+    virtual std::string get_name() const = 0;
 
     //! Using data from query methods in MeshInterface or calculating
     //! as necessary depending on values in Settings, initialize

@@ -51,46 +51,46 @@ class NodeSetTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_set_all );
     CPPUNIT_TEST( test_clear_all );
     CPPUNIT_TEST( test_num_before );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
-    void test_init( );
-    void test_clear( );
-    void test_set_get_clear_simple( );
-    void test_set_get_clear_dim( );
-    void test_set_node( );
-    void test_clear_node( );
-    void test_num_nodes( );
-    void test_have_any( );
-    void test_set_all( );
-    void test_clear_all( );
-    void test_num_before( );
+    void test_init();
+    void test_clear();
+    void test_set_get_clear_simple();
+    void test_set_get_clear_dim();
+    void test_set_node();
+    void test_clear_node();
+    void test_num_nodes();
+    void test_have_any();
+    void test_set_all();
+    void test_clear_all();
+    void test_num_before();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( NodeSetTest, "NodeSetTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( NodeSetTest, "Unit" );
 
-void NodeSetTest::test_init( )
+void NodeSetTest::test_init()
 {
     NodeSet set;
-    CPPUNIT_ASSERT( !set.get_bits( ) );
+    CPPUNIT_ASSERT( !set.get_bits() );
 }
 
-void NodeSetTest::test_clear( )
+void NodeSetTest::test_clear()
 {
     NodeSet set;
     set.set_corner_node( 1 );
-    set.clear( );
-    CPPUNIT_ASSERT( !set.get_bits( ) );
+    set.clear();
+    CPPUNIT_ASSERT( !set.get_bits() );
     set.set_mid_edge_node( 2 );
-    set.clear( );
-    CPPUNIT_ASSERT( !set.get_bits( ) );
-    set.set_mid_region_node( );
-    set.clear( );
-    CPPUNIT_ASSERT( !set.get_bits( ) );
+    set.clear();
+    CPPUNIT_ASSERT( !set.get_bits() );
+    set.set_mid_region_node();
+    set.clear();
+    CPPUNIT_ASSERT( !set.get_bits() );
 }
 
-void NodeSetTest::test_set_get_clear_simple( )
+void NodeSetTest::test_set_get_clear_simple()
 {
     NodeSet set;
     for( unsigned i = 0; i < NodeSet::NUM_CORNER_BITS; ++i )
@@ -127,7 +127,7 @@ void NodeSetTest::test_set_get_clear_simple( )
     }
 }
 
-void NodeSetTest::test_set_get_clear_dim( )
+void NodeSetTest::test_set_get_clear_dim()
 {
     NodeSet set;
     for( unsigned i = 0; i < NodeSet::NUM_CORNER_BITS; ++i )
@@ -164,149 +164,149 @@ void NodeSetTest::test_set_get_clear_dim( )
     }
 }
 
-void NodeSetTest::test_set_node( )
+void NodeSetTest::test_set_node()
 {
     NodeSet set;
     for( unsigned i = 0; i < NodeSet::NUM_CORNER_BITS; ++i )
     {
         set.set_corner_node( i );
-        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::CORNER_OFFSET + i ), set.get_bits( ) );
-        set.clear( );
+        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::CORNER_OFFSET + i ), set.get_bits() );
+        set.clear();
     }
     for( unsigned i = 0; i < NodeSet::NUM_EDGE_BITS; ++i )
     {
         set.set_mid_edge_node( i );
-        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::EDGE_OFFSET + i ), set.get_bits( ) );
-        set.clear( );
+        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::EDGE_OFFSET + i ), set.get_bits() );
+        set.clear();
     }
     for( unsigned i = 0; i < NodeSet::NUM_FACE_BITS; ++i )
     {
         set.set_mid_face_node( i );
-        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::FACE_OFFSET + i ), set.get_bits( ) );
-        set.clear( );
+        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::FACE_OFFSET + i ), set.get_bits() );
+        set.clear();
     }
     for( unsigned i = 0; i < NodeSet::NUM_REGION_BITS; ++i )
     {
         set.set_mid_region_node( i );
-        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::REGION_OFFSET + i ), set.get_bits( ) );
-        set.clear( );
+        CPPUNIT_ASSERT_EQUAL( 1u << ( NodeSet::REGION_OFFSET + i ), set.get_bits() );
+        set.clear();
     }
 }
 
-void NodeSetTest::test_clear_node( )
+void NodeSetTest::test_clear_node()
 {
     const EntityTopology type = HEXAHEDRON;
-    NodeSet              set;
-    NodeSet::BitSet      expected;
+    NodeSet set;
+    NodeSet::BitSet expected;
     for( unsigned i = 0; i < TopologyInfo::corners( type ); ++i )
     {
         set.set_all_nodes( type );
-        expected = set.get_bits( ) & ~( 1u << ( NodeSet::CORNER_OFFSET + i ) );
+        expected = set.get_bits() & ~( 1u << ( NodeSet::CORNER_OFFSET + i ) );
         set.clear_corner_node( i );
-        CPPUNIT_ASSERT_EQUAL( expected, set.get_bits( ) );
+        CPPUNIT_ASSERT_EQUAL( expected, set.get_bits() );
     }
     for( unsigned i = 0; i < TopologyInfo::edges( type ); ++i )
     {
         set.set_all_nodes( type );
-        expected = set.get_bits( ) & ~( 1u << ( NodeSet::EDGE_OFFSET + i ) );
+        expected = set.get_bits() & ~( 1u << ( NodeSet::EDGE_OFFSET + i ) );
         set.clear_mid_edge_node( i );
-        CPPUNIT_ASSERT_EQUAL( expected, set.get_bits( ) );
+        CPPUNIT_ASSERT_EQUAL( expected, set.get_bits() );
     }
     for( unsigned i = 0; i < TopologyInfo::faces( type ); ++i )
     {
         set.set_all_nodes( type );
-        expected = set.get_bits( ) & ~( 1u << ( NodeSet::FACE_OFFSET + i ) );
+        expected = set.get_bits() & ~( 1u << ( NodeSet::FACE_OFFSET + i ) );
         set.clear_mid_face_node( i );
-        CPPUNIT_ASSERT_EQUAL( expected, set.get_bits( ) );
+        CPPUNIT_ASSERT_EQUAL( expected, set.get_bits() );
     }
 
     set.set_all_nodes( type );
-    expected = set.get_bits( ) & ~( 1u << ( NodeSet::REGION_OFFSET ) );
+    expected = set.get_bits() & ~( 1u << ( NodeSet::REGION_OFFSET ) );
     set.clear_mid_region_node( 0 );
-    CPPUNIT_ASSERT_EQUAL( expected, set.get_bits( ) );
+    CPPUNIT_ASSERT_EQUAL( expected, set.get_bits() );
 }
 
-void NodeSetTest::test_num_nodes( )
+void NodeSetTest::test_num_nodes()
 {
     NodeSet set;
-    set.clear( );
+    set.clear();
     set.set_corner_node( 1 );
-    CPPUNIT_ASSERT_EQUAL( 1u, set.num_nodes( ) );
+    CPPUNIT_ASSERT_EQUAL( 1u, set.num_nodes() );
     set.set_corner_node( 3 );
-    CPPUNIT_ASSERT_EQUAL( 2u, set.num_nodes( ) );
+    CPPUNIT_ASSERT_EQUAL( 2u, set.num_nodes() );
     set.set_mid_region_node( 0 );
-    CPPUNIT_ASSERT_EQUAL( 3u, set.num_nodes( ) );
+    CPPUNIT_ASSERT_EQUAL( 3u, set.num_nodes() );
     set.set_mid_edge_node( 1 );
     set.set_mid_edge_node( 2 );
-    CPPUNIT_ASSERT_EQUAL( 5u, set.num_nodes( ) );
+    CPPUNIT_ASSERT_EQUAL( 5u, set.num_nodes() );
     set.set_all_nodes( HEXAHEDRON );
-    CPPUNIT_ASSERT_EQUAL( 27u, set.num_nodes( ) );
-    set.clear( );
+    CPPUNIT_ASSERT_EQUAL( 27u, set.num_nodes() );
+    set.clear();
     set.set_all_nodes( TETRAHEDRON );
-    CPPUNIT_ASSERT_EQUAL( 15u, set.num_nodes( ) );
-    set.clear( );
+    CPPUNIT_ASSERT_EQUAL( 15u, set.num_nodes() );
+    set.clear();
     set.set_all_nodes( TRIANGLE );
-    CPPUNIT_ASSERT_EQUAL( 7u, set.num_nodes( ) );
-    set.clear( );
+    CPPUNIT_ASSERT_EQUAL( 7u, set.num_nodes() );
+    set.clear();
     set.set_all_nodes( QUADRILATERAL );
-    CPPUNIT_ASSERT_EQUAL( 9u, set.num_nodes( ) );
-    set.clear( );
+    CPPUNIT_ASSERT_EQUAL( 9u, set.num_nodes() );
+    set.clear();
     set.set_all_nodes( PYRAMID );
-    CPPUNIT_ASSERT_EQUAL( 19u, set.num_nodes( ) );
-    set.clear( );
+    CPPUNIT_ASSERT_EQUAL( 19u, set.num_nodes() );
+    set.clear();
     set.set_all_nodes( PRISM );
-    CPPUNIT_ASSERT_EQUAL( 21u, set.num_nodes( ) );
+    CPPUNIT_ASSERT_EQUAL( 21u, set.num_nodes() );
 }
 
-void NodeSetTest::test_have_any( )
+void NodeSetTest::test_have_any()
 {
     NodeSet set;
-    set.clear( );
+    set.clear();
 
-    CPPUNIT_ASSERT( !set.have_any_corner_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_corner_node() );
     set.set_corner_node( 0 );
-    CPPUNIT_ASSERT( set.have_any_corner_node( ) );
+    CPPUNIT_ASSERT( set.have_any_corner_node() );
     set.clear_corner_node( 0 );
-    CPPUNIT_ASSERT( !set.have_any_corner_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_corner_node() );
     set.set_corner_node( NodeSet::NUM_CORNER_BITS - 1 );
-    CPPUNIT_ASSERT( set.have_any_corner_node( ) );
-    CPPUNIT_ASSERT( !set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( set.have_any_corner_node() );
+    CPPUNIT_ASSERT( !set.have_any_mid_node() );
 
-    CPPUNIT_ASSERT( !set.have_any_mid_edge_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_mid_edge_node() );
     set.set_mid_edge_node( 0 );
-    CPPUNIT_ASSERT( set.have_any_mid_edge_node( ) );
-    CPPUNIT_ASSERT( set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( set.have_any_mid_edge_node() );
+    CPPUNIT_ASSERT( set.have_any_mid_node() );
     set.clear_mid_edge_node( 0 );
-    CPPUNIT_ASSERT( !set.have_any_mid_edge_node( ) );
-    CPPUNIT_ASSERT( !set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_mid_edge_node() );
+    CPPUNIT_ASSERT( !set.have_any_mid_node() );
     set.set_mid_edge_node( NodeSet::NUM_EDGE_BITS - 1 );
-    CPPUNIT_ASSERT( set.have_any_mid_edge_node( ) );
-    CPPUNIT_ASSERT( set.have_any_mid_node( ) );
-    set.clear( );
+    CPPUNIT_ASSERT( set.have_any_mid_edge_node() );
+    CPPUNIT_ASSERT( set.have_any_mid_node() );
+    set.clear();
 
-    CPPUNIT_ASSERT( !set.have_any_mid_face_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_mid_face_node() );
     set.set_mid_face_node( 0 );
-    CPPUNIT_ASSERT( set.have_any_mid_face_node( ) );
-    CPPUNIT_ASSERT( set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( set.have_any_mid_face_node() );
+    CPPUNIT_ASSERT( set.have_any_mid_node() );
     set.clear_mid_face_node( 0 );
-    CPPUNIT_ASSERT( !set.have_any_mid_face_node( ) );
-    CPPUNIT_ASSERT( !set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_mid_face_node() );
+    CPPUNIT_ASSERT( !set.have_any_mid_node() );
     set.set_mid_face_node( NodeSet::NUM_FACE_BITS - 1 );
-    CPPUNIT_ASSERT( set.have_any_mid_face_node( ) );
-    CPPUNIT_ASSERT( set.have_any_mid_node( ) );
-    set.clear( );
+    CPPUNIT_ASSERT( set.have_any_mid_face_node() );
+    CPPUNIT_ASSERT( set.have_any_mid_node() );
+    set.clear();
 
-    CPPUNIT_ASSERT( !set.have_any_mid_region_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_mid_region_node() );
     set.set_mid_region_node( 0 );
-    CPPUNIT_ASSERT( set.have_any_mid_region_node( ) );
-    CPPUNIT_ASSERT( set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( set.have_any_mid_region_node() );
+    CPPUNIT_ASSERT( set.have_any_mid_node() );
     set.clear_mid_region_node( 0 );
-    CPPUNIT_ASSERT( !set.have_any_mid_region_node( ) );
-    CPPUNIT_ASSERT( !set.have_any_mid_node( ) );
+    CPPUNIT_ASSERT( !set.have_any_mid_region_node() );
+    CPPUNIT_ASSERT( !set.have_any_mid_node() );
     set.set_mid_region_node( NodeSet::NUM_REGION_BITS - 1 );
-    CPPUNIT_ASSERT( set.have_any_mid_region_node( ) );
-    CPPUNIT_ASSERT( set.have_any_mid_node( ) );
-    set.clear( );
+    CPPUNIT_ASSERT( set.have_any_mid_region_node() );
+    CPPUNIT_ASSERT( set.have_any_mid_node() );
+    set.clear();
 }
 
 static bool check_all( EntityTopology type, NodeSet set, unsigned dim, bool value )
@@ -327,13 +327,13 @@ static bool check_range_set( EntityTopology type, NodeSet set, unsigned dim, boo
     {
         if( d == dim ) continue;
 
-        for( unsigned i = 0; i < max_count[ d ]; ++i )
+        for( unsigned i = 0; i < max_count[d]; ++i )
             if( !set.node( Sample( d, i ) ) != value ) return false;
     }
 
     // test that any bits for this dimension beyond the number for this
     // type are not set
-    for( unsigned i = TopologyInfo::adjacent( type, dim ); i < max_count[ dim ]; ++i )
+    for( unsigned i = TopologyInfo::adjacent( type, dim ); i < max_count[dim]; ++i )
         if( !set.node( Sample( dim, i ) ) != value ) return false;
 
     // test that any bits for the type and dimension are set
@@ -343,63 +343,63 @@ static bool check_range_set( EntityTopology type, NodeSet set, unsigned dim, boo
     return true;
 }
 
-void NodeSetTest::test_set_all( )
+void NodeSetTest::test_set_all()
 {
     const EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID };
-    const int            num_types = sizeof( types ) / sizeof( types[ 0 ] );
+    const int num_types          = sizeof( types ) / sizeof( types[0] );
 
     for( int i = 0; i < num_types; ++i )
     {
         NodeSet set;
-        set.set_all_corner_nodes( types[ i ] );
-        check_range_set( types[ i ], set, 0 );
-        set.clear( );
-        set.set_all_mid_edge_nodes( types[ i ] );
-        check_range_set( types[ i ], set, 1 );
-        set.clear( );
-        set.set_all_mid_face_nodes( types[ i ] );
-        check_range_set( types[ i ], set, 2 );
-        set.clear( );
-        set.set_all_mid_region_nodes( types[ i ] );
-        check_range_set( types[ i ], set, 3 );
+        set.set_all_corner_nodes( types[i] );
+        check_range_set( types[i], set, 0 );
+        set.clear();
+        set.set_all_mid_edge_nodes( types[i] );
+        check_range_set( types[i], set, 1 );
+        set.clear();
+        set.set_all_mid_face_nodes( types[i] );
+        check_range_set( types[i], set, 2 );
+        set.clear();
+        set.set_all_mid_region_nodes( types[i] );
+        check_range_set( types[i], set, 3 );
     }
 }
 
-void NodeSetTest::test_clear_all( )
+void NodeSetTest::test_clear_all()
 {
     const EntityTopology type = HEXAHEDRON;
-    NodeSet              set;
+    NodeSet set;
     set.set_all_nodes( type );
-    set.clear_all_corner_nodes( );
+    set.clear_all_corner_nodes();
     CPPUNIT_ASSERT( check_all( type, set, 0, false ) );
     CPPUNIT_ASSERT( check_all( type, set, 1, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 2, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 3, true ) );
     set.set_all_nodes( type );
-    set.clear_all_mid_edge_nodes( );
+    set.clear_all_mid_edge_nodes();
     CPPUNIT_ASSERT( check_all( type, set, 0, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 1, false ) );
     CPPUNIT_ASSERT( check_all( type, set, 2, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 3, true ) );
     set.set_all_nodes( type );
-    set.clear_all_mid_face_nodes( );
+    set.clear_all_mid_face_nodes();
     CPPUNIT_ASSERT( check_all( type, set, 0, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 1, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 2, false ) );
     CPPUNIT_ASSERT( check_all( type, set, 3, true ) );
     set.set_all_nodes( type );
-    set.clear_all_mid_region_nodes( );
+    set.clear_all_mid_region_nodes();
     CPPUNIT_ASSERT( check_all( type, set, 0, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 1, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 2, true ) );
     CPPUNIT_ASSERT( check_all( type, set, 3, false ) );
 }
 
-void NodeSetTest::test_num_before( )
+void NodeSetTest::test_num_before()
 {
     const EntityTopology type = HEXAHEDRON;
-    NodeSet              set;
-    set.clear( );
+    NodeSet set;
+    set.clear();
     set.set_mid_face_node( 2 );
     CPPUNIT_ASSERT_EQUAL( 0u, set.num_before_mid_face( 2 ) );
     CPPUNIT_ASSERT_EQUAL( 1u, set.num_before_mid_face( 3 ) );

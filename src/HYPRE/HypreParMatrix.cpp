@@ -40,31 +40,31 @@ namespace moab
         }                                                   \
     }
 
-template< typename TargetT, typename SourceT >
+template < typename TargetT, typename SourceT >
 static TargetT* DuplicateAs( const SourceT* array, int size, bool cplusplus = true )
 {
-    TargetT* target_array = cplusplus ? new TargetT[ size ]
+    TargetT* target_array = cplusplus ? new TargetT[size]
                                       /*     */
                                       : hypre_TAlloc( TargetT, size );
 
     for( int i = 0; i < size; i++ )
     {
-        target_array[ i ] = array[ i ];
+        target_array[i] = array[i];
     }
 
     return target_array;
 }
 
-void HypreParMatrix::Init( )
+void HypreParMatrix::Init()
 {
-    A = NULL;
-    A_parcsr = NULL;
+    A           = NULL;
+    A_parcsr    = NULL;
     ParCSROwner = 1;
 }
 
 HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm ) : pcomm( p_comm )
 {
-    Init( );
+    Init();
     height = width = 0;
 }
 
@@ -73,7 +73,7 @@ HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm, HYPRE_Int glob_size,
                                 HYPRE_Int nnz_pr )
     : pcomm( p_comm )
 {
-    Init( );
+    Init();
     resize( glob_size, row_starts, nnz_pr );
 }
 
@@ -83,14 +83,14 @@ void HypreParMatrix::resize( HYPRE_Int glob_size, HYPRE_Int* row_starts, HYPRE_I
     /* Create the matrix.
         Note that this is a square matrix, so we indicate the row partition
         size twice (since number of rows = number of cols) */
-    HYPRE_IJMatrixCreate( pcomm->comm( ), row_starts[ 0 ], row_starts[ 1 ], row_starts[ 0 ], row_starts[ 1 ], &A );
+    HYPRE_IJMatrixCreate( pcomm->comm(), row_starts[0], row_starts[1], row_starts[0], row_starts[1], &A );
     /* Choose a parallel csr format storage (see the User's Manual) */
     HYPRE_IJMatrixSetObjectType( A, HYPRE_PARCSR );
 
-    int locsize = row_starts[ 1 ] - row_starts[ 0 ] + 1;
+    int locsize = row_starts[1] - row_starts[0] + 1;
     int num_procs, rank;
-    MPI_Comm_size( pcomm->comm( ), &num_procs );
-    MPI_Comm_rank( pcomm->comm( ), &rank );
+    MPI_Comm_size( pcomm->comm(), &num_procs );
+    MPI_Comm_rank( pcomm->comm(), &rank );
 
     if( nnz_pr_diag != 0 || nnz_pr_offdiag != 0 )
     {
@@ -98,12 +98,12 @@ void HypreParMatrix::resize( HYPRE_Int glob_size, HYPRE_Int* row_starts, HYPRE_I
         {
             std::vector< HYPRE_Int > m_nnz_pr_diag( locsize, nnz_pr_diag );
             std::vector< HYPRE_Int > m_onz_pr_diag( locsize, nnz_pr_offdiag );
-            HYPRE_IJMatrixSetDiagOffdSizes( A, &m_nnz_pr_diag[ 0 ], &m_onz_pr_diag[ 0 ] );
+            HYPRE_IJMatrixSetDiagOffdSizes( A, &m_nnz_pr_diag[0], &m_onz_pr_diag[0] );
         }
         else
         {
             std::vector< HYPRE_Int > m_nnz_pr_diag( locsize, nnz_pr_diag );
-            HYPRE_IJMatrixSetRowSizes( A, &m_nnz_pr_diag[ 0 ] );
+            HYPRE_IJMatrixSetRowSizes( A, &m_nnz_pr_diag[0] );
         }
     }
 
@@ -119,8 +119,8 @@ void HypreParMatrix::resize( HYPRE_Int glob_size, HYPRE_Int* row_starts, HYPRE_I
     HYPRE_ParCSRSetupMatvec( &matvec_fn );
     gnrows = glob_size;
     gncols = glob_size;
-    height = GetNumRows( );
-    width = GetNumCols( );
+    height = GetNumRows();
+    width  = GetNumCols();
 }
 
 void HypreParMatrix::resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_cols, HYPRE_Int* row_starts,
@@ -130,12 +130,12 @@ void HypreParMatrix::resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_col
     /* Create the matrix.
         Note that this is a square matrix, so we indicate the row partition
         size twice (since number of rows = number of cols) */
-    HYPRE_IJMatrixCreate( pcomm->comm( ), row_starts[ 0 ], row_starts[ 1 ], col_starts[ 0 ], col_starts[ 1 ], &A );
+    HYPRE_IJMatrixCreate( pcomm->comm(), row_starts[0], row_starts[1], col_starts[0], col_starts[1], &A );
     /* Choose a parallel csr format storage (see the User's Manual) */
     HYPRE_IJMatrixSetObjectType( A, HYPRE_PARCSR );
 
     int num_procs;
-    MPI_Comm_size( pcomm->comm( ), &num_procs );
+    MPI_Comm_size( pcomm->comm(), &num_procs );
 
     /* Set the matrix pre-allocation data */
     if( num_procs > 1 )
@@ -167,8 +167,8 @@ void HypreParMatrix::resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_col
     HYPRE_ParCSRSetupMatvec( &matvec_fn );
     gnrows = global_num_rows;
     gncols = global_num_cols;
-    height = GetNumRows( );
-    width = GetNumCols( );
+    height = GetNumRows();
+    width  = GetNumCols();
 }
 
 // Rectangular block-diagonal constructor
@@ -177,25 +177,25 @@ HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm, HYPRE_Int global_num
                                 HYPRE_Int onz_pr_diag, HYPRE_Int nnz_pr_offdiag )
     : pcomm( p_comm )
 {
-    Init( );
-    std::vector< HYPRE_Int > m_nnz_pr_diag( row_starts[ 1 ] - row_starts[ 0 ], nnz_pr_diag );
-    std::vector< HYPRE_Int > m_onz_pr_diag( row_starts[ 1 ] - row_starts[ 0 ], onz_pr_diag );
-    resize( global_num_rows, global_num_cols, row_starts, col_starts, &m_nnz_pr_diag[ 0 ], &m_onz_pr_diag[ 0 ],
+    Init();
+    std::vector< HYPRE_Int > m_nnz_pr_diag( row_starts[1] - row_starts[0], nnz_pr_diag );
+    std::vector< HYPRE_Int > m_onz_pr_diag( row_starts[1] - row_starts[0], onz_pr_diag );
+    resize( global_num_rows, global_num_cols, row_starts, col_starts, &m_nnz_pr_diag[0], &m_onz_pr_diag[0],
             nnz_pr_offdiag );
 }
 
 void HypreParMatrix::MakeRef( const HypreParMatrix& master )
 {
-    Destroy( );
-    Init( );
-    A = master.A;
-    A_parcsr = master.A_parcsr;
+    Destroy();
+    Init();
+    A           = master.A;
+    A_parcsr    = master.A_parcsr;
     ParCSROwner = 0;
-    height = master.GetNumRows( );
-    width = master.GetNumCols( );
+    height      = master.GetNumRows();
+    width       = master.GetNumCols();
 }
 
-HYPRE_IJMatrix HypreParMatrix::StealData( )
+HYPRE_IJMatrix HypreParMatrix::StealData()
 {
     // Only safe when (diagOwner == -1 && offdOwner == -1 && colMapOwner == -1)
     // Otherwise, there may be memory leaks or hypre may destroy arrays allocated
@@ -203,10 +203,10 @@ HYPRE_IJMatrix HypreParMatrix::StealData( )
     moab_hypre_assert( diagOwner == -1 && offdOwner == -1 && colMapOwner == -1, "" );
     moab_hypre_assert( ParCSROwner, "" );
     HYPRE_IJMatrix R = A;
-    A = NULL;
-    ParCSROwner = 0;
-    Destroy( );
-    Init( );
+    A                = NULL;
+    ParCSROwner      = 0;
+    Destroy();
+    Init();
     return R;
 }
 
@@ -219,14 +219,14 @@ void HypreParMatrix::StealData( HypreParMatrix& X )
     moab_hypre_assert( ParCSROwner, "" );
     moab_hypre_assert( X.diagOwner == -1 && X.offdOwner == -1 && X.colMapOwner == -1, "" );
     moab_hypre_assert( X.ParCSROwner, "" );
-    A = X.A;
-    A_parcsr = X.A_parcsr;
-    ParCSROwner = 1;
-    X.A = NULL;
-    X.A_parcsr = NULL;
+    A             = X.A;
+    A_parcsr      = X.A_parcsr;
+    ParCSROwner   = 1;
+    X.A           = NULL;
+    X.A_parcsr    = NULL;
     X.ParCSROwner = 0;
-    X.Destroy( );
-    X.Init( );
+    X.Destroy();
+    X.Init();
 }
 
 void HypreParMatrix::GetDiag( Eigen::VectorXd& diag ) const
@@ -236,21 +236,21 @@ void HypreParMatrix::GetDiag( Eigen::VectorXd& diag ) const
 
     for( int j = 0; j < size; j++ )
     {
-        diag( j ) = A_parcsr->diag->data[ A_parcsr->diag->i[ j ] ];
-        moab_hypre_assert( A_parcsr->diag->j[ A_parcsr->diag->i[ j ] ] == j,
+        diag( j ) = A_parcsr->diag->data[A_parcsr->diag->i[j]];
+        moab_hypre_assert( A_parcsr->diag->j[A_parcsr->diag->i[j]] == j,
                            "the first entry in each row must be the diagonal one" );
     }
 }
 
 static void MakeWrapper( const hypre_CSRMatrix* mat, Eigen::SparseMatrix< double, Eigen::RowMajor >& wrapper )
 {
-    HYPRE_Int                                      nr = hypre_CSRMatrixNumRows( mat );
-    HYPRE_Int                                      nc = hypre_CSRMatrixNumCols( mat );
+    HYPRE_Int nr = hypre_CSRMatrixNumRows( mat );
+    HYPRE_Int nc = hypre_CSRMatrixNumCols( mat );
     Eigen::SparseMatrix< double, Eigen::RowMajor > tmp( nr, nc );
-    typedef Eigen::Triplet< double >               T;
-    HYPRE_Int                                      nnz = hypre_CSRMatrixNumNonzeros( mat );
-    int *                                          rindx, *cindx;
-    double*                                        dindx;
+    typedef Eigen::Triplet< double > T;
+    HYPRE_Int nnz = hypre_CSRMatrixNumNonzeros( mat );
+    int *rindx, *cindx;
+    double* dindx;
 #ifndef HYPRE_BIGINT
     rindx = hypre_CSRMatrixI( mat );
     cindx = hypre_CSRMatrixJ( mat );
@@ -264,10 +264,10 @@ static void MakeWrapper( const hypre_CSRMatrix* mat, Eigen::SparseMatrix< double
 
     for( int i = 0; i < nnz; ++i )
     {
-        tripletList.push_back( T( rindx[ i ], cindx[ i ], dindx[ i ] ) );
+        tripletList.push_back( T( rindx[i], cindx[i], dindx[i] ) );
     }
 
-    tmp.setFromTriplets( tripletList.begin( ), tripletList.end( ) );
+    tmp.setFromTriplets( tripletList.begin(), tripletList.end() );
     wrapper.swap( tmp );
 }
 
@@ -424,29 +424,29 @@ void HypreParMatrix::ScaleRows( const Eigen::VectorXd& diag )
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != hypre_CSRMatrixNumRows( A_parcsr->offd ) )
     { MB_SET_ERR_RET( "Row does not match" ); }
 
-    if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != diag.size( ) )
+    if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != diag.size() )
     { MB_SET_ERR_RET( "Note the Eigen::VectorXd diag is not of compatible dimensions with A\n" ); }
 
-    int        size = this->height;
-    double*    Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
+    int size           = this->height;
+    double* Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
     HYPRE_Int* Adiag_i = hypre_CSRMatrixI( A_parcsr->diag );
-    double*    Aoffd_data = hypre_CSRMatrixData( A_parcsr->offd );
+    double* Aoffd_data = hypre_CSRMatrixData( A_parcsr->offd );
     HYPRE_Int* Aoffd_i = hypre_CSRMatrixI( A_parcsr->offd );
-    double     val;
-    HYPRE_Int  jj;
+    double val;
+    HYPRE_Int jj;
 
     for( int i( 0 ); i < size; ++i )
     {
-        val = diag[ i ];
+        val = diag[i];
 
-        for( jj = Adiag_i[ i ]; jj < Adiag_i[ i + 1 ]; ++jj )
+        for( jj = Adiag_i[i]; jj < Adiag_i[i + 1]; ++jj )
         {
-            Adiag_data[ jj ] *= val;
+            Adiag_data[jj] *= val;
         }
 
-        for( jj = Aoffd_i[ i ]; jj < Aoffd_i[ i + 1 ]; ++jj )
+        for( jj = Aoffd_i[i]; jj < Aoffd_i[i + 1]; ++jj )
         {
-            Aoffd_data[ jj ] *= val;
+            Aoffd_data[jj] *= val;
         }
     }
 }
@@ -456,16 +456,16 @@ void HypreParMatrix::InvScaleRows( const Eigen::VectorXd& diag )
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != hypre_CSRMatrixNumRows( A_parcsr->offd ) )
     { MB_SET_ERR_RET( "Row does not match" ); }
 
-    if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != diag.size( ) )
+    if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != diag.size() )
     { MB_SET_ERR_RET( "Note the Eigen::VectorXd diag is not of compatible dimensions with A_parcsr\n" ); }
 
-    int        size = this->height;
-    double*    Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
+    int size           = this->height;
+    double* Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
     HYPRE_Int* Adiag_i = hypre_CSRMatrixI( A_parcsr->diag );
-    double*    Aoffd_data = hypre_CSRMatrixData( A_parcsr->offd );
+    double* Aoffd_data = hypre_CSRMatrixData( A_parcsr->offd );
     HYPRE_Int* Aoffd_i = hypre_CSRMatrixI( A_parcsr->offd );
-    double     val;
-    HYPRE_Int  jj;
+    double val;
+    HYPRE_Int jj;
 
     for( int i( 0 ); i < size; ++i )
     {
@@ -476,14 +476,14 @@ void HypreParMatrix::InvScaleRows( const Eigen::VectorXd& diag )
 #endif
         val = 1. / diag( i );
 
-        for( jj = Adiag_i[ i ]; jj < Adiag_i[ i + 1 ]; ++jj )
+        for( jj = Adiag_i[i]; jj < Adiag_i[i + 1]; ++jj )
         {
-            Adiag_data[ jj ] *= val;
+            Adiag_data[jj] *= val;
         }
 
-        for( jj = Aoffd_i[ i ]; jj < Aoffd_i[ i + 1 ]; ++jj )
+        for( jj = Aoffd_i[i]; jj < Aoffd_i[i + 1]; ++jj )
         {
-            Aoffd_data[ jj ] *= val;
+            Aoffd_data[jj] *= val;
         }
     }
 }
@@ -493,22 +493,22 @@ void HypreParMatrix::operator*=( double s )
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != hypre_CSRMatrixNumRows( A_parcsr->offd ) )
     { MB_SET_ERR_RET( "Row does not match" ); }
 
-    HYPRE_Int  size = hypre_CSRMatrixNumRows( A_parcsr->diag );
-    HYPRE_Int  jj;
-    double*    Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
+    HYPRE_Int size = hypre_CSRMatrixNumRows( A_parcsr->diag );
+    HYPRE_Int jj;
+    double* Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
     HYPRE_Int* Adiag_i = hypre_CSRMatrixI( A_parcsr->diag );
 
-    for( jj = 0; jj < Adiag_i[ size ]; ++jj )
+    for( jj = 0; jj < Adiag_i[size]; ++jj )
     {
-        Adiag_data[ jj ] *= s;
+        Adiag_data[jj] *= s;
     }
 
-    double*    Aoffd_data = hypre_CSRMatrixData( A_parcsr->offd );
+    double* Aoffd_data = hypre_CSRMatrixData( A_parcsr->offd );
     HYPRE_Int* Aoffd_i = hypre_CSRMatrixI( A_parcsr->offd );
 
-    for( jj = 0; jj < Aoffd_i[ size ]; ++jj )
+    for( jj = 0; jj < Aoffd_i[size]; ++jj )
     {
-        Aoffd_data[ jj ] *= s;
+        Aoffd_data[jj] *= s;
     }
 }
 
@@ -535,39 +535,39 @@ HYPRE_Int HypreParMatrix::verbosity( const HYPRE_Int level )
     return HYPRE_IJMatrixSetPrintLevel( A, level );
 }
 
-HYPRE_Int HypreParMatrix::FinalizeAssembly( )
+HYPRE_Int HypreParMatrix::FinalizeAssembly()
 {
     return HYPRE_IJMatrixAssemble( A );
 }
 
 static void get_sorted_rows_cols( const std::vector< HYPRE_Int >& rows_cols, std::vector< HYPRE_Int >& hypre_sorted )
 {
-    hypre_sorted.resize( rows_cols.size( ) );
-    std::copy( rows_cols.begin( ), rows_cols.end( ), hypre_sorted.begin( ) );
-    std::sort( hypre_sorted.begin( ), hypre_sorted.end( ) );
+    hypre_sorted.resize( rows_cols.size() );
+    std::copy( rows_cols.begin(), rows_cols.end(), hypre_sorted.begin() );
+    std::sort( hypre_sorted.begin(), hypre_sorted.end() );
 }
 
 void HypreParMatrix::Threshold( double threshold )
 {
-    int                 ierr = 0;
-    int                 num_procs;
-    hypre_CSRMatrix*    csr_A;
-    hypre_CSRMatrix*    csr_A_wo_z;
+    int ierr = 0;
+    int num_procs;
+    hypre_CSRMatrix* csr_A;
+    hypre_CSRMatrix* csr_A_wo_z;
     hypre_ParCSRMatrix* parcsr_A_ptr;
-    int*                row_starts = NULL;
-    int*                col_starts = NULL;
-    int                 row_start = -1;
-    int                 row_end = -1;
-    int                 col_start = -1;
-    int                 col_end = -1;
-    MPI_Comm_size( pcomm->comm( ), &num_procs );
+    int* row_starts = NULL;
+    int* col_starts = NULL;
+    int row_start   = -1;
+    int row_end     = -1;
+    int col_start   = -1;
+    int col_end     = -1;
+    MPI_Comm_size( pcomm->comm(), &num_procs );
     ierr += hypre_ParCSRMatrixGetLocalRange( A_parcsr, &row_start, &row_end, &col_start, &col_end );
-    row_starts = hypre_ParCSRMatrixRowStarts( A_parcsr );
-    col_starts = hypre_ParCSRMatrixColStarts( A_parcsr );
-    parcsr_A_ptr = hypre_ParCSRMatrixCreate( pcomm->comm( ), row_starts[ num_procs ], col_starts[ num_procs ],
-                                             row_starts, col_starts, 0, 0, 0 );
-    csr_A = hypre_MergeDiagAndOffd( A_parcsr );
-    csr_A_wo_z = hypre_CSRMatrixDeleteZeros( csr_A, threshold );
+    row_starts   = hypre_ParCSRMatrixRowStarts( A_parcsr );
+    col_starts   = hypre_ParCSRMatrixColStarts( A_parcsr );
+    parcsr_A_ptr = hypre_ParCSRMatrixCreate( pcomm->comm(), row_starts[num_procs], col_starts[num_procs], row_starts,
+                                             col_starts, 0, 0, 0 );
+    csr_A        = hypre_MergeDiagAndOffd( A_parcsr );
+    csr_A_wo_z   = hypre_CSRMatrixDeleteZeros( csr_A, threshold );
 
     /* hypre_CSRMatrixDeleteZeros will return a NULL pointer rather than a usable
        CSR matrix if it finds no non-zeros */
@@ -590,7 +590,7 @@ void HypreParMatrix::EliminateRowsCols( const std::vector< HYPRE_Int >& rows_col
 {
     std::vector< HYPRE_Int > rc_sorted;
     get_sorted_rows_cols( rows_cols, rc_sorted );
-    internal::hypre_ParCSRMatrixEliminateAXB( A_parcsr, rc_sorted.size( ), rc_sorted.data( ), X.x_par, B.x_par );
+    internal::hypre_ParCSRMatrixEliminateAXB( A_parcsr, rc_sorted.size(), rc_sorted.data(), X.x_par, B.x_par );
 }
 
 HypreParMatrix* HypreParMatrix::EliminateRowsCols( const std::vector< HYPRE_Int >& rows_cols )
@@ -598,8 +598,8 @@ HypreParMatrix* HypreParMatrix::EliminateRowsCols( const std::vector< HYPRE_Int 
     std::vector< HYPRE_Int > rc_sorted;
     get_sorted_rows_cols( rows_cols, rc_sorted );
     hypre_ParCSRMatrix* Ae;
-    internal::hypre_ParCSRMatrixEliminateAAe( A_parcsr, &Ae, rc_sorted.size( ), rc_sorted.data( ) );
-    HypreParMatrix* tmpMat = new HypreParMatrix( pcomm, M( ), N( ), RowPart( ), ColPart( ), 0, 0 );
+    internal::hypre_ParCSRMatrixEliminateAAe( A_parcsr, &Ae, rc_sorted.size(), rc_sorted.data() );
+    HypreParMatrix* tmpMat            = new HypreParMatrix( pcomm, M(), N(), RowPart(), ColPart(), 0, 0 );
     hypre_IJMatrixObject( tmpMat->A ) = Ae;
     /* Get the parcsr matrix object to use */
     HYPRE_IJMatrixGetObject( tmpMat->A, (void**)tmpMat->A_parcsr );
@@ -613,17 +613,17 @@ void HypreParMatrix::Print( const char* fname, HYPRE_Int offi, HYPRE_Int offj )
 
 void HypreParMatrix::Read( const char* fname )
 {
-    Destroy( );
-    Init( );
+    Destroy();
+    Init();
     HYPRE_Int base_i, base_j;
-    hypre_ParCSRMatrixReadIJ( pcomm->comm( ), fname, &base_i, &base_j, &A_parcsr );
+    hypre_ParCSRMatrixReadIJ( pcomm->comm(), fname, &base_i, &base_j, &A_parcsr );
     hypre_ParCSRMatrixSetNumNonzeros( A_parcsr );
     hypre_MatvecCommPkgCreate( A_parcsr );
-    height = GetNumRows( );
-    width = GetNumCols( );
+    height = GetNumRows();
+    width  = GetNumCols();
 }
 
-void HypreParMatrix::Destroy( )
+void HypreParMatrix::Destroy()
 {
     if( interpreter ) { hypre_TFree( interpreter ); }
 
@@ -640,7 +640,7 @@ HypreParMatrix* ParMult( HypreParMatrix* A, HypreParMatrix* B )
     hypre_ParCSRMatrix* ab;
     ab = hypre_ParMatmul( A->A_parcsr, B->A_parcsr );
     hypre_MatvecCommPkgCreate( ab );
-    HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M( ), A->N( ), A->RowPart( ), A->ColPart( ), 0, 0 );
+    HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M(), A->N(), A->RowPart(), A->ColPart(), 0, 0 );
     hypre_IJMatrixObject( tmpMat->A ) = ab;
     /* Get the parcsr matrix object to use */
     HYPRE_IJMatrixGetObject( tmpMat->A, (void**)tmpMat->A_parcsr );
@@ -649,7 +649,7 @@ HypreParMatrix* ParMult( HypreParMatrix* A, HypreParMatrix* B )
 
 HypreParMatrix* RAP( HypreParMatrix* A, HypreParMatrix* P )
 {
-    HYPRE_Int           P_owns_its_col_starts = hypre_ParCSRMatrixOwnsColStarts( (hypre_ParCSRMatrix*)( P->A_parcsr ) );
+    HYPRE_Int P_owns_its_col_starts = hypre_ParCSRMatrixOwnsColStarts( (hypre_ParCSRMatrix*)( P->A_parcsr ) );
     hypre_ParCSRMatrix* rap;
     hypre_BoomerAMGBuildCoarseOperator( P->A_parcsr, A->A_parcsr, P->A_parcsr, &rap );
     hypre_ParCSRMatrixSetNumNonzeros( rap );
@@ -661,7 +661,7 @@ HypreParMatrix* RAP( HypreParMatrix* A, HypreParMatrix* P )
 
     if( P_owns_its_col_starts ) { hypre_ParCSRMatrixSetColStartsOwner( P->A_parcsr, 1 ); }
 
-    HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M( ), A->N( ), A->RowPart( ), A->ColPart( ), 0, 0 );
+    HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M(), A->N(), A->RowPart(), A->ColPart(), 0, 0 );
     hypre_IJMatrixObject( tmpMat->A ) = rap;
     /* Get the parcsr matrix object to use */
     HYPRE_IJMatrixGetObject( tmpMat->A, (void**)tmpMat->A_parcsr );
@@ -670,7 +670,7 @@ HypreParMatrix* RAP( HypreParMatrix* A, HypreParMatrix* P )
 
 HypreParMatrix* RAP( HypreParMatrix* Rt, HypreParMatrix* A, HypreParMatrix* P )
 {
-    HYPRE_Int P_owns_its_col_starts = hypre_ParCSRMatrixOwnsColStarts( (hypre_ParCSRMatrix*)( P->A_parcsr ) );
+    HYPRE_Int P_owns_its_col_starts  = hypre_ParCSRMatrixOwnsColStarts( (hypre_ParCSRMatrix*)( P->A_parcsr ) );
     HYPRE_Int Rt_owns_its_col_starts = hypre_ParCSRMatrixOwnsColStarts( (hypre_ParCSRMatrix*)( Rt->A_parcsr ) );
     hypre_ParCSRMatrix* rap;
     hypre_BoomerAMGBuildCoarseOperator( Rt->A_parcsr, A->A_parcsr, P->A_parcsr, &rap );
@@ -691,7 +691,7 @@ HypreParMatrix* RAP( HypreParMatrix* Rt, HypreParMatrix* A, HypreParMatrix* P )
         hypre_ParCSRMatrixSetRowStartsOwner( rap, 0 );
     }
 
-    HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M( ), A->N( ), A->RowPart( ), A->ColPart( ), 0, 0 );
+    HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M(), A->N(), A->RowPart(), A->ColPart(), 0, 0 );
     hypre_IJMatrixObject( tmpMat->A ) = rap;
     /* Get the parcsr matrix object to use */
     HYPRE_IJMatrixGetObject( tmpMat->A, (void**)tmpMat->A_parcsr );
@@ -704,37 +704,37 @@ void EliminateBC( HypreParMatrix& A, HypreParMatrix& Ae, const std::vector< int 
     // B -= Ae*X
     Ae.Mult( -1.0, X, 1.0, B );
     hypre_CSRMatrix* A_diag = hypre_ParCSRMatrixDiag( (hypre_ParCSRMatrix*)A.A_parcsr );
-    double*          data = hypre_CSRMatrixData( A_diag );
-    HYPRE_Int*       I = hypre_CSRMatrixI( A_diag );
+    double* data            = hypre_CSRMatrixData( A_diag );
+    HYPRE_Int* I            = hypre_CSRMatrixI( A_diag );
 #ifdef MOAB_DEBUG
-    HYPRE_Int*       J = hypre_CSRMatrixJ( A_diag );
+    HYPRE_Int* J            = hypre_CSRMatrixJ( A_diag );
     hypre_CSRMatrix* A_offd = hypre_ParCSRMatrixOffd( (hypre_ParCSRMatrix*)A.A_parcsr );
-    HYPRE_Int*       I_offd = hypre_CSRMatrixI( A_offd );
-    double*          data_offd = hypre_CSRMatrixData( A_offd );
+    HYPRE_Int* I_offd       = hypre_CSRMatrixI( A_offd );
+    double* data_offd       = hypre_CSRMatrixData( A_offd );
 #endif
-    std::vector< HYPRE_Complex > bdata( ess_dof_list.size( ) ), xdata( ess_dof_list.size( ) );
-    B.GetValues( ess_dof_list.size( ), ess_dof_list.data( ), bdata.data( ) );
-    X.GetValues( ess_dof_list.size( ), ess_dof_list.data( ), xdata.data( ) );
+    std::vector< HYPRE_Complex > bdata( ess_dof_list.size() ), xdata( ess_dof_list.size() );
+    B.GetValues( ess_dof_list.size(), ess_dof_list.data(), bdata.data() );
+    X.GetValues( ess_dof_list.size(), ess_dof_list.data(), xdata.data() );
 
-    for( size_t i = 0; i < ess_dof_list.size( ); i++ )
+    for( size_t i = 0; i < ess_dof_list.size(); i++ )
     {
-        int r = ess_dof_list[ i ];
-        bdata[ r ] = data[ I[ r ] ] * xdata[ r ];
+        int r    = ess_dof_list[i];
+        bdata[r] = data[I[r]] * xdata[r];
 #ifdef MOAB_DEBUG
 
         // Check that in the rows specified by the ess_dof_list, the matrix A has
         // only one entry -- the diagonal.
         // if (I[r+1] != I[r]+1 || J[I[r]] != r || I_offd[r] != I_offd[r+1])
-        if( J[ I[ r ] ] != r ) { MB_SET_ERR_RET( "the diagonal entry must be the first entry in the row!" ); }
+        if( J[I[r]] != r ) { MB_SET_ERR_RET( "the diagonal entry must be the first entry in the row!" ); }
 
-        for( int j = I[ r ] + 1; j < I[ r + 1 ]; j++ )
+        for( int j = I[r] + 1; j < I[r + 1]; j++ )
         {
-            if( data[ j ] != 0.0 ) { MB_SET_ERR_RET( "all off-diagonal entries must be zero!" ); }
+            if( data[j] != 0.0 ) { MB_SET_ERR_RET( "all off-diagonal entries must be zero!" ); }
         }
 
-        for( int j = I_offd[ r ]; j < I_offd[ r + 1 ]; j++ )
+        for( int j = I_offd[r]; j < I_offd[r + 1]; j++ )
         {
-            if( data_offd[ j ] != 0.0 ) { MB_SET_ERR_RET( "all off-diagonal entries must be zero!" ); }
+            if( data_offd[j] != 0.0 ) { MB_SET_ERR_RET( "all off-diagonal entries must be zero!" ); }
         }
 
 #endif
@@ -745,16 +745,16 @@ void EliminateBC( HypreParMatrix& A, HypreParMatrix& Ae, const std::vector< int 
 // negative step sizes to approximate low-pass filter effect.
 
 int ParCSRRelax_Taubin( hypre_ParCSRMatrix* A,  // matrix to relax with
-                        hypre_ParVector*    f,  // right-hand side
+                        hypre_ParVector* f,     // right-hand side
                         double lambda, double mu, int N, double max_eig,
                         hypre_ParVector* u,  // initial/updated approximation
-                        hypre_ParVector* r  // another temp vector
+                        hypre_ParVector* r   // another temp vector
 )
 {
     hypre_CSRMatrix* A_diag = hypre_ParCSRMatrixDiag( A );
-    HYPRE_Int        num_rows = hypre_CSRMatrixNumRows( A_diag );
-    double*          u_data = hypre_VectorData( hypre_ParVectorLocalVector( u ) );
-    double*          r_data = hypre_VectorData( hypre_ParVectorLocalVector( r ) );
+    HYPRE_Int num_rows      = hypre_CSRMatrixNumRows( A_diag );
+    double* u_data          = hypre_VectorData( hypre_ParVectorLocalVector( u ) );
+    double* r_data          = hypre_VectorData( hypre_ParVectorLocalVector( r ) );
 
     for( int i = 0; i < N; i++ )
     {
@@ -766,7 +766,7 @@ int ParCSRRelax_Taubin( hypre_ParCSRMatrix* A,  // matrix to relax with
 
         for( HYPRE_Int j = 0; j < num_rows; j++ )
         {
-            u_data[ j ] += coef * r_data[ j ] / max_eig;
+            u_data[j] += coef * r_data[j] / max_eig;
         }
     }
 
@@ -777,20 +777,20 @@ int ParCSRRelax_Taubin( hypre_ParCSRMatrix* A,  // matrix to relax with
 // to approximate a low-pass step filter.
 
 int ParCSRRelax_FIR( hypre_ParCSRMatrix* A,  // matrix to relax with
-                     hypre_ParVector*    f,  // right-hand side
+                     hypre_ParVector* f,     // right-hand side
                      double max_eig, int poly_order, double* fir_coeffs,
-                     hypre_ParVector* u,  // initial/updated approximation
+                     hypre_ParVector* u,   // initial/updated approximation
                      hypre_ParVector* x0,  // temporaries
                      hypre_ParVector* x1, hypre_ParVector* x2, hypre_ParVector* x3 )
 
 {
     hypre_CSRMatrix* A_diag = hypre_ParCSRMatrixDiag( A );
-    HYPRE_Int        num_rows = hypre_CSRMatrixNumRows( A_diag );
-    double*          u_data = hypre_VectorData( hypre_ParVectorLocalVector( u ) );
-    double*          x0_data = hypre_VectorData( hypre_ParVectorLocalVector( x0 ) );
-    double*          x1_data = hypre_VectorData( hypre_ParVectorLocalVector( x1 ) );
-    double*          x2_data = hypre_VectorData( hypre_ParVectorLocalVector( x2 ) );
-    double*          x3_data = hypre_VectorData( hypre_ParVectorLocalVector( x3 ) );
+    HYPRE_Int num_rows      = hypre_CSRMatrixNumRows( A_diag );
+    double* u_data          = hypre_VectorData( hypre_ParVectorLocalVector( u ) );
+    double* x0_data         = hypre_VectorData( hypre_ParVectorLocalVector( x0 ) );
+    double* x1_data         = hypre_VectorData( hypre_ParVectorLocalVector( x1 ) );
+    double* x2_data         = hypre_VectorData( hypre_ParVectorLocalVector( x2 ) );
+    double* x3_data         = hypre_VectorData( hypre_ParVectorLocalVector( x3 ) );
     hypre_ParVectorCopy( u, x0 );
     // x1 = f -A*x0/max_eig
     hypre_ParVectorCopy( f, x1 );
@@ -798,19 +798,19 @@ int ParCSRRelax_FIR( hypre_ParCSRMatrix* A,  // matrix to relax with
 
     for( HYPRE_Int i = 0; i < num_rows; i++ )
     {
-        x1_data[ i ] /= -max_eig;
+        x1_data[i] /= -max_eig;
     }
 
     // x1 = x0 -x1
     for( HYPRE_Int i = 0; i < num_rows; i++ )
     {
-        x1_data[ i ] = x0_data[ i ] - x1_data[ i ];
+        x1_data[i] = x0_data[i] - x1_data[i];
     }
 
     // x3 = f0*x0 +f1*x1
     for( HYPRE_Int i = 0; i < num_rows; i++ )
     {
-        x3_data[ i ] = fir_coeffs[ 0 ] * x0_data[ i ] + fir_coeffs[ 1 ] * x1_data[ i ];
+        x3_data[i] = fir_coeffs[0] * x0_data[i] + fir_coeffs[1] * x1_data[i];
     }
 
     for( int n = 2; n <= poly_order; n++ )
@@ -821,7 +821,7 @@ int ParCSRRelax_FIR( hypre_ParCSRMatrix* A,  // matrix to relax with
 
         for( HYPRE_Int i = 0; i < num_rows; i++ )
         {
-            x2_data[ i ] /= -max_eig;
+            x2_data[i] /= -max_eig;
         }
 
         // x2 = (x1-x0) +(x1-2*x2)
@@ -831,16 +831,16 @@ int ParCSRRelax_FIR( hypre_ParCSRMatrix* A,  // matrix to relax with
 
         for( HYPRE_Int i = 0; i < num_rows; i++ )
         {
-            x2_data[ i ] = ( x1_data[ i ] - x0_data[ i ] ) + ( x1_data[ i ] - 2 * x2_data[ i ] );
-            x3_data[ i ] += fir_coeffs[ n ] * x2_data[ i ];
-            x0_data[ i ] = x1_data[ i ];
-            x1_data[ i ] = x2_data[ i ];
+            x2_data[i] = ( x1_data[i] - x0_data[i] ) + ( x1_data[i] - 2 * x2_data[i] );
+            x3_data[i] += fir_coeffs[n] * x2_data[i];
+            x0_data[i] = x1_data[i];
+            x1_data[i] = x2_data[i];
         }
     }
 
     for( HYPRE_Int i = 0; i < num_rows; i++ )
     {
-        u_data[ i ] = x3_data[ i ];
+        u_data[i] = x3_data[i];
     }
 
     return 0;

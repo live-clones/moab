@@ -52,9 +52,9 @@ class TUntangleBeta : public TMetric
   public:
     TUntangleBeta( double gamma = 0.0 ) : mGamma( gamma ) {}
 
-    MESQUITE_EXPORT virtual ~TUntangleBeta( );
+    MESQUITE_EXPORT virtual ~TUntangleBeta();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 
@@ -62,8 +62,8 @@ class TUntangleBeta : public TMetric
                                                      MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                                     MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err );
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T, MsqMatrix< 2, 2 > second_wrt_T[3],
+                                                     MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 
@@ -71,13 +71,15 @@ class TUntangleBeta : public TMetric
                                                      MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                                     MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err );
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > second_wrt_T[6],
+                                                     MsqError& err );
 
   private:
-    template< unsigned D > inline bool eval( const MsqMatrix< D, D >& T, double& result );
-    template< unsigned D > inline bool grad( const MsqMatrix< D, D >& T, double& result, MsqMatrix< D, D >& first );
-    template< unsigned D >
+    template < unsigned D >
+    inline bool eval( const MsqMatrix< D, D >& T, double& result );
+    template < unsigned D >
+    inline bool grad( const MsqMatrix< D, D >& T, double& result, MsqMatrix< D, D >& first );
+    template < unsigned D >
     inline bool hess( const MsqMatrix< D, D >& T, double& result, MsqMatrix< D, D >& first, MsqMatrix< D, D >* second );
 };
 

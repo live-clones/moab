@@ -45,7 +45,8 @@ static const std::string& barrier_violated_msg_aw =
         If a Barrier metric is used, you can only use untangled initial meshes.\n";
 
 class MsqError;
-template< unsigned R, unsigned C > class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 /**\brief A metric for comparing a matrix A with a target matrix W
  *
@@ -54,9 +55,9 @@ template< unsigned R, unsigned C > class MsqMatrix;
 class AWMetricBarrier : public AWMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~AWMetricBarrier( );
+    MESQUITE_EXPORT virtual ~AWMetricBarrier();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const
+    MESQUITE_EXPORT virtual std::string get_name() const
     {
         return "AWMetricBarrier";
     }
@@ -70,7 +71,7 @@ class AWMetricBarrier : public AWMetric
 class AWMetricBarrier2D : public AWMetricBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~AWMetricBarrier2D( );
+    MESQUITE_EXPORT virtual ~AWMetricBarrier2D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
@@ -83,7 +84,7 @@ class AWMetricBarrier2D : public AWMetricBarrier
 class AWMetricBarrier3D : public AWMetricBarrier
 {
   public:
-    MESQUITE_EXPORT virtual ~AWMetricBarrier3D( );
+    MESQUITE_EXPORT virtual ~AWMetricBarrier3D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *

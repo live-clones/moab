@@ -56,14 +56,14 @@ class LocalSizeQualityMetric : public VertexQM, public AveragingQM
 {
   public:
     // Default constructor.
-    LocalSizeQualityMetric( ) : AveragingQM( RMS ) {}
+    LocalSizeQualityMetric() : AveragingQM( RMS ) {}
 
     // virtual destructor ensures use of polymorphism during destruction
-    virtual ~LocalSizeQualityMetric( );
+    virtual ~LocalSizeQualityMetric();
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
-    virtual int get_negate_flag( ) const;
+    virtual int get_negate_flag() const;
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 

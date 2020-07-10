@@ -61,7 +61,7 @@ CompositeOFMultiply::CompositeOFMultiply( ObjectiveFunction* Obj1, ObjectiveFunc
 }
 
 // Michael:  need to clean up here
-CompositeOFMultiply::~CompositeOFMultiply( )
+CompositeOFMultiply::~CompositeOFMultiply()
 {
     if( deleteObjFuncs )
     {
@@ -70,21 +70,23 @@ CompositeOFMultiply::~CompositeOFMultiply( )
     }
 }
 
-ObjectiveFunction* CompositeOFMultiply::clone( ) const
+ObjectiveFunction* CompositeOFMultiply::clone() const
 {
-    return new CompositeOFMultiply( objFunc1->clone( ), objFunc2->clone( ), true );
+    return new CompositeOFMultiply( objFunc1->clone(), objFunc2->clone(), true );
 }
 
-void CompositeOFMultiply::clear( )
+void CompositeOFMultiply::clear()
 {
-    objFunc1->clear( );
-    objFunc2->clear( );
+    objFunc1->clear();
+    objFunc2->clear();
 }
 
 void CompositeOFMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-    objFunc1->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
-    objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+    objFunc1->initialize_queue( mesh_and_domain, settings, err );
+    MSQ_ERRRTN( err );
+    objFunc2->initialize_queue( mesh_and_domain, settings, err );
+    MSQ_ERRRTN( err );
 }
 
 bool CompositeOFMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
@@ -101,7 +103,7 @@ bool CompositeOFMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* 
 bool CompositeOFMultiply::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
     double value_2;
-    bool   ok;
+    bool ok;
 
     ok = objFunc1->evaluate( type, pd, value_out, free, err );
     if( MSQ_CHKERR( err ) || !ok ) return false;
@@ -116,18 +118,18 @@ bool CompositeOFMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, 
                                                   std::vector< Vector3D >& grad_out, MsqError& err )
 {
     double value_2;
-    bool   ok;
+    bool ok;
 
     ok = objFunc1->evaluate_with_gradient( type, pd, value_out, grad_out, err );
     if( MSQ_CHKERR( err ) || !ok ) return false;
     ok = objFunc2->evaluate_with_gradient( type, pd, value_2, mGradient, err );
     if( MSQ_CHKERR( err ) || !ok ) return false;
 
-    assert( grad_out.size( ) == pd.num_free_vertices( ) );
-    assert( mGradient.size( ) == pd.num_free_vertices( ) );
+    assert( grad_out.size() == pd.num_free_vertices() );
+    assert( mGradient.size() == pd.num_free_vertices() );
 
-    std::vector< Vector3D >::iterator i = grad_out.begin( ), j = mGradient.begin( );
-    while( i != grad_out.end( ) )
+    std::vector< Vector3D >::iterator i = grad_out.begin(), j = mGradient.begin();
+    while( i != grad_out.end() )
     {
         *i *= value_2;
         *j *= value_out;
@@ -140,27 +142,27 @@ bool CompositeOFMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, 
 }
 
 bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                          std::vector< Vector3D >&    grad_out,
+                                                          std::vector< Vector3D >& grad_out,
                                                           std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
     double value_2;
-    bool   valid;
+    bool valid;
 
     valid = objFunc1->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
     valid = objFunc2->evaluate_with_Hessian_diagonal( type, pd, value_2, mGradient, mDiagonal, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;
 
-    for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
+    for( size_t i = 0; i < pd.num_free_vertices(); ++i )
     {
-        diag_out[ i ] *= value_2;
-        mDiagonal[ i ] *= value_out;
-        diag_out[ i ] += mDiagonal[ i ];
-        diag_out[ i ] += outer_plus_transpose( grad_out[ i ], mGradient[ i ] );
+        diag_out[i] *= value_2;
+        mDiagonal[i] *= value_out;
+        diag_out[i] += mDiagonal[i];
+        diag_out[i] += outer_plus_transpose( grad_out[i], mGradient[i] );
 
-        grad_out[ i ] *= value_2;
-        mGradient[ i ] *= value_out;
-        grad_out[ i ] += mGradient[ i ];
+        grad_out[i] *= value_2;
+        mGradient[i] *= value_out;
+        grad_out[i] += mGradient[i];
     }
 
     value_out *= value_2;
@@ -180,10 +182,10 @@ bool CompositeOFMultiply::evaluate_with_Hessian( EvalType, PatchData&, double&, 
     return false;
 }
 
-int CompositeOFMultiply::min_patch_layers( ) const
+int CompositeOFMultiply::min_patch_layers() const
 {
-    const int v1 = objFunc1->min_patch_layers( );
-    const int v2 = objFunc2->min_patch_layers( );
+    const int v1 = objFunc1->min_patch_layers();
+    const int v2 = objFunc2->min_patch_layers();
     return v1 > v2 ? v1 : v2;
 }
 

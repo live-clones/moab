@@ -41,7 +41,8 @@ namespace MBMesquite
 class TargetCalculator;
 class WeightCalculator;
 class TMetric;
-template< unsigned R, unsigned C > class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 /**\brief Compare targets to affine map to ideal element.
  *
@@ -58,9 +59,9 @@ class AffineMapMetric : public ElemSampleQM
     MESQUITE_EXPORT
     AffineMapMetric( TargetCalculator* tc, TMetric* target_metric );
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                   bool free_vertices_only, MsqError& err );
@@ -81,16 +82,16 @@ class AffineMapMetric : public ElemSampleQM
     {
         weightCalc = wc;
     }
-    TargetCalculator* get_target_calculator( ) const
+    TargetCalculator* get_target_calculator() const
     {
         return targetCalc;
     }
-    WeightCalculator* get_weight_calculator( ) const
+    WeightCalculator* get_weight_calculator() const
     {
         return weightCalc;
     }
 
-    TMetric* get_target_metric( ) const
+    TMetric* get_target_metric() const
     {
         return targetMetric;
     }
@@ -102,7 +103,7 @@ class AffineMapMetric : public ElemSampleQM
   private:
     TargetCalculator* targetCalc;
     WeightCalculator* weightCalc;
-    TMetric*          targetMetric;
+    TMetric* targetMetric;
 };
 
 }  // namespace MBMesquite

@@ -17,38 +17,38 @@ int main( int argc, char* argv[] )
     if( nproc != 2 )
     {
         std::cout << " run this test on 2 tasks\n";
-        MPI_Finalize( );
+        MPI_Finalize();
         return 1;
     }
 
     std::string filename0 = TestDir + "/brick1.vtk";
     std::string filename1 = TestDir + "/brick2.vtk";
 
-    moab::Core*         mb = new moab::Core( );
+    moab::Core* mb         = new moab::Core();
     moab::ParallelComm* pc = new moab::ParallelComm( mb, MPI_COMM_WORLD );
-    ErrorCode           rval = MB_SUCCESS;
+    ErrorCode rval         = MB_SUCCESS;
 
     if( 0 == rank )
-        rval = mb->load_file( filename0.c_str( ) );
+        rval = mb->load_file( filename0.c_str() );
     else
-        rval = mb->load_file( filename1.c_str( ) );
+        rval = mb->load_file( filename1.c_str() );
 
     if( rval != MB_SUCCESS )
     {
         std::cout << "fail to load file\n";
         delete pc;
         delete mb;
-        MPI_Finalize( );
+        MPI_Finalize();
         return 1;
     }
     ParallelMergeMesh pm( pc, 0.001 );
-    rval = pm.merge( );
+    rval = pm.merge();
     if( rval != MB_SUCCESS )
     {
         std::cout << "fail to merge in parallel \n";
         delete pc;
         delete mb;
-        MPI_Finalize( );
+        MPI_Finalize();
         return 1;
     }
     // check number of shared entities
@@ -59,7 +59,7 @@ int main( int argc, char* argv[] )
     {
         delete pc;
         delete mb;
-        MPI_Finalize( );
+        MPI_Finalize();
         return 1;
     }
     // there should be exactly 9 vertices, 12 edges, 4 faces
@@ -73,7 +73,7 @@ int main( int argc, char* argv[] )
                   << " f:" << numF << "\n";
         delete pc;
         delete mb;
-        MPI_Finalize( );
+        MPI_Finalize();
         return 1;
     }
 
@@ -83,13 +83,13 @@ int main( int argc, char* argv[] )
         std::cout << "fail to write output file \n";
         delete pc;
         delete mb;
-        MPI_Finalize( );
+        MPI_Finalize();
         return 1;
     }
 
     delete pc;
     delete mb;
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return 0;
 }

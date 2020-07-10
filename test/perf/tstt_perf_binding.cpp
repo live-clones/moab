@@ -47,14 +47,14 @@ int main( int argc, char* argv[] )
     int nelem = 20;
     if( argc < 3 )
     {
-        std::cout << "Usage: " << argv[ 0 ] << " <ints_per_side> <A|B|C>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <ints_per_side> <A|B|C>" << std::endl;
         return 1;
     }
 
     char which_test = '\0';
 
-    sscanf( argv[ 1 ], "%d", &nelem );
-    sscanf( argv[ 2 ], "%c", &which_test );
+    sscanf( argv[1], "%d", &nelem );
+    sscanf( argv[2], "%c", &which_test );
 
     if( which_test != 'B' && which_test != 'C' )
     {
@@ -75,7 +75,7 @@ int main( int argc, char* argv[] )
 
     // create an implementation
     iMesh_Instance mesh;
-    int            result;
+    int result;
     iMesh_newMesh( NULL, &mesh, &result, 0 );
     int* connect = NULL;
 
@@ -117,7 +117,7 @@ int main( int argc, char* argv[] )
 void testB( iMesh_Instance mesh, const int nelem, const double* coords, int* connect )
 {
     double utime, stime, ttime0, ttime1, ttime2, ttime3, ttime4;
-    long   imem0, rmem0, imem1, rmem1, imem2, rmem2, imem3, rmem3, imem4, rmem4;
+    long imem0, rmem0, imem1, rmem1, imem2, rmem2, imem3, rmem3, imem4, rmem4;
 
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
     int num_verts = ( nelem + 1 ) * ( nelem + 1 ) * ( nelem + 1 );
@@ -125,8 +125,8 @@ void testB( iMesh_Instance mesh, const int nelem, const double* coords, int* con
 
     // create vertices as a block; initialize to NULL so allocation is done in interface
     iBase_EntityHandle* vertices = NULL;
-    int                 vertices_allocated = 0, vertices_size;
-    int                 result;
+    int vertices_allocated       = 0, vertices_size;
+    int result;
     iMesh_createVtxArr( mesh, num_verts, iBase_BLOCKED, coords, 3 * num_verts, &vertices, &vertices_allocated,
                         &vertices_size, &result );
     if( iBase_SUCCESS != result )
@@ -138,14 +138,14 @@ void testB( iMesh_Instance mesh, const int nelem, const double* coords, int* con
 
     // need to explicitly fill connectivity array, since we don't know
     // the format of entity handles
-    int                 nconnect = 8 * num_elems;
+    int nconnect                     = 8 * num_elems;
     iBase_EntityHandle* sidl_connect = (iBase_EntityHandle*)malloc( nconnect * sizeof( iBase_EntityHandle ) );
 
     for( int i = 0; i < nconnect; i++ )
     {
         // use connect[i]-1 because we used starting vertex index (vstart) of 1
-        assert( connect[ i ] - 1 < num_verts );
-        sidl_connect[ i ] = vertices[ connect[ i ] - 1 ];
+        assert( connect[i] - 1 < num_verts );
+        sidl_connect[i] = vertices[connect[i] - 1];
     }
 
     // no longer need vertices and connect arrays, free here to reduce overall peak memory usage
@@ -154,9 +154,9 @@ void testB( iMesh_Instance mesh, const int nelem, const double* coords, int* con
 
     // create the entities
     iBase_EntityHandle* new_hexes = NULL;
-    int                 new_hexes_allocated = 0, new_hexes_size;
-    int*                status = NULL;
-    int                 status_allocated = 0, status_size;
+    int new_hexes_allocated       = 0, new_hexes_size;
+    int* status                   = NULL;
+    int status_allocated          = 0, status_size;
 
     iMesh_createEntArr( mesh, iMesh_HEXAHEDRON, sidl_connect, nconnect, &new_hexes, &new_hexes_allocated,
                         &new_hexes_size, &status, &status_allocated, &status_size, &result );
@@ -198,23 +198,23 @@ void testB( iMesh_Instance mesh, const int nelem, const double* coords, int* con
 void testC( iMesh_Instance mesh, const int nelem, const double* coords )
 {
     double utime, stime, ttime0, ttime1, ttime2, ttime3, ttime4;
-    long   imem0, rmem0, imem1, rmem1, imem2, rmem2, imem3, rmem3, imem4, rmem4;
+    long imem0, rmem0, imem1, rmem1, imem2, rmem2, imem3, rmem3, imem4, rmem4;
     print_time( false, ttime0, utime, stime, imem0, rmem0 );
 
     // need some dimensions
-    int numv = nelem + 1;
-    int numv_sq = numv * numv;
+    int numv      = nelem + 1;
+    int numv_sq   = numv * numv;
     int num_verts = numv * numv * numv;
 #define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
 
     // array to hold vertices created individually
     iBase_EntityHandle* sidl_vertices = (iBase_EntityHandle*)malloc( num_verts * sizeof( iBase_EntityHandle ) );
-    int                 result;
+    int result;
 
     for( int i = 0; i < num_verts; i++ )
     {
         // create the vertex
-        iMesh_createVtx( mesh, coords[ i ], coords[ i + num_verts ], coords[ i + 2 * num_verts ], sidl_vertices + i,
+        iMesh_createVtx( mesh, coords[i], coords[i + num_verts], coords[i + 2 * num_verts], sidl_vertices + i,
                          &result );
         if( iBase_SUCCESS != result )
         {
@@ -223,7 +223,7 @@ void testC( iMesh_Instance mesh, const int nelem, const double* coords )
         }
     }
 
-    iBase_EntityHandle tmp_conn[ 8 ], new_hex;
+    iBase_EntityHandle tmp_conn[8], new_hex;
 
     for( int i = 0; i < nelem; i++ )
     {
@@ -231,15 +231,15 @@ void testC( iMesh_Instance mesh, const int nelem, const double* coords )
         {
             for( int k = 0; k < nelem; k++ )
             {
-                int vijk = VINDEX( i, j, k );
-                tmp_conn[ 0 ] = sidl_vertices[ vijk ];
-                tmp_conn[ 1 ] = sidl_vertices[ vijk + 1 ];
-                tmp_conn[ 2 ] = sidl_vertices[ vijk + 1 + numv ];
-                tmp_conn[ 3 ] = sidl_vertices[ vijk + numv ];
-                tmp_conn[ 4 ] = sidl_vertices[ vijk + numv * numv ];
-                tmp_conn[ 5 ] = sidl_vertices[ vijk + 1 + numv * numv ];
-                tmp_conn[ 6 ] = sidl_vertices[ vijk + 1 + numv + numv * numv ];
-                tmp_conn[ 7 ] = sidl_vertices[ vijk + numv + numv * numv ];
+                int vijk    = VINDEX( i, j, k );
+                tmp_conn[0] = sidl_vertices[vijk];
+                tmp_conn[1] = sidl_vertices[vijk + 1];
+                tmp_conn[2] = sidl_vertices[vijk + 1 + numv];
+                tmp_conn[3] = sidl_vertices[vijk + numv];
+                tmp_conn[4] = sidl_vertices[vijk + numv * numv];
+                tmp_conn[5] = sidl_vertices[vijk + 1 + numv * numv];
+                tmp_conn[6] = sidl_vertices[vijk + 1 + numv + numv * numv];
+                tmp_conn[7] = sidl_vertices[vijk + numv + numv * numv];
 
                 // create the entity
 
@@ -281,10 +281,10 @@ void testC( iMesh_Instance mesh, const int nelem, const double* coords )
 void query_elem_to_vert( iMesh_Instance mesh )
 {
     iBase_EntityHandle* all_hexes = NULL;
-    int                 all_hexes_size, all_hexes_allocated = 0;
+    int all_hexes_size, all_hexes_allocated = 0;
 
     // get all the hex elements
-    int                   success;
+    int success;
     iBase_EntitySetHandle root_set;
     iMesh_getRootSet( mesh, &root_set, &success );
     if( iBase_SUCCESS != success )
@@ -303,10 +303,10 @@ void query_elem_to_vert( iMesh_Instance mesh )
 
     // now loop over elements
     iBase_EntityHandle* dum_connect = NULL;
-    int                 dum_connect_allocated = 0, dum_connect_size;
-    double*             dum_coords = NULL;
-    int                 dum_coords_size, dum_coords_allocated = 0;
-    int                 order;
+    int dum_connect_allocated       = 0, dum_connect_size;
+    double* dum_coords              = NULL;
+    int dum_coords_size, dum_coords_allocated = 0;
+    int order;
     iMesh_getDfltStorage( mesh, &order, &success );
     if( iBase_SUCCESS != success ) return;
 
@@ -314,7 +314,7 @@ void query_elem_to_vert( iMesh_Instance mesh )
     {
         // get the connectivity of this element; will allocate space on 1st iteration,
         // but will have correct size on subsequent ones
-        iMesh_getEntAdj( mesh, all_hexes[ i ], iBase_VERTEX, &dum_connect, &dum_connect_allocated, &dum_connect_size,
+        iMesh_getEntAdj( mesh, all_hexes[i], iBase_VERTEX, &dum_connect, &dum_connect_allocated, &dum_connect_size,
                          &success );
 
         if( iBase_SUCCESS == success )
@@ -324,23 +324,23 @@ void query_elem_to_vert( iMesh_Instance mesh )
             iMesh_getVtxArrCoords( mesh, dum_connect, dum_connect_size, order, &dum_coords, &dum_coords_allocated,
                                    &dum_coords_size, &success );
 
-            double centroid[ 3 ] = { 0.0, 0.0, 0.0 };
+            double centroid[3] = { 0.0, 0.0, 0.0 };
             if( order == iBase_BLOCKED )
             {
                 for( int j = 0; j < 8; j++ )
                 {
-                    centroid[ 0 ] += dum_coords[ j ];
-                    centroid[ 1 ] += dum_coords[ 8 + j ];
-                    centroid[ 2 ] += dum_coords[ 16 + j ];
+                    centroid[0] += dum_coords[j];
+                    centroid[1] += dum_coords[8 + j];
+                    centroid[2] += dum_coords[16 + j];
                 }
             }
             else
             {
                 for( int j = 0; j < 8; j++ )
                 {
-                    centroid[ 0 ] += dum_coords[ 3 * j ];
-                    centroid[ 1 ] += dum_coords[ 3 * j + 1 ];
-                    centroid[ 2 ] += dum_coords[ 3 * j + 2 ];
+                    centroid[0] += dum_coords[3 * j];
+                    centroid[1] += dum_coords[3 * j + 1];
+                    centroid[2] += dum_coords[3 * j + 2];
                 }
             }
         }
@@ -360,10 +360,10 @@ void query_elem_to_vert( iMesh_Instance mesh )
 void query_vert_to_elem( iMesh_Instance mesh )
 {
     iBase_EntityHandle* all_verts = NULL;
-    int                 all_verts_allocated = 0, all_verts_size;
+    int all_verts_allocated       = 0, all_verts_size;
 
     iBase_EntitySetHandle root_set;
-    int                   success;
+    int success;
     iMesh_getRootSet( mesh, &root_set, &success );
     if( iBase_SUCCESS != success )
     {
@@ -391,7 +391,7 @@ void query_vert_to_elem( iMesh_Instance mesh )
 
         // get the connectivity of this element; will have to allocate space on every
         // iteration, since size can vary
-        iMesh_getEntAdj( mesh, all_verts[ i ], iBase_REGION, &dum_hexes, &dum_hexes_allocated, &dum_hexes_size,
+        iMesh_getEntAdj( mesh, all_verts[i], iBase_REGION, &dum_hexes, &dum_hexes_allocated, &dum_hexes_size,
                          &success );
         if( iBase_SUCCESS != success )
         {
@@ -411,8 +411,8 @@ void print_time( const bool print_em, double& tot_time, double& utime, double& s
 #ifndef _WIN32  // Windows does not have rusage
     struct rusage r_usage;
     getrusage( RUSAGE_SELF, &r_usage );
-    utime = (double)r_usage.ru_utime.tv_sec + ( (double)r_usage.ru_utime.tv_usec / 1.e6 );
-    stime = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
+    utime    = (double)r_usage.ru_utime.tv_sec + ( (double)r_usage.ru_utime.tv_usec / 1.e6 );
+    stime    = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
     tot_time = utime + stime;
     if( print_em )
         std::cout << "User, system, total time = " << utime << ", " << stime << ", " << tot_time << std::endl;
@@ -435,9 +435,9 @@ void compute_edge( double* start, const int nelem, const double xint, const int 
 {
     for( int i = 1; i < nelem; i++ )
     {
-        start[ i * stride ] = start[ 0 ] + i * xint;
-        start[ nelem + 1 + i * stride ] = start[ nelem + 1 ] + i * xint;
-        start[ 2 * ( nelem + 1 ) + i * stride ] = start[ 2 * ( nelem + 1 ) ] + i * xint;
+        start[i * stride]                     = start[0] + i * xint;
+        start[nelem + 1 + i * stride]         = start[nelem + 1] + i * xint;
+        start[2 * ( nelem + 1 ) + i * stride] = start[2 * ( nelem + 1 )] + i * xint;
     }
 }
 
@@ -451,27 +451,27 @@ void compute_face( double* a, const int nelem, const double xint, const int stri
         {
             double ada = i * xint;
 
-            a[ i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ i * stride1 ] + ada * a[ i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ j * stride2 ] + tse * a[ j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ 0 ] - ( 1.0 - tse ) * ada * a[ nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ nelem * stride2 ] - tse * ada * a[ nelem * ( stride1 + stride2 ) ];
-            a[ nelem + 1 + i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ nelem + 1 + i * stride1 ] + ada * a[ nelem + 1 + i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ nelem + 1 + j * stride2 ] + tse * a[ nelem + 1 + j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ nelem + 1 + 0 ] -
-                ( 1.0 - tse ) * ada * a[ nelem + 1 + nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ nelem + 1 + nelem * stride2 ] -
-                tse * ada * a[ nelem + 1 + nelem * ( stride1 + stride2 ) ];
-            a[ 2 * ( nelem + 1 ) + i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ 2 * ( nelem + 1 ) + i * stride1 ] +
-                ada * a[ 2 * ( nelem + 1 ) + i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ 2 * ( nelem + 1 ) + j * stride2 ] +
-                tse * a[ 2 * ( nelem + 1 ) + j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ 2 * ( nelem + 1 ) + 0 ] -
-                ( 1.0 - tse ) * ada * a[ 2 * ( nelem + 1 ) + nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ 2 * ( nelem + 1 ) + nelem * stride2 ] -
-                tse * ada * a[ 2 * ( nelem + 1 ) + nelem * ( stride1 + stride2 ) ];
+            a[i * stride1 + j * stride2] =
+                ( 1.0 - ada ) * a[i * stride1] + ada * a[i * stride1 + nelem * stride2] +
+                ( 1.0 - tse ) * a[j * stride2] + tse * a[j * stride2 + nelem * stride1] -
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[0] - ( 1.0 - tse ) * ada * a[nelem * stride1] -
+                tse * ( 1.0 - ada ) * a[nelem * stride2] - tse * ada * a[nelem * ( stride1 + stride2 )];
+            a[nelem + 1 + i * stride1 + j * stride2] =
+                ( 1.0 - ada ) * a[nelem + 1 + i * stride1] + ada * a[nelem + 1 + i * stride1 + nelem * stride2] +
+                ( 1.0 - tse ) * a[nelem + 1 + j * stride2] + tse * a[nelem + 1 + j * stride2 + nelem * stride1] -
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[nelem + 1 + 0] -
+                ( 1.0 - tse ) * ada * a[nelem + 1 + nelem * stride1] -
+                tse * ( 1.0 - ada ) * a[nelem + 1 + nelem * stride2] -
+                tse * ada * a[nelem + 1 + nelem * ( stride1 + stride2 )];
+            a[2 * ( nelem + 1 ) + i * stride1 + j * stride2] =
+                ( 1.0 - ada ) * a[2 * ( nelem + 1 ) + i * stride1] +
+                ada * a[2 * ( nelem + 1 ) + i * stride1 + nelem * stride2] +
+                ( 1.0 - tse ) * a[2 * ( nelem + 1 ) + j * stride2] +
+                tse * a[2 * ( nelem + 1 ) + j * stride2 + nelem * stride1] -
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[2 * ( nelem + 1 ) + 0] -
+                ( 1.0 - tse ) * ada * a[2 * ( nelem + 1 ) + nelem * stride1] -
+                tse * ( 1.0 - ada ) * a[2 * ( nelem + 1 ) + nelem * stride2] -
+                tse * ada * a[2 * ( nelem + 1 ) + nelem * ( stride1 + stride2 )];
         }
     }
 }
@@ -479,18 +479,18 @@ void compute_face( double* a, const int nelem, const double xint, const int stri
 void build_coords( const int nelem, double*& coords )
 {
     double ttime0, ttime1, utime1, stime1;
-    long   imem, rmem;
+    long imem, rmem;
     print_time( false, ttime0, utime1, stime1, imem, rmem );
 
     // allocate the memory
-    int numv = nelem + 1;
-    int numv_sq = numv * numv;
+    int numv     = nelem + 1;
+    int numv_sq  = numv * numv;
     int tot_numv = numv * numv * numv;
-    coords = (double*)malloc( 3 * tot_numv * sizeof( double ) );
+    coords       = (double*)malloc( 3 * tot_numv * sizeof( double ) );
 
 // use FORTRAN-like indexing
 #define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
-    int    idx;
+    int idx;
     double scale1, scale2, scale3;
     // use these to prevent optimization on 1-scale, etc (real map wouldn't have
     // all these equal)
@@ -502,45 +502,45 @@ void build_coords( const int nelem, double*& coords )
     // use a real TFI xform to compute coordinates
     // compute edges
     // i (stride=1)
-    compute_edge( &coords[ VINDEX( 0, 0, 0 ) ], nelem, scale1, 1 );
-    compute_edge( &coords[ VINDEX( 0, nelem, 0 ) ], nelem, scale1, 1 );
-    compute_edge( &coords[ VINDEX( 0, 0, nelem ) ], nelem, scale1, 1 );
-    compute_edge( &coords[ VINDEX( 0, nelem, nelem ) ], nelem, scale1, 1 );
+    compute_edge( &coords[VINDEX( 0, 0, 0 )], nelem, scale1, 1 );
+    compute_edge( &coords[VINDEX( 0, nelem, 0 )], nelem, scale1, 1 );
+    compute_edge( &coords[VINDEX( 0, 0, nelem )], nelem, scale1, 1 );
+    compute_edge( &coords[VINDEX( 0, nelem, nelem )], nelem, scale1, 1 );
     // j (stride=numv)
-    compute_edge( &coords[ VINDEX( 0, 0, 0 ) ], nelem, scale1, numv );
-    compute_edge( &coords[ VINDEX( nelem, 0, 0 ) ], nelem, scale1, numv );
-    compute_edge( &coords[ VINDEX( 0, 0, nelem ) ], nelem, scale1, numv );
-    compute_edge( &coords[ VINDEX( nelem, 0, nelem ) ], nelem, scale1, numv );
+    compute_edge( &coords[VINDEX( 0, 0, 0 )], nelem, scale1, numv );
+    compute_edge( &coords[VINDEX( nelem, 0, 0 )], nelem, scale1, numv );
+    compute_edge( &coords[VINDEX( 0, 0, nelem )], nelem, scale1, numv );
+    compute_edge( &coords[VINDEX( nelem, 0, nelem )], nelem, scale1, numv );
     // k (stride=numv^2)
-    compute_edge( &coords[ VINDEX( 0, 0, 0 ) ], nelem, scale1, numv_sq );
-    compute_edge( &coords[ VINDEX( nelem, 0, 0 ) ], nelem, scale1, numv_sq );
-    compute_edge( &coords[ VINDEX( 0, nelem, 0 ) ], nelem, scale1, numv_sq );
-    compute_edge( &coords[ VINDEX( nelem, nelem, 0 ) ], nelem, scale1, numv_sq );
+    compute_edge( &coords[VINDEX( 0, 0, 0 )], nelem, scale1, numv_sq );
+    compute_edge( &coords[VINDEX( nelem, 0, 0 )], nelem, scale1, numv_sq );
+    compute_edge( &coords[VINDEX( 0, nelem, 0 )], nelem, scale1, numv_sq );
+    compute_edge( &coords[VINDEX( nelem, nelem, 0 )], nelem, scale1, numv_sq );
 
     // compute faces
     // i=0, nelem
-    compute_face( &coords[ VINDEX( 0, 0, 0 ) ], nelem, scale1, numv, numv_sq );
-    compute_face( &coords[ VINDEX( nelem, 0, 0 ) ], nelem, scale1, numv, numv_sq );
+    compute_face( &coords[VINDEX( 0, 0, 0 )], nelem, scale1, numv, numv_sq );
+    compute_face( &coords[VINDEX( nelem, 0, 0 )], nelem, scale1, numv, numv_sq );
     // j=0, nelem
-    compute_face( &coords[ VINDEX( 0, 0, 0 ) ], nelem, scale1, 1, numv_sq );
-    compute_face( &coords[ VINDEX( 0, nelem, 0 ) ], nelem, scale1, 1, numv_sq );
+    compute_face( &coords[VINDEX( 0, 0, 0 )], nelem, scale1, 1, numv_sq );
+    compute_face( &coords[VINDEX( 0, nelem, 0 )], nelem, scale1, 1, numv_sq );
     // k=0, nelem
-    compute_face( &coords[ VINDEX( 0, 0, 0 ) ], nelem, scale1, 1, numv );
-    compute_face( &coords[ VINDEX( 0, 0, nelem ) ], nelem, scale1, 1, numv );
+    compute_face( &coords[VINDEX( 0, 0, 0 )], nelem, scale1, 1, numv );
+    compute_face( &coords[VINDEX( 0, 0, nelem )], nelem, scale1, 1, numv );
 
     // initialize corner indices
-    int    i000 = VINDEX( 0, 0, 0 );
-    int    ia00 = VINDEX( nelem, 0, 0 );
-    int    i0t0 = VINDEX( 0, nelem, 0 );
-    int    iat0 = VINDEX( nelem, nelem, 0 );
-    int    i00g = VINDEX( 0, 0, nelem );
-    int    ia0g = VINDEX( nelem, 0, nelem );
-    int    i0tg = VINDEX( 0, nelem, nelem );
-    int    iatg = VINDEX( nelem, nelem, nelem );
+    int i000 = VINDEX( 0, 0, 0 );
+    int ia00 = VINDEX( nelem, 0, 0 );
+    int i0t0 = VINDEX( 0, nelem, 0 );
+    int iat0 = VINDEX( nelem, nelem, 0 );
+    int i00g = VINDEX( 0, 0, nelem );
+    int ia0g = VINDEX( nelem, 0, nelem );
+    int i0tg = VINDEX( 0, nelem, nelem );
+    int iatg = VINDEX( nelem, nelem, nelem );
     double cX, cY, cZ;
-    int    adaInts = nelem;
-    int    tseInts = nelem;
-    int    gammaInts = nelem;
+    int adaInts   = nelem;
+    int tseInts   = nelem;
+    int gammaInts = nelem;
 
     for( int i = 1; i < nelem; i++ )
     {
@@ -549,50 +549,50 @@ void build_coords( const int nelem, double*& coords )
             for( int k = 1; k < nelem; k++ )
             {
                 // idx = VINDEX(i,j,k);
-                double tse = i * scale1;
-                double ada = j * scale2;
+                double tse   = i * scale1;
+                double ada   = j * scale2;
                 double gamma = k * scale3;
-                double tm1 = 1.0 - tse;
-                double am1 = 1.0 - ada;
-                double gm1 = 1.0 - gamma;
+                double tm1   = 1.0 - tse;
+                double am1   = 1.0 - ada;
+                double gm1   = 1.0 - gamma;
 
-                cX = gm1 * ( am1 * ( tm1 * coords[ i000 ] + tse * coords[ i0t0 ] ) +
-                             ada * ( tm1 * coords[ ia00 ] + tse * coords[ iat0 ] ) ) +
-                     gamma * ( am1 * ( tm1 * coords[ i00g ] + tse * coords[ i0tg ] ) +
-                               ada * ( tm1 * coords[ ia0g ] + tse * coords[ iatg ] ) );
+                cX = gm1 * ( am1 * ( tm1 * coords[i000] + tse * coords[i0t0] ) +
+                             ada * ( tm1 * coords[ia00] + tse * coords[iat0] ) ) +
+                     gamma * ( am1 * ( tm1 * coords[i00g] + tse * coords[i0tg] ) +
+                               ada * ( tm1 * coords[ia0g] + tse * coords[iatg] ) );
 
-                cY = gm1 * ( am1 * ( tm1 * coords[ i000 ] + tse * coords[ i0t0 ] ) +
-                             ada * ( tm1 * coords[ ia00 ] + tse * coords[ iat0 ] ) ) +
-                     gamma * ( am1 * ( tm1 * coords[ i00g ] + tse * coords[ i0tg ] ) +
-                               ada * ( tm1 * coords[ ia0g ] + tse * coords[ iatg ] ) );
+                cY = gm1 * ( am1 * ( tm1 * coords[i000] + tse * coords[i0t0] ) +
+                             ada * ( tm1 * coords[ia00] + tse * coords[iat0] ) ) +
+                     gamma * ( am1 * ( tm1 * coords[i00g] + tse * coords[i0tg] ) +
+                               ada * ( tm1 * coords[ia0g] + tse * coords[iatg] ) );
 
-                cZ = gm1 * ( am1 * ( tm1 * coords[ i000 ] + tse * coords[ i0t0 ] ) +
-                             ada * ( tm1 * coords[ ia00 ] + tse * coords[ iat0 ] ) ) +
-                     gamma * ( am1 * ( tm1 * coords[ i00g ] + tse * coords[ i0tg ] ) +
-                               ada * ( tm1 * coords[ ia0g ] + tse * coords[ iatg ] ) );
+                cZ = gm1 * ( am1 * ( tm1 * coords[i000] + tse * coords[i0t0] ) +
+                             ada * ( tm1 * coords[ia00] + tse * coords[iat0] ) ) +
+                     gamma * ( am1 * ( tm1 * coords[i00g] + tse * coords[i0tg] ) +
+                               ada * ( tm1 * coords[ia0g] + tse * coords[iatg] ) );
 
-                double* ai0k = &coords[ VINDEX( k, 0, i ) ];
-                double* aiak = &coords[ VINDEX( k, adaInts, i ) ];
-                double* a0jk = &coords[ VINDEX( k, j, 0 ) ];
-                double* atjk = &coords[ VINDEX( k, j, tseInts ) ];
-                double* aij0 = &coords[ VINDEX( 0, j, i ) ];
-                double* aijg = &coords[ VINDEX( gammaInts, j, i ) ];
+                double* ai0k = &coords[VINDEX( k, 0, i )];
+                double* aiak = &coords[VINDEX( k, adaInts, i )];
+                double* a0jk = &coords[VINDEX( k, j, 0 )];
+                double* atjk = &coords[VINDEX( k, j, tseInts )];
+                double* aij0 = &coords[VINDEX( 0, j, i )];
+                double* aijg = &coords[VINDEX( gammaInts, j, i )];
 
-                coords[ VINDEX( i, j, k ) ] = ( am1 * ai0k[ 0 ] + ada * aiak[ 0 ] + tm1 * a0jk[ 0 ] + tse * atjk[ 0 ] +
-                                                gm1 * aij0[ 0 ] + gamma * aijg[ 0 ] ) /
-                                                  2.0 -
-                                              cX / 2.0;
+                coords[VINDEX( i, j, k )] = ( am1 * ai0k[0] + ada * aiak[0] + tm1 * a0jk[0] + tse * atjk[0] +
+                                              gm1 * aij0[0] + gamma * aijg[0] ) /
+                                                2.0 -
+                                            cX / 2.0;
 
-                coords[ nelem + 1 + VINDEX( i, j, k ) ] =
-                    ( am1 * ai0k[ nelem + 1 ] + ada * aiak[ nelem + 1 ] + tm1 * a0jk[ nelem + 1 ] +
-                      tse * atjk[ nelem + 1 ] + gm1 * aij0[ nelem + 1 ] + gamma * aijg[ nelem + 1 ] ) /
+                coords[nelem + 1 + VINDEX( i, j, k )] =
+                    ( am1 * ai0k[nelem + 1] + ada * aiak[nelem + 1] + tm1 * a0jk[nelem + 1] + tse * atjk[nelem + 1] +
+                      gm1 * aij0[nelem + 1] + gamma * aijg[nelem + 1] ) /
                         2.0 -
                     cY / 2.0;
 
-                coords[ 2 * ( nelem + 1 ) + VINDEX( i, j, k ) ] =
-                    ( am1 * ai0k[ 2 * ( nelem + 1 ) ] + ada * aiak[ 2 * ( nelem + 1 ) ] +
-                      tm1 * a0jk[ 2 * ( nelem + 1 ) ] + tse * atjk[ 2 * ( nelem + 1 ) ] +
-                      gm1 * aij0[ 2 * ( nelem + 1 ) ] + gamma * aijg[ 2 * ( nelem + 1 ) ] ) /
+                coords[2 * ( nelem + 1 ) + VINDEX( i, j, k )] =
+                    ( am1 * ai0k[2 * ( nelem + 1 )] + ada * aiak[2 * ( nelem + 1 )] + tm1 * a0jk[2 * ( nelem + 1 )] +
+                      tse * atjk[2 * ( nelem + 1 )] + gm1 * aij0[2 * ( nelem + 1 )] +
+                      gamma * aijg[2 * ( nelem + 1 )] ) /
                         2.0 -
                     cZ / 2.0;
             }
@@ -608,9 +608,9 @@ void build_coords( const int nelem, double*& coords )
             {
                 idx = VINDEX( i, j, k );
                 // blocked coordinate ordering
-                coords[ idx ] = i * scale1;
-                coords[ tot_numv + idx ] = j * scale2;
-                coords[ 2 * tot_numv + idx ] = k * scale3;
+                coords[idx]                = i * scale1;
+                coords[tot_numv + idx]     = j * scale2;
+                coords[2 * tot_numv + idx] = k * scale3;
             }
         }
     }
@@ -624,27 +624,27 @@ void build_connect( const int nelem, const int vstart, int*& connect )
 {
     // allocate the memory
     int nume_tot = nelem * nelem * nelem;
-    connect = (int*)malloc( 8 * nume_tot * sizeof( int ) );
+    connect      = (int*)malloc( 8 * nume_tot * sizeof( int ) );
 
     int vijk;
-    int numv = nelem + 1;
+    int numv    = nelem + 1;
     int numv_sq = numv * numv;
-    int idx = 0;
+    int idx     = 0;
     for( int i = 0; i < nelem; i++ )
     {
         for( int j = 0; j < nelem; j++ )
         {
             for( int k = 0; k < nelem; k++ )
             {
-                vijk = vstart + VINDEX( i, j, k );
-                connect[ idx++ ] = vijk;
-                connect[ idx++ ] = vijk + 1;
-                connect[ idx++ ] = vijk + 1 + numv;
-                connect[ idx++ ] = vijk + numv;
-                connect[ idx++ ] = vijk + numv * numv;
-                connect[ idx++ ] = vijk + 1 + numv * numv;
-                connect[ idx++ ] = vijk + 1 + numv + numv * numv;
-                connect[ idx++ ] = vijk + numv + numv * numv;
+                vijk           = vstart + VINDEX( i, j, k );
+                connect[idx++] = vijk;
+                connect[idx++] = vijk + 1;
+                connect[idx++] = vijk + 1 + numv;
+                connect[idx++] = vijk + numv;
+                connect[idx++] = vijk + numv * numv;
+                connect[idx++] = vijk + 1 + numv * numv;
+                connect[idx++] = vijk + 1 + numv + numv * numv;
+                connect[idx++] = vijk + numv + numv * numv;
                 assert( i <= numv * numv * numv );
             }
         }

@@ -14,7 +14,7 @@ const int NUM_XSCT = 20000;
 
 using namespace moab;
 
-static void usage( )
+static void usage()
 {
     std::cerr << "obb_time [-r <int>] [-i <int>] <filename>" << std::endl
               << "  -r - Specify total rays to fire." << std::endl
@@ -31,15 +31,15 @@ static void usage( )
 void generate_ray( const CartVect& sphere_center, double sphere_radius, CartVect& point, CartVect& dir )
 {
     const int H = RAND_MAX / 2;
-    point[ 0 ] = (double)rand( ) / H - 1;
-    point[ 1 ] = (double)rand( ) / H - 1;
-    point[ 2 ] = (double)rand( ) / H - 1;
+    point[0]    = (double)rand() / H - 1;
+    point[1]    = (double)rand() / H - 1;
+    point[2]    = (double)rand() / H - 1;
     point *= sphere_radius;
 
-    dir[ 0 ] = (double)rand( ) * -point[ 0 ];
-    dir[ 1 ] = (double)rand( ) * -point[ 1 ];
-    dir[ 2 ] = (double)rand( ) * -point[ 2 ];
-    dir.normalize( );
+    dir[0] = (double)rand() * -point[0];
+    dir[1] = (double)rand() * -point[1];
+    dir[2] = (double)rand() * -point[2];
+    dir.normalize();
 
     point += sphere_center;
 }
@@ -58,20 +58,20 @@ ErrorCode read_tree( Interface* instance, const char* filename, EntityHandle& tr
 }
 
 // global variables for CLI options
-int         num_rays = NUM_RAYS;
-int         num_xsct = NUM_XSCT;
+int num_rays         = NUM_RAYS;
+int num_xsct         = NUM_XSCT;
 const char* filename = 0;
-bool        do_sets = false;
-bool        do_trv_stats = false;
+bool do_sets         = false;
+bool do_trv_stats    = false;
 
 // global to make accessable to signal handler
-int     rays = 0, xsct = 0, gen = 0;
+int rays = 0, xsct = 0, gen = 0;
 clock_t ttimer;
 
 extern "C" {
 void signal_handler( int )
 {
-    ttimer = clock( ) - ttimer;
+    ttimer = clock() - ttimer;
     std::cout << filename << ":" << std::endl
               << rays << " of " << num_rays << " ray fires done" << std::endl
               << xsct << " of " << num_xsct << " intersecting fires" << std::endl
@@ -87,68 +87,68 @@ int main( int argc, char* argv[] )
 
     for( int i = 1; i < argc; ++i )
     {
-        if( !strcmp( argv[ i ], "-r" ) )
+        if( !strcmp( argv[i], "-r" ) )
         {
             ++i;
-            if( i == argc || !argv[ i ][ 0 ] )
+            if( i == argc || !argv[i][0] )
             {
                 std::cerr << "Expected value following '-r'" << std::endl;
-                usage( );
+                usage();
             }
             char* end;
-            long  t1 = strtol( argv[ i ], &end, 0 );
+            long t1  = strtol( argv[i], &end, 0 );
             num_rays = (int)t1;
             if( *end || t1 < 0 || num_rays != t1 )
             {
                 std::cerr << "Expected positive integer following '-r'" << std::endl;
-                usage( );
+                usage();
             }
         }
-        else if( !strcmp( argv[ i ], "-i" ) )
+        else if( !strcmp( argv[i], "-i" ) )
         {
             ++i;
-            if( i == argc || !argv[ i ][ 0 ] )
+            if( i == argc || !argv[i][0] )
             {
                 std::cerr << "Expected value following '-i'" << std::endl;
-                usage( );
+                usage();
             }
             char* end;
-            long  t1 = strtol( argv[ i ], &end, 0 );
+            long t1  = strtol( argv[i], &end, 0 );
             num_xsct = (int)t1;
             if( *end || t1 < 0 || num_xsct != t1 )
             {
                 std::cerr << "Expected positive integer following '-i'" << std::endl;
-                usage( );
+                usage();
             }
         }
-        else if( !strcmp( argv[ i ], "-s" ) )
+        else if( !strcmp( argv[i], "-s" ) )
         {
             do_sets = true;
         }
-        else if( !strcmp( argv[ i ], "-p" ) )
+        else if( !strcmp( argv[i], "-p" ) )
         {
             do_trv_stats = true;
         }
         else if( filename )
         {
             std::cerr << "Invalid options or multiple file names specified." << std::endl;
-            usage( );
+            usage();
         }
         else
         {
-            filename = argv[ i ];
+            filename = argv[i];
         }
     }
     if( !filename )
     {
         std::cerr << "No file name specified." << std::endl;
-        usage( );
+        usage();
     }
 
-    Core         instance;
-    Interface*   iface = &instance;
+    Core instance;
+    Interface* iface = &instance;
     EntityHandle root;
-    ErrorCode    rval = read_tree( iface, filename, root );
+    ErrorCode rval = read_tree( iface, filename, root );
     if( MB_SUCCESS != rval )
     {
         std::cerr << "Failed to read \"" << filename << '"' << std::endl;
@@ -156,7 +156,7 @@ int main( int argc, char* argv[] )
     }
 
     OrientedBoxTreeTool tool( iface );
-    OrientedBox         box;
+    OrientedBox box;
     rval = tool.box( root, box );
     if( MB_SUCCESS != rval )
     {
@@ -167,15 +167,15 @@ int main( int argc, char* argv[] )
     OrientedBoxTreeTool::TrvStats* stats = NULL;
     if( do_trv_stats ) { stats = new OrientedBoxTreeTool::TrvStats; }
 
-    const unsigned              cached = 1000;
-    std::vector< double >       intersections;
+    const unsigned cached = 1000;
+    std::vector< double > intersections;
     std::vector< EntityHandle > sets, facets;
-    CartVect                    point, dir;
-    std::vector< CartVect >     randrays;
+    CartVect point, dir;
+    std::vector< CartVect > randrays;
     randrays.reserve( cached );
     int cached_idx = 0;
 
-    ttimer = clock( );
+    ttimer = clock();
     for( ;; )
     {
         if( !num_rays )
@@ -190,33 +190,33 @@ int main( int argc, char* argv[] )
             break;
 
         ++rays;
-        if( randrays.size( ) < cached )
+        if( randrays.size() < cached )
         {
-            generate_ray( box.center, box.outer_radius( ), point, dir );
+            generate_ray( box.center, box.outer_radius(), point, dir );
             ++gen;
         }
         else
         {
-            point = randrays[ cached_idx++ ];
-            dir = randrays[ cached_idx++ ];
-            cached_idx = cached_idx % randrays.size( );
+            point      = randrays[cached_idx++];
+            dir        = randrays[cached_idx++];
+            cached_idx = cached_idx % randrays.size();
         }
 
-        intersections.clear( );
+        intersections.clear();
         if( do_sets )
         {
-            sets.clear( );
-            facets.clear( );
+            sets.clear();
+            facets.clear();
 
             OrientedBoxTreeTool::IntersectSearchWindow search_win;
-            OrientedBoxTreeTool::IntRegCtxt            int_reg_ctxt;
-            rval = tool.ray_intersect_sets( intersections, sets, facets, root, 1e-6, point.array( ), dir.array( ),
+            OrientedBoxTreeTool::IntRegCtxt int_reg_ctxt;
+            rval = tool.ray_intersect_sets( intersections, sets, facets, root, 1e-6, point.array(), dir.array(),
                                             search_win, int_reg_ctxt, stats );
         }
         else
         {
-            rval = tool.ray_intersect_triangles( intersections, facets, root, 1e-6, point.array( ), dir.array( ), 0,
-                                                 stats );
+            rval =
+                tool.ray_intersect_triangles( intersections, facets, root, 1e-6, point.array(), dir.array(), 0, stats );
         }
         if( MB_SUCCESS != rval )
         {
@@ -224,16 +224,16 @@ int main( int argc, char* argv[] )
             return 4;
         }
 
-        if( !intersections.empty( ) ) { ++xsct; }
+        if( !intersections.empty() ) { ++xsct; }
 
-        if( randrays.size( ) < cached && ( !intersections.empty( ) || !num_xsct || xsct >= num_xsct ) )
+        if( randrays.size() < cached && ( !intersections.empty() || !num_xsct || xsct >= num_xsct ) )
         {
             randrays.push_back( point );
             randrays.push_back( dir );
         }
     }
 
-    ttimer = clock( ) - ttimer;
+    ttimer = clock() - ttimer;
     std::cout << rays << " ray fires done" << std::endl
               << gen << " unique rays used" << std::endl
               << xsct << " intersecting fires" << std::endl

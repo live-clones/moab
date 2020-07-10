@@ -36,7 +36,7 @@
 namespace MBMesquite
 {
 
-ElementQM::~ElementQM( ) {}
+ElementQM::~ElementQM() {}
 
 void ElementQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err )
 {
@@ -46,24 +46,24 @@ void ElementQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, 
 void ElementQM::get_element_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
                                          MsqError& /*err*/ )
 {
-    size_t num_elem = pd.num_elements( );
+    size_t num_elem = pd.num_elements();
     if( !free_vertices_only )
     {
         handles.resize( num_elem );
         for( size_t i = 0; i < num_elem; ++i )
-            handles[ i ] = i;
+            handles[i] = i;
         return;
     }
 
-    handles.clear( );
+    handles.clear();
     for( size_t i = 0; i < num_elem; ++i )
     {
         // check if element has any free vertices
         MsqMeshEntity& elem = pd.element_by_index( i );
-        unsigned       num_vtx = elem.node_count( );
-        size_t*        vtx = elem.get_vertex_index_array( );
-        unsigned       j;
-        for( j = 0; j < num_vtx && vtx[ j ] >= pd.num_free_vertices( ); ++j )
+        unsigned num_vtx    = elem.node_count();
+        size_t* vtx         = elem.get_vertex_index_array();
+        unsigned j;
+        for( j = 0; j < num_vtx && vtx[j] >= pd.num_free_vertices(); ++j )
             ;
         if( j < num_vtx ) handles.push_back( i );
     }
@@ -73,11 +73,11 @@ bool ElementQM::evaluate_with_indices( PatchData& pd, size_t handle, double& val
                                        MsqError& err )
 {
     const MsqMeshEntity& elem = pd.element_by_index( handle );
-    const size_t*        vtx = elem.get_vertex_index_array( );
-    const unsigned       n = elem.vertex_count( );
-    indices.clear( );
+    const size_t* vtx         = elem.get_vertex_index_array();
+    const unsigned n          = elem.vertex_count();
+    indices.clear();
     for( unsigned i = 0; i < n; ++i )
-        if( vtx[ i ] < pd.num_free_vertices( ) ) indices.push_back( vtx[ i ] );
+        if( vtx[i] < pd.num_free_vertices() ) indices.push_back( vtx[i] );
 
     bool rval = evaluate( pd, handle, value, err );
     return !MSQ_CHKERR( err ) && rval;

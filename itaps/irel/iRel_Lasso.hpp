@@ -3,7 +3,7 @@
 
 #include "iRel.h"
 
-#define RETURN( CODE ) ERROR( ( CODE ), "" )
+#define RETURN( CODE )  ERROR( ( CODE ), "" )
 #define RETURNR( CODE ) ERRORR( ( CODE ), "" )
 
 #define ERROR( CODE, MSG )                                  \
@@ -29,7 +29,7 @@
         if( err != iBase_SUCCESS ) return err; \
     } while( false )
 
-#define CHK_PAIR( )                                                              \
+#define CHK_PAIR()                                                               \
     do                                                                           \
     {                                                                            \
         if( NULL == pair ) { ERROR( iBase_FAILURE, "Invalid relation pair." ); } \

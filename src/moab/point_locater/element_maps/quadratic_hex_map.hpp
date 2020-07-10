@@ -47,7 +47,8 @@ namespace element_utility
 
     }  // namespace
 
-    template< typename _Matrix > class Quadratic_hex_map
+    template < typename _Matrix >
+    class Quadratic_hex_map
     {
       public:
         typedef _Matrix Matrix;
@@ -57,18 +58,18 @@ namespace element_utility
 
       public:
         // Constructor
-        Quadratic_hex_map( ) {}
+        Quadratic_hex_map() {}
         // Copy constructor
         Quadratic_hex_map( const Self& f ) {}
 
       public:
         // Natural coordinates
-        template< typename Moab, typename Entity_handle, typename Points, typename Point >
-        std::pair< bool, Point > operator( )( const Moab& /* moab */, const Entity_handle& /* h */, const Points& v,
-                                              const Point& p, const double tol = 1.e-6 ) const
+        template < typename Moab, typename Entity_handle, typename Points, typename Point >
+        std::pair< bool, Point > operator()( const Moab& /* moab */, const Entity_handle& /* h */, const Points& v,
+                                             const Point& p, const double tol = 1.e-6 ) const
         {
             Point result( 3, 0.0 );
-            bool  point_found = solve_inverse( p, result, v, tol ) && is_contained( result, tol );
+            bool point_found = solve_inverse( p, result, v, tol ) && is_contained( result, tol );
             return std::make_pair( point_found, result );
         }
 
@@ -78,43 +79,43 @@ namespace element_utility
         // This should unroll..
         inline double reference_points( const std::size_t& i, const std::size_t& j ) const
         {
-            const double rpts[ 27 ][ 3 ] = {
-                { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 },  // reference_points nodes: 0-7
-                { -1, 1, -1 },  // mid-edge nodes: 8-19
-                { -1, -1, 1 },  // center-face nodes 20-25  center node  26
-                { 1, -1, 1 },  //
-                { 1, 1, 1 },    { -1, 1, 1 },  //                    4   ----- 19   -----  7
-                { 0, -1, -1 },  //                .   |                 .   |
-                { 1, 0, -1 },  //            16         25         18      |
-                { 0, 1, -1 },  //         .          |          .          |
-                { -1, 0, -1 },  //      5   ----- 17   -----  6             |
-                { -1, -1, 0 },  //      |            12       | 23         15
-                { 1, -1, 0 },  //      |                     |             |
-                { 1, 1, 0 },  //      |     20      |  26   |     22      |
-                { -1, 1, 0 },  //      |                     |             |
-                { 0, -1, 1 },  //     13         21  |      14             |
-                { 1, 0, 1 },  //      |             0   ----- 11   -----  3
-                { 0, 1, 1 },  //      |         .           |         .
-                { -1, 0, 1 },  //      |      8         24   |     10
-                { 0, -1, 0 },  //      |  .                  |  .
-                { 1, 0, 0 },  //      1   -----  9   -----  2
-                { 0, 1, 0 },  //
-                { -1, 0, 0 },   { 0, 0, -1 },  { 0, 0, 1 },  { 0, 0, 0 } };
-            return rpts[ i ][ j ];
+            const double rpts[27][3] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 },  // reference_points nodes: 0-7
+                                         { -1, 1, -1 },                                // mid-edge nodes: 8-19
+                                         { -1, -1, 1 },                 // center-face nodes 20-25  center node  26
+                                         { 1, -1, 1 },                  //
+                                         { 1, 1, 1 },    { -1, 1, 1 },  //                    4   ----- 19   -----  7
+                                         { 0, -1, -1 },                 //                .   |                 .   |
+                                         { 1, 0, -1 },                  //            16         25         18      |
+                                         { 0, 1, -1 },                  //         .          |          .          |
+                                         { -1, 0, -1 },                 //      5   ----- 17   -----  6             |
+                                         { -1, -1, 0 },                 //      |            12       | 23         15
+                                         { 1, -1, 0 },                  //      |                     |             |
+                                         { 1, 1, 0 },                   //      |     20      |  26   |     22      |
+                                         { -1, 1, 0 },                  //      |                     |             |
+                                         { 0, -1, 1 },                  //     13         21  |      14             |
+                                         { 1, 0, 1 },                   //      |             0   ----- 11   -----  3
+                                         { 0, 1, 1 },                   //      |         .           |         .
+                                         { -1, 0, 1 },                  //      |      8         24   |     10
+                                         { 0, -1, 0 },                  //      |  .                  |  .
+                                         { 1, 0, 0 },                   //      1   -----  9   -----  2
+                                         { 0, 1, 0 },                   //
+                                         { -1, 0, 0 },   { 0, 0, -1 },  { 0, 0, 1 },  { 0, 0, 0 } };
+            return rpts[i][j];
         }
 
-        template< typename Point > bool is_contained( const Point& p, const double tol ) const
+        template < typename Point >
+        bool is_contained( const Point& p, const double tol ) const
         {
             // just look at the box+tol here
-            return ( p[ 0 ] >= -1. - tol ) && ( p[ 0 ] <= 1. + tol ) && ( p[ 1 ] >= -1. - tol ) &&
-                   ( p[ 1 ] <= 1. + tol ) && ( p[ 2 ] >= -1. - tol ) && ( p[ 2 ] <= 1. + tol );
+            return ( p[0] >= -1. - tol ) && ( p[0] <= 1. + tol ) && ( p[1] >= -1. - tol ) && ( p[1] <= 1. + tol ) &&
+                   ( p[2] >= -1. - tol ) && ( p[2] <= 1. + tol );
         }
 
-        template< typename Point, typename Points >
+        template < typename Point, typename Points >
         bool solve_inverse( const Point& x, Point& xi, const Points& points, const double tol = 1.e-6 ) const
         {
             const double error_tol_sqr = tol * tol;
-            Point        delta( 3, 0.0 );
+            Point delta( 3, 0.0 );
             xi = delta;
             evaluate( xi, points, delta );
             vec_subtract( delta, x );
@@ -122,11 +123,11 @@ namespace element_utility
 #ifdef QUADRATIC_HEX_DEBUG
             std::stringstream ss;
             ss << "Point: ";
-            ss << x[ 0 ] << ", " << x[ 1 ] << ", " << x[ 2 ] << std::endl;
+            ss << x[0] << ", " << x[1] << ", " << x[2] << std::endl;
             ss << "Hex: ";
             for( int i = 0; i < 8; ++i )
             {
-                ss << points[ i ][ 0 ] << ", " << points[ i ][ 1 ] << ", " << points[ i ][ 2 ] << std::endl;
+                ss << points[i][0] << ", " << points[i][1] << ", " << points[i][2] << std::endl;
             }
             ss << std::endl;
 #endif
@@ -134,7 +135,7 @@ namespace element_utility
             {
 #ifdef QUADRATIC_HEX_DEBUG
                 ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) ) << " Iterate: ";
-                ss << xi[ 0 ] << ", " << xi[ 1 ] << ", " << xi[ 2 ] << std::endl;
+                ss << xi[0] << ", " << xi[1] << ", " << xi[2] << std::endl;
 #endif
                 if( ++num_iterations >= 5 ) { return false; }
                 Matrix J;
@@ -143,10 +144,10 @@ namespace element_utility
                 if( fabs( det ) < 1.e-10 )
                 {
 #ifdef QUADRATIC_HEX_DEBUG
-                    std::cerr << ss.str( );
+                    std::cerr << ss.str();
 #endif
 #ifndef QUADRATIC_HEX_DEBUG
-                    std::cerr << x[ 0 ] << ", " << x[ 1 ] << ", " << x[ 2 ] << std::endl;
+                    std::cerr << x[0] << ", " << x[1] << ", " << x[2] << std::endl;
 #endif
                     std::cerr << "inverse solve failure: det: " << det << std::endl;
                     exit( -1 );
@@ -158,63 +159,62 @@ namespace element_utility
             return true;
         }
 
-        template< typename Point, typename Points >
+        template < typename Point, typename Points >
         Point& evaluate( const Point& p, const Points& points, Point& f ) const
         {
             typedef typename Points::value_type Vector;
-            Vector                              result;
+            Vector result;
             for( int i = 0; i < 3; ++i )
             {
-                result[ i ] = 0;
+                result[i] = 0;
             }
             for( unsigned i = 0; i < 27; ++i )
             {
-                const double sh = SH( reference_points( i, 0 ), p[ 0 ] ) * SH( reference_points( i, 1 ), p[ 1 ] ) *
-                                  SH( reference_points( i, 2 ), p[ 2 ] );
-                result += sh * points[ i ];
+                const double sh = SH( reference_points( i, 0 ), p[0] ) * SH( reference_points( i, 1 ), p[1] ) *
+                                  SH( reference_points( i, 2 ), p[2] );
+                result += sh * points[i];
             }
             for( int i = 0; i < 3; ++i )
             {
-                f[ i ] = result[ i ];
+                f[i] = result[i];
             }
             return f;
         }
-        template< typename Point, typename Field >
+        template < typename Point, typename Field >
         double evaluate_scalar_field( const Point& p, const Field& field ) const
         {
             double x = 0.0;
             for( int i = 0; i < 27; i++ )
             {
-                const double sh = SH( reference_points( i, 0 ), p[ 0 ] ) * SH( reference_points( i, 1 ), p[ 1 ] ) *
-                                  SH( reference_points( i, 2 ), p[ 2 ] );
-                x += sh * field[ i ];
+                const double sh = SH( reference_points( i, 0 ), p[0] ) * SH( reference_points( i, 1 ), p[1] ) *
+                                  SH( reference_points( i, 2 ), p[2] );
+                x += sh * field[i];
             }
             return x;
         }
-        template< typename Field, typename Points >
+        template < typename Field, typename Points >
         double integrate_scalar_field( const Points& p, const Field& field_values ) const
         {
             // TODO: gaussian integration , probably 2x2x2
             return 0.;
         }
 
-        template< typename Point, typename Points >
+        template < typename Point, typename Points >
         Matrix& jacobian( const Point& p, const Points& /* points */, Matrix& J ) const
         {
             J = Matrix( 0.0 );
             for( int i = 0; i < 27; i++ )
             {
-                const double sh[ 3 ] = { SH( reference_points( i, 0 ), p[ 0 ] ), SH( reference_points( i, 1 ), p[ 1 ] ),
-                                         SH( reference_points( i, 2 ), p[ 2 ] ) };
-                const double dsh[ 3 ] = { DSH( reference_points( i, 0 ), p[ 0 ] ),
-                                          DSH( reference_points( i, 1 ), p[ 1 ] ),
-                                          DSH( reference_points( i, 2 ), p[ 2 ] ) };
+                const double sh[3]  = { SH( reference_points( i, 0 ), p[0] ), SH( reference_points( i, 1 ), p[1] ),
+                                       SH( reference_points( i, 2 ), p[2] ) };
+                const double dsh[3] = { DSH( reference_points( i, 0 ), p[0] ), DSH( reference_points( i, 1 ), p[1] ),
+                                        DSH( reference_points( i, 2 ), p[2] ) };
                 for( int j = 0; j < 3; j++ )
                 {
                     // dxj/dr first column
-                    J( j, 0 ) += dsh[ 0 ] * sh[ 1 ] * sh[ 2 ] * reference_points( i, j );
-                    J( j, 1 ) += sh[ 0 ] * dsh[ 1 ] * sh[ 2 ] * reference_points( i, j );  // dxj/ds
-                    J( j, 2 ) += sh[ 0 ] * sh[ 1 ] * dsh[ 2 ] * reference_points( i, j );  // dxj/dt
+                    J( j, 0 ) += dsh[0] * sh[1] * sh[2] * reference_points( i, j );
+                    J( j, 1 ) += sh[0] * dsh[1] * sh[2] * reference_points( i, j );  // dxj/ds
+                    J( j, 2 ) += sh[0] * sh[1] * dsh[2] * reference_points( i, j );  // dxj/dt
                 }
             }
             return J;

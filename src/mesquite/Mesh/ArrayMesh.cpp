@@ -44,20 +44,20 @@ class IndexIterator : public EntityIterator
 {
   public:
     IndexIterator( size_t pStart, size_t pEnd ) : mStart( pStart ), mEnd( pEnd ), mCurrent( pStart ) {}
-    virtual ~IndexIterator( ) {}
-    virtual void restart( )
+    virtual ~IndexIterator() {}
+    virtual void restart()
     {
         mCurrent = mStart;
     }
-    virtual Mesh::EntityHandle operator*( ) const
+    virtual Mesh::EntityHandle operator*() const
     {
         return (Mesh::EntityHandle)mCurrent;
     }
-    virtual void operator++( )
+    virtual void operator++()
     {
         ++mCurrent;
     }
-    virtual bool is_at_end( ) const
+    virtual bool is_at_end() const
     {
         return mEnd - mCurrent <= 1;
     }
@@ -66,7 +66,7 @@ class IndexIterator : public EntityIterator
     size_t mStart, mEnd, mCurrent;
 };
 
-ArrayMesh::ArrayMesh( )
+ArrayMesh::ArrayMesh()
     : mDimension( 0 ), vertexCount( 0 ), coordArray( 0 ), fixedFlags( 0 ), slavedFlags( 0 ), vertexByteArray( 0 ),
       elementCount( 0 ), connArray( 0 ), connOffsets( 0 ), allocConnOffsets( 0 ), elementType( MIXED ),
       elementTypes( 0 ), nodesPerElement( 0 ), oneBasedArrays( false ), vertexAdjacencyList( 0 ),
@@ -80,7 +80,7 @@ ArrayMesh::ArrayMesh( int coords_per_vertex, unsigned long num_vertices, double*
                       unsigned nodes_per_element, const int* vertex_slaved_flags )
     : mDimension( coords_per_vertex ), vertexCount( num_vertices ), coordArray( interleaved_vertex_coords ),
       fixedFlags( vertex_fixed_flags ), slavedFlags( vertex_slaved_flags ),
-      vertexByteArray( new unsigned char[ num_vertices + one_based_conn_indices ] ), elementCount( num_elements ),
+      vertexByteArray( new unsigned char[num_vertices + one_based_conn_indices] ), elementCount( num_elements ),
       connArray( element_connectivity_array ), connOffsets( 0 ), allocConnOffsets( 0 ), elementType( element_type ),
       elementTypes( 0 ), nodesPerElement( nodes_per_element ), oneBasedArrays( one_based_conn_indices ),
       vertexAdjacencyList( 0 ), vertexAdjacencyOffsets( 0 ), tagList( 0 )
@@ -93,7 +93,7 @@ ArrayMesh::ArrayMesh( int coords_per_vertex, unsigned long num_vertices, double*
 
     if( nodesPerElement < 2 ) nodesPerElement = TopologyInfo::corners( element_type );
 
-    assert( valid( ) );
+    assert( valid() );
     memset( vertexByteArray, 0, num_vertices + one_based_conn_indices );
 }
 
@@ -104,7 +104,7 @@ ArrayMesh::ArrayMesh( int coords_per_vertex, unsigned long num_vertices, double*
                       const int* vertex_slaved_flags )
     : mDimension( coords_per_vertex ), vertexCount( num_vertices ), coordArray( interleaved_vertex_coords ),
       fixedFlags( vertex_fixed_flags ), slavedFlags( vertex_slaved_flags ),
-      vertexByteArray( new unsigned char[ num_vertices + one_based_conn_indices ] ), elementCount( num_elements ),
+      vertexByteArray( new unsigned char[num_vertices + one_based_conn_indices] ), elementCount( num_elements ),
       connArray( element_connectivity_array ), connOffsets( element_connectivity_offsets ), allocConnOffsets( 0 ),
       elementType( MIXED ), elementTypes( element_types ), nodesPerElement( 0 ),
       oneBasedArrays( one_based_conn_indices ), vertexAdjacencyList( 0 ), vertexAdjacencyOffsets( 0 ), tagList( 0 )
@@ -118,22 +118,22 @@ ArrayMesh::ArrayMesh( int coords_per_vertex, unsigned long num_vertices, double*
 
     if( !element_connectivity_offsets )
     {
-        connOffsets = allocConnOffsets = new unsigned long[ num_elements + 1 ];
-        allocConnOffsets[ 0 ] = 0;
+        connOffsets = allocConnOffsets = new unsigned long[num_elements + 1];
+        allocConnOffsets[0]            = 0;
         for( unsigned long i = 1; i <= num_elements; ++i )
-            allocConnOffsets[ i ] = allocConnOffsets[ i - 1 ] + TopologyInfo::corners( elementTypes[ i - 1 ] );
+            allocConnOffsets[i] = allocConnOffsets[i - 1] + TopologyInfo::corners( elementTypes[i - 1] );
     }
 
-    assert( valid( ) );
+    assert( valid() );
     memset( vertexByteArray, 0, num_vertices + one_based_conn_indices );
 }
 
-bool ArrayMesh::valid( ) const
+bool ArrayMesh::valid() const
 {
     unsigned long off = oneBasedArrays ? 1 : 0;
     for( unsigned long i = off; i < vertexCount + off; ++i )
     {
-        if( fixedFlags[ i ] != 0 && fixedFlags[ i ] != 1 )
+        if( fixedFlags[i] != 0 && fixedFlags[i] != 1 )
         {
             std::cerr << "Invalid vertex fixed flag at index " << i << std::endl;
             return false;
@@ -142,7 +142,7 @@ bool ArrayMesh::valid( ) const
 
     for( unsigned long i = 0; i < elementCount * nodesPerElement; ++i )
     {
-        unsigned long j = connArray[ i ] - oneBasedArrays;
+        unsigned long j = connArray[i] - oneBasedArrays;
         if( j >= vertexCount )
         {
             std::cerr << "Invalid connectivity index at index " << j << "(element " << j / elementCount << " node "
@@ -154,7 +154,7 @@ bool ArrayMesh::valid( ) const
     return true;
 }
 
-void ArrayMesh::clear_mesh( )
+void ArrayMesh::clear_mesh()
 {
     delete[] vertexByteArray;
     delete[] vertexAdjacencyList;
@@ -163,7 +163,7 @@ void ArrayMesh::clear_mesh( )
     while( tagList )
     {
         Tag* dead = tagList;
-        tagList = tagList->next;
+        tagList   = tagList->next;
         delete[] dead->name;
         delete[] dead->defaultValue;
         if( dead->owned )
@@ -173,19 +173,19 @@ void ArrayMesh::clear_mesh( )
         }
         delete dead;
     }
-    mDimension = 0;
-    vertexCount = 0;
-    coordArray = 0;
-    connOffsets = 0;
-    allocConnOffsets = 0;
-    fixedFlags = 0;
-    vertexByteArray = 0;
-    elementCount = 0;
-    elementType = MIXED;
-    elementTypes = 0;
-    nodesPerElement = 0;
-    oneBasedArrays = false;
-    vertexAdjacencyList = 0;
+    mDimension             = 0;
+    vertexCount            = 0;
+    coordArray             = 0;
+    connOffsets            = 0;
+    allocConnOffsets       = 0;
+    fixedFlags             = 0;
+    vertexByteArray        = 0;
+    elementCount           = 0;
+    elementType            = MIXED;
+    elementTypes           = 0;
+    nodesPerElement        = 0;
+    oneBasedArrays         = false;
+    vertexAdjacencyList    = 0;
     vertexAdjacencyOffsets = 0;
 }
 
@@ -194,15 +194,15 @@ void ArrayMesh::set_mesh( int coords_per_vertex, unsigned long num_vertices, dou
                           const unsigned long* element_connectivity_array, bool one_based_conn_indices,
                           unsigned nodes_per_element, const int* vertex_slaved_flags )
 {
-    clear_mesh( );
-    mDimension = coords_per_vertex;
-    vertexCount = num_vertices;
-    coordArray = interleaved_vertex_coords;
-    fixedFlags = vertex_fixed_flags;
-    slavedFlags = vertex_slaved_flags;
-    elementCount = num_elements;
-    connArray = element_connectivity_array;
-    elementType = element_type;
+    clear_mesh();
+    mDimension     = coords_per_vertex;
+    vertexCount    = num_vertices;
+    coordArray     = interleaved_vertex_coords;
+    fixedFlags     = vertex_fixed_flags;
+    slavedFlags    = vertex_slaved_flags;
+    elementCount   = num_elements;
+    connArray      = element_connectivity_array;
+    elementType    = element_type;
     oneBasedArrays = one_based_conn_indices;
 
     if( oneBasedArrays )
@@ -216,14 +216,14 @@ void ArrayMesh::set_mesh( int coords_per_vertex, unsigned long num_vertices, dou
     else
         nodesPerElement = nodes_per_element;
 
-    vertexByteArray = new unsigned char[ num_vertices + one_based_conn_indices ];
-    assert( valid( ) );
+    vertexByteArray = new unsigned char[num_vertices + one_based_conn_indices];
+    assert( valid() );
     memset( vertexByteArray, 0, num_vertices + one_based_conn_indices );
 }
 
-ArrayMesh::~ArrayMesh( )
+ArrayMesh::~ArrayMesh()
 {
-    clear_mesh( );
+    clear_mesh();
 }
 
 inline const unsigned long* ArrayMesh::elem_verts( size_t e, int& n ) const
@@ -231,8 +231,8 @@ inline const unsigned long* ArrayMesh::elem_verts( size_t e, int& n ) const
     assert( e < elementCount );
     if( connOffsets )
     {
-        n = connOffsets[ e + 1 ] - connOffsets[ e ];
-        return connArray + connOffsets[ e ];
+        n = connOffsets[e + 1] - connOffsets[e];
+        return connArray + connOffsets[e];
     }
     else
     {
@@ -250,14 +250,14 @@ void ArrayMesh::get_all_elements( std::vector< ElementHandle >& elements, MsqErr
 {
     elements.resize( elementCount );
     for( unsigned long i = 0; i < elementCount; ++i )
-        elements[ i ] = (Mesh::ElementHandle)i;
+        elements[i] = (Mesh::ElementHandle)i;
 }
 
 void ArrayMesh::get_all_vertices( std::vector< VertexHandle >& vertices, MsqError& )
 {
     vertices.resize( vertexCount );
     for( unsigned long i = 0; i < vertexCount; ++i )
-        vertices[ i ] = ( Mesh::VertexHandle )( i + oneBasedArrays );
+        vertices[i] = ( Mesh::VertexHandle )( i + oneBasedArrays );
 }
 
 VertexIterator* ArrayMesh::vertex_iterator( MsqError& )
@@ -277,8 +277,8 @@ void ArrayMesh::vertices_get_fixed_flag( const VertexHandle vert_array[], std::v
     const size_t* indices = (const size_t*)vert_array;
     for( size_t i = 0; i < num_vtx; ++i )
     {
-        assert( indices[ i ] < vertexCount );
-        fixed_flag_array[ i ] = !!fixedFlags[ indices[ i ] ];
+        assert( indices[i] < vertexCount );
+        fixed_flag_array[i] = !!fixedFlags[indices[i]];
     }
 }
 
@@ -296,8 +296,8 @@ void ArrayMesh::vertices_get_slaved_flag( const VertexHandle* vert_array, std::v
     const size_t* indices = (const size_t*)vert_array;
     for( size_t i = 0; i < num_vtx; ++i )
     {
-        assert( indices[ i ] < vertexCount );
-        slaved_flags[ i ] = !!slavedFlags[ indices[ i ] ];
+        assert( indices[i] < vertexCount );
+        slaved_flags[i] = !!slavedFlags[indices[i]];
     }
 }
 
@@ -308,14 +308,14 @@ void ArrayMesh::vertices_get_coordinates( const VertexHandle vert_array[], MsqVe
     if( mDimension == 3 )
         for( size_t i = 0; i < num_vtx; ++i )
         {
-            assert( indices[ i ] < vertexCount + oneBasedArrays );
-            coordinates[ i ].set( coordArray + 3 * indices[ i ] );
+            assert( indices[i] < vertexCount + oneBasedArrays );
+            coordinates[i].set( coordArray + 3 * indices[i] );
         }
     else if( mDimension == 2 )
         for( size_t i = 0; i < num_vtx; ++i )
         {
-            assert( indices[ i ] < vertexCount + oneBasedArrays );
-            coordinates[ i ].set( coordArray[ 2 * indices[ i ] ], coordArray[ 2 * indices[ i ] + 1 ], 0.0 );
+            assert( indices[i] < vertexCount + oneBasedArrays );
+            coordinates[i].set( coordArray[2 * indices[i]], coordArray[2 * indices[i] + 1], 0.0 );
         }
     else
         MSQ_SETERR( err )( MsqError::INVALID_STATE );
@@ -329,8 +329,8 @@ void ArrayMesh::vertex_set_coordinates( VertexHandle vert, const Vector3D& coord
         coordinates.get_coordinates( coordArray + 3 * i );
     else if( mDimension == 2 )
     {
-        coordArray[ 2 * i ] = coordinates[ 0 ];
-        coordArray[ 2 * i + 1 ] = coordinates[ 1 ];
+        coordArray[2 * i]     = coordinates[0];
+        coordArray[2 * i + 1] = coordinates[1];
     }
     else
         MSQ_SETERR( err )( MsqError::INVALID_STATE );
@@ -339,7 +339,7 @@ void ArrayMesh::vertex_set_coordinates( VertexHandle vert, const Vector3D& coord
 void ArrayMesh::vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqError& )
 {
     assert( (size_t)vertex < vertexCount + oneBasedArrays );
-    vertexByteArray[ (size_t)vertex ] = byte;
+    vertexByteArray[(size_t)vertex] = byte;
 }
 
 void ArrayMesh::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
@@ -348,15 +348,15 @@ void ArrayMesh::vertices_set_byte( const VertexHandle* vert_array, const unsigne
     const size_t* indices = (const size_t*)vert_array;
     for( size_t i = 0; i < array_size; ++i )
     {
-        assert( indices[ i ] < vertexCount + oneBasedArrays );
-        vertexByteArray[ indices[ i ] ] = byte_array[ i ];
+        assert( indices[i] < vertexCount + oneBasedArrays );
+        vertexByteArray[indices[i]] = byte_array[i];
     }
 }
 
 void ArrayMesh::vertex_get_byte( VertexHandle vertex, unsigned char* byte, MsqError& )
 {
     assert( (size_t)vertex < vertexCount + oneBasedArrays );
-    *byte = vertexByteArray[ (size_t)vertex ];
+    *byte = vertexByteArray[(size_t)vertex];
 }
 
 void ArrayMesh::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array, size_t array_size,
@@ -365,8 +365,8 @@ void ArrayMesh::vertices_get_byte( const VertexHandle* vert_array, unsigned char
     const size_t* indices = (const size_t*)vert_array;
     for( size_t i = 0; i < array_size; ++i )
     {
-        assert( indices[ i ] < vertexCount + oneBasedArrays );
-        byte_array[ i ] = vertexByteArray[ indices[ i ] ];
+        assert( indices[i] < vertexCount + oneBasedArrays );
+        byte_array[i] = vertexByteArray[indices[i]];
     }
 }
 
@@ -375,38 +375,38 @@ void ArrayMesh::vertices_get_attached_elements( const VertexHandle* vertex_array
                                                 MsqError& )
 {
     const size_t* indices = (const size_t*)vertex_array;
-    if( !vertexAdjacencyList ) build_vertex_adjacency_list( );
+    if( !vertexAdjacencyList ) build_vertex_adjacency_list();
 
-    elements.clear( );
+    elements.clear();
     offsets.resize( num_vertex + 1 );
     for( size_t i = 0; i < num_vertex; ++i )
     {
-        offsets[ i ] = elements.size( );
-        assert( indices[ i ] < vertexCount + oneBasedArrays );
-        for( size_t j = vertexAdjacencyOffsets[ indices[ i ] ]; j < vertexAdjacencyOffsets[ indices[ i ] + 1 ]; ++j )
-            elements.push_back( (ElementHandle)vertexAdjacencyList[ j ] );
+        offsets[i] = elements.size();
+        assert( indices[i] < vertexCount + oneBasedArrays );
+        for( size_t j = vertexAdjacencyOffsets[indices[i]]; j < vertexAdjacencyOffsets[indices[i] + 1]; ++j )
+            elements.push_back( (ElementHandle)vertexAdjacencyList[j] );
     }
-    offsets[ num_vertex ] = elements.size( );
+    offsets[num_vertex] = elements.size();
 }
 
 void ArrayMesh::elements_get_attached_vertices( const ElementHandle* elem_handles, size_t num_elems,
                                                 std::vector< VertexHandle >& vert_handles,
-                                                std::vector< size_t >&       offsets, MsqError& )
+                                                std::vector< size_t >& offsets, MsqError& )
 {
     const size_t* indices = (const size_t*)elem_handles;
     offsets.resize( num_elems + 1 );
-    vert_handles.clear( );
+    vert_handles.clear();
     for( size_t i = 0; i < num_elems; ++i )
     {
-        assert( indices[ i ] < elementCount );
-        int                  count;
-        const unsigned long* conn = elem_verts( indices[ i ], count );
-        size_t               prev_size = vert_handles.size( );
-        offsets[ i ] = prev_size;
+        assert( indices[i] < elementCount );
+        int count;
+        const unsigned long* conn = elem_verts( indices[i], count );
+        size_t prev_size          = vert_handles.size();
+        offsets[i]                = prev_size;
         vert_handles.resize( prev_size + count );
-        std::copy( conn, conn + count, (size_t*)( &vert_handles[ prev_size ] ) );
+        std::copy( conn, conn + count, (size_t*)( &vert_handles[prev_size] ) );
     }
-    offsets[ num_elems ] = vert_handles.size( );
+    offsets[num_elems] = vert_handles.size();
 }
 
 void ArrayMesh::elements_get_topologies( const ElementHandle* handles, EntityTopology* element_topologies,
@@ -416,14 +416,14 @@ void ArrayMesh::elements_get_topologies( const ElementHandle* handles, EntityTop
     if( elementType == MIXED )
         for( size_t i = 0; i < num_elements; ++i )
         {
-            assert( indices[ i ] < elementCount );
-            element_topologies[ i ] = elementTypes[ indices[ i ] ];
+            assert( indices[i] < elementCount );
+            element_topologies[i] = elementTypes[indices[i]];
         }
     else
         for( size_t i = 0; i < num_elements; ++i )
         {
-            assert( indices[ i ] < elementCount );
-            element_topologies[ i ] = elementType;
+            assert( indices[i] < elementCount );
+            element_topologies[i] = elementType;
         }
 }
 
@@ -432,43 +432,43 @@ void ArrayMesh::release_entity_handles( const EntityHandle*, size_t, MsqError& e
     MSQ_SETERR( err )( MsqError::NOT_IMPLEMENTED );
 }
 
-void ArrayMesh::release( ) {}
+void ArrayMesh::release() {}
 
-void ArrayMesh::build_vertex_adjacency_list( )
+void ArrayMesh::build_vertex_adjacency_list()
 {
     delete[] vertexAdjacencyList;
     delete[] vertexAdjacencyOffsets;
-    vertexAdjacencyOffsets = new unsigned long[ vertexCount + oneBasedArrays + 1 ];
+    vertexAdjacencyOffsets = new unsigned long[vertexCount + oneBasedArrays + 1];
 
     // for each vertex, store the number of elements the previous
     // vertex occurs in.
     memset( vertexAdjacencyOffsets, 0, sizeof( unsigned long ) * ( vertexCount + oneBasedArrays + 1 ) );
     for( size_t i = 0; i < elementCount; ++i )
     {
-        int                  n;
+        int n;
         const unsigned long* conn = elem_verts( i, n );
         for( int j = 0; j < n; ++j )
-            ++vertexAdjacencyOffsets[ conn[ j ] + 1 ];
+            ++vertexAdjacencyOffsets[conn[j] + 1];
     }
 
     // convert vertexAdjacencyOffsets from a shifted list of counts
     // to a list of offsts
     for( size_t i = 1; i <= vertexCount + oneBasedArrays; ++i )
-        vertexAdjacencyOffsets[ i ] += vertexAdjacencyOffsets[ i - 1 ];
+        vertexAdjacencyOffsets[i] += vertexAdjacencyOffsets[i - 1];
 
     // allocate space and populate with reverse connectivity
-    vertexAdjacencyList = new unsigned long[ vertexAdjacencyOffsets[ vertexCount + oneBasedArrays ] ];
+    vertexAdjacencyList = new unsigned long[vertexAdjacencyOffsets[vertexCount + oneBasedArrays]];
     for( size_t i = 0; i < elementCount; ++i )
     {
-        int                  n;
+        int n;
         const unsigned long* conn = elem_verts( i, n );
         for( int j = 0; j < n; ++j )
-            vertexAdjacencyList[ vertexAdjacencyOffsets[ conn[ j ] ]++ ] = i;
+            vertexAdjacencyList[vertexAdjacencyOffsets[conn[j]]++] = i;
     }
 
     for( size_t i = vertexCount + oneBasedArrays; i > 0; --i )
-        vertexAdjacencyOffsets[ i ] = vertexAdjacencyOffsets[ i - 1 ];
-    vertexAdjacencyOffsets[ 0 ] = 0;
+        vertexAdjacencyOffsets[i] = vertexAdjacencyOffsets[i - 1];
+    vertexAdjacencyOffsets[0] = 0;
 }
 
 unsigned ArrayMesh::bytes( TagType type )
@@ -519,10 +519,10 @@ ArrayMesh::Tag* ArrayMesh::allocate_tag( const char* name, bool owned, TagType t
     Tag* result = new Tag;
 
     // initialize members
-    result->type = type;
-    result->size = size * bytes( type );
+    result->type  = type;
+    result->size  = size * bytes( type );
     result->owned = owned;
-    result->name = new char[ strlen( name ) + 1 ];
+    result->name  = new char[strlen( name ) + 1];
     strcpy( result->name, name );
 
     result->vtxWritePtr = reinterpret_cast< unsigned char* >( vertex_rw_data );
@@ -539,7 +539,7 @@ ArrayMesh::Tag* ArrayMesh::allocate_tag( const char* name, bool owned, TagType t
 
     if( default_value )
     {
-        result->defaultValue = new unsigned char[ result->size ];
+        result->defaultValue = new unsigned char[result->size];
         memcpy( result->defaultValue, default_value, result->size );
     }
     else
@@ -549,7 +549,7 @@ ArrayMesh::Tag* ArrayMesh::allocate_tag( const char* name, bool owned, TagType t
 
     // prepend to tag list
     result->next = tagList;
-    tagList = result;
+    tagList      = result;
 
     return result;
 }
@@ -577,7 +577,7 @@ TagHandle ArrayMesh::add_writable_tag_data( const char* tag_name, TagType data_t
 TagHandle ArrayMesh::tag_create( const std::string& tag_name, TagType data_type, unsigned size,
                                  const void* default_value, MsqError& err )
 {
-    Tag* tag = allocate_tag( tag_name.c_str( ), true, data_type, size, 0, 0, 0, 0, default_value, err );
+    Tag* tag = allocate_tag( tag_name.c_str(), true, data_type, size, 0, 0, 0, 0, default_value, err );
     MSQ_ERRZERO( err );
     return reinterpret_cast< TagHandle >( tag );
 }
@@ -624,9 +624,9 @@ TagHandle ArrayMesh::tag_get( const std::string& name, MsqError& err )
 void ArrayMesh::tag_properties( TagHandle handle, std::string& name, TagType& type, unsigned& size, MsqError& )
 {
     const Tag* ptr = reinterpret_cast< const Tag* >( handle );
-    name = ptr->name;
-    type = ptr->type;
-    size = ptr->size / bytes( ptr->type );
+    name           = ptr->name;
+    type           = ptr->type;
+    size           = ptr->size / bytes( ptr->type );
 }
 
 void ArrayMesh::tag_set_element_data( TagHandle handle, size_t count, const ElementHandle* entities, const void* data,
@@ -644,7 +644,7 @@ void ArrayMesh::tag_set_element_data( TagHandle handle, size_t count, const Elem
         else
         {
             assert( !tag->eleReadPtr );
-            tag->eleReadPtr = tag->eleWritePtr = new unsigned char[ elementCount * tag->size ];
+            tag->eleReadPtr = tag->eleWritePtr = new unsigned char[elementCount * tag->size];
             fill( tag->eleWritePtr, tag->defaultValue, tag->size, elementCount );
         }
     }
@@ -654,7 +654,7 @@ void ArrayMesh::tag_set_element_data( TagHandle handle, size_t count, const Elem
     assert( ptr + tag->size * elementCount <= tag->eleWritePtr || tag->eleWritePtr + tag->size * elementCount <= ptr );
     for( size_t i = 0; i < count; ++i )
     {
-        size_t idx = reinterpret_cast< size_t >( entities[ i ] );
+        size_t idx = reinterpret_cast< size_t >( entities[i] );
         memcpy( tag->eleWritePtr + idx * tag->size, ptr + i * tag->size, tag->size );
     }
 }
@@ -674,7 +674,7 @@ void ArrayMesh::tag_set_vertex_data( TagHandle handle, size_t count, const Verte
         else
         {
             assert( !tag->vtxReadPtr );
-            tag->vtxReadPtr = tag->vtxWritePtr = new unsigned char[ vertexCount * tag->size ];
+            tag->vtxReadPtr = tag->vtxWritePtr = new unsigned char[vertexCount * tag->size];
             fill( tag->vtxWritePtr, tag->defaultValue, tag->size, vertexCount );
         }
     }
@@ -684,7 +684,7 @@ void ArrayMesh::tag_set_vertex_data( TagHandle handle, size_t count, const Verte
     assert( ptr + tag->size * vertexCount <= tag->vtxWritePtr || tag->vtxWritePtr + tag->size * vertexCount <= ptr );
     for( size_t i = 0; i < count; ++i )
     {
-        size_t idx = reinterpret_cast< size_t >( entities[ i ] ) - oneBasedArrays;
+        size_t idx = reinterpret_cast< size_t >( entities[i] ) - oneBasedArrays;
         memcpy( tag->vtxWritePtr + idx * tag->size, ptr + i * tag->size, tag->size );
     }
 }
@@ -693,12 +693,12 @@ void ArrayMesh::tag_get_element_data( TagHandle handle, size_t count, const Elem
                                       MsqError& err )
 {
     unsigned char* ptr = reinterpret_cast< unsigned char* >( data );
-    const Tag*     tag = reinterpret_cast< const Tag* >( handle );
+    const Tag* tag     = reinterpret_cast< const Tag* >( handle );
     if( tag->eleReadPtr )
     {
         for( size_t i = 0; i < count; ++i )
         {
-            size_t idx = reinterpret_cast< size_t >( entities[ i ] );
+            size_t idx = reinterpret_cast< size_t >( entities[i] );
             memcpy( ptr + i * tag->size, tag->eleReadPtr + idx * tag->size, tag->size );
         }
     }
@@ -716,12 +716,12 @@ void ArrayMesh::tag_get_vertex_data( TagHandle handle, size_t count, const Verte
                                      MsqError& err )
 {
     unsigned char* ptr = reinterpret_cast< unsigned char* >( data );
-    const Tag*     tag = reinterpret_cast< const Tag* >( handle );
+    const Tag* tag     = reinterpret_cast< const Tag* >( handle );
     if( tag->vtxReadPtr )
     {
         for( size_t i = 0; i < count; ++i )
         {
-            size_t idx = reinterpret_cast< size_t >( entities[ i ] ) - oneBasedArrays;
+            size_t idx = reinterpret_cast< size_t >( entities[i] ) - oneBasedArrays;
             memcpy( ptr + i * tag->size, tag->vtxReadPtr + idx * tag->size, tag->size );
         }
     }

@@ -39,12 +39,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeSize2DNB1::get_name( ) const
+std::string TShapeSize2DNB1::get_name() const
 {
     return "TShapeSize2DNB1";
 }
 
-TShapeSize2DNB1::~TShapeSize2DNB1( ) {}
+TShapeSize2DNB1::~TShapeSize2DNB1() {}
 
 /** \f$ \mu(T) = |T|^2 - 2 \psi(T) + 2 \f$
  *  \f$ \psi(T) = \sqrt{|T|^2 + 2 \tau} \f$
@@ -53,7 +53,7 @@ TShapeSize2DNB1::~TShapeSize2DNB1( ) {}
 bool TShapeSize2DNB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& /*err*/ )
 {
     double frob_sqr = sqr_Frobenius( T );
-    double psi = sqrt( frob_sqr + 2.0 * det( T ) );
+    double psi      = sqrt( frob_sqr + 2.0 * det( T ) );
 
     MsqMatrix< 2, 2 > Tdelta( T );
     while( fabs( psi ) < DBL_EPSILON )
@@ -61,7 +61,7 @@ bool TShapeSize2DNB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqE
         Tdelta( 0, 0 ) += 1e-12;
         Tdelta( 1, 1 ) += 1e-12;
         frob_sqr = sqr_Frobenius( Tdelta );
-        psi = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
+        psi      = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
     }
 
     result = frob_sqr - 2.0 * psi + 2.0;
@@ -72,7 +72,7 @@ bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& re
                                           MsqError& /*err*/ )
 {
     double frob_sqr = sqr_Frobenius( T );
-    double psi = sqrt( frob_sqr + 2.0 * det( T ) );
+    double psi      = sqrt( frob_sqr + 2.0 * det( T ) );
 
     MsqMatrix< 2, 2 > Tdelta( T );
     while( fabs( psi ) < DBL_EPSILON )
@@ -80,7 +80,7 @@ bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& re
         Tdelta( 0, 0 ) += 1e-12;
         Tdelta( 1, 1 ) += 1e-12;
         frob_sqr = sqr_Frobenius( Tdelta );
-        psi = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
+        psi      = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
     }
 
     result = frob_sqr - 2.0 * psi + 2.0;
@@ -101,10 +101,10 @@ bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& re
 }
 
 bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                          MsqMatrix< 2, 2 > second[ 3 ], MsqError& /*err*/ )
+                                          MsqMatrix< 2, 2 > second[3], MsqError& /*err*/ )
 {
     double frob_sqr = sqr_Frobenius( T );
-    double psi = sqrt( frob_sqr + 2.0 * det( T ) );
+    double psi      = sqrt( frob_sqr + 2.0 * det( T ) );
 
     MsqMatrix< 2, 2 > Tdelta( T );
     while( fabs( psi ) < DBL_EPSILON )
@@ -112,7 +112,7 @@ bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& re
         Tdelta( 0, 0 ) += 1e-12;
         Tdelta( 1, 1 ) += 1e-12;
         frob_sqr = sqr_Frobenius( Tdelta );
-        psi = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
+        psi      = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
     }
 
     result = frob_sqr - 2.0 * psi + 2.0;

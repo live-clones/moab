@@ -38,14 +38,15 @@
 namespace MBMesquite
 {
 
-std::string TShapeSizeOrientNB1::get_name( ) const
+std::string TShapeSizeOrientNB1::get_name() const
 {
     return "TShapeSizeOrientNB1";
 }
 
-TShapeSizeOrientNB1::~TShapeSizeOrientNB1( ) {}
+TShapeSizeOrientNB1::~TShapeSizeOrientNB1() {}
 
-template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
     MsqMatrix< DIM, DIM > T_I( T );
     pluseq_scaled_I( T_I, -1 );
@@ -53,7 +54,7 @@ template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv )
 {
     deriv = T;
@@ -63,7 +64,7 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatr
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv,
                          MsqMatrix< DIM, DIM >* second )
 {

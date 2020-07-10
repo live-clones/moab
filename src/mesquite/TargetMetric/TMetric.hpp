@@ -39,14 +39,15 @@ namespace MBMesquite
 {
 
 class MsqError;
-template< unsigned R, unsigned C > class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 class TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetric( );
+    MESQUITE_EXPORT virtual ~TMetric();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const = 0;
+    MESQUITE_EXPORT virtual std::string get_name() const = 0;
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
@@ -138,8 +139,8 @@ class TMetric
      *          (e.g. division by zero, etc.), true otherwise.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                                     MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err );
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T, MsqMatrix< 2, 2 > second_wrt_T[3],
+                                                     MsqError& err );
     /**\brief Hessian of \f$\mu(T)\f$ with respect to components of T
      *
      *\param T 3x3 relative measure matrix (typically A W^-1)
@@ -216,8 +217,8 @@ class TMetric
      *          (e.g. division by zero, etc.), true otherwise.
      */
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
-                                                     MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                                     MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err );
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > second_wrt_T[6],
+                                                     MsqError& err );
 
     static inline bool invalid_determinant( double d )
     {
@@ -228,7 +229,7 @@ class TMetric
 class TMetric2D : public TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetric2D( );
+    MESQUITE_EXPORT virtual ~TMetric2D();
 
     /**\brief Evaluate \f$\mu(T)\f$
      *
@@ -240,7 +241,7 @@ class TMetric2D : public TMetric
 class TMetric3D : public TMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~TMetric3D( );
+    MESQUITE_EXPORT virtual ~TMetric3D();
 
     /**\brief Evaluate \f$\mu(T)\f$
      *

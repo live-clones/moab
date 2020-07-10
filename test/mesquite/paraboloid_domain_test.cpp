@@ -63,28 +63,27 @@ class ParaboloidDomain : public MeshDomain
     virtual void closest_point( Mesh::VertexHandle /*handle*/, const Vector3D& position, Vector3D& closest,
                                 Vector3D& /*normal*/, MsqError& /*err*/ ) const
     {
-        closest =
-            Vector3D( position[ 0 ], position[ 1 ], position[ 0 ] * position[ 0 ] + position[ 1 ] * position[ 1 ] );
+        closest = Vector3D( position[0], position[1], position[0] * position[0] + position[1] * position[1] );
     };
 
-    virtual void snap_to( Mesh::VertexHandle /*entity_handle*/, Vector3D& /*coordinate*/ ) const { };
+    virtual void snap_to( Mesh::VertexHandle /*entity_handle*/, Vector3D& /*coordinate*/ ) const {};
 
-    virtual void vertex_normal_at( Mesh::VertexHandle /*entity_handle*/, Vector3D& /*coordinate*/ ) const { };
-    virtual void element_normal_at( Mesh::ElementHandle /*entity_handle*/, Vector3D& /*coordinate*/ ) const { };
+    virtual void vertex_normal_at( Mesh::VertexHandle /*entity_handle*/, Vector3D& /*coordinate*/ ) const {};
+    virtual void element_normal_at( Mesh::ElementHandle /*entity_handle*/, Vector3D& /*coordinate*/ ) const {};
 
     virtual void vertex_normal_at( const Mesh::VertexHandle* /*handles*/, Vector3D /*coordinates*/[],
-                                   unsigned /*count*/, MsqError& /*err*/ ) const { };
+                                   unsigned /*count*/, MsqError& /*err*/ ) const {};
 
     virtual void domain_DoF( const Mesh::EntityHandle* /*handle_array*/, unsigned short* /*dof_array*/,
-                             size_t /*num_handles*/, MsqError& /*err*/ ) const { };
+                             size_t /*num_handles*/, MsqError& /*err*/ ) const {};
 };
 
-int main( )
+int main()
 {
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
-    std::string          file_name = TestDir + "/2D/vtk/quads/untangled/paraboloid.vtk";
-    mesh.read_vtk( file_name.c_str( ), err );
+    std::string file_name = TestDir + "/2D/vtk/quads/untangled/paraboloid.vtk";
+    mesh.read_vtk( file_name.c_str(), err );
     if( err ) return 1;
 
     ParaboloidDomain domain;

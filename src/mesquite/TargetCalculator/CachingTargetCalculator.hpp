@@ -44,20 +44,20 @@ namespace MBMesquite
 
 struct CachedTargetData
 {
-    std::vector< size_t >            elementOffsets;
+    std::vector< size_t > elementOffsets;
     std::vector< MsqMatrix< 3, 3 > > targets3D;
     std::vector< MsqMatrix< 3, 2 > > targetsSurface;
     std::vector< MsqMatrix< 2, 2 > > targets2D;
-    bool                             has_data( ) const
+    bool has_data() const
     {
-        return !elementOffsets.empty( );
+        return !elementOffsets.empty();
     }
-    void clear( )
+    void clear()
     {
-        elementOffsets.clear( );
-        targets3D.clear( );
-        targets2D.clear( );
-        targetsSurface.clear( );
+        elementOffsets.clear();
+        targets3D.clear();
+        targets2D.clear();
+        targetsSurface.clear();
     }
 };
 
@@ -74,9 +74,9 @@ class CachingTargetCalculator : public TargetCalculator, private ExtraDataUser< 
   public:
     CachingTargetCalculator( TargetCalculator* cached ) : cachedCalculator( cached ) {}
 
-    virtual ~CachingTargetCalculator( );
+    virtual ~CachingTargetCalculator();
 
-    TargetCalculator* get_cached_calculator( ) const
+    TargetCalculator* get_cached_calculator() const
     {
         return cachedCalculator;
     }
@@ -88,9 +88,9 @@ class CachingTargetCalculator : public TargetCalculator, private ExtraDataUser< 
 
     virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-    virtual bool have_surface_orient( ) const
+    virtual bool have_surface_orient() const
     {
-        return cachedCalculator->have_surface_orient( );
+        return cachedCalculator->have_surface_orient();
     }
 
   protected:

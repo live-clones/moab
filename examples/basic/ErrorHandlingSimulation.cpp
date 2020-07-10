@@ -76,7 +76,7 @@ int main( int argc, char** argv )
 {
     if( argc < 2 )
     {
-        cout << "Usage: " << argv[ 0 ] << " <test_case_num(1 to 4)>" << endl;
+        cout << "Usage: " << argv[0] << " <test_case_num(1 to 4)>" << endl;
         return 0;
     }
 
@@ -85,10 +85,10 @@ int main( int argc, char** argv )
 #endif
 
     // Initialize error handler, required for this example (not using a moab instance)
-    MBErrorHandler_Init( );
+    MBErrorHandler_Init();
 
-    int test_case_num = atoi( argv[ 1 ] );
-    int rank = 0;
+    int test_case_num = atoi( argv[1] );
+    int rank          = 0;
 #ifdef MOAB_HAVE_MPI
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 #endif
@@ -96,10 +96,10 @@ int main( int argc, char** argv )
     ErrorCode rval = FunctionA( test_case_num, rank );MB_CHK_ERR( rval );
 
     // Finalize error handler, required for this example (not using a moab instance)
-    MBErrorHandler_Finalize( );
+    MBErrorHandler_Finalize();
 
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
 
     return 0;

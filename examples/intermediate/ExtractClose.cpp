@@ -57,8 +57,8 @@ int main( int argc, char** argv )
 
     opts.parseCommandLine( argc, argv );
 
-    int         rank = 0;
-    int         numProcesses = 1;
+    int rank         = 0;
+    int numProcesses = 1;
     std::string readopts;
 
 #ifdef MOAB_HAVE_MPI
@@ -75,8 +75,8 @@ int main( int argc, char** argv )
 
     // Load the file into a new file set
     EntityHandle fileSet;
-    ErrorCode    rval = mb.create_meshset( MESHSET_SET, fileSet );MB_CHK_SET_ERR( rval, "Error creating file set" );
-    rval = mb.load_file( inputFile.c_str( ), &fileSet, readopts.c_str( ) );MB_CHK_SET_ERR( rval, "Error loading file" );
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, fileSet );MB_CHK_SET_ERR( rval, "Error creating file set" );
+    rval = mb.load_file( inputFile.c_str(), &fileSet, readopts.c_str() );MB_CHK_SET_ERR( rval, "Error loading file" );
 
     if( !rank )
     {
@@ -100,25 +100,25 @@ int main( int argc, char** argv )
     {
         std::cout << " use spherical coordinates on the sphere of radius 1.\n";
         SphereCoords pos;
-        pos.R = 1;  // always on the
+        pos.R   = 1;                 // always on the
         pos.lat = lat * M_PI / 180;  // defined in math.h
         pos.lon = lon * M_PI / 180;
-        point = spherical_to_cart( pos );
+        point   = spherical_to_cart( pos );
     }
 
     Range closeByCells;
-    for( Range::iterator it = elems.begin( ); it != elems.end( ); it++ )
+    for( Range::iterator it = elems.begin(); it != elems.end(); it++ )
     {
         EntityHandle cell = *it;
-        CartVect     center;
-        rval = mb.get_coords( &cell, 1, &( center[ 0 ] ) );MB_CHK_SET_ERR( rval, "Can't get cell center coords" );
-        double dist = ( center - point ).length( );
+        CartVect center;
+        rval = mb.get_coords( &cell, 1, &( center[0] ) );MB_CHK_SET_ERR( rval, "Can't get cell center coords" );
+        double dist = ( center - point ).length();
         if( dist <= distance ) { closeByCells.insert( cell ); }
     }
 
     rval = mb.add_entities( outSet, closeByCells );MB_CHK_SET_ERR( rval, "Can't add to entity set" );
 
-    int numCells = (int)closeByCells.size( );
+    int numCells = (int)closeByCells.size();
 #ifdef MOAB_HAVE_MPI
     // Reduce all of the local sums into the global sum
     int globalCells;
@@ -137,7 +137,7 @@ int main( int argc, char** argv )
                       << "\n";
         string writeOpts;
         if( numProcesses > 1 ) writeOpts = string( "PARALLEL=WRITE_PART;" );
-        rval = mb.write_file( outFile.c_str( ), 0, writeOpts.c_str( ), &outSet, 1 );MB_CHK_SET_ERR( rval, "Can't write file" );
+        rval = mb.write_file( outFile.c_str(), 0, writeOpts.c_str(), &outSet, 1 );MB_CHK_SET_ERR( rval, "Can't write file" );
     }
     return 0;
 }

@@ -35,7 +35,8 @@ namespace moab
 
 class SequenceManager;
 class Error;
-template< typename KeyType, typename ValType, ValType NullVal > class RangeMap;
+template < typename KeyType, typename ValType, ValType NullVal >
+class RangeMap;
 typedef RangeMap< EntityHandle, EntityHandle, 0 > HandleMap;
 class ParallelMergeMesh;
 class DebugOutput;
@@ -66,7 +67,7 @@ class ParallelComm
     ParallelComm( Interface* impl, std::vector< unsigned char >& tmp_buff, MPI_Comm comm, int* pcomm_id_out = 0 );
 
     //! Get ID used to reference this PCOMM instance
-    int get_id( ) const
+    int get_id() const
     {
         return pcommID;
     }
@@ -82,7 +83,7 @@ class ParallelComm
     static ErrorCode get_all_pcomm( Interface* impl, std::vector< ParallelComm* >& list );
 
     //! destructor
-    ~ParallelComm( );
+    ~ParallelComm();
 
     static unsigned char PROC_SHARED, PROC_OWNER;
 
@@ -132,10 +133,10 @@ class ParallelComm
      */
     ErrorCode send_entities( const int to_proc, Range& orig_ents, const bool adjs, const bool tags,
                              const bool store_remote_handles, const bool is_iface, Range& final_ents, int& incoming1,
-                             int&                        incoming2,  // newly added
-                             TupleList&                  entprocs,  // newly added
+                             int& incoming2,                                 // newly added
+                             TupleList& entprocs,                            // newly added
                              std::vector< MPI_Request >& recv_remoteh_reqs,  // newly added
-                             bool                        wait_all = true );
+                             bool wait_all = true );
 
     ErrorCode send_entities( std::vector< unsigned int >& send_procs, std::vector< Range* >& send_ents, int& incoming1,
                              int& incoming2, const bool store_remote_handles );
@@ -543,28 +544,28 @@ class ParallelComm
     // ==================================
 
     //! Get proc config for this communication object
-    const ProcConfig& proc_config( ) const
+    const ProcConfig& proc_config() const
     {
         return procConfig;
     }
 
     //! Get proc config for this communication object
-    ProcConfig& proc_config( )
+    ProcConfig& proc_config()
     {
         return procConfig;
     }
 
-    unsigned rank( ) const
+    unsigned rank() const
     {
-        return proc_config( ).proc_rank( );
+        return proc_config().proc_rank();
     }
-    unsigned size( ) const
+    unsigned size() const
     {
-        return proc_config( ).proc_size( );
+        return proc_config().proc_size();
     }
-    MPI_Comm comm( ) const
+    MPI_Comm comm() const
     {
-        return proc_config( ).proc_comm( );
+        return proc_config().proc_comm();
     }
 
     //! return the tags used to indicate shared procs and handles
@@ -572,47 +573,47 @@ class ParallelComm
                                     Tag& pstatus_tag );
 
     //! return partition, interface set ranges
-    Range& partition_sets( )
+    Range& partition_sets()
     {
         return partitionSets;
     }
-    const Range& partition_sets( ) const
+    const Range& partition_sets() const
     {
         return partitionSets;
     }
-    Range& interface_sets( )
+    Range& interface_sets()
     {
         return interfaceSets;
     }
-    const Range& interface_sets( ) const
+    const Range& interface_sets() const
     {
         return interfaceSets;
     }
 
     //! return sharedp tag
-    Tag sharedp_tag( );
+    Tag sharedp_tag();
 
     //! return sharedps tag
-    Tag sharedps_tag( );
+    Tag sharedps_tag();
 
     //! return sharedh tag
-    Tag sharedh_tag( );
+    Tag sharedh_tag();
 
     //! return sharedhs tag
-    Tag sharedhs_tag( );
+    Tag sharedhs_tag();
 
     //! return pstatus tag
-    Tag pstatus_tag( );
+    Tag pstatus_tag();
 
     //! return pcomm tag; static because might not have a pcomm before going
     //! to look for one on the interface
     static Tag pcomm_tag( Interface* impl, bool create_if_missing = true );
 
     //! return partitions set tag
-    Tag partition_tag( );
-    Tag part_tag( )
+    Tag partition_tag();
+    Tag part_tag()
     {
-        return partition_tag( );
+        return partition_tag();
     }
 
     // ==================================
@@ -632,7 +633,7 @@ class ParallelComm
     //! return all the entities in parts owned locally
     ErrorCode get_part_entities( Range& ents, int dim = -1 );
 
-    EntityHandle get_partitioning( ) const
+    EntityHandle get_partitioning() const
     {
         return partitioningSet;
     }
@@ -643,13 +644,12 @@ class ParallelComm
     ErrorCode get_part_handle( int id, EntityHandle& handle_out ) const;
     ErrorCode create_part( EntityHandle& part_out );
     ErrorCode destroy_part( EntityHandle part );
-    ErrorCode collective_sync_partition( );
-    ErrorCode get_part_neighbor_ids( EntityHandle part, int neighbors_out[ MAX_SHARING_PROCS ],
-                                     int& num_neighbors_out );
+    ErrorCode collective_sync_partition();
+    ErrorCode get_part_neighbor_ids( EntityHandle part, int neighbors_out[MAX_SHARING_PROCS], int& num_neighbors_out );
     ErrorCode get_interface_sets( EntityHandle part, Range& iface_sets_out, int* adj_part_id = 0 );
     ErrorCode get_owning_part( EntityHandle entity, int& owning_part_id_out, EntityHandle* owning_handle = 0 );
-    ErrorCode get_sharing_parts( EntityHandle entity, int part_ids_out[ MAX_SHARING_PROCS ], int& num_part_ids_out,
-                                 EntityHandle remote_handles[ MAX_SHARING_PROCS ] = 0 );
+    ErrorCode get_sharing_parts( EntityHandle entity, int part_ids_out[MAX_SHARING_PROCS], int& num_part_ids_out,
+                                 EntityHandle remote_handles[MAX_SHARING_PROCS] = 0 );
 
     /** Filter the entities by pstatus tag.
      * op is one of PSTATUS_ AND, OR, NOT; an entity is output if:
@@ -682,7 +682,7 @@ class ParallelComm
      */
     ErrorCode get_iface_entities( int other_proc, int dim, Range& iface_ents );
 
-    Interface* get_moab( ) const
+    Interface* get_moab() const
     {
         return mbImpl;
     }
@@ -694,11 +694,11 @@ class ParallelComm
       public:
         unsigned char* mem_ptr;
         unsigned char* buff_ptr;
-        unsigned int   alloc_size;
+        unsigned int alloc_size;
 
         Buffer( unsigned int sz = 0 );
         Buffer( const Buffer& );
-        ~Buffer( );
+        ~Buffer();
         void reset_buffer( size_t buff_pos = 0 )
         {
             reset_ptr( buff_pos );
@@ -710,15 +710,15 @@ class ParallelComm
             buff_ptr = mem_ptr + buff_pos;
         }
         inline void reserve( unsigned int new_size );
-        void        set_stored_size( )
+        void set_stored_size()
         {
             *( (int*)mem_ptr ) = (int)( buff_ptr - mem_ptr );
         }
-        int get_stored_size( )
+        int get_stored_size()
         {
             return *( (int*)mem_ptr );
         }
-        int get_current_size( )
+        int get_current_size()
         {
             return (int)( buff_ptr - mem_ptr );
         }
@@ -758,18 +758,18 @@ class ParallelComm
     {
         EntityHandle local;
         EntityHandle remote;
-        EntityID     owner;
+        EntityID owner;
     };
 
     ErrorCode pack_shared_handles( std::vector< std::vector< SharedEntityData > >& send_data );
 
     // check consistency of sharedEnts against their tags and their
     // vertices' tags
-    ErrorCode check_local_shared( );
+    ErrorCode check_local_shared();
 
     // check contents of communicated shared entity data against tags
     ErrorCode check_my_shared_handles( std::vector< std::vector< SharedEntityData > >& shents,
-                                       const char*                                     prefix = NULL );
+                                       const char* prefix = NULL );
 
     //! set rank for this pcomm; USED FOR TESTING ONLY!
     void set_rank( unsigned int r );
@@ -784,7 +784,7 @@ class ParallelComm
     int get_buffers( int to_proc, bool* is_new = NULL );
 
     //! get buff processor vector
-    const std::vector< unsigned int >& buff_procs( ) const;
+    const std::vector< unsigned int >& buff_procs() const;
 
     /* \brief Unpack message with remote handles
      * PUBLIC ONLY FOR TESTING!
@@ -809,7 +809,7 @@ class ParallelComm
     // do the same but working straight from sharedEnts
     ErrorCode create_interface_sets( EntityHandle this_set, int resolve_dim, int shared_dim );
 
-    ErrorCode tag_shared_verts( TupleList&                                                   shared_ents,
+    ErrorCode tag_shared_verts( TupleList& shared_ents,
                                 std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs,
                                 Range& proc_verts, unsigned int i_extra = 1 );
 
@@ -823,7 +823,7 @@ class ParallelComm
 
     //! reset message buffers to their initial state
     // changed to public function (HJK)
-    void reset_all_buffers( );
+    void reset_all_buffers();
 
     static const unsigned int INITIAL_BUFF_SIZE;
 
@@ -831,7 +831,7 @@ class ParallelComm
     void set_debug_verbosity( int verb );
 
     //! get the verbosity level of output from this pcomm
-    int get_debug_verbosity( );
+    int get_debug_verbosity();
 
     /* \brief Gather tag value from entities down to a specified root proc
      * This function gathers data from a domain-decomposed mesh onto a global mesh
@@ -869,7 +869,7 @@ class ParallelComm
      */
     ErrorCode settle_intersection_points( Range& edges, Range& shared_edges_owned,
                                           std::vector< std::vector< EntityHandle >* >& extraNodesVec,
-                                          double                                       tolerance );
+                                          double tolerance );
 
     /* \brief delete entities from moab database
      * will check the shared ents array, and clean it if necessary
@@ -885,12 +885,13 @@ class ParallelComm
      * eventually, it should become private, and be called automatically
      */
 
-    ErrorCode correct_thin_ghost_layers( );
+    ErrorCode correct_thin_ghost_layers();
 
   private:
     ErrorCode reduce_void( int tag_data_type, const MPI_Op mpi_op, int num_ents, void* old_vals, void* new_vals );
 
-    template< class T > ErrorCode reduce( const MPI_Op mpi_op, int num_ents, void* old_vals, void* new_vals );
+    template < class T >
+    ErrorCode reduce( const MPI_Op mpi_op, int num_ents, void* old_vals, void* new_vals );
 
     void print_debug_isend( int from, int to, unsigned char* buff, int tag, int size );
 
@@ -901,14 +902,14 @@ class ParallelComm
     void print_debug_waitany( std::vector< MPI_Request >& reqs, int tag, int proc );
 
     // common initialization code, called from various constructors
-    void initialize( );
+    void initialize();
 
     ErrorCode set_sharing_data( EntityHandle ent, unsigned char pstatus, int old_nump, int new_nump, int* ps,
                                 EntityHandle* hs );
 
     ErrorCode check_clean_iface( Range& allsent );
 
-    void define_mpe( );
+    void define_mpe();
 
     ErrorCode get_sent_ents( const bool is_iface, const int bridge_dim, const int ghost_dim, const int num_layers,
                              const int addl_ents, Range* sent_ents, Range& allsent, TupleList& entprocs );
@@ -1107,13 +1108,13 @@ class ParallelComm
 
     ErrorCode tag_shared_verts( TupleList& shared_verts, Range* skin_ents,
                                 std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs,
-                                Range&                                                       proc_verts );
+                                Range& proc_verts );
 
     ErrorCode get_proc_nvecs( int resolve_dim, int shared_dim, Range* skin_ents,
                               std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs );
 
     // after verifying shared entities, now parent/child links between sets can be established
-    ErrorCode create_iface_pc_links( );
+    ErrorCode create_iface_pc_links();
 
     //! pack a range map with keys in this_range and values a contiguous series
     //! of handles starting at actual_start
@@ -1181,7 +1182,7 @@ class ParallelComm
 
     /** \brief Set pstatus tag interface bit on entities in sets passed in
      */
-    ErrorCode tag_iface_entities( );
+    ErrorCode tag_iface_entities();
 
     //! add a pc to the iface instance tag PARALLEL_COMM
     int add_pcomm( ParallelComm* pc );
@@ -1218,7 +1219,7 @@ class ParallelComm
     // void reset_all_buffers();
 
     //! delete all buffers, freeing up any memory held by them
-    void delete_all_buffers( );
+    void delete_all_buffers();
 
     //! request objects, may be used if store_remote_handles is used
     std::vector< MPI_Request > sendReqs;
@@ -1258,7 +1259,7 @@ class ParallelComm
 inline ParallelComm::Buffer::Buffer( const Buffer& other_buff )
 {
     alloc_size = other_buff.alloc_size;
-    mem_ptr = (unsigned char*)malloc( alloc_size );
+    mem_ptr    = (unsigned char*)malloc( alloc_size );
     memcpy( mem_ptr, other_buff.mem_ptr, alloc_size );
     buff_ptr = mem_ptr + ( other_buff.buff_ptr - other_buff.mem_ptr );
 }
@@ -1268,7 +1269,7 @@ inline ParallelComm::Buffer::Buffer( unsigned int new_size ) : mem_ptr( NULL ), 
     if( new_size ) this->reserve( new_size );
 }
 
-inline ParallelComm::Buffer::~Buffer( )
+inline ParallelComm::Buffer::~Buffer()
 {
     if( mem_ptr )
     {
@@ -1289,22 +1290,22 @@ inline void ParallelComm::Buffer::reserve( unsigned int new_size )
     assert( 0 <= tmp_pos && tmp_pos <= (int)alloc_size );
     if( tmp_pos ) memcpy( buff_ptr, mem_ptr, tmp_pos );
     if( mem_ptr ) free( mem_ptr );
-    mem_ptr = buff_ptr;
+    mem_ptr    = buff_ptr;
     alloc_size = new_size;
-    buff_ptr = mem_ptr + tmp_pos;
+    buff_ptr   = mem_ptr + tmp_pos;
 #else
     if( mem_ptr && alloc_size < new_size )
     {
         size_t tmp_pos = mem_ptr ? buff_ptr - mem_ptr : 0;
-        mem_ptr = (unsigned char*)realloc( mem_ptr, new_size );
-        alloc_size = new_size;
-        buff_ptr = mem_ptr + tmp_pos;
+        mem_ptr        = (unsigned char*)realloc( mem_ptr, new_size );
+        alloc_size     = new_size;
+        buff_ptr       = mem_ptr + tmp_pos;
     }
     else if( !mem_ptr )
     {
-        mem_ptr = (unsigned char*)malloc( new_size );
+        mem_ptr    = (unsigned char*)malloc( new_size );
         alloc_size = new_size;
-        buff_ptr = mem_ptr;
+        buff_ptr   = mem_ptr;
     }
 #endif
 }
@@ -1316,28 +1317,28 @@ inline void ParallelComm::Buffer::check_space( unsigned int addl_space )
     if( new_size > alloc_size ) reserve( 3 * new_size / 2 );
 }
 
-inline void ParallelComm::reset_all_buffers( )
+inline void ParallelComm::reset_all_buffers()
 {
     std::vector< Buffer* >::iterator vit;
-    for( vit = localOwnedBuffs.begin( ); vit != localOwnedBuffs.end( ); ++vit )
-        ( *vit )->reset_buffer( );
-    for( vit = remoteOwnedBuffs.begin( ); vit != remoteOwnedBuffs.end( ); ++vit )
-        ( *vit )->reset_buffer( );
+    for( vit = localOwnedBuffs.begin(); vit != localOwnedBuffs.end(); ++vit )
+        ( *vit )->reset_buffer();
+    for( vit = remoteOwnedBuffs.begin(); vit != remoteOwnedBuffs.end(); ++vit )
+        ( *vit )->reset_buffer();
 }
 
-inline void ParallelComm::delete_all_buffers( )
+inline void ParallelComm::delete_all_buffers()
 {
     std::vector< Buffer* >::iterator vit;
-    for( vit = localOwnedBuffs.begin( ); vit != localOwnedBuffs.end( ); ++vit )
+    for( vit = localOwnedBuffs.begin(); vit != localOwnedBuffs.end(); ++vit )
         delete( *vit );
-    localOwnedBuffs.clear( );
+    localOwnedBuffs.clear();
 
-    for( vit = remoteOwnedBuffs.begin( ); vit != remoteOwnedBuffs.end( ); ++vit )
+    for( vit = remoteOwnedBuffs.begin(); vit != remoteOwnedBuffs.end(); ++vit )
         delete( *vit );
-    remoteOwnedBuffs.clear( );
+    remoteOwnedBuffs.clear();
 }
 
-inline const std::vector< unsigned int >& ParallelComm::buff_procs( ) const
+inline const std::vector< unsigned int >& ParallelComm::buff_procs() const
 {
     return buffProcs;
 }
@@ -1345,11 +1346,11 @@ inline const std::vector< unsigned int >& ParallelComm::buff_procs( ) const
 inline ErrorCode ParallelComm::get_shared_proc_tags( Tag& sharedp, Tag& sharedps, Tag& sharedh, Tag& sharedhs,
                                                      Tag& pstatus )
 {
-    sharedp = sharedp_tag( );
-    sharedps = sharedps_tag( );
-    sharedh = sharedh_tag( );
-    sharedhs = sharedhs_tag( );
-    pstatus = pstatus_tag( );
+    sharedp  = sharedp_tag();
+    sharedps = sharedps_tag();
+    sharedh  = sharedh_tag();
+    sharedhs = sharedhs_tag();
+    pstatus  = pstatus_tag();
 
     return MB_SUCCESS;
 }
@@ -1358,10 +1359,10 @@ inline ErrorCode ParallelComm::exchange_tags( const char* tag_name, const Range&
 {
     // get the tag handle
     std::vector< Tag > tags( 1 );
-    ErrorCode          result = mbImpl->tag_get_handle( tag_name, 0, MB_TYPE_OPAQUE, tags[ 0 ], MB_TAG_ANY );
+    ErrorCode result = mbImpl->tag_get_handle( tag_name, 0, MB_TYPE_OPAQUE, tags[0], MB_TAG_ANY );
     if( MB_SUCCESS != result )
         return result;
-    else if( !tags[ 0 ] )
+    else if( !tags[0] )
         return MB_TAG_NOT_FOUND;
 
     return exchange_tags( tags, tags, entities );
@@ -1380,10 +1381,10 @@ inline ErrorCode ParallelComm::reduce_tags( const char* tag_name, const MPI_Op m
 {
     // get the tag handle
     std::vector< Tag > tags( 1 );
-    ErrorCode          result = mbImpl->tag_get_handle( tag_name, 0, MB_TYPE_OPAQUE, tags[ 0 ], MB_TAG_ANY );
+    ErrorCode result = mbImpl->tag_get_handle( tag_name, 0, MB_TYPE_OPAQUE, tags[0], MB_TAG_ANY );
     if( MB_SUCCESS != result )
         return result;
-    else if( !tags[ 0 ] )
+    else if( !tags[0] )
         return MB_TAG_NOT_FOUND;
 
     return reduce_tags( tags, tags, mpi_op, entities );
@@ -1403,7 +1404,7 @@ inline ErrorCode ParallelComm::get_comm_procs( std::set< unsigned int >& procs )
     ErrorCode result = get_interface_procs( procs );
     if( MB_SUCCESS != result ) return result;
 
-    std::copy( buffProcs.begin( ), buffProcs.end( ), std::inserter( procs, procs.begin( ) ) );
+    std::copy( buffProcs.begin(), buffProcs.end(), std::inserter( procs, procs.begin() ) );
 
     return MB_SUCCESS;
 }
@@ -1429,7 +1430,7 @@ inline ErrorCode ParallelComm::unpack_remote_handles( unsigned int from_proc, co
 inline void ParallelComm::set_rank( unsigned int r )
 {
     procConfig.proc_rank( r );
-    if( procConfig.proc_size( ) < r ) procConfig.proc_size( r + 1 );
+    if( procConfig.proc_size() < r ) procConfig.proc_size( r + 1 );
 }
 
 inline void ParallelComm::set_size( unsigned int s )
@@ -1451,7 +1452,7 @@ inline ErrorCode ParallelComm::get_sharing_data( const EntityHandle entity, int*
                                                  unsigned char& pstat, int& num_ps )
 {
     unsigned int dum_ps;
-    ErrorCode    result = get_sharing_data( entity, ps, hs, pstat, dum_ps );
+    ErrorCode result = get_sharing_data( entity, ps, hs, pstat, dum_ps );
     if( MB_SUCCESS == result ) num_ps = dum_ps;
     return result;
 }

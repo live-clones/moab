@@ -78,11 +78,11 @@ int main( int argc, char* argv[] )
     else if( argc == 2 )
     {
         cout << " given 1 command line arguments.\n";
-        file_name = argv[ 1 ];
+        file_name = argv[1];
     }
 
     MBMesquite::MeshImpl mesh;
-    mesh.read_vtk( file_name.c_str( ), err );
+    mesh.read_vtk( file_name.c_str(), err );
 
     // creates a wrapper
     ShapeImprovementWrapper wrapper;

@@ -49,7 +49,7 @@ using namespace moab;
         }                                                                                       \
     } while( false )
 
-Interface*  iface = 0;
+Interface* iface     = 0;
 const char* exe_name = 0;
 
 static void usage( bool error = true )
@@ -140,21 +140,21 @@ static void parse_error( const char* msg, const char* val = 0 )
 int main( int argc, char* argv[] )
 {
     Core mb_core;
-    exe_name = argv[ 0 ];
-    iface = &mb_core;
+    exe_name = argv[0];
+    iface    = &mb_core;
 
-    if( argc == 1 ) about( );
+    if( argc == 1 ) about();
 
     // find file names
     // load input file before processing other options so
     // tags are defined
-    const char* input_name = 0;
+    const char* input_name  = 0;
     const char* output_name = 0;
     for( int i = 1; i < argc; ++i )
     {
-        if( argv[ i ][ 0 ] == '-' )
+        if( argv[i][0] == '-' )
         {
-            switch( argv[ i ][ 1 ] )
+            switch( argv[i][1] )
             {
                 case 't':
                 case 'c':
@@ -169,16 +169,16 @@ int main( int argc, char* argv[] )
                     usage( false );
                     break;
                 default:
-                    parse_error( "Invalid option", argv[ i ] );
+                    parse_error( "Invalid option", argv[i] );
                     break;
             }
         }
         else if( !input_name )
-            input_name = argv[ i ];
+            input_name = argv[i];
         else if( !output_name )
-            output_name = argv[ i ];
+            output_name = argv[i];
         else
-            parse_error( "Unexpected argument", argv[ i ] );
+            parse_error( "Unexpected argument", argv[i] );
     }
 
     if( !input_name ) parse_error( "No input file specified." );
@@ -193,67 +193,67 @@ int main( int argc, char* argv[] )
         return 2;
     }
 
-    bool                           nodes_spec = false;
-    bool                           elems_spec = false;
-    bool                           node_from_elem_spec = false;
-    bool                           have_data_tag = false;
-    const char*                    write_tag_name = 0;
-    Tag                            write_tag = 0;
-    TagSpec                        data_tag = { 0, 0 };
+    bool nodes_spec            = false;
+    bool elems_spec            = false;
+    bool node_from_elem_spec   = false;
+    bool have_data_tag         = false;
+    const char* write_tag_name = 0;
+    Tag write_tag              = 0;
+    TagSpec data_tag           = { 0, 0 };
     typedef std::vector< TagSpec > TagVect;
-    TagVect                        ident_tags;
-    int                            data_size = 0;
+    TagVect ident_tags;
+    int data_size = 0;
 
     for( int i = 1; i < argc; ++i )
     {
-        if( argv[ i ] == input_name || argv[ i ] == output_name )
+        if( argv[i] == input_name || argv[i] == output_name )
             continue;
-        else if( !strcmp( argv[ i ], "-n" ) )
+        else if( !strcmp( argv[i], "-n" ) )
             nodes_spec = true;
-        else if( !strcmp( argv[ i ], "-e" ) )
+        else if( !strcmp( argv[i], "-e" ) )
             elems_spec = true;
-        else if( !strcmp( argv[ i ], "-E" ) )
+        else if( !strcmp( argv[i], "-E" ) )
         {
             node_from_elem_spec = true;
-            elems_spec = true;
-            nodes_spec = false;
+            elems_spec          = true;
+            nodes_spec          = false;
         }
-        else if( !argv[ i ][ 0 ] )
-            usage( );
+        else if( !argv[i][0] )
+            usage();
         else
         {
-            char flag = argv[ i ][ 1 ];
-            if( ( flag != 't' && flag != 'd' && flag != 'w' && flag != 'c' ) || argv[ i ][ 2 ] )
-                parse_error( "Invalid argument", argv[ i ] );
+            char flag = argv[i][1];
+            if( ( flag != 't' && flag != 'd' && flag != 'w' && flag != 'c' ) || argv[i][2] )
+                parse_error( "Invalid argument", argv[i] );
 
             ++i;
-            if( i == argc ) parse_error( "Expected tag spec following option", argv[ i - 1 ] );
+            if( i == argc ) parse_error( "Expected tag spec following option", argv[i - 1] );
 
             if( flag == 'w' )
             {
-                if( write_tag_name ) parse_error( "Invalid argument", argv[ i ] );
-                write_tag_name = argv[ i ];
+                if( write_tag_name ) parse_error( "Invalid argument", argv[i] );
+                write_tag_name = argv[i];
             }
             else if( flag == 'c' )
             {
                 TagSpec spec;
-                if( parse_tag_create( argv[ i ], spec, iface ) ) parse_error( "Failed to parse tag spec", argv[ i ] );
+                if( parse_tag_create( argv[i], spec, iface ) ) parse_error( "Failed to parse tag spec", argv[i] );
 
-                if( have_data_tag ) parse_error( "Invalid argument", argv[ i ] );
+                if( have_data_tag ) parse_error( "Invalid argument", argv[i] );
 
-                data_tag = spec;
+                data_tag      = spec;
                 have_data_tag = true;
             }
             else
             {
                 TagSpec spec;
-                if( parse_tag_spec( argv[ i ], spec, iface ) ) parse_error( "Failed to parse tag spec", argv[ i ] );
+                if( parse_tag_spec( argv[i], spec, iface ) ) parse_error( "Failed to parse tag spec", argv[i] );
 
                 if( flag == 'd' )
                 {
-                    if( have_data_tag ) parse_error( "Invalid argument", argv[ i ] );
+                    if( have_data_tag ) parse_error( "Invalid argument", argv[i] );
 
-                    data_tag = spec;
+                    data_tag      = spec;
                     have_data_tag = true;
                 }
                 else
@@ -268,14 +268,14 @@ int main( int argc, char* argv[] )
     if( !nodes_spec && !elems_spec ) nodes_spec = elems_spec = true;
 
     // must have at least one identifying tag
-    if( ident_tags.empty( ) ) parse_error( "At least one identifying tag must be specified." );
+    if( ident_tags.empty() ) parse_error( "At least one identifying tag must be specified." );
 
     // If data tag wasn't specified, use identifying tag for data
     if( !have_data_tag )
     {
-        if( ident_tags.size( ) > 1 ) parse_error( "No data tag specified." );
-        data_tag.value = 0;
-        data_tag.handle = ident_tags[ 0 ].handle;
+        if( ident_tags.size() > 1 ) parse_error( "No data tag specified." );
+        data_tag.value  = 0;
+        data_tag.handle = ident_tags[0].handle;
     }
     CALL( tag_get_bytes, ( data_tag.handle, data_size ) );
 
@@ -297,7 +297,7 @@ int main( int argc, char* argv[] )
 
     // Get list of sets with identifying tags
     Range sets, temp;
-    for( TagVect::iterator i = ident_tags.begin( ); i != ident_tags.end( ); ++i )
+    for( TagVect::iterator i = ident_tags.begin(); i != ident_tags.end(); ++i )
     {
         const void* value[] = { i->value };
         CALL( get_entities_by_type_and_tag, ( 0, MBENTITYSET, &i->handle, i->value ? value : 0, 1, temp ) );
@@ -306,10 +306,10 @@ int main( int argc, char* argv[] )
 
     // For each set, set tag on contained entities
     std::vector< unsigned char > tag_data( data_size );
-    for( Range::iterator i = sets.begin( ); i != sets.end( ); ++i )
+    for( Range::iterator i = sets.begin(); i != sets.end(); ++i )
     {
         // Get tag value
-        ErrorCode rval = iface->tag_get_data( data_tag.handle, &*i, 1, &tag_data[ 0 ] );
+        ErrorCode rval = iface->tag_get_data( data_tag.handle, &*i, 1, &tag_data[0] );
         if( MB_TAG_NOT_FOUND == rval )
         {
             if( !data_tag.value )
@@ -317,33 +317,32 @@ int main( int argc, char* argv[] )
                 std::cerr << "Data tag not set for entityset " << iface->id_from_handle( *i ) << std::endl;
                 continue;
             }
-            memcpy( &tag_data[ 0 ], data_tag.value, data_size );
+            memcpy( &tag_data[0], data_tag.value, data_size );
         }
         else if( MB_SUCCESS != rval )
         {
-            CALL( tag_get_data, ( data_tag.handle, &*i, 1, &tag_data[ 0 ] ) );
+            CALL( tag_get_data, ( data_tag.handle, &*i, 1, &tag_data[0] ) );
         }
 
         // Get entities
         Range entities;
         CALL( get_entities_by_handle, ( *i, entities, true ) );
-        int             junk;
-        Range::iterator eb =
-            entities.lower_bound( entities.begin( ), entities.end( ), CREATE_HANDLE( MBEDGE, 0, junk ) );
+        int junk;
+        Range::iterator eb = entities.lower_bound( entities.begin(), entities.end(), CREATE_HANDLE( MBEDGE, 0, junk ) );
         if( elems_spec )
-            for( Range::iterator j = eb; j != entities.end( ); ++j )
-                CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[ 0 ] ) );
+            for( Range::iterator j = eb; j != entities.end(); ++j )
+                CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[0] ) );
         if( nodes_spec )
-            for( Range::iterator j = entities.begin( ); j != eb; ++j )
-                CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[ 0 ] ) );
+            for( Range::iterator j = entities.begin(); j != eb; ++j )
+                CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[0] ) );
         if( node_from_elem_spec )
         {
             Range elems;
-            elems.merge( eb, entities.end( ) );
-            entities.clear( );
+            elems.merge( eb, entities.end() );
+            entities.clear();
             CALL( get_adjacencies, ( elems, 0, false, entities, Interface::UNION ) );
-            for( Range::iterator j = entities.begin( ); j != entities.end( ); ++j )
-                CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[ 0 ] ) );
+            for( Range::iterator j = entities.begin(); j != entities.end(); ++j )
+                CALL( tag_set_data, ( write_tag, &*j, 1, &tag_data[0] ) );
         }
     }
 

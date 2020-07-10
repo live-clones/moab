@@ -50,7 +50,7 @@ class StdDevTemplate : public VarianceTemplate
     StdDevTemplate( QualityMetric* qm = 0 ) : VarianceTemplate( qm ) {}
 
     MESQUITE_EXPORT
-    virtual ~StdDevTemplate( ) {}
+    virtual ~StdDevTemplate() {}
 
     MESQUITE_EXPORT
     virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
@@ -61,11 +61,11 @@ class StdDevTemplate : public VarianceTemplate
 
     MESQUITE_EXPORT
     virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                 std::vector< Vector3D >&    grad_out,
+                                                 std::vector< Vector3D >& grad_out,
                                                  std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual ObjectiveFunction* clone( ) const;
+    virtual ObjectiveFunction* clone() const;
 };
 
 }  // namespace MBMesquite

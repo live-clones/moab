@@ -17,10 +17,10 @@ int main( int /* argc*/, char** /* argv[]*/ )
     const char* filename_mesh = STRINGIFY( MESHDIR ) "/mbcslam/eulerHomme.vtk";
 
     // read input mesh in a set
-    Core         moab;
-    Interface*   mb = &moab;  // global
+    Core moab;
+    Interface* mb = &moab;  // global
     EntityHandle sf;
-    ErrorCode    rval = mb->create_meshset( MESHSET_SET, sf );
+    ErrorCode rval = mb->create_meshset( MESHSET_SET, sf );
     if( MB_SUCCESS != rval ) return 1;
 
     rval = mb->load_file( filename_mesh, &sf );
@@ -34,14 +34,14 @@ int main( int /* argc*/, char** /* argv[]*/ )
 
     {
         moab::IntxAreaUtils areaAdaptor( moab::IntxAreaUtils::Girard );  // use_lHuiller = true
-        double              area1 = areaAdaptor.area_on_sphere( mb, sf, R );
+        double area1 = areaAdaptor.area_on_sphere( mb, sf, R );
         std::cout << "total area with Girard          :  " << area1
                   << " rel error:" << fabs( ( area1 - area_sphere ) / area_sphere ) << "\n";
     }
 
     {
         moab::IntxAreaUtils areaAdaptor( moab::IntxAreaUtils::lHuiller );
-        double              area2 = areaAdaptor.area_on_sphere( mb, sf, R );
+        double area2 = areaAdaptor.area_on_sphere( mb, sf, R );
         std::cout << "total area with l'Huiller       : " << area2
                   << " rel error:" << fabs( ( area2 - area_sphere ) / area_sphere ) << "\n";
     }
@@ -49,7 +49,7 @@ int main( int /* argc*/, char** /* argv[]*/ )
 #ifdef MOAB_HAVE_TEMPESTREMAP
     {
         moab::IntxAreaUtils areaAdaptor( moab::IntxAreaUtils::GaussQuadrature );
-        double              area3 = areaAdaptor.area_on_sphere( mb, sf, R );
+        double area3 = areaAdaptor.area_on_sphere( mb, sf, R );
         std::cout << "total area with GaussQuadrature : " << area3
                   << " rel error:" << fabs( ( area3 - area_sphere ) / area_sphere ) << "\n";
     }

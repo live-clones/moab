@@ -41,13 +41,13 @@ namespace MBMesquite
 
 std::ostream& operator<<( std::ostream& s, const MBMesquite::Vector3D& v )
 {
-    return s << v[ 0 ] << ' ' << v[ 1 ] << ' ' << v[ 2 ];
+    return s << v[0] << ' ' << v[1] << ' ' << v[2];
 }
 
 double Vector3D::interior_angle( const Vector3D& lhs, const Vector3D& rhs, MsqError& err )
 {
-    double len1 = lhs.length( );
-    double len2 = rhs.length( );
+    double len1      = lhs.length();
+    double len2      = rhs.length();
     double angle_cos = ( lhs % rhs ) / ( len1 * len2 );
     if( !moab::Util::is_finite( angle_cos ) )
     {

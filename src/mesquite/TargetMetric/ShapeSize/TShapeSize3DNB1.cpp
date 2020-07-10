@@ -37,29 +37,29 @@
 namespace MBMesquite
 {
 
-std::string TShapeSize3DNB1::get_name( ) const
+std::string TShapeSize3DNB1::get_name() const
 {
     return "TShapeSize3DNB1";
 }
 
-TShapeSize3DNB1::~TShapeSize3DNB1( ) {}
+TShapeSize3DNB1::~TShapeSize3DNB1() {}
 
 bool TShapeSize3DNB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& /*err*/ )
 {
-    const double nT = Frobenius( T );
-    const double tau = det( T );
+    const double nT   = Frobenius( T );
+    const double tau  = det( T );
     const double tau1 = tau - 1;
-    result = nT * nT * nT - 3 * MSQ_SQRT_THREE * tau + mGamma * tau1 * tau1;
+    result            = nT * nT * nT - 3 * MSQ_SQRT_THREE * tau + mGamma * tau1 * tau1;
     return true;
 }
 
 bool TShapeSize3DNB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T,
                                           MsqError& /*err*/ )
 {
-    const double nT = Frobenius( T );
-    const double tau = det( T );
+    const double nT   = Frobenius( T );
+    const double tau  = det( T );
     const double tau1 = tau - 1;
-    result = nT * nT * nT - 3 * MSQ_SQRT_THREE * tau + mGamma * tau1 * tau1;
+    result            = nT * nT * nT - 3 * MSQ_SQRT_THREE * tau + mGamma * tau1 * tau1;
 
     wrt_T = T;
     wrt_T *= 3 * nT;
@@ -69,16 +69,16 @@ bool TShapeSize3DNB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& re
 }
 
 bool TShapeSize3DNB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& wrt_T,
-                                          MsqMatrix< 3, 3 > second[ 6 ], MsqError& /*err*/ )
+                                          MsqMatrix< 3, 3 > second[6], MsqError& /*err*/ )
 {
-    const double nT = Frobenius( T );
-    const double tau = det( T );
+    const double nT   = Frobenius( T );
+    const double tau  = det( T );
     const double tau1 = tau - 1;
-    result = nT * nT * nT - 3 * MSQ_SQRT_THREE * tau + mGamma * tau1 * tau1;
+    result            = nT * nT * nT - 3 * MSQ_SQRT_THREE * tau + mGamma * tau1 * tau1;
 
-    const double            f = ( 3 * MSQ_SQRT_THREE - 2 * mGamma * tau1 );
+    const double f               = ( 3 * MSQ_SQRT_THREE - 2 * mGamma * tau1 );
     const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    wrt_T = T;
+    wrt_T                        = T;
     wrt_T *= 3 * nT;
     wrt_T -= f * adjt;
 

@@ -64,7 +64,7 @@ class UntangleBetaQualityMetric : public ElementQM, public AveragingQM
     MESQUITE_EXPORT UntangleBetaQualityMetric( double bet = 0.05 );
 
     // virtual destructor ensures use of polymorphism during destruction
-    MESQUITE_EXPORT virtual ~UntangleBetaQualityMetric( ) {}
+    MESQUITE_EXPORT virtual ~UntangleBetaQualityMetric() {}
 
     /*!Function to allow users to set the beta value after the
       metric has already been created. */
@@ -73,14 +73,14 @@ class UntangleBetaQualityMetric : public ElementQM, public AveragingQM
         mBeta = beta_in;
     }
     /*!Function to allow the user to check the value of beta.*/
-    MESQUITE_EXPORT double get_beta( )
+    MESQUITE_EXPORT double get_beta()
     {
         return mBeta;
     }
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 

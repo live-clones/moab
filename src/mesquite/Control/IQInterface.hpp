@@ -45,7 +45,7 @@ class ParallelMesh;
 class MESQUITE_EXPORT IQInterface : public Settings
 {
   public:
-    virtual ~IQInterface( );
+    virtual ~IQInterface();
 
     inline void run_instructions( MeshDomainAssoc* mesh_and_domain, MsqError& err )
     {

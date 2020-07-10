@@ -30,11 +30,11 @@ int main( int argc, char** argv )
     if( argc > 1 )
     {
         // User has input a mesh file
-        test_file_name = argv[ 1 ];
+        test_file_name = argv[1];
     }
 
     // Load the mesh from vtk file
-    ErrorCode rval = mb->load_mesh( test_file_name.c_str( ) );MB_CHK_ERR( rval );
+    ErrorCode rval = mb->load_mesh( test_file_name.c_str() );MB_CHK_ERR( rval );
 
     // Get verts entities, by type
     Range verts;
@@ -53,10 +53,10 @@ int main( int argc, char** argv )
     rval = mb->get_entities_by_dimension( 0, 3, elems );MB_CHK_ERR( rval );
 
     // Output the number of entities
-    cout << "Number of vertices is " << verts.size( ) << endl;
-    cout << "Number of edges is " << edges.size( ) << endl;
-    cout << "Number of faces is " << faces.size( ) << endl;
-    cout << "Number of elements is " << elems.size( ) << endl;
+    cout << "Number of vertices is " << verts.size() << endl;
+    cout << "Number of edges is " << edges.size() << endl;
+    cout << "Number of faces is " << faces.size() << endl;
+    cout << "Number of elements is " << elems.size() << endl;
 
     delete mb;
 

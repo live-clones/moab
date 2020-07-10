@@ -33,15 +33,15 @@ class BVHTree : public Tree
   public:
     BVHTree( Interface* impl );
 
-    ~BVHTree( )
+    ~BVHTree()
     {
-        reset_tree( );
+        reset_tree();
     }
 
     /** \brief Destroy the tree maintained by this object, optionally checking we have the right
      * root. \param root If non-NULL, check that this is the root, return failure if not
      */
-    virtual ErrorCode reset_tree( );
+    virtual ErrorCode reset_tree();
 
     virtual ErrorCode parse_options( FileOptions& opts );
 
@@ -106,13 +106,13 @@ class BVHTree : public Tree
      * \param result_params If non-NULL, will contain parameters of the point in the ents in
      * leaves_out \param tree_root Start from this tree node (non-NULL) instead of tree root (NULL)
      */
-    virtual ErrorCode distance_search( const double from_point[ 3 ], const double distance,
+    virtual ErrorCode distance_search( const double from_point[3], const double distance,
                                        std::vector< EntityHandle >& result_list, const double iter_tol = 1.0e-10,
                                        const double inside_tol = 1.0e-6, std::vector< double >* result_dists = NULL,
                                        std::vector< CartVect >* result_params = NULL, EntityHandle* tree_root = NULL );
 
     //! print various things about this tree
-    virtual ErrorCode print( );
+    virtual ErrorCode print();
 
   private:
     // don't allow copy constructor, too complicated
@@ -122,17 +122,17 @@ class BVHTree : public Tree
     {
       public:
         HandleData( EntityHandle h, const BoundBox& bx, const double dp ) : myHandle( h ), myBox( bx ), myDim( dp ) {}
-        HandleData( ) : myHandle( 0 ), myDim( -1 ) {}
+        HandleData() : myHandle( 0 ), myDim( -1 ) {}
         EntityHandle myHandle;
-        BoundBox     myBox;
-        double       myDim;
+        BoundBox myBox;
+        double myDim;
     };
     typedef std::vector< HandleData > HandleDataVec;
 
     class SplitData
     {
       public:
-        SplitData( )
+        SplitData()
             : dim( UINT_MAX ), nl( UINT_MAX ), nr( UINT_MAX ), split( DBL_MAX ), Lmax( -DBL_MAX ), Rmin( DBL_MAX )
         {
         }
@@ -142,20 +142,20 @@ class BVHTree : public Tree
         {
         }
         unsigned int dim, nl, nr;
-        double       split;
-        double       Lmax, Rmin;
-        BoundBox     boundingBox, leftBox, rightBox;
-        SplitData&   operator=( const SplitData& f )
+        double split;
+        double Lmax, Rmin;
+        BoundBox boundingBox, leftBox, rightBox;
+        SplitData& operator=( const SplitData& f )
         {
-            dim = f.dim;
-            nl = f.nl;
-            nr = f.nr;
-            split = f.split;
-            Lmax = f.Lmax;
-            Rmin = f.Rmin;
+            dim         = f.dim;
+            nl          = f.nl;
+            nr          = f.nr;
+            split       = f.split;
+            Lmax        = f.Lmax;
+            Rmin        = f.Rmin;
             boundingBox = f.boundingBox;
-            leftBox = f.leftBox;
-            rightBox = f.rightBox;
+            leftBox     = f.leftBox;
+            rightBox    = f.rightBox;
             return *this;
         }
     };  // SplitData
@@ -168,7 +168,7 @@ class BVHTree : public Tree
         }
 
       public:
-        bool operator( )( const SplitData& a, const SplitData& b ) const
+        bool operator()( const SplitData& a, const SplitData& b ) const
         {
             return objective( a ) < objective( b );
         }
@@ -177,7 +177,7 @@ class BVHTree : public Tree
     class HandleData_comparator : public std::binary_function< HandleData, HandleData, bool >
     {
       public:
-        bool operator( )( const HandleData& a, const HandleData& b )
+        bool operator()( const HandleData& a, const HandleData& b )
         {
             return a.myDim < b.myDim || ( a.myDim == b.myDim && a.myHandle < b.myHandle );
         }
@@ -186,17 +186,17 @@ class BVHTree : public Tree
     class Bucket
     {
       public:
-        Bucket( ) : mySize( 0 ) {}
+        Bucket() : mySize( 0 ) {}
         Bucket( const Bucket& f ) : mySize( f.mySize ), boundingBox( f.boundingBox ) {}
         Bucket( const unsigned int sz ) : mySize( sz ) {}
         static unsigned int bucket_index( int num_splits, const BoundBox& box, const BoundBox& interval,
                                           const unsigned int dim );
-        unsigned int        mySize;
-        BoundBox            boundingBox;
-        Bucket&             operator=( const Bucket& f )
+        unsigned int mySize;
+        BoundBox boundingBox;
+        Bucket& operator=( const Bucket& f )
         {
             boundingBox = f.boundingBox;
-            mySize = f.mySize;
+            mySize      = f.mySize;
             return *this;
         }
     };  // Bucket
@@ -205,16 +205,16 @@ class BVHTree : public Tree
     {
       public:
         HandleDataVec entities;
-        unsigned int  dim, child;
-        double        Lmax, Rmin;
-        BoundBox      box;
-        Node( ) : dim( UINT_MAX ), child( UINT_MAX ), Lmax( -DBL_MAX ), Rmin( DBL_MAX ) {}
+        unsigned int dim, child;
+        double Lmax, Rmin;
+        BoundBox box;
+        Node() : dim( UINT_MAX ), child( UINT_MAX ), Lmax( -DBL_MAX ), Rmin( DBL_MAX ) {}
         Node& operator=( const Node& f )
         {
-            dim = f.dim;
-            child = f.child;
-            Lmax = f.Lmax;
-            Rmin = f.Rmin;
+            dim      = f.dim;
+            child    = f.child;
+            Lmax     = f.Lmax;
+            Rmin     = f.Rmin;
             entities = f.entities;
             return *this;
         }
@@ -224,18 +224,18 @@ class BVHTree : public Tree
     {
       public:
         unsigned int dim, child;
-        double       Lmax, Rmin;
-        BoundBox     box;
+        double Lmax, Rmin;
+        BoundBox box;
         TreeNode( int dm, int chld, double lmx, double rmn, BoundBox& bx )
             : dim( dm ), child( chld ), Lmax( lmx ), Rmin( rmn ), box( bx )
         {
         }
         TreeNode& operator=( const TreeNode& f )
         {
-            dim = f.dim;
+            dim   = f.dim;
             child = f.child;
-            Lmax = f.Lmax;
-            Rmin = f.Rmin;
+            Lmax  = f.Lmax;
+            Rmin  = f.Rmin;
             return *this;
         }
     };  // TreeNode
@@ -246,7 +246,7 @@ class BVHTree : public Tree
     unsigned int set_interval( BoundBox& interval, std::vector< Bucket >::const_iterator begin,
                                std::vector< Bucket >::const_iterator end ) const;
 
-    void initialize_splits( std::vector< std::vector< SplitData > >&    splits,
+    void initialize_splits( std::vector< std::vector< SplitData > >& splits,
                             const std::vector< std::vector< Bucket > >& buckets, const SplitData& data ) const;
 
     void order_elements( HandleDataVec::iterator& begin, HandleDataVec::iterator& end, SplitData& data ) const;
@@ -276,10 +276,10 @@ class BVHTree : public Tree
     // print tree nodes
     ErrorCode print_nodes( std::vector< Node >& nodes );
 
-    Range                          entityHandles;
-    std::vector< TreeNode >        myTree;
-    int                            splitsPerDir;
-    EntityHandle                   startSetHandle;
+    Range entityHandles;
+    std::vector< TreeNode > myTree;
+    int splitsPerDir;
+    EntityHandle startSetHandle;
     static MOAB_EXPORT const char* treeName;
 };  // class Bvh_tree
 
@@ -290,15 +290,15 @@ inline unsigned int BVHTree::Bucket::bucket_index( int num_splits, const BoundBo
     // around page 9
 
     // Paper arithmetic is over-optimized.. this is safer.
-    const double min = interval.bMin[ dim ];
-    const double length = ( interval.bMax[ dim ] - min ) / ( num_splits + 1 );
-    const double center = ( ( box.bMax[ dim ] + box.bMin[ dim ] ) / 2.0 ) - min;
+    const double min    = interval.bMin[dim];
+    const double length = ( interval.bMax[dim] - min ) / ( num_splits + 1 );
+    const double center = ( ( box.bMax[dim] + box.bMin[dim] ) / 2.0 ) - min;
 #ifndef NDEBUG
 #ifdef BVH_SHOW_INDEX
-    std::cout << "[" << min << " , " << interval.max[ dim ] << " ]" << std::endl;
-    std::cout << "[" << box.bMin[ dim ] << " , " << box.bMax[ dim ] << " ]" << std::endl;
+    std::cout << "[" << min << " , " << interval.max[dim] << " ]" << std::endl;
+    std::cout << "[" << box.bMin[dim] << " , " << box.bMax[dim] << " ]" << std::endl;
     std::cout << "Length of bucket" << length << std::endl;
-    std::cout << "Center: " << ( box.bMax[ dim ] + box.bMin[ dim ] ) / 2.0 << std::endl;
+    std::cout << "Center: " << ( box.bMax[dim] + box.bMin[dim] ) / 2.0 << std::endl;
     std::cout << "Distance of center from min:  " << center << std::endl;
     std::cout << "ratio: " << center / length << std::endl;
     std::cout << "index: " << std::ceil( center / length ) - 1 << std::endl;
@@ -316,7 +316,7 @@ inline BVHTree::BVHTree( Interface* impl ) : Tree( impl ), splitsPerDir( 3 ), st
 inline unsigned int BVHTree::set_interval( BoundBox& interval, std::vector< Bucket >::const_iterator begin,
                                            std::vector< Bucket >::const_iterator end ) const
 {
-    bool         first = true;
+    bool first         = true;
     unsigned int count = 0;
     for( std::vector< Bucket >::const_iterator b = begin; b != end; ++b )
     {
@@ -327,7 +327,7 @@ inline unsigned int BVHTree::set_interval( BoundBox& interval, std::vector< Buck
             if( first )
             {
                 interval = box;
-                first = false;
+                first    = false;
             }
             else
                 interval.update( box );
@@ -342,43 +342,43 @@ inline void BVHTree::order_elements( HandleDataVec::iterator& begin, HandleDataV
     for( HandleDataVec::iterator i = begin; i != end; ++i )
     {
         const int index = Bucket::bucket_index( splitsPerDir, i->myBox, data.boundingBox, data.dim );
-        i->myDim = ( index <= data.split ) ? 0 : 1;
+        i->myDim        = ( index <= data.split ) ? 0 : 1;
     }
-    std::sort( begin, end, HandleData_comparator( ) );
+    std::sort( begin, end, HandleData_comparator() );
 }
 
 inline void BVHTree::choose_best_split( const std::vector< std::vector< SplitData > >& splits, SplitData& data ) const
 {
     std::vector< SplitData > best_splits;
-    for( std::vector< std::vector< SplitData > >::const_iterator i = splits.begin( ); i != splits.end( ); ++i )
+    for( std::vector< std::vector< SplitData > >::const_iterator i = splits.begin(); i != splits.end(); ++i )
     {
         std::vector< SplitData >::const_iterator j =
-            std::min_element( ( *i ).begin( ), ( *i ).end( ), Split_comparator( ) );
+            std::min_element( ( *i ).begin(), ( *i ).end(), Split_comparator() );
         best_splits.push_back( *j );
     }
-    data = *std::min_element( best_splits.begin( ), best_splits.end( ), Split_comparator( ) );
+    data = *std::min_element( best_splits.begin(), best_splits.end(), Split_comparator() );
 }
 
 inline ErrorCode BVHTree::construct_element_vec( std::vector< HandleData >& handle_data_vec, const Range& elements,
                                                  BoundBox& bounding_box )
 {
-    std::vector< double >       coordinate( 3 * CN::MAX_NODES_PER_ELEMENT );
-    int                         num_conn;
-    ErrorCode                   rval = MB_SUCCESS;
+    std::vector< double > coordinate( 3 * CN::MAX_NODES_PER_ELEMENT );
+    int num_conn;
+    ErrorCode rval = MB_SUCCESS;
     std::vector< EntityHandle > storage;
-    for( Range::iterator i = elements.begin( ); i != elements.end( ); ++i )
+    for( Range::iterator i = elements.begin(); i != elements.end(); ++i )
     {
         // TODO: not generic enough. Why dim != 3
         // Commence un-necessary deep copying.
         const EntityHandle* connect;
         rval = mbImpl->get_connectivity( *i, connect, num_conn, false, &storage );
         if( MB_SUCCESS != rval ) return rval;
-        rval = mbImpl->get_coords( connect, num_conn, &coordinate[ 0 ] );
+        rval = mbImpl->get_coords( connect, num_conn, &coordinate[0] );
         if( MB_SUCCESS != rval ) return rval;
         BoundBox box;
         for( int j = 0; j < num_conn; j++ )
-            box.update( &coordinate[ 3 * j ] );
-        if( i == elements.begin( ) )
+            box.update( &coordinate[3 * j] );
+        if( i == elements.begin() )
             bounding_box = box;
         else
             bounding_box.update( box );
@@ -388,9 +388,9 @@ inline ErrorCode BVHTree::construct_element_vec( std::vector< HandleData >& hand
     return rval;
 }
 
-inline ErrorCode BVHTree::reset_tree( )
+inline ErrorCode BVHTree::reset_tree()
 {
-    return delete_tree_sets( );
+    return delete_tree_sets();
 }
 
 }  // namespace moab

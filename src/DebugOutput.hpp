@@ -125,15 +125,15 @@ class DebugOutput
      * Destructor flushes any remaining output that wasn't followed
      * by a newline character.
      */
-    ~DebugOutput( );
+    ~DebugOutput();
 
     //!\brief Check if MPI rank has been set.
-    bool have_rank( ) const
+    bool have_rank() const
     {
         return mpiRank >= 0;
     }
     //!\brief Get MPI rank.
-    int get_rank( ) const
+    int get_rank() const
     {
         return mpiRank;
     }
@@ -144,7 +144,7 @@ class DebugOutput
     }
     //!\brief Set MPI rank to the rank of this proccess in MPI_COMM_WORLD,
     //!       or zero if MOAB is build w/out MPI.
-    void use_world_rank( );
+    void use_world_rank();
 
     //!\brief Only print debug output from N processes
     void limit_output_to_first_N_procs( int N )
@@ -153,7 +153,7 @@ class DebugOutput
     }
 
     //!\brief Get verbosity limit
-    unsigned get_verbosity( ) const
+    unsigned get_verbosity() const
     {
         return verbosityLimit;
     }
@@ -164,7 +164,7 @@ class DebugOutput
     }
 
     //!\brief Get line prefix
-    const std::string& get_prefix( ) const
+    const std::string& get_prefix() const
     {
         return linePfx;
     }
@@ -235,13 +235,13 @@ class DebugOutput
     }
 
   private:
-    std::string        linePfx;
+    std::string linePfx;
     DebugOutputStream* outputImpl;
-    int                mpiRank;
-    unsigned           verbosityLimit;
-    CpuTimer           cpuTi;
+    int mpiRank;
+    unsigned verbosityLimit;
+    CpuTimer cpuTi;
 
-    void tprint( );
+    void tprint();
 
     void list_range_real( const char* pfx, const Range& range );
     void list_ints_real( const char* pfx, const Range& range );
@@ -256,7 +256,7 @@ class DebugOutput
     // (yet) portable (c99, no c++ standard).
     void print_real( const char* buffer, va_list args1, va_list args2 );
     void tprint_real( const char* buffer, va_list args1, va_list args2 );
-    void process_line_buffer( );
+    void process_line_buffer();
 
     std::vector< char > lineBuffer;
 
@@ -273,9 +273,9 @@ class DebugOutputStream
     int referenceCount;
 
   public:
-    DebugOutputStream( ) : referenceCount( 1 ) {}
-    virtual ~DebugOutputStream( );
-    virtual void println( const char* pfx, const char* str ) = 0;
+    DebugOutputStream() : referenceCount( 1 ) {}
+    virtual ~DebugOutputStream();
+    virtual void println( const char* pfx, const char* str )           = 0;
     virtual void println( int rank, const char* pfx, const char* str ) = 0;
 };
 

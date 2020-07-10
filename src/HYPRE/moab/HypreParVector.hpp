@@ -57,13 +57,13 @@ class HypreParVector
 
     /// The actual object
     hypre_ParVector* x_par;
-    HYPRE_IJVector   x;
+    HYPRE_IJVector x;
 
     friend class HypreParMatrix;
     friend class HypreSolver;
 
     moab::ParallelComm* pcomm;
-    char                initialized;
+    char initialized;
 
   public:
     /** Creates an empty vector with given global comm. */
@@ -79,31 +79,31 @@ class HypreParVector
     int resize( HYPRE_Int glob_size, HYPRE_Int rstart, HYPRE_Int rend );
 
     /// MPI communicator
-    moab::ParallelComm* GetParallelCommunicator( )
+    moab::ParallelComm* GetParallelCommunicator()
     {
         return pcomm;
     }
 
     /// Returns the row partitioning
-    inline HYPRE_Int* Partitioning( )
+    inline HYPRE_Int* Partitioning()
     {
         return x->partitioning;
     }
 
     /// Returns the global number of rows
-    inline HYPRE_Int GlobalSize( ) const
+    inline HYPRE_Int GlobalSize() const
     {
         return x->global_num_rows;
     }
 
     /// Typecasting to hypre's HYPRE_IJVector*
-    operator HYPRE_IJVector( ) const;
+    operator HYPRE_IJVector() const;
     // #ifndef HYPRE_PAR_VECTOR_STRUCT
     /// Typecasting to hypre's HYPRE_ParVector, a.k.a. void *
-    operator HYPRE_ParVector( ) const;
+    operator HYPRE_ParVector() const;
     // #endif
     /// Changes the ownership of the the vector
-    HYPRE_IJVector StealParVector( )
+    HYPRE_IJVector StealParVector()
     {
         own_ParVector = 0;
         return x;
@@ -116,7 +116,7 @@ class HypreParVector
     }
 
     /// Gets ownership of the internal HYPRE_IJVector
-    int GetOwnership( ) const
+    int GetOwnership() const
     {
         return own_ParVector;
     }
@@ -149,7 +149,7 @@ class HypreParVector
 
     HYPRE_Int verbosity( const HYPRE_Int level );
 
-    HYPRE_Int FinalizeAssembly( );
+    HYPRE_Int FinalizeAssembly();
 
     // const HYPRE_Complex& operator()(int index) const;
 
@@ -159,7 +159,7 @@ class HypreParVector
     void Print( const char* fname ) const;
 
     /// Calls hypre's destroy function
-    ~HypreParVector( );
+    ~HypreParVector();
 
     static double InnerProduct( HypreParVector& x, HypreParVector& y );
 };

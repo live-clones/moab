@@ -39,18 +39,18 @@
 namespace MBMesquite
 {
 
-std::string AWSizeB1::get_name( ) const
+std::string AWSizeB1::get_name() const
 {
     return "AWSizeB1";
 }
 
-AWSizeB1::~AWSizeB1( ) {}
+AWSizeB1::~AWSizeB1() {}
 
 bool AWSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {
     const double alpha = det( A );
     const double omega = det( W );
-    const double prod = alpha * omega;
+    const double prod  = alpha * omega;
     if( AWMetric::invalid_determinant( prod ) )
     {
         MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
@@ -68,7 +68,7 @@ bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 
 {
     const double alpha = det( A );
     const double omega = det( W );
-    const double prod = alpha * omega;
+    const double prod  = alpha * omega;
     if( AWMetric::invalid_determinant( prod ) )
     {
         MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
@@ -87,7 +87,7 @@ bool AWSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
 {
     const double alpha = det( A );
     const double omega = det( W );
-    const double prod = alpha * omega;
+    const double prod  = alpha * omega;
     if( AWMetric::invalid_determinant( prod ) )
     {
         MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
@@ -105,7 +105,7 @@ bool AWSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 
 {
     const double alpha = det( A );
     const double omega = det( W );
-    const double prod = alpha * omega;
+    const double prod  = alpha * omega;
     if( AWMetric::invalid_determinant( prod ) )
     {
         MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );

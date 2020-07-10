@@ -42,9 +42,9 @@ class FauxAbsShapeMetric : public AWMetric
     TShapeNB1 mMetric;
 
   public:
-    std::string get_name( ) const
+    std::string get_name() const
     {
-        return mMetric.get_name( );
+        return mMetric.get_name();
     }
     bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
     {
@@ -56,10 +56,11 @@ class FauxAbsShapeMetric : public AWMetric
     }
 };
 
-template<> class TMPTypes< AWQualityMetric >
+template <>
+class TMPTypes< AWQualityMetric >
 {
   public:
-    typedef AWMetric           MetricType;
+    typedef AWMetric MetricType;
     typedef FauxAbsShapeMetric TestType;
 };
 
@@ -69,7 +70,7 @@ class AWQualityMetricTest : public TMPQualityMetricTest< AWQualityMetric >
 
     REGISTER_TMP_TESTS
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( AWQualityMetricTest, "AWQualityMetricTest" );

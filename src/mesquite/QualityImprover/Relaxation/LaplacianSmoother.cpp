@@ -42,29 +42,29 @@
 namespace MBMesquite
 {
 
-std::string LaplacianSmoother::get_name( ) const
+std::string LaplacianSmoother::get_name() const
 {
     return "LaplacianSmoother";
 }
 
-LaplacianSmoother::~LaplacianSmoother( ) {}
+LaplacianSmoother::~LaplacianSmoother() {}
 
 void LaplacianSmoother::optimize_vertex_positions( PatchData& pd, MsqError& err )
 {
-    assert( pd.num_free_vertices( ) == 1 );
+    assert( pd.num_free_vertices() == 1 );
     const size_t center_vtx_index = 0;
 
-    adjVtxList.clear( );
+    adjVtxList.clear();
     pd.get_adjacent_vertex_indices( center_vtx_index, adjVtxList, err );MSQ_ERRRTN( err );
 
-    if( adjVtxList.empty( ) ) return;
+    if( adjVtxList.empty() ) return;
 
     const MsqVertex* verts = pd.get_vertex_array( err );
-    const size_t     n = adjVtxList.size( );
+    const size_t n         = adjVtxList.size();
 
-    Vector3D new_pos = verts[ adjVtxList[ 0 ] ];
+    Vector3D new_pos = verts[adjVtxList[0]];
     for( size_t i = 1; i < n; ++i )
-        new_pos += verts[ adjVtxList[ i ] ];
+        new_pos += verts[adjVtxList[i]];
     new_pos *= 1.0 / n;
     pd.set_vertex_coordinates( new_pos, center_vtx_index, err );
     pd.snap_vertex_to_domain( center_vtx_index, err );MSQ_ERRRTN( err );

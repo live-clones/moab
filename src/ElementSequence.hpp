@@ -16,9 +16,9 @@ class ElementSequence : public EntitySequence
     {
     }
 
-    virtual ~ElementSequence( ) {}
+    virtual ~ElementSequence() {}
 
-    inline unsigned int nodes_per_element( ) const
+    inline unsigned int nodes_per_element() const
     {
         return nodesPerElement;
     }
@@ -31,13 +31,13 @@ class ElementSequence : public EntitySequence
 
     virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length ) = 0;
 
-    inline EntityHandle const* get_connectivity_array( ) const;
+    inline EntityHandle const* get_connectivity_array() const;
 
-    virtual EntityHandle* get_connectivity_array( ) = 0;
+    virtual EntityHandle* get_connectivity_array() = 0;
 
-    inline bool has_mid_edge_nodes( ) const;
-    inline bool has_mid_face_nodes( ) const;
-    inline bool has_mid_volume_nodes( ) const;
+    inline bool has_mid_edge_nodes() const;
+    inline bool has_mid_face_nodes() const;
+    inline bool has_mid_volume_nodes() const;
 
   protected:
     ElementSequence( ElementSequence& split_from, EntityHandle here )
@@ -49,24 +49,24 @@ class ElementSequence : public EntitySequence
     unsigned nodesPerElement;
 };
 
-inline EntityHandle const* ElementSequence::get_connectivity_array( ) const
+inline EntityHandle const* ElementSequence::get_connectivity_array() const
 {
-    return const_cast< ElementSequence* >( this )->get_connectivity_array( );
+    return const_cast< ElementSequence* >( this )->get_connectivity_array();
 }
 
-inline bool ElementSequence::has_mid_edge_nodes( ) const
+inline bool ElementSequence::has_mid_edge_nodes() const
 {
-    return CN::HasMidEdgeNodes( type( ), nodes_per_element( ) );
+    return CN::HasMidEdgeNodes( type(), nodes_per_element() );
 }
 
-inline bool ElementSequence::has_mid_face_nodes( ) const
+inline bool ElementSequence::has_mid_face_nodes() const
 {
-    return CN::HasMidFaceNodes( type( ), nodes_per_element( ) );
+    return CN::HasMidFaceNodes( type(), nodes_per_element() );
 }
 
-inline bool ElementSequence::has_mid_volume_nodes( ) const
+inline bool ElementSequence::has_mid_volume_nodes() const
 {
-    return CN::HasMidRegionNodes( type( ), nodes_per_element( ) );
+    return CN::HasMidRegionNodes( type(), nodes_per_element() );
 }
 
 }  // namespace moab

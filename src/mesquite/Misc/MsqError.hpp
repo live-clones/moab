@@ -48,7 +48,7 @@ namespace MBMesquite
  * file/line onto the stack trace if the error flag is true.  Returns
  * false otherwise.
  */
-#define MSQ_CHKERR( err ) ( err.error( ) && err.push( MSQ_FUNCTION, __FILE__, __LINE__ ) )
+#define MSQ_CHKERR( err ) ( err.error() && err.push( MSQ_FUNCTION, __FILE__, __LINE__ ) )
 
 /**\brief If passed error is true, return from a void function.
  *
@@ -109,55 +109,55 @@ class MsqError
      */
     enum ErrorCode
     {
-        NO_ERROR = 0, /**< no error */
-        UNKNOWN_ERROR, /**< unknown error occured */
-        OUT_OF_MEMORY, /**< unable to allocate the necessary memory */
-        INVALID_ARG, /**< invalid function argument passed */
-        NOT_INITIALIZED, /**< object not initialized */
-        INVALID_STATE, /**< object is in an invalid state */
-        FILE_ACCESS, /**< File cannot be opened/created. */
-        FILE_FORMAT, /**< Wrong file type */
-        PARSE_ERROR, /**< Error parsing input (or input file) */
-        IO_ERROR, /**< An I/O error occured (e.g. read from file failed.) */
-        INVALID_MESH, /**< The mesh is invalid */
-        NO_PD_STORAGE_MODE, /**< no storage mode chosen within PatchData */
-        NOT_IMPLEMENTED, /**< requested functionality is not (yet) implemented */
-        INTERNAL_ERROR, /**< A bug in Mesquite */
-        INTERRUPTED, /**< Application or user interrupted operation */
-        TAG_ALREADY_EXISTS, /**< Attempt to create tag that already exists */
-        TAG_NOT_FOUND, /**< Specified tag does not exist */
+        NO_ERROR = 0,        /**< no error */
+        UNKNOWN_ERROR,       /**< unknown error occured */
+        OUT_OF_MEMORY,       /**< unable to allocate the necessary memory */
+        INVALID_ARG,         /**< invalid function argument passed */
+        NOT_INITIALIZED,     /**< object not initialized */
+        INVALID_STATE,       /**< object is in an invalid state */
+        FILE_ACCESS,         /**< File cannot be opened/created. */
+        FILE_FORMAT,         /**< Wrong file type */
+        PARSE_ERROR,         /**< Error parsing input (or input file) */
+        IO_ERROR,            /**< An I/O error occured (e.g. read from file failed.) */
+        INVALID_MESH,        /**< The mesh is invalid */
+        NO_PD_STORAGE_MODE,  /**< no storage mode chosen within PatchData */
+        NOT_IMPLEMENTED,     /**< requested functionality is not (yet) implemented */
+        INTERNAL_ERROR,      /**< A bug in Mesquite */
+        INTERRUPTED,         /**< Application or user interrupted operation */
+        TAG_ALREADY_EXISTS,  /**< Attempt to create tag that already exists */
+        TAG_NOT_FOUND,       /**< Specified tag does not exist */
         UNSUPPORTED_ELEMENT, /**< the element type is not supported. */
-        PARALLEL_ERROR, /**< an error occurred in parallel > */
-        BARRIER_VIOLATED, /**< barruer violated when processing barrier Target Metric */
+        PARALLEL_ERROR,      /**< an error occurred in parallel > */
+        BARRIER_VIOLATED,    /**< barruer violated when processing barrier Target Metric */
         LAST_ERROR_CODE
     };
 
     //! \brief resets error object to non-active state (no error).
-    MESQUITE_EXPORT void clear( );
+    MESQUITE_EXPORT void clear();
 
     //! \brief Check if an error has occured
-    inline bool error( ) const
+    inline bool error() const
     {
         return NO_ERROR != errorCode;
     }
     //! \brief Check if an error has occured
-    inline operator bool( ) const
+    inline operator bool() const
     {
         return NO_ERROR != errorCode;
     }
 
     //! \brief Initialize to cleared state.
-    MESQUITE_EXPORT MsqError( ) : errorCode( NO_ERROR ) {}
+    MESQUITE_EXPORT MsqError() : errorCode( NO_ERROR ) {}
 
     //! Destructor - empty but must declar virtual destrucor if virtual functions.
-    MESQUITE_EXPORT virtual ~MsqError( );
+    MESQUITE_EXPORT virtual ~MsqError();
 
     /* ************************************************************ *
      *            Low-level access to error data
      * ************************************************************ */
 
     //! Get error code
-    inline ErrorCode error_code( ) const
+    inline ErrorCode error_code() const
     {
         return errorCode;
     }
@@ -168,20 +168,20 @@ class MsqError
     {
         std::string function;
         std::string file;
-        int         line;
+        int line;
 
         Trace( const char* fun, const char* fil, int lin ) : function( fun ), file( fil ), line( lin ) {}
     };
 
     //! Get error message
-    MESQUITE_EXPORT const char* error_message( ) const;
+    MESQUITE_EXPORT const char* error_message() const;
 
     //! Container type used to store stack trace.
     //! Return type for stack()
     typedef std::list< Trace > StackTrace;
 
     //! Get stack trace
-    inline const StackTrace& stack( ) const
+    inline const StackTrace& stack() const
     {
         return stackTrace;
     }
@@ -217,10 +217,10 @@ class MsqError
 #endif
             ;  // ending semicolon for set( ErrorCode num, const char* format, ... )
       private:
-        MsqError&   mErr;
+        MsqError& mErr;
         const char* functionName;
         const char* fileName;
-        int         lineNumber;
+        int lineNumber;
     };
 
     static inline Setter setter( MsqError& err, const char* function, const char* file, int line )
@@ -229,9 +229,9 @@ class MsqError
     }
 
   private:
-    ErrorCode   errorCode;
+    ErrorCode errorCode;
     std::string errorMessage;
-    StackTrace  stackTrace;
+    StackTrace stackTrace;
 };
 
 //! Print message and stack trace
@@ -258,7 +258,7 @@ class MsqPrintError : public MsqError
     MESQUITE_EXPORT MsqPrintError( std::ostream& stream ) : outputStream( stream ) {}
 
     //!\brief On destruction, conditionally prints error data.
-    MESQUITE_EXPORT virtual ~MsqPrintError( );
+    MESQUITE_EXPORT virtual ~MsqPrintError();
 
   private:
     std::ostream& outputStream;

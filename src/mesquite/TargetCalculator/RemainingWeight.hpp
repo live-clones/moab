@@ -46,7 +46,7 @@ class RemainingWeight : public WeightCalculator
   public:
     RemainingWeight( WeightCalculator* primary_weight ) : primaryWeight( primary_weight ) {}
 
-    virtual ~RemainingWeight( );
+    virtual ~RemainingWeight();
 
     virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 };

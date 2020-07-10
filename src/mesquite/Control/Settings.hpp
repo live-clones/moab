@@ -47,10 +47,10 @@ class MESQUITE_EXPORT Settings
 {
   public:
     //! Initialize to default settings.
-    Settings( );
+    Settings();
     //! Copy existing settings
     Settings( const Settings& other );
-    ~Settings( );
+    ~Settings();
     //! Copy existing settings.
     Settings& operator=( const Settings& other );
 
@@ -63,18 +63,18 @@ class MESQUITE_EXPORT Settings
     void set_mapping_functions( const MappingFunction2D* const array[], size_t array_size );
     void set_mapping_functions( const MappingFunction3D* const array[], size_t array_size );
     //! Get the mapping function for an element topology.
-    const MappingFunction*   get_mapping_function( EntityTopology element_type ) const;
+    const MappingFunction* get_mapping_function( EntityTopology element_type ) const;
     const MappingFunction2D* get_mapping_function_2D( EntityTopology element_type ) const;
     const MappingFunction3D* get_mapping_function_3D( EntityTopology element_type ) const;
 
     enum FixedVertexMode
     {
-        FIXED_FLAG = 4,  //!< Ask application which vertices are fixed by
-                         //!< calling Mesh::vertices_get_fixed_flag
+        FIXED_FLAG = 4,    //!< Ask application which vertices are fixed by
+                           //!< calling Mesh::vertices_get_fixed_flag
         FIXED_VERTEX = 0,  //!< Treat all vertices for which the mesh domain
                            //!< is topologically 0-dimensional as fixed.
-        FIXED_CURVE = 1,  //!< Treat all vertices for which the mesh domain
-                          //!< is topologically 1-dimensional as fixed.
+        FIXED_CURVE = 1,   //!< Treat all vertices for which the mesh domain
+                           //!< is topologically 1-dimensional as fixed.
         FIXED_SURFACE = 2  //!< Treat all vertices for which the corresponding
                            //!< mesh domain has a topological dimension *less than*
                            //!< or equal to 2 as fixed.
@@ -82,7 +82,7 @@ class MESQUITE_EXPORT Settings
     //! Change how Mesquite determines which vertices are fixed.
     void set_fixed_vertex_mode( FixedVertexMode mode );
     //! Get the setting for how Mesquite determines which vertices are fixed.
-    FixedVertexMode get_fixed_vertex_mode( ) const;
+    FixedVertexMode get_fixed_vertex_mode() const;
 
     enum HigherOrderSlaveMode
     {
@@ -109,7 +109,7 @@ class MESQUITE_EXPORT Settings
     //! Set the slaved higher-order node setting.
     void set_slaved_ho_node_mode( HigherOrderSlaveMode mode );
     //! Get the slaved higher-order node setting.
-    HigherOrderSlaveMode get_slaved_ho_node_mode( ) const;
+    HigherOrderSlaveMode get_slaved_ho_node_mode() const;
 
     /**\brief Generate SIGFPE whenever a floating point exception occurs
      *
@@ -131,7 +131,7 @@ class MESQUITE_EXPORT Settings
      * it is not supported, this option has no effect.
      */
     void trap_floating_point_exception( bool enable );
-    bool trap_floating_point_exception( ) const;
+    bool trap_floating_point_exception() const;
 
   private:
     SettingData* mData;

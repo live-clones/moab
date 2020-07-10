@@ -66,7 +66,7 @@ using std::endl;
 #include "TestUtil.hpp"
 using namespace MBMesquite;
 
-int main( )
+int main()
 {
     /* Reads a Mesh file */
     std::string file_name = TestDir +
@@ -76,9 +76,9 @@ int main( )
                             //   "/3D/vtk/hexes/untangled/cube_tet_2.vtk";
                             "/3D/vtk/tets/untangled/tire.vtk";
     printf( "Loading mesh set 1\n" );
-    MsqPrintError        err( cout );
+    MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
-    mesh.read_vtk( file_name.c_str( ), err );
+    mesh.read_vtk( file_name.c_str(), err );
     if( err ) return 1;
 
     // Creates an intruction queue

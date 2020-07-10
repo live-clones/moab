@@ -41,41 +41,41 @@ namespace MBMesquite
 class SimpleStats
 {
   private:
-    double        valueSum, valueSqrSum, valueMin, valueMax;
+    double valueSum, valueSqrSum, valueMin, valueMax;
     unsigned long valueCount;
 
   public:
-    SimpleStats( );
+    SimpleStats();
 
     /**\brief minimum value */
-    double minimum( ) const
+    double minimum() const
     {
         return valueMin;
     }
     /**\brief maximum value */
-    double maximum( ) const
+    double maximum() const
     {
         return valueMax;
     }
     /**\brief algebraic mean of values */
-    double average( ) const
+    double average() const
     {
         return valueSum / valueCount;
     }
     /**\brief root mean squared of values */
-    double rms( ) const
+    double rms() const
     {
         return sqrt( valueSqrSum / valueCount );
     }
     /**\brief variance of values */
-    double variance( ) const
+    double variance() const
     {
-        return valueSqrSum / valueCount - average( ) * average( );
+        return valueSqrSum / valueCount - average() * average();
     }
     /**\brief standard deviation of values */
-    double standard_deviation( ) const
+    double standard_deviation() const
     {
-        return sqrt( fabs( variance( ) ) );
+        return sqrt( fabs( variance() ) );
     }
 
     /**\brief incorporate another value into statistics */
@@ -99,9 +99,9 @@ class SimpleStats
         ++valueCount;
     }
 
-    void clear( );
+    void clear();
 
-    bool empty( )
+    bool empty()
     {
         return 0ul == valueCount;
     }

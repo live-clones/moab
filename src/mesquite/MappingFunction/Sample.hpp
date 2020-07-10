@@ -79,7 +79,7 @@ struct MESQUITE_EXPORT Sample
         /** Number of bits used to store the dimension of an element 'side' */
         SIDE_DIMENSION_BITS = 2,
         /** Number of bits used to store the index of an element 'side' of a specific dimension */
-        SIDE_NUMBER_BITS = 4,
+        SIDE_NUMBER_BITS   = 4,
         NUMBER_PACKED_BITS = SIDE_DIMENSION_BITS + SIDE_NUMBER_BITS,
         /** Number of distinct side dimension values that will fit
          *  in a sample value (one greater than the largest dimension) */
@@ -94,7 +94,7 @@ struct MESQUITE_EXPORT Sample
     };
 
     //! Return packed representation of this sample.
-    inline size_t pack( ) const
+    inline size_t pack() const
     {
         return ( ( (size_t)dimension ) << SIDE_NUMBER_BITS ) | number;
     }
@@ -102,7 +102,7 @@ struct MESQUITE_EXPORT Sample
     inline void unpack( size_t packed )
     {
         dimension = ( packed >> SIDE_NUMBER_BITS ) & SIDE_DIMENSON_MASK;
-        number = packed & SIDE_NUMBER_MASK;
+        number    = packed & SIDE_NUMBER_MASK;
     }
     //! Initialization constructor
     Sample( unsigned dim, unsigned num ) : dimension( dim ), number( num ) {}
@@ -115,31 +115,31 @@ struct MESQUITE_EXPORT Sample
     //! Do nothing (don't waste time initilazing to zero or something, I'd rather
     //! be able to catch the use of uninitialized values using a memory checker
     //! anyway if I make such a mistake.)
-    Sample( ) {}
+    Sample() {}
 
     bool operator==( const Sample& other ) const
     {
-        return pack( ) == other.pack( );
+        return pack() == other.pack();
     }
     bool operator!=( const Sample& other ) const
     {
-        return pack( ) != other.pack( );
+        return pack() != other.pack();
     }
     bool operator<( const Sample& other ) const
     {
-        return pack( ) < other.pack( );
+        return pack() < other.pack();
     }
     bool operator>( const Sample& other ) const
     {
-        return pack( ) > other.pack( );
+        return pack() > other.pack();
     }
     bool operator<=( const Sample& other ) const
     {
-        return pack( ) <= other.pack( );
+        return pack() <= other.pack();
     }
     bool operator>=( const Sample& other ) const
     {
-        return pack( ) >= other.pack( );
+        return pack() >= other.pack();
     }
 };
 

@@ -52,7 +52,7 @@ class WriteHDF5 : public WriterIface
 
     WriteHDF5( Interface* iface );
 
-    virtual ~WriteHDF5( );
+    virtual ~WriteHDF5();
 
     /** Export specified meshsets to file
      * \param filename     The filename to export.
@@ -83,7 +83,7 @@ class WriteHDF5 : public WriterIface
         //! The number of nodes per entity - not used for nodes and sets
         int num_nodes;
 
-        virtual ~ExportType( ) {}
+        virtual ~ExportType() {}
 
         bool operator==( ExportType t ) const
         {
@@ -141,7 +141,7 @@ class WriteHDF5 : public WriterIface
             return ( type == other.first && num_nodes == other.second );
         }
 
-        const char* name( ) const;
+        const char* name() const;
     };
 
     //! Tag to write to file.
@@ -173,7 +173,7 @@ class WriteHDF5 : public WriterIface
 
         bool have_dense( const ExportType& type ) const
         {
-            return std::find( dense_list.begin( ), dense_list.end( ), type ) != dense_list.end( );
+            return std::find( dense_list.begin(), dense_list.end(), type ) != dense_list.end();
         }
 
         bool operator<( const TagDesc& ) const;
@@ -188,15 +188,15 @@ class WriteHDF5 : public WriterIface
     struct HDF5ErrorHandler
     {
         HDF5_Error_Func_Type func;
-        void*                data;
+        void* data;
     };
 
-    mhdf_FileHandle file_ptr( )
+    mhdf_FileHandle file_ptr()
     {
         return filePtr;
     }
 
-    WriteUtilIface* write_util( )
+    WriteUtilIface* write_util()
     {
         return writeUtil;
     }
@@ -211,8 +211,8 @@ class WriteHDF5 : public WriterIface
     virtual ErrorCode parallel_create_file( const char* filename, bool overwrite,
                                             const std::vector< std::string >& qa_records, const FileOptions& opts,
                                             const Tag* tag_list, int num_tags, int dimension = 3, double* times = 0 );
-    virtual ErrorCode write_finished( );
-    virtual void      debug_barrier_line( int lineno );
+    virtual ErrorCode write_finished();
+    virtual void debug_barrier_line( int lineno );
 
     //! Gather tags
     ErrorCode gather_tags( const Tag* user_tag_list, int user_tag_list_length );
@@ -314,8 +314,8 @@ class WriteHDF5 : public WriterIface
         else
         {
             std::list< ExportSet >::const_iterator it;
-            it = std::find( exportList.begin( ), exportList.end( ), type );
-            return it == exportList.end( ) ? 0 : &*it;
+            it = std::find( exportList.begin(), exportList.end(), type );
+            return it == exportList.end() ? 0 : &*it;
         }
     }
 
@@ -340,15 +340,15 @@ class WriteHDF5 : public WriterIface
     //! data for shared sets owned by this process when writing in parallel.
     struct SpecialSetData
     {
-        EntityHandle         setHandle;
-        unsigned             setFlags;
+        EntityHandle setHandle;
+        unsigned setFlags;
         std::vector< wid_t > contentIds;
         std::vector< wid_t > childIds;
         std::vector< wid_t > parentIds;
     };
     struct SpecSetLess
     {
-        bool operator( )( const SpecialSetData& a, SpecialSetData b ) const
+        bool operator()( const SpecialSetData& a, SpecialSetData b ) const
         {
             return a.setHandle < b.setHandle;
         }
@@ -356,7 +356,7 @@ class WriteHDF5 : public WriterIface
 
     //! Array of special/shared sets, in order of handle value.
     std::vector< SpecialSetData > specialSets;
-    const SpecialSetData*         find_set_data( EntityHandle h ) const
+    const SpecialSetData* find_set_data( EntityHandle h ) const
     {
         return const_cast< WriteHDF5* >( this )->find_set_data( h );
     }
@@ -386,7 +386,7 @@ class WriteHDF5 : public WriterIface
     //! Look for overlapping and/or missing writes
     bool debugTrack;
 
-    void print_id_map( ) const;
+    void print_id_map() const;
     void print_id_map( std::ostream& str, const char* prefix = "" ) const;
 
     /** Helper function for create-file
@@ -482,7 +482,7 @@ class WriteHDF5 : public WriterIface
                                const std::vector< std::string >& qa_records, const Tag* tag_list, int num_tags,
                                int user_dimension = 3 );
 
-    ErrorCode init( );
+    ErrorCode init();
 
     ErrorCode serial_create_file( const char* filename, bool overwrite, const std::vector< std::string >& qa_records,
                                   const Tag* tag_list, int num_tags, int dimension = 3 );
@@ -497,16 +497,16 @@ class WriteHDF5 : public WriterIface
     ErrorCode gather_mesh_info( const std::vector< EntityHandle >& export_sets );
 
     //! Same as gather_mesh_info, except for entire mesh
-    ErrorCode gather_all_mesh( );
+    ErrorCode gather_all_mesh();
 
     //! Initialize internal data structures from gathered mesh
-    ErrorCode initialize_mesh( const Range entities_by_dim[ 5 ] );
+    ErrorCode initialize_mesh( const Range entities_by_dim[5] );
 
     /** Write out the nodes.
      *
      * Note: Assigns IDs to nodes.
      */
-    ErrorCode write_nodes( );
+    ErrorCode write_nodes();
 
     /** Write out element connectivity.
      *
@@ -646,7 +646,7 @@ class WriteHDF5 : public WriterIface
         NUM_TIMES
     };
 
-    virtual void print_times( const double times[ NUM_TIMES ] ) const;
+    virtual void print_times( const double times[NUM_TIMES] ) const;
 };
 
 }  // namespace moab

@@ -27,10 +27,10 @@ namespace moab
 //! elements maps to a VTK type.
 struct VtkElemType
 {
-    const char*     name;  //!< String name for use in error messages
-    unsigned        vtk_type;  //!< VTK integer type
-    EntityType      mb_type;  //!< MOAB type
-    unsigned        num_nodes;  //!< Number of nodes (0 for polygon)
+    const char* name;            //!< String name for use in error messages
+    unsigned vtk_type;           //!< VTK integer type
+    EntityType mb_type;          //!< MOAB type
+    unsigned num_nodes;          //!< Number of nodes (0 for polygon)
     const unsigned* node_order;  //!< VTK element node ordering, indexed by
                                  //!< the VTK node position and containing
                                  //!< the corresponding MOAB node position.

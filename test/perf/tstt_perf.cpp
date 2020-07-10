@@ -79,11 +79,11 @@ typedef void* Entity_Handle;
 
 using namespace std;
 
-#define ARRAY_PTR( array, type ) reinterpret_cast< type* >( array._get_ior( )->d_firstElement )
-#define HANDLE_ARRAY_PTR( array ) reinterpret_cast< Entity_Handle* >( array._get_ior( )->d_firstElement )
-#define ARRAY_SIZE( array ) ( array._is_nil( ) ? 0 : array.upper( 0 ) - array.lower( 0 ) + 1 )
+#define ARRAY_PTR( array, type )  reinterpret_cast< type* >( array._get_ior()->d_firstElement )
+#define HANDLE_ARRAY_PTR( array ) reinterpret_cast< Entity_Handle* >( array._get_ior()->d_firstElement )
+#define ARRAY_SIZE( array )       ( array._is_nil() ? 0 : array.upper( 0 ) - array.lower( 0 ) + 1 )
 #define CHECK_SIZE( array, size )                                     \
-    if( array._is_nil( ) || ARRAY_SIZE( array ) == 0 )                \
+    if( array._is_nil() || ARRAY_SIZE( array ) == 0 )                 \
         array = array.create1d( size );                               \
     else if( ARRAY_SIZE( array ) < size )                             \
     {                                                                 \
@@ -110,14 +110,14 @@ int main( int argc, char* argv[] )
     int nelem = 20;
     if( argc < 3 )
     {
-        std::cout << "Usage: " << argv[ 0 ] << " <ints_per_side> <A|B|C>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <ints_per_side> <A|B|C>" << std::endl;
         return 1;
     }
 
     char which_test = '\0';
 
-    sscanf( argv[ 1 ], "%d", &nelem );
-    sscanf( argv[ 2 ], "%c", &which_test );
+    sscanf( argv[1], "%d", &nelem );
+    sscanf( argv[2], "%c", &which_test );
 
     if( which_test != 'B' && which_test != 'C' )
     {
@@ -136,7 +136,7 @@ int main( int argc, char* argv[] )
     build_connect( nelem, 1, connect );
 
     // create an implementation
-    TSTTM::Mesh mesh = IMPLEMENTATION_CLASS::_create( );
+    TSTTM::Mesh mesh = IMPLEMENTATION_CLASS::_create();
 
     switch( which_test )
     {
@@ -182,7 +182,7 @@ void testB( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords, c
     // need to explicitly fill connectivity array, since we don't know
     // the format of entity handles
     sidl::array< Entity_Handle > sidl_connect;
-    int                          sidl_connect_size = 8 * num_elems;
+    int sidl_connect_size = 8 * num_elems;
     CHECK_SIZE( sidl_connect, 8 * num_elems );
     Entity_Handle* sidl_connect_ptr = HANDLE_ARRAY_PTR( sidl_connect );
 
@@ -190,15 +190,15 @@ void testB( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords, c
     for( int i = 0; i < sidl_connect_size; i++ )
     {
         // use connect[i]-1 because we used starting vertex index (vstart) of 1
-        assert( connect[ i ] - 1 < num_verts );
-        sidl_connect_ptr[ i ] = sidl_vertices_ptr[ connect[ i ] - 1 ];
+        assert( connect[i] - 1 < num_verts );
+        sidl_connect_ptr[i] = sidl_vertices_ptr[connect[i] - 1];
     }
 
     // create the entities
-    sidl::array< Entity_Handle >         new_hexes;
-    int                                  new_hexes_size;
+    sidl::array< Entity_Handle > new_hexes;
+    int new_hexes_size;
     sidl::array< TSTTM::CreationStatus > status;
-    int                                  status_size;
+    int status_size;
 
     try
     {
@@ -234,8 +234,8 @@ void testC( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords )
     CAST_MINTERFACE( mesh, mesh_arrmod, ArrMod );
 
     // need some dimensions
-    int numv = nelem + 1;
-    int numv_sq = numv * numv;
+    int numv      = nelem + 1;
+    int numv_sq   = numv * numv;
     int num_verts = numv * numv * numv;
 #define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
 
@@ -246,7 +246,7 @@ void testC( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords )
 
     // temporary array to hold vertex positions for single vertex
     sidl::array< double > tmp_coords;
-    int                   tmp_coords_size = 3;
+    int tmp_coords_size = 3;
     CHECK_SIZE( tmp_coords, 3 );
     double* dum_coords = ARRAY_PTR( tmp_coords, double );
 
@@ -258,12 +258,12 @@ void testC( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords )
 
         // temporary array to hold (single) vertices
         sidl::array< Entity_Handle > tmp_vertices;
-        int                          tmp_vertices_size = 0;
+        int tmp_vertices_size = 0;
 
         // create the vertex
-        dum_coords[ 0 ] = coords_ptr[ i ];
-        dum_coords[ 1 ] = coords_ptr[ num_verts + i ];
-        dum_coords[ 2 ] = coords_ptr[ 2 * num_verts + i ];
+        dum_coords[0] = coords_ptr[i];
+        dum_coords[1] = coords_ptr[num_verts + i];
+        dum_coords[2] = coords_ptr[2 * num_verts + i];
         try
         {
             mesh_arrmod.createVtxArr( 1, TSTTM::StorageOrder_BLOCKED, tmp_coords, tmp_coords_size, tmp_vertices,
@@ -290,25 +290,25 @@ void testC( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords )
             {
 
                 sidl::array< Entity_Handle > tmp_conn;
-                int                          tmp_conn_size = 8;
+                int tmp_conn_size = 8;
                 CHECK_SIZE( tmp_conn, 8 );
 
                 int vijk = VINDEX( i, j, k );
-                tmp_conn.set( 0, tmp_sidl_vertices[ vijk ] );
-                tmp_conn.set( 1, tmp_sidl_vertices[ vijk + 1 ] );
-                tmp_conn.set( 2, tmp_sidl_vertices[ vijk + 1 + numv ] );
-                tmp_conn.set( 3, tmp_sidl_vertices[ vijk + numv ] );
-                tmp_conn.set( 4, tmp_sidl_vertices[ vijk + numv * numv ] );
-                tmp_conn.set( 5, tmp_sidl_vertices[ vijk + 1 + numv * numv ] );
-                tmp_conn.set( 6, tmp_sidl_vertices[ vijk + 1 + numv + numv * numv ] );
-                tmp_conn.set( 7, tmp_sidl_vertices[ vijk + numv + numv * numv ] );
+                tmp_conn.set( 0, tmp_sidl_vertices[vijk] );
+                tmp_conn.set( 1, tmp_sidl_vertices[vijk + 1] );
+                tmp_conn.set( 2, tmp_sidl_vertices[vijk + 1 + numv] );
+                tmp_conn.set( 3, tmp_sidl_vertices[vijk + numv] );
+                tmp_conn.set( 4, tmp_sidl_vertices[vijk + numv * numv] );
+                tmp_conn.set( 5, tmp_sidl_vertices[vijk + 1 + numv * numv] );
+                tmp_conn.set( 6, tmp_sidl_vertices[vijk + 1 + numv + numv * numv] );
+                tmp_conn.set( 7, tmp_sidl_vertices[vijk + numv + numv * numv] );
 
                 // create the entity
 
-                sidl::array< Entity_Handle >         new_hex;
-                int                                  new_hex_size = 0;
+                sidl::array< Entity_Handle > new_hex;
+                int new_hex_size = 0;
                 sidl::array< TSTTM::CreationStatus > status;
-                int                                  status_size = 0;
+                int status_size = 0;
 
                 try
                 {
@@ -342,7 +342,7 @@ void testC( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords )
 void query_elem_to_vert( TSTTM::Mesh& mesh )
 {
     sidl::array< Entity_Handle > all_hexes;
-    int                          all_hexes_size;
+    int all_hexes_size;
     CAST_MINTERFACE( mesh, mesh_ent, Entity );
 
     // get all the hex elements
@@ -364,42 +364,42 @@ void query_elem_to_vert( TSTTM::Mesh& mesh )
         // now loop over elements
         for( int i = 0; i < all_hexes_size; i++ )
         {
-            sidl::array< int >           dum_offsets;
+            sidl::array< int > dum_offsets;
             sidl::array< Entity_Handle > dum_connect;
-            int                          dum_connect_size = 0;
+            int dum_connect_size = 0;
             // get the connectivity of this element; will allocate space on 1st iteration,
             // but will have correct size on subsequent ones
-            mesh_ent.getEntAdj( all_hexes_ptr[ i ], TSTTM::EntityType_VERTEX, dum_connect, dum_connect_size );
+            mesh_ent.getEntAdj( all_hexes_ptr[i], TSTTM::EntityType_VERTEX, dum_connect, dum_connect_size );
 
             // get vertex coordinates; ; will allocate space on 1st iteration,
             // but will have correct size on subsequent ones
             sidl::array< double > dum_coords;
-            int                   dum_coords_size = 0;
-            TSTTM::StorageOrder   order = TSTTM::StorageOrder_UNDETERMINED;
+            int dum_coords_size       = 0;
+            TSTTM::StorageOrder order = TSTTM::StorageOrder_UNDETERMINED;
             mesh.getVtxArrCoords( dum_connect, dum_connect_size, order, dum_coords, dum_coords_size );
 
             assert( 24 == dum_coords_size && ARRAY_SIZE( dum_coords ) == 24 );
             double* dum_coords_ptr = ARRAY_PTR( dum_coords, double );
-            double  centroid[ 3 ] = { 0.0, 0.0, 0.0 };
+            double centroid[3]     = { 0.0, 0.0, 0.0 };
             if( order == TSTTM::StorageOrder_BLOCKED )
             {
                 for( int j = 0; j < 8; j++ )
                 {
-                    centroid[ 0 ] += dum_coords_ptr[ j ];
-                    centroid[ 1 ] += dum_coords_ptr[ 8 + j ];
-                    centroid[ 2 ] += dum_coords_ptr[ 16 + j ];
-                    centroid[ 0 ] += dum_coords.get( j );
-                    centroid[ 1 ] += dum_coords.get( 8 + j );
-                    centroid[ 2 ] += dum_coords.get( 16 + j );
+                    centroid[0] += dum_coords_ptr[j];
+                    centroid[1] += dum_coords_ptr[8 + j];
+                    centroid[2] += dum_coords_ptr[16 + j];
+                    centroid[0] += dum_coords.get( j );
+                    centroid[1] += dum_coords.get( 8 + j );
+                    centroid[2] += dum_coords.get( 16 + j );
                 }
             }
             else
             {
                 for( int j = 0; j < 8; j++ )
                 {
-                    centroid[ 0 ] += dum_coords_ptr[ 3 * j ];
-                    centroid[ 1 ] += dum_coords_ptr[ 3 * j + 1 ];
-                    centroid[ 2 ] += dum_coords_ptr[ 3 * j + 2 ];
+                    centroid[0] += dum_coords_ptr[3 * j];
+                    centroid[1] += dum_coords_ptr[3 * j + 1];
+                    centroid[2] += dum_coords_ptr[3 * j + 2];
                 }
             }
         }
@@ -414,7 +414,7 @@ void query_elem_to_vert( TSTTM::Mesh& mesh )
 void query_vert_to_elem( TSTTM::Mesh& mesh )
 {
     sidl::array< Entity_Handle > all_verts;
-    int                          all_verts_size;
+    int all_verts_size;
     CAST_MINTERFACE( mesh, mesh_ent, Entity );
 
     // get all the vertices elements
@@ -437,11 +437,11 @@ void query_vert_to_elem( TSTTM::Mesh& mesh )
         for( int i = 0; i < all_verts_size; i++ )
         {
             sidl::array< Entity_Handle > dum_hexes;
-            int                          dum_hexes_size;
+            int dum_hexes_size;
 
             // get the connectivity of this element; will have to allocate space on every
             // iteration, since size can vary
-            mesh_ent.getEntAdj( all_verts_ptr[ i ], TSTTM::EntityType_REGION, dum_hexes, dum_hexes_size );
+            mesh_ent.getEntAdj( all_verts_ptr[i], TSTTM::EntityType_REGION, dum_hexes, dum_hexes_size );
         }
     }
     catch( TSTT::Error& /* err */ )
@@ -455,8 +455,8 @@ void print_time( const bool print_em, double& tot_time, double& utime, double& s
 {
     struct rusage r_usage;
     getrusage( RUSAGE_SELF, &r_usage );
-    utime = (double)r_usage.ru_utime.tv_sec + ( (double)r_usage.ru_utime.tv_usec / 1.e6 );
-    stime = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
+    utime    = (double)r_usage.ru_utime.tv_sec + ( (double)r_usage.ru_utime.tv_usec / 1.e6 );
+    stime    = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
     tot_time = utime + stime;
     if( print_em )
         std::cout << "User, system, total time = " << utime << ", " << stime << ", " << tot_time << std::endl;
@@ -473,9 +473,9 @@ void compute_edge( double* start, const int nelem, const double xint, const int 
 {
     for( int i = 1; i < nelem; i++ )
     {
-        start[ i * stride ] = start[ 0 ] + i * xint;
-        start[ nelem + 1 + i * stride ] = start[ nelem + 1 ] + i * xint;
-        start[ 2 * ( nelem + 1 ) + i * stride ] = start[ 2 * ( nelem + 1 ) ] + i * xint;
+        start[i * stride]                     = start[0] + i * xint;
+        start[nelem + 1 + i * stride]         = start[nelem + 1] + i * xint;
+        start[2 * ( nelem + 1 ) + i * stride] = start[2 * ( nelem + 1 )] + i * xint;
     }
 }
 
@@ -489,27 +489,27 @@ void compute_face( double* a, const int nelem, const double xint, const int stri
         {
             double ada = i * xint;
 
-            a[ i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ i * stride1 ] + ada * a[ i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ j * stride2 ] + tse * a[ j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ 0 ] - ( 1.0 - tse ) * ada * a[ nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ nelem * stride2 ] - tse * ada * a[ nelem * ( stride1 + stride2 ) ];
-            a[ nelem + 1 + i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ nelem + 1 + i * stride1 ] + ada * a[ nelem + 1 + i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ nelem + 1 + j * stride2 ] + tse * a[ nelem + 1 + j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ nelem + 1 + 0 ] -
-                ( 1.0 - tse ) * ada * a[ nelem + 1 + nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ nelem + 1 + nelem * stride2 ] -
-                tse * ada * a[ nelem + 1 + nelem * ( stride1 + stride2 ) ];
-            a[ 2 * ( nelem + 1 ) + i * stride1 + j * stride2 ] =
-                ( 1.0 - ada ) * a[ 2 * ( nelem + 1 ) + i * stride1 ] +
-                ada * a[ 2 * ( nelem + 1 ) + i * stride1 + nelem * stride2 ] +
-                ( 1.0 - tse ) * a[ 2 * ( nelem + 1 ) + j * stride2 ] +
-                tse * a[ 2 * ( nelem + 1 ) + j * stride2 + nelem * stride1 ] -
-                ( 1.0 - tse ) * ( 1.0 - ada ) * a[ 2 * ( nelem + 1 ) + 0 ] -
-                ( 1.0 - tse ) * ada * a[ 2 * ( nelem + 1 ) + nelem * stride1 ] -
-                tse * ( 1.0 - ada ) * a[ 2 * ( nelem + 1 ) + nelem * stride2 ] -
-                tse * ada * a[ 2 * ( nelem + 1 ) + nelem * ( stride1 + stride2 ) ];
+            a[i * stride1 + j * stride2] =
+                ( 1.0 - ada ) * a[i * stride1] + ada * a[i * stride1 + nelem * stride2] +
+                ( 1.0 - tse ) * a[j * stride2] + tse * a[j * stride2 + nelem * stride1] -
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[0] - ( 1.0 - tse ) * ada * a[nelem * stride1] -
+                tse * ( 1.0 - ada ) * a[nelem * stride2] - tse * ada * a[nelem * ( stride1 + stride2 )];
+            a[nelem + 1 + i * stride1 + j * stride2] =
+                ( 1.0 - ada ) * a[nelem + 1 + i * stride1] + ada * a[nelem + 1 + i * stride1 + nelem * stride2] +
+                ( 1.0 - tse ) * a[nelem + 1 + j * stride2] + tse * a[nelem + 1 + j * stride2 + nelem * stride1] -
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[nelem + 1 + 0] -
+                ( 1.0 - tse ) * ada * a[nelem + 1 + nelem * stride1] -
+                tse * ( 1.0 - ada ) * a[nelem + 1 + nelem * stride2] -
+                tse * ada * a[nelem + 1 + nelem * ( stride1 + stride2 )];
+            a[2 * ( nelem + 1 ) + i * stride1 + j * stride2] =
+                ( 1.0 - ada ) * a[2 * ( nelem + 1 ) + i * stride1] +
+                ada * a[2 * ( nelem + 1 ) + i * stride1 + nelem * stride2] +
+                ( 1.0 - tse ) * a[2 * ( nelem + 1 ) + j * stride2] +
+                tse * a[2 * ( nelem + 1 ) + j * stride2 + nelem * stride1] -
+                ( 1.0 - tse ) * ( 1.0 - ada ) * a[2 * ( nelem + 1 ) + 0] -
+                ( 1.0 - tse ) * ada * a[2 * ( nelem + 1 ) + nelem * stride1] -
+                tse * ( 1.0 - ada ) * a[2 * ( nelem + 1 ) + nelem * stride2] -
+                tse * ada * a[2 * ( nelem + 1 ) + nelem * ( stride1 + stride2 )];
         }
     }
 }
@@ -520,15 +520,15 @@ void build_coords( const int nelem, sidl::array< double >& coords )
     print_time( false, ttime0, utime1, stime1 );
 
     // allocate the memory
-    int numv = nelem + 1;
-    int numv_sq = numv * numv;
+    int numv     = nelem + 1;
+    int numv_sq  = numv * numv;
     int tot_numv = numv * numv * numv;
     CHECK_SIZE( coords, 3 * tot_numv );
     double* coords_ptr = ARRAY_PTR( coords, double );
 
 // use FORTRAN-like indexing
 #define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
-    int    idx;
+    int idx;
     double scale1, scale2, scale3;
     // use these to prevent optimization on 1-scale, etc (real map wouldn't have
     // all these equal)
@@ -539,65 +539,65 @@ void build_coords( const int nelem, sidl::array< double >& coords )
 #ifdef REALTFI
     // use a real TFI xform to compute coordinates
     // initialize positions of 8 corners
-    coords_ptr[ VINDEX( 0, 0, 0 ) ] = coords_ptr[ VINDEX( 0, 0, 0 ) + nelem + 1 ] =
-        coords_ptr[ VINDEX( 0, 0, 0 ) + 2 * ( nelem + 1 ) ] = 0.0;
-    coords_ptr[ VINDEX( 0, nelem, 0 ) ] = coords_ptr[ VINDEX( 0, nelem, 0 ) + 2 * ( nelem + 1 ) ] = 0.0;
-    coords_ptr[ VINDEX( 0, nelem, 0 ) + nelem + 1 ] = LENGTH;
-    coords_ptr[ VINDEX( 0, 0, nelem ) ] = coords_ptr[ VINDEX( 0, 0, nelem ) + nelem + 1 ] = 0.0;
-    coords_ptr[ VINDEX( 0, 0, nelem ) + 2 * ( nelem + 1 ) ] = LENGTH;
-    coords_ptr[ VINDEX( 0, nelem, nelem ) ] = 0.0;
-    coords_ptr[ VINDEX( 0, nelem, nelem ) + nelem + 1 ] = coords_ptr[ VINDEX( 0, nelem, nelem ) + 2 * ( nelem + 1 ) ] =
+    coords_ptr[VINDEX( 0, 0, 0 )]                         = coords_ptr[VINDEX( 0, 0, 0 ) + nelem + 1] =
+        coords_ptr[VINDEX( 0, 0, 0 ) + 2 * ( nelem + 1 )] = 0.0;
+    coords_ptr[VINDEX( 0, nelem, 0 )] = coords_ptr[VINDEX( 0, nelem, 0 ) + 2 * ( nelem + 1 )] = 0.0;
+    coords_ptr[VINDEX( 0, nelem, 0 ) + nelem + 1]                                             = LENGTH;
+    coords_ptr[VINDEX( 0, 0, nelem )] = coords_ptr[VINDEX( 0, 0, nelem ) + nelem + 1] = 0.0;
+    coords_ptr[VINDEX( 0, 0, nelem ) + 2 * ( nelem + 1 )]                             = LENGTH;
+    coords_ptr[VINDEX( 0, nelem, nelem )]                                             = 0.0;
+    coords_ptr[VINDEX( 0, nelem, nelem ) + nelem + 1] = coords_ptr[VINDEX( 0, nelem, nelem ) + 2 * ( nelem + 1 )] =
         LENGTH;
-    coords_ptr[ VINDEX( nelem, 0, 0 ) ] = LENGTH;
-    coords_ptr[ VINDEX( nelem, 0, 0 ) + nelem + 1 ] = coords_ptr[ VINDEX( nelem, 0, 0 ) + 2 * ( nelem + 1 ) ] = 0.0;
-    coords_ptr[ VINDEX( nelem, 0, nelem ) ] = coords_ptr[ VINDEX( nelem, 0, nelem ) + 2 * ( nelem + 1 ) ] = LENGTH;
-    coords_ptr[ VINDEX( nelem, 0, nelem ) + nelem + 1 ] = 0.0;
-    coords_ptr[ VINDEX( nelem, nelem, 0 ) ] = coords_ptr[ VINDEX( nelem, nelem, 0 ) + nelem + 1 ] = LENGTH;
-    coords_ptr[ VINDEX( nelem, nelem, 0 ) + 2 * ( nelem + 1 ) ] = 0.0;
-    coords_ptr[ VINDEX( nelem, nelem, nelem ) ] = coords_ptr[ VINDEX( nelem, nelem, nelem ) + nelem + 1 ] =
-        coords_ptr[ VINDEX( nelem, nelem, nelem ) + 2 * ( nelem + 1 ) ] = LENGTH;
+    coords_ptr[VINDEX( nelem, 0, 0 )]             = LENGTH;
+    coords_ptr[VINDEX( nelem, 0, 0 ) + nelem + 1] = coords_ptr[VINDEX( nelem, 0, 0 ) + 2 * ( nelem + 1 )] = 0.0;
+    coords_ptr[VINDEX( nelem, 0, nelem )] = coords_ptr[VINDEX( nelem, 0, nelem ) + 2 * ( nelem + 1 )] = LENGTH;
+    coords_ptr[VINDEX( nelem, 0, nelem ) + nelem + 1]                                                 = 0.0;
+    coords_ptr[VINDEX( nelem, nelem, 0 )] = coords_ptr[VINDEX( nelem, nelem, 0 ) + nelem + 1] = LENGTH;
+    coords_ptr[VINDEX( nelem, nelem, 0 ) + 2 * ( nelem + 1 )]                                 = 0.0;
+    coords_ptr[VINDEX( nelem, nelem, nelem )] = coords_ptr[VINDEX( nelem, nelem, nelem ) + nelem + 1] =
+        coords_ptr[VINDEX( nelem, nelem, nelem ) + 2 * ( nelem + 1 )] = LENGTH;
 
     // compute edges
     // i (stride=1)
-    compute_edge( &coords_ptr[ VINDEX( 0, 0, 0 ) ], nelem, scale1, 1 );
-    compute_edge( &coords_ptr[ VINDEX( 0, nelem, 0 ) ], nelem, scale1, 1 );
-    compute_edge( &coords_ptr[ VINDEX( 0, 0, nelem ) ], nelem, scale1, 1 );
-    compute_edge( &coords_ptr[ VINDEX( 0, nelem, nelem ) ], nelem, scale1, 1 );
+    compute_edge( &coords_ptr[VINDEX( 0, 0, 0 )], nelem, scale1, 1 );
+    compute_edge( &coords_ptr[VINDEX( 0, nelem, 0 )], nelem, scale1, 1 );
+    compute_edge( &coords_ptr[VINDEX( 0, 0, nelem )], nelem, scale1, 1 );
+    compute_edge( &coords_ptr[VINDEX( 0, nelem, nelem )], nelem, scale1, 1 );
     // j (stride=numv)
-    compute_edge( &coords_ptr[ VINDEX( 0, 0, 0 ) ], nelem, scale1, numv );
-    compute_edge( &coords_ptr[ VINDEX( nelem, 0, 0 ) ], nelem, scale1, numv );
-    compute_edge( &coords_ptr[ VINDEX( 0, 0, nelem ) ], nelem, scale1, numv );
-    compute_edge( &coords_ptr[ VINDEX( nelem, 0, nelem ) ], nelem, scale1, numv );
+    compute_edge( &coords_ptr[VINDEX( 0, 0, 0 )], nelem, scale1, numv );
+    compute_edge( &coords_ptr[VINDEX( nelem, 0, 0 )], nelem, scale1, numv );
+    compute_edge( &coords_ptr[VINDEX( 0, 0, nelem )], nelem, scale1, numv );
+    compute_edge( &coords_ptr[VINDEX( nelem, 0, nelem )], nelem, scale1, numv );
     // k (stride=numv^2)
-    compute_edge( &coords_ptr[ VINDEX( 0, 0, 0 ) ], nelem, scale1, numv_sq );
-    compute_edge( &coords_ptr[ VINDEX( nelem, 0, 0 ) ], nelem, scale1, numv_sq );
-    compute_edge( &coords_ptr[ VINDEX( 0, nelem, 0 ) ], nelem, scale1, numv_sq );
-    compute_edge( &coords_ptr[ VINDEX( nelem, nelem, 0 ) ], nelem, scale1, numv_sq );
+    compute_edge( &coords_ptr[VINDEX( 0, 0, 0 )], nelem, scale1, numv_sq );
+    compute_edge( &coords_ptr[VINDEX( nelem, 0, 0 )], nelem, scale1, numv_sq );
+    compute_edge( &coords_ptr[VINDEX( 0, nelem, 0 )], nelem, scale1, numv_sq );
+    compute_edge( &coords_ptr[VINDEX( nelem, nelem, 0 )], nelem, scale1, numv_sq );
 
     // compute faces
     // i=0, nelem
-    compute_face( &coords_ptr[ VINDEX( 0, 0, 0 ) ], nelem, scale1, numv, numv_sq );
-    compute_face( &coords_ptr[ VINDEX( nelem, 0, 0 ) ], nelem, scale1, numv, numv_sq );
+    compute_face( &coords_ptr[VINDEX( 0, 0, 0 )], nelem, scale1, numv, numv_sq );
+    compute_face( &coords_ptr[VINDEX( nelem, 0, 0 )], nelem, scale1, numv, numv_sq );
     // j=0, nelem
-    compute_face( &coords_ptr[ VINDEX( 0, 0, 0 ) ], nelem, scale1, 1, numv_sq );
-    compute_face( &coords_ptr[ VINDEX( 0, nelem, 0 ) ], nelem, scale1, 1, numv_sq );
+    compute_face( &coords_ptr[VINDEX( 0, 0, 0 )], nelem, scale1, 1, numv_sq );
+    compute_face( &coords_ptr[VINDEX( 0, nelem, 0 )], nelem, scale1, 1, numv_sq );
     // k=0, nelem
-    compute_face( &coords_ptr[ VINDEX( 0, 0, 0 ) ], nelem, scale1, 1, numv );
-    compute_face( &coords_ptr[ VINDEX( 0, 0, nelem ) ], nelem, scale1, 1, numv );
+    compute_face( &coords_ptr[VINDEX( 0, 0, 0 )], nelem, scale1, 1, numv );
+    compute_face( &coords_ptr[VINDEX( 0, 0, nelem )], nelem, scale1, 1, numv );
 
     // initialize corner indices
-    int    i000 = VINDEX( 0, 0, 0 );
-    int    ia00 = VINDEX( nelem, 0, 0 );
-    int    i0t0 = VINDEX( 0, nelem, 0 );
-    int    iat0 = VINDEX( nelem, nelem, 0 );
-    int    i00g = VINDEX( 0, 0, nelem );
-    int    ia0g = VINDEX( nelem, 0, nelem );
-    int    i0tg = VINDEX( 0, nelem, nelem );
-    int    iatg = VINDEX( nelem, nelem, nelem );
+    int i000 = VINDEX( 0, 0, 0 );
+    int ia00 = VINDEX( nelem, 0, 0 );
+    int i0t0 = VINDEX( 0, nelem, 0 );
+    int iat0 = VINDEX( nelem, nelem, 0 );
+    int i00g = VINDEX( 0, 0, nelem );
+    int ia0g = VINDEX( nelem, 0, nelem );
+    int i0tg = VINDEX( 0, nelem, nelem );
+    int iatg = VINDEX( nelem, nelem, nelem );
     double cX, cY, cZ;
-    int    adaInts = nelem;
-    int    tseInts = nelem;
-    int    gammaInts = nelem;
+    int adaInts   = nelem;
+    int tseInts   = nelem;
+    int gammaInts = nelem;
 
     for( int i = 1; i < nelem; i++ )
     {
@@ -606,50 +606,50 @@ void build_coords( const int nelem, sidl::array< double >& coords )
             for( int k = 1; k < nelem; k++ )
             {
                 // idx = VINDEX(i,j,k);
-                double tse = i * scale1;
-                double ada = j * scale2;
+                double tse   = i * scale1;
+                double ada   = j * scale2;
                 double gamma = k * scale3;
-                double tm1 = 1.0 - tse;
-                double am1 = 1.0 - ada;
-                double gm1 = 1.0 - gamma;
+                double tm1   = 1.0 - tse;
+                double am1   = 1.0 - ada;
+                double gm1   = 1.0 - gamma;
 
-                cX = gm1 * ( am1 * ( tm1 * coords_ptr[ i000 ] + tse * coords_ptr[ i0t0 ] ) +
-                             ada * ( tm1 * coords_ptr[ ia00 ] + tse * coords_ptr[ iat0 ] ) ) +
-                     gamma * ( am1 * ( tm1 * coords_ptr[ i00g ] + tse * coords_ptr[ i0tg ] ) +
-                               ada * ( tm1 * coords_ptr[ ia0g ] + tse * coords_ptr[ iatg ] ) );
+                cX = gm1 * ( am1 * ( tm1 * coords_ptr[i000] + tse * coords_ptr[i0t0] ) +
+                             ada * ( tm1 * coords_ptr[ia00] + tse * coords_ptr[iat0] ) ) +
+                     gamma * ( am1 * ( tm1 * coords_ptr[i00g] + tse * coords_ptr[i0tg] ) +
+                               ada * ( tm1 * coords_ptr[ia0g] + tse * coords_ptr[iatg] ) );
 
-                cY = gm1 * ( am1 * ( tm1 * coords_ptr[ i000 ] + tse * coords_ptr[ i0t0 ] ) +
-                             ada * ( tm1 * coords_ptr[ ia00 ] + tse * coords_ptr[ iat0 ] ) ) +
-                     gamma * ( am1 * ( tm1 * coords_ptr[ i00g ] + tse * coords_ptr[ i0tg ] ) +
-                               ada * ( tm1 * coords_ptr[ ia0g ] + tse * coords_ptr[ iatg ] ) );
+                cY = gm1 * ( am1 * ( tm1 * coords_ptr[i000] + tse * coords_ptr[i0t0] ) +
+                             ada * ( tm1 * coords_ptr[ia00] + tse * coords_ptr[iat0] ) ) +
+                     gamma * ( am1 * ( tm1 * coords_ptr[i00g] + tse * coords_ptr[i0tg] ) +
+                               ada * ( tm1 * coords_ptr[ia0g] + tse * coords_ptr[iatg] ) );
 
-                cZ = gm1 * ( am1 * ( tm1 * coords_ptr[ i000 ] + tse * coords_ptr[ i0t0 ] ) +
-                             ada * ( tm1 * coords_ptr[ ia00 ] + tse * coords_ptr[ iat0 ] ) ) +
-                     gamma * ( am1 * ( tm1 * coords_ptr[ i00g ] + tse * coords_ptr[ i0tg ] ) +
-                               ada * ( tm1 * coords_ptr[ ia0g ] + tse * coords_ptr[ iatg ] ) );
+                cZ = gm1 * ( am1 * ( tm1 * coords_ptr[i000] + tse * coords_ptr[i0t0] ) +
+                             ada * ( tm1 * coords_ptr[ia00] + tse * coords_ptr[iat0] ) ) +
+                     gamma * ( am1 * ( tm1 * coords_ptr[i00g] + tse * coords_ptr[i0tg] ) +
+                               ada * ( tm1 * coords_ptr[ia0g] + tse * coords_ptr[iatg] ) );
 
-                double* ai0k = &coords_ptr[ VINDEX( k, 0, i ) ];
-                double* aiak = &coords_ptr[ VINDEX( k, adaInts, i ) ];
-                double* a0jk = &coords_ptr[ VINDEX( k, j, 0 ) ];
-                double* atjk = &coords_ptr[ VINDEX( k, j, tseInts ) ];
-                double* aij0 = &coords_ptr[ VINDEX( 0, j, i ) ];
-                double* aijg = &coords_ptr[ VINDEX( gammaInts, j, i ) ];
+                double* ai0k = &coords_ptr[VINDEX( k, 0, i )];
+                double* aiak = &coords_ptr[VINDEX( k, adaInts, i )];
+                double* a0jk = &coords_ptr[VINDEX( k, j, 0 )];
+                double* atjk = &coords_ptr[VINDEX( k, j, tseInts )];
+                double* aij0 = &coords_ptr[VINDEX( 0, j, i )];
+                double* aijg = &coords_ptr[VINDEX( gammaInts, j, i )];
 
-                coords_ptr[ VINDEX( i, j, k ) ] = ( am1 * ai0k[ 0 ] + ada * aiak[ 0 ] + tm1 * a0jk[ 0 ] +
-                                                    tse * atjk[ 0 ] + gm1 * aij0[ 0 ] + gamma * aijg[ 0 ] ) /
-                                                      2.0 -
-                                                  cX / 2.0;
+                coords_ptr[VINDEX( i, j, k )] = ( am1 * ai0k[0] + ada * aiak[0] + tm1 * a0jk[0] + tse * atjk[0] +
+                                                  gm1 * aij0[0] + gamma * aijg[0] ) /
+                                                    2.0 -
+                                                cX / 2.0;
 
-                coords_ptr[ nelem + 1 + VINDEX( i, j, k ) ] =
-                    ( am1 * ai0k[ nelem + 1 ] + ada * aiak[ nelem + 1 ] + tm1 * a0jk[ nelem + 1 ] +
-                      tse * atjk[ nelem + 1 ] + gm1 * aij0[ nelem + 1 ] + gamma * aijg[ nelem + 1 ] ) /
+                coords_ptr[nelem + 1 + VINDEX( i, j, k )] =
+                    ( am1 * ai0k[nelem + 1] + ada * aiak[nelem + 1] + tm1 * a0jk[nelem + 1] + tse * atjk[nelem + 1] +
+                      gm1 * aij0[nelem + 1] + gamma * aijg[nelem + 1] ) /
                         2.0 -
                     cY / 2.0;
 
-                coords_ptr[ 2 * ( nelem + 1 ) + VINDEX( i, j, k ) ] =
-                    ( am1 * ai0k[ 2 * ( nelem + 1 ) ] + ada * aiak[ 2 * ( nelem + 1 ) ] +
-                      tm1 * a0jk[ 2 * ( nelem + 1 ) ] + tse * atjk[ 2 * ( nelem + 1 ) ] +
-                      gm1 * aij0[ 2 * ( nelem + 1 ) ] + gamma * aijg[ 2 * ( nelem + 1 ) ] ) /
+                coords_ptr[2 * ( nelem + 1 ) + VINDEX( i, j, k )] =
+                    ( am1 * ai0k[2 * ( nelem + 1 )] + ada * aiak[2 * ( nelem + 1 )] + tm1 * a0jk[2 * ( nelem + 1 )] +
+                      tse * atjk[2 * ( nelem + 1 )] + gm1 * aij0[2 * ( nelem + 1 )] +
+                      gamma * aijg[2 * ( nelem + 1 )] ) /
                         2.0 -
                     cZ / 2.0;
             }
@@ -665,9 +665,9 @@ void build_coords( const int nelem, sidl::array< double >& coords )
             {
                 idx = VINDEX( i, j, k );
                 // blocked coordinate ordering
-                coords_ptr[ idx ] = i * scale1;
-                coords_ptr[ tot_numv + idx ] = j * scale2;
-                coords_ptr[ 2 * tot_numv + idx ] = k * scale3;
+                coords_ptr[idx]                = i * scale1;
+                coords_ptr[tot_numv + idx]     = j * scale2;
+                coords_ptr[2 * tot_numv + idx] = k * scale3;
             }
         }
     }
@@ -680,27 +680,27 @@ void build_connect( const int nelem, const int vstart, int*& connect )
 {
     // allocate the memory
     int nume_tot = nelem * nelem * nelem;
-    connect = new int[ 8 * nume_tot ];
+    connect      = new int[8 * nume_tot];
 
     int vijk;
-    int numv = nelem + 1;
+    int numv    = nelem + 1;
     int numv_sq = numv * numv;
-    int idx = 0;
+    int idx     = 0;
     for( int i = 0; i < nelem; i++ )
     {
         for( int j = 0; j < nelem; j++ )
         {
             for( int k = 0; k < nelem; k++ )
             {
-                vijk = vstart + VINDEX( i, j, k );
-                connect[ idx++ ] = vijk;
-                connect[ idx++ ] = vijk + 1;
-                connect[ idx++ ] = vijk + 1 + numv;
-                connect[ idx++ ] = vijk + numv;
-                connect[ idx++ ] = vijk + numv * numv;
-                connect[ idx++ ] = vijk + 1 + numv * numv;
-                connect[ idx++ ] = vijk + 1 + numv + numv * numv;
-                connect[ idx++ ] = vijk + numv + numv * numv;
+                vijk           = vstart + VINDEX( i, j, k );
+                connect[idx++] = vijk;
+                connect[idx++] = vijk + 1;
+                connect[idx++] = vijk + 1 + numv;
+                connect[idx++] = vijk + numv;
+                connect[idx++] = vijk + numv * numv;
+                connect[idx++] = vijk + 1 + numv * numv;
+                connect[idx++] = vijk + 1 + numv + numv * numv;
+                connect[idx++] = vijk + numv + numv * numv;
                 assert( i <= numv * numv * numv );
             }
         }

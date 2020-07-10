@@ -80,7 +80,7 @@ class ShapeImprovementWrapper : public Wrapper
     // constants
     const double untBeta;
     const double successiveEps;
-    int          parallelIterations;
+    int parallelIterations;
 };
 
 }  // namespace MBMesquite

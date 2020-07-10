@@ -53,13 +53,13 @@ Member functions of the MBMesquite::InstructionQueue class
 
 using namespace MBMesquite;
 
-InstructionQueue::InstructionQueue( )
+InstructionQueue::InstructionQueue()
     : autoQualAssess( true ), vertexSlaverCount( 0 ), nbPreConditionners( 0 ), isMasterSet( false ),
       masterInstrIndex( 0 )
 {
 }
 
-InstructionQueue::~InstructionQueue( ) {}
+InstructionQueue::~InstructionQueue() {}
 
 void InstructionQueue::add_target_calculator( TargetWriter* tc, MsqError& )
 {
@@ -77,7 +77,7 @@ void InstructionQueue::add_vertex_slaver( VertexSlaver* vs, MsqError& )
 void InstructionQueue::remove_vertex_slaver( VertexSlaver* vs, MsqError& err )
 {
     size_t idx = 0;
-    for( std::list< Instruction* >::iterator i = instructions.begin( ); i != instructions.end( ); ++i, ++idx )
+    for( std::list< Instruction* >::iterator i = instructions.begin(); i != instructions.end(); ++i, ++idx )
     {
         if( *i == vs )
         {
@@ -100,7 +100,7 @@ void InstructionQueue::add_tag_vertex_mesh( TagVertexMesh* vs, MsqError& )
 void InstructionQueue::remove_tag_vertex_mesh( TagVertexMesh* vs, MsqError& err )
 {
     size_t idx = 0;
-    for( std::list< Instruction* >::iterator i = instructions.begin( ); i != instructions.end( ); ++i, ++idx )
+    for( std::list< Instruction* >::iterator i = instructions.begin(); i != instructions.end(); ++i, ++idx )
     {
         if( *i == vs )
         {
@@ -150,7 +150,7 @@ void InstructionQueue::remove_preconditioner( size_t index, MsqError& err )
         MSQ_SETERR( err )( "cannot remove master QualityImprover.", MsqError::INVALID_ARG );
         return;
     }
-    else if( index >= instructions.size( ) )
+    else if( index >= instructions.size() )
     {
         MSQ_SETERR( err )( "Index points beyond end of list.", MsqError::INVALID_ARG );
         return;
@@ -158,7 +158,7 @@ void InstructionQueue::remove_preconditioner( size_t index, MsqError& err )
 
     // position the instruction iterator over the preconditioner to delete
     std::list< Instruction* >::iterator pos;
-    pos = instructions.begin( );
+    pos = instructions.begin();
     std::advance( pos, index );
 
     if( !dynamic_cast< QualityImprover* >( *pos ) )
@@ -167,7 +167,7 @@ void InstructionQueue::remove_preconditioner( size_t index, MsqError& err )
         return;
     }
 
-    std::string name = ( *pos )->get_name( );
+    std::string name = ( *pos )->get_name();
     instructions.erase( pos );
     nbPreConditionners--;
 }
@@ -191,7 +191,7 @@ void InstructionQueue::insert_preconditioner( QualityImprover* instr, size_t ind
           MsqError::INVALID_STATE );
         return;
     }
-    if( index >= instructions.size( ) )
+    if( index >= instructions.size() )
     {
         MSQ_SETERR( err )( "index", MsqError::INVALID_ARG );
         return;
@@ -199,7 +199,7 @@ void InstructionQueue::insert_preconditioner( QualityImprover* instr, size_t ind
 
     // position the instruction iterator
     std::list< Instruction* >::iterator pos;
-    pos = instructions.begin( );
+    pos = instructions.begin();
     std::advance( pos, index );
     // adds the preconditioner
     instructions.insert( pos, instr );
@@ -225,7 +225,7 @@ void InstructionQueue::add_quality_assessor( QualityAssessor* instr, MsqError& /
 void InstructionQueue::remove_quality_assessor( size_t index, MsqError& err )
 {
     // checks index is valid
-    if( index >= instructions.size( ) )
+    if( index >= instructions.size() )
     {
         MSQ_SETERR( err )( "index", MsqError::INVALID_ARG );
         return;
@@ -233,7 +233,7 @@ void InstructionQueue::remove_quality_assessor( size_t index, MsqError& err )
 
     // position the instruction iterator over the QualityAssessor to delete
     std::list< Instruction* >::iterator pos;
-    pos = instructions.begin( );
+    pos = instructions.begin();
     std::advance( pos, index );
 
     if( !dynamic_cast< QualityAssessor* >( *pos ) )
@@ -242,7 +242,7 @@ void InstructionQueue::remove_quality_assessor( size_t index, MsqError& err )
         return;
     }
 
-    std::string name = ( *pos )->get_name( );
+    std::string name = ( *pos )->get_name();
     instructions.erase( pos );
 }
 
@@ -256,7 +256,7 @@ void InstructionQueue::remove_quality_assessor( size_t index, MsqError& err )
 void InstructionQueue::insert_quality_assessor( QualityAssessor* instr, size_t index, MsqError& err )
 {
     // checks index is valid
-    if( index > instructions.size( ) )
+    if( index > instructions.size() )
     {
         MSQ_SETERR( err )
         ( "index points two positions beyond end of list.", MsqError::INVALID_ARG );
@@ -265,7 +265,7 @@ void InstructionQueue::insert_quality_assessor( QualityAssessor* instr, size_t i
 
     // position the instruction iterator
     std::list< Instruction* >::iterator pos;
-    pos = instructions.begin( );
+    pos = instructions.begin();
     std::advance( pos, index );
     // adds the QualityAssessor
     instructions.insert( pos, instr );
@@ -287,8 +287,8 @@ void InstructionQueue::set_master_quality_improver( QualityImprover* instr, MsqE
     {
         // if master is not set, add it at the end of the queue.
         instructions.push_back( instr );
-        isMasterSet = true;
-        masterInstrIndex = instructions.size( ) - 1;
+        isMasterSet      = true;
+        masterInstrIndex = instructions.size() - 1;
     }
 }
 
@@ -311,18 +311,18 @@ void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMes
     MsqInterrupt msq_interrupt;
 #endif
 
-    Mesh*       mesh = mesh_and_domain->get_mesh( );
-    MeshDomain* domain = mesh_and_domain->get_domain( );
+    Mesh* mesh         = mesh_and_domain->get_mesh();
+    MeshDomain* domain = mesh_and_domain->get_domain();
 
     // Generate SIGFPE on floating point errors
-    MsqFPE fpe_trap( settings->trap_floating_point_exception( ) );
+    MsqFPE fpe_trap( settings->trap_floating_point_exception() );
 
     std::list< Instruction* >::const_iterator instr;
 
     // Initialize each instruction
-    for( instr = instructions.begin( ); instr != instructions.end( ); ++instr )
+    for( instr = instructions.begin(); instr != instructions.end(); ++instr )
     {
-        if( MsqInterrupt::interrupt( ) )
+        if( MsqInterrupt::interrupt() )
         {
             MSQ_SETERR( err )( MsqError::INTERRUPTED );
             return;
@@ -332,9 +332,9 @@ void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMes
     }
 
     // Run each instruction
-    for( instr = instructions.begin( ); instr != instructions.end( ); ++instr )
+    for( instr = instructions.begin(); instr != instructions.end(); ++instr )
     {
-        if( MsqInterrupt::interrupt( ) )
+        if( MsqInterrupt::interrupt() )
         {
             MSQ_SETERR( err )( MsqError::INTERRUPTED );
             return;
@@ -353,11 +353,11 @@ void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMes
     }
 }
 
-void InstructionQueue::clear( )
+void InstructionQueue::clear()
 {
-    instructions.clear( );
-    autoQualAssess = true;
-    isMasterSet = false;
+    instructions.clear();
+    autoQualAssess   = true;
+    isMasterSet      = false;
     masterInstrIndex = 0;
 }
 
@@ -373,11 +373,11 @@ std::list< Instruction* >::iterator InstructionQueue::clear_master( MsqError& er
     }
 
     // position the instruction iterator over the master quality improver
-    master_pos = instructions.begin( );
+    master_pos = instructions.begin();
     std::advance( master_pos, masterInstrIndex );
 
     // erases the master quality improver
-    instr_iter = instructions.erase( master_pos );
+    instr_iter  = instructions.erase( master_pos );
     isMasterSet = false;
 
     // returns the position where the Master was

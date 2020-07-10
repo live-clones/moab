@@ -18,18 +18,18 @@ namespace moab
 enum ErrorType
 {
     MB_ERROR_TYPE_NEW_GLOBAL = 0,
-    MB_ERROR_TYPE_NEW_LOCAL = 1,
-    MB_ERROR_TYPE_EXISTING = 2
+    MB_ERROR_TYPE_NEW_LOCAL  = 1,
+    MB_ERROR_TYPE_EXISTING   = 2
 };
 
 //! Initialize MOAB error handler (e.g. create a utility object for printing error output)
-void MBErrorHandler_Init( );
+void MBErrorHandler_Init();
 
 //! Finalize MOAB error handler (e.g. delete the utility object for printing error output)
-void MBErrorHandler_Finalize( );
+void MBErrorHandler_Finalize();
 
 //! Indicates whether MBErrorHandler_Init has been called
-bool MBErrorHandler_Initialized( );
+bool MBErrorHandler_Initialized();
 
 //! Get information about the last error
 void MBErrorHandler_GetLastError( std::string& error );
@@ -43,7 +43,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 #define __FILENAME__ ( strrchr( __FILE__, '/' ) ? strrchr( __FILE__, '/' ) + 1 : __FILE__ )
 
 #define MBSTRINGIFY_( X ) #X
-#define MBSTRINGIFY( X ) MBSTRINGIFY_( X )
+#define MBSTRINGIFY( X )  MBSTRINGIFY_( X )
 
 #ifdef LOCDIR
 #define __MBSDIR__ MBSTRINGIFY( LOCDIR )
@@ -53,90 +53,90 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 
 //! Set a new error with the given error message (a string or a stream) and return the given error
 //! code Used in functions which return ErrorCode
-#define MB_SET_ERR( err_code, err_msg )                                                                         \
-    do                                                                                                          \
-    {                                                                                                           \
-        std::ostringstream err_ostr;                                                                            \
-        err_ostr << err_msg;                                                                                    \
-        return moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, err_ostr.str( ).c_str( ), \
-                              moab::MB_ERROR_TYPE_NEW_LOCAL );                                                  \
+#define MB_SET_ERR( err_code, err_msg )                                                                       \
+    do                                                                                                        \
+    {                                                                                                         \
+        std::ostringstream err_ostr;                                                                          \
+        err_ostr << err_msg;                                                                                  \
+        return moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, err_ostr.str().c_str(), \
+                              moab::MB_ERROR_TYPE_NEW_LOCAL );                                                \
     } while( false )
 
 //! Set a new error with the given error message (a string or a stream) and return
 //! Used in functions which return void types (or have no return types at all, e.g. constructors)
-#define MB_SET_ERR_RET( err_msg )                                                                                \
-    do                                                                                                           \
-    {                                                                                                            \
-        std::ostringstream err_ostr;                                                                             \
-        err_ostr << err_msg;                                                                                     \
-        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str( ).c_str( ), \
-                       moab::MB_ERROR_TYPE_NEW_LOCAL );                                                          \
-        return;                                                                                                  \
+#define MB_SET_ERR_RET( err_msg )                                                                              \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::ostringstream err_ostr;                                                                           \
+        err_ostr << err_msg;                                                                                   \
+        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
+                       moab::MB_ERROR_TYPE_NEW_LOCAL );                                                        \
+        return;                                                                                                \
     } while( false )
 
 //! Set a new error with the given error message (a string or a stream) and return the given value
 //! Used in functions which return any data type
-#define MB_SET_ERR_RET_VAL( err_msg, ret_val )                                                                   \
-    do                                                                                                           \
-    {                                                                                                            \
-        std::ostringstream err_ostr;                                                                             \
-        err_ostr << err_msg;                                                                                     \
-        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str( ).c_str( ), \
-                       moab::MB_ERROR_TYPE_NEW_LOCAL );                                                          \
-        return ret_val;                                                                                          \
+#define MB_SET_ERR_RET_VAL( err_msg, ret_val )                                                                 \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::ostringstream err_ostr;                                                                           \
+        err_ostr << err_msg;                                                                                   \
+        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
+                       moab::MB_ERROR_TYPE_NEW_LOCAL );                                                        \
+        return ret_val;                                                                                        \
     } while( false )
 
 //! Set a new error with the given error message (a string or a stream) and continue
 //! Used in functions which return any data type
-#define MB_SET_ERR_CONT( err_msg )                                                                               \
-    do                                                                                                           \
-    {                                                                                                            \
-        std::ostringstream err_ostr;                                                                             \
-        err_ostr << err_msg;                                                                                     \
-        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str( ).c_str( ), \
-                       moab::MB_ERROR_TYPE_NEW_LOCAL );                                                          \
+#define MB_SET_ERR_CONT( err_msg )                                                                             \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::ostringstream err_ostr;                                                                           \
+        err_ostr << err_msg;                                                                                   \
+        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
+                       moab::MB_ERROR_TYPE_NEW_LOCAL );                                                        \
     } while( false )
 
 //! Similar to MB_SET_ERR except that the error is considered globally fatal
-#define MB_SET_GLB_ERR( err_code, err_msg )                                                                     \
-    do                                                                                                          \
-    {                                                                                                           \
-        std::ostringstream err_ostr;                                                                            \
-        err_ostr << err_msg;                                                                                    \
-        return moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, err_ostr.str( ).c_str( ), \
-                              moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                 \
+#define MB_SET_GLB_ERR( err_code, err_msg )                                                                   \
+    do                                                                                                        \
+    {                                                                                                         \
+        std::ostringstream err_ostr;                                                                          \
+        err_ostr << err_msg;                                                                                  \
+        return moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, err_ostr.str().c_str(), \
+                              moab::MB_ERROR_TYPE_NEW_GLOBAL );                                               \
     } while( false )
 
 //! Similar to MB_SET_ERR_RET except that the error is considered globally fatal
-#define MB_SET_GLB_ERR_RET( err_msg )                                                                            \
-    do                                                                                                           \
-    {                                                                                                            \
-        std::ostringstream err_ostr;                                                                             \
-        err_ostr << err_msg;                                                                                     \
-        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str( ).c_str( ), \
-                       moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                         \
-        return;                                                                                                  \
+#define MB_SET_GLB_ERR_RET( err_msg )                                                                          \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::ostringstream err_ostr;                                                                           \
+        err_ostr << err_msg;                                                                                   \
+        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
+                       moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                       \
+        return;                                                                                                \
     } while( false )
 
 //! Similar to MB_SET_ERR_RET_VAL except that the error is considered globally fatal
-#define MB_SET_GLB_ERR_RET_VAL( err_msg, ret_val )                                                               \
-    do                                                                                                           \
-    {                                                                                                            \
-        std::ostringstream err_ostr;                                                                             \
-        err_ostr << err_msg;                                                                                     \
-        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str( ).c_str( ), \
-                       moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                         \
-        return ret_val;                                                                                          \
+#define MB_SET_GLB_ERR_RET_VAL( err_msg, ret_val )                                                             \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::ostringstream err_ostr;                                                                           \
+        err_ostr << err_msg;                                                                                   \
+        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
+                       moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                       \
+        return ret_val;                                                                                        \
     } while( false )
 
 //! Similar to MB_SET_ERR_CONT except that the error is considered globally fatal
-#define MB_SET_GLB_ERR_CONT( err_msg )                                                                           \
-    do                                                                                                           \
-    {                                                                                                            \
-        std::ostringstream err_ostr;                                                                             \
-        err_ostr << err_msg;                                                                                     \
-        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str( ).c_str( ), \
-                       moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                         \
+#define MB_SET_GLB_ERR_CONT( err_msg )                                                                         \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::ostringstream err_ostr;                                                                           \
+        err_ostr << err_msg;                                                                                   \
+        moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
+                       moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                       \
     } while( false )
 
 //! Check error code, if not MB_SUCCESS, call the error handler and return the given error code

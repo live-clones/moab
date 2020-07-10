@@ -60,7 +60,7 @@ class FileTokenizer
      * file will automatically be closed when the caller
      * returns.
      */
-    ~FileTokenizer( );
+    ~FileTokenizer();
 
     /** \brief get next token
      *
@@ -72,7 +72,7 @@ class FileTokenizer
      * \return A pointer to the buffer space containing the string,
      *         or NULL if an error occurred.
      */
-    const char* get_string( );
+    const char* get_string();
 
     /** \brief check for newline
      *
@@ -167,12 +167,12 @@ class FileTokenizer
     /**
      * Check for end-of-file condition.
      */
-    bool eof( ) const;
+    bool eof() const;
 
     /**
      * Get the line number the last token was read from.
      */
-    int line_number( ) const
+    int line_number() const
     {
         return lineNumber;
     }
@@ -180,7 +180,7 @@ class FileTokenizer
     /**
      * Put current token back in buffer.  Can only unget one token.
      */
-    void unget_token( );
+    void unget_token();
 
     /**
      * Match current token to passed string.  If token
@@ -220,7 +220,7 @@ class FileTokenizer
     std::FILE* filePtr;
 
     /** Input buffer */
-    char buffer[ 512 ];
+    char buffer[512];
 
     /** One past the end of the last token returned */
     char* nextToken;

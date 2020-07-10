@@ -26,7 +26,7 @@ class WriteHDF5Parallel : public WriteHDF5
      */
     WriteHDF5Parallel( Interface* iface );
 
-    virtual ~WriteHDF5Parallel( );
+    virtual ~WriteHDF5Parallel();
 
   protected:
     virtual void debug_barrier_line( int lineno );
@@ -85,19 +85,19 @@ class WriteHDF5Parallel : public WriteHDF5
     //! Communicate with other processors to negotiate
     //! the types of elements that will be written
     //! (the union of the types defined on each proc.)
-    ErrorCode negotiate_type_list( );
+    ErrorCode negotiate_type_list();
 
     //! Create tables to hold element connectivity
-    ErrorCode create_element_tables( );
+    ErrorCode create_element_tables();
 
     //! Create tables to hold element adjacencies.
-    ErrorCode create_adjacency_tables( );
+    ErrorCode create_adjacency_tables();
 
     //! Create tables for mesh sets
     ErrorCode create_meshset_tables( double* times );
 
     //! Write tag descriptions and create tables to hold tag data.
-    ErrorCode create_tag_tables( );
+    ErrorCode create_tag_tables();
 
     //! Remove any remote mesh entities from the passed range.
     void remove_remote_entities( EntityHandle relative, Range& range );
@@ -106,7 +106,7 @@ class WriteHDF5Parallel : public WriteHDF5
     void remove_remote_sets( EntityHandle relative, std::vector< EntityHandle >& vect );
 
     //! get any existing tags which aren't excluded and add to shared set tags
-    ErrorCode get_sharedset_tags( );
+    ErrorCode get_sharedset_tags();
 
     ErrorCode append_serial_tag_data( std::vector< unsigned char >& buffer, const WriteHDF5::TagDesc& tag );
 
@@ -117,12 +117,12 @@ class WriteHDF5Parallel : public WriteHDF5
     /**\brief Argument ot create_dataset */
     struct DataSetCreator
     {
-        virtual ErrorCode operator( )( WriteHDF5* writer, long data_set_size, const ExportSet* group,
-                                       long& start_id_out ) const = 0;
+        virtual ErrorCode operator()( WriteHDF5* writer, long data_set_size, const ExportSet* group,
+                                      long& start_id_out ) const = 0;
     };
     struct NoopDescCreator : public DataSetCreator
     {
-        ErrorCode operator( )( WriteHDF5*, long, const ExportSet*, long& start_id ) const
+        ErrorCode operator()( WriteHDF5*, long, const ExportSet*, long& start_id ) const
         {
             start_id = -1;
             return MB_SUCCESS;
@@ -158,10 +158,10 @@ class WriteHDF5Parallel : public WriteHDF5
      */
     ErrorCode create_dataset( int num_datasets, const long* num_owned_entities, long* offsets_out,
                               long* max_proc_ents_out, long* total_ents_out,
-                              const DataSetCreator& creator = NoopDescCreator( ), ExportSet* groups[] = 0,
+                              const DataSetCreator& creator = NoopDescCreator(), ExportSet* groups[] = 0,
                               wid_t* first_ids_out = NULL );
 
-    void print_shared_sets( );
+    void print_shared_sets();
     void print_set_sharing_data( const Range& range, const char* label, Tag idt );
 
   private:

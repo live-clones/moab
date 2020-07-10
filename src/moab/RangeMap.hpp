@@ -34,7 +34,8 @@ namespace moab
  * for use in situations where there are relatively few insertions
  * of large contiguous ranges of values.
  */
-template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeMap
+template < typename KeyType, typename ValType, ValType NullVal = 0 >
+class RangeMap
 {
   public:
     typedef KeyType key_type;
@@ -44,27 +45,27 @@ template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeM
     {
         KeyType begin, count;
         ValType value;
-        bool    operator<( const Range& other ) const
+        bool operator<( const Range& other ) const
         {
             return begin + count <= other.begin;
         }  // equal if overlapping!
     };
-    typedef typename std::vector< Range >      RangeList;
+    typedef typename std::vector< Range > RangeList;
     typedef typename RangeList::const_iterator iterator;
     typedef typename RangeList::const_iterator const_iterator;
 
-    inline bool empty( ) const
+    inline bool empty() const
     {
-        return data.empty( );
+        return data.empty();
     }
 
-    inline const Range& back( ) const
+    inline const Range& back() const
     {
-        return data.back( );
+        return data.back();
     }
-    inline const Range& front( ) const
+    inline const Range& front() const
     {
-        return data.front( );
+        return data.front();
     }
 
     /**\brief Insert mapping between range of keys and range of values
@@ -102,23 +103,23 @@ template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeM
     /** Remove a block of values */
     inline iterator erase( KeyType beg, KeyType count );
 
-    inline unsigned num_ranges( ) const
+    inline unsigned num_ranges() const
     {
-        return data.size( );
+        return data.size();
     }
 
-    inline iterator begin( ) const
+    inline iterator begin() const
     {
-        return data.begin( );
+        return data.begin();
     }
-    inline iterator end( ) const
+    inline iterator end() const
     {
-        return data.end( );
+        return data.end();
     }
     inline iterator lower_bound( KeyType key ) const
     {
         Range b = { key, 1, NullVal };
-        return std::lower_bound( begin( ), end( ), b );
+        return std::lower_bound( begin(), end(), b );
     }
     static inline iterator lower_bound( iterator s, iterator e, KeyType key )
     {
@@ -128,7 +129,7 @@ template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeM
     inline iterator upper_bound( KeyType key ) const
     {
         Range b = { key, 1, NullVal };
-        return std::upper_bound( begin( ), end( ), b );
+        return std::upper_bound( begin(), end(), b );
     }
     static inline iterator upper_bound( iterator s, iterator e, KeyType key )
     {
@@ -138,28 +139,28 @@ template< typename KeyType, typename ValType, ValType NullVal = 0 > class RangeM
     inline std::pair< iterator, iterator > equal_range( KeyType key ) const
     {
         Range b = { key, 1, NullVal };
-        return std::equal_range( begin( ), end( ), b );
+        return std::equal_range( begin(), end(), b );
     }
 
-    inline void clear( )
+    inline void clear()
     {
-        data.clear( );
+        data.clear();
     }
 
   protected:
     RangeList data;
 };
 
-template< typename KeyType, typename ValType, ValType NullVal >
-inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool >
-    RangeMap< KeyType, ValType, NullVal >::insert( KeyType first_key, ValType first_val, KeyType count )
+template < typename KeyType, typename ValType, ValType NullVal >
+inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool > RangeMap<
+    KeyType, ValType, NullVal >::insert( KeyType first_key, ValType first_val, KeyType count )
 {
-    Range                        block = { first_key, count, first_val };
-    typename RangeList::iterator i = std::lower_bound( data.begin( ), data.end( ), block );
+    Range block                    = { first_key, count, first_val };
+    typename RangeList::iterator i = std::lower_bound( data.begin(), data.end(), block );
 
-    if( i == data.end( ) )
+    if( i == data.end() )
     {
-        if( i != data.begin( ) )
+        if( i != data.begin() )
         {
             --i;
             if( i->begin + i->count == first_key && i->value + i->count == first_val )
@@ -169,7 +170,7 @@ inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool
             }
         }
         data.push_back( block );
-        return std::pair< iterator, bool >( data.end( ) - 1, true );
+        return std::pair< iterator, bool >( data.end() - 1, true );
     }
 
     if( i->begin < first_key + count ) return std::pair< iterator, bool >( i, false );
@@ -179,7 +180,7 @@ inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool
         i->begin = first_key;
         i->value = first_val;
         i->count += count;
-        if( i != data.begin( ) )
+        if( i != data.begin() )
         {
             count = i->count;
             --i;
@@ -194,7 +195,7 @@ inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool
         return std::pair< iterator, bool >( i, true );
     }
 
-    if( i != data.begin( ) )
+    if( i != data.begin() )
     {
         --i;
         if( i->begin + i->count == first_key && i->value + i->count == first_val )
@@ -208,38 +209,38 @@ inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool
     return std::pair< iterator, bool >( data.insert( i, block ), true );
 }
 
-template< typename KeyType, typename ValType, ValType NullVal >
+template < typename KeyType, typename ValType, ValType NullVal >
 inline bool RangeMap< KeyType, ValType, NullVal >::merge( const RangeMap< KeyType, ValType, NullVal >& other )
 {
     // grow map sufficiently to hold new ranges
     RangeList new_data;
-    new_data.reserve( other.data.size( ) + data.size( ) );
+    new_data.reserve( other.data.size() + data.size() );
 
     // merge
-    typename RangeList::const_iterator i = other.data.begin( );
-    typename RangeList::const_iterator j = data.begin( );
+    typename RangeList::const_iterator i = other.data.begin();
+    typename RangeList::const_iterator j = data.begin();
     typename RangeList::const_iterator k;
-    while( i != other.data.end( ) || j != data.end( ) )
+    while( i != other.data.end() || j != data.end() )
     {
-        if( j != data.end( ) && ( i == other.data.end( ) || j->begin < i->begin ) )
+        if( j != data.end() && ( i == other.data.end() || j->begin < i->begin ) )
         {
             k = j;
             ++j;
         }
-        else if( i != other.data.end( ) )
+        else if( i != other.data.end() )
         {
             k = i;
             ++i;
         }
 
         // check if we need to merge with the end of the previous block
-        if( new_data.empty( ) )
+        if( new_data.empty() )
             new_data.push_back( *k );
-        else if( new_data.back( ).begin + new_data.back( ).count > k->begin )
+        else if( new_data.back().begin + new_data.back().count > k->begin )
             return false;
-        else if( new_data.back( ).begin + new_data.back( ).count == k->begin &&
-                 new_data.back( ).value + new_data.back( ).count == k->value )
-            new_data.back( ).count += k->count;
+        else if( new_data.back().begin + new_data.back().count == k->begin &&
+                 new_data.back().value + new_data.back().count == k->value )
+            new_data.back().count += k->count;
         else
             new_data.push_back( *k );
     }
@@ -248,22 +249,22 @@ inline bool RangeMap< KeyType, ValType, NullVal >::merge( const RangeMap< KeyTyp
     return true;
 }
 
-template< typename KeyType, typename ValType, ValType NullVal >
+template < typename KeyType, typename ValType, ValType NullVal >
 inline ValType RangeMap< KeyType, ValType, NullVal >::find( KeyType key ) const
 {
-    Range                              search = { key, 1, NullVal };
-    typename RangeList::const_iterator i = std::lower_bound( data.begin( ), data.end( ), search );
-    if( i == data.end( ) || i->begin > key ) return NullVal;
+    Range search                         = { key, 1, NullVal };
+    typename RangeList::const_iterator i = std::lower_bound( data.begin(), data.end(), search );
+    if( i == data.end() || i->begin > key ) return NullVal;
 
     return i->value + key - i->begin;
 }
 
-template< typename KeyType, typename ValType, ValType NullVal >
+template < typename KeyType, typename ValType, ValType NullVal >
 inline bool RangeMap< KeyType, ValType, NullVal >::find( KeyType key, ValType& val ) const
 {
-    Range                              search = { key, 1, NullVal };
-    typename RangeList::const_iterator i = std::lower_bound( data.begin( ), data.end( ), search );
-    if( i == data.end( ) || i->begin > key )
+    Range search                         = { key, 1, NullVal };
+    typename RangeList::const_iterator i = std::lower_bound( data.begin(), data.end(), search );
+    if( i == data.end() || i->begin > key )
     {
         val = NullVal;
         return false;
@@ -273,31 +274,31 @@ inline bool RangeMap< KeyType, ValType, NullVal >::find( KeyType key, ValType& v
     return true;
 }
 
-template< typename KeyType, typename ValType, ValType NullVal >
+template < typename KeyType, typename ValType, ValType NullVal >
 inline bool RangeMap< KeyType, ValType, NullVal >::exists( KeyType key ) const
 {
-    Range                              search = { key, 1, NullVal };
-    typename RangeList::const_iterator i = std::lower_bound( data.begin( ), data.end( ), search );
-    return i != data.end( ) && key >= i->begin;
+    Range search                         = { key, 1, NullVal };
+    typename RangeList::const_iterator i = std::lower_bound( data.begin(), data.end(), search );
+    return i != data.end() && key >= i->begin;
 }
 
-template< typename KeyType, typename ValType, ValType NullVal >
+template < typename KeyType, typename ValType, ValType NullVal >
 inline bool RangeMap< KeyType, ValType, NullVal >::intersects( KeyType start, KeyType count ) const
 {
-    Range                              search = { start, count, NullVal };
-    typename RangeList::const_iterator i = std::lower_bound( data.begin( ), data.end( ), search );
-    return i != data.end( ) && start + count > i->begin && i->begin + i->count > start;
+    Range search                         = { start, count, NullVal };
+    typename RangeList::const_iterator i = std::lower_bound( data.begin(), data.end(), search );
+    return i != data.end() && start + count > i->begin && i->begin + i->count > start;
 }
 
-template< typename KeyType, typename ValType, ValType NullVal >
-inline typename RangeMap< KeyType, ValType, NullVal >::iterator
-    RangeMap< KeyType, ValType, NullVal >::erase( KeyType key, KeyType count )
+template < typename KeyType, typename ValType, ValType NullVal >
+inline typename RangeMap< KeyType, ValType, NullVal >::iterator RangeMap< KeyType, ValType, NullVal >::erase(
+    KeyType key, KeyType count )
 {
-    Range                        search = { key, 1, NullVal };
+    Range search = { key, 1, NullVal };
     typename RangeList::iterator i, j;
-    i = std::lower_bound( data.begin( ), data.end( ), search );
+    i = std::lower_bound( data.begin(), data.end(), search );
 
-    if( i == data.end( ) ) return i;
+    if( i == data.end() ) return i;
 
     if( key > i->begin )
     {
@@ -318,12 +319,12 @@ inline typename RangeMap< KeyType, ValType, NullVal >::iterator
     }
 
     // remove any entries entirely convered by the input range
-    for( j = i; j != data.end( ) && ( j->begin + j->count ) <= ( key + count ); ++j )
+    for( j = i; j != data.end() && ( j->begin + j->count ) <= ( key + count ); ++j )
         ;
     i = data.erase( i, j );
 
     // remove beginning of last block
-    if( i != data.end( ) && ( key + count ) >= i->begin )
+    if( i != data.end() && ( key + count ) >= i->begin )
     {
         KeyType offset = key + count - i->begin;
         i->begin += offset;

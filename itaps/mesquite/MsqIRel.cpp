@@ -49,11 +49,11 @@ MsqIRel::MsqIRel( iGeom_Instance geom, iRel_Instance relate_iface, iRel_PairHand
 {
 }
 
-MsqIRel::~MsqIRel( ) {}
+MsqIRel::~MsqIRel() {}
 
 void MsqIRel::snap_to( Mesh::VertexHandle handle, Vector3D& coordinate ) const
 {
-    int                ierr, dim;
+    int ierr, dim;
     iBase_EntityHandle geom;
 
     ierr = geom_from_mesh( handle, geom, dim );
@@ -76,7 +76,7 @@ void MsqIRel::snap_to( Mesh::VertexHandle handle, Vector3D& coordinate ) const
 
 void MsqIRel::vertex_normal_at( Mesh::VertexHandle handle, Vector3D& coordinate ) const
 {
-    int                ierr, dim;
+    int ierr, dim;
     iBase_EntityHandle geom;
 
     ierr = geom_from_mesh( handle, geom, dim );
@@ -109,11 +109,11 @@ void MsqIRel::element_normal_at( Mesh::ElementHandle handle, Vector3D& coordinat
 void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coordinates[], unsigned count,
                                 MsqError& err ) const
 {
-    int                ierr, dim;
+    int ierr, dim;
     iBase_EntityHandle geom;
     for( unsigned i = 0; i < count; ++i )
     {
-        ierr = geom_from_mesh( handle[ i ], geom, dim );
+        ierr = geom_from_mesh( handle[i], geom, dim );
         if( iBase_SUCCESS != ierr )
         {
             process_itaps_error( ierr );
@@ -127,7 +127,7 @@ void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coord
             return;
         }
 
-        ierr = normal( geom, coordinates[ i ] );
+        ierr = normal( geom, coordinates[i] );
         if( iBase_SUCCESS != ierr )
         {
             process_itaps_error( ierr );
@@ -153,7 +153,7 @@ void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short
 void MsqIRel::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest, Vector3D& p_normal,
                              MsqError& err ) const
 {
-    int                ierr, dim;
+    int ierr, dim;
     iBase_EntityHandle geom;
 
     ierr = geom_from_mesh( handle, geom, dim );
@@ -199,9 +199,9 @@ int MsqIRel::geom_from_mesh( const Mesh::EntityHandle* handles, iBase_EntityHand
     int ierr, dim;
     for( size_t i = 0; i < count; ++i )
     {
-        ierr = geom_from_mesh( handles[ i ], geom_handles[ i ], dim );
+        ierr = geom_from_mesh( handles[i], geom_handles[i], dim );
         if( iBase_SUCCESS != ierr ) return ierr;
-        dims[ i ] = dim;
+        dims[i] = dim;
     }
 
     return iBase_SUCCESS;

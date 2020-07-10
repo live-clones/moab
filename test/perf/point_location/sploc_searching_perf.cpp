@@ -29,12 +29,12 @@ int main( int argc, char** argv )
     if( fail ) return fail;
 #else
     // silence the warning of parameters not used, in serial; there should be a smarter way :(
-    argv[ 0 ] = argv[ argc - argc ];
+    argv[0] = argv[argc - argc];
 #endif
 
-    int    npoints = 100, dim = 3;
-    int    dints = 1, dleafs = 1, ddeps = 1;
-    bool   eval = false;
+    int npoints = 100, dim = 3;
+    int dints = 1, dleafs = 1, ddeps = 1;
+    bool eval   = false;
     double rtol = 1.0e-10;
 
     ProgOptions po( "tree_searching_perf options" );
@@ -51,13 +51,13 @@ int main( int argc, char** argv )
     std::vector< int > ints, deps, leafs;
     ints.push_back( 10 );
     for( int i = 1; i < dints; i++ )
-        ints.push_back( 2 * ints[ i - 1 ] );
+        ints.push_back( 2 * ints[i - 1] );
     deps.push_back( 30 );
     for( int i = 1; i < ddeps; i++ )
-        deps.push_back( deps[ i - 1 ] - 5 );
+        deps.push_back( deps[i - 1] - 5 );
     leafs.push_back( 6 );
     for( int i = 1; i < dleafs; i++ )
-        leafs.push_back( 2 * leafs[ i - 1 ] );
+        leafs.push_back( 2 * leafs[i - 1] );
 
     ErrorCode rval = MB_SUCCESS;
     std::cout << "Tree_type"
@@ -85,19 +85,19 @@ int main( int argc, char** argv )
               << "leafObjectTests" << std::endl;
 
     // outermost iteration: # elements
-    for( std::vector< int >::iterator int_it = ints.begin( ); int_it != ints.end( ); ++int_it )
+    for( std::vector< int >::iterator int_it = ints.begin(); int_it != ints.end(); ++int_it )
     {
-        Core  mb;
+        Core mb;
         Range elems;
         rval = create_hex_mesh( mb, elems, *int_it, dim );
         if( MB_SUCCESS != rval ) return rval;
 
         // iteration: tree depth
-        for( std::vector< int >::iterator dep_it = deps.begin( ); dep_it != deps.end( ); ++dep_it )
+        for( std::vector< int >::iterator dep_it = deps.begin(); dep_it != deps.end(); ++dep_it )
         {
 
             // iteration: tree max elems/leaf
-            for( std::vector< int >::iterator leafs_it = leafs.begin( ); leafs_it != leafs.end( ); ++leafs_it )
+            for( std::vector< int >::iterator leafs_it = leafs.begin(); leafs_it != leafs.end(); ++leafs_it )
             {
 
                 // iteration: tree type
@@ -115,13 +115,13 @@ int main( int argc, char** argv )
                     {
                         // create an element evaluator
                         eeval = new ElemEvaluator( &mb );
-                        rval = eeval->set_eval_set( *elems.begin( ) );
+                        rval  = eeval->set_eval_set( *elems.begin() );
                         if( MB_SUCCESS != rval ) return rval;
                     }
 
                     std::ostringstream opts;
                     opts << "MAX_DEPTH=" << *dep_it << ";MAX_PER_LEAF=" << *leafs_it;
-                    FileOptions fo( opts.str( ).c_str( ) );
+                    FileOptions fo( opts.str().c_str() );
                     rval = tree->parse_options( fo );
                     if( MB_SUCCESS != rval ) return rval;
                     SpatialLocator sl( &mb, elems, tree, eeval );
@@ -135,7 +135,7 @@ int main( int argc, char** argv )
                               << " " << ( *int_it ) * ( *int_it ) * ( *int_it ) << " " << cpu_time << " "
                               << perc_outside << " ";
 
-                    tree->tree_stats( ).output_all_stats( );
+                    tree->tree_stats().output_all_stats();
 
                     if( eeval ) delete eeval;
 
@@ -148,7 +148,7 @@ int main( int argc, char** argv )
     }  // # elements
 
 #ifdef MOAB_HAVE_MPI
-    fail = MPI_Finalize( );
+    fail = MPI_Finalize();
     if( fail ) return fail;
 #endif
 
@@ -157,35 +157,35 @@ int main( int argc, char** argv )
 
 ErrorCode test_locator( SpatialLocator& sl, int npoints, double rtol, double& cpu_time, double& percent_outside )
 {
-    BoundBox box = sl.local_box( );
+    BoundBox box     = sl.local_box();
     CartVect box_del = box.bMax - box.bMin;
 
-    std::vector< CartVect >     test_pts( npoints ), test_res( npoints );
+    std::vector< CartVect > test_pts( npoints ), test_res( npoints );
     std::vector< EntityHandle > ents( npoints );
-    int*                        is_in = new int[ npoints ];
+    int* is_in = new int[npoints];
 
     double denom = 1.0 / (double)RAND_MAX;
     for( int i = 0; i < npoints; i++ )
     {
         // generate a small number of random point to test
-        double rx = (double)rand( ) * denom, ry = (double)rand( ) * denom, rz = (double)rand( ) * denom;
-        test_pts[ i ] = box.bMin + CartVect( rx * box_del[ 0 ], ry * box_del[ 1 ], rz * box_del[ 2 ] );
+        double rx = (double)rand() * denom, ry = (double)rand() * denom, rz = (double)rand() * denom;
+        test_pts[i] = box.bMin + CartVect( rx * box_del[0], ry * box_del[1], rz * box_del[2] );
     }
 
     CpuTimer ct;
 
     // call spatial locator to locate points
     ErrorCode rval =
-        sl.locate_points( test_pts[ 0 ].array( ), npoints, &ents[ 0 ], test_res[ 0 ].array( ), &is_in[ 0 ], rtol, 0.0 );
+        sl.locate_points( test_pts[0].array(), npoints, &ents[0], test_res[0].array(), &is_in[0], rtol, 0.0 );
     if( MB_SUCCESS != rval )
     {
         delete[] is_in;
         return rval;
     }
 
-    cpu_time = ct.time_elapsed( );
+    cpu_time = ct.time_elapsed();
 
-    int num_out = std::count( is_in, is_in + npoints, false );
+    int num_out     = std::count( is_in, is_in + npoints, false );
     percent_outside = ( (double)num_out ) / npoints;
     delete[] is_in;
 
@@ -195,12 +195,12 @@ ErrorCode test_locator( SpatialLocator& sl, int npoints, double rtol, double& cp
 ErrorCode create_hex_mesh( Interface& mb, Range& elems, int n, int dim )
 {
     ScdInterface* scdi;
-    ErrorCode     rval = mb.query_interface( scdi );
+    ErrorCode rval = mb.query_interface( scdi );
     if( MB_SUCCESS != rval ) return rval;
 
     HomCoord high( n - 1, -1, -1 );
-    if( dim > 1 ) high[ 1 ] = n - 1;
-    if( dim > 2 ) high[ 2 ] = n - 1;
+    if( dim > 1 ) high[1] = n - 1;
+    if( dim > 2 ) high[2] = n - 1;
     ScdBox* new_box;
     rval = scdi->construct_box( HomCoord( 0, 0, 0 ), high, NULL, 0, new_box );
     if( MB_SUCCESS != rval ) return rval;

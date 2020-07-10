@@ -59,10 +59,10 @@ namespace DomainUtil
     void get_fixed_vertices( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array, size_t num_vertices,
                              std::vector< Mesh::VertexHandle >& fixed_handles_out, MsqError& err );
 
-    bool non_colinear_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[ 3 ],
+    bool non_colinear_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[3],
                                 double epsilon );
 
-    bool non_coplanar_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[ 4 ],
+    bool non_coplanar_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[4],
                                 double epsilon );
 
 }  // namespace DomainUtil

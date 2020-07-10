@@ -53,7 +53,7 @@ class TempestOnlineMap : public OfflineMap
     ///	<summary>
     ///		Define a virtual destructor.
     ///	</summary>
-    virtual ~TempestOnlineMap( );
+    virtual ~TempestOnlineMap();
 
   public:
     // Input / Output types
@@ -119,13 +119,13 @@ class TempestOnlineMap : public OfflineMap
     ///		If we computed the reduction, get the vector representing the source areas for all entities
     /// in the mesh
     ///	</summary>
-    const DataArray1D< double >& GetGlobalSourceAreas( ) const;
+    const DataArray1D< double >& GetGlobalSourceAreas() const;
 
     ///	<summary>
     ///		If we computed the reduction, get the vector representing the target areas for all entities
     /// in the mesh
     ///	</summary>
-    const DataArray1D< double >& GetGlobalTargetAreas( ) const;
+    const DataArray1D< double >& GetGlobalTargetAreas() const;
 
   private:
     ///	<summary>
@@ -145,14 +145,14 @@ class TempestOnlineMap : public OfflineMap
     ///		Generate the OfflineMap for linear conserative element-average
     ///		spectral element to element average remapping.
     ///	</summary>
-    void LinearRemapSE0_Tempest_MOAB( const DataArray3D< int >&    dataGLLNodes,
+    void LinearRemapSE0_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                       const DataArray3D< double >& dataGLLJacobian );
 
     ///	<summary>
     ///		Generate the OfflineMap for cubic conserative element-average
     ///		spectral element to element average remapping.
     ///	</summary>
-    void LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >&    dataGLLNodes,
+    void LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                       const DataArray3D< double >& dataGLLJacobian, int nMonotoneType,
                                       bool fContinuousIn, bool fNoConservation );
 
@@ -168,9 +168,9 @@ class TempestOnlineMap : public OfflineMap
     ///		Generate the OfflineMap for remapping from finite elements to finite
     ///		elements.
     ///	</summary>
-    void LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >&    dataGLLNodesIn,
+    void LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >& dataGLLNodesIn,
                                     const DataArray3D< double >& dataGLLJacobianIn,
-                                    const DataArray3D< int >&    dataGLLNodesOut,
+                                    const DataArray3D< int >& dataGLLNodesOut,
                                     const DataArray3D< double >& dataGLLJacobianOut,
                                     const DataArray1D< double >& dataNodalAreaOut, int nPin, int nPout,
                                     int nMonotoneType, bool fContinuousIn, bool fContinuousOut, bool fNoConservation );
@@ -179,9 +179,9 @@ class TempestOnlineMap : public OfflineMap
     ///		Generate the OfflineMap for remapping from finite elements to finite
     ///		elements (pointwise interpolation).
     ///	</summary>
-    void LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArray3D< int >&    dataGLLNodesIn,
+    void LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArray3D< int >& dataGLLNodesIn,
                                               const DataArray3D< double >& dataGLLJacobianIn,
-                                              const DataArray3D< int >&    dataGLLNodesOut,
+                                              const DataArray3D< int >& dataGLLNodesOut,
                                               const DataArray3D< double >& dataGLLJacobianOut,
                                               const DataArray1D< double >& dataNodalAreaOut, int nPin, int nPout,
                                               int nMonotoneType, bool fContinuousIn, bool fContinuousOut );
@@ -192,7 +192,7 @@ class TempestOnlineMap : public OfflineMap
     ///     needed for projections.
     ///	</summary>
 #ifdef MOAB_HAVE_EIGEN
-    void copy_tempest_sparsemat_to_eigen3( );
+    void copy_tempest_sparsemat_to_eigen3();
 #endif
 
   public:
@@ -213,63 +213,63 @@ class TempestOnlineMap : public OfflineMap
 
 #ifdef MOAB_HAVE_EIGEN
 
-    typedef Eigen::Matrix< double, 1, Eigen::Dynamic >     WeightDRowVector;
-    typedef Eigen::Matrix< double, Eigen::Dynamic, 1 >     WeightDColVector;
-    typedef Eigen::SparseVector< double >                  WeightSVector;
+    typedef Eigen::Matrix< double, 1, Eigen::Dynamic > WeightDRowVector;
+    typedef Eigen::Matrix< double, Eigen::Dynamic, 1 > WeightDColVector;
+    typedef Eigen::SparseVector< double > WeightSVector;
     typedef Eigen::SparseMatrix< double, Eigen::RowMajor > WeightRMatrix;
     typedef Eigen::SparseMatrix< double, Eigen::ColMajor > WeightCMatrix;
 
     typedef WeightDRowVector WeightRowVector;
     typedef WeightDColVector WeightColVector;
-    typedef WeightRMatrix    WeightMatrix;
+    typedef WeightRMatrix WeightMatrix;
 
     ///	<summary>
     ///		Get the raw reference to the Eigen weight matrix representing the projection from source to
     /// destination mesh.
     ///	</summary>
-    WeightMatrix& GetWeightMatrix( );
+    WeightMatrix& GetWeightMatrix();
 
     ///	<summary>
     ///		Get the row vector that is amenable for application of A*x operation.
     ///	</summary>
-    WeightRowVector& GetRowVector( );
+    WeightRowVector& GetRowVector();
 
     ///	<summary>
     ///		Get the column vector that is amenable for application of A^T*x operation.
     ///	</summary>
-    WeightColVector& GetColVector( );
+    WeightColVector& GetColVector();
 
 #endif
 
     ///	<summary>
     ///		Get the number of total Degrees-Of-Freedom defined on the source mesh.
     ///	</summary>
-    int GetSourceGlobalNDofs( );
+    int GetSourceGlobalNDofs();
 
     ///	<summary>
     ///		Get the number of total Degrees-Of-Freedom defined on the destination mesh.
     ///	</summary>
-    int GetDestinationGlobalNDofs( );
+    int GetDestinationGlobalNDofs();
 
     ///	<summary>
     ///		Get the number of local Degrees-Of-Freedom defined on the source mesh.
     ///	</summary>
-    int GetSourceLocalNDofs( );
+    int GetSourceLocalNDofs();
 
     ///	<summary>
     ///		Get the number of local Degrees-Of-Freedom defined on the destination mesh.
     ///	</summary>
-    int GetDestinationLocalNDofs( );
+    int GetDestinationLocalNDofs();
 
     ///	<summary>
     ///		Get the number of Degrees-Of-Freedom per element on the source mesh.
     ///	</summary>
-    int GetSourceNDofsPerElement( );
+    int GetSourceNDofsPerElement();
 
     ///	<summary>
     ///		Get the number of Degrees-Of-Freedom per element on the destination mesh.
     ///	</summary>
-    int GetDestinationNDofsPerElement( );
+    int GetDestinationNDofsPerElement();
 
     ///	<summary>
     ///		Get the global Degrees-Of-Freedom ID on the destination mesh.
@@ -335,7 +335,7 @@ class TempestOnlineMap : public OfflineMap
 
 #ifdef MOAB_HAVE_EIGEN
 
-    WeightMatrix    m_weightMatrix;
+    WeightMatrix m_weightMatrix;
     WeightRowVector m_rowVector;
     WeightColVector m_colVector;
 
@@ -356,19 +356,19 @@ class TempestOnlineMap : public OfflineMap
     ///	<summary>
     ///		The original tag data and local to global DoF mapping to associate matrix values to
     /// solution 	<summary>
-    moab::Tag               m_dofTagSrc, m_dofTagDest;
+    moab::Tag m_dofTagSrc, m_dofTagDest;
     std::vector< unsigned > row_gdofmap, col_gdofmap, srccol_gdofmap;
     std::vector< unsigned > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
 
     DataArray3D< int > dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
     DiscretizationType m_srcDiscType, m_destDiscType;
-    int                m_nTotDofs_Src, m_nTotDofs_SrcCov, m_nTotDofs_Dest;
+    int m_nTotDofs_Src, m_nTotDofs_SrcCov, m_nTotDofs_Dest;
 
     // Key details about the current map
-    int                m_nDofsPEl_Src, m_nDofsPEl_Dest;
+    int m_nDofsPEl_Src, m_nDofsPEl_Dest;
     DiscretizationType m_eInputType, m_eOutputType;
-    bool               m_bConserved;
-    int                m_iMonotonicity;
+    bool m_bConserved;
+    int m_iMonotonicity;
 
     Mesh* m_meshInput;
     Mesh* m_meshInputCov;
@@ -376,87 +376,87 @@ class TempestOnlineMap : public OfflineMap
     Mesh* m_meshOverlap;
 
     bool is_parallel, is_root;
-    int  rank, size;
+    int rank, size;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 inline int moab::TempestOnlineMap::GetRowGlobalDoF( int localRowID ) const
 {
-    return row_gdofmap[ localRowID ];
+    return row_gdofmap[localRowID];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 inline int moab::TempestOnlineMap::GetColGlobalDoF( int localColID ) const
 {
-    return col_gdofmap[ localColID ];
+    return col_gdofmap[localColID];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef MOAB_HAVE_EIGEN
 
-inline int moab::TempestOnlineMap::GetSourceGlobalNDofs( )
+inline int moab::TempestOnlineMap::GetSourceGlobalNDofs()
 {
-    return m_weightMatrix.cols( );  // return the global number of rows from the weight matrix
+    return m_weightMatrix.cols();  // return the global number of rows from the weight matrix
 }
 
 // ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetDestinationGlobalNDofs( )
+inline int moab::TempestOnlineMap::GetDestinationGlobalNDofs()
 {
-    return m_weightMatrix.rows( );  // return the global number of columns from the weight matrix
+    return m_weightMatrix.rows();  // return the global number of columns from the weight matrix
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetSourceLocalNDofs( )
+inline int moab::TempestOnlineMap::GetSourceLocalNDofs()
 {
-    return m_weightMatrix.cols( );  // return the local number of rows from the weight matrix
+    return m_weightMatrix.cols();  // return the local number of rows from the weight matrix
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetDestinationLocalNDofs( )
+inline int moab::TempestOnlineMap::GetDestinationLocalNDofs()
 {
-    return m_weightMatrix.rows( );  // return the local number of columns from the weight matrix
+    return m_weightMatrix.rows();  // return the local number of columns from the weight matrix
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetSourceNDofsPerElement( )
+inline int moab::TempestOnlineMap::GetSourceNDofsPerElement()
 {
     return m_nDofsPEl_Src;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement( )
+inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
 {
     return m_nDofsPEl_Dest;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline moab::TempestOnlineMap::WeightMatrix& moab::TempestOnlineMap::GetWeightMatrix( )
+inline moab::TempestOnlineMap::WeightMatrix& moab::TempestOnlineMap::GetWeightMatrix()
 {
-    assert( m_weightMatrix.rows( ) != 0 && m_weightMatrix.cols( ) != 0 );
+    assert( m_weightMatrix.rows() != 0 && m_weightMatrix.cols() != 0 );
     return m_weightMatrix;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline moab::TempestOnlineMap::WeightRowVector& moab::TempestOnlineMap::GetRowVector( )
+inline moab::TempestOnlineMap::WeightRowVector& moab::TempestOnlineMap::GetRowVector()
 {
-    assert( m_rowVector.size( ) != 0 );
+    assert( m_rowVector.size() != 0 );
     return m_rowVector;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline moab::TempestOnlineMap::WeightColVector& moab::TempestOnlineMap::GetColVector( )
+inline moab::TempestOnlineMap::WeightColVector& moab::TempestOnlineMap::GetColVector()
 {
-    assert( m_colVector.size( ) != 0 );
+    assert( m_colVector.size() != 0 );
     return m_colVector;
 }
 

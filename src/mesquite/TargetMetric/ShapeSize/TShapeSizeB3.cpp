@@ -39,12 +39,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeSizeB3::get_name( ) const
+std::string TShapeSizeB3::get_name() const
 {
     return "TShapeSizeB3";
 }
 
-TShapeSizeB3::~TShapeSizeB3( ) {}
+TShapeSizeB3::~TShapeSizeB3() {}
 
 bool TShapeSizeB3::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -69,7 +69,7 @@ bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& resul
         return false;
     }
 
-    result = sqr_Frobenius( T ) - 2.0 * std::log( tau ) - 2;
+    result      = sqr_Frobenius( T ) - 2.0 * std::log( tau ) - 2;
     deriv_wrt_T = T;
     deriv_wrt_T -= 1 / tau * transpose_adj( T );
     deriv_wrt_T *= 2;
@@ -78,7 +78,7 @@ bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& resul
 }
 
 bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                       MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                       MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -90,8 +90,8 @@ bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& resul
     result = sqr_Frobenius( T ) - 2.0 * std::log( tau ) - 2;
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    const double            it = 1 / tau;
-    deriv_wrt_T = T;
+    const double it              = 1 / tau;
+    deriv_wrt_T                  = T;
     deriv_wrt_T -= it * adjt;
     deriv_wrt_T *= 2;
 
@@ -112,7 +112,7 @@ bool TShapeSizeB3::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqErro
     }
 
     double n = Frobenius( T );
-    result = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
+    result   = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
     return true;
 }
 
@@ -127,10 +127,10 @@ bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& resul
     }
 
     double n = Frobenius( T );
-    result = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
+    result   = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
 
     const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    deriv_wrt_T = T;
+    deriv_wrt_T                  = T;
     deriv_wrt_T *= 3 * n;
     deriv_wrt_T -= 3 * MSQ_SQRT_THREE / tau * adjt;
 
@@ -138,7 +138,7 @@ bool TShapeSizeB3::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& resul
 }
 
 bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                       MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                       MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )
@@ -148,11 +148,11 @@ bool TShapeSizeB3::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& resul
     }
 
     double n = Frobenius( T );
-    result = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
+    result   = n * n * n - 3 * MSQ_SQRT_THREE * ( log( tau ) + 1 );
 
     const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    const double            it = 1 / tau;
-    deriv_wrt_T = T;
+    const double it              = 1 / tau;
+    deriv_wrt_T                  = T;
     deriv_wrt_T *= 3 * n;
     deriv_wrt_T -= 3 * MSQ_SQRT_THREE * it * adjt;
 

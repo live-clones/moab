@@ -7,8 +7,8 @@
 
 using namespace MBMesquite;
 
-const char ROTATE_FLAG = 'r';
-const char SCALE_FLAG = 's';
+const char ROTATE_FLAG    = 'r';
+const char SCALE_FLAG     = 's';
 const char TRANSLATE_FLAG = 't';
 
 class RotateArg : public CLArgs::DoubleListArgI
@@ -40,31 +40,31 @@ class TranslateArg : public CLArgs::DoubleListArgI
 };
 bool RotateArg::value( const std::vector< double >& vals )
 {
-    mTransform->add_rotation( Vector3D( vals[ 1 ], vals[ 2 ], vals[ 3 ] ), vals[ 0 ] * M_PI / 180 );
+    mTransform->add_rotation( Vector3D( vals[1], vals[2], vals[3] ), vals[0] * M_PI / 180 );
     return true;
 }
 bool ScaleArg::value( const std::vector< double >& vals )
 {
-    for( unsigned i = 0; i < vals.size( ); ++i )
-        if( vals[ i ] <= 0 ) return false;
-    if( vals.size( ) == 1 )
-        mTransform->add_scale( vals[ 0 ] );
+    for( unsigned i = 0; i < vals.size(); ++i )
+        if( vals[i] <= 0 ) return false;
+    if( vals.size() == 1 )
+        mTransform->add_scale( vals[0] );
     else
-        mTransform->add_scale( Vector3D( vals[ 0 ], vals[ 1 ], vals[ 2 ] ) );
+        mTransform->add_scale( Vector3D( vals[0], vals[1], vals[2] ) );
     return true;
 }
 bool TranslateArg::value( const std::vector< double >& vals )
 {
-    mTransform->add_translation( Vector3D( vals[ 0 ], vals[ 1 ], vals[ 2 ] ) );
+    mTransform->add_translation( Vector3D( vals[0], vals[1], vals[2] ) );
     return true;
 }
 
 int main( int argc, char* argv[] )
 {
-    MeshTransform     xform;
-    RotateArg         rotate_arg( &xform );
-    ScaleArg          scale_arg( &xform );
-    TranslateArg      translate_arg( &xform );
+    MeshTransform xform;
+    RotateArg rotate_arg( &xform );
+    ScaleArg scale_arg( &xform );
+    TranslateArg translate_arg( &xform );
     CLArgs::ToggleArg freeonly, skin;
 
     CLArgs args( "vtkxform", "Transform a mesh",
@@ -97,19 +97,19 @@ int main( int argc, char* argv[] )
         args.print_usage( std::cerr );
         exit( 1 );
     }
-    std::string input_file = files[ 0 ];
-    std::string output_file = files[ 1 ];
+    std::string input_file  = files[0];
+    std::string output_file = files[1];
 
     MeshImpl mesh;
     MsqError err;
-    mesh.read_vtk( input_file.c_str( ), err );
+    mesh.read_vtk( input_file.c_str(), err );
     if( err )
     {
         std::cerr << err << std::endl << "Failed to read file: " << input_file << std::endl;
         return 1;
     }
 
-    if( skin.value( ) )
+    if( skin.value() )
     {
         mesh.mark_skin_fixed( err, false );
         if( err )
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
         }
     }
 
-    xform.skip_fixed_vertices( freeonly.value( ) );
+    xform.skip_fixed_vertices( freeonly.value() );
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, 0 );
     xform.loop_over_mesh( &mesh_and_domain, 0, err );
     if( err )
@@ -128,7 +128,7 @@ int main( int argc, char* argv[] )
         return 2;
     }
 
-    mesh.write_vtk( output_file.c_str( ), err );
+    mesh.write_vtk( output_file.c_str(), err );
     if( err )
     {
         std::cerr << err << std::endl << "Failed to write file: " << output_file << std::endl;

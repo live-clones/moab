@@ -121,7 +121,7 @@ class BitPage
 
   private:
     /**\brief The actual array of bytes */
-    char byteArray[ BitTag::PageSize ];
+    char byteArray[BitTag::PageSize];
 };
 
 inline unsigned char BitPage::get_bits( int offset, int per_ent ) const
@@ -129,21 +129,21 @@ inline unsigned char BitPage::get_bits( int offset, int per_ent ) const
     // Assume per_ent is a power of two, which should be guaranteed
     // by higher-level code.
     unsigned char mask = (unsigned char)( 1 << per_ent ) - 1;  // 2^per_ent - 1
-    int           byte = ( offset * per_ent ) >> 3;  // shifting 3 is dividing by eight
-    int           bit = ( offset * per_ent ) & 7;  // masking with 7 is modulo eight
+    int byte           = ( offset * per_ent ) >> 3;            // shifting 3 is dividing by eight
+    int bit            = ( offset * per_ent ) & 7;             // masking with 7 is modulo eight
     assert( byte < BitTag::PageSize );
-    return (unsigned char)( byteArray[ byte ] >> bit ) & mask;
+    return (unsigned char)( byteArray[byte] >> bit ) & mask;
 }
 
 inline void BitPage::set_bits( int offset, int per_ent, unsigned char bits )
 {
     int byte = ( offset * per_ent ) >> 3;  // shifting 3 is dividing by eight
-    int bit = ( offset * per_ent ) & 7;  // masking with 7 is modulo eight
+    int bit  = ( offset * per_ent ) & 7;   // masking with 7 is modulo eight
     assert( byte < BitTag::PageSize );
     // Assume per_ent is a power of two, which should be guaranteed
     // by higher-level code.
     unsigned char mask = (unsigned char)( ( 1 << per_ent ) - 1 ) << bit;
-    byteArray[ byte ] = (char)( ( byteArray[ byte ] & ~mask ) | ( ( bits << bit ) & mask ) );
+    byteArray[byte]    = (char)( ( byteArray[byte] & ~mask ) | ( ( bits << bit ) & mask ) );
 }
 
 inline void BitPage::get_bits( int offset, int count, int per_ent, unsigned char* data ) const

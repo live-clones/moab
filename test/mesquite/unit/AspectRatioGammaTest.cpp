@@ -56,83 +56,83 @@ class AspectRatioGammaTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_scale_invariant );
     CPPUNIT_TEST( test_orient_invariant );
 
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     AspectRatioGammaQualityMetric mMetric;
-    QualityMetricTester           tester;
+    QualityMetricTester tester;
 
   public:
-    AspectRatioGammaTest( ) : tester( QualityMetricTester::SIMPLICIES ) {}
+    AspectRatioGammaTest() : tester( QualityMetricTester::SIMPLICIES ) {}
 
-    void test_supported_types( )
+    void test_supported_types()
     {
         tester.test_supported_element_types( &mMetric );
     }
 
-    void test_ideal_element_eval( )
+    void test_ideal_element_eval()
     {
         tester.test_evaluate_unit_edge_element( &mMetric, TRIANGLE, 1.0 );
         tester.test_evaluate_unit_edge_element( &mMetric, TETRAHEDRON, 1.0 );
     }
 
-    void test_ideal_element_grad( )
+    void test_ideal_element_grad()
     {
         tester.test_ideal_element_zero_gradient( &mMetric, false );
     }
 
-    void test_measures_quality( )
+    void test_measures_quality()
     {
         tester.test_measures_quality( &mMetric );
     }
 
-    void test_gradient_reflects_quality( )
+    void test_gradient_reflects_quality()
     {
         tester.test_gradient_reflects_quality( &mMetric );
     }
 
-    void test_inverted_elements( )
+    void test_inverted_elements()
     {
         tester.test_evaluate_inverted_element( &mMetric, false );
     }
 
-    void test_degenerate_elements( )
+    void test_degenerate_elements()
     {
         tester.test_evaluate_degenerate_element( &mMetric, false );
     }
 
-    void test_get_evaluations( )
+    void test_get_evaluations()
     {
         tester.test_get_element_evaluations( &mMetric );
     }
 
-    void test_get_element_indices( )
+    void test_get_element_indices()
     {
         tester.test_get_element_indices( &mMetric );
     }
 
-    void test_get_fixed_indices( )
+    void test_get_fixed_indices()
     {
         tester.test_get_indices_fixed( &mMetric );
     }
 
-    void test_eval_with_indices( )
+    void test_eval_with_indices()
     {
         tester.compare_eval_and_eval_with_indices( &mMetric );
     }
 
-    void test_location_invariant( )
+    void test_location_invariant()
     {
         tester.test_location_invariant( &mMetric );
         tester.test_grad_location_invariant( &mMetric );
         tester.test_hessian_location_invariant( &mMetric );
     }
 
-    void test_scale_invariant( )
+    void test_scale_invariant()
     {
         tester.test_scale_invariant( &mMetric );
     }
 
-    void test_orient_invariant( )
+    void test_orient_invariant()
     {
         tester.test_orient_invariant( &mMetric );
         tester.test_grad_orient_invariant( &mMetric );

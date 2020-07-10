@@ -50,9 +50,9 @@ namespace MBMesquite
 class ElemSampleQM : public QualityMetric
 {
   public:
-    MESQUITE_EXPORT virtual ~ElemSampleQM( );
+    MESQUITE_EXPORT virtual ~ElemSampleQM();
 
-    MESQUITE_EXPORT virtual MetricType get_metric_type( ) const
+    MESQUITE_EXPORT virtual MetricType get_metric_type() const
     {
         return ELEMENT_BASED;
     }
@@ -81,14 +81,14 @@ class ElemSampleQM : public QualityMetric
            /** Mask to remove sample bits from handle */
            ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1 };
 #else /* MS Visual C compiler broken for 64-bit enums */
-    static const size_t ELEM_INDEX_BITS = sizeof( size_t ) * 8 - Sample::NUMBER_PACKED_BITS;
+    static const size_t ELEM_INDEX_BITS    = sizeof( size_t ) * 8 - Sample::NUMBER_PACKED_BITS;
     static const size_t MAX_ELEM_PER_PATCH = ( (size_t)1 ) << ELEM_INDEX_BITS;
-    static const size_t ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1;
+    static const size_t ELEM_SAMPLE_MASK   = MAX_ELEM_PER_PATCH - 1;
 #endif
 
     inline static size_t handle( Sample sample, size_t index )
     {
-        return ( sample.pack( ) << ELEM_INDEX_BITS ) | index;
+        return ( sample.pack() << ELEM_INDEX_BITS ) | index;
     }
 
     inline static Sample sample( size_t handle )

@@ -102,7 +102,7 @@ void ParallelMeshImpl::vertices_set_global_id( const VertexHandle vert_array[], 
         const char GLOBAL_ID_NAME[] = "GLOBAL_ID";
 
         int default_gid = -1;
-        gid_tag = tag_create( GLOBAL_ID_NAME, HANDLE, 1, &default_gid, err );
+        gid_tag         = tag_create( GLOBAL_ID_NAME, HANDLE, 1, &default_gid, err );
         // the 'HANDLE' is the type of data to store
         // the '1' is for one value per vertex
         // NULL for no default value, if you want them all
@@ -135,7 +135,7 @@ void ParallelMeshImpl::vertices_set_processor_id( const VertexHandle vert_array[
         const char PROCESSOR_ID_NAME[] = "PROCESSOR_ID";
 
         int default_pid = -1;
-        pid_tag = tag_create( PROCESSOR_ID_NAME, INT, 1, &default_pid, err );
+        pid_tag         = tag_create( PROCESSOR_ID_NAME, INT, 1, &default_pid, err );
         // the 'INT' is the type of data to store
         // the '1' is for one value per vertex
         // NULL for no default value, if you want them all
@@ -279,9 +279,9 @@ void ParallelMeshImpl::release_entity_handles( const EntityHandle* handle_array,
     myMesh->release_entity_handles( handle_array, num_handles, err );
 }
 
-void ParallelMeshImpl::release( )
+void ParallelMeshImpl::release()
 {
-    myMesh->release( );
+    myMesh->release();
 }
 
 }  // namespace MBMesquite

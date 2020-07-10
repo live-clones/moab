@@ -54,10 +54,10 @@ typedef double realType;
 /* apparently uint and ulong can be defined already in standard headers */
 #define uint uint_
 //#define ulong ulong_
-#define sint sint_
+#define sint  sint_
 #define slong slong_
 
-typedef signed INTEGER   sint;
+typedef signed INTEGER sint;
 typedef unsigned INTEGER uint;
 #undef INTEGER
 
@@ -65,7 +65,7 @@ typedef unsigned INTEGER uint;
 typedef signed GLOBAL_INT slong;
 // typedef unsigned GLOBAL_INT ulong;
 #else
-typedef sint        slong;
+typedef sint slong;
 // typedef uint ulong;
 #endif
 
@@ -91,7 +91,7 @@ class TupleList
     {
       public:
         size_t buffSize;
-        char*  ptr;
+        char* ptr;
 
         /**Constructor which sets an initial capacity of the buffer
          */
@@ -99,11 +99,11 @@ class TupleList
 
         /**Default constructor (Note:  buffer must be initialized before use!)
          */
-        buffer( );
+        buffer();
 
-        ~buffer( )
+        ~buffer()
         {
-            this->reset( );
+            this->reset();
         };
 
         /**Initializes the buffer to have a capacity of size
@@ -116,10 +116,10 @@ class TupleList
 
         /**Frees any allocated memory used by the buffer
          */
-        void reset( );
+        void reset();
 
         // Aliases for using the buffer methods
-#define buffer_init( sz ) buffer_init_( sz, __FILE__ )
+#define buffer_init( sz )     buffer_init_( sz, __FILE__ )
 #define buffer_reserve( min ) buffer_reserve_( min, __FILE__ )
     };
 
@@ -130,11 +130,11 @@ class TupleList
 
     /**Default constructor (Note:  TupleList must be initialized before use!)
      */
-    TupleList( );
+    TupleList();
 
-    ~TupleList( )
+    ~TupleList()
     {
-        reset( );
+        reset();
     };
 
     /**Initializes the starting memory to be used by the TupleList
@@ -186,11 +186,11 @@ class TupleList
 
     /**Frees all allocated memory in use by the TupleList
      */
-    void reset( );
+    void reset();
 
     /**Adds one to the total number of in-use tuples and resizes if necessary
      */
-    void reserve( );
+    void reserve();
 
     /**Finds index of the tuple containing 'value' at the key_numth index of
      * said tuple; return -1 if key_num is out of bounds or if 'value' not found
@@ -213,9 +213,9 @@ class TupleList
      * param m         index of the value within the tuple
      * return the value at the given position
      */
-    sint     get_sint( unsigned int index, unsigned int m );
-    slong    get_int( unsigned int index, unsigned int m );
-    Ulong    get_ulong( unsigned int index, unsigned int m );
+    sint get_sint( unsigned int index, unsigned int m );
+    slong get_int( unsigned int index, unsigned int m );
+    Ulong get_ulong( unsigned int index, unsigned int m );
     realType get_double( unsigned int index, unsigned int m );
 
     /**get pointers to the data for the index'th tuple; ptr is
@@ -242,8 +242,8 @@ class TupleList
       which can affect operations such as
       whether or not we know the tuple list is sorted
       (for a binary search)*/
-    void enableWriteAccess( );
-    void disableWriteAccess( );
+    void enableWriteAccess();
+    void disableWriteAccess();
 
     /*Get information on the Tuple Sizes
      * param &mi_out  Count of uints in a tuple
@@ -260,43 +260,43 @@ class TupleList
     void set_n( uint n_in );
 
     /* Get the count of Tuples in the Tuple List */
-    uint get_n( ) const;
+    uint get_n() const;
 
     /*Get the maximum number of Tuples currently allocated for*/
-    uint get_max( ) const;
+    uint get_max() const;
 
-    bool get_writeEnabled( ) const;
+    bool get_writeEnabled() const;
 
     /*Increment n by 1
      * Warning, automatically calls enableWriteAccess()
      * returns current TupleList.n after the increment */
-    uint inc_n( );
+    uint inc_n();
 
     void print( const char* ) const;
     void print_to_file( const char* ) const;
 
     // Variables to allow for direct write access
-    sint*     vi_wr;
-    slong*    vl_wr;
-    Ulong*    vul_wr;
+    sint* vi_wr;
+    slong* vl_wr;
+    Ulong* vul_wr;
     realType* vr_wr;
 
     // Variables to allow for direct read access
     const sint* vi_rd;
-    slong*      vl_rd;
-    Ulong*      vul_rd;
-    realType*   vr_rd;
+    slong* vl_rd;
+    Ulong* vul_rd;
+    realType* vr_rd;
 
   private:
     /* storage layed out as: vi[max][mi], vl[max][ml], vul[max][mul],
      * vr[max][mr] where "tuple" i is given by
      * (vi[i][0:mi-1],vl[i][0:ml-1],vul[i][0:mul-1],vr[i][0:mr-1]).
      * only the first n tuples are in use */
-    uint      mi, ml, mul, mr;
-    uint      n, max;
-    sint*     vi;
-    slong*    vl;
-    Ulong*    vul;
+    uint mi, ml, mul, mr;
+    uint n, max;
+    sint* vi;
+    slong* vl;
+    Ulong* vul;
     realType* vr;
 
     // Used by sort:  see .cpp for more details
@@ -313,42 +313,42 @@ class TupleList
 
     typedef uint Index;
 
-    template< typename Value > struct SortData
+    template < typename Value >
+    struct SortData
     {
         Value v;
         Index i;
     };
 
-#define DIGIT_BITS 8
-#define DIGIT_VALUES ( 1 << DIGIT_BITS )
-#define DIGIT_MASK ( ( Value )( DIGIT_VALUES - 1 ) )
+#define DIGIT_BITS      8
+#define DIGIT_VALUES    ( 1 << DIGIT_BITS )
+#define DIGIT_MASK      ( ( Value )( DIGIT_VALUES - 1 ) )
 #define CEILDIV( a, b ) ( ( ( a ) + (b)-1 ) / ( b ) )
-#define DIGITS CEILDIV( CHAR_BIT * sizeof( Value ), DIGIT_BITS )
-#define VALUE_BITS ( DIGIT_BITS * DIGITS )
-#define COUNT_SIZE ( DIGITS * DIGIT_VALUES )
+#define DIGITS          CEILDIV( CHAR_BIT * sizeof( Value ), DIGIT_BITS )
+#define VALUE_BITS      ( DIGIT_BITS * DIGITS )
+#define COUNT_SIZE      ( DIGITS * DIGIT_VALUES )
 
-    template< class Value >
-    static Value radix_count( const Value* A, const Value* end, Index stride, Index count[ DIGITS ][ DIGIT_VALUES ] );
+    template < class Value >
+    static Value radix_count( const Value* A, const Value* end, Index stride, Index count[DIGITS][DIGIT_VALUES] );
 
     static void radix_offsets( Index* c );
 
-    template< class Value >
-    static unsigned radix_zeros( Value bitorkey, Index count[ DIGITS ][ DIGIT_VALUES ], unsigned* shift,
-                                 Index** offsets );
+    template < class Value >
+    static unsigned radix_zeros( Value bitorkey, Index count[DIGITS][DIGIT_VALUES], unsigned* shift, Index** offsets );
 
-    template< class Value >
+    template < class Value >
     static void radix_index_pass_b( const Value* A, Index n, Index stride, unsigned sh, Index* off,
                                     SortData< Value >* out );
 
-    template< class Value >
+    template < class Value >
     static void radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
                                     SortData< Value >* out );
 
-    template< class Value >
+    template < class Value >
     static void radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
                                     Index* out );
 
-    template< class Value >
+    template < class Value >
     static void radix_index_pass_be( const Value* A, Index n, Index stride, unsigned sh, Index* off, Index* out );
 
     /*------------------------------------------------------------------------------
@@ -359,7 +359,7 @@ class TupleList
       stable; O(n) time
 
       ----------------------------------------------------------------------------*/
-    template< class Value >
+    template < class Value >
     static void radix_index_sort( const Value* A, Index n, Index stride, Index* idx, SortData< Value >* work );
 
     /*------------------------------------------------------------------------------
@@ -370,10 +370,10 @@ class TupleList
       stable; O(n log n) time
 
       ----------------------------------------------------------------------------*/
-    template< class Value >
+    template < class Value >
     static void merge_index_sort( const Value* A, const Index An, Index stride, Index* idx, SortData< Value >* work );
 
-    template< class Value >
+    template < class Value >
     static void index_sort( const Value* A, Index n, Index stride, Index* idx, SortData< Value >* work );
 
 #undef DIGIT_BITS
@@ -385,15 +385,15 @@ class TupleList
 #undef COUNT_SIZE
 };
 
-inline uint TupleList::get_max( ) const
+inline uint TupleList::get_max() const
 {
     return max;
 }
-inline uint TupleList::get_n( ) const
+inline uint TupleList::get_n() const
 {
     return n;
 }
-inline bool TupleList::get_writeEnabled( ) const
+inline bool TupleList::get_writeEnabled() const
 {
     return writeEnabled;
 }

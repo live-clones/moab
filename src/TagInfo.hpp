@@ -16,7 +16,7 @@ class TagInfo
 {
   public:
     //! constructor
-    TagInfo( )
+    TagInfo()
         : mDefaultValue( NULL ), mMeshValue( NULL ), mDefaultValueSize( 0 ), mMeshValueSize( 0 ), mDataSize( 0 ),
           dataType( MB_TYPE_OPAQUE )
     {
@@ -25,7 +25,7 @@ class TagInfo
     //! constructor that takes all parameters
     TagInfo( const char* name, int size, DataType type, const void* default_value, int default_value_size );
 
-    virtual ~TagInfo( );
+    virtual ~TagInfo();
 
     /**\brief Remove/clear tag data for all entities
      *
@@ -49,19 +49,19 @@ class TagInfo
     }
 
     //! get the name of the tag
-    const std::string& get_name( ) const
+    const std::string& get_name() const
     {
         return mTagName;
     }
 
     //! get length of default value
-    int get_default_value_size( ) const
+    int get_default_value_size() const
     {
         return mDefaultValueSize;
     }
 
     //! get the default data
-    const void* get_default_value( ) const
+    const void* get_default_value() const
     {
         return mDefaultValue;
     }
@@ -70,21 +70,21 @@ class TagInfo
     //! returns false if no default value.
     bool equals_default_value( const void* data, int size = -1 ) const;
 
-    inline DataType get_data_type( ) const
+    inline DataType get_data_type() const
     {
         return dataType;
     }
 
     //! get the size of the data in bytes
-    int get_size( ) const
+    int get_size() const
     {
         return mDataSize;
     }
 
     //! Check if variable-length tag
-    bool variable_length( ) const
+    bool variable_length() const
     {
-        return get_size( ) == MB_VARIABLE_LENGTH;
+        return get_size() == MB_VARIABLE_LENGTH;
     }
 
     static int size_from_data_type( DataType t );
@@ -103,7 +103,7 @@ class TagInfo
      */
     ErrorCode validate_lengths( Error* error_handler, const int* lengths, size_t num_lengths ) const;
 
-    virtual TagType get_storage_type( ) const = 0;
+    virtual TagType get_storage_type() const = 0;
 
     /**\brief Get tag value for passed entities
      *
@@ -345,7 +345,7 @@ class TagInfo
      */
     virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
                                                 Range& output_entities, const void* value, int value_bytes = 0,
-                                                EntityType   type = MBMAXTYPE,
+                                                EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const = 0;
 
     /**\brief Check if entity is tagged */
@@ -358,9 +358,9 @@ class TagInfo
                                       unsigned long& per_entity ) const = 0;
 
   protected:
-    unsigned long get_memory_use( ) const
+    unsigned long get_memory_use() const
     {
-        return get_default_value_size( ) + get_name( ).size( );
+        return get_default_value_size() + get_name().size();
     }
 
   private:

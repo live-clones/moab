@@ -27,12 +27,13 @@ class TypeSequenceManager
      * Define less-than comparison for EntitySequence pointers as a comparison
      * of the entity handles in the pointed-to EntitySequences.
      */
-    template< class T > class SequenceCompare
+    template < class T >
+    class SequenceCompare
     {
       public:
-        inline bool operator( )( const T* a, const T* b ) const
+        inline bool operator()( const T* a, const T* b ) const
         {
-            return a->end_handle( ) < b->start_handle( );
+            return a->end_handle() < b->start_handle();
         }
     };
     /**\brief Dummy EntitySequence for use in querying set container */
@@ -80,8 +81,8 @@ class TypeSequenceManager
 
   private:
     mutable EntitySequence* lastReferenced;  //!< Last accessed EntitySequence - Null only if no sequences
-    set_type                sequenceSet;  //!< Set of all managed EntitySequence instances
-    data_set_type           availableList;  //!< SequenceData containing unused entries
+    set_type sequenceSet;                    //!< Set of all managed EntitySequence instances
+    data_set_type availableList;             //!< SequenceData containing unused entries
 
     iterator erase( iterator i );  //!< Remove a sequence
 
@@ -140,28 +141,28 @@ class TypeSequenceManager
      */
     ErrorCode replace_subsequence( EntitySequence* seq_ptr, const int* tag_sizes, int num_tag_sizes );
 
-    TypeSequenceManager( ) : lastReferenced( 0 ) {}
+    TypeSequenceManager() : lastReferenced( 0 ) {}
 
-    ~TypeSequenceManager( );
+    ~TypeSequenceManager();
 
     /**\brief Start of EntitySequence set */
-    const_iterator begin( ) const
+    const_iterator begin() const
     {
-        return sequenceSet.begin( );
+        return sequenceSet.begin();
     }
-    iterator begin( )
+    iterator begin()
     {
-        return sequenceSet.begin( );
+        return sequenceSet.begin();
     }
 
     /**\brief End of EntitySequence set */
-    const_iterator end( ) const
+    const_iterator end() const
     {
-        return sequenceSet.end( );
+        return sequenceSet.end();
     }
-    iterator end( )
+    iterator end()
     {
-        return sequenceSet.end( );
+        return sequenceSet.end();
     }
 
     /**\brief Return EntitySequence for specified handle.
@@ -197,11 +198,11 @@ class TypeSequenceManager
     /**\brief Get EntitySequence for handle.
      *\return EntitySequence for handle, or NULL if no such sequence.
      */
-    inline EntitySequence*       find( EntityHandle h ) const;
-    inline EntitySequence*       find( EntityHandle h );
-    inline ErrorCode             find( EntityHandle h, EntitySequence*& );
-    inline ErrorCode             find( EntityHandle h, const EntitySequence*& ) const;
-    inline const EntitySequence* get_last_accessed( ) const;
+    inline EntitySequence* find( EntityHandle h ) const;
+    inline EntitySequence* find( EntityHandle h );
+    inline ErrorCode find( EntityHandle h, EntitySequence*& );
+    inline ErrorCode find( EntityHandle h, const EntitySequence*& ) const;
+    inline const EntitySequence* get_last_accessed() const;
 
     /**\brief Get handles for all entities in all sequences. */
     inline void get_entities( Range& entities_out ) const;
@@ -210,7 +211,7 @@ class TypeSequenceManager
     inline void get_entities( std::vector< EntityHandle >& entities_out ) const;
 
     /**\brief Get number of entities represented by all sequences. */
-    inline EntityID get_number_entities( ) const;
+    inline EntityID get_number_entities() const;
 
     ErrorCode check_valid_handles( Error* error_handler, EntityHandle first, EntityHandle last ) const;
 
@@ -224,7 +225,7 @@ class TypeSequenceManager
     ErrorCode erase( Error* error_handler, EntityHandle entity );
 
     /**\brief Test if this instance contains no sequences */
-    bool empty( ) const
+    bool empty() const
     {
         return 0 == lastReferenced;
     }
@@ -343,9 +344,9 @@ class TypeSequenceManager
     void get_memory_use( EntityHandle start, EntityHandle end, unsigned long long& total_entity_storage,
                          unsigned long long& total_amortized_storage ) const;
 
-    unsigned long get_sequence_count( ) const
+    unsigned long get_sequence_count() const
     {
-        return sequenceSet.size( );
+        return sequenceSet.size();
     }
 
     /**\brief Get used size of SequenceData
@@ -360,26 +361,26 @@ inline EntitySequence* TypeSequenceManager::find( EntityHandle h ) const
 {
     if( !lastReferenced )  // only null if empty
         return 0;
-    else if( h >= lastReferenced->start_handle( ) && h <= lastReferenced->end_handle( ) )
+    else if( h >= lastReferenced->start_handle() && h <= lastReferenced->end_handle() )
         return lastReferenced;
     else
     {
-        DummySequence  seq( h );
+        DummySequence seq( h );
         const_iterator i = sequenceSet.find( &seq );
-        return i == end( ) ? 0 : ( lastReferenced = *i );
+        return i == end() ? 0 : ( lastReferenced = *i );
     }
 }
 inline EntitySequence* TypeSequenceManager::find( EntityHandle h )
 {
     if( !lastReferenced )  // only null if empty
         return 0;
-    else if( h >= lastReferenced->start_handle( ) && h <= lastReferenced->end_handle( ) )
+    else if( h >= lastReferenced->start_handle() && h <= lastReferenced->end_handle() )
         return lastReferenced;
     else
     {
         DummySequence seq( h );
-        iterator      i = sequenceSet.find( &seq );
-        return i == end( ) ? 0 : ( lastReferenced = *i );
+        iterator i = sequenceSet.find( &seq );
+        return i == end() ? 0 : ( lastReferenced = *i );
     }
 }
 
@@ -390,7 +391,7 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, EntitySequence*& seq
         seq = 0;
         return MB_ENTITY_NOT_FOUND;
     }
-    else if( h >= lastReferenced->start_handle( ) && h <= lastReferenced->end_handle( ) )
+    else if( h >= lastReferenced->start_handle() && h <= lastReferenced->end_handle() )
     {
         seq = lastReferenced;
         return MB_SUCCESS;
@@ -398,8 +399,8 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, EntitySequence*& seq
     else
     {
         DummySequence ds( h );
-        iterator      i = sequenceSet.lower_bound( &ds );
-        if( i == end( ) || ( *i )->start_handle( ) > h )
+        iterator i = sequenceSet.lower_bound( &ds );
+        if( i == end() || ( *i )->start_handle() > h )
         {
             seq = 0;
             return MB_ENTITY_NOT_FOUND;
@@ -419,16 +420,16 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, const EntitySequence
         seq = 0;
         return MB_ENTITY_NOT_FOUND;
     }
-    else if( h >= lastReferenced->start_handle( ) && h <= lastReferenced->end_handle( ) )
+    else if( h >= lastReferenced->start_handle() && h <= lastReferenced->end_handle() )
     {
         seq = lastReferenced;
         return MB_SUCCESS;
     }
     else
     {
-        DummySequence  ds( h );
+        DummySequence ds( h );
         const_iterator i = sequenceSet.lower_bound( &ds );
-        if( i == end( ) || ( *i )->start_handle( ) > h )
+        if( i == end() || ( *i )->start_handle() > h )
         {
             seq = 0;
             return MB_ENTITY_NOT_FOUND;
@@ -441,30 +442,30 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, const EntitySequence
     }
 }
 
-inline const EntitySequence* TypeSequenceManager::get_last_accessed( ) const
+inline const EntitySequence* TypeSequenceManager::get_last_accessed() const
 {
     return lastReferenced; /* only NULL if TypeSequenceManager is empty */
 }
 
 inline void TypeSequenceManager::get_entities( Range& entities_out ) const
 {
-    Range::iterator in = entities_out.begin( );
-    for( const_iterator i = begin( ); i != end( ); ++i )
-        in = entities_out.insert( in, ( *i )->start_handle( ), ( *i )->end_handle( ) );
+    Range::iterator in = entities_out.begin();
+    for( const_iterator i = begin(); i != end(); ++i )
+        in = entities_out.insert( in, ( *i )->start_handle(), ( *i )->end_handle() );
 }
 
 inline void TypeSequenceManager::get_entities( std::vector< EntityHandle >& entities_out ) const
 {
-    for( const_iterator i = begin( ); i != end( ); ++i )
-        for( EntityHandle j = ( *i )->start_handle( ); j <= ( *i )->end_handle( ); ++j )
+    for( const_iterator i = begin(); i != end(); ++i )
+        for( EntityHandle j = ( *i )->start_handle(); j <= ( *i )->end_handle(); ++j )
             entities_out.push_back( j );
 }
 
-inline EntityID TypeSequenceManager::get_number_entities( ) const
+inline EntityID TypeSequenceManager::get_number_entities() const
 {
     EntityID count = 0;
-    for( const_iterator i = begin( ); i != end( ); ++i )
-        count += ( *i )->size( );
+    for( const_iterator i = begin(); i != end(); ++i )
+        count += ( *i )->size();
     return count;
 }
 

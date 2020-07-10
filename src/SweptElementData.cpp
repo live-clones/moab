@@ -50,32 +50,32 @@ SweptElementData::SweptElementData( EntityHandle shandle, const int imin, const 
     // need to have meaningful parameters
     assert( imax >= imin && jmax >= jmin && kmax >= kmin );
 
-    elementParams[ 0 ] = HomCoord( imin, jmin, kmin );
-    elementParams[ 1 ] = HomCoord( imax, jmax, kmax );
-    elementParams[ 2 ] = HomCoord( 1, 1, 1 );
+    elementParams[0] = HomCoord( imin, jmin, kmin );
+    elementParams[1] = HomCoord( imax, jmax, kmax );
+    elementParams[2] = HomCoord( 1, 1, 1 );
 
     // assign and compute parameter stuff
-    dIJK[ 0 ] = elementParams[ 1 ][ 0 ] - elementParams[ 0 ][ 0 ] + 1;
-    dIJK[ 1 ] = elementParams[ 1 ][ 1 ] - elementParams[ 0 ][ 1 ] + 1;
-    dIJK[ 2 ] = elementParams[ 1 ][ 2 ] - elementParams[ 0 ][ 2 ] + 1;
-    dIJKm1[ 0 ] = dIJK[ 0 ] - 1;
-    dIJKm1[ 1 ] = dIJK[ 1 ] - 1;
-    dIJKm1[ 2 ] = dIJK[ 2 ] - 1;
+    dIJK[0]   = elementParams[1][0] - elementParams[0][0] + 1;
+    dIJK[1]   = elementParams[1][1] - elementParams[0][1] + 1;
+    dIJK[2]   = elementParams[1][2] - elementParams[0][2] + 1;
+    dIJKm1[0] = dIJK[0] - 1;
+    dIJKm1[1] = dIJK[1] - 1;
+    dIJKm1[2] = dIJK[2] - 1;
 }
 
-SweptElementData::~SweptElementData( ) {}
+SweptElementData::~SweptElementData() {}
 
-bool SweptElementData::boundary_complete( ) const
+bool SweptElementData::boundary_complete() const
 {
     // test the bounding vertex sequences to see if they fully define the
     // vertex parameter space for this rectangular block of elements
 
-    int                          p;
+    int p;
     std::vector< VertexDataRef > minlist, maxlist;
 
     // pseudo code:
     // for each vertex sequence v:
-    for( std::vector< VertexDataRef >::const_iterator vseq = vertexSeqRefs.begin( ); vseq != vertexSeqRefs.end( );
+    for( std::vector< VertexDataRef >::const_iterator vseq = vertexSeqRefs.begin(); vseq != vertexSeqRefs.end();
          ++vseq )
     {
         //   test min corner mincorner:
@@ -85,12 +85,12 @@ bool SweptElementData::boundary_complete( ) const
         {
 
             //     for each vsequence v' != v:
-            for( std::vector< VertexDataRef >::const_iterator othervseq = vertexSeqRefs.begin( );
-                 othervseq != vertexSeqRefs.end( ); ++othervseq )
+            for( std::vector< VertexDataRef >::const_iterator othervseq = vertexSeqRefs.begin();
+                 othervseq != vertexSeqRefs.end(); ++othervseq )
             {
                 if( othervseq == vseq ) continue;
                 //       if v.min-p contained in v'
-                if( ( *othervseq ).contains( ( *vseq ).minmax[ 0 ] - HomCoord::unitv[ p ] ) )
+                if( ( *othervseq ).contains( ( *vseq ).minmax[0] - HomCoord::unitv[p] ) )
                 {
                     //         mincorner = false
                     mincorner = false;
@@ -106,12 +106,12 @@ bool SweptElementData::boundary_complete( ) const
         {
 
             //     for each vsequence v' != v:
-            for( std::vector< VertexDataRef >::const_iterator othervseq = vertexSeqRefs.begin( );
-                 othervseq != vertexSeqRefs.end( ); ++othervseq )
+            for( std::vector< VertexDataRef >::const_iterator othervseq = vertexSeqRefs.begin();
+                 othervseq != vertexSeqRefs.end(); ++othervseq )
             {
                 if( othervseq == vseq ) continue;
                 //       if v.max+p contained in v'
-                if( ( *othervseq ).contains( ( *vseq ).minmax[ 1 ] + HomCoord::unitv[ p ] ) )
+                if( ( *othervseq ).contains( ( *vseq ).minmax[1] + HomCoord::unitv[p] ) )
                 {
                     //         maxcorner = false
                     maxcorner = false;
@@ -130,8 +130,8 @@ bool SweptElementData::boundary_complete( ) const
     //
     // if minlist.size = 1 & maxlist.size = 1 & minlist[0] = esequence.min &
     //         maxlist[0] = esequence.max+(1,1,1)
-    if( minlist.size( ) == 1 && maxlist.size( ) == 1 && minlist[ 0 ].minmax[ 0 ] == elementParams[ 0 ] &&
-        maxlist[ 0 ].minmax[ 1 ] == elementParams[ 1 ] )
+    if( minlist.size() == 1 && maxlist.size() == 1 && minlist[0].minmax[0] == elementParams[0] &&
+        maxlist[0].minmax[1] == elementParams[1] )
         //   complete
         return true;
     // else
@@ -145,9 +145,9 @@ SequenceData* SweptElementData::subset( EntityHandle /*start*/, EntityHandle /*e
     return 0;
 }
 
-unsigned long SweptElementData::get_memory_use( ) const
+unsigned long SweptElementData::get_memory_use() const
 {
-    return sizeof( *this ) + vertexSeqRefs.capacity( ) * sizeof( VertexDataRef );
+    return sizeof( *this ) + vertexSeqRefs.capacity() * sizeof( VertexDataRef );
 }
 
 }  // namespace moab

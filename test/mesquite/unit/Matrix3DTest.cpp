@@ -77,7 +77,7 @@ class Matrix3DTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_vector_times );
     CPPUNIT_TEST( test_det );
     CPPUNIT_TEST( test_B_times_invA );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
     Vector3D e1, e2, e3;
@@ -90,10 +90,10 @@ class Matrix3DTest : public CppUnit::TestFixture
     Matrix3D mMat1plus2trans;
     Matrix3D mMat1times2;
     Matrix3D mMat1times2inv;
-    double   tolEps;
+    double tolEps;
 
   public:
-    void setUp( )
+    void setUp()
     {
         // sets up the unit vectors
         e1.set( 1, 0, 0 );
@@ -139,25 +139,25 @@ class Matrix3DTest : public CppUnit::TestFixture
         tolEps = 1e-12;
     }
 
-    void tearDown( ) {}
+    void tearDown() {}
 
   public:
-    Matrix3DTest( ) {}
+    Matrix3DTest() {}
 
-    void test_equal( )
+    void test_equal()
     {
         CPPUNIT_ASSERT( mMat1 == mMat1 );
         CPPUNIT_ASSERT( mMat1 != mMat2 );
     }
 
-    void test_plus( )
+    void test_plus()
     {
         Matrix3D sum;
         sum = mMat1 + mMat2;
         CPPUNIT_ASSERT( sum == mMat1plus2 );
     }
 
-    void test_minus( )
+    void test_minus()
     {
         Matrix3D res;
         res = mMat1 - mIdentity;
@@ -167,25 +167,25 @@ class Matrix3DTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( res == correct );
     }
 
-    void test_Frobenius_2( )
+    void test_Frobenius_2()
     {
         double fro = Frobenius_2( mMat1 );
         CPPUNIT_ASSERT_DOUBLES_EQUAL( 124.84, fro, tolEps );
     }
 
-    void test_transpose( )
+    void test_transpose()
     {
         Matrix3D trans = transpose( mMat2 );
         CPPUNIT_ASSERT( trans == mMat2trans );
     }
 
-    void test_plus_equal( )
+    void test_plus_equal()
     {
         mMat1 += mMat2;
         CPPUNIT_ASSERT( mMat1 == mMat1plus2 );
     }
 
-    void test_times_equal_scalar( )
+    void test_times_equal_scalar()
     {
         mMat2 *= 3;
         Matrix3D correct( " 6   12   15 "
@@ -193,30 +193,30 @@ class Matrix3DTest : public CppUnit::TestFixture
                           " 0   21   24 " );
         CPPUNIT_ASSERT( mMat2 == correct );
     }
-    void test_times_scalar( )
+    void test_times_scalar()
     {
         Matrix3D tmp = mMat2 * 3;
         Matrix3D correct( " 6   12   15 "
                           " 6    3    9 "
                           " 0   21   24 " );
         CPPUNIT_ASSERT( tmp == correct );
-        tmp[ 0 ][ 0 ] = 0;
-        tmp = 3 * mMat2;
+        tmp[0][0] = 0;
+        tmp       = 3 * mMat2;
         CPPUNIT_ASSERT( tmp == correct );
     }
-    void test_plus_transpose( )
+    void test_plus_transpose()
     {
         Matrix3D plus_trans = plus_transpose( mMat1, mMat2 );
         CPPUNIT_ASSERT( plus_trans == mMat1plus2trans );
     }
 
-    void test_plus_transpose_equal( )
+    void test_plus_transpose_equal()
     {
         mMat1.plus_transpose_equal( mMat2 );
         CPPUNIT_ASSERT( mMat1 == mMat1plus2trans );
     }
 
-    void test_outer_product( )
+    void test_outer_product()
     {
         Matrix3D mat;
         Vector3D vec1( 2, 7, 3 );
@@ -229,13 +229,13 @@ class Matrix3DTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( mat == correct );
     }
 
-    void test_fill_lower_triangle( )
+    void test_fill_lower_triangle()
     {
-        mMat1.fill_lower_triangle( );
+        mMat1.fill_lower_triangle();
         CPPUNIT_ASSERT( mMat1 == mMat1sym );
     }
 
-    void test_times( )
+    void test_times()
     {
         Matrix3D mult = mMat1 * mMat2;
         CPPUNIT_ASSERT( mult == mMat1times2 );
@@ -244,7 +244,7 @@ class Matrix3DTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( mult == mMat1 );
     }
 
-    void test_mult_element( )
+    void test_mult_element()
     {
         Matrix3D mat = mult_element( mMat1, mIdentity );
         Matrix3D correct( " 1 0 0 "
@@ -253,7 +253,7 @@ class Matrix3DTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( mat == correct );
     }
 
-    void test_times_vector( )
+    void test_times_vector()
     {
         Vector3D vec = mMat1 * e1;
         Vector3D correct( 1, 5.2, 1 );
@@ -265,7 +265,7 @@ class Matrix3DTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( vec_12 == correct );
     }
 
-    void test_vector_times( )
+    void test_vector_times()
     {
         Vector3D vec = e1 * mMat1;
         Vector3D correct( 1, 4.2, 2 );
@@ -277,17 +277,17 @@ class Matrix3DTest : public CppUnit::TestFixture
         int loop_i = 0;
         for( loop_i = 0; loop_i < 3; ++loop_i )
         {
-            CPPUNIT_ASSERT_DOUBLES_EQUAL( vec[ loop_i ], correct[ loop_i ], tolEps );
+            CPPUNIT_ASSERT_DOUBLES_EQUAL( vec[loop_i], correct[loop_i], tolEps );
         }
     }
 
-    void test_det( )
+    void test_det()
     {
         double d = det( mMat1 );
         CPPUNIT_ASSERT_DOUBLES_EQUAL( 48.064, d, tolEps );
     }
 
-    void test_B_times_invA( )
+    void test_B_times_invA()
     {
         Matrix3D orig1( mMat1 );
         timesInvA( mMat2, mMat1 );
@@ -298,7 +298,7 @@ class Matrix3DTest : public CppUnit::TestFixture
         // Checks mMat2 now contains the correct result
         for( int i = 0; i < 3; ++i )
             for( int j = 0; j < 3; ++j )
-                CPPUNIT_ASSERT_DOUBLES_EQUAL( mMat2[ i ][ j ], mMat1times2inv[ i ][ j ], 0.0001 );
+                CPPUNIT_ASSERT_DOUBLES_EQUAL( mMat2[i][j], mMat1times2inv[i][j], 0.0001 );
     }
 };
 

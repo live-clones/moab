@@ -39,9 +39,9 @@ class EdgeSizeSimpleImplicit : public EdgeSizeEvaluator
 {
   public:
     /// Construct an evaluator.
-    EdgeSizeSimpleImplicit( );
+    EdgeSizeSimpleImplicit();
     /// Destruction is virtual so subclasses may clean up after refinement.
-    virtual ~EdgeSizeSimpleImplicit( );
+    virtual ~EdgeSizeSimpleImplicit();
 
     /** \brief Given an edge of length L, true when edge midpoint is within $\alpha^2$ of
      * $\left(\frac{2f(x,y,z)}{L}\right)^2$.
@@ -62,14 +62,14 @@ class EdgeSizeSimpleImplicit : public EdgeSizeEvaluator
         this->ratio = r;
     }
     /// Get the threshold ratio of function value to half-edge length that triggers subdivision.
-    double get_ratio( )
+    double get_ratio()
     {
         return this->ratio;
     }
 
   protected:
-    double coeffA[ 6 ];
-    double coeffB[ 3 ];
+    double coeffA[6];
+    double coeffB[3];
     double coeffC;
     double ratio;
 };

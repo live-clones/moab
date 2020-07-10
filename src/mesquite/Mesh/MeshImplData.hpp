@@ -44,26 +44,26 @@ class MeshImplData
 {
 
   public:
-    MeshImplData( ) : haveSlavedFlags( false ) {}
+    MeshImplData() : haveSlavedFlags( false ) {}
 
     /** Clear all data */
-    void clear( );
+    void clear();
 
     /** Get number of vertices, does not include mid-nodes */
-    size_t num_vertices( ) const;
+    size_t num_vertices() const;
     /** Get number of elements */
-    size_t num_elements( ) const;
+    size_t num_elements() const;
     /** Get number of vertex uses (sum of connectivity length for all elements)
      * Does not count mid-nodes */
-    size_t num_vertex_uses( ) const;
+    size_t num_vertex_uses() const;
 
-    size_t max_vertex_index( ) const
+    size_t max_vertex_index() const
     {
-        return vertexList.size( );
+        return vertexList.size();
     }
-    size_t max_element_index( ) const
+    size_t max_element_index() const
     {
-        return elementList.size( );
+        return elementList.size();
     }
 
     /** Copy internal representation into CSR rep
@@ -80,13 +80,13 @@ class MeshImplData
     /** Check if passed vertex index is valid */
     inline bool is_vertex_valid( size_t index ) const
     {
-        return index < vertexList.size( ) && vertexList[ index ].valid;
+        return index < vertexList.size() && vertexList[index].valid;
     }
 
     /** Check if passed element index is valid */
     inline bool is_element_valid( size_t index ) const
     {
-        return index < elementList.size( ) && !elementList[ index ].connectivity.empty( );
+        return index < elementList.size() && !elementList[index].connectivity.empty();
     }
 
     /** Check if the specified node is used as a mid-node on any element */
@@ -180,7 +180,7 @@ class MeshImplData
      */
     void skin( std::vector< size_t >& sides, MsqError& err );
 
-    bool have_slaved_flags( ) const
+    bool have_slaved_flags() const
     {
         return haveSlavedFlags;
     }
@@ -212,26 +212,26 @@ class MeshImplData
         {
         }
 
-        Vertex( ) : midcount( 0 ), valid( false ), byte( '\0' ) {}
+        Vertex() : midcount( 0 ), valid( false ), byte( '\0' ) {}
 
-        Vector3D              coords; /**< location */
+        Vector3D coords;                   /**< location */
         std::vector< size_t > adjacencies; /**< indices of adjacent elements */
-        unsigned              midcount; /**< num elements referencing this as a mid-node */
-        bool                  fixed; /**< is fixed */
-        bool                  slaved;
-        bool                  valid; /**< is a valid (initialized) array entry */
-        unsigned char         byte; /**< mark */
+        unsigned midcount;                 /**< num elements referencing this as a mid-node */
+        bool fixed;                        /**< is fixed */
+        bool slaved;
+        bool valid;         /**< is a valid (initialized) array entry */
+        unsigned char byte; /**< mark */
     };
 
     /** Struct holding an element */
     struct Element
     {
         std::vector< size_t > connectivity; /**< list of vertex indices */
-        EntityTopology        topology; /**< element type */
-        Element( ) : topology( MIXED ) {}
+        EntityTopology topology;            /**< element type */
+        Element() : topology( MIXED ) {}
     };
 
-    std::vector< Vertex >  vertexList; /**< Array of vertices */
+    std::vector< Vertex > vertexList;   /**< Array of vertices */
     std::vector< Element > elementList; /**< Array of elements */
 
     /** List of unused indices in vertex list */
@@ -250,23 +250,23 @@ class MeshImplVertIter : public VertexIterator
 {
   private:
     MeshImplData* mesh;
-    size_t        index;
+    size_t index;
 
   public:
     MeshImplVertIter( MeshImplData* data ) : mesh( data )
     {
-        restart( );
+        restart();
     }
 
-    virtual ~MeshImplVertIter( );
+    virtual ~MeshImplVertIter();
 
-    virtual void restart( );
+    virtual void restart();
 
-    virtual void operator++( );
+    virtual void operator++();
 
-    virtual Mesh::VertexHandle operator*( ) const;
+    virtual Mesh::VertexHandle operator*() const;
 
-    virtual bool is_at_end( ) const;
+    virtual bool is_at_end() const;
 };
 
 /**\brief ElementIterator for MeshImpl
@@ -277,23 +277,23 @@ class MeshImplElemIter : public ElementIterator
 {
   private:
     MeshImplData* mesh;
-    size_t        index;
+    size_t index;
 
   public:
     MeshImplElemIter( MeshImplData* data ) : mesh( data )
     {
-        restart( );
+        restart();
     }
 
-    virtual ~MeshImplElemIter( );
+    virtual ~MeshImplElemIter();
 
-    virtual void restart( );
+    virtual void restart();
 
-    virtual void operator++( );
+    virtual void operator++();
 
-    virtual Mesh::ElementHandle operator*( ) const;
+    virtual Mesh::ElementHandle operator*() const;
 
-    virtual bool is_at_end( ) const;
+    virtual bool is_at_end() const;
 };
 
 }  // namespace MBMesquite

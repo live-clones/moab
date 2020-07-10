@@ -36,7 +36,7 @@ class SpectralQuad
      * the element */
     static int insideFcn( const double* params, const int ndim, const double tol );
 
-    static EvalSet eval_set( )
+    static EvalSet eval_set()
     {
         return EvalSet( evalFcn, reverseEvalFcn, jacobianFcn, integrateFcn, initFcn );
     }
@@ -48,24 +48,24 @@ class SpectralQuad
         for( i = 3; i * i == numv || i * i > numv; i++ )
             ;
         if( i * i != numv ) return false;
-        eset = eval_set( );
+        eset = eval_set();
         return true;
     }
 
   protected:
-    static int           _n;
-    static double*       _z[ 2 ];
-    static lagrange_data _ld[ 2 ];
-    static opt_data_2    _data;  // we should use only 2nd component
-    static double*       _odwork;  // work area
+    static int _n;
+    static double* _z[2];
+    static lagrange_data _ld[2];
+    static opt_data_2 _data;  // we should use only 2nd component
+    static double* _odwork;   // work area
 
     // flag for initialization of data
-    static bool    _init;
+    static bool _init;
     static double* _glpoints;  // it is a space we can use to store gl positions for elements
                                // on the fly; we do not have a tag yet for them, as in Nek5000 application
                                // also, these positions might need to be moved on the sphere, for HOMME grids
                                // do we project them or how do we move them on the sphere?
-};  // class SpectralQuad
+};                             // class SpectralQuad
 
 }  // namespace moab
 

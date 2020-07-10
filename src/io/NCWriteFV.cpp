@@ -9,7 +9,7 @@
 namespace moab
 {
 
-NCWriteFV::~NCWriteFV( )
+NCWriteFV::~NCWriteFV()
 {
     // TODO Auto-generated destructor stub
 }

@@ -27,78 +27,79 @@ namespace moab
 //
 
 const EntityType ExoIIUtil::ExoIIElementMBEntity[] = {
-    MBVERTEX,  // SPHERE,
-    MBEDGE,  // SPRING,
-    MBEDGE,  // BAR = 0,
-    MBEDGE,  // BAR2,
-    MBEDGE,  // BAR3,
-    MBEDGE,  // BEAM,
-    MBEDGE,  // BEAM2,
-    MBEDGE,  // BEAM3,
-    MBEDGE,  // TRUSS,
-    MBEDGE,  // TRUSS2,
-    MBEDGE,  // TRUSS3,
-    MBTRI,  // TRI,
-    MBTRI,  // TRI3,
-    MBTRI,  // SHELL3,
-    MBTRI,  // TRI6,
-    MBTRI,  // TRI7,
-    MBQUAD,  // QUAD,
-    MBQUAD,  // QUAD4,
-    MBQUAD,  // QUAD5,
-    MBQUAD,  // QUAD8,
-    MBQUAD,  // QUAD9,
-    MBQUAD,  // SHELL,
-    MBQUAD,  // SHELL4,
-    MBQUAD,  // SHELL5,
-    MBQUAD,  // SHELL8,
-    MBQUAD,  // SHELL9,
-    MBTET,  // TETRA,
-    MBTET,  // TETRA4,
-    MBTET,  // TET4
-    MBTET,  // TETRA8,
-    MBTET,  // TETRA10,
-    MBTET,  // TETRA14,
-    MBPYRAMID,  // PYRAMID,
-    MBPYRAMID,  // PYRAMID5,
-    MBPYRAMID,  // PYRAMID10,
-    MBPYRAMID,  // PYRAMID13,
-    MBPYRAMID,  // PYRAMID18,
-    MBPRISM,  // WEDGE,
-    MBKNIFE,  // KNIFE,
-    MBHEX,  // HEX,
-    MBHEX,  // HEX8,
-    MBHEX,  // HEX9,
-    MBHEX,  // HEX20,
-    MBHEX,  // HEX27,
-    MBHEX,  // HEXSHELL,
-    MBPOLYGON,  // POLYGON
+    MBVERTEX,      // SPHERE,
+    MBEDGE,        // SPRING,
+    MBEDGE,        // BAR = 0,
+    MBEDGE,        // BAR2,
+    MBEDGE,        // BAR3,
+    MBEDGE,        // BEAM,
+    MBEDGE,        // BEAM2,
+    MBEDGE,        // BEAM3,
+    MBEDGE,        // TRUSS,
+    MBEDGE,        // TRUSS2,
+    MBEDGE,        // TRUSS3,
+    MBTRI,         // TRI,
+    MBTRI,         // TRI3,
+    MBTRI,         // SHELL3,
+    MBTRI,         // TRI6,
+    MBTRI,         // TRI7,
+    MBQUAD,        // QUAD,
+    MBQUAD,        // QUAD4,
+    MBQUAD,        // QUAD5,
+    MBQUAD,        // QUAD8,
+    MBQUAD,        // QUAD9,
+    MBQUAD,        // SHELL,
+    MBQUAD,        // SHELL4,
+    MBQUAD,        // SHELL5,
+    MBQUAD,        // SHELL8,
+    MBQUAD,        // SHELL9,
+    MBTET,         // TETRA,
+    MBTET,         // TETRA4,
+    MBTET,         // TET4
+    MBTET,         // TETRA8,
+    MBTET,         // TETRA10,
+    MBTET,         // TETRA14,
+    MBPYRAMID,     // PYRAMID,
+    MBPYRAMID,     // PYRAMID5,
+    MBPYRAMID,     // PYRAMID10,
+    MBPYRAMID,     // PYRAMID13,
+    MBPYRAMID,     // PYRAMID18,
+    MBPRISM,       // WEDGE,
+    MBKNIFE,       // KNIFE,
+    MBHEX,         // HEX,
+    MBHEX,         // HEX8,
+    MBHEX,         // HEX9,
+    MBHEX,         // HEX20,
+    MBHEX,         // HEX27,
+    MBHEX,         // HEXSHELL,
+    MBPOLYGON,     // POLYGON
     MBPOLYHEDRON,  // POLYHEDRON
-    MBMAXTYPE  // UNKNOWN
+    MBMAXTYPE      // UNKNOWN
 };
 
-const char* ExoIIUtil::ElementTypeNames[] = {
-    "SPHERE",  // 0
-    "SPRING",  // 1
-    "BAR",  // 2
-    "BAR2",  // 3
-    "BAR3",  // 4
-    "BEAM",  // 5
-    "BEAM2",  // 6
-    "BEAM3",  // 7
-    "TRUSS",  // 8
-    "TRUSS2",  // 9
-    "TRUSS3",  // 10
-    "TRI",  // 11
-    "TRI3",  // 12
-    "SHELL3",  // 13  really the same as TRI3; for sure in 3d?
-    "TRI6",    "TRI7",    "QUAD",    "QUAD4",    "QUAD5",     "QUAD8",     "QUAD9",     "SHELL",
-    "SHELL4",  "SHELL5",  "SHELL8",  "SHELL9",   "TETRA",     "TETRA4",    "TET4",      "TETRA8",
-    "TETRA10", "TETRA14", "PYRAMID", "PYRAMID5", "PYRAMID10", "PYRAMID13", "PYRAMID18", "WEDGE",
-    "KNIFE",   "HEX",     "HEX8",    "HEX9",     "HEX20",     "HEX27",     "HEXSHELL",
-    "nsided",  // polygons, described differently
-    "NFACED",  // polyhedra, described in faconn%d attributes
-    "UNKNOWN" };
+const char* ExoIIUtil::ElementTypeNames[] = { "SPHERE",  // 0
+                                              "SPRING",  // 1
+                                              "BAR",     // 2
+                                              "BAR2",    // 3
+                                              "BAR3",    // 4
+                                              "BEAM",    // 5
+                                              "BEAM2",   // 6
+                                              "BEAM3",   // 7
+                                              "TRUSS",   // 8
+                                              "TRUSS2",  // 9
+                                              "TRUSS3",  // 10
+                                              "TRI",     // 11
+                                              "TRI3",    // 12
+                                              "SHELL3",  // 13  really the same as TRI3; for sure in 3d?
+                                              "TRI6",     "TRI7",     "QUAD",      "QUAD4",     "QUAD5",     "QUAD8",
+                                              "QUAD9",    "SHELL",    "SHELL4",    "SHELL5",    "SHELL8",    "SHELL9",
+                                              "TETRA",    "TETRA4",   "TET4",      "TETRA8",    "TETRA10",   "TETRA14",
+                                              "PYRAMID",  "PYRAMID5", "PYRAMID10", "PYRAMID13", "PYRAMID18", "WEDGE",
+                                              "KNIFE",    "HEX",      "HEX8",      "HEX9",      "HEX20",     "HEX27",
+                                              "HEXSHELL",
+                                              "nsided",  // polygons, described differently
+                                              "NFACED",  // polyhedra, described in faconn%d attributes
+                                              "UNKNOWN" };
 
 const int ExoIIUtil::VerticesPerElement[] = {
     1,  // SPHERE
@@ -124,17 +125,17 @@ const int ExoIIUtil::VerticesPerElement[] = {
     14,  // TETRA
     5,  5,  10, 13,
     18,  // PYRAMID
-    6,  // WEDGE
-    7,  // KNIFE
+    6,   // WEDGE
+    7,   // KNIFE
     8,  8,  9,  20,
     27,  // HEX
     12,  // HEXSHELL
-    0,  // POLYGON
-    0,  // POLYHEDRON
-    0  // UNKNOWN
+    0,   // POLYGON
+    0,   // POLYHEDRON
+    0    // UNKNOWN
 };
 
-const int ExoIIUtil::HasMidNodes[][ 4 ] = {
+const int ExoIIUtil::HasMidNodes[][4] = {
     { 0, 0, 0, 0 },  // SPHERE - no mid nodes
     { 0, 0, 0, 0 },  // SPRING - no mid nodes
     { 0, 0, 0, 0 },  // BAR - no mid nodes, same as BAR2
@@ -182,7 +183,7 @@ const int ExoIIUtil::HasMidNodes[][ 4 ] = {
     { 0, 0, 0, 0 },  // HEXSHELL - *** TODO - not sure if this is right...
     { 0, 0, 0, 0 },  // POLYGON
     { 0, 0, 0, 0 },  // POLYHEDRON
-    { 0, 0, 0, 0 }  // UNKNOWN - no mid nodes
+    { 0, 0, 0, 0 }   // UNKNOWN - no mid nodes
 };
 
 const int ExoIIUtil::ElementGeometricDimension[] = {
@@ -211,14 +212,14 @@ const int ExoIIUtil::ElementGeometricDimension[] = {
     3,  // HEXSHELL
     2,  // POLYGON
     3,  // POLYHEDRON
-    0  // UNKNOWN
+    0   // UNKNOWN
 };
 
 ExoIIElementType ExoIIUtil::static_element_name_to_type( const char* name )
 {
     int i;
     for( i = 0; i < EXOII_MAX_ELEM_TYPE; i++ )
-        if( strcmp( ElementTypeNames[ i ], name ) == 0 ) return (ExoIIElementType)i;
+        if( strcmp( ElementTypeNames[i], name ) == 0 ) return (ExoIIElementType)i;
 
     return EXOII_MAX_ELEM_TYPE;
 }
@@ -237,7 +238,7 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
 
         // get the element type of the block; first, get the hasMidNodes tag, then convert to an exo
         // element type
-        int has_mid_nodes[ 4 ];
+        int has_mid_nodes[4];
         int dimension = -1;
         if( mdbImpl->tag_get_data( mid_nodes_tag, &entity, 1, has_mid_nodes ) != MB_SUCCESS )
         {
@@ -267,10 +268,10 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
 
         for( int i = 0; i < EXOII_MAX_ELEM_TYPE; i++ )
         {
-            if( ( indiv_entity_type == MBMAXTYPE || indiv_entity_type == ExoIIElementMBEntity[ i ] ) &&
-                has_mid_nodes[ 0 ] == HasMidNodes[ i ][ 0 ] && has_mid_nodes[ 1 ] == HasMidNodes[ i ][ 1 ] &&
-                has_mid_nodes[ 2 ] == HasMidNodes[ i ][ 2 ] && has_mid_nodes[ 3 ] == HasMidNodes[ i ][ 3 ] &&
-                ( -1 == dimension || ElementGeometricDimension[ i ] == dimension ) )
+            if( ( indiv_entity_type == MBMAXTYPE || indiv_entity_type == ExoIIElementMBEntity[i] ) &&
+                has_mid_nodes[0] == HasMidNodes[i][0] && has_mid_nodes[1] == HasMidNodes[i][1] &&
+                has_mid_nodes[2] == HasMidNodes[i][2] && has_mid_nodes[3] == HasMidNodes[i][3] &&
+                ( -1 == dimension || ElementGeometricDimension[i] == dimension ) )
                 return (ExoIIElementType)i;
         }
 
@@ -286,7 +287,7 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
         std::vector< EntityHandle > tmp( 31 );
 
         mdbImpl->get_connectivity( &entity, 1, tmp, true );
-        return get_element_type_from_num_verts( tmp.size( ), indiv_entity_type );
+        return get_element_type_from_num_verts( tmp.size(), indiv_entity_type );
         // it's a regular entity - look for a connectivity tag
     }
 
@@ -301,8 +302,8 @@ ExoIIElementType ExoIIUtil::get_element_type_from_num_verts( const int num_verts
     if( MBPOLYHEDRON == entity_type && 3 == dimension ) return EXOII_POLYHEDRON;
     for( int i = 0; i < EXOII_MAX_ELEM_TYPE; i++ )
     {
-        if( ( entity_type == MBMAXTYPE || entity_type == ExoIIElementMBEntity[ i ] ) &&
-            VerticesPerElement[ i ] == num_verts && ElementGeometricDimension[ i ] >= dimension )
+        if( ( entity_type == MBMAXTYPE || entity_type == ExoIIElementMBEntity[i] ) &&
+            VerticesPerElement[i] == num_verts && ElementGeometricDimension[i] >= dimension )
             return (ExoIIElementType)i;
     }
 

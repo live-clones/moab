@@ -13,7 +13,7 @@ SMF_State::SMF_State( const SMF_ivars& ivar, SMF_State* next )
     if( next )
     {
         vertex_correction = next->vertex_correction;
-        xform = next->xform;
+        xform             = next->xform;
     }
     else
     {
@@ -23,12 +23,12 @@ SMF_State::SMF_State( const SMF_ivars& ivar, SMF_State* next )
     }
 }
 
-void SMF_State::vertex( double v[ 3 ] )
+void SMF_State::vertex( double v[3] )
 {
     xform.xform_point( v );
 }
 
-void SMF_State::normal( double nrm[ 3 ] )
+void SMF_State::normal( double nrm[3] )
 {
     xform.xform_vector( nrm );
 }
@@ -37,10 +37,10 @@ void SMF_State::face( int* verts, const SMF_ivars& ivar )
 {
     for( int i = 0; i < 3; i++ )
     {
-        if( verts[ i ] < 0 )
-            verts[ i ] += ivar.next_vertex;
+        if( verts[i] < 0 )
+            verts[i] += ivar.next_vertex;
         else
-            verts[ i ] += vertex_correction + ( first_vertex - 1 );
+            verts[i] += vertex_correction + ( first_vertex - 1 );
     }
 }
 

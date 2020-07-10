@@ -37,7 +37,7 @@ class ReadTemplate : public ReaderIface
     ReadTemplate( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadTemplate( );
+    virtual ~ReadTemplate();
 
   private:
     /** \brief Read vertex data and create vertices in MOAB database

@@ -49,7 +49,7 @@ MsqIGeom::MsqIGeom( iGeom_Instance geom, iBase_EntityHandle geom_ent_handle )
 {
 }
 
-MsqIGeom::~MsqIGeom( ) {}
+MsqIGeom::~MsqIGeom() {}
 
 void MsqIGeom::snap_to( Mesh::VertexHandle, Vector3D& coordinate ) const
 {
@@ -87,7 +87,7 @@ void MsqIGeom::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array,
                            MsqError& err ) const
 {
     unsigned short dim;
-    int            ierr = get_dimension( &geomEntHandle, &dim, 1 );
+    int ierr = get_dimension( &geomEntHandle, &dim, 1 );
     if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
     std::fill( dof_array, dof_array + num_vertices, dim );
 }
@@ -96,13 +96,13 @@ void MsqIGeom::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array,
 
 MsqCommonIGeom::MsqCommonIGeom( iGeom_Instance geom ) : geomIFace( geom ) {}
 
-MsqCommonIGeom::~MsqCommonIGeom( ) {}
+MsqCommonIGeom::~MsqCommonIGeom() {}
 
 int MsqCommonIGeom::move_to( iBase_EntityHandle geom, Vector3D& coord ) const
 {
     double x, y, z;
-    int    ierr;
-    iGeom_getEntClosestPt( geomIFace, geom, coord[ 0 ], coord[ 1 ], coord[ 2 ], &x, &y, &z, &ierr );
+    int ierr;
+    iGeom_getEntClosestPt( geomIFace, geom, coord[0], coord[1], coord[2], &x, &y, &z, &ierr );
     coord.set( x, y, z );
     return ierr;
 }
@@ -110,8 +110,8 @@ int MsqCommonIGeom::move_to( iBase_EntityHandle geom, Vector3D& coord ) const
 int MsqCommonIGeom::normal( iBase_EntityHandle geom, Vector3D& coord ) const
 {
     double i, j, k;
-    int    ierr;
-    iGeom_getEntNrmlXYZ( geomIFace, geom, coord[ 0 ], coord[ 1 ], coord[ 2 ], &i, &j, &k, &ierr );
+    int ierr;
+    iGeom_getEntNrmlXYZ( geomIFace, geom, coord[0], coord[1], coord[2], &i, &j, &k, &ierr );
     coord.set( i, j, k );
     return ierr;
 }
@@ -129,12 +129,12 @@ int MsqCommonIGeom::normal( const iBase_EntityHandle* geom_handles, Vector3D coo
     assert( sizeof( Vector3D ) == 3 * sizeof( double ) );
 
     // copy input coordinates into array
-    coordArray.clear( );
-    coordArray.insert( coordArray.begin( ), &coords[ 0 ][ 0 ], &coords[ 0 ][ 0 ] + 3 * count );
+    coordArray.clear();
+    coordArray.insert( coordArray.begin(), &coords[0][0], &coords[0][0] + 3 * count );
 
     // define junk variables required for ITAPS "consistancy"
-    int     junk_1 = count * 3, junk_2 = count * 3;
-    double* norm_ptr = &coords[ 0 ][ 0 ];
+    int junk_1 = count * 3, junk_2 = count * 3;
+    double* norm_ptr = &coords[0][0];
 
     // get the normals
     int ierr;
@@ -148,8 +148,8 @@ int MsqCommonIGeom::closest_and_normal( iBase_EntityHandle geom, const Vector3D&
                                         Vector3D& p_normal ) const
 {
     int ierr;
-    iGeom_getEntNrmlPlXYZ( geomIFace, geom, position[ 0 ], position[ 1 ], position[ 2 ], &closest[ 0 ], &closest[ 1 ],
-                           &closest[ 2 ], &p_normal[ 0 ], &p_normal[ 1 ], &p_normal[ 2 ], &ierr );
+    iGeom_getEntNrmlPlXYZ( geomIFace, geom, position[0], position[1], position[2], &closest[0], &closest[1],
+                           &closest[2], &p_normal[0], &p_normal[1], &p_normal[2], &ierr );
     return ierr;
 }
 
@@ -159,14 +159,14 @@ int MsqCommonIGeom::get_dimension( const iBase_EntityHandle* geom_handle, unsign
     typeArray.resize( count );
 
     // define junk variables required for ITAPS "consistancy"
-    int  junk_1 = count, junk_2 = count;
+    int junk_1 = count, junk_2 = count;
     int* type_ptr = arrptr( typeArray );
 
     // get the types
     iGeom_getArrType( geomIFace, geom_handle, count, &type_ptr, &junk_1, &junk_2, &ierr );
 
     // convert from int to unsigned short
-    std::copy( typeArray.begin( ), typeArray.end( ), dof_out );
+    std::copy( typeArray.begin(), typeArray.end(), dof_out );
     return ierr;
 }
 

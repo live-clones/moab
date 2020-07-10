@@ -35,22 +35,22 @@ class SweptVertexData : public SequenceData
 
   private:
     //! parameter min/max, in homogeneous coords ijkh (extra row for stride eventually)
-    HomCoord vertexParams[ 3 ];
+    HomCoord vertexParams[3];
 
     //! difference between max and min params plus one (i.e. # VERTICES in
     //! each parametric direction)
-    int dIJK[ 3 ];
+    int dIJK[3];
 
     //! difference between max and min params (i.e. # VERTEXS in
     //! each parametric direction)
-    int dIJKm1[ 3 ];
+    int dIJKm1[3];
 
   public:
     //! constructor
     SweptVertexData( const EntityHandle start_vertex, const int imin, const int jmin, const int kmin, const int imax,
                      const int jmax, const int kmax );
 
-    virtual ~SweptVertexData( ) {}
+    virtual ~SweptVertexData() {}
 
     //! get handle of vertex at i, j, k
     EntityHandle get_vertex( const int i, const int j, const int k ) const;
@@ -69,38 +69,38 @@ class SweptVertexData : public SequenceData
     void max_params( int& i, int& j, int& k ) const;
 
     //! get the min params
-    const HomCoord& min_params( ) const;
+    const HomCoord& min_params() const;
 
     //! get the max params
-    const HomCoord& max_params( ) const;
+    const HomCoord& max_params() const;
 
     //! get the number of vertices in each direction, inclusive
     void param_extents( int& di, int& dj, int& dk ) const;
 
     //! convenience functions for parameter extents
-    int i_min( ) const
+    int i_min() const
     {
-        return vertexParams[ 0 ].hom_coord( )[ 0 ];
+        return vertexParams[0].hom_coord()[0];
     }
-    int j_min( ) const
+    int j_min() const
     {
-        return vertexParams[ 0 ].hom_coord( )[ 1 ];
+        return vertexParams[0].hom_coord()[1];
     }
-    int k_min( ) const
+    int k_min() const
     {
-        return vertexParams[ 0 ].hom_coord( )[ 2 ];
+        return vertexParams[0].hom_coord()[2];
     }
-    int i_max( ) const
+    int i_max() const
     {
-        return vertexParams[ 1 ].hom_coord( )[ 0 ];
+        return vertexParams[1].hom_coord()[0];
     }
-    int j_max( ) const
+    int j_max() const
     {
-        return vertexParams[ 1 ].hom_coord( )[ 1 ];
+        return vertexParams[1].hom_coord()[1];
     }
-    int k_max( ) const
+    int k_max() const
     {
-        return vertexParams[ 1 ].hom_coord( )[ 2 ];
+        return vertexParams[1].hom_coord()[2];
     }
 
     //! return whether this vseq's parameter space contains these parameters
@@ -113,30 +113,30 @@ class SweptVertexData : public SequenceData
 
 inline EntityHandle SweptVertexData::get_vertex( const int i, const int j, const int k ) const
 {
-    return start_handle( ) + ( i - i_min( ) ) + ( j - j_min( ) ) * dIJK[ 0 ] + ( k - k_min( ) ) * dIJK[ 0 ] * dIJK[ 1 ];
+    return start_handle() + ( i - i_min() ) + ( j - j_min() ) * dIJK[0] + ( k - k_min() ) * dIJK[0] * dIJK[1];
 }
 
 inline EntityHandle SweptVertexData::get_vertex( const HomCoord& coords ) const
 {
-    return get_vertex( coords.hom_coord( )[ 0 ], coords.hom_coord( )[ 1 ], coords.hom_coord( )[ 2 ] );
+    return get_vertex( coords.hom_coord()[0], coords.hom_coord()[1], coords.hom_coord()[2] );
 }
 
 inline ErrorCode SweptVertexData::get_params( const EntityHandle vhandle, int& i, int& j, int& k ) const
 {
     if( TYPE_FROM_HANDLE( vhandle ) != MBVERTEX ) return MB_FAILURE;
 
-    int hdiff = vhandle - start_handle( );
+    int hdiff = vhandle - start_handle();
 
-    k = hdiff / ( dIJK[ 0 ] * dIJK[ 1 ] );
-    j = ( hdiff - ( k * dIJK[ 0 ] * dIJK[ 1 ] ) ) / dIJK[ 0 ];
-    i = hdiff % dIJK[ 0 ];
+    k = hdiff / ( dIJK[0] * dIJK[1] );
+    j = ( hdiff - ( k * dIJK[0] * dIJK[1] ) ) / dIJK[0];
+    i = hdiff % dIJK[0];
 
-    k += vertexParams[ 0 ].k( );
-    j += vertexParams[ 0 ].j( );
-    i += vertexParams[ 0 ].i( );
+    k += vertexParams[0].k();
+    j += vertexParams[0].j();
+    i += vertexParams[0].i();
 
-    return ( vhandle >= start_handle( ) && i >= i_min( ) && i <= i_max( ) && j >= j_min( ) && j <= j_max( ) &&
-             k >= k_min( ) && k <= k_max( ) )
+    return ( vhandle >= start_handle() && i >= i_min() && i <= i_max() && j >= j_min() && j <= j_max() &&
+             k >= k_min() && k <= k_max() )
                ? MB_SUCCESS
                : MB_FAILURE;
 }
@@ -144,40 +144,40 @@ inline ErrorCode SweptVertexData::get_params( const EntityHandle vhandle, int& i
 //! get min params for this vertex
 inline void SweptVertexData::min_params( int& i, int& j, int& k ) const
 {
-    i = i_min( );
-    j = j_min( );
-    k = k_min( );
+    i = i_min();
+    j = j_min();
+    k = k_min();
 }
 
 //! get max params for this vertex
 inline void SweptVertexData::max_params( int& i, int& j, int& k ) const
 {
-    i = i_max( );
-    j = j_max( );
-    k = k_max( );
+    i = i_max();
+    j = j_max();
+    k = k_max();
 }
 
-inline const HomCoord& SweptVertexData::min_params( ) const
+inline const HomCoord& SweptVertexData::min_params() const
 {
-    return vertexParams[ 0 ];
+    return vertexParams[0];
 }
 
-inline const HomCoord& SweptVertexData::max_params( ) const
+inline const HomCoord& SweptVertexData::max_params() const
 {
-    return vertexParams[ 1 ];
+    return vertexParams[1];
 }
 
 //! get the number of vertices in each direction, inclusive
 inline void SweptVertexData::param_extents( int& di, int& dj, int& dk ) const
 {
-    di = dIJK[ 0 ];
-    dj = dIJK[ 1 ];
-    dk = dIJK[ 2 ];
+    di = dIJK[0];
+    dj = dIJK[1];
+    dk = dIJK[2];
 }
 
 inline bool SweptVertexData::contains( const HomCoord& coords ) const
 {
-    return ( coords >= vertexParams[ 0 ] && coords <= vertexParams[ 1 ] ) ? true : false;
+    return ( coords >= vertexParams[0] && coords <= vertexParams[1] ) ? true : false;
 }
 
 inline bool SweptVertexData::contains( const int i, const int j, const int k ) const

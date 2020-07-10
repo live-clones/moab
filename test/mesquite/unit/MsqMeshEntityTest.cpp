@@ -81,7 +81,7 @@ class MsqMeshEntityTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_all_nodes );
     CPPUNIT_TEST( test_check_element_orientation_linear );
     CPPUNIT_TEST( test_check_element_orientation_quadratic );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     void test_all_nodes( EntityTopology type, unsigned num_nodes );
 
@@ -90,11 +90,11 @@ class MsqMeshEntityTest : public CppUnit::TestFixture
     PatchData oneTetPatch;
     PatchData oneQuadPatch;
     PatchData oneTriPatch;
-    Vector3D  e1, e2, e3;
-    double    tolEps;
+    Vector3D e1, e2, e3;
+    double tolEps;
 
   public:
-    void setUp( )
+    void setUp()
     {
         tolEps = 1.e-12;
 
@@ -116,42 +116,42 @@ class MsqMeshEntityTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( !err );
     }
 
-    void tearDown( )
+    void tearDown()
     {
         destroy_patch_with_domain( oneTriPatch );
         destroy_patch_with_domain( oneQuadPatch );
     }
 
   public:
-    MsqMeshEntityTest( ) {}
+    MsqMeshEntityTest() {}
 
-    void test_hex_vertices( )
+    void test_hex_vertices()
     {
         MsqPrintError err( cout );
         // prints out the vertices.
         const MsqVertex* ideal_vertices = oneHexPatch.get_vertex_array( err );
         CPPUNIT_ASSERT( !err );
-        size_t num_vtx = oneHexPatch.num_nodes( );
+        size_t num_vtx = oneHexPatch.num_nodes();
         CPPUNIT_ASSERT_EQUAL( size_t( 8 ), num_vtx );
 
         MsqVertex vtx;
 
         vtx.set( 1, 1, 1 );
-        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[ 0 ] );
+        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[0] );
 
         vtx.set( 2, 2, 2 );
-        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[ 6 ] );
+        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[6] );
 
         vtx.set( 1, 2, 2 );
-        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[ 7 ] );
+        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[7] );
     }
 
     //! test the centroid of the first element in the Patch
     void test_centroid( PatchData& pd, Vector3D& correct )
     {
         MsqPrintError err( cout );
-        double        eps = 1e-6;
-        Vector3D      centroid;
+        double eps = 1e-6;
+        Vector3D centroid;
 
         MsqMeshEntity* elem = pd.get_element_array( err );
         CPPUNIT_ASSERT( !err );
@@ -162,30 +162,30 @@ class MsqMeshEntityTest : public CppUnit::TestFixture
         //     cout << "correct: "<< correct <<endl;
 
         for( int i = 0; i < 3; ++i )
-            CPPUNIT_ASSERT_DOUBLES_EQUAL( centroid[ i ], correct[ i ], eps );
+            CPPUNIT_ASSERT_DOUBLES_EQUAL( centroid[i], correct[i], eps );
     }
 
-    void test_centroid_tri( )
+    void test_centroid_tri()
     {
         Vector3D correct( 1.5, 1 + 1 / ( 2.0 * sqrt( 3.0 ) ), 1.0 );
         test_centroid( oneTriPatch, correct );
     }
 
-    void test_centroid_quad( )
+    void test_centroid_quad()
     {
         Vector3D correct( 1.5, 1.5, 1.0 );
         test_centroid( oneQuadPatch, correct );
     }
 
-    void test_centroid_hex( )
+    void test_centroid_hex()
     {
         Vector3D correct( 1.5, 1.5, 1.5 );
         test_centroid( oneHexPatch, correct );
     }
 
-    void test_unsigned_area( )
+    void test_unsigned_area()
     {
-        MsqPrintError  err( cout );
+        MsqPrintError err( cout );
         MsqMeshEntity* tri = oneTriPatch.get_element_array( err );
         CPPUNIT_ASSERT( !err );
         CPPUNIT_ASSERT( fabs( tri->compute_unsigned_area( oneTriPatch, err ) - ( sqrt( 3.0 ) / 4.0 ) ) < tolEps );
@@ -194,17 +194,17 @@ class MsqMeshEntityTest : public CppUnit::TestFixture
         CPPUNIT_ASSERT( fabs( quad->compute_unsigned_area( oneQuadPatch, err ) - 1.0 ) < tolEps );
     }
 
-    void test_unsigned_area_poly( );
-    void test_unsigned_area_tet( );
-    void test_unsigned_area_pyr( );
-    void test_unsigned_area_pri( );
-    void test_unsigned_area_hex( );
-    void test_all_nodes( );
+    void test_unsigned_area_poly();
+    void test_unsigned_area_tet();
+    void test_unsigned_area_pyr();
+    void test_unsigned_area_pri();
+    void test_unsigned_area_hex();
+    void test_all_nodes();
 
     void test_unsigned_area_common( EntityTopology type, const double* coords, double expected );
 
-    void test_check_element_orientation_linear( );
-    void test_check_element_orientation_quadratic( );
+    void test_check_element_orientation_linear();
+    void test_check_element_orientation_quadratic();
     void test_check_element_orientation( EntityTopology type, int nodes );
 };
 
@@ -212,14 +212,14 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MsqMeshEntityTest, "MsqMeshEntityTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( MsqMeshEntityTest, "Unit" );
 
 const size_t conn[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-const bool   fixed[] = { false, false, false, false, false, false, false, false };
+const bool fixed[]  = { false, false, false, false, false, false, false, false };
 
-void MsqMeshEntityTest::test_unsigned_area_poly( )
+void MsqMeshEntityTest::test_unsigned_area_poly()
 {
-    const double   coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0.5, 1.5, 0, 0, 1, 0 };
-    size_t         n_vtx = 5;
-    EntityTopology type = POLYGON;
-    MsqError       err;
+    const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0.5, 1.5, 0, 0, 1, 0 };
+    size_t n_vtx          = 5;
+    EntityTopology type   = POLYGON;
+    MsqError err;
 
     PatchData pd;
     pd.fill( n_vtx, coords, 1, &type, &n_vtx, conn, fixed, err );
@@ -232,7 +232,7 @@ void MsqMeshEntityTest::test_unsigned_area_poly( )
 
 void MsqMeshEntityTest::test_unsigned_area_common( EntityTopology type, const double* coords, double expected )
 {
-    MsqError  err;
+    MsqError err;
     PatchData pd;
 
     pd.fill( TopologyInfo::corners( type ), coords, 1, type, conn, fixed, err );
@@ -244,13 +244,13 @@ void MsqMeshEntityTest::test_unsigned_area_common( EntityTopology type, const do
     CPPUNIT_ASSERT_DOUBLES_EQUAL( expected, a, 1e-8 );
 }
 
-void MsqMeshEntityTest::test_unsigned_area_tet( )
+void MsqMeshEntityTest::test_unsigned_area_tet()
 {
     const double coords[] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     test_unsigned_area_common( TETRAHEDRON, coords, 1.0 / 6.0 );
 }
 
-void MsqMeshEntityTest::test_unsigned_area_pyr( )
+void MsqMeshEntityTest::test_unsigned_area_pyr()
 {
     const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1 };
     test_unsigned_area_common( PYRAMID, coords, 1.0 / 3.0 );
@@ -259,7 +259,7 @@ void MsqMeshEntityTest::test_unsigned_area_pyr( )
     test_unsigned_area_common( PYRAMID, pyr_coords, 4.0 / 3.0 );
 }
 
-void MsqMeshEntityTest::test_unsigned_area_pri( )
+void MsqMeshEntityTest::test_unsigned_area_pri()
 {
     const double coords[] = { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1 };
     test_unsigned_area_common( PRISM, coords, 0.5 );
@@ -268,7 +268,7 @@ void MsqMeshEntityTest::test_unsigned_area_pri( )
     test_unsigned_area_common( PRISM, tet_coords, 1.0 / 6.0 );
 }
 
-void MsqMeshEntityTest::test_unsigned_area_hex( )
+void MsqMeshEntityTest::test_unsigned_area_hex()
 {
     const double coords[] = { 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 };
     test_unsigned_area_common( HEXAHEDRON, coords, 1.0 );
@@ -282,34 +282,34 @@ void MsqMeshEntityTest::test_unsigned_area_hex( )
 
 void MsqMeshEntityTest::test_all_nodes( EntityTopology type, unsigned num_nodes )
 {
-    const unsigned num_vtx = 27;
-    double         coords[ 3 * num_vtx ] = { 0.0 };
-    size_t         conn[ num_vtx ];
+    const unsigned num_vtx     = 27;
+    double coords[3 * num_vtx] = { 0.0 };
+    size_t conn[num_vtx];
     for( size_t i = 0; i < num_vtx; ++i )
-        conn[ i ] = i;
-    bool fixed[ num_vtx ] = { false };
+        conn[i] = i;
+    bool fixed[num_vtx] = { false };
     CPPUNIT_ASSERT( num_nodes <= num_vtx );
 
-    MsqError  err;
+    MsqError err;
     PatchData pd;
-    size_t    n = num_nodes;
+    size_t n = num_nodes;
     pd.fill( num_nodes, coords, 1, &type, &n, conn, fixed, err );
     ASSERT_NO_ERROR( err );
 
     MsqMeshEntity& elem = pd.element_by_index( 0 );
-    NodeSet        all = elem.all_nodes( err );
+    NodeSet all         = elem.all_nodes( err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( num_nodes, all.num_nodes( ) );
-    CPPUNIT_ASSERT( all.have_any_corner_node( ) );
+    CPPUNIT_ASSERT_EQUAL( num_nodes, all.num_nodes() );
+    CPPUNIT_ASSERT( all.have_any_corner_node() );
     bool mid_edge, mid_face, mid_reg;
     TopologyInfo::higher_order( type, num_nodes, mid_edge, mid_face, mid_reg, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( mid_edge, !!all.have_any_mid_edge_node( ) );
-    CPPUNIT_ASSERT_EQUAL( mid_face, !!all.have_any_mid_face_node( ) );
-    CPPUNIT_ASSERT_EQUAL( mid_reg, !!all.have_any_mid_region_node( ) );
+    CPPUNIT_ASSERT_EQUAL( mid_edge, !!all.have_any_mid_edge_node() );
+    CPPUNIT_ASSERT_EQUAL( mid_face, !!all.have_any_mid_face_node() );
+    CPPUNIT_ASSERT_EQUAL( mid_reg, !!all.have_any_mid_region_node() );
 }
 
-void MsqMeshEntityTest::test_all_nodes( )
+void MsqMeshEntityTest::test_all_nodes()
 {
     test_all_nodes( TRIANGLE, 3 );
     test_all_nodes( TRIANGLE, 4 );
@@ -340,47 +340,47 @@ void MsqMeshEntityTest::test_all_nodes( )
     test_all_nodes( HEXAHEDRON, 27 );
 }
 
-void MsqMeshEntityTest::test_check_element_orientation_linear( )
+void MsqMeshEntityTest::test_check_element_orientation_linear()
 {
     const EntityTopology types[] = { TRIANGLE, QUADRILATERAL, TETRAHEDRON, PYRAMID, PRISM, HEXAHEDRON };
-    const int            num_types = sizeof( types ) / sizeof( types[ 0 ] );
+    const int num_types          = sizeof( types ) / sizeof( types[0] );
 
     for( int i = 0; i < num_types; ++i )
     {
-        test_check_element_orientation( types[ i ], TopologyInfo::corners( types[ i ] ) );
+        test_check_element_orientation( types[i], TopologyInfo::corners( types[i] ) );
     }
 }
 
-void MsqMeshEntityTest::test_check_element_orientation_quadratic( )
+void MsqMeshEntityTest::test_check_element_orientation_quadratic()
 {
     struct ElemType
     {
         EntityTopology topo;
-        unsigned       nodes;
+        unsigned nodes;
     };
 
     const ElemType types[] = { { TRIANGLE, 6 }, { QUADRILATERAL, 8 }, { QUADRILATERAL, 9 }, { TETRAHEDRON, 10 } };
-    const int      num_types = sizeof( types ) / sizeof( types[ 0 ] );
+    const int num_types    = sizeof( types ) / sizeof( types[0] );
 
     for( int i = 0; i < num_types; ++i )
     {
-        test_check_element_orientation( types[ i ].topo, types[ i ].nodes );
+        test_check_element_orientation( types[i].topo, types[i].nodes );
     }
 }
 
 void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int nodes )
 {
     // get an ideal element
-    MsqError  err;
+    MsqError err;
     PatchData pd;
     create_ideal_element_patch( pd, type, nodes, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( (size_t)1, pd.num_elements( ) );
-    CPPUNIT_ASSERT_EQUAL( (size_t)nodes, pd.num_nodes( ) );
+    CPPUNIT_ASSERT_EQUAL( (size_t)1, pd.num_elements() );
+    CPPUNIT_ASSERT_EQUAL( (size_t)nodes, pd.num_nodes() );
     MsqMeshEntity& elem = pd.element_by_index( 0 );
-    CPPUNIT_ASSERT_EQUAL( (size_t)nodes, elem.node_count( ) );
-    CPPUNIT_ASSERT_EQUAL( type, elem.get_element_type( ) );
-    const size_t* conn = elem.get_vertex_index_array( );
+    CPPUNIT_ASSERT_EQUAL( (size_t)nodes, elem.node_count() );
+    CPPUNIT_ASSERT_EQUAL( type, elem.get_element_type() );
+    const size_t* conn = elem.get_vertex_index_array();
 
     // test that ideal element is not reported as inverted
     int inverted, tested;
@@ -389,8 +389,9 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
     CPPUNIT_ASSERT_EQUAL( 0, inverted );
     CPPUNIT_ASSERT( tested > 0 );
 
-    bool mids[ 4 ] = { false };
-    TopologyInfo::higher_order( type, nodes, mids[ 1 ], mids[ 2 ], mids[ 3 ], err );MSQ_ERRRTN( err );
+    bool mids[4] = { false };
+    TopologyInfo::higher_order( type, nodes, mids[1], mids[2], mids[3], err );
+    MSQ_ERRRTN( err );
 
     // invert element at each vertex and test
     Vector3D centroid;
@@ -401,12 +402,12 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
         unsigned dim, num;
         TopologyInfo::side_from_higher_order( type, nodes, i, dim, num, err );
         ASSERT_NO_ERROR( err );
-        const Vector3D old_pos = pd.vertex_by_index( conn[ i ] );
-        Vector3D       new_pos = old_pos;
+        const Vector3D old_pos = pd.vertex_by_index( conn[i] );
+        Vector3D new_pos       = old_pos;
         if( dim == TopologyInfo::dimension( type ) )
         {
             // move mid-element node 3/4 of the way to corner 0
-            new_pos += 3 * pd.vertex_by_index( conn[ 0 ] );
+            new_pos += 3 * pd.vertex_by_index( conn[0] );
             new_pos *= 0.25;
         }
         else if( dim == 0 )
@@ -416,7 +417,7 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
                 // move tri/tet vertex past opposite side of element
                 new_pos += 2 * ( centroid - old_pos );
             }
-            else if( mids[ 1 ] )
+            else if( mids[1] )
             {
                 // if have mid-edge nodes move 3/4 of the way to center vertex
                 new_pos += 3 * centroid;
@@ -434,7 +435,7 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
             new_pos += 2.5 * ( centroid - old_pos );
         }
 
-        pd.set_vertex_coordinates( new_pos, conn[ i ], err );
+        pd.set_vertex_coordinates( new_pos, conn[i], err );
         ASSERT_NO_ERROR( err );
 
         // test that element is inverted
@@ -445,11 +446,11 @@ void MsqMeshEntityTest::test_check_element_orientation( EntityTopology type, int
         str << TopologyInfo::short_name( type ) << nodes << " Vertex " << i << " (Dimension " << dim << " Index " << num
             << ")";
         CppUnit::Message m( "MsqMeshEntity failed to detect inverted element" );
-        m.addDetail( str.str( ) );
+        m.addDetail( str.str() );
         ASSERT_MESSAGE( m, inverted > 0 );
 
         // move vertex back to ideal position
-        pd.set_vertex_coordinates( old_pos, conn[ i ], err );
+        pd.set_vertex_coordinates( old_pos, conn[i], err );
         ASSERT_NO_ERROR( err );
     }
 }

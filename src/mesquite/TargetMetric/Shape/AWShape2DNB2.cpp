@@ -37,12 +37,12 @@
 namespace MBMesquite
 {
 
-std::string AWShape2DNB2::get_name( ) const
+std::string AWShape2DNB2::get_name() const
 {
     return "AWShape2DNB2";
 }
 
-AWShape2DNB2::~AWShape2DNB2( ) {}
+AWShape2DNB2::~AWShape2DNB2() {}
 
 bool AWShape2DNB2::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& )
 {
@@ -55,10 +55,10 @@ bool AWShape2DNB2::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >
 bool AWShape2DNB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
                                        MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& )
 {
-    const double            alpha = det( A );
-    const double            omega = det( W );
+    const double alpha           = det( A );
+    const double omega           = det( W );
     const MsqMatrix< 2, 2 > adjA = adj( A );
-    result = sqr_Frobenius( A * adj( W ) );
+    result                       = sqr_Frobenius( A * adj( W ) );
     result += sqr_Frobenius( W * adjA );
     result -= 4 * alpha * omega;
 

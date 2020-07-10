@@ -38,18 +38,18 @@
 
 using namespace moab;
 
-const static double      radius = 1.0;
-const double             MOAB_PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
-const static double      surface_area = 4.0 * MOAB_PI * radius * radius;
-const static std::string outFilenames[ 5 ] = { "outTempestCS.g", "outTempestRLL.g", "outTempestICO.g",
-                                               "outTempestICOD.g", "outTempestOV.g" };
+const static double radius               = 1.0;
+const double MOAB_PI                     = 3.1415926535897932384626433832795028841971693993751058209749445923;
+const static double surface_area         = 4.0 * MOAB_PI * radius * radius;
+const static std::string outFilenames[5] = { "outTempestCS.g", "outTempestRLL.g", "outTempestICO.g", "outTempestICOD.g",
+                                             "outTempestOV.g" };
 
-void test_tempest_cs_create( );
-void test_tempest_rll_create( );
-void test_tempest_ico_create( );
-void test_tempest_mpas_create( );
-void test_tempest_overlap_combinations( );
-void test_tempest_to_moab_convert( );
+void test_tempest_cs_create();
+void test_tempest_rll_create();
+void test_tempest_ico_create();
+void test_tempest_mpas_create();
+void test_tempest_overlap_combinations();
+void test_tempest_to_moab_convert();
 
 int main( int argc, char** argv )
 {
@@ -65,20 +65,20 @@ int main( int argc, char** argv )
 #endif
     int result = RUN_TESTS( argc, argv );
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
     return result;
 }
 
-void test_tempest_cs_create( )
+void test_tempest_cs_create()
 {
-    NcError           error( NcError::verbose_nonfatal );
-    const int         blockSize = 5;
-    const std::string outFilename = outFilenames[ 0 ];
+    NcError error( NcError::verbose_nonfatal );
+    const int blockSize           = 5;
+    const std::string outFilename = outFilenames[0];
 
     std::cout << "Creating TempestRemap Cubed-Sphere Mesh ...\n";
     Mesh tempest_mesh;
-    int  ierr = GenerateCSMesh( tempest_mesh, blockSize, outFilename, "NetCDF4" );
+    int ierr = GenerateCSMesh( tempest_mesh, blockSize, outFilename, "NetCDF4" );
     CHECK_EQUAL( ierr, 0 );
 
     // Compute the surface area of CS mesh
@@ -86,15 +86,15 @@ void test_tempest_cs_create( )
     CHECK_REAL_EQUAL( sphere_area, surface_area, 1e-10 );
 }
 
-void test_tempest_rll_create( )
+void test_tempest_rll_create()
 {
-    NcError           error( NcError::verbose_nonfatal );
-    const int         blockSize = 10;
-    const std::string outFilename = outFilenames[ 1 ];
+    NcError error( NcError::verbose_nonfatal );
+    const int blockSize           = 10;
+    const std::string outFilename = outFilenames[1];
 
     std::cout << "Creating TempestRemap Latitude-Longitude Mesh ...\n";
     Mesh tempest_mesh;
-    int  ierr =
+    int ierr =
         GenerateRLLMesh( tempest_mesh, blockSize * 2, blockSize, 0.0, 360.0, -90.0, 90.0, false, false, true, "", "",
                          "",  // std::string strInputFile, std::string strInputFileLonName, std::string
                               // strInputFileLatName,
@@ -107,16 +107,16 @@ void test_tempest_rll_create( )
     CHECK_REAL_EQUAL( sphere_area, surface_area, 1e-10 );
 }
 
-void test_tempest_ico_create( )
+void test_tempest_ico_create()
 {
-    NcError           error( NcError::verbose_nonfatal );
-    const int         blockSize = 5;
-    const bool        computeDual = false;
-    const std::string outFilename = outFilenames[ 2 ];
+    NcError error( NcError::verbose_nonfatal );
+    const int blockSize           = 5;
+    const bool computeDual        = false;
+    const std::string outFilename = outFilenames[2];
 
     std::cout << "Creating TempestRemap Icosahedral Mesh ...\n";
     Mesh tempest_mesh;
-    int  ierr = GenerateICOMesh( tempest_mesh, blockSize, computeDual, outFilename, "NetCDF4" );
+    int ierr = GenerateICOMesh( tempest_mesh, blockSize, computeDual, outFilename, "NetCDF4" );
     CHECK_EQUAL( ierr, 0 );
 
     // Compute the surface area of ICO mesh
@@ -124,16 +124,16 @@ void test_tempest_ico_create( )
     CHECK_REAL_EQUAL( sphere_area, surface_area, 1e-10 );
 }
 
-void test_tempest_mpas_create( )
+void test_tempest_mpas_create()
 {
-    NcError           error( NcError::verbose_nonfatal );
-    const int         blockSize = 5;
-    const bool        computeDual = true;
-    const std::string outFilename = outFilenames[ 3 ];
+    NcError error( NcError::verbose_nonfatal );
+    const int blockSize           = 5;
+    const bool computeDual        = true;
+    const std::string outFilename = outFilenames[3];
 
     std::cout << "Creating TempestRemap MPAS Mesh (dual of the Icosahedral) ...\n";
     Mesh tempest_mesh;
-    int  ierr = GenerateICOMesh( tempest_mesh, blockSize, computeDual, outFilename, "NetCDF4" );
+    int ierr = GenerateICOMesh( tempest_mesh, blockSize, computeDual, outFilename, "NetCDF4" );
     CHECK_EQUAL( ierr, 0 );
 
     // Compute the surface area of MPAS mesh
@@ -141,12 +141,12 @@ void test_tempest_mpas_create( )
     CHECK_REAL_EQUAL( sphere_area, surface_area, 1e-10 );
 }
 
-void test_tempest_overlap_combinations( )
+void test_tempest_overlap_combinations()
 {
-    NcError           error( NcError::verbose_nonfatal );
-    const std::string outFilename = outFilenames[ 4 ];
+    NcError error( NcError::verbose_nonfatal );
+    const std::string outFilename = outFilenames[4];
 
-    Mesh inpMesh( outFilenames[ 0 ] );
+    Mesh inpMesh( outFilenames[0] );
     // verify input mesh area first
     const double inpArea = inpMesh.CalculateFaceAreas( false );
     CHECK_REAL_EQUAL( inpArea, surface_area, 1e-10 );
@@ -155,10 +155,10 @@ void test_tempest_overlap_combinations( )
     {
         for( int jsrc = 0; jsrc < 4; ++jsrc )
         {
-            std::cout << "Computing Overlap between " << outFilenames[ isrc ] << " and " << outFilenames[ jsrc ]
+            std::cout << "Computing Overlap between " << outFilenames[isrc] << " and " << outFilenames[jsrc]
                       << " ...\n";
             Mesh tempest_mesh;
-            int  ierr = GenerateOverlapMesh( outFilenames[ isrc ], outFilenames[ jsrc ], tempest_mesh, outFilename,
+            int ierr = GenerateOverlapMesh( outFilenames[isrc], outFilenames[jsrc], tempest_mesh, outFilename,
                                             "NetCDF4", "exact", false, false, false, false );
             CHECK_EQUAL( ierr, 0 );
             // verify overlap mesh area
@@ -168,25 +168,25 @@ void test_tempest_overlap_combinations( )
     }
 }
 
-void test_tempest_to_moab_convert( )
+void test_tempest_to_moab_convert()
 {
     NcError error( NcError::verbose_nonfatal );
 
     // Allocate and create MOAB Remapper object
-    moab::ErrorCode  rval;
+    moab::ErrorCode rval;
     moab::Interface* mbCore = new( std::nothrow ) moab::Core;
     CHECK( NULL != mbCore );
 
     moab::ParallelComm* pcomm = new moab::ParallelComm( mbCore, MPI_COMM_WORLD, 0 );
 
     moab::TempestRemapper* remapper = new moab::TempestRemapper( mbCore, pcomm );
-    remapper->meshValidate = true;
-    remapper->constructEdgeMap = true;
-    remapper->initialize( );
+    remapper->meshValidate          = true;
+    remapper->constructEdgeMap      = true;
+    remapper->initialize();
 
-    rval = pcomm->check_all_shared_handles( );CHECK_ERR( rval );
+    rval = pcomm->check_all_shared_handles();CHECK_ERR( rval );
 
-    rval = remapper->LoadMesh( moab::Remapper::SourceMesh, outFilenames[ 0 ], moab::TempestRemapper::CS );CHECK_ERR( rval );
+    rval = remapper->LoadMesh( moab::Remapper::SourceMesh, outFilenames[0], moab::TempestRemapper::CS );CHECK_ERR( rval );
 
     // Load the meshes and validate
     rval = remapper->ConvertTempestMesh( moab::Remapper::SourceMesh );CHECK_ERR( rval );
@@ -204,8 +204,8 @@ void test_tempest_to_moab_convert( )
 
     Mesh* tgtTempest = remapper->GetMesh( moab::Remapper::TargetMesh );
 
-    const size_t tempest_nodes_src = srcTempest->nodes.size( ), tempest_elems_src = srcTempest->faces.size( );
-    const size_t tempest_nodes_tgt = tgtTempest->nodes.size( ), tempest_elems_tgt = tgtTempest->faces.size( );
+    const size_t tempest_nodes_src = srcTempest->nodes.size(), tempest_elems_src = srcTempest->faces.size();
+    const size_t tempest_nodes_tgt = tgtTempest->nodes.size(), tempest_elems_tgt = tgtTempest->faces.size();
     CHECK_EQUAL( tempest_nodes_src, tempest_nodes_tgt );
     CHECK_EQUAL( tempest_elems_src, tempest_elems_tgt );
 

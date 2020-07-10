@@ -77,17 +77,17 @@ class InstructionQueueTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_remove_quality_assessor );
     CPPUNIT_TEST( test_insert_quality_assessor );
     CPPUNIT_TEST( test_add_remove_vertex_slaver );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
-    QualityAssessor*   mQA;
-    QualityImprover*   mQI;
-    QualityMetric*     mQM;
+    QualityAssessor* mQA;
+    QualityImprover* mQI;
+    QualityMetric* mQM;
     ObjectiveFunction* mOF;
-    InstructionQueue   mQueue;
+    InstructionQueue mQueue;
 
   public:
-    void setUp( )
+    void setUp()
     {
         MsqPrintError err( cout );
         // creates a quality assessor and a qualilty improver
@@ -96,12 +96,12 @@ class InstructionQueueTest : public CppUnit::TestFixture
         mOF = new LPtoPTemplate( mQM, 2, err );
         CPPUNIT_ASSERT( !err );
         mQI = new SteepestDescent( mOF );
-        mQA = new QualityAssessor( );
+        mQA = new QualityAssessor();
         mQA->set_stopping_assessment( mQM );
         CPPUNIT_ASSERT( !err );
     }
 
-    void tearDown( )
+    void tearDown()
     {
         delete mQA;
         delete mQI;
@@ -110,125 +110,125 @@ class InstructionQueueTest : public CppUnit::TestFixture
     }
 
   public:
-    InstructionQueueTest( ) {}
+    InstructionQueueTest() {}
 
-    void test_add_preconditioner( )
+    void test_add_preconditioner()
     {
         MsqPrintError err( cout );
-        mQueue.clear( );
+        mQueue.clear();
         mQueue.add_preconditioner( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.set_master_quality_improver( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.add_preconditioner( mQI, err );
         CPPUNIT_ASSERT_MESSAGE( "preconditioner cannot be added after master QI", err );
-        err.clear( );
+        err.clear();
     }
 
-    void test_remove_preconditioner( )
+    void test_remove_preconditioner()
     {
         MsqPrintError err( cout );
-        mQueue.clear( );
-        mQueue.add_preconditioner( mQI, err );  // 0
+        mQueue.clear();
+        mQueue.add_preconditioner( mQI, err );    // 0
         mQueue.add_quality_assessor( mQA, err );  // 1
-        mQueue.add_preconditioner( mQI, err );  // 2
+        mQueue.add_preconditioner( mQI, err );    // 2
         mQueue.set_master_quality_improver( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.remove_preconditioner( 2, err );
         CPPUNIT_ASSERT_MESSAGE( "should remove QualityImprover", !err );
-        err.clear( );
+        err.clear();
         mQueue.remove_preconditioner( 3, err );
         CPPUNIT_ASSERT_MESSAGE( "should not remove master QualityImprover", err );
-        err.clear( );
+        err.clear();
         mQueue.remove_preconditioner( 1, err );
         CPPUNIT_ASSERT_MESSAGE( "should not remove QualityAssessor", err );
-        err.clear( );
+        err.clear();
         mQueue.remove_preconditioner( 0, err );
         CPPUNIT_ASSERT_MESSAGE( "should  remove QualityImprover", !err );
-        err.clear( );
+        err.clear();
         mQueue.remove_preconditioner( 0, err );
         CPPUNIT_ASSERT_MESSAGE( "should not remove QualityAssessor", err );
-        err.clear( );
+        err.clear();
     }
 
-    void test_insert_preconditioner( )
+    void test_insert_preconditioner()
     {
         MsqPrintError err( cout );
-        mQueue.clear( );
-        mQueue.add_preconditioner( mQI, err );  // 0
+        mQueue.clear();
+        mQueue.add_preconditioner( mQI, err );    // 0
         mQueue.add_quality_assessor( mQA, err );  // 1
-        mQueue.add_preconditioner( mQI, err );  // 2
+        mQueue.add_preconditioner( mQI, err );    // 2
         mQueue.set_master_quality_improver( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.insert_preconditioner( mQI, 2, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.insert_preconditioner( mQI, 5, err );
         CPPUNIT_ASSERT_MESSAGE( "should not insert after master QualityImprover", err );
-        err.clear( );
+        err.clear();
     }
 
-    void test_add_quality_assessor( )
+    void test_add_quality_assessor()
     {
         MsqPrintError err( cout );
-        mQueue.clear( );
+        mQueue.clear();
         mQueue.add_quality_assessor( mQA, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.set_master_quality_improver( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.add_quality_assessor( mQA, err );
         CPPUNIT_ASSERT( !err );
     }
 
-    void test_remove_quality_assessor( )
+    void test_remove_quality_assessor()
     {
         MsqPrintError err( cout );
-        mQueue.clear( );
-        mQueue.add_preconditioner( mQI, err );  // 0
+        mQueue.clear();
+        mQueue.add_preconditioner( mQI, err );    // 0
         mQueue.add_quality_assessor( mQA, err );  // 1
-        mQueue.add_preconditioner( mQI, err );  // 2
+        mQueue.add_preconditioner( mQI, err );    // 2
         mQueue.set_master_quality_improver( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.remove_quality_assessor( 2, err );
         CPPUNIT_ASSERT_MESSAGE( "should not remove QualityImprover", err );
-        err.clear( );
+        err.clear();
         mQueue.remove_quality_assessor( 3, err );
         CPPUNIT_ASSERT_MESSAGE( "should not remove master QualityImprover", err );
-        err.clear( );
+        err.clear();
         mQueue.remove_quality_assessor( 1, err );
         CPPUNIT_ASSERT_MESSAGE( "should remove QualityAssessor", !err );
-        err.clear( );
+        err.clear();
         mQueue.remove_quality_assessor( 1, err );
         CPPUNIT_ASSERT_MESSAGE( "should not remove QualityImprover", err );
-        err.clear( );
+        err.clear();
     }
 
-    void test_insert_quality_assessor( )
+    void test_insert_quality_assessor()
     {
         MsqPrintError err( cout );
-        mQueue.clear( );
-        mQueue.add_preconditioner( mQI, err );  // 0
+        mQueue.clear();
+        mQueue.add_preconditioner( mQI, err );    // 0
         mQueue.add_quality_assessor( mQA, err );  // 1
-        mQueue.add_preconditioner( mQI, err );  // 2
+        mQueue.add_preconditioner( mQI, err );    // 2
         mQueue.set_master_quality_improver( mQI, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.insert_quality_assessor( mQA, 2, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
         mQueue.insert_quality_assessor( mQA, 5, err );
         CPPUNIT_ASSERT( !err );
-        err.clear( );
+        err.clear();
     }
 
-    void test_add_remove_vertex_slaver( );
+    void test_add_remove_vertex_slaver();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( InstructionQueueTest, "InstructionQueueTest" );
@@ -242,34 +242,34 @@ class DummyVertexSlaver : public VertexSlaver
         CPPUNIT_ASSERT( false );
         return 0.0;
     }
-    virtual std::string get_name( ) const
+    virtual std::string get_name() const
     {
         return "Dummy";
     }
     virtual void initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 };
 
-void InstructionQueueTest::test_add_remove_vertex_slaver( )
+void InstructionQueueTest::test_add_remove_vertex_slaver()
 {
-    InstructionQueue  q;
+    InstructionQueue q;
     DummyVertexSlaver s1, s2;
-    MsqPrintError     err( std::cerr );
+    MsqPrintError err( std::cerr );
 
-    CPPUNIT_ASSERT( q.get_slaved_ho_node_mode( ) != Settings::SLAVE_CALCULATED );
+    CPPUNIT_ASSERT( q.get_slaved_ho_node_mode() != Settings::SLAVE_CALCULATED );
     q.add_vertex_slaver( &s1, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode( ) );
+    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode() );
     q.add_vertex_slaver( &s2, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode( ) );
+    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode() );
     q.remove_vertex_slaver( &s2, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode( ) );
+    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode() );
     q.remove_vertex_slaver( &s2, err );
     CPPUNIT_ASSERT( err );
-    err.clear( );
-    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode( ) );
+    err.clear();
+    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_CALCULATED, q.get_slaved_ho_node_mode() );
     q.remove_vertex_slaver( &s1, err );
     ASSERT_NO_ERROR( err );
-    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_ALL, q.get_slaved_ho_node_mode( ) );
+    CPPUNIT_ASSERT_EQUAL( Settings::SLAVE_ALL, q.get_slaved_ho_node_mode() );
 }

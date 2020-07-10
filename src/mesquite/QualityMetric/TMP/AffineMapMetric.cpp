@@ -48,7 +48,7 @@
 namespace MBMesquite
 {
 
-const double      TRI_XFORM_VALS[] = { 1.0, -1.0 / sqrt( 3.0 ), 0.0, 2.0 / sqrt( 3.0 ) };
+const double TRI_XFORM_VALS[] = { 1.0, -1.0 / sqrt( 3.0 ), 0.0, 2.0 / sqrt( 3.0 ) };
 MsqMatrix< 2, 2 > TRI_XFORM( TRI_XFORM_VALS );
 
 const double TET_XFORM_VALS[] = {
@@ -66,14 +66,14 @@ AffineMapMetric::AffineMapMetric( TargetCalculator* tc, TMetric* target_metric )
 {
 }
 
-int AffineMapMetric::get_negate_flag( ) const
+int AffineMapMetric::get_negate_flag() const
 {
     return 1;
 }
 
-std::string AffineMapMetric::get_name( ) const
+std::string AffineMapMetric::get_name() const
 {
-    return std::string( "AffineMap(" ) + targetMetric->get_name( ) + ')';
+    return std::string( "AffineMap(" ) + targetMetric->get_name() + ')';
 }
 
 void AffineMapMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )
@@ -89,12 +89,12 @@ void AffineMapMetric::get_element_evaluations( PatchData& pd, size_t p_elem, std
 
 bool AffineMapMetric::evaluate( PatchData& pd, size_t p_handle, double& value, MsqError& err )
 {
-    Sample         s = ElemSampleQM::sample( p_handle );
-    size_t         e = ElemSampleQM::elem( p_handle );
+    Sample s              = ElemSampleQM::sample( p_handle );
+    size_t e              = ElemSampleQM::elem( p_handle );
     MsqMeshEntity& p_elem = pd.element_by_index( e );
-    EntityTopology type = p_elem.get_element_type( );
-    unsigned       edim = TopologyInfo::dimension( type );
-    const size_t*  conn = p_elem.get_vertex_index_array( );
+    EntityTopology type   = p_elem.get_element_type();
+    unsigned edim         = TopologyInfo::dimension( type );
+    const size_t* conn    = p_elem.get_vertex_index_array();
 
     // This metric only supports sampling at corners, except for simplices.
     // If element is a simpex, then the Jacobian is constant over a linear
@@ -115,16 +115,16 @@ bool AffineMapMetric::evaluate( PatchData& pd, size_t p_handle, double& value, M
     bool rval;
     if( edim == 3 )
     {  // 3x3 or 3x2 targets ?
-        Vector3D        c[ 3 ] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
-        unsigned        n;
+        Vector3D c[3] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
+        unsigned n;
         const unsigned* adj = TopologyInfo::adjacent_vertices( type, s.number, n );
-        c[ 0 ] = pd.vertex_by_index( conn[ adj[ 0 ] ] ) - pd.vertex_by_index( conn[ s.number ] );
-        c[ 1 ] = pd.vertex_by_index( conn[ adj[ 1 ] ] ) - pd.vertex_by_index( conn[ s.number ] );
-        c[ 2 ] = pd.vertex_by_index( conn[ adj[ 2 ] ] ) - pd.vertex_by_index( conn[ s.number ] );
+        c[0]                = pd.vertex_by_index( conn[adj[0]] ) - pd.vertex_by_index( conn[s.number] );
+        c[1]                = pd.vertex_by_index( conn[adj[1]] ) - pd.vertex_by_index( conn[s.number] );
+        c[2]                = pd.vertex_by_index( conn[adj[2]] ) - pd.vertex_by_index( conn[s.number] );
         MsqMatrix< 3, 3 > A;
-        A.set_column( 0, MsqMatrix< 3, 1 >( c[ 0 ].to_array( ) ) );
-        A.set_column( 1, MsqMatrix< 3, 1 >( c[ 1 ].to_array( ) ) );
-        A.set_column( 2, MsqMatrix< 3, 1 >( c[ 2 ].to_array( ) ) );
+        A.set_column( 0, MsqMatrix< 3, 1 >( c[0].to_array() ) );
+        A.set_column( 1, MsqMatrix< 3, 1 >( c[1].to_array() ) );
+        A.set_column( 2, MsqMatrix< 3, 1 >( c[2].to_array() ) );
         if( type == TETRAHEDRON ) A = A * TET_XFORM;
 
         MsqMatrix< 3, 3 > W;
@@ -135,14 +135,14 @@ bool AffineMapMetric::evaluate( PatchData& pd, size_t p_handle, double& value, M
     }
     else
     {
-        Vector3D        c[ 2 ] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
-        unsigned        n;
+        Vector3D c[2] = { Vector3D( 0, 0, 0 ), Vector3D( 0, 0, 0 ) };
+        unsigned n;
         const unsigned* adj = TopologyInfo::adjacent_vertices( type, s.number, n );
-        c[ 0 ] = pd.vertex_by_index( conn[ adj[ 0 ] ] ) - pd.vertex_by_index( conn[ s.number ] );
-        c[ 1 ] = pd.vertex_by_index( conn[ adj[ 1 ] ] ) - pd.vertex_by_index( conn[ s.number ] );
+        c[0]                = pd.vertex_by_index( conn[adj[0]] ) - pd.vertex_by_index( conn[s.number] );
+        c[1]                = pd.vertex_by_index( conn[adj[1]] ) - pd.vertex_by_index( conn[s.number] );
         MsqMatrix< 3, 2 > App;
-        App.set_column( 0, MsqMatrix< 3, 1 >( c[ 0 ].to_array( ) ) );
-        App.set_column( 1, MsqMatrix< 3, 1 >( c[ 1 ].to_array( ) ) );
+        App.set_column( 0, MsqMatrix< 3, 1 >( c[0].to_array() ) );
+        App.set_column( 1, MsqMatrix< 3, 1 >( c[1].to_array() ) );
 
         MsqMatrix< 3, 2 > Wp;
         targetCalc->get_surface_target( pd, e, s, Wp, err );
@@ -171,11 +171,11 @@ bool AffineMapMetric::evaluate( PatchData& pd, size_t p_handle, double& value, M
 bool AffineMapMetric::evaluate_with_indices( PatchData& pd, size_t p_handle, double& value,
                                              std::vector< size_t >& indices, MsqError& err )
 {
-    Sample         s = ElemSampleQM::sample( p_handle );
-    size_t         e = ElemSampleQM::elem( p_handle );
+    Sample s              = ElemSampleQM::sample( p_handle );
+    size_t e              = ElemSampleQM::elem( p_handle );
     MsqMeshEntity& p_elem = pd.element_by_index( e );
-    EntityTopology type = p_elem.get_element_type( );
-    const size_t*  conn = p_elem.get_vertex_index_array( );
+    EntityTopology type   = p_elem.get_element_type();
+    const size_t* conn    = p_elem.get_vertex_index_array();
 
     // this metric only supports sampling at corners
     if( s.dimension != 0 )
@@ -187,15 +187,15 @@ bool AffineMapMetric::evaluate_with_indices( PatchData& pd, size_t p_handle, dou
             return false;
         }
         s.dimension = 0;
-        s.number = 0;
+        s.number    = 0;
     }
 
-    unsigned        n;
+    unsigned n;
     const unsigned* adj = TopologyInfo::adjacent_vertices( type, s.number, n );
-    indices.clear( );
-    if( conn[ s.number ] < pd.num_free_vertices( ) ) indices.push_back( conn[ s.number ] );
+    indices.clear();
+    if( conn[s.number] < pd.num_free_vertices() ) indices.push_back( conn[s.number] );
     for( unsigned i = 0; i < n; ++i )
-        if( conn[ adj[ i ] ] < pd.num_free_vertices( ) ) indices.push_back( conn[ adj[ i ] ] );
+        if( conn[adj[i]] < pd.num_free_vertices() ) indices.push_back( conn[adj[i]] );
 
     return evaluate( pd, p_handle, value, err );
 }

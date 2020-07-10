@@ -11,22 +11,22 @@
 using namespace moab;
 
 /* map from MB's entity type to TSTT's entity topology */
-extern const iMesh_EntityTopology tstt_topology_table[ MBMAXTYPE + 1 ];
+extern const iMesh_EntityTopology tstt_topology_table[MBMAXTYPE + 1];
 
 /* map from MB's entity type to TSTT's entity type */
-extern const iBase_EntityType tstt_type_table[ MBMAXTYPE + 1 ];
+extern const iBase_EntityType tstt_type_table[MBMAXTYPE + 1];
 
 /* map to MB's entity type from TSTT's entity topology */
-extern const EntityType mb_topology_table[ MBMAXTYPE + 1 ];
+extern const EntityType mb_topology_table[MBMAXTYPE + 1];
 
 /* map from TSTT's tag types to MOAB's */
-extern const DataType mb_data_type_table[ iBase_TagValueType_MAX + 1 ];
+extern const DataType mb_data_type_table[iBase_TagValueType_MAX + 1];
 
 /* map from MOAB's tag types to tstt's */
-extern const iBase_TagValueType tstt_data_type_table[ MB_MAX_DATA_TYPE + 1 ];
+extern const iBase_TagValueType tstt_data_type_table[MB_MAX_DATA_TYPE + 1];
 
 /* map from MOAB's ErrorCode to tstt's */
-extern "C" const iBase_ErrorType iBase_ERROR_MAP[ MB_FAILURE + 1 ];
+extern "C" const iBase_ErrorType iBase_ERROR_MAP[MB_FAILURE + 1];
 
 #include "MBiMesh.hpp"
 
@@ -40,7 +40,7 @@ static inline bool iMesh_isError( ErrorCode code )
 }
 
 #define PP_CAT_( a, b ) a##b
-#define PP_CAT( a, b ) PP_CAT_( a, b )
+#define PP_CAT( a, b )  PP_CAT_( a, b )
 
 #define RETURN( CODE )                                   \
     do                                                   \
@@ -83,7 +83,7 @@ static inline bool iMesh_isError( ErrorCode code )
         if( type != ( TYPE ) ) ERROR( iBase_INVALID_TAG_HANDLE, "Invalid tag data type" ); \
     } while( false )
 
-#define CHKNONEMPTY( )                                                                                 \
+#define CHKNONEMPTY()                                                                                  \
     do                                                                                                 \
     {                                                                                                  \
         int count, result;                                                                             \
@@ -105,7 +105,7 @@ static inline bool iMesh_isError( ErrorCode code )
                                        *( array##_size ), this_size, 1, err );                                \
     if( iBase_SUCCESS != *err ) return
 
-#define KEEP_ARRAY( array ) array##_manager.keep_array( )
+#define KEEP_ARRAY( array ) array##_manager.keep_array()
 
 // Check the array size, and allocate the array if necessary.
 // Do NOT free the array upon leaving scope.
@@ -125,7 +125,7 @@ class iMeshArrayManager
     {
         if( !array_allocated_space || !*array_ptr )
         {
-            *array_ptr = std::malloc( val_size * count );
+            *array_ptr            = std::malloc( val_size * count );
             array_allocated_space = array_size = count;
             if( !*array_ptr ) { ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." ); }
             arrayPtr = array_ptr;
@@ -139,7 +139,7 @@ class iMeshArrayManager
         RETURN( iBase_SUCCESS );
     }
 
-    ~iMeshArrayManager( )
+    ~iMeshArrayManager()
     {
         if( arrayPtr )
         {
@@ -148,7 +148,7 @@ class iMeshArrayManager
         }
     }
 
-    void keep_array( )
+    void keep_array()
     {
         arrayPtr = 0;
     }
@@ -165,10 +165,10 @@ inline int compare_no_case( const char* str1, const char* str2, size_t n )
 inline std::string filter_options( const char* begin, const char* end )
 {
     const char* opt_begin = begin;
-    const char* opt_end = begin;
+    const char* opt_end   = begin;
 
     std::string filtered;
-    bool        first = true;
+    bool first = true;
 
     while( opt_end != end )
     {

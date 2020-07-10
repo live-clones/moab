@@ -51,16 +51,16 @@ class PatchSetUser
 
     PatchSetUser( PatchSet* my_patch_set ) : myVertexPatches( 1, true ), activePatchSet( my_patch_set ) {}
 
-    virtual ~PatchSetUser( );
+    virtual ~PatchSetUser();
 
     /**\brief Use a single patch representing the entire mesh */
-    void use_global_patch( )
+    void use_global_patch()
     {
         activePatchSet = &myGlobalPatch;
     }
 
     /**\brief Using a single patch representing the entire mesh */
-    bool using_global_patch( ) const
+    bool using_global_patch() const
     {
         return activePatchSet == &myGlobalPatch;
     }
@@ -76,7 +76,7 @@ class PatchSetUser
     }
 
     /**\brief True if a patch will be constructed for each free vertex */
-    bool using_element_on_vertex_patch( ) const
+    bool using_element_on_vertex_patch() const
     {
         return activePatchSet == &myVertexPatches;
     }
@@ -84,12 +84,12 @@ class PatchSetUser
     /**\brief Get the number of layers of elements that will be included
      *        in an element-on-vertex patch
      */
-    unsigned num_element_on_vertex_layers( ) const
+    unsigned num_element_on_vertex_layers() const
     {
-        return myVertexPatches.get_num_layers( );
+        return myVertexPatches.get_num_layers();
     }
 
-    virtual PatchSet* get_patch_set( )
+    virtual PatchSet* get_patch_set()
     {
         return activePatchSet;
     }
@@ -101,8 +101,8 @@ class PatchSetUser
 
   private:
     VertexPatches myVertexPatches;
-    GlobalPatch   myGlobalPatch;
-    PatchSet*     activePatchSet;
+    GlobalPatch myGlobalPatch;
+    PatchSet* activePatchSet;
 };
 
 }  // namespace MBMesquite

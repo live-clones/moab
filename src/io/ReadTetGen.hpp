@@ -50,10 +50,10 @@ class ReadTetGen : public ReaderIface
     ReadTetGen( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadTetGen( );
+    virtual ~ReadTetGen();
 
   private:
-    Interface*     mbIface;
+    Interface* mbIface;
     ReadUtilIface* readTool;
 
     /**\brief Try to open one of several input files

@@ -19,7 +19,7 @@
 namespace moab
 {
 
-const CN::ConnMap CN::mConnectivityMap[ MBMAXTYPE ][ 3 ] = {
+const CN::ConnMap CN::mConnectivityMap[MBMAXTYPE][3] = {
     // vertex-edge
     { { 0,
         0,
@@ -294,7 +294,7 @@ const CN::ConnMap CN::mConnectivityMap[ MBMAXTYPE ][ 3 ] = {
     // maxtype
 };
 
-const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
+const CN::UpConnMap CN::mUpConnMap[MBMAXTYPE][4][4] = {
     {
         // type MBVERTEX
         { { { 1 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 0
@@ -307,149 +307,149 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
         // type MBEDGE
         {
             // source dim 0
-            { // target dim 0
-              { 1, 1 },  // 1 connected vertices for all vertices
+            {                      // target dim 0
+              { 1, 1 },            // 1 connected vertices for all vertices
               { { 1 }, { 0 } } },  // end target dimension 0
-            { // target dimension 1
-              { 1, 1 },  // 1 connected edges for all vertices
+            {                      // target dimension 1
+              { 1, 1 },            // 1 connected edges for all vertices
               { { 0 }, { 0 } } },  // end target dimension 1
-            { // target dimension 2
-              { 0 },  // 0 connected faces for all vertices
-              { { 0 } } },  // end target dimension 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 0
+            {                      // target dimension 2
+              { 0 },               // 0 connected faces for all vertices
+              { { 0 } } },         // end target dimension 2
+            {                      // target dimension 3
+              { 0 },               // 0 connected elements for all vertices
+              { { 0 } } }          // end target dimension 3
+        },                         // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
-              { 2 },  // 2 vertices for all edges
+            {                  // target dim 0
+              { 2 },           // 2 vertices for all edges
               { { 0, 1 } } },  // end target dim 0
-            { // target dim 1
-              { 0 },  // 0 edges for all edges
-              { { 0 } } },  // end target dim 1
-            { // target dim 2
-              { 0 },  // 2 faces for all edges
-              { { 0 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 1
+            {                  // target dim 1
+              { 0 },           // 0 edges for all edges
+              { { 0 } } },     // end target dim 1
+            {                  // target dim 2
+              { 0 },           // 2 faces for all edges
+              { { 0 } } },     // end target dim 2
+            {                  // target dimension 3
+              { 0 },           // 0 connected elements for all vertices
+              { { 0 } } }      // end target dimension 3
+        },                     // end source dim 1
 
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 2
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 3
-    },  // end type MBEDGE
+    },                                                                                               // end type MBEDGE
 
     {
         // type MBTRI
         {
             // source dim 0
-            { // target dim 0
-              { 2, 2, 2 },  // 2 connected vertices for all vertices
+            {                                      // target dim 0
+              { 2, 2, 2 },                         // 2 connected vertices for all vertices
               { { 1, 2 }, { 0, 2 }, { 0, 1 } } },  // end target dimension 0
-            { // target dimension 1
-              { 2, 2, 2 },  // 2 connected edges for all vertices
+            {                                      // target dimension 1
+              { 2, 2, 2 },                         // 2 connected edges for all vertices
               { { 0, 2 }, { 0, 1 }, { 1, 2 } } },  // end target dimension 1
-            { // target dimension 2
-              { 1, 1, 1 },  // 1 connected faces for all vertices
-              { { 0 }, { 0 }, { 0 } } },  // end target dimension 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 0
+            {                                      // target dimension 2
+              { 1, 1, 1 },                         // 1 connected faces for all vertices
+              { { 0 }, { 0 }, { 0 } } },           // end target dimension 2
+            {                                      // target dimension 3
+              { 0 },                               // 0 connected elements for all vertices
+              { { 0 } } }                          // end target dimension 3
+        },                                         // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
-              { 2, 2, 2 },  // 2 vertices for all edges
+            {                                      // target dim 0
+              { 2, 2, 2 },                         // 2 vertices for all edges
               { { 0, 1 }, { 1, 2 }, { 0, 2 } } },  // end target dim 0
-            { // target dim 1
-              { 2, 2, 2 },  // 2 edges for all edges
+            {                                      // target dim 1
+              { 2, 2, 2 },                         // 2 edges for all edges
               { { 1, 2 }, { 0, 2 }, { 0, 1 } } },  // end target dim 1
-            { // target dim 2
-              { 1, 1, 1 },  // 1 faces for all edges
-              { { 0 }, { 0 }, { 0 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 1
+            {                                      // target dim 2
+              { 1, 1, 1 },                         // 1 faces for all edges
+              { { 0 }, { 0 }, { 0 } } },           // end target dim 2
+            {                                      // target dimension 3
+              { 0 },                               // 0 connected elements for all vertices
+              { { 0 } } }                          // end target dimension 3
+        },                                         // end source dim 1
 
         {
             // source dim 2
-            { // target dim 0
-              { 3 },  // 3 vertices for all faces
+            {                     // target dim 0
+              { 3 },              // 3 vertices for all faces
               { { 0, 1, 2 } } },  // end target dim 0
-            { // target dim 1
-              { 3 },  // 3 edges for all faces
+            {                     // target dim 1
+              { 3 },              // 3 edges for all faces
               { { 0, 1, 2 } } },  // end target dim 1
-            { // target dim 2
-              { 0 },  // 0 faces for all faces
-              { { 0 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 2
+            {                     // target dim 2
+              { 0 },              // 0 faces for all faces
+              { { 0 } } },        // end target dim 2
+            {                     // target dimension 3
+              { 0 },              // 0 connected elements for all vertices
+              { { 0 } } }         // end target dimension 3
+        },                        // end source dim 2
 
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } }  // source dim 3
-    },  // end type MBTRI
+    },                                                                        // end type MBTRI
 
     {
         // type MBQUAD
         {
             // source dim 0
-            { // target dim 0
-              { 2, 2, 2, 2 },  // 2 connected vertices for all vertices
+            {                                                // target dim 0
+              { 2, 2, 2, 2 },                                // 2 connected vertices for all vertices
               { { 1, 3 }, { 0, 2 }, { 2, 3 }, { 0, 2 } } },  // end target dimension 0
-            { // target dimension 1
-              { 2, 2, 2, 2 },  // 2 connected edges for all vertices
+            {                                                // target dimension 1
+              { 2, 2, 2, 2 },                                // 2 connected edges for all vertices
               { { 0, 3 }, { 0, 1 }, { 1, 2 }, { 2, 3 } } },  // end target dimension 1
-            { // target dimension 2
-              { 1, 1, 1, 1 },  // 1 connected faces for all vertices
-              { { 0 }, { 0 }, { 0 }, { 0 } } },  // end target dimension 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 0
+            {                                                // target dimension 2
+              { 1, 1, 1, 1 },                                // 1 connected faces for all vertices
+              { { 0 }, { 0 }, { 0 }, { 0 } } },              // end target dimension 2
+            {                                                // target dimension 3
+              { 0 },                                         // 0 connected elements for all vertices
+              { { 0 } } }                                    // end target dimension 3
+        },                                                   // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
-              { 2, 2, 2, 2 },  // 2 vertices for all edges
+            {                                                // target dim 0
+              { 2, 2, 2, 2 },                                // 2 vertices for all edges
               { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 0, 3 } } },  // end target dim 0
-            { // target dim 1
-              { 2, 2, 2, 2 },  // 2 edges for all edges
+            {                                                // target dim 1
+              { 2, 2, 2, 2 },                                // 2 edges for all edges
               { { 1, 3 }, { 0, 2 }, { 1, 3 }, { 0, 2 } } },  // end target dim 1
-            { // target dim 2
-              { 1, 1, 1, 1 },  // 1 faces for all edges
-              { { 0 }, { 0 }, { 0 }, { 0 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 1
+            {                                                // target dim 2
+              { 1, 1, 1, 1 },                                // 1 faces for all edges
+              { { 0 }, { 0 }, { 0 }, { 0 } } },              // end target dim 2
+            {                                                // target dimension 3
+              { 0 },                                         // 0 connected elements for all vertices
+              { { 0 } } }                                    // end target dimension 3
+        },                                                   // end source dim 1
 
         {
             // source dim 2
-            { // target dim 0
-              { 4 },  // 4 vertices for all faces
+            {                        // target dim 0
+              { 4 },                 // 4 vertices for all faces
               { { 0, 1, 2, 3 } } },  // end target dim 0
-            { // target dim 1
-              { 4 },  // 4 edges for all faces
+            {                        // target dim 1
+              { 4 },                 // 4 edges for all faces
               { { 0, 1, 2, 3 } } },  // end target dim 1
-            { // target dim 2
-              { 0 },  // 4 faces for all faces
-              { { 0 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        },  // end source dim 2
+            {                        // target dim 2
+              { 0 },                 // 4 faces for all faces
+              { { 0 } } },           // end target dim 2
+            {                        // target dimension 3
+              { 0 },                 // 0 connected elements for all vertices
+              { { 0 } } }            // end target dimension 3
+        },                           // end source dim 2
 
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } }  // source dim 3
-    },  // end type MBQUAD
+    },                                                                        // end type MBQUAD
 
     {
         // type MBPOLYGON
-        { // source dim 0
+        {   // source dim 0
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -463,7 +463,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             { 0 },
             { { 0 } } } },  // end source dim 0
 
-        { // source dim 1
+        {   // source dim 1
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -477,7 +477,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             { 0 },
             { { 0 } } } },  // end source dim 1
 
-        { // source dim 2
+        {   // source dim 2
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -491,7 +491,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             { 0 },
             { { 0 } } } },  // end source dim 2
 
-        { // source dim 3
+        {   // source dim 3
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -504,104 +504,104 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
           { // target dimension 3
             { 0 },
             { { 0 } } } }  // end source dim 3
-    },  // end type MBPOLYGON
+    },                     // end type MBPOLYGON
 
     {
         // type MBTET
         {
             // source dim 0
-            { // target dim 0
-              { 3, 3, 3, 3 },  // 3 connected vertices for all vertices
+            {                                                            // target dim 0
+              { 3, 3, 3, 3 },                                            // 3 connected vertices for all vertices
               { { 1, 2, 3 }, { 0, 2, 3 }, { 0, 1, 3 }, { 0, 1, 2 } } },  // end target dimension 0
-            { // target dimension 1
-              { 3, 3, 3, 3 },  // 3 connected edges for all vertices
+            {                                                            // target dimension 1
+              { 3, 3, 3, 3 },                                            // 3 connected edges for all vertices
               { { 0, 2, 3 }, { 0, 1, 4 }, { 1, 2, 5 }, { 3, 4, 5 } } },  // end target dimension 1
-            { // target dimension 2
-              { 3, 3, 3, 3 },  // 3 connected faces for all vertices
+            {                                                            // target dimension 2
+              { 3, 3, 3, 3 },                                            // 3 connected faces for all vertices
               { { 0, 2, 3 }, { 0, 1, 3 }, { 1, 2, 3 }, { 0, 1, 2 } } },  // end target dimension 2
-            { // target dimension 3
-              { 1, 1, 1, 1 },  // 0 connected elements for all vertices
-              { { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 0
+            {                                                            // target dimension 3
+              { 1, 1, 1, 1 },                                            // 0 connected elements for all vertices
+              { { 0 }, { 0 }, { 0 }, { 0 } } }                           // end target dimension 3
+        },                                                               // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
-              { 2, 2, 2, 2, 2, 2 },  // 2 vertices for all edges
+            {                                                                    // target dim 0
+              { 2, 2, 2, 2, 2, 2 },                                              // 2 vertices for all edges
               { { 0, 1 }, { 1, 2 }, { 0, 2 }, { 0, 3 }, { 1, 3 }, { 2, 3 } } },  // end target dim 0
-            { // target dim 1
-              { 4, 4, 4, 4, 4, 4 },  // 4 edges for all edges
+            {                                                                    // target dim 1
+              { 4, 4, 4, 4, 4, 4 },                                              // 4 edges for all edges
               { { 1, 2, 3, 4 },
                 { 0, 2, 4, 5 },
                 { 0, 1, 3, 5 },
                 { 0, 2, 4, 5 },
                 { 0, 1, 3, 5 },
-                { 1, 2, 3, 4 } } },  // end target dim 1
-            { // target dim 2
-              { 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
+                { 1, 2, 3, 4 } } },                                              // end target dim 1
+            {                                                                    // target dim 2
+              { 2, 2, 2, 2, 2, 2 },                                              // 2 faces for all edges
               { { 0, 3 }, { 1, 3 }, { 2, 3 }, { 0, 2 }, { 0, 1 }, { 1, 2 } } },  // end target dim 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+            {                                                                    // target dimension 3
+              { 1, 1, 1, 1, 1, 1 },                           // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 1
+        },                                                    // end source dim 1
 
         {
             // source dim 2
-            { // target dim 0
-              { 3, 3, 3, 3 },  // 3 vertices for all faces
+            {                                                            // target dim 0
+              { 3, 3, 3, 3 },                                            // 3 vertices for all faces
               { { 0, 1, 3 }, { 1, 2, 3 }, { 0, 3, 2 }, { 0, 2, 1 } } },  // end target dim 0
-            { // target dim 1
-              { 3, 3, 3, 3 },  // 3 edges for all faces
+            {                                                            // target dim 1
+              { 3, 3, 3, 3 },                                            // 3 edges for all faces
               { { 0, 4, 3 }, { 1, 5, 4 }, { 3, 5, 2 }, { 2, 1, 0 } } },  // end target dim 1
-            { // target dim 2
-              { 3, 3, 3, 3 },  // 3 faces for all faces
+            {                                                            // target dim 2
+              { 3, 3, 3, 3 },                                            // 3 faces for all faces
               { { 3, 1, 2 }, { 3, 2, 0 }, { 0, 1, 3 }, { 2, 1, 0 } } },  // end target dim 2
-            { // target dimension 3
-              { 1, 1, 1, 1 },  // 0 connected elements for all vertices
-              { { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 2
+            {                                                            // target dimension 3
+              { 1, 1, 1, 1 },                                            // 0 connected elements for all vertices
+              { { 0 }, { 0 }, { 0 }, { 0 } } }                           // end target dimension 3
+        },                                                               // end source dim 2
 
         {
             // source dim 3
-            { // target dim 0
-              { 4 },  // 4 vertices for all elements
-              { { 0, 1, 2, 3 } } },  // end target dim 0
-            { // target dim 1
-              { 6 },  // 6 edges for all elements
+            {                              // target dim 0
+              { 4 },                       // 4 vertices for all elements
+              { { 0, 1, 2, 3 } } },        // end target dim 0
+            {                              // target dim 1
+              { 6 },                       // 6 edges for all elements
               { { 0, 1, 2, 3, 4, 5 } } },  // end target dim 1
-            { // target dim 2
-              { 4 },  // 4 faces for all elements
-              { { 0, 1, 2, 3 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        }  // end source dim 3
-    },  // end type MBTET
+            {                              // target dim 2
+              { 4 },                       // 4 faces for all elements
+              { { 0, 1, 2, 3 } } },        // end target dim 2
+            {                              // target dimension 3
+              { 0 },                       // 0 connected elements for all vertices
+              { { 0 } } }                  // end target dimension 3
+        }                                  // end source dim 3
+    },                                     // end type MBTET
 
     {
         // type MBPYRAMID
         {
             // source dim 0
-            { // target dim 0
+            {                     // target dim 0
               { 3, 3, 3, 3, 4 },  // 3 connected vertices for most vertices
               { { 1, 3, 4 }, { 0, 2, 4 }, { 1, 3, 4 }, { 0, 2, 4 }, { 0, 1, 2, 3 } } },  // end target dimension 0
-            { // target dimension 1
+            {                                                                            // target dimension 1
               { 3, 3, 3, 3, 4 },  // 3 connected edges for most vertices
               { { 0, 3, 4 }, { 0, 1, 5 }, { 1, 2, 6 }, { 2, 3, 7 }, { 4, 5, 6, 7 } } },  // end target dimension 1
-            { // target dimension 2
+            {                                                                            // target dimension 2
               { 3, 3, 3, 3, 4 },  // 3 connected faces for most vertices
               { { 0, 3, 4 }, { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 0, 1, 2, 3 } } },  // end target dimension 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+            {                                                                            // target dimension 3
+              { 1, 1, 1, 1, 1 },                       // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 0
+        },                                             // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
+            {                              // target dim 0
               { 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 vertices for all edges
               { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 0, 3 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } } },  // end target dim 0
-            { // target dim 1
+            {                                                                                        // target dim 1
               { 4, 4, 4, 4, 5, 5, 5, 5 },  // 4 edges for some edges, 5 for others
               { { 1, 3, 4, 5 },
                 { 0, 2, 5, 6 },
@@ -610,78 +610,78 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 0, 3, 5, 6, 7 },
                 { 0, 1, 4, 6, 7 },
                 { 1, 2, 4, 5, 7 },
-                { 2, 3, 4, 5, 6 } } },  // end target dim 1
-            { // target dim 2
+                { 2, 3, 4, 5, 6 } } },     // end target dim 1
+            {                              // target dim 2
               { 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
               { { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 }, { 0, 3 }, { 0, 1 }, { 1, 2 }, { 2, 3 } } },  // end target dim 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+            {                                                               // target dimension 3
+              { 1, 1, 1, 1, 1, 1, 1, 1 },                                   // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension
                                                                             // 3
-        },  // end source dim 1
+        },                                                                  // end source dim 1
 
         {
             // source dim 2
-            { // target dim 0
-              { 3, 3, 3, 3, 4 },  // 3 vertices for most edges
+            {                                                                            // target dim 0
+              { 3, 3, 3, 3, 4 },                                                         // 3 vertices for most edges
               { { 0, 1, 4 }, { 1, 2, 4 }, { 2, 3, 4 }, { 0, 3, 4 }, { 0, 1, 2, 3 } } },  // end target dim 0
-            { // target dim 1
-              { 3, 3, 3, 3, 4 },  // 3 edges for most faces
+            {                                                                            // target dim 1
+              { 3, 3, 3, 3, 4 },                                                         // 3 edges for most faces
               { { 0, 5, 4 }, { 1, 6, 5 }, { 6, 2, 7 }, { 3, 4, 7 }, { 0, 3, 2, 1 } } },  // end target dim 1
-            { // target dim 2
-              { 3, 3, 3, 3, 4 },  // 4 faces for most faces
+            {                                                                            // target dim 2
+              { 3, 3, 3, 3, 4 },                                                         // 4 faces for most faces
               { { 4, 1, 3 }, { 4, 2, 0 }, { 4, 3, 1 }, { 4, 0, 2 }, { 0, 1, 2, 3 } } },  // end target dim 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+            {                                                                            // target dimension 3
+              { 1, 1, 1, 1, 1 },                       // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 2
+        },                                             // end source dim 2
 
         {
             // source dim 3
-            { // target dim 0
-              { 5 },  // 5 vertices for all elements
-              { { 0, 1, 2, 3, 4 } } },  // end target dim 0
-            { // target dim 1
-              { 8 },  // 8 edges for all elements
+            {                                    // target dim 0
+              { 5 },                             // 5 vertices for all elements
+              { { 0, 1, 2, 3, 4 } } },           // end target dim 0
+            {                                    // target dim 1
+              { 8 },                             // 8 edges for all elements
               { { 0, 1, 2, 3, 4, 5, 6, 7 } } },  // end target dim 1
-            { // target dim 2
-              { 5 },  // 5 faces for all elements
-              { { 0, 1, 2, 3, 4 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        }  // end source dim 3
-    },  // end type MBPYRAMID
+            {                                    // target dim 2
+              { 5 },                             // 5 faces for all elements
+              { { 0, 1, 2, 3, 4 } } },           // end target dim 2
+            {                                    // target dimension 3
+              { 0 },                             // 0 connected elements for all vertices
+              { { 0 } } }                        // end target dimension 3
+        }                                        // end source dim 3
+    },                                           // end type MBPYRAMID
 
     {
         // type MBPRISM
         {
             // source dim 0
-            { // target dim 0
+            {                        // target dim 0
               { 3, 3, 3, 3, 3, 3 },  // 3 connected vertices for all vertices
               { { 1, 2, 3 }, { 0, 2, 4 }, { 0, 1, 5 }, { 0, 4, 5 }, { 1, 3, 5 }, { 2, 3, 4 } } },  // end target
                                                                                                    // dimension 0
-            { // target dimension 1
+            {                                                                                      // target dimension 1
               { 3, 3, 3, 3, 3, 3 },  // 3 connected edges for all vertices
               { { 0, 2, 3 }, { 0, 1, 4 }, { 1, 2, 5 }, { 3, 6, 8 }, { 4, 6, 7 }, { 5, 7, 8 } } },  // end target
                                                                                                    // dimension 1
-            { // target dimension 2
+            {                                                                                      // target dimension 2
               { 3, 3, 3, 3, 3, 3 },  // 3 connected faces for all vertices
               { { 0, 2, 3 }, { 0, 1, 3 }, { 1, 2, 3 }, { 0, 2, 4 }, { 0, 1, 4 }, { 1, 2, 4 } } },  // end target
                                                                                                    // dimension 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+            {                                                                                      // target dimension 3
+              { 1, 1, 1, 1, 1, 1 },                           // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 0
+        },                                                    // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
+            {                                 // target dim 0
               { 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 vertices for all edges
               { { 0, 1 }, { 1, 2 }, { 0, 2 }, { 0, 3 }, { 1, 4 }, { 2, 5 }, { 3, 4 }, { 4, 5 }, { 3, 5 } } },  // end
                                                                                                                // target
                                                                                                                // dim 0
-            { // target dim 1
+            {                                 // target dim 1
               { 4, 4, 4, 4, 4, 4, 4, 4, 4 },  // 4 edges for all edges
               { { 1, 2, 3, 4 },
                 { 0, 2, 4, 5 },
@@ -691,64 +691,64 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 1, 2, 7, 8 },
                 { 3, 4, 7, 8 },
                 { 4, 5, 7, 8 },
-                { 3, 5, 6, 7 } } },  // end target dim 1
-            { // target dim 2
+                { 3, 5, 6, 7 } } },           // end target dim 1
+            {                                 // target dim 2
               { 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
               { { 0, 3 }, { 1, 3 }, { 2, 3 }, { 0, 2 }, { 0, 1 }, { 1, 2 }, { 0, 4 }, { 1, 4 }, { 2, 4 } } },  // end
                                                                                                                // target
                                                                                                                // dim 2
-            { // target dimension 3
+            {                                 // target dimension 3
               { 1, 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target
                                                                                    // dimension 3
-        },  // end source dim 1
+        },                                                                         // end source dim 1
 
         {
             // source dim 2
-            { // target dim 0
+            {                     // target dim 0
               { 4, 4, 4, 3, 3 },  // 4 vertices for some faces, 3 for others
               { { 0, 1, 3, 4 }, { 1, 2, 4, 5 }, { 0, 2, 3, 5 }, { 0, 1, 2 }, { 3, 4, 5 } } },  // end target dim 0
-            { // target dim 1
+            {                                                                                  // target dim 1
               { 4, 4, 4, 3, 3 },  // 4 edges for some faces, 3 for others
               { { 0, 4, 6, 3 }, { 1, 5, 7, 4 }, { 2, 3, 8, 5 }, { 0, 2, 1 }, { 6, 7, 8 } } },  // end target dim 1
-            { // target dim 2
+            {                                                                                  // target dim 2
               { 4, 4, 4, 3, 3 },  // 4 faces for some faces, 3 for others
               { { 3, 1, 4, 2 }, { 3, 2, 4, 0 }, { 3, 0, 4, 1 }, { 0, 2, 1 }, { 0, 1, 2 } } },  // end target dim 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+            {                                                                                  // target dimension 3
+              { 1, 1, 1, 1, 1 },                       // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 2
+        },                                             // end source dim 2
 
         {
             // source dim 3
-            { // target dim 0
-              { 6 },  // 6 vertices for all elements
-              { { 0, 1, 2, 3, 4, 5 } } },  // end target dim 0
-            { // target dim 1
-              { 9 },  // 9 edges for all elements
+            {                                       // target dim 0
+              { 6 },                                // 6 vertices for all elements
+              { { 0, 1, 2, 3, 4, 5 } } },           // end target dim 0
+            {                                       // target dim 1
+              { 9 },                                // 9 edges for all elements
               { { 0, 1, 2, 3, 4, 5, 6, 7, 8 } } },  // end target dim 1
-            { // target dim 2
-              { 5 },  // 5 faces for all elements
-              { { 0, 1, 2, 3, 4 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        }  // end source dim 3
-    },  // end type MBPRISM
+            {                                       // target dim 2
+              { 5 },                                // 5 faces for all elements
+              { { 0, 1, 2, 3, 4 } } },              // end target dim 2
+            {                                       // target dimension 3
+              { 0 },                                // 0 connected elements for all vertices
+              { { 0 } } }                           // end target dimension 3
+        }                                           // end source dim 3
+    },                                              // end type MBPRISM
 
     {
         // type MBKNIFE
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 0
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 1
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 2
-        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } }  // source dim 3
-    },  // end type MBKNIFE
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } }   // source dim 3
+    },                                                                         // end type MBKNIFE
 
     {
         // type MBHEX
         {
             // source dim 0
-            { // target dim 0
+            {                              // target dim 0
               { 3, 3, 3, 3, 3, 3, 3, 3 },  // 3 connected vertices for all vertices
               { { 1, 3, 4 },
                 { 0, 2, 5 },
@@ -757,8 +757,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 0, 5, 7 },
                 { 1, 4, 6 },
                 { 2, 5, 7 },
-                { 3, 4, 6 } } },  // end target dimension 0
-            { // target dimension 1
+                { 3, 4, 6 } } },           // end target dimension 0
+            {                              // target dimension 1
               { 3, 3, 3, 3, 3, 3, 3, 3 },  // 3 connected edges for all vertices
               { { 0, 3, 4 },
                 { 0, 1, 5 },
@@ -767,8 +767,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 4, 8, 11 },
                 { 5, 8, 9 },
                 { 6, 9, 10 },
-                { 7, 10, 11 } } },  // end target dimension 1
-            { // target dimension 2
+                { 7, 10, 11 } } },         // end target dimension 1
+            {                              // target dimension 2
               { 3, 3, 3, 3, 3, 3, 3, 3 },  // 3 connected faces for all vertices
               { { 0, 3, 4 },
                 { 0, 1, 4 },
@@ -777,16 +777,16 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 0, 3, 5 },
                 { 0, 1, 5 },
                 { 1, 2, 5 },
-                { 2, 3, 5 } } },  // end target dimension 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+                { 2, 3, 5 } } },                                            // end target dimension 2
+            {                                                               // target dimension 3
+              { 1, 1, 1, 1, 1, 1, 1, 1 },                                   // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension
                                                                             // 3
-        },  // end source dim 0
+        },                                                                  // end source dim 0
 
         {
             // source dim 1
-            { // target dim 0
+            {                                          // target dim 0
               { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 vertices for all edges
               { { 0, 1 },
                 { 1, 2 },
@@ -799,8 +799,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 4, 5 },
                 { 5, 6 },
                 { 6, 7 },
-                { 4, 7 } } },  // end target dim 0
-            { // target dim 1
+                { 4, 7 } } },                          // end target dim 0
+            {                                          // target dim 1
               { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 },  // 4 edges for all edges
               { { 1, 3, 4, 5 },
                 { 0, 2, 5, 6 },
@@ -813,8 +813,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 4, 5, 9, 11 },
                 { 5, 6, 8, 10 },
                 { 6, 7, 9, 11 },
-                { 4, 7, 8, 10 } } },  // end target dim 1
-            { // target dim 2
+                { 4, 7, 8, 10 } } },                   // end target dim 1
+            {                                          // target dim 2
               { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
               { { 0, 4 },
                 { 1, 4 },
@@ -827,8 +827,8 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 0, 5 },
                 { 1, 5 },
                 { 2, 5 },
-                { 3, 5 } } },  // end target dim 2
-            { // target dimension 3
+                { 3, 5 } } },                          // end target dim 2
+            {                                          // target dimension 3
               { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target
                                                                                                         // dimension 3
@@ -836,7 +836,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
 
         {
             // source dim 2
-            { // target dim 0
+            {                        // target dim 0
               { 4, 4, 4, 4, 4, 4 },  // 4 vertices for all faces
               { { 0, 1, 4, 5 },
                 { 1, 2, 5, 6 },
@@ -844,7 +844,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 0, 3, 4, 7 },
                 { 0, 1, 2, 3 },
                 { 4, 5, 6, 7 } } },  // end target dim 0
-            { // target dim 1
+            {                        // target dim 1
               { 4, 4, 4, 4, 4, 4 },  // 4 edges for all faces
               { { 0, 5, 8, 4 },
                 { 1, 6, 9, 5 },
@@ -852,39 +852,39 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
                 { 3, 4, 11, 7 },
                 { 0, 3, 2, 1 },
                 { 8, 9, 10, 11 } } },  // end target dim 1
-            { // target dim 2
-              { 4, 4, 4, 4, 4, 4 },  // 4 faces for all faces
+            {                          // target dim 2
+              { 4, 4, 4, 4, 4, 4 },    // 4 faces for all faces
               { { 4, 1, 5, 3 },
                 { 4, 2, 5, 0 },
                 { 4, 3, 5, 1 },
                 { 4, 0, 5, 2 },
                 { 0, 3, 2, 1 },
-                { 0, 1, 2, 3 } } },  // end target dim 2
-            { // target dimension 3
-              { 1, 1, 1, 1, 1, 1 },  // 0 connected elements for all vertices
+                { 0, 1, 2, 3 } } },                           // end target dim 2
+            {                                                 // target dimension 3
+              { 1, 1, 1, 1, 1, 1 },                           // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
-        },  // end source dim 2
+        },                                                    // end source dim 2
 
         {
             // source dim 3
-            { // target dim 0
-              { 8 },  // 8 vertices for all elements
-              { { 0, 1, 2, 3, 4, 5, 6, 7 } } },  // end target dim 0
-            { // target dim 1
-              { 12 },  // 12 edges for all elements
+            {                                                  // target dim 0
+              { 8 },                                           // 8 vertices for all elements
+              { { 0, 1, 2, 3, 4, 5, 6, 7 } } },                // end target dim 0
+            {                                                  // target dim 1
+              { 12 },                                          // 12 edges for all elements
               { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 } } },  // end target dim 1
-            { // target dim 2
-              { 6 },  // 6 faces for all elements
-              { { 0, 1, 2, 3, 4, 5 } } },  // end target dim 2
-            { // target dimension 3
-              { 0 },  // 0 connected elements for all vertices
-              { { 0 } } }  // end target dimension 3
-        }  // end source dim 3
-    },  // end type MBHEX
+            {                                                  // target dim 2
+              { 6 },                                           // 6 faces for all elements
+              { { 0, 1, 2, 3, 4, 5 } } },                      // end target dim 2
+            {                                                  // target dimension 3
+              { 0 },                                           // 0 connected elements for all vertices
+              { { 0 } } }                                      // end target dimension 3
+        }                                                      // end source dim 3
+    },                                                         // end type MBHEX
 
     {
         // type MBPOLYHEDRON
-        { // source dim 0
+        {   // source dim 0
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -898,7 +898,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             { 0 },
             { { 0 } } } },  // end source dim 0
 
-        { // source dim 1
+        {   // source dim 1
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -912,7 +912,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             { 0 },
             { { 0 } } } },  // end source dim 1
 
-        { // source dim 2
+        {   // source dim 2
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -926,7 +926,7 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
             { 0 },
             { { 0 } } } },  // end source dim 2
 
-        { // source dim 3
+        {   // source dim 3
           { // target dim 0
             { 0 },
             { { 0 } } },
@@ -939,20 +939,20 @@ const CN::UpConnMap CN::mUpConnMap[ MBMAXTYPE ][ 4 ][ 4 ] = {
           { // target dimension 3
             { 0 },
             { { 0 } } } }  // end source dim 3
-    },  // end type MBPOLYHEDRON
+    },                     // end type MBPOLYHEDRON
 
     {
         // type MBENTITYSET
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 0
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 1
         { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } },  // source dim 2
-        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } }  // source dim 3
-    }  // end type MBENTITYSET
+        { { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } }, { { 0 }, { { 0 } } } }   // source dim 3
+    }                                                                          // end type MBENTITYSET
 };
-const unsigned char E = CN::MID_EDGE_BIT;
-const unsigned char F = CN::MID_FACE_BIT;
-const unsigned char R = CN::MID_REGION_BIT;
-const unsigned char CN::midNodesPerType[ MBMAXTYPE ][ MAX_NODES_PER_ELEMENT + 1 ] = {
+const unsigned char E                                                         = CN::MID_EDGE_BIT;
+const unsigned char F                                                         = CN::MID_FACE_BIT;
+const unsigned char R                                                         = CN::MID_REGION_BIT;
+const unsigned char CN::midNodesPerType[MBMAXTYPE][MAX_NODES_PER_ELEMENT + 1] = {
     // vertex
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     // edge

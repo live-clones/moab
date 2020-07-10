@@ -26,9 +26,9 @@ class FBEngine
   public:
     FBEngine( Interface* impl, GeomTopoTool* geomTopoTool = NULL, const bool smooth = false );
 
-    ~FBEngine( );
+    ~FBEngine();
 
-    ErrorCode Init( );
+    ErrorCode Init();
 
     ErrorCode getRootSet( EntityHandle* root_set );
 
@@ -67,7 +67,7 @@ class FBEngine
 
     ErrorCode createTag( const char* tag_name, int tag_num_type_values, int tag_type, Tag& tag_handle_out );
 
-    Interface* moab_instance( )
+    Interface* moab_instance()
     {
         return _mbImpl;
     }
@@ -118,13 +118,13 @@ class FBEngine
                                             EntityHandle& new_edge );
     // helper for cleaning the stuff
     // will be called if the topology is modified
-    void clean( );
+    void clean();
 
-    void delete_smooth_tags( );
+    void delete_smooth_tags();
 
     // access to the geom topo tool
     // be careful what you do with it
-    GeomTopoTool* get_gtt( )
+    GeomTopoTool* get_gtt()
     {
         return this->_my_geomTopoTool;
     }
@@ -155,13 +155,13 @@ class FBEngine
 
     ErrorCode get_vert_edges( EntityHandle edge, EntityHandle& v1, EntityHandle& v2 );
 
-    void set_smooth( )
+    void set_smooth()
     {
         _smooth = true;
     }
 
   private:
-    ErrorCode initializeSmoothing( );
+    ErrorCode initializeSmoothing();
 
     ErrorCode getAdjacentEntities( const EntityHandle from, const int to_dim, Range& adj_ents );
 
@@ -203,7 +203,7 @@ class FBEngine
 
     // split the quads if needed; it will create a new gtt, which will
     // contain triangles instead of quads
-    ErrorCode split_quads( );
+    ErrorCode split_quads();
 
     ErrorCode boundary_nodes_on_face( EntityHandle face, std::vector< EntityHandle >& boundary_nodes );
 
@@ -212,34 +212,34 @@ class FBEngine
     // used for splitting an edge
     ErrorCode split_internal_edge( EntityHandle& edge, EntityHandle& newVertex );
     // triangle split
-    ErrorCode  divide_triangle( EntityHandle triangle, EntityHandle& newVertex );
+    ErrorCode divide_triangle( EntityHandle triangle, EntityHandle& newVertex );
     Interface* _mbImpl;
 
     // this will be used during volume creation
-    ErrorCode set_default_neumann_tags( );
+    ErrorCode set_default_neumann_tags();
 
     ErrorCode chain_able_edge( EntityHandle edge, double min_dot, EntityHandle& next_edge, bool& chainable );
 
     GeomTopoTool* _my_geomTopoTool;
-    bool          _t_created;
-    bool          _smooth;
-    bool          _initialized;
+    bool _t_created;
+    bool _smooth;
+    bool _initialized;
     // these are initial ranges, that should not change during geometry gimmicks
     // those that are added are changing gtt ranges, but they are not yet "smoothed"
     // when new geometry is created, these ranges are not yet updated
-    Range _my_gsets[ 5 ];
+    Range _my_gsets[5];
     // these are used only for smooth evaluations
     // these smooth faces and edges will be initialized after reading the file
     // the maps keep the link between EH in moab (geom sets) and
     //   their corresponding smooth counterparts
-    std::map< EntityHandle, SmoothFace* >  _faces;
+    std::map< EntityHandle, SmoothFace* > _faces;
     std::map< EntityHandle, SmoothCurve* > _edges;
-    SmoothFace**                           _smthFace;
-    SmoothCurve**                          _smthCurve;
+    SmoothFace** _smthFace;
+    SmoothCurve** _smthCurve;
 
-    Range                                  _piercedTriangles;  // triangles to delete
-    Range                                  _newTriangles;
-    Range                                  _piercedEdges;  // edges to delete
+    Range _piercedTriangles;  // triangles to delete
+    Range _newTriangles;
+    Range _piercedEdges;                                  // edges to delete
     std::map< EntityHandle, EntityHandle > _brokenEdges;  // this is a map between splitting nodes and edges that
     // are broken on the boundary, by the polyline; the edges will be deleted in the end
     // new edges?

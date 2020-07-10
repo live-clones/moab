@@ -35,7 +35,7 @@
 namespace MBMesquite
 {
 
-WeightCalculator::~WeightCalculator( ) {}
+WeightCalculator::~WeightCalculator() {}
 
 void WeightCalculator::initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 

@@ -12,31 +12,31 @@ namespace moab
 class BoundBox
 {
   public:
-    BoundBox( ) : bMin( DBL_MAX ), bMax( -DBL_MAX ) {}
+    BoundBox() : bMin( DBL_MAX ), bMax( -DBL_MAX ) {}
     BoundBox( const CartVect& min, const CartVect& max ) : bMin( min ), bMax( max ) {}
     BoundBox( const double* corners );
     // constructor used in element maps
     BoundBox( std::vector< CartVect > points ) : bMin( DBL_MAX ), bMax( -DBL_MAX )
     {
-        for( size_t i = 0; i < points.size( ); i++ )
+        for( size_t i = 0; i < points.size(); i++ )
         {
-            update_min( points[ i ].array( ) );
-            update_max( points[ i ].array( ) );
+            update_min( points[i].array() );
+            update_max( points[i].array() );
         }
     }
-    ~BoundBox( ) {}
+    ~BoundBox() {}
 
-    bool      contains_point( const double* point, const double tol = 0.0 ) const;
-    bool      intersects_box( const BoundBox& b, const double tol = 0.0 ) const;
-    void      compute_center( CartVect& center );
-    void      update( const BoundBox& other_box );
-    void      update( const double* coords );
+    bool contains_point( const double* point, const double tol = 0.0 ) const;
+    bool intersects_box( const BoundBox& b, const double tol = 0.0 ) const;
+    void compute_center( CartVect& center );
+    void update( const BoundBox& other_box );
+    void update( const double* coords );
     ErrorCode update( Interface& iface, const Range& elems, bool spherical = false, double radius = 1. );
     ErrorCode update( Interface& iface, const EntityHandle ent, bool spherical = false, double radius = 1. );
-    void      update_min( const BoundBox& other_box );
-    void      update_min( const double* coords );
-    void      update_max( const BoundBox& other_box );
-    void      update_max( const double* coords );
+    void update_min( const BoundBox& other_box );
+    void update_min( const double* coords );
+    void update_max( const BoundBox& other_box );
+    void update_max( const double* coords );
     ErrorCode get( double* coords );
     /** in case of spherical elements, account for curvature if needed
      */
@@ -44,11 +44,11 @@ class BoundBox
 
     /** \brief Return the diagonal length of this box
      */
-    double diagonal_length( ) const;
+    double diagonal_length() const;
 
     /** \brief Return the square of the diagonal length of this box
      */
-    double diagonal_squared( ) const;
+    double diagonal_squared() const;
 
     /** \brief Return square of distance from box, or zero if inside
      * \param from_point Point from which you want distance_sq
@@ -77,15 +77,15 @@ class BoundBox
 inline BoundBox::BoundBox( const double* corners )
 {
     // relies on CartVect being Plain Old Data, no virtual table
-    double* arr = bMin.array( );
+    double* arr = bMin.array();
     for( int i = 0; i < 6; i++ )
-        arr[ i ] = corners[ i ];
+        arr[i] = corners[i];
 }
 
 inline bool BoundBox::contains_point( const double* point, const double tol ) const
 {
-    if( point[ 0 ] < bMin[ 0 ] - tol || point[ 0 ] > bMax[ 0 ] + tol || point[ 1 ] < bMin[ 1 ] - tol ||
-        point[ 1 ] > bMax[ 1 ] + tol || point[ 2 ] < bMin[ 2 ] - tol || point[ 2 ] > bMax[ 2 ] + tol )
+    if( point[0] < bMin[0] - tol || point[0] > bMax[0] + tol || point[1] < bMin[1] - tol || point[1] > bMax[1] + tol ||
+        point[2] < bMin[2] - tol || point[2] > bMax[2] + tol )
         return false;
     else
         return true;
@@ -93,8 +93,8 @@ inline bool BoundBox::contains_point( const double* point, const double tol ) co
 
 inline bool BoundBox::intersects_box( const BoundBox& b, const double tol ) const
 {
-    if( b.bMax[ 0 ] < bMin[ 0 ] - tol || b.bMin[ 0 ] > bMax[ 0 ] + tol || b.bMax[ 1 ] < bMin[ 1 ] - tol ||
-        b.bMin[ 1 ] > bMax[ 1 ] + tol || b.bMax[ 2 ] < bMin[ 2 ] - tol || b.bMin[ 2 ] > bMax[ 2 ] + tol )
+    if( b.bMax[0] < bMin[0] - tol || b.bMin[0] > bMax[0] + tol || b.bMax[1] < bMin[1] - tol ||
+        b.bMin[1] > bMax[1] + tol || b.bMax[2] < bMin[2] - tol || b.bMin[2] > bMax[2] + tol )
         return false;
 
     else
@@ -115,30 +115,30 @@ inline void BoundBox::update( const double* coords )
 
 inline void BoundBox::update_min( const BoundBox& other_box )
 {
-    bMin[ 0 ] = std::min( bMin[ 0 ], other_box.bMin[ 0 ] );
-    bMin[ 1 ] = std::min( bMin[ 1 ], other_box.bMin[ 1 ] );
-    bMin[ 2 ] = std::min( bMin[ 2 ], other_box.bMin[ 2 ] );
+    bMin[0] = std::min( bMin[0], other_box.bMin[0] );
+    bMin[1] = std::min( bMin[1], other_box.bMin[1] );
+    bMin[2] = std::min( bMin[2], other_box.bMin[2] );
 }
 
 inline void BoundBox::update_min( const double* coords )
 {
-    bMin[ 0 ] = std::min( bMin[ 0 ], coords[ 0 ] );
-    bMin[ 1 ] = std::min( bMin[ 1 ], coords[ 1 ] );
-    bMin[ 2 ] = std::min( bMin[ 2 ], coords[ 2 ] );
+    bMin[0] = std::min( bMin[0], coords[0] );
+    bMin[1] = std::min( bMin[1], coords[1] );
+    bMin[2] = std::min( bMin[2], coords[2] );
 }
 
 inline void BoundBox::update_max( const BoundBox& other_box )
 {
-    bMax[ 0 ] = std::max( bMax[ 0 ], other_box.bMax[ 0 ] );
-    bMax[ 1 ] = std::max( bMax[ 1 ], other_box.bMax[ 1 ] );
-    bMax[ 2 ] = std::max( bMax[ 2 ], other_box.bMax[ 2 ] );
+    bMax[0] = std::max( bMax[0], other_box.bMax[0] );
+    bMax[1] = std::max( bMax[1], other_box.bMax[1] );
+    bMax[2] = std::max( bMax[2], other_box.bMax[2] );
 }
 
 inline void BoundBox::update_max( const double* coords )
 {
-    bMax[ 0 ] = std::max( bMax[ 0 ], coords[ 0 ] );
-    bMax[ 1 ] = std::max( bMax[ 1 ], coords[ 1 ] );
-    bMax[ 2 ] = std::max( bMax[ 2 ], coords[ 2 ] );
+    bMax[0] = std::max( bMax[0], coords[0] );
+    bMax[1] = std::max( bMax[1], coords[1] );
+    bMax[2] = std::max( bMax[2], coords[2] );
 }
 
 inline ErrorCode BoundBox::get( double* coords )
@@ -173,10 +173,10 @@ inline double BoundBox::distance_squared( const double* from_point ) const
     double dist_sq = 0.0;
     for( int i = 0; i < 3; ++i )
     {
-        if( from_point[ i ] < bMin[ i ] )
-            dist_sq += ( bMin[ i ] - from_point[ i ] ) * ( bMin[ i ] - from_point[ i ] );
-        else if( from_point[ i ] > bMax[ i ] )
-            dist_sq += ( bMax[ i ] - from_point[ i ] ) * ( bMax[ i ] - from_point[ i ] );
+        if( from_point[i] < bMin[i] )
+            dist_sq += ( bMin[i] - from_point[i] ) * ( bMin[i] - from_point[i] );
+        else if( from_point[i] > bMax[i] )
+            dist_sq += ( bMax[i] - from_point[i] ) * ( bMax[i] - from_point[i] );
     }
     return dist_sq;
 }
@@ -187,20 +187,20 @@ inline double BoundBox::distance( const double* from_point ) const
     return sqrt( dist_sq );
 }
 
-inline double BoundBox::diagonal_length( ) const
+inline double BoundBox::diagonal_length() const
 {
-    if( DBL_MAX == bMax[ 0 ] || DBL_MAX == bMax[ 1 ] || DBL_MAX == bMax[ 2 ] || DBL_MAX == bMin[ 0 ] ||
-        DBL_MAX == bMin[ 1 ] || DBL_MAX == bMin[ 2 ] )
+    if( DBL_MAX == bMax[0] || DBL_MAX == bMax[1] || DBL_MAX == bMax[2] || DBL_MAX == bMin[0] || DBL_MAX == bMin[1] ||
+        DBL_MAX == bMin[2] )
         return DBL_MAX;
-    return ( bMax - bMin ).length( );
+    return ( bMax - bMin ).length();
 }
 
-inline double BoundBox::diagonal_squared( ) const
+inline double BoundBox::diagonal_squared() const
 {
-    if( DBL_MAX == bMax[ 0 ] || DBL_MAX == bMax[ 1 ] || DBL_MAX == bMax[ 2 ] || DBL_MAX == bMin[ 0 ] ||
-        DBL_MAX == bMin[ 1 ] || DBL_MAX == bMin[ 2 ] )
+    if( DBL_MAX == bMax[0] || DBL_MAX == bMax[1] || DBL_MAX == bMax[2] || DBL_MAX == bMin[0] || DBL_MAX == bMin[1] ||
+        DBL_MAX == bMin[2] )
         return DBL_MAX;
-    return ( bMax - bMin ).length_squared( );
+    return ( bMax - bMin ).length_squared();
 }
 
 }  // namespace moab

@@ -123,7 +123,7 @@ class ReadRTT : public ReaderIface
     ReadRTT( Interface* impl = NULL );
 
     // destructor
-    virtual ~ReadRTT( );
+    virtual ~ReadRTT();
 
     // implementation empty
     ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
@@ -143,50 +143,50 @@ class ReadRTT : public ReaderIface
     // structure to hold sense & vol data
     struct boundary
     {
-        int         sense;
+        int sense;
         std::string name;
     };
 
     // structure to hold side data
     struct side
     {
-        int         id;
-        int         senses[ 2 ];
-        std::string names[ 2 ];
-        side( ) : id( 0 )
+        int id;
+        int senses[2];
+        std::string names[2];
+        side() : id( 0 )
         {
-            senses[ 0 ] = senses[ 1 ] = 0;
-            names[ 0 ] = names[ 1 ] = "";
+            senses[0] = senses[1] = 0;
+            names[0] = names[1] = "";
         }
     };
 
     // structure to hold cell data
     struct cell
     {
-        int         id;
+        int id;
         std::string name;
-        cell( ) : id( 0 ), name( "" ) {}
+        cell() : id( 0 ), name( "" ) {}
     };
 
     // structure to hold node data
     struct node
     {
-        int    id;
+        int id;
         double x, y, z;
-        node( ) : id( 0 ), x( 0. ), y( 0. ), z( 0. ) {}
+        node() : id( 0 ), x( 0. ), y( 0. ), z( 0. ) {}
     };
 
     // structure to hold facet data
     struct facet
     {
         int id;
-        int connectivity[ 3 ];
+        int connectivity[3];
         int side_id;
         int surface_number;
-        facet( ) : id( 0 ), side_id( 0 ), surface_number( 0 )
+        facet() : id( 0 ), side_id( 0 ), surface_number( 0 )
         {
             for( int k = 0; k < 3; k++ )
-                connectivity[ k ] = 0;
+                connectivity[k] = 0;
         }
     };
 
@@ -194,13 +194,13 @@ class ReadRTT : public ReaderIface
     struct tet
     {
         int id;
-        int connectivity[ 4 ];
+        int connectivity[4];
         int material_number;
         // with c++11 we could use tet(): id(0), connectivity({0}), material_number(0) {}
-        tet( ) : id( 0 ), material_number( 0 )
+        tet() : id( 0 ), material_number( 0 )
         {
             for( int k = 0; k < 4; k++ )
-                connectivity[ k ] = 0;
+                connectivity[k] = 0;
         }
     };
 
@@ -231,7 +231,7 @@ class ReadRTT : public ReaderIface
      * @param cell_data, vector of the cell data in the problem
      *
      */
-    void generate_parent_child_links( int num_ents[ 4 ], std::vector< EntityHandle > entity_map[ 4 ],
+    void generate_parent_child_links( int num_ents[4], std::vector< EntityHandle > entity_map[4],
                                       std::vector< side > side_data, std::vector< cell > cell_data );
     /**
      * Sets the appropriate surface senses for each surface in the problem. By looping through all
@@ -244,8 +244,8 @@ class ReadRTT : public ReaderIface
      * @param cell_data, vector of the cell data in the problem
      *
      */
-    void set_surface_senses( int num_ents[ 4 ], std::vector< EntityHandle > entity_map[ 4 ],
-                             std::vector< side > side_data, std::vector< cell > cell_data );
+    void set_surface_senses( int num_ents[4], std::vector< EntityHandle > entity_map[4], std::vector< side > side_data,
+                             std::vector< cell > cell_data );
 
     /**
      * creates the group data requried for dagmc, reflecting planes, material assignments etc
@@ -253,7 +253,7 @@ class ReadRTT : public ReaderIface
      *
      * @returns moab::ErrorCode
      */
-    ErrorCode setup_group_data( std::vector< EntityHandle > entity_map[ 4 ] );
+    ErrorCode setup_group_data( std::vector< EntityHandle > entity_map[4] );
 
     /**
      * create a group of a given name, mustkeep track of id

@@ -79,12 +79,12 @@ class ExoIIInterface
   public:
     enum
     {
-        MAX_STR_LENGTH = 33,
+        MAX_STR_LENGTH  = 33,
         MAX_LINE_LENGTH = 80
     };
 
-    ExoIIInterface( ) {}
-    virtual ~ExoIIInterface( ) {}
+    ExoIIInterface() {}
+    virtual ~ExoIIInterface() {}
 
     //! given the element name, return the type
     virtual ExoIIElementType element_name_to_type( const char* name ) = 0;
@@ -95,8 +95,8 @@ class ExoIIInterface
     virtual ExoIIElementType get_element_type( EntityHandle entity, Tag mid_nodes_tag, Tag geom_dimension_tag,
                                                EntityType indiv_entity_type = MBMAXTYPE ) = 0;
 
-    virtual int  has_mid_nodes( ExoIIElementType elem_type, int dimension ) = 0;
-    virtual void has_mid_nodes( ExoIIElementType elem_type, int* array ) = 0;
+    virtual int has_mid_nodes( ExoIIElementType elem_type, int dimension ) = 0;
+    virtual void has_mid_nodes( ExoIIElementType elem_type, int* array )   = 0;
 
     virtual const char* element_type_name( ExoIIElementType type ) = 0;
 

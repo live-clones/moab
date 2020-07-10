@@ -43,19 +43,19 @@ class PatchIterator
 
     bool get_next_patch( PatchData&, MsqError& err );
 
-    PatchSet* get_patch_set( ) const
+    PatchSet* get_patch_set() const
     {
         return patchSet;
     }
 
-    void reset( );  //!< reset current position to beginning o
+    void reset();  //!< reset current position to beginning o
 
   private:
     PatchSet* patchSet;
 
-    std::vector< PatchSet::PatchHandle >           patches;
-    std::vector< Mesh::ElementHandle >             elems;
-    std::vector< Mesh::VertexHandle >              verts;
+    std::vector< PatchSet::PatchHandle > patches;
+    std::vector< Mesh::ElementHandle > elems;
+    std::vector< Mesh::VertexHandle > verts;
     std::vector< PatchSet::PatchHandle >::iterator current;
 };
 

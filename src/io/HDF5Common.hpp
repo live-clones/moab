@@ -15,6 +15,6 @@ typedef herr_t ( *HDF5_Error_Func_Type )( void* );
 #endif
 }
 
-bool HDF5_can_append_hyperslabs( );
+bool HDF5_can_append_hyperslabs();
 
 }  // namespace moab

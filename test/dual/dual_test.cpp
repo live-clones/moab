@@ -10,14 +10,14 @@
 
 using namespace moab;
 
-std::string default_input = TestDir + "/hex01.vtk";
-const char  default_output[] = "dual.vtk";
+std::string default_input   = TestDir + "/hex01.vtk";
+const char default_output[] = "dual.vtk";
 
 Interface* gMB;
 
 int main( int argc, char* argv[] )
 {
-    const char* f1 = default_input.c_str( );
+    const char* f1 = default_input.c_str();
     const char* f2 = default_output;
     if( argc <= 2 )
     {
@@ -26,17 +26,17 @@ int main( int argc, char* argv[] )
     }
     else
     {
-        f1 = argv[ 1 ];
-        f2 = argv[ 2 ];
+        f1 = argv[1];
+        f2 = argv[2];
     }
 
-    gMB = new Core( );
+    gMB = new Core();
 
     // read the mesh file
     ErrorCode result = gMB->load_mesh( f1 );
     if( MB_SUCCESS != result )
     {
-        std::cout << "Problems reading file " << argv[ 1 ] << "." << std::endl;
+        std::cout << "Problems reading file " << argv[1] << "." << std::endl;
         delete gMB;
         return 1;
     }
@@ -82,16 +82,16 @@ int main( int argc, char* argv[] )
     if( MB_SUCCESS != result )
         std::cout << "Problem getting dual faces." << std::endl;
     else
-        std::cout << "Found " << dual_faces.size( ) << "/" << num_edges << " dual faces." << std::endl;
+        std::cout << "Found " << dual_faces.size() << "/" << num_edges << " dual faces." << std::endl;
 
     result = dt.get_dual_entities( 0, 0, 3, dual_cells );
     if( MB_SUCCESS != result )
         std::cout << "Problem getting dual cells." << std::endl;
     else
-        std::cout << "Found " << dual_cells.size( ) << "/" << all_verts.size( ) << " dual cells." << std::endl;
+        std::cout << "Found " << dual_cells.size() << "/" << all_verts.size() << " dual cells." << std::endl;
 
     // print information about dual hyperplanes, if any
-    Tag   hp_tag;
+    Tag hp_tag;
     Range hp_sets;
     if( num_2d == num_quad )
     {
@@ -100,8 +100,8 @@ int main( int argc, char* argv[] )
         if( MB_SUCCESS == result )
         {
             result = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, &hp_tag, NULL, 1, hp_sets );
-            if( MB_SUCCESS == result && !hp_sets.empty( ) )
-                std::cout << "Found " << hp_sets.size( ) << " 1d dual hyperplanes (chords)." << std::endl;
+            if( MB_SUCCESS == result && !hp_sets.empty() )
+                std::cout << "Found " << hp_sets.size() << " 1d dual hyperplanes (chords)." << std::endl;
         }
     }
 
@@ -111,10 +111,10 @@ int main( int argc, char* argv[] )
         result = gMB->tag_get_handle( DualTool::DUAL_SURFACE_TAG_NAME, 1, MB_TYPE_HANDLE, hp_tag );
         if( MB_SUCCESS == result )
         {
-            hp_sets.clear( );
+            hp_sets.clear();
             result = gMB->get_entities_by_type_and_tag( 0, MBENTITYSET, &hp_tag, NULL, 1, hp_sets );
-            if( MB_SUCCESS == result && !hp_sets.empty( ) )
-                std::cout << "Found " << hp_sets.size( ) << " 2d dual hyperplanes (sheets)." << std::endl;
+            if( MB_SUCCESS == result && !hp_sets.empty() )
+                std::cout << "Found " << hp_sets.size() << " 2d dual hyperplanes (sheets)." << std::endl;
         }
     }
 

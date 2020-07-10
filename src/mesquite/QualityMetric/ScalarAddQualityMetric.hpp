@@ -44,18 +44,18 @@ class ScalarAddQualityMetric : public QualityMetric
   public:
     ScalarAddQualityMetric( QualityMetric* metric, double offset ) : mMetric( metric ), mOffset( offset ) {}
 
-    ~ScalarAddQualityMetric( ) {}
+    ~ScalarAddQualityMetric() {}
 
-    MetricType get_metric_type( ) const
+    MetricType get_metric_type() const
     {
-        return mMetric->get_metric_type( );
+        return mMetric->get_metric_type();
     }
 
-    std::string get_name( ) const;
+    std::string get_name() const;
 
-    int get_negate_flag( ) const
+    int get_negate_flag() const
     {
-        return mMetric->get_negate_flag( );
+        return mMetric->get_negate_flag();
     }
 
     void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err );
@@ -73,7 +73,7 @@ class ScalarAddQualityMetric : public QualityMetric
 
   private:
     QualityMetric* mMetric;
-    double         mOffset;
+    double mOffset;
 };
 
 }  // namespace MBMesquite

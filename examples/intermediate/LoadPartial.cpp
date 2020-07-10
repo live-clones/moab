@@ -28,13 +28,13 @@ ErrorCode get_file_options( int argc, char** argv, string& filename, string& tag
 {
     // Get mesh filename
     if( argc > 1 )
-        filename = string( argv[ 1 ] );
+        filename = string( argv[1] );
     else
         filename = string( MESH_DIR ) + string( "/64bricks_512hex_256part.h5m" );
 
     // Get tag selection options
     if( argc > 2 )
-        tagName = string( argv[ 2 ] );
+        tagName = string( argv[2] );
     else
         tagName = "USERTAG";
 
@@ -42,16 +42,16 @@ ErrorCode get_file_options( int argc, char** argv, string& filename, string& tag
     {
         tagValues.resize( argc - 3, 0 );
         for( int i = 3; i < argc; ++i )
-            tagValues[ i - 3 ] = atoi( argv[ i ] );
+            tagValues[i - 3] = atoi( argv[i] );
     }
     else
     {
-        for( unsigned i = 0; i < tagValues.size( ); ++i )
-            tagValues[ i ] = 2 * i + 1;
+        for( unsigned i = 0; i < tagValues.size(); ++i )
+            tagValues[i] = 2 * i + 1;
     }
 
     if( argc > 1 && argc < 4 )  // print usage
-        cout << " usage is " << argv[ 0 ] << " <file> <tag_name> <value1> <value2> .. \n";
+        cout << " usage is " << argv[0] << " <file> <tag_name> <value1> <value2> .. \n";
     return MB_SUCCESS;
 }
 
@@ -61,13 +61,13 @@ int main( int argc, char** argv )
     Interface* mb = new( std::nothrow ) Core;
     if( NULL == mb ) return 1;
 
-    std::string   filename, tagname;
+    std::string filename, tagname;
     vector< int > tagvals( NTAGVALS );  // Allocate for a maximum of 5 tag values
-    ErrorCode     rval = get_file_options( argc, argv, filename, tagname, tagvals );MB_CHK_ERR( rval );
+    ErrorCode rval = get_file_options( argc, argv, filename, tagname, tagvals );MB_CHK_ERR( rval );
 
 #ifdef MOAB_HAVE_HDF5
     // This file is in the mesh files directory
-    rval = mb->load_file( filename.c_str( ), 0, 0, PARALLEL_PARTITION_TAG_NAME, tagvals.data( ), (int)tagvals.size( ) );MB_CHK_SET_ERR( rval, "Failed to read" );
+    rval = mb->load_file( filename.c_str(), 0, 0, PARALLEL_PARTITION_TAG_NAME, tagvals.data(), (int)tagvals.size() );MB_CHK_SET_ERR( rval, "Failed to read" );
 
     // If HANDLEID tag present, convert to long, and see what we read from file
     Tag handleid_tag;
@@ -77,10 +77,9 @@ int main( int argc, char** argv )
         // Convert a few values for a few vertices
         Range verts;
         rval = mb->get_entities_by_type( 0, MBVERTEX, verts );MB_CHK_SET_ERR( rval, "Failed to get vertices" );
-        vector< long > valsTag( verts.size( ) );
-        rval = mb->tag_get_data( handleid_tag, verts, &valsTag[ 0 ] );
-        if( MB_SUCCESS == rval )
-            cout << "First 2 long values recovered: " << valsTag[ 0 ] << " " << valsTag[ 1 ] << "\n";
+        vector< long > valsTag( verts.size() );
+        rval = mb->tag_get_data( handleid_tag, verts, &valsTag[0] );
+        if( MB_SUCCESS == rval ) cout << "First 2 long values recovered: " << valsTag[0] << " " << valsTag[1] << "\n";
     }
 
     rval = mb->write_file( "part.h5m" );MB_CHK_SET_ERR( rval, "Failed to write partial file" );

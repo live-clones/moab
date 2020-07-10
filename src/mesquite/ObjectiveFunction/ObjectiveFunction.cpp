@@ -46,7 +46,7 @@
 namespace MBMesquite
 {
 
-ObjectiveFunction::~ObjectiveFunction( ) {}
+ObjectiveFunction::~ObjectiveFunction() {}
 
 /*!Returns an appropiate value (eps) to use as a delta step for
   MsqVertex vertex in dimension k (i.e. k=0 -> x, k=1 -> y, k=2 -> z).
@@ -56,23 +56,23 @@ ObjectiveFunction::~ObjectiveFunction( ) {}
 double ObjectiveFunction::get_eps( PatchData& pd, EvalType type, double& local_val, int dim, size_t vertex_index,
                                    MsqError& err )
 {
-    double       eps = 1.e-07;
+    double eps       = 1.e-07;
     const double rho = 0.5;
-    const int    imax = 20;
-    bool         feasible = false;
-    double       tmp_var = 0.0;
-    Vector3D     delta( 0, 0, 0 );
+    const int imax   = 20;
+    bool feasible    = false;
+    double tmp_var   = 0.0;
+    Vector3D delta( 0, 0, 0 );
     for( int i = 0; i < imax; ++i )
     {
         // perturb kth coord val and check feas if needed
-        tmp_var = pd.vertex_by_index( vertex_index )[ dim ];
-        delta[ dim ] = eps;
+        tmp_var    = pd.vertex_by_index( vertex_index )[dim];
+        delta[dim] = eps;
         pd.move_vertex( delta, vertex_index, err );
         feasible = evaluate( type, pd, local_val, OF_FREE_EVALS_ONLY, err );
         MSQ_ERRZERO( err );
         // revert kth coord val
-        delta = pd.vertex_by_index( vertex_index );
-        delta[ dim ] = tmp_var;
+        delta      = pd.vertex_by_index( vertex_index );
+        delta[dim] = tmp_var;
         pd.set_vertex_coordinates( delta, vertex_index, err );
         // if step was too big, shorten it and go again
         if( feasible )
@@ -86,10 +86,10 @@ double ObjectiveFunction::get_eps( PatchData& pd, EvalType type, double& local_v
 bool ObjectiveFunction::compute_subpatch_numerical_gradient( EvalType type, EvalType subtype, PatchData& pd,
                                                              double& flocal, Vector3D& grad, MsqError& err )
 {
-    assert( pd.num_free_vertices( ) == 1 );
+    assert( pd.num_free_vertices() == 1 );
 
     double flocald = 0;
-    double eps = 0;
+    double eps     = 0;
 
     bool b = evaluate( type, pd, flocal, OF_FREE_EVALS_ONLY, err );
     if( MSQ_CHKERR( err ) || !b ) { return false; }
@@ -105,7 +105,7 @@ bool ObjectiveFunction::compute_subpatch_numerical_gradient( EvalType type, Eval
             ( "Dividing by zero in Objective Functions numerical grad", MsqError::INVALID_STATE );
             return false;
         }
-        grad[ j ] = ( flocald - flocal ) / eps;
+        grad[j] = ( flocald - flocal ) / eps;
     }
     return true;
 }
@@ -114,12 +114,12 @@ bool ObjectiveFunction::compute_patch_numerical_gradient( EvalType type, EvalTyp
                                                           double& flocal, std::vector< Vector3D >& grad, MsqError& err )
 {
     double flocald = 0;
-    double eps = 0;
+    double eps     = 0;
 
     bool b = evaluate( type, pd, flocal, OF_FREE_EVALS_ONLY, err );
     if( MSQ_CHKERR( err ) || !b ) { return false; }
 
-    for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
+    for( size_t i = 0; i < pd.num_free_vertices(); ++i )
     {
         // loop over the three coords x,y,z
         for( int j = 0; j < 3; ++j )
@@ -132,7 +132,7 @@ bool ObjectiveFunction::compute_patch_numerical_gradient( EvalType type, EvalTyp
                 ( "Dividing by zero in Objective Functions numerical grad", MsqError::INVALID_STATE );
                 return false;
             }
-            grad[ i ][ j ] = ( flocald - flocal ) / eps;
+            grad[i][j] = ( flocald - flocal ) / eps;
         }
     }
 
@@ -163,26 +163,26 @@ bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type, PatchData& p
                                                 std::vector< Vector3D >& grad, MsqError& err )
 {
     bool b;
-    grad.resize( pd.num_free_vertices( ) );
+    grad.resize( pd.num_free_vertices() );
 
     // Fast path for single-free-vertex patch
-    if( pd.num_free_vertices( ) == 1 )
+    if( pd.num_free_vertices() == 1 )
     {
         const EvalType sub_type = ( eval_type == CALCULATE ) ? CALCULATE : TEMPORARY;
-        b = compute_subpatch_numerical_gradient( eval_type, sub_type, pd, OF_val, grad[ 0 ], err );
+        b                       = compute_subpatch_numerical_gradient( eval_type, sub_type, pd, OF_val, grad[0], err );
         return !MSQ_CHKERR( err ) && b;
     }
 
-    ObjectiveFunction*                 of = this;
+    ObjectiveFunction* of = this;
     std::auto_ptr< ObjectiveFunction > deleter;
     if( eval_type == CALCULATE )
     {
-        of->clear( );
+        of->clear();
         b = of->evaluate( ACCUMULATE, pd, OF_val, OF_FREE_EVALS_ONLY, err );
         if( err )
         {  // OF doesn't support BCD type evals, try slow method
-            err.clear( );
-            of->clear( );
+            err.clear();
+            of->clear();
             b = compute_patch_numerical_gradient( CALCULATE, CALCULATE, pd, OF_val, grad, err );
             return !MSQ_CHKERR( err ) && b;
         }
@@ -193,35 +193,35 @@ bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type, PatchData& p
     {
         b = this->evaluate( eval_type, pd, OF_val, OF_FREE_EVALS_ONLY, err );
         if( MSQ_CHKERR( err ) || !b ) return false;
-        of = this->clone( );
+        of      = this->clone();
         deleter = std::auto_ptr< ObjectiveFunction >( of );
     }
 
     // Determine number of layers of adjacent elements based on metric type.
-    unsigned layers = min_patch_layers( );
+    unsigned layers = min_patch_layers();
 
     // Create a subpatch for each free vertex and use it to evaluate the
     // gradient for that vertex.
-    double    flocal;
+    double flocal;
     PatchData subpatch;
-    for( size_t i = 0; i < pd.num_free_vertices( ); ++i )
+    for( size_t i = 0; i < pd.num_free_vertices(); ++i )
     {
         pd.get_subpatch( i, layers, subpatch, err );
         MSQ_ERRZERO( err );
-        b = of->compute_subpatch_numerical_gradient( SAVE, TEMPORARY, subpatch, flocal, grad[ i ], err );
+        b = of->compute_subpatch_numerical_gradient( SAVE, TEMPORARY, subpatch, flocal, grad[i], err );
         if( MSQ_CHKERR( err ) || !b )
         {
-            of->clear( );
+            of->clear();
             return false;
         }
     }
 
-    of->clear( );
+    of->clear();
     return true;
 }
 
 bool ObjectiveFunction::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
-                                                        std::vector< Vector3D >&    grad_out,
+                                                        std::vector< Vector3D >& grad_out,
                                                         std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
 {
     MsqHessian hess;
@@ -229,9 +229,9 @@ bool ObjectiveFunction::evaluate_with_Hessian_diagonal( EvalType type, PatchData
     MSQ_ERRZERO( err );
     bool val = evaluate_with_Hessian( type, pd, value_out, grad_out, hess, err );
     MSQ_ERRZERO( err );
-    hess_diag_out.resize( hess.size( ) );
-    for( size_t i = 0; i < hess.size( ); ++i )
-        hess_diag_out[ i ] = hess.get_block( i, i )->upper( );
+    hess_diag_out.resize( hess.size() );
+    for( size_t i = 0; i < hess.size(); ++i )
+        hess_diag_out[i] = hess.get_block( i, i )->upper();
     return val;
 }
 

@@ -36,7 +36,7 @@ class QuadraticHex
      * the element */
     static int insideFcn( const double* params, const int ndim, const double tol );
 
-    static EvalSet eval_set( )
+    static EvalSet eval_set()
     {
         return EvalSet( evalFcn, reverseEvalFcn, normalFcn, jacobianFcn, integrateFcn, NULL, insideFcn );
     }
@@ -45,7 +45,7 @@ class QuadraticHex
     {
         if( tp == MBHEX && numv == 27 )
         {
-            eset = eval_set( );
+            eset = eval_set();
             return true;
         }
         else
@@ -57,10 +57,10 @@ class QuadraticHex
     static double DSH( const int i, const double params );
 
     /* Preimages of the vertices -- "canonical vertices" -- are known as "corners". */
-    static const int          corner[ 27 ][ 3 ];
-    static const double       gauss[ 8 ][ 2 ];  // TODO fix me
+    static const int corner[27][3];
+    static const double gauss[8][2];  // TODO fix me
     static const unsigned int corner_count = 27;
-    static const unsigned int gauss_count = 8;  // TODO fix me
+    static const unsigned int gauss_count  = 8;  // TODO fix me
 
 };  // class QuadraticHex
 

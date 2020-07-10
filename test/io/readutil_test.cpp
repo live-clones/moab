@@ -20,7 +20,7 @@ using namespace moab;
         }                                                                                                  \
     } while( false )
 
-ErrorCode gather_related_test( )
+ErrorCode gather_related_test()
 {
     // create an entityset structure and test related entities function
     // sets: A
@@ -31,8 +31,8 @@ ErrorCode gather_related_test( )
     // if D is passed in to gather_related_ents, A-D should be returned, and E should not be
     //
     EntityHandle A, B, C, D, E;
-    Core         mb;
-    ErrorCode    rval = mb.create_meshset( MESHSET_SET, A );CHKERR( rval );
+    Core mb;
+    ErrorCode rval = mb.create_meshset( MESHSET_SET, A );CHKERR( rval );
     rval = mb.create_meshset( MESHSET_SET, B );CHKERR( rval );
     rval = mb.create_meshset( MESHSET_SET, C );CHKERR( rval );
     rval = mb.create_meshset( MESHSET_SET, D );CHKERR( rval );
@@ -51,24 +51,24 @@ ErrorCode gather_related_test( )
     init_range.insert( D );
     rval = readMeshIface->gather_related_ents( init_range, set_range );CHKERR( rval );
 
-    if( set_range.size( ) != 4 ) return MB_FAILURE;
+    if( set_range.size() != 4 ) return MB_FAILURE;
     all_sets -= set_range;
-    if( 1 != all_sets.size( ) || *all_sets.begin( ) != E ) return MB_FAILURE;
+    if( 1 != all_sets.size() || *all_sets.begin() != E ) return MB_FAILURE;
 
     return MB_SUCCESS;
 }
 
-int number_tests = 0;
+int number_tests        = 0;
 int number_tests_failed = 0;
 #define RUN_TEST( A ) _run_test( ( A ), #A )
 
-typedef ErrorCode ( *TestFunc )( );
+typedef ErrorCode ( *TestFunc )();
 static void _run_test( TestFunc func, const char* func_str )
 {
     ++number_tests;
     std::cout << "   " << func_str << ": ";
-    std::cout.flush( );
-    ErrorCode error = func( );
+    std::cout.flush();
+    ErrorCode error = func();
 
     if( MB_SUCCESS == error )
         std::cout << "Success" << std::endl;

@@ -50,10 +50,10 @@
 namespace MBMesquite
 {
 
-const double DEFAULT_BETA = 0.0;
-const int    DEFUALT_PARALLEL_ITERATIONS = 10;
+const double DEFAULT_BETA             = 0.0;
+const int DEFUALT_PARALLEL_ITERATIONS = 10;
 
-ShapeImprover::ShapeImprover( )
+ShapeImprover::ShapeImprover()
     : maxTime( 300.0 ), mBeta( DEFAULT_BETA ), parallelIterations( DEFUALT_PARALLEL_ITERATIONS )
 {
 }
@@ -86,8 +86,8 @@ void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh*
 {
     // Quality Metrics
     IdealShapeTarget target;
-    Mesh*            mesh = mesh_and_domain->get_mesh( );
-    MeshDomain*      domain = mesh_and_domain->get_domain( );
+    Mesh* mesh         = mesh_and_domain->get_mesh();
+    MeshDomain* domain = mesh_and_domain->get_domain();
 
     // only calc min edge length if user hasn't set the vertex_movement_limit_factor
     if( !mBeta )
@@ -100,7 +100,7 @@ void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh*
         patch.set_domain( domain );
         if( settings ) patch.attach_settings( settings );
         std::vector< Mesh::ElementHandle > patch_elems;
-        std::vector< Mesh::VertexHandle >  patch_verts;
+        std::vector< Mesh::VertexHandle > patch_verts;
         mesh->get_all_elements( patch_elems, err );
         mesh->get_all_vertices( patch_verts, err );
         patch.set_mesh_entities( patch_elems, patch_verts, err );
@@ -116,7 +116,7 @@ void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh*
     // check for inverted elements
 
     // create QualityAssessor instance without a Quality Metric
-    QualityAssessor  check_inverted( false, false );
+    QualityAssessor check_inverted( false, false );
     InstructionQueue q_invert_check;
     // a QuallityAssessor without a metric will just check for inverted elements and samples
     q_invert_check.add_quality_assessor( &check_inverted, err );
@@ -126,16 +126,16 @@ void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh*
     if( inverted_elems || inverted_samples )
     {
         // use non barrier shape improvement on tangled mesh
-        TShapeNB1      mu_no;
+        TShapeNB1 mu_no;
         TQualityMetric metric_no_0( &target, &mu_no );
-        ElementPMeanP  metric_no( 1.0, &metric_no_0 );
+        ElementPMeanP metric_no( 1.0, &metric_no_0 );
 
         // QualityAssessor
         qa->add_quality_assessment( &metric_no );
 
-        PMeanPTemplate    obj_func_no( 1.0, &metric_no );
+        PMeanPTemplate obj_func_no( 1.0, &metric_no );
         ConjugateGradient improver_no( &obj_func_no );
-        improver_no.use_global_patch( );
+        improver_no.use_global_patch();
         TerminationCriterion inner_no;
         if( maxTime > 0.0 ) inner_no.add_cpu_time( maxTime );
         inner_no.add_absolute_vertex_movement_edge_length( mBeta );
@@ -150,14 +150,14 @@ void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh*
     {
         // use barrer metric on non-tangled mesh
 
-        Timer          totalTimer;
-        TShapeB1       mu_b;
+        Timer totalTimer;
+        TShapeB1 mu_b;
         TQualityMetric metric_b_0( &target, &mu_b );
-        ElementPMeanP  metric_b( 1.0, &metric_b_0 );
+        ElementPMeanP metric_b( 1.0, &metric_b_0 );
         qa->add_quality_assessment( &metric_b );
-        PMeanPTemplate    obj_func_b( 1.0, &metric_b );
+        PMeanPTemplate obj_func_b( 1.0, &metric_b );
         ConjugateGradient improver_b( &obj_func_b );
-        improver_b.use_global_patch( );
+        improver_b.use_global_patch();
 
         if( maxTime > 0.0 ) inner_b.add_cpu_time( maxTime );
         inner_b.add_absolute_vertex_movement_edge_length( mBeta );

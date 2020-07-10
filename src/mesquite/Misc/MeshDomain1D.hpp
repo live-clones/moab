@@ -48,7 +48,7 @@ class MESQUITE_EXPORT PointDomain : public MeshDomain
   public:
     PointDomain( const Vector3D& location ) : mGeom( location ) {}
 
-    const Vector3D& geom( ) const
+    const Vector3D& geom() const
     {
         return mGeom;
     }
@@ -78,7 +78,7 @@ class MESQUITE_EXPORT LineDomain : public MeshDomain, public CurveDomain
 
     LineDomain( const MsqLine& line ) : mGeom( line ) {}
 
-    const MsqLine& geom( ) const
+    const MsqLine& geom() const
     {
         return mGeom;
     }
@@ -97,9 +97,9 @@ class MESQUITE_EXPORT LineDomain : public MeshDomain, public CurveDomain
     virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_handles,
                              MsqError& err ) const;
 
-    virtual double arc_length( const double position1[ 3 ], const double position2[ 3 ], MsqError& err );
+    virtual double arc_length( const double position1[3], const double position2[3], MsqError& err );
 
-    virtual void position_from_length( const double from_here[ 3 ], double length, double result_point[ 3 ],
+    virtual void position_from_length( const double from_here[3], double length, double result_point[3],
                                        MsqError& err );
 };
 
@@ -113,7 +113,7 @@ class MESQUITE_EXPORT CircleDomain : public MeshDomain, CurveDomain
 
     CircleDomain( const MsqCircle& circle ) : mGeom( circle ) {}
 
-    const MsqCircle& geom( ) const
+    const MsqCircle& geom() const
     {
         return mGeom;
     }
@@ -132,9 +132,9 @@ class MESQUITE_EXPORT CircleDomain : public MeshDomain, CurveDomain
     virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_handles,
                              MsqError& err ) const;
 
-    virtual double arc_length( const double position1[ 3 ], const double position2[ 3 ], MsqError& err );
+    virtual double arc_length( const double position1[3], const double position2[3], MsqError& err );
 
-    virtual void position_from_length( const double from_here[ 3 ], double length, double result_point[ 3 ],
+    virtual void position_from_length( const double from_here[3], double length, double result_point[3],
                                        MsqError& err );
 };
 

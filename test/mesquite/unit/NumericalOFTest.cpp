@@ -53,28 +53,28 @@ class NumericalOFTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_changed );
     CPPUNIT_TEST( test_unchanged );
     CPPUNIT_TEST( test_Hessian_fails );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
     PatchData pd;
 
   public:
-    void setUp( );
+    void setUp();
     void test_gradient_values( bool constant );
 
-    void test_gradient_constant( )
+    void test_gradient_constant()
     {
         test_gradient_values( true );
     }
-    void test_gradient_linear( )
+    void test_gradient_linear()
     {
         test_gradient_values( false );
     }
 
-    void test_handles_eval_failure( );
-    void test_handles_eval_false( );
-    void test_changed( );
-    void test_unchanged( );
-    void test_Hessian_fails( );
+    void test_handles_eval_failure();
+    void test_handles_eval_false();
+    void test_changed();
+    void test_unchanged();
+    void test_Hessian_fails();
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( NumericalOFTest, "NumericalOFTest" );
@@ -96,20 +96,20 @@ class NumericalTestOF : public ObjectiveFunctionTemplate
 
     bool evaluate( EvalType type, PatchData& pd, double& val, bool free, MsqError& );
 
-    ObjectiveFunction* clone( ) const
+    ObjectiveFunction* clone() const
     {
         return new NumericalTestOF( *this );
     }
 
-    void clear( )
+    void clear()
     {
         changed = true;
     }
 
-    bool changed;  // "accumulated value" has changed (tester should initialize)
-    bool fail;  // if true, calls to accumulate will unconditionally fail
+    bool changed;       // "accumulated value" has changed (tester should initialize)
+    bool fail;          // if true, calls to accumulate will unconditionally fail
     bool return_false;  // if true, evaluate will return false.
-    bool constant;  // if true, OF value is constant, otherwise linear.
+    bool constant;      // if true, OF value is constant, otherwise linear.
 
     const Vector3D linearGrad;
 };
@@ -122,7 +122,7 @@ bool NumericalTestOF::evaluate( EvalType type, PatchData& pd, double& val, bool 
         return false;
     }
 
-    if( pd.num_free_vertices( ) < 1 )
+    if( pd.num_free_vertices() < 1 )
     {
         MSQ_SETERR( err )( "PatchData without free vertices.", MsqError::INVALID_ARG );
         return false;
@@ -137,22 +137,22 @@ bool NumericalTestOF::evaluate( EvalType type, PatchData& pd, double& val, bool 
     }
 
     val = 0.0;
-    for( size_t i = 0; i < pd.num_nodes( ); ++i )
+    for( size_t i = 0; i < pd.num_nodes(); ++i )
     {
         const MsqVertex& v = pd.vertex_by_index( i );
-        val += linearGrad[ 0 ] * v[ 0 ] + linearGrad[ 1 ] * v[ 1 ] + linearGrad[ 2 ] * v[ 2 ];
+        val += linearGrad[0] * v[0] + linearGrad[1] * v[1] + linearGrad[2] * v[2];
     }
 
     return !return_false;
 }
 
-void NumericalOFTest::setUp( )
+void NumericalOFTest::setUp()
 {
     MsqPrintError err( std::cout );
 
     // Create a triangle mesh with three free vertices
-    const double coords[] = { 1, 1, 0, 2, 1, 0, 3, 1, 0, 2, 2, 0, 1, 3, 0, 1, 2, 0 };
-    const bool   fixed_vtx[] = { true, false, true, false, true, false };
+    const double coords[]   = { 1, 1, 0, 2, 1, 0, 3, 1, 0, 2, 2, 0, 1, 3, 0, 1, 2, 0 };
+    const bool fixed_vtx[]  = { true, false, true, false, true, false };
     const size_t tri_conn[] = { 0, 1, 5, 1, 2, 3, 3, 4, 5, 1, 3, 5 };
     pd.fill( 6, coords, 4, TRIANGLE, tri_conn, fixed_vtx, err );
     ASSERT_NO_ERROR( err );
@@ -160,9 +160,9 @@ void NumericalOFTest::setUp( )
 
 void NumericalOFTest::test_gradient_values( bool constant )
 {
-    NumericalTestOF    func( false, false, constant );
-    MsqPrintError      err( std::cout );
-    double             value;
+    NumericalTestOF func( false, false, constant );
+    MsqPrintError err( std::cout );
+    double value;
     vector< Vector3D > gradient;
 
     bool rval = func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
@@ -170,27 +170,27 @@ void NumericalOFTest::test_gradient_values( bool constant )
     CPPUNIT_ASSERT( rval );
 
     Vector3D expected = constant ? Vector3D( 0, 0, 0 ) : func.linearGrad;
-    CPPUNIT_ASSERT( gradient.size( ) == pd.num_free_vertices( ) );
-    for( vector< Vector3D >::iterator i = gradient.begin( ); i != gradient.end( ); ++i )
+    CPPUNIT_ASSERT( gradient.size() == pd.num_free_vertices() );
+    for( vector< Vector3D >::iterator i = gradient.begin(); i != gradient.end(); ++i )
         CPPUNIT_ASSERT_VECTORS_EQUAL( expected, *i, EPSILON );
 }
 
-void NumericalOFTest::test_handles_eval_failure( )
+void NumericalOFTest::test_handles_eval_failure()
 {
-    MsqError           err;
-    NumericalTestOF    func( true, false, true );
-    double             value;
+    MsqError err;
+    NumericalTestOF func( true, false, true );
+    double value;
     vector< Vector3D > gradient;
 
     func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
     CPPUNIT_ASSERT( err );
 }
 
-void NumericalOFTest::test_handles_eval_false( )
+void NumericalOFTest::test_handles_eval_false()
 {
-    MsqError           err;
-    NumericalTestOF    func( false, true, true );
-    double             value;
+    MsqError err;
+    NumericalTestOF func( false, true, true );
+    double value;
     vector< Vector3D > gradient;
 
     bool rval = func.evaluate_with_gradient( ObjectiveFunction::CALCULATE, pd, value, gradient, err );
@@ -198,49 +198,49 @@ void NumericalOFTest::test_handles_eval_false( )
     CPPUNIT_ASSERT( !rval );
 }
 
-void NumericalOFTest::test_changed( )
+void NumericalOFTest::test_changed()
 {
-    MsqPrintError      err( cout );
-    NumericalTestOF    func( false, false, true );
-    double             value;
+    MsqPrintError err( cout );
+    NumericalTestOF func( false, false, true );
+    double value;
     vector< Vector3D > gradient;
-    bool               rval;
+    bool rval;
 
     func.changed = false;
-    rval = func.evaluate_with_gradient( ObjectiveFunction::SAVE, pd, value, gradient, err );
+    rval         = func.evaluate_with_gradient( ObjectiveFunction::SAVE, pd, value, gradient, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
     CPPUNIT_ASSERT( func.changed );
 
     func.changed = false;
-    rval = func.evaluate_with_gradient( ObjectiveFunction::UPDATE, pd, value, gradient, err );
+    rval         = func.evaluate_with_gradient( ObjectiveFunction::UPDATE, pd, value, gradient, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
     CPPUNIT_ASSERT( func.changed );
 }
 
-void NumericalOFTest::test_unchanged( )
+void NumericalOFTest::test_unchanged()
 {
-    MsqPrintError      err( cout );
-    NumericalTestOF    func( false, false, true );
-    double             value;
+    MsqPrintError err( cout );
+    NumericalTestOF func( false, false, true );
+    double value;
     vector< Vector3D > gradient;
-    bool               rval;
+    bool rval;
 
     func.changed = false;
-    rval = func.evaluate_with_gradient( ObjectiveFunction::TEMPORARY, pd, value, gradient, err );
+    rval         = func.evaluate_with_gradient( ObjectiveFunction::TEMPORARY, pd, value, gradient, err );
     ASSERT_NO_ERROR( err );
     CPPUNIT_ASSERT( rval );
     CPPUNIT_ASSERT( !func.changed );
 }
 
-void NumericalOFTest::test_Hessian_fails( )
+void NumericalOFTest::test_Hessian_fails()
 {
-    MsqError           err;
-    NumericalTestOF    func( false, false, true );
-    double             value;
+    MsqError err;
+    NumericalTestOF func( false, false, true );
+    double value;
     vector< Vector3D > gradient;
-    MsqHessian         Hessian;
+    MsqHessian Hessian;
 
     func.evaluate_with_Hessian( ObjectiveFunction::CALCULATE, pd, value, gradient, Hessian, err );
     CPPUNIT_ASSERT( err );

@@ -46,7 +46,7 @@ class WriteGMV : public WriterIface
     WriteGMV( Interface* impl );
 
     //! Destructor
-    virtual ~WriteGMV( );
+    virtual ~WriteGMV();
 
     static WriterIface* factory( Interface* );
 
@@ -62,7 +62,7 @@ class WriteGMV : public WriterIface
   protected:
   private:
     //! interface instance
-    Interface*      mbImpl;
+    Interface* mbImpl;
     WriteUtilIface* mWriteIface;
 
     //! Cached tags for reading.  Note that all these tags are defined when the
@@ -74,7 +74,7 @@ class WriteGMV : public WriterIface
     Tag mGeomDimensionTag;
     Tag mGlobalIdTag;
 
-    static const char* gmvTypeNames[ MBMAXTYPE ];
+    static const char* gmvTypeNames[MBMAXTYPE];
 
     ErrorCode local_write_mesh( const char* file_name, const EntityHandle output_set, const int user_dimension,
                                 const bool mesh, const bool poly_mesh );

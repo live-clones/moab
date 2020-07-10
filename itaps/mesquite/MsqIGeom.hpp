@@ -52,7 +52,7 @@ class MsqCommonIGeom : public MeshDomain
     /**\param geom The ITAPS geometry interface implementation to query */
     MsqCommonIGeom( iGeom_Instance geom );
 
-    virtual ~MsqCommonIGeom( );
+    virtual ~MsqCommonIGeom();
 
     /** Evaluate the closest point to the input position on the specified
      *  geometric entity and return the result in the passed position
@@ -94,8 +94,8 @@ class MsqCommonIGeom : public MeshDomain
 
   private:
     mutable std::vector< iBase_EntityHandle > geomHandles;
-    mutable std::vector< double >             coordArray;
-    mutable std::vector< int >                typeArray;
+    mutable std::vector< double > coordArray;
+    mutable std::vector< int > typeArray;
 };
 
 /**\brief A MBMesquite::MeshDomain implemented on top of the ITAPS iGeom API.
@@ -109,7 +109,7 @@ class MsqIGeom : public MsqCommonIGeom
   public:
     MsqIGeom( iGeom_Instance geom, iBase_EntityHandle geom_ent_handle );
 
-    virtual ~MsqIGeom( );
+    virtual ~MsqIGeom();
 
     void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinat ) const;
 

@@ -40,11 +40,11 @@ ErrorCode ReadIDEAS::load_file( const char* fname, const EntityHandle*, const Fi
     if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for IDEAS" ); }
 
     file.open( fname );
-    if( !file.good( ) ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "Failed to open file: " << fname ); }
+    if( !file.good() ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "Failed to open file: " << fname ); }
 
     ErrorCode rval;
 
-    char line[ 10000 ];
+    char line[10000];
     file.getline( line, 10000 );
     char* liter = line;
     while( *liter && isspace( *liter ) )
@@ -56,7 +56,7 @@ ErrorCode ReadIDEAS::load_file( const char* fname, const EntityHandle*, const Fi
         if( !isspace( *liter ) ) return MB_FAILURE;
 
     EntityHandle first_vertex = 0;
-    while( !file.eof( ) )
+    while( !file.eof() )
     {
         file.getline( line, 10000 );
         unsigned int header_id = (unsigned int)strtol( line, NULL, 10 );
@@ -78,20 +78,20 @@ ErrorCode ReadIDEAS::load_file( const char* fname, const EntityHandle*, const Fi
         // Skip everything else
         else
         {
-            rval = skip_header( );
+            rval = skip_header();
             if( MB_SUCCESS != rval ) return MB_FAILURE;
         }
     }
 
-    file.close( );
+    file.close();
     return MB_SUCCESS;
 }
 
-ErrorCode ReadIDEAS::skip_header( )
+ErrorCode ReadIDEAS::skip_header()
 {
     // Go until finding a pair of -1 lines
-    char*       ctmp;
-    char        line[ 10000 ];
+    char* ctmp;
+    char line[10000];
     std::string s;
 
     int end_of_block = 0;
@@ -104,7 +104,7 @@ ErrorCode ReadIDEAS::skip_header( )
         if( il == -1 )
         {
             s = ctmp;
-            if( s.empty( ) ) end_of_block++;
+            if( s.empty() ) end_of_block++;
         }
         else
             end_of_block = 0;
@@ -118,15 +118,15 @@ ErrorCode ReadIDEAS::skip_header( )
 ErrorCode ReadIDEAS::create_vertices( EntityHandle& first_vertex, const Tag* file_id_tag )
 {
     // Read two lines: first has some data, second has coordinates
-    char        line1[ 10000 ], line2[ 10000 ];
-    int         il1, il2;
-    char *      ctmp1, *ctmp2;
+    char line1[10000], line2[10000];
+    int il1, il2;
+    char *ctmp1, *ctmp2;
     std::string s1, s2;
 
     ErrorCode rval;
 
-    std::streampos top_of_block = file.tellg( );
-    unsigned int   num_verts = 0;
+    std::streampos top_of_block = file.tellg();
+    unsigned int num_verts      = 0;
 
     for( ;; )
     {
@@ -141,7 +141,7 @@ ErrorCode ReadIDEAS::create_vertices( EntityHandle& first_vertex, const Tag* fil
         {
             s1 = ctmp1;
             s2 = ctmp2;
-            if( ( s1.empty( ) ) && ( s2.empty( ) ) ) break;
+            if( ( s1.empty() ) && ( s2.empty() ) ) break;
         }
         num_verts++;
     }
@@ -155,14 +155,14 @@ ErrorCode ReadIDEAS::create_vertices( EntityHandle& first_vertex, const Tag* fil
     Range verts;
     verts.insert( first_vertex, first_vertex + num_verts - 1 );
 
-    double* x = arrays[ 0 ];
-    double* y = arrays[ 1 ];
-    double* z = arrays[ 2 ];
+    double* x = arrays[0];
+    double* y = arrays[1];
+    double* z = arrays[2];
 
     // For now, assume ids are sequential and begin with 1
-    Tag       id_tag = MBI->globalId_tag( );
+    Tag id_tag                  = MBI->globalId_tag();
     const int beginning_node_id = 1;
-    int       node_id = beginning_node_id;
+    int node_id                 = beginning_node_id;
 
     for( unsigned int i = 0; i < num_verts; i++ )
     {
@@ -177,9 +177,9 @@ ErrorCode ReadIDEAS::create_vertices( EntityHandle& first_vertex, const Tag* fil
             ++node_id;
 
         // Get the doubles out of the 2nd line
-        x[ i ] = std::strtod( line2, &ctmp2 );
-        y[ i ] = std::strtod( ctmp2 + 1, &ctmp2 );
-        z[ i ] = std::strtod( ctmp2 + 1, NULL );
+        x[i] = std::strtod( line2, &ctmp2 );
+        y[i] = std::strtod( ctmp2 + 1, &ctmp2 );
+        z[i] = std::strtod( ctmp2 + 1, NULL );
     }
 
     if( !file.getline( line1, 10000 ) ) MB_SET_ERR( MB_FAILURE, " expect more lines" );
@@ -197,11 +197,11 @@ ErrorCode ReadIDEAS::create_vertices( EntityHandle& first_vertex, const Tag* fil
 
 ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_tag )
 {
-    char         line1[ 10000 ], line2[ 10000 ];
-    int          il1, il2;
-    char *       ctmp1, *ctmp2;
-    std::string  s1, s2;
-    ErrorCode    rval;
+    char line1[10000], line2[10000];
+    int il1, il2;
+    char *ctmp1, *ctmp2;
+    std::string s1, s2;
+    ErrorCode rval;
     EntityHandle handle;
 
     Tag mat_tag, phys_tag, id_tag;
@@ -209,7 +209,7 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
     if( MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval ) return rval;
     rval = MBI->tag_get_handle( PHYS_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, phys_tag, MB_TAG_DENSE | MB_TAG_CREAT );
     if( MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval ) return rval;
-    id_tag = MBI->globalId_tag( );
+    id_tag = MBI->globalId_tag();
 
     for( ;; )
     {
@@ -222,14 +222,14 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
         {
             s1 = ctmp1;
             s2 = ctmp2;
-            if( ( s1.empty( ) ) && ( s2.empty( ) ) ) return MB_SUCCESS;
+            if( ( s1.empty() ) && ( s2.empty() ) ) return MB_SUCCESS;
         }
 
         // The first line describes attributes of the element other than connectivity.
         const int element_id = strtol( line1 + 1, &ctmp1, 10 );
         const int ideas_type = strtol( line1 + 11, &ctmp1, 10 );
         const int phys_table = strtol( line1 + 21, &ctmp1, 10 );
-        const int mat_table = strtol( line1 + 31, &ctmp1, 10 );
+        const int mat_table  = strtol( line1 + 31, &ctmp1, 10 );
 
         // Determine the element type.
         EntityType mb_type;
@@ -251,13 +251,13 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
 
         // Get the connectivity out of the 2nd line
         std::stringstream ss( line2 );
-        const int         n_conn = CN::VerticesPerEntity( mb_type );
-        EntityHandle      conn[ CN::MAX_NODES_PER_ELEMENT ];
-        EntityHandle      vert;
+        const int n_conn = CN::VerticesPerEntity( mb_type );
+        EntityHandle conn[CN::MAX_NODES_PER_ELEMENT];
+        EntityHandle vert;
         for( int i = 0; i < n_conn; ++i )
         {
             ss >> vert;
-            conn[ i ] = vstart + vert - 1;
+            conn[i] = vstart + vert - 1;
         }
 
         // Make the element. According to the Gmsh 2.2.3 source code, the IDEAS
@@ -265,18 +265,18 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
         rval = MBI->create_element( mb_type, conn, n_conn, handle );MB_CHK_SET_ERR( rval, "can't create elements of type " << mb_type );
 
         // If the phys set does not already exist, create it.
-        Range             phys_sets;
-        EntityHandle      phys_set;
+        Range phys_sets;
+        EntityHandle phys_set;
         const void* const phys_set_id_val[] = { &phys_table };
         rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &phys_tag, phys_set_id_val, 1, phys_sets );MB_CHK_SET_ERR( rval, "can't get phys sets" );
-        if( phys_sets.empty( ) )
+        if( phys_sets.empty() )
         {
             rval = MBI->create_meshset( MESHSET_SET, phys_set );MB_CHK_SET_ERR( rval, "can't create phys set" );
             rval = MBI->tag_set_data( phys_tag, &phys_set, 1, &phys_table );MB_CHK_SET_ERR( rval, "can't set tag to phys set" );
         }
-        else if( 1 == phys_sets.size( ) )
+        else if( 1 == phys_sets.size() )
         {
-            phys_set = phys_sets.front( );
+            phys_set = phys_sets.front();
         }
         else
         {
@@ -285,21 +285,21 @@ ErrorCode ReadIDEAS::create_elements( EntityHandle vstart, const Tag* file_id_ta
         rval = MBI->add_entities( phys_set, &handle, 1 );MB_CHK_SET_ERR( rval, "can't add entities to phys set" );
 
         // If the material set does not already exist, create it.
-        Range             mat_sets;
-        EntityHandle      mat_set;
+        Range mat_sets;
+        EntityHandle mat_set;
         const void* const mat_set_id_val[] = { &mat_table };
         rval = MBI->get_entities_by_type_and_tag( 0, MBENTITYSET, &mat_tag, mat_set_id_val, 1, mat_sets );
         if( MB_SUCCESS != rval ) return rval;
-        if( mat_sets.empty( ) )
+        if( mat_sets.empty() )
         {
             rval = MBI->create_meshset( MESHSET_SET, mat_set );
             if( MB_SUCCESS != rval ) return rval;
             rval = MBI->tag_set_data( mat_tag, &mat_set, 1, &mat_table );
             if( MB_SUCCESS != rval ) return rval;
         }
-        else if( 1 == mat_sets.size( ) )
+        else if( 1 == mat_sets.size() )
         {
-            mat_set = mat_sets.front( );
+            mat_set = mat_sets.front();
         }
         else
         {

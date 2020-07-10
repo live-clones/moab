@@ -44,11 +44,11 @@
 #define NCDF_DIFF MPI_Offset
 #else
 #include "netcdf.h"
-#define NCFUNC( func ) nc_##func
+#define NCFUNC( func )   nc_##func
 #define NCFUNCAG( func ) nc_get##func
-#define NCFUNCG( func ) nc_get##func
-#define NCDF_SIZE size_t
-#define NCDF_DIFF ptrdiff_t
+#define NCFUNCG( func )  nc_get##func
+#define NCDF_SIZE        size_t
+#define NCDF_DIFF        ptrdiff_t
 #endif
 
 namespace moab
@@ -82,7 +82,7 @@ class ReadNC : public ReaderIface
     ReadNC( Interface* impl = NULL );
 
     //! Destructor
-    virtual ~ReadNC( );
+    virtual ~ReadNC();
 
     virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
                                        std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
@@ -104,38 +104,38 @@ class ReadNC : public ReaderIface
     class AttData
     {
       public:
-        AttData( ) : attId( -1 ), attLen( 0 ), attVarId( -2 ) {}
-        int         attId;
-        NCDF_SIZE   attLen;
-        int         attVarId;
-        nc_type     attDataType;
+        AttData() : attId( -1 ), attLen( 0 ), attVarId( -2 ) {}
+        int attId;
+        NCDF_SIZE attLen;
+        int attVarId;
+        nc_type attDataType;
         std::string attName;
     };
 
     class VarData
     {
       public:
-        VarData( ) : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ), has_tsteps( false ) {}
-        int                              varId;
-        int                              numAtts;
-        nc_type                          varDataType;
-        std::vector< int >               varDims;  // The dimension indices making up this multi-dimensional variable
+        VarData() : varId( -1 ), numAtts( -1 ), entLoc( ENTLOCSET ), numLev( 0 ), sz( 0 ), has_tsteps( false ) {}
+        int varId;
+        int numAtts;
+        nc_type varDataType;
+        std::vector< int > varDims;  // The dimension indices making up this multi-dimensional variable
         std::map< std::string, AttData > varAtts;
-        std::string                      varName;
-        std::vector< Tag >               varTags;  // Tags created for this variable, e.g. one tag per timestep
-        std::vector< void* >             varDatas;
-        std::vector< NCDF_SIZE >         readStarts;  // Starting index for reading data values along each dimension
-        std::vector< NCDF_SIZE >         readCounts;  // Number of data values to be read along each dimension
-        int                              entLoc;
-        int                              numLev;
-        int                              sz;
-        bool                             has_tsteps;  // Indicate whether timestep numbers are appended to tag names
+        std::string varName;
+        std::vector< Tag > varTags;  // Tags created for this variable, e.g. one tag per timestep
+        std::vector< void* > varDatas;
+        std::vector< NCDF_SIZE > readStarts;  // Starting index for reading data values along each dimension
+        std::vector< NCDF_SIZE > readCounts;  // Number of data values to be read along each dimension
+        int entLoc;
+        int numLev;
+        int sz;
+        bool has_tsteps;  // Indicate whether timestep numbers are appended to tag names
     };
 
     ReadUtilIface* readMeshIface;
 
     //! Read the header information
-    ErrorCode read_header( );
+    ErrorCode read_header();
 
     //! Get all global attributes in the file
     ErrorCode get_attributes( int var_id, int num_atts, std::map< std::string, AttData >& atts,
@@ -145,7 +145,7 @@ class ReadNC : public ReaderIface
     ErrorCode get_dimensions( int file_id, std::vector< std::string >& dim_names, std::vector< int >& dim_lens );
 
     //! Get the variable names and other info defined for this file
-    ErrorCode get_variables( );
+    ErrorCode get_variables();
 
     ErrorCode parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
                              std::vector< int >& tstep_nums, std::vector< double >& tstep_vals );
@@ -208,9 +208,9 @@ class ReadNC : public ReaderIface
     bool spectralMesh;
     bool noMixedElements;
     bool noEdges;
-    int  gatherSetRank;
-    int  tStepBase;
-    int  trivialPartitionShift;
+    int gatherSetRank;
+    int tStepBase;
+    int trivialPartitionShift;
 
     //! Helper class instance
     NCHelper* myHelper;

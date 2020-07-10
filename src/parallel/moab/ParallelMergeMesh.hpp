@@ -30,11 +30,11 @@ class ParallelMergeMesh
     ErrorCode merge( EntityHandle levelset = 0, bool skip_local_merge = false, int dim = -1 );
 
   private:
-    ParallelComm*         myPcomm;
-    Interface*            myMB;
-    std::vector< Range >  mySkinEnts;
-    double                myEps;
-    TupleList             myTup, myMatches;
+    ParallelComm* myPcomm;
+    Interface* myMB;
+    std::vector< Range > mySkinEnts;
+    double myEps;
+    TupleList myTup, myMatches;
     gs_data::crystal_data myCD;
 
     // Wrapper of merge() that performs the merge
@@ -46,13 +46,13 @@ class ParallelMergeMesh
     // Fill out the local myTup before the first gather-scatter
     ErrorCode PopulateMyTup( double* gbox );
     // Once myTup is filled and gather scattered, figure out the matches
-    ErrorCode PopulateMyMatches( );
+    ErrorCode PopulateMyMatches();
     // Sort the matching tuples
-    ErrorCode SortMyMatches( );
+    ErrorCode SortMyMatches();
     // Tag the shared elements once the myMatches has been filled
     ErrorCode TagSharedElements( int dim );
     // Cleanup any data allocated by class members
-    void CleanUp( );
+    void CleanUp();
     // Partition the global box by the number of procs
     // Returns results in lengths and parts, which needs to be of length 3
     ErrorCode PartitionGlobalBox( double* gbox, double* lengths, int* parts );

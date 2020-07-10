@@ -54,11 +54,11 @@ class ConjugateGradient : public VertexMover, public PatchSetUser
     MESQUITE_EXPORT ConjugateGradient( ObjectiveFunction* objective );
     MESQUITE_EXPORT ConjugateGradient( ObjectiveFunction* objective, MsqError& err );
 
-    MESQUITE_EXPORT virtual ~ConjugateGradient( );
+    MESQUITE_EXPORT virtual ~ConjugateGradient();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    virtual PatchSet* get_patch_set( );
+    virtual PatchSet* get_patch_set();
 
     //! Just for debugging purposes or for obtaining more data
     //! during the optimization process.
@@ -78,7 +78,7 @@ class ConjugateGradient : public VertexMover, public PatchSetUser
     virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
 
     //! Delete arrays initially created in initialize().
-    virtual void cleanup( );
+    virtual void cleanup();
 
     //! Returns the step distance to take in the search direction.
     double get_step( PatchData& pd, double f0, int& j, MsqError& err );
@@ -87,7 +87,7 @@ class ConjugateGradient : public VertexMover, public PatchSetUser
     // void cull_list(PatchData &pd, double beta, MsqError &err);
 
   private:
-    std::vector< Vector3D >   fGrad, pGrad, fNewGrad;
+    std::vector< Vector3D > fGrad, pGrad, fNewGrad;
     PatchDataVerticesMemento* pMemento;
     // just for debugging
     int conjGradDebug;

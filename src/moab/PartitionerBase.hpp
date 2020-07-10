@@ -35,13 +35,14 @@ class Interface;
 
 using namespace moab;
 
-template< typename T > class PartitionerBase
+template < typename T >
+class PartitionerBase
 {
 
   public:
     PartitionerBase( Interface* impl = NULL, const bool use_coords = false );
 
-    virtual ~PartitionerBase( );
+    virtual ~PartitionerBase();
 
     virtual ErrorCode partition_mesh_and_geometry( const double part_geom_mesh_size, const T nparts,
                                                    const char* zmethod, const char* other_method, double imbal_tol,
@@ -61,14 +62,14 @@ template< typename T > class PartitionerBase
                                        const bool write_as_tags ) = 0;
 
     // put closure of entities in the part sets too
-    virtual ErrorCode include_closure( ) = 0;
+    virtual ErrorCode include_closure() = 0;
 
-    Range& part_sets( )
+    Range& part_sets()
     {
         return partSets;
     };
 
-    const Range& part_sets( ) const
+    const Range& part_sets() const
     {
         return partSets;
     };
@@ -78,7 +79,7 @@ template< typename T > class PartitionerBase
         assign_global_ids = id_opt;
     }
 
-    bool get_global_id_option( )
+    bool get_global_id_option()
     {
         return assign_global_ids;
     }
@@ -96,7 +97,7 @@ template< typename T > class PartitionerBase
     Range partSets;
 };
 
-template< typename T >
+template < typename T >
 inline PartitionerBase< T >::PartitionerBase( Interface* impl, const bool use_coords )
     : mbImpl( impl ), useCoords( use_coords ), newComm( false )
 {
@@ -104,13 +105,14 @@ inline PartitionerBase< T >::PartitionerBase( Interface* impl, const bool use_co
     mbpc = ParallelComm::get_pcomm( mbImpl, 0 );
     if( !mbpc )
     {
-        mbpc = new ParallelComm( impl, MPI_COMM_WORLD, 0 );
+        mbpc    = new ParallelComm( impl, MPI_COMM_WORLD, 0 );
         newComm = true;
     }
 #endif
 }
 
-template< typename T > inline PartitionerBase< T >::~PartitionerBase( )
+template < typename T >
+inline PartitionerBase< T >::~PartitionerBase()
 {
 #ifdef MOAB_HAVE_MPI
     if( newComm ) delete mbpc;

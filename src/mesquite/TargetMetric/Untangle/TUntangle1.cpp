@@ -39,29 +39,30 @@
 namespace MBMesquite
 {
 
-TUntangle1::~TUntangle1( ) {}
+TUntangle1::~TUntangle1() {}
 
-std::string TUntangle1::get_name( ) const
+std::string TUntangle1::get_name() const
 {
     return "Untangle1";
 }
 
-template< unsigned DIM > inline bool TUntangle1::eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template < unsigned DIM >
+inline bool TUntangle1::eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
     double tau = det( T );
-    result = 0.5 * ( sqrt( tau * tau + mFactor ) - tau );
+    result     = 0.5 * ( sqrt( tau * tau + mFactor ) - tau );
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TUntangle1::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T )
 {
     double tau = det( T );
-    double g = sqrt( tau * tau + mFactor );
+    double g   = sqrt( tau * tau + mFactor );
     if( g > 1e-50 )
     {
-        double f = tau / g - 1;
-        result = 0.5 * ( g - tau );
+        double f    = tau / g - 1;
+        result      = 0.5 * ( g - tau );
         deriv_wrt_T = transpose_adj( T );
         deriv_wrt_T *= 0.5 * f;
         return true;
@@ -73,16 +74,16 @@ inline bool TUntangle1::grad( const MsqMatrix< DIM, DIM >& T, double& result, Ms
     }
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 inline bool TUntangle1::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
                               MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     const MsqMatrix< DIM, DIM > adjt = transpose_adj( T );
-    double                      tau = det( T );
-    double                      g = sqrt( tau * tau + mFactor );
+    double tau                       = det( T );
+    double g                         = sqrt( tau * tau + mFactor );
     if( g == 0 ) return false;
     double f = 0.5 * ( tau / g - 1 );
-    result = 0.5 * ( g - tau );
+    result   = 0.5 * ( g - tau );
 
     deriv_wrt_T = adjt;
     deriv_wrt_T *= f;

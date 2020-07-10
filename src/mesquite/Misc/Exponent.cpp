@@ -77,7 +77,7 @@ Exponent::constMemberPtr Exponent::get_func_ptr( double exponent )
 
 void Exponent::set_exponent( double exponent )
 {
-    mExponent = exponent;
+    mExponent   = exponent;
     funcPointer = get_func_ptr( exponent );
 }
 

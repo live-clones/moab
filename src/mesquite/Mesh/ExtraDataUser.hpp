@@ -39,7 +39,8 @@
 namespace MBMesquite
 {
 
-template< typename T > class ExtraUserData;
+template < typename T >
+class ExtraUserData;
 
 /**\brief Manage extra data attached to PatchData instances
  *
@@ -54,12 +55,13 @@ template< typename T > class ExtraUserData;
  * class is the data type.  Provide implementations of the pure
  * virtual (abstract) methods for notification of changes to the PatchData.
  */
-template< typename T > class ExtraDataUser
+template < typename T >
+class ExtraDataUser
 {
   public:
-    ExtraDataUser( );
+    ExtraDataUser();
 
-    virtual ~ExtraDataUser( );
+    virtual ~ExtraDataUser();
 
     typedef T DataType;
 
@@ -84,12 +86,13 @@ template< typename T > class ExtraDataUser
     ExtraUserData< T >* listHead;
 };
 
-template< typename T > class ExtraUserData : public ExtraData
+template < typename T >
+class ExtraUserData : public ExtraData
 {
   public:
     ExtraDataUser< T >* dataOwner;
     ExtraUserData< T >* userNext;
-    T                   userData;
+    T userData;
 
     ExtraUserData( PatchData& patch, ExtraDataUser< T >* owner, ExtraUserData< T >* next, const T& data )
         : ExtraData( patch ), dataOwner( owner ), userNext( next ), userData( data )
@@ -101,62 +104,71 @@ template< typename T > class ExtraUserData : public ExtraData
     {
     }
 
-    virtual void notify_patch_destroyed( );
+    virtual void notify_patch_destroyed();
 
-    virtual void notify_new_patch( );
+    virtual void notify_new_patch();
 
     virtual void notify_sub_patch( PatchData& sub_patch, const size_t* vtx_index_map, const size_t* elm_index_map,
                                    MsqError& err );
 };
 
-template< typename T > void ExtraUserData< T >::notify_patch_destroyed( )
+template < typename T >
+void ExtraUserData< T >::notify_patch_destroyed()
 {
     dataOwner->notify_patch_destroyed( this );
 }
 
-template< typename T > void ExtraUserData< T >::notify_new_patch( )
+template < typename T >
+void ExtraUserData< T >::notify_new_patch()
 {
-    dataOwner->notify_new_patch( *get_patch_data( ), userData );
+    dataOwner->notify_new_patch( *get_patch_data(), userData );
 }
 
-template< typename T >
+template < typename T >
 void ExtraUserData< T >::notify_sub_patch( PatchData& sub, const size_t* vertex_map, const size_t* element_map,
                                            MsqError& err )
 {
-    dataOwner->notify_sub_patch( *get_patch_data( ), userData, sub, vertex_map, element_map, err );
+    dataOwner->notify_sub_patch( *get_patch_data(), userData, sub, vertex_map, element_map, err );
 }
 
-template< typename T > ExtraDataUser< T >::ExtraDataUser( ) : listHead( 0 ) {}
+template < typename T >
+ExtraDataUser< T >::ExtraDataUser() : listHead( 0 )
+{
+}
 
-template< typename T > ExtraDataUser< T >::~ExtraDataUser( )
+template < typename T >
+ExtraDataUser< T >::~ExtraDataUser()
 {
     while( ExtraUserData< T >* dead_ptr = listHead )
     {
-        listHead = dead_ptr->userNext;
+        listHead           = dead_ptr->userNext;
         dead_ptr->userNext = 0;
         delete dead_ptr;
     }
 }
 
-template< typename T > T* ExtraDataUser< T >::get_data_ptr( PatchData& patch )
+template < typename T >
+T* ExtraDataUser< T >::get_data_ptr( PatchData& patch )
 {
     for( ExtraUserData< T >* ptr = listHead; ptr; ptr = ptr->userNext )
-        if( ptr->get_patch_data( ) == &patch ) return &( ptr->userData );
+        if( ptr->get_patch_data() == &patch ) return &( ptr->userData );
     return 0;
 }
 
-template< typename T > T& ExtraDataUser< T >::get_data( PatchData& patch )
+template < typename T >
+T& ExtraDataUser< T >::get_data( PatchData& patch )
 {
     T* ptr = get_data_ptr( patch );
     if( !ptr )
     {
         listHead = new ExtraUserData< T >( patch, this, listHead );
-        ptr = &( listHead->userData );
+        ptr      = &( listHead->userData );
     }
     return *ptr;
 }
 
-template< typename T > void ExtraDataUser< T >::set_data( PatchData& patch, const T& data )
+template < typename T >
+void ExtraDataUser< T >::set_data( PatchData& patch, const T& data )
 {
     T* ptr = get_data_ptr( patch );
     if( ptr )
@@ -165,7 +177,8 @@ template< typename T > void ExtraDataUser< T >::set_data( PatchData& patch, cons
         listHead = new ExtraUserData< T >( patch, this, listHead, data );
 }
 
-template< typename T > void ExtraDataUser< T >::notify_patch_destroyed( ExtraUserData< T >* data )
+template < typename T >
+void ExtraDataUser< T >::notify_patch_destroyed( ExtraUserData< T >* data )
 {
     // remove from list
     assert( listHead != 0 );

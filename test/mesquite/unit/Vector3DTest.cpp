@@ -38,38 +38,38 @@ class Vector3DTest : public CppUnit::TestFixture
     CPPUNIT_TEST( test_double_constructor );
     CPPUNIT_TEST( test_copy_constructor );
     //  CPPUNIT_TEST_EXCEPTION (throw_exception, CppUnit::SignalException);
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
-    Vector3DTest( ) {}
+    Vector3DTest() {}
 
-    void test_default_constructor( )
+    void test_default_constructor()
     {
         MBMesquite::Vector3D v;
-        CPPUNIT_ASSERT( v.x( ) == 0 );
-        CPPUNIT_ASSERT( v.y( ) == 0 );
-        CPPUNIT_ASSERT( v.z( ) == 0 );
+        CPPUNIT_ASSERT( v.x() == 0 );
+        CPPUNIT_ASSERT( v.y() == 0 );
+        CPPUNIT_ASSERT( v.z() == 0 );
     }
-    void test_double_constructor( )
+    void test_double_constructor()
     {
         MBMesquite::Vector3D v( 3, 2, 1 );
-        CPPUNIT_ASSERT( v.x( ) == 3 );
-        CPPUNIT_ASSERT( v.y( ) == 2 );
-        CPPUNIT_ASSERT( v.z( ) == 1 );
+        CPPUNIT_ASSERT( v.x() == 3 );
+        CPPUNIT_ASSERT( v.y() == 2 );
+        CPPUNIT_ASSERT( v.z() == 1 );
     }
-    void test_copy_constructor( )
+    void test_copy_constructor()
     {
         MBMesquite::Vector3D v2( 3, 2, 1 );
         MBMesquite::Vector3D v( v2 );
 
-        CPPUNIT_ASSERT( v.x( ) == 3 );
-        CPPUNIT_ASSERT( v.y( ) == 2 );
-        CPPUNIT_ASSERT( v.z( ) == 1 );
+        CPPUNIT_ASSERT( v.x() == 3 );
+        CPPUNIT_ASSERT( v.y() == 2 );
+        CPPUNIT_ASSERT( v.z() == 1 );
     }
-    void throw_exception( )
+    void throw_exception()
     {
         MBMesquite::Vector3D* v = NULL;
-        double                d = v->x( );
+        double d                = v->x();
         std::cout << d << std::endl;
     }
 };
@@ -77,10 +77,10 @@ class Vector3DTest : public CppUnit::TestFixture
 class Vector3DTest2 : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( Vector3DTest );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   public:
-    Vector3DTest2( ) {}
+    Vector3DTest2() {}
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( Vector3DTest, "Unit" );

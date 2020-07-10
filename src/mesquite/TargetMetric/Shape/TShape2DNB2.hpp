@@ -42,9 +42,9 @@ namespace MBMesquite
 class TShape2DNB2 : public TMetricNonBarrier2D
 {
   public:
-    MESQUITE_EXPORT virtual ~TShape2DNB2( );
+    MESQUITE_EXPORT virtual ~TShape2DNB2();
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
     MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 
@@ -52,8 +52,8 @@ class TShape2DNB2 : public TMetricNonBarrier2D
                                                      MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
-                                                     MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                                     MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err );
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T, MsqMatrix< 2, 2 > second_wrt_T[3],
+                                                     MsqError& err );
 };
 
 }  // namespace MBMesquite

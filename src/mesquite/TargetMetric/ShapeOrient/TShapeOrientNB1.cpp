@@ -38,25 +38,26 @@
 namespace MBMesquite
 {
 
-std::string TShapeOrientNB1::get_name( ) const
+std::string TShapeOrientNB1::get_name() const
 {
     return "TShapeOrientNB1";
 }
 
-TShapeOrientNB1::~TShapeOrientNB1( ) {}
+TShapeOrientNB1::~TShapeOrientNB1() {}
 
-template< unsigned DIM > static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
-    result = Frobenius( T ) - trace( T ) / DimConst< DIM >::sqrt( );
+    result = Frobenius( T ) - trace( T ) / DimConst< DIM >::sqrt();
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv )
 {
-    const double norm = Frobenius( T );
-    const double invroot = 1.0 / DimConst< DIM >::sqrt( );
-    result = norm - invroot * trace( T );
+    const double norm    = Frobenius( T );
+    const double invroot = 1.0 / DimConst< DIM >::sqrt();
+    result               = norm - invroot * trace( T );
 
     if( norm < 1e-50 )
     {
@@ -69,13 +70,13 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatr
     return true;
 }
 
-template< unsigned DIM >
+template < unsigned DIM >
 static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv,
                          MsqMatrix< DIM, DIM >* second )
 {
-    const double norm = Frobenius( T );
-    const double invroot = 1.0 / DimConst< DIM >::sqrt( );
-    result = norm - invroot * trace( T );
+    const double norm    = Frobenius( T );
+    const double invroot = 1.0 / DimConst< DIM >::sqrt();
+    result               = norm - invroot * trace( T );
 
     if( norm < 1e-50 )
     {
@@ -85,7 +86,7 @@ static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatr
     }
 
     const double invnorm = 1.0 / norm;
-    deriv = invnorm * T;
+    deriv                = invnorm * T;
     pluseq_scaled_I( deriv, -invroot );
 
     set_scaled_outer_product( second, -invnorm * invnorm * invnorm, T );

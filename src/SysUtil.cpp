@@ -41,10 +41,10 @@ namespace SysUtil
 
     long filesize( std::ifstream& str )
     {
-        std::istream::pos_type curr_pos = str.tellg( );
+        std::istream::pos_type curr_pos = str.tellg();
         if( !str.seekg( 0, std::ios_base::end ) ) return -1;
 
-        long length = static_cast< long >( str.tellg( ) );
+        long length = static_cast< long >( str.tellg() );
         if( !str.seekg( curr_pos, std::ios_base::beg ) )
         {
             assert( 0 );
@@ -56,13 +56,13 @@ namespace SysUtil
 
     void byteswap( void* data, unsigned value_size, size_t num_elem )
     {
-        char*       mem = reinterpret_cast< char* >( data );
+        char* mem       = reinterpret_cast< char* >( data );
         char* const end = mem + value_size * num_elem;
         for( ; mem < end; mem += value_size )
         {
             unsigned i = 0, j = value_size - 1;
             while( i < j )
-                std::swap( mem[ i++ ], mem[ j-- ] );
+                std::swap( mem[i++], mem[j--] );
         }
     }
 
@@ -156,9 +156,9 @@ namespace SysUtil
             uint32_t* end = mem + 2 * num_elem;
             for( ; mem < end; mem += 2 )
             {
-                uint32_t tmp = swap_bytes( mem[ 0 ] );
-                mem[ 0 ] = swap_bytes( mem[ 1 ] );
-                mem[ 1 ] = tmp;
+                uint32_t tmp = swap_bytes( mem[0] );
+                mem[0]       = swap_bytes( mem[1] );
+                mem[1]       = tmp;
             }
         }
     }

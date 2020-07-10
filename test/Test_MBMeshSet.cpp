@@ -54,180 +54,180 @@ bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents,
                    const Range& set2_ents );
 void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, EntityType etype, int dim );
 void test_iterators( unsigned int flags, bool type, bool dim );
-void test_all_iterators( );
+void test_all_iterators();
 
-void test_add_entities_ordered( )
+void test_add_entities_ordered()
 {
     test_add_entities( MESHSET_ORDERED );
 }
-void test_add_entities_set( )
+void test_add_entities_set()
 {
     test_add_entities( MESHSET_SET );
 }
-void test_add_entities_ordered_tracking( )
+void test_add_entities_ordered_tracking()
 {
     test_add_entities( MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
-void test_add_entities_set_tracking( )
+void test_add_entities_set_tracking()
 {
     test_add_entities( MESHSET_TRACK_OWNER | MESHSET_SET );
 }
 
-void test_remove_entities_ordered( )
+void test_remove_entities_ordered()
 {
     test_remove_entities( MESHSET_ORDERED );
 }
-void test_remove_entities_set( )
+void test_remove_entities_set()
 {
     test_remove_entities( MESHSET_SET );
 }
-void test_remove_entities_ordered_tracking( )
+void test_remove_entities_ordered_tracking()
 {
     test_remove_entities( MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
-void test_remove_entities_set_tracking( )
+void test_remove_entities_set_tracking()
 {
     test_remove_entities( MESHSET_TRACK_OWNER | MESHSET_SET );
 }
 
-void test_entities_by_type_ordered( )
+void test_entities_by_type_ordered()
 {
     test_entities_by_type( MESHSET_ORDERED );
 }
-void test_entities_by_type_set( )
+void test_entities_by_type_set()
 {
     test_entities_by_type( MESHSET_SET );
 }
-void test_entities_by_dim_ordered( )
+void test_entities_by_dim_ordered()
 {
     test_entities_by_dimension( MESHSET_ORDERED );
 }
-void test_entities_by_dim_set( )
+void test_entities_by_dim_set()
 {
     test_entities_by_dimension( MESHSET_SET );
 }
 
-void test_subtract_set_set( )
+void test_subtract_set_set()
 {
     test_subtract( MESHSET_SET, MESHSET_SET );
 }
-void test_subtract_set_ordered( )
+void test_subtract_set_ordered()
 {
     test_subtract( MESHSET_SET, MESHSET_ORDERED );
 }
-void test_subtract_ordered_set( )
+void test_subtract_ordered_set()
 {
     test_subtract( MESHSET_ORDERED, MESHSET_SET );
 }
-void test_subtract_ordered_ordered( )
+void test_subtract_ordered_ordered()
 {
     test_subtract( MESHSET_ORDERED, MESHSET_ORDERED );
 }
-void test_subtract_set_set_tracking( )
+void test_subtract_set_set_tracking()
 {
     test_subtract( MESHSET_TRACK_OWNER | MESHSET_SET, MESHSET_TRACK_OWNER | MESHSET_SET );
 }
-void test_subtract_set_ordered_tracking( )
+void test_subtract_set_ordered_tracking()
 {
     test_subtract( MESHSET_TRACK_OWNER | MESHSET_SET, MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
-void test_subtract_ordered_set_tracking( )
+void test_subtract_ordered_set_tracking()
 {
     test_subtract( MESHSET_TRACK_OWNER | MESHSET_ORDERED, MESHSET_TRACK_OWNER | MESHSET_SET );
 }
-void test_subtract_ordered_ordered_tracking( )
+void test_subtract_ordered_ordered_tracking()
 {
     test_subtract( MESHSET_TRACK_OWNER | MESHSET_ORDERED, MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
 
-void test_itersect_set_set( )
+void test_itersect_set_set()
 {
     test_intersect( MESHSET_SET, MESHSET_SET );
 }
-void test_itersect_set_ordered( )
+void test_itersect_set_ordered()
 {
     test_intersect( MESHSET_SET, MESHSET_ORDERED );
 }
-void test_itersect_ordered_set( )
+void test_itersect_ordered_set()
 {
     test_intersect( MESHSET_ORDERED, MESHSET_SET );
 }
-void test_itersect_ordered_ordered( )
+void test_itersect_ordered_ordered()
 {
     test_intersect( MESHSET_ORDERED, MESHSET_ORDERED );
 }
-void test_itersect_set_set_tracking( )
+void test_itersect_set_set_tracking()
 {
     test_intersect( MESHSET_TRACK_OWNER | MESHSET_SET, MESHSET_TRACK_OWNER | MESHSET_SET );
 }
-void test_itersect_set_ordered_tracking( )
+void test_itersect_set_ordered_tracking()
 {
     test_intersect( MESHSET_TRACK_OWNER | MESHSET_SET, MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
-void test_itersect_ordered_set_tracking( )
+void test_itersect_ordered_set_tracking()
 {
     test_intersect( MESHSET_TRACK_OWNER | MESHSET_ORDERED, MESHSET_TRACK_OWNER | MESHSET_SET );
 }
-void test_itersect_ordered_ordered_tracking( )
+void test_itersect_ordered_ordered_tracking()
 {
     test_intersect( MESHSET_TRACK_OWNER | MESHSET_ORDERED, MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
 
-void test_unite_set_set( )
+void test_unite_set_set()
 {
     test_unite( MESHSET_SET, MESHSET_SET );
 }
-void test_unite_set_ordered( )
+void test_unite_set_ordered()
 {
     test_unite( MESHSET_SET, MESHSET_ORDERED );
 }
-void test_unite_ordered_set( )
+void test_unite_ordered_set()
 {
     test_unite( MESHSET_ORDERED, MESHSET_SET );
 }
-void test_unite_ordered_ordered( )
+void test_unite_ordered_ordered()
 {
     test_unite( MESHSET_ORDERED, MESHSET_ORDERED );
 }
-void test_unite_set_set_tracking( )
+void test_unite_set_set_tracking()
 {
     test_unite( MESHSET_TRACK_OWNER | MESHSET_SET, MESHSET_TRACK_OWNER | MESHSET_SET );
 }
-void test_unite_set_ordered_tracking( )
+void test_unite_set_ordered_tracking()
 {
     test_unite( MESHSET_TRACK_OWNER | MESHSET_SET, MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
-void test_unite_ordered_set_tracking( )
+void test_unite_ordered_set_tracking()
 {
     test_unite( MESHSET_TRACK_OWNER | MESHSET_ORDERED, MESHSET_TRACK_OWNER | MESHSET_SET );
 }
-void test_unite_ordered_ordered_tracking( )
+void test_unite_ordered_ordered_tracking()
 {
     test_unite( MESHSET_TRACK_OWNER | MESHSET_ORDERED, MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
 
-void test_contains_entities_ordered( )
+void test_contains_entities_ordered()
 {
     test_contains_entities( MESHSET_ORDERED );
 }
-void test_contains_entities_set( )
+void test_contains_entities_set()
 {
     test_contains_entities( MESHSET_SET );
 }
 
-void test_clear_ordered( )
+void test_clear_ordered()
 {
     test_clear( MESHSET_ORDERED );
 }
-void test_clear_set( )
+void test_clear_set()
 {
     test_clear( MESHSET_SET );
 }
-void test_clear_ordered_tracking( )
+void test_clear_ordered_tracking()
 {
     test_clear( MESHSET_TRACK_OWNER | MESHSET_ORDERED );
 }
-void test_clear_set_tracking( )
+void test_clear_set_tracking()
 {
     test_clear( MESHSET_TRACK_OWNER | MESHSET_SET );
 }
@@ -235,9 +235,9 @@ void test_clear_set_tracking( )
 // Reproduce contitions that resulted in bug reported to
 // mailing list:
 // http://lists.mcs.anl.gov/pipermail/moab-dev/2010/002714.html
-void regression_insert_set_1( );
+void regression_insert_set_1();
 
-int main( )
+int main()
 {
     int err = 0;
 
@@ -316,10 +316,10 @@ void make_mesh( Interface& iface )
         {
             for( int x = 0; x <= dim; ++x )
             {
-                const double coords[] = { static_cast< double >( x ), static_cast< double >( y ),
+                const double coords[]   = { static_cast< double >( x ), static_cast< double >( y ),
                                           static_cast< double >( z ) };
                 EntityHandle new_handle = 0;
-                ErrorCode    rval = iface.create_vertex( coords, new_handle );CHECK_ERR( rval );
+                ErrorCode rval          = iface.create_vertex( coords, new_handle );CHECK_ERR( rval );
                 CHECK_EQUAL( ++prev_handle, new_handle );
             }
         }
@@ -328,18 +328,18 @@ void make_mesh( Interface& iface )
     // create hexes
     const int dim1 = dim + 1;
     const int dimq = dim1 * dim1;
-    prev_handle = FIRST_HANDLE( MBHEX );
+    prev_handle    = FIRST_HANDLE( MBHEX );
     for( int z = 0; z < dim; ++z )
     {
         for( int y = 0; y < dim; ++y )
         {
             for( int x = 0; x < dim; ++x )
             {
-                const EntityHandle off = 1 + x + dim1 * y + dimq * z;
+                const EntityHandle off    = 1 + x + dim1 * y + dimq * z;
                 const EntityHandle conn[] = { off,        off + 1,        off + 1 + dim1,        off + dim1,
                                               off + dimq, off + 1 + dimq, off + 1 + dim1 + dimq, off + dim1 + dimq };
-                EntityHandle       new_handle = 0;
-                ErrorCode          rval = iface.create_element( MBHEX, conn, 8, new_handle );CHECK_ERR( rval );
+                EntityHandle new_handle   = 0;
+                ErrorCode rval            = iface.create_element( MBHEX, conn, 8, new_handle );CHECK_ERR( rval );
                 CHECK_EQUAL( prev_handle++, new_handle );
             }
         }
@@ -353,19 +353,19 @@ void make_mesh( Interface& mb, EntityHandle& first_vert, EntityHandle& last_vert
 
     // Get handle ranges, and validate assumption that handles
     // are contiguous.
-    Range     range;
+    Range range;
     ErrorCode rval = mb.get_entities_by_type( 0, MBVERTEX, range );CHECK_ERR( rval );
-    first_vert = range.front( );
-    last_vert = range.back( );
+    first_vert = range.front();
+    last_vert  = range.back();
     CHECK_EQUAL( (EntityHandle)1331, last_vert - first_vert + 1 );
-    range.clear( );
+    range.clear();
     rval = mb.get_entities_by_type( 0, MBHEX, range );CHECK_ERR( rval );
-    first_hex = range.front( );
-    last_hex = range.back( );
+    first_hex = range.front();
+    last_hex  = range.back();
     CHECK_EQUAL( (EntityHandle)1000, last_hex - first_hex + 1 );
 }
 
-template< typename iter_type >
+template < typename iter_type >
 void print_handles( std::ostream& str, const char* prefix, iter_type begin, iter_type end )
 {
     if( prefix ) str << prefix << ':';
@@ -375,8 +375,8 @@ void print_handles( std::ostream& str, const char* prefix, iter_type begin, iter
         return;
     }
 
-    iter_type    i = begin;
-    EntityType   prev_type = TYPE_FROM_HANDLE( *i );
+    iter_type i           = begin;
+    EntityType prev_type  = TYPE_FROM_HANDLE( *i );
     EntityHandle prev_ent = *i;
     str << ' ' << CN::EntityTypeName( prev_type ) << ' ' << ID_FROM_HANDLE( *i );
     for( ;; )
@@ -404,12 +404,12 @@ void print_handles( std::ostream& str, const char* prefix, iter_type begin, iter
 
 void print_handle_vect( const char* prefix, const std::vector< EntityHandle >& vect )
 {
-    print_handles( std::cout, prefix, vect.begin( ), vect.end( ) );
+    print_handles( std::cout, prefix, vect.begin(), vect.end() );
 }
 
 void print_mbrange( const char* prefix, const Range& range )
 {
-    print_handles( std::cout, prefix, range.begin( ), range.end( ) );
+    print_handles( std::cout, prefix, range.begin(), range.end() );
 }
 
 bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& expected, int set_count,
@@ -417,8 +417,8 @@ bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& ex
 {
 
     std::vector< EntityHandle > sorted( expected );
-    std::sort( sorted.begin( ), sorted.end( ) );
-    sorted.erase( std::unique( sorted.begin( ), sorted.end( ) ), sorted.end( ) );
+    std::sort( sorted.begin(), sorted.end() );
+    sorted.erase( std::unique( sorted.begin(), sorted.end() ), sorted.end() );
 
     int expected_size = 0;
     if( flags & MESHSET_ORDERED )
@@ -430,7 +430,7 @@ bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& ex
             print_handle_vect( "Actual", vect );
             return false;
         }
-        expected_size = expected.size( );
+        expected_size = expected.size();
     }
     else
     {
@@ -441,7 +441,7 @@ bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& ex
             print_handle_vect( "Actual", vect );
             return false;
         }
-        expected_size = sorted.size( );
+        expected_size = sorted.size();
     }
 
     if( expected_size != set_count )
@@ -452,9 +452,9 @@ bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& ex
         return false;
     }
 
-    vect.clear( );
-    vect.resize( range.size( ) );
-    std::copy( range.begin( ), range.end( ), vect.begin( ) );
+    vect.clear();
+    vect.resize( range.size() );
+    std::copy( range.begin(), range.end(), vect.begin() );
     if( sorted != vect )
     {
         std::cout << "Incorrect set contents from mbrange-based query" << std::endl;
@@ -468,12 +468,12 @@ bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& ex
 
 bool check_set_contents( Core& mb, EntityHandle set, const std::vector< EntityHandle >& expected )
 {
-    unsigned  flags;
+    unsigned flags;
     ErrorCode rval = mb.get_meshset_options( set, flags );CHECK_ERR( rval );
 
-    int                         count;
+    int count;
     std::vector< EntityHandle > vect;
-    Range                       range;
+    Range range;
     rval = mb.get_entities_by_handle( set, vect, false );CHECK_ERR( rval );
     rval = mb.get_entities_by_handle( set, range, false );CHECK_ERR( rval );
     rval = mb.get_number_entities_by_handle( set, count, false );CHECK_ERR( rval );
@@ -484,15 +484,15 @@ bool check_set_contents( Core& mb, EntityHandle set, const std::vector< EntityHa
 
     // get all entitites with an adjacency to the set
     std::vector< EntityHandle > adj;
-    Range                       all, adjacent;
-    Range::iterator             in = adjacent.begin( );
+    Range all, adjacent;
+    Range::iterator in = adjacent.begin();
     mb.get_entities_by_handle( 0, all );
-    for( Range::iterator i = all.begin( ); i != all.end( ); ++i )
+    for( Range::iterator i = all.begin(); i != all.end(); ++i )
     {
-        adj.clear( );
-        rval = mb.a_entity_factory( )->get_adjacencies( *i, adj );CHECK_ERR( rval );
-        std::vector< EntityHandle >::iterator j = std::lower_bound( adj.begin( ), adj.end( ), set );
-        if( j != adj.end( ) && *j == set ) in = adjacent.insert( in, *i, *i );
+        adj.clear();
+        rval = mb.a_entity_factory()->get_adjacencies( *i, adj );CHECK_ERR( rval );
+        std::vector< EntityHandle >::iterator j = std::lower_bound( adj.begin(), adj.end(), set );
+        if( j != adj.end() && *j == set ) in = adjacent.insert( in, *i, *i );
     }
 
     if( range != adjacent )
@@ -508,14 +508,14 @@ bool check_set_contents( Core& mb, EntityHandle set, const std::vector< EntityHa
 
 bool check_set_contents( Core& mb, EntityType type, EntityHandle set, unsigned flags )
 {
-    ErrorCode                   rval;
-    int                         count;
+    ErrorCode rval;
+    int count;
     std::vector< EntityHandle > vect, expected;
-    Range                       range;
+    Range range;
 
     rval = mb.get_entities_by_handle( set, expected, false );CHECK_ERR( rval );
-    std::vector< EntityHandle >::iterator i = expected.begin( );
-    while( i != expected.end( ) )
+    std::vector< EntityHandle >::iterator i = expected.begin();
+    while( i != expected.end() )
     {
         if( TYPE_FROM_HANDLE( *i ) != type )
             i = expected.erase( i );
@@ -526,20 +526,20 @@ bool check_set_contents( Core& mb, EntityType type, EntityHandle set, unsigned f
     rval = mb.get_entities_by_type( set, type, range, false );CHECK_ERR( rval );
     rval = mb.get_number_entities_by_type( set, type, count, false );CHECK_ERR( rval );
 
-    std::copy( range.begin( ), range.end( ), std::back_inserter( vect ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( vect ) );
     return compare_set_contents( flags, expected, count, vect, range );
 }
 
 bool check_set_contents( Core& mb, int dim, EntityHandle set, unsigned flags )
 {
-    ErrorCode                   rval;
-    int                         count;
+    ErrorCode rval;
+    int count;
     std::vector< EntityHandle > vect, expected;
-    Range                       range;
+    Range range;
 
     rval = mb.get_entities_by_handle( set, expected, false );CHECK_ERR( rval );
-    std::vector< EntityHandle >::iterator i = expected.begin( );
-    while( i != expected.end( ) )
+    std::vector< EntityHandle >::iterator i = expected.begin();
+    while( i != expected.end() )
     {
         if( CN::Dimension( TYPE_FROM_HANDLE( *i ) ) != dim )
             i = expected.erase( i );
@@ -550,7 +550,7 @@ bool check_set_contents( Core& mb, int dim, EntityHandle set, unsigned flags )
     rval = mb.get_entities_by_dimension( set, dim, range, false );CHECK_ERR( rval );
     rval = mb.get_number_entities_by_dimension( set, dim, count, false );CHECK_ERR( rval );
 
-    std::copy( range.begin( ), range.end( ), std::back_inserter( vect ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( vect ) );
     return compare_set_contents( flags, expected, count, vect, range );
 }
 
@@ -560,172 +560,172 @@ void test_add_entities( unsigned flags )
     make_mesh( mb );
 
     EntityHandle set;
-    ErrorCode    rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
 
     std::vector< EntityHandle > contents, vect;
-    Range                       range;
+    Range range;
 
-    range.clear( );
+    range.clear();
     range.insert( 11, 20 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [11,20]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 31, 40 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [11,20],[31,40]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 51, 60 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [11,20],[31,40],[51,60]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 71, 80 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [11,20],[31,40],[51,60],[71,80]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 91, 100 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [11,20],[31,40],[51,60],[71,80],[91,100]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 111, 120 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [11,20],[31,40],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 6, 12 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [6,20],[31,40],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1, 3 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[31,40],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 25, 25 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[31,40],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 30, 30 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[30,40],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 29, 31 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[29,40],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 41, 41 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[29,41],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 41, 45 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[29,45],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 47, 47 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[29,45],[47,47],[51,60],[71,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 51, 80 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[29,45],[47,47],[51,80],[91,100],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 49, 105 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,3],[6,20],[25,25],[29,45],[47,47],[49,105],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    vect.clear( );
+    vect.clear();
     for( EntityHandle h = 1; h < 100; ++h )
     {
         vect.push_back( h );
         contents.push_back( h );
     }
-    rval = mb.add_entities( set, &vect[ 0 ], vect.size( ) );CHECK_ERR( rval );
+    rval = mb.add_entities( set, &vect[0], vect.size() );CHECK_ERR( rval );
     // [1,105],[111,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    vect.clear( );
+    vect.clear();
     vect.push_back( 106 );
     vect.push_back( 108 );
     vect.push_back( 110 );
-    std::copy( vect.begin( ), vect.end( ), std::back_inserter( contents ) );
-    rval = mb.add_entities( set, &vect[ 0 ], vect.size( ) );CHECK_ERR( rval );
+    std::copy( vect.begin(), vect.end(), std::back_inserter( contents ) );
+    rval = mb.add_entities( set, &vect[0], vect.size() );CHECK_ERR( rval );
     // [1,106],[108,108],[110,120]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 107, 200 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,200]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1, 1 );
     range.insert( 5, 6 );
     range.insert( 199, 200 );
     range.insert( 201, 202 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,202]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 300, 301 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,202],[300,301]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 203, 203 );
     range.insert( 205, 205 );
     range.insert( 207, 207 );
     range.insert( 299, 299 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,203],[205,205],[207,207],[299,301]
     CHECK( check_set_contents( mb, set, contents ) );
@@ -733,13 +733,13 @@ void test_add_entities( unsigned flags )
 
 void remove_from_back( std::vector< EntityHandle >& vect, const Range& range )
 {
-    for( Range::const_iterator r = range.begin( ); r != range.end( ); ++r )
+    for( Range::const_iterator r = range.begin(); r != range.end(); ++r )
     {
-        std::vector< EntityHandle >::reverse_iterator i = find( vect.rbegin( ), vect.rend( ), *r );
-        if( i != vect.rend( ) ) *i = 0;
+        std::vector< EntityHandle >::reverse_iterator i = find( vect.rbegin(), vect.rend(), *r );
+        if( i != vect.rend() ) *i = 0;
     }
-    std::vector< EntityHandle >::iterator j = vect.begin( );
-    while( j != vect.end( ) )
+    std::vector< EntityHandle >::iterator j = vect.begin();
+    while( j != vect.end() )
     {
         if( *j == 0 )
             j = vect.erase( j );
@@ -754,152 +754,152 @@ void test_remove_entities( unsigned flags )
     make_mesh( mb );
 
     EntityHandle set;
-    ErrorCode    rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
 
     std::vector< EntityHandle > contents;
-    Range                       range;
+    Range range;
 
-    range.clear( );
+    range.clear();
     range.insert( 1, 1000 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1, 5 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [6,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 6, 6 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [7,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 7, 10 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [11,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1, 20 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1, 5 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 22, 30 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,1000]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1000, 1000 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,999]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 901, 999 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,900]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 900, 999 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 1000, 1001 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 890, 898 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 100, 149 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[31,99],[150,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 31, 99 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[150,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 200, 249 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[150,199],[250,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 300, 349 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[150,199],[250,299],[350,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 159, 399 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[150,158],[400,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 450, 499 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[150,158],[400,449],[500,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 550, 599 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[150,158],[400,449],[500,549],[600,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 150, 549 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
     // [21,21],[600,889],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
-    range.clear( );
+    range.clear();
     range.insert( 650, 699 );
     remove_from_back( contents, range );
     rval = mb.remove_entities( set, range );CHECK_ERR( rval );
@@ -907,33 +907,33 @@ void test_remove_entities( unsigned flags )
     CHECK( check_set_contents( mb, set, contents ) );
 
     // test vector-based remove
-    assert( contents.size( ) == 242 );
+    assert( contents.size() == 242 );
     std::vector< EntityHandle > remlist( 5 );
-    remlist[ 0 ] = contents[ 240 ];
-    contents.erase( contents.begin( ) + 240 );
-    remlist[ 1 ] = contents[ 200 ];
-    contents.erase( contents.begin( ) + 200 );
-    remlist[ 2 ] = contents[ 100 ];
-    contents.erase( contents.begin( ) + 100 );
-    remlist[ 3 ] = contents[ 25 ];
-    contents.erase( contents.begin( ) + 25 );
-    remlist[ 4 ] = contents[ 0 ];
-    contents.erase( contents.begin( ) + 0 );
-    rval = mb.remove_entities( set, &remlist[ 0 ], remlist.size( ) );CHECK_ERR( rval );
+    remlist[0] = contents[240];
+    contents.erase( contents.begin() + 240 );
+    remlist[1] = contents[200];
+    contents.erase( contents.begin() + 200 );
+    remlist[2] = contents[100];
+    contents.erase( contents.begin() + 100 );
+    remlist[3] = contents[25];
+    contents.erase( contents.begin() + 25 );
+    remlist[4] = contents[0];
+    contents.erase( contents.begin() + 0 );
+    rval = mb.remove_entities( set, &remlist[0], remlist.size() );CHECK_ERR( rval );
     // [600,623],[625,649],[700,748],[750,848],[850,888],[899,899]
     CHECK( check_set_contents( mb, set, contents ) );
 
     // remove everything
-    std::reverse( contents.begin( ), contents.begin( ) + contents.size( ) / 2 );  // mix up a bit
-    rval = mb.remove_entities( set, &contents[ 0 ], contents.size( ) );CHECK_ERR( rval );
-    contents.clear( );
+    std::reverse( contents.begin(), contents.begin() + contents.size() / 2 );  // mix up a bit
+    rval = mb.remove_entities( set, &contents[0], contents.size() );CHECK_ERR( rval );
+    contents.clear();
     CHECK( check_set_contents( mb, set, contents ) );
 
     // try complicated range-based remove
-    range.clear( );
-    contents.clear( );
+    range.clear();
+    contents.clear();
     range.insert( 100, 200 );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
     // [1000,2000]
     CHECK( check_set_contents( mb, set, contents ) );
@@ -949,8 +949,8 @@ void test_remove_entities( unsigned flags )
     remove.insert( 230, 240 );
     range = subtract( range, remove );
 
-    contents.clear( );
-    std::copy( range.begin( ), range.end( ), std::back_inserter( contents ) );
+    contents.clear();
+    std::copy( range.begin(), range.end(), std::back_inserter( contents ) );
     rval = mb.remove_entities( set, remove );CHECK_ERR( rval );
     CHECK( check_set_contents( mb, set, contents ) );
 }
@@ -958,12 +958,12 @@ void test_remove_entities( unsigned flags )
 void test_entities_by_type( unsigned flags )
 {
     EntityHandle first_vert, last_vert, first_hex, last_hex;
-    Core         mb;
+    Core mb;
     make_mesh( mb, first_vert, last_vert, first_hex, last_hex );
 
     // Create an entity set
     EntityHandle set;
-    ErrorCode    rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
 
     // Test empty set
     CHECK( check_set_contents( mb, MBVERTEX, set, flags ) );
@@ -987,12 +987,12 @@ void test_entities_by_type( unsigned flags )
 void test_entities_by_dimension( unsigned flags )
 {
     EntityHandle first_vert, last_vert, first_hex, last_hex;
-    Core         mb;
+    Core mb;
     make_mesh( mb, first_vert, last_vert, first_hex, last_hex );
 
     // Create an entity set
     EntityHandle set;
-    ErrorCode    rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
 
     // Test empty set
     CHECK( check_set_contents( mb, 0, set, flags ) );
@@ -1027,7 +1027,7 @@ bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents,
     rval = mb.add_entities( set1, set1_ents );CHECK_ERR( rval );
     rval = mb.add_entities( set2, set2_ents );CHECK_ERR( rval );
 
-    Range                       tmp_range;
+    Range tmp_range;
     std::vector< EntityHandle > expected;
     rval = MB_INDEX_OUT_OF_RANGE;
     switch( op )
@@ -1037,27 +1037,27 @@ bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents,
             {
                 tmp_range = set1_ents;
                 tmp_range.merge( set2_ents );
-                expected.resize( tmp_range.size( ) );
-                std::copy( tmp_range.begin( ), tmp_range.end( ), expected.begin( ) );
+                expected.resize( tmp_range.size() );
+                std::copy( tmp_range.begin(), tmp_range.end(), expected.begin() );
             }
             else
             {
-                expected.clear( );
-                std::copy( set1_ents.begin( ), set1_ents.end( ), std::back_inserter( expected ) );
-                std::copy( set2_ents.begin( ), set2_ents.end( ), std::back_inserter( expected ) );
+                expected.clear();
+                std::copy( set1_ents.begin(), set1_ents.end(), std::back_inserter( expected ) );
+                std::copy( set2_ents.begin(), set2_ents.end(), std::back_inserter( expected ) );
             }
             rval = mb.unite_meshset( set1, set2 );
             break;
         case INTERSECT:
             tmp_range = intersect( set1_ents, set2_ents );
-            expected.resize( tmp_range.size( ) );
-            std::copy( tmp_range.begin( ), tmp_range.end( ), expected.begin( ) );
+            expected.resize( tmp_range.size() );
+            std::copy( tmp_range.begin(), tmp_range.end(), expected.begin() );
             rval = mb.intersect_meshset( set1, set2 );
             break;
         case SUBTRACT:
             tmp_range = subtract( set1_ents, set2_ents );
-            expected.resize( tmp_range.size( ) );
-            std::copy( tmp_range.begin( ), tmp_range.end( ), expected.begin( ) );
+            expected.resize( tmp_range.size() );
+            std::copy( tmp_range.begin(), tmp_range.end(), expected.begin() );
             rval = mb.subtract_meshset( set1, set2 );
             break;
     }
@@ -1068,9 +1068,9 @@ bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents,
 
 void test_intersect( unsigned flags1, unsigned flags2 )
 {
-    Range        empty, set1_ents, set2_ents;
+    Range empty, set1_ents, set2_ents;
     EntityHandle first_vert, last_vert, first_hex, last_hex;
-    Core         mb;
+    Core mb;
     make_mesh( mb, first_vert, last_vert, first_hex, last_hex );
 
     // define contents of first set
@@ -1095,9 +1095,9 @@ void test_intersect( unsigned flags1, unsigned flags2 )
 
 void test_unite( unsigned flags1, unsigned flags2 )
 {
-    Range        empty, set1_ents, set2_ents;
+    Range empty, set1_ents, set2_ents;
     EntityHandle first_vert, last_vert, first_hex, last_hex;
-    Core         mb;
+    Core mb;
     make_mesh( mb, first_vert, last_vert, first_hex, last_hex );
 
     // define contents of first set
@@ -1123,9 +1123,9 @@ void test_unite( unsigned flags1, unsigned flags2 )
 
 void test_subtract( unsigned flags1, unsigned flags2 )
 {
-    Range        empty, set1_ents, set2_ents;
+    Range empty, set1_ents, set2_ents;
     EntityHandle first_vert, last_vert, first_hex, last_hex;
-    Core         mb;
+    Core mb;
     make_mesh( mb, first_vert, last_vert, first_hex, last_hex );
 
     // define contents of first set
@@ -1154,11 +1154,11 @@ void test_contains_entities( unsigned flags )
 {
     CHECK( !( flags & MESHSET_TRACK_OWNER ) );
     MeshSet set( flags );
-    bool    result;
+    bool result;
 
     const EntityHandle entities[] = { 1, 2, 3, 6, 10, 11, 25, 100 };
-    const int          num_ents = sizeof( entities ) / sizeof( EntityHandle );
-    ErrorCode          rval = set.add_entities( entities, num_ents, 0, 0 );CHECK_ERR( rval );
+    const int num_ents            = sizeof( entities ) / sizeof( EntityHandle );
+    ErrorCode rval                = set.add_entities( entities, num_ents, 0, 0 );CHECK_ERR( rval );
 
     result = set.contains_entities( entities, num_ents, Interface::UNION );
     CHECK( result );
@@ -1171,8 +1171,8 @@ void test_contains_entities( unsigned flags )
     CHECK( result );
 
     const EntityHandle entities2[] = { 3, 4, 5 };
-    const int          num_ents2 = sizeof( entities2 ) / sizeof( EntityHandle );
-    result = set.contains_entities( entities2, num_ents2, Interface::UNION );
+    const int num_ents2            = sizeof( entities2 ) / sizeof( EntityHandle );
+    result                         = set.contains_entities( entities2, num_ents2, Interface::UNION );
     CHECK( result );
     result = set.contains_entities( entities2, num_ents2, Interface::INTERSECT );
     CHECK( !result );
@@ -1181,21 +1181,21 @@ void test_contains_entities( unsigned flags )
 void test_clear( unsigned flags )
 {
     std::vector< EntityHandle > contents( 4 );
-    Core                        mb;
-    make_mesh( mb, contents[ 0 ], contents[ 1 ], contents[ 2 ], contents[ 3 ] );
+    Core mb;
+    make_mesh( mb, contents[0], contents[1], contents[2], contents[3] );
     EntityHandle set;
-    ErrorCode    rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
-    rval = mb.add_entities( set, &contents[ 0 ], contents.size( ) );CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
+    rval = mb.add_entities( set, &contents[0], contents.size() );CHECK_ERR( rval );
     CHECK( check_set_contents( mb, set, contents ) );
     rval = mb.clear_meshset( &set, 1 );CHECK_ERR( rval );
-    contents.clear( );
+    contents.clear();
     CHECK( check_set_contents( mb, set, contents ) );
 }
 
-void regression_insert_set_1( )
+void regression_insert_set_1()
 {
-    EntityHandle       e = CREATE_HANDLE( MBEDGE, 0 );
-    EntityHandle       q = CREATE_HANDLE( MBQUAD, 0 );
+    EntityHandle e                      = CREATE_HANDLE( MBEDGE, 0 );
+    EntityHandle q                      = CREATE_HANDLE( MBQUAD, 0 );
     const EntityHandle initial_ranges[] = {
         0x7fe,      0x7fe,      0x802,      0x80b,      0xb3a,      0xb3c,      0xb6b,      0xb6b,      0xbed,
         0xbee,      0x19ff,     0x19ff,     0x1a0b,     0x1a0b,     0x1a16,     0x1a17,     0x1a56,     0x1a57,
@@ -1209,18 +1209,18 @@ void regression_insert_set_1( )
                                         0x1a0b, 0x1a0b, 0x1a11, 0x1a17, 0x1a1b, 0x1a23, 0x1a56, 0x1a57, 0x1a7c,
                                         0x1a96, 0x1bb5, 0x1bba, 0x254b, 0x2565, 0x25a5, 0x25bf };
 
-    Core       moab;
+    Core moab;
     Interface& mb = moab;
-    ErrorCode  rval;
+    ErrorCode rval;
 
     EntityHandle set;
     rval = mb.create_meshset( MESHSET_SET, set );CHECK_ERR( rval );
 
     Range init, add;
-    for( size_t i = 0; i < sizeof( initial_ranges ) / sizeof( initial_ranges[ 0 ] ); i += 2 )
-        init.insert( initial_ranges[ i ], initial_ranges[ i + 1 ] );
-    for( size_t i = 0; i < sizeof( new_ranges ) / sizeof( new_ranges[ 0 ] ); i += 2 )
-        add.insert( new_ranges[ i ], new_ranges[ i + 1 ] );
+    for( size_t i = 0; i < sizeof( initial_ranges ) / sizeof( initial_ranges[0] ); i += 2 )
+        init.insert( initial_ranges[i], initial_ranges[i + 1] );
+    for( size_t i = 0; i < sizeof( new_ranges ) / sizeof( new_ranges[0] ); i += 2 )
+        add.insert( new_ranges[i], new_ranges[i + 1] );
 
     rval = mb.add_entities( set, init );CHECK_ERR( rval );
     rval = mb.add_entities( set, add );CHECK_ERR( rval );
@@ -1229,14 +1229,14 @@ void regression_insert_set_1( )
     rval = mb.get_entities_by_handle( set, contents );CHECK_ERR( rval );
 
     init.merge( add );
-    Range::iterator                       r = init.begin( );
-    std::vector< EntityHandle >::iterator v = contents.begin( );
+    Range::iterator r                       = init.begin();
+    std::vector< EntityHandle >::iterator v = contents.begin();
     for( ;; )
     {
-        if( r == init.end( ) || v == contents.end( ) )
+        if( r == init.end() || v == contents.end() )
         {
-            CHECK( r == init.end( ) );
-            CHECK( v == contents.end( ) );
+            CHECK( r == init.end() );
+            CHECK( v == contents.end() );
             break;
         }
         CHECK_EQUAL( *r, *v );
@@ -1245,7 +1245,7 @@ void regression_insert_set_1( )
     }
 }
 
-void test_all_iterators( )
+void test_all_iterators()
 {
     test_iterators( MESHSET_SET, true, false );
     test_iterators( MESHSET_SET, false, true );
@@ -1259,16 +1259,16 @@ void test_iterators( unsigned int flags, bool test_type, bool test_dim )
     if( test_type && test_dim ) CHECK_ERR( MB_FAILURE );
 
     EntityHandle first_vert, last_vert, first_hex, last_hex;
-    Core         mb;
+    Core mb;
     make_mesh( mb, first_vert, last_vert, first_hex, last_hex );
 
     // Create an entity set
     EntityHandle set;
-    ErrorCode    rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
+    ErrorCode rval = mb.create_meshset( flags, set );CHECK_ERR( rval );
 
     // Test iteration over empty set
     SetIterator* iter = NULL;
-    rval = mb.create_set_iterator( set, MBMAXTYPE, -1, 1, false, iter );CHECK_ERR( rval );
+    rval              = mb.create_set_iterator( set, MBMAXTYPE, -1, 1, false, iter );CHECK_ERR( rval );
     if( NULL != iter )
     {
         test_iterator( mb, iter, set, MBMAXTYPE, -1 );
@@ -1309,10 +1309,10 @@ void test_iterators( unsigned int flags, bool test_type, bool test_dim )
     rval = mb.add_entities( set, range );CHECK_ERR( rval );
 
     EntityType etype = MBVERTEX;
-    int        edim = -1;
+    int edim         = -1;
     if( test_dim && !test_type )
     {
-        edim = 0;
+        edim  = 0;
         etype = MBMAXTYPE;
     }
 
@@ -1436,8 +1436,8 @@ void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, Entity
 {
     // iterate over the set, adding to contents
     std::vector< EntityHandle > entities, entities2;
-    bool                        atend = false;
-    ErrorCode                   rval;
+    bool atend = false;
+    ErrorCode rval;
 
     while( !atend )
     {
@@ -1463,5 +1463,5 @@ void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, Entity
         CHECK_ERR( MB_FAILURE );
     }
 
-    CHECK_EQUAL( entities.size( ), entities2.size( ) );
+    CHECK_EQUAL( entities.size(), entities2.size() );
 }

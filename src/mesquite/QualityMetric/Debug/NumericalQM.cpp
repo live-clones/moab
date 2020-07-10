@@ -40,19 +40,19 @@ NumericalQM::NumericalQM( QualityMetric* real_metric, bool numerical_gradient, b
 {
 }
 
-QualityMetric::MetricType NumericalQM::get_metric_type( ) const
+QualityMetric::MetricType NumericalQM::get_metric_type() const
 {
-    return realMetric->get_metric_type( );
+    return realMetric->get_metric_type();
 }
 
-std::string NumericalQM::get_name( ) const
+std::string NumericalQM::get_name() const
 {
-    return realMetric->get_name( );
+    return realMetric->get_name();
 }
 
-int NumericalQM::get_negate_flag( ) const
+int NumericalQM::get_negate_flag() const
 {
-    return realMetric->get_negate_flag( );
+    return realMetric->get_negate_flag();
 }
 
 void NumericalQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )

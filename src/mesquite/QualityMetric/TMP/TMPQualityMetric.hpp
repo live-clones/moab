@@ -61,7 +61,7 @@ class TMPQualityMetric : public ElemSampleQM
      */
     TMPQualityMetric( TargetCalculator* tc, WeightCalculator* wc ) : targetCalc( tc ), weightCalc( wc ) {}
 
-    MESQUITE_EXPORT virtual int get_negate_flag( ) const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
                                                   bool free_vertices_only, MsqError& err );
@@ -88,12 +88,12 @@ class TMPQualityMetric : public ElemSampleQM
         weightCalc = wc;
     }
     MESQUITE_EXPORT
-    TargetCalculator* get_target_calculator( ) const
+    TargetCalculator* get_target_calculator() const
     {
         return targetCalc;
     }
     MESQUITE_EXPORT
-    WeightCalculator* get_weight_calculator( ) const
+    WeightCalculator* get_weight_calculator() const
     {
         return weightCalc;
     }
@@ -120,10 +120,10 @@ class TMPQualityMetric : public ElemSampleQM
     {
         MAX_ELEM_NODES = 27
     };
-    size_t                           mIndices[ MAX_ELEM_NODES ];
+    size_t mIndices[MAX_ELEM_NODES];
     std::vector< MsqMatrix< 2, 2 > > hess2d;
-    MsqVector< 3 >                   mDerivs3D[ MAX_ELEM_NODES ];
-    MsqVector< 2 >                   mDerivs2D[ MAX_ELEM_NODES ];
+    MsqVector< 3 > mDerivs3D[MAX_ELEM_NODES];
+    MsqVector< 2 > mDerivs2D[MAX_ELEM_NODES];
 
     TargetCalculator* targetCalc;
 

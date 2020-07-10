@@ -40,12 +40,12 @@
 namespace MBMesquite
 {
 
-std::string TShapeOrientB1::get_name( ) const
+std::string TShapeOrientB1::get_name() const
 {
     return "TShapeOrientB1";
 }
 
-TShapeOrientB1::~TShapeOrientB1( ) {}
+TShapeOrientB1::~TShapeOrientB1() {}
 
 bool TShapeOrientB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
@@ -62,9 +62,9 @@ bool TShapeOrientB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqEr
 bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                          MsqError& err )
 {
-    const double norm = Frobenius( T );
+    const double norm    = Frobenius( T );
     const double invroot = 1.0 / MSQ_SQRT_TWO;
-    const double tau = det( T );
+    const double tau     = det( T );
     if( TMetric::invalid_determinant( tau ) )
     {  // barrier
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
@@ -84,11 +84,11 @@ bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& res
 }
 
 bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                         MsqMatrix< 2, 2 > second_wrt_T[ 3 ], MsqError& err )
+                                         MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
 {
-    const double norm = Frobenius( T );
+    const double norm    = Frobenius( T );
     const double invroot = 1.0 / MSQ_SQRT_TWO;
-    const double tau = det( T );
+    const double tau     = det( T );
     if( TMetric::invalid_determinant( tau ) )
     {  // barrier
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
@@ -98,10 +98,10 @@ bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& res
     const double invnorm = 1.0 / norm;
 
     const double f = norm - invroot * trace( T );
-    result = 0.5 * inv_tau * f;
+    result         = 0.5 * inv_tau * f;
 
     const MsqMatrix< 2, 2 > adjt = transpose_adj( T );
-    deriv_wrt_T = invnorm * T;
+    deriv_wrt_T                  = invnorm * T;
     pluseq_scaled_I( deriv_wrt_T, -invroot );
     deriv_wrt_T *= 0.5;
     deriv_wrt_T -= result * adjt;
@@ -132,9 +132,9 @@ bool TShapeOrientB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqEr
 bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
                                          MsqError& err )
 {
-    const double norm = Frobenius( T );
+    const double norm    = Frobenius( T );
     const double invroot = 1.0 / MSQ_SQRT_THREE;
-    const double tau = det( T );
+    const double tau     = det( T );
     if( TMetric::invalid_determinant( tau ) )
     {  // barrier
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
@@ -154,11 +154,11 @@ bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& res
 }
 
 bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                         MsqMatrix< 3, 3 > second_wrt_T[ 6 ], MsqError& err )
+                                         MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
 {
-    const double norm = Frobenius( T );
+    const double norm    = Frobenius( T );
     const double invroot = 1.0 / MSQ_SQRT_THREE;
-    const double tau = det( T );
+    const double tau     = det( T );
     if( TMetric::invalid_determinant( tau ) )
     {  // barrier
         MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
@@ -168,10 +168,10 @@ bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& res
     const double invnorm = 1.0 / norm;
 
     const double f = norm - invroot * trace( T );
-    result = 0.5 * inv_tau * f;
+    result         = 0.5 * inv_tau * f;
 
     const MsqMatrix< 3, 3 > adjt = transpose_adj( T );
-    deriv_wrt_T = invnorm * T;
+    deriv_wrt_T                  = invnorm * T;
     pluseq_scaled_I( deriv_wrt_T, -invroot );
     deriv_wrt_T *= 0.5;
     deriv_wrt_T -= result * adjt;

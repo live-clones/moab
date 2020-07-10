@@ -33,12 +33,12 @@
 namespace MBMesquite
 {
 
-EntityTopology HexLagrangeShape::element_topology( ) const
+EntityTopology HexLagrangeShape::element_topology() const
 {
     return HEXAHEDRON;
 }
 
-int HexLagrangeShape::num_nodes( ) const
+int HexLagrangeShape::num_nodes() const
 {
     return 27;
 }
@@ -46,7 +46,7 @@ int HexLagrangeShape::num_nodes( ) const
 void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
                                      size_t& num_coeff, MsqError& err ) const
 {
-    if( nodeset.num_nodes( ) != 27 )
+    if( nodeset.num_nodes() != 27 )
     {
         MSQ_SETERR( err )
         ( "Mapping function supports only 27-node hexahedra with no slaved nodes.", MsqError::UNSUPPORTED_ELEMENT );
@@ -56,24 +56,24 @@ void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_
     switch( loc.dimension )
     {
         case 0:  // Corner sample point - assume that it is there always
-            num_coeff = 1;
-            indices_out[ 0 ] = loc.number;
-            coeff_out[ 0 ] = 1.0;
+            num_coeff      = 1;
+            indices_out[0] = loc.number;
+            coeff_out[0]   = 1.0;
             break;
         case 1:  // Line sample point - check if it is there,
-            num_coeff = 1;
-            indices_out[ 0 ] = loc.number + 8;
-            coeff_out[ 0 ] = 1.0;
+            num_coeff      = 1;
+            indices_out[0] = loc.number + 8;
+            coeff_out[0]   = 1.0;
             break;
         case 2:  // Face sample point - check if it is there,
-            num_coeff = 1;
-            indices_out[ 0 ] = loc.number + 20;
-            coeff_out[ 0 ] = 1.0;
+            num_coeff      = 1;
+            indices_out[0] = loc.number + 20;
+            coeff_out[0]   = 1.0;
             break;
         case 3:  // Center sample point - check if it is there,
-            num_coeff = 1;
-            indices_out[ 0 ] = 26;
-            coeff_out[ 0 ] = 1.0;
+            num_coeff      = 1;
+            indices_out[0] = 26;
+            coeff_out[0]   = 1.0;
             break;
         default:
             MSQ_SETERR( err )
@@ -87,7 +87,7 @@ void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_
 void HexLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* derivs,
                                     size_t& num_vtx, MsqError& err ) const
 {
-    if( nodeset.num_nodes( ) != 27 )
+    if( nodeset.num_nodes() != 27 )
     {
         MSQ_SETERR( err )
         ( "Mapping function supports only 27-node hexahedra with no slaved nodes.", MsqError::UNSUPPORTED_ELEMENT );
@@ -149,172 +149,172 @@ void HexLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertice
 
     if( location != 26 )
     {
-        vertices[ num_vtx ] = location;
-        derivs[ num_vtx ][ 0 ] = entries[ HLS1[ location ] ];
-        derivs[ num_vtx ][ 1 ] = entries[ HLS2[ location ] ];
-        derivs[ num_vtx ][ 2 ] = entries[ HLS3[ location ] ];
+        vertices[num_vtx]  = location;
+        derivs[num_vtx][0] = entries[HLS1[location]];
+        derivs[num_vtx][1] = entries[HLS2[location]];
+        derivs[num_vtx][2] = entries[HLS3[location]];
         num_vtx++;
     }
 
-    if( HLSup1[ location ] != -1 )
+    if( HLSup1[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSup1[ location ];
-        if( HLS3[ location ] == 2 )
+        vertices[num_vtx] = HLSup1[location];
+        if( HLS3[location] == 2 )
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = 1;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = 1;
         }
         else
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = 4;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = 4;
         }
         num_vtx++;
     }
 
-    if( HLSdn1[ location ] != -1 )
+    if( HLSdn1[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSdn1[ location ];
-        if( HLS3[ location ] == 2 )
+        vertices[num_vtx] = HLSdn1[location];
+        if( HLS3[location] == 2 )
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = -1;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = -1;
         }
         else
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = -4;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = -4;
         }
         num_vtx++;
     }
 
-    if( HLSup2[ location ] != -1 )
+    if( HLSup2[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSup2[ location ];
-        derivs[ num_vtx ][ 0 ] = 0;
-        derivs[ num_vtx ][ 1 ] = 0;
-        derivs[ num_vtx ][ 2 ] = -1;
+        vertices[num_vtx]  = HLSup2[location];
+        derivs[num_vtx][0] = 0;
+        derivs[num_vtx][1] = 0;
+        derivs[num_vtx][2] = -1;
         num_vtx++;
     }
 
-    if( HLSdn2[ location ] != -1 )
+    if( HLSdn2[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSdn2[ location ];
-        derivs[ num_vtx ][ 0 ] = 0;
-        derivs[ num_vtx ][ 1 ] = 0;
-        derivs[ num_vtx ][ 2 ] = 1;
+        vertices[num_vtx]  = HLSdn2[location];
+        derivs[num_vtx][0] = 0;
+        derivs[num_vtx][1] = 0;
+        derivs[num_vtx][2] = 1;
         num_vtx++;
     }
 
-    if( HLSlt1[ location ] != -1 )
+    if( HLSlt1[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSlt1[ location ];
-        if( HLS1[ location ] == 2 )
+        vertices[num_vtx] = HLSlt1[location];
+        if( HLS1[location] == 2 )
         {
-            derivs[ num_vtx ][ 0 ] = -1;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = -1;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = 0;
         }
         else
         {
-            derivs[ num_vtx ][ 0 ] = -4;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = -4;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = 0;
         }
         num_vtx++;
     }
 
-    if( HLSrt1[ location ] != -1 )
+    if( HLSrt1[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSrt1[ location ];
-        if( HLS1[ location ] == 2 )
+        vertices[num_vtx] = HLSrt1[location];
+        if( HLS1[location] == 2 )
         {
-            derivs[ num_vtx ][ 0 ] = 1;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = 1;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = 0;
         }
         else
         {
-            derivs[ num_vtx ][ 0 ] = 4;
-            derivs[ num_vtx ][ 1 ] = 0;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = 4;
+            derivs[num_vtx][1] = 0;
+            derivs[num_vtx][2] = 0;
         }
         num_vtx++;
     }
 
-    if( HLSlt2[ location ] != -1 )
+    if( HLSlt2[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSlt2[ location ];
-        derivs[ num_vtx ][ 0 ] = 1;
-        derivs[ num_vtx ][ 1 ] = 0;
-        derivs[ num_vtx ][ 2 ] = 0;
+        vertices[num_vtx]  = HLSlt2[location];
+        derivs[num_vtx][0] = 1;
+        derivs[num_vtx][1] = 0;
+        derivs[num_vtx][2] = 0;
         num_vtx++;
     }
 
-    if( HLSrt2[ location ] != -1 )
+    if( HLSrt2[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSrt2[ location ];
-        derivs[ num_vtx ][ 0 ] = -1;
-        derivs[ num_vtx ][ 1 ] = 0;
-        derivs[ num_vtx ][ 2 ] = 0;
+        vertices[num_vtx]  = HLSrt2[location];
+        derivs[num_vtx][0] = -1;
+        derivs[num_vtx][1] = 0;
+        derivs[num_vtx][2] = 0;
         num_vtx++;
     }
 
-    if( HLSft1[ location ] != -1 )
+    if( HLSft1[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSft1[ location ];
-        if( HLS2[ location ] == 2 )
+        vertices[num_vtx] = HLSft1[location];
+        if( HLS2[location] == 2 )
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = -1;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = -1;
+            derivs[num_vtx][2] = 0;
         }
         else
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = -4;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = -4;
+            derivs[num_vtx][2] = 0;
         }
         num_vtx++;
     }
 
-    if( HLSbk1[ location ] != -1 )
+    if( HLSbk1[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSbk1[ location ];
-        if( HLS2[ location ] == 2 )
+        vertices[num_vtx] = HLSbk1[location];
+        if( HLS2[location] == 2 )
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = 1;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = 1;
+            derivs[num_vtx][2] = 0;
         }
         else
         {
-            derivs[ num_vtx ][ 0 ] = 0;
-            derivs[ num_vtx ][ 1 ] = 4;
-            derivs[ num_vtx ][ 2 ] = 0;
+            derivs[num_vtx][0] = 0;
+            derivs[num_vtx][1] = 4;
+            derivs[num_vtx][2] = 0;
         }
         num_vtx++;
     }
 
-    if( HLSft2[ location ] != -1 )
+    if( HLSft2[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSft2[ location ];
-        derivs[ num_vtx ][ 0 ] = 0;
-        derivs[ num_vtx ][ 1 ] = 1;
-        derivs[ num_vtx ][ 2 ] = 0;
+        vertices[num_vtx]  = HLSft2[location];
+        derivs[num_vtx][0] = 0;
+        derivs[num_vtx][1] = 1;
+        derivs[num_vtx][2] = 0;
         num_vtx++;
     }
 
-    if( HLSbk2[ location ] != -1 )
+    if( HLSbk2[location] != -1 )
     {
-        vertices[ num_vtx ] = HLSbk2[ location ];
-        derivs[ num_vtx ][ 0 ] = 0;
-        derivs[ num_vtx ][ 1 ] = -1;
-        derivs[ num_vtx ][ 2 ] = 0;
+        vertices[num_vtx]  = HLSbk2[location];
+        derivs[num_vtx][0] = 0;
+        derivs[num_vtx][1] = -1;
+        derivs[num_vtx][2] = 0;
         num_vtx++;
     }
 }

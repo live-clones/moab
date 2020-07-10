@@ -18,10 +18,10 @@ class CpuTimer
     int mpi_initialized;
 #endif
     double tAtBirth, tAtLast;
-    double runtime( );
+    double runtime();
 
   public:
-    CpuTimer( )
+    CpuTimer()
 #ifdef MOAB_HAVE_MPI
         : mpi_initialized( 0 )
 #endif
@@ -30,29 +30,29 @@ class CpuTimer
         int flag = 0;
         if( MPI_SUCCESS == MPI_Initialized( &flag ) && flag ) { mpi_initialized = 1; }
 #endif
-        tAtBirth = runtime( );
-        tAtLast = tAtBirth;
+        tAtBirth = runtime();
+        tAtLast  = tAtBirth;
     }
-    double time_since_birth( )
+    double time_since_birth()
     {
-        return ( tAtLast = runtime( ) ) - tAtBirth;
+        return ( tAtLast = runtime() ) - tAtBirth;
     };
-    double time_elapsed( )
+    double time_elapsed()
     {
         double tmp = tAtLast;
-        return ( tAtLast = runtime( ) ) - tmp;
+        return ( tAtLast = runtime() ) - tmp;
     }
 };
 
-inline double CpuTimer::runtime( )
+inline double CpuTimer::runtime()
 {
 #ifdef MOAB_HAVE_MPI
     if( mpi_initialized )
-        return MPI_Wtime( );
+        return MPI_Wtime();
     else
-        return (double)clock( ) / CLOCKS_PER_SEC;
+        return (double)clock() / CLOCKS_PER_SEC;
 #else
-    return (double)clock( ) / CLOCKS_PER_SEC;
+    return (double)clock() / CLOCKS_PER_SEC;
 #endif
 }
 }  // namespace moab

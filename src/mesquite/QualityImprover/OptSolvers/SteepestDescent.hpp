@@ -57,14 +57,14 @@ class SteepestDescent : public VertexMover, public PatchSetUser
     MESQUITE_EXPORT
     SteepestDescent( ObjectiveFunction* of );
 
-    MESQUITE_EXPORT virtual ~SteepestDescent( ) {}
+    MESQUITE_EXPORT virtual ~SteepestDescent() {}
 
-    MESQUITE_EXPORT virtual std::string get_name( ) const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual PatchSet* get_patch_set( );
+    MESQUITE_EXPORT virtual PatchSet* get_patch_set();
 
     MESQUITE_EXPORT
-    bool project_gradient( ) const
+    bool project_gradient() const
     {
         return projectGradient;
     }
@@ -86,12 +86,12 @@ class SteepestDescent : public VertexMover, public PatchSetUser
     MESQUITE_EXPORT virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     MESQUITE_EXPORT virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
     MESQUITE_EXPORT virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
-    MESQUITE_EXPORT virtual void cleanup( );
+    MESQUITE_EXPORT virtual void cleanup();
 
   private:
     bool projectGradient;
     // bool cosineStep;
-    SteepestDescent( const SteepestDescent& pd );  // disable copying
+    SteepestDescent( const SteepestDescent& pd );             // disable copying
     SteepestDescent& operator=( const SteepestDescent& pd );  // disable assignment
 };
 

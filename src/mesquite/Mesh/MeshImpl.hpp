@@ -62,9 +62,9 @@ class MESQUITE_EXPORT MeshImpl : public MBMesquite::Mesh
   public:
     //********* Functions that are NOT inherited ************
 
-    MeshImpl( );
+    MeshImpl();
 
-    virtual ~MeshImpl( );
+    virtual ~MeshImpl();
 
     /**\brief Initialize mesh by copying data from arrays.
      *
@@ -358,10 +358,10 @@ class MESQUITE_EXPORT MeshImpl : public MBMesquite::Mesh
     // just call the destructor.  More sophisticated implementations
     // may want to keep the Mesh object to live longer than Mesquite
     // is using it.
-    virtual void release( );
+    virtual void release();
 
     // Remove all data
-    void clear( );
+    void clear();
 
   protected:
     /** Coordinate values per vertex */

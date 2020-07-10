@@ -28,7 +28,7 @@ namespace moab
 struct MBuuid
 {
     //! default constructor that initializes to zero
-    MBuuid( )
+    MBuuid()
     {
         memset( this, 0, sizeof( MBuuid ) );
     }
@@ -36,17 +36,17 @@ struct MBuuid
     MBuuid( unsigned l, unsigned short w1, unsigned short w2, unsigned char b1, unsigned char b2, unsigned char b3,
             unsigned char b4, unsigned char b5, unsigned char b6, unsigned char b7, unsigned char b8 )
     {
-        data1 = l;
-        data2 = w1;
-        data3 = w2;
-        data4[ 0 ] = b1;
-        data4[ 1 ] = b2;
-        data4[ 2 ] = b3;
-        data4[ 3 ] = b4;
-        data4[ 4 ] = b5;
-        data4[ 5 ] = b6;
-        data4[ 6 ] = b7;
-        data4[ 7 ] = b8;
+        data1    = l;
+        data2    = w1;
+        data3    = w2;
+        data4[0] = b1;
+        data4[1] = b2;
+        data4[2] = b3;
+        data4[3] = b4;
+        data4[4] = b5;
+        data4[5] = b6;
+        data4[6] = b7;
+        data4[7] = b8;
     }
     //! copy constructor
     MBuuid( const MBuuid& mdbuuid )
@@ -71,10 +71,10 @@ struct MBuuid
     }
 
     //! uuid data storage
-    unsigned       data1;
+    unsigned data1;
     unsigned short data2;
     unsigned short data3;
-    unsigned char  data4[ 8 ];
+    unsigned char data4[8];
 };
 
 //! uuid for an unknown interface
@@ -88,7 +88,7 @@ class UnknownInterface
 {
   public:
     virtual int QueryInterface( const MBuuid&, UnknownInterface** ) = 0;
-    virtual ~UnknownInterface( ) {}
+    virtual ~UnknownInterface() {}
 };
 
 }  // namespace moab

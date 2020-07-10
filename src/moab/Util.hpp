@@ -42,7 +42,8 @@ namespace moab
 class Util
 {
   public:
-    template< typename T > static bool is_finite( T value );
+    template < typename T >
+    static bool is_finite( T value );
 
     static void normal( Interface* MB, EntityHandle handle, double& x, double& y, double& z );
 
@@ -55,10 +56,11 @@ class Util
     // &coords_list);
 
   private:
-    Util( ) {}
+    Util() {}
 };
 
-template< typename T > inline bool Util::is_finite( T value )
+template < typename T >
+inline bool Util::is_finite( T value )
 {
     return moab_isfinite( (double)value );
 }

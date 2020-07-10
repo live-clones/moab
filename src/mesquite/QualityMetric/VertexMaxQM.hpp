@@ -45,16 +45,16 @@ class VertexMaxQM : public VertexQM
   public:
     VertexMaxQM( ElemSampleQM* metric );
 
-    virtual ~VertexMaxQM( );
+    virtual ~VertexMaxQM();
 
-    ElemSampleQM* get_quality_metric( ) const
+    ElemSampleQM* get_quality_metric() const
     {
         return mMetric;
     }
 
-    virtual std::string get_name( ) const;
+    virtual std::string get_name() const;
 
-    virtual int get_negate_flag( ) const;
+    virtual int get_negate_flag() const;
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
@@ -62,7 +62,7 @@ class VertexMaxQM : public VertexQM
                                         MsqError& err );
 
   private:
-    ElemSampleQM*                 mMetric;
+    ElemSampleQM* mMetric;
     mutable std::vector< size_t > mHandles, mIndices;
 };
 

@@ -28,28 +28,28 @@ class BSPTreePoly
 
     void set_vertex_marks( int value );
 
-    BSPTreePoly( const BSPTreePoly& copy );  // not implemented
+    BSPTreePoly( const BSPTreePoly& copy );             // not implemented
     BSPTreePoly& operator=( const BSPTreePoly& copy );  // not implemented
 
   public:
     /**\brief Initialize as a planar-faced hexahedron
      *\param hex_corners Corner coordinates for a hexahedron, in Exodus/Patran order
      */
-    BSPTreePoly( const CartVect hex_corners[ 8 ] ) : faceList( 0 )
+    BSPTreePoly( const CartVect hex_corners[8] ) : faceList( 0 )
     {
         set( hex_corners );
     }
-    BSPTreePoly( ) : faceList( 0 ) {}
-    ~BSPTreePoly( )
+    BSPTreePoly() : faceList( 0 ) {}
+    ~BSPTreePoly()
     {
-        clear( );
+        clear();
     }
 
     /**\brief Initialize as a planar-faced hexahedron
      *\param hex_corners Corner coordinates for a hexahedron, in Exodus/Patran order
      */
-    ErrorCode set( const CartVect hex_corners[ 8 ] );
-    void      clear( );
+    ErrorCode set( const CartVect hex_corners[8] );
+    void clear();
 
     /**\brief Get handles for faces */
     void get_faces( std::vector< const Face* >& face_list ) const;
@@ -69,14 +69,14 @@ class BSPTreePoly
     bool is_point_contained( const CartVect& point ) const;
 
     //! Assumes planar faces
-    double volume( ) const;
+    double volume() const;
 
     // Check that data structure is consistent and represents
     // a closed polyhedron
-    bool is_valid( ) const;
+    bool is_valid() const;
 
     /** For debugging, does nothing unless debug feature is enabled */
-    static void reset_debug_ids( );
+    static void reset_debug_ids();
 };
 
 }  // namespace moab

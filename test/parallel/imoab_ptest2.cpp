@@ -78,18 +78,18 @@
 
 int main( int argc, char** argv )
 {
-    int  my_id, num_procs, ix, iy, numv, nume;
-    int  dime, lco, mbtype, blockid, npe;
-    char appname[ 10 ] = "IMTEST";
+    int my_id, num_procs, ix, iy, numv, nume;
+    int dime, lco, mbtype, blockid, npe;
+    char appname[10] = "IMTEST";
     /* coordinates for 9 vertices */
-    double coordinates[ 27 ], deltax, deltay;
-    int    ids[ 9 ] = { 1, 2, 3, 6, 7, 8, 11, 12, 13 };
-    int    connec[ 16 ] = { 1, 2, 5, 4, 2, 3, 6, 5, 4, 5, 8, 7, 5, 6, 9, 8 };
+    double coordinates[27], deltax, deltay;
+    int ids[9]     = { 1, 2, 3, 6, 7, 8, 11, 12, 13 };
+    int connec[16] = { 1, 2, 5, 4, 2, 3, 6, 5, 4, 5, 8, 7, 5, 6, 9, 8 };
     /*      used for ghosting */
-    int         dimgh, bridge, num_layers;
-    double      coords_core[ 27 ] = { 0., 0., 0., 0., 1., 0., 0., 2., 0., 1., 0., 0., 1., 1.,
-                                 0., 1., 2., 0., 2., 0., 0., 2., 1., 0., 2., 2., 0. };
-    int         appID, compid;
+    int dimgh, bridge, num_layers;
+    double coords_core[27] = { 0., 0., 0., 0., 1., 0., 0., 2., 0., 1., 0., 0., 1., 1.,
+                               0., 1., 2., 0., 2., 0., 0., 2., 1., 0., 2., 2., 0. };
+    int appID, compid;
     iMOAB_AppID pid = &appID;
 
     MPI_Init( &argc, &argv );
@@ -102,44 +102,44 @@ int main( int argc, char** argv )
     ERROR( rc, "can't initialize" );
     if( !my_id ) printf( " I'm process %d out of %d\n", my_id, num_procs );
 
-    appname[ 7 ] = 0;  // make sure it is NULL
-    compid = 8;  // given number, external application number
-    rc = iMOAB_RegisterApplication( appname, &comm, &compid, pid );
+    appname[7] = 0;  // make sure it is NULL
+    compid     = 8;  // given number, external application number
+    rc         = iMOAB_RegisterApplication( appname, &comm, &compid, pid );
     ERROR( rc, " can't register app" );
     /* create first 9 vertices,  in a square 3x3; */
     deltax = ( my_id / 2 ) * 2.;
     deltay = ( my_id % 2 ) * 2.;
-    ix = ( my_id / 2 ) * 10;
-    iy = my_id % 2 * 2;
+    ix     = ( my_id / 2 ) * 10;
+    iy     = my_id % 2 * 2;
     for( int i = 0; i < 9; i++ )
     {
-        coordinates[ 3 * i ] = coords_core[ 3 * i ] + deltax;
-        coordinates[ 3 * i + 1 ] = coords_core[ 3 * i + 1 ] + deltay;
-        coordinates[ 3 * i + 2 ] = coords_core[ 3 * i + 2 ];
+        coordinates[3 * i]     = coords_core[3 * i] + deltax;
+        coordinates[3 * i + 1] = coords_core[3 * i + 1] + deltay;
+        coordinates[3 * i + 2] = coords_core[3 * i + 2];
 
         /*       translate the ids too, by multiples of 10 or add 2, depending on my_id*/
-        ids[ i ] = ids[ i ] + ix + iy;
+        ids[i] = ids[i] + ix + iy;
     }
     numv = 9;
     nume = 4;
-    lco = numv * 3;
+    lco  = numv * 3;
     dime = 3;
-    rc = iMOAB_CreateVertices( pid, &lco, &dime, coordinates );
+    rc   = iMOAB_CreateVertices( pid, &lco, &dime, coordinates );
     ERROR( rc, "can't create vertices" );
     /* create now 4 quads with those 9 vertices*/
-    mbtype = 3;
+    mbtype  = 3;
     blockid = 100;
-    npe = 4;
-    rc = iMOAB_CreateElements( pid, &nume, &mbtype, &npe, connec, &blockid );
+    npe     = 4;
+    rc      = iMOAB_CreateElements( pid, &nume, &mbtype, &npe, connec, &blockid );
     ERROR( rc, "can't create elements" );
 
     rc = iMOAB_ResolveSharedEntities( pid, &numv, ids );
     ERROR( rc, "can't resolve shared ents" );
 
     // test iMOAB_ReduceTagsMax on a tag
-    int tagType = DENSE_INTEGER;
+    int tagType        = DENSE_INTEGER;
     int num_components = 1;
-    int tagIndex = 0;  // output
+    int tagIndex       = 0;  // output
 
     rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagType, &num_components, &tagIndex, strlen( "INTFIELD" ) );
     ERROR( rc, "failed to get tag INTFIELD " );
@@ -147,11 +147,11 @@ int main( int argc, char** argv )
     std::vector< int > valstest( numv );
     for( int k = 0; k < numv; k++ )
     {
-        valstest[ k ] = my_id + k;
+        valstest[k] = my_id + k;
     }
     int num_tag_storage_length = numv * num_components;
-    int entType = 0;  // vertex
-    rc = iMOAB_SetIntTagStorage( pid, "INTFIELD", &num_tag_storage_length, &entType, &valstest[ 0 ],
+    int entType                = 0;  // vertex
+    rc = iMOAB_SetIntTagStorage( pid, "INTFIELD", &num_tag_storage_length, &entType, &valstest[0],
                                  strlen( "INTFIELD" ) );
     ERROR( rc, "failed to set tag INTFIELD " );
 
@@ -159,26 +159,26 @@ int main( int argc, char** argv )
     ERROR( rc, "failed reduce tags max " );
 
     /* see ghost elements */
-    dimgh = 2; /* will ghost quads, topological dim 2 */
-    bridge = 0; /* use vertex as bridge */
+    dimgh      = 2; /* will ghost quads, topological dim 2 */
+    bridge     = 0; /* use vertex as bridge */
     num_layers = 1; /* so far, one layer only */
-    rc = iMOAB_DetermineGhostEntities( pid, &dimgh, &num_layers, &bridge );
+    rc         = iMOAB_DetermineGhostEntities( pid, &dimgh, &num_layers, &bridge );
     ERROR( rc, "can't determine ghosts" );
 
 /*     write out the mesh file to disk, in parallel, if h5m*/
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-    char outfile[ 32 ] = "whole.h5m";
-    char wopts[ 100 ] = "PARALLEL=WRITE_PART";
-    rc = iMOAB_WriteMesh( pid, outfile, wopts, 9, 19 );
+    char outfile[32] = "whole.h5m";
+    char wopts[100]  = "PARALLEL=WRITE_PART";
+    rc               = iMOAB_WriteMesh( pid, outfile, wopts, 9, 19 );
     ERROR( rc, "can't write mesh" );
 #endif
     /*     all done. de-register and finalize */
     rc = iMOAB_DeregisterApplication( pid );
     ERROR( rc, "can't de-register app" );
 
-    rc = iMOAB_Finalize( );
+    rc = iMOAB_Finalize();
     ERROR( rc, "can't finalize" );
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return 0;
 }

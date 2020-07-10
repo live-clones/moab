@@ -69,9 +69,9 @@ std::string get_hex_3d_part_example( DomainClassifier& geom, MeshImpl& mesh, Msq
 typedef std::string ( *example_setup_t )( DomainClassifier& geom, MeshImpl& mesh, MsqError& err );
 struct Example
 {
-    char            flag;
+    char flag;
     example_setup_t func;
-    const char*     desc;
+    const char* desc;
 };
 
 int run_example( const Example& e, bool write_output_file );
@@ -83,13 +83,13 @@ const Example examples[] = { { 'H', &get_homogenious_example, "homogenous mesh (
                              { 'l', &get_cut_cube_example, "cube with slot removed" },
                              { 's', &get_sphere_cylinder_example, "cylinder with subtracted sphere" },
                              { 'x', &get_hex_3d_part_example, "rectangular prism with two cylindrical slots" } };
-const int     num_examples = sizeof( examples ) / sizeof( examples[ 0 ] );
+const int num_examples   = sizeof( examples ) / sizeof( examples[0] );
 
 void usage( const char* argv0, bool help = false )
 {
     std::cerr << "Usage: " << argv0 << "[-w] ";
     for( int i = 0; i < num_examples; ++i )
-        std::cerr << " [-" << examples[ i ].flag << "]";
+        std::cerr << " [-" << examples[i].flag << "]";
     std::cerr << std::endl;
 
     if( !help )
@@ -100,69 +100,69 @@ void usage( const char* argv0, bool help = false )
     std::cerr << "  -w : Write final meshes to VTK file" << std::endl;
     std::cerr << "NOTE: If no options are specified, all examples will be run" << std::endl;
     for( int i = 0; i < num_examples; ++i )
-        std::cerr << "  -" << examples[ i ].flag << " : Run " << examples[ i ].desc << std::endl;
+        std::cerr << "  -" << examples[i].flag << " : Run " << examples[i].desc << std::endl;
     std::cerr << std::endl;
     std::exit( 0 );
 }
 
 int main( int argc, char* argv[] )
 {
-    bool                   write_final_meshes = false;
+    bool write_final_meshes = false;
     std::vector< Example > list;
     for( int i = 1; i < argc; ++i )
     {
-        if( argv[ i ][ 0 ] != '-' )
+        if( argv[i][0] != '-' )
         {
-            std::cerr << "Invalid argument: \"" << argv[ i ] << '"' << std::endl;
-            usage( argv[ 0 ] );
+            std::cerr << "Invalid argument: \"" << argv[i] << '"' << std::endl;
+            usage( argv[0] );
         }
-        for( int j = 1; argv[ i ][ j ]; ++j )
+        for( int j = 1; argv[i][j]; ++j )
         {
-            if( argv[ i ][ j ] == 'w' ) { write_final_meshes = true; }
+            if( argv[i][j] == 'w' ) { write_final_meshes = true; }
             else
             {
                 int idx;
                 for( idx = 0; idx < num_examples; ++idx )
-                    if( examples[ idx ].flag == argv[ i ][ j ] ) break;
+                    if( examples[idx].flag == argv[i][j] ) break;
                 if( idx == num_examples )
                 {
-                    if( argv[ i ][ j ] == 'h' )
-                        usage( argv[ 0 ], true );
+                    if( argv[i][j] == 'h' )
+                        usage( argv[0], true );
                     else
                     {
-                        std::cerr << "Invalid flag: '" << argv[ i ][ j ] << "'" << std::endl;
-                        usage( argv[ 0 ] );
+                        std::cerr << "Invalid flag: '" << argv[i][j] << "'" << std::endl;
+                        usage( argv[0] );
                     }
                 }
-                list.push_back( examples[ idx ] );
+                list.push_back( examples[idx] );
             }
         }
     }
 
     const Example* exlist;
-    int            exlistlen;
-    if( list.empty( ) )
+    int exlistlen;
+    if( list.empty() )
     {
-        exlist = examples;
+        exlist    = examples;
         exlistlen = num_examples;
     }
     else
     {
-        exlist = &list[ 0 ];
-        exlistlen = list.size( );
+        exlist    = &list[0];
+        exlistlen = list.size();
     }
 
     int result = 0;
     for( int i = 0; i < exlistlen; ++i )
-        result += run_example( exlist[ i ], write_final_meshes );
+        result += run_example( exlist[i], write_final_meshes );
 
     return result;
 }
 
 int run_example( const Example& e, bool write_output_file )
 {
-    MsqPrintError    err( std::cerr );
-    MeshImpl         mesh;
+    MsqPrintError err( std::cerr );
+    MeshImpl mesh;
     DomainClassifier domain;
     HexLagrangeShape hex27;
 
@@ -203,11 +203,11 @@ int run_example( const Example& e, bool write_output_file )
             name += ".out";
         }
 
-        mesh.write_vtk( name.c_str( ), err );MSQ_CHKERR( err );
+        mesh.write_vtk( name.c_str(), err );MSQ_CHKERR( err );
         std::cout << "Write mesh to file: " << name << std::endl;
     }
 
-    return smoother.quality_assessor( ).invalid_elements( );
+    return smoother.quality_assessor().invalid_elements();
 }
 
 void get_planar_example( const char* filename, DomainClassifier& geom, MeshImpl& mesh, MsqError& err )
@@ -224,21 +224,21 @@ void get_planar_example( const char* filename, DomainClassifier& geom, MeshImpl&
 std::string get_homogenious_example( DomainClassifier& geom, MeshImpl& mesh, MsqError& err )
 {
     std::string filename = std::string( STRINGIFY( SRCDIR ) ) + "/homogeneousPart.vtk";
-    get_planar_example( filename.c_str( ), geom, mesh, err );MSQ_CHKERR( err );
+    get_planar_example( filename.c_str(), geom, mesh, err );MSQ_CHKERR( err );
     return filename;
 }
 
 std::string get_part_example_tri( DomainClassifier& geom, MeshImpl& mesh, MsqError& err )
 {
     std::string filename = std::string( STRINGIFY( SRCDIR ) ) + "/triPart.vtk";
-    get_planar_example( filename.c_str( ), geom, mesh, err );MSQ_CHKERR( err );
+    get_planar_example( filename.c_str(), geom, mesh, err );MSQ_CHKERR( err );
     return filename;
 }
 
 std::string get_part_example_quad( DomainClassifier& geom, MeshImpl& mesh, MsqError& err )
 {
     std::string filename = std::string( STRINGIFY( SRCDIR ) ) + "/quadPart.vtk";
-    get_planar_example( filename.c_str( ), geom, mesh, err );MSQ_CHKERR( err );
+    get_planar_example( filename.c_str(), geom, mesh, err );MSQ_CHKERR( err );
     return filename;
 }
 
@@ -305,16 +305,16 @@ std::string get_sphere_cube_example( DomainClassifier& geom, MeshImpl& mesh, Msq
         //&cy,
         &sp_t  //, &sp_b
     };
-    const int NDOM = sizeof( base_domains ) / sizeof( base_domains[ 0 ] );
+    const int NDOM = sizeof( base_domains ) / sizeof( base_domains[0] );
 
-    int dim_array[ NDOM ] = {
+    int dim_array[NDOM] = {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 1,1,1,
-        2, 2, 2, 2, 2, 2, 2  //,2,2
+        2, 2, 2, 2, 2, 2, 2                                             //,2,2
     };
 
     //++ MESH & DOMAIN ++
 
-    mesh.read_vtk( filename.c_str( ), err );
+    mesh.read_vtk( filename.c_str(), err );
     MSQ_ERRZERO( err );
     DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
@@ -370,7 +370,7 @@ std::string get_cut_cube_example( DomainClassifier& geom, MeshImpl& mesh, MsqErr
     static PlanarDomain sf_j( vec_j, vec_j ), sf_nj( vec_nj, vec_nj );
     static PlanarDomain sf_k( vec_k, vec_k ), sf_nk( vec_nk, vec_nk );
     // cut
-    static CylinderDomain  cy( 1.0, vec_k, vec_bs );
+    static CylinderDomain cy( 1.0, vec_k, vec_bs );
     static SphericalDomain sp_t( vec_ts, 1.0 ), sp_b( vec_bs, 1.0 );
 
     MeshDomain* base_domains[] = { &pt_tfl, &pt_tfr, &pt_tbl, &pt_tbr, &pt_bfl, &pt_bfr, &pt_bbl, &pt_bbr,
@@ -379,14 +379,14 @@ std::string get_cut_cube_example( DomainClassifier& geom, MeshImpl& mesh, MsqErr
                                    &lin_rf, &ln_lb,  &lin_rb, &cr_tf,  &cr_tn,  &cr_bf,  &cr_bn,
 
                                    &sf_i,   &sf_ni,  &sf_j,   &sf_nj,  &sf_k,   &sf_nk,  &cy,     &sp_t,   &sp_b };
-    const int   NDOM = sizeof( base_domains ) / sizeof( base_domains[ 0 ] );
+    const int NDOM             = sizeof( base_domains ) / sizeof( base_domains[0] );
 
-    int dim_array[ NDOM ] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+    int dim_array[NDOM] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                            1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
 
     //++ MESH & DOMAIN ++
 
-    mesh.read_vtk( filename.c_str( ), err );
+    mesh.read_vtk( filename.c_str(), err );
     MSQ_ERRZERO( err );
     DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
@@ -414,18 +414,18 @@ std::string get_sphere_cylinder_example( DomainClassifier& geom, MeshImpl& mesh,
 
     //++ 2D domains ++
 
-    static PlanarDomain    sf_t( vec_k, vec_k ), sf_b( vec_nk, vec_nk );
-    static CylinderDomain  cy( 8.0, vec_k, vec_k );
+    static PlanarDomain sf_t( vec_k, vec_k ), sf_b( vec_nk, vec_nk );
+    static CylinderDomain cy( 8.0, vec_k, vec_k );
     static SphericalDomain sp( vec_c, 5.0 );
 
     MeshDomain* base_domains[] = { &cr_to, &cr_ti, &cr_bo, &sf_t, &sf_b, &cy, &sp };
-    const int   NDOM = sizeof( base_domains ) / sizeof( base_domains[ 0 ] );
+    const int NDOM             = sizeof( base_domains ) / sizeof( base_domains[0] );
 
-    int dim_array[ NDOM ] = { 1, 1, 1, 2, 2, 2, 2 };
+    int dim_array[NDOM] = { 1, 1, 1, 2, 2, 2, 2 };
 
     //++ MESH & DOMAIN ++
 
-    mesh.read_vtk( filename.c_str( ), err );
+    mesh.read_vtk( filename.c_str(), err );
     MSQ_ERRZERO( err );
     DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.001, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );
@@ -517,32 +517,32 @@ std::string get_hex_3d_part_example( DomainClassifier& geom, MeshImpl& mesh, Msq
 
     static CylinderDomain C00( 1.5, vec_k, vec_top, false );
     static CylinderDomain C01( 1.5, vec_k, vec_bottom, false );
-    static PlanarDomain   P00( vec_ni, vec_left );
-    static PlanarDomain   P01( vec_i, vec_right );
-    static PlanarDomain   P02( vec_j, vec_top );
-    static PlanarDomain   P03( vec_nj, vec_bottom );
-    static PlanarDomain   P04( vec_k, vec_front );
-    static PlanarDomain   P05( vec_nk, vec_back );
+    static PlanarDomain P00( vec_ni, vec_left );
+    static PlanarDomain P01( vec_i, vec_right );
+    static PlanarDomain P02( vec_j, vec_top );
+    static PlanarDomain P03( vec_nj, vec_bottom );
+    static PlanarDomain P04( vec_k, vec_front );
+    static PlanarDomain P05( vec_nk, vec_back );
 
-    const int   NDOM = 44;
-    MeshDomain* base_domains[ NDOM ] = { &p00, &p01, &p02, &p03, &p04, &p05, &p06, &p07,
+    const int NDOM                 = 44;
+    MeshDomain* base_domains[NDOM] = { &p00, &p01, &p02, &p03, &p04, &p05, &p06, &p07,
 
-                                         &p08, &p09, &p10, &p11, &p12, &p13, &p14, &p15,
+                                       &p08, &p09, &p10, &p11, &p12, &p13, &p14, &p15,
 
-                                         &c00, &c01, &c02, &c03,
+                                       &c00, &c01, &c02, &c03,
 
-                                         &l00, &l01, &l02, &l03,
+                                       &l00, &l01, &l02, &l03,
 
-                                         &l04, &l05, &l06, &l07, &l08, &l09, &l10, &l11, &l12, &l13, &l14, &l15,
+                                       &l04, &l05, &l06, &l07, &l08, &l09, &l10, &l11, &l12, &l13, &l14, &l15,
 
-                                         &C00, &C01, &P00, &P01, &P02, &P03, &P04, &P05 };
+                                       &C00, &C01, &P00, &P01, &P02, &P03, &P04, &P05 };
 
-    int dim_array[ NDOM ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2 };
+    int dim_array[NDOM] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+                            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2 };
 
     //++ MESH & DOMAIN ++
 
-    mesh.read_vtk( filename.c_str( ), err );
+    mesh.read_vtk( filename.c_str(), err );
     MSQ_ERRZERO( err );
     DomainClassifier::classify_skin_geometrically( geom, &mesh, 0.1, base_domains, dim_array, NDOM, err );
     MSQ_ERRZERO( err );

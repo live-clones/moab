@@ -67,18 +67,18 @@ class MsqVertexTest : public CppUnit::TestFixture
   private:
     CPPUNIT_TEST_SUITE( MsqVertexTest );
     CPPUNIT_TEST( test_flags );
-    CPPUNIT_TEST_SUITE_END( );
+    CPPUNIT_TEST_SUITE_END();
 
   private:
     PatchData one_hex_patch;
     PatchData one_tet_patch;
     PatchData one_qua_patch;
     PatchData one_tri_patch;
-    Vector3D  e1, e2, e3;
-    double    tolEps;
+    Vector3D e1, e2, e3;
+    double tolEps;
 
   public:
-    void setUp( )
+    void setUp()
     {
         tolEps = 1.e-12;
         // set up the unit vectors
@@ -90,7 +90,7 @@ class MsqVertexTest : public CppUnit::TestFixture
 
         double hcoords[] = { 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 1.0,
                              1.0, 1.0, 2.0, 2.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 2.0, 2.0 };
-        size_t hconn[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+        size_t hconn[]   = { 0, 1, 2, 3, 4, 5, 6, 7 };
         one_hex_patch.fill( 8, hcoords, 1, HEXAHEDRON, hconn, 0, err );
 
         double tcoords[] = { 1.0,
@@ -105,49 +105,49 @@ class MsqVertexTest : public CppUnit::TestFixture
                              1.5,
                              1 + sqrt( 3.0 ) / 6.0,
                              1 + sqrt( 2.0 ) / sqrt( 3.0 ) };
-        size_t tconn[] = { 0, 1, 2, 3 };
+        size_t tconn[]   = { 0, 1, 2, 3 };
         one_tet_patch.fill( 4, tcoords, 1, TETRAHEDRON, tconn, 0, err );
 
         double qcoords[] = { 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 1.0 };
-        size_t qconn[] = { 0, 1, 2, 3 };
+        size_t qconn[]   = { 0, 1, 2, 3 };
         one_qua_patch.fill( 4, qcoords, 1, QUADRILATERAL, qconn, 0, err );
 
         double rcoords[] = { 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.5, 1 + sqrt( 3.0 ) / 2.0, 1.0 };
-        size_t rconn[] = { 0, 1, 2 };
+        size_t rconn[]   = { 0, 1, 2 };
         one_tri_patch.fill( 3, rcoords, 1, TRIANGLE, rconn, 0, err );
     }
 
-    void tearDown( ) {}
+    void tearDown() {}
 
   public:
-    MsqVertexTest( ) {}
+    MsqVertexTest() {}
 
-    void test_hex_vertices( )
+    void test_hex_vertices()
     {
         MsqPrintError err( cout );
         // prints out the vertices.
         const MsqVertex* ideal_vertices = one_hex_patch.get_vertex_array( err );
         CPPUNIT_ASSERT( !err );
-        int num_vtx = one_hex_patch.num_nodes( );
+        int num_vtx = one_hex_patch.num_nodes();
         CPPUNIT_ASSERT_EQUAL( 8, num_vtx );
 
         MsqVertex vtx;
 
         vtx.set( 1, 1, 1 );
-        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[ 0 ] );
+        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[0] );
 
         vtx.set( 2, 2, 2 );
-        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[ 6 ] );
+        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[6] );
 
         vtx.set( 1, 2, 2 );
-        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[ 7 ] );
+        CPPUNIT_ASSERT_EQUAL( vtx, ideal_vertices[7] );
     }
 
-    void test_flags( )
+    void test_flags()
     {
         MsqVertex vtx( 1, 2, 3 );
         CPPUNIT_ASSERT( vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) == false );
-        vtx.set_hard_fixed_flag( );
+        vtx.set_hard_fixed_flag();
         CPPUNIT_ASSERT( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) == false );
         CPPUNIT_ASSERT( vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) == true );
         CPPUNIT_ASSERT( ( vtx.is_flag_set( MsqVertex::MSQ_CULLED ) || vtx.is_flag_set( MsqVertex::MSQ_HARD_FIXED ) ) ==

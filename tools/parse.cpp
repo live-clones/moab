@@ -38,7 +38,7 @@ void tag_syntax( std::ostream& s )
 
 // Check endian-ness of platform.  Used when parsing numerical
 // value for opaque tags.
-inline static bool is_platform_little_endian( );
+inline static bool is_platform_little_endian();
 
 // Parse tag value from a string (vals).  The passed size
 // is the number of values returned by MOAB from tag_get_length.
@@ -50,27 +50,30 @@ static unsigned char* parse_opaque_value( const char* vals, int size );
 
 // Parse one or more non-opaque tag values in a comma-separated list.
 // The passed size is the size returned by MOAB (num values * sizeof(type)).
-template< typename T > T* parse_values_typed( const char* vals, int size );
+template < typename T >
+T* parse_values_typed( const char* vals, int size );
 
 // Template function to parse a single non-opaque tag value.
 // Parses the value in the string pointed to by "iter" and updates
 // iter to point passed the parsed value.  Returns zero on success.
-template< typename T > int parse_value( const char*& iter, T& value );
+template < typename T >
+int parse_value( const char*& iter, T& value );
 
 // Convert an ASCII hexidecimal digit to its numerical value.
 static int hexdigit( char c );
 
-inline static bool is_platform_little_endian( )
+inline static bool is_platform_little_endian()
 {
     static const unsigned int one = 1;
-    static const bool         little = !*( (char*)&one );
+    static const bool little      = !*( (char*)&one );
     return little;
 }
 
-template< typename T > int parse_value( const char*& iter, T& value )
+template < typename T >
+int parse_value( const char*& iter, T& value )
 {
     char* endptr;
-    long  parsed_val = strtol( iter, &endptr, 0 );
+    long parsed_val = strtol( iter, &endptr, 0 );
     if( endptr == iter ) return 1;
     iter = endptr;
 
@@ -84,7 +87,8 @@ template< typename T > int parse_value( const char*& iter, T& value )
     return 0;
 }
 
-template<> int parse_value< double >( const char*& iter, double& value )
+template <>
+int parse_value< double >( const char*& iter, double& value )
 {
     char* endptr;
     value = strtod( iter, &endptr );
@@ -108,24 +112,24 @@ int hexdigit( char c )
 unsigned char* parse_opaque_value( const char* vals, int size )
 {
     unsigned char* data = (unsigned char*)malloc( size );
-    if( vals[ 0 ] && vals[ 0 ] == '0' && vals[ 1 ] && toupper( vals[ 1 ] ) == 'X' )
+    if( vals[0] && vals[0] == '0' && vals[1] && toupper( vals[1] ) == 'X' )
     {
         unsigned char *iter, *end;
-        int            step;
-        if( is_platform_little_endian( ) )
+        int step;
+        if( is_platform_little_endian() )
         {
             iter = data;
-            end = data + size;
+            end  = data + size;
             step = 1;
         }
         else
         {
             iter = data + size - 1;
-            end = data - 1;
+            end  = data - 1;
             step = -1;
         }
 
-        const char* vals_end = vals + 1;
+        const char* vals_end  = vals + 1;
         const char* vals_iter = vals + strlen( vals ) - 1;
         for( ; iter != end; iter += step )
         {
@@ -160,12 +164,13 @@ unsigned char* parse_opaque_value( const char* vals, int size )
     return data;
 }
 
-template< typename T > T* parse_values_typed( const char* vals, int count )
+template < typename T >
+T* parse_values_typed( const char* vals, int count )
 {
     if( !count ) return 0;
 
     T* data = (T*)malloc( count * sizeof( T ) );
-    T* end = data + count;
+    T* end  = data + count;
     if( parse_value< T >( vals, *data ) )
     {
         free( data );
@@ -286,7 +291,7 @@ int parse_tag_create( char* name, TagSpec& result, Interface* iface )
     {
         *eq2 = '\0';
         ++eq2;
-        val = ( '\0' == eq1[ 0 ] ) ? 0 : eq1;
+        val      = ( '\0' == eq1[0] ) ? 0 : eq1;
         type_str = eq2;
     }
 
@@ -323,7 +328,7 @@ int parse_tag_create( char* name, TagSpec& result, Interface* iface )
         return 1;
     }
     char* end_ptr;
-    int   count = (int)strtol( size_str, &end_ptr, 0 );
+    int count = (int)strtol( size_str, &end_ptr, 0 );
     if( !*size_str || *end_ptr || count < 1 )
     {
         std::cerr << "Invalid tag size specification: " << size_str << std::endl;
@@ -343,7 +348,7 @@ int parse_tag_create( char* name, TagSpec& result, Interface* iface )
     {
         // make sure it matches
         DataType etype;
-        int      esize;
+        int esize;
         if( MB_SUCCESS != iface->tag_get_data_type( result.handle, etype ) ||
             MB_SUCCESS != iface->tag_get_length( result.handle, esize ) )
         {
@@ -360,13 +365,13 @@ int parse_tag_create( char* name, TagSpec& result, Interface* iface )
         std::vector< unsigned char > value( esize );
         if( result.value )
         {
-            ErrorCode rval = iface->tag_get_default_value( result.handle, &value[ 0 ] );
+            ErrorCode rval = iface->tag_get_default_value( result.handle, &value[0] );
             if( rval != MB_ENTITY_NOT_FOUND && rval != MB_SUCCESS )
             {
                 std::cerr << "Error checking default value of tag: " << name << std::endl;
                 return 3;
             }
-            else if( rval == MB_ENTITY_NOT_FOUND || memcmp( &value[ 0 ], result.value, esize ) )
+            else if( rval == MB_ENTITY_NOT_FOUND || memcmp( &value[0], result.value, esize ) )
             {
                 std::cerr << "Tag already exists and default value doesn't match: " << name << std::endl;
                 return 1;

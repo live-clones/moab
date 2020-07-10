@@ -19,14 +19,14 @@ class IntxUtils
     // vec utilities that could be common between quads on a plane or sphere
     static inline double dist2( double* a, double* b )
     {
-        double abx = b[ 0 ] - a[ 0 ], aby = b[ 1 ] - a[ 1 ];
+        double abx = b[0] - a[0], aby = b[1] - a[1];
         return sqrt( abx * abx + aby * aby );
     }
 
     static inline double area2D( double* a, double* b, double* c )
     {
         // (b-a)x(c-a) / 2
-        return ( ( b[ 0 ] - a[ 0 ] ) * ( c[ 1 ] - a[ 1 ] ) - ( b[ 1 ] - a[ 1 ] ) * ( c[ 0 ] - a[ 0 ] ) ) / 2;
+        return ( ( b[0] - a[0] ) * ( c[1] - a[1] ) - ( b[1] - a[1] ) * ( c[0] - a[0] ) ) / 2;
     }
 
     static int borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double* P, int* side, double epsilon_area );
@@ -160,14 +160,14 @@ class IntxAreaUtils
   public:
     enum AreaMethod
     {
-        lHuiller = 0,
-        Girard = 1,
+        lHuiller        = 0,
+        Girard          = 1,
         GaussQuadrature = 2
     };
 
     IntxAreaUtils( AreaMethod p_eAreaMethod = lHuiller ) : m_eAreaMethod( p_eAreaMethod ) {}
 
-    ~IntxAreaUtils( ) {}
+    ~IntxAreaUtils() {}
 
     /*
      * utilities to compute area of a polygon on which all edges are arcs of great circles on a

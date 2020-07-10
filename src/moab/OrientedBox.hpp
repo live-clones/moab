@@ -45,7 +45,7 @@ class OrientedBox
 
   public:
     CartVect center;  //!< Box center
-    Matrix3  axes;  //!< Box axes, unit vectors sorted by extent of box along axis
+    Matrix3 axes;     //!< Box axes, unit vectors sorted by extent of box along axis
 #if MB_ORIENTED_BOX_UNIT_VECTORS
     CartVect length;  //!< distance from center to plane along each axis
 #endif
@@ -53,20 +53,20 @@ class OrientedBox
     double radius;  //!< outer radius (1/2 diagonal length) of box
 #endif
 
-    inline OrientedBox( ) : radius( 0.0 ) {}
+    inline OrientedBox() : radius( 0.0 ) {}
 
     OrientedBox( const Matrix3& axes_mat, const CartVect& center );
-    OrientedBox( const CartVect axes_in[ 3 ], const CartVect& center );
+    OrientedBox( const CartVect axes_in[3], const CartVect& center );
 
-    inline double inner_radius( ) const;  //!< radius of inscribed sphere
-    inline double outer_radius( ) const;  //!< radius of circumscribed sphere
-    inline double
-                  outer_radius_squared( const double reps ) const;  //!< square of (radius+at least epsilon) of circumsphere
+    inline double inner_radius() const;  //!< radius of inscribed sphere
+    inline double outer_radius() const;  //!< radius of circumscribed sphere
+    inline double outer_radius_squared(
+        const double reps ) const;  //!< square of (radius+at least epsilon) of circumsphere
     inline double inner_radius_squared( const double reps ) const;  //!< square of (radius-epsilon) of inscribed sphere
-    inline double volume( ) const;  //!< volume of box
-    inline CartVect dimensions( ) const;  //!< number of dimensions for which box is not flat
-    inline double   area( ) const;  //!< largest side area
-    inline CartVect axis( int index ) const;  //!< get unit vector in direction of axis
+    inline double volume() const;                                   //!< volume of box
+    inline CartVect dimensions() const;                             //!< number of dimensions for which box is not flat
+    inline double area() const;                                     //!< largest side area
+    inline CartVect axis( int index ) const;                        //!< get unit vector in direction of axis
     inline CartVect scaled_axis( int index ) const;  //!< get vector in direction of axis, scaled to its true length
 
     /** Test if point is contained in box */
@@ -100,11 +100,11 @@ class OrientedBox
      */
     struct CovarienceData
     {
-        CovarienceData( ) : area( 0.0 ) {}
+        CovarienceData() : area( 0.0 ) {}
         CovarienceData( const Matrix3& m, const CartVect& c, double a ) : matrix( m ), center( c ), area( a ) {}
-        Matrix3  matrix;  //!< Running sum for covariance matrix
+        Matrix3 matrix;   //!< Running sum for covariance matrix
         CartVect center;  //!< Sum of triangle centroids weighted by 2*triangle area
-        double   area;  //!< 2x the sum of the triangle areas
+        double area;      //!< 2x the sum of the triangle areas
     };
 
     /** Calculate a CovarienceData struct from a list of triangles */
@@ -152,23 +152,23 @@ class OrientedBox
 
 std::ostream& operator<<( std::ostream&, const OrientedBox& );
 
-double OrientedBox::inner_radius( ) const
+double OrientedBox::inner_radius() const
 {
 #if MB_ORIENTED_BOX_UNIT_VECTORS
-    return length[ 0 ];
+    return length[0];
 #else
-    return axes.col( 0 ).length( );
+    return axes.col( 0 ).length();
 #endif
 }
 
-double OrientedBox::outer_radius( ) const
+double OrientedBox::outer_radius() const
 {
 #if MB_ORIENTED_BOX_OUTER_RADIUS
     return radius;
 #elif MB_ORIENTED_BOX_UNIT_VECTORS
-    return length.length( );
+    return length.length();
 #else
-    return ( axes.col( 0 ) + axes.col( 1 ) + axes.col( 2 ) ).length( );
+    return ( axes.col( 0 ) + axes.col( 1 ) + axes.col( 2 ) ).length();
 #endif
 }
 
@@ -178,7 +178,7 @@ double OrientedBox::outer_radius_squared( const double reps ) const
 #if MB_ORIENTED_BOX_OUTER_RADIUS
     return ( radius + reps ) * ( radius + reps );
 #elif MB_ORIENTED_BOX_UNIT_VECTORS
-    CartVect tmp( length[ 0 ] + reps, length[ 1 ] + reps, length[ 2 ] + reps );
+    CartVect tmp( length[0] + reps, length[1] + reps, length[2] + reps );
     return tmp % tmp;
 #else
     CartVect half_diag = axes.col( 0 ) + axes.col( 1 ) + axes.col( 2 );
@@ -191,7 +191,7 @@ double OrientedBox::outer_radius_squared( const double reps ) const
 double OrientedBox::inner_radius_squared( const double reps ) const
 {
 #if MB_ORIENTED_BOX_UNIT_VECTORS
-    return ( length[ 0 ] - reps ) * ( length[ 0 ] - reps );
+    return ( length[0] - reps ) * ( length[0] - reps );
 #else
     CartVect tmp = axes.col( 0 );
     tmp -= CartVect( reps, reps, reps );
@@ -199,30 +199,30 @@ double OrientedBox::inner_radius_squared( const double reps ) const
 #endif
 }
 
-double OrientedBox::volume( ) const
+double OrientedBox::volume() const
 {
 #if MB_ORIENTED_BOX_UNIT_VECTORS
-    return 8 * length[ 0 ] * length[ 1 ] * length[ 2 ];
+    return 8 * length[0] * length[1] * length[2];
 #else
     return fabs( 8 * axes.col( 0 ) % ( axes.col( 1 ) * axes.col( 2 ) ) );
 #endif
 }
 
-CartVect OrientedBox::dimensions( ) const
+CartVect OrientedBox::dimensions() const
 {
 #if MB_ORIENTED_BOX_UNIT_VECTORS
     return 2.0 * length;
 #else
-    return 2.0 * CartVect( axes.col( 0 ).length( ), axes.col( 1 ).length( ), axes.col( 2 ).length( ) );
+    return 2.0 * CartVect( axes.col( 0 ).length(), axes.col( 1 ).length(), axes.col( 2 ).length() );
 #endif
 }
 
-double OrientedBox::area( ) const
+double OrientedBox::area() const
 {
 #if MB_ORIENTED_BOX_UNIT_VECTORS
-    return 4 * length[ 1 ] * length[ 2 ];
+    return 4 * length[1] * length[2];
 #else
-    return 4 * ( axes.col( 1 ) * axes.col( 2 ) ).length( );
+    return 4 * ( axes.col( 1 ) * axes.col( 2 ) ).length();
 #endif
 }
 
@@ -234,7 +234,7 @@ CartVect OrientedBox::axis( int index ) const
 CartVect OrientedBox::scaled_axis( int index ) const
 {
 #if MB_ORIENTED_BOX_UNIT_VECTORS
-    return length[ index ] * axes.col( index );
+    return length[index] * axes.col( index );
 #else
     return axes.col( index );
 #endif

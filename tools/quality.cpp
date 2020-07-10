@@ -43,13 +43,13 @@ int main( int argc, char* argv[] )
 #endif
     if( argc < 2 && 0 == proc_id )
     {
-        print_usage( argv[ 0 ], std::cerr );
+        print_usage( argv[0], std::cerr );
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
-    Core        mb;
+    Core mb;
     std::string read_options;
     if( size > 1 ) read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
 
@@ -57,50 +57,50 @@ int main( int argc, char* argv[] )
     {
         std::cerr << " cannot use verbose option in parallel \n";
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
 
-    char*         out_file = NULL;
+    char* out_file = NULL;
     std::ofstream ofile;
 
     if( argc == 3 )
     {
-        std::cout << " write verbose output to a CSV file " << argv[ 2 ] << "\n";
-        out_file = argv[ 2 ];
+        std::cout << " write verbose output to a CSV file " << argv[2] << "\n";
+        out_file = argv[2];
         ofile.open( out_file );
     }
-    if( MB_SUCCESS != mb.load_file( argv[ 1 ], 0, read_options.c_str( ) ) )
+    if( MB_SUCCESS != mb.load_file( argv[1], 0, read_options.c_str() ) )
     {
-        fprintf( stderr, "Error reading file: %s\n", argv[ 1 ] );
+        fprintf( stderr, "Error reading file: %s\n", argv[1] );
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
 
     VerdictWrapper vw( &mb );
     vw.set_size( 1. );  // for relative size measures; maybe it should be user input
-    Range     entities;
+    Range entities;
     ErrorCode rval = mb.get_entities_by_handle( 0, entities );
     if( MB_SUCCESS != rval )
     {
-        fprintf( stderr, "Error getting entities from file %s\n", argv[ 1 ] );
+        fprintf( stderr, "Error getting entities from file %s\n", argv[1] );
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
     // get all edges and faces, force them to be created
     Range allfaces, alledges;
     Range cells = entities.subset_by_dimension( 3 );
-    rval = mb.get_adjacencies( cells, 2, true, allfaces, Interface::UNION );
+    rval        = mb.get_adjacencies( cells, 2, true, allfaces, Interface::UNION );
     if( MB_SUCCESS != rval )
     {
         fprintf( stderr, "Error getting all faces" );
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
@@ -110,7 +110,7 @@ int main( int argc, char* argv[] )
     {
         fprintf( stderr, "Error getting all edges" );
 #ifdef MOAB_HAVE_MPI
-        MPI_Finalize( );
+        MPI_Finalize();
 #endif
         return 1;
     }
@@ -120,10 +120,10 @@ int main( int argc, char* argv[] )
     {
         int num_qualities = vw.num_qualities( et );
         if( !num_qualities ) continue;
-        Range                           owned = entities.subset_by_type( et );
+        Range owned = entities.subset_by_type( et );
         std::map< QualityType, double > qualities, minq, maxq;
-        int                             ne_local = (int)owned.size( );
-        int                             ne_global = ne_local;
+        int ne_local  = (int)owned.size();
+        int ne_global = ne_local;
 
 #ifdef MOAB_HAVE_MPI
         int mpi_err;
@@ -131,19 +131,19 @@ int main( int argc, char* argv[] )
         {
             // filter the entities not owned, so we do not process them more than once
             ParallelComm* pcomm = ParallelComm::get_pcomm( &mb, 0 );
-            Range         current = owned;
-            owned.clear( );
+            Range current       = owned;
+            owned.clear();
             rval = pcomm->filter_pstatus( current, PSTATUS_NOT_OWNED, PSTATUS_NOT, -1, &owned );
             if( rval != MB_SUCCESS )
             {
-                MPI_Finalize( );
+                MPI_Finalize();
                 return 1;
             }
-            ne_local = (int)owned.size( );
-            mpi_err = MPI_Reduce( &ne_local, &ne_global, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
+            ne_local = (int)owned.size();
+            mpi_err  = MPI_Reduce( &ne_local, &ne_global, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
             if( mpi_err )
             {
-                MPI_Finalize( );
+                MPI_Finalize();
                 return 1;
             }
         }
@@ -152,32 +152,32 @@ int main( int argc, char* argv[] )
         {
             if( ne_local > 0 )
             {
-                Range::iterator it = owned.begin( );
-                rval = vw.all_quality_measures( *it, qualities );
+                Range::iterator it = owned.begin();
+                rval               = vw.all_quality_measures( *it, qualities );
                 if( MB_SUCCESS != rval )
                 {
                     fprintf( stderr, "Error getting quality for entity type %d with id %ld \n", et,
                              (long)mb.id_from_handle( *it ) );
 #ifdef MOAB_HAVE_MPI
-                    MPI_Finalize( );
+                    MPI_Finalize();
 #endif
                     return 1;
                 }
-                if( ofile.is_open( ) )
+                if( ofile.is_open() )
                 {
                     // write first header or this entity type, then the first values, separated by
                     // commas
                     ofile << " There are " << ne_local << " entities of type " << vw.entity_type_name( et ) << " with "
-                          << qualities.size( ) << " qualities:\n"
+                          << qualities.size() << " qualities:\n"
                           << " Entity id ";
-                    for( std::map< QualityType, double >::iterator qit = qualities.begin( ); qit != qualities.end( );
+                    for( std::map< QualityType, double >::iterator qit = qualities.begin(); qit != qualities.end();
                          ++qit )
                     {
                         ofile << ", " << vw.quality_name( qit->first );
                     }
                     ofile << "\n";
                     ofile << mb.id_from_handle( *it );
-                    for( std::map< QualityType, double >::iterator qit = qualities.begin( ); qit != qualities.end( );
+                    for( std::map< QualityType, double >::iterator qit = qualities.begin(); qit != qualities.end();
                          ++qit )
                     {
                         ofile << ", " << qit->second;
@@ -187,7 +187,7 @@ int main( int argc, char* argv[] )
                 minq = qualities;
                 maxq = qualities;
                 ++it;
-                for( ; it != owned.end( ); ++it )
+                for( ; it != owned.end(); ++it )
                 {
                     rval = vw.all_quality_measures( *it, qualities );
                     if( MB_SUCCESS != rval )
@@ -195,23 +195,23 @@ int main( int argc, char* argv[] )
                         fprintf( stderr, "Error getting quality for entity type %d with id %ld \n", et,
                                  (long)mb.id_from_handle( *it ) );
 #ifdef MOAB_HAVE_MPI
-                        MPI_Finalize( );
+                        MPI_Finalize();
 #endif
                         return 1;
                     }
-                    if( ofile.is_open( ) )
+                    if( ofile.is_open() )
                     {
                         ofile << mb.id_from_handle( *it );
-                        for( std::map< QualityType, double >::iterator qit = qualities.begin( );
-                             qit != qualities.end( ); ++qit )
+                        for( std::map< QualityType, double >::iterator qit = qualities.begin(); qit != qualities.end();
+                             ++qit )
                         {
                             ofile << ", " << qit->second;
                         }
                         ofile << "\n";
                     }
-                    std::map< QualityType, double >::iterator minit = minq.begin( );
-                    std::map< QualityType, double >::iterator maxit = maxq.begin( );
-                    for( std::map< QualityType, double >::iterator mit = qualities.begin( ); mit != qualities.end( );
+                    std::map< QualityType, double >::iterator minit = minq.begin();
+                    std::map< QualityType, double >::iterator maxit = maxq.begin();
+                    for( std::map< QualityType, double >::iterator mit = qualities.begin(); mit != qualities.end();
                          ++mit, ++minit, ++maxit )
                     {
                         if( mit->second > maxit->second ) maxit->second = mit->second;
@@ -233,29 +233,29 @@ int main( int argc, char* argv[] )
                 while( !( vw.possible_quality( et, quality_type ) ) && quality_type < MB_QUALITY_COUNT )
                     quality_type = ( QualityType )( quality_type + 1 );  // will get them in order
                 const char* name_q = vw.quality_name( quality_type );
-                double      local_min, global_min;
-                double      local_max, global_max;
+                double local_min, global_min;
+                double local_max, global_max;
                 if( ne_local > 0 )
                 {
-                    local_min = minq[ quality_type ];
-                    local_max = maxq[ quality_type ];
+                    local_min = minq[quality_type];
+                    local_max = maxq[quality_type];
                 }
                 else
                 {
-                    local_min = 1.e38;  // so this task has no entities of this type
+                    local_min = 1.e38;   // so this task has no entities of this type
                     local_max = -1.e38;  // it can get here only in parallel
                 }
 #ifdef MOAB_HAVE_MPI
                 mpi_err = MPI_Reduce( &local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
                 if( mpi_err )
                 {
-                    MPI_Finalize( );
+                    MPI_Finalize();
                     return 1;
                 }
                 mpi_err = MPI_Reduce( &local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
                 if( mpi_err )
                 {
-                    MPI_Finalize( );
+                    MPI_Finalize();
                     return 1;
                 }
 #else
@@ -270,9 +270,9 @@ int main( int argc, char* argv[] )
             }
         }
     }  // etype
-    if( ofile.is_open( ) ) { ofile.close( ); }
+    if( ofile.is_open() ) { ofile.close(); }
 #ifdef MOAB_HAVE_MPI
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
     return 0;
 }

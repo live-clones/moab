@@ -19,21 +19,21 @@
 using namespace moab;
 using namespace std;
 
-string bd_name = string( MESH_DIR ) + string( "/../examples/earth/boundary_points.dat" );
-string loops = string( MESH_DIR ) + string( "/../examples/earth/SaveLoopCounts" );
+string bd_name    = string( MESH_DIR ) + string( "/../examples/earth/boundary_points.dat" );
+string loops      = string( MESH_DIR ) + string( "/../examples/earth/SaveLoopCounts" );
 string input_file = string( MESH_DIR ) + string( "/../examples/earth/poly2000.h5m" );
 
 double getLat( CartVect p )
 {
-    p.normalize( );
-    return asin( p[ 2 ] );
+    p.normalize();
+    return asin( p[2] );
 }
 double getLon( CartVect p )
 {
-    p.normalize( );
+    p.normalize();
     double lon;
 
-    lon = atan2( p[ 1 ], p[ 0 ] );
+    lon = atan2( p[1], p[0] );
 
     if( lon < -2.95 )
     {  // separate Asia/Europe from Americas
@@ -55,15 +55,15 @@ bool interior_point( vector< double >& coords, int& startLoop, int& endLoop, dou
     double totalAngle = 0;
     for( int i = startLoop; i <= endLoop; i++ )
     {
-        double x1 = coords[ 2 * i ], y1 = coords[ 2 * i + 1 ];
-        int    i2 = i + 1;
+        double x1 = coords[2 * i], y1 = coords[2 * i + 1];
+        int i2 = i + 1;
         if( i == endLoop ) i2 = startLoop;
-        double   x2 = coords[ 2 * i2 ], y2 = coords[ 2 * i2 + 1 ];
+        double x2 = coords[2 * i2], y2 = coords[2 * i2 + 1];
         CartVect P1( x1 - lat, y1 - lon, 0. );
         CartVect P2( x2 - lat, y2 - lon, 0. );
         CartVect cross = P1 * P2;
-        double   angle1 = angle( P1, P2 );
-        if( cross[ 2 ] < 0 ) angle1 = -angle1;
+        double angle1  = angle( P1, P2 );
+        if( cross[2] < 0 ) angle1 = -angle1;
         totalAngle += angle1;
     }
     if( fabs( totalAngle + 2 * M_PI ) < 0.1 || fabs( totalAngle - 2 * M_PI ) < 0.1 ) return true;
@@ -79,12 +79,12 @@ int main( int argc, char** argv )
     if( argc > 1 )
     {
         // User has input file for mesh file
-        input_file = argv[ 1 ];
+        input_file = argv[1];
     }
 
     cout << "input file : " << input_file << "\n";
     std::vector< double > coords;
-    ifstream              bdFile( bd_name.c_str( ) );
+    ifstream bdFile( bd_name.c_str() );
     if( !bdFile )
     {
         cout << endl << "Failed to open file " << bd_name << endl;
@@ -92,61 +92,61 @@ int main( int argc, char** argv )
         return 1;
     }
     coords.resize( 0 );
-    while( !bdFile.eof( ) )
+    while( !bdFile.eof() )
     {
         double co;
         bdFile >> co;
         coords.push_back( co );
     }
-    cout << " number of boundary points:" << coords.size( ) / 3 << "\n";
+    cout << " number of boundary points:" << coords.size() / 3 << "\n";
     /// get loops for boundaries
     vector< int > loopsindx;
-    ifstream      loopFile( loops.c_str( ) );
-    while( !loopFile.eof( ) )
+    ifstream loopFile( loops.c_str() );
+    while( !loopFile.eof() )
     {
         int indx;
         loopFile >> indx;
         loopsindx.push_back( indx );
     }
-    cout << "number of loops: " << loopsindx.size( ) / 2 << "\n";
+    cout << "number of loops: " << loopsindx.size() / 2 << "\n";
     // convert loops to lat-lon loops
     // it will be easier to determine in-out relations for points in 2d plane
     // careful with the international time zone; ( + - Pi longitude )
     vector< double > coords2d;
-    coords2d.resize( coords.size( ) / 3 * 2 );
-    for( int i = 0; i < (int)coords.size( ) / 3; i++ )
+    coords2d.resize( coords.size() / 3 * 2 );
+    for( int i = 0; i < (int)coords.size() / 3; i++ )
     {
-        CartVect p( coords[ 3 * i ], coords[ 3 * i + 1 ], coords[ 3 * i + 2 ] );
-        coords2d[ 2 * i ] = getLat( p );
-        coords2d[ 2 * i + 1 ] = getLon( p );
+        CartVect p( coords[3 * i], coords[3 * i + 1], coords[3 * i + 2] );
+        coords2d[2 * i]     = getLat( p );
+        coords2d[2 * i + 1] = getLon( p );
     }
 
-    ErrorCode rval = mb->load_file( input_file.c_str( ) );MB_CHK_SET_ERR( rval, "Can't load file" );
+    ErrorCode rval = mb->load_file( input_file.c_str() );MB_CHK_SET_ERR( rval, "Can't load file" );
     // look at the center of element, and see if it is inside the loop
 
     Range cells;
     rval = mb->get_entities_by_dimension( 0, 2, cells );MB_CHK_SET_ERR( rval, "Can't get cells" );
 
-    cout << "number of cells: " << cells.size( ) << "\n";
+    cout << "number of cells: " << cells.size() << "\n";
 
     // tag for continents
     Tag tag1;
     int defa = -1;
-    rval = mb->tag_get_handle( "continent", 1, MB_TYPE_INTEGER, tag1, MB_TAG_DENSE | MB_TAG_CREAT, &defa );MB_CHK_SET_ERR( rval, "Trouble creating continent tag" );
-    EntityHandle islandSets[ 6 ];
+    rval     = mb->tag_get_handle( "continent", 1, MB_TYPE_INTEGER, tag1, MB_TAG_DENSE | MB_TAG_CREAT, &defa );MB_CHK_SET_ERR( rval, "Trouble creating continent tag" );
+    EntityHandle islandSets[6];
     for( int loop_index = 0; loop_index < 6; loop_index++ )
     {
-        rval = mb->create_meshset( MESHSET_SET, islandSets[ loop_index ] );MB_CHK_SET_ERR( rval, "Can't create island set" );
-        int startLoop = loopsindx[ 2 * loop_index ];
-        int endLoop = loopsindx[ 2 * loop_index + 1 ];
+        rval = mb->create_meshset( MESHSET_SET, islandSets[loop_index] );MB_CHK_SET_ERR( rval, "Can't create island set" );
+        int startLoop = loopsindx[2 * loop_index];
+        int endLoop   = loopsindx[2 * loop_index + 1];
 
         vector< EntityHandle > interiorCells;
-        for( Range::iterator cit = cells.begin( ); cit != cells.end( ); cit++ )
+        for( Range::iterator cit = cells.begin(); cit != cells.end(); cit++ )
         {
             EntityHandle cell = *cit;
             // see if it is in the interior of the loop
             CartVect center;
-            rval = mb->get_coords( &cell, 1, &( center[ 0 ] ) );MB_CHK_SET_ERR( rval, "Can't get cell center coords" );
+            rval = mb->get_coords( &cell, 1, &( center[0] ) );MB_CHK_SET_ERR( rval, "Can't get cell center coords" );
             double lat = getLat( center ), lon = getLon( center );
             // if NA, use some boxes too, for lat/lon
             // if (NorthAmerica && (lat < 0.15 || lon < M_PI || lon > 2*M_PI - 0.5) )
@@ -159,13 +159,13 @@ int main( int argc, char** argv )
             }
         }
 
-        rval = mb->add_entities( islandSets[ loop_index ], &interiorCells[ 0 ], interiorCells.size( ) );MB_CHK_SET_ERR( rval, "Can't add entities to set" );
+        rval = mb->add_entities( islandSets[loop_index], &interiorCells[0], interiorCells.size() );MB_CHK_SET_ERR( rval, "Can't add entities to set" );
     }
 
     std::stringstream islandFile;
 
     islandFile << "map.h5m";
 
-    rval = mb->write_file( islandFile.str( ).c_str( ) );MB_CHK_SET_ERR( rval, "Can't write island file" );
+    rval = mb->write_file( islandFile.str().c_str() );MB_CHK_SET_ERR( rval, "Can't write island file" );
     return 0;
 }

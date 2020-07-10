@@ -44,8 +44,8 @@ class MESQUITE_EXPORT ViscousCFDTetShapeWrapper : public Wrapper
 {
   private:
     double dCutoff, aVal;
-    int    iterationLimit;
-    int    parallelIterations;
+    int iterationLimit;
+    int parallelIterations;
     double maxVtxMovement;
 
     void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,

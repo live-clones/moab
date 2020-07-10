@@ -73,20 +73,20 @@ const int TIME_STR_LEN = 11;
     INS_ID( name, varname, id );                  \
     GET_DIM( ncdim, name, val );
 
-#define GET_VAR( name, id, dims )                                   \
-    {                                                               \
-        id = -1;                                                    \
-        int gvfail = nc_inq_varid( ncFile, name, &id );             \
-        if( NC_NOERR == gvfail )                                    \
-        {                                                           \
-            int ndims;                                              \
-            gvfail = nc_inq_varndims( ncFile, id, &ndims );         \
-            if( NC_NOERR == gvfail )                                \
-            {                                                       \
-                dims.resize( ndims );                               \
-                gvfail = nc_inq_vardimid( ncFile, id, &dims[ 0 ] ); \
-            }                                                       \
-        }                                                           \
+#define GET_VAR( name, id, dims )                                 \
+    {                                                             \
+        id         = -1;                                          \
+        int gvfail = nc_inq_varid( ncFile, name, &id );           \
+        if( NC_NOERR == gvfail )                                  \
+        {                                                         \
+            int ndims;                                            \
+            gvfail = nc_inq_varndims( ncFile, id, &ndims );       \
+            if( NC_NOERR == gvfail )                              \
+            {                                                     \
+                dims.resize( ndims );                             \
+                gvfail = nc_inq_vardimid( ncFile, id, &dims[0] ); \
+            }                                                     \
+        }                                                         \
     }
 
 WriterIface* WriteNCDF::factory( Interface* iface )
@@ -113,7 +113,7 @@ WriteNCDF::WriteNCDF( Interface* impl )
     impl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT,
                           &negone );
 
-    mGlobalIdTag = impl->globalId_tag( );
+    mGlobalIdTag = impl->globalId_tag();
 
     int dum_val_array[] = { -1, -1, -1, -1 };
     impl->tag_get_handle( HAS_MID_NODES_TAG_NAME, 4, MB_TYPE_INTEGER, mHasMidNodesTag, MB_TAG_SPARSE | MB_TAG_CREAT,
@@ -127,7 +127,7 @@ WriteNCDF::WriteNCDF( Interface* impl )
     impl->tag_get_handle( "WriteNCDF element mark", 1, MB_TYPE_BIT, mEntityMark, MB_TAG_CREAT );
 }
 
-WriteNCDF::~WriteNCDF( )
+WriteNCDF::~WriteNCDF()
 {
     mdbImpl->release_interface( mWriteIface );
 
@@ -140,19 +140,19 @@ void WriteNCDF::reset_block( std::vector< MaterialSetData >& block_info )
 {
     std::vector< MaterialSetData >::iterator iter;
 
-    for( iter = block_info.begin( ); iter != block_info.end( ); ++iter )
+    for( iter = block_info.begin(); iter != block_info.end(); ++iter )
     {
-        iter->elements.clear( );
+        iter->elements.clear();
     }
 }
 
 void WriteNCDF::time_and_date( char* time_string, char* date_string )
 {
     struct tm* local_time;
-    time_t     calendar_time;
+    time_t calendar_time;
 
     calendar_time = time( NULL );
-    local_time = localtime( &calendar_time );
+    local_time    = localtime( &calendar_time );
 
     assert( NULL != time_string && NULL != date_string );
 
@@ -160,8 +160,8 @@ void WriteNCDF::time_and_date( char* time_string, char* date_string )
     strftime( date_string, TIME_STR_LEN, "%m/%d/%Y", local_time );
 
     // Terminate with NULL character
-    time_string[ 10 ] = (char)NULL;
-    date_string[ 10 ] = (char)NULL;
+    time_string[10] = (char)NULL;
+    date_string[10] = (char)NULL;
 }
 
 ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwrite, const FileOptions& opts,
@@ -183,24 +183,24 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
         // Default to all defined block, nodeset and sideset-type sets
         Range this_range;
         mdbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mMaterialSetTag, NULL, 1, this_range );
-        std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( blocks ) );
-        this_range.clear( );
+        std::copy( this_range.begin(), this_range.end(), std::back_inserter( blocks ) );
+        this_range.clear();
         mdbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mDirichletSetTag, NULL, 1, this_range );
-        std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( nodesets ) );
-        this_range.clear( );
+        std::copy( this_range.begin(), this_range.end(), std::back_inserter( nodesets ) );
+        this_range.clear();
         mdbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &mNeumannSetTag, NULL, 1, this_range );
-        std::copy( this_range.begin( ), this_range.end( ), std::back_inserter( sidesets ) );
+        std::copy( this_range.begin(), this_range.end(), std::back_inserter( sidesets ) );
 
         // If there is nothing to write, write everything as one block.
-        if( blocks.empty( ) && nodesets.empty( ) && sidesets.empty( ) )
+        if( blocks.empty() && nodesets.empty() && sidesets.empty() )
         {
-            this_range.clear( );
-            for( int d = user_dimension; d > 0 && this_range.empty( ); --d )
+            this_range.clear();
+            for( int d = user_dimension; d > 0 && this_range.empty(); --d )
                 mdbImpl->get_entities_by_dimension( 0, d, this_range, false );
-            if( this_range.empty( ) ) return MB_FILE_WRITE_ERROR;
+            if( this_range.empty() ) return MB_FILE_WRITE_ERROR;
 
             EntityHandle block_handle;
-            int          block_id = 1;
+            int block_id = 1;
             mdbImpl->create_meshset( MESHSET_SET, block_handle );
             mdbImpl->tag_set_data( mMaterialSetTag, &block_handle, 1, &block_id );
             mdbImpl->add_entities( block_handle, this_range );
@@ -222,23 +222,23 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
     }
 
     // If there is nothing to write just return.
-    if( blocks.empty( ) && nodesets.empty( ) && sidesets.empty( ) ) return MB_FILE_WRITE_ERROR;
+    if( blocks.empty() && nodesets.empty() && sidesets.empty() ) return MB_FILE_WRITE_ERROR;
 
     // Try to get mesh information
     ExodusMeshInfo mesh_info;
 
-    std::vector< MaterialSetData >  block_info;
-    std::vector< NeumannSetData >   sideset_info;
+    std::vector< MaterialSetData > block_info;
+    std::vector< NeumannSetData > sideset_info;
     std::vector< DirichletSetData > nodeset_info;
 
     mesh_info.num_dim = user_dimension;
 
-    if( qa_records.empty( ) )
+    if( qa_records.empty() )
     {
         // qa records are empty - initialize some MB-standard ones
         mesh_info.qaRecords.push_back( "MB" );
         mesh_info.qaRecords.push_back( "0.99" );
-        char string1[ 80 ], string2[ 80 ];
+        char string1[80], string2[80];
         time_and_date( string2, string1 );
         mesh_info.qaRecords.push_back( string2 );
         mesh_info.qaRecords.push_back( string1 );
@@ -246,12 +246,12 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
     else
     {
         // Constrained to multiples of 4 qa records
-        assert( qa_records.size( ) % 4 == 0 );
+        assert( qa_records.size() % 4 == 0 );
 
-        std::copy( qa_records.begin( ), qa_records.end( ), std::back_inserter( mesh_info.qaRecords ) );
+        std::copy( qa_records.begin(), qa_records.end(), std::back_inserter( mesh_info.qaRecords ) );
     }
 
-    block_info.clear( );
+    block_info.clear();
     if( gather_mesh_information( mesh_info, block_info, sideset_info, nodeset_info, blocks, sidesets, nodesets ) !=
         MB_SUCCESS )
     {
@@ -275,9 +275,9 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
 
     {
         // write dummy time_whole
-        double             timev = 0.0;  // dummy, to make paraview happy
-        size_t             start = 0, count = 1;
-        int                nc_var;
+        double timev = 0.0;  // dummy, to make paraview happy
+        size_t start = 0, count = 1;
+        int nc_var;
         std::vector< int > dims;
         GET_VAR( "time_whole", nc_var, dims );
         fail = nc_put_vara_double( ncFile, nc_var, &start, &count, &timev );
@@ -290,7 +290,7 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
         return MB_FAILURE;
     }
 
-    if( !mesh_info.polyhedronFaces.empty( ) )
+    if( !mesh_info.polyhedronFaces.empty() )
     {
         if( write_poly_faces( mesh_info ) != MB_SUCCESS )
         {
@@ -347,24 +347,24 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
 }
 
 ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
-                                              std::vector< NeumannSetData >&   sideset_info,
+                                              std::vector< NeumannSetData >& sideset_info,
                                               std::vector< DirichletSetData >& nodeset_info,
-                                              std::vector< EntityHandle >&     blocks,
-                                              std::vector< EntityHandle >&     sidesets,
-                                              std::vector< EntityHandle >&     nodesets )
+                                              std::vector< EntityHandle >& blocks,
+                                              std::vector< EntityHandle >& sidesets,
+                                              std::vector< EntityHandle >& nodesets )
 {
-    ErrorCode                             rval;
+    ErrorCode rval;
     std::vector< EntityHandle >::iterator vector_iter, end_vector_iter;
 
-    mesh_info.num_nodes = 0;
-    mesh_info.num_elements = 0;
-    mesh_info.num_elementblocks = 0;
+    mesh_info.num_nodes            = 0;
+    mesh_info.num_elements         = 0;
+    mesh_info.num_elementblocks    = 0;
     mesh_info.num_polyhedra_blocks = 0;
 
     int id = 0;
 
-    vector_iter = blocks.begin( );
-    end_vector_iter = blocks.end( );
+    vector_iter     = blocks.begin();
+    end_vector_iter = blocks.end();
 
     std::vector< EntityHandle > parent_meshsets;
 
@@ -376,7 +376,7 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
 
     int highest_dimension_of_element_blocks = 0;
 
-    for( vector_iter = blocks.begin( ); vector_iter != blocks.end( ); ++vector_iter )
+    for( vector_iter = blocks.begin(); vector_iter != blocks.end(); ++vector_iter )
     {
         MaterialSetData block_data;
 
@@ -389,19 +389,19 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         if( MB_SUCCESS != rval ) return rval;
 
         // Skip empty blocks
-        if( dummy_range.empty( ) ) continue;
+        if( dummy_range.empty() ) continue;
 
         // Get the block's id
         if( mdbImpl->tag_get_data( mMaterialSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
         { MB_SET_ERR( MB_FAILURE, "Couldn't get block id from a tag for an element block" ); }
 
-        block_data.id = id;
+        block_data.id                = id;
         block_data.number_attributes = 0;
 
         // Wait a minute, we are doing some filtering here that doesn't make sense at this level CJS
 
         // Find the dimension of the last entity in this range
-        int this_dim = CN::Dimension( TYPE_FROM_HANDLE( dummy_range.back( ) ) );
+        int this_dim = CN::Dimension( TYPE_FROM_HANDLE( dummy_range.back() ) );
         if( this_dim > 3 ) { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Block " << id << " contains entity sets" ); }
         block_data.elements = dummy_range.subset_by_dimension( this_dim );
 
@@ -409,7 +409,7 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         // level CJS
 
         // Get the entity type for this block, verifying that it's the same for all elements
-        EntityType entity_type = TYPE_FROM_HANDLE( block_data.elements.front( ) );
+        EntityType entity_type = TYPE_FROM_HANDLE( block_data.elements.front() );
         if( !block_data.elements.all_of_type( entity_type ) )
         { MB_SET_ERR( MB_FAILURE, "Entities in block " << id << " not of common type" ); }
 
@@ -424,10 +424,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         if( dimension > highest_dimension_of_element_blocks ) highest_dimension_of_element_blocks = dimension;
 
         std::vector< EntityHandle > tmp_conn;
-        rval = mdbImpl->get_connectivity( &( block_data.elements.front( ) ), 1, tmp_conn );
+        rval = mdbImpl->get_connectivity( &( block_data.elements.front() ), 1, tmp_conn );
         if( MB_SUCCESS != rval ) return rval;
-        block_data.element_type =
-            ExoIIUtil::get_element_type_from_num_verts( tmp_conn.size( ), entity_type, dimension );
+        block_data.element_type = ExoIIUtil::get_element_type_from_num_verts( tmp_conn.size(), entity_type, dimension );
 
         if( block_data.element_type == EXOII_MAX_ELEM_TYPE )
         { MB_SET_ERR( MB_FAILURE, "Element type in block " << id << " didn't get set correctly" ); }
@@ -436,21 +435,22 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         {
             // get all poly connectivity
             int numconn = 0;
-            for( Range::iterator eit = block_data.elements.begin( ); eit != block_data.elements.end( ); eit++ )
+            for( Range::iterator eit = block_data.elements.begin(); eit != block_data.elements.end(); eit++ )
             {
-                EntityHandle        polg = *eit;
-                int                 nnodes = 0;
+                EntityHandle polg        = *eit;
+                int nnodes               = 0;
                 const EntityHandle* conn = NULL;
-                rval = mdbImpl->get_connectivity( polg, conn, nnodes );MB_CHK_ERR( rval );
+                rval                     = mdbImpl->get_connectivity( polg, conn, nnodes );
+                MB_CHK_ERR( rval );
                 numconn += nnodes;
             }
             block_data.number_nodes_per_element = numconn;
         }
         else
-            block_data.number_nodes_per_element = ExoIIUtil::VerticesPerElement[ block_data.element_type ];
+            block_data.number_nodes_per_element = ExoIIUtil::VerticesPerElement[block_data.element_type];
 
         // Number of nodes for this block
-        block_data.number_elements = block_data.elements.size( );
+        block_data.number_elements = block_data.elements.size();
 
         // Total number of elements
         mesh_info.num_elements += block_data.number_elements;
@@ -462,17 +462,18 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         // if polyhedra block
         if( EXOII_POLYHEDRON == block_data.element_type )
         {
-            rval = mdbImpl->get_connectivity( block_data.elements, mesh_info.polyhedronFaces );MB_CHK_ERR( rval );
+            rval = mdbImpl->get_connectivity( block_data.elements, mesh_info.polyhedronFaces );
+            MB_CHK_ERR( rval );
             mesh_info.num_polyhedra_blocks++;
         }
 
-        if( !sidesets.empty( ) )
+        if( !sidesets.empty() )
         {
             // If there are sidesets, keep track of which elements are being written out
-            for( Range::iterator iter = block_data.elements.begin( ); iter != block_data.elements.end( ); ++iter )
+            for( Range::iterator iter = block_data.elements.begin(); iter != block_data.elements.end(); ++iter )
             {
                 unsigned char bit = 0x1;
-                rval = mdbImpl->tag_set_data( mEntityMark, &( *iter ), 1, &bit );
+                rval              = mdbImpl->tag_set_data( mEntityMark, &( *iter ), 1, &bit );
                 if( MB_SUCCESS != rval ) return rval;
             }
         }
@@ -480,18 +481,18 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         block_info.push_back( block_data );
 
         const void* data = NULL;
-        int         size = 0;
+        int size         = 0;
         if( MB_SUCCESS == mdbImpl->tag_get_by_ptr( mQaRecordTag, &( *vector_iter ), 1, &data, &size ) && NULL != data )
         {
             // There are qa records on this block - copy over to mesh qa records
             const char* qa_rec = static_cast< const char* >( data );
-            int         start = 0;
-            int         count = 0;
+            int start          = 0;
+            int count          = 0;
             for( int i = 0; i < size; i++ )
             {
-                if( qa_rec[ i ] == '\0' )
+                if( qa_rec[i] == '\0' )
                 {
-                    std::string qa_string( &qa_rec[ start ], i - start );
+                    std::string qa_string( &qa_rec[start], i - start );
                     mesh_info.qaRecords.push_back( qa_string );
                     start = i + 1;
                     count++;
@@ -503,9 +504,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         }
     }
 
-    mesh_info.num_elementblocks = block_info.size( );
+    mesh_info.num_elementblocks = block_info.size();
 
-    for( std::vector< MaterialSetData >::iterator blit = block_info.begin( ); blit != block_info.end( ); blit++ )
+    for( std::vector< MaterialSetData >::iterator blit = block_info.begin(); blit != block_info.end(); blit++ )
     {
         MaterialSetData& block = *blit;
         if( block.element_type != EXOII_POLYHEDRON )
@@ -523,20 +524,20 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
     }
 
     Range::iterator range_iter, end_range_iter;
-    range_iter = mesh_info.nodes.begin( );
-    end_range_iter = mesh_info.nodes.end( );
+    range_iter     = mesh_info.nodes.begin();
+    end_range_iter = mesh_info.nodes.end();
 
-    mesh_info.num_nodes = mesh_info.nodes.size( );
+    mesh_info.num_nodes = mesh_info.nodes.size();
 
     //------nodesets--------
 
-    vector_iter = nodesets.begin( );
-    end_vector_iter = nodesets.end( );
+    vector_iter     = nodesets.begin();
+    end_vector_iter = nodesets.end();
 
     for( ; vector_iter != end_vector_iter; ++vector_iter )
     {
         DirichletSetData nodeset_data;
-        nodeset_data.id = 0;
+        nodeset_data.id           = 0;
         nodeset_data.number_nodes = 0;
 
         // Get the nodeset's id
@@ -552,8 +553,8 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
 
         // Get the tag for distribution factors
         const double* dist_factor_vector;
-        int           dist_factor_size;
-        const void*   ptr = 0;
+        int dist_factor_size;
+        const void* ptr = 0;
 
         int has_dist_factors = 0;
         if( mdbImpl->tag_get_by_ptr( mDistFactorTag, &( *vector_iter ), 1, &ptr, &dist_factor_size ) == MB_SUCCESS &&
@@ -562,35 +563,36 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         dist_factor_size /= sizeof( double );
         dist_factor_vector = reinterpret_cast< const double* >( ptr );
         std::vector< EntityHandle >::iterator iter, end_iter;
-        iter = node_vector.begin( );
-        end_iter = node_vector.end( );
+        iter     = node_vector.begin();
+        end_iter = node_vector.end();
 
-        int           j = 0;
+        int j                     = 0;
         unsigned char node_marked = 0;
-        ErrorCode     result;
+        ErrorCode result;
         for( ; iter != end_iter; ++iter )
         {
             if( TYPE_FROM_HANDLE( *iter ) != MBVERTEX ) continue;
-            result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &node_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+            result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &node_marked );
+            MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
             if( 0x1 == node_marked )
             {
                 nodeset_data.nodes.push_back( *iter );
                 if( 0 != has_dist_factors )
-                    nodeset_data.node_dist_factors.push_back( dist_factor_vector[ j ] );
+                    nodeset_data.node_dist_factors.push_back( dist_factor_vector[j] );
                 else
                     nodeset_data.node_dist_factors.push_back( 1.0 );
             }
             j++;
         }
 
-        nodeset_data.number_nodes = nodeset_data.nodes.size( );
+        nodeset_data.number_nodes = nodeset_data.nodes.size();
         nodeset_info.push_back( nodeset_data );
     }
 
     //------sidesets--------
-    vector_iter = sidesets.begin( );
-    end_vector_iter = sidesets.end( );
+    vector_iter     = sidesets.begin();
+    end_vector_iter = sidesets.end();
 
     for( ; vector_iter != end_vector_iter; ++vector_iter )
     {
@@ -599,7 +601,7 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         // Get the sideset's id
         if( mdbImpl->tag_get_data( mNeumannSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS ) return MB_FAILURE;
 
-        sideset_data.id = id;
+        sideset_data.id              = id;
         sideset_data.mesh_set_handle = *vector_iter;
 
         // Get the sides in two lists, one forward the other reverse; starts with forward sense
@@ -607,10 +609,12 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         Range forward_elems, reverse_elems;
         if( get_sideset_elems( *vector_iter, 0, forward_elems, reverse_elems ) == MB_FAILURE ) return MB_FAILURE;
 
-        ErrorCode result = get_valid_sides( forward_elems, mesh_info, 1, sideset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
-        result = get_valid_sides( reverse_elems, mesh_info, -1, sideset_data );MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
+        ErrorCode result = get_valid_sides( forward_elems, mesh_info, 1, sideset_data );
+        MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
+        result = get_valid_sides( reverse_elems, mesh_info, -1, sideset_data );
+        MB_CHK_SET_ERR( result, "Couldn't get valid sides data" );
 
-        sideset_data.number_elements = sideset_data.elements.size( );
+        sideset_data.number_elements = sideset_data.elements.size();
         sideset_info.push_back( sideset_data );
     }
 
@@ -624,28 +628,29 @@ ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*
 
     // Get the sideset-based info for distribution factors
     const double* dist_factor_vector = 0;
-    int           dist_factor_size = 0;
+    int dist_factor_size             = 0;
 
     // Initialize dist_fac_iter to get rid of compiler warning
     const double* dist_fac_iter = 0;
-    const void*   ptr = 0;
-    bool          has_dist_factors = false;
+    const void* ptr             = 0;
+    bool has_dist_factors       = false;
     if( mdbImpl->tag_get_by_ptr( mDistFactorTag, &( sideset_data.mesh_set_handle ), 1, &ptr, &dist_factor_size ) ==
             MB_SUCCESS &&
         dist_factor_size )
     {
-        has_dist_factors = true;
+        has_dist_factors   = true;
         dist_factor_vector = reinterpret_cast< const double* >( ptr );
-        dist_fac_iter = dist_factor_vector;
+        dist_fac_iter      = dist_factor_vector;
         dist_factor_size /= sizeof( double );
     }
 
     unsigned char element_marked = 0;
-    ErrorCode     result;
-    for( Range::iterator iter = elems.begin( ); iter != elems.end( ); ++iter )
+    ErrorCode result;
+    for( Range::iterator iter = elems.begin(); iter != elems.end(); ++iter )
     {
         // Should insert here if "side" is a quad/tri on a quad/tri mesh
-        result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+        result = mdbImpl->tag_get_data( mEntityMark, &( *iter ), 1, &element_marked );
+        MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
         if( 0x1 == element_marked )
         {
@@ -657,7 +662,7 @@ ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*
         else
         {  // Then "side" is probably a quad/tri on a hex/tet mesh
             std::vector< EntityHandle > parents;
-            int                         dimension = CN::Dimension( TYPE_FROM_HANDLE( *iter ) );
+            int dimension = CN::Dimension( TYPE_FROM_HANDLE( *iter ) );
 
             // Get the adjacent parent element of "side"
             if( mdbImpl->get_adjacencies( &( *iter ), 1, dimension + 1, false, parents ) != MB_SUCCESS )
@@ -669,19 +674,20 @@ ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*
 #endif
             }
 
-            if( !parents.empty( ) )
+            if( !parents.empty() )
             {
                 // Make sure the adjacent parent element will be output
-                for( unsigned int k = 0; k < parents.size( ); k++ )
+                for( unsigned int k = 0; k < parents.size(); k++ )
                 {
-                    result = mdbImpl->tag_get_data( mEntityMark, &( parents[ k ] ), 1, &element_marked );MB_CHK_SET_ERR( result, "Couldn't get mark data" );
+                    result = mdbImpl->tag_get_data( mEntityMark, &( parents[k] ), 1, &element_marked );
+                    MB_CHK_SET_ERR( result, "Couldn't get mark data" );
 
                     int side_no, this_sense, this_offset;
                     if( 0x1 == element_marked &&
-                        mdbImpl->side_number( parents[ k ], *iter, side_no, this_sense, this_offset ) == MB_SUCCESS &&
+                        mdbImpl->side_number( parents[k], *iter, side_no, this_sense, this_offset ) == MB_SUCCESS &&
                         this_sense == sense )
                     {
-                        sideset_data.elements.push_back( parents[ k ] );
+                        sideset_data.elements.push_back( parents[k] );
                         sideset_data.side_numbers.push_back( side_no + 1 );
                         break;
                     }
@@ -697,7 +703,7 @@ ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*
             }
         }
 
-        if( sideset_data.elements.size( ) != 0 )
+        if( sideset_data.elements.size() != 0 )
         {
             // Distribution factors
             int num_nodes = CN::VerticesPerEntity( TYPE_FROM_HANDLE( *iter ) );
@@ -724,10 +730,10 @@ ErrorCode WriteNCDF::write_qa_records( std::vector< std::string >& qa_record_lis
 {
     int i = 0;
 
-    for( std::vector< std::string >::iterator string_it = qa_record_list.begin( ); string_it != qa_record_list.end( ); )
+    for( std::vector< std::string >::iterator string_it = qa_record_list.begin(); string_it != qa_record_list.end(); )
     {
         for( int j = 0; j < 4; j++ )
-            write_qa_string( ( *string_it++ ).c_str( ), i, j );
+            write_qa_string( ( *string_it++ ).c_str(), i, j );
         i++;
     }
 
@@ -739,19 +745,19 @@ ErrorCode WriteNCDF::write_qa_string( const char* string, int record_number, int
     // Get the variable id in the exodus file
 
     std::vector< int > dims;
-    int                temp_var = -1;
+    int temp_var = -1;
     GET_VAR( "qa_records", temp_var, dims );
     if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF:: Problem getting qa record variable" ); }
-    size_t count[ 3 ], start[ 3 ];
+    size_t count[3], start[3];
 
     // Write out the record
-    start[ 0 ] = record_number;
-    start[ 1 ] = record_position;
-    start[ 2 ] = 0;
+    start[0] = record_number;
+    start[1] = record_position;
+    start[2] = 0;
 
-    count[ 0 ] = 1;
-    count[ 1 ] = 1;
-    count[ 2 ] = (long)strlen( string ) + 1;
+    count[0] = 1;
+    count[1] = 1;
+    count[2] = (long)strlen( string ) + 1;
     int fail = nc_put_vara_text( ncFile, temp_var, start, count, string );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed to position qa string variable" ); }
 
@@ -761,25 +767,25 @@ ErrorCode WriteNCDF::write_qa_string( const char* string, int record_number, int
 ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
 {
     // Write coordinates names
-    int                nc_var = -1;
+    int nc_var = -1;
     std::vector< int > dims;
     GET_VAR( "coor_names", nc_var, dims );
     if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Trouble getting coordinate name variable" ); }
 
-    size_t start[ 2 ] = { 0, 0 }, count[ 2 ] = { 1, ExoIIInterface::MAX_STR_LENGTH };
-    char   dum_str[ ExoIIInterface::MAX_STR_LENGTH ];
+    size_t start[2] = { 0, 0 }, count[2] = { 1, ExoIIInterface::MAX_STR_LENGTH };
+    char dum_str[ExoIIInterface::MAX_STR_LENGTH];
     strcpy( dum_str, "x" );
     int fail = nc_put_vara_text( ncFile, nc_var, start, count, dum_str );
     if( NC_NOERR != fail )
     { MB_SET_ERR( MB_FAILURE, "Trouble adding x coordinate name; netcdf message: " << nc_strerror( fail ) ); }
 
-    start[ 0 ] = 1;
+    start[0] = 1;
     strcpy( dum_str, "y" );
     fail = nc_put_vara_text( ncFile, nc_var, start, count, dum_str );
     if( NC_NOERR != fail )
     { MB_SET_ERR( MB_FAILURE, "Trouble adding y coordinate name; netcdf message: " << nc_strerror( fail ) ); }
 
-    start[ 0 ] = 2;
+    start[0] = 2;
     strcpy( dum_str, "z" );
     fail = nc_put_vara_text( ncFile, nc_var, start, count, dum_str );
     if( NC_NOERR != fail )
@@ -787,54 +793,55 @@ ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
 
     // See if should transform coordinates
     ErrorCode result;
-    Tag       trans_tag;
-    result = mdbImpl->tag_get_handle( MESH_TRANSFORM_TAG_NAME, 16, MB_TYPE_DOUBLE, trans_tag );
+    Tag trans_tag;
+    result                = mdbImpl->tag_get_handle( MESH_TRANSFORM_TAG_NAME, 16, MB_TYPE_DOUBLE, trans_tag );
     bool transform_needed = true;
     if( result == MB_TAG_NOT_FOUND ) transform_needed = false;
 
     int num_coords_to_fill = transform_needed ? 3 : dimension;
 
     std::vector< double* > coord_arrays( 3 );
-    coord_arrays[ 0 ] = new double[ num_nodes ];
-    coord_arrays[ 1 ] = new double[ num_nodes ];
-    coord_arrays[ 2 ] = NULL;
+    coord_arrays[0] = new double[num_nodes];
+    coord_arrays[1] = new double[num_nodes];
+    coord_arrays[2] = NULL;
 
-    if( num_coords_to_fill == 3 ) coord_arrays[ 2 ] = new double[ num_nodes ];
+    if( num_coords_to_fill == 3 ) coord_arrays[2] = new double[num_nodes];
 
     result = mWriteIface->get_node_coords( dimension, num_nodes, nodes, mGlobalIdTag, 1, coord_arrays );
     if( result != MB_SUCCESS )
     {
-        delete[] coord_arrays[ 0 ];
-        delete[] coord_arrays[ 1 ];
-        if( coord_arrays[ 2 ] ) delete[] coord_arrays[ 2 ];
+        delete[] coord_arrays[0];
+        delete[] coord_arrays[1];
+        if( coord_arrays[2] ) delete[] coord_arrays[2];
         return result;
     }
 
     if( transform_needed )
     {
-        double             trans_matrix[ 16 ];
+        double trans_matrix[16];
         const EntityHandle mesh = 0;
-        result = mdbImpl->tag_get_data( trans_tag, &mesh, 0, trans_matrix );MB_CHK_SET_ERR( result, "Couldn't get transform data" );
+        result                  = mdbImpl->tag_get_data( trans_tag, &mesh, 0, trans_matrix );
+        MB_CHK_SET_ERR( result, "Couldn't get transform data" );
 
         for( int i = 0; i < num_nodes; i++ )
         {
-            double vec1[ 3 ];
-            double vec2[ 3 ];
+            double vec1[3];
+            double vec2[3];
 
-            vec2[ 0 ] = coord_arrays[ 0 ][ i ];
-            vec2[ 1 ] = coord_arrays[ 1 ][ i ];
-            vec2[ 2 ] = coord_arrays[ 2 ][ i ];
+            vec2[0] = coord_arrays[0][i];
+            vec2[1] = coord_arrays[1][i];
+            vec2[2] = coord_arrays[2][i];
 
             for( int row = 0; row < 3; row++ )
             {
-                vec1[ row ] = 0.0;
+                vec1[row] = 0.0;
                 for( int col = 0; col < 3; col++ )
-                    vec1[ row ] += ( trans_matrix[ ( row * 4 ) + col ] * vec2[ col ] );
+                    vec1[row] += ( trans_matrix[( row * 4 ) + col] * vec2[col] );
             }
 
-            coord_arrays[ 0 ][ i ] = vec1[ 0 ];
-            coord_arrays[ 1 ][ i ] = vec1[ 1 ];
-            coord_arrays[ 2 ][ i ] = vec1[ 2 ];
+            coord_arrays[0][i] = vec1[0];
+            coord_arrays[1][i] = vec1[1];
+            coord_arrays[2][i] = vec1[2];
         }
     }
 
@@ -842,22 +849,22 @@ ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
     nc_var = -1;
     GET_VAR( "coord", nc_var, dims );
     if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Trouble getting coordinate variable" ); }
-    start[ 0 ] = 0;
-    count[ 1 ] = num_nodes;
-    fail = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[ 0 ][ 0 ] ) );
+    start[0] = 0;
+    count[1] = num_nodes;
+    fail     = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[0][0] ) );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble writing x coordinate" ); }
 
-    start[ 0 ] = 1;
-    fail = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[ 1 ][ 0 ] ) );
+    start[0] = 1;
+    fail     = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[1][0] ) );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble writing y coordinate" ); }
 
-    start[ 0 ] = 2;
-    fail = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[ 2 ][ 0 ] ) );
+    start[0] = 2;
+    fail     = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[2][0] ) );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble writing z coordinate" ); }
 
-    delete[] coord_arrays[ 0 ];
-    delete[] coord_arrays[ 1 ];
-    if( coord_arrays[ 2 ] ) delete[] coord_arrays[ 2 ];
+    delete[] coord_arrays[0];
+    delete[] coord_arrays[1];
+    if( coord_arrays[2] ) delete[] coord_arrays[2];
 
     return MB_SUCCESS;
 }
@@ -876,36 +883,37 @@ ErrorCode WriteNCDF::write_poly_faces( ExodusMeshInfo& mesh_info )
                 fbepecnt1:entity_type1 = "NODE" ;
                 fbepecnt1:entity_type2 = "FACE" ;
      */
-    if( pfaces.empty( ) ) return MB_SUCCESS;
-    char               wname[ 80 ];
-    int                nc_var = -1;
+    if( pfaces.empty() ) return MB_SUCCESS;
+    char wname[80];
+    int nc_var = -1;
     std::vector< int > dims;
 
     // write one for each element block, to make paraview and visit happy
-    int num_faces_in_block = (int)pfaces.size( );
+    int num_faces_in_block = (int)pfaces.size();
     for( unsigned int bl = 0; bl < mesh_info.num_polyhedra_blocks; bl++ )
     {
         INS_ID( wname, "fbconn%u", bl + 1 );  // it is the first block
-        GET_VAR( wname, nc_var, dims );  // fbconn# variable, 1 dimensional
+        GET_VAR( wname, nc_var, dims );       // fbconn# variable, 1 dimensional
 
         INS_ID( wname, "num_nod_per_fa%u", bl + 1 );
         int ncdim, num_nod_per_face;
         GET_DIM( ncdim, wname, num_nod_per_face );
-        int*               connectivity = new int[ num_nod_per_face ];
-        int                ixcon = 0, j = 0;
+        int* connectivity = new int[num_nod_per_face];
+        int ixcon = 0, j = 0;
         std::vector< int > fbepe( num_faces_in_block );  // fbepecnt1
-        for( Range::iterator eit = pfaces.begin( ); eit != pfaces.end( ); eit++ )
+        for( Range::iterator eit = pfaces.begin(); eit != pfaces.end(); eit++ )
         {
-            EntityHandle        polyg = *eit;
-            int                 nnodes = 0;
+            EntityHandle polyg       = *eit;
+            int nnodes               = 0;
             const EntityHandle* conn = NULL;
-            ErrorCode           rval = mdbImpl->get_connectivity( polyg, conn, nnodes );MB_CHK_ERR( rval );
+            ErrorCode rval           = mdbImpl->get_connectivity( polyg, conn, nnodes );
+            MB_CHK_ERR( rval );
             for( int k = 0; k < nnodes; k++ )
-                connectivity[ ixcon++ ] = conn[ k ];
-            fbepe[ j++ ] = nnodes;
+                connectivity[ixcon++] = conn[k];
+            fbepe[j++] = nnodes;
         }
-        size_t start[ 1 ] = { 0 }, count[ 1 ] = { 0 };
-        count[ 0 ] = ixcon;
+        size_t start[1] = { 0 }, count[1] = { 0 };
+        count[0] = ixcon;
         int fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
         if( NC_NOERR != fail )
         {
@@ -915,9 +923,9 @@ ErrorCode WriteNCDF::write_poly_faces( ExodusMeshInfo& mesh_info )
 
         INS_ID( wname, "fbepecnt%u", bl + 1 );
         GET_VAR( wname, nc_var, dims );  // fbconn# variable, 1 dimensional
-        count[ 0 ] = num_faces_in_block;
+        count[0] = num_faces_in_block;
 
-        fail = nc_put_vara_int( ncFile, nc_var, start, count, &fbepe[ 0 ] );
+        fail = nc_put_vara_int( ncFile, nc_var, start, count, &fbepe[0] );
         if( NC_NOERR != fail )
         {
             delete[] connectivity;
@@ -939,12 +947,12 @@ ErrorCode WriteNCDF::write_poly_faces( ExodusMeshInfo& mesh_info )
     return MB_SUCCESS;
 }
 ErrorCode WriteNCDF::write_header( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
-                                   std::vector< NeumannSetData >&   sideset_info,
+                                   std::vector< NeumannSetData >& sideset_info,
                                    std::vector< DirichletSetData >& nodeset_info, const char* filename )
 {
     // Get the date and time
-    char time[ TIME_STR_LEN ];
-    char date[ TIME_STR_LEN ];
+    char time[TIME_STR_LEN];
+    char date[TIME_STR_LEN];
     time_and_date( time, date );
 
     std::string title_string = "MOAB";
@@ -955,12 +963,12 @@ ErrorCode WriteNCDF::write_header( ExodusMeshInfo& mesh_info, std::vector< Mater
     title_string.append( ": " );
     title_string.append( "time " );
 
-    if( title_string.length( ) > ExoIIInterface::MAX_LINE_LENGTH )
+    if( title_string.length() > ExoIIInterface::MAX_LINE_LENGTH )
         title_string.resize( ExoIIInterface::MAX_LINE_LENGTH );
 
     // Initialize the exodus file
 
-    int result = initialize_exodus_file( mesh_info, block_info, sideset_info, nodeset_info, title_string.c_str( ) );
+    int result = initialize_exodus_file( mesh_info, block_info, sideset_info, nodeset_info, title_string.c_str() );
 
     if( result == MB_FAILURE ) return MB_FAILURE;
 
@@ -970,18 +978,18 @@ ErrorCode WriteNCDF::write_header( ExodusMeshInfo& mesh_info, std::vector< Mater
 ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_data )
 {
     unsigned int i;
-    int          block_index = 0;  // Index into block list, may != 1 if there are inactive blocks
-    int          exodus_id = 1;
+    int block_index = 0;  // Index into block list, may != 1 if there are inactive blocks
+    int exodus_id   = 1;
 
-    for( i = 0; i < block_data.size( ); i++ )
+    for( i = 0; i < block_data.size(); i++ )
     {
-        MaterialSetData& block = block_data[ i ];
+        MaterialSetData& block = block_data[i];
 
         unsigned int num_nodes_per_elem = block.number_nodes_per_element;
 
         // Write out the id for the block
 
-        int id = block.id;
+        int id         = block.id;
         int num_values = 1;
 
         if( write_exodus_integer_variable( "eb_prop1", &id, block_index, num_values ) != MB_SUCCESS )
@@ -998,10 +1006,10 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
         //
         // Map the connectivity to the new nodes
         const unsigned int num_elem = block.number_elements;
-        unsigned int       num_nodes = num_nodes_per_elem * num_elem;
+        unsigned int num_nodes      = num_nodes_per_elem * num_elem;
         if( EXOII_POLYGON == block.element_type || EXOII_POLYHEDRON == block.element_type )
         { num_nodes = num_nodes_per_elem; }
-        int* connectivity = new int[ num_nodes ];
+        int* connectivity = new int[num_nodes];
 
         ErrorCode result = MB_SUCCESS;
         if( block.element_type != EXOII_POLYHEDRON )
@@ -1014,16 +1022,16 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
         }
 
         // If necessary, convert from EXODUS to CN node order
-        const EntityType elem_type = ExoIIUtil::ExoIIElementMBEntity[ block.element_type ];
+        const EntityType elem_type = ExoIIUtil::ExoIIElementMBEntity[block.element_type];
         assert( block.elements.all_of_type( elem_type ) );
         const int* reorder = 0;
         if( block.element_type != EXOII_POLYHEDRON && block.element_type != EXOII_POLYGON )
-            reorder = exodus_elem_order_map[ elem_type ][ block.number_nodes_per_element ];
+            reorder = exodus_elem_order_map[elem_type][block.number_nodes_per_element];
         if( reorder )
             WriteUtilIface::reorder( reorder, connectivity, block.number_elements, block.number_nodes_per_element );
 
-        char               wname[ 80 ];
-        int                nc_var = -1;
+        char wname[80];
+        int nc_var = -1;
         std::vector< int > dims;
         if( block.element_type != EXOII_POLYHEDRON )
         {
@@ -1040,8 +1048,8 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
 
         if( EXOII_POLYGON == block.element_type )
         {
-            size_t start[ 1 ] = { 0 }, count[ 1 ] = { num_nodes_per_elem };
-            int    fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
+            size_t start[1] = { 0 }, count[1] = { num_nodes_per_elem };
+            int fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
             if( NC_NOERR != fail )
             {
                 delete[] connectivity;
@@ -1050,17 +1058,18 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
             // now put also number ebepecnt1
             INS_ID( wname, "ebepecnt%u", i + 1 );
             GET_VAR( wname, nc_var, dims );
-            count[ 0 ] = block.number_elements;
-            start[ 0 ] = 0;
+            count[0] = block.number_elements;
+            start[0] = 0;
             // reuse connectivity array, to not allocate another one
             int j = 0;
-            for( Range::iterator eit = block.elements.begin( ); eit != block.elements.end( ); j++, eit++ )
+            for( Range::iterator eit = block.elements.begin(); eit != block.elements.end(); j++, eit++ )
             {
-                EntityHandle        polg = *eit;
-                int                 nnodes = 0;
+                EntityHandle polg        = *eit;
+                int nnodes               = 0;
                 const EntityHandle* conn = NULL;
-                ErrorCode           rval = mdbImpl->get_connectivity( polg, conn, nnodes );MB_CHK_ERR( rval );
-                connectivity[ j ] = nnodes;
+                ErrorCode rval           = mdbImpl->get_connectivity( polg, conn, nnodes );
+                MB_CHK_ERR( rval );
+                connectivity[j] = nnodes;
             }
             fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
             if( NC_NOERR != fail )
@@ -1071,8 +1080,8 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
         }
         else if( block.element_type != EXOII_POLYHEDRON )
         {
-            size_t start[ 2 ] = { 0, 0 }, count[ 2 ] = { num_elem, num_nodes_per_elem };
-            int    fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
+            size_t start[2] = { 0, 0 }, count[2] = { num_elem, num_nodes_per_elem };
+            int fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
             if( NC_NOERR != fail )
             {
                 delete[] connectivity;
@@ -1106,26 +1115,27 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
             INS_ID( wname, "facconn%u", i + 1 );
             GET_VAR( wname, nc_var, dims );  // fbconn# variable, 1 dimensional
 
-            std::vector< int > ebepe( block.elements.size( ) );  // ebepecnt1
-            int                ixcon = 0, j = 0;
-            size_t             start[ 1 ] = { 0 }, count[ 1 ] = { 0 };
+            std::vector< int > ebepe( block.elements.size() );  // ebepecnt1
+            int ixcon = 0, j = 0;
+            size_t start[1] = { 0 }, count[1] = { 0 };
 
-            for( Range::iterator eit = block.elements.begin( ); eit != block.elements.end( ); eit++ )
+            for( Range::iterator eit = block.elements.begin(); eit != block.elements.end(); eit++ )
             {
-                EntityHandle        polyh = *eit;
-                int                 nfaces = 0;
+                EntityHandle polyh       = *eit;
+                int nfaces               = 0;
                 const EntityHandle* conn = NULL;
-                ErrorCode           rval = mdbImpl->get_connectivity( polyh, conn, nfaces );MB_CHK_ERR( rval );
+                ErrorCode rval           = mdbImpl->get_connectivity( polyh, conn, nfaces );
+                MB_CHK_ERR( rval );
                 for( int k = 0; k < nfaces; k++ )
                 {
-                    int index = block_faces.index( conn[ k ] );
+                    int index = block_faces.index( conn[k] );
                     if( index == -1 ) MB_SET_ERR( MB_FAILURE, "Couldn't find face in polyhedron" );
-                    connectivity[ ixcon++ ] = index + 1;
+                    connectivity[ixcon++] = index + 1;
                 }
-                ebepe[ j++ ] = nfaces;
+                ebepe[j++] = nfaces;
                 // num_faces+=nfaces;
             }
-            count[ 0 ] = ixcon;  // facconn1
+            count[0] = ixcon;  // facconn1
             int fail = nc_put_vara_int( ncFile, nc_var, start, count, connectivity );
             if( NC_NOERR != fail )
             {
@@ -1135,9 +1145,9 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
 
             INS_ID( wname, "ebepecnt%u", i + 1 );
             GET_VAR( wname, nc_var, dims );  // ebepecnt# variable, 1 dimensional
-            count[ 0 ] = block.elements.size( );
+            count[0] = block.elements.size();
 
-            fail = nc_put_vara_int( ncFile, nc_var, start, count, &ebepe[ 0 ] );
+            fail = nc_put_vara_int( ncFile, nc_var, start, count, &ebepe[0] );
             if( NC_NOERR != fail )
             {
                 delete[] connectivity;
@@ -1156,20 +1166,20 @@ ErrorCode WriteNCDF::write_global_node_order_map( int num_nodes, Range& nodes )
     // Note: this routine bypasses the standard exodusII interface for efficiency!
 
     // Node order map
-    int* map = new int[ num_nodes ];
+    int* map = new int[num_nodes];
 
     // For now, output a dummy map!
 
     Range::iterator range_iter, end_iter;
-    range_iter = nodes.begin( );
-    end_iter = nodes.end( );
+    range_iter = nodes.begin();
+    end_iter   = nodes.end();
 
     int i = 0;
 
     for( ; range_iter != end_iter; ++range_iter )
     {
         // TODO -- do we really want to cast this to an int?
-        map[ i++ ] = (int)ID_FROM_HANDLE( *range_iter );
+        map[i++] = (int)ID_FROM_HANDLE( *range_iter );
     }
 
     // Output array and cleanup
@@ -1186,14 +1196,14 @@ ErrorCode WriteNCDF::write_global_node_order_map( int num_nodes, Range& nodes )
 ErrorCode WriteNCDF::write_global_element_order_map( int num_elements )
 {
     // Allocate map array
-    int* map = new int[ num_elements ];
+    int* map = new int[num_elements];
 
     // Many Sandia codes assume this map is unique, and CUBIT does not currently
     // have unique ids for all elements. Therefore, to make sure nothing crashes,
     // insert a dummy map...
 
     for( int i = 0; i < num_elements; i++ )
-        map[ i ] = i + 1;
+        map[i] = i + 1;
 
     // Output array and cleanup
 
@@ -1211,13 +1221,13 @@ ErrorCode WriteNCDF::write_element_order_map( int num_elements )
     // Note: this routine bypasses the standard exodusII interface for efficiency!
 
     // Element order map
-    int* map = new int[ num_elements ];
+    int* map = new int[num_elements];
 
     // For now, output a dummy map!
 
     for( int i = 0; i < num_elements; i++ )
     {
-        map[ i ] = i + 1;
+        map[i] = i + 1;
     }
 
     // Output array and cleanup
@@ -1239,7 +1249,7 @@ ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, i
     // Write directly to netcdf interface for efficiency
 
     // Get the variable id of the element map
-    int                nc_var = -1;
+    int nc_var = -1;
     std::vector< int > dims;
     GET_VAR( variable_name, nc_var, dims );
     if( -1 == nc_var )
@@ -1247,17 +1257,17 @@ ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, i
     // This contortion is necessary because netCDF is expecting nclongs;
     // fortunately it's necessary only when ints and nclongs aren't the same size
 
-    size_t start[ 1 ], count[ 1 ];
-    start[ 0 ] = start_position;
-    count[ 0 ] = number_values;
+    size_t start[1], count[1];
+    start[0] = start_position;
+    count[0] = number_values;
 
     int fail = NC_NOERR;
     if( sizeof( int ) == sizeof( long ) ) { fail = nc_put_vara_int( ncFile, nc_var, start, count, variable_array ); }
     else
     {
-        long* lptr = new long[ number_values ];
+        long* lptr = new long[number_values];
         for( int jj = 0; jj < number_values; jj++ )
-            lptr[ jj ] = variable_array[ jj ];
+            lptr[jj] = variable_array[jj];
         fail = nc_put_vara_long( ncFile, nc_var, start, count, lptr );
         delete[] lptr;
     }
@@ -1270,10 +1280,10 @@ ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, i
 ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::vector< DirichletSetData >& nodesets )
 {
     unsigned int i, j;
-    int          id;
-    int          ns_index = -1;
+    int id;
+    int ns_index = -1;
 
-    for( std::vector< DirichletSetData >::iterator ns_it = nodesets.begin( ); ns_it != nodesets.end( ); ++ns_it )
+    for( std::vector< DirichletSetData >::iterator ns_it = nodesets.begin(); ns_it != nodesets.end(); ++ns_it )
     {
         // Get number of nodes in set
         int number_nodes = ( *ns_it ).number_nodes;
@@ -1286,25 +1296,26 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
         id = ( *ns_it ).id;
 
         // Build new array to old exodus ids
-        int*    exodus_id_array = new int[ number_nodes ];
-        double* dist_factor_array = new double[ number_nodes ];
+        int* exodus_id_array      = new int[number_nodes];
+        double* dist_factor_array = new double[number_nodes];
 
         std::vector< EntityHandle >::iterator begin_iter, end_iter;
-        std::vector< double >::iterator       other_iter;
-        begin_iter = ( *ns_it ).nodes.begin( );
-        end_iter = ( *ns_it ).nodes.end( );
-        other_iter = ( *ns_it ).node_dist_factors.begin( );
+        std::vector< double >::iterator other_iter;
+        begin_iter = ( *ns_it ).nodes.begin();
+        end_iter   = ( *ns_it ).nodes.end();
+        other_iter = ( *ns_it ).node_dist_factors.begin();
 
         j = 0;
-        int       exodus_id;
+        int exodus_id;
         ErrorCode result;
         // Fill up node array and dist. factor array at the same time
         for( ; begin_iter != end_iter; ++begin_iter )
         {
-            result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );MB_CHK_SET_ERR( result, "Problem getting id tag data" );
+            result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );
+            MB_CHK_SET_ERR( result, "Problem getting id tag data" );
 
-            exodus_id_array[ j ] = exodus_id;
-            dist_factor_array[ j ] = *( other_iter );
+            exodus_id_array[j]   = exodus_id;
+            dist_factor_array[j] = *( other_iter );
             ++other_iter;
             j++;
         }
@@ -1313,25 +1324,27 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
 
         int num_values = 1;
 
-        result = write_exodus_integer_variable( "ns_prop1", &id, ns_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
+        result = write_exodus_integer_variable( "ns_prop1", &id, ns_index, num_values );
+        MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
 
         // Write out the nodeset status
 
         int status = 1;
         if( !number_nodes ) status = 0;
 
-        result = write_exodus_integer_variable( "ns_status", &status, ns_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set status", MB_FAILURE );
+        result = write_exodus_integer_variable( "ns_status", &status, ns_index, num_values );
+        MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set status", MB_FAILURE );
 
         // Write it out
-        char               wname[ 80 ];
-        int                nc_var = -1;
+        char wname[80];
+        int nc_var = -1;
         std::vector< int > dims;
         INS_ID( wname, "node_ns%d", ns_index + 1 );
         GET_VAR( wname, nc_var, dims );
         if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get node_ns variable" ); }
 
         size_t start = 0, count = number_nodes;
-        int    fail = nc_put_vara_int( ncFile, nc_var, &start, &count, exodus_id_array );
+        int fail = nc_put_vara_int( ncFile, nc_var, &start, &count, exodus_id_array );
         if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing exodus id array" ); }
 
         // Write out nodeset distribution factors
@@ -1349,9 +1362,9 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
     // Now do sidesets
     int ss_index = 0;  // Index of sideset - not the same as 'i' because
                        // only writing non-empty side sets
-    for( i = 0; i < sidesets.size( ); i++ )
+    for( i = 0; i < sidesets.size(); i++ )
     {
-        NeumannSetData sideset_data = sidesets[ i ];
+        NeumannSetData sideset_data = sidesets[i];
 
         // Get the side set id
         int side_set_id = sideset_data.id;
@@ -1361,13 +1374,13 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
         if( 0 == number_elements ) continue;
 
         // Build new array to old exodus ids
-        int* output_element_ids = new int[ number_elements ];
-        int* output_element_side_numbers = new int[ number_elements ];
+        int* output_element_ids          = new int[number_elements];
+        int* output_element_side_numbers = new int[number_elements];
 
         std::vector< EntityHandle >::iterator begin_iter, end_iter;
-        begin_iter = sideset_data.elements.begin( );
-        end_iter = sideset_data.elements.end( );
-        std::vector< int >::iterator side_iter = sideset_data.side_numbers.begin( );
+        begin_iter                             = sideset_data.elements.begin();
+        end_iter                               = sideset_data.elements.end();
+        std::vector< int >::iterator side_iter = sideset_data.side_numbers.begin();
 
         // Get the tag handle
         j = 0;
@@ -1376,11 +1389,12 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
         // For each "side"
         for( ; begin_iter != end_iter; ++begin_iter, ++side_iter )
         {
-            ErrorCode result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );MB_CHK_SET_ERR( result, "Problem getting exodus id for sideset element "
+            ErrorCode result = mdbImpl->tag_get_data( mGlobalIdTag, &( *begin_iter ), 1, &exodus_id );
+            MB_CHK_SET_ERR( result, "Problem getting exodus id for sideset element "
                                         << (long unsigned int)ID_FROM_HANDLE( *begin_iter ) );
 
-            output_element_ids[ j ] = exodus_id;
-            output_element_side_numbers[ j++ ] = *side_iter;
+            output_element_ids[j]            = exodus_id;
+            output_element_side_numbers[j++] = *side_iter;
         }
 
         if( 0 != number_elements )
@@ -1390,7 +1404,8 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             int num_values = 1;
 
             // ss_prop1[ss_index] = side_set_id
-            ErrorCode result = write_exodus_integer_variable( "ss_prop1", &side_set_id, ss_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
+            ErrorCode result = write_exodus_integer_variable( "ss_prop1", &side_set_id, ss_index, num_values );
+            MB_CHK_SET_ERR_RET_VAL( result, "Problem writing node set id " << id, MB_FAILURE );
 
             // FIXME : Something seems wrong here.  The we are within a block
             // started with if (0 != number_elements), so this condition is always
@@ -1402,7 +1417,8 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             if( 0 == number_elements ) status = 0;
 
             // ss_status[ss_index] = status
-            result = write_exodus_integer_variable( "ss_status", &status, ss_index, num_values );MB_CHK_SET_ERR_RET_VAL( result, "Problem writing side set status", MB_FAILURE );
+            result = write_exodus_integer_variable( "ss_status", &status, ss_index, num_values );
+            MB_CHK_SET_ERR_RET_VAL( result, "Problem writing side set status", MB_FAILURE );
 
             // Increment ss_index now because we want a) we need to
             // increment it somewhere within the if (0 != number_elements)
@@ -1410,14 +1426,14 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             // while the following use a one-based index.
             ++ss_index;
 
-            char               wname[ 80 ];
-            int                nc_var;
+            char wname[80];
+            int nc_var;
             std::vector< int > dims;
             INS_ID( wname, "elem_ss%d", ss_index );
             GET_VAR( wname, nc_var, dims );
             if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get elem_ss variable" ); }
             size_t start = 0, count = number_elements;
-            int    fail = nc_put_vara_int( ncFile, nc_var, &start, &count, output_element_ids );
+            int fail = nc_put_vara_int( ncFile, nc_var, &start, &count, output_element_ids );
             if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing sideset element array" ); }
 
             INS_ID( wname, "side_ss%d", ss_index );
@@ -1431,8 +1447,8 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             nc_var = -1;
             GET_VAR( wname, nc_var, dims );
             if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get sideset dist factors variable" ); }
-            count = sideset_data.ss_dist_factors.size( );
-            fail = nc_put_vara_double( ncFile, nc_var, &start, &count, &( sideset_data.ss_dist_factors[ 0 ] ) );
+            count = sideset_data.ss_dist_factors.size();
+            fail  = nc_put_vara_double( ncFile, nc_var, &start, &count, &( sideset_data.ss_dist_factors[0] ) );
             if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing sideset dist factors array" ); }
         }
 
@@ -1444,7 +1460,7 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
 }
 
 ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_data,
-                                             std::vector< NeumannSetData >&   sideset_data,
+                                             std::vector< NeumannSetData >& sideset_data,
                                              std::vector< DirichletSetData >& nodeset_data, const char* title_string,
                                              bool write_maps, bool /* write_sideset_distribution_factors */ )
 {
@@ -1496,13 +1512,13 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
     // Get a working copy of the title_string;
 
-    char working_title[ 80 ];
+    char working_title[80];
     strncpy( working_title, title_string, 79 );
 
     int length = strlen( working_title );
     for( int pos = 0; pos < length; pos++ )
     {
-        if( working_title[ pos ] == '\\' ) strncpy( &working_title[ pos ], "/", 1 );
+        if( working_title[pos] == '\\' ) strncpy( &working_title[pos], "/", 1 );
     }
 
     if( NC_NOERR != nc_put_att_text( ncFile, NC_GLOBAL, "title", length, working_title ) )
@@ -1530,8 +1546,8 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
     int num_nod_per_fa;  // it is needed for polyhedron only; need to compute it (connectivity of
                          // faces of polyhedra)
-    if( mesh_info.polyhedronFaces.size( ) > 0 )
-        if( nc_def_dim( ncFile, "num_faces", (int)mesh_info.polyhedronFaces.size( ), &num_faces ) != NC_NOERR )
+    if( mesh_info.polyhedronFaces.size() > 0 )
+        if( nc_def_dim( ncFile, "num_faces", (int)mesh_info.polyhedronFaces.size(), &num_faces ) != NC_NOERR )
         { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes" ); }
 
     if( nc_def_dim( ncFile, "num_elem", mesh_info.num_elements, &num_elem ) != NC_NOERR )
@@ -1559,9 +1575,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
     // count how many are polyhedron blocks
     int num_fa_blocks = 0, num_polyh_blocks = 0;
-    for( unsigned int i = 0; i < block_data.size( ); i++ )
+    for( unsigned int i = 0; i < block_data.size(); i++ )
     {
-        MaterialSetData& block = block_data[ i ];
+        MaterialSetData& block = block_data[i];
         if( EXOII_POLYHEDRON == block.element_type )
         {
             num_fa_blocks++;
@@ -1569,7 +1585,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
         }
     }
     if( 0 == this->repeat_face_blocks && num_fa_blocks > 1 ) num_fa_blocks = 1;
-    char wname[ 80 ];
+    char wname[80];
 
     if( num_fa_blocks > 0 )
     {
@@ -1604,13 +1620,14 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
         int num_nodes_per_face = 0;
 
-        int dims[ 1 ];  // maybe 1 is enough here
-        for( Range::iterator eit = mesh_info.polyhedronFaces.begin( ); eit != mesh_info.polyhedronFaces.end( ); eit++ )
+        int dims[1];  // maybe 1 is enough here
+        for( Range::iterator eit = mesh_info.polyhedronFaces.begin(); eit != mesh_info.polyhedronFaces.end(); eit++ )
         {
-            EntityHandle        polyg = *eit;
-            int                 nnodes = 0;
+            EntityHandle polyg       = *eit;
+            int nnodes               = 0;
             const EntityHandle* conn = NULL;
-            ErrorCode           rval = mdbImpl->get_connectivity( polyg, conn, nnodes );MB_CHK_ERR( rval );
+            ErrorCode rval           = mdbImpl->get_connectivity( polyg, conn, nnodes );
+            MB_CHK_ERR( rval );
             num_nodes_per_face += nnodes;
         }
 
@@ -1620,41 +1637,41 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             INS_ID( wname, "num_nod_per_fa%d", j );
             if( nc_def_dim( ncFile, wname, (size_t)num_nodes_per_face, &num_nod_per_fa ) != NC_NOERR )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for face block " ); }
-            dims[ 0 ] = num_nod_per_fa;
+            dims[0] = num_nod_per_fa;
             INS_ID( wname, "fbconn%d", j );  // first one, or more
             int fbconn;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &fbconn ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for face block " << 1 ); }
             std::string element_type_string( "nsided" );
-            if( NC_NOERR != nc_put_att_text( ncFile, fbconn, "elem_type", element_type_string.length( ),
-                                             element_type_string.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, fbconn, "elem_type", element_type_string.length(),
+                                             element_type_string.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type nsided " ); }
 
             INS_ID( wname, "num_fa_in_blk%d", j );  // first one, or more
             int num_fa_in_blk;
-            if( nc_def_dim( ncFile, wname, (size_t)mesh_info.polyhedronFaces.size( ), &num_fa_in_blk ) != NC_NOERR )
+            if( nc_def_dim( ncFile, wname, (size_t)mesh_info.polyhedronFaces.size(), &num_fa_in_blk ) != NC_NOERR )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for face block " ); }
 
             // fbepecnt
             INS_ID( wname, "fbepecnt%d", j );  // first one, or more
             int fbepecnt;
-            dims[ 0 ] = num_fa_in_blk;
+            dims[0] = num_fa_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &fbepecnt ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create fbepecnt array for block " << 1 ); }
             std::string enttype1( "NODE" );
-            if( NC_NOERR != nc_put_att_text( ncFile, fbepecnt, "entity_type1", enttype1.length( ), enttype1.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, fbepecnt, "entity_type1", enttype1.length(), enttype1.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type 1  " ); }
             std::string enttype2( "FACE" );
-            if( NC_NOERR != nc_put_att_text( ncFile, fbepecnt, "entity_type2", enttype2.length( ), enttype2.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, fbepecnt, "entity_type2", enttype2.length(), enttype2.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type 2  " ); }
         }
     }
 
     // Define element blocks
 
-    for( unsigned int i = 0; i < block_data.size( ); i++ )
+    for( unsigned int i = 0; i < block_data.size(); i++ )
     {
-        MaterialSetData& block = block_data[ i ];
+        MaterialSetData& block = block_data[i];
 
         element_block_index = i + 1;
         int num_el_in_blk = -1, num_att_in_blk = -1;
@@ -1676,7 +1693,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             }
 
         /* Define element attribute array for this block */
-        int dims[ 3 ];
+        int dims[3];
         if( block.number_attributes > 0 )
         {
             INS_ID( wname, "num_att_in_blk%d", element_block_index );
@@ -1684,8 +1701,8 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of attributes in block " << block.id ); }
 
             INS_ID( wname, "attrib%d", element_block_index );
-            dims[ 0 ] = num_el_in_blk;
-            dims[ 1 ] = num_att_in_blk;
+            dims[0] = num_el_in_blk;
+            dims[1] = num_att_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_DOUBLE, 2, dims, &blk_attrib ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define attributes for element block " << block.id ); }
         }
@@ -1695,16 +1712,16 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
         if( EXOII_POLYGON != block.element_type && EXOII_POLYHEDRON != block.element_type )
         {
             INS_ID( wname, "connect%d", element_block_index );
-            dims[ 0 ] = num_el_in_blk;
-            dims[ 1 ] = num_nod_per_el;
+            dims[0] = num_el_in_blk;
+            dims[1] = num_nod_per_el;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 2, dims, &connect ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for block " << i + 1 ); }
 
             /* Store element type as attribute of connectivity variable */
 
-            std::string element_type_string( ExoIIUtil::ElementTypeNames[ block.element_type ] );
-            if( NC_NOERR != nc_put_att_text( ncFile, connect, "elem_type", element_type_string.length( ),
-                                             element_type_string.c_str( ) ) )
+            std::string element_type_string( ExoIIUtil::ElementTypeNames[block.element_type] );
+            if( NC_NOERR != nc_put_att_text( ncFile, connect, "elem_type", element_type_string.length(),
+                                             element_type_string.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type name " << (int)block.element_type ); }
         }
         else if( EXOII_POLYGON == block.element_type )
@@ -1718,23 +1735,23 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
                int ebepecnt1(num_el_in_blk1) ;
                   ebepecnt1:entity_type1 = "NODE" ;
                   ebepecnt1:entity_type2 = "ELEM" ;*/
-            dims[ 0 ] = num_nod_per_el;
+            dims[0] = num_nod_per_el;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &connect ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for block " << i + 1 ); }
             std::string element_type_string( "nsided" );
-            if( NC_NOERR != nc_put_att_text( ncFile, connect, "elem_type", element_type_string.length( ),
-                                             element_type_string.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, connect, "elem_type", element_type_string.length(),
+                                             element_type_string.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type name " << (int)block.element_type ); }
             INS_ID( wname, "ebepecnt%d", element_block_index );
             int ebepecnt;
-            dims[ 0 ] = num_el_in_blk;
+            dims[0] = num_el_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &ebepecnt ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create ebepecnt array for block " << i + 1 ); }
             std::string etype1( "NODE" );
-            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type1", etype1.length( ), etype1.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type1", etype1.length(), etype1.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type1 " << (int)block.element_type ); }
             std::string etype2( "ELEM" );
-            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type2", etype2.length( ), etype2.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type2", etype2.length(), etype2.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type2 " << (int)block.element_type ); }
         }
         else if( EXOII_POLYHEDRON == block.element_type )
@@ -1755,12 +1772,13 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
              */
             int num_faces2 = 0;
 
-            for( Range::iterator eit = block.elements.begin( ); eit != block.elements.end( ); eit++ )
+            for( Range::iterator eit = block.elements.begin(); eit != block.elements.end(); eit++ )
             {
-                EntityHandle        polyh = *eit;
-                int                 nfaces = 0;
+                EntityHandle polyh       = *eit;
+                int nfaces               = 0;
                 const EntityHandle* conn = NULL;
-                ErrorCode           rval = mdbImpl->get_connectivity( polyh, conn, nfaces );MB_CHK_ERR( rval );
+                ErrorCode rval           = mdbImpl->get_connectivity( polyh, conn, nfaces );
+                MB_CHK_ERR( rval );
                 num_faces2 += nfaces;
             }
 
@@ -1781,24 +1799,24 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             // facconn
             INS_ID( wname, "facconn%d", element_block_index );
             int facconn;
-            dims[ 0 ] = num_fac_per_el;
+            dims[0] = num_fac_per_el;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &facconn ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create facconn array for block " << i + 1 ); }
             std::string etype( "NFACED" );
-            if( NC_NOERR != nc_put_att_text( ncFile, facconn, "elem_type", etype.length( ), etype.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, facconn, "elem_type", etype.length(), etype.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store elem type " << (int)block.element_type ); }
 
             // ebepecnt
             INS_ID( wname, "ebepecnt%d", element_block_index );
             int ebepecnt;
-            dims[ 0 ] = num_el_in_blk;
+            dims[0] = num_el_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &ebepecnt ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create ebepecnt array for block " << i + 1 ); }
             std::string etype1( "FACE" );
-            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type1", etype1.length( ), etype1.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type1", etype1.length(), etype1.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type1 " << (int)block.element_type ); }
             std::string etype2( "ELEM" );
-            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type2", etype2.length( ), etype2.c_str( ) ) )
+            if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type2", etype2.length(), etype2.c_str() ) )
             { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type2 " << (int)block.element_type ); }
 
             block.number_nodes_per_element = num_faces2;  // connectivity for all polyhedra in block
@@ -1810,12 +1828,12 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     int non_empty_nss = 0;
     // Need to go through nodesets to compute # nodesets, some might be empty
     std::vector< DirichletSetData >::iterator ns_it;
-    for( ns_it = nodeset_data.begin( ); ns_it != nodeset_data.end( ); ++ns_it )
+    for( ns_it = nodeset_data.begin(); ns_it != nodeset_data.end(); ++ns_it )
     {
         if( 0 != ( *ns_it ).number_nodes ) non_empty_nss++;
     }
 
-    int num_ns = -1;
+    int num_ns    = -1;
     int ns_idstat = -1, ns_idarr = -1;
     if( non_empty_nss > 0 )
     {
@@ -1839,9 +1857,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
         int index = 0;
 
-        for( unsigned i = 0; i < nodeset_data.size( ); i++ )
+        for( unsigned i = 0; i < nodeset_data.size(); i++ )
         {
-            DirichletSetData node_set = nodeset_data[ i ];
+            DirichletSetData node_set = nodeset_data[i];
 
             if( 0 == node_set.number_nodes )
             {
@@ -1877,7 +1895,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     long non_empty_ss = 0;
     // Need to go through nodesets to compute # nodesets, some might be empty
     std::vector< NeumannSetData >::iterator ss_it;
-    for( ss_it = sideset_data.begin( ); ss_it != sideset_data.end( ); ++ss_it )
+    for( ss_it = sideset_data.begin(); ss_it != sideset_data.end(); ++ss_it )
     {
         if( 0 != ( *ss_it ).number_elements ) non_empty_ss++;
     }
@@ -1904,9 +1922,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
         // Now, define the arrays needed for each side set
 
         int index = 0;
-        for( unsigned int i = 0; i < sideset_data.size( ); i++ )
+        for( unsigned int i = 0; i < sideset_data.size(); i++ )
         {
-            NeumannSetData side_set = sideset_data[ i ];
+            NeumannSetData side_set = sideset_data[i];
 
             // Don't define an empty set
             if( 0 == side_set.number_elements ) continue;
@@ -1935,7 +1953,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             // sideset distribution factors
             int num_df_ss = -1;
             INS_ID( wname, "num_df_ss%d", index );
-            if( nc_def_dim( ncFile, wname, (size_t)side_set.ss_dist_factors.size( ), &num_df_ss ) != NC_NOERR )
+            if( nc_def_dim( ncFile, wname, (size_t)side_set.ss_dist_factors.size(), &num_df_ss ) != NC_NOERR )
             {
                 MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of dist factors in side set "
                                             << side_set.id ); /* Exit define mode and return */
@@ -1955,16 +1973,16 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
     /* Node coordinate arrays: */
 
-    int coord, name_coord, dims[ 3 ];
-    dims[ 0 ] = num_dim;
-    dims[ 1 ] = num_nodes;
+    int coord, name_coord, dims[3];
+    dims[0] = num_dim;
+    dims[1] = num_nodes;
     if( NC_NOERR != nc_def_var( ncFile, "coord", NC_DOUBLE, 2, dims, &coord ) )
     { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define node coordinate array" ); }
 
     /* Coordinate names array */
 
-    dims[ 0 ] = num_dim;
-    dims[ 1 ] = dim_str;
+    dims[0] = num_dim;
+    dims[1] = dim_str;
     if( NC_NOERR != nc_def_var( ncFile, "coor_names", NC_CHAR, 2, dims, &name_coord ) )
     { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define coordinate name array" ); }
 
@@ -1996,17 +2014,17 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
     // Define qa records to be used
 
-    int num_qa_rec = mesh_info.qaRecords.size( ) / 4;
-    int num_qa = -1;
+    int num_qa_rec = mesh_info.qaRecords.size() / 4;
+    int num_qa     = -1;
 
     if( nc_def_dim( ncFile, "num_qa_rec", (long)num_qa_rec, &num_qa ) != NC_NOERR )
     { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define qa record array size" ); }
 
     // Define qa array
     int qa_title;
-    dims[ 0 ] = num_qa;
-    dims[ 1 ] = dim_four;
-    dims[ 2 ] = dim_str;
+    dims[0] = num_qa;
+    dims[1] = dim_four;
+    dims[2] = dim_str;
     if( NC_NOERR != nc_def_var( ncFile, "qa_records", NC_CHAR, 3, dims, &qa_title ) )
     { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define qa record array" ); }
 
@@ -2044,36 +2062,35 @@ ErrorCode WriteNCDF::get_sideset_elems( EntityHandle sideset, int current_sense,
     if( MB_FAILURE == result ) return result;
 
     // Now remove the meshsets into the ss_meshsets; first find the first meshset,
-    Range::iterator range_iter = ss_elems.begin( );
-    while( TYPE_FROM_HANDLE( *range_iter ) != MBENTITYSET && range_iter != ss_elems.end( ) )
+    Range::iterator range_iter = ss_elems.begin();
+    while( TYPE_FROM_HANDLE( *range_iter ) != MBENTITYSET && range_iter != ss_elems.end() )
         ++range_iter;
 
     // Then, if there are some, copy them into ss_meshsets and erase from ss_elems
-    if( range_iter != ss_elems.end( ) )
+    if( range_iter != ss_elems.end() )
     {
-        std::copy( range_iter, ss_elems.end( ), range_inserter( ss_meshsets ) );
-        ss_elems.erase( range_iter, ss_elems.end( ) );
+        std::copy( range_iter, ss_elems.end(), range_inserter( ss_meshsets ) );
+        ss_elems.erase( range_iter, ss_elems.end() );
     }
 
     // OK, for the elements, check the sense of this set and copy into the right range
     // (if the sense is 0, copy into both ranges)
 
     // Need to step forward on list until we reach the right dimension
-    Range::iterator dum_it = ss_elems.end( );
+    Range::iterator dum_it = ss_elems.end();
     --dum_it;
     int target_dim = CN::Dimension( TYPE_FROM_HANDLE( *dum_it ) );
-    dum_it = ss_elems.begin( );
-    while( target_dim != CN::Dimension( TYPE_FROM_HANDLE( *dum_it ) ) && dum_it != ss_elems.end( ) )
+    dum_it         = ss_elems.begin();
+    while( target_dim != CN::Dimension( TYPE_FROM_HANDLE( *dum_it ) ) && dum_it != ss_elems.end() )
         ++dum_it;
 
-    if( current_sense == 1 || current_sense == 0 )
-        std::copy( dum_it, ss_elems.end( ), range_inserter( forward_elems ) );
+    if( current_sense == 1 || current_sense == 0 ) std::copy( dum_it, ss_elems.end(), range_inserter( forward_elems ) );
     if( current_sense == -1 || current_sense == 0 )
-        std::copy( dum_it, ss_elems.end( ), range_inserter( reverse_elems ) );
+        std::copy( dum_it, ss_elems.end(), range_inserter( reverse_elems ) );
 
     // Now loop over the contained meshsets, getting the sense of those and calling this
     // function recursively
-    for( range_iter = ss_meshsets.begin( ); range_iter != ss_meshsets.end( ); ++range_iter )
+    for( range_iter = ss_meshsets.begin(); range_iter != ss_meshsets.end(); ++range_iter )
     {
         // First get the sense; if it's not there, by convention it's forward
         int this_sense;

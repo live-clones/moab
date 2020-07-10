@@ -15,15 +15,15 @@
 namespace moab
 {
 
-#define MAX_DEGREE 3
-#define MAX_VERTS 64
+#define MAX_DEGREE    3
+#define MAX_VERTS     64
 #define MAX_CHILDRENS 27
-#define MAX_HE 12
-#define MAX_HF 6
-#define MAX_CONN 8
-#define MAX_VHF 20
-#define MAX_LEVELS 20
-#define MAX_PROCS 64
+#define MAX_HE        12
+#define MAX_HF        6
+#define MAX_CONN      8
+#define MAX_VHF       20
+#define MAX_LEVELS    20
+#define MAX_PROCS     64
 
 // Forward Declarations
 class Core;
@@ -37,9 +37,9 @@ class NestedRefine
   public:
     NestedRefine( Core* impl, ParallelComm* comm = 0, EntityHandle rset = 0 );
 
-    ~NestedRefine( );
+    ~NestedRefine();
 
-    ErrorCode initialize( );
+    ErrorCode initialize();
 
     //! \brief Generate a mesh hierarchy.
     /** Given a mesh, generate a sequence of meshes via uniform refinement. The inputs are: a) an
@@ -157,19 +157,19 @@ class NestedRefine
     codeperf timeall;
 
   protected:
-    Core*         mbImpl;
+    Core* mbImpl;
     ParallelComm* pcomm;
     HalfFacetRep* ahf;
-    CpuTimer*     tm;
-    EntityHandle  _rset;
+    CpuTimer* tm;
+    EntityHandle _rset;
 
     Range _inverts, _inedges, _infaces, _incells;
 
-    EntityType           elementype;
-    int                  meshdim, nlevels;
-    int                  level_dsequence[ MAX_LEVELS ];
+    EntityType elementype;
+    int meshdim, nlevels;
+    int level_dsequence[MAX_LEVELS];
     std::map< int, int > deg_index;
-    bool                 hasghost;
+    bool hasghost;
 
     /*! \struct refPatterns
      * Refinement patterns w.r.t the reference element. It consists of a locally indexed vertex list
@@ -193,33 +193,33 @@ class NestedRefine
         //! Total number of new child entities
         short int total_new_ents;
         //! Lower and upper indices of the new vertices
-        int vert_index_bnds[ 2 ];
+        int vert_index_bnds[2];
         //! Natural coordinates of the new vertices w.r.t reference
-        double vert_nat_coord[ MAX_VERTS ][ 3 ];
+        double vert_nat_coord[MAX_VERTS][3];
         //! Connectivity of the new entities
-        int ents_conn[ MAX_CHILDRENS ][ MAX_CONN ];
+        int ents_conn[MAX_CHILDRENS][MAX_CONN];
         //! Vertex to half-facet map of the new vertices
-        int v2hf[ MAX_VERTS ][ 2 ];
+        int v2hf[MAX_VERTS][2];
         //! Opposite half-facet map of the new entities
-        int ents_opphfs[ MAX_CHILDRENS ][ 2 * MAX_CONN ];
+        int ents_opphfs[MAX_CHILDRENS][2 * MAX_CONN];
         //! Helper: storing the local ids of vertices on each local edge
-        int vert_on_edges[ MAX_HE ][ MAX_VHF ];
+        int vert_on_edges[MAX_HE][MAX_VHF];
         //!  Helper: storing local ids of verts on each local face, doesnt include those on edges of
         //!  the face
-        int vert_on_faces[ MAX_HF ][ MAX_VHF ];
+        int vert_on_faces[MAX_HF][MAX_VHF];
         //! Helper: stores child half-facets incident on parent half-facet. First column contain the
         //! number of such children
-        int ents_on_pent[ MAX_HF ][ MAX_CHILDRENS ];
+        int ents_on_pent[MAX_HF][MAX_CHILDRENS];
         //! Helper: stores child ents incident on new verts on edge.
         // Each triad in the column consists of :
         // 1) a local child incident on the vertex on the edge
         // 2) the local face id from the child
         // 3) the local vertex id wrt the child connectivity
-        int ents_on_vedge[ MAX_HE ][ MAX_VHF * 3 ];
+        int ents_on_vedge[MAX_HE][MAX_VHF * 3];
     };
     //! refPatterns
 
-    static const refPatterns refTemplates[ 9 ][ MAX_DEGREE ];
+    static const refPatterns refTemplates[9][MAX_DEGREE];
 
     //! Helper
     struct intFEdge
@@ -227,29 +227,29 @@ class NestedRefine
         //! Number of edges interior to a face
         short int nie;
         //! Local connectivity of the interior edges
-        int ieconn[ 12 ][ 2 ];
+        int ieconn[12][2];
     };
-    static const intFEdge intFacEdg[ 2 ][ 2 ];
+    static const intFEdge intFacEdg[2][2];
 
     int get_index_from_degree( int degree );
 
     // HM Storage Helper
     struct level_memory
     {
-        int                    num_verts, num_edges, num_faces, num_cells;
-        EntityHandle           start_vertex, start_edge, start_face, start_cell;
+        int num_verts, num_edges, num_faces, num_cells;
+        EntityHandle start_vertex, start_edge, start_face, start_cell;
         std::vector< double* > coordinates;
-        EntityHandle *         edge_conn, *face_conn, *cell_conn;
-        Range                  verts, edges, faces, cells;
+        EntityHandle *edge_conn, *face_conn, *cell_conn;
+        Range verts, edges, faces, cells;
     };
 
-    level_memory level_mesh[ MAX_LEVELS ];
+    level_memory level_mesh[MAX_LEVELS];
 
     // Basic Functions
 
     // Estimate and create storage for the levels
-    ErrorCode estimate_hm_storage( EntityHandle set, int level_degree, int cur_level, int hmest[ 4 ] );
-    ErrorCode create_hm_storage_single_level( EntityHandle* set, int cur_level, int estL[ 4 ] );
+    ErrorCode estimate_hm_storage( EntityHandle set, int level_degree, int cur_level, int hmest[4] );
+    ErrorCode create_hm_storage_single_level( EntityHandle* set, int cur_level, int estL[4] );
 
     // Generate HM : Construct the hierarchical mesh: 1D, 2D, 3D
     ErrorCode generate_hm( int* level_degrees, int num_level, EntityHandle* hm_set, bool optimize );
@@ -268,8 +268,8 @@ class NestedRefine
     ErrorCode copy_vertices_from_prev_level( int cur_level );
     ErrorCode count_subentities( EntityHandle set, int cur_level, int* nedges, int* nfaces );
     ErrorCode get_octahedron_corner_coords( int cur_level, int deg, EntityHandle* vbuffer, double* ocoords );
-    int       find_shortest_diagonal_octahedron( int cur_level, int deg, EntityHandle* vbuffer );
-    int       get_local_vid( EntityHandle vid, EntityHandle ent, int level );
+    int find_shortest_diagonal_octahedron( int cur_level, int deg, EntityHandle* vbuffer );
+    int get_local_vid( EntityHandle vid, EntityHandle ent, int level );
 
     // Book-keeping functions
     ErrorCode update_tracking_verts( EntityHandle cid, int cur_level, int deg,
@@ -288,15 +288,15 @@ class NestedRefine
     // Permutation matrices
     struct pmat
     {
-        short int num_comb;  // Number of combinations
-        int       comb[ MAX_HE ][ MAX_HE ];  // Combinations
-        int       lemap[ MAX_HE ][ MAX_HE ];  // Local edge map
-        int       orient[ MAX_HE ];  // Orientation
-        int       porder2[ MAX_HE ][ MAX_HE ];  // Permuted order degree 2
-        int       porder3[ MAX_HE ][ MAX_HE ];  // Permuted order degree 3
+        short int num_comb;           // Number of combinations
+        int comb[MAX_HE][MAX_HE];     // Combinations
+        int lemap[MAX_HE][MAX_HE];    // Local edge map
+        int orient[MAX_HE];           // Orientation
+        int porder2[MAX_HE][MAX_HE];  // Permuted order degree 2
+        int porder3[MAX_HE][MAX_HE];  // Permuted order degree 3
     };
 
-    static const pmat permutation[ 2 ];
+    static const pmat permutation[2];
 
     // Print functions
     ErrorCode print_maps_1D( int level );
@@ -389,28 +389,28 @@ class NestedRefine
                              std::vector< EntityHandle >& RList );
 
     ErrorCode decipher_remote_handles( std::vector< int >& sharedprocs, std::vector< std::vector< int > >& auxinfo,
-                                       std::vector< std::vector< EntityHandle > >&  localbuffers,
-                                       std::vector< std::vector< EntityHandle > >&  remotebuffers,
-                                       std::multimap< EntityHandle, int >&          remProcs,
+                                       std::vector< std::vector< EntityHandle > >& localbuffers,
+                                       std::vector< std::vector< EntityHandle > >& remotebuffers,
+                                       std::multimap< EntityHandle, int >& remProcs,
                                        std::multimap< EntityHandle, EntityHandle >& remHandles );
 
     ErrorCode decipher_remote_handles_face( int shared_proc, int numfaces, std::vector< EntityHandle >& localFaceList,
-                                            std::vector< EntityHandle >&                 remFaceList,
-                                            std::multimap< EntityHandle, int >&          remProcs,
+                                            std::vector< EntityHandle >& remFaceList,
+                                            std::multimap< EntityHandle, int >& remProcs,
                                             std::multimap< EntityHandle, EntityHandle >& remHandles );
 
     ErrorCode decipher_remote_handles_edge( int shared_proc, int numedges, std::vector< EntityHandle >& localEdgeList,
-                                            std::vector< EntityHandle >&                 remEdgeList,
-                                            std::multimap< EntityHandle, int >&          remProcs,
+                                            std::vector< EntityHandle >& remEdgeList,
+                                            std::multimap< EntityHandle, int >& remProcs,
                                             std::multimap< EntityHandle, EntityHandle >& remHandles );
 
     ErrorCode decipher_remote_handles_vertex( int shared_proc, int numverts,
-                                              std::vector< EntityHandle >&                 localVertexList,
-                                              std::vector< EntityHandle >&                 remVertexList,
-                                              std::multimap< EntityHandle, int >&          remProcs,
+                                              std::vector< EntityHandle >& localVertexList,
+                                              std::vector< EntityHandle >& remVertexList,
+                                              std::multimap< EntityHandle, int >& remProcs,
                                               std::multimap< EntityHandle, EntityHandle >& remHandles );
 
-    ErrorCode update_parallel_tags( std::multimap< EntityHandle, int >&          remProcs,
+    ErrorCode update_parallel_tags( std::multimap< EntityHandle, int >& remProcs,
                                     std::multimap< EntityHandle, EntityHandle >& remHandles );
 
     ErrorCode get_data_from_buff( int dim, int type, int level, int entityidx, int nentities,

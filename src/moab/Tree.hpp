@@ -34,17 +34,17 @@ class Tree
 
     /** \brief Destructor
      */
-    virtual ~Tree( );
+    virtual ~Tree();
 
     /** \brief Destroy the tree maintained by this object, optionally checking we have the right
      * root. \param root If non-NULL, check that this is the root, return failure if not
      */
-    virtual ErrorCode reset_tree( ) = 0;
+    virtual ErrorCode reset_tree() = 0;
 
     /** \brief Delete the entity sets associated with the tree, starting with the root and
      * traversing children
      */
-    ErrorCode delete_tree_sets( );
+    ErrorCode delete_tree_sets();
 
     /** Build the tree
      * Build a tree with the entities input.  If a non-NULL tree_root_set pointer is input,
@@ -81,7 +81,7 @@ class Tree
      * \param max Maximum corner of bounding box
      * \param max_dep Maximum depth of tree below root
      */
-    virtual ErrorCode get_info( EntityHandle root, double min[ 3 ], double max[ 3 ], unsigned int& max_dep );
+    virtual ErrorCode get_info( EntityHandle root, double min[3], double max[3], unsigned int& max_dep );
 
     /** \brief Find all trees, by bounding box tag
      */
@@ -128,55 +128,55 @@ class Tree
                                        std::vector< EntityHandle >& leaves_out, const double iter_tol = 1.0e-10,
                                        const double inside_tol = 1.0e-6, std::vector< double >* dists_out = NULL,
                                        std::vector< CartVect >* params_out = NULL,
-                                       EntityHandle*            start_node = NULL ) = 0;
+                                       EntityHandle* start_node            = NULL ) = 0;
 
     /** \brief Return the MOAB interface associated with this tree
      */
-    Interface* moab( )
+    Interface* moab()
     {
         return mbImpl;
     }
 
     /** \brief Return the MOAB interface associated with this tree
      */
-    const Interface* moab( ) const
+    const Interface* moab() const
     {
         return mbImpl;
     }
 
     /** \brief Get max depth set on tree */
-    double get_max_depth( )
+    double get_max_depth()
     {
         return maxDepth;
     }
 
     /** \brief Get max entities per leaf set on tree */
-    double get_max_per_leaf( )
+    double get_max_per_leaf()
     {
         return maxPerLeaf;
     }
 
     /** \brief Get tree traversal stats object */
-    TreeStats& tree_stats( )
+    TreeStats& tree_stats()
     {
         return treeStats;
     }
 
     /** \brief Get tree traversal stats object */
-    const TreeStats& tree_stats( ) const
+    const TreeStats& tree_stats() const
     {
         return treeStats;
     }
 
     /** \brief Create tree root and tag with bounding box
      */
-    ErrorCode create_root( const double box_min[ 3 ], const double box_max[ 3 ], EntityHandle& root_handle );
+    ErrorCode create_root( const double box_min[3], const double box_max[3], EntityHandle& root_handle );
 
     //! print various things about this tree
-    virtual ErrorCode print( ) = 0;
+    virtual ErrorCode print() = 0;
 
     //! get/set the ElemEvaluator
-    inline ElemEvaluator* get_eval( )
+    inline ElemEvaluator* get_eval()
     {
         return myEval;
     }
@@ -252,7 +252,7 @@ inline Tree::Tree( Interface* iface )
 {
 }
 
-inline Tree::~Tree( ) {}
+inline Tree::~Tree() {}
 
 inline ErrorCode Tree::get_bounding_box( BoundBox& box, EntityHandle* tree_node ) const
 {
@@ -275,13 +275,13 @@ inline Tag Tree::get_box_tag( bool create_if_missing )
 {
     if( !boxTag && create_if_missing )
     {
-        assert( boxTagName.length( ) > 0 );
+        assert( boxTagName.length() > 0 );
         ErrorCode rval =
-            moab( )->tag_get_handle( boxTagName.c_str( ), 6, MB_TYPE_DOUBLE, boxTag, MB_TAG_CREAT | MB_TAG_SPARSE );
+            moab()->tag_get_handle( boxTagName.c_str(), 6, MB_TYPE_DOUBLE, boxTag, MB_TAG_CREAT | MB_TAG_SPARSE );
         if( MB_INVALID_SIZE == rval )
         {
             // delete the tag and get it again, legacy file...
-            rval = moab( )->tag_delete( boxTag );
+            rval = moab()->tag_delete( boxTag );
             if( MB_SUCCESS != rval ) return 0;
             boxTag = 0;
             return get_box_tag( true );

@@ -34,17 +34,17 @@ int main( int argc, char* argv[] )
 #endif
     // Check command line arg
     std::string def_file( TestDir + "/io/brick_cubit10.2.cub" );
-    const char* file = def_file.c_str( );
+    const char* file = def_file.c_str();
     if( argc < 2 )
     {
         std::cout << "Usage: tqdcfr <cub_file_name>" << std::endl;
         // exit(1);
     }
     else
-        file = argv[ 1 ];
+        file = argv[1];
 
-    Core*       my_impl = new Core( );
-    Tqdcfr*     my_tqd = new Tqdcfr( my_impl );
+    Core* my_impl  = new Core();
+    Tqdcfr* my_tqd = new Tqdcfr( my_impl );
     FileOptions opts( NULL );
 
     ErrorCode result = my_tqd->load_file( file, 0, opts, 0, 0 );
@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
 
     // now check for multiple procs
     my_impl = new Core;
-    my_tqd = new Tqdcfr( my_impl );
+    my_tqd  = new Tqdcfr( my_impl );
 
     result = my_tqd->load_file( file, 0, opts, 0, 0 );
 
@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
     std::string options = "PARALLEL=READ_DELETE;PARTITION=MATERIAL_SET;PARTITION_DISTRIBUTE";
     std::cout << "Testing parallel..." << std::endl;
 
-    result = my_impl->load_file( file, 0, options.c_str( ) );
+    result = my_impl->load_file( file, 0, options.c_str() );
 
     if( MB_SUCCESS == result )
         std::cout << "Success." << std::endl;
@@ -115,7 +115,7 @@ int main( int argc, char* argv[] )
     }
 
     delete my_impl;  // done with the read
-    MPI_Finalize( );
+    MPI_Finalize();
 #endif
 
     return result;

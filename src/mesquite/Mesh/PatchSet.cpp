@@ -35,6 +35,6 @@
 namespace MBMesquite
 {
 
-PatchSet::~PatchSet( ) {}
+PatchSet::~PatchSet() {}
 
 }  // namespace MBMesquite

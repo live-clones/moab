@@ -49,7 +49,7 @@ ReadNASTRAN::ReadNASTRAN( Interface* impl ) : MBI( impl )
 }
 
 // Destructor
-ReadNASTRAN::~ReadNASTRAN( )
+ReadNASTRAN::~ReadNASTRAN()
 {
     if( readMeshIface )
     {
@@ -73,21 +73,21 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
     // At this time there is no support for reading a subset of the file
     if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for NASTRAN" ); }
 
-    nodeIdMap.clear( );
-    elemIdMap.clear( );
+    nodeIdMap.clear();
+    elemIdMap.clear();
 
     bool debug = false;
     if( debug ) std::cout << "begin ReadNASTRAN::load_file" << std::endl;
     ErrorCode result;
 
     // Count the entities of each type in the file. This is used to allocate the node array.
-    int entity_count[ MBMAXTYPE ];
+    int entity_count[MBMAXTYPE];
     for( int i = 0; i < MBMAXTYPE; i++ )
-        entity_count[ i ] = 0;
+        entity_count[i] = 0;
 
     /* Determine the line_format of the first line. Assume that the entire file
        has the same format. */
-    std::string   line;
+    std::string line;
     std::ifstream file( filename );
     if( !getline( file, line ) ) return MB_FILE_DOES_NOT_EXIST;
     line_format format;
@@ -96,7 +96,7 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
 
     /* Count the number of each entity in the file. This allows one to allocate
        a sequential array of vertex handles. */
-    while( !file.eof( ) )
+    while( !file.eof() )
     {
         // Cut the line into fields as determined by the line format.
         // Use a vector to allow for an unknown number of tokens (continue lines).
@@ -108,9 +108,9 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
 
         // Process the tokens of the line. The first token describes the entity type.
         EntityType type;
-        result = determine_entity_type( ( tokens.empty( ) ) ? "" : tokens.front( ), type );
+        result = determine_entity_type( ( tokens.empty() ) ? "" : tokens.front(), type );
         if( MB_SUCCESS != result ) return result;
-        entity_count[ type ]++;
+        entity_count[type]++;
         getline( file, line );
     }
 
@@ -118,7 +118,7 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
     {
         for( int i = 0; i < MBMAXTYPE; i++ )
         {
-            std::cout << "entity_count[" << i << "]=" << entity_count[ i ] << std::endl;
+            std::cout << "entity_count[" << i << "]=" << entity_count[i] << std::endl;
         }
     }
 
@@ -126,18 +126,18 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
     std::vector< Range > materials;
 
     // Now that the number of vertices is known, create the vertices.
-    EntityHandle           start_vert = 0;
+    EntityHandle start_vert = 0;
     std::vector< double* > coord_arrays( 3 );
-    result = readMeshIface->get_node_coords( 3, entity_count[ 0 ], MB_START_ID, start_vert, coord_arrays );
+    result = readMeshIface->get_node_coords( 3, entity_count[0], MB_START_ID, start_vert, coord_arrays );
     if( MB_SUCCESS != result ) return result;
     if( 0 == start_vert ) return MB_FAILURE;  // check for NULL
     int id, vert_index = 0;
     if( debug ) std::cout << "allocated coord arrays" << std::endl;
 
     // Read the file again to create the entities.
-    file.clear( );  // Clear eof state from object
+    file.clear();     // Clear eof state from object
     file.seekg( 0 );  // Rewind file
-    while( !file.eof( ) )
+    while( !file.eof() )
     {
         getline( file, line );
 
@@ -151,15 +151,15 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
 
         // Process the tokens of the line. The first token describes the entity type.
         EntityType type;
-        result = determine_entity_type( tokens.front( ), type );
+        result = determine_entity_type( tokens.front(), type );
         if( MB_SUCCESS != result ) return result;
 
         // Create the entity.
         if( MBVERTEX == type )
         {
-            double* coords[ 3 ] = { coord_arrays[ 0 ] + vert_index, coord_arrays[ 1 ] + vert_index,
-                                    coord_arrays[ 2 ] + vert_index };
-            result = read_node( tokens, debug, coords, id );
+            double* coords[3] = { coord_arrays[0] + vert_index, coord_arrays[1] + vert_index,
+                                  coord_arrays[2] + vert_index };
+            result            = read_node( tokens, debug, coords, id );
             if( MB_SUCCESS != result ) return result;
             if( !nodeIdMap.insert( id, start_vert + vert_index, 1 ).second ) return MB_FAILURE;  // Duplicate IDs!
             ++vert_index;
@@ -177,9 +177,9 @@ ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* f
     result = assign_ids( file_id_tag );
     if( MB_SUCCESS != result ) return result;
 
-    file.close( );
-    nodeIdMap.clear( );
-    elemIdMap.clear( );
+    file.close();
+    nodeIdMap.clear();
+    elemIdMap.clear();
     return MB_SUCCESS;
 }
 
@@ -216,14 +216,14 @@ ErrorCode ReadNASTRAN::determine_line_format( const std::string& line, line_form
 ErrorCode ReadNASTRAN::tokenize_line( const std::string& line, const line_format format,
                                       std::vector< std::string >& tokens )
 {
-    size_t line_size = line.size( );
+    size_t line_size = line.size();
     switch( format )
     {
         case SMALL_FIELD: {
             // Expect 10 fields of 8 characters.
             // The sample file does not have all 10 fields in each line
-            const int    field_length = 8;
-            unsigned int n_tokens = line_size / field_length;
+            const int field_length = 8;
+            unsigned int n_tokens  = line_size / field_length;
             for( unsigned int i = 0; i < n_tokens; i++ )
             {
                 tokens.push_back( line.substr( i * field_length, field_length ) );
@@ -275,7 +275,7 @@ ErrorCode ReadNASTRAN::determine_entity_type( const std::string& first_token, En
 ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
 {
     std::string significand = token;
-    std::string exponent = "0";
+    std::string exponent    = "0";
 
     // Cut off the first digit because a "-" could be here indicating a negative
     // number. Instead we are looking for a negative exponent.
@@ -286,13 +286,13 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
     if( std::string::npos != found_minus )
     {
         // separate the significand from the exponent at the "-"
-        exponent = token.substr( found_minus + 1 );
+        exponent    = token.substr( found_minus + 1 );
         significand = token.substr( 0, found_minus + 1 );
 
         // If the significand has an "E", remove it
         if( std::string::npos != significand.find( "E" ) )
             // Assume the "E" is at the end of the significand.
-            significand = significand.substr( 1, significand.size( ) - 2 );
+            significand = significand.substr( 1, significand.size() - 2 );
 
         // If a minus does not exist past the 1st digit, but an "E" or "+" does, then
         // it is a positive exponent. First look for an "E",
@@ -303,7 +303,7 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
         if( std::string::npos != found_E )
         {
             significand = token.substr( 0, found_E - 1 );
-            exponent = token.substr( found_E + 1 );
+            exponent    = token.substr( found_E + 1 );
             // If there is a "+" on the exponent, cut it off
             std::size_t found_plus = exponent.find( "+" );
             if( std::string::npos != found_plus ) { exponent = exponent.substr( found_plus + 1 ); }
@@ -315,14 +315,14 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
             if( std::string::npos != found_plus )
             {
                 significand = token.substr( 0, found_plus - 1 );
-                exponent = token.substr( found_plus + 1 );
+                exponent    = token.substr( found_plus + 1 );
             }
         }
     }
 
     // Now assemble the real number
-    double signi = atof( significand.c_str( ) );
-    double expon = atof( exponent.c_str( ) );
+    double signi = atof( significand.c_str() );
+    double expon = atof( exponent.c_str() );
 
     if( HUGE_VAL == signi || HUGE_VAL == expon ) return MB_FAILURE;
 
@@ -333,16 +333,16 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
 
 /* It has been determined that this line is a vertex. Read the rest of
    the line and create the vertex. */
-ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, const bool debug, double* coords[ 3 ],
+ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, const bool debug, double* coords[3],
                                   int& id )
 {
     // Read the node's id (unique)
     ErrorCode result;
-    id = atoi( tokens[ 1 ].c_str( ) );
+    id = atoi( tokens[1].c_str() );
 
     // Read the node's coordinate system number
     // "0" or blank refers to the basic coordinate system.
-    int coord_system = atoi( tokens[ 2 ].c_str( ) );
+    int coord_system = atoi( tokens[2].c_str() );
     if( 0 != coord_system )
     {
         std::cerr << "ReadNASTRAN: alternative coordinate systems not implemented" << std::endl;
@@ -352,9 +352,9 @@ ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, cons
     // Read the coordinates
     for( unsigned int i = 0; i < 3; i++ )
     {
-        result = get_real( tokens[ i + 3 ], *coords[ i ] );
+        result = get_real( tokens[i + 3], *coords[i] );
         if( MB_SUCCESS != result ) return result;
-        if( debug ) std::cout << "read_node: coords[" << i << "]=" << coords[ i ] << std::endl;
+        if( debug ) std::cout << "read_node: coords[" << i << "]=" << coords[i] << std::endl;
     }
 
     return MB_SUCCESS;
@@ -368,35 +368,35 @@ ErrorCode ReadNASTRAN::read_element( const std::vector< std::string >& tokens, s
 {
     // Read the element's id (unique) and material set
     ErrorCode result;
-    int       id = atoi( tokens[ 1 ].c_str( ) );
-    int       material = atoi( tokens[ 2 ].c_str( ) );
+    int id       = atoi( tokens[1].c_str() );
+    int material = atoi( tokens[2].c_str() );
 
     // Resize materials list if necessary. This code is somewhat complicated
     // so as to avoid copying of Ranges
-    if( material >= (int)materials.size( ) )
+    if( material >= (int)materials.size() )
     {
-        if( (int)materials.capacity( ) < material )
+        if( (int)materials.capacity() < material )
             materials.resize( material + 1 );
         else
         {
             std::vector< Range > new_mat( material + 1 );
-            for( size_t i = 0; i < materials.size( ); ++i )
-                new_mat[ i ].swap( materials[ i ] );
+            for( size_t i = 0; i < materials.size(); ++i )
+                new_mat[i].swap( materials[i] );
             materials.swap( new_mat );
         }
     }
 
     // The size of the connectivity array depends on the element type
-    int          n_conn = CN::VerticesPerEntity( element_type );
-    EntityHandle conn_verts[ 27 ];
+    int n_conn = CN::VerticesPerEntity( element_type );
+    EntityHandle conn_verts[27];
     assert( n_conn <= (int)( sizeof( conn_verts ) / sizeof( EntityHandle ) ) );
 
     // Read the connected node ids from the file
     for( int i = 0; i < n_conn; i++ )
     {
-        int n = atoi( tokens[ 3 + i ].c_str( ) );
-        conn_verts[ i ] = nodeIdMap.find( n );
-        if( !conn_verts[ i ] )  // invalid vertex id
+        int n         = atoi( tokens[3 + i].c_str() );
+        conn_verts[i] = nodeIdMap.find( n );
+        if( !conn_verts[i] )  // invalid vertex id
             return MB_FAILURE;
     }
 
@@ -406,22 +406,22 @@ ErrorCode ReadNASTRAN::read_element( const std::vector< std::string >& tokens, s
     if( MB_SUCCESS != result ) return result;
     elemIdMap.insert( id, element, 1 );
 
-    materials[ material ].insert( element );
+    materials[material].insert( element );
     return MB_SUCCESS;
 }
 
 ErrorCode ReadNASTRAN::create_materials( const std::vector< Range >& materials )
 {
     ErrorCode result;
-    Tag       material_tag;
-    int       negone = -1;
+    Tag material_tag;
+    int negone = -1;
     result = MBI->tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, material_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
                                   &negone );
     if( MB_SUCCESS != result ) return result;
 
-    for( size_t i = 0; i < materials.size( ); ++i )
+    for( size_t i = 0; i < materials.size(); ++i )
     {
-        if( materials[ i ].empty( ) ) continue;
+        if( materials[i].empty() ) continue;
 
         // Merge with existing or create new?  Original code effectively
         // created new by only merging with existing in current file set,
@@ -431,7 +431,7 @@ ErrorCode ReadNASTRAN::create_materials( const std::vector< Range >& materials )
         result = MBI->create_meshset( MESHSET_SET, handle );
         if( MB_SUCCESS != result ) return result;
 
-        result = MBI->add_entities( handle, materials[ i ] );
+        result = MBI->add_entities( handle, materials[i] );
         if( MB_SUCCESS != result ) return result;
 
         int id = i;
@@ -446,13 +446,13 @@ ErrorCode ReadNASTRAN::assign_ids( const Tag* file_id_tag )
 {
     // Create tag
     ErrorCode result;
-    Tag       id_tag = MBI->globalId_tag( );
+    Tag id_tag = MBI->globalId_tag();
 
     RangeMap< int, EntityHandle >::iterator i;
     for( int t = 0; t < 2; ++t )
     {
         RangeMap< int, EntityHandle >& fileIdMap = t ? elemIdMap : nodeIdMap;
-        for( i = fileIdMap.begin( ); i != fileIdMap.end( ); ++i )
+        for( i = fileIdMap.begin(); i != fileIdMap.end(); ++i )
         {
             Range range( i->value, i->value + i->count - 1 );
 

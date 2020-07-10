@@ -126,7 +126,7 @@ int main( int argc, char* argv[] )
     /* load different mesh files on each processor */
     MBMesquite::MsqError err;
     MBMesquite::MeshImpl mesh;
-    mesh.read_vtk( in_name.str( ).c_str( ), err );
+    mesh.read_vtk( in_name.str().c_str(), err );
     if( err )
     {
         cerr << err << endl;
@@ -135,7 +135,7 @@ int main( int argc, char* argv[] )
 
     /* create parallel mesh instance, specifying tags
      * containing parallel data */
-    MBMesquite::ParallelMeshImpl   parallel_mesh( &mesh, "GLOBAL_ID", "PROCESSOR_ID" );
+    MBMesquite::ParallelMeshImpl parallel_mesh( &mesh, "GLOBAL_ID", "PROCESSOR_ID" );
     MBMesquite::ParallelHelperImpl helper;
     helper.set_communicator( MPI_COMM_WORLD );
     helper.set_parallel_mesh( &parallel_mesh );
@@ -154,7 +154,7 @@ int main( int argc, char* argv[] )
     }
 
     /* write mesh */
-    mesh.write_vtk( out_name.str( ).c_str( ), err );
+    mesh.write_vtk( out_name.str().c_str(), err );
     if( err )
     {
         cerr << err << endl;
@@ -163,16 +163,16 @@ int main( int argc, char* argv[] )
 
     /* compare mesh with gold copy */
     MeshImpl gold;
-    gold.read_vtk( gold_name.str( ).c_str( ), err );
+    gold.read_vtk( gold_name.str().c_str(), err );
     if( err )
     {
         cerr << err << endl;
         return 1;
     }
 
-    bool   do_print = true;
-    double tol = 1.e-4;
-    bool   diff = MeshUtil::meshes_are_different( mesh, gold, err, tol, do_print );
+    bool do_print = true;
+    double tol    = 1.e-4;
+    bool diff     = MeshUtil::meshes_are_different( mesh, gold, err, tol, do_print );
     if( err )
     {
         cerr << err << endl;
@@ -187,6 +187,6 @@ int main( int argc, char* argv[] )
 
     print_timing_diagnostics( cout );
 
-    MPI_Finalize( );
+    MPI_Finalize();
     return 0;
 }
