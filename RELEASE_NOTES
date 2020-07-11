@@ -1,3 +1,40 @@
+#Version 5.2.0
+## Features
+  * *PR #424, #445, #461, #462, #474 parallelize tempestremap serial algorithms through mbtempest tool
+  * *PR #467 add verification option for maps computed with mbtempest/tempestremap
+  * *PR #454, #464, #475 coupling for discrete meshes, point cloud data, rendezvous coupling, 
+    for atmosphere, ocean, land 
+  * *PR #485 Windows build improvements
+  * *PR #437 allow empty parts in parallel mesh handling
+  * *PR #465 add KDtree-based intersection 
+  * *PR #471 introduce master-slave partitioning method for coupling scenarios
+  * *PR #482 domain file reader in netcdf format
+  * *PR #486 option for area computations using gauss integration
+
+## Enhancements
+  * *PR #468 PyMOAB bindings to set_connectivity
+  * *PR #420, #435, #442 global id default value (unset) is now -1, while DOFs related to Global 
+     ID start from 1
+  * *PR #446 option to reset global ids during partitioning
+  * *PR #419 cache the latest facet for RayHistory in OBB tree
+  * *PR #429 option for ghost layers in thin partitions
+  * *PR #438 improve coexistence of LAPACK and Eigen3 
+  * *PR #444, #449, #455 cmake improvements related to MPI, HDF5, OSX, autotools
+  * *PR #463 add download option for netcdf, hdf5 
+  * *PR #483 add download option for large files
+  * *PR #475 intersection robustness 
+  
+## Fixes
+  * *PR #414, #434 HDF5 writer fixes for polyhedral meshes, issue #99, #110
+  * *PR #415 sqij partition for structured meshes index overflow 
+  * *PR #430 HDF5 filename conflicts
+  * *PR #472 HDF5 file descriptor initialization
+  * *PR #417, #421, #469 python bindings fixes and compliance to Python 3
+  * *PR #450 fix seqfault in Range destructor
+  * *PR #473 geometry reader 
+  * *PR #431, #453, #466, #480 tempestremap API changes
+  
+  
 #Version 5.1.0:
 ## Features
   * *PR #399, #406, #408, #410: Updates for E3SM workflow to support online remapping computation for climate applications through interfaces to TempestRemap library. 
@@ -9,7 +46,7 @@
      We’ve done away with static `.cpp` files in the project and are now relying on users having a Cython installation greater than 0.26 on their machine. 
      This helps us with python 2/3 compatibility issues as well as superfluous re-compiles of libraries.
 ## Enhancements
-  * *PR #376, #365: Updates to PyMOAB to improve the Cython interaction and Python3 compatability.
+  * *PR #376, #365: Updates to PyMOAB to improve the Cython interaction and Python3 compatibility.
   * *PR #397: Consistent CMake configurations for downstream apps
   * *PR #404: Update RTT reader to support v1.0.1 specs
   * *PR #391, #401: Delete volume/surface OBB trees and restore OBBs from file
