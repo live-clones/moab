@@ -42,7 +42,6 @@ ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 DerivePointerAlignment: false
 DisableFormat:   false
-ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
 IndentCaseLabels: true
 IndentWidth:     4
 IndentWrappedFunctionNames: true
