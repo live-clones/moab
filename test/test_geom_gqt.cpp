@@ -611,7 +611,8 @@ ErrorCode test_ray_fire( GeomQueryTool* gqt )
                                       // piercing node
                                       { 1, { 0.0, 0.0, -1. }, { 0.0, 0.0, 1.0 }, 6, 1.0 },
                                       // glancing edge then interior
-                                      { 2, { 1.0, 0.0, 0.5 }, { -1.0 / ROOT2, 1.0 / ROOT2, 0.0 }, 3, ROOT2 } };
+                                      { 2, { 1.0, 0.0, 0.5 }, { -1.0 / ROOT2, 1.0 / ROOT2, 0.0 }, 3, ROOT2 }
+    };
 
     ErrorCode rval;
     Interface* moab = gqt->moab_instance();
@@ -754,7 +755,8 @@ ErrorCode overlap_test_ray_fire( GeomQueryTool* gqt )
                                       { 8, { -0.5, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 10, 0.5 },
                                       // numerical location on surface 9 of region1
                                       { 10, { -1.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, 8, 1.01 },
-                                      { 8, { -1.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 10, 0.0 } };
+                                      { 8, { -1.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0 }, 10, 0.0 }
+    };
 
     ErrorCode rval;
     Interface* moab = gqt->moab_instance();

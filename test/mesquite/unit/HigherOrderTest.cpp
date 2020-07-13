@@ -795,7 +795,8 @@ void HigherOrderTest::test_hex_basic()
                                    // bottom and top mid-face
                                    P, Q, 0, Q, P, 1,
                                    // mid-element
-                                   P, Q, P };
+                                   P, Q, P
+    };
     unsigned long conn[num_vtx];
     for( unsigned i = 0; i < num_vtx; i++ )
         conn[i] = i;

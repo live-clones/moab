@@ -1301,9 +1301,9 @@ static double condition3x3( const double A[9] )
 
 double NonSmoothDescent::SymmetricMatrix::condition3x3() const
 {
-    double values[9] =
-        { operator()( 0, 0 ), operator()( 0, 1 ), operator()( 0, 2 ), operator()( 1, 0 ), operator()( 1, 1 ),
-          operator()( 1, 2 ), operator()( 2, 0 ), operator()( 2, 1 ), operator()( 2, 2 ) };
+    double values[9] = { operator()( 0, 0 ), operator()( 0, 1 ), operator()( 0, 2 ),
+                         operator()( 1, 0 ), operator()( 1, 1 ), operator()( 1, 2 ),
+                         operator()( 2, 0 ), operator()( 2, 1 ), operator()( 2, 2 ) };
     return MBMesquite::condition3x3( values );
 }
 

@@ -1376,7 +1376,8 @@ void test_write_polygons()
         { -1, 0, static_cast< double >( rank ) },
         { static_cast< double >( -r ), static_cast< double >( -r ), static_cast< double >( rank ) },
         { 0, -1, static_cast< double >( rank ) },
-        { static_cast< double >( r ), static_cast< double >( -r ), static_cast< double >( rank ) } };
+        { static_cast< double >( r ), static_cast< double >( -r ), static_cast< double >( rank ) }
+    };
     const int nvtx = rank % 4 + 5;
     std::vector< EntityHandle > conn( nvtx );
     for( int i = 0; i < nvtx; ++i )

@@ -177,8 +177,9 @@ void test_iterator()
 bool compare_hexes( const double expected[8][3], const double actual[8][3], double epsilon )
 {
     // for each of three possible rotations
-    const int rotation_maps[3][8] = {
-        { 0, 1, 2, 3, 4, 5, 6, 7 }, { 3, 2, 6, 7, 0, 1, 5, 4 }, { 7, 3, 2, 6, 4, 0, 1, 5 } };
+    const int rotation_maps[3][8] = { { 0, 1, 2, 3, 4, 5, 6, 7 },
+                                      { 3, 2, 6, 7, 0, 1, 5, 4 },
+                                      { 7, 3, 2, 6, 4, 0, 1, 5 } };
     for( int i = 0; i < 3; ++i )
     {
         // compare for rotationts about axis from face 4 to 5

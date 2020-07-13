@@ -1452,7 +1452,8 @@ void MeshImpl::tag_to_bool( const char* tag_name, std::vector< bool >& values, M
 void MeshImpl::vtk_read_dataset( FileTokenizer& tokens, MsqError& err )
 {
     const char* const data_type_names[] = {
-        "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD", 0 };
+        "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD", 0
+    };
     int datatype = tokens.match_token( data_type_names, err );MSQ_ERRRTN( err );
 
     // Ignore FIELD data at beginning of DATASET. As far as I (J.Kraftcheck)

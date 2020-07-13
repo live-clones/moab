@@ -192,7 +192,8 @@ void ExodusTest::check_mesh( const char* filename )
     // Check connectivity of first six hexes
     static const unsigned expected_hex_connectivity[num_to_check][8] = {
         { 64, 63, 168, 167, 4, 5, 28, 27 }, { 63, 62, 132, 133, 5, 6, 24, 25 },   { 62, 169, 131, 132, 6, 29, 23, 24 },
-        { 62, 46, 170, 169, 6, 1, 30, 29 }, { 46, 152, 153, 170, 1, 10, 11, 30 }, { 46, 66, 171, 152, 1, 2, 31, 10 } };
+        { 62, 46, 170, 169, 6, 1, 30, 29 }, { 46, 152, 153, 170, 1, 10, 11, 30 }, { 46, 66, 171, 152, 1, 2, 31, 10 }
+    };
     for( j = 0; j < num_to_check; ++j )
     {
         sprintf( buffer, "bad hex: %d\n", j );
@@ -213,7 +214,8 @@ void ExodusTest::check_mesh( const char* filename )
     // Check locations of first six vertices
     static const double expected_node_coords[num_to_check][3] = {
         { 2.000000, 0.000000, 5.000000 },   { 1.000000, -1.732051, 5.000000 }, { -1.000000, -1.732051, 5.000000 },
-        { -2.000000, -0.000000, 5.000000 }, { -1.000000, 1.732051, 5.000000 }, { 1.000000, 1.732051, 5.000000 } };
+        { -2.000000, -0.000000, 5.000000 }, { -1.000000, 1.732051, 5.000000 }, { 1.000000, 1.732051, 5.000000 }
+    };
     MBMesquite::MsqVertex vert;
     for( j = 0; j < num_to_check; ++j )
     {
@@ -1096,7 +1098,8 @@ bool create_exodus_file( const char* filename )
         0x00, 0xc9, 0x00, 0x00, 0x00, 0xca, 0x00, 0x00, 0x00, 0xcb, 0x00, 0x00, 0x00, 0xcc, 0x00, 0x00, 0x00, 0xcd,
         0x00, 0x00, 0x00, 0xce, 0x00, 0x00, 0x00, 0xcf, 0x00, 0x00, 0x00, 0xd0, 0x00, 0x00, 0x00, 0xd1, 0x00, 0x00,
         0x00, 0xd2, 0x00, 0x00, 0x00, 0xd3, 0x00, 0x00, 0x00, 0xd4, 0x00, 0x00, 0x00, 0xd5, 0x00, 0x00, 0x00, 0xd6,
-        0x00, 0x00, 0x00, 0xd7, 0x00, 0x00, 0x00, 0xd8 };
+        0x00, 0x00, 0x00, 0xd7, 0x00, 0x00, 0x00, 0xd8
+    };
 
     FILE* file = fopen( filename, "w" );
     if( !file ) return false;

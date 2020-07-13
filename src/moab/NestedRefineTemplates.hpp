@@ -854,7 +854,8 @@ const NestedRefine::refPatterns NestedRefine::refTemplates[9][MAX_DEGREE] = {
           { 20, 0, 4, 21, 0, 4 },
           { 24, 1, 5, 27, 1, 5 },
           { 26, 2, 6, 25, 2, 6 },
-          { 22, 3, 7, 19, 3, 7 } } } } };
+          { 22, 3, 7, 19, 3, 7 } } } }
+};
 
 const NestedRefine::pmat NestedRefine::permutation[2] = {
     // MBTRI
@@ -904,7 +905,8 @@ const NestedRefine::pmat NestedRefine::permutation[2] = {
         { 1, 4, 7, 2, 5, 8, 3, 6, 9 },
         { 7, 4, 1, 8, 5, 2, 9, 6, 3 },
         { 9, 8, 7, 6, 5, 4, 3, 2, 1 },
-        { 3, 6, 9, 2, 5, 8, 1, 4, 7 } } } };
+        { 3, 6, 9, 2, 5, 8, 1, 4, 7 } } }
+};
 
 const NestedRefine::intFEdge NestedRefine::intFacEdg[2][2] = {
     // MBTRI
@@ -925,7 +927,8 @@ const NestedRefine::intFEdge NestedRefine::intFacEdg[2][2] = {
           { 13, 6 },
           { 10, 15 },
           { 15, 14 },
-          { 14, 7 } } } } };
+          { 14, 7 } } } }
+};
 
 }  // namespace moab
 

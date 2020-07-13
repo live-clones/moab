@@ -206,7 +206,8 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( AveragingQMTest, "Unit" );
 
 const double AveragingQMTest::VAL_LIST_1[5] = { 1, 2, -1, -2, 5 };
 const double AveragingQMTest::VAL_LIST_2[8] = {
-    M_PI, std::exp( 1.0 ), -20, 8, M_PI / 4, std::log( 2.0 ), std::sqrt( 2.0 ), -1 };
+    M_PI, std::exp( 1.0 ), -20, 8, M_PI / 4, std::log( 2.0 ), std::sqrt( 2.0 ), -1
+};
 const unsigned AveragingQMTest::LEN_LIST_1 = sizeof( VAL_LIST_1 ) / sizeof( double );
 const unsigned AveragingQMTest::LEN_LIST_2 = sizeof( VAL_LIST_2 ) / sizeof( double );
 

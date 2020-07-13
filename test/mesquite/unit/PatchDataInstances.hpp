@@ -392,7 +392,8 @@ inline void create_qm_two_tet_patch( PatchData& tetPatch, MsqError& err )
 {
     double coords[] = {
         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.5, sqrt( 3.0 ) / 2.0, 0.0, 0.5, sqrt( 3.0 ) / 6.0, sqrt( 2.0 ) / sqrt( 3.0 ),
-        2.0, 3.0, -.5 };
+        2.0, 3.0, -.5
+    };
 
     const size_t conn[] = { 0, 1, 2, 3, 1, 4, 2, 3 };
 
@@ -423,7 +424,8 @@ inline void create_qm_two_pyr_patch( PatchData& pyrPatch, MsqError& err )
                         /* Unit height */
                         1, -1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, 0, 0, 2,
                         /* Apex for a squashed pyramid */
-                        0, 0, -1 };
+                        0, 0, -1
+    };
 
     const size_t conn[] = { 0, 1, 2, 3, 4, 3, 2, 1, 0, 5 };
 
@@ -441,7 +443,8 @@ inline void create_qm_two_wdg_patch( PatchData& wdgPatch, MsqError& err )
     double coords[] = { // ideal prism vertices
                         0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.5, hgt, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.5, hgt, 1.0,
                         // top vertices for stretched wedge
-                        0.5, -3.0, 0.0, 0.5, -4.0, 1.0 };
+                        0.5, -3.0, 0.0, 0.5, -4.0, 1.0
+    };
 
     const size_t conn[] = { 0, 1, 2, 3, 4, 5, 1, 0, 6, 4, 3, 7 };
 

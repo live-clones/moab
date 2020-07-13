@@ -46,7 +46,8 @@ int main()
 
         0, 0, 1, 1, 0, 1, 2, 0, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1,
 
-        0, 0, 2, 1, 0, 2, 2, 0, 2, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 2, 2, 1, 2, 2, 2, 2, 2 };
+        0, 0, 2, 1, 0, 2, 2, 0, 2, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 2, 2, 1, 2, 2, 2, 2, 2
+    };
 
     // Create the vertexes and store their entity handles in the
     // vertex_handles range. In MOAB, entities are defined using Entity

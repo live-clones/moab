@@ -40,7 +40,8 @@ CartVect hex_verts[] = {
     CartVect( 0, -1, 0 ), CartVect( 1, 0, 0 ), CartVect( 0, 1, 0 ), CartVect( -1, 0, 0 ), CartVect( 0, 0, -1 ),
     CartVect( 0, 0, 1 ),
     // mid-element
-    CartVect( 0, 0, 0 ) };
+    CartVect( 0, 0, 0 )
+};
 
 const double EPS1 = 1.0e-6;
 
@@ -425,9 +426,10 @@ ErrorCode create_mesh( Core& mb, EntityType type )
     }
     else if( type == MBQUAD )
     {
-        const double coords[] = { 0, 0,  0, 1, 0,  0,  1, 1, 0,  0, 1, 0,  -1, 1,
-                                  0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 1, -1, 0 };
-        const size_t num_vtx  = sizeof( coords ) / sizeof( double ) / 3;
+        const double coords[] = {
+            0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, -1, 1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 1, -1, 0
+        };
+        const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
         const int conn[]       = { 0, 1, 2, 3, 0, 3, 4, 5, 0, 5, 6, 7, 0, 7, 8, 1 };
         const size_t num_elems = sizeof( conn ) / sizeof( int ) / 4;
@@ -472,10 +474,11 @@ ErrorCode create_mesh( Core& mb, EntityType type )
     }
     else if( type == MBHEX )
     {
-        const double coords[] = { 0,  0,  0, 1,  0,  0, 1,  1,  0, 0,  1,  0, -1, 1,  0, -1, 0,  0,
-                                  -1, -1, 0, 0,  -1, 0, 1,  -1, 0, 0,  0,  1, 1,  0,  1, 1,  1,  1,
-                                  0,  1,  1, -1, 1,  1, -1, 0,  1, -1, -1, 1, 0,  -1, 1, 1,  -1, 1 };
-        const size_t num_vtx  = sizeof( coords ) / sizeof( double ) / 3;
+        const double coords[] = {
+            0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, -1, 1, 0, -1, 0, 0, -1, -1, 0, 0, -1, 0, 1, -1, 0,
+            0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, -1, 1, 1, -1, 0, 1, -1, -1, 1, 0, -1, 1, 1, -1, 1
+        };
+        const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
         const int conn[]       = { 0, 1, 2, 3, 9, 10, 11, 12, 0, 3, 4, 5, 9, 12, 13, 14,
                              0, 5, 6, 7, 9, 14, 15, 16, 0, 7, 8, 1, 9, 16, 17, 10 };

@@ -1736,7 +1736,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputF
                                  map_disc_details[5] };
     int loc_buf[7]           = {
         tot_src_ents, tot_tgt_ents, weightMatNNZ, m_remapper->max_source_edges, m_remapper->max_target_edges,
-        maxrow,       maxcol };
+        maxrow,       maxcol
+    };
     int glb_buf[4] = { 0, 0, 0, 0 };
     MPI_Reduce( &loc_buf[0], &glb_buf[0], 3, MPI_INT, MPI_SUM, 0, m_pcomm->comm() );
     glb_smatmetadata[0] = glb_buf[0];

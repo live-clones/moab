@@ -1785,7 +1785,8 @@ int SimplexTemplateRefiner::permutations_from_index[24][14] = {
 
     { 2, 0, 3, 1, 6, 7, 9, 5, 4, 8, 13, 10, 11, 12 }, /* Face 2-3-0 */
     { 0, 3, 2, 1, 7, 9, 6, 4, 8, 5, 13, 11, 12, 10 },
-    { 3, 2, 0, 1, 9, 6, 7, 8, 5, 4, 13, 12, 10, 11 } };
+    { 3, 2, 0, 1, 9, 6, 7, 8, 5, 4, 13, 12, 10, 11 }
+};
 
 /*
  * Below is a list of output tetrahedra. The array is

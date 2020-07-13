@@ -1606,10 +1606,11 @@ void test_get_set_variable_length_sparse()
 
     const int ints[32]   = { 1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15,
                            -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 };
-    const void* ivals[9] = { ints,      ints + 1,  ints + 3,  ints + 12, ints + 17,
-                             ints + 21, ints + 28, ints + 29, ints + 31 };
-    const int ilens[9]   = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
-    const int defvals[]  = { 42, 5, 8, 74 };
+    const void* ivals[9] = {
+        ints, ints + 1, ints + 3, ints + 12, ints + 17, ints + 21, ints + 28, ints + 29, ints + 31
+    };
+    const int ilens[9]  = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
+    const int defvals[] = { 42, 5, 8, 74 };
     test_get_set_variable_length( "vdef", MB_TAG_SPARSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals, 4 );
 }
 
@@ -1622,10 +1623,11 @@ void test_get_set_variable_length_dense()
 
     const int ints[32]   = { 1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15,
                            -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 };
-    const void* ivals[9] = { ints,      ints + 1,  ints + 3,  ints + 12, ints + 17,
-                             ints + 21, ints + 28, ints + 29, ints + 31 };
-    const int ilens[9]   = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
-    const int defvals[]  = { 42, 5, 8, 74 };
+    const void* ivals[9] = {
+        ints, ints + 1, ints + 3, ints + 12, ints + 17, ints + 21, ints + 28, ints + 29, ints + 31
+    };
+    const int ilens[9]  = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
+    const int defvals[] = { 42, 5, 8, 74 };
     test_get_set_variable_length( "vdef", MB_TAG_DENSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals, 4 );
 }
 

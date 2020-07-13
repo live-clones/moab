@@ -52,8 +52,8 @@ const double TRI_XFORM_VALS[] = { 1.0, -1.0 / sqrt( 3.0 ), 0.0, 2.0 / sqrt( 3.0 
 MsqMatrix< 2, 2 > TRI_XFORM( TRI_XFORM_VALS );
 
 const double TET_XFORM_VALS[] = {
-    1.0, -1.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0, 2.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0,
-    0.0, sqrt( 3.0 / 2.0 ) };
+    1.0, -1.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0, 2.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0, 0.0, sqrt( 3.0 / 2.0 )
+};
 MsqMatrix< 3, 3 > TET_XFORM( TET_XFORM_VALS );
 
 AffineMapMetric::AffineMapMetric( TargetCalculator* tc, WeightCalculator* wc, TMetric* target_metric )

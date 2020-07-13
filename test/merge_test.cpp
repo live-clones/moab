@@ -950,7 +950,8 @@ int main()
         std::string( "test/2hexcase5.g" ),  std::string( "test/2quadcase1.g" ), std::string( "test/2quadcase2.g" ),
         std::string( "test/2quadcase3.g" ), std::string( "test/2quadcase4.g" ), std::string( "test/2tetcase1.g" ),
         std::string( "test/2tetcase2.g" ),  std::string( "test/2tetcase3.g" ),  std::string( "test/2tetcase4.g" ),
-        std::string( "test/2tricase1.g" ),  std::string( "test/2tricase2.g" ),  std::string( "test/2tricase3.g" ) };
+        std::string( "test/2tricase1.g" ),  std::string( "test/2tricase2.g" ),  std::string( "test/2tricase3.g" )
+    };
 
     // Create the MB database instance.
     gMB = new Core();

@@ -500,7 +500,8 @@ void test_sub_entity_indices_pyr()
     const int num_vtx     = 5;
     const int edges[][2]  = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } };
     const int faces[][5]  = {
-        { 3, 0, 1, 4, 0 }, { 3, 1, 2, 4, 0 }, { 3, 2, 3, 4, 0 }, { 3, 3, 0, 4, 0 }, { 4, 3, 2, 1, 0 } };
+        { 3, 0, 1, 4, 0 }, { 3, 1, 2, 4, 0 }, { 3, 2, 3, 4, 0 }, { 3, 3, 0, 4, 0 }, { 4, 3, 2, 1, 0 }
+    };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[0] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[0] ), faces );
@@ -513,7 +514,8 @@ void test_sub_entity_indices_pri()
     const int num_vtx     = 6;
     const int edges[][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 4 }, { 2, 5 }, { 3, 4 }, { 4, 5 }, { 5, 3 } };
     const int faces[][5] = {
-        { 4, 0, 1, 4, 3 }, { 4, 1, 2, 5, 4 }, { 4, 2, 0, 3, 5 }, { 3, 2, 1, 0, 0 }, { 3, 3, 4, 5, 0 } };
+        { 4, 0, 1, 4, 3 }, { 4, 1, 2, 5, 4 }, { 4, 2, 0, 3, 5 }, { 3, 2, 1, 0, 0 }, { 3, 3, 4, 5, 0 }
+    };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[0] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[0] ), faces );

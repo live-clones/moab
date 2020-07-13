@@ -204,7 +204,8 @@ void create_simple_grid( Interface& moab, unsigned x, unsigned y, unsigned z )
                 const size_t idx           = (size_t)i + (size_t)j * x + (size_t)k * x * y;
                 const EntityHandle conn[8] = {
                     verts[idx],         verts[idx + 1],         verts[idx + x + 1],         verts[idx + x],
-                    verts[idx + x * y], verts[idx + x * y + 1], verts[idx + x * y + x + 1], verts[idx + x * y + x] };
+                    verts[idx + x * y], verts[idx + x * y + 1], verts[idx + x * y + x + 1], verts[idx + x * y + x]
+                };
                 rval = moab.create_element( MBHEX, conn, 8, elems[( x - 1 ) * ( y - 1 ) * k + ( x - 1 ) * j + i] );CHECK_ERR( rval );
             }
     delete[] verts;
@@ -412,8 +413,9 @@ void test_pack_vertices()
     Range verts;
 
     const size_t num_verts             = 4;
-    const double coords[3 * num_verts] = { -0.5, -1. / 3, 0.0, 0.5, -1. / 3, 0.0,
-                                           0.0,  2. / 3,  0.0, 0.0, 0.0,     0.745356 };
+    const double coords[3 * num_verts] = {
+        -0.5, -1. / 3, 0.0, 0.5, -1. / 3, 0.0, 0.0, 2. / 3, 0.0, 0.0, 0.0, 0.745356
+    };
 
     rval = moab.create_vertices( coords, num_verts, verts );CHECK_ERR( rval );
 
@@ -586,7 +588,8 @@ void test_pack_higher_order()
     const size_t num_tet         = 2;
     EntityHandle tet_conn[2][10] = {
         { verts[0], verts[4], verts[9], verts[2], verts[8], verts[12], verts[10], verts[1], verts[3], verts[11] },
-        { verts[0], verts[9], verts[4], verts[6], verts[10], verts[12], verts[8], verts[7], verts[13], verts[5] } };
+        { verts[0], verts[9], verts[4], verts[6], verts[10], verts[12], verts[8], verts[7], verts[13], verts[5] }
+    };
 
     EntityHandle tets[num_tet];
     rval = moab.create_element( MBTET, tet_conn[0], 10, tets[0] );CHECK_ERR( rval );

@@ -171,7 +171,8 @@ ReadVtk::~ReadVtk()
 
 const char* const vtk_type_names[] = {
     "bit",  "char",          "unsigned_char", "short",  "unsigned_short", "int", "unsigned_int",
-    "long", "unsigned_long", "float",         "double", "vtkIdType",      0 };
+    "long", "unsigned_long", "float",         "double", "vtkIdType",      0
+};
 
 ErrorCode ReadVtk::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
                                     const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
@@ -361,7 +362,8 @@ ErrorCode ReadVtk::allocate_elements( long num_elements, int vert_per_element, E
 ErrorCode ReadVtk::vtk_read_dataset( FileTokenizer& tokens, Range& vertex_list, std::vector< Range >& element_list )
 {
     const char* const data_type_names[] = {
-        "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD", 0 };
+        "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD", 0
+    };
     int datatype = tokens.match_token( data_type_names );
     switch( datatype )
     {

@@ -890,7 +890,8 @@ ErrorCode mb_adjacent_create_test()
     const EntityHandle faces[6][4] = {
         { verts[0], verts[1], verts[5], verts[4] }, { verts[1], verts[2], verts[6], verts[5] },
         { verts[2], verts[3], verts[7], verts[6] }, { verts[3], verts[0], verts[4], verts[7] },
-        { verts[3], verts[2], verts[1], verts[0] }, { verts[4], verts[5], verts[6], verts[7] } };
+        { verts[3], verts[2], verts[1], verts[0] }, { verts[4], verts[5], verts[6], verts[7] }
+    };
     for( int i = 0; i < 6; ++i )
     {  // for each expected face
         // get sorted list of verts first for easy comparison
@@ -4371,9 +4372,10 @@ ErrorCode mb_poly_test()
 
     // test polygon and polyhedron representation
     // create a couple of polygons; vertices first
-    const double vert_pos[48] = { -1, 0,  0,  1, 0, 0,  2, 0, 0,  2, 1, 0,  1,  1,   0,  0,
-                                  2,  0,  -1, 1, 0, -2, 1, 0, -2, 0, 0, -2, -1, 0,   -1, -1,
-                                  0,  -1, -2, 0, 1, -2, 0, 1, -1, 0, 2, -1, 0,  1.5, .5, 1 };
+    const double vert_pos[48] = {
+        -1, 0, 0, 1,  0,  0, 2,  0,  0, 2,  1,  0, 1, 1,  0, 0, 2,  0, -1, 1,  0, -2,  1,  0,
+        -2, 0, 0, -2, -1, 0, -1, -1, 0, -1, -2, 0, 1, -2, 0, 1, -1, 0, 2,  -1, 0, 1.5, .5, 1
+    };
 
     EntityHandle verts[16];
     ErrorCode result;
@@ -6016,9 +6018,11 @@ ErrorCode mb_skin_poly_test()
         { -3, 3 }, { -1, 1 },  { 1, 1 },   { 1, -1 },  { -1, -1 }  // 15
     };
     const int polyconn[4][6] = {
-        { 0, 1, 2, 13, 12, 11 }, { 2, 3, 4, 5, 14, 13 }, { 5, 6, 7, 8, 15, 14 }, { 8, 9, 10, 11, 12, 15 } };
+        { 0, 1, 2, 13, 12, 11 }, { 2, 3, 4, 5, 14, 13 }, { 5, 6, 7, 8, 15, 14 }, { 8, 9, 10, 11, 12, 15 }
+    };
     const int polyside[4][6] = {
-        { 0, 1, 13, 16, 12, 11 }, { 2, 3, 4, 14, 17, 13 }, { 5, 6, 7, 15, 18, 14 }, { 8, 9, 10, 12, 19, 15 } };
+        { 0, 1, 13, 16, 12, 11 }, { 2, 3, 4, 14, 17, 13 }, { 5, 6, 7, 15, 18, 14 }, { 8, 9, 10, 12, 19, 15 }
+    };
 
     ErrorCode rval;
     Core moab;
@@ -6410,7 +6414,8 @@ ErrorCode mb_skin_higher_order_regions_common( bool use_adj )
                           { 1, 1, 0 },
                           { 1, 1, 2 },
                           // mid-volume
-                          { 1, 1, 1 } };
+                          { 1, 1, 1 }
+    };
 
     EntityHandle hexverts[2][27];
     for( int i = 0; i < 2; ++i )

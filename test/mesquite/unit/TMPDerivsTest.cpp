@@ -348,7 +348,8 @@ void TMPDerivsTest::test_set_scaled_sum_outer_product_3D()
         A.column( 0 ) * transpose( B.column( 2 ) ) + B.column( 0 ) * transpose( A.column( 2 ) ),
         A.column( 1 ) * transpose( B.column( 1 ) ) + B.column( 1 ) * transpose( A.column( 1 ) ),
         A.column( 1 ) * transpose( B.column( 2 ) ) + B.column( 1 ) * transpose( A.column( 2 ) ),
-        A.column( 2 ) * transpose( B.column( 2 ) ) + B.column( 2 ) * transpose( A.column( 2 ) ) };
+        A.column( 2 ) * transpose( B.column( 2 ) ) + B.column( 2 ) * transpose( A.column( 2 ) )
+    };
 #endif
 
     ASSERT_MATRICES_EQUAL( a * E[0], R[0], e );

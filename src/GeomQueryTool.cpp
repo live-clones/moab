@@ -173,7 +173,7 @@ class GQT_IntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt
           minTolInt( min_tolerance_intersections ), rootSet( root_set ), geomVol( geom_volume ), senseTag( sense_tag ),
           desiredOrient( desired_orient ), prevFacets( prev_facets ){
 
-                                           };
+          };
 
     virtual ErrorCode register_intersection( EntityHandle set, EntityHandle triangle, double distance,
                                              OrientedBoxTreeTool::IntersectSearchWindow&,

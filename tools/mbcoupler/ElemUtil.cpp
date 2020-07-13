@@ -793,7 +793,8 @@ namespace Element
         { 0, -1, 0 },                                 //      |  .                  |  .
         { 1, 0, 0 },                                  //      1   -----  9   -----  2
         { 0, 1, 0 },                                  //
-        { -1, 0, 0 },   { 0, 0, -1 },  { 0, 0, 1 },  { 0, 0, 0 } };
+        { -1, 0, 0 },   { 0, 0, -1 },  { 0, 0, 1 },  { 0, 0, 0 }
+    };
     // QuadraticHex::QuadraticHex(const std::vector<CartVect>& vertices) : Map(vertices){};
     QuadraticHex::QuadraticHex() : Map( 0 ) {}
 

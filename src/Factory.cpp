@@ -41,7 +41,8 @@ MB_EXPORT void ReleaseInterface( UnknownInterface* iface );
 static const nsModuleComponentInfo components[] = {
     { "MOAB Interface", CORE_CID, CORE_CONTRACTID, CoreConstructor, NULL /* NULL if you dont need one */,
       NULL /* NULL if you dont need one */, NULL /* no factory destructor */, NS_CI_INTERFACE_GETTER_NAME( moab::Core ),
-      NULL /* no language helper */, &NS_CLASSINFO_NAME( moab::Core ), 0 } };
+      NULL /* no language helper */, &NS_CLASSINFO_NAME( moab::Core ), 0 }
+};
 
 // implement NSGetModule()
 NS_IMPL_NSGETMODULE( moab::Core, components );

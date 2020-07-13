@@ -215,8 +215,9 @@ static void print_type_sets( Interface* iFace, DebugOutput* str, Range& sets )
     iFace->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, nid );
     iFace->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, sid );
     Range typesets[10];
-    const char* typenames[] = { "Block ",  "Sideset ", "NodeSet", "Vertex", "Curve",
-                                "Surface", "Volume",   "Body",    "Other" };
+    const char* typenames[] = {
+        "Block ", "Sideset ", "NodeSet", "Vertex", "Curve", "Surface", "Volume", "Body", "Other"
+    };
     for( Range::iterator riter = sets.begin(); riter != sets.end(); ++riter )
     {
         unsigned dim, id;  //, oldsize;

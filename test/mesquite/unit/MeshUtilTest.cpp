@@ -82,7 +82,7 @@ void MeshUtilTest::test_edge_length_distribution_types()
 {
     // create a mesh that contains one of each element type,
     // completely disconnected from any other element
-    double coords[]            = { // triangle : 0 - 2
+    double coords[] = { // triangle : 0 - 2
                         0, 0, 0, 2, 0, 0, 1, 1, 0,
                         // quad : 3 - 6
                         3, 0, 0, 3, 1, 0, 3, 2, 2, 3, 0, 1,
@@ -93,7 +93,8 @@ void MeshUtilTest::test_edge_length_distribution_types()
                         // wedge : 16 - 21
                         0, 0, -2, 2, 0, -2, 1, 1, -2, 0, 0, -1.5, 2, 0, -1.5, 1, 1, -1, 5,
                         // hex : 22 - 29
-                        4, 0, 0, 4, 1, 0, 4, 2, 2, 4, 0, 1, 5, 0, 0, 5, 1, 0, 5, 2, 2, 5, 0, 1 };
+                        4, 0, 0, 4, 1, 0, 4, 2, 2, 4, 0, 1, 5, 0, 0, 5, 1, 0, 5, 2, 2, 5, 0, 1
+    };
     const int tri_offset       = 0;
     const int quad_offset      = tri_offset + 3;
     const int tet_offset       = quad_offset + 4;
@@ -161,8 +162,9 @@ void MeshUtilTest::test_edge_length_distribution_types()
                              { 26, 27 },
                              { 27, 28 },
                              { 28, 29 },
-                             { 29, 26 } };
-    const int num_edges  = sizeof( edges ) / sizeof( edges[0] );
+                             { 29, 26 }
+    };
+    const int num_edges = sizeof( edges ) / sizeof( edges[0] );
 
     double exp_min = HUGE_VAL, exp_max = -HUGE_VAL;
     double exp_avg = 0, exp_rms = 0;
@@ -302,7 +304,7 @@ void MeshUtilTest::test_lambda_distribution_mixed()
 {
     // create a mesh that contains one of each element type,
     // completely disconnected from any other element
-    double coords[]            = { // triangle : 0 - 2
+    double coords[] = { // triangle : 0 - 2
                         0, 0, 0, 2, 0, 0, 1, 1, 0,
                         // quad : 3 - 6
                         3, 0, 0, 3, 1, 0, 3, 2, 2, 3, 0, 1,
@@ -313,7 +315,8 @@ void MeshUtilTest::test_lambda_distribution_mixed()
                         // wedge : 16 - 21
                         0, 0, -2, 2, 0, -2, 1, 1, -2, 0, 0, -1.5, 2, 0, -1.5, 1, 1, -1, 5,
                         // hex : 22 - 29
-                        4, 0, 0, 4, 1, 0, 4, 2, 2, 4, 0, 1, 5, 0, 0, 5, 1, 0, 5, 2, 2, 5, 0, 1 };
+                        4, 0, 0, 4, 1, 0, 4, 2, 2, 4, 0, 1, 5, 0, 0, 5, 1, 0, 5, 2, 2, 5, 0, 1
+    };
     const int tri_offset       = 0;
     const int quad_offset      = tri_offset + 3;
     const int tet_offset       = quad_offset + 4;
