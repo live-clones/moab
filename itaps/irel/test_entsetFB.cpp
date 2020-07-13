@@ -10,6 +10,8 @@
 #define DEFAULT_TEST_FILE  shell.h5m
 #define DEFAULT_TEST_FILE1 shellQuad.h5m
 
+// clang-format off
+
 #define STRINGIFY_( X ) #X
 #define STRINGIFY( X )  STRINGIFY_( X )
 #if defined( MESHDIR ) && defined( MOAB_HAVE_HDF5 )
@@ -29,6 +31,8 @@
     {                                                                \
         printf( "   Array passed in is non-zero but too short.\n" ); \
     }
+
+// clang-format on
 
 typedef void* iRel_EntityHandle;
 

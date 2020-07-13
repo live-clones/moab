@@ -70,6 +70,8 @@ extern enum iBase_ErrorType iBase_ERROR_MAP[MB_FAILURE + 1];
 
 #define DEFAULT_TEST_FILE brick.vtk
 
+// clang-format off
+
 #ifdef SRCDIR
 #define DEFAULT_INPUT_FILE STRINGIFY( SRCDIR/DEFAULT_TEST_FILE )
 #else
@@ -97,6 +99,8 @@ void PRINT_ASSERT_FAILURE( const char* cond, const char* file, int line )
             printf( "%s:%d ITAPS error %d\n", __FILE__, __LINE__, err ); \
             return 0;                                                    \
     } while( 0 )
+
+// clang-format on
 
 static iBase_EntitySetHandle root_set;
 

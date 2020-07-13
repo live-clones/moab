@@ -6,6 +6,8 @@
 #include "stdlib.h"
 #include "string.h"
 
+// clang-format off
+
 #define STRINGIFY_( X ) #X
 #define STRINGIFY( X )  STRINGIFY_( X )
 #ifdef MESHDIR
@@ -30,6 +32,8 @@
     {                                                                \
         printf( "   Array passed in is non-zero but too short.\n" ); \
     }
+
+// clang-format on
 
 typedef void* iRel_EntityHandle;
 
