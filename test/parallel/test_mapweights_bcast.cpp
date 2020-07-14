@@ -84,34 +84,32 @@ void test_tempest_map_bcast()
      *      ..Per-dof conservation (tol 1.00000e-08).. PASS
      *      ..Weights within range [-10,+10].. Done
      *      ..
-     *      ..  Total nonzero entries: 871
+     *      ..  Total nonzero entries: 8976
      *      ..   Column index min/max: 1 / 150 (150 source dofs)
      *      ..      Row index min/max: 1 / 252 (252 target dofs)
-     *      ..      Source area / 4pi: 9.999999999999986e-01
-     *      ..    Source area min/max: 7.758193626682276e-02 / 9.789674024213996e-02
-     *      ..      Target area / 4pi: 9.999999999999988e-01
-     *      ..    Target area min/max: 3.418848585325412e-02 / 5.362041648788487e-02
-     *      ..    Source frac min/max: 9.999999999999984e-01 / 9.999999999999997e-01
-     *      ..    Target frac min/max: 9.999999999999981e-01 / 1.000000000000000e+00
-     *      ..    Map weights min/max: 2.377132934153108e-07 / 9.999999999999988e-01
-     *      ..       Row sums min/max: 9.999999999999981e-01 / 1.000000000000000e+00
-     *      ..   Consist. err min/max: -1.887379141862766e-15 / 0.000000000000000e+00
-     *      ..    Col wt.sums min/max: 9.999999999999983e-01 / 9.999999999999997e-01
-     *      ..   Conserv. err min/max: -1.665334536937735e-15 / -3.330669073875470e-16
+     *      ..      Source area / 4pi: 9.999999999991666e-01
+     *      ..    Source area min/max: 7.758193626656797e-02 / 9.789674024202324e-02
+     *      ..      Target area / 4pi: 9.999999999999928e-01
+     *      ..    Target area min/max: 3.418848585325412e-02 / 5.362041648788460e-02
+     *      ..    Source frac min/max: 9.999999999997851e-01 / 1.000000000003865e+00
+     *      ..    Target frac min/max: 9.999999999993099e-01 / 1.000000000000784e+00
+     *      ..    Map weights min/max: -2.062659472710135e-01 / 1.143815352351317e+00
+     *      ..       Row sums min/max: 9.999999999993099e-01 / 1.000000000000784e+00
+     *      ..   Consist. err min/max: -6.901146321069973e-13 / 7.838174553853605e-13
+     *      ..    Col wt.sums min/max: 9.999999999997854e-01 / 1.000000000003865e+00
+     *      ..   Conserv. err min/max: -2.146061106600428e-13 / 3.865352482534945e-12
      *      ..
      *      ..Histogram of nonzero entries in sparse matrix
      *      ....Column 1: Number of nonzero entries (bin minimum)
      *      ....Column 2: Number of columns with that many nonzero values
      *      ....Column 3: Number of rows with that many nonzero values
-     *      ..[[1, 0, 2],[2, 0, 51],[3, 0, 48],[4, 15, 138],[5, 39, 7],[6, 64, 6],[7, 24, 0],[8, 8, 0]]
+     *      ..[[25, 0, 2],[29, 0, 8],[30, 0, 10],[31, 150, 232]]
      *      ..
      *      ..Histogram of weights
      *      ....Column 1: Lower bound on weights
      *      ....Column 2: Upper bound on weights
      *      ....Column 3: # of weights in that bin
-     *      ..[[0, 1, 871]]
-     *      ------------------------------------------------------------
-     *      0  Writing remap weights with size [252 X 150] and NNZ = 871
+     *      ..[[-1, 0, 4577],[0, 1, 4365],[1, 2, 34]]
      *
      */
     NcError error( NcError::silent_nonfatal );
@@ -135,11 +133,11 @@ void test_tempest_map_bcast()
         mapRemap.SetFillValueOverride( static_cast< float >( dFillValueOverride ) );
 
         int isConsistent = mapRemap.IsConsistent( dTolerance );
-        CHECK_EQUAL( isConsistent, 0 );
+        CHECK_EQUAL( 0, isConsistent );
         int isConservative = mapRemap.IsConservative( dTolerance );
-        CHECK_EQUAL( isConservative, 0 );
+        CHECK_EQUAL( 0, isConservative );
         int isMonotone = mapRemap.IsMonotone( dTolerance );
-        CHECK_EQUAL( isMonotone, 4600 );
+        CHECK_EQUAL( 4600, isMonotone );
 
         // verify that the source and target mesh areas are equal
         DataArray1D< double >& srcAreas = mapRemap.GetSourceAreas();
@@ -164,11 +162,14 @@ void test_tempest_map_bcast()
     // Retrieve all data from the map operator on root process
     DataArray1D< int > dataRowsGlobal, dataColsGlobal;
     DataArray1D< double > dataEntriesGlobal;
-    if( rank == 0 ) sparseMatrix.GetEntries( dataRowsGlobal, dataColsGlobal, dataEntriesGlobal );
+    if( rank == 0 )
+    {
+        sparseMatrix.GetEntries( dataRowsGlobal, dataColsGlobal, dataEntriesGlobal );
+        std::cout << "Total NNZ in remap matrix = " << dataRowsGlobal.GetRows() << std::endl;
+    }
 
     int *rg, *cg;
-    double *de;
-
+    double* de;
     int nMapGlobalRowCols[3] = { sparseMatrix.GetRows(), sparseMatrix.GetColumns(),
                                  static_cast< int >( dataEntriesGlobal.GetRows() ) };
 
@@ -186,33 +187,32 @@ void test_tempest_map_bcast()
         // Let us do a trivial partitioning of the row data
         rowAllocation.resize( nprocs * NDATA );
         displs.resize( nprocs );
-        sendCounts.resize(nprocs);
+        sendCounts.resize( nprocs );
 
         int nRowPerPart = nMapGlobalRowCols[0] / nprocs;
-        int remainder = nMapGlobalRowCols[0] % nprocs;  // Keep the remainder in root
+        int remainder   = nMapGlobalRowCols[0] % nprocs;  // Keep the remainder in root
         // printf( "nRowPerPart = %d, remainder = %d\n", nRowPerPart, remainder );
         int sum = 0;
         for( int i = 0; i < nprocs; ++i )
         {
-            rowAllocation[i * NDATA] = nRowPerPart + ( i == 0 ? remainder : 0 );
-            displs[i] = sum;
+            rowAllocation[i * NDATA]     = nRowPerPart + ( i == 0 ? remainder : 0 );
+            rowAllocation[i * NDATA + 1] = std::find( rg, rg + dataRowsGlobal.GetRows(), sum ) - rg;
             sum += rowAllocation[i * NDATA];
-            rowAllocation[i * NDATA + 1] = std::find( rg, rg + dataRowsGlobal.GetRows(), displs[i] ) - rg;
+            displs[i] = rowAllocation[i * NDATA + 1];
         }
-        for( int i = 0; i < nprocs-1; ++i )
+        for( int i = 0; i < nprocs - 1; ++i )
         {
             rowAllocation[i * NDATA + 2] = rowAllocation[( i + 1 ) * NDATA + 1] - rowAllocation[i * NDATA + 1];
             sendCounts[i]                = rowAllocation[i * NDATA + 2];
         }
-        rowAllocation[(nprocs-1) * NDATA + 2] = nMapGlobalRowCols[2] - displs[nprocs - 1];
-        sendCounts[nprocs-1]                  = rowAllocation[( nprocs - 1 ) * NDATA + 2];
+        rowAllocation[( nprocs - 1 ) * NDATA + 2] = nMapGlobalRowCols[2] - displs[nprocs - 1];
+        sendCounts[nprocs - 1]                    = rowAllocation[( nprocs - 1 ) * NDATA + 2];
 
         // for( int i = 0; i < nprocs; i++ )
-        //     printf( "sendcounts[%d] = %d, %d, %d\tdispls[%d] = %d\n", i, rowAllocation[i * NDATA],
-        //             rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i] );
+        //     printf( "sendcounts[%d] = %d, %d, %d\tdispls[%d] = %d, %d\n", i, rowAllocation[i * NDATA],
+        //             rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i], sendCounts[i] );
     }
 
-    // std::cout << nMapGlobalRowCols[0] << ", " << nMapGlobalRowCols[1] << ", " << nMapGlobalRowCols[2] << "\n";
     mpierr = MPI_Bcast( nMapGlobalRowCols, 3, MPI_INTEGER, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
@@ -228,6 +228,7 @@ void test_tempest_map_bcast()
     dataCols.Allocate( allocationSize[2] );
     dataEntries.Allocate( allocationSize[2] );
 
+    /* TODO: combine row and column scatters together. Save one communication by better packing */
     // Scatter the rows, cols and entries to the processes according to the partition
     mpierr = MPI_Scatterv( rg, sendCounts.data(), displs.data(), MPI_INTEGER, (int*)( dataRows ),
                            dataRows.GetByteSize(), MPI_INTEGER, rootProc, commW );
@@ -237,12 +238,68 @@ void test_tempest_map_bcast()
                            dataCols.GetByteSize(), MPI_INTEGER, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
-    mpierr = MPI_Scatterv( de, sendCounts.data(), displs.data(), MPI_INTEGER,
-                           (double*)( dataEntries ), dataEntries.GetByteSize(), MPI_INTEGER, rootProc, commW );
+    mpierr = MPI_Scatterv( de, sendCounts.data(), displs.data(), MPI_DOUBLE, (double*)( dataEntries ),
+                           dataEntries.GetByteSize(), MPI_DOUBLE, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
+
+    // Compute an offset for the rows and columns by creating a local to global mapping
+    std::vector< int > rowMap, colMap;
+    int rindex = 0, cindex = 0;
+    for( int i = 0; i < allocationSize[2]; ++i )
+    {
+        std::vector< int >::iterator riter = std::find( rowMap.begin(), rowMap.end(), dataRows[i] );
+        if( riter == rowMap.end() )
+        {
+            rowMap.push_back( dataRows[i] );
+            rindex = rowMap.size() - 1;
+        }
+        else
+            rindex = riter - rowMap.begin();
+        dataRows[i] = rindex;
+
+        std::vector< int >::iterator citer = std::find( colMap.begin(), colMap.end(), dataCols[i] );
+        if( citer == colMap.end() )
+        {
+            colMap.push_back( dataCols[i] );
+            cindex = colMap.size() - 1;
+        }
+        else
+            cindex = citer - colMap.begin();
+        dataCols[i] = cindex;
+
+        // if (rank == 1)
+        //     std::cout << i << " -- row,col,val = " << rindex << ", " << rowMap[rindex] << ", " << cindex << ", " <<
+        //     colMap[cindex] << ", " << dataEntries[i]
+        //               << std::endl;
+    }
 
     // Now set the data received from root onto the sparse matrix
     sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
 
-    // Let us run some more tests to verify that the map data has been distributed correctly
+    /**
+     * Perform a series of checks to ensure that the local maps in each process still preserve map properties
+     * Let us run our usual tests to verify that the map data has been distributed correctly
+     *   1) Consistency check -- row sum = 1.0
+     *   2) Disable conservation checks that require global column sums (and hence more communication/reduction)
+     *   3) Perform monotonicity check and ensure failures globally are same as serial case
+     */
+
+    // consistency: row sums
+    int isConsistentP = mapRemap.IsConsistent( dTolerance );
+    CHECK_EQUAL( 0, isConsistentP );
+
+    // conservation: we will disable this conservation check for now.
+    // int isConservativeP = mapRemap.IsConservative( dTolerance );
+    // CHECK_EQUAL( 0, isConservativeP );
+
+    // monotonicity: local failures
+    int isMonotoneP = mapRemap.IsMonotone( dTolerance );
+    // Accumulate sum of failures to ensure that it is exactly same as serial case
+    int isMonotoneG;
+    mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INTEGER, MPI_SUM, commW );
+    CHECK_EQUAL( mpierr, 0 );
+    // 4600 fails in serial. What about parallel ? Check and confirm.
+    CHECK_EQUAL( 4600, isMonotoneG );
+
+    return;
 }
