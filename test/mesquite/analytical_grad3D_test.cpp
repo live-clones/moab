@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -67,65 +68,64 @@ using namespace MBMesquite;
 
 int main()
 {
-  MsqPrintError err(std::cout);
-  MBMesquite::MeshImpl mesh;
+    MsqPrintError err( std::cout );
+    MBMesquite::MeshImpl mesh;
 
-  std::string file_name = TestDir + "/3D/vtk/hexes/untangled/hexes_4by2by2.vtk";
-  mesh.read_vtk(file_name.c_str(), err);
+    std::string file_name = TestDir + "/3D/vtk/hexes/untangled/hexes_4by2by2.vtk";
+    mesh.read_vtk( file_name.c_str(), err );
 
     // creates an intruction queue
-  InstructionQueue queue1;
+    InstructionQueue queue1;
 
     // creates a mean ratio quality metric ...
-  IdealWeightInverseMeanRatio mean_ratio(err);
-  if (err) return 1;
-  ConditionNumberQualityMetric cond_num;
-  mean_ratio.set_averaging_method(QualityMetric::LINEAR);
+    IdealWeightInverseMeanRatio mean_ratio( err );
+    if( err ) return 1;
+    ConditionNumberQualityMetric cond_num;
+    mean_ratio.set_averaging_method( QualityMetric::LINEAR );
 
     // ... and builds an objective function with it
-    //LInfTemplate* obj_func = new LInfTemplate(mean_ratio);
-  LPtoPTemplate obj_func(&mean_ratio, 2, err);
-  if (err) return 1;
-   // creates the steepest descent optimization procedures
-  SteepestDescent pass1( &obj_func );
-  pass1.use_global_patch();
-  //if (err) return 1;
-  //pass1.set_maximum_iteration(6);
+    // LInfTemplate* obj_func = new LInfTemplate(mean_ratio);
+    LPtoPTemplate obj_func( &mean_ratio, 2, err );
+    if( err ) return 1;
+    // creates the steepest descent optimization procedures
+    SteepestDescent pass1( &obj_func );
+    pass1.use_global_patch();
+    // if (err) return 1;
+    // pass1.set_maximum_iteration(6);
 
-  QualityAssessor stop_qa=QualityAssessor(&mean_ratio);
-  if (err) return 1;
-  stop_qa.add_quality_assessment(&cond_num);
-  if (err) return 1;
+    QualityAssessor stop_qa = QualityAssessor( &mean_ratio );
+    if( err ) return 1;
+    stop_qa.add_quality_assessment( &cond_num );
+    if( err ) return 1;
 
+    //**************Set stopping criterion****************
+    // StoppingCriterion sc1(&stop_qa,1.0,1.8);
+    // StoppingCriterion sc2(StoppingCriterion::NUMBER_OF_PASSES,1);
+    TerminationCriterion tc2;
+    tc2.add_iteration_limit( 1 );
+    // CompositeAndStoppingCriterion sc(&sc1,&sc2);
+    pass1.set_inner_termination_criterion( &tc2 );
 
-   //**************Set stopping criterion****************
-// StoppingCriterion sc1(&stop_qa,1.0,1.8);
-    //StoppingCriterion sc2(StoppingCriterion::NUMBER_OF_PASSES,1);
-  TerminationCriterion tc2;
-  tc2.add_iteration_limit( 1 );
-// CompositeAndStoppingCriterion sc(&sc1,&sc2);
-  pass1.set_inner_termination_criterion(&tc2);
+    // adds 1 pass of pass1 to mesh_set1
+    //  queue1.add_preconditioner(pass1, err);
+    //  if (err) return 1;
+    queue1.add_quality_assessor( &stop_qa, err );
+    queue1.set_master_quality_improver( &pass1, err );
+    if( err ) return 1;
+    queue1.add_quality_assessor( &stop_qa, err );
+    if( err ) return 1;
+    // adds 1 passes of pass2 to mesh_set1
+    //  mesh_set1.add_quality_pass(pass2);
 
-  // adds 1 pass of pass1 to mesh_set1
-//  queue1.add_preconditioner(pass1, err);
-//  if (err) return 1;
-  queue1.add_quality_assessor(&stop_qa,err);
-  queue1.set_master_quality_improver(&pass1, err);
-  if (err) return 1;
-  queue1.add_quality_assessor(&stop_qa,err);
-  if (err) return 1;
-  // adds 1 passes of pass2 to mesh_set1
-//  mesh_set1.add_quality_pass(pass2);
-
-  mesh.write_vtk("original_mesh.vtk", err);
-  if (err) return 1;
+    mesh.write_vtk( "original_mesh.vtk", err );
+    if( err ) return 1;
 
     // launches optimization on mesh_set1
-  queue1.run_instructions(&mesh, err);
-  if (err) return 1;
+    queue1.run_instructions( &mesh, err );
+    if( err ) return 1;
 
-  mesh.write_vtk("smoothed_mesh.vtk", err);
-  if (err) return 1;
+    mesh.write_vtk( "smoothed_mesh.vtk", err );
+    if( err ) return 1;
 
-  return 0;
+    return 0;
 }

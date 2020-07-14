@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TRel2DShapeSizeOrient.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,48 +35,47 @@
 #include "TMPCommon.hpp"
 #include "TMPDerivs.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string TShapeSizeOrientNB1::get_name() const
-  { return "TShapeSizeOrientNB1"; }
+{
+    return "TShapeSizeOrientNB1";
+}
 
 TShapeSizeOrientNB1::~TShapeSizeOrientNB1() {}
 
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& T, double& result)
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
-  MsqMatrix<DIM,DIM> T_I(T);
-  pluseq_scaled_I( T_I, -1 );
-  result = sqr_Frobenius( T_I );
-  return true;
+    MsqMatrix< DIM, DIM > T_I( T );
+    pluseq_scaled_I( T_I, -1 );
+    result = sqr_Frobenius( T_I );
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& T,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv )
+template < unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv )
 {
-  deriv = T;
-  pluseq_scaled_I( deriv, -1 );
-  result = sqr_Frobenius( deriv );
-  deriv *= 2.0;
-  return true;
+    deriv = T;
+    pluseq_scaled_I( deriv, -1 );
+    result = sqr_Frobenius( deriv );
+    deriv *= 2.0;
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool hess( const MsqMatrix<DIM,DIM>& T,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv,
-           MsqMatrix<DIM,DIM>* second )
+template < unsigned DIM >
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv,
+                         MsqMatrix< DIM, DIM >* second )
 {
-  deriv = T;
-  pluseq_scaled_I( deriv, -1 );
-  result = sqr_Frobenius( deriv );
-  deriv *= 2.0;
-  set_scaled_I( second, 2.0 );
-  return true;
+    deriv = T;
+    pluseq_scaled_I( deriv, -1 );
+    result = sqr_Frobenius( deriv );
+    deriv *= 2.0;
+    set_scaled_I( second, 2.0 );
+    return true;
 }
 
-TMP_T_TEMPL_IMPL_COMMON(TShapeSizeOrientNB1)
+TMP_T_TEMPL_IMPL_COMMON( TShapeSizeOrientNB1 )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

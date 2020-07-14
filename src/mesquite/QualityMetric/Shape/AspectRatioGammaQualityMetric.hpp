@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file AspectRatioGammaQualityMetric.hpp
   \brief
@@ -34,7 +35,6 @@
   \date   2002-05-16
  */
 
-
 #ifndef AspectRatioGammaQualityMetric_hpp
 #define AspectRatioGammaQualityMetric_hpp
 
@@ -43,36 +43,28 @@
 #include "ElementQM.hpp"
 namespace MBMesquite
 {
-     /*! \class AspectRatioGammaQualityMetric
-       \brief Object for computing the aspect ratio gamma of
-       simplicial elements.
-     */
-   class AspectRatioGammaQualityMetric : public ElementQM
-   {
-   public:
-     AspectRatioGammaQualityMetric() {}
+/*! \class AspectRatioGammaQualityMetric
+  \brief Object for computing the aspect ratio gamma of
+  simplicial elements.
+*/
+class AspectRatioGammaQualityMetric : public ElementQM
+{
+  public:
+    AspectRatioGammaQualityMetric() {}
 
-       //! virtual destructor ensures use of polymorphism during destruction
-     virtual ~AspectRatioGammaQualityMetric()
-        {}
+    //! virtual destructor ensures use of polymorphism during destruction
+    virtual ~AspectRatioGammaQualityMetric() {}
 
-     virtual std::string get_name() const;
+    virtual std::string get_name() const;
 
-     int get_negate_flag() const;
+    int get_negate_flag() const;
 
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
+    bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-   private:
-      std::vector<Vector3D> vert;
-   };
+  private:
+    std::vector< Vector3D > vert;
+};
 
+}  // namespace MBMesquite
 
-} //namespace
-
-
-#endif // AspectRatioGammaQualityMetric_hpp
-
-
+#endif  // AspectRatioGammaQualityMetric_hpp

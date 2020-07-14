@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file EdgeLengthMetric.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,74 +34,75 @@
 #include "MsqError.hpp"
 #include "Matrix3D.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-
-EdgeLengthMetric::EdgeLengthMetric( double gamma )
-  : mGamma( gamma ) {}
+EdgeLengthMetric::EdgeLengthMetric( double gamma ) : mGamma( gamma ) {}
 
 std::string EdgeLengthMetric::get_name() const
-  { return "EdgeLength"; }
+{
+    return "EdgeLength";
+}
 
-   //! 1 if metric should be minimized, -1 if metric should be maximized.
+//! 1 if metric should be minimized, -1 if metric should be maximized.
 int EdgeLengthMetric::get_negate_flag() const
-  { return 1; }
-
-bool EdgeLengthMetric::evaluate( PatchData& pd,
-                 size_t p_handle,
-                 double& value,
-                 MsqError& err )
 {
-  MsqMeshEntity& e = pd.element_by_index( elem(p_handle) );
-  const unsigned* vert_nums;
-  vert_nums = TopologyInfo::edge_vertices( e.get_element_type(), edge(p_handle), err );
-  MSQ_ERRZERO(err);
-  size_t svi = e.get_vertex_index( vert_nums[0] );
-  size_t evi = e.get_vertex_index( vert_nums[1] );
-  Vector3D diff = pd.vertex_by_index( svi ) - pd.vertex_by_index( evi );
-  double len_sqr = diff % diff - mGamma;
-  if (len_sqr <= 0.0) {
-    value = 0.0;
-    return false;
-  }
-  value = sqrt(len_sqr);
-  return true;
+    return 1;
 }
 
-bool EdgeLengthMetric::evaluate_with_gradient( PatchData& pd,
-                 size_t p_handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 MsqError& err )
+bool EdgeLengthMetric::evaluate( PatchData& pd, size_t p_handle, double& value, MsqError& err )
 {
-  MsqMeshEntity& e = pd.element_by_index( elem(p_handle) );
-  const unsigned* vert_nums;
-  vert_nums = TopologyInfo::edge_vertices( e.get_element_type(), edge(p_handle), err );
-  MSQ_ERRZERO(err);
-  size_t svi = e.get_vertex_index( vert_nums[0] );
-  size_t evi = e.get_vertex_index( vert_nums[1] );
-  Vector3D diff = pd.vertex_by_index( svi ) - pd.vertex_by_index( evi );
-  double val_sqr = diff % diff - mGamma;
-  if (val_sqr <= 0.0) {
-    value = 0.0;
-    return false;
-  }
-  value = sqrt(val_sqr);
-
-  diff *= 1.0/value;
-  indices.clear();
-  gradient.clear();
-  if (svi < pd.num_free_vertices())  {
-    indices.push_back( svi );
-    gradient.push_back( diff );
-  }
-  if (evi < pd.num_free_vertices()) {
-    indices.push_back( evi );
-    gradient.push_back( -diff );
-  }
-
-  return true;
+    MsqMeshEntity& e = pd.element_by_index( elem( p_handle ) );
+    const unsigned* vert_nums;
+    vert_nums = TopologyInfo::edge_vertices( e.get_element_type(), edge( p_handle ), err );
+    MSQ_ERRZERO( err );
+    size_t svi     = e.get_vertex_index( vert_nums[0] );
+    size_t evi     = e.get_vertex_index( vert_nums[1] );
+    Vector3D diff  = pd.vertex_by_index( svi ) - pd.vertex_by_index( evi );
+    double len_sqr = diff % diff - mGamma;
+    if( len_sqr <= 0.0 )
+    {
+        value = 0.0;
+        return false;
+    }
+    value = sqrt( len_sqr );
+    return true;
 }
 
-} // namespace MBMesquite
+bool EdgeLengthMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, double& value,
+                                               std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                               MsqError& err )
+{
+    MsqMeshEntity& e = pd.element_by_index( elem( p_handle ) );
+    const unsigned* vert_nums;
+    vert_nums = TopologyInfo::edge_vertices( e.get_element_type(), edge( p_handle ), err );
+    MSQ_ERRZERO( err );
+    size_t svi     = e.get_vertex_index( vert_nums[0] );
+    size_t evi     = e.get_vertex_index( vert_nums[1] );
+    Vector3D diff  = pd.vertex_by_index( svi ) - pd.vertex_by_index( evi );
+    double val_sqr = diff % diff - mGamma;
+    if( val_sqr <= 0.0 )
+    {
+        value = 0.0;
+        return false;
+    }
+    value = sqrt( val_sqr );
+
+    diff *= 1.0 / value;
+    indices.clear();
+    gradient.clear();
+    if( svi < pd.num_free_vertices() )
+    {
+        indices.push_back( svi );
+        gradient.push_back( diff );
+    }
+    if( evi < pd.num_free_vertices() )
+    {
+        indices.push_back( evi );
+        gradient.push_back( -diff );
+    }
+
+    return true;
+}
+
+}  // namespace MBMesquite

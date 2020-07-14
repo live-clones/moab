@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWSizeNB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,52 +35,48 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string AWSizeNB1::get_name() const
-  { return "AWSizeNB1"; }
+{
+    return "AWSizeNB1";
+}
 
 AWSizeNB1::~AWSizeNB1() {}
 
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result)
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
-  result = det(A) - det(W);
-  result *= result;
-  return true;
+    result = det( A ) - det( W );
+    result *= result;
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv )
+template < unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
-  result = det(A) - det(W);
-  deriv = transpose_adj(A);
-  deriv *= 2*result;
-  result *= result;
-  return true;
+    result = det( A ) - det( W );
+    deriv  = transpose_adj( A );
+    deriv *= 2 * result;
+    result *= result;
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool hess( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv,
-           MsqMatrix<DIM,DIM>* second )
+template < unsigned DIM >
+static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
 {
-  result = det(A) - det(W);
-  deriv = transpose_adj(A);
-  set_scaled_outer_product( second, 2.0, deriv );
-  pluseq_scaled_2nd_deriv_of_det( second, 2*result, A );
-  deriv *= 2*result;
-  result *= result;
-  return true;
+    result = det( A ) - det( W );
+    deriv  = transpose_adj( A );
+    set_scaled_outer_product( second, 2.0, deriv );
+    pluseq_scaled_2nd_deriv_of_det( second, 2 * result, A );
+    deriv *= 2 * result;
+    result *= result;
+    return true;
 }
 
-TMP_AW_TEMPL_IMPL_COMMON(AWSizeNB1)
+TMP_AW_TEMPL_IMPL_COMMON( AWSizeNB1 )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

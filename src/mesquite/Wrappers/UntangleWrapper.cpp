@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file UntangleWrapper.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -57,134 +56,130 @@
 
 #include <memory>
 
-const int NUM_INNER_ITERATIONS = 1;
+const int NUM_INNER_ITERATIONS       = 1;
 const double DEFAULT_MOVEMENT_FACTOR = 0.001;
-const bool CULLING_DEFAULT = true;
-const bool JACOBI_DEFAULT = false;
+const bool CULLING_DEFAULT           = true;
+const bool JACOBI_DEFAULT            = false;
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 UntangleWrapper::UntangleWrapper()
-  : qualityMetric( SIZE ),
-    maxTime(-1),
-    movementFactor( DEFAULT_MOVEMENT_FACTOR ),
-    metricConstant( -1 ),
-    maxIterations(-1),
-    doCulling(CULLING_DEFAULT),
-    doJacobi(JACOBI_DEFAULT)
-{}
-
-UntangleWrapper::UntangleWrapper(UntangleMetric m)
-  : qualityMetric( m ),
-    maxTime(-1),
-    movementFactor( DEFAULT_MOVEMENT_FACTOR ),
-    metricConstant( -1 ),
-    maxIterations(-1),
-    doCulling(CULLING_DEFAULT),
-    doJacobi(JACOBI_DEFAULT)
-{}
-
-UntangleWrapper::~UntangleWrapper()
-{}
-
-void UntangleWrapper::set_untangle_metric( UntangleMetric metric )
-  { qualityMetric = metric; }
-
-void UntangleWrapper::set_metric_constant( double value )
-  { metricConstant = value; }
-
-void UntangleWrapper::set_cpu_time_limit( double seconds )
-  { maxTime = seconds; }
-
-void UntangleWrapper::set_outer_iteration_limit( int maxIt )
-  { maxIterations = maxIt; }
-
-void UntangleWrapper::set_vertex_movement_limit_factor( double f )
-  { movementFactor = f; }
-
-
-void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                                   ParallelMesh* pmesh,
-                                   Settings* settings,
-                                   QualityAssessor* qa,
-                                   MsqError& err )
+    : qualityMetric( SIZE ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), metricConstant( -1 ),
+      maxIterations( -1 ), doCulling( CULLING_DEFAULT ), doJacobi( JACOBI_DEFAULT )
 {
-  Instruction::initialize_vertex_byte( mesh_and_domain, settings, err ); MSQ_ERRRTN(err);
-
-  Mesh* mesh = mesh_and_domain->get_mesh();
-
-    // get some global mesh properties
-  SimpleStats edge_len, lambda;
-  std::auto_ptr<MeshUtil> tool(new MeshUtil( mesh, settings ));
-  tool->edge_length_distribution( edge_len, err ); MSQ_ERRRTN(err);
-  tool->lambda_distribution( lambda, err ); MSQ_ERRRTN(err);
-  tool.reset(0);
-
-    // get target metrics from user perferences
-  TSizeNB1 mu_size;
-  TShapeSize2DNB1 mu_shape_2d;
-  TShapeSize3DNB1 mu_shape_3d;
-  TMixed mu_shape( &mu_shape_2d, &mu_shape_3d );
-  std::auto_ptr<TMetric> mu;
-  if (qualityMetric == BETA) {
-    double beta = metricConstant;
-    if (beta < 0)
-      beta = (lambda.average()*lambda.average())/20;
-    //std::cout << "beta= " << beta << std::endl;
-    mu.reset(new TUntangleBeta( beta ));
-  }
-  else {
-    TMetric* sub = 0;
-    if (qualityMetric == SIZE)
-      sub = &mu_size;
-    else
-      sub = &mu_shape;
-    if (metricConstant >= 0)
-      mu.reset(new TUntangleMu( sub, metricConstant ));
-    else
-      mu.reset(new TUntangleMu( sub ));
-  }
-
-    // define objective function
-  IdealShapeTarget base_target;
-  LambdaConstant target( lambda.average(), &base_target );
-  TQualityMetric metric_0(&target, mu.get());
-  ElementPMeanP metric( 1.0, &metric_0 );
-  PMeanPTemplate objfunc( 1.0, &metric );
-
-    // define termination criterion
-  double eps = movementFactor * (edge_len.average() - edge_len.standard_deviation());
-  TerminationCriterion inner("<type:untangle_inner>", TerminationCriterion::TYPE_INNER),
-    outer("<type:untangle_outer>", TerminationCriterion::TYPE_OUTER);
-  outer.add_untangled_mesh();
-  if (doCulling)
-    inner.cull_on_absolute_vertex_movement( eps );
-  else
-    outer.add_absolute_vertex_movement( eps );
-  if (maxTime > 0.0)
-    outer.add_cpu_time( maxTime );
-  inner.add_iteration_limit( NUM_INNER_ITERATIONS );
-  if (maxIterations > 0)
-    outer.add_iteration_limit(maxIterations);
-
-    // construct solver
-  SteepestDescent solver( &objfunc );
-  solver.use_element_on_vertex_patch();
-  solver.set_inner_termination_criterion( &inner );
-  solver.set_outer_termination_criterion( &outer );
-  if (doJacobi)
-    solver.do_jacobi_optimization();
-  else
-    solver.do_gauss_optimization();
-
-    // Run
-  qa->add_quality_assessment( &metric );
-  InstructionQueue q;
-  q.add_quality_assessor( qa, err ); MSQ_ERRRTN(err);
-  q.set_master_quality_improver( &solver, err ); MSQ_ERRRTN(err);
-  q.add_quality_assessor( qa, err ); MSQ_ERRRTN(err);
-  q.run_common( mesh_and_domain, pmesh, settings, err ); MSQ_ERRRTN(err);
 }
 
+UntangleWrapper::UntangleWrapper( UntangleMetric m )
+    : qualityMetric( m ), maxTime( -1 ), movementFactor( DEFAULT_MOVEMENT_FACTOR ), metricConstant( -1 ),
+      maxIterations( -1 ), doCulling( CULLING_DEFAULT ), doJacobi( JACOBI_DEFAULT )
+{
+}
 
-} // namespace MBMesquite
+UntangleWrapper::~UntangleWrapper() {}
+
+void UntangleWrapper::set_untangle_metric( UntangleMetric metric )
+{
+    qualityMetric = metric;
+}
+
+void UntangleWrapper::set_metric_constant( double value )
+{
+    metricConstant = value;
+}
+
+void UntangleWrapper::set_cpu_time_limit( double seconds )
+{
+    maxTime = seconds;
+}
+
+void UntangleWrapper::set_outer_iteration_limit( int maxIt )
+{
+    maxIterations = maxIt;
+}
+
+void UntangleWrapper::set_vertex_movement_limit_factor( double f )
+{
+    movementFactor = f;
+}
+
+void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+                                   QualityAssessor* qa, MsqError& err )
+{
+    Instruction::initialize_vertex_byte( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+
+    Mesh* mesh = mesh_and_domain->get_mesh();
+
+    // get some global mesh properties
+    SimpleStats edge_len, lambda;
+    std::auto_ptr< MeshUtil > tool( new MeshUtil( mesh, settings ) );
+    tool->edge_length_distribution( edge_len, err );MSQ_ERRRTN( err );
+    tool->lambda_distribution( lambda, err );MSQ_ERRRTN( err );
+    tool.reset( 0 );
+
+    // get target metrics from user perferences
+    TSizeNB1 mu_size;
+    TShapeSize2DNB1 mu_shape_2d;
+    TShapeSize3DNB1 mu_shape_3d;
+    TMixed mu_shape( &mu_shape_2d, &mu_shape_3d );
+    std::auto_ptr< TMetric > mu;
+    if( qualityMetric == BETA )
+    {
+        double beta = metricConstant;
+        if( beta < 0 ) beta = ( lambda.average() * lambda.average() ) / 20;
+        // std::cout << "beta= " << beta << std::endl;
+        mu.reset( new TUntangleBeta( beta ) );
+    }
+    else
+    {
+        TMetric* sub = 0;
+        if( qualityMetric == SIZE )
+            sub = &mu_size;
+        else
+            sub = &mu_shape;
+        if( metricConstant >= 0 )
+            mu.reset( new TUntangleMu( sub, metricConstant ) );
+        else
+            mu.reset( new TUntangleMu( sub ) );
+    }
+
+    // define objective function
+    IdealShapeTarget base_target;
+    LambdaConstant target( lambda.average(), &base_target );
+    TQualityMetric metric_0( &target, mu.get() );
+    ElementPMeanP metric( 1.0, &metric_0 );
+    PMeanPTemplate objfunc( 1.0, &metric );
+
+    // define termination criterion
+    double eps = movementFactor * ( edge_len.average() - edge_len.standard_deviation() );
+    TerminationCriterion inner( "<type:untangle_inner>", TerminationCriterion::TYPE_INNER ),
+        outer( "<type:untangle_outer>", TerminationCriterion::TYPE_OUTER );
+    outer.add_untangled_mesh();
+    if( doCulling )
+        inner.cull_on_absolute_vertex_movement( eps );
+    else
+        outer.add_absolute_vertex_movement( eps );
+    if( maxTime > 0.0 ) outer.add_cpu_time( maxTime );
+    inner.add_iteration_limit( NUM_INNER_ITERATIONS );
+    if( maxIterations > 0 ) outer.add_iteration_limit( maxIterations );
+
+    // construct solver
+    SteepestDescent solver( &objfunc );
+    solver.use_element_on_vertex_patch();
+    solver.set_inner_termination_criterion( &inner );
+    solver.set_outer_termination_criterion( &outer );
+    if( doJacobi )
+        solver.do_jacobi_optimization();
+    else
+        solver.do_gauss_optimization();
+
+    // Run
+    qa->add_quality_assessment( &metric );
+    InstructionQueue q;
+    q.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
+    q.set_master_quality_improver( &solver, err );MSQ_ERRRTN( err );
+    q.add_quality_assessor( qa, err );MSQ_ERRRTN( err );
+    q.run_common( mesh_and_domain, pmesh, settings, err );MSQ_ERRRTN( err );
+}
+
+}  // namespace MBMesquite

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file UntangleWrapper.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,92 +35,100 @@
 #include "Mesquite.hpp"
 #include "Wrapper.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Wrapper that implements several TMP-based untanglers */
-class UntangleWrapper : public Wrapper {
+class UntangleWrapper : public Wrapper
+{
 
-public:
+  public:
+    /**\brief Which quality metric to use */
+    enum UntangleMetric
+    {
+        BETA,      //!< Use TMP UntangleBeta metric
+        SIZE,      //!< Use UntangleMu(TargetSize}
+        SHAPESIZE  //!< Use UntangleMu(TargetShapeSize}
+    };
 
-  /**\brief Which quality metric to use */
-  enum UntangleMetric {
-    BETA, //!< Use TMP UntangleBeta metric
-    SIZE, //!< Use UntangleMu(TargetSize}
-    SHAPESIZE //!< Use UntangleMu(TargetShapeSize}
-  };
+    /**\brief Specify which untangle metric to use */
+    MESQUITE_EXPORT
+    void set_untangle_metric( UntangleMetric metric );
 
-  /**\brief Specify which untangle metric to use */
-  MESQUITE_EXPORT
-  void set_untangle_metric( UntangleMetric metric );
+    /**\brief Specify constant value for untangle metric */
+    MESQUITE_EXPORT
+    void set_metric_constant( double value );
 
-  /**\brief Specify constant value for untangle metric */
-  MESQUITE_EXPORT
-  void set_metric_constant( double value );
+    /**\brief Specify timeout after which untangler will exit */
+    MESQUITE_EXPORT
+    void set_cpu_time_limit( double seconds );
 
-  /**\brief Specify timeout after which untangler will exit */
-  MESQUITE_EXPORT
-  void set_cpu_time_limit( double seconds );
+    /**\brief Specify max number of outer iterations after which untangler will exit */
+    MESQUITE_EXPORT
+    void set_outer_iteration_limit( int maxIt );
 
-  /**\brief Specify max number of outer iterations after which untangler will exit */
-  MESQUITE_EXPORT
-  void set_outer_iteration_limit( int maxIt );
+    /**\brief Specify factor by which to minimum distance a vertex must
+     *        move in an iteration to avoid termination of the untangler */
+    MESQUITE_EXPORT
+    void set_vertex_movement_limit_factor( double f );
 
-  /**\brief Specify factor by which to minimum distance a vertex must
-   *        move in an iteration to avoid termination of the untangler */
-  MESQUITE_EXPORT
-  void set_vertex_movement_limit_factor( double f );
+    MESQUITE_EXPORT
+    UntangleWrapper();
 
-  MESQUITE_EXPORT
-  UntangleWrapper();
+    MESQUITE_EXPORT
+    UntangleWrapper( UntangleMetric m );
 
-  MESQUITE_EXPORT
-  UntangleWrapper(UntangleMetric m);
+    MESQUITE_EXPORT
+    ~UntangleWrapper();
 
-  MESQUITE_EXPORT
-  ~UntangleWrapper();
+    /**\brief Check if vertex culling will be used */
+    inline bool is_culling_enabled() const
+    {
+        return doCulling;
+    }
 
-  /**\brief Check if vertex culling will be used */
-  inline bool is_culling_enabled() const
-    { return doCulling; }
+    /**\brief Enable vertex culling */
+    inline void enable_culling( bool yesno )
+    {
+        doCulling = yesno;
+    }
 
-  /**\brief Enable vertex culling */
-  inline void enable_culling( bool yesno )
-    { doCulling = yesno; }
+    /**\brief Check if a Jacobi optimization strategy will be used */
+    inline bool is_jacobi_optimization() const
+    {
+        return doJacobi;
+    }
 
-  /**\brief Check if a Jacobi optimization strategy will be used */
-  inline bool is_jacobi_optimization() const
-    { return doJacobi; }
+    /**\brief Check if a Gauss optimization strategy will be used */
+    inline bool is_gauss_optimization() const
+    {
+        return !doJacobi;
+    }
 
-  /**\brief Check if a Gauss optimization strategy will be used */
-  inline bool is_gauss_optimization() const
-    { return !doJacobi; }
+    /**\brief Use a Jacobi optimization strategy */
+    inline void do_jacobi_optimization()
+    {
+        doJacobi = true;
+    }
 
-  /**\brief Use a Jacobi optimization strategy */
-  inline void do_jacobi_optimization()
-    { doJacobi = true; }
+    /**\brief Use a Gauss optimization strategy */
+    inline void do_gauss_optimization()
+    {
+        doJacobi = false;
+    }
 
-  /**\brief Use a Gauss optimization strategy */
-  inline void do_gauss_optimization()
-    { doJacobi = false; }
+  protected:
+    MESQUITE_EXPORT
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+                      MsqError& err );
 
-protected:
-
-  MESQUITE_EXPORT
-  void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                    ParallelMesh* pmesh,
-                    Settings* settings,
-                    QualityAssessor* qa,
-                    MsqError& err );
-
-private:
-
-  UntangleMetric qualityMetric;
-  double maxTime, movementFactor, metricConstant;
-  int maxIterations;
-  bool doCulling, doJacobi;
+  private:
+    UntangleMetric qualityMetric;
+    double maxTime, movementFactor, metricConstant;
+    int maxIterations;
+    bool doCulling, doJacobi;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

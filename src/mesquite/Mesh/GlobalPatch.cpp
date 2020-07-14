@@ -37,30 +37,28 @@
 #include "MsqError.hpp"
 #include <assert.h>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 const PatchSet::PatchHandle GLOBAL_PATCH_HANDLE = 0;
 
 GlobalPatch::~GlobalPatch() {}
 
-void GlobalPatch::get_patch_handles( std::vector<PatchHandle>& patch_handles_out,
-                                     MsqError& )
+void GlobalPatch::get_patch_handles( std::vector< PatchHandle >& patch_handles_out, MsqError& )
 {
-  patch_handles_out.resize(1);
-  patch_handles_out[0] = GLOBAL_PATCH_HANDLE;
+    patch_handles_out.resize( 1 );
+    patch_handles_out[0] = GLOBAL_PATCH_HANDLE;
 }
 
-void GlobalPatch::get_patch( PatchHandle patch_handle,
-                             std::vector<Mesh::ElementHandle>& elem_handles_out,
-                             std::vector<Mesh::VertexHandle>& free_vertices_out,
-                             MsqError& err )
+void GlobalPatch::get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
+                             std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err )
 {
-  free_vertices_out.clear();
-  assert(GLOBAL_PATCH_HANDLE == patch_handle);
-  get_mesh()->get_all_elements( elem_handles_out, err ); MSQ_ERRRTN(err);
-  //get_mesh()->get_all_vertices( free_vertices_out, err ); MSQ_ERRRTN(err);
+    free_vertices_out.clear();
+    assert( GLOBAL_PATCH_HANDLE == patch_handle );
+    get_mesh()->get_all_elements( elem_handles_out, err );MSQ_ERRRTN( err );
+    // get_mesh()->get_all_vertices( free_vertices_out, err ); MSQ_ERRRTN(err);
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

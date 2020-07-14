@@ -31,7 +31,8 @@
 
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class Mesh;
 class ParallelMesh;
@@ -44,44 +45,33 @@ class Settings;
 class MESQUITE_EXPORT Instruction
 {
   public:
-
     virtual ~Instruction();
 
-      //! Called for all instructions in queue before loop_over_mesh
-      //! is called for any insetruction in queue.  Default behavior
-      //! is to do nothing.
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
-                                   MsqError& err ) = 0;
+    //! Called for all instructions in queue before loop_over_mesh
+    //! is called for any insetruction in queue.  Default behavior
+    //! is to do nothing.
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err ) = 0;
 
-      //! Virtual fuction implementing primary functionaliy of
-      //! instruction instance.
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
-                                   MsqError& err ) = 0;
+    //! Virtual fuction implementing primary functionaliy of
+    //! instruction instance.
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err ) = 0;
 
-      //! Virtual fuction implementing primary functionaliy of
-      //! instruction instance for parallel mesh.
-    virtual double loop_over_mesh( ParallelMesh* mesh,
-                                   MeshDomain* domain,
-                                   const Settings* settings,
-                                   MsqError& err );
+    //! Virtual fuction implementing primary functionaliy of
+    //! instruction instance for parallel mesh.
+    virtual double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings, MsqError& err );
 
-      //! Get string name for use in diagnostic and status output
+    //! Get string name for use in diagnostic and status output
     virtual std::string get_name() const = 0;
 
-      //! Using data from query methods in MeshInterface or calculating
-      //! as necessary depending on values in Settings, initialize
-      //! MSQ_HARD_FIXED and MSQ_SLAVED flags on vertices, and clear
-      //! MSQ_CULLED flag on all vertices.
-      //! \NOTE SLAVE_ALL setting is handled in PatchData rather than here
-      //! for efficiency.
-    static
-    void initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain,
-                                 const Settings* settings,
-                                 MsqError& err );
+    //! Using data from query methods in MeshInterface or calculating
+    //! as necessary depending on values in Settings, initialize
+    //! MSQ_HARD_FIXED and MSQ_SLAVED flags on vertices, and clear
+    //! MSQ_CULLED flag on all vertices.
+    //! \NOTE SLAVE_ALL setting is handled in PatchData rather than here
+    //! for efficiency.
+    static void initialize_vertex_byte( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

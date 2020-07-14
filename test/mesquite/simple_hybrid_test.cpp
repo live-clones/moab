@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -68,72 +69,74 @@ using namespace MBMesquite;
 
 int main()
 {
-  MBMesquite::MeshImpl mesh;
-  MsqPrintError err(cout);
-    //create geometry: plane z=0, normal (0,0,1)
-  Vector3D pnt(0,0,0);
-  Vector3D s_norm(0,0,1);
-  MBMesquite::PlanarDomain msq_geom(s_norm, pnt);
+    MBMesquite::MeshImpl mesh;
+    MsqPrintError err( cout );
+    // create geometry: plane z=0, normal (0,0,1)
+    Vector3D pnt( 0, 0, 0 );
+    Vector3D s_norm( 0, 0, 1 );
+    MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
-  std::string default_file_name = TestDir + "/2D/vtk/mixed/untangled/hybrid_3quad_1tri.vtk";
-  mesh.read_vtk(default_file_name.c_str(), err);
-  if (err) return 1;
+    std::string default_file_name = TestDir + "/2D/vtk/mixed/untangled/hybrid_3quad_1tri.vtk";
+    mesh.read_vtk( default_file_name.c_str(), err );
+    if( err ) return 1;
 
     // creates an intruction queue
-  InstructionQueue queue1;
+    InstructionQueue queue1;
 
     // creates a mean ratio quality metric ...
-  IdealWeightInverseMeanRatio mean_ratio(err);
-  if (err) return 1;
+    IdealWeightInverseMeanRatio mean_ratio( err );
+    if( err ) return 1;
     //   mean_ratio->set_gradient_type(QualityMetric::NUMERICAL_GRADIENT);
     //   mean_ratio->set_hessian_type(QualityMetric::NUMERICAL_HESSIAN);
-    //mean_ratio->set_averaging_method(QualityMetric::SUM, err);
-    //MSQ_CHKERR(err);
+    // mean_ratio->set_averaging_method(QualityMetric::SUM, err);
+    // MSQ_CHKERR(err);
 
     // ... and builds an objective function with it
-  LPtoPTemplate obj_func(&mean_ratio, 2, err);
-  if (err) return 1;;
+    LPtoPTemplate obj_func( &mean_ratio, 2, err );
+    if( err ) return 1;
+    ;
 
     // creates the steepest descent, feas newt optimization procedures
-    //ConjugateGradient* pass1 = new ConjugateGradient( &obj_func, err );
-  SteepestDescent pass1( &obj_func );
-  pass1.use_global_patch();
-  if (err) return 1;;
+    // ConjugateGradient* pass1 = new ConjugateGradient( &obj_func, err );
+    SteepestDescent pass1( &obj_func );
+    pass1.use_global_patch();
+    if( err ) return 1;
+    ;
 
-  QualityAssessor qa=QualityAssessor(&mean_ratio);
-  if (err) return 1;;
+    QualityAssessor qa = QualityAssessor( &mean_ratio );
+    if( err ) return 1;
+    ;
 
     // **************Set termination criterion****************
-  TerminationCriterion tc_inner;
-  tc_inner.add_iteration_limit( 1 );
+    TerminationCriterion tc_inner;
+    tc_inner.add_iteration_limit( 1 );
     //_inner.add_absolute_quality_improvement( OF_value );
-    //tc_inner.add_absolute_gradient_L2_norm( OF_value );
-  TerminationCriterion tc_outer;
-    //tc_outer.add_iteration_limit( 1 );
-  tc_outer.add_iteration_limit( 1 );
+    // tc_inner.add_absolute_gradient_L2_norm( OF_value );
+    TerminationCriterion tc_outer;
+    // tc_outer.add_iteration_limit( 1 );
+    tc_outer.add_iteration_limit( 1 );
 
-  pass1.set_inner_termination_criterion(&tc_inner);
-  pass1.set_outer_termination_criterion(&tc_outer);
+    pass1.set_inner_termination_criterion( &tc_inner );
+    pass1.set_outer_termination_criterion( &tc_outer );
 
-  queue1.add_quality_assessor(&qa,err);
-  if (err) return 1;
+    queue1.add_quality_assessor( &qa, err );
+    if( err ) return 1;
     // adds 1 pass of pass1 to mesh_set1
-  queue1.set_master_quality_improver(&pass1, err);
-  if (err) return 1;
-  queue1.add_quality_assessor(&qa,err);
-  if (err) return 1;
-  mesh.write_vtk("original_mesh.vtk",err);
-  if (err) return 1;
+    queue1.set_master_quality_improver( &pass1, err );
+    if( err ) return 1;
+    queue1.add_quality_assessor( &qa, err );
+    if( err ) return 1;
+    mesh.write_vtk( "original_mesh.vtk", err );
+    if( err ) return 1;
 
-  MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(&mesh, &msq_geom);
-  queue1.run_instructions(&mesh_and_domain, err);
-  if (err) return 1;
-  mesh.write_vtk("smoothed_mesh.vtk",err);
-  if (err) return 1;
-    //std::cout<<"\n\nNow running the shape wrapper.\n=n";
-    //ShapeImprovementWrapper wrap(100);
-    //wrap.run_instructions(mesh_set1, err); MSQ_CHKERR(err);
-  print_timing_diagnostics(cout);
-  return 0;
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
+    queue1.run_instructions( &mesh_and_domain, err );
+    if( err ) return 1;
+    mesh.write_vtk( "smoothed_mesh.vtk", err );
+    if( err ) return 1;
+    // std::cout<<"\n\nNow running the shape wrapper.\n=n";
+    // ShapeImprovementWrapper wrap(100);
+    // wrap.run_instructions(mesh_set1, err); MSQ_CHKERR(err);
+    print_timing_diagnostics( cout );
+    return 0;
 }
-

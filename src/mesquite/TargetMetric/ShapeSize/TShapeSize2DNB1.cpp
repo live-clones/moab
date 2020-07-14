@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TShapeSize2DNB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,10 +36,13 @@
 
 #include <iostream>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string TShapeSize2DNB1::get_name() const
-  { return "TShapeSize2DNB1"; }
+{
+    return "TShapeSize2DNB1";
+}
 
 TShapeSize2DNB1::~TShapeSize2DNB1() {}
 
@@ -48,94 +50,89 @@ TShapeSize2DNB1::~TShapeSize2DNB1() {}
  *  \f$ \psi(T) = \sqrt{|T|^2 + 2 \tau} \f$
  *  \f$ \tau = det(T) \f$
  */
-bool TShapeSize2DNB1::evaluate( const MsqMatrix<2,2>& T,
-                                double& result,
-                                MsqError& /*err*/ )
+bool TShapeSize2DNB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& /*err*/ )
 {
-  double frob_sqr = sqr_Frobenius(T);
-  double psi = sqrt( frob_sqr + 2.0*det(T) );
+    double frob_sqr = sqr_Frobenius( T );
+    double psi      = sqrt( frob_sqr + 2.0 * det( T ) );
 
-  MsqMatrix<2,2> Tdelta(T);
-  while (fabs(psi) < DBL_EPSILON) {
-    Tdelta(0,0) += 1e-12;
-    Tdelta(1,1) += 1e-12;
-    frob_sqr = sqr_Frobenius(Tdelta);
-    psi = sqrt( frob_sqr + 2.0*det(Tdelta) );
-  }
+    MsqMatrix< 2, 2 > Tdelta( T );
+    while( fabs( psi ) < DBL_EPSILON )
+    {
+        Tdelta( 0, 0 ) += 1e-12;
+        Tdelta( 1, 1 ) += 1e-12;
+        frob_sqr = sqr_Frobenius( Tdelta );
+        psi      = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
+    }
 
-  result = frob_sqr - 2.0 * psi + 2.0;
-  return true;
+    result = frob_sqr - 2.0 * psi + 2.0;
+    return true;
 }
 
-
-bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix<2,2>& T,
-                                          double& result,
-                                          MsqMatrix<2,2>& deriv_wrt_T,
+bool TShapeSize2DNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
                                           MsqError& /*err*/ )
 {
-  double frob_sqr = sqr_Frobenius(T);
-  double psi = sqrt( frob_sqr + 2.0*det(T) );
+    double frob_sqr = sqr_Frobenius( T );
+    double psi      = sqrt( frob_sqr + 2.0 * det( T ) );
 
-  MsqMatrix<2,2> Tdelta(T);
-  while (fabs(psi) < DBL_EPSILON) {
-    Tdelta(0,0) += 1e-12;
-    Tdelta(1,1) += 1e-12;
-    frob_sqr = sqr_Frobenius(Tdelta);
-    psi = sqrt( frob_sqr + 2.0*det(Tdelta) );
-  }
+    MsqMatrix< 2, 2 > Tdelta( T );
+    while( fabs( psi ) < DBL_EPSILON )
+    {
+        Tdelta( 0, 0 ) += 1e-12;
+        Tdelta( 1, 1 ) += 1e-12;
+        frob_sqr = sqr_Frobenius( Tdelta );
+        psi      = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
+    }
 
-  result = frob_sqr - 2.0 * psi + 2.0;
+    result = frob_sqr - 2.0 * psi + 2.0;
 
-  deriv_wrt_T = T;
-  if (psi > 1e-50)
-  {
-    deriv_wrt_T *= (1.0 - 1.0/psi);
-    deriv_wrt_T -= 1.0/psi * transpose_adj(T);
-    deriv_wrt_T *= 2;
-  }
-  else
-  {
-    std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_grad()" << std::endl;
-  }
+    deriv_wrt_T = T;
+    if( psi > 1e-50 )
+    {
+        deriv_wrt_T *= ( 1.0 - 1.0 / psi );
+        deriv_wrt_T -= 1.0 / psi * transpose_adj( T );
+        deriv_wrt_T *= 2;
+    }
+    else
+    {
+        std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_grad()" << std::endl;
+    }
 
-  return true;
+    return true;
 }
 
-bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix<2,2>& T,
-                                          double& result,
-                                          MsqMatrix<2,2>& deriv_wrt_T,
-                                          MsqMatrix<2,2> second[3],
-                                          MsqError& /*err*/ )
+bool TShapeSize2DNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                          MsqMatrix< 2, 2 > second[3], MsqError& /*err*/ )
 {
-  double frob_sqr = sqr_Frobenius(T);
-  double psi = sqrt( frob_sqr + 2.0*det(T) );
+    double frob_sqr = sqr_Frobenius( T );
+    double psi      = sqrt( frob_sqr + 2.0 * det( T ) );
 
-  MsqMatrix<2,2> Tdelta(T);
-  while (fabs(psi) < DBL_EPSILON) {
-    Tdelta(0,0) += 1e-12;
-    Tdelta(1,1) += 1e-12;
-    frob_sqr = sqr_Frobenius(Tdelta);
-    psi = sqrt( frob_sqr + 2.0*det(Tdelta) );
-  }
+    MsqMatrix< 2, 2 > Tdelta( T );
+    while( fabs( psi ) < DBL_EPSILON )
+    {
+        Tdelta( 0, 0 ) += 1e-12;
+        Tdelta( 1, 1 ) += 1e-12;
+        frob_sqr = sqr_Frobenius( Tdelta );
+        psi      = sqrt( frob_sqr + 2.0 * det( Tdelta ) );
+    }
 
-  result = frob_sqr - 2.0 * psi + 2.0;
+    result = frob_sqr - 2.0 * psi + 2.0;
 
-  deriv_wrt_T = T;
-  if (psi > 1e-50)
-  {
-    deriv_wrt_T *= (1.0 - 1.0/psi);
-    deriv_wrt_T -= 1.0/psi * transpose_adj(T);
-    deriv_wrt_T *= 2;
-  }
-  else
-  {
-    std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_hess()" << std::endl;
-  }
+    deriv_wrt_T = T;
+    if( psi > 1e-50 )
+    {
+        deriv_wrt_T *= ( 1.0 - 1.0 / psi );
+        deriv_wrt_T -= 1.0 / psi * transpose_adj( T );
+        deriv_wrt_T *= 2;
+    }
+    else
+    {
+        std::cout << "Warning: Division by zero avoided in TShapeSize2DNB2::evaluate_with_hess()" << std::endl;
+    }
 
-  set_scaled_2nd_deriv_wrt_psi( second, -2.0, psi, T );
-  pluseq_scaled_I( second, 2 );
+    set_scaled_2nd_deriv_wrt_psi( second, -2.0, psi, T );
+    pluseq_scaled_I( second, 2 );
 
-  return true;
+    return true;
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

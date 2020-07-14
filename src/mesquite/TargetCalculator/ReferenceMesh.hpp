@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ReferenceMesh.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "MsqVertex.hpp"
 #include "MeshInterface.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class Mesh;
 
@@ -50,34 +50,28 @@ class Mesh;
  */
 class MESQUITE_EXPORT ReferenceMeshInterface
 {
-public:
-  virtual ~ReferenceMeshInterface();
+  public:
+    virtual ~ReferenceMeshInterface();
 
-  virtual void get_reference_vertex_coordinates(
-                           const Mesh::VertexHandle* vertices,
-                           size_t num_vertices,
-                           Vector3D* coordinates_out,
-                           MsqError& err ) = 0;
+    virtual void get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices, size_t num_vertices,
+                                                   Vector3D* coordinates_out, MsqError& err ) = 0;
 };
 
 class ReferenceMesh : public ReferenceMeshInterface
 {
-public:
-  MESQUITE_EXPORT ReferenceMesh( Mesh* mesh ) : mMesh(mesh) {}
-  MESQUITE_EXPORT virtual ~ReferenceMesh();
+  public:
+    MESQUITE_EXPORT ReferenceMesh( Mesh* mesh ) : mMesh( mesh ) {}
+    MESQUITE_EXPORT virtual ~ReferenceMesh();
 
-  MESQUITE_EXPORT virtual
-  void get_reference_vertex_coordinates(
-                           const Mesh::VertexHandle* vertices,
-                           size_t num_vertices,
-                           Vector3D* coordinates_out,
-                           MsqError& err );
-private:
-  Mesh* mMesh;
-  std::vector<MsqVertex> tmpStorage;
+    MESQUITE_EXPORT virtual void get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices,
+                                                                   size_t num_vertices, Vector3D* coordinates_out,
+                                                                   MsqError& err );
+
+  private:
+    Mesh* mMesh;
+    std::vector< MsqVertex > tmpStorage;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

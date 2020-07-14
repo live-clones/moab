@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWMetricBarrier.hpp
  *  \brief
  *  \author Boyd Tidwell
@@ -37,14 +36,17 @@
 #include "AWMetric.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-static const std::string& barrier_violated_msg_aw = " Barrier of barrier metric has been violated due to negative volume.\n \
+static const std::string& barrier_violated_msg_aw =
+    " Barrier of barrier metric has been violated due to negative volume.\n \
   Hint: If your initial mesh is tangled, you must use a non-Barrier metric.\n \
         If a Barrier metric is used, you can only use untangled initial meshes.\n";
 
 class MsqError;
-template <unsigned R, unsigned C> class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 /**\brief A metric for comparing a matrix A with a target matrix W
  *
@@ -52,53 +54,46 @@ template <unsigned R, unsigned C> class MsqMatrix;
  */
 class AWMetricBarrier : public AWMetric
 {
-public:
-  MESQUITE_EXPORT virtual
-  ~AWMetricBarrier();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetricBarrier();
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const {return "AWMetricBarrier";}
+    MESQUITE_EXPORT virtual std::string get_name() const
+    {
+        return "AWMetricBarrier";
+    }
 
-  static inline bool invalid_determinant( double d )
-    { return d < 1e-12; }
+    static inline bool invalid_determinant( double d )
+    {
+        return d < 1e-12;
+    }
 };
 
 class AWMetricBarrier2D : public AWMetricBarrier
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~AWMetricBarrier2D();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetricBarrier2D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
      * This method always returns an error for 2D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                           MsqError& err );
 };
 
 class AWMetricBarrier3D : public AWMetricBarrier
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~AWMetricBarrier3D();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetricBarrier3D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
      * This method always returns an error for 3D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

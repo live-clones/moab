@@ -42,11 +42,11 @@
 namespace MBMesquite
 {
 
-  int get_parallel_rank();
-  int get_parallel_size();
-  double reduce_parallel_max(double value);
-  void parallel_barrier();
+int get_parallel_rank();
+int get_parallel_size();
+double reduce_parallel_max( double value );
+void parallel_barrier();
 
-} // namespace
+}  // namespace MBMesquite
 
-#endif // Mesquite_ParallelHelperNoMPIStub_hpp
+#endif  // Mesquite_ParallelHelperNoMPIStub_hpp

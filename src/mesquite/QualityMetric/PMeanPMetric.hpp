@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file PMeanPMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -41,7 +40,8 @@
 
 #include <vector>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class PatchData;
 class MsqError;
@@ -50,64 +50,43 @@ class QualityMetric;
 class PMeanPMetric
 {
   public:
+    PMeanPMetric( double p ) : P( p ), P1( p - 1.0 ), P2( p - 2.0 ) {}
 
-    PMeanPMetric( double p )
-      : P(p), P1(p-1.0), P2(p-2.0) {}
-
-    const Exponent& get_power() const { return P; }
+    const Exponent& get_power() const
+    {
+        return P;
+    }
 
   protected:
+    bool average( PatchData& pd, QualityMetric* qm, const std::vector< size_t >& qm_handles, double& value, MsqError& );
 
-    bool average( PatchData& pd,
-                  QualityMetric* qm,
-                  const std::vector<size_t>& qm_handles,
-                  double& value,
-                  MsqError& );
+    bool average_with_indices( PatchData& pd, QualityMetric* qm, const std::vector< size_t >& qm_handles, double& value,
+                               std::vector< size_t >& indices, MsqError& err );
 
-    bool average_with_indices( PatchData& pd,
-                               QualityMetric* qm,
-                               const std::vector<size_t>& qm_handles,
-                               double& value,
-                               std::vector<size_t>& indices,
-                               MsqError& err );
-
-    bool average_with_gradient( PatchData& pd,
-                                QualityMetric* qm,
-                                const std::vector<size_t>& qm_handles,
-                                double& value,
-                                std::vector<size_t>& indices,
-                                std::vector<Vector3D>& gradient,
+    bool average_with_gradient( PatchData& pd, QualityMetric* qm, const std::vector< size_t >& qm_handles,
+                                double& value, std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
                                 MsqError& err );
 
-    bool average_with_Hessian_diagonal( PatchData& pd,
-                                        QualityMetric* metric,
-                                        const std::vector<size_t>& qm_handles,
-                                        double& value,
-                                        std::vector<size_t>& indices,
-                                        std::vector<Vector3D>& gradient,
-                                        std::vector<SymMatrix3D>& Hessian_diagonal,
+    bool average_with_Hessian_diagonal( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
+                                        double& value, std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& gradient, std::vector< SymMatrix3D >& Hessian_diagonal,
                                         MsqError& err );
 
-    bool average_with_Hessian( PatchData& pd,
-                               QualityMetric* metric,
-                               const std::vector<size_t>& qm_handles,
-                               double& value,
-                               std::vector<size_t>& indices,
-                               std::vector<Vector3D>& gradient,
-                               std::vector<Matrix3D>& Hessian,
-                               MsqError& err );
-  private:
+    bool average_with_Hessian( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
+                               double& value, std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                               std::vector< Matrix3D >& Hessian, MsqError& err );
 
+  private:
     Exponent P;
     Exponent P1;
     Exponent P2;
-    std::vector<size_t> mIndices, mOffsets;
-    std::vector<Vector3D> mGrad;
-    std::vector<Matrix3D> mHess;
-    std::vector<SymMatrix3D> mDiag;
-    std::vector<double> mValues;
+    std::vector< size_t > mIndices, mOffsets;
+    std::vector< Vector3D > mGrad;
+    std::vector< Matrix3D > mHess;
+    std::vector< SymMatrix3D > mDiag;
+    std::vector< double > mValues;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

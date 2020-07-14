@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ElementMaxQM.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,54 +36,52 @@
 #include "PatchData.hpp"
 #include <limits>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-ElementMaxQM::ElementMaxQM( ElemSampleQM* metric )
-    : mMetric(metric)
-    {}
+ElementMaxQM::ElementMaxQM( ElemSampleQM* metric ) : mMetric( metric ) {}
 
 ElementMaxQM::~ElementMaxQM() {}
 
 std::string ElementMaxQM::get_name() const
 {
-  std::string result("ElementMaxQM(");
-  result += mMetric->get_name();
-  result += ")";
-  return result;
+    std::string result( "ElementMaxQM(" );
+    result += mMetric->get_name();
+    result += ")";
+    return result;
 }
-
 
 int ElementMaxQM::get_negate_flag() const
 {
-  return get_quality_metric()->get_negate_flag();
+    return get_quality_metric()->get_negate_flag();
 }
 
-bool ElementMaxQM::evaluate( PatchData& pd,
-                              size_t handle,
-                              double& value,
-                              MsqError& err )
+bool ElementMaxQM::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  qm->get_element_evaluations( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
+    ElemSampleQM* qm = get_quality_metric();
+    mHandles.clear();
+    qm->get_element_evaluations( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
 
-  bool valid = true;
-  double tmpval;
-  bool tmpvalid;
+    bool valid = true;
+    double tmpval;
+    bool tmpvalid;
 
-  value = -1.e+100; // initialize max computation
-  for (std::vector<size_t>::iterator h = mHandles.begin(); h != mHandles.end(); ++h) {
-    tmpvalid = qm->evaluate( pd, *h, tmpval, err );  // MSQ_ERRZERO(err);
-    if (!tmpvalid)
+    value = -1.e+100;  // initialize max computation
+    for( std::vector< size_t >::iterator h = mHandles.begin(); h != mHandles.end(); ++h )
     {
-      value = +1.e+100;
-      return false;   // if any handle within the element makes tmpvalid false, then valid is false, no matter what the other handles say
+        tmpvalid = qm->evaluate( pd, *h, tmpval, err );  // MSQ_ERRZERO(err);
+        if( !tmpvalid )
+        {
+            value = +1.e+100;
+            return false;  // if any handle within the element makes tmpvalid false, then valid is
+                           // false, no matter what the other handles say
+        }
+        else if( tmpval > value )
+            value = tmpval;
     }
-    else if (tmpval > value)
-      value = tmpval;
-  }
 
-  return valid;
+    return valid;
 }
 /*
 bool ElementMaxQM::evaluate_with_gradient( PatchData& pd,
@@ -145,4 +142,4 @@ bool ElementMaxQM::evaluate_with_gradient( PatchData& pd,
 }
 */
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file CompositeOFMultiply.hpp
 
@@ -33,7 +34,6 @@ Header file for the MBMesquite:: CompositeOFMultiply class
   \author Michael Brewer
   \date   2002-05-23
  */
-
 
 #ifndef CompositeOFMultiply_hpp
 #define CompositeOFMultiply_hpp
@@ -44,83 +44,64 @@ Header file for the MBMesquite:: CompositeOFMultiply class
 
 namespace MBMesquite
 {
-   /*!\class CompositeOFMultiply
-       \brief Multiplies two ObjectiveFunction values together.
-     */
-   class MsqMeshEntity;
-   class PatchData;
-   class CompositeOFMultiply : public ObjectiveFunction
-   {
-   public:
-	 MESQUITE_EXPORT
-     CompositeOFMultiply(ObjectiveFunction*, ObjectiveFunction*,
-                         bool delete_OFs = false);
-	 MESQUITE_EXPORT
-     virtual ~CompositeOFMultiply();
+/*!\class CompositeOFMultiply
+    \brief Multiplies two ObjectiveFunction values together.
+  */
+class MsqMeshEntity;
+class PatchData;
+class CompositeOFMultiply : public ObjectiveFunction
+{
+  public:
+    MESQUITE_EXPORT
+    CompositeOFMultiply( ObjectiveFunction*, ObjectiveFunction*, bool delete_OFs = false );
+    MESQUITE_EXPORT
+    virtual ~CompositeOFMultiply();
 
-      //!\brief Called at start of instruction queue processing
-      //!
-      //! Do any preliminary global initialization, consistency checking,
-      //! etc.
-	 MESQUITE_EXPORT
-     virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                    const Settings* settings,
-                                    MsqError& err );
+    //!\brief Called at start of instruction queue processing
+    //!
+    //! Do any preliminary global initialization, consistency checking,
+    //! etc.
+    MESQUITE_EXPORT
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-	 MESQUITE_EXPORT
-     virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                       const Settings* settings,
-                                                       PatchSet* user_set,
-                                                       MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                      PatchSet* user_set, MsqError& err );
 
-	 MESQUITE_EXPORT
-     virtual bool evaluate( EvalType type,
-                            PatchData& pd,
-                            double& value_out,
-                            bool free,
-                            MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
-	 MESQUITE_EXPORT
-     virtual bool evaluate_with_gradient( EvalType type,
-                                          PatchData& pd,
-                                          double& value_out,
-                                          std::vector<Vector3D>& grad_out,
-                                          MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                         std::vector< Vector3D >& grad_out, MsqError& err );
 
-	 MESQUITE_EXPORT
-     virtual bool evaluate_with_Hessian_diagonal( EvalType type,
-                                        PatchData& pd,
-                                        double& value_out,
-                                        std::vector<Vector3D>& grad_out,
-                                        std::vector<SymMatrix3D>& hess_diag_out,
-                                        MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+                                                 std::vector< Vector3D >& grad_out,
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
-	 MESQUITE_EXPORT
-     virtual bool evaluate_with_Hessian( EvalType type,
-                                         PatchData& pd,
-                                         double& value_out,
-                                         std::vector<Vector3D>& grad_out,
-                                         MsqHessian& Hessian_out,
-                                         MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
-	 MESQUITE_EXPORT
-     virtual ObjectiveFunction* clone() const;
+    MESQUITE_EXPORT
+    virtual ObjectiveFunction* clone() const;
 
-	 MESQUITE_EXPORT
-     virtual void clear();
+    MESQUITE_EXPORT
+    virtual void clear();
 
-	 MESQUITE_EXPORT
-     virtual int min_patch_layers() const;
+    MESQUITE_EXPORT
+    virtual int min_patch_layers() const;
 
-	private:
-     /** Temporary storage for gradient */
-     mutable std::vector<Vector3D> mGradient;
-     /** Temporary storage for hessian diagonal */
-     mutable std::vector<SymMatrix3D> mDiagonal;
+  private:
+    /** Temporary storage for gradient */
+    mutable std::vector< Vector3D > mGradient;
+    /** Temporary storage for hessian diagonal */
+    mutable std::vector< SymMatrix3D > mDiagonal;
 
-     ObjectiveFunction* objFunc1;
-     ObjectiveFunction* objFunc2;
-     bool deleteObjFuncs;
-   };
-}//namespace
-#endif //  CompositeOFMultiply_hpp
+    ObjectiveFunction* objFunc1;
+    ObjectiveFunction* objFunc2;
+    bool deleteObjFuncs;
+};
+}  // namespace MBMesquite
+#endif  //  CompositeOFMultiply_hpp

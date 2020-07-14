@@ -3,12 +3,12 @@
 
 #include "moab/MOABConfig.h"
 
-#if defined(MOAB_FC_FUNC_)
+#if defined( MOAB_FC_FUNC_ )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
+#elif defined( MOAB_FC_FUNC )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define ITAPS_FC_WRAPPER(name,NAME) name
+#define ITAPS_FC_WRAPPER( name, NAME ) name
 #endif
 
 #define FBiGeom_getDescription ITAPS_FC_WRAPPER( fbigeom_getdescription, FBIGEOM_GETDESCRIPTION )
@@ -31,7 +31,8 @@
 #define FBiGeom_isArrAdj ITAPS_FC_WRAPPER( fbigeom_isarradj, FBIGEOM_ISARRADJ )
 #define FBiGeom_getTopoLevel ITAPS_FC_WRAPPER( fbigeom_gettopolevel, FBIGEOM_GETTOPOLEVEL )
 #define FBiGeom_getEntClosestPt ITAPS_FC_WRAPPER( fbigeom_getentclosestpt, FBIGEOM_GETENTCLOSESTPT )
-#define FBiGeom_getEntClosestPtTrimmed ITAPS_FC_WRAPPER( fbigeom_getentclosestpttrimmed, FBIGEOM_GETENTCLOSESTPTTRIMMED )
+#define FBiGeom_getEntClosestPtTrimmed \
+    ITAPS_FC_WRAPPER( fbigeom_getentclosestpttrimmed, FBIGEOM_GETENTCLOSESTPTTRIMMED )
 #define FBiGeom_getArrClosestPt ITAPS_FC_WRAPPER( fbigeom_getarrclosestpt, FBIGEOM_GETARRCLOSESTPT )
 #define FBiGeom_getEntNrmlXYZ ITAPS_FC_WRAPPER( fbigeom_getentnrmlxyz, FBIGEOM_GETENTNRMLXYZ )
 #define FBiGeom_getArrNrmlXYZ ITAPS_FC_WRAPPER( fbigeom_getarrnrmlxyz, FBIGEOM_GETARRNRMLXYZ )

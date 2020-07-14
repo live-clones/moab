@@ -39,97 +39,110 @@
 
 namespace MBMesquite
 {
-    /*!
-      \class MsqVertex
-      \brief MsqVertex is the Mesquite object that stores information about
-      the vertices in the mesh.
+/*!
+  \class MsqVertex
+  \brief MsqVertex is the Mesquite object that stores information about
+  the vertices in the mesh.
 
-      This class has no virtual destructor for performance reasons.
-      !!! Make sure NOT to delete a MsqVertex object from a pointer
-          to Vector3D !!!
-    */
-  class MESQUITE_EXPORT MsqVertex : public Vector3D
-   {
-   public:
-       //!Construct vertex using three doubles.
-     MsqVertex(double p_x, double p_y, double p_z)
-       : Vector3D(p_x, p_y, p_z), vertexBitFlags(0)
-       {}
+  This class has no virtual destructor for performance reasons.
+  !!! Make sure NOT to delete a MsqVertex object from a pointer
+      to Vector3D !!!
+*/
+class MESQUITE_EXPORT MsqVertex : public Vector3D
+{
+  public:
+    //! Construct vertex using three doubles.
+    MsqVertex( double p_x, double p_y, double p_z ) : Vector3D( p_x, p_y, p_z ), vertexBitFlags( 0 ) {}
 
-       //!Construct vertex using Vector3D.
-     MsqVertex(const Vector3D &vec)
-       : Vector3D(vec), vertexBitFlags(0)
-       {}
+    //! Construct vertex using Vector3D.
+    MsqVertex( const Vector3D& vec ) : Vector3D( vec ), vertexBitFlags( 0 ) {}
 
-       //!Construct default vertex with coordinates (0.0,0.0,0.0)
-     MsqVertex()
-       : Vector3D(0,0,0), vertexBitFlags(0)
-       {}
+    //! Construct default vertex with coordinates (0.0,0.0,0.0)
+    MsqVertex() : Vector3D( 0, 0, 0 ), vertexBitFlags( 0 ) {}
 
-       //!Construct default vertex with coordinates (0.0,0.0,0.0)
-     MsqVertex(const MsqVertex& rhs)
-       : Vector3D(rhs), vertexBitFlags(rhs.vertexBitFlags)
-       {}
+    //! Construct default vertex with coordinates (0.0,0.0,0.0)
+    MsqVertex( const MsqVertex& rhs ) : Vector3D( rhs ), vertexBitFlags( rhs.vertexBitFlags ) {}
 
-       //! Initializes with coordinates. Sets tag data/pointer to 0.
-     MsqVertex& operator=(const Vector3D& rhs)
-       { Vector3D::operator=(rhs);
-         return *this; }
+    //! Initializes with coordinates. Sets tag data/pointer to 0.
+    MsqVertex& operator=( const Vector3D& rhs )
+    {
+        Vector3D::operator=( rhs );
+        return *this;
+    }
 
-       // This allows for 8 flag bits.
-       // I don't think we'll want more than that (yet).
-     typedef unsigned char FlagMask;
+    // This allows for 8 flag bits.
+    // I don't think we'll want more than that (yet).
+    typedef unsigned char FlagMask;
 
-       //! \enum FlagMaskID
-       //!   Those are the available flags... currently only return
-       //!   is_free.
-       //!   Developers: The values used in that enum are used by a bitset,
-       //!               so they have to be 2-based (2,4,8,16,32, ...)
-     enum FlagMaskID
-     {
-       MSQ_HARD_FIXED  = 1<<0, //!< vertex is always fixed. This can only be set on and never off.
-       MSQ_DEPENDENT   = 1<<1, //!< higher-order node w/ position determined by mapping function
-       MSQ_CULLED      = 1<<2, //!< vertex is fixed. This flag can be set on and off.
-       MSQ_PATCH_FIXED = 1<<3, //!< vertex is fixed only because it is on patch boundary (not by app request)
-       MSQ_MARK        = 1<<4, //!< arbitrary mark for use by code - clear before using
-       MSQ_FIXED = (MSQ_HARD_FIXED|MSQ_CULLED|MSQ_PATCH_FIXED)
-     };
-       //!Returns true if vertex is ``free''.
-     bool is_free_vertex() const
-       { return (vertexBitFlags & (MSQ_HARD_FIXED|MSQ_PATCH_FIXED)) == 0; }
+    //! \enum FlagMaskID
+    //!   Those are the available flags... currently only return
+    //!   is_free.
+    //!   Developers: The values used in that enum are used by a bitset,
+    //!               so they have to be 2-based (2,4,8,16,32, ...)
+    enum FlagMaskID
+    {
+        MSQ_HARD_FIXED  = 1 << 0,  //!< vertex is always fixed. This can only be set on and never off.
+        MSQ_DEPENDENT   = 1 << 1,  //!< higher-order node w/ position determined by mapping function
+        MSQ_CULLED      = 1 << 2,  //!< vertex is fixed. This flag can be set on and off.
+        MSQ_PATCH_FIXED = 1 << 3,  //!< vertex is fixed only because it is on patch boundary (not by app request)
+        MSQ_MARK        = 1 << 4,  //!< arbitrary mark for use by code - clear before using
+        MSQ_FIXED       = ( MSQ_HARD_FIXED | MSQ_CULLED | MSQ_PATCH_FIXED )
+    };
+    //! Returns true if vertex is ``free''.
+    bool is_free_vertex() const
+    {
+        return ( vertexBitFlags & ( MSQ_HARD_FIXED | MSQ_PATCH_FIXED ) ) == 0;
+    }
 
-     void set_soft_fixed_flag()
-       { vertexBitFlags|=MSQ_CULLED; }
+    void set_soft_fixed_flag()
+    {
+        vertexBitFlags |= MSQ_CULLED;
+    }
 
-     void remove_soft_fixed_flag()
-       { vertexBitFlags &= (~MSQ_CULLED); }
+    void remove_soft_fixed_flag()
+    {
+        vertexBitFlags &= ( ~MSQ_CULLED );
+    }
 
-     void set_hard_fixed_flag()
-       { vertexBitFlags|=MSQ_HARD_FIXED; }
+    void set_hard_fixed_flag()
+    {
+        vertexBitFlags |= MSQ_HARD_FIXED;
+    }
 
-     void set_vertex_flag(FlagMaskID flag)
-       { vertexBitFlags|=flag; }
+    void set_vertex_flag( FlagMaskID flag )
+    {
+        vertexBitFlags |= flag;
+    }
 
-     void remove_vertex_flag(FlagMaskID flag)
-       { vertexBitFlags &= (~flag); }
+    void remove_vertex_flag( FlagMaskID flag )
+    {
+        vertexBitFlags &= ( ~flag );
+    }
 
-     bool is_flag_set(FlagMaskID flag) const
-       { return (vertexBitFlags & flag) != 0; }
+    bool is_flag_set( FlagMaskID flag ) const
+    {
+        return ( vertexBitFlags & flag ) != 0;
+    }
 
-     FlagMask get_flags() const
-      { return vertexBitFlags; }
+    FlagMask get_flags() const
+    {
+        return vertexBitFlags;
+    }
 
-     FlagMask& flags()
-      { return vertexBitFlags; }
+    FlagMask& flags()
+    {
+        return vertexBitFlags;
+    }
 
-     void set_flags( FlagMask p_flags )
-      { vertexBitFlags = p_flags; }
+    void set_flags( FlagMask p_flags )
+    {
+        vertexBitFlags = p_flags;
+    }
 
-   private:
-     FlagMask vertexBitFlags;
-   };
+  private:
+    FlagMask vertexBitFlags;
+};
 
-} //namespace
+}  // namespace MBMesquite
 
-
-#endif // MsqVertex_hpp
+#endif  // MsqVertex_hpp

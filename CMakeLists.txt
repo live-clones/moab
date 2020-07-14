@@ -316,8 +316,8 @@ if ( ENABLE_HDF5 )
   include_directories( ${HDF5_INCLUDE_DIR} src/io/mhdf/include )
 endif ( ENABLE_HDF5 )
 
+# Check for NetCDF availability
 set (MOAB_HAVE_NETCDF OFF CACHE INTERNAL "Found necessary NetCDF components. Configure MOAB with it." )
-set (MOAB_HAVE_PNETCDF OFF CACHE INTERNAL "Found necessary PNetCDF components. Configure MOAB with it." )
 if ( ENABLE_NETCDF )
   find_package( NetCDF REQUIRED )
   # set( MOAB_DEFINES "-DNETCDF_FILE ${MOAB_DEFINES}" )
@@ -325,38 +325,45 @@ if ( ENABLE_NETCDF )
   set (MOAB_HAVE_NETCDF_H 1)
   include_directories( ${NETCDF_INCLUDES} )
   set( MOAB_LIBS ${NETCDF_LIBRARIES} ${MOAB_LIBS} )
-  #
-  if ( PNETCDF_FOUND )
-    # find_package( PNetCDF REQUIRED )
-    set (MOAB_HAVE_PNETCDF ON)
-    include_directories( ${PNETCDF_INCLUDES} )
-    set( MOAB_LIBS ${PNETCDF_LIBRARIES} ${MOAB_LIBS} )
-  endif ( PNETCDF_FOUND )
 endif ( ENABLE_NETCDF )
 
+# Check for PNetCDF availability
+set (MOAB_HAVE_PNETCDF OFF CACHE INTERNAL "Found necessary PNetCDF components. Configure MOAB with it." )
+if ( ENABLE_PNETCDF AND MOAB_HAVE_NETCDF )
+	find_package( PNetCDF REQUIRED )
+	set (MOAB_HAVE_PNETCDF ON)
+	include_directories( ${PNETCDF_INCLUDES} )
+	set( MOAB_LIBS ${PNETCDF_LIBRARIES} ${MOAB_LIBS} )
+endif ( ENABLE_PNETCDF AND MOAB_HAVE_NETCDF )
+
+# Check for Metis partitioner availability
 set (MOAB_HAVE_METIS OFF CACHE INTERNAL "Found necessary Metis components. Configure MOAB with it." )
 if ( ENABLE_METIS )
   find_package( Metis REQUIRED )
   set (MOAB_HAVE_METIS ON)
 endif (ENABLE_METIS )
 
+# Check for ParMetis partitioner availability
 set (MOAB_HAVE_PARMETIS OFF CACHE INTERNAL "Found necessary ParMetis components. Configure MOAB with it." )
 if ( ENABLE_PARMETIS AND ENABLE_METIS AND METIS_FOUND )
   find_package( ParMetis REQUIRED )
   set (MOAB_HAVE_PARMETIS ON)
 endif ( ENABLE_PARMETIS AND ENABLE_METIS AND METIS_FOUND )
 
+# Check for Zoltan partitioner availability
 set (MOAB_HAVE_ZOLTAN OFF CACHE INTERNAL "Found necessary Zoltan components. Configure MOAB with it." )
 if ( ENABLE_ZOLTAN )
   find_package( Zoltan REQUIRED )
   set (MOAB_HAVE_ZOLTAN ON)
 endif (ENABLE_ZOLTAN )
 
+# Check for TempestRemap availability if Eigen3 headers have been found already
 if ( EIGEN3_FOUND AND ENABLE_TEMPESTREMAP )
   find_package( TempestRemap REQUIRED )
   set(MOAB_HAVE_TEMPESTREMAP ON)
 endif( EIGEN3_FOUND AND ENABLE_TEMPESTREMAP )
 
+# Check if user has asked for configuration with CGM
 set (MOAB_HAVE_CGM OFF CACHE INTERNAL "Found necessary CGM components. Configure MOAB with it." )
 if ( ENABLE_CGM )
    find_package( CGM REQUIRED )
@@ -476,6 +483,67 @@ if (ENABLE_FORTRAN)
   set(MOAB_FC_FUNC   "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
   set(MOAB_FC_FUNC_  "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
 endif (ENABLE_FORTRAN)
+
+## Find and use clang-format if available
+find_program( CLANG_FORMAT_EXE NAMES "clang-format" DOC "Path to clang-format executable" )
+if(CLANG_FORMAT_EXE)
+	message(STATUS "clang-format found: ${CLANG_FORMAT_EXE}")
+	set(DO_CLANG_FORMAT "${CLANG_FORMAT_EXE}" "-i -style=file")
+endif()
+
+# get all project files
+file(GLOB_RECURSE MOAB_PROJECT_SOURCE_FILES 
+			RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+			LIST_DIRECTORIES false 
+			src/*.cpp src/*.c src/*.hpp 
+			tools/*.cpp tools/*.hpp 
+			test/*.cpp 
+			itaps/*.cpp itaps/*.h itaps/*.hpp 
+			examples/*.cpp
+		)
+
+function(prepend var prefix)
+  set(listVar "")
+  foreach(f ${ARGN})
+    list(APPEND listVar "${prefix}/${f}")
+  endforeach()
+  set(${var} "${listVar}" PARENT_SCOPE)
+endfunction()
+
+if(CLANG_FORMAT_EXE)
+	prepend(FILES_TO_FORMAT ${CMAKE_CURRENT_SOURCE_DIR} ${MOAB_PROJECT_SOURCE_FILES})
+	add_custom_target( clang-format-project-files COMMAND ${CLANG_FORMAT_EXE} -i -style=file ${FILES_TO_FORMAT} )
+endif()
+
+## Check for clang-tidy as well for performing pre-commit checks
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy" DOC "Path to clang-tidy executable")
+if(CLANG_TIDY_EXE)
+  message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+  SET(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_EXE} 
+    -format-style=file 
+    -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters 
+    -header-filter="\"moab/*\""
+    -fix -fix-errors
+    -p=${CMAKE_CURRENT_BINARY_DIR} )
+
+  find_program(RUN_CLANG_TIDY_BIN /usr/local/Cellar/llvm/10.0.0_3/share/clang/run-clang-tidy.py)
+  find_program(RUN_CLANG_APPLY_REPLACEMENTS_BIN clang-apply-replacements PATH /usr/local/bin /usr/local/opt/llvm/bin)
+  list(APPEND RUN_CLANG_TIDY_BIN_ARGS
+        -clang-tidy-binary ${CLANG_TIDY_EXE}
+        -clang-apply-replacements-binary ${RUN_CLANG_APPLY_REPLACEMENTS_BIN}
+        -header-filter="\"moab/*\""
+        -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters
+        -fix
+        )
+
+	add_custom_target(
+		tidy
+		COMMAND ${RUN_CLANG_TIDY_BIN} ${RUN_CLANG_TIDY_BIN_ARGS}
+		COMMENT "running clang tidy"
+		)
+	add_custom_target( clang-tidy-project-files COMMAND ${CMAKE_CXX_CLANG_TIDY} ${FILES_TO_FORMAT} )
+
+endif(CLANG_TIDY_EXE)
 
 # Generate the CMake input header file and then pass it through configuration
 ## execute_process( COMMAND cat MOABConfig.h.in COMMAND sed -e "s/#undef /#cmakedefine MOAB_/g"

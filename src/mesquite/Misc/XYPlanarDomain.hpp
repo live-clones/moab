@@ -36,7 +36,6 @@
   \date   2012-03-07
 */
 
-
 #ifndef MSQ_XYPLANAR_DOMAIN_HPP
 #define MSQ_XYPLANAR_DOMAIN_HPP
 
@@ -45,44 +44,32 @@
 
 namespace MBMesquite
 {
-  /*! \class XYPlanarDomain
-       This is a template for a planar domain that exists in the xy-plane (z=0).
-       It will provide the normal information necessary for surface mesh optimization.
-    */
-  class MESQUITE_EXPORT XYPlanarDomain : public MBMesquite::MeshDomain
-  {
+/*! \class XYPlanarDomain
+     This is a template for a planar domain that exists in the xy-plane (z=0).
+     It will provide the normal information necessary for surface mesh optimization.
+  */
+class MESQUITE_EXPORT XYPlanarDomain : public MBMesquite::MeshDomain
+{
   public:
-
-    XYPlanarDomain() {};
+    XYPlanarDomain(){};
 
     virtual ~XYPlanarDomain();
 
-    virtual void snap_to(Mesh::VertexHandle entity_handle,
-                         Vector3D &coordinate) const;
+    virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at(Mesh::VertexHandle entity_handle,
-                                  Vector3D &coordinate) const;
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void element_normal_at(Mesh::ElementHandle entity_handle,
-                                   Vector3D &coordinate) const;
+    virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at(const Mesh::VertexHandle* handle,
-                                  Vector3D coords[],
-                                  unsigned count,
-                                  MsqError& err) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[], unsigned count,
+                                   MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle,
-                                const Vector3D& position,
-                                Vector3D& closest,
-                                Vector3D& normal,
-                                MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                Vector3D& normal, MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                             unsigned short* dof_array,
-                             size_t num_vertices,
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_vertices,
                              MsqError& err ) const;
-
-  };
-}
+};
+}  // namespace MBMesquite
 
 #endif

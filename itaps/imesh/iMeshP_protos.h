@@ -3,12 +3,12 @@
 
 #include "moab/MOABConfig.h"
 
-#if defined(MOAB_FC_FUNC_)
+#if defined( MOAB_FC_FUNC_ )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
+#elif defined( MOAB_FC_FUNC )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define ITAPS_FC_WRAPPER(name,NAME) name
+#define ITAPS_FC_WRAPPER( name, NAME ) name
 #endif
 
 #define iMeshP_createPartitionAll ITAPS_FC_WRAPPER( imeshp_createpartitionall, IMESHP_CREATEPARTITIONALL )
@@ -26,10 +26,14 @@
 #define iMeshP_getNumOfTopoAll ITAPS_FC_WRAPPER( imeshp_getnumoftopoall, IMESHP_GETNUMOFTOPOALL )
 #define iMeshP_createPart ITAPS_FC_WRAPPER( imeshp_createpart, IMESHP_CREATEPART )
 #define iMeshP_destroyPart ITAPS_FC_WRAPPER( imeshp_destroypart, IMESHP_DESTROYPART )
-#define iMeshP_getPartIdFromPartHandle ITAPS_FC_WRAPPER( imeshp_getpartidfromparthandle, IMESHP_GETPARTIDFROMPARTHANDLE )
-#define iMeshP_getPartIdsFromPartHandlesArr ITAPS_FC_WRAPPER( imeshp_getpartidsfromparthandlesarr, IMESHP_GETPARTIDSFROMPARTHANDLESARR )
-#define iMeshP_getPartHandleFromPartId ITAPS_FC_WRAPPER( imeshp_getparthandlefrompartid, IMESHP_GETPARTHANDLEFROMPARTID )
-#define iMeshP_getPartHandlesFromPartsIdsArr ITAPS_FC_WRAPPER( imeshp_getparthandlesfrompartsidsarr, IMESHP_GETPARTHANDLESFROMPARTSIDSARR )
+#define iMeshP_getPartIdFromPartHandle \
+    ITAPS_FC_WRAPPER( imeshp_getpartidfromparthandle, IMESHP_GETPARTIDFROMPARTHANDLE )
+#define iMeshP_getPartIdsFromPartHandlesArr \
+    ITAPS_FC_WRAPPER( imeshp_getpartidsfromparthandlesarr, IMESHP_GETPARTIDSFROMPARTHANDLESARR )
+#define iMeshP_getPartHandleFromPartId \
+    ITAPS_FC_WRAPPER( imeshp_getparthandlefrompartid, IMESHP_GETPARTHANDLEFROMPARTID )
+#define iMeshP_getPartHandlesFromPartsIdsArr \
+    ITAPS_FC_WRAPPER( imeshp_getparthandlesfrompartsidsarr, IMESHP_GETPARTHANDLESFROMPARTSIDSARR )
 #define iMeshP_getNumPartNbors ITAPS_FC_WRAPPER( imeshp_getnumpartnbors, IMESHP_GETNUMPARTNBORS )
 #define iMeshP_getNumPartNborsArr ITAPS_FC_WRAPPER( imeshp_getnumpartnborsarr, IMESHP_GETNUMPARTNBORSARR )
 #define iMeshP_getPartNbors ITAPS_FC_WRAPPER( imeshp_getpartnbors, IMESHP_GETPARTNBORS )

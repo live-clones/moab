@@ -43,8 +43,8 @@ describe main.cpp here
 //
 
 #include <iostream>
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 #include <cstdlib>
 
@@ -67,92 +67,83 @@ using namespace MBMesquite;
 
 void usage()
 {
-  cerr << "Usage: main [filename] [objective function val]" << endl;
-  exit(1);
+    cerr << "Usage: main [filename] [objective function val]" << endl;
+    exit( 1 );
 }
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
-  MBMesquite::MsqPrintError err(cout);
+    MBMesquite::MsqPrintError err( cout );
 
-  std::string file_name = TestDir + "/3D/vtk/hexes/untangled/large_box_hex_1000.vtk";
-  double OF_value = 0.;
+    std::string file_name = TestDir + "/3D/vtk/hexes/untangled/large_box_hex_1000.vtk";
+    double OF_value       = 0.;
 
-  if (argc == 1)
-  {
-    cerr << "Warning: No file specified, using default: " << file_name << endl;
-  }
+    if( argc == 1 ) { cerr << "Warning: No file specified, using default: " << file_name << endl; }
 
-  if (argc > 1)
-  {
-    file_name = argv[1];
-  }
-  if (argc > 2)
-  {
-    char* end_ptr;
-    OF_value = strtod( argv[2], &end_ptr );
-    if (!*argv[2] || *end_ptr)
-      usage();
-  }
-  if (argc > 3)
-  {
-    usage();
-  }
+    if( argc > 1 ) { file_name = argv[1]; }
+    if( argc > 2 )
+    {
+        char* end_ptr;
+        OF_value = strtod( argv[2], &end_ptr );
+        if( !*argv[2] || *end_ptr ) usage();
+    }
+    if( argc > 3 ) { usage(); }
 
-  MBMesquite::MeshImpl mesh;
-  mesh.read_vtk(file_name.c_str(), err);
-  if (err) return 1;
+    MBMesquite::MeshImpl mesh;
+    mesh.read_vtk( file_name.c_str(), err );
+    if( err ) return 1;
 
-  // creates an intruction queue
-  InstructionQueue queue1;
+    // creates an intruction queue
+    InstructionQueue queue1;
 
-  // creates a mean ratio quality metric ...
-//   SmoothnessQualityMetric* mean_ratio = new EdgeLengthQualityMetric;
-  IdealWeightInverseMeanRatio mean_ratio(err);
-  if (err) return 1;
-//  mean_ratio->set_gradient_type(QualityMetric::NUMERICAL_GRADIENT);
-//   mean_ratio->set_hessian_type(QualityMetric::NUMERICAL_HESSIAN);
-  mean_ratio.set_averaging_method(QualityMetric::SUM);
+    // creates a mean ratio quality metric ...
+    //   SmoothnessQualityMetric* mean_ratio = new EdgeLengthQualityMetric;
+    IdealWeightInverseMeanRatio mean_ratio( err );
+    if( err ) return 1;
+    //  mean_ratio->set_gradient_type(QualityMetric::NUMERICAL_GRADIENT);
+    //   mean_ratio->set_hessian_type(QualityMetric::NUMERICAL_HESSIAN);
+    mean_ratio.set_averaging_method( QualityMetric::SUM );
 
-  // ... and builds an objective function with it
-  LPtoPTemplate obj_func(&mean_ratio, 1, err);
-    if (err) return 1;
+    // ... and builds an objective function with it
+    LPtoPTemplate obj_func( &mean_ratio, 1, err );
+    if( err ) return 1;
 
-  // creates the steepest descentfeas newt optimization procedures
-//  ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
-  FeasibleNewton pass1( &obj_func );
-  pass1.use_global_patch();
-    if (err) return 1;
+    // creates the steepest descentfeas newt optimization procedures
+    //  ConjugateGradient* pass1 = new ConjugateGradient( obj_func, err );
+    FeasibleNewton pass1( &obj_func );
+    pass1.use_global_patch();
+    if( err ) return 1;
 
-  QualityAssessor stop_qa=QualityAssessor(&mean_ratio);
+    QualityAssessor stop_qa = QualityAssessor( &mean_ratio );
 
-  // **************Set stopping criterion****************
-  TerminationCriterion tc_inner;
-  if (OF_value!=0) {
-    tc_inner.add_absolute_quality_improvement( OF_value );
-    pass1.set_inner_termination_criterion(&tc_inner);
-  }
-  TerminationCriterion tc_outer;
-  tc_outer.add_iteration_limit( 1 );
-  pass1.set_outer_termination_criterion(&tc_outer);
+    // **************Set stopping criterion****************
+    TerminationCriterion tc_inner;
+    if( OF_value != 0 )
+    {
+        tc_inner.add_absolute_quality_improvement( OF_value );
+        pass1.set_inner_termination_criterion( &tc_inner );
+    }
+    TerminationCriterion tc_outer;
+    tc_outer.add_iteration_limit( 1 );
+    pass1.set_outer_termination_criterion( &tc_outer );
 
-  queue1.add_quality_assessor(&stop_qa, err);
-  if (err) return 1;
+    queue1.add_quality_assessor( &stop_qa, err );
+    if( err ) return 1;
 
-  // adds 1 pass of pass1 to mesh_set1
-  queue1.set_master_quality_improver(&pass1, err);
-  if (err) return 1;
+    // adds 1 pass of pass1 to mesh_set1
+    queue1.set_master_quality_improver( &pass1, err );
+    if( err ) return 1;
 
-  queue1.add_quality_assessor(&stop_qa, err);
-  if (err) return 1;
+    queue1.add_quality_assessor( &stop_qa, err );
+    if( err ) return 1;
 
-//mesh.write_vtk("original_mesh",err); MSQ_CHKERR(err);
+    // mesh.write_vtk("original_mesh",err); MSQ_CHKERR(err);
 
-  // launches optimization on mesh_set1
-  queue1.run_instructions(&mesh, err);
-  if (err) return 1;
+    // launches optimization on mesh_set1
+    queue1.run_instructions( &mesh, err );
+    if( err ) return 1;
 
-//mesh.write_vtk("smoothed_mesh", err); MSQ_CHKERR(err);
-  print_timing_diagnostics( cout );
-  return 0;
+    // mesh.write_vtk("smoothed_mesh", err); MSQ_CHKERR(err);
+    print_timing_diagnostics( cout );
+    return 0;
 }

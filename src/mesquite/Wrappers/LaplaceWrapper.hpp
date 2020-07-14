@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file LaplaceWrapper.hpp
  *  \brief Define LaplaceWrapper class
  *  \author Jason Kraftcheck
@@ -35,71 +34,80 @@
 
 #include "Wrapper.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class LaplaceWrapper : public Wrapper
 {
-public:
+  public:
+    MESQUITE_EXPORT
+    LaplaceWrapper();
 
-  MESQUITE_EXPORT
-  LaplaceWrapper();
+    /**\brief Specify timeout after which untangler will exit
+     *
+     *  Specify a value less than or equal to zero for no limit
+     */
+    void set_cpu_time_limit( double seconds )
+    {
+        maxTime = seconds;
+    }
+    double get_cpu_time_limit() const
+    {
+        return maxTime;
+    }
 
-  /**\brief Specify timeout after which untangler will exit
-   *
-   *  Specify a value less than or equal to zero for no limit
-   */
-  void set_cpu_time_limit( double seconds )
-    { maxTime = seconds; }
-  double get_cpu_time_limit() const
-    { return maxTime; }
+    /**\brief Specify factor by which to minimum distance a vertex must
+     *        move in an iteration to avoid termination of the untangler
+     *
+     *  Specify a value less than or equal to zero for no limit.
+     *\NOTE Culling cannot be done w/out a limit on vertex movement
+     */
+    void set_vertex_movement_limit_factor( double f )
+    {
+        movementFactor = f;
+    }
+    double get_vertex_movement_limit_factor() const
+    {
+        return movementFactor;
+    }
 
-  /**\brief Specify factor by which to minimum distance a vertex must
-   *        move in an iteration to avoid termination of the untangler
-   *
-   *  Specify a value less than or equal to zero for no limit.
-   *\NOTE Culling cannot be done w/out a limit on vertex movement
-   */
-  void set_vertex_movement_limit_factor( double f )
-    { movementFactor = f; }
-  double get_vertex_movement_limit_factor() const
-    { return movementFactor; }
+    /**\brief Specify maximum number of iterations.
+     *
+     * Specify a value less than or equal to zero for no limit
+     */
+    void set_iteration_limit( int limit )
+    {
+        iterationLimit = limit;
+    }
+    int get_iteration_limit() const
+    {
+        return iterationLimit;
+    }
 
-  /**\brief Specify maximum number of iterations.
-   *
-   * Specify a value less than or equal to zero for no limit
-   */
-  void set_iteration_limit( int limit )
-    { iterationLimit = limit; }
-  int get_iteration_limit() const
-    { return iterationLimit; }
+    /**\brief Cull vertices based on movement limit */
+    inline void enable_culling( bool yesno )
+    {
+        doCulling = yesno;
+    }
+    inline bool is_culling_enabled() const
+    {
+        return doCulling;
+    }
 
-  /**\brief Cull vertices based on movement limit */
-  inline void enable_culling( bool yesno )
-    { doCulling = yesno; }
-  inline bool is_culling_enabled() const
-    { return doCulling; }
+    MESQUITE_EXPORT
+    ~LaplaceWrapper();
 
+  protected:
+    MESQUITE_EXPORT
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+                      MsqError& err );
 
-  MESQUITE_EXPORT
-  ~LaplaceWrapper();
-
-protected:
-
-  MESQUITE_EXPORT
-  void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                    ParallelMesh* pmesh,
-                    Settings* settings,
-                    QualityAssessor* qa,
-                    MsqError& err );
-
-private:
-
-  double maxTime, movementFactor;
-  int iterationLimit;
-  bool doCulling;
+  private:
+    double maxTime, movementFactor;
+    int iterationLimit;
+    bool doCulling;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

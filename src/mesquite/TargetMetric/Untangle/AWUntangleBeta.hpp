@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWUntangleBeta.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,81 +35,63 @@
 #include "Mesquite.hpp"
 #include "AWMetric.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 /** \f$ \left\{ |\alpha - \gamma \, \omega| - ( \alpha - \gamma \, \omega ) \right\}^p \f$ */
 class AWUntangleBeta : public AWMetric
 {
   private:
-
-  double mGamma;
+    double mGamma;
 
   public:
+    MESQUITE_EXPORT
+    AWUntangleBeta( double gamma = 0.5 ) : mGamma( gamma ) {}
 
-  MESQUITE_EXPORT
-  AWUntangleBeta( double gamma = 0.5 ) : mGamma(gamma) {}
+    MESQUITE_EXPORT virtual ~AWUntangleBeta();
 
-  MESQUITE_EXPORT virtual
-  ~AWUntangleBeta();
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                           MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
+                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<2,2>& A,
-                           const MsqMatrix<2,2>& W,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_A,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
+                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err );
+    /*
+      MESQUITE_EXPORT virtual
+      bool evaluate_with_hess( const MsqMatrix<2,2>& A,
+                               const MsqMatrix<2,2>& W,
+                               double& result,
+                               MsqMatrix<2,2>& deriv_wrt_A,
+                               MsqMatrix<2,2> second_wrt_A[3],
+                               MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<3,3>& A,
-                           const MsqMatrix<3,3>& W,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_A,
-                           MsqError& err );
-/*
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<2,2>& A,
-                           const MsqMatrix<2,2>& W,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_A,
-                           MsqMatrix<2,2> second_wrt_A[3],
-                           MsqError& err );
+      MESQUITE_EXPORT virtual
+      bool evaluate_with_hess( const MsqMatrix<3,3>& A,
+                               const MsqMatrix<3,3>& W,
+                               double& result,
+                               MsqMatrix<3,3>& deriv_wrt_A,
+                               MsqMatrix<3,3> second_wrt_A[6],
+                               MsqError& err );
+    */
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<3,3>& A,
-                           const MsqMatrix<3,3>& W,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_A,
-                           MsqMatrix<3,3> second_wrt_A[6],
-                           MsqError& err );
-*/
-
-private:
-  template <unsigned D> inline
-  bool eval( const MsqMatrix<D,D>& A, const MsqMatrix<D,D>& W, double& result );
-  template <unsigned D> inline
-  bool grad( const MsqMatrix<D,D>& A, const MsqMatrix<D,D>& W, double& result, MsqMatrix<D,D>& first );
-//  template <unsigned D> inline
-//  bool hess( const MsqMatrix<D,D>& T, double& result, MsqMatrix<D,D>& first, MsqMatrix<D,D>* second );
+  private:
+    template < unsigned D >
+    inline bool eval( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result );
+    template < unsigned D >
+    inline bool grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result,
+                      MsqMatrix< D, D >& first );
+    //  template <unsigned D> inline
+    //  bool hess( const MsqMatrix<D,D>& T, double& result, MsqMatrix<D,D>& first, MsqMatrix<D,D>*
+    //  second );
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

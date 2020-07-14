@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ConicDomain.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,14 +36,15 @@
 #include "MeshInterface.hpp"
 #include "Vector3D.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /*! \class ConicDomain
      Define the geometry of an unbounded cone with circular cross-section.
   */
 class MESQUITE_EXPORT ConicDomain : public MBMesquite::MeshDomain
 {
-public:
+  public:
     /**
      *\param radius_at_point    The radius of the cone at axis_point
      *\param height_to_apex     The distance in the direction of
@@ -54,73 +54,61 @@ public:
      *\NOTE Cone is not bounded at apex.  It extends infinitely in both
      *      directions.
      */
-  inline ConicDomain( double radius_at_point,
-                      double height_to_apex,
-                      Vector3D axis_direction = Vector3D(0,0,1),
-                      Vector3D axis_point = Vector3D(0,0,0),
-                      bool outward_normal = true)
-    : mAxis( axis_direction / axis_direction.length() ),
-      mPoint( axis_point ),
-      mRadius( radius_at_point ),
-      mHeight( height_to_apex ),
-      outwardSign( outward_normal ? 1.0 : -1.0 )
-    { }
+    inline ConicDomain( double radius_at_point, double height_to_apex, Vector3D axis_direction = Vector3D( 0, 0, 1 ),
+                        Vector3D axis_point = Vector3D( 0, 0, 0 ), bool outward_normal = true )
+        : mAxis( axis_direction / axis_direction.length() ), mPoint( axis_point ), mRadius( radius_at_point ),
+          mHeight( height_to_apex ), outwardSign( outward_normal ? 1.0 : -1.0 )
+    {
+    }
 
-  inline ConicDomain() {}
+    inline ConicDomain() {}
 
-  virtual ~ConicDomain();
+    virtual ~ConicDomain();
 
-  virtual void snap_to(Mesh::VertexHandle entity_handle,
-                       Vector3D &coordinate) const;
+    virtual void snap_to( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
-  virtual void vertex_normal_at(Mesh::VertexHandle entity_handle,
-                                Vector3D &coordinate) const;
+    virtual void vertex_normal_at( Mesh::VertexHandle entity_handle, Vector3D& coordinate ) const;
 
+    virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-  virtual void element_normal_at(Mesh::ElementHandle entity_handle,
-                                 Vector3D &coordinate) const;
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[], unsigned count,
+                                   MsqError& err ) const;
 
+    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
+                                Vector3D& normal, MsqError& err ) const;
 
-  virtual void vertex_normal_at(const Mesh::VertexHandle* handle,
-                                Vector3D coords[],
-                                unsigned count,
-                                MsqError& err) const;
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+                             MsqError& err ) const;
 
-  virtual void closest_point( Mesh::VertexHandle handle,
-                              const Vector3D& position,
-                              Vector3D& closest,
-                              Vector3D& normal,
-                              MsqError& err ) const;
+    const Vector3D& axis() const
+    {
+        return mAxis;
+    }
+    const Vector3D& point() const
+    {
+        return mPoint;
+    }
+    double point_radius() const
+    {
+        return mRadius;
+    }
+    double height_from_point() const
+    {
+        return mHeight;
+    }
 
-  virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                           unsigned short* dof_array,
-                           size_t count,
-                           MsqError& err ) const;
+  protected:
+    virtual void evaluate( Mesh::VertexHandle handle, const Vector3D& point, Vector3D& closest,
+                           Vector3D& normal ) const;
 
-
-  const Vector3D& axis() const { return mAxis; }
-  const Vector3D& point() const { return mPoint; }
-  double point_radius() const { return mRadius; }
-  double height_from_point() const { return mHeight; }
-
-protected:
-
-  virtual void evaluate( Mesh::VertexHandle handle,
-                         const Vector3D& point,
-                         Vector3D& closest,
-                         Vector3D& normal ) const;
-
-private:
-
-  Vector3D mAxis;   //!< Direction of central axis of cone. Unit vector.
-  Vector3D mPoint;  //!< A point on the axis of the cone.
-  double mRadius;   //!< Radius at mPoint
-  double mHeight;   //!< Distance from mPoint to apex, in direction of mAxis
-  double outwardSign; //!< 1.0 if normal points away from axis, -1.0 otherwise
+  private:
+    Vector3D mAxis;      //!< Direction of central axis of cone. Unit vector.
+    Vector3D mPoint;     //!< A point on the axis of the cone.
+    double mRadius;      //!< Radius at mPoint
+    double mHeight;      //!< Distance from mPoint to apex, in direction of mAxis
+    double outwardSign;  //!< 1.0 if normal points away from axis, -1.0 otherwise
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

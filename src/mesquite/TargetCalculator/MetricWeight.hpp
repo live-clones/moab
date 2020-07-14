@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file MetricWeight.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,27 +35,25 @@
 #include "Mesquite.hpp"
 #include "WeightCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ElemSampleQM;
 
 /**\brief Use metric value as target weight */
 class MESQUITE_EXPORT MetricWeight : public WeightCalculator
 {
-public:
-  MetricWeight( ElemSampleQM* metric ) : mMetric(metric) {}
+  public:
+    MetricWeight( ElemSampleQM* metric ) : mMetric( metric ) {}
 
-  virtual ~MetricWeight();
+    virtual ~MetricWeight();
 
-  virtual double get_weight( PatchData& pd,
-                             size_t element,
-                             Sample sample,
-                             MsqError& err );
-private:
+    virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 
-  ElemSampleQM* mMetric;
+  private:
+    ElemSampleQM* mMetric;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -54,31 +55,34 @@ using std::endl;
 
 using namespace MBMesquite;
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
-  MBMesquite::MsqPrintError err(cout);
-  char in_file_name[256];
-  char out_file_name[256];
+    MBMesquite::MsqPrintError err( cout );
+    char in_file_name[256];
+    char out_file_name[256];
 
-  // command line arguments
-  if (argc!=3){
-    cout << "Input meshfile name needed as first argument.\n"
-      "Output meshfile name needed as second argument.\n" << endl;
-    return -1;
-  }
-  else{
-    cout << " given 2 command line arguments.\n";
-    strcpy(in_file_name, argv[1]);
-    strcpy(out_file_name, argv[2]);
-  }
+    // command line arguments
+    if( argc != 3 )
+    {
+        cout << "Input meshfile name needed as first argument.\n"
+                "Output meshfile name needed as second argument.\n"
+             << endl;
+        return -1;
+    }
+    else
+    {
+        cout << " given 2 command line arguments.\n";
+        strcpy( in_file_name, argv[1] );
+        strcpy( out_file_name, argv[2] );
+    }
 
-  MBMesquite::MeshImpl *mesh = new MBMesquite::MeshImpl;
-  cout<<"\nReading Exodus file.\n";
-  mesh->read_exodus(in_file_name, err);
-  if (err) return 1;
-  cout<<"Writing VTK file.\n";
-  mesh->write_vtk(out_file_name,err);
-  if (err) return 1;
+    MBMesquite::MeshImpl* mesh = new MBMesquite::MeshImpl;
+    cout << "\nReading Exodus file.\n";
+    mesh->read_exodus( in_file_name, err );
+    if( err ) return 1;
+    cout << "Writing VTK file.\n";
+    mesh->write_vtk( out_file_name, err );
+    if( err ) return 1;
 
-  return 0;
+    return 0;
 }

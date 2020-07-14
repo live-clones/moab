@@ -3,12 +3,12 @@
 
 #include "moab/MOABConfig.h"
 
-#if defined(MOAB_FC_FUNC_)
+#if defined( MOAB_FC_FUNC_ )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
+#elif defined( MOAB_FC_FUNC )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define ITAPS_FC_WRAPPER(name,NAME) name
+#define ITAPS_FC_WRAPPER( name, NAME ) name
 #endif
 
 #define iRel_getErrorType ITAPS_FC_WRAPPER( irel_geterrortype, IREL_GETERRORTYPE )
@@ -38,7 +38,8 @@
 #define iRel_getEntArrSetArrRelation ITAPS_FC_WRAPPER( irel_getentarrsetarrrelation, IREL_GETENTARRSETARRRELATION )
 #define iRel_getSetArrEntArrRelation ITAPS_FC_WRAPPER( irel_getsetarrentarrrelation, IREL_GETSETARRENTARRRELATION )
 #define iRel_getSetArrSetArrRelation ITAPS_FC_WRAPPER( irel_getsetarrsetarrrelation, IREL_GETSETARRSETARRRELATION )
-#define iRel_getEntArrSetIterArrRelation ITAPS_FC_WRAPPER( irel_getentarrsetiterarrrelation, IREL_GETENTARRSETITERARRRELATION )
+#define iRel_getEntArrSetIterArrRelation \
+    ITAPS_FC_WRAPPER( irel_getentarrsetiterarrrelation, IREL_GETENTARRSETITERARRRELATION )
 #define iRel_rmvEntRelation ITAPS_FC_WRAPPER( irel_rmventrelation, IREL_RMVENTRELATION )
 #define iRel_rmvSetRelation ITAPS_FC_WRAPPER( irel_rmvsetrelation, IREL_RMVSETRELATION )
 #define iRel_rmvEntArrRelation ITAPS_FC_WRAPPER( irel_rmventarrrelation, IREL_RMVENTARRRELATION )

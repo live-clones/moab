@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShapeOrientNB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,47 +35,45 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string AWShapeOrientNB1::get_name() const
-  { return "AWShapeOrientNB1"; }
+{
+    return "AWShapeOrientNB1";
+}
 
 AWShapeOrientNB1::~AWShapeOrientNB1() {}
 
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result)
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
-  result = std::sqrt(sqr_Frobenius(A) * sqr_Frobenius(W));
-  result -= A % W;
-  result *= result;
-  return true;
+    result = std::sqrt( sqr_Frobenius( A ) * sqr_Frobenius( W ) );
+    result -= A % W;
+    result *= result;
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv )
+template < unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
-  const double nsW = sqr_Frobenius(W);
-  const double nsA = sqr_Frobenius(A);
-  const double nW = std::sqrt(nsW);
-  const double nA = std::sqrt(nsA);
-  const double dot = A % W;
-  result = nA*nW - dot;
-  result *= result;
+    const double nsW = sqr_Frobenius( W );
+    const double nsA = sqr_Frobenius( A );
+    const double nW  = std::sqrt( nsW );
+    const double nA  = std::sqrt( nsA );
+    const double dot = A % W;
+    result           = nA * nW - dot;
+    result *= result;
 
-  deriv  = nA * W;
-  double tmp;
-  if (divide(dot,nA,tmp))
-    deriv += tmp*A;
-  deriv *= -nW;
-  deriv += nsW * A;
-  deriv += dot * W;
-  deriv *= 2.0;
-  return true;
+    deriv = nA * W;
+    double tmp;
+    if( divide( dot, nA, tmp ) ) deriv += tmp * A;
+    deriv *= -nW;
+    deriv += nsW * A;
+    deriv += dot * W;
+    deriv *= 2.0;
+    return true;
 }
 
 /*
@@ -90,6 +87,6 @@ bool hess( const MsqMatrix<DIM,DIM>& A,
 }
 */
 
-TMP_AW_TEMPL_IMPL_COMMON_NO2ND(AWShapeOrientNB1)
+TMP_AW_TEMPL_IMPL_COMMON_NO2ND( AWShapeOrientNB1 )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

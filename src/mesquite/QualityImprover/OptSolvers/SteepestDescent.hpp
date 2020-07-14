@@ -45,61 +45,56 @@
 
 namespace MBMesquite
 {
-  class ObjectiveFunction;
+class ObjectiveFunction;
 
-  /*! \class SteepestDescent
+/*! \class SteepestDescent
 
-      This is a very basic implementation of the steepest descent optimization algorythm.
-   */
-  class SteepestDescent : public VertexMover, public PatchSetUser
-  {
+    This is a very basic implementation of the steepest descent optimization algorythm.
+ */
+class SteepestDescent : public VertexMover, public PatchSetUser
+{
   public:
     MESQUITE_EXPORT
-    SteepestDescent(ObjectiveFunction* of);
+    SteepestDescent( ObjectiveFunction* of );
 
-    MESQUITE_EXPORT virtual
-    ~SteepestDescent() { }
+    MESQUITE_EXPORT virtual ~SteepestDescent() {}
 
-    MESQUITE_EXPORT virtual
-    std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual
-    PatchSet* get_patch_set();
+    MESQUITE_EXPORT virtual PatchSet* get_patch_set();
 
     MESQUITE_EXPORT
     bool project_gradient() const
-      { return projectGradient; }
+    {
+        return projectGradient;
+    }
 
     MESQUITE_EXPORT
     void project_gradient( bool yesno )
-      { projectGradient = yesno; }
+    {
+        projectGradient = yesno;
+    }
 
-    //bool cosine_projection_step() const
+    // bool cosine_projection_step() const
     //  { return cosineStep; }
     //
-    //void cosine_projection_step( bool yesno )
+    // void cosine_projection_step( bool yesno )
     //  { cosineStep = yesno; }
 
   protected:
-    MESQUITE_EXPORT virtual
-    void initialize( PatchData &pd, MsqError &err );
-    MESQUITE_EXPORT virtual
-    void optimize_vertex_positions( PatchData &pd, MsqError &err );
-    MESQUITE_EXPORT virtual
-    void initialize_mesh_iteration( PatchData &pd, MsqError &err );
-    MESQUITE_EXPORT virtual
-    void terminate_mesh_iteration( PatchData &pd, MsqError &err );
-    MESQUITE_EXPORT virtual
-    void cleanup();
+    MESQUITE_EXPORT virtual void initialize( PatchData& pd, MsqError& err );
+    MESQUITE_EXPORT virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
+    MESQUITE_EXPORT virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
+    MESQUITE_EXPORT virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
+    MESQUITE_EXPORT virtual void cleanup();
 
   private:
     bool projectGradient;
-    //bool cosineStep;
-    SteepestDescent(const SteepestDescent &pd); //disable copying
-    SteepestDescent& operator=(const SteepestDescent &pd);  //disable assignment
+    // bool cosineStep;
+    SteepestDescent( const SteepestDescent& pd );             // disable copying
+    SteepestDescent& operator=( const SteepestDescent& pd );  // disable assignment
+};
 
-  };
-
-}
+}  // namespace MBMesquite
 
 #endif

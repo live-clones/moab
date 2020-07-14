@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file InverseMetricWeight.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,27 +35,25 @@
 #include "Mesquite.hpp"
 #include "WeightCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ElemSampleQM;
 
 /**\brief Use inverse of metric value as target weight */
 class MESQUITE_EXPORT InverseMetricWeight : public WeightCalculator
 {
-public:
-  InverseMetricWeight( ElemSampleQM* metric ) : mMetric(metric) {}
+  public:
+    InverseMetricWeight( ElemSampleQM* metric ) : mMetric( metric ) {}
 
-  virtual ~InverseMetricWeight();
+    virtual ~InverseMetricWeight();
 
-  virtual double get_weight( PatchData& pd,
-                             size_t element,
-                             Sample sample,
-                             MsqError& err );
-private:
+    virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 
-  ElemSampleQM* mMetric;
+  private:
+    ElemSampleQM* mMetric;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

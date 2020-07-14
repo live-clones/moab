@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ElemSampleQM.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "QualityMetric.hpp"
 #include "Sample.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Base type for metrics evaluated at several
  *        sample points within each element.
@@ -49,12 +49,13 @@ namespace MBMesquite {
  */
 class ElemSampleQM : public QualityMetric
 {
-public:
+  public:
+    MESQUITE_EXPORT virtual ~ElemSampleQM();
 
-  MESQUITE_EXPORT virtual ~ElemSampleQM();
-
-  MESQUITE_EXPORT virtual MetricType get_metric_type() const
-    { return ELEMENT_BASED; }
+    MESQUITE_EXPORT virtual MetricType get_metric_type() const
+    {
+        return ELEMENT_BASED;
+    }
 
     /**\brief Get evaluation point handles for a given element
      *
@@ -64,41 +65,44 @@ public:
      * returns sample points for all elements in a PatchData, this
      * method returns only the subset corresponding to a single element.
      */
-  MESQUITE_EXPORT virtual
-  void get_element_evaluations( PatchData& pd, size_t elem_index,
-                                std::vector<size_t>& handles,
-                                MsqError& err ) = 0;
+    MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd, size_t elem_index,
+                                                          std::vector< size_t >& handles, MsqError& err ) = 0;
 
-  /** Misc constants used in defining how element index, side dimension,
-   *  and side number are packed into a single handle describing a logical
-   *  location in the patch at which a sample-based metric is to be
-   *  evaluated.
-   */
+    /** Misc constants used in defining how element index, side dimension,
+     *  and side number are packed into a single handle describing a logical
+     *  location in the patch at which a sample-based metric is to be
+     *  evaluated.
+     */
 #ifndef _WIN32
-  enum {
-    /** the number of bits in a handle that are used to store element index */
-    ELEM_INDEX_BITS = sizeof(size_t)*8 - Sample::NUMBER_PACKED_BITS,
-    /** the maximum number of elements in a PatchData without overflowing handle space */
-    MAX_ELEM_PER_PATCH = ((size_t)1)<<ELEM_INDEX_BITS,
-    /** Mask to remove sample bits from handle */
-    ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1
-  };
+    enum { /** the number of bits in a handle that are used to store element index */
+           ELEM_INDEX_BITS = sizeof( size_t ) * 8 - Sample::NUMBER_PACKED_BITS,
+           /** the maximum number of elements in a PatchData without overflowing handle space */
+           MAX_ELEM_PER_PATCH = ( (size_t)1 ) << ELEM_INDEX_BITS,
+           /** Mask to remove sample bits from handle */
+           ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1
+    };
 #else /* MS Visual C compiler broken for 64-bit enums */
-  static const size_t ELEM_INDEX_BITS = sizeof(size_t)*8 - Sample::NUMBER_PACKED_BITS;
-  static const size_t MAX_ELEM_PER_PATCH = ((size_t)1)<<ELEM_INDEX_BITS;
-  static const size_t ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1;
+    static const size_t ELEM_INDEX_BITS    = sizeof( size_t ) * 8 - Sample::NUMBER_PACKED_BITS;
+    static const size_t MAX_ELEM_PER_PATCH = ( (size_t)1 ) << ELEM_INDEX_BITS;
+    static const size_t ELEM_SAMPLE_MASK   = MAX_ELEM_PER_PATCH - 1;
 #endif
 
-  inline static size_t handle( Sample sample, size_t index )
-    { return (sample.pack() << ELEM_INDEX_BITS) | index; }
+    inline static size_t handle( Sample sample, size_t index )
+    {
+        return ( sample.pack() << ELEM_INDEX_BITS ) | index;
+    }
 
-  inline static Sample sample( size_t handle )
-    { return Sample(handle >> ELEM_INDEX_BITS); }
+    inline static Sample sample( size_t handle )
+    {
+        return Sample( handle >> ELEM_INDEX_BITS );
+    }
 
-  inline static size_t elem( size_t handle )
-    { return handle & ELEM_SAMPLE_MASK; }
+    inline static size_t elem( size_t handle )
+    {
+        return handle & ELEM_SAMPLE_MASK;
+    }
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

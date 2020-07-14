@@ -40,11 +40,11 @@
 #include "Mesquite.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string process_itaps_error( int itaps_err );
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif
-

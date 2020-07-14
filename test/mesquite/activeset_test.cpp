@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -68,64 +69,64 @@ using namespace MBMesquite;
 int main()
 {
     /* Reads a Mesh file */
-  std::string file_name = TestDir +
-//   "/2D/vtk/tris/untangled/equil_tri2.vtk";
-//   "/2D/vtk/tris/untangled/tri_20258.vtk";
-//   "/3D/vtk/tets/untangled/tet_1.vtk";
-//   "/3D/vtk/hexes/untangled/cube_tet_2.vtk";
-     "/3D/vtk/tets/untangled/tire.vtk";
-  printf("Loading mesh set 1\n");
-  MsqPrintError err( cout );
-  MBMesquite::MeshImpl mesh;
-  mesh.read_vtk(file_name.c_str(), err);
-  if (err) return 1;
+    std::string file_name = TestDir +
+                            //   "/2D/vtk/tris/untangled/equil_tri2.vtk";
+                            //   "/2D/vtk/tris/untangled/tri_20258.vtk";
+                            //   "/3D/vtk/tets/untangled/tet_1.vtk";
+                            //   "/3D/vtk/hexes/untangled/cube_tet_2.vtk";
+                            "/3D/vtk/tets/untangled/tire.vtk";
+    printf( "Loading mesh set 1\n" );
+    MsqPrintError err( cout );
+    MBMesquite::MeshImpl mesh;
+    mesh.read_vtk( file_name.c_str(), err );
+    if( err ) return 1;
 
     // Creates an intruction queue
     //  printf("Creating instruction queue\n");
-  InstructionQueue queue1;
+    InstructionQueue queue1;
 
-  // Creates a condition number quality metric
-  //  printf("Creating quality metric\n");
-  ConditionNumberQualityMetric cond_no;
+    // Creates a condition number quality metric
+    //  printf("Creating quality metric\n");
+    ConditionNumberQualityMetric cond_no;
 
-  // Create the NonSmooth Steepest Descent procedures
-  //  printf("creating optimizer\n");
-  NonSmoothDescent minmax_method( &cond_no );
+    // Create the NonSmooth Steepest Descent procedures
+    //  printf("creating optimizer\n");
+    NonSmoothDescent minmax_method( &cond_no );
 
-  // Set a termination criterion
-  TerminationCriterion tc2;
-  tc2.add_iteration_limit( 1 );
-  minmax_method.set_outer_termination_criterion(&tc2);
-  // Set up the quality assessor
-  //  printf("Setting up the quality assessor\n");
-  QualityAssessor quality_assessor=QualityAssessor(&cond_no);
+    // Set a termination criterion
+    TerminationCriterion tc2;
+    tc2.add_iteration_limit( 1 );
+    minmax_method.set_outer_termination_criterion( &tc2 );
+    // Set up the quality assessor
+    //  printf("Setting up the quality assessor\n");
+    QualityAssessor quality_assessor = QualityAssessor( &cond_no );
 
-  // assess the quality of the initial mesh
-  queue1.add_quality_assessor(&quality_assessor, err);
-  if (err) return 1;
+    // assess the quality of the initial mesh
+    queue1.add_quality_assessor( &quality_assessor, err );
+    if( err ) return 1;
 
-  // Set the max min method to be the master quality improver
-  queue1.set_master_quality_improver(&minmax_method, err);
-  if (err) return 1;
+    // Set the max min method to be the master quality improver
+    queue1.set_master_quality_improver( &minmax_method, err );
+    if( err ) return 1;
 
-  // assess the quality of the final mesh
-  queue1.add_quality_assessor(&quality_assessor, err);
-  if (err) return 1;
+    // assess the quality of the final mesh
+    queue1.add_quality_assessor( &quality_assessor, err );
+    if( err ) return 1;
 
-  // write out the original mesh
-  //  printf("Writing out the original mesh\n");
-  mesh.write_vtk("original_mesh.vtk", err);
-  if (err) return 1;
+    // write out the original mesh
+    //  printf("Writing out the original mesh\n");
+    mesh.write_vtk( "original_mesh.vtk", err );
+    if( err ) return 1;
 
-  // launches optimization on mesh_set1
-  //  printf("Running the instruction queue\n");
-  queue1.run_instructions(&mesh, err);
-  if (err) return 1;
+    // launches optimization on mesh_set1
+    //  printf("Running the instruction queue\n");
+    queue1.run_instructions( &mesh, err );
+    if( err ) return 1;
 
-  // write out the smoothed mesh
-  //  printf("Writing out the final mesh\n");
-  mesh.write_vtk("smoothed_mesh.vtk", err);
-  if (err) return 1;
+    // write out the smoothed mesh
+    //  printf("Writing out the final mesh\n");
+    mesh.write_vtk( "smoothed_mesh.vtk", err );
+    if( err ) return 1;
 
-  return 0;
+    return 0;
 }

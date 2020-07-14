@@ -16,38 +16,38 @@
 #include "ScdVertexData.hpp"
 #include <assert.h>
 
-namespace moab {
+namespace moab
+{
 
-    //! constructor
-ScdVertexData::ScdVertexData(const EntityHandle start_vertex,
-                             const int imin, const int jmin, const int kmin,
-                             const int imax, const int jmax, const int kmax)
+//! constructor
+ScdVertexData::ScdVertexData( const EntityHandle start_vertex, const int imin, const int jmin, const int kmin,
+                              const int imax, const int jmax, const int kmax )
     : SequenceData( 3, start_vertex,
-                   start_vertex + (imax-imin+1)*(jmax-jmin+1)*(kmax-kmin+1) - 1 )
+                    start_vertex + ( imax - imin + 1 ) * ( jmax - jmin + 1 ) * ( kmax - kmin + 1 ) - 1 )
 {
     // need to have meaningful parameters
-  assert(imax >= imin && jmax >= jmin && kmax >= kmin);
+    assert( imax >= imin && jmax >= jmin && kmax >= kmin );
 
-  vertexParams[0] = HomCoord(imin, jmin, kmin);
-  vertexParams[1] = HomCoord(imax, jmax, kmax);
-  vertexParams[2] = HomCoord(1,1,1);
+    vertexParams[0] = HomCoord( imin, jmin, kmin );
+    vertexParams[1] = HomCoord( imax, jmax, kmax );
+    vertexParams[2] = HomCoord( 1, 1, 1 );
 
-  dIJK[0] = imax-imin+1; dIJK[1] = jmax-jmin+1; dIJK[2] = kmax-kmin+1;
-  dIJKm1[0] = dIJK[0]-1;
-  dIJKm1[1] = dIJK[1]-1;
-  dIJKm1[2] = dIJK[2]-1;
+    dIJK[0]   = imax - imin + 1;
+    dIJK[1]   = jmax - jmin + 1;
+    dIJK[2]   = kmax - kmin + 1;
+    dIJKm1[0] = dIJK[0] - 1;
+    dIJKm1[1] = dIJK[1] - 1;
+    dIJKm1[2] = dIJK[2] - 1;
 
-  create_sequence_data( 0, sizeof(double) );
-  create_sequence_data( 1, sizeof(double) );
-  create_sequence_data( 2, sizeof(double) );
+    create_sequence_data( 0, sizeof( double ) );
+    create_sequence_data( 1, sizeof( double ) );
+    create_sequence_data( 2, sizeof( double ) );
 }
 
-SequenceData* ScdVertexData::subset( EntityHandle /*start*/,
-                                     EntityHandle /*end*/,
-                                     const int* /*sequence_data_sizes*/,
+SequenceData* ScdVertexData::subset( EntityHandle /*start*/, EntityHandle /*end*/, const int* /*sequence_data_sizes*/,
                                      const int* /*tag_data_sizes*/ ) const
 {
-  return 0;
+    return 0;
 }
 
-} // namespace moab
+}  // namespace moab

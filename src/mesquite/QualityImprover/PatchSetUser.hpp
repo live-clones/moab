@@ -27,12 +27,12 @@
 #ifndef MSQ_PATCH_SET_USER_HPP
 #define MSQ_PATCH_SET_USER_HPP
 
-
 #include "Mesquite.hpp"
 #include "VertexPatches.hpp"
 #include "GlobalPatch.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Utility class for handling variable patch types
  *
@@ -40,67 +40,71 @@ namespace MBMesquite {
  */
 class PatchSetUser
 {
-public:
-
-    PatchSetUser( bool defaultGlobal ) :
-      myVertexPatches( 1, true )
-      {
-        if(defaultGlobal)
-          activePatchSet = &myGlobalPatch;
+  public:
+    PatchSetUser( bool defaultGlobal ) : myVertexPatches( 1, true )
+    {
+        if( defaultGlobal )
+            activePatchSet = &myGlobalPatch;
         else
-          activePatchSet = &myVertexPatches;
-      }
+            activePatchSet = &myVertexPatches;
+    }
 
-    PatchSetUser( PatchSet* my_patch_set ) :
-      myVertexPatches( 1, true ),
-      activePatchSet( my_patch_set )
-      {}
+    PatchSetUser( PatchSet* my_patch_set ) : myVertexPatches( 1, true ), activePatchSet( my_patch_set ) {}
 
     virtual ~PatchSetUser();
 
-      /**\brief Use a single patch representing the entire mesh */
+    /**\brief Use a single patch representing the entire mesh */
     void use_global_patch()
-      { activePatchSet = &myGlobalPatch; }
+    {
+        activePatchSet = &myGlobalPatch;
+    }
 
-      /**\brief Using a single patch representing the entire mesh */
+    /**\brief Using a single patch representing the entire mesh */
     bool using_global_patch() const
-      { return activePatchSet == &myGlobalPatch; }
+    {
+        return activePatchSet == &myGlobalPatch;
+    }
 
-      /**\brief Construct a patch for each free vertex in the mesh
-       *\param num_layers Number of layers of adjacent elements to
-       *                  include in the patch.  If unsure, use 1.
-       */
+    /**\brief Construct a patch for each free vertex in the mesh
+     *\param num_layers Number of layers of adjacent elements to
+     *                  include in the patch.  If unsure, use 1.
+     */
     void use_element_on_vertex_patch( unsigned num_layers = 1 )
-      {
+    {
         activePatchSet = &myVertexPatches;
         myVertexPatches.set_num_layers( num_layers );
-      }
+    }
 
-      /**\brief True if a patch will be constructed for each free vertex */
+    /**\brief True if a patch will be constructed for each free vertex */
     bool using_element_on_vertex_patch() const
-      { return activePatchSet == &myVertexPatches; }
+    {
+        return activePatchSet == &myVertexPatches;
+    }
 
-      /**\brief Get the number of layers of elements that will be included
-       *        in an element-on-vertex patch
-       */
+    /**\brief Get the number of layers of elements that will be included
+     *        in an element-on-vertex patch
+     */
     unsigned num_element_on_vertex_layers() const
-      { return myVertexPatches.get_num_layers(); }
+    {
+        return myVertexPatches.get_num_layers();
+    }
 
     virtual PatchSet* get_patch_set()
-      { return activePatchSet; }
+    {
+        return activePatchSet;
+    }
 
     void use_patch_set( PatchSet* patch_set )
-      { activePatchSet = patch_set; }
+    {
+        activePatchSet = patch_set;
+    }
 
-private:
-
+  private:
     VertexPatches myVertexPatches;
-    GlobalPatch   myGlobalPatch;
+    GlobalPatch myGlobalPatch;
     PatchSet* activePatchSet;
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

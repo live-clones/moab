@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TAbsQualityMetricTest.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -38,37 +37,41 @@
 
 using namespace MBMesquite;
 
-class FauxAbsShapeMetric : public AWMetric {
-  TShapeNB1 mMetric;
-public:
-  std::string get_name() const { return mMetric.get_name(); }
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err )
-    { return mMetric.evaluate( A * inverse(W), result, err ); }
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err )
-    { return mMetric.evaluate( A * inverse(W), result, err ); }
-};
-
-template <> class TMPTypes<AWQualityMetric> {
-public:
-  typedef AWMetric MetricType;
-  typedef FauxAbsShapeMetric TestType;
-};
-
-class AWQualityMetricTest : public TMPQualityMetricTest<AWQualityMetric>
+class FauxAbsShapeMetric : public AWMetric
 {
-  CPPUNIT_TEST_SUITE(AWQualityMetricTest);
+    TShapeNB1 mMetric;
 
-  REGISTER_TMP_TESTS
-
-  CPPUNIT_TEST_SUITE_END();
+  public:
+    std::string get_name() const
+    {
+        return mMetric.get_name();
+    }
+    bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
+    {
+        return mMetric.evaluate( A * inverse( W ), result, err );
+    }
+    bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& err )
+    {
+        return mMetric.evaluate( A * inverse( W ), result, err );
+    }
 };
 
+template <>
+class TMPTypes< AWQualityMetric >
+{
+  public:
+    typedef AWMetric MetricType;
+    typedef FauxAbsShapeMetric TestType;
+};
 
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(AWQualityMetricTest, "AWQualityMetricTest");
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(AWQualityMetricTest, "Unit");
+class AWQualityMetricTest : public TMPQualityMetricTest< AWQualityMetric >
+{
+    CPPUNIT_TEST_SUITE( AWQualityMetricTest );
+
+    REGISTER_TMP_TESTS
+
+    CPPUNIT_TEST_SUITE_END();
+};
+
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( AWQualityMetricTest, "AWQualityMetricTest" );
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( AWQualityMetricTest, "Unit" );

@@ -30,7 +30,8 @@
 #include <sys/types.h>
 #include "Mesquite.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Utility class used by InstructionQueue SIGFPE option
  *
@@ -48,44 +49,41 @@ namespace MBMesquite {
  */
 class MsqFPE
 {
-public:
-
+  public:
     /**\brief Set FPE state
      *
      * If <code>enabled == true</code>, floating point exceptions
      * are enabled by the constructor and reset by the destructor.
      * If <code>enabled == false</code>, nothing is done.
      */
-  MsqFPE( bool enabled );
+    MsqFPE( bool enabled );
 
     /**\brief Restore FPE state */
-  ~MsqFPE();
+    ~MsqFPE();
 
     /**\brief Check if FPE state manipulation is supported on this platform */
-  static bool fpe_trap_supported();
+    static bool fpe_trap_supported();
     /**\return An integer representing the current FPE flags */
-  static int get_current_fpe_state();
+    static int get_current_fpe_state();
     /**\return Set the FPE flags on the processor */
-  static void set_current_fpe_state(int state);
+    static void set_current_fpe_state( int state );
     /**\return Enable trapping of INVALID, DIVBYZERO, and OVERFLOW */
-  static void enable_trap_fpe();
+    static void enable_trap_fpe();
 
-private:
-
+  private:
     /**\brief dummy declaration preventing heap allocation */
-  void* operator new(size_t);
+    void* operator new( size_t );
     /**\brief dummy declaration preventing default copy constructor */
-  MsqFPE( const MsqFPE& );
+    MsqFPE( const MsqFPE& );
     /**\brief dummy declaration preventing default assignment operator */
-  MsqFPE& operator=( const MsqFPE& );
+    MsqFPE& operator=( const MsqFPE& );
 
     /** Saved constructor argument for use in destructor */
-  bool isEnabled;
+    bool isEnabled;
     /** Saved FPE state for use in destructor */
-  int prevState;
+    int prevState;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif
-

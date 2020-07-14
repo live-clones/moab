@@ -25,14 +25,14 @@
 #ifndef MSQ_DEBUG_HPP
 #define MSQ_DEBUG_HPP
 
-
 #include "Mesquite.hpp"
 
 #include <vector>
 #include <iostream>
 #include <cstdio>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**
  *\defgroup debug Mesquite debug output
@@ -73,65 +73,72 @@ namespace MBMesquite {
 class MsqDebug
 {
   public:
-
-      // some pre-defined meanings of debug flags
-    enum {
-      WARN = 1,
-      INFO = 2
+    // some pre-defined meanings of debug flags
+    enum
+    {
+        WARN = 1,
+        INFO = 2
     };
 
-      /**\brief Enable a debug flag */
-    static void enable( unsigned flag )          { set( flag, true );  }
-      /**\brief Disable a debug flag */
-    static void disable( unsigned flag )         { set( flag, false ); }
-      /**\brief Set a debug flag */
+    /**\brief Enable a debug flag */
+    static void enable( unsigned flag )
+    {
+        set( flag, true );
+    }
+    /**\brief Disable a debug flag */
+    static void disable( unsigned flag )
+    {
+        set( flag, false );
+    }
+    /**\brief Set a debug flag */
     static void set( unsigned flag, bool state );
-      /**\brief Check a debug flag */
+    /**\brief Check a debug flag */
     static bool get( unsigned flag );
 
-      /**\brief Disable all debug streams */
+    /**\brief Disable all debug streams */
     static void disable_all();
 
-      /**\brief Get the output stream to be used for a given debug flag */
+    /**\brief Get the output stream to be used for a given debug flag */
     static std::ostream& get_stream( unsigned flag );
-      /**\brief Set the output stream to be used for a given debug flag */
+    /**\brief Set the output stream to be used for a given debug flag */
     static void set_stream( unsigned flag, std::ostream& stream );
 
-      // Work around limitations of preprocessor macros.
-      // You probably don't want to use this directly.  See
-      // MSQ_PRINT macro below.
-    class FormatPrinter {
+    // Work around limitations of preprocessor macros.
+    // You probably don't want to use this directly.  See
+    // MSQ_PRINT macro below.
+    class FormatPrinter
+    {
       public:
-        FormatPrinter( unsigned flag ) : myFlag(flag) {}
+        FormatPrinter( unsigned flag ) : myFlag( flag ) {}
         void print( const char* format, ... ) const
-          #ifdef __GNUC__
-           __attribute__ ((format (printf, 2, 3)))
-          #endif
-          ;
+#ifdef __GNUC__
+            __attribute__( ( format( printf, 2, 3 ) ) )
+#endif
+            ;
         const unsigned myFlag;
     };
 
-      // Static initialize function (declare a static instance of this
-      // such that the constructor can be used as a function to initialize
-      // static data.)
-    class InitializeFlags {
+    // Static initialize function (declare a static instance of this
+    // such that the constructor can be used as a function to initialize
+    // static data.)
+    class InitializeFlags
+    {
       public:
         InitializeFlags();
     };
 
   private:
-
-    static std::vector<std::ostream*> streams;
-    static std::vector<bool> flags;
+    static std::vector< std::ostream* > streams;
+    static std::vector< bool > flags;
     static InitializeFlags init;
 };
 
 /** \brief Check if a debug flag is activated - evaluates to a bool.
  */
 #ifdef MSQ_ENABLE_DEBUG
-#  define MSQ_DBG(flag) MBMesquite::MsqDebug::get(flag)
+#define MSQ_DBG( flag ) MBMesquite::MsqDebug::get( flag )
 #else
-#  define MSQ_DBG(flag) false
+#define MSQ_DBG( flag ) false
 #endif
 
 /**
@@ -141,7 +148,8 @@ class MsqDebug
  * debug flag.  Example:
  *   MSQ_DBGOUT(f) << "Debug flag " << f << " is activated" << endl;
  */
-#define MSQ_DBGOUT(flag) if (MSQ_DBG(flag)) MBMesquite::MsqDebug::get_stream(flag)
+#define MSQ_DBGOUT( flag ) \
+    if( MSQ_DBG( flag ) ) MBMesquite::MsqDebug::get_stream( flag )
 
 /**
  *\brief Check debug flag and print printf-style formatted output.
@@ -150,10 +158,11 @@ class MsqDebug
  * Example:
  *  MSQ_PRINT(f)("Debug flag %d is activated", f);
  */
-#define MSQ_PRINT(flag)  if (MSQ_DBG(flag)) MBMesquite::MsqDebug::FormatPrinter(flag).print
+#define MSQ_PRINT( flag ) \
+    if( MSQ_DBG( flag ) ) MBMesquite::MsqDebug::FormatPrinter( flag ).print
 
 /*@}*/
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

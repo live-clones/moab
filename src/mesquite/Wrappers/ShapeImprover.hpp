@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ShapeImprover.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,14 +35,15 @@
 #include "Mesquite.hpp"
 #include "Wrapper.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-  /**\brief Wrapper that implements TMP-based shape improvement
-     */
-  class ShapeImprover : public Wrapper {
+/**\brief Wrapper that implements TMP-based shape improvement
+ */
+class ShapeImprover : public Wrapper
+{
 
   public:
-
     MESQUITE_EXPORT
     ShapeImprover();
 
@@ -71,24 +71,16 @@ namespace MBMesquite {
     MESQUITE_EXPORT
     void set_parallel_iterations( int count );
 
-
   protected:
-
     MESQUITE_EXPORT
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                      ParallelMesh* pmesh,
-                      Settings* settings,
-                      QualityAssessor* qa,
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
                       MsqError& err );
 
-
   private:
-
     double maxTime, mBeta;
     int parallelIterations;
-  };
+};
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

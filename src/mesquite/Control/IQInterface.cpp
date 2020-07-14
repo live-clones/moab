@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file IQInterface.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -32,9 +31,9 @@
 
 #include "IQInterface.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 IQInterface::~IQInterface() {}
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

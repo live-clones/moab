@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TTau.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -34,28 +33,26 @@
 #include "TTau.hpp"
 #include "MsqMatrix.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 TTau::~TTau() {}
 
-std::string TTau::get_name() const { return "Tau"; }
-
-bool TTau::evaluate( const MsqMatrix<2,2>& T,
-                     double& result,
-                     MsqError&  )
+std::string TTau::get_name() const
 {
-  result = det(T);
-  return true;
+    return "Tau";
 }
 
-bool TTau::evaluate( const MsqMatrix<3,3>& T,
-                     double& result,
-                     MsqError&  )
+bool TTau::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& )
 {
-  result = det(T);
-  return true;
+    result = det( T );
+    return true;
 }
 
+bool TTau::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& )
+{
+    result = det( T );
+    return true;
+}
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

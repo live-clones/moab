@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file MeshUtil.hpp
  *  \author Jason Kraftcheck
  */
@@ -34,7 +33,8 @@
 
 #include "Mesquite.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class Mesh;
 class MsqError;
@@ -56,11 +56,7 @@ class MeshUtil
     PatchData* get_global_patch( MsqError& err );
 
   public:
-    MeshUtil( Mesh* mesh, Settings* settings = 0 )
-      : myMesh( mesh ),
-        mySettings( settings ),
-        globalPatch(0)
-        {}
+    MeshUtil( Mesh* mesh, Settings* settings = 0 ) : myMesh( mesh ), mySettings( settings ), globalPatch( 0 ) {}
 
     ~MeshUtil();
 
@@ -80,12 +76,10 @@ class MeshUtil
      * \NOTE Only basic mesh properties are checked, number of vertices & elements,
      * element connectivity, and coordinates (within the given relative tolerance).
      */
-  static bool meshes_are_different(Mesh& mesh1, Mesh& mesh2, MsqError& err, double tol=1.e-5, bool do_print = false);
-
-
+    static bool meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, double tol = 1.e-5,
+                                      bool do_print = false );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

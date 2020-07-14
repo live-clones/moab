@@ -326,6 +326,10 @@ list(APPEND MOAB_ALL_LIBS "${MPI_LIBRARY}")
 list(APPEND MOAB_ALL_LIBS ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 target_link_libraries(MOAB "${MOAB_ALL_LIBS}")
 
+# If using clang-tidy, set the target property so that
+# reformatting code does not use full fledged C++11 semantics
+# set_property(TARGET MOAB PROPERTY CXX_STANDARD 98)
+
 install(
   TARGETS MOAB
   EXPORT MOABTargets

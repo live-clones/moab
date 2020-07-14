@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShape2DB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,33 +35,32 @@
 #include "MsqError.hpp"
 #include "TMPDerivs.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string AWShape2DB1::get_name() const
-  { return "AWShape2DB1"; }
+{
+    return "AWShape2DB1";
+}
 
 AWShape2DB1::~AWShape2DB1() {}
 
-bool AWShape2DB1::evaluate( const MsqMatrix<2,2>& A,
-                            const MsqMatrix<2,2>& W,
-                            double& result,
-                            MsqError& err )
+bool AWShape2DB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  const double prod = alpha * omega;
-  if (AWMetric::invalid_determinant( prod ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double alpha = det( A );
+    const double omega = det( W );
+    const double prod  = alpha * omega;
+    if( AWMetric::invalid_determinant( prod ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result =  sqr_Frobenius(A * adj(W));
-  result += sqr_Frobenius(W * adj(A));
-  result *= 0.25/prod;
-  result -= 1.0;
-  return true;
+    result = sqr_Frobenius( A * adj( W ) );
+    result += sqr_Frobenius( W * adj( A ) );
+    result *= 0.25 / prod;
+    result -= 1.0;
+    return true;
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

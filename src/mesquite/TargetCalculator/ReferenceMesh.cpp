@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ReferenceMesh.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,23 +35,19 @@
 #include "MeshInterface.hpp"
 #include <algorithm>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 ReferenceMeshInterface::~ReferenceMeshInterface() {}
 
 ReferenceMesh::~ReferenceMesh() {}
 
-void ReferenceMesh::get_reference_vertex_coordinates(
-                           const Mesh::VertexHandle* vertices,
-                           size_t num_vertices,
-                           Vector3D* coordinates_out,
-                           MsqError& err )
+void ReferenceMesh::get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices, size_t num_vertices,
+                                                      Vector3D* coordinates_out, MsqError& err )
 {
-  tmpStorage.resize( num_vertices );
-  mMesh->vertices_get_coordinates( vertices, arrptr(tmpStorage), num_vertices, err );
-  MSQ_ERRRTN(err);
-  std::copy( tmpStorage.begin(), tmpStorage.end(), coordinates_out );
+    tmpStorage.resize( num_vertices );
+    mMesh->vertices_get_coordinates( vertices, arrptr( tmpStorage ), num_vertices, err );MSQ_ERRRTN( err );
+    std::copy( tmpStorage.begin(), tmpStorage.end(), coordinates_out );
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

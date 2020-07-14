@@ -26,7 +26,8 @@
     (2006) kraftche@cae.wisc.edu
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file QualityAssessor.hpp
 
@@ -37,7 +38,6 @@ Header file for the MBMesquite::QualityAssessor class
   \author Jason Kraftcheck
   \date   2005-03-09
  */
-
 
 #ifndef MSQ_QUALITYASSESSOR_HPP
 #define MSQ_QUALITYASSESSOR_HPP
@@ -54,44 +54,43 @@ Header file for the MBMesquite::QualityAssessor class
 namespace MBMesquite
 {
 
-   class QualityMetric;
-   class MsqError;
-   class ParallelHelper;
+class QualityMetric;
+class MsqError;
+class ParallelHelper;
 
-  /*! \class QualityAssessor
+/*! \class QualityAssessor
 
-      \brief A QualityAssessor instance can be inserted into an
-      InstructionQueue to calculate and summarize registered
-      QualityMetric or QualityMetrics for the mesh.
+    \brief A QualityAssessor instance can be inserted into an
+    InstructionQueue to calculate and summarize registered
+    QualityMetric or QualityMetrics for the mesh.
 
-      QualityAssessor provides a summary of the mesh quality.  An
-      instance of QualityAssessor may be inserted in the InstructionQueue
-      at any point to print a summary of the mesh quality at that
-      time during the optimization.  The application is expected to
-      register QualityMetric instances to be used in assessing the
-      mesh quality.  If no QualityMetrics are registered, the only
-      assessment that will be performed is a simple count of inverted
-      elements.
+    QualityAssessor provides a summary of the mesh quality.  An
+    instance of QualityAssessor may be inserted in the InstructionQueue
+    at any point to print a summary of the mesh quality at that
+    time during the optimization.  The application is expected to
+    register QualityMetric instances to be used in assessing the
+    mesh quality.  If no QualityMetrics are registered, the only
+    assessment that will be performed is a simple count of inverted
+    elements.
 
-      The "stopping assessor" and "stopping function", if set,
-      determinte the value reported to Mesquite for the overall
-      run of of the QualityAssessor.
+    The "stopping assessor" and "stopping function", if set,
+    determinte the value reported to Mesquite for the overall
+    run of of the QualityAssessor.
 
-      All summary data except the histogram and custom power-means is
-      accumulated for all registered metrics.  QualityAssessment data
-      can be obtained through three different mechanisms:
-        - QualityAssessor can print a summary to std::out or a specified
-          output stream after they are calculated.
-        - The get_results and get_all_results methods can be used to
-          obtain the sumary data programatically.
-        - Quality measures for element-based or vertex-based metrics can
-          be stored on the corresponding entities using "tags".
+    All summary data except the histogram and custom power-means is
+    accumulated for all registered metrics.  QualityAssessment data
+    can be obtained through three different mechanisms:
+      - QualityAssessor can print a summary to std::out or a specified
+        output stream after they are calculated.
+      - The get_results and get_all_results methods can be used to
+        obtain the sumary data programatically.
+      - Quality measures for element-based or vertex-based metrics can
+        be stored on the corresponding entities using "tags".
 
-  */
-  class QualityAssessor : public Instruction
-  {
+*/
+class QualityAssessor : public Instruction
+{
   public:
-
     /**\brief Simple consturctor.  Metrics registered separately.
      *\param print_summary_to_std_out If true, summary of mesh quality
      *                will be written to std::out.  If false, quality
@@ -107,10 +106,8 @@ namespace MBMesquite
      *                are in use at the same time.
      */
     MESQUITE_EXPORT
-    QualityAssessor( bool print_summary_to_std_out = true,
-                     bool free_elements_only = true,
-                     const char* inverted_element_tag_name = 0,
-                     std::string name = std::string() );
+    QualityAssessor( bool print_summary_to_std_out = true, bool free_elements_only = true,
+                     const char* inverted_element_tag_name = 0, std::string name = std::string() );
 
     /**\brief Simple consturctor.  Metrics registered separately.
      *\param output_stream IO stream to which to write a summary of the
@@ -125,10 +122,8 @@ namespace MBMesquite
      *                are in use at the same time.
      */
     MESQUITE_EXPORT
-    QualityAssessor( std::ostream& output_stream,
-                     bool free_elements_only = true,
-                     const char* inverted_element_tag_name = 0,
-                     std::string name = std::string() );
+    QualityAssessor( std::ostream& output_stream, bool free_elements_only = true,
+                     const char* inverted_element_tag_name = 0, std::string name = std::string() );
 
     /**\brief Construct and register a QualityMetric
      *\param output_stream IO stream to which to write a summary of the
@@ -158,15 +153,9 @@ namespace MBMesquite
      *                are in use at the same time.
      */
     MESQUITE_EXPORT
-    QualityAssessor( std::ostream& output_stream,
-                     QualityMetric* metric,
-                     int histogram_intervals = 0,
-                     double power_mean = 0.0,
-                     bool free_elements_only = true,
-                     const char* metric_value_tag_name = 0,
-                     const char* inverted_element_tag_name = 0,
-                     std::string name = std::string() );
-
+    QualityAssessor( std::ostream& output_stream, QualityMetric* metric, int histogram_intervals = 0,
+                     double power_mean = 0.0, bool free_elements_only = true, const char* metric_value_tag_name = 0,
+                     const char* inverted_element_tag_name = 0, std::string name = std::string() );
 
     /**\brief Construct and register a QualityMetric
      *\param print_summary_to_std_out If true, summary of mesh quality
@@ -198,50 +187,55 @@ namespace MBMesquite
      *                are in use at the same time.
      */
     MESQUITE_EXPORT
-    QualityAssessor( QualityMetric* metric,
-                     int histogram_intervals = 0,
-                     double power_mean = 0.0,
-                     bool free_elements_only = true,
-                     const char* metric_value_tag_name = 0,
-                     bool print_summary_to_std_out = true,
-                     const char* inverted_element_tag_name = 0,
+    QualityAssessor( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
+                     bool free_elements_only = true, const char* metric_value_tag_name = 0,
+                     bool print_summary_to_std_out = true, const char* inverted_element_tag_name = 0,
                      std::string name = std::string() );
 
     MESQUITE_EXPORT virtual ~QualityAssessor();
 
-      //! Provides a name to the QualityAssessor (use it for default name in constructor).
-    MESQUITE_EXPORT void set_name(std::string name) { qualityAssessorName = name; };
-      //! Retrieves the QualityAssessor name. A default name should be set in the constructor.
-    MESQUITE_EXPORT virtual std::string get_name() const { return qualityAssessorName; }
+    //! Provides a name to the QualityAssessor (use it for default name in constructor).
+    MESQUITE_EXPORT void set_name( std::string name )
+    {
+        qualityAssessorName = name;
+    };
+    //! Retrieves the QualityAssessor name. A default name should be set in the constructor.
+    MESQUITE_EXPORT virtual std::string get_name() const
+    {
+        return qualityAssessorName;
+    }
 
-      /**\brief All elements or only improvable ones.
-       *
-       * If set to true, the quality assessment results will include
-       * quality values only for those elements (or more precisely metric
-       * sample points) which are influenced by at least one free vertex.
-       * That is, quality for elements (or sample points) that the sovler
-       * cannot improve (e.g. an element with all vertices fixed) will not
-       * be included in the quality assessment.
-       *
-       * If set to false, quality for all elements will be assessed.
-       */
+    /**\brief All elements or only improvable ones.
+     *
+     * If set to true, the quality assessment results will include
+     * quality values only for those elements (or more precisely metric
+     * sample points) which are influenced by at least one free vertex.
+     * That is, quality for elements (or sample points) that the sovler
+     * cannot improve (e.g. an element with all vertices fixed) will not
+     * be included in the quality assessment.
+     *
+     * If set to false, quality for all elements will be assessed.
+     */
     MESQUITE_EXPORT void measure_free_samples_only( bool yesno )
-      { skipFixedSamples = yesno; }
+    {
+        skipFixedSamples = yesno;
+    }
 
-      /**\brief All elements or only improvable ones.
-       *
-       * If set to true, the quality assessment results will include
-       * quality values only for those elements (or more precisely metric
-       * sample points) which are influenced by at least one free vertex.
-       * That is, quality for elements (or sample points) that the sovler
-       * cannot improve (e.g. an element with all vertices fixed) will not
-       * be included in the quality assessment.
-       *
-       * If set to false, quality for all elements will be assessed.
-       */
+    /**\brief All elements or only improvable ones.
+     *
+     * If set to true, the quality assessment results will include
+     * quality values only for those elements (or more precisely metric
+     * sample points) which are influenced by at least one free vertex.
+     * That is, quality for elements (or sample points) that the sovler
+     * cannot improve (e.g. an element with all vertices fixed) will not
+     * be included in the quality assessment.
+     *
+     * If set to false, quality for all elements will be assessed.
+     */
     MESQUITE_EXPORT bool measuring_free_samples_only() const
-      { return skipFixedSamples; }
-
+    {
+        return skipFixedSamples;
+    }
 
     /**\brief Register a QualityMetric for use in quality assessment.
      *
@@ -269,22 +263,16 @@ namespace MBMesquite
      *                inverted elements.
      */
     MESQUITE_EXPORT
-    void add_quality_assessment( QualityMetric* metric,
-                                 int histogram_intervals = 0,
-                                 double power_mean = 0.0,
-                                 const char* metric_value_tag_name = 0,
-                                 const char* metric_label = 0 );
+    void add_quality_assessment( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
+                                 const char* metric_value_tag_name = 0, const char* metric_label = 0 );
 
     /**\brief Same as add_quality_assessment, except that the average
      *        metric value is also used as the return value from loop_over_mesh.
      *        Specify a power_mean value to control which average is used.
      */
     MESQUITE_EXPORT
-    void set_stopping_assessment( QualityMetric* metric,
-                                  int histogram_intervals = 0,
-                                  double power_mean = 0.0,
-                                  const char* metric_value_tag_name = 0,
-                                  const char* metric_label = 0 );
+    void set_stopping_assessment( QualityMetric* metric, int histogram_intervals = 0, double power_mean = 0.0,
+                                  const char* metric_value_tag_name = 0, const char* metric_label = 0 );
 
     /**\brief Register a QualityMetric for use in quality assessment.
      *
@@ -313,80 +301,78 @@ namespace MBMesquite
      *                inverted elements.
      */
     MESQUITE_EXPORT
-    void add_histogram_assessment( QualityMetric* qm,
-                                   double min,
-                                   double max,
-                                   int intervals,
-                                   double power_mean = 0.0,
-                                   const char* metric_value_tag_name = 0,
-                                   const char* metric_label = 0 );
+    void add_histogram_assessment( QualityMetric* qm, double min, double max, int intervals, double power_mean = 0.0,
+                                   const char* metric_value_tag_name = 0, const char* metric_label = 0 );
 
-    virtual MESQUITE_EXPORT
-    void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                           const Settings* settings,
-                           MsqError& err );
+    virtual MESQUITE_EXPORT void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                   MsqError& err );
 
-      //! Does one sweep over the mesh and assess the quality with the metrics previously added.
-    virtual MESQUITE_EXPORT
-    double loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                           const Settings* settings,
-                           MsqError &err);
+    //! Does one sweep over the mesh and assess the quality with the metrics previously added.
+    virtual MESQUITE_EXPORT double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                   MsqError& err );
 
-      //! Does one sweep over the mesh and assess the quality with the metrics previously added.
-    virtual MESQUITE_EXPORT
-    double loop_over_mesh( ParallelMesh* mesh,
-                           MeshDomain* domain,
-                           const Settings* settings,
-                           MsqError &err);
+    //! Does one sweep over the mesh and assess the quality with the metrics previously added.
+    virtual MESQUITE_EXPORT double loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings,
+                                                   MsqError& err );
 
-      //! Do not print results of assessment.
+    //! Do not print results of assessment.
     MESQUITE_EXPORT void disable_printing_results()
-       {
-         printSummary = false;
-       }
+    {
+        printSummary = false;
+    }
 
-      //! Print accumulated summary data to specified stream.
+    //! Print accumulated summary data to specified stream.
     MESQUITE_EXPORT void print_summary( std::ostream& stream ) const;
 
-      //! True if any metric evaluated to an invalid value
-      //! for any element
+    //! True if any metric evaluated to an invalid value
+    //! for any element
     MESQUITE_EXPORT bool invalid_elements() const;
 
-      //! Provides the number of inverted elements, inverted_elmes,
-      //!  and the number of elements whose orientation can not be
-      //!  determined, undefined_elems.
-      //! Returns false if this information is not yet available.
-      //! Returns true, otherwise.
-    MESQUITE_EXPORT bool get_inverted_element_count(int &inverted_elems,
-                                                    int &inverted_samples,
-                                                    MsqError &err);
+    //! Provides the number of inverted elements, inverted_elmes,
+    //!  and the number of elements whose orientation can not be
+    //!  determined, undefined_elems.
+    //! Returns false if this information is not yet available.
+    //! Returns true, otherwise.
+    MESQUITE_EXPORT bool get_inverted_element_count( int& inverted_elems, int& inverted_samples, MsqError& err );
 
-      //! Reset calculated data
+    //! Reset calculated data
     MESQUITE_EXPORT void reset_data();
 
-      //! Produces two historgrams on a single scale from a before
-      //! optimization histogram and an after optimization histogram.
-      //! The histogram intervals are adjusted to include the enitre
-      //! range of both histograms, the horizontal interval value bars
-      //! are adjusted to be on the same scale, and the metric quality
-      //! values are placed in the correct quality value 'bin' based
-      //! on the new interval scale.
+    //! Produces two historgrams on a single scale from a before
+    //! optimization histogram and an after optimization histogram.
+    //! The histogram intervals are adjusted to include the enitre
+    //! range of both histograms, the horizontal interval value bars
+    //! are adjusted to be on the same scale, and the metric quality
+    //! values are placed in the correct quality value 'bin' based
+    //! on the new interval scale.
 
-    MESQUITE_EXPORT void scale_histograms(QualityAssessor* optimal);
+    MESQUITE_EXPORT void scale_histograms( QualityAssessor* optimal );
 
     MESQUITE_EXPORT void tag_inverted_elements( std::string tagname )
-      { invertedTagName = tagname; }
+    {
+        invertedTagName = tagname;
+    }
     MESQUITE_EXPORT void dont_tag_inverted_elements()
-      { invertedTagName.clear(); }
+    {
+        invertedTagName.clear();
+    }
     MESQUITE_EXPORT bool tagging_inverted_elements() const
-      { return !invertedTagName.empty(); }
+    {
+        return !invertedTagName.empty();
+    }
 
     MESQUITE_EXPORT void tag_fixed_elements( std::string tagname )
-      { fixedTagName = tagname; }
+    {
+        fixedTagName = tagname;
+    }
     MESQUITE_EXPORT void dont_tag_fixed_elements()
-      { fixedTagName.clear(); }
+    {
+        fixedTagName.clear();
+    }
     MESQUITE_EXPORT bool tagging_fixed_elements() const
-      { return !fixedTagName.empty(); }
+    {
+        return !fixedTagName.empty();
+    }
 
     /** \brief Per-metric QualityAssessor data
      *
@@ -402,21 +388,38 @@ namespace MBMesquite
     class Assessor
     {
       public:
-
         MESQUITE_EXPORT Assessor( QualityMetric* metric, const char* name = 0 );
 
-        MESQUITE_EXPORT double get_average() const ;
-        MESQUITE_EXPORT double get_maximum() const { return maximum; }
-        MESQUITE_EXPORT double get_minimum() const { return minimum; }
-        MESQUITE_EXPORT double get_rms()     const ;
-        MESQUITE_EXPORT double get_stddev()  const ;
+        MESQUITE_EXPORT double get_average() const;
+        MESQUITE_EXPORT double get_maximum() const
+        {
+            return maximum;
+        }
+        MESQUITE_EXPORT double get_minimum() const
+        {
+            return minimum;
+        }
+        MESQUITE_EXPORT double get_rms() const;
+        MESQUITE_EXPORT double get_stddev() const;
         MESQUITE_EXPORT double get_power_mean() const;
-        MESQUITE_EXPORT double get_power() const   { return pMean; }
-        MESQUITE_EXPORT int get_count() const { return count; }
+        MESQUITE_EXPORT double get_power() const
+        {
+            return pMean;
+        }
+        MESQUITE_EXPORT int get_count() const
+        {
+            return count;
+        }
 
-        MESQUITE_EXPORT bool have_power_mean() const { return 0.0 != pMean; }
+        MESQUITE_EXPORT bool have_power_mean() const
+        {
+            return 0.0 != pMean;
+        }
 
-        MESQUITE_EXPORT int get_invalid_element_count() const { return numInvalid; }
+        MESQUITE_EXPORT int get_invalid_element_count() const
+        {
+            return numInvalid;
+        }
 
         /** Get historgram of data, if calculated.
          *\param lower_bound_out  The lower bound of the histogram
@@ -430,9 +433,7 @@ namespace MBMesquite
          *              upper bounds.
          */
         MESQUITE_EXPORT
-        void get_histogram( double& lower_bound_out,
-                            double& upper_bound_out,
-                            std::vector<int>& counts_out,
+        void get_histogram( double& lower_bound_out, double& upper_bound_out, std::vector< int >& counts_out,
                             MsqError& err ) const;
 
         /** Reset all calculated data */
@@ -442,9 +443,15 @@ namespace MBMesquite
         MESQUITE_EXPORT void print_histogram( std::ostream&, int width = 0 ) const;
 
         /** Get the QualityMetric */
-        MESQUITE_EXPORT QualityMetric* get_metric() const { return qualMetric; }
+        MESQUITE_EXPORT QualityMetric* get_metric() const
+        {
+            return qualMetric;
+        }
 
-        MESQUITE_EXPORT const std::string& get_label() const { return mLabel; }
+        MESQUITE_EXPORT const std::string& get_label() const
+        {
+            return mLabel;
+        }
 
         /** Add a value to the running counts */
         MESQUITE_EXPORT void add_value( double metric_value );
@@ -453,44 +460,51 @@ namespace MBMesquite
         MESQUITE_EXPORT void add_hist_value( double metric_value );
 
         /** Note invalid result */
-        MESQUITE_EXPORT void add_invalid_value() ;
+        MESQUITE_EXPORT void add_invalid_value();
 
         MESQUITE_EXPORT bool have_histogram() const
-          { return !histogram.empty(); }
+        {
+            return !histogram.empty();
+        }
 
         /** If range of histogram has not yet been determined,
-          * calculate it from the min/max values.
-          */
+         * calculate it from the min/max values.
+         */
         MESQUITE_EXPORT void calculate_histogram_range();
 
-        MESQUITE_EXPORT bool write_to_tag() const { return !tagName.empty(); }
+        MESQUITE_EXPORT bool write_to_tag() const
+        {
+            return !tagName.empty();
+        }
 
         MESQUITE_EXPORT void set_stopping_function( bool value )
-          { stoppingFunction = value; }
+        {
+            stoppingFunction = value;
+        }
 
-        MESQUITE_EXPORT bool stopping_function( ) const
-          { return stoppingFunction; }
+        MESQUITE_EXPORT bool stopping_function() const
+        {
+            return stoppingFunction;
+        }
 
         MESQUITE_EXPORT double stopping_function_value() const;
 
-
       private:
-
         friend class QualityAssessor;
 
-        QualityMetric *const qualMetric; //< The quality metric
+        QualityMetric* const qualMetric;  //< The quality metric
         std::string mLabel;
 
         unsigned long count;  //< The total number of times the metric was evaluated
 
-        double sum;       //< The sum of the metric over all elements
-        double maximum;   //< The maximum of the metric
-        double minimum;   //< The minimum value of the metric
-        double sqrSum;    //< The sum of the square of the metric values
-        double pSum;      //< The sum of the metric values raised to the pMean power
+        double sum;                //< The sum of the metric over all elements
+        double maximum;            //< The maximum of the metric
+        double minimum;            //< The minimum value of the metric
+        double sqrSum;             //< The sum of the square of the metric values
+        double pSum;               //< The sum of the metric values raised to the pMean power
         unsigned long numInvalid;  //< Count of invalid metric values
 
-        double pMean;     //< Power for general power-mean.
+        double pMean;  //< Power for general power-mean.
 
         /** The histogram counts, where the first and last values are
          * counts of values below the lower bound and above the upper
@@ -498,11 +512,11 @@ namespace MBMesquite
          * counts.
          */
         bool haveHistRange;
-        double histMin;   //< Lower bound of histogram
-        double histMax;   //< Upper bound of histogram
-        std::vector<int> histogram;
+        double histMin;  //< Lower bound of histogram
+        double histMax;  //< Upper bound of histogram
+        std::vector< int > histogram;
 
-        std::string tagName; //< Tag to which to write metric values.
+        std::string tagName;  //< Tag to which to write metric values.
         /** Cached tag handle */
         TagHandle tagHandle;
 
@@ -512,10 +526,9 @@ namespace MBMesquite
         int referenceCount;
 
         enum AssessSchemes assessScheme;
+    };
 
-     };
-
-    typedef std::list<Assessor*> list_type;
+    typedef std::list< Assessor* > list_type;
 
     /** \brief Request summary data for a specific QualityMetric
      * This method allows the application to request the summary
@@ -539,51 +552,54 @@ namespace MBMesquite
      *  Return a const reference to the internal list of
      *  calculated data.
      */
-   const list_type& get_all_results() const
-      { return assessList; }
+    const list_type& get_all_results() const
+    {
+        return assessList;
+    }
 
-   MESQUITE_EXPORT
-   QualityAssessor( const QualityAssessor& copy );
+    MESQUITE_EXPORT
+    QualityAssessor( const QualityAssessor& copy );
 
-   MESQUITE_EXPORT
-   QualityAssessor& operator=( const QualityAssessor& copy );
+    MESQUITE_EXPORT
+    QualityAssessor& operator=( const QualityAssessor& copy );
 
   private:
-
-    struct Data {
+    struct Data
+    {
         /** Count of inverted elements. */
-      int invertedElementCount;
+        int invertedElementCount;
 
         /** Count of inverted Jacobians within elements.*/
-      int invertedSampleCount;
+        int invertedSampleCount;
 
         /** Number of elements */
-      size_t elementCount;
+        size_t elementCount;
 
         /** Total number of element Jacobians tested for inversion */
-      size_t sampleCount;
+        size_t sampleCount;
 
         /** Number of elements with at least one free vertex */
-      size_t freeElementCount;
+        size_t freeElementCount;
 
-      int referenceCount;
+        int referenceCount;
 
-      Data() : referenceCount(1) { clear(); }
+        Data() : referenceCount( 1 )
+        {
+            clear();
+        }
 
-      void clear() {
-        invertedElementCount = invertedSampleCount = -1;
-        elementCount = sampleCount = freeElementCount = 0;
-      }
+        void clear()
+        {
+            invertedElementCount = invertedSampleCount = -1;
+            elementCount = sampleCount = freeElementCount = 0;
+        }
     };
 
     Data* myData;
 
-
-      //! Common code for serial and parallel loop_over_mesh
-    double loop_over_mesh_internal( MeshDomainAssoc* mesh_and_domain,
-                                    const Settings* settings,
-                                    ParallelHelper* helper,
-                                    MsqError &err);
+    //! Common code for serial and parallel loop_over_mesh
+    double loop_over_mesh_internal( MeshDomainAssoc* mesh_and_domain, const Settings* settings, ParallelHelper* helper,
+                                    MsqError& err );
 
     /** Find an Assessor corresponding to the passed
      *  QualityMetric, or create it if is not found in
@@ -598,21 +614,16 @@ namespace MBMesquite
     list_type::iterator find_stopping_assessment();
 
     /** Find or create tag */
-    TagHandle get_tag( Mesh* mesh,
-                       std::string name,
-                       Mesh::TagType type,
-                       unsigned size,
-                       MsqError& err );
+    TagHandle get_tag( Mesh* mesh, std::string name, Mesh::TagType type, unsigned size, MsqError& err );
 
     /** Try to determine if output stream is a terminal and if so,
         the width of that terminal.  Returns zero if width cannot
         be determined. */
     int get_terminal_width() const;
 
-    static std::string element_name_as_string(int enum_name);
+    static std::string element_name_as_string( int enum_name );
 
-    static double round_to_3_significant_digits(double number);
-
+    static double round_to_3_significant_digits( double number );
 
     /** Name */
     std::string qualityAssessorName;
@@ -629,14 +640,11 @@ namespace MBMesquite
 
     bool skipFixedSamples;
 
-    int elementTypeCount[MIXED - POLYGON+1];
+    int elementTypeCount[MIXED - POLYGON + 1];
 
     bool invalid_values;  // set to true when a target metric contains inverted elements
+};
 
-  };
+}  // namespace MBMesquite
 
-
-} //namespace
-
-
-#endif // QualityAssessor_hpp
+#endif  // QualityAssessor_hpp

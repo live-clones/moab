@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file SizeMetric.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -34,21 +33,25 @@
 #include "SizeMetric.hpp"
 #include "PatchData.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 SizeMetric::~SizeMetric() {}
 
-std::string SizeMetric::get_name() const { return "Size"; }
-
-int SizeMetric::get_negate_flag() const { return 1; }
-
-bool SizeMetric::evaluate( PatchData& pd,
-                           size_t handle,
-                           double& value,
-                           MsqError& err )
+std::string SizeMetric::get_name() const
 {
-  value = pd.element_by_index(handle).compute_unsigned_area( pd, err );
-  return true;
+    return "Size";
 }
 
-} // namespace MBMesquite
+int SizeMetric::get_negate_flag() const
+{
+    return 1;
+}
+
+bool SizeMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
+{
+    value = pd.element_by_index( handle ).compute_unsigned_area( pd, err );
+    return true;
+}
+
+}  // namespace MBMesquite

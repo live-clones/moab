@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -59,38 +60,40 @@ using std::endl;
 
 using namespace MBMesquite;
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
-  MBMesquite::MsqPrintError err(cout);
+    MBMesquite::MsqPrintError err( cout );
 
-  std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
+    std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
 
-  // command line arguments
-  if (argc==1) {
-	
-     cout << "No command line argument given for mesh file.\n"
-          << "Defaulting to " << file_name << "\n";
-  }
-  else if (argc>2)
-    cout << "Too many command line arguments.\n" << endl;
-  else if (argc==2) {
-    cout << " given 1 command line arguments.\n";
-    file_name = argv[1];
-  }
+    // command line arguments
+    if( argc == 1 )
+    {
 
-  MBMesquite::MeshImpl mesh;
-  mesh.read_vtk(file_name.c_str(), err);
+        cout << "No command line argument given for mesh file.\n"
+             << "Defaulting to " << file_name << "\n";
+    }
+    else if( argc > 2 )
+        cout << "Too many command line arguments.\n" << endl;
+    else if( argc == 2 )
+    {
+        cout << " given 1 command line arguments.\n";
+        file_name = argv[1];
+    }
 
-  // creates a wrapper
-  ShapeImprovementWrapper wrapper;
+    MBMesquite::MeshImpl mesh;
+    mesh.read_vtk( file_name.c_str(), err );
 
-//  mesh->write_vtk("original_mesh",err); MSQ_CHKERR(err);
+    // creates a wrapper
+    ShapeImprovementWrapper wrapper;
 
-  // launches optimization on mesh_set1
-  wrapper.run_instructions(&mesh, err);
-  if (err) return 1;
+    //  mesh->write_vtk("original_mesh",err); MSQ_CHKERR(err);
 
-//  mesh->write_vtk("smoothed_mesh", err); MSQ_CHKERR(err);
-  print_timing_diagnostics(cout);
-  return 0;
+    // launches optimization on mesh_set1
+    wrapper.run_instructions( &mesh, err );
+    if( err ) return 1;
+
+    //  mesh->write_vtk("smoothed_mesh", err); MSQ_CHKERR(err);
+    print_timing_diagnostics( cout );
+    return 0;
 }

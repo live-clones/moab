@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ManPage.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -39,42 +38,68 @@
 
 class ManPage
 {
-public:
-  static std::ostream& begin_bold( std::ostream& str )
-    { return str << std::endl << ".B" << std::endl; }
-  static std::ostream& end_bold( std::ostream& str )
-    { return str << std::endl; }
-  static std::ostream& bold( std::ostream& str, const std::string& s )
-    { return end_bold( begin_bold(str) << s ); }
+  public:
+    static std::ostream& begin_bold( std::ostream& str )
+    {
+        return str << std::endl << ".B" << std::endl;
+    }
+    static std::ostream& end_bold( std::ostream& str )
+    {
+        return str << std::endl;
+    }
+    static std::ostream& bold( std::ostream& str, const std::string& s )
+    {
+        return end_bold( begin_bold( str ) << s );
+    }
 
-  static std::ostream& begin_italic( std::ostream& str )
-    { return str << std::endl << ".I" << std::endl; }
-  static std::ostream& end_italic( std::ostream& str )
-    { return str << std::endl; }
-  static std::ostream& italic( std::ostream& str, const std::string& s )
-    { return end_italic( begin_italic(str) << s ); }
+    static std::ostream& begin_italic( std::ostream& str )
+    {
+        return str << std::endl << ".I" << std::endl;
+    }
+    static std::ostream& end_italic( std::ostream& str )
+    {
+        return str << std::endl;
+    }
+    static std::ostream& italic( std::ostream& str, const std::string& s )
+    {
+        return end_italic( begin_italic( str ) << s );
+    }
 
-  static std::ostream& begin_section( std::ostream& str, const std::string& name )
-    { return str << std::endl << ".SH " << name << std::endl; }
+    static std::ostream& begin_section( std::ostream& str, const std::string& name )
+    {
+        return str << std::endl << ".SH " << name << std::endl;
+    }
 
-  static std::ostream& begin_subsection( std::ostream& str, const std::string& name )
-    { return str << std::endl << ".SS " << name << std::endl; }
+    static std::ostream& begin_subsection( std::ostream& str, const std::string& name )
+    {
+        return str << std::endl << ".SS " << name << std::endl;
+    }
 
-  static std::ostream& begin_paragraph( std::ostream& str )
-    { return str << std::endl << ".P " << std::endl; }
+    static std::ostream& begin_paragraph( std::ostream& str )
+    {
+        return str << std::endl << ".P " << std::endl;
+    }
 
-  static std::ostream& begin_hanging_paragraph( std::ostream& str )
-    { return str << std::endl << ".HP " << std::endl; }
+    static std::ostream& begin_hanging_paragraph( std::ostream& str )
+    {
+        return str << std::endl << ".HP " << std::endl;
+    }
 
-  static std::ostream& begin_indent( std::ostream& str )
-    { return str << std::endl << ".RS " << std::endl; }
-  static std::ostream& end_indent( std::ostream& str )
-    { return str << std::endl << ".RE " << std::endl; }
+    static std::ostream& begin_indent( std::ostream& str )
+    {
+        return str << std::endl << ".RS " << std::endl;
+    }
+    static std::ostream& end_indent( std::ostream& str )
+    {
+        return str << std::endl << ".RE " << std::endl;
+    }
 
-  static std::ostream& begin_manpage( std::ostream& str, const std::string& name, int section )
-    { return str << std::endl << ".TH " << name << " " << section << std::endl; }
+    static std::ostream& begin_manpage( std::ostream& str, const std::string& name, int section )
+    {
+        return str << std::endl << ".TH " << name << " " << section << std::endl;
+    }
 
-  static std::ostream& write_text( std::ostream& str, bool hanging_indent, const std::string& text );
+    static std::ostream& write_text( std::ostream& str, bool hanging_indent, const std::string& text );
 };
 
 #endif

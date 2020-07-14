@@ -19,15 +19,16 @@
 #include "moab/Types.hpp"
 #include <vector>
 
-namespace moab {
+namespace moab
+{
 
 class Interface;
 class Range;
 class SetIterator;
 class ProcConfig;
 
-typedef std::vector<EntityHandle> HandleVec;
+typedef std::vector< EntityHandle > HandleVec;
 
-} // namespace moab
+}  // namespace moab
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TUntangleBeta.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "TMetric.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Untangle metric
  *
@@ -46,66 +46,43 @@ namespace MBMesquite {
  */
 class TUntangleBeta : public TMetric
 {
-private:
-  double mGamma;
+  private:
+    double mGamma;
 
-public:
+  public:
+    TUntangleBeta( double gamma = 0.0 ) : mGamma( gamma ) {}
 
-  TUntangleBeta( double gamma = 0.0 ) : mGamma(gamma) {}
+    MESQUITE_EXPORT virtual ~TUntangleBeta();
 
-  MESQUITE_EXPORT virtual
-  ~TUntangleBeta();
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<2,2>& T,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_T,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_T, MsqMatrix< 2, 2 > second_wrt_T[3],
+                                                     MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<2,2>& T,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_T,
-                           MsqMatrix<2,2> second_wrt_T[3],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_T, MsqMatrix< 3, 3 > second_wrt_T[6],
+                                                     MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<3,3>& T,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_T,
-                           MsqMatrix<3,3> second_wrt_T[6],
-                           MsqError& err );
-
-private:
-  template <unsigned D> inline
-  bool eval( const MsqMatrix<D,D>& T, double& result );
-  template <unsigned D> inline
-  bool grad( const MsqMatrix<D,D>& T, double& result, MsqMatrix<D,D>& first );
-  template <unsigned D> inline
-  bool hess( const MsqMatrix<D,D>& T, double& result, MsqMatrix<D,D>& first, MsqMatrix<D,D>* second );
+  private:
+    template < unsigned D >
+    inline bool eval( const MsqMatrix< D, D >& T, double& result );
+    template < unsigned D >
+    inline bool grad( const MsqMatrix< D, D >& T, double& result, MsqMatrix< D, D >& first );
+    template < unsigned D >
+    inline bool hess( const MsqMatrix< D, D >& T, double& result, MsqMatrix< D, D >& first, MsqMatrix< D, D >* second );
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

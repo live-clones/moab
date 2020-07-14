@@ -37,6 +37,10 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+if (MOAB_HAVE_TEMPESTREMAP)
+  include_directories( ${TEMPESTREMAP_INCLUDES} ${EIGEN3_DIR} )
+endif (MOAB_HAVE_TEMPESTREMAP)
+
 set( TOOLS_LINK_LIBS MOAB ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 if ( MOAB_HAVE_CGM )
   set( TOOLS_LINK_LIBS ${TOOLS_LINK_LIBS} ${CGM_LIBRARIES} )
@@ -106,7 +110,7 @@ endif ( )
 if ( MOAB_BUILD_MBCONVERT )
   add_executable( mbconvert convert.cpp)
   set_source_files_properties( convert.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
-  target_link_libraries( mbconvert ${TOOLS_LINK_LIBS} )
+  target_link_libraries( mbconvert ${TOOLS_LINK_LIBS} ${TEMPESTREMAP_LIBRARIES} )
   set( MOAB_HAVE_MBCONVERT 1 )
   install(
     TARGETS mbconvert
@@ -234,10 +238,9 @@ if ( MOAB_BUILD_MBSLAVEPART )
 endif( )
 
 # MBTEMPEST
-if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
+if ( MOAB_BUILD_MBTEMPEST )
   add_executable( mbtempest mbtempest.cpp)
   set_source_files_properties( mbtempest.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
-  include_directories( ${TEMPESTREMAP_INCLUDES} ${EIGEN3_DIR} )
   target_link_libraries( mbtempest ${TOOLS_LINK_LIBS} ${TEMPESTREMAP_LIBRARIES} )
   set( MOAB_HAVE_MBTEMPEST 1 )
   install(
@@ -246,6 +249,7 @@ if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+
 endif( )
 
 # MBQUALITY

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TUntangleBeta.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,68 +34,67 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-
-TUntangleBeta::~TUntangleBeta()
-{}
+TUntangleBeta::~TUntangleBeta() {}
 
 std::string TUntangleBeta::get_name() const
-  { return "untangle beta"; }
-
-
-template <unsigned DIM> inline
-bool TUntangleBeta::eval( const MsqMatrix<DIM,DIM>& T,
-                          double& result )
 {
-  double tau = det(T);
-  double d = tau - mGamma;
-  double f = fabs(d) - d;
-  result = 0.125*f*f*f;
-  return true;
+    return "untangle beta";
 }
 
-template <unsigned DIM> inline
-bool TUntangleBeta::grad( const MsqMatrix<DIM,DIM>& T,
-                          double& result,
-                          MsqMatrix<DIM,DIM>& deriv_wrt_T )
+template < unsigned DIM >
+inline bool TUntangleBeta::eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
-  double tau = det(T);
-  if (tau < mGamma) {
-    double d = mGamma - tau;
-    result = d*d*d;
-    deriv_wrt_T = -3*d*d*transpose_adj(T);
-  }
-  else {
-    result = 0.0;
-    deriv_wrt_T = MsqMatrix<DIM,DIM>(0.0);
-  }
-  return true;
+    double tau = det( T );
+    double d   = tau - mGamma;
+    double f   = fabs( d ) - d;
+    result     = 0.125 * f * f * f;
+    return true;
 }
 
-template <unsigned DIM> inline
-bool TUntangleBeta::hess( const MsqMatrix<DIM,DIM>& T,
-                          double& result,
-                          MsqMatrix<DIM,DIM>& deriv_wrt_T,
-                          MsqMatrix<DIM,DIM>* second_wrt_T )
+template < unsigned DIM >
+inline bool TUntangleBeta::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T )
 {
-  double tau = det(T);
-  if (tau < mGamma) {
-    const MsqMatrix<DIM,DIM> adjt = transpose_adj(T);
-    double d = mGamma - tau;
-    result = d*d*d;
-    deriv_wrt_T = -3*d*d*adjt;
-    set_scaled_outer_product( second_wrt_T, 6*d, adjt );
-    pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -3*d*d, T );
-  }
-  else {
-    result = 0.0;
-    deriv_wrt_T = MsqMatrix<DIM,DIM>(0.0);
-    set_scaled_I( second_wrt_T, 0.0 ); // zero everything
-  }
-  return true;
+    double tau = det( T );
+    if( tau < mGamma )
+    {
+        double d    = mGamma - tau;
+        result      = d * d * d;
+        deriv_wrt_T = -3 * d * d * transpose_adj( T );
+    }
+    else
+    {
+        result      = 0.0;
+        deriv_wrt_T = MsqMatrix< DIM, DIM >( 0.0 );
+    }
+    return true;
 }
 
-TMP_T_TEMPL_IMPL_COMMON(TUntangleBeta)
+template < unsigned DIM >
+inline bool TUntangleBeta::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                                 MsqMatrix< DIM, DIM >* second_wrt_T )
+{
+    double tau = det( T );
+    if( tau < mGamma )
+    {
+        const MsqMatrix< DIM, DIM > adjt = transpose_adj( T );
+        double d                         = mGamma - tau;
+        result                           = d * d * d;
+        deriv_wrt_T                      = -3 * d * d * adjt;
+        set_scaled_outer_product( second_wrt_T, 6 * d, adjt );
+        pluseq_scaled_2nd_deriv_of_det( second_wrt_T, -3 * d * d, T );
+    }
+    else
+    {
+        result      = 0.0;
+        deriv_wrt_T = MsqMatrix< DIM, DIM >( 0.0 );
+        set_scaled_I( second_wrt_T, 0.0 );  // zero everything
+    }
+    return true;
+}
 
-} // namespace MBMesquite
+TMP_T_TEMPL_IMPL_COMMON( TUntangleBeta )
+
+}  // namespace MBMesquite

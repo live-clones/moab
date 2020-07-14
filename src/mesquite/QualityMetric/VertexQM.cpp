@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file VertexQM.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,54 +34,48 @@
 #include "PatchData.hpp"
 #include "ElemSampleQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 VertexQM::~VertexQM() {}
 
-void VertexQM::get_evaluations( PatchData& pd,
-                                std::vector<size_t>& handles,
-                                bool free_vertices_only,
-                                MsqError& err )
+void VertexQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err )
 {
-  get_vertex_evaluations( pd, handles, free_vertices_only, err );
+    get_vertex_evaluations( pd, handles, free_vertices_only, err );
 }
 
-void VertexQM::get_vertex_evaluations( PatchData& pd,
-                                       std::vector<size_t>& handles,
-                                       bool free_vertices_only,
+void VertexQM::get_vertex_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
                                        MsqError& /*err*/ )
 {
-  if (free_vertices_only) {
-    handles.resize( pd.num_free_vertices() );
-    for (size_t i = 0; i < pd.num_free_vertices(); ++i)
-      handles[i] = i;
-  }
-  else {
-    handles.clear();
-    handles.reserve( pd.num_nodes() );
-    for (size_t i = 0; i < pd.num_nodes(); ++i)
-      if (!(pd.vertex_by_index(i).get_flags() & MsqVertex::MSQ_PATCH_FIXED))
-        handles.push_back(i);
-  }
+    if( free_vertices_only )
+    {
+        handles.resize( pd.num_free_vertices() );
+        for( size_t i = 0; i < pd.num_free_vertices(); ++i )
+            handles[i] = i;
+    }
+    else
+    {
+        handles.clear();
+        handles.reserve( pd.num_nodes() );
+        for( size_t i = 0; i < pd.num_nodes(); ++i )
+            if( !( pd.vertex_by_index( i ).get_flags() & MsqVertex::MSQ_PATCH_FIXED ) ) handles.push_back( i );
+    }
 }
 
-void VertexQM::get_vertex_corner_handles( PatchData& pd,
-                                          size_t vtx_idx,
-                                          std::vector<size_t>& handles,
-                                          MsqError& err )
+void VertexQM::get_vertex_corner_handles( PatchData& pd, size_t vtx_idx, std::vector< size_t >& handles, MsqError& err )
 {
-  size_t len;
-  const size_t *elems = pd.get_vertex_element_adjacencies( vtx_idx, len, err );
-  MSQ_ERRRTN(err);
+    size_t len;
+    const size_t* elems = pd.get_vertex_element_adjacencies( vtx_idx, len, err );MSQ_ERRRTN( err );
 
-  handles.resize(len);
-  for (size_t i = 0; i < len; ++i) {
-    const MsqMeshEntity& elem = pd.element_by_index( elems[i] );
-    const size_t* verts = elem.get_vertex_index_array();
-    const size_t* ptr = std::find( verts, verts+elem.node_count(), vtx_idx );
-    unsigned idx = ptr - verts;
-    handles[i] = ElemSampleQM::handle( Sample(0,idx), elems[i] );
-  }
+    handles.resize( len );
+    for( size_t i = 0; i < len; ++i )
+    {
+        const MsqMeshEntity& elem = pd.element_by_index( elems[i] );
+        const size_t* verts       = elem.get_vertex_index_array();
+        const size_t* ptr         = std::find( verts, verts + elem.node_count(), vtx_idx );
+        unsigned idx              = ptr - verts;
+        handles[i]                = ElemSampleQM::handle( Sample( 0, idx ), elems[i] );
+    }
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,22 +35,23 @@
 #include "Mesquite.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
-template <unsigned R, unsigned C> class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 /**\brief A metric for comparing a matrix A with a target matrix W
  *
  * Implement a scalar function \f$\mu(A,W)\f$ where A and W are 2x2 or 3x3 matrices.
  */
-class AWMetric {
-public:
-  MESQUITE_EXPORT virtual
-  ~AWMetric();
+class AWMetric
+{
+  public:
+    MESQUITE_EXPORT virtual ~AWMetric();
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const = 0;
+    MESQUITE_EXPORT virtual std::string get_name() const = 0;
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
@@ -61,11 +61,8 @@ public:
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
@@ -75,11 +72,8 @@ public:
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                           MsqError& err );
 
     /**\brief Gradient of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -97,12 +91,8 @@ public:
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<2,2>& A,
-                           const MsqMatrix<2,2>& W,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_A,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
+                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err );
 
     /**\brief Gradient of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -125,12 +115,8 @@ public:
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_grad( const MsqMatrix<3,3>& A,
-                           const MsqMatrix<3,3>& W,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_A,
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
+                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err );
 
     /**\brief Hessian of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -163,13 +149,9 @@ public:
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<2,2>& A,
-                           const MsqMatrix<2,2>& W,
-                           double& result,
-                           MsqMatrix<2,2>& deriv_wrt_A,
-                           MsqMatrix<2,2> second_wrt_A[3],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
+                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A,
+                                                     MsqMatrix< 2, 2 > second_wrt_A[3], MsqError& err );
 
     /**\brief Hessian of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -248,54 +230,42 @@ public:
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_hess( const MsqMatrix<3,3>& A,
-                           const MsqMatrix<3,3>& W,
-                           double& result,
-                           MsqMatrix<3,3>& deriv_wrt_A,
-                           MsqMatrix<3,3> second_wrt_A[6],
-                           MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
+                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A,
+                                                     MsqMatrix< 3, 3 > second_wrt_A[6], MsqError& err );
 
-  static inline bool invalid_determinant( double d )
-    { return d < 1e-12; }
+    static inline bool invalid_determinant( double d )
+    {
+        return d < 1e-12;
+    }
 };
 
 class AWMetric2D : public AWMetric
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~AWMetric2D();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetric2D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
      * This method always returns an error for 2D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                           MsqError& err );
 };
 
 class AWMetric3D : public AWMetric
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~AWMetric3D();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetric3D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
      * This method always returns an error for 3D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

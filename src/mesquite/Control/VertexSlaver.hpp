@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file VertexSlaver.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,12 +34,13 @@
 
 #include "Instruction.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MESQUITE_EXPORT VertexSlaver : public Instruction
 {
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

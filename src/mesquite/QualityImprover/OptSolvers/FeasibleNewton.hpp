@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //    AUTHOR: Thomas Leurent <tleurent@mcs.anl.gov>
 //       ORG: Argonne National Laboratory
@@ -60,61 +61,63 @@
 
 namespace MBMesquite
 {
-  class ObjectiveFunction;
+class ObjectiveFunction;
 
+/*! \class FeasibleNewton
 
-  /*! \class FeasibleNewton
+    \brief High Performance implementation of the Feasible Newton algorythm.
 
-      \brief High Performance implementation of the Feasible Newton algorythm.
+    Consider our non-linear objective function
+    \f$ f: I\!\!R^{3N} \rightarrow I\!\!R \f$ where \f$ N \f$
+    is the number of vertices of the mesh, and \f$ 3N \f$ is therefore the number
+    of degrees of freedom of the mesh.
+    The Taylor expansion of \f$ f \f$ around the point \f$ x_0 \f$ is
+    \f[ f(x_0+d) = f(x_0) + \nabla f(x_0)d + \frac{1}{2} d^T\nabla^2 f(x_0)d
+        + ...  \;\;\; .\f]
 
-      Consider our non-linear objective function
-      \f$ f: I\!\!R^{3N} \rightarrow I\!\!R \f$ where \f$ N \f$
-      is the number of vertices of the mesh, and \f$ 3N \f$ is therefore the number
-      of degrees of freedom of the mesh.
-      The Taylor expansion of \f$ f \f$ around the point \f$ x_0 \f$ is
-      \f[ f(x_0+d) = f(x_0) + \nabla f(x_0)d + \frac{1}{2} d^T\nabla^2 f(x_0)d
-          + ...  \;\;\; .\f]
+    Each iteration of the Newton algorithm tries to find a descent vector that
+    minimizes the above quadratic approximation, i.e. it looks for
+    \f[ \min_{d} q(d;x_0) = f(x_0) + \nabla f(x_0)d + \frac{1}{2} d^T\nabla^2 f(x_0)d
+        \;\; . \f]
+    We know that if a quadratic function has a finite minimum, it is reached at the
+    point where the function gradient is null and that the function Hessian
+    is then positive definite.
+    Therefore we are looking for \f$ d \f$ such that \f$ \nabla q(d;x_0) =0 \f$. We have
+    \f[ \nabla q(d;x_0) = \nabla f(x_0) + \nabla^2 f(x_0)d \;\;, \f]
+    therefore we must solve for \f$ d \f$ the system
+    \f[ \nabla^2 f(x_0)d = -\nabla f(x_0) \;\; . \f]
 
-      Each iteration of the Newton algorithm tries to find a descent vector that
-      minimizes the above quadratic approximation, i.e. it looks for
-      \f[ \min_{d} q(d;x_0) = f(x_0) + \nabla f(x_0)d + \frac{1}{2} d^T\nabla^2 f(x_0)d
-          \;\; . \f]
-      We know that if a quadratic function has a finite minimum, it is reached at the
-      point where the function gradient is null and that the function Hessian
-      is then positive definite.
-      Therefore we are looking for \f$ d \f$ such that \f$ \nabla q(d;x_0) =0 \f$. We have
-      \f[ \nabla q(d;x_0) = \nabla f(x_0) + \nabla^2 f(x_0)d \;\;, \f]
-      therefore we must solve for \f$ d \f$ the system
-      \f[ \nabla^2 f(x_0)d = -\nabla f(x_0) \;\; . \f]
-
-      We assume that the Hessian is positive definite and we use the conjugate gradient
-      algebraic solver to solve the above system. If the conjugate gradient solver finds
-      a direction of negative curvature, the Hessian was not positive definite and we take
-      a step in that direction of negative curvature, which is a descent direction.
-  */
-  class FeasibleNewton : public VertexMover, public PatchSetUser
-  {
+    We assume that the Hessian is positive definite and we use the conjugate gradient
+    algebraic solver to solve the above system. If the conjugate gradient solver finds
+    a direction of negative curvature, the Hessian was not positive definite and we take
+    a step in that direction of negative curvature, which is a descent direction.
+*/
+class FeasibleNewton : public VertexMover, public PatchSetUser
+{
   public:
-    MESQUITE_EXPORT FeasibleNewton(ObjectiveFunction* of);
+    MESQUITE_EXPORT FeasibleNewton( ObjectiveFunction* of );
 
     MESQUITE_EXPORT virtual ~FeasibleNewton()
-    { delete coordsMem; }
+    {
+        delete coordsMem;
+    }
 
     /*! Sets a minimum value for the gradient. If the gradient is below that value,
       we stop iterating. */
-    MESQUITE_EXPORT void set_lower_gradient_bound(double gradc){
-        convTol=gradc;}
+    MESQUITE_EXPORT void set_lower_gradient_bound( double gradc )
+    {
+        convTol = gradc;
+    }
 
     PatchSet* get_patch_set();
 
     MESQUITE_EXPORT std::string get_name() const;
 
   protected:
-    virtual void initialize(PatchData &pd, MsqError &err);
-    virtual void optimize_vertex_positions(PatchData &pd,
-                                           MsqError &err);
-    virtual void initialize_mesh_iteration(PatchData &pd, MsqError &err);
-    virtual void terminate_mesh_iteration(PatchData &pd, MsqError &err);
+    virtual void initialize( PatchData& pd, MsqError& err );
+    virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
+    virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
+    virtual void terminate_mesh_iteration( PatchData& pd, MsqError& err );
     virtual void cleanup();
 
   private:
@@ -122,8 +125,8 @@ namespace MBMesquite
     MsqHessian mHessian;
     PatchDataVerticesMemento* coordsMem;
     bool havePrintedDirectionMessage;
-  };
+};
 
-}
+}  // namespace MBMesquite
 
-#endif // MSQ_FeasibleNewton_hpp
+#endif  // MSQ_FeasibleNewton_hpp
