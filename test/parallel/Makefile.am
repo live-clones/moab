@@ -52,6 +52,7 @@ if HAVE_ZOLTAN
 endif
 
 if HAVE_TEMPESTREMAP
+AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
 migrate_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 migrate_nontrivial_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 commgraph_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
@@ -63,13 +64,14 @@ endif
 
 if HAVE_TEMPESTREMAP
   EXTRA_DIST = imoab_coupler_utils.hpp
-  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 if HAVE_EXTMESHES
   HDF5_TESTS +=  imoab_apg2_ol_coupler
   imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
+  test_mapweights_bcast_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 endif
 
 else
@@ -175,6 +177,7 @@ imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
 commgraph_test_SOURCES = commgraph_test.cpp
+test_mapweights_bcast_SOURCES = test_mapweights_bcast.cpp
 
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
