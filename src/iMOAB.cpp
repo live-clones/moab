@@ -2222,19 +2222,23 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
             assert( tagType1 );
             rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );
-            ;CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
         }
         else if( *type1 == 2 )
         {
             rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() );
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );
-            ;CHKERRVAL( rval );  // just global ids
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
+        }
+        else if ( *type1 == 3 ) // for FV meshes, just get the global id of cell
+        {
+            rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL ( rval );
+            valuesComp1.resize( ents_of_interest.size() );
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL ( rval );// just global ids
         }
         else
         {
-            CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2
+            CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2 or 3
         }
         // now fill the tuple list with info and markers
         // because we will send only the ids, order and compress the list
@@ -2293,15 +2297,19 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
             assert( tagType1 );
             rval = context.MBI->get_entities_by_type( fset2, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp2.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );
-            ;CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
         }
         else if( *type2 == 2 )
         {
             rval = context.MBI->get_entities_by_type( fset2, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
             valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );
-            ;CHKERRVAL( rval );  // just global ids
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
+        }
+        else if (*type2==3)
+        {
+            rval = context.MBI->get_entities_by_dimension(fset2, 2, ents_of_interest );CHKERRVAL ( rval );
+            valuesComp2.resize( ents_of_interest.size() ); // stride is 1 here
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL ( rval );// just global ids
         }
         else
         {
