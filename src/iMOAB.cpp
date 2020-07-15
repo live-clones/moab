@@ -2230,11 +2230,11 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
             valuesComp1.resize( ents_of_interest.size() );
             rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
         }
-        else if ( *type1 == 3 ) // for FV meshes, just get the global id of cell
+        else if( *type1 == 3 )  // for FV meshes, just get the global id of cell
         {
-            rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL ( rval );
+            rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() );
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL ( rval );// just global ids
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
         }
         else
         {
@@ -2305,11 +2305,11 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
             valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
             rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
         }
-        else if (*type2==3)
+        else if( *type2 == 3 )
         {
-            rval = context.MBI->get_entities_by_dimension(fset2, 2, ents_of_interest );CHKERRVAL ( rval );
-            valuesComp2.resize( ents_of_interest.size() ); // stride is 1 here
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL ( rval );// just global ids
+            rval = context.MBI->get_entities_by_dimension( fset2, 2, ents_of_interest );CHKERRVAL( rval );
+            valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
         }
         else
         {
