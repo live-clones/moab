@@ -335,9 +335,11 @@ cdef extern from "moab/Core.hpp" namespace "moab":
                                   const int num_entities)
         ErrorCode delete_mesh()
 
+# --------------------------------------------------------------------
 
 cimport mpi4py.MPI as MPI
 from mpi4py.libmpi cimport *
+
 cdef extern from "moab/ParallelComm.hpp" namespace "moab":
 
     cdef cppclass ParallelComm:
@@ -348,19 +350,19 @@ cdef extern from "moab/ParallelComm.hpp" namespace "moab":
         int get_id() const
         
         ErrorCode  assign_global_ids (EntityHandle this_set, const int dimension, 
-                                      const int start_id=1, const bool largest_dim_only=true, 
-                                      const bool parallel=true, const bool owned_only=false)
+                                      const int start_id, const bool largest_dim_only, 
+                                      const bool parallel, const bool owned_only)
 
         ErrorCode   exchange_tags (const char *tag_name, const Range &entities)
         ErrorCode   exchange_tags (Tag tagh, const Range &entities)
         ErrorCode   reduce_tags (const char *tag_name, const MPI_Op mpi_op, const Range &entities)
         ErrorCode   reduce_tags (Tag tag_handle, const MPI_Op mpi_op, const Range &entities)
 
-        ErrorCode   resolve_shared_ents (EntityHandle this_set, Range &proc_ents, int resolve_dim=-1, int shared_dim=-1, Range *skin_ents=NULL, const Tag *id_tag=0)
-        ErrorCode   resolve_shared_ents (EntityHandle this_set, int resolve_dim=3, int shared_dim=-1, const Tag *id_tag=0)
-        ErrorCode   resolve_shared_sets (EntityHandle this_set, const Tag *id_tag=0)
-        ErrorCode   resolve_shared_sets (Range &candidate_sets, Tag id_tag)
-        ErrorCode   augment_default_sets_with_ghosts (EntityHandle file_set)
+        ErrorCode   resolve_shared_ents (EntityHandle this_set, Range &proc_ents, int resolve_dim, int shared_dim, Range *skin_ents, const Tag *id_tag)
+        ErrorCode   resolve_shared_ents (EntityHandle this_set, int resolve_dim, int shared_dim, const Tag *id_tag)
+        # ErrorCode   resolve_shared_sets (EntityHandle this_set, const Tag *id_tag=0)
+        # ErrorCode   resolve_shared_sets (Range &candidate_sets, Tag id_tag)
+        # ErrorCode   augment_default_sets_with_ghosts (EntityHandle file_set)
 
         ErrorCode   get_pstatus (EntityHandle entity, unsigned char &pstatus_val)
         ErrorCode   get_pstatus_entities (int dim, unsigned char pstatus_val, Range &pstatus_ents)
@@ -374,7 +376,12 @@ cdef extern from "moab/ParallelComm.hpp" namespace "moab":
         const Range &   partition_sets () const
         Range &     interface_sets ()
         const Range &   interface_sets () const
+        EntityHandle    get_partitioning () const
+        ErrorCode   set_partitioning (EntityHandle h)
 
+        TagInfo*     partition_tag ()
+
+        Interface*  get_moab ()
         unsigned    size ()
         unsigned    rank ()
         MPI_Comm    comm () const

@@ -136,8 +136,8 @@ cdef class Core(object):
         cdef bytes cfname = fname.encode('UTF-8')
         cdef const char * file_name = cfname
         cdef bytes opts = writeopts.encode('UTF-8')
-        # cdef const char * fileopts = opts
-        cdef const char * fileopts = <const char*>0
+        cdef const char * fileopts = opts
+        # cdef const char * fileopts = <const char*>0
         cdef moab.ErrorCode err
         cdef int num_tags = 0
         cdef _tagArray ta = _tagArray()

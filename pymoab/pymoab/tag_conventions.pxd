@@ -8,6 +8,7 @@ cdef extern from "MBTagConventions.hpp":
     cdef std_string MATERIAL_SET_TAG_NAME
     cdef std_string DIRICHLET_SET_TAG_NAME
     cdef std_string NEUMANN_SET_TAG_NAME
+    cdef std_string PARALLEL_PARTITION_SET_TAG_NAME
     cdef std_string HAS_MID_NODES_TAG_NAME
     cdef std_string GEOM_DIMENSION_TAG_NAME
     cdef std_string MESH_TRANSFORM_TAG_NAME
