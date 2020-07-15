@@ -892,6 +892,7 @@ int main( int argc, char* argv[] )
         char outputFileTgt[] = "fLndOnCpl3.h5m";
         ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
                                 strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write land on coupler" )
     }
 
 #ifdef VERBOSE
