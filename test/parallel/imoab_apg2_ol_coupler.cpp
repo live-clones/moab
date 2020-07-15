@@ -945,6 +945,7 @@ int main( int argc, char* argv[] )
         char outputFileLnd[] = "LndWithProj3.h5m";
         ierr                 = iMOAB_WriteMesh( cmpLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
                                 strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write land file with projection" )
     }
 
 #endif  // ENABLE_ATMLND_COUPLING
