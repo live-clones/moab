@@ -34,6 +34,7 @@
   * *PR #468: PyMOAB bindings to set_connectivity
   * *PR #475: Improve regridding intersection robustness 
   * *PR #483: Add a new download option to sync large files from FTP site to avoid bloating repository with static meshes
+  * *PR #488: enforce uniform formatting of source code with clang tool
   
 ## Fixes
   * *PR #414, #434: HDF5 writer fixes for polyhedral meshes, to address issues #99 and #110
