@@ -1,41 +1,56 @@
-#Version 5.2.0
+# Version 5.2.0
+
 ## Features
-  * *PR #424, #445, #461, #462, #474 parallelize tempestremap serial algorithms through mbtempest tool
-  * *PR #467 add verification option for maps computed with mbtempest/tempestremap
-  * *PR #454, #464, #475 coupling for discrete meshes, point cloud data, rendezvous coupling, 
-    for atmosphere, ocean, land 
-  * *PR #485 Windows build improvements
-  * *PR #437 allow empty parts in parallel mesh handling
-  * *PR #465 add KDtree-based intersection 
-  * *PR #471 introduce master-slave partitioning method for coupling scenarios
-  * *PR #482 domain file reader in netcdf format
-  * *PR #486 option for area computations using gauss integration
+
+* *PR #424, #445, #461, #462, #467, #474*: Significant feature additions in `mbtempest` to improve the TempestRemap-based mapping weights generation workflow
+  -- Expose both Kd-tree and advancing front intersection
+  -- Verifications of mapping weight generation for very high-res cases at scale
+  -- Improve `mbconvert` to transform TR supported file formats to MOAB h5m and vice-versa
+  -- Ability to write out the computed remapping weights in parallel to a h5m file is now supported. A `h5mtoscrip` utility tool to convert the h5m file to SCRIP format is available.
+  -- Add an extra verification option for maps computed with `mbtempest` to validate projection weights
+  -- Improve master-slave partitioner tool
+  -- Performance enhancements: Several optimizations in the iMOAB implementation and OnlineMap computation routines have been implemented
+* *PR #437*: Allow ability to support empty parts in parallel mesh handling
+* *PR #454, #464, #475*: Enable coupling and consistent remap of data between discrete meshes and point cloud representations
+  -- A new ParCommGraph class is now available to store communication patterns between MPI groups
+  -- Feature additions support rendezvous coupling that has been tested for multi-way transfer between atmosphere, ocean, land components
+* *PR #465*: Add a new KDtree-based intersection to replace advancing front intersection when dealing with source grids with holes
+* *PR #471*: Introduce a concept of master-slave partitioning method using Zoltan RCB algorithm
+  -- This feature provided a significant speedup for offline remapping calculations on a sphere
+  -- *TODO*: Test similar ideas for other coupled computational problems
+* *PR #482*: Domain file reader in NetCDF format to support E3SM integration
+* *PR #485*: Extensive CMake configuration updates to support Windows platform builds
+* *PR #486*: Adding a new option for area computations using Gauss quadrature based integration instead of spherical excess
 
 ## Enhancements
-  * *PR #468 PyMOAB bindings to set_connectivity
-  * *PR #420, #435, #442 global id default value (unset) is now -1, while DOFs related to Global 
-     ID start from 1
-  * *PR #446 option to reset global ids during partitioning
-  * *PR #419 cache the latest facet for RayHistory in OBB tree
-  * *PR #429 option for ghost layers in thin partitions
-  * *PR #438 improve coexistence of LAPACK and Eigen3 
-  * *PR #444, #449, #455 cmake improvements related to MPI, HDF5, OSX, autotools
-  * *PR #463 add download option for netcdf, hdf5 
-  * *PR #483 add download option for large files
-  * *PR #475 intersection robustness 
-  
+
+* *PR #419*: Cache the latest facet for RayHistory in OBB tree
+* *PR #420, #435*: Global ID default value (unset) is now -1, while DOFs related to Global ID start from 1
+* *PR #429*: Option for consistent (multiple) ghost layers in thin partitions
+* *PR #438*: Improve coexistence of LAPACK and Eigen3 in configurations
+* *PR #442*: MBTR - Remove assumption that FV DoF numbering is 0-based (now 1-based for both FV/SE)
+* *PR #444, #449*: CMake build improvements related to MPI, HDF5, OSX
+* *PR #446*: Option to reset Global IDs during partitioning
+* *PR #455*: Enforce MOAB flags to add c++0x flags if supported
+* *PR #463*: Update default download option for NetCDF(4.6.3), HDF5 (1.10.1)
+* *PR #468*: PyMOAB bindings to set_connectivity
+* *PR #475*: Improve regridding intersection robustness
+* *PR #483*: Add a new download option to sync large files from FTP site to avoid bloating repository with static meshes
+* *PR #488*: Enforce uniform formatting of the entire source repository with clang-format tool with updated coding guidelines
+
 ## Fixes
-  * *PR #414, #434 HDF5 writer fixes for polyhedral meshes, issue #99, #110
-  * *PR #415 sqij partition for structured meshes index overflow 
-  * *PR #430 HDF5 filename conflicts
-  * *PR #472 HDF5 file descriptor initialization
-  * *PR #417, #421, #469 python bindings fixes and compliance to Python 3
-  * *PR #450 fix seqfault in Range destructor
-  * *PR #473 geometry reader 
-  * *PR #431, #453, #466, #480 tempestremap API changes
-  
-  
-#Version 5.1.0:
+
+* *PR #414, #434*: HDF5 writer fixes for polyhedral meshes, to address issues #99 and #110
+* *PR #415*: Fixing index overflow in SQIJ partition for structured meshes
+* *PR #417, #421, #469*: Python bindings fixes and compliance to Python 3 standards
+* *PR #430*: Fixing HDF5 regression test issues
+* *PR #431, #453, #466, #480*: Changes to conform to evolving TempestRemap API co-development
+* *PR #450*: Fix seqfault in Range destructor
+* *PR #472*: HDF5 file descriptor initialization that resolves some issues in VisIt-MOAB plugin
+* *PR #473*: Minor fix for Tqdcfr reader
+
+ 
+# Version 5.1.0:
 ## Features
   * *PR #399, #406, #408, #410: Updates for E3SM workflow to support online remapping computation for climate applications through interfaces to TempestRemap library. 
      Major additions to expose online remapping capabilities by computing exact intersection between unstructured meshes on a sphere, and providing 
@@ -56,7 +71,7 @@
   * *PR #364: CMake configuration updates to not always require Fortran for BLAS/LAPACK linkage
   * *PR #362: Several semantic and memory leak fixes due to Coverity, cppcheck and valgrind
   * *PR #364, #366, #368, #373, #374, #375, #379, #381, #382, #384, #387, #388, #389, #400, #407, #409: Several miscellaneous configuration updates for both autotools and CMake workflows
-#Version 5.0.0:
+# Version 5.0.0:
 ## Features
   * *PR #248, #290, #299*: Eigen3, BLAS/LAPACK -- Add support for the Eigen3 BLAS/LAPACK header libraries; Now BLAS/LAPACK are required dependencies for MOAB in order to support high-performance dense solver support for various algorithms
   * *PR #278, #286, #280, #296, #300, #325, #326, #332, #331, #334, #335, #317, #345, #346, #353, #356*: PyMOAB -- This interface now directly exposes Python modules to access common MOAB functionality in order to load, query and manipulate structured/unstructured meshes in memory. It also includes interfaces to some specific classes such as the ScdInterface and its associated classes along with the TopoUtil tool. We have also added support for Tags, Range, Skinner modules that can be used to build more advanced capabilities as needed. Currently, this interface only supports serial configuration and we intend to support parallelism through `mpi4py` dependencies in the next release. Several useful tests and examples have also been added for users to get started.
@@ -105,7 +120,7 @@
   * *PR #349*: Update HDF5 includes - found through failures in Ubuntu installations
   * *PR #337*: Fixing several compiler (GNU, Clang, Intel) warnings
 
-#Version 4.9.2:
+# Version 4.9.2:
 ## Features
   * *PR #259*: Introduce the new language-agnostic iMOAB interface to MOAB that is oriented towards FEM/FDM/FVM applications codes.
                This is a ongoing replacement to the ITAPS iMesh interfaces but with much less verbosity and indirection in implementation.
