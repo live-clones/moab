@@ -35,7 +35,8 @@ examples_DATA = \
                examples/makefile \
                examples/makefile.config \
                examples/makefile.config.in \
-               examples/CMakeLists.txt
+               examples/CMakeLists.txt \
+               examples/makefile.config.cmake
 examples_beginnerdir = $(datadir)/examples/beginner
 examples_beginner_DATA = \
                examples/beginner/README \
@@ -98,11 +99,11 @@ examples_apps_earth_DATA = \
                examples/apps/earth/addPCdata.cpp 
 
 CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
-			    config/AutoconfHeader.cmake      config/FindCGM.cmake        config/FindMetis.cmake     config/FindZoltan.cmake    config/ForceAddFlags.cmake \
-			    config/ResolveCompilerPaths.cmake  config/CMakeDistCheck.cmake      config/FindEigen3.cmake     config/FindNetCDF.cmake    config/Findgraphviz.cmake \
-			    config/GetAcInitVersion.cmake  config/TestBigEndian.cmake    config/CheckCompilerFlags.cmake  config/FindHDF5_MOAB.cmake  config/FindParMetis.cmake  \
-			    config/Findverdict.cmake   config/MOABConfig.cmake.cmake    config/CMakeReplicateConfig.sh    config/cmake_uninstall.cmake.in \
-			    config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in
+														config/AutoconfHeader.cmake      config/FindCGM.cmake          config/FindNetCDF.cmake        config/FindZoltan.cmake     config/GetAcInitVersion.cmake \
+														config/CMakeDistCheck.cmake      config/FindEigen3.cmake       config/FindPNetCDF.cmake       config/Findgraphviz.cmake   config/MOABConfig.cmake.cmake \
+														config/CMakeLibraryFuncs.cmake   config/FindHDF5_MOAB.cmake    config/FindParMetis.cmake      config/Findverdict.cmake    config/ResolveCompilerPaths.cmake \
+														config/CheckCompilerFlags.cmake  config/FindMetis.cmake        config/FindTempestRemap.cmake  config/ForceAddFlags.cmake  config/TestBigEndian.cmake \
+														config/CMakeReplicateConfig.sh   config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in   config/cmake_uninstall.cmake.in moab.make.cmake 
 
 EXTRA_DIST = $(doc_DATA) \
 						 debian \

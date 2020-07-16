@@ -302,6 +302,7 @@ add_library(
   ${MOABPAR_OBJECTS}
   ${MDHF_OBJ}
   )
+include(CMakeLibraryFuncs)
 SciFixupLibrary(MOAB MOAB MOAB)
 
 target_include_directories(MOAB
