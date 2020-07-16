@@ -416,5 +416,5 @@ if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@
 endif
 
-EXTRA_DIST += CMakeLists.txt
+EXTRA_DIST += CMakeLists.txt IntxMesh/CMakeLists.txt
 

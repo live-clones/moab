@@ -102,7 +102,9 @@ CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
 			    config/ResolveCompilerPaths.cmake  config/CMakeDistCheck.cmake      config/FindEigen3.cmake     config/FindNetCDF.cmake    config/Findgraphviz.cmake \
 			    config/GetAcInitVersion.cmake  config/TestBigEndian.cmake    config/CheckCompilerFlags.cmake  config/FindHDF5_MOAB.cmake  config/FindParMetis.cmake  \
 			    config/Findverdict.cmake   config/MOABConfig.cmake.cmake    config/CMakeReplicateConfig.sh    config/cmake_uninstall.cmake.in \
-			    config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in
+			    config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in config/FindPNetCDF.cmake config/CMakeLibraryFuncs.cmake \
+			    examples/makefile.config.cmake moab.make.cmake pymoab/CMakeLists.txt pymoab/cmake/FindPythonDev.cmake pymoab/setup.py.cmake.in \
+			    pymoab/install.sh.cmake
 
 EXTRA_DIST = $(doc_DATA) \
 						 debian \
