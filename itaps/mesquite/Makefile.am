@@ -49,5 +49,5 @@ AM_CPPFLAGS = $(CPPFLAGS) \
               -I$(top_srcdir)/itaps/irel \
               -I$(top_builddir)/itaps/irel
 
-EXTRA_DIST =
+EXTRA_DIST = CMakeLists.txt
 

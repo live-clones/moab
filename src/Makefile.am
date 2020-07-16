@@ -278,7 +278,8 @@ pointloctreeincludedir = $(pointlocincludedir)/tree
 pointloctreeinclude_HEADERS = \
   moab/point_locater/tree/common_tree.hpp \
   moab/point_locater/tree/element_tree.hpp \
-  moab/point_locater/tree/bvh_tree.hpp
+  moab/point_locater/tree/bvh_tree.hpp \
+  moab/point_locater/tree/initialize_tree.hpp
 
 pointlocelementmapsincludedir = $(pointlocincludedir)/element_maps
 pointlocelementmapsinclude_HEADERS = \

@@ -29,7 +29,7 @@ endif
 build-check:
 	$(MAKE) 'TESTS_ENVIRONMENT=: ' check
 
-doc_DATA = ANNOUNCE KNOWN_ISSUES LICENSE README.md RELEASE_NOTES
+doc_DATA = ANNOUNCE AUTHORS KNOWN_ISSUES LICENSE README.md RELEASE_NOTES TODO
 
 examples_DATA = \
                examples/makefile \
@@ -37,6 +37,8 @@ examples_DATA = \
                examples/makefile.config.in \
                examples/CMakeLists.txt \
                examples/makefile.config.cmake
+examples_cmakedir = $(datadir)/examples/cmake
+examples_cmake_DATA = examples/cmake/CMakeLists.txt
 examples_beginnerdir = $(datadir)/examples/beginner
 examples_beginner_DATA = \
                examples/beginner/README \
@@ -68,7 +70,9 @@ examples_intermediate_DATA = \
                examples/intermediate/DirectAccessWithHoles.cpp \
                examples/intermediate/LoadPartial.cpp \
                examples/intermediate/PointInElementSearch.cpp \
-               examples/intermediate/ReduceExchangeTags.cpp
+               examples/intermediate/ReduceExchangeTags.cpp \
+               examples/intermediate/QuadTriConv.cpp \
+               examples/intermediate/ExtractClose.cpp
 examples_advanceddir = $(datadir)/examples/advanced
 examples_advanced_DATA = \
                examples/advanced/makefile \
@@ -78,16 +82,27 @@ examples_advanced_DATA = \
                examples/advanced/LloydRelaxation.cpp \
                examples/advanced/CoupleMGen.cpp \
                examples/advanced/VisTags.cpp
+examples_advancedsmoothdir = $(datadir)/examples/advanced/smoothing
+examples_advancedsmooth_DATA = \
+               examples/advanced/smoothing/makefile \
+               examples/advanced/smoothing/LaplacianSmoother.cpp \
+               examples/advanced/smoothing/OptimizeMeshMesquite.cpp
 examples_fortrandir = $(datadir)/examples/fortran
 examples_fortran_DATA = \
                examples/fortran/makefile \
                examples/fortran/DirectAccessNoHolesF90.F90 \
                examples/fortran/PushParMeshIntoMoabF90.F90 \
-               examples/fortran/MigrateMesh.F90
+               examples/fortran/MigrateMesh.F90 \
+               examples/fortran/spherecube.h5m
 examples_pythonexdir = $(datadir)/examples/python
 examples_pythonex_DATA = \
                examples/python/makefile \
-               examples/python/laplaciansmoother.py
+               examples/python/laplaciansmoother.py \
+               examples/python/H5MToScrip.py examples/python/ScripToH5M.py \
+               examples/python/gr3rd.py \
+               examples/python/interrogate_mesh.py \
+               examples/python/scrip3d.py \
+               examples/python/ocean.QU.240km.scrip.151209.nc
 examples_appsdir = $(datadir)/examples/apps
 examples_apps_DATA = \
                examples/apps/makefile
@@ -99,24 +114,28 @@ examples_apps_earth_DATA = \
                examples/apps/earth/addPCdata.cpp 
 
 CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
-														config/AutoconfHeader.cmake      config/FindCGM.cmake          config/FindNetCDF.cmake        config/FindZoltan.cmake     config/GetAcInitVersion.cmake \
-														config/CMakeDistCheck.cmake      config/FindEigen3.cmake       config/FindPNetCDF.cmake       config/Findgraphviz.cmake   config/MOABConfig.cmake.cmake \
-														config/CMakeLibraryFuncs.cmake   config/FindHDF5_MOAB.cmake    config/FindParMetis.cmake      config/Findverdict.cmake    config/ResolveCompilerPaths.cmake \
-														config/CheckCompilerFlags.cmake  config/FindMetis.cmake        config/FindTempestRemap.cmake  config/ForceAddFlags.cmake  config/TestBigEndian.cmake \
-														config/CMakeReplicateConfig.sh   config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in   config/cmake_uninstall.cmake.in moab.make.cmake 
+   config/AutoconfHeader.cmake      config/FindCGM.cmake          config/FindNetCDF.cmake        config/FindZoltan.cmake     config/GetAcInitVersion.cmake \
+   config/CMakeDistCheck.cmake      config/FindEigen3.cmake       config/FindPNetCDF.cmake       config/Findgraphviz.cmake   config/MOABConfig.cmake.cmake \
+   config/CMakeLibraryFuncs.cmake   config/FindHDF5_MOAB.cmake    config/FindParMetis.cmake      config/Findverdict.cmake    config/ResolveCompilerPaths.cmake \
+   config/CheckCompilerFlags.cmake  config/FindMetis.cmake        config/FindTempestRemap.cmake  config/ForceAddFlags.cmake  config/TestBigEndian.cmake \
+   config/CMakeReplicateConfig.sh   config/TemplateSpecialization.cxx   config/MOABConfig.cmake.h.in   config/cmake_uninstall.cmake.in moab.make.cmake  \
+   pymoab/CMakeLists.txt            pymoab/cmake/FindPythonDev.cmake  pymoab/setup.py.cmake.in     pymoab/install.sh.cmake
 
 EXTRA_DIST = $(doc_DATA) \
 						 debian \
 						 $(CMAKE_CONFIGURATION_FILES) \
 						 $(examples_DATA) \
+						 $(examples_cmake_DATA) \
 						 $(examples_beginner_DATA) \
 						 $(examples_basic_DATA) \
 						 $(examples_intermediate_DATA) \
 						 $(examples_advanced_DATA) \
+						 $(examples_advancedsmooth_DATA) \
 						 $(examples_fortran_DATA) \
 						 $(examples_pythonex_DATA) \
 						 $(examples_apps_DATA) \
-						 $(examples_apps_earth_DATA)
+						 $(examples_apps_earth_DATA) \
+						 suggest_configuration.sh
 
 # Automake doesn't seem to have a directory defined for
 # platform-dependent data (or include) files. So put
