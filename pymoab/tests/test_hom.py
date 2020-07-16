@@ -1,8 +1,5 @@
-from pymoab import core
-from pymoab import types
 from pymoab.hcoord import HomCoord
 from math import sqrt
-import numpy as np
 from driver import test_driver, CHECK_EQ
 
 

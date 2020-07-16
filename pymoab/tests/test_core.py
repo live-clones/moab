@@ -1,9 +1,6 @@
 from pymoab import core
 from pymoab import types
 from pymoab.rng import Range
-from pymoab.scd import ScdInterface
-from pymoab.hcoord import HomCoord
-from subprocess import call
 from driver import test_driver, CHECK, CHECK_EQ, CHECK_NOT_EQ, CHECK_ITER_EQ
 import numpy as np
 import os
@@ -70,9 +67,7 @@ def test_write_ents():
 
 
 def test_write_tags():
-    """
-    Test write tag functionality
-    """
+    """Test write tag functionality"""
 
     # test values
     outfile = "write_tag_test.h5m"
@@ -418,7 +413,6 @@ def test_add_entity():
     mb.add_entity(msh, vh)
 
 def vertex_handle(core):
-
     """Convenience function for getting an arbitrary vertex element handle."""
     coord = np.array((1,1,1),dtype='float64')
     vert = core.create_vertices(coord)
@@ -575,7 +569,7 @@ def test_get_conn():
         pass
     else:
         print("Shouldn't be here. Test fails.")
-        raise(IndexErrorx)
+        raise(IndexError)
 
 def test_set_conn():
 
@@ -1054,7 +1048,7 @@ def test_create_element_iterable():
     tris = mb.create_element(types.MBTRI,verts)
     #create another with the same vertices but in a list
     tri_verts = [verts[0], verts[1], verts[2]]
-    tris = mb.create_element(types.MBTRI,verts)
+    tris = mb.create_element(types.MBTRI,tri_verts)
     #make sure the right number of triangles is in the instance
     rs = mb.get_root_set()
     all_tris = mb.get_entities_by_type(rs,types.MBTRI)

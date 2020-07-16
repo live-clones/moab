@@ -4,7 +4,6 @@
 
 import sys, os, math
 import netCDF4
-import numpy as np
 
 from optparse import OptionParser
 from pymoab import core

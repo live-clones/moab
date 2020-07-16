@@ -9,7 +9,6 @@ from optparse import OptionParser
 
 from pymoab import core
 from pymoab import types
-from pymoab.rng import Range
 
 print("== Gathering information.  (Invoke with --help for more details. All arguments are optional)")
 parser = OptionParser()

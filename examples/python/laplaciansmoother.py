@@ -2,7 +2,7 @@
 
 import argparse
 import numpy as np
-from pymoab import core,types,topo_util,skinner
+from pymoab import core,topo_util,skinner
 from pymoab.tag import Tag
 
 def parse_args(): 
