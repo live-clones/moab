@@ -278,7 +278,8 @@ pointloctreeincludedir = $(pointlocincludedir)/tree
 pointloctreeinclude_HEADERS = \
   moab/point_locater/tree/common_tree.hpp \
   moab/point_locater/tree/element_tree.hpp \
-  moab/point_locater/tree/bvh_tree.hpp
+  moab/point_locater/tree/bvh_tree.hpp \
+  moab/point_locater/tree/initialize_tree.hpp
 
 pointlocelementmapsincludedir = $(pointlocincludedir)/element_maps
 pointlocelementmapsinclude_HEADERS = \
@@ -388,8 +389,6 @@ moabhypreinclude_HEADERS = \
 
 endif # if HAVE_HYPRE
 
-EXTRA_DIST += parallel/CMakeLists.txt
-
 endif
 
 if ENABLE_metis
@@ -416,5 +415,5 @@ if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@
 endif
 
-EXTRA_DIST += CMakeLists.txt
+EXTRA_DIST += CMakeLists.txt parallel/CMakeLists.txt IntxMesh/CMakeLists.txt
 

@@ -1,7 +1,7 @@
 from ctypes import *
 
 from pymoab import core, types, skinner
-from driver import test_driver, CHECK_EQ, CHECK_NOT_EQ
+from driver import test_driver, CHECK_EQ
 import numpy as np
 
 def test_get_geometric_skin():

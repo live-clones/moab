@@ -2,10 +2,8 @@ from pymoab import core
 from pymoab import types
 from pymoab.scd import ScdInterface
 from pymoab.hcoord import HomCoord
-from subprocess import call
 from driver import test_driver, CHECK_EQ, CHECK_ITER_EQ, CHECK_TYPE
 import numpy as np
-import os
 from pymoab.types import _eh_py_type
 
 def test_w_coordinates():
@@ -42,8 +40,8 @@ def test_w_coordinates():
 
     hexes = mb.get_entities_by_type(0, types.MBHEX)
 
-    hex_con_str = "Hex {} connectivity is: {}"
-    vert_str = "Vert: {}"
+    # hex_con_str = "Hex {} connectivity is: {}"
+    # vert_str = "Vert: {}"
 
     assert len(hexes) == 2
 

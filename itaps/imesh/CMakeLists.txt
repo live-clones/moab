@@ -44,6 +44,7 @@ add_library(
   ${MOAB_IMESH_SRCS}
   ${MOAB_IMESH_LIB_INCLUDES}
   )
+include(CMakeLibraryFuncs)
 SciFixupLibrary(MOAB iMesh iMesh)
 
 target_include_directories(iMesh

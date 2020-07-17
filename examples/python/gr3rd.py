@@ -22,7 +22,7 @@ from pymoab import types
 from pymoab.rng import Range
 
 
-print "== Gathering information.  (Invoke with --help for more details. All arguments are optional)"
+print ("== Gathering information.  (Invoke with --help for more details. All arguments are optional)")
 parser = OptionParser()
 parser.description = "This script takes a gr3 mesh file and generates a MOAB h5m file."
 
@@ -52,7 +52,7 @@ radius = 6.3781e6 # radius in meters
 data = line1.split()
 nume= int(data[0])
 numv= int(data[1])
-print "number of elements: " , nume, " number of vertices: " , numv
+print ("number of elements: " , nume, " number of vertices: " , numv)
 coords = np.zeros(numv*3)
 hgts   = np.zeros(numv)
 if options.convert2d:
@@ -77,7 +77,7 @@ else:
     hgts[i] = height 
   
 connect=np.zeros((nume, 3), dtype='uint64')
-print coords[0], coords[1], coords[2], coords[3]
+print (coords[0], coords[1], coords[2], coords[3])
 for i in range(0,nume):
   line=filein.readline()
   data = line.split()

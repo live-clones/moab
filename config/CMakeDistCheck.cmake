@@ -37,9 +37,8 @@ MACRO(DEFINE_DISTCHECK)
 
   ADD_CUSTOM_TARGET(distcheck
     COMMAND
-    rm -rf ${DISTBASENAME}
-    && ${GZIP} -d ${DISTBASENAME}.tar.gz
-    && ${TAR} -xf ${DISTBASENAME}.tar
+    mkdir -p ${DISTBASENAME} && chmod -R u+w ${DISTBASENAME} && rm -rf ${DISTBASENAME}
+    && ${TAR} -xf ${DISTBASENAME}.tar.gz
     && cd ${DISTBASENAME}/
     && chmod u+w . && mkdir -p _build && mkdir -p _inst
     && ${CMAKE_SOURCE_DIR}/config/CMakeReplicateConfig.sh "${CMAKE_BINARY_DIR}/CMakeCache.txt" _build/CMakeCache.txt
@@ -64,7 +63,6 @@ MACRO(DEFINE_DISTCHECK)
     && find . -type d -print0 | xargs -0 chmod u+w
     && cd ${CMAKE_BINARY_DIR}
     && rm -rf ${CMAKE_BINARY_DIR}/${DISTBASENAME}
-    && ${GZIP} ${DISTBASENAME}.tar
     && echo "=============================================================="
     && echo "${DISTBASENAME}"
             "is ready for distribution."

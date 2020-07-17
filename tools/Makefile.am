@@ -44,6 +44,7 @@ EXTRA_DIST = README.hexmodops \
              README.mbsurfplot \
              README.mbtagprop \
              README.spheredecomp \
+             README.tools \
              CMakeLists.txt
 
 if HAVE_HDF5

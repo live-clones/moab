@@ -2,6 +2,7 @@
 AUTOMAKE_OPTIONS=foreign
 
 EXTRA_DIST = $(srcdir)/cmake/cython_test.pyx $(srcdir)/pymoab/* $(srcdir)/tests/*
+EXTRA_DIST += $(srcdir)/interface_notes.txt $(srcdir)/pyproject.toml $(srcdir)/requirements.txt
 
 test_files = test_core.py test_hom.py test_scd.py test_range.py test_tag.py test_topo_util.py test_skinner.py
 
