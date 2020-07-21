@@ -1013,7 +1013,7 @@ int main( int argc, char* argv[] )
 
     // we have received on ocean component some data projected from atm, on coupler
 
-    // path was T_ph (atm phys) towards atm on FV mesh,
+    // path was T_ph (atm phys) towards atm on FV mesh, we projected, then we sent back to ocean comp
 // start copy ocn atm coupling; go reverse direction now !!
 #ifdef ENABLE_ATMOCN_COUPLING
     PUSH_TIMER( "Send/receive data from ocn component to coupler in atm context" )
@@ -1028,7 +1028,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         // receive on ocn on coupler pes, that was redistributed according to coverage
-        ierr = iMOAB_ReceiveElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &atmCouComm, &cplatm,
+        ierr = iMOAB_ReceiveElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm,
                                         strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot receive tag values" )
     }
@@ -1089,16 +1089,16 @@ int main( int argc, char* argv[] )
     if( atmComm != MPI_COMM_NULL )
     {
         int tagIndexIn2;
-        ierr = iMOAB_DefineTagStorage( cmpAtmPID, bottomTempPhProjectedField, &tagTypes[1], &atmCompNDoFs,
+        ierr = iMOAB_DefineTagStorage( cmpPhAtmPID, bottomTempPhProjectedField, &tagTypes[1], &atmCompNDoFs,
                                        &tagIndexIn2, strlen( bottomTempPhProjectedField ) );
         CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                          "Tph_proj on atm pes" );
-        ierr = iMOAB_DefineTagStorage( cmpAtmPID, bottomUVelPhProjectedField, &tagTypes[1], &atmCompNDoFs,
-                                       &tagIndexIn2, strlen( bottomUVelProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cmpPhAtmPID, bottomUVelPhProjectedField, &tagTypes[1], &atmCompNDoFs,
+                                       &tagIndexIn2, strlen( bottomUVelPhProjectedField ) );
         CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                          "uph_proj on atm pes" );
-        ierr = iMOAB_DefineTagStorage( cmpAtmPID, bottomVVelPhProjectedField, &tagTypes[1], &atmCompNDoFs,
-                                       &tagIndexIn2, strlen( bottomVVelProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cmpPhAtmPID, bottomVVelPhProjectedField, &tagTypes[1], &atmCompNDoFs,
+                                       &tagIndexIn2, strlen( bottomVVelPhProjectedField ) );
         CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                          "vph_proj on atm pes" );
     }
