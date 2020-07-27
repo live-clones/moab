@@ -587,16 +587,26 @@ int main( int argc, char* argv[] )
         int typeB = 3;  // cells of atmosphere, dof based; maybe need another type for ParCommGraph graphtype ?
         ierr = iMOAB_ComputeCommGraph( cmpPhAtmPID, cplAtmOcnPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
                                        &cmpatm, &atmocnid );
+        CHECKIERR( ierr, "cannot compute graph between phys grid on atm and intx between FV atm and ocn" )
     }
 
     // also
     // need to compute graph between ocn/atm intx and phys atm mesh
-    if( atmCouComm != MPI_COMM_NULL )
+    /*if( atmCouComm != MPI_COMM_NULL )
     {
         int typeA = 3;  // cells of atmosphere, dof based; maybe need another type for ParCommGraph graphtype ?
         int typeB = 2;  // point cloud, phys mesh
         ierr = iMOAB_ComputeCommGraph( cplOcnAtmPID, cmpPhAtmPID, &atmCouComm, &couPEGroup, &atmPEGroup, &typeA, &typeB,
                                        &ocnatmid, &cmpatm );
+    }*/
+    // need to compute graph between atm on coupler and phys atm mesh on component
+    if( atmCouComm != MPI_COMM_NULL )
+    {
+        int typeA = 2;  // point cloud, phys mesh
+        int typeB = 3;  // cells of atmosphere, dof based; need another type for ParCommGraph graphtype ?
+        ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
+                                           &cmpatm, &cplatm );
+        CHECKIERR( ierr, "cannot compute graph between phys grid on atm and FV atm on coupler" )
     }
 #endif
 
@@ -1105,26 +1115,25 @@ int main( int argc, char* argv[] )
                          "vph_proj on atm pes" );
     }
     // send the tag to atm pes, from atm pg2 mesh on coupler pes
-    //   from couComm, using common joint comm atm_coupler, and computed graph, intxocnatm -> atmPh
+    //   from couComm, using common joint comm atm_coupler, and computed graph, phys-grid -> atm FV on cpl, in reverse
     // as always, use nonblocking sends
     // graph context comes from commgraph ?
 
-    //      ierr = iMOAB_ComputeCommGraph( cplOcnAtmPID, cmpPhAtmPID, &atmCouComm, &couPEGroup, &atmPEGroup, &typeA,
-    //      &typeB,
-    //              &ocnatmid, &cmpatm );
+    //      ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
+    //  &cmpatm, &cplatm );
 
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmpatm;
-        ierr       = iMOAB_SendElementTag( cplOcnAtmPID, "T2_ph;u2_ph;v2_ph;", &atmCouComm, &context_id,
+        ierr       = iMOAB_SendElementTag( cplAtmPID, "T2_ph;u2_ph;v2_ph;", &atmCouComm, &context_id,
                                      strlen( "T2_ph;u2_ph;v2_ph;" ) );
         CHECKIERR( ierr, "cannot send tag values back to atm pes" )
     }
 
-    // receive on component atm phy mesh
+    // receive on component atm phys mesh
     if( atmComm != MPI_COMM_NULL )
     {
-        context_id = ocnatmid;
+        context_id = cplatm;
         ierr       = iMOAB_ReceiveElementTag( cmpPhAtmPID, "Tph_proj;uph_proj;vph_proj;", &atmCouComm, &context_id,
                                         strlen( "Tph_proj;uph_proj;vph_proj;" ) );
         CHECKIERR( ierr, "cannot receive tag values from atm pg2 mesh on coupler pes" )
@@ -1135,7 +1144,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmpatm;
-        ierr       = iMOAB_FreeSenderBuffers( cplOcnAtmPID, &context_id );
+        ierr       = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
     }
     if( atmComm != MPI_COMM_NULL )  // write only for n==1 case
     {

@@ -2062,7 +2062,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     // also, what if this was the "source" mesh in intx?
     // in that case, the elements might have been instantiated in the coverage set locally, the
     // "owned" range can be different the elements are now in tempestRemap coverage_set
-    cover_set = cgraph->get_cover_set();  // this will be non null only for intx app ?
+    cover_set = cgraph->get_cover_set(); // this will be non null only for intx app ?
 
     if( 0 != cover_set )
     {
