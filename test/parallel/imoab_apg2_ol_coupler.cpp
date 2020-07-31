@@ -313,9 +313,9 @@ int main( int argc, char* argv[] )
 
 #ifdef ENABLE_ATMLND_COUPLING
     int cmpLndAppID       = -1;
-    iMOAB_AppID cmpLndPID = &cmpLndAppID;        // lnd
-    int cplLndAppID = -1, cplAtmLndAppID = -1, cplLndAtmAppID = -1;   // -1 means it is not initialized
-    iMOAB_AppID cplLndPID    = &cplLndAppID;     // land on coupler PEs
+    iMOAB_AppID cmpLndPID = &cmpLndAppID;                            // lnd
+    int cplLndAppID = -1, cplAtmLndAppID = -1, cplLndAtmAppID = -1;  // -1 means it is not initialized
+    iMOAB_AppID cplLndPID    = &cplLndAppID;                         // land on coupler PEs
     iMOAB_AppID cplAtmLndPID = &cplAtmLndAppID;  // intx atm - lnd on coupler PEs will be similar to ocn atm intx
 
     iMOAB_AppID cplLndAtmPID = &cplLndAtmAppID;
@@ -529,7 +529,6 @@ int main( int argc, char* argv[] )
         // now compute intersection between ATMx and LNDx on coupler PEs
         ierr = iMOAB_RegisterApplication( "LNDATM", &couComm, &lndatmid, cplLndAtmPID );
         CHECKIERR( ierr, "Cannot register lnd_atm intx over coupler pes " )
-
     }
 #endif
 
@@ -610,8 +609,8 @@ int main( int argc, char* argv[] )
     {
         int typeA = 2;  // point cloud, phys mesh
         int typeB = 3;  // cells of atmosphere, dof based; need another type for ParCommGraph graphtype ?
-        ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
-                                           &cmpatm, &cplatm );
+        ierr = iMOAB_ComputeCommGraph( cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
+                                       &cmpatm, &cplatm );
         CHECKIERR( ierr, "cannot compute graph between phys grid on atm and FV atm on coupler" )
     }
 #endif
@@ -771,14 +770,13 @@ int main( int argc, char* argv[] )
     const char* bottomUVelField3 = "u3_ph";
     const char* bottomVVelField3 = "v3_ph";
 
-
     // tags on phys grid atm mesh
     const char* bottomTempPhProjectedField = "Tph_proj";
     const char* bottomUVelPhProjectedField = "uph_proj";
     const char* bottomVVelPhProjectedField = "vph_proj";
 
     // tags on phys grid atm mesh
-    const char* bottomTempPhLndProjectedField = "TphL_proj"; // L and Lnd signify the fields projected from land
+    const char* bottomTempPhLndProjectedField = "TphL_proj";  // L and Lnd signify the fields projected from land
     const char* bottomUVelPhLndProjectedField = "uphL_proj";
     const char* bottomVVelPhLndProjectedField = "vphL_proj";
 
@@ -1168,7 +1166,8 @@ int main( int argc, char* argv[] )
     // as always, use nonblocking sends
     // graph context comes from commgraph ?
 
-    //      ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
+    //      ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA,
+    //      &typeB,
     //  &cmpatm, &cplatm );
 
     if( couComm != MPI_COMM_NULL )
@@ -1205,8 +1204,8 @@ int main( int argc, char* argv[] )
 #endif
     // end copy need more work for land
 // start copy
-    // lnd atm coupling; go reverse direction now, from lnd to atm , using lnd - atm intx, weight gen
-    // send back the T_proj , etc , from lan comp to land coupler
+// lnd atm coupling; go reverse direction now, from lnd to atm , using lnd - atm intx, weight gen
+// send back the T_proj , etc , from lan comp to land coupler
 #ifdef ENABLE_ATMLND_COUPLING
     PUSH_TIMER( "Send/receive data from lnd component to coupler in atm context" )
     if( lndComm != MPI_COMM_NULL )
@@ -1240,7 +1239,7 @@ int main( int argc, char* argv[] )
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "could not write recvLndCpl.h5m to disk" )
     }
-        //#endif
+    //#endif
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -1266,7 +1265,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "failed to compute projection weight application from lnd to atm " );
         POP_TIMER( couComm, rankInCouComm )
 
-        char outputFileTgt[] = "fAtm3OnCpl.h5m"; // this is for T3_ph, etc
+        char outputFileTgt[] = "fAtm3OnCpl.h5m";  // this is for T3_ph, etc
         ierr                 = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "could not write fAtm3OnCpl.h5m to disk" )
@@ -1295,7 +1294,8 @@ int main( int argc, char* argv[] )
     // as always, use nonblocking sends
     // graph context comes from commgraph ?
 
-    //      ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
+    //      ierr = iMOAB_ComputeCommGraph(  cmpPhAtmPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA,
+    //      &typeB,
     //  &cmpatm, &cplatm );
 
     if( couComm != MPI_COMM_NULL )
@@ -1329,7 +1329,7 @@ int main( int argc, char* argv[] )
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "could not write AtmPhysProj3.h5m to disk" )
     }
-    #endif
+#endif
     // we could deregister cplLndAtmPID
     if( couComm != MPI_COMM_NULL )
     {
