@@ -479,7 +479,7 @@ int main( int argc, char* argv[] )
         // First compute the covering set such that the target elements are fully covered by the
         // lcoal source grid
         runCtx->timer_push( "construct covering set for intersection" );
-        rval = remapper.ConstructCoveringSet( epsrel, 1.0, 1.0, 0.1, runCtx->rrmGrids );MB_CHK_ERR( rval );
+        rval = remapper.ConstructCoveringSet( epsrel, 1.0, 1.0, boxeps, runCtx->rrmGrids );MB_CHK_ERR( rval );
         runCtx->timer_pop();
 
         // Compute intersections with MOAB with either the Kd-tree or the advancing front algorithm
