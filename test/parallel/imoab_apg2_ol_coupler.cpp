@@ -644,14 +644,15 @@ int main( int argc, char* argv[] )
         POP_TIMER( atmCouComm, rankInAtmComm )  // hijack this rank
     }
 
-    // we will compute comm graph between atm phys and land, directly; we do not need any intersection
-    // later, we will send data from atm phys to land on coupler; then back to land comp;
+    // we will compute comm graph between atm phys and land, directly;
+    // on the new TriGrid workflow, we do need intersection between atm and land;
     if( atmCouComm != MPI_COMM_NULL )
     {
         int typeA = 2;  // point cloud
         int typeB = 3;  // type 3 for land on coupler, based on global ids for land cells ?
         ierr = iMOAB_ComputeCommGraph( cmpPhAtmPID, cplAtmLndPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
                                        &cmpatm, &atmlndid );
+        CHECKIERR( ierr, "cannot compute comm graph between atm and atm/lnd intersection" )
     }
 
     // for reverse direction, lnd - atm intx:
@@ -916,6 +917,7 @@ int main( int argc, char* argv[] )
         char outputFileTgt[] = "fOcnOnCpl3.h5m";
         ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
                                 strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "failed to write fOcnOnCpl3.h5m " );
     }
     // send the projected tag back to ocean pes, with send/receive tag
     if( ocnComm != MPI_COMM_NULL )
@@ -952,12 +954,16 @@ int main( int argc, char* argv[] )
 
     MPI_Barrier( MPI_COMM_WORLD );
 
-    if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id ); }
+    if( couComm != MPI_COMM_NULL ) {
+        ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+        CHECKIERR( ierr, "cannot free buffers related to send tag")
+    }
     if( ocnComm != MPI_COMM_NULL )
     {
         char outputFileOcn[] = "OcnWithProj3.h5m";
         ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
                                 strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write OcnWithProj3.h5m")
     }
 #endif
 
@@ -1017,15 +1023,6 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot write land on coupler" )
     }
 
-#ifdef VERBOSE
-    if( couComm != MPI_COMM_NULL )
-    {
-        char outputFileTgtLnd[] = "fLndOnCpl.h5m";
-        ierr = iMOAB_WriteMesh( cplLndPID, outputFileTgtLnd, fileWriteOptions, strlen( outputFileTgtLnd ),
-                                strlen( fileWriteOptions ) );
-    }
-#endif
-
     // end land proj
     // send the tags back to land pes, from land mesh on coupler pes
     // send from cplLndPID to cmpLndPID, using common joint comm
@@ -1062,7 +1059,10 @@ int main( int argc, char* argv[] )
     }
 
     MPI_Barrier( MPI_COMM_WORLD );
-    if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id ); }
+    if( couComm != MPI_COMM_NULL ) {
+        ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
+        CHECKIERR( ierr, "cannot free buffers related to sending tags from coupler to land pes" )
+    }
     if( lndComm != MPI_COMM_NULL )
     {
         char outputFileLnd[] = "LndWithProj3.h5m";
@@ -1321,6 +1321,7 @@ int main( int argc, char* argv[] )
     {
         context_id = cmpatm;
         ierr       = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
+        CHECKIERR( ierr, "cannot free buffers used for sending back atm tags " )
     }
     if( atmComm != MPI_COMM_NULL )  // write only for n==1 case
     {
