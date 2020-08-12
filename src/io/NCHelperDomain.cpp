@@ -390,32 +390,32 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     {
         if( 0 == mask[elem_index] ) continue;  // nothing to do, do not advance elem_index in actual moab arrays
         // set area and fraction on those elements too
-        for( int j = 0; j < nv; j++ )
+        for( int k = 0; k < nv; k++ )
         {
-            EntityHandle vertex = start_vertex + nv * index + j;
+            EntityHandle vertex = start_vertex + nv * index + k;
 
-            int index_v_arr = nv * elem_index + j;
+            int index_v_arr = nv * elem_index + k;
             double x, y;
             if( nv > 1 )
             {
-                conn_arr[nv * index + j] = vertex;
+                conn_arr[nv * index + k] = vertex;
                 x                        = xv[index_v_arr];
                 y                        = yv[index_v_arr];
                 double cosphi            = cos( pideg * y );
                 double zmult             = sin( pideg * y );
                 double xmult             = cosphi * cos( x * pideg );
                 double ymult             = cosphi * sin( x * pideg );
-                xptr[nv * index + j]     = radius * xmult;
-                yptr[nv * index + j]     = radius * ymult;
-                zptr[nv * index + j]     = radius * zmult;
+                xptr[nv * index + k]     = radius * xmult;
+                yptr[nv * index + k]     = radius * ymult;
+                zptr[nv * index + k]     = radius * zmult;
             }
             else  // nv ==1 , tempest remap case, only xc make sense
             {
                 x                    = xc[elem_index];
                 y                    = yc[elem_index];
-                xptr[nv * index + j] = x;
-                yptr[nv * index + j] = y;
-                zptr[nv * index + j] = 0;
+                xptr[nv * index + k] = x;
+                yptr[nv * index + k] = y;
+                zptr[nv * index + k] = 0;
             }
         }
         EntityHandle cell = start_vertex + index;
