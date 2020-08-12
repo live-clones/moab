@@ -40,6 +40,7 @@ EXTRA_DIST = HommeMapping.nc \
              mix.h5m \
              p8ex1.h5m \
              oneside.h5m \
+             ln4.h5m \
              rtttest_v100.rtt \
              rtttest_v101.rtt \
              test.obj \

@@ -76,9 +76,10 @@ int main( int argc, char* argv[] )
     int nproc, rank;
     MPI_Comm_size( MPI_COMM_WORLD, &nproc );
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-    if( nproc <= 3 && rank == 0 )
+    if( nproc <= 3 )
     {
         std::cout << " launch it on at least 4 processes. \n";
+        MPI_Finalize();
         return 0;
     }
 
