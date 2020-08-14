@@ -352,7 +352,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         myZZ->LB_Point_PP_Assign( ecoords, proc, part );
 
         // Store the part assignment in the return array
-        part_assignments[part - 1].push_back( elverts[iel] );
+        part_assignments[part].push_back( elverts[iel] );
     }
 
     // get the partition set tag
