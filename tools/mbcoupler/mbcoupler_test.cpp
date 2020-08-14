@@ -2,6 +2,7 @@
 #include "moab/ParallelComm.hpp"
 #include "MBParallelConventions.h"
 #include "moab/Core.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 #include "Coupler.hpp"
 #include "moab_mpi.h"
 #include "ElemUtil.hpp"
@@ -15,19 +16,31 @@
 
 using namespace moab;
 
-/*
-  Sample usages:
-    1) P_0 interpolation: ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth
-  0 -outfile <output> 2) P_1 interpolation: ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag
-  <interp_tag> -meth 1 -outfile <output> 3) P_1 interpolation with epsilon control: ./mbcoupler_test
-  -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 1 -eps <tolerance for locating points;
-  say 0.01> -outfile <output> 3) P_0 interpolation with global normalization: ./mbcoupler_test
-  -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 0 -gnorm <gnorm_tag_name> -outfile
-  <output> 4) P_1 interpolation with subset normalization: ./mbcoupler_test -meshes <src_mesh>
-  <target_mesh> -itag <interp_tag> -meth 1 -ssnorm <snorm_tag_name> <snorm_criteria: MATERIAL_SET>
-  -outfile <output> 5) P_1 interpolation for meshes on sphere  ./mbcoupler_test -meshes  <src_mesh>
-  <target_mesh>  -itag  <interp_tag>  -meth 4 -outfile  <output>
-*/
+/**
+ * Sample usages:
+ * ==============
+ * 1) P_0 interpolation:
+ * > ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 0 -outfile <output>
+ *
+ * 2) P_1 interpolation:
+ * > ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 1 -outfile <output>
+ *
+ * 3) P_1 interpolation with epsilon control:
+ * > ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 1 \
+ *        -eps <tolerance for locating points;say 0.01> -outfile <output>
+ *
+ * 4) P_0 interpolation with global normalization:
+ * > ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 0 \
+ *        -gnorm <gnorm_tag_name> -outfile <output>
+ *
+ * 5) P_1 interpolation with subset normalization:
+ * > ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 1 \
+ *        -ssnorm <snorm_tag_name> <snorm_criteria: MATERIAL_SET> -outfile <output>
+ *
+ * 6) P_1 interpolation for meshes on sphere:
+ * > ./mbcoupler_test -meshes <src_mesh> <target_mesh> -itag <interp_tag> -meth 4 -outfile <output>
+ *
+**/
 
 // Print usage
 void print_usage()
@@ -39,6 +52,8 @@ void print_usage()
               << std::endl;
     std::cerr << "    -meshes" << std::endl;
     std::cerr << "        Read in mesh files <source_mesh> and <target_mesh>." << std::endl;
+    std::cerr << "    -dim" << std::endl;
+    std::cerr << "        Leading dimension of the mesh" << std::endl;
     std::cerr << "    -itag" << std::endl;
     std::cerr << "        Interpolate tag <interp_tag> from source mesh to target mesh." << std::endl;
     std::cerr << "    -gnorm" << std::endl;
@@ -46,8 +61,7 @@ void print_usage()
     std::cerr << "        tag \"<gnorm_tag>_normf\" on the mesh set.  Do this for all meshes." << std::endl;
     std::cerr << "    -ssnorm" << std::endl;
     std::cerr << "        Normalize the value of tag <ssnorm_tag> over subsets of a mesh and save to" << std::endl;
-    std::cerr << "        tag \"<ssnorm_tag>_normf\" on the Entity Set for each subset.  Subsets "
-                 "are selected"
+    std::cerr << "        tag \"<ssnorm_tag>_normf\" on the Entity Set for each subset.  Subsets are selected"
               << std::endl;
     std::cerr << "        using criteria in <ssnorm_selection>.  Do this for all meshes." << std::endl;
     std::cerr << "    -ropts" << std::endl;
@@ -66,15 +80,15 @@ void print_usage()
 #ifdef MOAB_HAVE_HDF5
 
 ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::vector< std::string >& meshFiles,
-                            Coupler::Method& method, std::string& interpTag, std::string& gNormTag,
+                            Coupler::Method& method, int& dimension, std::string& interpTag, std::string& gNormTag,
                             std::string& ssNormTag, std::vector< const char* >& ssTagNames,
                             std::vector< const char* >& ssTagValues, std::string& readOpts, std::string& outFile,
                             std::string& writeOpts, std::string& dbgFile, bool& help, double& epsilon );
 
 ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs, bool print_results );
 
-ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::string& interpTag, std::string& gNormTag,
-                              std::string& ssNormTag, std::vector< const char* >& ssTagNames,
+ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, int dimension, std::string& interpTag,
+                              std::string& gNormTag, std::string& ssNormTag, std::vector< const char* >& ssTagNames,
                               std::vector< const char* >& ssTagValues, EntityHandle* roots,
                               std::vector< ParallelComm* >& pcs, double& instant_time, double& pointloc_time,
                               double& interp_time, double& gnorm_time, double& ssnorm_time, double& toler );
@@ -103,13 +117,14 @@ int main( int argc, char** argv )
     ErrorCode result;
     bool help    = false;
     double toler = 5.e-10;
+    int dim      = 3;
     int nprocs, rank;
     ierr = MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
     assert( MPI_SUCCESS == ierr );
     ierr = MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     assert( MPI_SUCCESS == ierr );
 
-    result = get_file_options( argc, argv, nprocs, rank, meshFiles, method, interpTag, gNormTag, ssNormTag, ssTagNames,
+    result = get_file_options( argc, argv, nprocs, rank, meshFiles, method, dim, interpTag, gNormTag, ssNormTag, ssTagNames,
                                ssTagValues, readOpts, outFile, writeOpts, dbgFile, help, toler );
 
     if( result != MB_SUCCESS || help )
@@ -153,6 +168,11 @@ int main( int argc, char** argv )
         result = mbImpl->load_file( meshFiles[i].c_str(), &roots[i], newReadopts.c_str() );MB_CHK_ERR( result );
         // result = rps[i]->load_file(meshFiles[i].c_str(), &roots[i],
         // FileOptions(readOpts.c_str()));MB_CHK_ERR(result);
+
+        if( method == Coupler::SPHERICAL )
+        {
+            result = moab::IntxUtils::ScaleToRadius( mbImpl, roots[i], 1.0 );MB_CHK_ERR( result );
+        }
     }
 
     result = report_iface_ents( mbImpl, pcs, true );MB_CHK_ERR( result );
@@ -160,7 +180,7 @@ int main( int argc, char** argv )
     double instant_time = 0.0, pointloc_time = 0.0, interp_time = 0.0, gnorm_time = 0.0, ssnorm_time = 0.0;
     // Test interpolation and global normalization and subset normalization
 
-    result = test_interpolation( mbImpl, method, interpTag, gNormTag, ssNormTag, ssTagNames, ssTagValues, roots, pcs,
+    result = test_interpolation( mbImpl, method, dim, interpTag, gNormTag, ssNormTag, ssTagNames, ssTagValues, roots, pcs,
                                  instant_time, pointloc_time, interp_time, gnorm_time, ssnorm_time, toler );MB_CHK_ERR( result );
 
     reduceMax( instant_time );
@@ -258,7 +278,7 @@ bool check_for_flag( const char* str )
 
 // get_file_options() function with added possibilities for mbcoupler_test.
 ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::vector< std::string >& meshFiles,
-                            Coupler::Method& method, std::string& interpTag, std::string& gNormTag,
+                            Coupler::Method& method, int& dimension, std::string& interpTag, std::string& gNormTag,
                             std::string& ssNormTag, std::vector< const char* >& ssTagNames,
                             std::vector< const char* >& ssTagValues, std::string& readOpts, std::string& outFile,
                             std::string& writeOpts, std::string& dbgFile, bool& help, double& epsilon )
@@ -267,10 +287,6 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::ve
     // in the argument list.
     gNormTag                   = "";
     ssNormTag                  = "";
-    readOpts                   = ( nprocs > 1 ? "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                              "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME"
-                            : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                              "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME" );
     outFile                    = "";
     writeOpts                  = ( nprocs > 1 ? "PARALLEL=WRITE_PART;CPUTIME" : "" );
     dbgFile                    = "";
@@ -344,6 +360,18 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::ve
                 return MB_FAILURE;
             }
             npos++;
+        }
+        else if( argv[npos] == std::string( "-dim" ) )
+        {
+            // Parse out the tolerance
+            npos++;
+            if( ( npos < argc ) && ( !check_for_flag( argv[npos] ) ) )
+                dimension = atoi( argv[npos++] );
+            else
+            {
+                std::cerr << "    ERROR - missing <dimension>" << std::endl;
+                return MB_FAILURE;
+            }
         }
         else if( argv[npos] == std::string( "-eps" ) )
         {
@@ -508,33 +536,50 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::ve
     }
 #endif
 
+    std::stringstream sstr;
+    if (nprocs > 1)
+        sstr << "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS="
+             << dimension
+             << ".0.1;CPUTIME";
+    else
+    {
+        sstr << "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME";
+    }
+
+    readOpts = sstr.str();
+
     return MB_SUCCESS;
 }
 
 // End get_file_options()
 
-ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::string& interpTag, std::string& gNormTag,
-                              std::string& ssNormTag, std::vector< const char* >& ssTagNames,
+ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, int dimension, std::string& interpTag,
+                              std::string& gNormTag, std::string& ssNormTag, std::vector< const char* >& ssTagNames,
                               std::vector< const char* >& ssTagValues, EntityHandle* roots,
                               std::vector< ParallelComm* >& pcs, double& instant_time, double& pointloc_time,
                               double& interp_time, double& gnorm_time, double& ssnorm_time, double& toler )
 {
+    ErrorCode result;
     assert( method >= Coupler::CONSTANT && method <= Coupler::SPHERICAL );
 
     // Source is 1st mesh, target is 2nd
     Range src_elems, targ_elems, targ_verts;
-    ErrorCode result = pcs[0]->get_part_entities( src_elems, 3 );MB_CHK_ERR( result );
+    result = pcs[0]->get_part_entities( src_elems, dimension );MB_CHK_ERR( result );
 
     double start_time = MPI_Wtime();
 
     // Instantiate a coupler, which does not initialize the tree yet
-    Coupler mbc( mbImpl, pcs[0], src_elems, 0, false );  // do not initialize tree yet
+    Coupler mbc( mbImpl, pcs[0], src_elems, 0, false, dimension );  // do not initialize tree yet
     if( Coupler::SPHERICAL == method ) mbc.set_spherical();
     mbc.initialize_tree();  // it is expensive, but do something different for spherical
 
     // Initialize spectral elements, if they exist
     bool specSou = false, specTar = false;
     result = mbc.initialize_spectral_elements( roots[0], roots[1], specSou, specTar );
+
+    std::cout << "Source spectral ? " << specSou << " and target spectral ? " << specTar << std::endl;
 
     instant_time = MPI_Wtime();
 
@@ -548,8 +593,8 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
         Range tmp_verts;
 
         // First get all vertices adj to partition entities in target mesh
-        result = pcs[1]->get_part_entities( targ_elems, 3 );MB_CHK_ERR( result );
-        if( Coupler::SPHERICAL == method ) result = pcs[1]->get_part_entities( targ_elems, 2 );MB_CHK_ERR( result );  // get the polygons/quads on a sphere.
+        result = pcs[1]->get_part_entities( targ_elems, dimension );MB_CHK_ERR( result );
+        // if( Coupler::SPHERICAL == method ) result = pcs[1]->get_part_entities( targ_elems, 2 );MB_CHK_ERR( result );  // get the polygons/quads on a sphere.
         if( Coupler::CONSTANT == method )
             targ_verts = targ_elems;
         else
@@ -572,7 +617,7 @@ ErrorCode test_interpolation( Interface* mbImpl, Coupler::Method method, std::st
         // In this case, the target mesh is spectral, we want values
         // interpolated on the GL positions; for each element, get the GL points, and construct
         // CartVect!!!
-        result = pcs[1]->get_part_entities( targ_elems, 3 );MB_CHK_ERR( result );
+        result = pcs[1]->get_part_entities( targ_elems, dimension );MB_CHK_ERR( result );
         result = mbc.get_gl_points_on_elements( targ_elems, vpos, numPointsOfInterest );MB_CHK_ERR( result );
         std::cout << "rank " << pcs[0]->proc_config().proc_rank() << " points of interest: " << numPointsOfInterest
                   << "\n";

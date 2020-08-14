@@ -94,6 +94,9 @@ ErrorCode Coupler::initialize_tree()
     }
     else
         local_ents = myRange;
+
+    printf( "Dimension: %d, ents size: %d\n", max_dim, local_ents.size() );
+
     if( MB_SUCCESS != result || local_ents.empty() )
     {
         std::cout << "Problems getting source entities" << std::endl;
@@ -119,6 +122,7 @@ ErrorCode Coupler::initialize_tree()
             double radius = pos0.length();
             str << "SPHERICAL=true;RADIUS=" << radius << ";";
         }
+        printf("KD-tree options string: %s\n", str.str().c_str());
         FileOptions opts( str.str().c_str() );
         myTree = new AdaptiveKDTree( mbImpl );
         result = myTree->build_tree( local_ents, &localRoot, &opts );
@@ -271,11 +275,13 @@ ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, Entity
 
 ErrorCode Coupler::locate_points( Range& targ_ents, double rel_eps, double abs_eps, TupleList* tl, bool store_local )
 {
+    ErrorCode rval;
+
     // Get locations
     std::vector< double > locs( 3 * targ_ents.size() );
-    Range verts    = targ_ents.subset_by_type( MBVERTEX );
-    ErrorCode rval = mbImpl->get_coords( verts, &locs[0] );
-    if( MB_SUCCESS != rval ) return rval;
+    Range verts = targ_ents.subset_by_type( MBVERTEX );
+    rval        = mbImpl->get_coords( verts, &locs[0] );MB_CHK_ERR( rval );
+
     // Now get other ents; reuse verts
     unsigned int num_verts = verts.size();
     verts                  = subtract( targ_ents, verts );
@@ -288,10 +294,8 @@ ErrorCode Coupler::locate_points( Range& targ_ents, double rel_eps, double abs_e
     // Do this here instead of a function to allow reuse of dum_pos and dum_conn
     for( Range::const_iterator rit = verts.begin(); rit != verts.end(); ++rit )
     {
-        rval = mbImpl->get_connectivity( *rit, conn, num_conn, false, &dum_conn );
-        if( MB_SUCCESS != rval ) return rval;
-        rval = mbImpl->get_coords( conn, num_conn, &dum_pos[0] );
-        if( MB_SUCCESS != rval ) return rval;
+        rval = mbImpl->get_connectivity( *rit, conn, num_conn, false, &dum_conn );MB_CHK_ERR( rval );
+        rval = mbImpl->get_coords( conn, num_conn, &dum_pos[0] );MB_CHK_ERR( rval );
         coords[0] = coords[1] = coords[2] = 0.0;
         for( int i = 0; i < num_conn; i++ )
         {
@@ -345,7 +349,6 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
     // into the mappedPts tuple list
     for( unsigned int i = 0; i < 3 * num_points; i += 3 )
     {
-
         std::vector< int > procs_to_send_to;
         for( unsigned int j = 0; j < ( myPc ? myPc->proc_config().proc_size() : 0 ); j++ )
         {
@@ -388,6 +391,7 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
 #endif
             procs_to_send_to.push_back( index );  // will send to just one proc, that has the closest box
         }
+
         // we finally decided to populate the tuple list for a list of processors
         for( size_t k = 0; k < procs_to_send_to.size(); k++ )
         {
@@ -409,11 +413,15 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
 
     int num_to_me = 0;
     for( unsigned int i = 0; i < target_pts.get_n(); i++ )
+    {
         if( target_pts.vi_rd[2 * i] == (int)my_rank ) num_to_me++;
+    }
+
 #ifdef VERBOSE
     printf( "rank: %u local points: %u, nb sent target pts: %u mappedPts: %u num to me: %d \n", my_rank, num_points,
             target_pts.get_n(), mappedPts->get_n(), num_to_me );
 #endif
+
     // Perform scatter/gather, to gather points to source mesh procs
     if( myPc )
     {
@@ -449,8 +457,7 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
         for( unsigned i = 0; i < target_pts.get_n(); i++ )
         {
             result = test_local_box( target_pts.vr_wr + 3 * i, target_pts.vi_rd[2 * i], target_pts.vi_rd[2 * i + 1], i,
-                                     point_located, rel_eps, abs_eps, &source_pts );
-            if( MB_SUCCESS != result ) return result;
+                                     point_located, rel_eps, abs_eps, &source_pts );MB_CHK_ERR( result );
         }
 
         // No longer need target_pts
@@ -518,18 +525,18 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
         if( tl_tmp->vi_rd[3 * i + 1] == -1 )
         {
             missing_pts++;
-#ifdef VERBOSE
+// #ifdef VERBOSE
             printf( "missing point at index i:  %d -> %15.10f %15.10f %15.10f\n", i, xyz[3 * i], xyz[3 * i + 1],
                     xyz[3 * i + 2] );
-#endif
+// #endif
         }
         else if( tl_tmp->vi_rd[3 * i] == (int)my_rank )
             local_pts++;
     }
-#ifdef VERBOSE
+// #ifdef VERBOSE
     printf( "rank: %u point location: wanted %u got %u locally, %u remote, missing %u\n", my_rank, num_points,
             local_pts, num_points - missing_pts - local_pts, missing_pts );
-#endif
+// #endif
     assert( 0 == missing_pts );  // Will likely break on curved geometries
 
     // No longer need source_pts
