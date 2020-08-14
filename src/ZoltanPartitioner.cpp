@@ -367,7 +367,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         result = mbImpl->remove_entities( sfileset, oldpsets );RR;
     }
 
-    int nparts_assigned = 0;
+    size_t nparts_assigned = 0;
     for( size_t partnum = 0; partnum < num_parts; ++partnum )
     {
         std::vector< EntityHandle >& partvec = part_assignments[partnum];
@@ -401,7 +401,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
 
     if( nparts_assigned != num_parts )
     {
-        std::cout << "ERROR: The inference yielded lesser number of parts (" << part_assignments.size()
+        std::cout << "WARNING: The inference yielded lesser number of parts (" << nparts_assigned
                   << ") than requested by user (" << num_parts << ").\n";
     }
 
