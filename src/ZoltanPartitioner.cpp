@@ -339,14 +339,12 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
     std::vector< double > elcoords( elverts.size() * 3 );
     result = mbImpl->get_coords( elverts, &elcoords[0] );RR;
 
-    std::map< int, std::vector< EntityHandle > > part_assignments;
-
+    std::vector< std::vector< EntityHandle > > part_assignments( num_parts );
     int part, proc;
 
     // Loop over coordinates
     for( size_t iel = 0; iel < elverts.size(); iel++ )
     {
-
         // Gather coordinates into temporary array
         double* ecoords = &elcoords[iel * 3];
 
@@ -354,7 +352,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         myZZ->LB_Point_PP_Assign( ecoords, proc, part );
 
         // Store the part assignment in the return array
-        part_assignments[part].push_back( elverts[iel] );
+        part_assignments[part - 1].push_back( elverts[iel] );
     }
 
     // get the partition set tag
@@ -369,21 +367,27 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         result = mbImpl->remove_entities( sfileset, oldpsets );RR;
     }
 
-    std::map< int, std::vector< EntityHandle > >::iterator it;
-    for( it = part_assignments.begin(); it != part_assignments.end(); ++it )
+    int nparts_assigned = 0;
+    for( size_t partnum = 0; partnum < num_parts; ++partnum )
     {
-        int partnum                          = it->first;
-        std::vector< EntityHandle >& partvec = it->second;
+        std::vector< EntityHandle >& partvec = part_assignments[partnum];
+
+        nparts_assigned += ( partvec.size() ? 1 : 0 );
 
         if( write_as_sets )
         {
             EntityHandle partNset;
             result = mbImpl->create_meshset( moab::MESHSET_SET, partNset );RR;
-            result = mbImpl->add_entities( partNset, &partvec[0], partvec.size() );RR;
+            if( partvec.size() )
+            {
+                result = mbImpl->add_entities( partNset, &partvec[0], partvec.size() );RR;
+            }
             result = mbImpl->add_parent_child( sfileset, partNset );RR;
-            // std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
+
+            int ipartnum = partnum + 1;
+
             // assign partitions as a sparse tag by grouping elements under sets
-            result = mbImpl->tag_set_data( part_set_tag, &partNset, 1, &partnum );RR;
+            result = mbImpl->tag_set_data( part_set_tag, &partNset, 1, &ipartnum );RR;
         }
         else
         {
@@ -395,7 +399,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         }
     }
 
-    if( part_assignments.size() != num_parts )
+    if( nparts_assigned != num_parts )
     {
         std::cout << "ERROR: The inference yielded lesser number of parts (" << part_assignments.size()
                   << ") than requested by user (" << num_parts << ").\n";
@@ -1706,11 +1710,12 @@ void ZoltanPartitioner::SetRCB_Parameters()
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
     myZZ->Set_Param( "LB_METHOD", "RCB" );  // recursive coordinate bisection
+    // myZZ->Set_Param( "RCB_RECOMPUTE_BOX", "1" );  // recompute RCB box if needed ?
 
     // RCB parameters:
 
     myZZ->Set_Param( "RCB_OUTPUT_LEVEL", "1" );
-    myZZ->Set_Param( "KEEP_CUTS", "1" );  // save decomposition
+    myZZ->Set_Param( "KEEP_CUTS", "1" );  // save decomposition so that we can infer partitions
     // myZZ->Set_Param("RCB_RECTILINEAR_BLOCKS", "1"); // don't split point on boundary
 }
 
