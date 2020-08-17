@@ -1209,7 +1209,7 @@ cdef class Core(object):
         """
         cdef moab.ErrorCode err
         cdef Range r = Range()
-        err = self.inst.get_parent_meshsets(<unsigned long> meshset_handle, deref(r.inst), 0)
+        err = self.inst.get_parent_meshsets(<unsigned long> meshset_handle, deref(r.inst), num_hops)
         check_error(err, exceptions)
         return r
 
