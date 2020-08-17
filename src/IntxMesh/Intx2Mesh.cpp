@@ -131,6 +131,9 @@ ErrorCode Intx2Mesh::createTags()
     // for tgt cells, save a dense tag with the bordering edges, so we do not have to search for
     // them each time edges were for sure created before (tgtEdges)
     std::vector< EntityHandle > zeroh( max_edges_2, 0 );
+    // if we have a tag with this name, it could be of a different size, so delete it
+    rval = mb->tag_get_handle( "__tgtEdgeNeighbors", neighTgtEdgeTag );
+    if( rval == MB_SUCCESS && neighTgtEdgeTag ) mb->tag_delete( neighTgtEdgeTag );
     rval = mb->tag_get_handle( "__tgtEdgeNeighbors", max_edges_2, MB_TYPE_HANDLE, neighTgtEdgeTag,
                                MB_TAG_DENSE | MB_TAG_CREAT, &zeroh[0] );MB_CHK_SET_ERR( rval, "can't create tgt edge neighbors tag" );
     for( Range::iterator rit = rs2.begin(); rit != rs2.end(); rit++ )
@@ -268,6 +271,9 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
 
     // for tgt cells, save a dense tag with the bordering edges, so we do not have to search for
     // them each time edges were for sure created before (tgtEdges)
+    // if we have a tag with this name, it could be of a different size, so delete it
+    rval = mb->tag_get_handle( "__tgtEdgeNeighbors", neighTgtEdgeTag );
+    if( rval == MB_SUCCESS && neighTgtEdgeTag ) mb->tag_delete( neighTgtEdgeTag );
     std::vector< EntityHandle > zeroh( max_edges_2, 0 );
     rval = mb->tag_get_handle( "__tgtEdgeNeighbors", max_edges_2, MB_TYPE_HANDLE, neighTgtEdgeTag,
                                MB_TAG_DENSE | MB_TAG_CREAT, &zeroh[0] );MB_CHK_SET_ERR( rval, "can't create tgt edge neighbors tag" );

@@ -2042,7 +2042,33 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     ParCommGraph* cgraph = mt->second;
     ParallelComm* pco    = context.pcomms[*pid];
     Range owned          = data.owned_elems;
+    ErrorCode rval;
+    EntityHandle cover_set;
+
     if( data.point_cloud ) { owned = data.local_verts; }
+    // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for
+    // after atm ocn intx, from phys (case from imoab_phatm_ocn_coupler.cpp) get then the cover set
+    // from ints remapper
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    if( data.tempestData.remapper != NULL )  // this is the case this is part of intx;;
+    {
+        cover_set = data.tempestData.remapper->GetMeshSet( Remapper::CoveringMesh );
+        rval      = context.MBI->get_entities_by_dimension( cover_set, 2, owned );CHKERRVAL( rval );
+        // should still have only quads ?
+    }
+#else
+    // now, in case we are sending from intx between ocn and atm, we involve coverage set
+    // how do I know if this receiver already participated in an intersection driven by coupler?
+    // also, what if this was the "source" mesh in intx?
+    // in that case, the elements might have been instantiated in the coverage set locally, the
+    // "owned" range can be different the elements are now in tempestRemap coverage_set
+    cover_set = cgraph->get_cover_set(); // this will be non null only for intx app ?
+
+    if( 0 != cover_set )
+    {
+        rval = context.MBI->get_entities_by_dimension( cover_set, 2, owned );CHKERRVAL( rval );
+    }
+#endif
 
     std::string tag_name( tag_storage_name );
 
@@ -2055,7 +2081,6 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     std::vector< Tag > tagHandles;
     std::string separator( ";" );
     split_tag_names( tag_name, separator, tagNames );
-    ErrorCode rval;
     for( size_t i = 0; i < tagNames.size(); i++ )
     {
         Tag tagHandle;
@@ -2222,19 +2247,23 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
             assert( tagType1 );
             rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );
-            ;CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
         }
         else if( *type1 == 2 )
         {
             rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() );
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );
-            ;CHKERRVAL( rval );  // just global ids
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
+        }
+        else if( *type1 == 3 )  // for FV meshes, just get the global id of cell
+        {
+            rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL( rval );
+            valuesComp1.resize( ents_of_interest.size() );
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
         }
         else
         {
-            CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2
+            CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2 or 3
         }
         // now fill the tuple list with info and markers
         // because we will send only the ids, order and compress the list
@@ -2293,15 +2322,19 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
             assert( tagType1 );
             rval = context.MBI->get_entities_by_type( fset2, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp2.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );
-            ;CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
         }
         else if( *type2 == 2 )
         {
             rval = context.MBI->get_entities_by_type( fset2, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
             valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );
-            ;CHKERRVAL( rval );  // just global ids
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
+        }
+        else if( *type2 == 3 )
+        {
+            rval = context.MBI->get_entities_by_dimension( fset2, 2, ents_of_interest );CHKERRVAL( rval );
+            valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
         }
         else
         {
