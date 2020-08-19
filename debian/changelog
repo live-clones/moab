@@ -1,3 +1,9 @@
+moab (5.2.0) unstable; urgency=low
+
+  * Updates to improve the debian build support
+
+ -- Vijay Mahadevan <vijay.m@gmail.com>  Wed, 19 Aug 2020 16:36:31 -0600
+
 moab (4.8.0) unstable; urgency=low
 
   * Initial Release.

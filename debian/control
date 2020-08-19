@@ -1,19 +1,17 @@
 Source: moab
 Priority: extra
-Maintainer: Nico Schlömer <nico.schloemer@gmail.com>
-Uploaders: Jason Kraftcheck <kraftche@cae.wisc.edu>
+Maintainer: Vijay Mahadevan <vijay.m@gmail.com>
+Uploaders: Nico Schlömer <nico.schloemer@gmail.com>, Jason Kraftcheck <kraftche@cae.wisc.edu>
 Build-Depends: debhelper (>= 9),
-  cmake (>= 2.8.12),
+  cmake (>= 3.1.0),
   doxygen,
-  g++ (>= 4.0.0),
+  g++ (>= 5.0.0),
   gfortran,
   libblas-dev,
-  libhdf5-mpi-dev,
   liblapack-dev,
   libmetis-dev,
-  libopenmpi-dev,
-  libparmetis-dev,
-  openmpi-bin
+  libeigen3-dev,
+  libhdf5-mpich-dev
 Standards-Version: 3.9.8
 Section: libs
 Homepage: http://sigma.mcs.anl.gov/moab-library/
