@@ -1,3 +1,12 @@
+# Version 5.2.1
+
+## Fixes
+
+* *PR #492*: Use a tighter boxeps tolerance in Kd-tree searches for performance optimization
+* *PR #493*: make check fixes for parallel tests using OpenMPI in Conda
+* *PR #489*: New test for 3-component 2-way coupling with the PG2 ATM-OCN-LND cases
+* *PR #495*: Minor fix in PyMOAB get_parent_meshsets implementation
+
 # Version 5.2.0
 
 ## Features
