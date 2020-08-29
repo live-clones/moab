@@ -384,7 +384,8 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
             }
             result = mbImpl->add_parent_child( sfileset, partNset );RR;
 
-            int ipartnum = partnum + 1;
+            // part numbering should start from 0
+            int ipartnum = (int)partnum;
 
             // assign partitions as a sparse tag by grouping elements under sets
             result = mbImpl->tag_set_data( part_set_tag, &partNset, 1, &ipartnum );RR;
