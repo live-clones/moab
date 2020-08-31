@@ -31,10 +31,10 @@
 
 using namespace moab;
 
-const static double radius               = 1.0;
-const double MOAB_PI                     = 3.1415926535897932384626433832795028841971693993751058209749445923;
-const static double surface_area         = 4.0 * MOAB_PI * radius * radius;
-std::string inMapFilename = "outCS5ICOD5_map.nc";
+const static double radius       = 1.0;
+const double MOAB_PI             = 3.1415926535897932384626433832795028841971693993751058209749445923;
+const static double surface_area = 4.0 * MOAB_PI * radius * radius;
+std::string inMapFilename        = "outCS5ICOD5_map.nc";
 
 void test_tempest_create_meshes();
 void test_tempest_map_bcast();
@@ -43,7 +43,7 @@ void read_buffered_map();
 int main( int argc, char** argv )
 {
     if( argc > 1 )
-        inMapFilename = TestDir + "/" + std::string( argv[1] );
+        inMapFilename = "../../mapSEFV-NE11_p4.nc"; // std::string( argv[1] );
     else
         inMapFilename = TestDir + "/" + inMapFilename;
 
@@ -99,7 +99,8 @@ void test_tempest_create_meshes()
 //     int n_a, n_b, n_s;
 //     MPI_Info info = MPI_INFO_NULL;
 //     int omode = NC_NOWRITE | NC_PNETCDF | NC_MPIIO;
-//     err           = nc_open_par( filename.c_str(), omode, comm, info, &ncid );NCERROREXIT( err, "reading the NetCDF Map file: " << filename );
+//     err           = nc_open_par( filename.c_str(), omode, comm, info, &ncid );NCERROREXIT( err, "reading the NetCDF
+//     Map file: " << filename );
 
 //     /* free info object */
 //     if( info != MPI_INFO_NULL ) MPI_Info_free( &info );
@@ -121,27 +122,29 @@ void test_tempest_create_meshes()
 //     return;
 // }
 
-void read_buffered_map( )
+void read_buffered_map()
 {
     NcError error( NcError::silent_nonfatal );
 
     // Define our total buffer size to use
     NcFile* ncMap = NULL;
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
-    const int nBufferSize = 1 * 1024 * 1024;  // 64 KB
+
+    const int nBufferSize = 3 * 32 * 1024;  // 64 KB
+    const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
 
-    MPI_Comm commW                = MPI_COMM_WORLD;
-    const int rootProc            = 0;
+    MPI_Comm commW     = MPI_COMM_WORLD;
+    const int rootProc = 0;
     // const std::string outFilename = TestDir + "/" + outFilenames[0];
-    double dTolerance             = 1e-08;
-    int mpierr                    = 0;
+    double dTolerance = 1e-08;
+    int mpierr        = 0;
 
     int nprocs, rank;
     MPI_Comm_size( commW, &nprocs );
     MPI_Comm_rank( commW, &rank );
 
-    if (rank == 0)
+    if( rank == 0 )
     {
         ncMap = new NcFile( inMapFilename.c_str(), NcFile::ReadOnly );
         if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() ); }
@@ -167,34 +170,34 @@ void read_buffered_map( )
 
         // Read SparseMatrix entries
         NcDim* dimNS = ncMap->get_dim( "n_s" );
-        if( dimNS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", inMapFilename.c_str() ); }
+        if( dimNS == NULL )
+        { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", inMapFilename.c_str() ); }
 
         // store total number of nonzeros
         nS = dimNS->size();
 
         varRow = ncMap->get_var( "row" );
-        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", inMapFilename.c_str() ); }
+        if( varRow == NULL )
+        { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", inMapFilename.c_str() ); }
 
         varCol = ncMap->get_var( "col" );
-        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", inMapFilename.c_str() ); }
+        if( varRow == NULL )
+        { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", inMapFilename.c_str() ); }
 
         varS = ncMap->get_var( "S" );
-        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
-
+        if( varRow == NULL )
+        { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
     }
 
-    const int nNNZBytes      = 2 * sizeof( int ) + sizeof( double );
-    const int nTotalBytes    = nS * nNNZBytes;
-    int nBytesRemaining      = nS;
-    int nBufferedReads = static_cast< int >( ceil( (1.0 * nTotalBytes) / (1.0 * nBufferSize) ) );
-    if (rank == 0) printf( "nBufferedReads: nTotalBytes = %d, nBufferSize = %d, nBufferedReads = %d\n", nTotalBytes, nBufferSize, nBufferedReads);
-
-    int runData[6] = { nA, nB, nVA, nVB, nS, nBufferedReads };
+    const int nTotalBytes = nS * nNNZBytes;
+    int nEntriesRemaining = nS;
+    int nBufferedReads    = static_cast< int >( ceil( ( 1.0 * nTotalBytes ) / ( 1.0 * nBufferSize ) ) );
+    int runData[6]        = { nA, nB, nVA, nVB, nS, nBufferedReads };
 
     mpierr = MPI_Bcast( runData, 6, MPI_INTEGER, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
-    if (rank)
+    if( rank )
     {
         nA             = runData[0];
         nB             = runData[1];
@@ -202,6 +205,17 @@ void read_buffered_map( )
         nVB            = runData[3];
         nS             = runData[4];
         nBufferedReads = runData[5];
+    }
+
+    int nGRowPerPart   = nS / nprocs;
+    int nGRowRemainder = nS % nprocs;  // Keep the remainder in root
+    std::vector< std::pair<int,int> > rowOwnership(nprocs);
+    rowOwnership[0] = std::make_pair< int, int >( 0, nGRowPerPart + nGRowRemainder );
+    int roffset     = nGRowPerPart + nGRowRemainder;
+    for (int ip=1; ip < nprocs; ++ip)
+    {
+        rowOwnership[ip] = std::make_pair< int, int >( roffset, nGRowPerPart );
+        roffset += nGRowPerPart;
     }
 
     // Let us declare the map object for every process
@@ -214,7 +228,11 @@ void read_buffered_map( )
                 nTotalBytes, nBufferedReads );
 
     long offset = 0;
-    for( int iRead = 0; iRead < nBufferedReads ; ++iRead)
+    std::vector< int > rowMap, colMap;
+    rowMap.reserve( nB );
+    colMap.reserve( nA );
+
+    for( int iRead = 0; iRead < nBufferedReads; ++iRead )
     {
         /* split the rows and send to processes in chunks */
         std::vector< int > rowAllocation;
@@ -227,58 +245,79 @@ void read_buffered_map( )
         DataArray1D< int > vecRow;
         DataArray1D< int > vecCol;
         DataArray1D< double > vecS;
+        std::vector< std::vector< int > > dataPerProcess( nprocs );
         if( rank == 0 )
         {
-            int nLocSize = std::min( nBytesRemaining, static_cast< int >( nBufferSize / nNNZBytes ) );
+            int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
             // int nLocSize    = nLocBufSize / nNNZBytes;
 
-            printf( "Reading file: bytes %ld to %ld\n", offset, offset + nLocSize );
+            printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
 
             vecRow.Allocate( nLocSize );
             vecCol.Allocate( nLocSize );
             vecS.Allocate( nLocSize );
 
-            varRow->set_cur( (long)( offset * sizeof( int ) ) );
+            varRow->set_cur( (long)( offset ) );
             varRow->get( &( vecRow[0] ), nLocSize );
 
-            varCol->set_cur( (long)( offset * sizeof( int ) ) );
+            varCol->set_cur( (long)( offset ) );
             varCol->get( &( vecCol[0] ), nLocSize );
 
-            varS->set_cur( (long)( offset * sizeof( double ) ) );
+            varS->set_cur( (long)( offset ) );
             varS->get( &( vecS[0] ), nLocSize );
 
             // Decrement vecRow and vecCol
-            std::vector<int> rowUn, colUn;
+            std::vector< int > rowUn, colUn;
+            // std::vector< int > dataPerProcess(nprocs, 0);
             for( size_t i = 0; i < vecRow.GetRows(); i++ )
             {
                 vecRow[i]--;
                 if( std::find( rowUn.begin(), rowUn.end(), vecRow[i] ) == rowUn.end() ) rowUn.push_back( vecRow[i] );
                 vecCol[i]--;
-                if( std::find( colUn.begin(), colUn.end(), vecRow[i] ) == colUn.end() ) colUn.push_back( vecRow[i] );
+                if( std::find( colUn.begin(), colUn.end(), vecCol[i] ) == colUn.end() ) colUn.push_back( vecCol[i] );
+
+                // TODO: Fix this linear search to compute process ownership
+                int pOwner = -1;
+                for (int ip=0; ip < nprocs; ++ip)
+                {
+                    if (rowOwnership[ip].first <= vecRow[i] && rowOwnership[ip].second > vecRow[i])
+                    {
+                        pOwner = ip;
+                        break;
+                    }
+                }
+
+                assert(pOwner >= 0 && pOwner < nprocs);
+
+                dataPerProcess[pOwner].push_back(i);
+
+                // printf( "(%d, %d) = %f\n", vecRow[i], vecCol[i], vecS[i]);
+                if (pOwner == rootProc) // avoid actual communication if setting data on root proccess
+                    sparseMatrix( vecRow[i], vecCol[i] ) = vecS[i];
             }
 
             offset += nLocSize;
-            nBytesRemaining -= nLocSize;
+            nEntriesRemaining -= nLocSize;
 
-            // Set the entries of the map
+            // Set the entries of the map on the root
             // sparseMatrix.SetEntries( vecRow, vecCol, vecS );
 
             nMapGlobalRowCols[0] = rowUn.size();
             nMapGlobalRowCols[1] = colUn.size();
             nMapGlobalRowCols[2] = static_cast< int >( vecS.GetRows() );
-            printf( "Rank 0: nMapGlobalRowCols = %d, %d, %d, vecRow = %zu\n", nMapGlobalRowCols[0], nMapGlobalRowCols[1],
-                    nMapGlobalRowCols[2], vecRow.GetRows() );
+            printf( "Rank 0: nMapGlobalRowCols = %d, %d, %d, vecRow = %zu\n", nMapGlobalRowCols[0],
+                    nMapGlobalRowCols[1], nMapGlobalRowCols[2], vecRow.GetRows() );
             rowUn.clear();
             colUn.clear();
 
             // Now let us perform the communication of the data
             // Form the dataset to send to other processes
-            int* rg    = vecRow;
+            int* rg = vecRow;
 
             // Let us do a trivial partitioning of the row data
-            rowAllocation.resize( nprocs * NDATA );
-            displs.resize( nprocs );
-            sendCounts.resize( nprocs );
+            rowAllocation.resize( nprocs * NDATA, 0 );
+            displs.resize( nprocs, 0 );
+            sendCounts.resize( nprocs, 0 );
 
             int nRowPerPart = nMapGlobalRowCols[0] / nprocs;
             int remainder   = nMapGlobalRowCols[0] % nprocs;  // Keep the remainder in root
@@ -287,35 +326,34 @@ void read_buffered_map( )
             for( int i = 0; i < nprocs; ++i )
             {
                 rowAllocation[i * NDATA]     = nRowPerPart + ( i == 0 ? remainder : 0 );
-                rowAllocation[i * NDATA + 1] = std::find( rg, rg + vecS.GetRows(), sum ) - rg;
+                rowAllocation[i * NDATA + 1] = std::find( rg, rg + vecRow.GetRows(), sum ) - rg;
                 sum += rowAllocation[i * NDATA];
                 displs[i] = rowAllocation[i * NDATA + 1];
             }
             for( int i = 0; i < nprocs - 1; ++i )
             {
+                // TODO: FIX this
                 rowAllocation[i * NDATA + 2] = rowAllocation[( i + 1 ) * NDATA + 1] - rowAllocation[i * NDATA + 1];
                 sendCounts[i]                = rowAllocation[i * NDATA + 2];
             }
             rowAllocation[( nprocs - 1 ) * NDATA + 2] = nMapGlobalRowCols[2] - displs[nprocs - 1];
             sendCounts[nprocs - 1]                    = rowAllocation[( nprocs - 1 ) * NDATA + 2];
 
-            // for( int i = 0; i < nprocs; i++ )
-            //     printf( "sendcounts[%d] = %d, %d, %d\tdispls[%d] = %d, %d\n", i, rowAllocation[i * NDATA],
-            //             rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i], sendCounts[i]
-            //             );
+            for( int i = 0; i < nprocs; i++ )
+                printf( "sendcounts[%d] = %d, %d, %d\tdispls[%d] = %d, %d\n", i, rowAllocation[i * NDATA],
+                        rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i], sendCounts[i]
+                        );
         }
 
-        MPI_Barrier(commW);
-
-        printf( "Rank %d: nMapGlobalRowCols = %d, %d, %d\n", rank, nMapGlobalRowCols[0], nMapGlobalRowCols[1],
-                nMapGlobalRowCols[2] );
-        mpierr = MPI_Bcast( nMapGlobalRowCols, 3, MPI_INTEGER, rootProc, commW );
-        CHECK_EQUAL( mpierr, 0 );
+        // mpierr = MPI_Bcast( nMapGlobalRowCols, 3, MPI_INTEGER, rootProc, commW );
+        // CHECK_EQUAL( mpierr, 0 );
 
         int allocationSize[NDATA] = { 0, 0, 0 };
-        mpierr = MPI_Scatter( rowAllocation.data(), NDATA, MPI_INTEGER, &allocationSize, NDATA, MPI_INTEGER,
-                                rootProc, commW );
+        mpierr = MPI_Scatter( rowAllocation.data(), NDATA, MPI_INTEGER, &allocationSize, NDATA, MPI_INTEGER, rootProc,
+                              commW );
         CHECK_EQUAL( mpierr, 0 );
+
+        printf( "Rank %d: Alloccation size: %d, %d, %d\n", rank, allocationSize[0], allocationSize[1], allocationSize[2] );
 
         // create buffers to receive the data from root process
         DataArray1D< int > dataRows, dataCols;
@@ -327,19 +365,18 @@ void read_buffered_map( )
         /* TODO: combine row and column scatters together. Save one communication by better packing */
         // Scatter the rows, cols and entries to the processes according to the partition
         mpierr = MPI_Scatterv( vecRow, sendCounts.data(), displs.data(), MPI_INTEGER, (int*)( dataRows ),
-                                dataRows.GetByteSize(), MPI_INTEGER, rootProc, commW );
+                               dataRows.GetByteSize(), MPI_INTEGER, rootProc, commW );
         CHECK_EQUAL( mpierr, 0 );
 
         mpierr = MPI_Scatterv( vecCol, sendCounts.data(), displs.data(), MPI_INTEGER, (int*)( dataCols ),
-                                dataCols.GetByteSize(), MPI_INTEGER, rootProc, commW );
+                               dataCols.GetByteSize(), MPI_INTEGER, rootProc, commW );
         CHECK_EQUAL( mpierr, 0 );
 
         mpierr = MPI_Scatterv( vecS, sendCounts.data(), displs.data(), MPI_DOUBLE, (double*)( dataEntries ),
-                                dataEntries.GetByteSize(), MPI_DOUBLE, rootProc, commW );
+                               dataEntries.GetByteSize(), MPI_DOUBLE, rootProc, commW );
         CHECK_EQUAL( mpierr, 0 );
 
         // Compute an offset for the rows and columns by creating a local to global mapping
-        std::vector< int > rowMap, colMap;
         int rindex = 0, cindex = 0;
         for( int i = 0; i < allocationSize[2]; ++i )
         {
@@ -363,6 +400,9 @@ void read_buffered_map( )
                 cindex = citer - colMap.begin();
             dataCols[i] = cindex;
 
+            // printf( "(%d, %d) = %f\n", rindex, cindex, dataEntries[i]);
+            sparseMatrix( rindex, cindex ) = dataEntries[i];
+
             // if (rank == 1)
             //     std::cout << i << " -- row,col,val = " << rindex << ", " << rowMap[rindex] << ", " << cindex <<
             //     ", "
@@ -371,12 +411,14 @@ void read_buffered_map( )
         }
 
         // Now set the data received from root onto the sparse matrix
-        sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
+        // sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
 
-        printf( "Rank %d: sparsematrix size = %d x %d\n", rank, allocationSize[0], allocationSize[2] );
+        // printf( "Rank %d: sparsematrix size = %d x %d\n", rank, allocationSize[0], allocationSize[2] );
     }
 
-    assert( nBytesRemaining == 0 );
+    MPI_Barrier( commW );
+
+    if( rank == 0 ) assert( nEntriesRemaining == 0 );
 
     /**
      * Perform a series of checks to ensure that the local maps in each process still preserve map properties
@@ -544,9 +586,9 @@ void test_tempest_map_bcast()
         rowAllocation[( nprocs - 1 ) * NDATA + 2] = nMapGlobalRowCols[2] - displs[nprocs - 1];
         sendCounts[nprocs - 1]                    = rowAllocation[( nprocs - 1 ) * NDATA + 2];
 
-        // for( int i = 0; i < nprocs; i++ )
-        //     printf( "sendcounts[%d] = %d, %d, %d\tdispls[%d] = %d, %d\n", i, rowAllocation[i * NDATA],
-        //             rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i], sendCounts[i] );
+        for( int i = 0; i < nprocs; i++ )
+            printf( "sendcounts[%d] = %d, %d, %d\tdispls[%d] = %d, %d\n", i, rowAllocation[i * NDATA],
+                    rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i], sendCounts[i] );
     }
 
     mpierr = MPI_Bcast( nMapGlobalRowCols, 3, MPI_INTEGER, rootProc, commW );
