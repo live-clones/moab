@@ -43,8 +43,7 @@ void read_buffered_map();
 int main( int argc, char** argv )
 {
     if( argc > 1 )
-        // inMapFilename = "../../e3sm_ne11/mapSEFV-NE11.nc";  // mapSEFV-NE11_p4.nc";  // std::string( argv[1] );
-        inMapFilename = "/Users/mahadevan/Code/TempestRemap/Ulrich/build/revRemapWeights.nc";
+        inMapFilename = std::string( argv[1] );
     else
         inMapFilename = TestDir + "/" + inMapFilename;
 
@@ -92,37 +91,6 @@ void test_tempest_create_meshes()
         return;                                                                     \
     }
 
-// void read_nc_par(const std::string& filename, MPI_Comm& comm)
-// {
-//     int err;
-//     int ncid;
-//     int na_id, nb_id, ns_id;
-//     int n_a, n_b, n_s;
-//     MPI_Info info = MPI_INFO_NULL;
-//     int omode = NC_NOWRITE | NC_PNETCDF | NC_MPIIO;
-//     err           = nc_open_par( filename.c_str(), omode, comm, info, &ncid );NCERROREXIT( err, "reading the NetCDF
-//     Map file: " << filename );
-
-//     /* free info object */
-//     if( info != MPI_INFO_NULL ) MPI_Info_free( &info );
-
-//     /* inquire dimension IDs and lengths */
-//     err = nc_inq_dimid( ncid, "n_a", &na_id );NCERROREXIT( err, "reading the n_s dimension" );
-//     err = nc_inq_dimid( ncid, "n_b", &nb_id );NCERROREXIT( err, "reading the n_s dimension" );
-//     err = nc_inq_dimid( ncid, "n_s", &ns_id );NCERROREXIT( err, "reading the n_s dimension" );
-
-//     err = nc_inq_dimlen( ncid, na_id, &n_a );NCERROREXIT( err, "reading the n_s value" );
-//     err = nc_inq_dimlen( ncid, nb_id, &n_b );NCERROREXIT( err, "reading the n_s value" );
-//     err = nc_inq_dimlen( ncid, ns_id, &n_s );NCERROREXIT( err, "reading the n_s value" );
-
-//     if (verbose)
-//         printf( "global dimension of map: %zd X %zd, with %zd non-zero elements.\n", n_a, n_b, n_s );
-
-//     err = nc_close( ncid );NCERROREXIT( err, "closing file failed" );
-
-//     return;
-// }
-
 void read_buffered_map()
 {
     NcError error( NcError::silent_nonfatal );
@@ -131,22 +99,21 @@ void read_buffered_map()
     NcFile* ncMap = NULL;
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
 
-    const int nBufferSize = 4 * 128 * 1024;  // 64 KB
+    const int nBufferSize = 64 * 1024;  // 64 KB
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
 
     MPI_Comm commW     = MPI_COMM_WORLD;
     const int rootProc = 0;
-    // const std::string outFilename = TestDir + "/" + outFilenames[0];
-    double dTolerance = 1e-08;
-    int mpierr        = 0;
+    double dTolerance  = 1e-08;
+    int mpierr         = 0;
 
     int nprocs, rank;
     MPI_Comm_size( commW, &nprocs );
     MPI_Comm_rank( commW, &rank );
 
-    if( rank == 0 )
+    if( rank == rootProc )
     {
         ncMap = new NcFile( inMapFilename.c_str(), NcFile::ReadOnly );
         if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() ); }
@@ -199,7 +166,7 @@ void read_buffered_map()
     mpierr = MPI_Bcast( runData, 6, MPI_INTEGER, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
-    if( rank )
+    if( rank != rootProc )
     {
         nA             = runData[0];
         nB             = runData[1];
@@ -208,18 +175,19 @@ void read_buffered_map()
         nS             = runData[4];
         nBufferedReads = runData[5];
     }
-    else printf("Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS);
+    else
+        printf( "Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS );
 
+    std::vector< std::pair< int, int > > rowOwnership( nprocs );
     int nGRowPerPart   = nB / nprocs;
     int nGRowRemainder = nB % nprocs;  // Keep the remainder in root
-    std::vector< std::pair< int, int > > rowOwnership( nprocs );
-    rowOwnership[0] = std::make_pair( 0, nGRowPerPart + nGRowRemainder );
-    int roffset     = rowOwnership[0].second;
+    rowOwnership[0]    = std::make_pair( 0, nGRowPerPart + nGRowRemainder );
+    int roffset        = rowOwnership[0].second;
     // printf("Rank %d ownership: %d -- %d\n", 0, rowOwnership[0].first, rowOwnership[0].second );
     for( int ip = 1; ip < nprocs; ++ip )
     {
         rowOwnership[ip] = std::make_pair( roffset, roffset + nGRowPerPart );
-        roffset = rowOwnership[ip].second;
+        roffset          = rowOwnership[ip].second;
         // printf( "Rank %d ownership: %d -- %d\n", ip, rowOwnership[ip].first, rowOwnership[ip].second );
     }
 
@@ -228,13 +196,11 @@ void read_buffered_map()
     // SparseMatrix< double > sparseMatrix;
     SparseMatrix< double >& sparseMatrix = mapRemap.GetSparseMatrix();
 
-    if( rank == 0 )
+    if( rank == rootProc )
         printf( "Parameters: nNNZBytes = %d, nS = %d, nTotalBytes = %d, nBufferedReads = %d\n", nNNZBytes, nS,
                 nTotalBytes, nBufferedReads );
 
     std::map< int, int > rowMap, colMap;
-    // rowMap.reserve( nB );
-    // colMap.reserve( nA );
     int rindexMax = 0, cindexMax = 0;
     long offset = 0;
 
@@ -251,14 +217,13 @@ void read_buffered_map()
         for( int ip = 0; ip < nprocs; ++ip )
             dataPerProcess[ip].reserve( std::max( 100, nMaxEntries / nprocs ) );
 
-        bool sendrecvActive = false;
-        if( rank == 0 )
+        if( rank == rootProc )
         {
             int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
-            // int nLocSize    = nLocBufSize / nNNZBytes;
 
             printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
 
+            // Allocate and resize based on local buffer size
             vecRow.Allocate( nLocSize );
             vecCol.Allocate( nLocSize );
             vecS.Allocate( nLocSize );
@@ -284,8 +249,7 @@ void read_buffered_map()
                 {
                     if( rowOwnership[ip].first <= vecRow[i] && rowOwnership[ip].second > vecRow[i] )
                     {
-                        pOwner         = ip;
-                        sendrecvActive = true;
+                        pOwner = ip;
                         break;
                     }
                 }
@@ -309,56 +273,119 @@ void read_buffered_map()
             // sparseMatrix.SetEntries( vecRow, vecCol, vecS );
         }
 
+        // Communicate the number of DoF data to expect from root
         int nEntriesComm = 0;
         mpierr = MPI_Scatter( nDataPerProcess.data(), 1, MPI_INT, &nEntriesComm, 1, MPI_INT, rootProc, commW );
         CHECK_EQUAL( mpierr, 0 );
 
-        if( rank ) sendrecvActive = nEntriesComm > 0;
-        if( sendrecvActive )
+        if( rank == rootProc )
         {
-            if( rank == rootProc )
+            std::vector< MPI_Request > cRequests;
+            std::vector< MPI_Status > cStats( 2 * nprocs - 2 );
+            cRequests.reserve( 2 * nprocs - 2 );
+
+            // First send out all the relevant data buffers to other process
+            std::vector< std::vector< int > > dataRowColsAll( nprocs );
+            std::vector< std::vector< double > > dataEntriesAll( nprocs );
+            for( int ip = 1; ip < nprocs; ++ip )
             {
-                std::vector< MPI_Request > cRequests;
-                std::vector< MPI_Status > cStats( 2 * nprocs - 2 );
-                cRequests.reserve( 2 * nprocs - 2 );
-
-                // First send out all the relevant data buffers to other process
-                for( int ip = 1; ip < nprocs; ++ip )
+                const int nDPP = nDataPerProcess[ip];
+                if( nDPP > 0 )
                 {
-                    const int nDPP = nDataPerProcess[ip];
-                    if( nDPP > 0 )
+                    std::vector< int >& dataRowCols = dataRowColsAll[ip];
+                    dataRowCols.resize( 2 * nDPP );
+                    std::vector< double >& dataEntries = dataEntriesAll[ip];
+                    dataEntries.resize( nDPP );
+
+                    for( int ij = 0; ij < nDPP; ++ij )
                     {
-                        std::vector< int > dataRowCols( 2 * nDPP );
-                        std::vector< double > dataEntries( nDPP );
-
-                        for( int ij = 0; ij < nDPP; ++ij )
-                        {
-                            dataRowCols[ij * 2]     = vecRow[dataPerProcess[ip][ij]];
-                            dataRowCols[ij * 2 + 1] = vecCol[dataPerProcess[ip][ij]];
-                            dataEntries[ij]         = vecS[dataPerProcess[ip][ij]];
-                            // printf( "%d: Sending (%d, %d) = %f\n", ij, dataRowCols[ij * 2], dataRowCols[ij * 2 + 1],
-                            //         dataEntries[ij] );
-                        }
-
-                        MPI_Request rcsend, dsend;
-                        mpierr = MPI_Isend( dataRowCols.data(), 2 * nDPP, MPI_INT, ip, iRead * 1000, commW, &rcsend );
-                        CHECK_EQUAL( mpierr, 0 );
-                        mpierr = MPI_Isend( dataEntries.data(), nDPP, MPI_DOUBLE, ip, iRead * 1000 + 1, commW, &dsend );
-                        CHECK_EQUAL( mpierr, 0 );
-
-                        cRequests.push_back( rcsend );
-                        cRequests.push_back( dsend );
+                        dataRowCols[ij * 2]     = vecRow[dataPerProcess[ip][ij]];
+                        dataRowCols[ij * 2 + 1] = vecCol[dataPerProcess[ip][ij]];
+                        dataEntries[ij]         = vecS[dataPerProcess[ip][ij]];
+                        // printf( "%d: Sending (%d, %d) = %f\n", ij, dataRowCols[ij * 2], dataRowCols[ij * 2 + 1],
+                        //         dataEntries[ij] );
                     }
-                }
 
-                // Next perform all necessary local work while we wait for the buffers to be sent out
-                // Compute an offset for the rows and columns by creating a local to global mapping for rootProc
+                    MPI_Request rcsend, dsend;
+                    mpierr = MPI_Isend( dataRowCols.data(), 2 * nDPP, MPI_INT, ip, iRead * 1000, commW, &rcsend );
+                    CHECK_EQUAL( mpierr, 0 );
+                    mpierr = MPI_Isend( dataEntries.data(), nDPP, MPI_DOUBLE, ip, iRead * 1000 + 1, commW, &dsend );
+                    CHECK_EQUAL( mpierr, 0 );
+
+                    cRequests.push_back( rcsend );
+                    cRequests.push_back( dsend );
+                }
+            }
+
+            // Next perform all necessary local work while we wait for the buffers to be sent out
+            // Compute an offset for the rows and columns by creating a local to global mapping for rootProc
+            int rindex = 0, cindex = 0;
+            assert( dataPerProcess[0].size() - nEntriesComm == 0 );  // sanity check
+            for( int i = 0; i < nEntriesComm; ++i )
+            {
+                const int& vecRowValue = vecRow[dataPerProcess[0][i]];
+                const int& vecColValue = vecCol[dataPerProcess[0][i]];
+
+                std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+                if( riter == rowMap.end() )
+                {
+                    rowMap[vecRowValue] = rindexMax;
+                    rindex              = rindexMax;
+                    rindexMax++;
+                }
+                else
+                    rindex = riter->second;
+
+                std::map< int, int >::iterator citer = colMap.find( vecColValue );
+                if( citer == colMap.end() )
+                {
+                    colMap[vecColValue] = cindexMax;
+                    cindex              = cindexMax;
+                    cindexMax++;
+                }
+                else
+                    cindex = citer->second;
+
+                // printf( "(%d, %d) = %f\n", rindex, cindex, vecS[i]);
+                sparseMatrix( rindex, cindex ) = vecS[i];
+            }
+
+            // Wait until all communication is pushed out
+            mpierr = MPI_Waitall( cRequests.size(), cRequests.data(), cStats.data() );
+            CHECK_EQUAL( mpierr, 0 );
+        }  // if( rank == rootProc )
+        else
+        {
+            if( nEntriesComm > 0 )
+            {
+                MPI_Request cRequests[2];
+                MPI_Status cStats[2];
+                /* code */
+                // create buffers to receive the data from root process
+                std::vector< int > dataRowCols( 2 * nEntriesComm );
+                vecRow.Allocate( nEntriesComm );
+                vecCol.Allocate( nEntriesComm );
+                vecS.Allocate( nEntriesComm );
+
+                /* TODO: combine row and column scatters together. Save one communication by better packing */
+                // Scatter the rows, cols and entries to the processes according to the partition
+                mpierr = MPI_Irecv( dataRowCols.data(), 2 * nEntriesComm, MPI_INT, rootProc, iRead * 1000, commW,
+                                    &cRequests[0] );
+                CHECK_EQUAL( mpierr, 0 );
+
+                mpierr = MPI_Irecv( vecS, nEntriesComm, MPI_DOUBLE, rootProc, iRead * 1000 + 1, commW, &cRequests[1] );
+                CHECK_EQUAL( mpierr, 0 );
+
+                // Wait until all communication is pushed out
+                mpierr = MPI_Waitall( 2, cRequests, cStats );
+                CHECK_EQUAL( mpierr, 0 );
+
+                // Compute an offset for the rows and columns by creating a local to global mapping
                 int rindex = 0, cindex = 0;
-                assert( dataPerProcess[0].size() - nEntriesComm == 0 );  // sanity check
                 for( int i = 0; i < nEntriesComm; ++i )
                 {
-                    const int& vecRowValue = vecRow[dataPerProcess[0][i]];
-                    const int& vecColValue = vecCol[dataPerProcess[0][i]];
+                    const int& vecRowValue = dataRowCols[i * 2];
+                    const int& vecColValue = dataRowCols[i * 2 + 1];
 
                     std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
                     if( riter == rowMap.end() )
@@ -386,90 +413,16 @@ void read_buffered_map()
                     sparseMatrix( rindex, cindex ) = vecS[i];
                 }
 
-                // Wait until all communication is pushed out
-                mpierr = MPI_Waitall( cRequests.size(), cRequests.data(), cStats.data() );
-                CHECK_EQUAL( mpierr, 0 );
-            }  // if( rank == rootProc )
-            else
-            {
-                if( nEntriesComm > 0 )
-                {
-                    MPI_Request cRequests[2];
-                    MPI_Status cStats[2];
-                    /* code */
-                    // create buffers to receive the data from root process
-                    std::vector< int > dataRowCols( 2 * nEntriesComm );
-                    vecRow.Allocate( nEntriesComm );
-                    vecCol.Allocate( nEntriesComm );
-                    vecS.Allocate( nEntriesComm );
+                // clear the local buffer
+                dataRowCols.clear();
 
-                    /* TODO: combine row and column scatters together. Save one communication by better packing */
-                    // Scatter the rows, cols and entries to the processes according to the partition
-                    mpierr = MPI_Irecv( dataRowCols.data(), 2 * nEntriesComm, MPI_INT, rootProc, iRead * 1000, commW,
-                                        &cRequests[0] );
-                    CHECK_EQUAL( mpierr, 0 );
+                // Now set the data received from root onto the sparse matrix
+                // sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
 
-                    mpierr =
-                        MPI_Irecv( vecS, nEntriesComm, MPI_DOUBLE, rootProc, iRead * 1000 + 1, commW, &cRequests[1] );
-                    CHECK_EQUAL( mpierr, 0 );
-
-                    // Wait until all communication is pushed out
-                    mpierr = MPI_Waitall( 2, cRequests, cStats );
-                    CHECK_EQUAL( mpierr, 0 );
-
-                    // for( int ij = 0; ij < nEntriesComm; ++ij )
-                    // {
-                    //     vecRow[ij] = dataRowCols[ij * 2];
-                    //     vecCol[ij] = dataRowCols[ij * 2 + 1];
-                    //     // printf( "(%d, %d) = %f\n", vecRow[ij], vecCol[ij], vecS[ij] );
-                    // }
-
-                    // Compute an offset for the rows and columns by creating a local to global mapping
-                    int rindex = 0, cindex = 0;
-                    for( int i = 0; i < nEntriesComm; ++i )
-                    {
-                        const int& vecRowValue = dataRowCols[i * 2];
-                        const int& vecColValue = dataRowCols[i * 2 + 1];
-
-                        std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
-                        if( riter == rowMap.end() )
-                        {
-                            rowMap[vecRowValue] = rindexMax;
-                            rindex              = rindexMax;
-                            rindexMax++;
-                        }
-                        else
-                            rindex = riter->second;
-                        vecRow[i] = rindex;
-
-                        std::map< int, int >::iterator citer = colMap.find( vecColValue );
-                        if( citer == colMap.end() )
-                        {
-                            colMap[vecColValue] = cindexMax;
-                            cindex              = cindexMax;
-                            cindexMax++;
-                        }
-                        else
-                            cindex = citer->second;
-                        vecCol[i] = cindex;
-
-                        // printf( "(%d, %d) = %f\n", rindex, cindex, vecS[i]);
-                        sparseMatrix( rindex, cindex ) = vecS[i];
-                    }
-
-                    // clear the local buffer
-                    dataRowCols.clear();
-
-                    // Now set the data received from root onto the sparse matrix
-                    // sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
-
-                }  // if( nEntriesComm > 0 )
-            }      // if( rank != rootProc )
-        }          // if (sendrecvActive)
+            }  // if( nEntriesComm > 0 )
+        }      // if( rank != rootProc )
 
         MPI_Barrier( commW );
-
-        // printf( "Rank %d: sparsematrix size = %d x %d\n", rank, allocationSize[0], allocationSize[2] );
     }
 
     if( rank == 0 ) assert( nEntriesRemaining == 0 );
@@ -484,14 +437,10 @@ void read_buffered_map()
     printf( "Rank %d: sparsematrix size = %d x %d\n", rank, sparseMatrix.GetRows(), sparseMatrix.GetColumns() );
 
     // consistency: row sums
-    // if( rank > 1 )
     {
         int isConsistentP = mapRemap.IsConsistent( dTolerance );
-        if (0 != isConsistentP)
-        {
-            printf("Rank %d failed consistency checks...\n", rank);
-        }
-        // CHECK_EQUAL( 0, isConsistentP );
+        if( 0 != isConsistentP ) { printf( "Rank %d failed consistency checks...\n", rank ); }
+        CHECK_EQUAL( 0, isConsistentP );
     }
 
     // conservation: we will disable this conservation check for now.
@@ -499,14 +448,16 @@ void read_buffered_map()
     // CHECK_EQUAL( 0, isConservativeP );
 
     // monotonicity: local failures
-    int isMonotoneP = mapRemap.IsMonotone( dTolerance );
-    // Accumulate sum of failures to ensure that it is exactly same as serial case
-    int isMonotoneG;
-    mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INTEGER, MPI_SUM, commW );
-    CHECK_EQUAL( mpierr, 0 );
+    {
+        int isMonotoneP = mapRemap.IsMonotone( dTolerance );
+        // Accumulate sum of failures to ensure that it is exactly same as serial case
+        int isMonotoneG;
+        mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INTEGER, MPI_SUM, commW );
+        CHECK_EQUAL( mpierr, 0 );
 
-    // 4600 monotonicity fails in serial and parallel for the test map file
-    // CHECK_EQUAL( 4600, isMonotoneG );
+        // 4600 monotonicity fails in serial and parallel for the test map file
+        CHECK_EQUAL( 4600, isMonotoneG );
+    }
 
     delete ncMap;
 
