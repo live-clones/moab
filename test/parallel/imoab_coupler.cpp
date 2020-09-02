@@ -429,6 +429,20 @@ int main( int argc, char* argv[] )
             strlen( dof_tag_names[0] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
+
+        // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+        {
+            const char* atmocn_map_file_name = "atm_ocn_map.nc";
+            ierr = iMOAB_WriteMappingWeightsToFile( cplAtmOcnPID, weights_identifiers[0], atmocn_map_file_name,
+                                                    strlen( weights_identifiers[0] ), strlen( atmocn_map_file_name ) );
+            CHECKIERR( ierr, "failed to write map file to disk" );
+
+            const char* intx_from_file_identifier = "map-from-file";
+            ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier, atmocn_map_file_name,
+                                                     NULL, NULL, NULL, strlen( intx_from_file_identifier ),
+                                                     strlen( atmocn_map_file_name ) );
+            CHECKIERR( ierr, "failed to load map file from disk" );
+        }
     }
 
 #endif
@@ -448,6 +462,22 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                          "non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
+
+        // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+        // VSM: TODO: This does not work since the LND model is a point cloud and we do not initilize
+        // data correctly in TempestOnlineMap::WriteParallelWeightsToFile routine.
+        // {
+        //     const char* atmlnd_map_file_name = "atm_lnd_map.nc";
+        //     ierr = iMOAB_WriteMappingWeightsToFile( cplAtmLndPID, weights_identifiers[1], atmlnd_map_file_name,
+        //                                             strlen( weights_identifiers[0] ), strlen( atmlnd_map_file_name ) );
+        //     CHECKIERR( ierr, "failed to write map file to disk" );
+
+        //     const char* intx_from_file_identifier = "map-from-file";
+        //     ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmLndPID, intx_from_file_identifier, atmlnd_map_file_name,
+        //                                              NULL, NULL, NULL, strlen( intx_from_file_identifier ),
+        //                                              strlen( atmlnd_map_file_name ) );
+        //     CHECKIERR( ierr, "failed to load map file from disk" );
+        // }
     }
 #endif
 
