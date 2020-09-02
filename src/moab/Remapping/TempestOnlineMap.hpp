@@ -90,9 +90,13 @@ class TempestOnlineMap : public OfflineMap
     ///	<summary>
     ///		Read the OfflineMap from a NetCDF file.
     ///	</summary>
-    // virtual void Read(
-    // 	const std::string & strSource
-    // );
+    moab::ErrorCode ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
+                                     bool row_major_ownership = true );
+
+    ///	<summary>
+    ///		Parallel I/O with HDF5 to write out the remapping weights from multiple processors.
+    ///	</summary>
+    moab::ErrorCode WriteParallelMap( std::string strOutputFile );
 
     ///	<summary>
     ///		Write the TempestOnlineMap to a parallel NetCDF file.
@@ -100,6 +104,11 @@ class TempestOnlineMap : public OfflineMap
     // virtual void Write(
     // 	const std::string & strTarget
     // );
+
+    ///	<summary>
+    ///		Parallel I/O with NetCDF to write out the SCRIP file from multiple processors.
+    ///	</summary>
+    moab::ErrorCode WriteParallelWeightsToFile( std::string filename );
 
   public:
     ///	<summary>
@@ -300,16 +309,6 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     moab::ErrorCode ApplyWeights( moab::Tag srcSolutionTag, moab::Tag tgtSolutionTag, bool transpose = false );
 
-    ///	<summary>
-    ///		Parallel I/O with NetCDF to write out the SCRIP file from multiple processors.
-    ///	</summary>
-    void WriteParallelWeightsToFile( std::string filename );
-
-    ///	<summary>
-    ///		Parallel I/O with HDF5 to write out the remapping weights from multiple processors.
-    ///	</summary>
-    moab::ErrorCode WriteParallelMap( std::string strOutputFile );
-
     typedef double ( *sample_function )( double, double );
 
     /// <summary>
@@ -378,7 +377,7 @@ class TempestOnlineMap : public OfflineMap
     Mesh* m_meshOverlap;
 
     bool is_parallel, is_root;
-    int rank, size;
+    int rank, size, root_proc;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
