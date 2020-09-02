@@ -91,6 +91,11 @@ void test_tempest_create_meshes()
         return;                                                                     \
     }
 
+
+// Main inputs;
+//   1. Map Filename
+//   2. Ownership info from the processes to be gathered on root
+//   3.
 void read_buffered_map()
 {
     NcError error( NcError::silent_nonfatal );
@@ -99,19 +104,21 @@ void read_buffered_map()
     NcFile* ncMap = NULL;
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
 
+    int mpierr = 0;
+
     const int nBufferSize = 64 * 1024;  // 64 KB
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
-
-    MPI_Comm commW     = MPI_COMM_WORLD;
-    const int rootProc = 0;
     double dTolerance  = 1e-08;
-    int mpierr         = 0;
 
-    int nprocs, rank;
+    const int rootProc = 0;
+    int nprocs = 1, rank = 0;
+#ifdef MOAB_HAVE_MPI
+    MPI_Comm commW     = MPI_COMM_WORLD;
     MPI_Comm_size( commW, &nprocs );
     MPI_Comm_rank( commW, &rank );
+#endif
 
     if( rank == rootProc )
     {
@@ -425,7 +432,11 @@ void read_buffered_map()
         MPI_Barrier( commW );
     }
 
-    if( rank == 0 ) assert( nEntriesRemaining == 0 );
+    if( rank == 0 )
+    {
+        assert( nEntriesRemaining == 0 );
+        ncMap->close();
+    }
 
     /**
      * Perform a series of checks to ensure that the local maps in each process still preserve map properties

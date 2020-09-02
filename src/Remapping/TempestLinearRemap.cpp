@@ -342,7 +342,7 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 ///////////////////////////////////////////////////////////////////////////////
 
 // #define IO_USE_PARALLEL_NETCDF
-void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename )
+moab::ErrorCode moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename )
 {
     // m_weightMatrix.Print(filename.c_str(), 0, 0);
 
@@ -572,13 +572,15 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     DataArray1D< int > vecCol( nS );
     DataArray1D< double > vecS( nS );
 
-    for( int i = 0; i < m_weightMatrix.outerSize(); i++ )
+    int offset=0;
+    for( int i = 0; i < m_weightMatrix.outerSize(); ++i )
     {
         for( WeightMatrix::InnerIterator it( m_weightMatrix, i ); it; ++it )
         {
-            vecRow[i] = 1 + it.row();  // row index
-            vecCol[i] = 1 + it.col();  // col index
-            vecS[i]   = it.value();    // value
+            vecRow[offset] = 1 + it.row();  // row index
+            vecCol[offset] = 1 + it.col();  // col index
+            vecS[offset]   = it.value();    // value
+            offset++;
         }
     }
 
@@ -616,6 +618,10 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     //         iterAttributes->first.c_str(),
     //         iterAttributes->second.c_str());
     // }
+
+    ncMap.close();
+
+    return moab::MB_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

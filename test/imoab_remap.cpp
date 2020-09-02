@@ -22,11 +22,12 @@
 int main( int argc, char* argv[] )
 {
     ErrCode ierr;
-    std::string atmFilename, ocnFilename, lndFilename;
+    std::string atmFilename, ocnFilename, lndFilename, mapFilename;
 
     atmFilename = TestDir + "/wholeATM_T.h5m";
     ocnFilename = TestDir + "/recMeshOcn.h5m";
     lndFilename = TestDir + "/wholeLnd.h5m";
+    // mapFilename = TestDir + "/outCS5ICOD5_map.nc";
 
     ProgOptions opts;
     opts.addOpt< std::string >( "atmosphere,t", "atm mesh filename (source)", &atmFilename );
@@ -58,6 +59,7 @@ int main( int argc, char* argv[] )
     iMOAB_AppID atmocnPID = &atmocnAppID;
     iMOAB_AppID atmlndPID = &atmlndAppID;
     iMOAB_AppID lndatmPID = &lndatmAppID;
+
     /*
      * Each application has to be registered once. A mesh set and a parallel communicator will be
      * associated with each application. A unique application id will be returned, and will be used
@@ -216,6 +218,20 @@ int main( int argc, char* argv[] )
                                                  strlen( dof_tag_names[1] ) );
     CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-OCN scalar "
                      "non-conservative field" );
+
+    // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+    {
+        const char* atmocn_map_file_name = "atm_ocn_map.nc";
+        ierr = iMOAB_WriteMappingWeightsToFile( atmocnPID, weights_identifiers[0], atmocn_map_file_name,
+                                                strlen( weights_identifiers[0] ), strlen( atmocn_map_file_name ) );
+        CHECKIERR( ierr, "failed to write map file to disk" );
+
+        const char* intx_from_file_identifier = "map-from-file";
+        ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, intx_from_file_identifier, atmocn_map_file_name, NULL, NULL,
+                                                 NULL, strlen( intx_from_file_identifier ),
+                                                 strlen( atmocn_map_file_name ) );
+        CHECKIERR( ierr, "failed to load map file from disk" );
+    }
 
     /* Compute the weights to preoject the solution from ATM component to LND compoenent */
     ierr = iMOAB_ComputeScalarProjectionWeights( atmlndPID, weights_identifiers[1], disc_methods[0], &disc_orders[0],
