@@ -69,6 +69,9 @@ class IntxUtils
 
 
     // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
+    static void gnomonic_unroll( double &c1, double &c2, double R, int plane );
+
+    // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
     static ErrorCode global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only, EntityHandle & outSet );
 
     /*
