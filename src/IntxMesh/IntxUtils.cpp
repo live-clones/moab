@@ -477,6 +477,69 @@ ErrorCode IntxUtils::reverse_gnomonic_projection( const double& c1, const double
     return MB_SUCCESS;  // no error
 }
 
+// given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
+ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only, EntityHandle & outSet )
+{
+
+    ErrorCode rval = ScaleToRadius(mb, inSet, 1.0);MB_CHK_ERR( rval);
+    // Get all entities of dimension 2
+    Range inputRange; // get
+    rval = mb->get_entities_by_dimension( inSet, 1, inputRange );MB_CHK_ERR( rval);
+    rval = mb->get_entities_by_dimension( inSet, 2, inputRange );MB_CHK_ERR( rval);
+    double tmp;
+
+    for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
+    {
+        CartVect center;
+        EntityHandle cell=*it;
+        rval = mb->get_coords(&cell, 1, center.array()); MB_CHK_ERR(rval);
+        int plane;
+        decide_gnomonic_plane( center, plane );
+        double c[3];
+        c[2] = 0.;
+        gnomonic_projection( center, R, plane, c[0], c[1] );
+        switch( plane )
+        {
+            case 1:
+            break; //nothing
+        case 2: // rotate + 90
+            tmp = c[0];
+            c[0] = -c[1];
+            c[1] = tmp;
+            c[0] = c[0] + 2;
+            break;
+        case 3:
+            c[0] = c[0] + 4;
+            break;
+        case 4: // rotate with -90 x-> -y; y -> x
+
+            tmp = c[0];
+            c[0] = c[1];
+            c[1] = -tmp;
+            c[0] = c[0] - 2;
+            break;
+        case 5: // South Pole
+            // rotate 180 then move to (-2, -2)
+            c[0] = -c[0] - 2.;
+            c[1] = -c[1] - 2.;
+            break;
+            ;
+        case 6:  // North Pole
+            c[0] = c[0] - 2.;
+            c[1] = c[1] + 2.;
+            break;
+
+
+        }
+        EntityHandle vertex;
+        rval = mb->create_vertex(c, vertex); MB_CHK_ERR(rval);
+        rval = mb->add_entities(outSet, &vertex, 1); MB_CHK_ERR(rval);
+
+    }
+
+    return MB_SUCCESS;
+}
+
 /*
  *
  use physical_constants, only : dd_pi

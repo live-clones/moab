@@ -67,6 +67,10 @@ class IntxUtils
     static ErrorCode reverse_gnomonic_projection( const double& c1, const double& c2, double R, int plane,
                                                   CartVect& pos );
 
+
+    // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
+    static ErrorCode global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only, EntityHandle & outSet );
+
     /*
     *   other methods to convert from spherical coord to cartesian, and back
     *   A spherical coordinate triple is (R, lon, lat)
