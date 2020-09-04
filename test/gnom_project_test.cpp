@@ -19,7 +19,7 @@ using namespace std;
 int main( int  argc, char*  argv[] )
 {
     string filein = STRINGIFY( MESHDIR ) "/mbcslam/eulerHomme.vtk";
-    string fileout = "out.vtk";
+    string fileout = "project.vtk";
 
     ProgOptions opts;
     opts.addOpt< std::string >( "model,m", "input file ", &filein );

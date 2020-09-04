@@ -26,6 +26,7 @@
 #include <iomanip>
 #endif
 #include <queue>
+#include <map>
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 #include "GridElements.h"
@@ -522,23 +523,72 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
     rval = mb->get_entities_by_dimension( inSet, 1, inputRange );MB_CHK_ERR( rval);
     rval = mb->get_entities_by_dimension( inSet, 2, inputRange );MB_CHK_ERR( rval);
 
-    for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
+    if (centers_only)
+        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
+        {
+            CartVect center;
+            EntityHandle cell=*it;
+            rval = mb->get_coords(&cell, 1, center.array()); MB_CHK_ERR(rval);
+            int plane;
+            decide_gnomonic_plane( center, plane );
+            double c[3];
+            c[2] = 0.;
+            gnomonic_projection( center, R, plane, c[0], c[1] );
+
+            gnomonic_unroll( c[0], c[1] , R, plane );
+
+            EntityHandle vertex;
+            rval = mb->create_vertex(c, vertex); MB_CHK_ERR(rval);
+            rval = mb->add_entities(outSet, &vertex, 1); MB_CHK_ERR(rval);
+
+        }
+    else
     {
-        CartVect center;
-        EntityHandle cell=*it;
-        rval = mb->get_coords(&cell, 1, center.array()); MB_CHK_ERR(rval);
-        int plane;
-        decide_gnomonic_plane( center, plane );
-        double c[3];
-        c[2] = 0.;
-        gnomonic_projection( center, R, plane, c[0], c[1] );
-
-        gnomonic_unroll( c[0], c[1] , R, plane );
-
-        EntityHandle vertex;
-        rval = mb->create_vertex(c, vertex); MB_CHK_ERR(rval);
-        rval = mb->add_entities(outSet, &vertex, 1); MB_CHK_ERR(rval);
-
+        // distribute the cells to 6 planes, based on the center
+        Range subranges[6];
+        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
+        {
+            CartVect center;
+            EntityHandle cell=*it;
+            rval = mb->get_coords(&cell, 1, center.array()); MB_CHK_ERR(rval);
+            int plane;
+            decide_gnomonic_plane( center, plane );
+            subranges[plane-1].insert(cell);
+        }
+        for (int i=1; i<=6; i++)
+        {
+            Range verts;
+            rval = mb->get_connectivity(subranges[i-1], verts);MB_CHK_ERR(rval);
+            std::map<EntityHandle, EntityHandle> corr;
+            for (Range::iterator vt=verts.begin(); vt!=verts.end(); vt++)
+            {
+                CartVect vect;
+                EntityHandle v=*vt;
+                rval = mb->get_coords(&v, 1, vect.array()); MB_CHK_ERR(rval);
+                double c[3];
+                c[2] = 0.;
+                gnomonic_projection( vect, R, i, c[0], c[1] );
+                gnomonic_unroll( c[0], c[1] , R, i );
+                EntityHandle vertex;
+                rval = mb->create_vertex(c, vertex); MB_CHK_ERR(rval);
+                corr[v] = vertex;// for new connectivity
+            }
+            EntityHandle new_conn[20]; //max edges in 2d ?
+            for (Range::iterator eit=subranges[i-1].begin(); eit!=subranges[i-1].end(); eit++)
+            {
+                EntityHandle eh = *eit;
+                const EntityHandle * conn=NULL;
+                int num_nodes;
+                rval = mb->get_connectivity(eh, conn, num_nodes);MB_CHK_ERR(rval);
+                // build a new vertex array
+                for (int i=0; i<num_nodes; i++)
+                    new_conn[i] = corr[conn[i]];
+                EntityType type = mb->type_from_handle( eh );
+                EntityHandle newCell;
+                rval = mb->create_element(type, new_conn, num_nodes, newCell); MB_CHK_ERR(rval);
+                rval = mb->add_entities(outSet, &newCell, 1); MB_CHK_ERR(rval);
+            }
+        }
     }
 
     return MB_SUCCESS;
