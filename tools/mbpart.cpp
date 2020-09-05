@@ -98,6 +98,9 @@ int main( int argc, char* argv[] )
 
     bool incl_closure = false;
     opts.addOpt< void >( "include_closure,c", "Include element closure for part sets.", &incl_closure );
+
+    bool recompute_box_rcb = false;
+    opts.addOpt< void >( "recompute_rcb_box,b", "recompute box in rcb cuts", &recompute_box_rcb );
 #endif  // MOAB_HAVE_ZOLTAN
 
     double imbal_tol = 1.03;
@@ -164,9 +167,8 @@ int main( int argc, char* argv[] )
     bool print_time = false;
     opts.addOpt< void >( ",T", "Print CPU time for each phase.", &print_time );
 
-    bool spherical_coords = false;
-    opts.addOpt< void >( "project_on_sphere,s", "use spherical coordinates for partitioning ", &spherical_coords );
-
+    int projection_type = 0;
+    opts.addOpt< int >( "project_on_sphere,p", "use spherical coordinates (1) or gnomonic projection (2) for partitioning ", &projection_type );
 #ifdef MOAB_HAVE_METIS
     bool partition_tagged_sets = false;
     opts.addOpt< void >( "taggedsets,x", "(Metis) Partition tagged sets.", &partition_tagged_sets );
@@ -384,7 +386,7 @@ int main( int argc, char* argv[] )
             rval = zoltan_tool->partition_mesh_and_geometry(
                 part_geom_mesh_size, num_parts, zoltan_method.c_str(),
                 ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), imbal_tol, part_dim, write_sets,
-                write_tags, obj_weight, edge_weight, part_surf, ghost, spherical_coords, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
+                write_tags, obj_weight, edge_weight, part_surf, ghost, projection_type, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
         }
 #endif
 #ifdef MOAB_HAVE_METIS
@@ -516,7 +518,7 @@ int main( int argc, char* argv[] )
         if( moab_use_zoltan && moab_partition_slave && p == 0 )
         {
             t                = clock();
-            spherical_coords = true;
+            //spherical_coords = true;
             double master_radius, slave_radius;
             if( rescale_spherical_radius )
             {
@@ -547,7 +549,7 @@ int main( int argc, char* argv[] )
                 rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, master_radius );MB_CHK_ERR( rval );
             }
 
-            rval = zoltan_tool->partition_inferred_mesh( slaveset, num_parts, part_dim );
+            rval = zoltan_tool->partition_inferred_mesh( slaveset, num_parts, part_dim, projection_type );
 
             if( rescale_spherical_radius )
             {

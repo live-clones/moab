@@ -516,12 +516,45 @@ void IntxUtils::gnomonic_unroll( double &c1, double &c2, double R, int plane )
 // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
 ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only, EntityHandle & outSet )
 {
-
-    ErrorCode rval = ScaleToRadius(mb, inSet, 1.0);MB_CHK_ERR( rval);
+    std::string parTagName("PARALLEL_PARTITION");
+    Tag part_tag;
+    ErrorCode rval =
+        mb->tag_get_handle( parTagName.c_str(),part_tag );
+    Range partSets;
+    if (part_tag!=0)
+    {
+        rval = mb->get_entities_by_type_and_tag( inSet, MBENTITYSET, &part_tag, NULL, 1, partSets, Interface::UNION );MB_CHK_ERR( rval);
+    }
+    rval = ScaleToRadius(mb, inSet, 1.0);MB_CHK_ERR( rval);
     // Get all entities of dimension 2
     Range inputRange; // get
     rval = mb->get_entities_by_dimension( inSet, 1, inputRange );MB_CHK_ERR( rval);
     rval = mb->get_entities_by_dimension( inSet, 2, inputRange );MB_CHK_ERR( rval);
+
+    std::map<EntityHandle, int> partsAssign;
+    std::map<int, EntityHandle> newPartSets;
+    if (!partSets.empty())
+    {
+        // get all cells, and assign parts
+        for (Range::iterator setIt = partSets.begin(); setIt!=partSets.end(); setIt++)
+        {
+            EntityHandle pSet = *setIt;
+            Range ents;
+            rval = mb->get_entities_by_handle(pSet, ents); MB_CHK_ERR( rval);
+            int val;
+            rval = mb->tag_get_data(part_tag, &pSet, 1, &val); MB_CHK_ERR( rval);
+            // create a new set with the same part id tag, in the outSet
+            EntityHandle newPartSet;
+            rval = mb->create_meshset( MESHSET_SET, newPartSet );MB_CHK_ERR( rval );
+            rval = mb->tag_set_data(part_tag, &newPartSet, 1, &val); MB_CHK_ERR( rval);
+            newPartSets[val] = newPartSet;
+            rval = mb->add_entities(outSet, &newPartSet, 1); MB_CHK_ERR( rval);
+            for (Range::iterator it=ents.begin(); it!=ents.end(); it++)
+            {
+                partsAssign[*it] = val;
+            }
+        }
+    }
 
     if (centers_only)
         for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
@@ -587,13 +620,42 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
                 EntityHandle newCell;
                 rval = mb->create_element(type, new_conn, num_nodes, newCell); MB_CHK_ERR(rval);
                 rval = mb->add_entities(outSet, &newCell, 1); MB_CHK_ERR(rval);
+                std::map<EntityHandle, int>::iterator mit=partsAssign.find(eh);
+                if (mit != partsAssign.end())
+                {
+                    int val = mit->second;
+                    rval = mb->add_entities(newPartSets[val], &newCell, 1); MB_CHK_ERR(rval);
+                }
             }
         }
     }
 
     return MB_SUCCESS;
 }
+void IntxUtils::transform_coordinates(double * avg_position, int projection_type)
+{
+    if( projection_type == 1 )
+    {
+        double R = avg_position[0] * avg_position[0] + avg_position[1] * avg_position[1] +
+                   avg_position[2] * avg_position[2];
+        R               = sqrt( R );
+        double lat      = asin( avg_position[2] / R );
+        double lon      = atan2( avg_position[1], avg_position[0] );
+        avg_position[0] = lon;
+        avg_position[1] = lat;
+        avg_position[2] = R;
+    }
+    else if (projection_type == 2) // gnomonic projection
+    {
+        CartVect pos(avg_position);
+        int gplane;
+        IntxUtils::decide_gnomonic_plane( pos, gplane );
 
+        IntxUtils::gnomonic_projection( pos, 1.0, gplane, avg_position[0], avg_position[1] );
+        avg_position[2]=0;
+        IntxUtils::gnomonic_unroll(avg_position[0], avg_position[1], 1.0, gplane );
+    }
+}
 /*
  *
  use physical_constants, only : dd_pi

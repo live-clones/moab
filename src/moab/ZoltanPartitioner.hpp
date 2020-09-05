@@ -93,7 +93,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
                                                    const int part_dim = 3, const bool write_as_sets = true,
                                                    const bool write_as_tags = false, const int obj_weight = 0,
                                                    const int edge_weight = 0, const bool part_surf = false,
-                                                   const bool ghost = false, const bool spherical_coords = false,
+                                                   const bool ghost = false, const int projection_type = 0, const bool recompute_rcb_box = false,
                                                    const bool print_time = false );
 
     virtual ErrorCode partition_mesh( const int nparts, const char* method, const int part_dim = 3,
@@ -105,7 +105,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
     // given a processor assignment returned from Zoltan, use that to infer a partition
     // to generate processor assignment for a new MOAB mesh in specified fileset
     ErrorCode partition_inferred_mesh( EntityHandle sfileset, size_t num_parts, int part_dim = 3,
-                                       const bool write_as_sets = true );
+                                       const bool write_as_sets = true, int projection_type = 0 );
 
     // given a processor assignment returned from Zoltan, write that as a
     // processor assignment to MOAB
@@ -146,7 +146,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
 
     void SetRIB_Parameters();
 
-    void SetRCB_Parameters();
+    void SetRCB_Parameters(const bool recompute_rcb_box = false);
 
   private:
     Zoltan* myZZ;
@@ -169,7 +169,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
     // moab_ids
     ErrorCode assemble_graph( const int dimension, std::vector< double >& coords, std::vector< int >& moab_ids,
                               std::vector< int >& adjacencies, std::vector< int >& length, Range& elems,
-                              bool part_geom = false, const bool spherical_coords = false );
+                              bool part_geom = false, const int projection_type = 0 );
 
 #ifdef MOAB_HAVE_CGM
     std::map< int, int > body_vertex_map, surf_vertex_map;
@@ -204,7 +204,7 @@ inline ErrorCode ZoltanPartitioner::partition_mesh( const int nparts, const char
                                                     const bool, const char*, const bool print_time )
 {
     return partition_mesh_and_geometry( -1.0, nparts, method, NULL, 1.03, part_dim, write_as_sets, write_as_tags, 0, 0,
-                                        false, false, false, print_time );
+                                        false, false, 0, false, print_time );
 }
 
 #endif
