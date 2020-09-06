@@ -549,7 +549,7 @@ int main( int argc, char* argv[] )
                 rval = moab::IntxUtils::ScaleToRadius( &mb, slaveset, master_radius );MB_CHK_ERR( rval );
             }
 
-            rval = zoltan_tool->partition_inferred_mesh( slaveset, num_parts, part_dim, projection_type );
+            rval = zoltan_tool->partition_inferred_mesh( slaveset, num_parts, part_dim, write_sets, projection_type );
 
             if( rescale_spherical_radius )
             {
