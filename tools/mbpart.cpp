@@ -386,7 +386,7 @@ int main( int argc, char* argv[] )
             rval = zoltan_tool->partition_mesh_and_geometry(
                 part_geom_mesh_size, num_parts, zoltan_method.c_str(),
                 ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), imbal_tol, part_dim, write_sets,
-                write_tags, obj_weight, edge_weight, part_surf, ghost, projection_type, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
+                write_tags, obj_weight, edge_weight, part_surf, ghost, projection_type, recompute_box_rcb, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
         }
 #endif
 #ifdef MOAB_HAVE_METIS
