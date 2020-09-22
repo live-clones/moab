@@ -3,7 +3,7 @@ include ../makefile.config
 
 default: all
 
-EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv FixPolys
+EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv FixPolys AddFieldtoPG2
 PAREXAMPLES = ReduceExchangeTags
 ALLEXAMPLES = ${EXAMPLES}
 
@@ -24,6 +24,7 @@ ReduceExchangeTags: ReduceExchangeTags.o ${MOAB_LIBDIR}/libMOAB.la
 PointInElementSearch: PointInElementSearch.o ${MOAB_LIBDIR}/libMOAB.la
 ExtractClose: ExtractClose.o ${MOAB_LIBDIR}/libMOAB.la
 FixPolys: FixPolys.o ${MOAB_LIBDIR}/libMOAB.la
+AddFieldtoPG2: AddFieldtoPG2.o ${MOAB_LIBDIR}/libMOAB.la
 
 $(EXAMPLES) $(PAREXAMPLES):
 	@echo "[CXXLD]  $@"
