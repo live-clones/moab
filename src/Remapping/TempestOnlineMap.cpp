@@ -747,13 +747,15 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
         if( fPreserveAll && ( vecPreserveVariableStrings.size() != 0 ) )
         { _EXCEPTIONT( "--preserveall and --preserve cannot both be specified" ); }
 
-        m_nDofsPEl_Src  = nPin;
-        m_nDofsPEl_Dest = nPout;
-
         m_bConserved    = !fNoConservation;
         m_iMonotonicity = fMonotoneTypeID;
         m_eInputType    = eInputType;
         m_eOutputType   = eOutputType;
+
+        m_nDofsPEl_Src =
+            ( m_eInputType == DiscretizationType_FV || m_eInputType == DiscretizationType_PCLOUD ? 1 : nPin );
+        m_nDofsPEl_Dest =
+            ( m_eOutputType == DiscretizationType_FV || m_eOutputType == DiscretizationType_PCLOUD ? 1 : nPout );
 
         rval = SetDOFmapTags( srcDofTagName, tgtDofTagName );MB_CHK_ERR( rval );
 
@@ -2455,7 +2457,6 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
         // Sample data
         for( int k = 0; k < nElements; k++ )
         {
-
             const Face& face = trmesh->faces[k];
 
             // Sample data at GLL nodes
@@ -2572,7 +2573,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
     }
     else
     {
-        assert( discOrder == 1 );
+        // assert( discOrder == 1 );
         if( discMethod == DiscretizationType_FV )
         {
             /* Compute an element-wise integral to store the sampled solution based on Quadrature
@@ -2585,7 +2586,6 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             // Loop through all Faces
             for( size_t i = 0; i < trmesh->faces.size(); i++ )
             {
-
                 const Face& face = trmesh->faces[i];
 
                 // Loop through all sub-triangles
