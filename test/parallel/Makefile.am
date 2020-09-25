@@ -90,6 +90,10 @@ else
 endif
 endif
 
+if HAVE_PNETCDF
+  write_nc_par_LDADD = $(LDADD) $(PNETCDF_LIBS)
+endif
+
 if HAVE_HYPRE
   MBHYPRE_TESTS = hypre_test
 else
@@ -254,3 +258,4 @@ LTPPF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
    $(AM_FFLAGS) $(FFLAGS)
 
 DISTCLEANFILES = a.out
+
