@@ -62,6 +62,7 @@ commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
+  EXTRA_DIST = imoab_coupler_utils.hpp
   HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
