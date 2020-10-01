@@ -32,27 +32,7 @@
 #include <iostream>
 #include <sstream>
 
-#define CHECKIERR( rc, message )                       \
-    if( 0 != rc )                                      \
-    {                                                  \
-        printf( "%s. ErrorCode = %d\n", message, rc ); \
-        return 1;                                      \
-    }
-#define PUSH_TIMER( operation )               \
-    {                                         \
-        timer_ops = timer.time_since_birth(); \
-        opName    = operation;                \
-    }
-#define POP_TIMER( localcomm, localrank )                                                         \
-    {                                                                                             \
-        double locElapsed = timer.time_since_birth() - timer_ops, minElapsed = 0, maxElapsed = 0; \
-        MPI_Reduce( &locElapsed, &maxElapsed, 1, MPI_DOUBLE, MPI_MAX, 0, localcomm );             \
-        MPI_Reduce( &locElapsed, &minElapsed, 1, MPI_DOUBLE, MPI_MIN, 0, localcomm );             \
-        if( !localrank )                                                                          \
-            std::cout << "[LOG] Time taken to " << opName.c_str() << ": max = " << maxElapsed     \
-                      << ", avg = " << ( maxElapsed + minElapsed ) / 2 << "\n";                   \
-        opName.clear();                                                                           \
-    }
+#include "imoab_coupler_utils.hpp"
 
 using namespace moab;
 
@@ -187,111 +167,60 @@ int main( int argc, char* argv[] )
 
             "\n  partitioning (0 trivial, 1 graph, 2 geometry) " << repartitioner_scheme << "\n  ";
     }
-
     // load files on 3 different communicators, groups
     // first groups has task 0, second group tasks 0 and 1
     // coupler will be on joint tasks, will be on a third group (0 and 1, again)
     MPI_Group atmPEGroup;
-    groupTasks.resize( numProcesses, 0 );
-    for( int i = startG1; i <= endG1; i++ )
-        groupTasks[i - startG1] = i;
-
-    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, &groupTasks[0], &atmPEGroup );
-    CHECKIERR( ierr, "Cannot create atmPEGroup" )
+    MPI_Comm atmComm;
+    ierr = create_group_and_comm(startG1, endG1, jgroup, &atmPEGroup, &atmComm);
+    CHECKIERR(ierr, "Cannot create atm MPI group and communicator ")
 
 #ifdef ENABLE_ATMOCN_COUPLING
-    groupTasks.clear();
-    groupTasks.resize( numProcesses, 0 );
     MPI_Group ocnPEGroup;
-    for( int i = startG2; i <= endG2; i++ )
-        groupTasks[i - startG2] = i;
-
-    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, &groupTasks[0], &ocnPEGroup );
-    CHECKIERR( ierr, "Cannot create ocnPEGroup" )
+    MPI_Comm ocnComm;
+    ierr = create_group_and_comm(startG2, endG2, jgroup, &ocnPEGroup, &ocnComm);
+    CHECKIERR(ierr, "Cannot create ocn MPI group and communicator ")
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
-    groupTasks.clear();
-    groupTasks.resize( numProcesses, 0 );
     MPI_Group lndPEGroup;
-    for( int i = startG3; i <= endG3; i++ )
-        groupTasks[i - startG3] = i;
-
-    ierr = MPI_Group_incl( jgroup, endG3 - startG3 + 1, &groupTasks[0], &lndPEGroup );
-    CHECKIERR( ierr, "Cannot create lndPEGroup" )
+    MPI_Comm lndComm;
+    ierr = create_group_and_comm(startG3, endG3, jgroup, &lndPEGroup, &lndComm);
+    CHECKIERR(ierr, "Cannot create lnd MPI group and communicator ")
 #endif
 
     // we will always have a coupler
-    groupTasks.clear();
-    groupTasks.resize( numProcesses, 0 );
     MPI_Group couPEGroup;
-    for( int i = startG4; i <= endG4; i++ )
-        groupTasks[i - startG4] = i;
-
-    ierr = MPI_Group_incl( jgroup, endG4 - startG4 + 1, &groupTasks[0], &couPEGroup );
-    CHECKIERR( ierr, "Cannot create couPEGroup" )
-
-    // create 4 communicators, one for each group
-    int ATM_COMM_TAG = 1;
-    MPI_Comm atmComm;
-    // atmComm is for atmosphere app;
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, atmPEGroup, ATM_COMM_TAG, &atmComm );
-    CHECKIERR( ierr, "Cannot create atmComm" )
-
-#ifdef ENABLE_ATMOCN_COUPLING
-    int OCN_COMM_TAG = 2;
-    MPI_Comm ocnComm;
-    // ocnComm is for ocean app
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, ocnPEGroup, OCN_COMM_TAG, &ocnComm );
-    CHECKIERR( ierr, "Cannot create ocnComm" )
-#endif
-
-#ifdef ENABLE_ATMLND_COUPLING
-    int LND_COMM_TAG = 3;
-    MPI_Comm lndComm;
-    // lndComm is for land app
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, lndPEGroup, LND_COMM_TAG, &lndComm );
-    CHECKIERR( ierr, "Cannot create lndComm" )
-#endif
-
-    int COU_COMM_TAG = 4;
     MPI_Comm couComm;
-    // lndComm is for land app
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, couPEGroup, COU_COMM_TAG, &couComm );
-    CHECKIERR( ierr, "Cannot create lndComm" )
+    ierr = create_group_and_comm(startG4, endG4, jgroup, &couPEGroup, &couComm);
+    CHECKIERR(ierr, "Cannot create cpl MPI group and communicator ")
 
-    // now, create the joint communicators atm_coupler, ocn_coupler, atmphys_coupler
+    // now, create the joint communicators atm_coupler, ocn_coupler, lnd_coupler
     // for each, we will have to create the group first, then the communicator
 
     // atm_coupler
     MPI_Group joinAtmCouGroup;
-    ierr = MPI_Group_union( atmPEGroup, couPEGroup, &joinAtmCouGroup );
-    CHECKIERR( ierr, "Cannot create joint atm cou group" )
-    int ATM_COU_COMM_TAG = 5;
     MPI_Comm atmCouComm;
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, joinAtmCouGroup, ATM_COU_COMM_TAG, &atmCouComm );
-    CHECKIERR( ierr, "Cannot create joint atm cou communicator" )
+    ierr = create_joint_comm_group(atmPEGroup, couPEGroup, &joinAtmCouGroup,
+            &atmCouComm);
+    CHECKIERR(ierr, "Cannot create joint atm cou communicator")
 
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocn_coupler
     MPI_Group joinOcnCouGroup;
-    ierr = MPI_Group_union( ocnPEGroup, couPEGroup, &joinOcnCouGroup );
-    CHECKIERR( ierr, "Cannot create joint ocn cou group" )
-    int OCN_COU_COMM_TAG = 6;
     MPI_Comm ocnCouComm;
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, joinOcnCouGroup, OCN_COU_COMM_TAG, &ocnCouComm );
-    CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
+    ierr = create_joint_comm_group(ocnPEGroup, couPEGroup, &joinOcnCouGroup,
+            &ocnCouComm);
+    CHECKIERR(ierr, "Cannot create joint ocn cou communicator")
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     // lnd_coupler
     MPI_Group joinLndCouGroup;
-    ierr = MPI_Group_union( lndPEGroup, couPEGroup, &joinLndCouGroup );
-    CHECKIERR( ierr, "Cannot create joint lnd cou group" )
-    int LND_COU_COMM_TAG = 7;
     MPI_Comm lndCouComm;
-    ierr = MPI_Comm_create_group( MPI_COMM_WORLD, joinLndCouGroup, LND_COU_COMM_TAG, &lndCouComm );
-    CHECKIERR( ierr, "Cannot create joint lnd cou communicator" )
+    ierr = create_joint_comm_group(lndPEGroup, couPEGroup, &joinLndCouGroup,
+            &lndCouComm);
+    CHECKIERR(ierr, "Cannot create joint ocn cou communicator")
 #endif
 
     ierr = iMOAB_Initialize( argc, argv );  // not really needed anything from argc, argv, yet; maybe we should
@@ -341,44 +270,13 @@ int main( int argc, char* argv[] )
 #endif
     }
 
+
     if( atmComm != MPI_COMM_NULL )
     {
         MPI_Comm_rank( atmComm, &rankInAtmComm );
         ierr = iMOAB_RegisterApplication( "ATM1", &atmComm, &cmpatm, cmpAtmPID );
         CHECKIERR( ierr, "Cannot register ATM App" )
-
-        PUSH_TIMER( "Load ATM mesh" )
-        // load first mesh
-        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay, atmFilename.length(),
-                               readopts.length() );
-        CHECKIERR( ierr, "Cannot load ATM mesh" )
-        POP_TIMER( atmComm, rankInAtmComm )
-
-        PUSH_TIMER( "ATM mesh: compute partition and send mesh" )
-        // then send mesh to coupler pes, on cplAtmPID
-        // atmCouComm is a join communicator, so
-        ierr = iMOAB_SendMesh( cmpAtmPID, &atmCouComm, &couPEGroup, &cplatm,
-                               &repartitioner_scheme );  // send to component 3, on coupler pes
-        CHECKIERR( ierr, "cannot send elements" )
-        POP_TIMER( atmComm, rankInAtmComm )
     }
-    // now, receive mesh, on coupler communicator; first mesh 1, atm
-    if( couComm != MPI_COMM_NULL )
-    {
-        PUSH_TIMER( "Receive ATM mesh and resolve shared entities" )
-        ierr = iMOAB_ReceiveMesh( cplAtmPID, &atmCouComm, &atmPEGroup, &cmpatm );  // receive from component 1
-        CHECKIERR( ierr, "cannot receive elements on ATMX app" )
-        POP_TIMER( couComm, rankInCouComm )
-    }
-
-    // we can now free the sender buffers
-    if( atmComm != MPI_COMM_NULL )
-    {
-        ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &context_id );
-        CHECKIERR( ierr, "cannot free buffers used to send atm mesh" )
-    }
-
-    MPI_Barrier( MPI_COMM_WORLD );
 
 #ifdef ENABLE_ATMOCN_COUPLING
     if( ocnComm != MPI_COMM_NULL )
@@ -386,38 +284,22 @@ int main( int argc, char* argv[] )
         MPI_Comm_rank( ocnComm, &rankInOcnComm );
         ierr = iMOAB_RegisterApplication( "OCN1", &ocnComm, &cmpocn, cmpOcnPID );
         CHECKIERR( ierr, "Cannot register OCN App" )
+    }
+#endif
 
-        // load second mesh
-        PUSH_TIMER( "Load OCN mesh" )
-        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay, ocnFilename.length(),
-                               readopts.length() );
-        CHECKIERR( ierr, "Cannot load OCN mesh on cmpOcnPID" )
-        POP_TIMER( ocnComm, rankInOcnComm )
-
-        // then send mesh to coupler pes, on cplAtmPID
-        PUSH_TIMER( "OCN mesh: compute partition and send mesh" )
-        // we could have an assert(ocnCouComm != MPI_COMM_NULL);
-        ierr = iMOAB_SendMesh( cmpOcnPID, &ocnCouComm, &couPEGroup, &cplocn,
-                               &repartitioner_scheme );  // send to component 3, on coupler pes
-        CHECKIERR( ierr, "cannot send elements" )
-        POP_TIMER( ocnComm, rankInOcnComm )
-    }
-    if( couComm != MPI_COMM_NULL )
-    {
-        PUSH_TIMER( "Receive OCN mesh and resolve shared entities" )
-        // we could have an assert(ocnCouComm != MPI_COMM_NULL);
-        ierr = iMOAB_ReceiveMesh( cplOcnPID, &ocnCouComm, &ocnPEGroup,
-                                  &cmpocn );  // receive from component 2, ocn, on coupler pes
-        CHECKIERR( ierr, "cannot receive elements on OCNX app" )
-        POP_TIMER( couComm, rankInCouComm )
-    }
-    if( ocnComm != MPI_COMM_NULL )
-    {
-        ierr = iMOAB_FreeSenderBuffers( cmpOcnPID, &context_id );
-        CHECKIERR( ierr, "cannot free buffers used to send ocn mesh" )
-    }
+    //atm
+    ierr = setup_component_coupler_meshes(cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
+             &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme);
+    CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
 
     MPI_Barrier( MPI_COMM_WORLD );
+
+
+#ifdef ENABLE_ATMOCN_COUPLING
+    // ocean
+    ierr = setup_component_coupler_meshes(cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm,  &ocnPEGroup, &couComm,
+             &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme);
+    CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -430,6 +312,7 @@ int main( int argc, char* argv[] )
     }
 #endif  // #ifdef ENABLE_ATMOCN_COUPLING
 
+    MPI_Barrier( MPI_COMM_WORLD );
     // load phys atm mesh, with some data on it already
     if( atmComm != MPI_COMM_NULL )
     {
@@ -453,57 +336,21 @@ int main( int argc, char* argv[] )
     MPI_Barrier( MPI_COMM_WORLD );
 
 #ifdef ENABLE_ATMLND_COUPLING
+    // land
     if( lndComm != MPI_COMM_NULL )
     {
-        MPI_Comm_rank( lndComm, &rankInLndComm );
         ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
         CHECKIERR( ierr, "Cannot register LND App " )
-
-        // load the next component mesh; land is now similar to ocean
-        PUSH_TIMER( "Load LND mesh" )
-        ierr = iMOAB_LoadMesh( cmpLndPID, lndFilename.c_str(), readopts.c_str(), &nghlay, lndFilename.length(),
-                               readopts.length() );
-        CHECKIERR( ierr, "Cannot load LND mesh on cmpLndPID" )
-        POP_TIMER( lndComm, rankInLndComm )
-
-        int nverts[3], nelem[3];
-        ierr = iMOAB_GetMeshInfo( cmpLndPID, nverts, nelem, 0, 0, 0 );
-        CHECKIERR( ierr, "failed to get mesh info" );
-        printf( "Land Component Mesh: %d vertices and %d elements\n", nverts[0], nelem[0] );
-
-        // then send mesh to coupler pes, on cplLndPID
-        PUSH_TIMER( "LND mesh: compute partition and send mesh" )
-        // use joint land cou comm
-        ierr = iMOAB_SendMesh( cmpLndPID, &lndCouComm, &couPEGroup, &cpllnd,
-                               &repartitioner_scheme );  // send to component 3, on coupler pes
-        CHECKIERR( ierr, "cannot send elements" )
-        POP_TIMER( lndComm, rankInLndComm )
     }
+    ierr = setup_component_coupler_meshes(cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm,  &lndPEGroup, &couComm,
+             &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay, repartitioner_scheme);
 
     if( couComm != MPI_COMM_NULL )
-    {
-        PUSH_TIMER( "Receive LND mesh and resolve shared entities" )
-        ierr = iMOAB_ReceiveMesh( cplLndPID, &lndCouComm, &lndPEGroup,
-                                  &cmplnd );  // receive from component 2, lnd, on coupler pes
-        CHECKIERR( ierr, "cannot receive elements on LNDX app" )
-        POP_TIMER( couComm, rankInCouComm )
-    }
-    if( lndComm != MPI_COMM_NULL )
-    {
-        ierr = iMOAB_FreeSenderBuffers( cmpLndPID, &context_id );
-        CHECKIERR( ierr, "cannot free buffers used to send lnd mesh" )
-    }
-
-    MPI_Barrier( MPI_COMM_WORLD );
-
-    if( couComm != MPI_COMM_NULL )
-    {
-        char outputFileLnd[] = "recvLnd3.h5m";
-        PUSH_TIMER( "Write migrated LND mesh on coupler PEs" )
+    {  // write only for n==1 case
+        char outputFileLnd[] = "recvLnd.h5m";
         ierr = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
-        POP_TIMER( couComm, rankInCouComm )
     }
 
 #endif  // #ifdef ENABLE_ATMLND_COUPLING
