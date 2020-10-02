@@ -131,16 +131,19 @@ ErrorCode MergeMesh::merge_all( EntityHandle meshset, const double merge_tol )
     AdaptiveKDTree kd( mbImpl );
     EntityHandle tree_root;
     rval = kd.build_tree( verts, &tree_root );MB_CHK_ERR( rval );
-
+    std::cout << " build kd tree \n";
     // find matching vertices, mark them
     rval = find_merged_to( tree_root, kd, mbMergeTag );MB_CHK_ERR( rval );
+    std::cout << " find merged to \n";
 
     rval = perform_merge( mbMergeTag );MB_CHK_ERR( rval );
+    std::cout << " performed merge \n";
 
     if( deadEnts.size() != 0 )
     {
         rval = merge_higher_dimensions( entities );MB_CHK_ERR( rval );
     }
+    std::cout << " merged higher dimensions \n";
     return MB_SUCCESS;
 }
 ErrorCode MergeMesh::perform_merge( Tag merge_tag )
@@ -154,12 +157,14 @@ ErrorCode MergeMesh::perform_merge( Tag merge_tag )
         if( printError ) std::cout << "\nWarning: Geometries don't have a common face; Nothing to merge" << std::endl;
         return MB_SUCCESS;  // nothing to merge carry on with the program
     }
-    if( mbImpl->type_from_handle( *deadEnts.rbegin() ) != MBVERTEX ) return MB_FAILURE;
+    if( mbImpl->type_from_handle( *deadEnts.begin() ) != MBVERTEX ) return MB_FAILURE;
     std::vector< EntityHandle > merge_tag_val( deadEnts.size() );
-    result = mbImpl->tag_get_data( merge_tag, deadEnts, &merge_tag_val[0] );
+    Range deadEntsRange;
+    std::copy( deadEnts.rbegin(), deadEnts.rend(), range_inserter( deadEntsRange ) );
+    result = mbImpl->tag_get_data( merge_tag, deadEntsRange, &merge_tag_val[0] );
     if( MB_SUCCESS != result ) return result;
 
-    Range::iterator rit;
+    std::set<EntityHandle>::iterator rit;
     unsigned int i;
     for( rit = deadEnts.begin(), i = 0; rit != deadEnts.end(); ++rit, i++ )
     {
@@ -168,7 +173,7 @@ ErrorCode MergeMesh::perform_merge( Tag merge_tag )
         result = mbImpl->merge_entities( merge_tag_val[i], *rit, false, false );
         if( MB_SUCCESS != result ) { return result; }
     }
-    result = mbImpl->delete_entities( deadEnts );
+    result = mbImpl->delete_entities( deadEntsRange );
     return result;
 }
 // merge vertices according to an input tag
@@ -358,7 +363,9 @@ ErrorCode MergeMesh::merge_higher_dimensions( Range& elems )
 
     // all higher dim entities that will be merged will be connected to the vertices that were
     // merged earlier; we will look at these vertices only
-    Range vertsOfInterest = intersect( this->mergedToVertices, verts );
+    Range mergedToVertsRange;
+    std::copy( mergedToVertices.rbegin(), mergedToVertices.rend(), range_inserter( mergedToVertsRange ) );
+    Range vertsOfInterest = intersect( mergedToVertsRange, verts );
     // Go through each dimension
     Range possibleEntsToMerge, conn, matches, moreDeadEnts;
 
