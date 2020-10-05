@@ -3,7 +3,7 @@ include ../makefile.config
 
 default: all
 
-EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv
+EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv FixPolys
 PAREXAMPLES = ReduceExchangeTags
 ALLEXAMPLES = ${EXAMPLES}
 
@@ -23,6 +23,7 @@ DirectAccessNoHoles: DirectAccessNoHoles.o ${MOAB_LIBDIR}/libMOAB.la
 ReduceExchangeTags: ReduceExchangeTags.o ${MOAB_LIBDIR}/libMOAB.la
 PointInElementSearch: PointInElementSearch.o ${MOAB_LIBDIR}/libMOAB.la
 ExtractClose: ExtractClose.o ${MOAB_LIBDIR}/libMOAB.la
+FixPolys: FixPolys.o ${MOAB_LIBDIR}/libMOAB.la
 
 $(EXAMPLES) $(PAREXAMPLES):
 	@echo "[CXXLD]  $@"
