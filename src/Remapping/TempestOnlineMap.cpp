@@ -1490,6 +1490,19 @@ int moab::TempestOnlineMap::IsMonotone( double dTolerance )
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static void print_progress(const int barWidth, const float progress, const char* message)
+{
+    std::cout << message << " [";
+    int pos = barWidth * progress;
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] " << int(progress * 100.0) << " %\r";
+    std::cout.flush();
+}
+
 moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                                                       const std::vector< int >& owned_dof_ids,
                                                       bool row_major_ownership )
@@ -1502,7 +1515,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     int mpierr = 0;
 
-    const int nBufferSize = 64 * 1024;  // 64 KB
+    const int nBufferSize = 256 * 1024;  // 256 KB
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
@@ -1570,8 +1583,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         nS             = runData[4];
         nBufferedReads = runData[5];
     }
-    else
-        printf( "Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS );
 
     std::vector< std::pair< int, int > > rowOwnership;
     // if owned_dof_ids = NULL, use the default trivial partitioning scheme
@@ -1582,26 +1593,29 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         int nGRowRemainder = nB % size;  // Keep the remainder in root
         rowOwnership[0]    = std::make_pair( 0, nGRowPerPart + nGRowRemainder );
         int roffset        = rowOwnership[0].second;
-        printf("Rank %d ownership: %d -- %d\n", 0, rowOwnership[0].first, rowOwnership[0].second );
+        // printf("Rank %d ownership: %d -- %d\n", 0, rowOwnership[0].first, rowOwnership[0].second );
         for( int ip = 1; ip < size; ++ip )
         {
             rowOwnership[ip] = std::make_pair( roffset, roffset + nGRowPerPart );
             roffset          = rowOwnership[ip].second;
-            printf( "Rank %d ownership: %d -- %d\n", ip, rowOwnership[ip].first, rowOwnership[ip].second );
+            // printf( "Rank %d ownership: %d -- %d\n", ip, rowOwnership[ip].first, rowOwnership[ip].second );
         }
     }
 
     // Let us declare the map object for every process
     SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
 
-    if( is_root )
-        printf( "Parameters: nNNZBytes = %d, nS = %d, nTotalBytes = %d, nBufferedReads = %d\n", nNNZBytes, nS,
-                nTotalBytes, nBufferedReads );
+    // if( is_root )
+    //     printf( "Parameters: nNNZBytes = %d, nS = %d, nTotalBytes = %d, nBufferedReads = %d\n", nNNZBytes, nS,
+    //             nTotalBytes, nBufferedReads );
 
     std::map< int, int > rowMap, colMap;
     int rindexMax = 0, cindexMax = 0;
     long offset = 0;
 
+    const char* message = "MapReadBcast: ";
+    int barWidth = 50;
+    float progress = 0.0;
     /* Split the rows and send to processes in chunks
        Let us start the buffered read */
     for( int iRead = 0; iRead < nBufferedReads; ++iRead )
@@ -1619,7 +1633,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         {
             int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
 
-            printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
+            // printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
+            print_progress(barWidth, progress, message);
 
             // Allocate and resize based on local buffer size
             vecRow.Allocate( nLocSize );
@@ -1663,6 +1678,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
             offset += nLocSize;
             nEntriesRemaining -= nLocSize;
+            progress = 1.0 - (nEntriesRemaining) * 1.0/nS;
 
             for( int ip = 0; ip < size; ++ip )
                 nDataPerProcess[ip] = dataPerProcess[ip].size();
@@ -1818,6 +1834,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     if( rank == 0 )
     {
+        print_progress(barWidth, progress, message);
+        std::cout << std::endl;
         assert( nEntriesRemaining == 0 );
         ncMap->close();
     }

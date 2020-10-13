@@ -164,6 +164,9 @@ if (test "x" != "x$NETCDF_DIR" && test "xno" != "x$NETCDF_DIR"); then
 
 
   if (test "x$enablenetcdf" != "xno"); then
+    # check for parallel NetCDF C header files
+    AC_CHECK_HEADER([netcdf_par.h], [AC_DEFINE(HAVE_NETCDFPAR,  [1], [MOAB is configured with MPI enabled NetCDF]) ])
+
     # check for C++ header files
     if (test "x$NETCDFCXX_DIR" != "x"); then # User specified explicitly a NetCDF C++ installation path
       LDFLAGS="-L$NETCDFCXX_DIR/lib $LDFLAGS"
