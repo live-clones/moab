@@ -80,5 +80,6 @@ MOSTLYCLEANFILES = intersect1.h5m \
                    spectral.vtk \
                    intx1.vtk \
                    SpanEdges0.h5m \
-                   SpanQuads0.h5m
+                   SpanQuads0.h5m \
+		   file_set2rk_0.h5m
 
