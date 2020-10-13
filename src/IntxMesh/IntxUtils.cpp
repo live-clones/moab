@@ -1203,8 +1203,16 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
             }
         }
     }
-    std::cout << "on local process " << my_rank << " " << brokenPolys
-              << " concave polygons were decomposed in convex ones \n";
+    if (brokenPolys > 0)
+    {
+        std::cout << "on local process " << my_rank << ", " << brokenPolys
+                  << " concave polygons were decomposed in convex ones \n";
+        std::stringstream fff;
+        fff << "file_set" <<  mb->id_from_handle(lset) << "rk_"<< my_rank << ".h5m";
+        rval = mb->write_file(fff.str().c_str(), 0, 0, &lset, 1);
+        if( MB_SUCCESS != rval ) return rval;
+        std::cout << "wrote new file set: " << fff.str() << "\n";
+    }
     return MB_SUCCESS;
 }
 

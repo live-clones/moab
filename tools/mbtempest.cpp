@@ -59,6 +59,7 @@ struct ToolContext
     bool computeDual;
     bool computeWeights;
     bool verifyWeights;
+    bool enforceConvexity;
     int ensureMonotonicity;
     bool fNoConservation;
     bool fVolumetric;
@@ -77,7 +78,7 @@ struct ToolContext
             outputFormatter ( std::cout, 0, 0 ),
 #endif
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
-          computeDual( false ), computeWeights( false ), verifyWeights( false ), ensureMonotonicity( 0 ),
+          computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity(false), ensureMonotonicity( 0 ),
           fNoConservation( false ), fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( false ),
           fInputConcave( false ), fOutputConcave( false ), fNoCheck( false )
     {
@@ -189,6 +190,9 @@ struct ToolContext
                                     &expectedDofTagName );
         opts.addOpt< std::string >( "file,f", "Output remapping weights filename", &outFilename );
         opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
+
+        opts.addOpt< void >( "enforce_convexity",
+                                "check convexity of input meshes to compute mesh intersections" , &enforceConvexity);
 
         opts.parseCommandLine( argc, argv );
 
@@ -461,6 +465,10 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 0, rintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 2, rintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[0] );MB_CHK_ERR( rval );
+            if (runCtx->enforceConvexity)
+            {
+                rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[0], proc_id );MB_CHK_ERR( rval );
+            }
             rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src );MB_CHK_ERR( rval );
             if( !proc_id )
                 outputFormatter.printf( 0, "The source set contains %lu vertices and %lu elements \n",
@@ -470,6 +478,10 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 0, bintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, bintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[1] );MB_CHK_ERR( rval );
+            if (runCtx->enforceConvexity)
+            {
+                rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[1], proc_id );MB_CHK_ERR( rval );
+            }
             rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest );MB_CHK_ERR( rval );
             if( !proc_id )
                 outputFormatter.printf( 0, "The target set contains %lu vertices and %lu elements \n",
