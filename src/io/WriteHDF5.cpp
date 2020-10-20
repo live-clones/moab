@@ -80,7 +80,7 @@ inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& v )
     (void)VALGRIND_MAKE_MEM_UNDEFINED( (T*)&v[0], v.size() * sizeof( T ) );
 }
 
-#define WRITE_HDF5_BUFFER_SIZE ( 120 * 1024 * 1024 )
+#define WRITE_HDF5_BUFFER_SIZE ( 40 * 1024 * 1024 )
 
 static hid_t get_id_type()
 {
