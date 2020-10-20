@@ -1588,9 +1588,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputF
     int tot_src_ents                     = m_remapper->m_source_entities.size();
     int tot_tgt_ents                     = m_remapper->m_target_entities.size();
     int tot_src_size                     = dSourceCenterLon.GetRows();
-    int tot_tgt_size                     = m_dTargetCenterLon.GetRows();
+    int tot_tgt_size                     = dTargetCenterLon.GetRows();
     int tot_vsrc_size                    = dSourceVertexLon.GetRows() * dSourceVertexLon.GetColumns();
-    int tot_vtgt_size                    = m_dTargetVertexLon.GetRows() * m_dTargetVertexLon.GetColumns();
+    int tot_vtgt_size                    = dTargetVertexLon.GetRows() * dTargetVertexLon.GetColumns();
 
     const int weightMatNNZ = m_weightMatrix.nonZeros();
     moab::Tag tagMapMetaData, tagMapIndexRow, tagMapIndexCol, tagMapValues, srcEleIDs, tgtEleIDs;
@@ -1811,8 +1811,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputF
     dsize                           = dSourceCenterLon.GetRows();
     rval = m_interface->tag_set_by_ptr( tagSrcCoordsCLon, &m_meshOverlapSet, 1, &srccoordsclonvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
     rval = m_interface->tag_set_by_ptr( tagSrcCoordsCLat, &m_meshOverlapSet, 1, &srccoordsclatvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
-    const void* tgtcoordsclonvals_d = &m_dTargetCenterLon[0];
-    const void* tgtcoordsclatvals_d = &m_dTargetCenterLat[0];
+    const void* tgtcoordsclonvals_d = &dTargetCenterLon[0];
+    const void* tgtcoordsclatvals_d = &dTargetCenterLat[0];
     dsize                           = vecTargetFaceArea.GetRows();
     rval = m_interface->tag_set_by_ptr( tagTgtCoordsCLon, &m_meshOverlapSet, 1, &tgtcoordsclonvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
     rval = m_interface->tag_set_by_ptr( tagTgtCoordsCLat, &m_meshOverlapSet, 1, &tgtcoordsclatvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
@@ -1823,9 +1823,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputF
     dsize                           = dSourceVertexLon.GetRows() * dSourceVertexLon.GetColumns();
     rval = m_interface->tag_set_by_ptr( tagSrcCoordsVLon, &m_meshOverlapSet, 1, &srccoordsvlonvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
     rval = m_interface->tag_set_by_ptr( tagSrcCoordsVLat, &m_meshOverlapSet, 1, &srccoordsvlatvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
-    const void* tgtcoordsvlonvals_d = &( m_dTargetVertexLon[0][0] );
-    const void* tgtcoordsvlatvals_d = &( m_dTargetVertexLat[0][0] );
-    dsize                           = m_dTargetVertexLon.GetRows() * m_dTargetVertexLon.GetColumns();
+    const void* tgtcoordsvlonvals_d = &( dTargetVertexLon[0][0] );
+    const void* tgtcoordsvlatvals_d = &( dTargetVertexLat[0][0] );
+    dsize                           = dTargetVertexLon.GetRows() * dTargetVertexLon.GetColumns();
     rval = m_interface->tag_set_by_ptr( tagTgtCoordsVLon, &m_meshOverlapSet, 1, &tgtcoordsvlonvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
     rval = m_interface->tag_set_by_ptr( tagTgtCoordsVLat, &m_meshOverlapSet, 1, &tgtcoordsvlatvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
 
