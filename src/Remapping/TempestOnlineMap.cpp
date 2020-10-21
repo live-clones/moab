@@ -1844,14 +1844,19 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputF
         rval = m_interface->tag_set_by_ptr( tgtMaskValues, &m_meshOverlapSet, 1, &tgtmaskvals_d, &dsize );MB_CHK_SET_ERR( rval, "Setting local tag data failed" );
     }
 
-#ifdef MOAB_HAVE_MPI
-    const char* writeOptions = ( this->size > 1 ? "PARALLEL=WRITE_PART" : "" );
-#else
-    const char* writeOptions = "";
-#endif
+    const int max_hdf5_buffer_size = 40 * 1024 * 1024;
 
-    // EntityHandle sets[3] = {m_remapper->m_source_set, m_remapper->m_target_set,
-    // m_remapper->m_overlap_set};
+    int max_buffer_size = std::max( dSourceVertexLon.GetRows() * dSourceVertexLon.GetColumns(),
+                                    dTargetVertexLon.GetRows() * dTargetVertexLon.GetColumns() ) *
+                              sizeof( double ) +
+                          1024;
+
+    std::stringstream sstr;
+    if( max_buffer_size > max_hdf5_buffer_size ) sstr << "BUFFER_SIZE=" << max_buffer_size << ";";
+    if( this->size > 1 ) sstr << "PARALLEL=WRITE_PART";
+    const char* writeOptions = sstr.str().c_str();
+
+    // std::cout << "Write options being used for the map file: " << writeOptions << std::endl;
     EntityHandle sets[1] = { m_remapper->m_overlap_set };
     rval                 = m_interface->write_file( strOutputFile.c_str(), NULL, writeOptions, sets, 1 );MB_CHK_ERR( rval );
 
