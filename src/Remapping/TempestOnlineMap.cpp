@@ -1854,11 +1854,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputF
     std::stringstream sstr;
     if( max_buffer_size > max_hdf5_buffer_size ) sstr << "BUFFER_SIZE=" << max_buffer_size << ";";
     if( this->size > 1 ) sstr << "PARALLEL=WRITE_PART";
-    const char* writeOptions = sstr.str().c_str();
 
     // std::cout << "Write options being used for the map file: " << writeOptions << std::endl;
     EntityHandle sets[1] = { m_remapper->m_overlap_set };
-    rval                 = m_interface->write_file( strOutputFile.c_str(), NULL, writeOptions, sets, 1 );MB_CHK_ERR( rval );
+    rval                 = m_interface->write_file( strOutputFile.c_str(), NULL, sstr.str().c_str(), sets, 1 );MB_CHK_ERR( rval );
 
 #ifdef WRITE_SCRIP_FILE
     sstr.str( "" );
