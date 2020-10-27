@@ -761,8 +761,8 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
         result = pcomm->assign_global_ids( srcmesh, 2, 1, false );MB_CHK_ERR( result );
 #else
-        result = remapper->assign_vertex_element_IDs( gMB, gidTag, srcmesh, 2, 1 );MB_CHK_ERR( result );
-        result = remapper->assign_vertex_element_IDs( gMB, gidTag, srcmesh, 0, 1 );MB_CHK_ERR( result );
+        result = remapper->assign_vertex_element_IDs( gidTag, srcmesh, 2, 1 );MB_CHK_ERR( result );
+        result = remapper->assign_vertex_element_IDs( gidTag, srcmesh, 0, 1 );MB_CHK_ERR( result );
 #endif
     }
 

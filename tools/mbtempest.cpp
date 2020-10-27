@@ -74,7 +74,7 @@ struct ToolContext
     ToolContext ( moab::Interface* icore ) :
             mbcore(icore),
             proc_id ( 0 ), n_procs ( 1 ),
-            outputFormatter ( std::cout, 0, 0 )
+            outputFormatter ( std::cout, 0, 0 ),
 #endif
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
           computeDual( false ), computeWeights( false ), verifyWeights( false ), ensureMonotonicity( 0 ),
