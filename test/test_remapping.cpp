@@ -177,14 +177,19 @@ void test_tempest_to_moab_convert()
     moab::Interface* mbCore = new( std::nothrow ) moab::Core;
     CHECK( NULL != mbCore );
 
+#ifdef MOAB_HAVE_MPI
     moab::ParallelComm* pcomm = new moab::ParallelComm( mbCore, MPI_COMM_WORLD, 0 );
-
     moab::TempestRemapper* remapper = new moab::TempestRemapper( mbCore, pcomm );
+#else
+    moab::TempestRemapper* remapper = new moab::TempestRemapper( mbCore );
+#endif
     remapper->meshValidate          = true;
     remapper->constructEdgeMap      = true;
     remapper->initialize();
 
+#ifdef MOAB_HAVE_MPI
     rval = pcomm->check_all_shared_handles();CHECK_ERR( rval );
+#endif
 
     rval = remapper->LoadMesh( moab::Remapper::SourceMesh, outFilenames[0], moab::TempestRemapper::CS );CHECK_ERR( rval );
 
@@ -210,6 +215,9 @@ void test_tempest_to_moab_convert()
     CHECK_EQUAL( tempest_elems_src, tempest_elems_tgt );
 
     delete remapper;
+#ifdef MOAB_HAVE_MPI
     delete pcomm;
+#endif
     delete mbCore;
 }
+
