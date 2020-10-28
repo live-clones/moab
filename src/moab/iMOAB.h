@@ -706,6 +706,43 @@ ErrCode iMOAB_ReceiveElementTag(iMOAB_AppID pid, const iMOAB_String tag_storage_
 ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* join,
     MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2);
 
+/**
+  \brief Recompute the communication graph between component and coupler, considering intersection coverage .
+  \note
+  Original communication graph for source used an initial partition, while during intersection some of the source
+  elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
+  between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
+  The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the cells
+  involved in intersection with the target cells.
+  The new ParCommGraph between cc source mesh and cx source mesh will be used just for tag migration, later on;
+  The original ParCommGraph will stay unchanged, because this source mesh could be used for other intersection (atm with lnd) ?
+  on component source tasks, we will wait for information; from each intx task, will receive cells ids involved in intx
+  \param[in]  join (MPI_Comm)                        communicator that overlaps component source PEs and coupler PEs
+  \param[in]  pid_src (iMOAB_AppID)                  moab id for the component mesh on component PE
+  \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs
+  \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs)
+  \param[in]  context_id (int*)                      id of the other component in intersection
+  */
+ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx, int * context_id);
+
+/**
+  \brief Dump info about communication graph.
+  <B>Operations:</B> Collective per sender or receiver group
+
+  \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
+  \param[in] context_id  (int*)                            context id                                                       names are separated by ";", the same way as for tag migration
+  \param[in] is_sender (int*)                              is it called from sender or receiver side
+  \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
+  \param[in] prefix_len   (int)                            The length of the prefix string
+*/
+ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
+                                               int* context_id,
+                                               int * is_sender,
+                                               const iMOAB_String prefix,
+                                               int prefix_length);
+
+#endif // #ifdef MOAB_HAVE_MPI
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 /**
@@ -742,26 +779,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere ( iMOAB_AppID pid_source, iMOAB_Ap
 ErrCode iMOAB_ComputePointDoFIntersection ( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx );
 
 /**
-  \brief Recompute the communication graph between component and coupler, considering intersection coverage .
-  \note
-  Original communication graph for source used an initial partition, while during intersection some of the source
-  elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
-  between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
-  The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the cells
-  involved in intersection with the target cells.
-  The new ParCommGraph between cc source mesh and cx source mesh will be used just for tag migration, later on;
-  The original ParCommGraph will stay unchanged, because this source mesh could be used for other intersection (atm with lnd) ?
-  on component source tasks, we will wait for information; from each intx task, will receive cells ids involved in intx
-  \param[in]  join (MPI_Comm)                        communicator that overlaps component source PEs and coupler PEs
-  \param[in]  pid_src (iMOAB_AppID)                  moab id for the component mesh on component PE
-  \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs
-  \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs)
-  \param[in]  context_id (int*)                      id of the other component in intersection
-  */
-ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx, int * context_id);
-
-/**
-  \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined on a sphere. 
+  \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
   The intersection of the mesh should be computed a-priori.
 
   \note
@@ -771,16 +789,16 @@ ErrCode iMOAB_CoverageGraph(MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid
   <B>Operations:</B> Collective
 
   \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID
-  \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically, 
+  \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
                                                            values could be identifiers such as "scalar", "flux" or "custom".
   \param[in] disc_method_source  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid
   \param[in] disc_order_source   (int *)                   The discretization order for the solution field on the source grid
   \param[in] disc_method_target  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid
   \param[in] disc_order_target   (int *)                   The discretization order for the solution field on the source grid
-  \param[in] fMonotoneTypeID   (int *)                     The flag to indicate whether solution monotonicity is to be preserved. 0: none, 1: 
+  \param[in] fMonotoneTypeID   (int *)                     The flag to indicate whether solution monotonicity is to be preserved. 0: none, 1:
   \param[in] fVolumetric   (int *)                         The flag to indicate whether we need to compute volumetric projection weights
   \param[in] fNoConservation   (int *)                     The flag to indicate whether to ignore conservation of solution field during projection
-  \param[in] fValidate   (int *)                           The flag to indicate whether to validate the consistency and conservation of solution field during projection; 
+  \param[in] fValidate   (int *)                           The flag to indicate whether to validate the consistency and conservation of solution field during projection;
                                                            Production runs should not have this flag enabled to minimize collective operations.
   \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization
   \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization
@@ -809,7 +827,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
   <B>Operations:</B> Collective
 
   \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID
-  \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically, 
+  \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
                                                            values could be identifiers such as "scalar", "flux" or "custom".
   \param[in] source_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the source discretization;
                                                            names are separated by ";", the same way as for tag migration
@@ -818,7 +836,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
   \param[in] source_solution_tag_name_length   (int)       The length of the source solution field tag name string
   \param[in] target_solution_tag_name_length   (int)       The length of the target solution field tag name string
 */
-ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection, 
+ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
                                                const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
                                                const iMOAB_String source_solution_tag_name,
                                                const iMOAB_String target_solution_tag_name,
@@ -826,25 +844,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
                                                int source_solution_tag_name_length,
                                                int target_solution_tag_name_length );
 
-/**
-  \brief Dump info about communication graph.
-  <B>Operations:</B> Collective per sender or receiver group
-
-  \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
-  \param[in] context_id  (int*)                            context id                                                       names are separated by ";", the same way as for tag migration
-  \param[in] is_sender (int*)                              is it called from sender or receiver side
-  \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
-  \param[in] prefix_len   (int)                            The length of the prefix string
-*/
-ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
-                                               int* context_id,
-                                               int * is_sender,
-                                               const iMOAB_String prefix,
-                                               int prefix_length);
-
 #endif // #ifdef MOAB_HAVE_TEMPESTREMAP
-
-#endif // #ifdef MOAB_HAVE_MPI
 
 #ifdef __cplusplus
 }
