@@ -1,6 +1,7 @@
 #include "NCHelperDomain.hpp"
 #include "moab/FileOptions.hpp"
 #include "moab/ReadUtilIface.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 #include <cmath>
 #include <sstream>
@@ -442,6 +443,15 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     faces.merge( tmp_range );
     tmp_range.insert( start_vertex, start_vertex + nLocalVertices - 1 );
     rval = mbImpl->add_entities( _fileSet, tmp_range );MB_CHK_SET_ERR( rval, "Failed to add new cells to current file set" );
+
+    // modify local file set, to merge coincident vertices, and to correct repeated vertices in elements
+    std::vector<Tag> tagList ;
+    tagList.push_back(mGlobalIdTag);
+    tagList.push_back(xcTag);
+    tagList.push_back(ycTag);
+    tagList.push_back(areaTag);
+    tagList.push_back(fracTag);
+    rval = IntxUtils::remove_duplicate_vertices(mbImpl, _fileSet, 1.e-9, tagList); MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
 
     return MB_SUCCESS;
 }

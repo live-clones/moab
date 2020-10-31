@@ -1658,4 +1658,78 @@ ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle sourc
     return MB_SUCCESS;
 }
 
+ErrorCode IntxUtils::remove_duplicate_vertices(Interface* mb, EntityHandle file_set, double merge_tol, std::vector<Tag> & tagList )
+{
+    MergeMesh mm(mb);
+
+    ErrorCode rval = mm.merge_all(file_set, merge_tol ); MB_CHK_ERR( rval );
+
+    // now correct vertices that are repeated in polygons
+    Range cells;
+    rval = mb->get_entities_by_dimension(file_set, 2, cells); MB_CHK_ERR( rval );
+
+    Range modifiedCells;  // will be deleted at the end; keep the gid
+    Range newCells;
+
+    for( Range::iterator cit = cells.begin(); cit != cells.end(); cit++ )
+    {
+        EntityHandle cell          = *cit;
+        const EntityHandle* connec = NULL;
+        int num_verts              = 0;
+        rval                       = mb->get_connectivity( cell, connec, num_verts );MB_CHK_SET_ERR( rval, "Failed to get connectivity" );
+
+        std::vector< EntityHandle > newConnec;
+        newConnec.push_back( connec[0] );  // at least one vertex
+        int index    = 0;
+        int new_size = 1;
+        while( index < num_verts - 2 )
+        {
+            int next_index = ( index + 1 );
+            if( connec[next_index] != newConnec[new_size - 1] )
+            {
+                newConnec.push_back( connec[next_index] );
+                new_size++;
+            }
+            index++;
+        }
+        // add the last one only if different from previous and first node
+        if( ( connec[num_verts - 1] != connec[num_verts - 2] ) && ( connec[num_verts - 1] != connec[0] ) )
+        {
+            newConnec.push_back( connec[num_verts - 1] );
+            new_size++;
+        }
+        if( new_size < num_verts )
+        {
+            // cout << "new cell from " << cell << " has only " << new_size << " vertices \n";
+            modifiedCells.insert( cell );
+            // create a new cell with type triangle, quad or polygon
+            EntityType type = MBTRI;
+            if( new_size == 3 )
+                type = MBTRI;
+            else if( new_size == 4 )
+                type = MBQUAD;
+            else if( new_size > 4 )
+                type = MBPOLYGON;
+
+            // create new cell
+            EntityHandle newCell;
+            rval = mb->create_element( type, &newConnec[0], new_size, newCell );MB_CHK_SET_ERR( rval, "Failed to create new cell" );
+            // set the old id to the new element
+            newCells.insert(newCell);
+            double value; // use the same value to reset the tags, even if the tags are int (like Global ID)
+            for (size_t i=0; i<tagList.size(); i++)
+            {
+                rval = mb->tag_get_data( tagList[i], &cell, 1, (void*)(&value) );MB_CHK_SET_ERR( rval, "Failed to get tag value" );
+                rval = mb->tag_set_data( tagList[i], &newCell, 1, (void*)(&value) );MB_CHK_SET_ERR( rval, "Failed to set tag value on new cell" );
+            }
+        }
+    }
+
+    rval = mb->remove_entities(file_set, modifiedCells); MB_CHK_SET_ERR( rval, "Failed to remove old cells from file set" );
+    rval = mb->delete_entities( modifiedCells ); MB_CHK_SET_ERR( rval, "Failed to delete old cells" );
+    rval = mb->add_entities(file_set, newCells); MB_CHK_SET_ERR( rval, "Failed to add new cells to file set" );
+
+    return MB_SUCCESS;
+}
+
 }  // namespace moab
