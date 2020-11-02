@@ -6,7 +6,7 @@
 // Creator       : Vijay Mahadevan
 //-------------------------------------------------------------------------
 
-#if defined(MOAB_HAVE_NETCDFPAR) && defined(MOAB_HAVE_TEMPESTREMAP)
+#if defined( MOAB_HAVE_NETCDFPAR ) && defined( MOAB_HAVE_TEMPESTREMAP )
 #include "netcdf_par.h"
 #include "netcdfcpp.h"
 
@@ -15,8 +15,7 @@ class ParNcFile : public NcFile
   public:
     ParNcFile( MPI_Comm comm, MPI_Info comm_info, const char* path, FileMode fmode = ReadOnly,
                FileFormat fformat = Classic )
-        :  NcFile(),
-        m_comm( comm )
+        : NcFile(), m_comm( comm )
     {
         NcError err( NcError::verbose_nonfatal );  // constructor must not fail
 
@@ -86,12 +85,13 @@ class ParNcFile : public NcFile
         }
     }
 
-    virtual ~ParNcFile( void ) {};
+    virtual ~ParNcFile( void ){};
 
     NcBool enable_var_par_access( NcVar* var, bool is_independent = true )  // synchronize to disk
     {
         int status;
-        status = NcError::set_err( nc_var_par_access( the_id, var->id(), (is_independent ? NC_INDEPENDENT : NC_COLLECTIVE) ) );
+        status = NcError::set_err(
+            nc_var_par_access( the_id, var->id(), ( is_independent ? NC_INDEPENDENT : NC_COLLECTIVE ) ) );
         if( status != NC_NOERR )
         {
             NcError::set_err( status );
@@ -103,7 +103,7 @@ class ParNcFile : public NcFile
   protected:
     MPI_Comm m_comm;
     static const int ncGlobal = NC_GLOBAL;  // psuedo-variable for global attributes
-    static const int ncBad = -1;  // failure return for netCDF C interface
+    static const int ncBad    = -1;         // failure return for netCDF C interface
 };
 
 #endif  // #if defined(MOAB_HAVE_NETCDFPAR) && defined(MOAB_HAVE_TEMPESTREMAP)

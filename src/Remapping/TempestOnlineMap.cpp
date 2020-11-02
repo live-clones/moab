@@ -94,12 +94,12 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
     std::vector< int > dimSizes( 1 );
     dimNames[0] = "num_elem";
 
-    if (m_meshInputCov)
+    if( m_meshInputCov )
     {
         dimSizes[0] = m_meshInputCov->faces.size();
         this->InitializeSourceDimensions( dimNames, dimSizes );
     }
-    if (m_meshOutput)
+    if( m_meshOutput )
     {
         dimSizes[0] = m_meshOutput->faces.size();
         this->InitializeTargetDimensions( dimNames, dimSizes );
@@ -1490,22 +1490,25 @@ int moab::TempestOnlineMap::IsMonotone( double dTolerance )
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void print_progress(const int barWidth, const float progress, const char* message)
+static void print_progress( const int barWidth, const float progress, const char* message )
 {
     std::cout << message << " [";
     int pos = barWidth * progress;
-    for (int i = 0; i < barWidth; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
+    for( int i = 0; i < barWidth; ++i )
+    {
+        if( i < pos )
+            std::cout << "=";
+        else if( i == pos )
+            std::cout << ">";
+        else
+            std::cout << " ";
     }
-    std::cout << "] " << int(progress * 100.0) << " %\r";
+    std::cout << "] " << int( progress * 100.0 ) << " %\r";
     std::cout.flush();
 }
 
-moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
-                                                      const std::vector< int >& owned_dof_ids,
-                                                      bool row_major_ownership )
+moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
+                                                         bool row_major_ownership )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -1521,7 +1524,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
 
 #ifdef MOAB_HAVE_MPI
-    MPI_Comm commW    = m_pcomm->comm();
+    MPI_Comm commW = m_pcomm->comm();
 #endif
 
     if( is_root )
@@ -1614,8 +1617,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     long offset = 0;
 
     const char* message = "MapReadBcast: ";
-    int barWidth = 50;
-    float progress = 0.0;
+    int barWidth        = 50;
+    float progress      = 0.0;
     /* Split the rows and send to processes in chunks
        Let us start the buffered read */
     for( int iRead = 0; iRead < nBufferedReads; ++iRead )
@@ -1634,7 +1637,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
             int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
 
             // printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
-            print_progress(barWidth, progress, message);
+            print_progress( barWidth, progress, message );
 
             // Allocate and resize based on local buffer size
             vecRow.Allocate( nLocSize );
@@ -1678,7 +1681,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
             offset += nLocSize;
             nEntriesRemaining -= nLocSize;
-            progress = 1.0 - (nEntriesRemaining) * 1.0/nS;
+            progress = 1.0 - nEntriesRemaining * ( 1.0 / nS );
 
             for( int ip = 0; ip < size; ++ip )
                 nDataPerProcess[ip] = dataPerProcess[ip].size();
@@ -1834,7 +1837,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     if( rank == 0 )
     {
-        print_progress(barWidth, progress, message);
+        print_progress( barWidth, progress, message );
         std::cout << std::endl;
         assert( nEntriesRemaining == 0 );
         ncMap->close();
@@ -1844,7 +1847,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     delete ncMap;
 
     m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
-    m_nTotDofs_Dest = sparseMatrix.GetRows();
+    m_nTotDofs_Dest   = sparseMatrix.GetRows();
 
 #ifdef MOAB_HAVE_EIGEN
     this->copy_tempest_sparsemat_to_eigen3();

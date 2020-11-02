@@ -505,7 +505,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string 
     int globuf[5] = { (int)nA, (int)nB, nS, nSourceNodesPerFace, nTargetNodesPerFace };
 #endif
 
-    // printf( "[%d] Dimensionality: %d, %d, %d, %d, %d; Offset buffer = %d, %d, %d\n", rank, nA, nB, nS, nSourceNodesPerFace,
+    // printf( "[%d] Dimensionality: %d, %d, %d, %d, %d; Offset buffer = %d, %d, %d\n", rank, nA, nB, nS,
+    // nSourceNodesPerFace,
     //         nTargetNodesPerFace, offbuf[0], offbuf[1], offbuf[2] );
 
     // Write output dimensions entries
@@ -554,7 +555,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string 
     {
         for( unsigned i = 0; i < m_vecTargetDimSizes.size(); i++ )
         {
-            int tmp = (i == 0 ? globuf[1] : m_vecTargetDimSizes[i]);
+            int tmp = ( i == 0 ? globuf[1] : m_vecTargetDimSizes[i] );
             varDstGridDims->set_cur( nDstGridDims - i - 1 );
             varDstGridDims->put( &( tmp ), 1 );
         }
