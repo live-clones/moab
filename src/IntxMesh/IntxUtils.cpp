@@ -1660,13 +1660,22 @@ ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle sourc
 
 ErrorCode IntxUtils::remove_duplicate_vertices(Interface* mb, EntityHandle file_set, double merge_tol, std::vector<Tag> & tagList )
 {
+    Range verts;
+    ErrorCode rval = mb->get_entities_by_dimension(file_set, 0, verts ); MB_CHK_ERR( rval );
+    rval = mb->remove_entities(file_set, verts); MB_CHK_ERR( rval );
+
     MergeMesh mm(mb);
 
-    ErrorCode rval = mm.merge_all(file_set, merge_tol ); MB_CHK_ERR( rval );
+    // remove the vertices from the set, before merging
+
+    rval = mm.merge_all(file_set, merge_tol ); MB_CHK_ERR( rval );
 
     // now correct vertices that are repeated in polygons
     Range cells;
     rval = mb->get_entities_by_dimension(file_set, 2, cells); MB_CHK_ERR( rval );
+
+    verts.clear();
+    rval = mb->get_connectivity(cells, verts); MB_CHK_ERR( rval );
 
     Range modifiedCells;  // will be deleted at the end; keep the gid
     Range newCells;
@@ -1728,6 +1737,7 @@ ErrorCode IntxUtils::remove_duplicate_vertices(Interface* mb, EntityHandle file_
     rval = mb->remove_entities(file_set, modifiedCells); MB_CHK_SET_ERR( rval, "Failed to remove old cells from file set" );
     rval = mb->delete_entities( modifiedCells ); MB_CHK_SET_ERR( rval, "Failed to delete old cells" );
     rval = mb->add_entities(file_set, newCells); MB_CHK_SET_ERR( rval, "Failed to add new cells to file set" );
+    rval = mb->add_entities(file_set, verts); MB_CHK_SET_ERR( rval, "Failed to add verts to the file set" );
 
     return MB_SUCCESS;
 }

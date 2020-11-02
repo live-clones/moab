@@ -707,6 +707,7 @@ ErrCode iMOAB_ComputeCommGraph(iMOAB_AppID  pid1, iMOAB_AppID  pid2,  MPI_Comm* 
     MPI_Group* group1, MPI_Group* group2, int * type1, int * type2, int *comp1, int *comp2);
 
 /**
+<<<<<<< HEAD
   \brief Recompute the communication graph between component and coupler, considering intersection coverage .
   \note
   Original communication graph for source used an initial partition, while during intersection some of the source
@@ -741,8 +742,17 @@ ErrCode iMOAB_DumpCommGraph                 (  iMOAB_AppID pid,
                                                const iMOAB_String prefix,
                                                int prefix_length);
 
-#endif // #ifdef MOAB_HAVE_MPI
 
+/**
+  \brief merge vertices in an explicit, parallel mesh; it will also reassign global IDs on vertices,
+     and resolve parallel sharing of vertices
+   <B>Operations:</B> Collective
+
+   \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the application ID
+*/
+ErrCode iMOAB_MergeVertices(iMOAB_AppID  pid);
+
+#endif // #ifdef MOAB_HAVE_MPI
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 /**
