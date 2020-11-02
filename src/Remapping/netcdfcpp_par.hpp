@@ -15,13 +15,10 @@ class ParNcFile : public NcFile
   public:
     ParNcFile( MPI_Comm comm, MPI_Info comm_info, const char* path, FileMode fmode = ReadOnly,
                FileFormat fformat = Classic )
-        :  NcFile( path, fmode, NULL, 0, fformat ),
+        :  NcFile(),
         m_comm( comm )
     {
         NcError err( NcError::verbose_nonfatal );  // constructor must not fail
-
-        // if the base class has an open handle, close it first
-        this->close();
 
         int mode      = NC_NOWRITE;
         the_fill_mode = Fill;
