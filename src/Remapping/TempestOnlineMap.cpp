@@ -1843,6 +1843,9 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     // Close and free the handle to mapping file
     delete ncMap;
 
+    m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
+    m_nTotDofs_Dest = sparseMatrix.GetRows();
+
 #ifdef MOAB_HAVE_EIGEN
     this->copy_tempest_sparsemat_to_eigen3();
 #endif
