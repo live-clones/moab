@@ -9,6 +9,7 @@
 #include "moab/ParallelComm.hpp"
 #include "moab/ParCommGraph.hpp"
 #include "moab/ParallelMergeMesh.hpp"
+#include "moab/IntxMesh/IntxUtils.hpp"
 #endif
 #include "DebugOutput.hpp"
 #include "moab/iMOAB.h"
