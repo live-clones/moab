@@ -806,19 +806,23 @@ moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef MOAB_HAVE_MPI
-static ErrorCode assign_vertex_element_IDs( moab::Interface* mbImpl, Tag idtag, EntityHandle this_set,
-                                            const int dimension = 2, const int start_id = 1 )
+ErrorCode TempestRemapper::assign_vertex_element_IDs( Tag idtag, EntityHandle this_set,
+                                            const int dimension, const int start_id )
 {
+    assert(idtag);
+
     ErrorCode rval;
     Range entities;
-    rval = mbImpl->get_entities_by_dimension( this_set, dimension, entities );MB_CHK_SET_ERR( rval, "Failed to get entities" );
+    rval = m_interface->get_entities_by_dimension( this_set, dimension, entities );MB_CHK_SET_ERR( rval, "Failed to get entities" );
+
+    if (entities.size() == 0) return moab::MB_SUCCESS;
 
     int idoffset = start_id;
     std::vector< int > gid( entities.size() );
     for( unsigned i = 0; i < entities.size(); ++i )
         gid[i] = idoffset++;
 
-    rval = mbImpl->tag_set_data( idtag, entities, &gid[0] );MB_CHK_ERR( rval );
+    rval = m_interface->tag_set_data( idtag, entities, &gid[0] );MB_CHK_ERR( rval );
 
     return moab::MB_SUCCESS;
 }
@@ -1191,7 +1195,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 #ifdef MOAB_HAVE_MPI
                 rval = m_pcomm->assign_global_ids( m_source_set, 2, 1, false, true, false );MB_CHK_ERR( rval );
 #else
-                rval = assign_vertex_element_IDs( m_interface, gidtag, m_source_set, 2, 1 );MB_CHK_ERR( rval );
+                rval = this->assign_vertex_element_IDs( gidtag, m_source_set, 2, 1 );MB_CHK_ERR( rval );
 #endif
             }
         }
@@ -1209,7 +1213,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 #ifdef MOAB_HAVE_MPI
                 rval = m_pcomm->assign_global_ids( m_target_set, 2, 1, false, true, false );MB_CHK_ERR( rval );
 #else
-                rval = assign_vertex_element_IDs( m_interface, gidtag, m_target_set, 2, 1 );MB_CHK_ERR( rval );
+                rval = this->assign_vertex_element_IDs( gidtag, m_target_set, 2, 1 );MB_CHK_ERR( rval );
 #endif
             }
         }

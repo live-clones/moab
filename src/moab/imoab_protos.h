@@ -3,12 +3,12 @@
 
 #include "moab/MOABConfig.h"
 
-#if defined(MOAB_FC_FUNC_)
+#if defined( MOAB_FC_FUNC_ )
 #define IMOAB_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
+#elif defined( MOAB_FC_FUNC )
 #define IMOAB_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define IMOAB_FC_WRAPPER(name,NAME) name
+#define IMOAB_FC_WRAPPER( name, NAME ) name
 #endif
 
 #define iMOAB_Initialize                     IMOAB_FC_WRAPPER( imoab_initialize, IMOAB_INITIALIZE )
@@ -57,11 +57,16 @@
 #define iMOAB_ReceiveElementTag              IMOAB_FC_WRAPPER( imoab_receiveelementtag, IMOAB_RECEIVEELEMENTTAG )
 #define iMOAB_DumpCommGraph                  IMOAB_FC_WRAPPER( imoab_dumpcommgraph, IMOAB_DUMPCOMMGRAPH)
 #define iMOAB_ComputeCommGraph               IMOAB_FC_WRAPPER( imoab_computecommgraph, IMOAB_COMPUTECOMMGRAPH)
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
+
 #define iMOAB_ComputeMeshIntersectionOnSphere IMOAB_FC_WRAPPER( imoab_computemeshintersectiononsphere, IMOAB_COMPUTEMESHINTERSECTIONONSPHERE)
 #define iMOAB_ComputePointDoFIntersection    IMOAB_FC_WRAPPER( imoab_computepointdofintersection, IMOAB_COMPUTEPOINTDOFINTERSECTION)
 #define iMOAB_ComputeScalarProjectionWeights IMOAB_FC_WRAPPER(imoab_computescalarprojectionweights,IMOAB_COMPUTESCALARPROJECTIONWEIGHTS)
 #define iMOAB_ApplyScalarProjectionWeights   IMOAB_FC_WRAPPER(imoab_applyscalarprojectionweights, IMOAB_APPLYSCALARPROJECTIONWEIGHTS)
 #define iMOAB_CoverageGraph                  IMOAB_FC_WRAPPER(imoab_coveragegraph, IMOAB_COVERAGEGRAPH)
+
 #endif
+
 #endif /*IMOAB_PROTOS_H */
+

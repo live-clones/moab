@@ -229,6 +229,14 @@ class TempestRemapper : public Remapper
     ///	</summary>
     moab::ErrorCode GetOverlapAugmentedEntities( moab::Range& sharedGhostEntities );
 
+#ifndef MOAB_HAVE_MPI
+    /// <summary>
+    ///    Internal method to assign vertex and element global IDs if one does not exist already
+    /// </summary>
+    moab::ErrorCode assign_vertex_element_IDs( Tag idtag, EntityHandle this_set,
+                                            const int dimension = 2, const int start_id = 1 );
+#endif
+
   public:               // public members
     bool meshValidate;  // Validate the mesh after loading from file
 
