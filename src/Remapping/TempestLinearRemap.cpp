@@ -24,6 +24,7 @@
 #include "moab/AdaptiveKDTree.hpp"
 
 #include "moab/Remapping/TempestOnlineMap.hpp"
+#include "moab/TupleList.hpp"
 
 #ifdef MOAB_HAVE_EIGEN
 #include <Eigen/Dense>
@@ -275,6 +276,102 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
     return;
 }
+#ifdef MOAB_HAVE_MPI
+int moab::TempestOnlineMap::rearrange_arrays_by_dofs( std::vector<unsigned int> & gdofmap,
+        DataArray1D< double > &  vecFaceArea,
+        DataArray1D< double > &  dCenterLon,
+        DataArray1D< double > & dCenterLat,
+        DataArray2D< double > & dVertexLon,
+        DataArray2D< double > & dVertexLat,
+        unsigned & N, // will have the local, after
+        int nv,
+        int & maxdof)
+{
+    // first decide maxdof, for partitioning
+    int localmax=0;
+    for (unsigned i = 0; i < N; i++)
+        if (gdofmap[i] > localmax)
+            localmax = gdofmap[i];
+
+    // decide partitioning based on maxdof/size
+    MPI_Allreduce( &localmax, &maxdof, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
+    // maxdof is 0 based, so actual number is +1
+    // maxdof
+    int size_per_task = (maxdof+1)/size; // based on this, processor to process dof x is x/size_per_task
+    // so we decide to reorder by actual dof, such that task 0 has dofs from [0 to size_per_task), etc
+    moab::TupleList tl;
+    unsigned numr = 2 * nv + 3; //  doubles: area, centerlon, center lat, nv (vertex lon, vertex lat)
+    tl.initialize( 2, 0, 0, numr, N );  // to proc, dof, then
+    tl.enableWriteAccess();
+    // populate
+    for (unsigned i=0; i < N; i++ )
+    {
+        int gdof = gdofmap[i] ;
+        int to_proc = gdof / size_per_task;
+        if (to_proc >= size) to_proc = size-1; // the last ones got to last proc
+        int n = tl.get_n();
+        tl.vi_wr[2 * n]         = to_proc;
+        tl.vi_wr[2 * n + 1]     = gdof;
+        tl.vr_wr[n * numr] = vecFaceArea[i];
+        tl.vr_wr[n * numr + 1] = dCenterLon[i];
+        tl.vr_wr[n * numr + 2] = dCenterLat[i];
+        for (int j=0; j<nv; j++)
+        {
+            tl.vr_wr[n * numr + 3 + j]      = dVertexLon[i][j];
+            tl.vr_wr[n * numr + 3 + nv + j] = dVertexLat[i][j];
+        }
+        tl.inc_n();
+    }
+
+    // now do the heavy communication
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+
+    // after communication, on each processor we should have tuples coming in
+    // still need to order by global dofs; then rearrange input vectors
+    moab::TupleList::buffer sort_buffer;
+    sort_buffer.buffer_init( tl.get_n() );
+    tl.sort( 1, &sort_buffer );
+    // count how many are unique, and collapse
+    int nb_unique = 1;
+    for (unsigned i=0; i<tl.get_n()-1; i++)
+    {
+        if (tl.vi_wr[2*i+1] != tl.vi_wr[2*i+3])
+            nb_unique++;
+    }
+    vecFaceArea.Allocate(nb_unique);
+    dCenterLon.Allocate(nb_unique);
+    dCenterLat.Allocate(nb_unique);
+    dVertexLon.Allocate(nb_unique, nv);
+    dVertexLat.Allocate(nb_unique, nv);
+    int current_size=1;
+    vecFaceArea[0] = tl.vr_wr[0];
+    dCenterLon[0] = tl.vr_wr[1];
+    dCenterLat[0] = tl.vr_wr[2];
+    for (int j=0; j<nv; j++)
+    {
+        dVertexLon[0][j] = tl.vr_wr[ 3 + j ];
+        dVertexLat[0][j] = tl.vr_wr[ 3 + nv + j ];
+    }
+    for (unsigned i=0; i<tl.get_n()-1; i++)
+    {
+        if (tl.vi_wr[2*i+1] != tl.vi_wr[2*i+3])
+        {
+            vecFaceArea[current_size] = tl.vr_wr[ i * numr ];
+            dCenterLon[current_size] = tl.vr_wr[ i * numr + 1];
+            dCenterLat[current_size] = tl.vr_wr[ i * numr + 2];
+            for (int j=0; j<nv; j++)
+            {
+                dVertexLon[current_size][j] = tl.vr_wr[ i * numr + 3 + j ];
+                dVertexLat[current_size][j] = tl.vr_wr[ i * numr + 3 + nv + j ];
+            }
+            current_size++;
+        }
+    }
+
+    N = current_size; // or nb_unique, should be the same
+    return 0;
+}
+#endif
 
 #ifdef MOAB_HAVE_EIGEN
 void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
@@ -480,9 +577,31 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string 
     unsigned nA = ( vecSourceFaceArea.GetRows() );
     unsigned nB = ( vecTargetFaceArea.GetRows() );
 
+
     // Number of nodes per Face
     int nSourceNodesPerFace = dSourceVertexLon.GetColumns();
     int nTargetNodesPerFace = dTargetVertexLon.GetColumns();
+    // first move data if in parallel
+#if defined( MOAB_HAVE_MPI )
+    if (size > 1)
+    {
+        int maxdof; // output; arrays will be re-distributed in chunks [maxdof/size]
+        int ierr = rearrange_arrays_by_dofs( srccol_gdofmap,
+                vecSourceFaceArea,
+                dSourceCenterLon, dSourceCenterLat,
+                dSourceVertexLon, dSourceVertexLat,
+                nA, nSourceNodesPerFace, maxdof); // now nA will be close to maxdof/size
+        if (ierr!=0) { _EXCEPTION1( "Unable to arrange source data %d ", nA ); }
+        // rearrange target data: (nB)
+        //
+        ierr = rearrange_arrays_by_dofs( row_gdofmap,
+                vecTargetFaceArea,
+                dTargetCenterLon, dTargetCenterLat,
+                dTargetVertexLon, dTargetVertexLat,
+                nB, nTargetNodesPerFace, maxdof); // now nA will be close to maxdof/size
+        if (ierr!=0) { _EXCEPTION1( "Unable to arrange target data %d ", nB ); }
+    }
+#endif
 
     // Number of non-zeros in the remap matrix operator
     int nS = m_weightMatrix.nonZeros();

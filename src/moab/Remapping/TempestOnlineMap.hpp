@@ -328,6 +328,18 @@ class TempestOnlineMap : public OfflineMap
     moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag,
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
+#ifdef MOAB_HAVE_MPI
+    int rearrange_arrays_by_dofs( std::vector<unsigned int> & gdofmap,
+                DataArray1D< double > &  vecFaceArea,
+                DataArray1D< double > &  dCenterLon,
+                DataArray1D< double > & dCenterLat,
+                DataArray2D< double > & dVertexLat,
+                DataArray2D< double > & dVertexLon,
+                unsigned & N, // this will be output too now
+                int nv,
+                int & maxdof);
+#endif
+
   public:
     ///	<summary>
     ///		The fundamental remapping operator object.
