@@ -2544,6 +2544,20 @@ ErrCode iMOAB_MergeVertices(iMOAB_AppID  pid)
     rval = pco->assign_global_ids(data.file_set, /*dim*/ 0);
     if (rval != MB_SUCCESS) return 1;
 
+    // set the partition tag on the file set
+    Tag part_tag;
+    int dum_id = -1;
+    rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
+                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+
+    if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
+    {
+        std::cout << " can't get par part tag.\n";
+        return 1;
+    }
+
+    int rank = pco->rank();
+    rval     = context.MBI->tag_set_data( part_tag, &data.file_set, 1, &rank );CHKERRVAL( rval );
 
     return 0;
 }
