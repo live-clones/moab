@@ -9,10 +9,4 @@ if [[ ! -d $PYMOAB_INSTALL_PREFIX ]]; then
 fi
 
 
-if [ -x "$(command -v python)" ]; then
-  python_exe=python
-elif [ -x "$(command -v python3)" ]; then
-  python_exe=python3
-fi
-
-${python_exe} setup.py install --prefix=@CMAKE_INSTALL_PREFIX@ --record @PYMOAB_INSTALL_PREFIX@/install_files.txt
+@PYTHON@ setup.py install --prefix=@CMAKE_INSTALL_PREFIX@ --record @PYMOAB_INSTALL_PREFIX@/install_files.txt
