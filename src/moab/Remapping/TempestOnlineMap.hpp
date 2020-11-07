@@ -329,7 +329,7 @@ class TempestOnlineMap : public OfflineMap
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
 #ifdef MOAB_HAVE_MPI
-    int rearrange_arrays_by_dofs( std::vector<unsigned int> & gdofmap,
+    int rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,
                 DataArray1D< double > &  vecFaceArea,
                 DataArray1D< double > &  dCenterLon,
                 DataArray1D< double > & dCenterLat,

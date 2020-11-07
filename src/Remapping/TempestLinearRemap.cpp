@@ -277,7 +277,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     return;
 }
 #ifdef MOAB_HAVE_MPI
-int moab::TempestOnlineMap::rearrange_arrays_by_dofs( std::vector<unsigned int> & gdofmap,
+int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,
         DataArray1D< double > &  vecFaceArea,
         DataArray1D< double > &  dCenterLon,
         DataArray1D< double > & dCenterLat,
@@ -583,7 +583,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string 
     int nTargetNodesPerFace = dTargetVertexLon.GetColumns();
     // first move data if in parallel
 #if defined( MOAB_HAVE_MPI )
-    if (size > 1)
+    //if (size > 1)
     {
         int maxdof; // output; arrays will be re-distributed in chunks [maxdof/size]
         int ierr = rearrange_arrays_by_dofs( srccol_gdofmap,
