@@ -155,7 +155,8 @@ class IntxUtils
     static ErrorCode deep_copy_set_with_quads( Interface* mb, EntityHandle source_set, EntityHandle dest_set );
 
     // used to 'repair' scrip-like meshes
-    static ErrorCode remove_duplicate_vertices(Interface* mb, EntityHandle file_set, double merge_tol, std::vector<Tag> & tagList );
+    static ErrorCode remove_duplicate_vertices( Interface* mb, EntityHandle file_set, double merge_tol,
+                                                std::vector< Tag >& tagList );
 };
 
 class IntxAreaUtils

@@ -444,30 +444,30 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     rval = mbImpl->add_entities( _fileSet, tmp_range );MB_CHK_SET_ERR( rval, "Failed to add new cells to current file set" );
 
     // modify local file set, to merge coincident vertices, and to correct repeated vertices in elements
-    std::vector<Tag> tagList ;
-    tagList.push_back(mGlobalIdTag);
-    tagList.push_back(xcTag);
-    tagList.push_back(ycTag);
-    tagList.push_back(areaTag);
-    tagList.push_back(fracTag);
+    std::vector< Tag > tagList;
+    tagList.push_back( mGlobalIdTag );
+    tagList.push_back( xcTag );
+    tagList.push_back( ycTag );
+    tagList.push_back( areaTag );
+    tagList.push_back( fracTag );
     double tol = 1.e-9;
-    rval = IntxUtils::remove_duplicate_vertices(mbImpl, _fileSet, tol, tagList); MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
+    rval       = IntxUtils::remove_duplicate_vertices( mbImpl, _fileSet, tol, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
 
-    rval = mbImpl->get_entities_by_dimension(_fileSet, 2, faces); MB_CHK_ERR( rval );
+    rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_ERR( rval );
     Range all_verts;
-    rval = mbImpl->get_connectivity(faces, all_verts); MB_CHK_ERR( rval );
-    rval = mbImpl->add_entities(_fileSet, all_verts); MB_CHK_ERR( rval );
+    rval = mbImpl->get_connectivity( faces, all_verts );MB_CHK_ERR( rval );
+    rval = mbImpl->add_entities( _fileSet, all_verts );MB_CHK_ERR( rval );
 #ifdef MOAB_HAVE_MPI
     ParallelComm*& myPcomm = _readNC->myPcomm;
     if( myPcomm )
     {
-        ParallelMergeMesh pmm(myPcomm, tol);
-        rval = pmm.merge(_fileSet,
-                /* do not do local merge*/false,
-                /*  2d cells*/ 2); MB_CHK_SET_ERR( rval, "Failed to merge vertices in parallel" );
+        ParallelMergeMesh pmm( myPcomm, tol );
+        rval = pmm.merge( _fileSet,
+                          /* do not do local merge*/ false,
+                          /*  2d cells*/ 2 );MB_CHK_SET_ERR( rval, "Failed to merge vertices in parallel" );
 
         // assign global ids only for vertices, cells have them fine
-        rval = myPcomm->assign_global_ids(_fileSet, /*dim*/ 0); MB_CHK_ERR( rval );
+        rval = myPcomm->assign_global_ids( _fileSet, /*dim*/ 0 );MB_CHK_ERR( rval );
     }
 #endif
 

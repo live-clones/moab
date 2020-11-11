@@ -2064,7 +2064,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     // also, what if this was the "source" mesh in intx?
     // in that case, the elements might have been instantiated in the coverage set locally, the
     // "owned" range can be different the elements are now in tempestRemap coverage_set
-    cover_set = cgraph->get_cover_set(); // this will be non null only for intx app ?
+    cover_set = cgraph->get_cover_set();  // this will be non null only for intx app ?
 
     if( 0 != cover_set )
     {
@@ -2494,60 +2494,60 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
 }
 //#undef VERBOSE
 
-ErrCode iMOAB_MergeVertices(iMOAB_AppID  pid)
+ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 {
-    appData& data = context.appDatas[*pid];
+    appData& data     = context.appDatas[*pid];
     ParallelComm* pco = context.pcomms[*pid];
     // collapse vertices and transform cells into triangles/quads /polys
     // tags we care about: area, frac, global id
-    std::vector<Tag> tagsList;
+    std::vector< Tag > tagsList;
     Tag tag;
-    ErrorCode rval = context.MBI->tag_get_handle("GLOBAL_ID", tag);
-    if( !tag || rval != MB_SUCCESS) return 1;  // fatal error, abort
-    tagsList.push_back(tag);
-    rval = context.MBI->tag_get_handle("area", tag);
-    if(tag && rval == MB_SUCCESS)  tagsList.push_back(tag);
-    rval = context.MBI->tag_get_handle("frac", tag);
-    if(tag && rval == MB_SUCCESS)  tagsList.push_back(tag);
+    ErrorCode rval = context.MBI->tag_get_handle( "GLOBAL_ID", tag );
+    if( !tag || rval != MB_SUCCESS ) return 1;  // fatal error, abort
+    tagsList.push_back( tag );
+    rval = context.MBI->tag_get_handle( "area", tag );
+    if( tag && rval == MB_SUCCESS ) tagsList.push_back( tag );
+    rval = context.MBI->tag_get_handle( "frac", tag );
+    if( tag && rval == MB_SUCCESS ) tagsList.push_back( tag );
     double tol = 1.0e-9;
-    rval = IntxUtils::remove_duplicate_vertices(context.MBI, data.file_set, tol, tagsList);
-    if (rval != MB_SUCCESS) return 1;
+    rval       = IntxUtils::remove_duplicate_vertices( context.MBI, data.file_set, tol, tagsList );
+    if( rval != MB_SUCCESS ) return 1;
 
     // clean material sets of cells that were deleted
     rval = context.MBI->get_entities_by_type_and_tag( data.file_set, MBENTITYSET, &( context.material_tag ), 0, 1,
-                                                          data.mat_sets, Interface::UNION );CHKERRVAL( rval );
+                                                      data.mat_sets, Interface::UNION );CHKERRVAL( rval );
 
-    if (!data.mat_sets.empty()) {
+    if( !data.mat_sets.empty() )
+    {
         EntityHandle matSet = data.mat_sets[0];
         Range elems;
-        rval = context.MBI->get_entities_by_dimension(matSet, 2, elems);
-        if (rval != MB_SUCCESS) return 1;
-        rval = context.MBI->remove_entities(matSet, elems);
-        if (rval != MB_SUCCESS) return 1;
+        rval = context.MBI->get_entities_by_dimension( matSet, 2, elems );
+        if( rval != MB_SUCCESS ) return 1;
+        rval = context.MBI->remove_entities( matSet, elems );
+        if( rval != MB_SUCCESS ) return 1;
         // put back only cells from data.file_set
         elems.clear();
-        rval = context.MBI->get_entities_by_dimension(data.file_set, 2, elems);
-        if (rval != MB_SUCCESS) return 1;
-        rval = context.MBI->add_entities(matSet, elems);
-        if (rval != MB_SUCCESS) return 1;
+        rval = context.MBI->get_entities_by_dimension( data.file_set, 2, elems );
+        if( rval != MB_SUCCESS ) return 1;
+        rval = context.MBI->add_entities( matSet, elems );
+        if( rval != MB_SUCCESS ) return 1;
     }
-    int ierr = iMOAB_UpdateMeshInfo(pid);
-    if (ierr>0)
-        return ierr;
-    ParallelMergeMesh pmm(pco, tol);
-    rval = pmm.merge(data.file_set,
-            /* do not do local merge*/false,
-            /*  2d cells*/ 2);
-    if (rval != MB_SUCCESS) return 1;
+    int ierr = iMOAB_UpdateMeshInfo( pid );
+    if( ierr > 0 ) return ierr;
+    ParallelMergeMesh pmm( pco, tol );
+    rval = pmm.merge( data.file_set,
+                      /* do not do local merge*/ false,
+                      /*  2d cells*/ 2 );
+    if( rval != MB_SUCCESS ) return 1;
 
     // assign global ids only for vertices, cells have them fine
-    rval = pco->assign_global_ids(data.file_set, /*dim*/ 0);
-    if (rval != MB_SUCCESS) return 1;
+    rval = pco->assign_global_ids( data.file_set, /*dim*/ 0 );
+    if( rval != MB_SUCCESS ) return 1;
 
     // set the partition tag on the file set
     Tag part_tag;
     int dum_id = -1;
-    rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
+    rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
                                         MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )

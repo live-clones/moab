@@ -1,42 +1,54 @@
-# MOAB_DIR points to top-level install dir, below which MOAB's lib/ and include/ are located
-include ../../makefile.config
+#MOAB_DIR points to top - level install dir, below which MOAB's lib/ and include/ are located
+include../../
+    makefile.config
 
-default: all
+    default : all
 
-ifeq ("$(MOAB_HDF5_ENABLED)","yes")
-ALLEXAMPLES += ContinentsOnGlobe BoundaryContinents addPCdata copyPartition
-endif
+                  ifeq( "$(MOAB_HDF5_ENABLED)", "yes" ) ALLEXAMPLES
+    += ContinentsOnGlobe BoundaryContinents addPCdata copyPartition endif
 
-all: $(ALLEXAMPLES)
+               all : $( ALLEXAMPLES )
 
-ContinentsOnGlobe: ContinentsOnGlobe.o ${MOAB_LIBDIR}/libMOAB.la
-	@echo "[CXXLD]  $@"
-	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+                         ContinentsOnGlobe : ContinentsOnGlobe.o ${ MOAB_LIBDIR } /
+               libMOAB.la @echo "[CXXLD]  $@" ${ VERBOSE } ${ MOAB_CXX } -
+           o $ @$ <
+       ${ MOAB_LIBS_LINK }
 
-run-ContinentsOnGlobe: ContinentsOnGlobe
-	${RUNSERIAL} ./ContinentsOnGlobe
+           run
+           -
+           ContinentsOnGlobe : ContinentsOnGlobe ${ RUNSERIAL }./
+               ContinentsOnGlobe
 
-BoundaryContinents: BoundaryContinents.o ${MOAB_LIBDIR}/libMOAB.la
-	@echo "[CXXLD]  $@"
-	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+               BoundaryContinents : BoundaryContinents.o ${ MOAB_LIBDIR } /
+               libMOAB.la @echo "[CXXLD]  $@" ${ VERBOSE } ${ MOAB_CXX } -
+           o $ @$ <
+       ${ MOAB_LIBS_LINK }
 
-run-BoundaryContinents: BoundaryContinents
-	${RUNSERIAL} ./BoundaryContinents
+           run
+           -
+           BoundaryContinents : BoundaryContinents ${ RUNSERIAL }./
+               BoundaryContinents
 
-addPCdata: addPCdata.o ${MOAB_LIBDIR}/libMOAB.la
-	@echo "[CXXLD]  $@"
-	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+               addPCdata : addPCdata.o ${ MOAB_LIBDIR } /
+               libMOAB.la @echo "[CXXLD]  $@" ${ VERBOSE } ${ MOAB_CXX } -
+           o $ @$ <
+       ${ MOAB_LIBS_LINK }
 
-run-addPCdata: addPCdata
-	${RUNSERIAL} ./addPCdata
+           run
+           -
+           addPCdata : addPCdata ${ RUNSERIAL }./
+               addPCdata
 
-copyPartition: copyPartition.o ${MOAB_LIBDIR}/libMOAB.la
-	@echo "[CXXLD]  $@"
-	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+               copyPartition : copyPartition.o ${ MOAB_LIBDIR } /
+               libMOAB.la @echo "[CXXLD]  $@" ${ VERBOSE } ${ MOAB_CXX } -
+           o $ @$ <
+       ${ MOAB_LIBS_LINK }
 
+           run : all $( addprefix run -, $( ALLEXAMPLES ) )
 
-run: all $(addprefix run-,$(ALLEXAMPLES))
-
-clean: clobber
-	rm -rf ${ALLEXAMPLES}
-
+                     clean : clobber rm
+                             -
+                             rf $
+{
+    ALLEXAMPLES
+}

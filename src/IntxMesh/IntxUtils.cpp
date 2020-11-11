@@ -1658,29 +1658,30 @@ ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle sourc
     return MB_SUCCESS;
 }
 
-ErrorCode IntxUtils::remove_duplicate_vertices(Interface* mb, EntityHandle file_set, double merge_tol, std::vector<Tag> & tagList )
+ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file_set, double merge_tol,
+                                                std::vector< Tag >& tagList )
 {
     Range verts;
-    ErrorCode rval = mb->get_entities_by_dimension(file_set, 0, verts ); MB_CHK_ERR( rval );
-    rval = mb->remove_entities(file_set, verts); MB_CHK_ERR( rval );
+    ErrorCode rval = mb->get_entities_by_dimension( file_set, 0, verts );MB_CHK_ERR( rval );
+    rval = mb->remove_entities( file_set, verts );MB_CHK_ERR( rval );
 
-    MergeMesh mm(mb);
+    MergeMesh mm( mb );
 
     // remove the vertices from the set, before merging
 
-    rval = mm.merge_all(file_set, merge_tol ); MB_CHK_ERR( rval );
+    rval = mm.merge_all( file_set, merge_tol );MB_CHK_ERR( rval );
 
     // now correct vertices that are repeated in polygons
     Range cells;
-    rval = mb->get_entities_by_dimension(file_set, 2, cells); MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_dimension( file_set, 2, cells );MB_CHK_ERR( rval );
 
     verts.clear();
-    rval = mb->get_connectivity(cells, verts); MB_CHK_ERR( rval );
+    rval = mb->get_connectivity( cells, verts );MB_CHK_ERR( rval );
 
     Range modifiedCells;  // will be deleted at the end; keep the gid
     Range newCells;
 
-    for( Range::iterator cit = cells.begin(); cit != cells.end(); cit++ )
+    for( Range::iterator cit = cells.begin(); cit != cells.end(); ++cit )
     {
         EntityHandle cell          = *cit;
         const EntityHandle* connec = NULL;
@@ -1724,20 +1725,20 @@ ErrorCode IntxUtils::remove_duplicate_vertices(Interface* mb, EntityHandle file_
             EntityHandle newCell;
             rval = mb->create_element( type, &newConnec[0], new_size, newCell );MB_CHK_SET_ERR( rval, "Failed to create new cell" );
             // set the old id to the new element
-            newCells.insert(newCell);
-            double value; // use the same value to reset the tags, even if the tags are int (like Global ID)
-            for (size_t i=0; i<tagList.size(); i++)
+            newCells.insert( newCell );
+            double value;  // use the same value to reset the tags, even if the tags are int (like Global ID)
+            for( size_t i = 0; i < tagList.size(); i++ )
             {
-                rval = mb->tag_get_data( tagList[i], &cell, 1, (void*)(&value) );MB_CHK_SET_ERR( rval, "Failed to get tag value" );
-                rval = mb->tag_set_data( tagList[i], &newCell, 1, (void*)(&value) );MB_CHK_SET_ERR( rval, "Failed to set tag value on new cell" );
+                rval = mb->tag_get_data( tagList[i], &cell, 1, (void*)( &value ) );MB_CHK_SET_ERR( rval, "Failed to get tag value" );
+                rval = mb->tag_set_data( tagList[i], &newCell, 1, (void*)( &value ) );MB_CHK_SET_ERR( rval, "Failed to set tag value on new cell" );
             }
         }
     }
 
-    rval = mb->remove_entities(file_set, modifiedCells); MB_CHK_SET_ERR( rval, "Failed to remove old cells from file set" );
-    rval = mb->delete_entities( modifiedCells ); MB_CHK_SET_ERR( rval, "Failed to delete old cells" );
-    rval = mb->add_entities(file_set, newCells); MB_CHK_SET_ERR( rval, "Failed to add new cells to file set" );
-    rval = mb->add_entities(file_set, verts); MB_CHK_SET_ERR( rval, "Failed to add verts to the file set" );
+    rval = mb->remove_entities( file_set, modifiedCells );MB_CHK_SET_ERR( rval, "Failed to remove old cells from file set" );
+    rval = mb->delete_entities( modifiedCells );MB_CHK_SET_ERR( rval, "Failed to delete old cells" );
+    rval = mb->add_entities( file_set, newCells );MB_CHK_SET_ERR( rval, "Failed to add new cells to file set" );
+    rval = mb->add_entities( file_set, verts );MB_CHK_SET_ERR( rval, "Failed to add verts to the file set" );
 
     return MB_SUCCESS;
 }
