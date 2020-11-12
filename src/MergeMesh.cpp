@@ -131,19 +131,15 @@ ErrorCode MergeMesh::merge_all( EntityHandle meshset, const double merge_tol )
     AdaptiveKDTree kd( mbImpl );
     EntityHandle tree_root;
     rval = kd.build_tree( verts, &tree_root );MB_CHK_ERR( rval );
-    std::cout << " build kd tree \n";
     // find matching vertices, mark them
     rval = find_merged_to( tree_root, kd, mbMergeTag );MB_CHK_ERR( rval );
-    std::cout << " find merged to \n";
 
     rval = perform_merge( mbMergeTag );MB_CHK_ERR( rval );
-    std::cout << " performed merge \n";
 
     if( deadEnts.size() != 0 )
     {
         rval = merge_higher_dimensions( entities );MB_CHK_ERR( rval );
     }
-    std::cout << " merged higher dimensions \n";
     return MB_SUCCESS;
 }
 ErrorCode MergeMesh::perform_merge( Tag merge_tag )
