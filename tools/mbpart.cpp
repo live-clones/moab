@@ -534,7 +534,7 @@ int main( int argc, char* argv[] )
             }
             EntityHandle slaveset;
             rval = mb.create_meshset( moab::MESHSET_SET, slaveset );MB_CHK_SET_ERR( rval, "Can't create new set" );
-            rval = mb.load_file( slave_file_name.c_str(), &slaveset, options );
+            rval = mb.load_file( slave_file_name.c_str(), &slaveset, options );MB_CHK_SET_ERR( rval, "Can't load slave mesh" );
             if( rescale_spherical_radius )
             {
                 double points[6];

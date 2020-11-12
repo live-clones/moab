@@ -579,7 +579,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
     {
         // distribute the cells to 6 planes, based on the center
         Range subranges[6];
-        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
+        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); ++it)
         {
             CartVect center;
             EntityHandle cell=*it;
