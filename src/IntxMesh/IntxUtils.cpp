@@ -536,7 +536,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
     if (!partSets.empty())
     {
         // get all cells, and assign parts
-        for (Range::iterator setIt = partSets.begin(); setIt!=partSets.end(); setIt++)
+        for (Range::iterator setIt = partSets.begin(); setIt!=partSets.end(); ++setIt)
         {
             EntityHandle pSet = *setIt;
             Range ents;
@@ -549,7 +549,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
             rval = mb->tag_set_data(part_tag, &newPartSet, 1, &val); MB_CHK_ERR( rval);
             newPartSets[val] = newPartSet;
             rval = mb->add_entities(outSet, &newPartSet, 1); MB_CHK_ERR( rval);
-            for (Range::iterator it=ents.begin(); it!=ents.end(); it++)
+            for (Range::iterator it=ents.begin(); it!=ents.end(); ++it)
             {
                 partsAssign[*it] = val;
             }
@@ -557,7 +557,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
     }
 
     if (centers_only)
-        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); it++)
+        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); ++it)
         {
             CartVect center;
             EntityHandle cell=*it;
@@ -593,7 +593,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
             Range verts;
             rval = mb->get_connectivity(subranges[i-1], verts);MB_CHK_ERR(rval);
             std::map<EntityHandle, EntityHandle> corr;
-            for (Range::iterator vt=verts.begin(); vt!=verts.end(); vt++)
+            for (Range::iterator vt=verts.begin(); vt!=verts.end(); ++vt)
             {
                 CartVect vect;
                 EntityHandle v=*vt;
@@ -607,7 +607,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
                 corr[v] = vertex;// for new connectivity
             }
             EntityHandle new_conn[20]; //max edges in 2d ?
-            for (Range::iterator eit=subranges[i-1].begin(); eit!=subranges[i-1].end(); eit++)
+            for (Range::iterator eit=subranges[i-1].begin(); eit!=subranges[i-1].end(); ++eit)
             {
                 EntityHandle eh = *eit;
                 const EntityHandle * conn=NULL;
