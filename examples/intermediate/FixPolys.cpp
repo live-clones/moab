@@ -50,7 +50,7 @@ int main( int argc, char** argv )
 
     Tag gidTag = mb.globalId_tag();
     Range OldCells;
-    for( Range::iterator it = elems.begin(); it != elems.end(); it++ )
+    for( Range::iterator it = elems.begin(); it != elems.end(); ++it )
     {
         EntityHandle cell = *it;
         const EntityHandle* conn;
