@@ -402,7 +402,7 @@ ErrorCode GeomTopoTool::construct_obb_tree( EntityHandle eh )
     rval = mdbImpl->tag_get_data( geomTag, &eh, 1, &dim );MB_CHK_SET_ERR( rval, "Failed to get dimension" );
 
     // ensure that the rootSets vector is of the correct size
-    if( m_rootSets_vector && ( eh < setOffset || eh > setOffset + rootSets.size() ) )
+    if( m_rootSets_vector && ( eh < setOffset || eh >= setOffset + rootSets.size() ) )
     {
         rval = resize_rootSets();MB_CHK_SET_ERR( rval, "Error setting offset and sizing rootSets vector." );
     }
