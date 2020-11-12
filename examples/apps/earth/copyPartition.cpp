@@ -1,11 +1,11 @@
 /** @example copyPartition.cpp  copy partition info on a mesh file from a point cloud
  * this tool will take an existing h5m  phys grid partition file (point cloud) and copy the
- * partition information on a pg2 mesh file, for better viewing it with VisIt
+ * partition information on a pg2 mesh file, for better viewing with VisIt
  *
  * example of usage:
  * ./copyPartition -p AtmPhys.h5m -g wholeATM_PG2.h5m -o atm_PG2_part.h5m
  *
- * the *PG2" style atm mesh is available only for pg2 runs, something like
+ * the *PG2" style atm mesh is available in E3SM only for pg2 runs, something like
  *  --res ne30pg2_r05_oECv3_ICG --compset A_WCYCL1850S_CMIP6
  *  or
  *  --res ne4pg2_ne4pg2 --compset FC5AV1C-L
@@ -30,6 +30,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "output,o", "output mesh filename", &outfile );
 
     opts.parseCommandLine( argc, argv );
+
 
     std::cout << "phys grid cloud file: " << physfile << "\n";
     std::cout << "pg2 mesh file: " << pg2file << "\n";
