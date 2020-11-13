@@ -518,7 +518,6 @@ int main( int argc, char* argv[] )
         if( moab_use_zoltan && moab_partition_slave && p == 0 )
         {
             t                = clock();
-            //spherical_coords = true;
             double master_radius, slave_radius;
             if( rescale_spherical_radius )
             {

@@ -478,153 +478,153 @@ ErrorCode IntxUtils::reverse_gnomonic_projection( const double& c1, const double
     return MB_SUCCESS;  // no error
 }
 
-void IntxUtils::gnomonic_unroll( double &c1, double &c2, double R, int plane )
+void IntxUtils::gnomonic_unroll( double& c1, double& c2, double R, int plane )
 {
     double tmp;
-    switch (plane) {
+    switch( plane )
+    {
         case 1:
-            break; //nothing
-        case 2: // rotate + 90
+            break;  // nothing
+        case 2:     // rotate + 90
             tmp = c1;
-            c1 = -c2;
-            c2 = tmp;
-            c1 = c1 + 2*R;
+            c1  = -c2;
+            c2  = tmp;
+            c1  = c1 + 2 * R;
             break;
         case 3:
-            c1 = c1 + 4*R;
+            c1 = c1 + 4 * R;
             break;
-        case 4: // rotate with -90 x-> -y; y -> x
+        case 4:  // rotate with -90 x-> -y; y -> x
 
             tmp = c1;
-            c1 = c2;
-            c2 = -tmp;
-            c1 = c1 - 2*R;
+            c1  = c2;
+            c2  = -tmp;
+            c1  = c1 - 2 * R;
             break;
-        case 5: // South Pole
+        case 5:  // South Pole
             // rotate 180 then move to (-2, -2)
-            c1 = -c1 - 2.*R;
-            c2 = -c2 - 2.*R;
+            c1 = -c1 - 2. * R;
+            c2 = -c2 - 2. * R;
             break;
             ;
         case 6:  // North Pole
-            c1 = c1 - 2.*R;
-            c2 = c2 + 2.*R;
+            c1 = c1 - 2. * R;
+            c2 = c2 + 2. * R;
             break;
     }
     return;
 }
 // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
-ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only, EntityHandle & outSet )
+ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only,
+                                                 EntityHandle& outSet )
 {
-    std::string parTagName("PARALLEL_PARTITION");
+    std::string parTagName( "PARALLEL_PARTITION" );
     Tag part_tag;
-    ErrorCode rval =
-        mb->tag_get_handle( parTagName.c_str(),part_tag );
+    ErrorCode rval = mb->tag_get_handle( parTagName.c_str(), part_tag );
     Range partSets;
-    if (part_tag!=0)
+    if( MB_SUCCESS == rval && part_tag != 0 )
     {
-        rval = mb->get_entities_by_type_and_tag( inSet, MBENTITYSET, &part_tag, NULL, 1, partSets, Interface::UNION );MB_CHK_ERR( rval);
+        rval = mb->get_entities_by_type_and_tag( inSet, MBENTITYSET, &part_tag, NULL, 1, partSets, Interface::UNION );MB_CHK_ERR( rval );
     }
-    rval = ScaleToRadius(mb, inSet, 1.0);MB_CHK_ERR( rval);
+    rval = ScaleToRadius( mb, inSet, 1.0 );MB_CHK_ERR( rval );
     // Get all entities of dimension 2
-    Range inputRange; // get
-    rval = mb->get_entities_by_dimension( inSet, 1, inputRange );MB_CHK_ERR( rval);
-    rval = mb->get_entities_by_dimension( inSet, 2, inputRange );MB_CHK_ERR( rval);
+    Range inputRange;  // get
+    rval = mb->get_entities_by_dimension( inSet, 1, inputRange );MB_CHK_ERR( rval );
+    rval = mb->get_entities_by_dimension( inSet, 2, inputRange );MB_CHK_ERR( rval );
 
-    std::map<EntityHandle, int> partsAssign;
-    std::map<int, EntityHandle> newPartSets;
-    if (!partSets.empty())
+    std::map< EntityHandle, int > partsAssign;
+    std::map< int, EntityHandle > newPartSets;
+    if( !partSets.empty() )
     {
         // get all cells, and assign parts
-        for (Range::iterator setIt = partSets.begin(); setIt!=partSets.end(); ++setIt)
+        for( Range::iterator setIt = partSets.begin(); setIt != partSets.end(); ++setIt )
         {
             EntityHandle pSet = *setIt;
             Range ents;
-            rval = mb->get_entities_by_handle(pSet, ents); MB_CHK_ERR( rval);
+            rval = mb->get_entities_by_handle( pSet, ents );MB_CHK_ERR( rval );
             int val;
-            rval = mb->tag_get_data(part_tag, &pSet, 1, &val); MB_CHK_ERR( rval);
+            rval = mb->tag_get_data( part_tag, &pSet, 1, &val );MB_CHK_ERR( rval );
             // create a new set with the same part id tag, in the outSet
             EntityHandle newPartSet;
             rval = mb->create_meshset( MESHSET_SET, newPartSet );MB_CHK_ERR( rval );
-            rval = mb->tag_set_data(part_tag, &newPartSet, 1, &val); MB_CHK_ERR( rval);
+            rval = mb->tag_set_data( part_tag, &newPartSet, 1, &val );MB_CHK_ERR( rval );
             newPartSets[val] = newPartSet;
-            rval = mb->add_entities(outSet, &newPartSet, 1); MB_CHK_ERR( rval);
-            for (Range::iterator it=ents.begin(); it!=ents.end(); ++it)
+            rval             = mb->add_entities( outSet, &newPartSet, 1 );MB_CHK_ERR( rval );
+            for( Range::iterator it = ents.begin(); it != ents.end(); ++it )
             {
                 partsAssign[*it] = val;
             }
         }
     }
 
-    if (centers_only)
-        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); ++it)
+    if( centers_only )
+        for( Range::iterator it = inputRange.begin(); it != inputRange.end(); ++it )
         {
             CartVect center;
-            EntityHandle cell=*it;
-            rval = mb->get_coords(&cell, 1, center.array()); MB_CHK_ERR(rval);
+            EntityHandle cell = *it;
+            rval              = mb->get_coords( &cell, 1, center.array() );MB_CHK_ERR( rval );
             int plane;
             decide_gnomonic_plane( center, plane );
             double c[3];
             c[2] = 0.;
             gnomonic_projection( center, R, plane, c[0], c[1] );
 
-            gnomonic_unroll( c[0], c[1] , R, plane );
+            gnomonic_unroll( c[0], c[1], R, plane );
 
             EntityHandle vertex;
-            rval = mb->create_vertex(c, vertex); MB_CHK_ERR(rval);
-            rval = mb->add_entities(outSet, &vertex, 1); MB_CHK_ERR(rval);
-
+            rval = mb->create_vertex( c, vertex );MB_CHK_ERR( rval );
+            rval = mb->add_entities( outSet, &vertex, 1 );MB_CHK_ERR( rval );
         }
     else
     {
         // distribute the cells to 6 planes, based on the center
         Range subranges[6];
-        for (Range::iterator it=inputRange.begin(); it!= inputRange.end(); ++it)
+        for( Range::iterator it = inputRange.begin(); it != inputRange.end(); ++it )
         {
             CartVect center;
-            EntityHandle cell=*it;
-            rval = mb->get_coords(&cell, 1, center.array()); MB_CHK_ERR(rval);
+            EntityHandle cell = *it;
+            rval              = mb->get_coords( &cell, 1, center.array() );MB_CHK_ERR( rval );
             int plane;
             decide_gnomonic_plane( center, plane );
-            subranges[plane-1].insert(cell);
+            subranges[plane - 1].insert( cell );
         }
-        for (int i=1; i<=6; i++)
+        for( int i = 1; i <= 6; i++ )
         {
             Range verts;
-            rval = mb->get_connectivity(subranges[i-1], verts);MB_CHK_ERR(rval);
-            std::map<EntityHandle, EntityHandle> corr;
-            for (Range::iterator vt=verts.begin(); vt!=verts.end(); ++vt)
+            rval = mb->get_connectivity( subranges[i - 1], verts );MB_CHK_ERR( rval );
+            std::map< EntityHandle, EntityHandle > corr;
+            for( Range::iterator vt = verts.begin(); vt != verts.end(); ++vt )
             {
                 CartVect vect;
-                EntityHandle v=*vt;
-                rval = mb->get_coords(&v, 1, vect.array()); MB_CHK_ERR(rval);
+                EntityHandle v = *vt;
+                rval           = mb->get_coords( &v, 1, vect.array() );MB_CHK_ERR( rval );
                 double c[3];
                 c[2] = 0.;
                 gnomonic_projection( vect, R, i, c[0], c[1] );
-                gnomonic_unroll( c[0], c[1] , R, i );
+                gnomonic_unroll( c[0], c[1], R, i );
                 EntityHandle vertex;
-                rval = mb->create_vertex(c, vertex); MB_CHK_ERR(rval);
-                corr[v] = vertex;// for new connectivity
+                rval = mb->create_vertex( c, vertex );MB_CHK_ERR( rval );
+                corr[v] = vertex;  // for new connectivity
             }
-            EntityHandle new_conn[20]; //max edges in 2d ?
-            for (Range::iterator eit=subranges[i-1].begin(); eit!=subranges[i-1].end(); ++eit)
+            EntityHandle new_conn[20];  // max edges in 2d ?
+            for( Range::iterator eit = subranges[i - 1].begin(); eit != subranges[i - 1].end(); ++eit )
             {
-                EntityHandle eh = *eit;
-                const EntityHandle * conn=NULL;
+                EntityHandle eh          = *eit;
+                const EntityHandle* conn = NULL;
                 int num_nodes;
-                rval = mb->get_connectivity(eh, conn, num_nodes);MB_CHK_ERR(rval);
+                rval = mb->get_connectivity( eh, conn, num_nodes );MB_CHK_ERR( rval );
                 // build a new vertex array
-                for (int i=0; i<num_nodes; i++)
+                for( int i = 0; i < num_nodes; i++ )
                     new_conn[i] = corr[conn[i]];
                 EntityType type = mb->type_from_handle( eh );
                 EntityHandle newCell;
-                rval = mb->create_element(type, new_conn, num_nodes, newCell); MB_CHK_ERR(rval);
-                rval = mb->add_entities(outSet, &newCell, 1); MB_CHK_ERR(rval);
-                std::map<EntityHandle, int>::iterator mit=partsAssign.find(eh);
-                if (mit != partsAssign.end())
+                rval = mb->create_element( type, new_conn, num_nodes, newCell );MB_CHK_ERR( rval );
+                rval = mb->add_entities( outSet, &newCell, 1 );MB_CHK_ERR( rval );
+                std::map< EntityHandle, int >::iterator mit = partsAssign.find( eh );
+                if( mit != partsAssign.end() )
                 {
                     int val = mit->second;
-                    rval = mb->add_entities(newPartSets[val], &newCell, 1); MB_CHK_ERR(rval);
+                    rval    = mb->add_entities( newPartSets[val], &newCell, 1 );MB_CHK_ERR( rval );
                 }
             }
         }
@@ -632,12 +632,12 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
 
     return MB_SUCCESS;
 }
-void IntxUtils::transform_coordinates(double * avg_position, int projection_type)
+void IntxUtils::transform_coordinates( double* avg_position, int projection_type )
 {
     if( projection_type == 1 )
     {
-        double R = avg_position[0] * avg_position[0] + avg_position[1] * avg_position[1] +
-                   avg_position[2] * avg_position[2];
+        double R =
+            avg_position[0] * avg_position[0] + avg_position[1] * avg_position[1] + avg_position[2] * avg_position[2];
         R               = sqrt( R );
         double lat      = asin( avg_position[2] / R );
         double lon      = atan2( avg_position[1], avg_position[0] );
@@ -645,15 +645,15 @@ void IntxUtils::transform_coordinates(double * avg_position, int projection_type
         avg_position[1] = lat;
         avg_position[2] = R;
     }
-    else if (projection_type == 2) // gnomonic projection
+    else if( projection_type == 2 )  // gnomonic projection
     {
-        CartVect pos(avg_position);
+        CartVect pos( avg_position );
         int gplane;
         IntxUtils::decide_gnomonic_plane( pos, gplane );
 
         IntxUtils::gnomonic_projection( pos, 1.0, gplane, avg_position[0], avg_position[1] );
-        avg_position[2]=0;
-        IntxUtils::gnomonic_unroll(avg_position[0], avg_position[1], 1.0, gplane );
+        avg_position[2] = 0;
+        IntxUtils::gnomonic_unroll( avg_position[0], avg_position[1], 1.0, gplane );
     }
 }
 /*
