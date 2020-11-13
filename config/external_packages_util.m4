@@ -321,7 +321,7 @@ AC_DEFUN([CLONE_SOURCE_REPOSITORY],
     else
       eval "rm -rf $4" # Can't clone into an existing directory
       PREFIX_PRINT([ *      Git: $1 package downloading to $4  ])
-      op_downloadlog$1="`git clone --quiet -b $gitbranch $2 $4`"
+      op_downloadlog$1="`git clone --single-branch --quiet --branch $gitbranch $2 $4`"
       eval "cd $4 && git rev-parse HEAD > $4/HEAD_HASH && cd $currdir"
       filedownloaded=yes
       new_download=true
@@ -397,7 +397,7 @@ AC_DEFUN([CHECK_SOURCE_RECOMPILATION_HASH],
 [
   PREFIX_PRINTN([Checking whether $1 sources need compilation and installation... ])
   defaultshasum="0"
-  if (test "x$pkg_download_url" != "xmaster"); then
+  if (test "x$pkg_sourced_tarball" != "xno"); then
     # Compute the hash of the source directory - Recompile only if sources have changed
     # ac_cv_sha_moabcpp="`find $moab_src_dir -name '*.cpp' \( -exec $HASHPRGM "$PWD"/{} \; -o -print \) | $HASHPRGM | cut -d ' ' -f1`"
     # defaultshasum="`find $2 -type f -regex '.*\(hpp\|cpp\|c\|h\|f\|f90\)$' \( -exec $HASHPRGM {} \; -o -print \) | $HASHPRGM | cut -d ' ' -f1`"
@@ -506,15 +506,22 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
 
 	  MSG_ECHO_SEPARATOR
 
-    if (test "x$pkg_download_url" != "xmaster"); then
+    pkg_sourced_tarball=no
+    case "$pkg_download_url" in
+      master) pkg_repo_branch="master" ;;
+      git:*)  pkg_repo_branch="${pkg_download_url:4}" ;;
+      *) pkg_repo_branch=""; pkg_sourced_tarball=yes ;;
+    esac
+
+    if (test "x$pkg_repo_branch" != "x"); then
+      # Clone the repository
+      CLONE_SOURCE_REPOSITORY([$1], [$pkg_repo_url], [$pkg_repo_branch], [$pkg_srcdir/${pkg_repo_branch//\//_}])
+    else
       # Check if we need to download an archive file
       DOWNLOAD_EXTERNAL_PACKAGE([$1], [$pkg_download_url], [$MOAB_PACKAGES_DIR/$pkg_archive_name])
       
       # Deflate the archive file containing the sources, if needed
       DEFLATE_EXTERNAL_PACKAGE([$1], [$MOAB_PACKAGES_DIR/$pkg_archive_name], [$pkg_srcdir])
-    else
-      # Clone the repository
-      CLONE_SOURCE_REPOSITORY([$1], [$pkg_repo_url], [$pkg_repo_branch], [$pkg_srcdir/$pkg_repo_branch])
     fi
 
     # Invoke the package specific configuration and build commands
