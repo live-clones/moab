@@ -16,22 +16,23 @@
      (for typical cases, should be the allocated length)
 */
 
-/*
-
-1) Fortran MPI_Comm won't work. Take an integer argument and use MPI_F2C calls to get the C-Comm object
-2) ReadHeaderInfo - Does it need the pid ?
-3) Reuse the comm object form the registration for both load and write ops. Do not take comm objects again to avoid
-confusion. 4) Decipher the global comm object and the subset partioning for each application based on the comm object 5)
-GetMeshInfo - return separately the owned and ghosted vertices/elements -- not together in visible_** but rather
-owned_** and ghosted_**. Make these arrays of size 2. 6) Should we sort the vertices after we do ghosting ? So that the
-locally owned is first and then the ghosted is appended. 7) RCM only for hte owned part of the mesh -- do not screw with
-the ghosted layers 8) GetBlockID - identical to GetVertexID -- return the global numberign for block 9) GetVertexID --
-remember that the order of vertices returned have an implicit numbering embedded in it. DO NOT CHANGE THIS ORDERING...
-10) GetBlockInfo takes global Block ID; Remove blockname unless there is a separate use case for it..
-11) GetElementConnectivity - clarify whether we return global or local vertex numbering. Preferably local numbering else
-lot of deciphering for global.
+/** \Notes
+  1) Fortran MPI_Comm won't work. Take an integer argument and use MPI_F2C calls to get the C-Comm object
+  2) ReadHeaderInfo - Does it need the pid ?
+  3) Reuse the comm object from the registration for both load and write operations.
+     Do not take comm objects again to avoid confusion and retain consistency.
+  4) Decipher the global comm object and the subset partioning for each application based on the comm object
+  5) GetMeshInfo - return separately the owned and ghosted vertices/elements -- not together in visible_** but rather
+     owned_** and ghosted_**. Make these arrays of size 2.
+  6) Should we sort the vertices after ghosting, such that the locally owned is first, and the ghosted appended next.
+  7) RCM only for the owned part of the mesh -- do not screw with the ghosted layers
+  8) GetBlockID - identical to GetVertexID -- return the global numbering for block
+  9) GetVertexID -- remember that the order of vertices returned have an implicit numbering embedded in it.
+     DO NOT CHANGE THIS ORDERING...
+  10) GetBlockInfo takes global Block ID; Remove blockname unless there is a separate use case for it..
+  11) GetElementConnectivity - clarify whether we return global or local vertex numbering.
+      Preferably local numbering else lot of deciphering for global.
 */
-
 #include "imoab_protos.h"
 
 #define iMOAB_AppID    int*

@@ -2510,8 +2510,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
     rval = context.MBI->tag_get_handle( "frac", tag );
     if( tag && rval == MB_SUCCESS ) tagsList.push_back( tag );
     double tol = 1.0e-9;
-    rval       = IntxUtils::remove_duplicate_vertices( context.MBI, data.file_set, tol, tagsList );
-    if( rval != MB_SUCCESS ) return 1;
+    rval       = IntxUtils::remove_duplicate_vertices( context.MBI, data.file_set, tol, tagsList );CHKERRVAL( rval );
 
     // clean material sets of cells that were deleted
     rval = context.MBI->get_entities_by_type_and_tag( data.file_set, MBENTITYSET, &( context.material_tag ), 0, 1,
@@ -2521,28 +2520,22 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
     {
         EntityHandle matSet = data.mat_sets[0];
         Range elems;
-        rval = context.MBI->get_entities_by_dimension( matSet, 2, elems );
-        if( rval != MB_SUCCESS ) return 1;
-        rval = context.MBI->remove_entities( matSet, elems );
-        if( rval != MB_SUCCESS ) return 1;
+        rval = context.MBI->get_entities_by_dimension( matSet, 2, elems );CHKERRVAL( rval );
+        rval = context.MBI->remove_entities( matSet, elems );CHKERRVAL( rval );
         // put back only cells from data.file_set
         elems.clear();
-        rval = context.MBI->get_entities_by_dimension( data.file_set, 2, elems );
-        if( rval != MB_SUCCESS ) return 1;
-        rval = context.MBI->add_entities( matSet, elems );
-        if( rval != MB_SUCCESS ) return 1;
+        rval = context.MBI->get_entities_by_dimension( data.file_set, 2, elems );CHKERRVAL( rval );
+        rval = context.MBI->add_entities( matSet, elems );CHKERRVAL( rval );
     }
     int ierr = iMOAB_UpdateMeshInfo( pid );
     if( ierr > 0 ) return ierr;
     ParallelMergeMesh pmm( pco, tol );
     rval = pmm.merge( data.file_set,
                       /* do not do local merge*/ false,
-                      /*  2d cells*/ 2 );
-    if( rval != MB_SUCCESS ) return 1;
+                      /*  2d cells*/ 2 );CHKERRVAL( rval );
 
     // assign global ids only for vertices, cells have them fine
-    rval = pco->assign_global_ids( data.file_set, /*dim*/ 0 );
-    if( rval != MB_SUCCESS ) return 1;
+    rval = pco->assign_global_ids( data.file_set, /*dim*/ 0 );CHKERRVAL( rval );
 
     // set the partition tag on the file set
     Tag part_tag;
