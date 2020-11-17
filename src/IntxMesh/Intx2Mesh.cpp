@@ -339,7 +339,7 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
     {
         // basically, the sag for an arc of length max_length on a circle of radius 1
         tolerance = 1. - sqrt( 1 - max_length * max_length / 4 );
-        tolerance = 2 * tolerance;  // why ?
+        tolerance = 3 * tolerance;  // why ?
         if( !my_rank )
             std::cout << " max edge length: " << max_length << "  tolerance for kd tree: " << tolerance << "\n";
     }
