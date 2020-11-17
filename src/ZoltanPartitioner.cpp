@@ -2220,7 +2220,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
             std::copy( neighbors, neighbors + size_adjs, std::back_inserter( adjacencies ) );
             std::copy( neib_proc, neib_proc + size_adjs, std::back_inserter( nbor_proc ) );
         }
-        else if( 2 == met )
+        else if( 2 <= met ) // include 2 RCB or 3, RCB + gnomonic projection
         {
             if( TYPE_FROM_HANDLE( cell ) == MBVERTEX )
             {
@@ -2229,6 +2229,10 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
             else
             {
                 rval = mtu.get_average_position( cell, avg_position );MB_CHK_ERR( rval );
+            }
+            if (3 == met)
+            {
+                IntxUtils::transform_coordinates(avg_position, 2); // 2 means gnomonic projection
             }
             std::copy( avg_position, avg_position + 3, std::back_inserter( coords ) );
         }
@@ -2287,7 +2291,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
     myZZ->Set_Num_Obj_Fn( mbGetNumberOfAssignedObjects, NULL );
     myZZ->Set_Obj_List_Fn( mbGetObjectList, NULL );
     // due to a bug in zoltan, if method is graph partitioning, do not pass coordinates!!
-    if( 2 == met )
+    if( 2 == met || 3 == met )
     {
         myZZ->Set_Num_Geom_Fn( mbGetObjectSize, NULL );
         myZZ->Set_Geom_Multi_Fn( mbGetObject, NULL );
