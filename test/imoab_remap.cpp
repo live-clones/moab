@@ -208,7 +208,7 @@ int main( int argc, char* argv[] )
     CHECKIERR( ierr, "failed to compute point-cloud mapping LND-ATM" );
 
     /* We have the mesh intersection now. Let us compute the remapping weights */
-    fNoConserve = 1;
+    fNoConserve = 0;
     /* Compute the weights to preoject the solution from ATM component to OCN compoenent */
     ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[0], disc_methods[0], &disc_orders[0],
                                                  disc_methods[1], &disc_orders[1], &fMonotoneTypeID, &fVolumetric,
