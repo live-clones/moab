@@ -520,8 +520,8 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
 {
     std::string parTagName( "PARALLEL_PARTITION" );
     Tag part_tag;
-    ErrorCode rval = mb->tag_get_handle( parTagName.c_str(), part_tag );
     Range partSets;
+    ErrorCode rval = mb->tag_get_handle( parTagName.c_str(), part_tag );
     if( MB_SUCCESS == rval && part_tag != 0 )
     {
         rval = mb->get_entities_by_type_and_tag( inSet, MBENTITYSET, &part_tag, NULL, 1, partSets, Interface::UNION );MB_CHK_ERR( rval );
@@ -558,6 +558,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
     }
 
     if( centers_only )
+    {
         for( Range::iterator it = inputRange.begin(); it != inputRange.end(); ++it )
         {
             CartVect center;
@@ -575,6 +576,7 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
             rval = mb->create_vertex( c, vertex );MB_CHK_ERR( rval );
             rval = mb->add_entities( outSet, &vertex, 1 );MB_CHK_ERR( rval );
         }
+    }
     else
     {
         // distribute the cells to 6 planes, based on the center
