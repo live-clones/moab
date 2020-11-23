@@ -1,7 +1,10 @@
 #include "NCHelperDomain.hpp"
 #include "moab/FileOptions.hpp"
 #include "moab/ReadUtilIface.hpp"
-
+#include "moab/IntxMesh/IntxUtils.hpp"
+#ifdef MOAB_HAVE_MPI
+#include "moab/ParallelMergeMesh.hpp"
+#endif
 #include <cmath>
 #include <sstream>
 
@@ -438,10 +441,35 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
         index++;
     }
 
-    // Add new vertices and quads to current file set
-    faces.merge( tmp_range );
-    tmp_range.insert( start_vertex, start_vertex + nLocalVertices - 1 );
     rval = mbImpl->add_entities( _fileSet, tmp_range );MB_CHK_SET_ERR( rval, "Failed to add new cells to current file set" );
+
+    // modify local file set, to merge coincident vertices, and to correct repeated vertices in elements
+    std::vector< Tag > tagList;
+    tagList.push_back( mGlobalIdTag );
+    tagList.push_back( xcTag );
+    tagList.push_back( ycTag );
+    tagList.push_back( areaTag );
+    tagList.push_back( fracTag );
+    double tol = 1.e-9;
+    rval       = IntxUtils::remove_duplicate_vertices( mbImpl, _fileSet, tol, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
+
+    rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_ERR( rval );
+    Range all_verts;
+    rval = mbImpl->get_connectivity( faces, all_verts );MB_CHK_ERR( rval );
+    rval = mbImpl->add_entities( _fileSet, all_verts );MB_CHK_ERR( rval );
+#ifdef MOAB_HAVE_MPI
+    ParallelComm*& myPcomm = _readNC->myPcomm;
+    if( myPcomm )
+    {
+        ParallelMergeMesh pmm( myPcomm, tol );
+        rval = pmm.merge( _fileSet,
+                          /* do not do local merge*/ false,
+                          /*  2d cells*/ 2 );MB_CHK_SET_ERR( rval, "Failed to merge vertices in parallel" );
+
+        // assign global ids only for vertices, cells have them fine
+        rval = myPcomm->assign_global_ids( _fileSet, /*dim*/ 0 );MB_CHK_ERR( rval );
+    }
+#endif
 
     return MB_SUCCESS;
 }
