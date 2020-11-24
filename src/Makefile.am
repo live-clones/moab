@@ -300,10 +300,11 @@ intxmeshinclude_HEADERS = \
 if ENABLE_mbtempest
 MOAB_REMAPPING_SRCS =
 
-MOAB_REMAPPING_HDRS = \
-	moab/Remapping/Remapper.hpp
+MOAB_REMAPPING_HDRS = moab/Remapping/Remapper.hpp
 
 AM_CPPFLAGS += -I$(srcdir)/Remapping
+
+EXTRA_DIST += Remapping/netcdfcpp_par.hpp
 
 if HAVE_TEMPESTREMAP
   AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
