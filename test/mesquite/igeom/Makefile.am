@@ -31,4 +31,4 @@ main$(EXEEXT):
 	echo "ITAPS support disabled.  Reconfigure to build this test."
 endif
 
-MOSTLYCLEANFILES =	
+DISTCLEANFILES = a.out
