@@ -60,7 +60,7 @@ include/Mesquite_all_headers.hpp: $(MSQ_HDRS)
 	@echo '#endif'                                  >> $@
 
 MOSTLYCLEANFILES = $(BUILT_SOURCES)
-DISTCLEANFILES = $(OLD_AM_GENERATED_HDRS)
+DISTCLEANFILES = $(OLD_AM_GENERATED_HDRS) a.out
 
 EXTRA_DIST = CMakeLists.txt
 

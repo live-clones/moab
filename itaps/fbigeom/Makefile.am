@@ -81,4 +81,5 @@ install-data-hook:
 	$(AM_V_at)echo "MOAB_LIBDIR=${libdir}" >> $(DESTDIR)$(cfgdir)/FBiGeom-Defs.inc
 
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out
 

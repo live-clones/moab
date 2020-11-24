@@ -17,3 +17,4 @@ setup_SOURCES = setup.cpp
 setup_DEPENDENCIES = $(LDADD)
 TESTS = main
 EXTRA_DIST = CMakeLists.txt input.vtk
+DISTCLEANFILES = a.out

@@ -31,3 +31,5 @@ h5portable_SOURCES = h5portable.cpp
 
 dump_sets_SOURCES = dump_sets.c
 dump_sets_LDADD = $(top_builddir)/src/io/mhdf/libmhdf.la
+
+DISTCLEANFILES = a.out

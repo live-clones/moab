@@ -31,3 +31,4 @@ EXTRA_DIST = CMakeLists.txt \
 	     triPart.vtk
 
 MOSTLYCLEANFILES = smooth_ho.vtk
+DISTCLEANFILES = a.out

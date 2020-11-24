@@ -116,3 +116,4 @@ MOSTLYCLEANFILES = dumped_acis.sat \
                    test_homme_T.nc \
                    test_mpas_vars.nc \
                    rtttest.rtt
+DISTCLEANFILES = a.out

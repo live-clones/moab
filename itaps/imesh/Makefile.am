@@ -111,3 +111,5 @@ LTPPF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
    $(AM_FFLAGS) $(FFLAGS)
 
 include $(abs_top_builddir)/itaps/imesh/iMesh-Defs.inc
+
+DISTCLEANFILES = a.out

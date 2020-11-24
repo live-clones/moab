@@ -134,4 +134,5 @@ if ENABLE_fbigeom
 endif
 
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out
 

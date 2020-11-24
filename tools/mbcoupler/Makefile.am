@@ -60,3 +60,4 @@ LOG_COMPILER = `if echo "$(PARALLEL_TESTS)" | $(GREP) "$$p" > /dev/null; then ec
 
 EXTRA_DIST = CMakeLists.txt
 MOSTLYCLEANFILES = dum.h5m
+DISTCLEANFILES = a.out

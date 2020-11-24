@@ -46,4 +46,5 @@ cub2h5m_SOURCES = cub2h5m.cpp quads_to_tris.cpp quads_to_tris.hpp
 cub2h5m_LDADD = $(top_builddir)/src/libMOAB.la
 
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out
 

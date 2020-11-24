@@ -179,4 +179,5 @@ libmoabio_la_includedir = $(includedir)
 nobase_libmoabio_la_include_HEADERS = moab/ExoIIInterface.hpp moab/VtkUtil.hpp
 
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out
 

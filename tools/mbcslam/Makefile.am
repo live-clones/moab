@@ -82,3 +82,4 @@ MOSTLYCLEANFILES = intersect1.h5m \
                    SpanEdges0.h5m \
                    SpanQuads0.h5m
 
+DISTCLEANFILES = a.out
