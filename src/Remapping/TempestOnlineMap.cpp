@@ -1507,8 +1507,11 @@ static void print_progress( const int barWidth, const float progress, const char
     std::cout.flush();
 }
 
-moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
-                                                         bool row_major_ownership )
+///////////////////////////////////////////////////////////////////////////////
+
+moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
+                                                         const std::vector< int >& owned_dof_ids,
+                                                         bool /* row_major_ownership */ )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -1568,7 +1571,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
     }
 
-    const int nTotalBytes = nS * nNNZBytes;
+    // const int nTotalBytes = nS * nNNZBytes;
     int nEntriesRemaining = nS;
     int nBufferedReads    = static_cast< int >( ceil( nS * ( 1.0 / nMaxEntries ) ) );
     int runData[6]        = { nA, nB, nVA, nVB, nS, nBufferedReads };
@@ -1591,6 +1594,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     // if owned_dof_ids = NULL, use the default trivial partitioning scheme
     if( is_root && owned_dof_ids.size() == 0 )
     {
+        // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
         rowOwnership.resize( size );
         int nGRowPerPart   = nB / size;
         int nGRowRemainder = nB % size;  // Keep the remainder in root
@@ -1855,6 +1859,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
     return moab::MB_SUCCESS;
 }
+
 
 moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputFile )
 {

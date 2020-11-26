@@ -14,6 +14,8 @@
 #ifdef MOAB_HAVE_TEMPESTREMAP
 #include "moab/Remapping/TempestRemapper.hpp"
 #include "OfflineMap.h"
+#else
+#error Re-configure with TempestRemap
 #endif
 
 #include <string>
@@ -86,7 +88,6 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     // moab::ErrorCode GenerateMetaData();
 
-  public:
     ///	<summary>
     ///		Read the OfflineMap from a NetCDF file.
     ///	</summary>
@@ -110,7 +111,6 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     moab::ErrorCode WriteParallelWeightsToFile( std::string filename );
 
-  public:
     ///	<summary>
     ///		Determine if the map is first-order accurate.
     ///	</summary>
@@ -328,6 +328,8 @@ class TempestOnlineMap : public OfflineMap
     moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag,
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
+  private:
+
 #ifdef MOAB_HAVE_MPI
     int rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,
                 DataArray1D< double > &  vecFaceArea,
@@ -340,7 +342,6 @@ class TempestOnlineMap : public OfflineMap
                 int & maxdof);
 #endif
 
-  public:
     ///	<summary>
     ///		The fundamental remapping operator object.
     ///	</summary>

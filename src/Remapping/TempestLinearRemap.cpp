@@ -288,7 +288,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector<unsigned
         int & maxdof)
 {
     // first decide maxdof, for partitioning
-    int localmax=0;
+    unsigned int localmax=0;
     for (unsigned i = 0; i < N; i++)
         if (gdofmap[i] > localmax)
             localmax = gdofmap[i];
