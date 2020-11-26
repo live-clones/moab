@@ -4,3 +4,4 @@ bin_PROGRAMS = mcnpmit
 mcnpmit_SOURCES = mcnpmit.hpp mcnpmit.cpp main.cpp
 mcnpmit_LDADD = $(top_builddir)/tools/mbcoupler/libmbcoupler.la $(top_builddir)/itaps/imesh/libiMesh.la $(top_builddir)/src/libMOAB.la
 
+DISTCLEANFILES = a.out

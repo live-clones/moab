@@ -33,3 +33,4 @@ EXTRA_DIST = CMakeLists.txt \
              sph-10-zsquare.vtk
 
 MOSTLYCLEANFILES = original_mesh.vtk smoothed_mesh.vtk
+DISTCLEANFILES = a.out

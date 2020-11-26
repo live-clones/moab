@@ -21,3 +21,4 @@ TESTS = $(PARALLEL_TESTS)
 LOG_COMPILER = `if echo "$(PARALLEL_TESTS)" | $(GREP) "$$p" > /dev/null; then echo "${MPIEXEC} ${MPIEXEC_NP} ${NP}"; else echo ""; fi`
 
 MOSTLYCLEANFILES = *.*.vtk
+DISTCLEANFILES = a.out

@@ -30,3 +30,5 @@ point_location_SOURCES = point_location.cpp
 elem_eval_time_SOURCES = elem_eval_time.cpp
 tree_searching_perf_SOURCES = tree_searching_perf.cpp
 sploc_searching_perf_SOURCES = sploc_searching_perf.cpp
+
+DISTCLEANFILES = a.out

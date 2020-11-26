@@ -8,3 +8,4 @@ LDADD = $(top_builddir)/src/libMOAB.la
 dual_test_DEPENDENCIES = $(LDADD)
 TESTS = dual_test
 MOSTLYCLEANFILES = dual.vtk
+DISTCLEANFILES = a.out

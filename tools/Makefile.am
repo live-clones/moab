@@ -224,3 +224,4 @@ mbintxchk_SOURCES = mbIntxCheck.cpp
 bin_PROGRAMS += mbslavepart
 mbslavepart_SOURCES = mbslavepart.cpp
 
+DISTCLEANFILES = a.out

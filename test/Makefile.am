@@ -291,6 +291,7 @@ CLEANFILES = mb_big_test.g \
              fIntxLndTarget.h5m \
              fIntxAtmTarget.h5m \
              fIntxOcnTarget.h5m
+DISTCLEANFILES = a.out
 
 # Utility target: build but don't run tests
 build-check:

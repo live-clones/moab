@@ -13,3 +13,5 @@ LDADD = $(top_builddir)/src/libMOAB.la
 obb_test_SOURCES = obb_test.cpp
 obb_time_SOURCES = obb_time.cpp
 obb_tree_tool_SOURCES = obb_tree_tool.cpp
+
+DISTCLEANFILES = a.out

@@ -38,3 +38,4 @@ endif
 MOSTLYCLEANFILES =	feasible-newton-result.vtk \
 			original.vtk \
 			smart-laplacian-result.vtk
+DISTCLEANFILES = a.out
