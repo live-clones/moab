@@ -290,7 +290,8 @@ CLEANFILES = mb_big_test.g \
              geom_w_obbs.h5m \
              fIntxLndTarget.h5m \
              fIntxAtmTarget.h5m \
-             fIntxOcnTarget.h5m
+             fIntxOcnTarget.h5m \
+             atm_ocn_map.nc
 DISTCLEANFILES = a.out
 
 # Utility target: build but don't run tests
