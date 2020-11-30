@@ -92,10 +92,6 @@ void test_tempest_create_meshes()
     }
 
 
-// Main inputs;
-//   1. Map Filename
-//   2. Ownership info from the processes to be gathered on root
-//   3.
 void read_buffered_map()
 {
     NcError error( NcError::silent_nonfatal );
@@ -104,8 +100,12 @@ void read_buffered_map()
     NcFile* ncMap = NULL;
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
 
+#ifdef MOAB_HAVE_MPI
     int mpierr = 0;
-
+#endif
+    // Main inputs;
+    //   1. Map Filename
+    //   2. Ownership info from the processes to be gathered on root
     const int nBufferSize = 64 * 1024;  // 64 KB
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
@@ -128,21 +128,19 @@ void read_buffered_map()
         // Source and Target mesh resolutions
         NcDim* dimNA = ncMap->get_dim( "n_a" );
         if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
+        else nA = dimNA->size();
 
         NcDim* dimNB = ncMap->get_dim( "n_b" );
         if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
-
-        nA = dimNA->size();
-        nB = dimNB->size();
+        else nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
         if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        else nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
         if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
-
-        nVA = dimNVA->size();
-        nVB = dimNVB->size();
+        else nVB = dimNVB->size();
 
         // Read SparseMatrix entries
         NcDim* dimNS = ncMap->get_dim( "n_s" );
@@ -165,7 +163,7 @@ void read_buffered_map()
         { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
     }
 
-    const int nTotalBytes = nS * nNNZBytes;
+    // const int nTotalBytes = nS * nNNZBytes;
     int nEntriesRemaining = nS;
     int nBufferedReads    = static_cast< int >( ceil( ( 1.0 * nS ) / ( 1.0 * nMaxEntries ) ) );
     int runData[6]        = { nA, nB, nVA, nVB, nS, nBufferedReads };
@@ -200,12 +198,11 @@ void read_buffered_map()
 
     // Let us declare the map object for every process
     OfflineMap mapRemap;
-    // SparseMatrix< double > sparseMatrix;
     SparseMatrix< double >& sparseMatrix = mapRemap.GetSparseMatrix();
 
     if( rank == rootProc )
-        printf( "Parameters: nNNZBytes = %d, nS = %d, nTotalBytes = %d, nBufferedReads = %d\n", nNNZBytes, nS,
-                nTotalBytes, nBufferedReads );
+        printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n", nA, nB, nVA,
+                nVB, nS, nNNZBytes, nBufferedReads );
 
     std::map< int, int > rowMap, colMap;
     int rindexMax = 0, cindexMax = 0;
@@ -262,12 +259,7 @@ void read_buffered_map()
                 }
 
                 assert( pOwner >= 0 && pOwner < nprocs );
-
                 dataPerProcess[pOwner].push_back( i );
-
-                // printf( "(%d, %d) = %f\n", vecRow[i], vecCol[i], vecS[i]);
-                // if( pOwner == rootProc )  // avoid actual communication if setting data on root proccess
-                //     sparseMatrix( vecRow[i], vecCol[i] ) = vecS[i];
             }
 
             offset += nLocSize;
@@ -275,9 +267,6 @@ void read_buffered_map()
 
             for( int ip = 0; ip < nprocs; ++ip )
                 nDataPerProcess[ip] = dataPerProcess[ip].size();
-
-            // Set the entries of the map on the root
-            // sparseMatrix.SetEntries( vecRow, vecCol, vecS );
         }
 
         // Communicate the number of DoF data to expect from root
@@ -309,8 +298,6 @@ void read_buffered_map()
                         dataRowCols[ij * 2]     = vecRow[dataPerProcess[ip][ij]];
                         dataRowCols[ij * 2 + 1] = vecCol[dataPerProcess[ip][ij]];
                         dataEntries[ij]         = vecS[dataPerProcess[ip][ij]];
-                        // printf( "%d: Sending (%d, %d) = %f\n", ij, dataRowCols[ij * 2], dataRowCols[ij * 2 + 1],
-                        //         dataEntries[ij] );
                     }
 
                     MPI_Request rcsend, dsend;
@@ -353,7 +340,6 @@ void read_buffered_map()
                 else
                     cindex = citer->second;
 
-                // printf( "(%d, %d) = %f\n", rindex, cindex, vecS[i]);
                 sparseMatrix( rindex, cindex ) = vecS[i];
             }
 
@@ -416,23 +402,18 @@ void read_buffered_map()
                         cindex = citer->second;
                     vecCol[i] = cindex;
 
-                    // printf( "(%d, %d) = %f\n", rindex, cindex, vecS[i]);
                     sparseMatrix( rindex, cindex ) = vecS[i];
                 }
 
                 // clear the local buffer
                 dataRowCols.clear();
-
-                // Now set the data received from root onto the sparse matrix
-                // sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
-
             }  // if( nEntriesComm > 0 )
         }      // if( rank != rootProc )
 
         MPI_Barrier( commW );
     }
 
-    if( rank == 0 )
+    if( rank == rootProc )
     {
         assert( nEntriesRemaining == 0 );
         ncMap->close();
@@ -669,11 +650,6 @@ void test_tempest_map_bcast()
         else
             cindex = citer - colMap.begin();
         dataCols[i] = cindex;
-
-        // if (rank == 1)
-        //     std::cout << i << " -- row,col,val = " << rindex << ", " << rowMap[rindex] << ", " << cindex << ", " <<
-        //     colMap[cindex] << ", " << dataEntries[i]
-        //               << std::endl;
     }
 
     // Now set the data received from root onto the sparse matrix

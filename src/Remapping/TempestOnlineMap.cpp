@@ -1515,12 +1515,14 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 {
     NcError error( NcError::silent_nonfatal );
 
+    const bool verbose = false;
     // Define our total buffer size to use
     NcFile* ncMap = NULL;
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
 
+#ifdef MOAB_HAVE_MPI
     int mpierr = 0;
-
+#endif
     const int nBufferSize = 256 * 1024;  // 256 KB
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
@@ -1538,21 +1540,19 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         // Source and Target mesh resolutions
         NcDim* dimNA = ncMap->get_dim( "n_a" );
         if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
+        else nA = dimNA->size();
 
         NcDim* dimNB = ncMap->get_dim( "n_b" );
         if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
-
-        nA = dimNA->size();
-        nB = dimNB->size();
+        else nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
         if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        else nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
         if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
-
-        nVA = dimNVA->size();
-        nVB = dimNVB->size();
+        else nVB = dimNVB->size();
 
         // Read SparseMatrix entries
         NcDim* dimNS = ncMap->get_dim( "n_s" );
@@ -1588,6 +1588,10 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         nVB            = runData[3];
         nS             = runData[4];
         nBufferedReads = runData[5];
+
+        if( verbose )
+            printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n",
+                    nA, nB, nVA, nVB, nS, nNNZBytes, nBufferedReads );
     }
 
     std::vector< std::pair< int, int > > rowOwnership;
@@ -1600,21 +1604,15 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         int nGRowRemainder = nB % size;  // Keep the remainder in root
         rowOwnership[0]    = std::make_pair( 0, nGRowPerPart + nGRowRemainder );
         int roffset        = rowOwnership[0].second;
-        // printf("Rank %d ownership: %d -- %d\n", 0, rowOwnership[0].first, rowOwnership[0].second );
         for( int ip = 1; ip < size; ++ip )
         {
             rowOwnership[ip] = std::make_pair( roffset, roffset + nGRowPerPart );
             roffset          = rowOwnership[ip].second;
-            // printf( "Rank %d ownership: %d -- %d\n", ip, rowOwnership[ip].first, rowOwnership[ip].second );
         }
     }
 
     // Let us declare the map object for every process
     SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
-
-    // if( is_root )
-    //     printf( "Parameters: nNNZBytes = %d, nS = %d, nTotalBytes = %d, nBufferedReads = %d\n", nNNZBytes, nS,
-    //             nTotalBytes, nBufferedReads );
 
     std::map< int, int > rowMap, colMap;
     int rindexMax = 0, cindexMax = 0;
@@ -1674,7 +1672,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                     }
                 }
 
-                // printf( "(%d, %d) = %f\n", vecRow[i], vecCol[i], vecS[i]);
                 assert( pOwner >= 0 && pOwner < size );
 
                 dataPerProcess[pOwner].push_back( i );
@@ -1722,8 +1719,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                         dataRowCols[ij * 2]     = vecRow[dataPerProcess[ip][ij]];
                         dataRowCols[ij * 2 + 1] = vecCol[dataPerProcess[ip][ij]];
                         dataEntries[ij]         = vecS[dataPerProcess[ip][ij]];
-                        // printf( "%d: Sending (%d, %d) = %f\n", ij, dataRowCols[ij * 2], dataRowCols[ij * 2 + 1],
-                        //         dataEntries[ij] );
                     }
 
                     MPI_Request rcsend, dsend;
@@ -1764,7 +1759,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                 else
                     cindex = citer->second;
 
-                // printf( "(%d, %d) = %f\n", rindex, cindex, vecS[i]);
                 sparseMatrix( rindex, cindex ) = vecS[i];
             }
 
@@ -1777,7 +1771,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
             {
                 MPI_Request cRequests[2];
                 MPI_Status cStats[2];
-                /* code */
+
                 // create buffers to receive the data from root process
                 std::vector< int > dataRowCols( 2 * nEntriesComm );
                 vecRow.Allocate( nEntriesComm );
@@ -1823,7 +1817,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                         cindex = citer->second;
                     vecCol[i] = cindex;
 
-                    // printf( "(%d, %d) = %f\n", rindex, cindex, vecS[i]);
                     sparseMatrix( rindex, cindex ) = vecS[i];
                 }
 
