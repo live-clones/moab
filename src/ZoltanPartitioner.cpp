@@ -33,6 +33,8 @@
 #include "moab/MeshTopoUtil.hpp"
 #include "MBTagConventions.hpp"
 #include "moab/CN.hpp"
+// used for gnomonic projection
+#include "moab/IntxMesh/IntxUtils.hpp"
 
 #ifdef MOAB_HAVE_CGM
 #include "CGMConfig.h"
@@ -329,7 +331,7 @@ ErrorCode ZoltanPartitioner::repartition( std::vector< double >& x, std::vector<
 }
 
 ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, size_t num_parts, int part_dim,
-                                                      const bool write_as_sets )
+                                                      const bool write_as_sets, int projection_type )
 {
     ErrorCode result;
 
@@ -339,16 +341,18 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
     std::vector< double > elcoords( elverts.size() * 3 );
     result = mbImpl->get_coords( elverts, &elcoords[0] );RR;
 
-    std::map< int, std::vector< EntityHandle > > part_assignments;
-
+    std::vector< std::vector< EntityHandle > > part_assignments( num_parts );
     int part, proc;
 
     // Loop over coordinates
     for( size_t iel = 0; iel < elverts.size(); iel++ )
     {
-
         // Gather coordinates into temporary array
         double* ecoords = &elcoords[iel * 3];
+
+        // do a projection if needed
+        if (projection_type > 0)
+            IntxUtils::transform_coordinates(ecoords, projection_type);
 
         // Compute the coordinate's part assignment
         myZZ->LB_Point_PP_Assign( ecoords, proc, part );
@@ -369,21 +373,28 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         result = mbImpl->remove_entities( sfileset, oldpsets );RR;
     }
 
-    std::map< int, std::vector< EntityHandle > >::iterator it;
-    for( it = part_assignments.begin(); it != part_assignments.end(); ++it )
+    size_t nparts_assigned = 0;
+    for( size_t partnum = 0; partnum < num_parts; ++partnum )
     {
-        int partnum                          = it->first;
-        std::vector< EntityHandle >& partvec = it->second;
+        std::vector< EntityHandle >& partvec = part_assignments[partnum];
+
+        nparts_assigned += ( partvec.size() ? 1 : 0 );
 
         if( write_as_sets )
         {
             EntityHandle partNset;
             result = mbImpl->create_meshset( moab::MESHSET_SET, partNset );RR;
-            result = mbImpl->add_entities( partNset, &partvec[0], partvec.size() );RR;
+            if( partvec.size() )
+            {
+                result = mbImpl->add_entities( partNset, &partvec[0], partvec.size() );RR;
+            }
             result = mbImpl->add_parent_child( sfileset, partNset );RR;
-            // std::cout << "Part " << partnum << " contains " << partvec.size() << " elements \n";
+
+            // part numbering should start from 0
+            int ipartnum = (int)partnum;
+
             // assign partitions as a sparse tag by grouping elements under sets
-            result = mbImpl->tag_set_data( part_set_tag, &partNset, 1, &partnum );RR;
+            result = mbImpl->tag_set_data( part_set_tag, &partNset, 1, &ipartnum );RR;
         }
         else
         {
@@ -395,9 +406,9 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         }
     }
 
-    if( part_assignments.size() != num_parts )
+    if( nparts_assigned != num_parts )
     {
-        std::cout << "ERROR: The inference yielded lesser number of parts (" << part_assignments.size()
+        std::cout << "WARNING: The inference yielded lesser number of parts (" << nparts_assigned
                   << ") than requested by user (" << num_parts << ").\n";
     }
 
@@ -414,7 +425,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry( const double part_geom
 #else
                                                           const bool, const bool,
 #endif
-                                                          const bool spherical_coords, const bool print_time )
+                                                          const int projection_type, const bool recompute_rcb_box, const bool print_time )
 {
     // should only be called in serial
     if( mbpc->proc_config().proc_size() != 1 )
@@ -487,7 +498,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry( const double part_geom
     if( part_geom_mesh_size < 0. )
     {
         // if (!part_geom) {
-        result = assemble_graph( part_dim, pts, ids, adjs, length, elems, part_geom, spherical_coords );RR;
+        result = assemble_graph( part_dim, pts, ids, adjs, length, elems, part_geom, projection_type );RR;
     }
     else
     {
@@ -546,7 +557,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry( const double part_geom
     if( NULL == myZZ ) myZZ = new Zoltan( mbpc->comm() );
 
     if( NULL == zmethod || !strcmp( zmethod, "RCB" ) )
-        SetRCB_Parameters();
+        SetRCB_Parameters(recompute_rcb_box);
     else if( !strcmp( zmethod, "RIB" ) )
         SetRIB_Parameters();
     else if( !strcmp( zmethod, "HSFC" ) )
@@ -748,7 +759,7 @@ ErrorCode ZoltanPartitioner::include_closure()
 ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< double >& coords,
                                              std::vector< int >& moab_ids, std::vector< int >& adjacencies,
                                              std::vector< int >& length, Range& elems, bool part_geom,
-                                             bool spherical_coords )
+                                             int projection_type )
 {
     // assemble a graph with vertices equal to elements of specified dimension, edges
     // signified by list of other elements to which an element is connected
@@ -807,17 +818,8 @@ ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< d
         // copy those into coords vector
         moab_ids.push_back( moab_id );
         // transform coordinates to spherical coordinates, if requested
-        if( spherical_coords )
-        {
-            double R = avg_position[0] * avg_position[0] + avg_position[1] * avg_position[1] +
-                       avg_position[2] * avg_position[2];
-            R               = sqrt( R );
-            double lat      = asin( avg_position[2] / R );
-            double lon      = atan2( avg_position[1], avg_position[0] );
-            avg_position[0] = lon;
-            avg_position[1] = lat;
-            avg_position[2] = R;
-        }
+        if (projection_type > 0)
+            IntxUtils::transform_coordinates(avg_position, projection_type);
 
         std::copy( avg_position, avg_position + 3, std::back_inserter( coords ) );
     }
@@ -1699,19 +1701,22 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, Range& elems, co
     return MB_SUCCESS;
 }
 
-void ZoltanPartitioner::SetRCB_Parameters()
+void ZoltanPartitioner::SetRCB_Parameters(const bool recompute_rcb_box)
 {
     if( mbpc->proc_config().proc_rank() == 0 ) std::cout << "\nRecursive Coordinate Bisection" << std::endl;
     // General parameters:
 
     myZZ->Set_Param( "DEBUG_LEVEL", "0" );  // no debug messages
     myZZ->Set_Param( "LB_METHOD", "RCB" );  // recursive coordinate bisection
+    // myZZ->Set_Param( "RCB_RECOMPUTE_BOX", "1" );  // recompute RCB box if needed ?
 
     // RCB parameters:
 
     myZZ->Set_Param( "RCB_OUTPUT_LEVEL", "1" );
-    myZZ->Set_Param( "KEEP_CUTS", "1" );  // save decomposition
+    myZZ->Set_Param( "KEEP_CUTS", "1" );  // save decomposition so that we can infer partitions
     // myZZ->Set_Param("RCB_RECTILINEAR_BLOCKS", "1"); // don't split point on boundary
+    if (recompute_rcb_box)
+        myZZ->Set_Param( "RCB_RECOMPUTE_BOX", "1" );
 }
 
 void ZoltanPartitioner::SetRIB_Parameters()
