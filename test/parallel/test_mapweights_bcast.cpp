@@ -31,12 +31,8 @@
 
 using namespace moab;
 
-const static double radius       = 1.0;
-const double MOAB_PI             = 3.1415926535897932384626433832795028841971693993751058209749445923;
-const static double surface_area = 4.0 * MOAB_PI * radius * radius;
 std::string inMapFilename        = "outCS5ICOD5_map.nc";
 
-void test_tempest_create_meshes();
 void test_tempest_map_bcast();
 void read_buffered_map();
 
@@ -47,7 +43,6 @@ int main( int argc, char** argv )
     else
         inMapFilename = TestDir + "/" + inMapFilename;
 
-    // REGISTER_TEST( test_tempest_create_meshes );
     REGISTER_TEST( test_tempest_map_bcast );
     REGISTER_TEST( read_buffered_map );
 
@@ -61,27 +56,6 @@ int main( int argc, char** argv )
     return result;
 }
 
-void test_tempest_create_meshes()
-{
-    NcError error( NcError::verbose_nonfatal );
-    const int blockSize    = 5;
-    const bool computeDual = true;
-    int ierr;
-    const static std::string outFilenames[2] = { "outTempestCS.g", "outTempestRLL.g" };
-
-    std::cout << "Creating TempestRemap Cubed-Sphere Mesh ...\n";
-    Mesh src_tempest_mesh, dest_tempest_mesh;
-    ierr = GenerateCSMesh( src_tempest_mesh, blockSize, outFilenames[0], "NetCDF4" );
-    CHECK_EQUAL( ierr, 0 );
-    ierr = GenerateICOMesh( dest_tempest_mesh, blockSize, computeDual, outFilenames[1], "NetCDF4" );
-    CHECK_EQUAL( ierr, 0 );
-
-    // Compute the surface area of CS mesh
-    const double ssphere_area = src_tempest_mesh.CalculateFaceAreas( false );
-    CHECK_REAL_EQUAL( ssphere_area, surface_area, 1e-10 );
-    const double tsphere_area = dest_tempest_mesh.CalculateFaceAreas( false );
-    CHECK_REAL_EQUAL( tsphere_area, surface_area, 1e-10 );
-}
 
 #define NCERROREXIT( err, MSG )                                                     \
     if( err )                                                                       \
@@ -135,32 +109,34 @@ void read_buffered_map()
         else nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
-        if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
         else nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
-        if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
+        if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
         else nVB = dimNVB->size();
 
         // Read SparseMatrix entries
         NcDim* dimNS = ncMap->get_dim( "n_s" );
         if( dimNS == NULL )
-        { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", inMapFilename.c_str() ); }
-
-        // store total number of nonzeros
-        nS = dimNS->size();
+        {
+            _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", inMapFilename.c_str() );
+        }
+        else
+            nS = dimNS->size();  // store total number of nonzeros
 
         varRow = ncMap->get_var( "row" );
         if( varRow == NULL )
         { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", inMapFilename.c_str() ); }
 
         varCol = ncMap->get_var( "col" );
-        if( varRow == NULL )
-        { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", inMapFilename.c_str() ); }
+        if( varCol == NULL )
+        {
+            _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", inMapFilename.c_str() );
+        }
 
         varS = ncMap->get_var( "S" );
-        if( varRow == NULL )
-        { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
+        if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
     }
 
     // const int nTotalBytes = nS * nNNZBytes;
@@ -183,17 +159,14 @@ void read_buffered_map()
     else
         printf( "Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS );
 
-    std::vector< std::pair< int, int > > rowOwnership( nprocs );
+    std::vector<int> rowOwnership( nprocs );
     int nGRowPerPart   = nB / nprocs;
     int nGRowRemainder = nB % nprocs;  // Keep the remainder in root
-    rowOwnership[0]    = std::make_pair( 0, nGRowPerPart + nGRowRemainder );
-    int roffset        = rowOwnership[0].second;
-    // printf("Rank %d ownership: %d -- %d\n", 0, rowOwnership[0].first, rowOwnership[0].second );
-    for( int ip = 1; ip < nprocs; ++ip )
+    rowOwnership[0]    = nGRowPerPart + nGRowRemainder;
+    for( int ip = 1, roffset = rowOwnership[0]; ip < nprocs; ++ip )
     {
-        rowOwnership[ip] = std::make_pair( roffset, roffset + nGRowPerPart );
-        roffset          = rowOwnership[ip].second;
-        // printf( "Rank %d ownership: %d -- %d\n", ip, rowOwnership[ip].first, rowOwnership[ip].second );
+        roffset += nGRowPerPart;
+        rowOwnership[ip] = roffset;
     }
 
     // Let us declare the map object for every process
@@ -249,12 +222,17 @@ void read_buffered_map()
 
                 // TODO: Fix this linear search to compute process ownership
                 int pOwner = -1;
-                for( int ip = 0; ip < nprocs; ++ip )
+                if( rowOwnership[0] > vecRow[i] )
+                    pOwner = 0;
+                else
                 {
-                    if( rowOwnership[ip].first <= vecRow[i] && rowOwnership[ip].second > vecRow[i] )
+                    for( int ip = 1; ip < nprocs; ++ip )
                     {
-                        pOwner = ip;
-                        break;
+                        if( rowOwnership[ip - 1] <= vecRow[i] && rowOwnership[ip] > vecRow[i] )
+                        {
+                            pOwner = ip;
+                            break;
+                        }
                     }
                 }
 

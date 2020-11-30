@@ -223,15 +223,15 @@ int main( int argc, char* argv[] )
 
     // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
     {
-        const char* atmocn_map_file_name = "atm_ocn_map.nc";
-        ierr = iMOAB_WriteMappingWeightsToFile( atmocnPID, weights_identifiers[0].c_str(), atmocn_map_file_name,
-                                                weights_identifiers[0].size(), strlen( atmocn_map_file_name ) );
+        const std::string atmocn_map_file_name = "atm_ocn_map.nc";
+        ierr = iMOAB_WriteMappingWeightsToFile( atmocnPID, weights_identifiers[0].c_str(), atmocn_map_file_name.c_str(),
+                                                weights_identifiers[0].size(), atmocn_map_file_name.size() );
         CHECKIERR( ierr, "failed to write map file to disk" );
 
-        const char* intx_from_file_identifier = "map-from-file";
-        ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, intx_from_file_identifier, atmocn_map_file_name, NULL, NULL,
-                                                 NULL, strlen( intx_from_file_identifier ),
-                                                 strlen( atmocn_map_file_name ) );
+        const std::string intx_from_file_identifier = "map-from-file";
+        ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, intx_from_file_identifier.c_str(),
+                                                 atmocn_map_file_name.c_str(), NULL, NULL, NULL,
+                                                 intx_from_file_identifier.size(), atmocn_map_file_name.size() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 

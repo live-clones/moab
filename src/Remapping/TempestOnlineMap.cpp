@@ -1547,11 +1547,11 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         else nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
-        if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
         else nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
-        if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
+        if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
         else nVB = dimNVB->size();
 
         // Read SparseMatrix entries
@@ -1565,10 +1565,10 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
 
         varCol = ncMap->get_var( "col" );
-        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
+        if( varCol == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
 
         varS = ncMap->get_var( "S" );
-        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
+        if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
     }
 
     // const int nTotalBytes = nS * nNNZBytes;
@@ -1594,7 +1594,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                     nA, nB, nVA, nVB, nS, nNNZBytes, nBufferedReads );
     }
 
-    std::vector< std::pair< int, int > > rowOwnership;
+    std::vector<int> rowOwnership;
     // if owned_dof_ids = NULL, use the default trivial partitioning scheme
     if( is_root && owned_dof_ids.size() == 0 )
     {
@@ -1602,12 +1602,11 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         rowOwnership.resize( size );
         int nGRowPerPart   = nB / size;
         int nGRowRemainder = nB % size;  // Keep the remainder in root
-        rowOwnership[0]    = std::make_pair( 0, nGRowPerPart + nGRowRemainder );
-        int roffset        = rowOwnership[0].second;
-        for( int ip = 1; ip < size; ++ip )
+        rowOwnership[0]    = nGRowPerPart + nGRowRemainder;
+        for( int ip = 1, roffset = rowOwnership[0]; ip < size; ++ip )
         {
-            rowOwnership[ip] = std::make_pair( roffset, roffset + nGRowPerPart );
-            roffset          = rowOwnership[ip].second;
+            roffset          += nGRowPerPart;
+            rowOwnership[ip] = roffset;
         }
     }
 
@@ -1663,17 +1662,21 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
                 // TODO: Fix this linear search to compute process ownership
                 int pOwner = -1;
-                for( int ip = 0; ip < size; ++ip )
+                if( rowOwnership[0] > vecRow[i] )
+                    pOwner = 0;
+                else
                 {
-                    if( rowOwnership[ip].first <= vecRow[i] && rowOwnership[ip].second > vecRow[i] )
+                    for( int ip = 1; ip < size; ++ip )
                     {
-                        pOwner = ip;
-                        break;
+                        if( rowOwnership[ip - 1] <= vecRow[i] && rowOwnership[ip] > vecRow[i] )
+                        {
+                            pOwner = ip;
+                            break;
+                        }
                     }
                 }
 
                 assert( pOwner >= 0 && pOwner < size );
-
                 dataPerProcess[pOwner].push_back( i );
 
                 // if( pOwner == rootProc )  // avoid actual communication if setting data on root proccess
