@@ -622,9 +622,9 @@ void test_tempest_map_bcast()
 
     // Compute an offset for the rows and columns by creating a local to global mapping
     std::vector< int > rowMap, colMap;
-    int rindex = 0, cindex = 0;
     for( int i = 0; i < allocationSize[2]; ++i )
     {
+        int rindex = 0, cindex = 0;
         std::vector< int >::iterator riter = std::find( rowMap.begin(), rowMap.end(), dataRows[i] );
         if( riter == rowMap.end() )
         {
