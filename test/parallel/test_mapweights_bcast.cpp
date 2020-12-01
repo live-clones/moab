@@ -76,6 +76,7 @@ void read_buffered_map()
 
 #ifdef MOAB_HAVE_MPI
     int mpierr = 0;
+    const int rootProc = 0;
 #endif
     // Main inputs;
     //   1. Map Filename
@@ -86,7 +87,6 @@ void read_buffered_map()
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
     double dTolerance  = 1e-08;
 
-    const int rootProc = 0;
     int nprocs = 1, rank = 0;
 #ifdef MOAB_HAVE_MPI
     MPI_Comm commW     = MPI_COMM_WORLD;
@@ -94,7 +94,9 @@ void read_buffered_map()
     MPI_Comm_rank( commW, &rank );
 #endif
 
+#ifdef MOAB_HAVE_MPI
     if( rank == rootProc )
+#endif
     {
         ncMap = new NcFile( inMapFilename.c_str(), NcFile::ReadOnly );
         if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() ); }
@@ -147,6 +149,7 @@ void read_buffered_map()
     mpierr = MPI_Bcast( runData, 6, MPI_INTEGER, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
+#ifdef MOAB_HAVE_MPI
     if( rank != rootProc )
     {
         nA             = runData[0];
@@ -158,6 +161,9 @@ void read_buffered_map()
     }
     else
         printf( "Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS );
+#else
+    printf( "Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS );
+#endif
 
     std::vector<int> rowOwnership( nprocs );
     int nGRowPerPart   = nB / nprocs;
@@ -173,8 +179,10 @@ void read_buffered_map()
     OfflineMap mapRemap;
     SparseMatrix< double >& sparseMatrix = mapRemap.GetSparseMatrix();
 
+#ifdef MOAB_HAVE_MPI
     if( rank == rootProc )
-        printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n", nA, nB, nVA,
+#endif
+      printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n", nA, nB, nVA,
                 nVB, nS, nNNZBytes, nBufferedReads );
 
     std::map< int, int > rowMap, colMap;
@@ -194,7 +202,9 @@ void read_buffered_map()
         for( int ip = 0; ip < nprocs; ++ip )
             dataPerProcess[ip].reserve( std::max( 100, nMaxEntries / nprocs ) );
 
+#ifdef MOAB_HAVE_MPI
         if( rank == rootProc )
+#endif
         {
             int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
 
@@ -252,7 +262,9 @@ void read_buffered_map()
         mpierr = MPI_Scatter( nDataPerProcess.data(), 1, MPI_INT, &nEntriesComm, 1, MPI_INT, rootProc, commW );
         CHECK_EQUAL( mpierr, 0 );
 
+#ifdef MOAB_HAVE_MPI
         if( rank == rootProc )
+#endif
         {
             std::vector< MPI_Request > cRequests;
             std::vector< MPI_Status > cStats( 2 * nprocs - 2 );
@@ -325,6 +337,7 @@ void read_buffered_map()
             mpierr = MPI_Waitall( cRequests.size(), cRequests.data(), cStats.data() );
             CHECK_EQUAL( mpierr, 0 );
         }  // if( rank == rootProc )
+#ifdef MOAB_HAVE_MPI
         else
         {
             if( nEntriesComm > 0 )
@@ -389,9 +402,12 @@ void read_buffered_map()
         }      // if( rank != rootProc )
 
         MPI_Barrier( commW );
+#endif
     }
 
+#ifdef MOAB_HAVE_MPI
     if( rank == rootProc )
+#endif
     {
         assert( nEntriesRemaining == 0 );
         ncMap->close();
