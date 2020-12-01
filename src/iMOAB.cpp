@@ -2554,6 +2554,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 
     return 0;
 }
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 // this call must be collective on the joint communicator
@@ -2771,6 +2772,13 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
     return 0;
 }
 
+#endif  // #ifdef MOAB_HAVE_TEMPESTREMAP
+
+#endif  // #ifdef MOAB_HAVE_MPI
+
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
+
 #ifdef MOAB_HAVE_NETCDF
 
 ErrCode iMOAB_LoadMappingWeightsFromFile(
@@ -2876,13 +2884,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile(
     return 0;
 }
 
-#endif
-
-#endif  // #ifdef MOAB_HAVE_TEMPESTREMAP
-
-#endif  // #ifdef MOAB_HAVE_MPI
-
-#ifdef MOAB_HAVE_TEMPESTREMAP
+#endif  // #ifdef MOAB_HAVE_NETCDF
 
 #define USE_API
 static ErrCode ComputeSphereRadius( iMOAB_AppID pid, double* radius )

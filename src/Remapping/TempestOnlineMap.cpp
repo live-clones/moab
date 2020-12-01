@@ -1696,8 +1696,13 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
         // Communicate the number of DoF data to expect from root
         int nEntriesComm = 0;
+#ifdef MOAB_HAVE_MPI
         mpierr = MPI_Scatter( nDataPerProcess.data(), 1, MPI_INT, &nEntriesComm, 1, MPI_INT, root_proc, commW );MPI_CHK_ERR( mpierr );
+#else
+        nEntriesComm = nDataPerProcess[0];
+#endif
 
+#ifdef MOAB_HAVE_MPI
         if( is_root )
         {
             std::vector< MPI_Request > cRequests;
@@ -1732,13 +1737,13 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                     cRequests.push_back( dsend );
                 }
             }
-
+#endif
             // Next perform all necessary local work while we wait for the buffers to be sent out
             // Compute an offset for the rows and columns by creating a local to global mapping for rootProc
-            int rindex = 0, cindex = 0;
             assert( dataPerProcess[0].size() - nEntriesComm == 0 );  // sanity check
             for( int i = 0; i < nEntriesComm; ++i )
             {
+                int rindex, cindex;
                 const int& vecRowValue = vecRow[dataPerProcess[0][i]];
                 const int& vecColValue = vecCol[dataPerProcess[0][i]];
 
@@ -1765,6 +1770,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
                 sparseMatrix( rindex, cindex ) = vecS[i];
             }
 
+#ifdef MOAB_HAVE_MPI
             // Wait until all communication is pushed out
             mpierr = MPI_Waitall( cRequests.size(), cRequests.data(), cStats.data() );MPI_CHK_ERR( mpierr );
         }  // if( is_root )
@@ -1833,6 +1839,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
         }      // if( !is_root )
 
         MPI_Barrier( commW );
+#endif
     }
 
     if( rank == 0 )

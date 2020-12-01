@@ -222,6 +222,7 @@ int main( int argc, char* argv[] )
                      "non-conservative field" );
 
     // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+#ifdef MOAB_HAVE_NETCDF
     {
         const std::string atmocn_map_file_name = "atm_ocn_map.nc";
         ierr = iMOAB_WriteMappingWeightsToFile( atmocnPID, weights_identifiers[0].c_str(), atmocn_map_file_name.c_str(),
@@ -234,6 +235,7 @@ int main( int argc, char* argv[] )
                                                  intx_from_file_identifier.size(), atmocn_map_file_name.size() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
+#endif
 
     /* Compute the weights to preoject the solution from ATM component to LND compoenent */
     ierr = iMOAB_ComputeScalarProjectionWeights( atmlndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
