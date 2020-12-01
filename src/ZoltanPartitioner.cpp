@@ -2220,7 +2220,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
             std::copy( neighbors, neighbors + size_adjs, std::back_inserter( adjacencies ) );
             std::copy( neib_proc, neib_proc + size_adjs, std::back_inserter( nbor_proc ) );
         }
-        else if( 2 <= met ) // include 2 RCB or 3, RCB + gnomonic projection
+        else if( 2 <= met )  // include 2 RCB or 3, RCB + gnomonic projection
         {
             if( TYPE_FROM_HANDLE( cell ) == MBVERTEX )
             {
@@ -2230,9 +2230,9 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
             {
                 rval = mtu.get_average_position( cell, avg_position );MB_CHK_ERR( rval );
             }
-            if (3 == met)
+            if( 3 == met )
             {
-                IntxUtils::transform_coordinates(avg_position, 2); // 2 means gnomonic projection
+                IntxUtils::transform_coordinates( avg_position, 2 );  // 2 means gnomonic projection
             }
             std::copy( avg_position, avg_position + 3, std::back_inserter( coords ) );
         }

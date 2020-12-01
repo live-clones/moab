@@ -649,10 +649,10 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
             // do not write if iters > 0)
-            if (0 == iters)
+            if( 0 == iters )
             {
                 char outputFileTgt[] = "fAtmOnCpl3.h5m";
-                ierr                 = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
+                ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
                                         strlen( fileWriteOptions ) );
                 CHECKIERR( ierr, "failed to write fAtmOnCpl3.h5m " );
             }
@@ -683,7 +683,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
-        if( (atmComm != MPI_COMM_NULL) && (0 == iters) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmWithProj2.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
@@ -734,10 +734,10 @@ int main( int argc, char* argv[] )
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
-            if (0 == iters )
+            if( 0 == iters )
             {
                 char outputFileTgt[] = "fAtmOnCpl4.h5m";
-                ierr                 = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
+                ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
                                         strlen( fileWriteOptions ) );
                 CHECKIERR( ierr, "failed to write fAtmOnCpl4.h5m " );
             }
@@ -768,7 +768,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
-        if( (atmComm != MPI_COMM_NULL) && (0 == iters) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmWithProj3.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
