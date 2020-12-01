@@ -624,7 +624,7 @@ void test_tempest_map_bcast()
     std::vector< int > rowMap, colMap;
     for( int i = 0; i < allocationSize[2]; ++i )
     {
-        int rindex = 0, cindex = 0;
+        int rindex, cindex;
         std::vector< int >::iterator riter = std::find( rowMap.begin(), rowMap.end(), dataRows[i] );
         if( riter == rowMap.end() )
         {
