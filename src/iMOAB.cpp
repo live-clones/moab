@@ -2554,7 +2554,9 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 
     return 0;
 }
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
+
 // this call must be collective on the joint communicator
 //  intersection tasks on coupler will need to send to the components tasks the list of
 // id elements that are relevant: they intersected some of the target elements (which are not needed
@@ -2774,7 +2776,115 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 #endif  // #ifdef MOAB_HAVE_MPI
 
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
+
+#ifdef MOAB_HAVE_NETCDF
+
+ErrCode iMOAB_LoadMappingWeightsFromFile(
+    iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String remap_weights_filename, int* owned_dof_ids, int* owned_dof_ids_length, int* row_major_ownership,
+    int solution_weights_identifier_length, int remap_weights_filename_length )
+{
+    assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
+    // assert( row_major_ownership != NULL );
+
+    ErrorCode rval;
+    bool row_based_partition = ( row_major_ownership != NULL && *row_major_ownership > 0 ? true : false );
+
+    // Get the source and target data and pcomm objects
+    appData& data_intx   = context.appDatas[*pid_intersection];
+    TempestMapAppData& tdata = data_intx.tempestData;
+
+    // Get the handle to the remapper object
+    if( tdata.remapper == NULL )
+    {
+        // Now allocate and initialize the remapper object
+#ifdef MOAB_HAVE_MPI
+        ParallelComm* pco = context.pcomms[*pid_intersection];
+        tdata.remapper    = new moab::TempestRemapper( context.MBI, pco );
+#else
+        tdata.remapper = new moab::TempestRemapper( context.MBI );
+#endif
+        tdata.remapper->meshValidate     = true;
+        tdata.remapper->constructEdgeMap = true;
+
+        // Do not create new filesets; Use the sets from our respective applications
+        tdata.remapper->initialize( false );
+        // tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )  = data_src.file_set;
+        // tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh )  = data_tgt.file_set;
+        tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
+    }
+
+    // Setup loading of weights onto TempestOnlineMap
+    // Set the context for the remapping weights computation
+    tdata.weightMaps[std::string( solution_weights_identifier )] = new moab::TempestOnlineMap( tdata.remapper );
+
+    // Now allocate and initialize the remapper object
+    moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
+    assert( weightMap != NULL );
+
+    // Check that both the DoF ownership array and length are NULL. Here we will assume a trivial partition for the map
+    // If both are non-NULL, then ensure that the length of the array is greater than 0.
+    assert( ( owned_dof_ids == NULL && owned_dof_ids_length == NULL ) ||
+            ( owned_dof_ids != NULL && owned_dof_ids_length != NULL && *owned_dof_ids_length > 0 ) );
+
+    // Invoke the actual call to read in the parallel map
+    if( owned_dof_ids == NULL && owned_dof_ids_length == NULL )
+    {
+        std::vector< int > tmp_owned_ids;
+        rval = weightMap->ReadParallelMap( remap_weights_filename,
+                                           tmp_owned_ids,
+                                           row_based_partition );CHKERRVAL( rval );
+    }
+    else
+    {
+        rval = weightMap->ReadParallelMap( remap_weights_filename,
+                                           std::vector< int >( owned_dof_ids, owned_dof_ids + *owned_dof_ids_length ),
+                                           row_based_partition );CHKERRVAL( rval );
+    }
+
+    return 0;
+}
+
+ErrCode iMOAB_WriteMappingWeightsToFile(
+    iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length, int remap_weights_filename_length )
+{
+    assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
+
+    ErrorCode rval;
+
+    // Get the source and target data and pcomm objects
+    appData& data_intx       = context.appDatas[*pid_intersection];
+    TempestMapAppData& tdata = data_intx.tempestData;
+
+    // Get the handle to the remapper object
+    assert( tdata.remapper != NULL );
+
+    // Now get online weights object and ensure it is valid
+    moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
+    assert( weightMap != NULL );
+
+    std::string filename  = std::string( remap_weights_filename );
+    size_t lastindex      = filename.find_last_of( "." );
+    std::string extension = filename.substr( lastindex + 1, filename.size() );
+
+    if (extension == "nc")
+    {
+        // Invoke the actual call to write the parallel map to disk
+        rval = weightMap->WriteParallelWeightsToFile( filename );CHKERRVAL( rval );
+    }
+    else
+    {
+        /* Write to the parallel H5M format */
+        rval = weightMap->WriteParallelMap( filename );CHKERRVAL( rval );
+    }
+
+    return 0;
+}
+
+#endif  // #ifdef MOAB_HAVE_NETCDF
 
 #define USE_API
 static ErrCode ComputeSphereRadius( iMOAB_AppID pid, double* radius )
@@ -2992,10 +3102,8 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
     }
 #endif
 
-    ierr = iMOAB_UpdateMeshInfo( pid_src );
-    CHKIERRVAL( ierr );
-    ierr = iMOAB_UpdateMeshInfo( pid_tgt );
-    CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_src );CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_tgt );CHKIERRVAL( ierr );
 
     // Rescale the radius of both to compute the intersection
     ComputeSphereRadius( pid_src, &radius_source );

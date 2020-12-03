@@ -52,6 +52,7 @@ if HAVE_ZOLTAN
 endif
 
 if HAVE_TEMPESTREMAP
+AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
 migrate_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 migrate_nontrivial_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 commgraph_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
@@ -63,13 +64,14 @@ endif
 
 if HAVE_TEMPESTREMAP
   EXTRA_DIST = imoab_coupler_utils.hpp
-  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 if HAVE_EXTMESHES
   HDF5_TESTS +=  imoab_apg2_ol_coupler
   imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
+  test_mapweights_bcast_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 endif
 
 else
@@ -179,6 +181,7 @@ imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
 commgraph_test_SOURCES = commgraph_test.cpp
+test_mapweights_bcast_SOURCES = test_mapweights_bcast.cpp
 
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
@@ -239,9 +242,9 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m \
                    fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m recvLnd2.h5m LndWithProj2.h5m \
                    LndWithProj3.h5m  fLndOnCpl3.h5m  OcnWithProj3.h5m  fOcnOnCpl3.h5m  recvLnd3.h5m  recvOcn3.h5m \
-		           AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m \
-		           AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m 
-
+                   AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m \
+                   AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m \
+                   atm_ocn_map.nc
 
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \

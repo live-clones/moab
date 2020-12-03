@@ -341,10 +341,10 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-    const char* weights_identifiers[2] = { "scalar", "scalar-pc" };
-    int disc_orders[3]                 = { 4, 1, 1 };
-    const char* disc_methods[3]        = { "cgll", "fv", "pcloud" };
-    const char* dof_tag_names[3]       = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
+    int disc_orders[3]                       = { 4, 1, 1 };
+    const std::string weights_identifiers[2] = { "scalar", "scalar-pc" };
+    const std::string disc_methods[3]        = { "cgll", "fv", "pcloud" };
+    const std::string dof_tag_names[3]       = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
 #ifdef ENABLE_ATMOCN_COUPLING
     if( couComm != MPI_COMM_NULL )
     {
@@ -423,12 +423,28 @@ int main( int argc, char* argv[] )
     {
         PUSH_TIMER( "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmOcnPID, weights_identifiers[0], disc_methods[0], &disc_orders[0], disc_methods[1], &disc_orders[1],
-            &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0], dof_tag_names[1],
-            strlen( weights_identifiers[0] ), strlen( disc_methods[0] ), strlen( disc_methods[1] ),
-            strlen( dof_tag_names[0] ), strlen( dof_tag_names[1] ) );
+            cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[1].c_str(), &disc_orders[1],
+            &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
+            weights_identifiers[0].size(), disc_methods[0].size(), disc_methods[1].size(),
+            dof_tag_names[0].size(), dof_tag_names[1].size() );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
+
+        // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+#ifdef MOAB_HAVE_NETCDF
+        {
+            const std::string atmocn_map_file_name = "atm_ocn_map.nc";
+            ierr = iMOAB_WriteMappingWeightsToFile( cplAtmOcnPID, weights_identifiers[0].c_str(), atmocn_map_file_name.c_str(),
+                                                    weights_identifiers[0].size(), atmocn_map_file_name.size() );
+            CHECKIERR( ierr, "failed to write map file to disk" );
+
+            const std::string intx_from_file_identifier = "map-from-file";
+            ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(), atmocn_map_file_name.c_str(),
+                                                     NULL, NULL, NULL, intx_from_file_identifier.size(),
+                                                     atmocn_map_file_name.size() );
+            CHECKIERR( ierr, "failed to load map file from disk" );
+        }
+#endif
     }
 
 #endif
@@ -441,13 +457,29 @@ int main( int argc, char* argv[] )
         /* Compute the weights to preoject the solution from ATM component to LND compoenent */
         PUSH_TIMER( "Compute ATM-LND remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmLndPID, weights_identifiers[1], disc_methods[0], &disc_orders[0], disc_methods[2], &disc_orders[2],
-            &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0], dof_tag_names[2],
-            strlen( weights_identifiers[1] ), strlen( disc_methods[0] ), strlen( disc_methods[2] ),
-            strlen( dof_tag_names[0] ), strlen( dof_tag_names[2] ) );
+            cplAtmLndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+            disc_methods[2].c_str(), &disc_orders[2], &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
+            dof_tag_names[0].c_str(), dof_tag_names[2].c_str(), weights_identifiers[1].size(), disc_methods[0].size(),
+            disc_methods[2].size(), dof_tag_names[0].size(), dof_tag_names[2].size() );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                          "non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
+
+        // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+        // VSM: TODO: This does not work since the LND model is a point cloud and we do not initilize
+        // data correctly in TempestOnlineMap::WriteParallelWeightsToFile routine.
+        // {
+        //     const char* atmlnd_map_file_name = "atm_lnd_map.nc";
+        //     ierr = iMOAB_WriteMappingWeightsToFile( cplAtmLndPID, weights_identifiers[1], atmlnd_map_file_name,
+        //                                             strlen( weights_identifiers[0] ), strlen( atmlnd_map_file_name ) );
+        //     CHECKIERR( ierr, "failed to write map file to disk" );
+
+        //     const char* intx_from_file_identifier = "map-from-file";
+        //     ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmLndPID, intx_from_file_identifier, atmlnd_map_file_name,
+        //                                              NULL, NULL, NULL, strlen( intx_from_file_identifier ),
+        //                                              strlen( atmlnd_map_file_name ) );
+        //     CHECKIERR( ierr, "failed to load map file from disk" );
+        // }
     }
 #endif
 
@@ -594,8 +626,8 @@ int main( int argc, char* argv[] )
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( "Apply Scalar projection weights" )
-            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], concat_fieldname,
-                                                       concat_fieldnameT, strlen( weights_identifiers[0] ),
+            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0].c_str(), concat_fieldname,
+                                                       concat_fieldnameT, weights_identifiers[0].size(),
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
@@ -699,8 +731,8 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             PUSH_TIMER( "Apply Scalar projection weights for land" )
-            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmLndPID, weights_identifiers[1], concat_fieldname,
-                                                       concat_fieldnameT, strlen( weights_identifiers[1] ),
+            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmLndPID, weights_identifiers[1].c_str(), concat_fieldname,
+                                                       concat_fieldnameT, weights_identifiers[1].size(),
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )

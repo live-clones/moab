@@ -61,6 +61,7 @@
 #define iMOAB_DumpCommGraph          IMOAB_FC_WRAPPER( imoab_dumpcommgraph, IMOAB_DUMPCOMMGRAPH )
 #define iMOAB_ComputeCommGraph       IMOAB_FC_WRAPPER( imoab_computecommgraph, IMOAB_COMPUTECOMMGRAPH )
 #define iMOAB_MergeVertices          IMOAB_FC_WRAPPER( imoab_mergevertices, IMOAB_MERGEVERTICES )
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #define iMOAB_ComputeMeshIntersectionOnSphere \
@@ -73,6 +74,13 @@
     IMOAB_FC_WRAPPER( imoab_applyscalarprojectionweights, IMOAB_APPLYSCALARPROJECTIONWEIGHTS )
 #define iMOAB_CoverageGraph IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
 
-#endif
+#ifdef MOAB_HAVE_NETCDF
+
+#define iMOAB_LoadMappingWeightsFromFile IMOAB_FC_WRAPPER( imoab_loadmappingweightsfromfile, IMOAB_LOADMAPPINGWEIGHTSFROMFILE )
+#define iMOAB_WriteMappingWeightsToFile IMOAB_FC_WRAPPER( imoab_writemappingweightstofile, IMOAB_WRITEMAPPINGWEIGHTSTOFILE )
+
+#endif /* MOAB_HAVE_NETCDF */
+
+#endif /* MOAB_HAVE_TEMPESTREMAP */
 
 #endif /*IMOAB_PROTOS_H */

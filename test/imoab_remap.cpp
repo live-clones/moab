@@ -22,11 +22,12 @@
 int main( int argc, char* argv[] )
 {
     ErrCode ierr;
-    std::string atmFilename, ocnFilename, lndFilename;
+    std::string atmFilename, ocnFilename, lndFilename, mapFilename;
 
     atmFilename = TestDir + "/wholeATM_T.h5m";
     ocnFilename = TestDir + "/recMeshOcn.h5m";
     lndFilename = TestDir + "/wholeLnd.h5m";
+    // mapFilename = TestDir + "/outCS5ICOD5_map.nc";
 
     ProgOptions opts;
     opts.addOpt< std::string >( "atmosphere,t", "atm mesh filename (source)", &atmFilename );
@@ -58,6 +59,7 @@ int main( int argc, char* argv[] )
     iMOAB_AppID atmocnPID = &atmocnAppID;
     iMOAB_AppID atmlndPID = &atmlndAppID;
     iMOAB_AppID lndatmPID = &lndatmAppID;
+
     /*
      * Each application has to be registered once. A mesh set and a parallel communicator will be
      * associated with each application. A unique application id will be returned, and will be used
@@ -155,39 +157,41 @@ int main( int argc, char* argv[] )
     // const char* disc_methods[2] = {"fv", "fv"};
     // const char* dof_tag_names[2] = {"GLOBAL_ID", "GLOBAL_ID"};
     int disc_orders[3]           = { 4, 1, 1 };
-    const char* disc_methods[3]  = { "cgll", "fv", "pcloud" };
-    const char* dof_tag_names[3] = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
-
-    const char* weights_identifiers[3] = { "scalar", "scalar_pointcloud", "scalar_conservative" };
     int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0;
 
-    const char* bottomTempField            = "a2oTbot";
-    const char* bottomTempFieldATM         = "a2oTbotATM";
-    const char* bottomTempProjectedField   = "a2oTbot_proj";
-    const char* bottomTempProjectedNCField = "a2oTbot_projnocons";
+    const std::string disc_methods[3]        = { "cgll", "fv", "pcloud" };
+    const std::string dof_tag_names[3]       = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
+    const std::string weights_identifiers[3] = { "scalar", "scalar_pointcloud", "scalar_conservative" };
+
+    const std::string bottomTempField            = "a2oTbot";
+    const std::string bottomTempFieldATM         = "a2oTbotATM";
+    const std::string bottomTempProjectedField   = "a2oTbot_proj";
+    const std::string bottomTempProjectedNCField = "a2oTbot_projnocons";
+
+    // Attributes for tag data storage
     int tagIndex[4];
     // int entTypes[2] = {1, 1}; /* both on elements; */
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
 
-    ierr = iMOAB_DefineTagStorage( atmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
-                                   strlen( bottomTempField ) );
+    ierr = iMOAB_DefineTagStorage( atmPID, bottomTempField.c_str(), &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
+                                   bottomTempField.size() );
     CHECKIERR( ierr, "failed to define the field tag on ATM" );
 
-    ierr = iMOAB_DefineTagStorage( atmPID, bottomTempFieldATM, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
-                                   strlen( bottomTempFieldATM ) );
+    ierr = iMOAB_DefineTagStorage( atmPID, bottomTempFieldATM.c_str(), &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
+                                   bottomTempFieldATM.size() );
     CHECKIERR( ierr, "failed to define the field tag on ATM" );
 
-    ierr = iMOAB_DefineTagStorage( ocnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
-                                   strlen( bottomTempProjectedField ) );
+    ierr = iMOAB_DefineTagStorage( ocnPID, bottomTempProjectedField.c_str(), &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
+                                   bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to define the field tag on OCN" );
 
-    ierr = iMOAB_DefineTagStorage( ocnPID, bottomTempProjectedNCField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[2],
-                                   strlen( bottomTempProjectedNCField ) );
+    ierr = iMOAB_DefineTagStorage( ocnPID, bottomTempProjectedNCField.c_str(), &tagTypes[1], &ocnCompNDoFs, &tagIndex[2],
+                                   bottomTempProjectedNCField.size() );
     CHECKIERR( ierr, "failed to define the field tag on OCN" );
 
-    ierr = iMOAB_DefineTagStorage( lndPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[3],
-                                   strlen( bottomTempProjectedField ) );
+    ierr = iMOAB_DefineTagStorage( lndPID, bottomTempProjectedField.c_str(), &tagTypes[1], &ocnCompNDoFs, &tagIndex[3],
+                                   bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to define the field tag on LND" );
 
     /* Next compute the mesh intersection on the sphere between the source (ATM) and target (OCN)
@@ -206,73 +210,89 @@ int main( int argc, char* argv[] )
     CHECKIERR( ierr, "failed to compute point-cloud mapping LND-ATM" );
 
     /* We have the mesh intersection now. Let us compute the remapping weights */
-    fNoConserve = 1;
+    fNoConserve = 0;
     /* Compute the weights to preoject the solution from ATM component to OCN compoenent */
-    ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[0], disc_methods[0], &disc_orders[0],
-                                                 disc_methods[1], &disc_orders[1], &fMonotoneTypeID, &fVolumetric,
-                                                 &fNoConserve, &fValidate, dof_tag_names[0], dof_tag_names[1],
-                                                 strlen( weights_identifiers[0] ), strlen( disc_methods[0] ),
-                                                 strlen( disc_methods[1] ), strlen( dof_tag_names[0] ),
-                                                 strlen( dof_tag_names[1] ) );
+    ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+                                                 disc_methods[1].c_str(), &disc_orders[1], &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
+                                                 weights_identifiers[0].size(), disc_methods[0].size(),
+                                                 disc_methods[1].size(), dof_tag_names[0].size(),
+                                                 dof_tag_names[1].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-OCN scalar "
                      "non-conservative field" );
 
+    // Let us now write the map file to disk and then read it back to test the I/O API in iMOAB
+#ifdef MOAB_HAVE_NETCDF
+    {
+        const std::string atmocn_map_file_name = "atm_ocn_map.nc";
+        ierr = iMOAB_WriteMappingWeightsToFile( atmocnPID, weights_identifiers[0].c_str(), atmocn_map_file_name.c_str(),
+                                                weights_identifiers[0].size(), atmocn_map_file_name.size() );
+        CHECKIERR( ierr, "failed to write map file to disk" );
+
+        const std::string intx_from_file_identifier = "map-from-file";
+        ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, intx_from_file_identifier.c_str(),
+                                                 atmocn_map_file_name.c_str(), NULL, NULL, NULL,
+                                                 intx_from_file_identifier.size(), atmocn_map_file_name.size() );
+        CHECKIERR( ierr, "failed to load map file from disk" );
+    }
+#endif
+
     /* Compute the weights to preoject the solution from ATM component to LND compoenent */
-    ierr = iMOAB_ComputeScalarProjectionWeights( atmlndPID, weights_identifiers[1], disc_methods[0], &disc_orders[0],
-                                                 disc_methods[2], &disc_orders[2], &fMonotoneTypeID, &fVolumetric,
-                                                 &fNoConserve, &fValidate, dof_tag_names[0], dof_tag_names[2],
-                                                 strlen( weights_identifiers[1] ), strlen( disc_methods[0] ),
-                                                 strlen( disc_methods[2] ), strlen( dof_tag_names[0] ),
-                                                 strlen( dof_tag_names[2] ) );
+    ierr = iMOAB_ComputeScalarProjectionWeights( atmlndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+                                                 disc_methods[2].c_str(), &disc_orders[2], &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[2].c_str(),
+                                                 weights_identifiers[1].size(), disc_methods[0].size(),
+                                                 disc_methods[2].size(), dof_tag_names[0].size(),
+                                                 dof_tag_names[2].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                      "non-conservative field" );
 
     /* Compute the weights to preoject the solution from ATM component to LND compoenent */
-    ierr = iMOAB_ComputeScalarProjectionWeights( lndatmPID, weights_identifiers[1], disc_methods[2], &disc_orders[2],
-                                                 disc_methods[0], &disc_orders[0], &fMonotoneTypeID, &fVolumetric,
-                                                 &fNoConserve, &fValidate, dof_tag_names[2], dof_tag_names[0],
-                                                 strlen( weights_identifiers[1] ), strlen( disc_methods[2] ),
-                                                 strlen( disc_methods[0] ), strlen( dof_tag_names[2] ),
-                                                 strlen( dof_tag_names[0] ) );
+    ierr = iMOAB_ComputeScalarProjectionWeights( lndatmPID, weights_identifiers[1].c_str(), disc_methods[2].c_str(), &disc_orders[2],
+                                                 disc_methods[0].c_str(), &disc_orders[0], &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[2].c_str(), dof_tag_names[0].c_str(),
+                                                 weights_identifiers[1].size(), disc_methods[2].size(),
+                                                 disc_methods[0].size(), dof_tag_names[2].size(),
+                                                 dof_tag_names[0].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for LND-ATM scalar "
                      "non-conservative field" );
 
     /* We have the mesh intersection now. Let us compute the remapping weights */
     fNoConserve = 0;
-    ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[2], disc_methods[0], &disc_orders[0],
-                                                 disc_methods[1], &disc_orders[1], &fMonotoneTypeID, &fVolumetric,
-                                                 &fNoConserve, &fValidate, dof_tag_names[0], dof_tag_names[1],
-                                                 strlen( weights_identifiers[1] ), strlen( disc_methods[0] ),
-                                                 strlen( disc_methods[1] ), strlen( dof_tag_names[0] ),
-                                                 strlen( dof_tag_names[1] ) );
+    ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[2].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+                                                 disc_methods[1].c_str(), &disc_orders[1], &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
+                                                 weights_identifiers[1].size(), disc_methods[0].size(),
+                                                 disc_methods[1].size(), dof_tag_names[0].size(),
+                                                 dof_tag_names[1].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for scalar conservative field" );
 
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
-    ierr = iMOAB_ApplyScalarProjectionWeights( atmocnPID, weights_identifiers[0], bottomTempField,
-                                               bottomTempProjectedNCField, strlen( weights_identifiers[0] ),
-                                               strlen( bottomTempField ), strlen( bottomTempProjectedNCField ) );
+    ierr = iMOAB_ApplyScalarProjectionWeights( atmocnPID, weights_identifiers[0].c_str(), bottomTempField.c_str(),
+                                               bottomTempProjectedNCField.c_str(), weights_identifiers[0].size(),
+                                               bottomTempField.size(), bottomTempProjectedNCField.size() );
     CHECKIERR( ierr, "failed to apply projection weights for scalar non-conservative field" );
 
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
-    ierr = iMOAB_ApplyScalarProjectionWeights( atmocnPID, weights_identifiers[2], bottomTempField,
-                                               bottomTempProjectedField, strlen( weights_identifiers[1] ),
-                                               strlen( bottomTempField ), strlen( bottomTempProjectedField ) );
+    ierr = iMOAB_ApplyScalarProjectionWeights( atmocnPID, weights_identifiers[2].c_str(), bottomTempField.c_str(),
+                                               bottomTempProjectedField.c_str(), weights_identifiers[1].size(),
+                                               bottomTempField.size(), bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to apply projection weights for scalar conservative field" );
 
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
-    ierr = iMOAB_ApplyScalarProjectionWeights( atmlndPID, weights_identifiers[1], bottomTempField,
-                                               bottomTempProjectedField, strlen( weights_identifiers[1] ),
-                                               strlen( bottomTempField ), strlen( bottomTempProjectedField ) );
+    ierr = iMOAB_ApplyScalarProjectionWeights( atmlndPID, weights_identifiers[1].c_str(), bottomTempField.c_str(),
+                                               bottomTempProjectedField.c_str(), weights_identifiers[1].size(),
+                                               bottomTempField.size(), bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to apply projection weights for ATM-LND scalar field" );
 
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
-    ierr = iMOAB_ApplyScalarProjectionWeights( lndatmPID, weights_identifiers[1], bottomTempProjectedField,
-                                               bottomTempFieldATM, strlen( weights_identifiers[1] ),
-                                               strlen( bottomTempField ), strlen( bottomTempProjectedField ) );
+    ierr = iMOAB_ApplyScalarProjectionWeights( lndatmPID, weights_identifiers[1].c_str(), bottomTempProjectedField.c_str(),
+                                               bottomTempFieldATM.c_str(), weights_identifiers[1].size(),
+                                               bottomTempField.size(), bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to apply projection weights for LND-ATM scalar field" );
 
     /*

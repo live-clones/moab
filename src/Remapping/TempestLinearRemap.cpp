@@ -24,10 +24,16 @@
 #include "moab/AdaptiveKDTree.hpp"
 
 #include "moab/Remapping/TempestOnlineMap.hpp"
-#include "netcdfcpp.h"
+#include "moab/TupleList.hpp"
 
 #ifdef MOAB_HAVE_EIGEN
 #include <Eigen/Dense>
+#endif
+
+#ifdef MOAB_HAVE_NETCDFPAR
+#include "netcdfcpp_par.hpp"
+#else
+#include "netcdfcpp.h"
 #endif
 
 #include <fstream>
@@ -270,6 +276,102 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
     return;
 }
+#ifdef MOAB_HAVE_MPI
+int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,
+        DataArray1D< double > &  vecFaceArea,
+        DataArray1D< double > &  dCenterLon,
+        DataArray1D< double > & dCenterLat,
+        DataArray2D< double > & dVertexLon,
+        DataArray2D< double > & dVertexLat,
+        unsigned & N, // will have the local, after
+        int nv,
+        int & maxdof)
+{
+    // first decide maxdof, for partitioning
+    unsigned int localmax=0;
+    for (unsigned i = 0; i < N; i++)
+        if (gdofmap[i] > localmax)
+            localmax = gdofmap[i];
+
+    // decide partitioning based on maxdof/size
+    MPI_Allreduce( &localmax, &maxdof, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
+    // maxdof is 0 based, so actual number is +1
+    // maxdof
+    int size_per_task = (maxdof+1)/size; // based on this, processor to process dof x is x/size_per_task
+    // so we decide to reorder by actual dof, such that task 0 has dofs from [0 to size_per_task), etc
+    moab::TupleList tl;
+    unsigned numr = 2 * nv + 3; //  doubles: area, centerlon, center lat, nv (vertex lon, vertex lat)
+    tl.initialize( 2, 0, 0, numr, N );  // to proc, dof, then
+    tl.enableWriteAccess();
+    // populate
+    for (unsigned i=0; i < N; i++ )
+    {
+        int gdof = gdofmap[i] ;
+        int to_proc = gdof / size_per_task;
+        if (to_proc >= size) to_proc = size-1; // the last ones got to last proc
+        int n = tl.get_n();
+        tl.vi_wr[2 * n]         = to_proc;
+        tl.vi_wr[2 * n + 1]     = gdof;
+        tl.vr_wr[n * numr] = vecFaceArea[i];
+        tl.vr_wr[n * numr + 1] = dCenterLon[i];
+        tl.vr_wr[n * numr + 2] = dCenterLat[i];
+        for (int j=0; j<nv; j++)
+        {
+            tl.vr_wr[n * numr + 3 + j]      = dVertexLon[i][j];
+            tl.vr_wr[n * numr + 3 + nv + j] = dVertexLat[i][j];
+        }
+        tl.inc_n();
+    }
+
+    // now do the heavy communication
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+
+    // after communication, on each processor we should have tuples coming in
+    // still need to order by global dofs; then rearrange input vectors
+    moab::TupleList::buffer sort_buffer;
+    sort_buffer.buffer_init( tl.get_n() );
+    tl.sort( 1, &sort_buffer );
+    // count how many are unique, and collapse
+    int nb_unique = 1;
+    for (unsigned i=0; i<tl.get_n()-1; i++)
+    {
+        if (tl.vi_wr[2*i+1] != tl.vi_wr[2*i+3])
+            nb_unique++;
+    }
+    vecFaceArea.Allocate(nb_unique);
+    dCenterLon.Allocate(nb_unique);
+    dCenterLat.Allocate(nb_unique);
+    dVertexLon.Allocate(nb_unique, nv);
+    dVertexLat.Allocate(nb_unique, nv);
+    int current_size=1;
+    vecFaceArea[0] = tl.vr_wr[0];
+    dCenterLon[0] = tl.vr_wr[1];
+    dCenterLat[0] = tl.vr_wr[2];
+    for (int j=0; j<nv; j++)
+    {
+        dVertexLon[0][j] = tl.vr_wr[ 3 + j ];
+        dVertexLat[0][j] = tl.vr_wr[ 3 + nv + j ];
+    }
+    for (unsigned i=0; i<tl.get_n()-1; i++)
+    {
+        if (tl.vi_wr[2*i+1] != tl.vi_wr[2*i+3])
+        {
+            vecFaceArea[current_size] = tl.vr_wr[ i * numr ];
+            dCenterLon[current_size] = tl.vr_wr[ i * numr + 1];
+            dCenterLat[current_size] = tl.vr_wr[ i * numr + 2];
+            for (int j=0; j<nv; j++)
+            {
+                dVertexLon[current_size][j] = tl.vr_wr[ i * numr + 3 + j ];
+                dVertexLat[current_size][j] = tl.vr_wr[ i * numr + 3 + nv + j ];
+            }
+            current_size++;
+        }
+    }
+
+    N = current_size; // or nb_unique, should be the same
+    return 0;
+}
+#endif
 
 #ifdef MOAB_HAVE_EIGEN
 void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
@@ -341,13 +443,16 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// #define IO_USE_PARALLEL_NETCDF
-void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename )
+moab::ErrorCode moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename )
 {
+    NcError error( NcError::silent_nonfatal );
+
     // m_weightMatrix.Print(filename.c_str(), 0, 0);
 
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiFile ncMap( MPI_COMM_WORLD, strFilename.c_str(), NcmpiFile::Replace, NcmpiFile::classic5 );
+#ifdef MOAB_HAVE_NETCDFPAR
+    bool is_independent = true;
+    ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strFilename.c_str(), NcFile::Replace, NcFile::Netcdf4 );
+    // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strFilename.c_str(), NcmpiFile::replace, NcmpiFile::classic5 );
 #else
     NcFile ncMap( strFilename.c_str(), NcFile::Replace );
 #endif
@@ -357,43 +462,200 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     // Attributes
     ncMap.add_att( "Title", "MOAB-TempestRemap Online Regridding Weight Generator" );
 
+    /**
+     * Need to get the global maximum of number of vertices per element
+     * Key issue is that when calling InitializeCoordinatesFromMeshFV, the allocation for
+     *dVertexLon/dVertexLat are made based on the maximum vertices in the current process. However,
+     *when writing this out, other processes may have a different size for the same array. This is
+     *hence a mess to consolidate in h5mtoscrip eventually.
+     **/
+
+    /* Let us compute all relevant data for the current original source mesh on the process */
+    DataArray1D< double > vecSourceFaceArea, vecTargetFaceArea;
+    DataArray1D< double > dSourceCenterLon, dSourceCenterLat, dTargetCenterLon, dTargetCenterLat;
+    DataArray2D< double > dSourceVertexLon, dSourceVertexLat, dTargetVertexLon, dTargetVertexLat;
+    if( m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD )
+    {
+        // printf("Source FV discretization with order - %d, \n", m_nDofsPEl_Src);
+        this->InitializeCoordinatesFromMeshFV( *m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon,
+                                               dSourceVertexLat, false /* fLatLon = false */,
+                                               m_remapper->max_source_edges );
+
+        vecSourceFaceArea.Allocate( m_meshInput->vecFaceArea.GetRows() );
+        for( unsigned i = 0; i < m_meshInput->vecFaceArea.GetRows(); ++i )
+            vecSourceFaceArea[i] = m_meshInput->vecFaceArea[i];
+    }
+    else
+    {
+        DataArray3D< double > dataGLLJacobianSrc;
+        // printf("Source FE discretization with order - %d, \n", m_nDofsPEl_Src);
+        this->InitializeCoordinatesFromMeshFE( *m_meshInput, m_nDofsPEl_Src, dataGLLNodesSrc, dSourceCenterLon,
+                                               dSourceCenterLat, dSourceVertexLon, dSourceVertexLat );
+
+        // Generate the continuous Jacobian for input mesh
+        GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
+
+        if( m_srcDiscType == DiscretizationType_CGLL )
+        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea ); }
+        else
+        {
+            GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+        }
+
+        vecSourceFaceArea.Allocate( m_nTotDofs_Src );
+        int offset = 0;
+        for( size_t e = 0; e < m_meshInput->faces.size(); e++ )
+        {
+            for( int s = 0; s < m_nDofsPEl_Src; s++ )
+            {
+                for( int t = 0; t < m_nDofsPEl_Src; t++ )
+                {
+                    // vecSourceFaceArea[offset + s * m_nDofsPEl_Src + t] =
+                    // dataGLLJacobianSrc[s][t][e];
+                    vecSourceFaceArea[srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t]] =
+                        dataGLLJacobianSrc[s][t][e];
+                    // if (rank)
+                    //     printf( "VecArea: %d -- %3.10e\n",
+                    //             srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t],
+                    //             vecSourceFaceArea[srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t]] );
+                }
+            }
+            offset += m_nDofsPEl_Src * m_nDofsPEl_Src;
+        }
+    }
+
+    if( m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD )
+    {
+        // printf("Target FV discretization with order - %d, \n", m_nDofsPEl_Dest);
+        this->InitializeCoordinatesFromMeshFV( *m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon,
+                                               dTargetVertexLat, false /* fLatLon = false */,
+                                               m_remapper->max_target_edges );
+
+        vecTargetFaceArea.Allocate( m_meshOutput->vecFaceArea.GetRows() );
+        for( unsigned i = 0; i < m_meshOutput->vecFaceArea.GetRows(); ++i )
+        {
+            vecTargetFaceArea[i] = m_meshOutput->vecFaceArea[i];
+            // if( rank )
+            //     printf( "VecArea: %d -- %3.10e\n", i, vecTargetFaceArea[i] );
+        }
+    }
+    else
+    {
+        DataArray3D< double > dataGLLJacobianDest;
+        // printf("Target FE discretization with order - %d, \n", m_nDofsPEl_Dest);
+        this->InitializeCoordinatesFromMeshFE( *m_meshOutput, m_nDofsPEl_Dest, dataGLLNodesDest, dTargetCenterLon,
+                                               dTargetCenterLat, dTargetVertexLon, dTargetVertexLat );
+
+        // Generate the continuous Jacobian for input mesh
+        GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
+
+        if( m_destDiscType == DiscretizationType_CGLL )
+        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea ); }
+        else
+        {
+            GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+        }
+
+        vecTargetFaceArea.Allocate( m_nTotDofs_Dest );
+        int offset = 0;
+        for( size_t e = 0; e < m_meshOutput->faces.size(); e++ )
+        {
+            for( int s = 0; s < m_nDofsPEl_Dest; s++ )
+            {
+                for( int t = 0; t < m_nDofsPEl_Dest; t++ )
+                {
+                    // vecTargetFaceArea[offset + s * m_nDofsPEl_Dest + t] =
+                    // dataGLLJacobianDest[s][t][e];
+                    vecTargetFaceArea[row_dtoc_dofmap[offset + s * m_nDofsPEl_Dest + t]] = dataGLLJacobianDest[s][t][e];
+                }
+            }
+            offset += m_nDofsPEl_Dest * m_nDofsPEl_Dest;
+        }
+    }
+
     // Map dimensions
-    unsigned nA = ( m_dSourceAreas.GetRows() );
-    unsigned nB = ( m_dTargetAreas.GetRows() );
+    unsigned nA = ( vecSourceFaceArea.GetRows() );
+    unsigned nB = ( vecTargetFaceArea.GetRows() );
+
+
+    // Number of nodes per Face
+    int nSourceNodesPerFace = dSourceVertexLon.GetColumns();
+    int nTargetNodesPerFace = dTargetVertexLon.GetColumns();
+    // first move data if in parallel
+#if defined( MOAB_HAVE_MPI )
+    //if (size > 1)
+    {
+        int maxdof; // output; arrays will be re-distributed in chunks [maxdof/size]
+        int ierr = rearrange_arrays_by_dofs( srccol_gdofmap,
+                vecSourceFaceArea,
+                dSourceCenterLon, dSourceCenterLat,
+                dSourceVertexLon, dSourceVertexLat,
+                nA, nSourceNodesPerFace, maxdof); // now nA will be close to maxdof/size
+        if (ierr!=0) { _EXCEPTION1( "Unable to arrange source data %d ", nA ); }
+        // rearrange target data: (nB)
+        //
+        ierr = rearrange_arrays_by_dofs( row_gdofmap,
+                vecTargetFaceArea,
+                dTargetCenterLon, dTargetCenterLat,
+                dTargetVertexLon, dTargetVertexLat,
+                nB, nTargetNodesPerFace, maxdof); // now nA will be close to maxdof/size
+        if (ierr!=0) { _EXCEPTION1( "Unable to arrange target data %d ", nB ); }
+    }
+#endif
+
+    // Number of non-zeros in the remap matrix operator
+    int nS = m_weightMatrix.nonZeros();
+
+#if defined( MOAB_HAVE_MPI ) && defined( MOAB_HAVE_NETCDFPAR )
+    int locbuf[5] = { (int)nA, (int)nB, nS, nSourceNodesPerFace, nTargetNodesPerFace };
+    int offbuf[3] = { 0, 0, 0 };
+    int globuf[5] = { 0, 0, 0, 0, 0 };
+    MPI_Scan( locbuf, offbuf, 3, MPI_INT, MPI_SUM, m_pcomm->comm() );
+    MPI_Allreduce( locbuf, globuf, 3, MPI_INT, MPI_SUM, m_pcomm->comm() );
+    MPI_Allreduce( &locbuf[3], &globuf[3], 2, MPI_INT, MPI_MAX, m_pcomm->comm() );
+
+    // MPI_Scan is inclusive of data in current rank; modify accordingly.
+    offbuf[0] -= nA;
+    offbuf[1] -= nB;
+    offbuf[2] -= nS;
+
+#else
+    int offbuf[3] = { 0, 0, 0 };
+    int globuf[5] = { (int)nA, (int)nB, nS, nSourceNodesPerFace, nTargetNodesPerFace };
+#endif
+
+    // printf( "[%d] Dimensionality: %d, %d, %d, %d, %d; Offset buffer = %d, %d, %d\n", rank, nA, nB, nS,
+    // nSourceNodesPerFace,
+    //         nTargetNodesPerFace, offbuf[0], offbuf[1], offbuf[2] );
 
     // Write output dimensions entries
     unsigned nSrcGridDims = ( m_vecSourceDimSizes.size() );
     unsigned nDstGridDims = ( m_vecTargetDimSizes.size() );
 
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiDim* dimSrcGridRank = ncMap.addDim( "src_grid_rank", nSrcGridDims );
-    NcmpiDim* dimDstGridRank = ncMap.addDim( "dst_grid_rank", nDstGridDims );
-#else
     NcDim* dimSrcGridRank = ncMap.add_dim( "src_grid_rank", nSrcGridDims );
     NcDim* dimDstGridRank = ncMap.add_dim( "dst_grid_rank", nDstGridDims );
-#endif
 
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varSrcGridDims = ncMap.addVar( "src_grid_dims", ncmpiInt, dimSrcGridRank );
-    NcmpiVar* varDstGridDims = ncMap.addVar( "dst_grid_dims", ncmpiInt, dimDstGridRank );
-#else
     NcVar* varSrcGridDims = ncMap.add_var( "src_grid_dims", ncInt, dimSrcGridRank );
     NcVar* varDstGridDims = ncMap.add_var( "dst_grid_dims", ncInt, dimDstGridRank );
+
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varSrcGridDims, is_independent );
+    ncMap.enable_var_par_access( varDstGridDims, is_independent );
 #endif
 
     char szDim[64];
     if( ( nSrcGridDims == 1 ) && ( m_vecSourceDimSizes[0] != (int)nA ) )
     {
-        int tmp = (int)( nA );
-        varSrcGridDims->put( &tmp, 1 );
+        varSrcGridDims->put( &globuf[0], 1 );
         varSrcGridDims->add_att( "name0", "num_dof" );
     }
     else
     {
         for( unsigned i = 0; i < m_vecSourceDimSizes.size(); i++ )
         {
+            int tmp = ( i == 0 ? globuf[0] : m_vecSourceDimSizes[i] );
             varSrcGridDims->set_cur( nSrcGridDims - i - 1 );
-            varSrcGridDims->put( &( m_vecSourceDimSizes[i] ), 1 );
+            varSrcGridDims->put( &( tmp ), 1 );
         }
 
         for( unsigned i = 0; i < m_vecSourceDimSizes.size(); i++ )
@@ -405,16 +667,16 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
 
     if( ( nDstGridDims == 1 ) && ( m_vecTargetDimSizes[0] != (int)nB ) )
     {
-        int tmp = (int)( nB );
-        varDstGridDims->put( &tmp, 1 );
+        varDstGridDims->put( &globuf[1], 1 );
         varDstGridDims->add_att( "name0", "num_dof" );
     }
     else
     {
         for( unsigned i = 0; i < m_vecTargetDimSizes.size(); i++ )
         {
+            int tmp = ( i == 0 ? globuf[1] : m_vecTargetDimSizes[i] );
             varDstGridDims->set_cur( nDstGridDims - i - 1 );
-            varDstGridDims->put( &( m_vecTargetDimSizes[i] ), 1 );
+            varDstGridDims->put( &( tmp ), 1 );
         }
 
         for( unsigned i = 0; i < m_vecTargetDimSizes.size(); i++ )
@@ -425,42 +687,16 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     }
 
     // Source and Target mesh resolutions
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiDim* dimNA = ncMap.addDim( "n_a", nA );
-    NcmpiDim* dimNB = ncMap.addDim( "n_b", nB );
-#else
-    NcDim* dimNA          = ncMap.add_dim( "n_a", nA );
-    NcDim* dimNB          = ncMap.add_dim( "n_b", nB );
-#endif
+    NcDim* dimNA = ncMap.add_dim( "n_a", globuf[0] );
+    NcDim* dimNB = ncMap.add_dim( "n_b", globuf[1] );
 
     // Number of nodes per Face
-    int nSourceNodesPerFace = m_dSourceVertexLon.GetColumns();
-    int nTargetNodesPerFace = m_dTargetVertexLon.GetColumns();
-
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiDim* dimNVA = ncMap.addDim( "nv_a", nSourceNodesPerFace );
-    NcmpiDim* dimNVB = ncMap.addDim( "nv_b", nTargetNodesPerFace );
-#else
-    NcDim* dimNVA         = ncMap.add_dim( "nv_a", nSourceNodesPerFace );
-    NcDim* dimNVB         = ncMap.add_dim( "nv_b", nTargetNodesPerFace );
-#endif
+    NcDim* dimNVA = ncMap.add_dim( "nv_a", globuf[3] );
+    NcDim* dimNVB = ncMap.add_dim( "nv_b", globuf[4] );
 
     // Write coordinates
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varYCA = ncMap.addVar( "yc_a", ncmpiDouble, dimNA );
-    NcmpiVar* varYCB = ncMap.addVar( "yc_b", ncmpiDouble, dimNB );
-
-    NcmpiVar* varXCA = ncMap.addVar( "xc_a", ncmpiDouble, dimNA );
-    NcmpiVar* varXCB = ncMap.addVar( "xc_b", ncmpiDouble, dimNB );
-
-    NcmpiVar* varYVA = ncMap.addVar( "yv_a", ncmpiDouble, dimNA, dimNVA );
-    NcmpiVar* varYVB = ncMap.addVar( "yv_b", ncmpiDouble, dimNB, dimNVB );
-
-    NcmpiVar* varXVA = ncMap.addVar( "xv_a", ncmpiDouble, dimNA, dimNVA );
-    NcmpiVar* varXVB = ncMap.addVar( "xv_b", ncmpiDouble, dimNB, dimNVB );
-#else
-    NcVar* varYCA         = ncMap.add_var( "yc_a", ncDouble, dimNA );
-    NcVar* varYCB         = ncMap.add_var( "yc_b", ncDouble, dimNB );
+    NcVar* varYCA = ncMap.add_var( "yc_a", ncDouble, dimNA );
+    NcVar* varYCB = ncMap.add_var( "yc_b", ncDouble, dimNB );
 
     NcVar* varXCA = ncMap.add_var( "xc_a", ncDouble, dimNA );
     NcVar* varXCB = ncMap.add_var( "xc_b", ncDouble, dimNB );
@@ -468,8 +704,18 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     NcVar* varYVA = ncMap.add_var( "yv_a", ncDouble, dimNA, dimNVA );
     NcVar* varYVB = ncMap.add_var( "yv_b", ncDouble, dimNB, dimNVB );
 
-    NcVar* varXVA   = ncMap.add_var( "xv_a", ncDouble, dimNA, dimNVA );
-    NcVar* varXVB   = ncMap.add_var( "xv_b", ncDouble, dimNB, dimNVB );
+    NcVar* varXVA = ncMap.add_var( "xv_a", ncDouble, dimNA, dimNVA );
+    NcVar* varXVB = ncMap.add_var( "xv_b", ncDouble, dimNB, dimNVB );
+
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varYCA, is_independent );
+    ncMap.enable_var_par_access( varYCB, is_independent );
+    ncMap.enable_var_par_access( varXCA, is_independent );
+    ncMap.enable_var_par_access( varXCB, is_independent );
+    ncMap.enable_var_par_access( varYVA, is_independent );
+    ncMap.enable_var_par_access( varYVB, is_independent );
+    ncMap.enable_var_par_access( varXVA, is_independent );
+    ncMap.enable_var_par_access( varXVB, is_independent );
 #endif
 
     varYCA->add_att( "units", "degrees" );
@@ -485,61 +731,49 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     varXVB->add_att( "units", "degrees" );
 
     // Verify dimensionality
-    if( m_dSourceCenterLon.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceCenterLon and nA" ); }
-    if( m_dSourceCenterLat.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceCenterLat and nA" ); }
-    if( m_dTargetCenterLon.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetCenterLon and nB" ); }
-    if( m_dTargetCenterLat.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetCenterLat and nB" ); }
-    if( m_dSourceVertexLon.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceVertexLon and nA" ); }
-    if( m_dSourceVertexLat.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between m_dSourceVertexLat and nA" ); }
-    if( m_dTargetVertexLon.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetVertexLon and nB" ); }
-    if( m_dTargetVertexLat.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between m_dTargetVertexLat and nB" ); }
+    if( dSourceCenterLon.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceCenterLon and nA" ); }
+    if( dSourceCenterLat.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceCenterLat and nA" ); }
+    if( dTargetCenterLon.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetCenterLon and nB" ); }
+    if( dTargetCenterLat.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetCenterLat and nB" ); }
+    if( dSourceVertexLon.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceVertexLon and nA" ); }
+    if( dSourceVertexLat.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceVertexLat and nA" ); }
+    if( dTargetVertexLon.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetVertexLon and nB" ); }
+    if( dTargetVertexLat.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetVertexLat and nB" ); }
 
-    varYCA->put( &( m_dSourceCenterLat[0] ), nA );
-    varYCB->put( &( m_dTargetCenterLat[0] ), nB );
+    varYCA->set_cur( (long)offbuf[0] );
+    varYCA->put( &( dSourceCenterLat[0] ), nA );
+    varYCB->set_cur( (long)offbuf[1] );
+    varYCB->put( &( dTargetCenterLat[0] ), nB );
 
-    varXCA->put( &( m_dSourceCenterLon[0] ), nA );
-    varXCB->put( &( m_dTargetCenterLon[0] ), nB );
+    varXCA->set_cur( (long)offbuf[0] );
+    varXCA->put( &( dSourceCenterLon[0] ), nA );
+    varXCB->set_cur( (long)offbuf[1] );
+    varXCB->put( &( dTargetCenterLon[0] ), nB );
 
-    varYVA->put( &( m_dSourceVertexLat[0][0] ), nA, nSourceNodesPerFace );
-    varYVB->put( &( m_dTargetVertexLat[0][0] ), nB, nTargetNodesPerFace );
+    varYVA->set_cur( (long)offbuf[0] );
+    varYVA->put( &( dSourceVertexLat[0][0] ), nA, nSourceNodesPerFace );
+    varYVB->set_cur( (long)offbuf[1] );
+    varYVB->put( &( dTargetVertexLat[0][0] ), nB, nTargetNodesPerFace );
 
-    varXVA->put( &( m_dSourceVertexLon[0][0] ), nA, nSourceNodesPerFace );
-    varXVB->put( &( m_dTargetVertexLon[0][0] ), nB, nTargetNodesPerFace );
-
-    // Write vector centers
-    if( ( m_dVectorTargetCenterLat.GetRows() != 0 ) && ( m_dVectorTargetCenterLon.GetRows() != 0 ) )
-    {
-        NcDim* dimLatB = ncMap.add_dim( "lat_b", m_dVectorTargetCenterLat.GetRows() );
-        NcDim* dimLonB = ncMap.add_dim( "lon_b", m_dVectorTargetCenterLon.GetRows() );
-
-        NcVar* varLatCB = ncMap.add_var( "latc_b", ncDouble, dimLatB );
-        NcVar* varLonCB = ncMap.add_var( "lonc_b", ncDouble, dimLonB );
-
-        varLatCB->put( &( m_dVectorTargetCenterLat[0] ), dimLatB->size() );
-        varLonCB->put( &( m_dVectorTargetCenterLon[0] ), dimLonB->size() );
-
-        NcDim* dimBounds    = ncMap.add_dim( "bnds", 2 );
-        NcVar* varLatBounds = ncMap.add_var( "lat_bnds", ncDouble, dimLatB, dimBounds );
-        NcVar* varLonBounds = ncMap.add_var( "lon_bnds", ncDouble, dimLonB, dimBounds );
-
-        varLatBounds->put( &( m_dVectorTargetBoundsLat[0][0] ), m_dVectorTargetBoundsLat.GetRows(), 2 );
-        varLonBounds->put( &( m_dVectorTargetBoundsLon[0][0] ), m_dVectorTargetBoundsLon.GetRows(), 2 );
-    }
+    varXVA->set_cur( (long)offbuf[0] );
+    varXVA->put( &( dSourceVertexLon[0][0] ), nA, nSourceNodesPerFace );
+    varXVB->set_cur( (long)offbuf[1] );
+    varXVB->put( &( dTargetVertexLon[0][0] ), nB, nTargetNodesPerFace );
 
     // Write areas
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varAreaA = ncMap.addVar( "area_a", ncmpiDouble, dimNA );
-#else
     NcVar* varAreaA = ncMap.add_var( "area_a", ncDouble, dimNA );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varAreaA, is_independent );
 #endif
-    varAreaA->put( &( m_dSourceAreas[0] ), nA );
+    varAreaA->set_cur( (long)offbuf[0] );
+    varAreaA->put( &( vecSourceFaceArea[0] ), nA );
 
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varAreaB = ncMap.addVar( "area_b", ncmpiDouble, dimNB );
-#else
     NcVar* varAreaB = ncMap.add_var( "area_b", ncDouble, dimNB );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varAreaB, is_independent );
 #endif
-    varAreaB->put( &( m_dTargetAreas[0] ), nB );
+    varAreaB->set_cur( (long)offbuf[1] );
+    varAreaB->put( &( vecTargetFaceArea[0] ), nB );
 
     // Write frac
     DataArray1D< double > dFracA( nA );
@@ -547,11 +781,11 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     {
         dFracA[i] = 1.0;
     }
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varFracA = ncMap.addVar( "frac_a", ncmpiDouble, dimNA );
-#else
     NcVar* varFracA = ncMap.add_var( "frac_a", ncDouble, dimNA );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varFracA, is_independent );
 #endif
+    varFracA->set_cur( (long)offbuf[0] );
     varFracA->put( &( dFracA[0] ), nA );
 
     DataArray1D< double > dFracB( nB );
@@ -559,53 +793,52 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     {
         dFracB[i] = 1.0;
     }
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varFracB = ncMap.addVar( "frac_b", ncmpiDouble, dimNB );
-#else
     NcVar* varFracB = ncMap.add_var( "frac_b", ncDouble, dimNB );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varFracB, is_independent );
 #endif
+    varFracB->set_cur( (long)offbuf[1] );
     varFracB->put( &( dFracB[0] ), nB );
 
     // Write SparseMatrix entries
-    int nS = m_weightMatrix.nonZeros();
     DataArray1D< int > vecRow( nS );
     DataArray1D< int > vecCol( nS );
     DataArray1D< double > vecS( nS );
 
-    for( int i = 0; i < m_weightMatrix.outerSize(); i++ )
+    int offset = 0;
+    for( int i = 0; i < m_weightMatrix.outerSize(); ++i )
     {
         for( WeightMatrix::InnerIterator it( m_weightMatrix, i ); it; ++it )
         {
-            vecRow[i] = 1 + it.row();  // row index
-            vecCol[i] = 1 + it.col();  // col index
-            vecS[i]   = it.value();    // value
+            vecRow[offset] = 1 + this->GetRowGlobalDoF( it.row() );  // row index
+            vecCol[offset] = 1 + this->GetColGlobalDoF( it.col() );  // col index
+            vecS[offset]   = it.value();                             // value
+            offset++;
         }
     }
 
+    // printf( "rank %d: nS = %d, offset = %d, vals = %d, %d, %d, %d\n", rank, nS, offset, vecRow[offset - 1],
+    //         vecRow[offset - 2], vecCol[offset - 1], vecCol[offset - 2] );
+
     // Load in data
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiDim* dimNS = ncMap.add_dim( "n_s", nS );
-#else
-    NcDim* dimNS    = ncMap.add_dim( "n_s", nS );
+    NcDim* dimNS = ncMap.add_dim( "n_s", globuf[2] );
+
+    NcVar* varRow = ncMap.add_var( "row", ncInt, dimNS );
+    NcVar* varCol = ncMap.add_var( "col", ncInt, dimNS );
+    NcVar* varS   = ncMap.add_var( "S", ncDouble, dimNS );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varRow, is_independent );
+    ncMap.enable_var_par_access( varCol, is_independent );
+    ncMap.enable_var_par_access( varS, is_independent );
 #endif
 
-#ifdef IO_USE_PARALLEL_NETCDF
-    NcmpiVar* varRow = ncMap.addVar( "row", ncmpiInt, dimNS );
-    NcmpiVar* varCol = ncMap.addVar( "col", ncmpiInt, dimNS );
-    NcmpiVar* varS   = ncMap.addVar( "S", ncmpiDouble, dimNS );
-#else
-    NcVar* varRow   = ncMap.add_var( "row", ncInt, dimNS );
-    NcVar* varCol   = ncMap.add_var( "col", ncInt, dimNS );
-    NcVar* varS     = ncMap.add_var( "S", ncDouble, dimNS );
-#endif
+    varRow->set_cur( (long)offbuf[2] );
+    varRow->put( vecRow, nS );
 
-    varRow->set_cur( (long)0 );
-    varRow->put( &( vecRow[0] ), nS );
+    varCol->set_cur( (long)offbuf[2] );
+    varCol->put( vecCol, nS );
 
-    varCol->set_cur( (long)0 );
-    varCol->put( &( vecCol[0] ), nS );
-
-    varS->set_cur( (long)0 );
+    varS->set_cur( (long)offbuf[2] );
     varS->put( &( vecS[0] ), nS );
 
     // Add global attributes
@@ -616,6 +849,10 @@ void moab::TempestOnlineMap::WriteParallelWeightsToFile( std::string strFilename
     //         iterAttributes->first.c_str(),
     //         iterAttributes->second.c_str());
     // }
+
+    ncMap.close();
+
+    return moab::MB_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

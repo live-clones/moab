@@ -5,6 +5,10 @@
 #include <string>
 #endif
 #include "moab/MOABConfig.h"
+#ifdef MOAB_HAVE_MPI
+#include "mpi.h"
+#endif
+
 /* Define these here because they are used by many tests
  * to find the add directory for input files */
 #define STRINGIFY_( X ) #X
@@ -271,7 +275,15 @@ typedef moab::ErrorCode ( *test_func_err )( void );
 int run_test( test_func_err test, const char* func_name )
 #endif
 {
-    printf( "Running %s ...\n", func_name );
+    // check if we are running parallel MPI tests
+    int rank = 0;
+#ifdef MOAB_HAVE_MPI
+    int isInit;
+    MPI_Initialized( &isInit );
+    if( isInit ) { MPI_Comm_rank( MPI_COMM_WORLD, &rank ); }
+#endif
+
+    if( rank == 0 ) printf( "Running %s ...\n", func_name );
 
 #if MODE == EXCEPTION_MODE
     /* On Windows, run all tests in same process.
@@ -284,12 +296,12 @@ int run_test( test_func_err test, const char* func_name )
     }
     catch( ErrorExcept )
     {
-        printf( "  %s: FAILED\n", func_name );
+        printf( "[%d]  %s: FAILED\n", rank, func_name );
         return 1;
     }
     catch( ... )
     {
-        printf( "  %s: UNCAUGHT EXCEPTION\n", func_name );
+        printf( "[%d]  %s: UNCAUGHT EXCEPTION\n", rank, func_name );
         return 1;
     }
 

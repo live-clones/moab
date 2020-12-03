@@ -46,6 +46,14 @@ void LinearRemapFVtoGLL_Volumetric( const Mesh& meshInput, const Mesh& meshOutpu
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#define MPI_CHK_ERR( err )                                      \
+    if( err )                                                   \
+    {                                                           \
+        std::cout << "MPI Failure. ErrorCode (" << err << ") "; \
+        std::cout << "\nMPI Aborting... \n";                    \
+        return moab::MB_FAILURE;                                \
+    }
+
 moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : OfflineMap(), m_remapper( remapper )
 {
     // Get the references for the MOAB core objects
@@ -63,6 +71,7 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
     is_parallel = false;
     is_root     = true;
     rank        = 0;
+    root_proc   = rank;
     size        = 1;
 #ifdef MOAB_HAVE_MPI
     int flagInit;
@@ -85,10 +94,16 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
     std::vector< int > dimSizes( 1 );
     dimNames[0] = "num_elem";
 
-    dimSizes[0] = m_meshInputCov->faces.size();
-    this->InitializeSourceDimensions( dimNames, dimSizes );
-    dimSizes[0] = m_meshOutput->faces.size();
-    this->InitializeTargetDimensions( dimNames, dimSizes );
+    if( m_meshInputCov )
+    {
+        dimSizes[0] = m_meshInputCov->faces.size();
+        this->InitializeSourceDimensions( dimNames, dimSizes );
+    }
+    if( m_meshOutput )
+    {
+        dimSizes[0] = m_meshOutput->faces.size();
+        this->InitializeTargetDimensions( dimNames, dimSizes );
+    }
 
     // Build a matrix of source and target discretization so that we know how to assign
     // the global DoFs in parallel for the mapping weights
@@ -1474,6 +1489,380 @@ int moab::TempestOnlineMap::IsMonotone( double dTolerance )
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+static void print_progress( const int barWidth, const float progress, const char* message )
+{
+    std::cout << message << " [";
+    int pos = barWidth * progress;
+    for( int i = 0; i < barWidth; ++i )
+    {
+        if( i < pos )
+            std::cout << "=";
+        else if( i == pos )
+            std::cout << ">";
+        else
+            std::cout << " ";
+    }
+    std::cout << "] " << int( progress * 100.0 ) << " %\r";
+    std::cout.flush();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
+                                                         const std::vector< int >& owned_dof_ids,
+                                                         bool /* row_major_ownership */ )
+{
+    NcError error( NcError::silent_nonfatal );
+
+    const bool verbose = false;
+    // Define our total buffer size to use
+    NcFile* ncMap = NULL;
+    NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
+
+#ifdef MOAB_HAVE_MPI
+    int mpierr = 0;
+#endif
+    const int nBufferSize = 256 * 1024;  // 256 KB
+    const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
+    const int nMaxEntries = nBufferSize / nNNZBytes;
+    int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
+
+#ifdef MOAB_HAVE_MPI
+    MPI_Comm commW = m_pcomm->comm();
+#endif
+
+    if( is_root )
+    {
+        ncMap = new NcFile( strSource, NcFile::ReadOnly );
+        if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", strSource ); }
+
+        // Source and Target mesh resolutions
+        NcDim* dimNA = ncMap->get_dim( "n_a" );
+        if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
+        else nA = dimNA->size();
+
+        NcDim* dimNB = ncMap->get_dim( "n_b" );
+        if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
+        else nB = dimNB->size();
+
+        NcDim* dimNVA = ncMap->get_dim( "nv_a" );
+        if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        else nVA = dimNVA->size();
+
+        NcDim* dimNVB = ncMap->get_dim( "nv_b" );
+        if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
+        else nVB = dimNVB->size();
+
+        // Read SparseMatrix entries
+        NcDim* dimNS = ncMap->get_dim( "n_s" );
+        if( dimNS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", strSource ); }
+
+        // store total number of nonzeros
+        nS = dimNS->size();
+
+        varRow = ncMap->get_var( "row" );
+        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
+
+        varCol = ncMap->get_var( "col" );
+        if( varCol == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
+
+        varS = ncMap->get_var( "S" );
+        if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
+    }
+
+    // const int nTotalBytes = nS * nNNZBytes;
+    int nEntriesRemaining = nS;
+    int nBufferedReads    = static_cast< int >( ceil( nS * ( 1.0 / nMaxEntries ) ) );
+    int runData[6]        = { nA, nB, nVA, nVB, nS, nBufferedReads };
+
+#ifdef MOAB_HAVE_MPI
+    mpierr = MPI_Bcast( runData, 6, MPI_INT, root_proc, commW );MPI_CHK_ERR( mpierr );
+#endif
+
+    if( !is_root )
+    {
+        nA             = runData[0];
+        nB             = runData[1];
+        nVA            = runData[2];
+        nVB            = runData[3];
+        nS             = runData[4];
+        nBufferedReads = runData[5];
+
+        if( verbose )
+            printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n",
+                    nA, nB, nVA, nVB, nS, nNNZBytes, nBufferedReads );
+    }
+
+    std::vector<int> rowOwnership;
+    // if owned_dof_ids = NULL, use the default trivial partitioning scheme
+    if( is_root && owned_dof_ids.size() == 0 )
+    {
+        // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
+        rowOwnership.resize( size );
+        int nGRowPerPart   = nB / size;
+        int nGRowRemainder = nB % size;  // Keep the remainder in root
+        rowOwnership[0]    = nGRowPerPart + nGRowRemainder;
+        for( int ip = 1, roffset = rowOwnership[0]; ip < size; ++ip )
+        {
+            roffset          += nGRowPerPart;
+            rowOwnership[ip] = roffset;
+        }
+    }
+
+    // Let us declare the map object for every process
+    SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
+
+    std::map< int, int > rowMap, colMap;
+    int rindexMax = 0, cindexMax = 0;
+    long offset = 0;
+
+    const char* message = "MapReadBcast: ";
+    int barWidth        = 50;
+    float progress      = 0.0;
+    /* Split the rows and send to processes in chunks
+       Let us start the buffered read */
+    for( int iRead = 0; iRead < nBufferedReads; ++iRead )
+    {
+        // pointers to the data
+        DataArray1D< int > vecRow;
+        DataArray1D< int > vecCol;
+        DataArray1D< double > vecS;
+        std::vector< std::vector< int > > dataPerProcess( size );
+        std::vector< int > nDataPerProcess( size, 0 );
+        for( int ip = 0; ip < size; ++ip )
+            dataPerProcess[ip].reserve( std::max( 100, nMaxEntries / size ) );
+
+        if( is_root )
+        {
+            int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
+
+            // printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
+            print_progress( barWidth, progress, message );
+
+            // Allocate and resize based on local buffer size
+            vecRow.Allocate( nLocSize );
+            vecCol.Allocate( nLocSize );
+            vecS.Allocate( nLocSize );
+
+            varRow->set_cur( (long)( offset ) );
+            varRow->get( &( vecRow[0] ), nLocSize );
+
+            varCol->set_cur( (long)( offset ) );
+            varCol->get( &( vecCol[0] ), nLocSize );
+
+            varS->set_cur( (long)( offset ) );
+            varS->get( &( vecS[0] ), nLocSize );
+
+            // Decrement vecRow and vecCol
+            for( size_t i = 0; i < vecRow.GetRows(); i++ )
+            {
+                vecRow[i]--;
+                vecCol[i]--;
+
+                // TODO: Fix this linear search to compute process ownership
+                int pOwner = -1;
+                if( rowOwnership[0] > vecRow[i] )
+                    pOwner = 0;
+                else
+                {
+                    for( int ip = 1; ip < size; ++ip )
+                    {
+                        if( rowOwnership[ip - 1] <= vecRow[i] && rowOwnership[ip] > vecRow[i] )
+                        {
+                            pOwner = ip;
+                            break;
+                        }
+                    }
+                }
+
+                assert( pOwner >= 0 && pOwner < size );
+                dataPerProcess[pOwner].push_back( i );
+
+                // if( pOwner == rootProc )  // avoid actual communication if setting data on root proccess
+                //     sparseMatrix( vecRow[i], vecCol[i] ) = vecS[i];
+            }
+
+            offset += nLocSize;
+            nEntriesRemaining -= nLocSize;
+            progress = 1.0 - nEntriesRemaining * ( 1.0 / nS );
+
+            for( int ip = 0; ip < size; ++ip )
+                nDataPerProcess[ip] = dataPerProcess[ip].size();
+
+            // Set the entries of the map on the root
+            // sparseMatrix.SetEntries( vecRow, vecCol, vecS );
+        }
+
+        // Communicate the number of DoF data to expect from root
+        int nEntriesComm = 0;
+#ifdef MOAB_HAVE_MPI
+        mpierr = MPI_Scatter( nDataPerProcess.data(), 1, MPI_INT, &nEntriesComm, 1, MPI_INT, root_proc, commW );MPI_CHK_ERR( mpierr );
+#else
+        nEntriesComm = nDataPerProcess[0];
+#endif
+
+#ifdef MOAB_HAVE_MPI
+        if( is_root )
+        {
+            std::vector< MPI_Request > cRequests;
+            std::vector< MPI_Status > cStats( 2 * size - 2 );
+            cRequests.reserve( 2 * size - 2 );
+
+            // First send out all the relevant data buffers to other process
+            std::vector< std::vector< int > > dataRowColsAll( size );
+            std::vector< std::vector< double > > dataEntriesAll( size );
+            for( int ip = 1; ip < size; ++ip )
+            {
+                const int nDPP = nDataPerProcess[ip];
+                if( nDPP > 0 )
+                {
+                    std::vector< int >& dataRowCols = dataRowColsAll[ip];
+                    dataRowCols.resize( 2 * nDPP );
+                    std::vector< double >& dataEntries = dataEntriesAll[ip];
+                    dataEntries.resize( nDPP );
+
+                    for( int ij = 0; ij < nDPP; ++ij )
+                    {
+                        dataRowCols[ij * 2]     = vecRow[dataPerProcess[ip][ij]];
+                        dataRowCols[ij * 2 + 1] = vecCol[dataPerProcess[ip][ij]];
+                        dataEntries[ij]         = vecS[dataPerProcess[ip][ij]];
+                    }
+
+                    MPI_Request rcsend, dsend;
+                    mpierr = MPI_Isend( dataRowCols.data(), 2 * nDPP, MPI_INT, ip, iRead * 1000, commW, &rcsend );MPI_CHK_ERR( mpierr );
+                    mpierr = MPI_Isend( dataEntries.data(), nDPP, MPI_DOUBLE, ip, iRead * 1000 + 1, commW, &dsend );MPI_CHK_ERR( mpierr );
+
+                    cRequests.push_back( rcsend );
+                    cRequests.push_back( dsend );
+                }
+            }
+#endif
+            // Next perform all necessary local work while we wait for the buffers to be sent out
+            // Compute an offset for the rows and columns by creating a local to global mapping for rootProc
+            assert( dataPerProcess[0].size() - nEntriesComm == 0 );  // sanity check
+            for( int i = 0; i < nEntriesComm; ++i )
+            {
+                int rindex, cindex;
+                const int& vecRowValue = vecRow[dataPerProcess[0][i]];
+                const int& vecColValue = vecCol[dataPerProcess[0][i]];
+
+                std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+                if( riter == rowMap.end() )
+                {
+                    rowMap[vecRowValue] = rindexMax;
+                    rindex              = rindexMax;
+                    rindexMax++;
+                }
+                else
+                    rindex = riter->second;
+
+                std::map< int, int >::iterator citer = colMap.find( vecColValue );
+                if( citer == colMap.end() )
+                {
+                    colMap[vecColValue] = cindexMax;
+                    cindex              = cindexMax;
+                    cindexMax++;
+                }
+                else
+                    cindex = citer->second;
+
+                sparseMatrix( rindex, cindex ) = vecS[i];
+            }
+
+#ifdef MOAB_HAVE_MPI
+            // Wait until all communication is pushed out
+            mpierr = MPI_Waitall( cRequests.size(), cRequests.data(), cStats.data() );MPI_CHK_ERR( mpierr );
+        }  // if( is_root )
+        else
+        {
+            if( nEntriesComm > 0 )
+            {
+                MPI_Request cRequests[2];
+                MPI_Status cStats[2];
+
+                // create buffers to receive the data from root process
+                std::vector< int > dataRowCols( 2 * nEntriesComm );
+                vecRow.Allocate( nEntriesComm );
+                vecCol.Allocate( nEntriesComm );
+                vecS.Allocate( nEntriesComm );
+
+                /* TODO: combine row and column scatters together. Save one communication by better packing */
+                // Scatter the rows, cols and entries to the processes according to the partition
+                mpierr = MPI_Irecv( dataRowCols.data(), 2 * nEntriesComm, MPI_INT, root_proc, iRead * 1000, commW,
+                                    &cRequests[0] );MPI_CHK_ERR( mpierr );
+
+                mpierr = MPI_Irecv( vecS, nEntriesComm, MPI_DOUBLE, root_proc, iRead * 1000 + 1, commW, &cRequests[1] );MPI_CHK_ERR( mpierr );
+
+                // Wait until all communication is pushed out
+                mpierr = MPI_Waitall( 2, cRequests, cStats );MPI_CHK_ERR( mpierr );
+
+                // Compute an offset for the rows and columns by creating a local to global mapping
+                int rindex = 0, cindex = 0;
+                for( int i = 0; i < nEntriesComm; ++i )
+                {
+                    const int& vecRowValue = dataRowCols[i * 2];
+                    const int& vecColValue = dataRowCols[i * 2 + 1];
+
+                    std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+                    if( riter == rowMap.end() )
+                    {
+                        rowMap[vecRowValue] = rindexMax;
+                        rindex              = rindexMax;
+                        rindexMax++;
+                    }
+                    else
+                        rindex = riter->second;
+                    vecRow[i] = rindex;
+
+                    std::map< int, int >::iterator citer = colMap.find( vecColValue );
+                    if( citer == colMap.end() )
+                    {
+                        colMap[vecColValue] = cindexMax;
+                        cindex              = cindexMax;
+                        cindexMax++;
+                    }
+                    else
+                        cindex = citer->second;
+                    vecCol[i] = cindex;
+
+                    sparseMatrix( rindex, cindex ) = vecS[i];
+                }
+
+                // clear the local buffer
+                dataRowCols.clear();
+
+                // Now set the data received from root onto the sparse matrix
+                // sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
+
+            }  // if( nEntriesComm > 0 )
+        }      // if( !is_root )
+
+        MPI_Barrier( commW );
+#endif
+    }
+
+    if( rank == 0 )
+    {
+        print_progress( barWidth, progress, message );
+        std::cout << std::endl;
+        assert( nEntriesRemaining == 0 );
+        ncMap->close();
+    }
+
+    // Close and free the handle to mapping file
+    delete ncMap;
+
+    m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
+    m_nTotDofs_Dest   = sparseMatrix.GetRows();
+
+#ifdef MOAB_HAVE_EIGEN
+    this->copy_tempest_sparsemat_to_eigen3();
+#endif
+
+    return moab::MB_SUCCESS;
+}
+
 
 moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( std::string strOutputFile )
 {

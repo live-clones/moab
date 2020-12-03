@@ -319,24 +319,35 @@ int runner_run_tests( int argc, char* argv[] )
         }
     } while( ran_some );
 
+    // check if we are running parallel MPI tests
+    int rank = 0;
+#ifdef MOAB_HAVE_MPI
+    int isInit;
+    MPI_Initialized( &isInit );
+    if( isInit ) { MPI_Comm_rank( MPI_COMM_WORLD, &rank ); }
+#endif
+
     // Print brief summary
-    if( num_run == (int)RunnerTestCount && !fail_count ) { printf( "All %d tests passed.\n", num_run ); }
-    else if( num_run == num_selected && !fail_count )
+    if( rank == 0 )
     {
-        printf( "All %d selected tests passed.\n", num_run );
-        printf( "Skipped %d non-selected tests\n", (int)( RunnerTestCount - num_selected ) );
-    }
-    else
-    {
-        printf( "%2d tests registered\n", (int)RunnerTestCount );
-        if( num_selected == num_run )
-            printf( "%2d tests selected\n", num_selected );
+        if( num_run == (int)RunnerTestCount && !fail_count ) { printf( "All %d tests passed.\n", num_run ); }
+        else if( num_run == num_selected && !fail_count )
+        {
+            printf( "All %d selected tests passed.\n", num_run );
+            printf( "Skipped %d non-selected tests\n", (int)( RunnerTestCount - num_selected ) );
+        }
         else
-            printf( "%2d of %2d tests ran\n", num_run, num_selected );
-        if( num_run < (int)RunnerTestCount )
-            printf( "%2d of %2d tests skipped\n", (int)RunnerTestCount - num_run, (int)RunnerTestCount );
-        printf( "%2d of %2d tests passed\n", num_run - fail_count, num_run );
-        if( fail_count ) printf( "%2d of %2d tests FAILED\n", fail_count, num_run );
+        {
+            printf( "%2d tests registered\n", (int)RunnerTestCount );
+            if( num_selected == num_run )
+                printf( "%2d tests selected\n", num_selected );
+            else
+                printf( "%2d of %2d tests ran\n", num_run, num_selected );
+            if( num_run < (int)RunnerTestCount )
+                printf( "%2d of %2d tests skipped\n", (int)RunnerTestCount - num_run, (int)RunnerTestCount );
+            printf( "%2d of %2d tests passed\n", num_run - fail_count, num_run );
+            if( fail_count ) printf( "%2d of %2d tests FAILED\n", fail_count, num_run );
+        }
     }
 
     return error_count;
