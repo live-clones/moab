@@ -99,11 +99,11 @@ int main( int argc, char** argv )
     if( spherical )
     {
         std::cout << " use spherical coordinates on the sphere of radius 1.\n";
-        SphereCoords pos;
+        IntxUtils::SphereCoords pos;
         pos.R   = 1;                 // always on the
         pos.lat = lat * M_PI / 180;  // defined in math.h
         pos.lon = lon * M_PI / 180;
-        point   = spherical_to_cart( pos );
+        point   = IntxUtils::spherical_to_cart( pos );
     }
 
     Range closeByCells;
