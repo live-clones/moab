@@ -71,6 +71,7 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
       esac
     fi
   fi
+  AM_CONDITIONAL(HAVE_EIGEN, [test "xno" != "x$enableeigen"])
   
   dnl Substitute the substitution variables
   AC_SUBST(EIGEN3_DIR) 
