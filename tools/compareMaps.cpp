@@ -247,10 +247,10 @@ int main( int argc, char* argv[] )
     weight2.makeCompressed();
 
     Eigen::SparseMatrix< double > diff = weight1 - weight2;
-    double maxv                        = diff.coeffs().maxCoeff();
-    double minv                        = diff.coeffs().minCoeff();
+    /*double maxv                        = diff.coeffs().maxCoeff();
+    double minv                        = diff.coeffs().minCoeff();*/
     std::cout << " euclidian norm for difference: " << diff.norm()
-              << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
-              << " minv: " << minv << " maxv: " << maxv << "\n";
+              << " \n squared norm for difference: " << diff.squaredNorm() << "\n";
+             // << " minv: " << minv << " maxv: " << maxv << "\n";
     return 0;
 }
