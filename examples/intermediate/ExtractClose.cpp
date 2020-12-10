@@ -139,5 +139,9 @@ int main( int argc, char** argv )
         if( numProcesses > 1 ) writeOpts = string( "PARALLEL=WRITE_PART;" );
         rval = mb.write_file( outFile.c_str(), 0, writeOpts.c_str(), &outSet, 1 );MB_CHK_SET_ERR( rval, "Can't write file" );
     }
+#ifdef MOAB_HAVE_MPI
+    fail = MPI_Finalize();
+    if( fail ) return 1;
+#endif
     return 0;
 }
