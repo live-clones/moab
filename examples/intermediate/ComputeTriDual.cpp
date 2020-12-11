@@ -22,7 +22,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual_set, moab::Range& cells)
+moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual_set, moab::Range& cells )
 {
     moab::ErrorCode rval;
 
@@ -97,7 +97,7 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
         }
 
         std::vector< moab::EntityHandle >& face = polygonConn[nEdges];
-        if (face.size() == 0) face.reserve(nEdges*verts.size()/4);
+        if( face.size() == 0 ) face.reserve( nEdges * verts.size() / 4 );
         face.push_back( dualverts[adjs[0] - svtx] );
 
         // Orient each Face by putting Nodes in order of increasing angle
@@ -133,12 +133,12 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
         rval = iface->get_element_connect( nElePerType, eit->first, moab::MBPOLYGON, 0, starte, conn );MB_CHK_SET_ERR( rval, "Can't get element connectivity" );
 
         // copy the connectivity that we have accumulated
-        std::copy( eit->second.begin(), eit->second.end(), conn);
+        std::copy( eit->second.begin(), eit->second.end(), conn );
         eit->second.clear();
 
         // add this polygon sequence to the aggregate data
         moab::Range mbcells( starte, starte + nElePerType - 1 );
-        dualcells.merge(mbcells);
+        dualcells.merge( mbcells );
     }
 
     // add the computed dual cells to mesh
@@ -148,10 +148,10 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
     assert( dualcells.size() == verts.size() );
     gids.resize( verts.size() );
     rval = mb->tag_get_data( gidTag, verts, &gids[0] );MB_CHK_SET_ERR( rval, "Can't set global_id tag" );
-    if (gids[0] == gids[1] && gids[0] < 0)
+    if( gids[0] == gids[1] && gids[0] < 0 )
     {
 #ifdef MOAB_HAVE_MPI
-        moab::ParallelComm pcomm(mb, MPI_COMM_WORLD);
+        moab::ParallelComm pcomm( mb, MPI_COMM_WORLD );
 
         rval = pcomm.assign_global_ids( dual_set, 2, 1, false, true, true );MB_CHK_SET_ERR( rval, "Can't assign global_ids" );
 #else
@@ -201,8 +201,7 @@ int main( int argc, char** argv )
     int numProcesses = 1;
 
 #ifdef MOAB_HAVE_MPI
-    int fail = MPI_Init( &argc, &argv );
-    if( fail ) return 1;
+    if( MPI_Init( &argc, &argv ) ) return 1;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
 
@@ -232,13 +231,11 @@ int main( int argc, char** argv )
     rval = compute_dual_mesh( mb, dual_set, cells );MB_CHK_SET_ERR( rval, "Failed to compute dual mesh" );
 
     std::string writeopts="";
-#ifdef MOAB_HAVE_MPI
-#ifdef MOAB_HAVE_HDF5
+#if defined(MOAB_HAVE_MPI) && defined(MOAB_HAVE_HDF5)
     if( outputFile.substr( outputFile.find_last_of( "." ) + 1 ) == "h5m" )
     {
         writeopts = "PARALLEL=WRITE_PART";
     }
-#endif
 #endif
 
     // write the mesh to disk
@@ -251,8 +248,7 @@ int main( int argc, char** argv )
     delete mb;
 
 #ifdef MOAB_HAVE_MPI
-    fail = MPI_Finalize();
-    if( fail ) return 1;
+    if( MPI_Finalize() ) return 1;
 #endif
     return 0;
 }
