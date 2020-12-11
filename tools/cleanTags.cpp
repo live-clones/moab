@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
             if( !deleteTag ) tagsToDelete.push_back( tname );
         }
     }
-    if( !deleteTags.empty() ) { vector< string > tagsToDelete = split( deleteTags, string( ":" ) ); }
+    if( !deleteTags.empty() ) { tagsToDelete = split( deleteTags, string( ":" ) ); }
     for( size_t i = 0; i < tagsToDelete.size(); i++ )
     {
         Tag tag;
