@@ -382,6 +382,7 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
         }
     }
 
+
     // ***********************
     // Read acis records...
     // ***********************
@@ -389,6 +390,10 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
     if( MB_SUCCESS != opts.get_str_option( "SAT_FILE", sat_file_name ) ) sat_file_name.clear();
     result = read_acis_records( sat_file_name.empty() ? NULL : sat_file_name.c_str() );RR;
 
+    if( MB_SUCCESS == opts.get_null_option( "SKIP_TOPOLOGY") )
+    {
+        return MB_SUCCESS;
+    }
     // ***********************
     // Read groups...
     // ***********************
