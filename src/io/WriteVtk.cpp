@@ -251,7 +251,9 @@ ErrorCode WriteVtk::write_elems( std::ostream& stream, const Range& nodes, const
         EntityHandle elem           = *i;
         const EntityHandle* connect = NULL;
         int conn_len                = 0;
-        rval                        = mbImpl->get_connectivity( elem, connect, conn_len );MB_CHK_ERR( rval );
+        // Dummy storage vector for structured mesh "get_connectivity" function
+        std::vector< EntityHandle > storage;
+        rval = mbImpl->get_connectivity( elem, connect, conn_len, false, &storage );MB_CHK_ERR( rval );
 
         num_uses += conn_len;
         // if polyhedra, we will count the number of nodes in each face too
@@ -286,7 +288,9 @@ ErrorCode WriteVtk::write_elems( std::ostream& stream, const Range& nodes, const
         // Get element connectivity
         const EntityHandle* connect = NULL;
         int conn_len                = 0;
-        rval                        = mbImpl->get_connectivity( elem, connect, conn_len );MB_CHK_ERR( rval );
+        // Dummy storage vector for structured mesh "get_connectivity" function
+        std::vector< EntityHandle > storage;
+        rval = mbImpl->get_connectivity( elem, connect, conn_len, false, &storage );MB_CHK_ERR( rval );
 
         // Get VTK type
         const VtkElemType* vtk_type = VtkUtil::get_vtk_type( type, conn_len );

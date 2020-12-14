@@ -50,6 +50,15 @@ ifeq ("$(MOAB_MPI_ENABLED)","yes")
 	${RUNPARALLEL} ./PointInElementSearch
 endif
 
+run-ExtractClose: ExtractClose 
+	${RUNSERIAL} ./ExtractClose -h
+
+run-FixPolys: FixPolys
+	${RUNSERIAL} ./FixPolys -h
+
+run-QuadTriConv: QuadTriConv
+	${RUNSERIAL} ./QuadTriConv
+
 run: all $(addprefix run-,$(ALLEXAMPLES))
 
 clean: clobber
