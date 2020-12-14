@@ -48,11 +48,11 @@ EXTRA_DIST = README.hexmodops \
              CMakeLists.txt
 
 if HAVE_HDF5
-  bin_PROGRAMS += compareFiles mbintxchk cleanTags 
+  bin_PROGRAMS += mbcmpfiles mbintxchk mbcleantags 
 if HAVE_NETCDF
   bin_PROGRAMS += mbaddnc mbaddchunk
 if HAVE_EIGEN
-  bin_PROGRAMS += compareMaps
+  bin_PROGRAMS += mbcmpmaps
 endif
 endif
 endif
@@ -221,10 +221,10 @@ parread_SOURCES = parread.cpp
 mbhonodes_SOURCES = honodes.cpp
 mbaddnc_SOURCES = addncdata.cpp
 mbaddchunk_SOURCES = mbaddchunk.cpp
-compareFiles_SOURCES = compareFiles.cpp
+mbcmpfiles_SOURCES = compareFiles.cpp
 mbintxchk_SOURCES = mbIntxCheck.cpp
-compareMaps_SOURCES = compareMaps.cpp
-cleanTags_SOURCES = cleanTags.cpp
+mbcmpmaps_SOURCES = compareMaps.cpp
+mbcleantags_SOURCES = cleanTags.cpp
 
 bin_PROGRAMS += mbslavepart
 mbslavepart_SOURCES = mbslavepart.cpp

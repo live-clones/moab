@@ -5,7 +5,7 @@
  * maybe there is another utility in nco, need to ask Charlie Zender
  *
  * example of usage:
- * ./compareMaps map1.nc map2.nc
+ * ./mbcmpmaps map1.nc map2.nc
  * will look for row, col, S entries, and use eigen3 sparse matrix constructor
  *
  * can be built only if netcdf and eigen3 are available

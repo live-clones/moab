@@ -4,7 +4,7 @@
  * will use just the names of the tags
  *
  * example of usage:
- * ./cleanTags -i input_file.h5m -o outfile.h5m -d list_tags_separated_by':' -k list_tags separated by ':'
+ * ./mbcleantags -i input_file.h5m -o outfile.h5m -d list_tags_separated_by':' -k list_tags separated by ':'
  *
  */
 #include "moab/MOABConfig.h"
