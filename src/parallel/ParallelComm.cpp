@@ -3907,7 +3907,7 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
     result = mbImpl->get_number_entities_by_dimension(this_set, 0, num_local);
     if (MB_SUCCESS != result)return result;
     int failure = MPI_Allreduce(num_local, num_total, 1,
-    MPI_INTEGER, MPI_SUM, procConfig.proc_comm());
+    MPI_INT, MPI_SUM, procConfig.proc_comm());
     if (failure) {
       MB_SET_ERR(MB_FAILURE, "Allreduce for total number of shared ents failed");
     }

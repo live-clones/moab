@@ -904,7 +904,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             }
 
 #ifdef MOAB_HAVE_MPI
-            if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INTEGER, MPI_MAX, m_pcomm->comm() );
+            if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
 #endif
 
             /*
@@ -1300,7 +1300,7 @@ int moab::TempestOnlineMap::IsConsistent( double dTolerance )
 
     int ierr;
     int fConsistentGlobal = 0;
-    ierr = MPI_Allreduce( &fConsistent, &fConsistentGlobal, 1, MPI_INTEGER, MPI_SUM, m_pcomm->comm() );
+    ierr = MPI_Allreduce( &fConsistent, &fConsistentGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     return fConsistentGlobal;
@@ -1355,7 +1355,7 @@ int moab::TempestOnlineMap::IsConservative( double dTolerance )
     const int nDATA = 3;
     if( !rank ) nElementsInProc.resize( size * nDATA );
     int senddata[nDATA] = { nColumns, m_nTotDofs_SrcCov, m_nTotDofs_Src };
-    ierr = MPI_Gather( senddata, nDATA, MPI_INTEGER, nElementsInProc.data(), nDATA, MPI_INTEGER, rootProc,
+    ierr = MPI_Gather( senddata, nDATA, MPI_INT, nElementsInProc.data(), nDATA, MPI_INT, rootProc,
                        m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
@@ -1393,8 +1393,8 @@ int moab::TempestOnlineMap::IsConservative( double dTolerance )
     // Need to do a gatherv here since different processes have different number of elements
     // MPI_Reduce(&dColumnSums[0], &dColumnSumsTotal[0], m_mapRemap.GetColumns(), MPI_DOUBLE,
     // MPI_SUM, 0, m_pcomm->comm());
-    ierr = MPI_Gatherv( &dColumnsUnique[0], m_nTotDofs_SrcCov, MPI_INTEGER, &dColumnIndices[0], rcount.data(),
-                        displs.data(), MPI_INTEGER, rootProc, m_pcomm->comm() );
+    ierr = MPI_Gatherv( &dColumnsUnique[0], m_nTotDofs_SrcCov, MPI_INT, &dColumnIndices[0], rcount.data(),
+                        displs.data(), MPI_INT, rootProc, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
     ierr = MPI_Gatherv( &dColumnSums[0], m_nTotDofs_SrcCov, MPI_DOUBLE, &dColumnSumsTotal[0], rcount.data(),
                         displs.data(), MPI_DOUBLE, rootProc, m_pcomm->comm() );
@@ -1443,7 +1443,7 @@ int moab::TempestOnlineMap::IsConservative( double dTolerance )
     }
 
     // TODO: Just do a broadcast from root instead of a reduction
-    ierr = MPI_Bcast( &fConservative, 1, MPI_INTEGER, rootProc, m_pcomm->comm() );
+    ierr = MPI_Bcast( &fConservative, 1, MPI_INT, rootProc, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     return fConservative;
@@ -1481,7 +1481,7 @@ int moab::TempestOnlineMap::IsMonotone( double dTolerance )
 
     int ierr;
     int fMonotoneGlobal = 0;
-    ierr = MPI_Allreduce( &fMonotone, &fMonotoneGlobal, 1, MPI_INTEGER, MPI_SUM, m_pcomm->comm() );
+    ierr = MPI_Allreduce( &fMonotone, &fMonotoneGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     return fMonotoneGlobal;
@@ -2725,7 +2725,7 @@ moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::Intersec
 #ifdef MOAB_HAVE_MPI
     if( m_pcomm )
     {
-        MPI_Reduce( &ntotsize, &ntotsize_glob, 1, MPI_INTEGER, MPI_SUM, 0, m_pcomm->comm() );
+        MPI_Reduce( &ntotsize, &ntotsize_glob, 1, MPI_INT, MPI_SUM, 0, m_pcomm->comm() );
         MPI_Reduce( &errnorms[0], &globerrnorms[0], 2, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
         MPI_Reduce( &errnorms[2], &globerrnorms[2], 1, MPI_DOUBLE, MPI_MAX, 0, m_pcomm->comm() );
     }
