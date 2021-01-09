@@ -62,7 +62,7 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
       EIGEN3_INCLUDES="-I$EIGEN3_DIR"
       CPPFLAGS="$EIGEN3_INCLUDES $CPPFLAGS"
       DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-eigen3=\"${EIGEN3_DIR}\""
-      AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
+      AC_DEFINE(HAVE_EIGEN3, 1, [Flag indicating whether the library will be compiled with Eigen support])
 
       # Let us explicitly disable -Wshadow warnings since Eigen3 does not respect shadow declarations
       # and it results in an exorbitant amount of warnings during the build
@@ -71,7 +71,7 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
       esac
     fi
   fi
-  AM_CONDITIONAL(HAVE_EIGEN, [test "xno" != "x$enableeigen"])
+  AM_CONDITIONAL(HAVE_EIGEN3, [test "xno" != "x$enableeigen"])
   
   dnl Substitute the substitution variables
   AC_SUBST(EIGEN3_DIR) 

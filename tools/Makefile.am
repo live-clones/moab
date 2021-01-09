@@ -51,7 +51,7 @@ if HAVE_HDF5
   bin_PROGRAMS += mbcmpfiles mbintxchk mbcleantags 
 if HAVE_NETCDF
   bin_PROGRAMS += mbaddnc mbaddchunk
-if HAVE_EIGEN
+if HAVE_EIGEN3
   bin_PROGRAMS += mbcmpmaps
 endif
 endif

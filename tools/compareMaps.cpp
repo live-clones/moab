@@ -14,7 +14,7 @@
  */
 #include "moab/MOABConfig.h"
 
-#ifndef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_EIGEN3
 #error compareMaps tool requires eigen3 configuration
 #endif
 

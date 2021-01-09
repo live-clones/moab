@@ -19,7 +19,7 @@
 #include "moab/MOABConfig.h"
 #include "moab/Core.hpp"
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 #else

@@ -26,7 +26,7 @@
 #include "moab/Remapping/TempestOnlineMap.hpp"
 #include "moab/TupleList.hpp"
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 #include <Eigen/Dense>
 #endif
 
@@ -373,7 +373,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector<unsigned
 }
 #endif
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 {
 #ifndef VERBOSE

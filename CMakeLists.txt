@@ -237,11 +237,11 @@ else ( LAPACK_FOUND )
   
 endif ( LAPACK_FOUND )
 
-set (MOAB_HAVE_EIGEN OFF CACHE INTERNAL "Configured MOAB with Eigen3 library support." )
+set (MOAB_HAVE_EIGEN3 OFF CACHE INTERNAL "Configured MOAB with Eigen3 library support." )
 if ( EIGEN3_FOUND )
   INCLUDE_DIRECTORIES ( "${EIGEN3_DIR}" )
   SET(MOAB_DEFINES "${MOAB_DEFINES} ${EIGEN3_INCLUDES}")
-  SET(MOAB_HAVE_EIGEN ON)
+  SET(MOAB_HAVE_EIGEN3 ON)
 endif (EIGEN3_FOUND)
 
 find_package( verdict REQUIRED )
