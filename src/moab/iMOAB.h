@@ -679,7 +679,15 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
    \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
    \param[in]  receivingGroup (MPI_Group *)           receiving group
    \param[in]  rcompid  (int*)                        external id of application that receives the mesh
-   \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
+   \param[in]  method (int*)                          method of partitioning
+             0 trivial partitioning
+             1 graph partitioning with ZOLTAN PHG
+             2 geometric partitioning with ZOLTAN RCB
+             3 geometric partitioning with ZOLTAN RCB in gnomonic space
+             4 geometric partitioning with ZOLTAN RCB, in gnomonic space, and with storing of the cuts in a buffer
+                        on receiver root PE, which should be the coupler root PE
+             5 geometric partitioning with ZOLTAN RCB, with cuts restored from a buffer from the receiver root PE
+                  (5 implies that some partitioning was called in advance with method 4)
  */
 
 ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGroup, int* rcompid, int* method );
