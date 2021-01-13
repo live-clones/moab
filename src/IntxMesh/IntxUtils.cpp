@@ -3,7 +3,10 @@
  *
  *  Created on: Oct 3, 2012
  */
-#define _USE_MATH_DEFINES
+#ifdef _MSC_VER  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
+
 #include <math.h>
 #include "moab/IntxMesh/IntxUtils.hpp"
 // this is from mbcoupler; maybe it should be moved somewhere in moab src
