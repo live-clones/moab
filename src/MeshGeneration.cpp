@@ -54,7 +54,10 @@ ErrorCode MeshGeneration::BrickInstance(MeshGeneration::BrickOpts & opts)
   bool parmerge = opts.parmerge;
 
   int rank = 0, size = 1;
+
+#ifndef _MSC_VER  /* windows */
   clock_t tt = clock();
+#endif
 
   #ifdef MOAB_HAVE_MPI
     rank =pc->rank();
@@ -369,9 +372,12 @@ ErrorCode MeshGeneration::BrickInstance(MeshGeneration::BrickOpts & opts)
   //rval = mb->get_entities_by_dimension(0, 3, all3dcells);MB_CHK_SET_ERR(rval, "Can't get all 3d cells elements");
 
   if (0 == rank) {
+#ifndef _MSC_VER  /* windows */
     std::cout << "generate local mesh: "
          << (clock() - tt) / (double)CLOCKS_PER_SEC << " seconds" << endl;
     tt = clock();
+#endif
+
     std::cout << "number of elements on rank 0: " << all3dcells.size() << endl;
     std::cout << "Total number of elements " << all3dcells.size()*size << endl;
     std::cout << "Element type: " << ( tetra ? "MBTET" : "MBHEX") << " order:" <<
@@ -385,12 +391,13 @@ ErrorCode MeshGeneration::BrickInstance(MeshGeneration::BrickOpts & opts)
     else {
       rval = mm.merge_entities(all3dcells, 0.0001);MB_CHK_SET_ERR(rval, "Can't merge");
     }
-
+#ifndef _MSC_VER  /* windows */
     if (0 == rank) {
        std::cout << "merge locally: "
             << (clock() - tt) / (double)CLOCKS_PER_SEC << " seconds" << endl;
        tt = clock();
     }
+#endif
   }
   // if adjEnts, add now to each set
   if (adjEnts)
