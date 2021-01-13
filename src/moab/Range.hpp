@@ -167,6 +167,8 @@
 #include <iterator>
 #include <iosfwd>
 #include <algorithm>
+#include <string>
+
 #include "moab/Types.hpp"
 
 namespace moab

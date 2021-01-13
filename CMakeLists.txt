@@ -56,6 +56,7 @@ if (NOT (CMAKE_VERSION VERSION_LESS "3.12.0"))
   cmake_policy(SET CMP0074 NEW)
 endif ()
 
+
 set ( abs_srcdir   ${CMAKE_SOURCE_DIR} )
 set ( abs_builddir ${PROJECT_BINARY_DIR} )
 
@@ -199,6 +200,7 @@ if (BUILD_SHARED_LIBS)
 # https://cmake.org/cmake/help/v3.4/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html
 # Export all symbols
       set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES")
     endif ()
   else ()
     # add_definitions(-DMOAB_DLL) # Not needed?
@@ -303,7 +305,12 @@ if ( ENABLE_HDF5 )
   if (MOAB_HAVE_MPI)
     set(HDF5_PREFER_PARALLEL TRUE)
   endif()
+  #TODO: test on all architectures with CMake-native FindHDF5 module instead of a custom one
+  IF(WIN32)
+  find_package( HDF5 REQUIRED )
+  ELSE()
   find_package( HDF5_MOAB REQUIRED )
+ENDIF()  
   set (MOAB_HAVE_HDF5 ON)
   # if ( HDF5_IS_PARALLEL AND MOAB_HAVE_MPI )
   if ( MOAB_HAVE_MPI )
