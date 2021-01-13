@@ -3,7 +3,7 @@
  *
  *  Created on: Oct 3, 2012
  */
-
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include "moab/IntxMesh/IntxUtils.hpp"
 // this is from mbcoupler; maybe it should be moved somewhere in moab src
