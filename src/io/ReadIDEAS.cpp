@@ -89,7 +89,7 @@ ErrorCode ReadIDEAS::load_file(const char* fname,
     }
     // Skip everything else
     else {
-      rval = skip_header(); 
+      rval = skip_header();
       if (MB_SUCCESS != rval)
         return MB_FAILURE;
     }
@@ -172,12 +172,7 @@ ErrorCode ReadIDEAS::create_vertices(EntityHandle& first_vertex,
   double *z = arrays[2];
 
   // For now, assume ids are sequential and begin with 1
-  Tag id_tag;
-  int zero = 0;
-  rval = MBI->tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, id_tag,
-                             MB_TAG_DENSE | MB_TAG_CREAT, &zero);
-  if (MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval) 
-    return rval;
+  Tag id_tag = MBI->globalId_tag();
   const int beginning_node_id = 1;
   int node_id = beginning_node_id;
 
@@ -233,11 +228,8 @@ ErrorCode ReadIDEAS::create_elements(EntityHandle vstart,
   rval = MBI->tag_get_handle(PHYS_PROP_TABLE_TAG, 1, MB_TYPE_INTEGER, phys_tag, MB_TAG_DENSE | MB_TAG_CREAT);
   if (MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval)
     return rval;
-  const int zero = 0;
-  rval = MBI->tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, id_tag, MB_TAG_DENSE | MB_TAG_CREAT, &zero);
-  if (MB_SUCCESS != rval && MB_ALREADY_ALLOCATED != rval)
-    return rval;
- 
+  id_tag = MBI->globalId_tag();
+
   for (;;) {
     if (!file.getline(line1, 10000) || !file.getline(line2, 10000))
       return MB_FAILURE;
@@ -248,8 +240,8 @@ ErrorCode ReadIDEAS::create_elements(EntityHandle vstart,
     if ((il1 == -1) && (il2 == -1)) {
       s1 = ctmp1;
       s2 = ctmp2;
-      if ((s1.empty()) && (s2.empty())) 
-        return MB_SUCCESS;     
+      if ((s1.empty()) && (s2.empty()))
+        return MB_SUCCESS;
     }
 
     // The first line describes attributes of the element other than connectivity.

@@ -1,4 +1,4 @@
-/** @example BoundaryContinents       
+/** @example BoundaryContinents
  * Description: read boundary points and loops that form islands and continents
       and create an edge mesh file \n
  *
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     return 1;
   }
   coords.resize(0);
-  while(!bdFile.eof()) 
+  while(!bdFile.eof())
   {
     double co;
     bdFile >> co;
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
   /// get loops for boundaries
   vector<int> loopsindx;
   ifstream loopFile(loops.c_str());
-  while(!loopFile.eof()) 
+  while(!loopFile.eof())
   {
     int indx;
     loopFile >> indx;
@@ -85,8 +85,7 @@ int main(int argc, char **argv)
                                       coords.size()/3,
                                       verts ); MB_CHK_SET_ERR(rval, "do not create boundary vertices");
 
-  Tag gid;
-  rval = mb->tag_get_handle("GLOBAL_ID", 1, MB_TYPE_INTEGER, gid); MB_CHK_SET_ERR(rval, "can't get global id tag");
+  Tag gid= mb->globalId_tag();
 
   int num_edges=0;
   for (size_t i=0; i<loopsindx.size()/2; i++)
@@ -105,7 +104,7 @@ int main(int argc, char **argv)
     {
       int  j2;
       j2 = j;
-      if (j == loopsindx[2*i+1]) 
+      if (j == loopsindx[2*i+1])
         j2 = loopsindx[2*i]-1; // close the loop
       conn_array[2*i1] = verts[j-1]; // vertices for sure start at 1
       conn_array[2*i1+1] = verts[j2]; // vertices for sure start at 1
@@ -113,7 +112,7 @@ int main(int argc, char **argv)
     }
     // the last vertex is first one in the loop
   }
- 
+
   Range bedges(handle, handle+num_edges-1);
   EntityHandle bound_set;
   rval = mb->create_meshset(MESHSET_SET, bound_set);MB_CHK_SET_ERR(rval, "Can't create boundary edges set");
@@ -132,7 +131,7 @@ int main(int argc, char **argv)
   rval = mb->tag_set_data(gid, bedges, &gids[0]); MB_CHK_SET_ERR(rval, "Can't set global ids on edges");
 
   mb-> write_file("bound.vtk", 0, 0, &bound_set, 1);
- 
+
   // now project the mesh in 2d plane
   // get all the vertices coordinates
   std::vector<CartVect> co3;
@@ -147,7 +146,7 @@ int main(int argc, char **argv)
   }
   rval = mb->set_coords(verts, &(co3[0][0])); MB_CHK_SET_ERR(rval, "Can't set new vertex coords");
   // remove edges in 2d that are too long (longer than 6; they are on the other side..., periodic)
-  
+
   Range longEdges;
   for (Range::iterator eit=bedges.begin(); eit!=bedges.end(); ++eit)
   {
@@ -163,7 +162,7 @@ int main(int argc, char **argv)
       longEdges.insert(eh);
   }
   rval = mb->delete_entities(longEdges); MB_CHK_ERR(rval);
-  
+
   mb-> write_file("bound2d.vtk");
   delete mb;
 

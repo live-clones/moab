@@ -77,7 +77,7 @@ void test_read_all()
   CHECK_ERR(rval);
 }
 
-void test_read_onevar() 
+void test_read_onevar()
 {
   Core moab;
   Interface& mb = moab;
@@ -151,7 +151,7 @@ void test_read_onetimestep()
   CHECK_ERR(rval);
 }
 
-void test_read_nomesh() 
+void test_read_nomesh()
 {
   Core moab;
   Interface& mb = moab;
@@ -372,8 +372,7 @@ void test_gather_onevar()
   rval = mb.tag_get_handle("T0", levels, MB_TYPE_DOUBLE, Ttag0, MB_TAG_DENSE);
   CHECK_ERR(rval);
 
-  rval = mb.tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, gid_tag, MB_TAG_DENSE);
-  CHECK_ERR(rval);
+  gid_tag = mb.globalId_tag();
 
   pcomm->gather_data(verts_owned, Ttag0, gid_tag, gather_set, 0);
 

@@ -1,16 +1,16 @@
 /**
  * MOAB, a Mesh-Oriented datABase, is a software component for creating,
  * storing and accessing finite element mesh data.
- * 
+ *
  * Copyright 2004 Sandia Corporation.  Under the terms of Contract
  * DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government
  * retains certain rights in this software.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  */
 
 #ifdef WIN32
@@ -60,7 +60,7 @@ WriteTemplate::WriteTemplate(Interface* impl)
 
   // Initialize in case tag_get_handle fails below
   //! Get and cache predefined tag handles
-  int zero = 0, negone = -1;
+  int  negone = -1;
   impl->tag_get_handle(MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER,
                        mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT, &negone);
 
@@ -70,8 +70,7 @@ WriteTemplate::WriteTemplate(Interface* impl)
   impl->tag_get_handle(NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER,
                        mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT, &negone);
 
-  impl->tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER,
-                       mGlobalIdTag, MB_TAG_SPARSE | MB_TAG_CREAT, &zero);
+  mGlobalIdTag = impl->globalId_tag();
 
   impl->tag_get_handle("WriteTemplate element mark", 1, MB_TYPE_BIT, mEntityMark, MB_TAG_CREAT);
 }
@@ -327,7 +326,7 @@ ErrorCode WriteTemplate::gather_mesh_information(MeshInfo &mesh_info,
       MB_SET_ERR(MB_FAILURE, "Couldn't get id tag for dirset " << id);
     }
 
-    dirset_data.id = id; 
+    dirset_data.id = id;
 
     std::vector<EntityHandle> node_vector;
     // Get the nodes of the dirset that are in mesh_info.nodes
@@ -350,7 +349,7 @@ ErrorCode WriteTemplate::gather_mesh_information(MeshInfo &mesh_info,
       if (0x1 == node_marked)
         dirset_data.nodes.push_back(*iter);
       j++;
-    } 
+    }
 
     dirset_data.number_nodes = dirset_data.nodes.size();
     dirset_info.push_back(dirset_data);
@@ -379,7 +378,7 @@ ErrorCode WriteTemplate::gather_mesh_information(MeshInfo &mesh_info,
     ErrorCode result = get_valid_sides(forward_elems, 1, neuset_data);MB_CHK_SET_ERR(result, "Couldn't get valid sides data");
     result = get_valid_sides(reverse_elems, -1, neuset_data);MB_CHK_SET_ERR(result, "Couldn't get valid sides data");
 
-    neuset_data.number_elements = neuset_data.elements.size(); 
+    neuset_data.number_elements = neuset_data.elements.size();
     neuset_info.push_back(neuset_data);
   }
 

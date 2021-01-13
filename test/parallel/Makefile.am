@@ -11,7 +11,7 @@ DEFS += -DIS_BUILDING_MB \
 
 FCDEFS += $(FC_DEFINE)IS_BUILDING_MB \
 					$(FC_DEFINE)SRCDIR=$(srcdir) \
-          $(FC_DEFINE)MESHDIR=$(MESHDIR) 
+          $(FC_DEFINE)MESHDIR=$(MESHDIR)
 
 AM_CPPFLAGS  = -I. \
                -I.. -I$(srcdir)/.. \
@@ -44,16 +44,18 @@ TESTS = pcomm_unit \
 
 if HAVE_HDF5_PARALLEL
   HDF5_TESTS = parallel_hdf5_test mhdf_parallel parallel_write_test \
-         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test imoab_coupler \
-         migrate_nontrivial
+         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test imoab_coupler 
+if HAVE_ZOLTAN
+         HDF5_TESTS += migrate_nontrivial
+endif 
 else
-  HDF5_TESTS = 
+  HDF5_TESTS =
 endif
 
 if HAVE_NETCDF
   NETCDF_TESTS = scdpart read_nc_par ucdtrvpart mpastrvpart gcrm_par
 else
-  NETCDF_TESTS = 
+  NETCDF_TESTS =
 endif
 
 if HAVE_PNETCDF
@@ -67,21 +69,21 @@ endif
 if HAVE_HYPRE
   MBHYPRE_TESTS = hypre_test
 else
-  MBHYPRE_TESTS = 
+  MBHYPRE_TESTS =
 endif
 
 if HAVE_HDF5_PARALLEL
-  MBCSLAM_TESTS = par_intx_sph 
+  MBCSLAM_TESTS = par_intx_sph
 else
   MBCSLAM_TESTS =
 endif
 
-IMOAB_TESTS = 
+IMOAB_TESTS =
 if ENABLE_FORTRAN
    IMOAB_TESTS += imoab_ptest
 endif
 
-IMESH_TESTS = 
+IMESH_TESTS =
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
 if ENABLE_FORTRAN
@@ -91,7 +93,7 @@ if ENABLE_FORTRAN
               -I$(top_builddir)/itaps \
               -I$(top_builddir)/itaps/imesh
 endif
-endif 
+endif
 endif
 
 if HAVE_HYPRE
@@ -102,7 +104,7 @@ hypre_test_SOURCES = hypre_test.cpp
 TESTS += hypre_test
 endif
 
-check_PROGRAMS = $(TESTS) mbparallelcomm_test partcheck structured3 
+check_PROGRAMS = $(TESTS) mbparallelcomm_test partcheck structured3
 if HAVE_HDF5_PARALLEL
   check_PROGRAMS += parmerge
 endif
@@ -151,10 +153,12 @@ endif
 
 
 par_intx_sph_SOURCES = par_intx_sph.cpp
-par_intx_sph_LDADD = $(LDADD)  
+par_intx_sph_LDADD = $(LDADD)
 
 # Other files to clean up (e.g. output from tests)
-MOSTLYCLEANFILES = mhdf_ll.h5m tmp0.h5m tmp1.h5m tmp2.h5m tmp3.h5m \
+MOSTLYCLEANFILES = mhdf_ll.h5m \
+		   tmp0.0.h5m tmp1.0.h5m tmp2.0.h5m tmp3.0.h5m \
+		   tmp0.1.h5m tmp1.1.h5m tmp2.1.h5m tmp3.1.h5m \
                    partial0.vtk \
                    partial1.vtk  \
                    partialConvex1.vtk \
@@ -191,9 +195,10 @@ MOSTLYCLEANFILES = mhdf_ll.h5m tmp0.h5m tmp1.h5m tmp2.h5m tmp3.h5m \
                    recvMesh.h5m \
                    migrate12.h5m migrate21.h5m migrate11.h5m migrate22.h5m \
                    migrate11_tag.h5m migrate21_tag.h5m migrate12_tag.h5m migrate22_tag.h5m \
-                   intx_00.h5m intx_01.h5m fIntxTarget.h5m recvTarget.h5m OcnWithProj.h5m
+                   intx_00.h5m intx_01.h5m fIntxTarget.h5m recvTarget.h5m OcnWithProj.h5m \
+                   migrate_graph.h5m migrate_geom.h5m
 
-FORTDEFS = $(FCDEFS) 
+FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
     $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)
 LTPPFCCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=FC $(AM_LIBTOOLFLAGS) \

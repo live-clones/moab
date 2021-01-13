@@ -33,7 +33,7 @@
  *      (CCMIOWriteRestartInfo, kCCMIORestartData), reference data?
  * phase:
  *   field: char name[], dims, CCMIODataType datatype, char units[]
- *       dims = kCCMIOScalar (CCMIOWriteFieldDataf), 
+ *       dims = kCCMIOScalar (CCMIOWriteFieldDataf),
  *              kCCMIOVector (CCMIOWriteMultiDimensionalFieldData),
  *              kCCMIOTensor
  * MonitoringSets: num, name (CellSet, VertexSet, BoundarySet, BlockSet, SplineSet, CoupleSet)
@@ -71,7 +71,7 @@
 #include "Internals.hpp"
 #include "ExoIIUtil.hpp"
 #include "MBTagConventions.hpp"
-#ifdef MOAB_HAVE_MPI  
+#ifdef MOAB_HAVE_MPI
 #include "MBParallelConventions.h"
 #endif
 #include "moab/WriteUtilIface.hpp"
@@ -124,7 +124,7 @@ namespace moab {
 
     // Initialize in case tag_get_handle fails below
     //! Get and cache predefined tag handles
-    int zero = 0, negone = -1;
+    int negone = -1;
     impl->tag_get_handle(MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER,
                          mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT, &negone);
 
@@ -134,8 +134,7 @@ namespace moab {
     impl->tag_get_handle(NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER,
                          mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT, &negone);
 
-    impl->tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER,
-                         mGlobalIdTag, MB_TAG_SPARSE | MB_TAG_CREAT, &zero);
+    mGlobalIdTag = impl->globalId_tag();
 
 #ifdef MOAB_HAVE_MPI
     impl->tag_get_handle(PARALLEL_PARTITION_TAG_NAME,
@@ -143,7 +142,7 @@ namespace moab {
                          MB_TAG_SPARSE);
     // No need to check result, if it's not there, we don't create one
 #endif
-  
+
     int dum_val_array[] = {-1, -1, -1, -1};
     impl->tag_get_handle(HAS_MID_NODES_TAG_NAME, 4, MB_TYPE_INTEGER,
                          mHasMidNodesTag, MB_TAG_SPARSE | MB_TAG_CREAT, dum_val_array);
@@ -190,7 +189,7 @@ namespace moab {
     std::vector<EntityHandle> matsets, dirsets, neusets, partsets;
 
     // Separate into material, dirichlet, neumann, partition sets
-    result = get_sets(ent_handles, num_sets, matsets, 
+    result = get_sets(ent_handles, num_sets, matsets,
                       dirsets, neusets, partsets);MB_CHK_SET_ERR(result, "Failed to get material/etc. sets");
 
     // If entity handles were input but didn't contain matsets, return error
@@ -600,7 +599,7 @@ namespace moab {
     if (1 == matsets.size() && 0 == matsets[0]) {
       // Whole mesh
       mWholeMesh = true;
-    
+
       result = mbImpl->get_entities_by_dimension(0, mDimension, matset_data[0].elems);MB_CHK_SET_ERR(result, "Trouble getting all elements in mesh");
       result = mWriteIface->gather_nodes_from_elements(matset_data[0].elems,
                                                        mEntityMark, all_verts);MB_CHK_SET_ERR(result, "Trouble gathering nodes from elements");

@@ -116,7 +116,7 @@ int main(int argc, char * argv[])
   rc = iMOAB_GetMeshInfo( pid1, nverts, nelem, 0, 0, 0);
   CHECKRC(rc, "failed to get mesh info");
   printf("Source Mesh: %d vertices and %d elements\n", nverts[0], nelem[0]);
-  
+
   rc = iMOAB_GetMeshInfo( pid2, nverts, nelem, 0, 0, 0);
   CHECKRC(rc, "failed to get mesh info");
   printf("Destination Mesh: %d vertices and %d elements\n", nverts[0], nelem[0]);
@@ -128,12 +128,16 @@ int main(int argc, char * argv[])
    * The name of the tag is case sensitive.
    * This method is collective.
    */
+  // int disc_orders[2] = {1, 1};
+  // const char* disc_methods[2] = {"fv", "fv"};
+  // const char* dof_tag_names[2] = {"GLOBAL_ID", "GLOBAL_ID"};
   int disc_orders[2] = {4, 1};
-  const char* weights_identifiers[2] = {"scalar", "scalar_conservative"};
   const char* disc_methods[2] = {"cgll", "fv"};
   const char* dof_tag_names[2] = {"GLOBAL_DOFS", "GLOBAL_ID"};
-  int fMonotoneTypeID=0, fVolumetric=0, fValidate=1, fNoConserve=0;
   
+  const char* weights_identifiers[2] = {"scalar", "scalar_conservative"};
+  int fMonotoneTypeID=0, fVolumetric=0, fValidate=1, fNoConserve=0;
+
   const char* fieldname = "a2oTbot";
   const char* fieldnameT = "a2oTbot_proj";
   const char* fieldnameTnc = "a2oTbot_projnocons";
@@ -154,14 +158,14 @@ int main(int argc, char * argv[])
   /* Next compute the mesh intersection on the sphere between the source and target meshes */
   rc = iMOAB_ComputeMeshIntersectionOnSphere(pid1, pid2, pid3);
   CHECKRC(rc, "failed to compute mesh intersection");
-  
+
   /* We have the mesh intersection now. Let us compute the remapping weights */
   fNoConserve=1;
-  rc = iMOAB_ComputeScalarProjectionWeights ( pid3, 
-                                              weights_identifiers[0], 
-                                              disc_methods[0], &disc_orders[0], 
-                                              disc_methods[1], &disc_orders[1], 
-                                              &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, 
+  rc = iMOAB_ComputeScalarProjectionWeights ( pid3,
+                                              weights_identifiers[0],
+                                              disc_methods[0], &disc_orders[0],
+                                              disc_methods[1], &disc_orders[1],
+                                              &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
                                               dof_tag_names[0], dof_tag_names[1],
                                               strlen(weights_identifiers[0]),
                                               strlen(disc_methods[0]), strlen(disc_methods[1]),
@@ -171,11 +175,11 @@ int main(int argc, char * argv[])
 
   /* We have the mesh intersection now. Let us compute the remapping weights */
   fNoConserve=0;
-  rc = iMOAB_ComputeScalarProjectionWeights ( pid3, 
-                                              weights_identifiers[1], 
-                                              disc_methods[0], &disc_orders[0], 
-                                              disc_methods[1], &disc_orders[1], 
-                                              &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, 
+  rc = iMOAB_ComputeScalarProjectionWeights ( pid3,
+                                              weights_identifiers[1],
+                                              disc_methods[0], &disc_orders[0],
+                                              disc_methods[1], &disc_orders[1],
+                                              &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
                                               dof_tag_names[0], dof_tag_names[1],
                                               strlen(weights_identifiers[1]),
                                               strlen(disc_methods[0]), strlen(disc_methods[1]),
@@ -183,10 +187,10 @@ int main(int argc, char * argv[])
                                             );
   CHECKRC(rc, "failed to compute remapping projection weights for scalar conservative field");
 
-  /* We have the remapping weights now. Let us apply the weights onto the tag we defined 
+  /* We have the remapping weights now. Let us apply the weights onto the tag we defined
      on the srouce mesh and get the projection on the target mesh */
   rc = iMOAB_ApplyScalarProjectionWeights ( pid3,
-                                            weights_identifiers[0], 
+                                            weights_identifiers[0],
                                             fieldname,
                                             fieldnameTnc,
                                             strlen(weights_identifiers[0]),
@@ -195,10 +199,10 @@ int main(int argc, char * argv[])
                                             );
   CHECKRC(rc, "failed to compute projection weight application for scalar non-conservative field");
 
-  /* We have the remapping weights now. Let us apply the weights onto the tag we defined 
+  /* We have the remapping weights now. Let us apply the weights onto the tag we defined
      on the srouce mesh and get the projection on the target mesh */
   rc = iMOAB_ApplyScalarProjectionWeights ( pid3,
-                                            weights_identifiers[1], 
+                                            weights_identifiers[1],
                                             fieldname,
                                             fieldnameT,
                                             strlen(weights_identifiers[1]),
@@ -206,7 +210,7 @@ int main(int argc, char * argv[])
                                             strlen(fieldnameT)
                                             );
   CHECKRC(rc, "failed to compute projection weight application for scalar conservative field");
-  
+
   /*
    * the file can be written in parallel, and it will contain additional tags defined by the user
    * we may extend the method to write only desired tags to the file
@@ -218,12 +222,12 @@ int main(int argc, char * argv[])
     char writeOptions[] ="";
 
     rc = iMOAB_WriteMesh(pid2, outputFileTgt, writeOptions,
-      strlen(outputFileTgt), strlen(writeOptions) );  
+      strlen(outputFileTgt), strlen(writeOptions) );
 
     rc = iMOAB_WriteMesh(pid3, outputFileOv, writeOptions,
       strlen(outputFileOv), strlen(writeOptions) );
   }
-  
+
   /*
    * deregistering application will delete all mesh entities associated with the application and will
    *  free allocated tag storage.

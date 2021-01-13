@@ -151,7 +151,7 @@ ErrorCode area_coordinates(Interface * mbi, EntityHandle tri, CartVect & pnt,
   bool side0 = (area_coord[0] < tolerance_segment);
   bool side1 = (area_coord[1] < tolerance_segment);
   bool side2 = (area_coord[2] < tolerance_segment);
-  if (!side0 && !side1 && !side2) 
+  if (!side0 && !side1 && !side2)
     return MB_SUCCESS; // interior point
   // now, find out what boundary is in question
   // first, get all edges, in order
@@ -233,7 +233,7 @@ ErrorCode FBEngine::Init()
     ErrorCode rval = _my_geomTopoTool->find_geomsets(_my_gsets);
     assert(rval == MB_SUCCESS);
     if (MB_SUCCESS != rval){return rval;}
-    
+
 
     rval = split_quads();
     assert (rval == MB_SUCCESS);
@@ -257,11 +257,10 @@ ErrorCode FBEngine::initializeSmoothing()
   // first of all, we need to retrieve all the surfaces from the (root) set
   // in icesheet_test we use iGeom, but maybe that is a stretch
   // get directly the sets with geom dim 2, and from there create the SmoothFace
-  Tag geom_tag, gid_tag;
+  Tag geom_tag;
   ErrorCode rval = MBI->tag_get_handle(GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geom_tag);
   MBERRORR(rval, "can't get geom tag");
-  rval = MBI->tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, gid_tag);
-  MBERRORR(rval, "can't get id tag");
+
   int numSurfaces = _my_gsets[2].size();
   //SmoothFace ** smthFace = new SmoothFace *[numSurfaces];
   _smthFace = new SmoothFace *[numSurfaces];
@@ -304,7 +303,7 @@ ErrorCode FBEngine::initializeSmoothing()
   // unsigned char def_data_bit = 1;// valid by default
   // rval = mb->tag_create("valid", 1, MB_TAG_BIT, validTag, &def_data_bit);
   Tag markTag;
-  rval = MBI->tag_get_handle("MARKER", 1, MB_TYPE_BIT, markTag, 
+  rval = MBI->tag_get_handle("MARKER", 1, MB_TYPE_BIT, markTag,
                              MB_TAG_EXCL|MB_TAG_BIT, &value); // default value : 0 = not computed yet
   // each feature edge will need to have a way to retrieve at every moment the surfaces it belongs to
   // from edge sets, using the sense tag, we can get faces, and from each face, using the map, we can get
@@ -314,13 +313,13 @@ ErrorCode FBEngine::initializeSmoothing()
   // create the tag also for control points on the edges
   double defCtrlPoints[9] = { 0., 0., 0., 0., 0., 0., 0., 0., 0. };
   Tag edgeCtrlTag;
-  rval = MBI->tag_get_handle("CONTROLEDGE", 9, MB_TYPE_DOUBLE, edgeCtrlTag, 
+  rval = MBI->tag_get_handle("CONTROLEDGE", 9, MB_TYPE_DOUBLE, edgeCtrlTag,
                              MB_TAG_DENSE|MB_TAG_CREAT, &defCtrlPoints );
   assert(rval == MB_SUCCESS);
 
   Tag facetCtrlTag;
   double defControls[18] = { 0. };
-  rval = MBI->tag_get_handle("CONTROLFACE", 18, MB_TYPE_DOUBLE, 
+  rval = MBI->tag_get_handle("CONTROLFACE", 18, MB_TYPE_DOUBLE,
                              facetCtrlTag, MB_TAG_CREAT|MB_TAG_DENSE,
                              &defControls);
   assert(rval == MB_SUCCESS);
@@ -1463,7 +1462,7 @@ ErrorCode FBEngine::split_surface(EntityHandle face,
   MBERRORR(rval, "can't get initial triangles");
 
   // start from a triangle that is not in the triangles to delete
-  // flood fill 
+  // flood fill
 
   bool closed = splittingNodes.size()==0;
   if (!closed)
@@ -1480,7 +1479,7 @@ ErrorCode FBEngine::split_surface(EntityHandle face,
     MBERRORR(rval, "can't split with second node)");
   }
   // we will separate triangles to delete, unaffected, new_triangles,
-  //  nodesAlongPolyline, 
+  //  nodesAlongPolyline,
   Range first, second;
   rval = separate (face, chainedEdges, first, second);
 
@@ -3072,7 +3071,7 @@ ErrorCode FBEngine::split_internal_edge(EntityHandle & edge, EntityHandle & newV
     _piercedTriangles.insert(tri);
     const EntityHandle * conn3;
     int nnodes;
-    rval = _mbImpl->get_connectivity(tri, conn3, nnodes); 
+    rval = _mbImpl->get_connectivity(tri, conn3, nnodes);
     MBERRORR(rval, "can't get nodes");
     int num1, sense, offset;
     rval = _mbImpl->side_number(tri, edge, num1, sense, offset);
@@ -3112,11 +3111,11 @@ ErrorCode FBEngine::split_internal_edge(EntityHandle & edge, EntityHandle & newV
   // triangle split
 ErrorCode FBEngine::divide_triangle(EntityHandle triangle, EntityHandle & newVertex)
 {
-  // 
+  //
   _piercedTriangles.insert(triangle);
   int nnodes = 0;
   const EntityHandle * conn3 = NULL;
-  ErrorCode  rval = _mbImpl->get_connectivity(triangle, conn3, nnodes); 
+  ErrorCode  rval = _mbImpl->get_connectivity(triangle, conn3, nnodes);
   MBERRORR(rval, "can't get nodes");
   EntityHandle t1[]={conn3[0], conn3[1], newVertex};
   EntityHandle t2[]={conn3[1], conn3[2], newVertex};

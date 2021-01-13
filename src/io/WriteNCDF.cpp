@@ -1,16 +1,16 @@
 /**
  * MOAB, a Mesh-Oriented datABase, is a software component for creating,
  * storing and accessing finite element mesh data.
- * 
+ *
  * Copyright 2004 Sandia Corporation.  Under the terms of Contract
  * DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government
  * retains certain rights in this software.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  */
 
 #ifdef WIN32
@@ -102,7 +102,7 @@ WriteNCDF::WriteNCDF(Interface *impl)
 
   // Initialize in case tag_get_handle fails below
   //! Get and cache predefined tag handles
-  int zero = 0, negone = -1;
+  int negone = -1;
   impl->tag_get_handle(MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER,
                        mMaterialSetTag, MB_TAG_SPARSE | MB_TAG_CREAT, &negone);
 
@@ -112,8 +112,7 @@ WriteNCDF::WriteNCDF(Interface *impl)
   impl->tag_get_handle(NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER,
                        mNeumannSetTag, MB_TAG_SPARSE | MB_TAG_CREAT, &negone);
 
-  impl->tag_get_handle(GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER,
-                       mGlobalIdTag, MB_TAG_SPARSE | MB_TAG_CREAT, &zero);
+  mGlobalIdTag = impl->globalId_tag();
 
   int dum_val_array[] = {-1, -1, -1, -1};
   impl->tag_get_handle(HAS_MID_NODES_TAG_NAME, 4, MB_TYPE_INTEGER,
@@ -546,7 +545,7 @@ ErrorCode WriteNCDF::gather_mesh_information(ExodusMeshInfo &mesh_info,
   range_iter = mesh_info.nodes.begin();
   end_range_iter = mesh_info.nodes.end();
 
-  mesh_info.num_nodes = mesh_info.nodes.size(); 
+  mesh_info.num_nodes = mesh_info.nodes.size();
 
   //------nodesets--------
 
@@ -604,7 +603,7 @@ ErrorCode WriteNCDF::gather_mesh_information(ExodusMeshInfo &mesh_info,
       j++;
     }
 
-    nodeset_data.number_nodes = nodeset_data.nodes.size(); 
+    nodeset_data.number_nodes = nodeset_data.nodes.size();
     nodeset_info.push_back(nodeset_data);
   }
 
@@ -717,7 +716,7 @@ ErrorCode WriteNCDF::get_valid_sides(Range &elems, ExodusMeshInfo& /*mesh_info*/
       // put some dummy dist factors for polygons; why do we need them?
       if (TYPE_FROM_HANDLE(*iter)==MBPOLYGON) num_nodes = 1; //dummy
       if (has_dist_factors) {
-        std::copy(dist_fac_iter, dist_fac_iter + num_nodes, 
+        std::copy(dist_fac_iter, dist_fac_iter + num_nodes,
                   std::back_inserter(sideset_data.ss_dist_factors));
         dist_fac_iter += num_nodes;
       }
@@ -824,7 +823,7 @@ ErrorCode WriteNCDF::write_nodes(int num_nodes, Range& nodes, int dimension)
 
   if (num_coords_to_fill == 3)
     coord_arrays[2] = new double[num_nodes];
- 
+
   result = mWriteIface->get_node_coords(dimension, num_nodes, nodes, mGlobalIdTag, 1, coord_arrays);
   if (result != MB_SUCCESS) {
     delete [] coord_arrays[0];
@@ -2203,7 +2202,7 @@ ErrorCode WriteNCDF::get_sideset_elems(EntityHandle sideset, int current_sense,
   int target_dim = CN::Dimension(TYPE_FROM_HANDLE(*dum_it));
   dum_it = ss_elems.begin();
   while (target_dim != CN::Dimension(TYPE_FROM_HANDLE(*dum_it)) &&
-         dum_it != ss_elems.end()) 
+         dum_it != ss_elems.end())
     ++dum_it;
 
   if (current_sense == 1 || current_sense == 0)

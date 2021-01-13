@@ -22,15 +22,15 @@ ErrorCode make_tris_from_quad( Interface *MBI,
                                  EntityHandle quad,  /* input */
                                  EntityHandle &tri0, /* output */
 				 EntityHandle &tri1  /* output */) {
-  
+
   // get connectivity (ordered counterclockwise for 2D elements in MOAB)
-  ErrorCode result;    
+  ErrorCode result;
   const EntityHandle *quad_conn;
   int n_verts=0;
   result = MBI->get_connectivity( quad, quad_conn, n_verts );
   assert( 4 == n_verts );
   assert( MB_SUCCESS == result);
-   
+
   // find length of diagonals
   std::vector<CartVect> coords(n_verts);
   result = MBI->get_coords( quad_conn, n_verts, coords[0].array() );
@@ -80,7 +80,7 @@ ErrorCode make_tris_from_quads( Interface *MBI,
     tris.insert( tri1 );
   }
   return MB_SUCCESS;
-}  
+}
 
 ErrorCode quads_to_tris( Interface *MBI, EntityHandle input_meshset ) {
 
@@ -93,10 +93,7 @@ ErrorCode quads_to_tris( Interface *MBI, EntityHandle input_meshset ) {
     return result;
 
   // create an id tag to find the surface id with
-  result = MBI->tag_get_handle( GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, id_tag,
-                                MB_TAG_DENSE|MB_TAG_CREAT );
-  if (MB_SUCCESS != result)
-    return result;
+  id_tag = MBI->globalId_tag();
 
   // get all surface meshsets
   Range surface_meshsets;
@@ -128,12 +125,12 @@ ErrorCode quads_to_tris( Interface *MBI, EntityHandle input_meshset ) {
     // For each quad, make two triangles then delete the quad.
     // ******************************************************************
     for(Range::iterator j=quads.begin(); j!=quads.end(); ++j ) {
-    
+
       // make the tris
       EntityHandle tri0 = 0, tri1 = 0;
       result = make_tris_from_quad( MBI, *j, tri0, tri1 );
         assert( MB_SUCCESS == result );
-      
+
       // add all the tris to the same surface meshset as the quads were inside.
       result = MBI->add_entities( *i, &tri0, 1 );
         if ( MB_SUCCESS != result ) std::cout << "result=" << result << std::endl;
@@ -151,5 +148,5 @@ ErrorCode quads_to_tris( Interface *MBI, EntityHandle input_meshset ) {
 
     } // end quad loop
   }   // end surface meshset loop
-  return MB_SUCCESS; 
+  return MB_SUCCESS;
 }
