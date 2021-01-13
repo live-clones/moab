@@ -5,7 +5,12 @@
 #include <stdio.h>
 #include <iomanip>
 #include <fstream>
-#include <sys/time.h>
+#if defined(__MINGW32__)
+  #include <sys/time.h>
+#else
+  #include <time.h>
+#endif
+
 #include <time.h>
 #include <math.h>
 #include <assert.h>

@@ -29,7 +29,12 @@
 #if defined(_MSC_VER)
   typedef int id_t;
 #elif defined(__MINGW32__)
+  #if defined(__MINGW32__)
   #include <sys/time.h>
+#else
+  #include <time.h>
+#endif
+
 #endif
 #include <time.h>
 #include <stdlib.h>
