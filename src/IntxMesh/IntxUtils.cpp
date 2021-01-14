@@ -1059,8 +1059,7 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
     // then get the connectivity, etc
 
     Range inputRange;
-    ErrorCode rval = mb->get_entities_by_dimension( lset, 2, inputRange );
-    if( MB_SUCCESS != rval ) return rval;
+    ErrorCode rval = mb->get_entities_by_dimension( lset, 2, inputRange );MB_CHK_ERR( rval );
 
     Tag corrTag       = 0;
     EntityHandle dumH = 0;
@@ -1068,9 +1067,7 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
     if( rval == MB_TAG_NOT_FOUND ) corrTag = 0;
 
     Tag gidTag;
-    rval = mb->tag_get_handle( "GLOBAL_ID", 1, MB_TYPE_INTEGER, gidTag, MB_TAG_DENSE );
-
-    if( rval != MB_SUCCESS ) return rval;
+    rval = mb->tag_get_handle( "GLOBAL_ID", 1, MB_TYPE_INTEGER, gidTag, MB_TAG_DENSE );MB_CHK_ERR( rval );
 
     std::vector< double > coords;
     coords.resize( 3 * MAXEDGES );  // at most 10 vertices per polygon
@@ -1095,8 +1092,7 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
         // get the nodes, then the coordinates
         const EntityHandle* verts;
         int num_nodes;
-        rval = mb->get_connectivity( eh, verts, num_nodes );
-        if( MB_SUCCESS != rval ) return rval;
+        rval = mb->get_connectivity( eh, verts, num_nodes );MB_CHK_ERR( rval );
         int nsides = num_nodes;
         // account for possible padded polygons
         while( verts[nsides - 2] == verts[nsides - 1] && nsides > 3 )
@@ -1104,17 +1100,14 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
         EntityHandle corrHandle = 0;
         if( corrTag )
         {
-            rval = mb->tag_get_data( corrTag, &eh, 1, &corrHandle );
-            if( MB_SUCCESS != rval ) return rval;
+            rval = mb->tag_get_data( corrTag, &eh, 1, &corrHandle );MB_CHK_ERR( rval );
         }
         int gid = 0;
-        rval    = mb->tag_get_data( gidTag, &eh, 1, &gid );
-        if( MB_SUCCESS != rval ) return rval;
+        rval    = mb->tag_get_data( gidTag, &eh, 1, &gid );MB_CHK_ERR( rval );
         coords.resize( 3 * nsides );
         if( nsides < 4 ) continue;  // if already triangles, don't bother
         // get coordinates
-        rval = mb->get_coords( verts, nsides, &coords[0] );
-        if( MB_SUCCESS != rval ) return rval;
+        rval = mb->get_coords( verts, nsides, &coords[0] );MB_CHK_ERR( rval );
         // compute each angle
         bool alreadyBroken = false;
 
@@ -1156,49 +1149,34 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
                     conn[j - 1] = verts[( i + j + 2 ) % nsides];
                 }
                 EntityHandle newElement;
-                rval = mb->create_element( MBTRI, conn3, 3, newElement );
-                if( MB_SUCCESS != rval ) return rval;
+                rval = mb->create_element( MBTRI, conn3, 3, newElement );MB_CHK_ERR( rval );
 
-                rval = mb->add_entities( lset, &newElement, 1 );
-                if( MB_SUCCESS != rval ) return rval;
+                rval = mb->add_entities( lset, &newElement, 1 );MB_CHK_ERR( rval );
                 if( corrTag )
                 {
-                    rval = mb->tag_set_data( corrTag, &newElement, 1, &corrHandle );
-                    if( MB_SUCCESS != rval ) return rval;
+                    rval = mb->tag_set_data( corrTag, &newElement, 1, &corrHandle );MB_CHK_ERR( rval );
                 }
-                rval = mb->tag_set_data( gidTag, &newElement, 1, &gid );
-                if( MB_SUCCESS != rval ) return rval;
+                rval = mb->tag_set_data( gidTag, &newElement, 1, &gid );MB_CHK_ERR( rval );
                 if( nsides == 4 )
                 {
                     // create another triangle
-                    rval = mb->create_element( MBTRI, &conn[0], 3, newElement );
-                    if( MB_SUCCESS != rval ) return rval;
+                    rval = mb->create_element( MBTRI, &conn[0], 3, newElement );MB_CHK_ERR( rval );
                 }
                 else
                 {
                     // create another polygon, and add it to the inputRange
-                    rval = mb->create_element( MBPOLYGON, &conn[0], nsides - 1, newElement );
-                    if( MB_SUCCESS != rval ) return rval;
+                    rval = mb->create_element( MBPOLYGON, &conn[0], nsides - 1, newElement );MB_CHK_ERR( rval );
                     newPolys.push( newElement );  // because it has less number of edges, the
                     // reverse should work to find it.
                 }
-                rval = mb->add_entities( lset, &newElement, 1 );
-                if( MB_SUCCESS != rval ) return rval;
+                rval = mb->add_entities( lset, &newElement, 1 );MB_CHK_ERR( rval );
                 if( corrTag )
                 {
-                    rval = mb->tag_set_data( corrTag, &newElement, 1, &corrHandle );
-                    if( MB_SUCCESS != rval ) return rval;
+                    rval = mb->tag_set_data( corrTag, &newElement, 1, &corrHandle );MB_CHK_ERR( rval );
                 }
-                rval = mb->tag_set_data( gidTag, &newElement, 1, &gid );
-                if( MB_SUCCESS != rval ) return rval;
-                mb->remove_entities( lset, &eh, 1 );
+                rval = mb->tag_set_data( gidTag, &newElement, 1, &gid );MB_CHK_ERR( rval );
+                rval = mb->remove_entities( lset, &eh, 1 );MB_CHK_ERR( rval );
                 brokenPolys++;
-                /*std::cout<<"remove: " ;
-                 mb->list_entities(&eh, 1);
-
-                 std::stringstream fff;
-                 fff << "file0" <<  brokenQuads<< ".vtk";
-                 mb->write_file(fff.str().c_str(), 0, 0, &lset, 1);*/
                 alreadyBroken = true;  // get out of the loop, element is broken
             }
         }
@@ -1207,11 +1185,12 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
     {
         std::cout << "on local process " << my_rank << ", " << brokenPolys
                   << " concave polygons were decomposed in convex ones \n";
+#ifdef VERBOSE
         std::stringstream fff;
         fff << "file_set" <<  mb->id_from_handle(lset) << "rk_"<< my_rank << ".h5m";
-        rval = mb->write_file(fff.str().c_str(), 0, 0, &lset, 1);
-        if( MB_SUCCESS != rval ) return rval;
+        rval = mb->write_file(fff.str().c_str(), 0, 0, &lset, 1);MB_CHK_ERR( rval );
         std::cout << "wrote new file set: " << fff.str() << "\n";
+#endif
     }
     return MB_SUCCESS;
 }
