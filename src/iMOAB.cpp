@@ -267,6 +267,21 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
 #endif
 
     app_data.point_cloud = false;
+#ifdef MOAB_HAVE_MPI
+    // set here the parallel partition tag
+    // provide partition tag equal to rank
+    Tag part_tag;
+    int dum_id = -1;
+    rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
+                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+
+    if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
+    {
+        std::cout << " can't get par part tag.\n";
+        return 1;
+    }
+    rval = context.MBI->tag_set_data( part_tag, &file_set, 1, &rankHere );CHKERRVAL( rval );
+#endif
 
     context.appDatas.push_back(
         app_data );  // it will correspond to app_FileSets[*pid] will be the file set of interest
@@ -1759,20 +1774,6 @@ ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marke
 
         rval = context.MBI->tag_delete( stag );CHKERRVAL( rval );
     }
-    // provide partition tag equal to rank
-    Tag part_tag;
-    dum_id = -1;
-    rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
-
-    if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
-    {
-        std::cout << " can't get par part tag.\n";
-        return 1;
-    }
-
-    int rank = pco->rank();
-    rval     = context.MBI->tag_set_data( part_tag, &cset, 1, &rank );CHKERRVAL( rval );
 
     return 0;
 }
@@ -2009,20 +2010,6 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
             rval = context.MBI->tag_set_data( densePartTag, local_verts, &vals[0] );CHKERRVAL( rval );
         }
     }
-    // set the parallel partition tag
-    Tag part_tag;
-    int dum_id = -1;
-    rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
-
-    if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
-    {
-        std::cout << " can't get par part tag.\n";
-        return 1;
-    }
-
-    int rank = pco->rank();
-    rval     = context.MBI->tag_set_data( part_tag, &local_set, 1, &rank );CHKERRVAL( rval );
 
     // populate the mesh with current data info
     ierr = iMOAB_UpdateMeshInfo( pid );
@@ -2536,21 +2523,6 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 
     // assign global ids only for vertices, cells have them fine
     rval = pco->assign_global_ids( data.file_set, /*dim*/ 0 );CHKERRVAL( rval );
-
-    // set the partition tag on the file set
-    Tag part_tag;
-    int dum_id = -1;
-    rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
-
-    if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
-    {
-        std::cout << " can't get par part tag.\n";
-        return 1;
-    }
-
-    int rank = pco->rank();
-    rval     = context.MBI->tag_set_data( part_tag, &data.file_set, 1, &rank );CHKERRVAL( rval );
 
     return 0;
 }
