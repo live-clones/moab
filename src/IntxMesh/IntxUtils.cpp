@@ -1829,9 +1829,9 @@ ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle sourc
 ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file_set, double merge_tol,
                                                 std::vector< Tag >& tagList )
 {
-    Range verts;
-    ErrorCode rval = mb->get_entities_by_dimension( file_set, 0, verts );MB_CHK_ERR( rval );
-    rval = mb->remove_entities( file_set, verts );MB_CHK_ERR( rval );
+    Range iniVerts;
+    ErrorCode rval = mb->get_entities_by_dimension( file_set, 0, iniVerts );MB_CHK_ERR( rval );
+    rval = mb->remove_entities( file_set, iniVerts );MB_CHK_ERR( rval );
 
     MergeMesh mm( mb );
 
@@ -1843,8 +1843,8 @@ ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file
     Range cells;
     rval = mb->get_entities_by_dimension( file_set, 2, cells );MB_CHK_ERR( rval );
 
-    verts.clear();
-    rval = mb->get_connectivity( cells, verts );MB_CHK_ERR( rval );
+    Range verts;
+    rval = mb->get_connectivity( cells, verts );MB_CHK_ERR( rval ); // these are the vertices still valid
 
     Range modifiedCells;  // will be deleted at the end; keep the gid
     Range newCells;
@@ -1906,12 +1906,14 @@ ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file
     rval = mb->remove_entities( file_set, modifiedCells );MB_CHK_SET_ERR( rval, "Failed to remove old cells from file set" );
     // remove modified cells from any sets they may be in
     // first find all sets included in the file set
+    Range deletedVertices = subtract(iniVerts, verts );
     Range meshSets;
     rval = mb->get_entities_by_type( file_set, MBENTITYSET, meshSets, /*recursive*/ true );MB_CHK_SET_ERR( rval, "Failed to retrieve sets" );
     for (Range::iterator setIt = meshSets.begin(); setIt != meshSets.end(); setIt++ )
     {
         EntityHandle meshSet=*setIt;
         rval = mb->remove_entities(meshSet, modifiedCells );MB_CHK_SET_ERR( rval, "Failed to remove entities from including sets" );
+        rval = mb->remove_entities(meshSet, deletedVertices);MB_CHK_SET_ERR( rval, "Failed to remove deleted vertices from including sets" );
     }
     rval = mb->delete_entities( modifiedCells );MB_CHK_SET_ERR( rval, "Failed to delete old cells" );
     rval = mb->add_entities( file_set, newCells );MB_CHK_SET_ERR( rval, "Failed to add new cells to file set" );

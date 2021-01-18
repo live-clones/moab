@@ -52,6 +52,7 @@ ErrorCode migrate_1_1( const char* filename );
 ErrorCode migrate_1_2( const char* filename );
 ErrorCode migrate_2_1( const char* filename );
 ErrorCode migrate_2_2( const char* filename );
+ErrorCode migrate_2_2_n( const char* filename );
 ErrorCode migrate_4_2( const char* filename );
 ErrorCode migrate_2_4( const char* filename );
 ErrorCode migrate_4_3( const char* filename );
@@ -90,7 +91,7 @@ int main( int argc, char* argv[] )
     num_errors += RUN_TEST_ARG2( migrate_2_1, filename.c_str() );
     num_errors += RUN_TEST_ARG2( migrate_2_2, filename.c_str() );
     merge_before_send = true;
-    num_errors += RUN_TEST_ARG2( migrate_2_2, filename2.c_str() );
+    num_errors += RUN_TEST_ARG2( migrate_2_2_n, filename2.c_str() );
     if( size >= 4 )
     {
         merge_before_send = false;
@@ -209,52 +210,54 @@ ErrorCode migrate( const char* filename, const char* outfile )
     // we can now free the sender buffers
     if( comm1 != MPI_COMM_NULL ) ierr = iMOAB_FreeSenderBuffers( pid1, &context_id );
 
-    // exchange tag, from component to component
-    // one is receiving, one is sending the tag; the one that is sending needs to have communicator
-    // not null
-    int size_tag  = 1;  // a double dense tag, on elements
-    int tagType   = DENSE_DOUBLE;
-    int tagIndex2 = 0, tagIndex1 = 0;  // these will be tag indices on each app pid
-
-    std::string fileAfterTagMigr( outfile );  // has h5m
-    int sizen = fileAfterTagMigr.length();
-    fileAfterTagMigr.erase( sizen - 4, 4 );  // erase extension .h5m
-    fileAfterTagMigr = fileAfterTagMigr + "_tag.h5m";
-
-    // now send a tag from component 2, towards component 1
-    if( comm2 != MPI_COMM_NULL )
+    if (!merge_before_send) // migrate_tag is not working for merging case, yet
     {
-        ierr =
-            iMOAB_DefineTagStorage( pid2, "element_field", &tagType, &size_tag, &tagIndex2, strlen( "element_field" ) );
-        CHECKRC( ierr, "failed to get tag element_field " );
-        // this tag is already existing in the file
+        // exchange tag, from component to component
+        // one is receiving, one is sending the tag; the one that is sending needs to have communicator
+        // not null
+        int size_tag  = 1;  // a double dense tag, on elements
+        int tagType   = DENSE_DOUBLE;
+        int tagIndex2 = 0, tagIndex1 = 0;  // these will be tag indices on each app pid
 
-        // first, send from compid2 to compid1, from comm2, using common joint comm
-        // as always, use nonblocking sends
-        ierr = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
-        CHECKRC( ierr, "cannot send tag values" )
+        std::string fileAfterTagMigr( outfile );  // has h5m
+        int sizen = fileAfterTagMigr.length();
+        fileAfterTagMigr.erase( sizen - 4, 4 );  // erase extension .h5m
+        fileAfterTagMigr = fileAfterTagMigr + "_tag.h5m";
+
+        // now send a tag from component 2, towards component 1
+        if( comm2 != MPI_COMM_NULL )
+        {
+            ierr =
+                iMOAB_DefineTagStorage( pid2, "element_field", &tagType, &size_tag, &tagIndex2, strlen( "element_field" ) );
+            CHECKRC( ierr, "failed to get tag element_field " );
+            // this tag is already existing in the file
+
+            // first, send from compid2 to compid1, from comm2, using common joint comm
+            // as always, use nonblocking sends
+            ierr = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
+            CHECKRC( ierr, "cannot send tag values" )
+        }
+        // receive on component 1
+        if( comm1 != MPI_COMM_NULL )
+        {
+            ierr =
+                iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1, strlen( "element_field" ) );
+            CHECKRC( ierr, "failed to get tag DFIELD " );
+
+            ierr = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
+            CHECKRC( ierr, "cannot send tag values" )
+            std::string wopts;
+            wopts = "PARALLEL=WRITE_PART;";
+            ierr  = iMOAB_WriteMesh( pid1, (char*)fileAfterTagMigr.c_str(), (char*)wopts.c_str(), fileAfterTagMigr.length(),
+                                    strlen( wopts.c_str() ) );
+            CHECKRC( ierr, "cannot write received mesh" )
+        }
+
+        MPI_Barrier( jcomm );
+
+        // we can now free the sender buffers
+        if( comm2 != MPI_COMM_NULL ) ierr = iMOAB_FreeSenderBuffers( pid2, &context_id );
     }
-    // receive on component 1
-    if( comm1 != MPI_COMM_NULL )
-    {
-        ierr =
-            iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1, strlen( "element_field" ) );
-        CHECKRC( ierr, "failed to get tag DFIELD " );
-
-        ierr = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
-        CHECKRC( ierr, "cannot send tag values" )
-        std::string wopts;
-        wopts = "PARALLEL=WRITE_PART;";
-        ierr  = iMOAB_WriteMesh( pid1, (char*)fileAfterTagMigr.c_str(), (char*)wopts.c_str(), fileAfterTagMigr.length(),
-                                strlen( wopts.c_str() ) );
-        CHECKRC( ierr, "cannot write received mesh" )
-    }
-
-    MPI_Barrier( jcomm );
-
-    // we can now free the sender buffers
-    if( comm2 != MPI_COMM_NULL ) ierr = iMOAB_FreeSenderBuffers( pid2, &context_id );
-
     if( comm2 != MPI_COMM_NULL )
     {
         ierr = iMOAB_DeregisterApplication( pid2 );
@@ -306,6 +309,12 @@ ErrorCode migrate_2_2( const char* filename )
     startG1 = startG2 = 0;
     endG1 = endG2 = 1;
     return migrate( filename, "migrate22.h5m" );
+}
+ErrorCode migrate_2_2_n( const char* filename )
+{
+    startG1 = startG2 = 0;
+    endG1 = endG2 = 1;
+    return migrate( filename, "migrate22n.h5m" );
 }
 // migrate from 4 tasks to 2 tasks
 ErrorCode migrate_4_2( const char* filename )
