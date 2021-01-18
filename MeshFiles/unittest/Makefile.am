@@ -75,5 +75,6 @@ EXTRA_DIST = 125hex.g \
              recMeshOcn.h5m \
              AtmPhys.h5m \
              AtmPhys_01.h5m \
-             outCS5ICOD5_map.nc
+             outCS5ICOD5_map.nc \
+	     wholeLnd2.h5m
 

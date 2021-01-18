@@ -64,6 +64,7 @@ int compid1, compid2;  // component ids are unique over all pes, and established
 int nghlay;            // number of ghost layers for loading the file
 int groupTasks[4];     // at most 4 tasks
 int startG1, startG2, endG1, endG2;
+bool merge_before_send;
 
 MPI_Comm jcomm;  // will be a copy of the global
 MPI_Group jgroup;
@@ -77,16 +78,22 @@ int main( int argc, char* argv[] )
     MPI_Comm_dup( MPI_COMM_WORLD, &jcomm );
     MPI_Comm_group( jcomm, &jgroup );
 
-    std::string filename;
+    std::string filename, filename2;
     filename = TestDir + "/field1.h5m";
+    filename2 = TestDir + "/wholeLnd2.h5m";
     if( argc > 1 ) { filename = argv[1]; }
+    if (argc > 2 ) { filename2 = argv[2]; }
     int num_errors = 0;
+    merge_before_send = false;
     num_errors += RUN_TEST_ARG2( migrate_1_1, filename.c_str() );
     num_errors += RUN_TEST_ARG2( migrate_1_2, filename.c_str() );
     num_errors += RUN_TEST_ARG2( migrate_2_1, filename.c_str() );
     num_errors += RUN_TEST_ARG2( migrate_2_2, filename.c_str() );
+    merge_before_send = true;
+    num_errors += RUN_TEST_ARG2( migrate_2_2, filename2.c_str() );
     if( size >= 4 )
     {
+        merge_before_send = false;
         num_errors += RUN_TEST_ARG2( migrate_4_2, filename.c_str() );
         num_errors += RUN_TEST_ARG2( migrate_2_4, filename.c_str() );
         num_errors += RUN_TEST_ARG2( migrate_4_3, filename.c_str() );
@@ -161,14 +168,27 @@ ErrorCode migrate( const char* filename, const char* outfile )
     int method = 0;  // trivial partition for sending
     if( comm1 != MPI_COMM_NULL )
     {
-
-        std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
-
         nghlay = 0;
-
-        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay, filen.length(),
-                               strlen( readopts.c_str() ) );
-        CHECKRC( ierr, "can't load mesh " )
+        if ( merge_before_send )
+        {
+            // case wholeLnd2.h5m, do not resolve, it will create undesired edges
+            std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );
+            ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay, filen.length(),
+                       strlen( readopts.c_str() ) );
+            CHECKRC( ierr, "can't load mesh " )
+            ierr = iMOAB_MergeVertices( pid1 );
+            CHECKRC( ierr, "can't merge vertices " )
+#ifdef MOAB_HAVE_ZOLTAN
+            method = 2; // zoltan RCB
+#endif
+        }
+        else
+        {
+            std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
+            ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay, filen.length(),
+                      strlen( readopts.c_str() ) );
+            CHECKRC( ierr, "can't load mesh " )
+        }
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &method );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
     }

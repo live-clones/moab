@@ -2499,21 +2499,6 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
     double tol = 1.0e-9;
     rval       = IntxUtils::remove_duplicate_vertices( context.MBI, data.file_set, tol, tagsList );CHKERRVAL( rval );
 
-    // clean material sets of cells that were deleted
-    rval = context.MBI->get_entities_by_type_and_tag( data.file_set, MBENTITYSET, &( context.material_tag ), 0, 1,
-                                                      data.mat_sets, Interface::UNION );CHKERRVAL( rval );
-
-    if( !data.mat_sets.empty() )
-    {
-        EntityHandle matSet = data.mat_sets[0];
-        Range elems;
-        rval = context.MBI->get_entities_by_dimension( matSet, 2, elems );CHKERRVAL( rval );
-        rval = context.MBI->remove_entities( matSet, elems );CHKERRVAL( rval );
-        // put back only cells from data.file_set
-        elems.clear();
-        rval = context.MBI->get_entities_by_dimension( data.file_set, 2, elems );CHKERRVAL( rval );
-        rval = context.MBI->add_entities( matSet, elems );CHKERRVAL( rval );
-    }
     int ierr = iMOAB_UpdateMeshInfo( pid );
     if( ierr > 0 ) return ierr;
     ParallelMergeMesh pmm( pco, tol );

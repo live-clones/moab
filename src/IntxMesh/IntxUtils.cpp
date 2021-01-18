@@ -1904,6 +1904,15 @@ ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file
     }
 
     rval = mb->remove_entities( file_set, modifiedCells );MB_CHK_SET_ERR( rval, "Failed to remove old cells from file set" );
+    // remove modified cells from any sets they may be in
+    // first find all sets included in the file set
+    Range meshSets;
+    rval = mb->get_entities_by_type( file_set, MBENTITYSET, meshSets, /*recursive*/ true );MB_CHK_SET_ERR( rval, "Failed to retrieve sets" );
+    for (Range::iterator setIt = meshSets.begin(); setIt != meshSets.end(); setIt++ )
+    {
+        EntityHandle meshSet=*setIt;
+        rval = mb->remove_entities(meshSet, modifiedCells );MB_CHK_SET_ERR( rval, "Failed to remove entities from including sets" );
+    }
     rval = mb->delete_entities( modifiedCells );MB_CHK_SET_ERR( rval, "Failed to delete old cells" );
     rval = mb->add_entities( file_set, newCells );MB_CHK_SET_ERR( rval, "Failed to add new cells to file set" );
     rval = mb->add_entities( file_set, verts );MB_CHK_SET_ERR( rval, "Failed to add verts to the file set" );
