@@ -23,10 +23,18 @@
 
 #include "moab/Remapping/TempestOnlineMap.hpp"
 #include "DebugOutput.hpp"
+#include "moab/TupleList.hpp"
 
 #include <fstream>
 #include <cmath>
 #include <cstdlib>
+
+
+#ifdef MOAB_HAVE_NETCDFPAR
+#include "netcdfcpp_par.hpp"
+#else
+#include "netcdfcpp.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1520,17 +1528,48 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     NcFile* ncMap = NULL;
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
 
+    NcVar *varRow2 = NULL, *varCol2 = NULL, *varS2 = NULL;
+    int nS2 = 0;
+#ifdef MOAB_HAVE_NETCDFPAR
+    bool is_independent = true;
+    ParNcFile ncMap2( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
+    // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strFilename.c_str(), NcmpiFile::replace, NcmpiFile::classic5 );
+#else
+    NcFile ncMap2( strSource, NcFile::ReadOnly );
+#endif
+
 #ifdef MOAB_HAVE_MPI
     int mpierr = 0;
+    MPI_Comm commW = m_pcomm->comm();
+
 #endif
+    // Read SparseMatrix entries
+
+    NcDim* dimNS2 = ncMap2.get_dim( "n_s" );
+    if( dimNS2 == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", strSource ); }
+
+    // store total number of nonzeros
+    nS2 = dimNS2->size();
+
+    varRow2 = ncMap2.get_var( "row" );
+    if( varRow2 == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
+
+    varCol2 = ncMap2.get_var( "col" );
+    if( varCol2 == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
+
+    varS2 = ncMap2.get_var( "S" );
+    if( varS2 == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
+
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap2.enable_var_par_access( varRow2, is_independent );
+    ncMap2.enable_var_par_access( varCol2, is_independent );
+    ncMap2.enable_var_par_access( varS2, is_independent );
+#endif
+
     const int nBufferSize = 256 * 1024;  // 256 KB
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
-
-#ifdef MOAB_HAVE_MPI
-    MPI_Comm commW = m_pcomm->comm();
-#endif
 
     if( is_root )
     {
@@ -1596,7 +1635,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     std::vector<int> rowOwnership;
     // if owned_dof_ids = NULL, use the default trivial partitioning scheme
-    if( is_root && owned_dof_ids.size() == 0 )
+    if( owned_dof_ids.size() == 0 )
     {
         // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
         rowOwnership.resize( size );
@@ -1613,10 +1652,108 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     // Let us declare the map object for every process
     SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
 
+    SparseMatrix< double > sparseMatrix2;
+
     std::map< int, int > rowMap, colMap;
     int rindexMax = 0, cindexMax = 0;
     long offset = 0;
 
+
+    int localSize = nS/size;
+    long offsetRead = rank*localSize;
+    // leftovers on last rank
+    if (rank == size-1)
+    {
+        localSize += nS%size;
+    }
+
+    std::vector<int> vecRow2, vecCol2;
+    std::vector<double> vecS2;
+    vecRow2.resize(localSize);
+    vecCol2.resize(localSize);
+    vecS2.resize(localSize);
+
+    varRow2->set_cur( (long)( offsetRead ) );
+    varRow2->get( &( vecRow2[0] ), localSize );
+
+    varCol2->set_cur( (long)( offsetRead ) );
+    varCol2->get( &( vecCol2[0] ), localSize );
+
+    varS2->set_cur( (long)( offsetRead ) );
+    varS2->get( &( vecS2[0] ), localSize );
+
+    // send to
+    moab::TupleList tl;
+    unsigned numr = 1; //
+    tl.initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
+    tl.enableWriteAccess();
+    // populate
+    for (unsigned i=0; i < localSize; i++ )
+    {
+        int rowval = vecRow2[i] ;
+        int colval = vecCol2[i];
+        int to_proc = -1;
+        //
+
+        if( rowOwnership[0] > rowval )
+            to_proc = 0;
+        else
+        {
+            for( int ip = 1; ip < size; ++ip )
+            {
+                if( rowOwnership[ip - 1] <= rowval && rowOwnership[ip] > rowval )
+                {
+                    to_proc = ip;
+                    break;
+                }
+            }
+        }
+
+        int n = tl.get_n();
+        tl.vi_wr[3 * n]         = to_proc;
+        tl.vi_wr[3 * n + 1]     = rowval;
+        tl.vi_wr[3 * n + 2] = colval;
+        tl.vr_wr[n] = vecS2[i];
+
+        tl.inc_n();
+    }
+
+    // now do the heavy communication
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+
+    // populate the sparsematrix2, using rowMap and colMap; what is the need for them?
+    int n = tl.get_n();
+    for (int i=0; i<n; i++){
+
+        int rindex, cindex;
+        const int& vecRowValue = tl.vi_wr[3*i+1];
+        const int& vecColValue = tl.vi_wr[3*i+2];
+
+        std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+        if( riter == rowMap.end() )
+        {
+            rowMap[vecRowValue] = rindexMax;
+            rindex              = rindexMax;
+            rindexMax++;
+        }
+        else
+            rindex = riter->second;
+
+        std::map< int, int >::iterator citer = colMap.find( vecColValue );
+        if( citer == colMap.end() )
+        {
+            colMap[vecColValue] = cindexMax;
+            cindex              = cindexMax;
+            cindexMax++;
+        }
+        else
+            cindex = citer->second;
+
+        sparseMatrix2( rindex, cindex ) = tl.vr_wr[i];
+
+    }
+    rowMap.clear();
+    colMap.clear();
     const char* message = "MapReadBcast: ";
     int barWidth        = 50;
     float progress      = 0.0;
