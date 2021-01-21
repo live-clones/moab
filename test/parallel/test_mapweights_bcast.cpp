@@ -146,7 +146,7 @@ void read_buffered_map()
     int nBufferedReads    = static_cast< int >( ceil( ( 1.0 * nS ) / ( 1.0 * nMaxEntries ) ) );
     int runData[6]        = { nA, nB, nVA, nVB, nS, nBufferedReads };
 
-    mpierr = MPI_Bcast( runData, 6, MPI_INTEGER, rootProc, commW );
+    mpierr = MPI_Bcast( runData, 6, MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
 #ifdef MOAB_HAVE_MPI
@@ -438,7 +438,7 @@ void read_buffered_map()
         int isMonotoneP = mapRemap.IsMonotone( dTolerance );
         // Accumulate sum of failures to ensure that it is exactly same as serial case
         int isMonotoneG;
-        mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INTEGER, MPI_SUM, commW );
+        mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INT, MPI_SUM, commW );
         CHECK_EQUAL( mpierr, 0 );
 
         // 4600 monotonicity fails in serial and parallel for the test map file
@@ -591,12 +591,12 @@ void test_tempest_map_bcast()
         //             rowAllocation[i * NDATA + 1], rowAllocation[i * NDATA + 2], i, displs[i], sendCounts[i] );
     }
 
-    mpierr = MPI_Bcast( nMapGlobalRowCols, 3, MPI_INTEGER, rootProc, commW );
+    mpierr = MPI_Bcast( nMapGlobalRowCols, 3, MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
     int allocationSize[NDATA] = { 0, 0, 0 };
     mpierr =
-        MPI_Scatter( rowAllocation.data(), NDATA, MPI_INTEGER, &allocationSize, NDATA, MPI_INTEGER, rootProc, commW );
+        MPI_Scatter( rowAllocation.data(), NDATA, MPI_INT, &allocationSize, NDATA, MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
     // create buffers to receive the data from root process
@@ -608,12 +608,12 @@ void test_tempest_map_bcast()
 
     /* TODO: combine row and column scatters together. Save one communication by better packing */
     // Scatter the rows, cols and entries to the processes according to the partition
-    mpierr = MPI_Scatterv( rg, sendCounts.data(), displs.data(), MPI_INTEGER, (int*)( dataRows ),
-                           dataRows.GetByteSize(), MPI_INTEGER, rootProc, commW );
+    mpierr = MPI_Scatterv( rg, sendCounts.data(), displs.data(), MPI_INT, (int*)( dataRows ),
+                           dataRows.GetByteSize(), MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
-    mpierr = MPI_Scatterv( cg, sendCounts.data(), displs.data(), MPI_INTEGER, (int*)( dataCols ),
-                           dataCols.GetByteSize(), MPI_INTEGER, rootProc, commW );
+    mpierr = MPI_Scatterv( cg, sendCounts.data(), displs.data(), MPI_INT, (int*)( dataCols ),
+                           dataCols.GetByteSize(), MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
     mpierr = MPI_Scatterv( de, sendCounts.data(), displs.data(), MPI_DOUBLE, (double*)( dataEntries ),
@@ -669,7 +669,7 @@ void test_tempest_map_bcast()
     int isMonotoneP = mapRemap.IsMonotone( dTolerance );
     // Accumulate sum of failures to ensure that it is exactly same as serial case
     int isMonotoneG;
-    mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INTEGER, MPI_SUM, commW );
+    mpierr = MPI_Allreduce( &isMonotoneP, &isMonotoneG, 1, MPI_INT, MPI_SUM, commW );
     CHECK_EQUAL( mpierr, 0 );
     // 4600 fails in serial. What about parallel ? Check and confirm.
     CHECK_EQUAL( 4600, isMonotoneG );

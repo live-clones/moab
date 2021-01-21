@@ -1849,11 +1849,11 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         number_elems_per_part[rank] = local_owned_elem;
 #if( MPI_VERSION >= 2 )
         // Use "in place" option
-        ierr = MPI_Allgather( MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, &number_elems_per_part[0], 1, MPI_INTEGER, sender );
+        ierr = MPI_Allgather( MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, &number_elems_per_part[0], 1, MPI_INT, sender );
 #else
         {
             std::vector< int > all_tmp( size );
-            ierr = MPI_Allgather( &number_elems_per_part[rank], 1, MPI_INTEGER, &all_tmp[0], 1, MPI_INTEGER, sender );
+            ierr = MPI_Allgather( &number_elems_per_part[rank], 1, MPI_INT, &all_tmp[0], 1, MPI_INT, sender );
             number_elems_per_part = all_tmp;
         }
 #endif
