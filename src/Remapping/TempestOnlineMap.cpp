@@ -1608,6 +1608,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     varS->set_cur( (long)( offsetRead ) );
     varS->get( &( vecS[0] ), localSize );
 
+    ncMap.close();
+
     // send to
     moab::TupleList tl;
     unsigned numr = 1; //
@@ -1616,8 +1618,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     // populate
     for (unsigned i=0; i < localSize; i++ )
     {
-        int rowval = vecRow[i] ;
-        int colval = vecCol[i];
+        int rowval = vecRow[i] - 1; // dofs are 1 based in the file
+        int colval = vecCol[i] - 1;
         int to_proc = -1;
         //
 
@@ -1679,9 +1681,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     }
 
-
-
-    ncMap.close();
 
     m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
     m_nTotDofs_Dest   = sparseMatrix.GetRows();
