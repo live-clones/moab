@@ -1610,77 +1610,114 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     ncMap.close();
 
-    // send to
-    moab::TupleList tl;
-    unsigned numr = 1; //
-    tl.initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
-    tl.enableWriteAccess();
-    // populate
-    for (unsigned i=0; i < localSize; i++ )
+    // bother with tuple list only if size > 1
+    // otherwise, just fill the sparse matrix
+    if (size > 1)
     {
-        int rowval = vecRow[i] - 1; // dofs are 1 based in the file
-        int colval = vecCol[i] - 1;
-        int to_proc = -1;
-        //
-
-        if( rowOwnership[0] > rowval )
-            to_proc = 0;
-        else
+        // send to
+        moab::TupleList tl;
+        unsigned numr = 1; //
+        tl.initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
+        tl.enableWriteAccess();
+        // populate
+        for (unsigned i=0; i < localSize; i++ )
         {
-            for( int ip = 1; ip < size; ++ip )
+            int rowval = vecRow[i] - 1; // dofs are 1 based in the file
+            int colval = vecCol[i] - 1;
+            int to_proc = -1;
+            //
+
+            if( rowOwnership[0] > rowval )
+                to_proc = 0;
+            else
             {
-                if( rowOwnership[ip - 1] <= rowval && rowOwnership[ip] > rowval )
+                for( int ip = 1; ip < size; ++ip )
                 {
-                    to_proc = ip;
-                    break;
+                    if( rowOwnership[ip - 1] <= rowval && rowOwnership[ip] > rowval )
+                    {
+                        to_proc = ip;
+                        break;
+                    }
                 }
             }
+
+            int n = tl.get_n();
+            tl.vi_wr[3 * n]         = to_proc;
+            tl.vi_wr[3 * n + 1]     = rowval;
+            tl.vi_wr[3 * n + 2] = colval;
+            tl.vr_wr[n] = vecS[i];
+
+            tl.inc_n();
         }
 
+#ifdef MOAB_HAVE_MPI
+        // now do the heavy communication
+        ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+#endif
+        // populate the sparsematrix, using rowMap and colMap; what is the need for them?
         int n = tl.get_n();
-        tl.vi_wr[3 * n]         = to_proc;
-        tl.vi_wr[3 * n + 1]     = rowval;
-        tl.vi_wr[3 * n + 2] = colval;
-        tl.vr_wr[n] = vecS[i];
+        for (int i=0; i<n; i++){
 
-        tl.inc_n();
-    }
+            int rindex, cindex;
+            const int& vecRowValue = tl.vi_wr[3*i+1];
+            const int& vecColValue = tl.vi_wr[3*i+2];
 
-    // now do the heavy communication
-    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+            std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+            if( riter == rowMap.end() )
+            {
+                rowMap[vecRowValue] = rindexMax;
+                rindex              = rindexMax;
+                rindexMax++;
+            }
+            else
+                rindex = riter->second;
 
-    // populate the sparsematrix, using rowMap and colMap; what is the need for them?
-    int n = tl.get_n();
-    for (int i=0; i<n; i++){
+            std::map< int, int >::iterator citer = colMap.find( vecColValue );
+            if( citer == colMap.end() )
+            {
+                colMap[vecColValue] = cindexMax;
+                cindex              = cindexMax;
+                cindexMax++;
+            }
+            else
+                cindex = citer->second;
 
-        int rindex, cindex;
-        const int& vecRowValue = tl.vi_wr[3*i+1];
-        const int& vecColValue = tl.vi_wr[3*i+2];
+            sparseMatrix( rindex, cindex ) = tl.vr_wr[i];
 
-        std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
-        if( riter == rowMap.end() )
-        {
-            rowMap[vecRowValue] = rindexMax;
-            rindex              = rindexMax;
-            rindexMax++;
         }
-        else
-            rindex = riter->second;
-
-        std::map< int, int >::iterator citer = colMap.find( vecColValue );
-        if( citer == colMap.end() )
-        {
-            colMap[vecColValue] = cindexMax;
-            cindex              = cindexMax;
-            cindexMax++;
-        }
-        else
-            cindex = citer->second;
-
-        sparseMatrix( rindex, cindex ) = tl.vr_wr[i];
-
     }
+    else
+    {
+        for (int i=0; i<nS; i++){
 
+            int rindex, cindex;
+            const int& vecRowValue = vecRow[i];
+            const int& vecColValue = vecCol[i];
+
+            std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+            if( riter == rowMap.end() )
+            {
+                rowMap[vecRowValue] = rindexMax;
+                rindex              = rindexMax;
+                rindexMax++;
+            }
+            else
+                rindex = riter->second;
+
+            std::map< int, int >::iterator citer = colMap.find( vecColValue );
+            if( citer == colMap.end() )
+            {
+                colMap[vecColValue] = cindexMax;
+                cindex              = cindexMax;
+                cindexMax++;
+            }
+            else
+                cindex = citer->second;
+
+            sparseMatrix( rindex, cindex ) = vecS[i];
+
+        }
+    }
 
     m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
     m_nTotDofs_Dest   = sparseMatrix.GetRows();
