@@ -49,9 +49,16 @@ int main( int  argc, char*  argv[] )
     double coords[3];
     rval  = mb->get_coords(&firstCell, 1, coords); MB_CHK_ERR( rval );
     // check position
+#ifdef  MOAB_FORCE_32_BIT_HANDLES
+    double eps = 1.e-6;
+    double values[3]={ -0.788675, 0.788675, 0};
+    CHECK_REAL_EQUAL( values[0], coords[0], eps );
+    CHECK_REAL_EQUAL( values[1], coords[1], eps );
+    CHECK_REAL_EQUAL( values[2], coords[2], eps );
+#else
     double values[3]={-0.78867513420303437, 0.78867513420303437, 0};
     CHECK_ARRAYS_EQUAL(coords, 3, values, 3);
-
+#endif
     rval = mb->write_file(fileout.c_str(), 0, 0, &outSet, 1); ;MB_CHK_ERR( rval );
 
     return 0;
