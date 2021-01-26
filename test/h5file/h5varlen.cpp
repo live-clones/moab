@@ -33,6 +33,8 @@ void test_var_length_default_opaque();
 
 void test_var_length_handle_tag();
 
+void test_huge_var_length();
+
 void create_mesh( Interface& mb );
 
 void create_big_mesh( Interface& mb );
@@ -76,6 +78,8 @@ int main( int argc, char* argv[] )
     err_count += RUN_TEST( test_var_length_default_opaque );
     err_count += RUN_TEST( test_var_length_handle_tag );
     err_count += RUN_TEST( test_var_length_data_big );
+
+    err_count += RUN_TEST (test_huge_var_length);
 
 #ifdef MOAB_HAVE_MPI
     fail = MPI_Finalize();
@@ -530,6 +534,58 @@ void test_var_length_handle_tag()
     }
 }
 
+void test_huge_var_length()
+{
+    ErrorCode rval;
+    Core moab1, moab2;
+    Interface &mb1 = moab1, &mb2 = moab2;
+    Tag tag;
+    Range::const_iterator i;
+
+    create_mesh( mb1 );
+    rval = mb1.tag_get_handle( "test_tag", 0, MB_TYPE_DOUBLE, tag, MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL );CHECK_ERR( rval );
+
+    // Get all entities
+    Range range;
+    rval = mb1.get_entities_by_handle( 0, range );CHECK_ERR( rval );
+
+    // For each entity, if it is a vertex store its own handle
+    // in its tag.  Otherwise store the element connectivity list
+    // in the tag.  Skip entity sets.
+    EntityHandle v1 = range[0]; // first vertex
+    // huge data
+    std::vector<double> dataArr; // larger than the buffer
+    int N = 2000;
+    dataArr.resize(N); // size will be 8 * N > bufferSize = 10000 set by option during writing
+    for (int i=0; i<N; i++)
+        dataArr[i] = i;
+    const void * ptr = &dataArr[0];
+    rval            = mb1.tag_set_by_ptr( tag, &v1, 1, &ptr, &N );CHECK_ERR( rval );
+    // second vertex, do a smaller N
+    v1 = range[1];
+    int M = N-5;
+    ptr = &dataArr[2]; // start with 2
+    rval            = mb1.tag_set_by_ptr( tag, &v1, 1, &ptr, &M );CHECK_ERR( rval );
+
+    // write with a smaller buffer, size controlled by option to test
+    const char* writeOptions = "BUFFER_SIZE=4000;DEBUG_IO=5";
+    rval = mb1.write_file("test_huge_var_tag.h5m", NULL, writeOptions ); CHECK_ERR( rval );
+    rval = mb2.load_file( "test_huge_var_tag.h5m" ); CHECK_ERR( rval );
+    compare_tags( "test_tag", mb1, mb2 );
+    // compare some values for the 2nd vertex
+    Tag tag2;
+    rval = mb2.tag_get_handle("test_tag", tag2); CHECK_ERR( rval );
+    EntityHandle vertex2=2;
+    int len2;
+    const void* ptr2;
+    rval = mb2.tag_get_by_ptr(tag2,&vertex2, 1, &ptr2, &len2); CHECK_ERR( rval );
+    CHECK_EQUAL( len2, M );
+
+    CHECK_REAL_EQUAL( dataArr[2], ((double*)ptr2)[0] , 0.000000001);
+
+    if( !keep_files ) remove( "test_huge_var_tag.h5m" );CHECK_ERR( rval );
+
+}
 void create_structured_quad_mesh( Interface& mb, int x, int y )
 {
     ErrorCode rval;
@@ -606,7 +662,7 @@ void compare_tags( const char* name, Interface& mb1, Interface& mb2 )
 
 void read_write( const char* filename, Interface& writer, Interface& reader )
 {
-    ErrorCode rval = writer.write_mesh( filename );
+    ErrorCode rval = writer.write_file( filename );
     if( !keep_files && MB_SUCCESS != rval ) remove( filename );CHECK_ERR( rval );
     rval = reader.load_mesh( filename );
     if( !keep_files ) remove( filename );CHECK_ERR( rval );

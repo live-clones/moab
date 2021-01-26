@@ -2139,6 +2139,7 @@ ErrorCode WriteHDF5::write_var_len_data( const TagDesc& tag_data, const Range& r
                 convert_handle_tag( (const EntityHandle*)ptr, (EntityHandle*)buffer, len );
             else
                 memcpy( buffer, ptr, len * type_size );
+            count = len;
         }
 
         for( ; count < buffer_size && iter != range.end(); ++iter )
@@ -2147,23 +2148,23 @@ ErrorCode WriteHDF5::write_var_len_data( const TagDesc& tag_data, const Range& r
             const void* ptr;
             rval = iFace->tag_get_by_ptr( tag_data.tag_id, &*iter, 1, &ptr, &len );
             CHK_MB_ERR_0( rval );
-            int bytes = len * type_size;
             if( len + count > buffer_size )
             {
                 prev_len  = len + count - buffer_size;
-                prev_data = ( (const char*)ptr ) + prev_len * type_size;
                 len       = buffer_size - count;
+                prev_data = ( (const char*)ptr ) + len * type_size;
             }
 
             if( handle_tag )
                 convert_handle_tag( (const EntityHandle*)ptr, ( (EntityHandle*)buffer ) + count, len );
             else
-                memcpy( buffer + count * type_size, ptr, bytes );
+                memcpy( buffer + count * type_size, ptr, len * type_size );
             count += len;
         }
 
         track.record_io( offset, count );
         mhdf_writeTagValuesWithOpt( table, offset, count, hdf_type, buffer, writeProp, &status );
+        offset+=count;
         CHK_MHDF_ERR_0( status );
         --num_writes;
     }
