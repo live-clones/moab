@@ -22,9 +22,7 @@ if (NOT WIN32)
 endif()
 
 project( MOAB )
-if(MSVC)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-endif()
+
 include(GNUInstallDirs)
 
 #Add our Cmake directory to the module search path
@@ -53,6 +51,13 @@ IF(CMAKE_VERSION VERSION_EQUAL "3.0.0" OR CMAKE_VERSION VERSION_GREATER "3.0.0")
   cmake_policy(SET CMP0020 NEW)
   cmake_policy(SET CMP0042 OLD)
 ENDIF ()
+
+if(MSVC)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_USE_MATH_DEFINES")
+endif()
 
 set ( abs_srcdir   ${CMAKE_SOURCE_DIR} )
 set ( abs_builddir ${PROJECT_BINARY_DIR} )
