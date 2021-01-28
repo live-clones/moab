@@ -445,13 +445,6 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
         mdbImpl->list_entities( 0, 0 );
     }
 
-    // **************************
-    // Restore geometric topology
-    // **************************
-    GeomTopoTool gtt( mdbImpl, true, 0, true, false );
-    result = gtt.restore_topology_from_adjacency();
-    if( MB_SUCCESS != result ) { std::cout << "Failed to restore topology " << std::endl; }
-
     // Convert blocks to nodesets/sidesets if tag is set
     result = convert_nodesets_sidesets();
     if( MB_SUCCESS != result ) return result;
@@ -463,6 +456,16 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
     after_ents = subtract( after_ents, beforeEnts );
 
     if( file_id_tag ) readUtilIface->assign_ids( *file_id_tag, after_ents );
+
+    if( MB_SUCCESS != opts.get_null_option( "SKIP_TOPOLOGY") ) 
+    {
+        // **************************
+        // Restore geometric topology
+        // **************************
+        GeomTopoTool gtt( mdbImpl, true, 0, true, false );
+        result = gtt.restore_topology_from_adjacency();
+        if( MB_SUCCESS != result ) { std::cout << "Failed to restore topology " << std::endl; }
+    }
 
     // done with the cubit file
     fclose( cubFile );
