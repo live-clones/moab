@@ -779,7 +779,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
   # configure HDF5
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77 MPIEXEC=$MPIEXEC"
+    compiler_opts="CC=$CC CXX=$CXX MPIEXEC=$MPIEXEC"
     configure_command="$hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1 $compiler_opts"
     # configure_command="$configure_command --enable-cxx --enable-unsupported"
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
@@ -790,9 +790,6 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
     #fi
     if (test "$enable_shared" != "no"); then
       configure_command="$configure_command --enable-shared"
-    fi
-    if (test "$enablefortran" != "no"); then
-      configure_command="$configure_command --enable-fortran"
     fi
     if (test "$enable_cxx_optimize" != "no"); then
       if (test "$HDF5_DOWNLOAD_SRC_VERSION" != "1.8.12" || test "$HDF5_DOWNLOAD_SRC_VERSION" != "1.8.21"); then
@@ -971,7 +968,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_NETCDF],
   # configure NETCDF
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, NETCDF
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    compiler_opts="CC=$CC CXX=$CXX"
     configure_command="$netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     if (test "$enablehdf5" != "no"); then
       configure_command="$configure_command --enable-netcdf-4 LDFLAGS=\"$HDF5_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$HDF5_CPPFLAGS\" LIBS=\"$HDF5_LIBS -ldl -lm -lz\""
