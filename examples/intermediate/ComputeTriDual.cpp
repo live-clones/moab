@@ -55,7 +55,7 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
     moab::Range dualcells;
     std::map< size_t, std::vector< moab::EntityHandle > > polygonConn;
     // Generate new Face array
-    for( moab::Range::iterator vit = verts.begin(); vit != verts.end(); vit++ )
+    for( moab::Range::iterator vit = verts.begin(); vit != verts.end(); ++vit )
     {
         moab::EntityHandle vtx = *vit;
 
@@ -197,12 +197,9 @@ int main( int argc, char** argv )
 
     opts.parseCommandLine( argc, argv );
 
-    int rank         = 0;
-    int numProcesses = 1;
-
 #ifdef MOAB_HAVE_MPI
     if( MPI_Init( &argc, &argv ) ) return 1;
-    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    int numProcesses = 1;
     MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
 
     // we need one ghost layer so that each process can compute the dual independently
