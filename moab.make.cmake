@@ -31,6 +31,7 @@ MOAB_INCLUDES += $(IGEOM_INCLUDES)
 endif
 
 ifeq ($(MOAB_MESQUITE_ENABLED),yes)
+MSQ_LIBDIR = @abs_builddir@/src/mesquite/.libs
 MSQ_LIBS = -L@abs_builddir@/src/mesquite/.libs -lmbmesquite
 MSQ_INCLUDES = -I@abs_srcdir@/src/mesquite/include \
 	-I@abs_builddir@/src/mesquite/include \

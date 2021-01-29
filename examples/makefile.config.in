@@ -2,13 +2,26 @@
 MOAB_BUILD_DIR := @abs_top_builddir@
 MOAB_DIR := @prefix@
 
+# MESH_DIR is the directory containing mesh files that come with MOAB source
+MESH_DIR="@abs_top_srcdir@/MeshFiles/unittest"
+
+MOAB_CMAKE="no"
+
+####### COMMON SETUP FOR ALL EXAMPLES ##########
 MOAB_DEV = no
 ifneq ($(wildcard ${MOAB_DIR}/lib/moab.make),)
 include ${MOAB_DIR}/lib/moab.make
-include ${MOAB_DIR}/lib/iMesh-Defs.inc
+ifeq ("$(MOAB_IMESH_ENABLED)","yes")
+	include ${MOAB_DIR}/lib/iMesh-Defs.inc
+endif
+RUNLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MOAB_DIR}/lib"
 else
 include ${MOAB_BUILD_DIR}/moab.make
+ifeq ("$(MOAB_IMESH_ENABLED)","yes")
 include ${MOAB_BUILD_DIR}/itaps/imesh/iMesh-Defs.inc
+endif
+
+RUNLD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MOAB_LIBDIR}:${IMESH_LIBDIR}:${MSQ_LIBDIR}"
 MOAB_DEV = yes
 endif
 
@@ -21,15 +34,12 @@ ifeq ($(V),1)
 	VERBOSE=
 endif
 
-# MESH_DIR is the directory containing mesh files that come with MOAB source
-MESH_DIR="@abs_top_srcdir@/MeshFiles/unittest"
-
-RUNSERIAL =
+RUNSERIAL = LD_LIBRARY_PATH=${RUNLD_LIBRARY_PATH} 
 ifeq ("$(MOAB_MPI_ENABLED)","yes")
 NPROCS = @NP@
-RUNPARALLEL = @MPIEXEC@ @MPIEXEC_NP@ @NP@
+RUNPARALLEL = LD_LIBRARY_PATH=${RUNLD_LIBRARY_PATH} @MPIEXEC@ @MPIEXEC_NP@ @NP@
 else
-RUNPARALLEL =
+RUNPARALLEL = LD_LIBRARY_PATH=${RUNLD_LIBRARY_PATH} 
 endif
 
 .cpp.o:
@@ -47,6 +57,7 @@ else
 	@echo "Using installation MOAB_DIR = ${MOAB_BUILD_DIR}"
 endif
 	@echo "Using development version of MOAB = ${MOAB_DEV}"
+	@echo "Using library paths during runs = ${RUNLD_LIBRARY_PATH}" 
 
 clobber:
 	@rm -rf *.o *.mod *.vtk

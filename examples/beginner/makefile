@@ -24,7 +24,7 @@ run-mbex3: mbex3
 run-mbex4: mbex4
 
 $(addprefix run-,$(ALLEXAMPLES)):
-	./$<
+	${RUNSERIAL} ./$<
 
 run: all $(addprefix run-,$(ALLEXAMPLES))
 
