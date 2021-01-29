@@ -90,17 +90,12 @@ if HAVE_HDF5
 	gqt_pointinvol_test \
 	gqt_findvol_test
 
-if PARALLEL
 # imoab tests
-  TESTS += imoab_test
+TESTS += imoab_test
 if ENABLE_FORTRAN
   TESTS += imoab_testF
 endif
 endif
-endif
-
-#       merge_test \         # input files no longer exist?
-#       test_tag_server \    # fails
 
 check_PROGRAMS = $(TESTS) \
 		 kd_tree_tool \
