@@ -1114,7 +1114,7 @@ void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp, std::v
 }
 //#undef VERBOSE
 // new partition calculation
-ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int met )
+ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int met, std::vector<char> & zoltanBuffer )
 {
     // we are on a task on sender, and need to compute a new partition;
     // primary cells need to be distributed to nb receivers tasks
@@ -1228,13 +1228,14 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
         int numNewPartitions = (int)receiverTasks.size();
         Range primaryCells   = owned.subset_by_dimension( primaryDim );
         rval = mbZTool->partition_owned_cells( primaryCells, pco, extraGraphEdges, extraCellsProc, numNewPartitions,
-                                               distribution, met );MB_CHK_ERR( rval );
+                                               distribution, met, zoltanBuffer );MB_CHK_ERR( rval );
         for( std::map< int, Range >::iterator mit = distribution.begin(); mit != distribution.end(); mit++ )
         {
             int part_index = mit->first;
             assert( part_index < numNewPartitions );
             split_ranges[receiverTasks[part_index]] = mit->second;
         }
+
     }
     // delete now the partitioner
     delete mbZTool;

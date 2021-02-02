@@ -160,7 +160,8 @@ int main( int argc, char* argv[] )
             "\n land file: " << lndFilename << "\n     on tasks : " << startG3 << ":" << endG3 <<
 #endif
 
-            "\n  partitioning (0 trivial, 1 graph, 2 geometry, 3 gnomonic) " << repartitioner_scheme << "\n  ";
+            "\n  partitioning (0 trivial, 1 graph, 2 geometry, 3 gnomonic, \n  4 gnomonic RCB + storing cuts \n"
+            "  5 restoring cuts ) \n  " << repartitioner_scheme << "\n  ";
     }
     // load files on 3 different communicators, groups
 

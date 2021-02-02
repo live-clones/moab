@@ -221,7 +221,7 @@ class ParCommGraph
     // will form back and forth information, from ordered list of IDs, to valuesComp
     void settle_comm_by_ids( int comp, TupleList& TLBackToComp, std::vector< int >& valuesComp );
     // new partition calculation
-    ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met );
+    ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met, std::vector<char> & zoltanBuffer );
 
     // dump local information about graph
     ErrorCode dump_comm_information( std::string prefix, int is_send );

@@ -2154,7 +2154,8 @@ void mbGetPart( void* /* userDefinedData */, int /* numGlobalIds */, int /* numL
 ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm* pco,
                                                     std::multimap< int, int >& extraGraphEdges,
                                                     std::map< int, int > procs, int& numNewPartitions,
-                                                    std::map< int, Range >& distribution, int met )
+                                                    std::map< int, Range >& distribution, int met,
+                                                    std::vector<char> & ZoltanBuffer )
 {
     // start copy
     MeshTopoUtil mtu( mbImpl );
@@ -2230,7 +2231,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
             {
                 rval = mtu.get_average_position( cell, avg_position );MB_CHK_ERR( rval );
             }
-            if( 3 == met )
+            if( 3 <= met )
             {
                 IntxUtils::transform_coordinates( avg_position, 2 );  // 2 means gnomonic projection
             }
@@ -2276,103 +2277,136 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
     Zoltan_Initialize( argcArg, argvArg, &version );
 
     // Create Zoltan object.  This calls Zoltan_Create.
-    if( NULL == myZZ ) myZZ = new Zoltan( pco->comm() );
+    // old code
+    if (met <= 4) {
 
-    // set # requested partitions
-    char buff[10];
-    sprintf( buff, "%d", numNewPartitions );
-    int retval = myZZ->Set_Param( "NUM_GLOBAL_PARTITIONS", buff );
-    if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
-    // request parts assignment
-    retval = myZZ->Set_Param( "RETURN_LISTS", "PARTS" );
-    if( ZOLTAN_OK != retval ) return MB_FAILURE;
+        if( NULL == myZZ ) myZZ = new Zoltan( pco->comm() );
 
-    myZZ->Set_Num_Obj_Fn( mbGetNumberOfAssignedObjects, NULL );
-    myZZ->Set_Obj_List_Fn( mbGetObjectList, NULL );
-    // due to a bug in zoltan, if method is graph partitioning, do not pass coordinates!!
-    if( 2 == met || 3 == met )
-    {
-        myZZ->Set_Num_Geom_Fn( mbGetObjectSize, NULL );
-        myZZ->Set_Geom_Multi_Fn( mbGetObject, NULL );
-        SetRCB_Parameters();  // geometry
-    }
-    else if( 1 == met )
-    {
-        myZZ->Set_Num_Edges_Multi_Fn( mbGetNumberOfEdges, NULL );
-        myZZ->Set_Edge_List_Multi_Fn( mbGetEdgeList, NULL );
-        SetHypergraph_Parameters( "auto" );
-    }
+        // set # requested partitions
+        char buff[10];
+        sprintf( buff, "%d", numNewPartitions );
+        int retval = myZZ->Set_Param( "NUM_GLOBAL_PARTITIONS", buff );
+        if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
-    // Perform the load balancing partitioning
+        // request parts assignment
+        retval = myZZ->Set_Param( "RETURN_LISTS", "PARTS" );
+        if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
-    int changes;
-    int numGidEntries;
-    int numLidEntries;
-    int num_import;
-    ZOLTAN_ID_PTR import_global_ids, import_local_ids;
-    int* import_procs;
-    int* import_to_part;
-    int num_export;
-    ZOLTAN_ID_PTR export_global_ids, export_local_ids;
-    int *assign_procs, *assign_parts;
+        myZZ->Set_Num_Obj_Fn( mbGetNumberOfAssignedObjects, NULL );
+        myZZ->Set_Obj_List_Fn( mbGetObjectList, NULL );
+        // due to a bug in zoltan, if method is graph partitioning, do not pass coordinates!!
+        if( 2 == met || 3 == met )
+        {
+            myZZ->Set_Num_Geom_Fn( mbGetObjectSize, NULL );
+            myZZ->Set_Geom_Multi_Fn( mbGetObject, NULL );
+            SetRCB_Parameters();  // geometry
+        }
+        else if( 1 == met )
+        {
+            myZZ->Set_Num_Edges_Multi_Fn( mbGetNumberOfEdges, NULL );
+            myZZ->Set_Edge_List_Multi_Fn( mbGetEdgeList, NULL );
+            SetHypergraph_Parameters( "auto" );
+        }
 
-    if( pco->rank() == 0 )
-        std::cout << "Computing partition using method (1-graph, 2-geom):" << met << " for " << numNewPartitions
-                  << " parts..." << std::endl;
+        // Perform the load balancing partitioning
+
+        int changes;
+        int numGidEntries;
+        int numLidEntries;
+        int num_import;
+        ZOLTAN_ID_PTR import_global_ids, import_local_ids;
+        int* import_procs;
+        int* import_to_part;
+        int num_export;
+        ZOLTAN_ID_PTR export_global_ids, export_local_ids;
+        int *assign_procs, *assign_parts;
+
+        if( pco->rank() == 0 )
+            std::cout << "Computing partition using method (1-graph, 2-geom):" << met << " for " << numNewPartitions
+                      << " parts..." << std::endl;
 
 #ifndef NDEBUG
 #if 0
-  static int counter=0; // it may be possible to call function multiple times in a simulation
-  // give a way to not overwrite the files
-  // it should work only with a modified version of Zoltan
-  std::stringstream basename;
-  if (1==met)
-  {
-    basename << "phg_" << counter++;
-    Zoltan_Generate_Files(myZZ->Get_C_Handle(), (char*)(basename.str().c_str()), 1, 0, 1, 0);
-  }
-  else if (2==met)
-  {
-    basename << "rcb_" << counter++;
-    Zoltan_Generate_Files(myZZ->Get_C_Handle(), (char*)(basename.str().c_str()), 1, 1, 0, 0);
-  }
+      static int counter=0; // it may be possible to call function multiple times in a simulation
+      // give a way to not overwrite the files
+      // it should work only with a modified version of Zoltan
+      std::stringstream basename;
+      if (1==met)
+      {
+        basename << "phg_" << counter++;
+        Zoltan_Generate_Files(myZZ->Get_C_Handle(), (char*)(basename.str().c_str()), 1, 0, 1, 0);
+      }
+      else if (2==met)
+      {
+        basename << "rcb_" << counter++;
+        Zoltan_Generate_Files(myZZ->Get_C_Handle(), (char*)(basename.str().c_str()), 1, 1, 0, 0);
+      }
 #endif
 #endif
-    retval = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, num_import, import_global_ids, import_local_ids,
-                                 import_procs, import_to_part, num_export, export_global_ids, export_local_ids,
-                                 assign_procs, assign_parts );
-    if( ZOLTAN_OK != retval ) return MB_FAILURE;
+        retval = myZZ->LB_Partition( changes, numGidEntries, numLidEntries, num_import, import_global_ids, import_local_ids,
+                                     import_procs, import_to_part, num_export, export_global_ids, export_local_ids,
+                                     assign_procs, assign_parts );
+        if( ZOLTAN_OK != retval ) return MB_FAILURE;
 
 #ifdef VERBOSE
-    std::stringstream ff3;
-    ff3 << "zoltanOutput_" << pco->rank() << ".txt";
-    std::ofstream ofs3;
-    ofs3.open( ff3.str().c_str(), std::ofstream::out );
-    ofs3 << " export elements on rank " << rank << " \n";
-    ofs3 << "\t index \t gb_id \t local \t proc \t part \n";
-    for( int k = 0; k < num_export; k++ )
-    {
-        ofs3 << "\t" << k << "\t" << export_global_ids[k] << "\t" << export_local_ids[k] << "\t" << assign_procs[k]
-             << "\t" << assign_parts[k] << "\n";
-    }
-    ofs3.close();
+        std::stringstream ff3;
+        ff3 << "zoltanOutput_" << pco->rank() << ".txt";
+        std::ofstream ofs3;
+        ofs3.open( ff3.str().c_str(), std::ofstream::out );
+        ofs3 << " export elements on rank " << rank << " \n";
+        ofs3 << "\t index \t gb_id \t local \t proc \t part \n";
+        for( int k = 0; k < num_export; k++ )
+        {
+            ofs3 << "\t" << k << "\t" << export_global_ids[k] << "\t" << export_local_ids[k] << "\t" << assign_procs[k]
+                 << "\t" << assign_parts[k] << "\n";
+        }
+        ofs3.close();
 #endif
 
-    // basically each local cell is assigned to a part
+        // basically each local cell is assigned to a part
 
-    assert( num_export == (int)primary.size() );
-    for( i = 0; i < num_export; i++ )
+        // new code: if method == 4, we need to serialize, and send it to root of the coupler
+        // here, we serialize it; sending it will happen in the calling method, where we have access to
+        // the root of the coupler, which will store the buffer
+        if (4 == met)
+        {
+            size_t bufSize;
+            if (0 == rank) {
+                bufSize = myZZ->Serialize_Size();
+                /* Then allocate  the buffer */
+                ZoltanBuffer.resize(bufSize);
+                int ierr = myZZ->Serialize(bufSize, &ZoltanBuffer[0]);
+                if (ierr != 0 ) MB_CHK_ERR(MB_FAILURE);
+            }
+
+        }
+        assert( num_export == (int)primary.size() );
+        for( i = 0; i < num_export; i++ )
+        {
+            EntityHandle cell = primary[export_local_ids[i]];
+            distribution[assign_parts[i]].insert( cell );
+        }
+
+        Zoltan::LB_Free_Part( &import_global_ids, &import_local_ids, &import_procs, &import_to_part );
+        Zoltan::LB_Free_Part( &export_global_ids, &export_local_ids, &assign_procs, &assign_parts );
+
+        delete myZZ;
+        myZZ = NULL;
+    }
+    else if (5 == met)
     {
-        EntityHandle cell = primary[export_local_ids[i]];
-        distribution[assign_parts[i]].insert( cell );
+        if( NULL == myZZ ) myZZ = new Zoltan( pco->comm() );
+
+        int ierr = myZZ->Deserialize(ZoltanBuffer.size(), &ZoltanBuffer[0]);
+        if (ierr != 0 ) MB_CHK_ERR(MB_FAILURE);
+
+        // use here the partitioning !!
+        // TODO
+        delete myZZ;
+        myZZ = NULL;
     }
 
-    Zoltan::LB_Free_Part( &import_global_ids, &import_local_ids, &import_procs, &import_to_part );
-    Zoltan::LB_Free_Part( &export_global_ids, &export_local_ids, &assign_procs, &assign_parts );
-
-    delete myZZ;
-    myZZ = NULL;
 
     // clear arrays that were resized locally, to free up local memory
 
