@@ -95,6 +95,15 @@ struct appData
 #ifdef MOAB_HAVE_TEMPESTREMAP
     TempestMapAppData tempestData;
 #endif
+
+#ifdef MOAB_HAVE_ZOLTAN
+    // this data structure exists only on the root PE of the coupler
+    // it will store the buffer with the RCB cuts from which the Zoltan zz structure can be de-serialized,
+    // to be used in the partitioning
+    // zoltanBuffers[ *pid ] = zoltanBuffer; pid is the iMOAB app id of the original sender, from which the
+    //  cuts are inferred
+    std::map<int, std::vector<char> > zoltanBuffers;
+#endif
 };
 
 struct GlobalContext
@@ -2112,6 +2121,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
     // how to distribute local elements to receiving tasks?
     // trivial partition: compute first the total number of elements need to be sent
     Range owned = context.appDatas[*pid].owned_elems;
+    std::vector<char> zoltanBuffer;
     if( owned.size() == 0 )
     {
         // must be vertices that we want to send then
@@ -2150,8 +2160,26 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
     }
     else  // *method != 0, so it is either graph or geometric, parallel
     {
+        int rootCouplerRank = cgraph->receiver(0); // task in the joint communicator, for the receiver root
+        int rankSender = cgraph->sender(0); // first task in the joint comm
+
         // owned are the primary elements on this app
-        rval = cgraph->compute_partition( pco, owned, *method );MB_CHK_ERR( rval );
+        if (*method == 5 && 0==sender_rank)
+        {
+            // send from root of root coupler, the buffer, and receive it on the root of the sender
+            if (rootCouplerRank != rankSender)
+            {
+
+            }
+            // we will receive the buffer from there
+        }
+        rval = cgraph->compute_partition( pco, owned, *method, zoltanBuffer );CHKERRVAL( rval );
+        if (*method == 4 && 0 == sender_rank)
+        {
+            // store the buffer somewhere on the root of the coupler pes, to use it when needed
+            // what is the rank of the coupler in the joint communicator we are using for sending the mesh?
+
+        }
 
         // basically, send the graph to the receiver side, with unblocking send
         rval = cgraph->send_graph_partition( pco, global );MB_CHK_ERR( rval );

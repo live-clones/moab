@@ -119,7 +119,8 @@ class ZoltanPartitioner : public PartitionerBase< int >
     // cell on a different task
     ErrorCode partition_owned_cells( Range& owned, ParallelComm* pco, std::multimap< int, int >& extraGraphEdges,
                                      std::map< int, int > procs, int& numNewPartitions,
-                                     std::map< int, Range >& distribution, int met );
+                                     std::map< int, Range >& distribution, int met,
+                                     std::vector<char> & ZoltanBuffer);
 
 #ifdef MOAB_HAVE_CGM
     ErrorCode write_partition( const int nparts, DLIList< RefEntity* > entities, const int* assignment,

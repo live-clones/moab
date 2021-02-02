@@ -231,7 +231,7 @@ class ParCommGraph
                                      EntityHandle fset, Range& primary_ents, std::vector< int >& values_entities );
 
     // new partition calculation
-    ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met );
+    ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met, std::vector<char> & zoltanBuffer );
 
     // dump local information about graph
     ErrorCode dump_comm_information( std::string prefix, int is_send );
