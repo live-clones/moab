@@ -296,7 +296,15 @@ int main( int argc, char* argv[] )
         setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
                                         &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
-
+    if( couComm != MPI_COMM_NULL )
+    {
+        char outputFileAtmInf[] = "recvAtmInf.h5m";
+        PUSH_TIMER( "Write migrated ATM mesh on coupler PEs, inferred from OCN" )
+        ierr = iMOAB_WriteMesh( cplAtmPID, outputFileAtmInf, fileWriteOptions, strlen( outputFileAtmInf ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write atm mesh after receiving" )
+        POP_TIMER( couComm, rankInCouComm )
+    }
     MPI_Barrier( MPI_COMM_WORLD );
 
 #endif  // #ifdef ENABLE_ATMOCN_COUPLING
