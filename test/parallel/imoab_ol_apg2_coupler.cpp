@@ -273,21 +273,14 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-    // atm
-    ierr =
-        setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
-                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
-    CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
-
-    MPI_Barrier( MPI_COMM_WORLD );
-
+    // store the ocean RCB partition, to be used by atm
 #ifdef ENABLE_OCNATM_COUPLING
+    repartitioner_scheme = 4; // will use RCB + storing of the cuts
     // ocean
     ierr =
         setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
                                         &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
-
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileTgt3[] = "recvOcn3.h5m";
@@ -297,6 +290,15 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
         POP_TIMER( couComm, rankInCouComm )
     }
+    // atm
+    repartitioner_scheme = 5; // reuse the partition stored at previous step
+    ierr =
+        setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
+                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
+    CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
+
+    MPI_Barrier( MPI_COMM_WORLD );
+
 #endif  // #ifdef ENABLE_ATMOCN_COUPLING
 
     MPI_Barrier( MPI_COMM_WORLD );
@@ -309,6 +311,8 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
         CHECKIERR( ierr, "Cannot register LND App " )
     }
+    // we can reuse the ocn, or use the regular repartitioner_scheme = 2;
+    repartitioner_scheme = 2;
     ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
                                            &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
                                            repartitioner_scheme );

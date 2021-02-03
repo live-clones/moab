@@ -2296,7 +2296,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
         myZZ->Set_Num_Obj_Fn( mbGetNumberOfAssignedObjects, NULL );
         myZZ->Set_Obj_List_Fn( mbGetObjectList, NULL );
         // due to a bug in zoltan, if method is graph partitioning, do not pass coordinates!!
-        if( 2 == met || 3 == met )
+        if( 2 <= met )
         {
             myZZ->Set_Num_Geom_Fn( mbGetObjectSize, NULL );
             myZZ->Set_Geom_Multi_Fn( mbGetObject, NULL );
@@ -2397,11 +2397,41 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
     else if (5 == met)
     {
         if( NULL == myZZ ) myZZ = new Zoltan( pco->comm() );
+        // zoltan buffer is only on rank 0 right now
+        // broadcast it first:
+        int rank = pco->rank();
+        size_t bufSize;
+        if (rank == 0) bufSize = ZoltanBuffer.size();
+        MPI_Bcast((char *)&bufSize, sizeof(bufSize), MPI_CHAR, 0, pco->comm());
+        if (0 != rank) ZoltanBuffer.resize(bufSize);
 
+        MPI_Bcast(&ZoltanBuffer[0], bufSize, MPI_CHAR, 0, MPI_COMM_WORLD);
+        // deserialize on each task
         int ierr = myZZ->Deserialize(ZoltanBuffer.size(), &ZoltanBuffer[0]);
         if (ierr != 0 ) MB_CHK_ERR(MB_FAILURE);
 
         // use here the partitioning !!
+        /* code in inferred partitions:
+        // Compute the coordinate's part assignment
+        myZZ->LB_Point_PP_Assign( ecoords, proc, part );
+
+        // Store the part assignment in the return array
+        part_assignments[part].push_back( elverts[iel] );*/
+        for( Range::iterator rit = primary.begin(); rit != primary.end(); ++rit, i++ )
+        {
+            EntityHandle cell = *rit;
+            if( TYPE_FROM_HANDLE( cell ) == MBVERTEX )
+            {
+                rval = mbImpl->get_coords( &cell, 1, avg_position );MB_CHK_ERR( rval );
+            }
+            else
+            {
+                rval = mtu.get_average_position( cell, avg_position );MB_CHK_ERR( rval );
+            }
+            int proc=0, part=0;
+            myZZ->LB_Point_PP_Assign( avg_position, proc, part );
+            distribution[part].insert( cell );
+        }
         // TODO
         delete myZZ;
         myZZ = NULL;
