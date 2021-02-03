@@ -104,14 +104,6 @@ struct appData
     TempestMapAppData tempestData;
 #endif
 
-#ifdef MOAB_HAVE_ZOLTAN
-    // this data structure exists only on the root PE of the coupler
-    // it will store the buffer with the RCB cuts from which the Zoltan zz structure can be de-serialized,
-    // to be used in the partitioning
-    // zoltanBuffers[ *pid ] = zoltanBuffer; pid is the iMOAB app id of the original sender, from which the
-    //  cuts are inferred
-    std::map<int, std::vector<char> > zoltanBuffers;
-#endif
 };
 
 struct GlobalContext
@@ -131,7 +123,18 @@ struct GlobalContext
 
 #ifdef MOAB_HAVE_MPI
     std::vector< ParallelComm* > pcomms;  // created in order of applications, one moab::ParallelComm for each
+
+#ifdef MOAB_HAVE_ZOLTAN
+    // this data structure exists only on the root PE of the coupler
+    // it will store the buffer with the RCB cuts from which the Zoltan zz structure can be de-serialized,
+    // to be used in the partitioning
+    //
+    std::vector<char> uniqueZoltanBuffer;
 #endif
+
+#endif
+
+
 
     std::vector< appData > appDatas;  // the same order as pcomms
     int globalrank, worldprocs;
@@ -1901,23 +1904,71 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         int rankSender = cgraph->sender(0); // first task in the joint comm
 
         // owned are the primary elements on this app
-        if (*method == 5 && 0==sender_rank)
+        if (*method == 5)
         {
             // send from root of root coupler, the buffer, and receive it on the root of the sender
             if (rootCouplerRank != rankSender)
             {
+                if (cgraph->is_root_receiver()) // we are on the coupler root
+                {
+                    // alias
+                    std::vector<char> & buff1 = context.uniqueZoltanBuffer; // make a deep copy of the first buffer
+                    int tag = 1234;
+                    ierr =  MPI_Send(&buff1[0], (int)buff1.size(), MPI_CHAR, rankSender, tag, *global);
+                    if( ierr != 0 ) { return 1; }
+                }
+                if (cgraph->is_root_sender()) // we are on the component root
+                {
+                    int tag = 1234;
+                    MPI_Status status;
+                    ierr = MPI_Probe(rootCouplerRank, tag, *global, &status); // blocking call, to get size
+                    int incoming_msg_size;
+                    MPI_Get_count(&status, MPI_CHAR, &incoming_msg_size);
+                    zoltanBuffer.resize(incoming_msg_size);
+                    ierr = MPI_Recv(&zoltanBuffer[0], incoming_msg_size, MPI_CHAR, rootCouplerRank, tag, *global, &status);
+                    if( ierr != 0 ) { return 1; }
+                }
 
             }
-            // we will receive the buffer from there
+            else
+            {
+                zoltanBuffer = context.uniqueZoltanBuffer;
+            }
         }
+        MPI_Barrier( *global );
         rval = cgraph->compute_partition( pco, owned, *method, zoltanBuffer );CHKERRVAL( rval );
-        if (*method == 4 && 0 == sender_rank)
+        if (*method == 4)
         {
             // store the buffer somewhere on the root of the coupler pes, to use it when needed
             // what is the rank of the coupler in the joint communicator we are using for sending the mesh?
-
+            if (rootCouplerRank != rankSender)
+            {
+                if (cgraph->is_root_sender())
+                {
+                    //std::vector<char> buff1 = uniqueZoltanBuffer; // make a deep copy of the first buffer
+                    int tag = 12345;
+                    ierr =  MPI_Send(&zoltanBuffer[0], (int)zoltanBuffer.size(), MPI_CHAR, rootCouplerRank, tag, *global);
+                    if( ierr != 0 ) { return 1; }
+                }
+                if (cgraph->is_root_receiver())
+                {
+                    int tag = 12345;
+                    MPI_Status status;
+                    ierr = MPI_Probe(rankSender, tag, *global, &status); // blocking call, to get size
+                    int incoming_msg_size;
+                    MPI_Get_count(&status, MPI_CHAR, &incoming_msg_size);
+                    std::vector<char> & buff1 = context.uniqueZoltanBuffer; // alias
+                    buff1.resize(incoming_msg_size);
+                    ierr =  MPI_Recv(&buff1[0], incoming_msg_size, MPI_CHAR, rankSender, tag, *global, &status);
+                    if( ierr != 0 ) { return 1; }
+                }
+            }
+            else
+            {
+                context.uniqueZoltanBuffer = zoltanBuffer;// deep copy, we are on the right proc
+            }
         }
-
+        MPI_Barrier( *global );
         // basically, send the graph to the receiver side, with unblocking send
         rval = cgraph->send_graph_partition( pco, *global );CHKERRVAL( rval );
     }
