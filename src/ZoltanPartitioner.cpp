@@ -2417,19 +2417,13 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
 
         // Store the part assignment in the return array
         part_assignments[part].push_back( elverts[iel] );*/
+        i = 0;
         for( Range::iterator rit = primary.begin(); rit != primary.end(); ++rit, i++ )
         {
             EntityHandle cell = *rit;
-            if( TYPE_FROM_HANDLE( cell ) == MBVERTEX )
-            {
-                rval = mbImpl->get_coords( &cell, 1, avg_position );MB_CHK_ERR( rval );
-            }
-            else
-            {
-                rval = mtu.get_average_position( cell, avg_position );MB_CHK_ERR( rval );
-            }
             int proc=0, part=0;
-            myZZ->LB_Point_PP_Assign( avg_position, proc, part );
+            // coords are calculated in advance, contain the centers of the cells, maybe in gnomonic plane
+            myZZ->LB_Point_PP_Assign( &coords[3*i], proc, part );
             distribution[part].insert( cell );
         }
         // TODO
