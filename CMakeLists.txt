@@ -391,7 +391,7 @@ message(STATUS "Adding src subdirectory.")
 add_subdirectory( src )
 message(STATUS "Adding itaps subdirectory.")
 add_subdirectory( itaps )
-if (NOT WIN32) # Need further work to prepare for windows
+if (NOT WIN32 OR MSYS OR MINGW) # Need further work to prepare for windows
   add_subdirectory( tools )
 endif ()
 if (ENABLE_PYMOAB)
