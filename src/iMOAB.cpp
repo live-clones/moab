@@ -2161,6 +2161,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
 
         rval = cgraph->send_graph( global );MB_CHK_ERR( rval );
     }
+#ifdef MOAB_HAVE_ZOLTAN
     else  // *method != 0, so it is either graph or geometric, parallel
     {
         int rootCouplerRank = cgraph->receiver(0); // task in the joint communicator, for the receiver root
@@ -2235,6 +2236,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
         // basically, send the graph to the receiver side, with unblocking send
         rval = cgraph->send_graph_partition( pco, global );MB_CHK_ERR( rval );
     }
+#endif   //  #ifdef MOAB_HAVE_ZOLTAN
     // pco is needed to pack, not for communication
     rval = cgraph->send_mesh_parts( global, pco, owned );MB_CHK_ERR( rval );
 
