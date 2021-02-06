@@ -3,7 +3,7 @@
  *
  *       Filename:  TempestOnlineMapIO.cpp
  *
- *    Description:  All I/O implementations related to TempestOnlineMap 
+ *    Description:  All I/O implementations related to TempestOnlineMap
  *
  *        Version:  1.0
  *        Created:  02/06/2021 02:35:41
@@ -24,45 +24,49 @@
 #endif
 
 #ifdef MOAB_HAVE_MPI
-int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,
-        DataArray1D< double > &  vecFaceArea,
-        DataArray1D< double > &  dCenterLon,
-        DataArray1D< double > & dCenterLat,
-        DataArray2D< double > & dVertexLon,
-        DataArray2D< double > & dVertexLat,
-        unsigned & N, // will have the local, after
-        int nv,
-        int & maxdof)
+
+#define MPI_CHK_ERR( err )                                      \
+    if( err )                                                   \
+    {                                                           \
+        std::cout << "MPI Failure. ErrorCode (" << err << ") "; \
+        std::cout << "\nMPI Aborting... \n";                    \
+        return moab::MB_FAILURE;                                \
+    }
+
+int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
+    const std::vector< unsigned int >& gdofmap, DataArray1D< double >& vecFaceArea, DataArray1D< double >& dCenterLon,
+    DataArray1D< double >& dCenterLat, DataArray2D< double >& dVertexLon, DataArray2D< double >& dVertexLat,
+    unsigned& N,  // will have the local, after
+    int nv, int& maxdof )
 {
     // first decide maxdof, for partitioning
-    unsigned int localmax=0;
-    for (unsigned i = 0; i < N; i++)
-        if (gdofmap[i] > localmax)
-            localmax = gdofmap[i];
+    unsigned int localmax = 0;
+    for( unsigned i = 0; i < N; i++ )
+        if( gdofmap[i] > localmax ) localmax = gdofmap[i];
 
     // decide partitioning based on maxdof/size
     MPI_Allreduce( &localmax, &maxdof, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
     // maxdof is 0 based, so actual number is +1
     // maxdof
-    int size_per_task = (maxdof+1)/size; // based on this, processor to process dof x is x/size_per_task
+    int size_per_task = ( maxdof + 1 ) / size;  // based on this, processor to process dof x is x/size_per_task
     // so we decide to reorder by actual dof, such that task 0 has dofs from [0 to size_per_task), etc
     moab::TupleList tl;
-    unsigned numr = 2 * nv + 3; //  doubles: area, centerlon, center lat, nv (vertex lon, vertex lat)
+    unsigned numr = 2 * nv + 3;         //  doubles: area, centerlon, center lat, nv (vertex lon, vertex lat)
     tl.initialize( 2, 0, 0, numr, N );  // to proc, dof, then
     tl.enableWriteAccess();
     // populate
-    for (unsigned i=0; i < N; i++ )
+    for( unsigned i = 0; i < N; i++ )
     {
-        int gdof = gdofmap[i] ;
+        int gdof    = gdofmap[i];
         int to_proc = gdof / size_per_task;
-        if (to_proc >= size) to_proc = size-1; // the last ones got to last proc
-        int n = tl.get_n();
-        tl.vi_wr[2 * n]         = to_proc;
-        tl.vi_wr[2 * n + 1]     = gdof;
-        tl.vr_wr[n * numr] = vecFaceArea[i];
+        if( to_proc >= size ) to_proc = size - 1;  // the last ones got to last proc
+        int n                  = tl.get_n();
+        tl.vi_wr[2 * n]        = to_proc;
+        tl.vi_wr[2 * n + 1]    = gdof;
+        tl.vr_wr[n * numr]     = vecFaceArea[i];
         tl.vr_wr[n * numr + 1] = dCenterLon[i];
         tl.vr_wr[n * numr + 2] = dCenterLat[i];
-        for (int j=0; j<nv; j++)
+        for( int j = 0; j < nv; j++ )
         {
             tl.vr_wr[n * numr + 3 + j]      = dVertexLon[i][j];
             tl.vr_wr[n * numr + 3 + nv + j] = dVertexLat[i][j];
@@ -80,42 +84,41 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector<unsigned
     tl.sort( 1, &sort_buffer );
     // count how many are unique, and collapse
     int nb_unique = 1;
-    for (unsigned i=0; i<tl.get_n()-1; i++)
+    for( unsigned i = 0; i < tl.get_n() - 1; i++ )
     {
-        if (tl.vi_wr[2*i+1] != tl.vi_wr[2*i+3])
-            nb_unique++;
+        if( tl.vi_wr[2 * i + 1] != tl.vi_wr[2 * i + 3] ) nb_unique++;
     }
-    vecFaceArea.Allocate(nb_unique);
-    dCenterLon.Allocate(nb_unique);
-    dCenterLat.Allocate(nb_unique);
-    dVertexLon.Allocate(nb_unique, nv);
-    dVertexLat.Allocate(nb_unique, nv);
-    int current_size=1;
-    vecFaceArea[0] = tl.vr_wr[0];
-    dCenterLon[0] = tl.vr_wr[1];
-    dCenterLat[0] = tl.vr_wr[2];
-    for (int j=0; j<nv; j++)
+    vecFaceArea.Allocate( nb_unique );
+    dCenterLon.Allocate( nb_unique );
+    dCenterLat.Allocate( nb_unique );
+    dVertexLon.Allocate( nb_unique, nv );
+    dVertexLat.Allocate( nb_unique, nv );
+    int current_size = 1;
+    vecFaceArea[0]   = tl.vr_wr[0];
+    dCenterLon[0]    = tl.vr_wr[1];
+    dCenterLat[0]    = tl.vr_wr[2];
+    for( int j = 0; j < nv; j++ )
     {
-        dVertexLon[0][j] = tl.vr_wr[ 3 + j ];
-        dVertexLat[0][j] = tl.vr_wr[ 3 + nv + j ];
+        dVertexLon[0][j] = tl.vr_wr[3 + j];
+        dVertexLat[0][j] = tl.vr_wr[3 + nv + j];
     }
-    for (unsigned i=0; i<tl.get_n()-1; i++)
+    for( unsigned i = 0; i < tl.get_n() - 1; i++ )
     {
-        if (tl.vi_wr[2*i+1] != tl.vi_wr[2*i+3])
+        if( tl.vi_wr[2 * i + 1] != tl.vi_wr[2 * i + 3] )
         {
-            vecFaceArea[current_size] = tl.vr_wr[ i * numr ];
-            dCenterLon[current_size] = tl.vr_wr[ i * numr + 1];
-            dCenterLat[current_size] = tl.vr_wr[ i * numr + 2];
-            for (int j=0; j<nv; j++)
+            vecFaceArea[current_size] = tl.vr_wr[i * numr];
+            dCenterLon[current_size]  = tl.vr_wr[i * numr + 1];
+            dCenterLat[current_size]  = tl.vr_wr[i * numr + 2];
+            for( int j = 0; j < nv; j++ )
             {
-                dVertexLon[current_size][j] = tl.vr_wr[ i * numr + 3 + j ];
-                dVertexLat[current_size][j] = tl.vr_wr[ i * numr + 3 + nv + j ];
+                dVertexLon[current_size][j] = tl.vr_wr[i * numr + 3 + j];
+                dVertexLat[current_size][j] = tl.vr_wr[i * numr + 3 + nv + j];
             }
             current_size++;
         }
     }
 
-    N = current_size; // or nb_unique, should be the same
+    N = current_size;  // or nb_unique, should be the same
     return 0;
 }
 #endif
@@ -130,7 +133,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteParallelMap( const std::string& str
     std::string extension = strFilename.substr( lastindex + 1, strFilename.size() );
 
     // Write the map file to disk in parallel
-    if ( extension == "nc" )
+    if( extension == "nc" )
     {
         /* Invoke the actual call to write the parallel map to disk in SCRIP format */
         rval = this->WriteSCRIPMapFile( strFilename.c_str() );MB_CHK_ERR( rval );
@@ -195,7 +198,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
@@ -239,7 +244,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
@@ -264,29 +271,24 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     unsigned nA = ( vecSourceFaceArea.GetRows() );
     unsigned nB = ( vecTargetFaceArea.GetRows() );
 
-
     // Number of nodes per Face
     int nSourceNodesPerFace = dSourceVertexLon.GetColumns();
     int nTargetNodesPerFace = dTargetVertexLon.GetColumns();
     // first move data if in parallel
 #if defined( MOAB_HAVE_MPI )
-    //if (size > 1)
+    // if (size > 1)
     {
-        int maxdof; // output; arrays will be re-distributed in chunks [maxdof/size]
-        int ierr = rearrange_arrays_by_dofs( srccol_gdofmap,
-                vecSourceFaceArea,
-                dSourceCenterLon, dSourceCenterLat,
-                dSourceVertexLon, dSourceVertexLat,
-                nA, nSourceNodesPerFace, maxdof); // now nA will be close to maxdof/size
-        if (ierr!=0) { _EXCEPTION1( "Unable to arrange source data %d ", nA ); }
+        int maxdof;  // output; arrays will be re-distributed in chunks [maxdof/size]
+        int ierr = rearrange_arrays_by_dofs( srccol_gdofmap, vecSourceFaceArea, dSourceCenterLon, dSourceCenterLat,
+                                             dSourceVertexLon, dSourceVertexLat, nA, nSourceNodesPerFace,
+                                             maxdof );  // now nA will be close to maxdof/size
+        if( ierr != 0 ) { _EXCEPTION1( "Unable to arrange source data %d ", nA ); }
         // rearrange target data: (nB)
         //
-        ierr = rearrange_arrays_by_dofs( row_gdofmap,
-                vecTargetFaceArea,
-                dTargetCenterLon, dTargetCenterLat,
-                dTargetVertexLon, dTargetVertexLat,
-                nB, nTargetNodesPerFace, maxdof); // now nA will be close to maxdof/size
-        if (ierr!=0) { _EXCEPTION1( "Unable to arrange target data %d ", nB ); }
+        ierr = rearrange_arrays_by_dofs( row_gdofmap, vecTargetFaceArea, dTargetCenterLon, dTargetCenterLat,
+                                         dTargetVertexLon, dTargetVertexLat, nB, nTargetNodesPerFace,
+                                         maxdof );  // now nA will be close to maxdof/size
+        if( ierr != 0 ) { _EXCEPTION1( "Unable to arrange target data %d ", nB ); }
     }
 #endif
 
@@ -573,7 +575,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
@@ -615,7 +619,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
@@ -918,3 +924,228 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static void print_progress( const int barWidth, const float progress, const char* message )
+{
+    std::cout << message << " [";
+    int pos = barWidth * progress;
+    for( int i = 0; i < barWidth; ++i )
+    {
+        if( i < pos )
+            std::cout << "=";
+        else if( i == pos )
+            std::cout << ">";
+        else
+            std::cout << " ";
+    }
+    std::cout << "] " << int( progress * 100.0 ) << " %\r";
+    std::cout.flush();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
+                                                         bool /* row_major_ownership */ )
+{
+    NcError error( NcError::silent_nonfatal );
+
+    NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
+    int nS = 0, nB = 0;
+#ifdef MOAB_HAVE_NETCDFPAR
+    bool is_independent = true;
+    ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
+    // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strFilename.c_str(), NcmpiFile::replace, NcmpiFile::classic5 );
+#else
+    NcFile ncMap( strSource, NcFile::ReadOnly );
+#endif
+
+    // Read SparseMatrix entries
+
+    NcDim* dimNS = ncMap.get_dim( "n_s" );
+    if( dimNS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", strSource ); }
+
+    NcDim* dimNB = ncMap.get_dim( "n_b" );
+    if( dimNB == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"nB\"", strSource ); }
+
+    // store total number of nonzeros
+    nS = dimNS->size();
+    nB = dimNB->size();
+
+    varRow = ncMap.get_var( "row" );
+    if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
+
+    varCol = ncMap.get_var( "col" );
+    if( varCol == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
+
+    varS = ncMap.get_var( "S" );
+    if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
+
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varRow, is_independent );
+    ncMap.enable_var_par_access( varCol, is_independent );
+    ncMap.enable_var_par_access( varS, is_independent );
+#endif
+
+    std::vector< int > rowOwnership;
+    // if owned_dof_ids = NULL, use the default trivial partitioning scheme
+    if( owned_dof_ids.size() == 0 )
+    {
+        // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
+        rowOwnership.resize( size );
+        int nGRowPerPart   = nB / size;
+        int nGRowRemainder = nB % size;  // Keep the remainder in root
+        rowOwnership[0]    = nGRowPerPart + nGRowRemainder;
+        for( int ip = 1, roffset = rowOwnership[0]; ip < size; ++ip )
+        {
+            roffset += nGRowPerPart;
+            rowOwnership[ip] = roffset;
+        }
+    }
+
+    // Let us declare the map object for every process
+    SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
+
+    std::map< int, int > rowMap, colMap;
+    int rindexMax = 0, cindexMax = 0;
+
+    int localSize   = nS / size;
+    long offsetRead = rank * localSize;
+    // leftovers on last rank
+    if( rank == size - 1 ) { localSize += nS % size; }
+
+    std::vector< int > vecRow, vecCol;
+    std::vector< double > vecS;
+    vecRow.resize( localSize );
+    vecCol.resize( localSize );
+    vecS.resize( localSize );
+
+    varRow->set_cur( (long)( offsetRead ) );
+    varRow->get( &( vecRow[0] ), localSize );
+
+    varCol->set_cur( (long)( offsetRead ) );
+    varCol->get( &( vecCol[0] ), localSize );
+
+    varS->set_cur( (long)( offsetRead ) );
+    varS->get( &( vecS[0] ), localSize );
+
+    ncMap.close();
+
+    // bother with tuple list only if size > 1
+    // otherwise, just fill the sparse matrix
+    if( size > 1 )
+    {
+        // send to
+        moab::TupleList tl;
+        unsigned numr = 1;                          //
+        tl.initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
+        tl.enableWriteAccess();
+        // populate
+        for( int i = 0; i < localSize; i++ )
+        {
+            int rowval  = vecRow[i] - 1;  // dofs are 1 based in the file
+            int colval  = vecCol[i] - 1;
+            int to_proc = -1;
+            //
+
+            if( rowOwnership[0] > rowval )
+                to_proc = 0;
+            else
+            {
+                for( int ip = 1; ip < size; ++ip )
+                {
+                    if( rowOwnership[ip - 1] <= rowval && rowOwnership[ip] > rowval )
+                    {
+                        to_proc = ip;
+                        break;
+                    }
+                }
+            }
+
+            int n               = tl.get_n();
+            tl.vi_wr[3 * n]     = to_proc;
+            tl.vi_wr[3 * n + 1] = rowval;
+            tl.vi_wr[3 * n + 2] = colval;
+            tl.vr_wr[n]         = vecS[i];
+
+            tl.inc_n();
+        }
+
+#ifdef MOAB_HAVE_MPI
+        // now do the heavy communication
+        ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+#endif
+        // populate the sparsematrix, using rowMap and colMap; what is the need for them?
+        int n = tl.get_n();
+        for( int i = 0; i < n; i++ )
+        {
+
+            int rindex, cindex;
+            const int& vecRowValue = tl.vi_wr[3 * i + 1];
+            const int& vecColValue = tl.vi_wr[3 * i + 2];
+
+            std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+            if( riter == rowMap.end() )
+            {
+                rowMap[vecRowValue] = rindexMax;
+                rindex              = rindexMax;
+                rindexMax++;
+            }
+            else
+                rindex = riter->second;
+
+            std::map< int, int >::iterator citer = colMap.find( vecColValue );
+            if( citer == colMap.end() )
+            {
+                colMap[vecColValue] = cindexMax;
+                cindex              = cindexMax;
+                cindexMax++;
+            }
+            else
+                cindex = citer->second;
+
+            sparseMatrix( rindex, cindex ) = tl.vr_wr[i];
+        }
+    }
+    else
+    {
+        for( int i = 0; i < nS; i++ )
+        {
+
+            int rindex, cindex;
+            const int& vecRowValue = vecRow[i];
+            const int& vecColValue = vecCol[i];
+
+            std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+            if( riter == rowMap.end() )
+            {
+                rowMap[vecRowValue] = rindexMax;
+                rindex              = rindexMax;
+                rindexMax++;
+            }
+            else
+                rindex = riter->second;
+
+            std::map< int, int >::iterator citer = colMap.find( vecColValue );
+            if( citer == colMap.end() )
+            {
+                colMap[vecColValue] = cindexMax;
+                cindex              = cindexMax;
+                cindexMax++;
+            }
+            else
+                cindex = citer->second;
+
+            sparseMatrix( rindex, cindex ) = vecS[i];
+        }
+    }
+
+    m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
+    m_nTotDofs_Dest   = sparseMatrix.GetRows();
+
+#ifdef MOAB_HAVE_EIGEN3
+    this->copy_tempest_sparsemat_to_eigen3();
+#endif
+
+    return moab::MB_SUCCESS;
+}
+
+///////////////////////////////////////////////////////////////////////////////

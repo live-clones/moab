@@ -283,6 +283,7 @@ if (MOAB_HAVE_TEMPESTREMAP)
                         Remapping/TempestRemapper.cpp 
                         Remapping/TempestOnlineMap.cpp 
                         Remapping/TempestLinearRemap.cpp
+                        Remapping/TempestOnlineMapIO.cpp 
                         )
   set( MOAB_INSTALL_HEADERS ${MOAB_INSTALL_HEADERS} 
         moab/Remapping/Remapper.hpp
