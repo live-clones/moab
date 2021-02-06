@@ -313,7 +313,8 @@ if HAVE_TEMPESTREMAP
   MOAB_REMAPPING_SRCS += \
      Remapping/TempestRemapper.cpp  \
      Remapping/TempestLinearRemap.cpp \
-     Remapping/TempestOnlineMap.cpp
+     Remapping/TempestOnlineMap.cpp \
+     Remapping/TempestOnlineMapIO.cpp
 
   MOAB_REMAPPING_HDRS += \
      moab/Remapping/TempestRemapper.hpp \

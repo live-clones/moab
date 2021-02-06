@@ -95,21 +95,9 @@ class TempestOnlineMap : public OfflineMap
                                      bool row_major_ownership = true );
 
     ///	<summary>
-    ///		Parallel I/O with HDF5 to write out the remapping weights from multiple processors.
-    ///	</summary>
-    moab::ErrorCode WriteParallelMap( std::string strOutputFile );
-
-    ///	<summary>
     ///		Write the TempestOnlineMap to a parallel NetCDF file.
     ///	</summary>
-    // virtual void Write(
-    // 	const std::string & strTarget
-    // );
-
-    ///	<summary>
-    ///		Parallel I/O with NetCDF to write out the SCRIP file from multiple processors.
-    ///	</summary>
-    moab::ErrorCode WriteParallelWeightsToFile( std::string filename );
+    moab::ErrorCode WriteParallelMap( const std::string& strTarget );
 
     ///	<summary>
     ///		Determine if the map is first-order accurate.
@@ -205,6 +193,17 @@ class TempestOnlineMap : public OfflineMap
 #ifdef MOAB_HAVE_EIGEN3
     void copy_tempest_sparsemat_to_eigen3();
 #endif
+
+    ///	<summary>
+    ///		Parallel I/O with HDF5 to write out the remapping weights from multiple processors.
+    ///	</summary>
+    moab::ErrorCode WriteSCRIPMapFile( const std::string& strOutputFile );
+
+    ///	<summary>
+    ///		Parallel I/O with NetCDF to write out the SCRIP file from multiple processors.
+    ///	</summary>
+    moab::ErrorCode WriteHDF5MapFile( const std::string& filename );
+
 
   public:
     ///	<summary>

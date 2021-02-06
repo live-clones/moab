@@ -612,24 +612,13 @@ int main( int argc, char* argv[] )
 
             if( runCtx->outFilename.size() )
             {
-                size_t lastindex      = runCtx->outFilename.find_last_of( "." );
-								std::string extension = runCtx->outFilename.substr( lastindex + 1, runCtx->outFilename.size() );
-                
-								// Write the map file to disk in parallel
-								if (extension == "nc")
-								{
-										/* Invoke the actual call to write the parallel map to disk in SCRIP format */
-										rval = weightMap->WriteParallelWeightsToFile( runCtx->outFilename.c_str() );MB_CHK_ERR( rval );
-								}
-								else
-								{
-										/* Write to the parallel H5M format */
-										rval = weightMap->WriteParallelMap( runCtx->outFilename.c_str() );MB_CHK_ERR( rval );
-								}
+								// Write the map file to disk in parallel using either HDF5 or SCRIP interface
+								rval = weightMap->WriteParallelMap( runCtx->outFilename.c_str() );MB_CHK_ERR( rval );
 
                 // Write out the metadata information for the map file
                 if( proc_id == 0 )
                 {
+                    size_t lastindex      = runCtx->outFilename.find_last_of( "." );
                     sstr.str( "" );
                     sstr << runCtx->outFilename.substr( 0, lastindex ) << ".meta";
 

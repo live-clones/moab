@@ -2867,19 +2867,9 @@ ErrCode iMOAB_WriteMappingWeightsToFile(
     assert( weightMap != NULL );
 
     std::string filename  = std::string( remap_weights_filename );
-    size_t lastindex      = filename.find_last_of( "." );
-    std::string extension = filename.substr( lastindex + 1, filename.size() );
 
-    if (extension == "nc")
-    {
-        // Invoke the actual call to write the parallel map to disk
-        rval = weightMap->WriteParallelWeightsToFile( filename );CHKERRVAL( rval );
-    }
-    else
-    {
-        /* Write to the parallel H5M format */
-        rval = weightMap->WriteParallelMap( filename );CHKERRVAL( rval );
-    }
+    // Write the map file to disk in parallel using either HDF5 or SCRIP interface
+    rval = weightMap->WriteParallelMap( filename );CHKERRVAL( rval );
 
     return 0;
 }
