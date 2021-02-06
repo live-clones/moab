@@ -197,25 +197,12 @@ int main( int argc, char** argv )
 
     opts.parseCommandLine( argc, argv );
 
-#ifdef MOAB_HAVE_MPI
-    if( MPI_Init( &argc, &argv ) ) return 1;
-    int numProcesses = 1;
-    MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
-
-    // we need one ghost layer so that each process can compute the dual independently
-    const char* readopts = ( numProcesses == 1 ? ""
-                                               : std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;"
-                                                              "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=2.0.1" )
-                                                     .c_str() );
-#else
-    const char* readopts = "";
-#endif
-
     moab::EntityHandle triangle_set, dual_set;
     rval = mb->create_meshset( moab::MESHSET_SET, triangle_set );MB_CHK_SET_ERR( rval, "Can't create new set" );
     rval = mb->create_meshset( moab::MESHSET_SET, dual_set );MB_CHK_SET_ERR( rval, "Can't create new set" );
 
     // This file is in the mesh files directory
+    const char* readopts = "";
     rval = mb->load_file( inputFile.c_str(), &triangle_set, readopts );MB_CHK_SET_ERR( rval, "Failed to read" );
 
     // get all cells of dimension 2;
@@ -227,16 +214,8 @@ int main( int argc, char** argv )
     // call the routine to compute the dual grid
     rval = compute_dual_mesh( mb, dual_set, cells );MB_CHK_SET_ERR( rval, "Failed to compute dual mesh" );
 
-    std::string writeopts="";
-#if defined(MOAB_HAVE_MPI) && defined(MOAB_HAVE_HDF5)
-    if( outputFile.substr( outputFile.find_last_of( "." ) + 1 ) == "h5m" )
-    {
-        writeopts = "PARALLEL=WRITE_PART";
-    }
-#endif
-
     // write the mesh to disk
-    rval = mb->write_file( outputFile.c_str(), 0, writeopts.c_str() );MB_CHK_SET_ERR( rval, "Failed to write new file" );
+    rval = mb->write_file( outputFile.c_str() );MB_CHK_SET_ERR( rval, "Failed to write new file" );
 
     cells.clear();
     rval = mb->get_entities_by_dimension( dual_set, 2, cells );MB_CHK_SET_ERR( rval, "Failed to get cells" );
@@ -244,9 +223,6 @@ int main( int argc, char** argv )
 
     delete mb;
 
-#ifdef MOAB_HAVE_MPI
-    if( MPI_Finalize() ) return 1;
-#endif
     return 0;
 }
 
