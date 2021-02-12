@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 #include <Eigen/Sparse>
 #endif
 
@@ -202,7 +202,7 @@ class TempestOnlineMap : public OfflineMap
     ///		to the parallel CSR Eigen Matrix for scalable application of matvec
     ///     needed for projections.
     ///	</summary>
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
     void copy_tempest_sparsemat_to_eigen3();
 #endif
 
@@ -222,7 +222,7 @@ class TempestOnlineMap : public OfflineMap
                                           DiscretizationType destType, bool isDestContinuous,
                                           DataArray3D< int >* tgtdataGLLNodes );
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 
     typedef Eigen::Matrix< double, 1, Eigen::Dynamic > WeightDRowVector;
     typedef Eigen::Matrix< double, Eigen::Dynamic, 1 > WeightDColVector;
@@ -347,7 +347,7 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     moab::TempestRemapper* m_remapper;
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 
     WeightMatrix m_weightMatrix;
     WeightRowVector m_rowVector;
@@ -408,7 +408,7 @@ inline int moab::TempestOnlineMap::GetColGlobalDoF( int localColID ) const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
 
 inline int moab::TempestOnlineMap::GetSourceGlobalNDofs()
 {

@@ -38,7 +38,7 @@
 
 #ifndef MOAB_HAVE_LAPACK
 
-#ifndef MOAB_HAVE_EIGEN
+#ifndef MOAB_HAVE_EIGEN3
 #error Need either Eigen3 or BLAS/LAPACK libraries
 #endif
 

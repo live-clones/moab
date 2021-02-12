@@ -648,7 +648,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
     }
 
     // Let us also allocate the local representation of the sparse matrix
-#if defined( MOAB_HAVE_EIGEN ) && defined( VERBOSE )
+#if defined( MOAB_HAVE_EIGEN3 ) && defined( VERBOSE )
     if( vprint )
     {
         std::cout << "[" << rank << "]"
@@ -1195,7 +1195,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             _EXCEPTIONT( "Not implemented" );
         }
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
         copy_tempest_sparsemat_to_eigen3();
 #endif
 
@@ -1858,7 +1858,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
     m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
     m_nTotDofs_Dest   = sparseMatrix.GetRows();
 
-#ifdef MOAB_HAVE_EIGEN
+#ifdef MOAB_HAVE_EIGEN3
     this->copy_tempest_sparsemat_to_eigen3();
 #endif
 

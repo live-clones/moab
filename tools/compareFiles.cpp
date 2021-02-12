@@ -9,10 +9,10 @@
  *
  *
  * example of usage:
- * ./compareFiles -i file1.h5m -j file2.h5m -n <tag_name>  -o out.file
+ * ./mbcmpfiles -i file1.h5m -j file2.h5m -n <tag_name>  -o out.file
  *
  *
- * Basically, will output a new h5m file (out.file), which has an extra tags, corresponding to the
+ * Basically, will output a new h5m file (out.file), which has an extra tag, corresponding to the
  * difference between the 2 values
  *
  */

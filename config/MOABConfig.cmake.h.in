@@ -86,7 +86,7 @@
 #cmakedefine MOAB_HAVE_FBIGEOM @MOAB_HAVE_FBIGEOM@
 
 /* Flag indicating whether the library will be compiled with Eigen support */
-#cmakedefine MOAB_HAVE_EIGEN @MOAB_HAVE_EIGEN@
+#cmakedefine MOAB_HAVE_EIGEN3 @MOAB_HAVE_EIGEN3@
 
 /* define if compiler has finite */
 #cmakedefine MOAB_HAVE_FINITE @MOAB_HAVE_FINITE@
