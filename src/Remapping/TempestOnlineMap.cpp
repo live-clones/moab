@@ -23,10 +23,18 @@
 
 #include "moab/Remapping/TempestOnlineMap.hpp"
 #include "DebugOutput.hpp"
+#include "moab/TupleList.hpp"
 
 #include <fstream>
 #include <cmath>
 #include <cstdlib>
+
+
+#ifdef MOAB_HAVE_NETCDFPAR
+#include "netcdfcpp_par.hpp"
+#else
+#include "netcdfcpp.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1517,88 +1525,48 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 {
     NcError error( NcError::silent_nonfatal );
 
-    const bool verbose = false;
-    // Define our total buffer size to use
-    NcFile* ncMap = NULL;
+
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
-
-#ifdef MOAB_HAVE_MPI
-    int mpierr = 0;
-#endif
-    const int nBufferSize = 256 * 1024;  // 256 KB
-    const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
-    const int nMaxEntries = nBufferSize / nNNZBytes;
-    int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
-
-#ifdef MOAB_HAVE_MPI
-    MPI_Comm commW = m_pcomm->comm();
+    int nS = 0, nB = 0;
+#ifdef MOAB_HAVE_NETCDFPAR
+    bool is_independent = true;
+    ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
+    // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strFilename.c_str(), NcmpiFile::replace, NcmpiFile::classic5 );
+#else
+    NcFile ncMap( strSource, NcFile::ReadOnly );
 #endif
 
-    if( is_root )
-    {
-        ncMap = new NcFile( strSource, NcFile::ReadOnly );
-        if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", strSource ); }
+    // Read SparseMatrix entries
 
-        // Source and Target mesh resolutions
-        NcDim* dimNA = ncMap->get_dim( "n_a" );
-        if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
-        else nA = dimNA->size();
+    NcDim* dimNS = ncMap.get_dim( "n_s" );
+    if( dimNS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", strSource ); }
 
-        NcDim* dimNB = ncMap->get_dim( "n_b" );
-        if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
-        else nB = dimNB->size();
+    NcDim* dimNB = ncMap.get_dim( "n_b" );
+    if( dimNB == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"nB\"", strSource ); }
 
-        NcDim* dimNVA = ncMap->get_dim( "nv_a" );
-        if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
-        else nVA = dimNVA->size();
+    // store total number of nonzeros
+    nS = dimNS->size();
+    nB = dimNB->size();
 
-        NcDim* dimNVB = ncMap->get_dim( "nv_b" );
-        if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
-        else nVB = dimNVB->size();
+    varRow = ncMap.get_var( "row" );
+    if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
 
-        // Read SparseMatrix entries
-        NcDim* dimNS = ncMap->get_dim( "n_s" );
-        if( dimNS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", strSource ); }
+    varCol = ncMap.get_var( "col" );
+    if( varCol == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
 
-        // store total number of nonzeros
-        nS = dimNS->size();
+    varS = ncMap.get_var( "S" );
+    if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
 
-        varRow = ncMap->get_var( "row" );
-        if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
-
-        varCol = ncMap->get_var( "col" );
-        if( varCol == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
-
-        varS = ncMap->get_var( "S" );
-        if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
-    }
-
-    // const int nTotalBytes = nS * nNNZBytes;
-    int nEntriesRemaining = nS;
-    int nBufferedReads    = static_cast< int >( ceil( nS * ( 1.0 / nMaxEntries ) ) );
-    int runData[6]        = { nA, nB, nVA, nVB, nS, nBufferedReads };
-
-#ifdef MOAB_HAVE_MPI
-    mpierr = MPI_Bcast( runData, 6, MPI_INT, root_proc, commW );MPI_CHK_ERR( mpierr );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varRow, is_independent );
+    ncMap.enable_var_par_access( varCol, is_independent );
+    ncMap.enable_var_par_access( varS, is_independent );
 #endif
 
-    if( !is_root )
-    {
-        nA             = runData[0];
-        nB             = runData[1];
-        nVA            = runData[2];
-        nVB            = runData[3];
-        nS             = runData[4];
-        nBufferedReads = runData[5];
-
-        if( verbose )
-            printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n",
-                    nA, nB, nVA, nVB, nS, nNNZBytes, nBufferedReads );
-    }
 
     std::vector<int> rowOwnership;
     // if owned_dof_ids = NULL, use the default trivial partitioning scheme
-    if( is_root && owned_dof_ids.size() == 0 )
+    if( owned_dof_ids.size() == 0 )
     {
         // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
         rowOwnership.resize( size );
@@ -1617,243 +1585,141 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
 
     std::map< int, int > rowMap, colMap;
     int rindexMax = 0, cindexMax = 0;
-    long offset = 0;
 
-    const char* message = "MapReadBcast: ";
-    int barWidth        = 50;
-    float progress      = 0.0;
-    /* Split the rows and send to processes in chunks
-       Let us start the buffered read */
-    for( int iRead = 0; iRead < nBufferedReads; ++iRead )
+
+    int localSize = nS/size;
+    long offsetRead = rank*localSize;
+    // leftovers on last rank
+    if (rank == size-1)
     {
-        // pointers to the data
-        DataArray1D< int > vecRow;
-        DataArray1D< int > vecCol;
-        DataArray1D< double > vecS;
-        std::vector< std::vector< int > > dataPerProcess( size );
-        std::vector< int > nDataPerProcess( size, 0 );
-        for( int ip = 0; ip < size; ++ip )
-            dataPerProcess[ip].reserve( std::max( 100, nMaxEntries / size ) );
+        localSize += nS%size;
+    }
 
-        if( is_root )
+    std::vector<int> vecRow, vecCol;
+    std::vector<double> vecS;
+    vecRow.resize(localSize);
+    vecCol.resize(localSize);
+    vecS.resize(localSize);
+
+    varRow->set_cur( (long)( offsetRead ) );
+    varRow->get( &( vecRow[0] ), localSize );
+
+    varCol->set_cur( (long)( offsetRead ) );
+    varCol->get( &( vecCol[0] ), localSize );
+
+    varS->set_cur( (long)( offsetRead ) );
+    varS->get( &( vecS[0] ), localSize );
+
+    ncMap.close();
+
+    // bother with tuple list only if size > 1
+    // otherwise, just fill the sparse matrix
+    if (size > 1)
+    {
+        // send to
+        moab::TupleList tl;
+        unsigned numr = 1; //
+        tl.initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
+        tl.enableWriteAccess();
+        // populate
+        for (unsigned i=0; i < localSize; i++ )
         {
-            int nLocSize = std::min( nEntriesRemaining, static_cast< int >( ceil( nBufferSize * 1.0 / nNNZBytes ) ) );
+            int rowval = vecRow[i] - 1; // dofs are 1 based in the file
+            int colval = vecCol[i] - 1;
+            int to_proc = -1;
+            //
 
-            // printf( "Reading file: elements %ld to %ld\n", offset, offset + nLocSize );
-            print_progress( barWidth, progress, message );
-
-            // Allocate and resize based on local buffer size
-            vecRow.Allocate( nLocSize );
-            vecCol.Allocate( nLocSize );
-            vecS.Allocate( nLocSize );
-
-            varRow->set_cur( (long)( offset ) );
-            varRow->get( &( vecRow[0] ), nLocSize );
-
-            varCol->set_cur( (long)( offset ) );
-            varCol->get( &( vecCol[0] ), nLocSize );
-
-            varS->set_cur( (long)( offset ) );
-            varS->get( &( vecS[0] ), nLocSize );
-
-            // Decrement vecRow and vecCol
-            for( size_t i = 0; i < vecRow.GetRows(); i++ )
+            if( rowOwnership[0] > rowval )
+                to_proc = 0;
+            else
             {
-                vecRow[i]--;
-                vecCol[i]--;
-
-                // TODO: Fix this linear search to compute process ownership
-                int pOwner = -1;
-                if( rowOwnership[0] > vecRow[i] )
-                    pOwner = 0;
-                else
+                for( int ip = 1; ip < size; ++ip )
                 {
-                    for( int ip = 1; ip < size; ++ip )
+                    if( rowOwnership[ip - 1] <= rowval && rowOwnership[ip] > rowval )
                     {
-                        if( rowOwnership[ip - 1] <= vecRow[i] && rowOwnership[ip] > vecRow[i] )
-                        {
-                            pOwner = ip;
-                            break;
-                        }
+                        to_proc = ip;
+                        break;
                     }
                 }
-
-                assert( pOwner >= 0 && pOwner < size );
-                dataPerProcess[pOwner].push_back( i );
-
-                // if( pOwner == rootProc )  // avoid actual communication if setting data on root proccess
-                //     sparseMatrix( vecRow[i], vecCol[i] ) = vecS[i];
             }
 
-            offset += nLocSize;
-            nEntriesRemaining -= nLocSize;
-            progress = 1.0 - nEntriesRemaining * ( 1.0 / nS );
+            int n = tl.get_n();
+            tl.vi_wr[3 * n]         = to_proc;
+            tl.vi_wr[3 * n + 1]     = rowval;
+            tl.vi_wr[3 * n + 2] = colval;
+            tl.vr_wr[n] = vecS[i];
 
-            for( int ip = 0; ip < size; ++ip )
-                nDataPerProcess[ip] = dataPerProcess[ip].size();
-
-            // Set the entries of the map on the root
-            // sparseMatrix.SetEntries( vecRow, vecCol, vecS );
+            tl.inc_n();
         }
 
-        // Communicate the number of DoF data to expect from root
-        int nEntriesComm = 0;
 #ifdef MOAB_HAVE_MPI
-        mpierr = MPI_Scatter( nDataPerProcess.data(), 1, MPI_INT, &nEntriesComm, 1, MPI_INT, root_proc, commW );MPI_CHK_ERR( mpierr );
-#else
-        nEntriesComm = nDataPerProcess[0];
+        // now do the heavy communication
+        ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
 #endif
+        // populate the sparsematrix, using rowMap and colMap; what is the need for them?
+        int n = tl.get_n();
+        for (int i=0; i<n; i++){
 
-#ifdef MOAB_HAVE_MPI
-        if( is_root )
-        {
-            std::vector< MPI_Request > cRequests;
-            std::vector< MPI_Status > cStats( 2 * size - 2 );
-            cRequests.reserve( 2 * size - 2 );
+            int rindex, cindex;
+            const int& vecRowValue = tl.vi_wr[3*i+1];
+            const int& vecColValue = tl.vi_wr[3*i+2];
 
-            // First send out all the relevant data buffers to other process
-            std::vector< std::vector< int > > dataRowColsAll( size );
-            std::vector< std::vector< double > > dataEntriesAll( size );
-            for( int ip = 1; ip < size; ++ip )
+            std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+            if( riter == rowMap.end() )
             {
-                const int nDPP = nDataPerProcess[ip];
-                if( nDPP > 0 )
-                {
-                    std::vector< int >& dataRowCols = dataRowColsAll[ip];
-                    dataRowCols.resize( 2 * nDPP );
-                    std::vector< double >& dataEntries = dataEntriesAll[ip];
-                    dataEntries.resize( nDPP );
-
-                    for( int ij = 0; ij < nDPP; ++ij )
-                    {
-                        dataRowCols[ij * 2]     = vecRow[dataPerProcess[ip][ij]];
-                        dataRowCols[ij * 2 + 1] = vecCol[dataPerProcess[ip][ij]];
-                        dataEntries[ij]         = vecS[dataPerProcess[ip][ij]];
-                    }
-
-                    MPI_Request rcsend, dsend;
-                    mpierr = MPI_Isend( dataRowCols.data(), 2 * nDPP, MPI_INT, ip, iRead * 1000, commW, &rcsend );MPI_CHK_ERR( mpierr );
-                    mpierr = MPI_Isend( dataEntries.data(), nDPP, MPI_DOUBLE, ip, iRead * 1000 + 1, commW, &dsend );MPI_CHK_ERR( mpierr );
-
-                    cRequests.push_back( rcsend );
-                    cRequests.push_back( dsend );
-                }
+                rowMap[vecRowValue] = rindexMax;
+                rindex              = rindexMax;
+                rindexMax++;
             }
-#endif
-            // Next perform all necessary local work while we wait for the buffers to be sent out
-            // Compute an offset for the rows and columns by creating a local to global mapping for rootProc
-            assert( dataPerProcess[0].size() - nEntriesComm == 0 );  // sanity check
-            for( int i = 0; i < nEntriesComm; ++i )
+            else
+                rindex = riter->second;
+
+            std::map< int, int >::iterator citer = colMap.find( vecColValue );
+            if( citer == colMap.end() )
             {
-                int rindex, cindex;
-                const int& vecRowValue = vecRow[dataPerProcess[0][i]];
-                const int& vecColValue = vecCol[dataPerProcess[0][i]];
-
-                std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
-                if( riter == rowMap.end() )
-                {
-                    rowMap[vecRowValue] = rindexMax;
-                    rindex              = rindexMax;
-                    rindexMax++;
-                }
-                else
-                    rindex = riter->second;
-
-                std::map< int, int >::iterator citer = colMap.find( vecColValue );
-                if( citer == colMap.end() )
-                {
-                    colMap[vecColValue] = cindexMax;
-                    cindex              = cindexMax;
-                    cindexMax++;
-                }
-                else
-                    cindex = citer->second;
-
-                sparseMatrix( rindex, cindex ) = vecS[i];
+                colMap[vecColValue] = cindexMax;
+                cindex              = cindexMax;
+                cindexMax++;
             }
+            else
+                cindex = citer->second;
 
-#ifdef MOAB_HAVE_MPI
-            // Wait until all communication is pushed out
-            mpierr = MPI_Waitall( cRequests.size(), cRequests.data(), cStats.data() );MPI_CHK_ERR( mpierr );
-        }  // if( is_root )
-        else
-        {
-            if( nEntriesComm > 0 )
-            {
-                MPI_Request cRequests[2];
-                MPI_Status cStats[2];
+            sparseMatrix( rindex, cindex ) = tl.vr_wr[i];
 
-                // create buffers to receive the data from root process
-                std::vector< int > dataRowCols( 2 * nEntriesComm );
-                vecRow.Allocate( nEntriesComm );
-                vecCol.Allocate( nEntriesComm );
-                vecS.Allocate( nEntriesComm );
-
-                /* TODO: combine row and column scatters together. Save one communication by better packing */
-                // Scatter the rows, cols and entries to the processes according to the partition
-                mpierr = MPI_Irecv( dataRowCols.data(), 2 * nEntriesComm, MPI_INT, root_proc, iRead * 1000, commW,
-                                    &cRequests[0] );MPI_CHK_ERR( mpierr );
-
-                mpierr = MPI_Irecv( vecS, nEntriesComm, MPI_DOUBLE, root_proc, iRead * 1000 + 1, commW, &cRequests[1] );MPI_CHK_ERR( mpierr );
-
-                // Wait until all communication is pushed out
-                mpierr = MPI_Waitall( 2, cRequests, cStats );MPI_CHK_ERR( mpierr );
-
-                // Compute an offset for the rows and columns by creating a local to global mapping
-                int rindex = 0, cindex = 0;
-                for( int i = 0; i < nEntriesComm; ++i )
-                {
-                    const int& vecRowValue = dataRowCols[i * 2];
-                    const int& vecColValue = dataRowCols[i * 2 + 1];
-
-                    std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
-                    if( riter == rowMap.end() )
-                    {
-                        rowMap[vecRowValue] = rindexMax;
-                        rindex              = rindexMax;
-                        rindexMax++;
-                    }
-                    else
-                        rindex = riter->second;
-                    vecRow[i] = rindex;
-
-                    std::map< int, int >::iterator citer = colMap.find( vecColValue );
-                    if( citer == colMap.end() )
-                    {
-                        colMap[vecColValue] = cindexMax;
-                        cindex              = cindexMax;
-                        cindexMax++;
-                    }
-                    else
-                        cindex = citer->second;
-                    vecCol[i] = cindex;
-
-                    sparseMatrix( rindex, cindex ) = vecS[i];
-                }
-
-                // clear the local buffer
-                dataRowCols.clear();
-
-                // Now set the data received from root onto the sparse matrix
-                // sparseMatrix.SetEntries( dataRows, dataCols, dataEntries );
-
-            }  // if( nEntriesComm > 0 )
-        }      // if( !is_root )
-
-        MPI_Barrier( commW );
-#endif
+        }
     }
-
-    if( rank == 0 )
+    else
     {
-        print_progress( barWidth, progress, message );
-        std::cout << std::endl;
-        assert( nEntriesRemaining == 0 );
-        ncMap->close();
-    }
+        for (int i=0; i<nS; i++){
 
-    // Close and free the handle to mapping file
-    delete ncMap;
+            int rindex, cindex;
+            const int& vecRowValue = vecRow[i];
+            const int& vecColValue = vecCol[i];
+
+            std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
+            if( riter == rowMap.end() )
+            {
+                rowMap[vecRowValue] = rindexMax;
+                rindex              = rindexMax;
+                rindexMax++;
+            }
+            else
+                rindex = riter->second;
+
+            std::map< int, int >::iterator citer = colMap.find( vecColValue );
+            if( citer == colMap.end() )
+            {
+                colMap[vecColValue] = cindexMax;
+                cindex              = cindexMax;
+                cindexMax++;
+            }
+            else
+                cindex = citer->second;
+
+            sparseMatrix( rindex, cindex ) = vecS[i];
+
+        }
+    }
 
     m_nTotDofs_SrcCov = sparseMatrix.GetColumns();
     m_nTotDofs_Dest   = sparseMatrix.GetRows();
