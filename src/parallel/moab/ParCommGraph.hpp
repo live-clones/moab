@@ -182,14 +182,14 @@ class ParCommGraph
 
     ErrorCode split_owned_range( Range& owned );
 
-    ErrorCode send_graph( MPI_Comm jcomm );
+    ErrorCode send_graph( MPI_Comm jcomm , std::vector<char> & zBuff);
 
-    ErrorCode send_graph_partition( ParallelComm* pco, MPI_Comm jcomm );
+    ErrorCode send_graph_partition( ParallelComm* pco, MPI_Comm jcomm, std::vector<char> & zoltanBuffer );
 
     ErrorCode send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Range& owned );
 
     // this is called on receiver side
-    ErrorCode receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array );
+    ErrorCode receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array, std::vector<char> & zoltanBuffer );
 
     ErrorCode receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityHandle local_set,
                             std::vector< int >& senders_local );
@@ -273,9 +273,10 @@ class ParCommGraph
     std::vector< ParallelComm::Buffer* > localSendBuffs;  // this will store the pointers to the Buffers
     //                                    will be  released only when all mpi requests are waited
     //                                    for
-    int* comm_graph;  // this will store communication graph, on sender master, sent by nonblocking
+    std::vector<int>  comm_graph;  // this will store communication graph, on sender master, sent by nonblocking
                       // send to the master receiver first integer will be the size of the graph,
                       // the rest will be the packed graph, for trivial partition
+    std::vector<char> zBuff; // this will hang on the comm graph to not go out of scope before
 
     // these will be now used to store ranges to be sent from current sender to each receiver in
     // joint comm

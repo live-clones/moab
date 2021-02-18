@@ -2405,7 +2405,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
         MPI_Bcast((char *)&bufSize, sizeof(bufSize), MPI_CHAR, 0, pco->comm());
         if (0 != rank) ZoltanBuffer.resize(bufSize);
 
-        MPI_Bcast(&ZoltanBuffer[0], bufSize, MPI_CHAR, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&ZoltanBuffer[0], bufSize, MPI_CHAR, 0, pco->comm());
         // deserialize on each task
         int ierr = myZZ->Deserialize(ZoltanBuffer.size(), &ZoltanBuffer[0]);
         if (ierr != 0 ) MB_CHK_ERR(MB_FAILURE);
