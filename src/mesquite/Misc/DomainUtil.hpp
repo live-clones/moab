@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file DomainUtil.hpp
  *  \brief Utility functions for use in build-in geometric domains
  *  \author Jason Kraftcheck
@@ -36,46 +35,38 @@
 #include "Mesquite.hpp"
 #include "MeshInterface.hpp"
 #include <vector>
-#include <stdlib.h> // size_t
+#include <stdlib.h>  // size_t
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqVertex;
 class Vector3D;
 class Mesh;
 
-namespace DomainUtil {
+namespace DomainUtil
+{
 
-void bounding_box( const MsqVertex* vertex_array,
-                   size_t num_vertices,
-                   Vector3D& box_min,
-                   Vector3D& box_max );
+    void bounding_box( const MsqVertex* vertex_array, size_t num_vertices, Vector3D& box_min, Vector3D& box_max );
 
-double max_box_extent( const MsqVertex* vertex_array, size_t num_vertices );
+    double max_box_extent( const MsqVertex* vertex_array, size_t num_vertices );
 
-inline double
-default_tolerance( const MsqVertex* vertex_array, size_t num_vertices )
-  { return 1e-3 * max_box_extent( vertex_array, num_vertices ); }
+    inline double default_tolerance( const MsqVertex* vertex_array, size_t num_vertices )
+    {
+        return 1e-3 * max_box_extent( vertex_array, num_vertices );
+    }
 
-void get_fixed_vertices( Mesh* mesh_instance,
-                         const Mesh::VertexHandle* vertex_array,
-                         size_t num_vertices,
-                         std::vector<Mesh::VertexHandle>& fixed_handles_out,
-                         MsqError& err );
+    void get_fixed_vertices( Mesh* mesh_instance, const Mesh::VertexHandle* vertex_array, size_t num_vertices,
+                             std::vector< Mesh::VertexHandle >& fixed_handles_out, MsqError& err );
 
-bool non_colinear_vertices( const MsqVertex* vertex_array,
-                            size_t num_vertices,
-                            Vector3D coords_out[3],
-                            double epsilon );
+    bool non_colinear_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[3],
+                                double epsilon );
 
-bool non_coplanar_vertices( const MsqVertex* vertex_array,
-                            size_t num_vertices,
-                            Vector3D coords_out[4],
-                            double epsilon );
+    bool non_coplanar_vertices( const MsqVertex* vertex_array, size_t num_vertices, Vector3D coords_out[4],
+                                double epsilon );
 
+}  // namespace DomainUtil
 
-} // namespace DomainUtil
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

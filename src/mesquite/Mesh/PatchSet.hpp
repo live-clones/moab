@@ -37,7 +37,8 @@
 #include "Mesquite.hpp"
 #include "MeshInterface.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
 
@@ -49,7 +50,6 @@ class MsqError;
 class MESQUITE_EXPORT PatchSet
 {
   public:
-
     typedef void* PatchHandle;
 
     inline PatchSet() {}
@@ -58,11 +58,13 @@ class MESQUITE_EXPORT PatchSet
     virtual ~PatchSet();
 
     /**\brief Specify the working Mesh */
-    inline void set_mesh( Mesh* mesh ) { myMesh = mesh; }
+    inline void set_mesh( Mesh* mesh )
+    {
+        myMesh = mesh;
+    }
 
     /**\brief Get a list of handles, one for each patch */
-    virtual void get_patch_handles( std::vector<PatchHandle>& patch_handles_out,
-                                    MsqError& err ) = 0;
+    virtual void get_patch_handles( std::vector< PatchHandle >& patch_handles_out, MsqError& err ) = 0;
 
     /**\brief Get the mesh entities in a patch
      *
@@ -75,24 +77,24 @@ class MESQUITE_EXPORT PatchSet
      *                         vertices in the closure of the elements are
      *                         free.
      */
-    virtual void get_patch( PatchHandle patch_handle,
-                            std::vector<Mesh::ElementHandle>& elem_handles_out,
-                            std::vector<Mesh::VertexHandle>& free_vertices_out,
-                            MsqError& err ) = 0;
+    virtual void get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
+                            std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err ) = 0;
 
-      /**\brief get the Mesh object passed to set_mesh() */
-    inline Mesh* get_mesh() const { return myMesh; }
+    /**\brief get the Mesh object passed to set_mesh() */
+    inline Mesh* get_mesh() const
+    {
+        return myMesh;
+    }
 
   private:
-
-      /**\brief disallow copying*/
+    /**\brief disallow copying*/
     PatchSet( const PatchSet& );
-      /**\brief disallow assignment*/
-    PatchSet& operator=(const PatchSet& );
+    /**\brief disallow assignment*/
+    PatchSet& operator=( const PatchSet& );
 
     Mesh* myMesh;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

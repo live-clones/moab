@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShape2DNB2.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,42 +34,38 @@
 #include "MsqMatrix.hpp"
 #include "TMPDerivs.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string AWShape2DNB2::get_name() const
-  { return "AWShape2DNB2"; }
+{
+    return "AWShape2DNB2";
+}
 
 AWShape2DNB2::~AWShape2DNB2() {}
 
-
-bool AWShape2DNB2::evaluate( const MsqMatrix<2,2>& A,
-                             const MsqMatrix<2,2>& W,
-                             double& result,
-                             MsqError& )
+bool AWShape2DNB2::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& )
 {
-  result =  sqr_Frobenius( A * adj(W) );
-  result += sqr_Frobenius( W * adj(A) );
-  result -= 4 * det(A) * det(W);
-  return true;
+    result = sqr_Frobenius( A * adj( W ) );
+    result += sqr_Frobenius( W * adj( A ) );
+    result -= 4 * det( A ) * det( W );
+    return true;
 }
 
-bool AWShape2DNB2::evaluate_with_grad( const MsqMatrix<2,2>& A,
-                                       const MsqMatrix<2,2>& W,
-                                       double& result,
-                                       MsqMatrix<2,2>& deriv_wrt_A,
-                                       MsqError& )
+bool AWShape2DNB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                       MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& )
 {
-  const double alpha = det(A);
-  const double omega = det(W);
-  const MsqMatrix<2,2> adjA = adj(A);
-  result =  sqr_Frobenius( A * adj(W) );
-  result += sqr_Frobenius( W * adjA );
-  result -= 4 * alpha * omega;
+    const double alpha           = det( A );
+    const double omega           = det( W );
+    const MsqMatrix< 2, 2 > adjA = adj( A );
+    result                       = sqr_Frobenius( A * adj( W ) );
+    result += sqr_Frobenius( W * adjA );
+    result -= 4 * alpha * omega;
 
-  deriv_wrt_A  = A * adj(transpose(W) * W);
-  deriv_wrt_A -= omega * transpose(adjA);
-  deriv_wrt_A *= 4;
-  return true;
+    deriv_wrt_A = A * adj( transpose( W ) * W );
+    deriv_wrt_A -= omega * transpose( adjA );
+    deriv_wrt_A *= 4;
+    return true;
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

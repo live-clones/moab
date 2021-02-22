@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file QuasiNewton.hpp
  *  \brief Port Todd Munson's quasi-Newton solver to Mesquite
  *  \author Jason Kraftcheck
@@ -38,14 +37,14 @@
 #include "PatchSetUser.hpp"
 #include "MsqHessian.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class PatchDataVerticesMemento;
 
 class QuasiNewton : public VertexMover, public PatchSetUser
 {
   public:
-
     MESQUITE_EXPORT QuasiNewton( ObjectiveFunction* of );
 
     MESQUITE_EXPORT virtual ~QuasiNewton();
@@ -55,7 +54,6 @@ class QuasiNewton : public VertexMover, public PatchSetUser
     MESQUITE_EXPORT std::string get_name() const;
 
   protected:
-
     virtual void initialize( PatchData& pd, MsqError& err );
     virtual void optimize_vertex_positions( PatchData& pd, MsqError& err );
     virtual void initialize_mesh_iteration( PatchData& pd, MsqError& err );
@@ -65,14 +63,16 @@ class QuasiNewton : public VertexMover, public PatchSetUser
     void solve( Vector3D* z, const Vector3D* v ) const;
 
   private:
-
-    enum Constants { QNVEC = 5 };
+    enum Constants
+    {
+        QNVEC = 5
+    };
 
     PatchDataVerticesMemento* mMemento;
-    std::vector<Vector3D> x, v[QNVEC+1], w[QNVEC+1], d;
-    std::vector<SymMatrix3D> mHess;
+    std::vector< Vector3D > x, v[QNVEC + 1], w[QNVEC + 1], d;
+    std::vector< SymMatrix3D > mHess;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

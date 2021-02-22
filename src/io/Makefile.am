@@ -23,6 +23,7 @@ if HAVE_NETCDF
                      NCHelper.cpp NCHelper.hpp \
                      NCHelperEuler.cpp NCHelperEuler.hpp \
                      NCHelperFV.cpp NCHelperFV.hpp \
+                     NCHelperDomain.cpp NCHelperDomain.hpp \
                      NCHelperHOMME.cpp NCHelperHOMME.hpp \
                      NCHelperMPAS.cpp NCHelperMPAS.hpp \
                      NCHelperGCRM.cpp NCHelperGCRM.hpp \
@@ -31,7 +32,7 @@ if HAVE_NETCDF
                      NCWriteFV.cpp NCWriteFV.hpp \
                      NCWriteHOMME.cpp NCWriteHOMME.hpp \
                      NCWriteMPAS.cpp NCWriteMPAS.hpp \
-                     NCWriteGCRM.cpp NCWriteGCRM.hpp
+                     NCWriteGCRM.cpp NCWriteGCRM.hpp 
 else
   MOAB_NETCDF_SRCS =
 endif
@@ -43,6 +44,7 @@ if !HAVE_NETCDF
                      NCHelper.cpp NCHelper.hpp \
                      NCHelperEuler.cpp NCHelperEuler.hpp \
                      NCHelperFV.cpp NCHelperFV.hpp \
+                     NCHelperDomain.cpp NCHelperDomain.hpp \
                      NCHelperHOMME.cpp NCHelperHOMME.hpp \
                      NCHelperMPAS.cpp NCHelperMPAS.hpp \
                      NCHelperGCRM.cpp NCHelperGCRM.hpp \
@@ -67,6 +69,7 @@ else
 endif
 
 if HAVE_HDF5
+  AM_CPPFLAGS += $(HDF5_CPPFLAGS)
   libmoabio_la_LIBADD += mhdf/libmhdf.la
   MOAB_HDF5_SRCS = HDF5Common.cpp \
                    HDF5Common.hpp \
@@ -176,4 +179,5 @@ libmoabio_la_includedir = $(includedir)
 nobase_libmoabio_la_include_HEADERS = moab/ExoIIInterface.hpp moab/VtkUtil.hpp
 
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out
 

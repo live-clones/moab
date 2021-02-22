@@ -30,8 +30,8 @@
 #include "Mesquite.hpp"
 #include "PatchSet.hpp"
 
-
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief A PatchSet representing a decomposition of the mesh
  *        into patches containing a single element.
@@ -41,13 +41,11 @@ namespace MBMesquite {
  */
 class MESQUITE_EXPORT ElementPatches : public PatchSet
 {
-public:
-
+  public:
     ~ElementPatches();
 
     /**\brief Get a list of handles, one for each patch */
-    virtual void get_patch_handles( std::vector<PatchHandle>& patch_handles_out,
-                                    MsqError& err );
+    virtual void get_patch_handles( std::vector< PatchHandle >& patch_handles_out, MsqError& err );
 
     /**\brief Get the mesh entities in a patch
      *
@@ -60,13 +58,10 @@ public:
      *\param elem_handles_out the list of elements in the mesh
      *\param free_vertices_out the list of vertices interior to the patch
      */
-    virtual void get_patch( PatchHandle patch_handle,
-                            std::vector<Mesh::ElementHandle>& elem_handles_out,
-                            std::vector<Mesh::VertexHandle>& free_vertices_out,
-                            MsqError& err );
-
+    virtual void get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
+                            std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

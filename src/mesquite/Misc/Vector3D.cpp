@@ -33,40 +33,36 @@
 #include <math.h>
 
 #ifdef MSQ_HAVE_IEEEFP_H
-#  include <ieeefp.h>
+#include <ieeefp.h>
 #endif
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-std::ostream& operator<<(std::ostream &s, const MBMesquite::Vector3D &v)
+std::ostream& operator<<( std::ostream& s, const MBMesquite::Vector3D& v )
 {
     return s << v[0] << ' ' << v[1] << ' ' << v[2];
 }
 
-double Vector3D::interior_angle(const Vector3D &lhs,
-                                const Vector3D &rhs,
-                                MsqError& err)
-  {
-    double len1 = lhs.length();
-    double len2 = rhs.length();
-    double angle_cos = (lhs % rhs)/(len1 * len2);
-    if (!moab::Util::is_finite( angle_cos ))
+double Vector3D::interior_angle( const Vector3D& lhs, const Vector3D& rhs, MsqError& err )
+{
+    double len1      = lhs.length();
+    double len2      = rhs.length();
+    double angle_cos = ( lhs % rhs ) / ( len1 * len2 );
+    if( !moab::Util::is_finite( angle_cos ) )
     {
-      MSQ_SETERR(err)(MsqError::INTERNAL_ERROR);
-      return 0.0;
+        MSQ_SETERR( err )( MsqError::INTERNAL_ERROR );
+        return 0.0;
     }
 
     // Adjust the cosine if slightly out of range
-    if ((angle_cos > 1.0) && (angle_cos < 1.0001))
-      {
-        angle_cos = 1.0;
-      }
-    else if (angle_cos < -1.0 && angle_cos > -1.0001)
-      {
+    if( ( angle_cos > 1.0 ) && ( angle_cos < 1.0001 ) ) { angle_cos = 1.0; }
+    else if( angle_cos < -1.0 && angle_cos > -1.0001 )
+    {
         angle_cos = -1.0;
-      }
+    }
 
-    return std::acos(angle_cos);
-  }
-
+    return std::acos( angle_cos );
 }
+
+}  // namespace MBMesquite

@@ -68,7 +68,8 @@ TESTS = range_test \
         arc_intx_tests \
         intx_in_plane_test \
         intx_on_sphere_test \
-        mgen_test
+        mgen_test \
+        gnom_project_test
 
 if HAVE_NETCDF
    TESTS += intx_rll_cs_sphere_test
@@ -86,19 +87,15 @@ if HAVE_HDF5
 	test_geom_gqt \
 	gqt_simple_test \
 	gqt_rayfire_test \
-	gqt_pointinvol_test
+	gqt_pointinvol_test \
+	gqt_findvol_test
 
-if PARALLEL
 # imoab tests
-  TESTS += imoab_test
+TESTS += imoab_test
 if ENABLE_FORTRAN
   TESTS += imoab_testF
 endif
 endif
-endif
-
-#       merge_test \         # input files no longer exist?
-#       test_tag_server \    # fails
 
 check_PROGRAMS = $(TESTS) \
 		 kd_tree_tool \
@@ -122,7 +119,7 @@ MOSTLYCLEANFILES = mb_write.g \
                    fIntxOverlap.h5m fIntxTarget.h5m fnew.h5m fnew2.h5m out1.h5m \
                    intx.vtk \
                    polyWithEdges.vtk \
-                   intx1.vtk
+                   intx1.vtk intx.h5m project.vtk
 
 # Tests and such
 test_Matrix3_SOURCES = test_Matrix3.cpp
@@ -130,9 +127,20 @@ mgen_test_SOURCES = mgen_test.cpp
 if ENABLE_FORTRAN
 imoab_testF_SOURCES = imoab_testF.F
 imoab_testF_FFLAGS = -DMESHDIR2=\"$(RMESHDIR)\" $(FFLAGS)
+#imoab_testF_LDADD = $(LDADD) $(FCLIBS)
+if HAVE_TEMPESTREMAP
+imoab_testF_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+else
 imoab_testF_LDADD = $(LDADD) $(FCLIBS)
 endif
+endif
 imoab_test_SOURCES = imoab_test.cpp
+if HAVE_TEMPESTREMAP
+imoab_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+else
+imoab_test_LDADD = $(LDADD)
+endif
+
 verdict_test_SOURCES = verdict_test.cpp
 range_test_SOURCES = range_test.cpp
 moab_test_SOURCES = MBTest.cpp
@@ -177,6 +185,7 @@ intx_in_plane_test_SOURCES = intx_in_plane_test.cpp
 spherical_area_test_SOURCES = spherical_area_test.cpp
 arc_intx_tests_SOURCES = arc_intx_tests.cpp
 intx_rll_cs_sphere_test_SOURCES = intx_rll_cs_sphere_test.cpp
+gnom_project_test_SOURCES = gnom_project_test.cpp
 
 #mbcn_test_SOURCES = $(top_srcdir)/src/moab/CN.hpp \
 #                    $(top_srcdir)/src/CN.cpp \
@@ -213,6 +222,7 @@ test_geom_gqt_SOURCES = test_geom_gqt.cpp
 gqt_simple_test_SOURCES = gqt_simple_test.cpp
 gqt_rayfire_test_SOURCES = gqt_rayfire_test.cpp
 gqt_pointinvol_test_SOURCES = gqt_pointinvol_test.cpp
+gqt_findvol_test_SOURCES = gqt_findvol_test.cpp
 
 if PARALLEL
 moab_test_CPPFLAGS += -I$(top_srcdir)/src/parallel
@@ -274,7 +284,12 @@ CLEANFILES = mb_big_test.g \
              outTempestICOD.g \
              outTempestOV.g \
              geom_missing_obb.h5m \
-             geom_w_obbs.h5m
+             geom_w_obbs.h5m \
+             fIntxLndTarget.h5m \
+             fIntxAtmTarget.h5m \
+             fIntxOcnTarget.h5m \
+             atm_ocn_map.nc
+DISTCLEANFILES = a.out
 
 # Utility target: build but don't run tests
 build-check:

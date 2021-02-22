@@ -38,7 +38,6 @@
 #include "MsqTimer.hpp"
 using namespace MBMesquite;
 
-
 /*!
 Sets the QualityMetric pointer to the metric associated with Obj1.
 The new ObjectiveFunction's negateFlag is also the
@@ -47,93 +46,76 @@ gradient which essentially just calls Obj1's gradient function.
   \param alp (double)
   \param Obj1 (ObjectiveFunction*)
  */
-CompositeOFScalarAdd::CompositeOFScalarAdd( double alp,
-                                            ObjectiveFunction* Obj1,
-                                            bool delete_OF)
-  : deleteObjFunc(delete_OF)
+CompositeOFScalarAdd::CompositeOFScalarAdd( double alp, ObjectiveFunction* Obj1, bool delete_OF )
+    : deleteObjFunc( delete_OF )
 {
-  objFunc=Obj1;
-  mAlpha=alp;
+    objFunc = Obj1;
+    mAlpha  = alp;
 }
 
-
-//Michael:  need to clean up here
-CompositeOFScalarAdd::~CompositeOFScalarAdd(){
-  if (deleteObjFunc)
-    delete objFunc;
+// Michael:  need to clean up here
+CompositeOFScalarAdd::~CompositeOFScalarAdd()
+{
+    if( deleteObjFunc ) delete objFunc;
 }
 
 ObjectiveFunction* CompositeOFScalarAdd::clone() const
-  { return new CompositeOFScalarAdd( mAlpha, objFunc->clone(), true ); }
+{
+    return new CompositeOFScalarAdd( mAlpha, objFunc->clone(), true );
+}
 
 void CompositeOFScalarAdd::clear()
 {
-  objFunc->clear();
+    objFunc->clear();
 }
 
-
-void CompositeOFScalarAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                             const Settings* settings,
-                                             MsqError& err )
+void CompositeOFScalarAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-  objFunc->initialize_queue( mesh_and_domain, settings, err ); MSQ_ERRRTN(err);
+    objFunc->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-bool CompositeOFScalarAdd::initialize_block_coordinate_descent(
-                                                       MeshDomainAssoc* mesh_and_domain,
-                                                       const Settings* settings,
-                                                       PatchSet* user_set,
-                                                       MsqError& err )
+bool CompositeOFScalarAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
+                                                                const Settings* settings, PatchSet* user_set,
+                                                                MsqError& err )
 {
-  bool rval = objFunc->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
-  return !MSQ_CHKERR(err) && rval;
+    bool rval = objFunc->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
+    return !MSQ_CHKERR( err ) && rval;
 }
 
-bool CompositeOFScalarAdd::evaluate( EvalType type,
-                                     PatchData& pd,
-                                     double& value_out,
-                                     bool free,
-                                     MsqError& err )
+bool CompositeOFScalarAdd::evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err )
 {
-  bool ok = objFunc->evaluate( type, pd, value_out, free, err );
-  value_out += mAlpha;
-  return !MSQ_CHKERR(err) && ok;
+    bool ok = objFunc->evaluate( type, pd, value_out, free, err );
+    value_out += mAlpha;
+    return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarAdd::evaluate_with_gradient( EvalType type,
-                                             PatchData& pd,
-                                             double& value_out,
-                                             std::vector<Vector3D>& grad_out,
-                                             MsqError& err )
+bool CompositeOFScalarAdd::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                                   std::vector< Vector3D >& grad_out, MsqError& err )
 {
-  bool ok = objFunc->evaluate_with_gradient( type, pd, value_out, grad_out, err );
-  value_out += mAlpha;
-  return !MSQ_CHKERR(err) && ok;
+    bool ok = objFunc->evaluate_with_gradient( type, pd, value_out, grad_out, err );
+    value_out += mAlpha;
+    return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarAdd::evaluate_with_Hessian_diagonal( EvalType type,
-                                            PatchData& pd,
-                                            double& value_out,
-                                            std::vector<Vector3D>& grad_out,
-                                            std::vector<SymMatrix3D>& diag_out,
-                                            MsqError& err )
+bool CompositeOFScalarAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+                                                           std::vector< Vector3D >& grad_out,
+                                                           std::vector< SymMatrix3D >& diag_out, MsqError& err )
 {
-  bool ok = objFunc->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
-  value_out += mAlpha;
-  return !MSQ_CHKERR(err) && ok;
+    bool ok = objFunc->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
+    value_out += mAlpha;
+    return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarAdd::evaluate_with_Hessian( EvalType type,
-                                            PatchData& pd,
-                                            double& value_out,
-                                            std::vector<Vector3D>& grad_out,
-                                            MsqHessian& Hessian_out,
-                                            MsqError& err )
+bool CompositeOFScalarAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
+                                                  std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
+                                                  MsqError& err )
 {
-  bool ok = objFunc->evaluate_with_Hessian( type, pd, value_out, grad_out, Hessian_out, err );
-  value_out += mAlpha;
-  return !MSQ_CHKERR(err) && ok;
+    bool ok = objFunc->evaluate_with_Hessian( type, pd, value_out, grad_out, Hessian_out, err );
+    value_out += mAlpha;
+    return !MSQ_CHKERR( err ) && ok;
 }
 
 int CompositeOFScalarAdd::min_patch_layers() const
-  { return objFunc->min_patch_layers(); }
+{
+    return objFunc->min_patch_layers();
+}

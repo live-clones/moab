@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file VertexPMeanP.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,93 +36,79 @@
 #include "MsqError.hpp"
 #include "PatchData.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-VertexPMeanP::VertexPMeanP( double p, ElemSampleQM* metric )
-    : PMeanPMetric( p ),
-      mMetric(metric)
-    {}
+VertexPMeanP::VertexPMeanP( double p, ElemSampleQM* metric ) : PMeanPMetric( p ), mMetric( metric ) {}
 
 VertexPMeanP::~VertexPMeanP() {}
 
 std::string VertexPMeanP::get_name() const
 {
-  std::string result("VertexPMeanP(");
-  result += mMetric->get_name();
-  result += ")";
-  return result;
+    std::string result( "VertexPMeanP(" );
+    result += mMetric->get_name();
+    result += ")";
+    return result;
 }
 
 int VertexPMeanP::get_negate_flag() const
-  { return mMetric->get_negate_flag(); }
-
-bool VertexPMeanP::evaluate( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          MsqError& err )
 {
-  mHandles.clear();
-  get_vertex_corner_handles( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average( pd, get_quality_metric(), mHandles, value, err );
-  return !MSQ_CHKERR(err) && result;
+    return mMetric->get_negate_flag();
 }
 
-
-bool VertexPMeanP::evaluate_with_indices( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          std::vector<size_t>& indices,
-                          MsqError& err )
+bool VertexPMeanP::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  get_vertex_corner_handles( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_indices( pd, qm, mHandles, value, indices, err );
-  return !MSQ_CHKERR(err) && result;
+    mHandles.clear();
+    get_vertex_corner_handles( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average( pd, get_quality_metric(), mHandles, value, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
-bool VertexPMeanP::evaluate_with_gradient( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          std::vector<size_t>& indices,
-                          std::vector<Vector3D>& gradient,
-                          MsqError& err )
+bool VertexPMeanP::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                          MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  get_vertex_corner_handles( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_gradient( pd, qm, mHandles, value, indices, gradient, err );
-  return !MSQ_CHKERR(err) && result;
+    ElemSampleQM* qm = get_quality_metric();
+    mHandles.clear();
+    get_vertex_corner_handles( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average_with_indices( pd, qm, mHandles, value, indices, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
-bool VertexPMeanP::evaluate_with_Hessian( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          std::vector<size_t>& indices,
-                          std::vector<Vector3D>& gradient,
-                          std::vector<Matrix3D>& Hessian,
-                          MsqError& err )
+bool VertexPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                           std::vector< Vector3D >& gradient, MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  get_vertex_corner_handles( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_Hessian( pd, qm, mHandles, value, indices, gradient, Hessian, err );
-  return !MSQ_CHKERR(err) && result;
+    ElemSampleQM* qm = get_quality_metric();
+    mHandles.clear();
+    get_vertex_corner_handles( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average_with_gradient( pd, qm, mHandles, value, indices, gradient, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
-bool VertexPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd,
-                          size_t handle,
-                          double& value,
-                          std::vector<size_t>& indices,
-                          std::vector<Vector3D>& gradient,
-                          std::vector<SymMatrix3D>& diagonal,
-                          MsqError& err )
+bool VertexPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                          std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+                                          MsqError& err )
 {
-  ElemSampleQM* qm = get_quality_metric();
-  mHandles.clear();
-  get_vertex_corner_handles( pd, handle, mHandles, err ); MSQ_ERRFALSE(err);
-  bool result = average_with_Hessian_diagonal( pd, qm, mHandles, value, indices, gradient, diagonal, err );
-  return !MSQ_CHKERR(err) && result;
+    ElemSampleQM* qm = get_quality_metric();
+    mHandles.clear();
+    get_vertex_corner_handles( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average_with_Hessian( pd, qm, mHandles, value, indices, gradient, Hessian, err );
+    return !MSQ_CHKERR( err ) && result;
 }
 
-} // namespace MBMesquite
+bool VertexPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                                   std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+                                                   std::vector< SymMatrix3D >& diagonal, MsqError& err )
+{
+    ElemSampleQM* qm = get_quality_metric();
+    mHandles.clear();
+    get_vertex_corner_handles( pd, handle, mHandles, err );
+    MSQ_ERRFALSE( err );
+    bool result = average_with_Hessian_diagonal( pd, qm, mHandles, value, indices, gradient, diagonal, err );
+    return !MSQ_CHKERR( err ) && result;
+}
+
+}  // namespace MBMesquite

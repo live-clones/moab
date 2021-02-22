@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file UntangleBetaQualityMetric.hpp
 
@@ -42,58 +43,51 @@ Header file for the MBMesquite::UntangleBetaQualityMetric class
 #include "AveragingQM.hpp"
 namespace MBMesquite
 {
-     /*! \class UntangleBetaQualityMetric
-       \brief The untangle beta quality metric.
+/*! \class UntangleBetaQualityMetric
+  \brief The untangle beta quality metric.
 
-       Given a scalar value beta and local signed element volume alpha_i,
-       define delta_i to be alpha_i minus beta.  The Untangle beta value
-       is then defined as square root of the sum over sample points
-       of the absolute value of delta_i minus delta_i, difference squared.
-       That is, the root mean square of the difference, abs(delta_i) minus
-       delta_i.
+  Given a scalar value beta and local signed element volume alpha_i,
+  define delta_i to be alpha_i minus beta.  The Untangle beta value
+  is then defined as square root of the sum over sample points
+  of the absolute value of delta_i minus delta_i, difference squared.
+  That is, the root mean square of the difference, abs(delta_i) minus
+  delta_i.
 
-       The constructor defaults to RMS AveragingMethod and
-       ELEMENT_VERTICES evaluationMode.  The default beta value is
-       .05.
-     */
+  The constructor defaults to RMS AveragingMethod and
+  ELEMENT_VERTICES evaluationMode.  The default beta value is
+  .05.
+*/
 
-   class UntangleBetaQualityMetric : public ElementQM, public AveragingQM
-   {
-   public:
+class UntangleBetaQualityMetric : public ElementQM, public AveragingQM
+{
+  public:
+    MESQUITE_EXPORT UntangleBetaQualityMetric( double bet = 0.05 );
 
-     MESQUITE_EXPORT UntangleBetaQualityMetric(double bet=0.05);
+    // virtual destructor ensures use of polymorphism during destruction
+    MESQUITE_EXPORT virtual ~UntangleBetaQualityMetric() {}
 
-       // virtual destructor ensures use of polymorphism during destruction
-     MESQUITE_EXPORT virtual ~UntangleBetaQualityMetric()
-        {}
+    /*!Function to allow users to set the beta value after the
+      metric has already been created. */
+    MESQUITE_EXPORT void set_beta( double beta_in )
+    {
+        mBeta = beta_in;
+    }
+    /*!Function to allow the user to check the value of beta.*/
+    MESQUITE_EXPORT double get_beta()
+    {
+        return mBeta;
+    }
 
-       /*!Function to allow users to set the beta value after the
-         metric has already been created. */
-     MESQUITE_EXPORT void set_beta(double beta_in)
-       {mBeta = beta_in;}
-       /*!Function to allow the user to check the value of beta.*/
-     MESQUITE_EXPORT double get_beta()
-       {return mBeta;}
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-     MESQUITE_EXPORT virtual
-     std::string get_name() const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
-     MESQUITE_EXPORT virtual
-     int get_negate_flag() const;
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-     MESQUITE_EXPORT virtual
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
+  private:
+    double mBeta;
+};
 
-   private:
-     double mBeta;
-   };
+}  // namespace MBMesquite
 
-} //namespace
-
-
-#endif // UntangleBetaQualityMetric_hpp
-
-
+#endif  // UntangleBetaQualityMetric_hpp

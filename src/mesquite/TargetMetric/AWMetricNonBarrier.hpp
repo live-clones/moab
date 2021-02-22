@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWMetricNonBarrier.hpp
  *  \brief
  *  \author Boyd Tidwell
@@ -37,63 +36,58 @@
 #include "AWMetric.hpp"
 #include <string>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
-template <unsigned R, unsigned C> class MsqMatrix;
+template < unsigned R, unsigned C >
+class MsqMatrix;
 
 /**\brief The parent class for all AWMetricNonBarrier sub-classes
  *
  */
 class AWMetricNonBarrier : public AWMetric
 {
-public:
-  MESQUITE_EXPORT virtual
-  ~AWMetricNonBarrier();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetricNonBarrier();
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const {return "AWMetricNonBarrier";}
+    MESQUITE_EXPORT virtual std::string get_name() const
+    {
+        return "AWMetricNonBarrier";
+    }
 
-  static inline bool invalid_determinant( double d )
-    { return d < 1e-12; }
+    static inline bool invalid_determinant( double d )
+    {
+        return d < 1e-12;
+    }
 };
 
 class AWMetricNonBarrier2D : public AWMetricNonBarrier
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~AWMetricNonBarrier2D();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetricNonBarrier2D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
      * This method always returns an error for 2D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& A,
-                 const MsqMatrix<3,3>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+                                           MsqError& err );
 };
 
 class AWMetricNonBarrier3D : public AWMetricNonBarrier
 {
-public:
-
-  MESQUITE_EXPORT virtual
-  ~AWMetricNonBarrier3D();
+  public:
+    MESQUITE_EXPORT virtual ~AWMetricNonBarrier3D();
 
     /**\brief Evaluate \f$\mu(A,W)\f$
      *
      * This method always returns an error for 3D-only metrics
      */
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& A,
-                 const MsqMatrix<2,2>& W,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+                                           MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

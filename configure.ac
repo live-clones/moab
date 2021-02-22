@@ -1,7 +1,7 @@
 ################################################################################
 #                           Standard Stuff
 ################################################################################
-AC_INIT([MOAB],[5.1.1],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
+AC_INIT([MOAB],[5.2.1],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
 AC_CONFIG_SRCDIR([moab.make.in])
 AC_CONFIG_SRCDIR([config/MOABConfig.cmake.in])
 AC_CONFIG_SRCDIR([examples/makefile.config.in])
@@ -130,6 +130,11 @@ if test "xyes" = "x$ENABLE_FORTRAN" && test "x" != "x$FC"; then
   ])
 fi
 
+
+# Check how to add std-c++0x flag enabled
+# VSM: This is a hard requirement from 5.1.1+
+AX_CXX_COMPILE_STDCXX_0X
+
 ################################################################################
 #                           Basic Portability Stuff
 ################################################################################
@@ -224,6 +229,8 @@ if (test "x$enable_blaslapack" != "xno"); then
   AX_LAPACK
   LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS"
 fi
+
+AC_SUBST(enable_blaslapack)
 
 ################################################################################
 #                                 pymoab
@@ -518,6 +525,12 @@ else
   VERSION_STRING="AC_PACKAGE_STRING (Beta)"
 fi
 AC_DEFINE_UNQUOTED(VERSION_STRING,"${VERSION_STRING}",[MOAB Version String])
+
+# reverse engineer the parameters for libtool's version-info option to accomplish
+# the .so naming we desire based on the version number
+LIBTOOL_CURRENT=`expr $VERSION_MAJOR + $VERSION_PATCH`
+LIBTOOL_VERSION="$LIBTOOL_CURRENT:$VERSION_MINOR:$VERSION_PATCH"
+AC_SUBST(LIBTOOL_VERSION)
 
 ################################################################################
 #                Create libtool script
@@ -934,9 +947,9 @@ AC_ARG_WITH( [vtk-lib-suffix],
                esac],[VTK_LIB_SUFFIX=] )
 
 # Provide downloadable option for TempestRemap library
-# Supported TempestRemap versions: 2.0.3
+# Supported TempestRemap versions: 2.0.5, 2.0.3, 2.0.2
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.0.3],[no])
+AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.0.5],[no])
 
 # Configuration for TempestRemap library
 AC_ARG_WITH([tempestremap],
@@ -982,12 +995,15 @@ if (test "x$WITH_TEMPEST" != "xno" && test "x$WITH_TEMPEST" != "x"); then
     AC_DEFINE([HAVE_TEMPESTREMAP],[1],[Enable use of TempestRemap library API for computing intersection and remapping for Climate problems])
     HAVE_TEMPEST=yes
 
-    # We also need std-c++11 enabled
-    AX_CXX_COMPILE_STDCXX_0X
+    TEMPESTREMAP_DIR=$WITH_TEMPEST
+    AC_SUBST(TEMPESTREMAP_DIR)
+
   fi
 fi
-AM_CONDITIONAL( HAVE_TEMPESTREMAP, [test "x$HAVE_TEMPEST" = "xyes"] )
 
+enabletempestremap=$HAVE_TEMPEST
+AM_CONDITIONAL( HAVE_TEMPESTREMAP, [test "x$HAVE_TEMPEST" = "xyes"] )
+AC_SUBST(enabletempestremap)
 ################################################################################
 #                           Zoltan - Part 2 of 2
 ################################################################################
@@ -1524,10 +1540,30 @@ if  (test "x$WITH_VTK" != "xno" && test "x$WITH_VTK" != "x"); then
   AC_SUBST(VTK_INC_DIR)
 fi
 
+###############################################################################
+#                       Download Auxilliary Files locally
+###############################################################################
+AC_ARG_DOWNLOAD(extmeshfiles,
+                [AS_HELP_STRING([--download-extmeshfiles],[Download and locally store the external mesh files (URL:http://ftp.mcs.anl.gov/pub/fathom/MeshFiles)])],
+  [case "x${downloadval}" in
+    xno)   download_ext_meshfiles=no ;;
+    *)     download_ext_meshfiles=yes  ;;
+  esac],
+  [download_ext_meshfiles=no])
+
+if (test "x$download_ext_meshfiles" != "xno"); then
+  DOWNLOAD_EXTERNAL_DATA([ne4pg2], [e3sm/ne4pg2_o240], 
+                        [[AtmPhys_pg2.h5m], [land_p8.h5m], [ne4pg2_p8.h5m]])
+  DOWNLOAD_EXTERNAL_DATA([ne30pg2], [e3sm/ne30pg2_r05_oECv3_ICG], 
+                        [[AtmPhys_01.h5m], [domain_clean_p16.h5m], [outCS30_pg2_p8.h5m], [wholeMPAS.h5m]])
+fi
+AM_CONDITIONAL([HAVE_EXTMESHES],[test "$download_ext_meshfiles" = "yes"])
+
 ################################################################################
 #                           Output Files
 ################################################################################
-rm -r -f a.out
+find . -name "a.out" -type f -delete
+#rm -r -f a.out
 
 # --------------------------------------------------------------
 # Print configuration info to the header file
@@ -1723,8 +1759,8 @@ fi
 # echo "Other details"
 # echo "Static: $enable_static"
 # echo "Shared: $enable_shared"
-# echo "BLAS: $enableblas"
-# echo "LAPACK: $enablelapack"
+# echo "BLAS: $enable_blaslapack"
+# echo "LAPACK: $enable_blaslapack"
 # echo "Zoltan: $enablezoltan"
 # echo "Zlib: $enablezlib"
 # echo "SZip: $enableszip"

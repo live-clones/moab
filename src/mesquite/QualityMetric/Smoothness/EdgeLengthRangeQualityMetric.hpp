@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file EdgeLengthRangeQualityMetric.hpp
 
@@ -33,7 +34,6 @@ Header file for the MBMesquite::EdgeLengthRangeQualityMetric class
   \author Michael Brewer
   \date   2002-06-13
  */
-
 
 #ifndef EdgeLengthRangeQualityMetric_hpp
 #define EdgeLengthRangeQualityMetric_hpp
@@ -44,24 +44,23 @@ Header file for the MBMesquite::EdgeLengthRangeQualityMetric class
 
 namespace MBMesquite
 {
-     /*! \class EdgeLengthRangeQualityMetric
-       \brief Computes the edge length range metric for a given vertex.
+/*! \class EdgeLengthRangeQualityMetric
+  \brief Computes the edge length range metric for a given vertex.
 
-        EdgeLengthRangeQualityMetric is a vertex based metric which computes
-        the lengths of the edges connected to a given vertex and then
-        uses those values to form a metric.  The metric is created using
-        two doubles A and B.  The value of the metric is zero (ideal) if
-        the edge lengths are in the range [A,B].  Otherwise, the
-        metric value is some positive number.  For a given vertex,
-        v_i, with connected edges of lengths l_j for j=1...k, the metric
-        value is the average (where the default average type is SUM) of
-        u_j = ( | l_j - A | - (l_j - A) )^2 + ( | B - l_j | - (B - l_j) )^2.
-     */
-  class EdgeLengthRangeQualityMetric : public VertexQM, public AveragingQM
-  {
-   public:
-
-    EdgeLengthRangeQualityMetric(double low_a, double high_a);
+   EdgeLengthRangeQualityMetric is a vertex based metric which computes
+   the lengths of the edges connected to a given vertex and then
+   uses those values to form a metric.  The metric is created using
+   two doubles A and B.  The value of the metric is zero (ideal) if
+   the edge lengths are in the range [A,B].  Otherwise, the
+   metric value is some positive number.  For a given vertex,
+   v_i, with connected edges of lengths l_j for j=1...k, the metric
+   value is the average (where the default average type is SUM) of
+   u_j = ( | l_j - A | - (l_j - A) )^2 + ( | B - l_j | - (B - l_j) )^2.
+*/
+class EdgeLengthRangeQualityMetric : public VertexQM, public AveragingQM
+{
+  public:
+    EdgeLengthRangeQualityMetric( double low_a, double high_a );
 
     virtual ~EdgeLengthRangeQualityMetric();
 
@@ -69,36 +68,18 @@ namespace MBMesquite
 
     virtual int get_negate_flag() const;
 
-    virtual
-    bool evaluate( PatchData& pd,
-                   size_t vertex,
-                   double& value,
-                   MsqError& err );
+    virtual bool evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err );
 
-    virtual
-    bool evaluate_with_indices( PatchData& pd,
-                   size_t vertex,
-                   double& value,
-                   std::vector<size_t>& indices,
-                   MsqError& err );
+    virtual bool evaluate_with_indices( PatchData& pd, size_t vertex, double& value, std::vector< size_t >& indices,
+                                        MsqError& err );
 
-   private:
-
-    bool evaluate_common( PatchData& pd,
-                          size_t vertex,
-                          double& value,
-                          std::vector<size_t>& vertices,
-                          MsqError& err );
+  private:
+    bool evaluate_common( PatchData& pd, size_t vertex, double& value, std::vector< size_t >& vertices, MsqError& err );
 
     double highVal;
     double lowVal;
+};
 
-  };
+}  // namespace MBMesquite
 
-
-} //namespace
-
-
-#endif // EdgeLengthRangeQualityMetric_hpp
-
-
+#endif  // EdgeLengthRangeQualityMetric_hpp

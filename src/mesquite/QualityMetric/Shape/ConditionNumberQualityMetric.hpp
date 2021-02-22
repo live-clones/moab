@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file ConditionNumberQualityMetric.hpp
 
@@ -34,53 +35,40 @@ Header file for the MBMesquite::ConditionNumberQualityMetric class
   \date   2002-06-19
  */
 
-
 #ifndef ConditionNumberQualityMetric_hpp
 #define ConditionNumberQualityMetric_hpp
-
 
 #include "Mesquite.hpp"
 #include "ElementQM.hpp"
 #include "AveragingQM.hpp"
 
-
 namespace MBMesquite
 {
-     /*! \class ConditionNumberQualityMetric
-       \brief Computes the condition number of given element.
+/*! \class ConditionNumberQualityMetric
+  \brief Computes the condition number of given element.
 
-       The metric does not use the sample point functionality or the
-       compute_weighted_jacobian.  It evaluates the metric at
-       the element vertices, and uses the isotropic ideal element.
-       It does require a feasible region, and the metric needs
-       to be minimized.
-     */
-   class ConditionNumberQualityMetric : public ElementQM, public AveragingQM
-   {
+  The metric does not use the sample point functionality or the
+  compute_weighted_jacobian.  It evaluates the metric at
+  the element vertices, and uses the isotropic ideal element.
+  It does require a feasible region, and the metric needs
+  to be minimized.
+*/
+class ConditionNumberQualityMetric : public ElementQM, public AveragingQM
+{
   public:
-     MESQUITE_EXPORT ConditionNumberQualityMetric();
+    MESQUITE_EXPORT ConditionNumberQualityMetric();
 
-       //! virtual destructor ensures use of polymorphism during destruction
-     MESQUITE_EXPORT virtual ~ConditionNumberQualityMetric()
-        {}
+    //! virtual destructor ensures use of polymorphism during destruction
+    MESQUITE_EXPORT virtual ~ConditionNumberQualityMetric() {}
 
-     MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-      //! 1 if metric should be minimized, -1 if metric should be maximized.
-     MESQUITE_EXPORT virtual int get_negate_flag() const;
+    //! 1 if metric should be minimized, -1 if metric should be maximized.
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
-     MESQUITE_EXPORT virtual
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
-  };
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
+};
 
+}  // namespace MBMesquite
 
-
-} //namespace
-
-
-#endif // ConditionNumberQualityMetric_hpp
-
-
+#endif  // ConditionNumberQualityMetric_hpp

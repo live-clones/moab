@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file JacobianCalculator.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -40,60 +39,51 @@
 
 #include <vector>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MappingFunction2D;
 class MappingFunction3D;
 
 /**\brief Calculate Jacobian matrices given vertex coordinates and MappingFunction
-*/
+ */
 class JacobianCalculator
 {
-public:
-  /**\brief Calculate Jacobian for surface element
-   *
-   * Calculate the Jacobian matrix at a specified location in a surface element.
-   *\param mf The mapping function
-   *\param ho_bits bit mask indicating which higher-order nodes are present in the element
-   *               (zero for a linear element)
-   *\param location Logical position within element at which to evaluate Jacobian
-   *\param J_out The resulting Jacobian matrix.
-   */
-  void get_Jacobian_2D( const MappingFunction2D* mf,
-                        NodeSet ho_bits,
-                        Sample location,
-                        const Vector3D* vertex_coords,
-                        size_t num_vertex,
-                        MsqMatrix<3,2>& J_out,
-                        MsqError& err );
+  public:
+    /**\brief Calculate Jacobian for surface element
+     *
+     * Calculate the Jacobian matrix at a specified location in a surface element.
+     *\param mf The mapping function
+     *\param ho_bits bit mask indicating which higher-order nodes are present in the element
+     *               (zero for a linear element)
+     *\param location Logical position within element at which to evaluate Jacobian
+     *\param J_out The resulting Jacobian matrix.
+     */
+    void get_Jacobian_2D( const MappingFunction2D* mf, NodeSet ho_bits, Sample location, const Vector3D* vertex_coords,
+                          size_t num_vertex, MsqMatrix< 3, 2 >& J_out, MsqError& err );
 
-  /**\brief Calculate Jacobian for volume element
-   *
-   * Calculate the Jacobian matrix at a specified location in a volume element.
-   *\param mf The mapping function
-   *\param ho_bits bit mask indicating which higher-order nodes are present in the element
-   *               (zero for a linear element)
-   *\param location Logical position within element at which to evaluate Jacobian
-   *\param J_out The resulting Jacobian matrix.
-   */
-  void get_Jacobian_3D( const MappingFunction3D* mf,
-                        NodeSet ho_bits,
-                        Sample location,
-                        const Vector3D* vertex_coords,
-                        size_t num_vertex,
-                        MsqMatrix<3,3>& J_out,
-                        MsqError& err );
-private:
+    /**\brief Calculate Jacobian for volume element
+     *
+     * Calculate the Jacobian matrix at a specified location in a volume element.
+     *\param mf The mapping function
+     *\param ho_bits bit mask indicating which higher-order nodes are present in the element
+     *               (zero for a linear element)
+     *\param location Logical position within element at which to evaluate Jacobian
+     *\param J_out The resulting Jacobian matrix.
+     */
+    void get_Jacobian_3D( const MappingFunction3D* mf, NodeSet ho_bits, Sample location, const Vector3D* vertex_coords,
+                          size_t num_vertex, MsqMatrix< 3, 3 >& J_out, MsqError& err );
 
-  enum { MAX_ELEM_NODES = 27 };
-  size_t mIndices[MAX_ELEM_NODES];
-  MsqVector<3> mDerivs3D[MAX_ELEM_NODES];
-  MsqVector<2> mDerivs2D[MAX_ELEM_NODES];
+  private:
+    enum
+    {
+        MAX_ELEM_NODES = 27
+    };
+    size_t mIndices[MAX_ELEM_NODES];
+    MsqVector< 3 > mDerivs3D[MAX_ELEM_NODES];
+    MsqVector< 2 > mDerivs2D[MAX_ELEM_NODES];
 };
 
-
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

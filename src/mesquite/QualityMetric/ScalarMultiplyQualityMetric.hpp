@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file ScalarMultiplyQualityMetric.hpp
 \brief
@@ -34,7 +35,6 @@ Header file for the MBMesquite::ScalarMultiplyQualityMetric class
   \date   2004-12-21
  */
 
-
 #ifndef ScalarMultiplyQualityMetric_hpp
 #define ScalarMultiplyQualityMetric_hpp
 
@@ -43,65 +43,46 @@ Header file for the MBMesquite::ScalarMultiplyQualityMetric class
 
 namespace MBMesquite
 {
-     /*! \class ScalarMultiplyQualityMetric
-       \brief Multiplies quality metric value by a number (a double).
-     */
+/*! \class ScalarMultiplyQualityMetric
+  \brief Multiplies quality metric value by a number (a double).
+*/
 class ScalarMultiplyQualityMetric : public QualityMetric
 {
-public:
+  public:
+    ScalarMultiplyQualityMetric( QualityMetric* metric, double scale ) : mMetric( metric ), mScale( scale ) {}
 
-  ScalarMultiplyQualityMetric( QualityMetric* metric, double scale )
-    : mMetric(metric),
-      mScale( scale )
-    {}
+    ~ScalarMultiplyQualityMetric() {}
 
-  ~ScalarMultiplyQualityMetric() {}
+    MetricType get_metric_type() const
+    {
+        return mMetric->get_metric_type();
+    }
 
-  MetricType get_metric_type() const
-    { return mMetric->get_metric_type(); }
+    std::string get_name() const;
 
-  std::string get_name() const;
+    int get_negate_flag() const
+    {
+        return mMetric->get_negate_flag();
+    }
 
-  int get_negate_flag() const
-    { return mMetric->get_negate_flag(); }
+    void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only, MsqError& err );
 
-  void get_evaluations( PatchData& pd,
-                        std::vector<size_t>& handles,
-                        bool free_vertices_only,
-                        MsqError& err );
+    bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-  bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
+    bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                MsqError& err );
 
-  bool evaluate_with_indices( PatchData& pd,
-                              size_t handle,
-                              double& value,
-                              std::vector<size_t>& indices,
-                              MsqError& err );
+    bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                 std::vector< Vector3D >& gradient, MsqError& err );
 
-  bool evaluate_with_gradient( PatchData& pd,
-                               size_t handle,
-                               double& value,
-                               std::vector<size_t>& indices,
-                               std::vector<Vector3D>& gradient,
-                               MsqError& err );
+    bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian, MsqError& err );
 
-  bool evaluate_with_Hessian( PatchData& pd,
-                              size_t handle,
-                              double& value,
-                              std::vector<size_t>& indices,
-                              std::vector<Vector3D>& gradient,
-                              std::vector<Matrix3D>& Hessian,
-                              MsqError& err );
-
-private:
-
-  QualityMetric* mMetric;
-  double mScale;
+  private:
+    QualityMetric* mMetric;
+    double mScale;
 };
 
-} //namespace
+}  // namespace MBMesquite
 
-
-#endif // ScalarMultiplyQualityMetric_hpp
-
-
+#endif  // ScalarMultiplyQualityMetric_hpp

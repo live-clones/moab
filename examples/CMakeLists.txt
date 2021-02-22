@@ -86,6 +86,7 @@ endif ( MOAB_USE_MPI )
 set ( APPS_EXAMPLES
   apps/earth/ContinentsOnGlobe.cpp
   apps/earth/BoundaryContinents.cpp
+  apps/earth/addPCdata.cpp
 )
 
 include_directories(${MOAB_INCLUDE_DIRS})

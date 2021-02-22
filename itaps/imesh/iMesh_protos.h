@@ -3,12 +3,12 @@
 
 #include "moab/MOABConfig.h"
 
-#if defined(MOAB_FC_FUNC_)
+#if defined( MOAB_FC_FUNC_ )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC_
-#elif defined(MOAB_FC_FUNC)
+#elif defined( MOAB_FC_FUNC )
 #define ITAPS_FC_WRAPPER MOAB_FC_FUNC
 #else
-#define ITAPS_FC_WRAPPER(name,NAME) name
+#define ITAPS_FC_WRAPPER( name, NAME ) name
 #endif
 
 #define iMesh_getErrorType ITAPS_FC_WRAPPER( imesh_geterrortype, IMESH_GETERRORTYPE )

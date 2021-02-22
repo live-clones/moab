@@ -35,3 +35,4 @@ tstt_perf_binding_SOURCES = tstt_perf_binding.cpp
 endif
 endif
 
+DISTCLEANFILES = a.out

@@ -34,6 +34,7 @@ if ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
   ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-ignored-attributes")
   ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-variadic-macros")
   ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-deprecated-declarations")
+  ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-std=gnu++0x")
   # Need to enable or check for this only if user asks for C++11 support
   # ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-c++11-long-long")
   if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8)
@@ -42,7 +43,7 @@ if ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
   if(APPLE) # Clang / Mac OS only
     # Required on OSX to compile c++11
     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-stdlib=libc++")
-    # ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-mmacosx-version-min=10.7")
+    ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-std=c++0x")
   endif()
   # gfortran
   set (CMAKE_Fortran_FLAGS_RELEASE "-funroll-all-loops -fno-f2c -O2")
@@ -57,54 +58,66 @@ else ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
     ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd981")
     ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd279")
     ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd1418")
-    ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd383")
     ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd1572")
+    ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd383")
     ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd2259")
     FORCE_ADD_FLAGS(CMAKE_C_FLAGS "${MOAB_CXX_FLAGS}")
     FORCE_ADD_FLAGS(CMAKE_Fortran_FLAGS "${MOAB_CXX_FLAGS}")
+    ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-std=c++0x")
     # ifort (untested)
     set (CMAKE_Fortran_FLAGS_RELEASE "-f77rtl -O2")
     set (CMAKE_Fortran_FLAGS_DEBUG   "-f77rtl -O0 -g")
   else ()
-    set (CMAKE_Fortran_FLAGS_RELEASE "-O2")
-    set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
+    if(NOT WIN32)
+      set (CMAKE_Fortran_FLAGS_RELEASE "-O2")
+      set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
+    else(NOT WIN32)
+      set (CMAKE_Fortran_FLAGS_RELEASE "-O2")
+      set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
+    endif(NOT WIN32)
   endif()
 endif ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
+
 
 FORCE_ADD_FLAGS(CMAKE_CXX_FLAGS "${MOAB_CXX_FLAGS}")
 
 # Debug targets
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
 
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Og")
-  #
-  # If -Og is not available, fall back to -O0:
-  #
-  IF(NOT CMAKE_HAVE_FLAG_Og)
-    FORCE_ADD_FLAGS(CMAKE_CXX_FLAGS "-O0")
-    FORCE_ADD_FLAGS(CMAKE_C_FLAGS "-O0")
-  ENDIF()
-
-  ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS "-ggdb")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-ggdb")
-  ENABLE_IF_SUPPORTED(CMAKE_EXE_LINKER_FLAGS "-ggdb")
-  #
-  # If -ggdb is not available, fall back to -g:
-  #
-  IF(NOT CMAKE_HAVE_FLAG_ggdb)
-    ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS "-g")
-    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-g")
-    ENABLE_IF_SUPPORTED(CMAKE_EXE_LINKER_FLAGS "-g")
-  ENDIF()
-
-  IF(CMAKE_SETUP_COVERAGE)
+  if(NOT WIN32)
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Og")
     #
-    # Enable test coverage
+    # If -Og is not available, fall back to -O0:
     #
-    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fno-elide-constructors")
-    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-ftest-coverage -fprofile-arcs")
-    ENABLE_IF_SUPPORTED(CMAKE_EXE_LINKER_FLAGS "-ftest-coverage -fprofile-arcs")
-  ENDIF()
+    IF(NOT CMAKE_HAVE_FLAG_Og)
+      FORCE_ADD_FLAGS(CMAKE_CXX_FLAGS "-O0")
+      FORCE_ADD_FLAGS(CMAKE_C_FLAGS "-O0")
+    ENDIF()
+
+    ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS "-ggdb")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-ggdb")
+    ENABLE_IF_SUPPORTED(CMAKE_EXE_LINKER_FLAGS "-ggdb")
+    #
+    # If -ggdb is not available, fall back to -g:
+    #
+    IF(NOT CMAKE_HAVE_FLAG_ggdb)
+      ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS "-g")
+      ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-g")
+      ENABLE_IF_SUPPORTED(CMAKE_EXE_LINKER_FLAGS "-g")
+    ENDIF()
+
+    IF(CMAKE_SETUP_COVERAGE)
+      #
+      # Enable test coverage
+      #
+      ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fno-elide-constructors")
+      ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-ftest-coverage -fprofile-arcs")
+      ENABLE_IF_SUPPORTED(CMAKE_EXE_LINKER_FLAGS "-ftest-coverage -fprofile-arcs")
+    ENDIF()
+  else(NOT WIN32)
+    ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS "/Od /w")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "/Od /w")
+  endif(NOT WIN32)
 
 ENDIF()
 
@@ -113,15 +126,21 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   #
   # General optimization flags:
   #
-  FORCE_ADD_FLAGS(CMAKE_C_FLAGS "-O2")
-  FORCE_ADD_FLAGS(CMAKE_CXX_FLAGS "-O2")
+  if(NOT WIN32)
+    FORCE_ADD_FLAGS(CMAKE_C_FLAGS "-O2")
+    FORCE_ADD_FLAGS(CMAKE_CXX_FLAGS "-O2")
 
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-ip")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-funroll-loops")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-funroll-all-loops")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fstrict-aliasing")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-ip")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-funroll-loops")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-funroll-all-loops")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fstrict-aliasing")
 
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
+  else(NOT WIN32)
+    ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS "/O2 /w")
+    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "/O2 /w")
+  endif(NOT WIN32)
+
 ENDIF()
 
 mark_as_advanced(CMAKE_Fortran_FLAGS MOAB_CXX_FLAGS)

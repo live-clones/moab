@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file SizeAdaptShapeWrapper.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "Wrapper.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MESQUITE_EXPORT SizeAdaptShapeWrapper : public Wrapper
 {
@@ -45,14 +45,10 @@ class MESQUITE_EXPORT SizeAdaptShapeWrapper : public Wrapper
     int parallelIterations;
     double maxVtxMovement;
 
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                      ParallelMesh* pmesh,
-                      Settings* settings,
-                      QualityAssessor* qa,
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
                       MsqError& err );
 
   public:
-
     /**
      *\param max_vertex_movement  Termination optimization if no vertex is moved
      *                            by more than this distance in the previous solver
@@ -60,17 +56,13 @@ class MESQUITE_EXPORT SizeAdaptShapeWrapper : public Wrapper
      *\param max_iterations       Termination optimizaiton after this many solver
      *                            steps.
      */
-    SizeAdaptShapeWrapper( double max_vertex_movement,
-                           int max_iterations = 50,
-                           int parallel_iterations = 10 )
-                         : iterationLimit( max_iterations ),
-                           parallelIterations( parallel_iterations ),
-                           maxVtxMovement( max_vertex_movement )
-      {}
-
+    SizeAdaptShapeWrapper( double max_vertex_movement, int max_iterations = 50, int parallel_iterations = 10 )
+        : iterationLimit( max_iterations ), parallelIterations( parallel_iterations ),
+          maxVtxMovement( max_vertex_movement )
+    {
+    }
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

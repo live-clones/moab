@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TTau.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,33 +35,26 @@
 #include "Mesquite.hpp"
 #include "TMetric.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief det(T)
  *
  * Intended for use in QualityAssessment only.  If used elsewhere,
  * analytical derivatives should probably be implemented.
  */
-class TTau : public TMetric {
-public:
-  MESQUITE_EXPORT virtual
-  ~TTau();
+class TTau : public TMetric
+{
+  public:
+    MESQUITE_EXPORT virtual ~TTau();
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T,
-                 double& result,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

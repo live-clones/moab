@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file InvTransBarrier.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,41 +34,42 @@
 #include "MsqMatrix.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string InvTransBarrier::get_name() const
-  { return "InvTransBarrier"; }
+{
+    return "InvTransBarrier";
+}
 
 InvTransBarrier::~InvTransBarrier() {}
 
-bool InvTransBarrier::evaluate( const MsqMatrix<2,2>& T,
-                                double& result, MsqError& err )
+bool InvTransBarrier::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err )
 {
-  double tau = det(T);
-  if (invalid_determinant(tau)) {
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
-  MsqMatrix<2,2> Tp = transpose_adj(T);
-  Tp *= 1.0/tau;
-  bool rval = metricPtr->evaluate( Tp, result, err );
-  return !MSQ_CHKERR(err) && rval;
+    double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
+    MsqMatrix< 2, 2 > Tp = transpose_adj( T );
+    Tp *= 1.0 / tau;
+    bool rval = metricPtr->evaluate( Tp, result, err );
+    return !MSQ_CHKERR( err ) && rval;
 }
 
-bool InvTransBarrier::evaluate( const MsqMatrix<3,3>& T,
-                                double& result,
-                                MsqError& err )
+bool InvTransBarrier::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err )
 {
-  double tau = det(T);
-  if (invalid_determinant(tau)) {
-    MSQ_SETERR(err)( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
-  MsqMatrix<3,3> Tp = transpose_adj(T);
-  Tp *= 1.0/tau;
-  bool rval = metricPtr->evaluate( Tp, result, err );
-  return !MSQ_CHKERR(err) && rval;
+    double tau = det( T );
+    if( invalid_determinant( tau ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
+    MsqMatrix< 3, 3 > Tp = transpose_adj( T );
+    Tp *= 1.0 / tau;
+    bool rval = metricPtr->evaluate( Tp, result, err );
+    return !MSQ_CHKERR( err ) && rval;
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

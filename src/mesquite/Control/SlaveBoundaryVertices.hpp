@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file SlaveBoundaryVertices.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "VertexSlaver.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Utility to set slaved vs. non-slaved vertices.
  *
@@ -77,30 +77,36 @@ class MESQUITE_EXPORT SlaveBoundaryVertices : public VertexSlaver
      *             entity with an equal or smaller topological dimension)
      *             will be considered to be the boundary.
      */
-    SlaveBoundaryVertices( unsigned depth,
-                           unsigned max_boundary_domain_dimension = 4 );
+    SlaveBoundaryVertices( unsigned depth, unsigned max_boundary_domain_dimension = 4 );
 
-    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
-                                   MsqError& err );
+    virtual double loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
     virtual std::string get_name() const;
 
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-    unsigned get_num_boundary_layers() const { return elemDepth; }
-    bool boundary_is_fixed_vertices() const { return domainDoF >= 4; }
-    bool boundary_is_mesh_domain() const { return domainDoF < 4; }
-    unsigned boundary_mesh_domain_dimension() const { return domainDoF; }
+    unsigned get_num_boundary_layers() const
+    {
+        return elemDepth;
+    }
+    bool boundary_is_fixed_vertices() const
+    {
+        return domainDoF >= 4;
+    }
+    bool boundary_is_mesh_domain() const
+    {
+        return domainDoF < 4;
+    }
+    unsigned boundary_mesh_domain_dimension() const
+    {
+        return domainDoF;
+    }
 
-   private:
+  private:
     unsigned elemDepth;
     unsigned domainDoF;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file SimpleStats.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,60 +34,79 @@
 
 #include "Mesquite.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Accumulate various statistics for a list of discrete values */
 class SimpleStats
 {
-private:
-  double valueSum, valueSqrSum, valueMin, valueMax;
-  unsigned long valueCount;
+  private:
+    double valueSum, valueSqrSum, valueMin, valueMax;
+    unsigned long valueCount;
 
-public:
-  SimpleStats();
+  public:
+    SimpleStats();
 
-  /**\brief minimum value */
-  double minimum()  const { return valueMin; }
-  /**\brief maximum value */
-  double maximum()  const { return valueMax; }
-  /**\brief algebraic mean of values */
-  double average()  const { return valueSum/valueCount; }
-  /**\brief root mean squared of values */
-  double rms()      const { return sqrt(valueSqrSum/valueCount); }
-  /**\brief variance of values */
-  double variance() const { return valueSqrSum/valueCount - average()*average(); }
-  /**\brief standard deviation of values */
-  double standard_deviation() const { return sqrt(fabs(variance())); }
+    /**\brief minimum value */
+    double minimum() const
+    {
+        return valueMin;
+    }
+    /**\brief maximum value */
+    double maximum() const
+    {
+        return valueMax;
+    }
+    /**\brief algebraic mean of values */
+    double average() const
+    {
+        return valueSum / valueCount;
+    }
+    /**\brief root mean squared of values */
+    double rms() const
+    {
+        return sqrt( valueSqrSum / valueCount );
+    }
+    /**\brief variance of values */
+    double variance() const
+    {
+        return valueSqrSum / valueCount - average() * average();
+    }
+    /**\brief standard deviation of values */
+    double standard_deviation() const
+    {
+        return sqrt( fabs( variance() ) );
+    }
 
-  /**\brief incorporate another value into statistics */
-  void add_value( double value ) {
-    valueSum += value;
-    valueSqrSum += value*value;
-    if (value < valueMin)
-      valueMin = value;
-    if (value > valueMax)
-      valueMax = value;
-    ++valueCount;
-  }
+    /**\brief incorporate another value into statistics */
+    void add_value( double value )
+    {
+        valueSum += value;
+        valueSqrSum += value * value;
+        if( value < valueMin ) valueMin = value;
+        if( value > valueMax ) valueMax = value;
+        ++valueCount;
+    }
 
-  /**\brief incorporate another value into statistics */
-  void add_squared( double value_squared ) {
-    double value = sqrt(value_squared);
-    valueSum += value;
-    valueSqrSum += value_squared;
-    if (value < valueMin)
-      valueMin = value;
-    if (value > valueMax)
-      valueMax = value;
-    ++valueCount;
-  }
+    /**\brief incorporate another value into statistics */
+    void add_squared( double value_squared )
+    {
+        double value = sqrt( value_squared );
+        valueSum += value;
+        valueSqrSum += value_squared;
+        if( value < valueMin ) valueMin = value;
+        if( value > valueMax ) valueMax = value;
+        ++valueCount;
+    }
 
-  void clear();
+    void clear();
 
-  bool empty() { return 0ul == valueCount; }
+    bool empty()
+    {
+        return 0ul == valueCount;
+    }
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ElementPMeanP.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,63 +36,49 @@
 #include "PMeanPMetric.hpp"
 #include "ElementQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ElemSampleQM;
 
 class ElementPMeanP : public ElementQM, public PMeanPMetric
 {
-public:
+  public:
+    MESQUITE_EXPORT ElementPMeanP( double p, ElemSampleQM* metric );
 
-  MESQUITE_EXPORT ElementPMeanP( double p, ElemSampleQM* metric );
+    MESQUITE_EXPORT virtual ~ElementPMeanP();
 
-  MESQUITE_EXPORT virtual ~ElementPMeanP();
+    MESQUITE_EXPORT ElemSampleQM* get_quality_metric() const
+    {
+        return mMetric;
+    }
 
-  MESQUITE_EXPORT ElemSampleQM* get_quality_metric() const
-    { return mMetric; }
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-  MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
-  MESQUITE_EXPORT virtual int get_negate_flag() const;
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
+                                                         std::vector< size_t >& indices,
+                                                         std::vector< Vector3D >& gradient, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_gradient( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+                                                        std::vector< size_t >& indices,
+                                                        std::vector< Vector3D >& gradient,
+                                                        std::vector< Matrix3D >& Hessian, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_Hessian( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 std::vector<Matrix3D>& Hessian,
-                 MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+                                                                 std::vector< size_t >& indices,
+                                                                 std::vector< Vector3D >& gradient,
+                                                                 std::vector< SymMatrix3D >& Hessian_diagonal,
+                                                                 MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate_with_Hessian_diagonal( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 std::vector<SymMatrix3D>& Hessian_diagonal,
-                 MsqError& err );
-private:
-
-  ElemSampleQM* mMetric;
-  mutable std::vector<size_t> mHandles;
+  private:
+    ElemSampleQM* mMetric;
+    mutable std::vector< size_t > mHandles;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

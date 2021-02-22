@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file NodeSet.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -34,27 +33,26 @@
 #include "NodeSet.hpp"
 #include <iostream>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::ostream& operator<<( std::ostream& s, NodeSet set )
 {
-  unsigned i;
-  s << '{';
-  for (i = 0; i < NodeSet::NUM_CORNER_BITS; ++i)
-    s << (set.corner_node(i) ? '1' : '0');
-  s << ' ';
-  for (i = 0; i < NodeSet::NUM_EDGE_BITS; ++i)
-    s << (set.mid_edge_node(i) ? '1' : '0');
-  s << ' ';
-  for (i = 0; i < NodeSet::NUM_FACE_BITS; ++i)
-    s << (set.mid_face_node(i) ? '1' : '0');
-  s << ' ';
-  for (i = 0; i < NodeSet::NUM_REGION_BITS; ++i)
-    s << (set.mid_region_node(i) ? '1' : '0');
-  s << '}';
-  return s;
+    unsigned i;
+    s << '{';
+    for( i = 0; i < NodeSet::NUM_CORNER_BITS; ++i )
+        s << ( set.corner_node( i ) ? '1' : '0' );
+    s << ' ';
+    for( i = 0; i < NodeSet::NUM_EDGE_BITS; ++i )
+        s << ( set.mid_edge_node( i ) ? '1' : '0' );
+    s << ' ';
+    for( i = 0; i < NodeSet::NUM_FACE_BITS; ++i )
+        s << ( set.mid_face_node( i ) ? '1' : '0' );
+    s << ' ';
+    for( i = 0; i < NodeSet::NUM_REGION_BITS; ++i )
+        s << ( set.mid_region_node( i ) ? '1' : '0' );
+    s << '}';
+    return s;
 }
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

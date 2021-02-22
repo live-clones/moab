@@ -22,17 +22,18 @@
 
 #include <math.h>
 #if defined MOAB_HAVE_ISFINITE
-#define moab_isfinite(f) isfinite(f)
+#define moab_isfinite( f ) isfinite( f )
 #elif defined MOAB_HAVE_STDISFINITE
 #include <cmath>
-#define moab_isfinite(f) std::isfinite(f)
+#define moab_isfinite( f ) std::isfinite( f )
 #elif defined MOAB_HAVE_FINITE
-#define moab_isfinite(f) finite(f)
+#define moab_isfinite( f ) finite( f )
 #else
-#define moab_isfinite(f) (!isinf(double(f)) && !isnan(double(f)))
+#define moab_isfinite( f ) (!isinf( double(f) ) && !isnan( double(f) ))
 #endif
 
-namespace moab {
+namespace moab
+{
 
 /** \class Util
  *
@@ -40,32 +41,30 @@ namespace moab {
  */
 class Util
 {
-public:
+  public:
+    template < typename T >
+    static bool is_finite( T value );
 
-  template <typename T>
-  static bool is_finite(T value);
+    static void normal( Interface* MB, EntityHandle handle, double& x, double& y, double& z );
 
-  static void normal(Interface* MB, EntityHandle handle, double& x, double& y, double& z);
+    static void centroid( Interface* MB, EntityHandle handle, CartVect& coord );
 
-  static void centroid(Interface *MB, EntityHandle handle,CartVect &coord);
+    // static void edge_centers(Interface *MB, EntityHandle handle, std::vector<CartVect>
+    // &coords_list);
 
-  //static void edge_centers(Interface *MB, EntityHandle handle, std::vector<CartVect> &coords_list);
+    // static void face_centers(Interface *MB, EntityHandle handle, std::vector<CartVect>
+    // &coords_list);
 
-  //static void face_centers(Interface *MB, EntityHandle handle, std::vector<CartVect> &coords_list);
-
-private:
-
-  Util(){}
-
+  private:
+    Util() {}
 };
 
-template <typename T>
-inline
-bool Util::is_finite(T value)
+template < typename T >
+inline bool Util::is_finite( T value )
 {
-  return moab_isfinite(value);
+    return moab_isfinite( (double)value );
 }
 
-} // namespace moab
+}  // namespace moab
 
 #endif

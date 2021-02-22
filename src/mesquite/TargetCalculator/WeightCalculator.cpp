@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file WeightCalculator.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -33,15 +32,11 @@
 #include "Mesquite.hpp"
 #include "WeightCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
+WeightCalculator::~WeightCalculator() {}
 
-WeightCalculator::~WeightCalculator()
-{}
+void WeightCalculator::initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 
-void WeightCalculator::initialize_queue( MeshDomainAssoc* ,
-                                         const Settings* ,
-                                         MsqError&  )
-{}
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

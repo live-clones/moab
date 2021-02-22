@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file LambdaTarget.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "TargetCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Scale a target matrix by the size of another.
  *
@@ -47,45 +47,33 @@ namespace MBMesquite {
  */
 class LambdaTarget : public TargetCalculator
 {
-public:
-  /**
-   *\param lambda_source Target calculator from which to extract
-   *                     scaling factor (lambda).
-   *\param composite_source Target calcualtor from which to obtain
-   *                     a target that will be scaled by lambda.
-   */
-  LambdaTarget( TargetCalculator* lambda_source,
-                TargetCalculator* composite_source );
+  public:
+    /**
+     *\param lambda_source Target calculator from which to extract
+     *                     scaling factor (lambda).
+     *\param composite_source Target calcualtor from which to obtain
+     *                     a target that will be scaled by lambda.
+     */
+    LambdaTarget( TargetCalculator* lambda_source, TargetCalculator* composite_source );
 
-  ~LambdaTarget();
+    ~LambdaTarget();
 
-  bool get_3D_target( PatchData& pd,
-                      size_t element,
-                      Sample sample,
-                      MsqMatrix<3,3>& W_out,
-                      MsqError& err );
+    bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err );
 
-  bool get_2D_target( PatchData& pd,
-                      size_t element,
-                      Sample sample,
-                      MsqMatrix<2,2>& W_out,
-                      MsqError& err );
+    bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out, MsqError& err );
 
-  bool get_surface_target( PatchData& pd,
-                      size_t element,
-                      Sample sample,
-                      MsqMatrix<3,2>& W_out,
-                      MsqError& err );
+    bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out, MsqError& err );
 
-  bool have_surface_orient() const
-    { return compositeSource->have_surface_orient(); }
+    bool have_surface_orient() const
+    {
+        return compositeSource->have_surface_orient();
+    }
 
-private:
-  TargetCalculator* lambdaSource;
-  TargetCalculator* compositeSource;
+  private:
+    TargetCalculator* lambdaSource;
+    TargetCalculator* compositeSource;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

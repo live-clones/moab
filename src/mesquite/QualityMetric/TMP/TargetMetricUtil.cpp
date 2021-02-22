@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TargetMetricUtil.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,41 +36,42 @@
 #include "ElementQM.hpp"
 #include "ElemSampleQM.hpp"
 
-namespace MBMesquite {
-
-void surface_to_2d( const MsqMatrix<3,2>& A,
-                    const MsqMatrix<3,2>& W,
-                    MsqMatrix<2,2>& W_22,
-                    MsqMatrix<3,2>& RZ )
+namespace MBMesquite
 {
-  MsqMatrix<3,1> W1 = W.column(0);
-  MsqMatrix<3,1> W2 = W.column(1);
-  MsqMatrix<3,1> nw = W1 * W2;
-  nw *= 1.0/length(nw);
 
-  MsqMatrix<3,1> z[2];
-  z[0] = W1 * (1.0 / length( W1 ));
-  z[1] = nw * z[0];
-  MsqMatrix<3,2> Z(z);
+void surface_to_2d( const MsqMatrix< 3, 2 >& A, const MsqMatrix< 3, 2 >& W, MsqMatrix< 2, 2 >& W_22,
+                    MsqMatrix< 3, 2 >& RZ )
+{
+    MsqMatrix< 3, 1 > W1 = W.column( 0 );
+    MsqMatrix< 3, 1 > W2 = W.column( 1 );
+    MsqMatrix< 3, 1 > nw = W1 * W2;
+    nw *= 1.0 / length( nw );
 
-  MsqMatrix<3,1> np = A.column(0) * A.column(1);
-  np *= 1.0 / length(np);
-  double dot = np % nw;
-  MsqMatrix<3,1> nr = (dot >= 0.0) ? nw : -nw;
-  MsqMatrix<3,1> v = nr * np;
-  double vlen = length(v);
-  if (vlen < DBL_EPSILON) {
-    RZ = Z; // R = I
-  }
-  else {
-    v *= 1.0 / vlen;
-    MsqMatrix<3,1> r1[3] = { v, np, v * np };
-    MsqMatrix<3,1> r2[3] = { v, nr, v * nr };
-    MsqMatrix<3,3> R1( r1 ), R2( r2 );
-    RZ = R1 * transpose(R2) * Z;
-  }
+    MsqMatrix< 3, 1 > z[2];
+    z[0] = W1 * ( 1.0 / length( W1 ) );
+    z[1] = nw * z[0];
+    MsqMatrix< 3, 2 > Z( z );
 
-  W_22 = transpose(Z) * W;
+    MsqMatrix< 3, 1 > np = A.column( 0 ) * A.column( 1 );
+    np *= 1.0 / length( np );
+    double dot           = np % nw;
+    MsqMatrix< 3, 1 > nr = ( dot >= 0.0 ) ? nw : -nw;
+    MsqMatrix< 3, 1 > v  = nr * np;
+    double vlen          = length( v );
+    if( vlen < DBL_EPSILON )
+    {
+        RZ = Z;  // R = I
+    }
+    else
+    {
+        v *= 1.0 / vlen;
+        MsqMatrix< 3, 1 > r1[3] = { v, np, v * np };
+        MsqMatrix< 3, 1 > r2[3] = { v, nr, v * nr };
+        MsqMatrix< 3, 3 > R1( r1 ), R2( r2 );
+        RZ = R1 * transpose( R2 ) * Z;
+    }
+
+    W_22 = transpose( Z ) * W;
 }
 /*
 void surface_to_2d( const MsqMatrix<3,2>& App,
@@ -110,48 +110,36 @@ void surface_to_2d( const MsqMatrix<3,2>& App,
 }
 */
 
-static inline void append_elem_samples( PatchData& pd,
-                                        size_t e,
-                                        std::vector<size_t>& handles )
+static inline void append_elem_samples( PatchData& pd, size_t e, std::vector< size_t >& handles )
 {
-  NodeSet samples = pd.get_samples( e );
-  EntityTopology type = pd.element_by_index( e ).get_element_type();
-  size_t curr_size = handles.size();
-  handles.resize( curr_size + samples.num_nodes() );
-  std::vector<size_t>::iterator i = handles.begin() + curr_size;
-  for (unsigned j = 0; j < TopologyInfo::corners(type); ++j)
-    if (samples.corner_node(j))
-      *(i++) = ElemSampleQM::handle( Sample(0,j), e );
-  for (unsigned j = 0; j < TopologyInfo::edges(type); ++j)
-    if (samples.mid_edge_node(j))
-      *(i++) = ElemSampleQM::handle( Sample(1,j), e );
-  for (unsigned j = 0; j < TopologyInfo::faces(type); ++j)
-    if (samples.mid_face_node(j))
-      *(i++) = ElemSampleQM::handle( Sample(2,j), e );
-  if (TopologyInfo::dimension(type) == 3 && samples.mid_region_node())
-    *(i++) = ElemSampleQM::handle( Sample(3,0), e );
+    NodeSet samples     = pd.get_samples( e );
+    EntityTopology type = pd.element_by_index( e ).get_element_type();
+    size_t curr_size    = handles.size();
+    handles.resize( curr_size + samples.num_nodes() );
+    std::vector< size_t >::iterator i = handles.begin() + curr_size;
+    for( unsigned j = 0; j < TopologyInfo::corners( type ); ++j )
+        if( samples.corner_node( j ) ) *( i++ ) = ElemSampleQM::handle( Sample( 0, j ), e );
+    for( unsigned j = 0; j < TopologyInfo::edges( type ); ++j )
+        if( samples.mid_edge_node( j ) ) *( i++ ) = ElemSampleQM::handle( Sample( 1, j ), e );
+    for( unsigned j = 0; j < TopologyInfo::faces( type ); ++j )
+        if( samples.mid_face_node( j ) ) *( i++ ) = ElemSampleQM::handle( Sample( 2, j ), e );
+    if( TopologyInfo::dimension( type ) == 3 && samples.mid_region_node() )
+        *( i++ ) = ElemSampleQM::handle( Sample( 3, 0 ), e );
 }
 
-
-void get_sample_pt_evaluations( PatchData& pd,
-                                std::vector<size_t>& handles,
-                                bool free,
-                                MsqError& err )
+void get_sample_pt_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free, MsqError& err )
 {
-  handles.clear();
-  std::vector<size_t> elems;
-  ElementQM::get_element_evaluations( pd, elems, free, err ); MSQ_ERRRTN(err);
-  for (std::vector<size_t>::iterator i = elems.begin(); i != elems.end(); ++i)
-    append_elem_samples( pd, *i, handles );
+    handles.clear();
+    std::vector< size_t > elems;
+    ElementQM::get_element_evaluations( pd, elems, free, err );MSQ_ERRRTN( err );
+    for( std::vector< size_t >::iterator i = elems.begin(); i != elems.end(); ++i )
+        append_elem_samples( pd, *i, handles );
 }
 
-void get_elem_sample_points( PatchData& pd,
-                             size_t elem,
-                             std::vector<size_t>& handles,
-                             MsqError& /*err*/ )
+void get_elem_sample_points( PatchData& pd, size_t elem, std::vector< size_t >& handles, MsqError& /*err*/ )
 {
-  handles.clear();
-  append_elem_samples( pd, elem, handles );
+    handles.clear();
+    append_elem_samples( pd, elem, handles );
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

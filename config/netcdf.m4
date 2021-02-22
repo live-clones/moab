@@ -49,9 +49,9 @@ AC_DEFUN([FATHOM_CHECK_NETCDF_LIMITS],[
 #######################################################################################
 AC_DEFUN([FATHOM_CHECK_NETCDF],[
 
-  # Supported NetCDF versions: 4.3.3, 4.3.2, 4.2.1
+  # Supported NetCDF versions: 4.4.1.1, 4.5.0, 4.6.3, 4.7.3
   # Arguments: 1) Default Version Number, 2) Download by default ?
-  AUSCM_CONFIGURE_DOWNLOAD_NETCDF([4.3.3],[no])
+  AUSCM_CONFIGURE_DOWNLOAD_NETCDF([4.6.3],[no])
 
 AC_MSG_CHECKING([if NetCDF support is enabled])
 AC_ARG_WITH(netcdf, 
@@ -124,7 +124,7 @@ if (test "x" != "x$NETCDF_DIR" && test "xno" != "x$NETCDF_DIR"); then
       # If we haven't already looked for HDF5 libraries, again now incase
       # they're in the NetCDF lib directory.
       FATHOM_DETECT_HDF5_LIBS
-      LDFLAGS="$LDFLAGS $HDF5_LDFLAGS"
+      LDFLAGS="$HDF5_LDFLAGS $LDFLAGS "
       AC_CHECK_LIB( [netcdf], [nc_create], [NETCDF_LIBS="-lnetcdf $PNETCDF_LIBS $HDF5_LIBS"; enablenetcdf=yes;], [
         # Try one more time with HDF5 and libcurl
         unset ac_cv_lib_netcdf
@@ -147,55 +147,14 @@ if (test "x" != "x$NETCDF_DIR" && test "xno" != "x$NETCDF_DIR"); then
 
   AC_LANG_POP([C])
 
-  AC_ARG_WITH(netcdf-cxx, 
-  [AS_HELP_STRING([--with-netcdf-cxx@<:@=DIR@:>@], [Specify NetCDF C++ library to use for Climate files])
-  AS_HELP_STRING([--without-netcdf-cxx], [Disable support for NetCDF C++ interfaces])],
-  [if (test "x$withval" != "x" && test "x$withval" != "xno"); then
-    NETCDFCXX_DIR=$withval
-    DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-netcdf-cxx=\"${withval}\""
-  fi], [NETCDFCXX_DIR=$NETCDFCXX_DIR])
-  if (test "x" != "x$NETCDFCXX_DIR" && test "xno" != "x$NETCDFCXX_DIR"); then
-    AC_MSG_RESULT([yes])
-  else
-    AC_MSG_RESULT([no])
-    # Reset the directory since we do not want to configure NetCDF C++
-    NETCDFCXX_DIR=""
-  fi
-
-
   if (test "x$enablenetcdf" != "xno"); then
-    # check for C++ header files
-    if (test "x$NETCDFCXX_DIR" != "x"); then # User specified explicitly a NetCDF C++ installation path
-      LDFLAGS="-L$NETCDFCXX_DIR/lib $LDFLAGS"
-      CPPFLAGS="-I$NETCDFCXX_DIR/include $CPPFLAGS"
-    fi
-    AC_LANG_PUSH([C++])
-    AC_CHECK_HEADER([netcdfcpp.h],[acx_netcdfpp_ok=yes],[acx_netcdfpp_ok=no])
-    LIBS="-lnetcdf_c++ $NETCDF_LIBS $LIBS"
-    AC_MSG_CHECKING([for netCDF C++ library])
-    AC_LINK_IFELSE([
-                  AC_LANG_PROGRAM(
-                      [[
-  @%:@include <netcdfcpp.h>
-                      ]],
-                      [[
-  NcError err_handler;
-                      ]]
-                  )],
-                  [
-                  acx_netcdfpp_ok=yes
-                  NETCDF_LIBS="-lnetcdf_c++ $NETCDF_LIBS"
-                  if (test "x$NETCDFCXX_DIR" != "x"); then
-                    NETCDF_LDFLAGS="-L$NETCDFCXX_DIR/lib $NETCDF_LDFLAGS"
-                    NETCDF_CPPFLAGS="-I$NETCDFCXX_DIR/include $NETCDF_CPPFLAGS"
-                  fi
-                  AC_MSG_RESULT([yes])
-                  ],
-                  [
-                  acx_netcdfpp_ok=no
-                  AC_MSG_RESULT([no])                ]
-              )
-    AC_LANG_POP([C++])
+    # check for parallel NetCDF C header files
+    AC_CHECK_HEADERS([netcdf_par.h], [AC_DEFINE(HAVE_NETCDFPAR,  [1], [MOAB is configured with MPI enabled NetCDF]) ], [], 
+    [#ifdef HAVE_NETCDF_H
+    #include <netcdf.h>
+    #endif
+    ])
+
   fi
   LIBS=$oldLIBS
   CPPFLAGS="$old_CPPFLAGS"

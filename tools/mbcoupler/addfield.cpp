@@ -6,11 +6,13 @@
 
 using namespace std;
 
-namespace moab {
+namespace moab
+{
 
-//make a nice picture. tweak here
-//217: x,y -> [-8, 8] /// z -> [-65, 65]
-double physField(double x, double y, double z, double factor){
+// make a nice picture. tweak here
+// 217: x,y -> [-8, 8] /// z -> [-65, 65]
+double physField( double x, double y, double z, double factor )
+{
 
     // 1/r^2 decay from {0,0,0}
     // tjt - changing to 1/r
@@ -20,134 +22,137 @@ double physField(double x, double y, double z, double factor){
   out += 1e-1; // clamp
   out = 1/out;
     */
-  double out = factor * sqrt(x*x + y*y + z*z);
+    double out = factor * sqrt( x * x + y * y + z * z );
 
-  return out;
+    return out;
 }
 
+void putElementField( Interface* mbi, const char* tagname, double factor )
+{
+    Range elems;
 
-void putElementField(Interface *mbi, const char *tagname, double factor){
-  Range elems;
+    mbi->get_entities_by_dimension( 0, 3, elems );
 
-  mbi->get_entities_by_dimension(0, 3, elems);
-
-  const double defVal = 0.;
-  Tag fieldTag;
-  ErrorCode rval = mbi->tag_get_handle(tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE|MB_TAG_CREAT, &defVal);
-  assert(MB_SUCCESS == rval);
+    const double defVal = 0.;
+    Tag fieldTag;
+    ErrorCode rval = mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
+    assert( MB_SUCCESS == rval );
 #ifdef NDEBUG
-  if (MB_SUCCESS == rval) {}; // Line to avoid compiler warning about unused variable
+    if( MB_SUCCESS == rval ) {};  // Line to avoid compiler warning about unused variable
 #endif
 
-  int numElems = elems.size();
+    int numElems = elems.size();
 
-  for(int i=0; i<numElems; i++){
-      //cout << elems[i] << endl;
-    EntityHandle elem = elems[i];
+    for( int i = 0; i < numElems; i++ )
+    {
+        // cout << elems[i] << endl;
+        EntityHandle elem = elems[i];
 
-    double xyz[3];
-    mbi->get_coords(&elem, 1, xyz);
+        double xyz[3];
+        mbi->get_coords( &elem, 1, xyz );
 
-    double fieldValue =  physField(xyz[0], xyz[1], xyz[2], factor);
+        double fieldValue = physField( xyz[0], xyz[1], xyz[2], factor );
 
-    mbi->tag_set_data(fieldTag, &elem, 1, &fieldValue);
-  }
-
+        mbi->tag_set_data( fieldTag, &elem, 1, &fieldValue );
+    }
 }
 
+void putSpectralElementField( Interface* mbi, int dim, int np, const char* tagname, double factor )
+{
+    Range elems;
 
-void putSpectralElementField(Interface *mbi, int dim, int np, const char *tagname, double factor){
-  Range elems;
+    mbi->get_entities_by_dimension( 0, dim, elems );
 
-  mbi->get_entities_by_dimension(0, dim, elems);
-
-  const int ndofperE = np*np;
-  double* defDouble = new double [ndofperE];
-  Tag fieldTag;
-  ErrorCode rval = mbi->tag_get_handle(tagname, ndofperE, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE|MB_TAG_CREAT, &defDouble);
-  std::cout << "rval = " << rval << std::endl;
-  assert(MB_SUCCESS == rval || rval == MB_ALREADY_ALLOCATED);
+    const int ndofperE = np * np;
+    double* defDouble  = new double[ndofperE];
+    Tag fieldTag;
+    ErrorCode rval =
+        mbi->tag_get_handle( tagname, ndofperE, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defDouble );
+    std::cout << "rval = " << rval << std::endl;
+    assert( MB_SUCCESS == rval || rval == MB_ALREADY_ALLOCATED );
 #ifdef NDEBUG
-  if (MB_SUCCESS == rval || rval == MB_ALREADY_ALLOCATED) {}; // Line to avoid compiler warning about unused variable
+    if( MB_SUCCESS == rval || rval == MB_ALREADY_ALLOCATED ) {
+    };  // Line to avoid compiler warning about unused variable
 #endif
 
-  int numElems = elems.size();
-  std::vector<double> tData(ndofperE,0.0);
+    int numElems = elems.size();
+    std::vector< double > tData( ndofperE, 0.0 );
 
-  for(int i=0; i<numElems; i++){
-    EntityHandle elem = elems[i];
+    for( int i = 0; i < numElems; i++ )
+    {
+        EntityHandle elem = elems[i];
 
-    double xyz[3];
-    mbi->get_coords(&elem, 1, xyz);
+        double xyz[3];
+        mbi->get_coords( &elem, 1, xyz );
 
-    double fieldValue =  physField(xyz[0], xyz[1], xyz[2], factor);
-    for (int j=0; j < ndofperE; ++j)
-      tData[j] = fieldValue; // same value evaluated at the center; could modify it to use GLL points ?
+        double fieldValue = physField( xyz[0], xyz[1], xyz[2], factor );
+        for( int j = 0; j < ndofperE; ++j )
+            tData[j] = fieldValue;  // same value evaluated at the center; could modify it to use
+                                    // GLL points ?
 
-    mbi->tag_set_data(fieldTag, &elem, 1, &tData[0]);
-  }
+        mbi->tag_set_data( fieldTag, &elem, 1, &tData[0] );
+    }
 
-   delete [] defDouble;
-  tData.clear();
-
+    delete[] defDouble;
+    tData.clear();
 }
 
+void putVertexField( Interface* mbi, const char* tagname, double factor )
+{
+    Range verts;
 
+    mbi->get_entities_by_type( 0, MBVERTEX, verts );
 
-void putVertexField(Interface *mbi, const char *tagname, double factor){
-  Range verts;
+    const double defVal = 0.;
+    Tag fieldTag;
+    mbi->tag_get_handle( tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE | MB_TAG_CREAT, &defVal );
 
-  mbi->get_entities_by_type(0, MBVERTEX, verts);
+    int numVerts = verts.size();
+    for( int i = 0; i < numVerts; i++ )
+    {
+        EntityHandle vert = verts[i];  //?
 
-  const double defVal = 0.;
-  Tag fieldTag;
-  mbi->tag_get_handle(tagname, 1, MB_TYPE_DOUBLE, fieldTag, MB_TAG_DENSE|MB_TAG_CREAT, &defVal);
+        double vertPos[3];
+        mbi->get_coords( &vert, 1, vertPos );
 
-  int numVerts = verts.size();
-  for(int i=0; i<numVerts; i++){
-    EntityHandle vert = verts[i]; //?
+        double fieldValue = physField( vertPos[0], vertPos[1], vertPos[2], factor );
 
-    double vertPos[3];
-    mbi->get_coords(&vert, 1, vertPos);
-
-    double fieldValue =  physField(vertPos[0], vertPos[1], vertPos[2], factor);
-
-    mbi->tag_set_data(fieldTag, &vert, 1, &fieldValue);
-  }
-
-
-
+        mbi->tag_set_data( fieldTag, &vert, 1, &fieldValue );
+    }
 }
 
+}  // namespace moab
 
-} // namespace moab
+// Using moab instead of imesh for dev speed
+int main( int argc, char** argv )
+{
 
-//Using moab instead of imesh for dev speed
-int main(int argc, char **argv){
+    using namespace moab;
 
-  using namespace moab;
+    Interface* mbi = new Core();
 
-  Interface *mbi = new Core();
+    if( argc < 3 )
+    {
+        cout << "Usage: " << argv[0] << " <infile> <outfile> [factor]\n"
+             << "Writes both vertex and element fields.\n";
+        return 0;
+    }
 
-  if (argc < 3){
-    cout << "Usage: " << argv[0] << " <infile> <outfile> [factor]\n"
-         << "Writes both vertex and element fields.\n";
-    return 0;
-  }
+    mbi->load_mesh( argv[1] );
 
-  mbi->load_mesh(argv[1]);
+    double factor = 1.0;
+    if( argc == 4 ) factor = atof( argv[3] );
 
-  double factor = 1.0;
-  if (argc == 4) factor = atof(argv[3]);
+    putVertexField( mbi, "vertex_field", factor );
+    putElementField( mbi, "element_field", factor );
+    // putSpectralElementField(mbi, 2, 4, "spectral_element_field", factor);
+    putSpectralElementField( mbi, 2, 4, "a2oTAG", factor );
 
-  putVertexField(mbi, "vertex_field", factor);
-  putElementField(mbi, "element_field", factor);
-  // putSpectralElementField(mbi, 2, 4, "spectral_element_field", factor);
-  putSpectralElementField(mbi, 2, 4, "a2oTAG", factor);
-
-  ErrorCode result = mbi->write_mesh(argv[2]);
-  if (MB_SUCCESS == result) cout << "wrote " << argv[2] << endl;
-  else cout << "Failed to write " << argv[2] << endl;
+    ErrorCode result = mbi->write_mesh( argv[2] );
+    if( MB_SUCCESS == result )
+        cout << "wrote " << argv[2] << endl;
+    else
+        cout << "Failed to write " << argv[2] << endl;
 
     //  vector<double> coords;
     //  mbi->get_vertex_coordinates(coords);
@@ -155,6 +160,5 @@ int main(int argc, char **argv){
     //  for (int i = 0; i < coords.size()/3; i++) xavg += coords[i];
     //  cout << xavg << endl;
 
-  return 1;
+    return 1;
 }
-

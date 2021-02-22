@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file CompositeOFScalarAdd.hpp
 
@@ -34,7 +35,6 @@ Header file for the MBMesquite:: CompositeOFScalarAdd class
   \date   2002-06-24
  */
 
-
 #ifndef CompositeOFScalarAdd_hpp
 #define CompositeOFScalarAdd_hpp
 
@@ -43,68 +43,50 @@ Header file for the MBMesquite:: CompositeOFScalarAdd class
 
 namespace MBMesquite
 {
-   /*! \class CompositeOFScalarAdd.
-       \brief Adds a scalar to a given ObjectiveFunction.
-     */
-   class MsqMeshEntity;
-   class PatchData;
-   class MsqError;
+/*! \class CompositeOFScalarAdd.
+    \brief Adds a scalar to a given ObjectiveFunction.
+  */
+class MsqMeshEntity;
+class PatchData;
+class MsqError;
 
-   class MESQUITE_EXPORT CompositeOFScalarAdd : public ObjectiveFunction
-   {
-   public:
-     CompositeOFScalarAdd(double, ObjectiveFunction*, bool delete_OF = false);
-     virtual ~CompositeOFScalarAdd();
+class MESQUITE_EXPORT CompositeOFScalarAdd : public ObjectiveFunction
+{
+  public:
+    CompositeOFScalarAdd( double, ObjectiveFunction*, bool delete_OF = false );
+    virtual ~CompositeOFScalarAdd();
 
-      //!\brief Called at start of instruction queue processing
-      //!
-      //! Do any preliminary global initialization, consistency checking,
-      //! etc.
-     virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                    const Settings* settings,
-                                    MsqError& err );
+    //!\brief Called at start of instruction queue processing
+    //!
+    //! Do any preliminary global initialization, consistency checking,
+    //! etc.
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
-     virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                       const Settings* settings,
-                                                       PatchSet* user_set,
-                                                       MsqError& err );
+    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+                                                      PatchSet* user_set, MsqError& err );
 
-     virtual bool evaluate( EvalType type,
-                            PatchData& pd,
-                            double& value_out,
-                            bool free,
-                            MsqError& err );
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
-     virtual bool evaluate_with_gradient( EvalType type,
-                                          PatchData& pd,
-                                          double& value_out,
-                                          std::vector<Vector3D>& grad_out,
-                                          MsqError& err );
+    virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                         std::vector< Vector3D >& grad_out, MsqError& err );
 
-     virtual bool evaluate_with_Hessian_diagonal( EvalType type,
-                                        PatchData& pd,
-                                        double& value_out,
-                                        std::vector<Vector3D>& grad_out,
-                                        std::vector<SymMatrix3D>& hess_diag_out,
-                                        MsqError& err );
+    virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+                                                 std::vector< Vector3D >& grad_out,
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
-     virtual bool evaluate_with_Hessian( EvalType type,
-                                         PatchData& pd,
-                                         double& value_out,
-                                         std::vector<Vector3D>& grad_out,
-                                         MsqHessian& Hessian_out,
-                                         MsqError& err );
+    virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
-     virtual ObjectiveFunction* clone() const;
+    virtual ObjectiveFunction* clone() const;
 
-     virtual void clear();
+    virtual void clear();
 
-     virtual int min_patch_layers() const;
+    virtual int min_patch_layers() const;
 
-   private:
-     double mAlpha;
-     ObjectiveFunction* objFunc;
-     bool deleteObjFunc;
-   };
-}//namespace
-#endif //  CompositeOFScalarAdd_hpp
+  private:
+    double mAlpha;
+    ObjectiveFunction* objFunc;
+    bool deleteObjFunc;
+};
+}  // namespace MBMesquite
+#endif  //  CompositeOFScalarAdd_hpp

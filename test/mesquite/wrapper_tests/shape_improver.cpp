@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file main.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -32,9 +31,9 @@
 
 #include "TestUtil.hpp"
 #ifdef TEST_OLD_WRAPPER
-#  include "ShapeImprovementWrapper.hpp"
+#include "ShapeImprovementWrapper.hpp"
 #else
-#  include "ShapeImprover.hpp"
+#include "ShapeImprover.hpp"
 #endif
 #include "QualityAssessor.hpp"
 #include "MeshImpl.hpp"
@@ -50,93 +49,97 @@ using namespace MBMesquite;
 
 std::string DEFAULT_INPUT = TestDir + "/2D/vtk/quads/tangled/inverted-hole-1.vtk";
 
-void usage( const char* argv0, bool help = false ) {
-  std::ostream& str = help ? std::cout : std::cerr;
-  str << "Usage: " << argv0 << "[input_file] [output_file]" << std::endl;
-  str << "Usage: " << argv0 << "-h" << std::endl;
-  if (help) {
-    str << "Default input file: " << DEFAULT_INPUT << std::endl
-        << "Default output file: (none)" << std::endl
-        << "Input meshes are expected to lie in the XY-plane" << std::endl
-        << "Input meshes are expected to be smoothable to ideal elements" << std::endl;
-  }
-  exit(!help);
+void usage( const char* argv0, bool help = false )
+{
+    std::ostream& str = help ? std::cout : std::cerr;
+    str << "Usage: " << argv0 << "[input_file] [output_file]" << std::endl;
+    str << "Usage: " << argv0 << "-h" << std::endl;
+    if( help )
+    {
+        str << "Default input file: " << DEFAULT_INPUT << std::endl
+            << "Default output file: (none)" << std::endl
+            << "Input meshes are expected to lie in the XY-plane" << std::endl
+            << "Input meshes are expected to be smoothable to ideal elements" << std::endl;
+    }
+    exit( !help );
 }
-
 
 int main( int argc, char* argv[] )
 {
-  const char* input_file = 0;
-  const char* output_file = 0;
-  for (int i = 1; i < argc; ++i) {
-    if (!strcmp("-h", argv[i]))
-      usage(argv[0],true);
-    else if (!input_file)
-      input_file = argv[i];
-    else if (!output_file)
-      output_file = argv[i];
-    else
-      usage(argv[0]);
-  }
-  if (!input_file)
-    input_file = DEFAULT_INPUT.c_str();
-
-  MsqError err;
-  MeshImpl mesh;
-  mesh.read_vtk( input_file, err );
-  if (err) {
-    std::cerr << err << std::endl
-              << input_file << ": failed to read file" << std::endl;
-    return 3;
-  }
-
-  PlanarDomain plane(PlanarDomain::XY);
-#ifdef TEST_OLD_WRAPPER
-  ShapeImprovementWrapper smoother;
-#else
-  ShapeImprover smoother;
-#endif
-  IdealWeightInverseMeanRatio extra_metric;
-  smoother.quality_assessor().add_quality_assessment(&extra_metric);
-  MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(&mesh, &plane);
-  smoother.run_instructions( &mesh_and_domain, err );
-  if (err) {
-    std::cerr << err << std::endl
-              << input_file << ": smoother failed" << std::endl;
-    return 2;
-  }
-
-  if (output_file) {
-    mesh.write_vtk( output_file, err );
-    if (err) {
-      std::cerr << err << std::endl
-                << output_file << ": failed to write file" << std::endl;
-      return 3;
+    const char* input_file  = 0;
+    const char* output_file = 0;
+    for( int i = 1; i < argc; ++i )
+    {
+        if( !strcmp( "-h", argv[i] ) )
+            usage( argv[0], true );
+        else if( !input_file )
+            input_file = argv[i];
+        else if( !output_file )
+            output_file = argv[i];
+        else
+            usage( argv[0] );
     }
-  }
+    if( !input_file ) input_file = DEFAULT_INPUT.c_str();
 
-  if (smoother.quality_assessor().invalid_elements()) {
-    std::cerr << "Resulting mesh contains invalid elements: untangler did not succeed" << std::endl;
-    return 4;
-  }
+    MsqError err;
+    MeshImpl mesh;
+    mesh.read_vtk( input_file, err );
+    if( err )
+    {
+        std::cerr << err << std::endl << input_file << ": failed to read file" << std::endl;
+        return 3;
+    }
 
-  const QualityAssessor::Assessor* quality =
-    smoother.quality_assessor().get_results(&extra_metric);
-  if (!quality) {
-    std::cerr << "Failed to get quality stats for IMR metric" << std::endl;
-    return 2;
-  }
+    PlanarDomain plane( PlanarDomain::XY );
+#ifdef TEST_OLD_WRAPPER
+    ShapeImprovementWrapper smoother;
+#else
+    ShapeImprover smoother;
+#endif
+    IdealWeightInverseMeanRatio extra_metric;
+    smoother.quality_assessor().add_quality_assessment( &extra_metric );
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &plane );
+    smoother.run_instructions( &mesh_and_domain, err );
+    if( err )
+    {
+        std::cerr << err << std::endl << input_file << ": smoother failed" << std::endl;
+        return 2;
+    }
 
-  if (fabs(1 - quality->get_average()) > 1e-3) {
-    std::cerr << "Average quality is not optimal." << std::endl;
-    return 4;
-  }
+    if( output_file )
+    {
+        mesh.write_vtk( output_file, err );
+        if( err )
+        {
+            std::cerr << err << std::endl << output_file << ": failed to write file" << std::endl;
+            return 3;
+        }
+    }
 
-  if (quality->get_stddev() > 1e-3) {
-    std::cerr << "Not all elements have optimal quality." << std::endl;
-    return 4;
-  }
+    if( smoother.quality_assessor().invalid_elements() )
+    {
+        std::cerr << "Resulting mesh contains invalid elements: untangler did not succeed" << std::endl;
+        return 4;
+    }
 
-  return 0;
+    const QualityAssessor::Assessor* quality = smoother.quality_assessor().get_results( &extra_metric );
+    if( !quality )
+    {
+        std::cerr << "Failed to get quality stats for IMR metric" << std::endl;
+        return 2;
+    }
+
+    if( fabs( 1 - quality->get_average() ) > 1e-3 )
+    {
+        std::cerr << "Average quality is not optimal." << std::endl;
+        return 4;
+    }
+
+    if( quality->get_stddev() > 1e-3 )
+    {
+        std::cerr << "Not all elements have optimal quality." << std::endl;
+        return 4;
+    }
+
+    return 0;
 }
-

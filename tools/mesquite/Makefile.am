@@ -22,4 +22,5 @@ msqquality_SOURCES = quality.cpp domain.hpp domain.cpp
 
 MOSTLYCLEANFILES = $(dist_man1_MANS)
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out
 

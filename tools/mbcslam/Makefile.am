@@ -25,29 +25,32 @@ if HAVE_HDF5
 endif
 endif
 
-noinst_PROGRAMS =  proj1 create_dp
-if PARALLEL
-endif
+noinst_PROGRAMS =  proj1 create_dp 
 
 check_PROGRAMS = $(TESTS)
 DEFS += -DBUILDING_MB \
         -DSRCDIR=$(srcdir) \
         -DMESHDIR=$(MESHDIR)
 
+EXTRA_DIST = IntxUtilsCSLAM.cpp \
+             IntxUtilsCSLAM.hpp
+
+noinst_DATA = IntxUtilsCSLAM.o
 case1_test_SOURCES = case1_test.cpp
 proj1_SOURCES = proj1.cpp
 create_dp_SOURCES = create_dp.cpp
 # this test is for netcdf only ; maybe convert to vtk for the test
 linear_remap_SOURCES = linear_remap.cpp
+LDADD += IntxUtilsCSLAM.o
 
 if PARALLEL
   linear_advection_SOURCES = linear_advection.cpp
   noinst_PROGRAMS += linear_advection
 if HAVE_HDF5
-  diffusion_SOURCES = diffusion.cpp
+  diffusion_SOURCES = diffusion.cpp 
   intx_imesh_SOURCES = intx_imesh.cpp update_tracer.cpp
-  intx_imesh_LDADD =  $(top_builddir)/itaps/imesh/libiMesh.la $(top_builddir)/src/libMOAB.la
-  cslam_par_test_SOURCES = cslam_par_test.cpp
+  intx_imesh_LDADD =  IntxUtilsCSLAM.o $(top_builddir)/itaps/imesh/libiMesh.la $(top_builddir)/src/libMOAB.la
+  cslam_par_test_SOURCES = cslam_par_test.cpp 
   intx_mpas_SOURCES = intx_mpas.cpp
   noinst_PROGRAMS += cslam_par_test intx_imesh intx_mpas diffusion
 if ENABLE_FORTRAN
@@ -77,4 +80,7 @@ MOSTLYCLEANFILES = intersect1.h5m \
                    spectral.vtk \
                    intx1.vtk \
                    SpanEdges0.h5m \
-                   SpanQuads0.h5m
+                   SpanQuads0.h5m \
+		   file_set2rk_0.h5m
+
+DISTCLEANFILES = a.out

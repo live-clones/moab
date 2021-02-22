@@ -32,78 +32,66 @@
 
 #include <list>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class BoundedCylinderDomain : public CylinderDomain
 {
   public:
-      /**
-       *\param radius         - Radius of the cylinder
-       *\param axis_direction - Vector defining the direction of the axis
-       *\param axis_point     - A point through which the axis passes.
-       */
-    inline BoundedCylinderDomain( double pradius,
-                           Vector3D axis_direction = Vector3D(0,0,1),
-                           Vector3D axis_point = Vector3D(0,0,0) )
-      : CylinderDomain( pradius, axis_direction, axis_point ) {}
+    /**
+     *\param radius         - Radius of the cylinder
+     *\param axis_direction - Vector defining the direction of the axis
+     *\param axis_point     - A point through which the axis passes.
+     */
+    inline BoundedCylinderDomain( double pradius, Vector3D axis_direction = Vector3D( 0, 0, 1 ),
+                                  Vector3D axis_point = Vector3D( 0, 0, 0 ) )
+        : CylinderDomain( pradius, axis_direction, axis_point )
+    {
+    }
 
-
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
-                             unsigned short* dof_array,
-                             size_t count,
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
                              MsqError& err ) const;
 
-      /**\brief define a circular curve bounding the cylinder
-       *\param distance Location on cylinder at which to create
-       *                  a circular curve, specified as the distance
-       *                  along the cylinder axis from axis_point
-       *                  specified to the constructor.
-       *\param handles  A list of handles which are to be constidered
-       *                  bound to the curve.
-       */
-    void create_curve( double distance,
-                       const std::vector<Mesh::VertexHandle>& handles );
+    /**\brief define a circular curve bounding the cylinder
+     *\param distance Location on cylinder at which to create
+     *                  a circular curve, specified as the distance
+     *                  along the cylinder axis from axis_point
+     *                  specified to the constructor.
+     *\param handles  A list of handles which are to be constidered
+     *                  bound to the curve.
+     */
+    void create_curve( double distance, const std::vector< Mesh::VertexHandle >& handles );
 
-      /**\brief define a circular curve bounding the cylinder
-       *\param distance  Location on cylinder at which to create
-       *                  a circular curve, specified as the distance
-       *                  along the cylinder axis from axis_point
-       *                  specified to the constructor.
-       *\param mesh      All vertices in this mesh within the specified
-       *                  tolerance of the curve will be considered bound
-       *                  to the curve.
-       *\param tolerance The distance tolerance to use.
-       */
-    void create_curve( double distance,
-                       Mesh* mesh,
-                       double tolerance,
-                       MsqError& err );
+    /**\brief define a circular curve bounding the cylinder
+     *\param distance  Location on cylinder at which to create
+     *                  a circular curve, specified as the distance
+     *                  along the cylinder axis from axis_point
+     *                  specified to the constructor.
+     *\param mesh      All vertices in this mesh within the specified
+     *                  tolerance of the curve will be considered bound
+     *                  to the curve.
+     *\param tolerance The distance tolerance to use.
+     */
+    void create_curve( double distance, Mesh* mesh, double tolerance, MsqError& err );
 
   protected:
+    void evaluate( double t, const Vector3D& point, Vector3D& closest, Vector3D& normal ) const;
 
-    void evaluate( double t,
-                   const Vector3D& point,
-                   Vector3D& closest,
-                   Vector3D& normal ) const;
-
-    virtual void evaluate( Mesh::VertexHandle handle,
-                           const Vector3D& point,
-                           Vector3D& closest,
+    virtual void evaluate( Mesh::VertexHandle handle, const Vector3D& point, Vector3D& closest,
                            Vector3D& normal ) const;
 
     bool find_curve( Mesh::VertexHandle handle, double& t ) const;
 
   private:
-
-    struct Curve {
-      double t;
-      std::vector<Mesh::EntityHandle> handles;
+    struct Curve
+    {
+        double t;
+        std::vector< Mesh::EntityHandle > handles;
     };
 
-    std::list<Curve> curveList;
+    std::list< Curve > curveList;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

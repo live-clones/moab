@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file Sample.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -33,9 +32,12 @@
 #include "Sample.hpp"
 #include <ostream>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-std::ostream& operator <<( std::ostream& str, Sample s )
-  { return str << s.dimension << '-' << s.number; }
+std::ostream& operator<<( std::ostream& str, Sample s )
+{
+    return str << s.dimension << '-' << s.number;
+}
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

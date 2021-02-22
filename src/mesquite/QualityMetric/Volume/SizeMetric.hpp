@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file SizeMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "ElementQM.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Element size (area or volume)
  *
@@ -45,20 +45,16 @@ namespace MBMesquite {
  */
 class SizeMetric : public ElementQM
 {
-public:
-     MESQUITE_EXPORT virtual ~SizeMetric();
+  public:
+    MESQUITE_EXPORT virtual ~SizeMetric();
 
-     MESQUITE_EXPORT virtual std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-     MESQUITE_EXPORT virtual int get_negate_flag() const;
+    MESQUITE_EXPORT virtual int get_negate_flag() const;
 
-     MESQUITE_EXPORT virtual
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

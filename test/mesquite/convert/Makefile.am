@@ -15,3 +15,4 @@ vtk_to_exo_SOURCES = vtk_to_exo.cpp
 exo_to_vtk_DEPENDENCIES = $(LDADD)
 vtk_to_exo_DEPENDENCIES = $(LDADD)
 EXTRA_DIST = CMakeLists.txt
+DISTCLEANFILES = a.out

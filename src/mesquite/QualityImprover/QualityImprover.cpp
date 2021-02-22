@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -50,33 +51,31 @@ Implements a couple of default virtual functions of the virtual class
 #include "QualityImprover.hpp"
 #include "MsqError.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
-    /*! The default constructor initialises a few member variables
-        to default values.
-        This can be reused by concrete class constructor. */
+/*! The default constructor initialises a few member variables
+    to default values.
+    This can be reused by concrete class constructor. */
 QualityImprover::QualityImprover()
 {
-  defaultOuterCriterion = new TerminationCriterion;
-  defaultInnerCriterion = new TerminationCriterion;
-  defaultOuterCriterion->add_iteration_limit( 1 );
-  outerTerminationCriterion = defaultOuterCriterion;
-  innerTerminationCriterion = defaultInnerCriterion;
+    defaultOuterCriterion = new TerminationCriterion;
+    defaultInnerCriterion = new TerminationCriterion;
+    defaultOuterCriterion->add_iteration_limit( 1 );
+    outerTerminationCriterion = defaultOuterCriterion;
+    innerTerminationCriterion = defaultInnerCriterion;
 }
 
 QualityImprover::~QualityImprover()
 {
-	delete defaultOuterCriterion;
-	delete defaultInnerCriterion;
+    delete defaultOuterCriterion;
+    delete defaultInnerCriterion;
 }
 
-void QualityImprover::initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                        const Settings* settings,
-                                        MsqError& err )
+void QualityImprover::initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err )
 {
-  innerTerminationCriterion->initialize_queue( mesh_and_domain, settings, err ); MSQ_ERRRTN(err);
-  outerTerminationCriterion->initialize_queue( mesh_and_domain, settings, err ); MSQ_ERRRTN(err);
+    innerTerminationCriterion->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
+    outerTerminationCriterion->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-} // namespace MBMesquite
-
+}  // namespace MBMesquite

@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -52,7 +53,6 @@ describe main.cpp here
 // algorythms
 #include "LaplaceWrapper.hpp"
 
-
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -60,31 +60,30 @@ using std::endl;
 
 using namespace MBMesquite;
 
-
 int main()
 {
-  MBMesquite::MeshImpl mesh;
-  MsqPrintError err(cout);
-  std::string file_name = TestDir + "/2D/vtk/quads/untangled/square_quad_2.vtk";
-  mesh.read_vtk(file_name.c_str(), err);
-  if (err) return 1;
+    MBMesquite::MeshImpl mesh;
+    MsqPrintError err( cout );
+    std::string file_name = TestDir + "/2D/vtk/quads/untangled/square_quad_2.vtk";
+    mesh.read_vtk( file_name.c_str(), err );
+    if( err ) return 1;
 
-     //create geometry: plane z=0, normal (0,0,1)
-  Vector3D pnt(0,0,5);
-  Vector3D s_norm(0,0,1);
-  MBMesquite::PlanarDomain msq_geom(s_norm, pnt);
+    // create geometry: plane z=0, normal (0,0,1)
+    Vector3D pnt( 0, 0, 5 );
+    Vector3D s_norm( 0, 0, 1 );
+    MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
     // creates an intruction queue
-  LaplaceWrapper laplacian_smoother;
+    LaplaceWrapper laplacian_smoother;
 
-  mesh.write_vtk("original_mesh.vtk", err);
-  if (err) return 1;
+    mesh.write_vtk( "original_mesh.vtk", err );
+    if( err ) return 1;
 
     // launches optimization on mesh_set1
-  MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(&mesh, &msq_geom);
-  laplacian_smoother.run_instructions(&mesh_and_domain, err);
-  if (err) return 1;
+    MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
+    laplacian_smoother.run_instructions( &mesh_and_domain, err );
+    if( err ) return 1;
 
-  mesh.write_vtk("smoothed_mesh.vtk", err);
-  if (err) return 1;
+    mesh.write_vtk( "smoothed_mesh.vtk", err );
+    if( err ) return 1;
 }

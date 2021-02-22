@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShapeSizeB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -37,44 +36,40 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string AWShapeSizeB1::get_name() const
-  { return "AWShapeSizeB1"; }
+{
+    return "AWShapeSizeB1";
+}
 
 AWShapeSizeB1::~AWShapeSizeB1() {}
 
-bool AWShapeSizeB1::evaluate( const MsqMatrix<2,2>& A,
-                              const MsqMatrix<2,2>& W,
-                              double& result,
-                              MsqError& err )
+bool AWShapeSizeB1::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result, MsqError& err )
 {
-  const double alpha = det(A);
-  if (AWMetric::invalid_determinant( alpha ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double alpha = det( A );
+    if( AWMetric::invalid_determinant( alpha ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = sqr_Frobenius( A - 1/alpha * transpose_adj(A) * transpose(W) * W );
-  return true;
+    result = sqr_Frobenius( A - 1 / alpha * transpose_adj( A ) * transpose( W ) * W );
+    return true;
 }
 
-bool AWShapeSizeB1::evaluate( const MsqMatrix<3,3>& A,
-                              const MsqMatrix<3,3>& W,
-                              double& result,
-                              MsqError& err )
+bool AWShapeSizeB1::evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result, MsqError& err )
 {
-  const double alpha = det(A);
-  if (AWMetric::invalid_determinant( alpha ))
-  {
-    MSQ_SETERR(err)( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
-    return false;
-  }
+    const double alpha = det( A );
+    if( AWMetric::invalid_determinant( alpha ) )
+    {
+        MSQ_SETERR( err )( barrier_violated_msg_aw, MsqError::BARRIER_VIOLATED );
+        return false;
+    }
 
-  result = sqr_Frobenius( A - 1/alpha * transpose_adj(A) * transpose(W) * W );
-  return true;
+    result = sqr_Frobenius( A - 1 / alpha * transpose_adj( A ) * transpose( W ) * W );
+    return true;
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

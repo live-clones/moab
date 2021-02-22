@@ -153,6 +153,7 @@ AC_DEFUN([INITIALIZE_EXTERNAL_PACKAGES],
     MOAB_ARCH_DIR="$MOAB_SANDBOX/$MOAB_ARCH"
   fi
   MOAB_PACKAGES_DIR="$MOAB_SANDBOX/archives"
+  MOAB_EXTERNAL_MESHDIR="$MOAB_SANDBOX/MeshFiles"
 ])
 
 # AC_PROG_MKDIR_P
@@ -169,10 +170,12 @@ dnl Fetches an external package into MOAB_ARCH using:
 dnl $1 = Package Name
 dnl $2 = URL
 dnl $3 = Storage location (Archive name)
+dnl $4 = If directory, download recursively ? Default: no.
+dnl $5 = If present, do not print verbose messages
 dnl -------------------------------------------------------------
 AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
 [
-  PREFIX_PRINT(Downloading sources from URL: $2 )
+  PREFIX_PRINT(Downloading from URL: $2 )
   cdir=`dirname $3`
   if (test "x$cdir" != "x."); then
     op_dirname="$cdir"
@@ -183,21 +186,35 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
   if (test -f "$3"); then
     hashtarfile1="`$HASHPRGM $3 | cut -d ' ' -f1`"
   fi
+  recursivedownload=no
+  if (test "x$4" != "x"); then
+    recursivedownload=yes
+  fi
   filedownloaded=no
   remoteprotocol=yes
-  
+  verbosemessages=yes
+  if (test "x$5" != "x"); then
+    verbosemessages=no
+  fi
+ 
   # decipher protocol needed to download
   case $2 in
     @*) remoteprotocol=no ;;
     *)  remoteprotocol=yes ;;
   esac
   currdir="$PWD"
-  if (test -f "$3" ); then
+  if (test -f "$3" || test -d "$3"); then
     filedownloaded=yes # Perhaps from a previous run
   else
     if (test $remoteprotocol != no); then
+      ADDLN_OPTS=""
       if (test "$HAVE_WGET" != "no" ); then
-        PREFIX_PRINT([   WGET: $1 package downloading to $3 ])
+        if (test "$verbosemessages" != "no" ); then
+          PREFIX_PRINT([   WGET: $1 package downloading to $3 ])
+        fi
+        if (test "$recursivedownload" != "no"); then
+          ADDLN_OPTS="--recursive --no-parent"
+        fi
         if (test -f "$3"); then
           # Check if the file requested exists in the remote directory -- inform user if there is a network error 
           op_checkifexists="`wget --spider -O/dev/null -q $2 && echo yes || echo no`"
@@ -205,25 +222,35 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
             AC_ERROR([ --  Requested URL does not exist in remote host. Try again later. ($2)  -- ])
           fi
           #op_needdownload="`wget --spider -N -q $2 && echo yes || echo no; cd $currdir`"
-          op_downloadlog$1="`wget -q -c -N --progress=bar $2 -O $3`"
+          op_downloadlog$1="`wget $ADDLN_OPTS -q -c -N --progress=bar $2 -O $3`"
         else
           # No need to check for time-stamping
-          op_downloadlog$1="`wget -q --progress=bar $2 -O $3`"
+          op_downloadlog$1="`wget $ADDLN_OPTS -q --progress=bar $2 -O $3`"
         fi
         filedownloaded=yes
       fi
 
       if (test "$HAVE_CURL" != "no" && test "$filedownloaded" != "yes"); then
-        PREFIX_PRINT([   CURL: $1 package downloading to $3 ])
-        op_downloadlog$1="`curl -R -L -s $2 -z $3 -o $3`"
+        if (test "$verbosemessages" != "no" ); then
+          PREFIX_PRINT([   CURL: $1 package downloading to $3 ])
+        fi
+        if (test "$recursivedownload" != "no"); then
+          ADDLN_OPTS="-r"
+        fi
+        op_downloadlog$1="`curl $ADDLN_OPTS -R -L -s $2 -z $3 -o $3`"
         filedownloaded=yes
       fi
     else
       if (test "$HAVE_SCP" != "no" && test "$filedownloaded" != "yes"); then
         bnamerem="`echo $2 | cut -c 2-`"
         # op_downloadlog$1="`scp -q $bnamerem $3`"
-        PREFIX_PRINT([   SCP: $1 package downloading to $3 ])
-        op_downloadlog$1="`scp -q $2 $3`"
+        if (test "$verbosemessages" != "no" ); then
+          PREFIX_PRINT([   SCP: $1 package downloading to $3 ])
+        fi
+        if (test "$recursivedownload" != "no"); then
+          ADDLN_OPTS="-r"
+        fi
+        op_downloadlog$1="`scp $ADDLN_OPTS -q $2 $3`"
         filedownloaded=yes
       fi
     fi
@@ -232,7 +259,9 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
   if (test "$filedownloaded" != "yes"); then
     AC_ERROR([ --  The archive URL ($2) specified cannot be handled by wget, curl or scp  -- ])
   else
-    MSG_ECHO_LOG(${op_downloadlog$1})
+    if (test "$verbosemessages" != "no" ); then
+      MSG_ECHO_LOG(${op_downloadlog$1})
+    fi
   fi
 
   hashtarfile2="`$HASHPRGM $3 | cut -d ' ' -f1`"
@@ -244,6 +273,20 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
 
 ])
 
+dnl --------------------------------------------------------------------
+dnl Fetches an external data artifact into MOAB_SANDBOX directory using:
+dnl $1 = Base name identifier
+dnl $2 = Base directory and path hierarchy
+dnl $3 = List of filenames to download
+dnl --------------------------------------------------------------------
+AC_DEFUN([DOWNLOAD_EXTERNAL_DATA],
+[
+  PPREFIX="MOAB Data"
+  PREFIX_PRINT(Downloading data from MOAB FTP website: $1 )
+  AS_MKDIR_P("$MOAB_EXTERNAL_MESHDIR/$2")
+  m4_foreach([fnamevar], [$3], [DOWNLOAD_EXTERNAL_PACKAGE([$1], [http://ftp.mcs.anl.gov/pub/fathom/MeshFiles/$2/fnamevar], [$MOAB_EXTERNAL_MESHDIR/$2/fnamevar], [], [yes])])
+  #DOWNLOAD_EXTERNAL_PACKAGE([$1-$fname], [http://ftp.mcs.anl.gov/pub/fathom/MeshFiles/$2/$fname], [$MOAB_EXTERNAL_MESHDIR/$2/$fname], [], [yes])
+])
 
 dnl -------------------------------------------------------------
 dnl Fetches an external source package:
@@ -278,7 +321,7 @@ AC_DEFUN([CLONE_SOURCE_REPOSITORY],
     else
       eval "rm -rf $4" # Can't clone into an existing directory
       PREFIX_PRINT([ *      Git: $1 package downloading to $4  ])
-      op_downloadlog$1="`git clone --quiet -b $gitbranch $2 $4`"
+      op_downloadlog$1="`git clone --single-branch --quiet --branch $gitbranch $2 $4`"
       eval "cd $4 && git rev-parse HEAD > $4/HEAD_HASH && cd $currdir"
       filedownloaded=yes
       new_download=true
@@ -354,7 +397,7 @@ AC_DEFUN([CHECK_SOURCE_RECOMPILATION_HASH],
 [
   PREFIX_PRINTN([Checking whether $1 sources need compilation and installation... ])
   defaultshasum="0"
-  if (test "x$pkg_download_url" != "xmaster"); then
+  if (test "x$pkg_sourced_tarball" != "xno"); then
     # Compute the hash of the source directory - Recompile only if sources have changed
     # ac_cv_sha_moabcpp="`find $moab_src_dir -name '*.cpp' \( -exec $HASHPRGM "$PWD"/{} \; -o -print \) | $HASHPRGM | cut -d ' ' -f1`"
     # defaultshasum="`find $2 -type f -regex '.*\(hpp\|cpp\|c\|h\|f\|f90\)$' \( -exec $HASHPRGM {} \; -o -print \) | $HASHPRGM | cut -d ' ' -f1`"
@@ -374,7 +417,7 @@ AC_DEFUN([CHECK_SOURCE_RECOMPILATION_HASH],
       defaultshasum="`cat $2/HEAD_HASH`"
     fi
     AC_CACHE_VAL([ac_cv_sha_$1], [ac_cv_sha_$1="0"])
-    if (test -f "$2/HEAD_HASH2" || !$new_download); then
+    if (test -f "$2/HEAD_HASH2" || $new_download -eq false); then
       hashdiff="`diff $2/HEAD_HASH $2/HEAD_HASH2 | wc -l | xargs`"
       if (test "x$hashdiff" != "x0" || test $need_configuration); then # hashes are different
         recompile_and_install=true
@@ -463,15 +506,22 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
 
 	  MSG_ECHO_SEPARATOR
 
-    if (test "x$pkg_download_url" != "xmaster"); then
+    pkg_sourced_tarball=no
+    case "$pkg_download_url" in
+      master) pkg_repo_branch="master" ;;
+      git:*)  pkg_repo_branch="${pkg_download_url:4}" ;;
+      *) pkg_repo_branch=""; pkg_sourced_tarball=yes ;;
+    esac
+
+    if (test "x$pkg_repo_branch" != "x"); then
+      # Clone the repository
+      CLONE_SOURCE_REPOSITORY([$1], [$pkg_repo_url], [$pkg_repo_branch], [$pkg_srcdir/${pkg_repo_branch//\//_}])
+    else
       # Check if we need to download an archive file
       DOWNLOAD_EXTERNAL_PACKAGE([$1], [$pkg_download_url], [$MOAB_PACKAGES_DIR/$pkg_archive_name])
       
       # Deflate the archive file containing the sources, if needed
       DEFLATE_EXTERNAL_PACKAGE([$1], [$MOAB_PACKAGES_DIR/$pkg_archive_name], [$pkg_srcdir])
-    else
-      # Clone the repository
-      CLONE_SOURCE_REPOSITORY([$1], [$pkg_repo_url], [$pkg_repo_branch], [$pkg_srcdir/$pkg_repo_branch])
     fi
 
     # Invoke the package specific configuration and build commands
@@ -645,13 +695,15 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_HDF5],[
   # Set the default HDF5 download version
   m4_pushdef([HDF5_DOWNLOAD_VERSION],[$1])dnl
 
+  HDF5_DOWNLOAD_SRC_VERSION=$1
+
   # Invoke the download-hdf5 command
   m4_case( HDF5_DOWNLOAD_VERSION, 
-                                  [1.10.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.10.1.tar.gz], [$2] ) ],
-                                  [1.8.19], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.gz], [$2] ) ],
-                                  [1.8.15p1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.15-patch1/src/hdf5-1.8.15-patch1.tar.gz], [$2] ) ],
-                                  [1.8.12], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.12/src/hdf5-1.8.12.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8/hdf5-1.8.19/src/hdf5-1.8.19.tar.gz], [$2] ) ] 
+                                  [1.10.6], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.6/src/hdf5-1.10.6.tar.gz], [$2] ) ],
+                                  [1.10.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ],
+                                  [1.8.21], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz], [$2] ) ],
+                                  [1.8.12], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.12/src/hdf5-1.8.12.tar.gz], [$2] ) ],
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ] 
           )
 
   if (test "x$downloadhdf5" == "xyes") ; then
@@ -727,21 +779,24 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
   # configure HDF5
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77 MPIEXEC=$MPIEXEC"
+    compiler_opts="CC=$CC CXX=$CXX MPIEXEC=$MPIEXEC"
     configure_command="$hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1 $compiler_opts"
     # configure_command="$configure_command --enable-cxx --enable-unsupported"
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
     #if (test "$enable_debug" != "no"); then
     #  configure_command="$configure_command --enable-debug"
+    #  For version 1.10.x, use option
+    #      --enable-build-mode=debug
     #fi
     if (test "$enable_shared" != "no"); then
       configure_command="$configure_command --enable-shared"
     fi
-    if (test "$enablefortran" != "no"); then
-      configure_command="$configure_command --enable-fortran"
-    fi
     if (test "$enable_cxx_optimize" != "no"); then
-      configure_command="$configure_command --enable-production=yes"
+      if (test "$HDF5_DOWNLOAD_SRC_VERSION" != "1.8.12" || test "$HDF5_DOWNLOAD_SRC_VERSION" != "1.8.21"); then
+        configure_command="$configure_command --enable-build-mode=production"
+      else
+        configure_command="$configure_command --enable-production=yes"
+      fi
     fi
     if (test "$enablempi" != "no"); then
       configure_command="$configure_command --enable-parallel"
@@ -828,11 +883,12 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_NETCDF],[
   m4_pushdef([NETCDF_DOWNLOAD_VERSION],[$1])dnl
 
   # Invoke the download-netcdf command
-  m4_case( NETCDF_DOWNLOAD_VERSION, [4.4.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.4.1.tar.gz], [$2] ) ],
-                                  [4.3.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.3.1.tar.gz], [$2] ) ],
-                                  [4.3.2], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/old/netcdf-4.3.2.tar.gz], [$2] ) ],
-                                  [4.2.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/old/netcdf-4.2.1.1.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [ftp://ftp.unidata.ucar.edu/pub/netcdf/old/netcdf-4.3.2.tar.gz], [$2] ) ] )
+  m4_case( NETCDF_DOWNLOAD_VERSION, 
+                                  [4.7.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.7.3.tar.gz], [$2] ) ],
+                                  [4.6.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.6.3.tar.gz], [$2] ) ],
+                                  [4.5.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.5.0.tar.gz], [$2] ) ],
+                                  [4.4.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.4.1.1.tar.gz], [$2] ) ],
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.6.3.tar.gz], [$2] ) ] )
 
   if (test "x$downloadnetcdf" == "xyes") ; then
     # download the latest NetCDF sources, configure and install
@@ -912,7 +968,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_NETCDF],
   # configure NETCDF
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, NETCDF
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    compiler_opts="CC=$CC CXX=$CXX"
     configure_command="$netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     if (test "$enablehdf5" != "no"); then
       configure_command="$configure_command --enable-netcdf-4 LDFLAGS=\"$HDF5_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$HDF5_CPPFLAGS\" LIBS=\"$HDF5_LIBS -ldl -lm -lz\""
@@ -1535,9 +1591,10 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP],[
   tempestremap_repository_branch="master"
 
   # Invoke the download-tempestremap command
-  m4_case( TEMPESTREMAP_DOWNLOAD_VERSION, [2.0.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.3.tar.gz], [$2] ) ],
+  m4_case( TEMPESTREMAP_DOWNLOAD_VERSION, [2.0.5], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.5.tar.gz], [$2] ) ],
+                                  [2.0.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.3.tar.gz], [$2] ) ],
                                   [2.0.2], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.2.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.3.tar.gz], [$2] ) ] )
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.5.tar.gz], [$2] ) ] )
 
   if (test "x$downloadtempestremap" == "xyes") ; then
     # download the latest TempestRemap sources, configure and install

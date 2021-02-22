@@ -35,7 +35,7 @@ TESTS = pcomm_unit \
         scdtest \
         pcomm_serial \
         par_spatial_locator_test \
-        parallel_unit_tests imoab_ptest2 \
+        parallel_unit_tests \
         uber_parallel_test \
         hireconst_test_parallel \
         $(NETCDF_TESTS) \
@@ -44,10 +44,36 @@ TESTS = pcomm_unit \
 
 if HAVE_HDF5_PARALLEL
   HDF5_TESTS = parallel_hdf5_test mhdf_parallel parallel_write_test \
-         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test imoab_coupler 
+         parallel_adj parmerge_test augment_with_ghosts uref_hirec_test_parallel migrate_test \
+         ghost_thin_layers commgraph_test 
+
 if HAVE_ZOLTAN
-         HDF5_TESTS += migrate_nontrivial
-endif 
+  HDF5_TESTS += migrate_nontrivial
+endif
+
+if HAVE_TEMPESTREMAP
+AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
+migrate_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+migrate_nontrivial_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+commgraph_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+else
+migrate_test_LDADD = $(LDADD) $(FCLIBS)
+migrate_nontrivial_LDADD = $(LDADD) $(FCLIBS)
+commgraph_test_LDADD = $(LDADD) $(FCLIBS)
+endif
+
+if HAVE_TEMPESTREMAP
+  EXTRA_DIST = imoab_coupler_utils.hpp
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
+  imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+if HAVE_EXTMESHES
+  HDF5_TESTS +=  imoab_apg2_ol_coupler
+  imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+endif
+  test_mapweights_bcast_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+endif
+
 else
   HDF5_TESTS =
 endif
@@ -66,6 +92,10 @@ else
 endif
 endif
 
+if HAVE_PNETCDF
+  write_nc_par_LDADD = $(LDADD) $(PNETCDF_LIBS)
+endif
+
 if HAVE_HYPRE
   MBHYPRE_TESTS = hypre_test
 else
@@ -80,7 +110,14 @@ endif
 
 IMOAB_TESTS =
 if ENABLE_FORTRAN
-   IMOAB_TESTS += imoab_ptest
+   IMOAB_TESTS += imoab_ptest imoab_ptest2
+if HAVE_TEMPESTREMAP
+imoab_ptest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+imoab_ptest2_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+else
+imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
+imoab_ptest2_LDADD = $(LDADD) $(FCLIBS)
+endif
 endif
 
 IMESH_TESTS =
@@ -134,13 +171,17 @@ parallel_adj_SOURCES = ../adj_moab_test.cpp
 parmerge_test_SOURCES = parmerge_test.cpp
 augment_with_ghosts_SOURCES = augment_with_ghosts.cpp
 imoab_ptest_SOURCES = imoab_ptest.F
-imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
 imoab_ptest2_SOURCES = imoab_ptest2.cpp
 hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
 uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
 migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
+imoab_phatm_ocn_coupler_SOURCES = imoab_phatm_ocn_coupler.cpp
+imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
+ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
+commgraph_test_SOURCES = commgraph_test.cpp
+test_mapweights_bcast_SOURCES = test_mapweights_bcast.cpp
 
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
@@ -191,12 +232,19 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    TaskMesh_n2.1.h5m \
                    testReadGhost_n2.0.h5m \
                    testReadGhost_n2.1.h5m \
-                   whole.h5m \
+                   whole.h5m wholeF.h5m \
                    recvMesh.h5m \
                    migrate12.h5m migrate21.h5m migrate11.h5m migrate22.h5m \
                    migrate11_tag.h5m migrate21_tag.h5m migrate12_tag.h5m migrate22_tag.h5m \
                    intx_00.h5m intx_01.h5m fIntxTarget.h5m recvTarget.h5m OcnWithProj.h5m \
-                   migrate_graph.h5m migrate_geom.h5m
+                   migrate_graph.h5m migrate_geom.h5m \
+                   recvLnd.h5m LndWithProj.h5m fOcnOnCpl.h5m recvOcn.h5m outPhys.h5m wholeATM_new.h5m \
+                   outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m \
+                   fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m recvLnd2.h5m LndWithProj2.h5m \
+                   LndWithProj3.h5m  fLndOnCpl3.h5m  OcnWithProj3.h5m  fOcnOnCpl3.h5m  recvLnd3.h5m  recvOcn3.h5m \
+                   AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m \
+                   AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m \
+                   atm_ocn_map.nc file_set7rk_0.h5m file_set7rk_1.h5m
 
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -211,4 +259,6 @@ LTPPF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
    $(LIBTOOLFLAGS) --mode=compile $(F77) $(FCDEFS) \
    $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
    $(AM_FFLAGS) $(FFLAGS)
+
+DISTCLEANFILES = a.out
 

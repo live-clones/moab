@@ -16,9 +16,12 @@
 #include "moab/CartVect.hpp"
 #include <ostream>
 
-namespace moab {
+namespace moab
+{
 
 std::ostream& operator<<( std::ostream& s, const CartVect& v )
-  { return s << '[' << v[0] << ' ' << v[1] << ' ' << v[2] << ']'; }
+{
+    return s << '[' << v[0] << ' ' << v[1] << ' ' << v[2] << ']';
+}
 
-} // namespace moab
+}  // namespace moab

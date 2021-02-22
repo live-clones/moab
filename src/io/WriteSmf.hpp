@@ -13,7 +13,6 @@
  *
  */
 
-
 #ifndef WRITE_SMF_HPP
 #define WRITE_SMF_HPP
 
@@ -22,40 +21,34 @@
 #include "moab/Forward.hpp"
 #include "moab/WriterIface.hpp"
 
-namespace moab {
+namespace moab
+{
 
 class WriteUtilIface;
 
 class WriteSmf : public WriterIface
 {
 
-public:
+  public:
+    //! Constructor
+    WriteSmf( Interface* impl );
 
-   //! Constructor
-   WriteSmf(Interface *impl);
+    //! Destructor
+    virtual ~WriteSmf();
 
-   //! Destructor
-  virtual ~WriteSmf();
-
-  static WriterIface* factory( Interface* );
+    static WriterIface* factory( Interface* );
 
     //! writes out a file
-  ErrorCode write_file(const char *file_name,
-                         const bool overwrite,
-                         const FileOptions& opts,
-                         const EntityHandle *output_list,
-                         const int num_sets,
-                         const std::vector<std::string>& qa_list,
-                         const Tag* tag_list = NULL,
-                         int num_tags = 0,
-                         int export_dimension = 3);
+    ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
+                          const EntityHandle* output_list, const int num_sets,
+                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+                          int export_dimension = 3 );
 
   private:
-
     Interface* mbImpl;
     WriteUtilIface* writeTool;
 };
 
-} // namespace moab
+}  // namespace moab
 
 #endif

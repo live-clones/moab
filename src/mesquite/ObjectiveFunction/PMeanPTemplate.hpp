@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file PMeanPTemplate.hpp
  *  \brief previous name: PowerMeanP.hpp
  *  \author Jason Kraftcheck
@@ -38,7 +37,8 @@
 #include "Exponent.hpp"
 #include "Matrix3D.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief \f$\frac{1}{n}\sum_{i=1}^n\mu(s_i)^p\f$
  *
@@ -51,91 +51,71 @@ namespace MBMesquite {
 class PMeanPTemplate : public ObjectiveFunctionTemplate
 {
   public:
-
-      /**
-       *\param power   The exponent to use for the power-mean
-       *\param qm      The quality metric.
-       */
-	MESQUITE_EXPORT
-    PMeanPTemplate( double power, QualityMetric* qm = 0 )
-      : ObjectiveFunctionTemplate(qm)
+    /**
+     *\param power   The exponent to use for the power-mean
+     *\param qm      The quality metric.
+     */
+    MESQUITE_EXPORT
+    PMeanPTemplate( double power, QualityMetric* qm = 0 ) : ObjectiveFunctionTemplate( qm )
     {
-      clear();
-      set_power( power );
+        clear();
+        set_power( power );
     }
 
-      /**\brief copy constructor
-       *
-       * Define a copy constructor because the compiler-provided
-       * default one would also copy the temporary arrays, which
-       * would be a waste of time.
-       */
-	MESQUITE_EXPORT
+    /**\brief copy constructor
+     *
+     * Define a copy constructor because the compiler-provided
+     * default one would also copy the temporary arrays, which
+     * would be a waste of time.
+     */
+    MESQUITE_EXPORT
     PMeanPTemplate( const PMeanPTemplate& copy )
-      : ObjectiveFunctionTemplate( copy ),
-        mPower( copy.mPower ),
-        mPowerMinus1( copy.mPowerMinus1 ),
-        mPowerMinus2( copy.mPowerMinus2 ),
-        mCount( copy.mCount ),
-        mPowSum( copy.mPowSum ),
-        saveCount( copy.saveCount ),
-        savePowSum( copy.savePowSum )
-      {}
+        : ObjectiveFunctionTemplate( copy ), mPower( copy.mPower ), mPowerMinus1( copy.mPowerMinus1 ),
+          mPowerMinus2( copy.mPowerMinus2 ), mCount( copy.mCount ), mPowSum( copy.mPowSum ),
+          saveCount( copy.saveCount ), savePowSum( copy.savePowSum )
+    {
+    }
 
-	MESQUITE_EXPORT
-    virtual ~PMeanPTemplate()
-      {}
+    MESQUITE_EXPORT
+    virtual ~PMeanPTemplate() {}
 
-	MESQUITE_EXPORT
+    MESQUITE_EXPORT
     double get_power() const
-      { return mPower.value(); }
+    {
+        return mPower.value();
+    }
 
-	MESQUITE_EXPORT
+    MESQUITE_EXPORT
     void set_power( double p )
-      {
-        mPower = p;
+    {
+        mPower       = p;
         mPowerMinus1 = p - 1;
         mPowerMinus2 = p - 2;
-      }
+    }
 
-	MESQUITE_EXPORT
-    virtual bool evaluate( EvalType type,
-                           PatchData& pd,
-                           double& value_out,
-                           bool free,
-                           MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
-	MESQUITE_EXPORT
-    virtual bool evaluate_with_gradient( EvalType type,
-                                         PatchData& pd,
-                                         double& value_out,
-                                         std::vector<Vector3D>& grad_out,
-                                         MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
+                                         std::vector< Vector3D >& grad_out, MsqError& err );
 
-	MESQUITE_EXPORT
-    virtual bool evaluate_with_Hessian_diagonal( EvalType type,
-                                        PatchData& pd,
-                                        double& value_out,
-                                        std::vector<Vector3D>& grad_out,
-                                        std::vector<SymMatrix3D>& hess_diag_out,
-                                        MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+                                                 std::vector< Vector3D >& grad_out,
+                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
 
-	MESQUITE_EXPORT
-    virtual bool evaluate_with_Hessian( EvalType type,
-                                        PatchData& pd,
-                                        double& value_out,
-                                        std::vector<Vector3D>& grad_out,
-                                        MsqHessian& Hessian_out,
-                                        MsqError& err );
+    MESQUITE_EXPORT
+    virtual bool evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
+                                        std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err );
 
-	MESQUITE_EXPORT
+    MESQUITE_EXPORT
     virtual ObjectiveFunction* clone() const;
 
-	MESQUITE_EXPORT
+    MESQUITE_EXPORT
     virtual void clear();
 
   protected:
-
     /**\brief Handle EvalType for all eval functions, return OF value
      *
      * This function implements the common handling of the EvalType
@@ -151,31 +131,29 @@ class PMeanPTemplate : public ObjectiveFunctionTemplate
      */
     double get_value( double power_sum, size_t count, EvalType type, size_t& global_count );
 
-    Exponent mPower;  /**< The power to use */
-    Exponent mPowerMinus1;  /**< mPower - 1.0 */
-    Exponent mPowerMinus2;  /**< mPower - 2.0 */
+    Exponent mPower;       /**< The power to use */
+    Exponent mPowerMinus1; /**< mPower - 1.0 */
+    Exponent mPowerMinus2; /**< mPower - 2.0 */
 
   private:
-
-    size_t mCount;    /**< The number of accumulated entires */
-    double mPowSum;   /**< The accumulated sum of values to the mPower */
-    size_t saveCount; /**< Saved count from previous patch */
-    double savePowSum;/**< Saved sum from previous patch */
+    size_t mCount;     /**< The number of accumulated entires */
+    double mPowSum;    /**< The accumulated sum of values to the mPower */
+    size_t saveCount;  /**< Saved count from previous patch */
+    double savePowSum; /**< Saved sum from previous patch */
 
   protected:
-
     /** Temporary storage for qm sample handles */
-    mutable std::vector<size_t> qmHandles;
+    mutable std::vector< size_t > qmHandles;
     /** Temporary storage for qm vertex indices */
-    mutable std::vector<size_t> mIndices;
+    mutable std::vector< size_t > mIndices;
     /** Temporary storage for qm gradient */
-    mutable std::vector<Vector3D> mGradient;
+    mutable std::vector< Vector3D > mGradient;
     /** Temporary storage for qm hessian diagonal */
-    mutable std::vector<SymMatrix3D> mDiag;
-     /** Temporary storage for qm Hessian */
-    mutable std::vector<Matrix3D> mHessian;
+    mutable std::vector< SymMatrix3D > mDiag;
+    /** Temporary storage for qm Hessian */
+    mutable std::vector< Matrix3D > mHessian;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

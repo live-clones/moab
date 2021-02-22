@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AddQualityMetric.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,76 +35,54 @@
 #include "Mesquite.hpp"
 #include "QualityMetric.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class AddQualityMetric : public QualityMetric
 {
-public:
+  public:
+    AddQualityMetric( QualityMetric* qm1, QualityMetric* qm2, MsqError& err );
 
-  AddQualityMetric( QualityMetric* qm1, QualityMetric* qm2, MsqError& err );
+    ~AddQualityMetric();
 
-  ~AddQualityMetric();
+    MetricType get_metric_type() const;
 
-  MetricType get_metric_type() const;
+    std::string get_name() const;
 
-  std::string get_name() const;
+    int get_negate_flag() const;
 
-  int get_negate_flag() const;
+    QualityMetric* get_first_metric() const
+    {
+        return &metric1;
+    }
+    QualityMetric* get_second_metric() const
+    {
+        return &metric2;
+    }
 
-  QualityMetric* get_first_metric() const { return &metric1; }
-  QualityMetric* get_second_metric() const { return &metric2; }
+    virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+                                  MsqError& err );
 
-  virtual
-  void get_evaluations( PatchData& pd,
-                        std::vector<size_t>& handles,
-                        bool free_vertices_only,
-                        MsqError& err );
+    virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-  virtual
-  bool evaluate( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 MsqError& err );
+    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                        MsqError& err );
 
+    virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                         std::vector< Vector3D >& gradient, MsqError& err );
 
-  virtual
-  bool evaluate_with_indices( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 MsqError& err );
+    virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+                                        MsqError& err );
 
-
-  virtual
-  bool evaluate_with_gradient( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 MsqError& err );
-
-
-  virtual
-  bool evaluate_with_Hessian( PatchData& pd,
-                 size_t handle,
-                 double& value,
-                 std::vector<size_t>& indices,
-                 std::vector<Vector3D>& gradient,
-                 std::vector<Matrix3D>& Hessian,
-                 MsqError& err );
-
-private:
-  QualityMetric &metric1, &metric2;
-  mutable std::vector<size_t> mHandles;
-  mutable std::vector<size_t> indices1, indices2;
-  mutable std::vector<Vector3D> grad1, grad2;
-  mutable std::vector<Matrix3D> Hess1, Hess2;
-
+  private:
+    QualityMetric &metric1, &metric2;
+    mutable std::vector< size_t > mHandles;
+    mutable std::vector< size_t > indices1, indices2;
+    mutable std::vector< Vector3D > grad1, grad2;
+    mutable std::vector< Matrix3D > Hess1, Hess2;
 };
 
-
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

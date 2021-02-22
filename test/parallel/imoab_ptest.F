@@ -165,7 +165,7 @@ C  see ghost elements
       call errorout(ierr, 'fail to determine ghosts')
 C     write out the mesh file to disk, in parallel, if h5m
 #ifdef MOAB_HAVE_HDF5
-      outfile = 'whole.h5m'//CHAR(0)
+      outfile = 'wholeF.h5m'//CHAR(0)
       wopts   = 'PARALLEL=WRITE_PART'//CHAR(0)
       ierr = iMOAB_WriteMesh(pid, outfile, wopts)
       call errorout(ierr, 'fail to write the mesh file')

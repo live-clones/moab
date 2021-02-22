@@ -7,6 +7,7 @@ EXTRA_DIST = HommeMapping.nc \
              eul3x48x96.t2.nc \
              eul3x48x96.t.3.nc \
              fv3x46x72.t.3.nc \
+	     domain.ocn.ne4np4_oQU240.160614.nc \
 	     cubtest12.cub \
 	     cubtest14.cub \
 	     cubtest.jou \
@@ -39,6 +40,7 @@ EXTRA_DIST = HommeMapping.nc \
              mix.h5m \
              p8ex1.h5m \
              oneside.h5m \
+             ln4.h5m \
              rtttest_v100.rtt \
              rtttest_v101.rtt \
              test.obj \

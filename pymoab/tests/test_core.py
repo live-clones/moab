@@ -1,9 +1,6 @@
 from pymoab import core
 from pymoab import types
 from pymoab.rng import Range
-from pymoab.scd import ScdInterface
-from pymoab.hcoord import HomCoord
-from subprocess import call
 from driver import test_driver, CHECK, CHECK_EQ, CHECK_NOT_EQ, CHECK_ITER_EQ
 import numpy as np
 import os
@@ -70,9 +67,7 @@ def test_write_ents():
 
 
 def test_write_tags():
-    """
-    Test write tag functionality
-    """
+    """Test write tag functionality"""
 
     # test values
     outfile = "write_tag_test.h5m"
@@ -418,7 +413,6 @@ def test_add_entity():
     mb.add_entity(msh, vh)
 
 def vertex_handle(core):
-
     """Convenience function for getting an arbitrary vertex element handle."""
     coord = np.array((1,1,1),dtype='float64')
     vert = core.create_vertices(coord)
@@ -575,7 +569,23 @@ def test_get_conn():
         pass
     else:
         print("Shouldn't be here. Test fails.")
-        raise(IndexErrorx)
+        raise(IndexError)
+
+def test_set_conn():
+
+    mb = core.Core()
+    coords = np.array((0,0,0,1,0,0,1,1,1),dtype='float64')
+    verts = mb.create_vertices(coords)
+    #create element
+    verts = np.array(((verts[0],verts[1],verts[2]),),dtype='uint64')
+    tri = mb.create_elements(types.MBTRI,verts)
+    # make new verts to set new connectivity
+    verts_new = mb.create_vertices(coords)
+    mb.set_connectivity(tri[0], verts_new)
+    # get the adjacencies of the triangle (vertices)
+    conn = mb.get_connectivity(tri)
+    # check the returned EHs match the new vertices entity handles
+    CHECK_EQ(list(conn), list(verts_new))
 
 def test_type_from_handle():
     mb = core.Core()
@@ -1038,7 +1048,7 @@ def test_create_element_iterable():
     tris = mb.create_element(types.MBTRI,verts)
     #create another with the same vertices but in a list
     tri_verts = [verts[0], verts[1], verts[2]]
-    tris = mb.create_element(types.MBTRI,verts)
+    tris = mb.create_element(types.MBTRI,tri_verts)
     #make sure the right number of triangles is in the instance
     rs = mb.get_root_set()
     all_tris = mb.get_entities_by_type(rs,types.MBTRI)
@@ -1128,6 +1138,7 @@ if __name__ == "__main__":
              test_add_entity,
              test_tag_failures,
              test_adj,
+             test_set_conn,
              test_type_from_handle,
              test_meshsets,
              test_rs,

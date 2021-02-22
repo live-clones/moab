@@ -1,6 +1,10 @@
 import sys
 import traceback
-from collections import Iterable
+
+if sys.version_info < (3, 0):
+    from collections import Iterable
+else:
+    from collections.abc import Iterable
 
 class colors:
     HEADER = '\033[95m'

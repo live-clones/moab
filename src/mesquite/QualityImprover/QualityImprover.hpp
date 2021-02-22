@@ -45,70 +45,68 @@
 
 namespace MBMesquite
 {
-  class PatchSet;
-  class MsqError;
-  class Mesh;
-  class MeshDomain;
-  class Settings;
+class PatchSet;
+class MsqError;
+class Mesh;
+class MeshDomain;
+class Settings;
 
+/*! \class QualityImprover
+  \brief Base class for all quality improvers.
+  Mote that the PatchData settings are inherited from the PathDataUser class.
 
-  /*! \class QualityImprover
-    \brief Base class for all quality improvers.
-    Mote that the PatchData settings are inherited from the PathDataUser class.
-
-  */
-  class MESQUITE_EXPORT QualityImprover : public Instruction
-  {
+*/
+class MESQUITE_EXPORT QualityImprover : public Instruction
+{
   public:
-
     // Constructor is protected ... see below.
 
-     // virtual destructor ensures use of polymorphism during destruction
+    // virtual destructor ensures use of polymorphism during destruction
     virtual ~QualityImprover();
 
-      //!Sets in the termination criterion for the concrete solver's
-      //! optimization.
-    void set_inner_termination_criterion(TerminationCriterion* crit)
-      {
-        innerTerminationCriterion=crit;
-      }
-      //!Sets in the termination criterion for the outer loop over
-      //! patches.
-    void set_outer_termination_criterion(TerminationCriterion* crit)
-      {
-        outerTerminationCriterion=crit;
-      }
+    //! Sets in the termination criterion for the concrete solver's
+    //! optimization.
+    void set_inner_termination_criterion( TerminationCriterion* crit )
+    {
+        innerTerminationCriterion = crit;
+    }
+    //! Sets in the termination criterion for the outer loop over
+    //! patches.
+    void set_outer_termination_criterion( TerminationCriterion* crit )
+    {
+        outerTerminationCriterion = crit;
+    }
 
     virtual PatchSet* get_patch_set() = 0;
 
-    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
-                                   const Settings* settings,
-                                   MsqError& err );
+    virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings, MsqError& err );
 
   protected:
-
     /*! The default constructor initialises a few member variables
         to default values.
         This can be reused by concrete class constructor. */
     QualityImprover();
 
-      //!return the outer termination criterion pointer
+    //! return the outer termination criterion pointer
     TerminationCriterion* get_outer_termination_criterion()
-      { return outerTerminationCriterion; }
-      //!return the inner termination criterion pointer
+    {
+        return outerTerminationCriterion;
+    }
+    //! return the inner termination criterion pointer
     TerminationCriterion* get_inner_termination_criterion()
-      { return innerTerminationCriterion; }
+    {
+        return innerTerminationCriterion;
+    }
 
   private:
-
     TerminationCriterion* innerTerminationCriterion;
     TerminationCriterion* outerTerminationCriterion;
-      //default TerminationCriterion for outer loop will be set in constructor
+    // default TerminationCriterion for outer loop will be set in constructor
     TerminationCriterion* defaultOuterCriterion;
-      //default TerminationCriterion for inner loop set by concrete improver
+    // default TerminationCriterion for inner loop set by concrete improver
     TerminationCriterion* defaultInnerCriterion;
-  };
+};
 
-}
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file AWShapeSizeOrientNB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,48 +35,44 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string AWShapeSizeOrientNB1::get_name() const
-  { return "AWShapeSizeOrientNB1"; }
+{
+    return "AWShapeSizeOrientNB1";
+}
 
 AWShapeSizeOrientNB1::~AWShapeSizeOrientNB1() {}
 
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result)
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result )
 {
-  result = sqr_Frobenius( A - W );
-  return true;
+    result = sqr_Frobenius( A - W );
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv )
+template < unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv )
 {
-  deriv = A - W;
-  result = sqr_Frobenius( deriv );
-  deriv *= 2.0;
-  return true;
+    deriv  = A - W;
+    result = sqr_Frobenius( deriv );
+    deriv *= 2.0;
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool hess( const MsqMatrix<DIM,DIM>& A,
-           const MsqMatrix<DIM,DIM>& W,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv,
-           MsqMatrix<DIM,DIM>* second )
+template < unsigned DIM >
+static inline bool hess( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+                         MsqMatrix< DIM, DIM >& deriv, MsqMatrix< DIM, DIM >* second )
 {
-  deriv = A - W;
-  result = sqr_Frobenius( deriv );
-  deriv *= 2.0;
-  set_scaled_I( second, 2.0 );
-  return true;
+    deriv  = A - W;
+    result = sqr_Frobenius( deriv );
+    deriv *= 2.0;
+    set_scaled_I( second, 2.0 );
+    return true;
 }
 
-TMP_AW_TEMPL_IMPL_COMMON(AWShapeSizeOrientNB1)
+TMP_AW_TEMPL_IMPL_COMMON( AWShapeSizeOrientNB1 )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

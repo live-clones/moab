@@ -35,8 +35,8 @@
 #include "Mesquite.hpp"
 #include "PatchSet.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 /**\brief A PatchSet representing a decomposition of the mesh
  *        into patches containing a single free vertex and the
@@ -44,44 +44,46 @@ namespace MBMesquite {
  */
 class VertexPatches : public PatchSet
 {
-public:
-
+  public:
     /**\brief constructor
      *\param num_layers Number of layers of elements adjacent to each vertex
      *\param free_vertices_only Skip fixed vertices if true.
      */
-    inline
-    VertexPatches( unsigned p_num_layers = 1, bool p_free_vertices_only = true )
-      : numLayers(p_num_layers), freeVertices(p_free_vertices_only) {}
+    inline VertexPatches( unsigned p_num_layers = 1, bool p_free_vertices_only = true )
+        : numLayers( p_num_layers ), freeVertices( p_free_vertices_only )
+    {
+    }
 
     MESQUITE_EXPORT
     ~VertexPatches();
 
     /**\brief Set number of layers of elements adjacent to each vertex */
-    inline
-    void set_num_layers( unsigned num_layers )
-      { numLayers = num_layers; }
+    inline void set_num_layers( unsigned num_layers )
+    {
+        numLayers = num_layers;
+    }
 
     /**\brief Get number of layers of elements adjacent to each vertex */
-    inline
-    unsigned get_num_layers() const
-      { return numLayers; }
+    inline unsigned get_num_layers() const
+    {
+        return numLayers;
+    }
 
     /**\brief Skip fixed vertices if true. */
-    inline
-    void free_vertices_only( bool yesno )
-      { freeVertices = yesno; }
+    inline void free_vertices_only( bool yesno )
+    {
+        freeVertices = yesno;
+    }
 
     /**\brief Skip fixed vertices if true. */
-    inline
-    bool free_vertices_only() const
-      { return freeVertices; }
-
+    inline bool free_vertices_only() const
+    {
+        return freeVertices;
+    }
 
     /**\brief Get a list of handles, one for each patch */
     MESQUITE_EXPORT
-    virtual void get_patch_handles( std::vector<PatchHandle>& patch_handles_out,
-                                    MsqError& err );
+    virtual void get_patch_handles( std::vector< PatchHandle >& patch_handles_out, MsqError& err );
 
     /**\brief Get the mesh entities in a patch
      *
@@ -95,22 +97,16 @@ public:
      *\param free_vertices_out the list of vertices interior to the patch
      */
     MESQUITE_EXPORT
-    virtual void get_patch( PatchHandle patch_handle,
-                            std::vector<Mesh::ElementHandle>& elem_handles_out,
-                            std::vector<Mesh::VertexHandle>& free_vertices_out,
-                            MsqError& err );
+    virtual void get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
+                            std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err );
 
-private:
+  private:
+    std::vector< size_t > junk;
 
-    std::vector<size_t> junk;
-
-    unsigned numLayers; //!< number of layers of adjacent elements
-    bool freeVertices;  //!< skip fixed vertices if true
+    unsigned numLayers;  //!< number of layers of adjacent elements
+    bool freeVertices;   //!< skip fixed vertices if true
 };
 
-
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -20,6 +20,10 @@ else
 endif
 endif
 
+if HAVE_TEMPESTREMAP
+  LDADD += $(TEMPESTREMAP_LIBS)
+endif
+
 if HAVE_CGM
   geometry_DIR = geometry
 else
@@ -40,16 +44,21 @@ EXTRA_DIST = README.hexmodops \
              README.mbsurfplot \
              README.mbtagprop \
              README.spheredecomp \
+             README.tools \
              CMakeLists.txt
 
 if HAVE_HDF5
-  bin_PROGRAMS += compareFiles
+  bin_PROGRAMS += mbcmpfiles mbintxchk mbcleantags 
 if HAVE_NETCDF
   bin_PROGRAMS += mbaddnc mbaddchunk
+if HAVE_EIGEN3
+  bin_PROGRAMS += mbcmpmaps
+endif
 endif
 endif
 
 if ENABLE_mbconvert
+  mbconvert_SOURCES = convert.cpp
   bin_PROGRAMS += mbconvert
   dist_man1_MANS += mbconvert.man
   doc_DATA += README.mbconvert
@@ -176,9 +185,7 @@ if ENABLE_mbtempest
   AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE) -I$(top_srcdir)/src/Remapping -I$(top_srcdir)/src/IntxMesh
   bin_PROGRAMS += mbtempest h5mtoscrip
 mbtempest_SOURCES = mbtempest.cpp
-mbtempest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 h5mtoscrip_SOURCES = h5mtoscrip.cpp
-h5mtoscrip_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
 
 if ENABLE_mbmerge
@@ -201,7 +208,6 @@ SUBDIRS = . \
           $(mesquite_DIR) \
           $(geometry_DIR)
 
-mbconvert_SOURCES = convert.cpp
 mbgsets_SOURCES = gsets.cpp
 hexmodops_SOURCES = makeops.cpp
 mbsize_SOURCES = measure.cpp measure.hpp size.cpp
@@ -215,8 +221,12 @@ parread_SOURCES = parread.cpp
 mbhonodes_SOURCES = honodes.cpp
 mbaddnc_SOURCES = addncdata.cpp
 mbaddchunk_SOURCES = mbaddchunk.cpp
-compareFiles_SOURCES = compareFiles.cpp
+mbcmpfiles_SOURCES = compareFiles.cpp
+mbintxchk_SOURCES = mbIntxCheck.cpp
+mbcmpmaps_SOURCES = compareMaps.cpp
+mbcleantags_SOURCES = cleanTags.cpp
 
 bin_PROGRAMS += mbslavepart
 mbslavepart_SOURCES = mbslavepart.cpp
 
+DISTCLEANFILES = a.out

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TetLagrangeShape.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "MappingFunction.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief Lagrange shape function for tetrahedral elements
  *
@@ -69,41 +69,22 @@ namespace MBMesquite {
  */
 class MESQUITE_EXPORT TetLagrangeShape : public MappingFunction3D
 {
-public:
+  public:
+    virtual EntityTopology element_topology() const;
 
-  virtual
-  EntityTopology element_topology() const;
+    virtual int num_nodes() const;
 
-  virtual
-  int num_nodes() const;
+    virtual NodeSet sample_points( NodeSet higher_order_nodes ) const;
 
-  virtual
-  NodeSet sample_points( NodeSet higher_order_nodes ) const;
+    virtual void coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+                               size_t& num_coeff_out, MsqError& err ) const;
 
-  virtual
-  void coefficients( Sample location,
-                     NodeSet nodeset,
-                     double* coeff_out,
-                     size_t* indices_out,
-                     size_t& num_coeff_out,
-                     MsqError& err ) const;
+    virtual void derivatives( Sample location, NodeSet nodeset, size_t* vertex_indices_out,
+                              MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const;
 
-  virtual
-  void derivatives( Sample location,
-                    NodeSet nodeset,
-                    size_t* vertex_indices_out,
-                    MsqVector<3>* d_coeff_d_xi_out,
-                    size_t& num_vtx,
-                    MsqError& err ) const;
-
-  virtual
-  void ideal( Sample location,
-              MsqMatrix<3,3>& jacobian_out,
-              MsqError& err ) const;
+    virtual void ideal( Sample location, MsqMatrix< 3, 3 >& jacobian_out, MsqError& err ) const;
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -3,6 +3,7 @@
 option ( MOAB_BUILD_MBCONVERT    "Build the MOAB mesh converter tool?"           ON )
 option ( MOAB_BUILD_HEXMODOPS    "Build the hexahedral modops tool?"             ON )
 option ( MOAB_BUILD_MBSIZE       "Build the mbsize tool?"                        ON )
+option ( MOAB_BUILD_MBMERGE      "Build the mbmerge tool?"                       ON )
 option ( MOAB_BUILD_MBMEM        "Build the mbmem tool?"                         ON )
 option ( MOAB_BUILD_MBSKIN       "Build the mbskin tool?"                        ON )
 option ( MOAB_BUILD_MBDEPTH      "Build the mbdepth tool?"                       ON )
@@ -10,6 +11,7 @@ option ( MOAB_BUILD_MBTAGPROP    "Build the mbtagprop tool?"                    
 option ( MOAB_BUILD_MBGSETS      "Build the mbgsets tool?"                       ON )
 option ( MOAB_BUILD_SPHEREDECOMP "Build the sphere decomposition tool?"          ON )
 option ( MOAB_BUILD_MBSURFPLOT   "Build the mbsurfplot application?"             ON )
+option ( MOAB_BUILD_SPHEREDECOMP "Build the spheredecomp application?"           ON )
 option ( MOAB_BUILD_MBPART       "Build the mbpart (Zoltan-based) partitioner?" OFF )
 option ( MOAB_BUILD_MBSLAVEPART  "Build the slave partitioner tool?"             ON )
 option ( MOAB_BUILD_MBCOUPLER    "Build the mesh coupler tool?"                  ON )
@@ -35,11 +37,29 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+if (MOAB_HAVE_TEMPESTREMAP)
+  include_directories( ${TEMPESTREMAP_INCLUDES} ${EIGEN3_DIR} )
+endif (MOAB_HAVE_TEMPESTREMAP)
+
 set( TOOLS_LINK_LIBS MOAB ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 if ( MOAB_HAVE_CGM )
   set( TOOLS_LINK_LIBS ${TOOLS_LINK_LIBS} ${CGM_LIBRARIES} )
   add_subdirectory( geometry )
 endif ( MOAB_HAVE_CGM )
+
+# COMPAREFILES
+if ( MOAB_HAVE_HDF5 )
+  add_executable( compareFiles compareFiles.cpp)
+  set_source_files_properties( compareFiles.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( compareFiles ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_COMPAREFILES 1 )
+  install(
+    TARGETS compareFiles
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif ( MOAB_HAVE_HDF5 )
 
 # MBSIZE
 if ( MOAB_BUILD_MBSIZE )
@@ -53,7 +73,24 @@ if ( MOAB_BUILD_MBSIZE )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.mbsize)
 endif ( )
+
+# MBMERGE
+if ( MOAB_BUILD_MBMERGE )
+  add_executable( mbmerge merge.cpp)
+  set_source_files_properties( merge.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbmerge ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBMERGE 1 )
+  install(
+    TARGETS mbmerge
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif ( )
+
+
 
 # MBMEM
 if ( MOAB_BUILD_MBMEM )
@@ -73,7 +110,7 @@ endif ( )
 if ( MOAB_BUILD_MBCONVERT )
   add_executable( mbconvert convert.cpp)
   set_source_files_properties( convert.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
-  target_link_libraries( mbconvert ${TOOLS_LINK_LIBS} )
+  target_link_libraries( mbconvert ${TOOLS_LINK_LIBS} ${TEMPESTREMAP_LIBRARIES} )
   set( MOAB_HAVE_MBCONVERT 1 )
   install(
     TARGETS mbconvert
@@ -81,6 +118,8 @@ if ( MOAB_BUILD_MBCONVERT )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.mbconvert)
+  INSTALL(FILES mbconvert.man DESTINATION share/man/man1 RENAME mbconvert.1)
 endif ( )
 
 # MBHONODES
@@ -123,6 +162,7 @@ if ( MOAB_BUILD_MBSKIN )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.mbskin)
 endif ( )
 
 # MBSURFPLOT
@@ -137,6 +177,7 @@ if ( MOAB_BUILD_MBSURFPLOT )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.mbsurfplot)
 endif ( )
 
 # MBTAGPROP
@@ -151,6 +192,7 @@ if ( MOAB_BUILD_MBTAGPROP )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.mbtagprop)
 endif ( )
 
 # MBGSETS
@@ -196,10 +238,10 @@ if ( MOAB_BUILD_MBSLAVEPART )
 endif( )
 
 # MBTEMPEST
-if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
+if ( MOAB_BUILD_MBTEMPEST )
   add_executable( mbtempest mbtempest.cpp)
   set_source_files_properties( mbtempest.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
-  target_link_libraries( mbtempest ${TOOLS_LINK_LIBS} )
+  target_link_libraries( mbtempest ${TOOLS_LINK_LIBS} ${TEMPESTREMAP_LIBRARIES} )
   set( MOAB_HAVE_MBTEMPEST 1 )
   install(
     TARGETS mbtempest
@@ -207,6 +249,7 @@ if ( MOAB_BUILD_MBTEMPEST AND MOAB_HAVE_TEMPEST )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+
 endif( )
 
 # MBQUALITY
@@ -259,5 +302,22 @@ if( MOAB_BUILD_HEXMODOPS )
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.hexmodops)
 endif()
 
+# MBSPHEREDECOMP
+if ( MOAB_BUILD_SPHEREDECOMP )
+  add_executable( spheredecomp SphereDecomp.cpp SphereDecomp.hpp sphere_decomp.cpp )
+  set_source_files_properties( SphereDecomp.cpp SphereDecomp.hpp sphere_decomp.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( spheredecomp ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_SPHEREDECOMP 1 )
+  install(
+    TARGETS spheredecomp
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+  SET(MOAB_DOCS ${MOAB_DOCS} README.spheredecomp)
+endif ( )
+
+install(FILES ${MOAB_DOCS} DESTINATION share/doc/moab)

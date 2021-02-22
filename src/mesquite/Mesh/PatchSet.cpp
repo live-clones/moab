@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file PatchSet.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -33,9 +32,9 @@
 #include "Mesquite.hpp"
 #include "PatchSet.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 PatchSet::~PatchSet() {}
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

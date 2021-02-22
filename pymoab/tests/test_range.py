@@ -1,10 +1,9 @@
 from pymoab import core
-from pymoab import types
 from pymoab.rng import Range
 from pymoab.rng import intersect, subtract, unite
 from pymoab import types
 from pymoab.types import _eh_py_type
-from driver import test_driver, CHECK_EQ, CHECK_NOT_EQ, CHECK, CHECK_NOT, CHECK_TYPE
+from driver import test_driver, CHECK_EQ, CHECK, CHECK_NOT, CHECK_TYPE
 import numpy as np
 
 def test_range():

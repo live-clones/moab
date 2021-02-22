@@ -115,7 +115,7 @@ esac
 enablezlib=no
 if test "x$ZLIB_DIR" != "xno"; then
   old_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS $HDF5_LDFLAGS"
+  LDFLAGS="$HDF5_LDFLAGS $LDFLAGS "
   AC_CHECK_LIB([z],[deflate],[enablezlib=yes; HDF5_LIBS="$HDF5_LIBS -lz"],
     [if test "x$ZLIB_DIR" != "x"; then AC_MSG_ERROR([Could not find zlib]); fi])
   LDFLAGS="$old_LDFLAGS"
@@ -143,7 +143,7 @@ esac
 enableszip=no
 if test "x$SZIP_DIR" != "xno"; then
   old_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS $HDF5_LDFLAGS"
+  LDFLAGS="$HDF5_LDFLAGS $LDFLAGS "
   AC_CHECK_LIB([sz],[SZ_Decompress],[enableszip=yes; HDF5_LIBS="$HDF5_LIBS -lsz"],
     [if test "x$SZIP_DIR" != "x"; then AC_MSG_ERROR([Could not find libsz]); fi])
   LDFLAGS="$old_LDFLAGS"
@@ -190,7 +190,7 @@ fi
 
 # Supported HDF5 versions: 1.8.10, 1.8.12, 1.8.13, 1.8.18, 1.10
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_HDF5([1.8.19],[no])
+AUSCM_CONFIGURE_DOWNLOAD_HDF5([1.10.1],[no])
 
 enablehdf5=no
 if (test "x" != "x$HDF5_DIR" && test "xno" != "x$HDF5_DIR"); then
@@ -226,7 +226,7 @@ if (test "x" != "x$HDF5_DIR" && test "xno" != "x$HDF5_DIR"); then
   fi
  
   # Check for IBM parallel IO library
-  if test "x$enablempi" != "xno"; then
+  if (test "x$enablempi" != "xno" && test "x$MB_BLUEGENE_CONF" != "xno"); then
     AC_CHECK_LIB([gpfs],[gpfs_stat],[LIBS="-lgpfs $LIBS"])
   fi
 
@@ -274,7 +274,7 @@ AC_SUBST(enablehdf5)
 AC_SUBST(HDF5_DIR)
 AC_SUBST(HDF5_CPPFLAGS)
 MB_CPPFLAGS="$HDF5_CPPFLAGS $MB_CPPFLAGS"
-EXPORT_LDFLAGS="$EXPORT_LDFLAGS $HDF5_LDFLAGS"
+EXPORT_LDFLAGS="$HDF5_LDFLAGS $EXPORT_LDFLAGS"
 AC_SUBST(HDF5_LIBS)
 
 WARN_PARALLEL_HDF5=no
@@ -284,7 +284,7 @@ if (test "xno" != "x$enablehdf5"); then
   if (test "xno" != "x$enablempi"); then
     old_LDFLAGS="$LDFLAGS"
     old_LIBS="$LIBS"
-    LDFLAGS="$LDFLAGS $HDF5_LDFLAGS"
+    LDFLAGS="$HDF5_LDFLAGS $LDFLAGS"
     LIBS="$HDF5_LIBS $LIBS"
     IS_HDF5_NOT_PARALLEL=""
     AC_PATH_PROGS([H5CC], [h5cc h5pcc], [], [$HDF5_DIR/bin])

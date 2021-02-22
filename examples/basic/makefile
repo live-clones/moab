@@ -42,6 +42,9 @@ DeleteEdges: DeleteEdges.o ${MOAB_LIBDIR}/libMOAB.la
 run-GetEntities: GetEntities
 	${RUNSERIAL} ./GetEntities
 
+run-DeleteEdges: DeleteEdges
+	${RUNSERIAL} ./DeleteEdges
+
 SetsNTags: SetsNTags.o ${MOAB_LIBDIR}/libMOAB.la
 	@echo "[CXXLD]  $@"
 	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
@@ -59,6 +62,9 @@ run-StructuredMeshSimple: StructuredMeshSimple
 ReadPartFile: ReadPartFile.o ${MOAB_LIBDIR}/libMOAB.la
 	@echo "[CXXLD]  $@"
 	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+run-ReadPartFile: ReadPartFile
+	${RUNSERIAL} ./ReadPartFile
 
 HelloParMOAB: HelloParMOAB.o ${MOAB_LIBDIR}/libMOAB.la
 	@echo "[CXXLD]  $@"
@@ -103,8 +109,8 @@ UniformRefinement: UniformRefinement.o ${MOAB_LIBDIR}/libMOAB.la
 
 run-UniformRefinement: UniformRefinement
 ifeq ("$(MOAB_MPI_ENABLED)-$(MOAB_HDF5_ENABLED)","yes-yes")
-	${RUNSERIAL}   ./UniformRefinement ${MESH_DIR}/64bricks_12ktet.h5m 3 2
-	${RUNPARALLEL} ./UniformRefinement ${MESH_DIR}/64bricks_512hex_256part.h5m 3
+	${RUNSERIAL}   ./UniformRefinement ${MESH_DIR}/64bricks_12ktet.h5m 2 2
+	${RUNPARALLEL} ./UniformRefinement ${MESH_DIR}/64bricks_512hex_256part.h5m 2
 else
 	${RUNSERIAL} ./UniformRefinement ${MESH_DIR}/hex_2048.vtk 2
 endif

@@ -1,3 +1,5 @@
+SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
                     parallel
@@ -5,10 +7,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${MOAB_BINARY_DIR}/src/parallel )
 
 if(MOAB_HAVE_MPI AND MPI_FOUND)
+  message(STATUS "Adding parallel subdirectory.")
   add_subdirectory(parallel)
   set( MOAB_MPI moabpar )
   set( MOABPAR_OBJECTS $<TARGET_OBJECTS:moabpar> )
-  set( MPI_LIBRARIES ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY} )
+  # find_package(MPI) sets MPI_LIBARY, not MPI_LIBRARIES
+  if (MPI_LIBRARY AND NOT MPI_LIBRARIES)
+    set(MPI_LIBRARIES ${MPI_LIBRARY})
+  endif ()
+  if (MPI_EXTRA_LIBRARY)
+    list(APPEND MPI_LIBRARIES ${MPI_EXTRA_LIBRARY})
+  endif ()
+  # message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
 endif()
 
 #Create the moab/EntityHandle.hpp file
@@ -18,7 +28,9 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in" "${outstring2}
 configure_file(${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp)
 
 set(moab_link_lib)
+message(STATUS "Adding io subdirectory.")
 add_subdirectory(io)
+message(STATUS "Adding IntxMesh subdirectory.")
 add_subdirectory(IntxMesh)
 
 if (ENABLE_MESQUITE AND MOAB_HAVE_CGM)
@@ -172,6 +184,7 @@ set( MOAB_INSTALL_HEADERS
         moab/Forward.hpp
         moab/GeomUtil.hpp
         moab/iMOAB.h
+        moab/imoab_protos.h
         moab/Interface.hpp
         moab/IntxMesh/Intx2Mesh.hpp
         moab/IntxMesh/IntxUtils.hpp
@@ -189,6 +202,8 @@ set( MOAB_INSTALL_HEADERS
         moab/point_locater/element_maps/quadratic_hex_map.hpp
         moab/point_locater/point_locater.hpp
         moab/point_locater/parametrizer.hpp
+        moab/DiscreteGeometry/DGMSolver.hpp
+        moab/DiscreteGeometry/HiReconstruction.hpp
         moab/ElemEvaluator.hpp
         moab/LocalDiscretization/LinearHex.hpp
         moab/LocalDiscretization/LinearQuad.hpp
@@ -201,6 +216,7 @@ set( MOAB_INSTALL_HEADERS
         moab/MeshGeneration.hpp
         moab/OrientedBox.hpp
         moab/OrientedBoxTreeTool.hpp
+        moab/PartitionerBase.hpp
         moab/ProgOptions.hpp
         moab/Range.hpp
         moab/RangeMap.hpp
@@ -227,6 +243,7 @@ set( MOAB_INSTALL_HEADERS
         moab/WriterIface.hpp
         moab/verdict.h
         moab/verdict/VerdictWrapper.hpp
+        moab/win32_config.h
         MBEntityType.h
         MBCN.h
         MBCN_protos.h
@@ -261,6 +278,22 @@ if (MOAB_HAVE_METIS)
   list(APPEND MOAB_DEP_LIBRARIES ${METIS_LIBRARIES})
 endif()
 
+if (MOAB_HAVE_TEMPESTREMAP)
+  set( MOAB_LIB_SOURCES ${MOAB_LIB_SOURCES} 
+                        Remapping/TempestRemapper.cpp 
+                        Remapping/TempestOnlineMap.cpp 
+                        Remapping/TempestLinearRemap.cpp
+                        )
+  set( MOAB_INSTALL_HEADERS ${MOAB_INSTALL_HEADERS} 
+        moab/Remapping/Remapper.hpp
+        moab/Remapping/TempestRemapper.hpp
+        moab/Remapping/TempestOnlineMap.hpp )
+
+  include_directories( ${TEMPESTREMAP_INCLUDES} )
+  list(APPEND MOAB_DEP_LIBRARIES ${TEMPESTREMAP_LIBRARIES})
+
+endif (MOAB_HAVE_TEMPESTREMAP)
+
 add_library(
   MOAB
   ${MOAB_LIB_SOURCES} ${MOAB_INSTALL_HEADERS} ${MOAB_GENERATED_INSTALL_HEADERS}
@@ -269,10 +302,15 @@ add_library(
   ${MOABPAR_OBJECTS}
   ${MDHF_OBJ}
   )
+include(CMakeLibraryFuncs)
+SciFixupLibrary(MOAB MOAB MOAB)
 
 target_include_directories(MOAB
   PUBLIC
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+
+include(GenerateExportHeader)
+generate_export_header(MOAB)
 
 set_target_properties(
   MOAB
@@ -283,10 +321,15 @@ set_target_properties(
   SOVERSION ${MOAB_VERSION_MAJOR}
   )
 
-target_link_libraries(
-  MOAB
-  ${CMAKE_EXE_LINKER_FLAGS} ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS} ${MPI_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES}
-  )
+message(STATUS "MOAB_LIBS = ${MOAB_LIBS}.")
+set(MOAB_ALL_LIBS ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS})
+list(APPEND MOAB_ALL_LIBS "${MPI_LIBRARY}")
+list(APPEND MOAB_ALL_LIBS ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+target_link_libraries(MOAB "${MOAB_ALL_LIBS}")
+
+# If using clang-tidy, set the target property so that
+# reformatting code does not use full fledged C++11 semantics
+# set_property(TARGET MOAB PROPERTY CXX_STANDARD 98)
 
 install(
   TARGETS MOAB

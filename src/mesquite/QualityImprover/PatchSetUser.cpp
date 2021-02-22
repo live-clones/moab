@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file PatchSetUser.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -32,9 +31,9 @@
 
 #include "PatchSetUser.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 PatchSetUser::~PatchSetUser() {}
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file MaxTemplate.hpp
 
@@ -34,7 +35,6 @@ Header file for the MBMesquite::MaxTemplate class
   \date   2002-07-18
  */
 
-
 #ifndef MaxTemplate_hpp
 #define MaxTemplate_hpp
 
@@ -43,27 +43,24 @@ Header file for the MBMesquite::MaxTemplate class
 
 namespace MBMesquite
 {
-   /*! \class MaxTemplate
-    \brief Computes the maximum quality metric value.
+/*! \class MaxTemplate
+ \brief Computes the maximum quality metric value.
 
-    This function is the same as the LInfTemplate except that no
-    absolute values are used.
-  */
-   class MaxTemplate :public ObjectiveFunctionTemplate
-   {
-   public:
-     MaxTemplate(QualityMetric *);
-     virtual ~MaxTemplate();
-     virtual bool evaluate( EvalType type,
-                            PatchData& pd,
-                            double& value_out,
-                            bool free,
-                            MsqError& err );
-     virtual ObjectiveFunction* clone() const;
-     virtual void clear();
-   private:
-     /** Temporary storage for qm sample handles */
-     mutable std::vector<size_t> qmHandles;
-   };
-}//namespace
-#endif // MaxTemplate_hpp
+ This function is the same as the LInfTemplate except that no
+ absolute values are used.
+*/
+class MaxTemplate : public ObjectiveFunctionTemplate
+{
+  public:
+    MaxTemplate( QualityMetric* );
+    virtual ~MaxTemplate();
+    virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
+    virtual ObjectiveFunction* clone() const;
+    virtual void clear();
+
+  private:
+    /** Temporary storage for qm sample handles */
+    mutable std::vector< size_t > qmHandles;
+};
+}  // namespace MBMesquite
+#endif  // MaxTemplate_hpp

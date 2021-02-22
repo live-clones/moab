@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 # Things to build
 lib_LTLIBRARIES = libMOAB.la
 AM_CPPFLAGS =
+libMOAB_la_LDFLAGS = -version-info @LIBTOOL_VERSION@
 
 # Subdirectories to build
 SUBDIRS = io .
@@ -245,10 +246,11 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/WriteUtilIface.hpp \
   moab/WriterIface.hpp \
   moab/ElemEvaluator.hpp \
+  moab/win32_config.h \
   MBEntityType.h \
   MBCN.h \
   MBCN_protos.h \
-  MBTagConventions.hpp
+  MBTagConventions.hpp 
 
 verdictincludedir = $(includedir)/moab/verdict
 verdictinclude_HEADERS = \
@@ -269,16 +271,22 @@ localdiscinclude_HEADERS = \
 
 pointlocincludedir = $(includedir)/moab/point_locater
 pointlocinclude_HEADERS = \
+  moab/point_locater/io.hpp  \
+  moab/point_locater/point_locater.hpp \
+  moab/point_locater/parametrizer.hpp
+pointloctreeincludedir = $(pointlocincludedir)/tree
+pointloctreeinclude_HEADERS = \
   moab/point_locater/tree/common_tree.hpp \
   moab/point_locater/tree/element_tree.hpp \
   moab/point_locater/tree/bvh_tree.hpp \
-  moab/point_locater/io.hpp  \
+  moab/point_locater/tree/initialize_tree.hpp
+
+pointlocelementmapsincludedir = $(pointlocincludedir)/element_maps
+pointlocelementmapsinclude_HEADERS = \
   moab/point_locater/element_maps/linear_hex_map.hpp  \
   moab/point_locater/element_maps/linear_tet_map.hpp  \
   moab/point_locater/element_maps/spectral_hex_map.hpp  \
-  moab/point_locater/element_maps/quadratic_hex_map.hpp  \
-  moab/point_locater/point_locater.hpp \
-  moab/point_locater/parametrizer.hpp
+  moab/point_locater/element_maps/quadratic_hex_map.hpp  
 
 intxmeshincludedir = $(includedir)/moab/IntxMesh
 intxmeshinclude_HEADERS = \
@@ -292,14 +300,15 @@ intxmeshinclude_HEADERS = \
 if ENABLE_mbtempest
 MOAB_REMAPPING_SRCS =
 
-MOAB_REMAPPING_HDRS = \
-	moab/Remapping/Remapper.hpp
+MOAB_REMAPPING_HDRS = moab/Remapping/Remapper.hpp
 
 AM_CPPFLAGS += -I$(srcdir)/Remapping
 
+EXTRA_DIST += Remapping/netcdfcpp_par.hpp
+
 if HAVE_TEMPESTREMAP
   AM_CPPFLAGS += $(TEMPESTREMAP_INCLUDE)
-  AM_LDFLAGS += $(TEMPESTREMAP_LIBS)
+  libMOAB_la_LIBADD += $(TEMPESTREMAP_LIBS)
 
   MOAB_REMAPPING_SRCS += \
      Remapping/TempestRemapper.cpp  \
@@ -381,8 +390,6 @@ moabhypreinclude_HEADERS = \
 
 endif # if HAVE_HYPRE
 
-EXTRA_DIST += parallel/CMakeLists.txt
-
 endif
 
 if ENABLE_metis
@@ -409,5 +416,6 @@ if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@
 endif
 
-EXTRA_DIST += CMakeLists.txt
+DISTCLEANFILES = a.out
+EXTRA_DIST += CMakeLists.txt parallel/CMakeLists.txt IntxMesh/CMakeLists.txt
 

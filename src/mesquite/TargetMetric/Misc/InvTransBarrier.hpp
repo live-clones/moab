@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file InvTransBarrier.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,30 +35,27 @@
 #include "Mesquite.hpp"
 #include "TMetricBarrier.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /** Make a non-barrier metric into a barrier metric by passing it T^-t */
 class InvTransBarrier : public TMetricBarrier
 {
   public:
-  InvTransBarrier( TMetric* metric ) : metricPtr(metric) {}
+    InvTransBarrier( TMetric* metric ) : metricPtr( metric ) {}
 
-  MESQUITE_EXPORT virtual
-  ~InvTransBarrier();
+    MESQUITE_EXPORT virtual ~InvTransBarrier();
 
-  MESQUITE_EXPORT virtual
-  std::string get_name() const;
+    MESQUITE_EXPORT virtual std::string get_name() const;
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<2,2>& T, double& result, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& err );
 
-  MESQUITE_EXPORT virtual
-  bool evaluate( const MsqMatrix<3,3>& T, double& result, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& err );
 
   private:
-  TMetric* metricPtr;
+    TMetric* metricPtr;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

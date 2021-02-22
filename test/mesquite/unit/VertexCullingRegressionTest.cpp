@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 2; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+// -*- Mode : c++; tab-width: 2; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 2
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -75,95 +76,90 @@ using namespace MBMesquite;
 
 class VertexCullingRegressionTest : public CppUnit::TestFixture
 {
-private:
-  CPPUNIT_TEST_SUITE(VertexCullingRegressionTest);
-  CPPUNIT_TEST (test_laplacian_smoothing_with_cull);
-  CPPUNIT_TEST_SUITE_END();
+  private:
+    CPPUNIT_TEST_SUITE( VertexCullingRegressionTest );
+    CPPUNIT_TEST( test_laplacian_smoothing_with_cull );
+    CPPUNIT_TEST_SUITE_END();
 
-private:
-  int pF;//PRINT_FLAG
-public:
-  void setUp()
-  {
-      //pF=1;//PRINT_FLAG IS ON
-      pF=0;//PRINT_FLAG IS OFF
-  }
-
-  void tearDown()
-  {
-  }
-
-public:
-  VertexCullingRegressionTest()
-    {}
-
-  void test_laplacian_smoothing_with_cull()
+  private:
+    int pF;  // PRINT_FLAG
+  public:
+    void setUp()
     {
-        /* Read a VTK Mesh file */
-      MsqPrintError err(cout);
-      MBMesquite::MeshImpl mesh;
-      mesh.read_vtk(MESH_FILES_DIR "2D/vtk/quads/untangled/square_quad_10_rand.vtk", err);
-      CPPUNIT_ASSERT(!err);
-
-      Vector3D pnt(0,0,5);
-      Vector3D s_norm(0,0,1);
-      MBMesquite::PlanarDomain msq_geom(s_norm, pnt);
-
-        // create an objective function for use in termination criteria
-      IdealWeightInverseMeanRatio metric;
-      LPtoPTemplate of(2, &metric);
-
-        // creates an intruction queue
-      InstructionQueue queue1;
-
-        // creates a mean ratio quality metric ...
-      ConditionNumberQualityMetric shape_metric;
-      EdgeLengthQualityMetric lapl_met;
-      lapl_met.set_averaging_method(QualityMetric::RMS);
-
-        // creates the laplacian smoother  procedures
-      LaplacianSmoother lapl1(&of);
-      LaplacianSmoother lapl2(&of);
-      QualityAssessor stop_qa=QualityAssessor( &shape_metric );
-      stop_qa.add_quality_assessment( &lapl_met );
-
-        //**************Set termination criterion****************
-      TerminationCriterion sc2;
-      sc2.add_iteration_limit( 1000 );
-      sc2.add_absolute_successive_improvement( 0.0 );
-        //set a criterion with a culling method for the inner criterion
-      TerminationCriterion sc_cull;
-      sc_cull.cull_on_absolute_vertex_movement( 0.1 );
-      CPPUNIT_ASSERT(!err);
-      TerminationCriterion sc_cull_2;
-      sc_cull_2.cull_on_absolute_vertex_movement( 0.000001 );
-      CPPUNIT_ASSERT(!err);
-        //Make sure no errors
-      CPPUNIT_ASSERT(!err);
-      lapl1.set_outer_termination_criterion(&sc2);
-      lapl2.set_outer_termination_criterion(&sc2);
-      lapl1.set_inner_termination_criterion(&sc_cull);
-      lapl2.set_inner_termination_criterion(&sc_cull_2);
-        // adds 1 pass of pass1 to mesh_set1
-      queue1.add_quality_assessor(&stop_qa,err);
-       //Make sure no errors
-      CPPUNIT_ASSERT(!err);
-      queue1.add_preconditioner(&lapl1,err);
-        //Make sure no errors
-      CPPUNIT_ASSERT(!err);
-      queue1.set_master_quality_improver(&lapl2, err);
-       //Make sure no errors
-      CPPUNIT_ASSERT(!err);
-      queue1.add_quality_assessor(&stop_qa,err);
-        //Make sure no errors
-      CPPUNIT_ASSERT(!err);
-      MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(&mesh, &msq_geom);
-      queue1.run_instructions(&mesh_and_domain, err);
-      CPPUNIT_ASSERT(!err);
+        // pF=1;//PRINT_FLAG IS ON
+        pF = 0;  // PRINT_FLAG IS OFF
     }
 
+    void tearDown() {}
+
+  public:
+    VertexCullingRegressionTest() {}
+
+    void test_laplacian_smoothing_with_cull()
+    {
+        /* Read a VTK Mesh file */
+        MsqPrintError err( cout );
+        MBMesquite::MeshImpl mesh;
+        mesh.read_vtk( MESH_FILES_DIR "2D/vtk/quads/untangled/square_quad_10_rand.vtk", err );
+        CPPUNIT_ASSERT( !err );
+
+        Vector3D pnt( 0, 0, 5 );
+        Vector3D s_norm( 0, 0, 1 );
+        MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
+
+        // create an objective function for use in termination criteria
+        IdealWeightInverseMeanRatio metric;
+        LPtoPTemplate of( 2, &metric );
+
+        // creates an intruction queue
+        InstructionQueue queue1;
+
+        // creates a mean ratio quality metric ...
+        ConditionNumberQualityMetric shape_metric;
+        EdgeLengthQualityMetric lapl_met;
+        lapl_met.set_averaging_method( QualityMetric::RMS );
+
+        // creates the laplacian smoother  procedures
+        LaplacianSmoother lapl1( &of );
+        LaplacianSmoother lapl2( &of );
+        QualityAssessor stop_qa = QualityAssessor( &shape_metric );
+        stop_qa.add_quality_assessment( &lapl_met );
+
+        //**************Set termination criterion****************
+        TerminationCriterion sc2;
+        sc2.add_iteration_limit( 1000 );
+        sc2.add_absolute_successive_improvement( 0.0 );
+        // set a criterion with a culling method for the inner criterion
+        TerminationCriterion sc_cull;
+        sc_cull.cull_on_absolute_vertex_movement( 0.1 );
+        CPPUNIT_ASSERT( !err );
+        TerminationCriterion sc_cull_2;
+        sc_cull_2.cull_on_absolute_vertex_movement( 0.000001 );
+        CPPUNIT_ASSERT( !err );
+        // Make sure no errors
+        CPPUNIT_ASSERT( !err );
+        lapl1.set_outer_termination_criterion( &sc2 );
+        lapl2.set_outer_termination_criterion( &sc2 );
+        lapl1.set_inner_termination_criterion( &sc_cull );
+        lapl2.set_inner_termination_criterion( &sc_cull_2 );
+        // adds 1 pass of pass1 to mesh_set1
+        queue1.add_quality_assessor( &stop_qa, err );
+        // Make sure no errors
+        CPPUNIT_ASSERT( !err );
+        queue1.add_preconditioner( &lapl1, err );
+        // Make sure no errors
+        CPPUNIT_ASSERT( !err );
+        queue1.set_master_quality_improver( &lapl2, err );
+        // Make sure no errors
+        CPPUNIT_ASSERT( !err );
+        queue1.add_quality_assessor( &stop_qa, err );
+        // Make sure no errors
+        CPPUNIT_ASSERT( !err );
+        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( &mesh, &msq_geom );
+        queue1.run_instructions( &mesh_and_domain, err );
+        CPPUNIT_ASSERT( !err );
+    }
 };
 
-
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(VertexCullingRegressionTest, "VertexCullingRegressionTest");
-CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(VertexCullingRegressionTest, "Regression");
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( VertexCullingRegressionTest, "VertexCullingRegressionTest" );
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( VertexCullingRegressionTest, "Regression" );

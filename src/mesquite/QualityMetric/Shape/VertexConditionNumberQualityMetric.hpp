@@ -32,7 +32,6 @@ Header file for the MBMesquite::VertexConditionNumberQualityMetric class
   \date   April 14, 2003
  */
 
-
 #ifndef VertexConditionNumberQualityMetric_hpp
 #define VertexConditionNumberQualityMetric_hpp
 
@@ -42,47 +41,34 @@ Header file for the MBMesquite::VertexConditionNumberQualityMetric class
 
 namespace MBMesquite
 {
-     /*! \class VertexConditionNumberQualityMetric
-       \brief Computes the condition numbers of the corner's of elements
-       connected to the given vertex and then averages those values.
+/*! \class VertexConditionNumberQualityMetric
+  \brief Computes the condition numbers of the corner's of elements
+  connected to the given vertex and then averages those values.
 
-       The metric does not use the sample point functionality or the
-       compute_weighted_jacobian.  It uses the isotropic ideal
-       element.  This metric does require a feasible region, and
-       the metric needs to be minimized.
-     */
-   class VertexConditionNumberQualityMetric : public VertexQM, public AveragingQM
-   {
+  The metric does not use the sample point functionality or the
+  compute_weighted_jacobian.  It uses the isotropic ideal
+  element.  This metric does require a feasible region, and
+  the metric needs to be minimized.
+*/
+class VertexConditionNumberQualityMetric : public VertexQM, public AveragingQM
+{
   public:
-     VertexConditionNumberQualityMetric();
+    VertexConditionNumberQualityMetric();
 
-       //! virtual destructor ensures use of polymorphism during destruction
-     virtual ~VertexConditionNumberQualityMetric()
-        {}
+    //! virtual destructor ensures use of polymorphism during destruction
+    virtual ~VertexConditionNumberQualityMetric() {}
 
+    virtual std::string get_name() const;
 
-     virtual std::string get_name() const;
+    //! 1 if metric should be minimized, -1 if metric should be maximized.
+    virtual int get_negate_flag() const;
 
-      //! 1 if metric should be minimized, -1 if metric should be maximized.
-     virtual int get_negate_flag() const;
+    virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-     virtual
-     bool evaluate( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    MsqError& err );
+    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+                                        MsqError& err );
+};
 
-     virtual
-     bool evaluate_with_indices( PatchData& pd,
-                    size_t handle,
-                    double& value,
-                    std::vector<size_t>& indices,
-                    MsqError& err );
-  };
+}  // namespace MBMesquite
 
-
-
-} //namespace
-
-#endif // VertexConditionNumberQualityMetric_hpp
-
+#endif  // VertexConditionNumberQualityMetric_hpp

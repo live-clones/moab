@@ -4,7 +4,7 @@ include ../../makefile.config
 default: all
 
 ifeq ("$(MOAB_HDF5_ENABLED)","yes")
-ALLEXAMPLES += ContinentsOnGlobe BoundaryContinents
+ALLEXAMPLES += ContinentsOnGlobe BoundaryContinents addPCdata copyPartition AddFieldtoPG2
 endif
 
 all: $(ALLEXAMPLES)
@@ -23,6 +23,27 @@ BoundaryContinents: BoundaryContinents.o ${MOAB_LIBDIR}/libMOAB.la
 run-BoundaryContinents: BoundaryContinents
 	${RUNSERIAL} ./BoundaryContinents
 
+addPCdata: addPCdata.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+run-addPCdata: addPCdata
+	${RUNSERIAL} ./addPCdata
+
+copyPartition: copyPartition.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+run-copyPartition: copyPartition
+	${RUNSERIAL} ./copyPartition
+
+AddFieldtoPG2: AddFieldtoPG2.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
+run-AddFieldtoPG2: AddFieldtoPG2
+	${RUNSERIAL} ./AddFieldtoPG2
+	
 run: all $(addprefix run-,$(ALLEXAMPLES))
 
 clean: clobber

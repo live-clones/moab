@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file ExtraData.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,21 +34,21 @@
 #include "PatchData.hpp"
 #include <assert.h>
 
-namespace MBMesquite {
-
-ExtraData::ExtraData( PatchData& patch )
-  : patchNext(0), patchPtr(&patch)
+namespace MBMesquite
 {
-  if (!patch.attach_extra_data(this)) {
-    assert(false);
-    patchPtr = 0;
-  }
+
+ExtraData::ExtraData( PatchData& patch ) : patchNext( 0 ), patchPtr( &patch )
+{
+    if( !patch.attach_extra_data( this ) )
+    {
+        assert( false );
+        patchPtr = 0;
+    }
 }
 
 ExtraData::~ExtraData()
 {
-  if (patchPtr && !patchPtr->remove_extra_data(this))
-    assert(false);
+    if( patchPtr && !patchPtr->remove_extra_data( this ) ) assert( false );
 }
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

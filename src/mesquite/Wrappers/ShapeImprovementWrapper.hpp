@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 //
 //   SUMMARY:
 //     USAGE:
@@ -36,7 +37,6 @@
 // ORIG-DATE: 14-Nov-02 at 16:51:36
 //  LAST-MOD: 22-May-03 at 09:04:07 by Michael Brewer
 
-
 /*! \file ShapeImprovementWrapper.hpp
   ShapeImprovementWrapper header file.
 
@@ -44,55 +44,45 @@
 // DESCRIP-END.
 //
 
-
 #ifndef ShapeImprovementWrapper_hpp
 #define ShapeImprovementWrapper_hpp
 
 #include "Mesquite.hpp"
 #include "Wrapper.hpp"
 
-namespace MBMesquite {
-  /*! \class ShapeImprovementWrapper
-       \brief Wrapper which performs a Feasible Newton solve using
-       an \f$\ell_2^2 \f$ objective function template with inverse mean
-       ratio.
+namespace MBMesquite
+{
+/*! \class ShapeImprovementWrapper
+     \brief Wrapper which performs a Feasible Newton solve using
+     an \f$\ell_2^2 \f$ objective function template with inverse mean
+     ratio.
 
-     */
-  class ShapeImprovementWrapper : public Wrapper {
+   */
+class ShapeImprovementWrapper : public Wrapper
+{
 
   public:
-      //Constructor sets the instructions in the queue.
+    // Constructor sets the instructions in the queue.
     MESQUITE_EXPORT
-    ShapeImprovementWrapper(MsqError& err,
-                            double cpu_time = 0.0,
-                            double grad_norm =1.e-6,
-                            int parallel_iterations = 10);
-      //Constructor sets the instructions in the queue.
+    ShapeImprovementWrapper( MsqError& err, double cpu_time = 0.0, double grad_norm = 1.e-6,
+                             int parallel_iterations = 10 );
+    // Constructor sets the instructions in the queue.
     MESQUITE_EXPORT
-    ShapeImprovementWrapper(double cpu_time = 0.0,
-                            double grad_norm =1.e-6,
-                            int parallel_iterations = 10);
+    ShapeImprovementWrapper( double cpu_time = 0.0, double grad_norm = 1.e-6, int parallel_iterations = 10 );
 
   protected:
-
     MESQUITE_EXPORT
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain,
-                      ParallelMesh* pmesh,
-                      Settings* settings,
-                      QualityAssessor* qa,
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
                       MsqError& err );
 
-
   private:
-
     double maxTime, gradNorm;
-      // constants
+    // constants
     const double untBeta;
     const double successiveEps;
     int parallelIterations;
-  };
+};
 
+}  // namespace MBMesquite
 
-} // namespace
-
-#endif // ShapeImprovementWrapper_hpp
+#endif  // ShapeImprovementWrapper_hpp

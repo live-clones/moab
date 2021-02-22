@@ -3,7 +3,7 @@ include ../makefile.config
 
 default: all
 
-EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch
+EXAMPLES = LoadPartial DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv FixPolys
 PAREXAMPLES = ReduceExchangeTags
 ALLEXAMPLES = ${EXAMPLES}
 
@@ -17,10 +17,13 @@ endif
 all: $(ALLEXAMPLES)
 
 LoadPartial: LoadPartial.o ${MOAB_LIBDIR}/libMOAB.la
+QuadTriConv: QuadTriConv.o ${MOAB_LIBDIR}/libMOAB.la
 DirectAccessWithHoles: DirectAccessWithHoles.o ${MOAB_LIBDIR}/libMOAB.la
 DirectAccessNoHoles: DirectAccessNoHoles.o ${MOAB_LIBDIR}/libMOAB.la
 ReduceExchangeTags: ReduceExchangeTags.o ${MOAB_LIBDIR}/libMOAB.la
 PointInElementSearch: PointInElementSearch.o ${MOAB_LIBDIR}/libMOAB.la
+ExtractClose: ExtractClose.o ${MOAB_LIBDIR}/libMOAB.la
+FixPolys: FixPolys.o ${MOAB_LIBDIR}/libMOAB.la
 
 $(EXAMPLES) $(PAREXAMPLES):
 	@echo "[CXXLD]  $@"
@@ -46,6 +49,15 @@ run-PointInElementSearch: PointInElementSearch
 ifeq ("$(MOAB_MPI_ENABLED)","yes")
 	${RUNPARALLEL} ./PointInElementSearch
 endif
+
+run-ExtractClose: ExtractClose 
+	${RUNSERIAL} ./ExtractClose -h
+
+run-FixPolys: FixPolys
+	${RUNSERIAL} ./FixPolys -h
+
+run-QuadTriConv: QuadTriConv
+	${RUNSERIAL} ./QuadTriConv
 
 run: all $(addprefix run-,$(ALLEXAMPLES))
 

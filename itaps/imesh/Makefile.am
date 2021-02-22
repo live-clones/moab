@@ -19,7 +19,7 @@ if ENABLE_FORTRAN
   check_PROGRAMS += ScdMeshF90 ScdMeshF77 FindAdjacencyF90
 endif
 
-EXTRA_DIST = brick.vtk quad9.cub CMakeLists.txt
+EXTRA_DIST = brick.vtk quad9.cub CMakeLists.txt iMesh.dox
 
 libiMesh_la_SOURCES = \
 	iMesh_MOAB.cpp \
@@ -76,6 +76,8 @@ libiMesh_la_includedir = $(includedir)
 
 libiMesh_la_LIBADD = $(top_builddir)/src/libMOAB.la
 
+libiMesh_la_LDFLAGS = -version-info @LIBTOOL_VERSION@
+
 # Automake doesn't seem to have a directory defined for
 # platform-dependent data (or include) files. So put
 # in $(libdir).  Define a $(cfgdir) to get around automake's
@@ -109,3 +111,5 @@ LTPPF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
    $(AM_FFLAGS) $(FFLAGS)
 
 include $(abs_top_builddir)/itaps/imesh/iMesh-Defs.inc
+
+DISTCLEANFILES = a.out

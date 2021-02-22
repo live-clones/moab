@@ -24,7 +24,8 @@
     pknupp@sandia.gov, tleurent@mcs.anl.gov, tmunson@mcs.anl.gov
 
   ***************************************************************** */
-// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3 -*-
+// -*- Mode : c++; tab-width: 3; c-tab-always-indent: t; indent-tabs-mode: nil; c-basic-offset: 3
+// -*-
 
 /*! \file LInfTemplate.hpp
 
@@ -34,7 +35,6 @@ Header file for the MBMesquite::LInfTemplate class
   \date   2002-07-3
  */
 
-
 #ifndef LInfTemplate_hpp
 #define LInfTemplate_hpp
 
@@ -43,26 +43,23 @@ Header file for the MBMesquite::LInfTemplate class
 
 namespace MBMesquite
 {
-  /*! \class LInfTemplate
-    \brief Computes the L_infinity objective function for a given patch,
-    i.e., LInfTemplate::concrete_evaluate returns the maximum absolute value of
-    the quality metric values  on 'patch'.
-  */
-   class LInfTemplate :public ObjectiveFunctionTemplate
-   {
-   public:
-     MESQUITE_EXPORT LInfTemplate(QualityMetric *);
-     MESQUITE_EXPORT virtual ~LInfTemplate();
-     MESQUITE_EXPORT virtual bool evaluate( EvalType type,
-                                            PatchData& pd,
-                                            double& value_out,
-                                            bool free,
-                                            MsqError& err );
-     MESQUITE_EXPORT virtual ObjectiveFunction* clone() const;
-     MESQUITE_EXPORT virtual void clear();
-   private:
-     /** Temporary storage for qm sample handles */
-     mutable std::vector<size_t> qmHandles;
-   };
-}//namespace
-#endif // LInfTemplate_hpp
+/*! \class LInfTemplate
+  \brief Computes the L_infinity objective function for a given patch,
+  i.e., LInfTemplate::concrete_evaluate returns the maximum absolute value of
+  the quality metric values  on 'patch'.
+*/
+class LInfTemplate : public ObjectiveFunctionTemplate
+{
+  public:
+    MESQUITE_EXPORT LInfTemplate( QualityMetric* );
+    MESQUITE_EXPORT virtual ~LInfTemplate();
+    MESQUITE_EXPORT virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
+    MESQUITE_EXPORT virtual ObjectiveFunction* clone() const;
+    MESQUITE_EXPORT virtual void clear();
+
+  private:
+    /** Temporary storage for qm sample handles */
+    mutable std::vector< size_t > qmHandles;
+};
+}  // namespace MBMesquite
+#endif  // LInfTemplate_hpp

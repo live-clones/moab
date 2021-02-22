@@ -27,67 +27,59 @@
 #include "measure.hpp"
 using namespace moab;
 
-inline static double tet_volume( const CartVect& v0,
-                                 const CartVect& v1,
-                                 const CartVect& v2,
-                                 const CartVect& v3 )
+inline static double tet_volume( const CartVect& v0, const CartVect& v1, const CartVect& v2, const CartVect& v3 )
 {
-  return 1./6. * ( ((v1 - v0) * (v2 - v0)) % (v3 - v0) );
+    return 1. / 6. * ( ( ( v1 - v0 ) * ( v2 - v0 ) ) % ( v3 - v0 ) );
 }
 
-double edge_length( const double* start_vtx_coords,
-                    const double*   end_vtx_coords )
+double edge_length( const double* start_vtx_coords, const double* end_vtx_coords )
 {
-  const CartVect* start = reinterpret_cast<const CartVect*>(start_vtx_coords);
-  const CartVect*   end = reinterpret_cast<const CartVect*>(  end_vtx_coords);
-  return (*start - *end).length();
+    const CartVect* start = reinterpret_cast< const CartVect* >( start_vtx_coords );
+    const CartVect* end   = reinterpret_cast< const CartVect* >( end_vtx_coords );
+    return ( *start - *end ).length();
 }
 
-double measure( moab::EntityType type,
-                int num_vertices,
-                const double* vertex_coordinates )
+double measure( moab::EntityType type, int num_vertices, const double* vertex_coordinates )
 {
-  const CartVect* coords = reinterpret_cast<const CartVect*>(vertex_coordinates);
-  switch( type )
-  {
-    case moab::MBEDGE:
-      return (coords[0] - coords[1]).length();
-    case moab::MBTRI:
-      return 0.5 * ((coords[1] - coords[0]) * (coords[2] - coords[0])).length();
-    case moab::MBQUAD:
-      num_vertices = 4;
-    case moab::MBPOLYGON:
+    const CartVect* coords = reinterpret_cast< const CartVect* >( vertex_coordinates );
+    switch( type )
     {
-      CartVect mid(0,0,0);
-      for (int i = 0; i < num_vertices; ++i)
-        mid += coords[i];
-      mid /= num_vertices;
+        case moab::MBEDGE:
+            return ( coords[0] - coords[1] ).length();
+        case moab::MBTRI:
+            return 0.5 * ( ( coords[1] - coords[0] ) * ( coords[2] - coords[0] ) ).length();
+        case moab::MBQUAD:
+            num_vertices = 4;
+        case moab::MBPOLYGON: {
+            CartVect mid( 0, 0, 0 );
+            for( int i = 0; i < num_vertices; ++i )
+                mid += coords[i];
+            mid /= num_vertices;
 
-      double sum = 0.0;
-      for (int i = 0; i < num_vertices; ++i)
-      {
-        int j = (i+1)%num_vertices;
-        sum += ((mid - coords[i]) * (mid - coords[j])).length();
-      }
-      return 0.5 * sum;
+            double sum = 0.0;
+            for( int i = 0; i < num_vertices; ++i )
+            {
+                int j = ( i + 1 ) % num_vertices;
+                sum += ( ( mid - coords[i] ) * ( mid - coords[j] ) ).length();
+            }
+            return 0.5 * sum;
+        }
+        case moab::MBTET:
+            return tet_volume( coords[0], coords[1], coords[2], coords[3] );
+        case moab::MBPYRAMID:
+            return tet_volume( coords[0], coords[1], coords[2], coords[4] ) +
+                   tet_volume( coords[0], coords[2], coords[3], coords[4] );
+        case moab::MBPRISM:
+            return tet_volume( coords[0], coords[1], coords[2], coords[5] ) +
+                   tet_volume( coords[3], coords[5], coords[4], coords[0] ) +
+                   tet_volume( coords[1], coords[4], coords[5], coords[0] );
+        case moab::MBHEX:
+            return tet_volume( coords[0], coords[1], coords[3], coords[4] ) +
+                   tet_volume( coords[7], coords[3], coords[6], coords[4] ) +
+                   tet_volume( coords[4], coords[5], coords[1], coords[6] ) +
+                   tet_volume( coords[1], coords[6], coords[3], coords[4] ) +
+                   tet_volume( coords[2], coords[6], coords[3], coords[1] );
+        default:
+            return 0.0;
     }
-    case moab::MBTET:
-      return tet_volume( coords[0], coords[1], coords[2], coords[3] ) ;
-    case moab::MBPYRAMID:
-      return tet_volume( coords[0], coords[1], coords[2], coords[4] ) +
-             tet_volume( coords[0], coords[2], coords[3], coords[4] ) ;
-    case moab::MBPRISM:
-      return tet_volume( coords[0], coords[1], coords[2], coords[5] ) +
-             tet_volume( coords[3], coords[5], coords[4], coords[0] ) +
-             tet_volume( coords[1], coords[4], coords[5], coords[0] ) ;
-    case moab::MBHEX:
-      return tet_volume( coords[0], coords[1], coords[3], coords[4] ) +
-             tet_volume( coords[7], coords[3], coords[6], coords[4] ) +
-             tet_volume( coords[4], coords[5], coords[1], coords[6] ) +
-             tet_volume( coords[1], coords[6], coords[3], coords[4] ) +
-             tet_volume( coords[2], coords[6], coords[3], coords[1] ) ;
-    default:
-      return 0.0;
-  }
 }
-

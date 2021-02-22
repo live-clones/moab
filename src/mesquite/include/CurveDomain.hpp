@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file CurveDomain.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,10 +34,8 @@
 
 #include "Mesquite.hpp"
 
-namespace MBMesquite {
-
-
-
+namespace MBMesquite
+{
 
 /**\brief Domain used for optional curve smoother
  *
@@ -47,31 +44,25 @@ namespace MBMesquite {
  */
 class CurveDomain
 {
-public:
-  /**\brief Measure arc length along curve
-   *
-   * Get the length along a curve between two points on the curve.
-   */
-  virtual double arc_length( const double position1[3],
-                             const double position2[3],
-                             MsqError& err ) = 0;
-  /**\brief Get a position on the curve given an arc length
-   *
-   * Measure a specified arc length along a curve.
-   *\param from_here Point on curve from which to measure
-   *\param length    Length along curve to move
-   *\param result_point Output.  A point on the curve \c length units
-   *                 from the point \c from_here in the forward
-   *                 direction along the curve.
-   */
-  virtual void position_from_length( const double from_here[3],
-                                     double length,
-                                     double result_point[3],
-                                     MsqError& err ) = 0;
+  public:
+    /**\brief Measure arc length along curve
+     *
+     * Get the length along a curve between two points on the curve.
+     */
+    virtual double arc_length( const double position1[3], const double position2[3], MsqError& err ) = 0;
+    /**\brief Get a position on the curve given an arc length
+     *
+     * Measure a specified arc length along a curve.
+     *\param from_here Point on curve from which to measure
+     *\param length    Length along curve to move
+     *\param result_point Output.  A point on the curve \c length units
+     *                 from the point \c from_here in the forward
+     *                 direction along the curve.
+     */
+    virtual void position_from_length( const double from_here[3], double length, double result_point[3],
+                                       MsqError& err ) = 0;
 };
 
-
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

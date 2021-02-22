@@ -41,23 +41,15 @@
 
 namespace MBMesquite
 {
-  class NullImprover : public VertexMover
-  {
+class NullImprover : public VertexMover
+{
   protected:
-    virtual void initialize(PatchData &, MsqError &)
-      {}
-    virtual void cleanup()
-      {}
-    virtual void optimize_vertex_positions(PatchData &,
-                                           MsqError &)
-      {}
-    virtual void initialize_mesh_iteration(PatchData &,
-                                           MsqError &)
-      {}
-    virtual void terminate_mesh_iteration(PatchData &,
-                                          MsqError &)
-      {}
-  };
-}
+    virtual void initialize( PatchData&, MsqError& ) {}
+    virtual void cleanup() {}
+    virtual void optimize_vertex_positions( PatchData&, MsqError& ) {}
+    virtual void initialize_mesh_iteration( PatchData&, MsqError& ) {}
+    virtual void terminate_mesh_iteration( PatchData&, MsqError& ) {}
+};
+}  // namespace MBMesquite
 
 #endif

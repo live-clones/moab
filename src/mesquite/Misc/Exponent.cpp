@@ -35,82 +35,119 @@
 
 #include "Exponent.hpp"
 
-namespace MBMesquite {
-
-
+namespace MBMesquite
+{
 
 Exponent::constMemberPtr Exponent::get_func_ptr( double exponent )
 {
-  if (exponent == 0.0)
-    return &Exponent::pow0;
-  else if (exponent == 1.0)
-    return &Exponent::pow1;
-  else if (exponent == 0.5)
-    return &Exponent::squareRoot;
-  else if (exponent == 1./3.)
-    return &Exponent::cubeRoot;
-  else if (exponent == -1./3.)
-    return &Exponent::invCubeRoot;
-  else if (exponent == 2./3.)
-    return &Exponent::powTwoThirds;
-  else if (exponent == -2./3.)
-    return &Exponent::invTwoThirds;
-  else if (exponent == 2.0)
-    return &Exponent::pow2;
-  else if (exponent == -1.0)
-    return &Exponent::inverse;
-  else if (exponent == -0.5)
-    return &Exponent::invSquareRoot;
-  else if (exponent == 1.5)
-    return &Exponent::powThreeHalves;
-  else if (exponent == -2.0)
-    return &Exponent::invSquare;
-  else if (std::floor(exponent) == exponent)
-  {
-    if (exponent > 0.0)
-      return &Exponent::powPositiveInt;
+    if( exponent == 0.0 )
+        return &Exponent::pow0;
+    else if( exponent == 1.0 )
+        return &Exponent::pow1;
+    else if( exponent == 0.5 )
+        return &Exponent::squareRoot;
+    else if( exponent == 1. / 3. )
+        return &Exponent::cubeRoot;
+    else if( exponent == -1. / 3. )
+        return &Exponent::invCubeRoot;
+    else if( exponent == 2. / 3. )
+        return &Exponent::powTwoThirds;
+    else if( exponent == -2. / 3. )
+        return &Exponent::invTwoThirds;
+    else if( exponent == 2.0 )
+        return &Exponent::pow2;
+    else if( exponent == -1.0 )
+        return &Exponent::inverse;
+    else if( exponent == -0.5 )
+        return &Exponent::invSquareRoot;
+    else if( exponent == 1.5 )
+        return &Exponent::powThreeHalves;
+    else if( exponent == -2.0 )
+        return &Exponent::invSquare;
+    else if( std::floor( exponent ) == exponent )
+    {
+        if( exponent > 0.0 )
+            return &Exponent::powPositiveInt;
+        else
+            return &Exponent::powNegativeInt;
+    }
     else
-      return &Exponent::powNegativeInt;
-  }
-  else
-    return &Exponent::std_pow;
+        return &Exponent::std_pow;
 }
 
 void Exponent::set_exponent( double exponent )
 {
-  mExponent = exponent;
-  funcPointer = get_func_ptr( exponent );
+    mExponent   = exponent;
+    funcPointer = get_func_ptr( exponent );
 }
 
-double Exponent::pow0( double   ) const          { return 1.0;   }
-double Exponent::pow1( double x ) const          { return x;     }
-double Exponent::pow2( double x ) const          { return x * x; }
-double Exponent::squareRoot( double x ) const    { return std::sqrt( x ); }
-double Exponent::cubeRoot( double x ) const      { return MBMesquite::cbrt( x ); }
-double Exponent::invCubeRoot( double x ) const   { return 1.0/MBMesquite::cbrt( x ); }
-double Exponent::powTwoThirds( double x ) const  { return MBMesquite::cbrt_sqr(x); }
-double Exponent::invTwoThirds( double x ) const  { return 1.0 / MBMesquite::cbrt_sqr(x); }
-double Exponent::std_pow( double x ) const       { return std::pow( x, mExponent ); }
-double Exponent::inverse( double x ) const       { return 1.0 / x; }
-double Exponent::invSquareRoot( double x ) const { return 1.0 / std::sqrt(x); }
-double Exponent::powThreeHalves( double x ) const{ return x*x*x / std::sqrt(x); }
-double Exponent::invSquare( double x ) const     { return 1.0 / (x*x); }
+double Exponent::pow0( double ) const
+{
+    return 1.0;
+}
+double Exponent::pow1( double x ) const
+{
+    return x;
+}
+double Exponent::pow2( double x ) const
+{
+    return x * x;
+}
+double Exponent::squareRoot( double x ) const
+{
+    return std::sqrt( x );
+}
+double Exponent::cubeRoot( double x ) const
+{
+    return MBMesquite::cbrt( x );
+}
+double Exponent::invCubeRoot( double x ) const
+{
+    return 1.0 / MBMesquite::cbrt( x );
+}
+double Exponent::powTwoThirds( double x ) const
+{
+    return MBMesquite::cbrt_sqr( x );
+}
+double Exponent::invTwoThirds( double x ) const
+{
+    return 1.0 / MBMesquite::cbrt_sqr( x );
+}
+double Exponent::std_pow( double x ) const
+{
+    return std::pow( x, mExponent );
+}
+double Exponent::inverse( double x ) const
+{
+    return 1.0 / x;
+}
+double Exponent::invSquareRoot( double x ) const
+{
+    return 1.0 / std::sqrt( x );
+}
+double Exponent::powThreeHalves( double x ) const
+{
+    return x * x * x / std::sqrt( x );
+}
+double Exponent::invSquare( double x ) const
+{
+    return 1.0 / ( x * x );
+}
 
 double Exponent::powPositiveInt( double x ) const
 {
-  double result = x;
-  for (int i = (int)mExponent - 1; i > 0; --i)
-    result *= x;
-  return result;
+    double result = x;
+    for( int i = (int)mExponent - 1; i > 0; --i )
+        result *= x;
+    return result;
 }
 
 double Exponent::powNegativeInt( double x ) const
 {
-  double result = x;
-  for (int i = (-(int)mExponent) - 1; i > 0; --i)
-    result *= x;
-  return 1.0/result;
+    double result = x;
+    for( int i = ( -(int)mExponent ) - 1; i > 0; --i )
+        result *= x;
+    return 1.0 / result;
 }
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TSizeNB1.cpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,47 +35,46 @@
 #include "TMPDerivs.hpp"
 #include "TMPCommon.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 std::string TSizeNB1::get_name() const
-  { return "TSizeNB1"; }
+{
+    return "TSizeNB1";
+}
 
 TSizeNB1::~TSizeNB1() {}
 
-template <unsigned DIM> static inline
-bool eval( const MsqMatrix<DIM,DIM>& T, double& result)
+template < unsigned DIM >
+static inline bool eval( const MsqMatrix< DIM, DIM >& T, double& result )
 {
-  double d1 = det(T) - 1;
-  result = d1*d1;
-  return true;
+    double d1 = det( T ) - 1;
+    result    = d1 * d1;
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool grad( const MsqMatrix<DIM,DIM>& T,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv )
+template < unsigned DIM >
+static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv )
 {
-  double d1 = det(T) - 1;
-  result = d1*d1;
-  deriv = 2 * d1 * transpose_adj(T);
-  return true;
+    double d1 = det( T ) - 1;
+    result    = d1 * d1;
+    deriv     = 2 * d1 * transpose_adj( T );
+    return true;
 }
 
-template <unsigned DIM> static inline
-bool hess( const MsqMatrix<DIM,DIM>& T,
-           double& result,
-           MsqMatrix<DIM,DIM>& deriv,
-           MsqMatrix<DIM,DIM>* second )
+template < unsigned DIM >
+static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv,
+                         MsqMatrix< DIM, DIM >* second )
 {
-  double d1 = det(T) - 1;
-  result = d1*d1;
-  const MsqMatrix<DIM,DIM> adjt = transpose_adj(T);
-  deriv = 2 * d1 * adjt;
-  set_scaled_outer_product( second, 2, adjt );
-  pluseq_scaled_2nd_deriv_of_det( second, 2 * d1, T );
-  return true;
+    double d1                        = det( T ) - 1;
+    result                           = d1 * d1;
+    const MsqMatrix< DIM, DIM > adjt = transpose_adj( T );
+    deriv                            = 2 * d1 * adjt;
+    set_scaled_outer_product( second, 2, adjt );
+    pluseq_scaled_2nd_deriv_of_det( second, 2 * d1, T );
+    return true;
 }
 
-TMP_T_TEMPL_IMPL_COMMON(TSizeNB1)
+TMP_T_TEMPL_IMPL_COMMON( TSizeNB1 )
 
-} // namespace MBMesquite
+}  // namespace MBMesquite

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file TetDihedralWeight.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -36,7 +35,8 @@
 #include "Mesquite.hpp"
 #include "WeightCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class ReferenceMesh;
 
@@ -46,32 +46,27 @@ class ReferenceMesh;
  */
 class TetDihedralWeight : public WeightCalculator
 {
-public:
+  public:
+    TetDihedralWeight( double cutoff = 135, double a = 0.4395 ) : refMesh( 0 ), mCutoff( cutoff ), mA( a ) {}
 
-  TetDihedralWeight( double cutoff = 135, double a = 0.4395 )
-    : refMesh(0), mCutoff(cutoff), mA(a)
-    {}
+    TetDihedralWeight( ReferenceMesh* mesh, double cutoff = 135, double a = 0.4395 )
+        : refMesh( mesh ), mCutoff( cutoff ), mA( a )
+    {
+    }
 
-  TetDihedralWeight( ReferenceMesh* mesh, double cutoff = 135, double a = 0.4395 )
-    : refMesh(mesh), mCutoff(cutoff), mA(a)
-    {}
-
-  /**\brief Get target metric weight
-   *
-   *\param pd      The current PatchData
-   *\param element The index an element within the patch data.
-   *\param sample  The sample point in the element.
-   */
-  virtual double get_weight( PatchData& pd,
-                             size_t element,
-                             Sample sample,
-                             MsqError& err );
+    /**\brief Get target metric weight
+     *
+     *\param pd      The current PatchData
+     *\param element The index an element within the patch data.
+     *\param sample  The sample point in the element.
+     */
+    virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 
   private:
     ReferenceMesh* refMesh;
     double mCutoff, mA;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

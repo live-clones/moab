@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file MsqGeomPrim.hpp
  *  \brief Classes for primitive geometry
  *  \author Jason Kraftcheck
@@ -36,49 +35,59 @@
 #include "Mesquite.hpp"
 #include "Vector3D.hpp"
 
-namespace MBMesquite {
-
+namespace MBMesquite
+{
 
 /**\brief Line in R^3 */
 class MESQUITE_EXPORT MsqLine
 {
   private:
     Vector3D mPoint;
-    Vector3D mDirection; // unit direction
+    Vector3D mDirection;  // unit direction
 
   public:
+    MsqLine( const Vector3D& p_point, const Vector3D& p_dir ) : mPoint( p_point ), mDirection( p_dir / p_dir.length() )
+    {
+    }
 
-    MsqLine( const Vector3D& p_point, const Vector3D& p_dir )
-      : mPoint(p_point), mDirection(p_dir/p_dir.length())
-    {}
+    MsqLine() : mPoint( 0, 0, 0 ), mDirection( 0, 0, 0 ) {}
 
-    MsqLine()
-      : mPoint(0,0,0), mDirection(0,0,0)
-    {}
+    static MsqLine two_point( const Vector3D& p1, const Vector3D& p2 )
+    {
+        return MsqLine( p1, p2 - p1 );
+    }
 
-    static
-    MsqLine two_point( const Vector3D& p1, const Vector3D& p2 )
-      { return MsqLine( p1, p2 - p1 ); }
+    const Vector3D& point() const
+    {
+        return mPoint;
+    }
+    const Vector3D& direction() const
+    {
+        return mDirection;
+    }
 
-    const Vector3D& point() const { return mPoint; }
-    const Vector3D& direction() const { return mDirection; }
-
-      //! Get point given parameter (mPoint + param * mDirection)
+    //! Get point given parameter (mPoint + param * mDirection)
     Vector3D point( double param ) const
-      { return point() + param * direction(); }
+    {
+        return point() + param * direction();
+    }
 
-      //! Get parameter value for location on line closest to input point.
+    //! Get parameter value for location on line closest to input point.
     double closest( const Vector3D& from_point ) const
-      { return mDirection % (from_point - mPoint); }
+    {
+        return mDirection % ( from_point - mPoint );
+    }
 
     double distance( const Vector3D& from_point ) const
-      { return (point(closest(from_point)) - from_point).length(); }
+    {
+        return ( point( closest( from_point ) ) - from_point ).length();
+    }
 
-      //! Find intersection between two lines
-      //!\return false if no point intersection (skew, parallel, coincident, etc.)
+    //! Find intersection between two lines
+    //!\return false if no point intersection (skew, parallel, coincident, etc.)
     bool intersect( const MsqLine& other, double& param, double epsilon ) const;
 
-      //! Find parameter of closest position on this line to another line
+    //! Find parameter of closest position on this line to another line
     bool closest( const MsqLine& other, double& param ) const;
 };
 
@@ -87,92 +96,100 @@ class MESQUITE_EXPORT MsqCircle
 {
   private:
     Vector3D mCenter;
-    Vector3D mNormal; //!< unit normal
+    Vector3D mNormal;  //!< unit normal
     double mRadius;
 
   public:
-
-    MsqCircle()
-      : mCenter(0,0,0), mNormal(0,0,0), mRadius(0)
-      {}
+    MsqCircle() : mCenter( 0, 0, 0 ), mNormal( 0, 0, 0 ), mRadius( 0 ) {}
 
     MsqCircle( const Vector3D& p_center, const Vector3D& p_normal, double p_radius )
-      : mCenter(p_center), mNormal(p_normal/p_normal.length()), mRadius(p_radius)
-      {}
+        : mCenter( p_center ), mNormal( p_normal / p_normal.length() ), mRadius( p_radius )
+    {
+    }
 
-      //! Find circle passing through three points
-      //!\return false if points are colinear, true otherwise.
-    static
-    bool three_point( const Vector3D& p1,
-                      const Vector3D& p2,
-                      const Vector3D& p3,
-                      MsqCircle& result );
+    //! Find circle passing through three points
+    //!\return false if points are colinear, true otherwise.
+    static bool three_point( const Vector3D& p1, const Vector3D& p2, const Vector3D& p3, MsqCircle& result );
 
-      //! Find circle with center and two points
-      //!\return false if points are colinear or not equidistant from center, true otherwise.
-    static
-    bool two_point( const Vector3D& center,
-                    const Vector3D& p1,
-                    const Vector3D& p2,
-                    MsqCircle& result );
+    //! Find circle with center and two points
+    //!\return false if points are colinear or not equidistant from center, true otherwise.
+    static bool two_point( const Vector3D& center, const Vector3D& p1, const Vector3D& p2, MsqCircle& result );
 
-    const Vector3D& center() const { return mCenter; }
-    const Vector3D& normal() const { return mNormal; }
-    double radius() const          { return mRadius; }
+    const Vector3D& center() const
+    {
+        return mCenter;
+    }
+    const Vector3D& normal() const
+    {
+        return mNormal;
+    }
+    double radius() const
+    {
+        return mRadius;
+    }
 
-      //! Get arbitrary radial vector (vector in plane with length equal to radius)
+    //! Get arbitrary radial vector (vector in plane with length equal to radius)
     Vector3D radial_vector() const;
 
-      //! Find closest point on circle to input position.  Returns
-      //! arbitrary location on circle if point is at center.
+    //! Find closest point on circle to input position.  Returns
+    //! arbitrary location on circle if point is at center.
     Vector3D closest( const Vector3D& point ) const;
 
-      //! Find closest point on circle to input position, and tangent
-      //! at that point.  Fails and returns false if point is at center
-      //! of circle.
-    bool closest( const Vector3D& point,
-                  Vector3D& point_on_circle,
-                  Vector3D& tangent_at_point ) const;
+    //! Find closest point on circle to input position, and tangent
+    //! at that point.  Fails and returns false if point is at center
+    //! of circle.
+    bool closest( const Vector3D& point, Vector3D& point_on_circle, Vector3D& tangent_at_point ) const;
 };
-
 
 /**\brief Plane */
 class MESQUITE_EXPORT MsqPlane
 {
   private:
-    Vector3D mNormal; //!< unit normal
+    Vector3D mNormal;  //!< unit normal
     double mCoeff;
 
   public:
-
     MsqPlane( const Vector3D& p_normal, double coeff );
     MsqPlane( const Vector3D& p_normal, const Vector3D& p_point );
-      //! ax+by+cz+d=0
+    //! ax+by+cz+d=0
     MsqPlane( double a, double b, double c, double d );
 
-      //! get unit normal vector for plane
-    const Vector3D& normal() const { return mNormal; }
+    //! get unit normal vector for plane
+    const Vector3D& normal() const
+    {
+        return mNormal;
+    }
 
-      //! get coefficient term for plane
-    double coefficient() const { return mCoeff; }
+    //! get coefficient term for plane
+    double coefficient() const
+    {
+        return mCoeff;
+    }
 
-      //! Get point on plane closest to origin.
-    Vector3D point() const { return -mCoeff * mNormal; }
+    //! Get point on plane closest to origin.
+    Vector3D point() const
+    {
+        return -mCoeff * mNormal;
+    }
 
-      //! Get distance from point to plane
+    //! Get distance from point to plane
     double distance( const Vector3D& p_point ) const
-      { return fabs( normal() % p_point + coefficient() ); }
+    {
+        return fabs( normal() % p_point + coefficient() );
+    }
 
-      //! Get closest location on plane to input position
+    //! Get closest location on plane to input position
     Vector3D closest( const Vector3D& p_point ) const
-      { return p_point - normal() * (normal() % p_point + coefficient()); }
+    {
+        return p_point - normal() * ( normal() % p_point + coefficient() );
+    }
 
-      //! Find intersection of this plane with another.
-      //!\return false if parallel or invalid plane, true otherwise
+    //! Find intersection of this plane with another.
+    //!\return false if parallel or invalid plane, true otherwise
     bool intersect( const MsqPlane& plane, MsqLine& result ) const;
 
-      //! Find point of itersection with a line
-      //!\return false if parallel, true otherwise
+    //! Find point of itersection with a line
+    //!\return false if parallel, true otherwise
     bool intersect( const MsqLine& line, double& line_param ) const;
 };
 
@@ -184,38 +201,40 @@ class MESQUITE_EXPORT MsqSphere
     double mRadius;
 
   public:
+    MsqSphere( const Vector3D& p_center, double p_radius ) : mCenter( p_center ), mRadius( p_radius ) {}
 
-    MsqSphere( const Vector3D& p_center, double p_radius )
-      : mCenter(p_center), mRadius(p_radius) {}
+    const Vector3D& center() const
+    {
+        return mCenter;
+    }
+    double radius() const
+    {
+        return mRadius;
+    }
 
-    const Vector3D& center() const { return mCenter; }
-    double radius() const { return mRadius; }
-
-      //! Get location on sphere closest to input location.
-      //! Returns arbitrary point if input location is at center.
+    //! Get location on sphere closest to input location.
+    //! Returns arbitrary point if input location is at center.
     Vector3D closest( const Vector3D& point ) const;
 
-
-      //! Get location on sphere closest to input location, and
-      //! normal at closest point.
-      //!\return false if input point is at center, true otherwise.
-    bool closest( const Vector3D& point,
-                  Vector3D& point_on_sphere,
-                  Vector3D& normal_at_point ) const;
+    //! Get location on sphere closest to input location, and
+    //! normal at closest point.
+    //!\return false if input point is at center, true otherwise.
+    bool closest( const Vector3D& point, Vector3D& point_on_sphere, Vector3D& normal_at_point ) const;
 
     double distance( const Vector3D& point ) const
-      { return fabs( (center() - point).length() - radius() ); }
+    {
+        return fabs( ( center() - point ).length() - radius() );
+    }
 
-      //! Intersect plane with sphere
-      //!\return true if intersection exists, false otherwise.
+    //! Intersect plane with sphere
+    //!\return true if intersection exists, false otherwise.
     bool intersect( const MsqPlane& plane, MsqCircle& result ) const;
 
-      //! Intersect spheres
-      //!\return true if intersection exists, false otherwise.
+    //! Intersect spheres
+    //!\return true if intersection exists, false otherwise.
     bool intersect( const MsqSphere& sphere, MsqCircle& result ) const;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

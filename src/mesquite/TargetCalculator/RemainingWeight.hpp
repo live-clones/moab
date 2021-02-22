@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file RemainingWeight.hpp
  *  \brief
  *  \author Jason Kraftcheck
@@ -35,26 +34,23 @@
 
 #include "WeightCalculator.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 /**\brief c2_k = 1 - c1_k */
 class RemainingWeight : public WeightCalculator
 {
-private:
-  WeightCalculator* primaryWeight;
-public:
+  private:
+    WeightCalculator* primaryWeight;
 
-  RemainingWeight( WeightCalculator* primary_weight )
-    : primaryWeight(primary_weight) {}
+  public:
+    RemainingWeight( WeightCalculator* primary_weight ) : primaryWeight( primary_weight ) {}
 
-  virtual ~RemainingWeight();
+    virtual ~RemainingWeight();
 
-  virtual double get_weight( PatchData& pd,
-                             size_t element,
-                             Sample sample,
-                             MsqError& err );
+    virtual double get_weight( PatchData& pd, size_t element, Sample sample, MsqError& err );
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

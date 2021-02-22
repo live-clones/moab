@@ -31,33 +31,33 @@
 #include <sys/types.h>
 #include <vector>
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
 
 /** A struct describing a mapping between a Mesquite type/node_count
  *  combination an a VTK element type.*/
-struct MESQUITE_EXPORT VtkTypeInfo {
+struct MESQUITE_EXPORT VtkTypeInfo
+{
 
-  const char* name;
+    const char* name;
 
-  unsigned vtkType;        //!< The VTK type number
-  EntityTopology msqType;  //!< The Mesquite element topology for the VTK type
-  unsigned numNodes;       //!< The number of nodes in the VTK type.
-  const unsigned* vtkConnOrder;  /**< NULL if VTK node ordering is the same as
-                            *   Mesquite's internal ordering.  If non-null,
-                            *   an array of length VtkTypeInfo::numNodes, indexed
-                            *   with the Mesquite connectivity offset and
-                            *   containing the corresponding VTK connectivity
-                            *   offset
-                            */
+    unsigned vtkType;             //!< The VTK type number
+    EntityTopology msqType;       //!< The Mesquite element topology for the VTK type
+    unsigned numNodes;            //!< The number of nodes in the VTK type.
+    const unsigned* vtkConnOrder; /**< NULL if VTK node ordering is the same as
+                                   *   Mesquite's internal ordering.  If non-null,
+                                   *   an array of length VtkTypeInfo::numNodes, indexed
+                                   *   with the Mesquite connectivity offset and
+                                   *   containing the corresponding VTK connectivity
+                                   *   offset
+                                   */
 
     /** Get VtkTypeInfo from VTK type number */
-  static const VtkTypeInfo* find_type( unsigned vtk_type, MsqError& err );
+    static const VtkTypeInfo* find_type( unsigned vtk_type, MsqError& err );
     /** Get VtkTypeInfo from Mesquite type and number of nodes */
-  static const VtkTypeInfo* find_type( EntityTopology msq_type,
-                                       unsigned num_nodes,
-                                       MsqError& err );
+    static const VtkTypeInfo* find_type( EntityTopology msq_type, unsigned num_nodes, MsqError& err );
 
     /** Reorder element connectivty list for writing to a VTK file
      *
@@ -66,10 +66,9 @@ struct MESQUITE_EXPORT VtkTypeInfo {
      * ordering for the elment differs, the passed list will be reordered
      * for writing to a VTK file.
      */
-  void mesquiteToVtkOrder( std::vector<size_t>& connectivity_list ) const;
+    void mesquiteToVtkOrder( std::vector< size_t >& connectivity_list ) const;
 };
 
-
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

@@ -24,7 +24,6 @@
 
   ***************************************************************** */
 
-
 /** \file IQInterface.hpp
  *  \brief Interface for InstructionQueue and similar classes
  *  \author Jason Kraftcheck
@@ -37,7 +36,8 @@
 #include "Settings.hpp"
 #include "MeshInterface.hpp"
 
-namespace MBMesquite {
+namespace MBMesquite
+{
 
 class MsqError;
 class ParallelMesh;
@@ -45,42 +45,36 @@ class ParallelMesh;
 class MESQUITE_EXPORT IQInterface : public Settings
 {
   public:
-
     virtual ~IQInterface();
 
-    inline void
-    run_instructions( MeshDomainAssoc* mesh_and_domain, MsqError &err)
-      { this->run_common( mesh_and_domain, 0, this, err ); }
+    inline void run_instructions( MeshDomainAssoc* mesh_and_domain, MsqError& err )
+    {
+        this->run_common( mesh_and_domain, 0, this, err );
+    }
 
-    inline void
-    run_instructions( Mesh* mesh, MsqError& err )
-      {
-        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc(mesh, 0);
+    inline void run_instructions( Mesh* mesh, MsqError& err )
+    {
+        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( mesh, 0 );
         this->run_common( &mesh_and_domain, 0, this, err );
-      }
+    }
 
-    inline void
-    run_instructions( ParallelMesh* mesh, MeshDomain* domain, MsqError &err)
-      {
-        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc((Mesh*)mesh, domain);
+    inline void run_instructions( ParallelMesh* mesh, MeshDomain* domain, MsqError& err )
+    {
+        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( (Mesh*)mesh, domain );
         this->run_common( &mesh_and_domain, mesh, this, err );
-      }
+    }
 
-    inline void
-    run_instructions( ParallelMesh* mesh, MsqError& err )
-      {
-        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc((Mesh*)mesh, 0);
+    inline void run_instructions( ParallelMesh* mesh, MsqError& err )
+    {
+        MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( (Mesh*)mesh, 0 );
         this->run_common( &mesh_and_domain, mesh, this, err );
-      }
+    }
 
   protected:
-
-    virtual void run_common( MeshDomainAssoc* mesh_and_domain,
-                             ParallelMesh* pmesh,
-                             Settings* settings,
+    virtual void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
                              MsqError& err ) = 0;
 };
 
-} // namespace MBMesquite
+}  // namespace MBMesquite
 
 #endif

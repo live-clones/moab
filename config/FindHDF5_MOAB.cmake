@@ -9,24 +9,56 @@ set( HDF5_ROOT "" CACHE PATH "Path to search for HDF5 header and library files" 
 set( HDF5_FOUND NO CACHE INTERNAL "Found HDF5 components successfully." )
 set( SZIP_ROOT "" CACHE PATH "Path to search for SZIP header and library files" )
 
+if(WIN32)
+   set(HDF5_USE_STATIC_LIBRARIES ON)
+endif(WIN32)
+ 
 # Try to find HDF5 with the CMake finder
-set(ENV{HDF5_ROOT} ${HDF5_ROOT})
+if (CMAKE_VERSION VERSION_LESS "3.12.0")
+  set(ENV{HDF5_ROOT} ${HDF5_ROOT})
+endif ()
 if (EXISTS ${HDF5_ROOT})
    find_package(HDF5 COMPONENTS C HL NO_DEFAULT_PATH HINTS ${HDF5_ROOT})
 else()
    find_package(HDF5 COMPONENTS C HL)
 endif(EXISTS ${HDF5_ROOT})
- 
+
 if (HDF5_FOUND)
   # Translate to MOAB variables
   SET(HDF5_INCLUDES ${HDF5_INCLUDE_DIRS})
   SET(HDF5_LIBRARIES ${HDF5_HL_LIBRARIES} ${HDF5_C_LIBRARIES})
+
+  if(WIN32)
+    # Fix an issue with FindHDF5 shipped with CMake 3.10.0 < < 3.14.0
+    string(REPLACE "/hdf5_hl.lib" "/libhdf5_hl.lib" HDF5_HL_LIBRARIES ${HDF5_HL_LIBRARIES})
+    SET(HDF5_LIBRARIES ${HDF5_HL_LIBRARIES} ${HDF5_C_LIBRARIES})
+    # End of fix
+
+    # Get HDF5 Library path from libhdf5.lib location
+    string(REPLACE "/libhdf5.lib" "" HDF5_LIBRARIES_PATH ${HDF5_LIBRARIES})
+    foreach (VARIANT ZLIB SZIP)
+      set (HDF5_DEPLIBS_${VARIANT} "HDF5_DEPLIBS_${VARIANT}-NOTFOUND" CACHE INTERNAL "HDF5 external library component ${VARIANT}." )
+      string(TOLOWER VARIANT ${VARIANT})
+      FIND_LIBRARY(HDF5_DEPLIBS_${VARIANT} "lib${VARIANT}.lib"
+        HINTS ${HDF5_ROOT}/lib ${HDF5_LIBRARIES_PATH}
+      )
+      if (NOT ${HDF5_DEPLIBS_${VARIANT}} MATCHES "(.*)NOTFOUND")
+        list(APPEND HDF5_DEP_LIBRARIES ${HDF5_DEPLIBS_${VARIANT}})
+      endif (NOT ${HDF5_DEPLIBS_${VARIANT}} MATCHES "(.*)NOTFOUND")
+    endforeach()
+
+    list(APPEND HDF5_LIBRARIES ${HDF5_DEP_LIBRARIES}) 
+  endif(WIN32)
+
 else (HDF5_FOUND)
-  # Try to find HDF5 ourselves
-  if(EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+  # Try to find HDF5 ourselves.
+  # Below is simply a duplication of effort.
+  if (EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+    message(STATUS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake exists.")
     include(${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake)
     SET( HDF5_INCLUDES "${HDF5_INCLUDE_DIR}" )
-  else()
+  endif ()
+  if (NOT HDF5_FOUND)
 
     FIND_PATH(HDF5_INCLUDE_DIR
       NAMES hdf5.h H5public.h
@@ -47,7 +79,7 @@ else (HDF5_FOUND)
     endforeach()
 
     FIND_LIBRARY(HDF5_BASE_LIBRARY NAMES hdf5 hdf5d libhdf5.a libhdf5d.a
-      HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib 
+      HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib
       )
     FIND_LIBRARY(HDF5_HLBASE_LIBRARY hdf5_hl hdf5_hld libhdf5_hl.a libhdf5_hld.a
       HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib
@@ -65,7 +97,7 @@ else (HDF5_FOUND)
           HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib NO_DEFAULT_PATH
           )
         FIND_LIBRARY(HDF5_HLFORT_LIBRARY
-          NAMES hdf5hl_fortran hdf5_hl_fortran libhdf5hl_fortran.a libhdf5_hl_fortran.a 
+          NAMES hdf5hl_fortran hdf5_hl_fortran libhdf5hl_fortran.a libhdf5_hl_fortran.a
           HINTS ${HDF5_ROOT} ${HDF5_ROOT}/lib NO_DEFAULT_PATH
           )
         SET( HDF5_INCLUDES "${HDF5_INCLUDE_DIR}" )
@@ -93,7 +125,7 @@ else (HDF5_FOUND)
         endforeach()
         list(APPEND HDF5_LIBRARIES ${HDF5_DEP_LIBRARIES})
         # If the HDF5 include directory was found, open H5pubconf.h to determine if
-        # HDF5 was compiled with parallel IO support 
+        # HDF5 was compiled with parallel IO support
         set( HDF5_IS_PARALLEL FALSE )
         foreach( _dir IN LISTS HDF5_INCLUDE_DIR )
           if( EXISTS "${_dir}/H5pubconf.h" )
@@ -109,6 +141,13 @@ else (HDF5_FOUND)
           mark_as_advanced( HDF5_IS_PARALLEL )
         endforeach()
         SET( HDF5_FOUND YES )
+
+        # print some HDF5 configuration details
+        message (STATUS "---   HDF5 Configuration ::")
+        message (STATUS "        Directory    : ${HDF5_ROOT}")
+        message (STATUS "        IS_PARALLEL  : ${HDF5_IS_PARALLEL}")
+        message (STATUS "        INCLUDES     : ${HDF5_INCLUDES}")
+        message (STATUS "        LIBRARIES    : ${HDF5_LIBRARIES}")
       ELSE (HDF5_INCLUDE_DIR AND HDF5_BASE_LIBRARY)
         set( HDF5_FOUND NO )
         message("finding HDF5 failed, please try to set the var HDF5_ROOT")
@@ -118,13 +157,8 @@ else (HDF5_FOUND)
     #now we create fake targets to be used
     include(${HDF5_ROOT}/share/cmake/hdf5/hdf5-targets.cmake OPTIONAL)
 
-  endif(EXISTS "${HDF5_ROOT}/share/cmake/hdf5/hdf5-config.cmake")
+  endif ()
 endif (HDF5_FOUND)
-
-message (STATUS "---   HDF5 Configuration ::")
-message (STATUS "        IS_PARALLEL  : ${HDF5_IS_PARALLEL}")
-message (STATUS "        INCLUDES     : ${HDF5_INCLUDES}")
-message (STATUS "        LIBRARIES    : ${HDF5_LIBRARIES}")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (
