@@ -252,6 +252,7 @@ set( MOAB_INSTALL_HEADERS
 set( MOAB_GENERATED_INSTALL_HEADERS
      ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/moab/MOABConfig.h
+     ${CMAKE_CURRENT_BINARY_DIR}/moab/moab_export.h
   )
 
 if( MOAB_HAVE_CGM )
@@ -309,8 +310,11 @@ target_include_directories(MOAB
   PUBLIC
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
+
 include(GenerateExportHeader)
+generate_export_header(MOAB EXPORT_FILE_NAME moab/moab_export.h)
 generate_export_header(MOAB)
+
 
 set_target_properties(
   MOAB
@@ -320,6 +324,8 @@ set_target_properties(
   VERSION ${MOAB_VERSION}
   SOVERSION ${MOAB_VERSION_MAJOR}
   )
+
+
 
 message(STATUS "MOAB_LIBS = ${MOAB_LIBS}.")
 set(MOAB_ALL_LIBS ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS})
