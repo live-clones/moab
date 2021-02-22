@@ -34,7 +34,6 @@
   #include <time.h>
 #endif
 
-#endif
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
