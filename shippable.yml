@@ -1,8 +1,8 @@
 language: c
 
 env:
-  - CC="clang" CXX="clang++" CONFIGOPTS="--enable-debug --disable-optimize --enable-tools"
-  - CC="gcc" CXX="g++" CONFIGOPTS="--disable-debug --enable-optimize"
+  - CC="clang" CXX="clang++" CONFIGOPTS="--enable-debug --disable-optimize"
+  - CC="gcc" CXX="g++" CONFIGOPTS="--disable-debug --enable-optimize --enable-tools"
 
 branches:
   only:
@@ -22,11 +22,10 @@ build:
     options:
   ci:
     - autoreconf -fi
-    - ./configure CC=clang CXX=clang++ --enable-shared --enable-pymoab --disable-fortran $CONFIGOPTS
-    - make all
-    - make check
+    - ./configure --enable-shared --enable-pymoab --disable-fortran $CONFIGOPTS
+    - make all check
   post_ci:
-    - make dist
+    - make dist distclean
   on_success:
     - echo "Excellent. PyMOAB works cleanly!"
   on_failure:
