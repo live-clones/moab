@@ -311,7 +311,7 @@ target_include_directories(MOAB
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 
-include(GenerateExportHeader)
+#include(GenerateExportHeader)
 generate_export_header(MOAB EXPORT_FILE_NAME moab/moab_export.h)
 generate_export_header(MOAB)
 
