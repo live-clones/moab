@@ -5,7 +5,7 @@
 #if defined(__MINGW32__)
   #include <sys/time.h>
 #else
-  #include <time.h>
+  #include <ctime>
 #endif
 
 #include <vector>
