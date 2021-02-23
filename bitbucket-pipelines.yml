@@ -12,12 +12,12 @@ pipelines:
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
-                - cd build_atools && ../configure --with-mpi --enable-shared --enable-pymoab PYTHON=python3 --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-netcdf=/usr/lib/x86_64-linux-gnu/netcdf/mpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3
+                - cd build_atools && ../configure --with-mpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3
                 - make distcheck V=1 
                 # Now configure with CMake build system
                 # CMake Shared Library Builds
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi  -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
+                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/cmake/netCDF_mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
                 - make all test VERBOSE=1
                 - make dist
                 # Successfully finished both Autotools and CMake checks
@@ -33,11 +33,11 @@ pipelines:
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
-                - cd build_atools && ../configure --with-mpi --enable-shared --enable-pymoab PYTHON=python3 --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-netcdf=/usr/lib/x86_64-linux-gnu/netcdf/mpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3
+                - cd build_atools && ../configure --with-mpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3
                 - make distcheck V=1 
                 # Now configure with CMake build system
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi  -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
+                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/cmake/netCDF_mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
                 - make all test VERBOSE=1
                 - make dist
                 # Successfully finished both Autotools and CMake checks
@@ -52,11 +52,11 @@ pipelines:
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System"
-                - cd build_atools && ../configure --with-mpi --enable-shared --enable-pymoab PYTHON=python3 --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-netcdf=/usr/lib/x86_64-linux-gnu/netcdf/mpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3
+                - cd build_atools && ../configure --with-mpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3
                 - make distcheck V=1 
                 # Now configure with CMake build system
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi  -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
+                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/cmake/netCDF_mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
                 - make all test VERBOSE=1
                 - make dist
                 # Successfully finished both Autotools and CMake checks
