@@ -7,7 +7,7 @@ pipelines:
             script:
                 - alias python=python3
                 # Setup the build pipeline
-                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90
+                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 OMPI_ALLOW_RUN_AS_ROOT="1" OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1"
                 # AutoTools Static Library Builds
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
@@ -28,7 +28,7 @@ pipelines:
             script:
                 - alias python=python3
                 # Setup the build pipeline
-                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90
+                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 OMPI_ALLOW_RUN_AS_ROOT="1" OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1"
                 # AutoTools Static Library Builds
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
@@ -47,7 +47,7 @@ pipelines:
             script:
                 - alias python=python3
                 # Setup the build pipeline
-                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90
+                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 OMPI_ALLOW_RUN_AS_ROOT="1" OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1"
                 # AutoTools Static Library Builds
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
