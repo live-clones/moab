@@ -2168,7 +2168,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
         // right now, this works only if root of sender is the same as the root of coupler
         if (*method == 5 && ( cgraph->receiver(0) == cgraph->sender(0) ) )
         {
-            zoltanBuffer == context.uniqueZoltanBuffer;
+            zoltanBuffer = context.uniqueZoltanBuffer;
         }
         rval = cgraph->compute_partition( pco, owned, *method, zoltanBuffer );CHKERRVAL( rval );
         // basically, send the graph to the receiver side, with unblocking send
@@ -2223,7 +2223,8 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     // senders across for the current receiver
     int current_receiver = cgraph->receiver( receiver_rank );
 #ifdef MOAB_HAVE_ZOLTAN
-    if (zoltanBuff.size() > 0) // it could happen only on root of receiver
+    if (zoltanBuff.size() > 0) // it could happen only on root of receiver; store it in a global context member
+        // the corresponding send it with method 4, for sure
         context.uniqueZoltanBuffer = zoltanBuff;
 #endif
     std::vector< int > senders_local;
