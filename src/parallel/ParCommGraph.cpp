@@ -278,12 +278,14 @@ ErrorCode ParCommGraph::send_graph( MPI_Comm jcomm , std::vector<char> & zoltanB
         // the last integer
         // will signal if we have to send zoltan buffer too, in a separate message 0 for no, 1 for yes
         comm_graph = packed_recv_array;
-        comm_graph.resize(size_pack_array); // bigger by 1, to store the flag about zBuff
+        comm_graph.resize(size_pack_array); // bigger by 1, to store the semaphore about zBuff
         // will add 1 or 2 requests; first one with comm graph, second with zoltan buffer if needed
         if ( zoltanBuffer.size() > 0 )
         {
             sendReqs.resize( 2 );
             comm_graph[ size_pack_array - 1 ] = 1; // send zoltanBuffer too :)
+            zBuff = zoltanBuffer; // do a deep copy here, because the zoltanBuffer will go out of scope, and
+            // we need to keep the sent buffer, after the non-blocking sent is executed; thanks Karen Devine !
         }
         else
         {
@@ -294,11 +296,10 @@ ErrorCode ParCommGraph::send_graph( MPI_Comm jcomm , std::vector<char> & zoltanB
         ierr = MPI_Isend( &comm_graph[0], size_pack_array, MPI_INT, receiver( 0 ), 20, jcomm,
                           &sendReqs[0] );  // we have to use global communicator
         if( ierr != 0 ) return MB_FAILURE;
-        if ( zoltanBuffer.size() > 0 )
+        if ( zBuff.size() > 0 )
         {
-            ierr = MPI_Isend( &zoltanBuffer[0], (int)zoltanBuffer.size(), MPI_CHAR, receiver( 0 ), 30, jcomm,
+            ierr = MPI_Isend( &zBuff[0], (int)zBuff.size(), MPI_CHAR, receiver( 0 ), 30, jcomm,
                                       &sendReqs[1] );  // we have to use global communicator
-            this->zBuff = zoltanBuffer; // for actual storage
             if( ierr != 0 ) return MB_FAILURE;
         }
 
@@ -323,7 +324,7 @@ ErrorCode ParCommGraph::send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Rang
 
     int indexReq = 0;
     int ierr;                             // MPI error
-    if( is_root_sender() ) indexReq = (int) sendReqs.size() ;  // we could already have 2
+    if( is_root_sender() ) indexReq = (int) sendReqs.size() ;  // we could have 1 or 2 MPI_Request's already
     sendReqs.resize( indexReq + split_ranges.size() );
     for( std::map< int, Range >::iterator it = split_ranges.begin(); it != split_ranges.end(); it++ )
     {
@@ -360,7 +361,7 @@ ErrorCode ParCommGraph::send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Rang
                           &sendReqs[indexReq] );  // we have to use global communicator
         if( ierr != 0 ) return MB_FAILURE;
         indexReq++;
-        localSendBuffs.push_back( buffer );
+        localSendBuffs.push_back( buffer ); // these buffers will be cleared only after all MPI_Request's have been waited upon
     }
     return MB_SUCCESS;
 }
@@ -375,7 +376,6 @@ ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, s
     MPI_Status status;
     if( rootReceiver )
     {
-
         ierr = MPI_Probe( sender( 0 ), 20, jcomm, &status );
         if( 0 != ierr )
         {
@@ -403,10 +403,11 @@ ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, s
 #endif
         // the last int tells if we have another receive to do or not (for  zoltan buffer)
         // look at the last value, to see if we receive zoltan buffer or not
-        int zBuff = pack_array[size_pack_array-1];
-        if ( zBuff > 0 )
+        int semaphore = pack_array[size_pack_array-1];
+        if ( 1 == semaphore )
         {
-            // expect zoltanBuffer
+            // expect zoltanBuffer, the difference is the tag; we still need the joint comm
+            // the buffer was sent with a nonblocking send, from the root sender
             ierr = MPI_Probe( sender( 0 ), 30, jcomm, &status ); // blocking call, to get size
             if( 0 != ierr )
             {
@@ -587,6 +588,8 @@ ErrorCode ParCommGraph::release_send_buffers()
     if( ierr != 0 ) return MB_FAILURE;
     // now we can free all buffers
     comm_graph.clear();
+    zBuff.clear(); // this is for zoltan buffer, it will be used only when sending the
+                   // the RCB tree from component (sender) root to coupler (receiver) root
     std::vector< ParallelComm::Buffer* >::iterator vit;
     for( vit = localSendBuffs.begin(); vit != localSendBuffs.end(); ++vit )
         delete( *vit );
@@ -956,7 +959,6 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
             // rval = mb->tag_get_data(owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
         }
         // now, unpack the data and set the tags
-        sendReqs.resize( involved_IDs_map.size() );
         for( std::map< int, std::vector< int > >::iterator mit = involved_IDs_map.begin();
              mit != involved_IDs_map.end(); mit++ )
         {

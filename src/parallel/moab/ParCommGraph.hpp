@@ -263,10 +263,13 @@ class ParCommGraph
     std::vector< ParallelComm::Buffer* > localSendBuffs;  // this will store the pointers to the Buffers
     //                                    will be  released only when all mpi requests are waited
     //                                    for
-    std::vector<int>  comm_graph;  // this will store communication graph, on sender master, sent by nonblocking
-                      // send to the master receiver first integer will be the size of the graph,
-                      // the rest will be the packed graph, for trivial partition
-    std::vector<char> zBuff; // this will hang on the comm graph to not go out of scope before
+    std::vector<int>  comm_graph;  // this will store communication graph, on sender root, sent by nonblocking
+                      // send to the master receiver;  first integer will be the size of the graph,
+                      // the rest will be the packed graph, for trivial partition or Zoltan partition
+                      // the last integer will be a semaphore now that signals if we will send another
+                      // array, for the Zoltan buffer that stores right now the RCB tree
+    std::vector<char> zBuff; // this will keep the Zoltan buffer to not go out of scope before we are done sending
+    //
 
     // these will be now used to store ranges to be sent from current sender to each receiver in
     // joint comm
