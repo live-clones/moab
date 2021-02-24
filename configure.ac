@@ -238,7 +238,7 @@ AC_SUBST(enable_blaslapack)
 # function for detecting python modules
 AC_DEFUN([AC_PYTHON_MODULE],
 [AC_MSG_CHECKING(for module $1 in python)
-echo "import $1" | python -
+echo "import $1" | $PYTHON -
 if test $? -ne 0 ; then
 AC_MSG_RESULT(not found)
 AC_MSG_ERROR(You need the module $1 available to python for this package)

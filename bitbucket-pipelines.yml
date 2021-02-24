@@ -5,21 +5,19 @@ pipelines:
     default:
         - step:
             script:
+                - alias python=python3
                 # Setup the build pipeline
-                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90
-                # Setup cython properly
-                - easy_install pip
-                - pip install cython --user --force-reinstall --upgrade
+                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 OMPI_ALLOW_RUN_AS_ROOT="1" OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1"
                 # AutoTools Static Library Builds
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
-                - cd build_atools && ../configure --with-mpi --enable-static --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/mpich --with-netcdf=/usr --with-metis=/usr
-                - make distcheck V=1
+                - cd build_atools && ../configure --with-mpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3 --disable-mbcoupler
+                - make distcheck V=1 
                 # Now configure with CMake build system
                 # CMake Shared Library Builds
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/mpich -DENABLE_NETCDF=OFF -DENABLE_METIS=ON -DMETIS_DIR=/usr
+                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DCMAKE_CXX_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON  -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
                 - make all test VERBOSE=1
                 - make dist
                 # Successfully finished both Autotools and CMake checks
@@ -28,30 +26,18 @@ pipelines:
       master:
         - step:
             script:
+                - alias python=python3
                 # Setup the build pipeline
-                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90
-                # Setup cython properly
-                - easy_install pip
-                - pip install cython --user --force-reinstall --upgrade
+                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 OMPI_ALLOW_RUN_AS_ROOT="1" OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1"
                 # AutoTools Static Library Builds
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
-                - cd build_atools && ../configure --with-mpi --enable-static --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/mpich --with-netcdf=/usr --with-metis=/usr
-                - make distcheck V=1
-                # AutoTools Shared Library Builds
-                - make distclean && echo "Running the Autotools Build System Shared Library Build with Python-Enabled"
-                - ../configure --with-mpi --enable-shared --enable-optimize --enable-tools --enable-pymoab --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/mpich --with-netcdf=/usr --with-metis=/usr
-                - make distcheck V=1
+                - cd build_atools && ../configure --with-mpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3 --disable-mbcoupler
+                - make distcheck V=1 
                 # Now configure with CMake build system
-                # CMake Static Library Builds
-                - cd ../build_cmake && echo "Running the CMake Static Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=OFF -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/mpich -DENABLE_NETCDF=OFF -DENABLE_METIS=ON -DMETIS_DIR=/usr
-                - make all test VERBOSE=1
-                - make dist
-                # CMake Shared Library Builds
-                - cd ../ && rm -rf build_cmake && mkdir -p build_cmake && cd build_cmake && echo "Running the CMake Shared Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/mpich -DENABLE_NETCDF=OFF -DENABLE_METIS=ON -DMETIS_DIR=/usr
+                - cd ../build_cmake && echo "Running the CMake Shared Build System"
+                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DCMAKE_CXX_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON  -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
                 - make all test VERBOSE=1
                 - make dist
                 # Successfully finished both Autotools and CMake checks
@@ -59,27 +45,18 @@ pipelines:
       develop:
         - step:
             script:
+                - alias python=python3
                 # Setup the build pipeline
-                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90
+                - cd $BITBUCKET_CLONE_DIR && export CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 OMPI_ALLOW_RUN_AS_ROOT="1" OMPI_ALLOW_RUN_AS_ROOT_CONFIRM="1"
                 # AutoTools Static Library Builds
                 - rm -rf build_atools build_cmake && mkdir -p build_atools build_cmake
                 # Configure and build with Autotools
-                - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
-                - cd build_atools && ../configure --with-mpi --enable-static --enable-optimize --enable-tools --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/mpich --with-netcdf=/usr --with-metis=/usr
-                - make distcheck V=1
-                # AutoTools Shared Library Builds
-                - make distclean && echo "Running the Autotools Build System Shared Library Build with Python-Enabled"
-                - ../configure --with-mpi --enable-shared --enable-optimize --enable-tools --enable-pymoab --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/mpich --with-netcdf=/usr --with-metis=/usr
-                - make distcheck V=1
+                - autoreconf -fi && echo "Running the Autotools Build System"
+                - cd build_atools && ../configure --with-mpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3 --disable-mbcoupler
+                - make distcheck V=1 
                 # Now configure with CMake build system
-                # CMake Static Library Builds
-                - cd ../build_cmake && echo "Running the CMake Static Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=OFF -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/mpich -DENABLE_NETCDF=OFF -DENABLE_METIS=ON -DMETIS_DIR=/usr
-                - make all test VERBOSE=1
-                - make dist
-                # CMake Shared Library Builds
-                - cd ../ && rm -rf build_cmake && mkdir -p build_cmake && cd build_cmake && echo "Running the CMake Shared Build System"
-                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC" -DCMAKE_CXX_FLAGS="-fPIC -DPIC" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/mpich -DENABLE_NETCDF=OFF -DENABLE_METIS=ON -DMETIS_DIR=/usr
+                - cd ../build_cmake && echo "Running the CMake Shared Build System"
+                - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DCMAKE_CXX_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/cmake/netCDF_mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
                 - make all test VERBOSE=1
                 - make dist
                 # Successfully finished both Autotools and CMake checks
