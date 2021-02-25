@@ -283,7 +283,7 @@ int main( int argc, char* argv[] )
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
     if( couComm != MPI_COMM_NULL )
     {
-        char outputFileTgt3[] = "recvOcn3.h5m";
+        char outputFileTgt3[] = "recvOcn4.h5m";
         PUSH_TIMER( "Write migrated OCN mesh on coupler PEs" )
         ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
                                 strlen( fileWriteOptions ) );

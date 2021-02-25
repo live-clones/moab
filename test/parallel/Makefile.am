@@ -243,7 +243,7 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    outLnd.h5m wholeATM_lnd.h5m physAtm_lnd.h5m physBack_lnd.h5m \
                    fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m recvLnd2.h5m LndWithProj2.h5m \
                    LndWithProj3.h5m  fLndOnCpl3.h5m  OcnWithProj3.h5m  fOcnOnCpl3.h5m  recvLnd3.h5m  recvOcn3.h5m \
-                   AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m \
+                   AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m recvOcn4.h5m \
                    AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m \
                    atm_ocn_map.nc file_set7rk_0.h5m file_set7rk_1.h5m
 
