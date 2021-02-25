@@ -252,8 +252,8 @@ set( MOAB_INSTALL_HEADERS
 set( MOAB_GENERATED_INSTALL_HEADERS
      ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/moab/MOABConfig.h
-     ${CMAKE_CURRENT_BINARY_DIR}/moab/moab_export.h
   )
+#      ${CMAKE_CURRENT_BINARY_DIR}/moab/moab_export.h
 
 if( MOAB_HAVE_CGM )
   set( MOAB_CGM_LIBS ${CGM_LIBRARIES} )
