@@ -1,32 +1,21 @@
 # Contributing to the [MOAB][homepage] repository
 
-All contributions to configuration, source code, and documentation is accepted through the 
-pull request process in [Bitbucket][https://bitbucket.org/fathomteam/moab]. However, if you
-plan to submit a large contribution to MOAB, we recommend discussing the changes and motivations
-through the use of issue pages, or [developer mailing list][moab-dev@mcs.anl.gov]. 
+All contributions to configuration, source code, and documentation is accepted through the pull request process in [Bitbucket](https://bitbucket.org/fathomteam/moab). If you plan to submit a large contribution to MOAB, we do recommend discussing the changes and motivations through the use of issue pages, or in the [developer mailing list](mailto:moab-dev@mcs.anl.gov).
 
-Please note we have a [code of conduct](CODE_OF_CONDUCT.md), and so please follow it in all 
-your interactions with the project team and members.
+Please note we have a [code of conduct](CODE_OF_CONDUCT.md), and so please follow it in all your interactions with the project team and members.
 
-## Pull Request Process
+## Pull Request (PR) Process
 
-1. The pull request target should be "master". The "develop" branch will be used by the continuous 
-   integration system to ensure source stability and verification.
-2. Update the README.md with details of changes to the interface, this includes new environment 
-   variables, exposed ports, useful file locations and container parameters. If appropriate, document
-   all source artifacts with Doxygen-based comments in order to accurate reflect in the documentation
-   pages.
-3. The continous integration (CI) builds in the develop branch need to pass all tests strictly, and 
-   the nightly [Buildbot][buildbot] system should be green before the merge request can be processed. 
-4. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
-5. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
-   do not have permission to do that, you may request the second reviewer to merge it for you. 
+1. When submitting a PR containing your contribution, please ensure that the destination branch is `master`.
+2. All PR changes will be merged to the `develop` branch by maintainers in order to verify that tests in the continuous integration (CI) systems ([Buildbot][buildbot], [CircleCI][circleci]) pass cleanly. This process ensures source stability, and minimizes regressions. The contributor are encouraged to additionally request review of code formatting, test coverage and memory leaks specifically on their changeset.
+3. If the PR contains changes to the build system (autotools or CMake), which affect code configuration in certain architectures, ensure that the PR description explicitly states it. If appropriate, changes to README.md should be propagated about the updated build process.
+4. All public API changes in source artifacts should include Doxygen-based comments to ensure that the [code documentation][moabdocs] is current for `master` branch. If appropriate, request a version number change during PR submission in line with the [SemVer](http://semver.org/) scheme.
+5. Please address comments and concerns from developers in a timely manner when reviewers **Request changes** to a PR changeset.
+6. You may request the PR be merged to `master` once you have received the **Approved-by** status from two reviewers.
 
-MOAB is distributed under the LGPL version-3 license (see LICENSE). The act of submitting a pull 
-request will be understood as an affirmation of the following:
+MOAB is distributed under the LGPL version-3 license (see [LICENSE](LICENSE)). The act of submitting a pull request will be understood as an affirmation of the following:
 
-  Developer's Certificate of Origin 1.1
+<ins>*Developer's Certificate of Origin: version 1.1*</ins>
 
   By making a contribution to this project, I certify that:
 
@@ -52,7 +41,9 @@ request will be understood as an affirmation of the following:
       maintained indefinitely and may be redistributed consistent with
       this project or the open source license(s) involved.
 
+
 [homepage]: https://sigma.mcs.anl.gov/moab-library
 [buildbot]: http://gnep.mcs.anl.gov:8010
-
+[circleci]: https://app.circleci.com/pipelines/bitbucket/fathomteam/moab
+[moabdocs]: http://ftp.mcs.anl.gov/pub/fathom/moab-docs/index.html
 
