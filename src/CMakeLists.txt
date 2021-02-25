@@ -254,7 +254,6 @@ set( MOAB_GENERATED_INSTALL_HEADERS
      ${CMAKE_CURRENT_BINARY_DIR}/moab/MOABConfig.h
      ${CMAKE_CURRENT_BINARY_DIR}/moab_export.h
   )
-#      ${CMAKE_CURRENT_BINARY_DIR}/moab/moab_export.h
 
 if( MOAB_HAVE_CGM )
   set( MOAB_CGM_LIBS ${CGM_LIBRARIES} )
@@ -311,7 +310,6 @@ target_include_directories(MOAB
   PUBLIC
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
-#generate_export_header(MOAB EXPORT_FILE_NAME moab/moab_export.h)
 generate_export_header(MOAB)
 
 set_target_properties(
