@@ -1902,8 +1902,8 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
 #ifdef MOAB_HAVE_ZOLTAN
     else  // *method != 0, so it is either graph or geometric, parallel
     {
-        // right now, this works only if root of sender is the same as the root of coupler
-        if (*method == 5 && ( cgraph->receiver(0) == cgraph->sender(0) ) )
+        // it is assumed the method 4 was called in advance
+        if (*method == 5)
         {
             zoltanBuffer = context.uniqueZoltanBuffer;
         }
@@ -2076,6 +2076,61 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
     // mark for deletion
     MPI_Group_free( &receiverGroup );
 
+    return 0;
+}
+
+// need to send the zoltan buffer from coupler root towards the component root
+ErrCode iMOAB_RetrieveZBuffer( MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint )
+{
+    // need to use MPI_Group_translate_ranks to find the rank of sender root and the rank of receiver root,
+    // in the joint communicator
+    int rootRank = 0;
+    int rankCompRoot = -1; // this will receive the buffer
+    int rankCouplerRoot = -1; // this will send the coupler
+    int rank, ierr;
+    MPI_Group global_grp;
+    MPI_Comm_group( *joint, &global_grp );
+    MPI_Group_translate_ranks( *cmpGrp, 1, &rootRank, global_grp, &rankCompRoot );
+    MPI_Group_translate_ranks( *couGrp, 1, &rootRank, global_grp, &rankCouplerRoot );
+    MPI_Comm_rank( *joint, &rank );
+    MPI_Group_free( &global_grp ); // we do not need the global group anymore
+#ifdef MOAB_HAVE_ZOLTAN
+    // send from root of coupler, towards the root of component
+    if ( rankCouplerRoot != rankCompRoot ) // we do not send / receive if we do not have to; it is a blocking send/recv
+    {
+        if (rank == rankCouplerRoot)
+        {
+            // do a send of context.uniqueZoltanBuffer, towards the rankCompRoot
+            ierr = MPI_Send( &context.uniqueZoltanBuffer[0], (int)context.uniqueZoltanBuffer.size(), MPI_CHAR, rankCompRoot, 123, *joint);
+            if (ierr!=0)
+                return 1;
+        }
+        if (rank == rankCompRoot)
+        {
+            // first a probe, then a MPI_Recv
+            MPI_Status status;
+            ierr = MPI_Probe( rankCouplerRoot, 123, *joint, &status );
+            if( 0 != ierr )
+            {
+                std::cout << " MPI_Probe failure: " << ierr << "\n";
+                return 1;
+            }
+            // get the count of data received from the MPI_Status structure
+            int size_buff;
+            ierr = MPI_Get_count( &status, MPI_CHAR, &size_buff );
+            if( 0 != ierr )
+            {
+                std::cout << " MPI_Get_count failure: " << ierr << "\n";
+                return 1;
+            }
+
+            context.uniqueZoltanBuffer.resize( size_buff );
+            ierr = MPI_Recv( &context.uniqueZoltanBuffer[0], size_buff, MPI_CHAR, rankCouplerRoot, 123, *joint, &status );
+            if (ierr!=0)
+                return 1;
+        }
+    }
+#endif
     return 0;
 }
 

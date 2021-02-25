@@ -714,6 +714,17 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_d );
 ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGroup, int* scompid );
 
 /**
+  \brief
+  <B>Operations:</B> Collective over the sender and receiver  and joint comm
+  Only root of the receiver and root of the sender actually move data, which is zoltan buffer
+
+   \param[in]  cmpGrp (MPI_Group*)                     sender group
+   \param[in]  couGrp (MPI_Group*)                     receiver group
+   \param[in]  joint  (MPI_Comm*)                      joint communicator
+ */
+ErrCode iMOAB_RetrieveZBuffer(  MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint  );
+
+/**
   \brief migrate (send) a list of tags, from a sender group of tasks to a receiver group of tasks
   <B>Operations:</B> Collective over the sender group, nonblocking sends
 

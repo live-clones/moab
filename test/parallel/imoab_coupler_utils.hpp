@@ -69,6 +69,12 @@ int setup_component_coupler_meshes( iMOAB_AppID cmpId, int cmpTag, iMOAB_AppID c
                                     int repartitioner_scheme )
 {
     int ierr = 0;
+    if ( 5 == repartitioner_scheme )
+    {
+        // need to send the zoltan buffer from coupler root towards the component root
+        ierr = iMOAB_RetrieveZBuffer( cmpPEGroup, cplPEGroup, cmpcoucomm );
+        CHECKIERR( ierr, "Cannot retrieve Zoltan buffer" )
+    }
     if( *cmpcomm != MPI_COMM_NULL )
     {
         // load first mesh
