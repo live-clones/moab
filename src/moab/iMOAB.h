@@ -951,11 +951,24 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid,
  *                                                    intersection context (typically target); -1 if this refers to 
  *                                                    the original migration of meshes (internal detail).
  * \return ErrCode                                    The error code indicating success or failure.
- */
+*/
+
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid,
                                  const iMOAB_String tag_storage_name,
                                  MPI_Comm* joint_communicator,
                                  int* context_id );
+
+
+/**
+  \brief
+  <B>Operations:</B> Collective over the sender and receiver  and joint comm
+  Only root of the receiver and root of the sender actually move data, which is zoltan buffer
+
+   \param[in]  cmpGrp (MPI_Group*)                     sender group
+   \param[in]  couGrp (MPI_Group*)                     receiver group
+   \param[in]  joint  (MPI_Comm*)                      joint communicator
+ */
+ErrCode iMOAB_RetrieveZBuffer(  MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint  );
 
 /**
  * \brief Compute a communication graph between 2 iMOAB applications, based on ID matching of key data.
