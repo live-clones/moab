@@ -3,6 +3,12 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
+#if defined(__MINGW32__)
+  #include <sys/time.h>
+#else
+  #include <time.h>
+#endif
+
 #include <ctime>
 #include <cmath>
 #include <cassert>

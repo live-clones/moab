@@ -26,11 +26,14 @@
 //-------------------------------------------------------------------------
 
 #include <assert.h>
-#if defined( _WIN32 )
-typedef int id_t;
-#elif defined( __MINGW32__ )
-#include <sys/time.h>
+#if defined(_MSC_VER)
+  typedef int id_t;
+#elif defined(__MINGW32__)
+  #include <sys/time.h>
+#else
+  #include <time.h>
 #endif
+
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>

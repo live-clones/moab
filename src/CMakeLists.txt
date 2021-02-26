@@ -252,6 +252,7 @@ set( MOAB_INSTALL_HEADERS
 set( MOAB_GENERATED_INSTALL_HEADERS
      ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/moab/MOABConfig.h
+     ${CMAKE_CURRENT_BINARY_DIR}/moab_export.h
   )
 
 if( MOAB_HAVE_CGM )
@@ -310,7 +311,6 @@ target_include_directories(MOAB
   PUBLIC
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
-include(GenerateExportHeader)
 generate_export_header(MOAB)
 
 set_target_properties(

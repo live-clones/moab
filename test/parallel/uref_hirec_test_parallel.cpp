@@ -3,7 +3,12 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <sys/time.h>
+#if defined(__MINGW32__)
+  #include <sys/time.h>
+#else
+  #include <time.h>
+#endif
+
 #include <vector>
 #include <algorithm>
 #include "moab/Core.hpp"
