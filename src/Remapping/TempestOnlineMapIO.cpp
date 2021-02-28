@@ -1031,6 +1031,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
     // bother with tuple list only if size > 1
     // otherwise, just fill the sparse matrix
+#ifdef MOAB_HAVE_MPI
     if( size > 1 )
     {
         // send to
@@ -1069,10 +1070,9 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             tl.inc_n();
         }
 
-#ifdef MOAB_HAVE_MPI
+
         // now do the heavy communication
         ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
-#endif
         // populate the sparsematrix, using rowMap and colMap; what is the need for them?
         int n = tl.get_n();
         for( int i = 0; i < n; i++ )
@@ -1106,6 +1106,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         }
     }
     else
+#endif
     {
         for( int i = 0; i < nS; i++ )
         {
