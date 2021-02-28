@@ -420,11 +420,11 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, const EntitySequence
         seq = 0;
         return MB_ENTITY_NOT_FOUND;
     }
-    else if( h >= lastReferenced->start_handle() && h <= lastReferenced->end_handle() )
-    {
-        seq = lastReferenced;
-        return MB_SUCCESS;
-    }
+    // else if( h >= lastReferenced->start_handle() && h <= lastReferenced->end_handle() )
+    // {
+    //     seq = lastReferenced;
+    //     return MB_SUCCESS;
+    // }
     else
     {
         DummySequence ds( h );
@@ -436,7 +436,8 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, const EntitySequence
         }
         else
         {
-            seq = lastReferenced = *i;
+            seq = *i;
+            lastReferenced = *i;
             return MB_SUCCESS;
         }
     }
