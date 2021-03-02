@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "TypeSequenceManager.hpp"
 #include "EntitySequence.hpp"
 #include "SequenceData.hpp"
@@ -20,6 +22,7 @@ void test_find_free_handle();
 void test_find_free_sequence();
 void test_is_free_sequence();
 void test_is_free_handle();
+void test_threaded_access();
 
 void regression_svn1952();
 void regression_svn1958();
@@ -66,6 +69,7 @@ int main()
     error_count += RUN_TEST( test_find_free_handle );
     error_count += RUN_TEST( test_find_free_sequence );
     error_count += RUN_TEST( test_is_free_sequence );
+    error_count += RUN_TEST( test_threaded_access );
 
     error_count += RUN_TEST( regression_svn1952 );
     error_count += RUN_TEST( regression_svn1958 );
@@ -1025,6 +1029,11 @@ void test_is_free_handle()
     CHECK_EQUAL( (SequenceData*)0, data );
     CHECK_EQUAL( (EntityHandle)3001, first );
     CHECK_EQUAL( (EntityHandle)MB_END_ID, last );
+}
+
+void test_threaded_access()
+{
+
 }
 
 // Regression test for bug fixed in SVN revision 1952.
