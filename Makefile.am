@@ -31,6 +31,9 @@ build-check:
 
 doc_DATA = ANNOUNCE AUTHORS KNOWN_ISSUES LICENSE README.md RELEASE_NOTES TODO
 
+pkgconfig_DATA = MOAB.pc
+pkgconfigdir = $(libdir)/pkgconfig
+
 examples_DATA = \
                examples/makefile \
                examples/makefile.config \

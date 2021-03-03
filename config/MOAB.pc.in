@@ -15,6 +15,9 @@ URL: https://sigma.mcs.anl.gov/moab-library
 Repository: http://bitbucket.org/fathomteam/moab
 Version: @VERSION@
 Requires: <dependencies>
-Libs: -L${libdir} -lMOAB @EXPORT_LDFLAGS@ @CXX_LDFLAGS@ @LDFLAGS@
+Libs: -L${libdir} -lMOAB @EXPORT_LDFLAGS@ @CXX_LDFLAGS@ @LDFLAGS@ \
+          @TEMPESTREMAP_LIBS@ @NETCDF_LIBS@ @PNETCDF_LIBS@ @CGNS_LIBS@ @HDF5_LIBS@ @DAMSEL_LIBS@ @CCMIO_LIBS@ \
+          @CGM_LIBS@ @ZOLTAN_LIBS@ @PARMETIS_LIBS@ @METIS_LIBS@ \
+          @HYPRE_LIBS@ @LAPACK_LIBS@ @BLAS_LIBS@ @LIBS@ 
 Cflags: -I${includedir} @CXXFLAGS@ @ZOLTAN_INC_FLAGS@ @PNETCDF_CPPFLAGS@ @NETCDF_CPPFLAGS@ @HDF5_CPPFLAGS@ @PARMETIS_INCLUDES@ @METIS_INCLUDES@ @TEMPESTREMAP_INCLUDE@ @EIGEN3_INCLUDES@
 
