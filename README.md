@@ -1,17 +1,25 @@
-
 # MOAB: Mesh-Oriented datABase
 
-MOAB is a component for representing and evaluating mesh data. MOAB can store structured and unstructured mesh, consisting of elements in the finite element "zoo". The functional interface to MOAB is simple yet powerful, allowing the representation of many types of metadata commonly found on the mesh. MOAB is optimized for efficiency in space and time, based on access to mesh in chunks rather than through individual entities, while also versatile enough to support individual entity access. MOAB can be used in several ways: 
+MOAB is a software component for representing for creating, storing and accessing mesh data. MOAB can describe structured and unstructured mesh, consisting of elements in the finite element "zoo". The functional interface to MOAB is simple yet powerful, allowing the representation of many types of metadata commonly found on the mesh. MOAB is optimized for efficiency in space and time, based on access to mesh in chunks rather than through individual entities, while also versatile enough to support individual entity access. MOAB can be used in several ways: 
 
-* As the underlying mesh data representation for applications
-  - Several computational solvers in various scientific domains (nuclear engineering, climate modeling, nonlinear thermo-mechanics, CFD, etc)
-  - Mesh smoothing and optimization
-  - Mesh quality computation
-* As a mesh input mechanism (using mesh readers included with MOAB),
-* As as a translator between mesh formats (using readers and writers included with MOAB).
+A few highlights of the capabilities in MOAB include:
 
-MOAB was developed originally as part of the CUBIT project at Sandia National Laboratories, and has been partially funded by the DOE SciDAC program (TSTT, ITAPS, FASTMath) and DOE-NE (NEAMS program).
-More recently, DOE-BER programs under the E3SM project have provided support for enabling scalable solution transfer techniques for climate applications.
+* Representation of 0-3d elements in the finite element "zoo" (including support for quadratic elements), as well as support for polygon and polyhedron entities
+* Highly efficient storage and query of structured and unstructured mesh (e.g. a brick-shaped hex mesh requires approximately 25 and 55 MB per million hex elements in the structured and unstructured representations, respectively)
+* Powerful data model allowing representation of various metadata in the form of "sets" (arbitrary groupings of mesh entities and sets) and "tags" (annotation of entities, sets, and entire mesh)
+* Open source (LGPL) mesh readers/writers for Sandia ExodusII, CUBIT .cub save/restore, VTK, GMsh, and other mesh formats with capability to translate between them uniformly
+* Flexible access to MOAB routines from C and Fortran through *iMesh* and *iMOAB* interfaces are available
+* A high level Python interface (*PyMOAB*) based on Cython bindings can also be enabled
+
+Several computational solvers in various scientific domains (nuclear engineering, climate modeling, nonlinear thermo-mechanics, CFD, etc). Other common use-cases where MOAB is often applied are:
+
+  - Unstructured mesh generation and manipulation along with smoothing and optimization
+  - Mesh quality computation 
+  - Solution field transfers
+    + High-order interpolation between unstructured grids in two and three dimensions 
+    + Conservative remappng between meshes on the sphere for Climate problems
+
+MOAB was developed originally as part of the CUBIT project at Sandia National Laboratories, and has been partially funded by the DOE SciDAC program (TSTT, ITAPS, FASTMath), ASCR (CESAR), and DOE-NE (NEAMS program). More recently, DOE-BER programs under the E3SM project have provided support for enabling scalable solution transfer techniques for climate applications.
 
 ## Dependencies
 
