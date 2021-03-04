@@ -83,6 +83,35 @@ There are several hooks to online continuous integration systems, nightly and co
 ## Bugs, Correspondence, Contributing
 MOAB is distributed under LGPL(v3) licensing, and we encourage users to submit bug reports (and, if possible, fixes) directly on the Bitbucket interface. Optionally, users can email and discuss the issue with developers at [moab-dev@mcs.anl.gov](mailto:moab-dev@mcs.anl.gov). Please submit your changes through a pull requests (PR) with a Bitbucket fork (refer to [CONTRIBUTING.md](CONTRIBUTING.md) for further information), or send us patches that you would like merged upstream. Users are also encouraged to check [SIGMA-MOAB] documentation pages for news and updates. 
 
+## Citing MOAB
+
+If you use MOAB for your research, please use the following bibtex entries for the software and the original report to cite us.
+
+```
+@techreport{moab_2004,
+  author = {Tautges, T. J. and Meyers, R. and Merkley, K. and Stimpson, C. and Ernst, C.},
+  type = {{SAND2004-1592}},
+  title = {{MOAB:} A Mesh-Oriented Database},
+  institution = {Sandia National Laboratories},
+  month = apr,
+  year = {2004},
+  note = {Report}
+}
+@software{moab510_2019,
+  author       = {Mahadevan, Vijay and
+                  Grindeanu, Iulian and
+                  Jain, Rajeev},
+  title        = {MOAB v5.1.0},
+  month        = jan,
+  year         = 2019,
+  publisher    = {Zenodo},
+  version      = {5.1.0},
+  doi          = {10.5281/zenodo.2584863},
+  url          = {https://doi.org/10.5281/zenodo.2584863}
+}
+```
+
 [NetCDF]: http://www.unidata.ucar.edu/software/netcdf/
 [HDF5]: https://www.hdfgroup.org/HDF5/
 [SIGMA-MOAB]: http://sigma.mcs.anl.gov/moab-library
+
