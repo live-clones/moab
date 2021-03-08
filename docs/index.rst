@@ -7,10 +7,9 @@ Welcome to MOAB's documentation!
 ================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-
+    :maxdepth: 2
+    :caption: Contents:
 
 Indices and tables
 ==================
@@ -18,3 +17,13 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Table of Contents
+^^^^^^^^^^^^^^^^^
+
+.. toctree::
+
+   :maxdepth: 2
+   self
+   src/library_root
+
