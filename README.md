@@ -11,17 +11,28 @@ A few highlights of the capabilities in MOAB include:
 * Flexible access to MOAB routines from C and Fortran through *iMesh* and *iMOAB* interfaces are available
 * A high level Python interface (*PyMOAB*) based on Cython bindings can also be enabled
 
-Several computational solvers in various scientific domains (nuclear engineering, climate modeling, nonlinear thermo-mechanics, CFD, etc). Other common use-cases where MOAB is often applied are:
+Several computational solvers in various scientific domains such as nuclear engineering, climate modeling, nonlinear thermo-mechanics, CFD, etc have been built on top of MOAB. Other common use-cases where MOAB is often applied are:
 
-  - Unstructured mesh generation and manipulation along with smoothing and optimization
-  - Mesh quality computation 
-  - Solution field transfers
+  - Unstructured mesh generation and manipulation for complex geometry
+  - Mesh quality computation along with algorithms for smoothing and optimization
+  - Solution field transfers for multi-physics problems
     + High-order interpolation between unstructured grids in two and three dimensions 
     + Conservative remappng between meshes on the sphere for Climate problems
 
 MOAB was developed originally as part of the CUBIT project at Sandia National Laboratories, and has been partially funded by the DOE SciDAC program (TSTT, ITAPS, FASTMath), ASCR (CESAR), and DOE-NE (NEAMS program). More recently, DOE-BER programs under the E3SM project have provided support for enabling scalable solution transfer techniques for climate applications.
 
-## Dependencies
+## Continuous Integration
+
+There are several hooks to online continuous integration systems, nightly and commit-based Buildbot/Bitbucket builds that are constantly run during a development day to check the integrity and robustness of the MOAB library.
+
+- **Buildbot**: [ ![Buildbot Status](http://gnep.mcs.anl.gov:8010/badges/moab-all.svg)](https://gnep.mcs.anl.gov:8010)
+- **CircleCI**: [ ![CircleCI Status](https://circleci.com/bb/fathomteam/moab/tree/master.svg?style=shield)](https://circleci.com/bb/fathomteam/moab)
+- **CodeShip**: [ ![Codeship Status](https://codeship.com/projects/286b0e80-5715-0132-1105-0e0cfcc5dfb4/status?branch=master)](https://codeship.com/projects/49743)
+- **Code Coverage**: 
+  + **Coverity**: [ ![Coverity Scan Build Status](https://scan.coverity.com/projects/6201/badge.svg)](https://scan.coverity.com/projects/moab)
+  + **CodeCov**: [![codecov](https://codecov.io/bb/fathomteam/moab/branch/master/graph/badge.svg)](https://codecov.io/bb/fathomteam/moab)
+
+## Optional Dependencies
 
 - **MPI**: MOAB supports usage of MPICH and OpenMPI libraries configured externally in order to enable scalable mesh manipulation algorithms.
 - **HDF5**: In order to manage the data dependencies and to natively support parallel I/O, MOAB uses a custom file format that can represent the entire MOAB data model in a native HDF5-based file format. Support for this file format requires version 5 of the HDF library, which can be obtained at [HDF5].
@@ -33,9 +44,9 @@ MOAB was developed originally as part of the CUBIT project at Sandia National La
 
 ## Configuration and Build
 
-* Currently, both CMake and Autotools are maintained simultaneously in order to support all platforms (including Windows). Please choose your build system according to your needs and follow instructions below.
+* Currently, both CMake and Autotools are maintained simultaneously in order to support all platforms (including Windows). Please choose your build system according to your needs and follow instructions below. Both of these workflows follow the same pattern of commands to build and install in your platform.
 
-* **Autotools based configuration workflow**
+### **Autotools based configuration workflow**
 
   - Please ensure that the autotools toolchain is pre-installed locally. We recommend a minimum autoconf version of *v2.69*.
   - Run `autoreconf -fi` to generate the configure script
@@ -54,7 +65,7 @@ MOAB was developed originally as part of the CUBIT project at Sandia National La
         + *TempestRemap*: Use `--download-tempestremap` OR `--download-tempestremap=master` (to build from Git master)
   - Now run the `configure` script with desired configuration options either in-source or out-of-source (build) directory.
 
-* **CMake based configuration workflow**
+### **CMake based configuration workflow**
 
   - Please ensure you have CMake (>3.0) available locally.
   - Run `ccmake` visual configuration editor or `cmake` to get a bare configuration of MOAB
@@ -62,6 +73,7 @@ MOAB was developed originally as part of the CUBIT project at Sandia National La
     - C: `-DCMAKE_C_COMPILER=mpicc`
     - C++: `-DCMAKE_CXX_COMPILER=mpicxx`
     - Fortran: `-DCMAKE_Fortran_COMPILER=mpif90`
+  - Specify your installation directory by using `-DCMAKE_INSTALL_PREFIX=$MOAB_INSTALL_PATH`
   - If you have **MPI** installed, use `-DENABLE_MPI=ON -DMPI_HOME=$MPI_DIR`
   - If you have **HDF5** installed, use `-DENABLE_HDF5=ON -DHDF5_ROOT=$HDF5_DIR`
   - If you have **NetCDF** installed, use `-DENABLE_NETCDF=ON -DNETCDF_ROOT=$NETCDF_DIR`.
@@ -75,21 +87,11 @@ MOAB was developed originally as part of the CUBIT project at Sandia National La
 * Next to install the compiled libraries, headers and tools, run `make install`
 * You can now use the `makefile` generated under the `build/examples` folder and modify it to compile downstream code with MOAB dependency
 
-## Continuous Integration
-
-There are several hooks to online continuous integration systems, nightly and commit-based Buildbot/Bitbucket builds that are constantly run during a development day to check the integrity and robustness of the MOAB library.
-
-### Current overall build status
-
-- **Buildbot**: [ ![Buildbot Status](http://gnep.mcs.anl.gov:8010/badges/moab-all.svg)](https://gnep.mcs.anl.gov:8010)
-- **CircleCI**: [ ![CircleCI Status](https://circleci.com/bb/fathomteam/moab/tree/master.svg?style=shield)](https://circleci.com/bb/fathomteam/moab)
-- **CodeShip**: [ ![Codeship Status](https://codeship.com/projects/286b0e80-5715-0132-1105-0e0cfcc5dfb4/status?branch=master)](https://codeship.com/projects/49743)
-- **Code Coverage**: 
-  + **Coverity**: [ ![Coverity Scan Build Status](https://scan.coverity.com/projects/6201/badge.svg)](https://scan.coverity.com/projects/moab)
-  + **CodeCov**: [![codecov](https://codecov.io/bb/fathomteam/moab/branch/master/graph/badge.svg)](https://codecov.io/bb/fathomteam/moab)
-
 ## Bugs, Correspondence, Contributing
-MOAB is distributed under LGPL(v3) licensing, and we encourage users to submit bug reports (and, if possible, fixes) directly on the Bitbucket interface. Optionally, users can email and discuss the issue with developers at [moab-dev@mcs.anl.gov](mailto:moab-dev@mcs.anl.gov). Please submit your changes through a pull requests (PR) with a Bitbucket fork (refer to [CONTRIBUTING.md](CONTRIBUTING.md) for further information), or send us patches that you would like merged upstream. Users are also encouraged to check [SIGMA-MOAB] documentation pages for news and updates. 
+
+MOAB is distributed under LGPL(v3) licensing, and we encourage users to submit bug reports (and, if possible, fixes) directly on the Bitbucket interface. Optionally, users can email and discuss the issue with developers at [moab-dev@mcs.anl.gov](mailto:moab-dev@mcs.anl.gov). Also refer to [FAQ](FAQ.md) for some commonly asked questions and their resolutions. 
+
+MOAB follows a fully transparent, open-source development workflow (refer to our [Code of Conduct](CODE_OF_CONDUCT.md) for further information), and we welcome all contributions that enhance the feature sets provided by MOAB. If you would like to contribute to MOAB, please submit your changes through pull request (PR) using a Bitbucket fork of MOAB (refer to [CONTRIBUTING.md](CONTRIBUTING.md) for more details), or send us patches that you would like merged upstream. Users are also encouraged to check [SIGMA-MOAB] documentation pages for news and updates. 
 
 ## Citing MOAB
 
@@ -118,6 +120,8 @@ If you use MOAB for your research, please use the following bibtex entries for t
   url          = {https://doi.org/10.5281/zenodo.2584863}
 }
 ```
+
+Additionally, if you would like us to highlight your application, library or tool that uses MOAB, please contact the developers for more information.
 
 [NetCDF]: http://www.unidata.ucar.edu/software/netcdf/
 [HDF5]: https://www.hdfgroup.org/HDF5/
