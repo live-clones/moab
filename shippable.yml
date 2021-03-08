@@ -10,6 +10,8 @@ branches:
     - develop
     - pr-*
     - Version*
+    - vijaysm*
+    - iulian*
 
 build:
 
@@ -22,7 +24,7 @@ build:
     options:
   ci:
     - autoreconf -fi
-    - ./configure --enable-shared --enable-pymoab --disable-fortran $CONFIGOPTS
+    - ./configure --enable-shared --enable-pymoab --disable-fortran PYTHON=python3 $CONFIGOPTS
     - make all check
   post_ci:
     - make dist distclean
