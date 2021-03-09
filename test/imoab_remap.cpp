@@ -10,6 +10,7 @@
 
 // for malloc, free:
 #include <iostream>
+#include <iomanip>
 
 #define CHECKIERR( ierr, message ) \
     if( 0 != ierr )                \
@@ -33,6 +34,13 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "atmosphere,t", "atm mesh filename (source)", &atmFilename );
     opts.addOpt< std::string >( "ocean,m", "ocean mesh filename (target)", &ocnFilename );
     opts.addOpt< std::string >( "land,l", "land mesh filename (target)", &lndFilename );
+
+    int gen_baseline=0;
+    opts.addOpt< int >( "genbase,g", "generate baseline 1", &gen_baseline );
+
+    int test_against_baseline = 1;
+    opts.addOpt< int >( "testbase,t", "test against baseline 1", &test_against_baseline );
+    std::string baseline = TestDir + "/baseline1.txt";
 
     opts.parseCommandLine( argc, argv );
 
@@ -281,6 +289,65 @@ int main( int argc, char* argv[] )
                                                bottomTempField.size(), bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to apply projection weights for scalar conservative field" );
 
+    if (gen_baseline)
+    {
+        // get temp field on ocean, from conservative, the global ids, and dump to the baseline file
+        // first get GlobalIds from ocn, and fields:
+        ierr = iMOAB_GetMeshInfo( ocnPID, nverts, nelem, 0, 0, 0 );
+        CHECKIERR( ierr, "failed to get ocn mesh info");
+        std::vector<int> gidElems;
+        gidElems.resize(nelem[2]);
+        std::vector<double> tempElems;
+        tempElems.resize(nelem[2]);
+        // get global id storage
+        const std::string GidStr = "GLOBAL_ID"; // hard coded too
+        int lenG = (int)GidStr.length();
+        int tag_type = DENSE_INTEGER, ncomp = 1, tagInd = 0;
+        // we should not have to define global id tag, it is always defined
+        ierr = iMOAB_DefineTagStorage( ocnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd,
+                lenG );
+        CHECKIERR( ierr, "failed to define global id tag");
+        int  ent_type = 1;
+        ierr = iMOAB_GetIntTagStorage( ocnPID, GidStr.c_str(), &nelem[2],
+            &ent_type, &gidElems[0], lenG );
+        CHECKIERR( ierr, "failed to get global ids");
+        ierr = iMOAB_GetDoubleTagStorage( ocnPID, bottomTempProjectedField.c_str(), &nelem[2],
+                    &ent_type, &tempElems[0], bottomTempProjectedField.size() );
+        CHECKIERR( ierr, "failed to get temperature field");
+        std::fstream fs;
+        fs.open (baseline.c_str(),  std::fstream::out );
+        fs << std::setprecision(15) ; // maximum precision for doubles
+        for (int i=0; i<nelem[2]; i++)
+            fs << gidElems[i] << " " << tempElems[i] << "\n";
+        fs.close();
+    }
+    if (test_against_baseline)
+    {
+        // get temp field on ocean, from conservative, the global ids, and dump to the baseline file
+        // first get GlobalIds from ocn, and fields:
+        ierr = iMOAB_GetMeshInfo( ocnPID, nverts, nelem, 0, 0, 0 );
+        CHECKIERR( ierr, "failed to get ocn mesh info");
+        std::vector<int> gidElems;
+        gidElems.resize(nelem[2]);
+        std::vector<double> tempElems;
+        tempElems.resize(nelem[2]);
+        // get global id storage
+        const std::string GidStr = "GLOBAL_ID"; // hard coded too
+        int lenG = (int)GidStr.length();
+        int tag_type = DENSE_INTEGER, ncomp = 1, tagInd = 0;
+        ierr = iMOAB_DefineTagStorage( ocnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd,
+                lenG );
+        CHECKIERR( ierr, "failed to define global id tag");
+
+        int  ent_type = 1;
+        ierr = iMOAB_GetIntTagStorage( ocnPID, GidStr.c_str(), &nelem[2],
+            &ent_type, &gidElems[0], lenG );
+        CHECKIERR( ierr, "failed to get global ids");
+        ierr = iMOAB_GetDoubleTagStorage( ocnPID, bottomTempProjectedField.c_str(), &nelem[2],
+                    &ent_type, &tempElems[0], bottomTempProjectedField.size() );
+        CHECKIERR( ierr, "failed to get temperature field");
+        check_mapped_values_from_file(baseline, gidElems, tempElems, 1.e-9);
+    }
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
     ierr = iMOAB_ApplyScalarProjectionWeights( atmlndPID, weights_identifiers[1].c_str(), bottomTempField.c_str(),
