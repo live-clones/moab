@@ -71,7 +71,10 @@ div.fragment, #memdoc {
   color: #4000ff;
 }
 
-.hljs-string,
+.hljs-string {
+  color: #009019;
+}
+
 .hljs-bullet {
   color: #00ff00;
 }
