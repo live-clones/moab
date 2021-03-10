@@ -11,7 +11,6 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import subprocess, os, sys
-#sys.path.insert(0, os.path.abspath('../../src'))
 
 def configureDoxyfile(input_dir, output_dir):
     with open('Doxyfile.in', 'r') as file :
@@ -28,9 +27,9 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 breathe_projects = {}
 
-if read_the_docs_build or True:
+if read_the_docs_build:
     input_dir = 'doc'
-    output_dir = '.'
+    output_dir = 'doc/sphinx'
     #configureDoxyfile(input_dir, output_dir)
     #subprocess.call('doxygen', shell=True)
     breathe_projects['MOAB'] = output_dir + '/xml'
@@ -80,9 +79,9 @@ exhale_args = {
     "createTreeView":        True,
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": True,
+    "exhaleExecutesDoxygen": False,
     #"exhaleDoxygenStdin":    "INPUT = ../src ../itaps ../tools ../pymoab ../examples"
-    "exhaleDoxygenStdin":    "INPUT = ../src"
+    "exhaleDoxygenStdin":    "INPUT = ../../src"
 }
 
 # Add any paths that contain templates here, relative to this directory.
