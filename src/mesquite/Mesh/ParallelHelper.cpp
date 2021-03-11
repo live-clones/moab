@@ -1459,7 +1459,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
                 fflush( NULL );
             }
             rval =
-                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLEMPI_DOUBLE, neighbourProc[i],
+                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
