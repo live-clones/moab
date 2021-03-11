@@ -86,6 +86,7 @@ int main( int argc, char* argv[] )
         cplatm        = 6;  // component ids are unique over all pes, and established in advance;
 #ifdef ENABLE_ATMOCN_COUPLING
     std::string ocnFilename = TestDir + "/recMeshOcn.h5m";
+    std::string baseline = TestDir + "/baseline1.txt";
     int rankInOcnComm       = -1;
     int cmpocn = 17, cplocn = 18,
         atmocnid = 618;  // component ids are unique over all pes, and established in advance;
@@ -136,6 +137,8 @@ int main( int argc, char* argv[] )
     int n = 1;  // number of send/receive / project / send back cycles
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
+    int regression_test = 1;
+    opts.addOpt< int >( "regression,r", "regression test against baseline 1", &regression_test);
     opts.parseCommandLine( argc, argv );
 
     char fileWriteOptions[] = "PARALLEL=WRITE_PART";
@@ -685,6 +688,37 @@ int main( int argc, char* argv[] )
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
+            // test results only for n == 1, for bottomTempProjectedField
+            if (regression_test)
+            {
+                // the same as remap test
+                // get temp field on ocean, from conservative, the global ids, and dump to the baseline file
+                // first get GlobalIds from ocn, and fields:
+                int nverts[3], nelem[3];
+                ierr = iMOAB_GetMeshInfo( cmpOcnPID, nverts, nelem, 0, 0, 0 );
+                CHECKIERR( ierr, "failed to get ocn mesh info");
+                std::vector<int> gidElems;
+                gidElems.resize(nelem[2]);
+                std::vector<double> tempElems;
+                tempElems.resize(nelem[2]);
+                // get global id storage
+                const std::string GidStr = "GLOBAL_ID"; // hard coded too
+                int lenG = (int)GidStr.length();
+                int tag_type = DENSE_INTEGER, ncomp = 1, tagInd = 0;
+                ierr = iMOAB_DefineTagStorage( cmpOcnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd,
+                        lenG );
+                CHECKIERR( ierr, "failed to define global id tag");
+
+                int  ent_type = 1;
+                ierr = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2],
+                    &ent_type, &gidElems[0], lenG );
+                CHECKIERR( ierr, "failed to get global ids");
+                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2],
+                            &ent_type, &tempElems[0], strlen( bottomTempProjectedField ) );
+                CHECKIERR( ierr, "failed to get temperature field");
+                check_mapped_values_from_file(baseline, gidElems, tempElems, 1.e-9);
+            }
+
         }
 #endif
 

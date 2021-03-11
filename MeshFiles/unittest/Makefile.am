@@ -76,5 +76,6 @@ EXTRA_DIST = 125hex.g \
              AtmPhys.h5m \
              AtmPhys_01.h5m \
              outCS5ICOD5_map.nc \
-             globalmpas_deltri.h5m
+             globalmpas_deltri.h5m \
+	     baseline1.txt
 
