@@ -1,6 +1,10 @@
 #ifndef MOAB_GEOM_QUERY_TOOL_HPP
 #define MOAB_GEOM_QUERY_TOOL_HPP
 
+#ifdef _MSC_VER  /* windows */
+#  define _USE_MATH_DEFINES //For M_PI
+#endif
+
 #include "MBTagConventions.hpp"
 #include "moab/CartVect.hpp"
 #include "moab/Range.hpp"

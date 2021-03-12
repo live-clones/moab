@@ -3,10 +3,16 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
-#include <ctime>
-#include <cmath>
-#include <cassert>
-#include <limits>
+#if defined(__MINGW32__)
+  #include <sys/time.h>
+#else
+  #include <time.h>
+#endif
+
+#include <time.h>
+#include <math.h>
+#include <assert.h>
+#include <float.h>
 
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"

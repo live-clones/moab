@@ -56,8 +56,9 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     bool parmerge       = opts.parmerge;
 
     int rank = 0, size = 1;
-    clock_t tt = clock();
-
+#ifndef _MSC_VER  /* windows */
+  clock_t tt = clock();
+#endif
 #ifdef MOAB_HAVE_MPI
     rank = pc->rank();
     size = pc->size();
@@ -391,8 +392,11 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
     if( 0 == rank )
     {
+#ifndef _MSC_VER  /* windows */
         std::cout << "generate local mesh: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
         tt = clock();
+#endif
+
         std::cout << "number of elements on rank 0: " << all3dcells.size() << endl;
         std::cout << "Total number of elements " << all3dcells.size() * size << endl;
         std::cout << "Element type: " << ( tetra ? "MBTET" : "MBHEX" )
@@ -409,12 +413,13 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
         {
             rval = mm.merge_entities( all3dcells, 0.0001 );MB_CHK_SET_ERR( rval, "Can't merge" );
         }
-
+#ifndef _MSC_VER  /* windows */
         if( 0 == rank )
         {
             std::cout << "merge locally: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
             tt = clock();
         }
+#endif
     }
     // if adjEnts, add now to each set
     if( adjEnts )
@@ -441,22 +446,25 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
         {
             ParallelMergeMesh pm( pc, 0.00001 );
             rval = pm.merge();MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
+#ifndef _MSC_VER  /* windows */
             if( 0 == rank )
             {
                 std::cout << "parallel mesh merge: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
                 tt = clock();
             }
+#endif
         }
         else
         {
             rval = pc->resolve_shared_ents( cset, -1, -1, &new_id_tag );MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
-
+#ifndef _MSC_VER  /* windows */
             if( 0 == rank )
             {
                 std::cout << "resolve shared entities: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds"
                           << endl;
                 tt = clock();
             }
+#endif
         }
         if( !keep_skins )
         {  // Default is to delete the 1- and 2-dimensional entities
@@ -473,9 +481,10 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
                 std::cout << "delete edges and faces \n";
                 toDelete.print( std::cout );
-
+#ifndef _MSC_VER  /* windows */
                 std::cout << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
                 tt = clock();
+#endif
             }
         }
         // do some ghosting if required
@@ -486,12 +495,14 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                                              GL,  // int num_layers
                                              0,   // int addl_ents
                                              true );MB_CHK_ERR( rval );  // bool store_remote_handles
+#ifndef _MSC_VER  /* windows */
             if( 0 == rank )
             {
                 std::cout << "exchange  " << GL << " ghost layer(s) :" << ( clock() - tt ) / (double)CLOCKS_PER_SEC
                           << " seconds" << endl;
                 tt = clock();
             }
+#endif
         }
     }
 #endif
