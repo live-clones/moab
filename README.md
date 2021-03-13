@@ -122,17 +122,19 @@ If you use MOAB for your research, please use the following bibtex entries for t
   year = {2004},
   note = {Report}
 }
-@software{moab510_2019,
+@software{moab521_2020,
   author       = {Mahadevan, Vijay and
                   Grindeanu, Iulian and
-                  Jain, Rajeev},
-  title        = {MOAB v5.1.0},
-  month        = jan,
-  year         = 2019,
+                  Jain, Rajeev and
+                  Shriwise, Patrick and
+                  Wilson, Paul},
+  title        = {MOAB v5.2.1},
+  month        = aug,
+  year         = 2020,
   publisher    = {Zenodo},
-  version      = {5.1.0},
-  doi          = {10.5281/zenodo.2584863},
-  url          = {https://doi.org/10.5281/zenodo.2584863}
+  version      = {5.2.1},
+  doi          = {10.5281/zenodo.2584862},
+  url          = {https://doi.org/10.5281/zenodo.2584862}
 }
 ```
 
