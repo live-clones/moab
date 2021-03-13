@@ -1459,7 +1459,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
                 fflush( NULL );
             }
             rval =
-                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE_PRECISION, neighbourProc[i],
+                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
@@ -1477,7 +1477,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
                 fflush( NULL );
             }
             rval =
-                MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE_PRECISION, neighbourProc[i],
+                MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE, neighbourProc[i],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[i] ) );
             CHECK_MPI_RZERO( rval, err );
         }
@@ -1691,7 +1691,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         if( numVtxPerProcRecv[i] )
         {
             rval =
-                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE_PRECISION, neighbourProc[i],
+                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
@@ -1709,7 +1709,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         if( numVtxPerProcSend[i] )
         {
             rval =
-                MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE_PRECISION, neighbourProc[i],
+                MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE, neighbourProc[i],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[i] ) );
             CHECK_MPI_RZERO( rval, err );
         }
@@ -1922,7 +1922,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
     std::vector< MPI_Request > request( num_neighbourProcRecv );
     for( j = 0; j < num_neighbourProcRecv; j++ )
     {
-        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE_PRECISION,
+        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE,
                           neighbourProcRecv[j], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
         CHECK_MPI_RZERO( rval, err );
         if( 0 )
@@ -1941,7 +1941,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
         if( numVtxPerProcSend[j] )
         {
             rval =
-                MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE_PRECISION, neighbourProc[j],
+                MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE, neighbourProc[j],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[j] ) );
             CHECK_MPI_RZERO( rval, err );
             if( 0 )
@@ -2170,7 +2170,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     std::vector< MPI_Request > request( num_neighbourProcRecv );
     for( j = 0; j < num_neighbourProcRecv; j++ )
     {
-        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE_PRECISION,
+        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE,
                           neighbourProcRecv[j], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
         CHECK_MPI_RZERO( rval, err );
         if( 0 )
@@ -2189,7 +2189,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         if( numVtxPerProcSend[j] )
         {
             rval =
-                MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE_PRECISION, neighbourProc[j],
+                MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE, neighbourProc[j],
                            VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[j] ) );
             CHECK_MPI_RZERO( rval, err );
             if( 0 )
@@ -2335,7 +2335,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
 
         if( numVtxPerProc[j] )
         {
-            rval = MPI_Send( packed_vertices[j], 4 * numVtxPerProc[j], MPI_DOUBLE_PRECISION, neighbourProc[j],
+            rval = MPI_Send( packed_vertices[j], 4 * numVtxPerProc[j], MPI_DOUBLE, neighbourProc[j],
                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator );
             CHECK_MPI_RZERO( rval, err );
             // printf("[%d]i%dp%d Sent %d vertices to proc
@@ -2392,7 +2392,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
 
             rval = MPI_Recv( ARRPTR( vertex_pack ),    /* message buffer */
                              4 * num,                  /* num data's item with 4 doubles each */
-                             MPI_DOUBLE_PRECISION,     /* of type double */
+                             MPI_DOUBLE,     /* of type double */
                              proc,                     /* receive from this procesor only */
                              VERTEX_BLOCK + iteration, /* receive only VERTEX BLOCKs */
                              (MPI_Comm)communicator,   /* default communicator */
@@ -2401,7 +2401,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
 
             proc = status.MPI_SOURCE;
             // tag = status.MPI_TAG;
-            MPI_Get_count( &status, MPI_DOUBLE_PRECISION, &count );
+            MPI_Get_count( &status, MPI_DOUBLE, &count );
 
             if( count != 4 * num )
                 printf( "[%d]i%d WARNING: expected %d vertices = %d bytes from proc %d but only "
@@ -2526,7 +2526,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
 
             if( numVtxPerProc[j] )
             {
-                rval = MPI_Send( packed_vertices[j], 4 * numVtxPerProc[j], MPI_DOUBLE_PRECISION, neighbourProc[j],
+                rval = MPI_Send( packed_vertices[j], 4 * numVtxPerProc[j], MPI_DOUBLE, neighbourProc[j],
                                  VERTEX_BLOCK + iteration, (MPI_Comm)communicator );
                 CHECK_MPI_RZERO( rval, err );
 
@@ -2595,7 +2595,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
 
             rval = MPI_Recv( ARRPTR( vertex_pack ),    /* message buffer */
                              4 * num,                  /* num data's item with 4 doubles each */
-                             MPI_DOUBLE_PRECISION,     /* of type double */
+                             MPI_DOUBLE,     /* of type double */
                              proc,                     /* receive from this procesor only */
                              VERTEX_BLOCK + iteration, /* receive only VERTEX BLOCKs */
                              (MPI_Comm)communicator,   /* default communicator */
@@ -2604,7 +2604,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
 
             proc = status.MPI_SOURCE;
             // tag = status.MPI_TAG;
-            MPI_Get_count( &status, MPI_DOUBLE_PRECISION, &count );
+            MPI_Get_count( &status, MPI_DOUBLE, &count );
 
             if( count != 4 * num )
                 printf( "[%d]i%d WARNING: expected %d vertices = %d bytes from proc %d but only "
