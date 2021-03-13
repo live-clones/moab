@@ -12,9 +12,11 @@ ENV MOAB_SOURCE_DIR /home/sigma/moab
 ENV MOAB_INSTALL_DIR /opt/moab
 ENV CC mpicc
 ENV CXX=mpicxx
-ENV FC=mpif90
-ENV F77=mpif77
-ENV F90=mpif90
+ENV FC mpif90
+ENV F77 mpif77
+ENV F90 mpif90
+ENV OMPI_ALLOW_RUN_AS_ROOT 1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM 1
 
 # Perform a 
 # Set up user so that we do not run as root
