@@ -15,9 +15,9 @@ ENV HOME="/home/sigma" \
     CXX="mpicxx" \
     FC="mpif90" \
     F77="mpif77" \
-    F90="mpif90"
-#ENV OMPI_ALLOW_RUN_AS_ROOT 1
-#ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM 1
+    F90="mpif90" \
+    OMPI_ALLOW_RUN_AS_ROOT=1 \
+    OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 # Clone the repository, and configure/build the MOAB sources; 
 # Then change permissions so that sigmauser can modify/run examples
