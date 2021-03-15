@@ -29,12 +29,13 @@ RUN git clone https://bitbucket.org/fathomteam/moab.git --depth 1 -b master $MOA
     --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3 \
     --prefix=$MOAB_INSTALL_DIR \
     && make all install \
-    && cp examples/makefile.config $MOAB_SOURCE_DIR/examples/ \
+    && cp examples/makefile.config $MOAB_SOURCE_DIR/examples/
+
+RUN make MPIEXEC="mpiexec --allow-run-as-root" -C $MOAB_BUILD_DIR check \
+    make -C $MOAB_BUILD_DIR clean \
     && chown -R sigmauser:sigmauser $MOAB_SOURCE_DIR \
     && chown -R sigmauser:sigmauser $MOAB_INSTALL_DIR
-
-RUN /sbin/setuser sigmauser make -C $MOAB_SOURCE_DIR/build check clean \
-    && cd $MOAB_SOURCE_DIR/build/doc && doxygen user.dox
+#    && cd $MOAB_BUILD_DIR/doc && doxygen user.dox
 
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MOAB_INSTALL_DIR/lib" \
     PATH="$PATH:$MOAB_INSTALL_DIR/bin"
