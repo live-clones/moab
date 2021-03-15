@@ -29,7 +29,7 @@ endif
 build-check:
 	$(MAKE) 'TESTS_ENVIRONMENT=: ' check
 
-doc_DATA = ANNOUNCE AUTHORS KNOWN_ISSUES LICENSE README.md RELEASE_NOTES TODO
+doc_DATA = AUTHORS LICENSE README.md RELEASE_NOTES.md TODO.md
 
 examples_DATA = \
                examples/makefile \
