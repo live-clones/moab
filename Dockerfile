@@ -44,7 +44,7 @@ ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$MOAB_INSTALL_DIR/lib" \
 # Check if our examples build cleanly as well once environment is concretized.
 RUN cd $MOAB_SOURCE_DIR/examples/python && python3 laplaciansmoother.py \
     && cd $MOAB_SOURCE_DIR/examples/advanced && make GenLargeMesh \
-    && ./GenLargeMesh && mpiexec --allow-run-as-root --oversubscribe -n 2 ./GenLargeMesh && rm GenLargeMesh
+    && ./GenLargeMesh && mpiexec --allow-run-as-root --oversubscribe -n 2 ./GenLargeMesh -M 2 && rm GenLargeMesh
 
 ENTRYPOINT ["/sbin/setuser","sigmauser","/bin/bash","-c"]
 CMD ["/sbin/my_init"]
