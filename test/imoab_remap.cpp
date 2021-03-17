@@ -35,11 +35,11 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "ocean,m", "ocean mesh filename (target)", &ocnFilename );
     opts.addOpt< std::string >( "land,l", "land mesh filename (target)", &lndFilename );
 
-    int gen_baseline=0;
-    opts.addOpt< int >( "genbase,g", "generate baseline 1", &gen_baseline );
+    bool gen_baseline=false;
+    opts.addOpt< void >( "genbase,g", "generate baseline 1", &gen_baseline );
 
-    int test_against_baseline = 1;
-    opts.addOpt< int >( "testbase,t", "test against baseline 1", &test_against_baseline );
+    bool no_test_against_baseline = false;
+    opts.addOpt< void >( "testbase,t", "test against baseline 1", &no_test_against_baseline );
     std::string baseline = TestDir + "/baseline1.txt";
 
     opts.parseCommandLine( argc, argv );
@@ -321,7 +321,7 @@ int main( int argc, char* argv[] )
             fs << gidElems[i] << " " << tempElems[i] << "\n";
         fs.close();
     }
-    if (test_against_baseline)
+    if (!no_test_against_baseline)
     {
         // get temp field on ocean, from conservative, the global ids, and dump to the baseline file
         // first get GlobalIds from ocn, and fields:
@@ -346,7 +346,9 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_GetDoubleTagStorage( ocnPID, bottomTempProjectedField.c_str(), &nelem[2],
                     &ent_type, &tempElems[0], bottomTempProjectedField.size() );
         CHECKIERR( ierr, "failed to get temperature field");
-        check_mapped_values_from_file(baseline, gidElems, tempElems, 1.e-9);
+        int err_code = 1;
+        check_mapped_values_from_file(baseline, gidElems, tempElems, 1.e-9, err_code);
+        if ( 0 == err_code ) std::cout << " passed baseline test 1\n";
     }
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
