@@ -716,8 +716,10 @@ void check_equal( const moab::Range& A, const moab::Range& B, const char* sA, co
 #endif  // #ifdef MOAB_RANGE_HPP
 
 #include <map>
-void check_mapped_values_from_file( std::string basefile, std::vector<int> & gids, std::vector<double> & vals, double eps=1.e-12)
+void check_mapped_values_from_file( std::string basefile, std::vector<int> & gids,
+        std::vector<double> & vals, double eps, int & err_code)
 {
+    err_code = 1;
     std::fstream fs;
     fs.open (basefile.c_str(),  std::fstream::in );
     if (!fs.is_open())
@@ -751,6 +753,7 @@ void check_mapped_values_from_file( std::string basefile, std::vector<int> & gid
             return;
         }
     }
+    err_code = 0; // no error
 }
 #endif /* ifdef __cplusplus */
 

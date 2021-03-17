@@ -137,8 +137,8 @@ int main( int argc, char* argv[] )
     int n = 1;  // number of send/receive / project / send back cycles
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
-    int regression_test = 1;
-    opts.addOpt< int >( "regression,r", "regression test against baseline 1", &regression_test);
+    bool no_regression_test = false;
+    opts.addOpt< void >( "regression,r", "regression test against baseline 1", &no_regression_test);
     opts.parseCommandLine( argc, argv );
 
     char fileWriteOptions[] = "PARALLEL=WRITE_PART";
@@ -689,7 +689,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
             // test results only for n == 1, for bottomTempProjectedField
-            if (regression_test)
+            if ( !no_regression_test )
             {
                 // the same as remap test
                 // get temp field on ocean, from conservative, the global ids, and dump to the baseline file
@@ -716,7 +716,9 @@ int main( int argc, char* argv[] )
                 ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2],
                             &ent_type, &tempElems[0], strlen( bottomTempProjectedField ) );
                 CHECKIERR( ierr, "failed to get temperature field");
-                check_mapped_values_from_file(baseline, gidElems, tempElems, 1.e-9);
+                int err_code = 1;
+                check_mapped_values_from_file(baseline, gidElems, tempElems, 1.e-9, err_code);
+                if ( 0 == err_code ) std::cout << " passed baseline test 1\n";
             }
 
         }
