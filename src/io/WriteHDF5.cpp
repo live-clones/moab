@@ -34,7 +34,6 @@
   #include <ctime>
 #endif
 
-#include <ctime>
 #include <cstdlib>
 #include <cstring>
 #include <cstdarg>
