@@ -1,5 +1,5 @@
-#include <time.h>
-#include <assert.h>
+#include <ctime>
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include "moab/Core.hpp"
@@ -28,7 +28,7 @@ const int default_query_count = 100;    //!< number of times to do each query se
 const int default_order[]     = { 0, 1, 2 };
 const int default_create[]    = { 0, 1 };
 const int default_delete[]    = { 0, 10, 30, 50, 70, 90 };
-#define ARRSIZE( A ) ( sizeof( A ) / sizeof( A[0] ) )
+#define ARRSIZE( A ) ( sizeof( A ) / sizeof( (A)[0] ) )
 
 // input parameters
 long numSideInt, numVert, numElem;  //!< total counts;
@@ -261,19 +261,19 @@ void parse_order( const char* str, std::vector< int >& list )
 {
     if( str[0] == 'f' )
     {
-        if( strncmp( str, "forward", strlen( str ) ) ) usage();
+        if( strncmp( str, "forward", strlen( str ) ) != 0 ) usage();
         list.push_back( 0 );
     }
     else if( str[0] != 'r' )
         usage();
     else if( str[1] == 'e' )
     {
-        if( strncmp( str, "reverse", strlen( str ) ) ) usage();
+        if( strncmp( str, "reverse", strlen( str ) ) != 0 ) usage();
         list.push_back( 0 );
     }
     else
     {
-        if( strncmp( str, "random", strlen( str ) ) ) usage();
+        if( strncmp( str, "random", strlen( str ) ) != 0 ) usage();
         list.push_back( 0 );
     }
 }

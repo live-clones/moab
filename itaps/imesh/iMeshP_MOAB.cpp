@@ -14,7 +14,7 @@
 #include "Internals.hpp"
 #undef IS_BUILDING_MB
 
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 
 #ifdef MOAB_HAVE_MPI

@@ -26,12 +26,12 @@
 #include "netcdf.h"
 #include <utility>
 #include <algorithm>
-#include <time.h>
+#include <ctime>
 #include <string>
 #include <vector>
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 
 #include "moab/Interface.hpp"
 #include "moab/Range.hpp"
@@ -56,17 +56,17 @@ const int TIME_STR_LEN = 11;
 
 #define GET_DIM( ncdim, name, val )                                                                             \
     {                                                                                                           \
-        int gdfail = nc_inq_dimid( ncFile, name, &ncdim );                                                      \
+        int gdfail = nc_inq_dimid( ncFile, name, &(ncdim) );                                                      \
         if( NC_NOERR == gdfail )                                                                                \
         {                                                                                                       \
             size_t tmp_val;                                                                                     \
             gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                                                  \
             if( NC_NOERR != gdfail ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF:: couldn't get dimension length" ); } \
             else                                                                                                \
-                val = tmp_val;                                                                                  \
+                (val) = tmp_val;                                                                                  \
         }                                                                                                       \
         else                                                                                                    \
-            val = 0;                                                                                            \
+            (val) = 0;                                                                                            \
     }
 
 #define GET_DIMB( ncdim, name, varname, id, val ) \
@@ -75,16 +75,16 @@ const int TIME_STR_LEN = 11;
 
 #define GET_VAR( name, id, dims )                                 \
     {                                                             \
-        id         = -1;                                          \
-        int gvfail = nc_inq_varid( ncFile, name, &id );           \
+        (id)         = -1;                                          \
+        int gvfail = nc_inq_varid( ncFile, name, &(id) );           \
         if( NC_NOERR == gvfail )                                  \
         {                                                         \
             int ndims;                                            \
             gvfail = nc_inq_varndims( ncFile, id, &ndims );       \
             if( NC_NOERR == gvfail )                              \
             {                                                     \
-                dims.resize( ndims );                             \
-                gvfail = nc_inq_vardimid( ncFile, id, &dims[0] ); \
+                (dims).resize( ndims );                             \
+                gvfail = nc_inq_vardimid( ncFile, id, &(dims)[0] ); \
             }                                                     \
         }                                                         \
     }

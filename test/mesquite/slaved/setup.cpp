@@ -3,8 +3,8 @@
 #include "MsqVertex.hpp"
 
 #include <iostream>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 #include <map>
 #include <vector>
 #include <algorithm>

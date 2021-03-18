@@ -3,10 +3,10 @@
  */
 #include <iostream>
 #include <sstream>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <ctime>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include "moab/Types.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
 

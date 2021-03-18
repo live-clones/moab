@@ -30,22 +30,22 @@
 #include <cassert>
 #include <cctype>
 #include <cstring>
-#include <stdarg.h>
-#include <stdio.h>
-#define MIN( a, b ) ( a < b ? a : b )
+#include <cstdarg>
+#include <cstdio>
+#define MIN( a, b ) ( (a) < (b) ? (a) : (b) )
 
 #ifdef _WIN32
 #define snprintf( A, B, C, D ) _snprintf( ( A ), ( B ), ( C ), ( D ) )
 #endif
 
 static ErrorCode create_int_ents( MBiMesh* mbimesh, Range& from_ents, const EntityHandle* in_set = 0 );
-#define HANDLE_ARRAY_PTR( array )       reinterpret_cast< EntityHandle* >( array )
+#define HANDLE_ARRAY_PTR( array )       (reinterpret_cast< EntityHandle* >( array ))
 #define CONST_HANDLE_ARRAY_PTR( array ) reinterpret_cast< const EntityHandle* >( array )
 #define TAG_HANDLE( handle )            reinterpret_cast< Tag >( handle )
 #define CONST_TAG_HANDLE( handle )      static_cast< const Tag >( handle )
 #define ENTITY_HANDLE( handle )         reinterpret_cast< EntityHandle >( handle )
 #define CONST_ENTITY_HANDLE( handle )   reinterpret_cast< const EntityHandle >( handle )
-#define CAST_TO_VOID( ptr )             reinterpret_cast< void* >( ptr )
+#define CAST_TO_VOID( ptr )             (reinterpret_cast< void* >( ptr ))
 
 // map from MB's entity type to TSTT's entity topology
 const iMesh_EntityTopology tstt_topology_table[] = {

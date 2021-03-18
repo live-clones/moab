@@ -21,28 +21,43 @@ Several computational solvers in various scientific domains such as nuclear engi
 
 MOAB was developed originally as part of the CUBIT project at Sandia National Laboratories, and has been partially funded by the DOE SciDAC program (TSTT, ITAPS, FASTMath), ASCR (CESAR), and DOE-NE (NEAMS program). More recently, DOE-BER programs under the E3SM project have provided support for enabling scalable solution transfer techniques for climate applications.
 
+MOAB is distributed under an open-source, GNU LGPL licensing agreement. [![LGPL-version3 License](https://img.shields.io/badge/license-LGPLv3-green)](LICENSE)
+
 ## Continuous Integration
 
-There are several hooks to online continuous integration systems, nightly and commit-based Buildbot/Bitbucket builds that are constantly run during a development day to check the integrity and robustness of the MOAB library.
+There are several hooks to online continuous integration systems, nightly and commit-based Buildbot/Bitbucket builds that are constantly run during a development day to check the integrity and robustness of the library.
 
-- **Buildbot**: [ ![Buildbot Status](http://gnep.mcs.anl.gov:8010/badges/moab-all.svg)](https://gnep.mcs.anl.gov:8010)
-- **CircleCI**: [ ![CircleCI Status](https://circleci.com/bb/fathomteam/moab/tree/master.svg?style=shield)](https://circleci.com/bb/fathomteam/moab)
-- **CodeShip**: [ ![Codeship Status](https://codeship.com/projects/286b0e80-5715-0132-1105-0e0cfcc5dfb4/status?branch=master)](https://codeship.com/projects/49743)
-- **Code Coverage**: 
-  + **Coverity**: [ ![Coverity Scan Build Status](https://scan.coverity.com/projects/6201/badge.svg)](https://scan.coverity.com/projects/moab)
-  + **CodeCov**: [![codecov](https://codecov.io/bb/fathomteam/moab/branch/master/graph/badge.svg)](https://codecov.io/bb/fathomteam/moab)
+[![Buildbot Status](http://gnep.mcs.anl.gov:8010/badges/moab-all.svg)](https://gnep.mcs.anl.gov:8010)
+[![Bitbucket Pipelines Status](https://img.shields.io/bitbucket/pipelines/fathomteam/moab/master?label=bitbucket&style=plastic)](https://bitbucket.org/fathomteam/moab/addon/pipelines/home#!/results/branch/master/page/1)
+[![CircleCI Status](https://circleci.com/bb/fathomteam/moab/tree/master.svg?style=shield)](https://circleci.com/bb/fathomteam/moab) 
+[![Codeship Status](https://codeship.com/projects/286b0e80-5715-0132-1105-0e0cfcc5dfb4/status?branch=master)](https://codeship.com/projects/49743)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/6201/badge.svg)](https://scan.coverity.com/projects/moab)
+[![codcov](https://codecov.io/bb/fathomteam/moab/branch/master/graph/badge.svg)](https://codecov.io/bb/fathomteam/moab)
+[![Codacy grade](https://app.codacy.com/project/badge/Grade/a796f9d9f5f44d628de15ab95717b1d1)](https://www.codacy.com/bb/fathomteam/moab/dashboard?utm_source=vijaysm@bitbucket.org&amp;utm_medium=referral&amp;utm_content=fathomteam/moab&amp;utm_campaign=Badge_Grade)
+
+## Documentation
+
+Detailed API documentation and user/development guides are available for the following repository branches, updated daily.
+
+  - [master](https://ftp.mcs.anl.gov/pub/fathom/moab-docs/index.html)
+  - [develop](https://ftp.mcs.anl.gov/pub/fathom/moab-docs-develop/index.html)
+
+## MOAB Pre-installed
+
+  - MOAB pre-installed docker image: [![Docker for MOAB](https://img.shields.io/docker/pulls/vijaysm/moab-root?style=flat-square)](https://hub.docker.com/repository/docker/vijaysm/moab-root)
+  - MOAB tools with anaconda: [![conda-forge MOAB](https://img.shields.io/conda/pn/conda-forge/moab?color=blue&label=conda&style=plastic)](https://anaconda.org/conda-forge/moab)
 
 ## Optional Dependencies
 
 - **MPI**: MOAB supports usage of MPICH and OpenMPI libraries configured externally in order to enable scalable mesh manipulation algorithms.
 - **HDF5**: In order to manage the data dependencies and to natively support parallel I/O, MOAB uses a custom file format that can represent the entire MOAB data model in a native HDF5-based file format. Support for this file format requires version 5 of the HDF library, which can be obtained at [HDF5].
 - **NetCDF**: MOAB library optionally depends on the NetCDF libraries (C and C++) to compile the ExodusII reader/writer. To get netcdf, go to [NetCDF].
-- **Metis**: MOAB can use the Metis library for partitioning mesh files in serial
-- **Zoltan**: Support for online partitioning through Zoltan (and its dependencies on Scotch, Parmetis etc) can be utilized through the partitioner tool
+- **Metis**/**ParMetis**: MOAB can use the Metis or ParMetis library for partitioning mesh files in serial and parallel respectively
+- **Zoltan**: Support for online partitioning through Zoltan (and its dependencies on Scotch, ParMetis etc) can be utilized through the partitioner tool
 - **TempestRemap**: Provide support for both offline and online remapping of Climate field data on unstructured spherical meshes
 - **Eigen3**: A substitute for BLAS/LAPACK interfaces. However if *TempestRemap* tools are to be built, this becomes a required dependency
 
-## Configuration and Build
+## Configuration and Build from Source
 
 * Currently, both CMake and Autotools are maintained simultaneously in order to support all platforms (including Windows). Please choose your build system according to your needs and follow instructions below. Both of these workflows follow the same pattern of commands to build and install in your platform.
 
@@ -107,17 +122,19 @@ If you use MOAB for your research, please use the following bibtex entries for t
   year = {2004},
   note = {Report}
 }
-@software{moab510_2019,
+@software{moab521_2020,
   author       = {Mahadevan, Vijay and
                   Grindeanu, Iulian and
-                  Jain, Rajeev},
-  title        = {MOAB v5.1.0},
-  month        = jan,
-  year         = 2019,
+                  Jain, Rajeev and
+                  Shriwise, Patrick and
+                  Wilson, Paul},
+  title        = {MOAB v5.2.1},
+  month        = aug,
+  year         = 2020,
   publisher    = {Zenodo},
-  version      = {5.1.0},
-  doi          = {10.5281/zenodo.2584863},
-  url          = {https://doi.org/10.5281/zenodo.2584863}
+  version      = {5.2.1},
+  doi          = {10.5281/zenodo.2584862},
+  url          = {https://doi.org/10.5281/zenodo.2584862}
 }
 ```
 

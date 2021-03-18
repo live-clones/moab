@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <math.h>
-#include <time.h>
+#include <cmath>
+#include <ctime>
 #include <cstdlib>
-#include "assert.h"
+#include <cassert>
 
 #include "mcnpmit.hpp"
 

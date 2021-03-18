@@ -45,7 +45,7 @@
 #include <iomanip>
 using namespace std;
 
-#include <stdio.h>
+#include <cstdio>
 
 namespace MBMesquite
 {

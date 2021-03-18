@@ -5,7 +5,7 @@
  */
 #include <vector>
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 #include <sstream>
 #include <fstream>

@@ -22,7 +22,7 @@
 //-------------------------------------------------------------------------
 #include "moab/Util.hpp"
 #include "moab/Interface.hpp"
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <limits>
 #if defined( _MSC_VER ) || defined( __MINGW32__ )

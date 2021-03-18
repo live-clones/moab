@@ -49,7 +49,7 @@
 #include "moab/TupleList.hpp"
 #include "moab/ProgOptions.hpp"
 #include "moab/ErrorHandler.hpp"
-#include <time.h>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 

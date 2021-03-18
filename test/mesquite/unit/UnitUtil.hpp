@@ -39,7 +39,7 @@
 #include "MsqError.hpp"
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 
 #include "cppunit/extensions/HelperMacros.h"
 

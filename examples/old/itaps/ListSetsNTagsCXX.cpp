@@ -12,13 +12,13 @@
 #include <vector>
 #include "iMesh.h"
 
-#define ERRORR( a )                      \
-    {                                    \
-        if( iBase_SUCCESS != err )       \
-        {                                \
-            std::cout << a << std::endl; \
-            return err;                  \
-        }                                \
+#define ERRORR( a )                          \
+    {                                        \
+        if( iBase_SUCCESS != err )           \
+        {                                    \
+            std::cout << ( a ) << std::endl; \
+            return err;                      \
+        }                                    \
     }
 
 int main( int argc, char* argv[] )

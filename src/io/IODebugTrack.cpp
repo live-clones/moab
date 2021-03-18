@@ -2,7 +2,7 @@
 #include "moab/Range.hpp"
 #include <iostream>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

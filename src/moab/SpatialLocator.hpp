@@ -44,7 +44,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <math.h>
+#include <cmath>
 
 namespace moab
 {

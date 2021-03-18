@@ -54,7 +54,7 @@
 #include <cmath>
 #include <iostream>
 #include "../../ObjectiveFunction/ObjectiveFunction.hpp"
-#include <float.h>
+#include <cfloat>
 
 namespace MBMesquite
 {

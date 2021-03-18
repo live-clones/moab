@@ -36,7 +36,7 @@
 #include "moab/OrientedBox.hpp"
 #include "moab/Range.hpp"
 #include <ostream>
-#include <assert.h>
+#include <cassert>
 #include <limits>
 
 namespace moab

@@ -32,7 +32,7 @@
 #include "Mesquite.hpp"
 #include "TetLagrangeShape.hpp"
 #include "MsqError.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

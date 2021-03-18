@@ -35,7 +35,7 @@
 #include "Vector3D.hpp"
 #include "ConditionNumberFunctions.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 using std::vector;
 

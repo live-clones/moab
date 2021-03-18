@@ -6,10 +6,10 @@
  */
 #include <iostream>
 #include <sstream>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <ctime>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include "moab/Core.hpp"
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
@@ -18,7 +18,7 @@
 #include "moab/IntxMesh/IntxUtils.hpp"
 #include "TestUtil.hpp"
 #include "moab/ProgOptions.hpp"
-#include <math.h>
+#include <cmath>
 
 using namespace moab;
 

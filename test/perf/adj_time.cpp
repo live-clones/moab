@@ -2,8 +2,8 @@
 #include "moab/Range.hpp"
 #include "TestUtil.hpp"
 #include <iostream>
-#include <assert.h>
-#include <time.h>
+#include <cassert>
+#include <ctime>
 
 using namespace moab;
 

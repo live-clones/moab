@@ -29,7 +29,7 @@
 
 #include "Mesquite.hpp"
 #include "Sample.hpp"
-#include <string.h>
+#include <cstring>
 
 namespace MBMesquite
 {

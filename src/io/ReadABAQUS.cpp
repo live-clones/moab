@@ -20,10 +20,10 @@
 #include "ReadABAQUS.hpp"
 
 #include <algorithm>
-#include <time.h>
+#include <ctime>
 #include <string>
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstdio>
 #include <cmath>
 
 #include "moab/Range.hpp"

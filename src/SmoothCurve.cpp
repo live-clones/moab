@@ -6,7 +6,7 @@
 #include "SmoothCurve.hpp"
 //#include "SmoothVertex.hpp"
 #include "SmoothFace.hpp"
-#include "assert.h"
+#include <cassert>
 #include <iostream>
 #include "moab/GeomTopoTool.hpp"
 

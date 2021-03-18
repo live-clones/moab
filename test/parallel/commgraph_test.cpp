@@ -48,7 +48,7 @@
 #include <sstream>
 
 #define CHECKIERR( rc, message )                       \
-    if( 0 != rc )                                      \
+    if( 0 != ( rc ) )                                  \
     {                                                  \
         printf( "%s. ErrorCode = %d\n", message, rc ); \
         CHECK( 0 );                                    \

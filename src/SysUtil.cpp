@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
 #include "moab/EntityHandle.hpp"
 

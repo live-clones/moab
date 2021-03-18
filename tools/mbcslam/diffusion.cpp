@@ -24,11 +24,11 @@ on the sphere; see CSLAM Utils case1
 
 #include <iostream>
 #include <sstream>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>  // for M_PI
+#include <ctime>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cmath>  // for M_PI
 
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"

@@ -6,8 +6,8 @@
 #include "moab_mpi.h"
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 using namespace moab;
 
@@ -46,7 +46,7 @@ void read_write( const char* filename, Interface& write, Interface& reader );
 #define CHECK_ERR_FILE( ERRCODE, FILENAME )                            \
     do                                                                 \
     {                                                                  \
-        if( MB_SUCCESS != ERRCODE && !keep_files ) remove( FILENAME ); \
+        if( MB_SUCCESS != (ERRCODE) && !keep_files ) remove( FILENAME ); \
         CHECK_ERR( ERRCODE );                                          \
         while( false )
 
@@ -59,7 +59,7 @@ int main( int argc, char* argv[] )
 
     if( argc != 1 )
     {
-        if( argc != 2 || strcmp( argv[1], "-k" ) )
+        if( argc != 2 || strcmp( argv[1], "-k" ) != 0 )
         {
             fprintf( stderr, "Usage: %s [-k]\n", argv[0] );
             abort();

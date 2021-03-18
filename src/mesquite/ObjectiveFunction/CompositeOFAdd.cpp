@@ -32,7 +32,7 @@
   \author Michael Brewer
   \date   2002-06-24
 */
-#include <math.h>
+#include <cmath>
 #include "ObjectiveFunction.hpp"
 #include "CompositeOFAdd.hpp"
 #include "MsqTimer.hpp"

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <set>
 #include <limits>
-#include <time.h>
+#include <ctime>
 #include <vector>
 #include <cstdlib>
 #include <cstdio>
-#include <assert.h>
+#include <cassert>
 #if !defined( _MSC_VER ) && !defined( __MINGW32__ )
 #include <unistd.h>
 #include <sys/types.h>

@@ -27,8 +27,8 @@
 #include "MsqError.hpp"
 #include "TopologyInfo.hpp"
 
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 
 namespace MBMesquite
 {

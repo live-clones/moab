@@ -85,15 +85,15 @@ class WriteHDF5 : public WriterIface
 
         virtual ~ExportType() {}
 
-        bool operator==( ExportType t ) const
+        bool operator==( const ExportType& t ) const
         {
             return t.type == type && t.num_nodes == num_nodes;
         }
-        bool operator!=( ExportType t ) const
+        bool operator!=( const ExportType& t ) const
         {
             return t.type != type || t.num_nodes != num_nodes;
         }
-        bool operator<( ExportType t ) const
+        bool operator<( const ExportType& t ) const
         {
             return type < t.type || ( type == t.type && num_nodes < t.num_nodes );
         }
@@ -305,7 +305,7 @@ class WriteHDF5 : public WriterIface
     //! The list of sets to export
     ExportSet setSet;
 
-    const ExportSet* find( ExportType type ) const
+    const ExportSet* find( const ExportType& type ) const
     {
         if( type.type == MBVERTEX )
             return &nodeSet;

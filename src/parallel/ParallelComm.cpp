@@ -26,9 +26,9 @@
 #include <functional>
 #include <numeric>
 
-#include <math.h>
+#include <cmath>
 #include <cstdlib>
-#include <assert.h>
+#include <cassert>
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
@@ -8861,10 +8861,10 @@ void ParallelComm::print_pstatus( unsigned char pstat, std::string& ostr )
     int num = 0;
 #define ppstat( a, b )             \
     {                              \
-        if( pstat & a )            \
+        if( pstat & (a) )            \
         {                          \
             if( num ) str << ", "; \
-            str << b;              \
+            str << (b);              \
             num++;                 \
         }                          \
     }

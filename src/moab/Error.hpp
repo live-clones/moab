@@ -34,8 +34,8 @@
 #endif
 
 #include <string>
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 
 #include "moab/Types.hpp"
 #include "moab/Compiler.hpp"

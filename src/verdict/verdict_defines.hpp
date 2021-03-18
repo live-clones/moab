@@ -22,7 +22,7 @@
 #ifndef VERDICT_DEFINES
 #define VERDICT_DEFINES
 
-#include <math.h>
+#include <cmath>
 #include "v_vector.h"
 #include "VerdictVector.hpp"
 
@@ -40,7 +40,7 @@ inline double determinant( double a, double b, double c, double d )
     return ( ( a ) * ( d ) - ( b ) * ( c ) );
 }
 
-inline double determinant( VerdictVector v1, VerdictVector v2, VerdictVector v3 )
+inline double determinant( const VerdictVector& v1, const VerdictVector& v2, const VerdictVector& v3 )
 {
     return v1 % ( v2 * v3 );
 }
@@ -50,25 +50,25 @@ inline double determinant( VerdictVector v1, VerdictVector v2, VerdictVector v3 
     jac_mat_tmp = sqrt( a );                   \
     if( jac_mat_tmp == 0 )                     \
     {                                          \
-        d = 0;                                 \
-        e = 0;                                 \
-        f = 0;                                 \
-        g = 0;                                 \
+        (d) = 0;                                 \
+        (e) = 0;                                 \
+        (f) = 0;                                 \
+        (g) = 0;                                 \
     }                                          \
     else                                       \
     {                                          \
-        d = jac_mat_tmp;                       \
-        e = 0;                                 \
-        f = b / jac_mat_tmp;                   \
-        g = c / jac_mat_tmp;                   \
+        (d) = jac_mat_tmp;                       \
+        (e) = 0;                                 \
+        (f) = (b) / jac_mat_tmp;                   \
+        (g) = (c) / jac_mat_tmp;                   \
     }
 
 // this assumes that detmw != 0
 #define form_t( m11, m21, m12, m22, mw11, mw21, mw12, mw22, detmw, xm11, xm21, xm12, xm22 ) \
-    xm11 = ( m11 * mw22 - m12 * mw21 ) / detmw;                                             \
-    xm21 = ( m21 * mw22 - m22 * mw21 ) / detmw;                                             \
-    xm12 = ( m12 * mw11 - m11 * mw12 ) / detmw;                                             \
-    xm22 = ( m22 * mw11 - m21 * mw12 ) / detmw;
+    xm11 = ( (m11) * (mw22) - (m12) * (mw21) ) / (detmw);                                             \
+    (xm21) = ( (m21) * (mw22) - (m22) * (mw21) ) / (detmw);                                             \
+    (xm12) = ( (m12) * (mw11) - (m11) * (mw12) ) / (detmw);                                             \
+    (xm22) = ( (m22) * (mw11) - (m21) * (mw12) ) / (detmw);
 
 extern double verdictSqrt2;
 
@@ -108,9 +108,9 @@ inline double norm_squared( double m11, double m21, double m12, double m22 )
 }
 
 #define metric_matrix( m11, m21, m12, m22, gm11, gm12, gm22 ) \
-    gm11 = m11 * m11 + m21 * m21;                             \
-    gm12 = m11 * m12 + m21 * m22;                             \
-    gm22 = m12 * m12 + m22 * m22;
+    gm11 = (m11) * (m11) + (m21) * (m21);                             \
+    (gm12) = (m11) * (m12) + (m21) * (m22);                             \
+    (gm22) = (m12) * (m12) + (m22) * (m22);
 
 inline int skew_matrix( double gm11, double gm12, double gm22, double det, double& qm11, double& qm21, double& qm12,
                         double& qm22 )
@@ -125,7 +125,7 @@ inline int skew_matrix( double gm11, double gm12, double gm22, double det, doubl
     return true;
 }
 
-inline void inverse( VerdictVector x1, VerdictVector x2, VerdictVector x3, VerdictVector& u1, VerdictVector& u2,
+inline void inverse( const VerdictVector& x1, const VerdictVector& x2, const VerdictVector& x3, VerdictVector& u1, VerdictVector& u2,
                      VerdictVector& u3 )
 {
     double detx = determinant( x1, x2, x3 );

@@ -32,9 +32,9 @@
 #include "Mesquite.hpp"
 
 #include <ostream>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdarg>
+#include <cassert>
 
 #include <cstring>
 using std::strncpy;

@@ -13,8 +13,8 @@
  *
  */
 
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"

@@ -26,9 +26,9 @@ typedef int PartType;
 #include <iostream>
 #include <sstream>
 #include <cmath>
-#include <stdlib.h>
+#include <cstdlib>
 #include <list>
-#include <time.h>
+#include <ctime>
 
 #include "moab/IntxMesh/IntxUtils.hpp"
 

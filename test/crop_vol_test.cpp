@@ -15,7 +15,7 @@
 #include "moab/Core.hpp"
 #include <iostream>
 #include <fstream>
-#include <string.h>
+#include <cstring>
 #include "moab/FBEngine.hpp"
 #include "moab/GeomTopoTool.hpp"
 #include "TestUtil.hpp"

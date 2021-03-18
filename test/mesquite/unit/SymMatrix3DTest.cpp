@@ -26,7 +26,7 @@
 
 #include "SymMatrix3D.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include "UnitUtil.hpp"
 

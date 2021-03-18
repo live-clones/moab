@@ -15,8 +15,8 @@
 #ifndef TUPLE_LIST_HPP
 #define TUPLE_LIST_HPP
 
-#include <limits.h>
-#include <stdlib.h>
+#include <climits>
+#include <cstdlib>
 
 #include "moab/Types.hpp"
 #include <string>
@@ -400,4 +400,4 @@ inline bool TupleList::get_writeEnabled() const
 
 }  // namespace moab
 #endif
-#include <stdlib.h>
+#include <cstdlib>

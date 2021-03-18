@@ -409,7 +409,7 @@ class HalfFacetRep
 
     /* Find the number of edges and faces of given range of cells
      * */
-    ErrorCode find_total_edges_faces_3d( Range cells, int* nedges, int* nfaces );
+    ErrorCode find_total_edges_faces_3d( const Range& cells, int* nedges, int* nfaces );
 
     ErrorCode count_subentities( Range& edges, Range& faces, Range& cells, int* nedges, int* nfaces );
 

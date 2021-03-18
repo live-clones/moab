@@ -23,8 +23,8 @@
 #define _USE_MATH_DEFINES  // For M_PI
 #endif
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include <iostream>
 
 #include "ReadSmf.hpp"
@@ -296,7 +296,7 @@ ErrorCode ReadSmf::parse_line( char* ln )
     else
     {
         cmd_entry* entry = &read_cmds[0];
-        bool handled     = 0;
+        bool handled     = false;
 
         while( entry->name && !handled )
         {
@@ -304,7 +304,7 @@ ErrorCode ReadSmf::parse_line( char* ln )
             {
                 err = ( this->*( entry->cmd ) )( argv );
                 if( MB_SUCCESS != err ) return err;
-                handled = 1;
+                handled = true;
                 ++commandNo;
             }
             else

@@ -13,10 +13,10 @@
 
 #include <vector>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <limits>
 #include <algorithm>
-#include <stdio.h>  // for remove()
+#include <cstdio>  // for remove()
 
 #define CHKERR \
     if( MB_SUCCESS != rval ) return rval

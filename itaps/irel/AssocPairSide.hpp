@@ -2,7 +2,7 @@
 #define ASSOCPAIRSIDE_HPP
 
 #include <iBase.h>
-#include <iRel.h>
+#include "iRel.h"
 
 class AssocPairSide
 {

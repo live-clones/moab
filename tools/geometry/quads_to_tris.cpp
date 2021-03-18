@@ -70,7 +70,7 @@ ErrorCode make_tris_from_quad( Interface* MBI, EntityHandle quad, /* input */
     return MB_SUCCESS;
 }
 
-ErrorCode make_tris_from_quads( Interface* MBI, const Range quads, Range& tris )
+ErrorCode make_tris_from_quads( Interface* MBI, const Range& quads, Range& tris )
 {
     tris.clear();
     for( Range::const_iterator i = quads.begin(); i != quads.end(); ++i )

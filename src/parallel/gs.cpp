@@ -65,11 +65,11 @@
  call cpgs_free(hgs)
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstring>
+#include <cmath>
 #include "moab/gs.hpp"
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
@@ -96,9 +96,9 @@ namespace moab
 #define DO_ADD( a, b ) a += b
 #define DO_MUL( a, b ) a *= b
 #define DO_MIN( a, b ) \
-    if( b < a ) a = b
+    if( (b) < (a) ) (a) = b
 #define DO_MAX( a, b ) \
-    if( b > a ) a = b
+    if( (b) > (a) ) (a) = b
 #define DO_BPR( a, b )         \
     do                         \
     {                          \
@@ -113,7 +113,7 @@ namespace moab
             else               \
                 break;         \
         }                      \
-        a = a_;                \
+        (a) = a_;                \
     } while( 0 )
 
 #define LOOP( op )                       \

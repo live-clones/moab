@@ -14,7 +14,7 @@
  */
 
 #include "moab/HomXform.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

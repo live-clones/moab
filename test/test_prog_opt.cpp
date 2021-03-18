@@ -2,7 +2,7 @@
 #include "TestRunner.hpp"
 #include "moab/ProgOptions.hpp"
 #include <limits>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iterator>
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
@@ -30,7 +30,7 @@ void test_optional_args();
 void test_optional_arg();
 void test_squashed_short();
 
-#define ARGCV( A ) ( sizeof( A ) / sizeof( A[0] ) ), const_cast< char** >( A )
+#define ARGCV( A ) ( sizeof( A ) / sizeof( (A)[0] ) ), const_cast< char** >( A )
 
 int main( int argc, char* argv[] )
 {

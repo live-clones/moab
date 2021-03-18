@@ -65,12 +65,12 @@
 #include "moab/MOABConfig.h"
 #include "moab_mpi.h"
 #include "moab/iMOAB.h"
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <vector>
 
 #define ERROR( rc, msg )           \
-    if( 0 != rc )                  \
+    if( 0 != ( rc ) )              \
     {                              \
         printf( "error %s", msg ); \
         return 1;                  \

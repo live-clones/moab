@@ -10,7 +10,7 @@
 #include "SysUtil.hpp"
 #include "moab/Error.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <new>
 #include <algorithm>
 

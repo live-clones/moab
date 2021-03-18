@@ -30,8 +30,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <assert.h>
+#include <cerrno>
+#include <cassert>
 #include <iostream>
 
 #ifdef WIN32

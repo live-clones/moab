@@ -33,7 +33,7 @@
   \author Lori Freitag
   \date   2002-07-18
 */
-#include <math.h>
+#include <cmath>
 #include "MaxTemplate.hpp"
 #include "QualityMetric.hpp"
 #include "MsqError.hpp"

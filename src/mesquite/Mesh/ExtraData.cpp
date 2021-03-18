@@ -32,7 +32,7 @@
 #include "Mesquite.hpp"
 #include "ExtraData.hpp"
 #include "PatchData.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

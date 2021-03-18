@@ -36,7 +36,7 @@
 #include "Sample.hpp"
 #include "MsqMatrix.hpp"
 #include "MeshInterface.hpp"
-#include <stddef.h>
+#include <cstddef>
 
 namespace MBMesquite
 {

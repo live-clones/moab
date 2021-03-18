@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include "moab/Range.hpp"
 #include "moab/Core.hpp"
 #include "MBTagConventions.hpp"

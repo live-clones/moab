@@ -20,7 +20,7 @@
 #include "moab/Forward.hpp"
 #include "moab/WriterIface.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 
 namespace moab
 {

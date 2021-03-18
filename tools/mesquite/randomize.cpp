@@ -8,17 +8,17 @@
 #include "IdealWeightInverseMeanRatio.hpp"
 #include "PMeanPTemplate.hpp"
 #include "TerminationCriterion.hpp"
-#include <assert.h>
+#include <cassert>
 
 #include "domain.hpp"
 
 #include <iostream>
 #include <iomanip>
 #include <memory>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
 
 using namespace MBMesquite;
 

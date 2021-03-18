@@ -25,8 +25,8 @@
 
 #include <fstream>
 #include <iostream>
-#include <stdio.h>
-#include <assert.h>
+#include <cstdio>
+#include <cassert>
 #include <vector>
 #include <set>
 #include <iterator>

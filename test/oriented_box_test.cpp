@@ -5,7 +5,7 @@
 
 using namespace moab;
 
-#include <assert.h>
+#include <cassert>
 
 const double TOL = 1e-6;
 int error_count  = 0;
@@ -88,7 +88,7 @@ static CartVect scaled_face( const OrientedBox& box, int face, double factor )
 }
 
 // get vector containing axis lengths, ordered from smallest to largest
-static void axis_dims( const Matrix3 axis, CartVect& dims )
+static void axis_dims( const Matrix3& axis, CartVect& dims )
 {
     dims = CartVect( axis.col( 0 ).length(), axis.col( 1 ).length(), axis.col( 2 ).length() );
     if( dims[0] > dims[1] ) std::swap( dims[0], dims[1] );

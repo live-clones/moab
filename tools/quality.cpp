@@ -1,9 +1,9 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 #include <map>
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <iomanip>
 #include <fstream>
 #include "moab/MOABConfig.h"
@@ -15,9 +15,9 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 #endif
-#include <math.h>
-#include <assert.h>
-#include <float.h>
+#include <cmath>
+#include <cassert>
+#include <cfloat>
 
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"

@@ -13,12 +13,12 @@
 #include "moab/iMOAB.h"
 #include "TestUtil.hpp"
 
-#define RUN_TEST_ARG2( A, B ) run_test( &A, #A, B )
+#define RUN_TEST_ARG2( A, B ) run_test( &( A ), #A, B )
 
 using namespace moab;
 
 #define CHECKRC( rc, message )     \
-    if( 0 != rc )                  \
+    if( 0 != ( rc ) )              \
     {                              \
         printf( "%s\n", message ); \
         return MB_FAILURE;         \

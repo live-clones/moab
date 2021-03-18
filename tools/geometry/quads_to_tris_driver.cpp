@@ -1,5 +1,5 @@
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include "moab/Core.hpp"
 #include "quads_to_tris.hpp"
 

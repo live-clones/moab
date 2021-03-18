@@ -20,9 +20,9 @@
 
 #include "moab/FileOptions.hpp"
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
 #include <algorithm>
 #include <iostream>
 
@@ -36,7 +36,7 @@ using namespace moab;
     }
 
 #define EQUAL( A, B )                                                                                               \
-    if( A != B )                                                                                                    \
+    if( ( A ) != ( B ) )                                                                                            \
     {                                                                                                               \
         std::cerr << "Failure at line " << __LINE__ << ": expected " << ( B ) << " but got " << ( A ) << std::endl; \
         return 2;                                                                                                   \
@@ -238,7 +238,7 @@ int main()
 
     // test copy constructor
 
-    FileOptions tool6( tool2 );
+    const FileOptions& tool6( tool2 );
 
     rval = tool6.get_option( "opt1", s );
     CHECK( rval );
@@ -252,7 +252,7 @@ int main()
     l = tool6.size();
     EQUAL( l, 2 );
 
-    FileOptions tool7( tool5 );
+    const FileOptions& tool7( tool5 );
     e = tool7.empty();
     EQUAL( e, true );
     l = tool7.size();

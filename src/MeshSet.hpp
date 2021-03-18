@@ -10,7 +10,7 @@
 #include "moab/Range.hpp"
 #include "moab/CN.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <algorithm>
 #include <iterator>

@@ -5,8 +5,8 @@
 #include "SequenceManager.hpp"
 #include "moab/Error.hpp"
 #include "moab/ErrorHandler.hpp"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 namespace moab
 {

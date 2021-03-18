@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "mcnpmit.hpp"
 #include "moab/CartVect.hpp"
-#include "math.h"
+#include <cmath>
 
 moab::Interface* mb_instance();
 

@@ -54,12 +54,12 @@ void LinearRemapFVtoGLL_Volumetric( const Mesh& meshInput, const Mesh& meshOutpu
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define MPI_CHK_ERR( err )                                      \
-    if( err )                                                   \
-    {                                                           \
-        std::cout << "MPI Failure. ErrorCode (" << err << ") "; \
-        std::cout << "\nMPI Aborting... \n";                    \
-        return moab::MB_FAILURE;                                \
+#define MPI_CHK_ERR( err )                                          \
+    if( err )                                                       \
+    {                                                               \
+        std::cout << "MPI Failure. ErrorCode (" << ( err ) << ") "; \
+        std::cout << "\nMPI Aborting... \n";                        \
+        return moab::MB_FAILURE;                                    \
     }
 
 moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : OfflineMap(), m_remapper( remapper )

@@ -19,9 +19,9 @@
 #include <iterator>
 #include <algorithm>
 #include <iomanip>
-#include <assert.h>
-#include <string.h>
-#include <math.h>
+#include <cassert>
+#include <cstring>
+#include <cmath>
 #define CHECK( STR ) \
     if( err != iBase_SUCCESS ) return print_error( STR, err, geom, __FILE__, __LINE__ )
 
@@ -121,8 +121,8 @@ class SimpleArray
     }
 };
 
-#define ARRAY_INOUT( A ) A.ptr(), &A.capacity(), &A.size()
-#define ARRAY_IN( A )    &A[0], A.size()
+#define ARRAY_INOUT( A ) A.ptr(), &( A ).capacity(), &( A ).size()
+#define ARRAY_IN( A )    &( A )[0], ( A ).size()
 
 bool smooth_test( const std::string& filename, FBiGeom_Instance );
 

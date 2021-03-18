@@ -9,9 +9,9 @@
 #include "iMesh.h"
 #include "iRel.h"
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include "MBiMesh.hpp"
 #include "moab/Core.hpp"
@@ -28,15 +28,15 @@
 #endif
 #endif
 
-#define CHECK_SIZE_C( type, array, allocated_size, size )            \
-    if( NULL == *array || *allocated_size == 0 )                     \
-    {                                                                \
-        *array          = (type*)malloc( sizeof( type ) * size );    \
-        *allocated_size = size;                                      \
-    }                                                                \
-    else if( *allocated_size < size )                                \
-    {                                                                \
-        printf( "   Array passed in is non-zero but too short.\n" ); \
+#define CHECK_SIZE_C( type, array, allocated_size, size )                 \
+    if( NULL == *( array ) || *( allocated_size ) == 0 )                  \
+    {                                                                     \
+        *( array )          = (type*)malloc( sizeof( type ) * ( size ) ); \
+        *( allocated_size ) = size;                                       \
+    }                                                                     \
+    else if( *( allocated_size ) < ( size ) )                             \
+    {                                                                     \
+        printf( "   Array passed in is non-zero but too short.\n" );      \
     }
 
 typedef void* iRel_EntityHandle;

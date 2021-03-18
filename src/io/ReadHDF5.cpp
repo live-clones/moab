@@ -23,7 +23,7 @@
 // Creation Date : 04/18/04
 //-------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #include "moab/MOABConfig.h"
 /* Include our MPI header before any HDF5 because otherwise
    it will get included indirectly by HDF5 */
@@ -47,8 +47,8 @@
 #endif
 //#include "WriteHDF5.hpp"
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <functional>
 #include <iostream>

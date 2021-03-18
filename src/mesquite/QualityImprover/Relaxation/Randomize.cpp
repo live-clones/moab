@@ -38,7 +38,7 @@
 #include "Randomize.hpp"
 #include "MsqFreeVertexIndexIterator.hpp"
 #include "MsqDebug.hpp"
-#include <math.h>
+#include <cmath>
 
 using namespace MBMesquite;
 

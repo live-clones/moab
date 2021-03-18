@@ -25,8 +25,8 @@
 #include "moab/BSPTreePoly.hpp"
 #include "moab/Util.hpp"
 
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 #include <algorithm>
 #include <limits>
 

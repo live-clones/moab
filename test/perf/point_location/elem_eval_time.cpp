@@ -6,9 +6,9 @@
 #include "moab/CN.hpp"
 #include "ElemUtil.hpp"
 #include <iostream>
-#include <time.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <ctime>
+#include <cstdlib>
+#include <cassert>
 #include <sstream>
 #include <string>
 

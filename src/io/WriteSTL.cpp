@@ -27,13 +27,13 @@
 #include "moab/FileOptions.hpp"
 #include "SysUtil.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <math.h>
+#include <cerrno>
+#include <cmath>
 #include <fcntl.h>
-#include <limits.h>
+#include <climits>
 
 namespace moab
 {

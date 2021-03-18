@@ -35,7 +35,7 @@
 #define MSQ_NODE_SET_HPP
 
 #include "Mesquite.hpp"
-#include <assert.h>
+#include <cassert>
 #include <iosfwd>
 #include "Bits.hpp"
 #include "Sample.hpp"

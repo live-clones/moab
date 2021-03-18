@@ -1,8 +1,8 @@
 #include <iostream>
 #include "moab/Core.hpp"
-#include <math.h>
+#include <cmath>
 #include <cstdlib>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 

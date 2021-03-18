@@ -34,8 +34,8 @@
   \author Lori Freitag
   \date 2002-07-20 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include "NonSmoothDescent.hpp"
 #include "MsqTimer.hpp"
 

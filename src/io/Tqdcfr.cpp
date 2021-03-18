@@ -34,8 +34,8 @@
 #include "exodus_order.h"
 
 #include <sstream>
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 namespace moab
 {
@@ -1395,8 +1395,8 @@ ErrorCode Tqdcfr::read_nodes( const unsigned int gindex, Tqdcfr::ModelEntry* mod
         if( !beforeEnts.empty() ) tmp_range.merge( beforeEnts.subset_by_type( MBVERTEX ) );
         vrange = subtract( vrange, tmp_range );
         // Compute the max cid; map is indexed by cid, so size is max_cid + 1
-#define MAX( a, b ) ( a > b ? a : b )
-#define MIN( a, b ) ( a < b ? a : b )
+#define MAX( a, b ) ( (a) > (b) ? (a) : (b) )
+#define MIN( a, b ) ( (a) < (b) ? (a) : (b) )
         // Sanity check that max vhandle is larger than offset
         long new_max = *vrange.rbegin() - currVHandleOffset;
         assert( new_max >= 0 && ( (long)*vrange.begin() ) - currVHandleOffset >= 0 );

@@ -1,7 +1,7 @@
 #include "moab/LocalDiscretization/LinearTri.hpp"
 #include "moab/Forward.hpp"
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 namespace moab

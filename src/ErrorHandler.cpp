@@ -4,8 +4,8 @@
 #include "moab_mpi.h"
 #endif
 
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 
 #ifdef _WIN32
 #include <io.h>

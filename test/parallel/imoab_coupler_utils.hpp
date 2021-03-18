@@ -11,9 +11,8 @@
 #ifndef TEST_PARALLEL_IMOAB_COUPLER_UTILS_HPP_
 #define TEST_PARALLEL_IMOAB_COUPLER_UTILS_HPP_
 
-
 #define CHECKIERR( rc, message )                       \
-    if( 0 != rc )                                      \
+    if( 0 != ( rc ) )                                  \
     {                                                  \
         printf( "%s. ErrorCode = %d\n", message, rc ); \
         return 1;                                      \
@@ -28,7 +27,7 @@
         double locElapsed = timer.time_since_birth() - timer_ops, minElapsed = 0, maxElapsed = 0; \
         MPI_Reduce( &locElapsed, &maxElapsed, 1, MPI_DOUBLE, MPI_MAX, 0, localcomm );             \
         MPI_Reduce( &locElapsed, &minElapsed, 1, MPI_DOUBLE, MPI_MIN, 0, localcomm );             \
-        if( !localrank )                                                                          \
+        if( !( localrank ) )                                                                      \
             std::cout << "[LOG] Time taken to " << opName.c_str() << ": max = " << maxElapsed     \
                       << ", avg = " << ( maxElapsed + minElapsed ) / 2 << "\n";                   \
         opName.clear();                                                                           \

@@ -15,14 +15,14 @@
 
 #include <iostream>
 #include <sstream>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <ctime>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
-#include <math.h>
+#include <cmath>
 #include "TestUtil.hpp"
 #include "moab/ParallelComm.hpp"
 #include "moab/ProgOptions.hpp"
@@ -34,7 +34,7 @@
 #include "IntxUtilsCSLAM.hpp"
 
 // for M_PI
-#include <math.h>
+#include <cmath>
 
 using namespace moab;
 // some input data

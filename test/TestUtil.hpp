@@ -49,7 +49,7 @@ const char* TestDir = STRINGIFY( MESHDIR );
  *  Argument should be a function with the signature:  void func(void)
  *  Evaluates to zero if test is successful, one otherwise.
  */
-#define RUN_TEST( FUNC ) run_test( &FUNC, #FUNC )
+#define RUN_TEST( FUNC ) run_test( &((((FUNC)))), #FUNC )
 
 // Use C++ exceptions to return error state to test runner
 // Portable, but whole test suite stops if any test segfaults, asserts, etc.
@@ -83,10 +83,10 @@ const char* TestDir = STRINGIFY( MESHDIR );
  *       The above macros constitute the entire intended API.
  ***************************************************************************************/
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #ifdef __cplusplus
 #include <iostream>
 #include <vector>
@@ -118,8 +118,8 @@ struct ErrorExcept
 // return codes are used if the test caused a segfault or other
 // signal.)
 #elif MODE == LONGJMP_MODE
-#include <signal.h>
-#include <setjmp.h>
+#include <csignal>
+#include <csetjmp>
 #define FLAG_ERROR siglongjmp( jmpenv, -1 )
 #else
 #error "MODE not set"

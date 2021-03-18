@@ -25,12 +25,12 @@
 
 #ifdef MOAB_HAVE_MPI
 
-#define MPI_CHK_ERR( err )                                      \
-    if( err )                                                   \
-    {                                                           \
-        std::cout << "MPI Failure. ErrorCode (" << err << ") "; \
-        std::cout << "\nMPI Aborting... \n";                    \
-        return moab::MB_FAILURE;                                \
+#define MPI_CHK_ERR( err )                                          \
+    if( err )                                                       \
+    {                                                               \
+        std::cout << "MPI Failure. ErrorCode (" << ( err ) << ") "; \
+        std::cout << "\nMPI Aborting... \n";                        \
+        return moab::MB_FAILURE;                                    \
     }
 
 int moab::TempestOnlineMap::rearrange_arrays_by_dofs(

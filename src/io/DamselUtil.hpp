@@ -14,7 +14,7 @@
 #define CHK_DMSL_ERR( A, B )            \
     do                                  \
     {                                   \
-        if( DMSL_OK.id != A.id )        \
+        if( DMSL_OK.id != ( A ).id )    \
         {                               \
             MB_SET_ERR_CONT( B );       \
             return error( MB_FAILURE ); \
@@ -24,7 +24,7 @@
 #define CHK_DMSL_ERR_NM( A )               \
     do                                     \
     {                                      \
-        if( DMSL_OK.id != A.id )           \
+        if( DMSL_OK.id != ( A ).id )       \
         {                                  \
             MB_CHK_ERR_CONT( MB_FAILURE ); \
             return error( MB_FAILURE );    \

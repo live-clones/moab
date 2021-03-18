@@ -33,7 +33,7 @@
 */
 #include <vector>
 #include "ConditionNumberQualityMetric.hpp"
-#include <math.h>
+#include <cmath>
 #include "Vector3D.hpp"
 #include "ConditionNumberFunctions.hpp"
 

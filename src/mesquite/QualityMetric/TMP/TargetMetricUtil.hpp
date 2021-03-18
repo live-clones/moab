@@ -36,7 +36,7 @@
 #include "Mesquite.hpp"
 #include "SymMatrix3D.hpp"
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

@@ -30,10 +30,10 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdio>
-#include <time.h>
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
+#include <ctime>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
 #include "moab/Interface.hpp"
 #include "MBTagConventions.hpp"
 #include "moab/Range.hpp"
@@ -3639,7 +3639,7 @@ bool points_are_coincident( const double* first, const double* second )
 
     return false;
 }
-ErrorCode find_coincident_nodes( Interface* gMB, Range vertices,
+ErrorCode find_coincident_nodes( Interface* gMB, const Range& vertices,
                                  std::vector< std::pair< EntityHandle, EntityHandle > >& coin_nodes )
 {
     double first_coords[3], second_coords[3];
@@ -3671,7 +3671,7 @@ ErrorCode find_coincident_nodes( Interface* gMB, Range vertices,
     return MB_SUCCESS;
 }
 
-ErrorCode find_coincident_elements( Interface* gMB, Range entities, int num_nodes,
+ErrorCode find_coincident_elements( Interface* gMB, const Range& entities, int num_nodes,
                                     std::vector< std::pair< EntityHandle, EntityHandle > >& coin )
 {
     double coords1[8][3], coords2[8][3];
@@ -4535,7 +4535,7 @@ ErrorCode mb_topo_util_test()
 
     // make hexes
     int numv = 3, numv_sq = 9;
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( ( i ) + ( (j)*numv ) + ( (k)*numv_sq ) )
     EntityHandle connect[8];
     for( int j = 0; j < 2; j++ )
     {
@@ -4663,7 +4663,7 @@ ErrorCode mb_split_test()
 
     // make hexes
     int numv = 3, numv_sq = 9;
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( ( i ) + ( (j)*numv ) + ( (k)*numv_sq ) )
     EntityHandle connect[8];
     for( int k = 0; k < 2; k++ )
     {
@@ -6473,7 +6473,7 @@ ErrorCode mb_skin_higher_order_regions_common( bool use_adj )
     }
 
     bool all_okay    = true;
-    bool faces[2][6] = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+    bool faces[2][6] = { { false, false, false, false, false, false }, { false, false, false, false, false, false } };
     const EntityHandle* conn;
     int len;
     for( Range::iterator it = skin.begin(); it != skin.end(); ++it )

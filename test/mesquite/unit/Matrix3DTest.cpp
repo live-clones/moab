@@ -45,7 +45,7 @@ Unit testing of various functions in the Matrix3D class.
 #include "Vector3D.hpp"
 #include "Matrix3D.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include "cppunit/extensions/HelperMacros.h"
 

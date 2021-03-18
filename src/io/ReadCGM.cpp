@@ -44,9 +44,9 @@
 
 #include "CubitCompat.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 #include "ReadCGM.hpp"

@@ -3,7 +3,7 @@
 #include "RefinerTagManager.hpp"
 #include "moab/Interface.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

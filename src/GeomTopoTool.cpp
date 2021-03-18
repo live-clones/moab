@@ -1660,7 +1660,7 @@ ErrorCode GeomTopoTool::generate_implicit_complement( EntityHandle& implicit_com
 
 #define RETFALSE( a, b )           \
     {                              \
-        std::cout << a << "\n";    \
+        std::cout << (a) << "\n";    \
         mdbImpl->list_entity( b ); \
         return false;              \
     }

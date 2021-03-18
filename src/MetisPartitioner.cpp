@@ -17,7 +17,7 @@
 // This implementation is mostly borrowed from the mbzoltan MOAB partitioning tool
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <sstream>
 #include <map>
 #include <ctime>
@@ -58,7 +58,7 @@ ErrorCode MetisPartitioner::partition_mesh( const idx_t nparts, const char* meth
     }
 #endif
 
-    if( NULL != method && strcmp( method, "ML_RB" ) && strcmp( method, "ML_KWAY" ) )
+    if( NULL != method && strcmp( method, "ML_RB" ) != 0 && strcmp( method, "ML_KWAY" ) != 0 )
     {
         std::cout << "ERROR: Method must be "
                   << "ML_RB or ML_KWAY" << std::endl;

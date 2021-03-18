@@ -31,7 +31,7 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Mesquite.hpp"
 #include "MeshImpl.hpp"

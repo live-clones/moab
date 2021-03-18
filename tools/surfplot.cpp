@@ -5,7 +5,7 @@
 #include <fstream>
 #include <limits>
 #include <cstdlib>
-#include <math.h>
+#include <cmath>
 
 /* Exit values */
 #define USAGE_ERROR       1

@@ -1,7 +1,7 @@
 #include "moab/LocalDiscretization/LinearQuad.hpp"
 #include "moab/Matrix3.hpp"
 #include "moab/Forward.hpp"
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 namespace moab

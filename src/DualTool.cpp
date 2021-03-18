@@ -28,15 +28,15 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 
 #define RR \
     if( MB_SUCCESS != result ) return result
 #define SWAP( a, b )                    \
     {                                   \
         EntityHandle tmp_ent = a;       \
-        a                    = b;       \
-        b                    = tmp_ent; \
+        (a)                    = b;       \
+        (b)                    = tmp_ent; \
     }
 
 namespace moab
@@ -1746,12 +1746,12 @@ ErrorCode DualTool::face_open_collapse( EntityHandle ocl, EntityHandle ocr )
 
     // now merge entities, the C of foc
     EntityHandle keepit, deleteit;
-#define MIN( a, b ) ( a < b ? a : b )
-#define MAX( a, b ) ( a > b ? a : b )
+#define MIN( a, b ) ( (a) < (b) ? (a) : (b) )
+#define MAX( a, b ) ( (a) > (b) ? (a) : (b) )
 #define KEEP_DELETE( a, b, c, d ) \
     {                             \
-        c = MIN( a, b );          \
-        d = MAX( a, b );          \
+        (c) = MIN( a, b );          \
+        (d) = MAX( a, b );          \
     }
 
     // find how many shared edges there were

@@ -11,7 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 
 using namespace moab;
 

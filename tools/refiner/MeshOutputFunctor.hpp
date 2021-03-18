@@ -35,7 +35,7 @@
 #include <vector>
 #include <map>
 
-#include <string.h>
+#include <cstring>
 
 namespace moab
 {

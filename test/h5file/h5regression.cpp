@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 
 using namespace moab;
 

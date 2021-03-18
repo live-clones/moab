@@ -34,7 +34,7 @@
 */
 
 #include "AspectRatioGammaQualityMetric.hpp"
-#include <math.h>
+#include <cmath>
 #include "Vector3D.hpp"
 #include "MsqMeshEntity.hpp"
 #include "PatchData.hpp"

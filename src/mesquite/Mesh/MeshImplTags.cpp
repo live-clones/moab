@@ -26,8 +26,8 @@
 
 #include "MeshImplTags.hpp"
 #include "MsqError.hpp"
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 
 namespace MBMesquite
 {

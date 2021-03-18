@@ -24,7 +24,7 @@
 #include "moab/Types.hpp"
 #include "moab/Interface.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <string>
 #include <vector>
 

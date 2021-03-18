@@ -34,7 +34,7 @@
 
 #include "Mesquite.hpp"
 #include "Sample.hpp"
-#include <stddef.h>
+#include <cstddef>
 
 namespace MBMesquite
 {

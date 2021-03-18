@@ -39,7 +39,7 @@ evaluations.
 #ifndef MeanRatioFunctions_hpp
 #define MeanRatioFunctions_hpp
 
-#include <math.h>
+#include <cmath>
 #include "Mesquite.hpp"
 #include "Vector3D.hpp"
 #include "Matrix3D.hpp"

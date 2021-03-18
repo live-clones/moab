@@ -21,9 +21,9 @@
 #include <iterator>
 #include <algorithm>
 #include <iomanip>
-#include <assert.h>
-#include <string.h>
-#include <math.h>
+#include <cassert>
+#include <cstring>
+#include <cmath>
 #include "moab/FBEngine.hpp"
 #include "moab/GeomTopoTool.hpp"
 #include "TestUtil.hpp"

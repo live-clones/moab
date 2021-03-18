@@ -25,19 +25,19 @@
 // Creation Date : 04/01/04
 //-------------------------------------------------------------------------
 
-#include <assert.h>
+#include <cassert>
 #if defined(_MSC_VER)
   typedef int id_t;
 #elif defined(__MINGW32__)
   #include <sys/time.h>
 #else
-  #include <time.h>
+  #include <ctime>
 #endif
 
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
+#include <ctime>
+#include <cstdlib>
+#include <cstring>
+#include <cstdarg>
 #include <limits>
 #include <cstdio>
 #include <iostream>

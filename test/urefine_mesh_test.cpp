@@ -55,7 +55,7 @@ void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful
     }
 }
 
-ErrorCode test_adjacencies( Interface* mbImpl, NestedRefine* nr, Range all_ents )
+ErrorCode test_adjacencies( Interface* mbImpl, NestedRefine* nr, const Range& all_ents )
 {
     MeshTopoUtil mtu( mbImpl );
     ErrorCode error;

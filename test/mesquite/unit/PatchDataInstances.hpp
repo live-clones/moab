@@ -56,7 +56,7 @@ Patches must be allocated and dealocated by the caller.
 #include "IdealElements.hpp"
 #include "TopologyInfo.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 #include "cppunit/extensions/HelperMacros.h"

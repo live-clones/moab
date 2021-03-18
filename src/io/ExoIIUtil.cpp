@@ -17,7 +17,7 @@
 #include "Internals.hpp"
 #include "moab/Interface.hpp"
 #include "moab/CN.hpp"
-#include <string.h>
+#include <cstring>
 
 namespace moab
 {

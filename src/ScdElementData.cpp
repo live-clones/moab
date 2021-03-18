@@ -19,7 +19,7 @@
 #include "moab/ReadUtilIface.hpp"
 #include "moab/CN.hpp"
 #include "Internals.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {
