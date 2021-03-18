@@ -7,7 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"

@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <vector>
-#include "assert.h"
+#include <cassert>
 
 #include "moab/win32_config.h"
 

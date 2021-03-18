@@ -1,9 +1,9 @@
 #include "moab/Core.hpp"
 #include "moab/AdaptiveKDTree.hpp"
 #include "moab/Range.hpp"
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include <ctime>
 
 using namespace moab;

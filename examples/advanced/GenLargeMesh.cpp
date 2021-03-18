@@ -77,7 +77,7 @@
 #include "MBParallelConventions.h"
 #endif
 
-#include <time.h>
+#include <ctime>
 #include <iostream>
 #include <vector>
 

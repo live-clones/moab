@@ -10,8 +10,8 @@
 #include <iomanip>
 #include <cstdio>
 #include <limits>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 #if !defined( _MSC_VER ) && !defined( __MINGW32__ )
 #include <unistd.h>
 #include <sys/stat.h>

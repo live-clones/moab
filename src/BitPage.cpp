@@ -1,7 +1,7 @@
 #include "BitPage.hpp"
 #include "moab/Range.hpp"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 namespace moab
 {

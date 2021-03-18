@@ -25,7 +25,7 @@
 #include "moab/verdict.h"
 #include "V_GaussIntegration.hpp"
 
-#include <math.h>
+#include <cmath>
 
 double verdictSqrt2 = sqrt( (double)2.0 );
 

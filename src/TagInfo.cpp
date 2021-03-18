@@ -1,9 +1,9 @@
 #include "TagInfo.hpp"
 #include "moab/Error.hpp"
 #include "moab/ErrorHandler.hpp"
-#include <string.h> /* memcpy */
-#include <stdlib.h> /* realloc & free */
-#include <assert.h>
+#include <cstring> /* memcpy */
+#include <cstdlib> /* realloc & free */
+#include <cassert>
 
 namespace moab
 {

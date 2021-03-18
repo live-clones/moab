@@ -2,12 +2,12 @@
 
 #include <mpi.h>
 
-#include <stdio.h>
-#include <assert.h>
+#include <cstdio>
+#include <cassert>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <algorithm>
-#include <time.h>
+#include <ctime>
 
 #include "MsqVertex.hpp"
 #include "MsqError.hpp"
@@ -378,7 +378,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     mesh->vertices_get_global_id( ARRPTR( vertices ), ARRPTR( gid ), num_vertex, err );MSQ_ERRRTN( err );
     mesh->vertices_get_byte( ARRPTR( vertices ), ARRPTR( app_fixed ), num_vertex, err );MSQ_ERRRTN( err );
     mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );MSQ_ERRRTN( err );
-    if( 0 )
+    if( false )
     {
         int ncull = 0;
         for( i = 0; i < num_vertex; ++i )
@@ -401,7 +401,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     TagHandle lid_tag          = mesh->tag_create( LOCAL_ID_NAME, Mesh::INT, 1, NULL, err );MSQ_ERRRTN( err );
     mesh->tag_set_vertex_data( lid_tag, num_vertex, ARRPTR( vertices ), ARRPTR( lid ), err );MSQ_ERRRTN( err );
 
-    if( 0 ) printf( "[%d] set local tags on %d vertices\n", rank, num_vertex );
+    if( false ) printf( "[%d] set local tags on %d vertices\n", rank, num_vertex );
 
     /* get the elements */
     std::vector< MBMesquite::Mesh::ElementHandle > elements;
@@ -424,7 +424,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     std::vector< int > adj_vertices_lid( adj_vertices.size() );
     mesh->tag_get_vertex_data( lid_tag, adj_vertices.size(), ARRPTR( adj_vertices ), ARRPTR( adj_vertices_lid ), err );
 
-    if( 0 ) printf( "[%d] gotten adjacent elements for %d elements\n", rank, num_elems );
+    if( false ) printf( "[%d] gotten adjacent elements for %d elements\n", rank, num_elems );
 
     /* determine which vertices are smoothed as part of the boundary (and which are unused ghost
      * vertices) */
@@ -492,7 +492,7 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
         }
     }
 
-    if( 0 )
+    if( false )
     {
         printf( "[%d]i%d local %d remote %d ", rank, iteration, num_vtx_partition_boundary_local,
                 num_vtx_partition_boundary_remote );
@@ -1005,7 +1005,7 @@ void ParallelHelperImpl::compute_first_independent_set( std::vector< Mesh::Verte
         }
     }
 
-    if( 0 )
+    if( false )
     {
         printf( "[%d]i%d after first we smoothed %d of %d\n", rank, iteration, num_already_smoothed_vertices,
                 num_vtx_partition_boundary_local );
@@ -1060,7 +1060,7 @@ bool ParallelHelperImpl::compute_next_independent_set()
     if( global_work_remains && ( iteration < 20 ) )
     {
         iteration++;
-        if( 0 ) printf( "[%d] work remains %d after %d iterations\n", rank, global_work_remains, iteration );
+        if( false ) printf( "[%d] work remains %d after %d iterations\n", rank, global_work_remains, iteration );
         compute_independent_set();
         next_vtx_partition_boundary = 0;
         return true;
@@ -1088,7 +1088,7 @@ bool ParallelHelperImpl::get_next_partition_boundary_vertex( MBMesquite::Mesh::V
         }
         next_vtx_partition_boundary++;
     }
-    if( 0 )
+    if( false )
     {
         printf( "[%d]i%d after next we smoothed %d of %d\n", rank, iteration, num_already_smoothed_vertices,
                 num_vtx_partition_boundary_local );
@@ -1125,7 +1125,7 @@ void ParallelHelperImpl::communicate_next_independent_set( MsqError& err )
     {
         global_work_remains = ( total_num_vertices_to_smooth - num_already_smoothed_vertices ) +
                               ( total_num_vertices_to_recv - num_already_recv_vertices );
-        if( 0 )
+        if( false )
         {
             printf( "[%d]i%d %d - %d + %d  - %d = %d \n", rank, iteration, total_num_vertices_to_smooth,
                     num_already_smoothed_vertices, total_num_vertices_to_recv, num_already_recv_vertices,
@@ -1168,7 +1168,7 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
         std::vector< int > proc_owner( num_vertex );
         mesh->vertices_get_processor_id( ARRPTR( vertices ), ARRPTR( proc_owner ), num_vertex, err );MSQ_ERRRTN( err );
 
-        if( 0 )
+        if( false )
         {
             int ncull = 0;
             for( i = 0; i < num_vertex; ++i )
@@ -1925,7 +1925,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
         rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE,
                           neighbourProcRecv[j], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
         CHECK_MPI_RZERO( rval, err );
-        if( 0 )
+        if( false )
         {
             printf( "[%d]i%d Scheduling receipt of %d vertices to proc %d\n", rank, iteration, numVtxPerProcRecvRecv[j],
                     neighbourProcRecv[j] );
@@ -2136,7 +2136,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         }
         /* assert loop did not end without finding processor */
         assert( i != (long)neighbourProc.size() );
-        if( 0 ) printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, num, proc );
+        if( false ) printf( "[%d]i%d Will receive %d vertices from proc %d\n", rank, iteration, num, proc );
         fflush( NULL );
     }
 
@@ -2173,7 +2173,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
         rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE,
                           neighbourProcRecv[j], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
         CHECK_MPI_RZERO( rval, err );
-        if( 0 )
+        if( false )
         {
             printf( "[%d]i%d Scheduling receipt of %d vertices to proc %d\n", rank, iteration, numVtxPerProcRecvRecv[j],
                     neighbourProcRecv[j] );
@@ -2751,7 +2751,7 @@ void ParallelHelperImpl::compute_independent_set()
         }
     }
 
-    if( 0 )
+    if( false )
     {
         int in_set = 0;
         for( i = 0; i < num_vtx_partition_boundary_local; i++ )

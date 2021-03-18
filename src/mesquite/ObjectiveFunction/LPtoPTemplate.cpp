@@ -34,7 +34,7 @@
   \author Thomas Leurent
   \date   2002-01-23
 */
-#include <math.h>
+#include <cmath>
 #include "LPtoPTemplate.hpp"
 #include "MsqFreeVertexIndexIterator.hpp"
 #include "MsqTimer.hpp"

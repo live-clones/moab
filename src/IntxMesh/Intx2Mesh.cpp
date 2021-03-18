@@ -12,7 +12,7 @@
 #endif /* MOAB_HAVE_MPI */
 #include "MBTagConventions.hpp"
 // this is for DBL_MAX
-#include <float.h>
+#include <cfloat>
 #include <queue>
 #include <sstream>
 #include "moab/GeomUtil.hpp"

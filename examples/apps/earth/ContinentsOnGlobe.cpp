@@ -10,7 +10,7 @@
 
 #include "moab/Core.hpp"
 #include "moab/ReadUtilIface.hpp"
-#include "math.h"
+#include <cmath>
 #include "moab/CartVect.hpp"
 
 #include <iostream>

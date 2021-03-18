@@ -5,9 +5,9 @@
 
 #include "moab/Interface.hpp"
 #include "SharedSetData.hpp"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
 
 namespace moab
 {

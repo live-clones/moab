@@ -55,9 +55,9 @@
  *    the end of this file.
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include "iMesh.h"
 #include "iMesh_extensions.h"
 #include "moab/Types.hpp"
@@ -94,7 +94,7 @@ void PRINT_ASSERT_FAILURE( const char* cond, const char* file, int line )
 }
 
 #define CHK( err )                                                       \
-    if( err != iBase_SUCCESS ) do                                        \
+    if( (err) != iBase_SUCCESS ) do                                        \
         {                                                                \
             printf( "%s:%d ITAPS error %d\n", __FILE__, __LINE__, err ); \
             return 0;                                                    \
@@ -1744,7 +1744,7 @@ int tag_info_test( iMesh_Instance mesh )
         printf( "Couldn't get name of tag just created.\n" );
         return FALSE;
     }
-    if( strcmp( dum_name, "int_tag" ) )
+    if( strcmp( dum_name, "int_tag" ) != 0 )
     {
         printf( "Tag names didn't match.\n" );
         return FALSE;

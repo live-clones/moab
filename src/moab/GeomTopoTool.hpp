@@ -20,7 +20,7 @@
 #include "moab/Range.hpp"
 
 #include <map>
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

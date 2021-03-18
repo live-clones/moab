@@ -1,7 +1,7 @@
 #include "TypeSequenceManager.hpp"
 #include "SequenceData.hpp"
 #include "moab/Error.hpp"
-#include <assert.h>
+#include <cassert>
 #include <limits>
 
 namespace moab

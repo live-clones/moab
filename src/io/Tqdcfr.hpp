@@ -26,7 +26,7 @@
 #include "MBTagConventions.hpp"
 #include "moab/Range.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <vector>
 #include <map>

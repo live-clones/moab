@@ -41,26 +41,26 @@ using namespace moab;
 using namespace std;
 
 // Error routines for use with MPI API
-#define MPICHKERR( CODE, MSG )   \
-    do                           \
-    {                            \
-        if( 0 != CODE )          \
-        {                        \
-            cerr << MSG << endl; \
-            MPI_Finalize();      \
-        }                        \
+#define MPICHKERR( CODE, MSG )       \
+    do                               \
+    {                                \
+        if( 0 != ( CODE ) )          \
+        {                            \
+            cerr << ( MSG ) << endl; \
+            MPI_Finalize();          \
+        }                            \
     } while( false )
 
-#define dbgprint( MSG )                  \
-    do                                   \
-    {                                    \
-        if( !rank ) cerr << MSG << endl; \
+#define dbgprint( MSG )                      \
+    do                                       \
+    {                                        \
+        if( !rank ) cerr << ( MSG ) << endl; \
     } while( false )
 
-#define dbgprintall( MSG )                           \
-    do                                               \
-    {                                                \
-        cerr << "[" << rank << "]: " << MSG << endl; \
+#define dbgprintall( MSG )                               \
+    do                                                   \
+    {                                                    \
+        cerr << "[" << rank << "]: " << ( MSG ) << endl; \
     } while( false )
 
 // Function to parse input parameters

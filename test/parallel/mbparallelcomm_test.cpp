@@ -17,7 +17,7 @@
 #include "moab_mpi.h"
 #include <iostream>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 
 #define REALTFI 1
 
@@ -27,7 +27,7 @@ using namespace moab;
 
 #define ERROR( a, b )                \
     {                                \
-        std::cerr << a << std::endl; \
+        std::cerr << (a) << std::endl; \
         return b;                    \
     }
 
@@ -43,7 +43,7 @@ using namespace moab;
 #define RRA( a )               \
     if( MB_SUCCESS != result ) \
     {                          \
-        std::cerr << a;        \
+        std::cerr << (a);        \
         return result;         \
     }
 
@@ -272,15 +272,15 @@ ErrorCode report_nsets( Interface* mbImpl )
 #define PRINTSETS( a, b, c, p )                                                                         \
     if( a )                                                                                             \
     {                                                                                                   \
-        result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &a, p, 1, b );                   \
-        if( !b.empty() )                                                                                \
+        result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &(a), p, 1, b );                   \
+        if( !(b).empty() )                                                                                \
         {                                                                                               \
-            std::vector< int > ids( b.size() );                                                         \
+            std::vector< int > ids( (b).size() );                                                         \
             result = mbImpl->tag_get_data( gidtag, b, &ids[0] );                                        \
             if( MB_SUCCESS == result )                                                                  \
             {                                                                                           \
-                std::cout << "Proc " << rank << ": " << c << " (total " << b.size() << "): " << ids[0]; \
-                for( unsigned int i = 1; i < b.size(); i++ )                                            \
+                std::cout << "Proc " << rank << ": " << (c) << " (total " << (b).size() << "): " << ids[0]; \
+                for( unsigned int i = 1; i < (b).size(); i++ )                                            \
                     std::cout << ", " << ids[i];                                                        \
                 std::cout << std::endl;                                                                 \
             }                                                                                           \

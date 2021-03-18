@@ -33,9 +33,9 @@ extern "C" int getrusage( int, struct rusage* );
 #define IS_BUILDING_MB
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
 #include <iostream>
 #include "moab/Core.hpp"
 #include "moab/ReadUtilIface.hpp"
@@ -67,13 +67,13 @@ void check_answers( const char* );
 #define RC( msg )                                        \
     if( MB_SUCCESS != result ) do                        \
         {                                                \
-            std::cout << "FAIL in " << msg << std::endl; \
+            std::cout << "FAIL in " << (msg) << std::endl; \
             return;                                      \
     } while( true )
 #define RR( msg )                                        \
     if( MB_SUCCESS != result ) do                        \
         {                                                \
-            std::cout << "FAIL in " << msg << std::endl; \
+            std::cout << "FAIL in " << (msg) << std::endl; \
             return result;                               \
     } while( true )
 
@@ -134,7 +134,7 @@ void build_coords( const int nelem, double*& coords )
     coords       = new double[3 * tot_numv];
 
 // use FORTRAN-like indexing
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( (i) + ( (j) * numv ) + ( (k) * numv_sq ) )
     int idx;
     double scale1, scale2, scale3;
     // use these to prevent optimization on 1-scale, etc (real map wouldn't have

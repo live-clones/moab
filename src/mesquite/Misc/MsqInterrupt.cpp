@@ -23,7 +23,7 @@
   ***************************************************************** */
 
 #include "MsqInterrupt.hpp"
-#include <signal.h>
+#include <csignal>
 
 namespace MBMesquite
 {

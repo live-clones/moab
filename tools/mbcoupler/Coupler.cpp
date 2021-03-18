@@ -16,21 +16,21 @@
 
 #define ERROR( a )                                           \
     {                                                        \
-        if( MB_SUCCESS != err ) std::cerr << a << std::endl; \
+        if( MB_SUCCESS != err ) std::cerr << (a) << std::endl; \
     }
 #define ERRORR( a, b )                   \
     {                                    \
-        if( MB_SUCCESS != b )            \
+        if( MB_SUCCESS != (b) )            \
         {                                \
-            std::cerr << a << std::endl; \
+            std::cerr << (a) << std::endl; \
             return b;                    \
         }                                \
     }
 #define ERRORMPI( a, b )                 \
     {                                    \
-        if( MPI_SUCCESS != b )           \
+        if( MPI_SUCCESS != (b) )           \
         {                                \
-            std::cerr << a << std::endl; \
+            std::cerr << (a) << std::endl; \
             return MB_FAILURE;           \
         }                                \
     }
@@ -1287,7 +1287,7 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
     Range ent_sets;
     err =
         mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles, (const void* const*)tag_values,
-                                              num_tags, ent_sets, Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
+                                              num_tags, ent_sets, Interface::INTERSECT, false );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
 
     TupleList* tag_list = NULL;
     err                 = create_tuples( ent_sets, tag_handles, num_tags, &tag_list );ERRORR( "Failed to create tuples from entity sets.", err );
@@ -1404,7 +1404,7 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
 
         // Get entities recursively based on type and tag data
         err = mbImpl->get_entities_by_type_and_tag( root_set, moab::MBENTITYSET, tag_handles, (const void* const*)vals,
-                                                    mi, ent_sets, Interface::INTERSECT, 0 );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
+                                                    mi, ent_sets, Interface::INTERSECT, false );ERRORR( "Core::get_entities_by_type_and_tag failed.", err );
         if( debug ) std::cout << "ent_sets_size=" << ent_sets.size() << std::endl;
 
         // Free up the array of pointers

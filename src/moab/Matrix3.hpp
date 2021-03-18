@@ -123,7 +123,7 @@ void MOAB_dgetri( int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwo
 }
 
 #include <cstring>
-#define MOAB_DMEMZERO( a, b ) memset( a, 0, b * sizeof( double ) )
+#define MOAB_DMEMZERO( a, b ) memset( a, 0, (b) * sizeof( double ) )
 
 #endif
 

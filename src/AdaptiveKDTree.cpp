@@ -9,9 +9,9 @@
 #include "moab/CpuTimer.hpp"
 #include "Internals.hpp"
 #include "moab/Util.hpp"
-#include <math.h>
+#include <cmath>
 
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <limits>
 #include <iostream>

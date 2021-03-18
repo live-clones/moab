@@ -16,7 +16,7 @@
 #ifndef __partitioner_base_hpp__
 #define __partitioner_base_hpp__
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 
 #include "moab/MOABConfig.h"
@@ -31,7 +31,7 @@ namespace moab
 {
 
 class Interface;
-}
+}  // namespace moab
 
 using namespace moab;
 

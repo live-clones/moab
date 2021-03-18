@@ -37,7 +37,7 @@ using std::set;
 using std::string;
 using std::vector;
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Mesquite.hpp"
 #include "MsqError.hpp"

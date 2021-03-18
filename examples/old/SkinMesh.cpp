@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include "MBCore.hpp"
 #include "MBRange.hpp"
 #include "MBTagConventions.hpp"

@@ -6,10 +6,10 @@
 #include "moab/CartVect.hpp"
 #include "moab/FileOptions.hpp"
 #include "MBTagConventions.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>
 #include <map>
-#include "assert.h"
+#include <cassert>
 
 using namespace moab;
 
@@ -50,7 +50,7 @@ bool Debug_surf_eval = false;
 #define COPY_RANGE( r, vec )                                              \
     {                                                                     \
         EntityHandle* tmp_ptr = reinterpret_cast< EntityHandle* >( vec ); \
-        std::copy( r.begin(), r.end(), tmp_ptr );                         \
+        std::copy( ( r ).begin(), ( r ).end(), tmp_ptr );                 \
     }
 
 #define TAG_HANDLE( tagh ) reinterpret_cast< Tag >( tagh )
@@ -58,7 +58,7 @@ bool Debug_surf_eval = false;
 #define COPY_DOUBLEVEC( r, vec )                              \
     {                                                         \
         double* tmp_ptr = reinterpret_cast< double* >( vec ); \
-        std::copy( r.begin(), r.end(), tmp_ptr );             \
+        std::copy( ( r ).begin(), ( r ).end(), tmp_ptr );     \
     }
 
 void FBiGeom_getDescription( FBiGeom_Instance instance, char* descr, int descr_len )

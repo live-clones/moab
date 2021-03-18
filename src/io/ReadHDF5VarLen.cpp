@@ -6,7 +6,7 @@
 #include "ReadHDF5VarLen.hpp"
 #include "ReadHDF5Dataset.hpp"
 #include "H5Tpublic.h"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

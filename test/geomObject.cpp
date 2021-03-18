@@ -1,7 +1,7 @@
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <stdexcept>
-#include <assert.h>
+#include <cassert>
 
 class geomObject
 {

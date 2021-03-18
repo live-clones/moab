@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
 #include "moab/mhdf_public.h"
 
 static int print_file_summary( MHDF_FileDesc* data );

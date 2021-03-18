@@ -42,8 +42,8 @@
 #include "IdealWeightInverseMeanRatio.hpp"
 
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 using namespace MBMesquite;
 

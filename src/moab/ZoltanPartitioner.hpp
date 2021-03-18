@@ -22,7 +22,7 @@
 #ifndef ZOLTANPARTITIONER_HPP
 #define ZOLTANPARTITIONER_HPP
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "moab/PartitionerBase.hpp"
 #include "zoltan_cpp.h"
 #include <ctime>

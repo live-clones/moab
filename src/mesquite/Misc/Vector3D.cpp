@@ -30,7 +30,7 @@
 #include "moab/Util.hpp"
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #ifdef MSQ_HAVE_IEEEFP_H
 #include <ieeefp.h>

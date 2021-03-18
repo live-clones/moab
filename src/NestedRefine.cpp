@@ -13,7 +13,7 @@
 #endif
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <limits>
 #include <cmath>

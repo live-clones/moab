@@ -3,9 +3,9 @@
  *  \date   2010-07-09
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include "moab/MOABConfig.h"
 #include "ReadHDF5Dataset.hpp"

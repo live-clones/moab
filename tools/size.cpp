@@ -1,17 +1,17 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 #include <set>
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <iomanip>
 #include "moab/MOABConfig.h"
 #ifndef WIN32
 #include <sys/times.h>
-#include <limits.h>
+#include <climits>
 #include <unistd.h>
 #endif
-#include <time.h>
+#include <ctime>
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"
 #endif
@@ -19,9 +19,9 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 #endif
-#include <math.h>
-#include <assert.h>
-#include <float.h>
+#include <cmath>
+#include <cassert>
+#include <cfloat>
 
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"

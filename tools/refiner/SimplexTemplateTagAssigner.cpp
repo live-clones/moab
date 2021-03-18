@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include <math.h>
+#include <cmath>
 
 namespace moab
 {

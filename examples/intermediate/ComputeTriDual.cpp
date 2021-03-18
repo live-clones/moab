@@ -47,7 +47,8 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
     rval = mb->tag_set_data( gidTag, dualverts, &gids[0] );MB_CHK_SET_ERR( rval, "Can't set global_id tag" );
 
 #define CC( ind )        moab::CartVect( ccenters[0][ind], ccenters[1][ind], ccenters[2][ind] )
-#define CCXMY( ind, cv ) moab::CartVect( ccenters[0][ind] - cv[0], ccenters[1][ind] - cv[1], ccenters[2][ind] - cv[2] )
+#define CCXMY( ind, cv ) \
+    moab::CartVect( ccenters[0][ind] - ( cv )[0], ccenters[1][ind] - ( cv )[1], ccenters[2][ind] - ( cv )[2] )
 
     const moab::EntityHandle svtx = *( cells.begin() );
 

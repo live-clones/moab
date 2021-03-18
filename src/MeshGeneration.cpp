@@ -27,8 +27,16 @@ using std::vector;
 namespace moab
 {
 
-MeshGeneration::MeshGeneration( Interface* impl, ParallelComm* comm, EntityHandle rset )
-    : mb( impl ), pc( comm ), cset( rset )
+MeshGeneration::MeshGeneration( Interface* impl, 
+#ifdef MOAB_HAVE_MPI
+                                ParallelComm* comm, 
+#endif
+                                EntityHandle rset )
+    : mb( impl ),
+#ifdef MOAB_HAVE_MPI
+      pc( comm ),
+#endif
+      cset( rset )
 {
     // ErrorCode error;
 
@@ -46,14 +54,16 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     int A = opts.A, B = opts.B, C = opts.C, M = opts.M, N = opts.N, K = opts.K;
     int blockSize = opts.blockSize;
     double xsize = opts.xsize, ysize = opts.ysize, zsize = opts.zsize;  // The size of the region
-    int GL = opts.GL;                                                   // number of ghost layers
-
     bool newMergeMethod = opts.newMergeMethod;
     bool quadratic      = opts.quadratic;
-    bool keep_skins     = opts.keep_skins;
     bool tetra          = opts.tetra;
     bool adjEnts        = opts.adjEnts;
     bool parmerge       = opts.parmerge;
+
+#ifdef MOAB_HAVE_MPI
+    int GL              = opts.GL;                                      // number of ghost layers
+    bool keep_skins     = opts.keep_skins;
+#endif
 
     int rank = 0, size = 1;
 #ifndef _MSC_VER  /* windows */

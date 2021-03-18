@@ -5,14 +5,14 @@
 
 #include "iMesh.h"
 #include "iMesh_extensions.h"
-#include "stdio.h"
-#include "string.h"
+#include <cstdio>
+#include <cstring>
 
-#define CHKERR( e, m )       \
-    if( iBase_SUCCESS != e ) \
-    {                        \
-        printf( m );         \
-        return 1;            \
+#define CHKERR( e, m )           \
+    if( iBase_SUCCESS != ( e ) ) \
+    {                            \
+        printf( m );             \
+        return 1;                \
     }
 
 int main( int argc, char* argv[] )

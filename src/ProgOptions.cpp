@@ -7,8 +7,8 @@
 #include <set>
 #include <algorithm>
 
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 #include "moab/MOABConfig.h"
 #include "moab/ProgOptions.hpp"

@@ -36,7 +36,7 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
-#include <stdlib.h>
+#include <cstdlib>
 
 const char HELP_FLAG = 'h';
 const char MAN_FLAG  = 'M';

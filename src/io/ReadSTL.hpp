@@ -16,7 +16,7 @@
 #ifndef READ_STL_HPP
 #define READ_STL_HPP
 
-#include <stdio.h>
+#include <cstdio>
 #include "moab/Forward.hpp"
 #include "moab/ReaderIface.hpp"
 

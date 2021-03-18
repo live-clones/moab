@@ -56,15 +56,13 @@ int main( int argc, char** argv )
     return result;
 }
 
-
 #define NCERROREXIT( err, MSG )                                                     \
     if( err )                                                                       \
     {                                                                               \
-        std::cout << "Error (" << err << "): " << MSG;                              \
+        std::cout << "Error (" << ( err ) << "): " << ( MSG );                      \
         std::cout << "\nAborting with message: " << nc_strerror( err ) << "... \n"; \
         return;                                                                     \
     }
-
 
 void read_buffered_map()
 {

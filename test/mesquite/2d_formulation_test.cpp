@@ -52,7 +52,7 @@
 #include "WeightReader.hpp"
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace MBMesquite;
 using namespace std;

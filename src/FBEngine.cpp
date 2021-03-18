@@ -7,13 +7,13 @@
 #include "moab/GeomUtil.hpp"
 #include "moab/OrientedBoxTreeTool.hpp"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>
 #include <map>
 #include <set>
 #include <queue>
 #include <algorithm>
-#include "assert.h"
+#include <cassert>
 
 #include "SmoothCurve.hpp"
 #include "SmoothFace.hpp"
@@ -22,9 +22,9 @@
 #define MBI _mbImpl
 #define MBERRORR( rval, STR )              \
     {                                      \
-        if( MB_SUCCESS != rval )           \
+        if( MB_SUCCESS != (rval) )           \
         {                                  \
-            std::cout << STR << std::endl; \
+            std::cout << (STR) << std::endl; \
             return rval;                   \
         }                                  \
     }
@@ -465,7 +465,7 @@ ErrorCode FBEngine::getEntities( EntityHandle set_handle, int entity_type, Range
     return MB_SUCCESS;
 }
 
-ErrorCode FBEngine::addEntArrToSet( Range entities, EntityHandle set )
+ErrorCode FBEngine::addEntArrToSet( const Range& entities, EntityHandle set )
 {
     return MBI->add_entities( set, entities );
 }

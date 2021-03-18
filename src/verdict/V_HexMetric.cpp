@@ -62,13 +62,13 @@ C_FUNC_DEF void v_set_hex_size( double size )
 #define make_hex_nodes( coord, pos )                                         \
     for( int mhcii = 0; mhcii < 8; mhcii++ )                                 \
     {                                                                        \
-        pos[mhcii].set( coord[mhcii][0], coord[mhcii][1], coord[mhcii][2] ); \
+        (pos)[mhcii].set( (coord)[mhcii][0], (coord)[mhcii][1], (coord)[mhcii][2] ); \
     }
 
 #define make_edge_length_squares( edges, lengths )          \
     {                                                       \
         for( int melii = 0; melii < 12; melii++ )           \
-            lengths[melii] = edges[melii].length_squared(); \
+            (lengths)[melii] = (edges)[melii].length_squared(); \
     }
 
 //! make VerdictVectors from coordinates

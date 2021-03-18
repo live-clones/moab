@@ -16,7 +16,7 @@
 #ifndef READ_HDF5_HPP
 #define READ_HDF5_HPP
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <list>
 #include "mhdf.h"
 #include "moab/Forward.hpp"

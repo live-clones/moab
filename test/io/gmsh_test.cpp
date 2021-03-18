@@ -2,7 +2,7 @@
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"
 #include "MBTagConventions.hpp"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 using namespace moab;

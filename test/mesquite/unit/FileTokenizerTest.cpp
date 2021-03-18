@@ -1,14 +1,14 @@
 #include "FileTokenizer.hpp"
 #include "MsqError.hpp"
 #include "cppunit/extensions/HelperMacros.h"
-#include <assert.h>
+#include <cassert>
 
 #include <iostream>
 using std::cout;
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 #ifdef WIN32
 #include <string>
 #include <direct.h>

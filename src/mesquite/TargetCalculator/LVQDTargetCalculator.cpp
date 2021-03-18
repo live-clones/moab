@@ -34,7 +34,7 @@
 #include "MsqMatrix.hpp"
 #include "MsqError.hpp"
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

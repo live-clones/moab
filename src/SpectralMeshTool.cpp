@@ -5,7 +5,7 @@
 #include "moab/CN.hpp"
 
 #include <cmath>
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

@@ -1,6 +1,6 @@
 #include <HDF5Common.hpp>
 #include <H5Spublic.h>
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

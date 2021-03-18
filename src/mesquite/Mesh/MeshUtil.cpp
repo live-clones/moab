@@ -184,11 +184,11 @@ bool MeshUtil::meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, do
     mesh2.elements_get_topologies( arrptr( elements2 ), arrptr( types2 ), elements2.size(), err );
     MSQ_ERRZERO( err );
 
-#define MDRET( msg )                                                                                  \
-    do                                                                                                \
-    {                                                                                                 \
-        if( do_print ) std::cout << "MeshUtil::mesh_diff meshes are different: " << msg << std::endl; \
-        return true;                                                                                  \
+#define MDRET( msg )                                                                                      \
+    do                                                                                                    \
+    {                                                                                                     \
+        if( do_print ) std::cout << "MeshUtil::mesh_diff meshes are different: " << ( msg ) << std::endl; \
+        return true;                                                                                      \
     } while( 0 )
     if( elements1.size() != elements2.size() ) MDRET( "elements sizes differ" );
     if( vertices1.size() != vertices2.size() ) MDRET( "vertices sizes differ" );

@@ -1,6 +1,6 @@
 #ifndef FBENGINE_HPP_
 #define FBENGINE_HPP_
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <vector>
 #include <map>
@@ -40,7 +40,7 @@ class FBEngine
 
     ErrorCode getEntities( EntityHandle root_set, int ent_type, Range& gentities );
 
-    ErrorCode addEntArrToSet( Range entities, EntityHandle set );
+    ErrorCode addEntArrToSet( const Range& entities, EntityHandle set );
 
     ErrorCode getNumOfType( EntityHandle set, int ent_type, int* pNum );
 

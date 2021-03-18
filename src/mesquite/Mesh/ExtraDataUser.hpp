@@ -34,7 +34,7 @@
 
 #include "Mesquite.hpp"
 #include "ExtraData.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

@@ -25,7 +25,7 @@
 #endif
 
 #include "moab/Types.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

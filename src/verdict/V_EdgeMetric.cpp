@@ -23,7 +23,7 @@
 #define VERDICT_EXPORTS
 
 #include "moab/verdict.h"
-#include <math.h>
+#include <cmath>
 
 /*!
   length of and edge

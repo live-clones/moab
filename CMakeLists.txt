@@ -540,7 +540,7 @@ if(CLANG_TIDY_EXE)
         -clang-apply-replacements-binary ${RUN_CLANG_APPLY_REPLACEMENTS_BIN}
         -header-filter="\"moab/*\""
         -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters
-        -fix
+        -fix 
         )
 
 	add_custom_target(

@@ -17,7 +17,7 @@
 #include "MBParallelConventions.h"
 #endif
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 using namespace moab;
 using namespace std;

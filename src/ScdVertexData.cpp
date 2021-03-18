@@ -14,7 +14,7 @@
  */
 
 #include "ScdVertexData.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

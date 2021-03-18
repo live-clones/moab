@@ -1,7 +1,7 @@
 #ifndef SPECTRALFUNCS_HPP
 #define SPECTRALFUNCS_HPP
 
-#include "float.h"
+#include <cfloat>
 
 //======================================================
 // from types.h

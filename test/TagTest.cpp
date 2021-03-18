@@ -1,7 +1,7 @@
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"
 #include "TestUtil.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 #include <algorithm>
 
 using namespace moab;

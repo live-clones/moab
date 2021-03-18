@@ -36,7 +36,7 @@
 #include <limits.h>
 #include <unistd.h>
 #endif
-#include <time.h>
+#include <ctime>
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
 #endif
@@ -45,7 +45,7 @@
 #include "moab/Remapping/TempestRemapper.hpp"
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 
 /* Exit values */
 #define USAGE_ERROR   1

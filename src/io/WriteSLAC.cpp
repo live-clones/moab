@@ -25,13 +25,13 @@
 
 #include <utility>
 #include <algorithm>
-#include <time.h>
+#include <ctime>
 #include <string>
 #include <vector>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 #include "netcdf.h"
 #include "moab/Interface.hpp"
@@ -53,16 +53,16 @@ namespace moab
 
 #define GET_VAR( name, id, dims )                                 \
     {                                                             \
-        id         = -1;                                          \
-        int gvfail = nc_inq_varid( ncFile, name, &id );           \
+        (id)         = -1;                                          \
+        int gvfail = nc_inq_varid( ncFile, name, &(id) );           \
         if( NC_NOERR == gvfail )                                  \
         {                                                         \
             int ndims;                                            \
             gvfail = nc_inq_varndims( ncFile, id, &ndims );       \
             if( NC_NOERR == gvfail )                              \
             {                                                     \
-                dims.resize( ndims );                             \
-                gvfail = nc_inq_vardimid( ncFile, id, &dims[0] ); \
+                (dims).resize( ndims );                             \
+                gvfail = nc_inq_vardimid( ncFile, id, &(dims)[0] ); \
             }                                                     \
         }                                                         \
     }

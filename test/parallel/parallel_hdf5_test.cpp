@@ -13,8 +13,8 @@
 #include <algorithm>
 #include "moab_mpi.h"
 #include <unistd.h>
-#include <float.h>
-#include <stdio.h>
+#include <cfloat>
+#include <cstdio>
 #include <ctime>
 
 using namespace moab;

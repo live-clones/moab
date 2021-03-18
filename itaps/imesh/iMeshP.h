@@ -29,7 +29,7 @@ enum iMeshP_EntStatus
 };
 
 /** Part ID number indicating information should be returned about all parts. */
-#define iMeshP_ALL_PARTS -1
+#define iMeshP_ALL_PARTS (-1)
 
 /** \page imeshp  iMeshP: ITAPS Parallel Mesh Interface
 iMeshP.h -- ITAPS Parallel Mesh Interface

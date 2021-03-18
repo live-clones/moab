@@ -1,6 +1,6 @@
 #include "ProcessSet.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

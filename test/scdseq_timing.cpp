@@ -21,7 +21,7 @@
 #include "moab/ReadUtilIface.hpp"
 
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 using namespace moab;
 

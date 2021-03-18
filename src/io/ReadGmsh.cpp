@@ -33,8 +33,8 @@
 #include "moab/CN.hpp"
 #include "GmshUtil.hpp"
 
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 #include <map>
 #include <set>
 

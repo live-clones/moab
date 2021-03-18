@@ -1,7 +1,7 @@
 #include "SequenceData.hpp"
 #include "SysUtil.hpp"
 #include "VarLenTag.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

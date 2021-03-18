@@ -36,14 +36,20 @@ class MeshGeneration
         bool parmerge;               // = false;
     };
 
-    MeshGeneration( Interface* mbi, ParallelComm* pcomm = 0, EntityHandle rset = 0 );
+    MeshGeneration( Interface* mbi, 
+#ifdef MOAB_HAVE_MPI
+                    ParallelComm* pcomm = 0, 
+#endif
+                    EntityHandle rset = 0 );
     virtual ~MeshGeneration();
 
     ErrorCode BrickInstance( BrickOpts& opts );
 
   private:
     Interface* mb;
+#ifdef MOAB_HAVE_MPI
     ParallelComm* pc;
+#endif
     EntityHandle cset;
 };
 

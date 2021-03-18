@@ -33,7 +33,7 @@
   \author Michael Brewer
   \date   2002-07-3
 */
-#include <math.h>
+#include <cmath>
 #include "LInfTemplate.hpp"
 #include "QualityMetric.hpp"
 #include "MsqError.hpp"

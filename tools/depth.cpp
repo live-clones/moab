@@ -2,7 +2,7 @@
 #include "moab/Core.hpp"
 #include "moab/Skinner.hpp"
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace moab;
 

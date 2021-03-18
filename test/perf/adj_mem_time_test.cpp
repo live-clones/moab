@@ -1,7 +1,7 @@
 /*This function profiles the performance of the AHF datastructure */
 #include <iostream>
-#include <assert.h>
-#include <time.h>
+#include <cassert>
+#include <ctime>
 #include <vector>
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"

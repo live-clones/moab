@@ -23,7 +23,7 @@ ErrorCode initialize_tree()
     for( int i = 0; i < num_iterations; i++ )
     {
         tree   = Tree( &impl );
-        result = tree.build_tree( local_ents, local_root, &settings );
+        result = true.build_tree( local_ents, local_root, &settings );
         if( MB_SUCCESS != result )
         {
             std::cout << "Problems building tree";

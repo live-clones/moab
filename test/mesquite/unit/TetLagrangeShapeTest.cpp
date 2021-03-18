@@ -35,7 +35,7 @@
 #include "MsqError.hpp"
 #include "IdealElements.hpp"
 #include "JacobianCalculator.hpp"
-#include <math.h>
+#include <cmath>
 
 #include "UnitUtil.hpp"
 

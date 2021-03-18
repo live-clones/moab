@@ -12,7 +12,7 @@
 #include <iostream>
 
 #define CHECKIERR( ierr, message ) \
-    if( 0 != ierr )                \
+    if( 0 != ( ierr ) )            \
     {                              \
         printf( "%s", message );   \
         return 1;                  \

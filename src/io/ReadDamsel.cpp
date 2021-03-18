@@ -7,7 +7,7 @@
 
 #include "ReadDamsel.hpp"
 
-#include "assert.h"
+#include <cassert>
 #include "moab/Interface.hpp"
 #include "moab/Core.hpp"
 #include "moab/Range.hpp"

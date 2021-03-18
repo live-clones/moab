@@ -16,8 +16,8 @@
 #include "moab/CN.hpp"
 #include "MBCNArrays.hpp"
 #include "MBCN.h"
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 #include <iterator>
 
 namespace moab

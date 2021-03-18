@@ -4,8 +4,8 @@
 #include "TypeSequenceManager.hpp"
 
 #include <vector>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 namespace moab
 {

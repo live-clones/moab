@@ -9,7 +9,7 @@
 
 #define HIREC_USE_AHF
 
-#include <math.h>
+#include <cmath>
 #include <deque>
 #include <iostream>
 

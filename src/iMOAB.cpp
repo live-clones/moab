@@ -52,11 +52,11 @@ extern "C" {
 
 #define CHKERRVAL( ierr )                        \
     {                                            \
-        if( moab::MB_SUCCESS != ierr ) return 1; \
+        if( moab::MB_SUCCESS != (ierr) ) return 1; \
     }
 #define CHKIERRVAL( ierr )        \
     {                             \
-        if( 0 != ierr ) return 1; \
+        if( 0 != (ierr) ) return 1; \
     }
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -576,14 +576,14 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
             }
         }
     }
-
+#else
+    assert( num_ghost_layers == nullptr );
 #endif
 
     // Now let us actually load the MOAB file with the appropriate read options
     ErrorCode rval = context.MBI->load_file( filename, &context.appDatas[*pid].file_set, newopts.str().c_str() );CHKERRVAL( rval );
 
 #ifdef VERBOSE
-
     // some debugging stuff
     std::ostringstream outfile;
 #ifdef MOAB_HAVE_MPI
@@ -596,10 +596,10 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
     // the mesh contains ghosts too, but they are not part of mat/neumann set
     // write in serial the file, to see what tags are missing
     rval = context.MBI->write_file( outfile.str().c_str() );CHKERRVAL( rval );  // everything on current task, written in serial
-
 #endif
-    int rc = iMOAB_UpdateMeshInfo( pid );
-    return rc;
+
+    // Update mesh information
+    return iMOAB_UpdateMeshInfo( pid );
 }
 
 ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int filename_length,
@@ -1707,6 +1707,8 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
     return 0;
 }
 
+#ifdef MOAB_HAVE_MPI
+
 static void split_tag_names( std::string input_names, std::string& separator,
                              std::vector< std::string >& list_tag_names )
 {
@@ -1726,8 +1728,6 @@ static void split_tag_names( std::string input_names, std::string& separator,
     }
     return;
 }
-
-#ifdef MOAB_HAVE_MPI
 
 // this makes sense only for parallel runs
 ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marker )

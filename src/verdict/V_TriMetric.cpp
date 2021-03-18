@@ -27,7 +27,7 @@
 #include "V_GaussIntegration.hpp"
 #include "VerdictVector.hpp"
 #include <memory.h>
-#include <stddef.h>
+#include <cstddef>
 
 // the average area of a tri
 static double verdict_tri_size      = 0;

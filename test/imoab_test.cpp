@@ -8,12 +8,12 @@
 #include "TestUtil.hpp"
 
 // for malloc, free:
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
 #define CHECKRC( rc, message )   \
-    if( 0 != rc )                \
+    if( 0 != (rc) )                \
     {                            \
         printf( "%s", message ); \
         return 1;                \

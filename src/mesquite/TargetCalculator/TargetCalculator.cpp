@@ -35,7 +35,7 @@
 #include "PatchData.hpp"
 #include "ReferenceMesh.hpp"
 #include "MappingFunction.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

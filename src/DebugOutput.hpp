@@ -1,8 +1,8 @@
 #ifndef moab_DEBUG_OUTPUT_HPP
 #define moab_DEBUG_OUTPUT_HPP
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 #include <vector>
 #include <iosfwd>
 #include <string>

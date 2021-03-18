@@ -25,7 +25,7 @@
 #include "SequenceManager.hpp"
 #include "RangeSeqIntersectIter.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <set>
 

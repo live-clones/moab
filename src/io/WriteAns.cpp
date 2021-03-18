@@ -25,17 +25,17 @@
 
 #include <utility>
 #include <algorithm>
-#include <time.h>
+#include <ctime>
 #include <string>
 #include <vector>
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
 #include "moab/Interface.hpp"
 #include "moab/Range.hpp"
-#include "assert.h"
+#include <cassert>
 #include "Internals.hpp"
 #include "ExoIIUtil.hpp"
 #include "MBTagConventions.hpp"

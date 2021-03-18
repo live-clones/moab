@@ -12,10 +12,10 @@
 #include <sstream>
 #include <fstream>
 #include <map>
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <ctime>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 #include "moab/Range.hpp"
@@ -33,16 +33,16 @@ namespace moab
 {
 
 #define ERRORR( rval, str )       \
-    if( MB_SUCCESS != rval )      \
+    if( MB_SUCCESS != (rval) )      \
     {                             \
-        std::cout << str << "\n"; \
+        std::cout << (str) << "\n"; \
         return rval;              \
     }
 
 #define ERRORV( rval, str )       \
-    if( MB_SUCCESS != rval )      \
+    if( MB_SUCCESS != (rval) )      \
     {                             \
-        std::cout << str << "\n"; \
+        std::cout << (str) << "\n"; \
         return;                   \
     }
 

@@ -12,7 +12,7 @@
 #include "domain.hpp"
 #include <iostream>
 #include <algorithm>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace MBMesquite;
 

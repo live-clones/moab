@@ -32,7 +32,7 @@ using std::endl;
 using std::ostream;
 #include <memory>
 using std::auto_ptr;
-#include <ctype.h>
+#include <cctype>
 
 #include "MeshImpl.hpp"
 #include "MsqError.hpp"

@@ -2,9 +2,9 @@
 #include "iMesh.h"
 #include "iRel.h"
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 // clang-format off
 
@@ -23,12 +23,12 @@
 #endif
 
 #define CHECK_SIZE_C( type, array, allocated_size, size )            \
-    if( NULL == *array || *allocated_size == 0 )                     \
+    if( NULL == *(array) || *(allocated_size) == 0 )                     \
     {                                                                \
-        *array          = (type*)malloc( sizeof( type ) * size );    \
-        *allocated_size = size;                                      \
+        *(array)          = (type*)malloc( sizeof( type ) * (size) );    \
+        *(allocated_size) = size;                                      \
     }                                                                \
-    else if( *allocated_size < size )                                \
+    else if( *(allocated_size) < (size) )                                \
     {                                                                \
         printf( "   Array passed in is non-zero but too short.\n" ); \
     }

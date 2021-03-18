@@ -50,7 +50,7 @@ Unit testing of various functions in the MsqFreeVertexIndexIterator class.
 #include "MsqFreeVertexIndexIterator.hpp"
 #include "PatchDataInstances.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 #include "cppunit/extensions/HelperMacros.h"

@@ -7,7 +7,7 @@
 #include "MeshInterface.hpp"
 #include "MsqDebug.hpp"
 #include "MsqVertex.hpp"
-#include <assert.h>
+#include <cassert>
 #include "MsqIBase.hpp"
 #include <algorithm>
 

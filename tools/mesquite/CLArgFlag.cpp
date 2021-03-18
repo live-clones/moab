@@ -32,8 +32,8 @@
 #include "Mesquite.hpp"
 #include "CLArgFlag.hpp"
 #include "ManPage.hpp"
-#include <ctype.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 

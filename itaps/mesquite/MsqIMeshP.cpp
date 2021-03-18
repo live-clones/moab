@@ -43,7 +43,7 @@ to run mesquite by default.
 #include "MsqIMeshP.hpp"
 #include "MsqError.hpp"
 #include "MsqDebug.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace MBMesquite
 {

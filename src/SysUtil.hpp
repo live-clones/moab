@@ -1,8 +1,8 @@
 #ifndef MB_SYS_UTIL_HPP
 #define MB_SYS_UTIL_HPP
 
-#include <string.h>  // for size_t
-#include <stdio.h>
+#include <cstring>  // for size_t
+#include <cstdio>
 #include <iosfwd>
 
 namespace moab

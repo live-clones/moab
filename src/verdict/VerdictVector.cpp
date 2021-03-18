@@ -23,9 +23,9 @@
 #define VERDICT_EXPORTS
 
 #include "moab/verdict.h"
-#include <math.h>
+#include <cmath>
 #include "VerdictVector.hpp"
-#include <float.h>
+#include <cfloat>
 
 #if defined( __BORLANDC__ )
 #pragma warn - 8004 /* "assigned a value that is never used" */

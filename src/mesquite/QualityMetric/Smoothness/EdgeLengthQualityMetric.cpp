@@ -38,7 +38,7 @@
 #include "PatchData.hpp"
 #include "MsqError.hpp"
 
-#include <math.h>
+#include <cmath>
 
 using namespace MBMesquite;
 

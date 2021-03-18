@@ -35,7 +35,7 @@
 #include <vector>
 
 #include "TagInfo.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace moab
 {
