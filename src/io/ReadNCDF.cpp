@@ -1724,8 +1724,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     if( !ncFile )
     { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name ); }
 
-    rval = read_exodus_header();
-    if( MB_SUCCESS != rval ) return rval;
+    rval = read_exodus_header();MB_CHK_ERR(rval);
 
     // Check to make sure that the requested time step exists
     int ncdim = -1;
@@ -1811,8 +1810,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
     // Get nodes in cubit file
     Range cub_verts;
-    rval = mdbImpl->get_entities_by_type( cub_file_set, MBVERTEX, cub_verts );
-    if( MB_SUCCESS != rval ) return rval;
+    rval = mdbImpl->get_entities_by_type( cub_file_set, MBVERTEX, cub_verts );MB_CHK_ERR(rval);
     std::cout << "  cub_file_set contains " << cub_verts.size() << " nodes." << std::endl;
 
     // Some accounting
@@ -1833,8 +1831,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     if( match_node_ids )
     {
         std::vector< int > cub_ids( cub_verts.size() );
-        rval = mdbImpl->tag_get_data( mGlobalIdTag, cub_verts, &cub_ids[0] );
-        if( MB_SUCCESS != rval ) return rval;
+        rval = mdbImpl->tag_get_data( mGlobalIdTag, cub_verts, &cub_ids[0] );MB_CHK_ERR(rval);
         for( unsigned i = 0; i != cub_verts.size(); ++i )
         {
             cub_verts_id_map.insert( std::pair< int, EntityHandle >( cub_ids[i], cub_verts[i] ) );
@@ -1845,11 +1842,9 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     else
     {
         FileOptions tree_opts( "MAX_PER_LEAF=1;SPLITS_PER_DIR=1;CANDIDATE_PLANE_SET=0" );
-        rval = kdtree.build_tree( cub_verts, &root, &tree_opts );
-        if( MB_SUCCESS != rval ) return rval;
+        rval = kdtree.build_tree( cub_verts, &root, &tree_opts );MB_CHK_ERR(rval);
         AdaptiveKDTreeIter tree_iter;
-        rval = kdtree.get_tree_iterator( root, tree_iter );
-        if( MB_SUCCESS != rval ) return rval;
+        rval = kdtree.get_tree_iterator( root, tree_iter );MB_CHK_ERR(rval);
     }
 
     // For each exo vert, find the matching cub vert
@@ -1882,18 +1877,15 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
             std::vector< EntityHandle > leaves;
             double min_dist = MAX_NODE_DIST;
-            rval            = kdtree.distance_search( exo_coords.array(), MAX_NODE_DIST, leaves );
-            if( MB_SUCCESS != rval ) return rval;
+            rval            = kdtree.distance_search( exo_coords.array(), MAX_NODE_DIST, leaves );MB_CHK_ERR(rval);
             for( std::vector< EntityHandle >::const_iterator j = leaves.begin(); j != leaves.end(); ++j )
             {
                 std::vector< EntityHandle > leaf_verts;
-                rval = mdbImpl->get_entities_by_type( *j, MBVERTEX, leaf_verts );
-                if( MB_SUCCESS != rval ) return rval;
+                rval = mdbImpl->get_entities_by_type( *j, MBVERTEX, leaf_verts );MB_CHK_ERR(rval);
                 for( std::vector< EntityHandle >::const_iterator k = leaf_verts.begin(); k != leaf_verts.end(); ++k )
                 {
                     CartVect orig_cub_coords, difference;
-                    rval = mdbImpl->get_coords( &( *k ), 1, orig_cub_coords.array() );
-                    if( MB_SUCCESS != rval ) return rval;
+                    rval = mdbImpl->get_coords( &( *k ), 1, orig_cub_coords.array() );MB_CHK_ERR(rval);
                     difference  = orig_cub_coords - exo_coords;
                     double dist = difference.length();
                     if( dist < min_dist )
@@ -1913,10 +1905,11 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
             matched_cub_vert_id_map.insert( std::pair< int, EntityHandle >( exo_id, cub_vert ) );
             updated_exo_coords[0] = orig_coords[0][i] + deformed_arrays[0][i];
             updated_exo_coords[1] = orig_coords[1][i] + deformed_arrays[1][i];
+
             if( numberDimensions_loading == 3 ) updated_exo_coords[2] = orig_coords[2][i] + deformed_arrays[2][i];
-            rval = mdbImpl->set_coords( &cub_vert, 1, updated_exo_coords.array() );
-            if( MB_SUCCESS != rval ) return rval;
+            rval = mdbImpl->set_coords( &cub_vert, 1, updated_exo_coords.array() );MB_CHK_ERR(rval);
             ++found;
+
             double magnitude =
                 sqrt( deformed_arrays[0][i] * deformed_arrays[0][i] + deformed_arrays[1][i] * deformed_arrays[1][i] +
                       deformed_arrays[2][i] * deformed_arrays[2][i] );
@@ -1934,22 +1927,23 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     // cub verts that could not be matched.
     if( matched_cub_vert_id_map.size() < cub_verts.size() )
     {
-        const Range& unmatched_cub_verts = cub_verts;
+        Range unmatched_cub_verts = cub_verts;
         for( std::map< int, EntityHandle >::const_iterator i = matched_cub_vert_id_map.begin();
              i != matched_cub_vert_id_map.end(); ++i )
         {
             unmatched_cub_verts.erase( i->second );
         }
+
         for( Range::const_iterator i = unmatched_cub_verts.begin(); i != unmatched_cub_verts.end(); ++i )
         {
             int cub_id;
-            rval = mdbImpl->tag_get_data( mGlobalIdTag, &( *i ), 1, &cub_id );
-            if( MB_SUCCESS != rval ) return rval;
+            rval = mdbImpl->tag_get_data( mGlobalIdTag, &( *i ), 1, &cub_id );MB_CHK_ERR(rval);
+
             CartVect cub_coords;
-            rval = mdbImpl->get_coords( &( *i ), 1, cub_coords.array() );
-            if( MB_SUCCESS != rval ) return rval;
+            rval = mdbImpl->get_coords( &( *i ), 1, cub_coords.array() );MB_CHK_ERR(rval);
             std::cout << "cannot match cub node " << cub_id << " " << cub_coords << std::endl;
         }
+
         std::cout << "  " << unmatched_cub_verts.size() << " nodes from the cub file could not be matched."
                   << std::endl;
     }
