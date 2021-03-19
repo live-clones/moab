@@ -232,7 +232,7 @@ class MsqError
     ErrorCode errorCode;
     std::string errorMessage;
     StackTrace stackTrace;
-}  // namespace MBMesquite
+};  // class MsqError
 
 //! Print message and stack trace
 MESQUITE_EXPORT std::ostream&
