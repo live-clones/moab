@@ -401,6 +401,27 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     return 0;
 }
 
+// Utility function
+static void split_tag_names( std::string input_names, std::string& separator,
+                             std::vector< std::string >& list_tag_names )
+{
+    size_t pos = 0;
+    std::string token;
+    while( ( pos = input_names.find( separator ) ) != std::string::npos )
+    {
+        token = input_names.substr( 0, pos );
+        list_tag_names.push_back( token );
+        // std::cout << token << std::endl;
+        input_names.erase( 0, pos + separator.length() );
+    }
+    if( !input_names.empty() )
+    {
+        // if leftover something, or if not ended with delimiter
+        list_tag_names.push_back( input_names );
+    }
+    return;
+}
+
 ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
                               int* num_dimension, int* num_parts, int filename_length )
 {
@@ -1708,26 +1729,6 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
 }
 
 #ifdef MOAB_HAVE_MPI
-
-static void split_tag_names( std::string input_names, std::string& separator,
-                             std::vector< std::string >& list_tag_names )
-{
-    size_t pos = 0;
-    std::string token;
-    while( ( pos = input_names.find( separator ) ) != std::string::npos )
-    {
-        token = input_names.substr( 0, pos );
-        list_tag_names.push_back( token );
-        // std::cout << token << std::endl;
-        input_names.erase( 0, pos + separator.length() );
-    }
-    if( !input_names.empty() )
-    {
-        // if leftover something, or if not ended with delimiter
-        list_tag_names.push_back( input_names );
-    }
-    return;
-}
 
 // this makes sense only for parallel runs
 ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marker )
