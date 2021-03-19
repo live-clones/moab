@@ -22,20 +22,29 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
               witheigeninc=$withval,
               witheigeninc=no)
 
+  # Supported Metis versions: 3.3.9, 3.2.10
+  # Arguments: 1) Default Version Number, 2) Download by default ?
+  AUSCM_CONFIGURE_DOWNLOAD_EIGEN3([3.3.9],[no])
+
+  echo "Installed ? $eigen3_installed; Eigen3 dir = $EIGEN3_DIR"
   dnl Fall back on default paths to Eigen's include files
-  if (test "x$witheigeninc" != "xno"); then
-    EIGEN3_DIR="$witheigeninc"
-  elif test "x$EIGEN3_DIR" != x -a -f $EIGEN3_DIR/Eigen/Eigen; then
-    echo "Environment EIGEN3_DIR=$EIGEN3_DIR"
-  elif test -f /usr/include/eigen3/Eigen/Eigen ; then
-    EIGEN3_DIR="/usr/include/eigen3"
-  elif test -f /usr/local/include/eigen3/Eigen/Eigen ; then
-    EIGEN3_DIR="/usr/local/include/eigen3"
+  if (test "x$eigen3_installed" != "xno" && test -f "$eigen3_install_dir/include/Eigen/Eigen"); then
+    EIGEN3_DIR="$eigen3_install_dir/include"
   else
-    EIGEN3_DIR=""
+    enableeigen=no;
+    if (test "x$witheigeninc" != "xno"); then
+      EIGEN3_DIR="$witheigeninc"
+    elif test "x$EIGEN3_DIR" != x -a -f $EIGEN3_DIR/Eigen/Eigen; then
+      echo "Environment EIGEN3_DIR=$EIGEN3_DIR"
+    elif test -f /usr/include/eigen3/Eigen/Eigen ; then
+      EIGEN3_DIR="/usr/include/eigen3"
+    elif test -f /usr/local/include/eigen3/Eigen/Eigen ; then
+      EIGEN3_DIR="/usr/local/include/eigen3"
+    else
+      EIGEN3_DIR=""
+    fi
   fi
 
-  enableeigen=no;
   if (test "x$EIGEN3_DIR" != "x"); then
  
     dnl Check for existence of a header file in the specified location.  Note: here
