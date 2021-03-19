@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.5 )
 SET(PACKAGE_NAME "MOAB")
 SET(PACKAGE_VERSION "5.2.1")
 
@@ -728,7 +728,6 @@ moab_install_docs(${MOAB_EXAMPLES})
 feature_summary(WHAT ALL #ENABLED_FEATURES DISABLED_FEATURES PACKAGES_FOUND
                 DESCRIPTION "MOAB Configuration Summary"
                 INCLUDE_QUIET_PACKAGES
-                QUIET_ON_EMPTY
                 FILENAME ${CMAKE_BINARY_DIR}/summary.log 
                 )
 MESSAGE("-- MOAB Configuration summary has been written to ${CMAKE_BINARY_DIR}/summary.log.")
