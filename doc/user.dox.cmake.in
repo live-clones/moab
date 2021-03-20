@@ -1105,7 +1105,7 @@ HTML_STYLESHEET        =
 # see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = "@top_srcdir@/doc/customdoxygen.css"
+HTML_EXTRA_STYLESHEET  =
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1116,6 +1116,7 @@ HTML_EXTRA_STYLESHEET  = "@top_srcdir@/doc/customdoxygen.css"
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_FILES       = "@top_srcdir@/doc/highlight.pack.js" \
+                         "@top_srcdir@/doc/customdoxygen.css" \
                          "@top_srcdir@/doc/custom.css" \
                          "@top_srcdir@/doc/xt256-light.css"
                          #"@top_srcdir@/doc/custom_dark_theme.css" \
