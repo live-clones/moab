@@ -7,37 +7,31 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<!--BEGIN PROJECT_NAME--><title>$projectname: $title</title><!--END PROJECT_NAME-->
 		<!--BEGIN !PROJECT_NAME--><title>$title</title><!--END !PROJECT_NAME-->
-		<link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>
-		<script type="text/javascript" src="$relpath^jquery.js"></script>
-		<script type="text/javascript" src="$relpath^dynsections.js"></script>
+		<link href="tabs.css" rel="stylesheet" type="text/css"/>
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="dynsections.js"></script>
 		$treeview
 		$search
 		$mathjax
-		<link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
+		<link href="$stylesheet" rel="stylesheet" type="text/css" />
     <link href="customdoxygen.css" rel="stylesheet" type="text/css" />
-    <link href="custom.css" rel="stylesheet" type="text/css" />
     <!-- <link href="custom_dark_theme.css" rel="stylesheet" type="text/css" /> -->
-		<!--
-    <style>
-			div.fragmentbox {background: url(./pojoaque.jpg) repeat scroll left top #181914; }
-			div.fragment {background-color: #23241f; }
-		</style>
-    -->
-    <!-- <link rel="stylesheet" type="text/css" href="xt256-dark.css" /> -->
-    <link rel="stylesheet" type="text/css" href="xt256-light.css" />
+    <!-- <link href="xt256-dark.css" rel="stylesheet" type="text/css" /> -->
+    <link href="custom.css" rel="stylesheet" type="text/css" />
+    <link href="xt256-light.css" rel="stylesheet" type="text/css" />
     <script src="highlight.pack.js"></script>
     <script>
-			// hljs.configure({languages: ['cpp']});
+			hljs.configure({languages: ['cpp']});
 			$(function() {
 					$(".fragment").each(function(i,node) {
 							var $node = $(node);
 							$node.html("<pre><code class='language-cpp " +
 												$node.attr("class")+"'>" +
 												$node.text()+"</code></pre>");
-							// hljs.highlightBlock(node);
+							hljs.highlightBlock(node);
 					});
 			});
-			hljs.highlightAll();
+			// hljs.highlightAll();
 		</script>
 	</head>
 	<body>
@@ -49,7 +43,7 @@
 				<tbody>
 					<tr style="height: 56px;">
 						<!--BEGIN PROJECT_LOGO-->
-						<td id="projectlogo"><img alt="Logo" src="$relpath^$projectlogo"/></td>
+						<td id="projectlogo"><img alt="Logo" src="$projectlogo"/></td>
 						<!--END PROJECT_LOGO-->
 						<!--BEGIN PROJECT_NAME-->
 						<td id="projectalign" style="padding-left: 0.5em;">
