@@ -276,7 +276,7 @@ void ObjectiveFunctionTests::test_clone( ObjectiveFunctionTemplate* of )
     of->set_quality_metric( &metric );
 
     // test that we get the same value from both
-    auto_ptr< ObjectiveFunction > of2( of->clone() );
+    unique_ptr< ObjectiveFunction > of2( of->clone() );
     double exp_val, val;
     exp_val = evaluate_internal( ObjectiveFunction::CALCULATE, EVAL, of );
     val     = evaluate_internal( ObjectiveFunction::CALCULATE, EVAL, of2.get() );
@@ -303,7 +303,7 @@ void ObjectiveFunctionTests::test_clone( ObjectiveFunctionTemplate* of )
     evaluate_internal( ObjectiveFunction::ACCUMULATE, EVAL, of );
 
     // check that clone has same accumulated data
-    of2 = auto_ptr< ObjectiveFunction >( of->clone() );
+    of2 = unique_ptr< ObjectiveFunction >( of->clone() );
     metric.set_values( some_vals, num_vals );
     exp_val = evaluate_internal( ObjectiveFunction::UPDATE, EVAL, of );
     val     = evaluate_internal( ObjectiveFunction::UPDATE, EVAL, of2.get() );

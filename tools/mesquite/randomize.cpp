@@ -83,7 +83,7 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
     grad[0] /= grad[0].length();
 
     PatchDataVerticesMemento* memento = pd.create_vertices_memento( err );MSQ_ERRRTN( err );
-    std::auto_ptr< PatchDataVerticesMemento > deleter( memento );
+    std::unique_ptr< PatchDataVerticesMemento > deleter( memento );
     pd.get_minmax_edge_length( junk, coeff );
 
     for( int i = 0; i < 100; ++i )

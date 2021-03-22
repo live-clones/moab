@@ -63,7 +63,7 @@ using namespace MBMesquite;
             std::cout << "Assertion Failed: " << #A << std::endl; \
             std::cout << "  File: " << __FILE__ << std::endl;     \
             std::cout << "  Line: " << __LINE__ << std::endl;     \
-            return true;                                          \
+            return 1;                                             \
         }                                                         \
     } while( false )
 
