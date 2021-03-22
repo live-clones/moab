@@ -360,7 +360,7 @@ if ( ENABLE_NETCDF )
   include_directories( ${NETCDF_INCLUDES} )
   set( MOAB_LIBS ${NETCDF_LIBRARIES} ${MOAB_LIBS} )
 endif ( ENABLE_NETCDF )
-set_package_properties(HDF5 PROPERTIES
+set_package_properties(NetCDF PROPERTIES
                     TYPE RECOMMENDED
                     PURPOSE "NetCDF library interfaces for MOAB ExodusII file format support")
 
