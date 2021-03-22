@@ -82,8 +82,8 @@ void SteepestDescent::optimize_vertex_positions( PatchData& pd, MsqError& err )
 
     // get vertex memento so we can restore vertex coordinates for bad steps.
     pd_previous_coords = pd.create_vertices_memento( err );MSQ_ERRRTN( err );
-    // use auto_ptr to automatically delete memento when we exit this function
-    std::auto_ptr< PatchDataVerticesMemento > memento_deleter( pd_previous_coords );
+    // use unique_ptr to automatically delete memento when we exit this function
+    std::unique_ptr< PatchDataVerticesMemento > memento_deleter( pd_previous_coords );
 
     // Evaluate objective function.
     //

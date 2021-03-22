@@ -112,7 +112,7 @@ void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMes
 
     // get some global mesh properties
     SimpleStats edge_len, lambda;
-    std::auto_ptr< MeshUtil > tool( new MeshUtil( mesh, settings ) );
+    std::unique_ptr< MeshUtil > tool( new MeshUtil( mesh, settings ) );
     tool->edge_length_distribution( edge_len, err );MSQ_ERRRTN( err );
     tool->lambda_distribution( lambda, err );MSQ_ERRRTN( err );
     tool.reset( 0 );
@@ -122,7 +122,7 @@ void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMes
     TShapeSize2DNB1 mu_shape_2d;
     TShapeSize3DNB1 mu_shape_3d;
     TMixed mu_shape( &mu_shape_2d, &mu_shape_3d );
-    std::auto_ptr< TMetric > mu;
+    std::unique_ptr< TMetric > mu;
     if( qualityMetric == BETA )
     {
         double beta = metricConstant;

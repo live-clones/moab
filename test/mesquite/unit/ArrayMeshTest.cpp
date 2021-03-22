@@ -327,7 +327,7 @@ void ArrayMeshTest::test_vertex_iterator()
     MsqPrintError err( std::cerr );
     VertexIterator* iter = zeroBased3D->vertex_iterator( err );
     CPPUNIT_ASSERT( !err );
-    std::auto_ptr< VertexIterator > deleter( iter );
+    std::unique_ptr< VertexIterator > deleter( iter );
 
     CPPUNIT_ASSERT( !iter->is_at_end() );
     CPPUNIT_ASSERT_EQUAL( (size_t)0, (size_t)iter->operator*() );
@@ -365,7 +365,7 @@ void ArrayMeshTest::test_vertex_iterator_one_based()
     MsqPrintError err( std::cerr );
     VertexIterator* iter = oneBased3D->vertex_iterator( err );
     CPPUNIT_ASSERT( !err );
-    std::auto_ptr< VertexIterator > deleter( iter );
+    std::unique_ptr< VertexIterator > deleter( iter );
 
     CPPUNIT_ASSERT( !iter->is_at_end() );
     CPPUNIT_ASSERT_EQUAL( (size_t)1, (size_t)iter->operator*() );
@@ -403,7 +403,7 @@ void ArrayMeshTest::test_element_iterator()
     MsqPrintError err( std::cerr );
     ElementIterator* iter = zeroBased3D->element_iterator( err );
     CPPUNIT_ASSERT( !err );
-    std::auto_ptr< ElementIterator > deleter( iter );
+    std::unique_ptr< ElementIterator > deleter( iter );
 
     CPPUNIT_ASSERT( !iter->is_at_end() );
     CPPUNIT_ASSERT_EQUAL( (size_t)0, (size_t)iter->operator*() );

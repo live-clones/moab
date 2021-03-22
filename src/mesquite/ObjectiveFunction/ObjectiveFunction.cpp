@@ -41,7 +41,7 @@
 #include "MsqError.hpp"
 #include "MsqHessian.hpp"
 #include "SymMatrix3D.hpp"
-#include <memory>  // auto_ptr
+#include <memory>  // unique_ptr
 
 namespace MBMesquite
 {
@@ -174,7 +174,7 @@ bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type, PatchData& p
     }
 
     ObjectiveFunction* of = this;
-    std::auto_ptr< ObjectiveFunction > deleter;
+    std::unique_ptr< ObjectiveFunction > deleter;
     if( eval_type == CALCULATE )
     {
         of->clear();
@@ -194,7 +194,7 @@ bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type, PatchData& p
         b = this->evaluate( eval_type, pd, OF_val, OF_FREE_EVALS_ONLY, err );
         if( MSQ_CHKERR( err ) || !b ) return false;
         of      = this->clone();
-        deleter = std::auto_ptr< ObjectiveFunction >( of );
+        deleter = std::unique_ptr< ObjectiveFunction >( of );
     }
 
     // Determine number of layers of adjacent elements based on metric type.
