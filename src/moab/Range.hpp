@@ -188,7 +188,7 @@ struct range_base_iter
 };
 
 //! the class Range
-class Range
+MOAB_EXPORT class Range
 {
   public:
     // forward declare the iterators
@@ -396,7 +396,7 @@ class Range
 
   public:
     //! used to iterate over sub-ranges of a range
-    class pair_iterator : public range_base_iter
+    class MOAB_EXPORT pair_iterator : public range_base_iter
     {
         friend class Range;
 
@@ -456,7 +456,7 @@ class Range
     class const_pair_iterator;
 
     //! a const iterator which iterates over an Range
-    class const_iterator : public range_base_iter
+    class MOAB_EXPORT const_iterator : public range_base_iter
     {
         friend class Range;
         friend class pair_iterator;
@@ -596,7 +596,7 @@ class Range
     };
 
     //! a const reverse iterator which iterates over an Range
-    class const_reverse_iterator : public range_base_iter
+    class MOAB_EXPORT const_reverse_iterator : public range_base_iter
     {
         friend class Range;
         friend class pair_iterator;
@@ -679,7 +679,7 @@ class Range
     };
 
   public:
-    class const_pair_iterator
+    class MOAB_EXPORT const_pair_iterator
     {
       public:
         const_pair_iterator() : myNode( NULL ) {}
@@ -808,7 +808,7 @@ EntityID operator-( const Range::const_iterator& it1, const Range::const_iterato
  *  e.g. std::copy(list.begin(), list.end(), range_inserter(my_range);
  * Also, see comments/instructions at the top of this class declaration
  */
-class range_inserter
+class MOAB_EXPORT range_inserter
 {
 
   protected:

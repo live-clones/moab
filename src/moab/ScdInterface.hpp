@@ -104,7 +104,7 @@ class ParallelComm;
  */
 
 //! struct for keeping parallel data in one place
-class ScdParData
+MOAB_EXPORT class ScdParData
 {
   public:
     ScdParData() : partMethod( NOPART ), pComm( NULL )

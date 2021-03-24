@@ -37,6 +37,8 @@
 #ifdef WIN32               /* windows */
 #define _USE_MATH_DEFINES  // For M_PI
 #endif
+#include "win32_config.h"
+
 #ifndef MOAB_INTERFACE_HPP
 #define MOAB_INTERFACE_HPP
 
@@ -93,7 +95,7 @@ static const MBuuid IDD_MBCore = MBuuid( 0x8956e0a, 0xc300, 0x4005, 0xbd, 0xf6, 
 class NS_NO_VTABLE Interface : public nsISupports
 {
 #else
-class Interface : public UnknownInterface
+class MOAB_EXPORT Interface : public UnknownInterface
 {
 #endif
 
@@ -1062,7 +1064,7 @@ class Interface : public UnknownInterface
     /**@{*/
 
     //! function object for recieving events from MB of higher order nodes added to entities
-    class HONodeAddedRemoved
+    class MOAB_EXPORT HONodeAddedRemoved
     {
       public:
         //! Constructor
