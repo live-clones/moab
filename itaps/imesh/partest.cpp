@@ -1,10 +1,10 @@
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "moab_mpi.h"
 #include "iMeshP.h"
 
 #define IMESH_ASSERT( ierr ) \
-    if( ierr != 0 ) printf( "imesh assert\n" );
+    if( ( ierr ) != 0 ) printf( "imesh assert\n" );
 #define IMESH_NULL      0
 #define STRINGIFY_( X ) #X
 #define STRINGIFY( X )  STRINGIFY_( X )

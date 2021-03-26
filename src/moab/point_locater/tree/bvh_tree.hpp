@@ -684,7 +684,7 @@ class Bvh_tree
         // branch predicted..
         // bool dir = (point[ node.dim] - node.Rmin) <=
         //				(node.Lmax - point[ node.dim]);
-        bool dir = 0;
+        bool dir = false;
         _find_point( point, node.child + dir, tol, result );
         if( result.first == 0 ) { return _find_point( point, node.child + ( !dir ), tol, result ); }
         return result;

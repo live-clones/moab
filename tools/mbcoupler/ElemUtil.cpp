@@ -1,6 +1,6 @@
 #include <iostream>
 #include <limits>
-#include <assert.h>
+#include <cassert>
 
 #include "ElemUtil.hpp"
 #include "moab/BoundBox.hpp"

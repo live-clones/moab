@@ -28,10 +28,10 @@
 #include "moab/FileOptions.hpp"
 #include "SysUtil.hpp"
 
-#include <errno.h>
-#include <string.h>
-#include <limits.h>
-#include <assert.h>
+#include <cerrno>
+#include <cstring>
+#include <climits>
+#include <cassert>
 #include <map>
 
 namespace moab

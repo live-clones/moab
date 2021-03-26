@@ -6,7 +6,7 @@
 #if defined(__MINGW32__)
   #include <sys/time.h>
 #else
-  #include <time.h>
+#include <ctime>
 #endif
 
 #include <vector>
@@ -18,9 +18,9 @@
 #include "moab/DiscreteGeometry/HiReconstruction.hpp"
 #include "TestUtil.hpp"
 #include "geomObject.cpp"
-#include <math.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cmath>
+#include <cstdlib>
+#include <cassert>
 
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"

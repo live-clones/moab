@@ -24,8 +24,8 @@
 #define VERDICTVECTOR_HPP
 
 #include "moab/verdict.h"
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 class VerdictVector;
 typedef void ( VerdictVector::*transform_function )( double gamma, double gamma2 );

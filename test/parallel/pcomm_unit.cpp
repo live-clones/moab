@@ -326,9 +326,9 @@ ErrorCode create_shared_grid_3d( ParallelComm** pc, Range* verts, Range* hexes )
 
     int nijk[P][3];
     int NIJK[3] = { 0, 0, 0 };
-#define INDEXG( i, j, k ) ( k * NIJK[1] * NIJK[0] + j * NIJK[0] + i )
+#define INDEXG( i, j, k ) ( (k)*NIJK[1] * NIJK[0] + (j)*NIJK[0] + ( i ) )
 #define INDEXL( i, j, k ) \
-    ( ( k - ijkmin[p][2] ) * nijk[p][1] * nijk[p][0] + ( j - ijkmin[p][1] ) * nijk[p][0] + ( i - ijkmin[p][0] ) )
+    ( ( (k)-ijkmin[p][2] ) * nijk[p][1] * nijk[p][0] + ( (j)-ijkmin[p][1] ) * nijk[p][0] + ( (i)-ijkmin[p][0] ) )
 
     int p, i, j, k;
     for( p = 0; p < P; p++ )
@@ -1267,7 +1267,7 @@ void test_pack_tag_data_default_value()
     for( i = verts.begin(); i != verts.end(); ++i )
     {
         rval = mb.tag_get_data( dense_5_opaque_tag, &*i, 1, odata );CHECK_ERR( rval );
-        if( strcmp( odata, "DEFLT" ) )
+        if( strcmp( odata, "DEFLT" ) != 0 )
         {
             CHECK_EQUAL( std::string( "TAGGD" ), std::string( odata ) );
             ++vcount;
@@ -1277,7 +1277,7 @@ void test_pack_tag_data_default_value()
     for( i = elems.begin(); i != elems.end(); ++i )
     {
         rval = mb.tag_get_data( dense_5_opaque_tag, &*i, 1, odata );CHECK_ERR( rval );
-        if( strcmp( odata, "DEFLT" ) )
+        if( strcmp( odata, "DEFLT" ) != 0 )
         {
             CHECK_EQUAL( "TAGGD", odata );
             ++ecount;
@@ -1287,7 +1287,7 @@ void test_pack_tag_data_default_value()
     for( i = sets.begin(); i != sets.end(); ++i )
     {
         rval = mb.tag_get_data( dense_5_opaque_tag, &*i, 1, odata );CHECK_ERR( rval );
-        if( strcmp( odata, "DEFLT" ) )
+        if( strcmp( odata, "DEFLT" ) != 0 )
         {
             CHECK_EQUAL( "TAGGD", odata );
             ++scount;

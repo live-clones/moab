@@ -21,7 +21,7 @@
 
 #include "AxisBox.hpp"
 #include "moab/Range.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

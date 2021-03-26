@@ -14,7 +14,7 @@
 #endif
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace moab;
 using namespace std;

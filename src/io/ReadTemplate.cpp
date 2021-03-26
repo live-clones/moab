@@ -11,7 +11,7 @@
 #include "moab/FileOptions.hpp"
 
 #include <cstdio>
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

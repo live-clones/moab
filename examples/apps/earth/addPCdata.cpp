@@ -20,7 +20,7 @@
 #include "moab/ProgOptions.hpp"
 #include "moab/Core.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <sstream>
 
 using namespace moab;

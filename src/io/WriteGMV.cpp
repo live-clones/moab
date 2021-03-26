@@ -30,7 +30,7 @@
 #include "MBTagConventions.hpp"
 #include "moab/WriteUtilIface.hpp"
 #include <fstream>
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

@@ -7,9 +7,9 @@
 #include "moab_mpi.h"
 #endif
 
-#include <math.h>
-#include <assert.h>
-#include <float.h>
+#include <cmath>
+#include <cassert>
+#include <cfloat>
 #include <cstdio>
 
 #include "TestUtil.hpp"

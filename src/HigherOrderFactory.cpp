@@ -28,7 +28,7 @@
 #include "AEntityFactory.hpp"
 #include "moab/Core.hpp"
 #include "moab/CN.hpp"
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 
 namespace moab

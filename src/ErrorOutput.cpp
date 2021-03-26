@@ -2,9 +2,9 @@
 #include "moab/MOABConfig.h"
 
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

@@ -1,8 +1,8 @@
 #ifndef VAR_LEN_TAG_HPP
 #define VAR_LEN_TAG_HPP
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 namespace moab
 {

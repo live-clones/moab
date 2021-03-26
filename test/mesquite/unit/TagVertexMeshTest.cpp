@@ -37,7 +37,7 @@
 #include "MsqVertex.hpp"
 #include "InstructionQueue.hpp"
 #include <cppunit/extensions/HelperMacros.h>
-#include <stdio.h>
+#include <cstdio>
 
 using namespace MBMesquite;
 

@@ -31,7 +31,7 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Mesquite.hpp"
 #include "MeshImpl.hpp"
@@ -63,7 +63,7 @@ using namespace MBMesquite;
             std::cout << "Assertion Failed: " << #A << std::endl; \
             std::cout << "  File: " << __FILE__ << std::endl;     \
             std::cout << "  Line: " << __LINE__ << std::endl;     \
-            return true;                                          \
+            return 1;                                             \
         }                                                         \
     } while( false )
 

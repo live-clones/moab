@@ -43,7 +43,7 @@
 
 #include <vector>
 using std::vector;
-#include <math.h>
+#include <cmath>
 
 namespace MBMesquite
 {

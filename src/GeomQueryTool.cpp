@@ -11,10 +11,10 @@
 #include <algorithm>
 #include <set>
 
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cctype>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 
 #include "moab/OrientedBoxTreeTool.hpp"
 

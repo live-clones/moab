@@ -50,7 +50,7 @@ Unit testing of the MsqHessian class.
 #include "PatchDataInstances.hpp"
 #include "MsqHessian.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include "cppunit/extensions/HelperMacros.h"
 

@@ -27,7 +27,7 @@
  *
  *******************************************************/
 
-#include <assert.h>
+#include <cassert>
 #include "moab/Range.hpp"
 #include "Internals.hpp"
 #include "moab/CN.hpp"
@@ -608,8 +608,8 @@ void Range::print( const char* indent_prefix ) const
 }
 
 // intersect two ranges, placing the results in the return range
-#define MAX( a, b ) ( a < b ? b : a )
-#define MIN( a, b ) ( a > b ? b : a )
+#define MAX( a, b ) ( (a) < (b) ? (b) : (a) )
+#define MIN( a, b ) ( (a) > (b) ? (b) : (a) )
 Range intersect( const Range& range1, const Range& range2 )
 {
     Range::const_pair_iterator r_it[2] = { range1.const_pair_begin(), range2.const_pair_begin() };

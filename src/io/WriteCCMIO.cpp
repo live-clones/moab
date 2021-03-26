@@ -54,10 +54,10 @@
 #include "ccmiocore.h"
 #include <utility>
 #include <algorithm>
-#include <time.h>
+#include <ctime>
 #include <string>
 #include <vector>
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -66,7 +66,7 @@
 #include "moab/Range.hpp"
 #include "moab/CN.hpp"
 #include "moab/Skinner.hpp"
-#include "assert.h"
+#include <cassert>
 #include "Internals.hpp"
 #include "ExoIIUtil.hpp"
 #include "MBTagConventions.hpp"
@@ -98,9 +98,9 @@ static char const kStateName[] = "default";
 
 #define INS_ID( stringvar, prefix, id ) sprintf( stringvar, prefix, id )
 
-#define CHK_SET_CCMERR( ccm_err_code, ccm_err_msg )                              \
-    {                                                                            \
-        if( kCCMIONoErr != ccm_err_code ) MB_SET_ERR( MB_FAILURE, ccm_err_msg ); \
+#define CHK_SET_CCMERR( ccm_err_code, ccm_err_msg )                                  \
+    {                                                                                \
+        if( kCCMIONoErr != ( ccm_err_code ) ) MB_SET_ERR( MB_FAILURE, ccm_err_msg ); \
     }
 
 WriterIface* WriteCCMIO::factory( Interface* iface )

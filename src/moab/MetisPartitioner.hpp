@@ -19,7 +19,7 @@
 #ifndef __metispartitioner_hpp__
 #define __metispartitioner_hpp__
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "moab/PartitionerBase.hpp"
 #include "metis.h"
 

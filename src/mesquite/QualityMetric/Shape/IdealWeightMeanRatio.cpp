@@ -39,7 +39,7 @@
 #include "MsqError.hpp"
 #include "PatchData.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 using std::vector;
 

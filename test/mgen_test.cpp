@@ -73,7 +73,7 @@ int main( int argc, char* argv[] )
     ParallelComm* pc     = new ParallelComm( mb, MPI_COMM_WORLD );
     MeshGeneration* mgen = new MeshGeneration( mb, pc, fileset );
 #else
-    MeshGeneration* mgen = new MeshGeneration( mb, 0, fileset );
+    MeshGeneration* mgen = new MeshGeneration( mb, fileset );
 #endif
 
     rval = mgen->BrickInstance( opts );MB_CHK_ERR( rval );

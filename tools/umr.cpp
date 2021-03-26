@@ -6,13 +6,13 @@
 #if defined(__MINGW32__)
   #include <sys/time.h>
 #else
-  #include <time.h>
+  #include <ctime>
 #endif
 
-#include <time.h>
-#include <math.h>
-#include <assert.h>
-#include <float.h>
+#include <ctime>
+#include <cmath>
+#include <cassert>
+#include <cfloat>
 
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"

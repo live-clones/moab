@@ -3,7 +3,7 @@
 #include "MBTagConventions.hpp"
 #define IS_BUILDING_MB
 #include "moab/Range.hpp"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 using namespace moab;

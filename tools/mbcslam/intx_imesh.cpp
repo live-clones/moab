@@ -14,7 +14,7 @@
 #include "MBiMesh.hpp"
 
 #define IMESH_ASSERT( ierr ) \
-    if( ierr != 0 ) std::cout << "iMesh Assert: \n";
+    if( ( ierr ) != 0 ) std::cout << "iMesh Assert: \n";
 #define IMESH_NULL 0
 
 extern "C" void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set, int* ierr );

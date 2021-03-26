@@ -4,7 +4,7 @@
 #include "moab/CN.hpp"
 #include "moab/Range.hpp"
 #include "moab/GeomTopoTool.hpp"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 using namespace moab;

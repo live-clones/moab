@@ -46,7 +46,7 @@
 #include "UnitUtil.hpp"
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 using namespace MBMesquite;
 

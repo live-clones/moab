@@ -186,9 +186,9 @@ int main( int argc, char* argv[] )
         rval = mbCore->tag_get_data( smatMetadataTag, &rootset, 1, smat_metadata_glb );MB_CHK_ERR( rval );
         // std::cout << "Number of mesh sets is " << meshsets.size() << std::endl;
 
-#define DTYPE( a )                                               \
-    {                                                            \
-        ( ( a == 0 ) ? "FV" : ( ( a == 1 ) ? "cGLL" : "dGLL" ) ) \
+#define DTYPE( a )                                                       \
+    {                                                                    \
+        ( ( ( a ) == 0 ) ? "FV" : ( ( ( a ) == 1 ) ? "cGLL" : "dGLL" ) ) \
     }
         // Map dimensions
         int nA              = smat_metadata_glb[0];

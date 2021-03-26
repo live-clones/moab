@@ -35,7 +35,7 @@
 #include "Mesquite.hpp"
 #include "MeshInterface.hpp"
 #include <vector>
-#include <stdlib.h>  // size_t
+#include <cstdlib>  // size_t
 
 namespace MBMesquite
 {

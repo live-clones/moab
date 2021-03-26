@@ -20,7 +20,7 @@
 #include <vector>
 #include <cstdlib>
 #include <map>
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 
 #include "moab/Core.hpp"

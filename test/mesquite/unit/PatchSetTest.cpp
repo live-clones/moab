@@ -32,7 +32,7 @@
 #include "MsqError.hpp"
 #include "UnitUtil.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <algorithm>
 #include <set>

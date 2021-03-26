@@ -4,7 +4,7 @@
 #include "MBTagConventions.hpp"
 #include "moab/GeomTopoTool.hpp"
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 const char* ent_names[] = { "Vertex", "Edge", "Face", "Region" };
 

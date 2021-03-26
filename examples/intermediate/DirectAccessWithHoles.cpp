@@ -39,7 +39,7 @@
 #include "moab/ReadUtilIface.hpp"
 #include <map>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 using namespace moab;
 using namespace std;

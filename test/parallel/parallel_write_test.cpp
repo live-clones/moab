@@ -2,13 +2,13 @@
 #include "moab/ParallelComm.hpp"
 #include "MBTagConventions.hpp"
 #include "moab_mpi.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
-#include <time.h>
-#include <string.h>
-#include <math.h>
-#include <assert.h>
-#include <stdio.h>
+#include <ctime>
+#include <cstring>
+#include <cmath>
+#include <cassert>
+#include <cstdio>
 #include <sstream>
 
 using namespace moab;

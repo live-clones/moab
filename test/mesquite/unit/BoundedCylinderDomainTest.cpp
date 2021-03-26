@@ -5,8 +5,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <vector>
 #include <algorithm>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 
 const double EPSILON = 1e-6;

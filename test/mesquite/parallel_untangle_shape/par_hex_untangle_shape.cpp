@@ -100,8 +100,8 @@ using std::endl;
 
 using namespace MBMesquite;
 
-#define VTK_3D_DIR TestDir + "/3D/vtk/hexes/tangled/"
-#define VTK_2D_DIR TestDir + "/2D/vtk/quads/tangled/"
+#define VTK_3D_DIR ( TestDir + "/3D/vtk/hexes/tangled/" )
+#define VTK_2D_DIR ( TestDir + "/2D/vtk/quads/tangled/" )
 
 using namespace std;
 

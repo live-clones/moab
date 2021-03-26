@@ -36,7 +36,7 @@
 */
 
 #include "ConjugateGradient.hpp"
-#include <math.h>
+#include <cmath>
 #include "MsqDebug.hpp"
 #include "MsqTimer.hpp"
 //#include "MsqFreeVertexIndexIterator.hpp"

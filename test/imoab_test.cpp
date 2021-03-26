@@ -8,12 +8,12 @@
 #include "TestUtil.hpp"
 
 // for malloc, free:
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
 #define CHECKRC( rc, message )   \
-    if( 0 != rc )                \
+    if( 0 != (rc) )                \
     {                            \
         printf( "%s", message ); \
         return 1;                \
@@ -87,10 +87,11 @@ int main( int argc, char* argv[] )
 
 #ifdef MOAB_HAVE_MPI
     const char* read_opts = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
+    int num_ghost_layers[1] = {1};
 #else
     const char* read_opts = "";
+    int* num_ghost_layers = nullptr;
 #endif
-    int num_ghost_layers = 1;
 
     /*
      * Loading the mesh is a parallel IO operation. Ghost layers can be exchanged too, and default
@@ -99,10 +100,10 @@ int main( int argc, char* argv[] )
      * vertex entity should have a GLOBAL ID tag in the file, which will be available for visible
      * entities
      */
-    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, &num_ghost_layers, (int)( filen.size() ), strlen( read_opts ) );
+    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, num_ghost_layers, (int)( filen.size() ), strlen( read_opts ) );
     CHECKRC( rc, "failed to load mesh" );
 
-    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, &num_ghost_layers, (int)( filen.size() ),
+    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, num_ghost_layers, (int)( filen.size() ),
                          strlen( read_opts ) );
     CHECKRC( rc, "failed to load mesh" );
 

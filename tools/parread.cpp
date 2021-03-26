@@ -2,7 +2,7 @@
 #include "moab/Core.hpp"
 #include <sstream>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 
 const char usage[] = "[-b|-d|-f] [-P <rank>] [-p <name>] [-R] [-g <level>] [-O <option>] <filename>";

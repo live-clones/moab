@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdlib>
 #include <sstream>
-#include "assert.h"
+#include <cassert>
 
 #include "ReadIDEAS.hpp"
 #include "moab/Interface.hpp"

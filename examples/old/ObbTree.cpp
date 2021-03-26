@@ -5,7 +5,7 @@
 #include "moab/Range.hpp"
 #include "moab/OrientedBoxTreeTool.hpp"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 int main( int argc, char** argv )
 {

@@ -33,7 +33,7 @@
 #define MSQ_SETTINGS_HPP
 
 #include "Mesquite.hpp"
-#include <stdlib.h>  // for size_t
+#include <cstdlib>  // for size_t
 
 namespace MBMesquite
 {

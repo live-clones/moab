@@ -1,7 +1,7 @@
 #ifndef BIT_PAGE_HPP
 #define BIT_PAGE_HPP
 
-#include <assert.h>
+#include <cassert>
 #include "BitTag.hpp"
 
 namespace moab

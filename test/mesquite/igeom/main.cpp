@@ -112,7 +112,7 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    std::auto_ptr< MeshDomain > dom( use_native ? get_mesquite_domain() : get_itaps_domain() );
+    std::unique_ptr< MeshDomain > dom( use_native ? get_mesquite_domain() : get_itaps_domain() );
 
     if( !dom.get() )
     {

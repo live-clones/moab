@@ -13,8 +13,8 @@
 #include <algorithm>
 #include <sstream>
 
-#include <stdio.h>
-#include "assert.h"
+#include <cstdio>
+#include <cassert>
 
 namespace moab
 {

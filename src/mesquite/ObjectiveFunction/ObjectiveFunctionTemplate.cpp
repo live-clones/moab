@@ -55,14 +55,14 @@ bool ObjectiveFunctionTemplate::initialize_block_coordinate_descent( MeshDomainA
                                                                      const Settings* settings, PatchSet*,
                                                                      MsqError& err )
 {
-    std::auto_ptr< PatchSet > patch_set;
+    std::unique_ptr< PatchSet > patch_set;
     switch( get_quality_metric()->get_metric_type() )
     {
         case QualityMetric::VERTEX_BASED:
-            patch_set = std::auto_ptr< PatchSet >( new VertexPatches( 1, false ) );
+            patch_set = std::unique_ptr< PatchSet >( new VertexPatches( 1, false ) );
             break;
         case QualityMetric::ELEMENT_BASED:
-            patch_set = std::auto_ptr< PatchSet >( new ElementPatches );
+            patch_set = std::unique_ptr< PatchSet >( new ElementPatches );
             break;
         default:
             MSQ_SETERR( err )

@@ -27,10 +27,12 @@
  * transforms.
  */
 
-#define XFORM( a, b )       xForm[4 * a + b]
-#define XFORM_INDEX( a, b ) 4 * a + b
+#define XFORM( a, b )       xForm[4 * (a) + (b)]
+#define XFORM_INDEX( a, b ) (4 * (a) + (b))
 
-#include <math.h>
+#include <cmath>
+#include <cmath>
+
 #include <ostream>
 
 #include "moab/win32_config.h"
@@ -271,7 +273,7 @@ inline int HomCoord::length_squared() const
 //! length
 inline int HomCoord::length() const
 {
-    return (int)sqrt( (float)length_squared() );
+    return (int)std::sqrt( (float)length_squared() );
 }
 
 //! normalize

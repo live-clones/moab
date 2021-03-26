@@ -1,12 +1,12 @@
 #undef DEBUG
 #undef TIME_DEBUG
 
-#include <stdarg.h>
-#include <time.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <ctime>
+#include <cstdlib>
 
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 
 #include <vector>
 #include <set>

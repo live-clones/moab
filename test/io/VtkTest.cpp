@@ -3,10 +3,10 @@
 
 using namespace moab;
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
 #include <map>
 #include <vector>
 #include <algorithm>

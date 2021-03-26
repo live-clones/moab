@@ -164,7 +164,7 @@
 #define IBASE_MINENUM( enumName )    enumName##_MIN
 #define IBASE_MAXENUM( enumName )    enumName##_MAX
 #define IBASE_NUMENUM( enumName )    ( (int)IBASE_MAXENUM( enumName ) - (int)IBASE_MINENUM( enumName ) + 1 )
-#define IBASE_INCENUM( enumName, I ) ( I = ( enum enumName )( (int)I + 1 ) )
+#define IBASE_INCENUM( enumName, I ) ( (I) = ( enum (enumName) )( (int)(I) + 1 ) )
 /** @} */
 
 #ifdef __cplusplus

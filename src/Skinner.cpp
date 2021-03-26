@@ -26,8 +26,8 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include <math.h>
-#include <assert.h>
+#include <cmath>
+#include <cassert>
 #include <iostream>
 #include "moab/Util.hpp"
 #include "Internals.hpp"

@@ -61,7 +61,7 @@
 
 #include <limits>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 /*! \file Mesquite.hpp
  */

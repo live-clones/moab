@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <ctype.h>
+#include <cctype>
 #include <map>
 
 namespace moab

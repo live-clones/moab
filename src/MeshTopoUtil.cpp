@@ -23,7 +23,7 @@
 #include "moab/Interface.hpp"
 #include "moab/CN.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 #define RR                                        \
     {                                             \
@@ -596,10 +596,10 @@ ErrorCode MeshTopoUtil::split_entities_manifold( EntityHandle* entities, const i
     // most two higher-dimension entities bounded by a given entity; after split, the
     // new entity bounds one and the original entity bounds the other
 
-#define ITERATE_RANGE( range, it ) for( Range::iterator it = range.begin(); it != range.end(); ++it )
+#define ITERATE_RANGE( range, it ) for( Range::iterator it = (range).begin(); (it) != (range).end(); ++(it) )
 #define GET_CONNECT_DECL( ent, connect, num_connect )                                     \
     const EntityHandle* connect = NULL;                                                   \
-    int num_connect             = 0;                                                      \
+    int (num_connect)             = 0;                                                      \
     {                                                                                     \
         ErrorCode connect_result = mbImpl->get_connectivity( ent, connect, num_connect ); \
         if( MB_SUCCESS != connect_result ) return connect_result;                         \

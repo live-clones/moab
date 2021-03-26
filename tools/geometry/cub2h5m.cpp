@@ -11,7 +11,7 @@
 #include <limits>
 #include <cstdlib>
 #include <sstream>
-#include <time.h>
+#include <ctime>
 
 #define GF_CUBIT_FILE_TYPE    "CUBIT"
 #define GF_STEP_FILE_TYPE     "STEP"
@@ -321,7 +321,7 @@ ErrorCode build_new_surface( Interface* MBI, EntityHandle& new_surf, const Entit
 
 // Given a face, orient it outward wrt its adjacent mesh element.
 // Each face must be adjacent to exactly one mesh element.
-ErrorCode orient_faces_outward( Interface* MBI, const Range faces, const bool /*debug*/ )
+ErrorCode orient_faces_outward( Interface* MBI, const Range& faces, const bool /*debug*/ )
 {
 
     ErrorCode result;

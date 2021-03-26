@@ -48,7 +48,7 @@ namespace MBMesquite
  * file/line onto the stack trace if the error flag is true.  Returns
  * false otherwise.
  */
-#define MSQ_CHKERR( err ) ( err.error() && err.push( MSQ_FUNCTION, __FILE__, __LINE__ ) )
+#define MSQ_CHKERR( err ) ( ( err ).error() && ( err ).push( MSQ_FUNCTION, __FILE__, __LINE__ ) )
 
 /**\brief If passed error is true, return from a void function.
  *
@@ -232,10 +232,11 @@ class MsqError
     ErrorCode errorCode;
     std::string errorMessage;
     StackTrace stackTrace;
-};
+};  // class MsqError
 
 //! Print message and stack trace
-MESQUITE_EXPORT std::ostream& operator<<( std::ostream&, const MsqError& );
+MESQUITE_EXPORT std::ostream&
+    operator<<( std::ostream&, const MsqError& );
 //! Print MsqError::Trace
 MESQUITE_EXPORT std::ostream& operator<<( std::ostream&, const MsqError::Trace& );
 

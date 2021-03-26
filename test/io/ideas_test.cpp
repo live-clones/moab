@@ -4,7 +4,7 @@
 #define IS_BUILDING_MB
 #include "ReadIDEAS.hpp"
 #include "moab/Range.hpp"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 using namespace moab;

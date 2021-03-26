@@ -2,12 +2,12 @@
 #include "moab/CartVect.hpp"
 #include "moab/OrientedBox.hpp"
 #include "moab/OrientedBoxTreeTool.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <cmath>
-#include <time.h>
-#include <signal.h>
-#include <assert.h>
+#include <ctime>
+#include <csignal>
+#include <cassert>
 
 const int NUM_RAYS = 40000;
 const int NUM_XSCT = 20000;

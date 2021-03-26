@@ -34,12 +34,13 @@
 #include "MeshInterface.hpp"
 #include "MsqDebug.hpp"
 #include "MsqVertex.hpp"
-#include <assert.h>
+#include <cassert>
 #include "MsqIBase.hpp"
 #include <algorithm>
 
 #ifdef IMESH_MAJOR_VERSION
-#define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) 1000 * IMESH_MAJOR_VERSION + IMESH_MINOR_VERSION <= 1000 * MAJOR + MINOR
+#define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) \
+    ( 1000 * IMESH_MAJOR_VERSION + IMESH_MINOR_VERSION <= 1000 * ( MAJOR ) + ( MINOR ) )
 #else
 #define IMESH_VERSION_ATLEAST( MAJOR, MINOR ) 0
 #endif

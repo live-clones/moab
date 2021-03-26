@@ -4,7 +4,7 @@
 #include "moab/HomXform.hpp"
 #include "moab/ReadUtilIface.hpp"
 #include "TestUtil.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 #include <algorithm>
 
 void test_coords_connect_iterate();

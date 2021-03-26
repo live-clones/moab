@@ -31,8 +31,8 @@ using std::cout;
 using std::endl;
 using std::ostream;
 #include <memory>
-using std::auto_ptr;
-#include <ctype.h>
+using std::unique_ptr;
+#include <cctype>
 
 #include "MeshImpl.hpp"
 #include "MsqError.hpp"
@@ -118,9 +118,9 @@ static int do_smoother( const char* input_file, const char* output_file, const c
     cout << metrics[metric_idx].n << endl;
     cout << "Of Power:    " << of_power << endl;
 
-    auto_ptr< TargetCalculator > tc;
-    auto_ptr< MeshImpl > ref_mesh_impl;
-    auto_ptr< ReferenceMesh > ref_mesh;
+    unique_ptr< TargetCalculator > tc;
+    unique_ptr< MeshImpl > ref_mesh_impl;
+    unique_ptr< ReferenceMesh > ref_mesh;
     if( ref_mesh_file )
     {
         ref_mesh_impl.reset( new MeshImpl );

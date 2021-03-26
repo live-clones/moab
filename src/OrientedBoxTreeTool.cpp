@@ -29,8 +29,8 @@
 #include <iomanip>
 #include <algorithm>
 #include <limits>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 //#define MB_OBB_USE_VECTOR_QUERIES
 //#define MB_OBB_USE_TYPE_QUERIES

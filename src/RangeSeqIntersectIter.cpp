@@ -21,7 +21,7 @@
 #include "RangeSeqIntersectIter.hpp"
 #include "SequenceManager.hpp"
 #include "EntitySequence.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

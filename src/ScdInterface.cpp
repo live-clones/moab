@@ -11,15 +11,15 @@
 #include "moab/TupleList.hpp"
 #include "moab/gs.hpp"
 #endif
-#include "assert.h"
+#include <cassert>
 #include <iostream>
 #include <functional>
 
 #define ERRORR( rval, str )      \
     {                            \
-        if( MB_SUCCESS != rval ) \
+        if( MB_SUCCESS != (rval) ) \
         {                        \
-            std::cerr << str;    \
+            std::cerr << (str);    \
             return rval;         \
         }                        \
     }

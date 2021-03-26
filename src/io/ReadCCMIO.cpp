@@ -1,4 +1,4 @@
-#include <stdlib.h>  // For exit()
+#include <cstdlib>  // For exit()
 #include <vector>
 #include <map>
 #include <iostream>
@@ -77,10 +77,11 @@ static char const kUnitsName[]    = "Units";
 static int const kVertOffset      = 2;
 static int const kCellInc         = 4;
 
-#define CHK_SET_CCMERR( ccm_err_code, ccm_err_msg )                                                             \
-    {                                                                                                           \
-        if( kCCMIONoErr != ccm_err_code && kCCMIONoFileErr != ccm_err_code && kCCMIONoNodeErr != ccm_err_code ) \
-            MB_SET_ERR( MB_FAILURE, ccm_err_msg );                                                              \
+#define CHK_SET_CCMERR( ccm_err_code, ccm_err_msg )                                   \
+    {                                                                                 \
+        if( kCCMIONoErr != ( ccm_err_code ) && kCCMIONoFileErr != ( ccm_err_code ) && \
+            kCCMIONoNodeErr != ( ccm_err_code ) )                                     \
+            MB_SET_ERR( MB_FAILURE, ccm_err_msg );                                    \
     }
 
 ReaderIface* ReadCCMIO::factory( Interface* iface )

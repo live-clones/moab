@@ -8,17 +8,17 @@
 #include "IdealWeightInverseMeanRatio.hpp"
 #include "PMeanPTemplate.hpp"
 #include "TerminationCriterion.hpp"
-#include <assert.h>
+#include <cassert>
 
 #include "domain.hpp"
 
 #include <iostream>
 #include <iomanip>
 #include <memory>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
 
 using namespace MBMesquite;
 
@@ -83,7 +83,7 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
     grad[0] /= grad[0].length();
 
     PatchDataVerticesMemento* memento = pd.create_vertices_memento( err );MSQ_ERRRTN( err );
-    std::auto_ptr< PatchDataVerticesMemento > deleter( memento );
+    std::unique_ptr< PatchDataVerticesMemento > deleter( memento );
     pd.get_minmax_edge_length( junk, coeff );
 
     for( int i = 0; i < 100; ++i )

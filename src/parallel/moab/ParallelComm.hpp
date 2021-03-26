@@ -25,9 +25,9 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <assert.h>
-#include <stdlib.h>
-#include "math.h"
+#include <cassert>
+#include <cstdlib>
+#include <cmath>
 #include "moab/TupleList.hpp"
 
 namespace moab

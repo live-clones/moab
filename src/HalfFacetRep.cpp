@@ -16,7 +16,7 @@
 #include "moab/HalfFacetRep.hpp"
 #include "Internals.hpp"
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <map>
 #include "MBTagConventions.hpp"
@@ -3042,7 +3042,7 @@ ErrorCode HalfFacetRep::get_down_adjacencies_face_3d( EntityHandle cid, std::vec
     return MB_SUCCESS;
 }
 ////////////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::find_total_edges_faces_3d( Range cells, int* nedges, int* nfaces )
+ErrorCode HalfFacetRep::find_total_edges_faces_3d( const Range& cells, int* nedges, int* nfaces )
 {
     ErrorCode error;
     int index       = get_index_in_lmap( *cells.begin() );

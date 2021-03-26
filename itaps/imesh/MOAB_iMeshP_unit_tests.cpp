@@ -4,11 +4,11 @@
 #include <algorithm>
 #include <vector>
 #include <sstream>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 #include <map>
-#include <string.h>
-#include <stdio.h>  // remove()
+#include <cstring>
+#include <cstdio>  // remove()
 
 #if !defined( _MSC_VER ) && !defined( __MINGW32__ )
 #include <unistd.h>
@@ -381,7 +381,7 @@ static int get_coords( iMesh_Instance imesh, const iBase_EntityHandle* verts, in
                               Main Method
  **************************************************************************/
 
-#define RUN_TEST( A ) run_test( &A, #A )
+#define RUN_TEST( A ) run_test( &(A), #A )
 
 int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartMap& ), const char* func_name )
 {

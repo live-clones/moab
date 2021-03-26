@@ -84,7 +84,7 @@ int main( int argc, char** argv )
     rval = mb->get_entities_by_dimension( 0, dim, elems );MB_CHK_ERR( rval );
 
 #define MYSTREAM( a ) \
-    if( !rank ) cout << a << endl
+    if( !rank ) cout << ( a ) << endl
 
     if( pow( N, dim ) == (int)elems.size() && pow( N + 1, dim ) == (int)verts.size() )
     {  // Expected #e and #v are N^d and (N+1)^d, resp.

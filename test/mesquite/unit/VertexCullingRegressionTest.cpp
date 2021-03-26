@@ -50,7 +50,7 @@ Regression testing using the vertex culling algorithms.
 
 #include "PatchDataInstances.hpp"
 #include "cppunit/extensions/HelperMacros.h"
-#include <math.h>
+#include <cmath>
 
 #include "Mesquite.hpp"
 #include "MsqError.hpp"

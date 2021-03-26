@@ -28,7 +28,7 @@
 // -*-
 //
 
-#include <stdio.h>
+#include <cstdio>
 static bool create_exodus_file( const char* filename );
 
 #undef DEBUG

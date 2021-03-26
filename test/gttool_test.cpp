@@ -14,9 +14,9 @@
 #include "moab/Core.hpp"
 #include <iostream>
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstring>
+#include <cstdio>
 
 #include "TestUtil.hpp"
 #include "moab/GeomTopoTool.hpp"

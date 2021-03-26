@@ -52,11 +52,11 @@ extern "C" {
 
 #define CHKERRVAL( ierr )                        \
     {                                            \
-        if( moab::MB_SUCCESS != ierr ) return 1; \
+        if( moab::MB_SUCCESS != (ierr) ) return 1; \
     }
 #define CHKIERRVAL( ierr )        \
     {                             \
-        if( 0 != ierr ) return 1; \
+        if( 0 != (ierr) ) return 1; \
     }
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -401,6 +401,27 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     return 0;
 }
 
+// Utility function
+static void split_tag_names( std::string input_names, std::string& separator,
+                             std::vector< std::string >& list_tag_names )
+{
+    size_t pos = 0;
+    std::string token;
+    while( ( pos = input_names.find( separator ) ) != std::string::npos )
+    {
+        token = input_names.substr( 0, pos );
+        list_tag_names.push_back( token );
+        // std::cout << token << std::endl;
+        input_names.erase( 0, pos + separator.length() );
+    }
+    if( !input_names.empty() )
+    {
+        // if leftover something, or if not ended with delimiter
+        list_tag_names.push_back( input_names );
+    }
+    return;
+}
+
 ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
                               int* num_dimension, int* num_parts, int filename_length )
 {
@@ -576,14 +597,14 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
             }
         }
     }
-
+#else
+    assert( num_ghost_layers == nullptr );
 #endif
 
     // Now let us actually load the MOAB file with the appropriate read options
     ErrorCode rval = context.MBI->load_file( filename, &context.appDatas[*pid].file_set, newopts.str().c_str() );CHKERRVAL( rval );
 
 #ifdef VERBOSE
-
     // some debugging stuff
     std::ostringstream outfile;
 #ifdef MOAB_HAVE_MPI
@@ -596,10 +617,10 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
     // the mesh contains ghosts too, but they are not part of mat/neumann set
     // write in serial the file, to see what tags are missing
     rval = context.MBI->write_file( outfile.str().c_str() );CHKERRVAL( rval );  // everything on current task, written in serial
-
 #endif
-    int rc = iMOAB_UpdateMeshInfo( pid );
-    return rc;
+
+    // Update mesh information
+    return iMOAB_UpdateMeshInfo( pid );
 }
 
 ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int filename_length,
@@ -1705,26 +1726,6 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
     if( NULL != num_global_elems ) { *num_global_elems = data.num_global_elements; }
 
     return 0;
-}
-
-static void split_tag_names( std::string input_names, std::string& separator,
-                             std::vector< std::string >& list_tag_names )
-{
-    size_t pos = 0;
-    std::string token;
-    while( ( pos = input_names.find( separator ) ) != std::string::npos )
-    {
-        token = input_names.substr( 0, pos );
-        list_tag_names.push_back( token );
-        // std::cout << token << std::endl;
-        input_names.erase( 0, pos + separator.length() );
-    }
-    if( !input_names.empty() )
-    {
-        // if leftover something, or if not ended with delimiter
-        list_tag_names.push_back( input_names );
-    }
-    return;
 }
 
 #ifdef MOAB_HAVE_MPI

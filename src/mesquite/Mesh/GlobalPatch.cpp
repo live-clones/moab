@@ -35,7 +35,7 @@
 #include "GlobalPatch.hpp"
 #include "MeshInterface.hpp"
 #include "MsqError.hpp"
-#include <assert.h>
+#include <cassert>
 
 namespace MBMesquite
 {

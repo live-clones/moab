@@ -53,7 +53,7 @@
 #include <fstream>
 #include <iomanip>
 #include <set>
-#include <math.h>
+#include <cmath>
 
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>

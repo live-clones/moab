@@ -15,8 +15,8 @@
 #include "moab/CN.hpp"
 
 #include <cstdio>
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <map>
 #include <set>
 

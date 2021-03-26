@@ -40,8 +40,8 @@ ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_pa
 ErrorCode evaluate_element_sequence( ScdBox* this_box );
 ErrorCode eseq_test1a( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
 ErrorCode eseq_test1b( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
-ErrorCode eseq_test1c( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
-ErrorCode eseq_test2a( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
+ErrorCode eseq_test1c( ScdInterface* scdi, const HomCoord& tmp_min, const HomCoord& tmp_max );
+ErrorCode eseq_test2a( ScdInterface* scdi, const HomCoord& tmp_min, const HomCoord& tmp_max );
 ErrorCode eseq_test2b( ScdInterface* scdi );
 ErrorCode eseq_test2c( ScdInterface* scdi );
 ErrorCode eseq_test2d( ScdInterface* scdi );
@@ -395,7 +395,7 @@ ErrorCode eseq_test1b( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max )
     return result;
 }
 
-ErrorCode eseq_test1c( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max )
+ErrorCode eseq_test1c( ScdInterface* scdi, const HomCoord& tmp_min, const HomCoord& tmp_max )
 {
     // TEST 1c: 3d single vertex seq block, min/max = (-10,-5,-1)/(10,5,1)
 
@@ -421,7 +421,7 @@ ErrorCode eseq_test1c( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max )
     return result;
 }
 
-ErrorCode eseq_test2a( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max )
+ErrorCode eseq_test2a( ScdInterface* scdi, const HomCoord& tmp_min, const HomCoord& tmp_max )
 {
     // TEST 2a: 1d composite block, 0d difference between owning/sharing blocks
     // create vertex seq
@@ -1212,9 +1212,9 @@ ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method )
                         if( facedims_a[ind] != facedims_b[ind] || rdims_b[ind] != ldims[ind] ) fail = true;
                     }
                     if( across_bdy_a[0] != across_bdy_b[0] || across_bdy_a[1] != across_bdy_b[1] ) fail = true;
-#define PARRAY( a )        "(" << a[0] << "," << a[1] << "," << a[2] << ")"
-#define PARRAY3( a, b, c ) "(" << a << "," << b << "," << c << ")"
-#define PARRAY6( a )       PARRAY( a ) << "-" << PARRAY( ( a + 3 ) )
+#define PARRAY( a )        "(" << (a)[0] << "," << (a)[1] << "," << (a)[2] << ")"
+#define PARRAY3( a, b, c ) "(" << (a) << "," << (b) << "," << (c) << ")"
+#define PARRAY6( a )       PARRAY( a ) << "-" << PARRAY( ( (a) + 3 ) )
                     if( fail )
                     {
                         fails++;

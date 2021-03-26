@@ -8,7 +8,7 @@
 #include <sstream>
 #include <limits>
 #include <string>
-#include <time.h>
+#include <ctime>
 
 #include "moab_mpi.h"
 

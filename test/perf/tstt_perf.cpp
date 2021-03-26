@@ -31,8 +31,8 @@ extern "C" int getrusage( int, struct rusage* );
 #endif
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 
 //-------------------------------------------------------
@@ -50,7 +50,7 @@ extern "C" int getrusage( int, struct rusage* );
     TSTT::iface var_out;                                                   \
     try                                                                    \
     {                                                                      \
-        var_out = var_in;                                                  \
+        ( var_out ) = var_in;                                              \
     }                                                                      \
     catch( TSTT::Error )                                                   \
     {                                                                      \
@@ -62,7 +62,7 @@ extern "C" int getrusage( int, struct rusage* );
     TSTTM::iface var_out;                                                  \
     try                                                                    \
     {                                                                      \
-        var_out = var_in;                                                  \
+        ( var_out ) = var_in;                                              \
     }                                                                      \
     catch( TSTT::Error )                                                   \
     {                                                                      \
@@ -79,13 +79,13 @@ typedef void* Entity_Handle;
 
 using namespace std;
 
-#define ARRAY_PTR( array, type )  reinterpret_cast< type* >( array._get_ior()->d_firstElement )
-#define HANDLE_ARRAY_PTR( array ) reinterpret_cast< Entity_Handle* >( array._get_ior()->d_firstElement )
-#define ARRAY_SIZE( array )       ( array._is_nil() ? 0 : array.upper( 0 ) - array.lower( 0 ) + 1 )
+#define ARRAY_PTR( array, type )  ( reinterpret_cast< ( type )* >( ( array )._get_ior()->d_firstElement ) )
+#define HANDLE_ARRAY_PTR( array ) ( reinterpret_cast< Entity_Handle* >( ( array )._get_ior()->d_firstElement ) )
+#define ARRAY_SIZE( array )       ( ( array )._is_nil() ? 0 : ( array ).upper( 0 ) - ( array ).lower( 0 ) + 1 )
 #define CHECK_SIZE( array, size )                                     \
-    if( array._is_nil() || ARRAY_SIZE( array ) == 0 )                 \
-        array = array.create1d( size );                               \
-    else if( ARRAY_SIZE( array ) < size )                             \
+    if( ( array )._is_nil() || ARRAY_SIZE( array ) == 0 )             \
+        ( array ) = ( array ).create1d( size );                       \
+    else if( ARRAY_SIZE( array ) < ( size ) )                         \
     {                                                                 \
         cerr << "Array passed in is non-zero but too short." << endl; \
         assert( false );                                              \
@@ -237,7 +237,7 @@ void testC( TSTTM::Mesh& mesh, const int nelem, sidl::array< double >& coords )
     int numv      = nelem + 1;
     int numv_sq   = numv * numv;
     int num_verts = numv * numv * numv;
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( ( i ) + ( (j)*numv ) + ( (k)*numv_sq ) )
 
     // array to hold vertices created individually
     sidl::array< Entity_Handle > sidl_vertices;
@@ -527,7 +527,7 @@ void build_coords( const int nelem, sidl::array< double >& coords )
     double* coords_ptr = ARRAY_PTR( coords, double );
 
 // use FORTRAN-like indexing
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( ( i ) + ( (j)*numv ) + ( (k)*numv_sq ) )
     int idx;
     double scale1, scale2, scale3;
     // use these to prevent optimization on 1-scale, etc (real map wouldn't have

@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <assert.h>
+#include <cassert>
 
 #undef MB_DEBUG
 

@@ -54,7 +54,7 @@ Unit testing of various functions in the MsqMeshEntity class.
 #include "Vector3D.hpp"
 #include "PatchData.hpp"
 #include "PatchDataInstances.hpp"
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include "UnitUtil.hpp"

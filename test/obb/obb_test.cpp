@@ -13,7 +13,7 @@
 #include "../TestUtil.hpp"
 #include <iostream>
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <limits>
 #include <cstdio>
 #include <set>

@@ -1,5 +1,5 @@
 #include <vector>
-#include <assert.h>
+#include <cassert>
 #include "moab/Matrix3.hpp"
 #include "moab/Core.hpp"
 #include "moab/CartVect.hpp"

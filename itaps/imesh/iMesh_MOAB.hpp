@@ -97,7 +97,7 @@ static inline bool iMesh_isError( ErrorCode code )
 // is invoked.
 #define ALLOC_CHECK_ARRAY( array, this_size )                                                                 \
     iMeshArrayManager array##_manager( instance, reinterpret_cast< void** >( array ), *( array##_allocated ), \
-                                       *( array##_size ), this_size, sizeof( **array ), err );                \
+                                       *( array##_size ), this_size, sizeof( **(array) ), err );                \
     if( iBase_SUCCESS != *err ) return
 
 #define ALLOC_CHECK_TAG_ARRAY( array, this_size )                                                             \

@@ -20,7 +20,7 @@
 #include <fstream>
 #include <vector>
 #include <cstdlib>
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 
 #include "moab/Interface.hpp"

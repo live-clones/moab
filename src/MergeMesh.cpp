@@ -14,7 +14,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace moab
 {

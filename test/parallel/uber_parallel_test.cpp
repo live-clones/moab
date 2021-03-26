@@ -10,7 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
-#include <assert.h>
+#include <cassert>
 #if !defined( _MSC_VER ) && !defined( __MINGW32__ )
 #include <unistd.h>
 #endif
@@ -39,7 +39,7 @@ ErrorCode report_error( const char* file, int line )
 
 ErrorCode test_read( const char* filename, const char* option );
 
-#define RUN_TEST_ARG3( A, B, C ) run_test( &A, #A, B, C )
+#define RUN_TEST_ARG3( A, B, C ) run_test( &( A ), #A, B, C )
 
 int is_any_proc_error( int is_my_error )
 {

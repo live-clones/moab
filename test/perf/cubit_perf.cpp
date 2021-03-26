@@ -27,8 +27,8 @@ extern "C" int getrusage( int, struct rusage* );
 #endif
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include "CubitNode.hpp"
 #include "NodeHex.hpp"
@@ -53,7 +53,7 @@ void build_coords( const int nelem, double*& coords )
 
     double scale = LENGTH / nelem;
 // use FORTRAN-like indexing
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( ( i ) + ( (j)*numv ) + ( (k)*numv_sq ) )
 
     int idx;
     for( int i = 0; i < numv; i++ )

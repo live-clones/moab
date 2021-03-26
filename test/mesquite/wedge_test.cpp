@@ -33,7 +33,7 @@
 #include <iostream>
 using std::cout;
 using std::endl;
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Mesquite.hpp"
 #include "MeshImpl.hpp"
@@ -62,47 +62,47 @@ using namespace MBMesquite;
             std::cout << "Assertion Failed: " << #A << std::endl; \
             std::cout << "  File: " << __FILE__ << std::endl;     \
             std::cout << "  Line: " << __LINE__ << std::endl;     \
-            return true;                                          \
+            return 1;                                             \
         }                                                         \
     } while( false )
 
-#define CPPUNIT_ASSERT_DOUBLES_EQUAL( E, V, T )                                   \
-    do                                                                            \
-    {                                                                             \
-        if( fabs( E - V ) > T )                                                   \
-        {                                                                         \
-            std::cout << "Assertion Failed: " << #V << " == " << #E << std::endl; \
-            std::cout << "Expected: " << E << "  Got: " << V << std::endl;        \
-            std::cout << "  File: " << __FILE__ << std::endl;                     \
-            std::cout << "  Line: " << __LINE__ << std::endl;                     \
-            return true;                                                          \
-        }                                                                         \
+#define CPPUNIT_ASSERT_DOUBLES_EQUAL( E, V, T )                                    \
+    do                                                                             \
+    {                                                                              \
+        if( fabs( ( E ) - ( V ) ) > ( T ) )                                        \
+        {                                                                          \
+            std::cout << "Assertion Failed: " << #V << " == " << #E << std::endl;  \
+            std::cout << "Expected: " << ( E ) << "  Got: " << ( V ) << std::endl; \
+            std::cout << "  File: " << __FILE__ << std::endl;                      \
+            std::cout << "  Line: " << __LINE__ << std::endl;                      \
+            return 1;                                                              \
+        }                                                                          \
     } while( false )
 
-#define CPPUNIT_ASSERT_EQUAL( E, V )                                              \
-    do                                                                            \
-    {                                                                             \
-        if( E != V )                                                              \
-        {                                                                         \
-            std::cout << "Assertion Failed: " << #V << " == " << #E << std::endl; \
-            std::cout << "Expected: " << E << "  Got: " << V << std::endl;        \
-            std::cout << "  File: " << __FILE__ << std::endl;                     \
-            std::cout << "  Line: " << __LINE__ << std::endl;                     \
-            return true;                                                          \
-        }                                                                         \
+#define CPPUNIT_ASSERT_EQUAL( E, V )                                               \
+    do                                                                             \
+    {                                                                              \
+        if( ( E ) != ( V ) )                                                       \
+        {                                                                          \
+            std::cout << "Assertion Failed: " << #V << " == " << #E << std::endl;  \
+            std::cout << "Expected: " << ( E ) << "  Got: " << ( V ) << std::endl; \
+            std::cout << "  File: " << __FILE__ << std::endl;                      \
+            std::cout << "  Line: " << __LINE__ << std::endl;                      \
+            return 1;                                                              \
+        }                                                                          \
     } while( false )
 
-#define CPPUNIT_ASSERT_VECTORS_EQUAL( E, V, T )                                   \
-    do                                                                            \
-    {                                                                             \
-        if( !E.within_tolerance_box( V, T ) )                                     \
-        {                                                                         \
-            std::cout << "Assertion Failed: " << #V << " == " << #E << std::endl; \
-            std::cout << "Expected: " << E << "  Got: " << V << std::endl;        \
-            std::cout << "  File: " << __FILE__ << std::endl;                     \
-            std::cout << "  Line: " << __LINE__ << std::endl;                     \
-            return true;                                                          \
-        }                                                                         \
+#define CPPUNIT_ASSERT_VECTORS_EQUAL( E, V, T )                                    \
+    do                                                                             \
+    {                                                                              \
+        if( !( E ).within_tolerance_box( V, T ) )                                  \
+        {                                                                          \
+            std::cout << "Assertion Failed: " << #V << " == " << #E << std::endl;  \
+            std::cout << "Expected: " << ( E ) << "  Got: " << ( V ) << std::endl; \
+            std::cout << "  File: " << __FILE__ << std::endl;                      \
+            std::cout << "  Line: " << __LINE__ << std::endl;                      \
+            return 1;                                                              \
+        }                                                                          \
     } while( false )
 
 // Given a mesh with a single free vertex located at the origin,

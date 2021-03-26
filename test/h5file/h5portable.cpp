@@ -13,7 +13,7 @@
 #include "MBTagConventions.hpp"
 #include "moab/FileOptions.hpp"
 #include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
 #include <limits>

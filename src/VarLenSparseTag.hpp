@@ -36,7 +36,7 @@
 
 #include "TagInfo.hpp"
 #include "VarLenTag.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace moab
 {

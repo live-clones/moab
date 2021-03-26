@@ -1,7 +1,7 @@
 #include "moab/DiscreteGeometry/DGMSolver.hpp"
 #include "moab/ErrorHandler.hpp"
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <limits>
 #include <cmath>

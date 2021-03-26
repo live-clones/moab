@@ -5,7 +5,7 @@
 #include "Internals.hpp"
 #include <algorithm>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 
 namespace moab
 {

@@ -29,8 +29,8 @@
 #include "MBParallelConventions.h"
 #include "moab/CN.hpp"
 
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 #include <map>
 #include <set>
 #include <iostream>
@@ -38,7 +38,7 @@
 #define CHECK( a )                   \
     if( MB_SUCCESS != result )       \
     {                                \
-        std::cerr << a << std::endl; \
+        std::cerr << (a) << std::endl; \
         return result;               \
     }
 

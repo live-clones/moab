@@ -16,12 +16,12 @@ extern "C" int getrusage( int, struct rusage* );
 #endif
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include "iMesh.h"
 
 // needed to get the proper size for handles
@@ -205,7 +205,7 @@ void testC( iMesh_Instance mesh, const int nelem, const double* coords )
     int numv      = nelem + 1;
     int numv_sq   = numv * numv;
     int num_verts = numv * numv * numv;
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( (i) + ( (j) * numv ) + ( (k) * numv_sq ) )
 
     // array to hold vertices created individually
     iBase_EntityHandle* sidl_vertices = (iBase_EntityHandle*)malloc( num_verts * sizeof( iBase_EntityHandle ) );
@@ -489,7 +489,7 @@ void build_coords( const int nelem, double*& coords )
     coords       = (double*)malloc( 3 * tot_numv * sizeof( double ) );
 
 // use FORTRAN-like indexing
-#define VINDEX( i, j, k ) ( i + ( j * numv ) + ( k * numv_sq ) )
+#define VINDEX( i, j, k ) ( (i) + ( (j) * numv ) + ( (k) * numv_sq ) )
     int idx;
     double scale1, scale2, scale3;
     // use these to prevent optimization on 1-scale, etc (real map wouldn't have

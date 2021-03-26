@@ -16,11 +16,11 @@
 // MOAB performance tests building mapped mesh with nodes and
 // hexes created one at a time.  This also creates the node to hex adjacencies.
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <iomanip>
-#include <time.h>
-#include <assert.h>
+#include <ctime>
+#include <cassert>
 #include <list>
 #include "moab/Core.hpp"
 #include "moab/Skinner.hpp"

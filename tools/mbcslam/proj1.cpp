@@ -8,10 +8,10 @@
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include "moab/IntxMesh/IntxUtils.hpp"
-#include <assert.h>
+#include <cassert>
 using namespace moab;
 
 double radius = 1.;  // in m:  6371220.

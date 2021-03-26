@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <iosfwd>
-#include <float.h>
+#include <cfloat>
 
 namespace moab
 {

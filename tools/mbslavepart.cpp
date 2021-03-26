@@ -38,11 +38,12 @@ static V get_map_value( const std::map< K, V >& m, const K& key, const V& defval
 
 int main( int argc, char* argv[] )
 {
-    int proc_id = 0, size = 1, dimension = 3;
+    int nprocs = 1, dimension = 3;
 #ifdef MOAB_HAVE_MPI
+    int proc_id = 0;
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
-    MPI_Comm_size( MPI_COMM_WORLD, &size );
+    MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
 #endif
 
     int defaultpart  = 0;
@@ -85,7 +86,7 @@ int main( int argc, char* argv[] )
     std::vector< std::string > read_opts, write_opts;
     std::string read_options( "" ), write_options( "" );
 
-    if( size > 1 )
+    if( nprocs > 1 )
     {
         read_options  = "PARALLEL=READ_PART;PARTITION=" + partition_set_name + ";PARALLEL_RESOLVE_SHARED_ENTS";
         write_options = "PARALLEL=WRITE_PART";
@@ -342,7 +343,7 @@ int main( int argc, char* argv[] )
         // mbCore->print_database();
 
         // Write the re-partitioned slave mesh to disk
-        if( size == 1 )
+        if( nprocs == 1 )
         {
             error = mbCore->write_file( "slavemesh.vtk", "VTK", NULL, &slavefileset, 1 );MB_CHK_ERR( error );
         }

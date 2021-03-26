@@ -11,7 +11,7 @@
 #include <moab_mpi.h>
 #endif
 
-#include <stdlib.h>  // for size_t
+#include <cstdlib>  // for size_t
 #include <H5Ipublic.h>
 #include <H5Spublic.h>
 

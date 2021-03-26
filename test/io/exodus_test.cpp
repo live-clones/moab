@@ -7,7 +7,7 @@
 #include "moab/FileOptions.hpp"
 #define IS_BUILDING_MB
 #include "ExoIIUtil.hpp"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 using namespace moab;

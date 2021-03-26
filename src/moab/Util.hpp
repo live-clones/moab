@@ -20,7 +20,7 @@
 #include "moab/Forward.hpp"
 #include "moab/CartVect.hpp"
 
-#include <math.h>
+#include <cmath>
 #if defined MOAB_HAVE_ISFINITE
 #define moab_isfinite( f ) isfinite( f )
 #elif defined MOAB_HAVE_STDISFINITE
