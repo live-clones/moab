@@ -631,16 +631,17 @@ AC_DEFUN([RECURSIVE_COPY_DIR_SYMLINKS],
 m4_define([AC_FIND_ABSPATH], ["`perl -e 'use Cwd "abs_path";print abs_path(shift)' $1 | xargs dirname`"])
 
 
-# Finds the parent path of a file or directory
-# PREFIX_PRINT(PATH TO A FILE OR DIR)
+# Print the given text with a prefix defined by PPREFIX
+# PREFIX_PRINT(Text to print)
 # ------------------------
 m4_define([PREFIX_PRINT], 
 [_AS_ECHO_LOG([[[ $PPREFIX ]] --   $1 ]);
   AS_ECHO(["[[ $PPREFIX ]] --   $1 "])])
 
 
-# Finds the parent path of a file or directory
-# PREFIX_PRINTN(PATH TO A FILE OR DIR)
+# Print the given text with a prefix defined by PPREFIX
+# Note: Uses echo_n and so there is no newline in the end
+# PREFIX_PRINTN(Text to print)
 # ------------------------
 m4_define([PREFIX_PRINTN], 
 [_AS_ECHO_LOG([[[ $PPREFIX ]] --   $1 ]);

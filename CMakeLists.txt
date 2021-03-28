@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.5 )
 SET(PACKAGE_NAME "MOAB")
 SET(PACKAGE_VERSION "5.2.1")
 
@@ -24,6 +24,7 @@ endif()
 project( MOAB )
 
 include(GNUInstallDirs)
+include(FeatureSummary)
 
 #Add our Cmake directory to the module search path
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/config ${CMAKE_MODULE_PATH})
@@ -126,6 +127,9 @@ option ( ENABLE_BLASLAPACK   "Should require BLAS/LAPACK?" ON )
 option ( ENABLE_FORTRAN      "Should enable FORTRAN?" ON )
 option ( ENABLE_TEMPESTREMAP "Should enable TempestRemap dependency?" OFF )
 
+add_feature_info(SharedLibs BUILD_SHARED_LIBS "Should shared or static libraries be created?")
+add_feature_info(EnableFortran ENABLE_FORTRAN "Should FORTRAN support be enabled?")
+
 mark_as_advanced(
   MOAB_FORCE_64_BIT_HANDLES
   MOAB_FORCE_32_BIT_HANDLES
@@ -216,12 +220,19 @@ if ( ENABLE_BLASLAPACK  )
   if (BLAS_FOUND)
     set(MOAB_HAVE_BLAS ON)
   endif(BLAS_FOUND)
+  set_package_properties(BLAS PROPERTIES
+                       TYPE RECOMMENDED
+                       PURPOSE "Native BLAS implementations")
 
   # Find LAPACK
   FIND_PACKAGE(LAPACK REQUIRED)
   if (LAPACK_FOUND)
     set(MOAB_HAVE_LAPACK ON)
   endif(LAPACK_FOUND)
+
+  set_package_properties(LAPACK PROPERTIES
+                       TYPE RECOMMENDED
+                       PURPOSE "Native LAPACK implementations")
 
 endif (ENABLE_BLASLAPACK)
 
@@ -232,11 +243,19 @@ if ( LAPACK_FOUND )
   # Eigen3 is optional if LAPACK has been found
   FIND_PACKAGE(Eigen3 OPTIONAL_COMPONENTS)
 
+  set_package_properties(Eigen3 PROPERTIES
+                       TYPE RECOMMENDED
+                       PURPOSE "Eigen3 headers as supplement to BLAS/LAPACK implementations")
+
 else ( LAPACK_FOUND )
     
   # Find Eigen3 is required if LAPACK is not found (or requested)
   FIND_PACKAGE(Eigen3 REQUIRED)
-  
+ 
+  set_package_properties(Eigen3 PROPERTIES
+                        TYPE REQUIRED
+                       PURPOSE "Eigen3 headers as replacement for BLAS/LAPACK implementations")
+
 endif ( LAPACK_FOUND )
 
 set (MOAB_HAVE_EIGEN3 OFF CACHE INTERNAL "Configured MOAB with Eigen3 library support." )
@@ -245,8 +264,6 @@ if ( EIGEN3_FOUND )
   SET(MOAB_DEFINES "${MOAB_DEFINES} ${EIGEN3_INCLUDES}")
   SET(MOAB_HAVE_EIGEN3 ON)
 endif (EIGEN3_FOUND)
-
-find_package( verdict REQUIRED )
 
 # check for MPI package
 set (MOAB_HAVE_MPI OFF CACHE INTERNAL "Found necessary MPI components. Configure MOAB with it." )
@@ -280,6 +297,11 @@ if ( ENABLE_MPI )
     foreach (var C_COMPILER CXX_COMPILER BINDIR ROOTDIR INCLUDE_PATH LIBRARY)
       message(STATUS "    [VAR]: MPI_${var} = ${MPI_${var}}.")
     endforeach ()
+
+    set_package_properties(MPI PROPERTIES
+                       TYPE RECOMMENDED
+                       PURPOSE "MPI library to enable node-level parallelism")
+
   endif ( MPI_FOUND )
 endif ( ENABLE_MPI )
 
@@ -305,12 +327,14 @@ if ( ENABLE_HDF5 )
   if (MOAB_HAVE_MPI)
     set(HDF5_PREFER_PARALLEL TRUE)
   endif()
+
   #TODO: test on all architectures with CMake-native FindHDF5 module instead of a custom one
   IF(WIN32)
-  find_package( HDF5 REQUIRED )
-  ELSE()
-  find_package( HDF5_MOAB REQUIRED )
-ENDIF()  
+    find_package( HDF5 REQUIRED )
+  ELSE(WIN32)
+    find_package( HDF5_MOAB REQUIRED )
+  ENDIF(WIN32)
+
   set (MOAB_HAVE_HDF5 ON)
   # if ( HDF5_IS_PARALLEL AND MOAB_HAVE_MPI )
   if ( MOAB_HAVE_MPI )
@@ -322,6 +346,9 @@ ENDIF()
   set( MOAB_LIBS ${HDF5_LIBRARIES} ${MOAB_LIBS} )
   include_directories( ${HDF5_INCLUDE_DIR} src/io/mhdf/include )
 endif ( ENABLE_HDF5 )
+set_package_properties(HDF5 PROPERTIES
+                    TYPE RECOMMENDED
+                    PURPOSE "HDF5 library interfaces for MOAB native file format support")
 
 # Check for NetCDF availability
 set (MOAB_HAVE_NETCDF OFF CACHE INTERNAL "Found necessary NetCDF components. Configure MOAB with it." )
@@ -333,6 +360,9 @@ if ( ENABLE_NETCDF )
   include_directories( ${NETCDF_INCLUDES} )
   set( MOAB_LIBS ${NETCDF_LIBRARIES} ${MOAB_LIBS} )
 endif ( ENABLE_NETCDF )
+set_package_properties(NetCDF PROPERTIES
+                    TYPE RECOMMENDED
+                    PURPOSE "NetCDF library interfaces for MOAB ExodusII file format support")
 
 # Check for PNetCDF availability
 set (MOAB_HAVE_PNETCDF OFF CACHE INTERNAL "Found necessary PNetCDF components. Configure MOAB with it." )
@@ -342,6 +372,9 @@ if ( ENABLE_PNETCDF AND MOAB_HAVE_NETCDF )
 	include_directories( ${PNETCDF_INCLUDES} )
 	set( MOAB_LIBS ${PNETCDF_LIBRARIES} ${MOAB_LIBS} )
 endif ( ENABLE_PNETCDF AND MOAB_HAVE_NETCDF )
+set_package_properties(PNetCDF PROPERTIES
+                    TYPE RECOMMENDED
+                    PURPOSE "Parallel-NetCDF library interfaces for MOAB nc-file format support")
 
 # Check for Metis partitioner availability
 set (MOAB_HAVE_METIS OFF CACHE INTERNAL "Found necessary Metis components. Configure MOAB with it." )
@@ -349,6 +382,9 @@ if ( ENABLE_METIS )
   find_package( Metis REQUIRED )
   set (MOAB_HAVE_METIS ON)
 endif (ENABLE_METIS )
+set_package_properties(Metis PROPERTIES
+                    TYPE RECOMMENDED
+                    PURPOSE "Metis library interfaces for MOAB offline (serial) mesh partitioning support")
 
 # Check for ParMetis partitioner availability
 set (MOAB_HAVE_PARMETIS OFF CACHE INTERNAL "Found necessary ParMetis components. Configure MOAB with it." )
@@ -356,6 +392,9 @@ if ( ENABLE_PARMETIS AND ENABLE_METIS AND METIS_FOUND )
   find_package( ParMetis REQUIRED )
   set (MOAB_HAVE_PARMETIS ON)
 endif ( ENABLE_PARMETIS AND ENABLE_METIS AND METIS_FOUND )
+set_package_properties(ParMetis PROPERTIES
+                    TYPE RECOMMENDED
+                    PURPOSE "ParMetis library interfaces for MOAB parallel mesh partitioning support (through Zoltan)")
 
 # Check for Zoltan partitioner availability
 set (MOAB_HAVE_ZOLTAN OFF CACHE INTERNAL "Found necessary Zoltan components. Configure MOAB with it." )
@@ -363,11 +402,18 @@ if ( ENABLE_ZOLTAN )
   find_package( Zoltan REQUIRED )
   set (MOAB_HAVE_ZOLTAN ON)
 endif (ENABLE_ZOLTAN )
+set_package_properties(Zoltan PROPERTIES
+                    TYPE RECOMMENDED
+                    PURPOSE "Zoltan library interfaces for MOAB offline/online parallel mesh partitioning support")
 
 # Check for TempestRemap availability if Eigen3 headers have been found already
 if ( EIGEN3_FOUND AND ENABLE_TEMPESTREMAP )
   find_package( TempestRemap REQUIRED )
   set(MOAB_HAVE_TEMPESTREMAP ON)
+  set_package_properties(TempestRemap PROPERTIES
+                    TYPE OPTIONAL
+                    PURPOSE "TempestRemap library interfaces for MOAB climate remapping support")
+
 endif( EIGEN3_FOUND AND ENABLE_TEMPESTREMAP )
 
 # Check if user has asked for configuration with CGM
@@ -378,6 +424,9 @@ if ( ENABLE_CGM )
    set (MOAB_HAVE_CGM ON)
    set (ENABLE_IREL ON)
    set (ENABLE_FBIGEOM ON)
+   set_package_properties(CGM PROPERTIES
+                    TYPE OPTIONAL
+                    PURPOSE "CGM library interfaces for MOAB native-geometry support")
 endif (ENABLE_CGM)
 
 set (MOAB_HAVE_CGNS OFF CACHE INTERNAL "Found necessary CGNS components. Configure MOAB with it." )
@@ -676,5 +725,10 @@ include(AutoconfHeader)
 moab_install_docs(${MOAB_EXAMPLES})
 
 
-
+feature_summary(WHAT ALL #ENABLED_FEATURES DISABLED_FEATURES PACKAGES_FOUND
+                DESCRIPTION "MOAB Configuration Summary"
+                INCLUDE_QUIET_PACKAGES
+                FILENAME ${CMAKE_BINARY_DIR}/summary.log 
+                )
+MESSAGE("-- MOAB Configuration summary has been written to ${CMAKE_BINARY_DIR}/summary.log.")
 # All done.

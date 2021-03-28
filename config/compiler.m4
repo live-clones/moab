@@ -190,6 +190,9 @@ AC_ARG_ENABLE( optimize, AS_HELP_STRING([--enable-optimize],[Compile optimized (
                [enable_optimize=""; enable_cxx_optimize="no"; enable_cc_optimize="no"; enable_fc_optimize="no";	]
              )
 
+AC_SUBST(enable_debug)
+AC_SUBST(enable_cxx_optimize)
+
 EXTRA_PGI_ONLY_FCFLAGS="-Mfree"
 if (test "x$enable_debug" != "xno"); then # debug flags
 # GNU
