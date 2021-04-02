@@ -328,8 +328,13 @@ int main( int argc, char* argv[] )
     rval = CreateTempestMesh( *runCtx, remapper, tempest_mesh );MB_CHK_ERR( rval );
     runCtx->timer_pop();
 
+    double epsrel = ReferenceTolerance; // ReferenceTolerance is defined in Defines.h in tempestremap;
+                                        // Defines.h is included in SparseMatrix.h
+                                        // SparseMatrix.h is included in OfflineMap.h
+                                        // OfflineMap.h is included in TempestOnlineMap.hpp
+                                        // TempestOnlineMap.hpp is included in this file, and is part of MOAB
     // Some constant parameters
-    const double epsrel = 1.e-15;
+
     const double boxeps = 1e-6;
 
     if( runCtx->meshType == moab::TempestRemapper::OVERLAP_MEMORY )
