@@ -530,6 +530,13 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             {
                 Announce( "Very small overlap at index %i area polygon: (%1.10e )",
                         ixOverlap + j, m_meshOverlap->vecFaceArea[ixOverlap + j] );
+                int n=faceOverlap.edges.size();
+                Announce( "Number nodes: %d", n);
+                for (int k=0; k<n; k++)
+                {
+                    Node nd = nodesOverlap[faceOverlap[k]];
+                    Announce( "Node %d  %d  : %1.10e  %1.10e %1.10e ", k, faceOverlap[k], nd.x, nd.y, nd.z);
+                }
                 continue;
             }
 
