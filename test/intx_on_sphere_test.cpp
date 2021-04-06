@@ -5,6 +5,7 @@
  *      Author: iulian
  */
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <ctime>
 #include <cstdlib>
@@ -235,6 +236,12 @@ int main( int argc, char* argv[] )
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
 
 #ifdef MOAB_HAVE_MPI
+    double total_intx_area = 0;
+    MPI_Reduce( &intx_area, &total_intx_area, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    if ( 0 == rank )
+    {
+        std::cout << std::setprecision(10) << "total intx area: " << total_intx_area << "\n";
+    }
 #ifdef MOAB_HAVE_HDF5_PARALLEL
     rval = mb->write_file( outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
 #else
