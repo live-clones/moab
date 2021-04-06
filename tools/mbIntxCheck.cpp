@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
     std::string sourceFile, targetFile, intxFile;
     std::string source_verif( "outS.h5m" ), target_verif( "outt.h5m" );
     int sphere           = 1;
-    int oldNamesParents  = 1;
+    bool oldNamesParents  = false;
     double areaErrSource = -1;
     double areaErrTarget = -1;
     ProgOptions opts;
@@ -61,7 +61,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< double >( "threshold_target,q", "error target threshold ", &areaErrTarget );
 
     opts.addOpt< int >( "sphere,p", "mesh on a sphere", &sphere );
-    opts.addOpt< int >( "old_convention,n", "old names for parent tags", &oldNamesParents );
+    opts.addOpt< void >( "old_Convention,c", "old names for parent tags", &oldNamesParents );
 
     opts.parseCommandLine( argc, argv );
     // load meshes in parallel if needed
