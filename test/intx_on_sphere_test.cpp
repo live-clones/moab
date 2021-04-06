@@ -32,8 +32,8 @@ int main( int argc, char* argv[] )
     secondModel = TestDir + "/mbcslam/eulerHomme.vtk";
 
     ProgOptions opts;
-    opts.addOpt< std::string >( "first,t", "first mesh filename (source)", &firstModel );
-    opts.addOpt< std::string >( "second,m", "second mesh filename (target)", &secondModel );
+    opts.addOpt< std::string >( "first,s", "first mesh filename (source)", &firstModel );
+    opts.addOpt< std::string >( "second,t", "second mesh filename (target)", &secondModel );
     opts.addOpt< std::string >( "outputFile,o", "output intersection file", &outputFile );
 
     double R      = 1.;  // input
@@ -230,17 +230,22 @@ int main( int argc, char* argv[] )
         outf << "intersect" << rank << ".h5m";
         rval = mb->write_file( outf.str().c_str(), 0, 0, &outputSet, 1 );
     }
-    double intx_area    = areaAdaptor.area_on_sphere( mb, outputSet, R );
-    double arrival_area = areaAdaptor.area_on_sphere( mb, sf2, R );
-    std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
-              << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
+    double local_areas[3];
+    local_areas[0] = areaAdaptor.area_on_sphere( mb, sf1, R ); // source area
+    local_areas[1] = areaAdaptor.area_on_sphere( mb, sf2, R );  // target area
+    local_areas[2] = areaAdaptor.area_on_sphere( mb, outputSet, R ); // intx area
 
 #ifdef MOAB_HAVE_MPI
-    double total_intx_area = 0;
-    MPI_Reduce( &intx_area, &total_intx_area, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
+    double total_areas[3]={0,0,0};
+
+    MPI_Reduce( local_areas, total_areas, 3, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD );
     if ( 0 == rank )
     {
-        std::cout << std::setprecision(10) << "total intx area: " << total_intx_area << "\n";
+        std::cout << std::setprecision(10) << "total source area: " << total_areas[0] << "\n";
+        std::cout << "total target area: " << total_areas[1] << "\n";
+        std::cout << "total intersection area: " << total_areas[2] << "\n";
+        std::cout << " intx/source fraction:" << total_areas[2]/total_areas[0] << "\n";
+        std::cout << " intx/target fraction:" << total_areas[2]/total_areas[1] << "\n";
     }
 #ifdef MOAB_HAVE_HDF5_PARALLEL
     rval = mb->write_file( outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
