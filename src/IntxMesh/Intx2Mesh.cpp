@@ -14,6 +14,7 @@
 // this is for DBL_MAX
 #include <cfloat>
 #include <queue>
+#include <utility>
 #include <sstream>
 #include "moab/GeomUtil.hpp"
 #include "moab/AdaptiveKDTree.hpp"
@@ -474,6 +475,8 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
     // build a kd tree with the rs1 (source) cells
     AdaptiveKDTree kd( mb );
     EntityHandle tree_root = 0;
+
+    typedef std::pair<EntityHandle, EntityHandle>  pairCells;
     rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
 
     while( !rs22.empty() )
@@ -553,10 +556,8 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
         }
         if( !seedFound ) continue;  // continue while(!rs22.empty())
 
-        std::queue< EntityHandle > srcQueue;  // these are corresponding to Ta,
-        srcQueue.push( startSrc );
-        std::queue< EntityHandle > tgtQueue;
-        tgtQueue.push( startTgt );
+        std::queue< pairCells > qPairs;  // these are pairs of source and target handles
+        qPairs.push( std::make_pair(startSrc,startTgt) );
 
         Range toResetSrcs;  // will be used to reset src flags for every tgt quad
         // processed
@@ -566,15 +567,17 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
         unsigned char used = 1;
         // mark the start tgt quad as used, so it will not come back again
         rval = mb->tag_set_data( TgtFlagTag, &startTgt, 1, &used );MB_CHK_ERR( rval );
-        while( !tgtQueue.empty() )
+        while( !qPairs.empty() )
         {
             // flags for the side : 0 means a src cell not found on side
             // a paired src not found yet for the neighbors of tgt
             Range nextSrc[MAXEDGES];  // there are new ranges of possible next src cells for
                                       // seeding the side j of tgt cell
 
-            EntityHandle currentTgt = tgtQueue.front();
-            tgtQueue.pop();
+            pairCells currPair = qPairs.front();
+            //EntityHandle currentTgt = tgtQueue.front();
+            qPairs.pop();
+            EntityHandle currentTgt = currPair.second;
             int nsidesTgt;                                                   // will be initialized now
             double areaTgtCell   = setup_tgt_cell( currentTgt, nsidesTgt );  // this is the area in the gnomonic plane
             double recoveredArea = 0;
@@ -616,13 +619,12 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
                 std::cout << std::endl;
             }
 #endif
-            EntityHandle currentSrc = srcQueue.front();
+            EntityHandle currentSrc = currPair.first;
             // tgt and src queues are parallel; for clarity we should have kept in the queue pairs
             // of entity handle std::pair<EntityHandle, EntityHandle>; so just one queue, with
             // pairs;
             //  at every moment, the queue contains pairs of cells that intersect, and they form the
             //  "advancing front"
-            srcQueue.pop();
             toResetSrcs.clear();  // empty the range of used srcs, will have to be set unused again,
             // at the end of tgt element processing
             toResetSrcs.insert( currentSrc );
@@ -760,8 +762,9 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
                         /* tgt */ tgtNeigh, nextB, P, nP, area, nb, nr, nsidesSrc, nsidesTgt2 );MB_CHK_ERR( rval );
                     if( area > 0 )
                     {
-                        tgtQueue.push( tgtNeigh );
-                        srcQueue.push( nextB );
+                        qPairs.push(std::make_pair(nextB, tgtNeigh));
+                        /*tgtQueue.push( tgtNeigh );
+                        srcQueue.push( nextB );*/
 #ifdef ENABLE_DEBUG
                         if( dbg_1 )
                             std::cout << "new polys pushed: src, tgt:" << mb->id_from_handle( tgtNeigh ) << " "
@@ -774,7 +777,7 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
                 }
             }
 
-        }  // end while (!tgtQueue.empty())
+        }  // end while (!qPairs.empty())
     }
 #ifdef ENABLE_DEBUG
     if( dbg_1 )
