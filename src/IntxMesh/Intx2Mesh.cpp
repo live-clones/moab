@@ -26,6 +26,8 @@ namespace moab
 int Intx2Mesh::dbg_1 = 0;
 #endif
 
+#define CHECK_INTX_PAIRS
+
 Intx2Mesh::Intx2Mesh( Interface* mbimpl )
     : mb( mbimpl ), mbs1( 0 ), mbs2( 0 ), outSet( 0 ), gid( 0 ), TgtFlagTag( 0 ), tgtParentTag( 0 ), srcParentTag( 0 ),
       countTag( 0 ), srcNeighTag( 0 ), tgtNeighTag( 0 ), neighTgtEdgeTag( 0 ), orgSendProcTag( 0 ), tgtConn( NULL ),
@@ -478,7 +480,9 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
 
     typedef std::pair<EntityHandle, EntityHandle>  pairCells;
     rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
-
+#ifdef CHECK_INTX_PAIRS
+    std::set<pairCells> setOfPairs;
+#endif
     while( !rs22.empty() )
     {
 #if defined( ENABLE_DEBUG ) || defined( VERBOSE )
@@ -709,6 +713,18 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
                     if( nP > 1 )
                     {  // this will also construct triangles/polygons in the new mesh, if needed
                         rval = findNodes( currentTgt, nsidesTgt, srcT, nsidesSrc, P, nP );MB_CHK_ERR( rval );
+#ifdef CHECK_INTX_PAIRS
+                        pairCells intx_pair = std::make_pair(srcT, currentTgt);
+                        if(setOfPairs.find(intx_pair) != setOfPairs.end())
+                        {
+                            int sgid, tgid;
+                            rval = mb->tag_get_data( gid, &srcT, 1, &sgid );ERRORR( rval, "can't get source element global ID " );
+                            rval = mb->tag_get_data( gid, &currentTgt, 1, &tgid );ERRORR( rval, "can't get source element global ID " );
+                            std::cout <<" pair (source, target)  already found: " << sgid <<  " " << tgid << "\n";
+                        }
+                        else
+                            setOfPairs.insert(intx_pair);
+#endif
                     }
 
                     recoveredArea += area;
