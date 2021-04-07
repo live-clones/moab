@@ -720,7 +720,7 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
                             int sgid, tgid;
                             rval = mb->tag_get_data( gid, &srcT, 1, &sgid );ERRORR( rval, "can't get source element global ID " );
                             rval = mb->tag_get_data( gid, &currentTgt, 1, &tgid );ERRORR( rval, "can't get source element global ID " );
-                            std::cout <<" pair (source, target)  already found: " << sgid <<  " " << tgid << "\n";
+                            std::cout <<"rank: "<< my_rank <<" pair (source, target)  already found: " << sgid <<  " " << tgid << "\n";
                         }
                         else
                             setOfPairs.insert(intx_pair);
