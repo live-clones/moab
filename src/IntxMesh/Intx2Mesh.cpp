@@ -27,6 +27,7 @@ int Intx2Mesh::dbg_1 = 0;
 #endif
 
 #define CHECK_INTX_PAIRS
+//#define WRITE_MOVIE
 
 Intx2Mesh::Intx2Mesh( Interface* mbimpl )
     : mb( mbimpl ), mbs1( 0 ), mbs2( 0 ), outSet( 0 ), gid( 0 ), TgtFlagTag( 0 ), tgtParentTag( 0 ), srcParentTag( 0 ),
@@ -724,6 +725,17 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
                         }
                         else
                             setOfPairs.insert(intx_pair);
+
+#ifdef WRITE_MOVIE
+                      if(my_rank==0)
+                      {
+                        std::stringstream fff;
+                        fff << "file0" << counting << ".vtk";
+                        rval = mb->write_mesh( fff.str().c_str(), &outputSet, 1 );MB_CHK_ERR( rval );
+                      }
+
+#endif
+
 #endif
                     }
 
