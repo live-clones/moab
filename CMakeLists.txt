@@ -597,6 +597,10 @@ ADD_CUSTOM_TARGET(
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
   )
 
+CONFIGURE_FILE(config/MOAB.pc.cmake.in "${PROJECT_BINARY_DIR}/MOAB.pc" @ONLY)
+install(FILES ${PROJECT_BINARY_DIR}/MOAB.pc
+  DESTINATION lib/pkgconfig)
+
 ###################
 # INSTALL documentation and examples
 ####################
