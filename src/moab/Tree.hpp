@@ -145,13 +145,13 @@ class Tree
     }
 
     /** \brief Get max depth set on tree */
-    double get_max_depth()
+    int get_max_depth()
     {
         return maxDepth;
     }
 
     /** \brief Get max entities per leaf set on tree */
-    double get_max_per_leaf()
+    int get_max_per_leaf()
     {
         return maxPerLeaf;
     }
