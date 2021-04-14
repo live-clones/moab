@@ -1,24 +1,24 @@
 # Documentation
 # Optional tools
-option ( MOAB_BUILD_MBCONVERT    "Build the MOAB mesh converter tool?"           ON )
-option ( MOAB_BUILD_HEXMODOPS    "Build the hexahedral modops tool?"             ON )
-option ( MOAB_BUILD_MBSIZE       "Build the mbsize tool?"                        ON )
-option ( MOAB_BUILD_MBMERGE      "Build the mbmerge tool?"                       ON )
-option ( MOAB_BUILD_MBMEM        "Build the mbmem tool?"                         ON )
-option ( MOAB_BUILD_MBSKIN       "Build the mbskin tool?"                        ON )
-option ( MOAB_BUILD_MBDEPTH      "Build the mbdepth tool?"                       ON )
-option ( MOAB_BUILD_MBTAGPROP    "Build the mbtagprop tool?"                     ON )
-option ( MOAB_BUILD_MBGSETS      "Build the mbgsets tool?"                       ON )
-option ( MOAB_BUILD_SPHEREDECOMP "Build the sphere decomposition tool?"          ON )
-option ( MOAB_BUILD_MBSURFPLOT   "Build the mbsurfplot application?"             ON )
-option ( MOAB_BUILD_SPHEREDECOMP "Build the spheredecomp application?"           ON )
-option ( MOAB_BUILD_MBPART       "Build the mbpart (Zoltan-based) partitioner?" OFF )
-option ( MOAB_BUILD_MBSLAVEPART  "Build the slave partitioner tool?"             ON )
-option ( MOAB_BUILD_MBCOUPLER    "Build the mesh coupler tool?"                  ON )
-option ( MOAB_BUILD_MBHONODES    "Build the hex8 to hex27 converter tool?"       ON )
-option ( MOAB_BUILD_MBUMR        "Build the uniform mesh refinement tool?"       ON )
-option ( MOAB_BUILD_MBQUALITY    "Build the quality metrics tool?"               ON )
-option ( MOAB_BUILD_MBTEMPEST    "Build the TempestRemap coupler tool?"         OFF )
+option ( MOAB_BUILD_MBCONVERT      "Build the MOAB mesh converter tool?"           ON )
+option ( MOAB_BUILD_HEXMODOPS      "Build the hexahedral modops tool?"             ON )
+option ( MOAB_BUILD_MBSIZE         "Build the mbsize tool?"                        ON )
+option ( MOAB_BUILD_MBMERGE        "Build the mbmerge tool?"                       ON )
+option ( MOAB_BUILD_MBMEM          "Build the mbmem tool?"                         ON )
+option ( MOAB_BUILD_MBSKIN         "Build the mbskin tool?"                        ON )
+option ( MOAB_BUILD_MBDEPTH        "Build the mbdepth tool?"                       ON )
+option ( MOAB_BUILD_MBTAGPROP      "Build the mbtagprop tool?"                     ON )
+option ( MOAB_BUILD_MBGSETS        "Build the mbgsets tool?"                       ON )
+option ( MOAB_BUILD_SPHEREDECOMP   "Build the sphere decomposition tool?"          ON )
+option ( MOAB_BUILD_MBSURFPLOT     "Build the mbsurfplot application?"             ON )
+option ( MOAB_BUILD_SPHEREDECOMP   "Build the spheredecomp application?"           ON )
+option ( MOAB_BUILD_MBPART         "Build the mbpart (Zoltan-based) partitioner?" OFF )
+option ( MOAB_BUILD_MBINFERREDPART "Build the inferred partitioner tool?"          ON )
+option ( MOAB_BUILD_MBCOUPLER      "Build the mesh coupler tool?"                  ON )
+option ( MOAB_BUILD_MBHONODES      "Build the HEX8 to HEX27 converter tool?"       ON )
+option ( MOAB_BUILD_MBUMR          "Build the uniform mesh refinement tool?"       ON )
+option ( MOAB_BUILD_MBQUALITY      "Build the quality metrics tool?"               ON )
+option ( MOAB_BUILD_MBTEMPEST      "Build the TempestRemap coupler tool?"         OFF )
 
 if ( MOAB_HAVE_MPI AND MPI_FOUND )
   add_subdirectory( refiner )
@@ -223,14 +223,14 @@ if ( MOAB_BUILD_MBUMR )
     )
 endif( )
 
-# MBSLAVEPART
-if ( MOAB_BUILD_MBSLAVEPART )
-  add_executable( mbslavepart mbslavepart.cpp)
-  set_source_files_properties( mbslavepart.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
-  target_link_libraries( mbslavepart ${TOOLS_LINK_LIBS} )
-  set( MOAB_HAVE_MBSLAVEPART 1 )
+# MBINFERREDPART
+if ( MOAB_BUILD_MBINFERREDPART )
+  add_executable( mbinferredpart mbinferredpart.cpp)
+  set_source_files_properties( mbinferredpart.cpp COMPILE_FLAGS "${MOAB_DEFINES}" )
+  target_link_libraries( mbinferredpart ${TOOLS_LINK_LIBS} )
+  set( MOAB_HAVE_MBINFERREDPART 1 )
   install(
-    TARGETS mbslavepart
+    TARGETS mbinferredpart
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
