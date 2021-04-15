@@ -514,7 +514,6 @@ ErrorCode get_max_volume( Core& mb, EntityHandle fileset, int dim, double& vmax 
             break;
         default:
             return MB_FAILURE;
-            break;
     }
 
     // Get all entities of the highest dimension which is passed as a command line argument.

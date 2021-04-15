@@ -444,24 +444,21 @@ bool NestedRefine::is_entity_on_boundary( const EntityHandle& entity )
 
 ErrorCode NestedRefine::exchange_ghosts( std::vector< EntityHandle >& lsets, int num_glayers )
 {
+#ifdef MOAB_HAVE_MPI
     ErrorCode error;
 
     if( hasghost ) return MB_SUCCESS;
 
     hasghost = true;
-#ifdef MOAB_HAVE_MPI
     error = pcomm->exchange_ghost_cells( meshdim, 0, num_glayers, 0, true, false );MB_CHK_ERR( error );
     {
         Range empty_range;
         error = pcomm->exchange_tags( GLOBAL_ID_TAG_NAME, empty_range );MB_CHK_ERR( error );
         // error = pcomm->assign_global_ids(lsets[i], 0, 1, false, true, false);MB_CHK_ERR(error);
     }
-#else
-    MB_SET_ERR( MB_FAILURE, "Requesting ghost layers for a serial mesh" );
-#endif
 
-    Range* lverts = new Range[lsets.size()];
-    Range* lents  = new Range[lsets.size()];
+    std::vector< Range > lverts( lsets.size() );
+    std::vector< Range > lents( lsets.size() );
     for( size_t i = 0; i < lsets.size(); i++ )
     {
         error = mbImpl->get_entities_by_dimension( lsets[i], meshdim, lents[i] );MB_CHK_ERR( error );
@@ -479,9 +476,12 @@ ErrorCode NestedRefine::exchange_ghosts( std::vector< EntityHandle >& lsets, int
         error = mbImpl->add_entities( lsets[i], lents[i] );MB_CHK_ERR( error );
     }
 
-    delete[] lverts;
-    delete[] lents;
+    lverts.clear();
+    lents.clear();
     return MB_SUCCESS;
+#else
+    return MB_SUCCESS; // nothing to do
+#endif
 }
 
 ErrorCode NestedRefine::update_special_tags( int level, EntityHandle& lset )

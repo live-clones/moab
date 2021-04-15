@@ -17,7 +17,7 @@ ErrorCode Tree::parse_common_options( FileOptions& options )
     // MAX_DEPTH: max depth of the tree; default = 30
     rval = options.get_int_option( "MAX_DEPTH", tmp_int );
     if( MB_SUCCESS == rval ) maxDepth = tmp_int;
-    if( maxDepth < 1 ) maxDepth = std::numeric_limits< unsigned >::max();
+    if( maxDepth < 1 ) maxDepth = std::numeric_limits< int >::max();
 
     // MIN_WIDTH: minimum width of box, used like a tolerance; default = 1.0e-10
     rval = options.get_real_option( "MIN_WIDTH", tmp_dbl );

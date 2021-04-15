@@ -226,7 +226,7 @@ mbintxchk_SOURCES = mbIntxCheck.cpp
 mbcmpmaps_SOURCES = compareMaps.cpp
 mbcleantags_SOURCES = cleanTags.cpp
 
-bin_PROGRAMS += mbslavepart
-mbslavepart_SOURCES = mbslavepart.cpp
+bin_PROGRAMS += mbinferredpart
+mbinferredpart_SOURCES = mbinferredpart.cpp
 
 DISTCLEANFILES = a.out
