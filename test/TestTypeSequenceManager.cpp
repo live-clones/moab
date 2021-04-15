@@ -1085,12 +1085,12 @@ void test_threaded_access(int n_threads)
     threads.push_back(std::thread(call_find, &seqman, removed_indices, i_end, std::ref<int>(failures[i])));
   }
   // wait for threads to finish
-  for (int i = 0; i < threads.size(); i++) {
+  for (size_t i = 0; i < threads.size(); i++) {
     threads[i].join();
   }
 
   int n_failures = 0;
-  for (int i = 0; i < failures.size(); i ++) n_failures += failures[i];
+  for (size_t i = 0; i < failures.size(); i ++) n_failures += failures[i];
 
   if (n_failures > 0) {
     std::cout << n_failures << " invalid sequences found." << std::endl;
