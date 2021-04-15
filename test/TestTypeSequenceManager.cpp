@@ -1,3 +1,6 @@
+#include <thread>
+#include <set>
+
 #include "TypeSequenceManager.hpp"
 #include "EntitySequence.hpp"
 #include "SequenceData.hpp"
@@ -20,6 +23,9 @@ void test_find_free_handle();
 void test_find_free_sequence();
 void test_is_free_sequence();
 void test_is_free_handle();
+void test_threaded_access(int n_threads);
+void test_single_thread_access();
+void test_multi_thread_access();
 
 void regression_svn1952();
 void regression_svn1958();
@@ -66,6 +72,8 @@ int main()
     error_count += RUN_TEST( test_find_free_handle );
     error_count += RUN_TEST( test_find_free_sequence );
     error_count += RUN_TEST( test_is_free_sequence );
+    error_count += RUN_TEST( test_single_thread_access );
+    error_count += RUN_TEST( test_multi_thread_access );
 
     error_count += RUN_TEST( regression_svn1952 );
     error_count += RUN_TEST( regression_svn1958 );
@@ -1025,6 +1033,78 @@ void test_is_free_handle()
     CHECK_EQUAL( (SequenceData*)0, data );
     CHECK_EQUAL( (EntityHandle)3001, first );
     CHECK_EQUAL( (EntityHandle)MB_END_ID, last );
+}
+
+void call_find(TypeSequenceManager* seqman,
+               const std::set<int>& removed,
+               int num_orig_entities,
+               int& n_failures) {
+  ErrorCode rval = MB_SUCCESS;
+
+  const EntitySequence* seq;
+  int n_queries = 10000;
+  for (int i = 0; i < n_queries; i++) {
+      int idx = ((double)rand() / RAND_MAX * num_orig_entities) + 1;
+
+      // do not check for entities we've removed
+      if (removed.count(idx) != 0) continue;
+      // search for this entity in the sequence manager
+      rval = seqman->find(idx, seq);
+      CHECK_EQUAL(MB_SUCCESS, rval);
+      // check that the returned sequence actually contains this entity
+      // (this is where threaded access used to fail)
+      if(idx < seq->start_handle() || idx > seq->end_handle()) {
+        n_failures +=1;
+      }
+  }
+}
+
+void test_threaded_access(int n_threads)
+{
+  TypeSequenceManager seqman;
+  std::set<int> removed_indices;
+
+  // create a sequence from start to end
+  EntityHandle start = 1, end = 200000;
+  int i_end = end;
+  SequenceData* data = new SequenceData( 0, start, end);
+  CHECK_ERR(insert_seq(seqman, start, end, data));
+
+  // erase one hundred random entities from the sequence
+  // to ensure a lot of switching of TypeSequenceManager::lastReferenced
+  Error e;
+  for(int i = 0; i < 100; i ++) {
+    int idx = ((double)rand() / RAND_MAX * i_end) + 1;
+    removed_indices.insert(idx);
+    seqman.erase(&e, idx);
+  }
+  // create a set of quereies per thread
+  std::vector<std::thread> threads;
+  std::vector<int> failures(n_threads, 0);
+  for (int i = 0; i < n_threads; i++) {
+    threads.push_back(std::thread(call_find, &seqman, removed_indices, i_end, std::ref<int>(failures[i])));
+  }
+  // wait for threads to finish
+  for (int i = 0; i < threads.size(); i++) {
+    threads[i].join();
+  }
+
+  int n_failures = 0;
+  for (int i = 0; i < failures.size(); i ++) n_failures += failures[i];
+
+  if (n_failures > 0) {
+    std::cout << n_failures << " invalid sequences found." << std::endl;
+  }
+
+  CHECK_EQUAL(0, n_failures);
+}
+
+void test_single_thread_access() {
+  test_threaded_access(1);
+}
+
+void test_multi_thread_access() {
+  test_threaded_access(2);
 }
 
 // Regression test for bug fixed in SVN revision 1952.
