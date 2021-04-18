@@ -1,10 +1,14 @@
 /** @example spmvApp.cpp
- * Description: read two map files to project a solution forward and in reverse direction
- * Then compute the sparse Matrix-Vector products to compute the projections from
- * source component to target component. This is strictly an example to work on single
+ * \brief This example reads two map files to project a field in forward and reverse
+ * direction by computing projections via sparse Matrix-Vector products between source
+ * component and target component. This is strictly an example to work on single
  * node and we do not care about MPI parallelism in this experiment.
  *
- * To run: ./spmvApp -s srcMapFile -t tgtMapFile -n iterations
+ * Usage:
+ *      ./spmvApp -s srcMapFile -t tgtMapFile -n iterations
+ *
+ * Note: Some datasets for forward and reverse maps have been uploaded to:
+ *       https://ftp.mcs.anl.gov/pub/fathom/MeshFiles/maps/
  */
 
 #include "moab/Core.hpp"

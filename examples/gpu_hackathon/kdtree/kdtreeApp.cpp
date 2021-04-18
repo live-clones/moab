@@ -1,4 +1,5 @@
-/** \brief This test shows how to perform local point-in-element searches with MOAB's new tree
+/** @example kdTreeApp.cpp
+ * \brief This example shows how to perform local point-in-element searches with MOAB's new tree
  * searching functionality.
  *
  * MOAB's SpatialLocator functionality performs point-in-element searches over a local or parallel
