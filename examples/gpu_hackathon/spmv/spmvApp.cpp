@@ -4,7 +4,7 @@
  * source component to target component. This is strictly an example to work on single
  * node and we do not care about MPI parallelism in this experiment.
  *
- * To run: ./spmvApp srcMapFile tgtMapFile
+ * To run: ./spmvApp -s srcMapFile -t tgtMapFile -n iterations
  */
 
 #include "moab/Core.hpp"

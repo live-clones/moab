@@ -4,6 +4,10 @@
  * MOAB's SpatialLocator functionality performs point-in-element searches over a local or parallel
  * mesh. SpatialLocator is flexible as to what kind of tree is used and what kind of element basis
  * functions are used to localize elements and interpolate local fields.
+ *
+ * Usage:
+ *  Default mesh: ./kdtreeApp -d 3 -r 2
+ *  Custom mesh: ./kdtreeApp -d 3 -i mesh_file.h5m
  */
 
 #include <iostream>
@@ -23,16 +27,11 @@
 using namespace moab;
 using namespace std;
 
-#ifdef MOAB_HAVE_HDF5
-string test_file_name = string( MESH_DIR ) + string( "/64bricks_512hex_256part.h5m" );
-#else
-string test_file_name = string( MESH_DIR ) + string( "/mbtest1.vtk" );
-#endif
 int main( int argc, char** argv )
 {
-    std::string inputFilename   = string( MESH_DIR ) + string( "/64bricks_512hex_256part.h5m" );
+    std::string test_file_name  = string( MESH_DIR ) + string( "/64bricks_512hex_256part.h5m" );
     int num_queries             = 10000;
-    int dimension               = 1;
+    int dimension               = 3;
     int uniformRefinementLevels = 0;
 
     ProgOptions opts;
@@ -57,11 +56,7 @@ int main( int argc, char** argv )
 
     if( uniformRefinementLevels )
     {
-#ifdef MOAB_HAVE_MPI
         moab::NestedRefine uref( &mb, nullptr, baseFileset );
-#else
-        NestedRefine uref( &mb, baseFileset );
-#endif
         std::vector< int > uniformRefinementDegree( uniformRefinementLevels, 2 );
         std::vector< EntityHandle > level_sets;
         rval = uref.generate_mesh_hierarchy( uniformRefinementLevels,
@@ -86,7 +81,7 @@ int main( int argc, char** argv )
     // Get the box extents
     CartVect box_extents, pos;
     BoundBox box = sl.local_box();
-    box_extents  = box.bMax - box.bMin;
+    box_extents  = 1.1 * (box.bMax - box.bMin);
 
     // Query at random places in the tree
     CartVect params;
