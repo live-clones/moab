@@ -8,9 +8,9 @@ ALLEXAMPLES = ${EXAMPLES}
 
 all: $(ALLEXAMPLES)
 
-spmvApp: spmvApp.o ${MOAB_LIBDIR}/libMOAB.la
+spmvApp: spmvApp.o netcdf.o ncvalues.o ${MOAB_LIBDIR}/libMOAB.la
 	@echo "[CXXLD]  $@"
-	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} -lomp
+	${VERBOSE}${MOAB_CXX} -o $@ $< netcdf.o ncvalues.o ${MOAB_LIBS_LINK}
 
 run-spmvApp: spmvApp
 	${RUNSERIAL} ./spmvApp

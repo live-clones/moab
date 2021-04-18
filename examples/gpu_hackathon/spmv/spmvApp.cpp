@@ -10,7 +10,6 @@
 #include "moab/Core.hpp"
 #include "moab/ReadUtilIface.hpp"
 #include "moab/ProgOptions.hpp"
-#include <iostream>
 
 #ifndef MOAB_HAVE_NETCDF
 #error Require NetCDF to read the map files
@@ -25,6 +24,10 @@
 #include <Eigen/Sparse>
 #endif
 
+// C++ includes
+#include <iostream>
+#include <chrono>
+
 using namespace moab;
 using namespace std;
 
@@ -33,9 +36,29 @@ typedef int MOABSInt;
 typedef size_t MOABUInt;
 typedef double MOABReal;
 
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::high_resolution_clock::time_point Timer;
+using std::chrono::duration_cast;
+
+Timer start;
+std::map< std::string, std::chrono::nanoseconds > timeLog;
+
 moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
                                  std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS,
                                  Eigen::SparseMatrix< MOABReal >& mapOperator );
+
+#define PUSH_TIMER()          \
+    {                         \
+        start = Clock::now(); \
+    }
+
+#define POP_TIMER( EventName )                                                                                \
+    {                                                                                                         \
+        std::chrono::nanoseconds elapsed = duration_cast< std::chrono::nanoseconds >( Clock::now() - start ); \
+        timeLog[EventName]               = elapsed;                                                           \
+        std::cout << "[ " << EventName << " ]: elapsed = " << static_cast< double >( elapsed.count() / 1e6 )   \
+                  << " milli-seconds" << std::endl;                                                           \
+    }
 
 int main( int argc, char** argv )
 {
@@ -60,18 +83,39 @@ int main( int argc, char** argv )
     std::vector< MOABSInt > srcNNZRows, srcNNZCols;
     std::vector< MOABReal > srcNNZVals;
     Eigen::SparseMatrix< MOABReal > srcMapOperator;
+    PUSH_TIMER()
     rval = ReadParallelMap( src_map_file_name, srcNNZRows, srcNNZCols, srcNNZVals, srcMapOperator );MB_CHK_ERR(rval);
+    POP_TIMER( "SourceMap" )
 
-    std::cout << "Source Map [" << srcMapOperator.rows() << " x " << srcMapOperator.cols() << "]: NNZs ("
-              << srcMapOperator.nonZeros() << ")" << std::endl;
+    std::cout << "Source map size = [" << srcMapOperator.rows() << " x " << srcMapOperator.cols() << "] with NNZs = "
+              << srcMapOperator.nonZeros() << std::endl;
 
     std::vector< MOABSInt > tgtNNZRows, tgtNNZCols;
     std::vector< MOABReal > tgtNNZVals;
     Eigen::SparseMatrix< MOABReal > tgtMapOperator;
+    PUSH_TIMER()
     rval = ReadParallelMap( tgt_map_file_name, tgtNNZRows, tgtNNZCols, tgtNNZVals, tgtMapOperator );MB_CHK_ERR( rval );
+    POP_TIMER( "TargetMap" )
 
-    std::cout << "Target Map [" << tgtMapOperator.rows() << " x " << tgtMapOperator.cols() << "]: NNZs ("
-              << tgtMapOperator.nonZeros() << ")" << std::endl;
+    std::cout << "Target map size = [" << tgtMapOperator.rows() << " x " << tgtMapOperator.cols()
+              << "] with NNZs = " << tgtMapOperator.nonZeros() << std::endl;
+
+    Eigen::VectorXd srcTgt = Eigen::VectorXd::Random( srcMapOperator.cols() );
+    Eigen::VectorXd tgtSrc = Eigen::VectorXd::Zero( tgtMapOperator.cols() );
+
+    PUSH_TIMER()
+    for( int iR = 0; iR < n_remap_iterations; ++iR )
+    {
+        // Project data from source to target
+        tgtSrc = srcMapOperator * srcTgt;
+
+        // Project data from target to source
+        srcTgt = tgtMapOperator * tgtSrc;
+    }
+    POP_TIMER( "TotalSpMV" )
+
+    std::cout << "Average time (milli-secs) taken for " << 2*n_remap_iterations << " SpMV operation = "
+              << static_cast< double >( timeLog["TotalSpMV"].count() ) / ( 2E6 * n_remap_iterations ) << std::endl;
 
     delete mb;
 
@@ -146,12 +190,18 @@ moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOA
     // Let us populate the map object for every process
     mapOperator.resize( nB, nA );
     mapOperator.reserve( nS );
+    // create a triplet vector
+    typedef Eigen::Triplet< MOABReal > SparseEntry;
+    std::vector< SparseEntry > tripletList( nS );
 
     // loop over nnz and populate the sparse matrix operator
     for( int innz = 0; innz < nS; ++innz )
     {
-        mapOperator.insert( vecRow[innz]-1, vecCol[innz]-1 ) = vecS[innz];
+        // mapOperator.insert( vecRow[innz]-1, vecCol[innz]-1 ) = vecS[innz];
+        tripletList[innz] = SparseEntry( vecRow[innz] - 1, vecCol[innz] - 1, vecS[innz] );
     }
+
+    mapOperator.setFromTriplets( tripletList.begin(), tripletList.end() );
 
     return moab::MB_SUCCESS;
 }
