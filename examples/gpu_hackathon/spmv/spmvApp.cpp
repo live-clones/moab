@@ -5,14 +5,18 @@
  * node and we do not care about MPI parallelism in this experiment.
  *
  * Usage:
- *      ./spmvApp srcRemapWeightFile -t -n iterations
+ *      ./spmvApp srcRemapWeightFile -v 1 -t -n iterations
+ *
+ *          -v represents the RHS vector size
+ *          -t specifies that both A*x and A^T*x operations need to be profiled
+ *          -n number of times to repeat the SpMV operation to get average time
  *
  * Note: Some datasets for forward and reverse maps have been uploaded to:
  *       https://ftp.mcs.anl.gov/pub/fathom/MeshFiles/maps/
  */
 
-#include "moab/Core.hpp"
-#include "moab/ReadUtilIface.hpp"
+#include "moab/MOABConfig.h"
+#include "moab/ErrorHandler.hpp"
 #include "moab/ProgOptions.hpp"
 
 #ifndef MOAB_HAVE_NETCDF
@@ -78,17 +82,20 @@ void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSI
 int main( int argc, char** argv )
 {
     std::string remap_operator_filename = "";
-    bool is_target_transposed     = false;
-    int n_remap_iterations        = 100;
+    bool is_target_transposed           = false;
+    MOABSInt n_remap_iterations         = 100;
+    MOABSInt rhsvsize                   = 1;
+
     ProgOptions opts( "Remap SpMV Mini-App" );
     opts.addRequiredArg< std::string >( "MapOperator", "Remap weights filename to optimize for SpMV", &remap_operator_filename );
     // opts.addOpt< std::string >( "srcmap,s", "Source map file name for projection", &remap_operator_filename );
     opts.addOpt< void >( "transpose,t", "Compute the tranpose operator application as well", &is_target_transposed );
 
     // Need option handling here for input filename
-    opts.addOpt< int >( "iterations,n",
-                        "Number of iterations to perform to get the average performance profile (default=100)",
-                        &n_remap_iterations );
+    opts.addOpt< MOABSInt >( "vsize,v", "Number of vectors to project (default=1)", &rhsvsize );
+    opts.addOpt< MOABSInt >( "iterations,n",
+                             "Number of iterations to perform to get the average performance profile (default=100)",
+                             &n_remap_iterations );
 
     opts.parseCommandLine( argc, argv );
 
@@ -109,67 +116,81 @@ int main( int argc, char** argv )
 
     // compute source data
     {
+        // COO : Coorindate SparseMatrix
         std::vector< MOABSInt > opNNZRows, opNNZCols;
         std::vector< MOABReal > opNNZVals;
         PUSH_TIMER()
-        rval =
-            ReadParallelMap( remap_operator_filename, opNNZRows, opNNZCols, opNNZVals,
+        rval = ReadParallelMap( remap_operator_filename, opNNZRows, opNNZCols, opNNZVals,
                                 nOpRows, nOpCols, nOpNNZs );MB_CHK_ERR( rval );
         POP_TIMER( "ReadRemapOperator" )
         PRINT_TIMER( "ReadRemapOperator" )
 
-#ifdef MOAB_HAVE_EIGEN3
         PUSH_TIMER()
+#ifdef MOAB_HAVE_EIGEN3
         SetEigen3Matrix( srcMapOperator, nOpRows, nOpCols, opNNZRows, opNNZCols, opNNZVals );
+#endif
+#ifdef MOAB_HAVE_KOKKOSKERNELS
+        SetKokkosCSRMatrix( srcMapOperator, nOpRows, nOpCols, opNNZRows, opNNZCols, opNNZVals );
+#endif
+#ifdef MOAB_HAVE_GINKGO
+        // CSR, COO, ELL, Hybrid-ELL formats ?
+        SetGinkgoMatrix( srcMapOperator, nOpRows, nOpCols, opNNZRows, opNNZCols, opNNZVals );
+#endif
         POP_TIMER( "SetRemapOperator" )
         PRINT_TIMER( "SetRemapOperator" )
-#endif
     }
 
     std::cout << "Map operator size = [" << nOpRows << " x " << nOpCols << "] with NNZs = " << nOpNNZs << std::endl;
 
     // First let us perform SpMV from Source to Target
     {
-        Eigen::VectorXd srcTgt = Eigen::VectorXd::Random( srcMapOperator.cols() );
-        Eigen::VectorXd tgtSrc = Eigen::VectorXd::Zero( srcMapOperator.rows() );
+        // multiple RHS for each variable to be projected
+        Eigen::MatrixXd srcTgt = Eigen::MatrixXd::Random( srcMapOperator.cols(), rhsvsize );
+        Eigen::MatrixXd tgtSrc = Eigen::MatrixXd::Zero( srcMapOperator.rows(), rhsvsize );
 
         PUSH_TIMER()
-        for( int iR = 0; iR < n_remap_iterations; ++iR )
+        for( auto iR = 0; iR < n_remap_iterations; ++iR )
         {
-            // Project data from source to target
-            tgtSrc = srcMapOperator * srcTgt;
+            // Project data from source to target through weight application for each variable
+            for( auto iVar = 0; iVar < rhsvsize; ++iVar )
+                tgtSrc.col( iVar ) = srcMapOperator * srcTgt.col( iVar );
         }
         POP_TIMER( "RemapTotalSpMV" )
 
         std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
                   << " RemapOperator SpMV application = "
-                  << static_cast< double >( timeLog["RemapTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations )
+                  << static_cast< MOABReal >( timeLog["RemapTotalSpMV"].count() ) /
+                         ( 1E6 * n_remap_iterations * rhsvsize )
                   << std::endl;
     }
 
     // Now let us repeat SpMV from Target to Source if requested
     if( is_target_transposed )
     {
-        Eigen::VectorXd srcTgt = Eigen::VectorXd::Zero( srcMapOperator.cols() );
-        Eigen::VectorXd tgtSrc = Eigen::VectorXd::Random( srcMapOperator.rows() );
+        // multiple RHS for each variable to be projected
+        Eigen::MatrixXd srcTgt = Eigen::MatrixXd::Zero( srcMapOperator.cols(), rhsvsize );
+        Eigen::MatrixXd tgtSrc = Eigen::MatrixXd::Random( srcMapOperator.rows(), rhsvsize );
 
         PUSH_TIMER()
-        for( int iR = 0; iR < n_remap_iterations; ++iR )
+        for( auto iR = 0; iR < n_remap_iterations; ++iR )
         {
-            // Project data from target to source through transpose application
-            srcTgt = srcMapOperator.transpose() * tgtSrc;
+            // Project data from target to source through transpose application for each variable
+            for( auto iVar = 0; iVar < rhsvsize; ++iVar )
+                srcTgt.col( iVar ) = srcMapOperator.transpose() * tgtSrc.col( iVar );
         }
         POP_TIMER( "RemapTransposeTotalSpMV" )
 
         std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
                   << " RemapOperator (tranpose) SpMV application = "
-                  << static_cast< double >( timeLog["RemapTransposeTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations )
+                  << static_cast< MOABReal >( timeLog["RemapTransposeTotalSpMV"].count() ) /
+                         ( 1E6 * n_remap_iterations * rhsvsize )
                   << std::endl;
     }
 
     return 0;
 }
 
+#ifdef MOAB_HAVE_EIGEN3
 void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSInt nRows, const MOABSInt nCols,
                       const std::vector< MOABSInt >& vecRow, const std::vector< MOABSInt >& vecCol,
                       const std::vector< MOABReal >& vecS )
@@ -178,6 +199,7 @@ void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSI
     // Let us populate the map object for every process
     mapOperator.resize( nRows, nCols );
     mapOperator.reserve( nS );
+
     // create a triplet vector
     typedef Eigen::Triplet< MOABReal > SparseEntry;
     std::vector< SparseEntry > tripletList( nS );
@@ -195,6 +217,7 @@ void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSI
 
     return;
 }
+#endif
 
 moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
                                  std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS, MOABSInt& nRows,
