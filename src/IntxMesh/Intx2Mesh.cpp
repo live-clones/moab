@@ -14,6 +14,7 @@
 // this is for DBL_MAX
 #include <cfloat>
 #include <queue>
+#include <set>
 #include <utility>
 #include <sstream>
 #include "moab/GeomUtil.hpp"
