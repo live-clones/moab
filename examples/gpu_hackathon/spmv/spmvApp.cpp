@@ -167,6 +167,7 @@ int main( int argc, char** argv )
     // Now let us repeat SpMV from Target to Source if requested
     if( is_target_transposed )
     {
+        Eigen::SparseMatrix< MOABReal > srcTMapOperator = srcMapOperator.transpose();
         // multiple RHS for each variable to be projected
         Eigen::MatrixXd srcTgt = Eigen::MatrixXd::Zero( srcMapOperator.cols(), rhsvsize );
         Eigen::MatrixXd tgtSrc = Eigen::MatrixXd::Random( srcMapOperator.rows(), rhsvsize );
@@ -176,7 +177,7 @@ int main( int argc, char** argv )
         {
             // Project data from target to source through transpose application for each variable
             for( auto iVar = 0; iVar < rhsvsize; ++iVar )
-                srcTgt.col( iVar ) = srcMapOperator.transpose() * tgtSrc.col( iVar );
+                srcTgt.col( iVar ) = srcTMapOperator * tgtSrc.col( iVar );
         }
         POP_TIMER( "RemapTransposeTotalSpMV" )
 
