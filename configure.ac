@@ -132,8 +132,8 @@ fi
 
 
 # Check how to add std-c++0x flag enabled
-# VSM: This is a hard requirement from 5.1.1+
-AX_CXX_COMPILE_STDCXX_0X
+# VSM: This is a hard requirement from 5.2.1+
+AX_CXX_COMPILE_STDCXX([11],,[mandatory])
 
 ################################################################################
 #                           Basic Portability Stuff
