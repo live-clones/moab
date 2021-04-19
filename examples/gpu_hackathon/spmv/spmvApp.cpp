@@ -5,7 +5,7 @@
  * node and we do not care about MPI parallelism in this experiment.
  *
  * Usage:
- *      ./spmvApp srcMapFile -tmap tgtMapFile -n iterations
+ *      ./spmvApp srcRemapWeightFile -t -n iterations
  *
  * Note: Some datasets for forward and reverse maps have been uploaded to:
  *       https://ftp.mcs.anl.gov/pub/fathom/MeshFiles/maps/
@@ -77,14 +77,14 @@ void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSI
 
 int main( int argc, char** argv )
 {
-    std::string src_map_file_name = "";
-    std::string tgt_map_file_name = "";
+    std::string remap_operator_filename = "";
     bool is_target_transposed     = false;
     int n_remap_iterations        = 100;
     ProgOptions opts( "Remap SpMV Mini-App" );
-    opts.addRequiredArg< std::string >( "smap", "Source map file name for projection", &src_map_file_name );
-    // opts.addOpt< std::string >( "srcmap,s", "Source map file name for projection", &src_map_file_name );
-    opts.addOpt< std::string >( "tmap", "Target map file name for projection)", &tgt_map_file_name );
+    opts.addRequiredArg< std::string >( "MapOperator", "Remap weights filename to optimize for SpMV", &remap_operator_filename );
+    // opts.addOpt< std::string >( "srcmap,s", "Source map file name for projection", &remap_operator_filename );
+    opts.addOpt< void >( "transpose,t", "Compute the tranpose operator application as well", &is_target_transposed );
+
     // Need option handling here for input filename
     opts.addOpt< int >( "iterations,n",
                         "Number of iterations to perform to get the average performance profile (default=100)",
@@ -92,76 +92,41 @@ int main( int argc, char** argv )
 
     opts.parseCommandLine( argc, argv );
 
-    if( tgt_map_file_name.size() == 0 ) { is_target_transposed = true; }
-
     // Print problem parameter details
     std::cout << "    SpMV-Remap Application" << std::endl;
     std::cout << "-------------------------------" << std::endl;
-    std::cout << "Source map           = " << src_map_file_name << std::endl;
-    if( is_target_transposed )
-        std::cout << "Target map           = Transpose ( Source Map )" << std::endl;
-    else
-        std::cout << "Target map           = " << tgt_map_file_name << std::endl;
-    std::cout << "Number of iterations = " << n_remap_iterations << std::endl;
+    std::cout << "Source map             = " << remap_operator_filename << std::endl;
+    std::cout << "Compute transpose map  = " << ( is_target_transposed  ? "Yes" : "No" ) << std::endl;
+    std::cout << "Number of iterations   = " << n_remap_iterations << std::endl;
     std::cout << std::endl;
-
-    // Get MOAB instance
-    Core* mb = new( std::nothrow ) Core;
-    if( mb == nullptr ) return 1;
 
 #ifdef MOAB_HAVE_EIGEN3
     Eigen::SparseMatrix< MOABReal > srcMapOperator;
-    Eigen::SparseMatrix< MOABReal > tgtMapOperator;
 #endif
 
     ErrorCode rval;
-    MOABSInt srcOpRows, srcOpCols, srcOpNNZs;
-    MOABSInt tgtOpRows, tgtOpCols, tgtOpNNZs;
+    MOABSInt nOpRows, nOpCols, nOpNNZs;
 
     // compute source data
     {
-        std::vector< MOABSInt > srcNNZRows, srcNNZCols;
-        std::vector< MOABReal > srcNNZVals;
+        std::vector< MOABSInt > opNNZRows, opNNZCols;
+        std::vector< MOABReal > opNNZVals;
         PUSH_TIMER()
         rval =
-            ReadParallelMap( src_map_file_name, srcNNZRows, srcNNZCols, srcNNZVals,
-                                srcOpRows, srcOpCols, srcOpNNZs );MB_CHK_ERR( rval );
-        POP_TIMER( "ReadSourceMap" )
-        PRINT_TIMER( "ReadSourceMap" )
+            ReadParallelMap( remap_operator_filename, opNNZRows, opNNZCols, opNNZVals,
+                                nOpRows, nOpCols, nOpNNZs );MB_CHK_ERR( rval );
+        POP_TIMER( "ReadRemapOperator" )
+        PRINT_TIMER( "ReadRemapOperator" )
 
 #ifdef MOAB_HAVE_EIGEN3
         PUSH_TIMER()
-        SetEigen3Matrix( srcMapOperator, srcOpRows, srcOpCols, srcNNZRows, srcNNZCols, srcNNZVals );
-        POP_TIMER( "SetSourceOperator" )
-        PRINT_TIMER( "SetSourceOperator" )
+        SetEigen3Matrix( srcMapOperator, nOpRows, nOpCols, opNNZRows, opNNZCols, opNNZVals );
+        POP_TIMER( "SetRemapOperator" )
+        PRINT_TIMER( "SetRemapOperator" )
 #endif
     }
 
-    std::cout << "Source map size = [" << srcOpRows << " x " << srcOpCols << "] with NNZs = " << srcOpNNZs << std::endl;
-
-    if( !is_target_transposed )
-    {
-        std::vector< MOABSInt > tgtNNZRows, tgtNNZCols;
-        std::vector< MOABReal > tgtNNZVals;
-
-        PUSH_TIMER()
-        rval = ReadParallelMap( tgt_map_file_name, tgtNNZRows, tgtNNZCols, tgtNNZVals,
-                                tgtOpRows, tgtOpCols, tgtOpNNZs );MB_CHK_ERR( rval );
-        POP_TIMER( "ReadTargetMap" )
-        PRINT_TIMER( "ReadTargetMap" )
-
-#ifdef MOAB_HAVE_EIGEN3
-        PUSH_TIMER()
-        SetEigen3Matrix( tgtMapOperator, tgtOpRows, tgtOpCols, tgtNNZRows, tgtNNZCols, tgtNNZVals );
-        POP_TIMER( "SetTargetOperator" )
-        PRINT_TIMER( "SetTargetOperator" )
-#endif
-        std::cout << "Target map size = [" << tgtOpRows << " x " << tgtOpCols << "] with NNZs = " << tgtOpNNZs
-                  << std::endl;
-    }
-    else
-        std::cout << "Target map size = [" << srcOpCols << " x " << srcOpRows << "] with NNZs = " << srcOpNNZs
-                  << std::endl;
+    std::cout << "Map operator size = [" << nOpRows << " x " << nOpCols << "] with NNZs = " << nOpNNZs << std::endl;
 
     // First let us perform SpMV from Source to Target
     {
@@ -174,37 +139,33 @@ int main( int argc, char** argv )
             // Project data from source to target
             tgtSrc = srcMapOperator * srcTgt;
         }
-        POP_TIMER( "SourceTotalSpMV" )
+        POP_TIMER( "RemapTotalSpMV" )
 
         std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
-                  << " SourceOperator SpMV application = "
-                  << static_cast< double >( timeLog["SourceTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations ) << std::endl;
+                  << " RemapOperator SpMV application = "
+                  << static_cast< double >( timeLog["RemapTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations )
+                  << std::endl;
     }
-    // Now let us repeat SpMV from Target to Source
+
+    // Now let us repeat SpMV from Target to Source if requested
+    if( is_target_transposed )
     {
         Eigen::VectorXd srcTgt = Eigen::VectorXd::Zero( srcMapOperator.cols() );
         Eigen::VectorXd tgtSrc = Eigen::VectorXd::Random( srcMapOperator.rows() );
 
         PUSH_TIMER()
-        if( is_target_transposed )
-            for( int iR = 0; iR < n_remap_iterations; ++iR )
-            {
-                // Project data from target to source through transpose application
-                srcTgt = srcMapOperator.transpose() * tgtSrc;
-            }
-        else
-            for( int iR = 0; iR < n_remap_iterations; ++iR )
-            {
-                // Project data from target to source
-                srcTgt = tgtMapOperator * tgtSrc;
-            }
-        POP_TIMER( "TargetTotalSpMV" )
+        for( int iR = 0; iR < n_remap_iterations; ++iR )
+        {
+            // Project data from target to source through transpose application
+            srcTgt = srcMapOperator.transpose() * tgtSrc;
+        }
+        POP_TIMER( "RemapTransposeTotalSpMV" )
 
         std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
-                  << " TargetOperator SpMV application = "
-                  << static_cast< double >( timeLog["TargetTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations ) << std::endl;
+                  << " RemapOperator (tranpose) SpMV application = "
+                  << static_cast< double >( timeLog["RemapTransposeTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations )
+                  << std::endl;
     }
-    delete mb;
 
     return 0;
 }
