@@ -5,7 +5,7 @@
  * node and we do not care about MPI parallelism in this experiment.
  *
  * Usage:
- *      ./spmvApp -s srcMapFile -t tgtMapFile -n iterations
+ *      ./spmvApp srcMapFile -tmap tgtMapFile -n iterations
  *
  * Note: Some datasets for forward and reverse maps have been uploaded to:
  *       https://ftp.mcs.anl.gov/pub/fathom/MeshFiles/maps/
@@ -48,8 +48,14 @@ Timer start;
 std::map< std::string, std::chrono::nanoseconds > timeLog;
 
 moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
-                                 std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS,
-                                 Eigen::SparseMatrix< MOABReal >& mapOperator );
+                                 std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS, MOABSInt& nRows,
+                                 MOABSInt& nCols, MOABSInt& nNZs );
+
+#ifdef MOAB_HAVE_EIGEN3
+void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSInt nRows, const MOABSInt nCols,
+                      const std::vector< MOABSInt >& vecRow, const std::vector< MOABSInt >& vecCol,
+                      const std::vector< MOABReal >& vecS );
+#endif
 
 #define PUSH_TIMER()          \
     {                         \
@@ -60,75 +66,178 @@ moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOA
     {                                                                                                         \
         std::chrono::nanoseconds elapsed = duration_cast< std::chrono::nanoseconds >( Clock::now() - start ); \
         timeLog[EventName]               = elapsed;                                                           \
-        std::cout << "[ " << EventName << " ]: elapsed = " << static_cast< double >( elapsed.count() / 1e6 )   \
-                  << " milli-seconds" << std::endl;                                                           \
+    }
+
+#define PRINT_TIMER( EventName )                                                                                       \
+    {                                                                                                                  \
+        std::cout << "[ " << EventName                                                                                 \
+                  << " ]: elapsed = " << static_cast< double >( timeLog[EventName].count() / 1e6 ) << " milli-seconds" \
+                  << std::endl;                                                                                        \
     }
 
 int main( int argc, char** argv )
 {
-    std::string src_map_file_name = string( MESH_DIR ) + string( "/src_map.nc" );
-    std::string tgt_map_file_name = string( MESH_DIR ) + string( "/tgt_map.nc" );
+    std::string src_map_file_name = "";
+    std::string tgt_map_file_name = "";
+    bool is_target_transposed     = false;
     int n_remap_iterations        = 100;
-    ProgOptions opts;
-    opts.addOpt< std::string >( "srcmap,s", "Source map file name for projection)", &src_map_file_name );
-    opts.addOpt< std::string >( "tgtmap,t", "Target map file name for projection)", &tgt_map_file_name );
+    ProgOptions opts( "Remap SpMV Mini-App" );
+    opts.addRequiredArg< std::string >( "smap", "Source map file name for projection", &src_map_file_name );
+    // opts.addOpt< std::string >( "srcmap,s", "Source map file name for projection", &src_map_file_name );
+    opts.addOpt< std::string >( "tmap", "Target map file name for projection)", &tgt_map_file_name );
     // Need option handling here for input filename
-    opts.addOpt< int >( "iterations,i",
+    opts.addOpt< int >( "iterations,n",
                         "Number of iterations to perform to get the average performance profile (default=100)",
                         &n_remap_iterations );
 
     opts.parseCommandLine( argc, argv );
 
+    if( tgt_map_file_name.size() == 0 ) { is_target_transposed = true; }
+
+    // Print problem parameter details
+    std::cout << "    SpMV-Remap Application" << std::endl;
+    std::cout << "-------------------------------" << std::endl;
+    std::cout << "Source map           = " << src_map_file_name << std::endl;
+    if( is_target_transposed )
+        std::cout << "Target map           = Transpose ( Source Map )" << std::endl;
+    else
+        std::cout << "Target map           = " << tgt_map_file_name << std::endl;
+    std::cout << "Number of iterations = " << n_remap_iterations << std::endl;
+    std::cout << std::endl;
+
     // Get MOAB instance
     Core* mb = new( std::nothrow ) Core;
     if( mb == nullptr ) return 1;
 
-    ErrorCode rval;
-    std::vector< MOABSInt > srcNNZRows, srcNNZCols;
-    std::vector< MOABReal > srcNNZVals;
+#ifdef MOAB_HAVE_EIGEN3
     Eigen::SparseMatrix< MOABReal > srcMapOperator;
-    PUSH_TIMER()
-    rval = ReadParallelMap( src_map_file_name, srcNNZRows, srcNNZCols, srcNNZVals, srcMapOperator );MB_CHK_ERR(rval);
-    POP_TIMER( "SourceMap" )
-
-    std::cout << "Source map size = [" << srcMapOperator.rows() << " x " << srcMapOperator.cols() << "] with NNZs = "
-              << srcMapOperator.nonZeros() << std::endl;
-
-    std::vector< MOABSInt > tgtNNZRows, tgtNNZCols;
-    std::vector< MOABReal > tgtNNZVals;
     Eigen::SparseMatrix< MOABReal > tgtMapOperator;
-    PUSH_TIMER()
-    rval = ReadParallelMap( tgt_map_file_name, tgtNNZRows, tgtNNZCols, tgtNNZVals, tgtMapOperator );MB_CHK_ERR( rval );
-    POP_TIMER( "TargetMap" )
+#endif
 
-    std::cout << "Target map size = [" << tgtMapOperator.rows() << " x " << tgtMapOperator.cols()
-              << "] with NNZs = " << tgtMapOperator.nonZeros() << std::endl;
+    ErrorCode rval;
+    MOABSInt srcOpRows, srcOpCols, srcOpNNZs;
+    MOABSInt tgtOpRows, tgtOpCols, tgtOpNNZs;
 
-    Eigen::VectorXd srcTgt = Eigen::VectorXd::Random( srcMapOperator.cols() );
-    Eigen::VectorXd tgtSrc = Eigen::VectorXd::Zero( tgtMapOperator.cols() );
-
-    PUSH_TIMER()
-    for( int iR = 0; iR < n_remap_iterations; ++iR )
+    // compute source data
     {
-        // Project data from source to target
-        tgtSrc = srcMapOperator * srcTgt;
+        std::vector< MOABSInt > srcNNZRows, srcNNZCols;
+        std::vector< MOABReal > srcNNZVals;
+        PUSH_TIMER()
+        rval =
+            ReadParallelMap( src_map_file_name, srcNNZRows, srcNNZCols, srcNNZVals,
+                                srcOpRows, srcOpCols, srcOpNNZs );MB_CHK_ERR( rval );
+        POP_TIMER( "ReadSourceMap" )
+        PRINT_TIMER( "ReadSourceMap" )
 
-        // Project data from target to source
-        srcTgt = tgtMapOperator * tgtSrc;
+#ifdef MOAB_HAVE_EIGEN3
+        PUSH_TIMER()
+        SetEigen3Matrix( srcMapOperator, srcOpRows, srcOpCols, srcNNZRows, srcNNZCols, srcNNZVals );
+        POP_TIMER( "SetSourceOperator" )
+        PRINT_TIMER( "SetSourceOperator" )
+#endif
     }
-    POP_TIMER( "TotalSpMV" )
 
-    std::cout << "Average time (milli-secs) taken for " << 2*n_remap_iterations << " SpMV operation = "
-              << static_cast< double >( timeLog["TotalSpMV"].count() ) / ( 2E6 * n_remap_iterations ) << std::endl;
+    std::cout << "Source map size = [" << srcOpRows << " x " << srcOpCols << "] with NNZs = " << srcOpNNZs << std::endl;
 
+    if( !is_target_transposed )
+    {
+        std::vector< MOABSInt > tgtNNZRows, tgtNNZCols;
+        std::vector< MOABReal > tgtNNZVals;
+
+        PUSH_TIMER()
+        rval = ReadParallelMap( tgt_map_file_name, tgtNNZRows, tgtNNZCols, tgtNNZVals,
+                                tgtOpRows, tgtOpCols, tgtOpNNZs );MB_CHK_ERR( rval );
+        POP_TIMER( "ReadTargetMap" )
+        PRINT_TIMER( "ReadTargetMap" )
+
+#ifdef MOAB_HAVE_EIGEN3
+        PUSH_TIMER()
+        SetEigen3Matrix( tgtMapOperator, tgtOpRows, tgtOpCols, tgtNNZRows, tgtNNZCols, tgtNNZVals );
+        POP_TIMER( "SetTargetOperator" )
+        PRINT_TIMER( "SetTargetOperator" )
+#endif
+        std::cout << "Target map size = [" << tgtOpRows << " x " << tgtOpCols << "] with NNZs = " << tgtOpNNZs
+                  << std::endl;
+    }
+    else
+        std::cout << "Target map size = [" << srcOpCols << " x " << srcOpRows << "] with NNZs = " << srcOpNNZs
+                  << std::endl;
+
+    // First let us perform SpMV from Source to Target
+    {
+        Eigen::VectorXd srcTgt = Eigen::VectorXd::Random( srcMapOperator.cols() );
+        Eigen::VectorXd tgtSrc = Eigen::VectorXd::Zero( srcMapOperator.rows() );
+
+        PUSH_TIMER()
+        for( int iR = 0; iR < n_remap_iterations; ++iR )
+        {
+            // Project data from source to target
+            tgtSrc = srcMapOperator * srcTgt;
+        }
+        POP_TIMER( "SourceTotalSpMV" )
+
+        std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
+                  << " SourceOperator SpMV application = "
+                  << static_cast< double >( timeLog["SourceTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations ) << std::endl;
+    }
+    // Now let us repeat SpMV from Target to Source
+    {
+        Eigen::VectorXd srcTgt = Eigen::VectorXd::Zero( srcMapOperator.cols() );
+        Eigen::VectorXd tgtSrc = Eigen::VectorXd::Random( srcMapOperator.rows() );
+
+        PUSH_TIMER()
+        if( is_target_transposed )
+            for( int iR = 0; iR < n_remap_iterations; ++iR )
+            {
+                // Project data from target to source through transpose application
+                srcTgt = srcMapOperator.transpose() * tgtSrc;
+            }
+        else
+            for( int iR = 0; iR < n_remap_iterations; ++iR )
+            {
+                // Project data from target to source
+                srcTgt = tgtMapOperator * tgtSrc;
+            }
+        POP_TIMER( "TargetTotalSpMV" )
+
+        std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
+                  << " TargetOperator SpMV application = "
+                  << static_cast< double >( timeLog["TargetTotalSpMV"].count() ) / ( 1E6 * n_remap_iterations ) << std::endl;
+    }
     delete mb;
 
     return 0;
 }
 
+void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSInt nRows, const MOABSInt nCols,
+                      const std::vector< MOABSInt >& vecRow, const std::vector< MOABSInt >& vecCol,
+                      const std::vector< MOABReal >& vecS )
+{
+    const size_t nS = vecS.size();
+    // Let us populate the map object for every process
+    mapOperator.resize( nRows, nCols );
+    mapOperator.reserve( nS );
+    // create a triplet vector
+    typedef Eigen::Triplet< MOABReal > SparseEntry;
+    std::vector< SparseEntry > tripletList( nS );
+
+    // loop over nnz and populate the sparse matrix operator
+    for( size_t innz = 0; innz < nS; ++innz )
+    {
+        // mapOperator.insert( vecRow[innz]-1, vecCol[innz]-1 ) = vecS[innz];
+        tripletList[innz] = SparseEntry( vecRow[innz] - 1, vecCol[innz] - 1, vecS[innz] );
+    }
+
+    mapOperator.setFromTriplets( tripletList.begin(), tripletList.end() );
+
+    mapOperator.makeCompressed();
+
+    return;
+}
+
 moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
-                                 std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS,
-                                 Eigen::SparseMatrix< MOABReal >& mapOperator )
+                                 std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS, MOABSInt& nRows,
+                                 MOABSInt& nCols, MOABSInt& nNZs )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -191,21 +300,9 @@ moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOA
 
     ncMap.close();
 
-    // Let us populate the map object for every process
-    mapOperator.resize( nB, nA );
-    mapOperator.reserve( nS );
-    // create a triplet vector
-    typedef Eigen::Triplet< MOABReal > SparseEntry;
-    std::vector< SparseEntry > tripletList( nS );
-
-    // loop over nnz and populate the sparse matrix operator
-    for( int innz = 0; innz < nS; ++innz )
-    {
-        // mapOperator.insert( vecRow[innz]-1, vecCol[innz]-1 ) = vecS[innz];
-        tripletList[innz] = SparseEntry( vecRow[innz] - 1, vecCol[innz] - 1, vecS[innz] );
-    }
-
-    mapOperator.setFromTriplets( tripletList.begin(), tripletList.end() );
+    nRows = nB;
+    nCols = nA;
+    nNZs = nS;
 
     return moab::MB_SUCCESS;
 }
