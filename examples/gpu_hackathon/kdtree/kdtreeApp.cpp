@@ -23,7 +23,6 @@
 #include "moab/NestedRefine.hpp"
 
 #include "moab/AdaptiveKDTree.hpp"
-#include "moab/SpatialLocator.hpp"
 
 using namespace moab;
 using namespace std;
@@ -89,7 +88,7 @@ int main( int argc, char** argv )
         rval = uref.generate_mesh_hierarchy( uniformRefinementLevels,
                                                 uniformRefinementDegree.data(),
                                                 level_sets, true );MB_CHK_ERR( rval );
-        assert( level_sets.size() == uniformRefinementLevels + 1 );
+        assert( (int)level_sets.size() == uniformRefinementLevels + 1 );
         fileset = level_sets[uniformRefinementLevels];
     }
     else
@@ -103,47 +102,51 @@ int main( int argc, char** argv )
 
     PUSH_TIMER()
     // Create a tree to use for the location service
-    // Can we acclerate this setup phase on a GPU as well ??
+    // Can we accelerate this setup phase on a GPU as well ??
     // Or may be use Kokkos/OpenMP for CPU executor ?
-    AdaptiveKDTree tree(&mb, elems, &fileset);
+    AdaptiveKDTree kd( &mb );
+    EntityHandle tree_root = 0;
+    rval                   = kd.build_tree( elems, &tree_root );MB_CHK_ERR( rval );
+    //AdaptiveKDTree tree(&mb, elems, &fileset);
 
     // Build the SpatialLocator
-    SpatialLocator sl( &mb, elems, &tree );
+    //SpatialLocator sl( &mb, elems, &tree );
     POP_TIMER( "KdTree-Setup" )
     PRINT_TIMER( "KdTree-Setup" )
 
     // Get the box extents
-    CartVect box_extents, pos;
-    BoundBox box = sl.local_box();
-    box_extents  = 1.1 * (box.bMax - box.bMin);
+    CartVect min, max, box_extents, pos;
+    unsigned  depth;
+    kd.get_info( tree_root, &min[0], &max[0], depth );
+
+    cout << "box: " << min << " " <<  max << "depth: " << depth << "\n";
+    BoundBox box (min,max);
+    box_extents  = 1.1 * (max - min);
 
     // Use Kokkos views to transfer r-o data from CPU to GPU
     // KdTreeView treeview (&tree, KOKKOS_STUFF);
 
     // Query at random places in the tree
-    CartVect params;
+    /*CartVect params;
     int is_inside  = 0;
     int num_inside = 0;
-    EntityHandle elem;
-    // nearest neighbor interpolation
+    EntityHandle elem; */
+
     PUSH_TIMER()
+
+    EntityHandle leaf_out;
     for( int i = 0; i < num_queries; i++ )
     {
         pos  = box.bMin + CartVect( box_extents[0] * .01 * ( rand() % 100 ), box_extents[1] * .01 * ( rand() % 100 ),
                                    box_extents[2] * .01 * ( rand() % 100 ) );
         // Query technically on a GPU datastructure here.
-        rval = sl.locate_point( pos.array(), elem, params.array(), &is_inside, 0.0, 0.0 );MB_CHK_ERR( rval );
-        if( is_inside ) num_inside++;
+        rval = kd.point_search( &pos[0], leaf_out);  MB_CHK_ERR( rval );
+
     }
     POP_TIMER( "KdTree-Query" )
     PRINT_TIMER( "KdTree-Query" )
 
-    cout << "Mesh contains " << elems.size() << " elements of type "
-         << CN::EntityTypeName( mb.type_from_handle( *elems.begin() ) ) << endl;
-    cout << "Bounding box min-max = (" << box.bMin[0] << "," << box.bMin[1] << "," << box.bMin[2] << ")-("
-         << box.bMax[0] << "," << box.bMax[1] << "," << box.bMax[2] << ")" << endl;
-    cout << "Queries inside box = " << num_inside << "/" << num_queries << " = "
-         << 100.0 * ( (double)num_inside ) / num_queries << "%" << endl;
+
 
     return 0;
 }

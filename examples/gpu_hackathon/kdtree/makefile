@@ -10,7 +10,7 @@ all: $(ALLEXAMPLES)
 
 kdtreeApp: kdtreeApp.o ${MOAB_LIBDIR}/libMOAB.la
 	@echo "[CXXLD]  $@"
-	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} -lomp
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK} 
 
 run-kdtreeApp: kdtreeApp
 	${RUNSERIAL} ./kdtreeApp
