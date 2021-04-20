@@ -51,9 +51,12 @@ using std::chrono::duration_cast;
 Timer start;
 std::map< std::string, std::chrono::nanoseconds > timeLog;
 
-moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
+moab::ErrorCode ReadRemapOperator( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
                                  std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS, MOABSInt& nRows,
                                  MOABSInt& nCols, MOABSInt& nNZs );
+
+void print_metrics( MOABSInt nRows, MOABSInt nCols, const std::vector< MOABSInt >& vecRow,
+                    const std::vector< MOABSInt >& vecCol, const std::vector< MOABReal >& vecS );
 
 #ifdef MOAB_HAVE_EIGEN3
 void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSInt nRows, const MOABSInt nCols,
@@ -120,10 +123,12 @@ int main( int argc, char** argv )
         std::vector< MOABSInt > opNNZRows, opNNZCols;
         std::vector< MOABReal > opNNZVals;
         PUSH_TIMER()
-        rval = ReadParallelMap( remap_operator_filename, opNNZRows, opNNZCols, opNNZVals,
+        rval = ReadRemapOperator( remap_operator_filename, opNNZRows, opNNZCols, opNNZVals,
                                 nOpRows, nOpCols, nOpNNZs );MB_CHK_ERR( rval );
         POP_TIMER( "ReadRemapOperator" )
         PRINT_TIMER( "ReadRemapOperator" )
+
+        print_metrics( nOpRows, nOpCols, opNNZRows, opNNZCols, opNNZVals );
 
         PUSH_TIMER()
 #ifdef MOAB_HAVE_EIGEN3
@@ -140,8 +145,6 @@ int main( int argc, char** argv )
         PRINT_TIMER( "SetRemapOperator" )
     }
 
-    std::cout << "Map operator size = [" << nOpRows << " x " << nOpCols << "] with NNZs = " << nOpNNZs << std::endl;
-
     // First let us perform SpMV from Source to Target
     {
         // multiple RHS for each variable to be projected
@@ -157,11 +160,10 @@ int main( int argc, char** argv )
         }
         POP_TIMER( "RemapTotalSpMV" )
 
+        const MOABReal totalCPU_MS = static_cast< MOABReal >( timeLog["RemapTotalSpMV"].count() ) / ( 1E6 );
         std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
-                  << " RemapOperator SpMV application = "
-                  << static_cast< MOABReal >( timeLog["RemapTotalSpMV"].count() ) /
-                         ( 1E6 * n_remap_iterations * rhsvsize )
-                  << std::endl;
+                  << " RemapOperator: SpMV(1) = " << totalCPU_MS / ( n_remap_iterations * rhsvsize )
+                  << " and SpMV(" << rhsvsize << ") = " << totalCPU_MS / ( n_remap_iterations ) << std::endl;
     }
 
     // Now let us repeat SpMV from Target to Source if requested
@@ -181,11 +183,10 @@ int main( int argc, char** argv )
         }
         POP_TIMER( "RemapTransposeTotalSpMV" )
 
+        const MOABReal totalTCPU_MS = static_cast< MOABReal >( timeLog["RemapTransposeTotalSpMV"].count() ) / ( 1E6 );
         std::cout << "Average time (milli-secs) taken for " << n_remap_iterations
-                  << " RemapOperator (tranpose) SpMV application = "
-                  << static_cast< MOABReal >( timeLog["RemapTransposeTotalSpMV"].count() ) /
-                         ( 1E6 * n_remap_iterations * rhsvsize )
-                  << std::endl;
+                  << " RemapOperator: SpMV-Transpose(1) = " << totalTCPU_MS / ( n_remap_iterations * rhsvsize )
+                  << " and SpMV-Transpose(" << rhsvsize << ") = " << totalTCPU_MS / ( n_remap_iterations ) << std::endl;
     }
 
     return 0;
@@ -220,7 +221,7 @@ void SetEigen3Matrix( Eigen::SparseMatrix< MOABReal >& mapOperator, const MOABSI
 }
 #endif
 
-moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
+moab::ErrorCode ReadRemapOperator( const std::string& strMapFile, std::vector< MOABSInt >& vecRow,
                                  std::vector< MOABSInt >& vecCol, std::vector< MOABReal >& vecS, MOABSInt& nRows,
                                  MOABSInt& nCols, MOABSInt& nNZs )
 {
@@ -290,4 +291,43 @@ moab::ErrorCode ReadParallelMap( const std::string& strMapFile, std::vector< MOA
     nNZs = nS;
 
     return moab::MB_SUCCESS;
+}
+
+void print_metrics( MOABSInt nRows, MOABSInt nCols, const std::vector< MOABSInt >& vecRow,
+                    const std::vector< MOABSInt >& /* vecCol */, const std::vector< MOABReal >& /* vecS */ )
+{
+    const int MAXNNZ = 500;
+    std::cout << "Analyzing remap operator: size = [" << nRows << " x " << nCols << "] with NNZ = " << vecRow.size()
+              << "\n";
+    std::vector< int > nnzPerRow( nRows, 0 );
+    std::vector< int > nnzPerRowHist( MAXNNZ, -1 );
+    int maxNNZperRow = 0;
+    int minNNZperRow = MAXNNZ;
+
+    for( size_t iR = 0; iR < vecRow.size(); ++iR )
+    {
+        nnzPerRow[vecRow[iR]-1]++;
+    }
+    for( size_t iR = 0; iR < nnzPerRow.size(); ++iR )
+    {
+        // Compute maxima
+        maxNNZperRow = ( maxNNZperRow > nnzPerRow[iR] ? maxNNZperRow : nnzPerRow[iR] );
+        // Compute minima
+        minNNZperRow = ( minNNZperRow < nnzPerRow[iR] ? minNNZperRow : nnzPerRow[iR] );
+        // Update histogram
+        nnzPerRowHist[nnzPerRow[iR]]++;
+    }
+
+    // Print the results
+    printf( "---------------------------\n" );
+    printf( "      NNZ Histogram\n" );
+    printf( "---------------------------\n" );
+    printf( "      iNNZ       n(NNZ)\n" );
+    for( size_t iR = 0, index = 1; iR < nnzPerRowHist.size(); ++iR )
+    {
+        if( nnzPerRowHist[iR] > 0) printf( "%3zu   %3zu     %8d\n", index++, iR, nnzPerRowHist[iR] );
+    }
+    printf( "---------------------------\n" );
+    printf( "NNZ statistics: minima = %d, maxima = %d, average (rounded) = %3.0f\n\n", minNNZperRow, maxNNZperRow,
+            static_cast< double >( vecRow.size() ) / nRows );
 }
