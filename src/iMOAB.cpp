@@ -3205,7 +3205,8 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
     iMOAB_AppID pid_intx, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String disc_method_source, int* disc_order_source, const iMOAB_String disc_method_target,
     int* disc_order_target, int* fNoBubble, int* fMonotoneTypeID, int* fVolumetric, int* fNoConservation,
-    int* fValidate, const iMOAB_String source_solution_tag_dof_name, const iMOAB_String target_solution_tag_dof_name,
+    int* fValidate, int* fSparseConstraints, const iMOAB_String source_solution_tag_dof_name,
+    const iMOAB_String target_solution_tag_dof_name,
     int solution_weights_identifier_length, int disc_method_source_length, int disc_method_target_length,
     int source_solution_tag_dof_name_length, int target_solution_tag_dof_name_length )
 {
@@ -3243,7 +3244,8 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
         source_solution_tag_dof_name,                        // const std::string srcDofTagName = "GLOBAL_ID"
         target_solution_tag_dof_name,                        // const std::string tgtDofTagName = "GLOBAL_ID"
         false,                                               // bool fInputConcave = false
-        false                                                // bool fOutputConcave = false
+        false,                                               // bool fOutputConcave = false
+        (fSparseConstraints ? *fSparseConstraints : false)   // use sparse constraints
     );CHKERRVAL( rval );
 
     return 0;

@@ -694,7 +694,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
 moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
     std::string strInputType, std::string strOutputType, const int nPin, const int nPout, bool fBubble,
     int fMonotoneTypeID, bool fVolumetric, bool fNoConservation, bool fNoCheck, const std::string srcDofTagName,
-    const std::string tgtDofTagName, const bool fInputConcave, const bool fOutputConcave )
+    const std::string tgtDofTagName, const bool fInputConcave, const bool fOutputConcave, const bool useSparseConstraints )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -1119,7 +1119,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             }
 
             LinearRemapSE4_Tempest_MOAB( dataGLLNodesSrcCov, dataGLLJacobian, nMonotoneType, fContinuousIn,
-                                         fNoConservation );
+                                         fNoConservation, useSparseConstraints );
         }
         else if( ( eInputType != DiscretizationType_FV ) && ( eOutputType != DiscretizationType_FV ) )
         {

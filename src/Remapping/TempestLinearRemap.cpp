@@ -436,7 +436,7 @@ extern void ForceIntArrayConsistencyConservation( const DataArray1D< double >& v
 
 void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                                           const DataArray3D< double >& dataGLLJacobian,
-                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation )
+                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation, bool useSparseConstraints )
 {
     // Order of the polynomial interpolant
     int nP = dataGLLNodes.GetRows();
@@ -772,7 +772,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                 _EXCEPTIONT( "Target grid must be a subset of source grid" );
             }
 
-            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 )
+            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 ), useSparseConstraints
                                            /*, m_remapper->lid_to_gid_covsrc[ixFirst]*/ );
 
             for( int j = 0; j < nOverlapFaces; j++ )

@@ -423,13 +423,13 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot write intx file result" )
     }
 #endif
-
+    int sparseConstraints = 0;  // phys grid to ocn proj does not use sparse constraints actually
     if( couComm != MPI_COMM_NULL )
     {
         PUSH_TIMER( "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplAtmOcnPID, weights_identifiers[0], disc_methods[0], &disc_orders[0], disc_methods[1], &disc_orders[1],
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0], dof_tag_names[1],
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, &sparseConstraints, dof_tag_names[0], dof_tag_names[1],
             strlen( weights_identifiers[0] ), strlen( disc_methods[0] ), strlen( disc_methods[1] ),
             strlen( dof_tag_names[0] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )

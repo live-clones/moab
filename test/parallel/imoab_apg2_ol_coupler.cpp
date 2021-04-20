@@ -63,6 +63,7 @@ int main( int argc, char* argv[] )
     std::string opName;
 
     int repartitioner_scheme = 0;
+    int sparseConstraints = 0;
 #ifdef MOAB_HAVE_ZOLTAN
     repartitioner_scheme = 2;  // use the geometry partitioner in that case
 #endif
@@ -148,6 +149,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "endCoupler,j", "end task for coupler layout", &endG4 );
 
     opts.addOpt< int >( "partitioning,p", "partitioning option for migration", &repartitioner_scheme );
+    opts.addOpt< int >( "sparseCons,s", "sparse constraints for conservation and consistency", &sparseConstraints );
 
     opts.parseCommandLine( argc, argv );
 
@@ -542,7 +544,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplAtmOcnPID, weights_identifiers[0], disc_methods[1], &disc_orders[1],  // fv
             disc_methods[1], &disc_orders[1],                                        // fv
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, &sparseConstraints, dof_tag_names[1], dof_tag_names[1],
             strlen( weights_identifiers[0] ), strlen( disc_methods[1] ), strlen( disc_methods[1] ),
             strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
@@ -556,7 +558,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplOcnAtmPID, weights_identifiers[0], disc_methods[1], &disc_orders[1],  // fv
             disc_methods[1], &disc_orders[1],                                        // fv
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, &sparseConstraints, dof_tag_names[1], dof_tag_names[1],
             strlen( weights_identifiers[0] ), strlen( disc_methods[1] ), strlen( disc_methods[1] ),
             strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
@@ -576,7 +578,7 @@ int main( int argc, char* argv[] )
         PUSH_TIMER( "Compute ATM-LND remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplAtmLndPID, weights_identifiers[0], disc_methods[1], &disc_orders[1], disc_methods[1], &disc_orders[1],
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, &sparseConstraints, dof_tag_names[1], dof_tag_names[1],
             strlen( weights_identifiers[0] ), strlen( disc_methods[1] ), strlen( disc_methods[1] ),
             strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field" );
@@ -586,7 +588,7 @@ int main( int argc, char* argv[] )
         PUSH_TIMER( "Compute LND-ATM remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplLndAtmPID, weights_identifiers[0], disc_methods[1], &disc_orders[1], disc_methods[1], &disc_orders[1],
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, &sparseConstraints, dof_tag_names[1], dof_tag_names[1],
             strlen( weights_identifiers[0] ), strlen( disc_methods[1] ), strlen( disc_methods[1] ),
             strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "failed to compute remapping projection weights for LND-ATM scalar non-conservative field" );

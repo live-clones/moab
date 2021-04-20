@@ -66,6 +66,7 @@ struct ToolContext
     bool rrmGrids;
     bool kdtreeSearch;
     bool fNoBubble, fInputConcave, fOutputConcave, fCheck;
+    bool useSparseConstraints;
 
 #ifdef MOAB_HAVE_MPI
     ToolContext( moab::Interface* icore, moab::ParallelComm* p_pcomm )
@@ -79,7 +80,7 @@ struct ToolContext
           computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity( false ),
           ensureMonotonicity( 0 ), fNoConservation( false ), fVolumetric( false ), rrmGrids( false ),
           kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ), fOutputConcave( false ),
-          fCheck( n_procs > 1 ? false : true )
+          fCheck( n_procs > 1 ? false : true ), useSparseConstraints( false )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -198,6 +199,8 @@ struct ToolContext
                              &enforceConvexity );
         opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes", &fBubble );
 
+        opts.addOpt< void >( "sparse_constraints,s",
+                                "use sparse constraints in force consistency and conservation 3", &useSparseConstraints);
         opts.parseCommandLine( argc, argv );
 
         // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree
@@ -597,8 +600,10 @@ int main( int argc, char* argv[] )
                 runCtx->doftag_names[0],                         // std::string source_tag_name
                 runCtx->doftag_names[1],                         // std::string target_tag_name,
                 runCtx->fInputConcave,                           // bool fInputConcave
-                runCtx->fOutputConcave                           // bool fOutputConcave
-            );MB_CHK_ERR( rval );
+                runCtx->fOutputConcave,                          // bool fOutputConcave
+                runCtx->useSparseConstraints
+            );
+            MB_CHK_ERR( rval );
             runCtx->timer_pop();
 
             // Invoke the CheckMap routine on the TempestRemap serial interface directly, if running

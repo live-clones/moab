@@ -900,6 +900,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
   \param[in] fNoConservation     (int *)                   The flag to indicate whether to ignore conservation of solution field during projection
   \param[in] fValidate           (int *)                   The flag to indicate whether to validate the consistency and conservation of solution field during projection;
                                                            Production runs should not have this flag enabled to minimize collective operations.
+  \param[in] fSparseConstraints (int *)                    Use sparse constraints for consistency and conservation
   \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization
   \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization
   \param[in] solution_weights_identifier_length   (int)    The length of the solution weights identifier string
@@ -913,7 +914,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
                                                const iMOAB_String disc_method_source, int* disc_order_source,
                                                const iMOAB_String disc_method_target, int* disc_order_target,
                                                int* fNoBubble, int* fMonotoneTypeID, int* fVolumetric,
-                                               int* fNoConservation, int* fValidate,
+                                               int* fNoConservation, int* fValidate, int *fSparseConstraints,
                                                const iMOAB_String source_solution_tag_dof_name,
                                                const iMOAB_String target_solution_tag_dof_name,
                                                int solution_weights_identifier_length,

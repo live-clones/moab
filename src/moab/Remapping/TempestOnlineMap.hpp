@@ -80,7 +80,8 @@ class TempestOnlineMap : public OfflineMap
                                               bool fNoConservation = false, bool fNoCheck = false,
                                               const std::string srcDofTagName = "GLOBAL_ID",
                                               const std::string tgtDofTagName = "GLOBAL_ID",
-                                              const bool fInputConcave = false, const bool fOutputConcave = false );
+                                              const bool fInputConcave = false, const bool fOutputConcave = false,
+                                              const bool useSparseConstraints = false);
 
     ///	<summary>
     ///		Generate the metadata associated with the offline map.
@@ -152,7 +153,7 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     void LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                       const DataArray3D< double >& dataGLLJacobian, int nMonotoneType,
-                                      bool fContinuousIn, bool fNoConservation );
+                                      bool fContinuousIn, bool fNoConservation, bool useSparseConstraints );
 
     ///	<summary>
     ///		Generate the OfflineMap for remapping from finite volumes to finite
