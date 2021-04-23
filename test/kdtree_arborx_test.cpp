@@ -25,7 +25,12 @@
 #include "moab/AdaptiveKDTree.hpp"
 #include "TestUtil.hpp"
 
-#include "ArborX_LinearBVH.hpp"
+#include <ArborX.hpp>
+#include <Kokkos_Core.hpp>
+#include <random>
+
+using ExecutionSpace = Kokkos::DefaultExecutionSpace;
+using MemorySpace = ExecutionSpace::memory_space;
 
 using namespace moab;
 using namespace std;
@@ -126,8 +131,24 @@ int main( int argc, char** argv )
     BoundBox box (min,max);
     box_extents  = 1.1 * (max - min);
 
-    // Use Kokkos views to transfer r-o data from CPU to GPU
-    // KdTreeView treeview (&tree, KOKKOS_STUFF);
+    Kokkos::ScopeGuard guard(argc, argv);
+
+      int const n = 100;
+      std::vector<ArborX::Point> points;
+      // Fill vector with random points in [-1, 1]^3
+      std::uniform_real_distribution<float> dis{-1., 1.};
+      std::default_random_engine gen;
+      auto rd = [&]() { return dis(gen); };
+      std::generate_n(std::back_inserter(points), n, [&]() {
+        return ArborX::Point{rd(), rd(), rd()};
+      });
+
+      ArborX::BVH<MemorySpace> bvh{
+          ExecutionSpace{},
+          Kokkos::create_mirror_view_and_copy(
+              MemorySpace{},
+              Kokkos::View<ArborX::Point *, Kokkos::HostSpace,
+                           Kokkos::MemoryUnmanaged>(points.data(), points.size()))};
 
     // Query at random places in the tree
     /*CartVect params;
