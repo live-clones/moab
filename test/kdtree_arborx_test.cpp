@@ -25,6 +25,8 @@
 #include "moab/AdaptiveKDTree.hpp"
 #include "TestUtil.hpp"
 
+#include "ArborX_LinearBVH.hpp"
+
 using namespace moab;
 using namespace std;
 
