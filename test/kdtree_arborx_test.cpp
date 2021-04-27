@@ -175,7 +175,7 @@ int main( int argc, char** argv )
     std::cout << "ArborX version: " << ArborX::version() << std::endl;
     std::cout << "ArborX hash   : " << ArborX::gitCommitHash() << std::endl;
 
-    int const n = 1000;
+    /*int const n = 1000;
     std::vector<ArborX::Point> points;
     // Fill vector with random points in [-1, 1]^3
     std::uniform_real_distribution<float> dis{-1., 1.};
@@ -183,8 +183,19 @@ int main( int argc, char** argv )
     auto rd = [&]() { return dis(gen); };
     std::generate_n(std::back_inserter(points), n, [&]() {
     return ArborX::Point{rd(), rd(), rd()};
-    });
+    });*/
 
+    std::vector<ArborX::Point> points;
+    points.reserve(elems.size());
+    // use as points the centers of cells
+    for (Range::iterator it=elems.begin(); it!= elems.end(); it++)
+    {
+        EntityHandle cell=*it; // should we get the box
+        double coords[3];
+        rval = mb.get_coords(&cell, 1, coords); MB_CHK_ERR( rval );
+        points.push_back(ArborX::Point{ (float)coords[0], (float)coords[1], (float)coords[2]});
+
+    }
     ArborX::BVH<MemorySpace> bvh{
       ExecutionSpace{},
       Kokkos::create_mirror_view_and_copy(
