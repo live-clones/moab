@@ -185,28 +185,39 @@ int main( int argc, char** argv )
     return ArborX::Point{rd(), rd(), rd()};
     });*/
 
-    std::vector<ArborX::Point> points;
-    points.reserve(elems.size());
+    //std::vector<ArborX::Point> points;
+    Kokkos::View< ArborX::Point *, Kokkos::HostSpace > points("points", elems.size());
+    //points.reserve(elems.size());
     // use as points the centers of cells
-    for (Range::iterator it=elems.begin(); it!= elems.end(); it++)
+    for (size_t i=0; i<elems.size(); i++)
     {
-        EntityHandle cell=*it; // should we get the box
+        EntityHandle cell=elems[i];
         double coords[3];
         rval = mb.get_coords(&cell, 1, coords); MB_CHK_ERR( rval );
-        points.push_back(ArborX::Point{ (float)coords[0], (float)coords[1], (float)coords[2]});
-
+        points(i) = ArborX::Point{ (float)coords[0], (float)coords[1], (float)coords[2]};
     }
+    /*for (Range::iterator it=elems.begin(); it!= elems.end(); it++)
+    {
+        EntityHandle cell=*it; // should we get the box
+
+        points.push_back(;
+
+    }*/
     ArborX::BVH<MemorySpace> bvh{
       ExecutionSpace{},
       Kokkos::create_mirror_view_and_copy(
           MemorySpace{},
-          Kokkos::View<ArborX::Point *, Kokkos::HostSpace,
-                       Kokkos::MemoryUnmanaged>(points.data(), points.size()))};
+          points)};
 
 
 
     POP_TIMER( "ArborX-Build" )
     PRINT_TIMER( "ArborX-Build" )
+    cout << bvh.size() << "\n";
+
+    ArborX::Box bb = bvh.bounds();
+    ArborX::Point maxcorn = bb.maxCorner();
+    cout << "max_corner: " << maxcorn[0] <<" " <<  maxcorn[1] << " "  << maxcorn[2] << "\n";
 
  /*   // query at the same locations
     PUSH_TIMER()
