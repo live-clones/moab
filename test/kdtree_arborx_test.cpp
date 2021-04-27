@@ -1,6 +1,6 @@
-/** @example kdTreeApp.cpp
- * \brief This example shows how to perform local point-in-element searches with MOAB's new tree
- * searching functionality.
+/** @example kdtree_arborx_test.cpp
+ * \brief This example shows how to perform local point-in-element searches with MOAB's
+ * kdtree searching functionality, and with newer GPU capable ArborX  searching functionality.
  *
  * MOAB's SpatialLocator functionality performs point-in-element searches over a local or parallel
  * mesh. SpatialLocator is flexible as to what kind of tree is used and what kind of element basis
@@ -62,17 +62,24 @@ std::map< std::string, std::chrono::nanoseconds > timeLog;
 
 int main( int argc, char** argv )
 {
-    std::string test_file_name  = TestDir + string( "/hex_2048.vtk" );
+    std::string test_file_name  = TestDir + string( "/3k-tri-sphere.vtk" );
     int num_queries             = 1000000;
-    int dimension               = 3;
+    int dimension               = 2;
     int uniformRefinementLevels = 0;
+    int max_depth = 30;
+    int max_per_leaf = 6;
+    std::ostringstream options;
+
 
     ProgOptions opts;
+
     // Need option handling here for input filename
-    opts.addOpt< int >( "dim,d", "Dimension of the problem and mesh (default=3)", &dimension );
+    opts.addOpt< int >( "dim,d", "Dimension of the problem and mesh (default=2)", &dimension );
     opts.addOpt< int >( "queries,n", "Number of queries to perform on the mesh (default=1E4)", &num_queries );
     opts.addOpt< int >( "refine,r", "Number of levels of uniform refinements to perform on the mesh (default=0)",
                         &uniformRefinementLevels );
+    opts.addOpt< int > ("max_depth,m", "Maximum depth in kdtree (default 30)", &max_depth);
+    opts.addOpt <int >("max_per_leaf,l", "Maximum per leaf (default 6) ", &max_per_leaf);
     opts.addOpt< std::string >( "file,i", "File name to load the mesh)", &test_file_name );
 
     opts.parseCommandLine( argc, argv );
@@ -88,6 +95,7 @@ int main( int argc, char** argv )
     // Load the file
     rval = mb.load_file( test_file_name.c_str(), &baseFileset );MB_CHK_SET_ERR( rval, "Error loading file" );
 
+    cout << "load file:  " << test_file_name << "\n";
     if( uniformRefinementLevels )
     {
         moab::NestedRefine uref( &mb, nullptr, baseFileset );
@@ -104,23 +112,24 @@ int main( int argc, char** argv )
     POP_TIMER( "MeshIO-Refine" )
     PRINT_TIMER( "MeshIO-Refine" )
 
-    // Get all 3d elements in the file
+    // Get all elements in the file
     Range elems;
     rval = mb.get_entities_by_dimension( fileset, dimension, elems );MB_CHK_SET_ERR( rval, "Error getting 3d elements" );
 
+    cout << "mesh has " << elems.size()  << " cells \n";
     PUSH_TIMER()
     // Create a tree to use for the location service
     // Can we accelerate this setup phase on a GPU as well ??
     // Or may be use Kokkos/OpenMP for CPU executor ?
     AdaptiveKDTree kd( &mb );
     EntityHandle tree_root = 0;
-    rval                   = kd.build_tree( elems, &tree_root );MB_CHK_ERR( rval );
-    //AdaptiveKDTree tree(&mb, elems, &fileset);
+    options << "MAX_DEPTH=" << max_depth << ";";
+    options << "MAX_PER_LEAF=" << max_per_leaf << ";";
 
-    // Build the SpatialLocator
-    //SpatialLocator sl( &mb, elems, &tree );
-    POP_TIMER( "KdTree-Setup" )
-    PRINT_TIMER( "KdTree-Setup" )
+    FileOptions file_opts( options.str().c_str() );
+    rval                   = kd.build_tree( elems, &tree_root, &file_opts );MB_CHK_ERR( rval );
+    POP_TIMER( "MOAB KdTree-Setup" )
+    PRINT_TIMER( "MOAB KdTree-Setup" )
 
     // Get the box extents
     CartVect min, max, box_extents, pos;
@@ -128,20 +137,22 @@ int main( int argc, char** argv )
     kd.get_info( tree_root, &min[0], &max[0], depth );
 
     cout << "box: " << min << " " <<  max << "depth: " << depth << "\n";
+    // print various info about the tree
+    kd.print();
     BoundBox box (min,max);
     box_extents  = 1.1 * (max - min);
 
     Kokkos::ScopeGuard guard(argc, argv);
 
-      int const n = 100;
-      std::vector<ArborX::Point> points;
-      // Fill vector with random points in [-1, 1]^3
-      std::uniform_real_distribution<float> dis{-1., 1.};
-      std::default_random_engine gen;
-      auto rd = [&]() { return dis(gen); };
-      std::generate_n(std::back_inserter(points), n, [&]() {
-        return ArborX::Point{rd(), rd(), rd()};
-      });
+    int const n = 100;
+    std::vector<ArborX::Point> points;
+    // Fill vector with random points in [-1, 1]^3
+    std::uniform_real_distribution<float> dis{-1., 1.};
+    std::default_random_engine gen;
+    auto rd = [&]() { return dis(gen); };
+    std::generate_n(std::back_inserter(points), n, [&]() {
+    return ArborX::Point{rd(), rd(), rd()};
+    });
 
       ArborX::BVH<MemorySpace> bvh{
           ExecutionSpace{},
