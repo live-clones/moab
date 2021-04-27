@@ -26,6 +26,7 @@
 #include "TestUtil.hpp"
 
 #include <ArborX.hpp>
+#include <ArborX_Version.hpp>
 #include <Kokkos_Core.hpp>
 #include <random>
 
@@ -122,7 +123,8 @@ int main( int argc, char** argv )
     // Can we accelerate this setup phase on a GPU as well ??
     // Or may be use Kokkos/OpenMP for CPU executor ?
     AdaptiveKDTree kd( &mb );
-    EntityHandle tree_root = 0;
+    EntityHandle tree_root;
+    rval = mb.create_meshset(MESHSET_SET, tree_root); MB_CHK_ERR( rval );
     options << "MAX_DEPTH=" << max_depth << ";";
     options << "MAX_PER_LEAF=" << max_per_leaf << ";";
 
@@ -142,9 +144,38 @@ int main( int argc, char** argv )
     BoundBox box (min,max);
     box_extents  = 1.1 * (max - min);
 
+    std::vector<CartVect> queries;
+    queries.reserve(num_queries);
+    for( int i = 0; i < num_queries; i++ )
+    {
+        pos  = box.bMin + CartVect( box_extents[0] * .01 * ( rand() % 100 ), box_extents[1] * .01 * ( rand() % 100 ),
+                                   box_extents[2] * .01 * ( rand() % 100 ) );
+        // project on sphere of radius 100
+        pos = pos/pos.length()*100;
+        queries.push_back(pos);
+    }
+    PUSH_TIMER()
+
+    EntityHandle leaf_out;
+    for( int i = 0; i < num_queries; i++ )
+    {
+        pos  = queries[i];
+
+        // project on a sphere if dim 2?
+        rval = kd.point_search( &pos[0], leaf_out);  MB_CHK_ERR( rval );
+
+    }
+    POP_TIMER( "KdTree-Query" )
+    PRINT_TIMER( "KdTree-Query" )
+
+
+    PUSH_TIMER()
     Kokkos::ScopeGuard guard(argc, argv);
 
-    int const n = 100;
+    std::cout << "ArborX version: " << ArborX::version() << std::endl;
+    std::cout << "ArborX hash   : " << ArborX::gitCommitHash() << std::endl;
+
+    int const n = 1000;
     std::vector<ArborX::Point> points;
     // Fill vector with random points in [-1, 1]^3
     std::uniform_real_distribution<float> dis{-1., 1.};
@@ -154,33 +185,24 @@ int main( int argc, char** argv )
     return ArborX::Point{rd(), rd(), rd()};
     });
 
-      ArborX::BVH<MemorySpace> bvh{
-          ExecutionSpace{},
-          Kokkos::create_mirror_view_and_copy(
-              MemorySpace{},
-              Kokkos::View<ArborX::Point *, Kokkos::HostSpace,
-                           Kokkos::MemoryUnmanaged>(points.data(), points.size()))};
+    ArborX::BVH<MemorySpace> bvh{
+      ExecutionSpace{},
+      Kokkos::create_mirror_view_and_copy(
+          MemorySpace{},
+          Kokkos::View<ArborX::Point *, Kokkos::HostSpace,
+                       Kokkos::MemoryUnmanaged>(points.data(), points.size()))};
 
-    // Query at random places in the tree
-    /*CartVect params;
-    int is_inside  = 0;
-    int num_inside = 0;
-    EntityHandle elem; */
 
+
+    POP_TIMER( "ArborX-Build" )
+    PRINT_TIMER( "ArborX-Build" )
+
+ /*   // query at the same locations
     PUSH_TIMER()
 
-    EntityHandle leaf_out;
-    for( int i = 0; i < num_queries; i++ )
-    {
-        pos  = box.bMin + CartVect( box_extents[0] * .01 * ( rand() % 100 ), box_extents[1] * .01 * ( rand() % 100 ),
-                                   box_extents[2] * .01 * ( rand() % 100 ) );
-        // Query technically on a GPU datastructure here.
-        rval = kd.point_search( &pos[0], leaf_out);  MB_CHK_ERR( rval );
-
-    }
-    POP_TIMER( "KdTree-Query" )
-    PRINT_TIMER( "KdTree-Query" )
-
+    POP_TIMER( "ArborX-Query" )
+    PRINT_TIMER( "ArborX-Query" )
+*/
 
 
     return 0;
