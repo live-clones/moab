@@ -178,18 +178,6 @@ int main( int argc, char** argv )
     std::cout << "ArborX version: " << ArborX::version() << std::endl;
     std::cout << "ArborX hash   : " << ArborX::gitCommitHash() << std::endl;
 
-    /*int const n = 1000;
-    std::vector<ArborX::Point> points;
-    // Fill vector with random points in [-1, 1]^3
-    std::uniform_real_distribution<float> dis{-1., 1.};
-    std::default_random_engine gen;
-    auto rd = [&]() { return dis(gen); };
-    std::generate_n(std::back_inserter(points), n, [&]() {
-    return ArborX::Point{rd(), rd(), rd()};
-    });*/
-
-    //std::vector<ArborX::Point> points;
-    //Kokkos::View< ArborX::Point *, Kokkos::HostSpace > points("points", elems.size());
 
     // Create the View for the bounding boxes, on device
     Kokkos::View<ArborX::Box*, ExecutionSpace::memory_space> bounding_boxes("bounding_boxes", elems.size());
@@ -219,22 +207,55 @@ int main( int argc, char** argv )
     // Create the bounding volume hierarchy
     ArborX::BVH<Kokkos::CudaSpace> bvh(ExecutionSpace{}, bounding_boxes);
 
+
+    POP_TIMER( "ArborX-Build" )
+    PRINT_TIMER( "ArborX-Build" )
+
+    PUSH_TIMER()
     // queries
     // copy from paper
-#if 0
+
     // Create the View for the spatial-based queries
-    Kokkos::View<ArborX::Within *, ExecutionSpace::memory_space> queries("queries", num_queries);
-    // Fill in the queries
-    //using ExecutionSpace = typename DeviceType::execution_space;
-    Kokkos::parallel_for("setup_queries",
-        Kokkos::RangePolicy<ExecutionSpace>(0, num_queries), KOKKOS_LAMBDA(int i) {
-        queries(i) = ArborX::within(query_points(i), radius);
-    });
+    // Kokkos::View<decltype(ArborX::intersects(ArborX::Box{})) *, DeviceType>
+    Kokkos::View< decltype(ArborX::intersects(ArborX::Box{})) * , ExecutionSpace::memory_space> queries_ar("queries", num_queries);
+    // Fill in the queries on host mirror, then copy to device ?
+
+    auto h_queries_ar = create_mirror_view(queries_ar);
+
+    /*
+    Kokkos::parallel_for("fill_queries",
+                           Kokkos::RangePolicy<ExecutionSpace>(0, num_queries ),
+                           KOKKOS_LAMBDA(int i) {
+                                 h_queries_ar(i) = ArborX::intersects(
+                                         ArborX::Box (
+                                         ArborX::Point{ (float)queries[i][0], (float)queries[i][1], (float)queries[i][2]} ,
+                                         ArborX::Point{ (float)queries[i][0], (float)queries[i][1], (float)queries[i][2]}
+                                         )
+
+                                     );
+                           });
+                           */
+
+    for( int i = 0; i < num_queries; i++ )
+    {
+        pos  = queries[i];
+        h_queries_ar(i) = ArborX::intersects(
+                                                 ArborX::Box (
+                                                 { (float)pos[0], (float)pos[1], (float)pos[2] } ,
+                                                 { (float)pos[0], (float)pos[1], (float)pos[2] }
+                                                 )
+                                              );
+    }
+    // copy from host to device
+    Kokkos::deep_copy(queries_ar, h_queries_ar);
+
     // Perform the search
     Kokkos::View<int*, ExecutionSpace::memory_space> offsets("offset", 0);
     Kokkos::View<int*, ExecutionSpace::memory_space> indices("indices", 0);
-    ArborX::query(bvh, ExecutionSpace{}, queries, indices, offsets);
-#endif
+    ArborX::query(bvh, ExecutionSpace{}, queries_ar, indices, offsets);
+
+    POP_TIMER( "ArborX-Query" )
+    PRINT_TIMER( "ArborX-Query" )
     // end copy
     //
     /*for (Range::iterator it=elems.begin(); it!= elems.end(); it++)
@@ -246,8 +267,6 @@ int main( int argc, char** argv )
     }*/
 
 
-    POP_TIMER( "ArborX-Build" )
-    PRINT_TIMER( "ArborX-Build" )
     cout << bvh.size() << "\n";
 
     ArborX::Box bb = bvh.bounds();
