@@ -63,6 +63,9 @@ std::map< std::string, std::chrono::nanoseconds > timeLog;
 
 int main( int argc, char** argv )
 {
+    using ExecutionSpace = Kokkos::DefaultExecutionSpace;
+    using MemorySpace = ExecutionSpace::memory_space;
+
     std::string test_file_name  = TestDir + string( "/3k-tri-sphere.vtk" );
     int num_queries             = 1000000;
     int dimension               = 2;
@@ -186,16 +189,54 @@ int main( int argc, char** argv )
     });*/
 
     //std::vector<ArborX::Point> points;
-    Kokkos::View< ArborX::Point *, Kokkos::HostSpace > points("points", elems.size());
+    //Kokkos::View< ArborX::Point *, Kokkos::HostSpace > points("points", elems.size());
+
+    // Create the View for the bounding boxes, on device
+    Kokkos::View<ArborX::Box*, ExecutionSpace::memory_space> bounding_boxes("bounding_boxes", elems.size());
+    // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
+    //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
+    // mirror view on host, will be populated
+    auto h_bounding_boxes = Kokkos::create_mirror_view(bounding_boxes);
     //points.reserve(elems.size());
-    // use as points the centers of cells
+
+    std::vector<CartVect>  coords;
+    coords.resize(27);// max possible
     for (size_t i=0; i<elems.size(); i++)
     {
         EntityHandle cell=elems[i];
-        double coords[3];
-        rval = mb.get_coords(&cell, 1, coords); MB_CHK_ERR( rval );
-        points(i) = ArborX::Point{ (float)coords[0], (float)coords[1], (float)coords[2]};
+        const EntityHandle *conn ;
+        int nnodes;
+        rval = mb.get_connectivity(cell, conn, nnodes); MB_CHK_ERR( rval );
+        rval = mb.get_coords(conn, nnodes, &coords[0][0] );MB_CHK_SET_ERR( rval, "can't get coordinates" );
+        for (int j=0; j<nnodes; j++)
+        {
+            ArborX::Details::expand(h_bounding_boxes(i),
+                    ArborX::Point{ (float)coords[j][0], (float)coords[j][1], (float)coords[j][2]}  );
+        }
     }
+    Kokkos::deep_copy(bounding_boxes, h_bounding_boxes);
+
+    // Create the bounding volume hierarchy
+    ArborX::BVH<Kokkos::CudaSpace> bvh(ExecutionSpace{}, bounding_boxes);
+
+    // queries
+    // copy from paper
+#if 0
+    // Create the View for the spatial-based queries
+    Kokkos::View<ArborX::Within *, ExecutionSpace::memory_space> queries("queries", num_queries);
+    // Fill in the queries
+    //using ExecutionSpace = typename DeviceType::execution_space;
+    Kokkos::parallel_for("setup_queries",
+        Kokkos::RangePolicy<ExecutionSpace>(0, num_queries), KOKKOS_LAMBDA(int i) {
+        queries(i) = ArborX::within(query_points(i), radius);
+    });
+    // Perform the search
+    Kokkos::View<int*, ExecutionSpace::memory_space> offsets("offset", 0);
+    Kokkos::View<int*, ExecutionSpace::memory_space> indices("indices", 0);
+    ArborX::query(bvh, ExecutionSpace{}, queries, indices, offsets);
+#endif
+    // end copy
+    //
     /*for (Range::iterator it=elems.begin(); it!= elems.end(); it++)
     {
         EntityHandle cell=*it; // should we get the box
@@ -203,12 +244,6 @@ int main( int argc, char** argv )
         points.push_back(;
 
     }*/
-    ArborX::BVH<MemorySpace> bvh{
-      ExecutionSpace{},
-      Kokkos::create_mirror_view_and_copy(
-          MemorySpace{},
-          points)};
-
 
 
     POP_TIMER( "ArborX-Build" )
