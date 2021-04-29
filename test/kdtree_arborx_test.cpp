@@ -65,8 +65,6 @@ std::map< std::string, std::chrono::nanoseconds > timeLog;
 
 int main( int argc, char** argv )
 {
-    using ExecutionSpace = Kokkos::DefaultExecutionSpace;
-    using MemorySpace = ExecutionSpace::memory_space;
 
     std::string test_file_name  = TestDir + string( "/3k-tri-sphere.vtk" );
     int num_queries             = 1000000;
@@ -184,7 +182,9 @@ int main( int argc, char** argv )
 
 
     PUSH_TIMER()
-    Kokkos::ScopeGuard guard(argc, argv);
+    Kokkos::initialize(argc, argv);
+    {
+    //Kokkos::ScopeGuard guard(argc, argv);
 
     std::cout << "ArborX version: " << ArborX::version() << std::endl;
     std::cout << "ArborX hash   : " << ArborX::gitCommitHash() << std::endl;
@@ -216,7 +216,7 @@ int main( int argc, char** argv )
     Kokkos::deep_copy(bounding_boxes, h_bounding_boxes);
 
     // Create the bounding volume hierarchy
-    ArborX::BVH<Kokkos::CudaSpace> bvh(ExecutionSpace{}, bounding_boxes);
+    ArborX::BVH<MemorySpace> bvh(ExecutionSpace{}, bounding_boxes);
 
 
     POP_TIMER( "ArborX-Build" )
@@ -247,8 +247,8 @@ int main( int argc, char** argv )
     Kokkos::deep_copy(queries_ar, h_queries_ar);
 
     // Perform the search
-    Kokkos::View<int*, ExecutionSpace::memory_space> offsets("offset", 0);
-    Kokkos::View<int*, ExecutionSpace::memory_space> indices("indices", 0);
+    Kokkos::View<int*, ExecutionSpace> offsets("offset", 0);
+    Kokkos::View<int*, ExecutionSpace> indices("indices", 0);
     ArborX::query(bvh, ExecutionSpace{}, queries_ar, indices, offsets);
 
     auto host_indices=Kokkos::create_mirror_view( indices);
@@ -321,6 +321,8 @@ int main( int argc, char** argv )
     POP_TIMER( "ArborX-Query" )
     PRINT_TIMER( "ArborX-Query" )
 */
+    }
+    Kokkos::finalize();
 
 
     return 0;
