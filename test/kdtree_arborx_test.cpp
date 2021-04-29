@@ -43,6 +43,8 @@ using std::chrono::duration_cast;
 Timer start;
 std::map< std::string, std::chrono::nanoseconds > timeLog;
 
+//#define COMPARE_RESULTS
+
 #define PUSH_TIMER()          \
     {                         \
         start = Clock::now(); \
@@ -73,6 +75,9 @@ int main( int argc, char** argv )
     int max_depth = 30;
     int max_per_leaf = 6;
     std::ostringstream options;
+
+    //
+    srand(1234); // set a seed for repeatability
 
 
     ProgOptions opts;
@@ -160,12 +165,18 @@ int main( int argc, char** argv )
     PUSH_TIMER()
 
     EntityHandle leaf_out;
+#ifdef COMPARE_RESULTS
+    std::vector<EntityHandle> leaves(num_queries);
+#endif
     for( int i = 0; i < num_queries; i++ )
     {
         pos  = queries[i];
 
         // project on a sphere if dim 2?
         rval = kd.point_search( &pos[0], leaf_out);  MB_CHK_ERR( rval );
+#ifdef COMPARE_RESULTS
+        leaves[i] = leaf_out; // store it for later comparison
+#endif
 
     }
     POP_TIMER( "KdTree-Query" )
@@ -222,20 +233,6 @@ int main( int argc, char** argv )
 
     auto h_queries_ar = create_mirror_view(queries_ar);
 
-    /*
-    Kokkos::parallel_for("fill_queries",
-                           Kokkos::RangePolicy<ExecutionSpace>(0, num_queries ),
-                           KOKKOS_LAMBDA(int i) {
-                                 h_queries_ar(i) = ArborX::intersects(
-                                         ArborX::Box (
-                                         ArborX::Point{ (float)queries[i][0], (float)queries[i][1], (float)queries[i][2]} ,
-                                         ArborX::Point{ (float)queries[i][0], (float)queries[i][1], (float)queries[i][2]}
-                                         )
-
-                                     );
-                           });
-                           */
-
     for( int i = 0; i < num_queries; i++ )
     {
         pos  = queries[i];
@@ -253,6 +250,15 @@ int main( int argc, char** argv )
     Kokkos::View<int*, ExecutionSpace::memory_space> offsets("offset", 0);
     Kokkos::View<int*, ExecutionSpace::memory_space> indices("indices", 0);
     ArborX::query(bvh, ExecutionSpace{}, queries_ar, indices, offsets);
+
+    auto host_indices=Kokkos::create_mirror_view( indices);
+    auto host_offsets=Kokkos::create_mirror_view( offsets);
+    Kokkos::deep_copy(host_indices, indices);
+    Kokkos::deep_copy(host_offsets, offsets);
+
+    cout<< "host_indices.size() " << host_indices.size() << "\n";
+    cout<< "host_offsets.size() " << host_offsets.size() << "\n";
+
 
     POP_TIMER( "ArborX-Query" )
     PRINT_TIMER( "ArborX-Query" )
@@ -273,6 +279,42 @@ int main( int argc, char** argv )
     ArborX::Point maxcorn = bb.maxCorner();
     cout << "max_corner: " << maxcorn[0] <<" " <<  maxcorn[1] << " "  << maxcorn[2] << "\n";
 
+#ifdef COMPARE_RESULTS
+    // for few queries, print out the results, and dump the leaves
+    int num_verif = 10;
+    for (int i=0; i<num_verif; i++)
+    {
+        // write an mb file with just the result leaves
+        std::stringstream ffs;
+        ffs << "leaf_" << i << ".vtk";
+        rval = mb.write_mesh( ffs.str().c_str(), &leaves[i], 1 );MB_CHK_ERR( rval );
+        // put the results from ArborX in a set to be dumped out
+        Range close_by;
+        std::cout <<"query point: " << queries[i][0] << " " << queries[i][1] << " " << queries[i][2] << "\n";
+        for (int j=host_offsets(i); j<host_offsets(i+1); j++)
+        {
+            int index = host_indices(j);
+            close_by.insert(elems[index]);
+            std::cout << "  " << j << ",  " <<  host_indices(j) << "|"  ;
+        }
+        std::cout << " \n";
+        EntityHandle new_set;
+        rval = mb.create_meshset( MESHSET_SET, new_set );MB_CHK_ERR( rval );
+        rval = mb.add_entities(new_set, close_by);MB_CHK_ERR( rval );
+        std::stringstream fff;
+        fff << "close_by_" << i << ".vtk";
+        rval = mb.write_mesh( fff.str().c_str(), &new_set, 1 );MB_CHK_ERR( rval );
+        // write the search point into a new vertex
+        rval = mb.remove_entities(new_set, close_by);MB_CHK_ERR( rval );
+        EntityHandle new_vertex;
+        rval = mb.create_vertex(&queries[i][0], new_vertex); MB_CHK_ERR( rval );
+        std::stringstream ffp;
+        rval = mb.add_entities(new_set, &new_vertex, 1 ); MB_CHK_ERR( rval );
+       ffp << "search_point_" << i << ".vtk";
+       rval = mb.write_mesh( ffp.str().c_str(), &new_set, 1 );MB_CHK_ERR( rval );
+    }
+#endif
+    // compare results for the first few queries
  /*   // query at the same locations
     PUSH_TIMER()
 
