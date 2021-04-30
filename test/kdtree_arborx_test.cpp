@@ -29,6 +29,7 @@
 #include <ArborX_Version.hpp>
 #include <Kokkos_Core.hpp>
 #include <random>
+#include <nvToolsExt.h>
 
 using ExecutionSpace = Kokkos::DefaultExecutionSpace;
 using MemorySpace = ExecutionSpace::memory_space;
@@ -66,6 +67,13 @@ std::map< std::string, std::chrono::nanoseconds > timeLog;
 int main( int argc, char** argv )
 {
 
+    PUSH_TIMER()
+
+    Kokkos::initialize(argc, argv);
+
+    POP_TIMER( "Init k" )
+    PRINT_TIMER( "Init k" )
+    {
     std::string test_file_name  = TestDir + string( "/3k-tri-sphere.vtk" );
     int num_queries             = 1000000;
     int dimension               = 2;
@@ -182,8 +190,8 @@ int main( int argc, char** argv )
 
 
     PUSH_TIMER()
-    Kokkos::initialize(argc, argv);
-    {
+
+    std::cout << "Execution space: " << ExecutionSpace::name() << "\n";
     //Kokkos::ScopeGuard guard(argc, argv);
 
     std::cout << "ArborX version: " << ArborX::version() << std::endl;
@@ -192,6 +200,11 @@ int main( int argc, char** argv )
 
     // Create the View for the bounding boxes, on device
     Kokkos::View<ArborX::Box*, ExecutionSpace::memory_space> bounding_boxes("bounding_boxes", elems.size());
+
+    POP_TIMER( "gpu allocate" )
+    PRINT_TIMER( "gpu allocate" )
+
+    PUSH_TIMER()
     // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
     //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
     // mirror view on host, will be populated
@@ -213,7 +226,17 @@ int main( int argc, char** argv )
                     ArborX::Point{ (float)coords[j][0], (float)coords[j][1], (float)coords[j][2]}  );
         }
     }
+
+    POP_TIMER( "Pre ArborX-Build" )
+    PRINT_TIMER( "Pre ArborX-Build" )
+
+    PUSH_TIMER()
+
     Kokkos::deep_copy(bounding_boxes, h_bounding_boxes);
+    POP_TIMER( "Deep copy" )
+    PRINT_TIMER( "Deep copy" )
+
+    PUSH_TIMER()
 
     // Create the bounding volume hierarchy
     ArborX::BVH<MemorySpace> bvh(ExecutionSpace{}, bounding_boxes);
