@@ -2,6 +2,9 @@ cmake_minimum_required( VERSION 3.5 )
 SET(PACKAGE_NAME "MOAB")
 SET(PACKAGE_VERSION "5.2.1")
 
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if (NOT WIN32)
   #This all breaks on windows.
   SET(CMAKE_Fortran_COMPILER_INIT ${CMAKE_GENERATOR_FC})
@@ -239,9 +242,9 @@ if ( ENABLE_BLASLAPACK  )
 endif (ENABLE_BLASLAPACK)
 
 if ( LAPACK_FOUND )
-  
+
   SET (ENABLE_FORTRAN ON)
-    
+
   # Eigen3 is optional if LAPACK has been found
   FIND_PACKAGE(Eigen3 OPTIONAL_COMPONENTS)
 
@@ -250,10 +253,10 @@ if ( LAPACK_FOUND )
                        PURPOSE "Eigen3 headers as supplement to BLAS/LAPACK implementations")
 
 else ( LAPACK_FOUND )
-    
+
   # Find Eigen3 is required if LAPACK is not found (or requested)
   FIND_PACKAGE(Eigen3 REQUIRED)
- 
+
   set_package_properties(Eigen3 PROPERTIES
                         TYPE REQUIRED
                        PURPOSE "Eigen3 headers as replacement for BLAS/LAPACK implementations")
@@ -550,13 +553,13 @@ if(CLANG_FORMAT_EXE)
 endif()
 
 # get all project files
-file(GLOB_RECURSE MOAB_PROJECT_SOURCE_FILES 
-			RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-			LIST_DIRECTORIES false 
-			src/*.cpp src/*.c src/*.hpp 
-			tools/*.cpp tools/*.hpp 
-			test/*.cpp 
-			itaps/*.cpp itaps/*.h itaps/*.hpp 
+file(GLOB_RECURSE MOAB_PROJECT_SOURCE_FILES
+			RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+			LIST_DIRECTORIES false
+			src/*.cpp src/*.c src/*.hpp
+			tools/*.cpp tools/*.hpp
+			test/*.cpp
+			itaps/*.cpp itaps/*.h itaps/*.hpp
 			examples/*.cpp
 		)
 
@@ -577,9 +580,9 @@ endif()
 find_program(CLANG_TIDY_EXE NAMES "clang-tidy" DOC "Path to clang-tidy executable")
 if(CLANG_TIDY_EXE)
   message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-  SET(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_EXE} 
-    -format-style=file 
-    -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters 
+  SET(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_EXE}
+    -format-style=file
+    -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters
     -header-filter="\"moab/*\""
     -fix -fix-errors
     -p=${CMAKE_CURRENT_BINARY_DIR} )
@@ -591,7 +594,7 @@ if(CLANG_TIDY_EXE)
         -clang-apply-replacements-binary ${RUN_CLANG_APPLY_REPLACEMENTS_BIN}
         -header-filter="\"moab/*\""
         -checks=clan*,mpi-*,port*,bug*,llvm-namespace-comment,perf*,modernize-deprecated-headers,modernize-avoid-bind,modernize-use-bool-literals,misc-noexcept-move-constructor,-readability-braces-around-statements,-misc-unused-parameters
-        -fix 
+        -fix
         )
 
 	add_custom_target(
@@ -661,66 +664,66 @@ ADD_CUSTOM_TARGET(
 
 SET(MOAB_DOCS ${MOAB_DOCS}
   LICENSE README.md RELEASE_NOTES.md TODO.md
-)  
+)
 install(FILES ${MOAB_DOCS} DESTINATION share/doc/moab)
 
 CONFIGURE_FILE(examples/makefile.config.cmake "${PROJECT_BINARY_DIR}/share/examples/makefile.config" @ONLY)
 install(FILES ${PROJECT_BINARY_DIR}/share/examples/makefile.config
   DESTINATION share/examples)
-  
+
 SET(MOAB_EXAMPLES
-  examples/makefile 
-  examples/makefile.config.in 
+  examples/makefile
+  examples/makefile.config.in
   examples/CMakeLists.txt )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/beginner/README 
-  examples/beginner/makefile 
-  examples/beginner/mbex1.cpp 
-  examples/beginner/mbex2.cpp 
-  examples/beginner/mbex3.cpp 
+  examples/beginner/README
+  examples/beginner/makefile
+  examples/beginner/mbex1.cpp
+  examples/beginner/mbex2.cpp
+  examples/beginner/mbex3.cpp
   examples/beginner/mbex4.cpp )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/basic/makefile 
-  examples/basic/ErrorHandlingSimulation.cpp 
-  examples/basic/GetEntities.cpp 
-  examples/basic/HelloMOAB.cpp 
-  examples/basic/HelloParMOAB.cpp 
+  examples/basic/makefile
+  examples/basic/ErrorHandlingSimulation.cpp
+  examples/basic/GetEntities.cpp
+  examples/basic/HelloMOAB.cpp
+  examples/basic/HelloParMOAB.cpp
   examples/basic/ReadWriteTest.cpp
-  examples/basic/SetsNTags.cpp 
-  examples/basic/StructuredMeshSimple.cpp 
-  examples/basic/TestErrorHandling.cpp 
-  examples/basic/TestErrorHandlingPar.cpp 
-  examples/basic/TestExodusII.cpp 
+  examples/basic/SetsNTags.cpp
+  examples/basic/StructuredMeshSimple.cpp
+  examples/basic/TestErrorHandling.cpp
+  examples/basic/TestErrorHandlingPar.cpp
+  examples/basic/TestExodusII.cpp
   examples/basic/UniformRefinement.cpp )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/intermediate/makefile 
-  examples/intermediate/DirectAccessNoHoles.cpp 
-  examples/intermediate/DirectAccessWithHoles.cpp 
-  examples/intermediate/LoadPartial.cpp 
-  examples/intermediate/PointInElementSearch.cpp 
+  examples/intermediate/makefile
+  examples/intermediate/DirectAccessNoHoles.cpp
+  examples/intermediate/DirectAccessWithHoles.cpp
+  examples/intermediate/LoadPartial.cpp
+  examples/intermediate/PointInElementSearch.cpp
   examples/intermediate/ReduceExchangeTags.cpp )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/advanced/makefile 
-  examples/advanced/CrystalRouterExample.cpp 
-  examples/advanced/ExtrudePoly.cpp 
-  examples/advanced/GenLargeMesh.cpp 
-  examples/advanced/LloydRelaxation.cpp 
+  examples/advanced/makefile
+  examples/advanced/CrystalRouterExample.cpp
+  examples/advanced/ExtrudePoly.cpp
+  examples/advanced/GenLargeMesh.cpp
+  examples/advanced/LloydRelaxation.cpp
   examples/advanced/VisTags.cpp
   examples/advanced/CoupleMGen.cpp )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/fortran/makefile 
-  examples/fortran/DirectAccessNoHolesF90.F90 
+  examples/fortran/makefile
+  examples/fortran/DirectAccessNoHolesF90.F90
   examples/fortran/PushParMeshIntoMoabF90.F90
   examples/fortran/MigrateMesh.F90 )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/python/makefile 
+  examples/python/makefile
   examples/python/laplaciansmoother.py )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
   examples/apps/makefile )
 SET(MOAB_EXAMPLES ${MOAB_EXAMPLES}
-  examples/apps/earth/makefile 
-  examples/apps/earth/ContinentsOnGlobe.cpp 
-  examples/apps/earth/BoundaryContinents.cpp 
+  examples/apps/earth/makefile
+  examples/apps/earth/ContinentsOnGlobe.cpp
+  examples/apps/earth/BoundaryContinents.cpp
   examples/apps/earth/addPCdata.cpp )
 
 include(AutoconfHeader)
@@ -729,7 +732,7 @@ moab_install_docs(${MOAB_EXAMPLES})
 feature_summary(WHAT ALL #ENABLED_FEATURES DISABLED_FEATURES PACKAGES_FOUND
                 DESCRIPTION "MOAB Configuration Summary"
                 INCLUDE_QUIET_PACKAGES
-                FILENAME ${CMAKE_BINARY_DIR}/summary.log 
+                FILENAME ${CMAKE_BINARY_DIR}/summary.log
                 )
 MESSAGE("-- MOAB Configuration summary has been written to ${CMAKE_BINARY_DIR}/summary.log.")
 
