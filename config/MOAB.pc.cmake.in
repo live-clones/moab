@@ -1,0 +1,26 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@/bin
+libdir=@CMAKE_INSTALL_PREFIX@/lib
+includedir=@CMAKE_INSTALL_PREFIX@/include
+
+Name: MOAB
+Description: The Mesh-Oriented datABase, or MOAB, is a library 
+  for representing unstructured and structured mesh, and field 
+  data on a mesh. MOAB represents the finite element zoo, 
+  plus polygons and polyhedra. MOAB’s data model is simple 
+  yet powerful, being able to represent most kinds of 
+  metadata often accompanying the mesh (e.g. boundary 
+  conditions, processor partitions, geometric topology). 
+URL: https://sigma.mcs.anl.gov/moab-library
+Repository: http://bitbucket.org/fathomteam/moab
+Version: @MOAB_VERSION@
+Requires:
+Libs: -L${libdir} -lMOAB @EXPORT_LDFLAGS@ @CXX_LDFLAGS@ @LDFLAGS@ \
+          @TEMPESTREMAP_LIBRARIES@  @NETCDF_LIBRARIES@ @PNETCDF_LIBRARIES@ @CGNS_LIBRARIESS@ @HDF5_LIBRARIES@ \
+          @CGM_LIBRARIES@ @TEMPESTREMAP_LIBRARIES@ @ZOLTAN_LIBRARIES@ @PARMETIS_LIBRARIES@ \
+          @METIS_LIBRARIES@ @HYPRE_LIBRARIES@ @LAPACK_LIBRARIES@ @BLAS_LIBRARIES@ @LIBS@ 
+
+# MOAB_INCLUDES may actually have everthing we need. However, let us be explicit anyway
+Cflags: -I${includedir} @CMAKE_CXX_FLAGS@ @CXXFLAGS@ \
+         @ZOLTAN_INCLUDES@ @PNETCDF_INCLUDES@ @NETCDF_INCLUDES@ @HDF5_INCLUDES@ @PARMETIS_INCLUDES@ @METIS_INCLUDES@ @TEMPESTREMAP_INCLUDES@ @EIGEN3_INCLUDES@
+
