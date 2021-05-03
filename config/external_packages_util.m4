@@ -780,7 +780,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
   # configure HDF5
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI
-    compiler_opts="CC=$CC CXX=$CXX MPIEXEC=$MPIEXEC"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" MPIEXEC=\"$MPIEXEC\""
     configure_command="$hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1 $compiler_opts"
     # configure_command="$configure_command --enable-cxx --enable-unsupported"
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
@@ -969,7 +969,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_NETCDF],
   # configure NETCDF
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, NETCDF
-    compiler_opts="CC=$CC CXX=$CXX"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\""
     configure_command="$netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     if (test "$enablehdf5" != "no"); then
       configure_command="$configure_command --enable-netcdf-4 LDFLAGS=\"$HDF5_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$HDF5_CPPFLAGS\" LIBS=\"$HDF5_LIBS -ldl -lm -lz\""
@@ -1679,7 +1679,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_TEMPESTREMAP],
   # configure TEMPESTREMAP
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, TEMPESTREMAP
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
     configure_command="$tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     if (test "$enablenetcdf" != "no"); then
       configure_command="$configure_command --with-netcdf=$NETCDF_DIR LDFLAGS=\"$NETCDF_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$NETCDF_CPPFLAGS $CPPFLAGS\" LIBS=\"$NETCDF_LIBS $LIBS\""
@@ -1851,7 +1851,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HYPRE],
   # configure HYPRE
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, HYPRE
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
     configure_command="$hypre_src_dir/src/configure --prefix=$hypre_install_dir --libdir=$hypre_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     configure_command="$configure_command LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\""
 
