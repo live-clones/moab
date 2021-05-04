@@ -1959,7 +1959,7 @@ AC_DEFUN([AUSCM_AUTOMATED_SETUP_PREPROCESS_EIGEN3],
 [
   # configure PACKAGE
   eigen3_src_dir="$2"
-  eigen3_build_dir="$2"
+  eigen3_build_dir="$2/build"
   eigen3_install_dir="$3"
   eigen3_archive_name="$4"
 
@@ -1975,11 +1975,11 @@ AC_DEFUN([AUSCM_AUTOMATED_SETUP_PREPROCESS_EIGEN3],
   if (test ! -d "$eigen3_build_dir" ); then
    AS_MKDIR_P( $eigen3_build_dir )
   else
-    if (test -f "$eigen3_build_dir/signature_of_eigen3_matrix_library" ); then
+    if (test -f "$eigen3_build_dir/Eigen3Config.cmake" ); then
       eigen3_configured=true
-      if (test -f "$eigen3_build_dir/Eigen/Core") ; then
+      if (test -f "$eigen3_build_dir/eigen3.pc") ; then
         eigen3_made=true
-        if (test -f "$eigen3_install_dir/Eigen/Core"); then
+        if (test -f "$eigen3_install_dir/include/eigen3/Eigen/Core"); then
           eigen3_installed=true
         fi
       fi
@@ -2017,12 +2017,14 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_EIGEN3],
   # Eigen3 is a header-only library. Nothing to do.
   if [ $1 ]; then
     PREFIX_PRINT([Configuring with default options ])
+    eigen_configlog="`cd $eigen3_build_dir && cmake -DCMAKE_INSTALL_PREFIX=$eigen3_install_dir -DBUILD_TESTING=OFF  $eigen3_src_dir > $eigen3_src_dir/../config_eigen3.log 2>&1`"
   fi
 
-  if (test ! -f "$eigen3_build_dir/signature_of_eigen3_matrix_library" ); then
+  if (test ! -f "$eigen3_build_dir/Eigen3Config.cmake" ); then
     AC_MSG_ERROR([Eigen3 configuration was unsuccessful. Please make sure the tarball was downloaded correctly.])
+  else
+    eigen3_configured=true
   fi
-  eigen3_configured=true
 ])
 
 dnl ---------------------------------------------------------------------------
@@ -2034,11 +2036,12 @@ AC_DEFUN([AUSCM_AUTOMATED_BUILD_EIGEN3],
 [
   if [ $1 ]; then
     if [ $recompile_and_install || $need_build ]; then
-      PREFIX_PRINT([Header-only library. Skipping build...])
+      PREFIX_PRINT([Header-only library. Quick build...])
+      eigen_buildlog="`cd $eigen3_build_dir && make -j4 > $eigen3_src_dir/../build_eigen3.log 2>&1`"
     fi
   fi
 
-  if (test -f "$eigen3_build_dir/Eigen/Core") ; then
+  if (test -f "$eigen3_build_dir/eigen3.pc") ; then
     eigen3_made=true
   else
     AC_MSG_ERROR([Eigen3 build was unsuccessful. Please make sure the tarball was downloaded correctly.])
@@ -2055,12 +2058,15 @@ AC_DEFUN([AUSCM_AUTOMATED_INSTALL_EIGEN3],
   if [ $1 ]; then
     if [ $recompile_and_install ]; then
       PREFIX_PRINT(Installing the headers and libraries in to directory {$eigen3_install_dir} )
-      eigen3_installlog="`rsync -avz $eigen3_src_dir/Eigen $eigen3_install_dir/include/ > $eigen3_src_dir/../install_eigen3.log 2>&1`"
-      eigen3_installlog="`rsync -avz $eigen3_src_dir/unsupported $eigen3_install_dir/include/Eigen > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      eigen_buildlog="`cd $eigen3_build_dir && make install > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      # if (test "$HAVE_RSYNC" != "no"); then
+      #   eigen3_installlog="`rsync -avz $eigen3_src_dir/Eigen $eigen3_install_dir/include/ > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      #   eigen3_installlog="`rsync -avz $eigen3_src_dir/unsupported $eigen3_install_dir/include/Eigen > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      # fi
     fi
   fi
 
-  if (test -f "$eigen3_install_dir/include/Eigen/Core"); then
+  if (test -f "$eigen3_install_dir/include/eigen3/Eigen/Core"); then
     eigen3_installed=true
   else
     AC_MSG_ERROR([Eigen3 installation was unsuccessful.])
