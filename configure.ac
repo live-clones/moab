@@ -1608,6 +1608,7 @@ AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
 AC_CONFIG_FILES([Makefile
                  moab.make
                  MOABConfig.cmake:config/MOABConfig.cmake.in
+                 MOAB.pc:config/MOAB.pc.in
                  examples/makefile.config
                  src/Makefile
                  src/io/Makefile
