@@ -22,6 +22,7 @@ jobs:
         autoreconf -fi
     # Run the actual configuration command
     - run: |
+        export CC=/usr/bin/mpicc CXX=/usr/bin/mpicxx FC=/usr/bin/mpif90 F77=/usr/bin/mpif77
         ./configure --with-hdf5=/usr --with-metis=/usr --with-mpi=/usr
         make all -j4
         make check -j4
