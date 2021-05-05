@@ -30,7 +30,10 @@ if(NOT Eigen3_FIND_VERSION)
 endif(NOT Eigen3_FIND_VERSION)
 
 macro(_eigen3_check_version)
-  file(READ "${EIGEN3_DIR}/Eigen/src/Core/util/Macros.h" _eigen3_version_header)
+  file(TO_CMAKE_PATH "${EIGEN3_DIR}/Eigen/src/Core/util/Macros.h" EIGENMACROSPATH)
+  # The following only works from CMake 3.2 and above.
+  # cmake_path(CONVERT "${EIGEN3_DIR}/Eigen/src/Core/util/Macros.h" TO_NATIVE_PATH_LIST EIGENMACROSPATH NORMALIZE)
+  file(READ "${EIGENMACROSPATH}" _eigen3_version_header)
 
   string(REGEX MATCH "define[ \t]+EIGEN_WORLD_VERSION[ \t]+([0-9]+)" _eigen3_world_version_match "${_eigen3_version_header}")
   set(EIGEN3_WORLD_VERSION "${CMAKE_MATCH_1}")
