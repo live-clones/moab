@@ -1,0 +1,110 @@
+#!/bin/bash
+MOABHOMEDIR=/home/moabuser
+cd $MOABHOMEDIR
+#-------------------------------------------------#
+CONFIGSUCCESS=1
+BUILDSUCCESS=1
+INSTALLSUCCESS=1
+CURRDIR=$MOABHOMEDIR
+MOAB_SRCDIR=$MOABHOMEDIR/moab
+MOAB_BUILDDIR=$MOABHOMEDIR/moab/build
+MOAB_INSTALLDIR=/opt/moab
+MOAB_TPLDIR=/opt/view
+export PYTHONPATH=$MOABHOMEDIR/.local/lib/python3.6/site-packages/:$PYTHONPATH
+#--------------------------------------------------#
+echo "Starting bootstrap script at " `date +"%T"` on host `hostname` > $MOABHOMEDIR/bootstrap.log
+# Configure and build MOAB as needed
+git clone https://bitbucket.org/fathomteam/moab.git $MOAB_SRCDIR --depth 1 2>&1 | tee -a $MOABHOMEDIR/bootstrap.log
+echo "cd $MOAB_SRCDIR && autoreconf -fi && mkdir -p $MOAB_BUILDDIR && cd $MOAB_BUILDDIR" >> $MOABHOMEDIR/bootstrap.log
+cd $MOAB_SRCDIR && autoreconf -fi && mkdir -p $MOAB_BUILDDIR && cd $MOAB_BUILDDIR
+# All dependencies installed by spack are available under /opt/view
+$MOAB_SRCDIR/configure --prefix=$MOAB_INSTALLDIR LDFLAGS="-L$MOAB_TPLDIR/lib" --with-mpi=$MOAB_TPLDIR \
+  --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize \
+  --enable-tools --with-hdf5=$MOAB_TPLDIR --with-netcdf=$MOAB_TPLDIR --with-pnetcdf=$MOAB_TPLDIR \
+  --with-zoltan=$MOAB_TPLDIR --with-metis=$MOAB_TPLDIR --with-parmetis=$MOAB_TPLDIR \
+  --with-eigen3=$MOAB_TPLDIR/include/eigen3 \
+  --with-blas=$MOAB_TPLDIR/lib/libopenblas.a --with-lapack=$MOAB_TPLDIR/lib/libopenblas.a \
+  LIBS="-lgfortran"  2>&1 | tee -a $MOABHOMEDIR/bootstrap.log
+#CONFIGSUCCESS="${PIPESTATUS[0]}"
+if [ -f $MOAB_BUILDDIR/moab.make -a -f $MOAB_BUILDDIR/src/moab/MOABConfig.h ]; then
+  CONFIGSUCCESS=0
+fi
+if [ $CONFIGSUCCESS -eq 0 ]; then
+  make -C $MOAB_BUILDDIR all 2>&1 | tee -a $MOABHOMEDIR/bootstrap.log
+#  BUILDSUCCESS="${PIPESTATUS[0]}"
+  if [ -f $MOAB_BUILDDIR/src/.libs/libMOAB.a -o -f $MOAB_BUILDDIR/src/.libs/libMOAB.so ]; then
+    BUILDSUCCESS=0
+  fi
+fi
+if [ $CONFIGSUCCESS -eq 0 -a $BUILDSUCCESS -eq 0 ]; then
+  make -C $MOAB_BUILDDIR install 2>&1 | tee -a $MOABHOMEDIR/bootstrap.log
+#  INSTALLSUCCESS="${PIPESTATUS[0]}"
+  if [ -f $MOAB_INSTALLDIR/include/moab/MOABConfig.h ]; then
+    INSTALLSUCCESS=0
+  fi
+fi
+SUCCESS=$((CONFIGSUCCESS+BUILDSUCCESS+INSTALLSUCCESS))
+cd $CURRDIR
+echo ""
+# Build current sources
+if [ $SUCCESS -eq 0 ]; then
+  echo "###############################################################"  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "        MOAB built successfully and installed in /opt/moab!    "  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "###############################################################"  | tee -a $MOABHOMEDIR/bootstrap.log
+else
+  echo "###############################################################"  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "            MOAB configure/build/install failed.               "  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "            ------------------------------------               "  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "Cannot proceed further with the current build process.         "  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "Please review and submit the moab/build/config.log file to the "  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "support group (moab-dev@mcs.anl.gov) to diagnose the issues.   "  | tee -a $MOABHOMEDIR/bootstrap.log
+  echo ""                                                                 | tee -a $MOABHOMEDIR/bootstrap.log
+  echo "Contact mahadevan@anl.gov or iulian@anl.gov for further help.  "  | tee -a $MOABHOMEDIR/bootstrap.log
+  if [ $CONFIGSUCCESS -eq 1  ]; then
+    echo ""                                                               | tee -a $MOABHOMEDIR/bootstrap.log
+    echo "*** Failure in configuration process."                          | tee -a $MOABHOMEDIR/bootstrap.log
+  fi
+  if [ $BUILDSUCCESS -eq 1 ]; then
+    echo ""                                                               | tee -a $MOABHOMEDIR/bootstrap.log
+    echo "*** Failure in build process."                                  | tee -a $MOABHOMEDIR/bootstrap.log
+  fi
+  if [ $INSTALLSUCCESS -eq 1 ]; then
+    echo ""                                                               | tee -a $MOABHOMEDIR/bootstrap.log
+    echo "*** Failure in installation process."                           | tee -a $MOABHOMEDIR/bootstrap.log
+  fi
+  echo "###############################################################"  | tee -a $MOABHOMEDIR/bootstrap.log
+fi
+
+## Create some startup files
+echo "Welcome to the MOAB development environment image, which contains all
+tools, and library installation for handling and manipulating meshes
+(both structured and unstructured), and mesh generation for use in
+computational simulations along with interfaces for different output
+formats.
+
+This image provides the necessary setup for updating and re-building
+examples based on MOAB library. MOAB has been pre-built with MPI, HDF5,
+NetCDF, PNetCDF, Eigen3, Zoltan, Metis, Parmetis, BLAS/LAPACK as its
+dependencies. Python interfaces exposed with PyMOAB are also enabled.
+These TPLs have been installed with Spack in order to get a consistent
+toolchain. This image can be used by all users with intent to experiment,
+and use MOAB library in their own applications." > $MOABHOMEDIR/.WELCOMEMSG 
+
+## Generate .bash_profile file
+echo "# ~/.bash_profile: executed by bash(1) for login shells.
+
+if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
+" > $MOABHOMEDIR/.bash_profile
+
+echo "# ~/.bashrc: executed by bash(1) for non-login shells.
+
+cd $HOME
+cat $HOME/.WELCOMEMSG
+source /etc/profile
+export MOAB_DIR=/opt/moab
+export CC=/opt/view/bin/mpicc CXX=/opt/view/bin/mpicxx FC=/opt/view/bin/mpif90 F90=/opt/view/bin/mpif90 F77=/opt/view/bin/mpif77
+export LD_LIBRARY_PATH=\"/opt/view/lib:/opt/moab/lib:$LD_LIBRARY_PATH\"
+export PATH=\"/opt/view/bin:/opt/moab/bin:$HOME/.local/bin:$PATH\"
+export PYTHONPATH=\"$HOME/.local/lib/python3.6/site-packages:/opt/moab/lib/python3.6/site-packages:$PYTHONPATH\"
+" >> $MOABHOMEDIR/.bashrc
+
