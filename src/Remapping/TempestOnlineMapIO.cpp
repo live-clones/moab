@@ -460,35 +460,12 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     varAreaB->set_cur( (long)offbuf[1] );
     varAreaB->put( &( vecTargetFaceArea[0] ), nB );
 
-    // Write frac
-    DataArray1D< double > dFracA( nA );
-    for( unsigned i = 0; i < nA; i++ )
-    {
-        dFracA[i] = 1.0;
-    }
-    NcVar* varFracA = ncMap.add_var( "frac_a", ncDouble, dimNA );
-#ifdef MOAB_HAVE_NETCDFPAR
-    ncMap.enable_var_par_access( varFracA, is_independent );
-#endif
-    varFracA->set_cur( (long)offbuf[0] );
-    varFracA->put( &( dFracA[0] ), nA );
-
-    DataArray1D< double > dFracB( nB );
-    for( unsigned i = 0; i < nB; i++ )
-    {
-        dFracB[i] = 1.0;
-    }
-    NcVar* varFracB = ncMap.add_var( "frac_b", ncDouble, dimNB );
-#ifdef MOAB_HAVE_NETCDFPAR
-    ncMap.enable_var_par_access( varFracB, is_independent );
-#endif
-    varFracB->set_cur( (long)offbuf[1] );
-    varFracB->put( &( dFracB[0] ), nB );
-
     // Write SparseMatrix entries
     DataArray1D< int > vecRow( nS );
     DataArray1D< int > vecCol( nS );
     DataArray1D< double > vecS( nS );
+    DataArray1D< double > dFracA( nA );
+    DataArray1D< double > dFracB( nB );
 
     int offset = 0;
     for( int i = 0; i < m_weightMatrix.outerSize(); ++i )
@@ -498,6 +475,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
             vecRow[offset] = 1 + this->GetRowGlobalDoF( it.row() );  // row index
             vecCol[offset] = 1 + this->GetColGlobalDoF( it.col() );  // col index
             vecS[offset]   = it.value();                             // value
+
+            dFracA[it.col()] += vecS[offset] / vecSourceFaceArea[it.col()] * vecTargetFaceArea[it.row()];
+            dFracB[it.row()] += vecS[offset];
+
             offset++;
         }
     }
@@ -522,6 +503,25 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
 
     varS->set_cur( (long)offbuf[2] );
     varS->put( &( vecS[0] ), nS );
+
+    // Calculate and write fractional coverage arrays
+    NcVar* varFracA = ncMap.add_var( "frac_a", ncDouble, dimNA );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varFracA, is_independent );
+#endif
+    varFracA->add_att( "name", "fraction of target coverage of source dof" );
+    varFracA->add_att( "units", "unitless" );
+    varFracA->set_cur( (long)offbuf[0] );
+    varFracA->put( &( dFracA[0] ), nA );
+
+    NcVar* varFracB = ncMap.add_var( "frac_b", ncDouble, dimNB );
+#ifdef MOAB_HAVE_NETCDFPAR
+    ncMap.enable_var_par_access( varFracB, is_independent );
+#endif
+    varFracB->add_att( "name", "fraction of source coverage of target dof" );
+    varFracB->add_att( "units", "unitless" );
+    varFracB->set_cur( (long)offbuf[1] );
+    varFracB->put( &( dFracB[0] ), nB );
 
     // Add global attributes
     // std::map<std::string, std::string>::const_iterator iterAttributes =
@@ -924,7 +924,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void print_progress( const int barWidth, const float progress, const char* message )
+void print_progress( const int barWidth, const float progress, const char* message )
 {
     std::cout << message << " [";
     int pos = barWidth * progress;
