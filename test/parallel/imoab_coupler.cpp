@@ -138,7 +138,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
     bool no_regression_test = false;
-    opts.addOpt< void >( "regression,r", "regression test against baseline 1", &no_regression_test );
+    opts.addOpt< void >( "no_regression,r", "do not do regression test against baseline 1", &no_regression_test );
     opts.parseCommandLine( argc, argv );
 
     char fileWriteOptions[] = "PARALLEL=WRITE_PART";
