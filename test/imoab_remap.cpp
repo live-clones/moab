@@ -39,7 +39,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< void >( "genbase,g", "generate baseline 1", &gen_baseline );
 
     bool no_test_against_baseline = false;
-    opts.addOpt< void >( "testbase,t", "test against baseline 1", &no_test_against_baseline );
+    opts.addOpt< void >( "no_testbase,t", "do not test against baseline 1", &no_test_against_baseline );
     std::string baseline = TestDir + "/baseline1.txt";
 
     opts.parseCommandLine( argc, argv );
