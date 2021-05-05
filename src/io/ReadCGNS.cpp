@@ -61,7 +61,9 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
     if( subset_list )
     {
         if( subset_list->tag_list_length > 1 && !strcmp( subset_list->tag_list[0].tag_name, MATERIAL_SET_TAG_NAME ) )
-        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "CGNS supports subset read only by material ID" ); }
+        {
+            MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "CGNS supports subset read only by material ID" );
+        }
         material_set_list = subset_list->tag_list[0].tag_values;
         num_material_sets = subset_list->tag_list[0].num_tag_values;
     }
@@ -109,7 +111,9 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
     cg_nbases( filePtr, &num_bases );
 
     if( num_bases > 1 )
-    { MB_SET_ERR( MB_NOT_IMPLEMENTED, fileName << ": support for number of bases > 1 not implemented" ); }
+    {
+        MB_SET_ERR( MB_NOT_IMPLEMENTED, fileName << ": support for number of bases > 1 not implemented" );
+    }
 
     for( int indexBase = 1; indexBase <= num_bases; ++indexBase )
     {
@@ -117,7 +121,9 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
         cg_nzones( filePtr, indexBase, &num_zones );
 
         if( num_zones > 1 )
-        { MB_SET_ERR( MB_NOT_IMPLEMENTED, fileName << ": support for number of zones > 1 not implemented" ); }
+        {
+            MB_SET_ERR( MB_NOT_IMPLEMENTED, fileName << ": support for number of zones > 1 not implemented" );
+        }
 
         for( int indexZone = 1; indexZone <= num_zones; ++indexZone )
         {
@@ -467,7 +473,19 @@ ErrorCode ReadCGNS::create_elements( char* sectionName, const Tag* file_id_tag, 
 
     result = readMeshIface->get_element_connect( elems_count, verts_per_elem, ent_type, 1, handle, conn_array );MB_CHK_SET_ERR( result, fileName << ": Trouble reading elements" );
 
-    memcpy( conn_array, &elemsConn[0], elemsConn.size() * sizeof( EntityHandle ) );
+    if( sizeof( EntityHandle ) == sizeof( cgsize_t ) )
+    {
+        memcpy( conn_array, &elemsConn[0], elemsConn.size() * sizeof( EntityHandle ) );
+    }
+    else
+    {  // if CGNS is compiled without 64bit enabled
+        std::vector< EntityHandle > elemsConnTwin( elemsConn.size(), 0 );
+        for( int i = 0; i < elemsConn.size(); i++ )
+        {
+            elemsConnTwin[i] = static_cast< EntityHandle >( elemsConn[i] );
+        }
+        memcpy( conn_array, &elemsConnTwin[0], elemsConnTwin.size() * sizeof( EntityHandle ) );
+    }
 
     // Notify MOAB of the new elements
     result = readMeshIface->update_adjacencies( handle, elems_count, verts_per_elem, conn_array );
