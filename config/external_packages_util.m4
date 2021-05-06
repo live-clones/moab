@@ -781,8 +781,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
   # configure HDF5
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" MPIEXEC=\"$MPIEXEC\""
-    configure_command="$hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1 $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX MPIEXEC=$MPIEXEC"
+    configure_command="$compiler_opts $hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1"
     # configure_command="$configure_command --enable-cxx --enable-unsupported"
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
     #if (test "$enable_debug" != "no"); then
@@ -803,10 +803,11 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
     if (test "$enablempi" != "no"); then
       configure_command="$configure_command --enable-parallel"
     fi
-    
-    hdf5_configlog=`echo "Using configure command :==> cd $hdf5_build_dir && $configure_command > $hdf5_src_dir/../config_hdf5.log > $hdf5_src_dir/../config_hdf5.log"`
+
+    hdf5_configcmd="cd $hdf5_build_dir && $configure_command > $hdf5_src_dir/../config_hdf5.log"
+    echo "Using configure command :==> $hdf5_configcmd" > $hdf5_src_dir/../config_hdf5.log
     PREFIX_PRINT(Configuring with default options  {debug=$enable_debug production=$enable_cxx_optimize shared=$enable_shared parallel=$enablempi} )
-    hdf5_configlog="`cd $hdf5_build_dir && $configure_command >> $hdf5_src_dir/../config_hdf5.log 2>&1 && cd \"\$OLDPWD\"`"
+    eval "$hdf5_configcmd 2>&1 && cd \"\$OLDPWD\""
   fi
 
   # check if configuration - current or previous was successful
@@ -970,14 +971,14 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_NETCDF],
   # configure NETCDF
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, NETCDF
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\""
-    configure_command="$netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX"
+    configure_command="$compiler_opts $netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     if (test "$enablehdf5" != "no"); then
       configure_command="$configure_command --enable-netcdf-4 LDFLAGS=\"$HDF5_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$HDF5_CPPFLAGS\" LIBS=\"$HDF5_LIBS -ldl -lm -lz\""
     else
       configure_command="$configure_command --disable-netcdf-4 LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\""
     fi
-    eval "echo 'Using configure command :==> cd $netcdf_build_dir && $configure_command > $netcdf_src_dir/../config_netcdf.log' > $netcdf_src_dir/../config_netcdf.log"
+    echo "Using configure command :==> cd $netcdf_build_dir && $configure_command > $netcdf_src_dir/../config_netcdf.log" > $netcdf_src_dir/../config_netcdf.log
     PREFIX_PRINT([Configuring with default options  (debug=$enable_debug with-HDF5=$enablehdf5 shared=$enable_shared) ])
     eval "cd $netcdf_build_dir && $configure_command >> $netcdf_src_dir/../config_netcdf.log 2>&1 && cd \"\$OLDPWD\""
   fi
@@ -1680,8 +1681,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_TEMPESTREMAP],
   # configure TEMPESTREMAP
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, TEMPESTREMAP
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
-    configure_command="$tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    configure_command="$compiler_opts $tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     if (test "$enablenetcdf" != "no"); then
       configure_command="$configure_command --with-netcdf=$NETCDF_DIR LDFLAGS=\"$NETCDF_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$NETCDF_CPPFLAGS $CPPFLAGS\" LIBS=\"$NETCDF_LIBS $LIBS\""
       if (test "x$NETCDFCXX_DIR" != "x"); then
@@ -1852,8 +1853,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HYPRE],
   # configure HYPRE
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, HYPRE
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
-    configure_command="$hypre_src_dir/src/configure --prefix=$hypre_install_dir --libdir=$hypre_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    configure_command="$compiler_opts $hypre_src_dir/src/configure --prefix=$hypre_install_dir --libdir=$hypre_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     configure_command="$configure_command LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\""
 
     eval "echo 'Using configure command :==> cd $hypre_build_dir && $configure_command > $hypre_src_dir/../config_hypre.log' > $hypre_src_dir/../config_hypre.log"
