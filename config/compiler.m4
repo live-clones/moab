@@ -116,10 +116,10 @@ AC_ARG_WITH( [mpi], AS_HELP_STRING([[--with-mpi@<:@=DIR@:>@]], [Enable parallel 
 
 if test "xno" != "x$enablempi"; then
 
-  CC_LIST="mpixlc mpicc mpcc"
-  CXX_LIST="mpixlcxx mpicxx mpiCC mpCC"
-  FC_LIST="mpixlf95 mpixlf90 mpif90"
-  F77_LIST="mpixlf77 mpif77"
+  CC_LIST="mpicc mpixlc mpcc"
+  CXX_LIST="mpicxx mpixlcxx mpiCC mpic++ mpCC"
+  FC_LIST="mpif90 mpixlf95 mpixlf90"
+  F77_LIST="mpif77 mpixlf77"
   DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-mpi=\"${WITH_MPI}\""
 
 fi
