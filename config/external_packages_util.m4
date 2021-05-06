@@ -2,8 +2,8 @@ dnl -------------------------------------------------------------
 dnl  external_packages_util.m4
 dnl
 dnl  This file contains general instructions for downloading,
-dnl  unpacking, configuring, building, and installing 
-dnl  dependent packages.  It also contains definitions of 
+dnl  unpacking, configuring, building, and installing
+dnl  dependent packages.  It also contains definitions of
 dnl  configure line download options.
 dnl -------------------------------------------------------------
 
@@ -39,7 +39,7 @@ _AC_ENABLE_IF([download], [$1], [$3], [$4])dnl
 AU_DEFUN([AC_DOWNLOAD],
 [AC_ARG_DOWNLOAD([$1], [  --download-$1], [$2], [$3])])
 
-# _AC_INIT_PARSE_ENABLE(OPTION-NAME)                                                                                                                                                                                             
+# _AC_INIT_PARSE_ENABLE(OPTION-NAME)
 # ----------------------------------
 # A trivial front-end for _AC_INIT_PARSE_ENABLE2.
 #
@@ -53,8 +53,8 @@ m4_define([_AC_INIT_PARSE_ENABLE_ORIG],
 m4_define([_AC_INIT_PARSE_ENABLE],
 [m4_bmatch([$1], [^with],
      [_AC_INIT_PARSE_ENABLE2([$1], [with])
-      m4_ifdef([_AC_DEFINED_DOWNLOAD_MACRO], [], 
-        [ _AC_INIT_PARSE_ENABLE2([download], [download]) 
+      m4_ifdef([_AC_DEFINED_DOWNLOAD_MACRO], [],
+        [ _AC_INIT_PARSE_ENABLE2([download], [download])
           m4_define([_AC_DEFINED_DOWNLOAD_MACRO], [yes] )] )],
      [_AC_INIT_PARSE_ENABLE2([$1], [enable]) ]) ])
 
@@ -75,7 +75,7 @@ m4_define([_AC_INIT_PARSE_ENABLE2],
     # Reject names that are not valid shell variable names.
     expr "x$ac_useropt" : "[.*[^-+._$as_cr_alnum]]" >/dev/null &&
       AC_MSG_ERROR(
-  [invalid ]m4_if([$2], [[with | download]], [package], [feature])[ name: $ac_useropt])                                                                                                                                                       
+  [invalid ]m4_if([$2], [[with | download]], [package], [feature])[ name: $ac_useropt])
     ac_useropt_orig=$ac_useropt
     ac_useropt=`AS_ECHO(["$ac_useropt"]) | sed 's/[[-+.]]/_/g'`
     case $ac_user_opts in
@@ -196,7 +196,7 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
   if (test "x$5" != "x"); then
     verbosemessages=no
   fi
- 
+
   # decipher protocol needed to download
   case $2 in
     @*) remoteprotocol=no ;;
@@ -216,7 +216,7 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
           ADDLN_OPTS="--recursive --no-parent"
         fi
         if (test -f "$3"); then
-          # Check if the file requested exists in the remote directory -- inform user if there is a network error 
+          # Check if the file requested exists in the remote directory -- inform user if there is a network error
           op_checkifexists="`wget --spider -O/dev/null -q $2 && echo yes || echo no`"
           if (test "$op_checkifexists" != "yes"); then
             AC_ERROR([ --  Requested URL does not exist in remote host. Try again later. ($2)  -- ])
@@ -255,7 +255,7 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
       fi
     fi
   fi
-  
+
   if (test "$filedownloaded" != "yes"); then
     AC_ERROR([ --  The archive URL ($2) specified cannot be handled by wget, curl or scp  -- ])
   else
@@ -451,7 +451,7 @@ AC_DEFUN([PRINT_AUTOMATION_STATUS],
 
 dnl -------------------------------------------------------------
 dnl AUSCM_CONFIGURE_EXTERNAL_PACKAGE(PACKAGE_NAME, DOWNLOAD_URL, DEFAULT_BEHAVIOR)
-dnl Example: 
+dnl Example:
 dnl AUSCM_CONFIGURE_EXTERNAL_PACKAGE(MOAB, "http://ftp.mcs.anl.gov/pub/fathom/moab-4.6-nightly.tar.gz" )
 dnl -------------------------------------------------------------
 AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
@@ -468,7 +468,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
 
   # The default PACKAGE installation is under libraries
   pkg_install_dir="$MOAB_ARCH_DIR"
- 
+
   AC_ARG_DOWNLOAD(m4_tolower($1),
     [AS_HELP_STRING([--download-m4_tolower($1)],[Download and configure $1 with default options (URL:$2)])],
     [case "x${downloadval}" in
@@ -491,7 +491,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     if (test ! -d "$pkg_install_dir" ); then
       AS_MKDIR_P($pkg_install_dir)
     fi
-    
+
     if (test ! -d "$pkg_srcdir" ); then
       AS_MKDIR_P($pkg_srcdir)
     fi
@@ -500,7 +500,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     need_configuration=false
     need_build=false
     need_installation=false
-    
+
     #PPREFIX="$1"
     pkg_archive_name="`basename $pkg_download_url`"
 
@@ -519,7 +519,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     else
       # Check if we need to download an archive file
       DOWNLOAD_EXTERNAL_PACKAGE([$1], [$pkg_download_url], [$MOAB_PACKAGES_DIR/$pkg_archive_name])
-      
+
       # Deflate the archive file containing the sources, if needed
       DEFLATE_EXTERNAL_PACKAGE([$1], [$MOAB_PACKAGES_DIR/$pkg_archive_name], [$pkg_srcdir])
     fi
@@ -530,7 +530,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
 
     # Due to differences in autoconf we need to check if we should use m4_expand to call the package specific macros
     # Run the package preprocess and configure macros found in the package specific .m4 files
-    m4_version_prereq(2.64, [ 
+    m4_version_prereq(2.64, [
     	m4_expand(m4_toupper([AUSCM_AUTOMATED_SETUP_PREPROCESS_$1])([$1],"$pkg_srcdir","$pkg_install_dir", "$pkg_archive_name"))dnl
     	m4_expand(m4_toupper([AUSCM_AUTOMATED_CONFIGURE_$1])([$need_configuration]))dnl
     ],[
@@ -569,7 +569,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
 
 	  MSG_ECHO_SEPARATOR
 
-  fi  # if (test "$download_ext_package" != no) ; then 
+  fi  # if (test "$download_ext_package" != no) ; then
 
   m4_tolower(download$1)="$download_ext_package"
   AC_SUBST(m4_tolower(download$1))
@@ -577,8 +577,8 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
 ])
 
 dnl ------------------------------------------------------------
-dnl  Defines macros for printing colors, 
-dnl  copying symlinks, and custom 
+dnl  Defines macros for printing colors,
+dnl  copying symlinks, and custom
 dnl  printing definitions.
 dnl ------------------------------------------------------------
 AC_DEFUN([COLOR_PRINT],
@@ -635,7 +635,7 @@ m4_define([AC_FIND_ABSPATH], ["`perl -e 'use Cwd "abs_path";print abs_path(shift
 # Print the given text with a prefix defined by PPREFIX
 # PREFIX_PRINT(Text to print)
 # ------------------------
-m4_define([PREFIX_PRINT], 
+m4_define([PREFIX_PRINT],
 [_AS_ECHO_LOG([[[ $PPREFIX ]] --   $1 ]);
   AS_ECHO(["[[ $PPREFIX ]] --   $1 "])])
 
@@ -644,7 +644,7 @@ m4_define([PREFIX_PRINT],
 # Note: Uses echo_n and so there is no newline in the end
 # PREFIX_PRINTN(Text to print)
 # ------------------------
-m4_define([PREFIX_PRINTN], 
+m4_define([PREFIX_PRINTN],
 [_AS_ECHO_LOG([[[ $PPREFIX ]] --   $1 ]);
   AS_ECHO_N(["[[ $PPREFIX ]] --   $1 "])])
 
@@ -674,7 +674,7 @@ m4_define([MSG_ECHO_SEPARATOR],
 # Finds the parent path of a file or directory
 # ECHO_EVAL(PATH TO A FILE, COMMAND)
 # ------------------------
-m4_define([ECHO_EVAL], 
+m4_define([ECHO_EVAL],
 [ echo "$2" >> $1;
   eval $2
 ])
@@ -700,12 +700,12 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_HDF5],[
   HDF5_DOWNLOAD_SRC_VERSION=$1
 
   # Invoke the download-hdf5 command
-  m4_case( HDF5_DOWNLOAD_VERSION, 
+  m4_case( HDF5_DOWNLOAD_VERSION,
                                   [1.10.6], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.6/src/hdf5-1.10.6.tar.gz], [$2] ) ],
                                   [1.10.1], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ],
                                   [1.8.21], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz], [$2] ) ],
                                   [1.8.12], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.12/src/hdf5-1.8.12.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ] 
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([HDF5], [https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz], [$2] ) ]
           )
 
   if (test "x$downloadhdf5" == "xyes") ; then
@@ -781,8 +781,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
   # configure HDF5
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" MPIEXEC=\"$MPIEXEC\""
-    configure_command="$hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1 $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX MPIEXEC=$MPIEXEC"
+    configure_command="$compiler_opts $hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1"
     # configure_command="$configure_command --enable-cxx --enable-unsupported"
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
     #if (test "$enable_debug" != "no"); then
@@ -803,10 +803,11 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
     if (test "$enablempi" != "no"); then
       configure_command="$configure_command --enable-parallel"
     fi
-    
-    hdf5_configlog=`echo "Using configure command :==> cd $hdf5_build_dir && $configure_command > $hdf5_src_dir/../config_hdf5.log > $hdf5_src_dir/../config_hdf5.log"`
+
+    hdf5_configcmd="cd $hdf5_build_dir && $configure_command > $hdf5_src_dir/../config_hdf5.log"
+    echo "Using configure command :==> $hdf5_configcmd" > $hdf5_src_dir/../config_hdf5.log
     PREFIX_PRINT(Configuring with default options  {debug=$enable_debug production=$enable_cxx_optimize shared=$enable_shared parallel=$enablempi} )
-    hdf5_configlog="`cd $hdf5_build_dir && $configure_command >> $hdf5_src_dir/../config_hdf5.log 2>&1 && cd \"\$OLDPWD\"`"
+    eval "$hdf5_configcmd 2>&1 && cd \"\$OLDPWD\""
   fi
 
   # check if configuration - current or previous was successful
@@ -885,7 +886,7 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_NETCDF],[
   m4_pushdef([NETCDF_DOWNLOAD_VERSION],[$1])dnl
 
   # Invoke the download-netcdf command
-  m4_case( NETCDF_DOWNLOAD_VERSION, 
+  m4_case( NETCDF_DOWNLOAD_VERSION,
                                   [4.7.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.7.3.tar.gz], [$2] ) ],
                                   [4.6.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.6.3.tar.gz], [$2] ) ],
                                   [4.5.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([NetCDF], [https://github.com/Unidata/netcdf-c/archive/v4.5.0.tar.gz], [$2] ) ],
@@ -970,14 +971,14 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_NETCDF],
   # configure NETCDF
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, NETCDF
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\""
-    configure_command="$netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX"
+    configure_command="$compiler_opts $netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     if (test "$enablehdf5" != "no"); then
       configure_command="$configure_command --enable-netcdf-4 LDFLAGS=\"$HDF5_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$HDF5_CPPFLAGS\" LIBS=\"$HDF5_LIBS -ldl -lm -lz\""
     else
       configure_command="$configure_command --disable-netcdf-4 LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\""
     fi
-    eval "echo 'Using configure command :==> cd $netcdf_build_dir && $configure_command > $netcdf_src_dir/../config_netcdf.log' > $netcdf_src_dir/../config_netcdf.log"
+    echo "Using configure command :==> cd $netcdf_build_dir && $configure_command > $netcdf_src_dir/../config_netcdf.log" > $netcdf_src_dir/../config_netcdf.log
     PREFIX_PRINT([Configuring with default options  (debug=$enable_debug with-HDF5=$enablehdf5 shared=$enable_shared) ])
     eval "cd $netcdf_build_dir && $configure_command >> $netcdf_src_dir/../config_netcdf.log 2>&1 && cd \"\$OLDPWD\""
   fi
@@ -1172,7 +1173,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_METIS],
       eval "cd $metis_build_dir && $configure_command >> $metis_src_dir/../config_metis.log 2>&1 && cd \"\$OLDPWD\""
     fi
   fi
-  
+
   if (test "$metis_manual_install" != "no"); then
     touch $metis_src_dir/../config_metis.log
   fi
@@ -1680,8 +1681,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_TEMPESTREMAP],
   # configure TEMPESTREMAP
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, TEMPESTREMAP
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
-    configure_command="$tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    configure_command="$compiler_opts $tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     if (test "$enablenetcdf" != "no"); then
       configure_command="$configure_command --with-netcdf=$NETCDF_DIR LDFLAGS=\"$NETCDF_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$NETCDF_CPPFLAGS $CPPFLAGS\" LIBS=\"$NETCDF_LIBS $LIBS\""
       if (test "x$NETCDFCXX_DIR" != "x"); then
@@ -1852,8 +1853,8 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HYPRE],
   # configure HYPRE
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, HYPRE
-    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
-    configure_command="$hypre_src_dir/src/configure --prefix=$hypre_install_dir --libdir=$hypre_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
+    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    configure_command="$compiler_opts $hypre_src_dir/src/configure --prefix=$hypre_install_dir --libdir=$hypre_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     configure_command="$configure_command LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\""
 
     eval "echo 'Using configure command :==> cd $hypre_build_dir && $configure_command > $hypre_src_dir/../config_hypre.log' > $hypre_src_dir/../config_hypre.log"
@@ -2072,5 +2073,3 @@ AC_DEFUN([AUSCM_AUTOMATED_INSTALL_EIGEN3],
     AC_MSG_ERROR([Eigen3 installation was unsuccessful.])
   fi
 ])
-
-
