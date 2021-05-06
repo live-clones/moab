@@ -26,7 +26,6 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
   # Arguments: 1) Default Version Number, 2) Download by default ?
   AUSCM_CONFIGURE_DOWNLOAD_EIGEN3([3.3.9],[no])
 
-  echo "Installed ? $eigen3_installed; Eigen3 dir = $EIGEN3_DIR"
   dnl Fall back on default paths to Eigen's include files
   if (test "x$eigen3_installed" != "xno" && test -f "$eigen3_install_dir/include/Eigen/Eigen"); then
     EIGEN3_DIR="$eigen3_install_dir/include"
