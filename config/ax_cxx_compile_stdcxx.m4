@@ -87,9 +87,9 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX], [dnl
           [eval $cachevar=no])
          CXX="$ac_save_CXX"])
       if eval test x\$$cachevar = xyes; then
-        CXX="$CXX $switch"
+        CXXFLAGS="$CXXFLAGS $switch"
         if test -n "$CXXCPP" ; then
-          CXXCPP="$CXXCPP $switch"
+          CXXCPPFLAGS="$CXXCPPFLAGS $switch"
         fi
         ac_success=yes
         break
@@ -114,9 +114,9 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX], [dnl
             [eval $cachevar=no])
            CXX="$ac_save_CXX"])
         if eval test x\$$cachevar = xyes; then
-          CXX="$CXX $switch"
+          CXXFLAGS="$CXXFLAGS $switch"
           if test -n "$CXXCPP" ; then
-            CXXCPP="$CXXCPP $switch"
+            CXXCPPFLAGS="$CXXCPPFLAGS $switch"
           fi
           ac_success=yes
           break
