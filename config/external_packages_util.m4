@@ -297,7 +297,7 @@ dnl $4 = Source repository location
 dnl -------------------------------------------------------------
 AC_DEFUN([CLONE_SOURCE_REPOSITORY],
 [
-  PREFIX_PRINT(Downloading repository sources from URL: $2:$gitbranch )
+  PREFIX_PRINT(Downloading repository source from $2:$gitbranch )
   filedownloaded=no
   remoteprotocol=yes
   new_download=true
@@ -347,7 +347,7 @@ dnl $3 = Source location (to untar)
 dnl -------------------------------------------------------------
 AC_DEFUN([DEFLATE_EXTERNAL_PACKAGE],
 [
-  PREFIX_PRINT([Deflating archive ($2 => $3) ])
+  PREFIX_PRINT([Deflating archive ... ])
 
   currdir="$PWD"
   need_configuration=false
@@ -395,7 +395,7 @@ dnl $3 = Tarball location
 dnl -------------------------------------------------------------
 AC_DEFUN([CHECK_SOURCE_RECOMPILATION_HASH],
 [
-  PREFIX_PRINTN([Checking whether $1 sources need compilation and installation... ])
+  PREFIX_PRINTN([Checking whether sources need compilation and installation... ])
   defaultshasum="0"
   if (test "x$pkg_sourced_tarball" != "xno"); then
     # Compute the hash of the source directory - Recompile only if sources have changed
@@ -501,7 +501,7 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     need_build=false
     need_installation=false
     
-    PPREFIX="$1"
+    #PPREFIX="$1"
     pkg_archive_name="`basename $pkg_download_url`"
 
 	  MSG_ECHO_SEPARATOR
@@ -525,9 +525,9 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     fi
 
     # Invoke the package specific configuration and build commands
-    
+
     #m4_expand(m4_toupper([DEFAULT_CONFIGURE_MAKE_$1])([$1],"$pkg_srcdir","$pkg_install_dir", "$pkg_archive_name"))
-    
+
     # Due to differences in autoconf we need to check if we should use m4_expand to call the package specific macros
     # Run the package preprocess and configure macros found in the package specific .m4 files
     m4_version_prereq(2.64, [ 
@@ -538,8 +538,9 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     	  m4_toupper([AUSCM_AUTOMATED_CONFIGURE_$1])([$need_configuration])dnl
     ])
 
+    PREFIX_PRINT([Downloaded package version: m4_defn(m4_toupper($1)[_DOWNLOAD_VERSION])])
     CHECK_SOURCE_RECOMPILATION_HASH([$1],[$pkg_srcdir],[$MOAB_PACKAGES_DIR/$pkg_archive_name])
-    
+
     # Run the build, install, and postprocess macros found in the package specific .m4 files.
     m4_version_prereq(2.64, [
     	m4_expand(m4_toupper([AUSCM_AUTOMATED_BUILD_$1])([$need_build]))dnl
@@ -780,7 +781,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HDF5],[
   # configure HDF5
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI
-    compiler_opts="CC=$CC CXX=$CXX MPIEXEC=$MPIEXEC"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" MPIEXEC=\"$MPIEXEC\""
     configure_command="$hdf5_src_dir/configure --prefix=$hdf5_install_dir --libdir=$hdf5_install_dir/lib --with-pic=1 $compiler_opts"
     # configure_command="$configure_command --enable-cxx --enable-unsupported"
     # VSM: Adding --enable-debug=all is causing problems in h5legacy test. So disabling debug symbols for HDF5.
@@ -969,7 +970,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_NETCDF],
   # configure NETCDF
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, NETCDF
-    compiler_opts="CC=$CC CXX=$CXX"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\""
     configure_command="$netcdf_src_dir/configure --prefix=$netcdf_install_dir --libdir=$netcdf_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     if (test "$enablehdf5" != "no"); then
       configure_command="$configure_command --enable-netcdf-4 LDFLAGS=\"$HDF5_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$HDF5_CPPFLAGS\" LIBS=\"$HDF5_LIBS -ldl -lm -lz\""
@@ -1679,7 +1680,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_TEMPESTREMAP],
   # configure TEMPESTREMAP
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, TEMPESTREMAP
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
     configure_command="$tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     if (test "$enablenetcdf" != "no"); then
       configure_command="$configure_command --with-netcdf=$NETCDF_DIR LDFLAGS=\"$NETCDF_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$NETCDF_CPPFLAGS $CPPFLAGS\" LIBS=\"$NETCDF_LIBS $LIBS\""
@@ -1851,7 +1852,7 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_HYPRE],
   # configure HYPRE
   if [ $1 ]; then
     # configure PACKAGE with a minimal build: MPI, HDF5, HYPRE
-    compiler_opts="CC=$CC CXX=$CXX FC=$FC F90=$FC F77=$F77"
+    compiler_opts="CC=\"$CC\" CXX=\"$CXX\" FC=\"$FC\" F90=\"$FC\" F77=\"$F77\""
     configure_command="$hypre_src_dir/src/configure --prefix=$hypre_install_dir --libdir=$hypre_install_dir/lib --with-pic=1 --enable-shared=$enable_shared $compiler_opts"
     configure_command="$configure_command LDFLAGS=\"$LDFLAGS\" CPPFLAGS=\"$CPPFLAGS\" LIBS=\"$LIBS\""
 
@@ -1909,6 +1910,166 @@ AC_DEFUN([AUSCM_AUTOMATED_INSTALL_HYPRE],
     hypre_installed=true
   else
     AC_MSG_ERROR([HYPRE installation was unsuccessful. Please refer to $hypre_src_dir/../install_hypre.log for further details.])
+  fi
+])
+
+
+##########################################
+### Eigen3 AUTOMATED CONFIGURATION
+##########################################
+
+dnl
+dnl Arguments:
+dnl   1) Default Version Number,
+dnl   2) Download by default ?
+dnl
+AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_EIGEN3],[
+
+  # Check whether user wants to autodownload Eigen3
+  # Call package Download/Configure/Installation procedures for Eigen3, if requested by user
+  PPREFIX=Eigen3
+
+  # Set the default EIGEN3 download version
+  m4_pushdef([EIGEN3_DOWNLOAD_VERSION],[$1])dnl
+
+  # Invoke the download-eigen3 command
+  m4_case( EIGEN3_DOWNLOAD_VERSION, [3.3.9],  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([EIGEN3], [https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz], [$2] ) ],
+                                    [3.2.10], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([EIGEN3], [https://gitlab.com/libeigen/eigen/-/archive/3.2.10/eigen-3.2.10.tar.gz], [$2] ) ],
+                                              [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([EIGEN3], [https://gitlab.com/libeigen/eigen/-/archive/3.3.9/eigen-3.3.9.tar.gz], [$2] ) ] )
+
+
+  if (test "x$downloadeigen3" == "xyes") ; then
+    # download the latest Eigen3 sources, configure and install
+    EIGEN3_SRCDIR="$eigen3_src_dir"
+    AC_SUBST(EIGEN3_SRCDIR)
+    # The default Eigen3 installation is under libraries
+    EIGEN3_DIR="$eigen3_install_dir"
+    enableeigen=yes
+  fi  # if (test "$downloadeigen3" != no)
+])
+
+
+dnl ---------------------------------------------------------------------------
+dnl AUSCM_AUTOMATED SETUP PREPROCESS EIGEN3
+dnl   Prepares the system for an existing EIGEN3 install or sets flags to
+dnl   install a new copy of EIGEN3
+dnl   Arguments: [PACKAGE, SRC_DIR, INSTALL_DIR, NEED_CONFIGURATION]
+dnl ---------------------------------------------------------------------------
+AC_DEFUN([AUSCM_AUTOMATED_SETUP_PREPROCESS_EIGEN3],
+[
+  # configure PACKAGE
+  eigen3_src_dir="$2"
+  eigen3_build_dir="$2/build"
+  eigen3_install_dir="$3"
+  eigen3_archive_name="$4"
+
+  # Check if the EIGEN3 directory is valid
+  if (test ! -d "$eigen3_src_dir" || test ! -f "$eigen3_src_dir/signature_of_eigen3_matrix_library" ); then
+    AC_MSG_ERROR([Invalid source configuration for Eigen3. Source directory $eigen3_src_dir is invalid])
+  fi
+
+  # Check if we need to configure, build, and/or install EIGEN3
+  eigen3_configured=false
+  eigen3_made=false
+  eigen3_installed=false
+  if (test ! -d "$eigen3_build_dir" ); then
+   AS_MKDIR_P( $eigen3_build_dir )
+  else
+    if (test -f "$eigen3_build_dir/Eigen3Config.cmake" ); then
+      eigen3_configured=true
+      if (test -f "$eigen3_build_dir/eigen3.pc") ; then
+        eigen3_made=true
+        if (test -f "$eigen3_install_dir/include/eigen3/Eigen/Core"); then
+          eigen3_installed=true
+        fi
+      fi
+    fi
+  fi
+  AS_IF([ ! $eigen3_configured || $need_configuration ], [need_configuration=true], [need_configuration=false])
+  AS_IF([ ! $eigen3_made || $need_configuration ], [need_build=true], [need_build=false])
+  AS_IF([ ! $eigen3_installed || $need_configuration ], [need_installation=true], [need_installation=false])
+])
+
+
+dnl ---------------------------------------------------------------------------
+dnl AUSCM_AUTOMATED SETUP POSTPROCESS EIGEN3
+dnl   Postprocessing for EIGEN3 is minimal.  Exists for standardization of all
+dnl   package macros.
+dnl   Arguments: [PACKAGE]
+dnl ---------------------------------------------------------------------------
+AC_DEFUN([AUSCM_AUTOMATED_SETUP_POSTPROCESS_EIGEN3],
+[
+  # we have already checked configure/build/install logs for
+  # errors before getting here..
+  enableeigen=yes
+  DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-eigen3=\"${eigen3_install_dir}\""
+])
+
+
+dnl ---------------------------------------------------------------------------
+dnl AUSCM_AUTOMATED CONFIGURE EIGEN3
+dnl   Sets up the configure command and then ensures it ran correctly.
+dnl   Arguments: [NEED_CONFIGURATION)
+dnl ---------------------------------------------------------------------------
+AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_EIGEN3],
+[
+  # configure Eigen3
+  # Eigen3 is a header-only library. Nothing to do.
+  if [ $1 ]; then
+    PREFIX_PRINT([Configuring with default options ])
+    eigen_configlog="`cd $eigen3_build_dir && cmake -DCMAKE_INSTALL_PREFIX=$eigen3_install_dir -DBUILD_TESTING=OFF  $eigen3_src_dir > $eigen3_src_dir/../config_eigen3.log 2>&1`"
+  fi
+
+  if (test ! -f "$eigen3_build_dir/Eigen3Config.cmake" ); then
+    AC_MSG_ERROR([Eigen3 configuration was unsuccessful. Please make sure the tarball was downloaded correctly.])
+  else
+    eigen3_configured=true
+  fi
+])
+
+dnl ---------------------------------------------------------------------------
+dnl AUSCM_AUTOMATED BUILD EIGEN3
+dnl   Builds EIGEN3 and looks for libEIGEN3.
+dnl   Arguments: [NEED_BUILD)
+dnl ---------------------------------------------------------------------------
+AC_DEFUN([AUSCM_AUTOMATED_BUILD_EIGEN3],
+[
+  if [ $1 ]; then
+    if [ $recompile_and_install || $need_build ]; then
+      PREFIX_PRINT([Header-only library. Quick build...])
+      eigen_buildlog="`cd $eigen3_build_dir && make -j4 > $eigen3_src_dir/../build_eigen3.log 2>&1`"
+    fi
+  fi
+
+  if (test -f "$eigen3_build_dir/eigen3.pc") ; then
+    eigen3_made=true
+  else
+    AC_MSG_ERROR([Eigen3 build was unsuccessful. Please make sure the tarball was downloaded correctly.])
+  fi
+])
+
+dnl ---------------------------------------------------------------------------
+dnl AUSCM_AUTOMATED INSTALL EIGEN3
+dnl   Installs EIGEN3 and checks headers.
+dnl   Arguments: [NEED_INSTALLATION)
+dnl ---------------------------------------------------------------------------
+AC_DEFUN([AUSCM_AUTOMATED_INSTALL_EIGEN3],
+[
+  if [ $1 ]; then
+    if [ $recompile_and_install ]; then
+      PREFIX_PRINT(Installing the headers and libraries in to directory {$eigen3_install_dir} )
+      eigen_buildlog="`cd $eigen3_build_dir && make install > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      # if (test "$HAVE_RSYNC" != "no"); then
+      #   eigen3_installlog="`rsync -avz $eigen3_src_dir/Eigen $eigen3_install_dir/include/ > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      #   eigen3_installlog="`rsync -avz $eigen3_src_dir/unsupported $eigen3_install_dir/include/Eigen > $eigen3_src_dir/../install_eigen3.log 2>&1`"
+      # fi
+    fi
+  fi
+
+  if (test -f "$eigen3_install_dir/include/eigen3/Eigen/Core"); then
+    eigen3_installed=true
+  else
+    AC_MSG_ERROR([Eigen3 installation was unsuccessful.])
   fi
 ])
 
