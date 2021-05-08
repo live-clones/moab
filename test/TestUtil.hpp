@@ -3,6 +3,7 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <fstream>
 #endif
 #include "moab/MOABConfig.h"
 #ifdef MOAB_HAVE_MPI
@@ -90,6 +91,7 @@ const char* TestDir = STRINGIFY( MESHDIR );
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <map>
 #endif
 
 /***************************************************************************************
@@ -714,6 +716,45 @@ void check_equal( const moab::Range& A, const moab::Range& B, const char* sA, co
 
 #endif  // #ifdef MOAB_RANGE_HPP
 
+void check_baseline_file( std::string basefile, std::vector< int >& gids, std::vector< double >& vals, double eps,
+                          int& err_code )
+{
+    err_code = 1;
+    std::fstream fs;
+    fs.open( basefile.c_str(), std::fstream::in );
+    if( !fs.is_open() )
+    {
+        std::cout << " error opening base file  " << basefile << "\n";
+        flag_error();
+        return;
+    }
+    std::map< int, double > mapVals;
+    int id     = 0;
+    double val = 0;
+    while( !fs.eof() )
+    {
+        fs >> id >> val;
+        mapVals[id] = val;
+    }
+    for( size_t i = 0; i < gids.size(); i++ )
+    {
+        std::map< int, double >::iterator it = mapVals.find( gids[i] );
+        if( it == mapVals.end() )
+        {
+            std::cout << "id - value not found:" << gids[i] << "\n";
+            flag_error();
+            return;
+        }
+        if( fabs( it->second - vals[i] ) > eps )
+        {
+            std::cout << " value out of range: index i=" << i << " id: " << gids[i] << vals[i]
+                      << " expected : " << it->second << "\n";
+            flag_error();
+            return;
+        }
+    }
+    err_code = 0;  // no error
+}
 #endif /* ifdef __cplusplus */
 
 #endif

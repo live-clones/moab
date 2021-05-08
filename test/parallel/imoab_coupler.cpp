@@ -86,6 +86,7 @@ int main( int argc, char* argv[] )
         cplatm        = 6;  // component ids are unique over all pes, and established in advance;
 #ifdef ENABLE_ATMOCN_COUPLING
     std::string ocnFilename = TestDir + "/recMeshOcn.h5m";
+    std::string baseline    = TestDir + "/baseline1.txt";
     int rankInOcnComm       = -1;
     int cmpocn = 17, cplocn = 18,
         atmocnid = 618;  // component ids are unique over all pes, and established in advance;
@@ -136,6 +137,8 @@ int main( int argc, char* argv[] )
     int n = 1;  // number of send/receive / project / send back cycles
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
+    bool no_regression_test = false;
+    opts.addOpt< void >( "no_regression,r", "do not do regression test against baseline 1", &no_regression_test );
     opts.parseCommandLine( argc, argv );
 
     char fileWriteOptions[] = "PARALLEL=WRITE_PART";
@@ -159,40 +162,40 @@ int main( int argc, char* argv[] )
     // coupler will be on joint tasks, will be on a third group (0 and 1, again)
     MPI_Group atmPEGroup;
     MPI_Comm atmComm;
-    ierr = create_group_and_comm(startG1, endG1, jgroup, &atmPEGroup, &atmComm);
+    ierr = create_group_and_comm( startG1, endG1, jgroup, &atmPEGroup, &atmComm );
     CHECKIERR( ierr, "Cannot create atm MPI group and communicator " )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     MPI_Group ocnPEGroup;
     MPI_Comm ocnComm;
-    ierr = create_group_and_comm(startG2, endG2, jgroup, &ocnPEGroup, &ocnComm);
+    ierr = create_group_and_comm( startG2, endG2, jgroup, &ocnPEGroup, &ocnComm );
     CHECKIERR( ierr, "Cannot create ocn MPI group and communicator " )
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     MPI_Group lndPEGroup;
     MPI_Comm lndComm;
-    ierr = create_group_and_comm(startG3, endG3, jgroup, &lndPEGroup, &lndComm);
+    ierr = create_group_and_comm( startG3, endG3, jgroup, &lndPEGroup, &lndComm );
     CHECKIERR( ierr, "Cannot create lnd MPI group and communicator " )
 #endif
 
     // we will always have a coupler
     MPI_Group couPEGroup;
     MPI_Comm couComm;
-    ierr = create_group_and_comm(startG4, endG4, jgroup, &couPEGroup, &couComm);
+    ierr = create_group_and_comm( startG4, endG4, jgroup, &couPEGroup, &couComm );
     CHECKIERR( ierr, "Cannot create cpl MPI group and communicator " )
 
     // atm_coupler
     MPI_Group joinAtmCouGroup;
     MPI_Comm atmCouComm;
-    ierr = create_joint_comm_group(atmPEGroup, couPEGroup,  &joinAtmCouGroup, &atmCouComm);
+    ierr = create_joint_comm_group( atmPEGroup, couPEGroup, &joinAtmCouGroup, &atmCouComm );
     CHECKIERR( ierr, "Cannot create joint atm cou communicator" )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocn_coupler
     MPI_Group joinOcnCouGroup;
     MPI_Comm ocnCouComm;
-    ierr = create_joint_comm_group(ocnPEGroup, couPEGroup,  &joinOcnCouGroup, &ocnCouComm);
+    ierr = create_joint_comm_group( ocnPEGroup, couPEGroup, &joinOcnCouGroup, &ocnCouComm );
     CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
 #endif
 
@@ -200,7 +203,7 @@ int main( int argc, char* argv[] )
     // lnd_coupler
     MPI_Group joinLndCouGroup;
     MPI_Comm lndCouComm;
-    ierr = create_joint_comm_group(lndPEGroup, couPEGroup,  &joinLndCouGroup, &lndCouComm);
+    ierr = create_joint_comm_group( lndPEGroup, couPEGroup, &joinLndCouGroup, &lndCouComm );
     CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
 #endif
 
@@ -262,9 +265,10 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-    //atm
-    ierr = setup_component_coupler_meshes(cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
-             &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme);
+    // atm
+    ierr =
+        setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
+                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
 #ifdef GRAPH_INFO
     if( atmComm != MPI_COMM_NULL )
@@ -285,8 +289,9 @@ int main( int argc, char* argv[] )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocean
-    ierr = setup_component_coupler_meshes(cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm,  &ocnPEGroup, &couComm,
-             &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme);
+    ierr =
+        setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
+                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
 
     MPI_Barrier( MPI_COMM_WORLD );
@@ -295,7 +300,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL && 1 == n )
     {  // write only for n==1 case
         char outputFileTgt3[] = "recvOcn.h5m";
-        ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
+        ierr                  = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
     }
@@ -309,13 +314,14 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
         CHECKIERR( ierr, "Cannot register LND App " )
     }
-    ierr = setup_component_coupler_meshes(cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm,  &lndPEGroup, &couComm,
-             &couPEGroup, &lndCouComm, lndFilename, readoptsLnd, nghlay, repartitioner_scheme);
+    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
+                                           &couPEGroup, &lndCouComm, lndFilename, readoptsLnd, nghlay,
+                                           repartitioner_scheme );
 
     if( couComm != MPI_COMM_NULL && 1 == n )
     {  // write only for n==1 case
         char outputFileLnd[] = "recvLnd.h5m";
-        ierr = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
+        ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
     }
@@ -423,10 +429,10 @@ int main( int argc, char* argv[] )
     {
         PUSH_TIMER( "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[1].c_str(), &disc_orders[1],
-            &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
-            weights_identifiers[0].size(), disc_methods[0].size(), disc_methods[1].size(),
-            dof_tag_names[0].size(), dof_tag_names[1].size() );
+            cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+            disc_methods[1].c_str(), &disc_orders[1], &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
+            dof_tag_names[0].c_str(), dof_tag_names[1].c_str(), weights_identifiers[0].size(), disc_methods[0].size(),
+            disc_methods[1].size(), dof_tag_names[0].size(), dof_tag_names[1].size() );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
 
@@ -434,14 +440,15 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_NETCDF
         {
             const std::string atmocn_map_file_name = "atm_ocn_map.nc";
-            ierr = iMOAB_WriteMappingWeightsToFile( cplAtmOcnPID, weights_identifiers[0].c_str(), atmocn_map_file_name.c_str(),
-                                                    weights_identifiers[0].size(), atmocn_map_file_name.size() );
+            ierr = iMOAB_WriteMappingWeightsToFile( cplAtmOcnPID, weights_identifiers[0].c_str(),
+                                                    atmocn_map_file_name.c_str(), weights_identifiers[0].size(),
+                                                    atmocn_map_file_name.size() );
             CHECKIERR( ierr, "failed to write map file to disk" );
 
             const std::string intx_from_file_identifier = "map-from-file";
-            ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(), atmocn_map_file_name.c_str(),
-                                                     NULL, NULL, NULL, intx_from_file_identifier.size(),
-                                                     atmocn_map_file_name.size() );
+            ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(),
+                                                     atmocn_map_file_name.c_str(), NULL, NULL, NULL,
+                                                     intx_from_file_identifier.size(), atmocn_map_file_name.size() );
             CHECKIERR( ierr, "failed to load map file from disk" );
         }
 #endif
@@ -471,7 +478,8 @@ int main( int argc, char* argv[] )
         // {
         //     const char* atmlnd_map_file_name = "atm_lnd_map.nc";
         //     ierr = iMOAB_WriteMappingWeightsToFile( cplAtmLndPID, weights_identifiers[1], atmlnd_map_file_name,
-        //                                             strlen( weights_identifiers[0] ), strlen( atmlnd_map_file_name ) );
+        //                                             strlen( weights_identifiers[0] ), strlen( atmlnd_map_file_name )
+        //                                             );
         //     CHECKIERR( ierr, "failed to write map file to disk" );
 
         //     const char* intx_from_file_identifier = "map-from-file";
@@ -685,6 +693,37 @@ int main( int argc, char* argv[] )
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
+            // test results only for n == 1, for bottomTempProjectedField
+            if( !no_regression_test )
+            {
+                // the same as remap test
+                // get temp field on ocean, from conservative, the global ids, and dump to the baseline file
+                // first get GlobalIds from ocn, and fields:
+                int nverts[3], nelem[3];
+                ierr = iMOAB_GetMeshInfo( cmpOcnPID, nverts, nelem, 0, 0, 0 );
+                CHECKIERR( ierr, "failed to get ocn mesh info" );
+                std::vector< int > gidElems;
+                gidElems.resize( nelem[2] );
+                std::vector< double > tempElems;
+                tempElems.resize( nelem[2] );
+                // get global id storage
+                const std::string GidStr = "GLOBAL_ID";  // hard coded too
+                int lenG                 = (int)GidStr.length();
+                int tag_type = DENSE_INTEGER, ncomp = 1, tagInd = 0;
+                ierr = iMOAB_DefineTagStorage( cmpOcnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd, lenG );
+                CHECKIERR( ierr, "failed to define global id tag" );
+
+                int ent_type = 1;
+                ierr = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0], lenG );
+                CHECKIERR( ierr, "failed to get global ids" );
+                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2], &ent_type,
+                                                  &tempElems[0], strlen( bottomTempProjectedField ) );
+                CHECKIERR( ierr, "failed to get temperature field" );
+                int err_code = 1;
+                check_baseline_file( baseline, gidElems, tempElems, 1.e-9, err_code );
+                if( 0 == err_code )
+                    std::cout << " passed baseline test atm2ocn on ocean task " << rankInOcnComm << "\n";
+            }
         }
 #endif
 
