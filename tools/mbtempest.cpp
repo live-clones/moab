@@ -65,7 +65,7 @@ struct ToolContext
     bool fVolumetric;
     bool rrmGrids;
     bool kdtreeSearch;
-    bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
+    bool fNoBubble, fInputConcave, fOutputConcave, fCheck;
 
 #ifdef MOAB_HAVE_MPI
     ToolContext( moab::Interface* icore, moab::ParallelComm* p_pcomm )
@@ -80,7 +80,7 @@ struct ToolContext
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
           computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity(false), ensureMonotonicity( 0 ),
           fNoConservation( false ), fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( false ),
-          fInputConcave( false ), fOutputConcave( false ), fNoCheck( false )
+          fInputConcave( false ), fOutputConcave( false ), fCheck( pcomm->size() > 1 ? false : true )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -152,12 +152,10 @@ struct ToolContext
                             "OVERLAP_MEMORY=4, OVERLAP_MOAB=5])",
                             &imeshType );
         opts.addOpt< int >( "res,r", "Resolution of the mesh (default=5)", &blockSize );
-        opts.addOpt< void >( "dual,d", "Output the dual of the mesh (generally relevant only for ICO mesh)",
+        opts.addOpt< void >( "dual,d", "Output the dual of the mesh (relevant only for ICO mesh type)",
                              &computeDual );
-        opts.addOpt< void >( "weights,w",
-                             "Compute and output the weights using the overlap mesh (generally "
-                             "relevant only for OVERLAP mesh)",
-                             &computeWeights );
+        opts.addOpt< std::string >( "file,f", "Output computed mesh or remapping weights to specified filename", &outFilename );
+        opts.addOpt< std::string >( "load,l", "Input mesh filenames for source and target meshes. (relevant only when computing weights)", &expectedFName );
         opts.addOpt< void >( "noconserve,c",
                              "Do not apply conservation to the resultant weights (relevant only "
                              "when computing weights)",
@@ -166,21 +164,10 @@ struct ToolContext
                              "Apply a volumetric projection to compute the weights (relevant only "
                              "when computing weights)",
                              &fVolumetric );
-        opts.addOpt< void >( "rrmgrids",
-                             "At least one of the meshes is a regionally refined grid (relevant to "
-                             "accelerate intersection computation)",
-                             &rrmGrids );
-        opts.addOpt< void >( "nocheck", "Do not check the generated map for conservation and consistency", &fNoCheck );
         opts.addOpt< void >( "advfront,a",
                              "Use the advancing front intersection instead of the Kd-tree based algorithm "
-                             "to compute mesh intersections" );
-        opts.addOpt< void >( "verify",
-                             "Verify the accuracy of the maps by projecting analytical functions "
-                             "from source to target "
-                             "grid by applying the maps",
-                             &verifyWeights );
+                             "to compute mesh intersections. (relevant only when computing weights)" );
         opts.addOpt< int >( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
-        opts.addOpt< std::string >( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
         opts.addOpt< int >( "order,o", "Discretization orders for the source and target solution fields",
                             &expectedOrder );
         opts.addOpt< std::string >( "method,m", "Discretization method for the source and target solution fields",
@@ -188,11 +175,26 @@ struct ToolContext
         opts.addOpt< std::string >( "global_id,g",
                                     "Tag name that contains the global DoF IDs for source and target solution fields",
                                     &expectedDofTagName );
-        opts.addOpt< std::string >( "file,f", "Output remapping weights filename", &outFilename );
+
+        opts.addOpt< void >( "weights,w",
+                             "Compute and output the weights using the overlap mesh (generally "
+                             "relevant only for OVERLAP mesh)",
+                             &computeWeights );
         opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
 
+        opts.addOpt< void >( "rrmgrids",
+                             "At least one of the meshes is a regionally refined grid (relevant to "
+                             "accelerate intersection computation)",
+                             &rrmGrids );
+        opts.addOpt< void >( "checkmap", "Check the generated map for conservation and consistency", &fCheck );
+        opts.addOpt< void >( "verify",
+                             "Verify the accuracy of the maps by projecting analytical functions "
+                             "from source to target "
+                             "grid by applying the maps",
+                             &verifyWeights );
         opts.addOpt< void >( "enforce_convexity",
                                 "check convexity of input meshes to compute mesh intersections" , &enforceConvexity);
+
 
         opts.parseCommandLine( argc, argv );
 
@@ -582,7 +584,7 @@ int main( int argc, char* argv[] )
                 runCtx->fNoBubble,
                 runCtx->ensureMonotonicity,  // bool fNoBubble=true, int fMonotoneTypeID=0,
                 runCtx->fVolumetric, runCtx->fNoConservation,
-                runCtx->fNoCheck,  // bool fVolumetric=false, bool fNoConservation=false, bool
+                !runCtx->fCheck,  // bool fVolumetric=false, bool fNoConservation=false, bool
                                    // fNoCheck=false,
                 runCtx->doftag_names[0],
                 runCtx->doftag_names[1],  // std::string source_tag_name, std::string
@@ -605,8 +607,8 @@ int main( int argc, char* argv[] )
             {
                 const double dNormalTolerance = 1.0E-8;
                 const double dStrictTolerance = 1.0E-12;
-                weightMap->CheckMap( !runCtx->fNoCheck, !runCtx->fNoCheck,
-                                     !runCtx->fNoCheck && ( runCtx->ensureMonotonicity ), dNormalTolerance,
+                weightMap->CheckMap( runCtx->fCheck, runCtx->fCheck,
+                                     runCtx->fCheck && ( runCtx->ensureMonotonicity ), dNormalTolerance,
                                      dStrictTolerance );
             }
 
