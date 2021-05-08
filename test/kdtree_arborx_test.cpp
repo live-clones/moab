@@ -43,7 +43,6 @@ using std::chrono::duration_cast;
 Timer start;
 std::map< std::string, std::chrono::nanoseconds > timeLog;
 
-//#define COMPARE_RESULTS
 
 #define PUSH_TIMER()          \
     {                         \
@@ -80,7 +79,9 @@ int main( int argc, char** argv )
     int max_depth = 30;
     int max_per_leaf = 6;
     std::ostringstream options;
-
+    bool compare_results = false;
+    int num_verif = 10;
+    bool skip_moab_kdtree = false;
     //
     srand(1234); // set a seed for repeatability
 
@@ -95,6 +96,9 @@ int main( int argc, char** argv )
     opts.addOpt< int > ("max_depth,m", "Maximum depth in kdtree (default 30)", &max_depth);
     opts.addOpt <int >("max_per_leaf,l", "Maximum per leaf (default 6) ", &max_per_leaf);
     opts.addOpt< std::string >( "file,i", "File name to load the mesh)", &test_file_name );
+    opts.addOpt <void> ("compare_results,c", "compare search results ", &compare_results);
+    opts.addOpt <int> ("verifications,v", "number of verifications", &num_verif);
+    opts.addOpt <void> ("skip_moab,s", "skip regular moab kdtree build", &skip_moab_kdtree);
 
     opts.parseCommandLine( argc, argv );
 
@@ -131,32 +135,42 @@ int main( int argc, char** argv )
     rval = mb.get_entities_by_dimension( fileset, dimension, elems );MB_CHK_SET_ERR( rval, "Error getting 3d elements" );
 
     cout << "mesh has " << elems.size()  << " cells \n";
-    PUSH_TIMER()
-    // Create a tree to use for the location service
-    // Can we accelerate this setup phase on a GPU as well ??
-    // Or may be use Kokkos/OpenMP for CPU executor ?
-    AdaptiveKDTree kd( &mb );
-    EntityHandle tree_root;
-    rval = mb.create_meshset(MESHSET_SET, tree_root); MB_CHK_ERR( rval );
-    options << "MAX_DEPTH=" << max_depth << ";";
-    options << "MAX_PER_LEAF=" << max_per_leaf << ";";
 
-    FileOptions file_opts( options.str().c_str() );
-    rval                   = kd.build_tree( elems, &tree_root, &file_opts );MB_CHK_ERR( rval );
-    POP_TIMER( "MOAB KdTree-Setup" )
-    PRINT_TIMER( "MOAB KdTree-Setup" )
 
-    // Get the box extents
+
     CartVect min, max, box_extents, pos;
-    unsigned  depth;
-    kd.get_info( tree_root, &min[0], &max[0], depth );
+    BoundBox box;
+    AdaptiveKDTree kd( &mb ); // constructor does nothing
+    if (!skip_moab_kdtree)
+    {
+        PUSH_TIMER()
+        // Create a moab kdtree to use for the location service
+        EntityHandle tree_root;
+        rval = mb.create_meshset(MESHSET_SET, tree_root); MB_CHK_ERR( rval );
+        options << "MAX_DEPTH=" << max_depth << ";";
+        options << "MAX_PER_LEAF=" << max_per_leaf << ";";
 
-    cout << "box: " << min << " " <<  max << "depth: " << depth << "\n";
-    // print various info about the tree
-    kd.print();
-    BoundBox box (min,max);
+        FileOptions file_opts( options.str().c_str() );
+        rval                   = kd.build_tree( elems, &tree_root, &file_opts );MB_CHK_ERR( rval );
+        POP_TIMER( "MOAB KdTree-Setup" )
+        PRINT_TIMER( "MOAB KdTree-Setup" )
+
+        // Get the box extents
+
+        unsigned  depth;
+        kd.get_info( tree_root, &min[0], &max[0], depth );
+
+        cout << "box: " << min << " " <<  max << "depth: " << depth << "\n";
+        // print various info about the tree
+        kd.print();
+    }
+    else
+    {
+        min = CartVect(-100, -100, -100);
+        max = CartVect( 100,  100,  100);
+    }
+    box = BoundBox (min,max);
     box_extents  = 1.1 * (max - min);
-
     std::vector<CartVect> queries;
     queries.reserve(num_queries);
     for( int i = 0; i < num_queries; i++ )
@@ -167,28 +181,30 @@ int main( int argc, char** argv )
         pos = pos/pos.length()*100;
         queries.push_back(pos);
     }
-    PUSH_TIMER()
 
-    EntityHandle leaf_out;
-#ifdef COMPARE_RESULTS
-    std::vector<EntityHandle> leaves(num_queries);
-#endif
-    for( int i = 0; i < num_queries; i++ )
+
+
+    std::vector<EntityHandle> leaves;
+    if (compare_results)
+        leaves.resize(num_queries);
+    if (!skip_moab_kdtree)
     {
-        pos  = queries[i];
+        PUSH_TIMER()
+        EntityHandle leaf_out;
+        for( int i = 0; i < num_queries; i++ )
+        {
+            pos  = queries[i];
 
-        // project on a sphere if dim 2?
-        rval = kd.point_search( &pos[0], leaf_out);  MB_CHK_ERR( rval );
-#ifdef COMPARE_RESULTS
-        leaves[i] = leaf_out; // store it for later comparison
-#endif
-
+            // project on a sphere if dim 2?
+            rval = kd.point_search( &pos[0], leaf_out);  MB_CHK_ERR( rval );
+            if (compare_results)
+                leaves[i] = leaf_out; // store it for later comparison
+        }
+        POP_TIMER( "KdTree-Query" )
+        PRINT_TIMER( "KdTree-Query" )
     }
-    POP_TIMER( "KdTree-Query" )
-    PRINT_TIMER( "KdTree-Query" )
 
 
-    PUSH_TIMER()
 
     std::cout << "Execution space: " << ExecutionSpace::name() << "\n";
     //Kokkos::ScopeGuard guard(argc, argv);
@@ -196,19 +212,19 @@ int main( int argc, char** argv )
     std::cout << "ArborX version: " << ArborX::version() << std::endl;
     std::cout << "ArborX hash   : " << ArborX::gitCommitHash() << std::endl;
 
-
+    // start ArborX build and query
+    PUSH_TIMER()
     // Create the View for the bounding boxes, on device
     Kokkos::View<ArborX::Box*, ExecutionSpace::memory_space> bounding_boxes("bounding_boxes", elems.size());
 
-    POP_TIMER( "gpu allocate" )
-    PRINT_TIMER( "gpu allocate" )
+    POP_TIMER( "memory space allocate" )
+    PRINT_TIMER( "memory space allocate" )
 
     PUSH_TIMER()
     // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
     //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
     // mirror view on host, will be populated
     auto h_bounding_boxes = Kokkos::create_mirror_view(bounding_boxes);
-    //points.reserve(elems.size());
 
     std::vector<CartVect>  coords;
     coords.resize(27);// max possible
@@ -245,13 +261,13 @@ int main( int argc, char** argv )
     PRINT_TIMER( "ArborX-Build" )
 
     PUSH_TIMER()
+
     // queries
-    // copy from paper
 
     // Create the View for the spatial-based queries
     // Kokkos::View<decltype(ArborX::intersects(ArborX::Box{})) *, DeviceType>
     Kokkos::View< decltype(ArborX::intersects(ArborX::Box{})) * , ExecutionSpace::memory_space> queries_ar("queries", num_queries);
-    // Fill in the queries on host mirror, then copy to device ?
+    // Fill in the queries on host mirror, then copy to device
 
     auto h_queries_ar = create_mirror_view(queries_ar);
 
@@ -273,6 +289,7 @@ int main( int argc, char** argv )
     Kokkos::View<int*, ExecutionSpace> indices("indices", 0);
     ArborX::query(bvh, ExecutionSpace{}, queries_ar, indices, offsets);
 
+    // create mirror and copy at the same time does not work, somehow
     auto host_indices=Kokkos::create_mirror_view( indices);
     auto host_offsets=Kokkos::create_mirror_view( offsets);
     Kokkos::deep_copy(host_indices, indices);
@@ -284,16 +301,6 @@ int main( int argc, char** argv )
 
     POP_TIMER( "ArborX-Query" )
     PRINT_TIMER( "ArborX-Query" )
-    // end copy
-    //
-    /*for (Range::iterator it=elems.begin(); it!= elems.end(); it++)
-    {
-        EntityHandle cell=*it; // should we get the box
-
-        points.push_back(;
-
-    }*/
-
 
     cout << bvh.size() << "\n";
 
@@ -301,48 +308,51 @@ int main( int argc, char** argv )
     ArborX::Point maxcorn = bb.maxCorner();
     cout << "max_corner: " << maxcorn[0] <<" " <<  maxcorn[1] << " "  << maxcorn[2] << "\n";
 
-#ifdef COMPARE_RESULTS
-    // for few queries, print out the results, and dump the leaves
-    int num_verif = 10;
-    for (int i=0; i<num_verif; i++)
+    if (compare_results)
     {
-        // write an mb file with just the result leaves
-        std::stringstream ffs;
-        ffs << "leaf_" << i << ".vtk";
-        rval = mb.write_mesh( ffs.str().c_str(), &leaves[i], 1 );MB_CHK_ERR( rval );
-        // put the results from ArborX in a set to be dumped out
-        Range close_by;
-        std::cout <<"query point: " << queries[i][0] << " " << queries[i][1] << " " << queries[i][2] << "\n";
-        for (int j=host_offsets(i); j<host_offsets(i+1); j++)
-        {
-            int index = host_indices(j);
-            close_by.insert(elems[index]);
-            std::cout << "  " << j << ",  " <<  host_indices(j) << "|"  ;
-        }
-        std::cout << " \n";
-        EntityHandle new_set;
-        rval = mb.create_meshset( MESHSET_SET, new_set );MB_CHK_ERR( rval );
-        rval = mb.add_entities(new_set, close_by);MB_CHK_ERR( rval );
-        std::stringstream fff;
-        fff << "close_by_" << i << ".vtk";
-        rval = mb.write_mesh( fff.str().c_str(), &new_set, 1 );MB_CHK_ERR( rval );
-        // write the search point into a new vertex
-        rval = mb.remove_entities(new_set, close_by);MB_CHK_ERR( rval );
-        EntityHandle new_vertex;
-        rval = mb.create_vertex(&queries[i][0], new_vertex); MB_CHK_ERR( rval );
-        std::stringstream ffp;
-        rval = mb.add_entities(new_set, &new_vertex, 1 ); MB_CHK_ERR( rval );
-       ffp << "search_point_" << i << ".vtk";
-       rval = mb.write_mesh( ffp.str().c_str(), &new_set, 1 );MB_CHK_ERR( rval );
-    }
-#endif
-    // compare results for the first few queries
- /*   // query at the same locations
-    PUSH_TIMER()
+        // dump the vtk file with the refined mesh, if refinement >=1
+        // for few queries, print out the results, and dump the leaves
 
-    POP_TIMER( "ArborX-Query" )
-    PRINT_TIMER( "ArborX-Query" )
-*/
+        if (uniformRefinementLevels)
+        {
+            std::stringstream ffs;
+            ffs << "refinedMesh_" << uniformRefinementLevels << ".vtk";
+            rval = mb.write_mesh( ffs.str().c_str(), &fileset, 1 );MB_CHK_ERR( rval );
+        }
+        for (int i=0; i<num_verif; i++)
+        {
+            // write an mb file with just the result leaves
+            std::stringstream ffs;
+            ffs << "leaf_" << i << ".vtk";
+            rval = mb.write_mesh( ffs.str().c_str(), &leaves[i], 1 );MB_CHK_ERR( rval );
+            // put the results from ArborX in a set to be dumped out
+            Range close_by;
+            std::cout <<"query point: " << queries[i][0] << " " << queries[i][1] << " " << queries[i][2] << "\n";
+            for (int j=host_offsets(i); j<host_offsets(i+1); j++)
+            {
+                int index = host_indices(j);
+                close_by.insert(elems[index]);
+                std::cout << "  " << j << ",  " <<  host_indices(j) << "|"  ;
+            }
+            std::cout << " \n";
+            EntityHandle new_set;
+            rval = mb.create_meshset( MESHSET_SET, new_set );MB_CHK_ERR( rval );
+            rval = mb.add_entities(new_set, close_by);MB_CHK_ERR( rval );
+            std::stringstream fff;
+            fff << "close_by_" << i << ".vtk";
+            rval = mb.write_mesh( fff.str().c_str(), &new_set, 1 );MB_CHK_ERR( rval );
+            // write the search point into a new vertex
+            rval = mb.remove_entities(new_set, close_by);MB_CHK_ERR( rval );
+            EntityHandle new_vertex;
+            rval = mb.create_vertex(&queries[i][0], new_vertex); MB_CHK_ERR( rval );
+            std::stringstream ffp;
+            rval = mb.add_entities(new_set, &new_vertex, 1 ); MB_CHK_ERR( rval );
+           ffp << "search_point_" << i << ".vtk";
+           rval = mb.write_mesh( ffp.str().c_str(), &new_set, 1 );MB_CHK_ERR( rval );
+        }
+    }
+
+    //
     }
     Kokkos::finalize();
 
