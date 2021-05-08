@@ -29,7 +29,6 @@
 #include <ArborX_Version.hpp>
 #include <Kokkos_Core.hpp>
 #include <random>
-#include <nvToolsExt.h>
 
 using ExecutionSpace = Kokkos::DefaultExecutionSpace;
 using MemorySpace = ExecutionSpace::memory_space;
