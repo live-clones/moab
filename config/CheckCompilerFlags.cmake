@@ -34,7 +34,6 @@ if ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
   ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-ignored-attributes")
   ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-variadic-macros")
   ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-deprecated-declarations")
-  ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-std=gnu++0x")
   # Need to enable or check for this only if user asks for C++11 support
   # ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-Wno-c++11-long-long")
   if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8)
@@ -43,7 +42,6 @@ if ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
   if(APPLE) # Clang / Mac OS only
     # Required on OSX to compile c++11
     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-stdlib=libc++")
-    ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-std=c++0x")
   endif()
   # gfortran
   set (CMAKE_Fortran_FLAGS_RELEASE "-funroll-all-loops -fno-f2c -O2")
@@ -63,7 +61,6 @@ else ( CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
     ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-wd2259")
     FORCE_ADD_FLAGS(CMAKE_C_FLAGS "${MOAB_CXX_FLAGS}")
     FORCE_ADD_FLAGS(CMAKE_Fortran_FLAGS "${MOAB_CXX_FLAGS}")
-    ENABLE_IF_SUPPORTED(MOAB_CXX_FLAGS "-std=c++0x")
     # ifort (untested)
     set (CMAKE_Fortran_FLAGS_RELEASE "-f77rtl -O2")
     set (CMAKE_Fortran_FLAGS_DEBUG   "-f77rtl -O0 -g")
@@ -144,4 +141,3 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
 ENDIF()
 
 mark_as_advanced(CMAKE_Fortran_FLAGS MOAB_CXX_FLAGS)
-

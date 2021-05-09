@@ -109,6 +109,13 @@ fi
 AC_SUBST([ZCAT])
 AM_CONDITIONAL([HAVE_ZCAT],[test "x" = "x$ZCAT"])
 
+# Check for Pthread usage
+AX_PTHREAD
+
+# Check how to add std=c++11 or std-c++0x flag enabled
+# VSM: This is a hard requirement from 5.2.1+
+AX_CXX_COMPILE_STDCXX([11],,[mandatory])
+
 FATHOM_TEMPLATE_SPECIALIZATION
 FATHOM_TEMPLATE_FUNC_SPECIALIZATION
 MB_DEFS="$MB_DEFS $TEMPLATE_SPECIALIZATION $TEMPLATE_FUNC_SPECIALIZATION"
@@ -129,11 +136,6 @@ if test "xyes" = "x$ENABLE_FORTRAN" && test "x" != "x$FC"; then
     FCFLAGS="$FCFLAGS $CRAYPTR_FCFLAGS"
   ])
 fi
-
-
-# Check how to add std-c++0x flag enabled
-# VSM: This is a hard requirement from 5.1.1+
-AX_CXX_COMPILE_STDCXX_0X
 
 ################################################################################
 #                           Basic Portability Stuff
@@ -1488,7 +1490,6 @@ if  (test "x$WITH_VTK" != "xno" && test "x$WITH_VTK" != "x"); then
 
    # These are ordered such that a given library depends only on those libraries
    # that preceed it in the list.
-  FATHOM_CHECK_LIB_LIST([pthread],[AC_DEFINE([HAVE_PTHREAD],[1],["Define if configured with pthread support."])],[vtk_sys_libs])
   FATHOM_CHECK_LIB_LIST([dl],[AC_DEFINE([HAVE_LDL],[1],["Define if configured with dynamic library loading support."])],     [vtk_sys_libs])
   FATHOM_CHECK_LIB_LIST([m],[AC_DEFINE([HAVE_LM],[1],["Define if configured with math library support."])],      [vtk_sys_libs])
   FATHOM_CHECK_LIB_LIST([gcc],[],    [vtk_sys_libs])

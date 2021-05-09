@@ -118,11 +118,15 @@ AC_DEFUN([FATHOM_CONFIGURE_PARMETIS],[
                [enableparmetis=no; PARMETIS_DIR=""]
               )
 
+  if (test "x$enablempi" != "xno" || test "x$enablemetis" != "xno"); then
+    echo "WARNING: Cannot configure ParMetis without both Metis and MPI depenedencies."
+  fi
+
   # Supported ParMetis versions: 4.0.3, 3.2.0
   # Arguments: 1) Default Version Number, 2) Download by default ?
   AUSCM_CONFIGURE_DOWNLOAD_PARMETIS([4.0.3],[no])
 
-  if (test "x$enableparmetis" == "xyes" && test "x$PARMETIS_DIR" != "x"); then
+  if (test "x$enableparmetis" != "xno" && test "x$PARMETIS_DIR" != "x"); then
 
     # Check to see if we want to override the include directory
     # (do not honor if we are installing our own version of parmetis)
@@ -156,7 +160,7 @@ AC_DEFUN([FATHOM_CONFIGURE_PARMETIS],[
     fi
     
     #---------------------------------
-    # Check Metis Header and Library
+    # Check ParMetis Header and Library
     #---------------------------------
     AC_LANG_PUSH(C)
     oldCPPFLAGS=$CPPFLAGS
