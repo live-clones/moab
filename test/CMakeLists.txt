@@ -69,6 +69,10 @@ if(MOAB_HAVE_NETCDF)
               intx_rll_cs_sphere_test.cpp )
 endif()
 
+if (MOAB_HAVE_ARBORX)
+  set (TESTS ${TESTS}
+              kdtree_arborx_test.cpp )
+endif()
 foreach( fname ${TESTS} )
   string( REPLACE ".cpp" "" base ${fname} )
   add_executable( ${base} ${CMAKE_SOURCE_DIR}/test/TestUtil.hpp ${fname})
@@ -76,6 +80,10 @@ foreach( fname ${TESTS} )
   target_link_libraries( ${base} MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
   add_test( ${base} ${EXECUTABLE_OUTPUT_PATH}/${base} )
 endforeach()
+
+if (MOAB_HAVE_ARBORX)
+  target_link_libraries(kdtree_arborx_test ArborX::ArborX)
+endif()
 
 if(ENABLE_PYMOAB)
   SET(PYMOAB_TESTS test_core test_hom test_scd test_range test_tag test_topo_util test_skinner)
