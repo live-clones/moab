@@ -102,6 +102,15 @@ int main( int argc, char** argv )
 
     opts.parseCommandLine( argc, argv );
 
+    if (compare_results)
+    {
+        if (skip_moab_kdtree)
+        {
+            cout << " cannot skip moab kdtree if we want to compare results \n";
+            skip_moab_kdtree = false;
+        }
+
+    }
     // Instantiate
     ErrorCode rval;
     Core mb;
@@ -215,7 +224,7 @@ int main( int argc, char** argv )
     // start ArborX build and query
     PUSH_TIMER()
     // Create the View for the bounding boxes, on device
-    Kokkos::View<ArborX::Box*, ExecutionSpace::memory_space> bounding_boxes("bounding_boxes", elems.size());
+    Kokkos::View<ArborX::Box*, MemorySpace> bounding_boxes("bounding_boxes", elems.size());
 
     POP_TIMER( "memory space allocate" )
     PRINT_TIMER( "memory space allocate" )
@@ -266,7 +275,7 @@ int main( int argc, char** argv )
 
     // Create the View for the spatial-based queries
     // Kokkos::View<decltype(ArborX::intersects(ArborX::Box{})) *, DeviceType>
-    Kokkos::View< decltype(ArborX::intersects(ArborX::Box{})) * , ExecutionSpace::memory_space> queries_ar("queries", num_queries);
+    Kokkos::View< decltype(ArborX::intersects(ArborX::Box{})) * , MemorySpace> queries_ar("queries", num_queries);
     // Fill in the queries on host mirror, then copy to device
 
     auto h_queries_ar = create_mirror_view(queries_ar);
