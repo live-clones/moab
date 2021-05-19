@@ -173,6 +173,20 @@ int ncFile2;
         }                                                                                  \
     }
 
+typedef Eigen::Map<Eigen::VectorXd> EigenV;
+
+void diff_vect(const char * var_name, int n)
+{
+    // compare frac_a between maps
+    std::vector< double > fraca1( n ), fraca2( n );
+    int idfa1, idfa2;
+    GET_1D_DBL_VAR1( var_name, idfa1, fraca1 );
+    EigenV fa1( fraca1.data(), n);
+    GET_1D_DBL_VAR2( var_name, idfa2, fraca2 );
+    EigenV fa2( fraca2.data(), n);
+    std::cout << var_name << " diff norm: " << (fa1-fa2).norm() << "\n";
+    return;
+}
 int main( int argc, char* argv[] )
 {
 
@@ -252,5 +266,13 @@ int main( int argc, char* argv[] )
     std::cout << " euclidian norm for difference: " << diff.norm()
               << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
               << " minv: " << minv << " maxv: " << maxv << "\n";
+
+    // compare frac_a between maps
+    diff_vect("frac_a", na1);
+
+    diff_vect("frac_b", nb1);
+    diff_vect("area_a", na1);
+    diff_vect("area_b", nb1);
+
     return 0;
 }
