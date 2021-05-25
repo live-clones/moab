@@ -44,7 +44,7 @@ using namespace moab;
 
 #define ENABLE_OCNATM_COUPLING
 
-#define ENABLE_LNDATM_COUPLING
+//#define ENABLE_LNDATM_COUPLING
 
 int main( int argc, char* argv[] )
 {
@@ -368,11 +368,6 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot compute intersection" )
         POP_TIMER( couComm, rankInCouComm )
 
-        PUSH_TIMER( "Compute OCN-ATM mesh intersection" )
-        ierr =
-            iMOAB_ComputeMeshIntersectionOnSphere( cplOcnPID, cplAtmPID, cplOcnAtmPID );  // coverage mesh was computed
-        CHECKIERR( ierr, "cannot compute intersection" )
-        POP_TIMER( couComm, rankInCouComm )
     }
 
     if( ocnCouComm != MPI_COMM_NULL )
@@ -674,6 +669,7 @@ int main( int argc, char* argv[] )
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
         // original graph (context is -1_
+        PUSH_TIMER( "Send data from cpl atm back to atm pes" )
         if( couComm != MPI_COMM_NULL )
         {
             ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj2;u_proj2;v_proj2;", &atmCouComm, &context_id,
@@ -696,6 +692,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmWithProj2.h5m";
@@ -790,7 +787,7 @@ int main( int argc, char* argv[] )
         }
         // end copy
 #endif
-    }
+    } // end iters loop
 
 #ifdef ENABLE_LNDATM_COUPLING
     if( couComm != MPI_COMM_NULL )
