@@ -108,6 +108,10 @@ int main( int argc, char* argv[] )
     int n = 1;  // number of send/receive / project / send back cycles
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
+    bool analytic_field=false;
+
+    opts.addOpt< void >( "analytic,q", "analytic field", &analytic_field );
+
     opts.parseCommandLine( argc, argv );
 
     char fileWriteOptions[] = "PARALLEL=WRITE_PART";
@@ -284,6 +288,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "failed to define the field tag v_proj2" );
     }
 
+
     // need to make sure that the coverage mesh (created during intx method OCN - ATM) received the tag that need to be
     // projected to target (atm); the coverage mesh has only the ids; need to change the migrate method to
     // accommodate any ids;  now send a tag from original ocn (cmpOcnPID) towards migrated coverage mesh
@@ -321,7 +326,49 @@ int main( int argc, char* argv[] )
             // set the tag to 0
         }
     }
+    if (analytic_field && (ocnComm != MPI_COMM_NULL) ) // we are on ocean pes
+    {
+        // cmpOcnPID, "T_proj;u_proj;v_proj;"
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomTempField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
+                                               strlen( bottomTempField ) );
+        CHECKIERR( ierr, "failed to define the field tag T_proj" );
 
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomUVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
+                                               strlen( bottomUVelField ) );
+        CHECKIERR( ierr, "failed to define the field tag u_proj" );
+
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomVVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
+                                       strlen( bottomVVelField ) );
+        CHECKIERR( ierr, "failed to define the field tag v_proj" );
+
+        int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
+        /*
+         * Each process in the communicator will have access to a local mesh instance, which will contain the
+         * original cells in the local partition and ghost entities. Number of vertices, primary cells, visible
+         * blocks, number of sidesets and nodesets boundary conditions will be returned in numProcesses 3 arrays,
+         * for local, ghost and total numbers.
+         */
+        ierr = iMOAB_GetMeshInfo( cmpOcnPID, nverts, nelem, nblocks, nsbc, ndbc );
+        CHECKIERR( ierr, "failed to get num primary elems" );
+        int numAllElem = nelem[2];
+        std::vector< double > vals;
+        int storLeng = ocnCompNDoFs * numAllElem;
+        vals.resize( storLeng );
+        for( int k = 0; k < storLeng; k++ )
+            vals[k] = k;
+        int eetype = 1;
+        ierr       = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomTempField, &storLeng, &eetype, &vals[0],
+                                          strlen( bottomTempField ) );
+        CHECKIERR( ierr, "cannot make tag T_proj null" )
+        ierr = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomUVelField, &storLeng, &eetype, &vals[0],
+                                          strlen( bottomUVelField ) );
+        CHECKIERR( ierr, "cannot make tag u_proj null" )
+        ierr = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomVVelField, &storLeng, &eetype, &vals[0],
+                                          strlen( bottomVVelField ) );
+        CHECKIERR( ierr, "cannot make tag v_proj null" )
+                    // set the tag to 0
+
+    }
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
     {
