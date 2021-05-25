@@ -326,7 +326,7 @@ int main( int argc, char* argv[] )
     rval = CreateTempestMesh( *runCtx, remapper, tempest_mesh );MB_CHK_ERR( rval );
     runCtx->timer_pop();
 
-    double epsrel = ReferenceTolerance; // ReferenceTolerance is defined in Defines.h in tempestremap;
+    const double epsrel = ReferenceTolerance; // ReferenceTolerance is defined in Defines.h in tempestremap;
                                         // Defines.h is included in SparseMatrix.h
                                         // SparseMatrix.h is included in OfflineMap.h
                                         // OfflineMap.h is included in TempestOnlineMap.hpp
