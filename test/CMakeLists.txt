@@ -89,10 +89,12 @@ endif()
 add_executable( TestTypeSequenceManager ${CMAKE_SOURCE_DIR}/test/TestUtil.hpp TestTypeSequenceManager.cpp)
 set_target_properties( TestTypeSequenceManager PROPERTIES COMPILE_FLAGS "${TEST_COMP_FLAGS} ${MOAB_DEFINES} -DTEST -DIS_BUILDING_MB" )
 
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-target_link_libraries( TestTypeSequenceManager Threads::Threads MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
+set(TestTypeSequenceManager_LIBS MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+if(${Threads_FOUND})
+  list(APPEND TestTypeSequenceManager_LIBS Threads::Threads)
+endif()
+target_link_libraries(TestTypeSequenceManager ${TestTypeSequenceManager_LIBS})
+
 add_test( TestTypeSequenceManager ${EXECUTABLE_OUTPUT_PATH}/TestTypeSequenceManager )
 
 #Test_MBMeshSet.cpp
