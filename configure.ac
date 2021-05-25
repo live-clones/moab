@@ -1562,6 +1562,8 @@ if (test "x$download_ext_meshfiles" != "xno"); then
                         [[land.h5m], [ocn.h5m]])
   DOWNLOAD_EXTERNAL_DATA([ol_ne30pg2], [e3sm/ol_ne30pg2],
                         [[land.h5m], [ocn.h5m]])
+  DOWNLOAD_EXTERNAL_DATA([o_ne11pg2], [e3sm/o_ne11pg2],
+                        [[ne11pg2_inf.h5m.h5m]])
 fi
 AM_CONDITIONAL([HAVE_EXTMESHES],[test "$download_ext_meshfiles" = "yes"])
 
