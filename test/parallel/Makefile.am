@@ -63,13 +63,14 @@ commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
-  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast 
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 if HAVE_EXTMESHES
-  HDF5_TESTS +=  imoab_apg2_ol_coupler imoab_ol_apg2_coupler
-  imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  HDF5_TESTS +=  imoab_apg2_ol_coupler imoab_ol_apg2_coupler imoab_testB
   imoab_ol_apg2_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_testB_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
   test_mapweights_bcast_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 endif
@@ -177,6 +178,7 @@ uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cp
 migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
 imoab_phatm_ocn_coupler_SOURCES = imoab_phatm_ocn_coupler.cpp
+imoab_testB_SOURCES = imoab_testB.cpp
 imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 imoab_ol_apg2_coupler_SOURCES = imoab_ol_apg2_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
