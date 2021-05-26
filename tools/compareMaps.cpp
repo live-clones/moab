@@ -273,6 +273,11 @@ int main( int argc, char* argv[] )
     diff_vect("frac_b", nb1);
     diff_vect("area_a", na1);
     diff_vect("area_b", nb1);
+    diff_vect("yc_a", na1);
+    diff_vect("yc_b", nb1);
+    diff_vect("xc_a", na1);
+    diff_vect("xc_b", nb1);
+
 
     return 0;
 }
