@@ -106,13 +106,14 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
     {
         if( tl.vi_wr[2 * i + 1] != tl.vi_wr[2 * i + 3] )
         {
-            vecFaceArea[current_size] = tl.vr_wr[i * numr];
-            dCenterLon[current_size]  = tl.vr_wr[i * numr + 1];
-            dCenterLat[current_size]  = tl.vr_wr[i * numr + 2];
+            int i1 = i + 1;
+            vecFaceArea[current_size] = tl.vr_wr[i1 * numr];
+            dCenterLon[current_size]  = tl.vr_wr[i1 * numr + 1];
+            dCenterLat[current_size]  = tl.vr_wr[i1 * numr + 2];
             for( int j = 0; j < nv; j++ )
             {
-                dVertexLon[current_size][j] = tl.vr_wr[i * numr + 3 + j];
-                dVertexLat[current_size][j] = tl.vr_wr[i * numr + 3 + nv + j];
+                dVertexLon[current_size][j] = tl.vr_wr[i1 * numr + 3 + j];
+                dVertexLat[current_size][j] = tl.vr_wr[i1 * numr + 3 + nv + j];
             }
             current_size++;
         }
