@@ -341,7 +341,7 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
         tolerance = 1. - sqrt( 1 - max_length * max_length / 4 );
         if (box_error < tolerance)
             box_error = tolerance;
-        tolerance = 1.5 * tolerance;  // we use it for gnomonic plane too, projected sag could be =* sqrt(2.)
+        tolerance = 3 * tolerance;  // we use it for gnomonic plane too, projected sag could be =* sqrt(2.)
         // be more generous, use 1.5 ~= sqrt(2.)
 
         if( !my_rank )
