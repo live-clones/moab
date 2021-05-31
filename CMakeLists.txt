@@ -198,6 +198,10 @@ CHECK_FUNCTION_EXISTS(finite MOAB_HAVE_FINITE)
 # Find packages
 ################################################################################
 
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+
 include(config/CMakeLibraryFuncs.cmake)
 include(GenerateExportHeader)
 if (BUILD_SHARED_LIBS)

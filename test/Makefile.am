@@ -230,6 +230,10 @@ kd_tree_test_CPPFLAGS += -I$(top_srcdir)/src/parallel
 test_prog_opt_CPPFLAGS += -I$(top_srcdir)/src/parallel
 endif
 
+# Add thread flags/libraries for the TypeSequenceManagerTest
+seq_man_test_CPPFLAGS = $(AM_CPPFLAGS) $(PTHREAD_CFLAGS)
+seq_man_test_LDFLAGS = $(AM_LDFLAGS) $(PTHREAD_LIBS)
+
 # Tests for remapping
 if ENABLE_mbtempest
 if HAVE_TEMPESTREMAP
