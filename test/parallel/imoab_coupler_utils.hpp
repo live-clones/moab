@@ -79,7 +79,7 @@ int setup_component_coupler_meshes( iMOAB_AppID cmpId,
                                     int repartitioner_scheme )
 {
     int ierr = 0;
-    if ( 5 == repartitioner_scheme )
+    if ( *cmpcoucomm != MPI_COMM_NULL &&  5 == repartitioner_scheme )
     {
         // need to send the zoltan buffer from coupler root towards the component root
         ierr = iMOAB_RetrieveZBuffer( cmpPEGroup, cplPEGroup, cmpcoucomm );

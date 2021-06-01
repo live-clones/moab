@@ -294,6 +294,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
         POP_TIMER( couComm, rankInCouComm )
     }
+    MPI_Barrier( MPI_COMM_WORLD );
     // atm
     repartitioner_scheme = 5; // reuse the partition stored at previous step
     ierr =
