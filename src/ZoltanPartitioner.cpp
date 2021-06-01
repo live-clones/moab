@@ -554,7 +554,12 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
     if( NULL == myZZ ) myZZ = new Zoltan( mbpc->comm() );
 
     if( NULL == zmethod || !strcmp( zmethod, "RCB" ) )
-        SetRCB_Parameters( recompute_rcb_box );
+    {
+        if (projection_type == 2)
+            SetRCB_Parameters( true );
+        else
+            SetRCB_Parameters( recompute_rcb_box );
+    }
     else if( !strcmp( zmethod, "RIB" ) )
         SetRIB_Parameters();
     else if( !strcmp( zmethod, "HSFC" ) )
