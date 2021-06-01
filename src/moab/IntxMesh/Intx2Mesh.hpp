@@ -113,7 +113,7 @@ class Intx2Mesh
     void set_error_tolerance( double eps )
     {
         epsilon_1    = eps;
-        epsilon_area = eps * eps / 2;
+        epsilon_area = eps * sqrt(eps) ;
     }
 
 #ifdef MOAB_HAVE_MPI
