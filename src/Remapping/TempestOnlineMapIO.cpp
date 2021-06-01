@@ -493,7 +493,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
                 tlValCol.vr_wr[ncInd]         = vecS[offset];
                 tlValCol.inc_n();
             }
-
 #endif
             offset++;
         }
