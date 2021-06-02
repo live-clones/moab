@@ -72,15 +72,14 @@ struct ToolContext
         : mbcore( icore ), pcomm( p_pcomm ), proc_id( pcomm->rank() ), n_procs( pcomm->size() ),
           outputFormatter( std::cout, pcomm->rank(), 0 ),
 #else
-    ToolContext ( moab::Interface* icore ) :
-            mbcore(icore),
-            proc_id ( 0 ), n_procs ( 1 ),
-            outputFormatter ( std::cout, 0, 0 ),
+    ToolContext( moab::Interface* icore )
+        : mbcore( icore ), proc_id( 0 ), n_procs( 1 ), outputFormatter( std::cout, 0, 0 ),
 #endif
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
-          computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity(false), ensureMonotonicity( 0 ),
-          fNoConservation( false ), fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( false ),
-          fInputConcave( false ), fOutputConcave( false ), fCheck( pcomm->size() > 1 ? false : true )
+          computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity( false ),
+          ensureMonotonicity( 0 ), fNoConservation( false ), fVolumetric( false ), rrmGrids( false ),
+          kdtreeSearch( true ), fNoBubble( false ), fInputConcave( false ), fOutputConcave( false ),
+          fCheck( n_procs > 1 ? false : true )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
