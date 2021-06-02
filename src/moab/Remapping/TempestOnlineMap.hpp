@@ -74,14 +74,13 @@ class TempestOnlineMap : public OfflineMap
     ///     This method generates the mapping between the two meshes based on the overlap and stores
     ///     the result in the SparseMatrix.
     ///	</summary>
-    moab::ErrorCode GenerateRemappingWeights(
-        std::string strInputType = "fv", std::string strOutputType = "fv", const int nPin = 1, const int nPout = 1,
-        bool fBubble = false, int fMonotoneTypeID = 0, bool fVolumetric = false, bool fNoConservation = false,
-        bool fNoCheck = false, const std::string srcDofTagName = "GLOBAL_ID",
-        const std::string tgtDofTagName = "GLOBAL_ID", const std::string strVariables = "",
-        const std::string strInputData = "", const std::string strOutputData = "", const std::string strNColName = "",
-        const bool fOutputDouble = false, const std::string strPreserveVariables = "", const bool fPreserveAll = false,
-        const double dFillValueOverride = 0.0, const bool fInputConcave = false, const bool fOutputConcave = false );
+    moab::ErrorCode GenerateRemappingWeights( std::string strInputType = "fv", std::string strOutputType = "fv",
+                                              const int nPin = 1, const int nPout = 1, bool fBubble = false,
+                                              int fMonotoneTypeID = 0, bool fVolumetric = false,
+                                              bool fNoConservation = false, bool fNoCheck = false,
+                                              const std::string srcDofTagName = "GLOBAL_ID",
+                                              const std::string tgtDofTagName = "GLOBAL_ID",
+                                              const bool fInputConcave = false, const bool fOutputConcave = false );
 
     ///	<summary>
     ///		Generate the metadata associated with the offline map.

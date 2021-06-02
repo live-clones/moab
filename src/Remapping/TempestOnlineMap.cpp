@@ -131,33 +131,6 @@ moab::TempestOnlineMap::~TempestOnlineMap()
     m_meshOverlap = NULL;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-static void ParseVariableList( const std::string& strVariables, std::vector< std::string >& vecVariableStrings )
-{
-    unsigned iVarBegin   = 0;
-    unsigned iVarCurrent = 0;
-
-    // Parse variable name
-    for( ;; )
-    {
-        if( ( iVarCurrent >= strVariables.length() ) || ( strVariables[iVarCurrent] == ',' ) ||
-            ( strVariables[iVarCurrent] == ' ' ) )
-        {
-            if( iVarCurrent == iVarBegin )
-            {
-                if( iVarCurrent >= strVariables.length() ) { break; }
-                continue;
-            }
-
-            vecVariableStrings.push_back( strVariables.substr( iVarBegin, iVarCurrent - iVarBegin ) );
-
-            iVarBegin = iVarCurrent + 1;
-        }
-
-        iVarCurrent++;
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -674,10 +647,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
 moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
     std::string strInputType, std::string strOutputType, const int nPin, const int nPout, bool fBubble,
     int fMonotoneTypeID, bool fVolumetric, bool fNoConservation, bool fNoCheck, const std::string srcDofTagName,
-    const std::string tgtDofTagName, const std::string strVariables, const std::string strInputData,
-    const std::string strOutputData, const std::string strNColName, const bool fOutputDouble,
-    const std::string strPreserveVariables, const bool fPreserveAll, const double dFillValueOverride,
-    const bool fInputConcave, const bool fOutputConcave )
+    const std::string tgtDofTagName, const bool fInputConcave, const bool fOutputConcave )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -691,12 +661,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
     try
     {
-        // Check command line parameters (data arguments)
-        if( ( strInputData != "" ) && ( strOutputData == "" ) )
-        { _EXCEPTIONT( "--in_data specified without --out_data" ); }
-        if( ( strInputData == "" ) && ( strOutputData != "" ) )
-        { _EXCEPTIONT( "--out_data specified without --in_data" ); }
-
         // Check command line parameters (data type arguments)
         STLStringHelper::ToLower( strInputType );
         STLStringHelper::ToLower( strOutputType );
@@ -743,22 +707,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
         // Monotonicity flags
         int nMonotoneType = fMonotoneTypeID;
-
-        // Parse variable list
-        std::vector< std::string > vecVariableStrings;
-        ParseVariableList( strVariables, vecVariableStrings );
-
-        // Parse preserve variable list
-        std::vector< std::string > vecPreserveVariableStrings;
-        ParseVariableList( strPreserveVariables, vecPreserveVariableStrings );
-
-        if( fPreserveAll && ( vecPreserveVariableStrings.size() != 0 ) )
-        { _EXCEPTIONT( "--preserveall and --preserve cannot both be specified" ); }
-
-        m_bConserved    = !fNoConservation;
-        m_iMonotonicity = fMonotoneTypeID;
-        m_eInputType    = eInputType;
-        m_eOutputType   = eOutputType;
+        m_bConserved      = !fNoConservation;
+        m_iMonotonicity   = fMonotoneTypeID;
+        m_eInputType      = eInputType;
+        m_eOutputType     = eOutputType;
 
         m_nDofsPEl_Src =
             ( m_eInputType == DiscretizationType_FV || m_eInputType == DiscretizationType_PCLOUD ? 1 : nPin );
@@ -1225,29 +1177,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             if( nMonotoneType != 0 ) { this->IsMonotone( 1.0e-12 ); }
         }
 
-        // Apply Remapping Weights to data
-        if( strInputData != "" )
-        {
-            if( is_root ) dbgprint.printf( 0, "Applying remap weights to data\n" );
-
-            this->SetFillValueOverride( static_cast< float >( dFillValueOverride ) );
-            this->Apply( strInputData, strOutputData, vecVariableStrings, strNColName, fOutputDouble, false );
-        }
-
-        // Copy variables from input file to output file
-        if( ( strInputData != "" ) && ( strOutputData != "" ) )
-        {
-            if( fPreserveAll )
-            {
-                if( is_root ) dbgprint.printf( 0, "Preserving variables" );
-                this->PreserveAllVariables( strInputData, strOutputData );
-            }
-            else if( vecPreserveVariableStrings.size() != 0 )
-            {
-                if( is_root ) dbgprint.printf( 0, "Preserving variables" );
-                this->PreserveVariables( strInputData, strOutputData, vecPreserveVariableStrings );
-            }
-        }
     }
     catch( Exception& e )
     {

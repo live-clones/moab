@@ -3208,21 +3208,18 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
     // We need this mapping when computing matvec products and to do reductions in parallel
     // Additionally, the call below will also compute weights with TempestRemap
     rval = weightMap->GenerateRemappingWeights(
-        std::string( disc_method_source ),
-        std::string( disc_method_target ),               // std::string strInputType, std::string strOutputType,
-        ( *disc_order_source ), ( *disc_order_target ),  // const int nPin, const int nPout,
-        true,
-        ( fMonotoneTypeID ? *fMonotoneTypeID : 0 ),          // bool fBubble=false, int fMonotoneTypeID=0,
-        ( fVolumetric ? *fVolumetric > 0 : false ),          // bool fVolumetric=false,
-        ( fNoConservation ? *fNoConservation > 0 : false ),  // bool fNoConservation=false,
-        ( fValidate ? *fValidate : false ),                  // bool fNoCheck=false,
-        source_solution_tag_dof_name, target_solution_tag_dof_name,
-        "",              //"",   // std::string strVariables="", std::string strOutputMap="",
-        "", "",          // std::string strInputData="", std::string strOutputData="",
-        "", false,       // std::string strNColName="", bool fOutputDouble=false,
-        "", false, 0.0,  // std::string strPreserveVariables="", bool fPreserveAll=false, double
-                         // dFillValueOverride=0.0,
-        false, false     // bool fInputConcave = false, bool fOutputConcave = false
+        std::string( disc_method_source ),                   // std::string strInputType
+        std::string( disc_method_target ),                   // std::string strOutputType
+        ( *disc_order_source ), ( *disc_order_target ),      // const int nPin, const int nPout
+        true,                                                // bool fBubble=false
+        ( fMonotoneTypeID ? *fMonotoneTypeID : 0 ),          // int fMonotoneTypeID=0
+        ( fVolumetric ? *fVolumetric > 0 : false ),          // bool fVolumetric=false
+        ( fNoConservation ? *fNoConservation > 0 : false ),  // bool fNoConservation=false
+        ( fValidate ? *fValidate : false ),                  // bool fNoCheck=false
+        source_solution_tag_dof_name,                        // const std::string srcDofTagName = "GLOBAL_ID"
+        target_solution_tag_dof_name,                        // const std::string tgtDofTagName = "GLOBAL_ID"
+        false,                                               // bool fInputConcave = false
+        false                                                // bool fOutputConcave = false
     );CHKERRVAL( rval );
 
     return 0;

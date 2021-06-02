@@ -583,27 +583,19 @@ int main( int argc, char* argv[] )
             runCtx->timer_push( "compute weights with TempestRemap" );
 
             rval = weightMap->GenerateRemappingWeights(
-                runCtx->disc_methods[0],
-                runCtx->disc_methods[1],                         // std::string strInputType, std::string strOutputType,
-                runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin=4, int nPout=4,
-                runCtx->fNoBubble,
-                runCtx->ensureMonotonicity,  // bool fNoBubble=true, int fMonotoneTypeID=0,
-                runCtx->fVolumetric, runCtx->fNoConservation,
-                !runCtx->fCheck,  // bool fVolumetric=false, bool fNoConservation=false, bool
-                                   // fNoCheck=false,
-                runCtx->doftag_names[0],
-                runCtx->doftag_names[1],  // std::string source_tag_name, std::string
-                                          // target_tag_name,
-                "",                       //"",                                                       // std::string
-                                          // strVariables="",
-                "", "",                   // std::string strInputData="", std::string strOutputData="",
-                "", true,                 // std::string strNColName="", bool fOutputDouble=true,
-                "", false,
-                0.0,  // std::string strPreserveVariables="", bool fPreserveAll=false, double
-                      // dFillValueOverride=0.0,
-                runCtx->fInputConcave,
-                runCtx->fOutputConcave  // bool fInputConcave = false, bool fOutputConcave = false
-            );MB_CHK_ERR( rval );
+                runCtx->disc_methods[0],                         // std::string strInputType
+                runCtx->disc_methods[1],                         // std::string strOutputType,
+                runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin, int nPout,
+                runCtx->fNoBubble,                               // bool fNoBubble
+                runCtx->ensureMonotonicity,                      // int fMonotoneTypeID,
+                runCtx->fVolumetric, runCtx->fNoConservation,    // bool fVolumetric, bool fNoConservation,
+                !runCtx->fCheck,                                 //  bool fNoCheck,
+                runCtx->doftag_names[0],                         // std::string source_tag_name
+                runCtx->doftag_names[1],                         // std::string target_tag_name,
+                runCtx->fInputConcave,                           // bool fInputConcave
+                runCtx->fOutputConcave                           // bool fOutputConcave
+            );
+            MB_CHK_ERR( rval );
             runCtx->timer_pop();
 
             // Invoke the CheckMap routine on the TempestRemap serial interface directly, if running
