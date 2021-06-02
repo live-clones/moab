@@ -208,18 +208,23 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         }
 
         vecSourceFaceArea.Allocate( m_nTotDofs_Src );
-        int offset = 0;
-        for( size_t e = 0; e < m_meshInput->faces.size(); e++ )
+        if (1 == size )
+            vecSourceFaceArea = m_meshInput->vecFaceArea;
+        else
         {
-            for( int s = 0; s < m_nDofsPEl_Src; s++ )
+            int offset = 0;
+            for( size_t e = 0; e < m_meshInput->faces.size(); e++ )
             {
-                for( int t = 0; t < m_nDofsPEl_Src; t++ )
+                for( int s = 0; s < m_nDofsPEl_Src; s++ )
                 {
-                    vecSourceFaceArea[srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t]] =
-                        dataGLLJacobianSrc[s][t][e];
+                    for( int t = 0; t < m_nDofsPEl_Src; t++ )
+                    {
+                        vecSourceFaceArea[srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t]] =
+                            dataGLLJacobianSrc[s][t][e];
+                    }
                 }
+                offset += m_nDofsPEl_Src * m_nDofsPEl_Src;
             }
-            offset += m_nDofsPEl_Src * m_nDofsPEl_Src;
         }
     }
 
