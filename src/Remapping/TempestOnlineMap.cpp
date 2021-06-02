@@ -1202,6 +1202,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
         copy_tempest_sparsemat_to_eigen3();
 #endif
 
+        int fNoCheckLoc = fNoCheckGlob;
 #ifdef MOAB_HAVE_MPI
         {
             // Remove ghosted entities from overlap set
@@ -1212,7 +1213,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
         }
 
         // Let us see if we need to perform consistency/conservation checks
-        int fNoCheckLoc = fNoCheckGlob;
         if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
 #endif
         // Verify consistency, conservation and monotonicity, globally
