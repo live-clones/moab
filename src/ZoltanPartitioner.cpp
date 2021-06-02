@@ -2305,7 +2305,10 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
         {
             myZZ->Set_Num_Geom_Fn( mbGetObjectSize, NULL );
             myZZ->Set_Geom_Multi_Fn( mbGetObject, NULL );
-            SetRCB_Parameters();  // geometry
+            if (3<=met)
+                SetRCB_Parameters(/*const bool recompute_rcb_box*/true);  // recompute rcb box
+            else
+                SetRCB_Parameters(/*const bool recompute_rcb_box*/false);  // recompute rcb box // is it faster ?
         }
         else if( 1 == met )
         {
