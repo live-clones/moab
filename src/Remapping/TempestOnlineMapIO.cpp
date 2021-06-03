@@ -119,7 +119,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
         }
         else
         {
-            vecFaceArea[current_size - 1] += tl.vr_wr[i1 * numr]; // accumulate areas; will come here only for cgll ?
+            vecFaceArea[current_size - 1] += tl.vr_wr[i1 * numr];  // accumulate areas; will come here only for cgll ?
         }
     }
 
@@ -203,15 +203,11 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc,  vecSourceFaceArea);
-        }
+        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, vecSourceFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, vecSourceFaceArea );
         }
-
-
     }
 
     if( m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD )
@@ -236,14 +232,11 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, vecTargetFaceArea );
         }
-
     }
 
     // Map dimensions
@@ -288,8 +281,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     offbuf[2] -= nS;
 
 #else
-    int offbuf[3] = { 0, 0, 0 };
-    int globuf[5] = { (int)nA, (int)nB, nS, nSourceNodesPerFace, nTargetNodesPerFace };
+    int offbuf[3]            = { 0, 0, 0 };
+    int globuf[5]            = { (int)nA, (int)nB, nS, nSourceNodesPerFace, nTargetNodesPerFace };
 #endif
 
     // Write output dimensions entries
@@ -454,7 +447,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
             vecRow[offset] = 1 + this->GetRowGlobalDoF( it.row() );  // row index
             vecCol[offset] = 1 + this->GetColGlobalDoF( it.col() );  // col index
             vecS[offset]   = it.value();                             // value
-            if (size ==1)
+            if( size == 1 )
                 dFracA[it.col()] += vecS[offset] / vecSourceFaceArea[it.col()] * vecTargetFaceArea[it.row()];
             dFracB[it.row()] += vecS[offset];
 
@@ -554,9 +547,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
@@ -598,9 +589,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
@@ -1048,7 +1037,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
             tl.inc_n();
         }
-
 
         // now do the heavy communication
         ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
