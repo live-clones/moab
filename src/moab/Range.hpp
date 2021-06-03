@@ -188,7 +188,7 @@ struct range_base_iter
 };
 
 //! the class Range
-MOAB_EXPORT class Range
+class MOAB_EXPORT Range
 {
   public:
     // forward declare the iterators

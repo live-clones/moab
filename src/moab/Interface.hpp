@@ -36,8 +36,9 @@
 
 #ifdef WIN32               /* windows */
 #define _USE_MATH_DEFINES  // For M_PI
-#endif
 #include "win32_config.h"
+#endif
+
 
 #ifndef MOAB_INTERFACE_HPP
 #define MOAB_INTERFACE_HPP
