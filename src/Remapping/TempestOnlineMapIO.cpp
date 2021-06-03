@@ -104,9 +104,9 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
     }
     for( unsigned i = 0; i < tl.get_n() - 1; i++ )
     {
+        int i1 = i + 1;
         if( tl.vi_wr[2 * i + 1] != tl.vi_wr[2 * i + 3] )
         {
-            int i1 = i + 1;
             vecFaceArea[current_size] = tl.vr_wr[i1 * numr];
             dCenterLon[current_size]  = tl.vr_wr[i1 * numr + 1];
             dCenterLat[current_size]  = tl.vr_wr[i1 * numr + 2];
@@ -116,6 +116,10 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
                 dVertexLat[current_size][j] = tl.vr_wr[i1 * numr + 3 + nv + j];
             }
             current_size++;
+        }
+        else
+        {
+            vecFaceArea[current_size - 1] += tl.vr_wr[i1 * numr]; // accumulate areas; will come here only for cgll ?
         }
     }
 
@@ -200,32 +204,14 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
 
         if( m_srcDiscType == DiscretizationType_CGLL )
         {
-            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc,  vecSourceFaceArea);
         }
         else
         {
-            GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+            GenerateDiscontinuousJacobian( dataGLLJacobianSrc, vecSourceFaceArea );
         }
 
-        vecSourceFaceArea.Allocate( m_nTotDofs_Src );
-        if (1 == size )
-            vecSourceFaceArea = m_meshInput->vecFaceArea;
-        else
-        {
-            int offset = 0;
-            for( size_t e = 0; e < m_meshInput->faces.size(); e++ )
-            {
-                for( int s = 0; s < m_nDofsPEl_Src; s++ )
-                {
-                    for( int t = 0; t < m_nDofsPEl_Src; t++ )
-                    {
-                        vecSourceFaceArea[srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t]] =
-                            dataGLLJacobianSrc[s][t][e];
-                    }
-                }
-                offset += m_nDofsPEl_Src * m_nDofsPEl_Src;
-            }
-        }
+
     }
 
     if( m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD )
@@ -251,26 +237,13 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
 
         if( m_destDiscType == DiscretizationType_CGLL )
         {
-            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea );
         }
         else
         {
-            GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+            GenerateDiscontinuousJacobian( dataGLLJacobianDest, vecTargetFaceArea );
         }
 
-        vecTargetFaceArea.Allocate( m_nTotDofs_Dest );
-        int offset = 0;
-        for( size_t e = 0; e < m_meshOutput->faces.size(); e++ )
-        {
-            for( int s = 0; s < m_nDofsPEl_Dest; s++ )
-            {
-                for( int t = 0; t < m_nDofsPEl_Dest; t++ )
-                {
-                    vecTargetFaceArea[row_dtoc_dofmap[offset + s * m_nDofsPEl_Dest + t]] = dataGLLJacobianDest[s][t][e];
-                }
-            }
-            offset += m_nDofsPEl_Dest * m_nDofsPEl_Dest;
-        }
     }
 
     // Map dimensions
@@ -481,8 +454,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
             vecRow[offset] = 1 + this->GetRowGlobalDoF( it.row() );  // row index
             vecCol[offset] = 1 + this->GetColGlobalDoF( it.col() );  // col index
             vecS[offset]   = it.value();                             // value
-
-            dFracA[it.col()] += vecS[offset] / vecSourceFaceArea[it.col()] * vecTargetFaceArea[it.row()];
+            if (size ==1)
+                dFracA[it.col()] += vecS[offset] / vecSourceFaceArea[it.col()] * vecTargetFaceArea[it.row()];
             dFracB[it.row()] += vecS[offset];
 
             offset++;
