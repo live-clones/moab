@@ -185,9 +185,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     DataArray2D< double > dSourceVertexLon, dSourceVertexLat, dTargetVertexLon, dTargetVertexLat;
     if( m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD )
     {
-        this->InitializeCoordinatesFromMeshFV( *m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon,
-                                               dSourceVertexLat, false /* fLatLon = false */,
-                                               m_remapper->max_source_edges );
+        this->InitializeCoordinatesFromMeshFV(
+            *m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat,
+            ( this->m_remapper->m_source_type == moab::TempestRemapper::RLL ) /* fLatLon = false */,
+            m_remapper->max_source_edges );
 
         vecSourceFaceArea.Allocate( m_meshInput->vecFaceArea.GetRows() );
         for( unsigned i = 0; i < m_meshInput->vecFaceArea.GetRows(); ++i )
@@ -212,9 +213,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
 
     if( m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD )
     {
-        this->InitializeCoordinatesFromMeshFV( *m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon,
-                                               dTargetVertexLat, false /* fLatLon = false */,
-                                               m_remapper->max_target_edges );
+        this->InitializeCoordinatesFromMeshFV(
+            *m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat,
+            ( this->m_remapper->m_target_type == moab::TempestRemapper::RLL ) /* fLatLon = false */,
+            m_remapper->max_target_edges );
 
         vecTargetFaceArea.Allocate( m_meshOutput->vecFaceArea.GetRows() );
         for( unsigned i = 0; i < m_meshOutput->vecFaceArea.GetRows(); ++i )
@@ -529,9 +531,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
     DataArray2D< double > dSourceVertexLon, dSourceVertexLat, dTargetVertexLon, dTargetVertexLat;
     if( m_srcDiscType == DiscretizationType_FV || m_srcDiscType == DiscretizationType_PCLOUD )
     {
-        this->InitializeCoordinatesFromMeshFV( *m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon,
-                                               dSourceVertexLat, false /* fLatLon = false */,
-                                               m_remapper->max_source_edges );
+        this->InitializeCoordinatesFromMeshFV(
+            *m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat,
+            ( this->m_remapper->m_source_type == moab::TempestRemapper::RLL ) /* fLatLon = false */,
+            m_remapper->max_source_edges );
 
         vecSourceFaceArea.Allocate( m_meshInput->vecFaceArea.GetRows() );
         for( unsigned i = 0; i < m_meshInput->vecFaceArea.GetRows(); ++i )
@@ -571,9 +574,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
 
     if( m_destDiscType == DiscretizationType_FV || m_destDiscType == DiscretizationType_PCLOUD )
     {
-        this->InitializeCoordinatesFromMeshFV( *m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon,
-                                               dTargetVertexLat, false /* fLatLon = false */,
-                                               m_remapper->max_target_edges );
+        this->InitializeCoordinatesFromMeshFV(
+            *m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat,
+            ( this->m_remapper->m_target_type == moab::TempestRemapper::RLL ) /* fLatLon = false */,
+            m_remapper->max_target_edges );
 
         vecTargetFaceArea.Allocate( m_meshOutput->vecFaceArea.GetRows() );
         for( unsigned i = 0; i < m_meshOutput->vecFaceArea.GetRows(); ++i )

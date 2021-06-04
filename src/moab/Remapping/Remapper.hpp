@@ -75,7 +75,8 @@ class Remapper
     }
 #endif
 
-    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, const char* readopts = 0 )
+    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, bool& isRLL,
+                              const char* readopts = 0 )
     {
 #ifdef MOAB_HAVE_MPI
         size_t lastindex      = filename.find_last_of( "." );
@@ -103,7 +104,19 @@ class Remapper
         const std::string opts = std::string( ( readopts ? readopts : "" ) );
         std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #endif
-        return m_interface->load_file( filename.c_str(), &meshset, opts.c_str() );
+        moab::ErrorCode rval = m_interface->load_file( filename.c_str(), &meshset, opts.c_str() );MB_CHK_ERR(rval);
+
+        Tag rectilinearTag;
+        rval = m_interface->tag_get_handle( "RectilinearSizes", 2, MB_TYPE_INTEGER, rectilinearTag, MB_TAG_SPARSE );
+
+        if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED && rectilinearTag != nullptr )
+        {
+            isRLL = true;
+        }
+        else
+            isRLL = false;
+
+        return MB_SUCCESS;
     }
 
   protected:

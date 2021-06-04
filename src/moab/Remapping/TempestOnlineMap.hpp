@@ -327,6 +327,7 @@ class TempestOnlineMap : public OfflineMap
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
   private:
+    moab::ErrorCode setup_sizes_dimensions();
 
 #ifdef MOAB_HAVE_MPI
     int rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,

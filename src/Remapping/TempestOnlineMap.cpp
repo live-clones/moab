@@ -98,24 +98,78 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
     // to number of rows and columns in the mapping.
 
     // Initialize dimension information from file
-    std::vector< std::string > dimNames( 1 );
-    std::vector< int > dimSizes( 1 );
-    dimNames[0] = "num_elem";
-
-    if( m_meshInputCov )
-    {
-        dimSizes[0] = m_meshInputCov->faces.size();
-        this->InitializeSourceDimensions( dimNames, dimSizes );
-    }
-    if( m_meshOutput )
-    {
-        dimSizes[0] = m_meshOutput->faces.size();
-        this->InitializeTargetDimensions( dimNames, dimSizes );
-    }
+    this->setup_sizes_dimensions();
 
     // Build a matrix of source and target discretization so that we know how to assign
     // the global DoFs in parallel for the mapping weights
     // For example, FV->FV: rows X cols = faces_source X faces_target
+}
+
+moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
+{
+    ErrorCode rval;
+    std::vector< std::string > dimNames;
+    std::vector< int > dimSizes;
+
+    if( m_meshInputCov )
+    {
+        if( m_remapper->m_source_type == moab::TempestRemapper::RLL )
+        {
+            dimNames.resize( 2 );
+            dimSizes.resize( 2, 0 );
+            dimNames[0] = "lat";
+            dimNames[1] = "lon";
+
+            Tag rectilinearTag;
+            rval = m_interface->tag_get_handle( "RectilinearSizes", 2, MB_TYPE_INTEGER, rectilinearTag, MB_TAG_SPARSE );
+
+            if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
+                rectilinearTag != nullptr )
+            {
+                rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_source_set, 1, dimSizes.data() );
+            }
+        }
+        else
+        {
+            dimNames.resize( 1 );
+            dimSizes.resize( 1 );
+            dimNames[0] = "num_elem";
+            dimSizes[0] = m_meshInputCov->faces.size();
+        }
+
+        this->InitializeSourceDimensions( dimNames, dimSizes );
+    }
+
+    if( m_meshOutput )
+    {
+        if( m_remapper->m_target_type == moab::TempestRemapper::RLL )
+        {
+            dimNames.resize( 2 );
+            dimSizes.resize( 2, 0 );
+            dimNames[0] = "lat";
+            dimNames[1] = "lon";
+
+            Tag rectilinearTag;
+            rval = m_interface->tag_get_handle( "RectilinearSizes", 2, MB_TYPE_INTEGER, rectilinearTag, MB_TAG_SPARSE );
+
+            if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
+                rectilinearTag != nullptr )
+            {
+                rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_target_set, 1, dimSizes.data() );
+            }
+        }
+        else
+        {
+            dimNames.resize( 1 );
+            dimSizes.resize( 1 );
+            dimNames[0] = "num_elem";
+            dimSizes[0] = m_meshOutput->faces.size();
+        }
+
+        this->InitializeTargetDimensions( dimNames, dimSizes );
+    }
+
+    return moab::MB_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

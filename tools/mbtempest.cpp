@@ -755,16 +755,21 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         const double radius_src  = 1.0 /*2.0*acos(-1.0)*/;
         const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;
 
+        bool isSrcRLL = false;
+        bool isTgtRLL = false;
+
         const char* additional_read_opts = ( ctx.n_procs > 1 ? "NO_SET_CONTAINING_PARENTS;" : "" );
         // Load the source mesh and validate
-        rval = remapper.LoadNativeMesh( ctx.inFilenames[0], ctx.meshsets[0], additional_read_opts );MB_CHK_ERR( rval );
+        rval = remapper.LoadNativeMesh( ctx.inFilenames[0], ctx.meshsets[0], isSrcRLL, additional_read_opts );MB_CHK_ERR( rval );
+        if( isSrcRLL ) remapper.SetMeshType( moab::Remapper::SourceMesh, moab::TempestRemapper::RLL );
         // Rescale the radius of both to compute the intersection
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[0], radius_src );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
         ctx.meshes[0] = remapper.GetMesh( moab::Remapper::SourceMesh );
 
         // Load the target mesh and validate
-        rval = remapper.LoadNativeMesh( ctx.inFilenames[1], ctx.meshsets[1], additional_read_opts );MB_CHK_ERR( rval );
+        rval = remapper.LoadNativeMesh( ctx.inFilenames[1], ctx.meshsets[1], isTgtRLL, additional_read_opts );MB_CHK_ERR( rval );
+        if( isTgtRLL ) remapper.SetMeshType( moab::Remapper::TargetMesh, moab::TempestRemapper::RLL );
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[1], radius_dest );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
         ctx.meshes[1] = remapper.GetMesh( moab::Remapper::TargetMesh );
