@@ -39,7 +39,7 @@
 
 // #define VERBOSE
 // #define VVERBOSE
-#define CHECK_INCREASING_DOF
+// #define CHECK_INCREASING_DOF
 
 void LinearRemapFVtoGLL( const Mesh& meshInput, const Mesh& meshOutput, const Mesh& meshOverlap,
                          const DataArray3D< int >& dataGLLNodes, const DataArray3D< double >& dataGLLJacobian,
