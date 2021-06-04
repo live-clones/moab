@@ -447,7 +447,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     // value has to be sent to processor row/nB for for fracA and col/nA for fracB
     // vecTargetArea (indexRow ) has to be sent for fracA (index col?)
     // vecTargetFaceArea will have to be sent to col index, with its index !
-    tlValRow.initialize( 3, 0, 0, numr, nS );  // to proc(row),  global row / col, value
+    tlValRow.initialize( 2, 0, 0, numr, nS );  // to proc(row),  global row , value
     tlValCol.initialize( 3, 0, 0, numr, nS );  // to proc(col),  global row / col, value
     tlValRow.enableWriteAccess();
     tlValCol.enableWriteAccess();
@@ -457,6 +457,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
          dFracB[ row ] += val ;
  */
     int offset = 0;
+#if defined( MOAB_HAVE_MPI )
+    int nAbase = max_col_dof/size; // it is nA, except last rank ( == size - 1 )
+    int nBbase = max_row_dof/size; // it is nB, except last rank ( == size - 1 )
+#endif
     for( int i = 0; i < m_weightMatrix.outerSize(); ++i )
     {
         for( WeightMatrix::InnerIterator it( m_weightMatrix, i ); it; ++it )
@@ -464,34 +468,125 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
             vecRow[offset] = 1 + this->GetRowGlobalDoF( it.row() );  // row index
             vecCol[offset] = 1 + this->GetColGlobalDoF( it.col() );  // col index
             vecS[offset]   = it.value();                             // value
+
+#if defined( MOAB_HAVE_MPI )
             {
-/*
-                    // populate
-                    for( unsigned i = 0; i < N; i++ )
-                    {
-                        int gdof    = gdofmap[i];
-                        int to_proc = gdof / size_per_task;
-                        if( to_proc >= size ) to_proc = size - 1;  // the last ones got to last proc
-                        int n                  = tl.get_n();
-                        tl.vi_wr[2 * n]        = to_proc;
-                        tl.vi_wr[2 * n + 1]    = gdof;
-                        tl.vr_wr[n * numr]     = vecFaceArea[i];
-                        tl.vr_wr[n * numr + 1] = dCenterLon[i];
-                        tl.vr_wr[n * numr + 2] = dCenterLat[i];
-                        for( int j = 0; j < nv; j++ )
-                        {
-                            tl.vr_wr[n * numr + 3 + j]      = dVertexLon[i][j];
-                            tl.vr_wr[n * numr + 3 + nv + j] = dVertexLat[i][j];
-                        }
-                        tl.inc_n();
-                    }
-                    */
+                // value M(row, col) will contribute to procRow and procCol values for fracA and fracB
+                int procRow = (vecRow[offset] - 1) / nBbase;
+                if (procRow >= size)
+                    procRow = size-1;
+                int procCol = (vecCol[offset] - 1) / nAbase;
+                if (procCol>=size)
+                    procCol = size-1;
+                int nrInd = tlValRow.get_n();
+                tlValRow.vi_wr[2*nrInd] = procRow;
+                tlValRow.vi_wr[2*nrInd + 1] = vecRow[offset] - 1;
+                tlValRow.vr_wr[nrInd] = vecS[offset];
+                tlValRow.inc_n();
+                int ncInd = tlValCol.get_n();
+                tlValCol.vi_wr[3*ncInd] = procCol;
+                tlValCol.vi_wr[3*ncInd + 1] = vecRow[offset] - 1;
+                tlValCol.vi_wr[3*ncInd + 2] = vecCol[offset] - 1; // this is column
+                tlValCol.vr_wr[ncInd] = vecS[offset];
+                tlValCol.inc_n();
             }
 
+#endif
             offset++;
         }
     }
+#if defined( MOAB_HAVE_MPI )
+    // need to send values for their row and col processors, to compute fractions there
+    // now do the heavy communication
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tlValCol, 0 );
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tlValRow, 0 );
 
+    // we have now, for example,  dFracB[ row ] += val ;
+    // so we know that on current task, we received tlValRow
+    // reminder dFracA[ col ] += val / vecSourceFaceArea[ col ] * vecTargetFaceArea[ row ];
+    //          dFracB[ row ] += val ;
+    for( unsigned i = 0; i < tlValRow.get_n(); i++ )
+    {
+        //int fromProc = tlValRow.vi_wr[2 * i];
+        int gRowInd = tlValRow.vi_wr[2 * i + 1];
+        int localIndexRow = gRowInd - nBbase * rank; // modulo nBbase rank is from 0 to size - 1;
+        double wgt = tlValRow.vr_wr[i];
+        dFracB[localIndexRow] += wgt;
+    }
+    // to compute dFracA we need vecTargetFaceArea[ row ]; we know the row, and we can get the proc we need it from
+
+    std::set<int> neededRows;
+    for( unsigned i = 0; i < tlValCol.get_n(); i++ )
+    {
+        int rRowInd = tlValCol.vi_wr[3 * i + 1];
+        neededRows.insert(rRowInd);
+        // we need vecTargetFaceAreaGlobal[ rRowInd ]; this exists on proc procRow
+    }
+    moab::TupleList  tgtAreaReq;
+    tgtAreaReq.initialize( 2, 0, 0, 0, neededRows.size() );
+    tgtAreaReq.enableWriteAccess();
+    for (std::set<int>::iterator sit=neededRows.begin(); sit!=neededRows.end(); sit++ )
+    {
+        int neededRow = *sit;
+        int procRow = neededRow / nBbase;
+        if (procRow >= size)
+            procRow = size-1;
+        int nr = tgtAreaReq.get_n();
+        tgtAreaReq.vi_wr[2*nr] = procRow;
+        tgtAreaReq.vi_wr[2*nr + 1] = neededRow;
+        tgtAreaReq.inc_n();
+    }
+
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tgtAreaReq, 0 );
+    // we need to send back the tgtArea corresponding to row
+    moab::TupleList  tgtAreaInfo; // load it with tgtArea at row
+    tgtAreaInfo.initialize( 2, 0, 0, 1, tgtAreaReq.get_n() );
+    tgtAreaInfo.enableWriteAccess();
+    for( unsigned i = 0; i < tgtAreaReq.get_n(); i++ )
+    {
+        int from_proc = tgtAreaReq.vi_wr[2*i];
+        int row = tgtAreaReq.vi_wr[2*i + 1] ;
+        int locaIndexRow = row - rank * nBbase;
+        double areaToSend = vecTargetFaceArea[locaIndexRow];
+        //int remoteIndex = tgtAreaReq.vi_wr[3*i + 2] ;
+
+        tgtAreaInfo.vi_wr[2*i] = from_proc; // send back requested info
+        tgtAreaInfo.vi_wr[2*i + 1] = row;
+        tgtAreaInfo.vr_wr[i] = areaToSend; // this will be tgt area at row
+        tgtAreaInfo.inc_n();
+    }
+    ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tgtAreaInfo, 0 );
+
+    std::map<int, double> areaAtRow;
+    for( unsigned i = 0; i < tgtAreaInfo.get_n(); i++ )
+    {
+        // we have received from proc, value for row !
+        int row = tgtAreaInfo.vi_wr[2*i+1];
+        areaAtRow[row] = tgtAreaInfo.vr_wr[i];
+    }
+
+    // we have now for rows the
+    // it is ordered by index, so:
+    // now compute reminder dFracA[ col ] += val / vecSourceFaceArea[ col ] * vecTargetFaceArea[ row ];
+    // tgtAreaInfo will have at index i the area we need (from row)
+    // there should be an easier way :(
+    for( unsigned i = 0; i < tlValCol.get_n(); i++ )
+    {
+        int rRowInd = tlValCol.vi_wr[3 * i + 1];
+        int colInd = tlValCol.vi_wr[3 * i + 2];
+        double val = tlValCol.vr_wr[i];
+        int localColInd = colInd - rank * nAbase; // < local nA
+        // we need vecTargetFaceAreaGlobal[ rRowInd ]; this exists on proc procRow
+        auto itMap = areaAtRow.find(rRowInd); // it should be different from end
+        if (itMap != areaAtRow.end())
+        {
+            double areaRow = itMap->second; // we fished a lot for this !
+            dFracA [localColInd] += val / vecSourceFaceArea[localColInd] * areaRow;
+        }
+    }
+
+
+#endif
     // Load in data
     NcDim* dimNS = ncMap.add_dim( "n_s", globuf[2] );
 
