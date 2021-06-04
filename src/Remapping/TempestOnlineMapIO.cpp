@@ -59,7 +59,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
     {
         int gdof    = gdofmap[i];
         int to_proc = gdof / size_per_task;
-        if( to_proc >= size ) to_proc = size - 1;  // the last ones got to last proc
+        if( to_proc >= size ) to_proc = size - 1;  // the last ones go to last proc
         int n                  = tl.get_n();
         tl.vi_wr[2 * n]        = to_proc;
         tl.vi_wr[2 * n + 1]    = gdof;
@@ -250,18 +250,19 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     int nTargetNodesPerFace = dTargetVertexLon.GetColumns();
     // first move data if in parallel
 #if defined( MOAB_HAVE_MPI )
+    int max_row_dof, max_col_dof;  // output; arrays will be re-distributed in chunks [maxdof/size]
     // if (size > 1)
     {
-        int maxdof;  // output; arrays will be re-distributed in chunks [maxdof/size]
+
         int ierr = rearrange_arrays_by_dofs( srccol_gdofmap, vecSourceFaceArea, dSourceCenterLon, dSourceCenterLat,
                                              dSourceVertexLon, dSourceVertexLat, nA, nSourceNodesPerFace,
-                                             maxdof );  // now nA will be close to maxdof/size
+                                             max_col_dof );  // now nA will be close to maxdof/size
         if( ierr != 0 ) { _EXCEPTION1( "Unable to arrange source data %d ", nA ); }
         // rearrange target data: (nB)
         //
         ierr = rearrange_arrays_by_dofs( row_gdofmap, vecTargetFaceArea, dTargetCenterLon, dTargetCenterLat,
                                          dTargetVertexLon, dTargetVertexLat, nB, nTargetNodesPerFace,
-                                         maxdof );  // now nA will be close to maxdof/size
+                                         max_row_dof );  // now nA will be close to maxdof/size
         if( ierr != 0 ) { _EXCEPTION1( "Unable to arrange target data %d ", nB ); }
     }
 #endif
@@ -441,6 +442,20 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     DataArray1D< double > dFracA( nA );
     DataArray1D< double > dFracB( nB );
 
+    moab::TupleList tlValRow, tlValCol;
+    unsigned numr = 1;                          //
+    // value has to be sent to processor row/nB for for fracA and col/nA for fracB
+    // vecTargetArea (indexRow ) has to be sent for fracA (index col?)
+    // vecTargetFaceArea will have to be sent to col index, with its index !
+    tlValRow.initialize( 3, 0, 0, numr, nS );  // to proc(row),  global row / col, value
+    tlValCol.initialize( 3, 0, 0, numr, nS );  // to proc(col),  global row / col, value
+    tlValRow.enableWriteAccess();
+    tlValCol.enableWriteAccess();
+/*
+ *
+         dFracA[ col ] += val / vecSourceFaceArea[ col ] * vecTargetFaceArea[ row ];
+         dFracB[ row ] += val ;
+ */
     int offset = 0;
     for( int i = 0; i < m_weightMatrix.outerSize(); ++i )
     {
@@ -449,9 +464,29 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
             vecRow[offset] = 1 + this->GetRowGlobalDoF( it.row() );  // row index
             vecCol[offset] = 1 + this->GetColGlobalDoF( it.col() );  // col index
             vecS[offset]   = it.value();                             // value
-            if( size == 1 )
-                dFracA[it.col()] += vecS[offset] / vecSourceFaceArea[it.col()] * vecTargetFaceArea[it.row()];
-            dFracB[it.row()] += vecS[offset];
+            {
+/*
+                    // populate
+                    for( unsigned i = 0; i < N; i++ )
+                    {
+                        int gdof    = gdofmap[i];
+                        int to_proc = gdof / size_per_task;
+                        if( to_proc >= size ) to_proc = size - 1;  // the last ones got to last proc
+                        int n                  = tl.get_n();
+                        tl.vi_wr[2 * n]        = to_proc;
+                        tl.vi_wr[2 * n + 1]    = gdof;
+                        tl.vr_wr[n * numr]     = vecFaceArea[i];
+                        tl.vr_wr[n * numr + 1] = dCenterLon[i];
+                        tl.vr_wr[n * numr + 2] = dCenterLat[i];
+                        for( int j = 0; j < nv; j++ )
+                        {
+                            tl.vr_wr[n * numr + 3 + j]      = dVertexLon[i][j];
+                            tl.vr_wr[n * numr + 3 + nv + j] = dVertexLat[i][j];
+                        }
+                        tl.inc_n();
+                    }
+                    */
+            }
 
             offset++;
         }

@@ -285,10 +285,20 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     int GetRowGlobalDoF( int localID ) const;
 
+    /// <summary>
+    ///     Get the index of globaRowDoF.
+    /// </summary>
+    inline int GetIndexOfRowGlobalDoF( int globalRowDoF ) const;
+
     ///	<summary>
     ///		Get the global Degrees-Of-Freedom ID on the source mesh.
     ///	</summary>
     int GetColGlobalDoF( int localID ) const;
+
+    /// <summary>
+    ///     Get the index of globaColDoF.
+    /// </summary>
+    inline int GetIndexOfColGlobalDoF( int globalColDoF ) const;
 
     ///	<summary>
     ///		Apply the weight matrix onto the source vector provided as input, and return the column
@@ -371,7 +381,9 @@ class TempestOnlineMap : public OfflineMap
     /// solution 	<summary>
     moab::Tag m_dofTagSrc, m_dofTagDest;
     std::vector< unsigned > row_gdofmap, col_gdofmap, srccol_gdofmap;
+
     std::vector< unsigned > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
+
 
     DataArray3D< int > dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
     DiscretizationType m_srcDiscType, m_destDiscType;
@@ -399,11 +411,20 @@ inline int moab::TempestOnlineMap::GetRowGlobalDoF( int localRowID ) const
     return row_gdofmap[localRowID];
 }
 
+inline int moab::TempestOnlineMap::GetIndexOfRowGlobalDoF( int globalRowDoF ) const /* 0 based */
+{
+    return globalRowDoF+1;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 inline int moab::TempestOnlineMap::GetColGlobalDoF( int localColID ) const
 {
     return col_gdofmap[localColID];
+}
+
+inline int moab::TempestOnlineMap::GetIndexOfColGlobalDoF( int globalColDoF ) const /* 0 based */
+{
+    return globalColDoF+1;// temporary
 }
 
 ///////////////////////////////////////////////////////////////////////////////
