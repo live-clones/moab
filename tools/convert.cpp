@@ -429,6 +429,8 @@ int main( int argc, char* argv[] )
 #endif
     for( j = in.begin(); j != in.end(); ++j )
     {
+        std::string inFileName = *j;
+
         reset_times();
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -440,7 +442,57 @@ int main( int argc, char* argv[] )
         if( tempestin )
         {
             // convert
-            result = remapper->LoadMesh( moab::Remapper::SourceMesh, *j, moab::TempestRemapper::DEFAULT );MB_CHK_ERR( result );
+            result = remapper->LoadMesh( moab::Remapper::SourceMesh, inFileName, moab::TempestRemapper::DEFAULT );MB_CHK_ERR( result );
+
+            // Check if we are converting a RLL grid
+            NcFile ncInput( inFileName.c_str(), NcFile::ReadOnly );
+            bool isRectilinearGrid = false;
+            std::vector< std::string > vecDimNames( 2 );
+            std::vector< int > vecDimSizes( 2 );
+
+            NcError error_temp( NcError::silent_nonfatal );
+            // get the attribute
+            NcAtt* attRectilinear = ncInput.get_att( "rectilinear" );
+
+            // If rectilinear attribute present, mark it
+            if( attRectilinear != nullptr )
+            {
+                isRectilinearGrid = true;
+
+                vecDimNames.resize( 2 );
+                vecDimSizes.resize( 2 );
+
+                // Obtain rectilinear attributes (dimension sizes)
+                NcAtt* attRectilinearDim0Size = ncInput.get_att( "rectilinear_dim0_size" );
+                NcAtt* attRectilinearDim1Size = ncInput.get_att( "rectilinear_dim1_size" );
+
+                if( attRectilinearDim0Size == nullptr ) { _EXCEPTIONT( "Missing attribute \"rectilinear_dim0_size\"" ); }
+                if( attRectilinearDim1Size == nullptr ) { _EXCEPTIONT( "Missing attribute \"rectilinear_dim1_size\"" ); }
+
+                int nDim0Size = attRectilinearDim0Size->as_int( 0 );
+                int nDim1Size = attRectilinearDim1Size->as_int( 0 );
+
+                printf("Obtained rectilinear sizes from RLL mesh: %d X %d\n", nDim0Size, nDim1Size);
+
+                // Obtain rectilinear attributes (dimension names)
+                NcAtt* attRectilinearDim0Name = ncInput.get_att( "rectilinear_dim0_name" );
+                NcAtt* attRectilinearDim1Name = ncInput.get_att( "rectilinear_dim1_name" );
+
+                if( attRectilinearDim0Name == nullptr ) { _EXCEPTIONT( "Missing attribute \"rectilinear_dim0_name\"" ); }
+                if( attRectilinearDim1Name == nullptr ) { _EXCEPTIONT( "Missing attribute \"rectilinear_dim1_name\"" ); }
+
+                std::string strDim0Name = attRectilinearDim0Name->as_string( 0 );
+                std::string strDim1Name = attRectilinearDim1Name->as_string( 0 );
+
+                // Push rectilinear attributes into array
+                vecDimSizes[0] = nDim0Size;
+                vecDimSizes[1] = nDim1Size;
+
+                vecDimNames[0] = strDim0Name;
+                vecDimNames[1] = strDim1Name;
+            }
+
+            ncInput.close();
 
             Mesh* tempestMesh = remapper->GetMesh( moab::Remapper::SourceMesh );
             tempestMesh->RemoveZeroEdges();
@@ -448,6 +500,18 @@ int main( int argc, char* argv[] )
 
             // Load the meshes and validate
             result = remapper->ConvertTempestMesh( moab::Remapper::SourceMesh );
+
+            if( isRectilinearGrid )
+            {
+                moab::EntityHandle mSet;
+                Tag rectilinearTag;
+                result = gMB->tag_get_handle( "RectilinearSizes", 2, MB_TYPE_INTEGER, rectilinearTag,
+                                              MB_TAG_SPARSE | MB_TAG_CREAT,
+                                              vecDimSizes.data() );MB_CHK_SET_ERR( result, "can't create rectilinear sizes tag" );
+
+                mSet   = remapper->GetMeshSet( moab::Remapper::SourceMesh );
+                result = gMB->tag_set_data( rectilinearTag, &mSet, 1, vecDimSizes.data() );MB_CHK_ERR( result );
+            }
 
             const size_t nOverlapFaces = tempestMesh->faces.size();
             if( tempestMesh->vecSourceFaceIx.size() == nOverlapFaces &&
@@ -488,7 +552,8 @@ int main( int argc, char* argv[] )
             moab::EntityHandle& ovmesh  = remapper->GetMeshSet( moab::Remapper::OverlapMesh );
 
             // load the mesh in MOAB format
-            result = remapper->LoadNativeMesh( *j, srcmesh, 0 );MB_CHK_ERR( result );
+            bool isRLL = false;
+            result     = remapper->LoadNativeMesh( *j, srcmesh, isRLL );MB_CHK_ERR( result );
 
             // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting
             // an overlap grid
