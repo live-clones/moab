@@ -173,67 +173,75 @@ int ncFile2;
         }                                                                                  \
     }
 
-#define GET_2D_DBL_VAR1( name, id, vals )                                                  \
-    {                                                                                      \
-        std::vector< int > dum_dims;                                                       \
-        GET_VAR1( name, id, dum_dims );                                                    \
-        if( -1 != ( id ) )                                                                 \
-        {                                                                                  \
-            size_t ntmp[2];                                                                \
-            int dvfail = nc_inq_dimlen( ncFile1, dum_dims[0], &ntmp[0] );                  \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
-            dvfail = nc_inq_dimlen( ncFile1, dum_dims[1], &ntmp[1] );                      \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
-            ( vals ).resize( ntmp[0]*ntmp[1] );                                            \
-            size_t ntmp1[2] = {0,0};                                                       \
-            dvfail       = nc_get_vara_double( ncFile1, id, ntmp1, ntmp, &( vals )[0] );   \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
-        }                                                                                  \
+#define GET_2D_DBL_VAR1( name, id, vals )                                                   \
+    {                                                                                       \
+        std::vector< int > dum_dims;                                                        \
+        GET_VAR1( name, id, dum_dims );                                                     \
+        if( -1 != ( id ) )                                                                  \
+        {                                                                                   \
+            size_t ntmp[2];                                                                 \
+            int dvfail = nc_inq_dimlen( ncFile1, dum_dims[0], &ntmp[0] );                   \
+            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            dvfail = nc_inq_dimlen( ncFile1, dum_dims[1], &ntmp[1] );                       \
+            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            ( vals ).resize( ntmp[0] * ntmp[1] );                                           \
+            size_t ntmp1[2] = { 0, 0 };                                                     \
+            dvfail          = nc_get_vara_double( ncFile1, id, ntmp1, ntmp, &( vals )[0] ); \
+            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+        }                                                                                   \
     }
 
-#define GET_2D_DBL_VAR2( name, id, vals )                                                  \
-    {                                                                                      \
-        std::vector< int > dum_dims;                                                       \
-        GET_VAR2( name, id, dum_dims );                                                    \
-        if( -1 != ( id ) )                                                                 \
-        {                                                                                  \
-            size_t ntmp[2];                                                                \
-            int dvfail = nc_inq_dimlen( ncFile2, dum_dims[0], &ntmp[0] );                  \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
-            dvfail = nc_inq_dimlen( ncFile2, dum_dims[1], &ntmp[1] );                      \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
-            ( vals ).resize( ntmp[0]*ntmp[1] );                                            \
-            size_t ntmp1[2] = {0,0};                                                       \
-            dvfail       = nc_get_vara_double( ncFile2, id, ntmp1, ntmp, &( vals )[0] );   \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
-        }                                                                                  \
+#define GET_2D_DBL_VAR2( name, id, vals )                                                   \
+    {                                                                                       \
+        std::vector< int > dum_dims;                                                        \
+        GET_VAR2( name, id, dum_dims );                                                     \
+        if( -1 != ( id ) )                                                                  \
+        {                                                                                   \
+            size_t ntmp[2];                                                                 \
+            int dvfail = nc_inq_dimlen( ncFile2, dum_dims[0], &ntmp[0] );                   \
+            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            dvfail = nc_inq_dimlen( ncFile2, dum_dims[1], &ntmp[1] );                       \
+            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            ( vals ).resize( ntmp[0] * ntmp[1] );                                           \
+            size_t ntmp1[2] = { 0, 0 };                                                     \
+            dvfail          = nc_get_vara_double( ncFile2, id, ntmp1, ntmp, &( vals )[0] ); \
+            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+        }                                                                                   \
     }
 
-typedef Eigen::Map<Eigen::VectorXd> EigenV;
+typedef Eigen::Map< Eigen::VectorXd > EigenV;
 
-void diff_vect(const char * var_name, int n)
+void diff_vect( const char* var_name, int n )
 {
     // compare frac_a between maps
     std::vector< double > fraca1( n ), fraca2( n );
     int idfa1, idfa2;
     GET_1D_DBL_VAR1( var_name, idfa1, fraca1 );
-    EigenV fa1( fraca1.data(), n);
+    EigenV fa1( fraca1.data(), n );
     GET_1D_DBL_VAR2( var_name, idfa2, fraca2 );
-    EigenV fa2( fraca2.data(), n);
-    std::cout << var_name << " diff norm: " << (fa1-fa2).norm() << "\n";
+    EigenV fa2( fraca2.data(), n );
+
+    EigenV diff( fraca2.data(), n );
+    diff = fa1 - fa2;
+
+    int imin, imax;
+    double minV = diff.minCoeff( &imin );
+    double maxV = diff.maxCoeff( &imax );
+    std::cout << var_name << " diff norm: " << diff.norm() << " min at " << imin << " : " << minV << " max at " << imax
+              << " : " << maxV << "\n";
     return;
 }
 
-void diff_2d_vect(const char * var_name, int n)
+void diff_2d_vect( const char* var_name, int n )
 {
     // compare frac_a between maps
     std::vector< double > fraca1( n ), fraca2( n );
     int idfa1, idfa2;
     GET_2D_DBL_VAR1( var_name, idfa1, fraca1 );
-    EigenV fa1( fraca1.data(), n);
+    EigenV fa1( fraca1.data(), n );
     GET_2D_DBL_VAR2( var_name, idfa2, fraca2 );
-    EigenV fa2( fraca2.data(), n);
-    std::cout << var_name << " diff norm: " << (fa1-fa2).norm() << "\n";
+    EigenV fa2( fraca2.data(), n );
+    std::cout << var_name << " diff norm: " << ( fa1 - fa2 ).norm() << "\n";
     return;
 }
 int main( int argc, char* argv[] )
@@ -271,8 +279,8 @@ int main( int argc, char* argv[] )
     GET_DIM2( temp_dim, "nv_b", nv_b2 );
     if( nv_a != nv_a2 || nv_b != nv_b2 )
     {
-        std::cout << " different nv dimensions:" << nv_a << " == " << nv_a2 << "  or " <<
-                 nv_b << " == " << nv_b2 << "  bail out \n";
+        std::cout << " different nv dimensions:" << nv_a << " == " << nv_a2 << "  or " << nv_b << " == " << nv_b2
+                  << "  bail out \n";
         return 1;
     }
     std::cout << " n_a, n_b, n_s : " << na1 << ", " << nb1 << ", " << ns1 << " for map 1 \n";
@@ -327,20 +335,19 @@ int main( int argc, char* argv[] )
               << " minv: " << minv << " maxv: " << maxv << "\n";
 
     // compare frac_a between maps
-    diff_vect("frac_a", na1);
+    diff_vect( "frac_a", na1 );
 
-    diff_vect("frac_b", nb1);
-    diff_vect("area_a", na1);
-    diff_vect("area_b", nb1);
-    diff_vect("yc_a", na1);
-    diff_vect("yc_b", nb1);
-    diff_vect("xc_a", na1);
-    diff_vect("xc_b", nb1);
-    diff_2d_vect("xv_a", na1*nv_a);
-    diff_2d_vect("yv_a", na1*nv_a);
-    diff_2d_vect("xv_b", nb1*nv_b);
-    diff_2d_vect("yv_b", nb1*nv_b);
-
+    diff_vect( "frac_b", nb1 );
+    diff_vect( "area_a", na1 );
+    diff_vect( "area_b", nb1 );
+    diff_vect( "yc_a", na1 );
+    diff_vect( "yc_b", nb1 );
+    diff_vect( "xc_a", na1 );
+    diff_vect( "xc_b", nb1 );
+    diff_2d_vect( "xv_a", na1 * nv_a );
+    diff_2d_vect( "yv_a", na1 * nv_a );
+    diff_2d_vect( "xv_b", nb1 * nv_b );
+    diff_2d_vect( "yv_b", nb1 * nv_b );
 
     return 0;
 }

@@ -29,7 +29,6 @@
 #include <cmath>
 #include <cstdlib>
 
-
 #ifdef MOAB_HAVE_NETCDFPAR
 #include "netcdfcpp_par.hpp"
 #else
@@ -126,9 +125,7 @@ moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
 
             if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
                 rectilinearTag != nullptr )
-            {
-                rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_source_set, 1, dimSizes.data() );
-            }
+            { rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_source_set, 1, dimSizes.data() ); }
         }
         else
         {
@@ -155,9 +152,7 @@ moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
 
             if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
                 rectilinearTag != nullptr )
-            {
-                rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_target_set, 1, dimSizes.data() );
-            }
+            { rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_target_set, 1, dimSizes.data() ); }
         }
         else
         {
@@ -185,7 +180,6 @@ moab::TempestOnlineMap::~TempestOnlineMap()
     m_meshOutput  = NULL;
     m_meshOverlap = NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -696,18 +690,17 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
 
     // check monotonicity of row_gdofmap and col_gdofmap
 #ifdef CHECK_INCREASING_DOF
-    for (size_t i=0; i<row_gdofmap.size()-1 ; i++)
+    for( size_t i = 0; i < row_gdofmap.size() - 1; i++ )
     {
-        if ( row_gdofmap[i] > row_gdofmap[i+1])
-            std::cout <<" on rank " << rank <<" in row_gdofmap[" << i<< "]=" << row_gdofmap[i] <<
-               "row_gdofmap["<< i+1 << "]=" <<  row_gdofmap[i+1] << " \n";
-
+        if( row_gdofmap[i] > row_gdofmap[i + 1] )
+            std::cout << " on rank " << rank << " in row_gdofmap[" << i << "]=" << row_gdofmap[i] << " > row_gdofmap["
+                      << i + 1 << "]=" << row_gdofmap[i + 1] << " \n";
     }
-    for (size_t i=0; i<col_gdofmap.size()-1 ; i++)
+    for( size_t i = 0; i < col_gdofmap.size() - 1; i++ )
     {
-        if ( col_gdofmap[i] > col_gdofmap[i+1])
-            std::cout <<" on rank " << rank <<" in col_gdofmap[" << i<< "]=" << col_gdofmap[i] <<
-               "col_gdofmap["<< i+1 <<  "]=" <<  col_gdofmap[i+1] << " \n";
+        if( col_gdofmap[i] > col_gdofmap[i + 1] )
+            std::cout << " on rank " << rank << " in col_gdofmap[" << i << "]=" << col_gdofmap[i] << " > col_gdofmap["
+                      << i + 1 << "]=" << col_gdofmap[i + 1] << " \n";
     }
 #endif
 
@@ -1248,7 +1241,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
             if( nMonotoneType != 0 ) { this->IsMonotone( 1.0e-12 ); }
         }
-
     }
     catch( Exception& e )
     {
@@ -1356,8 +1348,7 @@ int moab::TempestOnlineMap::IsConservative( double dTolerance )
     const int nDATA = 3;
     if( !rank ) nElementsInProc.resize( size * nDATA );
     int senddata[nDATA] = { nColumns, m_nTotDofs_SrcCov, m_nTotDofs_Src };
-    ierr = MPI_Gather( senddata, nDATA, MPI_INT, nElementsInProc.data(), nDATA, MPI_INT, rootProc,
-                       m_pcomm->comm() );
+    ierr = MPI_Gather( senddata, nDATA, MPI_INT, nElementsInProc.data(), nDATA, MPI_INT, rootProc, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     int nTotVals = 0, nTotColumns = 0, nTotColumnsUnq = 0;
