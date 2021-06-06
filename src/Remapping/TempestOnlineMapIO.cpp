@@ -187,7 +187,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     {
         this->InitializeCoordinatesFromMeshFV(
             *m_meshInput, dSourceCenterLon, dSourceCenterLat, dSourceVertexLon, dSourceVertexLat,
-            ( this->m_remapper->m_source_type == moab::TempestRemapper::RLL ) /* fLatLon = false */,
+            ( this->m_remapper->m_source_type == moab::TempestRemapper::RLL ), /* fLatLon = false */
             m_remapper->max_source_edges );
 
         vecSourceFaceArea.Allocate( m_meshInput->vecFaceArea.GetRows() );
@@ -215,7 +215,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     {
         this->InitializeCoordinatesFromMeshFV(
             *m_meshOutput, dTargetCenterLon, dTargetCenterLat, dTargetVertexLon, dTargetVertexLat,
-            ( this->m_remapper->m_target_type == moab::TempestRemapper::RLL ) /* fLatLon = false */,
+            ( this->m_remapper->m_target_type == moab::TempestRemapper::RLL ), /* fLatLon = false */
             m_remapper->max_target_edges );
 
         vecTargetFaceArea.Allocate( m_meshOutput->vecFaceArea.GetRows() );

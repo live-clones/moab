@@ -108,31 +108,23 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
 moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
 {
     ErrorCode rval;
-    std::vector< std::string > dimNames;
-    std::vector< int > dimSizes;
 
     if( m_meshInputCov )
     {
+        std::vector< std::string > dimNames;
+        std::vector< int > dimSizes;
         if( m_remapper->m_source_type == moab::TempestRemapper::RLL )
         {
-            dimNames.resize( 2 );
+            dimNames.push_back( "lat" );
+            dimNames.push_back( "lon" );
             dimSizes.resize( 2, 0 );
-            dimNames[0] = "lat";
-            dimNames[1] = "lon";
-
-            Tag rectilinearTag;
-            rval = m_interface->tag_get_handle( "RectilinearSizes", 2, MB_TYPE_INTEGER, rectilinearTag, MB_TAG_SPARSE );
-
-            if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
-                rectilinearTag != nullptr )
-            { rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_source_set, 1, dimSizes.data() ); }
+            dimSizes[0] = m_remapper->m_source_metadata[0];
+            dimSizes[1] = m_remapper->m_source_metadata[1];
         }
         else
         {
-            dimNames.resize( 1 );
-            dimSizes.resize( 1 );
-            dimNames[0] = "num_elem";
-            dimSizes[0] = m_meshInputCov->faces.size();
+            dimNames.push_back( "num_elem" );
+            dimSizes.push_back( m_meshInputCov->faces.size() );
         }
 
         this->InitializeSourceDimensions( dimNames, dimSizes );
@@ -140,26 +132,20 @@ moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
 
     if( m_meshOutput )
     {
+        std::vector< std::string > dimNames;
+        std::vector< int > dimSizes;
         if( m_remapper->m_target_type == moab::TempestRemapper::RLL )
         {
-            dimNames.resize( 2 );
+            dimNames.push_back( "lat" );
+            dimNames.push_back( "lon" );
             dimSizes.resize( 2, 0 );
-            dimNames[0] = "lat";
-            dimNames[1] = "lon";
-
-            Tag rectilinearTag;
-            rval = m_interface->tag_get_handle( "RectilinearSizes", 2, MB_TYPE_INTEGER, rectilinearTag, MB_TAG_SPARSE );
-
-            if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
-                rectilinearTag != nullptr )
-            { rval = m_interface->tag_get_data( rectilinearTag, &m_remapper->m_target_set, 1, dimSizes.data() ); }
+            dimSizes[0] = m_remapper->m_target_metadata[0];
+            dimSizes[1] = m_remapper->m_target_metadata[1];
         }
         else
         {
-            dimNames.resize( 1 );
-            dimSizes.resize( 1 );
-            dimNames[0] = "num_elem";
-            dimSizes[0] = m_meshOutput->faces.size();
+            dimNames.push_back( "num_elem" );
+            dimSizes.push_back( m_meshOutput->faces.size() );
         }
 
         this->InitializeTargetDimensions( dimNames, dimSizes );
