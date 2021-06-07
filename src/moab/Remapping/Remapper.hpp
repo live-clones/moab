@@ -75,7 +75,7 @@ class Remapper
     }
 #endif
 
-    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, bool& isRLL, std::vector<int>& metadata,
+    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, std::vector<int>& metadata,
                               const char* readopts = 0 )
     {
 #ifdef MOAB_HAVE_MPI
@@ -107,21 +107,20 @@ class Remapper
         moab::ErrorCode rval = m_interface->load_file( filename.c_str(), &meshset, opts.c_str() );MB_CHK_ERR(rval);
 
         Tag rectilinearTag;
-        rval = m_interface->tag_get_handle( "RectilinearSizes", rectilinearTag );
+        rval = m_interface->tag_get_handle( "ClimateMetadata", rectilinearTag );
 
         metadata.clear();
         if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED && rectilinearTag != nullptr )
         {
-            int dimSizes[2];
+            int dimSizes[3];
             moab::EntityHandle rootset = 0;
             rval                       = m_interface->tag_get_data( rectilinearTag, &rootset, 1,
                                               dimSizes );  // MB_CHK_SET_ERR( rval, "Error geting tag data" );
-            isRLL = ( rval == MB_SUCCESS && dimSizes[0] + dimSizes[1] > 0 );
             metadata.push_back( dimSizes[0] );
             metadata.push_back( dimSizes[1] );
+            metadata.push_back( dimSizes[2] );
+            // printf( "Mesh metadata: %d, %d, %d\n", metadata[0], metadata[1], metadata[2] );
         }
-        else
-            isRLL = false;
 
         return MB_SUCCESS;
     }

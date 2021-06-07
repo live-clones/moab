@@ -590,9 +590,8 @@ int main( int argc, char* argv[] )
             moab::EntityHandle& ovmesh  = remapper->GetMeshSet( moab::Remapper::OverlapMesh );
 
             // load the mesh in MOAB format
-            bool isRLL = false;
             std::vector< int > metadata;
-            result     = remapper->LoadNativeMesh( *j, srcmesh, isRLL, metadata );MB_CHK_ERR( result );
+            result     = remapper->LoadNativeMesh( *j, srcmesh, metadata );MB_CHK_ERR( result );
 
             // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting
             // an overlap grid
@@ -617,7 +616,7 @@ int main( int argc, char* argv[] )
             }
             else
             {
-                if( isRLL )
+                if( metadata[0] == static_cast< int >( moab::TempestRemapper::RLL ) )
                 {
                     assert( metadata.size() );
                     std::cout << "Converting a RLL mesh with rectilinear dimension: " << metadata[0] << " X "

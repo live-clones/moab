@@ -111,13 +111,13 @@ void moab::TempestOnlineMap::setup_sizes_dimensions()
     {
         std::vector< std::string > dimNames;
         std::vector< int > dimSizes;
-        if( m_remapper->m_source_type == moab::TempestRemapper::RLL )
+        if( m_remapper->m_source_type == moab::TempestRemapper::RLL && m_remapper->m_source_metadata.size() )
         {
             dimNames.push_back( "lat" );
             dimNames.push_back( "lon" );
             dimSizes.resize( 2, 0 );
-            dimSizes[0] = m_remapper->m_source_metadata[0];
-            dimSizes[1] = m_remapper->m_source_metadata[1];
+            dimSizes[0] = m_remapper->m_source_metadata[1];
+            dimSizes[1] = m_remapper->m_source_metadata[2];
         }
         else
         {
@@ -132,13 +132,13 @@ void moab::TempestOnlineMap::setup_sizes_dimensions()
     {
         std::vector< std::string > dimNames;
         std::vector< int > dimSizes;
-        if( m_remapper->m_target_type == moab::TempestRemapper::RLL )
+        if( m_remapper->m_target_type == moab::TempestRemapper::RLL && m_remapper->m_target_metadata.size() )
         {
             dimNames.push_back( "lat" );
             dimNames.push_back( "lon" );
             dimSizes.resize( 2, 0 );
-            dimSizes[0] = m_remapper->m_target_metadata[0];
-            dimSizes[1] = m_remapper->m_target_metadata[1];
+            dimSizes[0] = m_remapper->m_target_metadata[1];
+            dimSizes[1] = m_remapper->m_target_metadata[2];
         }
         else
         {
