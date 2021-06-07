@@ -774,8 +774,6 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[1], radius_dest );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
         ctx.meshes[1] = remapper.GetMesh( moab::Remapper::TargetMesh );
-
-        printf("Is RLL source ? %d, Is RLL target ? %d\n", isSrcRLL, isTgtRLL);
     }
     else if( ctx.meshType == moab::TempestRemapper::ICO )
     {

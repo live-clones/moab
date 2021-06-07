@@ -510,7 +510,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         int localIndexRow = gRowInd - nBbase * rank;  // modulo nBbase rank is from 0 to size - 1;
         double wgt        = tlValRow.vr_wr[i];
         assert( localIndexRow >= 0 );
-        assert( localIndexRow < nB );
+        assert( nB - localIndexRow > 0 );
         dFracB[localIndexRow] += wgt;
     }
     // to compute dFracA we need vecTargetFaceArea[ row ]; we know the row, and we can get the proc we need it from

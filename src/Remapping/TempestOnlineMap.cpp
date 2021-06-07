@@ -105,10 +105,8 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
     // For example, FV->FV: rows X cols = faces_source X faces_target
 }
 
-moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
+void moab::TempestOnlineMap::setup_sizes_dimensions()
 {
-    ErrorCode rval;
-
     if( m_meshInputCov )
     {
         std::vector< std::string > dimNames;
@@ -150,8 +148,6 @@ moab::ErrorCode moab::TempestOnlineMap::setup_sizes_dimensions()
 
         this->InitializeTargetDimensions( dimNames, dimSizes );
     }
-
-    return moab::MB_SUCCESS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
