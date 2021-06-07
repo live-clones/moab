@@ -34,14 +34,14 @@
  * <a href="pages.html">Full List of Documents</a>
  */
 
-#ifdef WIN32               /* windows */
-#define _USE_MATH_DEFINES  // For M_PI
-#include "win32_config.h"
-#endif
-
 
 #ifndef MOAB_INTERFACE_HPP
 #define MOAB_INTERFACE_HPP
+
+#ifdef WIN32               /* windows */
+#define _USE_MATH_DEFINES  // For M_PI
+#endif
+#include "win32_config.h"
 
 #define MOAB_API_VERSION        1.01
 #define MOAB_API_VERSION_STRING "1.01"

@@ -23,7 +23,6 @@
 
 #include "moab/win32_config.h"
 
-
 /**\name Types and names
  * Types used in the MOAB interface
  */
