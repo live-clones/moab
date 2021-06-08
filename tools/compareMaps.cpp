@@ -336,7 +336,6 @@ int main( int argc, char* argv[] )
 
     // compare frac_a between maps
     diff_vect( "frac_a", na1 );
-
     diff_vect( "frac_b", nb1 );
     diff_vect( "area_a", na1 );
     diff_vect( "area_b", nb1 );

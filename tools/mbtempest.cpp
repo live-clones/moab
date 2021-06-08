@@ -759,10 +759,14 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         std::vector< int > smetadata, tmetadata;
         // Load the source mesh and validate
         rval = remapper.LoadNativeMesh( ctx.inFilenames[0], ctx.meshsets[0], smetadata, additional_read_opts );MB_CHK_ERR( rval );
-        // remapper.SetMeshType( moab::Remapper::SourceMesh,
-        //                       static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ), &smetadata );
-        remapper.SetMeshType( moab::Remapper::SourceMesh,
-                              static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ) );
+        if( smetadata.size() )
+        {
+            // remapper.SetMeshType( moab::Remapper::SourceMesh,
+            //                       static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ), &smetadata
+            //                       );
+            remapper.SetMeshType( moab::Remapper::SourceMesh,
+                                  static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ) );
+        }
         // Rescale the radius of both to compute the intersection
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[0], radius_src );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
@@ -770,10 +774,14 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
 
         // Load the target mesh and validate
         rval = remapper.LoadNativeMesh( ctx.inFilenames[1], ctx.meshsets[1], tmetadata, additional_read_opts );MB_CHK_ERR( rval );
-        // remapper.SetMeshType( moab::Remapper::TargetMesh,
-        //                       static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ), &tmetadata );
-        remapper.SetMeshType( moab::Remapper::TargetMesh,
-                              static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ) );
+        if( tmetadata.size() )
+        {
+            // remapper.SetMeshType( moab::Remapper::TargetMesh,
+            //                       static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ), &tmetadata
+            //                       );
+            remapper.SetMeshType( moab::Remapper::TargetMesh,
+                                  static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ) );
+        }
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[1], radius_dest );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
         ctx.meshes[1] = remapper.GetMesh( moab::Remapper::TargetMesh );
