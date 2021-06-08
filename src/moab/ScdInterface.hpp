@@ -104,7 +104,7 @@ class ParallelComm;
  */
 
 //! struct for keeping parallel data in one place
-class MOAB_EXPORT ScdParData
+class ScdParData
 {
   public:
     ScdParData() : partMethod( NOPART ), pComm( NULL )
@@ -148,7 +148,7 @@ class MOAB_EXPORT ScdParData
     ParallelComm* pComm;
 };
 
-class ScdInterface
+class MOAB_EXPORT ScdInterface
 {
   public:
     friend class ScdBox;
@@ -417,7 +417,7 @@ class ScdInterface
     Tag boxSetTag;
 };
 
-class ScdBox
+class MOAB_EXPORT ScdBox
 {
     friend class ScdInterface;
 
