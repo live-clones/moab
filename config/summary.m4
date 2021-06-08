@@ -39,7 +39,6 @@ AC_DEFUN([PRINT_CONFIGURATION_SUMMARY],[
    "xyes") SUMMARY_LINE([NetCDF support], [yes]) ;;
    *) SUMMARY_LINE([NetCDF support], [no], [  ${RED}(Support for ExodusII disabled)${NORMAL}]) ;;
   esac
-  SUMMARY_LINE([NetCDF support], [$enablenetcdf])
   SUMMARY_LINE([PNetCDF support], [$enablepnetcdf])
   SUMMARY_LINE([Metis support], [$enablemetis])
   SUMMARY_LINE([ParMetis support], [$enableparmetis])
