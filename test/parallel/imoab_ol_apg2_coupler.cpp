@@ -652,6 +652,7 @@ int main( int argc, char* argv[] )
                     // set the tag to 0
 
     }
+    MPI_Barrier( MPI_COMM_WORLD );
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
     {
@@ -689,7 +690,7 @@ int main( int argc, char* argv[] )
           }
         #endif
         */
-
+        MPI_Barrier( MPI_COMM_WORLD );
         if( couComm != MPI_COMM_NULL )
         {
             const char* concat_fieldname  = "T_proj;u_proj;v_proj;";
@@ -716,6 +717,7 @@ int main( int argc, char* argv[] )
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
         // original graph (context is -1_
+        MPI_Barrier( MPI_COMM_WORLD );
         PUSH_TIMER( "Send data from cpl atm back to atm pes" )
         if( couComm != MPI_COMM_NULL )
         {

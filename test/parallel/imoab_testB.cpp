@@ -369,6 +369,7 @@ int main( int argc, char* argv[] )
                     // set the tag to 0
 
     }
+    MPI_Barrier( MPI_COMM_WORLD );
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
     {
@@ -388,7 +389,7 @@ int main( int argc, char* argv[] )
                                          strlen( "T_proj;u_proj;v_proj;" ) );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
-        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+
 
         // we can now free the sender buffers
         if( ocnComm != MPI_COMM_NULL )
@@ -397,7 +398,8 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers used to send ocn tag towards the coverage mesh for atm" )
         }
 
-
+        MPI_Barrier( MPI_COMM_WORLD );
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         if( couComm != MPI_COMM_NULL )
         {
             const char* concat_fieldname  = "T_proj;u_proj;v_proj;";
