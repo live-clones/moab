@@ -81,9 +81,10 @@ int main( int argc, char* argv[] )
     int output_fraction  = 0;
     int write_files_rank = 0;
     int brute_force      = 0;
-
+    bool write_intx_file = false;
     opts.addOpt< int >( "outputFraction,f", "output fraction of areas", &output_fraction );
     opts.addOpt< int >( "writeFiles,w", "write files of interest", &write_files_rank );
+    opts.addOpt< void >( "writeIntxFile,W", "write intersection file ", &write_intx_file );
     opts.addOpt< int >( "kdtreeOption,k", "use kd tree for intersection", &brute_force );
 
     opts.parseCommandLine( argc, argv );
@@ -309,21 +310,28 @@ int main( int argc, char* argv[] )
     }
     Kokkos::finalize();
 #endif
-
+    if (write_intx_file)
+    {
 #ifdef MOAB_HAVE_MPI
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-    outputFile = "intx.h5m";
-    rval = mb->write_file( outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
+        outputFile = "intx.h5m";
+        rval = mb->write_file( outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
 #else
-    // write intx set on rank 0, in serial; we cannot write in parallel
-    if( 0 == rank )
-    {
+       // write intx set on rank 0, in serial; we cannot write in parallel
+        if( 0 == rank )
+        {
+            rval = mb->write_file( outputFile.c_str(), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
+        }
+#endif
+
+#else
         rval = mb->write_file( outputFile.c_str(), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
+#endif
     }
-#endif
+
+#ifdef MOAB_HAVE_MPI
     MPI_Finalize();
-#else
-    rval = mb->write_file( outputFile.c_str(), 0, 0, &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
 #endif
+
     return 0;
 }
