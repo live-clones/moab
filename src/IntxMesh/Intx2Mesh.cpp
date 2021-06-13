@@ -309,22 +309,8 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
         // now set the value of the tag
         rval = mb->tag_set_data( neighTgtEdgeTag, &tgtCell, 1, &( zeroh[0] ) );MB_CHK_SET_ERR( rval, "can't set edge tgt tag" );
     }
-
-    // create the kd tree on source cells, and intersect all targets in an expensive loop
-    // build a kd tree with the rs1 (source) cells
-    AdaptiveKDTree kd( mb );
-    EntityHandle tree_root = 0;
-    rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
-#ifdef MOAB_HAVE_ARBORX
-    // Create the View for the bounding boxes, on device
-    Kokkos::View<ArborX::Box*, MemorySpace> bounding_boxes("bounding_boxes", rs1.size());
-
-    // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
-    //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
-    // mirror view on host, will be populated
-    auto h_bounding_boxes = Kokkos::create_mirror_view(bounding_boxes);
     // find out max edge on source mesh;
-#endif
+
     double max_length = 0;
     {
         std::vector< double > coords;
@@ -365,6 +351,76 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
             std::cout << " box overlap tolerance: " << box_error << "\n";
         }
     }
+
+#ifdef MOAB_HAVE_ARBORX
+    // Create the View for the bounding boxes, on device
+    Kokkos::View<ArborX::Box*, MemorySpace> bounding_boxes("bounding_boxes", rs1.size());
+
+    // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
+    //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
+    // mirror view on host, will be populated
+    auto h_bounding_boxes = Kokkos::create_mirror_view(bounding_boxes);
+    std::vector<CartVect>  coords;
+    coords.resize(27);// max possible
+    for (size_t i=0; i<rs1.size(); i++)
+    {
+        EntityHandle cell=rs1[i];
+        const EntityHandle *conn ;
+        int nnodes;
+        rval = mb->get_connectivity(cell, conn, nnodes); MB_CHK_ERR( rval );
+        rval = mb->get_coords(conn, nnodes, &coords[0][0] );MB_CHK_SET_ERR( rval, "can't get coordinates" );
+        for (int j=0; j<nnodes; j++)
+        {
+            ArborX::Details::expand(h_bounding_boxes(i),
+                    ArborX::Point{ (float)coords[j][0], (float)coords[j][1], (float)coords[j][2]}  );
+        }
+    }
+    Kokkos::deep_copy(bounding_boxes, h_bounding_boxes);
+    // Create the bounding volume hierarchy
+    ArborX::BVH<MemorySpace> bvh(ExecutionSpace{}, bounding_boxes);
+
+    // Create the View for the spatial-based queries
+
+    Kokkos::View< decltype(ArborX::intersects(ArborX::Box{})) * , MemorySpace> queries_ar("queries", rs2.size());
+
+    // Fill in the queries on host mirror, then copy to device
+
+    float tolF = (float)tolerance;
+
+    auto h_queries_ar = create_mirror_view(queries_ar);
+    for (size_t i=0; i<rs2.size(); i++)
+    {
+        ArborX::Box bbox;
+        EntityHandle cell=rs2[i];
+        const EntityHandle *conn ;
+        int nnodes;
+        rval = mb->get_connectivity(cell, conn, nnodes); MB_CHK_ERR( rval );
+        rval = mb->get_coords(conn, nnodes, &coords[0][0] );MB_CHK_SET_ERR( rval, "can't get coordinates" );
+        for (int j=0; j<nnodes; j++)
+        {
+            ArborX::Details::expand(bbox,
+                    ArborX::Point{ (float)coords[j][0], (float)coords[j][1], (float)coords[j][2]}  );
+        }
+        ArborX::Point minc= bbox.minCorner();
+        ArborX::Point maxc= bbox.maxCorner();
+        bbox += ArborX::Point{ minc[0] - tolF, minc[1] - tolF, minc[2] - tolF };
+        bbox += ArborX::Point{ maxc[0] + tolF, maxc[1] + tolF, maxc[2] + tolF };
+        /*bbox += ArborX::Point{ (bbox.minCorner[0] - tolF), (bbox.minCorner[1] - tolF),(bbox.minCorner[2] - tolF) };
+        bbox += (bbox.maxCorner + tolPoint);*/
+        h_queries_ar(i) = ArborX::intersects(bbox);
+    }
+
+    // copy from host to device
+    Kokkos::deep_copy(queries_ar, h_queries_ar);
+
+#endif
+
+    // create the kd tree on source cells, and intersect all targets in an expensive loop
+    // build a kd tree with the rs1 (source) cells
+    AdaptiveKDTree kd( mb );
+    EntityHandle tree_root = 0;
+    rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
+
     for( Range::iterator it = rs2.begin(); it != rs2.end(); ++it )
     {
         EntityHandle tcell = *it;
