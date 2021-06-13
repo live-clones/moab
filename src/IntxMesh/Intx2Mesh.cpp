@@ -24,6 +24,7 @@
 #include <Kokkos_Core.hpp>
 using ExecutionSpace = Kokkos::DefaultExecutionSpace;
 using MemorySpace = ExecutionSpace::memory_space;
+#include <set>
 #endif
 
 namespace moab
@@ -251,6 +252,8 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
     rval   = mb->get_entities_by_dimension( mbs1, 2, rs1 );MB_CHK_ERR( rval );
     rval = mb->get_entities_by_dimension( mbs2, 2, rs2 );MB_CHK_ERR( rval );
     // from create tags, copy relevant ones
+    if ( 0 == my_rank )
+        std::cout << " source: " << rs1.size() << " cells,  target:" << rs2.size() << " cells \n";
     if( tgtParentTag ) mb->tag_delete( tgtParentTag );
     if( srcParentTag ) mb->tag_delete( srcParentTag );
     if( countTag ) mb->tag_delete( countTag );
@@ -413,7 +416,54 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
     // copy from host to device
     Kokkos::deep_copy(queries_ar, h_queries_ar);
 
-#endif
+    // Perform the search
+    Kokkos::View<int*, ExecutionSpace> offsets("offset", 0);
+    Kokkos::View<int*, ExecutionSpace> indices("indices", 0);
+    ArborX::query(bvh, ExecutionSpace{}, queries_ar, indices, offsets);
+
+    // create mirror and copy at the same time does not work, somehow
+    auto host_indices=Kokkos::create_mirror_view( indices);
+    auto host_offsets=Kokkos::create_mirror_view( offsets);
+    Kokkos::deep_copy(host_indices, indices);
+    Kokkos::deep_copy(host_offsets, offsets);
+
+    // now loop over all target cells, and intersect with close by source cells
+    for (size_t i=0; i<rs2.size(); i++)
+    {
+        EntityHandle tcell=rs2[i];
+        std::set<EntityHandle> close_by;
+        for (int j=host_offsets(i); j<host_offsets(i+1); j++)
+        {
+            int index = host_indices(j);
+            close_by.insert(rs1[index]);
+        }
+        int nnodes               = 0;
+        double areaTgtCell   = setup_tgt_cell( tcell, nnodes );  // this is the area in the gnomonic plane
+        double recoveredArea = 0;
+        for( auto it2 = close_by.begin(); it2 != close_by.end(); ++it2 )
+        {
+            EntityHandle startSrc = *it2;
+            double area           = 0;
+            // if area is > 0 , we have intersections
+            double P[10 * MAXEDGES];  // max 8 intx points + 8 more in the polygon
+            //
+            int nP = 0;
+            int nb[MAXEDGES], nr[MAXEDGES];  // sides 3 or 4? also, check boxes first
+            int nsTgt, nsSrc;
+            rval = computeIntersectionBetweenTgtAndSrc( tcell, startSrc, P, nP, area, nb, nr, nsSrc, nsTgt, true );MB_CHK_ERR( rval );
+            if( area > 0 )
+            {
+                if( nP > 1 )
+                {  // this will also construct triangles/polygons in the new mesh, if needed
+                    rval = findNodes( tcell, nnodes, startSrc, nsSrc, P, nP );MB_CHK_ERR( rval );
+                }
+                recoveredArea += area;
+            }
+        }
+        recoveredArea = ( recoveredArea - areaTgtCell ) / areaTgtCell;  // replace now with recovery fract
+    }
+
+#else
 
     // create the kd tree on source cells, and intersect all targets in an expensive loop
     // build a kd tree with the rs1 (source) cells
@@ -496,6 +546,7 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
         }
         recoveredArea = ( recoveredArea - areaTgtCell ) / areaTgtCell;  // replace now with recovery fract
     }
+#endif
     // before cleaning up , we need to settle the position of the intersection points
     // on the boundary edges
     // this needs to be collective, so we should maybe wait something

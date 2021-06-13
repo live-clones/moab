@@ -25,6 +25,33 @@
 #include "moab/NestedRefine.hpp"
 #include <cmath>
 
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::high_resolution_clock::time_point Timer;
+using std::chrono::duration_cast;
+
+Timer start;
+std::map< std::string, std::chrono::nanoseconds > timeLog;
+
+
+#define PUSH_TIMER()          \
+    {                         \
+        start = Clock::now(); \
+    }
+
+#define POP_TIMER( EventName )                                                                                \
+    {                                                                                                         \
+        std::chrono::nanoseconds elapsed = duration_cast< std::chrono::nanoseconds >( Clock::now() - start ); \
+        timeLog[EventName]               = elapsed;                                                           \
+    }
+
+#define PRINT_TIMER( EventName )                                                                                       \
+    {                                                                                                                  \
+        std::cout << "[ " << EventName                                                                                 \
+                  << " ]: elapsed = " << static_cast< double >( timeLog[EventName].count() / 1e6 ) << " milli-seconds" \
+                  << std::endl;                                                                                        \
+    }
+
 using namespace moab;
 
 int main( int argc, char* argv[] )
@@ -36,8 +63,8 @@ int main( int argc, char* argv[] )
     secondModel = TestDir + "/mbcslam/eulerHomme.vtk";
 
     ProgOptions opts;
-    opts.addOpt< std::string >( "first,t", "first mesh filename (source)", &firstModel );
-    opts.addOpt< std::string >( "second,m", "second mesh filename (target)", &secondModel );
+    opts.addOpt< std::string >( "source,s", "first mesh filename (source)", &firstModel );
+    opts.addOpt< std::string >( "target,t", "second mesh filename (target)", &secondModel );
     opts.addOpt< std::string >( "outputFile,o", "output intersection file", &outputFile );
 
     double R      = 1.;  // input
@@ -124,6 +151,15 @@ int main( int argc, char* argv[] )
     rval = moab::IntxUtils::ScaleToRadius( mb, sf1, R );MB_CHK_ERR( rval );
     rval = moab::IntxUtils::ScaleToRadius( mb, sf2, R );MB_CHK_ERR( rval );
 
+    if (uniformRefinementLevels)
+    {
+        std::stringstream ffs;
+        ffs << "source_R" << uniformRefinementLevels << ".vtk";
+        rval = mb->write_mesh( ffs.str().c_str(), &sf1, 1 );MB_CHK_ERR( rval );
+        std::stringstream ffs2;
+        ffs2 << "target_R" << uniformRefinementLevels << ".vtk";
+        rval = mb->write_mesh( ffs2.str().c_str(), &sf2, 1 );MB_CHK_ERR( rval );
+    }
 #if 0
   // std::cout << "Fix orientation etc ..\n";
   //IntxUtils; those calls do nothing for a good mesh
@@ -224,6 +260,8 @@ int main( int argc, char* argv[] )
 #endif
         covering_set = sf1;
 
+    PUSH_TIMER()
+
     if( 0 == rank ) std::cout << "Computing intersections ..\n";
 #ifdef MOAB_HAVE_MPI
     double elapsed = MPI_Wtime();
@@ -240,6 +278,8 @@ int main( int argc, char* argv[] )
     elapsed = MPI_Wtime() - elapsed;
     if( 0 == rank ) std::cout << "\nTime to compute the intersection between meshes = " << elapsed << std::endl;
 #endif
+    POP_TIMER( "Intersection time" )
+    PRINT_TIMER( "Intersection time"  )
     // the output set does not have the intx vertices on the boundary shared, so they will be
     // duplicated right now we write this file just for checking it looks OK
 
