@@ -326,6 +326,9 @@ message(STATUS "MOAB_LIBS = ${MOAB_LIBS}.")
 set(MOAB_ALL_LIBS ${MOAB_DEP_LIBRARIES} ${MOAB_LIBS} ${MOAB_CGM_LIBS})
 list(APPEND MOAB_ALL_LIBS "${MPI_LIBRARY}")
 list(APPEND MOAB_ALL_LIBS ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+if ( MOAB_HAVE_ARBORX )
+   list(APPEND MOAB_ALL_LIBS  ArborX::ArborX )
+endif (MOAB_HAVE_ARBORX )
 target_link_libraries(MOAB "${MOAB_ALL_LIBS}")
 
 # If using clang-tidy, set the target property so that

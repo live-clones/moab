@@ -446,6 +446,7 @@ endif(ENABLE_CGNS)
 if ( ENABLE_ARBORX )
   find_package( ArborX REQUIRED )
   set(MOAB_HAVE_ARBORX ON)
+  set( MOAB_DEFINES " -DMOAB_HAVE_ARBORX ${MOAB_DEFINES}" )
   message(STATUS "ArborX cmake found at  ${ArborX_DIR} ")
 endif( ENABLE_ARBORX )
 

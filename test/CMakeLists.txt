@@ -81,10 +81,6 @@ foreach( fname ${TESTS} )
   add_test( ${base} ${EXECUTABLE_OUTPUT_PATH}/${base} )
 endforeach()
 
-if (MOAB_HAVE_ARBORX)
-  target_link_libraries(kdtree_arborx_test ArborX::ArborX)
-endif()
-
 if(ENABLE_PYMOAB)
   SET(PYMOAB_TESTS test_core test_hom test_scd test_range test_tag test_topo_util test_skinner)
   FOREACH(pymoab_test ${PYMOAB_TESTS})

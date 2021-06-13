@@ -26,6 +26,10 @@ add_library( moab_intx_mesh OBJECT ${MOAB_INTX_LIB_SRCS} ${MOAB_INTX_INC_HDRS} )
 set_target_properties( moab_intx_mesh
                        PROPERTIES COMPILE_FLAGS "-DIS_BUILDING_MB ${MOAB_DEFINES}")
 
+if ( MOAB_HAVE_ARBORX )
+  target_link_libraries(moab_intx_mesh ArborX::ArborX )
+endif ( MOAB_HAVE_ARBORX )
+
 include(AutoconfHeader)
 moab_install_headers(${MOAB_INTX_INC_HDRS})
 

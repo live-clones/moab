@@ -18,6 +18,14 @@
 #include "moab/GeomUtil.hpp"
 #include "moab/AdaptiveKDTree.hpp"
 
+#ifdef MOAB_HAVE_ARBORX
+#include <ArborX.hpp>
+#include <ArborX_Version.hpp>
+#include <Kokkos_Core.hpp>
+using ExecutionSpace = Kokkos::DefaultExecutionSpace;
+using MemorySpace = ExecutionSpace::memory_space;
+#endif
+
 namespace moab
 {
 
@@ -307,8 +315,16 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
     AdaptiveKDTree kd( mb );
     EntityHandle tree_root = 0;
     rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
+#ifdef MOAB_HAVE_ARBORX
+    // Create the View for the bounding boxes, on device
+    Kokkos::View<ArborX::Box*, MemorySpace> bounding_boxes("bounding_boxes", rs1.size());
 
+    // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
+    //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
+    // mirror view on host, will be populated
+    auto h_bounding_boxes = Kokkos::create_mirror_view(bounding_boxes);
     // find out max edge on source mesh;
+#endif
     double max_length = 0;
     {
         std::vector< double > coords;

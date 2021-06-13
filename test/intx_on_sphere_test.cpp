@@ -14,10 +14,15 @@
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
 #endif
+
+#ifdef MOAB_HAVE_ARBORX
+#include <Kokkos_Core.hpp>
+#endif
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
 #include "TestUtil.hpp"
 #include "moab/ProgOptions.hpp"
+#include "moab/NestedRefine.hpp"
 #include <cmath>
 
 using namespace moab;
@@ -38,10 +43,13 @@ int main( int argc, char* argv[] )
     double R      = 1.;  // input
     double epsrel = 1.e-12;
     double boxeps = 1.e-4;
-    outputFile    = "intx.h5m";
+    outputFile    = "intx.vtk";
     opts.addOpt< double >( "radius,R", "radius for model intx", &R );
     opts.addOpt< double >( "epsilon,e", "relative error in intx", &epsrel );
     opts.addOpt< double >( "boxerror,b", "relative error for box boundaries", &boxeps );
+    int uniformRefinementLevels = 0;
+    opts.addOpt< int >( "refine,r", "Number of levels of uniform refinements to perform on the meshes (default=0)",
+                            &uniformRefinementLevels );
 
     int output_fraction  = 0;
     int write_files_rank = 0;
@@ -53,23 +61,27 @@ int main( int argc, char* argv[] )
 
     opts.parseCommandLine( argc, argv );
     int rank = 0, size = 1;
+    // read meshes in 2 file sets
+    ErrorCode rval;
+    Core moab;
+    Interface* mb = &moab;  // global
+    EntityHandle sf1, sf2, outputSet;
+
 #ifdef MOAB_HAVE_MPI
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &size );
 #endif
 
+#ifdef MOAB_HAVE_ARBORX
+    Kokkos::initialize(argc, argv);
+    {
+#endif
     // check command line arg second grid is red, arrival, first mesh is blue, departure
     // will will keep the
     std::string optsRead = ( size == 1 ? ""
                                        : std::string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" ) +
                                              std::string( ";PARALLEL_RESOLVE_SHARED_ENTS" ) );
-
-    // read meshes in 2 file sets
-    ErrorCode rval;
-    Core moab;
-    Interface* mb = &moab;  // global
-    EntityHandle sf1, sf2, outputSet;
 
     // create meshsets and load files
 
@@ -89,7 +101,26 @@ int main( int argc, char* argv[] )
     }
     rval = mb->create_meshset( MESHSET_SET, outputSet );MB_CHK_ERR( rval );
 
-    // fix radius of both meshes, to be consistent with input R
+
+    if( uniformRefinementLevels )
+    {
+        moab::NestedRefine uref( &moab, nullptr, sf1 );
+        std::vector< int > uniformRefinementDegree( uniformRefinementLevels, 2 );
+        std::vector< EntityHandle > level_sets;
+        rval = uref.generate_mesh_hierarchy( uniformRefinementLevels,
+                                                uniformRefinementDegree.data(),
+                                                level_sets, true );MB_CHK_ERR( rval );
+        assert( (int)level_sets.size() == uniformRefinementLevels + 1 );
+        sf1 = level_sets[uniformRefinementLevels];
+        moab::NestedRefine uref2( &moab, nullptr, sf2 );
+
+        std::vector< EntityHandle > level_sets2;
+        rval = uref2.generate_mesh_hierarchy( uniformRefinementLevels,
+                                                       uniformRefinementDegree.data(),
+                                                       level_sets2, true );MB_CHK_ERR( rval );
+        sf2 = level_sets2[uniformRefinementLevels];
+    }
+    // fix radius of both meshes, to be consistent with input R, after eventual refinement
     rval = moab::IntxUtils::ScaleToRadius( mb, sf1, R );MB_CHK_ERR( rval );
     rval = moab::IntxUtils::ScaleToRadius( mb, sf2, R );MB_CHK_ERR( rval );
 
@@ -234,8 +265,14 @@ int main( int argc, char* argv[] )
     std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
 
+#ifdef MOAB_HAVE_ARBORX
+    }
+    Kokkos::finalize();
+#endif
+
 #ifdef MOAB_HAVE_MPI
 #ifdef MOAB_HAVE_HDF5_PARALLEL
+    outputFile = "intx.h5m";
     rval = mb->write_file( outputFile.c_str(), 0, "PARALLEL=WRITE_PART", &outputSet, 1 );MB_CHK_SET_ERR( rval, "failed to write intx file" );
 #else
     // write intx set on rank 0, in serial; we cannot write in parallel
