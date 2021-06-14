@@ -362,6 +362,8 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
     // with MemorySpace=Kokkos::CudaSpace, BoundingVolume=ArborX::Box, Enable=void
     //Kokkos::View<ArborX::Box*> bounding_boxes("bounding_boxes", elems.size());
     // mirror view on host, will be populated
+    if (my_rank == 0)
+        std::cout << " Execution space : " << ExecutionSpace::name() << "\n";
     auto h_bounding_boxes = Kokkos::create_mirror_view(bounding_boxes);
     std::vector<CartVect>  coords;
     coords.resize(27);// max possible
