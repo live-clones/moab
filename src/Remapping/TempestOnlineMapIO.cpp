@@ -16,6 +16,7 @@
 
 #include "FiniteElementTools.h"
 #include "moab/Remapping/TempestOnlineMap.hpp"
+#include "moab/TupleList.hpp"
 
 #ifdef MOAB_HAVE_NETCDFPAR
 #include "netcdfcpp_par.hpp"
