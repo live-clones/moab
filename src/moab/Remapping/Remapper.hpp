@@ -73,6 +73,31 @@ class Remapper
     {
         return m_pcomm;
     }
+
+    /// <summary>
+    ///     ghost layers
+    /// </summary>
+    moab::ErrorCode GhostLayers( moab::EntityHandle& meshset, const int ngh_layers )
+    {
+        // meshset contains the mesh set distributed already
+        //
+        moab::ErrorCode rval = m_pcomm->exchange_ghost_cells( 2, 1, 1, 0, true, true, &meshset ); MB_CHK_ERR(rval);
+        for (int i=2; i<=ngh_layers; i++ )
+        {
+            rval = m_pcomm->correct_thin_ghost_layers(); MB_CHK_ERR(rval);
+            rval = m_pcomm->exchange_ghost_cells( 2, 1, i, 0, true, true, &meshset ); MB_CHK_ERR(rval);
+        }
+
+        // need to set global id tags
+        // need also to propagate global id to ghost cells; it is not done by default :(
+        moab::Tag gtag = m_interface->globalId_tag();
+        moab::Range entities;
+        rval = m_interface->get_entities_by_dimension(meshset, 2, entities); MB_CHK_ERR(rval);
+        rval = m_pcomm->exchange_tags( gtag, entities ); MB_CHK_ERR(rval);
+        return rval;
+    }
+
+
 #endif
 
     ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, std::vector< int >& metadata,

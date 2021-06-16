@@ -95,7 +95,7 @@ class TempestRemapper : public Remapper
     ///     communication.
     /// </summary>
     moab::ErrorCode ConstructCoveringSet( double tolerance = 1e-8, double radius_src = 1.0, double radius_tgt = 1.0,
-                                          double boxeps = 0.1, bool regional_mesh = false );
+                                          double boxeps = 0.1, bool regional_mesh = false, int order = 1 );
 
     /// <summary>
     ///     Compute the intersection mesh between the source and target grids that have been

@@ -11,6 +11,7 @@
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
 #include "moab/GeomUtil.hpp"
+#include "moab/MeshTopoUtil.hpp"
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
 #endif
@@ -834,7 +835,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
 // will distribute the mesh to other procs, so that on each task, the covering set covers the local
 // bounding box this means it will cover the second (local) mesh set; So the covering set will cover
 // completely the second local mesh set (in intersection)
-ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distributed_set, EntityHandle& covering_set )
+ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distributed_set, EntityHandle& covering_set, int order)
 {
     assert( parcomm != NULL );
     if( 1 == parcomm->proc_config().proc_size() )
@@ -1009,6 +1010,24 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
                 // good to be inserted
                 Rto[p].insert( q );
             }
+        }
+    }
+
+    // now, for higher order, we might need to send to processor p, not only the Range Rto[p] cells;
+    // we need to augment those ranges with adjacent cells, according to the order passed
+    // if order is 1, not do anything
+    // if order is 2, for example, we need to add all adj cells level 1, by edge
+    if (order >= 2)
+    {
+        for (int p = 0; p < numprocs; p++ )
+        {
+            Range originalSend = Rto[p];
+            // determine all adjacent cells for order 2 and higher
+            // Need to get layers of bridge-adj entities
+            if( originalSend.empty() ) continue;
+            Range extraCells;
+            rval  = MeshTopoUtil( mb ).get_bridge_adjacencies( originalSend, 1, 2, extraCells, order -1 ); MB_CHK_SET_ERR( rval, "Failed to get bridge adjacencies" );
+            Rto[p].merge(extraCells);
         }
     }
 

@@ -35,6 +35,7 @@
 #endif
 
 // #define VERBOSE
+#define MOAB_DBG
 
 namespace moab
 {
@@ -460,7 +461,9 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHa
             indxMap[*it] = j++;
         useRange = false;
     }
-
+#ifdef MOAB_DBG
+    Tag gtag = m_interface->globalId_tag();
+#endif
     for( unsigned iface = 0; iface < elems.size(); ++iface )
     {
         Face& face           = faces[iface];
@@ -478,6 +481,11 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHa
             assert( indx >= 0 );
             face.SetNode( iverts, indx );
         }
+#ifdef MOAB_DBG
+        int gid = 0;
+        rval = m_interface->tag_get_data( gtag, &ehandle, 1, &gid );MB_CHK_ERR( rval );
+        face.SetGlobalID(gid);
+#endif
     }
 
     unsigned nnodes = verts.size();
@@ -1010,7 +1018,7 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_el
 ///////////////////////////////////////////////////////////////////////////////////
 
 ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius_src, double radius_tgt, double boxeps,
-                                                 bool regional_mesh )
+                                                 bool regional_mesh, int order )
 {
     ErrorCode rval;
 
@@ -1042,7 +1050,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius
 
         rval = m_interface->create_meshset( moab::MESHSET_SET, m_covering_source_set );MB_CHK_SET_ERR( rval, "Can't create new set" );
 
-        rval = mbintx->construct_covering_set( m_source_set, m_covering_source_set );MB_CHK_ERR( rval );
+        rval = mbintx->construct_covering_set( m_source_set, m_covering_source_set, order );MB_CHK_ERR( rval );
         // if (rank == 1)
         // {
         //     moab::Range ents;

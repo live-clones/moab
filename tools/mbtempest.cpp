@@ -770,6 +770,18 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
             remapper.SetMeshType( moab::Remapper::SourceMesh,
                                   static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ) );
         }
+        // if order >=2, ghost at least this many layers (order -1) it may be too much
+#ifdef MOAB_HAVE_MPI
+        if (ctx.disc_orders[0]>=2 && ctx.n_procs > 1)
+        {
+            // get order -1 ghost layers; actually i should be decided by the mesh
+            // if the mesh has holes, it could be more
+            int nlayers = ctx.disc_orders[0] - 1; // this should work if no holes and order not too high
+            rval = remapper.GhostLayers( ctx.meshsets[0], nlayers ); MB_CHK_ERR( rval );
+        }
+#endif
+
+
         // Rescale the radius of both to compute the intersection
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[0], radius_src );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
