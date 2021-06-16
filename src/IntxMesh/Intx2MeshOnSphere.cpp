@@ -844,6 +844,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
         return MB_SUCCESS;
     }
 
+    bool extraWork = (order >= 2);
     // primary element came from, in the joint communicator ; this will be forwarded by coverage
     // mesh needed for tag migrate later on
     int defaultInt = -1;  // no processor, so it was not migrated from somewhere else
@@ -1017,7 +1018,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     // we need to augment those ranges with adjacent cells, according to the order passed
     // if order is 1, not do anything
     // if order is 2, for example, we need to add all adj cells level 1, by edge
-    if (order >= 2)
+    if (extraWork)
     {
         for (int p = 0; p < numprocs; p++ )
         {
@@ -1026,7 +1027,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             // Need to get layers of bridge-adj entities
             if( originalSend.empty() ) continue;
             Range extraCells;
-            rval  = MeshTopoUtil( mb ).get_bridge_adjacencies( originalSend, 1, 2, extraCells, order -1 ); MB_CHK_SET_ERR( rval, "Failed to get bridge adjacencies" );
+            rval  = MeshTopoUtil( mb ).get_bridge_adjacencies( originalSend, 1, 2, extraCells, order - 1 ); MB_CHK_SET_ERR( rval, "Failed to get bridge adjacencies" );
             Rto[p].merge(extraCells);
         }
     }
@@ -1070,7 +1071,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
                     numq );  // to proc, elem GLOBAL ID, connectivity[max_edges] (global ID v), plus
                              // original sender if set (migrated mesh case)
     // we will not send the entity handle, global ID should be more than enough
-    // we will not need more than 2B vertices
+    // we will not need more than 2B vertices TODO 2B vertices or cells
     // if we need more than 2B, we will need to use a different marker anyway (GLOBAL ID is not
     // enough then)
 
@@ -1132,6 +1133,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             // is the mesh migrated before or not?
             if( migrated_mesh )
             {
+                // case of extra work, maybe need to check if it is ghost ?
                 rval = mb->tag_get_data( orgSendProcTag, &q, 1, &orig_sender );MB_CHK_SET_ERR( rval, "can't get original sender for polygon, in migrate scenario" );
                 TLq.vi_wr[sizeTuple * n + currentIndexIntTuple] = orig_sender;  // should be different than -1
                 currentIndexIntTuple++;
@@ -1164,14 +1166,14 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     // we already have some vertices from second mesh set; they are already in the processor, even
     // before receiving other verts from neighbors this is an inverse map from gid to vertex handle,
     // which is local here, we do not want to duplicate vertices their identifier is the global ID!!
-    // it must be unique per mesh ! (I mean, second mesh); gid gor first mesh is not needed here
+    // it must be unique per mesh ! (I mean, first mesh, source); gid for second mesh is not needed here
     int k = 0;
     for( Range::iterator vit = mesh_verts.begin(); vit != mesh_verts.end(); ++vit, k++ )
     {
         globalID_to_vertex_handle[gids[k]] = *vit;
     }
     /*std::map<int, EntityHandle> globalID_to_eh;*/  // do we need this one?
-    globalID_to_eh.clear();                          // we do not really need it, but we keep it for debugging mostly
+    globalID_to_eh.clear();                          // we need it now in case of extra work, to not duplicate cells
 
     // now, look at every TLv, and see if we have to create a vertex there or not
     int n = TLv.get_n();  // the size of the points received
@@ -1200,12 +1202,21 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
 
     for( Range::iterator it = local_q.begin(); it != local_q.end(); ++it )
     {
-        EntityHandle q = *it;  // these are from lagr cells, local
+        EntityHandle q = *it;  // these are from source cells, local
         int gid_el;
         rval = mb->tag_get_data( gid, &q, 1, &gid_el );MB_CHK_SET_ERR( rval, "can't get global id of cell " );
         assert( gid_el >= 0 );
         globalID_to_eh[gid_el] = q;  // do we need this? yes, now we do; parent tags are now using it heavily
-        rval                   = mb->tag_set_data( sendProcTag, &q, 1, &my_rank );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+        if (extraWork)
+        {
+            int owner = my_rank;
+            parcomm->get_owner(q, owner); // this could happen if extra work, real owner is different ?
+            rval                   = mb->tag_set_data( sendProcTag, &q, 1, &owner );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+        }
+        else
+        {
+            rval                   = mb->tag_set_data( sendProcTag, &q, 1, &my_rank );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+        }
     }
 
     // now look at all elements received through; we do not want to duplicate them
@@ -1218,9 +1229,10 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
         int globalIdEl = TLq.vi_rd[sizeTuple * i + 1];
         // int from_proc=TLq.vi_rd[sizeTuple * i ]; // we do not need from_proc anymore
 
-        // do we already have a quad with this global ID, represented? no way !
-        // if (globalID_to_eh.find(globalIdEl) == globalID_to_eh.end())
-        //{
+        // do we already have a cell with this global ID, represented?
+        // yes, it could happen for extraWork !
+        if (globalID_to_eh.find(globalIdEl) != globalID_to_eh.end())
+             continue;
         // construct the conn triangle , quad or polygon
         EntityHandle new_conn[MAXEDGES];  // we should use std::vector with max_edges_1
         int nnodes = -1;
