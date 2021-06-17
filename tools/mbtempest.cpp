@@ -78,7 +78,7 @@ struct ToolContext
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
           computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity( false ),
           ensureMonotonicity( 0 ), fNoConservation( false ), fVolumetric( false ), rrmGrids( false ),
-          kdtreeSearch( true ), fNoBubble( false ), fInputConcave( false ), fOutputConcave( false ),
+          kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ), fOutputConcave( false ),
           fCheck( n_procs > 1 ? false : true )
     {
         inFilenames.resize( 2 );
@@ -137,6 +137,7 @@ struct ToolContext
         std::string expectedMethod     = "fv";
         std::string expectedDofTagName = "GLOBAL_ID";
         int expectedOrder              = 1;
+        bool fBubble                   = false;
 
         if( !proc_id )
         {
@@ -191,15 +192,19 @@ struct ToolContext
                              "from source to target "
                              "grid by applying the maps",
                              &verifyWeights );
-        opts.addOpt< void >( "enforce_convexity",
-                                "check convexity of input meshes to compute mesh intersections" , &enforceConvexity);
-
+        opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
+                             &enforceConvexity );
+        opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes",
+                             &fBubble );
 
         opts.parseCommandLine( argc, argv );
 
         // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree
         // algorithm
         kdtreeSearch = opts.numOptSet( "advfront,a" ) == 0;
+
+        // negate the option
+        fNoBubble = !fBubble;
 
         switch( imeshType )
         {
@@ -445,9 +450,8 @@ int main( int argc, char* argv[] )
                 runCtx->disc_methods[0],
                 runCtx->disc_methods[1],                         // std::string strInputType, std::string strOutputType,
                 runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin=4, int nPout=4,
-                runCtx->fNoBubble, true,
-                runCtx->ensureMonotonicity  // bool fNoBubble = false, bool fCorrectAreas = false,
-                                            // int fMonotoneTypeID = 0
+                runCtx->fNoBubble, true,                         // bool fNoBubble = false, bool fCorrectAreas = false,
+                runCtx->ensureMonotonicity                       // int fMonotoneTypeID = 0
             );
             runCtx->timer_pop();
 
