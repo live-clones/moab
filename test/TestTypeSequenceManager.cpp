@@ -23,8 +23,10 @@ void test_find_free_handle();
 void test_find_free_sequence();
 void test_is_free_sequence();
 void test_is_free_handle();
+#ifndef MOAB_FORCE_32_BIT_HANDLES
 void test_threaded_access(int n_threads);
 void test_single_thread_access();
+#endif
 void test_multi_thread_access();
 
 void regression_svn1952();
@@ -1058,7 +1060,7 @@ void call_find(TypeSequenceManager* seqman,
       }
   }
 }
-
+#ifndef MOAB_FORCE_32_BIT_HANDLES
 void test_threaded_access(int n_threads)
 {
   TypeSequenceManager seqman;
@@ -1106,7 +1108,7 @@ void test_single_thread_access() {
 void test_multi_thread_access() {
   test_threaded_access(2);
 }
-
+#endif
 // Regression test for bug fixed in SVN revision 1952.
 // SVN checkin message:
 //  Fixing a bug in allocation of sequences.  Before this commit, when:
