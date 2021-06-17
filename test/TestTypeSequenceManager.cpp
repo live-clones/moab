@@ -74,9 +74,10 @@ int main()
     error_count += RUN_TEST( test_find_free_handle );
     error_count += RUN_TEST( test_find_free_sequence );
     error_count += RUN_TEST( test_is_free_sequence );
+#ifndef MOAB_FORCE_32_BIT_HANDLES
     error_count += RUN_TEST( test_single_thread_access );
     error_count += RUN_TEST( test_multi_thread_access );
-
+#endif
     error_count += RUN_TEST( regression_svn1952 );
     error_count += RUN_TEST( regression_svn1958 );
     error_count += RUN_TEST( regression_svn1960 );
