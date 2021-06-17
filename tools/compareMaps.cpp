@@ -252,7 +252,8 @@ int main( int argc, char* argv[] )
     std::string inputfile1, inputfile2;
     opts.addOpt< std::string >( "firstMap,i", "input filename 1", &inputfile1 );
     opts.addOpt< std::string >( "secondMap,j", "input second map", &inputfile2 );
-
+    int print_diff = 20;
+    opts.addOpt< int >( "print_differences,p", "input second map", &print_diff );
     opts.parseCommandLine( argc, argv );
 
     // Open netcdf/exodus file
@@ -327,12 +328,33 @@ int main( int argc, char* argv[] )
     weight2.setFromTriplets( tripletList.begin(), tripletList.end() );
     weight2.makeCompressed();
 
+    // default storage type is column major
     Eigen::SparseMatrix< double > diff = weight1 - weight2;
-    double maxv                        = diff.coeffs().maxCoeff();
-    double minv                        = diff.coeffs().minCoeff();
+    diff.makeCompressed(); // is it needed or not ?
+    auto coeffs = diff.coeffs();
+    double maxv                        = coeffs.maxCoeff();
+    double minv                        = coeffs.minCoeff();
     std::cout << " euclidian norm for difference: " << diff.norm()
-              << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
-              << " minv: " << minv << " maxv: " << maxv << "\n";
+                  << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
+                  << " minv: " << minv << " maxv: " << maxv << "\n";
+    // print out the first 10 positions for which the value is outside 90% of min/max values
+    double min_threshold = 0.9*minv;
+    double max_threshold = 0.9*maxv;
+    int counter = 0;
+    for (int k=0; (k<diff.outerSize()) ; ++k) // this is by column
+    {
+        for (Eigen::SparseMatrix<double>::InnerIterator it(diff,k); (it) && (counter < print_diff); ++it)
+        {
+            double val = it.value();
+            if ( val <= min_threshold || val >=  max_threshold )
+            {
+                std::cout << "   col: " << it.col() << " row: "<< it.row()  << " value" <<  val << "\n" ;   // row index
+                counter ++ ;
+            }
+        }
+    }
+
+
 
     // compare frac_a between maps
     diff_vect( "frac_a", na1 );
