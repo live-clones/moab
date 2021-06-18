@@ -91,10 +91,15 @@ if HAVE_HDF5
 	gqt_findvol_test
 
 # imoab tests
+if HAVE_32BIT
+
+else
 TESTS += imoab_test
 if ENABLE_FORTRAN
   TESTS += imoab_testF
 endif
+endif
+
 endif
 
 check_PROGRAMS = $(TESTS) \
