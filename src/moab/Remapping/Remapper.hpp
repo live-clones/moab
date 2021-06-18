@@ -93,6 +93,10 @@ class Remapper
         moab::Tag gtag = m_interface->globalId_tag();
         moab::Range entities;
         rval = m_interface->get_entities_by_dimension(meshset, 2, entities); MB_CHK_ERR(rval);
+        // get all vertices too, need to exchange global ids for vertices too
+        moab::Range vertices;
+        rval = m_interface->get_connectivity(entities, vertices);MB_CHK_ERR(rval);
+        entities.merge(vertices);
         rval = m_pcomm->exchange_tags( gtag, entities ); MB_CHK_ERR(rval);
         return rval;
     }

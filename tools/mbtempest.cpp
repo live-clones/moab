@@ -27,6 +27,7 @@
 #include "moab/CpuTimer.hpp"
 #include "DebugOutput.hpp"
 
+#define MOAB_DBG
 //#ifndef MOAB_HAVE_MPI
 //    #error mbtempest tool requires MPI configuration
 //#endif
@@ -915,5 +916,5 @@ double sample_stationary_vortex( double dLon, double dLat )
 
     return ( 1.0 - tanh( dRho / dD * sin( dLon - dOmega * dT ) ) );
 }
-
+#undef MOAB_DBG
 ///////////////////////////////////////////////

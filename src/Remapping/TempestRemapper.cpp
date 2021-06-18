@@ -1936,7 +1936,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
         rval = m_interface->tag_set_data( ghostTag, &polyNew, 1, &orgProc );MB_CHK_ERR( rval );
     }
 
-#ifdef VERBOSE
+#ifdef MOAB_DBG
     EntityHandle tmpSet3;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet3 );MB_CHK_SET_ERR( rval, "Can't create temporary set3" );
     // add the boundary set and edges, and save it to a file
@@ -1955,4 +1955,5 @@ ErrorCode TempestRemapper::augment_overlap_set()
 
 #endif
 
+#undef MOAB_DBG
 }  // namespace moab

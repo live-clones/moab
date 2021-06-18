@@ -1210,12 +1210,13 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
         if (extraWork)
         {
             int owner = my_rank;
-            parcomm->get_owner(q, owner); // this could happen if extra work, real owner is different ?
-            rval                   = mb->tag_set_data( sendProcTag, &q, 1, &owner );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+            // this could happen if extra work, real owner is different ?
+            rval = parcomm->get_owner(q, owner); MB_CHK_SET_ERR( rval, "can't get owner for cell" );
+            rval = mb->tag_set_data( sendProcTag, &q, 1, &owner );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
         }
         else
         {
-            rval                   = mb->tag_set_data( sendProcTag, &q, 1, &my_rank );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+            rval = mb->tag_set_data( sendProcTag, &q, 1, &my_rank );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
         }
     }
 
@@ -1280,7 +1281,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
         rval          = mb->tag_set_data( sendProcTag, &new_element, 1, &from_proc );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
     }
 
-    // now, create a new set, covering_set
+    // now, add to the covering_set the elements created in the local_q range
     rval = mb->add_entities( covering_set, local_q );MB_CHK_SET_ERR( rval, "can't add entities to new mesh set " );
 #ifdef VERBOSE
     std::cout << " proc " << my_rank << " add " << local_q.size() << " cells to covering set \n";
