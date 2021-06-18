@@ -526,6 +526,20 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
         for( int j = 0; j < nOverlapFaces; j++ )
         {
             const Face& faceOverlap = m_meshOverlap->faces[ixOverlap + j];
+            if (m_meshOverlap->vecFaceArea[ixOverlap + j] < 1.e-16 ) // machine precision
+            {
+                Announce( "Very small overlap at index %i area polygon: (%1.10e )",
+                        ixOverlap + j, m_meshOverlap->vecFaceArea[ixOverlap + j] );
+                int n=faceOverlap.edges.size();
+                Announce( "Number nodes: %d", n);
+                for (int k=0; k<n; k++)
+                {
+                    Node nd = nodesOverlap[faceOverlap[k]];
+                    Announce( "Node %d  %d  : %1.10e  %1.10e %1.10e ", k, faceOverlap[k], nd.x, nd.y, nd.z);
+                }
+                continue;
+            }
+
 
             // #ifdef VERBOSE
             // if ( is_root )
@@ -616,7 +630,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                     // Sample the finite element at this point
                     SampleGLLFiniteElement( nMonotoneType, nP, dAlpha, dBeta, dSampleCoeff );
 
-                    // Add sample coefficients to the map
+                    // Add sample coefficients to the map if m_meshOverlap->vecFaceArea[ixOverlap + j] > 0
                     for( int p = 0; p < nP; p++ )
                     {
                         for( int q = 0; q < nP; q++ )

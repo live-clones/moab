@@ -465,16 +465,7 @@ int main( int argc, char* argv[] )
         std::cout << "Saving file to " << output_file << "..." << std::endl;
         if( part_geom_mesh_size < 0. )
         {
-            rval = mb.write_file( tmp_output_file.str().c_str() );
-            if( MB_SUCCESS != rval )
-            {
-                std::cerr << tmp_output_file.str() << " : failed to write file." << std::endl;
-                std::cerr << "  Error code: " << mb.get_error_string( rval ) << " (" << rval << ")" << std::endl;
-                std::string errstr;
-                mb.get_last_error( errstr );
-                if( !errstr.empty() ) std::cerr << "  Error message: " << errstr << std::endl;
-                return 2;
-            }
+            rval = mb.write_file( tmp_output_file.str().c_str() );MB_CHK_SET_ERR( rval, tmp_output_file.str() << " : failed to write file." << std::endl );
         }
 #ifdef MOAB_HAVE_ZOLTAN
 #ifdef MOAB_HAVE_CGM
@@ -568,16 +559,8 @@ int main( int argc, char* argv[] )
 
             // Save the resulting mesh
             std::cout << "Saving inferred file to " << inferred_output_file << "..." << std::endl;
-            rval = mb.write_file( inferred_output_file.c_str(), 0, 0, &slaveset, 1 );
-            if( MB_SUCCESS != rval )
-            {
-                std::cerr << tmp_output_file.str() << " : failed to write file." << std::endl;
-                std::cerr << "  Error code: " << mb.get_error_string( rval ) << " (" << rval << ")" << std::endl;
-                std::string errstr;
-                mb.get_last_error( errstr );
-                if( !errstr.empty() ) std::cerr << "  Error message: " << errstr << std::endl;
-                return 2;
-            }
+            rval = mb.write_file( inferred_output_file.c_str(), 0, 0,
+                                    &slaveset, 1 );MB_CHK_SET_ERR( rval, inferred_output_file << " : failed to write file." << std::endl );
         }
 #endif
 

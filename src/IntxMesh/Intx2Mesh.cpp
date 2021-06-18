@@ -339,9 +339,17 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
     {
         // basically, the sag for an arc of length max_length on a circle of radius 1
         tolerance = 1. - sqrt( 1 - max_length * max_length / 4 );
-        tolerance = 3 * tolerance;  // why ?
+        if (box_error < tolerance)
+            box_error = tolerance;
+        tolerance = 3 * tolerance;  // we use it for gnomonic plane too, projected sag could be =* sqrt(2.)
+        // be more generous, use 1.5 ~= sqrt(2.)
+
         if( !my_rank )
+        {
             std::cout << " max edge length: " << max_length << "  tolerance for kd tree: " << tolerance << "\n";
+            std::cout << " box overlap tolerance: " << box_error << "\n";
+        }
+
     }
     for( Range::iterator it = rs2.begin(); it != rs2.end(); ++it )
     {

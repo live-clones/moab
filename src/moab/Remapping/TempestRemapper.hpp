@@ -175,7 +175,7 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///     Set the mesh type corresponding to the intersection context
     /// </summary>
-    void SetMeshType( Remapper::IntersectionContext ctx, TempestMeshType type );
+    void SetMeshType( Remapper::IntersectionContext ctx, TempestMeshType type, const std::vector< int >* metadata = nullptr );
 
     /// <summary>
     ///     Get the mesh type corresponding to the intersection context
@@ -266,6 +266,7 @@ class TempestRemapper : public Remapper
     moab::EntityHandle m_source_set;
     int max_source_edges;
     bool point_cloud_source;
+    std::vector< int > m_source_metadata;
 
     /* Target meshset, mesh and entity references */
     Mesh* m_target;
@@ -275,6 +276,7 @@ class TempestRemapper : public Remapper
     moab::EntityHandle m_target_set;
     int max_target_edges;
     bool point_cloud_target;
+    std::vector< int > m_target_metadata;
 
     /* Overlap meshset, mesh and entity references */
     Mesh* m_overlap;
@@ -456,15 +458,25 @@ inline const moab::Range& TempestRemapper::GetMeshVertices( Remapper::Intersecti
     }
 }
 
-inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, TempestRemapper::TempestMeshType type )
+inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, TempestRemapper::TempestMeshType type, const std::vector<int>* metadata )
 {
     switch( ctx )
     {
         case Remapper::SourceMesh:
             m_source_type = type;
+            if( metadata )
+            {
+                m_source_metadata.resize( metadata->size() );
+                std::copy( metadata->begin(), metadata->end(), m_source_metadata.begin() );
+            }
             break;
         case Remapper::TargetMesh:
             m_target_type = type;
+            if (metadata)
+            {
+                m_target_metadata.resize( metadata->size() );
+                std::copy( metadata->begin(), metadata->end(), m_target_metadata.begin() );
+            }
             break;
         case Remapper::OverlapMesh:
             m_overlap_type = type;

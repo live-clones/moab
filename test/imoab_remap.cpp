@@ -165,7 +165,7 @@ int main( int argc, char* argv[] )
     // const char* disc_methods[2] = {"fv", "fv"};
     // const char* dof_tag_names[2] = {"GLOBAL_ID", "GLOBAL_ID"};
     int disc_orders[3]  = { 4, 1, 1 };
-    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0;
+    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1;
 
     const std::string disc_methods[3]        = { "cgll", "fv", "pcloud" };
     const std::string dof_tag_names[3]       = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
@@ -219,12 +219,14 @@ int main( int argc, char* argv[] )
 
     /* We have the mesh intersection now. Let us compute the remapping weights */
     fNoConserve = 0;
+
     /* Compute the weights to preoject the solution from ATM component to OCN compoenent */
-    ierr = iMOAB_ComputeScalarProjectionWeights(
-        atmocnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[1].c_str(),
-        &disc_orders[1], &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0].c_str(),
-        dof_tag_names[1].c_str(), weights_identifiers[0].size(), disc_methods[0].size(), disc_methods[1].size(),
-        dof_tag_names[0].size(), dof_tag_names[1].size() );
+    ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+                                                 disc_methods[1].c_str(), &disc_orders[1], &fNoBubble, &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
+                                                 weights_identifiers[0].size(), disc_methods[0].size(),
+                                                 disc_methods[1].size(), dof_tag_names[0].size(),
+                                                 dof_tag_names[1].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-OCN scalar "
                      "non-conservative field" );
 
@@ -244,31 +246,34 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-    /* Compute the weights to project the solution from ATM component to LND component */
-    ierr = iMOAB_ComputeScalarProjectionWeights(
-        atmlndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[2].c_str(),
-        &disc_orders[2], &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0].c_str(),
-        dof_tag_names[2].c_str(), weights_identifiers[1].size(), disc_methods[0].size(), disc_methods[2].size(),
-        dof_tag_names[0].size(), dof_tag_names[2].size() );
+    /* Compute the weights to preoject the solution from ATM component to LND compoenent */
+    ierr = iMOAB_ComputeScalarProjectionWeights( atmlndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+                                                 disc_methods[2].c_str(), &disc_orders[2], &fNoBubble, &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[2].c_str(),
+                                                 weights_identifiers[1].size(), disc_methods[0].size(),
+                                                 disc_methods[2].size(), dof_tag_names[0].size(),
+                                                 dof_tag_names[2].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                      "non-conservative field" );
 
-    /* Compute the weights to project the solution from ATM component to LND component */
-    ierr = iMOAB_ComputeScalarProjectionWeights(
-        lndatmPID, weights_identifiers[1].c_str(), disc_methods[2].c_str(), &disc_orders[2], disc_methods[0].c_str(),
-        &disc_orders[0], &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[2].c_str(),
-        dof_tag_names[0].c_str(), weights_identifiers[1].size(), disc_methods[2].size(), disc_methods[0].size(),
-        dof_tag_names[2].size(), dof_tag_names[0].size() );
+    /* Compute the weights to preoject the solution from ATM component to LND compoenent */
+    ierr = iMOAB_ComputeScalarProjectionWeights( lndatmPID, weights_identifiers[1].c_str(), disc_methods[2].c_str(), &disc_orders[2],
+                                                 disc_methods[0].c_str(), &disc_orders[0], &fNoBubble, &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[2].c_str(), dof_tag_names[0].c_str(),
+                                                 weights_identifiers[1].size(), disc_methods[2].size(),
+                                                 disc_methods[0].size(), dof_tag_names[2].size(),
+                                                 dof_tag_names[0].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for LND-ATM scalar "
                      "non-conservative field" );
 
     /* We have the mesh intersection now. Let us compute the remapping weights */
     fNoConserve = 0;
-    ierr        = iMOAB_ComputeScalarProjectionWeights(
-        atmocnPID, weights_identifiers[2].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[1].c_str(),
-        &disc_orders[1], &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0].c_str(),
-        dof_tag_names[1].c_str(), weights_identifiers[1].size(), disc_methods[0].size(), disc_methods[1].size(),
-        dof_tag_names[0].size(), dof_tag_names[1].size() );
+    ierr = iMOAB_ComputeScalarProjectionWeights( atmocnPID, weights_identifiers[2].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+                                                 disc_methods[1].c_str(), &disc_orders[1], &fNoBubble, &fMonotoneTypeID, &fVolumetric,
+                                                 &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
+                                                 weights_identifiers[1].size(), disc_methods[0].size(),
+                                                 disc_methods[1].size(), dof_tag_names[0].size(),
+                                                 dof_tag_names[1].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for scalar conservative field" );
 
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined

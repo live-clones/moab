@@ -73,7 +73,7 @@ int main( int argc, char** argv )
 void test_tempest_cs_create()
 {
     NcError error( NcError::verbose_nonfatal );
-    const int blockSize           = 5;
+    const int blockSize           = 30;
     const std::string outFilename = outFilenames[0];
 
     std::cout << "Creating TempestRemap Cubed-Sphere Mesh ...\n";
@@ -89,7 +89,7 @@ void test_tempest_cs_create()
 void test_tempest_rll_create()
 {
     NcError error( NcError::verbose_nonfatal );
-    const int blockSize           = 10;
+    const int blockSize           = 30;
     const std::string outFilename = outFilenames[1];
 
     std::cout << "Creating TempestRemap Latitude-Longitude Mesh ...\n";
@@ -110,7 +110,7 @@ void test_tempest_rll_create()
 void test_tempest_ico_create()
 {
     NcError error( NcError::verbose_nonfatal );
-    const int blockSize           = 5;
+    const int blockSize           = 30;
     const bool computeDual        = false;
     const std::string outFilename = outFilenames[2];
 
@@ -127,7 +127,7 @@ void test_tempest_ico_create()
 void test_tempest_mpas_create()
 {
     NcError error( NcError::verbose_nonfatal );
-    const int blockSize           = 5;
+    const int blockSize           = 30;
     const bool computeDual        = true;
     const std::string outFilename = outFilenames[3];
 
@@ -159,7 +159,7 @@ void test_tempest_overlap_combinations()
                       << " ...\n";
             Mesh tempest_mesh;
             int ierr = GenerateOverlapMesh( outFilenames[isrc], outFilenames[jsrc], tempest_mesh, outFilename,
-                                            "NetCDF4", "exact", false, false, false, false );
+                                            "NetCDF4", "exact", false, false, false, false, false );
             CHECK_EQUAL( ierr, 0 );
             // verify overlap mesh area
             const double ovArea = tempest_mesh.CalculateFaceAreas( false );

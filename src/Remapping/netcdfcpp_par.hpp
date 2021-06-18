@@ -17,7 +17,7 @@ class ParNcFile : public NcFile
                FileFormat fformat = Classic )
         : NcFile(), m_comm( comm )
     {
-        NcError err( NcError::verbose_nonfatal );  // constructor must not fail
+        NcError err( NcError::silent_nonfatal );  // constructor must not fail
 
         int mode      = NC_NOWRITE;
         the_fill_mode = Fill;

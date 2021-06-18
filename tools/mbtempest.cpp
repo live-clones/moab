@@ -65,22 +65,21 @@ struct ToolContext
     bool fVolumetric;
     bool rrmGrids;
     bool kdtreeSearch;
-    bool fNoBubble, fInputConcave, fOutputConcave, fNoCheck;
+    bool fNoBubble, fInputConcave, fOutputConcave, fCheck;
 
 #ifdef MOAB_HAVE_MPI
     ToolContext( moab::Interface* icore, moab::ParallelComm* p_pcomm )
         : mbcore( icore ), pcomm( p_pcomm ), proc_id( pcomm->rank() ), n_procs( pcomm->size() ),
           outputFormatter( std::cout, pcomm->rank(), 0 ),
 #else
-    ToolContext ( moab::Interface* icore ) :
-            mbcore(icore),
-            proc_id ( 0 ), n_procs ( 1 ),
-            outputFormatter ( std::cout, 0, 0 ),
+    ToolContext( moab::Interface* icore )
+        : mbcore( icore ), proc_id( 0 ), n_procs( 1 ), outputFormatter( std::cout, 0, 0 ),
 #endif
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
-          computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity(false), ensureMonotonicity( 0 ),
-          fNoConservation( false ), fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( false ),
-          fInputConcave( false ), fOutputConcave( false ), fNoCheck( false )
+          computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity( false ),
+          ensureMonotonicity( 0 ), fNoConservation( false ), fVolumetric( false ), rrmGrids( false ),
+          kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ), fOutputConcave( false ),
+          fCheck( n_procs > 1 ? false : true )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -138,6 +137,7 @@ struct ToolContext
         std::string expectedMethod     = "fv";
         std::string expectedDofTagName = "GLOBAL_ID";
         int expectedOrder              = 1;
+        bool fBubble                   = false;
 
         if( !proc_id )
         {
@@ -152,12 +152,10 @@ struct ToolContext
                             "OVERLAP_MEMORY=4, OVERLAP_MOAB=5])",
                             &imeshType );
         opts.addOpt< int >( "res,r", "Resolution of the mesh (default=5)", &blockSize );
-        opts.addOpt< void >( "dual,d", "Output the dual of the mesh (generally relevant only for ICO mesh)",
+        opts.addOpt< void >( "dual,d", "Output the dual of the mesh (relevant only for ICO mesh type)",
                              &computeDual );
-        opts.addOpt< void >( "weights,w",
-                             "Compute and output the weights using the overlap mesh (generally "
-                             "relevant only for OVERLAP mesh)",
-                             &computeWeights );
+        opts.addOpt< std::string >( "file,f", "Output computed mesh or remapping weights to specified filename", &outFilename );
+        opts.addOpt< std::string >( "load,l", "Input mesh filenames for source and target meshes. (relevant only when computing weights)", &expectedFName );
         opts.addOpt< void >( "noconserve,c",
                              "Do not apply conservation to the resultant weights (relevant only "
                              "when computing weights)",
@@ -166,21 +164,10 @@ struct ToolContext
                              "Apply a volumetric projection to compute the weights (relevant only "
                              "when computing weights)",
                              &fVolumetric );
-        opts.addOpt< void >( "rrmgrids",
-                             "At least one of the meshes is a regionally refined grid (relevant to "
-                             "accelerate intersection computation)",
-                             &rrmGrids );
-        opts.addOpt< void >( "nocheck", "Do not check the generated map for conservation and consistency", &fNoCheck );
         opts.addOpt< void >( "advfront,a",
                              "Use the advancing front intersection instead of the Kd-tree based algorithm "
-                             "to compute mesh intersections" );
-        opts.addOpt< void >( "verify",
-                             "Verify the accuracy of the maps by projecting analytical functions "
-                             "from source to target "
-                             "grid by applying the maps",
-                             &verifyWeights );
+                             "to compute mesh intersections. (relevant only when computing weights)" );
         opts.addOpt< int >( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
-        opts.addOpt< std::string >( "load,l", "Input mesh filenames (a source and target mesh)", &expectedFName );
         opts.addOpt< int >( "order,o", "Discretization orders for the source and target solution fields",
                             &expectedOrder );
         opts.addOpt< std::string >( "method,m", "Discretization method for the source and target solution fields",
@@ -188,17 +175,36 @@ struct ToolContext
         opts.addOpt< std::string >( "global_id,g",
                                     "Tag name that contains the global DoF IDs for source and target solution fields",
                                     &expectedDofTagName );
-        opts.addOpt< std::string >( "file,f", "Output remapping weights filename", &outFilename );
+
+        opts.addOpt< void >( "weights,w",
+                             "Compute and output the weights using the overlap mesh (generally "
+                             "relevant only for OVERLAP mesh)",
+                             &computeWeights );
         opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
 
-        opts.addOpt< void >( "enforce_convexity",
-                                "check convexity of input meshes to compute mesh intersections" , &enforceConvexity);
+        opts.addOpt< void >( "rrmgrids",
+                             "At least one of the meshes is a regionally refined grid (relevant to "
+                             "accelerate intersection computation)",
+                             &rrmGrids );
+        opts.addOpt< void >( "checkmap", "Check the generated map for conservation and consistency", &fCheck );
+        opts.addOpt< void >( "verify",
+                             "Verify the accuracy of the maps by projecting analytical functions "
+                             "from source to target "
+                             "grid by applying the maps",
+                             &verifyWeights );
+        opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
+                             &enforceConvexity );
+        opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes",
+                             &fBubble );
 
         opts.parseCommandLine( argc, argv );
 
         // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree
         // algorithm
         kdtreeSearch = opts.numOptSet( "advfront,a" ) == 0;
+
+        // negate the option
+        fNoBubble = !fBubble;
 
         switch( imeshType )
         {
@@ -326,8 +332,13 @@ int main( int argc, char* argv[] )
     rval = CreateTempestMesh( *runCtx, remapper, tempest_mesh );MB_CHK_ERR( rval );
     runCtx->timer_pop();
 
+    const double epsrel = ReferenceTolerance; // ReferenceTolerance is defined in Defines.h in tempestremap;
+                                        // Defines.h is included in SparseMatrix.h
+                                        // SparseMatrix.h is included in OfflineMap.h
+                                        // OfflineMap.h is included in TempestOnlineMap.hpp
+                                        // TempestOnlineMap.hpp is included in this file, and is part of MOAB
     // Some constant parameters
-    const double epsrel = 1.e-15;
+
     const double boxeps = 1e-6;
 
     if( runCtx->meshType == moab::TempestRemapper::OVERLAP_MEMORY )
@@ -439,9 +450,8 @@ int main( int argc, char* argv[] )
                 runCtx->disc_methods[0],
                 runCtx->disc_methods[1],                         // std::string strInputType, std::string strOutputType,
                 runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin=4, int nPout=4,
-                runCtx->fNoBubble, true,
-                runCtx->ensureMonotonicity  // bool fNoBubble = false, bool fCorrectAreas = false,
-                                            // int fMonotoneTypeID = 0
+                runCtx->fNoBubble, true,                         // bool fNoBubble = false, bool fCorrectAreas = false,
+                runCtx->ensureMonotonicity                       // int fMonotoneTypeID = 0
             );
             runCtx->timer_pop();
 
@@ -576,27 +586,19 @@ int main( int argc, char* argv[] )
             runCtx->timer_push( "compute weights with TempestRemap" );
 
             rval = weightMap->GenerateRemappingWeights(
-                runCtx->disc_methods[0],
-                runCtx->disc_methods[1],                         // std::string strInputType, std::string strOutputType,
-                runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin=4, int nPout=4,
-                runCtx->fNoBubble,
-                runCtx->ensureMonotonicity,  // bool fNoBubble=true, int fMonotoneTypeID=0,
-                runCtx->fVolumetric, runCtx->fNoConservation,
-                runCtx->fNoCheck,  // bool fVolumetric=false, bool fNoConservation=false, bool
-                                   // fNoCheck=false,
-                runCtx->doftag_names[0],
-                runCtx->doftag_names[1],  // std::string source_tag_name, std::string
-                                          // target_tag_name,
-                "",                       //"",                                                       // std::string
-                                          // strVariables="",
-                "", "",                   // std::string strInputData="", std::string strOutputData="",
-                "", true,                 // std::string strNColName="", bool fOutputDouble=true,
-                "", false,
-                0.0,  // std::string strPreserveVariables="", bool fPreserveAll=false, double
-                      // dFillValueOverride=0.0,
-                runCtx->fInputConcave,
-                runCtx->fOutputConcave  // bool fInputConcave = false, bool fOutputConcave = false
-            );MB_CHK_ERR( rval );
+                runCtx->disc_methods[0],                         // std::string strInputType
+                runCtx->disc_methods[1],                         // std::string strOutputType,
+                runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin, int nPout,
+                runCtx->fNoBubble,                               // bool fNoBubble
+                runCtx->ensureMonotonicity,                      // int fMonotoneTypeID,
+                runCtx->fVolumetric, runCtx->fNoConservation,    // bool fVolumetric, bool fNoConservation,
+                !runCtx->fCheck,                                 //  bool fNoCheck,
+                runCtx->doftag_names[0],                         // std::string source_tag_name
+                runCtx->doftag_names[1],                         // std::string target_tag_name,
+                runCtx->fInputConcave,                           // bool fInputConcave
+                runCtx->fOutputConcave                           // bool fOutputConcave
+            );
+            MB_CHK_ERR( rval );
             runCtx->timer_pop();
 
             // Invoke the CheckMap routine on the TempestRemap serial interface directly, if running
@@ -605,8 +607,8 @@ int main( int argc, char* argv[] )
             {
                 const double dNormalTolerance = 1.0E-8;
                 const double dStrictTolerance = 1.0E-12;
-                weightMap->CheckMap( !runCtx->fNoCheck, !runCtx->fNoCheck,
-                                     !runCtx->fNoCheck && ( runCtx->ensureMonotonicity ), dNormalTolerance,
+                weightMap->CheckMap( runCtx->fCheck, runCtx->fCheck,
+                                     runCtx->fCheck && ( runCtx->ensureMonotonicity ), dNormalTolerance,
                                      dStrictTolerance );
             }
 
@@ -758,15 +760,32 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         const double radius_dest = 1.0 /*2.0*acos(-1.0)*/;
 
         const char* additional_read_opts = ( ctx.n_procs > 1 ? "NO_SET_CONTAINING_PARENTS;" : "" );
+        std::vector< int > smetadata, tmetadata;
         // Load the source mesh and validate
-        rval = remapper.LoadNativeMesh( ctx.inFilenames[0], ctx.meshsets[0], additional_read_opts );MB_CHK_ERR( rval );
+        rval = remapper.LoadNativeMesh( ctx.inFilenames[0], ctx.meshsets[0], smetadata, additional_read_opts );MB_CHK_ERR( rval );
+        if( smetadata.size() )
+        {
+            // remapper.SetMeshType( moab::Remapper::SourceMesh,
+            //                       static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ), &smetadata
+            //                       );
+            remapper.SetMeshType( moab::Remapper::SourceMesh,
+                                  static_cast< moab::TempestRemapper::TempestMeshType >( smetadata[0] ) );
+        }
         // Rescale the radius of both to compute the intersection
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[0], radius_src );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
         ctx.meshes[0] = remapper.GetMesh( moab::Remapper::SourceMesh );
 
         // Load the target mesh and validate
-        rval = remapper.LoadNativeMesh( ctx.inFilenames[1], ctx.meshsets[1], additional_read_opts );MB_CHK_ERR( rval );
+        rval = remapper.LoadNativeMesh( ctx.inFilenames[1], ctx.meshsets[1], tmetadata, additional_read_opts );MB_CHK_ERR( rval );
+        if( tmetadata.size() )
+        {
+            // remapper.SetMeshType( moab::Remapper::TargetMesh,
+            //                       static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ), &tmetadata
+            //                       );
+            remapper.SetMeshType( moab::Remapper::TargetMesh,
+                                  static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ) );
+        }
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[1], radius_dest );MB_CHK_ERR( rval );
         rval = remapper.ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
         ctx.meshes[1] = remapper.GetMesh( moab::Remapper::TargetMesh );

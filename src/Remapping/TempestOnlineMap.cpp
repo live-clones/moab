@@ -29,7 +29,6 @@
 #include <cmath>
 #include <cstdlib>
 
-
 #ifdef MOAB_HAVE_NETCDFPAR
 #include "netcdfcpp_par.hpp"
 #else
@@ -40,6 +39,7 @@
 
 // #define VERBOSE
 // #define VVERBOSE
+// #define CHECK_INCREASING_DOF
 
 void LinearRemapFVtoGLL( const Mesh& meshInput, const Mesh& meshOutput, const Mesh& meshOverlap,
                          const DataArray3D< int >& dataGLLNodes, const DataArray3D< double >& dataGLLJacobian,
@@ -98,24 +98,56 @@ moab::TempestOnlineMap::TempestOnlineMap( moab::TempestRemapper* remapper ) : Of
     // to number of rows and columns in the mapping.
 
     // Initialize dimension information from file
-    std::vector< std::string > dimNames( 1 );
-    std::vector< int > dimSizes( 1 );
-    dimNames[0] = "num_elem";
-
-    if( m_meshInputCov )
-    {
-        dimSizes[0] = m_meshInputCov->faces.size();
-        this->InitializeSourceDimensions( dimNames, dimSizes );
-    }
-    if( m_meshOutput )
-    {
-        dimSizes[0] = m_meshOutput->faces.size();
-        this->InitializeTargetDimensions( dimNames, dimSizes );
-    }
+    this->setup_sizes_dimensions();
 
     // Build a matrix of source and target discretization so that we know how to assign
     // the global DoFs in parallel for the mapping weights
     // For example, FV->FV: rows X cols = faces_source X faces_target
+}
+
+void moab::TempestOnlineMap::setup_sizes_dimensions()
+{
+    if( m_meshInputCov )
+    {
+        std::vector< std::string > dimNames;
+        std::vector< int > dimSizes;
+        if( m_remapper->m_source_type == moab::TempestRemapper::RLL && m_remapper->m_source_metadata.size() )
+        {
+            dimNames.push_back( "lat" );
+            dimNames.push_back( "lon" );
+            dimSizes.resize( 2, 0 );
+            dimSizes[0] = m_remapper->m_source_metadata[1];
+            dimSizes[1] = m_remapper->m_source_metadata[2];
+        }
+        else
+        {
+            dimNames.push_back( "num_elem" );
+            dimSizes.push_back( m_meshInputCov->faces.size() );
+        }
+
+        this->InitializeSourceDimensions( dimNames, dimSizes );
+    }
+
+    if( m_meshOutput )
+    {
+        std::vector< std::string > dimNames;
+        std::vector< int > dimSizes;
+        if( m_remapper->m_target_type == moab::TempestRemapper::RLL && m_remapper->m_target_metadata.size() )
+        {
+            dimNames.push_back( "lat" );
+            dimNames.push_back( "lon" );
+            dimSizes.resize( 2, 0 );
+            dimSizes[0] = m_remapper->m_target_metadata[1];
+            dimSizes[1] = m_remapper->m_target_metadata[2];
+        }
+        else
+        {
+            dimNames.push_back( "num_elem" );
+            dimSizes.push_back( m_meshOutput->faces.size() );
+        }
+
+        this->InitializeTargetDimensions( dimNames, dimSizes );
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,34 +161,6 @@ moab::TempestOnlineMap::~TempestOnlineMap()
     m_meshInput   = NULL;
     m_meshOutput  = NULL;
     m_meshOverlap = NULL;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-static void ParseVariableList( const std::string& strVariables, std::vector< std::string >& vecVariableStrings )
-{
-    unsigned iVarBegin   = 0;
-    unsigned iVarCurrent = 0;
-
-    // Parse variable name
-    for( ;; )
-    {
-        if( ( iVarCurrent >= strVariables.length() ) || ( strVariables[iVarCurrent] == ',' ) ||
-            ( strVariables[iVarCurrent] == ' ' ) )
-        {
-            if( iVarCurrent == iVarBegin )
-            {
-                if( iVarCurrent >= strVariables.length() ) { break; }
-                continue;
-            }
-
-            vecVariableStrings.push_back( strVariables.substr( iVarBegin, iVarCurrent - iVarBegin ) );
-
-            iVarBegin = iVarCurrent + 1;
-        }
-
-        iVarCurrent++;
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -666,6 +670,22 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
     }
 #endif
 
+    // check monotonicity of row_gdofmap and col_gdofmap
+#ifdef CHECK_INCREASING_DOF
+    for( size_t i = 0; i < row_gdofmap.size() - 1; i++ )
+    {
+        if( row_gdofmap[i] > row_gdofmap[i + 1] )
+            std::cout << " on rank " << rank << " in row_gdofmap[" << i << "]=" << row_gdofmap[i] << " > row_gdofmap["
+                      << i + 1 << "]=" << row_gdofmap[i + 1] << " \n";
+    }
+    for( size_t i = 0; i < col_gdofmap.size() - 1; i++ )
+    {
+        if( col_gdofmap[i] > col_gdofmap[i + 1] )
+            std::cout << " on rank " << rank << " in col_gdofmap[" << i << "]=" << col_gdofmap[i] << " > col_gdofmap["
+                      << i + 1 << "]=" << col_gdofmap[i + 1] << " \n";
+    }
+#endif
+
     return moab::MB_SUCCESS;
 }
 
@@ -674,10 +694,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
 moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
     std::string strInputType, std::string strOutputType, const int nPin, const int nPout, bool fBubble,
     int fMonotoneTypeID, bool fVolumetric, bool fNoConservation, bool fNoCheck, const std::string srcDofTagName,
-    const std::string tgtDofTagName, const std::string strVariables, const std::string strInputData,
-    const std::string strOutputData, const std::string strNColName, const bool fOutputDouble,
-    const std::string strPreserveVariables, const bool fPreserveAll, const double dFillValueOverride,
-    const bool fInputConcave, const bool fOutputConcave )
+    const std::string tgtDofTagName, const bool fInputConcave, const bool fOutputConcave )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -691,12 +708,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
     try
     {
-        // Check command line parameters (data arguments)
-        if( ( strInputData != "" ) && ( strOutputData == "" ) )
-        { _EXCEPTIONT( "--in_data specified without --out_data" ); }
-        if( ( strInputData == "" ) && ( strOutputData != "" ) )
-        { _EXCEPTIONT( "--out_data specified without --in_data" ); }
-
         // Check command line parameters (data type arguments)
         STLStringHelper::ToLower( strInputType );
         STLStringHelper::ToLower( strOutputType );
@@ -743,22 +754,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
         // Monotonicity flags
         int nMonotoneType = fMonotoneTypeID;
-
-        // Parse variable list
-        std::vector< std::string > vecVariableStrings;
-        ParseVariableList( strVariables, vecVariableStrings );
-
-        // Parse preserve variable list
-        std::vector< std::string > vecPreserveVariableStrings;
-        ParseVariableList( strPreserveVariables, vecPreserveVariableStrings );
-
-        if( fPreserveAll && ( vecPreserveVariableStrings.size() != 0 ) )
-        { _EXCEPTIONT( "--preserveall and --preserve cannot both be specified" ); }
-
-        m_bConserved    = !fNoConservation;
-        m_iMonotonicity = fMonotoneTypeID;
-        m_eInputType    = eInputType;
-        m_eOutputType   = eOutputType;
+        m_bConserved      = !fNoConservation;
+        m_iMonotonicity   = fMonotoneTypeID;
+        m_eInputType      = eInputType;
+        m_eOutputType     = eOutputType;
 
         m_nDofsPEl_Src =
             ( m_eInputType == DiscretizationType_FV || m_eInputType == DiscretizationType_PCLOUD ? 1 : nPin );
@@ -901,7 +900,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             }
 
             // Partial cover
-            int fNoCheckLoc = fNoCheckGlob;
             if( fabs( dTotalAreaOutput - dTotalAreaInput ) > 1.0e-10 &&
                 fabs( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
             {
@@ -912,10 +910,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
                     fNoCheckGlob = 1;
                 }
             }
-
-#ifdef MOAB_HAVE_MPI
-            if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
-#endif
 
             /*
                 // Recalculate input mesh area from overlap mesh
@@ -1207,6 +1201,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
         copy_tempest_sparsemat_to_eigen3();
 #endif
 
+        int fNoCheckLoc = fNoCheckGlob;
 #ifdef MOAB_HAVE_MPI
         {
             // Remove ghosted entities from overlap set
@@ -1215,48 +1210,18 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet( moab::Remapper::OverlapMesh );
             rval                                = m_interface->remove_entities( m_meshOverlapSet, ghostedEnts );MB_CHK_SET_ERR( rval, "Deleting ghosted entities failed" );
         }
-#endif
 
-        // Verify consistency, conservation and monotonicity, globally
-#ifdef MOAB_HAVE_MPI
-        // first, we have to agree if checks are needed globally
-        // if there is at least one that does not want checks, no-one should do checks
-        int fck_int_loc  = fNoCheck ? 1 : 0;
-        int fck_int_glob = fck_int_loc;
-        if( m_pcomm ) MPI_Allreduce( &fck_int_loc, &fck_int_glob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
-        fNoCheck = ( 0 == fck_int_glob ) ? false : true;
+        // Let us see if we need to perform consistency/conservation checks
+        if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
 #endif
-        if( !fNoCheck )
+        // Verify consistency, conservation and monotonicity, globally
+        if( !fNoCheckLoc )
         {
             if( is_root ) dbgprint.printf( 0, "Verifying map" );
             this->IsConsistent( 1.0e-8 );
             if( !fNoConservation ) this->IsConservative( 1.0e-8 );
 
             if( nMonotoneType != 0 ) { this->IsMonotone( 1.0e-12 ); }
-        }
-
-        // Apply Remapping Weights to data
-        if( strInputData != "" )
-        {
-            if( is_root ) dbgprint.printf( 0, "Applying remap weights to data\n" );
-
-            this->SetFillValueOverride( static_cast< float >( dFillValueOverride ) );
-            this->Apply( strInputData, strOutputData, vecVariableStrings, strNColName, fOutputDouble, false );
-        }
-
-        // Copy variables from input file to output file
-        if( ( strInputData != "" ) && ( strOutputData != "" ) )
-        {
-            if( fPreserveAll )
-            {
-                if( is_root ) dbgprint.printf( 0, "Preserving variables" );
-                this->PreserveAllVariables( strInputData, strOutputData );
-            }
-            else if( vecPreserveVariableStrings.size() != 0 )
-            {
-                if( is_root ) dbgprint.printf( 0, "Preserving variables" );
-                this->PreserveVariables( strInputData, strOutputData, vecPreserveVariableStrings );
-            }
         }
     }
     catch( Exception& e )
@@ -1365,8 +1330,7 @@ int moab::TempestOnlineMap::IsConservative( double dTolerance )
     const int nDATA = 3;
     if( !rank ) nElementsInProc.resize( size * nDATA );
     int senddata[nDATA] = { nColumns, m_nTotDofs_SrcCov, m_nTotDofs_Src };
-    ierr = MPI_Gather( senddata, nDATA, MPI_INT, nElementsInProc.data(), nDATA, MPI_INT, rootProc,
-                       m_pcomm->comm() );
+    ierr = MPI_Gather( senddata, nDATA, MPI_INT, nElementsInProc.data(), nDATA, MPI_INT, rootProc, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     int nTotVals = 0, nTotColumns = 0, nTotColumnsUnq = 0;
