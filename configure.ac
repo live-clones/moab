@@ -213,6 +213,7 @@ if (test "x$enable_32bit_handles" != "x"); then
   MB_DEFS="$MB_DEFS -D_FILE_OFFSET_BITS=64"
   # AC_DEFINE_UNQUOTED([FILE_OFFSET_BITS], [64], [Support for handling files larger than 2GB on 32-bit machines])
 fi
+AM_CONDITIONAL( HAVE_32BIT, [ test "x$enable_32bit_handles" != "x" ] )
 
 AC_CHECK_LIB(dl, dlopen, LIBS="$LIBS -ldl")
 AC_CHECK_LIB(z, compress, LIBS="$LIBS -lz")
