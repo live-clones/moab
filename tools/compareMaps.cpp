@@ -22,7 +22,7 @@
 
 #include "netcdf.h"
 #include <cmath>
-#include <sstream>
+#include <iomanip>
 #include <Eigen/Sparse>
 #define ERR_NC( e )                                \
     {                                              \
@@ -253,7 +253,10 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "firstMap,i", "input filename 1", &inputfile1 );
     opts.addOpt< std::string >( "secondMap,j", "input second map", &inputfile2 );
     int print_diff = 20;
-    opts.addOpt< int >( "print_differences,p", "input second map", &print_diff );
+    opts.addOpt< int >( "print_differences,p", "print differences ", &print_diff );
+    double fraction = 0.9;
+    opts.addOpt< double >( "fraction_diff,f", "fraction threshold", &fraction );
+
     opts.parseCommandLine( argc, argv );
 
     // Open netcdf/exodus file
@@ -338,9 +341,10 @@ int main( int argc, char* argv[] )
                   << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
                   << " minv: " << minv << " maxv: " << maxv << "\n";
     // print out the first 10 positions for which the value is outside 90% of min/max values
-    double min_threshold = 0.9*minv;
-    double max_threshold = 0.9*maxv;
+    double min_threshold = fraction*minv;
+    double max_threshold = fraction*maxv;
     int counter = 0;
+    std::cout << std::setprecision(9) ;
     for (int k=0; (k<diff.outerSize()) ; ++k) // this is by column
     {
         for (Eigen::SparseMatrix<double>::InnerIterator it(diff,k); (it) && (counter < print_diff); ++it)
@@ -348,7 +352,10 @@ int main( int argc, char* argv[] )
             double val = it.value();
             if ( val <= min_threshold || val >=  max_threshold )
             {
-                std::cout << "   col: " << it.col() << " row: "<< it.row()  << " value" <<  val << "\n" ;   // row index
+                int row = it.row();
+                int col = it.col();
+                std::cout << " counter:" << counter << "\t col: " << col << "\t row: "<< row  << "\t diff: " <<  val;
+                std::cout <<  "\t map1: " <<weight1.coeffRef(row, col) <<  "\t map2: " <<weight2.coeffRef(row, col) << "\n" ;   // row index
                 counter ++ ;
             }
         }

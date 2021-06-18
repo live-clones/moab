@@ -216,6 +216,16 @@ int main( int argc, char* argv[] )
     Tag wtag;
     double defVal = 0;
 
+    std::string name_map=inputfile1;
+    // strip last 3 chars (.nc extension)
+    name_map.erase(name_map.begin() + name_map.length() - 3, name_map.end());
+    // if path , remove from name
+    size_t pos = name_map.rfind('/', name_map.length());
+    if (pos != std::string::npos)
+    {
+        name_map = name_map.erase(0, pos+1) ;
+    }
+
     rval = mb->tag_get_handle( "weight", 1, MB_TYPE_DOUBLE, wtag, MB_TAG_CREAT | MB_TAG_DENSE, &defVal );MB_CHK_SET_ERR( rval, "Failed to create weight" );
     EntityHandle partialSet;
     rval = mb->create_meshset(MESHSET_SET, partialSet); MB_CHK_SET_ERR( rval, "can't create partial set" );
@@ -243,7 +253,7 @@ int main( int argc, char* argv[] )
         rval = mb->add_entities(partialSet, targetEnts);
         // write now the set in a numbered file
         std::stringstream fff;
-        fff << "column" << col+1 << ".vtk";
+        fff << name_map << "_column" << col+1 << ".vtk";
         rval = mb->write_mesh( fff.str().c_str(), &partialSet, 1 );MB_CHK_ERR( rval );
     }
 
@@ -271,7 +281,7 @@ int main( int argc, char* argv[] )
         rval = mb->add_entities(partialSet, sourceEnts);
         // write now the set in a numbered file
         std::stringstream fff;
-        fff << "row" << row+1 << ".vtk";
+        fff << name_map << "_row" << row+1 << ".vtk";
         rval = mb->write_mesh( fff.str().c_str(), &partialSet, 1 );MB_CHK_ERR( rval );
     }
     return 0;

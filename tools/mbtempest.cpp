@@ -502,7 +502,7 @@ int main( int argc, char* argv[] )
         // First compute the covering set such that the target elements are fully covered by the
         // lcoal source grid
         runCtx->timer_push( "construct covering set for intersection" );
-        rval = remapper.ConstructCoveringSet( epsrel, 1.0, 1.0, boxeps, runCtx->rrmGrids );MB_CHK_ERR( rval );
+        rval = remapper.ConstructCoveringSet( epsrel, 1.0, 1.0, boxeps, runCtx->rrmGrids, runCtx->disc_orders[0] );MB_CHK_ERR( rval );
         runCtx->timer_pop();
 
         // Compute intersections with MOAB with either the Kd-tree or the advancing front algorithm
@@ -778,6 +778,13 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
             // if the mesh has holes, it could be more
             int nlayers = ctx.disc_orders[0] - 1; // this should work if no holes and order not too high
             rval = remapper.GhostLayers( ctx.meshsets[0], nlayers ); MB_CHK_ERR( rval );
+#ifdef MOAB_DBG
+            // write the new source sets, after layers were decided, should see the ghosts now
+            std::stringstream filename;
+            filename << "expand_source" << ctx.pcomm->rank() << ".h5m";
+            rval = ctx.mbcore->write_file( filename.str().c_str(), 0, 0, &(ctx.meshsets[0]), 1 );MB_CHK_ERR( rval );
+#endif
+
         }
 #endif
 

@@ -902,9 +902,9 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     }
 
     // another collective call, to see if the mesh is migrated and if the GLOBAL_DOFS tag need to be
-    // transferred over to the coverage mesh it is possible that there is no initial mesh source
+    // transferred over to the coverage mesh. It is possible that there is no initial mesh source
     // mesh on the task, so we do not know that info from the tag but TupleList needs to be sized
-    // uniformly for all tasks do a collective MPI_MAX to see if it is migrated and if we have
+    // uniformly for all tasks.  Do a collective MPI_MAX to see if it is migrated and if we have
     // (collectively) a GLOBAL_DOFS task
 
     int local_int_array[2], global_int_array[2];
