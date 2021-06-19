@@ -561,10 +561,24 @@ int main( int argc, char* argv[] )
                 moab::Range ghostedEnts;
                 rval = remapper.GetOverlapAugmentedEntities( ghostedEnts );MB_CHK_ERR( rval );
                 ovEnts = moab::subtract( ovEnts, ghostedEnts );
+#ifdef MOAB_DBG
+                std::stringstream filename;
+                filename << "aug_overlap" << runCtx->pcomm->rank() << ".h5m";
+                rval = runCtx->mbcore->write_file( filename.str().c_str(), 0, 0, &meshOverlapSet, 1 );MB_CHK_ERR( rval );
+#endif
             }
 #endif
-            rval = mbCore->add_entities( writableOverlapSet, ovEnts );MB_CHK_SET_ERR( rval, "Deleting ghosted entities failed" );
-
+            rval = mbCore->add_entities( writableOverlapSet, ovEnts );MB_CHK_SET_ERR( rval, "adding local intx cells failed" );
+#ifdef MOAB_HAVE_MPI
+#ifdef MOAB_DBG
+            if( nprocs > 1 )
+            {
+                std::stringstream filename;
+                filename << "writable_intx_" << runCtx->pcomm->rank() << ".h5m";
+                rval = runCtx->mbcore->write_file( filename.str().c_str(), 0, 0, &writableOverlapSet, 1 );MB_CHK_ERR( rval );
+            }
+#endif
+#endif
             size_t lastindex = runCtx->intxFilename.find_last_of( "." );
             sstr.str( "" );
             sstr << runCtx->intxFilename.substr( 0, lastindex ) << ".h5m";
