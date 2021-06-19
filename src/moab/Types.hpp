@@ -21,6 +21,8 @@
 #include "moab/EntityHandle.hpp"
 #endif
 
+#include "moab/win32_config.h"
+
 /**\name Types and names
  * Types used in the MOAB interface
  */
@@ -32,7 +34,7 @@ namespace moab
 #endif
 
 /** MOAB error codes */
-enum ErrorCode
+enum MOAB_EXPORT ErrorCode
 {
     MB_SUCCESS = 0,
     MB_INDEX_OUT_OF_RANGE,
@@ -64,7 +66,7 @@ enum Constants
 };
 
 /** Specify storage type for tags.  See MOAB users guide for more information. */
-enum TagType
+enum MOAB_EXPORT TagType
 {
     MB_TAG_BIT    = 0,      /**< Tag size specified in bits, tag value is 8 bits or less */
     MB_TAG_SPARSE = 1 << 0, /**< Storage optimized for tags on a few entities */
@@ -82,7 +84,7 @@ enum TagType
 };
 
 /** Specify data type for tags. */
-enum DataType
+enum MOAB_EXPORT DataType
 {
     MB_TYPE_OPAQUE   = 0, /**< byte array */
     MB_TYPE_INTEGER  = 1, /**< native 'int' type */
@@ -111,14 +113,14 @@ typedef struct TagInfo* Tag;
 /** Meshset options: properties for meshset creation.
  *  Values are bit flags that may be combined with a bitwise OR (|)
  */
-enum EntitySetProperty
+enum MOAB_EXPORT EntitySetProperty
 {
     MESHSET_TRACK_OWNER = 0x1, /**< create entity to meshset adjacencies */
     MESHSET_SET         = 0x2, /**< set contents are unique */
     MESHSET_ORDERED     = 0x4  /**< order of set contents is preserved */
 };
 
-enum SenseType
+enum MOAB_EXPORT SenseType
 {
     SENSE_INVALID = -2, /**< default, invalid, not defined */
     SENSE_REVERSE = -1, /**< reversed */
