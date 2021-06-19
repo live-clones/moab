@@ -508,7 +508,12 @@ int main( int argc, char* argv[] )
 
         // Compute intersections with MOAB with either the Kd-tree or the advancing front algorithm
         runCtx->timer_push( "setup and compute mesh intersections" );
-        rval = remapper.ComputeOverlapMesh( runCtx->kdtreeSearch, false );MB_CHK_ERR( rval );
+        int nlayers = 0;
+#ifdef MOAB_HAVE_MPI
+        if (runCtx->disc_orders[0]>=2 && runCtx->n_procs > 1)
+               nlayers = runCtx->disc_orders[0] - 1; // this should work if no holes and order not too high
+#endif
+        rval = remapper.ComputeOverlapMesh( runCtx->kdtreeSearch, false, nlayers );MB_CHK_ERR( rval );
         runCtx->timer_pop();
 
         // print some diagnostic checks to see if the overlap grid resolved the input meshes

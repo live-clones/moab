@@ -103,7 +103,7 @@ class TempestRemapper : public Remapper
     ///     intersection algorithm internally for spherical meshes and can handle arbitrary
     ///     unstructured grids (CS, RLL, ICO, MPAS) with and without holes.
     /// </summary>
-    moab::ErrorCode ComputeOverlapMesh( bool kdtree_search = true, bool use_tempest = false );
+    moab::ErrorCode ComputeOverlapMesh( bool kdtree_search = true, bool use_tempest = false, int ghost_layer = 0 );
 
     /* Converters between MOAB and Tempest representations */
 

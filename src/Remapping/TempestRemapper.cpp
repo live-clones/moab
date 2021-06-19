@@ -19,6 +19,9 @@
 #include "moab/Remapping/TempestRemapper.hpp"
 #include "moab/ReadUtilIface.hpp"
 
+// needed for higher order mapping, retrieve additional layers of cells with bridge methods
+#include "moab/MeshTopoUtil.hpp"
+
 // Intersection includes
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"
 #include "moab/IntxMesh/IntxUtils.hpp"
@@ -1159,7 +1162,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius
     return rval;
 }
 
-ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_tempest )
+ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_tempest, int ghost_layer )
 {
     ErrorCode rval;
     const bool outputEnabled = ( this->rank == 0 );
@@ -1293,6 +1296,13 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     assert( blueParent >= 0 );
                     intxCov.insert( covEnts[loc_gid_to_lid_covsrc[blueParent]] );
                 }
+                if (ghost_layer)
+                {
+                    // add to the intxCov range the ghost layers we used for coverage for higher order maps
+                    Range extraCovCells;
+                    rval  = MeshTopoUtil( m_interface ).get_bridge_adjacencies( intxCov, 1, 2, extraCovCells, ghost_layer ); MB_CHK_SET_ERR( rval, "Failed to get bridge adjacencies" );
+                    intxCov.merge(extraCovCells);
+                }
 
                 if( size > 1 )
                 {
@@ -1316,7 +1326,6 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     // that cover this to the original source for the source element; then
                     // distribute the overlap elements to all processors that have the coverage mesh
                     // used
-
                     rval = augment_overlap_set();MB_CHK_ERR( rval );
                 }
             }
