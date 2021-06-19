@@ -1,7 +1,54 @@
+# Version 5.3.0
+
+## Features
+* *PR #502*: Gnomonic projection option for partitioning using an <ins>"inferred"</ins> strategy with Zoltan RCB algorithm
+* *PR #513*: New example to produce the dual of a delaunay mesh on a sphere to produce a polygonal grid (MPAS-like)
+* *PR #525, PR #526*: CONTRIBUTING.md: Documentation for new users to contribute to MOAB
+* *PR #535*: Docker image of MOAB pre-installed using <ins>spack</ins> to install all TPL dependencies
+* *PR #544*: MOAB now requires a minimum of **C++11** standard to be supported by the C++ compiler
+
+## Enhancements
+* *PR #503*: Download git branches for dependencies directly instead of just tarball. Typically usage: `--download-<package>=git:branchname`
+* *PR #523, PR #528*: CI system updates for BitBucket-Pipelines and Shippable
+* *PR #531*: Update README 
+* *PR #530*: Add pkg-config support
+* *PR #538*: Print configuration summary after Autotools configure and CMake commands
+* *PR #543*: Autodownload a compatible version of Eigen3 header-only library
+
+## Fixes
+* *PR #494*: Fully support Python3 and deprecate Python2 usage
+* *PR #497*: Factor out repetitive code in many iMOAB tests for Climate remap
+* *PR #498*: Improve efficiency of merging for large meshes using MergeMesh
+* *PR #504*: Fixing off-by-one error in the check for resizing the root sets data structures in GeomTopoTool
+* *PR #505*: Remove -march=native for optimized mode
+* *PR #506*: Distclean now removes any orphan a.out files as well
+* *PR #507*: Fix sparse tag writing in HDF5 format, when buffer size exceeds first allocated amount (bug in buffered write)
+* *PR #508*: Structured mesh output in VTK format - use structured layout rather than serializing explicitly
+* *PR #510, PR #517*: Move the handling of the SKIP_TOPOLOGY option to a more appropriate location in TQDCFR
+* *PR #511*: Replace MPI_INTEGER with MPI_INT in couple of places that was causing segfaults
+* *PR #512, PR #516, PR #518, PR #520, PR #532*: Autotools fixes for general configuration and auto-download of dependencies
+* *PR #521, PR #522, PR #524, PR #534, PR #542*: Windows build fixes with CMake workflow using MinGW and VS2015 (or higher) 
+* *PR #529*: Fix to ensure thread-safety in MOAB caused due to a cached variable in TypeSequenceManager::find
+* *PR #536*: Several key fixes using clang-tidy for the entire repository
+* *PR #545*: Fix MOAB CGNS I/O failure when the underlying CGNS library is configured with `CGNS_ENABLE_64BIT` option
+* *PR #547*: Some updates for 32-bit builds; This support will get deprecated and dropped in the next major release.
+
+## Application Support
+* *PR #499*: Capability to read climate SCRIP files in parallel through buffered read mechanism
+* *PR #500*: Support instancing LND domain files directly
+* *PR #501*: Support both fully parallel and serial builds with TempestRemap
+* *PR #509*: Introduce a new tool to compare maps in NetCDF (nc) output files
+* *PR #514, PR #519, PR #527*: Capability to read climate SCRIP files in parallel directly (with MPI+NetCDF/HDF5 interfaces)
+* *PR #533*: Introduce baseline tests to catch regressions when computing field projections from ATM to OCN component
+* *PR #546*: Consolidated set of several fixes for both the offline and online remapping weight generation workflows in E3SM.
+  -- Updates to ensure that the Kd-tree tolerance computation is more robust, especially for RLL meshes
+  -- mbtempest will now use the same tolerance for intersection as TempestRemap usage for Node tolerances
+  -- Fix bugs in parallel I/O to get areas, fractions, mesh coordinates and other parameters ordered correctly
+  -- Add modifications to the mesh reading mechanisms to adapt I/O based on underlying mesh type
+
 # Version 5.2.1
 
 ## Fixes
-
 * *PR #492*: Use a tighter boxeps tolerance in Kd-tree searches for performance optimization
 * *PR #493*: make check fixes for parallel tests using OpenMPI in Conda
 * *PR #489*: New test for 3-component 2-way coupling with the PG2 ATM-OCN-LND cases
@@ -10,8 +57,7 @@
 # Version 5.2.0
 
 ## Features
-
-* *PR #424, #445, #461, #462, #467, #474*: Significant feature additions in `mbtempest` to improve the TempestRemap-based mapping weights generation workflow
+* *PR #424, PR #445, PR #461, PR #462, PR #467, PR #474*: Significant feature additions in `mbtempest` to improve the TempestRemap-based mapping weights generation workflow
   -- Expose both Kd-tree and advancing front intersection
   -- Verifications of mapping weight generation for very high-res cases at scale
   -- Improve `mbconvert` to transform TR supported file formats to MOAB h5m and vice-versa
@@ -20,7 +66,7 @@
   -- Improve master-slave partitioner tool
   -- Performance enhancements: Several optimizations in the iMOAB implementation and OnlineMap computation routines have been implemented
 * *PR #437*: Allow ability to support empty parts in parallel mesh handling
-* *PR #454, #464, #475*: Enable coupling and consistent remap of data between discrete meshes and point cloud representations
+* *PR #454, PR #464, PR #475*: Enable coupling and consistent remap of data between discrete meshes and point cloud representations
   -- A new ParCommGraph class is now available to store communication patterns between MPI groups
   -- Feature additions support rendezvous coupling that has been tested for multi-way transfer between atmosphere, ocean, land components
 * *PR #465*: Add a new KDtree-based intersection to replace advancing front intersection when dealing with source grids with holes
@@ -32,13 +78,12 @@
 * *PR #486*: Adding a new option for area computations using Gauss quadrature based integration instead of spherical excess
 
 ## Enhancements
-
 * *PR #419*: Cache the latest facet for RayHistory in OBB tree
-* *PR #420, #435*: Global ID default value (unset) is now -1, while DOFs related to Global ID start from 1
+* *PR #420, PR #435*: Global ID default value (unset) is now -1, while DOFs related to Global ID start from 1
 * *PR #429*: Option for consistent (multiple) ghost layers in thin partitions
 * *PR #438*: Improve coexistence of LAPACK and Eigen3 in configurations
 * *PR #442*: MBTR - Remove assumption that FV DoF numbering is 0-based (now 1-based for both FV/SE)
-* *PR #444, #449*: CMake build improvements related to MPI, HDF5, OSX
+* *PR #444, PR #449*: CMake build improvements related to MPI, HDF5, OSX
 * *PR #446*: Option to reset Global IDs during partitioning
 * *PR #455*: Enforce MOAB flags to add c++0x flags if supported
 * *PR #463*: Update default download option for NetCDF(4.6.3), HDF5 (1.10.1)
@@ -48,47 +93,51 @@
 * *PR #488*: Enforce uniform formatting of the entire source repository with clang-format tool with updated coding guidelines
 
 ## Fixes
-
-* *PR #414, #434*: HDF5 writer fixes for polyhedral meshes, to address issues #99 and #110
+* *PR #414, PR #434*: HDF5 writer fixes for polyhedral meshes, to address issues #99 and #110
 * *PR #415*: Fixing index overflow in SQIJ partition for structured meshes
-* *PR #417, #421, #469*: Python bindings fixes and compliance to Python 3 standards
+* *PR #417, PR #421, PR #469*: Python bindings fixes and compliance to Python 3 standards
 * *PR #430*: Fixing HDF5 regression test issues
-* *PR #431, #453, #466, #480*: Changes to conform to evolving TempestRemap API co-development
+* *PR #431, PR #453, PR #466, PR #480*: Changes to conform to evolving TempestRemap API co-development
 * *PR #450*: Fix seqfault in Range destructor
 * *PR #472*: HDF5 file descriptor initialization that resolves some issues in VisIt-MOAB plugin
 * *PR #473*: Minor fix for Tqdcfr reader
-
  
-# Version 5.1.0:
+# Version 5.1.0
+
 ## Features
-  * *PR #399, #406, #408, #410: Updates for E3SM workflow to support online remapping computation for climate applications through interfaces to TempestRemap library. 
+  * *PR #399, PR #406, PR #408, PR #410*: Updates for E3SM workflow to support online remapping computation for climate applications through interfaces to TempestRemap library. 
      Major additions to expose online remapping capabilities by computing exact intersection between unstructured meshes on a sphere, and providing 
      projection weight operator computation through interfaces to TempestRemap for both scalar and vector solution fields with conservation and/or 
      monotonicity constraints. While the primary application target is E3SM for this particular feature addition, the bulk of the interfaces added
      in this PR can be reused in other coupled physics simulations as well.
-  * *PR #403: Updates to Cython file generation process in PyMOAB.
+  * *PR #403*: Updates to Cython file generation process in PyMOAB.
      We’ve done away with static `.cpp` files in the project and are now relying on users having a Cython installation greater than 0.26 on their machine. 
      This helps us with python 2/3 compatibility issues as well as superfluous re-compiles of libraries.
+
 ## Enhancements
-  * *PR #376, #365: Updates to PyMOAB to improve the Cython interaction and Python3 compatibility.
-  * *PR #397: Consistent CMake configurations for downstream apps
-  * *PR #404: Update RTT reader to support v1.0.1 specs
-  * *PR #391, #401: Delete volume/surface OBB trees and restore OBBs from file
-  * *PR #370: Several improvements in the GeomTopoTool implementation
+  * *PR #376, PR #365*: Updates to PyMOAB to improve the Cython interaction and Python3 compatibility.
+  * *PR #397*: Consistent CMake configurations for downstream apps
+  * *PR #404*: Update RTT reader to support v1.0.1 specs
+  * *PR #391, PR #401*: Delete volume/surface OBB trees and restore OBBs from file
+  * *PR #370*: Several improvements in the GeomTopoTool implementation
+
 ## Fixes
-  * *PR #363, #398: PyMOAB tag and skinner test fixes
-  * *PR #364: CMake configuration updates to not always require Fortran for BLAS/LAPACK linkage
-  * *PR #362: Several semantic and memory leak fixes due to Coverity, cppcheck and valgrind
-  * *PR #364, #366, #368, #373, #374, #375, #379, #381, #382, #384, #387, #388, #389, #400, #407, #409: Several miscellaneous configuration updates for both autotools and CMake workflows
-# Version 5.0.0:
+  * *PR #363, PR #398*: PyMOAB tag and skinner test fixes
+  * *PR #364*: CMake configuration updates to not always require Fortran for BLAS/LAPACK linkage
+  * *PR #362*: Several semantic and memory leak fixes due to Coverity, cppcheck and valgrind
+  * *PR #364, PR #366, PR #368, PR #373, PR #374, PR #375, PR #379, PR #381, PR #382, PR #384, PR #387, PR #388, PR #389, PR #400, PR #407, PR #409*: Several miscellaneous configuration updates for both autotools and CMake workflows
+
+# Version 5.0.0
+
 ## Features
-  * *PR #248, #290, #299*: Eigen3, BLAS/LAPACK -- Add support for the Eigen3 BLAS/LAPACK header libraries; Now BLAS/LAPACK are required dependencies for MOAB in order to support high-performance dense solver support for various algorithms
-  * *PR #278, #286, #280, #296, #300, #325, #326, #332, #331, #334, #335, #317, #345, #346, #353, #356*: PyMOAB -- This interface now directly exposes Python modules to access common MOAB functionality in order to load, query and manipulate structured/unstructured meshes in memory. It also includes interfaces to some specific classes such as the ScdInterface and its associated classes along with the TopoUtil tool. We have also added support for Tags, Range, Skinner modules that can be used to build more advanced capabilities as needed. Currently, this interface only supports serial configuration and we intend to support parallelism through `mpi4py` dependencies in the next release. Several useful tests and examples have also been added for users to get started.
+  * *PR #248, PR #290, PR #299*: Eigen3, BLAS/LAPACK -- Add support for the Eigen3 BLAS/LAPACK header libraries; Now BLAS/LAPACK are required dependencies for MOAB in order to support high-performance dense solver support for various algorithms
+  * *PR #278, PR #286, PR #280, PR #296, PR #300, PR #325, PR #326, PR #332, PR #331, PR #334, PR #335, PR #317, PR #345, PR #346, PR #353, PR #356*: PyMOAB -- This interface now directly exposes Python modules to access common MOAB functionality in order to load, query and manipulate structured/unstructured meshes in memory. It also includes interfaces to some specific classes such as the ScdInterface and its associated classes along with the TopoUtil tool. We have also added support for Tags, Range, Skinner modules that can be used to build more advanced capabilities as needed. Currently, this interface only supports serial configuration and we intend to support parallelism through `mpi4py` dependencies in the next release. Several useful tests and examples have also been added for users to get started.
   * *PR #162*: Add capability to load an "*unpartitioned*" mesh file through a trivial partition with the parallel option: `PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL`; This works for any mesh format and so we are no longer restricted to just our parallel h5m native mesh.
   * *PR #238*: Discrete Geometry Module -- Higher order curve and surface reconstruction strategies based on local polynomial fittings along with integrated support for recursive uniform refinement. 
   * *PR #318*: Add Mesquite optimization support to MOAB so that mesh optimization algorithms can be natively run on a MOAB mesh. It can also use the geometry information when MOAB is configured with CGM (through Lasso relational databases in MOAB). 
   * *PR #330*: Add support for computing high-order, conservative, multi-mesh projection weights with the **TempestRemap** library. Several optimizations have been implemented for the advancing-front algorithm to compute the intersections between two unstructured meshes on a sphere. In addition to this, the integration with Tempest library enables computation of the projection weights between FV/cGLL/dGLL discretizations seamlessly in a scalable fashion, even though Tempest itself is a serial library!
   * *PR #288*: HEX8 (linear) to HEX27 (quadratic) mesh conversion utility
+
 ## Enhancements
   * *PR #263*: Support for building with CGM build directory (instead of installation) to ease SIGMA workflows
   * *PR #267*: Modify scale and reflect signature in FBiGeom, now it conforms to iGeom
@@ -96,9 +145,9 @@
   * *PR #143*: The original design of MOAB Core was responsible for initializing MPI (if the user / driver forgot to do it in a parallel setting). However, this is just bad design since after destruction of moab::Core object, and hence call to MPI_Finalize(), no other MPI calls could be made. This design has now been fixed and MPI_Init and MPI_Finalize should now be called in user driver code.
   * *PR #287*: Code fails gracefully when number of ranks are greater than number of parts in loaded h5m file
   * *PR #276*: iMOAB extensions to create and manipulate vertices in addition to querying entities and tags on the mesh
-  * *PR #291, #302*: The autotools parallel build toolchain has been accelerated and simplified
-  * *PR #298, #316*: Read node materials from gmsh file and other I/O issues.
-  * *PR #285, #293, #303, #306, #323, #315, #327, #339, #348, #355*: Several DagMC related enhancements
+  * *PR #291, PR #302*: The autotools parallel build toolchain has been accelerated and simplified
+  * *PR #298, PR #316*: Read node materials from gmsh file and other I/O issues.
+  * *PR #285, PR #293, PR #303, PR #306, PR #323, PR #315, PR #327, PR #339, PR #348, PR #355*: Several DagMC related enhancements
                - A major DagMC refactor to move bulk of the capability to OrientedBoxTreeTool, GeomTopoTool, and GeomQueryTool tools
                - various performance and API improvements
                - Completely remove the DagMC tool from MOAB since the bulk of the capabilities are now exposed through other native classes in MOAB directly.
@@ -107,29 +156,31 @@
   * *PR #311*: Update Debian dependencies.
   * *PR #308*: `mbconvert` tool can now include the MPAS (graph) partition data during conversion
   * *PR #304*: AHF adjacency queries will not be turned on by default until we add support for mixed meshes and poly-meshes
-  * *PR #201, #329*: The examples folder has been fully re-organized to better help users get started with capabilities and understand usage of MOAB for computational use-cases. New examples have also been added.
+  * *PR #201, PR #329*: The examples folder has been fully re-organized to better help users get started with capabilities and understand usage of MOAB for computational use-cases. New examples have also been added.
   * *PR #344*: Adding an example to compute exact normals using iRel when a geometry is available.
   * *PR #343*: Refactor the GenLargeMesh example to a callable API to generate structured HEX/TET meshes in memory
   * *PR #341*: Update the configuration suggestions for LCF machines: ALCF, NERSC
   * *PR #359*: Adding an option to explicitly specify NetCDF-C++ interfaces when TempestRemap is enabled
+
 ## Fixes
   * *PR #261*: Removing several verbose error outputs
   * *PR #264*: Fixes for 32-bit architectures
-  * *PR #250, #262, #282*: Better support for PGI and Clang compilers
+  * *PR #250, PR #262, PR #282*: Better support for PGI and Clang compilers
   * *PR #268*: Titan cray intel issue for parallel HDF5 I/O
-  * *PR #250, #277, #324*: MPAS and NetCDF I/O enhancements and fixes
+  * *PR #250, PR #277, PR #324*: MPAS and NetCDF I/O enhancements and fixes
   * *PR #270*: Better tests for ray tracing and OBB  
-  * *PR #273, #310, #312, #322, #347*: Several updates and fixes for autotools and CMake build configuration
-  * *PR #275, #297*: Several memory leak fixes for MOAB algorithms
+  * *PR #273, PR #310, PR #312, PR #322, PR #347*: Several updates and fixes for autotools and CMake build configuration
+  * *PR #275, PR #297*: Several memory leak fixes for MOAB algorithms
   * *PR #283*: Fix for DAGMC looking for OBB_TAG
   * *PR #283*: Several updates to `mbcoupler` tool and adding support for moab::SphericalQuad elements
   * *PR #313*: When reading Exodus files, if the entities are higher order, use only the corner nodes for matching
   * *PR #320*: Update options to disable fortran (this was complicated due to introduction of BLAS/LAPACK libraries as required dependencies)
-  * *PR #309, #333, #354*: Documentation updates
+  * *PR #309, PR #333, PR #354*: Documentation updates
   * *PR #349*: Update HDF5 includes - found through failures in Ubuntu installations
   * *PR #337*: Fixing several compiler (GNU, Clang, Intel) warnings
 
-# Version 4.9.2:
+# Version 4.9.2
+
 ## Features
   * *PR #259*: Introduce the new language-agnostic iMOAB interface to MOAB that is oriented towards FEM/FDM/FVM applications codes.
                This is a ongoing replacement to the ITAPS iMesh interfaces but with much less verbosity and indirection in implementation.
@@ -147,13 +198,14 @@
 ## Fixes
   * *PR #234*: Several key fixes found through cppcheck and Coverity (static analysis tools)
   * *PR #233*: Parallel h5m file load of recursive sets
-  * *PR #213, #230, #255, #253*: Autotools/CMake fixes for MPI, HDF5, NetCDF configurations on various architectures
+  * *PR #213, PR #230, PR #255, PR #253*: Autotools/CMake fixes for MPI, HDF5, NetCDF configurations on various architectures
   * *PR #231*: Remove explicit dependence on Cubit through MOAB
   * *PR #227*: Several fixes for reading NetCDF and MPAS climate files
   * *PR #236*: Correctly process mesh files created on Windows architectures
   * *PR #242*: Make the iterator over SequenceData deterministic (especially when filling holes in entity sequences)
 
-# Version 4.9.1:
+# Version 4.9.1
+
 ## Features
   * *PR #200*: MOAB now supports auto-download and configuration/installation of several dependencies (HDF5, NetCDF and Metis/ParMetis) out of the box; Use configuration options:
     * ```--download-hdf5 --download-netcdf --download-metis``` etc
@@ -162,6 +214,7 @@
   * *PR #218*: Remove ##`txt`## Reader/Writer support (this was an empty shell class)                                                                                                               
   * A configuration suggestion script (suggest_configuration.sh) that is part of MOAB repository.
     This script simplifies options to be used for new users.
+
 ## Enhancements
   * Better support for OSX, Linux and LCF systems
   * *PR #191*: Improve augmenting ghost entities with set information (remove parallel and memory bottlenecks)
@@ -169,27 +222,30 @@
   * *PR #199*: Enhanced support for dealing with polygons and polyhedra with added functionality for VTK and Exodus formats
   * *PR #202*: AHF support for high-order elements
   * *PR #208*: The debian support now includes Fortran and Metis dependencies
+
 ## Fixes
   * Several key fixes found through cppcheck and Coverity (static analysis tools)
   * Improvements in both autotools and CMake configuration systems
-  * *PR #214, #217*: Core::connect_iterate works with non congruently allocated cells of same type.
+  * *PR #214, PR #217*: Core::connect_iterate works with non congruently allocated cells of same type.
 
-# Version 4.9.0:
+# Version 4.9.0
+
 ## Features
   * PR #109: Optimized AHF data structure and scalability of parallel uniform mesh refinement now available (Major)
   * PR #140: Merge Lasso sources to MOAB completely (Major)
   * PR #137: Debian builds are available for MOAB out-of-the-box now; Check the link for updates:
              https://launchpad.net/~nschloe/+archive/ubuntu/moab-nightly/+packages (Major)
   * PR #172: Updated support to load geometry representations (CGM 15.0 + Cubit 14.9/15.0)
+
 ## Configuration
-  @ CMake
+  - CMake
     * PR #166: Missing file in CMakeLists.txt and remove exe flag from sources
     * PR #154: Don't require METIS_DIR, PARMETIS_DIR to be set
     * PR #150: Improve CMake HDF5 detection
     * PR #146: Remove usage of MPI_DIR, remove config/FindMPI.cmake
     * PR #135: CMake cleanup
     * PR #124: CMake support for verdict, Metis/ParMetis
-  @ Autotools
+  - Autotools
     * PR #168: Remove obsolete code related to netcdf workaround in moab_mpi.h
     * PR #163: Prepare to use "make run" target in examples folder
     * PR #149: Replace the deprecated finite routine (C99 standard)
@@ -199,8 +255,9 @@
     * PR #121: Fixes for examples and upgrade makefile with options to run targets
     * PR #114: Fix compiler warnings related to HAVE_UNORDERED_MAP
     * PR #122: Enable MOAB_HAVE_VSNPRINTF for ErrorOutput.cpp
+
 ## Fixes
-  @ General
+  - General
     * PR #165: GenLargeExample tetra option fix       
     * PR #157: Fix metis partitioner for serial builds
     * PR #147: Rename __SDIR__ macro
@@ -216,23 +273,24 @@
     * PR #125: Bug in Coupler
     * PR #119: Fix dual_test issue due to missing mesh file
     * PR #169: Fix for quadratic pyramid adjacency creation
-  @ Parallel fixes
+  - Parallel fixes
     * PR #160: Fix hdf5 parallel reader if number of partitions is too small 
     * PR #159: Run more parallel tests when built without HDF5
     * PR #158: Add option to skip augmenting the default sets with ghosts
     * PR #145: Factor in sequence manager for ghosting
     * PR #141: Populate sets with ghost entities
     * PR #131: Merge_all method added to merge mesh class
-  @ I/O
+  - I/O
     * PR #151: HDF5 parallel reader bug
     * PR #128: HDF5 file with more than 2^32 entities
-  @ Memory leaks
+  - Memory leaks
     * PR #156: Various fixes for memory leaks in serial and parallel examples
     * PR #153: Valgrind fix for parallel_hdf5_test
     * PR #127: Gen large mesh memory reduction
     * PR #116: Major changes for large mesh example
 
-# Version 4.8.2:
+# Version 4.8.2
+
 ## Fixes
   * PR #106: Ghosting polyhedra elements
   * PR #107: AHF polyhedra fix (triggered when configured with --enable-ahf)
@@ -240,26 +298,31 @@
   * PR #108: Addresses issues raised by faceting on models that have point curves
   * PR #113: Fix a ParallelComm issue in PGI optimization build
   * PR #117: Side number should return failure when side is -1
+
 ## Enhancement
   * PR #89: Writing Dense tags in parallel (minor)
   * PR #104: Install configuration header to decipher dependencies (major)
   * PR #115: Partitioning with Metis (major)
 
-# Version 4.8.1:
+# Version 4.8.1
+
 ## Fixes
   * PR #97: Support read and write of point clouds and free nodes in vtk format
   * PR #103: Add explicitly created skin entities to the passed non-null meshset. Previously, this was only available from root set
   * GMSH and VTK reader fixes
   * Several minor compiler warnings removed
+
 ## Enhancement
   * PR #101: Support computation of surface normals for different entity types
 
-# Version 4.8.0:
+# Version 4.8.0
+
 ## Features
   * UMR: Implemented the uniform mesh refinement capabilities for different entity types for degrees (2,3,5). Tools to load a MOAB mesh and uniformly refine it based on user inputs is now available
   * Coupler: Improvements in scalability of the spatial coupler and improved capabilities to perform global and subset based conservation/normalization
   * Verdict: A new set of API functions to measure quality metrics for MOAB entities (based on Verdict library)
   * Enhanced error handling support with clean stack traces in both serial and parallel are now provided natively (examples included)
+
 ## Build
   * Considerably improved CMake-based build support for linux/OSX/Windows
   * Updated autoconf based build system to address all warnings in different architectures and more robust configuration
@@ -281,7 +344,8 @@
 * Warning fixes for Clang/PGI/GNU/Intel
 * Build in optimized mode by default
 
-# Version 4.7.0:
+# Version 4.7.0
+
 * Implemented the Array-based Half Facet data structures in MOAB to improve adjacency querying and efficient traversals between related entities (use --enable-ahf during configure)
 * Co-developed (MOAB and PETSc) to introduce a new native MOAB-mesh based Discretization Manager (DM) implementation in PETSc that supports parallel solution to PDE problems on unstructured grids.
 * Remove memory leak for point-to-point communication (issue #7) caused due to reuse of MPIRequest structures
@@ -324,7 +388,8 @@
 * Added [Doxygen support][http://ftp.mcs.anl.gov/pub/fathom/lasso-docs] with nightly API built from repository
 * Better flag determination during configuration
 
-# Version 4.6:
+# Version 4.6
+
 * Removed deprecated functions from the Interface: (some overloaded variants of) query_interface, release_interface, 
   tag_get_data, tag_set_data, tag_get_size.
 * Added Interface::adjacencies_iterate, whose behavior is much like tag_iterate.
@@ -351,7 +416,8 @@
   values; see src/MBTagConventions.hpp for a list of default values and other conventional tag
   characteristics.
 
-# Version 4.5:
+# Version 4.5
+
 * ITAPS: added iMesh_stepEntIter, iMesh_stepEntArrIter, iMesh_tagIterate, iMesh_createTagWithOptions (see iMesh_extensions.h)
 * More partitioning options for structured mesh (see ScdInterface::compute_partition functions, and doc/metadata_info.doc)
 * Error class exposed in API, and query_interface now supports getting access to the moab::Core member of that class.
@@ -359,7 +425,8 @@
   coordinate and connectivity memory for blocks of entity handles)
 * Added new iMeshP extension tag_reduce
 
-# Version 4.1:
+# Version 4.1
+
 * Structured mesh API (see src/moab/ScdInterface.hpp)
 * Parallel read of netcdf-based .nc files using pnetcdf (see doc/metadata_info.pdf)
 * Updated ParaView plugin (see tools/vtkMOABReader/README for details)
@@ -368,10 +435,12 @@
 * Fix zoltan build on case-insensitive file systems (e.g. MacOS)
 * Fix netcdf build w/ required HDF5 in non-system path
 
-# Version 4.0.1:
+# Version 4.0.1
+
 * Compatible with iMesh 1.2 (see README.IMESH for details on compliance testing)
 
-# Version 4.0:
+# Version 4.0
+
 * Many improvements to parallel correctness and efficiency
 * Use of MPIO for parallel read of HDF5-based file format
 * Parallel import of file formats utilizing internal communication and/or partial read of files.
@@ -392,7 +461,8 @@
 * Fixed bug in get_entities_by_type_and_tag for cases with non-zero
   input set which has or doesn't have entities
 
-# Version 3.0.0 (SVN tag 3.0.0):
+# Version 3.0.0 (SVN tag 3.0.0)
+
 - Updated QVDual to work with new versions of VTK and removed
 dependence on graphviz
 - Move ITAPS/TSTT interface implementation into tools/iMesh and make
@@ -405,15 +475,16 @@ ray tracing) into tools/dagmc
 - Move entity sets to be stored in sequences, better performance &
 functionality
 - Improved various file writers/readers, including:
-. Better performance of HDF5 file reader
-. Configuration with/without HDF5, netcdf
-. Vtk writer improvements
+- Better performance of HDF5 file reader
+- Configuration with/without HDF5, netcdf
+- Vtk writer improvements
 - Added functions to MBInterface to get memory usage of MOAB
 - Fixes to various MBCN functions for 64-bit builds
 - Small changes to #defines of some tag names in MBTagConventions.hpp
 
 
-# Version 2.00 (CVS tag version_200):
+# Version 2.00 (CVS tag version_200)
+
 - New MBInterface method to get blocked coordinate data for vertices.
 - Speed up reading of entity sets in .h5m files.
 - Store sets in entity sequences
@@ -480,7 +551,9 @@ of the error code enum)
    bit tags.
 
 # Version 1.01 (CVS tag version_101): 
-##New Capabilities:
+
+## New Capabilities
+
 - Added support for polygons/polyhedra; polyhedra represented by
 storing polygon handles as connectivity array, otherwise poly elements
 similar to other entities in MOAB
@@ -504,7 +577,8 @@ entity sets; used e.g. to indicate a set represents geometric
 vertex/edge/face/region, dual surface/curve, etc.; currently only
 supported by .cub file reader
 
-##Bug Fixes/Rearrangements:
+## Bug Fixes/Rearrangements
+
 - Fixed bug getting up-adjacencies from entities having equivalent entities; 
 some adjacencies were being missed.
 - Fixed a bug in set_connectivity, where old vertices were put on the
