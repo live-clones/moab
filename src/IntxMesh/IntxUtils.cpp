@@ -3,8 +3,8 @@
  *
  *  Created on: Oct 3, 2012
  */
-#ifdef _MSC_VER  /* windows */
-#  define _USE_MATH_DEFINES //For M_PI
+#ifdef _MSC_VER            /* windows */
+#define _USE_MATH_DEFINES  // For M_PI
 #endif
 
 #ifdef WIN32               /* windows */
@@ -769,7 +769,9 @@ double IntxAreaUtils::spherical_angle( double* A, double* B, double* C, double R
     CartVect c( C );
     double err1 = a.length_squared() - Radius * Radius;
     if( fabs( err1 ) > 0.0001 )
-    { std::cout << " error in input " << a << " radius: " << Radius << " error:" << err1 << "\n"; }
+    {
+        std::cout << " error in input " << a << " radius: " << Radius << " error:" << err1 << "\n";
+    }
     CartVect normalOAB = a * b;
     CartVect normalOCB = c * b;
     return angle( normalOAB, normalOCB );
@@ -1184,14 +1186,14 @@ ErrorCode IntxUtils::enforce_convexity( Interface* mb, EntityHandle lset, int my
             }
         }
     }
-    if (brokenPolys > 0)
+    if( brokenPolys > 0 )
     {
         std::cout << "on local process " << my_rank << ", " << brokenPolys
                   << " concave polygons were decomposed in convex ones \n";
 #ifdef VERBOSE
         std::stringstream fff;
-        fff << "file_set" <<  mb->id_from_handle(lset) << "rk_"<< my_rank << ".h5m";
-        rval = mb->write_file(fff.str().c_str(), 0, 0, &lset, 1);MB_CHK_ERR( rval );
+        fff << "file_set" << mb->id_from_handle( lset ) << "rk_" << my_rank << ".h5m";
+        rval = mb->write_file( fff.str().c_str(), 0, 0, &lset, 1 );MB_CHK_ERR( rval );
         std::cout << "wrote new file set: " << fff.str() << "\n";
 #endif
     }

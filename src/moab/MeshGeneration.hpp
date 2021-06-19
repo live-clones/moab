@@ -36,9 +36,9 @@ class MeshGeneration
         bool parmerge;               // = false;
     };
 
-    MeshGeneration( Interface* mbi, 
+    MeshGeneration( Interface* mbi,
 #ifdef MOAB_HAVE_MPI
-                    ParallelComm* pcomm = 0, 
+                    ParallelComm* pcomm = 0,
 #endif
                     EntityHandle rset = 0 );
     virtual ~MeshGeneration();

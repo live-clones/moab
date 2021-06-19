@@ -14,7 +14,6 @@
 #include "moab/Range.hpp"
 #include "moab/ProgOptions.hpp"
 
-
 using namespace moab;
 using namespace std;
 
@@ -33,12 +32,10 @@ int main( int argc, char** argv )
 
     opts.parseCommandLine( argc, argv );
 
-
     // Instantiate
     Core mb;
 
-    ErrorCode rval = mb.load_file( inputFile.c_str());MB_CHK_SET_ERR( rval, "Error loading file" );
-
+    ErrorCode rval = mb.load_file( inputFile.c_str() );MB_CHK_SET_ERR( rval, "Error loading file" );
 
     cout << " reading file " << inputFile << "\n";
 
@@ -55,47 +52,46 @@ int main( int argc, char** argv )
         EntityHandle cell = *it;
         const EntityHandle* conn;
         int number_nodes;
-        rval = mb.get_connectivity( cell, conn, number_nodes); MB_CHK_SET_ERR( rval, "Error getting connectivity" );
+        rval = mb.get_connectivity( cell, conn, number_nodes );MB_CHK_SET_ERR( rval, "Error getting connectivity" );
         // now check if we have consecutive duplicated vertices, and if so, create a new cell
-        std::vector<EntityHandle> new_verts;
+        std::vector< EntityHandle > new_verts;
         // push to it, if we do not have duplicates
 
-        EntityHandle current=conn[0];
-        //new_verts.push_back(current);
-        for (int i=1; i<=number_nodes; i++)
+        EntityHandle current = conn[0];
+        // new_verts.push_back(current);
+        for( int i = 1; i <= number_nodes; i++ )
         {
             EntityHandle nextV;
-            if (i<number_nodes)
+            if( i < number_nodes )
                 nextV = conn[i];
             else
-                nextV=conn[0];// first vertex
-            if (current!=nextV)
+                nextV = conn[0];  // first vertex
+            if( current != nextV )
             {
-                new_verts.push_back(current);
-                current=nextV;
+                new_verts.push_back( current );
+                current = nextV;
             }
         }
-        if (number_nodes > (int)new_verts.size())
+        if( number_nodes > (int)new_verts.size() )
         {
             // create a new poly, and put this in a list to be removed
             int gid;
-            rval = mb.tag_get_data(gidTag, &cell, 1, &gid); MB_CHK_SET_ERR( rval, "Error getting global id tag" );
+            rval = mb.tag_get_data( gidTag, &cell, 1, &gid );MB_CHK_SET_ERR( rval, "Error getting global id tag" );
             EntityHandle newCell;
-            rval = mb.create_element(MBPOLYGON, &new_verts[0], (int)new_verts.size(),
-                    newCell); MB_CHK_SET_ERR( rval, "Error creating new polygon ");
-            rval = mb.tag_set_data(gidTag, &newCell, 1, &gid); MB_CHK_SET_ERR( rval, "Error setting global id tag" );
-            cout << "delete old cell " << cell << " with num_nodes vertices: " <<  number_nodes << " and with global id: "<< gid << "\n";
-            for (int i=0; i<number_nodes; i++)
+            rval = mb.create_element( MBPOLYGON, &new_verts[0], (int)new_verts.size(), newCell );MB_CHK_SET_ERR( rval, "Error creating new polygon " );
+            rval = mb.tag_set_data( gidTag, &newCell, 1, &gid );MB_CHK_SET_ERR( rval, "Error setting global id tag" );
+            cout << "delete old cell " << cell << " with num_nodes vertices: " << number_nodes
+                 << " and with global id: " << gid << "\n";
+            for( int i = 0; i < number_nodes; i++ )
             {
                 cout << " " << conn[i];
             }
             cout << "\n";
-            OldCells.insert(cell);
+            OldCells.insert( cell );
         }
-        mb.delete_entities(OldCells);
-
+        mb.delete_entities( OldCells );
     }
-    rval = mb.write_file( outFile.c_str());MB_CHK_SET_ERR( rval, "Error writing file" );
+    rval = mb.write_file( outFile.c_str() );MB_CHK_SET_ERR( rval, "Error writing file" );
 
     return 0;
 }

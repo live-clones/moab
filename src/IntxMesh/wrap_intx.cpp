@@ -729,7 +729,9 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
             return MB_FAILURE;
         }
         if( mapping_to_coords[index] == -1 )  // it means the vertex v was not yet encountered in the vertList
-        { mapping_to_coords[index] = kk; }
+        {
+            mapping_to_coords[index] = kk;
+        }
     }
     // check that every mapping has an index different from -1
     for( int k = 0; k < numVertices; k++ )

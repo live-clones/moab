@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#if defined(__MINGW32__)
-  #include <sys/time.h>
+#if defined( __MINGW32__ )
+#include <sys/time.h>
 #else
 #include <ctime>
 #endif
@@ -114,7 +114,9 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
 
             if( 0 == rank )
-            { std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl; }
+            {
+                std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl;
+            }
 
 #else
             std::cout << "Dimension of input mesh should be provided, positive and less than 3" << std::endl;

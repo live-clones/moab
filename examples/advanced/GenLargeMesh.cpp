@@ -257,7 +257,9 @@ int main( int argc, char** argv )
             rval = pcomm2->filter_pstatus( ncells, PSTATUS_GHOST, PSTATUS_NOT );MB_CHK_SET_ERR( rval, "Can't filter ghost cells" );
         }
         if( nverts.size() != nLocalVerts && ncells.size() != nLocalCells )
-        { MB_SET_ERR( MB_FAILURE, "Reading back the output file led to inconsistent number of entities." ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Reading back the output file led to inconsistent number of entities." );
+        }
 
         // delete the mesh that we already have in-memory
         mb2.delete_mesh();

@@ -649,7 +649,9 @@ inline ErrorCode MeshSet::get_entities_by_dimension( int dimension, std::vector<
     size_t count;
     const EntityHandle* ptr = get_contents( count );
     if( vector_based() )
-    { std::remove_copy_if( ptr, ptr + count, std::back_inserter( entity_list ), not_dim_test( dimension ) ); }
+    {
+        std::remove_copy_if( ptr, ptr + count, std::back_inserter( entity_list ), not_dim_test( dimension ) );
+    }
     else
     {
         size_t idx = std::lower_bound( ptr, ptr + count, FIRST_OF_DIM( dimension ) ) - ptr;
@@ -684,7 +686,9 @@ inline ErrorCode MeshSet::get_entities_by_dimension( int dimension, Range& entit
     size_t count;
     const EntityHandle* ptr = get_contents( count );
     if( vector_based() )
-    { std::remove_copy_if( ptr, ptr + count, range_inserter( entity_list ), not_dim_test( dimension ) ); }
+    {
+        std::remove_copy_if( ptr, ptr + count, range_inserter( entity_list ), not_dim_test( dimension ) );
+    }
     else
     {
         size_t idx         = std::lower_bound( ptr, ptr + count, FIRST_OF_DIM( dimension ) ) - ptr;

@@ -393,17 +393,16 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, const EntitySequence
     }
 
     seq = lastReferenced;
-    if (h >= seq->start_handle() && h <= seq->end_handle()) {
-      return MB_SUCCESS;
-    }
+    if( h >= seq->start_handle() && h <= seq->end_handle() ) { return MB_SUCCESS; }
 
     DummySequence ds( h );
     iterator i = sequenceSet.lower_bound( &ds );
-    if( i == end() || ( *i )->start_handle() > h ) {
+    if( i == end() || ( *i )->start_handle() > h )
+    {
         seq = 0;
         return MB_ENTITY_NOT_FOUND;
     }
-    seq = *i;
+    seq            = *i;
     lastReferenced = *i;
     return MB_SUCCESS;
 }
@@ -417,17 +416,16 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, EntitySequence*& seq
     }
 
     seq = lastReferenced;
-    if (h >= seq->start_handle() && h <= seq->end_handle()) {
-      return MB_SUCCESS;
-    }
+    if( h >= seq->start_handle() && h <= seq->end_handle() ) { return MB_SUCCESS; }
 
     DummySequence ds( h );
     iterator i = sequenceSet.lower_bound( &ds );
-    if( i == end() || ( *i )->start_handle() > h ) {
+    if( i == end() || ( *i )->start_handle() > h )
+    {
         seq = 0;
         return MB_ENTITY_NOT_FOUND;
     }
-    seq = *i;
+    seq            = *i;
     lastReferenced = *i;
     return MB_SUCCESS;
 }

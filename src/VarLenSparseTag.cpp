@@ -85,7 +85,9 @@ ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
                                      size_t num_entities, const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" ); }
+    {
+        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" );
+    }
 
     ErrorCode rval;
     for( size_t i = 0; i < num_entities; ++i )
@@ -101,7 +103,9 @@ ErrorCode VarLenSparseTag::get_data( const SequenceManager*, Error* /* error */,
                                      const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" ); }
+    {
+        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" );
+    }
 
     ErrorCode rval;
     Range::const_iterator i;

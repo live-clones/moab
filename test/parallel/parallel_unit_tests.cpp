@@ -144,7 +144,7 @@ void test_trivial_partition();
                               Main Method
  **************************************************************************/
 
-#define RUN_TEST_ARG2( A, B ) run_test( &(A), #A, B )
+#define RUN_TEST_ARG2( A, B ) run_test( &( A ), #A, B )
 
 int run_test( ErrorCode ( *func )( const char* ), const char* func_name, const char* file_name )
 {

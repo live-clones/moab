@@ -20,13 +20,13 @@
 
 // this is just to replace MBI with moab interface, which is _mbImpl in this class
 #define MBI _mbImpl
-#define MBERRORR( rval, STR )              \
-    {                                      \
-        if( MB_SUCCESS != (rval) )           \
-        {                                  \
-            std::cout << (STR) << std::endl; \
-            return rval;                   \
-        }                                  \
+#define MBERRORR( rval, STR )                  \
+    {                                          \
+        if( MB_SUCCESS != ( rval ) )           \
+        {                                      \
+            std::cout << ( STR ) << std::endl; \
+            return rval;                       \
+        }                                      \
     }
 
 namespace moab
@@ -145,7 +145,9 @@ ErrorCode area_coordinates( Interface* mbi, EntityHandle tri, CartVect& pnt, dou
     area_coord[2] = ( r0 * r1 ).length() / areaDouble;
 
     if( fabs( area_coord[0] + area_coord[1] + area_coord[2] - 1 ) > tolerance_segment )
-    { MBERRORR( MB_FAILURE, "point outside triangle" ); }
+    {
+        MBERRORR( MB_FAILURE, "point outside triangle" );
+    }
     // the tolerance is used here for area coordinates (0 to 1), and in other
     // parts it is used as an absolute distance; pretty inconsistent.
     bool side0 = ( area_coord[0] < tolerance_segment );
@@ -683,7 +685,9 @@ ErrorCode FBEngine::getEntNrmlXYZ( EntityHandle entity_handle, double x, double 
     MBERRORR( rval, "Failed to get entity type in iGeom_getEntNrmlXYZ." );
 
     if( type != 2 && type != 3 )
-    { MBERRORR( MB_FAILURE, "Entities passed into gentityNormal must be face or volume." ); }
+    {
+        MBERRORR( MB_FAILURE, "Entities passed into gentityNormal must be face or volume." );
+    }
 
     if( _smooth && 2 == type )
     {
@@ -1284,7 +1288,9 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
                 MBERRORR( MB_FAILURE, "Failed to get one intersection point, bad direction." );
 
             if( distances_out.size() > 1 )
-            { std::cout << " too many intersection points. Only the first one considered\n"; }
+            {
+                std::cout << " too many intersection points. Only the first one considered\n";
+            }
             std::vector< EntityHandle >::iterator pFace = std::find( sets_out.begin(), sets_out.end(), face );
 
             if( pFace == sets_out.end() ) MBERRORR( MB_FAILURE, "Failed to intersect given face, bad direction." );
@@ -2248,7 +2254,9 @@ ErrorCode FBEngine::split_edge_at_point( EntityHandle edge, CartVect& point, Ent
     // first of all, find a closest point
     // usually called for
     if( debug_splits )
-    { std::cout << "Split edge " << _mbImpl->id_from_handle( edge ) << " at point:" << point << "\n"; }
+    {
+        std::cout << "Split edge " << _mbImpl->id_from_handle( edge ) << " at point:" << point << "\n";
+    }
     int dim = _my_geomTopoTool->dimension( edge );
     if( dim != 1 ) return MB_FAILURE;
     if( !_smooth ) return MB_FAILURE;  // call it only for smooth option...
@@ -2333,7 +2341,9 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     // create a vertex set and add the node to it
 
     if( debug_splits )
-    { std::cout << "Split edge with " << num_mesh_edges << " mesh edges, at index (0 based) " << index_edge << "\n"; }
+    {
+        std::cout << "Split edge with " << num_mesh_edges << " mesh edges, at index (0 based) " << index_edge << "\n";
+    }
 
     // at this moment, the node set should have been already created in new_geo_edge
     EntityHandle nodeSet;  // the node set that has the node (find it!)
@@ -2548,7 +2558,9 @@ ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandl
     // create a vertex set and add the node to it
 
     if( debug_splits )
-    { std::cout << "Split edge with " << num_mesh_edges << " mesh edges, at index (0 based) " << index_edge << "\n"; }
+    {
+        std::cout << "Split edge with " << num_mesh_edges << " mesh edges, at index (0 based) " << index_edge << "\n";
+    }
 
     // at this moment, the node set should have been already created in new_geo_edge
     EntityHandle nodeSet;  // the node set that has the node (find it!)

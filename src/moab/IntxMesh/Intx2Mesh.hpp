@@ -32,18 +32,18 @@
 namespace moab
 {
 
-#define ERRORR( rval, str )       \
-    if( MB_SUCCESS != (rval) )      \
-    {                             \
-        std::cout << (str) << "\n"; \
-        return rval;              \
+#define ERRORR( rval, str )           \
+    if( MB_SUCCESS != ( rval ) )      \
+    {                                 \
+        std::cout << ( str ) << "\n"; \
+        return rval;                  \
     }
 
-#define ERRORV( rval, str )       \
-    if( MB_SUCCESS != (rval) )      \
-    {                             \
-        std::cout << (str) << "\n"; \
-        return;                   \
+#define ERRORV( rval, str )           \
+    if( MB_SUCCESS != ( rval ) )      \
+    {                                 \
+        std::cout << ( str ) << "\n"; \
+        return;                       \
     }
 
 #ifdef MOAB_HAVE_MPI
@@ -113,7 +113,7 @@ class Intx2Mesh
     void set_error_tolerance( double eps )
     {
         epsilon_1    = eps;
-        epsilon_area = eps * sqrt(eps) ;
+        epsilon_area = eps * sqrt( eps );
     }
 
 #ifdef MOAB_HAVE_MPI

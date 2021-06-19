@@ -420,7 +420,9 @@ ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (
             EntityHandle elem_handle = *elem_it;
             int elem_id              = mbImpl->id_from_handle( elem_handle );
             if( elem_it == mat_vector.begin() )
-            { ans_file << "esel,s,elem,," << std::setw( 8 ) << elem_id << std::endl; }
+            {
+                ans_file << "esel,s,elem,," << std::setw( 8 ) << elem_id << std::endl;
+            }
             else
             {
                 ans_file << "esel,a,elem,," << std::setw( 8 ) << elem_id << std::endl;

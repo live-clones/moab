@@ -660,7 +660,9 @@ void TerminationCriterion::accumulate_patch( PatchData& pd, MsqError& err )
             // if any of the coordinates are greater than eps
             if( ( vert[i][0] > boundedVertexMovementEps ) || ( vert[i][1] > boundedVertexMovementEps ) ||
                 ( vert[i][2] > boundedVertexMovementEps ) )
-            { ++vertexMovementExceedsBound; }
+            {
+                ++vertexMovementExceedsBound;
+            }
         }
     }
 
@@ -929,7 +931,9 @@ bool TerminationCriterion::cull_vertices( PatchData& pd, OFEvaluator& of_eval, M
             }
             // if the improvement was enough, cull
             if( ( currentOFValue - lowerOFBound ) <= ( cullingEps * ( initialOFValue - lowerOFBound ) ) )
-            { cull_bool = true; }
+            {
+                cull_bool = true;
+            }
             break;
             // if culling on vertex movement absolute
         case VERTEX_MOVEMENT_ABSOLUTE:

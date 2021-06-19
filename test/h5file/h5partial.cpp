@@ -463,7 +463,7 @@ void create_mesh( bool create_element_sets, bool create_vertex_sets, bool tag_el
                                         ( i > 0 && j < MBQUAD_INT ) ? quads[j][i - 1] : 0,
                                         ( i < MBQUAD_INT && j < MBQUAD_INT ) ? quads[j][i] : 0,
                                         ( i < MBQUAD_INT && j > 0 ) ? quads[j - 1][i] : 0 };
-                rval                = mb.tag_set_data( handle_tag, &verts[j][i], 1, val );CHECK_ERR( rval );
+                rval = mb.tag_set_data( handle_tag, &verts[j][i], 1, val );CHECK_ERR( rval );
             }
     }
     else if( adj_elem_tag_name && var_len_adj_elems )

@@ -258,7 +258,9 @@ void BVHTree::initialize_splits( std::vector< std::vector< SplitData > >& splits
                 std::cout << "Split boxes larger than bb" << std::endl;
             }
             if( !test_box.intersects_box( data.boundingBox ) )
-            { std::cout << "bb larger than union of split boxes" << std::endl; }
+            {
+                std::cout << "bb larger than union of split boxes" << std::endl;
+            }
         }
 #endif
     }

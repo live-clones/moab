@@ -329,7 +329,9 @@ bool VerdictVector::within_tolerance( const VerdictVector& vectorPtr2, double to
 {
     if( ( fabs( this->x() - vectorPtr2.x() ) < tolerance ) && ( fabs( this->y() - vectorPtr2.y() ) < tolerance ) &&
         ( fabs( this->z() - vectorPtr2.z() ) < tolerance ) )
-    { return true; }
+    {
+        return true;
+    }
 
     return false;
 }

@@ -28,7 +28,7 @@ const int default_query_count = 100;    //!< number of times to do each query se
 const int default_order[]     = { 0, 1, 2 };
 const int default_create[]    = { 0, 1 };
 const int default_delete[]    = { 0, 10, 30, 50, 70, 90 };
-#define ARRSIZE( A ) ( sizeof( A ) / sizeof( (A)[0] ) )
+#define ARRSIZE( A ) ( sizeof( A ) / sizeof( ( A )[0] ) )
 
 // input parameters
 long numSideInt, numVert, numElem;  //!< total counts;

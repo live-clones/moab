@@ -4,8 +4,8 @@
  *  Created on: Oct 3, 2012
  */
 
-#ifdef _MSC_VER  /* windows */
-#  define _USE_MATH_DEFINES //For M_PI
+#ifdef _MSC_VER            /* windows */
+#define _USE_MATH_DEFINES  // For M_PI
 #endif
 
 #include "moab/IntxMesh/Intx2MeshOnSphere.hpp"

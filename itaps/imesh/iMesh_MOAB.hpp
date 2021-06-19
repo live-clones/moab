@@ -97,7 +97,7 @@ static inline bool iMesh_isError( ErrorCode code )
 // is invoked.
 #define ALLOC_CHECK_ARRAY( array, this_size )                                                                 \
     iMeshArrayManager array##_manager( instance, reinterpret_cast< void** >( array ), *( array##_allocated ), \
-                                       *( array##_size ), this_size, sizeof( **(array) ), err );                \
+                                       *( array##_size ), this_size, sizeof( **( array ) ), err );            \
     if( iBase_SUCCESS != *err ) return
 
 #define ALLOC_CHECK_TAG_ARRAY( array, this_size )                                                             \
@@ -134,7 +134,9 @@ class iMeshArrayManager
         {
             array_size = count;
             if( array_allocated_space < count )
-            { ERROR( iBase_BAD_ARRAY_SIZE, "Allocated array not large enough to hold returned contents." ); }
+            {
+                ERROR( iBase_BAD_ARRAY_SIZE, "Allocated array not large enough to hold returned contents." );
+            }
         }
         RETURN( iBase_SUCCESS );
     }

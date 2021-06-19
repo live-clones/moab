@@ -353,7 +353,9 @@ ErrorCode HiReconstruction::hiproj_walf_in_element( EntityHandle elem, const int
     std::vector< EntityHandle > elemconn;
     error = mbImpl->get_connectivity( &elem, 1, elemconn );MB_CHK_ERR( error );
     if( nvpe != (int)elemconn.size() )
-    { MB_SET_ERR( MB_FAILURE, "element connectivity table size doesn't match input size" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "element connectivity table size doesn't match input size" );
+    }
 
     if( !_hasfittings ) { MB_SET_ERR( MB_FAILURE, "There is no existing fitting results" ); }
     else
@@ -364,14 +366,18 @@ ErrorCode HiReconstruction::hiproj_walf_in_element( EntityHandle elem, const int
         for( int i = 0; i < nvpe; ++i )
         {
             if( -1 == _verts2rec.index( elemconn[i] ) )
-            { MB_SET_ERR( MB_FAILURE, "There is no existing fitting results for element " + ID ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "There is no existing fitting results for element " + ID );
+            }
         }
     }
     // check correctness of input
     for( int i = 0; i < npts2fit; ++i )
     {
         if( !check_barycentric_coords( nvpe, naturalcoords2fit + i * nvpe ) )
-        { MB_SET_ERR( MB_FAILURE, "Wrong barycentric coordinates" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Wrong barycentric coordinates" );
+        }
     }
 
     double* elemcoords = new double[nvpe * 3];

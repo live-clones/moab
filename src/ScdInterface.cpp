@@ -15,13 +15,13 @@
 #include <iostream>
 #include <functional>
 
-#define ERRORR( rval, str )      \
-    {                            \
-        if( MB_SUCCESS != (rval) ) \
-        {                        \
-            std::cerr << (str);    \
-            return rval;         \
-        }                        \
+#define ERRORR( rval, str )          \
+    {                                \
+        if( MB_SUCCESS != ( rval ) ) \
+        {                            \
+            std::cerr << ( str );    \
+            return rval;             \
+        }                            \
     }
 
 namespace moab

@@ -140,7 +140,9 @@ ErrorCode ReadCCMIO::load_file( const char* file_name, const EntityHandle* file_
     CCMIOError error = kCCMIONoErr;
 
     if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CCMOI data" ); }
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CCMOI data" );
+    }
 
     CCMIOOpenFile( &error, file_name, kCCMIORead, &rootID );
     CHK_SET_CCMERR( error, "Problem opening file" );

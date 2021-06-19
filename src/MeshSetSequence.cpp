@@ -535,7 +535,9 @@ ErrorCode MeshSetSequence::get_contained_sets( const SequenceManager* seqman, En
                                                std::vector< EntityHandle >& contained, int num_hops ) const
 {
     if( num_hops == 1 && contained.empty() )
-    { return get_set( handle )->get_entities_by_type( MBENTITYSET, contained ); }
+    {
+        return get_set( handle )->get_entities_by_type( MBENTITYSET, contained );
+    }
 
     if( num_hops > 0 )
         return get_parent_child_meshsets( handle, seqman, contained, num_hops, CONTAINED );

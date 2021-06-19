@@ -273,7 +273,9 @@ int main( int argc, char* argv[] )
     bool obb_task = po.numOptSet( "obb-vis" ) || po.numOptSet( "obb-stats" );
 
     if( po.numOptSet( "no-outmesh" ) && !obb_task )
-    { po.error( "Nothing to do.  Please specify an OBB-related option, or remove --no_outmesh." ); }
+    {
+        po.error( "Nothing to do.  Please specify an OBB-related option, or remove --no_outmesh." );
+    }
 
     /* Load input file, with CAD processing options, if specified */
     std::string options;
@@ -333,7 +335,9 @@ int main( int argc, char* argv[] )
 
     ret = mbi.load_file( input_file.c_str(), &input_file_set, options.c_str() );
     if( ret == MB_UNHANDLED_OPTION )
-    { std::cerr << "Warning: unhandled option while loading input_file, will proceed anyway" << std::endl; }
+    {
+        std::cerr << "Warning: unhandled option while loading input_file, will proceed anyway" << std::endl;
+    }
     else
     {
         CHECKERR( mbi, ret );
@@ -348,7 +352,9 @@ int main( int argc, char* argv[] )
     {
 
         if( obb_task )
-        { std::cerr << "Warning: using obb features in conjunction with -m may not work correctly!" << std::endl; }
+        {
+            std::cerr << "Warning: using obb features in conjunction with -m may not work correctly!" << std::endl;
+        }
 
         // Create tags
         Tag dimTag, idTag, senseTag;

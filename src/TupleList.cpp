@@ -584,25 +584,25 @@ ErrorCode TupleList::sort( uint key, TupleList::buffer* buf )
 
 /* used to unroll a tiny loop: */
 #define COUNT_DIGIT_01( n, i ) \
-    if( (n) > (i) ) count[i][val & DIGIT_MASK]++, val >>= DIGIT_BITS
+    if( ( n ) > ( i ) ) count[i][val & DIGIT_MASK]++, val >>= DIGIT_BITS
 #define COUNT_DIGIT_02( n, i ) \
     COUNT_DIGIT_01( n, i );    \
-    COUNT_DIGIT_01( n, (i) + 1 )
+    COUNT_DIGIT_01( n, ( i ) + 1 )
 #define COUNT_DIGIT_04( n, i ) \
     COUNT_DIGIT_02( n, i );    \
-    COUNT_DIGIT_02( n, (i) + 2 )
+    COUNT_DIGIT_02( n, ( i ) + 2 )
 #define COUNT_DIGIT_08( n, i ) \
     COUNT_DIGIT_04( n, i );    \
-    COUNT_DIGIT_04( n, (i) + 4 )
+    COUNT_DIGIT_04( n, ( i ) + 4 )
 #define COUNT_DIGIT_16( n, i ) \
     COUNT_DIGIT_08( n, i );    \
-    COUNT_DIGIT_08( n, (i) + 8 )
+    COUNT_DIGIT_08( n, ( i ) + 8 )
 #define COUNT_DIGIT_32( n, i ) \
     COUNT_DIGIT_16( n, i );    \
-    COUNT_DIGIT_16( n, (i) + 16 )
+    COUNT_DIGIT_16( n, ( i ) + 16 )
 #define COUNT_DIGIT_64( n, i ) \
     COUNT_DIGIT_32( n, i );    \
-    COUNT_DIGIT_32( n, (i) + 32 )
+    COUNT_DIGIT_32( n, ( i ) + 32 )
 
 template < class Value >
 Value TupleList::radix_count( const Value* A, const Value* end, Index stride, Index count[DIGITS][DIGIT_VALUES] )

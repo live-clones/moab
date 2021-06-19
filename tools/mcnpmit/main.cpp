@@ -319,7 +319,9 @@ int main( int argc, char** argv )
     outfile.close();
 
     if( result == MCNP_SUCCESS )
-    { std::cout << "Success! " << elems_read << " elements interpolated." << std::endl << std::endl; }
+    {
+        std::cout << "Success! " << elems_read << " elements interpolated." << std::endl << std::endl;
+    }
     else
     {
         std::cout << "Failure during query! " << elems_read << " elements interpolated." << std::endl << std::endl;

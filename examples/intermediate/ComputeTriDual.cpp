@@ -1,7 +1,7 @@
 /** @example ComputeTriDual.cpp \n
  * \brief Compute the polygonal (dual) mesh of the primal simplex grid in 2-D. \n
  * <b>To run</b>: ComputeTriDual  input_file output_file \n
- * An example to demonstrate computing the dual polygonal grid of a triangulation 
+ * An example to demonstrate computing the dual polygonal grid of a triangulation
  * on a spherical surface.
  */
 
@@ -46,7 +46,7 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
     rval = mb->add_entities( dual_set, dualverts );MB_CHK_SET_ERR( rval, "Can't add entities" );
     rval = mb->tag_set_data( gidTag, dualverts, &gids[0] );MB_CHK_SET_ERR( rval, "Can't set global_id tag" );
 
-#define CC( ind )        moab::CartVect( ccenters[0][ind], ccenters[1][ind], ccenters[2][ind] )
+#define CC( ind ) moab::CartVect( ccenters[0][ind], ccenters[1][ind], ccenters[2][ind] )
 #define CCXMY( ind, cv ) \
     moab::CartVect( ccenters[0][ind] - ( cv )[0], ccenters[1][ind] - ( cv )[1], ccenters[2][ind] - ( cv )[2] )
 
@@ -204,7 +204,7 @@ int main( int argc, char** argv )
 
     // This file is in the mesh files directory
     const char* readopts = "";
-    rval = mb->load_file( inputFile.c_str(), &triangle_set, readopts );MB_CHK_SET_ERR( rval, "Failed to read" );
+    rval                 = mb->load_file( inputFile.c_str(), &triangle_set, readopts );MB_CHK_SET_ERR( rval, "Failed to read" );
 
     // get all cells of dimension 2;
     moab::Range cells;
@@ -226,4 +226,3 @@ int main( int argc, char** argv )
 
     return 0;
 }
-

@@ -27,7 +27,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(RECTANGULAR_TRUNCATION) && !defined(TRIANGULAR_TRUNCATION)
+#if !defined( RECTANGULAR_TRUNCATION ) && !defined( TRIANGULAR_TRUNCATION )
 #define RECTANGULAR_TRUNCATION
 // #define TRIANGULAR_TRUNCATION
 #endif
@@ -203,7 +203,6 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     moab::ErrorCode WriteHDF5MapFile( const std::string& filename );
 
-
   public:
     ///	<summary>
     ///		Store the tag names associated with global DoF ids for source and target meshes
@@ -340,15 +339,11 @@ class TempestOnlineMap : public OfflineMap
     void setup_sizes_dimensions();
 
 #ifdef MOAB_HAVE_MPI
-    int rearrange_arrays_by_dofs( const std::vector<unsigned int> & gdofmap,
-                DataArray1D< double > &  vecFaceArea,
-                DataArray1D< double > &  dCenterLon,
-                DataArray1D< double > & dCenterLat,
-                DataArray2D< double > & dVertexLat,
-                DataArray2D< double > & dVertexLon,
-                unsigned & N, // this will be output too now
-                int nv,
-                int & maxdof);
+    int rearrange_arrays_by_dofs( const std::vector< unsigned int >& gdofmap, DataArray1D< double >& vecFaceArea,
+                                  DataArray1D< double >& dCenterLon, DataArray1D< double >& dCenterLat,
+                                  DataArray2D< double >& dVertexLat, DataArray2D< double >& dVertexLon,
+                                  unsigned& N,  // this will be output too now
+                                  int nv, int& maxdof );
 #endif
 
     ///	<summary>
@@ -384,7 +379,6 @@ class TempestOnlineMap : public OfflineMap
 
     std::vector< unsigned > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
 
-
     DataArray3D< int > dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
     DiscretizationType m_srcDiscType, m_destDiscType;
     int m_nTotDofs_Src, m_nTotDofs_SrcCov, m_nTotDofs_Dest;
@@ -413,7 +407,7 @@ inline int moab::TempestOnlineMap::GetRowGlobalDoF( int localRowID ) const
 
 inline int moab::TempestOnlineMap::GetIndexOfRowGlobalDoF( int globalRowDoF ) const /* 0 based */
 {
-    return globalRowDoF+1;
+    return globalRowDoF + 1;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -424,7 +418,7 @@ inline int moab::TempestOnlineMap::GetColGlobalDoF( int localColID ) const
 
 inline int moab::TempestOnlineMap::GetIndexOfColGlobalDoF( int globalColDoF ) const /* 0 based */
 {
-    return globalColDoF+1;// temporary
+    return globalColDoF + 1;  // temporary
 }
 
 ///////////////////////////////////////////////////////////////////////////////

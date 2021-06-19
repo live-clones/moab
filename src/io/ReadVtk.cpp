@@ -396,7 +396,9 @@ ErrorCode ReadVtk::vtk_read_structured_points( FileTokenizer& tokens, Range& ver
         return MB_FAILURE;
 
     if( dims[0] < 1 || dims[1] < 1 || dims[2] < 1 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid dimension at line " << tokens.line_number() ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid dimension at line " << tokens.line_number() );
+    }
 
     if( !tokens.match_token( "ORIGIN" ) || !tokens.get_doubles( 3, origin ) || !tokens.get_newline() )
         return MB_FAILURE;
@@ -438,14 +440,18 @@ ErrorCode ReadVtk::vtk_read_structured_grid( FileTokenizer& tokens, Range& verte
         return MB_FAILURE;
 
     if( dims[0] < 1 || dims[1] < 1 || dims[2] < 1 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid dimension at line " << tokens.line_number() ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid dimension at line " << tokens.line_number() );
+    }
 
     if( !tokens.match_token( "POINTS" ) || !tokens.get_long_ints( 1, &num_verts ) ||
         !tokens.match_token( vtk_type_names ) || !tokens.get_newline() )
         return MB_FAILURE;
 
     if( num_verts != ( dims[0] * dims[1] * dims[2] ) )
-    { MB_SET_ERR( MB_FAILURE, "Point count not consistent with dimensions at line " << tokens.line_number() ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Point count not consistent with dimensions at line " << tokens.line_number() );
+    }
 
     // Create and read vertices
     EntityHandle start_handle = 0;
@@ -469,7 +475,9 @@ ErrorCode ReadVtk::vtk_read_rectilinear_grid( FileTokenizer& tokens, Range& vert
         return MB_FAILURE;
 
     if( dims[0] < 1 || dims[1] < 1 || dims[2] < 1 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid dimension at line " << tokens.line_number() ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid dimension at line " << tokens.line_number() );
+    }
 
     for( i = 0; i < 3; i++ )
     {
@@ -733,7 +741,9 @@ ErrorCode ReadVtk::vtk_read_unstructured_grid( FileTokenizer& tokens, Range& ver
             for( ; id < end_id; ++id )
             {
                 if( conn_iter == connectivity.end() )
-                { MB_SET_ERR( MB_FAILURE, "Connectivity data truncated at cell " << id ); }
+                {
+                    MB_SET_ERR( MB_FAILURE, "Connectivity data truncated at cell " << id );
+                }
                 // Make sure connectivity length is correct.
                 if( *conn_iter != num_vtx )
                 {
@@ -745,7 +755,9 @@ ErrorCode ReadVtk::vtk_read_unstructured_grid( FileTokenizer& tokens, Range& ver
                 for( i = 0; i < num_vtx; ++i, ++conn_iter )
                 {
                     if( conn_iter == connectivity.end() )
-                    { MB_SET_ERR( MB_FAILURE, "Connectivity data truncated at cell " << id ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Connectivity data truncated at cell " << id );
+                    }
 
                     conn_array[i] = *conn_iter + first_vertex;
                 }
@@ -770,7 +782,9 @@ ErrorCode ReadVtk::vtk_read_unstructured_grid( FileTokenizer& tokens, Range& ver
             for( ; id < end_id; ++id )
             {
                 if( conn_iter == connectivity.end() )
-                { MB_SET_ERR( MB_FAILURE, "Connectivity data truncated at polyhedra cell " << id ); }
+                {
+                    MB_SET_ERR( MB_FAILURE, "Connectivity data truncated at polyhedra cell " << id );
+                }
                 ++conn_iter;
                 // iterator is now at number of faces
                 // we should check it is indeed num_vtx
@@ -1124,7 +1138,9 @@ ErrorCode ReadVtk::vtk_read_texture_attrib( FileTokenizer& tokens, std::vector< 
     if( !tokens.get_integers( 1, &dim ) || !( type = tokens.match_token( vtk_type_names ) ) ) return MB_FAILURE;
 
     if( dim < 1 || dim > 3 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid dimension (" << dim << ") at line " << tokens.line_number() ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid dimension (" << dim << ") at line " << tokens.line_number() );
+    }
 
     return vtk_read_tag_data( tokens, type, dim, entities, name );
 }

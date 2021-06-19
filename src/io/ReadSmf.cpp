@@ -330,7 +330,9 @@ ErrorCode ReadSmf::parse_line( char* ln )
 ErrorCode ReadSmf::check_length( int count, const std::vector< std::string >& argv )
 {
     if( ( argv.size() < (unsigned)count ) || ( argv.size() > (unsigned)count && argv[count][0] != '#' ) )
-    { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Expect " << count << " arguments at line " << lineNo ); }
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "Expect " << count << " arguments at line " << lineNo );
+    }
 
     return MB_SUCCESS;
 }

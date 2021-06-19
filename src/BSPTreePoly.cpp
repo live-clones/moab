@@ -141,9 +141,9 @@ struct BSPTreePoly::Edge
     }
     BSPTreePoly::Vertex* common( BSPTreePoly::Edge* eother ) const
     {
-        return start() == eother->start() || start() == eother->end()
-                   ? start()
-                   : end() == eother->start() || end() == eother->end() ? end() : 0;
+        return start() == eother->start() || start() == eother->end() ? start()
+               : end() == eother->start() || end() == eother->end()   ? end()
+                                                                      : 0;
     }
 
     int sense( BSPTreePoly::Face* face ) const;

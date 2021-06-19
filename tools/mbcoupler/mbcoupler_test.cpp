@@ -269,7 +269,7 @@ ErrorCode get_file_options( int argc, char** argv, int nprocs, int rank, std::ve
     ssNormTag                  = "";
     readOpts                   = ( nprocs > 1 ? "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
                               "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME"
-                            : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                                              : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
                               "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME" );
     outFile                    = "";
     writeOpts                  = ( nprocs > 1 ? "PARALLEL=WRITE_PART;CPUTIME" : "" );

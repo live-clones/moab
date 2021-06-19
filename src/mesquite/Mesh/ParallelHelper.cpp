@@ -487,7 +487,9 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
                 /* obviously the vertex is not marked if it was already marked or if it is
                  * app_fixed*/
                 if( vtx_in_partition_boundary[incident_vtx] == 0 && app_fixed[incident_vtx] == 0 )
-                { vtx_in_partition_boundary[incident_vtx] = -1; }
+                {
+                    vtx_in_partition_boundary[incident_vtx] = -1;
+                }
             }
         }
     }
@@ -1068,7 +1070,9 @@ bool ParallelHelperImpl::compute_next_independent_set()
     else
     {
         if( global_work_remains )
-        { printf( "WARNING: global work remains %d after %d iterations\n", global_work_remains, iteration ); }
+        {
+            printf( "WARNING: global work remains %d after %d iterations\n", global_work_remains, iteration );
+        }
         return false;
     }
 }
@@ -1458,9 +1462,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
                         neighbourProc[i] );
                 fflush( NULL );
             }
-            rval =
-                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
-                           VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
+            rval = MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
+                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
         }
@@ -1476,9 +1479,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb( MsqError& err )
                         neighbourProc[i] );
                 fflush( NULL );
             }
-            rval =
-                MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE, neighbourProc[i],
-                           VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[i] ) );
+            rval = MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE, neighbourProc[i],
+                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[i] ) );
             CHECK_MPI_RZERO( rval, err );
         }
         else
@@ -1690,9 +1692,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         }
         if( numVtxPerProcRecv[i] )
         {
-            rval =
-                MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
-                           VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
+            rval = MPI_Irecv( packed_vertices_import[i], 4 * numVtxPerProcRecv[i], MPI_DOUBLE, neighbourProc[i],
+                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_recv[i] ) );
             CHECK_MPI_RZERO( rval, err );
             num_neighbourProcRecv++;
         }
@@ -1708,9 +1709,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_tnb_no_all( MsqError& err )
         }
         if( numVtxPerProcSend[i] )
         {
-            rval =
-                MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE, neighbourProc[i],
-                           VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[i] ) );
+            rval = MPI_Isend( packed_vertices_export[i], 4 * numVtxPerProcSend[i], MPI_DOUBLE, neighbourProc[i],
+                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[i] ) );
             CHECK_MPI_RZERO( rval, err );
         }
         else
@@ -1922,8 +1922,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
     std::vector< MPI_Request > request( num_neighbourProcRecv );
     for( j = 0; j < num_neighbourProcRecv; j++ )
     {
-        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE,
-                          neighbourProcRecv[j], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
+        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE, neighbourProcRecv[j],
+                          VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
         CHECK_MPI_RZERO( rval, err );
         if( false )
         {
@@ -1940,9 +1940,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb( MsqError& err )
     {
         if( numVtxPerProcSend[j] )
         {
-            rval =
-                MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE, neighbourProc[j],
-                           VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[j] ) );
+            rval = MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE, neighbourProc[j],
+                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[j] ) );
             CHECK_MPI_RZERO( rval, err );
             if( 0 )
             {
@@ -2170,8 +2169,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     std::vector< MPI_Request > request( num_neighbourProcRecv );
     for( j = 0; j < num_neighbourProcRecv; j++ )
     {
-        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE,
-                          neighbourProcRecv[j], VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
+        rval = MPI_Irecv( packed_vertices_import[j], 4 * numVtxPerProcRecvRecv[j], MPI_DOUBLE, neighbourProcRecv[j],
+                          VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( request[j] ) );
         CHECK_MPI_RZERO( rval, err );
         if( false )
         {
@@ -2188,9 +2187,8 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     {
         if( numVtxPerProcSend[j] )
         {
-            rval =
-                MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE, neighbourProc[j],
-                           VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[j] ) );
+            rval = MPI_Isend( packed_vertices_export[j], 4 * numVtxPerProcSend[j], MPI_DOUBLE, neighbourProc[j],
+                              VERTEX_BLOCK + iteration, (MPI_Comm)communicator, &( requests_send[j] ) );
             CHECK_MPI_RZERO( rval, err );
             if( 0 )
             {
@@ -2392,7 +2390,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b( MsqError& err )
 
             rval = MPI_Recv( ARRPTR( vertex_pack ),    /* message buffer */
                              4 * num,                  /* num data's item with 4 doubles each */
-                             MPI_DOUBLE,     /* of type double */
+                             MPI_DOUBLE,               /* of type double */
                              proc,                     /* receive from this procesor only */
                              VERTEX_BLOCK + iteration, /* receive only VERTEX BLOCKs */
                              (MPI_Comm)communicator,   /* default communicator */
@@ -2595,7 +2593,7 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
 
             rval = MPI_Recv( ARRPTR( vertex_pack ),    /* message buffer */
                              4 * num,                  /* num data's item with 4 doubles each */
-                             MPI_DOUBLE,     /* of type double */
+                             MPI_DOUBLE,               /* of type double */
                              proc,                     /* receive from this procesor only */
                              VERTEX_BLOCK + iteration, /* receive only VERTEX BLOCKs */
                              (MPI_Comm)communicator,   /* default communicator */

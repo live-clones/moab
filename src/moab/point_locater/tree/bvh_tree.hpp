@@ -212,12 +212,16 @@ class Bvh_tree
                 }
             }
             if( entity_handles.size() != entity_handles_.size() )
-            { std::cout << "Entity Handle Size Mismatch!" << std::endl; }
+            {
+                std::cout << "Entity Handle Size Mismatch!" << std::endl;
+            }
             typedef typename Entity_handles::iterator Entity_iterator_;
             for( Entity_iterator_ i = entity_handles_.begin(); i != entity_handles_.end(); ++i )
             {
                 if( entity_handles.find( *i ) == entity_handles.end() )
-                { std::cout << "Tree is missing an entity! " << std::endl; }
+                {
+                    std::cout << "Tree is missing an entity! " << std::endl;
+                }
             }
 
 #endif
@@ -289,7 +293,9 @@ class Bvh_tree
                 const std::size_t index = bucket_index( box, interval, dim );
                 _bvh::_Bucket& bucket   = buckets[dim][index];
                 if( !box_contains_box( bucket.bounding_box, box ) )
-                { std::cerr << "Buckets not covering elements!" << std::endl; }
+                {
+                    std::cerr << "Buckets not covering elements!" << std::endl;
+                }
             }
         }
         if( !box_contains_box( elt_union, interval ) )
@@ -321,7 +327,9 @@ class Bvh_tree
                 ct::update_bounding_box( test_box, buckets_[nonempty[i]].bounding_box );
             }
             if( !box_contains_box( test_box, interval ) )
-            { std::cout << "union of buckets in dimension: " << d << "does not contain original box!" << std::endl; }
+            {
+                std::cout << "union of buckets in dimension: " << d << "does not contain original box!" << std::endl;
+            }
             if( !box_contains_box( interval, test_box ) )
             {
                 std::cout << "original box does "
@@ -467,9 +475,13 @@ class Bvh_tree
         typename Split_data::Box test_box = data.left_box;
         ct::update_bounding_box( test_box, data.right_box );
         if( !box_contains_box( data.bounding_box, test_box ) )
-        { std::cerr << "MEDIAN: BB Does not contain splits" << std::endl; }
+        {
+            std::cerr << "MEDIAN: BB Does not contain splits" << std::endl;
+        }
         if( !box_contains_box( test_box, data.bounding_box ) )
-        { std::cerr << "MEDIAN: splits do not contain BB" << std::endl; }
+        {
+            std::cerr << "MEDIAN: splits do not contain BB" << std::endl;
+        }
 #endif
     }
 
@@ -574,13 +586,21 @@ class Bvh_tree
             }
         }
         if( !box_contains_box( left_box, data.left_box ) )
-        { std::cout << "left elts do not contain left box" << std::endl; }
+        {
+            std::cout << "left elts do not contain left box" << std::endl;
+        }
         if( !box_contains_box( data.left_box, left_box ) )
-        { std::cout << "left box does not contain left elts" << std::endl; }
+        {
+            std::cout << "left box does not contain left elts" << std::endl;
+        }
         if( !box_contains_box( right_box, data.right_box ) )
-        { std::cout << "right elts do not contain right box" << std::endl; }
+        {
+            std::cout << "right elts do not contain right box" << std::endl;
+        }
         if( !box_contains_box( data.right_box, right_box ) )
-        { std::cout << "right box do not contain right elts" << std::endl; }
+        {
+            std::cout << "right box do not contain right elts" << std::endl;
+        }
         if( count_left != data.nl || count_right != data.nr )
         {
             std::cerr << "counts are off!" << std::endl;

@@ -351,8 +351,7 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
         double* ecoords = &elcoords[iel * 3];
 
         // do a projection if needed
-        if (projection_type > 0)
-            IntxUtils::transform_coordinates(ecoords, projection_type);
+        if( projection_type > 0 ) IntxUtils::transform_coordinates( ecoords, projection_type );
 
         // Compute the coordinate's part assignment
         myZZ->LB_Point_PP_Assign( ecoords, proc, part );
@@ -415,17 +414,15 @@ ErrorCode ZoltanPartitioner::partition_inferred_mesh( EntityHandle sfileset, siz
     return MB_SUCCESS;
 }
 
-ErrorCode ZoltanPartitioner::partition_mesh_and_geometry( const double part_geom_mesh_size, const int nparts,
-                                                          const char* zmethod, const char* other_method,
-                                                          double imbal_tol, const int part_dim,
-                                                          const bool write_as_sets, const bool write_as_tags,
-                                                          const int obj_weight, const int edge_weight,
+ErrorCode ZoltanPartitioner::partition_mesh_and_geometry(
+    const double part_geom_mesh_size, const int nparts, const char* zmethod, const char* other_method, double imbal_tol,
+    const int part_dim, const bool write_as_sets, const bool write_as_tags, const int obj_weight, const int edge_weight,
 #ifdef MOAB_HAVE_CGM
-                                                          const bool part_surf, const bool ghost,
+    const bool part_surf, const bool ghost,
 #else
-                                                          const bool, const bool,
+    const bool, const bool,
 #endif
-                                                          const int projection_type, const bool recompute_rcb_box, const bool print_time )
+    const int projection_type, const bool recompute_rcb_box, const bool print_time )
 {
     // should only be called in serial
     if( mbpc->proc_config().proc_size() != 1 )
@@ -557,7 +554,7 @@ ErrorCode ZoltanPartitioner::partition_mesh_and_geometry( const double part_geom
     if( NULL == myZZ ) myZZ = new Zoltan( mbpc->comm() );
 
     if( NULL == zmethod || !strcmp( zmethod, "RCB" ) )
-        SetRCB_Parameters(recompute_rcb_box);
+        SetRCB_Parameters( recompute_rcb_box );
     else if( !strcmp( zmethod, "RIB" ) )
         SetRIB_Parameters();
     else if( !strcmp( zmethod, "HSFC" ) )
@@ -818,8 +815,7 @@ ErrorCode ZoltanPartitioner::assemble_graph( const int dimension, std::vector< d
         // copy those into coords vector
         moab_ids.push_back( moab_id );
         // transform coordinates to spherical coordinates, if requested
-        if (projection_type > 0)
-            IntxUtils::transform_coordinates(avg_position, projection_type);
+        if( projection_type > 0 ) IntxUtils::transform_coordinates( avg_position, projection_type );
 
         std::copy( avg_position, avg_position + 3, std::back_inserter( coords ) );
     }
@@ -1701,7 +1697,7 @@ ErrorCode ZoltanPartitioner::write_partition( const int nparts, Range& elems, co
     return MB_SUCCESS;
 }
 
-void ZoltanPartitioner::SetRCB_Parameters(const bool recompute_rcb_box)
+void ZoltanPartitioner::SetRCB_Parameters( const bool recompute_rcb_box )
 {
     if( mbpc->proc_config().proc_rank() == 0 ) std::cout << "\nRecursive Coordinate Bisection" << std::endl;
     // General parameters:
@@ -1715,8 +1711,7 @@ void ZoltanPartitioner::SetRCB_Parameters(const bool recompute_rcb_box)
     myZZ->Set_Param( "RCB_OUTPUT_LEVEL", "1" );
     myZZ->Set_Param( "KEEP_CUTS", "1" );  // save decomposition so that we can infer partitions
     // myZZ->Set_Param("RCB_RECTILINEAR_BLOCKS", "1"); // don't split point on boundary
-    if (recompute_rcb_box)
-        myZZ->Set_Param( "RCB_RECOMPUTE_BOX", "1" );
+    if( recompute_rcb_box ) myZZ->Set_Param( "RCB_RECOMPUTE_BOX", "1" );
 }
 
 void ZoltanPartitioner::SetRIB_Parameters()
@@ -1976,7 +1971,9 @@ void ZoltanPartitioner::mbPrintGlobalResult( const char* s, int begin, int impor
     v1[3] = change;
 
     if( mbpc->proc_config().proc_rank() == 0 )
-    { v2 = (int*)malloc( 4 * mbpc->proc_config().proc_size() * sizeof( int ) ); }
+    {
+        v2 = (int*)malloc( 4 * mbpc->proc_config().proc_size() * sizeof( int ) );
+    }
 
     MPI_Gather( v1, 4, MPI_INT, v2, 4, MPI_INT, 0, mbpc->comm() );
 

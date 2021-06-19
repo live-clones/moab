@@ -994,7 +994,9 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][3], unsigned 
 
     // calculate the shape and size
     if( metrics_request_flag & V_TET_SHAPE_AND_SIZE )
-    { metric_vals->shape_and_size = (double)( metric_vals->shape * metric_vals->relative_size_squared ); }
+    {
+        metric_vals->shape_and_size = (double)( metric_vals->shape * metric_vals->relative_size_squared );
+    }
 
     // calculate the scaled jacobian
     if( metrics_request_flag & V_TET_SCALED_JACOBIAN )
@@ -1046,7 +1048,9 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][3], unsigned 
 
     // calculate the distortion
     if( metrics_request_flag & V_TET_DISTORTION )
-    { metric_vals->distortion = v_tet_distortion( num_nodes, coordinates ); }
+    {
+        metric_vals->distortion = v_tet_distortion( num_nodes, coordinates );
+    }
 
     // check for overflow
     if( metrics_request_flag & V_TET_ASPECT_BETA )

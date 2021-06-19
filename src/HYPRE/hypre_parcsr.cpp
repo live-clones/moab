@@ -246,7 +246,9 @@ namespace internal
         {
             coef = eliminate_col[i];
             if( coef == coef )  // test for NaN
-            { num_offd_cols_to_elim++; }
+            {
+                num_offd_cols_to_elim++;
+            }
         }
 
         offd_cols_to_elim = hypre_CTAlloc( HYPRE_Int, num_offd_cols_to_elim );

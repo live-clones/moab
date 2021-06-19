@@ -890,7 +890,9 @@ void NonSmoothDescent::step_acceptance( PatchData& pd, int iterCount, const Vect
         }
     }
     if( current_improvement > 0 && optStatus == MSQ_STEP_ACCEPTED )
-    { MSQ_PRINT( 2 )( "Accepted a negative step %f \n", current_improvement ); }
+    {
+        MSQ_PRINT( 2 )( "Accepted a negative step %f \n", current_improvement );
+    }
 }
 
 bool NonSmoothDescent::compute_function( PatchData* patch_data, std::vector< double >& func, MsqError& err )
@@ -1113,7 +1115,9 @@ bool NonSmoothDescent::check_vector_dots( const std::vector< Vector3D >& vec, co
     {
         double dot = vec[i] % normal;
         if( ( ( dot > 0 && test_dot < 0 ) || ( dot < 0 && test_dot > 0 ) ) && ( fabs( dot ) > EPSILON ) )
-        { return true; }
+        {
+            return true;
+        }
     }
     return false;
 }

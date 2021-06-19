@@ -76,7 +76,9 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
     if( subset_list )
     {
         if( subset_list->tag_list_length > 1 && !strcmp( subset_list->tag_list[0].tag_name, MATERIAL_SET_TAG_NAME ) )
-        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "GMsh supports subset read only by material ID" ); }
+        {
+            MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "GMsh supports subset read only by material ID" );
+        }
         material_set_list = subset_list->tag_list[0].tag_values;
         num_material_sets = subset_list->tag_list[0].num_tag_values;
     }
@@ -167,7 +169,9 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
             return MB_FILE_WRITE_ERROR;
 
         if( !node_id_map.insert( std::pair< long, EntityHandle >( id, handle ) ).second )
-        { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Duplicate node ID at line " << tokens.line_number() ); }
+        {
+            MB_SET_ERR( MB_FILE_WRITE_ERROR, "Duplicate node ID at line " << tokens.line_number() );
+        }
     }
 
     // Create reverse map from handle to id
@@ -286,7 +290,9 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
         {
             std::map< long, EntityHandle >::iterator k = node_id_map.find( tmp_conn[j] );
             if( k == node_id_map.end() )
-            { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid node ID at line " << tokens.line_number() ); }
+            {
+                MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid node ID at line " << tokens.line_number() );
+            }
             connectivity.push_back( k->second );
         }
     }  // for (num_nodes)

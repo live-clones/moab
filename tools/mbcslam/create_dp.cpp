@@ -186,9 +186,13 @@ int main( int argc, char** argv )
     while( index < argc )
     {
         if( !strcmp( argv[index], "-t" ) )  // this is for radius to project
-        { t = atof( argv[++index] ); }
+        {
+            t = atof( argv[++index] );
+        }
         if( !strcmp( argv[index], "-dt" ) )  // delete partition sets
-        { dt = atof( argv[++index] ); }
+        {
+            dt = atof( argv[++index] );
+        }
 
         if( !strcmp( argv[index], "-h" ) )
         {
@@ -197,7 +201,9 @@ int main( int argc, char** argv )
             return 1;
         }
         if( !strcmp( argv[index], "-f" ) )  // delete partition sets
-        { field_type = atoi( argv[++index] ); }
+        {
+            field_type = atoi( argv[++index] );
+        }
 
         if( !strcmp( argv[index], "-skipdp" ) ) { skip = true; }
         index++;

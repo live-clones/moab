@@ -59,16 +59,16 @@ C_FUNC_DEF void v_set_hex_size( double size )
     verdict_hex_size = size;
 }
 
-#define make_hex_nodes( coord, pos )                                         \
-    for( int mhcii = 0; mhcii < 8; mhcii++ )                                 \
-    {                                                                        \
-        (pos)[mhcii].set( (coord)[mhcii][0], (coord)[mhcii][1], (coord)[mhcii][2] ); \
+#define make_hex_nodes( coord, pos )                                                         \
+    for( int mhcii = 0; mhcii < 8; mhcii++ )                                                 \
+    {                                                                                        \
+        ( pos )[mhcii].set( ( coord )[mhcii][0], ( coord )[mhcii][1], ( coord )[mhcii][2] ); \
     }
 
-#define make_edge_length_squares( edges, lengths )          \
-    {                                                       \
-        for( int melii = 0; melii < 12; melii++ )           \
-            (lengths)[melii] = (edges)[melii].length_squared(); \
+#define make_edge_length_squares( edges, lengths )                  \
+    {                                                               \
+        for( int melii = 0; melii < 12; melii++ )                   \
+            ( lengths )[melii] = ( edges )[melii].length_squared(); \
     }
 
 //! make VerdictVectors from coordinates
@@ -2551,7 +2551,9 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
 
             if( vec1.normalize() <= VERDICT_DBL_MIN || vec2.normalize() <= VERDICT_DBL_MIN ||
                 vec3.normalize() <= VERDICT_DBL_MIN )
-            { metric_vals->skew = (double)VERDICT_DBL_MAX; }
+            {
+                metric_vals->skew = (double)VERDICT_DBL_MAX;
+            }
             else
             {
                 double skewx = fabs( vec1 % vec2 );
@@ -2644,13 +2646,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[0] <= VERDICT_DBL_MIN || length_squared[3] <= VERDICT_DBL_MIN ||
                 length_squared[8] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2687,13 +2693,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[1] <= VERDICT_DBL_MIN || length_squared[0] <= VERDICT_DBL_MIN ||
                 length_squared[9] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2730,13 +2740,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[2] <= VERDICT_DBL_MIN || length_squared[1] <= VERDICT_DBL_MIN ||
                 length_squared[10] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2773,13 +2787,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[3] <= VERDICT_DBL_MIN || length_squared[2] <= VERDICT_DBL_MIN ||
                 length_squared[11] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2816,13 +2834,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[4] <= VERDICT_DBL_MIN || length_squared[8] <= VERDICT_DBL_MIN ||
                 length_squared[7] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2859,13 +2881,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[4] <= VERDICT_DBL_MIN || length_squared[5] <= VERDICT_DBL_MIN ||
                 length_squared[9] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2902,13 +2928,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[5] <= VERDICT_DBL_MIN || length_squared[6] <= VERDICT_DBL_MIN ||
                 length_squared[10] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =
@@ -2945,13 +2975,17 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( current_jacobian < jacobian ) jacobian = current_jacobian;
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )
-        { det_sum += current_jacobian; }
+        {
+            det_sum += current_jacobian;
+        }
 
         if( metrics_request_flag & ( V_HEX_SCALED_JACOBIAN | V_HEX_SHEAR | V_HEX_SHEAR_AND_SIZE ) )
         {
             if( length_squared[6] <= VERDICT_DBL_MIN || length_squared[7] <= VERDICT_DBL_MIN ||
                 length_squared[11] <= VERDICT_DBL_MIN )
-            { current_scaled_jacobian = VERDICT_DBL_MAX; }
+            {
+                current_scaled_jacobian = VERDICT_DBL_MAX;
+            }
             else
             {
                 current_scaled_jacobian =

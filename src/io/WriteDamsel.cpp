@@ -501,7 +501,9 @@ ErrorCode WriteDamsel::write_sets( RangeSeqIntersectIter& rsi )
         ents.clear();
         rval = mbImpl->get_entities_by_handle( seth, ents );MB_CHK_SET_ERR( rval, "get_entities_by_handle failed for set " << seth );
         if( !ents.empty() )
-        { mcont = DMSLcontainer_create_vector( dU.dmslModel, (damsel_handle*)&ents[0], ents.size() ); }
+        {
+            mcont = DMSLcontainer_create_vector( dU.dmslModel, (damsel_handle*)&ents[0], ents.size() );
+        }
         else
         {
             mcont = DMSLcontainer_create_vector( dU.dmslModel, (damsel_handle*)NULL, 0 );

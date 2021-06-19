@@ -1504,7 +1504,9 @@ void iMeshP_getPartsArrOnRank( iMesh_Instance instance, const iMeshP_PartitionHa
     if( !pc ) RETURN( iBase_ERROR_MAP[MB_FAILURE] );
 
     if( rank[0] != (int)pc->proc_config().proc_rank() || rank_size > 1 )
-    { RETURN( iBase_ERROR_MAP[MB_NOT_IMPLEMENTED] ); }
+    {
+        RETURN( iBase_ERROR_MAP[MB_NOT_IMPLEMENTED] );
+    }
 
     iMeshP_getPartsOnRank( instance, partition_handle, rank[0], part_handles, part_handles_allocated, part_handles_size,
                            err );

@@ -57,10 +57,10 @@ class MergeMesh
     double mergeTol, mergeTolSq;
 
     //- entities which will go away after the merge
-    std::set<EntityHandle> deadEnts;
+    std::set< EntityHandle > deadEnts;
 
     // vertices that were merged with other vertices, and were left in the database
-    std::set<EntityHandle>  mergedToVertices;
+    std::set< EntityHandle > mergedToVertices;
 
     // Allow a warning to be suppressed when no merging is done
     bool printError;

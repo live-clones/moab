@@ -64,17 +64,17 @@ void query_vert_to_elem_direct();
 ErrorCode normalize_elems( double* coords );
 void check_answers( const char* );
 
-#define RC( msg )                                        \
-    if( MB_SUCCESS != result ) do                        \
-        {                                                \
-            std::cout << "FAIL in " << (msg) << std::endl; \
-            return;                                      \
+#define RC( msg )                                            \
+    if( MB_SUCCESS != result ) do                            \
+        {                                                    \
+            std::cout << "FAIL in " << ( msg ) << std::endl; \
+            return;                                          \
     } while( true )
-#define RR( msg )                                        \
-    if( MB_SUCCESS != result ) do                        \
-        {                                                \
-            std::cout << "FAIL in " << (msg) << std::endl; \
-            return result;                               \
+#define RR( msg )                                            \
+    if( MB_SUCCESS != result ) do                            \
+        {                                                    \
+            std::cout << "FAIL in " << ( msg ) << std::endl; \
+            return result;                                   \
     } while( true )
 
 void compute_edge( double* start, const int nelem, const double xint, const int stride )
@@ -134,7 +134,7 @@ void build_coords( const int nelem, double*& coords )
     coords       = new double[3 * tot_numv];
 
 // use FORTRAN-like indexing
-#define VINDEX( i, j, k ) ( (i) + ( (j) * numv ) + ( (k) * numv_sq ) )
+#define VINDEX( i, j, k ) ( ( i ) + ( (j)*numv ) + ( (k)*numv_sq ) )
     int idx;
     double scale1, scale2, scale3;
     // use these to prevent optimization on 1-scale, etc (real map wouldn't have

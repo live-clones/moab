@@ -31,7 +31,6 @@ int main( int argc, char* argv[] )
 
     opts.parseCommandLine( argc, argv );
 
-
     std::cout << "phys grid cloud file: " << physfile << "\n";
     std::cout << "pg2 mesh file: " << pg2file << "\n";
     std::cout << "output file: " << outfile << "\n";

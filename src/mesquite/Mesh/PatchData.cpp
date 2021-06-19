@@ -1128,7 +1128,9 @@ void PatchData::snap_vertex_to_domain( size_t vertex_index, MsqError& err )
     {
         // if not doing normal caching or vertex is not on a single surface
         if( normalData.empty() )
-        { get_domain()->snap_to( vertexHandlesArray[vertex_index], vertexArray[vertex_index] ); }
+        {
+            get_domain()->snap_to( vertexHandlesArray[vertex_index], vertexArray[vertex_index] );
+        }
         // entire domain is 2-D (all vertices have a single normal)
         else if( vertexNormalIndices.empty() )
         {

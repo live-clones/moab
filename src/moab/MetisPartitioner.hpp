@@ -40,13 +40,11 @@ class MetisPartitioner : public PartitionerBase< idx_t >
 
     virtual ~MetisPartitioner();
 
-    virtual ErrorCode partition_mesh_and_geometry( const double part_geom_mesh_size, const idx_t nparts,
-                                                   const char* zmethod, const char* other_method, double imbal_tol,
-                                                   const int part_dim = 3, const bool write_as_sets = true,
-                                                   const bool write_as_tags = false, const int obj_weight = 0,
-                                                   const int edge_weight = 0, const bool part_surf = false,
-                                                   const bool ghost = false, const int projection_type = 0, const bool recompute_rcb_box = false,
-                                                   const bool print_time = false );
+    virtual ErrorCode partition_mesh_and_geometry(
+        const double part_geom_mesh_size, const idx_t nparts, const char* zmethod, const char* other_method,
+        double imbal_tol, const int part_dim = 3, const bool write_as_sets = true, const bool write_as_tags = false,
+        const int obj_weight = 0, const int edge_weight = 0, const bool part_surf = false, const bool ghost = false,
+        const int projection_type = 0, const bool recompute_rcb_box = false, const bool print_time = false );
 
     virtual ErrorCode partition_mesh( const idx_t nparts, const char* method, const int part_dim = 3,
                                       const bool write_as_sets = true, const bool write_as_tags = false,
@@ -83,8 +81,8 @@ class MetisPartitioner : public PartitionerBase< idx_t >
 inline ErrorCode MetisPartitioner::partition_mesh_and_geometry( const double, const idx_t nparts, const char* zmethod,
                                                                 const char*, double, const int part_dim,
                                                                 const bool write_as_sets, const bool write_as_tags,
-                                                                const int, const int, const bool, const bool,
-                                                                const int, const bool, const bool print_time )
+                                                                const int, const int, const bool, const bool, const int,
+                                                                const bool, const bool print_time )
 {
     // Only partition the mesh - no geometric partition available
     return partition_mesh( nparts, zmethod, part_dim, write_as_sets, write_as_tags, false, false, NULL, print_time );

@@ -186,8 +186,11 @@ void compare_nodes( size_t start_index, size_t end_index, Mesh* mesh1, Mesh* mes
         {
             MSQ_SETERR( err )
             ( MsqError::INTERNAL_ERROR, "%u%s vertices differ. (%f,%f,%f) vs (%f,%f,%f)", (unsigned)( 1 + i ),
-              i % 10 == 0 ? "st" : i % 10 == 1 ? "nd" : i % 10 == 2 ? "rd" : "th", verts1[i][0], verts1[i][1],
-              verts1[i][2], verts2[i][0], verts2[i][1], verts2[i][2] );
+              i % 10 == 0   ? "st"
+              : i % 10 == 1 ? "nd"
+              : i % 10 == 2 ? "rd"
+                            : "th",
+              verts1[i][0], verts1[i][1], verts1[i][2], verts2[i][0], verts2[i][1], verts2[i][2] );
             return;
         }
     }

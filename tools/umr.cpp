@@ -3,10 +3,10 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
-#if defined(__MINGW32__)
-  #include <sys/time.h>
+#if defined( __MINGW32__ )
+#include <sys/time.h>
 #else
-  #include <ctime>
+#include <ctime>
 #endif
 
 #include <ctime>

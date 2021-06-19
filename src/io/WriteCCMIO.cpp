@@ -183,7 +183,9 @@ ErrorCode WriteCCMIO::write_file( const char* file_name, const bool overwrite, c
 
     // If entity handles were input but didn't contain matsets, return error
     if( ent_handles && matsets.empty() )
-    { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Sets input to write but no material sets found" ); }
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "Sets input to write but no material sets found" );
+    }
 
     // Otherwise, if no matsets, use root set
     if( matsets.empty() ) matsets.push_back( 0 );
@@ -1222,7 +1224,9 @@ ErrorCode WriteCCMIO::write_external_faces( CCMIOID rootID, CCMIOID topologyID, 
         // Check we don't bound more than one cell being output
         result = mbImpl->tag_get_data( mEntityMark, &cells[0], cells.size(), cmarks );MB_CHK_SET_ERR( result, "Trouble getting mark tags on cells bounding facets" );
         if( cells.size() == 2 && ( mWholeMesh || ( cmarks[0] && cmarks[1] ) ) )
-        { MB_SET_ERR( MB_FILE_WRITE_ERROR, "External facet with two output bounding cells" ); }
+        {
+            MB_SET_ERR( MB_FILE_WRITE_ERROR, "External facet with two output bounding cells" );
+        }
         else if( 1 == cells.size() && !mWholeMesh && !cmarks[0] )
         {
             MB_SET_ERR( MB_FILE_WRITE_ERROR, "External facet with no output bounding cells" );

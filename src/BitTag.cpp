@@ -402,7 +402,9 @@ ErrorCode BitTag::find_entities_with_value( const SequenceManager*, Error* /* er
                                             const Range* intersect_entities ) const
 {
     if( value_bytes && value_bytes != 1 )
-    { MB_SET_ERR( MB_INVALID_SIZE, "Invalid tag size for bit tag: " << value_bytes << " bytes" ); }
+    {
+        MB_SET_ERR( MB_INVALID_SIZE, "Invalid tag size for bit tag: " << value_bytes << " bytes" );
+    }
 
     const signed char bits = *reinterpret_cast< const unsigned char* >( value );
     if( intersect_entities )

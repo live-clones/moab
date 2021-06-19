@@ -49,17 +49,17 @@ namespace moab
 
 #define GET_DIM( ncdim, name, val )                                                                            \
     {                                                                                                          \
-        int gdfail = nc_inq_dimid( ncFile, name, &(ncdim) );                                                     \
+        int gdfail = nc_inq_dimid( ncFile, name, &( ncdim ) );                                                 \
         if( NC_NOERR == gdfail )                                                                               \
         {                                                                                                      \
             size_t tmp_val;                                                                                    \
             gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                                                 \
             if( NC_NOERR != gdfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); } \
             else                                                                                               \
-                (val) = tmp_val;                                                                                 \
+                ( val ) = tmp_val;                                                                             \
         }                                                                                                      \
         else                                                                                                   \
-            (val) = 0;                                                                                           \
+            ( val ) = 0;                                                                                       \
     }
 
 #define GET_DIMB( ncdim, name, varname, id, val ) \
@@ -68,51 +68,53 @@ namespace moab
 
 #define GET_VAR( name, id, dims )                                                               \
     {                                                                                           \
-        (id)         = -1;                                                                        \
-        int gvfail = nc_inq_varid( ncFile, name, &(id) );                                         \
+        ( id )     = -1;                                                                        \
+        int gvfail = nc_inq_varid( ncFile, name, &( id ) );                                     \
         if( NC_NOERR == gvfail )                                                                \
         {                                                                                       \
             int ndims;                                                                          \
             gvfail = nc_inq_varndims( ncFile, id, &ndims );                                     \
             if( NC_NOERR == gvfail )                                                            \
             {                                                                                   \
-                (dims).resize( ndims );                                                           \
-                gvfail = nc_inq_vardimid( ncFile, id, &(dims)[0] );                               \
+                ( dims ).resize( ndims );                                                       \
+                gvfail = nc_inq_vardimid( ncFile, id, &( dims )[0] );                           \
                 if( NC_NOERR != gvfail )                                                        \
-                { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get variable dimension IDs" ); } \
+                {                                                                               \
+                    MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get variable dimension IDs" ); \
+                }                                                                               \
             }                                                                                   \
         }                                                                                       \
     }
 
-#define GET_1D_INT_VAR( name, id, vals )                                                                           \
-    {                                                                                                              \
-        GET_VAR( name, id, vals );                                                                                 \
-        if( -1 != (id) )                                                                                             \
-        {                                                                                                          \
-            size_t ntmp;                                                                                           \
-            int ivfail = nc_inq_dimlen( ncFile, (vals)[0], &ntmp );                                                  \
-            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }     \
-            (vals).resize( ntmp );                                                                                   \
-            size_t ntmp1 = 0;                                                                                      \
-            ivfail       = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &(vals)[0] );                                 \
-            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << (name) ); } \
-        }                                                                                                          \
+#define GET_1D_INT_VAR( name, id, vals )                                                                               \
+    {                                                                                                                  \
+        GET_VAR( name, id, vals );                                                                                     \
+        if( -1 != ( id ) )                                                                                             \
+        {                                                                                                              \
+            size_t ntmp;                                                                                               \
+            int ivfail = nc_inq_dimlen( ncFile, ( vals )[0], &ntmp );                                                  \
+            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }         \
+            ( vals ).resize( ntmp );                                                                                   \
+            size_t ntmp1 = 0;                                                                                          \
+            ivfail       = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                                 \
+            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << ( name ) ); } \
+        }                                                                                                              \
     }
 
-#define GET_1D_DBL_VAR( name, id, vals )                                                                           \
-    {                                                                                                              \
-        std::vector< int > dum_dims;                                                                               \
-        GET_VAR( name, id, dum_dims );                                                                             \
-        if( -1 != (id) )                                                                                             \
-        {                                                                                                          \
-            size_t ntmp;                                                                                           \
-            int dvfail = nc_inq_dimlen( ncFile, dum_dims[0], &ntmp );                                              \
-            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }     \
-            (vals).resize( ntmp );                                                                                   \
-            size_t ntmp1 = 0;                                                                                      \
-            dvfail       = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &(vals)[0] );                              \
-            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << (name) ); } \
-        }                                                                                                          \
+#define GET_1D_DBL_VAR( name, id, vals )                                                                               \
+    {                                                                                                                  \
+        std::vector< int > dum_dims;                                                                                   \
+        GET_VAR( name, id, dum_dims );                                                                                 \
+        if( -1 != ( id ) )                                                                                             \
+        {                                                                                                              \
+            size_t ntmp;                                                                                               \
+            int dvfail = nc_inq_dimlen( ncFile, dum_dims[0], &ntmp );                                                  \
+            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Couldn't get dimension length" ); }         \
+            ( vals ).resize( ntmp );                                                                                   \
+            size_t ntmp1 = 0;                                                                                          \
+            dvfail       = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                              \
+            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting variable " << ( name ) ); } \
+        }                                                                                                              \
     }
 
 ReaderIface* ReadNCDF::factory( Interface* iface )
@@ -196,12 +198,16 @@ ErrorCode ReadNCDF::read_tag_values( const char* file_name, const char* tag_name
                                      std::vector< int >& id_array, const SubsetList* subset_list )
 {
     if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader supports subset read only by material ID" ); }
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader supports subset read only by material ID" );
+    }
 
     // Open netcdf/exodus file
     int fail = nc_open( file_name, 0, &ncFile );
     if( NC_NOWRITE != fail )
-    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << file_name ); }
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << file_name );
+    }
 
     // 1. Read the header
     ErrorCode rval = read_exodus_header();
@@ -260,9 +266,13 @@ ErrorCode ReadNCDF::load_file( const char* exodus_file_name, const EntityHandle*
     if( subset_list )
     {
         if( subset_list->tag_list_length > 1 || !strcmp( subset_list->tag_list[0].tag_name, MATERIAL_SET_TAG_NAME ) )
-        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader supports subset read only by material ID" ); }
+        {
+            MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader supports subset read only by material ID" );
+        }
         if( subset_list->num_parts )
-        { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader does not support mesh partitioning" ); }
+        {
+            MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "ExodusII reader does not support mesh partitioning" );
+        }
         blocks_to_load = subset_list->tag_list[0].tag_values;
         num_blocks     = subset_list->tag_list[0].num_tag_values;
     }
@@ -284,7 +294,9 @@ ErrorCode ReadNCDF::load_file( const char* exodus_file_name, const EntityHandle*
     // open netcdf/exodus file
     fail = nc_open( exodus_file_name, 0, &ncFile );
     if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name ); }
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name );
+    }
 
     // 1. Read the header
     status = read_exodus_header();
@@ -376,9 +388,13 @@ ErrorCode ReadNCDF::read_exodus_header()
     size_t att_len;
     fail = nc_inq_att( ncFile, NC_GLOBAL, "floating_point_word_size", &att_type, &att_len );
     if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting floating_point_word_size attribute" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting floating_point_word_size attribute" );
+    }
     if( att_type != NC_INT || att_len != 1 )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Word size didn't have type int or size 1" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Word size didn't have type int or size 1" );
+    }
     fail = nc_get_att_int( ncFile, NC_GLOBAL, "floating_point_word_size", &IO_WORD_SIZE );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Trouble getting word size" ); }
 
@@ -386,7 +402,9 @@ ErrorCode ReadNCDF::read_exodus_header()
     fail = nc_inq_att( ncFile, NC_GLOBAL, "version", &att_type, &att_len );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting version attribute" ); }
     if( att_type != NC_FLOAT || att_len != 1 )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Version didn't have type float or size 1" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Version didn't have type float or size 1" );
+    }
     // float version = temp_att->as_float(0);
 
     // Read in initial variables
@@ -447,7 +465,9 @@ ErrorCode ReadNCDF::read_nodes( const Tag* file_id_tag )
             start[0] = d;
             fail     = nc_get_vara_double( ncFile, coord, start, count, arrays[d] );
             if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" );
+            }
         }
     }
     // Var for each coord
@@ -459,11 +479,15 @@ ErrorCode ReadNCDF::read_nodes( const Tag* file_id_tag )
             varname[5] = 'x' + (char)d;
             fail       = nc_inq_varid( ncFile, varname, &coord );
             if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord variable" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord variable" );
+            }
 
             fail = nc_get_vara_double( ncFile, coord, start, &count[1], arrays[d] );
             if( NC_NOERR != fail )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting " << (char)( 'x' + d ) << " coord array" );
+            }
         }
     }
 
@@ -685,7 +709,9 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             GET_VAR( temp_string, nc_var, dims );
 
             if( -1 == nc_var || 0 == nc_var )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting connec or faccon variable" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting connec or faccon variable" );
+            }
         }
         nc_type att_type;
         size_t att_len;
@@ -852,7 +878,9 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
             for( int i = number_nodes - 1; i >= 0; --i )
             {
                 if( (unsigned)tmp_ptr[i] >= nodesInLoadedBlocks.size() )
-                { MB_SET_ERR( MB_FAILURE, "Invalid node ID in block connectivity" ); }
+                {
+                    MB_SET_ERR( MB_FAILURE, "Invalid node ID in block connectivity" );
+                }
                 nodesInLoadedBlocks[tmp_ptr[i]] = 1;
                 conn[i]                         = static_cast< EntityHandle >( tmp_ptr[i] ) + vertexOffset;
             }
@@ -865,7 +893,9 @@ ErrorCode ReadNCDF::read_elements( const Tag* file_id_tag )
                                                ExoIIUtil::VerticesPerElement[( *this_it ).elemType], conn );
 
             if( result == -1 )
-            { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: error getting element connectivity for block " << block_id ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "ReadNCDF:: error getting element connectivity for block " << block_id );
+            }
 
             // Set the block id with an offset
             if( mdbImpl->tag_set_data( mMaterialSetTag, &ms_handle, 1, &block_id ) != MB_SUCCESS ) return MB_FAILURE;
@@ -1648,7 +1678,9 @@ ErrorCode ReadNCDF::read_qa_string( char* temp_string, int record_number, int re
     count[2] = max_str_length;
     int fail = nc_get_vara_text( ncFile, temp_var, start, count, temp_string );
     if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem setting current record number variable position" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem setting current record number variable position" );
+    }
     // Get the variable id in the exodus file
 
     return MB_SUCCESS;
@@ -1715,16 +1747,20 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     // 2. Check for the operations, currently support set.
     const char* op;
     if( tokens.size() < 3 || ( tokens[2] != "set" && tokens[2] != "add" ) )
-    { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "ReadNCDF: invalid operation specified for update" ); }
+    {
+        MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "ReadNCDF: invalid operation specified for update" );
+    }
     op = tokens[2].c_str();
 
     // Open netcdf/exodus file
     ncFile   = 0;
     int fail = nc_open( exodus_file_name, 0, &ncFile );
     if( !ncFile )
-    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name ); }
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf/Exodus II file " << exodus_file_name );
+    }
 
-    rval = read_exodus_header();MB_CHK_ERR(rval);
+    rval = read_exodus_header();MB_CHK_ERR( rval );
 
     // Check to make sure that the requested time step exists
     int ncdim = -1;
@@ -1776,7 +1812,9 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     GET_VAR( "vals_nod_var2", coordy, dims );
     if( numberDimensions_loading == 3 ) GET_VAR( "vals_nod_var3", coordz, dims );
     if( -1 == coordx || -1 == coordy || ( numberDimensions_loading == 3 && -1 == coordz ) )
-    { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting coords variable" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting coords variable" );
+    }
 
     fail = nc_get_vara_double( ncFile, coordx, start, count, &deformed_arrays[0][0] );
     if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "ReadNCDF:: Problem getting x deformation array" ); }
@@ -1810,7 +1848,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
     // Get nodes in cubit file
     Range cub_verts;
-    rval = mdbImpl->get_entities_by_type( cub_file_set, MBVERTEX, cub_verts );MB_CHK_ERR(rval);
+    rval = mdbImpl->get_entities_by_type( cub_file_set, MBVERTEX, cub_verts );MB_CHK_ERR( rval );
     std::cout << "  cub_file_set contains " << cub_verts.size() << " nodes." << std::endl;
 
     // Some accounting
@@ -1831,7 +1869,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     if( match_node_ids )
     {
         std::vector< int > cub_ids( cub_verts.size() );
-        rval = mdbImpl->tag_get_data( mGlobalIdTag, cub_verts, &cub_ids[0] );MB_CHK_ERR(rval);
+        rval = mdbImpl->tag_get_data( mGlobalIdTag, cub_verts, &cub_ids[0] );MB_CHK_ERR( rval );
         for( unsigned i = 0; i != cub_verts.size(); ++i )
         {
             cub_verts_id_map.insert( std::pair< int, EntityHandle >( cub_ids[i], cub_verts[i] ) );
@@ -1842,9 +1880,9 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
     else
     {
         FileOptions tree_opts( "MAX_PER_LEAF=1;SPLITS_PER_DIR=1;CANDIDATE_PLANE_SET=0" );
-        rval = kdtree.build_tree( cub_verts, &root, &tree_opts );MB_CHK_ERR(rval);
+        rval = kdtree.build_tree( cub_verts, &root, &tree_opts );MB_CHK_ERR( rval );
         AdaptiveKDTreeIter tree_iter;
-        rval = kdtree.get_tree_iterator( root, tree_iter );MB_CHK_ERR(rval);
+        rval = kdtree.get_tree_iterator( root, tree_iter );MB_CHK_ERR( rval );
     }
 
     // For each exo vert, find the matching cub vert
@@ -1877,15 +1915,15 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
 
             std::vector< EntityHandle > leaves;
             double min_dist = MAX_NODE_DIST;
-            rval            = kdtree.distance_search( exo_coords.array(), MAX_NODE_DIST, leaves );MB_CHK_ERR(rval);
+            rval            = kdtree.distance_search( exo_coords.array(), MAX_NODE_DIST, leaves );MB_CHK_ERR( rval );
             for( std::vector< EntityHandle >::const_iterator j = leaves.begin(); j != leaves.end(); ++j )
             {
                 std::vector< EntityHandle > leaf_verts;
-                rval = mdbImpl->get_entities_by_type( *j, MBVERTEX, leaf_verts );MB_CHK_ERR(rval);
+                rval = mdbImpl->get_entities_by_type( *j, MBVERTEX, leaf_verts );MB_CHK_ERR( rval );
                 for( std::vector< EntityHandle >::const_iterator k = leaf_verts.begin(); k != leaf_verts.end(); ++k )
                 {
                     CartVect orig_cub_coords, difference;
-                    rval = mdbImpl->get_coords( &( *k ), 1, orig_cub_coords.array() );MB_CHK_ERR(rval);
+                    rval = mdbImpl->get_coords( &( *k ), 1, orig_cub_coords.array() );MB_CHK_ERR( rval );
                     difference  = orig_cub_coords - exo_coords;
                     double dist = difference.length();
                     if( dist < min_dist )
@@ -1907,7 +1945,7 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
             updated_exo_coords[1] = orig_coords[1][i] + deformed_arrays[1][i];
 
             if( numberDimensions_loading == 3 ) updated_exo_coords[2] = orig_coords[2][i] + deformed_arrays[2][i];
-            rval = mdbImpl->set_coords( &cub_vert, 1, updated_exo_coords.array() );MB_CHK_ERR(rval);
+            rval = mdbImpl->set_coords( &cub_vert, 1, updated_exo_coords.array() );MB_CHK_ERR( rval );
             ++found;
 
             double magnitude =
@@ -1937,10 +1975,10 @@ ErrorCode ReadNCDF::update( const char* exodus_file_name, const FileOptions& opt
         for( Range::const_iterator i = unmatched_cub_verts.begin(); i != unmatched_cub_verts.end(); ++i )
         {
             int cub_id;
-            rval = mdbImpl->tag_get_data( mGlobalIdTag, &( *i ), 1, &cub_id );MB_CHK_ERR(rval);
+            rval = mdbImpl->tag_get_data( mGlobalIdTag, &( *i ), 1, &cub_id );MB_CHK_ERR( rval );
 
             CartVect cub_coords;
-            rval = mdbImpl->get_coords( &( *i ), 1, cub_coords.array() );MB_CHK_ERR(rval);
+            rval = mdbImpl->get_coords( &( *i ), 1, cub_coords.array() );MB_CHK_ERR( rval );
             std::cout << "cannot match cub node " << cub_id << " " << cub_coords << std::endl;
         }
 

@@ -560,7 +560,9 @@ ErrorCode ReadRTT::get_header_data( std::ifstream& input_file )
         {
             if( split_string[1].find( "v" ) != std::string::npos &&
                 split_string[0].find( "version" ) != std::string::npos )
-            { header_data.version = split_string[1]; }
+            {
+                header_data.version = split_string[1];
+            }
         }
 
         if( line.find( "title" ) != std::string::npos ) { header_data.title = split_string[1]; }

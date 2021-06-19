@@ -85,9 +85,9 @@ int main( int argc, char* argv[] )
     // atmocnid is for intx atm / ocn on coupler pes
     //
 
-    int cmpatm        = 5,
-        cplatm        = 6;    // component ids are unique over all pes, and established in advance;
-    int cmpPhysAtm    = 105;  // different from atm spectral ?
+    int cmpatm     = 5,
+        cplatm     = 6;    // component ids are unique over all pes, and established in advance;
+    int cmpPhysAtm = 105;  // different from atm spectral ?
 #ifdef ENABLE_ATMOCN_COUPLING
     std::string ocnFilename = TestDir + "/recMeshOcn.h5m";
     int rankInOcnComm       = -1;
@@ -165,27 +165,27 @@ int main( int argc, char* argv[] )
     // coupler will be on joint tasks, will be on a third group (0 and 1, again)
     MPI_Group atmPEGroup;
     MPI_Comm atmComm;
-    ierr = create_group_and_comm(startG1, endG1, jgroup, &atmPEGroup, &atmComm);
+    ierr = create_group_and_comm( startG1, endG1, jgroup, &atmPEGroup, &atmComm );
     CHECKIERR( ierr, "Cannot create atm MPI group and communicator " )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     MPI_Group ocnPEGroup;
     MPI_Comm ocnComm;
-    ierr = create_group_and_comm(startG2, endG2, jgroup, &ocnPEGroup, &ocnComm);
+    ierr = create_group_and_comm( startG2, endG2, jgroup, &ocnPEGroup, &ocnComm );
     CHECKIERR( ierr, "Cannot create ocn MPI group and communicator " )
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     MPI_Group lndPEGroup;
     MPI_Comm lndComm;
-    ierr = create_group_and_comm(startG3, endG3, jgroup, &lndPEGroup, &lndComm);
+    ierr = create_group_and_comm( startG3, endG3, jgroup, &lndPEGroup, &lndComm );
     CHECKIERR( ierr, "Cannot create lnd MPI group and communicator " )
 #endif
 
     // we will always have a coupler
     MPI_Group couPEGroup;
     MPI_Comm couComm;
-    ierr = create_group_and_comm(startG4, endG4, jgroup, &couPEGroup, &couComm);
+    ierr = create_group_and_comm( startG4, endG4, jgroup, &couPEGroup, &couComm );
     CHECKIERR( ierr, "Cannot create cpl MPI group and communicator " )
 
     // now, create the joint communicators atm_coupler, ocn_coupler, lnd_coupler
@@ -194,14 +194,14 @@ int main( int argc, char* argv[] )
     // atm_coupler
     MPI_Group joinAtmCouGroup;
     MPI_Comm atmCouComm;
-    ierr = create_joint_comm_group(atmPEGroup, couPEGroup,  &joinAtmCouGroup, &atmCouComm);
+    ierr = create_joint_comm_group( atmPEGroup, couPEGroup, &joinAtmCouGroup, &atmCouComm );
     CHECKIERR( ierr, "Cannot create joint atm cou communicator" )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocn_coupler
     MPI_Group joinOcnCouGroup;
     MPI_Comm ocnCouComm;
-    ierr = create_joint_comm_group(ocnPEGroup, couPEGroup,  &joinOcnCouGroup, &ocnCouComm);
+    ierr = create_joint_comm_group( ocnPEGroup, couPEGroup, &joinOcnCouGroup, &ocnCouComm );
     CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
 #endif
 
@@ -209,7 +209,7 @@ int main( int argc, char* argv[] )
     // lnd_coupler
     MPI_Group joinLndCouGroup;
     MPI_Comm lndCouComm;
-    ierr = create_joint_comm_group(lndPEGroup, couPEGroup,  &joinLndCouGroup, &lndCouComm);
+    ierr = create_joint_comm_group( lndPEGroup, couPEGroup, &joinLndCouGroup, &lndCouComm );
     CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
 #endif
 
@@ -275,23 +275,25 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-    //atm
-    ierr = setup_component_coupler_meshes(cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
-             &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme);
+    // atm
+    ierr =
+        setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
+                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
 
     MPI_Barrier( MPI_COMM_WORLD );
 
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocean
-    ierr = setup_component_coupler_meshes(cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm,  &ocnPEGroup, &couComm,
-             &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme);
+    ierr =
+        setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
+                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
 #ifdef VERBOSE
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileTgt3[] = "recvOcn2.h5m";
-        ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
+        ierr                  = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
     }
@@ -327,8 +329,9 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
         CHECKIERR( ierr, "Cannot register LND App " )
     }
-    ierr = setup_component_coupler_meshes(cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm,  &lndPEGroup, &couComm,
-             &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay, repartitioner_scheme);
+    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
+                                           &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
+                                           repartitioner_scheme );
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileLnd[] = "recvLnd2.h5m";
@@ -351,7 +354,6 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-
     const char* weights_identifiers[2] = { "scalar", "scalar-pc" };
     int disc_orders[3]                 = { 4, 1, 1 };
     const char* disc_methods[3]        = { "cgll", "fv", "pcloud" };
@@ -366,7 +368,6 @@ int main( int argc, char* argv[] )
         // basically, atm was redistributed according to target (ocean) partition, to "cover" the
         // ocean partitions check if intx valid, write some h5m intx file
         CHECKIERR( ierr, "cannot compute intersection" )
-
     }
 
     if( atmCouComm != MPI_COMM_NULL )
@@ -382,7 +383,6 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID,
                                     &cplocn );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for ocean" )
-
     }
 #endif
     // need to compute graph between phys atm and atm/ocn intx coverage

@@ -423,7 +423,9 @@ ErrorCode Core::load_file( const char* file_name, const EntityHandle* file_set, 
 
     assert( !file_set || ( *file_set && is_valid( *file_set ) ) );
     if( file_set && !*file_set )
-    { MB_SET_GLB_ERR( MB_FAILURE, "Non-NULL file set pointer should point to non-NULL set" ); }
+    {
+        MB_SET_GLB_ERR( MB_FAILURE, "Non-NULL file set pointer should point to non-NULL set" );
+    }
 
     // if reading in parallel, call a different reader
     std::string parallel_opt;
@@ -470,7 +472,9 @@ ErrorCode Core::load_file( const char* file_name, const EntityHandle* file_set, 
     {
         std::string bad_opt;
         if( MB_SUCCESS == opts.get_unseen_option( bad_opt ) )
-        { MB_SET_ERR( MB_UNHANDLED_OPTION, "Unrecognized option: \"" << bad_opt << "\"" ); }
+        {
+            MB_SET_ERR( MB_UNHANDLED_OPTION, "Unrecognized option: \"" << bad_opt << "\"" );
+        }
         else
         {
             MB_SET_ERR( MB_UNHANDLED_OPTION, "Unrecognized option" );
@@ -687,7 +691,9 @@ ErrorCode Core::write_file( const char* file_name, const char* file_type, const 
     }
 
     if( file_type && rval == MB_TYPE_OUT_OF_RANGE )
-    { MB_SET_ERR( rval, "Unrecognized file type \"" << file_type << "\"" ); }
+    {
+        MB_SET_ERR( rval, "Unrecognized file type \"" << file_type << "\"" );
+    }
     // Should we use default writer (e.g. HDF5)?
     else if( MB_SUCCESS != rval )
     {
@@ -700,7 +706,9 @@ ErrorCode Core::write_file( const char* file_name, const char* file_type, const 
     {
         std::string bad_opt;
         if( MB_SUCCESS == opts.get_unseen_option( bad_opt ) )
-        { MB_SET_ERR( MB_UNHANDLED_OPTION, "Unrecognized option: \"" << bad_opt << "\"" ); }
+        {
+            MB_SET_ERR( MB_UNHANDLED_OPTION, "Unrecognized option: \"" << bad_opt << "\"" );
+        }
         else
         {
             MB_SET_ERR( MB_UNHANDLED_OPTION, "Unrecognized option" );

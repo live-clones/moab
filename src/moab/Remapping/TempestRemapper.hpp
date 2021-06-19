@@ -175,7 +175,8 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///     Set the mesh type corresponding to the intersection context
     /// </summary>
-    void SetMeshType( Remapper::IntersectionContext ctx, TempestMeshType type, const std::vector< int >* metadata = nullptr );
+    void SetMeshType( Remapper::IntersectionContext ctx, TempestMeshType type,
+                      const std::vector< int >* metadata = nullptr );
 
     /// <summary>
     ///     Get the mesh type corresponding to the intersection context
@@ -233,8 +234,8 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///    Internal method to assign vertex and element global IDs if one does not exist already
     /// </summary>
-    moab::ErrorCode assign_vertex_element_IDs( Tag idtag, EntityHandle this_set,
-                                            const int dimension = 2, const int start_id = 1 );
+    moab::ErrorCode assign_vertex_element_IDs( Tag idtag, EntityHandle this_set, const int dimension = 2,
+                                               const int start_id = 1 );
 #endif
 
   public:               // public members
@@ -458,7 +459,8 @@ inline const moab::Range& TempestRemapper::GetMeshVertices( Remapper::Intersecti
     }
 }
 
-inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, TempestRemapper::TempestMeshType type, const std::vector<int>* metadata )
+inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, TempestRemapper::TempestMeshType type,
+                                          const std::vector< int >* metadata )
 {
     switch( ctx )
     {
@@ -472,7 +474,7 @@ inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, Tem
             break;
         case Remapper::TargetMesh:
             m_target_type = type;
-            if (metadata)
+            if( metadata )
             {
                 m_target_metadata.resize( metadata->size() );
                 std::copy( metadata->begin(), metadata->end(), m_target_metadata.begin() );

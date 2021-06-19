@@ -26,12 +26,12 @@
 //-------------------------------------------------------------------------
 
 #include <cassert>
-#if defined(_MSC_VER)
-  typedef int id_t;
-#elif defined(__MINGW32__)
-  #include <sys/time.h>
+#if defined( _MSC_VER )
+typedef int id_t;
+#elif defined( __MINGW32__ )
+#include <sys/time.h>
 #else
-  #include <ctime>
+#include <ctime>
 #endif
 
 #include <cstdlib>
@@ -1246,11 +1246,10 @@ ErrorCode WriteHDF5::write_set_data( const WriteUtilIface::EntityListType which_
             // we already have the data in a vector, just copy it.
             if( si != specialSets.end() && si->setHandle == *i )
             {
-                std::vector< wid_t >& list =
-                    ( which_data == WriteUtilIface::CONTENTS )
-                        ? si->contentIds
-                        : ( which_data == WriteUtilIface::PARENTS ) ? si->parentIds : si->childIds;
-                size_t append = list.size();
+                std::vector< wid_t >& list = ( which_data == WriteUtilIface::CONTENTS )  ? si->contentIds
+                                             : ( which_data == WriteUtilIface::PARENTS ) ? si->parentIds
+                                                                                         : si->childIds;
+                size_t append              = list.size();
                 if( count + list.size() > buffer_size )
                 {
                     append          = buffer_size - count;
@@ -1646,7 +1645,9 @@ inline ErrorCode range_to_blocked_list_templ( HandleRangeIter begin, HandleRange
 
             // See if we can append it to the previous range
             if( !output_id_list.empty() && output_id_list[output_id_list.size() - 2] + output_id_list.back() == id )
-            { output_id_list.back() += n; }
+            {
+                output_id_list.back() += n;
+            }
 
             // If we ran out of space, (or set is empty) just do list format
             else if( !pairs_remaining )
@@ -2166,7 +2167,7 @@ ErrorCode WriteHDF5::write_var_len_data( const TagDesc& tag_data, const Range& r
 
         track.record_io( offset, count );
         mhdf_writeTagValuesWithOpt( table, offset, count, hdf_type, buffer, writeProp, &status );
-        offset+=count;
+        offset += count;
         CHK_MHDF_ERR_0( status );
         --num_writes;
     }

@@ -309,7 +309,9 @@ void NonGradient::initialize_mesh_iteration( PatchData& pd, MsqError& err )
         pd.get_minmax_edge_length( minEdgeLen, maxEdgeLen );
         // ftol = minEdgeLen * 1.e-4; // Turn off Amoeba convergence criterion
         if( mNonGradDebug >= 1 )
-        { std::cout << "minimum edge length " << minEdgeLen << " maximum edge length " << maxEdgeLen << std::endl; }
+        {
+            std::cout << "minimum edge length " << minEdgeLen << " maximum edge length " << maxEdgeLen << std::endl;
+        }
         MSQ_PRINT( 3 )
         ( "minimum edge length %e    maximum edge length %e\n", minEdgeLen, maxEdgeLen );
     }

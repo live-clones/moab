@@ -1375,7 +1375,9 @@ ErrorCode GeomTopoTool::geometrize_surface_set( EntityHandle surface, EntityHand
         rval = mdbImpl->add_entities( output, &vertex, 1 );MB_CHK_SET_ERR( rval, "Failed to add the vertex meshset to the output set" );
 
         if( debugFlag )
-        { std::cout << "add edge with start node " << start_node << " with " << edges_loop.size() << " edges\n"; }
+        {
+            std::cout << "add edge with start node " << start_node << " with " << edges_loop.size() << " edges\n";
+        }
     }
 
     return MB_SUCCESS;
@@ -1658,11 +1660,11 @@ ErrorCode GeomTopoTool::generate_implicit_complement( EntityHandle& implicit_com
     return MB_SUCCESS;
 }
 
-#define RETFALSE( a, b )           \
-    {                              \
-        std::cout << (a) << "\n";    \
-        mdbImpl->list_entity( b ); \
-        return false;              \
+#define RETFALSE( a, b )            \
+    {                               \
+        std::cout << ( a ) << "\n"; \
+        mdbImpl->list_entity( b );  \
+        return false;               \
     }
 bool GeomTopoTool::check_model()
 {

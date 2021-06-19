@@ -75,7 +75,7 @@ class Remapper
     }
 #endif
 
-    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, std::vector<int>& metadata,
+    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, std::vector< int >& metadata,
                               const char* readopts = 0 )
     {
 #ifdef MOAB_HAVE_MPI
@@ -104,13 +104,14 @@ class Remapper
         const std::string opts = std::string( ( readopts ? readopts : "" ) );
         std::cout << "Reading file (" << filename << ") with options = [" << opts << "]\n";
 #endif
-        moab::ErrorCode rval = m_interface->load_file( filename.c_str(), &meshset, opts.c_str() );MB_CHK_ERR(rval);
+        moab::ErrorCode rval = m_interface->load_file( filename.c_str(), &meshset, opts.c_str() );MB_CHK_ERR( rval );
 
         Tag rectilinearTag;
         rval = m_interface->tag_get_handle( "ClimateMetadata", rectilinearTag );
 
         metadata.clear();
-        if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED && rectilinearTag != nullptr )
+        if( rval != MB_FAILURE && rval != MB_TAG_NOT_FOUND && rval != MB_ALREADY_ALLOCATED &&
+            rectilinearTag != nullptr )
         {
             int dimSizes[3];
             moab::EntityHandle rootset = 0;

@@ -49,7 +49,7 @@ const char* TestDir = STRINGIFY( MESHDIR );
  *  Argument should be a function with the signature:  void func(void)
  *  Evaluates to zero if test is successful, one otherwise.
  */
-#define RUN_TEST( FUNC ) run_test( &((((FUNC)))), #FUNC )
+#define RUN_TEST( FUNC ) run_test( &( ( ( ( FUNC ) ) ) ), #FUNC )
 
 // Use C++ exceptions to return error state to test runner
 // Portable, but whole test suite stops if any test segfaults, asserts, etc.

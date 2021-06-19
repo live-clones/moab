@@ -429,10 +429,10 @@ int main( int argc, char* argv[] )
     {
         PUSH_TIMER( "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[1].c_str(), &disc_orders[1],
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(),
-            weights_identifiers[0].size(), disc_methods[0].size(), disc_methods[1].size(),
-            dof_tag_names[0].size(), dof_tag_names[1].size() );
+            cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0],
+            disc_methods[1].c_str(), &disc_orders[1], &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
+            &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str(), weights_identifiers[0].size(),
+            disc_methods[0].size(), disc_methods[1].size(), dof_tag_names[0].size(), dof_tag_names[1].size() );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
 
@@ -465,9 +465,9 @@ int main( int argc, char* argv[] )
         PUSH_TIMER( "Compute ATM-LND remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplAtmLndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
-            disc_methods[2].c_str(), &disc_orders[2], &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
-            dof_tag_names[0].c_str(), dof_tag_names[2].c_str(), weights_identifiers[1].size(), disc_methods[0].size(),
-            disc_methods[2].size(), dof_tag_names[0].size(), dof_tag_names[2].size() );
+            disc_methods[2].c_str(), &disc_orders[2], &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
+            &fValidate, dof_tag_names[0].c_str(), dof_tag_names[2].c_str(), weights_identifiers[1].size(),
+            disc_methods[0].size(), disc_methods[2].size(), dof_tag_names[0].size(), dof_tag_names[2].size() );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                          "non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )

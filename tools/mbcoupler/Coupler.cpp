@@ -14,25 +14,25 @@
 #include <algorithm>
 #include <sstream>
 
-#define ERROR( a )                                           \
-    {                                                        \
-        if( MB_SUCCESS != err ) std::cerr << (a) << std::endl; \
+#define ERROR( a )                                               \
+    {                                                            \
+        if( MB_SUCCESS != err ) std::cerr << ( a ) << std::endl; \
     }
-#define ERRORR( a, b )                   \
-    {                                    \
-        if( MB_SUCCESS != (b) )            \
-        {                                \
-            std::cerr << (a) << std::endl; \
-            return b;                    \
-        }                                \
+#define ERRORR( a, b )                       \
+    {                                        \
+        if( MB_SUCCESS != ( b ) )            \
+        {                                    \
+            std::cerr << ( a ) << std::endl; \
+            return b;                        \
+        }                                    \
     }
-#define ERRORMPI( a, b )                 \
-    {                                    \
-        if( MPI_SUCCESS != (b) )           \
-        {                                \
-            std::cerr << (a) << std::endl; \
-            return MB_FAILURE;           \
-        }                                \
+#define ERRORMPI( a, b )                     \
+    {                                        \
+        if( MPI_SUCCESS != ( b ) )           \
+        {                                    \
+            std::cerr << ( a ) << std::endl; \
+            return MB_FAILURE;               \
+        }                                    \
     }
 
 #define MASTER_PROC 0

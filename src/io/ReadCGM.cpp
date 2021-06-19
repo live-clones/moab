@@ -612,7 +612,9 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
             {
                 std::cerr << "Warning: vertices not at ends of curve " << edge->id() << std::endl;
                 if( curve_warnings == 0 && !verbose_warn )
-                { std::cerr << "         further instances of this warning will be suppressed..." << std::endl; }
+                {
+                    std::cerr << "         further instances of this warning will be suppressed..." << std::endl;
+                }
             }
         }
         // Create interior points
@@ -823,7 +825,9 @@ ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* fil
 
     s = CubitCompat_import_solid_model( cgm_file_name, file_type );
     if( CUBIT_SUCCESS != s )
-    { MB_SET_ERR( MB_FAILURE, cgm_file_name << ": Failed to read file of type \"" << file_type << "\"" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, cgm_file_name << ": Failed to read file of type \"" << file_type << "\"" );
+    }
 
     // Create entity sets for all geometric entities
     std::map< RefEntity*, EntityHandle > entmap[5];  // One for each dim, and one for groups
