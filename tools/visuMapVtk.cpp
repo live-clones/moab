@@ -230,7 +230,7 @@ int main( int argc, char* argv[] )
     EntityHandle partialSet;
     rval = mb->create_meshset(MESHSET_SET, partialSet); MB_CHK_SET_ERR( rval, "can't create partial set" );
     // how to get a complete row in sparse matrix? Or a complete column ?
-    for (int col = startSourceID-1; col < endSourceID-1; col++)
+    for (int col = startSourceID-1; col <= endSourceID-1; col++)
     {
         Range targetEnts; // will find entries for column col-1 in sparse matrix weight1, and its entries
         // will assign a dense tag with values, and write out the file
@@ -258,7 +258,7 @@ int main( int argc, char* argv[] )
     }
 
     // how to get a complete column in sparse matrix?
-    for (int row = startTargetID-1; row < endTargetID-1; row++)
+    for (int row = startTargetID-1; row <= endTargetID-1; row++)
     {
         Range sourceEnts; // will find entries for row row in sparse matrix weight1, and its entries
         // will assign a dense tag with values, and write out the file

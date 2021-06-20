@@ -155,7 +155,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     // Fit weight exponent
     const int nFitWeightsExponent = nOrder + 2;
 
-    // Announcemnets
+    // Announcements
     moab::DebugOutput dbgprint( std::cout, this->rank, 0 );
     dbgprint.set_prefix( "[LinearRemapFVtoFV_Tempest_MOAB]: " );
     if( is_root )
