@@ -234,7 +234,7 @@ int main( int argc, char* argv[] )
 
     MPI_Barrier( MPI_COMM_WORLD );
 
-    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0;
+    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1;
     const char* weights_identifiers[2] = { "scalar", "scalar-pc" };
     int disc_orders[3]                 = { 4, 1, 1 };
     const char* disc_methods[3]        = { "cgll", "fv", "pcloud" };
@@ -245,7 +245,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplOcnAtmPID, weights_identifiers[0], disc_methods[1], &disc_orders[1],  // fv
             disc_methods[1], &disc_orders[1],                                        // fv
-            &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
             strlen( weights_identifiers[0] ), strlen( disc_methods[1] ), strlen( disc_methods[1] ),
             strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
