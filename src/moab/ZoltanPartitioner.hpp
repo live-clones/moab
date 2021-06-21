@@ -85,7 +85,7 @@ class ZoltanPartitioner : public PartitionerBase< int >
 
     virtual ~ZoltanPartitioner();
 
-    ErrorCode balance_mesh( const char* zmethod, const char* other_method, const bool write_as_sets = true,
+    ErrorCode balance_mesh( EntityHandle initialSet, const char* zmethod, const char* other_method, const bool write_as_sets = true,
                             const bool write_as_tags = false );
 
     virtual ErrorCode partition_mesh_and_geometry(

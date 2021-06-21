@@ -87,7 +87,7 @@ ZoltanPartitioner::~ZoltanPartitioner()
     if( NULL != myZZ ) delete myZZ;
 }
 
-ErrorCode ZoltanPartitioner::balance_mesh( const char* zmethod, const char* other_method, const bool write_as_sets,
+ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, const char* zmethod, const char* other_method, const bool write_as_sets,
                                            const bool write_as_tags )
 {
     if( !strcmp( zmethod, "RR" ) && !strcmp( zmethod, "RCB" ) && !strcmp( zmethod, "RIB" ) &&

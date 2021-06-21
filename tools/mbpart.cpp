@@ -50,16 +50,19 @@ std::ostringstream LONG_DESC;
 
 int main( int argc, char* argv[] )
 {
-#ifdef MOAB_HAVE_MPI
-    int err = MPI_Init( &argc, &argv );
-    if( err )
-    {
-        std::cerr << "MPI_Init failed.  Aborting." << std::endl;
-        return 3;
-    }
-#endif
     Core moab;
     Interface& mb = moab;
+    Interface* gMB = &moab;
+    int proc_id = 0, psize = 1;
+#ifdef MOAB_HAVE_MPI
+    MPI_Init( &argc, &argv );
+    MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
+    MPI_Comm_size( MPI_COMM_WORLD, &psize );
+    moab::ParallelComm* pcomm = new moab::ParallelComm( gMB, MPI_COMM_WORLD, 0 );
+#endif
+
+
+
     std::vector< int > set_l;
 
 #ifdef MOAB_HAVE_ZOLTAN
@@ -347,12 +350,22 @@ int main( int argc, char* argv[] )
     ErrorCode rval;
 #ifdef MOAB_HAVE_ZOLTAN
     if( part_geom_mesh_size > 0. ) options = "FACET_DISTANCE_TOLERANCE=0.1";
+#ifdef MOAB_HAVE_MPI
+    if (psize > 1)
+        // try to read in parallel, and just balance the mesh
+    {
+        options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;";
+    }
+#endif
 #endif  // MOAB_HAVE_ZOLTAN
+
+    EntityHandle initialSet;
+    rval = mb.create_meshset( MESHSET_SET, initialSet );MB_CHK_SET_ERR( rval, "Failed to create initial set: " + input_file );
 
     std::cout << "Loading file " << input_file << "..." << std::endl;
     if( load_msets == false )
     {
-        rval = mb.load_file( input_file.c_str(), 0, options );MB_CHK_SET_ERR( rval, "Failed to load input file: " + input_file );
+        rval = mb.load_file( input_file.c_str(), &initialSet, options );MB_CHK_SET_ERR( rval, "Failed to load input file: " + input_file );
     }
     else  // load the material set(s)
     {
@@ -364,7 +377,7 @@ int main( int argc, char* argv[] )
     for( int dim = part_dim; dim >= 0; --dim )
     {
         int n;
-        rval = mb.get_number_entities_by_dimension( 0, dim, n );
+        rval = mb.get_number_entities_by_dimension( initialSet, dim, n );
         if( MB_SUCCESS == rval && 0 != n )
         {
             part_dim = dim;
@@ -385,10 +398,29 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_ZOLTAN
         if( moab_use_zoltan )
         {
+#ifdef MOAB_HAVE_MPI
+            if (psize > 1)
+            {
+                // just balance the mesh for the time being, in parallel; it will not work for geometry yet
+                rval = zoltan_tool->balance_mesh( initialSet, zoltan_method.c_str(), ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ),
+                        write_sets, write_tags ); MB_CHK_SET_ERR( rval, "Zoltan balance failed." );
+            }
+            else
+            {
+                // old code, do not do anything in parallel
+                rval = zoltan_tool->partition_mesh_and_geometry(
+                    part_geom_mesh_size, num_parts, zoltan_method.c_str(),
+                    ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), imbal_tol, part_dim, write_sets,
+                    write_tags, obj_weight, edge_weight, part_surf, ghost, projection_type, recompute_box_rcb, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
+
+            }
+#else
             rval = zoltan_tool->partition_mesh_and_geometry(
                 part_geom_mesh_size, num_parts, zoltan_method.c_str(),
                 ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), imbal_tol, part_dim, write_sets,
                 write_tags, obj_weight, edge_weight, part_surf, ghost, projection_type, recompute_box_rcb, print_time );MB_CHK_SET_ERR( rval, "Zoltan partitioner failed." );
+
+#endif
         }
 #endif
 #ifdef MOAB_HAVE_METIS
@@ -576,8 +608,7 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef MOAB_HAVE_MPI
-    err = MPI_Finalize();
-    assert( MPI_SUCCESS == err );
+    MPI_Finalize();
 #endif
     return 0;
 }
