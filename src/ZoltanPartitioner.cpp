@@ -87,7 +87,7 @@ ZoltanPartitioner::~ZoltanPartitioner()
     if( NULL != myZZ ) delete myZZ;
 }
 
-ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, const char* zmethod, const char* other_method, const bool write_as_sets,
+ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, EntityHandle outputSet, const char* zmethod, const char* other_method, const bool write_as_sets,
                                            const bool write_as_tags )
 {
     if( !strcmp( zmethod, "RR" ) && !strcmp( zmethod, "RCB" ) && !strcmp( zmethod, "RIB" ) &&
@@ -108,7 +108,7 @@ ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, const char*
 
     ErrorCode result;
 
-    if( mbpc->proc_config().proc_rank() == 0 )
+    //if( mbpc->proc_config().proc_rank() == 0 )
     {
         result = assemble_graph( 3, pts, ids, adjs, length, elems );RR;
     }
@@ -210,12 +210,12 @@ ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, const char*
     myZZ->LB_Free_Part( &exportGlobalIds, &exportLocalIds, &exportProcs, &exportToPart );
 
     // Implementation note:  A Zoltan object contains an MPI communicator.
-    //   When the Zoltan object is destroyed, it uses it's MPI communicator.
+    //   When the Zoltan object is destroyed, it uses its MPI communicator.
     //   So it is important that the Zoltan object is destroyed before
     //   the MPI communicator is destroyed.  To ensure this, dynamically
     //   allocate the Zoltan object, so you can explicitly destroy it.
-    //   If you create a Zoltan object on the stack, it's destructor will
-    //   be invoked atexit, possibly after the communicator's
+    //   If you create a Zoltan object on the stack, its destructor will
+    //   be invoked at exit, possibly after the communicator's
     //   destructor.
 
     return MB_SUCCESS;

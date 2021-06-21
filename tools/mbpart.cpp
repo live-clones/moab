@@ -360,9 +360,16 @@ int main( int argc, char* argv[] )
 #endif  // MOAB_HAVE_ZOLTAN
 
     EntityHandle initialSet;
-    rval = mb.create_meshset( MESHSET_SET, initialSet );MB_CHK_SET_ERR( rval, "Failed to create initial set: " + input_file );
+    rval = mb.create_meshset( MESHSET_SET, initialSet );MB_CHK_SET_ERR( rval, "Failed to create initial set " );
+    EntityHandle outputSet;
+    if (psize > 1)
+    {
+      rval = mb.create_meshset( MESHSET_SET, outputSet );MB_CHK_SET_ERR( rval, "Failed to create initial set " );
+    }
+    else
+        outputSet = initialSet;
 
-    std::cout << "Loading file " << input_file << "..." << std::endl;
+    if (0 == proc_id) std::cout << "Loading file " << input_file << "..." << std::endl;
     if( load_msets == false )
     {
         rval = mb.load_file( input_file.c_str(), &initialSet, options );MB_CHK_SET_ERR( rval, "Failed to load input file: " + input_file );
@@ -371,7 +378,7 @@ int main( int argc, char* argv[] )
     {
         rval = mb.load_mesh( input_file.c_str(), &set_l[0], (int)set_l.size() );MB_CHK_SET_ERR( rval, "Failed to load input mesh: " + input_file );
     }
-    if( print_time )
+    if( print_time && 0 == proc_id)
         std::cout << "Read input file in " << ( clock() - t ) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
 
     for( int dim = part_dim; dim >= 0; --dim )
@@ -402,7 +409,7 @@ int main( int argc, char* argv[] )
             if (psize > 1)
             {
                 // just balance the mesh for the time being, in parallel; it will not work for geometry yet
-                rval = zoltan_tool->balance_mesh( initialSet, zoltan_method.c_str(), ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ),
+                rval = zoltan_tool->balance_mesh( initialSet, outputSet, zoltan_method.c_str(), ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ),
                         write_sets, write_tags ); MB_CHK_SET_ERR( rval, "Zoltan balance failed." );
             }
             else
@@ -496,11 +503,30 @@ int main( int argc, char* argv[] )
             tmp_output_file << output_file;
 
         t = clock();
+#ifdef MOAB_HAVE_MPI
+            if (psize > 1)
+            {
+#ifdef MOAB_HAVE_ZOLTAN
+                if (0 == proc_id) std::cout << "Saving file in parallel to " << output_file << std::endl;
+                rval = mb.write_file( tmp_output_file.str().c_str(), 0, "PARALLEL=WRITE_PART",
+                   &outputSet, 1 );MB_CHK_SET_ERR( rval, tmp_output_file.str() << " : failed to write file." << std::endl );
+#endif
+            }
+            else
+            {
+                std::cout << "Saving file to " << output_file << "..." << std::endl;
+                if( part_geom_mesh_size < 0. )
+                {
+                    rval = mb.write_file( tmp_output_file.str().c_str() );MB_CHK_SET_ERR( rval, tmp_output_file.str() << " : failed to write file." << std::endl );
+                }
+            }
+#else
         std::cout << "Saving file to " << output_file << "..." << std::endl;
         if( part_geom_mesh_size < 0. )
         {
             rval = mb.write_file( tmp_output_file.str().c_str() );MB_CHK_SET_ERR( rval, tmp_output_file.str() << " : failed to write file." << std::endl );
         }
+#endif
 #ifdef MOAB_HAVE_ZOLTAN
 #ifdef MOAB_HAVE_CGM
         else
