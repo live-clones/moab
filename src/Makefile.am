@@ -314,7 +314,8 @@ if HAVE_TEMPESTREMAP
      Remapping/TempestRemapper.cpp  \
      Remapping/TempestLinearRemap.cpp \
      Remapping/TempestOnlineMap.cpp \
-     Remapping/TempestOnlineMapIO.cpp
+     Remapping/TempestOnlineMapIO.cpp \
+     Remapping/netcdfcpp_par.hpp
 
   MOAB_REMAPPING_HDRS += \
      moab/Remapping/TempestRemapper.hpp \

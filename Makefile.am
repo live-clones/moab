@@ -29,7 +29,7 @@ endif
 build-check:
 	$(MAKE) 'TESTS_ENVIRONMENT=: ' check
 
-doc_DATA = AUTHORS LICENSE README.md RELEASE_NOTES.md TODO.md
+doc_DATA = AUTHORS LICENSE README.md RELEASE_NOTES.md TODO.md CODE_OF_CONDUCT.md CONTRIBUTING.md FAQ.md
 
 pkgconfig_DATA = MOAB.pc
 pkgconfigdir = $(libdir)/pkgconfig
