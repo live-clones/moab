@@ -458,16 +458,20 @@ int main( int argc, char* argv[] )
                     EntityHandle localSet;
                     rval = mb.create_meshset( MESHSET_SET, localSet );MB_CHK_SET_ERR( rval, "Failed to create local set " );
                     rval = rgraph->receive_mesh( comm, pcomm, localSet, senders_local );MB_CHK_ERR( rval );
-                    std::ostringstream tmp_outf;
-                    tmp_outf << "part_" << "_" << proc_id << ".h5m";
-                    rval = mb.write_file(tmp_outf.str().c_str(), 0, "",  &localSet, 1); MB_CHK_ERR( rval );
 
                     sgraph->release_send_buffers();
                     delete rgraph;
                     delete sgraph;
                     MPI_Group_free( &group );
 
-
+                    Tag ptag;
+                    rval = mb.tag_get_handle( DEFAULT_TAGGEDSETS_TAG.c_str(), 1, MB_TYPE_INTEGER, ptag );MB_CHK_SET_ERR( rval, "Partitioner did not create " + DEFAULT_TAGGEDSETS_TAG + " tag" );
+                    rval = mb.tag_set_data(ptag, &localSet, 1, &proc_id); MB_CHK_ERR( rval );
+                    std::ostringstream tmp_outf;
+                    tmp_outf << "part_" << "_" << proc_id << ".h5m";
+                    rval = mb.write_file(tmp_outf.str().c_str(), 0, "",  &localSet, 1); MB_CHK_ERR( rval );
+                    // can we write in parallel ?
+                    rval = mb.write_file("outp.h5m", 0, "PARALLEL=WRITE_PART;",  &localSet, 1); MB_CHK_ERR( rval );
                 }
             }
             else
