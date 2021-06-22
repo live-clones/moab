@@ -29,7 +29,7 @@ endif
 build-check:
 	$(MAKE) 'TESTS_ENVIRONMENT=: ' check
 
-doc_DATA = AUTHORS LICENSE README.md RELEASE_NOTES.md TODO.md CODE_OF_CONDUCT.md CONTRIBUTING.md FAQ.md
+doc_DATA = .gitignore AUTHORS LICENSE README.md RELEASE_NOTES.md TODO.md CODE_OF_CONDUCT.md CONTRIBUTING.md FAQ.md
 
 pkgconfig_DATA = MOAB.pc
 pkgconfigdir = $(libdir)/pkgconfig
@@ -75,7 +75,9 @@ examples_intermediate_DATA = \
                examples/intermediate/PointInElementSearch.cpp \
                examples/intermediate/ReduceExchangeTags.cpp \
                examples/intermediate/QuadTriConv.cpp \
-               examples/intermediate/ExtractClose.cpp
+               examples/intermediate/ExtractClose.cpp \
+               examples/intermediate/ComputeTriDual.cpp \
+               examples/intermediate/FixPolys.cpp
 examples_advanceddir = $(datadir)/examples/advanced
 examples_advanced_DATA = \
                examples/advanced/makefile \
@@ -114,7 +116,9 @@ examples_apps_earth_DATA = \
                examples/apps/earth/makefile \
                examples/apps/earth/ContinentsOnGlobe.cpp \
                examples/apps/earth/BoundaryContinents.cpp \
-               examples/apps/earth/addPCdata.cpp 
+               examples/apps/earth/addPCdata.cpp \
+               examples/apps/earth/AddFieldtoPG2.cpp \
+               examples/apps/earth/copyPartition.cpp
 
 CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
    config/AutoconfHeader.cmake      config/FindCGM.cmake          config/FindNetCDF.cmake        config/FindZoltan.cmake     config/GetAcInitVersion.cmake \
@@ -126,6 +130,7 @@ CMAKE_CONFIGURATION_FILES = CMakeLists.txt \
 
 EXTRA_DIST = $(doc_DATA) \
 						 debian \
+						 config/MOAB.pc.in config/MOAB.pc.cmake.in \
 						 $(CMAKE_CONFIGURATION_FILES) \
 						 $(examples_DATA) \
 						 $(examples_cmake_DATA) \
