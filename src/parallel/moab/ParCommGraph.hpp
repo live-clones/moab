@@ -226,6 +226,9 @@ class ParCommGraph
     // dump local information about graph
     ErrorCode dump_comm_information( std::string prefix, int is_send );
 
+    // added for rebalance
+    void set_splits (std::map< int, Range >  distributes ) { split_ranges = distributes;}; // deep copy :(  is it needed ?
+
   private:
     /**
     \brief find ranks of a group with respect to an encompassing communicator

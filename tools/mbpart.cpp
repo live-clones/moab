@@ -4,6 +4,7 @@
 
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
+#include "moab/ParCommGraph.hpp"
 #endif
 
 #ifdef MOAB_HAVE_ZOLTAN
@@ -407,6 +408,67 @@ int main( int argc, char* argv[] )
                 rval = zoltan_tool->balance_mesh( initialSet, zoltan_method.c_str(), ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), num_parts,
                         distributes,
                         write_sets, write_tags, part_dim ); MB_CHK_SET_ERR( rval, "Zoltan balance failed." );
+                // rebalance act, num_parts
+                if (num_parts == psize)
+                {
+                    // migrate ; reuse ParCommGraph; receiving group the same as sending group, sam
+                    MPI_Comm comm = pcomm->comm();
+                    MPI_Group group;
+                    MPI_Comm_group( comm, &group );
+                    int sendComp=1, recComp =1;
+                    ParCommGraph* sgraph = new ParCommGraph( comm, group, group, sendComp, recComp );
+                    // the distribution is computed now; part id are proc ids no
+                    sgraph -> set_splits(distributes);
+                    rval = sgraph->send_graph_partition( pcomm, comm );MB_CHK_ERR( rval );
+
+                    // pcomm is needed to pack, not for communication
+                    Range tmp; // empty range not used in this case
+
+                    rval = sgraph->send_mesh_parts( comm, pcomm, tmp );MB_CHK_ERR( rval );
+
+                    // now receive mesh parts, first receive graph and distribute ?
+                    // knows what data to expect
+                    ParCommGraph* rgraph = new ParCommGraph( comm, group, group, sendComp, recComp ); // the same one
+                    std::vector< int > pack_array;
+                    rval = rgraph->receive_comm_graph( comm, pcomm, pack_array ); MB_CHK_ERR( rval );
+
+                    // senders across for the current receiver
+                    int current_receiver = rgraph->receiver( proc_id );
+
+                    std::vector< int > senders_local;
+                    size_t n = 0;
+
+                    while( n < pack_array.size() )
+                    {
+                        if( current_receiver == pack_array[n] )
+                        {
+                            for( int j = 0; j < pack_array[n + 1]; j++ )
+                            {
+                                senders_local.push_back( pack_array[n + 2 + j] );
+                            }
+
+                            break;
+                        }
+
+                        n = n + 2 + pack_array[n + 1];
+                    }
+                    if( senders_local.empty() )
+                        { std::cout << " we do not have any senders for receiver rank " << proc_id << "\n"; }
+
+                    EntityHandle localSet;
+                    rval = mb.create_meshset( MESHSET_SET, localSet );MB_CHK_SET_ERR( rval, "Failed to create local set " );
+                    rval = rgraph->receive_mesh( comm, pcomm, localSet, senders_local );MB_CHK_ERR( rval );
+                    std::ostringstream tmp_outf;
+                    tmp_outf << "part_" << "_" << proc_id << ".h5m";
+                    rval = mb.write_file(tmp_outf.str().c_str(), 0, "",  &localSet, 1); MB_CHK_ERR( rval );
+
+                    sgraph->release_send_buffers();
+                    delete rgraph;
+                    delete sgraph;
+                    MPI_Group_free( &group );
+
+
+                }
             }
             else
             {
