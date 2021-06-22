@@ -86,41 +86,86 @@ ZoltanPartitioner::~ZoltanPartitioner()
 {
     if( NULL != myZZ ) delete myZZ;
 }
-
-ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, EntityHandle outputSet, const char* zmethod, const char* other_method, const bool write_as_sets,
-                                           const bool write_as_tags )
+#ifdef MOAB_HAVE_MPI
+ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, const char* zmethod, const char* other_method, int num_parts,
+        std::map<int, Range> &distributes, const bool write_as_sets,
+        const bool write_as_tags, int dimension )
 {
-    if( !strcmp( zmethod, "RR" ) && !strcmp( zmethod, "RCB" ) && !strcmp( zmethod, "RIB" ) &&
-        !strcmp( zmethod, "HSFC" ) && !strcmp( zmethod, "Hypergraph" ) && !strcmp( zmethod, "PHG" ) &&
-        !strcmp( zmethod, "PARMETIS" ) && !strcmp( zmethod, "OCTPART" ) )
+    if( !strcmp( zmethod, "RR" ) && !strcmp( zmethod, "RCB" ) && !strcmp( zmethod, "RIB" )  )
     {
         std::cout << "ERROR node " << mbpc->proc_config().proc_rank() << ": Method must be "
-                  << "RR, RCB, RIB, HSFC, Hypergraph (PHG), PARMETIS, or OCTPART" << std::endl;
+                  << "RR, RCB, RIB"  << std::endl;
         return MB_FAILURE;
     }
 
-    std::vector< double > pts;  // x[0], y[0], z[0], ... from MOAB
     std::vector< int > ids;     // point ids from MOAB
-    std::vector< int > adjs, length;
+
     Range elems;
 
     // Get a mesh from MOAB and divide it across processors.
+    ErrorCode rval;// get recursively
+    rval = mbImpl->get_entities_by_dimension(initialSet, dimension, elems, true); MB_CHK_ERR( rval );
 
-    ErrorCode result;
+    Tag gid = mbImpl->globalId_tag();
 
-    //if( mbpc->proc_config().proc_rank() == 0 )
+    ids.resize( elems.size() );
+    rval = mbImpl -> tag_get_data(gid, elems, &ids[0]); MB_CHK_ERR( rval );
+
+    std::map<int, EntityHandle> idmap; // from global id to entity handle
+    for (int k=0; k<(int)elems.size(); k++)
     {
-        result = assemble_graph( 3, pts, ids, adjs, length, elems );RR;
+        idmap[ids[k]] = elems[k];
     }
+    std::vector< double > coords;
+    coords.resize(elems.size()*3);
+    rval = mbImpl -> get_coords( elems, &coords[0]); MB_CHK_ERR( rval );
 
-    myNumPts = mbInitializePoints( (int)ids.size(), &pts[0], &ids[0], &adjs[0], &length[0] );
+    // this is our convention
+    Tag part_set_tag;
+    int dum_id = -1;
+    rval     = mbImpl->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_set_tag,
+                                     MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );MB_CHK_ERR( rval );
 
+    // get any sets already with this tag, and clear them
+    Range tagged_sets;
+    rval =
+        mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &part_set_tag, NULL, 1, tagged_sets, Interface::UNION );MB_CHK_ERR( rval );
+
+    std::vector<int> partIds;
+    partIds.resize(tagged_sets.size());
+    rval = mbImpl->tag_get_data(part_set_tag, tagged_sets, &partIds[0]);MB_CHK_ERR( rval );
+    std::map<EntityHandle , int> initialDist; // from eh to part assignment
+
+    int i=0;
+    // from local id (0-numpts) we can get to EH and to global id
+
+    std::vector<int> parts;
+    parts.resize(elems.size());
+
+    for (auto it = tagged_sets.begin(); it!=tagged_sets.end(); it++, i++ )
+    {
+        EntityHandle pset = *it;
+        Range ents;
+        rval = mbImpl->get_entities_by_dimension(pset, dimension, ents); MB_CHK_ERR( rval );
+        distributes[partIds[i]] = ents;
+
+        for (int k=0; k<(int)ents.size(); k++)
+        {
+            EntityHandle eh = ents[k];
+            int indexInElems = -1;
+            indexInElems = elems.index(eh);
+            if (indexInElems>=0)
+                parts[indexInElems] = partIds[i];
+            initialDist[eh] = partIds[i]; // we may need to remove it from sets
+        }
+    }
     // Initialize Zoltan.  This is a C call.  The simple C++ code
     // that creates Zoltan objects does not keep track of whether
     // Zoltan_Initialize has been called.
 
     float version;
-
+    int my_rank = mbpc->rank();
+    if (0 == my_rank) std::cout << " initialize Zoltan for rebalance of mesh\n";
     Zoltan_Initialize( argcArg, argvArg, &version );
 
     // Create Zoltan object.  This calls Zoltan_Create.
@@ -130,27 +175,17 @@ ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, EntityHandl
         SetRCB_Parameters();
     else if( !strcmp( zmethod, "RIB" ) )
         SetRIB_Parameters();
-    else if( !strcmp( zmethod, "HSFC" ) )
-        SetHSFC_Parameters();
-    else if( !strcmp( zmethod, "Hypergraph" ) || !strcmp( zmethod, "PHG" ) )
-        if( NULL == other_method )
-            SetHypergraph_Parameters( "auto" );
-        else
-            SetHypergraph_Parameters( other_method );
-    else if( !strcmp( zmethod, "PARMETIS" ) )
-    {
-        if( NULL == other_method )
-            SetPARMETIS_Parameters( "RepartGDiffusion" );
-        else
-            SetPARMETIS_Parameters( other_method );
-    }
-    else if( !strcmp( zmethod, "OCTPART" ) )
-    {
-        if( NULL == other_method )
-            SetOCTPART_Parameters( "2" );
-        else
-            SetOCTPART_Parameters( other_method );
-    }
+
+    // geometry based methods use just coords and global ids of elements
+    Points = &coords[0];
+    GlobalIds    = &ids[0];
+    NumPoints    = (int)ids.size();
+    NumEdges     = NULL;
+    NborGlobalId = NULL;
+    NborProcs    = NULL;
+    ObjWeights   = NULL;
+    EdgeWeights  = NULL;
+    Parts        = &parts[0]; // initial part assignment
 
     // Call backs:
 
@@ -160,6 +195,12 @@ ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, EntityHandl
     myZZ->Set_Geom_Multi_Fn( mbGetObject, NULL );
     myZZ->Set_Num_Edges_Multi_Fn( mbGetNumberOfEdges, NULL );
     myZZ->Set_Edge_List_Multi_Fn( mbGetEdgeList, NULL );
+    myZZ->Set_Part_Multi_Fn( mbGetPart, NULL ); // initial part ?
+
+    // set # requested partitions
+    char buff[10];
+    sprintf( buff, "%d", num_parts );
+    myZZ->Set_Param( "NUM_GLOBAL_PARTITIONS", buff );
 
     // Perform the load balancing partitioning
 
@@ -182,27 +223,64 @@ ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, EntityHandl
                                  exportToPart );
 
     rc = mbGlobalSuccess( rc );
-
-    if( !rc ) { mbPrintGlobalResult( "==============Result==============", myNumPts, numImport, numExport, changes ); }
-    else
+    if (changes)
     {
-        return MB_FAILURE;
+        if( !tagged_sets.empty() )
+        {
+            rval  = mbImpl->clear_meshset( tagged_sets );MB_CHK_ERR( rval );
+        }
+        // assign new parts according to num_export
+        for (int k = 0; k< numExport; k++)
+        {
+            EntityHandle eh = elems[exportLocalIds[k]];
+            // remove from existing distribution, and add it to new dist
+            int toPart = exportToPart[k];
+            int currentPart = initialDist[eh];
+            distributes[currentPart].erase(eh);
+            distributes[toPart].insert(eh);
+        }
     }
 
-    // take results & write onto MOAB partition sets
-
-    int* assignment;
-
-    mbFinalizePoints( (int)ids.size(), numExport, exportLocalIds, exportProcs, &assignment );
-
-    if( mbpc->proc_config().proc_rank() == 0 )
+    if (tagged_sets.size() < distributes.size())
     {
-        result = write_partition( mbpc->proc_config().proc_size(), elems, assignment, write_as_sets, write_as_tags );
-
-        if( MB_SUCCESS != result ) return result;
-
-        free( (int*)assignment );
+        // create new sets
+        EntityHandle newSet;
+        for (int i=0; i< (int) (distributes.size()-tagged_sets.size()) ; i++)
+        {
+            rval = mbImpl->create_meshset( MESHSET_SET, newSet );MB_CHK_SET_ERR( rval, "Failed to create new set set " );
+            tagged_sets.insert(newSet);
+        }
     }
+    partIds.resize(distributes.size());
+    // remove empty parts
+    // this works in C++11 only
+    for (auto it = distributes.cbegin(); it != distributes.cend() /* not hoisted */; /* no increment */)
+    {
+        Range eset = it->second;
+        if (eset.empty())
+        {
+            it = distributes.erase(it);    //  since C++11
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    i = 0;
+    for (auto mit = distributes.begin(); mit!= distributes.end(); mit++, i++)
+    {
+        int part = mit->first;
+        Range & eset = mit->second;
+        partIds[i] = part;
+        EntityHandle pset = tagged_sets[i];
+        rval = mbImpl->add_entities(pset, eset); MB_CHK_SET_ERR( rval, "Failed to add to set " );
+    }
+
+    // set the new part ids:
+    rval = mbImpl->tag_set_data(part_set_tag, tagged_sets, &partIds[0]); MB_CHK_SET_ERR( rval, "Failed to set par tag " );
+
+    rval = mbImpl->add_entities(initialSet, tagged_sets); MB_CHK_SET_ERR( rval, "Failed to add sets " );
 
     // Free the memory allocated for lists returned by LB_Parition()
 
@@ -220,7 +298,7 @@ ErrorCode ZoltanPartitioner::balance_mesh(  EntityHandle initialSet, EntityHandl
 
     return MB_SUCCESS;
 }
-
+#endif
 ErrorCode ZoltanPartitioner::repartition( std::vector< double >& x, std::vector< double >& y, std::vector< double >& z,
                                           int StartID, const char* zmethod, Range& localGIDs )
 {

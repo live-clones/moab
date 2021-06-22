@@ -361,13 +361,7 @@ int main( int argc, char* argv[] )
 
     EntityHandle initialSet;
     rval = mb.create_meshset( MESHSET_SET, initialSet );MB_CHK_SET_ERR( rval, "Failed to create initial set " );
-    EntityHandle outputSet;
-    if (psize > 1)
-    {
-      rval = mb.create_meshset( MESHSET_SET, outputSet );MB_CHK_SET_ERR( rval, "Failed to create initial set " );
-    }
-    else
-        outputSet = initialSet;
+
 
     if (0 == proc_id) std::cout << "Loading file " << input_file << "..." << std::endl;
     if( load_msets == false )
@@ -408,9 +402,11 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
             if (psize > 1)
             {
-                // just balance the mesh for the time being, in parallel; it will not work for geometry yet
-                rval = zoltan_tool->balance_mesh( initialSet, outputSet, zoltan_method.c_str(), ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ),
-                        write_sets, write_tags ); MB_CHK_SET_ERR( rval, "Zoltan balance failed." );
+                // just balance the mesh for the time being, in parallel; it will not work for CGM geo
+                std::map<int, Range> distributes; // each part will have some local cells out of this
+                rval = zoltan_tool->balance_mesh( initialSet, zoltan_method.c_str(), ( !parm_method.empty() ? parm_method.c_str() : oct_method.c_str() ), num_parts,
+                        distributes,
+                        write_sets, write_tags, part_dim ); MB_CHK_SET_ERR( rval, "Zoltan balance failed." );
             }
             else
             {
@@ -509,7 +505,7 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_ZOLTAN
                 if (0 == proc_id) std::cout << "Saving file in parallel to " << output_file << std::endl;
                 rval = mb.write_file( tmp_output_file.str().c_str(), 0, "PARALLEL=WRITE_PART",
-                   &outputSet, 1 );MB_CHK_SET_ERR( rval, tmp_output_file.str() << " : failed to write file." << std::endl );
+                   &initialSet, 1 );MB_CHK_SET_ERR( rval, tmp_output_file.str() << " : failed to write file." << std::endl );
 #endif
             }
             else

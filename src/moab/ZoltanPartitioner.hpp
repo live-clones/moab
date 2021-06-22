@@ -84,15 +84,18 @@ class ZoltanPartitioner : public PartitionerBase< int >
     );
 
     virtual ~ZoltanPartitioner();
-
-    ErrorCode balance_mesh( EntityHandle initialSet, EntityHandle outputSet, const char* zmethod, const char* other_method, const bool write_as_sets = true,
-                            const bool write_as_tags = false );
-
-    virtual ErrorCode partition_mesh_and_geometry(
-        const double part_geom_mesh_size, const int nparts, const char* zmethod, const char* other_method,
-        double imbal_tol, const int part_dim = 3, const bool write_as_sets = true, const bool write_as_tags = false,
-        const int obj_weight = 0, const int edge_weight = 0, const bool part_surf = false, const bool ghost = false,
-        const int projection_type = 0, const bool recompute_rcb_box = false, const bool print_time = false );
+#ifdef MOAB_HAVE_MPI
+    ErrorCode balance_mesh( EntityHandle initialSet, const char* zmethod, const char* other_method, int num_parts,
+            std::map<int, Range> &distributes, const bool write_as_sets = true,
+                            const bool write_as_tags = false , int dimension = 3 );
+#endif
+    virtual ErrorCode partition_mesh_and_geometry( const double part_geom_mesh_size, const int nparts,
+                                                   const char* zmethod, const char* other_method, double imbal_tol,
+                                                   const int part_dim = 3, const bool write_as_sets = true,
+                                                   const bool write_as_tags = false, const int obj_weight = 0,
+                                                   const int edge_weight = 0, const bool part_surf = false,
+                                                   const bool ghost = false, const int projection_type = 0, const bool recompute_rcb_box = false,
+                                                   const bool print_time = false );
 
     virtual ErrorCode partition_mesh( const int nparts, const char* method, const int part_dim = 3,
                                       const bool write_as_sets = true, const bool write_as_tags = false,
