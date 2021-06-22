@@ -3,7 +3,7 @@ include ../makefile.config
 
 default: all
 
-EXAMPLES =  ExtrudePoly
+EXAMPLES =  ExtrudePoly CoalescePartitions
 PAREXAMPLES = LloydRelaxation CrystalRouterExample GenLargeMesh CoupleMGen
 EXOIIEXAMPLES = VisTags
 ALLEXAMPLES = ${EXAMPLES}
@@ -22,12 +22,13 @@ endif
 all: $(ALLEXAMPLES)
 
 ExtrudePoly: ExtrudePoly.o ${MOAB_LIBDIR}/libMOAB.la
+CoalescePartitions: CoalescePartitions.o ${MOAB_LIBDIR}/libMOAB.la
 LloydRelaxation: LloydRelaxation.o ${MOAB_LIBDIR}/libMOAB.la
 CrystalRouterExample: CrystalRouterExample.o ${MOAB_LIBDIR}/libMOAB.la
 VisTags: VisTags.o ${MOAB_LIBDIR}/libMOAB.la
 GenLargeMesh: GenLargeMesh.o ${MOAB_LIBDIR}/libMOAB.la
 
-ExtrudePoly LloydRelaxation CrystalRouterExample VisTags GenLargeMesh:
+ExtrudePoly LloydRelaxation CrystalRouterExample VisTags GenLargeMesh CoalescePartitions:
 	@echo "[CXXLD]  $@"
 	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
 
