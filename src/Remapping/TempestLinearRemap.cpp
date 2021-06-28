@@ -313,7 +313,19 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     m_mapRemap.GetEntries( lrows, lcols, lvals );
     unsigned locvals = lvals.GetRows();
 
-    m_weightMatrix.reserve( locvals );
+    // first matrix
+    typedef Eigen::Triplet< double > Triplet;
+    std::vector< Triplet > tripletList;
+    tripletList.reserve( locvals );
+    for( int iv = 0; iv < locvals; iv++ )
+    {
+        tripletList.push_back( Triplet( lrows[iv], lcols[iv], lvals[iv] ) );
+    }
+
+    m_weightMatrix.setFromTriplets( tripletList.begin(), tripletList.end() );
+    m_weightMatrix.makeCompressed();
+
+    /*m_weightMatrix.reserve( locvals );
     for( unsigned iv = 0; iv < locvals; iv++ )
     {
         // std::cout << "Row = " << row_ldofmap[lrows[iv]] << ", Col = " << col_ldofmap[lcols[iv]]
@@ -322,7 +334,28 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
         m_weightMatrix.insert( lrows[iv], lcols[iv] ) = lvals[iv];
     }
 
-    m_weightMatrix.makeCompressed();
+    m_weightMatrix.makeCompressed();*/
+    int nrows = m_weightMatrix.rows();         // Number of rows
+    int ncols = m_weightMatrix.cols();         // Number of columns
+    int NNZ = m_weightMatrix.nonZeros();     // Number of non zero values
+#ifdef MOAB_HAVE_MPI
+    // find out min/max for NNZ, ncols, nrows
+    // should work on std c++ 11
+    int arr3[3] = {NNZ, nrows, ncols};
+    int rarr3[3];
+    int mpierr = MPI_Reduce(arr3, rarr3, 3, MPI_INT, MPI_MIN, 0, m_pcomm->comm());
+    if (!rank)
+        std::cout << "MIN nr rows: " << rarr3 [1] << " cols: " << rarr3[2] << " non-zeros: " << rarr3[0] << "\n";
+
+    mpierr = MPI_Reduce(arr3, rarr3, 3, MPI_INT, MPI_MAX, 0, m_pcomm->comm());
+    if (!rank)
+        std::cout << "MAX nr rows: " << rarr3 [1] << " cols: " << rarr3[2] << " non-zeros: " << rarr3[0] << "\n";
+    mpierr = MPI_Reduce(arr3, rarr3, 1, MPI_INT, MPI_SUM, 0, m_pcomm->comm());
+    if (!rank)
+        std::cout << " Total number of non-zeros: " << rarr3[0] << "\n";
+#else
+    std::cout << "nr rows: " << nrows << " cols: " << ncols << " non-zeros: " << NNZ << > "\n";
+#endif
 
 #ifdef VERBOSE
     std::stringstream sstr;
