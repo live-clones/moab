@@ -1398,7 +1398,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     rval = m_interface->write_mesh( ffs.str().c_str(), &tmpSet, 1 );MB_CHK_ERR( rval );
 #endif
 
-    // now that we have the boundary cells, see which overlap polys have have these as parents;
+    // now that we have the boundary cells, see which overlap polys have these as parents;
     //   find the ids of the boundary cells;
     Tag gid = m_interface->globalId_tag();
     std::set< int > targetBoundaryIds;
@@ -1513,7 +1513,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     if( is_root ) std::cout << "maximum number of edges for polygons to send is " << globalMaxEdges << "\n";
 #endif
 
-#ifdef VERBOSE
+#ifdef MOAB_DBG
     EntityHandle tmpSet2;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet2 );MB_CHK_SET_ERR( rval, "Can't create temporary set2" );
     // add the affected source and overlap elements
@@ -1653,7 +1653,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
 
     // send first the vertices and overlap cells to original task for coverage cells
     // now we are done populating the tuples; route them to the appropriate processors
-#ifdef VERBOSE
+#ifdef MOAB_DBG
     std::stringstream ff1;
     ff1 << "TLc_" << rank << ".txt";
     TLc.print_to_file( ff1.str().c_str() );
@@ -1664,7 +1664,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, TLv, 0 );
     ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, TLc, 0 );
 
-#ifdef VERBOSE
+#ifdef MOAB_DBG
     TLc.print_to_file( ff1.str().c_str() );  // will append to existing file
     TLv.print_to_file( ffv.str().c_str() );
 #endif
@@ -1886,7 +1886,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, TLc2, 0 );
     // now, look at vertices from TLv2, and create them
     // we should have in TLv2 only vertices with orgProc different from current task
-#ifdef VERBOSE
+#ifdef MOAB_DBG
     std::stringstream ff2;
     ff2 << "TLc2_" << rank << ".txt";
     TLc2.print_to_file( ff2.str().c_str() );

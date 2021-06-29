@@ -36,6 +36,7 @@
 #include <sstream>
 
 // #define VERBOSE
+#define MOAB_DBG
 
 extern void BuildIntegrationArray( const Mesh& m_meshInput, const Mesh& m_meshOverlap,
                                    const TriangularQuadratureRule& triquadrule, int ixFirstFace, int ixOverlapBegin,
@@ -262,7 +263,15 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
                 // signal to not participate, because it is a ghost target
                 if( ixSecondFaceLoc < 0 ) continue;  // do not do anything
-
+#ifdef MOAB_DBG
+                int desiredRow =  18640, desiredCol = 181;
+                if (row_gdofmap[ixSecondFaceLoc] == desiredRow-1 &&
+                        col_gdofmap[ixFirstFaceLoc] == desiredCol-1)
+                {
+                    dbgprint.printf( 0, "rank:%d ixSecondFaceLoc=%d , ixFirstFaceLoc=%d  row:%d col:%d \n" , rank, ixSecondFaceLoc,
+                            ixFirstFaceLoc,  row_gdofmap[ixSecondFaceLoc],  col_gdofmap[ixFirstFaceLoc], rank );
+                }
+#endif
                 m_mapRemap( ixSecondFaceLoc, ixFirstFaceLoc ) +=
                     dComposedArray[i][j] / m_meshOutput->vecFaceArea[ixSecondFaceLoc];
             }
@@ -1543,5 +1552,5 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
 
     return;
 }
-
+#undef MOAB_DBG
 ///////////////////////////////////////////////////////////////////////////////
