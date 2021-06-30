@@ -335,6 +335,8 @@ class TempestOnlineMap : public OfflineMap
     moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag,
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
+    // hack
+    void SetMeshInput (Mesh * imesh) { m_meshInput = imesh;};
   private:
     void setup_sizes_dimensions();
 

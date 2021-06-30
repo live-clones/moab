@@ -136,7 +136,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     // Verify ReverseNodeArray has been calculated
     if( m_meshInputCov->faces.size() > 0 && m_meshInputCov->revnodearray.size() == 0 )
     {
-        _EXCEPTIONT( "ReverseNodeArray has not been calculated for m_meshInput" );
+        _EXCEPTIONT( "ReverseNodeArray has not been calculated for m_meshInputCov" );
     }
 
     // Triangular quadrature rule

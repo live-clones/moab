@@ -178,6 +178,12 @@ class TempestRemapper : public Remapper
     void SetMeshType( Remapper::IntersectionContext ctx, TempestMeshType type,
                       const std::vector< int >* metadata = nullptr );
 
+
+    /// <summary>
+    ///     reconstruct mesh, used now only for IO; need a better solution maybe
+    /// </summary>
+    void ResetMeshSet( Remapper::IntersectionContext ctx, moab::EntityHandle meshSet );
+
     /// <summary>
     ///     Get the mesh type corresponding to the intersection context
     /// </summary>
@@ -348,6 +354,31 @@ inline void TempestRemapper::SetMesh( Remapper::IntersectionContext ctx, Mesh* m
             if( !overwrite && m_covering_source ) return;
             if( overwrite && m_covering_source ) delete m_covering_source;
             m_covering_source = mesh;
+            break;
+        case Remapper::DEFAULT:
+        default:
+            break;
+    }
+}
+
+inline void TempestRemapper::ResetMeshSet( Remapper::IntersectionContext ctx, moab::EntityHandle meshSet )
+{
+    switch( ctx )
+    {
+        case Remapper::SourceMesh:
+            delete m_source;
+            m_source = new Mesh;
+            m_source_set = meshSet;
+            convert_mesh_to_tempest_private( m_source, m_source_set, m_source_entities, &m_source_vertices );
+            break;
+        case Remapper::TargetMesh:
+            // not needed yet
+            break;
+        case Remapper::OverlapMesh:
+            // not needed yet
+            break;
+        case Remapper::CoveringMesh:
+            // not needed yet
             break;
         case Remapper::DEFAULT:
         default:
