@@ -75,8 +75,13 @@ namespace common_tree
     namespace
     {
         template < typename T >
-        struct Compute_center : public std::binary_function< T, T, T >
+        struct Compute_center
         {
+            // deprecation of binary_function
+            typedef T first_argument_type;
+            typedef T second_argument_type;
+            typedef T result_type;
+
             T operator()( const T a, const T b ) const
             {
                 return ( a + b ) / 2.0;

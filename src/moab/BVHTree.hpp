@@ -160,8 +160,13 @@ class BVHTree : public Tree
         }
     };  // SplitData
 
-    class Split_comparator : public std::binary_function< SplitData, SplitData, bool >
+    class Split_comparator
     {
+        // deprecation of binary_function
+        typedef SplitData first_argument_type;
+        typedef SplitData second_argument_type;
+        typedef bool result_type;
+
         inline double objective( const SplitData& a ) const
         {
             return a.Lmax * a.nl - a.Rmin * a.nr;
@@ -174,8 +179,13 @@ class BVHTree : public Tree
         }
     };  // Split_comparator
 
-    class HandleData_comparator : public std::binary_function< HandleData, HandleData, bool >
+    class HandleData_comparator
     {
+      // deprecation of binary_function
+      typedef HandleData first_argument_type;
+      typedef HandleData second_argument_type;
+      typedef bool result_type;
+        
       public:
         bool operator()( const HandleData& a, const HandleData& b )
         {
