@@ -1366,7 +1366,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
      *
      * 1) collect all boundary target cells on the current task, affected by the partition boundary;
      *    note: not only partition boundary, we need all boundary (all coastal lines) and partition
-     * boundary targetBoundaryIds is the set of target boundary cell IDs
+     *    boundary.
+     *    targetBoundaryIds is the set of target boundary cell IDs
      *
      * 2) collect all source cells that are intersecting boundary cells (call them
      * affectedSourceCellsIds)
@@ -1387,7 +1388,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     Range boundaryCells;  // these will be filtered from target_set
     rval = m_interface->get_adjacencies( boundaryEdges, 2, false, boundaryCells, Interface::UNION );MB_CHK_ERR( rval );
     boundaryCells = intersect( boundaryCells, targetCells );
-#ifdef VERBOSE
+#ifdef MOAB_DBG
     EntityHandle tmpSet;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet );MB_CHK_SET_ERR( rval, "Can't create temporary set" );
     // add the boundary set and edges, and save it to a file
@@ -1442,7 +1443,6 @@ ErrorCode TempestRemapper::augment_overlap_set()
     std::set< EntityHandle > affectedCovCells;  // their overlap cells will be sent to their
                                                 // original task, then distributed to all
     // other processes that might need them to compute conservation
-
     Range covCells;
     rval = m_interface->get_entities_by_dimension( m_covering_source_set, 2, covCells );MB_CHK_ERR( rval );
     // loop thru all cov cells, to find the ones with global ids in affectedSourceCellsIds
@@ -1458,7 +1458,9 @@ ErrorCode TempestRemapper::augment_overlap_set()
             affectedCovCells.insert( covCell );
         }
     }
-
+#ifdef MOAB_DBG
+    std::cout <<" on rank " << rank << " there are "<< affectedCovCells.size() <<" affectedCovCells \n";
+#endif
     // now loop again over all overlap cells, to see if their source parent is "affected"
     // store in ranges the overlap cells that need to be sent to original task of the source cell
     // from there, they will be redistributed to the tasks that need that coverage cell

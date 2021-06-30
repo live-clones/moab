@@ -925,6 +925,10 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     // global dofs tag that need to be sent with coverage info
     int migrated_mesh = 0;
     if( orig_sender != -1 ) migrated_mesh = 1;  //
+
+    int ghost_info = 0;
+    if (extraWork)
+        ghost_info = 1; // an extra field for ghost cell owner; we need it
     // if size_gdofs_tag>0, we are sure valsDOFs got resized to what we need
 
     // get all mesh verts1
@@ -1066,7 +1070,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
 
     // add also GLOBAL_DOFS info, if found on the mesh cell; it should be found only on HOMME cells!
     int sizeTuple =
-        2 + max_edges_1 + migrated_mesh + size_gdofs_tag;  // max edges could be up to MAXEDGES :) for polygons
+        2 + max_edges_1 + migrated_mesh + size_gdofs_tag + ghost_info;  // max edges could be up to MAXEDGES :) for polygons
     TLq.initialize( sizeTuple, 0, 0, 0,
                     numq );  // to proc, elem GLOBAL ID, connectivity[max_edges] (global ID v), plus
                              // original sender if set (migrated mesh case)
@@ -1133,9 +1137,18 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             // is the mesh migrated before or not?
             if( migrated_mesh )
             {
-                // case of extra work, maybe need to check if it is ghost ?
+                // case of extra work, maybe need to check if it is ghost ? yes, next loop !
                 rval = mb->tag_get_data( orgSendProcTag, &q, 1, &orig_sender );MB_CHK_SET_ERR( rval, "can't get original sender for polygon, in migrate scenario" );
                 TLq.vi_wr[sizeTuple * n + currentIndexIntTuple] = orig_sender;  // should be different than -1
+                currentIndexIntTuple++;
+            }
+            if (ghost_info > 0) // extraWork
+            {
+                // case of ghost
+                int owner = my_rank;
+                // this could happen if extra work, real owner is different ?
+                rval = parcomm->get_owner(q, owner); MB_CHK_SET_ERR( rval, "can't get owner for cell" );
+                TLq.vi_wr[sizeTuple * n + currentIndexIntTuple] = owner;  // should be different than -1
                 currentIndexIntTuple++;
             }
             // GLOBAL_DOFS info, if available
@@ -1267,6 +1280,16 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             rval        = mb->tag_set_data( orgSendProcTag, &new_element, 1, &orig_sender );MB_CHK_SET_ERR( rval, "can't set original sender for cell, in migrate scenario" );
             currentIndexIntTuple++;  // add one more
         }
+        // store also the processor this coverage element came from
+        int from_proc = TLq.vi_rd[sizeTuple * i];
+        if( ghost_info ) // ghost info will have the original owner of the coverage cell
+        {
+            // case of ghost
+           from_proc = TLq.vi_wr[sizeTuple * i + currentIndexIntTuple];
+           currentIndexIntTuple++;  // add one more
+        }
+        rval = mb->tag_set_data( sendProcTag, &new_element, 1, &from_proc );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+
         // check if we need to retrieve and set GLOBAL_DOFS data
         if( size_gdofs_tag )
         {
@@ -1276,9 +1299,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
             }
             rval = mb->tag_set_data( gdsTag, &new_element, 1, &valsDOFs[0] );MB_CHK_SET_ERR( rval, "can't set GLOBAL_DOFS data on coverage mesh" );
         }
-        // store also the processor this coverage element came from
-        int from_proc = TLq.vi_rd[sizeTuple * i];
-        rval          = mb->tag_set_data( sendProcTag, &new_element, 1, &from_proc );MB_CHK_SET_ERR( rval, "can't set sender for cell" );
+
     }
 
     // now, add to the covering_set the elements created in the local_q range

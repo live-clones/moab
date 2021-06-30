@@ -172,7 +172,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     int ixOverlap                  = 0;
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;
 
-    // Loop through all faces on m_meshInput
+    // Loop through all faces on m_meshInputCov
     for( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
     {
         // Output every 1000 elements
@@ -918,7 +918,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
     // Area of each overlap element in the output basis
     DataArray2D< double > dOverlapOutputArea( m_meshOverlap->faces.size(), nPout * nPout );
 
-    // Loop through all faces on m_meshInput
+    // Loop through all faces on m_meshInputCov
     ixOverlap                      = 0;
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;
 

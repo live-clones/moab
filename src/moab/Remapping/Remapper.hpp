@@ -77,11 +77,17 @@ class Remapper
     /// <summary>
     ///     ghost layers
     /// </summary>
-    moab::ErrorCode GhostLayers( moab::EntityHandle& meshset, const int ngh_layers )
+    moab::ErrorCode GhostLayers( moab::EntityHandle& meshset, const int ngh_layers, moab::EntityHandle& original )
     {
         // meshset contains the mesh set distributed already
         //
-        moab::ErrorCode rval = m_pcomm->exchange_ghost_cells( 2, 1, 1, 0, true, true, &meshset ); MB_CHK_ERR(rval);
+        moab::ErrorCode rval = m_interface -> create_meshset(MESHSET_SET, original); MB_CHK_ERR(rval);
+        // copy original content of mesh set here; we will use it later for local area, for example
+        // it will not have any ghosts in it
+        moab::Range orgEnts;
+        rval = m_interface -> get_entities_by_handle(meshset, orgEnts); MB_CHK_ERR(rval);
+        rval = m_interface -> add_entities(original, orgEnts); MB_CHK_ERR(rval);
+        rval = m_pcomm->exchange_ghost_cells( 2, 1, 1, 0, true, true, &meshset ); MB_CHK_ERR(rval);
         for (int i=2; i<=ngh_layers; i++ )
         {
             rval = m_pcomm->correct_thin_ghost_layers(); MB_CHK_ERR(rval);

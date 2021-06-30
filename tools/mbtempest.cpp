@@ -522,7 +522,18 @@ int main( int argc, char* argv[] )
             double local_areas[3],
                 global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_src );
+#ifdef MOAB_HAVE_MPI
+            if (nlayers > 0)
+            {
+                // compute area of original source set, without ghosts
+                local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[3], radius_src );
+            }
+            else
+                local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0], radius_src );
+#else
             local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0], radius_src );
+#endif
+
             local_areas[1] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1], radius_dest );
             local_areas[2] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[2], radius_src );
 
@@ -797,7 +808,9 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
             // get order -1 ghost layers; actually i should be decided by the mesh
             // if the mesh has holes, it could be more
             int nlayers = ctx.disc_orders[0] - 1; // this should work if no holes and order not too high
-            rval = remapper.GhostLayers( ctx.meshsets[0], nlayers ); MB_CHK_ERR( rval );
+            moab::EntityHandle originalSourceSet;
+            rval = remapper.GhostLayers( ctx.meshsets[0], nlayers, originalSourceSet); MB_CHK_ERR( rval );
+            ctx.meshsets.push_back(originalSourceSet); // so ctx.meshsets[3] will have the original source set
 #ifdef MOAB_DBG
             // write the new source sets, after layers were decided, should see the ghosts now
             std::stringstream filename;
