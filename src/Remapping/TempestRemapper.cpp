@@ -484,11 +484,6 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHa
             assert( indx >= 0 );
             face.SetNode( iverts, indx );
         }
-#ifdef MOAB_DBG
-        int gid = 0;
-        rval = m_interface->tag_get_data( gtag, &ehandle, 1, &gid );MB_CHK_ERR( rval );
-        face.SetGlobalID(gid);
-#endif
     }
 
     unsigned nnodes = verts.size();

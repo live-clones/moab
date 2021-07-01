@@ -370,6 +370,7 @@ inline void TempestRemapper::ResetMeshSet( Remapper::IntersectionContext ctx, mo
             m_source = new Mesh;
             m_source_set = meshSet;
             convert_mesh_to_tempest_private( m_source, m_source_set, m_source_entities, &m_source_vertices );
+            m_source->CalculateFaceAreas( false ); // fInputConcave is false ?
             break;
         case Remapper::TargetMesh:
             // not needed yet
