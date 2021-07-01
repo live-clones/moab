@@ -38,7 +38,7 @@
 #endif
 
 // #define VERBOSE
-#define MOAB_DBG
+//#define MOAB_DBG
 
 namespace moab
 {
