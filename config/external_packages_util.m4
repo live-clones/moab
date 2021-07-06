@@ -315,14 +315,14 @@ AC_DEFUN([CLONE_SOURCE_REPOSITORY],
       filedownloaded=yes # From a previous clone.
       # Let us update the repo instead
       PREFIX_PRINT([ *      Git: $1 package updating repository branch $gitbranch  ])
-      op_downloadlog$1="`cd $4 && git fetch -p && git pull origin $gitbranch && git reset --hard origin/$gitbranch && cd $currdir`"
+      op_downloadlog$1="`cd $4 && git fetch -p -q && git pull -q --ff-only origin $gitbranch && git reset --hard origin/$gitbranch && cd $currdir`"
       eval "cd $4 && git rev-parse HEAD > $4/HEAD_HASH2 && cd $currdir"
       new_download=false
     else
       eval "rm -rf $4" # Can't clone into an existing directory
       PREFIX_PRINT([ *      Git: $1 package downloading to $4  ])
       op_downloadlog$1="`git clone --single-branch --quiet --branch $gitbranch $2 $4`"
-      eval "cd $4 && git rev-parse HEAD > $4/HEAD_HASH && cd $currdir"
+      eval "cd $4 && git rev-parse HEAD > $4/HEAD_HASH && cp $4/HEAD_HASH $4/HEAD_HASH2 && cd $currdir"
       filedownloaded=yes
       new_download=true
     fi
@@ -538,7 +538,9 @@ AC_DEFUN([AUSCM_CONFIGURE_EXTERNAL_PACKAGE],
     	  m4_toupper([AUSCM_AUTOMATED_CONFIGURE_$1])([$need_configuration])dnl
     ])
 
-    PREFIX_PRINT([Downloaded package version: m4_defn(m4_toupper($1)[_DOWNLOAD_VERSION])])
+    if (test "x$pkg_repo_branch" == "x"); then
+      PREFIX_PRINT([Downloaded package version: m4_defn(m4_toupper($1)[_DOWNLOAD_VERSION])])
+    fi
     CHECK_SOURCE_RECOMPILATION_HASH([$1],[$pkg_srcdir],[$MOAB_PACKAGES_DIR/$pkg_archive_name])
 
     # Run the build, install, and postprocess macros found in the package specific .m4 files.
@@ -1594,10 +1596,10 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP],[
   tempestremap_repository_branch="master"
 
   # Invoke the download-tempestremap command
-  m4_case( TEMPESTREMAP_DOWNLOAD_VERSION, [2.0.5], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.5.tar.gz], [$2] ) ],
+  m4_case( TEMPESTREMAP_DOWNLOAD_VERSION, [2.1.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.1.0.tar.gz], [$2] ) ],
+                                  [2.0.5], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.5.tar.gz], [$2] ) ],
                                   [2.0.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.3.tar.gz], [$2] ) ],
-                                  [2.0.2], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.2.tar.gz], [$2] ) ],
-                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.0.5.tar.gz], [$2] ) ] )
+                                  [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([TempestRemap], [https://github.com/ClimateGlobalChange/tempestremap/archive/v2.1.0.tar.gz], [$2] ) ] )
 
   if (test "x$downloadtempestremap" == "xyes") ; then
     # download the latest TempestRemap sources, configure and install
