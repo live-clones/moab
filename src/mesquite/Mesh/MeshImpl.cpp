@@ -1173,8 +1173,12 @@ void MeshImpl::vertices_set_byte( const VertexHandle* vertex, const unsigned cha
 }
 
 template < typename T >
-struct cast_handle : public std::unary_function< size_t, T >
+struct cast_handle
 {
+    // deprecation of unary_function
+    typedef size_t argument_type;
+    typedef T result_type;
+
     T operator()( size_t idx ) const
     {
         return reinterpret_cast< T >( idx );

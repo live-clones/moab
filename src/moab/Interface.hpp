@@ -1871,8 +1871,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
 //! of the specified type.  For example, to remove all the tris out of a list
 //! of 2D entities retrieved using get_adjacencies you could do
 //! std::remove_if(list.begin(), list.end(), type_equals(gMB, MBTRI));
-class type_equals : public std::unary_function< EntityHandle, bool >
+class type_equals
 {
+  // deprecation of unary_function
+  typedef EntityHandle argument_type;
+  typedef bool result_type;
+  
   public:
     //! interface object
     Interface* meshDB;
@@ -1894,8 +1898,12 @@ class type_equals : public std::unary_function< EntityHandle, bool >
 //! of the specified type.  For example, to remove all but the tris out of a list
 //! of 2D entities retrieved using get_adjacencies you could do
 //! std::remove_if(list.begin(), list.end(), type_not_equals(gMB, MBTRI));
-class type_not_equals : public std::unary_function< EntityHandle, bool >
+class type_not_equals
 {
+  // deprecation of unary_function
+  typedef EntityHandle argument_type;
+  typedef bool result_type;
+  
   public:
     //! interface object
     Interface* meshDB;

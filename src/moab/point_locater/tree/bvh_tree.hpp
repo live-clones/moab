@@ -58,8 +58,13 @@ namespace
         };  // _Node
 
         template < typename Split >
-        class Split_comparator : public std::binary_function< Split, Split, bool >
+        class Split_comparator
         {
+            // deprecation of binary_function
+            typedef Split first_argument_type;
+            typedef Split second_argument_type;
+            typedef bool result_type;
+
             inline double objective( const Split& a ) const
             {
                 return a.Lmax * a.nl - a.Rmin * a.nr;
@@ -73,8 +78,12 @@ namespace
         };  // Split_comparator
 
         template < typename Iterator >
-        class Iterator_comparator : public std::binary_function< Iterator, Iterator, bool >
+        class Iterator_comparator
         {
+          // deprecation of binary_function
+          typedef Iterator first_argument_type;
+          typedef Iterator second_argument_type;
+          typedef bool result_type;
           public:
             bool operator()( const Iterator& a, const Iterator& b ) const
             {
