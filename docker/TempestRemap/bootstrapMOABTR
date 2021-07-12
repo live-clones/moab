@@ -77,19 +77,19 @@ else
 fi
 
 ## Create some startup files
-echo "Welcome to the MOAB development environment image, which contains all
-tools, and library installation for handling and manipulating meshes
-(both structured and unstructured), and mesh generation for use in
-computational simulations along with interfaces for different output
-formats.
+echo "Welcome to the MOAB-TempestRemap development environment image, 
+which contains all tools, and library installations for handling and 
+manipulating meshes (both structured and unstructured), and mesh generation 
+for use in computational simulations along with interfaces for different 
+output formats.
 
 This image provides the necessary setup for updating and re-building
 examples based on MOAB library. MOAB has been pre-built with MPI, HDF5,
-NetCDF, PNetCDF, Eigen3, Zoltan, Metis, Parmetis, BLAS/LAPACK as its
-dependencies. Python interfaces exposed with PyMOAB are also enabled.
-These TPLs have been installed with Spack in order to get a consistent
-toolchain. This image can be used by all users with intent to experiment,
-and use MOAB library in their own applications." > $MOABHOMEDIR/.WELCOMEMSG 
+NetCDF, PNetCDF, Eigen3, TempestRemap, Zoltan, Metis, Parmetis and 
+BLAS/LAPACK as its dependencies. These TPLs have been installed with 
+Spack in order to get a consistent toolchain. This image can be used 
+by all users with intent to experiment, and use MOAB-TempestRemap 
+libraries in their own applications." > $MOABHOMEDIR/.WELCOMEMSG 
 
 ## Generate .bash_profile file
 echo "# ~/.bash_profile: executed by bash(1) for login shells.
