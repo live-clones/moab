@@ -420,7 +420,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 
 extern void ForceConsistencyConservation3( const DataArray1D< double >& vecSourceArea,
                                            const DataArray1D< double >& vecTargetArea, DataArray2D< double >& dCoeff,
-                                           bool fMonotone );
+                                           bool fMonotone, bool fSparseConstraints = false );
 
 ///////////////////////////////////////////////////////////////////////////////
 
