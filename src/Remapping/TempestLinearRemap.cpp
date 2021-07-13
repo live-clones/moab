@@ -134,9 +134,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
     // Verify ReverseNodeArray has been calculated
     if( m_meshInputCov->faces.size() > 0 && m_meshInputCov->revnodearray.size() == 0 )
-    {
-        _EXCEPTIONT( "ReverseNodeArray has not been calculated for m_meshInput" );
-    }
+    { _EXCEPTIONT( "ReverseNodeArray has not been calculated for m_meshInput" ); }
 
     // Triangular quadrature rule
     TriangularQuadratureRule triquadrule( TriQuadRuleOrder );
@@ -176,9 +174,7 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     {
         // Output every 1000 elements
         if( ixFirst % outputFrequency == 0 && is_root )
-        {
-            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
-        }
+        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
 
         // Find the set of Faces that overlap faceFirst
         int ixOverlapBegin    = ixOverlap;
@@ -436,7 +432,8 @@ extern void ForceIntArrayConsistencyConservation( const DataArray1D< double >& v
 
 void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                                           const DataArray3D< double >& dataGLLJacobian,
-                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation, bool useSparseConstraints )
+                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation,
+                                                          bool useSparseConstraints )
 {
     // Order of the polynomial interpolant
     int nP = dataGLLNodes.GetRows();
@@ -503,9 +500,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
 
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        {
-            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
-        }
+        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
 
         // Need to re-number the overlap elements such that vecSourceFaceIx[a:b] = 0, then 1 and so
         // on wrt the input mesh data Then the overlap_end and overlap_begin will be correct.
@@ -721,9 +716,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                           m_meshInputCov->vecFaceArea[ixFirst] );
 #endif
                 if( dTargetArea > m_meshInputCov->vecFaceArea[ixFirst] )
-                {
-                    _EXCEPTIONT( "Partial element area exceeds total element area" );
-                }
+                { _EXCEPTIONT( "Partial element area exceeds total element area" ); }
 
                 dCoeff.Allocate( nOverlapFaces + 1, nP * nP );
 
@@ -772,7 +765,8 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                 _EXCEPTIONT( "Target grid must be a subset of source grid" );
             }
 
-            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 ), useSparseConstraints
+            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 ),
+                                           useSparseConstraints
                                            /*, m_remapper->lid_to_gid_covsrc[ixFirst]*/ );
 
             for( int j = 0; j < nOverlapFaces; j++ )
@@ -918,9 +912,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
     {
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        {
-            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
-        }
+        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
 
         // Quantities from the First Mesh
         const Face& faceFirst = m_meshInputCov->faces[ixFirst];
@@ -1153,9 +1145,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
 
         // Force consistency and conservation
         if( !fNoConservation )
-        {
-            ForceIntArrayConsistencyConservation( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType != 0 ) );
-        }
+        { ForceIntArrayConsistencyConservation( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType != 0 ) ); }
 
         // Update global coefficients
         for( int i = 0; i < nOverlapFaces; i++ )
@@ -1277,9 +1267,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
     {
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        {
-            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
-        }
+        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
 
         // Number of overlapping Faces and triangles
         int nOverlapFaces = nAllOverlapFaces[ixFirst];
@@ -1436,9 +1424,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
     {
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        {
-            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
-        }
+        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
 
         // Quantities from the First Mesh
         const Face& faceFirst = m_meshInputCov->faces[ixFirst];
@@ -1502,9 +1488,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
                     // Check if this node is within the first Face
                     if( ( dAlphaIn < -1.0e-10 ) || ( dAlphaIn > 1.0 + 1.0e-10 ) || ( dBetaIn < -1.0e-10 ) ||
                         ( dBetaIn > 1.0 + 1.0e-10 ) )
-                    {
-                        continue;
-                    }
+                    { continue; }
 
                     // Node is within the overlap region, mark as found
                     fSecondNodeFound[ixSecondNode] = true;

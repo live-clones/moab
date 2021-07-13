@@ -199,8 +199,8 @@ struct ToolContext
                              &enforceConvexity );
         opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes", &fBubble );
 
-        opts.addOpt< void >( "sparse_constraints,s",
-                                "use sparse constraints in force consistency and conservation 3", &useSparseConstraints);
+        opts.addOpt< void >( "sparse_constraints,s", "use sparse constraints in force consistency and conservation 3",
+                             &useSparseConstraints );
         opts.parseCommandLine( argc, argv );
 
         // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree
@@ -601,9 +601,7 @@ int main( int argc, char* argv[] )
                 runCtx->doftag_names[1],                         // std::string target_tag_name,
                 runCtx->fInputConcave,                           // bool fInputConcave
                 runCtx->fOutputConcave,                          // bool fOutputConcave
-                runCtx->useSparseConstraints
-            );
-            MB_CHK_ERR( rval );
+                runCtx->useSparseConstraints );MB_CHK_ERR( rval );
             runCtx->timer_pop();
 
             // Invoke the CheckMap routine on the TempestRemap serial interface directly, if running
