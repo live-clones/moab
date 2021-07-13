@@ -23,7 +23,6 @@ AM_CPPFLAGS  = -DIS_BUILDING_MB \
                -I$(top_srcdir)/src  \
                -I$(top_srcdir)/src/LocalDiscretization \
                -I$(top_srcdir)/src/verdict \
-               -I$(top_srcdir)/src/RefineMesh \
                -I$(top_srcdir)/src/DiscreteGeometry \
                -I$(top_srcdir)/src/IntxMesh
 

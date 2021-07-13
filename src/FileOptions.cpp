@@ -179,9 +179,9 @@ ErrorCode FileOptions::get_ints_option( const char* name, std::vector< int >& va
         char* endptr;
         long int sval = strtol( s, &endptr, 0 );
 
-#define EATSPACE( a )                                     \
-    while( ( *(a) == ' ' || *(a) == ',' ) && !strempty( a ) ) \
-        (a)++;
+#define EATSPACE( a )                                             \
+    while( ( *( a ) == ' ' || *( a ) == ',' ) && !strempty( a ) ) \
+        ( a )++;
         EATSPACE( endptr );
         long int eval = sval;
         if( *endptr == '-' )
@@ -413,7 +413,7 @@ using namespace moab;
     }
 
 #define EQUAL( A, B )                                                                                               \
-    if( (A) != (B) )                                                                                                    \
+    if( ( A ) != ( B ) )                                                                                            \
     {                                                                                                               \
         std::cerr << "Failure at line " << __LINE__ << ": expected " << ( B ) << " but got " << ( A ) << std::endl; \
         return 2;                                                                                                   \

@@ -160,7 +160,7 @@ ErrorCode MergeMesh::perform_merge( Tag merge_tag )
     result = mbImpl->tag_get_data( merge_tag, deadEntsRange, &merge_tag_val[0] );
     if( MB_SUCCESS != result ) return result;
 
-    std::set<EntityHandle>::iterator rit;
+    std::set< EntityHandle >::iterator rit;
     unsigned int i;
     for( rit = deadEnts.begin(), i = 0; rit != deadEnts.end(); ++rit, i++ )
     {

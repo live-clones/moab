@@ -95,7 +95,9 @@ ErrorCode WriteCGNS::write_file( const char* file_name, const bool overwrite, co
     // Give a base name
     BaseName = "Cgns Base";
     if( cg_base_write( IndexFile, BaseName, celldim, physdim, &IndexBase ) )
-    { std::cout << "Error creating CGNS base"; }
+    {
+        std::cout << "Error creating CGNS base";
+    }
     // Give a zone name
     ZoneName = "Cgns Zone";
     // isize array contains the total vertex size, cell size, and boundary

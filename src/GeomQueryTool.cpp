@@ -196,7 +196,9 @@ ErrorCode GQT_IntRegCtxt::update_orient( EntityHandle set, int* surfTriOrient )
     if( geomVol && senseTag && desiredOrient && surfTriOrient )
     {
         if( 1 != *desiredOrient && -1 != *desiredOrient )
-        { std::cerr << "error: desired orientation must be 1 (forward) or -1 (reverse)" << std::endl; }
+        {
+            std::cerr << "error: desired orientation must be 1 (forward) or -1 (reverse)" << std::endl;
+        }
         EntityHandle vols[2];
         rval = tool->get_moab_instance()->tag_get_data( *senseTag, &set, 1, vols );
         assert( MB_SUCCESS == rval );
@@ -699,7 +701,9 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     {
         ++n_ray_fire_calls;
         if( 0 == n_ray_fire_calls % 10000000 )
-        { std::cout << "n_ray_fires=" << n_ray_fire_calls << " n_pt_in_vols=" << n_pt_in_vol_calls << std::endl; }
+        {
+            std::cout << "n_ray_fires=" << n_ray_fire_calls << " n_pt_in_vols=" << n_pt_in_vol_calls << std::endl;
+        }
     }
 
     if( debug )
@@ -772,7 +776,9 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     // If both negative and nonnegative RTIs are returned, the negative RTI must
     // closer to the origin.
     if( ( 0 != facets[0] && 0 != facets[1] ) && ( -dists[0] > dists[1] ) )
-    { MB_SET_ERR( MB_FAILURE, "Invalid intersection distance values" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid intersection distance values" );
+    }
 
     // If an RTI is found at negative distance, perform a PMT to see if the
     // particle is inside an overlap.
@@ -1501,7 +1507,9 @@ void GeomQueryTool::set_overlap_thickness( double new_thickness )
 {
 
     if( new_thickness < 0 || new_thickness > 100 )
-    { std::cerr << "Invalid overlap_thickness = " << new_thickness << std::endl; }
+    {
+        std::cerr << "Invalid overlap_thickness = " << new_thickness << std::endl;
+    }
     else
     {
         overlapThickness = new_thickness;
@@ -1513,7 +1521,9 @@ void GeomQueryTool::set_numerical_precision( double new_precision )
 {
 
     if( new_precision <= 0 || new_precision > 1 )
-    { std::cerr << "Invalid numerical_precision = " << numericalPrecision << std::endl; }
+    {
+        std::cerr << "Invalid numerical_precision = " << numericalPrecision << std::endl;
+    }
     else
     {
         numericalPrecision = new_precision;

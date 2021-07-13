@@ -680,11 +680,15 @@ ErrorCode WriteHDF5Parallel::check_serial_tag_data( const std::vector< unsigned 
             DataType type;
             iFace->tag_get_data_type( tag_iter->tag_id, type );
             if( type != ptr->type )
-            { MB_SET_ERR( MB_FAILURE, "Processes have inconsistent data type for tag \"" << name << "\"" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "Processes have inconsistent data type for tag \"" << name << "\"" );
+            }
             int size;
             iFace->tag_get_length( tag_iter->tag_id, size );
             if( size != ptr->size )
-            { MB_SET_ERR( MB_FAILURE, "Processes have inconsistent size for tag \"" << name << "\"" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "Processes have inconsistent size for tag \"" << name << "\"" );
+            }
             tag_iter->write_sparse = false;
         }
 

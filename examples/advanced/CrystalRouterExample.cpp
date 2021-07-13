@@ -159,7 +159,9 @@ int main( int argc, char** argv )
 
     double secs = 0;
     if( rank == reportrank || ( reportrank >= size && 0 == rank ) )
-    { secs = ( clock() - tt ) / (double)CLOCKS_PER_SEC; }
+    {
+        secs = ( clock() - tt ) / (double)CLOCKS_PER_SEC;
+    }
     if( rank == reportrank )
     {
         cout << "rank " << rank << "\n";

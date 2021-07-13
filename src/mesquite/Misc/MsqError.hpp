@@ -235,8 +235,7 @@ class MsqError
 };  // class MsqError
 
 //! Print message and stack trace
-MESQUITE_EXPORT std::ostream&
-    operator<<( std::ostream&, const MsqError& );
+MESQUITE_EXPORT std::ostream& operator<<( std::ostream&, const MsqError& );
 //! Print MsqError::Trace
 MESQUITE_EXPORT std::ostream& operator<<( std::ostream&, const MsqError::Trace& );
 

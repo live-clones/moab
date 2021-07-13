@@ -73,7 +73,9 @@ ErrorCode SpectralMeshTool::convert_to_coarse( int order, EntityHandle spectral_
 {
     if( order ) spectralOrder = order;
     if( !spectralOrder )
-    { MB_SET_ERR( MB_FAILURE, "Spectral order must be set or input before converting to spectral mesh" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Spectral order must be set or input before converting to spectral mesh" );
+    }
 
     Range tmp_ents, ents;
     ErrorCode rval = mbImpl->get_entities_by_handle( spectral_set, tmp_ents );

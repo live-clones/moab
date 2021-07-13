@@ -544,7 +544,9 @@ void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle enti
     FWDERR();
 
     if( type != 2 && type != 3 )
-    { ERROR( iBase_INVALID_ENTITY_TYPE, "Entities passed into gentityNormal must be face or volume." ); }
+    {
+        ERROR( iBase_INVALID_ENTITY_TYPE, "Entities passed into gentityNormal must be face or volume." );
+    }
 
     // do 2 searches, so it is not fast enough
     FBiGeom_getEntClosestPt( instance, entity_handle, x, y, z, pt_x, pt_y, pt_z, err );

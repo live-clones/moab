@@ -73,10 +73,14 @@ RefinerTagManager::RefinerTagManager( Interface* in_mesh, Interface* out_mesh )
 
     this->tag_igid = this->input_mesh->globalId_tag();
     if( this->tag_igid == 0 )
-    { throw new std::logic_error( "Unable to find input mesh global ID tag \"" GLOBAL_ID_TAG_NAME "\"" ); }
+    {
+        throw new std::logic_error( "Unable to find input mesh global ID tag \"" GLOBAL_ID_TAG_NAME "\"" );
+    }
     this->tag_ogid = this->output_mesh->globalId_tag();
     if( this->tag_ogid == 0 )
-    { throw new std::logic_error( "Unable to find/create output mesh global ID tag \"" GLOBAL_ID_TAG_NAME "\"" ); }
+    {
+        throw new std::logic_error( "Unable to find/create output mesh global ID tag \"" GLOBAL_ID_TAG_NAME "\"" );
+    }
 
 #ifdef MB_DEBUG
     std::cout << "psproc:  " << this->tag_ipsproc << ", " << this->tag_opsproc << "\n"
@@ -333,7 +337,9 @@ int RefinerTagManager::copy_gid( EntityHandle ent_input, EntityHandle ent_output
     int gid = -1;
     int status;
     if( ( status = this->input_mesh->tag_get_data( this->tag_igid, &ent_input, 1, &gid ) ) == MB_SUCCESS )
-    { status = this->output_mesh->tag_set_data( this->tag_ogid, &ent_output, 1, &gid ); }
+    {
+        status = this->output_mesh->tag_set_data( this->tag_ogid, &ent_output, 1, &gid );
+    }
     return status;
 }
 

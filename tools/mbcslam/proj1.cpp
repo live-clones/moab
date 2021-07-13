@@ -29,9 +29,13 @@ int main( int argc, char** argv )
     while( index < argc )
     {
         if( !strcmp( argv[index], "-R" ) )  // this is for radius to project
-        { radius = atof( argv[++index] ); }
+        {
+            radius = atof( argv[++index] );
+        }
         if( !strcmp( argv[index], "-DS" ) )  // delete partition sets
-        { delete_partition_sets = true; }
+        {
+            delete_partition_sets = true;
+        }
 
         if( !strcmp( argv[index], "-h" ) )
         {

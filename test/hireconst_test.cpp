@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#if defined(__MINGW32__)
-  #include <sys/time.h>
+#if defined( __MINGW32__ )
+#include <sys/time.h>
 #else
 #include <ctime>
 #endif

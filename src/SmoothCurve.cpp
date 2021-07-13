@@ -234,7 +234,9 @@ double SmoothCurve::u_from_position( double x, double y, double z, EntityHandle&
             CartVect prevNodePos = coordNodes[edgeIndex - 1];
             CartVect nextNodePos = coordNodes[edgeIndex + 1];
             if( ( prevNodePos - initialPos ).length_squared() < ( nextNodePos - initialPos ).length_squared() )
-            { edgeIndex--; }
+            {
+                edgeIndex--;
+            }
         }
     }
     // now, we know for sure that the closest point is somewhere on edgeIndex edge

@@ -27,8 +27,8 @@
  * transforms.
  */
 
-#define XFORM( a, b )       xForm[4 * (a) + (b)]
-#define XFORM_INDEX( a, b ) (4 * (a) + (b))
+#define XFORM( a, b )       xForm[4 * ( a ) + ( b )]
+#define XFORM_INDEX( a, b ) ( 4 * ( a ) + ( b ) )
 
 #include <cmath>
 #include <cmath>

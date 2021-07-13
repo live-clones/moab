@@ -56,7 +56,9 @@ ErrorCode ReadDamsel::parse_options( const FileOptions& opts, bool& parallel )
     parallel       = ( rval != MB_ENTITY_NOT_FOUND );
     nativeParallel = ( rval == MB_SUCCESS );
     if( use_mpio && !parallel )
-    { MB_SET_ERR( MB_NOT_IMPLEMENTED, "'USE_MPIO' option specified w/out 'PARALLEL' option" ); }
+    {
+        MB_SET_ERR( MB_NOT_IMPLEMENTED, "'USE_MPIO' option specified w/out 'PARALLEL' option" );
+    }
 
     return MB_SUCCESS;
 }

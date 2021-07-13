@@ -96,9 +96,9 @@ namespace moab
 #define DO_ADD( a, b ) a += b
 #define DO_MUL( a, b ) a *= b
 #define DO_MIN( a, b ) \
-    if( (b) < (a) ) (a) = b
+    if( ( b ) < ( a ) ) ( a ) = b
 #define DO_MAX( a, b ) \
-    if( (b) > (a) ) (a) = b
+    if( ( b ) > ( a ) ) ( a ) = b
 #define DO_BPR( a, b )         \
     do                         \
     {                          \
@@ -113,7 +113,7 @@ namespace moab
             else               \
                 break;         \
         }                      \
-        (a) = a_;                \
+        ( a ) = a_;            \
     } while( 0 )
 
 #define LOOP( op )                       \

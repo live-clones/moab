@@ -891,7 +891,9 @@ void QualityAssessor::scale_histograms( QualityAssessor* optimized )
             {
                 double initial_bin_value = initial_min + ( initial_step * ( j - 1 ) );
                 if( initial_bin_value >= combined_bin_value && initial_bin_value < combined_bin_value + combined_step )
-                { new_initial_histogram[i] += ( *initial )->histogram[j]; }
+                {
+                    new_initial_histogram[i] += ( *initial )->histogram[j];
+                }
             }
         }
     }
@@ -918,7 +920,9 @@ void QualityAssessor::scale_histograms( QualityAssessor* optimized )
             {
                 double optimal_bin_value = optimal_min + ( optimal_step * ( j - 1 ) );
                 if( optimal_bin_value >= combined_bin_value && optimal_bin_value < combined_bin_value + combined_step )
-                { new_optimal_histogram[i] += ( *optimal )->histogram[j]; }
+                {
+                    new_optimal_histogram[i] += ( *optimal )->histogram[j];
+                }
             }
         }
     }
@@ -1289,7 +1293,9 @@ void QualityAssessor::print_summary( std::ostream& stream ) const
         }
     }
     if( !some_invalid )
-    { stream << "  No entities had undefined values for any computed metric." << std::endl << std::endl; }
+    {
+        stream << "  No entities had undefined values for any computed metric." << std::endl << std::endl;
+    }
 
     if( !invalid_values )
     {

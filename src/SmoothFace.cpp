@@ -1111,7 +1111,9 @@ ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list
             // edge of the patch if necessary
 
             if( project_to_facet( facet, this_point, areacoord, close_point, outside_facet, compareTol ) != MB_SUCCESS )
-            { return MB_FAILURE; }
+            {
+                return MB_FAILURE;
+            }
             // if (closest_point_ptr)
             //*closest_point_ptr = close_point;
         }

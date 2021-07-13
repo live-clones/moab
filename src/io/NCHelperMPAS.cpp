@@ -658,7 +658,9 @@ ErrorCode NCHelperMPAS::read_ucd_variables_to_nonset_allocate( std::vector< Read
             dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[i].varName.c_str(), tstep_nums[t] );
 
             if( tstep_nums[t] >= dimLens[tDim] )
-            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[t] ); }
+            {
+                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[t] );
+            }
 
             // Get the tag to read into
             if( !vdatas[i].varTags[t] )

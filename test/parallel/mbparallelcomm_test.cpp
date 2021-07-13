@@ -25,10 +25,10 @@ const bool debug = false;
 
 using namespace moab;
 
-#define ERROR( a, b )                \
-    {                                \
-        std::cerr << (a) << std::endl; \
-        return b;                    \
+#define ERROR( a, b )                    \
+    {                                    \
+        std::cerr << ( a ) << std::endl; \
+        return b;                        \
     }
 
 #define PRINT_LAST_ERROR                               \
@@ -43,7 +43,7 @@ using namespace moab;
 #define RRA( a )               \
     if( MB_SUCCESS != result ) \
     {                          \
-        std::cerr << (a);        \
+        std::cerr << ( a );    \
         return result;         \
     }
 
@@ -269,22 +269,22 @@ ErrorCode report_nsets( Interface* mbImpl )
     }
     std::cout << "Proc " << rank << ": Total of " << nsets << " entity sets." << std::endl;
 
-#define PRINTSETS( a, b, c, p )                                                                         \
-    if( a )                                                                                             \
-    {                                                                                                   \
-        result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &(a), p, 1, b );                   \
-        if( !(b).empty() )                                                                                \
-        {                                                                                               \
-            std::vector< int > ids( (b).size() );                                                         \
-            result = mbImpl->tag_get_data( gidtag, b, &ids[0] );                                        \
-            if( MB_SUCCESS == result )                                                                  \
-            {                                                                                           \
-                std::cout << "Proc " << rank << ": " << (c) << " (total " << (b).size() << "): " << ids[0]; \
-                for( unsigned int i = 1; i < (b).size(); i++ )                                            \
-                    std::cout << ", " << ids[i];                                                        \
-                std::cout << std::endl;                                                                 \
-            }                                                                                           \
-        }                                                                                               \
+#define PRINTSETS( a, b, c, p )                                                                                 \
+    if( a )                                                                                                     \
+    {                                                                                                           \
+        result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &( a ), p, 1, b );                       \
+        if( !( b ).empty() )                                                                                    \
+        {                                                                                                       \
+            std::vector< int > ids( ( b ).size() );                                                             \
+            result = mbImpl->tag_get_data( gidtag, b, &ids[0] );                                                \
+            if( MB_SUCCESS == result )                                                                          \
+            {                                                                                                   \
+                std::cout << "Proc " << rank << ": " << ( c ) << " (total " << ( b ).size() << "): " << ids[0]; \
+                for( unsigned int i = 1; i < ( b ).size(); i++ )                                                \
+                    std::cout << ", " << ids[i];                                                                \
+                std::cout << std::endl;                                                                         \
+            }                                                                                                   \
+        }                                                                                                       \
     }
 
     PRINTSETS( mtag, matsets, "material sets", NULL );

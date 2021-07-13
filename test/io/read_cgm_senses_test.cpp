@@ -139,7 +139,9 @@ void read_cylcube_curve_senses_test()
         // Load known curve-sense ID data
 #ifdef HAVE_OCC_STEP
         if( CGM_MAJOR_VERSION >= 14 )
-        { rval = load_stp_curve_sense_data( mb, curves[i], known_surf_ids, known_senses ); }
+        {
+            rval = load_stp_curve_sense_data( mb, curves[i], known_surf_ids, known_senses );
+        }
         else
         {
             rval = load_precgm14_stp_curve_sense_data( mb, curves[i], known_surf_ids, known_senses );

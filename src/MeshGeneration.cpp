@@ -27,9 +27,9 @@ using std::vector;
 namespace moab
 {
 
-MeshGeneration::MeshGeneration( Interface* impl, 
+MeshGeneration::MeshGeneration( Interface* impl,
 #ifdef MOAB_HAVE_MPI
-                                ParallelComm* comm, 
+                                ParallelComm* comm,
 #endif
                                 EntityHandle rset )
     : mb( impl ),
@@ -61,13 +61,13 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
     bool parmerge       = opts.parmerge;
 
 #ifdef MOAB_HAVE_MPI
-    int GL              = opts.GL;                                      // number of ghost layers
-    bool keep_skins     = opts.keep_skins;
+    int GL          = opts.GL;  // number of ghost layers
+    bool keep_skins = opts.keep_skins;
 #endif
 
     int rank = 0, size = 1;
-#ifndef _MSC_VER  /* windows */
-  clock_t tt = clock();
+#ifndef _MSC_VER /* windows */
+    clock_t tt = clock();
 #endif
 #ifdef MOAB_HAVE_MPI
     rank = pc->rank();
@@ -402,7 +402,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
     if( 0 == rank )
     {
-#ifndef _MSC_VER  /* windows */
+#ifndef _MSC_VER /* windows */
         std::cout << "generate local mesh: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
         tt = clock();
 #endif
@@ -423,7 +423,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
         {
             rval = mm.merge_entities( all3dcells, 0.0001 );MB_CHK_SET_ERR( rval, "Can't merge" );
         }
-#ifndef _MSC_VER  /* windows */
+#ifndef _MSC_VER /* windows */
         if( 0 == rank )
         {
             std::cout << "merge locally: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
@@ -456,7 +456,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
         {
             ParallelMergeMesh pm( pc, 0.00001 );
             rval = pm.merge();MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
-#ifndef _MSC_VER  /* windows */
+#ifndef _MSC_VER /* windows */
             if( 0 == rank )
             {
                 std::cout << "parallel mesh merge: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
@@ -467,7 +467,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
         else
         {
             rval = pc->resolve_shared_ents( cset, -1, -1, &new_id_tag );MB_CHK_SET_ERR( rval, "Can't resolve shared ents" );
-#ifndef _MSC_VER  /* windows */
+#ifndef _MSC_VER /* windows */
             if( 0 == rank )
             {
                 std::cout << "resolve shared entities: " << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds"
@@ -491,7 +491,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
 
                 std::cout << "delete edges and faces \n";
                 toDelete.print( std::cout );
-#ifndef _MSC_VER  /* windows */
+#ifndef _MSC_VER /* windows */
                 std::cout << ( clock() - tt ) / (double)CLOCKS_PER_SEC << " seconds" << endl;
                 tt = clock();
 #endif
@@ -505,7 +505,7 @@ ErrorCode MeshGeneration::BrickInstance( MeshGeneration::BrickOpts& opts )
                                              GL,  // int num_layers
                                              0,   // int addl_ents
                                              true );MB_CHK_ERR( rval );  // bool store_remote_handles
-#ifndef _MSC_VER  /* windows */
+#ifndef _MSC_VER                 /* windows */
             if( 0 == rank )
             {
                 std::cout << "exchange  " << GL << " ghost layer(s) :" << ( clock() - tt ) / (double)CLOCKS_PER_SEC

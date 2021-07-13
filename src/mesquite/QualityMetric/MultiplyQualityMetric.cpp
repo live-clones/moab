@@ -43,7 +43,9 @@ MultiplyQualityMetric::MultiplyQualityMetric( QualityMetric* qm1, QualityMetric*
     : metric1( *qm1 ), metric2( *qm2 )
 {
     if( qm1->get_metric_type() != qm2->get_metric_type() || qm1->get_negate_flag() != qm2->get_negate_flag() )
-    { MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_ARG ); }
+    {
+        MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_ARG );
+    }
 }
 
 MultiplyQualityMetric::~MultiplyQualityMetric() {}

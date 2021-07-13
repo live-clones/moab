@@ -152,10 +152,12 @@ struct ToolContext
                             "OVERLAP_MEMORY=4, OVERLAP_MOAB=5])",
                             &imeshType );
         opts.addOpt< int >( "res,r", "Resolution of the mesh (default=5)", &blockSize );
-        opts.addOpt< void >( "dual,d", "Output the dual of the mesh (relevant only for ICO mesh type)",
-                             &computeDual );
-        opts.addOpt< std::string >( "file,f", "Output computed mesh or remapping weights to specified filename", &outFilename );
-        opts.addOpt< std::string >( "load,l", "Input mesh filenames for source and target meshes. (relevant only when computing weights)", &expectedFName );
+        opts.addOpt< void >( "dual,d", "Output the dual of the mesh (relevant only for ICO mesh type)", &computeDual );
+        opts.addOpt< std::string >( "file,f", "Output computed mesh or remapping weights to specified filename",
+                                    &outFilename );
+        opts.addOpt< std::string >(
+            "load,l", "Input mesh filenames for source and target meshes. (relevant only when computing weights)",
+            &expectedFName );
         opts.addOpt< void >( "noconserve,c",
                              "Do not apply conservation to the resultant weights (relevant only "
                              "when computing weights)",
@@ -194,8 +196,7 @@ struct ToolContext
                              &verifyWeights );
         opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
                              &enforceConvexity );
-        opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes",
-                             &fBubble );
+        opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes", &fBubble );
 
         opts.parseCommandLine( argc, argv );
 
@@ -332,11 +333,11 @@ int main( int argc, char* argv[] )
     rval = CreateTempestMesh( *runCtx, remapper, tempest_mesh );MB_CHK_ERR( rval );
     runCtx->timer_pop();
 
-    const double epsrel = ReferenceTolerance; // ReferenceTolerance is defined in Defines.h in tempestremap;
-                                        // Defines.h is included in SparseMatrix.h
-                                        // SparseMatrix.h is included in OfflineMap.h
-                                        // OfflineMap.h is included in TempestOnlineMap.hpp
-                                        // TempestOnlineMap.hpp is included in this file, and is part of MOAB
+    const double epsrel = ReferenceTolerance;  // ReferenceTolerance is defined in Defines.h in tempestremap;
+                                               // Defines.h is included in SparseMatrix.h
+                                               // SparseMatrix.h is included in OfflineMap.h
+                                               // OfflineMap.h is included in TempestOnlineMap.hpp
+                                               // TempestOnlineMap.hpp is included in this file, and is part of MOAB
     // Some constant parameters
 
     const double boxeps = 1e-6;
@@ -475,7 +476,7 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 0, rintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 2, rintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[0] );MB_CHK_ERR( rval );
-            if (runCtx->enforceConvexity)
+            if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[0], proc_id );MB_CHK_ERR( rval );
             }
@@ -488,7 +489,7 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 0, bintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, bintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[1] );MB_CHK_ERR( rval );
-            if (runCtx->enforceConvexity)
+            if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[1], proc_id );MB_CHK_ERR( rval );
             }
@@ -597,8 +598,7 @@ int main( int argc, char* argv[] )
                 runCtx->doftag_names[1],                         // std::string target_tag_name,
                 runCtx->fInputConcave,                           // bool fInputConcave
                 runCtx->fOutputConcave                           // bool fOutputConcave
-            );
-            MB_CHK_ERR( rval );
+            );MB_CHK_ERR( rval );
             runCtx->timer_pop();
 
             // Invoke the CheckMap routine on the TempestRemap serial interface directly, if running
@@ -607,20 +607,19 @@ int main( int argc, char* argv[] )
             {
                 const double dNormalTolerance = 1.0E-8;
                 const double dStrictTolerance = 1.0E-12;
-                weightMap->CheckMap( runCtx->fCheck, runCtx->fCheck,
-                                     runCtx->fCheck && ( runCtx->ensureMonotonicity ), dNormalTolerance,
-                                     dStrictTolerance );
+                weightMap->CheckMap( runCtx->fCheck, runCtx->fCheck, runCtx->fCheck && ( runCtx->ensureMonotonicity ),
+                                     dNormalTolerance, dStrictTolerance );
             }
 
             if( runCtx->outFilename.size() )
             {
-								// Write the map file to disk in parallel using either HDF5 or SCRIP interface
-								rval = weightMap->WriteParallelMap( runCtx->outFilename.c_str() );MB_CHK_ERR( rval );
+                // Write the map file to disk in parallel using either HDF5 or SCRIP interface
+                rval = weightMap->WriteParallelMap( runCtx->outFilename.c_str() );MB_CHK_ERR( rval );
 
                 // Write out the metadata information for the map file
                 if( proc_id == 0 )
                 {
-                    size_t lastindex      = runCtx->outFilename.find_last_of( "." );
+                    size_t lastindex = runCtx->outFilename.find_last_of( "." );
                     sstr.str( "" );
                     sstr << runCtx->outFilename.substr( 0, lastindex ) << ".meta";
 

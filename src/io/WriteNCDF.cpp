@@ -56,37 +56,37 @@ const int TIME_STR_LEN = 11;
 
 #define GET_DIM( ncdim, name, val )                                                                             \
     {                                                                                                           \
-        int gdfail = nc_inq_dimid( ncFile, name, &(ncdim) );                                                      \
+        int gdfail = nc_inq_dimid( ncFile, name, &( ncdim ) );                                                  \
         if( NC_NOERR == gdfail )                                                                                \
         {                                                                                                       \
             size_t tmp_val;                                                                                     \
             gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                                                  \
             if( NC_NOERR != gdfail ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF:: couldn't get dimension length" ); } \
             else                                                                                                \
-                (val) = tmp_val;                                                                                  \
+                ( val ) = tmp_val;                                                                              \
         }                                                                                                       \
         else                                                                                                    \
-            (val) = 0;                                                                                            \
+            ( val ) = 0;                                                                                        \
     }
 
 #define GET_DIMB( ncdim, name, varname, id, val ) \
     INS_ID( name, varname, id );                  \
     GET_DIM( ncdim, name, val );
 
-#define GET_VAR( name, id, dims )                                 \
-    {                                                             \
-        (id)         = -1;                                          \
-        int gvfail = nc_inq_varid( ncFile, name, &(id) );           \
-        if( NC_NOERR == gvfail )                                  \
-        {                                                         \
-            int ndims;                                            \
-            gvfail = nc_inq_varndims( ncFile, id, &ndims );       \
-            if( NC_NOERR == gvfail )                              \
-            {                                                     \
-                (dims).resize( ndims );                             \
-                gvfail = nc_inq_vardimid( ncFile, id, &(dims)[0] ); \
-            }                                                     \
-        }                                                         \
+#define GET_VAR( name, id, dims )                                     \
+    {                                                                 \
+        ( id )     = -1;                                              \
+        int gvfail = nc_inq_varid( ncFile, name, &( id ) );           \
+        if( NC_NOERR == gvfail )                                      \
+        {                                                             \
+            int ndims;                                                \
+            gvfail = nc_inq_varndims( ncFile, id, &ndims );           \
+            if( NC_NOERR == gvfail )                                  \
+            {                                                         \
+                ( dims ).resize( ndims );                             \
+                gvfail = nc_inq_vardimid( ncFile, id, &( dims )[0] ); \
+            }                                                         \
+        }                                                             \
     }
 
 WriterIface* WriteNCDF::factory( Interface* iface )
@@ -393,7 +393,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
 
         // Get the block's id
         if( mdbImpl->tag_get_data( mMaterialSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Couldn't get block id from a tag for an element block" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't get block id from a tag for an element block" );
+        }
 
         block_data.id                = id;
         block_data.number_attributes = 0;
@@ -411,7 +413,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         // Get the entity type for this block, verifying that it's the same for all elements
         EntityType entity_type = TYPE_FROM_HANDLE( block_data.elements.front() );
         if( !block_data.elements.all_of_type( entity_type ) )
-        { MB_SET_ERR( MB_FAILURE, "Entities in block " << id << " not of common type" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Entities in block " << id << " not of common type" );
+        }
 
         int dimension = -1;
         if( entity_type == MBQUAD || entity_type == MBTRI )
@@ -429,7 +433,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
         block_data.element_type = ExoIIUtil::get_element_type_from_num_verts( tmp_conn.size(), entity_type, dimension );
 
         if( block_data.element_type == EXOII_MAX_ELEM_TYPE )
-        { MB_SET_ERR( MB_FAILURE, "Element type in block " << id << " didn't get set correctly" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Element type in block " << id << " didn't get set correctly" );
+        }
 
         if( block_data.element_type == EXOII_POLYGON )
         {
@@ -508,7 +514,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
     {
         MaterialSetData& block = *blit;
         if( block.element_type != EXOII_POLYHEDRON )
-        { mesh_info.polyhedronFaces = subtract( mesh_info.polyhedronFaces, block.elements ); }
+        {
+            mesh_info.polyhedronFaces = subtract( mesh_info.polyhedronFaces, block.elements );
+        }
     }
 
     // If user hasn't entered dimension, we figure it out
@@ -540,14 +548,18 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
 
         // Get the nodeset's id
         if( mdbImpl->tag_get_data( mDirichletSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Couldn't get id tag for nodeset " << id ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't get id tag for nodeset " << id );
+        }
 
         nodeset_data.id = id;
 
         std::vector< EntityHandle > node_vector;
         // Get the nodes of the nodeset that are in mesh_info.nodes
         if( mdbImpl->get_entities_by_handle( *vector_iter, node_vector, true ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Couldn't get nodes in nodeset " << id ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't get nodes in nodeset " << id );
+        }
 
         // Get the tag for distribution factors
         const double* dist_factor_vector;
@@ -770,19 +782,25 @@ ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
     strcpy( dum_str, "x" );
     int fail = nc_put_vara_text( ncFile, nc_var, start, count, dum_str );
     if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "Trouble adding x coordinate name; netcdf message: " << nc_strerror( fail ) ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble adding x coordinate name; netcdf message: " << nc_strerror( fail ) );
+    }
 
     start[0] = 1;
     strcpy( dum_str, "y" );
     fail = nc_put_vara_text( ncFile, nc_var, start, count, dum_str );
     if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "Trouble adding y coordinate name; netcdf message: " << nc_strerror( fail ) ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble adding y coordinate name; netcdf message: " << nc_strerror( fail ) );
+    }
 
     start[0] = 2;
     strcpy( dum_str, "z" );
     fail = nc_put_vara_text( ncFile, nc_var, start, count, dum_str );
     if( NC_NOERR != fail )
-    { MB_SET_ERR( MB_FAILURE, "Trouble adding z coordinate name; netcdf message: " << nc_strerror( fail ) ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble adding z coordinate name; netcdf message: " << nc_strerror( fail ) );
+    }
 
     // See if should transform coordinates
     ErrorCode result;
@@ -925,11 +943,15 @@ ErrorCode WriteNCDF::write_poly_faces( ExodusMeshInfo& mesh_info )
 
         int id = bl + 1;
         if( write_exodus_integer_variable( "fa_prop1", &id, bl, 1 ) != MB_SUCCESS )
-        { MB_SET_ERR_CONT( "Problem writing element block id " << id ); }
+        {
+            MB_SET_ERR_CONT( "Problem writing element block id " << id );
+        }
 
         int status = 1;
         if( write_exodus_integer_variable( "fa_status", &status, bl, 1 ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Problem writing face block status" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Problem writing face block status" );
+        }
 
         delete[] connectivity;
         if( 0 == repeat_face_blocks ) break;  // do not repeat face blocks
@@ -984,7 +1006,9 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
         int num_values = 1;
 
         if( write_exodus_integer_variable( "eb_prop1", &id, block_index, num_values ) != MB_SUCCESS )
-        { MB_SET_ERR_CONT( "Problem writing element block id " << id ); }
+        {
+            MB_SET_ERR_CONT( "Problem writing element block id " << id );
+        }
 
         // Write out the block status
 
@@ -992,14 +1016,18 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
         if( 0 == block.number_elements ) { MB_SET_ERR( MB_FAILURE, "No elements in block " << id ); }
 
         if( write_exodus_integer_variable( "eb_status", &status, block_index, num_values ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Problem writing element block status" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Problem writing element block status" );
+        }
 
         //
         // Map the connectivity to the new nodes
         const unsigned int num_elem = block.number_elements;
         unsigned int num_nodes      = num_nodes_per_elem * num_elem;
         if( EXOII_POLYGON == block.element_type || EXOII_POLYHEDRON == block.element_type )
-        { num_nodes = num_nodes_per_elem; }
+        {
+            num_nodes = num_nodes_per_elem;
+        }
         int* connectivity = new int[num_nodes];
 
         ErrorCode result = MB_SUCCESS;
@@ -1242,7 +1270,9 @@ ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, i
     std::vector< int > dims;
     GET_VAR( variable_name, nc_var, dims );
     if( -1 == nc_var )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to locate variable " << variable_name << " in file" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to locate variable " << variable_name << " in file" );
+    }
     // This contortion is necessary because netCDF is expecting nclongs;
     // fortunately it's necessary only when ints and nclongs aren't the same size
 
@@ -1471,20 +1501,30 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
     int dim_str, dim_four, dim_line, dim_time;
     if( nc_def_dim( ncFile, "len_string", ExoIIInterface::MAX_STR_LENGTH, &dim_str ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to get string length in file" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to get string length in file" );
+    }
 
     if( nc_def_dim( ncFile, "len_line", ExoIIInterface::MAX_STR_LENGTH, &dim_line ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to get line length in file" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to get line length in file" );
+    }
 
     if( nc_def_dim( ncFile, "four", 4, &dim_four ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to locate four in file" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to locate four in file" );
+    }
 
     if( nc_def_dim( ncFile, "time_step", 1, &dim_time ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to locate time step in file" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to locate time step in file" );
+    }
     // some whole_time dummy :(
     int dtime;
     if( NC_NOERR != nc_def_var( ncFile, "time_whole", NC_DOUBLE, 1, &dim_time, &dtime ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define time whole array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define time whole array" );
+    }
 
     /* Put file into define mode */
 
@@ -1505,56 +1545,80 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     }
 
     if( NC_NOERR != nc_put_att_text( ncFile, NC_GLOBAL, "title", length, working_title ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define title attribute" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define title attribute" );
+    }
 
     // Add other attributes while we're at it
     float dum_vers = 6.28F;
     if( NC_NOERR != nc_put_att_float( ncFile, NC_GLOBAL, "api_version", NC_FLOAT, 1, &dum_vers ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define api_version attribute" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define api_version attribute" );
+    }
     dum_vers = 6.28F;
     if( NC_NOERR != nc_put_att_float( ncFile, NC_GLOBAL, "version", NC_FLOAT, 1, &dum_vers ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define version attribute" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define version attribute" );
+    }
     int dum_siz = sizeof( double );
     if( NC_NOERR != nc_put_att_int( ncFile, NC_GLOBAL, "floating_point_word_size", NC_INT, 1, &dum_siz ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define floating pt word size attribute" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define floating pt word size attribute" );
+    }
 
     // Set up number of dimensions
 
     int num_el_blk, num_elem, num_nodes, num_dim, num_fa_blk, num_faces;
     if( nc_def_dim( ncFile, "num_dim", (size_t)mesh_info.num_dim, &num_dim ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of dimensions" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of dimensions" );
+    }
 
     if( nc_def_dim( ncFile, "num_nodes", mesh_info.num_nodes, &num_nodes ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes" );
+    }
 
     int num_nod_per_fa;  // it is needed for polyhedron only; need to compute it (connectivity of
                          // faces of polyhedra)
     if( mesh_info.polyhedronFaces.size() > 0 )
         if( nc_def_dim( ncFile, "num_faces", (int)mesh_info.polyhedronFaces.size(), &num_faces ) != NC_NOERR )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes" );
+        }
 
     if( nc_def_dim( ncFile, "num_elem", mesh_info.num_elements, &num_elem ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of elements" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of elements" );
+    }
 
     if( nc_def_dim( ncFile, "num_el_blk", mesh_info.num_elementblocks, &num_el_blk ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of element blocks" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of element blocks" );
+    }
 
     /* ...and some variables */
 
     /* Element block id status array */
     int idstat = -1;
     if( NC_NOERR != nc_def_var( ncFile, "eb_status", NC_LONG, 1, &num_el_blk, &idstat ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define element block status array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define element block status array" );
+    }
 
     /* Element block id array */
 
     int idarr = -1;
     if( NC_NOERR != nc_def_var( ncFile, "eb_prop1", NC_LONG, 1, &num_el_blk, &idarr ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define element block id array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define element block id array" );
+    }
 
     /*   store property name as attribute of property array variable */
     if( NC_NOERR != nc_put_att_text( ncFile, idarr, "name", strlen( "ID" ), "ID" ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element block property name ID" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element block property name ID" );
+    }
 
     // count how many are polyhedron blocks
     int num_fa_blocks = 0, num_polyh_blocks = 0;
@@ -1574,21 +1638,29 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     {
         /* face block id status array */
         if( nc_def_dim( ncFile, "num_fa_blk", num_fa_blocks, &num_fa_blk ) != NC_NOERR )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of face blocks" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of face blocks" );
+        }
 
         int idstatf = -1;
         if( NC_NOERR != nc_def_var( ncFile, "fa_status", NC_LONG, 1, &num_fa_blk, &idstatf ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define face block status array" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define face block status array" );
+        }
 
         /* Element block id array */
 
         int idarrf = -1;
         if( NC_NOERR != nc_def_var( ncFile, "fa_prop1", NC_LONG, 1, &num_fa_blk, &idarrf ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define face block id array" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define face block id array" );
+        }
 
         /*   store property name as attribute of property array variable */
         if( NC_NOERR != nc_put_att_text( ncFile, idarrf, "name", strlen( "ID" ), "ID" ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store face block property name ID" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store face block property name ID" );
+        }
         // determine the number of num_nod_per_face
         /*
           num_fa_in_blk1 = 15 ;
@@ -1618,34 +1690,48 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
         {
             INS_ID( wname, "num_nod_per_fa%d", j );
             if( nc_def_dim( ncFile, wname, (size_t)num_nodes_per_face, &num_nod_per_fa ) != NC_NOERR )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for face block " ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for face block " );
+            }
             dims[0] = num_nod_per_fa;
             INS_ID( wname, "fbconn%d", j );  // first one, or more
             int fbconn;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &fbconn ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for face block " << 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for face block " << 1 );
+            }
             std::string element_type_string( "nsided" );
             if( NC_NOERR != nc_put_att_text( ncFile, fbconn, "elem_type", element_type_string.length(),
                                              element_type_string.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type nsided " ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type nsided " );
+            }
 
             INS_ID( wname, "num_fa_in_blk%d", j );  // first one, or more
             int num_fa_in_blk;
             if( nc_def_dim( ncFile, wname, (size_t)mesh_info.polyhedronFaces.size(), &num_fa_in_blk ) != NC_NOERR )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for face block " ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for face block " );
+            }
 
             // fbepecnt
             INS_ID( wname, "fbepecnt%d", j );  // first one, or more
             int fbepecnt;
             dims[0] = num_fa_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &fbepecnt ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create fbepecnt array for block " << 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create fbepecnt array for block " << 1 );
+            }
             std::string enttype1( "NODE" );
             if( NC_NOERR != nc_put_att_text( ncFile, fbepecnt, "entity_type1", enttype1.length(), enttype1.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type 1  " ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type 1  " );
+            }
             std::string enttype2( "FACE" );
             if( NC_NOERR != nc_put_att_text( ncFile, fbepecnt, "entity_type2", enttype2.length(), enttype2.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type 2  " ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type 2  " );
+            }
         }
     }
 
@@ -1663,7 +1749,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
         INS_ID( wname, "num_el_in_blk%d", element_block_index );
         if( nc_def_dim( ncFile, wname, (size_t)block.number_elements, &num_el_in_blk ) != NC_NOERR )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of elements/block for block " << i + 1 ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of elements/block for block " << i + 1 );
+        }
 
         /* Define number of nodes per element for this block */
         INS_ID( wname, "num_nod_per_el%d", element_block_index );
@@ -1680,13 +1768,17 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
         {
             INS_ID( wname, "num_att_in_blk%d", element_block_index );
             if( nc_def_dim( ncFile, wname, (size_t)block.number_attributes, &num_att_in_blk ) != NC_NOERR )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of attributes in block " << block.id ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of attributes in block " << block.id );
+            }
 
             INS_ID( wname, "attrib%d", element_block_index );
             dims[0] = num_el_in_blk;
             dims[1] = num_att_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_DOUBLE, 2, dims, &blk_attrib ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define attributes for element block " << block.id ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define attributes for element block " << block.id );
+            }
         }
 
         /* Define element connectivity array for this block */
@@ -1697,14 +1789,18 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             dims[0] = num_el_in_blk;
             dims[1] = num_nod_per_el;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 2, dims, &connect ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for block " << i + 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for block " << i + 1 );
+            }
 
             /* Store element type as attribute of connectivity variable */
 
             std::string element_type_string( ExoIIUtil::ElementTypeNames[block.element_type] );
             if( NC_NOERR != nc_put_att_text( ncFile, connect, "elem_type", element_type_string.length(),
                                              element_type_string.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type name " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type name " << (int)block.element_type );
+            }
         }
         else if( EXOII_POLYGON == block.element_type )
         {
@@ -1719,22 +1815,32 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
                   ebepecnt1:entity_type2 = "ELEM" ;*/
             dims[0] = num_nod_per_el;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &connect ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for block " << i + 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create connectivity array for block " << i + 1 );
+            }
             std::string element_type_string( "nsided" );
             if( NC_NOERR != nc_put_att_text( ncFile, connect, "elem_type", element_type_string.length(),
                                              element_type_string.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type name " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store element type name " << (int)block.element_type );
+            }
             INS_ID( wname, "ebepecnt%d", element_block_index );
             int ebepecnt;
             dims[0] = num_el_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &ebepecnt ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create ebepecnt array for block " << i + 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create ebepecnt array for block " << i + 1 );
+            }
             std::string etype1( "NODE" );
             if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type1", etype1.length(), etype1.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type1 " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type1 " << (int)block.element_type );
+            }
             std::string etype2( "ELEM" );
             if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type2", etype2.length(), etype2.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type2 " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type2 " << (int)block.element_type );
+            }
         }
         else if( EXOII_POLYHEDRON == block.element_type )
         {
@@ -1767,7 +1873,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 
             INS_ID( wname, "num_fac_per_el%d", element_block_index );
             if( nc_def_dim( ncFile, wname, (size_t)num_faces2, &num_fac_per_el ) != NC_NOERR )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of faces per block " << block.id ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of faces per block " << block.id );
+            }
 
             /*
             int facconn1(num_fac_per_el1) ;
@@ -1782,23 +1890,33 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             int facconn;
             dims[0] = num_fac_per_el;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &facconn ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create facconn array for block " << i + 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create facconn array for block " << i + 1 );
+            }
             std::string etype( "NFACED" );
             if( NC_NOERR != nc_put_att_text( ncFile, facconn, "elem_type", etype.length(), etype.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store elem type " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store elem type " << (int)block.element_type );
+            }
 
             // ebepecnt
             INS_ID( wname, "ebepecnt%d", element_block_index );
             int ebepecnt;
             dims[0] = num_el_in_blk;
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, dims, &ebepecnt ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create ebepecnt array for block " << i + 1 ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create ebepecnt array for block " << i + 1 );
+            }
             std::string etype1( "FACE" );
             if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type1", etype1.length(), etype1.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type1 " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type1 " << (int)block.element_type );
+            }
             std::string etype2( "ELEM" );
             if( NC_NOERR != nc_put_att_text( ncFile, ebepecnt, "entity_type2", etype2.length(), etype2.c_str() ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type2 " << (int)block.element_type ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store entity type2 " << (int)block.element_type );
+            }
 
             block.number_nodes_per_element = num_faces2;  // connectivity for all polyhedra in block
         }
@@ -1819,20 +1937,28 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     if( non_empty_nss > 0 )
     {
         if( nc_def_dim( ncFile, "num_node_sets", ( size_t )( non_empty_nss ), &num_ns ) != NC_NOERR )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of node sets" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of node sets" );
+        }
 
         /* Node set id status array: */
 
         if( NC_NOERR != nc_def_var( ncFile, "ns_status", NC_LONG, 1, &num_ns, &ns_idstat ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create node sets status array" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create node sets status array" );
+        }
 
         /* Node set id array: */
         if( NC_NOERR != nc_def_var( ncFile, "ns_prop1", NC_LONG, 1, &num_ns, &ns_idarr ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create node sets property array" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create node sets property array" );
+        }
 
         /* Store property name as attribute of property array variable */
         if( NC_NOERR != nc_put_att_text( ncFile, NC_GLOBAL, "name", strlen( "ID" ), "ID" ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store node set property name ID" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store node set property name ID" );
+        }
 
         // Now, define the arrays needed for each node set
 
@@ -1852,13 +1978,17 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             int num_nod_ns = -1;
             INS_ID( wname, "num_nod_ns%d", index );
             if( nc_def_dim( ncFile, wname, (size_t)node_set.number_nodes, &num_nod_ns ) != NC_NOERR )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for set " << node_set.id ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of nodes for set " << node_set.id );
+            }
 
             /* Create variable array in which to store the node set node list */
             int node_ns = -1;
             INS_ID( wname, "node_ns%d", index );
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, &num_nod_ns, &node_ns ) )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create node set " << node_set.id << " node list" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to create node set " << node_set.id << " node list" );
+            }
 
             // Create distribution factor array
             int fact_ns = -1;
@@ -1885,20 +2015,28 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     {
         int num_ss = -1;
         if( nc_def_dim( ncFile, "num_side_sets", non_empty_ss, &num_ss ) != NC_NOERR )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of side sets" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of side sets" );
+        }
 
         /* Side set id status array: */
         int ss_idstat = -1, ss_idarr = -1;
         if( NC_NOERR != nc_def_var( ncFile, "ss_status", NC_LONG, 1, &num_ss, &ss_idstat ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define side set status" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define side set status" );
+        }
 
         /* Side set id array: */
         if( NC_NOERR != nc_def_var( ncFile, "ss_prop1", NC_LONG, 1, &num_ss, &ss_idarr ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define side set property" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define side set property" );
+        }
 
         /* Store property name as attribute of property array variable */
         if( NC_NOERR != nc_put_att_text( ncFile, ss_idarr, "name", strlen( "ID" ), "ID" ) )
-        { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store side set property name ID" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to store side set property name ID" );
+        }
 
         // Now, define the arrays needed for each side set
 
@@ -1916,7 +2054,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
             int elem_ss = -1, side_ss = -1;
             INS_ID( wname, "num_side_ss%d", index );
             if( nc_def_dim( ncFile, wname, (size_t)side_set.number_elements, &num_side_ss ) != NC_NOERR )
-            { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of sides in side set " << side_set.id ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of sides in side set " << side_set.id );
+            }
 
             INS_ID( wname, "elem_ss%d", index );
             if( NC_NOERR != nc_def_var( ncFile, wname, NC_LONG, 1, &num_side_ss, &elem_ss ) )
@@ -1958,14 +2098,18 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     dims[0] = num_dim;
     dims[1] = num_nodes;
     if( NC_NOERR != nc_def_var( ncFile, "coord", NC_DOUBLE, 2, dims, &coord ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define node coordinate array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define node coordinate array" );
+    }
 
     /* Coordinate names array */
 
     dims[0] = num_dim;
     dims[1] = dim_str;
     if( NC_NOERR != nc_def_var( ncFile, "coor_names", NC_CHAR, 2, dims, &name_coord ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define coordinate name array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define coordinate name array" );
+    }
 
     // Define genesis maps if required
 
@@ -1999,7 +2143,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     int num_qa     = -1;
 
     if( nc_def_dim( ncFile, "num_qa_rec", (long)num_qa_rec, &num_qa ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define qa record array size" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define qa record array size" );
+    }
 
     // Define qa array
     int qa_title;
@@ -2007,7 +2153,9 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     dims[1] = dim_four;
     dims[2] = dim_str;
     if( NC_NOERR != nc_def_var( ncFile, "qa_records", NC_CHAR, 3, dims, &qa_title ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define qa record array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define qa record array" );
+    }
 
     // Take it out of define mode
     if( NC_NOERR != nc_enddef( ncFile ) ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF: Trouble leaving define mode" ); }

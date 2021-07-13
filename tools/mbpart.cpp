@@ -168,7 +168,9 @@ int main( int argc, char* argv[] )
     opts.addOpt< void >( ",T", "Print CPU time for each phase.", &print_time );
 
     int projection_type = 0;
-    opts.addOpt< int >( "project_on_sphere,p", "use spherical coordinates (1) or gnomonic projection (2) for partitioning ", &projection_type );
+    opts.addOpt< int >( "project_on_sphere,p",
+                        "use spherical coordinates (1) or gnomonic projection (2) for partitioning ",
+                        &projection_type );
 #ifdef MOAB_HAVE_METIS
     bool partition_tagged_sets = false;
     opts.addOpt< void >( "taggedsets,x", "(Metis) Partition tagged sets.", &partition_tagged_sets );
@@ -508,7 +510,7 @@ int main( int argc, char* argv[] )
 
         if( moab_use_zoltan && moab_partition_slave && p == 0 )
         {
-            t                = clock();
+            t = clock();
             double master_radius, slave_radius;
             if( rescale_spherical_radius )
             {
@@ -559,8 +561,7 @@ int main( int argc, char* argv[] )
 
             // Save the resulting mesh
             std::cout << "Saving inferred file to " << inferred_output_file << "..." << std::endl;
-            rval = mb.write_file( inferred_output_file.c_str(), 0, 0,
-                                    &slaveset, 1 );MB_CHK_SET_ERR( rval, inferred_output_file << " : failed to write file." << std::endl );
+            rval = mb.write_file( inferred_output_file.c_str(), 0, 0, &slaveset, 1 );MB_CHK_SET_ERR( rval, inferred_output_file << " : failed to write file." << std::endl );
         }
 #endif
 

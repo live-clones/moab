@@ -56,7 +56,9 @@ int main( int argc, char** argv )
         while( index < argc )
         {
             if( !strcmp( argv[index], "-eps" ) )  // this is for box error
-            { EPS1 = atof( argv[++index] ); }
+            {
+                EPS1 = atof( argv[++index] );
+            }
             if( !strcmp( argv[index], "-input" ) ) { input_mesh_file = argv[++index]; }
             if( !strcmp( argv[index], "-radius" ) ) { Radius = atof( argv[++index] ); }
             if( !strcmp( argv[index], "-deltaT" ) ) { deltaT = atof( argv[++index] ); }

@@ -210,7 +210,9 @@ ErrorCode WriteNC::parse_options( const FileOptions& opts, std::vector< std::str
 #ifndef MOAB_HAVE_PNETCDF
     const int procs = myPcomm->proc_config().proc_size();
     if( procs > 1 )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Attempt to launch NC writer in parallel without pnetcdf support" ); }
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Attempt to launch NC writer in parallel without pnetcdf support" );
+    }
 #endif
 
     const int rank = myPcomm->proc_config().proc_rank();

@@ -63,7 +63,6 @@ commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
-  EXTRA_DIST = imoab_coupler_utils.hpp
   HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
@@ -246,6 +245,7 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m \
                    atm_ocn_map.nc file_set7rk_0.h5m file_set7rk_1.h5m
 
+EXTRA_DIST = imoab_coupler_utils.hpp
 FORTDEFS = $(FCDEFS)
 PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
     $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)

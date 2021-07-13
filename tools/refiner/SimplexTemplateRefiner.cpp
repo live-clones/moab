@@ -68,7 +68,9 @@ bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity
         {
             this->tag_manager->get_input_vertex_tag( i, tag_handle, tag_offset );
             if( imesh->tag_get_data( tag_handle, &conn[n], 1, (char*)tag_data + tag_offset ) != MB_SUCCESS )
-            { return false; }
+            {
+                return false;
+            }
         }
         if( this->input_is_output ) { this->corner_handles[n] = conn[n]; }
         else

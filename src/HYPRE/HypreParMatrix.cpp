@@ -422,10 +422,14 @@ HYPRE_Int HypreParMatrix::MultTranspose( HypreParVector& x, HypreParVector& y, d
 void HypreParMatrix::ScaleRows( const Eigen::VectorXd& diag )
 {
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != hypre_CSRMatrixNumRows( A_parcsr->offd ) )
-    { MB_SET_ERR_RET( "Row does not match" ); }
+    {
+        MB_SET_ERR_RET( "Row does not match" );
+    }
 
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != diag.size() )
-    { MB_SET_ERR_RET( "Note the Eigen::VectorXd diag is not of compatible dimensions with A\n" ); }
+    {
+        MB_SET_ERR_RET( "Note the Eigen::VectorXd diag is not of compatible dimensions with A\n" );
+    }
 
     int size           = this->height;
     double* Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
@@ -454,10 +458,14 @@ void HypreParMatrix::ScaleRows( const Eigen::VectorXd& diag )
 void HypreParMatrix::InvScaleRows( const Eigen::VectorXd& diag )
 {
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != hypre_CSRMatrixNumRows( A_parcsr->offd ) )
-    { MB_SET_ERR_RET( "Row does not match" ); }
+    {
+        MB_SET_ERR_RET( "Row does not match" );
+    }
 
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != diag.size() )
-    { MB_SET_ERR_RET( "Note the Eigen::VectorXd diag is not of compatible dimensions with A_parcsr\n" ); }
+    {
+        MB_SET_ERR_RET( "Note the Eigen::VectorXd diag is not of compatible dimensions with A_parcsr\n" );
+    }
 
     int size           = this->height;
     double* Adiag_data = hypre_CSRMatrixData( A_parcsr->diag );
@@ -491,7 +499,9 @@ void HypreParMatrix::InvScaleRows( const Eigen::VectorXd& diag )
 void HypreParMatrix::operator*=( double s )
 {
     if( hypre_CSRMatrixNumRows( A_parcsr->diag ) != hypre_CSRMatrixNumRows( A_parcsr->offd ) )
-    { MB_SET_ERR_RET( "Row does not match" ); }
+    {
+        MB_SET_ERR_RET( "Row does not match" );
+    }
 
     HYPRE_Int size = hypre_CSRMatrixNumRows( A_parcsr->diag );
     HYPRE_Int jj;

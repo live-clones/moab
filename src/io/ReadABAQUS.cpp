@@ -122,7 +122,9 @@ ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandl
     ErrorCode status;
 
     if( subset_list )
-    { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for ABAQUS data" ); }
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for ABAQUS data" );
+    }
 
     // Open file
     lineNo = 0;
@@ -486,7 +488,9 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
                     if( !read_translation )
                     {
                         if( tokens.size() != 3 )
-                        { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on INSTANCE translation line" ); }
+                        {
+                            MB_SET_ERR( MB_FAILURE, "Wrong number of entries on INSTANCE translation line" );
+                        }
 
                         for( unsigned int i = 0; i < 3; i++ )
                             translation[i] = atof( tokens[i].c_str() );
@@ -496,7 +500,9 @@ ErrorCode ReadABAQUS::read_instance( EntityHandle assembly_set, EntityHandle fil
                     else if( !read_rotation )
                     {
                         if( tokens.size() != 7 )
-                        { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on INSTANCE rotation line" ); }
+                        {
+                            MB_SET_ERR( MB_FAILURE, "Wrong number of entries on INSTANCE rotation line" );
+                        }
                         for( unsigned int i = 0; i < 7; i++ )
                             rotation[i] = atof( tokens[i].c_str() );
 
@@ -813,12 +819,16 @@ ErrorCode ReadABAQUS::read_element_set( EntityHandle parent_set, EntityHandle fi
             if( generate_elset )
             {
                 if( tokens.size() != 3 )
-                { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on GENERATE element set data line" ); }
+                {
+                    MB_SET_ERR( MB_FAILURE, "Wrong number of entries on GENERATE element set data line" );
+                }
                 int e1   = atoi( tokens[0].c_str() );
                 int e2   = atoi( tokens[1].c_str() );
                 int incr = atoi( tokens[2].c_str() );
                 if( ( incr == 0 ) || ( ( ( e2 - e1 ) % incr ) != 0 ) )
-                { MB_SET_ERR( MB_FAILURE, "Invalid data on GENERATE element set data line" ); }
+                {
+                    MB_SET_ERR( MB_FAILURE, "Invalid data on GENERATE element set data line" );
+                }
                 for( int element_id = e1; element_id <= e2; element_id += incr )
                     element_list.push_back( element_id );
             }
@@ -957,7 +967,9 @@ ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_
     }
 
     if( make_from_elset && generate_nset )
-    { MB_SET_ERR( MB_FAILURE, "Incompatible NSET parameters ELSET & GENERATE" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Incompatible NSET parameters ELSET & GENERATE" );
+    }
 
     if( make_from_elset )
     {
@@ -979,12 +991,16 @@ ErrorCode ReadABAQUS::read_node_set( EntityHandle parent_set, EntityHandle file_
                 if( generate_nset )
                 {
                     if( tokens.size() != 3 )
-                    { MB_SET_ERR( MB_FAILURE, "Wrong number of entries on GENERATE node set data line" ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Wrong number of entries on GENERATE node set data line" );
+                    }
                     int n1   = atoi( tokens[0].c_str() );
                     int n2   = atoi( tokens[1].c_str() );
                     int incr = atoi( tokens[2].c_str() );
                     if( ( incr == 0 ) || ( ( ( n2 - n1 ) % incr ) != 0 ) )
-                    { MB_SET_ERR( MB_FAILURE, "Invalid data on GENERATE node set data line" ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Invalid data on GENERATE node set data line" );
+                    }
                     for( int node_id = n1; node_id <= n2; node_id += incr )
                         node_list.push_back( node_id );
                 }
@@ -1105,7 +1121,9 @@ ErrorCode ReadABAQUS::read_element_list( EntityHandle parent_set, EntityHandle a
             case abq_element_type:
                 element_type = elementTypes[params[param_key]];
                 if( abq_eletype_unsupported == element_type )
-                { MB_SET_ERR( MB_FAILURE, "MOAB doesn't currently support this element type" ); }
+                {
+                    MB_SET_ERR( MB_FAILURE, "MOAB doesn't currently support this element type" );
+                }
                 // std::cout << "\tAdding ELEMENTS of type: " << params[param_key] << std::endl; //
                 // REMOVE
                 params.erase( param_key );
@@ -1150,7 +1168,9 @@ ErrorCode ReadABAQUS::read_element_list( EntityHandle parent_set, EntityHandle a
         {
             tokenize( readline, tokens, ", \n" );
             if( tokens.size() < nodes_per_element[element_type] + 1 )
-            { MB_SET_ERR( MB_FAILURE, "Not enough data on node data line" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "Not enough data on node data line" );
+            }
             element_ids.push_back( atoi( tokens[0].c_str() ) );
             for( unsigned int i = 1; i < nodes_per_element[element_type] + 1; i++ )
                 connect_list.push_back( atoi( tokens[i].c_str() ) );

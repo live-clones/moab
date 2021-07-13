@@ -144,7 +144,9 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
     {
         int num_fields = sscanf( shared_str.c_str(), "%d.%d", &resolve_dim, &shared_dim );
         if( 2 != num_fields )
-        { MB_SET_ERR( MB_FAILURE, "Didn't read 2 fields from PARALLEL_RESOLVE_SHARED_ENTS string" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Didn't read 2 fields from PARALLEL_RESOLVE_SHARED_ENTS string" );
+        }
     }
 
     // Get skip augmenting with ghosts option
@@ -175,7 +177,9 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
     {
         partition_by_rank = true;
         if( !partition_tag_vals.empty() )
-        { MB_SET_ERR( MB_FAILURE, "Cannot specify both PARTITION_VALS and PARTITION_BY_RANK" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Cannot specify both PARTITION_VALS and PARTITION_BY_RANK" );
+        }
     }
 
     double factor_seq;
@@ -334,7 +338,9 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
 
                 i_read = true;
                 if( num_files != 1 )
-                { MB_SET_ERR( MB_NOT_IMPLEMENTED, "Multiple file read not supported for READ_PART" ); }
+                {
+                    MB_SET_ERR( MB_NOT_IMPLEMENTED, "Multiple file read not supported for READ_PART" );
+                }
 
                 // If we're going to resolve shared entities, then we need
                 // to ask the file reader to populate a tag with unique ids

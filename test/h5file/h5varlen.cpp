@@ -43,11 +43,11 @@ void compare_tags( const char* name, Interface& mb1, Interface& mb2 );
 
 void read_write( const char* filename, Interface& write, Interface& reader );
 
-#define CHECK_ERR_FILE( ERRCODE, FILENAME )                            \
-    do                                                                 \
-    {                                                                  \
-        if( MB_SUCCESS != (ERRCODE) && !keep_files ) remove( FILENAME ); \
-        CHECK_ERR( ERRCODE );                                          \
+#define CHECK_ERR_FILE( ERRCODE, FILENAME )                                \
+    do                                                                     \
+    {                                                                      \
+        if( MB_SUCCESS != ( ERRCODE ) && !keep_files ) remove( FILENAME ); \
+        CHECK_ERR( ERRCODE );                                              \
         while( false )
 
 int main( int argc, char* argv[] )
@@ -79,7 +79,7 @@ int main( int argc, char* argv[] )
     err_count += RUN_TEST( test_var_length_handle_tag );
     err_count += RUN_TEST( test_var_length_data_big );
 
-    err_count += RUN_TEST (test_huge_var_length);
+    err_count += RUN_TEST( test_huge_var_length );
 
 #ifdef MOAB_HAVE_MPI
     fail = MPI_Finalize();
@@ -552,39 +552,38 @@ void test_huge_var_length()
     // For each entity, if it is a vertex store its own handle
     // in its tag.  Otherwise store the element connectivity list
     // in the tag.  Skip entity sets.
-    EntityHandle v1 = range[0]; // first vertex
+    EntityHandle v1 = range[0];  // first vertex
     // huge data
-    std::vector<double> dataArr; // larger than the buffer
+    std::vector< double > dataArr;  // larger than the buffer
     int N = 2000;
-    dataArr.resize(N); // size will be 8 * N > bufferSize = 10000 set by option during writing
-    for (int i=0; i<N; i++)
+    dataArr.resize( N );  // size will be 8 * N > bufferSize = 10000 set by option during writing
+    for( int i = 0; i < N; i++ )
         dataArr[i] = i;
-    const void * ptr = &dataArr[0];
+    const void* ptr = &dataArr[0];
     rval            = mb1.tag_set_by_ptr( tag, &v1, 1, &ptr, &N );CHECK_ERR( rval );
     // second vertex, do a smaller N
-    v1 = range[1];
-    int M = N-5;
-    ptr = &dataArr[2]; // start with 2
-    rval            = mb1.tag_set_by_ptr( tag, &v1, 1, &ptr, &M );CHECK_ERR( rval );
+    v1    = range[1];
+    int M = N - 5;
+    ptr   = &dataArr[2];  // start with 2
+    rval  = mb1.tag_set_by_ptr( tag, &v1, 1, &ptr, &M );CHECK_ERR( rval );
 
     // write with a smaller buffer, size controlled by option to test
     const char* writeOptions = "BUFFER_SIZE=4000;DEBUG_IO=5";
-    rval = mb1.write_file("test_huge_var_tag.h5m", NULL, writeOptions ); CHECK_ERR( rval );
-    rval = mb2.load_file( "test_huge_var_tag.h5m" ); CHECK_ERR( rval );
+    rval                     = mb1.write_file( "test_huge_var_tag.h5m", NULL, writeOptions );CHECK_ERR( rval );
+    rval = mb2.load_file( "test_huge_var_tag.h5m" );CHECK_ERR( rval );
     compare_tags( "test_tag", mb1, mb2 );
     // compare some values for the 2nd vertex
     Tag tag2;
-    rval = mb2.tag_get_handle("test_tag", tag2); CHECK_ERR( rval );
-    EntityHandle vertex2=2;
+    rval = mb2.tag_get_handle( "test_tag", tag2 );CHECK_ERR( rval );
+    EntityHandle vertex2 = 2;
     int len2;
     const void* ptr2;
-    rval = mb2.tag_get_by_ptr(tag2,&vertex2, 1, &ptr2, &len2); CHECK_ERR( rval );
+    rval = mb2.tag_get_by_ptr( tag2, &vertex2, 1, &ptr2, &len2 );CHECK_ERR( rval );
     CHECK_EQUAL( len2, M );
 
-    CHECK_REAL_EQUAL( dataArr[2], ((double*)ptr2)[0] , 0.000000001);
+    CHECK_REAL_EQUAL( dataArr[2], ( (double*)ptr2 )[0], 0.000000001 );
 
     if( !keep_files ) remove( "test_huge_var_tag.h5m" );CHECK_ERR( rval );
-
 }
 void create_structured_quad_mesh( Interface& mb, int x, int y )
 {

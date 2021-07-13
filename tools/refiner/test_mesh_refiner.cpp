@@ -8,7 +8,7 @@
 #ifdef MOAB_HAVE_MPI
 #include "moab/ParallelComm.hpp"
 #include "moab_mpi.h"
-#if defined(_MINGW32_) || defined(_MINGW64_)
+#if defined( _MINGW32_ ) || defined( _MINGW64_ )
 #include <time.h>
 #include <sys/time.h>
 #endif

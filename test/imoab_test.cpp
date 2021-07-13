@@ -13,7 +13,7 @@
 #include <cstring>
 
 #define CHECKRC( rc, message )   \
-    if( 0 != (rc) )                \
+    if( 0 != ( rc ) )            \
     {                            \
         printf( "%s", message ); \
         return 1;                \
@@ -86,8 +86,8 @@ int main( int argc, char* argv[] )
     CHECKRC( rc, "failed to register duplicate application" );
 
 #ifdef MOAB_HAVE_MPI
-    const char* read_opts = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
-    int num_ghost_layers[1] = {1};
+    const char* read_opts   = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
+    int num_ghost_layers[1] = { 1 };
 #else
     const char* read_opts = "";
     int* num_ghost_layers = nullptr;

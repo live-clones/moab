@@ -215,7 +215,9 @@ EntityHandle MeshOutputFunctor::map_vertex( EntityHandle vhash, const double* vc
         std::vector< int > gid;
         this->assign_tags( vertex_handle, vtags );
         if( this->tag_manager->get_input_gids( 1, &vhash, gid ) == MB_SUCCESS )
-        { this->tag_manager->set_gid( vertex_handle, gid[0] ); }
+        {
+            this->tag_manager->set_gid( vertex_handle, gid[0] );
+        }
     }
     if( !vertex_handle ) { std::cerr << "Could not insert vertex into new mesh!\n"; }
 #ifdef MB_DEBUG

@@ -544,7 +544,9 @@ ErrorCode NCWriteHelper::write_set_variables( std::vector< WriteNC::VarData >& v
 
             // Set variables with timesteps, e.g. xtime(Time) or xtime(Time, StrLen)
             if( variableData.has_tsteps )
-            { MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing set variables with timesteps is not implemented yet" ); }
+            {
+                MB_SET_ERR( MB_NOT_IMPLEMENTED, "Writing set variables with timesteps is not implemented yet" );
+            }
 
             switch( variableData.varDataType )
             {

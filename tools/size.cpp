@@ -771,7 +771,9 @@ int main( int argc, char* argv[] )
             if( dim_tag && id_tag )
             {
                 if( MB_SUCCESS != mb.get_entities_by_type_and_tag( 0, MBENTITYSET, &dim_tag, 0, 1, entities ) )
-                { fprintf( stderr, "Error retreiving geometry entitities.\n" ); }
+                {
+                    fprintf( stderr, "Error retreiving geometry entitities.\n" );
+                }
             }
 
             if( entities.empty() ) { fprintf( stderr, "No geometry entities defined in file.\n" ); }

@@ -715,7 +715,9 @@ ErrorCode ParallelComm::send_entities( std::vector< unsigned int >& send_procs, 
 {
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( OWNED_START, procConfig.proc_rank(), "Starting send_entities." ); }
+    {
+        MPE_Log_event( OWNED_START, procConfig.proc_rank(), "Starting send_entities." );
+    }
 #endif
     myDebug->tprintf( 1, "Entering send_entities\n" );
     if( myDebug->get_verbosity() == 4 )
@@ -815,7 +817,9 @@ ErrorCode ParallelComm::send_entities( std::vector< unsigned int >& send_procs, 
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending send_entities." ); }
+    {
+        MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending send_entities." );
+    }
 #endif
 
     return MB_SUCCESS;
@@ -836,7 +840,9 @@ ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs, std:
 {
 #ifdef USE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( OWNED_START, procConfig.proc_rank(), "Starting send_recv_entities." ); }
+    {
+        MPE_Log_event( OWNED_START, procConfig.proc_rank(), "Starting send_recv_entities." );
+    }
 #endif
     myDebug->tprintf( 1, "Entering send_recv_entities\n" );
     if( myDebug->get_verbosity() == 4 )
@@ -959,7 +965,9 @@ ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs, std:
 
 #ifdef USE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending send_recv_entities." ); }
+    {
+        MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending send_recv_entities." );
+    }
 #endif
 
     return MB_SUCCESS;
@@ -1118,7 +1126,9 @@ ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs, int
                                          buffProcs[i / 2], MB_MESG_REMOTEH_SIZE, procConfig.proc_comm(),
                                          &recvRemotehReqs[i] );
                     if( success != MPI_SUCCESS )
-                    { MB_SET_ERR( MB_FAILURE, "Failed to post irecv for remote handles in ghost exchange" ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Failed to post irecv for remote handles in ghost exchange" );
+                    }
                 }
                 recvReqs.resize( 2 * buffProcs.size(), MPI_REQUEST_NULL );
                 sendReqs.resize( 2 * buffProcs.size(), MPI_REQUEST_NULL );
@@ -1143,7 +1153,9 @@ ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs, int
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending recv entities." ); }
+    {
+        MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending recv entities." );
+    }
 #endif
 
     //===========================================
@@ -1915,7 +1927,9 @@ ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, con
                 {
                     int j = std::lower_bound( new_ents.begin(), new_ents.end(), *rit ) - new_ents.begin();
                     if( (int)new_ents.size() == j )
-                    { MB_SET_ERR( MB_FAILURE, "Failed to find new entity in send list" ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Failed to find new entity in send list" );
+                    }
                     int err;
                     to_vec[i] = CREATE_HANDLE( MBMAXTYPE, j, err );
                     if( err ) { MB_SET_ERR( MB_FAILURE, "Failed to create handle in remote_handles" ); }
@@ -3169,7 +3183,9 @@ ErrorCode ParallelComm::unpack_sets( unsigned char*& buff_ptr, std::vector< Enti
     int n_uid;
     UNPACK_INT( buff_ptr, n_uid );
     if( n_uid > 0 && n_uid != num_sets )
-    { std::cerr << "The number of Parallel geometry unique ids should be same." << std::endl; }
+    {
+        std::cerr << "The number of Parallel geometry unique ids should be same." << std::endl;
+    }
 
     if( n_uid > 0 )
     {  // If parallel geometry unique id is packed
@@ -3187,7 +3203,9 @@ ErrorCode ParallelComm::unpack_sets( unsigned char*& buff_ptr, std::vector< Enti
             Range temp_sets;
             void* tag_vals[] = { &uids[i] };
             if( uids[i] > 0 )
-            { result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &uid_tag, tag_vals, 1, temp_sets ); }
+            {
+                result = mbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, &uid_tag, tag_vals, 1, temp_sets );
+            }
             if( !temp_sets.empty() )
             {  // Existing set
                 set_handle = *temp_sets.begin();
@@ -3789,7 +3807,9 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
     myDebug->tprintf( 1, "Resolving shared entities.\n" );
 
     if( resolve_dim < shared_dim )
-    { MB_SET_ERR( MB_FAILURE, "MOAB does not support vertex-based partitions, only element-based ones" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "MOAB does not support vertex-based partitions, only element-based ones" );
+    }
 
     if( -1 == shared_dim )
     {
@@ -3853,7 +3873,9 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
         result = mbImpl->tag_get_handle( GLOBAL_ID_TAG_NAME, 1, MB_TYPE_INTEGER, gid_tag, MB_TAG_DENSE | MB_TAG_CREAT,
                                          &def_val, &tag_created );
         if( MB_ALREADY_ALLOCATED != result && MB_SUCCESS != result )
-        { MB_SET_ERR( result, "Failed to create/get gid tag handle" ); }
+        {
+            MB_SET_ERR( result, "Failed to create/get gid tag handle" );
+        }
         else if( tag_created )
         {
             // Just created it, so we need global ids
@@ -3894,7 +3916,9 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( SHAREDV_START, procConfig.proc_rank(), "Creating crystal router." ); }
+    {
+        MPE_Log_event( SHAREDV_START, procConfig.proc_rank(), "Creating crystal router." );
+    }
 #endif
 
     // Get a crystal router
@@ -3962,7 +3986,9 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( SHAREDV_END, procConfig.proc_rank(), "Finished tag_shared_verts." ); }
+    {
+        MPE_Log_event( SHAREDV_END, procConfig.proc_rank(), "Finished tag_shared_verts." );
+    }
 #endif
 
     // Get entities shared by 1 or n procs
@@ -4007,7 +4033,9 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( RESOLVE_END, procConfig.proc_rank(), "Exiting resolve_shared_ents." ); }
+    {
+        MPE_Log_event( RESOLVE_END, procConfig.proc_rank(), "Exiting resolve_shared_ents." );
+    }
 #endif
 
     // std::ostringstream ent_str;
@@ -5485,7 +5513,9 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
     //===========================================
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_START, procConfig.proc_rank(), "Starting entity exchange." ); }
+    {
+        MPE_Log_event( ENTITIES_START, procConfig.proc_rank(), "Starting entity exchange." );
+    }
 #endif
 
     // Index reqs the same as buffer/sharing procs indices
@@ -5625,7 +5655,9 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
                                          buffProcs[i / 3], MB_MESG_REMOTEH_SIZE, procConfig.proc_comm(),
                                          &recv_remoteh_reqs[i] );
                     if( success != MPI_SUCCESS )
-                    { MB_SET_ERR( MB_FAILURE, "Failed to post irecv for remote handles in ghost exchange" ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Failed to post irecv for remote handles in ghost exchange" );
+                    }
                 }
                 recv_ent_reqs.resize( 3 * buffProcs.size(), MPI_REQUEST_NULL );
                 sendReqs.resize( 3 * buffProcs.size(), MPI_REQUEST_NULL );
@@ -5642,7 +5674,9 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending entity exchange." ); }
+    {
+        MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending entity exchange." );
+    }
 #endif
 
     if( is_iface )
@@ -5665,7 +5699,9 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
 
 #ifdef MOAB_HAVE_MPE
         if( myDebug->get_verbosity() == 2 )
-        { MPE_Log_event( IFACE_END, procConfig.proc_rank(), "Ending interface exchange." ); }
+        {
+            MPE_Log_event( IFACE_END, procConfig.proc_rank(), "Ending interface exchange." );
+        }
 #endif
 
         //===========================================
@@ -5815,7 +5851,9 @@ ErrorCode ParallelComm::send_buffer( const unsigned int to_proc, Buffer* send_bu
         success = MPI_Irecv( next_recv_buff->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, to_proc, next_mesg_tag,
                              procConfig.proc_comm(), next_recv_req );
         if( success != MPI_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Failed to post irecv for next message in ghost exchange" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv for next message in ghost exchange" );
+        }
     }
     // If large, we'll need an ack before sending the rest
     else if( send_buff->get_stored_size() > (int)INITIAL_BUFF_SIZE )
@@ -5826,7 +5864,9 @@ ErrorCode ParallelComm::send_buffer( const unsigned int to_proc, Buffer* send_bu
         success = MPI_Irecv( (void*)ack_buff, sizeof( int ), MPI_UNSIGNED_CHAR, to_proc, mesg_tag - 1,
                              procConfig.proc_comm(), &ack_req );
         if( success != MPI_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Failed to post irecv for entity ack in ghost exchange" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv for entity ack in ghost exchange" );
+        }
     }
 
     // Send the buffer
@@ -6576,7 +6616,9 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
 {
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( OWNED_START, procConfig.proc_rank(), "Starting owned ents exchange." ); }
+    {
+        MPE_Log_event( OWNED_START, procConfig.proc_rank(), "Starting owned ents exchange." );
+    }
 #endif
 
     myDebug->tprintf( 1, "Entering exchange_owned_mesh\n" );
@@ -6608,7 +6650,9 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
     //===========================================
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_START, procConfig.proc_rank(), "Starting entity exchange." ); }
+    {
+        MPE_Log_event( ENTITIES_START, procConfig.proc_rank(), "Starting entity exchange." );
+    }
 #endif
 
     // Index reqs the same as buffer/sharing procs indices
@@ -6770,7 +6814,9 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
                                          buffProcs[i / 3], MB_MESG_REMOTEH_SIZE, procConfig.proc_comm(),
                                          &recv_remoteh_reqs[i] );
                     if( success != MPI_SUCCESS )
-                    { MB_SET_ERR( MB_FAILURE, "Failed to post irecv for remote handles in ghost exchange" ); }
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Failed to post irecv for remote handles in ghost exchange" );
+                    }
                 }
                 recv_ent_reqs.resize( 3 * buffProcs.size(), MPI_REQUEST_NULL );
                 sendReqs.resize( 3 * buffProcs.size(), MPI_REQUEST_NULL );
@@ -6794,7 +6840,9 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
 
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
-    { MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending entity exchange." ); }
+    {
+        MPE_Log_event( ENTITIES_END, procConfig.proc_rank(), "Ending entity exchange." );
+    }
 #endif
 
     // we still need to wait on sendReqs, if they are not fulfilled yet
@@ -7319,7 +7367,9 @@ ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const s
 
     // Check that restrictions are met: number of source/dst tags...
     if( src_tags.size() != dst_tags.size() )
-    { MB_SET_ERR( MB_FAILURE, "Source and destination tag handles must be specified for reduce_tags" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Source and destination tag handles must be specified for reduce_tags" );
+    }
 
     // ... tag data types
     std::vector< Tag >::const_iterator vits, vitd;
@@ -7332,7 +7382,9 @@ ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const s
         // Checks on tag characteristics
         result = mbImpl->tag_get_data_type( *vits, tags_type );MB_CHK_SET_ERR( result, "Failed to get src tag data type" );
         if( tags_type != MB_TYPE_INTEGER && tags_type != MB_TYPE_DOUBLE && tags_type != MB_TYPE_BIT )
-        { MB_SET_ERR( MB_FAILURE, "Src/dst tags must have integer, double, or bit data type" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Src/dst tags must have integer, double, or bit data type" );
+        }
 
         result = mbImpl->tag_get_bytes( *vits, tags_size );MB_CHK_SET_ERR( result, "Failed to get src tag bytes" );
         vals.resize( tags_size );
@@ -8861,10 +8913,10 @@ void ParallelComm::print_pstatus( unsigned char pstat, std::string& ostr )
     int num = 0;
 #define ppstat( a, b )             \
     {                              \
-        if( pstat & (a) )            \
+        if( pstat & ( a ) )        \
         {                          \
             if( num ) str << ", "; \
-            str << (b);              \
+            str << ( b );          \
             num++;                 \
         }                          \
     }

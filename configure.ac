@@ -1,7 +1,7 @@
 ################################################################################
 #                           Standard Stuff
 ################################################################################
-AC_INIT([MOAB],[5.2.1],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
+AC_INIT([MOAB],[5.3.0],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
 AC_CONFIG_SRCDIR([moab.make.in])
 AC_CONFIG_SRCDIR([config/MOABConfig.cmake.in])
 AC_CONFIG_SRCDIR([examples/makefile.config.in])
@@ -952,7 +952,7 @@ AC_ARG_WITH( [vtk-lib-suffix],
 # Provide downloadable option for TempestRemap library
 # Supported TempestRemap versions: 2.0.5, 2.0.3, 2.0.2
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.0.5],[no])
+AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.1.0],[no])
 
 # Configuration for TempestRemap library
 AC_ARG_WITH([tempestremap],

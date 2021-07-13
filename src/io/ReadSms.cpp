@@ -35,11 +35,11 @@
 #include <set>
 #include <iostream>
 
-#define CHECK( a )                   \
-    if( MB_SUCCESS != result )       \
-    {                                \
-        std::cerr << (a) << std::endl; \
-        return result;               \
+#define CHECK( a )                       \
+    if( MB_SUCCESS != result )           \
+    {                                    \
+        std::cerr << ( a ) << std::endl; \
+        return result;                   \
     }
 
 #define CHECKN( a ) \

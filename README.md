@@ -102,6 +102,30 @@ Detailed API documentation and user/development guides are available for the fol
 * Next to install the compiled libraries, headers and tools, run `make install`
 * You can now use the `makefile` generated under the `build/examples` folder and modify it to compile downstream code with MOAB dependency
 
+## Language Bindings
+
+Even though the MOAB library is written in C++ language (conforming to C++11 standard), several partial bindings and interfaces are available for other languages.
+
+  + **C/Fortran**: You can use the iMOAB interface to load, manipulate and query unstructured meshes in memory
+    - Supports both serial and parallel invocation under one interface. MOAB needs to be configured using `--with-mpi` option.
+    - Supports ability to migrate meshes and tags between processes
+    - Supports capability to compute remapping weights for Climate science applications
+
+    Note that the **ITAPS iMesh** interfaces are now deprecated and we encourage users to directly use MOAB or iMOAB interfaces if possible.
+    
+  + **Python3**: The Python bindings for MOAB can be enabled when configured with `--enable-shared --enable-pymoab` options.
+    - Supports access to the structured grid interfaces.
+    - Supports queries and access to Entities using a true-Pythonic implementation flavor.
+    - Utilizes Cython to provide flexible bindings without sacrificing runtime performance.
+    - Only supports serial computations for now. Parallel implementation using MPI4Py is underway.
+
+### Third-party bindings
+
+  + **C#**: This contributed source is developed and maintained by Qingfeng Xia, UKAEA 2021. It is distributed under the same LGPLv3 license as MOAB.
+    - The open-source repository containing C# interfaces are available in [MOABSharp Bitbucket repository](https://bitbucket.org/qingfengxia/moabsharp).
+    - Supports builds on .NET Core 3.1 under Ubuntu 20.04, and .NET framework 4.x under Windows 10-64bit (target on "netstandard2").
+    - Detailed documentation and supported features are listed in the [MOABSharp README file](https://bitbucket.org/qingfengxia/moabsharp/src/dev/README.md).
+
 ## Bugs, Correspondence, Contributing
 
 MOAB is distributed under LGPL(v3) licensing, and we encourage users to submit bug reports (and, if possible, fixes) directly on the Bitbucket interface. Optionally, users can email and discuss the issue with developers at [moab-dev@mcs.anl.gov](mailto:moab-dev@mcs.anl.gov). Also refer to [FAQ](FAQ.md) for some commonly asked questions and their resolutions. 
@@ -122,6 +146,7 @@ If you use MOAB for your research, please use the following bibtex entries for t
   year = {2004},
   note = {Report}
 }
+
 @software{moab521_2020,
   author       = {Mahadevan, Vijay and
                   Grindeanu, Iulian and

@@ -19,7 +19,7 @@ int main( int argc, char* argv[] )
 
     opts.parseCommandLine( argc, argv );
 
-    if (inputfile.empty())
+    if( inputfile.empty() )
     {
         opts.printHelp();
         return 0;

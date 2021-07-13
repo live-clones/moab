@@ -100,7 +100,9 @@ void CompareQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, 
     std::sort( handles1.begin(), handles1.end() );
     std::sort( handles2.begin(), handles2.end() );
     if( handles1 != handles2 )
-    { MSQ_SETERR( err )( "Incompatible metrics cannot be compared", MsqError::INVALID_STATE ); }
+    {
+        MSQ_SETERR( err )( "Incompatible metrics cannot be compared", MsqError::INVALID_STATE );
+    }
 }
 
 bool CompareQM::check_valid( size_t handle, bool rval1, bool rval2 )

@@ -48,7 +48,9 @@ ErrorCode ReadTetGen::open_file( const std::string& filename, const std::string&
 
     if( !real_file_name.empty() ) file_stream.open( real_file_name.c_str(), std::ios::in );
     if( file_required && !file_stream.is_open() )
-    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, real_file_name << ": cannot read file" ); }
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, real_file_name << ": cannot read file" );
+    }
 
     return MB_SUCCESS;
 }
@@ -77,7 +79,9 @@ ErrorCode ReadTetGen::load_file( const char* file_name_c, const EntityHandle* /*
         for( size_t i = 0; i < suffix.length(); ++i )
             suffix[i] = (char)tolower( suffix[i] );
         if( suffix == "node" || suffix == "ele" || suffix == "face" || suffix == "edge" )
-        { base = filename.substr( 0, dot_idx ); }
+        {
+            base = filename.substr( 0, dot_idx );
+        }
         else
         {
             base = filename;
@@ -205,7 +209,9 @@ ErrorCode ReadTetGen::read_line( std::istream& file, double* values_out, int num
     // Check that we're at the end of the line
     int junk;
     if( ( str >> junk ) || !str.eof() )
-    { MB_SET_ERR( MB_FAILURE, "Unexpected trailing data for line " << lineno << " of node data" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Unexpected trailing data for line " << lineno << " of node data" );
+    }
 
     return MB_SUCCESS;
 }
@@ -225,7 +231,9 @@ ErrorCode ReadTetGen::read_node_file( std::istream& file, const Tag* attr_tag_li
     const int num_attr  = (int)header_vals[2];
     const int bdry_flag = (int)header_vals[3];
     if( num_vtx < 1 || dim < 2 || dim > 3 || num_attr < 0 || bdry_flag < 0 || bdry_flag > 1 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid header line for node data" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid header line for node data" );
+    }
     if( attr_tag_list_len > num_attr ) attr_tag_list_len = num_attr;
 
     // Allocate space for tag data
@@ -339,7 +347,9 @@ ErrorCode ReadTetGen::read_elem_file( EntityType type, std::istream& file, const
     if( MB_SUCCESS != rval ) return rval;
     const int num_elem = (int)header_vals[0];
     if( num_elem < 1 || node_per_elem < 2 || have_group_id < 0 || have_group_id > 1 )
-    { MB_SET_ERR( MB_FAILURE, "Invalid header line for element data" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid header line for element data" );
+    }
 
     // Create group map
     std::map< double, EntityHandle > groups;

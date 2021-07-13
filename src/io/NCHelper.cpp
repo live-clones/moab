@@ -845,7 +845,9 @@ ErrorCode NCHelper::read_variables_to_set_allocate( std::vector< ReadNC::VarData
             dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[i].varName.c_str(), tstep_nums[t] );
 
             if( tstep_nums[t] >= dimLens[tDim] )
-            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[t] ); }
+            {
+                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[t] );
+            }
 
             // Get the tag to read into
             if( !vdatas[i].varTags[t] )
@@ -1130,7 +1132,9 @@ ErrorCode ScdNCHelper::read_scd_variables_to_nonset_allocate( std::vector< ReadN
             dbgOut.tprintf( 2, "Reading variable %s, time step %d\n", vdatas[i].varName.c_str(), tstep_nums[t] );
 
             if( tstep_nums[t] >= dimLens[tDim] )
-            { MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[t] ); }
+            {
+                MB_SET_ERR( MB_INDEX_OUT_OF_RANGE, "Wrong value for timestep number " << tstep_nums[t] );
+            }
 
             // Get the tag to read into
             if( !vdatas[i].varTags[t] )

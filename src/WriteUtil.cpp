@@ -237,7 +237,8 @@ ErrorCode WriteUtil::get_element_connect( const int num_elements, const int vert
         // Find a range that fits in the current entity sequence
         for( ; range_iter_lookahead != range_iter_end && *range_iter_lookahead <= ( *seq_iter )->end_handle();
              ++range_iter_lookahead )
-        {}
+        {
+        }
 
         if( current_type != TYPE_FROM_HANDLE( *range_iter ) )
         {

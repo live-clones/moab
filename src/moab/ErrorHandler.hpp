@@ -112,7 +112,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
     do                                                                                                         \
     {                                                                                                          \
         std::ostringstream err_ostr;                                                                           \
-        err_ostr << (err_msg);                                                                                   \
+        err_ostr << ( err_msg );                                                                               \
         moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
                        moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                       \
         return;                                                                                                \
@@ -123,7 +123,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
     do                                                                                                         \
     {                                                                                                          \
         std::ostringstream err_ostr;                                                                           \
-        err_ostr << (err_msg);                                                                                   \
+        err_ostr << ( err_msg );                                                                               \
         moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
                        moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                       \
         return ret_val;                                                                                        \
@@ -134,7 +134,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
     do                                                                                                         \
     {                                                                                                          \
         std::ostringstream err_ostr;                                                                           \
-        err_ostr << (err_msg);                                                                                   \
+        err_ostr << ( err_msg );                                                                               \
         moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, moab::MB_FAILURE, err_ostr.str().c_str(), \
                        moab::MB_ERROR_TYPE_NEW_GLOBAL );                                                       \
     } while( false )
@@ -144,7 +144,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 #define MB_CHK_ERR( err_code )                                                                \
     do                                                                                        \
     {                                                                                         \
-        if( moab::MB_SUCCESS != (err_code) )                                                    \
+        if( moab::MB_SUCCESS != ( err_code ) )                                                \
             return moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, "", \
                                   moab::MB_ERROR_TYPE_EXISTING );                             \
     } while( false )
@@ -154,7 +154,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 #define MB_CHK_ERR_RET( err_code )                                                                                     \
     do                                                                                                                 \
     {                                                                                                                  \
-        if( moab::MB_SUCCESS != (err_code) )                                                                             \
+        if( moab::MB_SUCCESS != ( err_code ) )                                                                         \
         {                                                                                                              \
             moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, "", moab::MB_ERROR_TYPE_EXISTING ); \
             return;                                                                                                    \
@@ -166,7 +166,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 #define MB_CHK_ERR_RET_VAL( err_code, ret_val )                                                                        \
     do                                                                                                                 \
     {                                                                                                                  \
-        if( moab::MB_SUCCESS != (err_code) )                                                                             \
+        if( moab::MB_SUCCESS != ( err_code ) )                                                                         \
         {                                                                                                              \
             moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, "", moab::MB_ERROR_TYPE_EXISTING ); \
             return ret_val;                                                                                            \
@@ -178,7 +178,7 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 #define MB_CHK_ERR_CONT( err_code )                                                                                    \
     do                                                                                                                 \
     {                                                                                                                  \
-        if( moab::MB_SUCCESS != (err_code) )                                                                             \
+        if( moab::MB_SUCCESS != ( err_code ) )                                                                         \
         {                                                                                                              \
             moab::MBError( __LINE__, __func__, __FILENAME__, __MBSDIR__, err_code, "", moab::MB_ERROR_TYPE_EXISTING ); \
         }                                                                                                              \
@@ -186,34 +186,34 @@ ErrorCode MBError( int line, const char* func, const char* file, const char* dir
 
 //! Check error code, if not MB_SUCCESS, set a new error with the given error message and return the
 //! given error code Used in functions which return ErrorCode
-#define MB_CHK_SET_ERR( err_code, err_msg )                                 \
-    do                                                                      \
-    {                                                                       \
-        if( moab::MB_SUCCESS != (err_code) ) MB_SET_ERR( err_code, err_msg ); \
+#define MB_CHK_SET_ERR( err_code, err_msg )                                     \
+    do                                                                          \
+    {                                                                           \
+        if( moab::MB_SUCCESS != ( err_code ) ) MB_SET_ERR( err_code, err_msg ); \
     } while( false )
 
 //! Check error code, if not MB_SUCCESS, set a new error with the given error message and return
 //! Used in functions which return void types (or have no return types at all, e.g. constructors)
-#define MB_CHK_SET_ERR_RET( err_code, err_msg )                       \
-    do                                                                \
-    {                                                                 \
-        if( moab::MB_SUCCESS != (err_code) ) MB_SET_ERR_RET( err_msg ); \
+#define MB_CHK_SET_ERR_RET( err_code, err_msg )                           \
+    do                                                                    \
+    {                                                                     \
+        if( moab::MB_SUCCESS != ( err_code ) ) MB_SET_ERR_RET( err_msg ); \
     } while( false )
 
 //! Check error code, if not MB_SUCCESS, set a new error with the given error message and return the
 //! given value Used in functions which return any data type
-#define MB_CHK_SET_ERR_RET_VAL( err_code, err_msg, ret_val )                       \
-    do                                                                             \
-    {                                                                              \
-        if( moab::MB_SUCCESS != (err_code) ) MB_SET_ERR_RET_VAL( err_msg, ret_val ); \
+#define MB_CHK_SET_ERR_RET_VAL( err_code, err_msg, ret_val )                           \
+    do                                                                                 \
+    {                                                                                  \
+        if( moab::MB_SUCCESS != ( err_code ) ) MB_SET_ERR_RET_VAL( err_msg, ret_val ); \
     } while( false )
 
 //! Check error code, if not MB_SUCCESS, set a new error with the given error message and continue
 //! Used in functions which return any data type
-#define MB_CHK_SET_ERR_CONT( err_code, err_msg )                       \
-    do                                                                 \
-    {                                                                  \
-        if( moab::MB_SUCCESS != (err_code) ) MB_SET_ERR_CONT( err_msg ); \
+#define MB_CHK_SET_ERR_CONT( err_code, err_msg )                           \
+    do                                                                     \
+    {                                                                      \
+        if( moab::MB_SUCCESS != ( err_code ) ) MB_SET_ERR_CONT( err_msg ); \
     } while( false )
 
 #endif

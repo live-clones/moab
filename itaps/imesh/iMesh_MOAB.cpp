@@ -32,20 +32,20 @@
 #include <cstring>
 #include <cstdarg>
 #include <cstdio>
-#define MIN( a, b ) ( (a) < (b) ? (a) : (b) )
+#define MIN( a, b ) ( ( a ) < ( b ) ? ( a ) : ( b ) )
 
 #ifdef _WIN32
 #define snprintf( A, B, C, D ) _snprintf( ( A ), ( B ), ( C ), ( D ) )
 #endif
 
 static ErrorCode create_int_ents( MBiMesh* mbimesh, Range& from_ents, const EntityHandle* in_set = 0 );
-#define HANDLE_ARRAY_PTR( array )       (reinterpret_cast< EntityHandle* >( array ))
+#define HANDLE_ARRAY_PTR( array )       ( reinterpret_cast< EntityHandle* >( array ) )
 #define CONST_HANDLE_ARRAY_PTR( array ) reinterpret_cast< const EntityHandle* >( array )
 #define TAG_HANDLE( handle )            reinterpret_cast< Tag >( handle )
 #define CONST_TAG_HANDLE( handle )      static_cast< const Tag >( handle )
 #define ENTITY_HANDLE( handle )         reinterpret_cast< EntityHandle >( handle )
 #define CONST_ENTITY_HANDLE( handle )   reinterpret_cast< const EntityHandle >( handle )
-#define CAST_TO_VOID( ptr )             (reinterpret_cast< void* >( ptr ))
+#define CAST_TO_VOID( ptr )             ( reinterpret_cast< void* >( ptr ) )
 
 // map from MB's entity type to TSTT's entity topology
 const iMesh_EntityTopology tstt_topology_table[] = {
@@ -444,7 +444,9 @@ void iMesh_getVtxArrCoords( iMesh_Instance instance,
     if( storage_order == iBase_INTERLEAVED )
     {
         if( 3 == geom_dim )
-        { result = MOABI->get_coords( CONST_HANDLE_ARRAY_PTR( vertex_handles ), vertex_handles_size, *coords ); }
+        {
+            result = MOABI->get_coords( CONST_HANDLE_ARRAY_PTR( vertex_handles ), vertex_handles_size, *coords );
+        }
         else
         {
             std::vector< double > dum_coords( 3 * vertex_handles_size );
@@ -1202,13 +1204,17 @@ void iMesh_setVtxArrCoords( iMesh_Instance instance,
     int geom_dim;
     MOABI->get_dimension( geom_dim );
     if( new_coords_size != geom_dim * vertex_handles_size )
-    { ERROR( iBase_INVALID_ARGUMENT, "iMesh_setVtxArrCoords: Didn't get the right # coordinates." ); }
+    {
+        ERROR( iBase_INVALID_ARGUMENT, "iMesh_setVtxArrCoords: Didn't get the right # coordinates." );
+    }
 
     ErrorCode result = MB_SUCCESS, tmp_result;
     if( storage_order == iBase_INTERLEAVED )
     {
         if( 3 == geom_dim )
-        { result = MOABI->set_coords( CONST_HANDLE_ARRAY_PTR( vertex_handles ), vertex_handles_size, new_coords ); }
+        {
+            result = MOABI->set_coords( CONST_HANDLE_ARRAY_PTR( vertex_handles ), vertex_handles_size, new_coords );
+        }
         else
         {
             const EntityHandle* verts = CONST_HANDLE_ARRAY_PTR( vertex_handles );
@@ -1252,7 +1258,9 @@ void iMesh_createVtxArr( iMesh_Instance instance,
     int geom_dim;
     MOABI->get_dimension( geom_dim );
     if( new_coords_size != geom_dim * num_verts )
-    { ERROR( iBase_INVALID_ARGUMENT, "iMesh_createVtxArr: Didn't get the right # coordinates." ); }
+    {
+        ERROR( iBase_INVALID_ARGUMENT, "iMesh_createVtxArr: Didn't get the right # coordinates." );
+    }
 
     // if there aren't any elements in the array, allocate it
     ALLOC_CHECK_ARRAY( new_vertex_handles, num_verts );
@@ -1309,7 +1317,9 @@ void iMesh_createEntArr( iMesh_Instance instance,
 {
     // for now, throw an error if lower order entity handles aren't vertices
     if( iMesh_POINT > new_entity_topology || iMesh_SEPTAHEDRON < new_entity_topology )
-    { ERROR( iBase_INVALID_ARGUMENT, "iMesh_createEntArr: invalid topology." ); }
+    {
+        ERROR( iBase_INVALID_ARGUMENT, "iMesh_createEntArr: invalid topology." );
+    }
     EntityType this_type = mb_topology_table[new_entity_topology];
     int num_ents         = 0, num_verts;
     const EntityHandle* lower_ents;
@@ -1320,7 +1330,9 @@ void iMesh_createEntArr( iMesh_Instance instance,
         lower_ents = CONST_HANDLE_ARRAY_PTR( lower_order_entity_handles );
         // check that we have the right number of lower order entity handles
         if( lower_order_entity_handles_size % CN::VerticesPerEntity( this_type ) != 0 )
-        { ERROR( iBase_INVALID_ENTITY_COUNT, "iMesh_createEntArr: wrong # vertices for this entity type." ); }
+        {
+            ERROR( iBase_INVALID_ENTITY_COUNT, "iMesh_createEntArr: wrong # vertices for this entity type." );
+        }
     }
     else
     {
@@ -1703,7 +1715,9 @@ void iMesh_createEnt( iMesh_Instance instance,
                       /*out*/ int* status, int* err )
 {
     if( 0 == lower_order_entity_handles_size )
-    { ERROR( iBase_INVALID_ENTITY_COUNT, "iMesh_createEnt: need more than zero lower order entities." ); }
+    {
+        ERROR( iBase_INVALID_ENTITY_COUNT, "iMesh_createEnt: need more than zero lower order entities." );
+    }
 
     // call  directly to allow creation of higher-order entities
     // directly from connectivity
@@ -1876,7 +1890,9 @@ void iMesh_setArrData( iMesh_Instance instance,
     if( iBase_SUCCESS != *err ) return;
 
     if( tag_values_size != ( tag_size * entity_handles_size ) )
-    { ERROR( iBase_BAD_ARRAY_SIZE, "iMesh_setArrData: bad tag_values_size passed." ); }
+    {
+        ERROR( iBase_BAD_ARRAY_SIZE, "iMesh_setArrData: bad tag_values_size passed." );
+    }
 
     ErrorCode result = MOABI->tag_set_data( TAG_HANDLE( tag_handle ), CONST_HANDLE_ARRAY_PTR( entity_handles ),
                                             entity_handles_size, tag_values );CHKERR( result, "iMesh_setArrData didn't succeed." );

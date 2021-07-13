@@ -30,7 +30,7 @@ void test_optional_args();
 void test_optional_arg();
 void test_squashed_short();
 
-#define ARGCV( A ) ( sizeof( A ) / sizeof( (A)[0] ) ), const_cast< char** >( A )
+#define ARGCV( A ) ( sizeof( A ) / sizeof( ( A )[0] ) ), const_cast< char** >( A )
 
 int main( int argc, char* argv[] )
 {

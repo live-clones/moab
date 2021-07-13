@@ -36,4 +36,4 @@ class NCHelperDomain : public ScdNCHelper
 };
 
 #endif /* NCHELPERDOMAIN_HPP */
-} // namespace moab
+}  // namespace moab

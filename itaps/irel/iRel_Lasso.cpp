@@ -469,7 +469,9 @@ static void iRel_inferArrArrRelations( iRel_Instance instance, iRel_PairHandle p
         if( iter != ents_gid_map[dim].end() )
         {
             if( ent_or_set1 == iRel_ENTITY && ent_or_set2 == iRel_ENTITY )
-            { result = ASSOCPAIRI->set_relation( ( *iter ).second, ents2[i] ); }
+            {
+                result = ASSOCPAIRI->set_relation( ( *iter ).second, ents2[i] );
+            }
             else if( ent_or_set1 != iRel_ENTITY && ent_or_set2 == iRel_ENTITY )
             {
                 result = ASSOCPAIRI->set_relation( ( iBase_EntitySetHandle )( *iter ).second, ents2[i] );

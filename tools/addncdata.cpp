@@ -66,7 +66,9 @@ int ncFile;
                 ( dims ).resize( ndims );                                                        \
                 gvfail = nc_inq_vardimid( ncFile, id, &( dims )[0] );                            \
                 if( NC_NOERR != gvfail )                                                         \
-                { MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get variable dimension IDs" ); } \
+                {                                                                                \
+                    MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get variable dimension IDs" ); \
+                }                                                                                \
             }                                                                                    \
         }                                                                                        \
     }
@@ -83,7 +85,9 @@ int ncFile;
             size_t ntmp1 = 0;                                                                                   \
             ivfail       = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                          \
             if( NC_NOERR != ivfail )                                                                            \
-            { MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) ); }                  \
+            {                                                                                                   \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) );                  \
+            }                                                                                                   \
         }                                                                                                       \
     }
 
@@ -100,7 +104,9 @@ int ncFile;
             size_t ntmp1 = 0;                                                                                   \
             dvfail       = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                       \
             if( NC_NOERR != dvfail )                                                                            \
-            { MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) ); }                  \
+            {                                                                                                   \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) );                  \
+            }                                                                                                   \
         }                                                                                                       \
     }
 
@@ -117,7 +123,9 @@ int ncFile;
             size_t ntmp1 = 0;                                                                                   \
             dvfail       = nc_get_vara_float( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                        \
             if( NC_NOERR != dvfail )                                                                            \
-            { MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) ); }                  \
+            {                                                                                                   \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) );                  \
+            }                                                                                                   \
         }                                                                                                       \
     }
 
@@ -190,7 +198,9 @@ int main( int argc, char* argv[] )
     // Open netcdf/exodus file
     int fail = nc_open( netcdfFile.c_str(), 0, &ncFile );
     if( NC_NOWRITE != fail )
-    { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf II file " << netcdfFile ); }
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "ReadNCDF:: problem opening Netcdf II file " << netcdfFile );
+    }
 
     std::cout << " opened " << netcdfFile << " with new data \n";
     std::vector< int > dims;

@@ -207,7 +207,9 @@ ErrorCode AEntityFactory::get_element( const EntityHandle* vertex_list, const in
         if( TYPE_FROM_HANDLE( *i_adj ) != target_type ) continue;
 
         if( true == entities_equivalent( *i_adj, vertex_list, vertex_list_size, target_type ) )
-        { temp_vec[temp_vec_size++] = *i_adj; }
+        {
+            temp_vec[temp_vec_size++] = *i_adj;
+        }
     }
 
     if( temp_vec_size == 0 && !create_if_missing ) return result;
@@ -576,7 +578,9 @@ ErrorCode AEntityFactory::get_adjacencies( const EntityHandle source_entity, con
         }
 
         if( source_dimension == 0 )
-        { result = get_zero_to_n_elements( source_entity, target_dimension, target_entities, create_if_missing ); }
+        {
+            result = get_zero_to_n_elements( source_entity, target_dimension, target_entities, create_if_missing );
+        }
         else if( source_dimension > target_dimension )
         {
             result = get_down_adjacency_elements( source_entity, target_dimension, target_entities, create_if_missing );

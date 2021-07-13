@@ -381,7 +381,7 @@ static int get_coords( iMesh_Instance imesh, const iBase_EntityHandle* verts, in
                               Main Method
  **************************************************************************/
 
-#define RUN_TEST( A ) run_test( &(A), #A )
+#define RUN_TEST( A ) run_test( &( A ), #A )
 
 int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartMap& ), const char* func_name )
 {
@@ -2920,7 +2920,9 @@ int PartMap::build_map( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, int n
     if( std::unique( sortedPartList.begin(), sortedPartList.end() ) != sortedPartList.end() )
     {
         if( rank == 0 )
-        { std::cerr << "ERROR: Duplicate iMeshP_Part values detected at " __FILE__ ":" << __LINE__ << std::endl; }
+        {
+            std::cerr << "ERROR: Duplicate iMeshP_Part values detected at " __FILE__ ":" << __LINE__ << std::endl;
+        }
         return 1;
     }
 

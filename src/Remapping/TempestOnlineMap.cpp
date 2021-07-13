@@ -876,12 +876,16 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
                 for( size_t i = 0; i < m_meshInputCov->faces.size(); i++ )
                 {
                     if( fabs( dSourceArea[i] - m_meshInputCov->vecFaceArea[i] ) < 1.0e-10 )
-                    { m_meshInputCov->vecFaceArea[i] = dSourceArea[i]; }
+                    {
+                        m_meshInputCov->vecFaceArea[i] = dSourceArea[i];
+                    }
                 }
                 for( size_t i = 0; i < m_meshOutput->faces.size(); i++ )
                 {
                     if( fabs( dTargetArea[i] - m_meshOutput->vecFaceArea[i] ) < 1.0e-10 )
-                    { m_meshOutput->vecFaceArea[i] = dTargetArea[i]; }
+                    {
+                        m_meshOutput->vecFaceArea[i] = dTargetArea[i];
+                    }
                 }
             }
 
@@ -963,7 +967,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuous = ( eOutputType == DiscretizationType_CGLL );
 
             if( eOutputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobian, this->GetTargetAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobian, this->GetTargetAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobian, this->GetTargetAreas() );
@@ -1003,7 +1009,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
                 // Initialize coordinates for map
                 if( eInputType == DiscretizationType_FV )
-                { this->InitializeSourceCoordinatesFromMeshFV( *m_meshInputCov ); }
+                {
+                    this->InitializeSourceCoordinatesFromMeshFV( *m_meshInputCov );
+                }
                 else
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
@@ -1022,7 +1030,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
                 // Initialize coordinates for map
                 if( eOutputType == DiscretizationType_FV )
-                { this->InitializeSourceCoordinatesFromMeshFV( *m_meshOutput ); }
+                {
+                    this->InitializeSourceCoordinatesFromMeshFV( *m_meshOutput );
+                }
                 else
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
@@ -1087,7 +1097,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuousIn = ( eInputType == DiscretizationType_CGLL );
 
             if( eInputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobian, this->GetSourceAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobian, this->GetSourceAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobian, this->GetSourceAreas() );
@@ -1164,7 +1176,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuousIn = ( eInputType == DiscretizationType_CGLL );
 
             if( eInputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobianIn, this->GetSourceAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobianIn, this->GetSourceAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobianIn, this->GetSourceAreas() );
@@ -1174,7 +1188,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuousOut = ( eOutputType == DiscretizationType_CGLL );
 
             if( eOutputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianOut, this->GetTargetAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianOut, this->GetTargetAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobianOut, this->GetTargetAreas() );
@@ -1547,7 +1563,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
-                                                        : m_remapper->m_covering_source_entities );
+                                                          : m_remapper->m_covering_source_entities );
             discOrder  = m_nDofsPEl_Src;
             discMethod = m_eInputType;
             break;
@@ -1888,7 +1904,7 @@ moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::Intersec
             meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
-                                                        : m_remapper->m_covering_source_entities );
+                                                          : m_remapper->m_covering_source_entities );
             discOrder  = m_nDofsPEl_Src;
             discMethod = m_eInputType;
             break;

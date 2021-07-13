@@ -129,7 +129,9 @@ ErrorCode VarLenDenseTag::get_array( SequenceManager* seqman, Error* /* error */
     {
         mem = seq->data()->allocate_tag_array( mySequenceArray, sizeof( VarLenTag ) );
         if( !mem )
-        { MB_SET_ERR( MB_MEMORY_ALLOCATION_FAILED, "Memory allocation for variable-length dense tag data failed" ); }
+        {
+            MB_SET_ERR( MB_MEMORY_ALLOCATION_FAILED, "Memory allocation for variable-length dense tag data failed" );
+        }
 
         memset( mem, 0, sizeof( VarLenTag ) * seq->data()->size() );
     }
@@ -156,7 +158,9 @@ ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* err
                                     size_t num_entities, const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" ); }
+    {
+        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" );
+    }
 
     ErrorCode result              = MB_SUCCESS, rval;
     const EntityHandle* const end = entities + num_entities;
@@ -192,7 +196,9 @@ ErrorCode VarLenDenseTag::get_data( const SequenceManager* seqman, Error* /* err
                                     const void** pointers, int* lengths ) const
 {
     if( !lengths )
-    { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" ); }
+    {
+        MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag " << get_name() << " data" );
+    }
 
     ErrorCode rval;
     size_t avail           = 0;

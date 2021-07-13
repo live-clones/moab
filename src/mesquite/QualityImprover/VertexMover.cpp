@@ -708,7 +708,9 @@ double VertexMover::loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, cons
             }
 
             if( patch_vertices.empty() )  // global patch hack (means all mesh vertices)
-            { mesh->get_all_vertices( patch_vertices, err ); }
+            {
+                mesh->get_all_vertices( patch_vertices, err );
+            }
 
             free_vertices.clear();
 

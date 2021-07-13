@@ -51,20 +51,20 @@ namespace moab
 
 #define INS_ID( stringvar, prefix, id ) sprintf( stringvar, prefix, id )
 
-#define GET_VAR( name, id, dims )                                 \
-    {                                                             \
-        (id)         = -1;                                          \
-        int gvfail = nc_inq_varid( ncFile, name, &(id) );           \
-        if( NC_NOERR == gvfail )                                  \
-        {                                                         \
-            int ndims;                                            \
-            gvfail = nc_inq_varndims( ncFile, id, &ndims );       \
-            if( NC_NOERR == gvfail )                              \
-            {                                                     \
-                (dims).resize( ndims );                             \
-                gvfail = nc_inq_vardimid( ncFile, id, &(dims)[0] ); \
-            }                                                     \
-        }                                                         \
+#define GET_VAR( name, id, dims )                                     \
+    {                                                                 \
+        ( id )     = -1;                                              \
+        int gvfail = nc_inq_varid( ncFile, name, &( id ) );           \
+        if( NC_NOERR == gvfail )                                      \
+        {                                                             \
+            int ndims;                                                \
+            gvfail = nc_inq_varndims( ncFile, id, &ndims );           \
+            if( NC_NOERR == gvfail )                                  \
+            {                                                         \
+                ( dims ).resize( ndims );                             \
+                gvfail = nc_inq_vardimid( ncFile, id, &( dims )[0] ); \
+            }                                                         \
+        }                                                             \
     }
 
 WriterIface* WriteSLAC::factory( Interface* iface )
@@ -261,7 +261,9 @@ ErrorCode WriteSLAC::gather_mesh_information(
 
         // Get the matset's id
         if( mbImpl->tag_get_data( mMaterialSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Couldn't get matset id from a tag for an element matset" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't get matset id from a tag for an element matset" );
+        }
 
         matset_data.id                = id;
         matset_data.number_attributes = 0;
@@ -276,7 +278,9 @@ ErrorCode WriteSLAC::gather_mesh_information(
         EntityType entity_type = TYPE_FROM_HANDLE( *elem_range_iter );
         --end_elem_range_iter;
         if( entity_type != TYPE_FROM_HANDLE( *( end_elem_range_iter++ ) ) )
-        { MB_SET_ERR( MB_FAILURE, "Entities in matset " << id << " not of common type" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Entities in matset " << id << " not of common type" );
+        }
 
         int dimension = -1;
         if( entity_type == MBQUAD || entity_type == MBTRI )
@@ -297,7 +301,9 @@ ErrorCode WriteSLAC::gather_mesh_information(
             ExoIIUtil::get_element_type_from_num_verts( tmp_conn.size(), entity_type, dimension );
 
         if( matset_data.element_type == EXOII_MAX_ELEM_TYPE )
-        { MB_SET_ERR( MB_FAILURE, "Element type in matset " << id << " didn't get set correctly" ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Element type in matset " << id << " didn't get set correctly" );
+        }
 
         matset_data.number_nodes_per_element = ExoIIUtil::VerticesPerElement[matset_data.element_type];
 
@@ -352,14 +358,18 @@ ErrorCode WriteSLAC::gather_mesh_information(
 
         // Get the dirset's id
         if( mbImpl->tag_get_data( mDirichletSetTag, &( *vector_iter ), 1, &id ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Couldn't get id tag for dirset " << id ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't get id tag for dirset " << id );
+        }
 
         dirset_data.id = id;
 
         std::vector< EntityHandle > node_vector;
         // Get the nodes of the dirset that are in mesh_info.nodes
         if( mbImpl->get_entities_by_handle( *vector_iter, node_vector, true ) != MB_SUCCESS )
-        { MB_SET_ERR( MB_FAILURE, "Couldn't get nodes in dirset " << id ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't get nodes in dirset " << id );
+        }
 
         std::vector< EntityHandle >::iterator iter, end_iter;
         iter     = node_vector.begin();
@@ -436,7 +446,9 @@ ErrorCode WriteSLAC::get_valid_sides( Range& elems, const int sense, WriteSLAC::
 
             // Get the adjacent parent element of "side"
             if( mbImpl->get_adjacencies( &( *iter ), 1, dimension + 1, false, parents ) != MB_SUCCESS )
-            { MB_SET_ERR( MB_FAILURE, "Couldn't get adjacencies for neuset" ); }
+            {
+                MB_SET_ERR( MB_FAILURE, "Couldn't get adjacencies for neuset" );
+            }
 
             if( !parents.empty() )
             {
@@ -815,38 +827,58 @@ ErrorCode WriteSLAC::initialize_file( MeshInfo& mesh_info )
     int tetinterior = -1, tetinteriorsize, tetexterior = -1, tetexteriorsize = -1;
 
     if( nc_def_dim( ncFile, "coord_size", (size_t)mesh_info.num_dim, &coord_size ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of dimensions" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of dimensions" );
+    }
 
     if( nc_def_dim( ncFile, "ncoords", (size_t)mesh_info.num_nodes, &ncoords ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of nodes" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of nodes" );
+    }
 
     if( 0 != mesh_info.num_int_hexes &&
         nc_def_dim( ncFile, "hexinterior", (size_t)mesh_info.num_int_hexes, &hexinterior ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of interior hex elements" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of interior hex elements" );
+    }
 
     if( nc_def_dim( ncFile, "hexinteriorsize", (size_t)9, &hexinteriorsize ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define interior hex element size" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define interior hex element size" );
+    }
 
     if( 0 != mesh_info.bdy_hexes.size() &&
         nc_def_dim( ncFile, "hexexterior", (size_t)mesh_info.bdy_hexes.size(), &hexexterior ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of exterior hex elements" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of exterior hex elements" );
+    }
 
     if( nc_def_dim( ncFile, "hexexteriorsize", (size_t)15, &hexexteriorsize ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define exterior hex element size" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define exterior hex element size" );
+    }
 
     if( 0 != mesh_info.num_int_tets &&
         nc_def_dim( ncFile, "tetinterior", (size_t)mesh_info.num_int_tets, &tetinterior ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of interior tet elements" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of interior tet elements" );
+    }
 
     if( nc_def_dim( ncFile, "tetinteriorsize", (size_t)5, &tetinteriorsize ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define interior tet element size" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define interior tet element size" );
+    }
 
     if( 0 != mesh_info.bdy_tets.size() &&
         nc_def_dim( ncFile, "tetexterior", (size_t)mesh_info.bdy_tets.size(), &tetexterior ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of exterior tet elements" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define number of exterior tet elements" );
+    }
 
     if( nc_def_dim( ncFile, "tetexteriorsize", (size_t)9, &tetexteriorsize ) != NC_NOERR )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define exterior tet element size" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define exterior tet element size" );
+    }
 
     /* ...and some variables */
 
@@ -856,32 +888,42 @@ ErrorCode WriteSLAC::initialize_file( MeshInfo& mesh_info )
     int dum_var;
     if( 0 != mesh_info.num_int_hexes &&
         NC_NOERR != nc_def_var( ncFile, "hexahedron_interior", NC_LONG, 2, dims, &dum_var ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for interior hexes" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for interior hexes" );
+    }
 
     dims[0] = hexexterior;
     dims[1] = hexexteriorsize;
     if( 0 != mesh_info.bdy_hexes.size() &&
         NC_NOERR != nc_def_var( ncFile, "hexahedron_exterior", NC_LONG, 2, dims, &dum_var ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for exterior hexes" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for exterior hexes" );
+    }
 
     dims[0] = tetinterior;
     dims[1] = tetinteriorsize;
     if( 0 != mesh_info.num_int_tets &&
         NC_NOERR != nc_def_var( ncFile, "tetrahedron_exterior", NC_LONG, 2, dims, &dum_var ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for interior tets" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for interior tets" );
+    }
 
     dims[0] = tetexterior;
     dims[1] = tetexteriorsize;
     if( 0 != mesh_info.bdy_tets.size() &&
         NC_NOERR != nc_def_var( ncFile, "tetrahedron_exterior", NC_LONG, 2, dims, &dum_var ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for exterior tets" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to create connectivity array for exterior tets" );
+    }
 
     /* Node coordinate arrays: */
 
     dims[0] = ncoords;
     dims[1] = coord_size;
     if( NC_NOERR != nc_def_var( ncFile, "coords", NC_DOUBLE, 2, dims, &dum_var ) )
-    { MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define node coordinate array" ); }
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteSLAC: failed to define node coordinate array" );
+    }
 
     return MB_SUCCESS;
 }

@@ -966,7 +966,9 @@ ErrorCode RayIntersectSets::leaf( EntityHandle node )
 
         if( GeomUtil::plucker_ray_tri_intersect( coords, ray_origin, ray_direction, int_dist, search_win.first,
                                                  search_win.second, surfTriOrient, &int_type ) )
-        { int_reg_callback.register_intersection( lastSet, *t, int_dist, search_win, int_type ); }
+        {
+            int_reg_callback.register_intersection( lastSet, *t, int_dist, search_win, int_type );
+        }
     }
     return MB_SUCCESS;
 }
@@ -1626,7 +1628,9 @@ void OrientedBoxTreeTool::TrvStats::print( std::ostream& str ) const
         << std::setw( h3.length() ) << num_leaves << std::setw( h4.length() ) << num_traversals << std::endl;
 
     if( ray_tri_tests_count )
-    { str << std::setw( h1.length() ) << "---- Total ray-tri tests: " << ray_tri_tests_count << std::endl; }
+    {
+        str << std::setw( h1.length() ) << "---- Total ray-tri tests: " << ray_tri_tests_count << std::endl;
+    }
 }
 
 /********************** Tree Statistics Code ****************************/

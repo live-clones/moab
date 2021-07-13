@@ -172,28 +172,28 @@ int main( int argc, char* argv[] )
     // coupler will be on joint tasks, will be on a third group (0 and 1, again)
     MPI_Group atmPEGroup;
     MPI_Comm atmComm;
-    ierr = create_group_and_comm(startG1, endG1, jgroup, &atmPEGroup, &atmComm);
-    CHECKIERR(ierr, "Cannot create atm MPI group and communicator ")
+    ierr = create_group_and_comm( startG1, endG1, jgroup, &atmPEGroup, &atmComm );
+    CHECKIERR( ierr, "Cannot create atm MPI group and communicator " )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     MPI_Group ocnPEGroup;
     MPI_Comm ocnComm;
-    ierr = create_group_and_comm(startG2, endG2, jgroup, &ocnPEGroup, &ocnComm);
-    CHECKIERR(ierr, "Cannot create ocn MPI group and communicator ")
+    ierr = create_group_and_comm( startG2, endG2, jgroup, &ocnPEGroup, &ocnComm );
+    CHECKIERR( ierr, "Cannot create ocn MPI group and communicator " )
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     MPI_Group lndPEGroup;
     MPI_Comm lndComm;
-    ierr = create_group_and_comm(startG3, endG3, jgroup, &lndPEGroup, &lndComm);
-    CHECKIERR(ierr, "Cannot create lnd MPI group and communicator ")
+    ierr = create_group_and_comm( startG3, endG3, jgroup, &lndPEGroup, &lndComm );
+    CHECKIERR( ierr, "Cannot create lnd MPI group and communicator " )
 #endif
 
     // we will always have a coupler
     MPI_Group couPEGroup;
     MPI_Comm couComm;
-    ierr = create_group_and_comm(startG4, endG4, jgroup, &couPEGroup, &couComm);
-    CHECKIERR(ierr, "Cannot create cpl MPI group and communicator ")
+    ierr = create_group_and_comm( startG4, endG4, jgroup, &couPEGroup, &couComm );
+    CHECKIERR( ierr, "Cannot create cpl MPI group and communicator " )
 
     // now, create the joint communicators atm_coupler, ocn_coupler, lnd_coupler
     // for each, we will have to create the group first, then the communicator
@@ -201,26 +201,23 @@ int main( int argc, char* argv[] )
     // atm_coupler
     MPI_Group joinAtmCouGroup;
     MPI_Comm atmCouComm;
-    ierr = create_joint_comm_group(atmPEGroup, couPEGroup, &joinAtmCouGroup,
-            &atmCouComm);
-    CHECKIERR(ierr, "Cannot create joint atm cou communicator")
+    ierr = create_joint_comm_group( atmPEGroup, couPEGroup, &joinAtmCouGroup, &atmCouComm );
+    CHECKIERR( ierr, "Cannot create joint atm cou communicator" )
 
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocn_coupler
     MPI_Group joinOcnCouGroup;
     MPI_Comm ocnCouComm;
-    ierr = create_joint_comm_group(ocnPEGroup, couPEGroup, &joinOcnCouGroup,
-            &ocnCouComm);
-    CHECKIERR(ierr, "Cannot create joint ocn cou communicator")
+    ierr = create_joint_comm_group( ocnPEGroup, couPEGroup, &joinOcnCouGroup, &ocnCouComm );
+    CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     // lnd_coupler
     MPI_Group joinLndCouGroup;
     MPI_Comm lndCouComm;
-    ierr = create_joint_comm_group(lndPEGroup, couPEGroup, &joinLndCouGroup,
-            &lndCouComm);
-    CHECKIERR(ierr, "Cannot create joint ocn cou communicator")
+    ierr = create_joint_comm_group( lndPEGroup, couPEGroup, &joinLndCouGroup, &lndCouComm );
+    CHECKIERR( ierr, "Cannot create joint ocn cou communicator" )
 #endif
 
     ierr = iMOAB_Initialize( argc, argv );  // not really needed anything from argc, argv, yet; maybe we should
@@ -270,7 +267,6 @@ int main( int argc, char* argv[] )
 #endif
     }
 
-
     if( atmComm != MPI_COMM_NULL )
     {
         MPI_Comm_rank( atmComm, &rankInAtmComm );
@@ -287,18 +283,19 @@ int main( int argc, char* argv[] )
     }
 #endif
 
-    //atm
-    ierr = setup_component_coupler_meshes(cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
-             &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme);
+    // atm
+    ierr =
+        setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
+                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
 
     MPI_Barrier( MPI_COMM_WORLD );
 
-
 #ifdef ENABLE_ATMOCN_COUPLING
     // ocean
-    ierr = setup_component_coupler_meshes(cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm,  &ocnPEGroup, &couComm,
-             &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme);
+    ierr =
+        setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
+                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
 
     if( couComm != MPI_COMM_NULL )
@@ -342,13 +339,14 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
         CHECKIERR( ierr, "Cannot register LND App " )
     }
-    ierr = setup_component_coupler_meshes(cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm,  &lndPEGroup, &couComm,
-             &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay, repartitioner_scheme);
+    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
+                                           &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
+                                           repartitioner_scheme );
 
     if( couComm != MPI_COMM_NULL )
     {  // write only for n==1 case
         char outputFileLnd[] = "recvLnd.h5m";
-        ierr = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
+        ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
     }
@@ -801,16 +799,17 @@ int main( int argc, char* argv[] )
 
     MPI_Barrier( MPI_COMM_WORLD );
 
-    if( couComm != MPI_COMM_NULL ) {
+    if( couComm != MPI_COMM_NULL )
+    {
         ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
-        CHECKIERR( ierr, "cannot free buffers related to send tag")
+        CHECKIERR( ierr, "cannot free buffers related to send tag" )
     }
     if( ocnComm != MPI_COMM_NULL )
     {
         char outputFileOcn[] = "OcnWithProj3.h5m";
         ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
                                 strlen( fileWriteOptions ) );
-        CHECKIERR( ierr, "cannot write OcnWithProj3.h5m")
+        CHECKIERR( ierr, "cannot write OcnWithProj3.h5m" )
     }
 #endif
 
@@ -906,7 +905,8 @@ int main( int argc, char* argv[] )
     }
 
     MPI_Barrier( MPI_COMM_WORLD );
-    if( couComm != MPI_COMM_NULL ) {
+    if( couComm != MPI_COMM_NULL )
+    {
         ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
         CHECKIERR( ierr, "cannot free buffers related to sending tags from coupler to land pes" )
     }
@@ -1168,7 +1168,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmpatm;
-        ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
+        ierr       = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
         CHECKIERR( ierr, "cannot free buffers used for sending back atm tags " )
     }
     if( atmComm != MPI_COMM_NULL )  // write only for n==1 case

@@ -50,13 +50,13 @@ using namespace moab;
 extern "C" {
 #endif
 
-#define CHKERRVAL( ierr )                        \
-    {                                            \
-        if( moab::MB_SUCCESS != (ierr) ) return 1; \
+#define CHKERRVAL( ierr )                            \
+    {                                                \
+        if( moab::MB_SUCCESS != ( ierr ) ) return 1; \
     }
-#define CHKIERRVAL( ierr )        \
-    {                             \
-        if( 0 != (ierr) ) return 1; \
+#define CHKIERRVAL( ierr )            \
+    {                                 \
+        if( 0 != ( ierr ) ) return 1; \
     }
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -1295,7 +1295,9 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     Tag tagHandle;
     ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
@@ -1347,7 +1349,9 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
@@ -1367,7 +1371,9 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     Range* ents_to_set;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_set = &data.all_verts; }
+    {
+        ents_to_set = &data.all_verts;
+    }
     else  // if (*ent_type == 1) // *ent_type can be 0 (vertices) or 1 (elements)
     {
         ents_to_set = &data.primary_elems;
@@ -1376,7 +1382,9 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     int nents_to_be_set = *num_tag_storage_length / tagLength;
 
     if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
-    { return 1; }  // to many entities to be set or too few
+    {
+        return 1;
+    }  // to many entities to be set or too few
 
     // restrict the range; everything is contiguous; or not?
 
@@ -1413,7 +1421,9 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     Range* ents_to_get;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_get = &data.all_verts; }
+    {
+        ents_to_get = &data.all_verts;
+    }
     else  // if (*ent_type == 1)
     {
         ents_to_get = &data.primary_elems;
@@ -1422,7 +1432,9 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     int nents_to_get = *num_tag_storage_length / tagLength;
 
     if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
-    { return 1; }  // to many entities to get, or too little
+    {
+        return 1;
+    }  // to many entities to get, or too little
 
     // restrict the range; everything is contiguous; or not?
     // Range contig_range ( * ( ents_to_get->begin() ), * ( ents_to_get->begin() + nents_to_get - 1
@@ -1460,7 +1472,9 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     Range* ents_to_set = NULL;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_set = &data.all_verts; }
+    {
+        ents_to_set = &data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ents_to_set = &data.primary_elems;
@@ -1506,7 +1520,9 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     Range* ents_to_get = NULL;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_get = &data.all_verts; }
+    {
+        ents_to_get = &data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ents_to_get = &data.primary_elems;
@@ -1637,7 +1653,9 @@ ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double
     appData& data = context.appDatas[*pid];
 
     if( !data.local_verts.empty() )  // we should have no vertices in the app
-    { return 1; }
+    {
+        return 1;
+    }
 
     int nverts = *coords_len / *dim;
 
@@ -1946,7 +1964,9 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
 #endif
 
     if( senders_local.empty() )
-    { std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n"; }
+    {
+        std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n";
+    }
     rval = cgraph->receive_mesh( *global, pco, local_set, senders_local );CHKERRVAL( rval );
 
     // after we are done, we could merge vertices that come from different senders, but
@@ -2076,7 +2096,9 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
     // basically, we assume everything is defined already on the tag,
     //   and we can get the tags just by its name
     // we assume that there are separators ";" between the tag names
@@ -2143,7 +2165,9 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     // we assume that there are separators ";" between the tag names
     std::vector< std::string > tagNames;
@@ -2777,7 +2801,6 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 #endif  // #ifdef MOAB_HAVE_MPI
 
-
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #ifdef MOAB_HAVE_NETCDF
@@ -2794,7 +2817,7 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     bool row_based_partition = ( row_major_ownership != NULL && *row_major_ownership > 0 ? true : false );
 
     // Get the source and target data and pcomm objects
-    appData& data_intx   = context.appDatas[*pid_intersection];
+    appData& data_intx       = context.appDatas[*pid_intersection];
     TempestMapAppData& tdata = data_intx.tempestData;
 
     // Get the handle to the remapper object
@@ -2834,9 +2857,7 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     if( owned_dof_ids == NULL && owned_dof_ids_length == NULL )
     {
         std::vector< int > tmp_owned_ids;
-        rval = weightMap->ReadParallelMap( remap_weights_filename,
-                                           tmp_owned_ids,
-                                           row_based_partition );CHKERRVAL( rval );
+        rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
     }
     else
     {
@@ -2850,7 +2871,8 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
 
 ErrCode iMOAB_WriteMappingWeightsToFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length, int remap_weights_filename_length )
+    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
+    int remap_weights_filename_length )
 {
     assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
 
@@ -2867,7 +2889,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile(
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
-    std::string filename  = std::string( remap_weights_filename );
+    std::string filename = std::string( remap_weights_filename );
 
     // Write the map file to disk in parallel using either HDF5 or SCRIP interface
     rval = weightMap->WriteParallelMap( filename );CHKERRVAL( rval );
@@ -3093,8 +3115,10 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
     }
 #endif
 
-    ierr = iMOAB_UpdateMeshInfo( pid_src );CHKIERRVAL( ierr );
-    ierr = iMOAB_UpdateMeshInfo( pid_tgt );CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_src );
+    CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_tgt );
+    CHKIERRVAL( ierr );
 
     // Rescale the radius of both to compute the intersection
     ComputeSphereRadius( pid_src, &radius_source );

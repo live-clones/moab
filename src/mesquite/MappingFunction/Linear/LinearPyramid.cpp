@@ -273,7 +273,9 @@ void LinearPyramid::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_ind
             break;
         case 1:
             if( loc.number < 4 )
-            { set_edge_derivatives( loc.number, 0.50, vertex_indices_out, d_coeff_d_xi_out, num_vtx ); }
+            {
+                set_edge_derivatives( loc.number, 0.50, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
+            }
             else
             {
                 set_corner_derivatives( loc.number - 4, 0.50, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
@@ -348,7 +350,9 @@ void LinearPyramid::ideal( Sample location, MsqMatrix< 3, 3 >& J, MsqError& ) co
 
     // The xi = eta = 0.5 locations (mid-element in xi and eta)
     if( location.dimension == 3 || ( location.dimension == 2 && location.number == 4 ) )
-    { J( 0, 2 ) = J( 1, 2 ) = 0.0; }
+    {
+        J( 0, 2 ) = J( 1, 2 ) = 0.0;
+    }
     // The corner locations
     else if( location.dimension == 0 || ( location.dimension == 1 && location.number >= 4 ) )
     {

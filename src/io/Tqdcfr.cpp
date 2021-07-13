@@ -457,7 +457,7 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
 
     if( file_id_tag ) readUtilIface->assign_ids( *file_id_tag, after_ents );
 
-    if( MB_SUCCESS != opts.get_null_option( "SKIP_TOPOLOGY") ) 
+    if( MB_SUCCESS != opts.get_null_option( "SKIP_TOPOLOGY" ) )
     {
         // **************************
         // Restore geometric topology
@@ -1395,8 +1395,8 @@ ErrorCode Tqdcfr::read_nodes( const unsigned int gindex, Tqdcfr::ModelEntry* mod
         if( !beforeEnts.empty() ) tmp_range.merge( beforeEnts.subset_by_type( MBVERTEX ) );
         vrange = subtract( vrange, tmp_range );
         // Compute the max cid; map is indexed by cid, so size is max_cid + 1
-#define MAX( a, b ) ( (a) > (b) ? (a) : (b) )
-#define MIN( a, b ) ( (a) < (b) ? (a) : (b) )
+#define MAX( a, b ) ( ( a ) > ( b ) ? ( a ) : ( b ) )
+#define MIN( a, b ) ( ( a ) < ( b ) ? ( a ) : ( b ) )
         // Sanity check that max vhandle is larger than offset
         long new_max = *vrange.rbegin() - currVHandleOffset;
         assert( new_max >= 0 && ( (long)*vrange.begin() ) - currVHandleOffset >= 0 );
@@ -2724,7 +2724,9 @@ ErrorCode Tqdcfr::process_record( AcisRecord& this_record )
         // Else it's a topological entity, I think
         if( ( type_substr = strstr( this_record.att_string.c_str(), "body" ) ) != NULL &&
             type_substr - this_record.att_string.c_str() < 20 )
-        { this_record.rec_type = Tqdcfr::aBODY; }
+        {
+            this_record.rec_type = Tqdcfr::aBODY;
+        }
         else if( ( type_substr = strstr( this_record.att_string.c_str(), "lump" ) ) != NULL &&
                  type_substr - this_record.att_string.c_str() < 20 )
         {

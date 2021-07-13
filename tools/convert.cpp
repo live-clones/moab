@@ -508,7 +508,7 @@ int main( int argc, char* argv[] )
                 // Push rectilinear attributes into array
                 vecDimNameSizes[strDim0Name] = nDim0Size;
                 vecDimNameSizes[strDim1Name] = nDim1Size;
-                vecDimSizes[0]               = static_cast<int>(moab::TempestRemapper::RLL);
+                vecDimSizes[0]               = static_cast< int >( moab::TempestRemapper::RLL );
                 vecDimSizes[1]               = vecDimNameSizes["lat"];
                 vecDimSizes[2]               = vecDimNameSizes["lon"];
 
@@ -521,8 +521,8 @@ int main( int argc, char* argv[] )
             else
             {
                 const Range& elems = remapper->GetMeshEntities( moab::Remapper::SourceMesh );
-                bool isQuads = elems.all_of_type(moab::MBQUAD);
-                bool isTris = elems.all_of_type(moab::MBTRI);
+                bool isQuads       = elems.all_of_type( moab::MBQUAD );
+                bool isTris        = elems.all_of_type( moab::MBTRI );
                 // vecDimSizes[0] = static_cast< int >( remapper->GetMeshType( moab::Remapper::SourceMesh );
                 vecDimSizes[0] = ( isQuads ? static_cast< int >( moab::TempestRemapper::CS )
                                            : ( isTris ? static_cast< int >( moab::TempestRemapper::ICO )
@@ -530,13 +530,14 @@ int main( int argc, char* argv[] )
                 vecDimSizes[1] = elems.size();
                 vecDimSizes[2] = remapper->GetMeshVertices( moab::Remapper::SourceMesh ).size();
 
-                switch(vecDimSizes[0])
+                switch( vecDimSizes[0] )
                 {
                     case 0:
                         printf( "Cubed-Sphere mesh: %d (elems), %d (nodes)\n", vecDimSizes[1], vecDimSizes[2] );
                         break;
                     case 2:
-                        printf( "Icosahedral (triangular) mesh: %d (elems), %d (nodes)\n", vecDimSizes[1], vecDimSizes[2] );
+                        printf( "Icosahedral (triangular) mesh: %d (elems), %d (nodes)\n", vecDimSizes[1],
+                                vecDimSizes[2] );
                         break;
                     case 3:
                     default:
@@ -591,7 +592,7 @@ int main( int argc, char* argv[] )
 
             // load the mesh in MOAB format
             std::vector< int > metadata;
-            result     = remapper->LoadNativeMesh( *j, srcmesh, metadata );MB_CHK_ERR( result );
+            result = remapper->LoadNativeMesh( *j, srcmesh, metadata );MB_CHK_ERR( result );
 
             // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting
             // an overlap grid

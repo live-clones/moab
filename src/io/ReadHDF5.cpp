@@ -293,7 +293,9 @@ ErrorCode ReadHDF5::set_up_read( const char* filename, const FileOptions& opts )
     bool parallel  = ( rval != MB_ENTITY_NOT_FOUND );
     nativeParallel = ( rval == MB_SUCCESS );
     if( use_mpio && !parallel )
-    { MB_SET_ERR( MB_NOT_IMPLEMENTED, "'USE_MPIO' option specified w/out 'PARALLEL' option" ); }
+    {
+        MB_SET_ERR( MB_NOT_IMPLEMENTED, "'USE_MPIO' option specified w/out 'PARALLEL' option" );
+    }
 
     // This option is intended for testing purposes only, and thus
     // is not documented anywhere.  Decreasing the buffer size can
@@ -661,10 +663,14 @@ ErrorCode ReadHDF5::find_int_tag( const char* name, int& index )
         if( !strcmp( name, fileInfo->tags[index].name ) ) break;
 
     if( index == fileInfo->num_tag_desc )
-    { MB_SET_ERR( MB_TAG_NOT_FOUND, "File does not contain subset tag '" << name << "'" ); }
+    {
+        MB_SET_ERR( MB_TAG_NOT_FOUND, "File does not contain subset tag '" << name << "'" );
+    }
 
     if( fileInfo->tags[index].type != mhdf_INTEGER || fileInfo->tags[index].size != 1 )
-    { MB_SET_ERR( MB_TAG_NOT_FOUND, "Tag ' " << name << "' does not contain single integer value" ); }
+    {
+        MB_SET_ERR( MB_TAG_NOT_FOUND, "Tag ' " << name << "' does not contain single integer value" );
+    }
 
     return MB_SUCCESS;
 }
@@ -2844,7 +2850,9 @@ ErrorCode ReadHDF5::create_tag( const mhdf_TagDesc& info, Tag& handle, hid_t& hd
     if( info.type == mhdf_BITFIELD )
     {
         if( info.size < 1 || info.size > 8 )
-        { MB_SET_ERR( MB_FAILURE, "Invalid bit tag: class is MB_TAG_BIT, num bits = " << info.size ); }
+        {
+            MB_SET_ERR( MB_FAILURE, "Invalid bit tag: class is MB_TAG_BIT, num bits = " << info.size );
+        }
         hdf_type = H5Tcopy( H5T_NATIVE_B8 );
         mb_type  = MB_TYPE_BIT;
         if( hdf_type < 0 ) MB_SET_ERR( MB_FAILURE, "ReadHDF5 Failure" );

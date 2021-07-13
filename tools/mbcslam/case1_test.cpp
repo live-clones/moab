@@ -104,7 +104,9 @@ int main( int argc, char** argv )
         while( index < argc )
         {
             if( !strcmp( argv[index], "-gtol" ) )  // this is for geometry tolerance
-            { gtol = atof( argv[++index] ); }
+            {
+                gtol = atof( argv[++index] );
+            }
             if( !strcmp( argv[index], "-cube" ) ) { CubeSide = atof( argv[++index] ); }
             if( !strcmp( argv[index], "-dt" ) ) { delta_t = atof( argv[++index] ); }
             if( !strcmp( argv[index], "-input" ) ) { filename_mesh1 = argv[++index]; }

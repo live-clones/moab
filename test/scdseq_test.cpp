@@ -1212,9 +1212,9 @@ ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method )
                         if( facedims_a[ind] != facedims_b[ind] || rdims_b[ind] != ldims[ind] ) fail = true;
                     }
                     if( across_bdy_a[0] != across_bdy_b[0] || across_bdy_a[1] != across_bdy_b[1] ) fail = true;
-#define PARRAY( a )        "(" << (a)[0] << "," << (a)[1] << "," << (a)[2] << ")"
-#define PARRAY3( a, b, c ) "(" << (a) << "," << (b) << "," << (c) << ")"
-#define PARRAY6( a )       PARRAY( a ) << "-" << PARRAY( ( (a) + 3 ) )
+#define PARRAY( a )        "(" << ( a )[0] << "," << ( a )[1] << "," << ( a )[2] << ")"
+#define PARRAY3( a, b, c ) "(" << ( a ) << "," << ( b ) << "," << ( c ) << ")"
+#define PARRAY6( a )       PARRAY( a ) << "-" << PARRAY( ( ( a ) + 3 ) )
                     if( fail )
                     {
                         fails++;

@@ -1390,7 +1390,9 @@ C_FUNC_DEF void v_quad_quality( int num_nodes, double coordinates[][3], unsigned
 
     // calculate the area
     if( metrics_request_flag & ( V_QUAD_AREA | V_QUAD_RELATIVE_SIZE_SQUARED ) )
-    { metric_vals->area = 0.25 * ( areas[0] + areas[1] + areas[2] + areas[3] ); }
+    {
+        metric_vals->area = 0.25 * ( areas[0] + areas[1] + areas[2] + areas[3] );
+    }
 
     // calculate the relative size
     if( metrics_request_flag & ( V_QUAD_RELATIVE_SIZE_SQUARED | V_QUAD_SHAPE_AND_SIZE | V_QUAD_SHEAR_AND_SIZE ) )
@@ -1410,7 +1412,9 @@ C_FUNC_DEF void v_quad_quality( int num_nodes, double coordinates[][3], unsigned
 
     // calculate the jacobian
     if( metrics_request_flag & V_QUAD_JACOBIAN )
-    { metric_vals->jacobian = VERDICT_MIN( VERDICT_MIN( areas[0], areas[1] ), VERDICT_MIN( areas[2], areas[3] ) ); }
+    {
+        metric_vals->jacobian = VERDICT_MIN( VERDICT_MIN( areas[0], areas[1] ), VERDICT_MIN( areas[2], areas[3] ) );
+    }
 
     if( metrics_request_flag & ( V_QUAD_SCALED_JACOBIAN | V_QUAD_SHEAR | V_QUAD_SHEAR_AND_SIZE ) )
     {

@@ -52,7 +52,9 @@ namespace
             double split_objective( const Data& a ) const
             {
                 if( a.second.sizes[2] == 0 || a.second.sizes[0] == 0 )
-                { return std::numeric_limits< std::size_t >::max(); }
+                {
+                    return std::numeric_limits< std::size_t >::max();
+                }
                 const double total = a.second.sizes[0] + a.second.sizes[2];
                 const int max      = 2 * ( a.second.sizes[2] > a.second.sizes[0] );
 
@@ -436,11 +438,15 @@ class Element_tree
             {
                 case 0:
                     if( box.max[dir] > best.second.left_line )
-                    { left_rightline = std::max( left_rightline, box.max[dir] ); }
+                    {
+                        left_rightline = std::max( left_rightline, box.max[dir] );
+                    }
                     break;
                 case 2:
                     if( box.min[dir] < best.second.right_line )
-                    { right_leftline = std::min( right_leftline, box.max[dir] ); }
+                    {
+                        right_leftline = std::min( right_leftline, box.max[dir] );
+                    }
                     break;
             }
         }

@@ -31,7 +31,7 @@
 
 using namespace moab;
 
-std::string inMapFilename        = "outCS5ICOD5_map.nc";
+std::string inMapFilename = "outCS5ICOD5_map.nc";
 
 void test_tempest_map_bcast();
 void read_buffered_map();
@@ -73,7 +73,7 @@ void read_buffered_map()
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
 
 #ifdef MOAB_HAVE_MPI
-    int mpierr = 0;
+    int mpierr         = 0;
     const int rootProc = 0;
 #endif
     // Main inputs;
@@ -83,11 +83,11 @@ void read_buffered_map()
     const int nNNZBytes   = 2 * sizeof( int ) + sizeof( double );
     const int nMaxEntries = nBufferSize / nNNZBytes;
     int nA = 0, nB = 0, nVA = 0, nVB = 0, nS = 0;
-    double dTolerance  = 1e-08;
+    double dTolerance = 1e-08;
 
     int nprocs = 1, rank = 0;
 #ifdef MOAB_HAVE_MPI
-    MPI_Comm commW     = MPI_COMM_WORLD;
+    MPI_Comm commW = MPI_COMM_WORLD;
     MPI_Comm_size( commW, &nprocs );
     MPI_Comm_rank( commW, &rank );
 #endif
@@ -102,19 +102,23 @@ void read_buffered_map()
         // Source and Target mesh resolutions
         NcDim* dimNA = ncMap->get_dim( "n_a" );
         if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
-        else nA = dimNA->size();
+        else
+            nA = dimNA->size();
 
         NcDim* dimNB = ncMap->get_dim( "n_b" );
         if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
-        else nB = dimNB->size();
+        else
+            nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
         if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
-        else nVA = dimNVA->size();
+        else
+            nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
         if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
-        else nVB = dimNVB->size();
+        else
+            nVB = dimNVB->size();
 
         // Read SparseMatrix entries
         NcDim* dimNS = ncMap->get_dim( "n_s" );
@@ -127,7 +131,9 @@ void read_buffered_map()
 
         varRow = ncMap->get_var( "row" );
         if( varRow == NULL )
-        { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", inMapFilename.c_str() ); }
+        {
+            _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", inMapFilename.c_str() );
+        }
 
         varCol = ncMap->get_var( "col" );
         if( varCol == NULL )
@@ -163,7 +169,7 @@ void read_buffered_map()
     printf( "Global parameters: nA = %d, nB = %d, nS = %d\n", nA, nB, nS );
 #endif
 
-    std::vector<int> rowOwnership( nprocs );
+    std::vector< int > rowOwnership( nprocs );
     int nGRowPerPart   = nB / nprocs;
     int nGRowRemainder = nB % nprocs;  // Keep the remainder in root
     rowOwnership[0]    = nGRowPerPart + nGRowRemainder;
@@ -180,7 +186,7 @@ void read_buffered_map()
 #ifdef MOAB_HAVE_MPI
     if( rank == rootProc )
 #endif
-      printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n", nA, nB, nVA,
+        printf( "Parameters: nA=%d, nB=%d, nVA=%d, nVB=%d, nS=%d, nNNZBytes = %d, nBufferedReads = %d\n", nA, nB, nVA,
                 nVB, nS, nNNZBytes, nBufferedReads );
 
     std::map< int, int > rowMap, colMap;
@@ -593,8 +599,7 @@ void test_tempest_map_bcast()
     CHECK_EQUAL( mpierr, 0 );
 
     int allocationSize[NDATA] = { 0, 0, 0 };
-    mpierr =
-        MPI_Scatter( rowAllocation.data(), NDATA, MPI_INT, &allocationSize, NDATA, MPI_INT, rootProc, commW );
+    mpierr = MPI_Scatter( rowAllocation.data(), NDATA, MPI_INT, &allocationSize, NDATA, MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
     // create buffers to receive the data from root process
@@ -606,12 +611,12 @@ void test_tempest_map_bcast()
 
     /* TODO: combine row and column scatters together. Save one communication by better packing */
     // Scatter the rows, cols and entries to the processes according to the partition
-    mpierr = MPI_Scatterv( rg, sendCounts.data(), displs.data(), MPI_INT, (int*)( dataRows ),
-                           dataRows.GetByteSize(), MPI_INT, rootProc, commW );
+    mpierr = MPI_Scatterv( rg, sendCounts.data(), displs.data(), MPI_INT, (int*)( dataRows ), dataRows.GetByteSize(),
+                           MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
-    mpierr = MPI_Scatterv( cg, sendCounts.data(), displs.data(), MPI_INT, (int*)( dataCols ),
-                           dataCols.GetByteSize(), MPI_INT, rootProc, commW );
+    mpierr = MPI_Scatterv( cg, sendCounts.data(), displs.data(), MPI_INT, (int*)( dataCols ), dataCols.GetByteSize(),
+                           MPI_INT, rootProc, commW );
     CHECK_EQUAL( mpierr, 0 );
 
     mpierr = MPI_Scatterv( de, sendCounts.data(), displs.data(), MPI_DOUBLE, (double*)( dataEntries ),

@@ -836,7 +836,9 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_TRI_MINIMUM_ANGLE )
         {
             if( sides_lengths_squared[0] == 0.0 || sides_lengths_squared[1] == 0.0 || sides_lengths_squared[2] == 0.0 )
-            { metric_vals->minimum_angle = 0.0; }
+            {
+                metric_vals->minimum_angle = 0.0;
+            }
             else if( short_side == 0 )
                 metric_vals->minimum_angle = (double)sides[2].interior_angle( sides[1] );
             else if( short_side == 1 )
@@ -849,7 +851,9 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_TRI_MAXIMUM_ANGLE )
         {
             if( sides_lengths_squared[0] == 0.0 || sides_lengths_squared[1] == 0.0 || sides_lengths_squared[2] == 0.0 )
-            { metric_vals->maximum_angle = 0.0; }
+            {
+                metric_vals->maximum_angle = 0.0;
+            }
             else if( long_side == 0 )
                 metric_vals->maximum_angle = (double)sides[2].interior_angle( sides[1] );
             else if( long_side == 1 )
@@ -863,7 +867,9 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
     // the following metrics depend on area
     if( metrics_request_flag &
         ( V_TRI_AREA | V_TRI_SCALED_JACOBIAN | V_TRI_SHAPE | V_TRI_RELATIVE_SIZE_SQUARED | V_TRI_SHAPE_AND_SIZE ) )
-    { metric_vals->area = (double)( ( sides[0] * sides[2] ).length() * 0.5 ); }
+    {
+        metric_vals->area = (double)( ( sides[0] * sides[2] ).length() * 0.5 );
+    }
 
     // calculate the aspect ratio
     if( metrics_request_flag & V_TRI_ASPECT_FROBENIUS )
@@ -975,7 +981,9 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
 
     // calculate shape and size
     if( metrics_request_flag & V_TRI_SHAPE_AND_SIZE )
-    { metric_vals->shape_and_size = metric_vals->relative_size_squared * metric_vals->shape; }
+    {
+        metric_vals->shape_and_size = metric_vals->relative_size_squared * metric_vals->shape;
+    }
 
     // calculate distortion
     if( metrics_request_flag & V_TRI_DISTORTION ) metric_vals->distortion = v_tri_distortion( num_nodes, coordinates );
@@ -1034,7 +1042,11 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
 
     if( metrics_request_flag & V_TRI_EDGE_RATIO ) { metric_vals->edge_ratio = v_tri_edge_ratio( 3, coordinates ); }
     if( metrics_request_flag & V_TRI_RADIUS_RATIO )
-    { metric_vals->radius_ratio = v_tri_radius_ratio( 3, coordinates ); }
+    {
+        metric_vals->radius_ratio = v_tri_radius_ratio( 3, coordinates );
+    }
     if( metrics_request_flag & V_TRI_ASPECT_FROBENIUS )  // there is no V_TRI_ASPECT_RATIO !
-    { metric_vals->aspect_ratio = v_tri_radius_ratio( 3, coordinates ); }
+    {
+        metric_vals->aspect_ratio = v_tri_radius_ratio( 3, coordinates );
+    }
 }
