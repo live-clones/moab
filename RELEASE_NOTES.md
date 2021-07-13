@@ -8,6 +8,7 @@
 - *PR #513*: New example to produce the dual of a delaunay mesh on a sphere to generate a polygonal grid (MPAS-like)
 - *PR #525, PR #526*: CONTRIBUTING.md: Documentation and guidelines for new users contributing to MOAB
 - *PR #535*: Docker image of MOAB pre-installed that uses <ins>spack</ins> for all TPL dependencies
+    - *PR #551*: Separate docker image for MOAB+TempestRemap for offline climate remappiing workflows
 - *PR #544*: MOAB now requires a minimum of **C++11** standard to be supported by the C++ compiler
 
 ### Enhancements
