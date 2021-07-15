@@ -384,7 +384,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         {
             m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Col: " << i << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i] << ", "
+            output_file << "Col: " << i << ", GID: " << col_dtoc_dofmap[i] << ", Data = " << srcVals[i] << ", "
                         << m_colVector( i ) << "\n";
 #endif
         }
@@ -400,7 +400,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         {
             tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Row: " << i << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector( i ) << "\n";
+            output_file << "Row: " << i << ", GID: " << row_dtoc_dofmap[i] << ", Data = " << m_rowVector( i ) << "\n";
 #endif
         }
     }

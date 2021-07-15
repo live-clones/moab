@@ -72,15 +72,18 @@ int setup_component_coupler_meshes(iMOAB_AppID cmpId, int cmpTag,
                                    MPI_Comm *cmpcoucomm,
                                    std::string& filename,
                                    std::string& readopts,
-                                   int nghlay, int repartitioner_scheme)
+                                   int nghlay, int repartitioner_scheme, bool loadmesh=true)
 {
     int ierr = 0;
     if( *cmpcomm != MPI_COMM_NULL )
     {
         // load first mesh
-        ierr = iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay, filename.length(),
-                               readopts.length() );
-        CHECKIERR( ierr, "Cannot load component mesh" )
+        if( loadmesh )
+        {
+            ierr = iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay, filename.length(),
+                                   readopts.length() );
+            CHECKIERR( ierr, "Cannot load component mesh" )
+        }
 
         // then send mesh to coupler pes
         ierr = iMOAB_SendMesh( cmpId, cmpcoucomm, cplPEGroup, &cmpcouTag,
@@ -90,7 +93,6 @@ int setup_component_coupler_meshes(iMOAB_AppID cmpId, int cmpTag,
     // now, receive mesh, on coupler communicator; first mesh 1, atm
     if( *coucomm != MPI_COMM_NULL )
     {
-
         ierr = iMOAB_ReceiveMesh( cplCmpId, cmpcoucomm, cmpPEGroup,
                                   &cmpTag );  // receive from component
         CHECKIERR( ierr, "cannot receive elements on coupler app" )
@@ -104,6 +106,45 @@ int setup_component_coupler_meshes(iMOAB_AppID cmpId, int cmpTag,
         CHECKIERR( ierr, "cannot free buffers used to send atm mesh" )
     }
     return 0;
+}
+
+inline double sample_stationary_vortex( double dLon, double dLat )
+{
+    const double dLon0 = 0.0;
+    const double dLat0 = 0.6;
+    const double dR0   = 3.0;
+    const double dD    = 5.0;
+    const double dT    = 6.0;
+
+    ///		Find the rotated longitude and latitude of a point on a sphere
+    ///		with pole at (dLonC, dLatC).
+    {
+        double dSinC = sin( dLat0 );
+        double dCosC = cos( dLat0 );
+        double dCosT = cos( dLat );
+        double dSinT = sin( dLat );
+
+        double dTrm = dCosT * cos( dLon - dLon0 );
+        double dX   = dSinC * dTrm - dCosC * dSinT;
+        double dY   = dCosT * sin( dLon - dLon0 );
+        double dZ   = dSinC * dSinT + dCosC * dTrm;
+
+        dLon = atan2( dY, dX );
+        if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+        dLat = asin( dZ );
+    }
+
+    double dRho = dR0 * cos( dLat );
+    double dVt  = 3.0 * sqrt( 3.0 ) / 2.0 / cosh( dRho ) / cosh( dRho ) * tanh( dRho );
+
+    double dOmega;
+    if( dRho == 0.0 ) { dOmega = 0.0; }
+    else
+    {
+        dOmega = dVt / dRho;
+    }
+
+    return ( 1.0 - tanh( dRho / dD * sin( dLon - dOmega * dT ) ) );
 }
 
 #endif /* TEST_PARALLEL_IMOAB_COUPLER_UTILS_HPP_ */

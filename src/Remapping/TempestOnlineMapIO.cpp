@@ -1050,7 +1050,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     NcError error( NcError::silent_nonfatal );
 
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
-    int nS = 0, nB = 0;
+    int nS = 0, nA = 0, nB = 0;
 #ifdef MOAB_HAVE_NETCDFPAR
     bool is_independent = true;
     ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
@@ -1059,26 +1059,35 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     NcFile ncMap( strSource, NcFile::ReadOnly );
 #endif
 
+#define CHECK_EXCEPTION( obj, type, varstr )                                                                               \
+    {                                                                                                                \
+        if( obj == NULL ) { _EXCEPTION3( "Map file \"%s\" does not contain %s \"%s\"", strSource, type, varstr ); } \
+    }
+
     // Read SparseMatrix entries
 
     NcDim* dimNS = ncMap.get_dim( "n_s" );
-    if( dimNS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"n_s\"", strSource ); }
+    CHECK_EXCEPTION( dimNS, "dimension", "n_s" );
+
+    NcDim* dimNA = ncMap.get_dim( "n_a" );
+    CHECK_EXCEPTION( dimNA, "dimension", "n_a" );
 
     NcDim* dimNB = ncMap.get_dim( "n_b" );
-    if( dimNB == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain dimension \"nB\"", strSource ); }
+    CHECK_EXCEPTION( dimNB, "dimension", "n_b" );
 
     // store total number of nonzeros
     nS = dimNS->size();
+    nA = dimNA->size();
     nB = dimNB->size();
 
     varRow = ncMap.get_var( "row" );
-    if( varRow == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"row\"", strSource ); }
+    CHECK_EXCEPTION( varRow, "variable", "row" );
 
     varCol = ncMap.get_var( "col" );
-    if( varCol == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"col\"", strSource ); }
+    CHECK_EXCEPTION( varCol, "variable", "col" );
 
     varS = ncMap.get_var( "S" );
-    if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", strSource ); }
+    CHECK_EXCEPTION( varS, "variable", "S" );
 
 #ifdef MOAB_HAVE_NETCDFPAR
     ncMap.enable_var_par_access( varRow, is_independent );
@@ -1105,9 +1114,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     // Let us declare the map object for every process
     SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
 
-    std::map< int, int > rowMap, colMap;
-    int rindexMax = 0, cindexMax = 0;
-
     int localSize   = nS / size;
     long offsetRead = rank * localSize;
     // leftovers on last rank
@@ -1130,9 +1136,18 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
     ncMap.close();
 
+    // Now let us set the necessary global-to-local ID maps so that A*x operations
+    // can be performed cleanly as if map was computed online
+    row_dtoc_dofmap.clear();
+    row_dtoc_dofmap.reserve( nB / size );
+    col_dtoc_dofmap.clear();
+    col_dtoc_dofmap.reserve( 2 * nA / size );
+    // row_dtoc_dofmap.resize( m_nTotDofs_Dest, UINT_MAX );
+    // col_dtoc_dofmap.resize( m_nTotDofs_SrcCov, UINT_MAX );
+
+#ifdef MOAB_HAVE_MPI
     // bother with tuple list only if size > 1
     // otherwise, just fill the sparse matrix
-#ifdef MOAB_HAVE_MPI
     if( size > 1 )
     {
         // send to
@@ -1173,11 +1188,13 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
         // now do the heavy communication
         ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
-        // populate the sparsematrix, using rowMap and colMap; what is the need for them?
+
+        std::map< int, int > rowMap, colMap;
+        int rindexMax = 0, cindexMax = 0;
+        // populate the sparsematrix, using rowMap and colMap
         int n = tl.get_n();
         for( int i = 0; i < n; i++ )
         {
-
             int rindex, cindex;
             const int& vecRowValue = tl.vi_wr[3 * i + 1];
             const int& vecColValue = tl.vi_wr[3 * i + 2];
@@ -1187,6 +1204,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
+                row_gdofmap.push_back( vecColValue );
+                row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
             else
@@ -1197,6 +1216,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
+                col_gdofmap.push_back( vecColValue );
+                col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }
             else
@@ -1208,9 +1229,11 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     else
 #endif
     {
+        std::map< int, int > rowMap, colMap;
+        int rindexMax = 0, cindexMax = 0;
+
         for( int i = 0; i < nS; i++ )
         {
-
             int rindex, cindex;
             const int& vecRowValue = vecRow[i];
             const int& vecColValue = vecCol[i];
@@ -1220,6 +1243,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
+                row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
             else
@@ -1230,6 +1254,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
+                col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }
             else
@@ -1245,6 +1270,10 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 #ifdef MOAB_HAVE_EIGEN3
     this->copy_tempest_sparsemat_to_eigen3();
 #endif
+
+    // Reset the source and target data first
+    m_rowVector.setZero();
+    m_colVector.setZero();
 
     return moab::MB_SUCCESS;
 }

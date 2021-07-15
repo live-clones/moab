@@ -62,6 +62,112 @@ enum MOAB_TAG_OWNER_TYPE
     TAG_ELEMENT
 };
 
+#ifdef MOAB_HAVE_TEMPESTREMAP
+
+// Forward declaration
+namespace moab
+{
+class TempestRemapper;
+class TempestOnlineMap;
+}  // namespace moab
+
+struct TempestMapAppData
+{
+    moab::TempestRemapper* remapper;
+    std::map< std::string, moab::TempestOnlineMap* > weightMaps;
+    iMOAB_AppID pid_src;
+    iMOAB_AppID pid_dest;
+};
+#endif
+
+#ifdef MOAB_HAVE_MPI
+
+// Forward declaration
+namespace moab
+{
+class ParallelComm;
+class ParCommGraph;
+}  // namespace moab
+
+#endif
+
+struct appData
+{
+    moab::EntityHandle file_set;
+    int global_id;  // external component id, unique for application
+    std::string name;
+    moab::Range all_verts;
+    moab::Range local_verts;  // it could include shared, but not owned at the interface
+    // these vertices would be all_verts if no ghosting was required
+    moab::Range ghost_vertices;  // locally ghosted from other processors
+    moab::Range primary_elems;
+    moab::Range owned_elems;
+    moab::Range ghost_elems;
+    int dimension;             // 2 or 3, dimension of primary elements (redundant?)
+    long num_global_elements;  // reunion of all elements in primary_elements; either from hdf5
+                               // reading or from reduce
+    long num_global_vertices;  // reunion of all nodes, after sharing is resolved; it could be
+                               // determined from hdf5 reading
+    moab::Range mat_sets;
+    std::map< int, int > matIndex;  // map from global block id to index in mat_sets
+    moab::Range neu_sets;
+    moab::Range diri_sets;
+    std::map< std::string, moab::Tag > tagMap;
+    std::vector< moab::Tag > tagList;
+    bool point_cloud;
+
+#ifdef MOAB_HAVE_MPI
+    // constructor for this ParCommGraph takes the joint comm and the MPI groups for each
+    // application
+    std::map< int, moab::ParCommGraph* > pgraph;  // map from context () to the parcommgraph*
+#endif
+
+#ifdef MOAB_HAVE_TEMPESTREMAP
+    TempestMapAppData tempestData;
+#endif
+};
+
+struct GlobalContext
+{
+    // are there reasons to have multiple moab inits? Is ref count needed?
+    moab::Interface* MBI;
+    // we should also have the default tags stored, initialized
+    moab::Tag material_tag, neumann_tag, dirichlet_tag,
+        globalID_tag;  // material, neumann, dirichlet,  globalID
+    int refCountMB;
+    int iArgc;
+    iMOAB_String* iArgv;
+    int unused_pid;
+
+    std::map< std::string, int > appIdMap;  // from app string (uppercase) to app id
+    std::map< int, int > appIdCompMap;      // from component id to app id
+
+#ifdef MOAB_HAVE_MPI
+    std::vector< moab::ParallelComm* > pcomms;  // created in order of applications, one moab::ParallelComm for each
+#endif
+
+    std::vector< appData > appDatas;  // the same order as pcomms
+    int globalrank, worldprocs;
+    bool MPI_initialized;
+
+    GlobalContext()
+    {
+        MBI        = nullptr;
+        refCountMB = 0;
+        unused_pid = 0;
+    }
+};
+
+/**
+  \brief Exposes all the underlying datastructures used in iMOAB.
+
+   Note: Use with caution as any rewrite of the data can cause
+   inconsistencies in later iMOAB calls.
+
+   \param[out] GlobalContext* A const pointer to the context
+*/
+const GlobalContext* iMOAB_GetGlobalContext( );
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -358,6 +464,22 @@ ErrCode iMOAB_GetVertexOwnership( iMOAB_AppID pid, int* vertices_length, int* vi
 
 */
 ErrCode iMOAB_GetVisibleVerticesCoordinates( iMOAB_AppID pid, int* coords_length, double* coordinates );
+
+/**
+  \brief Get element centroid coordinates for all local (owned) elements.
+
+  \note coordinates are returned in an array allocated by client, interleaved. (do need an option for blocked
+  coordinates ?) size of the array is dimension times number of elements.
+
+  <B>Operations:</B> Not Collective
+
+  \param[in]  pid (iMOAB_AppID)     The unique pointer to the application ID
+  \param[in]  coords_length (int*)   The size of the allocated coordinate array (array allocated by client, <TT>size :=
+  3*num_visible_vertices</TT>) \param[out] coordinates (double*) The pointer to client allocated memory that will be
+  filled with interleaved coordinates
+
+*/
+ErrCode iMOAB_GetOwnedElementsCoordinates( iMOAB_AppID pid, int* coords_length, double* coordinates );
 
 /**
   \brief Get the global block IDs for all locally visible (owned and shared/ghosted) blocks.
@@ -838,6 +960,8 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
 
   <B>Operations:</B> Collective
 
+  \param[in] pid_source (iMOAB_AppID)                     The unique pointer to the source application ID
+  \param[in] pid_target (iMOAB_AppID)                     The unique pointer to the target application ID
   \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map
   \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
                                                           values could be identifiers such as "scalar", "flux" or "custom".
@@ -848,7 +972,8 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
   \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string
   \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string
 */
-ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
+ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
+                                           iMOAB_AppID pid_intersection,
                                            const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
                                            const iMOAB_String remap_weights_filename,
                                            int* owned_dof_ids,

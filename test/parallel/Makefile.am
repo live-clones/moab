@@ -64,8 +64,9 @@ endif
 
 if HAVE_TEMPESTREMAP
   EXTRA_DIST = imoab_coupler_utils.hpp
-  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
+  HDF5_TESTS += imoab_coupler imoab_coupler_io imoab_phatm_ocn_coupler test_mapweights_bcast
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_coupler_io_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 if HAVE_EXTMESHES
   HDF5_TESTS +=  imoab_apg2_ol_coupler
@@ -176,6 +177,7 @@ hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
 uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
 migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
+imoab_coupler_io_SOURCES = imoab_coupler_io.cpp
 imoab_phatm_ocn_coupler_SOURCES = imoab_phatm_ocn_coupler.cpp
 imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp

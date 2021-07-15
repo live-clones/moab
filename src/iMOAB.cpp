@@ -59,83 +59,6 @@ extern "C" {
         if( 0 != (ierr) ) return 1; \
     }
 
-#ifdef MOAB_HAVE_TEMPESTREMAP
-struct TempestMapAppData
-{
-    moab::TempestRemapper* remapper;
-    std::map< std::string, moab::TempestOnlineMap* > weightMaps;
-    iMOAB_AppID pid_src;
-    iMOAB_AppID pid_dest;
-};
-#endif
-
-struct appData
-{
-    EntityHandle file_set;
-    int global_id;  // external component id, unique for application
-    std::string name;
-    Range all_verts;
-    Range local_verts;  // it could include shared, but not owned at the interface
-    // these vertices would be all_verts if no ghosting was required
-    Range ghost_vertices;  // locally ghosted from other processors
-    Range primary_elems;
-    Range owned_elems;
-    Range ghost_elems;
-    int dimension;             // 2 or 3, dimension of primary elements (redundant?)
-    long num_global_elements;  // reunion of all elements in primary_elements; either from hdf5
-                               // reading or from reduce
-    long num_global_vertices;  // reunion of all nodes, after sharing is resolved; it could be
-                               // determined from hdf5 reading
-    Range mat_sets;
-    std::map< int, int > matIndex;  // map from global block id to index in mat_sets
-    Range neu_sets;
-    Range diri_sets;
-    std::map< std::string, Tag > tagMap;
-    std::vector< Tag > tagList;
-    bool point_cloud;
-
-#ifdef MOAB_HAVE_MPI
-    // constructor for this ParCommGraph takes the joint comm and the MPI groups for each
-    // application
-    std::map< int, ParCommGraph* > pgraph;  // map from context () to the parcommgraph*
-#endif
-
-#ifdef MOAB_HAVE_TEMPESTREMAP
-    TempestMapAppData tempestData;
-#endif
-};
-
-struct GlobalContext
-{
-    // are there reasons to have multiple moab inits? Is ref count needed?
-    Interface* MBI;
-    // we should also have the default tags stored, initialized
-    Tag material_tag, neumann_tag, dirichlet_tag,
-        globalID_tag;  // material, neumann, dirichlet,  globalID
-    int refCountMB;
-    int iArgc;
-    iMOAB_String* iArgv;
-    int unused_pid;
-
-    std::map< std::string, int > appIdMap;  // from app string (uppercase) to app id
-    std::map< int, int > appIdCompMap;      // from component id to app id
-
-#ifdef MOAB_HAVE_MPI
-    std::vector< ParallelComm* > pcomms;  // created in order of applications, one moab::ParallelComm for each
-#endif
-
-    std::vector< appData > appDatas;  // the same order as pcomms
-    int globalrank, worldprocs;
-    bool MPI_initialized;
-
-    GlobalContext()
-    {
-        MBI        = 0;
-        refCountMB = 0;
-        unused_pid = 0;
-    }
-};
-
 static struct GlobalContext context;
 
 ErrCode iMOAB_Initialize( int argc, iMOAB_String* argv )
@@ -893,6 +816,18 @@ ErrCode iMOAB_GetVisibleVerticesCoordinates( iMOAB_AppID pid, int* coords_length
     if( *coords_length != 3 * (int)verts.size() ) { return 1; }
 
     ErrorCode rval = context.MBI->get_coords( verts, coordinates );CHKERRVAL( rval );
+
+    return 0;
+}
+
+ErrCode iMOAB_GetOwnedElementsCoordinates( iMOAB_AppID pid, int* coords_length, double* coordinates )
+{
+    Range& elems = context.appDatas[*pid].owned_elems;
+
+    // interleaved coordinates, so that means deep copy anyway
+    if( *coords_length != 3 * (int)elems.size() ) { return 1; }
+
+    ErrorCode rval = context.MBI->get_coords( elems, coordinates );CHKERRVAL( rval );
 
     return 0;
 }
@@ -2782,7 +2717,7 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 #ifdef MOAB_HAVE_NETCDF
 
-ErrCode iMOAB_LoadMappingWeightsFromFile(
+ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename, int* owned_dof_ids, int* owned_dof_ids_length, int* row_major_ownership,
     int solution_weights_identifier_length, int remap_weights_filename_length )
@@ -2791,14 +2726,31 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     // assert( row_major_ownership != NULL );
 
     ErrorCode rval;
+    ErrCode ierr;
     bool row_based_partition = ( row_major_ownership != NULL && *row_major_ownership > 0 ? true : false );
 
     // Get the source and target data and pcomm objects
+    appData& data_src        = context.appDatas[*pid_source];
+    appData& data_tgt        = context.appDatas[*pid_target];
     appData& data_intx   = context.appDatas[*pid_intersection];
     TempestMapAppData& tdata = data_intx.tempestData;
+    if( tdata.remapper != nullptr ) return 0;
+#ifdef MOAB_HAVE_MPI
+    ParallelComm* pco_intx = context.pcomms[*pid_intersection];
+#endif
+
+    ierr = iMOAB_UpdateMeshInfo( pid_source );CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_target );CHKIERRVAL( ierr );
+
+    data_intx.dimension = data_tgt.dimension;
+    // set the context for the source and destination applications
+    // set the context for the source and destination applications
+    tdata.pid_src         = pid_source;
+    tdata.pid_dest        = pid_target;
+    data_intx.point_cloud = ( data_src.point_cloud || data_tgt.point_cloud );
 
     // Get the handle to the remapper object
-    if( tdata.remapper == NULL )
+    if( tdata.remapper == nullptr )
     {
         // Now allocate and initialize the remapper object
 #ifdef MOAB_HAVE_MPI
@@ -2812,10 +2764,20 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
 
         // Do not create new filesets; Use the sets from our respective applications
         tdata.remapper->initialize( false );
-        // tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )  = data_src.file_set;
-        // tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh )  = data_tgt.file_set;
-        tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
+        tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )   = data_src.file_set;
+        tdata.remapper->GetMeshSet( moab::Remapper::CoveringMesh ) = data_src.file_set;
+        // tdata.remapper->GetMesh( moab::Remapper::CoveringMesh ) = tdata.remapper->GetMesh( moab::Remapper::SourceMesh
+        // );
+        tdata.remapper->GetMeshEntities( moab::Remapper::CoveringMesh ) =
+            tdata.remapper->GetMeshEntities( moab::Remapper::SourceMesh );
+        tdata.remapper->GetMeshVertices( moab::Remapper::CoveringMesh ) =
+            tdata.remapper->GetMeshVertices( moab::Remapper::SourceMesh );
+        tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh ) = data_tgt.file_set;
+        // tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
     }
+
+    // Now let us re-convert the MOAB mesh back to Tempest representation
+    rval = tdata.remapper->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
     // Setup loading of weights onto TempestOnlineMap
     // Set the context for the remapping weights computation
@@ -3261,18 +3223,19 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
 
     for( size_t i = 0; i < srcNames.size(); i++ )
     {
-        Tag tagHandle;
-        rval = context.MBI->tag_get_handle( srcNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
-        srcTagHandles.push_back( tagHandle );
-        rval = context.MBI->tag_get_handle( tgtNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
-        tgtTagHandles.push_back( tagHandle );
+        Tag srcTagHandle = nullptr;
+        rval = context.MBI->tag_get_handle( srcNames[i].c_str(), srcTagHandle );
+        if( MB_SUCCESS != rval || nullptr == srcTagHandle ) { return 1; }
+        srcTagHandles.push_back( srcTagHandle );
+
+        Tag tgtTagHandle = nullptr;
+        rval = context.MBI->tag_get_handle( tgtNames[i].c_str(), tgtTagHandle );
+        if( MB_SUCCESS != rval || nullptr == tgtTagHandle ) { return 1; }
+        tgtTagHandles.push_back( tgtTagHandle );
     }
 
     std::vector< double > solSTagVals;
     std::vector< double > solTTagVals;
-
     moab::Range sents, tents;
     if( data_intx.point_cloud )
     {
@@ -3311,6 +3274,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
     {
         moab::Range& covSrcEnts = remapper->GetMeshEntities( moab::Remapper::CoveringMesh );
         moab::Range& tgtEnts    = remapper->GetMeshEntities( moab::Remapper::TargetMesh );
+
         solSTagVals.resize(
             covSrcEnts.size() * weightMap->GetSourceNDofsPerElement() * weightMap->GetSourceNDofsPerElement(), -1.0 );
         solTTagVals.resize( tgtEnts.size() * weightMap->GetDestinationNDofsPerElement() *

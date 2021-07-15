@@ -696,7 +696,7 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
 {
     ErrorCode rval;
 
-    if( 0 == m_covering_source )
+    if( 0 == m_covering_source && m_covering_source_set != m_source_set )
     {
         m_covering_source = new Mesh();
         rval = convert_mesh_to_tempest_private( m_covering_source, m_covering_source_set, m_covering_source_entities,

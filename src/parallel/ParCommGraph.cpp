@@ -549,10 +549,10 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
     return MB_SUCCESS;
 }
 
-// VSM: Why is the communicator never used. Remove the argument ?
+
 ErrorCode ParCommGraph::release_send_buffers()
 {
-    int ierr, nsize = (int)sendReqs.size();
+    int ierr, nsize = static_cast< int >( sendReqs.size() );
     std::vector< MPI_Status > mult_status;
     mult_status.resize( sendReqs.size() );
     ierr = MPI_Waitall( nsize, &sendReqs[0], &mult_status[0] );
@@ -578,7 +578,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
     int ierr;
     Core* mb = (Core*)pco->get_moab();
     // get info about the tag
-    //! Get the size of the specified tag in bytes
+    // Get the size of the specified tag in bytes
     int total_bytes_per_entity = 0;  // we need to know, to allocate buffers
     ErrorCode rval;
     std::vector< int > vect_bytes_per_tag;

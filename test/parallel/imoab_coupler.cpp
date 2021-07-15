@@ -445,11 +445,11 @@ int main( int argc, char* argv[] )
                                                     atmocn_map_file_name.size() );
             CHECKIERR( ierr, "failed to write map file to disk" );
 
-            const std::string intx_from_file_identifier = "map-from-file";
-            ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(),
-                                                     atmocn_map_file_name.c_str(), NULL, NULL, NULL,
-                                                     intx_from_file_identifier.size(), atmocn_map_file_name.size() );
-            CHECKIERR( ierr, "failed to load map file from disk" );
+            // const std::string intx_from_file_identifier = "map-from-file";
+            // ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(),
+            //                                          atmocn_map_file_name.c_str(), NULL, NULL, NULL,
+            //                                          intx_from_file_identifier.size(), atmocn_map_file_name.size() );
+            // CHECKIERR( ierr, "failed to load map file from disk" );
         }
 #endif
     }
@@ -595,7 +595,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 1;
             int context   = cplocn;
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS", strlen( "AtmMigOcnS" ) );
+            ierr = iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS", strlen( "AtmMigOcnS" ) );
+            CHECKIERR( ierr, "cannot dump communication graph" )
 #endif
         }
         if( couComm != MPI_COMM_NULL )
