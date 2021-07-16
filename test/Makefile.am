@@ -68,7 +68,8 @@ TESTS = range_test \
         intx_in_plane_test \
         intx_on_sphere_test \
         mgen_test \
-        gnom_project_test
+        gnom_project_test \
+        errorglobals
 
 if HAVE_NETCDF
    TESTS += intx_rll_cs_sphere_test
