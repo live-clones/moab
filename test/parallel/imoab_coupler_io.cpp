@@ -545,7 +545,13 @@ int main( int argc, char* argv[] )
             ierr          = iMOAB_DumpCommGraph( cmpSrcPID, &context, &is_sender, "SrcCovTar", strlen( "SrcCovTar" ) );
             CHECKIERR( ierr, "cannot dump communication graph" )
 
-            int storLeng = 726, eetype = 1;
+            int nverts[3], nelem[3];
+
+            ierr = iMOAB_GetMeshInfo( cmpSrcPID, nverts, nelem, 0, 0, 0 );
+            CHECKIERR( ierr, "failed to get mesh info from source" );
+
+
+            int storLeng = nelem[0], eetype = 1;
             std::vector< double > vals_test( storLeng, 0.0 );
             ierr = iMOAB_GetDoubleTagStorage( cmpSrcPID, bottomTempField, &storLeng, &eetype, &vals_test[0],
                                               strlen( bottomTempField ) );
@@ -575,7 +581,13 @@ int main( int argc, char* argv[] )
                                             strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot receive tag values from coupler" )
 
-            int storLeng = 726, eetype = 1;
+            int nverts[3], nelem[3];
+
+            ierr = iMOAB_GetMeshInfo( cplSrcPID, nverts, nelem, 0, 0, 0 );
+            CHECKIERR( ierr, "failed to get mesh info from source mesh on coupler" );
+
+
+            int storLeng = nelem[0], eetype = 1;
             std::vector< double > vals_test( storLeng, 0.0 );
             ierr = iMOAB_GetDoubleTagStorage( cplSrcPID, bottomTempField, &storLeng, &eetype, &vals_test[0],
                                               strlen( bottomTempField ) );
