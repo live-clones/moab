@@ -137,42 +137,48 @@ int main( int argc, char* argv[] )
     // first groups has task 0, second group tasks 0 and 1
     // coupler will be on joint tasks, will be on a third group (0 and 1, again)
     MPI_Group srcPEGroup;
-    MPI_Comm srcComm;
+    MPI_Comm srcComm = MPI_COMM_NULL;
     ierr = create_group_and_comm( startG1, endG1, jgroup, &srcPEGroup, &srcComm );
     CHECKIERR( ierr, "Cannot create src MPI group and communicator " )
 
     MPI_Group tgtPEGroup;
-    MPI_Comm tgtComm;
+    MPI_Comm tgtComm = MPI_COMM_NULL;
     ierr = create_group_and_comm( startG2, endG2, jgroup, &tgtPEGroup, &tgtComm );
     CHECKIERR( ierr, "Cannot create tgt MPI group and communicator " )
 
     // we will always have a coupler
     MPI_Group couPEGroup;
-    MPI_Comm couComm;
+    MPI_Comm couComm = MPI_COMM_NULL;
     ierr = create_group_and_comm( startG4, endG4, jgroup, &couPEGroup, &couComm );
     CHECKIERR( ierr, "Cannot create cpl MPI group and communicator " )
 
     // we will always have a coupler
     MPI_Group couPEGroupIO;
-    MPI_Comm couCommIO;
-    ierr = create_group_and_comm( startG5, endG5, jgroup, &couPEGroupIO, &couCommIO );
-    CHECKIERR( ierr, "Cannot create cpl MPI group and communicator for map I/O " )
+    MPI_Comm couCommIO = MPI_COMM_NULL;
+    // ierr = create_group_and_comm( startG5, endG5, jgroup, &couPEGroupIO, &couCommIO );
+    // CHECKIERR( ierr, "Cannot create cpl MPI group and communicator for map I/O " )
 
     // src_coupler
     MPI_Group joinSrcCouGroup[2];
-    MPI_Comm srcCouComm[2];
+    MPI_Comm srcCouComm[2] = { MPI_COMM_NULL, MPI_COMM_NULL };
     ierr = create_joint_comm_group( srcPEGroup, couPEGroup, &joinSrcCouGroup[0], &srcCouComm[0] );
     CHECKIERR( ierr, "Cannot create joint src cou communicator" )
-    ierr = create_joint_comm_group( srcPEGroup, couPEGroupIO, &joinSrcCouGroup[1], &srcCouComm[1] );
-    CHECKIERR( ierr, "Cannot create joint src cou communicator" )
+    if( couCommIO != MPI_COMM_NULL )
+    {
+        ierr = create_joint_comm_group( srcPEGroup, couPEGroupIO, &joinSrcCouGroup[1], &srcCouComm[1] );
+        CHECKIERR( ierr, "Cannot create joint src cou communicator" )
+    }
 
     // tgt_coupler
     MPI_Group joinTgtCouGroup[2];
-    MPI_Comm tgtCouComm[2];
+    MPI_Comm tgtCouComm[2] = { MPI_COMM_NULL, MPI_COMM_NULL };
     ierr = create_joint_comm_group( tgtPEGroup, couPEGroup, &joinTgtCouGroup[0], &tgtCouComm[0] );
     CHECKIERR( ierr, "Cannot create joint tgt cou communicator" )
-    ierr = create_joint_comm_group( tgtPEGroup, couPEGroupIO, &joinTgtCouGroup[1], &tgtCouComm[1] );
-    CHECKIERR( ierr, "Cannot create joint tgt cou communicator" )
+    if( couCommIO != MPI_COMM_NULL )
+    {
+        ierr = create_joint_comm_group( tgtPEGroup, couPEGroupIO, &joinTgtCouGroup[1], &tgtCouComm[1] );
+        CHECKIERR( ierr, "Cannot create joint tgt cou communicator" )
+    }
 
     ierr = iMOAB_Initialize( argc, argv );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKIERR( ierr, "Cannot initialize iMOAB" )
@@ -238,20 +244,27 @@ int main( int argc, char* argv[] )
                                            &couPEGroup, &srcCouComm[0], srcFilename, readopts, nghlay,
                                            repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate src mesh" )
-    ierr = setup_component_coupler_meshes( cmpSrcPID, cmpsrc, cplIOSrcPID, cpliosrc, &srcComm, &srcPEGroup, &couCommIO,
-                                           &couPEGroupIO, &srcCouComm[1], srcFilename, readopts, nghlay,
-                                           repartitioner_scheme, false );
-    CHECKIERR( ierr, "Cannot load and migrate src mesh for IO" )
+
+    if( couCommIO != MPI_COMM_NULL )
+    {
+        ierr = setup_component_coupler_meshes( cmpSrcPID, cmpsrc, cplIOSrcPID, cpliosrc, &srcComm, &srcPEGroup,
+                                               &couCommIO, &couPEGroupIO, &srcCouComm[1], srcFilename, readopts, nghlay,
+                                               repartitioner_scheme, false );
+        CHECKIERR( ierr, "Cannot load and migrate src mesh for IO" )
+    }
 
     // target
     ierr = setup_component_coupler_meshes( cmpTgtPID, cmptgt, cplTgtPID, cpltgt, &tgtComm, &tgtPEGroup, &couComm,
                                            &couPEGroup, &tgtCouComm[0], tgtFilename, readopts, nghlay,
                                            repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate tgt mesh" )
-    ierr = setup_component_coupler_meshes( cmpTgtPID, cmptgt, cplIOTgtPID, cpliotgt, &tgtComm, &tgtPEGroup, &couCommIO,
-                                           &couPEGroupIO, &tgtCouComm[1], tgtFilename, readopts, nghlay,
-                                           repartitioner_scheme, false );
-    CHECKIERR( ierr, "Cannot load and migrate tgt mesh for IO" )
+    if( couCommIO != MPI_COMM_NULL )
+    {
+        ierr = setup_component_coupler_meshes( cmpTgtPID, cmptgt, cplIOTgtPID, cpliotgt, &tgtComm, &tgtPEGroup,
+                                               &couCommIO, &couPEGroupIO, &tgtCouComm[1], tgtFilename, readopts, nghlay,
+                                               repartitioner_scheme, false );
+        CHECKIERR( ierr, "Cannot load and migrate tgt mesh for IO" )
+    }
 
     MPI_Barrier( MPI_COMM_WORLD );
 
@@ -539,7 +552,6 @@ int main( int argc, char* argv[] )
         PUSH_TIMER( "Send/receive data from src component to coupler in tgt context" )
         if( srcComm != MPI_COMM_NULL )
         {
-
             int is_sender = 1;
             int context   = cpltgt;
             ierr          = iMOAB_DumpCommGraph( cmpSrcPID, &context, &is_sender, "SrcCovTar", strlen( "SrcCovTar" ) );
@@ -607,13 +619,13 @@ int main( int argc, char* argv[] )
         }
 
         // Next phase is for couplerIO
-        if( srcComm != MPI_COMM_NULL )
+        if( srcComm != MPI_COMM_NULL && srcCouComm[1] != MPI_COMM_NULL )
         {
             ierr = iMOAB_SendElementTag( cmpSrcPID, bottomTempField, &srcCouComm[1], &cpliosrc,
                                          strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot send tag values to IO coupler" )
         }
-        if( couCommIO != MPI_COMM_NULL )
+        if( couCommIO != MPI_COMM_NULL && srcCouComm[1] != MPI_COMM_NULL )
         {
             // receive on src on coupler pes, that was redistributed according to coverage
             ierr = iMOAB_ReceiveElementTag( cplIOSrcPID, bottomTempField, &srcCouComm[1], &cmpsrc,
@@ -622,7 +634,7 @@ int main( int argc, char* argv[] )
         }
 
         // we can now free the sender buffers
-        if( srcComm != MPI_COMM_NULL )
+        if( srcComm != MPI_COMM_NULL && srcCouComm[1] != MPI_COMM_NULL )
         {
             ierr = iMOAB_FreeSenderBuffers( cmpSrcPID, &cpliosrc );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend src tag towards the coverage mesh" )
@@ -694,11 +706,15 @@ int main( int argc, char* argv[] )
         }
 
         // receive on component 2, ocean
-        if( tgtComm != MPI_COMM_NULL )
+        if( tgtComm != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
         {
             ierr = iMOAB_ReceiveElementTag( cmpTgtPID, bottomTempProjectedField, &tgtCouComm[0], &context_id,
                                             strlen( bottomTempProjectedField ) );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
+        }
+
+        if( couCommIO != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
+        {
             ierr = iMOAB_ReceiveElementTag( cmpTgtPID, bottomTempProjectedField_IO, &tgtCouComm[1], &context_id,
                                             strlen( bottomTempProjectedField_IO ) );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
@@ -706,8 +722,8 @@ int main( int argc, char* argv[] )
 
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplTgtPID, &context_id ); }
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplTgtPID, &context_id ); }
+        // if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplTgtPID, &context_id ); }
+        // if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplTgtPID, &context_id ); }
         if( tgtComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileTgt[] = "TgtWithProj.h5m";
@@ -779,25 +795,37 @@ int main( int argc, char* argv[] )
     CHECKIERR( ierr, "did not finalize iMOAB" )
 
     // free src coupler group and comm
-    if( MPI_COMM_NULL != srcCouComm[0] ) MPI_Comm_free( &srcCouComm[0] );
-    if( MPI_COMM_NULL != srcCouComm[1] ) MPI_Comm_free( &srcCouComm[1] );
-    MPI_Group_free( &joinSrcCouGroup[0] );
-    MPI_Group_free( &joinSrcCouGroup[1] );
+    if( MPI_COMM_NULL != srcCouComm[0] )
+    {
+        MPI_Comm_free( &srcCouComm[0] );
+        MPI_Group_free( &joinSrcCouGroup[0] );
+    }
+    if( MPI_COMM_NULL != srcCouComm[1] )
+    {
+        MPI_Comm_free( &srcCouComm[1] );
+        MPI_Group_free( &joinSrcCouGroup[1] );
+    }
     if( MPI_COMM_NULL != srcComm ) MPI_Comm_free( &srcComm );
-
     if( MPI_COMM_NULL != tgtComm ) MPI_Comm_free( &tgtComm );
-    // free tgt - coupler group and comm
-    if( MPI_COMM_NULL != tgtCouComm[0] ) MPI_Comm_free( &tgtCouComm[0] );
-    if( MPI_COMM_NULL != tgtCouComm[1] ) MPI_Comm_free( &tgtCouComm[1] );
-    MPI_Group_free( &joinTgtCouGroup[0] );
-    MPI_Group_free( &joinTgtCouGroup[1] );
 
+    // free tgt - coupler group and comm
+    if( MPI_COMM_NULL != tgtCouComm[0] )
+    {
+        MPI_Comm_free( &tgtCouComm[0] );
+        MPI_Group_free( &joinTgtCouGroup[0] );
+    }
+    if( MPI_COMM_NULL != tgtCouComm[1] )
+    {
+        MPI_Comm_free( &tgtCouComm[1] );
+        MPI_Group_free( &joinTgtCouGroup[1] );
+    }
     if( MPI_COMM_NULL != couComm ) MPI_Comm_free( &couComm );
+    if( MPI_COMM_NULL != couCommIO ) MPI_Comm_free( &couCommIO );
 
     MPI_Group_free( &srcPEGroup );
     MPI_Group_free( &tgtPEGroup );
     MPI_Group_free( &couPEGroup );
-    MPI_Group_free( &couPEGroupIO );
+    // MPI_Group_free( &couPEGroupIO );
     MPI_Group_free( &jgroup );
 
     MPI_Finalize();
