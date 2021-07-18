@@ -155,8 +155,8 @@ int main( int argc, char* argv[] )
     // we will always have a coupler
     MPI_Group couPEGroupIO;
     MPI_Comm couCommIO = MPI_COMM_NULL;
-    // ierr = create_group_and_comm( startG5, endG5, jgroup, &couPEGroupIO, &couCommIO );
-    // CHECKIERR( ierr, "Cannot create cpl MPI group and communicator for map I/O " )
+    ierr = create_group_and_comm( startG5, endG5, jgroup, &couPEGroupIO, &couCommIO );
+    CHECKIERR( ierr, "Cannot create cpl MPI group and communicator for map I/O " )
 
     // src_coupler
     MPI_Group joinSrcCouGroup[2];
@@ -401,30 +401,30 @@ int main( int argc, char* argv[] )
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int srcCompNDoFs = disc_orders[0] * disc_orders[0], tgtCompNDoFs = disc_orders[1] * disc_orders[1] /*FV*/;
 
-    const char* bottomTempField             = "a2oTbot1";
-    const char* bottomTempProjectedField    = "a2oTbot_proj";
-    const char* bottomTempProjectedField_IO = "a2oTbot_proj_io";
+    const char* bottomTempField             = "srcsoln";
+    const char* bottomTempProjectedField    = "tgtsoln";
+    const char* bottomTempProjectedField_IO = "tgtsoln_io";
 
     if( couComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_DefineTagStorage( cplSrcPID, bottomTempField, &tagTypes[0], &srcCompNDoFs, &tagIndex[0],
                                        strlen( bottomTempField ) );
-        CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
+        CHECKIERR( ierr, "failed to define the field tag srcsoln" );
 
         ierr = iMOAB_DefineTagStorage( cplTgtPID, bottomTempProjectedField, &tagTypes[1], &tgtCompNDoFs, &tagIndex[1],
                                        strlen( bottomTempProjectedField ) );
-        CHECKIERR( ierr, "failed to define the field tag a2oTbot_proj" );
+        CHECKIERR( ierr, "failed to define the field tag tgtsoln" );
     }
 
     if( couCommIO != MPI_COMM_NULL )
     {
         ierr = iMOAB_DefineTagStorage( cplIOSrcPID, bottomTempField, &tagTypes[0], &srcCompNDoFs, &tagIndex[2],
                                        strlen( bottomTempField ) );
-        CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
+        CHECKIERR( ierr, "failed to define the field tag srcsoln" );
 
         ierr = iMOAB_DefineTagStorage( cplIOTgtPID, bottomTempProjectedField_IO, &tagTypes[1], &tgtCompNDoFs,
                                        &tagIndex[3], strlen( bottomTempProjectedField_IO ) );
-        CHECKIERR( ierr, "failed to define the field tag a2oTbot_proj" );
+        CHECKIERR( ierr, "failed to define the field tag srcsoln_proj" );
     }
 
     // need to make sure that the coverage mesh (created during intx method) received the tag that
@@ -452,7 +452,7 @@ int main( int argc, char* argv[] )
             int storLeng = srcCompNDoFs * numAllElem;
             int eetype   = 1;
 
-            vals.resize( storLeng, 0.0 );
+            vals.resize( storLeng, -1.0 );
 
             ierr = iMOAB_SetDoubleTagStorage( cplSrcPID, bottomTempField, &storLeng, &eetype, &vals[0],
                                                 strlen( bottomTempField ) );
@@ -477,7 +477,7 @@ int main( int argc, char* argv[] )
             int storLeng = srcCompNDoFs * numAllElem;
             int eetype   = 1;
 
-            vals.resize( storLeng, 0.0 );
+            vals.resize( storLeng, -1.0 );
 
             ierr = iMOAB_SetDoubleTagStorage( cplIOSrcPID, bottomTempField, &storLeng, &eetype, &vals[0],
                                               strlen( bottomTempField ) );
@@ -492,7 +492,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_DefineTagStorage( cmpTgtPID, bottomTempProjectedField, &tagTypes[1], &tgtCompNDoFs,
                                            &tagIndexIn2, strlen( bottomTempProjectedField ) );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
-                             "a2oTbot_proj on target pes" );
+                             "srcsoln_proj on target pes" );
         }
 
         // send the projected tag back to ocean pes, with send/receive tag
@@ -502,7 +502,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_DefineTagStorage( cmpSrcPID, bottomTempField, &tagTypes[0], &srcCompNDoFs, &tagIndexIn,
                                            strlen( bottomTempField ) );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
-                             "a2oTbot on source pes" );
+                             "srcsoln on source pes" );
 
             int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
             /*
@@ -557,9 +557,8 @@ int main( int argc, char* argv[] )
             ierr          = iMOAB_DumpCommGraph( cmpSrcPID, &context, &is_sender, "SrcCovTar", strlen( "SrcCovTar" ) );
             CHECKIERR( ierr, "cannot dump communication graph" )
 
-            int nverts[3], nelem[3];
-
-            ierr = iMOAB_GetMeshInfo( cmpSrcPID, nverts, nelem, 0, 0, 0 );
+            int nelem[3];
+            ierr = iMOAB_GetMeshInfo( cmpSrcPID, nullptr, nelem, nullptr, nullptr, nullptr );
             CHECKIERR( ierr, "failed to get mesh info from source" );
 
 
@@ -593,9 +592,8 @@ int main( int argc, char* argv[] )
                                             strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot receive tag values from coupler" )
 
-            int nverts[3], nelem[3];
-
-            ierr = iMOAB_GetMeshInfo( cplSrcPID, nverts, nelem, 0, 0, 0 );
+            int nelem[3];
+            ierr = iMOAB_GetMeshInfo( cplSrcPID, nullptr, nelem, nullptr, nullptr, nullptr );
             CHECKIERR( ierr, "failed to get mesh info from source mesh on coupler" );
 
 
@@ -609,6 +607,10 @@ int main( int argc, char* argv[] )
             {
                 printf( "Received %d value = %f\n", i, vals_test[i] );
             }
+
+            ierr = iMOAB_WriteMesh( cplSrcPID, "fSrcOnCpl.h5m", fileWriteOptions, strlen( "fSrcOnCpl.h5m" ),
+                                    strlen( fileWriteOptions ) );
+            CHECKIERR( ierr, "could not write fTgtOnCpl.h5m to disk" )
         }
 
         // we can now free the sender buffers
@@ -644,7 +646,7 @@ int main( int argc, char* argv[] )
 
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( couComm != MPI_COMM_NULL )
+        if( couComm != MPI_COMM_NULL && false)
         {
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
@@ -706,14 +708,14 @@ int main( int argc, char* argv[] )
         }
 
         // receive on component 2, ocean
-        if( tgtComm != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
+        if( tgtComm != MPI_COMM_NULL && tgtCouComm[0] != MPI_COMM_NULL )
         {
             ierr = iMOAB_ReceiveElementTag( cmpTgtPID, bottomTempProjectedField, &tgtCouComm[0], &context_id,
                                             strlen( bottomTempProjectedField ) );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
-        if( couCommIO != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
+        if( tgtComm != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
         {
             ierr = iMOAB_ReceiveElementTag( cmpTgtPID, bottomTempProjectedField_IO, &tgtCouComm[1], &context_id,
                                             strlen( bottomTempProjectedField_IO ) );

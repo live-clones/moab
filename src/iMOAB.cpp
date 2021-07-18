@@ -2766,18 +2766,32 @@ ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pi
         tdata.remapper->initialize( false );
         tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )   = data_src.file_set;
         tdata.remapper->GetMeshSet( moab::Remapper::CoveringMesh ) = data_src.file_set;
-        // tdata.remapper->GetMesh( moab::Remapper::CoveringMesh ) = tdata.remapper->GetMesh( moab::Remapper::SourceMesh
-        // );
-        tdata.remapper->GetMeshEntities( moab::Remapper::CoveringMesh ) =
-            tdata.remapper->GetMeshEntities( moab::Remapper::SourceMesh );
-        tdata.remapper->GetMeshVertices( moab::Remapper::CoveringMesh ) =
-            tdata.remapper->GetMeshVertices( moab::Remapper::SourceMesh );
         tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh ) = data_tgt.file_set;
         // tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
+
+        moab::Range& srcents = tdata.remapper->GetMeshEntities( moab::Remapper::SourceMesh );
+        moab::Range& srcverts = tdata.remapper->GetMeshVertices( moab::Remapper::SourceMesh );
+        moab::Range& covents  = tdata.remapper->GetMeshEntities( moab::Remapper::CoveringMesh );
+        moab::Range& covverts = tdata.remapper->GetMeshVertices( moab::Remapper::CoveringMesh );
+        moab::Range& tgtents = tdata.remapper->GetMeshEntities( moab::Remapper::TargetMesh );
+        moab::Range& tgtverts = tdata.remapper->GetMeshVertices( moab::Remapper::TargetMesh );
+
+        rval = context.MBI->get_entities_by_dimension( data_src.file_set, 2, srcents );MB_CHK_ERR( rval );
+        rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, srcverts );MB_CHK_ERR( rval );
+        covents = srcents;
+        covverts = srcverts;
+        rval     = context.MBI->get_entities_by_dimension( data_tgt.file_set, 2, tgtents );MB_CHK_ERR( rval );
+        rval     = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, tgtverts );
+        MB_CHK_ERR( rval );
+
+        // Now let us re-convert the MOAB mesh back to Tempest representation
+        rval = tdata.remapper->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
+
+        printf( "Source mesh = [%zu, %zu] entities and Target mesh = [%zu, %zu] entities \n",
+                srcents.size(), srcverts.size(),
+                tgtents.size(), tgtverts.size() );
     }
 
-    // Now let us re-convert the MOAB mesh back to Tempest representation
-    rval = tdata.remapper->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
     // Setup loading of weights onto TempestOnlineMap
     // Set the context for the remapping weights computation
@@ -2785,15 +2799,15 @@ ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pi
 
     // Now allocate and initialize the remapper object
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
-    assert( weightMap != NULL );
+    assert( weightMap != nullptr );
 
     // Check that both the DoF ownership array and length are NULL. Here we will assume a trivial partition for the map
     // If both are non-NULL, then ensure that the length of the array is greater than 0.
-    assert( ( owned_dof_ids == NULL && owned_dof_ids_length == NULL ) ||
-            ( owned_dof_ids != NULL && owned_dof_ids_length != NULL && *owned_dof_ids_length > 0 ) );
+    assert( ( owned_dof_ids == nullptr && owned_dof_ids_length == nullptr ) ||
+            ( owned_dof_ids != nullptr && owned_dof_ids_length != nullptr && *owned_dof_ids_length > 0 ) );
 
     // Invoke the actual call to read in the parallel map
-    if( owned_dof_ids == NULL && owned_dof_ids_length == NULL )
+    if( owned_dof_ids == nullptr && owned_dof_ids_length == nullptr )
     {
         std::vector< int > tmp_owned_ids;
         rval = weightMap->ReadParallelMap( remap_weights_filename,
@@ -3284,6 +3298,8 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
         sents = covSrcEnts;
         tents = tgtEnts;
     }
+
+    printf( "Source/target entities: %zu, %lu -- %zu, %lu\n", sents.size(), solSTagVals.size(), tents.size(), solTTagVals.size() );
 
     for( size_t i = 0; i < srcTagHandles.size(); i++ )
     {

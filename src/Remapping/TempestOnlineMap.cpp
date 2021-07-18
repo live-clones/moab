@@ -148,6 +148,9 @@ void moab::TempestOnlineMap::setup_sizes_dimensions()
 
         this->InitializeTargetDimensions( dimNames, dimSizes );
     }
+
+    // Initialize for FV-FV discretization by default
+    m_nDofsPEl_Src = m_nDofsPEl_Dest = 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

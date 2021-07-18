@@ -271,14 +271,24 @@ class TempestOnlineMap : public OfflineMap
     int GetDestinationLocalNDofs();
 
     ///	<summary>
+    ///		Get a writable reference to the number of Degrees-Of-Freedom per element on the source mesh.
+    ///	</summary>
+    int& GetSourceNDofsPerElement();
+
+    ///	<summary>
     ///		Get the number of Degrees-Of-Freedom per element on the source mesh.
     ///	</summary>
-    int GetSourceNDofsPerElement();
+    int GetSourceNDofsPerElement() const;
+
+    ///	<summary>
+    ///		Get a writable reference to the number of Degrees-Of-Freedom per element on the destination mesh.
+    ///	</summary>
+    int& GetDestinationNDofsPerElement();
 
     ///	<summary>
     ///		Get the number of Degrees-Of-Freedom per element on the destination mesh.
     ///	</summary>
-    int GetDestinationNDofsPerElement();
+    int GetDestinationNDofsPerElement() const;
 
     ///	<summary>
     ///		Get the global Degrees-Of-Freedom ID on the destination mesh.
@@ -458,14 +468,28 @@ inline int moab::TempestOnlineMap::GetDestinationLocalNDofs()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetSourceNDofsPerElement()
+inline int& moab::TempestOnlineMap::GetSourceNDofsPerElement()
 {
     return m_nDofsPEl_Src;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
+inline int moab::TempestOnlineMap::GetSourceNDofsPerElement() const
+{
+    return m_nDofsPEl_Src;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline int& moab::TempestOnlineMap::GetDestinationNDofsPerElement()
+{
+    return m_nDofsPEl_Dest;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement() const
 {
     return m_nDofsPEl_Dest;
 }

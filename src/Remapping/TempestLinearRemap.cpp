@@ -349,7 +349,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
     // Reset the source and target data first
     m_rowVector.setZero();
     m_colVector.setZero();
-
+// #define VERBOSE
 #ifdef VERBOSE
     std::stringstream sstr;
     sstr << "projection_" << rank << ".txt";
@@ -382,11 +382,10 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 #endif
         for( unsigned i = 0; i < srcVals.size(); ++i )
         {
-            m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Col: " << i << ", GID: " << col_dtoc_dofmap[i] << ", Data = " << srcVals[i] << ", "
-                        << m_colVector( i ) << "\n";
+            output_file << "Col: " << i << ", GID: " << col_dtoc_dofmap[i] << ", Data = " << srcVals[i] << "\n";
 #endif
+            m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
         }
 
         m_rowVector = m_weightMatrix * m_colVector;
@@ -398,10 +397,11 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 #endif
         for( unsigned i = 0; i < tgtVals.size(); ++i )
         {
-            tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Row: " << i << ", GID: " << row_dtoc_dofmap[i] << ", Data = " << m_rowVector( i ) << "\n";
+            output_file << "Row: " << i << ", GID: " << row_dtoc_dofmap[i]
+                        << ", Data = " << m_rowVector( row_dtoc_dofmap[i] ) << "\n";
 #endif
+            tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
         }
     }
 
@@ -409,7 +409,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
     output_file.flush();  // required here
     output_file.close();
 #endif
-
+#undef VERBOSE
     // All done with matvec application
     return moab::MB_SUCCESS;
 }
