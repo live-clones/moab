@@ -2645,24 +2645,24 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
         assert (tdata.weightMaps.size() == 1);
         // maybe we need to check it is the map we expect
         moab::TempestOnlineMap* weightMap = tdata.weightMaps.begin()->second;
-        std::vector<int> ids_of_interest;
+        //std::vector<int> ids_of_interest;
         // do a deep copy of the ids of interest: row ids or col ids, target or source direction
         if (*direction == 1)
         {
             // we are interested in row ids, source
             // new method from moab::TempestOnlineMap
-            rval = weightMap -> fill_row_ids(ids_of_interest); CHKERRVAL( rval );
+            rval = weightMap -> fill_row_ids(valuesComp2); CHKERRVAL( rval );
         }
         else if (*direction == 2)
         {
             // we are interested in col ids
-            rval = weightMap -> fill_col_ids(ids_of_interest); CHKERRVAL( rval );
+            rval = weightMap -> fill_col_ids(valuesComp2); CHKERRVAL( rval );
         }
         //
 
 
         // now fill the tuple list with info and markers
-        std::set< int > uniq( ids_of_interest.begin(), ids_of_interest.end() );
+        std::set< int > uniq( valuesComp2.begin(), valuesComp2.end() );
         TLcomp2.resize( uniq.size() );
         for( std::set< int >::iterator sit = uniq.begin(); sit != uniq.end(); sit++ )
         {
@@ -2768,7 +2768,6 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     pc.crystal_router()->gs_transfer( 1, TLBackToComp1, 0 );  // communication towards original tasks, with info about
     pc.crystal_router()->gs_transfer( 1, TLBackToComp2, 0 );
 
-#if 0
     if( *pid1 >= 0 )
     {
         // we are on original comp 1 tasks
@@ -2811,8 +2810,9 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
         //
     }
 
-// endif for commenting out, #if 0
-#endif
+// still need to do mesh migration, from component to coupler
+    // we could use direct sends of the involved entities, like in mesh migrate,
+    // or crystal router as in coverage mesh
     return 0;
 }
 
