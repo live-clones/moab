@@ -409,7 +409,7 @@ int main( int argc, char* argv[] )
         //  use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute OCN coverage graph for ATM mesh" )
         ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID,
-                                    &cplocn );  // it happens over joint communicator
+                     &cmpatm, &cplatm, &cplocn );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for ocean" )
         POP_TIMER( atmCouComm, rankInAtmComm )  // hijack this rank
     }
@@ -425,7 +425,7 @@ int main( int argc, char* argv[] )
         //  use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute ATM coverage graph for OCN mesh" )
         ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtmPID,
-                                    &cplatm );  // it happens over joint communicator, ocean + coupler
+                     &cmpocn, &cplocn,  &cplatm );  // it happens over joint communicator, ocean + coupler
         CHECKIERR( ierr, "cannot recompute direct coverage graph for atm" )
         POP_TIMER( ocnCouComm, rankInOcnComm )  // hijack this rank
     }
@@ -484,7 +484,7 @@ int main( int argc, char* argv[] )
         /// we will use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute LND coverage graph for ATM mesh" )
         ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmLndPID,
-                                    &cpllnd );  // it happens over joint communicator
+                     &cmpatm, &cplatm, &cpllnd );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for land" )
         POP_TIMER( atmCouComm, rankInAtmComm )  // hijack this rank
     }
@@ -513,7 +513,7 @@ int main( int argc, char* argv[] )
         //  use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute ATM coverage graph for LND mesh" )
         ierr = iMOAB_CoverageGraph( &lndCouComm, cmpLndPID, cplLndPID, cplLndAtmPID,
-                                    &cplatm );  // it happens over joint communicator, ocean + coupler
+                     &cmplnd, &cpllnd, &cplatm );  // it happens over joint communicator, ocean + coupler
         CHECKIERR( ierr, "cannot recompute direct coverage graph for atm for intx with land" )
         POP_TIMER( lndCouComm, rankInLndComm )
     }
@@ -784,6 +784,7 @@ int main( int argc, char* argv[] )
     // original graph (context is -1_
     if( couComm != MPI_COMM_NULL )
     {
+        context_id = cmpocn;
         ierr = iMOAB_SendElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
                                      strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
@@ -792,6 +793,7 @@ int main( int argc, char* argv[] )
     // receive on component 2, ocean
     if( ocnComm != MPI_COMM_NULL )
     {
+        context_id = cplocn;
         ierr = iMOAB_ReceiveElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
                                         strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
@@ -801,6 +803,7 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
+        context_id = cmpocn;
         ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
         CHECKIERR( ierr, "cannot free buffers related to send tag" )
     }
@@ -892,6 +895,7 @@ int main( int argc, char* argv[] )
     }
     if( couComm != MPI_COMM_NULL )
     {
+        context_id = cmplnd;
         ierr = iMOAB_SendElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id,
                                      strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot send tag values back to land pes" )
@@ -899,6 +903,7 @@ int main( int argc, char* argv[] )
     // receive on component 3, land
     if( lndComm != MPI_COMM_NULL )
     {
+        context_id = cpllnd;
         ierr = iMOAB_ReceiveElementTag( cmpLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id,
                                         strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot receive tag values from land mesh on coupler pes" )
@@ -907,6 +912,7 @@ int main( int argc, char* argv[] )
     MPI_Barrier( MPI_COMM_WORLD );
     if( couComm != MPI_COMM_NULL )
     {
+        context_id = cmplnd;
         ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
         CHECKIERR( ierr, "cannot free buffers related to sending tags from coupler to land pes" )
     }

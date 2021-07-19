@@ -760,14 +760,17 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
 cells involved in intersection with the target cells. The new ParCommGraph between cc source mesh and cx source mesh
 will be used just for tag migration, later on; The original ParCommGraph will stay unchanged, because this source mesh
 could be used for other intersection (atm with lnd) ? on component source tasks, we will wait for information; from each
-intx task, will receive cells ids involved in intx \param[in]  join (MPI_Comm)                        communicator that
-overlaps component source PEs and coupler PEs \param[in]  pid_src (iMOAB_AppID)                  moab id for the
-component mesh on component PE \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on
-coupler PEs \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs) \param[in]
-context_id (int*)                      id of the other component in intersection
+intx task, will receive cells ids involved in intx 
+  \param[in]  join (MPI_Comm)                        communicator that overlaps component source PEs and coupler PEs 
+  \param[in]  pid_src (iMOAB_AppID)                  moab id for the component mesh on component PE 
+  \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs 
+  \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs) 
+  \param[in]  src_id (int*)                          external id for the component mesh on component PE 
+  \param[in]  migr_id (int*)                         external id for the migrated mesh on coupler PEs 
+  \param[in]  context_id (int*)                      id of the other component in intersection
   */
 ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-                             int* context_id );
+                             int* src_id, int* migr_id, int* context_id );
 
 /**
   \brief Dump info about communication graph.

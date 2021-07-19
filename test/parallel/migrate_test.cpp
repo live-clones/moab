@@ -140,7 +140,7 @@ ErrorCode migrate( const char* filename, const char* outfile )
     // the par comm graph is unique between components
     compid1        = 4;
     compid2        = 7;
-    int context_id = -1;  // default context
+    int context_id = -1;  // default context; will be now set to compid1 or compid2
 
     int appID1;
     iMOAB_AppID pid1 = &appID1;
@@ -211,6 +211,8 @@ ErrorCode migrate( const char* filename, const char* outfile )
 
         // first, send from compid2 to compid1, from comm2, using common joint comm
         // as always, use nonblocking sends
+        // contex_id should be now compid1
+        context_id = compid1;
         ierr = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
         CHECKRC( ierr, "cannot send tag values" )
     }
@@ -220,7 +222,7 @@ ErrorCode migrate( const char* filename, const char* outfile )
         ierr =
             iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1, strlen( "element_field" ) );
         CHECKRC( ierr, "failed to get tag DFIELD " );
-
+        context_id = compid2;
         ierr = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id, strlen( "element_field" ) );
         CHECKRC( ierr, "cannot send tag values" )
         std::string wopts;

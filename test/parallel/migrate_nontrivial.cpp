@@ -139,7 +139,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         CHECKRC( ierr, "cannot send elements" )
 #ifdef GRAPH_INFO
         int is_sender = 1;
-        int context   = -1;
+        int context   = compid2;
         iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS", strlen( "MigrateS" ) );
 #endif
     }
@@ -155,7 +155,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         CHECKRC( ierr, "cannot write received mesh" )
 #ifdef GRAPH_INFO
         int is_sender = 0;
-        int context   = -1;
+        int context   = compid1;
         iMOAB_DumpCommGraph( pid2, &context, &is_sender, "MigrateR", strlen( "MigrateR" ) );
 #endif
     }
@@ -163,6 +163,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     MPI_Barrier( jcomm );
 
     // we can now free the sender buffers
+    context_id = compid2; // even for default migrate, be more explicit
     if( comm1 != MPI_COMM_NULL ) ierr = iMOAB_FreeSenderBuffers( pid1, &context_id );
 
     if( comm2 != MPI_COMM_NULL )

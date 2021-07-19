@@ -1840,7 +1840,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         new ParCommGraph( *global, senderGroup, *receivingGroup, context.appDatas[*pid].global_id, *rcompid );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    context.appDatas[*pid].pgraph[-1] = cgraph;
+    context.appDatas[*pid].pgraph[*rcompid] = cgraph;
 
     int sender_rank = -1;
     MPI_Comm_rank( sender, &sender_rank );
@@ -1920,7 +1920,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
         new ParCommGraph( *global, *sendingGroup, receiverGroup, *scompid, context.appDatas[*pid].global_id );
     // TODO we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    context.appDatas[*pid].pgraph[-1] = cgraph;
+    context.appDatas[*pid].pgraph[*scompid] = cgraph;
 
     int receiver_rank = -1;
     MPI_Comm_rank( receive, &receiver_rank );
@@ -2588,7 +2588,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 // here)
 //  in the intersection
 ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-                             int* context_id )
+              int* src_id, int* migr_id, int* context_id )
 {
     // first, based on the scompid and migrcomp, find the parCommGraph corresponding to this
     // exchange
@@ -2603,6 +2603,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     // And based on this one, we will build the newly modified one for coverage
     if( *pid_src >= 0 )
     {
+        default_context_id = *migr_id; // the other one
+	assert( context.appDatas[*pid_src].global_id == *src_id );
         sendGraph = context.appDatas[*pid_src].pgraph[default_context_id];  // maybe check if it does not exist
 
         // report the sender and receiver tasks in the joint comm
@@ -2617,6 +2619,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     if( *pid_migr >= 0 )
     {
         // find the original one
+	default_context_id = *src_id;
+        assert( context.appDatas[*pid_migr].global_id == *migr_id );
         recvGraph = context.appDatas[*pid_migr].pgraph[default_context_id];
         // report the sender and receiver tasks in the joint comm, from migrated mesh pt of view
         srcSenders = recvGraph->senders();
