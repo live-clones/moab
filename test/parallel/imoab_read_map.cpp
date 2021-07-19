@@ -231,8 +231,23 @@ int main( int argc, char* argv[] )
     }
 
 
+    if( atmCouComm != MPI_COMM_NULL )
+    {
+        int type = 1;  // quads in source set
+        int direction = 1; // from source to coupler; will create a mesh on cplAtmPID
+        ierr = iMOAB_ComputeDiscreteCommGraph( cmpAtmPID, cplAtmOcnPID, cplAtmPID,  &atmCouComm, &atmPEGroup, &couPEGroup, &type,
+                                       &cmpatm, &atmocnid, &direction );
+    }
     MPI_Barrier( MPI_COMM_WORLD );
 
+    if( ocnCouComm != MPI_COMM_NULL )
+    {
+        int type = 3;  // cells with GLOBAL_ID in ocean / target set
+        int direction = 2; // from coupler to target; will create a mesh on cplOcnPID
+        ierr = iMOAB_ComputeDiscreteCommGraph( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup,  &type,
+                                       &cmpocn, &atmocnid, &direction );
+    }
+    MPI_Barrier( MPI_COMM_WORLD );
 
     int tagIndex[2];
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };

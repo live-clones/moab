@@ -858,6 +858,27 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
                                            int remap_weights_filename_length );
 
 /**
+\brief compute a comm graph between 2 moab apps, based on ID matching, between a component and map that
+was read on coupler; component can be target or source !
+<B>Operations:</B> Collective
+
+ \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the component
+ \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the read map pid
+ \param[in]  pid3 (iMOAB_AppID)                     The unique pointer to the coupler instance of mesh
+ \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
+ \param[in]  group1 (MPI_Group *)                   MPI group for first comp
+ \param[in]  group2 (MPI_Group *)                   MPI group for second comp
+ \param[in]  type1 (int *)                          type of mesh (spectral with GLOBAL_DOFS, etc)
+ \param[in]  comp1 (int*)                           id of the component 1
+ \param[in]  comp2 (int*)                           id of the component 2
+ \param[in]  direction (int*)                       from source to coupler of from coupler to target
+
+*/
+ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
+        MPI_Comm* join, MPI_Group* group1,
+                                MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction );
+
+/**
   \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
 
   <B>Operations:</B> Collective
