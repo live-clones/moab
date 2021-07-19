@@ -854,9 +854,6 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
 ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
                                            const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
                                            const iMOAB_String remap_weights_filename,
-                                           int* owned_dof_ids,
-                                           int* owned_dof_ids_length,
-                                           int* row_major_ownership,
                                            int solution_weights_identifier_length,
                                            int remap_weights_filename_length );
 

@@ -2811,14 +2811,14 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 ErrCode iMOAB_LoadMappingWeightsFromFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename, int* owned_dof_ids, int* owned_dof_ids_length, int* row_major_ownership,
+    const iMOAB_String remap_weights_filename,
     int solution_weights_identifier_length, int remap_weights_filename_length )
 {
     assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
     // assert( row_major_ownership != NULL );
 
     ErrorCode rval;
-    bool row_based_partition = ( row_major_ownership != NULL && *row_major_ownership > 0 ? true : false );
+    bool row_based_partition =   true ;
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intersection];
@@ -2852,23 +2852,9 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
-    // Check that both the DoF ownership array and length are NULL. Here we will assume a trivial partition for the map
-    // If both are non-NULL, then ensure that the length of the array is greater than 0.
-    assert( ( owned_dof_ids == NULL && owned_dof_ids_length == NULL ) ||
-            ( owned_dof_ids != NULL && owned_dof_ids_length != NULL && *owned_dof_ids_length > 0 ) );
 
-    // Invoke the actual call to read in the parallel map
-    if( owned_dof_ids == NULL && owned_dof_ids_length == NULL )
-    {
-        std::vector< int > tmp_owned_ids;
-        rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
-    }
-    else
-    {
-        rval = weightMap->ReadParallelMap( remap_weights_filename,
-                                           std::vector< int >( owned_dof_ids, owned_dof_ids + *owned_dof_ids_length ),
-                                           row_based_partition );CHKERRVAL( rval );
-    }
+    std::vector< int > tmp_owned_ids;
+    rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
 
     return 0;
 }
