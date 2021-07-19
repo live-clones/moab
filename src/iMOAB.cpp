@@ -2533,6 +2533,9 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     // instantiate the par comm graph
     // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
     // int coid2)
+    // here we need to look at direction
+    // this direction is good for atm source -> coupler example
+
     ParCommGraph* cgraph = NULL;
     if( *pid1 >= 0 ) cgraph = new ParCommGraph( *join, *group1, *group2, *comp1, *comp2 );
     ParCommGraph* cgraph_rev = NULL;
@@ -2564,35 +2567,28 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     rval = context.MBI->tag_get_handle( "GLOBAL_ID", tagType2 );CHKERRVAL( rval );
 
     std::vector< int > valuesComp1;
-#if 0
+
     // populate first tuple
     if( *pid1 >= 0 )
     {
         appData& data1     = context.appDatas[*pid1];
         EntityHandle fset1 = data1.file_set;
-        // in case of tempest remap, get the coverage set
-#ifdef MOAB_HAVE_TEMPESTREMAP
-        if( data1.tempestData.remapper != NULL )  // this is the case this is part of intx;;
-        {
-            fset1 = data1.tempestData.remapper->GetMeshSet( Remapper::CoveringMesh );
-            // should still have only quads ?
-        }
-#endif
+
         Range ents_of_interest;
-        if( *type1 == 1 )
+        if( *type == 1 )
         {
             assert( tagType1 );
             rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
             rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
         }
-        else if( *type1 == 2 )
+        else if( *type == 2 )
         {
             rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() );
             rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
         }
-        else if( *type1 == 3 )  // for FV meshes, just get the global id of cell
+        else if( *type == 3 )  // for FV meshes, just get the global id of cell
         {
             rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() );
@@ -2638,47 +2634,35 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     // do the same, for the other component, number2, with type2
     // start copy
     TLcomp2.enableWriteAccess();
-    // populate second tuple
+
+    // populate second tuple with ids  from read map: we need row_gdofmap and col_gdofmap
     std::vector< int > valuesComp2;
-    if( *pid2 >= 0 )
+    if( *pid2 >= 0 ) // we are now on
     {
         appData& data2     = context.appDatas[*pid2];
-        EntityHandle fset2 = data2.file_set;
-        // in case of tempest remap, get the coverage set
-#ifdef MOAB_HAVE_TEMPESTREMAP
-        if( data2.tempestData.remapper != NULL )  // this is the case this is part of intx;;
+        TempestMapAppData& tdata = data2.tempestData;
+        // should be only one map, read from file
+        assert (tdata.weightMaps.size() == 1);
+        // maybe we need to check it is the map we expect
+        moab::TempestOnlineMap* weightMap = tdata.weightMaps.begin()->second;
+        std::vector<int> ids_of_interest;
+        // do a deep copy of the ids of interest: row ids or col ids, target or source direction
+        if (*direction == 1)
         {
-            fset2 = data2.tempestData.remapper->GetMeshSet( Remapper::CoveringMesh );
-            // should still have only quads ?
+            // we are interested in row ids, source
+            // new method from moab::TempestOnlineMap
+            rval = weightMap -> fill_row_ids(ids_of_interest); CHKERRVAL( rval );
         }
-#endif
+        else if (*direction == 2)
+        {
+            // we are interested in col ids
+            rval = weightMap -> fill_col_ids(ids_of_interest); CHKERRVAL( rval );
+        }
+        //
 
-        Range ents_of_interest;
-        if( *type2 == 1 )
-        {
-            assert( tagType1 );
-            rval = context.MBI->get_entities_by_type( fset2, MBQUAD, ents_of_interest );CHKERRVAL( rval );
-            valuesComp2.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
-        }
-        else if( *type2 == 2 )
-        {
-            rval = context.MBI->get_entities_by_type( fset2, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
-            valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
-        }
-        else if( *type2 == 3 )
-        {
-            rval = context.MBI->get_entities_by_dimension( fset2, 2, ents_of_interest );CHKERRVAL( rval );
-            valuesComp2.resize( ents_of_interest.size() );  // stride is 1 here
-            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );  // just global ids
-        }
-        else
-        {
-            CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2
-        }
+
         // now fill the tuple list with info and markers
-        std::set< int > uniq( valuesComp2.begin(), valuesComp2.end() );
+        std::set< int > uniq( ids_of_interest.begin(), ids_of_interest.end() );
         TLcomp2.resize( uniq.size() );
         for( std::set< int >::iterator sit = uniq.begin(); sit != uniq.end(); sit++ )
         {
@@ -2784,6 +2768,7 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     pc.crystal_router()->gs_transfer( 1, TLBackToComp1, 0 );  // communication towards original tasks, with info about
     pc.crystal_router()->gs_transfer( 1, TLBackToComp2, 0 );
 
+#if 0
     if( *pid1 >= 0 )
     {
         // we are on original comp 1 tasks
@@ -2826,6 +2811,7 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
         //
     }
 
+// endif for commenting out, #if 0
 #endif
     return 0;
 }
