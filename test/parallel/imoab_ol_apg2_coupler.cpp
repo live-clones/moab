@@ -44,7 +44,7 @@ using namespace moab;
 
 #define ENABLE_OCNATM_COUPLING
 
-//#define ENABLE_LNDATM_COUPLING
+#define ENABLE_LNDATM_COUPLING
 
 int main( int argc, char* argv[] )
 {
@@ -325,7 +325,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot register LND App " )
     }
     // we can reuse the ocn, or use the regular repartitioner_scheme = 2;
-    repartitioner_scheme = 2;
+    repartitioner_scheme = 5;
     ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
                                            &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
                                            repartitioner_scheme );
