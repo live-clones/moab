@@ -220,6 +220,15 @@ class ParCommGraph
     // will fill up ordered lists for corresponding IDs on the other component
     // will form back and forth information, from ordered list of IDs, to valuesComp
     void settle_comm_by_ids( int comp, TupleList& TLBackToComp, std::vector< int >& valuesComp );
+
+    // after map read, we need to know what entities we need to send to receiver
+    ErrorCode set_split_ranges( int comp, TupleList& TLBackToComp1, std::vector< int >& valuesComp1,
+            int lenTag, Range & ents_of_interest, int type);
+
+    // new methods to migrate mesh after reading map
+    ErrorCode form_tuples_to_migrate_mesh(Interface * mb, TupleList & TLv, TupleList & TLc, int type, int lenTagType1 );
+    ErrorCode form_mesh_from_tuples(Interface * mb, TupleList & TLv, TupleList & TLc, int type, int lenTagType1,  EntityHandle fset );
+
     // new partition calculation
     ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met );
 

@@ -237,6 +237,7 @@ int main( int argc, char* argv[] )
         int direction = 1; // from source to coupler; will create a mesh on cplAtmPID
         ierr = iMOAB_ComputeDiscreteCommGraph( cmpAtmPID, cplAtmOcnPID, cplAtmPID,  &atmCouComm, &atmPEGroup, &couPEGroup, &type,
                                        &cmpatm, &atmocnid, &direction );
+
     }
     MPI_Barrier( MPI_COMM_WORLD );
 

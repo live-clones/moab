@@ -2569,12 +2569,13 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     std::vector< int > valuesComp1;
 
     // populate first tuple
+    Range ents_of_interest; // will be filled with entities on pid1, that need to be distributed,
+                              // rearranged in split_ranges map
     if( *pid1 >= 0 )
     {
         appData& data1     = context.appDatas[*pid1];
         EntityHandle fset1 = data1.file_set;
 
-        Range ents_of_interest;
         if( *type == 1 )
         {
             assert( tagType1 );
@@ -2768,6 +2769,9 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     pc.crystal_router()->gs_transfer( 1, TLBackToComp1, 0 );  // communication towards original tasks, with info about
     pc.crystal_router()->gs_transfer( 1, TLBackToComp2, 0 );
 
+    TupleList TLv; // vertices
+    TupleList TLc; // cells if needed (not type 2)
+
     if( *pid1 >= 0 )
     {
         // we are on original comp 1 tasks
@@ -2779,17 +2783,28 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
         f1 << "TLBack1_" << localRank << ".txt";
         TLBackToComp1.print_to_file( f1.str().c_str() );
 #endif
-        sort_buffer.buffer_reserve( TLBackToComp1.get_n() );
-        TLBackToComp1.sort( 1, &sort_buffer );
-        sort_buffer.reset();
-#ifdef VERBOSE
-        TLBackToComp1.print_to_file( f1.str().c_str() );
-#endif
         // so we are now on pid1, we know now each marker were it has to go
-        // add a new method to ParCommGraph, to set up the involved_IDs_map
-        cgraph->settle_comm_by_ids( *comp1, TLBackToComp1, valuesComp1 );
+        // add a new method to ParCommGraph, to set up the split_ranges and involved_IDs_map
+        rval = cgraph->set_split_ranges( *comp1, TLBackToComp1, valuesComp1, lenTagType1,
+                ents_of_interest, *type);CHKERRVAL( rval );
+        // we can just send vertices and elements, with crystal routers;
+        // on the receiving end, make sure they are not duplicated, by looking at the global id
+        // if *type is 1, also send global_dofs tag in the element tuple
+        rval = cgraph->form_tuples_to_migrate_mesh(context.MBI, TLv, TLc, *type, lenTagType1 ); CHKERRVAL( rval );
+
     }
-    if( *pid2 >= 0 )
+    pc.crystal_router()->gs_transfer( 1, TLv, 0 );  // communication towards coupler tasks, with mesh vertices
+    if (*type != 2)
+        pc.crystal_router()->gs_transfer( 1, TLc, 0 ); // those are cells
+
+
+    if( *pid3 >= 0 ) // will receive the mesh, on coupler pes!
+    {
+        appData& data3     = context.appDatas[*pid3];
+        EntityHandle fset3 = data3.file_set;
+        rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type,  fset3, lenTagType1 ); CHKERRVAL( rval );
+    }
+   /* if( *pid2 >= 0 )
     {
         // we are on original comp 1 tasks
         // before ordering
@@ -2808,9 +2823,18 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
 #endif
         cgraph_rev->settle_comm_by_ids( *comp2, TLBackToComp2, valuesComp2 );
         //
-    }
+    }*/
 
 // still need to do mesh migration, from component to coupler
+    // based on the involved ids, and type of mesh, form split ranges that will be used in mesh migration?
+    // or use tuple list ?
+    // better to use send / receive meshes with parcommgraph directly
+    // still need to reset the type of parcommgraph after this
+    if( *pid1 >= 0 )
+    {
+        // we are on comp tasks, and we have filled the involved_IDs_map local data
+        // they refer now to dofs, but they will need to be reset for global ids in case of
+    }
     // we could use direct sends of the involved entities, like in mesh migrate,
     // or crystal router as in coverage mesh
     return 0;
