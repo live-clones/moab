@@ -2650,14 +2650,14 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
         // do a deep copy of the ids of interest: row ids or col ids, target or source direction
         if (*direction == 1)
         {
-            // we are interested in row ids, source
+            // we are interested in col ids, source
             // new method from moab::TempestOnlineMap
-            rval = weightMap -> fill_row_ids(valuesComp2); CHKERRVAL( rval );
+            rval = weightMap -> fill_col_ids(valuesComp2); CHKERRVAL( rval );
         }
         else if (*direction == 2)
         {
-            // we are interested in col ids
-            rval = weightMap -> fill_col_ids(valuesComp2); CHKERRVAL( rval );
+            // we are interested in row ids, for target ids
+            rval = weightMap -> fill_row_ids(valuesComp2); CHKERRVAL( rval );
         }
         //
 
