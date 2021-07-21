@@ -1212,7 +1212,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
-                row_gdofmap.push_back( vecColValue );
+                row_gdofmap.push_back( vecRowValue );
                 row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
