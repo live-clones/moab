@@ -1325,13 +1325,13 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh(Interface * mb, TupleList & 
         Range & verts = it->second;
         for( Range::iterator vit = verts.begin(); vit != verts.end(); ++vit )
         {
-             EntityHandle v = *vit;
-             int n                = TLv.get_n();             // current size of tuple list
-             TLv.vi_wr[2 * n]     = to_proc;                 // send to processor
+            EntityHandle v = *vit;
+            int n                = TLv.get_n();             // current size of tuple list
+            TLv.vi_wr[2 * n]     = to_proc;                 // send to processor
 
-             rval = mb->tag_get_data(gidtag, &v, 1, &( TLv.vi_wr[2 * n + 1] ) ) ;MB_CHK_ERR( rval );
-             rval = mb -> get_coords(&v, 1, &(TLv.vr_wr[3 * n]));MB_CHK_ERR( rval );
-             TLv.inc_n();  // increment tuple list size
+            rval = mb->tag_get_data(gidtag, &v, 1, &( TLv.vi_wr[2 * n + 1] ) ) ;MB_CHK_ERR( rval );
+            rval = mb -> get_coords(&v, 1, &(TLv.vr_wr[3 * n]));MB_CHK_ERR( rval );
+            TLv.inc_n();  // increment tuple list size
         }
     }
     if ( type == 2)
@@ -1342,6 +1342,7 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh(Interface * mb, TupleList & 
     std::vector<int> gdvals;
 
     TLc.initialize( size_tuple, 0, 0, 0, numc );  // to proc, GLOBAL ID, 3 real coordinates
+    TLc.enableWriteAccess();
     for (auto it=split_ranges.begin(); it!=split_ranges.end(); it++)
     {
         int to_proc = it->first;
@@ -1365,6 +1366,7 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh(Interface * mb, TupleList & 
             // fill nnodes:
             TLc.vi_wr[size_tuple * n + current_index] = nnodes;
             rval = mb->tag_get_data(gidtag, conn, nnodes, &( TLc.vi_wr[size_tuple * n + current_index + 1] ) ) ;MB_CHK_ERR( rval );
+            TLc.inc_n();  // increment tuple list size
         }
     }
     return MB_SUCCESS;
@@ -1431,7 +1433,7 @@ ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, T
             conn.resize(nnodes);
             for (int j=0; j<nnodes; j++)
             {
-                conn[j] = vertexMap[  TLc.vi_rd[size_tuple * i + current_index + j ] ];
+                conn[j] = vertexMap[  TLc.vi_rd[size_tuple * i + current_index + j + 1] ];
             }
             //
             EntityType entType = MBQUAD;

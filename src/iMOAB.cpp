@@ -2559,7 +2559,7 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", tagType1 );CHKERRVAL( rval );
     // find the values on first cell
     int lenTagType1 = 1;
-    if( tagType1 )
+    if( tagType1 && *type == 1 )
     {
         rval = context.MBI->tag_get_length( tagType1, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
     }
@@ -2802,7 +2802,8 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     {
         appData& data3     = context.appDatas[*pid3];
         EntityHandle fset3 = data3.file_set;
-        rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type,  fset3, lenTagType1 ); CHKERRVAL( rval );
+        rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type, lenTagType1, fset3 ); CHKERRVAL( rval );
+	    iMOAB_UpdateMeshInfo( pid3 );
     }
    /* if( *pid2 >= 0 )
     {

@@ -237,6 +237,16 @@ int main( int argc, char* argv[] )
         int direction = 1; // from source to coupler; will create a mesh on cplAtmPID
         ierr = iMOAB_ComputeDiscreteCommGraph( cmpAtmPID, cplAtmOcnPID, cplAtmPID,  &atmCouComm, &atmPEGroup, &couPEGroup, &type,
                                        &cmpatm, &atmocnid, &direction );
+        // rank in
+        int rank_cpl_atm;
+        MPI_Comm_rank( atmCouComm, &rank_cpl_atm );
+        std::stringstream out_file_cov;
+        out_file_cov << "atmcov_" << rank_cpl_atm << ".h5m";
+        char * filen = (char*)out_file_cov.str().c_str();
+        char opts[] = "";
+        ierr = iMOAB_WriteMesh( cplAtmPID, filen, opts, strlen( filen ),
+                                            strlen( opts ) );
+        
 
     }
     MPI_Barrier( MPI_COMM_WORLD );
@@ -247,6 +257,17 @@ int main( int argc, char* argv[] )
         int direction = 2; // from coupler to target; will create a mesh on cplOcnPID
         ierr = iMOAB_ComputeDiscreteCommGraph( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup,  &type,
                                        &cmpocn, &atmocnid, &direction );
+        int rank_cpl_ocn;
+        MPI_Comm_rank( ocnCouComm, &rank_cpl_ocn );
+        std::stringstream out_file_cov;
+        out_file_cov << "ocncov_" << rank_cpl_ocn << ".h5m";
+        char * filen = (char*)out_file_cov.str().c_str();
+        char opts[] = "";
+        ierr = iMOAB_WriteMesh( cplOcnPID, filen, opts, strlen( filen ),
+                                                    strlen( opts ) );
+        char outputFileRec[] = "CoupOcn.h5m";
+        ierr = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
+                                    strlen( fileWriteOptions ) );
     }
     MPI_Barrier( MPI_COMM_WORLD );
 
