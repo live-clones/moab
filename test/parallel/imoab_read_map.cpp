@@ -235,8 +235,9 @@ int main( int argc, char* argv[] )
     {
         int type = 1;  // quads in source set
         int direction = 1; // from source to coupler; will create a mesh on cplAtmPID
+        // because it is like "coverage", context will be cplocn
         ierr = iMOAB_ComputeDiscreteCommGraph( cmpAtmPID, cplAtmOcnPID, cplAtmPID,  &atmCouComm, &atmPEGroup, &couPEGroup, &type,
-                                       &cmpatm, &atmocnid, &direction );
+                                       &cmpatm, &cplocn, &direction );
         // rank in
         int rank_cpl_atm;
         MPI_Comm_rank( atmCouComm, &rank_cpl_atm );
@@ -255,8 +256,9 @@ int main( int argc, char* argv[] )
     {
         int type = 3;  // cells with GLOBAL_ID in ocean / target set
         int direction = 2; // from coupler to target; will create a mesh on cplOcnPID
+        // it will be like initial migrate cmpocn <-> cplocn
         ierr = iMOAB_ComputeDiscreteCommGraph( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup,  &type,
-                                       &cmpocn, &atmocnid, &direction );
+                                       &cmpocn, &cplocn, &direction );
         int rank_cpl_ocn;
         MPI_Comm_rank( ocnCouComm, &rank_cpl_ocn );
         std::stringstream out_file_cov;
@@ -381,12 +383,12 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn,
+            ierr = iMOAB_ReceiveElementTag( cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cmpatm,
                                             strlen( "a2oTbot;a2oUbot;a2oVbot;" ) );
             CHECKIERR( ierr, "cannot receive tag values" )
 #ifdef GRAPH_INFO
             int is_sender = 0;
-            int context   = cplocn;  // the same context, cplocn
+            int context   = atmocnid;  // the same context
             iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR", strlen( "AtmMigOcnR" ) );
 #endif
         }
