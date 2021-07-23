@@ -268,6 +268,32 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot register ATM App" )
     }
 
+#ifdef ENABLE_LNDATM_COUPLING
+    // land
+    if( lndComm != MPI_COMM_NULL )
+    {
+        MPI_Comm_rank( lndComm, &rankInLndComm );
+        ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
+        CHECKIERR( ierr, "Cannot register LND App " )
+    }
+    // we can reuse the ocn, or use the regular repartitioner_scheme = 2;
+    repartitioner_scheme = 2;
+    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
+                                           &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
+                                           repartitioner_scheme );
+
+    if( couComm != MPI_COMM_NULL )
+    {  // write only for n==1 case
+        char outputFileLnd[] = "recvLnd.h5m";
+        ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
+    }
+
+#endif  // #ifdef ENABLE_ATMLND_COUPLING
+
+    MPI_Barrier( MPI_COMM_WORLD );
+
 #ifdef ENABLE_OCNATM_COUPLING
     if( ocnComm != MPI_COMM_NULL )
     {
@@ -315,30 +341,6 @@ int main( int argc, char* argv[] )
 #endif  // #ifdef ENABLE_ATMOCN_COUPLING
 
     MPI_Barrier( MPI_COMM_WORLD );
-
-#ifdef ENABLE_LNDATM_COUPLING
-    // land
-    if( lndComm != MPI_COMM_NULL )
-    {
-        MPI_Comm_rank( lndComm, &rankInLndComm );
-        ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
-        CHECKIERR( ierr, "Cannot register LND App " )
-    }
-    // we can reuse the ocn, or use the regular repartitioner_scheme = 2;
-    repartitioner_scheme = 5;
-    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
-                                           &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
-                                           repartitioner_scheme );
-
-    if( couComm != MPI_COMM_NULL )
-    {  // write only for n==1 case
-        char outputFileLnd[] = "recvLnd.h5m";
-        ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
-                                strlen( fileWriteOptions ) );
-        CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
-    }
-
-#endif  // #ifdef ENABLE_ATMLND_COUPLING
 
 #ifdef ENABLE_OCNATM_COUPLING
     if( couComm != MPI_COMM_NULL )
@@ -705,7 +707,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
             // do not write if iters > 0)
-            if( 0 == iters )
+            if( 0 > iters )
             {
                 char outputFileTgt[] = "fAtmOnCpl3.h5m";
                 ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
@@ -742,7 +744,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
-        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 > iters ) )
         {
             char outputFileAtm[] = "AtmWithProj2.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
@@ -793,7 +795,7 @@ int main( int argc, char* argv[] )
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
-            if( 0 == iters )
+            if( 0 >  iters )
             {
                 char outputFileTgt[] = "fAtmOnCpl4.h5m";
                 ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
@@ -827,7 +829,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
-        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 > iters ) )
         {
             char outputFileAtm[] = "AtmWithProj3.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
