@@ -2522,7 +2522,7 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
 \brief compute a comm graph between 2 moab apps, based on ID matching; now used for read map
 <B>Operations:</B> Collective
 */
-ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
+ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
         MPI_Comm* join, MPI_Group* group1,
                                 MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction )
 {
@@ -2534,7 +2534,7 @@ ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOA
     // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
     // int coid2)
     // here we need to look at direction
-    // this direction is good for atm source -> coupler example
+    // this direction is good for atm source -> ocn target coupler example
 
     ParCommGraph* cgraph = NULL;
     if( *pid1 >= 0 ) cgraph = new ParCommGraph( *join, *group1, *group2, *comp1, *comp2 );
