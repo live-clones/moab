@@ -220,10 +220,11 @@ int main( int argc, char* argv[] )
 
     int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1;
 
+    const std::string intx_from_file_identifier = "map-from-file";
 
     if( couComm != MPI_COMM_NULL )
     {
-        const std::string intx_from_file_identifier = "map-from-file";
+
         ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(),
                 mapFilename.c_str(),
                 intx_from_file_identifier.size(), mapFilename.size() );
@@ -241,12 +242,15 @@ int main( int argc, char* argv[] )
         // rank in
         int rank_cpl_atm;
         MPI_Comm_rank( atmCouComm, &rank_cpl_atm );
-        std::stringstream out_file_cov;
-        out_file_cov << "atmcov_" << rank_cpl_atm << ".h5m";
-        char * filen = (char*)out_file_cov.str().c_str();
-        char opts[] = "";
-        ierr = iMOAB_WriteMesh( cplAtmPID, filen, opts, strlen( filen ),
-                                            strlen( opts ) );
+        if (*cplAtmPID >= 0)
+        {
+            std::stringstream out_file_cov;
+            out_file_cov << "atmcov_" << rank_cpl_atm << ".h5m";
+            char * filen = (char*)out_file_cov.str().c_str();
+            char opts[] = "";
+            ierr = iMOAB_WriteMesh( cplAtmPID, filen, opts, strlen( filen ),
+                                                strlen( opts ) );
+        }
         
 
     }
@@ -261,15 +265,18 @@ int main( int argc, char* argv[] )
                                        &cmpocn, &cplocn, &direction );
         int rank_cpl_ocn;
         MPI_Comm_rank( ocnCouComm, &rank_cpl_ocn );
-        std::stringstream out_file_cov;
-        out_file_cov << "ocncov_" << rank_cpl_ocn << ".h5m";
-        char * filen = (char*)out_file_cov.str().c_str();
-        char opts[] = "";
-        ierr = iMOAB_WriteMesh( cplOcnPID, filen, opts, strlen( filen ),
-                                                    strlen( opts ) );
-        char outputFileRec[] = "CoupOcn.h5m";
-        ierr = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
-                                    strlen( fileWriteOptions ) );
+        if (*cplOcnPID >= 0)
+        {
+            std::stringstream out_file_cov;
+            out_file_cov << "ocncov_" << rank_cpl_ocn << ".h5m";
+            char * filen = (char*)out_file_cov.str().c_str();
+            char opts[] = "";
+            ierr = iMOAB_WriteMesh( cplOcnPID, filen, opts, strlen( filen ),
+                                                        strlen( opts ) );
+            char outputFileRec[] = "CoupOcn.h5m";
+            ierr = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
+                                        strlen( fileWriteOptions ) );
+        }
     }
     MPI_Barrier( MPI_COMM_WORLD );
 
@@ -400,6 +407,18 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplocn );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
+        if (*cplAtmPID >= 0 && n == 1)
+        {
+            int rank_cpl_atm;
+            MPI_Comm_rank( atmCouComm, &rank_cpl_atm ); // this is joint comm, it has to exist here anyway
+            std::stringstream out_file_cov;
+            out_file_cov << "atmcov_aft_recv_" << rank_cpl_atm << ".h5m";
+            char * filen = (char*)out_file_cov.str().c_str();
+            char opts[] = "";
+            ierr = iMOAB_WriteMesh( cplAtmPID, filen, opts, strlen( filen ),
+                                                strlen( opts ) );
+        }
+
 #ifdef VERBOSE
         if( couComm != MPI_COMM_NULL && 1 == n )
         {
@@ -416,8 +435,8 @@ int main( int argc, char* argv[] )
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( "Apply Scalar projection weights" )
-            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0].c_str(), concat_fieldname,
-                                                       concat_fieldnameT, weights_identifiers[0].size(),
+            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(), concat_fieldname,
+                                                       concat_fieldnameT, intx_from_file_identifier.size(),
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
