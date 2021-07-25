@@ -2638,7 +2638,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 
     // populate second tuple with ids  from read map: we need row_gdofmap and col_gdofmap
     std::vector< int > valuesComp2;
-    if( *pid2 >= 0 ) // we are now on
+    if( *pid2 >= 0 ) // we are now on coupler, map side
     {
         appData& data2     = context.appDatas[*pid2];
         TempestMapAppData& tdata = data2.tempestData;
@@ -2679,6 +2679,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     pc.crystal_router()->gs_transfer( 1, TLcomp2,
                                       0 );  // communication towards joint tasks, with markers
     // sort by value (key 1)
+    // in the rendez-vous approach, markers meet at meet point (rendez-vous) processor marker % nprocs
 #ifdef VERBOSE
     std::stringstream ff2;
     ff2 << "TLcomp2_" << localRank << ".txt";
@@ -2692,7 +2693,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     TLcomp2.print_to_file( ff2.str().c_str() );
 #endif
     // need to send back the info, from the rendezvous point, for each of the values
-    /* so go over each value, on local process in joint communicator
+    /* so go over each value, on local process in joint communicator,
 
     now have to send back the info needed for communication;
      loop in in sync over both TLComp1 and TLComp2, in local process;
@@ -2802,8 +2803,30 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     {
         appData& data3     = context.appDatas[*pid3];
         EntityHandle fset3 = data3.file_set;
-        rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type, lenTagType1, fset3 ); CHKERRVAL( rval );
+        Range primary_ents3; // vertices for type 2, cells of dim 2 for type 1 or 3
+        rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type, lenTagType1, fset3,
+                primary_ents3); CHKERRVAL( rval );
 	    iMOAB_UpdateMeshInfo( pid3 );
+	    // because we are on the coupler, we know that the read map pid2 exists
+	    assert(*pid2 >= 0);
+	    appData& dataIntx      = context.appDatas[*pid2];
+	    TempestMapAppData& tdata = dataIntx.tempestData;
+
+	    // if we are on source coverage, direction 1, we can set covering mesh, covering cells
+	    if (1 == *direction)
+	    {
+	        tdata.pid_src = pid3;
+	        tdata.remapper->SetMeshSet( Remapper::CoveringMesh, fset3, primary_ents3 );
+	        // we need to also set the dofs now ?
+	        // recvGraph1->set_cover_set( fset3 );
+	    }
+	    // if we are on target, we can set the target cells
+	    else
+	    {
+	        tdata.pid_dest = pid3;
+	        tdata.remapper->SetMeshSet( Remapper::TargetMesh, fset3, primary_ents3 );
+	    }
+
     }
    /* if( *pid2 >= 0 )
     {
@@ -2831,11 +2854,11 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     // or use tuple list ?
     // better to use send / receive meshes with parcommgraph directly
     // still need to reset the type of parcommgraph after this
-    if( *pid1 >= 0 )
+   /* if( *pid1 >= 0 )
     {
         // we are on comp tasks, and we have filled the involved_IDs_map local data
         // they refer now to dofs, but they will need to be reset for global ids in case of
-    }
+    }*/
     // we could use direct sends of the involved entities, like in mesh migrate,
     // or crystal router as in coverage mesh
     return 0;
@@ -3175,7 +3198,7 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     assert( weightMap != NULL );
 
 
-    std::vector< int > tmp_owned_ids;
+    std::vector< int > tmp_owned_ids; // this will do a trivial row distribution
     rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
 
     return 0;

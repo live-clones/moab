@@ -1372,7 +1372,7 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh(Interface * mb, TupleList & 
     return MB_SUCCESS;
 }
 ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, TupleList & TLc, int type,
-        int lenTagType1, EntityHandle fset )
+        int lenTagType1, EntityHandle fset, Range & primary_ents )
 {
     // might need to fill also the split_range things
     // we will always need GlobalID tag
@@ -1411,7 +1411,10 @@ ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, T
     }
     rval = mb->add_entities(fset, verts);  MB_CHK_ERR( rval );
     if ( 2 == type )
+    {
+        primary_ents = verts;
         return MB_SUCCESS;
+    }
 
     n = TLc.get_n();
     int size_tuple = 2 + ( (type != 1) ? 0 : lenTagType1 ) + 1 + 10 ; // 10 is the max number of vertices in cell
@@ -1452,6 +1455,7 @@ ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, T
         split_ranges[from_proc].insert( cellMap[globalIdEl] );
     }
     rval = mb->add_entities(fset, cells);  MB_CHK_ERR( rval );
+    primary_ents = cells;
     return MB_SUCCESS;
 }
 
