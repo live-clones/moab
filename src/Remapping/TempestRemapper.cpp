@@ -802,7 +802,31 @@ moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string
 
     return moab::MB_SUCCESS;
 }
+void TempestRemapper::SetMeshSet(Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/, moab::EntityHandle mset ,
+            moab::Range & entities )
+{
 
+    if( ctx == Remapper::SourceMesh ) // should not be used
+    {
+        m_source_entities = entities;
+        m_source_set = mset;
+    }
+    else if( ctx == Remapper::TargetMesh )
+    {
+        m_target_entities = entities;
+        m_target_set = mset;
+    }
+    else if( ctx ==  Remapper::CoveringMesh )
+    {
+        m_covering_source_entities = entities;
+        m_covering_source_set = mset;
+    }
+    else
+    {
+        // some error
+    }
+    return;
+}
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef MOAB_HAVE_MPI
