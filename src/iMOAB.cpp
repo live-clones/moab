@@ -2824,7 +2824,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 	        tdata.pid_src = pid3;
 	        tdata.remapper->SetMeshSet( Remapper::CoveringMesh, fset3, primary_ents3 );
 	        weightMap->SetSourceNDofsPerElement( ndofPerEl );
-	        weightMap->set_col_dc_dofs ( *type, lenTagType1, values_entities ); // will set col_dtoc_dofmap
+	        weightMap->set_col_dc_dofs ( values_entities ); // will set col_dtoc_dofmap
 
 	        // we need to also set the dofs now ?
 	        // recvGraph1->set_cover_set( fset3 );
@@ -2835,7 +2835,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 	        tdata.pid_dest = pid3;
 	        tdata.remapper->SetMeshSet( Remapper::TargetMesh, fset3, primary_ents3 );
 	        weightMap->SetDestinationNDofsPerElement( ndofPerEl );
-	        weightMap->set_row_dc_dofs ( *type, lenTagType1, values_entities );  // will set row_dtoc_dofmap
+	        weightMap->set_row_dc_dofs ( values_entities );  // will set row_dtoc_dofmap
 	    }
 
     }

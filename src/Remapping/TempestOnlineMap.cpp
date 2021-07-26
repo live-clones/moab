@@ -689,7 +689,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode  moab::TempestOnlineMap::set_col_dc_dofs( int type, int lenTagType1, std::vector<int> & values_entities )
+moab::ErrorCode  moab::TempestOnlineMap::set_col_dc_dofs( std::vector<int> & values_entities )
 {
     // col_gdofmap has global dofs , that should be in the list of values, such that
     // row_dtoc_dofmap[offsetDOF] = localDOF;
@@ -703,7 +703,7 @@ moab::ErrorCode  moab::TempestOnlineMap::set_col_dc_dofs( int type, int lenTagTy
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode  moab::TempestOnlineMap::set_row_dc_dofs( int type, int lenTagType1, std::vector<int> & values_entities )
+moab::ErrorCode  moab::TempestOnlineMap::set_row_dc_dofs( std::vector<int> & values_entities )
 {
     // row_dtoc_dofmap = values_entities; // needs to point to local
     //  we need to find row_dtoc_dofmap such that: row_gdofmap[ row_dtoc_dofmap[i] ] == values_entities [i];

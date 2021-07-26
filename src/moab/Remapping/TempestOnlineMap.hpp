@@ -364,9 +364,9 @@ class TempestOnlineMap : public OfflineMap
         return moab::MB_SUCCESS;
     }
 
-    moab::ErrorCode  set_col_dc_dofs( int type, int lenTagType1, std::vector<int> & values_entities );
+    moab::ErrorCode  set_col_dc_dofs( std::vector<int> & values_entities );
 
-    moab::ErrorCode  set_row_dc_dofs( int type, int lenTagType1, std::vector<int> & values_entities );
+    moab::ErrorCode  set_row_dc_dofs( std::vector<int> & values_entities );
 
   private:
     void setup_sizes_dimensions();
