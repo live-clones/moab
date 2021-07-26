@@ -228,7 +228,7 @@ class ParCommGraph
     // new methods to migrate mesh after reading map
     ErrorCode form_tuples_to_migrate_mesh(Interface * mb, TupleList & TLv, TupleList & TLc, int type, int lenTagType1 );
     ErrorCode form_mesh_from_tuples(Interface * mb, TupleList & TLv, TupleList & TLc, int type, int lenTagType1,
-            EntityHandle fset, Range & primary_ents );
+            EntityHandle fset, Range & primary_ents, std::vector<int> & values_entities);
 
     // new partition calculation
     ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met );

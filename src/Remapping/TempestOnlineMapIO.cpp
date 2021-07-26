@@ -1147,9 +1147,9 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     // Now let us set the necessary global-to-local ID maps so that A*x operations
     // can be performed cleanly as if map was computed online
     row_dtoc_dofmap.clear();
-    row_dtoc_dofmap.reserve( nB / size );
+    //row_dtoc_dofmap.reserve( nB / size );
     col_dtoc_dofmap.clear();
-    col_dtoc_dofmap.reserve( 2 * nA / size );
+    //col_dtoc_dofmap.reserve( 2 * nA / size );
     // row_dtoc_dofmap.resize( m_nTotDofs_Dest, UINT_MAX );
     // col_dtoc_dofmap.resize( m_nTotDofs_SrcCov, UINT_MAX );
 
@@ -1213,7 +1213,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
                 row_gdofmap.push_back( vecRowValue );
-                row_dtoc_dofmap.push_back( vecRowValue );
+                //row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
             else
@@ -1225,7 +1225,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
                 col_gdofmap.push_back( vecColValue );
-                col_dtoc_dofmap.push_back( vecColValue );
+                //col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }
             else
@@ -1251,7 +1251,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
-                row_dtoc_dofmap.push_back( vecRowValue );
+                //row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
             else
@@ -1262,7 +1262,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
-                col_dtoc_dofmap.push_back( vecColValue );
+                //col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }
             else

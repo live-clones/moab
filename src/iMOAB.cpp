@@ -2636,6 +2636,8 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     // start copy
     TLcomp2.enableWriteAccess();
 
+    moab::TempestOnlineMap* weightMap = NULL; // declare it outside, but it will make sense only for *pid >= 0
+    // we know that :) (or *pid2 >= 0, it means we are on the coupler PEs, read map exists, and coupler procs exist)
     // populate second tuple with ids  from read map: we need row_gdofmap and col_gdofmap
     std::vector< int > valuesComp2;
     if( *pid2 >= 0 ) // we are now on coupler, map side
@@ -2645,7 +2647,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
         // should be only one map, read from file
         assert (tdata.weightMaps.size() == 1);
         // maybe we need to check it is the map we expect
-        moab::TempestOnlineMap* weightMap = tdata.weightMaps.begin()->second;
+        weightMap = tdata.weightMaps.begin()->second;
         //std::vector<int> ids_of_interest;
         // do a deep copy of the ids of interest: row ids or col ids, target or source direction
         if (*direction == 1)
@@ -2804,9 +2806,13 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
         appData& data3     = context.appDatas[*pid3];
         EntityHandle fset3 = data3.file_set;
         Range primary_ents3; // vertices for type 2, cells of dim 2 for type 1 or 3
+        std::vector<int> values_entities; // will be the size of primary_ents3 * lenTagType1
         rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type, lenTagType1, fset3,
-                primary_ents3); CHKERRVAL( rval );
+                primary_ents3, values_entities); CHKERRVAL( rval );
 	    iMOAB_UpdateMeshInfo( pid3 );
+	    int ndofPerEl = 1;
+        if (1 == *type)
+            ndofPerEl = (int) (sqrt (lenTagType1));
 	    // because we are on the coupler, we know that the read map pid2 exists
 	    assert(*pid2 >= 0);
 	    appData& dataIntx      = context.appDatas[*pid2];
@@ -2817,6 +2823,9 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 	    {
 	        tdata.pid_src = pid3;
 	        tdata.remapper->SetMeshSet( Remapper::CoveringMesh, fset3, primary_ents3 );
+	        weightMap->SetSourceNDofsPerElement( ndofPerEl );
+	        weightMap->set_col_dc_dofs ( *type, lenTagType1, values_entities ); // will set col_dtoc_dofmap
+
 	        // we need to also set the dofs now ?
 	        // recvGraph1->set_cover_set( fset3 );
 	    }
@@ -2825,6 +2834,8 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 	    {
 	        tdata.pid_dest = pid3;
 	        tdata.remapper->SetMeshSet( Remapper::TargetMesh, fset3, primary_ents3 );
+	        weightMap->SetDestinationNDofsPerElement( ndofPerEl );
+	        weightMap->set_row_dc_dofs ( *type, lenTagType1, values_entities );  // will set row_dtoc_dofmap
 	    }
 
     }

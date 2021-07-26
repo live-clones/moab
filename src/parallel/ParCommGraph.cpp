@@ -1372,7 +1372,7 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh(Interface * mb, TupleList & 
     return MB_SUCCESS;
 }
 ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, TupleList & TLc, int type,
-        int lenTagType1, EntityHandle fset, Range & primary_ents )
+        int lenTagType1, EntityHandle fset, Range & primary_ents, std::vector<int> & values_entities )
 {
     // might need to fill also the split_range things
     // we will always need GlobalID tag
@@ -1408,11 +1408,14 @@ ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, T
         {
             split_ranges[TLv.vi_rd[2*i]].insert( vertexMap[gid] );
         }
+        // todo : when to add the values_entities ?
     }
     rval = mb->add_entities(fset, verts);  MB_CHK_ERR( rval );
     if ( 2 == type )
     {
         primary_ents = verts;
+        values_entities.resize(verts.size()); // just get the ids of vertices
+        rval = mb->tag_get_data(gidtag, verts, &values_entities[0]);  MB_CHK_ERR( rval );
         return MB_SUCCESS;
     }
 
@@ -1456,6 +1459,16 @@ ErrorCode ParCommGraph::form_mesh_from_tuples(Interface * mb, TupleList & TLv, T
     }
     rval = mb->add_entities(fset, cells);  MB_CHK_ERR( rval );
     primary_ents = cells;
+    if (1 == type)
+    {
+        values_entities.resize(lenTagType1*primary_ents.size());
+        rval = mb->tag_get_data(gds, primary_ents, &values_entities[0]);  MB_CHK_ERR( rval );
+    }
+    else // type == 3
+    {
+        values_entities.resize(primary_ents.size()); // just get the ids !
+        rval = mb->tag_get_data(gidtag, primary_ents, &values_entities[0]);  MB_CHK_ERR( rval );
+    }
     return MB_SUCCESS;
 }
 

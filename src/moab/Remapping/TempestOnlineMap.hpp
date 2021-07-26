@@ -279,6 +279,16 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     int GetDestinationNDofsPerElement();
 
+    /// <summary>
+    ///     Set the number of Degrees-Of-Freedom per element on the source mesh.
+    /// </summary>
+    void  SetSourceNDofsPerElement(int ns);
+
+    /// <summary>
+    ///     Get the number of Degrees-Of-Freedom per element on the destination mesh.
+    /// </summary>
+    void  SetDestinationNDofsPerElement(int nt);
+
     ///	<summary>
     ///		Get the global Degrees-Of-Freedom ID on the destination mesh.
     ///	</summary>
@@ -353,6 +363,11 @@ class TempestOnlineMap : public OfflineMap
             ids_of_interest.push_back(*it+1);
         return moab::MB_SUCCESS;
     }
+
+    moab::ErrorCode  set_col_dc_dofs( int type, int lenTagType1, std::vector<int> & values_entities );
+
+    moab::ErrorCode  set_row_dc_dofs( int type, int lenTagType1, std::vector<int> & values_entities );
+
   private:
     void setup_sizes_dimensions();
 
@@ -438,6 +453,31 @@ inline int moab::TempestOnlineMap::GetIndexOfColGlobalDoF( int globalColDoF ) co
 {
     return globalColDoF + 1;  // temporary
 }
+///////////////////////////////////////////////////////////////////////////////
+
+inline int moab::TempestOnlineMap::GetSourceNDofsPerElement()
+{
+    return m_nDofsPEl_Src;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
+{
+    return m_nDofsPEl_Dest;
+}
+
+// setters for m_nDofsPEl_Src, m_nDofsPEl_Dest
+inline void moab::TempestOnlineMap::SetSourceNDofsPerElement(int ns)
+{
+    m_nDofsPEl_Src = ns;
+}
+
+
+inline void moab::TempestOnlineMap::SetDestinationNDofsPerElement(int nt)
+{
+    m_nDofsPEl_Dest = nt;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef MOAB_HAVE_EIGEN3
@@ -466,20 +506,6 @@ inline int moab::TempestOnlineMap::GetSourceLocalNDofs()
 inline int moab::TempestOnlineMap::GetDestinationLocalNDofs()
 {
     return m_weightMatrix.rows();  // return the local number of columns from the weight matrix
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-inline int moab::TempestOnlineMap::GetSourceNDofsPerElement()
-{
-    return m_nDofsPEl_Src;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
-{
-    return m_nDofsPEl_Dest;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
