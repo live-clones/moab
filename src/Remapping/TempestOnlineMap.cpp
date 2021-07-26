@@ -699,7 +699,15 @@ moab::ErrorCode  moab::TempestOnlineMap::set_col_dc_dofs( std::vector<int> & val
 
     col_dtoc_dofmap.resize(values_entities.size()) ;
     for (int j = 0; j < (int) values_entities.size() ; j++)
-        col_dtoc_dofmap[j] = colMap [ values_entities[j] -  1];
+    {
+        if (colMap.find( values_entities[j] -  1) != colMap.end())
+            col_dtoc_dofmap[j] = colMap [ values_entities[j] -  1];
+        else
+        {
+            col_dtoc_dofmap[j] = -1; // signal that this value should not be used in
+            std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not found in colMap \n";
+        }
+    }
     return moab::MB_SUCCESS;
 }
 
@@ -710,8 +718,15 @@ moab::ErrorCode  moab::TempestOnlineMap::set_row_dc_dofs( std::vector<int> & val
 
     row_dtoc_dofmap.resize(values_entities.size()) ;
     for (int j = 0; j < (int) values_entities.size() ; j++)
-        row_dtoc_dofmap[j] = rowMap [ values_entities[j] - 1]; // values are 1 based, but rowMap, colMap are not
-
+    {
+        if (rowMap.find( values_entities[j] -  1) != rowMap.end())
+            row_dtoc_dofmap[j] = rowMap [ values_entities[j] - 1]; // values are 1 based, but rowMap, colMap are not
+        else
+        {
+            row_dtoc_dofmap[j] = -1; // not all values are used
+            std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not found in rowMap \n";
+        }
+    }
     return moab::MB_SUCCESS;
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -410,7 +410,8 @@ class TempestOnlineMap : public OfflineMap
     moab::Tag m_dofTagSrc, m_dofTagDest;
     std::vector< unsigned > row_gdofmap, col_gdofmap, srccol_gdofmap;
 
-    std::vector< unsigned > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
+    // make it int, because it can be -1 in new logic
+    std::vector< int > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
 
     std::map< int, int > rowMap, colMap;
 

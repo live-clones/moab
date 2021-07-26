@@ -366,7 +366,8 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         // Permute the source data first
         for( unsigned i = 0; i < srcVals.size(); ++i )
         {
-            m_rowVector( row_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
+            if (row_dtoc_dofmap[i] >= 0)
+                m_rowVector( row_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
         }
 
         m_colVector = m_weightMatrix.adjoint() * m_rowVector;
@@ -374,7 +375,8 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         // Permute the resulting target data back
         for( unsigned i = 0; i < tgtVals.size(); ++i )
         {
-            tgtVals[i] = m_colVector( col_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
+            if (col_dtoc_dofmap[i] >= 0)
+                tgtVals[i] = m_colVector( col_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
         }
     }
     else
@@ -386,7 +388,8 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 #endif
         for( unsigned i = 0; i < srcVals.size(); ++i )
         {
-            m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
+            if (col_dtoc_dofmap[i] >= 0)
+                m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
 #ifdef VERBOSE
             output_file << "Col: " << i << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i] << ", "
                         << m_colVector( i ) << "\n";
@@ -402,7 +405,8 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 #endif
         for( unsigned i = 0; i < tgtVals.size(); ++i )
         {
-            tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
+            if (row_dtoc_dofmap[i] >= 0)
+                tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
 #ifdef VERBOSE
             output_file << "Row: " << i << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector( i ) << "\n";
 #endif
