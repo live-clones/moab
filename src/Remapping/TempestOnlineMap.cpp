@@ -694,7 +694,14 @@ moab::ErrorCode  moab::TempestOnlineMap::set_col_dc_dofs( int type, int lenTagTy
     // col_gdofmap has global dofs , that should be in the list of values, such that
     // row_dtoc_dofmap[offsetDOF] = localDOF;
     // //  we need to find col_dtoc_dofmap such that: col_gdofmap[ col_dtoc_dofmap[i] ] == values_entities [i];
+    // we know that col_gdofmap[0..(nbcols-1)] = global_col_dofs -> in values_entities
+    // form first inverse
+    std::map<int, int> global_col_to_local_index;
+    for (int i=0; i < (int)col_gdofmap.size(); i++)
+        global_col_to_local_index[ col_gdofmap[i] + 1 ] = i;
     col_dtoc_dofmap.resize(values_entities.size()) ;
+    for (int j = 0; j < (int) values_entities.size() ; j++)
+        col_dtoc_dofmap[j] = global_col_to_local_index [ values_entities[j] ];
     return moab::MB_SUCCESS;
 }
 
@@ -702,7 +709,13 @@ moab::ErrorCode  moab::TempestOnlineMap::set_row_dc_dofs( int type, int lenTagTy
 {
     // row_dtoc_dofmap = values_entities; // needs to point to local
     //  we need to find row_dtoc_dofmap such that: row_gdofmap[ row_dtoc_dofmap[i] ] == values_entities [i];
+    std::map<int, int> global_row_to_local_index;
+    for (int i=0; i < (int)row_gdofmap.size(); i++)
+        global_row_to_local_index[ row_gdofmap[i] + 1 ] = i;
     row_dtoc_dofmap.resize(values_entities.size()) ;
+    for (int j = 0; j < (int) values_entities.size() ; j++)
+        row_dtoc_dofmap[j] = global_row_to_local_index [ values_entities[j] ];
+
     return moab::MB_SUCCESS;
 }
 ///////////////////////////////////////////////////////////////////////////////
