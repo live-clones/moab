@@ -1149,6 +1149,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     row_dtoc_dofmap.clear();
     //row_dtoc_dofmap.reserve( nB / size );
     col_dtoc_dofmap.clear();
+    rowMap.clear();
+    colMap.clear();
     //col_dtoc_dofmap.reserve( 2 * nA / size );
     // row_dtoc_dofmap.resize( m_nTotDofs_Dest, UINT_MAX );
     // col_dtoc_dofmap.resize( m_nTotDofs_SrcCov, UINT_MAX );
@@ -1197,7 +1199,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         // now do the heavy communication
         ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
 
-        std::map< int, int > rowMap, colMap;
         int rindexMax = 0, cindexMax = 0;
         // populate the sparsematrix, using rowMap and colMap
         int n = tl.get_n();
@@ -1237,7 +1238,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     else
 #endif
     {
-        std::map< int, int > rowMap, colMap;
         int rindexMax = 0, cindexMax = 0;
 
         for( int i = 0; i < nS; i++ )

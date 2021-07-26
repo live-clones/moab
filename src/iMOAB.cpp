@@ -2809,8 +2809,8 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
         std::vector<int> values_entities; // will be the size of primary_ents3 * lenTagType1
         rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type, lenTagType1, fset3,
                 primary_ents3, values_entities); CHKERRVAL( rval );
-	    iMOAB_UpdateMeshInfo( pid3 );
-	    int ndofPerEl = 1;
+        iMOAB_UpdateMeshInfo( pid3 );
+        int ndofPerEl = 1;
         if (1 == *type)
             ndofPerEl = (int) (sqrt (lenTagType1));
 	    // because we are on the coupler, we know that the read map pid2 exists

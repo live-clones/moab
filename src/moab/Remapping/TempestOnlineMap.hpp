@@ -412,6 +412,8 @@ class TempestOnlineMap : public OfflineMap
 
     std::vector< unsigned > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
 
+    std::map< int, int > rowMap, colMap;
+
     DataArray3D< int > dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
     DiscretizationType m_srcDiscType, m_destDiscType;
     int m_nTotDofs_Src, m_nTotDofs_SrcCov, m_nTotDofs_Dest;
