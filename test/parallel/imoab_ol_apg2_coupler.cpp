@@ -675,7 +675,7 @@ int main( int argc, char* argv[] )
                                             strlen( "T_proj;u_proj;v_proj;" ) );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
-        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+
 
         // we can now free the sender buffers
         if( ocnComm != MPI_COMM_NULL )
@@ -683,6 +683,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpOcnPID, &cplatm );  // context is for atm
             CHECKIERR( ierr, "cannot free buffers used to send ocn tag towards the coverage mesh for atm" )
         }
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         /*
         #ifdef VERBOSE
           if (couComm != MPI_COMM_NULL) {
@@ -736,13 +737,13 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
         }
 
-        MPI_Barrier( MPI_COMM_WORLD );
 
         if( couComm != MPI_COMM_NULL )
         {
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
+        MPI_Barrier( MPI_COMM_WORLD );
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 > iters ) )
         {
@@ -822,13 +823,13 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
         }
 
-        MPI_Barrier( MPI_COMM_WORLD );
 
         if( couComm != MPI_COMM_NULL )
         {
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
+        MPI_Barrier( MPI_COMM_WORLD );
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 > iters ) )
         {
             char outputFileAtm[] = "AtmWithProj3.h5m";
@@ -848,11 +849,22 @@ int main( int argc, char* argv[] )
     }
 #endif  // ENABLE_LNDATM_COUPLING
 
+
 #ifdef ENABLE_OCNATM_COUPLING
     if( couComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_DeregisterApplication( cplOcnAtmPID );
         CHECKIERR( ierr, "cannot deregister app intx OA" )
+    }
+#endif
+
+
+
+#ifdef ENABLE_OCNATM_COUPLING
+    if( ocnComm != MPI_COMM_NULL )
+    {
+        ierr = iMOAB_DeregisterApplication( cmpOcnPID );
+        CHECKIERR( ierr, "Cannot deregister OCN1 App" )
     }
 #endif
 
@@ -863,15 +875,6 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot deregister app LND1" )
     }
 #endif
-
-#ifdef ENABLE_OCNATM_COUPLING
-    if( ocnComm != MPI_COMM_NULL )
-    {
-        ierr = iMOAB_DeregisterApplication( cmpOcnPID );
-        CHECKIERR( ierr, "Cannot deregister OCN1 App" )
-    }
-#endif
-
     if( atmComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_DeregisterApplication( cmpAtmPID );
