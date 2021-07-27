@@ -667,6 +667,20 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
     return 0;
 }
 
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length)
+{
+    std::ostringstream file_name;
+    int rank = 0;
+#ifdef MOAB_HAVE_MPI
+    rank   = context.pcomms[*pid]->rank();
+#endif
+    file_name << prefix  << "_" << rank << ".h5m";
+    // Now let us actually write the file to disk with appropriate options
+    ErrorCode rval = context.MBI->write_file( file_name.str().c_str(), 0, 0, &context.appDatas[*pid].file_set, 1 );CHKERRVAL( rval );
+
+    return 0;
+}
+
 ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid )
 {
     // this will include ghost elements info

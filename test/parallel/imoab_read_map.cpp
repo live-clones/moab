@@ -214,11 +214,6 @@ int main( int argc, char* argv[] )
     }
 
     int disc_orders[3]                       = { 4, 1, 1 };
-    const std::string weights_identifiers[2] = { "scalar", "scalar-pc" };
-    const std::string disc_methods[3]        = { "cgll", "fv", "pcloud" };
-    const std::string dof_tag_names[3]       = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
-
-    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1;
 
     const std::string intx_from_file_identifier = "map-from-file";
 
@@ -239,17 +234,12 @@ int main( int argc, char* argv[] )
         // because it is like "coverage", context will be cplocn
         ierr = iMOAB_MigrateMapMesh( cmpAtmPID, cplAtmOcnPID, cplAtmPID,  &atmCouComm, &atmPEGroup, &couPEGroup, &type,
                                        &cmpatm, &cplocn, &direction );
-        // rank in
-        int rank_cpl_atm;
-        MPI_Comm_rank( atmCouComm, &rank_cpl_atm );
+        CHECKIERR( ierr, "failed to migrate mesh for atm on coupler" );
         if (*cplAtmPID >= 0)
         {
-            std::stringstream out_file_cov;
-            out_file_cov << "atmcov_" << rank_cpl_atm << ".h5m";
-            char * filen = (char*)out_file_cov.str().c_str();
-            char opts[] = "";
-            ierr = iMOAB_WriteMesh( cplAtmPID, filen, opts, strlen( filen ),
-                                                strlen( opts ) );
+            char prefix [] = "atmcov";
+            ierr = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
+            CHECKIERR( ierr, "failed to write local mesh" );
         }
         
 
@@ -263,19 +253,17 @@ int main( int argc, char* argv[] )
         // it will be like initial migrate cmpocn <-> cplocn
         ierr = iMOAB_MigrateMapMesh( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup,  &type,
                                        &cmpocn, &cplocn, &direction );
-        int rank_cpl_ocn;
-        MPI_Comm_rank( ocnCouComm, &rank_cpl_ocn );
+        CHECKIERR( ierr, "failed to migrate mesh for ocn on coupler" );
+
         if (*cplOcnPID >= 0)
         {
-            std::stringstream out_file_cov;
-            out_file_cov << "ocncov_" << rank_cpl_ocn << ".h5m";
-            char * filen = (char*)out_file_cov.str().c_str();
-            char opts[] = "";
-            ierr = iMOAB_WriteMesh( cplOcnPID, filen, opts, strlen( filen ),
-                                                        strlen( opts ) );
+            char prefix[] = "ocntgt";
+            ierr = iMOAB_WriteLocalMesh( cplOcnPID, prefix, strlen( prefix ) );
+            CHECKIERR( ierr, "failed to write local ocean mesh" );
             char outputFileRec[] = "CoupOcn.h5m";
             ierr = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
                                         strlen( fileWriteOptions ) );
+            CHECKIERR( ierr, "failed to write ocean global mesh file" );
         }
     }
     MPI_Barrier( MPI_COMM_WORLD );
@@ -399,7 +387,7 @@ int main( int argc, char* argv[] )
             iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR", strlen( "AtmMigOcnR" ) );
 #endif
         }
-        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+
 
         // we can now free the sender buffers
         if( atmComm != MPI_COMM_NULL )
@@ -407,16 +395,12 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplocn );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         if (*cplAtmPID >= 0 && n == 1)
         {
-            int rank_cpl_atm;
-            MPI_Comm_rank( atmCouComm, &rank_cpl_atm ); // this is joint comm, it has to exist here anyway
-            std::stringstream out_file_cov;
-            out_file_cov << "atmcov_aft_recv_" << rank_cpl_atm << ".h5m";
-            char * filen = (char*)out_file_cov.str().c_str();
-            char opts[] = "";
-            ierr = iMOAB_WriteMesh( cplAtmPID, filen, opts, strlen( filen ),
-                                                strlen( opts ) );
+            char prefix[] = "atmcov_withdata";
+            ierr = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
+            CHECKIERR( ierr, "failed to write local atm cov mesh with data" );
         }
 
 #ifdef VERBOSE
@@ -488,9 +472,13 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
+        if( couComm != MPI_COMM_NULL )
+        {
+            context_id = cmpocn;
+            ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+        }
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id ); }
         if( ocnComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileOcn[] = "OcnWithProj.h5m";

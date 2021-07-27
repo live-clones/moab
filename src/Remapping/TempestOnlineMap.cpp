@@ -705,7 +705,7 @@ moab::ErrorCode  moab::TempestOnlineMap::set_col_dc_dofs( std::vector<int> & val
         else
         {
             col_dtoc_dofmap[j] = -1; // signal that this value should not be used in
-            std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not found in colMap \n";
+            // std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not found in colMap \n";
         }
     }
     return moab::MB_SUCCESS;
@@ -724,7 +724,7 @@ moab::ErrorCode  moab::TempestOnlineMap::set_row_dc_dofs( std::vector<int> & val
         else
         {
             row_dtoc_dofmap[j] = -1; // not all values are used
-            std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not found in rowMap \n";
+            // std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not found in rowMap \n";
         }
     }
     return moab::MB_SUCCESS;

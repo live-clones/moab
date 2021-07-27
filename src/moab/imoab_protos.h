@@ -21,6 +21,7 @@
 #define iMOAB_ReadHeaderInfo        IMOAB_FC_WRAPPER( imoab_readheaderinfo, IMOAB_READHEADERINFO )
 #define iMOAB_LoadMesh              IMOAB_FC_WRAPPER( imoab_loadmesh, IMOAB_LOADMESH )
 #define iMOAB_WriteMesh             IMOAB_FC_WRAPPER( imoab_writemesh, IMOAB_WRITEMESH )
+#define iMOAB_WriteLocalMesh        IMOAB_FC_WRAPPER( imoab_writelocalmesh, IMOAB_WRITELOCALMESH )
 #define iMOAB_UpdateMeshInfo        IMOAB_FC_WRAPPER( imoab_updatemeshinfo, IMOAB_UPDATEMESHINFO )
 #define iMOAB_GetMeshInfo           IMOAB_FC_WRAPPER( imoab_getmeshinfo, IMOAB_GETMESHINFO )
 #define iMOAB_GetVertexID           IMOAB_FC_WRAPPER( imoab_getvertexid, IMOAB_GETVERTEXID )
@@ -73,7 +74,7 @@
 #define iMOAB_ApplyScalarProjectionWeights \
     IMOAB_FC_WRAPPER( imoab_applyscalarprojectionweights, IMOAB_APPLYSCALARPROJECTIONWEIGHTS )
 #define iMOAB_CoverageGraph IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
-#define iMOAB_ComputeDiscreteCommGraph IMOAB_FC_WRAPPER( imoab_computediscretecommgraph, IMOAB_COMPUTEDISCRETECOMMGRAPH )
+#define iMOAB_MigrateMapMesh IMOAB_FC_WRAPPER( imoab_migratemapmesh, IMOAB_MIGRATEMAPMESH )
 #ifdef MOAB_HAVE_NETCDF
 
 #define iMOAB_LoadMappingWeightsFromFile IMOAB_FC_WRAPPER( imoab_loadmappingweightsfromfile, IMOAB_LOADMAPPINGWEIGHTSFROMFILE )

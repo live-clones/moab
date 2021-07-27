@@ -275,6 +275,22 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
                          int write_options_length );
 
 /**
+  \brief Write a local MOAB mesh .
+
+  \note
+  The interface will write one file per task.
+  Only the local mesh set and solution data associated to the application will be written to the file.
+
+  <B>Operations:</B>  non collective, independent .
+
+  \param[in] pid (iMOAB_AppID)            The unique pointer to the application ID
+  \param[in] prefix (iMOAB_String)        the moab file prefix. file name will include task id if parallel
+  \param[in] prefix_length (int)          Length of the prefix
+*/
+
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length);
+
+/**
    \brief Update local mesh data structure, from file information.
 
    The method should be called after mesh modifications, for example reading a file or creating mesh in memory
