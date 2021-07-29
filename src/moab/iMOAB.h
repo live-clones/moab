@@ -915,7 +915,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
                                           const iMOAB_String remap_weights_filename,
                                           int solution_weights_identifier_length,
                                           int remap_weights_filename_length );
-
+// endif for MOAB_HAVE_NETCDF
 #endif
 
 /**
