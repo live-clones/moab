@@ -105,6 +105,8 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "endOcn,d", "end task for ocean layout", &endG2 );
 #endif
 
+    opts.addOpt< std::string >( "land,l", "land mesh filename (source)", &lndFilename );
+
     opts.addOpt< int >( "startLnd,e", "start task for land layout", &startG3 );
     opts.addOpt< int >( "endLnd,f", "end task for land layout", &endG3 );
 
