@@ -13,6 +13,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -55,6 +56,7 @@ struct ToolContext
     std::vector< std::string > doftag_names;
     std::string outFilename;
     std::string intxFilename;
+    std::string baselineFile;
     moab::TempestRemapper::TempestMeshType meshType;
     bool computeDual;
     bool computeWeights;
@@ -75,7 +77,7 @@ struct ToolContext
     ToolContext( moab::Interface* icore )
         : mbcore( icore ), proc_id( 0 ), n_procs( 1 ), outputFormatter( std::cout, 0, 0 ),
 #endif
-          blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
+          blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), baselineFile( "" ), meshType( moab::TempestRemapper::DEFAULT ),
           computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity( false ),
           ensureMonotonicity( 0 ), fNoConservation( false ), fVolumetric( false ), rrmGrids( false ),
           kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ), fOutputConcave( false ),
@@ -98,6 +100,7 @@ struct ToolContext
         doftag_names.clear();
         outFilename.clear();
         intxFilename.clear();
+        baselineFile.clear();
         meshsets.clear();
         delete timer;
     }
@@ -183,6 +186,8 @@ struct ToolContext
                              "relevant only for OVERLAP mesh)",
                              &computeWeights );
         opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
+
+        opts.addOpt< std::string >( "baseline", "Output baseline file", &baselineFile );
 
         opts.addOpt< void >( "rrmgrids",
                              "At least one of the meshes is a regionally refined grid (relevant to "
@@ -675,6 +680,31 @@ int main( int argc, char* argv[] )
                 runCtx->timer_pop();
                 rval = mbCore->write_file( "tgtWithSolnTag2.h5m", NULL, writeOptions, &runCtx->meshsets[1], 1 );MB_CHK_ERR( rval );
 
+                if (nprocs == 1 && runCtx->baselineFile.size())
+                {
+                    // save the field from tgtWithSolnTag2 in a text file, and global ids for cells
+                    moab::Range tgtCells;
+                    rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, tgtCells );MB_CHK_ERR( rval );
+                    std::vector<int> globIds;
+                    globIds.resize(tgtCells.size());
+                    std::vector<double> vals;
+                    vals.resize(tgtCells.size());
+                    moab::Tag projTag;
+                    rval = mbCore->tag_get_handle("ProjectedSolnTgt", projTag); MB_CHK_ERR( rval );
+                    moab::Tag gid = mbCore->globalId_tag();
+                    rval = mbCore->tag_get_data(gid, tgtCells, &globIds[0]); MB_CHK_ERR( rval );
+                    rval = mbCore->tag_get_data(projTag, tgtCells, &vals[0]); MB_CHK_ERR( rval );
+                    std::fstream fs;
+                    fs.open( runCtx->baselineFile.c_str(), std::fstream::out );
+                    fs << std::setprecision( 15 );  // maximum precision for doubles
+                    for( size_t i = 0; i < tgtCells.size(); i++ )
+                        fs << globIds[i] << " " << vals[i] << "\n";
+                    fs.close();
+                    // for good measure, save the source file too, with the tag AnalyticalSolnSrcExact
+                    // it will be used later to test, along with a target file
+                    rval = mbCore->write_file ( "srcWithSolnTag.h5m", NULL, writeOptions,
+                               &runCtx->meshsets[0], 1 ); MB_CHK_ERR ( rval );
+                }
                 runCtx->timer_push( "compute error metrics against analytical solution on target grid" );
                 std::map< std::string, double > errMetrics;
                 rval = weightMap->ComputeMetrics( moab::Remapper::TargetMesh, tgtAnalyticalFunction,

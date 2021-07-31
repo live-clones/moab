@@ -2257,16 +2257,15 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
     TLcomp1.enableWriteAccess();
 
     // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
-    Tag tagType1;
-    rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", tagType1 );CHKERRVAL( rval );
+    Tag gdsTag;
     // find the values on first cell
     int lenTagType1 = 1;
-    if( tagType1 )
+    if( 1 == *type1 || 1 == *type2 )
     {
-        rval = context.MBI->tag_get_length( tagType1, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
+        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
+        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
     }
-    Tag tagType2;
-    rval = context.MBI->tag_get_handle( "GLOBAL_ID", tagType2 );CHKERRVAL( rval );
+    Tag tagType2 = context.MBI->globalId_tag();
 
     std::vector< int > valuesComp1;
     // populate first tuple
@@ -2285,10 +2284,10 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
         Range ents_of_interest;
         if( *type1 == 1 )
         {
-            assert( tagType1 );
+            assert( gdsTag );
             rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
         }
         else if( *type1 == 2 )
         {
@@ -2360,10 +2359,10 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
         Range ents_of_interest;
         if( *type2 == 1 )
         {
-            assert( tagType1 );
+            assert( gdsTag );
             rval = context.MBI->get_entities_by_type( fset2, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp2.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
         }
         else if( *type2 == 2 )
         {
@@ -2907,16 +2906,16 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     TLcomp1.enableWriteAccess();
 
     // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
-    Tag tagType1;
-    rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", tagType1 );CHKERRVAL( rval );
+    Tag gdsTag;
+
     // find the values on first cell
     int lenTagType1 = 1;
-    if( tagType1 && *type == 1 )
+    if( *type == 1 )
     {
-        rval = context.MBI->tag_get_length( tagType1, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
+        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
+        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
     }
-    Tag tagType2;
-    rval = context.MBI->tag_get_handle( "GLOBAL_ID", tagType2 );CHKERRVAL( rval );
+    Tag tagType2 = context.MBI->globalId_tag();;
 
     std::vector< int > valuesComp1;
 
@@ -2930,10 +2929,10 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 
         if( *type == 1 )
         {
-            assert( tagType1 );
+            assert( gdsTag );
             rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
         }
         else if( *type == 2 )
         {
