@@ -389,11 +389,20 @@ int main( int argc, char* argv[] )
     if( couCommIO != MPI_COMM_NULL )
     {
 #ifdef MOAB_HAVE_NETCDF
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplIOSrcPID, cplIOTgtPID, cplIOSrcTgtPID,
+        ierr = iMOAB_LoadMappingWeightsFromFile( cplIOSrcTgtPID,
                                                  intx_from_file_identifier.c_str(), srctgt_map_file_name.c_str(), NULL,
                                                  NULL, NULL, intx_from_file_identifier.size(),
                                                  srctgt_map_file_name.size() );
         CHECKIERR( ierr, "failed to load map file from disk" );
+
+        PUSH_TIMER( "Compute communication graph for target mesh" )
+        ierr = iMOAB_ComputeCommGraph( cmpSrcPID, cplIOSrcTgtPID, &srcCouComm[1], &srcPEGroup, &joinSrcCouGroup[1],
+                                       owned_source_dof_ids );  // it happens over joint communicator
+        ierr = iMOAB_ComputeCommGraph( cmpTgtPID, cplIOSrcTgtPID, &tgtCouComm[1], &tgtPEGroup, &joinTgtCouGroup[1],
+                                       owned_target_dof_ids );  // it happens over joint communicator
+
+        CHECKIERR( ierr, "cannot compute communication graph for target mesh" )
+        POP_TIMER( tgtCouComm[1], rankInTgtComm )  // hijack this rank
 #endif
     }
 
@@ -581,7 +590,6 @@ int main( int argc, char* argv[] )
         }
         if( couComm != MPI_COMM_NULL )
         {
-
             int is_sender = 0;
             int context   = cpltgt;
             ierr          = iMOAB_DumpCommGraph( cplSrcPID, &context, &is_sender, "TarSrcR", strlen( "TarSrcR" ) );

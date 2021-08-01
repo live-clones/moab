@@ -75,6 +75,7 @@ struct TempestMapAppData
 {
     moab::TempestRemapper* remapper;
     std::map< std::string, moab::TempestOnlineMap* > weightMaps;
+    std::map< std::string, bool > is_fully_discrete;
     iMOAB_AppID pid_src;
     iMOAB_AppID pid_dest;
 };

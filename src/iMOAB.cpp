@@ -2120,6 +2120,11 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_id )
     return 0;
 }
 
+// Collective
+ErrCode iMOAB_ComputeDiscreteCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* join, MPI_Group* group1,
+                                        MPI_Group* group2, int* nowned_dofs1, int* owned_dofs1, int* nowned_dofs2,
+                                        int* owned_dofs2 );
+
 /**
 \brief compute a comm graph between 2 moab apps, based on ID matching
 <B>Operations:</B> Collective
