@@ -689,7 +689,10 @@ int main( int argc, char* argv[] )
 
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id ); }
+        if( couComm != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+        }
         if( ocnComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileOcn[] = "OcnWithProj.h5m";
@@ -831,7 +834,10 @@ int main( int argc, char* argv[] )
         }
 
         MPI_Barrier( MPI_COMM_WORLD );
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id ); }
+        if( couComm != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
+        }
         if( lndComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileLnd[] = "LndWithProj.h5m";

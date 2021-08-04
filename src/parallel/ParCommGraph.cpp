@@ -524,7 +524,10 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
     }
     // make sure adjacencies are updated on the new elements
 
-    if( newEnts.empty() ) { std::cout << " WARNING: this task did not receive any entities \n"; }
+    if( newEnts.empty() )
+    {
+        std::cout << " WARNING: this task did not receive any entities \n";
+    }
     // in order for the merging to work, we need to be sure that the adjacencies are updated
     // (created)
     Range local_verts        = newEnts.subset_by_type( MBVERTEX );
@@ -1274,7 +1277,10 @@ ErrorCode ParCommGraph::set_split_ranges( int comp, TupleList& TLBackToComp1, st
             {
                 int proc                = mit->first;
                 std::set< int >& setIds = mit->second;
-                if( setIds.find( marker ) != setIds.end() ) { split_ranges[proc].insert( ent ); }
+                if( setIds.find( marker ) != setIds.end() )
+                {
+                    split_ranges[proc].insert( ent );
+                }
             }
         }
     }
@@ -1291,7 +1297,10 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh( Interface* mb, TupleList& T
     // for Type1, we need GLOBAL_DOFS tag;
     Tag gds;
     ErrorCode rval;
-    if( type == 1 ) { rval = mb->tag_get_handle( "GLOBAL_DOFS", gds ); }
+    if( type == 1 )
+    {
+        rval = mb->tag_get_handle( "GLOBAL_DOFS", gds );
+    }
     // find vertices to be sent, for each of the split_ranges procs
     std::map< int, Range > verts_to_proc;
     int numv = 0, numc = 0;
@@ -1400,7 +1409,9 @@ ErrorCode ParCommGraph::form_mesh_from_tuples( Interface* mb, TupleList& TLv, Tu
             // if point cloud,
         }
         if( 2 == type )  // point cloud, add it to the split_ranges ?
-        { split_ranges[TLv.vi_rd[2 * i]].insert( vertexMap[gid] ); }
+        {
+            split_ranges[TLv.vi_rd[2 * i]].insert( vertexMap[gid] );
+        }
         // todo : when to add the values_entities ?
     }
     rval = mb->add_entities( fset, verts );MB_CHK_ERR( rval );

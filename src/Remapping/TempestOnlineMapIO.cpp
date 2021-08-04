@@ -167,7 +167,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     NcFile ncMap( strFilename.c_str(), NcFile::Replace );
 #endif
 
-    if( !ncMap.is_valid() ) { _EXCEPTION1( "Unable to open output map file \"%s\"", strFilename.c_str() ); }
+    if( !ncMap.is_valid() )
+    {
+        _EXCEPTION1( "Unable to open output map file \"%s\"", strFilename.c_str() );
+    }
 
     // Attributes
     ncMap.add_att( "Title", "MOAB-TempestRemap Online Regridding Weight Generator" );
@@ -205,7 +208,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, vecSourceFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, vecSourceFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, vecSourceFaceArea );
@@ -235,7 +240,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, vecTargetFaceArea );
@@ -258,13 +265,19 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         int ierr = rearrange_arrays_by_dofs( srccol_gdofmap, vecSourceFaceArea, dSourceCenterLon, dSourceCenterLat,
                                              dSourceVertexLon, dSourceVertexLat, nA, nSourceNodesPerFace,
                                              max_col_dof );  // now nA will be close to maxdof/size
-        if( ierr != 0 ) { _EXCEPTION1( "Unable to arrange source data %d ", nA ); }
+        if( ierr != 0 )
+        {
+            _EXCEPTION1( "Unable to arrange source data %d ", nA );
+        }
         // rearrange target data: (nB)
         //
         ierr = rearrange_arrays_by_dofs( row_gdofmap, vecTargetFaceArea, dTargetCenterLon, dTargetCenterLat,
                                          dTargetVertexLon, dTargetVertexLat, nB, nTargetNodesPerFace,
                                          max_row_dof );  // now nA will be close to maxdof/size
-        if( ierr != 0 ) { _EXCEPTION1( "Unable to arrange target data %d ", nB ); }
+        if( ierr != 0 )
+        {
+            _EXCEPTION1( "Unable to arrange target data %d ", nB );
+        }
     }
 #endif
 
@@ -392,14 +405,38 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     varXVB->add_att( "units", "degrees" );
 
     // Verify dimensionality
-    if( dSourceCenterLon.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceCenterLon and nA" ); }
-    if( dSourceCenterLat.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceCenterLat and nA" ); }
-    if( dTargetCenterLon.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetCenterLon and nB" ); }
-    if( dTargetCenterLat.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetCenterLat and nB" ); }
-    if( dSourceVertexLon.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceVertexLon and nA" ); }
-    if( dSourceVertexLat.GetRows() != nA ) { _EXCEPTIONT( "Mismatch between dSourceVertexLat and nA" ); }
-    if( dTargetVertexLon.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetVertexLon and nB" ); }
-    if( dTargetVertexLat.GetRows() != nB ) { _EXCEPTIONT( "Mismatch between dTargetVertexLat and nB" ); }
+    if( dSourceCenterLon.GetRows() != nA )
+    {
+        _EXCEPTIONT( "Mismatch between dSourceCenterLon and nA" );
+    }
+    if( dSourceCenterLat.GetRows() != nA )
+    {
+        _EXCEPTIONT( "Mismatch between dSourceCenterLat and nA" );
+    }
+    if( dTargetCenterLon.GetRows() != nB )
+    {
+        _EXCEPTIONT( "Mismatch between dTargetCenterLon and nB" );
+    }
+    if( dTargetCenterLat.GetRows() != nB )
+    {
+        _EXCEPTIONT( "Mismatch between dTargetCenterLat and nB" );
+    }
+    if( dSourceVertexLon.GetRows() != nA )
+    {
+        _EXCEPTIONT( "Mismatch between dSourceVertexLon and nA" );
+    }
+    if( dSourceVertexLat.GetRows() != nA )
+    {
+        _EXCEPTIONT( "Mismatch between dSourceVertexLat and nA" );
+    }
+    if( dTargetVertexLon.GetRows() != nB )
+    {
+        _EXCEPTIONT( "Mismatch between dTargetVertexLon and nB" );
+    }
+    if( dTargetVertexLat.GetRows() != nB )
+    {
+        _EXCEPTIONT( "Mismatch between dTargetVertexLat and nB" );
+    }
 
     varYCA->set_cur( (long)offbuf[0] );
     varYCA->put( &( dSourceCenterLat[0] ), nA );
@@ -679,7 +716,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
@@ -722,7 +761,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea ); }
+        {
+            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+        }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
@@ -1059,9 +1100,12 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     NcFile ncMap( strSource, NcFile::ReadOnly );
 #endif
 
-#define CHECK_EXCEPTION( obj, type, varstr )                                                                        \
-    {                                                                                                               \
-        if( obj == NULL ) { _EXCEPTION3( "Map file \"%s\" does not contain %s \"%s\"", strSource, type, varstr ); } \
+#define CHECK_EXCEPTION( obj, type, varstr )                                                      \
+    {                                                                                             \
+        if( obj == NULL )                                                                         \
+        {                                                                                         \
+            _EXCEPTION3( "Map file \"%s\" does not contain %s \"%s\"", strSource, type, varstr ); \
+        }                                                                                         \
     }
 
     // Read SparseMatrix entries
@@ -1117,7 +1161,10 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     int localSize   = nS / size;
     long offsetRead = rank * localSize;
     // leftovers on last rank
-    if( rank == size - 1 ) { localSize += nS % size; }
+    if( rank == size - 1 )
+    {
+        localSize += nS % size;
+    }
 
     std::vector< int > vecRow, vecCol;
     std::vector< double > vecS;

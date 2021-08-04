@@ -116,7 +116,10 @@ int main( int argc, char* argv[] )
         std::cout << " atm file: " << atmFilename << "\n   on tasks : " << startG1 << ":" << endG1
                   << "\n ocn file: " << ocnFilename << "\n     on tasks : " << startG2 << ":" << endG2
                   << "\n map file:" << mapFilename << "\n     on tasks : " << startG4 << ":" << endG4 << "\n";
-        if( !no_regression_test ) { std::cout << " check projection against baseline: " << baseline << "\n"; }
+        if( !no_regression_test )
+        {
+            std::cout << " check projection against baseline: " << baseline << "\n";
+        }
     }
 
     // load files on 3 different communicators, groups

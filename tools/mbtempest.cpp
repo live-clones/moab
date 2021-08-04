@@ -250,17 +250,35 @@ struct ToolContext
             opts.getOptAllArgs( "method,m", disc_methods );
             opts.getOptAllArgs( "global_id,i", doftag_names );
 
-            if( disc_orders.size() == 0 ) { disc_orders.resize( 2, 1 ); }
+            if( disc_orders.size() == 0 )
+            {
+                disc_orders.resize( 2, 1 );
+            }
 
-            if( disc_orders.size() == 1 ) { disc_orders.push_back( 1 ); }
+            if( disc_orders.size() == 1 )
+            {
+                disc_orders.push_back( 1 );
+            }
 
-            if( disc_methods.size() == 0 ) { disc_methods.resize( 2, "fv" ); }
+            if( disc_methods.size() == 0 )
+            {
+                disc_methods.resize( 2, "fv" );
+            }
 
-            if( disc_methods.size() == 1 ) { disc_methods.push_back( "fv" ); }
+            if( disc_methods.size() == 1 )
+            {
+                disc_methods.push_back( "fv" );
+            }
 
-            if( doftag_names.size() == 0 ) { doftag_names.resize( 2, "GLOBAL_ID" ); }
+            if( doftag_names.size() == 0 )
+            {
+                doftag_names.resize( 2, "GLOBAL_ID" );
+            }
 
-            if( doftag_names.size() == 1 ) { doftag_names.push_back( "GLOBAL_ID" ); }
+            if( doftag_names.size() == 1 )
+            {
+                doftag_names.push_back( "GLOBAL_ID" );
+            }
 
             assert( inFilenames.size() == 2 );
             assert( disc_orders.size() == 2 );
@@ -298,7 +316,10 @@ int main( int argc, char* argv[] )
 
     moab::Interface* mbCore = new( std::nothrow ) moab::Core;
 
-    if( NULL == mbCore ) { return 1; }
+    if( NULL == mbCore )
+    {
+        return 1;
+    }
 
     ToolContext* runCtx;
 #ifdef MOAB_HAVE_MPI
@@ -462,7 +483,10 @@ int main( int argc, char* argv[] )
             runCtx->timer_pop();
 
             std::map< std::string, std::string > mapAttributes;
-            if( err ) { rval = moab::MB_FAILURE; }
+            if( err )
+            {
+                rval = moab::MB_FAILURE;
+            }
             else
             {
                 weightMap.Write( "outWeights.nc", mapAttributes );
@@ -732,7 +756,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     int err;
     moab::DebugOutput& outputFormatter = ctx.outputFormatter;
 
-    if( !ctx.proc_id ) { outputFormatter.printf( 0, "Creating TempestRemap Mesh object ...\n" ); }
+    if( !ctx.proc_id )
+    {
+        outputFormatter.printf( 0, "Creating TempestRemap Mesh object ...\n" );
+    }
 
     if( ctx.meshType == moab::TempestRemapper::OVERLAP_FILES )
     {
@@ -740,7 +767,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         err = GenerateOverlapMesh( ctx.inFilenames[0], ctx.inFilenames[1], *tempest_mesh, ctx.outFilename, "NetCDF4",
                                    "exact", true );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -768,7 +798,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         err = GenerateOverlapWithMeshes( *ctx.meshes[0], *ctx.meshes[1], *tempest_mesh, "" /*ctx.outFilename*/,
                                          "NetCDF4", "exact", false );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             remapper.SetMesh( moab::Remapper::OverlapMesh, tempest_mesh );
@@ -822,7 +855,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     {
         err = GenerateICOMesh( *tempest_mesh, ctx.blockSize, ctx.computeDual, ctx.outFilename, "NetCDF4" );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -842,7 +878,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
                                true                         // bool fVerbose
         );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -852,7 +891,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     {
         err = GenerateCSMesh( *tempest_mesh, ctx.blockSize, ctx.outFilename, "NetCDF4" );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -909,7 +951,10 @@ double sample_stationary_vortex( double dLon, double dLat )
         double dZ   = dSinC * dSinT + dCosC * dTrm;
 
         dLon = atan2( dY, dX );
-        if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+        if( dLon < 0.0 )
+        {
+            dLon += 2.0 * M_PI;
+        }
         dLat = asin( dZ );
     }
 
@@ -917,7 +962,10 @@ double sample_stationary_vortex( double dLon, double dLat )
     double dVt  = 3.0 * sqrt( 3.0 ) / 2.0 / cosh( dRho ) / cosh( dRho ) * tanh( dRho );
 
     double dOmega;
-    if( dRho == 0.0 ) { dOmega = 0.0; }
+    if( dRho == 0.0 )
+    {
+        dOmega = 0.0;
+    }
     else
     {
         dOmega = dVt / dRho;

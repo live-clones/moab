@@ -485,7 +485,10 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
         centroid.z *= factor;
 
         EntityHandle current_eh;
-        if( mapLocalMBNodes.find( centroid ) != mapLocalMBNodes.end() ) { current_eh = mapLocalMBNodes[centroid]; }
+        if( mapLocalMBNodes.find( centroid ) != mapLocalMBNodes.end() )
+        {
+            current_eh = mapLocalMBNodes[centroid];
+        }
 
         rval = m_interface->tag_get_data( m_dofTagSrc, &current_eh, 1, &locdofs[0] );MB_CHK_ERR( rval );
         for( int p = 0; p < m_nDofsPEl_Src; p++ )
@@ -758,7 +761,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
         DiscretizationType eOutputType;
         int fNoCheckGlob = ( fNoCheck ? 1 : 0 );
 
-        if( strInputType == "fv" ) { eInputType = DiscretizationType_FV; }
+        if( strInputType == "fv" )
+        {
+            eInputType = DiscretizationType_FV;
+        }
         else if( strInputType == "cgll" )
         {
             eInputType = DiscretizationType_CGLL;
@@ -776,7 +782,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             _EXCEPTION1( "Invalid \"in_type\" value (%s), expected [fv|cgll|dgll]", strInputType.c_str() );
         }
 
-        if( strOutputType == "fv" ) { eOutputType = DiscretizationType_FV; }
+        if( strOutputType == "fv" )
+        {
+            eOutputType = DiscretizationType_FV;
+        }
         else if( strOutputType == "cgll" )
         {
             eOutputType = DiscretizationType_CGLL;
@@ -918,12 +927,16 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
                 for( size_t i = 0; i < m_meshInputCov->faces.size(); i++ )
                 {
                     if( fabs( dSourceArea[i] - m_meshInputCov->vecFaceArea[i] ) < 1.0e-10 )
-                    { m_meshInputCov->vecFaceArea[i] = dSourceArea[i]; }
+                    {
+                        m_meshInputCov->vecFaceArea[i] = dSourceArea[i];
+                    }
                 }
                 for( size_t i = 0; i < m_meshOutput->faces.size(); i++ )
                 {
                     if( fabs( dTargetArea[i] - m_meshOutput->vecFaceArea[i] ) < 1.0e-10 )
-                    { m_meshOutput->vecFaceArea[i] = dTargetArea[i]; }
+                    {
+                        m_meshOutput->vecFaceArea[i] = dTargetArea[i];
+                    }
                 }
             }
 
@@ -931,14 +944,20 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             if( !m_bPointCloudSource && eInputType == DiscretizationType_FV )
             {
                 this->SetSourceAreas( m_meshInputCov->vecFaceArea );
-                if( m_meshInputCov->vecMask.IsAttached() ) { this->SetSourceMask( m_meshInputCov->vecMask ); }
+                if( m_meshInputCov->vecMask.IsAttached() )
+                {
+                    this->SetSourceMask( m_meshInputCov->vecMask );
+                }
             }
 
             // Set target mesh areas in map
             if( !m_bPointCloudTarget && eOutputType == DiscretizationType_FV )
             {
                 this->SetTargetAreas( m_meshOutput->vecFaceArea );
-                if( m_meshOutput->vecMask.IsAttached() ) { this->SetTargetMask( m_meshOutput->vecMask ); }
+                if( m_meshOutput->vecMask.IsAttached() )
+                {
+                    this->SetTargetMask( m_meshOutput->vecMask );
+                }
             }
 
             // Partial cover
@@ -1005,7 +1024,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuous = ( eOutputType == DiscretizationType_CGLL );
 
             if( eOutputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobian, this->GetTargetAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobian, this->GetTargetAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobian, this->GetTargetAreas() );
@@ -1045,7 +1066,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
                 // Initialize coordinates for map
                 if( eInputType == DiscretizationType_FV )
-                { this->InitializeSourceCoordinatesFromMeshFV( *m_meshInputCov ); }
+                {
+                    this->InitializeSourceCoordinatesFromMeshFV( *m_meshInputCov );
+                }
                 else
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
@@ -1064,7 +1087,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
                 // Initialize coordinates for map
                 if( eOutputType == DiscretizationType_FV )
-                { this->InitializeSourceCoordinatesFromMeshFV( *m_meshOutput ); }
+                {
+                    this->InitializeSourceCoordinatesFromMeshFV( *m_meshOutput );
+                }
                 else
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
@@ -1129,7 +1154,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuousIn = ( eInputType == DiscretizationType_CGLL );
 
             if( eInputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobian, this->GetSourceAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobian, this->GetSourceAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobian, this->GetSourceAreas() );
@@ -1206,7 +1233,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuousIn = ( eInputType == DiscretizationType_CGLL );
 
             if( eInputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobianIn, this->GetSourceAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesSrcCov, dataGLLJacobianIn, this->GetSourceAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobianIn, this->GetSourceAreas() );
@@ -1216,7 +1245,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             bool fContinuousOut = ( eOutputType == DiscretizationType_CGLL );
 
             if( eOutputType == DiscretizationType_CGLL )
-            { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianOut, this->GetTargetAreas() ); }
+            {
+                GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianOut, this->GetTargetAreas() );
+            }
             else
             {
                 GenerateDiscontinuousJacobian( dataGLLJacobianOut, this->GetTargetAreas() );
@@ -1263,7 +1294,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             this->IsConsistent( 1.0e-8 );
             if( !fNoConservation ) this->IsConservative( 1.0e-8 );
 
-            if( nMonotoneType != 0 ) { this->IsMonotone( 1.0e-12 ); }
+            if( nMonotoneType != 0 )
+            {
+                this->IsMonotone( 1.0e-12 );
+            }
         }
     }
     catch( Exception& e )
@@ -1615,7 +1649,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
                                         MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
     if( clonedSolnTag != NULL )
     {
-        if( cloneSolnName.size() == 0 ) { cloneSolnName = solnName + std::string( "Cloned" ); }
+        if( cloneSolnName.size() == 0 )
+        {
+            cloneSolnName = solnName + std::string( "Cloned" );
+        }
         rval = m_interface->tag_get_handle( cloneSolnName.c_str(), discOrder * discOrder, MB_TYPE_DOUBLE,
                                             *clonedSolnTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
     }
@@ -1677,7 +1714,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             {
                 for( int k = 0; k < nElements; k++ )
                 {
-                    if( dataGLLNodes[i][j][k] > iMaxNode ) { iMaxNode = dataGLLNodes[i][j][k]; }
+                    if( dataGLLNodes[i][j][k] > iMaxNode )
+                    {
+                        iMaxNode = dataGLLNodes[i][j][k];
+                    }
                 }
             }
         }
@@ -1723,7 +1763,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
 
                         // Sample data at this point
                         double dNodeLon = atan2( node.y, node.x );
-                        if( dNodeLon < 0.0 ) { dNodeLon += 2.0 * M_PI; }
+                        if( dNodeLon < 0.0 )
+                        {
+                            dNodeLon += 2.0 * M_PI;
+                        }
                         double dNodeLat = asin( node.z );
 
                         double dSample = ( *testFunction )( dNodeLon, dNodeLat );
@@ -1761,7 +1804,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
 
                         // Sample data at this point
                         double dNodeLon = atan2( node.y, node.x );
-                        if( dNodeLon < 0.0 ) { dNodeLon += 2.0 * M_PI; }
+                        if( dNodeLon < 0.0 )
+                        {
+                            dNodeLon += 2.0 * M_PI;
+                        }
                         double dNodeLat = asin( node.z );
 
                         double dSample = ( *testFunction )( dNodeLon, dNodeLat );
@@ -1870,7 +1916,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
                         node.z /= dMagnitude;
 
                         double dLon = atan2( node.y, node.x );
-                        if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+                        if( dLon < 0.0 )
+                        {
+                            dLon += 2.0 * M_PI;
+                        }
                         double dLat = asin( node.z );
 
                         double dSample = ( *testFunction )( dLon, dLat );
@@ -1899,7 +1948,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
                 node.y /= dMagnitude;
                 node.z /= dMagnitude;
                 double dLon = atan2( node.y, node.x );
-                if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+                if( dLon < 0.0 )
+                {
+                    dLon += 2.0 * M_PI;
+                }
                 double dLat = asin( node.z );
 
                 double dSample = ( *testFunction )( dLon, dLat );

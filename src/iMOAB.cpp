@@ -191,7 +191,10 @@ ErrCode iMOAB_Finalize()
 {
     context.refCountMB--;
 
-    if( 0 == context.refCountMB ) { delete context.MBI; }
+    if( 0 == context.refCountMB )
+    {
+        delete context.MBI;
+    }
 
     return MB_SUCCESS;
 }
@@ -378,7 +381,10 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     {
         int pidx = mit->second;
 
-        if( *pid == pidx ) { break; }
+        if( *pid == pidx )
+        {
+            break;
+        }
     }
 
     context.appIdMap.erase( mit );
@@ -388,7 +394,10 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     {
         int pidx = mit1->second;
 
-        if( *pid == pidx ) { break; }
+        if( *pid == pidx )
+        {
+            break;
+        }
     }
 
     context.appIdCompMap.erase( mit1 );
@@ -429,7 +438,10 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
 #ifdef MOAB_HAVE_HDF5
     std::string filen( filename );
 
-    if( filename_length < (int)strlen( filename ) ) { filen = filen.substr( 0, filename_length ); }
+    if( filename_length < (int)strlen( filename ) )
+    {
+        filen = filen.substr( 0, filename_length );
+    }
 
     *num_global_vertices = 0;
     int edges            = 0;
@@ -469,27 +481,60 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
         struct mhdf_ElemDesc* el_desc = &( data->elems[i] );
         struct mhdf_EntDesc* ent_d    = &( el_desc->desc );
 
-        if( 0 == strcmp( el_desc->type, mhdf_EDGE_TYPE_NAME ) ) { edges += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_EDGE_TYPE_NAME ) )
+        {
+            edges += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_TRI_TYPE_NAME ) ) { faces += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_TRI_TYPE_NAME ) )
+        {
+            faces += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_QUAD_TYPE_NAME ) ) { faces += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_QUAD_TYPE_NAME ) )
+        {
+            faces += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_POLYGON_TYPE_NAME ) ) { faces += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_POLYGON_TYPE_NAME ) )
+        {
+            faces += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_TET_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_TET_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_PYRAMID_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_PYRAMID_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_PRISM_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_PRISM_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mdhf_KNIFE_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mdhf_KNIFE_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mdhf_HEX_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mdhf_HEX_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_POLYHEDRON_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_POLYHEDRON_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_SEPTAHEDRON_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_SEPTAHEDRON_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
     }
 
     *num_parts = data->numEntSets[0];
@@ -655,7 +700,10 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
     std::string pw( "PARALLEL=WRITE_PART" );
     found = write_opts.find( pw );
 
-    if( found != std::string::npos ) { newopts << "PARALLEL_COMM=" << *pid << ";"; }
+    if( found != std::string::npos )
+    {
+        newopts << "PARALLEL_COMM=" << *pid << ";";
+    }
 
 #endif
 
@@ -863,7 +911,10 @@ ErrCode iMOAB_GetVertexID( iMOAB_AppID pid, int* vertices_length, iMOAB_GlobalID
 {
     Range& verts = context.appDatas[*pid].all_verts;
 
-    if( (int)verts.size() != *vertices_length ) { return 1; }  // problem with array length
+    if( (int)verts.size() != *vertices_length )
+    {
+        return 1;
+    }  // problem with array length
 
     // global id tag is context.globalID_tag
     ErrorCode rval = context.MBI->tag_get_data( context.globalID_tag, verts, global_vertex_ID );CHKERRVAL( rval );
@@ -883,12 +934,18 @@ ErrCode iMOAB_GetVertexOwnership( iMOAB_AppID pid, int* vertices_length, int* vi
         ErrorCode rval = pco->get_owner( *vit, visible_global_rank_ID[i] );CHKERRVAL( rval );
     }
 
-    if( i != *vertices_length ) { return 1; }  // warning array allocation problem
+    if( i != *vertices_length )
+    {
+        return 1;
+    }  // warning array allocation problem
 
 #else
 
     /* everything owned by proc 0 */
-    if( (int)verts.size() != *vertices_length ) { return 1; }  // warning array allocation problem
+    if( (int)verts.size() != *vertices_length )
+    {
+        return 1;
+    }  // warning array allocation problem
 
     for( Range::iterator vit = verts.begin(); vit != verts.end(); vit++, i++ )
     {
@@ -904,7 +961,10 @@ ErrCode iMOAB_GetVisibleVerticesCoordinates( iMOAB_AppID pid, int* coords_length
     Range& verts = context.appDatas[*pid].all_verts;
 
     // interleaved coordinates, so that means deep copy anyway
-    if( *coords_length != 3 * (int)verts.size() ) { return 1; }
+    if( *coords_length != 3 * (int)verts.size() )
+    {
+        return 1;
+    }
 
     ErrorCode rval = context.MBI->get_coords( verts, coordinates );CHKERRVAL( rval );
 
@@ -917,7 +977,10 @@ ErrCode iMOAB_GetBlockID( iMOAB_AppID pid, int* block_length, iMOAB_GlobalID* gl
     // will actually return material set tag value for global
     Range& matSets = context.appDatas[*pid].mat_sets;
 
-    if( *block_length != (int)matSets.size() ) { return 1; }
+    if( *block_length != (int)matSets.size() )
+    {
+        return 1;
+    }
 
     // return material set tag gtags[0 is material set tag
     ErrorCode rval = context.MBI->tag_get_data( context.material_tag, matSets, global_block_IDs );CHKERRVAL( rval );
@@ -938,18 +1001,27 @@ ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
     std::map< int, int >& matMap      = context.appDatas[*pid].matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = context.appDatas[*pid].mat_sets[blockIndex];
     Range blo_elems;
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, blo_elems );
 
-    if( MB_SUCCESS != rval || blo_elems.empty() ) { return 1; }
+    if( MB_SUCCESS != rval || blo_elems.empty() )
+    {
+        return 1;
+    }
 
     EntityType type = context.MBI->type_from_handle( blo_elems[0] );
 
-    if( !blo_elems.all_of_type( type ) ) { return 1; }  // not all of same  type
+    if( !blo_elems.all_of_type( type ) )
+    {
+        return 1;
+    }  // not all of same  type
 
     const EntityHandle* conn = NULL;
     int num_verts            = 0;
@@ -998,9 +1070,15 @@ ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements
             EntityHandle eh = *eit;
             int index       = data.primary_elems.index( eh );
 
-            if( -1 == index ) { return 1; }
+            if( -1 == index )
+            {
+                return 1;
+            }
 
-            if( -1 >= *num_visible_elements ) { return 1; }
+            if( -1 >= *num_visible_elements )
+            {
+                return 1;
+            }
 
             block_IDs[index] = valMatTag;
         }
@@ -1016,7 +1094,10 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
     std::map< int, int >& matMap      = data.matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = data.mat_sets[blockIndex];
@@ -1024,18 +1105,27 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
 
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, elems );CHKERRVAL( rval );
 
-    if( elems.empty() ) { return 1; }
+    if( elems.empty() )
+    {
+        return 1;
+    }
 
     std::vector< EntityHandle > vconnect;
     rval = context.MBI->get_connectivity( &elems[0], elems.size(), vconnect );CHKERRVAL( rval );
 
-    if( *connectivity_length != (int)vconnect.size() ) { return 1; }  // mismatched sizes
+    if( *connectivity_length != (int)vconnect.size() )
+    {
+        return 1;
+    }  // mismatched sizes
 
     for( int i = 0; i < *connectivity_length; i++ )
     {
         int inx = data.all_verts.index( vconnect[i] );
 
-        if( -1 == inx ) { return 1; }  // error, vertex not in local range
+        if( -1 == inx )
+        {
+            return 1;
+        }  // error, vertex not in local range
 
         element_connectivity[i] = inx;
     }
@@ -1056,13 +1146,19 @@ ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index
 
     ErrorCode rval = context.MBI->get_connectivity( eh, conn, num_nodes );CHKERRVAL( rval );
 
-    if( *connectivity_length < num_nodes ) { return 1; }  // wrong number of vertices
+    if( *connectivity_length < num_nodes )
+    {
+        return 1;
+    }  // wrong number of vertices
 
     for( int i = 0; i < num_nodes; i++ )
     {
         int index = data.all_verts.index( conn[i] );
 
-        if( -1 == index ) { return 1; }
+        if( -1 == index )
+        {
+            return 1;
+        }
 
         element_connectivity[i] = index;
     }
@@ -1079,7 +1175,10 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
 
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = context.appDatas[*pid].mat_sets[blockIndex];
@@ -1087,9 +1186,15 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
 
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, elems );CHKERRVAL( rval );
 
-    if( elems.empty() ) { return 1; }
+    if( elems.empty() )
+    {
+        return 1;
+    }
 
-    if( *num_elements_in_block != (int)elems.size() ) { return 1; }  // bad memory allocation
+    if( *num_elements_in_block != (int)elems.size() )
+    {
+        return 1;
+    }  // bad memory allocation
 
     int i = 0;
 #ifdef MOAB_HAVE_MPI
@@ -1116,16 +1221,25 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
 
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = data.mat_sets[blockIndex];
     Range elems;
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, elems );CHKERRVAL( rval );
 
-    if( elems.empty() ) { return 1; }
+    if( elems.empty() )
+    {
+        return 1;
+    }
 
-    if( *num_elements_in_block != (int)elems.size() ) { return 1; }  // bad memory allocation
+    if( *num_elements_in_block != (int)elems.size() )
+    {
+        return 1;
+    }  // bad memory allocation
 
     rval = context.MBI->tag_get_data( context.globalID_tag, elems, global_element_ID );CHKERRVAL( rval );
 
@@ -1134,7 +1248,10 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
     {
         local_element_ID[i] = data.primary_elems.index( elems[i] );
 
-        if( -1 == local_element_ID[i] ) { return 1; }  // error, not in local primary elements
+        if( -1 == local_element_ID[i] )
+        {
+            return 1;
+        }  // error, not in local primary elements
     }
 
     return 0;
@@ -1182,7 +1299,10 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
                 // get local element id
                 local_element_ID[index] = data.primary_elems.index( primaryEnt );
 
-                if( -1 == local_element_ID[index] ) { return 1; }  // did not find the element locally
+                if( -1 == local_element_ID[index] )
+                {
+                    return 1;
+                }  // did not find the element locally
 
                 int side_number, sense, offset;
                 rval = context.MBI->side_number( primaryEnt, subent, side_number, sense, offset );CHKERRVAL( rval );
@@ -1194,7 +1314,10 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
         }
     }
 
-    if( index != *surface_BC_length ) { return 1; }  // error in array allocations
+    if( index != *surface_BC_length )
+    {
+        return 1;
+    }  // error in array allocations
 
     return 0;
 }
@@ -1228,14 +1351,20 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
             global_vertext_ID[index] = vgid;*/
             local_vertex_ID[index] = data.all_verts.index( vt );
 
-            if( -1 == local_vertex_ID[index] ) { return 1; }  // vertex was not found
+            if( -1 == local_vertex_ID[index] )
+            {
+                return 1;
+            }  // vertex was not found
 
             boundary_condition_value[index] = diriVal;
             index++;
         }
     }
 
-    if( *vertex_BC_length != index ) { return 1; }  // array allocation issue
+    if( *vertex_BC_length != index )
+    {
+        return 1;
+    }  // array allocation issue
 
     return 0;
 }
@@ -1244,7 +1373,10 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
                                 int* components_per_entity, int* tag_index, int tag_storage_name_length )
 {
     // see if the tag is already existing, and if yes, check the type, length
-    if( *tag_type < 0 || *tag_type > 5 ) { return 1; }  // we have 6 types of tags supported so far
+    if( *tag_type < 0 || *tag_type > 5 )
+    {
+        return 1;
+    }  // we have 6 types of tags supported so far
 
     DataType tagDataType;
     TagType tagType;
@@ -1309,7 +1441,9 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     Tag tagHandle;
     ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
@@ -1361,11 +1495,16 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1375,13 +1514,18 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );
 
-    if( MB_SUCCESS != rval || dtype != MB_TYPE_INTEGER ) { return 1; }
+    if( MB_SUCCESS != rval || dtype != MB_TYPE_INTEGER )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_set;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_set = &data.all_verts; }
+    {
+        ents_to_set = &data.all_verts;
+    }
     else  // if (*ent_type == 1) // *ent_type can be 0 (vertices) or 1 (elements)
     {
         ents_to_set = &data.primary_elems;
@@ -1390,7 +1534,9 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     int nents_to_be_set = *num_tag_storage_length / tagLength;
 
     if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
-    { return 1; }  // to many entities to be set or too few
+    {
+        return 1;
+    }  // to many entities to be set or too few
 
     // restrict the range; everything is contiguous; or not?
 
@@ -1407,11 +1553,17 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     ErrorCode rval;
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    if( tag_storage_name_length < (int)tag_name.length() )
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1421,13 +1573,18 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );CHKERRVAL( rval );
 
-    if( dtype != MB_TYPE_INTEGER ) { return 1; }
+    if( dtype != MB_TYPE_INTEGER )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_get;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_get = &data.all_verts; }
+    {
+        ents_to_get = &data.all_verts;
+    }
     else  // if (*ent_type == 1)
     {
         ents_to_get = &data.primary_elems;
@@ -1436,7 +1593,9 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     int nents_to_get = *num_tag_storage_length / tagLength;
 
     if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
-    { return 1; }  // to many entities to get, or too little
+    {
+        return 1;
+    }  // to many entities to get, or too little
 
     // restrict the range; everything is contiguous; or not?
     // Range contig_range ( * ( ents_to_get->begin() ), * ( ents_to_get->begin() + nents_to_get - 1
@@ -1454,11 +1613,17 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     // exactly the same code as for int tag :) maybe should check the type of tag too
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    if( tag_storage_name_length < (int)tag_name.length() )
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1468,13 +1633,18 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );
 
-    if( MB_SUCCESS != rval || dtype != MB_TYPE_DOUBLE ) { return 1; }
+    if( MB_SUCCESS != rval || dtype != MB_TYPE_DOUBLE )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_set = NULL;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_set = &data.all_verts; }
+    {
+        ents_to_set = &data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ents_to_set = &data.primary_elems;
@@ -1482,7 +1652,10 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
 
     int nents_to_be_set = *num_tag_storage_length / tagLength;
 
-    if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 ) { return 1; }  // to many entities to be set
+    if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
+    {
+        return 1;
+    }  // to many entities to be set
 
     // restrict the range; everything is contiguous; or not?
     // Range contig_range ( * ( ents_to_set->begin() ), * ( ents_to_set->begin() + nents_to_be_set -
@@ -1500,11 +1673,17 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     // exactly the same code, except tag type check
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    if( tag_storage_name_length < (int)tag_name.length() )
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1514,13 +1693,18 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );CHKERRVAL( rval );
 
-    if( dtype != MB_TYPE_DOUBLE ) { return 1; }
+    if( dtype != MB_TYPE_DOUBLE )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_get = NULL;
 
     if( *ent_type == 0 )  // vertices
-    { ents_to_get = &data.all_verts; }
+    {
+        ents_to_get = &data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ents_to_get = &data.primary_elems;
@@ -1528,7 +1712,10 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
 
     int nents_to_get = *num_tag_storage_length / tagLength;
 
-    if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 ) { return 1; }  // to many entities to get
+    if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
+    {
+        return 1;
+    }  // to many entities to get
 
     // restrict the range; everything is contiguous; or not?
 
@@ -1548,12 +1735,18 @@ ErrCode iMOAB_SynchronizeTags( iMOAB_AppID pid, int* num_tag, int* tag_indices, 
 
     for( int i = 0; i < *num_tag; i++ )
     {
-        if( tag_indices[i] < 0 || tag_indices[i] >= (int)data.tagList.size() ) { return 1; }  // error in tag index
+        if( tag_indices[i] < 0 || tag_indices[i] >= (int)data.tagList.size() )
+        {
+            return 1;
+        }  // error in tag index
 
         tags.push_back( data.tagList[tag_indices[i]] );
     }
 
-    if( *ent_type == 0 ) { ent_exchange = data.all_verts; }
+    if( *ent_type == 0 )
+    {
+        ent_exchange = data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ent_exchange = data.primary_elems;
@@ -1584,11 +1777,17 @@ ErrCode iMOAB_ReduceTagsMax( iMOAB_AppID pid, int* tag_index, int* ent_type )
     appData& data = context.appDatas[*pid];
     Range ent_exchange;
 
-    if( *tag_index < 0 || *tag_index >= (int)data.tagList.size() ) { return 1; }  // error in tag index
+    if( *tag_index < 0 || *tag_index >= (int)data.tagList.size() )
+    {
+        return 1;
+    }  // error in tag index
 
     Tag tagh = data.tagList[*tag_index];
 
-    if( *ent_type == 0 ) { ent_exchange = data.all_verts; }
+    if( *ent_type == 0 )
+    {
+        ent_exchange = data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ent_exchange = data.primary_elems;
@@ -1624,7 +1823,10 @@ ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid, iMOAB_LocalID* local_index, 
     Range adjs;
     rval = mtu.get_bridge_adjacencies( eh, data.dimension - 1, data.dimension, adjs );CHKERRVAL( rval );
 
-    if( *num_adjacent_elements < (int)adjs.size() ) { return 1; }  // not dimensioned correctly
+    if( *num_adjacent_elements < (int)adjs.size() )
+    {
+        return 1;
+    }  // not dimensioned correctly
 
     *num_adjacent_elements = (int)adjs.size();
 
@@ -1651,7 +1853,9 @@ ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double
     appData& data = context.appDatas[*pid];
 
     if( !data.local_verts.empty() )  // we should have no vertices in the app
-    { return 1; }
+    {
+        return 1;
+    }
 
     int nverts = *coords_len / *dim;
 
@@ -1736,8 +1940,14 @@ ErrCode iMOAB_SetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
 ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
 {
     appData& data = context.appDatas[*pid];
-    if( NULL != num_global_verts ) { *num_global_verts = data.num_global_vertices; }
-    if( NULL != num_global_elems ) { *num_global_elems = data.num_global_elements; }
+    if( NULL != num_global_verts )
+    {
+        *num_global_verts = data.num_global_vertices;
+    }
+    if( NULL != num_global_elems )
+    {
+        *num_global_elems = data.num_global_elements;
+    }
 
     return 0;
 }
@@ -1766,7 +1976,10 @@ ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marke
         rval = context.MBI->tag_get_handle( "__sharedmarker", 1, MB_TYPE_INTEGER, stag, MB_TAG_CREAT | MB_TAG_DENSE,
                                             &dum_id );CHKERRVAL( rval );
 
-        if( *num_verts > (int)data.local_verts.size() ) { return 1; }  // we are not setting the size
+        if( *num_verts > (int)data.local_verts.size() )
+        {
+            return 1;
+        }  // we are not setting the size
 
         rval = context.MBI->tag_set_data( stag, data.local_verts, (void*)marker );CHKERRVAL( rval );  // assumes integer tag
 
@@ -1798,7 +2011,10 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
     ErrorCode rval;
 
     // verify we have valid ghost layers input specified. If invalid, exit quick.
-    if( *num_ghost_layers <= 0 ) { return 0; }  // nothing to do
+    if( *num_ghost_layers <= 0 )
+    {
+        return 0;
+    }  // nothing to do
 
     appData& data     = context.appDatas[*pid];
     ParallelComm* pco = context.pcomms[*pid];
@@ -1873,7 +2089,10 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         }
 #endif
 
-        if( ierr != 0 ) { return 1; }
+        if( ierr != 0 )
+        {
+            return 1;
+        }
 
         // every sender computes the trivial partition, it is cheap, and we need to send it anyway
         // to each sender
@@ -1960,7 +2179,9 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
 #endif
 
     if( senders_local.empty() )
-    { std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n"; }
+    {
+        std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n";
+    }
     rval = cgraph->receive_mesh( *global, pco, local_set, senders_local );CHKERRVAL( rval );
 
     // after we are done, we could merge vertices that come from different senders, but
@@ -2055,14 +2276,20 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 
     appData& data                               = context.appDatas[*pid];
     std::map< int, ParCommGraph* >::iterator mt = data.pgraph.find( *context_id );
-    if( mt == data.pgraph.end() ) { return 1; }
+    if( mt == data.pgraph.end() )
+    {
+        return 1;
+    }
     ParCommGraph* cgraph = mt->second;
     ParallelComm* pco    = context.pcomms[*pid];
     Range owned          = data.owned_elems;
     ErrorCode rval;
     EntityHandle cover_set;
 
-    if( data.point_cloud ) { owned = data.local_verts; }
+    if( data.point_cloud )
+    {
+        owned = data.local_verts;
+    }
     // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for
     // after atm ocn intx, from phys (case from imoab_phatm_ocn_coupler.cpp) get then the cover set
     // from ints remapper
@@ -2090,7 +2317,9 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
     // basically, we assume everything is defined already on the tag,
     //   and we can get the tags just by its name
     // we assume that there are separators ";" between the tag names
@@ -2102,7 +2331,10 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     {
         Tag tagHandle;
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         tagHandles.push_back( tagHandle );
     }
 
@@ -2120,7 +2352,10 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     appData& data = context.appDatas[*pid];
 
     std::map< int, ParCommGraph* >::iterator mt = data.pgraph.find( *context_id );
-    if( mt == data.pgraph.end() ) { return 1; }
+    if( mt == data.pgraph.end() )
+    {
+        return 1;
+    }
     ParCommGraph* cgraph = mt->second;
 
     ParallelComm* pco = context.pcomms[*pid];
@@ -2136,7 +2371,10 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     {
         rval = context.MBI->get_entities_by_dimension( cover_set, 2, owned );CHKERRVAL( rval );
     }
-    if( data.point_cloud ) { owned = data.local_verts; }
+    if( data.point_cloud )
+    {
+        owned = data.local_verts;
+    }
     // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for
     // after atm ocn intx, from phys (case from imoab_phatm_ocn_coupler.cpp) get then the cover set
     // from ints remapper
@@ -2157,7 +2395,9 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     // we assume that there are separators ";" between the tag names
     std::vector< std::string > tagNames;
@@ -2168,7 +2408,10 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     {
         Tag tagHandle;
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         tagHandles.push_back( tagHandle );
     }
 
@@ -2779,7 +3022,10 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 {
     ParCommGraph* cgraph = context.appDatas[*pid].pgraph[*context_id];
     std::string prefix_str( prefix );
-    if( length_prefix < (int)strlen( prefix ) ) { prefix_str = prefix_str.substr( 0, length_prefix ); }
+    if( length_prefix < (int)strlen( prefix ) )
+    {
+        prefix_str = prefix_str.substr( 0, length_prefix );
+    }
     if( NULL != cgraph )
         cgraph->dump_comm_information( prefix_str, *is_sender );
     else
@@ -3352,7 +3598,10 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         global_areas[1] = srctgt_areas_glb[1];
 
 #ifdef MOAB_HAVE_MPI
-        if( is_parallel ) { MPI_Reduce( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, 0, pco_intx->comm() ); }
+        if( is_parallel )
+        {
+            MPI_Reduce( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, 0, pco_intx->comm() );
+        }
         else
         {
             global_areas[2] = local_area;
@@ -3576,10 +3825,16 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
     {
         Tag tagHandle;
         rval = context.MBI->tag_get_handle( srcNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         srcTagHandles.push_back( tagHandle );
         rval = context.MBI->tag_get_handle( tgtNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         tgtTagHandles.push_back( tagHandle );
     }
 

@@ -404,7 +404,10 @@ ErrorCode TempestRemapper::ConvertMeshToTempest( Remapper::IntersectionContext c
         if( !m_source ) m_source = new Mesh();
         if( outputEnabled ) dbgprint.printf( 0, "Converting (source) MOAB to TempestRemap Mesh representation ...\n" );
         rval = convert_mesh_to_tempest_private( m_source, m_source_set, m_source_entities, &m_source_vertices );MB_CHK_SET_ERR( rval, "Can't convert source mesh to Tempest" );
-        if( m_source_entities.size() == 0 && m_source_vertices.size() != 0 ) { this->point_cloud_source = true; }
+        if( m_source_entities.size() == 0 && m_source_vertices.size() != 0 )
+        {
+            this->point_cloud_source = true;
+        }
     }
     else if( ctx == Remapper::TargetMesh )
     {
@@ -935,7 +938,10 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_el
         const Face& face        = csMesh.faces[k];
         const NodeVector& nodes = csMesh.nodes;
 
-        if( face.edges.size() != 4 ) { _EXCEPTIONT( "Mesh must only contain quadrilateral elements" ); }
+        if( face.edges.size() != 4 )
+        {
+            _EXCEPTIONT( "Mesh must only contain quadrilateral elements" );
+        }
 
         Node centroid;
         centroid.x = centroid.y = centroid.z = 0.0;
@@ -1198,7 +1204,9 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         int err = GenerateOverlapWithMeshes( *m_covering_source, *m_target, *m_overlap, "" /*outFilename*/, "Netcdf4",
                                              "exact", concaveMeshA, concaveMeshB, false );
         if( err )
-        { MB_CHK_SET_ERR( MB_FAILURE, "TempestRemap: Can't compute the intersection of meshes on the sphere" ); }
+        {
+            MB_CHK_SET_ERR( MB_FAILURE, "TempestRemap: Can't compute the intersection of meshes on the sphere" );
+        }
     }
     else
     {
@@ -1719,7 +1727,10 @@ ErrorCode TempestRemapper::augment_overlap_set()
             int sourceID = TLc.vi_rd[sizeTuple * i + 1];
             if( sourceID == currentSourceID )
             {
-                if( currentProcsCount.find( proc ) == currentProcsCount.end() ) { currentProcsCount[proc] = 1; }
+                if( currentProcsCount.find( proc ) == currentProcsCount.end() )
+                {
+                    currentProcsCount[proc] = 1;
+                }
                 else
                     currentProcsCount[proc]++;
             }
@@ -1824,7 +1835,9 @@ ErrorCode TempestRemapper::augment_overlap_set()
                         int vertexIndex = TLc.vi_rd[i * sizeTuple + 4 + j];
                         // is this vertex available from org proc?
                         if( availableVerticesFromThisProc.find( vertexIndex ) == availableVerticesFromThisProc.end() )
-                        { MB_CHK_SET_ERR( MB_FAILURE, " vertex index not available from processor" ); }
+                        {
+                            MB_CHK_SET_ERR( MB_FAILURE, " vertex index not available from processor" );
+                        }
                         TLc2.vi_wr[n2 * sizeTuple2 + 5 + j] = vertexIndex;
                         int indexInTLv                      = availVertexIndicesPerProcessor[orgProc][vertexIndex];
                         indexVerticesInTLv.insert( indexInTLv );

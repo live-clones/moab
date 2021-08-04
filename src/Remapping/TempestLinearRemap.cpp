@@ -134,7 +134,9 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
     // Verify ReverseNodeArray has been calculated
     if( m_meshInputCov->faces.size() > 0 && m_meshInputCov->revnodearray.size() == 0 )
-    { _EXCEPTIONT( "ReverseNodeArray has not been calculated for m_meshInput" ); }
+    {
+        _EXCEPTIONT( "ReverseNodeArray has not been calculated for m_meshInput" );
+    }
 
     // Triangular quadrature rule
     TriangularQuadratureRule triquadrule( TriQuadRuleOrder );
@@ -174,7 +176,9 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     {
         // Output every 1000 elements
         if( ixFirst % outputFrequency == 0 && is_root )
-        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
+        {
+            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
+        }
 
         // Find the set of Faces that overlap faceFirst
         int ixOverlapBegin    = ixOverlap;
@@ -182,7 +186,10 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
         for( ; ixOverlapEnd < m_meshOverlap->faces.size(); ixOverlapEnd++ )
         {
-            if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapEnd] != 0 ) { break; }
+            if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapEnd] != 0 )
+            {
+                break;
+            }
         }
 
         unsigned nOverlapFaces = ixOverlapEnd - ixOverlapBegin;
@@ -499,11 +506,16 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
     {
         const Face& faceFirst = m_meshInputCov->faces[ixFirst];
 
-        if( faceFirst.edges.size() != 4 ) { _EXCEPTIONT( "Only quadrilateral elements allowed for SE remapping" ); }
+        if( faceFirst.edges.size() != 4 )
+        {
+            _EXCEPTIONT( "Only quadrilateral elements allowed for SE remapping" );
+        }
 
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
+        {
+            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
+        }
 
         // Need to re-number the overlap elements such that vecSourceFaceIx[a:b] = 0, then 1 and so
         // on wrt the input mesh data Then the overlap_end and overlap_begin will be correct.
@@ -515,13 +527,19 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
         for( ; ixOverlapTemp < m_meshOverlap->faces.size(); ixOverlapTemp++ )
         {
             // const Face & faceOverlap = m_meshOverlap->faces[ixOverlapTemp];
-            if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapTemp] != 0 ) { break; }
+            if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapTemp] != 0 )
+            {
+                break;
+            }
 
             nOverlapFaces++;
         }
 
         // No overlaps
-        if( nOverlapFaces == 0 ) { continue; }
+        if( nOverlapFaces == 0 )
+        {
+            continue;
+        }
 
         // Allocate remap coefficients array for meshFirst Face
         DataArray3D< double > dRemapCoeff( nP, nP, nOverlapFaces );
@@ -561,7 +579,10 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             int nnodes   = faceOverlap.edges.size();
             for( int j1 = 1; j1 < nnodes; j1++ )
             {
-                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] ) { minIndex = j1; }
+                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] )
+                {
+                    minIndex = j1;
+                }
             }
 #endif
 
@@ -719,7 +740,9 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                           m_meshInputCov->vecFaceArea[ixFirst] );
 #endif
                 if( dTargetArea > m_meshInputCov->vecFaceArea[ixFirst] )
-                { _EXCEPTIONT( "Partial element area exceeds total element area" ); }
+                {
+                    _EXCEPTIONT( "Partial element area exceeds total element area" );
+                }
 
                 dCoeff.Allocate( nOverlapFaces + 1, nP * nP );
 
@@ -888,7 +911,10 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
         for( ; ixOverlapTemp < m_meshOverlap->faces.size(); ixOverlapTemp++ )
         {
             // const Face & faceOverlap = m_meshOverlap->faces[ixOverlapTemp];
-            if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapTemp] != 0 ) { break; }
+            if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapTemp] != 0 )
+            {
+                break;
+            }
 
             nOverlapFaces++;
         }
@@ -914,7 +940,9 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
     {
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
+        {
+            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
+        }
 
         // Quantities from the First Mesh
         const Face& faceFirst = m_meshInputCov->faces[ixFirst];
@@ -951,7 +979,10 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
             int nnodes   = faceOverlap.edges.size();
             for( int j1 = 1; j1 < nnodes; j1++ )
             {
-                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] ) { minIndex = j1; }
+                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] )
+                {
+                    minIndex = j1;
+                }
             }
 #endif
 
@@ -1147,7 +1178,9 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
 
         // Force consistency and conservation
         if( !fNoConservation )
-        { ForceIntArrayConsistencyConservation( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType != 0 ) ); }
+        {
+            ForceIntArrayConsistencyConservation( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType != 0 ) );
+        }
 
         // Update global coefficients
         for( int i = 0; i < nOverlapFaces; i++ )
@@ -1269,7 +1302,9 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
     {
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
+        {
+            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
+        }
 
         // Number of overlapping Faces and triangles
         int nOverlapFaces = nAllOverlapFaces[ixFirst];
@@ -1303,7 +1338,10 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
                 for( int q = 0; q < nPin; q++ )
                 {
                     int ixFirstNode;
-                    if( fContinuousIn ) { ixFirstNode = dataGLLNodesIn[p][q][ixFirst] - 1; }
+                    if( fContinuousIn )
+                    {
+                        ixFirstNode = dataGLLNodesIn[p][q][ixFirst] - 1;
+                    }
                     else
                     {
                         ixFirstNode = ixFirst * nPin * nPin + p * nPin + q;
@@ -1426,7 +1464,9 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
     {
         // Announce computation progress
         if( ixFirst % outputFrequency == 0 && is_root )
-        { dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() ); }
+        {
+            dbgprint.printf( 0, "Element %zu/%lu\n", ixFirst, m_meshInputCov->faces.size() );
+        }
 
         // Quantities from the First Mesh
         const Face& faceFirst = m_meshInputCov->faces[ixFirst];
@@ -1462,16 +1502,25 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
                 for( int t = 0; t < nPout; t++ )
                 {
                     size_t ixSecondNode;
-                    if( fContinuousOut ) { ixSecondNode = dataGLLNodesOut[s][t][ixSecond] - 1; }
+                    if( fContinuousOut )
+                    {
+                        ixSecondNode = dataGLLNodesOut[s][t][ixSecond] - 1;
+                    }
                     else
                     {
                         ixSecondNode = ixSecond * nPout * nPout + s * nPout + t;
                     }
 
-                    if( ixSecondNode >= fSecondNodeFound.GetRows() ) { _EXCEPTIONT( "Logic error" ); }
+                    if( ixSecondNode >= fSecondNodeFound.GetRows() )
+                    {
+                        _EXCEPTIONT( "Logic error" );
+                    }
 
                     // Check if this node has been found already
-                    if( fSecondNodeFound[ixSecondNode] ) { continue; }
+                    if( fSecondNodeFound[ixSecondNode] )
+                    {
+                        continue;
+                    }
 
                     // Check this node
                     Node node;
@@ -1490,7 +1539,9 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
                     // Check if this node is within the first Face
                     if( ( dAlphaIn < -1.0e-10 ) || ( dAlphaIn > 1.0 + 1.0e-10 ) || ( dBetaIn < -1.0e-10 ) ||
                         ( dBetaIn > 1.0 + 1.0e-10 ) )
-                    { continue; }
+                    {
+                        continue;
+                    }
 
                     // Node is within the overlap region, mark as found
                     fSecondNodeFound[ixSecondNode] = true;
@@ -1504,7 +1555,10 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
                         for( int q = 0; q < nPin; q++ )
                         {
                             int ixFirstNode;
-                            if( fContinuousIn ) { ixFirstNode = dataGLLNodesIn[p][q][ixFirst] - 1; }
+                            if( fContinuousIn )
+                            {
+                                ixFirstNode = dataGLLNodesIn[p][q][ixFirst] - 1;
+                            }
                             else
                             {
                                 ixFirstNode = ixFirst * nPin * nPin + p * nPin + q;
@@ -1524,7 +1578,10 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
     // Check for missing samples
     for( size_t i = 0; i < fSecondNodeFound.GetRows(); i++ )
     {
-        if( !fSecondNodeFound[i] ) { _EXCEPTION1( "Can't sample point %i", i ); }
+        if( !fSecondNodeFound[i] )
+        {
+            _EXCEPTION1( "Can't sample point %i", i );
+        }
     }
 
     return;

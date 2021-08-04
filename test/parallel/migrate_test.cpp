@@ -79,7 +79,10 @@ int main( int argc, char* argv[] )
 
     std::string filename;
     filename = TestDir + "/field1.h5m";
-    if( argc > 1 ) { filename = argv[1]; }
+    if( argc > 1 )
+    {
+        filename = argv[1];
+    }
     int num_errors = 0;
     num_errors += RUN_TEST_ARG2( migrate_1_1, filename.c_str() );
     num_errors += RUN_TEST_ARG2( migrate_1_2, filename.c_str() );
