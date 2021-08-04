@@ -205,9 +205,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, vecSourceFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, vecSourceFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, vecSourceFaceArea );
@@ -237,9 +235,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, vecTargetFaceArea );
@@ -683,9 +679,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshInput, m_nDofsPEl_Src, false /* fBubble */, dataGLLNodesSrc, dataGLLJacobianSrc );
 
         if( m_srcDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
@@ -728,9 +722,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
         GenerateMetaData( *m_meshOutput, m_nDofsPEl_Dest, false /* fBubble */, dataGLLNodesDest, dataGLLJacobianDest );
 
         if( m_destDiscType == DiscretizationType_CGLL )
-        {
-            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
-        }
+        { GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea ); }
         else
         {
             GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
@@ -1067,8 +1059,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     NcFile ncMap( strSource, NcFile::ReadOnly );
 #endif
 
-#define CHECK_EXCEPTION( obj, type, varstr )                                                                               \
-    {                                                                                                                \
+#define CHECK_EXCEPTION( obj, type, varstr )                                                                        \
+    {                                                                                                               \
         if( obj == NULL ) { _EXCEPTION3( "Map file \"%s\" does not contain %s \"%s\"", strSource, type, varstr ); } \
     }
 
@@ -1147,11 +1139,11 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     // Now let us set the necessary global-to-local ID maps so that A*x operations
     // can be performed cleanly as if map was computed online
     row_dtoc_dofmap.clear();
-    //row_dtoc_dofmap.reserve( nB / size );
+    // row_dtoc_dofmap.reserve( nB / size );
     col_dtoc_dofmap.clear();
     rowMap.clear();
     colMap.clear();
-    //col_dtoc_dofmap.reserve( 2 * nA / size );
+    // col_dtoc_dofmap.reserve( 2 * nA / size );
     // row_dtoc_dofmap.resize( m_nTotDofs_Dest, UINT_MAX );
     // col_dtoc_dofmap.resize( m_nTotDofs_SrcCov, UINT_MAX );
 
@@ -1214,7 +1206,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
                 row_gdofmap.push_back( vecRowValue );
-                //row_dtoc_dofmap.push_back( vecRowValue );
+                // row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
             else
@@ -1226,7 +1218,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
                 col_gdofmap.push_back( vecColValue );
-                //col_dtoc_dofmap.push_back( vecColValue );
+                // col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }
             else
@@ -1251,7 +1243,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
-                //row_dtoc_dofmap.push_back( vecRowValue );
+                // row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
             else
@@ -1262,7 +1254,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
-                //col_dtoc_dofmap.push_back( vecColValue );
+                // col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }
             else

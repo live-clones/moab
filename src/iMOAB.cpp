@@ -667,14 +667,14 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
     return 0;
 }
 
-ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length)
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length )
 {
     std::ostringstream file_name;
     int rank = 0;
 #ifdef MOAB_HAVE_MPI
-    rank   = context.pcomms[*pid]->rank();
+    rank = context.pcomms[*pid]->rank();
 #endif
-    file_name << prefix  << "_" << rank << ".h5m";
+    file_name << prefix << "_" << rank << ".h5m";
     // Now let us actually write the file to disk with appropriate options
     ErrorCode rval = context.MBI->write_file( file_name.str().c_str(), 0, 0, &context.appDatas[*pid].file_set, 1 );CHKERRVAL( rval );
 
@@ -1309,9 +1309,7 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     Tag tagHandle;
     ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
@@ -1363,9 +1361,7 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -1385,9 +1381,7 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     Range* ents_to_set;
 
     if( *ent_type == 0 )  // vertices
-    {
-        ents_to_set = &data.all_verts;
-    }
+    { ents_to_set = &data.all_verts; }
     else  // if (*ent_type == 1) // *ent_type can be 0 (vertices) or 1 (elements)
     {
         ents_to_set = &data.primary_elems;
@@ -1396,9 +1390,7 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     int nents_to_be_set = *num_tag_storage_length / tagLength;
 
     if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
-    {
-        return 1;
-    }  // to many entities to be set or too few
+    { return 1; }  // to many entities to be set or too few
 
     // restrict the range; everything is contiguous; or not?
 
@@ -1435,9 +1427,7 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     Range* ents_to_get;
 
     if( *ent_type == 0 )  // vertices
-    {
-        ents_to_get = &data.all_verts;
-    }
+    { ents_to_get = &data.all_verts; }
     else  // if (*ent_type == 1)
     {
         ents_to_get = &data.primary_elems;
@@ -1446,9 +1436,7 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     int nents_to_get = *num_tag_storage_length / tagLength;
 
     if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
-    {
-        return 1;
-    }  // to many entities to get, or too little
+    { return 1; }  // to many entities to get, or too little
 
     // restrict the range; everything is contiguous; or not?
     // Range contig_range ( * ( ents_to_get->begin() ), * ( ents_to_get->begin() + nents_to_get - 1
@@ -1486,9 +1474,7 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     Range* ents_to_set = NULL;
 
     if( *ent_type == 0 )  // vertices
-    {
-        ents_to_set = &data.all_verts;
-    }
+    { ents_to_set = &data.all_verts; }
     else if( *ent_type == 1 )
     {
         ents_to_set = &data.primary_elems;
@@ -1534,9 +1520,7 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     Range* ents_to_get = NULL;
 
     if( *ent_type == 0 )  // vertices
-    {
-        ents_to_get = &data.all_verts;
-    }
+    { ents_to_get = &data.all_verts; }
     else if( *ent_type == 1 )
     {
         ents_to_get = &data.primary_elems;
@@ -1667,9 +1651,7 @@ ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double
     appData& data = context.appDatas[*pid];
 
     if( !data.local_verts.empty() )  // we should have no vertices in the app
-    {
-        return 1;
-    }
+    { return 1; }
 
     int nverts = *coords_len / *dim;
 
@@ -1978,9 +1960,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
 #endif
 
     if( senders_local.empty() )
-    {
-        std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n";
-    }
+    { std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n"; }
     rval = cgraph->receive_mesh( *global, pco, local_set, senders_local );CHKERRVAL( rval );
 
     // after we are done, we could merge vertices that come from different senders, but
@@ -2110,9 +2090,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
     // basically, we assume everything is defined already on the tag,
     //   and we can get the tags just by its name
     // we assume that there are separators ";" between the tag names
@@ -2179,9 +2157,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     std::string tag_name( tag_storage_name );
 
     if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     // we assume that there are separators ";" between the tag names
     std::vector< std::string > tagNames;
@@ -2601,7 +2577,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 // here)
 //  in the intersection
 ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-              int* src_id, int* migr_id, int* context_id )
+                             int* src_id, int* migr_id, int* context_id )
 {
     // first, based on the scompid and migrcomp, find the parCommGraph corresponding to this
     // exchange
@@ -2616,8 +2592,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     // And based on this one, we will build the newly modified one for coverage
     if( *pid_src >= 0 )
     {
-        default_context_id = *migr_id; // the other one
-	assert( context.appDatas[*pid_src].global_id == *src_id );
+        default_context_id = *migr_id;  // the other one
+        assert( context.appDatas[*pid_src].global_id == *src_id );
         sendGraph = context.appDatas[*pid_src].pgraph[default_context_id];  // maybe check if it does not exist
 
         // report the sender and receiver tasks in the joint comm
@@ -2632,7 +2608,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     if( *pid_migr >= 0 )
     {
         // find the original one
-	default_context_id = *src_id;
+        default_context_id = *src_id;
         assert( context.appDatas[*pid_migr].global_id == *migr_id );
         recvGraph = context.appDatas[*pid_migr].pgraph[default_context_id];
         // report the sender and receiver tasks in the joint comm, from migrated mesh pt of view
@@ -2824,14 +2800,14 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 ErrCode iMOAB_LoadMappingWeightsFromFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename,
-    int solution_weights_identifier_length, int remap_weights_filename_length )
+    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
+    int remap_weights_filename_length )
 {
     assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
     // assert( row_major_ownership != NULL );
 
     ErrorCode rval;
-    bool row_based_partition =   true ;
+    bool row_based_partition = true;
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intersection];
@@ -2865,17 +2841,14 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
-
-    std::vector< int > tmp_owned_ids; // this will do a trivial row distribution
+    std::vector< int > tmp_owned_ids;  // this will do a trivial row distribution
     rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
 
     return 0;
 }
 
-
-ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
-        MPI_Comm* join, MPI_Group* group1,
-                                MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction )
+ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, MPI_Comm* join, MPI_Group* group1,
+                              MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction )
 {
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
@@ -2915,13 +2888,14 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
         rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
         rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
     }
-    Tag tagType2 = context.MBI->globalId_tag();;
+    Tag tagType2 = context.MBI->globalId_tag();
+    ;
 
     std::vector< int > valuesComp1;
 
     // populate first tuple
-    Range ents_of_interest; // will be filled with entities on pid1, that need to be distributed,
-                              // rearranged in split_ranges map
+    Range ents_of_interest;  // will be filled with entities on pid1, that need to be distributed,
+                             // rearranged in split_ranges map
     if( *pid1 >= 0 )
     {
         appData& data1     = context.appDatas[*pid1];
@@ -2987,33 +2961,32 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     // start copy
     TLcomp2.enableWriteAccess();
 
-    moab::TempestOnlineMap* weightMap = NULL; // declare it outside, but it will make sense only for *pid >= 0
+    moab::TempestOnlineMap* weightMap = NULL;  // declare it outside, but it will make sense only for *pid >= 0
     // we know that :) (or *pid2 >= 0, it means we are on the coupler PEs, read map exists, and coupler procs exist)
     // populate second tuple with ids  from read map: we need row_gdofmap and col_gdofmap
     std::vector< int > valuesComp2;
-    if( *pid2 >= 0 ) // we are now on coupler, map side
+    if( *pid2 >= 0 )  // we are now on coupler, map side
     {
-        appData& data2     = context.appDatas[*pid2];
+        appData& data2           = context.appDatas[*pid2];
         TempestMapAppData& tdata = data2.tempestData;
         // should be only one map, read from file
-        assert (tdata.weightMaps.size() == 1);
+        assert( tdata.weightMaps.size() == 1 );
         // maybe we need to check it is the map we expect
         weightMap = tdata.weightMaps.begin()->second;
-        //std::vector<int> ids_of_interest;
+        // std::vector<int> ids_of_interest;
         // do a deep copy of the ids of interest: row ids or col ids, target or source direction
-        if (*direction == 1)
+        if( *direction == 1 )
         {
             // we are interested in col ids, source
             // new method from moab::TempestOnlineMap
-            rval = weightMap -> fill_col_ids(valuesComp2); CHKERRVAL( rval );
+            rval = weightMap->fill_col_ids( valuesComp2 );CHKERRVAL( rval );
         }
-        else if (*direction == 2)
+        else if( *direction == 2 )
         {
             // we are interested in row ids, for target ids
-            rval = weightMap -> fill_row_ids(valuesComp2); CHKERRVAL( rval );
+            rval = weightMap->fill_row_ids( valuesComp2 );CHKERRVAL( rval );
         }
         //
-
 
         // now fill the tuple list with info and markers
         std::set< int > uniq( valuesComp2.begin(), valuesComp2.end() );
@@ -3123,8 +3096,8 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     pc.crystal_router()->gs_transfer( 1, TLBackToComp1, 0 );  // communication towards original tasks, with info about
     pc.crystal_router()->gs_transfer( 1, TLBackToComp2, 0 );
 
-    TupleList TLv; // vertices
-    TupleList TLc; // cells if needed (not type 2)
+    TupleList TLv;  // vertices
+    TupleList TLc;  // cells if needed (not type 2)
 
     if( *pid1 >= 0 )
     {
@@ -3139,44 +3112,38 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 #endif
         // so we are now on pid1, we know now each marker were it has to go
         // add a new method to ParCommGraph, to set up the split_ranges and involved_IDs_map
-        rval = cgraph->set_split_ranges( *comp1, TLBackToComp1, valuesComp1, lenTagType1,
-                ents_of_interest, *type);CHKERRVAL( rval );
+        rval = cgraph->set_split_ranges( *comp1, TLBackToComp1, valuesComp1, lenTagType1, ents_of_interest, *type );CHKERRVAL( rval );
         // we can just send vertices and elements, with crystal routers;
         // on the receiving end, make sure they are not duplicated, by looking at the global id
         // if *type is 1, also send global_dofs tag in the element tuple
-        rval = cgraph->form_tuples_to_migrate_mesh(context.MBI, TLv, TLc, *type, lenTagType1 ); CHKERRVAL( rval );
-
+        rval = cgraph->form_tuples_to_migrate_mesh( context.MBI, TLv, TLc, *type, lenTagType1 );CHKERRVAL( rval );
     }
     pc.crystal_router()->gs_transfer( 1, TLv, 0 );  // communication towards coupler tasks, with mesh vertices
-    if (*type != 2)
-        pc.crystal_router()->gs_transfer( 1, TLc, 0 ); // those are cells
+    if( *type != 2 ) pc.crystal_router()->gs_transfer( 1, TLc, 0 );  // those are cells
 
-
-    if( *pid3 >= 0 ) // will receive the mesh, on coupler pes!
+    if( *pid3 >= 0 )  // will receive the mesh, on coupler pes!
     {
         appData& data3     = context.appDatas[*pid3];
         EntityHandle fset3 = data3.file_set;
-        Range primary_ents3; // vertices for type 2, cells of dim 2 for type 1 or 3
-        std::vector<int> values_entities; // will be the size of primary_ents3 * lenTagType1
-        rval = cgraph_rev->form_mesh_from_tuples(context.MBI, TLv, TLc, *type, lenTagType1, fset3,
-                primary_ents3, values_entities); CHKERRVAL( rval );
+        Range primary_ents3;                 // vertices for type 2, cells of dim 2 for type 1 or 3
+        std::vector< int > values_entities;  // will be the size of primary_ents3 * lenTagType1
+        rval = cgraph_rev->form_mesh_from_tuples( context.MBI, TLv, TLc, *type, lenTagType1, fset3, primary_ents3,
+                                                  values_entities );CHKERRVAL( rval );
         iMOAB_UpdateMeshInfo( pid3 );
         int ndofPerEl = 1;
-        if (1 == *type)
-            ndofPerEl = (int) (sqrt (lenTagType1));
+        if( 1 == *type ) ndofPerEl = (int)( sqrt( lenTagType1 ) );
         // because we are on the coupler, we know that the read map pid2 exists
-        assert(*pid2 >= 0);
-        appData& dataIntx      = context.appDatas[*pid2];
+        assert( *pid2 >= 0 );
+        appData& dataIntx        = context.appDatas[*pid2];
         TempestMapAppData& tdata = dataIntx.tempestData;
 
         // if we are on source coverage, direction 1, we can set covering mesh, covering cells
-        if (1 == *direction)
+        if( 1 == *direction )
         {
             tdata.pid_src = pid3;
             tdata.remapper->SetMeshSet( Remapper::CoveringMesh, fset3, primary_ents3 );
             weightMap->SetSourceNDofsPerElement( ndofPerEl );
-            weightMap->set_col_dc_dofs ( values_entities ); // will set col_dtoc_dofmap
-
+            weightMap->set_col_dc_dofs( values_entities );  // will set col_dtoc_dofmap
         }
         // if we are on target, we can set the target cells
         else
@@ -3184,9 +3151,8 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
             tdata.pid_dest = pid3;
             tdata.remapper->SetMeshSet( Remapper::TargetMesh, fset3, primary_ents3 );
             weightMap->SetDestinationNDofsPerElement( ndofPerEl );
-            weightMap->set_row_dc_dofs ( values_entities );  // will set row_dtoc_dofmap
+            weightMap->set_row_dc_dofs( values_entities );  // will set row_dtoc_dofmap
         }
-
     }
 
     return 0;

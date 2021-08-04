@@ -282,12 +282,12 @@ class TempestOnlineMap : public OfflineMap
     /// <summary>
     ///     Set the number of Degrees-Of-Freedom per element on the source mesh.
     /// </summary>
-    void  SetSourceNDofsPerElement(int ns);
+    void SetSourceNDofsPerElement( int ns );
 
     /// <summary>
     ///     Get the number of Degrees-Of-Freedom per element on the destination mesh.
     /// </summary>
-    void  SetDestinationNDofsPerElement(int nt);
+    void SetDestinationNDofsPerElement( int nt );
 
     ///	<summary>
     ///		Get the global Degrees-Of-Freedom ID on the destination mesh.
@@ -345,28 +345,28 @@ class TempestOnlineMap : public OfflineMap
     moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag,
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
-    moab::ErrorCode fill_row_ids(std::vector<int> & ids_of_interest)
+    moab::ErrorCode fill_row_ids( std::vector< int >& ids_of_interest )
     {
-        ids_of_interest.reserve(row_gdofmap.size());
+        ids_of_interest.reserve( row_gdofmap.size() );
         // need to add 1
-        for (auto it=row_gdofmap.begin(); it!=row_gdofmap.end(); it++)
-            ids_of_interest.push_back(*it+1);
+        for( auto it = row_gdofmap.begin(); it != row_gdofmap.end(); it++ )
+            ids_of_interest.push_back( *it + 1 );
 
         return moab::MB_SUCCESS;
     }
 
-    moab::ErrorCode  fill_col_ids(std::vector<int> & ids_of_interest)
+    moab::ErrorCode fill_col_ids( std::vector< int >& ids_of_interest )
     {
-        ids_of_interest.reserve(col_gdofmap.size());
+        ids_of_interest.reserve( col_gdofmap.size() );
         // need to add 1
-        for (auto it=col_gdofmap.begin(); it!=col_gdofmap.end(); it++)
-            ids_of_interest.push_back(*it+1);
+        for( auto it = col_gdofmap.begin(); it != col_gdofmap.end(); it++ )
+            ids_of_interest.push_back( *it + 1 );
         return moab::MB_SUCCESS;
     }
 
-    moab::ErrorCode  set_col_dc_dofs( std::vector<int> & values_entities );
+    moab::ErrorCode set_col_dc_dofs( std::vector< int >& values_entities );
 
-    moab::ErrorCode  set_row_dc_dofs( std::vector<int> & values_entities );
+    moab::ErrorCode set_row_dc_dofs( std::vector< int >& values_entities );
 
   private:
     void setup_sizes_dimensions();
@@ -471,13 +471,12 @@ inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
 }
 
 // setters for m_nDofsPEl_Src, m_nDofsPEl_Dest
-inline void moab::TempestOnlineMap::SetSourceNDofsPerElement(int ns)
+inline void moab::TempestOnlineMap::SetSourceNDofsPerElement( int ns )
 {
     m_nDofsPEl_Src = ns;
 }
 
-
-inline void moab::TempestOnlineMap::SetDestinationNDofsPerElement(int nt)
+inline void moab::TempestOnlineMap::SetDestinationNDofsPerElement( int nt )
 {
     m_nDofsPEl_Dest = nt;
 }

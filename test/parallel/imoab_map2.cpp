@@ -68,10 +68,10 @@ int main( int argc, char* argv[] )
         cplatm        = 6;  // component ids are unique over all pes, and established in advance;
 
     std::string ocnFilename = TestDir + "/outTri15_8.h5m";
-    std::string mapFilename = TestDir + "/mapNE20_FV15.nc"; //this is a netcdf file!
+    std::string mapFilename = TestDir + "/mapNE20_FV15.nc";  // this is a netcdf file!
 
-    std::string baseline    = TestDir + "/baseline2.txt";
-    int rankInOcnComm       = -1;
+    std::string baseline = TestDir + "/baseline2.txt";
+    int rankInOcnComm    = -1;
     int cmpocn = 17, cplocn = 18,
         atmocnid = 618;  // component ids are unique over all pes, and established in advance;
 
@@ -102,7 +102,6 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "startCoupler,g", "start task for coupler layout", &startG4 );
     opts.addOpt< int >( "endCoupler,j", "end task for coupler layout", &endG4 );
 
-
     bool no_regression_test = false;
     opts.addOpt< void >( "no_regression,r", "do not do regression test against baseline 1", &no_regression_test );
     opts.parseCommandLine( argc, argv );
@@ -111,13 +110,10 @@ int main( int argc, char* argv[] )
 
     if( !rankInGlobalComm )
     {
-        std::cout << " atm file: " << atmFilename << "\n   on tasks : " << startG1 << ":" << endG1 <<
-            "\n ocn file: " << ocnFilename << "\n     on tasks : " << startG2 << ":" << endG2 <<
-            "\n map file:" << mapFilename << "\n     on tasks : " << startG4 << ":" << endG4 << "\n";
-        if (!no_regression_test)
-        {
-            std::cout << " check projection against baseline: " << baseline << "\n";
-        }
+        std::cout << " atm file: " << atmFilename << "\n   on tasks : " << startG1 << ":" << endG1
+                  << "\n ocn file: " << ocnFilename << "\n     on tasks : " << startG2 << ":" << endG2
+                  << "\n map file:" << mapFilename << "\n     on tasks : " << startG4 << ":" << endG4 << "\n";
+        if( !no_regression_test ) { std::cout << " check projection against baseline: " << baseline << "\n"; }
     }
 
     // load files on 3 different communicators, groups
@@ -129,7 +125,6 @@ int main( int argc, char* argv[] )
     MPI_Comm atmComm;
     ierr = create_group_and_comm( startG1, endG1, jgroup, &atmPEGroup, &atmComm );
     CHECKIERR( ierr, "Cannot create atm MPI group and communicator " )
-
 
     MPI_Group ocnPEGroup;
     MPI_Comm ocnComm;
@@ -168,7 +163,6 @@ int main( int argc, char* argv[] )
     iMOAB_AppID cplOcnPID    = &cplOcnAppID;     // ocn on coupler PEs
     iMOAB_AppID cplAtmOcnPID = &cplAtmOcnAppID;  // intx atm -ocn on coupler PEs
 
-
     if( couComm != MPI_COMM_NULL )
     {
         MPI_Comm_rank( couComm, &rankInCouComm );
@@ -187,7 +181,8 @@ int main( int argc, char* argv[] )
         MPI_Comm_rank( atmComm, &rankInAtmComm );
         ierr = iMOAB_RegisterApplication( "ATM1", &atmComm, &cmpatm, cmpAtmPID );
         CHECKIERR( ierr, "Cannot register ATM App" )
-        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay, atmFilename.length(), readopts.length() );
+        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay, atmFilename.length(),
+                               readopts.length() );
         CHECKIERR( ierr, "Cannot load atm mesh" )
     }
 
@@ -197,7 +192,8 @@ int main( int argc, char* argv[] )
         MPI_Comm_rank( ocnComm, &rankInOcnComm );
         ierr = iMOAB_RegisterApplication( "OCN1", &ocnComm, &cmpocn, cmpOcnPID );
         CHECKIERR( ierr, "Cannot register OCN App" )
-        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay, ocnFilename.length(), readopts.length() );
+        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay, ocnFilename.length(),
+                               readopts.length() );
         CHECKIERR( ierr, "Cannot load ocn mesh" )
     }
 
@@ -210,56 +206,52 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot register ocn_atm map instance over coupler pes " )
     }
 
-    int disc_orders[3]                       = { 1, 1, 1 };
+    int disc_orders[3] = { 1, 1, 1 };
 
     const std::string intx_from_file_identifier = "map-from-file";
 
     if( couComm != MPI_COMM_NULL )
     {
 
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(),
-                mapFilename.c_str(),
-                intx_from_file_identifier.size(), mapFilename.size() );
+        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(), mapFilename.c_str(),
+                                                 intx_from_file_identifier.size(), mapFilename.size() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 
-
     if( atmCouComm != MPI_COMM_NULL )
     {
-        int type = 3;  // quads in source set
-        int direction = 1; // from source to coupler; will create a mesh on cplAtmPID
+        int type      = 3;  // quads in source set
+        int direction = 1;  // from source to coupler; will create a mesh on cplAtmPID
         // because it is like "coverage", context will be cplocn
-        ierr = iMOAB_MigrateMapMesh( cmpAtmPID, cplAtmOcnPID, cplAtmPID,  &atmCouComm, &atmPEGroup, &couPEGroup, &type,
-                                       &cmpatm, &cplocn, &direction );
+        ierr = iMOAB_MigrateMapMesh( cmpAtmPID, cplAtmOcnPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &type,
+                                     &cmpatm, &cplocn, &direction );
         CHECKIERR( ierr, "failed to migrate mesh for atm on coupler" );
-        if (*cplAtmPID >= 0)
+        if( *cplAtmPID >= 0 )
         {
-            char prefix [] = "atmcov";
-            ierr = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
+            char prefix[] = "atmcov";
+            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local mesh" );
         }
-
-
     }
     MPI_Barrier( MPI_COMM_WORLD );
 
     if( ocnCouComm != MPI_COMM_NULL )
     {
-        int type = 3;  // cells with GLOBAL_ID in ocean / target set
-        int direction = 2; // from coupler to target; will create a mesh on cplOcnPID
+        int type      = 3;  // cells with GLOBAL_ID in ocean / target set
+        int direction = 2;  // from coupler to target; will create a mesh on cplOcnPID
         // it will be like initial migrate cmpocn <-> cplocn
-        ierr = iMOAB_MigrateMapMesh( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup,  &type,
-                                       &cmpocn, &cplocn, &direction );
+        ierr = iMOAB_MigrateMapMesh( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup, &type,
+                                     &cmpocn, &cplocn, &direction );
         CHECKIERR( ierr, "failed to migrate mesh for ocn on coupler" );
 
-        if (*cplOcnPID >= 0)
+        if( *cplOcnPID >= 0 )
         {
             char prefix[] = "ocntgt";
-            ierr = iMOAB_WriteLocalMesh( cplOcnPID, prefix, strlen( prefix ) );
+            ierr          = iMOAB_WriteLocalMesh( cplOcnPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local ocean mesh" );
             char outputFileRec[] = "CoupOcn.h5m";
-            ierr = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
-                                        strlen( fileWriteOptions ) );
+            ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
+                                    strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "failed to write ocean global mesh file" );
         }
     }
@@ -277,7 +269,6 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
                                        strlen( bottomTempField ) );
         CHECKIERR( ierr, "failed to define the field tag AnalyticalSolnSrcExact" );
-
 
         ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
                                        strlen( bottomTempProjectedField ) );
@@ -324,8 +315,6 @@ int main( int argc, char* argv[] )
     const char* concat_fieldname  = "AnalyticalSolnSrcExact";
     const char* concat_fieldnameT = "Target_proj";
 
-
-
     {
 
         PUSH_TIMER( "Send/receive data from atm component to coupler in ocn context" )
@@ -336,7 +325,6 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_SendElementTag( cmpAtmPID, "AnalyticalSolnSrcExact", &atmCouComm, &cplocn,
                                          strlen( "AnalyticalSolnSrcExact" ) );
             CHECKIERR( ierr, "cannot send tag values" )
-
         }
         if( couComm != MPI_COMM_NULL )
         {
@@ -344,9 +332,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_ReceiveElementTag( cplAtmPID, "AnalyticalSolnSrcExact", &atmCouComm, &cmpatm,
                                             strlen( "AnalyticalSolnSrcExact" ) );
             CHECKIERR( ierr, "cannot receive tag values" )
-
         }
-
 
         // we can now free the sender buffers
         if( atmComm != MPI_COMM_NULL )
@@ -355,23 +341,22 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
-        if (*cplAtmPID >= 0 )
+        if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov_withdata";
-            ierr = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
+            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local atm cov mesh with data" );
         }
-
-
 
         if( couComm != MPI_COMM_NULL )
         {
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( "Apply Scalar projection weights" )
-            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(), concat_fieldname,
-                                                       concat_fieldnameT, intx_from_file_identifier.size(),
-                                                       strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
+            ierr =
+                iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(), concat_fieldname,
+                                                    concat_fieldnameT, intx_from_file_identifier.size(),
+                                                    strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
 
@@ -391,7 +376,6 @@ int main( int argc, char* argv[] )
                                            &tagIndexIn2, strlen( bottomTempProjectedField ) );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                              "Target_proj on ocn pes" );
-
         }
         // send the tag to ocean pes, from ocean mesh on coupler pes
         //   from couComm, using common joint comm ocn_coupler
@@ -400,29 +384,28 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             // need to use ocean comp id for context
-            context_id = cmpocn; // id for ocean on comp
-            ierr = iMOAB_SendElementTag( cplOcnPID, "Target_proj", &ocnCouComm, &context_id,
-                                         strlen( "Target_proj" ) );
+            context_id = cmpocn;  // id for ocean on comp
+            ierr = iMOAB_SendElementTag( cplOcnPID, "Target_proj", &ocnCouComm, &context_id, strlen( "Target_proj" ) );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
         // receive on component 2, ocean
         if( ocnComm != MPI_COMM_NULL )
         {
-            context_id = cplocn; // id for ocean on coupler
-            ierr = iMOAB_ReceiveElementTag( cmpOcnPID, "Target_proj", &ocnCouComm,
-                                            &context_id, strlen( "Target_proj" ) );
+            context_id = cplocn;  // id for ocean on coupler
+            ierr =
+                iMOAB_ReceiveElementTag( cmpOcnPID, "Target_proj", &ocnCouComm, &context_id, strlen( "Target_proj" ) );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpocn;
-            ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+            ierr       = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
         }
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( ocnComm != MPI_COMM_NULL  )
+        if( ocnComm != MPI_COMM_NULL )
         {
             char outputFileOcn[] = "OcnWithProj.h5m";
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
@@ -461,11 +444,7 @@ int main( int argc, char* argv[] )
             }
         }
 
-
-
     }  // end loop iterations n
-
-
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -478,20 +457,17 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot deregister app OCN1" )
     }
 
-
     if( atmComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_DeregisterApplication( cmpAtmPID );
         CHECKIERR( ierr, "cannot deregister app ATM1" )
     }
 
-
     if( couComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_DeregisterApplication( cplOcnPID );
         CHECKIERR( ierr, "cannot deregister app OCNX" )
     }
-
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -513,7 +489,6 @@ int main( int argc, char* argv[] )
     if( MPI_COMM_NULL != ocnCouComm ) MPI_Comm_free( &ocnCouComm );
     MPI_Group_free( &joinOcnCouGroup );
 
-
     if( MPI_COMM_NULL != couComm ) MPI_Comm_free( &couComm );
 
     MPI_Group_free( &atmPEGroup );
@@ -527,4 +502,3 @@ int main( int argc, char* argv[] )
 
     return 0;
 }
-

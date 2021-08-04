@@ -802,24 +802,24 @@ moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string
 
     return moab::MB_SUCCESS;
 }
-void TempestRemapper::SetMeshSet(Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/, moab::EntityHandle mset ,
-            moab::Range & entities )
+void TempestRemapper::SetMeshSet( Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/,
+                                  moab::EntityHandle mset, moab::Range& entities )
 {
 
-    if( ctx == Remapper::SourceMesh ) // should not be used
+    if( ctx == Remapper::SourceMesh )  // should not be used
     {
         m_source_entities = entities;
-        m_source_set = mset;
+        m_source_set      = mset;
     }
     else if( ctx == Remapper::TargetMesh )
     {
         m_target_entities = entities;
-        m_target_set = mset;
+        m_target_set      = mset;
     }
-    else if( ctx ==  Remapper::CoveringMesh )
+    else if( ctx == Remapper::CoveringMesh )
     {
         m_covering_source_entities = entities;
-        m_covering_source_set = mset;
+        m_covering_source_set      = mset;
     }
     else
     {
@@ -1198,9 +1198,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         int err = GenerateOverlapWithMeshes( *m_covering_source, *m_target, *m_overlap, "" /*outFilename*/, "Netcdf4",
                                              "exact", concaveMeshA, concaveMeshB, false );
         if( err )
-        {
-            MB_CHK_SET_ERR( MB_FAILURE, "TempestRemap: Can't compute the intersection of meshes on the sphere" );
-        }
+        { MB_CHK_SET_ERR( MB_FAILURE, "TempestRemap: Can't compute the intersection of meshes on the sphere" ); }
     }
     else
     {
@@ -1826,9 +1824,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
                         int vertexIndex = TLc.vi_rd[i * sizeTuple + 4 + j];
                         // is this vertex available from org proc?
                         if( availableVerticesFromThisProc.find( vertexIndex ) == availableVerticesFromThisProc.end() )
-                        {
-                            MB_CHK_SET_ERR( MB_FAILURE, " vertex index not available from processor" );
-                        }
+                        { MB_CHK_SET_ERR( MB_FAILURE, " vertex index not available from processor" ); }
                         TLc2.vi_wr[n2 * sizeTuple2 + 5 + j] = vertexIndex;
                         int indexInTLv                      = availVertexIndicesPerProcessor[orgProc][vertexIndex];
                         indexVerticesInTLv.insert( indexInTLv );

@@ -129,8 +129,8 @@ class TempestRemapper : public Remapper
     /// </summary>
     void SetMesh( Remapper::IntersectionContext ctx, Mesh* mesh, bool overwrite = true );
 
-    void SetMeshSet(Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/, moab::EntityHandle mset ,
-            moab::Range & entities );
+    void SetMeshSet( Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/, moab::EntityHandle mset,
+                     moab::Range& entities );
     /// <summary>
     ///     Get the covering mesh (TempestRemap) object.
     /// </summary>

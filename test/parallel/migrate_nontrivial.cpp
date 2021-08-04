@@ -163,7 +163,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     MPI_Barrier( jcomm );
 
     // we can now free the sender buffers
-    context_id = compid2; // even for default migrate, be more explicit
+    context_id = compid2;  // even for default migrate, be more explicit
     if( comm1 != MPI_COMM_NULL ) ierr = iMOAB_FreeSenderBuffers( pid1, &context_id );
 
     if( comm2 != MPI_COMM_NULL )

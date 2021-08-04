@@ -73,12 +73,14 @@
     IMOAB_FC_WRAPPER( imoab_computescalarprojectionweights, IMOAB_COMPUTESCALARPROJECTIONWEIGHTS )
 #define iMOAB_ApplyScalarProjectionWeights \
     IMOAB_FC_WRAPPER( imoab_applyscalarprojectionweights, IMOAB_APPLYSCALARPROJECTIONWEIGHTS )
-#define iMOAB_CoverageGraph IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
+#define iMOAB_CoverageGraph  IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
 #define iMOAB_MigrateMapMesh IMOAB_FC_WRAPPER( imoab_migratemapmesh, IMOAB_MIGRATEMAPMESH )
 #ifdef MOAB_HAVE_NETCDF
 
-#define iMOAB_LoadMappingWeightsFromFile IMOAB_FC_WRAPPER( imoab_loadmappingweightsfromfile, IMOAB_LOADMAPPINGWEIGHTSFROMFILE )
-#define iMOAB_WriteMappingWeightsToFile IMOAB_FC_WRAPPER( imoab_writemappingweightstofile, IMOAB_WRITEMAPPINGWEIGHTSTOFILE )
+#define iMOAB_LoadMappingWeightsFromFile \
+    IMOAB_FC_WRAPPER( imoab_loadmappingweightsfromfile, IMOAB_LOADMAPPINGWEIGHTSFROMFILE )
+#define iMOAB_WriteMappingWeightsToFile \
+    IMOAB_FC_WRAPPER( imoab_writemappingweightstofile, IMOAB_WRITEMAPPINGWEIGHTSTOFILE )
 #endif /* MOAB_HAVE_NETCDF */
 
 #endif /* MOAB_HAVE_TEMPESTREMAP */
