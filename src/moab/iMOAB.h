@@ -685,6 +685,19 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
 ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGroup, int* rcompid, int* method );
 
 /**
+  \brief migrate (send) a set of elements from a group of tasks (senders) to another group of tasks (receivers)
+  <B>Operations:</B>  Collective on sender group; Fortran version
+
+   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
+   \param[in]  join (int *)                           communicator that overlaps both groups
+   \param[in]  receivingGroup (int *)                 receiving group
+   \param[in]  rcompid  (int*)                        external id of application that receives the mesh
+   \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
+ */
+
+ErrCode iMOAB_SendMeshFort( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method );
+
+/**
    \brief during nonblocking send, buffers were allocated, to keep data until received
    Free them after requests are completed
    \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID sender mesh
@@ -705,6 +718,20 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_d );
 
 ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGroup, int* scompid );
 
+
+/**
+  \brief migrate (receive) a set of elements from a sender group of tasks
+  <B>Operations:</B>  Collective on receiver group; Fortran version
+
+   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
+   \param[in]  join (int *)                           communicator that overlaps both groups
+   \param[in]  sendingGroup (int *)                   sending group
+   \param[in]  scompid ( int *)                       external id of application that sends the mesh
+ */
+
+ErrCode iMOAB_ReceiveMeshFort( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid );
+
+
 /**
   \brief migrate (send) a list of tags, from a sender group of tasks to a receiver group of tasks
   <B>Operations:</B> Collective over the sender group, nonblocking sends
@@ -719,6 +746,21 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
 ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
                               int tag_storage_name_length );
 
+
+/**
+  \brief migrate (send) a list of tags, from a sender group of tasks to a receiver group of tasks
+  <B>Operations:</B> Collective over the sender group, nonblocking sends; Fortran version
+
+   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
+   \param[in]  tag_storage_name(const iMOAB_String)   name of the tags; concatenated, separated by ";"
+   \param[in]  join (int *)                           communicator that overlaps both groups
+   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
+   \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
+ */
+
+ErrCode iMOAB_SendElementTagFort( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+                              int tag_storage_name_length );
+
 /**
   \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
   <B>Operations:</B> Collective over the receiver group, blocking receives
@@ -730,6 +772,19 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
+                                 int tag_storage_name_length );
+
+/**
+  \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
+  <B>Operations:</B> Collective over the receiver group, blocking receives; Fortran version
+
+   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
+   \param[in]  tag_storage_name (iMOAB_String)        name of the tags to be received; concatenated, separated by ";"
+   \param[in]  join (int *)                           communicator that overlaps both groups
+   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
+   \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
+ */
+ErrCode iMOAB_ReceiveElementTagFort( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
                                  int tag_storage_name_length );
 
 /**
@@ -750,6 +805,25 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
 ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* join, MPI_Group* group1,
                                 MPI_Group* group2, int* type1, int* type2, int* comp1, int* comp2 );
 
+
+/**
+\brief compute a comm graph between 2 moab apps, based on ID matching
+<B>Operations:</B> Collective over joint comm; Fortran version
+
+ \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the first application ID
+ \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the second application ID
+ \param[in]  join (int *)                           communicator that overlaps both groups
+ \param[in]  group1 (int *)                         MPI group for first comp
+ \param[in]  group2 (int *)                         MPI group for second comp
+ \param[in]  type1 (int *)                          type of mesh (spectral with GLOBAL_DOFS, etc)
+ \param[in]  type2 (int *)                          type of mesh (point cloud with GLOBAL_ID, etc)
+ \param[in]  comp1 (int*)                           id of the component 1
+ \param[in]  cpmp2 (int*)                           id of the component 2
+
+*/
+ErrCode iMOAB_ComputeCommGraphFort( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
+                                int* group2, int* type1, int* type2, int* comp1, int* comp2 );
+
 /**
   \brief Recompute the communication graph between component and coupler, considering intersection coverage .
   \note
@@ -767,6 +841,29 @@ coupler PEs \param[in]  pid_intx (iMOAB_AppID)                 moab id for inter
 context_id (int*)                      id of the other component in intersection
   */
 ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
+                             int* context_id );
+
+
+/**
+  \brief Recompute the communication graph between component and coupler, considering intersection coverage.
+  Fortran version
+  \note
+  Original communication graph for source used an initial partition, while during intersection some of the source
+  elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
+  between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
+  The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the
+  cells involved in intersection with the target cells. The new ParCommGraph between cc source mesh and cx source mesh
+  will be used just for tag migration, later on; The original ParCommGraph will stay unchanged, because this source mesh
+  could be used for other intersection (atm with lnd) ? on component source tasks, we will wait for information; from each
+  intx task, will receive cells ids involved in intx.
+
+  \param[in]  join (int *)                        communicator that overlaps component source PEs and coupler PEs
+  \param[in]  pid_src (iMOAB_AppID)               moab id for the component mesh on component PE
+  \param[in]  pid_migr (iMOAB_AppID)              moab id for the migrated mesh on coupler PEs
+  \param[in]  pid_intx (iMOAB_AppID)              moab id for intersection mesh (on coupler PEs)
+  \param[in]  context_id (int*)                   id of the other component in intersection
+*/
+ErrCode iMOAB_CoverageGraphFort( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
                              int* context_id );
 
 /**

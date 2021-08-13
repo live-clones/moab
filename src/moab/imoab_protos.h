@@ -54,12 +54,17 @@
 #define iMOAB_SetGlobalInfo          IMOAB_FC_WRAPPER( imoab_setglobalinfo, IMOAB_SETGLOBALINFO )
 #define iMOAB_GetGlobalInfo          IMOAB_FC_WRAPPER( imoab_getglobalinfo, IMOAB_GETGLOBALINFO )
 #define iMOAB_SendMesh               IMOAB_FC_WRAPPER( imoab_sendmesh, IMOAB_SENDMESH )
+#define iMOAB_SendMeshFort           IMOAB_FC_WRAPPER( imoab_sendmeshfort, IMOAB_SENDMESHFORT )
 #define iMOAB_FreeSenderBuffers      IMOAB_FC_WRAPPER( imoab_freesenderbuffers, IMOAB_FREESENDERBUFFERS )
 #define iMOAB_ReceiveMesh            IMOAB_FC_WRAPPER( imoab_receivemesh, IMOAB_RECEIVEMESH )
+#define iMOAB_ReceiveMeshFort        IMOAB_FC_WRAPPER( imoab_receivemeshfort, IMOAB_RECEIVEMESHFORT )
 #define iMOAB_SendElementTag         IMOAB_FC_WRAPPER( imoab_sendelementtag, IMOAB_SENDELEMENTTAG )
+#define iMOAB_SendElementTagFort     IMOAB_FC_WRAPPER( imoab_sendelementtagfort, IMOAB_SENDELEMENTTAGFORT )
 #define iMOAB_ReceiveElementTag      IMOAB_FC_WRAPPER( imoab_receiveelementtag, IMOAB_RECEIVEELEMENTTAG )
+#define iMOAB_ReceiveElementTagFort  IMOAB_FC_WRAPPER( imoab_receiveelementtagfort, IMOAB_RECEIVEELEMENTTAGFORT )
 #define iMOAB_DumpCommGraph          IMOAB_FC_WRAPPER( imoab_dumpcommgraph, IMOAB_DUMPCOMMGRAPH )
 #define iMOAB_ComputeCommGraph       IMOAB_FC_WRAPPER( imoab_computecommgraph, IMOAB_COMPUTECOMMGRAPH )
+#define iMOAB_ComputeCommGraphFort   IMOAB_FC_WRAPPER( imoab_computecommgraphfort, IMOAB_COMPUTECOMMGRAPHFORT )
 #define iMOAB_MergeVertices          IMOAB_FC_WRAPPER( imoab_mergevertices, IMOAB_MERGEVERTICES )
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -73,6 +78,7 @@
 #define iMOAB_ApplyScalarProjectionWeights \
     IMOAB_FC_WRAPPER( imoab_applyscalarprojectionweights, IMOAB_APPLYSCALARPROJECTIONWEIGHTS )
 #define iMOAB_CoverageGraph IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
+#define iMOAB_CoverageGraphFort IMOAB_FC_WRAPPER( imoab_coveragegraphfort, IMOAB_COVERAGEGRAPHFORT )
 
 #ifdef MOAB_HAVE_NETCDF
 
