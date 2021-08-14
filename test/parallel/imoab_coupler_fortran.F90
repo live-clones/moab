@@ -320,7 +320,7 @@ program imoab_coupler_fortran
 
     endif
 
-    if( couComm .NE. MPI_COMM_NULL ) then
+    if( cplComm .NE. MPI_COMM_NULL ) then
         !// receive on atm on coupler pes, that was redistributed according to coverage
         ierr = iMOAB_ReceiveElementTagFortran( cplAtmPID, concat_fieldname, atmCouComm, cplocn)
         call errorout(ierr, 'cannot receive tag values')
@@ -341,7 +341,7 @@ program imoab_coupler_fortran
             call errorout(ierr, 'could not write AtmOnCpl.h5m to disk')
 
     endif
-    if( couComm .ne. MPI_COMM_NULL ) then
+    if( cplComm .ne. MPI_COMM_NULL ) then
 
 !            /* We have the remapping weights now. Let us apply the weights onto the tag we defined
 !               on the source mesh and get the projection on the target mesh */
@@ -378,7 +378,7 @@ program imoab_coupler_fortran
 !        //   from couComm, using common joint comm ocn_coupler
 !        // as always, use nonblocking sends
 !        // original graph (context is -1_
-    if( couComm .ne. MPI_COMM_NULL ) then
+    if( cplComm .ne. MPI_COMM_NULL ) then
         context_id = -1
         ierr = iMOAB_SendElementTagFortran( cplOcnPID, concat_fieldnameT, ocnCouComm, context_id)
         call errorout(ierr, 'cannot send tag values back to ocean pes')
@@ -392,7 +392,7 @@ program imoab_coupler_fortran
 
 
 
-    if( couComm .ne. MPI_COMM_NULL ) then
+    if( cplComm .ne. MPI_COMM_NULL ) then
      context_id = -1
      ierr = iMOAB_FreeSenderBuffers( cplOcnPID, context_id )
      call errorout(ierr, 'cannot free sender buffers on coupler')
