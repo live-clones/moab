@@ -11,12 +11,13 @@
 #define IMOAB_FC_WRAPPER( name, NAME ) name
 #endif
 
-#define iMOAB_Initialize          IMOAB_FC_WRAPPER( imoab_initialize, IMOAB_INITIALIZE )
+/* remove the methods that will not be called from fortran; need to expose/declare only Fortran bindings ! */
+/*#define iMOAB_Initialize          IMOAB_FC_WRAPPER( imoab_initialize, IMOAB_INITIALIZE ) */
 #define iMOAB_InitializeFortran   IMOAB_FC_WRAPPER( imoab_initializefortran, IMOAB_INITIALIZEFORTRAN )
 #define iMOAB_Finalize            IMOAB_FC_WRAPPER( imoab_finalize, IMOAB_FINALIZE )
-#define iMOAB_RegisterApplication IMOAB_FC_WRAPPER( imoab_registerapplication, IMOAB_REGISTERAPPLICATION )
-#define iMOAB_RegisterFortranApplication \
-    IMOAB_FC_WRAPPER( imoab_registerfortranapplication, IMOAB_REGISTERFORTRANAPPLICATION )
+/*#define iMOAB_RegisterApplication IMOAB_FC_WRAPPER( imoab_registerapplication, IMOAB_REGISTERAPPLICATION ) */
+#define iMOAB_RegisterApplicationFortran \
+    IMOAB_FC_WRAPPER( imoab_registerapplicationfortran, IMOAB_REGISTERAPPLICATIONFORTRAN )
 #define iMOAB_DeregisterApplication IMOAB_FC_WRAPPER( imoab_deregisterapplication, IMOAB_DEREGISTERAPPLICATION )
 #define iMOAB_ReadHeaderInfo        IMOAB_FC_WRAPPER( imoab_readheaderinfo, IMOAB_READHEADERINFO )
 #define iMOAB_LoadMesh              IMOAB_FC_WRAPPER( imoab_loadmesh, IMOAB_LOADMESH )
@@ -53,18 +54,18 @@
 #define iMOAB_DetermineGhostEntities IMOAB_FC_WRAPPER( imoab_determineghostentities, IMOAB_DETERMINEGHOSTENTITIES )
 #define iMOAB_SetGlobalInfo          IMOAB_FC_WRAPPER( imoab_setglobalinfo, IMOAB_SETGLOBALINFO )
 #define iMOAB_GetGlobalInfo          IMOAB_FC_WRAPPER( imoab_getglobalinfo, IMOAB_GETGLOBALINFO )
-#define iMOAB_SendMesh               IMOAB_FC_WRAPPER( imoab_sendmesh, IMOAB_SENDMESH )
-#define iMOAB_SendMeshFort           IMOAB_FC_WRAPPER( imoab_sendmeshfort, IMOAB_SENDMESHFORT )
+/*#define iMOAB_SendMesh               IMOAB_FC_WRAPPER( imoab_sendmesh, IMOAB_SENDMESH ) */
+#define iMOAB_SendMeshFortran        IMOAB_FC_WRAPPER( imoab_sendmeshfortran, IMOAB_SENDMESHFORTRAN )
 #define iMOAB_FreeSenderBuffers      IMOAB_FC_WRAPPER( imoab_freesenderbuffers, IMOAB_FREESENDERBUFFERS )
-#define iMOAB_ReceiveMesh            IMOAB_FC_WRAPPER( imoab_receivemesh, IMOAB_RECEIVEMESH )
-#define iMOAB_ReceiveMeshFort        IMOAB_FC_WRAPPER( imoab_receivemeshfort, IMOAB_RECEIVEMESHFORT )
-#define iMOAB_SendElementTag         IMOAB_FC_WRAPPER( imoab_sendelementtag, IMOAB_SENDELEMENTTAG )
-#define iMOAB_SendElementTagFort     IMOAB_FC_WRAPPER( imoab_sendelementtagfort, IMOAB_SENDELEMENTTAGFORT )
-#define iMOAB_ReceiveElementTag      IMOAB_FC_WRAPPER( imoab_receiveelementtag, IMOAB_RECEIVEELEMENTTAG )
-#define iMOAB_ReceiveElementTagFort  IMOAB_FC_WRAPPER( imoab_receiveelementtagfort, IMOAB_RECEIVEELEMENTTAGFORT )
+/*#define iMOAB_ReceiveMesh            IMOAB_FC_WRAPPER( imoab_receivemesh, IMOAB_RECEIVEMESH ) */
+#define iMOAB_ReceiveMeshFortran     IMOAB_FC_WRAPPER( imoab_receivemeshfortran, IMOAB_RECEIVEMESHFORTRAN )
+/*#define iMOAB_SendElementTag         IMOAB_FC_WRAPPER( imoab_sendelementtag, IMOAB_SENDELEMENTTAG ) */
+#define iMOAB_SendElementTagFortran  IMOAB_FC_WRAPPER( imoab_sendelementtagfortran, IMOAB_SENDELEMENTTAGFORTRAN )
+/*#define iMOAB_ReceiveElementTag      IMOAB_FC_WRAPPER( imoab_receiveelementtag, IMOAB_RECEIVEELEMENTTAG )*/
+#define iMOAB_ReceiveElementTagFortran  IMOAB_FC_WRAPPER( imoab_receiveelementtagfortran, IMOAB_RECEIVEELEMENTTAGFORTRAN )
 #define iMOAB_DumpCommGraph          IMOAB_FC_WRAPPER( imoab_dumpcommgraph, IMOAB_DUMPCOMMGRAPH )
-#define iMOAB_ComputeCommGraph       IMOAB_FC_WRAPPER( imoab_computecommgraph, IMOAB_COMPUTECOMMGRAPH )
-#define iMOAB_ComputeCommGraphFort   IMOAB_FC_WRAPPER( imoab_computecommgraphfort, IMOAB_COMPUTECOMMGRAPHFORT )
+/*#define iMOAB_ComputeCommGraph       IMOAB_FC_WRAPPER( imoab_computecommgraph, IMOAB_COMPUTECOMMGRAPH )*/
+#define iMOAB_ComputeCommGraphFortran   IMOAB_FC_WRAPPER( imoab_computecommgraphfortran, IMOAB_COMPUTECOMMGRAPHFORTRAN )
 #define iMOAB_MergeVertices          IMOAB_FC_WRAPPER( imoab_mergevertices, IMOAB_MERGEVERTICES )
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -77,8 +78,10 @@
     IMOAB_FC_WRAPPER( imoab_computescalarprojectionweights, IMOAB_COMPUTESCALARPROJECTIONWEIGHTS )
 #define iMOAB_ApplyScalarProjectionWeights \
     IMOAB_FC_WRAPPER( imoab_applyscalarprojectionweights, IMOAB_APPLYSCALARPROJECTIONWEIGHTS )
-#define iMOAB_CoverageGraph IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
-#define iMOAB_CoverageGraphFort IMOAB_FC_WRAPPER( imoab_coveragegraphfort, IMOAB_COVERAGEGRAPHFORT )
+
+/* #define iMOAB_CoverageGraph IMOAB_FC_WRAPPER( imoab_coveragegraph, IMOAB_COVERAGEGRAPH )
+ */
+#define iMOAB_CoverageGraphFortran IMOAB_FC_WRAPPER( imoab_coveragegraphfortran, IMOAB_COVERAGEGRAPHFORTRAN )
 
 #ifdef MOAB_HAVE_NETCDF
 

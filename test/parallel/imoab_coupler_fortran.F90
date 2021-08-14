@@ -130,16 +130,16 @@ program imoab_coupler_fortran
 
     ierr = iMOAB_InitializeFortran()
     appname = 'ATM'//CHAR(0)
-    ierr = iMOAB_RegisterFortranApplication(appname, atmComm, cmpatm, cmpatmPid)
+    ierr = iMOAB_RegisterApplicationFortran(appname, atmComm, cmpatm, cmpatmPid)
     appname = 'ATMX'//CHAR(0)
-    ierr = iMOAB_RegisterFortranApplication(appname, cplComm, cplatm, cplatmPid)
+    ierr = iMOAB_RegisterApplicationFortran(appname, cplComm, cplatm, cplatmPid)
     appname = 'OCN'//CHAR(0)
-    ierr = iMOAB_RegisterFortranApplication(appname, ocnComm, cmpocn, cmpocnPid)
+    ierr = iMOAB_RegisterApplicationFortran(appname, ocnComm, cmpocn, cmpocnPid)
     appname = 'OCNX'//CHAR(0)
-    ierr = iMOAB_RegisterFortranApplication(appname, cplComm, cplocn, cplocnPid)
+    ierr = iMOAB_RegisterApplicationFortran(appname, cplComm, cplocn, cplocnPid)
 
     appname = 'ATMOCN'//CHAR(0)
-    ierr = iMOAB_RegisterFortranApplication(appname, cplComm, atmocnid, cplAtmOcnPID)
+    ierr = iMOAB_RegisterApplicationFortran(appname, cplComm, atmocnid, cplAtmOcnPID)
 
     ! read atm and migrate
 
@@ -147,12 +147,12 @@ program imoab_coupler_fortran
 
        ierr = iMOAB_LoadMesh( cmpatmPid, atmFileName, readopts, nghlay );
        call errorout(ierr, 'fail to load atm')
-       ierr = iMOAB_SendMeshFort( cmpatmPid, atmCouComm, cplGroup, cplatm, partScheme );
+       ierr = iMOAB_SendMeshFortran( cmpatmPid, atmCouComm, cplGroup, cplatm, partScheme );
        call errorout(ierr, 'fail to send atm')
     endif
     if( cplComm .NE. MPI_COMM_NULL ) then
 
-        ierr = iMOAB_ReceiveMeshFort( cplatmPid, atmCouComm, atmGroup, cmpatm ) !
+        ierr = iMOAB_ReceiveMeshFortran( cplatmPid, atmCouComm, atmGroup, cmpatm ) !
         call errorout(ierr, 'fail to receive atm')
     endif
 
@@ -169,12 +169,12 @@ program imoab_coupler_fortran
 
        ierr = iMOAB_LoadMesh( cmpocnPid, ocnFileName, readopts, nghlay );
        call errorout(ierr, 'fail to load ocn')
-       ierr = iMOAB_SendMeshFort( cmpocnPid, ocnCouComm, cplGroup, cplocn, partScheme );
+       ierr = iMOAB_SendMeshFortran( cmpocnPid, ocnCouComm, cplGroup, cplocn, partScheme );
        call errorout(ierr, 'fail to send ocn')
     endif
     if( cplComm .NE. MPI_COMM_NULL ) then
 
-        ierr = iMOAB_ReceiveMeshFort( cplocnPid, ocnCouComm, ocnGroup, cmpocn ) !
+        ierr = iMOAB_ReceiveMeshFortran( cplocnPid, ocnCouComm, ocnGroup, cmpocn ) !
         call errorout(ierr, 'fail to receive ocn')
     endif
 
@@ -203,7 +203,7 @@ program imoab_coupler_fortran
 !        // will
 !        //  use the element global id, which should uniquely identify the element
 
-        ierr = iMOAB_CoverageGraphFort( atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, cplocn ) ! it happens over joint communicator
+        ierr = iMOAB_CoverageGraphFortran( atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, cplocn ) ! it happens over joint communicator
          call errorout(ierr, 'cannot recompute direct coverage graph for ocean')
     endif
 
@@ -313,14 +313,14 @@ program imoab_coupler_fortran
 
 !            // as always, use nonblocking sends
 !            // this is for projection to ocean:
-        ierr = iMOAB_SendElementTagFort( cmpAtmPID, concat_fieldname, atmCouComm, cplocn)
+        ierr = iMOAB_SendElementTagFortran( cmpAtmPID, concat_fieldname, atmCouComm, cplocn)
         call errorout(ierr, 'cannot send tag values')
 
     endif
 
     if( couComm .NE. MPI_COMM_NULL ) then
         !// receive on atm on coupler pes, that was redistributed according to coverage
-        ierr = iMOAB_ReceiveElementTagFort( cplAtmPID, concat_fieldname, atmCouComm, cplocn)
+        ierr = iMOAB_ReceiveElementTagFortran( cplAtmPID, concat_fieldname, atmCouComm, cplocn)
         call errorout(ierr, 'cannot receive tag values')
     endif
 
@@ -378,13 +378,13 @@ program imoab_coupler_fortran
 !        // original graph (context is -1_
     if( couComm .ne. MPI_COMM_NULL ) then
         context_id = -1
-        ierr = iMOAB_SendElementTagFort( cplOcnPID, concat_fieldnameT, ocnCouComm, context_id)
+        ierr = iMOAB_SendElementTagFortran( cplOcnPID, concat_fieldnameT, ocnCouComm, context_id)
         call errorout(ierr, 'cannot send tag values back to ocean pes')
     endif
 
     if( ocnComm .ne. MPI_COMM_NULL ) then
        context_id = -1
-       ierr = iMOAB_ReceiveElementTagFort( cmpOcnPID, concat_fieldnameT, ocnCouComm, context_id)
+       ierr = iMOAB_ReceiveElementTagFortran( cmpOcnPID, concat_fieldnameT, ocnCouComm, context_id)
        call errorout(ierr, 'cannot receive tag values from ocean mesh on coupler pes')
     endif
 

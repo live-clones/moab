@@ -273,7 +273,7 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
     return 0;
 }
 
-ErrCode iMOAB_RegisterFortranApplication( const iMOAB_String app_name,
+ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* comm,
 #endif
@@ -1902,7 +1902,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
 }
 
 // fortran wrapper
-ErrCode iMOAB_SendMeshFort( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid,
+ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid,
         int* method )
 {
     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
@@ -2064,7 +2064,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
     return 0;
 }
 
-ErrCode iMOAB_ReceiveMeshFort( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid )
+ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid )
 {
     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
     MPI_Group sendGroup = MPI_Group_f2c( (MPI_Fint) *sendingGroup );
@@ -2139,7 +2139,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 }
 
 // fortran wrapper
-ErrCode iMOAB_SendElementTagFort( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
                               int tag_storage_name_length )
 {
     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
@@ -2220,7 +2220,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
 
     return 0;
 }
-ErrCode iMOAB_ReceiveElementTagFort( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join,
+ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join,
         int* context_id,  int tag_storage_name_length )
 {
     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
@@ -2548,7 +2548,7 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
     return 0;
 }
 
-ErrCode iMOAB_ComputeCommGraphFort( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
+ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
                                 int* group2, int* type1, int* type2, int* comp1, int* comp2 )
 {
     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
@@ -2822,7 +2822,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     return 0;  // success
 }
 
-ErrCode iMOAB_CoverageGraphFort( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr,
+ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr,
         iMOAB_AppID pid_intx, int* context_id )
 {
     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );

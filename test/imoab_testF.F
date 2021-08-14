@@ -81,10 +81,10 @@ c     find out MY process ID, and how many processes were started.
 C      give a unique external id; here we just use 8?
       compid = 8
 #ifdef MOAB_HAVE_MPI
-      ierr = iMOAB_RegisterFortranApplication(appname, MPI_COMM_WORLD,
+      ierr = iMOAB_RegisterApplicationFortran(appname, MPI_COMM_WORLD,
      & compid, pid)
 #else
-      ierr = iMOAB_RegisterFortranApplication(appname, compid,
+      ierr = iMOAB_RegisterApplicationFortran(appname, compid,
      & pid)
 #endif
       call errorout(ierr, 'fail to register application')

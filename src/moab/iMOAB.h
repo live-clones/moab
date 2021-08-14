@@ -133,7 +133,7 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
   (iMOAB_AppID)       The unique pointer to the application ID \param[in]  app_name_length (int)   Length of application
   name string.
 */
-ErrCode iMOAB_RegisterFortranApplication( const iMOAB_String app_name,
+ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* comm,
 #endif
@@ -695,7 +695,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
    \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
  */
 
-ErrCode iMOAB_SendMeshFort( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method );
+ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method );
 
 /**
    \brief during nonblocking send, buffers were allocated, to keep data until received
@@ -729,7 +729,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
    \param[in]  scompid ( int *)                       external id of application that sends the mesh
  */
 
-ErrCode iMOAB_ReceiveMeshFort( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid );
+ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid );
 
 
 /**
@@ -758,7 +758,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
 
-ErrCode iMOAB_SendElementTagFort( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
                               int tag_storage_name_length );
 
 /**
@@ -784,7 +784,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
    \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
-ErrCode iMOAB_ReceiveElementTagFort( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
                                  int tag_storage_name_length );
 
 /**
@@ -821,7 +821,7 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
  \param[in]  cpmp2 (int*)                           id of the component 2
 
 */
-ErrCode iMOAB_ComputeCommGraphFort( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
+ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
                                 int* group2, int* type1, int* type2, int* comp1, int* comp2 );
 
 /**
@@ -863,7 +863,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
   \param[in]  pid_intx (iMOAB_AppID)              moab id for intersection mesh (on coupler PEs)
   \param[in]  context_id (int*)                   id of the other component in intersection
 */
-ErrCode iMOAB_CoverageGraphFort( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
+ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
                              int* context_id );
 
 /**
