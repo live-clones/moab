@@ -73,18 +73,20 @@ program imoab_coupler_fortran
     cplocn = 18
     atmocnid = 618
 
+    m = iargc()
+    if (m .lt. 1) then
+      print *, 'specify the meshdir path for input files'
+      call exit(0)
+    endif
+
+    call getarg(1, pathFile)
     call mpi_init(ierr)
     call errorout(ierr,'mpi_init')
     call MPI_COMM_RANK (MPI_COMM_WORLD, my_id, ierr)
     call errorout(ierr, 'fail to get MPI rank')
 
 
-    m = iargc()
-    if (m .lt. 1) then
-      print *, 'specify the meshdir path for input files'
-      call exit(0)
-    endif
-    call getarg(1, pathFile)
+
 
     call MPI_COMM_SIZE (MPI_COMM_WORLD, num_procs, ierr)
     call errorout(ierr, 'fail to get MPI size')
@@ -275,7 +277,7 @@ program imoab_coupler_fortran
 
     ! make the tag 0, to check we are actually sending needed data
 
-      if( cplAtmAppID .ge. 0 ) then
+      if( cplAtmPID .ge. 0 ) then
 
 
 !            /*
