@@ -972,6 +972,7 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
                                            int solution_weights_identifier_length,
                                            int remap_weights_filename_length );
 
+#ifdef MOAB_HAVE_MPI
 /**
 \brief compute a comm graph between 2 moab apps, based on ID matching, between a component and map that
 was read on coupler;
@@ -1020,7 +1021,7 @@ while source mesh coverage is dictated by the active columns on respective tasks
 */
 ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
         int* join, int* group1, int* group2, int* type, int* comp1, int* comp2, int* direction );
-
+#endif // #ifdef MOAB_HAVE_MPI
 /**
   \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
 
