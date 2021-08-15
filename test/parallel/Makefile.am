@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 LDADD = $(top_builddir)/src/libMOAB.la
 
 MESHDIR = $(abs_top_srcdir)/MeshFiles/unittest
+RMESHDIR = $(abs_top_srcdir)/MeshFiles/unittest
 
 DEFS += -DIS_BUILDING_MB \
 				-DSRCDIR=$(srcdir) \
@@ -116,8 +117,10 @@ IMOAB_TESTS =
 if ENABLE_FORTRAN
    IMOAB_TESTS += imoab_ptest imoab_ptest2
 if HAVE_TEMPESTREMAP
+IMOAB_TESTS += imoab_coupler_fortran
 imoab_ptest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 imoab_ptest2_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+imoab_coupler_fortran_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 else
 imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
 imoab_ptest2_LDADD = $(LDADD) $(FCLIBS)
@@ -175,6 +178,7 @@ parallel_adj_SOURCES = ../adj_moab_test.cpp
 parmerge_test_SOURCES = parmerge_test.cpp
 augment_with_ghosts_SOURCES = augment_with_ghosts.cpp
 imoab_ptest_SOURCES = imoab_ptest.F
+imoab_coupler_fortran_SOURCES = imoab_coupler_fortran.F90
 imoab_ptest2_SOURCES = imoab_ptest2.cpp
 hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
 uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
