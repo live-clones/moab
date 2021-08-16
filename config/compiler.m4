@@ -111,8 +111,15 @@ USER_FFLAGS="$FFLAGS"
 
 # Check for Parallel
 # Need to check this early so we can look for the correct compiler
+#AC_ARG_WITH( [mpi], AS_HELP_STRING([[--with-mpi@<:@=DIR@:>@]], [Enable parallel support]),
+#             [WITH_MPI=$withval; enablempi=yes],[enablempi=no;WITH_MPI=$MPI_DIR] )
 AC_ARG_WITH( [mpi], AS_HELP_STRING([[--with-mpi@<:@=DIR@:>@]], [Enable parallel support]),
-             [WITH_MPI=$withval; enablempi=yes],[enablempi=no;WITH_MPI=$MPI_DIR] )
+    [case "x${withval}" in
+		  xyes)  WITH_MPI="$MPI_DIR";   enablempi=yes ;;
+      x)     WITH_MPI="$MPI_DIR"; ;;
+      *)     WITH_MPI="$withval"; enablempi=yes ;;
+      xno)   WITH_MPI="";  enablempi=no ;;
+		esac], [enablempi=no])
 
 if test "xno" != "x$enablempi"; then
 
@@ -131,7 +138,12 @@ F77_LIST="$F77 $F77_LIST $FC gfortran ifort pgf77 nag xlf g77 f77"
 
 COMPILERPATHS=""
 if test "xno" != "x$enablempi"; then
-  COMPILERPATHS="${WITH_MPI}/bin"
+  if test "x" != "x$WITH_MPI"; then
+    COMPILERPATHS="${WITH_MPI}/bin"
+  else
+    COMPILERPATHS="`which mpicc | sed -e "s/\/bin\/mpicc//"`"
+    WITH_MPI="$COMPILERPATHS"
+  fi
 fi
 
 FATHOM_SET_MPI_COMPILER([CC],  [$CC_LIST], [$COMPILERPATHS])
