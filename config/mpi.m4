@@ -39,22 +39,24 @@ AC_DEFUN([FATHOM_CHECK_MPITYPE], [
   if test "x$enablempi" != "xno"; then
     AC_MSG_CHECKING([for known MPI family and version])
     MPIFAMILY="GENERIC"
+    MPITYPE="$MPIFAMILY"
     mpifile="$WITH_MPI/include/mpi.h"
     if (test -f $mpifile); then
-      ismpich="`grep MPICH $mpifile`"
+      ismpich="$(grep 'define MPICH_NAME' $mpifile)"
       if (test "x$ismpich" != "x"); then
         MPIFAMILY="MPICH"
       else
-        isopenmpi="`grep OPEN_MPI $mpifile`"
+        isopenmpi="$(grep 'define OMPI_MPI' $mpifile)"
         if (test "x$isopenmpi" != "x"); then
           MPIFAMILY="OPENMPI"
         fi # openmpi
       fi # mpich
+      if (test "$MPIFAMILY" != "GENERIC"); then
+        MPI_VER="$(grep "MPI_VERSION" $mpifile | sed -e "s/#define MPI_VERSION //g" | tr -d '[:space:]')"
+        MPI_SVER="$(grep "MPI_SUBVERSION" $mpifile | sed -e "s/#define MPI_SUBVERSION //g" | tr -d '[:space:]')"
+        MPITYPE="$MPIFAMILY-$MPI_VER-$MPI_SVER"
+      fi
     fi # mpifile
-    if (test "$MPIFAMILY" != "GENERIC"); then
-      MPI_VER=`grep "MPI_VERSION" $mpifile | sed -e "s/#define MPI_VERSION //g" | tr ' ' '\0'`
-      MPITYPE="$MPIFAMILY-$MPI_VER"
-    fi
     AC_MSG_RESULT([$MPITYPE])
     AC_SUBST(MPITYPE)
   fi #enablempi
