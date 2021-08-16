@@ -90,10 +90,10 @@ int main( int argc, char* argv[] )
     int nghlay = 0;  // number of ghost layers for loading the file
     std::vector< int > groupTasks;
     int startG1 = 0, startG2 = 0, endG1 = numProcesses - 1,
-        endG2   = numProcesses - 1;         // Support launch of imoab_coupler test on any combo of 2*x processes
-    int startG4 = startG1, endG4 = endG1;   // these are for coupler layout
-    int startG5 = 0, endG5 = numProcesses-1;  // these are for coupler I/O layout
-    int context_id = -1;                    // used now for freeing buffers
+        endG2   = numProcesses - 1;             // Support launch of imoab_coupler test on any combo of 2*x processes
+    int startG4 = startG1, endG4 = endG1;       // these are for coupler layout
+    int startG5 = 0, endG5 = numProcesses - 1;  // these are for coupler I/O layout
+    int context_id = -1;                        // used now for freeing buffers
 
     // default: load src on 2 proc, ocean on 2, land on 2; migrate to 2 procs, then compute intx
     // later, we need to compute weight matrix with tempestremap
@@ -138,30 +138,30 @@ int main( int argc, char* argv[] )
     // coupler will be on joint tasks, will be on a third group (0 and 1, again)
     MPI_Group srcPEGroup;
     MPI_Comm srcComm = MPI_COMM_NULL;
-    ierr = create_group_and_comm( startG1, endG1, jgroup, &srcPEGroup, &srcComm );
+    ierr             = create_group_and_comm( startG1, endG1, jgroup, &srcPEGroup, &srcComm );
     CHECKIERR( ierr, "Cannot create src MPI group and communicator " )
 
     MPI_Group tgtPEGroup;
     MPI_Comm tgtComm = MPI_COMM_NULL;
-    ierr = create_group_and_comm( startG2, endG2, jgroup, &tgtPEGroup, &tgtComm );
+    ierr             = create_group_and_comm( startG2, endG2, jgroup, &tgtPEGroup, &tgtComm );
     CHECKIERR( ierr, "Cannot create tgt MPI group and communicator " )
 
     // we will always have a coupler
     MPI_Group couPEGroup;
     MPI_Comm couComm = MPI_COMM_NULL;
-    ierr = create_group_and_comm( startG4, endG4, jgroup, &couPEGroup, &couComm );
+    ierr             = create_group_and_comm( startG4, endG4, jgroup, &couPEGroup, &couComm );
     CHECKIERR( ierr, "Cannot create cpl MPI group and communicator " )
 
     // we will always have a coupler
     MPI_Group couPEGroupIO;
     MPI_Comm couCommIO = MPI_COMM_NULL;
-    ierr = create_group_and_comm( startG5, endG5, jgroup, &couPEGroupIO, &couCommIO );
+    ierr               = create_group_and_comm( startG5, endG5, jgroup, &couPEGroupIO, &couCommIO );
     CHECKIERR( ierr, "Cannot create cpl MPI group and communicator for map I/O " )
 
     // src_coupler
     MPI_Group joinSrcCouGroup[2];
     MPI_Comm srcCouComm[2] = { MPI_COMM_NULL, MPI_COMM_NULL };
-    ierr = create_joint_comm_group( srcPEGroup, couPEGroup, &joinSrcCouGroup[0], &srcCouComm[0] );
+    ierr                   = create_joint_comm_group( srcPEGroup, couPEGroup, &joinSrcCouGroup[0], &srcCouComm[0] );
     CHECKIERR( ierr, "Cannot create joint src cou communicator" )
     if( couCommIO != MPI_COMM_NULL )
     {
@@ -172,7 +172,7 @@ int main( int argc, char* argv[] )
     // tgt_coupler
     MPI_Group joinTgtCouGroup[2];
     MPI_Comm tgtCouComm[2] = { MPI_COMM_NULL, MPI_COMM_NULL };
-    ierr = create_joint_comm_group( tgtPEGroup, couPEGroup, &joinTgtCouGroup[0], &tgtCouComm[0] );
+    ierr                   = create_joint_comm_group( tgtPEGroup, couPEGroup, &joinTgtCouGroup[0], &tgtCouComm[0] );
     CHECKIERR( ierr, "Cannot create joint tgt cou communicator" )
     if( couCommIO != MPI_COMM_NULL )
     {
@@ -183,19 +183,22 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_Initialize( argc, argv );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKIERR( ierr, "Cannot initialize iMOAB" )
 
-    int cmpSrcAppID         = -1;
-    iMOAB_AppID cmpSrcPID   = &cmpSrcAppID;    // src
-    int cplSrcAppID         = -1;              // -1 means it is not initialized
-    iMOAB_AppID cplSrcPID   = &cplSrcAppID;    // src on coupler PEs
-    int cplIOSrcAppID       = -1;              // -1 means it is not initialized
-    iMOAB_AppID cplIOSrcPID = &cplIOSrcAppID;  // src on coupler PEs
+    int cmpSrcAppID       = -1;
+    iMOAB_AppID cmpSrcPID = &cmpSrcAppID;  // src
+    int cplSrcAppID       = -1;            // -1 means it is not initialized
+    iMOAB_AppID cplSrcPID = &cplSrcAppID;  // src on coupler PEs
+    // int cplIOSrcAppID       = -1;              // -1 means it is not initialized
+    // iMOAB_AppID cplIOSrcPID = &cplIOSrcAppID;  // src on coupler PEs
 
     int cmpTgtAppID       = -1;
     iMOAB_AppID cmpTgtPID = &cmpTgtAppID;  // tgt
-    int cplTgtAppID = -1, cplIOTgtAppID = -1, cplSrcTgtAppID = -1,
+    int cplTgtAppID       = -1;
+    iMOAB_AppID cplTgtPID = &cplTgtAppID;  // tgt on coupler PEs
+    // int cplIOTgtAppID     = -1;
+    // iMOAB_AppID cplIOTgtPID    = &cplIOTgtAppID;     // tgt on coupler PEs
+
+    int cplSrcTgtAppID         = -1,
         cplIOSrcTgtAppID       = -1;                 // -1 means it is not initialized
-    iMOAB_AppID cplTgtPID      = &cplTgtAppID;       // tgt on coupler PEs
-    iMOAB_AppID cplIOTgtPID    = &cplIOTgtAppID;     // tgt on coupler PEs
     iMOAB_AppID cplSrcTgtPID   = &cplSrcTgtAppID;    // intx src -tgt on coupler PEs
     iMOAB_AppID cplIOSrcTgtPID = &cplIOSrcTgtAppID;  // intx src -tgt on coupler PEs
 
@@ -212,18 +215,18 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot register target over coupler PEs" )
     }
 
-    if( couCommIO != MPI_COMM_NULL )
-    {
-        MPI_Comm_rank( couCommIO, &rankInCouCommIO );
-        // Register all the applications on the coupler PEs
-        ierr = iMOAB_RegisterApplication( "CouplerIOSourceComponent", &couCommIO, &cpliosrc,
-                                          cplIOSrcPID );  // src on coupler pes
-        CHECKIERR( ierr, "Cannot register source over coupler PEs" )
+    // if( couCommIO != MPI_COMM_NULL )
+    // {
+    //     MPI_Comm_rank( couCommIO, &rankInCouCommIO );
+    //     // Register all the applications on the coupler PEs
+    //     ierr = iMOAB_RegisterApplication( "CouplerIOSourceComponent", &couCommIO, &cpliosrc,
+    //                                       cplIOSrcPID );  // src on coupler pes
+    //     CHECKIERR( ierr, "Cannot register source over coupler PEs" )
 
-        ierr = iMOAB_RegisterApplication( "CouplerIOTargetComponent", &couCommIO, &cpliotgt,
-                                          cplIOTgtPID );  // tgt on coupler pes
-        CHECKIERR( ierr, "Cannot register target over coupler PEs" )
-    }
+    //     ierr = iMOAB_RegisterApplication( "CouplerIOTargetComponent", &couCommIO, &cpliotgt,
+    //                                       cplIOTgtPID );  // tgt on coupler pes
+    //     CHECKIERR( ierr, "Cannot register target over coupler PEs" )
+    // }
 
     if( srcComm != MPI_COMM_NULL )
     {
@@ -239,6 +242,13 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot register OCN App" )
     }
 
+    if( couCommIO != MPI_COMM_NULL )
+    {
+        // now compute intersection between OCNx and ATMx on coupler PEs
+        ierr = iMOAB_RegisterApplication( "SourceTargetIO", &couCommIO, &srctgtidio, cplIOSrcTgtPID );
+        CHECKIERR( ierr, "Cannot register tgt_src intx over coupler pes " )
+    }
+
     // source
     ierr = setup_component_coupler_meshes( cmpSrcPID, cmpsrc, cplSrcPID, cplsrc, &srcComm, &srcPEGroup, &couComm,
                                            &couPEGroup, &srcCouComm[0], srcFilename, readopts, nghlay,
@@ -247,10 +257,10 @@ int main( int argc, char* argv[] )
 
     if( couCommIO != MPI_COMM_NULL )
     {
-        ierr = setup_component_coupler_meshes( cmpSrcPID, cmpsrc, cplIOSrcPID, cpliosrc, &srcComm, &srcPEGroup,
-                                               &couCommIO, &couPEGroupIO, &srcCouComm[1], srcFilename, readopts, nghlay,
-                                               repartitioner_scheme, false );
-        CHECKIERR( ierr, "Cannot load and migrate src mesh for IO" )
+        // ierr = setup_component_coupler_meshes( cmpSrcPID, cmpsrc, cplIOSrcTgtPID, srctgtidio, &srcComm, &srcPEGroup,
+        //                                        &couCommIO, &couPEGroupIO, &srcCouComm[1], srcFilename, readopts, nghlay,
+        //                                        repartitioner_scheme, false );
+        // CHECKIERR( ierr, "Cannot load and migrate src mesh for IO" )
     }
 
     // target
@@ -260,10 +270,10 @@ int main( int argc, char* argv[] )
     CHECKIERR( ierr, "Cannot load and migrate tgt mesh" )
     if( couCommIO != MPI_COMM_NULL )
     {
-        ierr = setup_component_coupler_meshes( cmpTgtPID, cmptgt, cplIOTgtPID, cpliotgt, &tgtComm, &tgtPEGroup,
-                                               &couCommIO, &couPEGroupIO, &tgtCouComm[1], tgtFilename, readopts, nghlay,
-                                               repartitioner_scheme, false );
-        CHECKIERR( ierr, "Cannot load and migrate tgt mesh for IO" )
+        // ierr = setup_component_coupler_meshes( cmpTgtPID, cmptgt, cplIOSrcTgtPID, srctgtidio, &tgtComm, &tgtPEGroup,
+        //                                        &couCommIO, &couPEGroupIO, &tgtCouComm[1], tgtFilename, readopts, nghlay,
+        //                                        repartitioner_scheme, false );
+        // CHECKIERR( ierr, "Cannot load and migrate tgt mesh for IO" )
     }
 
     MPI_Barrier( MPI_COMM_WORLD );
@@ -272,13 +282,6 @@ int main( int argc, char* argv[] )
     {
         // now compute intersection between OCNx and ATMx on coupler PEs
         ierr = iMOAB_RegisterApplication( "SourceTarget", &couComm, &srctgtid, cplSrcTgtPID );
-        CHECKIERR( ierr, "Cannot register tgt_src intx over coupler pes " )
-    }
-
-    if( couCommIO != MPI_COMM_NULL )
-    {
-        // now compute intersection between OCNx and ATMx on coupler PEs
-        ierr = iMOAB_RegisterApplication( "SourceTargetIO", &couCommIO, &srctgtidio, cplIOSrcTgtPID );
         CHECKIERR( ierr, "Cannot register tgt_src intx over coupler pes " )
     }
 
@@ -325,42 +328,6 @@ int main( int argc, char* argv[] )
         POP_TIMER( srcCouComm[0], rankInSrcComm )  // hijack this rank
     }
 
-    if( srcCouComm[1] != MPI_COMM_NULL )
-    {
-        int typeA = 3;  // spectral mesh, with GLOBAL_DOFS tags on cells
-        int typeB = 3;  // point cloud mesh, with GLOBAL_ID tag on vertices
-        // the new graph will be for sending data from src comp to coverage mesh;
-        // it involves initial src app; cmpSrcPID; also migrate src mesh on coupler pes, cplSrcPID
-        // results are in cplSrcTgtPID, intx mesh; remapper also has some info about coverage mesh
-        // after this, the sending of tags from src pes to coupler pes will use the new par comm
-        // graph, that has more precise info about what to send for ocean cover ; every time, we
-        // will
-        //  use the element global id, which should uniquely identify the element
-        PUSH_TIMER( "Compute communication graph for source mesh" )
-        ierr = iMOAB_ComputeCommGraph( cmpSrcPID, cplIOSrcPID, &srcCouComm[1], &srcPEGroup, &joinSrcCouGroup[1], &typeA,
-                                       &typeB, &cmpsrc, &cpliosrc );  // it happens over joint communicator
-        CHECKIERR( ierr, "cannot compute communication graph for source mesh" )
-        POP_TIMER( srcCouComm[1], rankInSrcComm )  // hijack this rank
-    }
-
-    if( tgtCouComm[1] != MPI_COMM_NULL )
-    {
-        int typeA = 3;  // spectral mesh, with GLOBAL_DOFS tags on cells
-        int typeB = 3;  // point cloud mesh, with GLOBAL_ID tag on vertices
-        // the new graph will be for sending data from src comp to coverage mesh;
-        // it involves initial src app; cmpSrcPID; also migrate src mesh on coupler pes, cplSrcPID
-        // results are in cplSrcTgtPID, intx mesh; remapper also has some info about coverage mesh
-        // after this, the sending of tags from src pes to coupler pes will use the new par comm
-        // graph, that has more precise info about what to send for ocean cover ; every time, we
-        // will
-        //  use the element global id, which should uniquely identify the element
-        PUSH_TIMER( "Compute communication graph for target mesh" )
-        ierr = iMOAB_ComputeCommGraph( cmpTgtPID, cplIOTgtPID, &tgtCouComm[1], &tgtPEGroup, &joinTgtCouGroup[1], &typeA,
-                                       &typeB, &cmptgt, &cpliotgt );  // it happens over joint communicator
-        CHECKIERR( ierr, "cannot compute communication graph for target mesh" )
-        POP_TIMER( tgtCouComm[1], rankInTgtComm )  // hijack this rank
-    }
-
     if( couComm != MPI_COMM_NULL )
     {
         PUSH_TIMER( "Compute the projection weights with TempestRemap" )
@@ -386,24 +353,59 @@ int main( int argc, char* argv[] )
     MPI_Barrier( MPI_COMM_WORLD );
 
     const std::string intx_from_file_identifier = "map-from-file";
-    if( couCommIO != MPI_COMM_NULL )
+    if( couCommIO != MPI_COMM_NULL || srcCouComm[1] != MPI_COMM_NULL || tgtCouComm[1] != MPI_COMM_NULL )
     {
 #ifdef MOAB_HAVE_NETCDF
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplIOSrcTgtPID,
-                                                 intx_from_file_identifier.c_str(), srctgt_map_file_name.c_str(), NULL,
-                                                 NULL, NULL, intx_from_file_identifier.size(),
-                                                 srctgt_map_file_name.size() );
+        ierr = iMOAB_LoadMappingWeightsFromFile( cmpSrcPID, cmpTgtPID, cplIOSrcTgtPID, intx_from_file_identifier.c_str(),
+                                                 srctgt_map_file_name.c_str(), NULL, NULL, NULL,
+                                                 intx_from_file_identifier.size(), srctgt_map_file_name.size() );
         CHECKIERR( ierr, "failed to load map file from disk" );
 
-        PUSH_TIMER( "Compute communication graph for target mesh" )
-        ierr = iMOAB_ComputeCommGraph( cmpSrcPID, cplIOSrcTgtPID, &srcCouComm[1], &srcPEGroup, &joinSrcCouGroup[1],
-                                       owned_source_dof_ids );  // it happens over joint communicator
-        ierr = iMOAB_ComputeCommGraph( cmpTgtPID, cplIOSrcTgtPID, &tgtCouComm[1], &tgtPEGroup, &joinTgtCouGroup[1],
-                                       owned_target_dof_ids );  // it happens over joint communicator
+        // PUSH_TIMER( "Compute communication graph for target mesh" )
+        // ierr = iMOAB_ComputeCommGraph( cmpSrcPID, cplIOSrcTgtPID, &srcCouComm[1], &srcPEGroup, &joinSrcCouGroup[1],
+        //                                owned_source_dof_ids );  // it happens over joint communicator
+        // ierr = iMOAB_ComputeCommGraph( cmpTgtPID, cplIOSrcTgtPID, &tgtCouComm[1], &tgtPEGroup, &joinTgtCouGroup[1],
+        //                                owned_target_dof_ids );  // it happens over joint communicator
 
+        // CHECKIERR( ierr, "cannot compute communication graph for target mesh" )
+        // POP_TIMER( tgtCouComm[1], rankInTgtComm )  // hijack this rank
+#endif
+    }
+
+    if( srcCouComm[1] != MPI_COMM_NULL )
+    {
+        int typeA = 3;  // spectral mesh, with GLOBAL_DOFS tags on cells
+        int typeB = 3;  // point cloud mesh, with GLOBAL_ID tag on vertices
+        // the new graph will be for sending data from src comp to coverage mesh;
+        // it involves initial src app; cmpSrcPID; also migrate src mesh on coupler pes, cplSrcPID
+        // results are in cplSrcTgtPID, intx mesh; remapper also has some info about coverage mesh
+        // after this, the sending of tags from src pes to coupler pes will use the new par comm
+        // graph, that has more precise info about what to send for ocean cover ; every time, we
+        // will
+        //  use the element global id, which should uniquely identify the element
+        PUSH_TIMER( "Compute communication graph for source mesh" )
+        ierr = iMOAB_ComputeCommGraph( cmpSrcPID, cplIOSrcTgtPID, &srcCouComm[1], &srcPEGroup, &joinSrcCouGroup[1],
+                                       &typeA, &typeB, &cmpsrc, &srctgtidio );  // it happens over joint communicator
+        CHECKIERR( ierr, "cannot compute communication graph for source mesh" )
+        POP_TIMER( srcCouComm[1], rankInSrcComm )  // hijack this rank
+    }
+
+    if( tgtCouComm[1] != MPI_COMM_NULL )
+    {
+        int typeA = 3;  // spectral mesh, with GLOBAL_DOFS tags on cells
+        int typeB = 3;  // point cloud mesh, with GLOBAL_ID tag on vertices
+        // the new graph will be for sending data from src comp to coverage mesh;
+        // it involves initial src app; cmpSrcPID; also migrate src mesh on coupler pes, cplSrcPID
+        // results are in cplSrcTgtPID, intx mesh; remapper also has some info about coverage mesh
+        // after this, the sending of tags from src pes to coupler pes will use the new par comm
+        // graph, that has more precise info about what to send for ocean cover ; every time, we
+        // will
+        //  use the element global id, which should uniquely identify the element
+        PUSH_TIMER( "Compute communication graph for target mesh" )
+        ierr = iMOAB_ComputeCommGraph( cmpTgtPID, cplIOSrcTgtPID, &tgtCouComm[1], &tgtPEGroup, &joinTgtCouGroup[1],
+                                       &typeA, &typeB, &cmptgt, &srctgtidio );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot compute communication graph for target mesh" )
         POP_TIMER( tgtCouComm[1], rankInTgtComm )  // hijack this rank
-#endif
     }
 
     int tagIndex[4];
@@ -427,11 +429,11 @@ int main( int argc, char* argv[] )
 
     if( couCommIO != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( cplIOSrcPID, bottomTempField, &tagTypes[0], &srcCompNDoFs, &tagIndex[2],
+        ierr = iMOAB_DefineTagStorage( cplIOSrcTgtPID, bottomTempField, &tagTypes[0], &srcCompNDoFs, &tagIndex[2],
                                        strlen( bottomTempField ) );
         CHECKIERR( ierr, "failed to define the field tag srcsoln" );
 
-        ierr = iMOAB_DefineTagStorage( cplIOTgtPID, bottomTempProjectedField_IO, &tagTypes[1], &tgtCompNDoFs,
+        ierr = iMOAB_DefineTagStorage( cplIOSrcTgtPID, bottomTempProjectedField_IO, &tagTypes[1], &tgtCompNDoFs,
                                        &tagIndex[3], strlen( bottomTempProjectedField_IO ) );
         CHECKIERR( ierr, "failed to define the field tag srcsoln_proj" );
     }
@@ -464,35 +466,35 @@ int main( int argc, char* argv[] )
             vals.resize( storLeng, -1.0 );
 
             ierr = iMOAB_SetDoubleTagStorage( cplSrcPID, bottomTempField, &storLeng, &eetype, &vals[0],
-                                                strlen( bottomTempField ) );
+                                              strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot reset double tag storage for source coupler" )
 
             // set the tag to 0
         }
-        if( cplIOSrcAppID >= 0 )
-        {
-            int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
-            /*
-             * Each process in the communicator will have access to a local mesh instance, which
-             * will contain the original cells in the local partition and ghost entities. Number of
-             * vertices, primary cells, visible blocks, number of sidesets and nodesets boundary
-             * conditions will be returned in numProcesses 3 arrays, for local, ghost and total
-             * numbers.
-             */
-            ierr = iMOAB_GetMeshInfo( cplIOSrcPID, nverts, nelem, nblocks, nsbc, ndbc );
-            CHECKIERR( ierr, "failed to get num primary elems" );
-            int numAllElem = nelem[2];
-            std::vector< double > vals;
-            int storLeng = srcCompNDoFs * numAllElem;
-            int eetype   = 1;
+        // if( cplIOSrcAppID >= 0 )
+        // {
+        //     int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
+        //     /*
+        //      * Each process in the communicator will have access to a local mesh instance, which
+        //      * will contain the original cells in the local partition and ghost entities. Number of
+        //      * vertices, primary cells, visible blocks, number of sidesets and nodesets boundary
+        //      * conditions will be returned in numProcesses 3 arrays, for local, ghost and total
+        //      * numbers.
+        //      */
+        //     ierr = iMOAB_GetMeshInfo( cplIOSrcPID, nverts, nelem, nblocks, nsbc, ndbc );
+        //     CHECKIERR( ierr, "failed to get num primary elems" );
+        //     int numAllElem = nelem[2];
+        //     std::vector< double > vals;
+        //     int storLeng = srcCompNDoFs * numAllElem;
+        //     int eetype   = 1;
 
-            vals.resize( storLeng, -1.0 );
+        //     vals.resize( storLeng, -1.0 );
 
-            ierr = iMOAB_SetDoubleTagStorage( cplIOSrcPID, bottomTempField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomTempField ) );
-            CHECKIERR( ierr, "cannot reset double tag storage for source coupler IO" )
-            // set the tag to 0
-        }
+        //     ierr = iMOAB_SetDoubleTagStorage( cplIOSrcPID, bottomTempField, &storLeng, &eetype, &vals[0],
+        //                                       strlen( bottomTempField ) );
+        //     CHECKIERR( ierr, "cannot reset double tag storage for source coupler IO" )
+        //     // set the tag to 0
+        // }
 
         // send the projected tag back to ocean pes, with send/receive tag
         if( tgtComm != MPI_COMM_NULL )
@@ -570,7 +572,6 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_GetMeshInfo( cmpSrcPID, nullptr, nelem, nullptr, nullptr, nullptr );
             CHECKIERR( ierr, "failed to get mesh info from source" );
 
-
             int storLeng = nelem[0], eetype = 1;
             std::vector< double > vals_test( storLeng, 0.0 );
             ierr = iMOAB_GetDoubleTagStorage( cmpSrcPID, bottomTempField, &storLeng, &eetype, &vals_test[0],
@@ -584,8 +585,8 @@ int main( int argc, char* argv[] )
 
             // as always, use nonblocking sends
             // this is for projection to ocean:
-            ierr = iMOAB_SendElementTag( cmpSrcPID, bottomTempField, &srcCouComm[0], &cpltgt,
-                                         strlen( bottomTempField ) );
+            ierr =
+                iMOAB_SendElementTag( cmpSrcPID, bottomTempField, &srcCouComm[0], &cpltgt, strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot send tag values to coupler" )
         }
         if( couComm != MPI_COMM_NULL )
@@ -603,7 +604,6 @@ int main( int argc, char* argv[] )
             int nelem[3];
             ierr = iMOAB_GetMeshInfo( cplSrcPID, nullptr, nelem, nullptr, nullptr, nullptr );
             CHECKIERR( ierr, "failed to get mesh info from source mesh on coupler" );
-
 
             int storLeng = nelem[0], eetype = 1;
             std::vector< double > vals_test( storLeng, 0.0 );
@@ -631,14 +631,14 @@ int main( int argc, char* argv[] )
         // Next phase is for couplerIO
         if( srcComm != MPI_COMM_NULL && srcCouComm[1] != MPI_COMM_NULL )
         {
-            ierr = iMOAB_SendElementTag( cmpSrcPID, bottomTempField, &srcCouComm[1], &cpliosrc,
+            ierr = iMOAB_SendElementTag( cmpSrcPID, bottomTempField, &srcCouComm[1], &srctgtidio,
                                          strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot send tag values to IO coupler" )
         }
         if( couCommIO != MPI_COMM_NULL && srcCouComm[1] != MPI_COMM_NULL )
         {
             // receive on src on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplIOSrcPID, bottomTempField, &srcCouComm[1], &cmpsrc,
+            ierr = iMOAB_ReceiveElementTag( cplIOSrcTgtPID, bottomTempField, &srcCouComm[1], &srctgtidio,
                                             strlen( bottomTempField ) );
             CHECKIERR( ierr, "cannot receive tag values from IO coupler" )
         }
@@ -646,7 +646,7 @@ int main( int argc, char* argv[] )
         // we can now free the sender buffers
         if( srcComm != MPI_COMM_NULL && srcCouComm[1] != MPI_COMM_NULL )
         {
-            ierr = iMOAB_FreeSenderBuffers( cmpSrcPID, &cpliosrc );  // context is for ocean
+            ierr = iMOAB_FreeSenderBuffers( cmpSrcPID, &srctgtidio );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend src tag towards the coverage mesh" )
         }
 
@@ -654,7 +654,7 @@ int main( int argc, char* argv[] )
 
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( couComm != MPI_COMM_NULL && false)
+        if( couComm != MPI_COMM_NULL && false )
         {
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
@@ -708,13 +708,6 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
-        if( couCommIO != MPI_COMM_NULL )
-        {
-            ierr = iMOAB_SendElementTag( cplIOTgtPID, bottomTempProjectedField_IO, &tgtCouComm[1], &context_id,
-                                         strlen( bottomTempProjectedField_IO ) );
-            CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
-        }
-
         // receive on component 2, ocean
         if( tgtComm != MPI_COMM_NULL && tgtCouComm[0] != MPI_COMM_NULL )
         {
@@ -723,11 +716,33 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
+        // we can now free the sender buffers
+        if( tgtComm != MPI_COMM_NULL && tgtCouComm[0] != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cmpTgtPID, &context_id );  // context is for ocean
+            CHECKIERR( ierr, "cannot free buffers used to resend src tag towards the coverage mesh" )
+        }
+
+        MPI_Barrier( MPI_COMM_WORLD );
+        if( couCommIO != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_SendElementTag( cplIOSrcTgtPID, bottomTempProjectedField_IO, &tgtCouComm[1], &context_id,
+                                         strlen( bottomTempProjectedField_IO ) );
+            CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
+        }
+
         if( tgtComm != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
         {
             ierr = iMOAB_ReceiveElementTag( cmpTgtPID, bottomTempProjectedField_IO, &tgtCouComm[1], &context_id,
                                             strlen( bottomTempProjectedField_IO ) );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
+        }
+
+        // we can now free the sender buffers
+        if( tgtComm != MPI_COMM_NULL && tgtCouComm[1] != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cmpTgtPID, &context_id );  // context is for ocean
+            CHECKIERR( ierr, "cannot free buffers used to resend src tag towards the coverage mesh" )
         }
 
         MPI_Barrier( MPI_COMM_WORLD );
@@ -775,6 +790,11 @@ int main( int argc, char* argv[] )
 
     }  // end loop iterations n
 
+    if( couCommIO != MPI_COMM_NULL )
+    {
+        ierr = iMOAB_DeregisterApplication( cplIOSrcTgtPID );
+        CHECKIERR( ierr, "cannot deregister app intx AO IO" )
+    }
     if( couComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_DeregisterApplication( cplSrcTgtPID );
