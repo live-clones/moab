@@ -226,7 +226,7 @@ int main( int argc, char* argv[] )
         // precise info about what to send for atm cover ; every time, we will
         //  use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute ATM coverage graph for OCN mesh" )
-        ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtmPID,
+        ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtmPID, &cmpocn, &cplocn,
                                     &cplatm );  // it happens over joint communicator, ocean + coupler
         CHECKIERR( ierr, "cannot recompute direct coverage graph for atm" )
         POP_TIMER( ocnCouComm, rankInOcnComm )  // hijack this rank

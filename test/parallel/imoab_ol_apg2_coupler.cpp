@@ -388,8 +388,8 @@ int main( int argc, char* argv[] )
         // precise info about what to send for atm cover ; every time, we will
         //  use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute ATM coverage graph for OCN mesh" )
-        ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtmPID,
-                                    &cplatm );  // it happens over joint communicator, ocean + coupler
+        // it happens over joint communicator, ocean + coupler
+        ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtmPID, &cmpocn, &cplocn, &cplatm );
         CHECKIERR( ierr, "cannot recompute direct coverage graph for atm" )
         POP_TIMER( ocnCouComm, rankInOcnComm )  // hijack this rank
     }
@@ -413,7 +413,7 @@ int main( int argc, char* argv[] )
         // precise info about what to send (specifically for atm cover); every time,
         /// we will use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute ATM coverage graph for LND mesh" )
-        ierr = iMOAB_CoverageGraph( &lndCouComm, cmpLndPID, cplLndPID, cplLndAtmPID,
+        ierr = iMOAB_CoverageGraph( &lndCouComm, cmpLndPID, cplLndPID, cplLndAtmPID, &cmplnd, &cpllnd,
                                     &cplatm );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for land" )
         POP_TIMER( lndCouComm, rankInLndComm )  // hijack this rank
@@ -721,11 +721,12 @@ int main( int argc, char* argv[] )
         // send the tag to atm pes, from atm mesh on coupler pes
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
-        // original graph (context is -1_
+        // original graph from cpl atm to cmp atm
         MPI_Barrier( MPI_COMM_WORLD );
         PUSH_TIMER( "Send data from cpl atm back to atm pes" )
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmpatm;
             ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj2;u_proj2;v_proj2;", &atmCouComm, &context_id,
                                          strlen( "T_proj2;u_proj2;v_proj2;" ) );
             CHECKIERR( ierr, "cannot send tag values back to atm pes " )
@@ -734,6 +735,7 @@ int main( int argc, char* argv[] )
         // receive on component atm
         if( atmComm != MPI_COMM_NULL )
         {
+            context_id = cplatm;
             ierr = iMOAB_ReceiveElementTag( cmpAtmPID, "T_proj2;u_proj2;v_proj2;", &atmCouComm, &context_id,
                                             strlen( "T_proj2;u_proj2;v_proj2;" ) );
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
@@ -742,6 +744,7 @@ int main( int argc, char* argv[] )
 
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmpatm;
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
@@ -812,6 +815,7 @@ int main( int argc, char* argv[] )
         // original graph (context is -1_
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmpatm;
             ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj3;u_proj3;v_proj3;", &atmCouComm, &context_id,
                                          strlen( "T_proj3;u_proj3;v_proj3;" ) );
             CHECKIERR( ierr, "cannot send tag values back to atm pes " )
@@ -820,6 +824,7 @@ int main( int argc, char* argv[] )
         // receive on component atm
         if( atmComm != MPI_COMM_NULL )
         {
+            context_id = cplatm;
             ierr = iMOAB_ReceiveElementTag( cmpAtmPID, "T_proj3;u_proj3;v_proj3;", &atmCouComm, &context_id,
                                             strlen( "T_proj3;u_proj3;v_proj3;" ) );
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
@@ -828,6 +833,7 @@ int main( int argc, char* argv[] )
 
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmpatm;
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
