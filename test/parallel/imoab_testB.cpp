@@ -62,8 +62,8 @@ int main( int argc, char* argv[] )
 
     MPI_Comm_group( MPI_COMM_WORLD, &jgroup );  // all processes in jgroup
 
-    int rankInAtmComm = -1;
-    int cmpatm = 5, cplatm = 6;  //
+
+    int  cplatm = 6;  //
     std::string atmFilename =
             "../../sandbox/MeshFiles/e3sm/o_ne11pg2/ne11pg2_inf.h5m";
     // get the ocn from the ol_ne4pg2 projection folder, it has some data
@@ -82,7 +82,7 @@ int main( int argc, char* argv[] )
     // group 1 is atm, 2 is ocn; atm not used ? skip group 3 (land)
     int startG1 = 0, startG2 = 0, endG1 = numProcesses - 1, endG2 = numProcesses - 1;
     int startG4 = startG1, endG4 = endG1;  // these are for coupler layout
-    int context_id = -1;                   // used now for freeing buffers
+
 
     // default: load atm on 2 proc, ocean on 2, land on 2; migrate to 2 procs, then compute intx
     // later, we need to compute weight matrix with tempestremap
@@ -144,8 +144,6 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_Initialize( argc, argv );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKIERR( ierr, "Cannot initialize iMOAB" )
 
-    int cmpAtmAppID       = -1;
-    iMOAB_AppID cmpAtmPID = &cmpAtmAppID;  // atm
     int cplAtmAppID       = -1;            // -1 means it is not initialized
     iMOAB_AppID cplAtmPID = &cplAtmAppID;  // atm on coupler PEs
 
@@ -414,7 +412,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
          // do not write if iters > 0)
-           if( 0 == iters )
+           if( 1 == iters )
            {
                char outputFileTgt[] = "fAtmOnCpl5.h5m";
                ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
@@ -424,5 +422,53 @@ int main( int argc, char* argv[] )
         }
     }
         // do not need to send the tag to atm pes, from atm mesh on coupler pes; we are already on atm pes
+   // free data
+    // free up the MPI objects and finalize
+
+    if( couComm != MPI_COMM_NULL )
+    {
+        ierr = iMOAB_DeregisterApplication( cplOcnAtmPID );
+        CHECKIERR( ierr, "cannot deregister app OCNATM" )
+    }
+
+    if( ocnComm != MPI_COMM_NULL )
+    {
+        ierr = iMOAB_DeregisterApplication( cmpOcnPID );
+        CHECKIERR( ierr, "cannot deregister app OCN1" )
+    }
+
+    if( couComm != MPI_COMM_NULL )
+    {
+        ierr = iMOAB_DeregisterApplication( cplOcnPID );
+        CHECKIERR( ierr, "cannot deregister app OCNX" )
+    }
+    if( couComm != MPI_COMM_NULL )
+    {
+        ierr = iMOAB_DeregisterApplication( cplAtmPID );
+        CHECKIERR( ierr, "cannot deregister app ATMX" )
+    }
+
+
+    ierr = iMOAB_Finalize();
+    CHECKIERR( ierr, "did not finalize iMOAB" )
+
+    // free atm coupler group and comm
+
+
+    if( MPI_COMM_NULL != ocnComm ) MPI_Comm_free( &ocnComm );
+    // free ocn - coupler group and comm
+    if( MPI_COMM_NULL != ocnCouComm ) MPI_Comm_free( &ocnCouComm );
+    MPI_Group_free( &joinOcnCouGroup );
+
+    if( MPI_COMM_NULL != couComm ) MPI_Comm_free( &couComm );
+
+
+    MPI_Group_free( &ocnPEGroup );
+
+    MPI_Group_free( &couPEGroup );
+    MPI_Group_free( &jgroup );
+
+    MPI_Finalize();
+
     return 0;
 }
