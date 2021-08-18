@@ -93,6 +93,7 @@ struct appData
     std::map< std::string, Tag > tagMap;
     std::vector< Tag > tagList;
     bool point_cloud;
+    bool is_fortran;
 
 #ifdef MOAB_HAVE_MPI
     // constructor for this ParCommGraph takes the joint comm and the MPI groups for each
@@ -279,6 +280,7 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #endif
                                           int* compid, iMOAB_AppID pid, int app_name_length )
 {
+    ErrCode err;
     std::string name( app_name );
 
     if( (int)strlen( app_name ) > app_name_length )
@@ -299,11 +301,17 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #endif
 
     // now call C style registration function:
-    return iMOAB_RegisterApplication( app_name,
+    err = iMOAB_RegisterApplication( app_name,
 #ifdef MOAB_HAVE_MPI
                                       &ccomm,
 #endif
                                       compid, pid );
+
+    // Now that we have created the application context, store that 
+    // the driver is using Fortran
+    context.appDatas[*compid].is_fortran = true;
+
+    return err;
 }
 
 ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
@@ -3020,11 +3028,9 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and
      * unscale later. */
-    bool radii_scaled  = false;
     bool defaultradius = 1.0;
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
-        radii_scaled = true;
         rval         = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );CHKERRVAL( rval );
         rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, defaultradius );CHKERRVAL( rval );
     }
@@ -3222,10 +3228,8 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and
      * unscale later. */
-    bool radii_scaled = false;
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
-        radii_scaled = true;
         rval         = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, 1.0 );CHKERRVAL( rval );
         rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, 1.0 );CHKERRVAL( rval );
     }
