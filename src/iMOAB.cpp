@@ -284,13 +284,14 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
                                           int* compid, iMOAB_AppID pid, int app_name_length )
 {
     ErrCode err;
+    assert(app_name != nullptr);
     std::string name( app_name );
 
-    if( (int)strlen( app_name ) > app_name_length )
-    {
-        std::cout << " length of string issue \n";
-        return 1;
-    }
+    // if( (int)strlen( app_name ) > app_name_length )
+    // {
+    //     std::cout << " length of string issue \n";
+    //     return 1;
+    // }
 
 #ifdef MOAB_HAVE_MPI
     MPI_Comm ccomm;
@@ -312,7 +313,8 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 
     // Now that we have created the application context, store that 
     // the driver is using Fortran
-    context.appDatas[*compid].is_fortran = true;
+    // assert(context.appDatas.size() > *pid);
+    context.appDatas[*pid].is_fortran = true;
 
     return err;
 }
@@ -418,6 +420,15 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     return 0;
 }
 
+ErrCode iMOAB_DeregisterApplicationFortran( iMOAB_AppID pid )
+{
+    // release any Fortran specific allocations here before we pass it on
+    context.appDatas[*pid].is_fortran = false;
+
+    // release all datastructure allocations
+    return iMOAB_DeregisterApplication( pid );
+}
+
 // Utility function
 static void split_tag_names( std::string input_names, std::string& separator,
                              std::vector< std::string >& list_tag_names )
@@ -440,16 +451,14 @@ static void split_tag_names( std::string input_names, std::string& separator,
 }
 
 ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
-                              int* num_dimension, int* num_parts, int filename_length )
+                              int* num_dimension, int* num_parts, int /*filename_length*/ )
 {
-    assert( filename_length != 0 );
+    assert( filename != nullptr );
+    assert( strlen( filename ) > 0 );
 #ifdef MOAB_HAVE_HDF5
     std::string filen( filename );
 
-    if( filename_length < (int)strlen( filename ) )
-    {
-        filen = filen.substr( 0, filename_length );
-    }
+    // if( filename_length < (int)strlen( filename ) ) { filen = filen.substr( 0, filename_length ); }
 
     *num_global_vertices = 0;
     int edges            = 0;
@@ -581,21 +590,22 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
 }
 
 ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String read_options,
-                        int* num_ghost_layers, int filename_length, int read_options_length )
+                        int* num_ghost_layers, int filename_length, int /*read_options_length*/ )
 {
-    assert( filename_length != 0 );
+    assert( filename != nullptr );
+    assert( strlen(filename) > 0 );
+    // int flen = static_cast<int>(strlen( filename ));
+    // if( flen > filename_length )
+    // {
+    //     std::cout << " filename length issue\n";
+    //     return 1;
+    // }
 
-    if( (int)strlen( filename ) > filename_length )
-    {
-        std::cout << " filename length issue\n";
-        return 1;
-    }
-
-    if( (int)strlen( read_options ) > read_options_length )
-    {
-        std::cout << " read options length issue\n";
-        return 1;
-    }
+    // if( flen > read_options_length )
+    // {
+    //     std::cout << " read options length issue\n";
+    //     return 1;
+    // }
 
     // make sure we use the file set and pcomm associated with the *pid
     std::ostringstream newopts;
@@ -676,21 +686,21 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
     return iMOAB_UpdateMeshInfo( pid );
 }
 
-ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int filename_length,
-                         int write_options_length )
+ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int /*filename_length*/,
+                         int /*write_options_length*/ )
 {
     // maybe do some processing of strings and lengths
-    if( (int)strlen( filename ) > filename_length )
-    {
-        std::cout << " file name length issue\n";
-        return 1;
-    }
+    // if( (int)strlen( filename ) > filename_length )
+    // {
+    //     std::cout << " file name length issue\n";
+    //     return 1;
+    // }
 
-    if( (int)strlen( write_options ) > write_options_length )
-    {
-        std::cout << " write options issue\n";
-        return 1;
-    }
+    // if( (int)strlen( write_options ) > write_options_length )
+    // {
+    //     std::cout << " write options issue\n";
+    //     return 1;
+    // }
 
     std::ostringstream newopts;
 #ifdef MOAB_HAVE_MPI
@@ -741,9 +751,9 @@ ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_l
 ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid )
 {
     // this will include ghost elements info
-    //
     appData& data        = context.appDatas[*pid];
     EntityHandle fileSet = data.file_set;
+
     // first clear all data ranges; this can be called after ghosting
     data.all_verts.clear();
     data.primary_elems.clear();
@@ -1379,7 +1389,7 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
 }
 
 ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* tag_type,
-                                int* components_per_entity, int* tag_index, int tag_storage_name_length )
+                                int* components_per_entity, int* tag_index, int /*tag_storage_name_length*/ )
 {
     // see if the tag is already existing, and if yes, check the type, length
     if( *tag_type < 0 || *tag_type > 5 )
@@ -1449,10 +1459,10 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    // if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
+    // {
+    //     tag_name = tag_name.substr( 0, tag_storage_name_length );
+    // }
 
     Tag tagHandle;
     ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
@@ -1499,14 +1509,14 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 }
 
 ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* ent_type, int* tag_storage_data, int tag_storage_name_length )
+                                int* ent_type, int* tag_storage_data, int /*tag_storage_name_length*/ )
 {
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    // if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
+    // {
+    //     tag_name = tag_name.substr( 0, tag_storage_name_length );
+    // }
 
     appData& data = context.appDatas[*pid];
 
@@ -1557,15 +1567,12 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 }
 
 ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* ent_type, int* tag_storage_data, int tag_storage_name_length )
+                                int* ent_type, int* tag_storage_data, int /*tag_storage_name_length*/ )
 {
     ErrorCode rval;
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    // if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -1616,16 +1623,13 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 }
 
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* ent_type, double* tag_storage_data, int tag_storage_name_length )
+                                   int* ent_type, double* tag_storage_data, int /*tag_storage_name_length*/ )
 {
     ErrorCode rval;
     // exactly the same code as for int tag :) maybe should check the type of tag too
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    // if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -1676,16 +1680,13 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
 }
 
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* ent_type, double* tag_storage_data, int tag_storage_name_length )
+                                   int* ent_type, double* tag_storage_data, int /*tag_storage_name_length*/ )
 {
     ErrorCode rval;
     // exactly the same code, except tag type check
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
+    // if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -2039,17 +2040,21 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
     return rc;
 }
 
-ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingGroup, int* rcompid, int* method )
+ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGroup, int* rcompid, int* method )
 {
-    int ierr       = 0;
-    ErrorCode rval = MB_SUCCESS;
-    // appData & data = context.appDatas[*pid];
+    assert(join != nullptr);
+    assert(receivingGroup != nullptr);
+    assert(rcompid != nullptr);
+
+    ErrorCode rval;
+    int ierr;
+    appData & data = context.appDatas[*pid];
     ParallelComm* pco = context.pcomms[*pid];
 
-    MPI_Comm sender = pco->comm();  // the sender comm is obtained from parallel comm in moab;
-    // no need to pass it along
-    // first see what are the processors in each group; get the sender group too, from the sender
-    // communicator
+    MPI_Comm global = (data.is_fortran ? MPI_Comm_f2c( (MPI_Fint) *join ) : *join);
+    MPI_Group recvGroup = (data.is_fortran ? MPI_Group_f2c( (MPI_Fint) *receivingGroup ) : *receivingGroup);
+    MPI_Comm sender = pco->comm();  // the sender comm is obtained from parallel comm in moab; no need to pass it along
+    // first see what are the processors in each group; get the sender group too, from the sender communicator
     MPI_Group senderGroup;
     ierr = MPI_Comm_group( sender, &senderGroup );
     if( ierr != 0 ) return 1;
@@ -2058,7 +2063,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
     // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
     // int coid2)
     ParCommGraph* cgraph =
-        new ParCommGraph( *global, senderGroup, *receivingGroup, context.appDatas[*pid].global_id, *rcompid );
+        new ParCommGraph( global, senderGroup, recvGroup, context.appDatas[*pid].global_id, *rcompid );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
     context.appDatas[*pid].pgraph[*rcompid] = cgraph;
@@ -2107,7 +2112,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         // to each sender
         rval = cgraph->compute_trivial_partition( number_elems_per_part );CHKERRVAL( rval );
 
-        rval = cgraph->send_graph( *global );CHKERRVAL( rval );
+        rval = cgraph->send_graph( global );CHKERRVAL( rval );
     }
     else  // *method != 0, so it is either graph or geometric, parallel
     {
@@ -2115,10 +2120,10 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         rval = cgraph->compute_partition( pco, owned, *method );CHKERRVAL( rval );
 
         // basically, send the graph to the receiver side, with unblocking send
-        rval = cgraph->send_graph_partition( pco, *global );CHKERRVAL( rval );
+        rval = cgraph->send_graph_partition( pco, global );CHKERRVAL( rval );
     }
     // pco is needed to pack, not for communication
-    rval = cgraph->send_mesh_parts( *global, pco, owned );CHKERRVAL( rval );
+    rval = cgraph->send_mesh_parts( global, pco, owned );CHKERRVAL( rval );
 
     // mark for deletion
     MPI_Group_free( &senderGroup );
@@ -2126,21 +2131,28 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
 }
 
 // fortran wrapper
-ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid,
-        int* method )
-{
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group recvGroup = MPI_Group_f2c( (MPI_Fint) *receivingGroup );
-    return iMOAB_SendMesh(pid, &jcomm, &recvGroup, rcompid, method );
-}
+// ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid,
+//         int* method )
+// {
+//     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+//     MPI_Group recvGroup = MPI_Group_f2c( (MPI_Fint) *receivingGroup );
+//     return iMOAB_SendMesh(pid, &jcomm, &recvGroup, rcompid, method );
+// }
 
-ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendingGroup, int* scompid )
+ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGroup, int* scompid )
 {
+    assert(join != nullptr);
+    assert(sendingGroup != nullptr);
+    assert(scompid != nullptr);
+
+    ErrorCode rval;
     appData& data          = context.appDatas[*pid];
     ParallelComm* pco      = context.pcomms[*pid];
     MPI_Comm receive       = pco->comm();
     EntityHandle local_set = data.file_set;
-    ErrorCode rval;
+
+    MPI_Comm global = (data.is_fortran ? MPI_Comm_f2c( (MPI_Fint) *join ) : *join);
+    MPI_Group sendGroup = (data.is_fortran ? MPI_Group_f2c( (MPI_Fint) *sendingGroup ) : *sendingGroup);
 
     // first see what are the processors in each group; get the sender group too, from the sender
     // communicator
@@ -2150,7 +2162,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
 
     // instantiate the par comm graph
     ParCommGraph* cgraph =
-        new ParCommGraph( *global, *sendingGroup, receiverGroup, *scompid, context.appDatas[*pid].global_id );
+        new ParCommGraph( global, sendGroup, receiverGroup, *scompid, context.appDatas[*pid].global_id );
     // TODO we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
     context.appDatas[*pid].pgraph[*scompid] = cgraph;
@@ -2161,7 +2173,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
     // first, receive from sender_rank 0, the communication graph (matrix), so each receiver
     // knows what data to expect
     std::vector< int > pack_array;
-    rval = cgraph->receive_comm_graph( *global, pco, pack_array );CHKERRVAL( rval );
+    rval = cgraph->receive_comm_graph( global, pco, pack_array );CHKERRVAL( rval );
 
     // senders across for the current receiver
     int current_receiver = cgraph->receiver( receiver_rank );
@@ -2200,7 +2212,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
     {
         std::cout << " we do not have any senders for receiver rank " << receiver_rank << "\n";
     }
-    rval = cgraph->receive_mesh( *global, pco, local_set, senders_local );CHKERRVAL( rval );
+    rval = cgraph->receive_mesh( global, pco, local_set, senders_local );CHKERRVAL( rval );
 
     // after we are done, we could merge vertices that come from different senders, but
     // have the same global id
@@ -2288,12 +2300,12 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
     return 0;
 }
 
-ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid )
-{
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group sendGroup = MPI_Group_f2c( (MPI_Fint) *sendingGroup );
-    return iMOAB_ReceiveMesh( pid, &jcomm, &sendGroup, scompid );
-}
+// ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid )
+// {
+//     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+//     MPI_Group sendGroup = MPI_Group_f2c( (MPI_Fint) *sendingGroup );
+//     return iMOAB_ReceiveMesh( pid, &jcomm, &sendGroup, scompid );
+// }
 
 ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
                               int tag_storage_name_length )
@@ -2311,6 +2323,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     ErrorCode rval;
     EntityHandle cover_set;
 
+    MPI_Comm global = (data.is_fortran ? MPI_Comm_f2c( (MPI_Fint) *join ) : *join);
     if( data.point_cloud )
     {
         owned = data.local_verts;
@@ -2365,19 +2378,19 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 
     // pco is needed to pack, and for moab instance, not for communication!
     // still use nonblocking communication, over the joint comm
-    rval = cgraph->send_tag_values( *join, pco, owned, tagHandles );CHKERRVAL( rval );
+    rval = cgraph->send_tag_values( global, pco, owned, tagHandles );CHKERRVAL( rval );
     // now, send to each corr_tasks[i] tag data for corr_sizes[i] primary entities
 
     return 0;
 }
 
 // fortran wrapper
-ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
-                              int tag_storage_name_length )
-{
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    return iMOAB_SendElementTag(pid, tag_storage_name, &jcomm, context_id, tag_storage_name_length);
-}
+// ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+//                               int tag_storage_name_length )
+// {
+//     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+//     return iMOAB_SendElementTag(pid, tag_storage_name, &jcomm, context_id, tag_storage_name_length);
+// }
 
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
                                  int tag_storage_name_length )
@@ -2391,6 +2404,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     }
     ParCommGraph* cgraph = mt->second;
 
+    MPI_Comm global = (data.is_fortran ? MPI_Comm_f2c( (MPI_Fint) *join ) : *join);
     ParallelComm* pco = context.pcomms[*pid];
     Range owned       = data.owned_elems;
 
@@ -2454,7 +2468,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
 #endif
     // pco is needed to pack, and for moab instance, not for communication!
     // still use nonblocking communication
-    rval = cgraph->receive_tag_values( *join, pco, owned, tagHandles );CHKERRVAL( rval );
+    rval = cgraph->receive_tag_values( global, pco, owned, tagHandles );CHKERRVAL( rval );
 
 #ifdef VERBOSE
     std::cout << pco->rank() << ". Looking to receive data for tags: " << tag_name << "\n";
@@ -2462,13 +2476,15 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
 
     return 0;
 }
-ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join,
-        int* context_id,  int tag_storage_name_length )
-{
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    return iMOAB_ReceiveElementTag( pid, tag_storage_name, &jcomm,
-          context_id, tag_storage_name_length );
-}
+
+// ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join,
+//         int* context_id,  int tag_storage_name_length )
+// {
+//     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+//     return iMOAB_ReceiveElementTag( pid, tag_storage_name, &jcomm,
+//           context_id, tag_storage_name_length );
+// }
+
 ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_id )
 {
     // need first to find the pgraph that holds the information we need
@@ -2491,19 +2507,27 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
 {
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
-    MPI_Comm_rank( *join, &localRank );
-    MPI_Comm_size( *join, &numProcs );
+
+    appData& sData = context.appDatas[*pid1];
+    appData& tData = context.appDatas[*pid2];
+
+    MPI_Comm global = ((sData.is_fortran || tData.is_fortran) ? MPI_Comm_f2c( (MPI_Fint) *join ) : *join);
+    MPI_Group srcGroup = (sData.is_fortran ? MPI_Group_f2c( (MPI_Fint) *group1 ) : *group1);
+    MPI_Group tgtGroup = (tData.is_fortran ? MPI_Group_f2c( (MPI_Fint) *group2 ) : *group2);
+    
+    MPI_Comm_rank( global, &localRank );
+    MPI_Comm_size( global, &numProcs );
     // instantiate the par comm graph
     // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
     // int coid2)
     ParCommGraph* cgraph = NULL;
-    if( *pid1 >= 0 ) cgraph = new ParCommGraph( *join, *group1, *group2, *comp1, *comp2 );
+    if( *pid1 >= 0 ) cgraph = new ParCommGraph( global, srcGroup, tgtGroup, *comp1, *comp2 );
     ParCommGraph* cgraph_rev = NULL;
-    if( *pid2 >= 0 ) cgraph_rev = new ParCommGraph( *join, *group2, *group1, *comp2, *comp1 );
+    if( *pid2 >= 0 ) cgraph_rev = new ParCommGraph( global, tgtGroup, srcGroup, *comp2, *comp1 );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    if( *pid1 >= 0 ) context.appDatas[*pid1].pgraph[*comp2] = cgraph;      // the context will be the other comp
-    if( *pid2 >= 0 ) context.appDatas[*pid2].pgraph[*comp1] = cgraph_rev;  // from 2 to 1
+    if( *pid1 >= 0 ) sData.pgraph[*comp2] = cgraph;      // the context will be the other comp
+    if( *pid2 >= 0 ) tData.pgraph[*comp1] = cgraph_rev;  // from 2 to 1
     // each model has a list of global ids that will need to be sent by gs to rendezvous the other
     // model on the joint comm
     TupleList TLcomp1;
@@ -2579,7 +2603,7 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
         }
     }
 
-    ProcConfig pc( *join );  // proc config does the crystal router
+    ProcConfig pc( global );  // proc config does the crystal router
     pc.crystal_router()->gs_transfer( 1, TLcomp1,
                                       0 );  // communication towards joint tasks, with markers
     // sort by value (key 1)
@@ -2789,15 +2813,15 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
     return 0;
 }
 
-ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
-                                int* group2, int* type1, int* type2, int* comp1, int* comp2 )
-{
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
-    MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
-    return iMOAB_ComputeCommGraph( pid1, pid2, &jcomm, &gr1,
-            &gr2, type1, type2, comp1, comp2 );
-}
+// ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
+//                                 int* group2, int* type1, int* type2, int* comp1, int* comp2 )
+// {
+//     MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+//     MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
+//     MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
+//     return iMOAB_ComputeCommGraph( pid1, pid2, &jcomm, &gr1,
+//             &gr2, type1, type2, comp1, comp2 );
+// }
 
 //#undef VERBOSE
 
@@ -2880,6 +2904,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     ParCommGraph* sendGraph = NULL;
     int ierr;
     int default_context_id = -1;
+    bool is_fortran_context = false;
 
     // First, find the original graph between PE sets
     // And based on this one, we will build the newly modified one for coverage
@@ -2887,6 +2912,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     {
         default_context_id = *migr_id;  // the other one
         assert( context.appDatas[*pid_src].global_id == *src_id );
+        is_fortran_context = context.appDatas[*pid_src].is_fortran || is_fortran_context;
         sendGraph = context.appDatas[*pid_src].pgraph[default_context_id];  // maybe check if it does not exist
 
         // report the sender and receiver tasks in the joint comm
@@ -2900,6 +2926,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     ParCommGraph* recvGraph = NULL;  // will be non null on receiver tasks (intx tasks)
     if( *pid_migr >= 0 )
     {
+        is_fortran_context = context.appDatas[*pid_migr].is_fortran || is_fortran_context;
         // find the original one
         default_context_id = *src_id;
         assert( context.appDatas[*pid_migr].global_id == *migr_id );
@@ -2912,6 +2939,9 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
 #endif
     }
 
+    if( *pid_intx >= 0 )
+        is_fortran_context = context.appDatas[*pid_intx].is_fortran || is_fortran_context;
+
     // loop over pid_intx elements, to see what original processors in joint comm have sent the
     // coverage mesh;
     // If we are on intx tasks, send coverage info towards original component tasks,
@@ -2923,8 +2953,9 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     // the crystal router will send ID cell to the original source, on the component task
     // if we are on intx tasks, loop over all intx elements and
 
+    MPI_Comm global = (is_fortran_context ? MPI_Comm_f2c( (MPI_Fint) *join ) : *join);
     int currentRankInJointComm = -1;
-    ierr                       = MPI_Comm_rank( *join, &currentRankInJointComm );
+    ierr                       = MPI_Comm_rank( global, &currentRankInJointComm );
     CHKIERRVAL( ierr );
 
     // if currentRankInJointComm is in receivers list, it means that we are on intx tasks too, we
@@ -3050,7 +3081,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
         }
     }
 
-    ProcConfig pc( *join );  // proc config does the crystal router
+    ProcConfig pc( global );  // proc config does the crystal router
     pc.crystal_router()->gs_transfer( 1, TLcovIDs,
                                       0 );  // communication towards component tasks, with what ids are needed
     // for each task from receiver
@@ -3477,7 +3508,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile(
     const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
     int remap_weights_filename_length )
 {
-    assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
+    // assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
 
     ErrorCode rval;
 
@@ -3814,9 +3845,9 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
     moab::ErrorCode rval;
 
     assert( disc_order_source && disc_order_target && *disc_order_source > 0 && *disc_order_target > 0 );
-    assert( disc_method_source_length > 0 && disc_method_target_length > 0 );
-    assert( solution_weights_identifier_length > 0 && source_solution_tag_dof_name_length > 0 &&
-            target_solution_tag_dof_name_length > 0 );
+    // assert( disc_method_source_length > 0 && disc_method_target_length > 0 );
+    // assert( solution_weights_identifier_length > 0 && source_solution_tag_dof_name_length > 0 &&
+    //         target_solution_tag_dof_name_length > 0 );
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intx];
@@ -3858,8 +3889,8 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
 {
     moab::ErrorCode rval;
 
-    assert( solution_weights_identifier_length > 0 && source_solution_tag_name_length > 0 &&
-            target_solution_tag_name_length > 0 );
+    // assert( solution_weights_identifier_length > 0 && source_solution_tag_name_length > 0 &&
+    //         target_solution_tag_name_length > 0 );
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intersection];

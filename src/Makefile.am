@@ -211,7 +211,6 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/GeomUtil.hpp \
   moab/Interface.hpp \
   moab/iMOAB.h \
-  moab/imoab_protos.h \
   moab/LloydSmoother.hpp \
   moab/NestedRefine.hpp \
   moab/NestedRefineTemplates.hpp \

@@ -33,7 +33,7 @@
   11) GetElementConnectivity - clarify whether we return global or local vertex numbering.
       Preferably local numbering else lot of deciphering for global.
 */
-#include "imoab_protos.h"
+#include "moab/MOABConfig.h"
 
 #define iMOAB_AppID    int*
 #define iMOAB_String   char*
@@ -117,6 +117,18 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
                                    int* compid, iMOAB_AppID pid );
 
 /**
+  \brief De-Register application: delete mesh (set) associated with the application ID.
+
+  The associated communicator will be released, and all associated mesh entities and sets will be deleted from the
+  mesh data structure. Associated tag storage data will be freed too.
+
+  <B>Operations:</B> Collective
+
+  \param[in] pid (iMOAB_AppID) The unique pointer to the application ID
+*/
+ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid );
+
+/**
    \brief Register a Fortran-based application - Create a unique application ID and bootstrap interfaces for further
   queries.
 
@@ -140,7 +152,7 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
                                           int* compid, iMOAB_AppID pid, int app_name_length );
 
 /**
-  \brief De-Register application: delete mesh (set) associated with the application ID.
+  \brief De-Register the Fortran based application: delete mesh (set) associated with the application ID.
 
   The associated communicator will be released, and all associated mesh entities and sets will be deleted from the
   mesh data structure. Associated tag storage data will be freed too.
@@ -149,7 +161,7 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 
   \param[in] pid (iMOAB_AppID) The unique pointer to the application ID
 */
-ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid );
+ErrCode iMOAB_DeregisterApplicationFortran( iMOAB_AppID pid );
 
 /**
     \brief Get global information from the file.
@@ -498,12 +510,10 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
   <B>Operations:</B> Not Collective
 
   \param[in]  pid (iMOAB_AppID)                   The unique pointer to the application ID
-  \param[in]  surface_BC_length (int*)             The allocated size of surface boundary condition array, same as
-  <TT>num_visible_surfaceBC</TT> returned by GetMeshInfo() \param[out] local_element_ID (iMOAB_LocalID*)   The local
-  element IDs that contains the side with the surface BC \param[out] reference_surface_ID (int*)         The surface
-  number with the BC in the canonical reference element (e.g., 1 to 6 for HEX, 1-4 for TET) \param[out]
-  boundary_condition_value (int*)     The boundary condition type as obtained from the mesh description (value of the
-  NeumannSet defined on the element)
+  \param[in]  surface_BC_length (int*)             The allocated size of surface boundary condition array, same as <TT>num_visible_surfaceBC</TT> returned by GetMeshInfo()
+  \param[out] local_element_ID (iMOAB_LocalID*)   The local element IDs that contains the side with the surface BC
+  \param[out] reference_surface_ID (int*)         The surface number with the BC in the canonical reference element (e.g., 1 to 6 for HEX, 1-4 for TET)
+  \param[out] boundary_condition_value (int*)     The boundary condition type as obtained from the mesh description (value of the NeumannSet defined on the element)
 */
 ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iMOAB_LocalID* local_element_ID,
                                      int* reference_surface_ID, int* boundary_condition_value );
@@ -514,10 +524,9 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
   <B>Operations:</B> Not Collective
 
   \param[in]  pid (iMOAB_AppID)                   The unique pointer to the application ID
-  \param[in]  vertex_BC_length (int)              The allocated size of vertex boundary condition array, same as
-  <TT>num_visible_vertexBC</TT> returned by GetMeshInfo() \param[out] local_vertex_ID (iMOAB_LocalID*)    The local
-  vertex ID that has Dirichlet BC defined \param[out] boundary_condition_value (int*)     The boundary condition type as
-  obtained from the mesh description (value of the Dirichlet_Set tag defined on the vertex)
+  \param[in]  vertex_BC_length (int)              The allocated size of vertex boundary condition array, same as <TT>num_visible_vertexBC</TT> returned by GetMeshInfo() 
+  \param[out] local_vertex_ID (iMOAB_LocalID*)    The local vertex ID that has Dirichlet BC defined
+  \param[out] boundary_condition_value (int*)     The boundary condition type as obtained from the mesh description (value of the Dirichlet_Set tag defined on the vertex)
 */
 ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOAB_LocalID* local_vertex_ID,
                                     int* boundary_condition_value );
@@ -535,10 +544,10 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
 
    \param[in] pid (iMOAB_AppID)               The unique pointer to the application ID
    \param[in] tag_storage_name (iMOAB_String) The tag name to store/retrieve the data in MOAB
-   \param[in] tag_type (int*)                 The type of MOAB tag (Dense/Sparse, Double/Int/EntityHandle), enum
-  MOAB_TAG_TYPE \param[in] components_per_entity (int*)    The total size of vector dimension per entity for the tag
-  (e.g., number of doubles per entity) \param[out] tag_index (int*)               The tag index which can be used as
-  identifier in synchronize methods \param[in] tag_storage_name_length (int)   The length of the tag_storage_name string
+   \param[in] tag_type (int*)                 The type of MOAB tag (Dense/Sparse, Double/Int/EntityHandle), enum MOAB_TAG_TYPE 
+   \param[in] components_per_entity (int*)    The total size of vector dimension per entity for the tag (e.g., number of doubles per entity)
+   \param[out] tag_index (int*)               The tag index which can be used as identifier in synchronize methods
+   \param[in] tag_storage_name_length (int)   The length of the tag_storage_name string
 */
 ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* tag_type,
                                 int* components_per_entity, int* tag_index, int tag_storage_name_length );
@@ -554,12 +563,10 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 
    \param[in]  pid (iMOAB_AppID)                       The unique pointer to the application ID
    \param[in]  tag_storage_name (iMOAB_String)         The tag name to store/retreive the data in MOAB
-   \param[in]  num_tag_storage_length (int*)           The size of tag storage data (e.g.,
-   num_visible_vertices*components_per_entity or num_visible_elements*components_per_entity) \param[in]  entity_type
-   (int*)                      type 0 for vertices, 1 for primary elements \param[out] tag_storage_data (int*) The array
-   data of type <I>int</I> to replace the internal tag memory; The data is assumed to be contiguous over the local set
-   of visible entities (either vertices or elements) \param[in]  tag_storage_name_length (iMOAB_String)  The length of
-   the tag_storage_name string
+   \param[in]  num_tag_storage_length (int*)           The size of tag storage data (e.g., num_visible_vertices*components_per_entity or num_visible_elements*components_per_entity)
+   \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements
+   \param[out] tag_storage_data (int*)                 The array data of type <I>int</I> to replace the internal tag memory; The data is assumed to be contiguous over the local set of visible entities (either vertices or elements)
+   \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string
 */
 ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
                                 int* entity_type, int* tag_storage_data, int tag_storage_name_length );
@@ -571,12 +578,11 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 
    \param[in]  pid (iMOAB_AppID)                       The unique pointer to the application ID
    \param[in]  tag_storage_name (iMOAB_String)         The tag name to store/retreive the data in MOAB
-   \param[in]  num_tag_storage_length (int*)            The size of tag storage data (e.g.,
-   num_visible_vertices*components_per_entity or num_visible_elements*components_per_entity) \param[in]  entity_type
-   (int*)                      type 0 for vertices, 1 for primary elements \param[out] tag_storage_data (int*) The array
-   data of type <I>int</I> to be copied from the internal tag memory; The data is assumed to be contiguous over the
-   local set of visible entities (either vertices or elements) \param[in]  tag_storage_name_length (iMOAB_String)  The
-   length of the tag_storage_name string
+   \param[in]  num_tag_storage_length (int*)           The size of tag storage data (e.g., num_visible_vertices*components_per_entity or num_visible_elements*components_per_entity)
+   \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements
+   \param[out] tag_storage_data (int*)                 The array data of type <I>int</I> to be copied from the internal tag memory; The data is assumed to be contiguous over the
+   local set of visible entities (either vertices or elements)
+   \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string
 */
 ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
                                 int* entity_type, int* tag_storage_data, int tag_storage_name_length );
@@ -588,12 +594,10 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 
    \param[in]  pid (iMOAB_AppID)                       The unique pointer to the application ID
    \param[in]  tag_storage_name (iMOAB_String)         The tag name to store/retreive the data in MOAB
-   \param[in]  num_tag_storage_length (int*)            The size of tag storage data (e.g.,
-   num_visible_vertices*components_per_entity or num_visible_elements*components_per_entity) \param[in]  entity_type
-   (int*)                      type 0 for vertices, 1 for primary elements \param[out] tag_storage_data (double*) The
-   array data of type <I>double</I> to replace the internal tag memory; The data is assumed to be contiguous over the
-   local set of visible entities (either vertices or elements) \param[in]  tag_storage_name_length (iMOAB_String)  The
-   length of the tag_storage_name string
+   \param[in]  num_tag_storage_length (int*)           The size of tag storage data (e.g., num_visible_vertices*components_per_entity or num_visible_elements*components_per_entity)
+   \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements
+   \param[out] tag_storage_data (double*)              The array data of type <I>double</I> to replace the internal tag memory; The data is assumed to be contiguous over the local set of visible entities (either vertices or elements)
+   \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string
 */
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
                                    int* entity_type, double* tag_storage_data, int tag_storage_name_length );
@@ -711,7 +715,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
    \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
  */
 
-ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method );
+// ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method );
 
 /**
    \brief during nonblocking send, buffers were allocated, to keep data until received
@@ -745,7 +749,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
    \param[in]  scompid ( int *)                       external id of application that sends the mesh
  */
 
-ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid );
+// ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid );
 
 
 /**
@@ -774,8 +778,8 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
 
-ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
-                              int tag_storage_name_length );
+// ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+//                               int tag_storage_name_length );
 
 /**
   \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
@@ -800,8 +804,8 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
    \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
    \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
  */
-ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
-                                 int tag_storage_name_length );
+// ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+//                                  int tag_storage_name_length );
 
 /**
 \brief compute a comm graph between 2 moab apps, based on ID matching
@@ -837,8 +841,8 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
  \param[in]  cpmp2 (int*)                           id of the component 2
 
 */
-ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
-                                int* group2, int* type1, int* type2, int* comp1, int* comp2 );
+// ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
+//                                 int* group2, int* type1, int* type2, int* comp1, int* comp2 );
 
 /**
   \brief Recompute the communication graph between component and coupler, considering intersection coverage .
@@ -884,8 +888,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
   \param[in]  migr_id (int*)                      external id for the migrated mesh on coupler PEs
   \param[in]  context_id (int*)                   id of the other component in intersection
 */
-ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-          int* src_id, int* migr_id, int* context_id );
+// ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
+//                              int* src_id, int* migr_id, int* context_id );
 
 /**
   \brief Dump info about communication graph.
@@ -1113,6 +1117,37 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
                                                int target_solution_tag_name_length );
 
 #endif // #ifdef MOAB_HAVE_TEMPESTREMAP
+
+#ifdef MOAB_HAVE_MPI
+
+// Helper functions for MPI type conversions between Fortran and C++
+MPI_Fint MOAB_MPI_Comm_c2f(MPI_Comm *comm) {
+  return MPI_Comm_c2f(*comm);
+}
+
+MPI_Comm* MOAB_MPI_Comm_f2c(MPI_Fint fcomm)
+{
+  MPI_Comm* ccomm;
+  ccomm = static_cast<MPI_Comm*>(malloc(sizeof(MPI_Comm))); // memory leak ?!
+  *ccomm = MPI_Comm_f2c(fcomm);
+  assert(*ccomm != MPI_COMM_NULL);
+  return ccomm;
+}
+
+MPI_Fint MOAB_MPI_Group_c2f(MPI_Group *group) {
+  return MPI_Group_c2f(*group);
+}
+
+MPI_Group* MOAB_MPI_Group_f2c(MPI_Fint fgroup)
+{
+  MPI_Group* cgroup;
+  cgroup = static_cast<MPI_Group*>(malloc(sizeof(MPI_Group))); // memory leak ?!
+  *cgroup = MPI_Group_f2c(fgroup);
+  assert(*cgroup != MPI_GROUP_NULL);
+  return cgroup;
+}
+
+#endif // #ifdef MOAB_HAVE_MPI
 
 #ifdef __cplusplus
 }
