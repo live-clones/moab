@@ -371,12 +371,14 @@ interface
     integer(c_int), intent(in) :: comp2
   end function iMOAB_ComputeCommGraph
 
-  integer(c_int) function iMOAB_CoverageGraph(joint_comm, pid_source, pid_migration, pid_intx, context_id) bind(C, name='iMOAB_CoverageGraph')
+  integer(c_int) function iMOAB_CoverageGraph(joint_comm, pid_source, pid_migration, pid_intx, source_id, migration_id, context_id) bind(C, name='iMOAB_CoverageGraph')
     use, intrinsic :: iso_c_binding, only : c_int, c_ptr
     integer, intent(in) :: joint_comm ! MPI_Comm
     integer(c_int), intent(in) :: pid_source
     integer(c_int), intent(in) :: pid_migration
     integer(c_int), intent(in) :: pid_intx
+    integer(c_int), intent(in) :: source_id
+    integer(c_int), intent(in) :: migration_id
     integer(c_int), intent(in) :: context_id
   end function iMOAB_CoverageGraph
 

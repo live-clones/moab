@@ -22,6 +22,9 @@ SUBROUTINE errorout(ierr, message)
 
 program imoab_coupler_fortran
 
+    use iso_c_binding
+    use iMOAB
+
 #include "mpif.h"
 #include "moab/MOABConfig.h"
     !implicit none
@@ -34,9 +37,9 @@ program imoab_coupler_fortran
     character(:), allocatable :: atmFileName
     character(:), allocatable :: ocnFileName
     character(:), allocatable :: baselineFileName
-    character :: pathFile*100
+    character :: pathFile*1024
     character(:), allocatable :: readopts, fileWriteOptions
-    character :: appname*20
+    character :: appname*128
     character(:), allocatable :: weights_identifier1
     character(:), allocatable :: disc_methods1, disc_methods2, dof_tag_names1, dof_tag_names2
     integer :: disc_orders1, disc_orders2
@@ -86,8 +89,6 @@ program imoab_coupler_fortran
     call errorout(ierr, 'fail to get MPI rank')
 
 
-
-
     call MPI_COMM_SIZE (MPI_COMM_WORLD, num_procs, ierr)
     call errorout(ierr, 'fail to get MPI size')
     call mpi_comm_dup(MPI_COMM_WORLD, global_comm, ierr)
@@ -98,9 +99,9 @@ program imoab_coupler_fortran
 !    MPI_Group jgroup;
 !    std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
 !    std::string readoptsLnd( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );
-    atmFileName = trim(pathFile)//'/wholeATM_T.h5m'//CHAR(0)
-    ocnFileName = trim(pathFile)//'/recMeshOcn.h5m'//CHAR(0)
-    baselineFileName = trim(pathFile)//'/baseline1.txt'//CHAR(0)
+    atmFileName = trim(pathFile)//'/wholeATM_T.h5m'//C_NULL_CHAR
+    ocnFileName = trim(pathFile)//'/recMeshOcn.h5m'//C_NULL_CHAR
+    baselineFileName = trim(pathFile)//'/baseline1.txt'//C_NULL_CHAR
 ! all comms span the whole world, for simplicity
     atmComm = MPI_COMM_NULL
     ocnComm = MPI_COMM_NULL
@@ -126,22 +127,22 @@ program imoab_coupler_fortran
     endif
 
 
-    readopts ='PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS'//CHAR(0)
+    readopts ='PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS'//C_NULL_CHAR
     nghlay = 0 ! no ghost layers
     partScheme = 2  ! RCB with zoltan
 
-    ierr = iMOAB_InitializeFortran()
-    appname = 'ATM'//CHAR(0)
-    ierr = iMOAB_RegisterApplicationFortran(appname, atmComm, cmpatm, cmpatmPid)
-    appname = 'ATMX'//CHAR(0)
-    ierr = iMOAB_RegisterApplicationFortran(appname, cplComm, cplatm, cplatmPid)
-    appname = 'OCN'//CHAR(0)
-    ierr = iMOAB_RegisterApplicationFortran(appname, ocnComm, cmpocn, cmpocnPid)
-    appname = 'OCNX'//CHAR(0)
-    ierr = iMOAB_RegisterApplicationFortran(appname, cplComm, cplocn, cplocnPid)
+    ierr = iMOAB_Initialize()
+    appname = 'ATM'//C_NULL_CHAR
+    ierr = iMOAB_RegisterApplication(appname, atmComm, cmpatm, cmpatmPid)
+    appname = 'ATMX'//C_NULL_CHAR
+    ierr = iMOAB_RegisterApplication(appname, cplComm, cplatm, cplatmPid)
+    appname = 'OCN'//C_NULL_CHAR
+    ierr = iMOAB_RegisterApplication(appname, ocnComm, cmpocn, cmpocnPid)
+    appname = 'OCNX'//C_NULL_CHAR
+    ierr = iMOAB_RegisterApplication(appname, cplComm, cplocn, cplocnPid)
 
-    appname = 'ATMOCN'//CHAR(0)
-    ierr = iMOAB_RegisterApplicationFortran(appname, cplComm, atmocnid, cplAtmOcnPID)
+    appname = 'ATMOCN'//C_NULL_CHAR
+    ierr = iMOAB_RegisterApplication(appname, cplComm, atmocnid, cplAtmOcnPID)
 
     ! read atm and migrate
 
@@ -149,12 +150,12 @@ program imoab_coupler_fortran
 
        ierr = iMOAB_LoadMesh( cmpatmPid, atmFileName, readopts, nghlay );
        call errorout(ierr, 'fail to load atm')
-       ierr = iMOAB_SendMeshFortran( cmpatmPid, atmCouComm, cplGroup, cplatm, partScheme );
+       ierr = iMOAB_SendMesh( cmpatmPid, atmCouComm, cplGroup, cplatm, partScheme );
        call errorout(ierr, 'fail to send atm')
     endif
     if( cplComm .NE. MPI_COMM_NULL ) then
 
-        ierr = iMOAB_ReceiveMeshFortran( cplatmPid, atmCouComm, atmGroup, cmpatm ) !
+        ierr = iMOAB_ReceiveMesh( cplatmPid, atmCouComm, atmGroup, cmpatm ) !
         call errorout(ierr, 'fail to receive atm')
     endif
 
@@ -171,12 +172,12 @@ program imoab_coupler_fortran
 
        ierr = iMOAB_LoadMesh( cmpocnPid, ocnFileName, readopts, nghlay );
        call errorout(ierr, 'fail to load ocn')
-       ierr = iMOAB_SendMeshFortran( cmpocnPid, ocnCouComm, cplGroup, cplocn, partScheme );
+       ierr = iMOAB_SendMesh( cmpocnPid, ocnCouComm, cplGroup, cplocn, partScheme );
        call errorout(ierr, 'fail to send ocn')
     endif
     if( cplComm .NE. MPI_COMM_NULL ) then
 
-        ierr = iMOAB_ReceiveMeshFortran( cplocnPid, ocnCouComm, ocnGroup, cmpocn ) !
+        ierr = iMOAB_ReceiveMesh( cplocnPid, ocnCouComm, ocnGroup, cmpocn ) !
         call errorout(ierr, 'fail to receive ocn')
     endif
 
@@ -205,17 +206,17 @@ program imoab_coupler_fortran
 !        // will
 !        //  use the element global id, which should uniquely identify the element
 
-        ierr = iMOAB_CoverageGraphFortran( atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, cmpatm, cplatm, cplocn ) ! it happens over joint communicator
+         ierr = iMOAB_CoverageGraph( atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, cmpatm, cplatm, cplocn ) ! it happens over joint communicator
          call errorout(ierr, 'cannot recompute direct coverage graph for ocean')
     endif
 
-    weights_identifier1='scalar'//CHAR(0)
-    disc_methods1='cgll'//CHAR(0)
-    disc_methods2='fv'//CHAR(0)
+    weights_identifier1='scalar'//C_NULL_CHAR
+    disc_methods1='cgll'//C_NULL_CHAR
+    disc_methods2='fv'//C_NULL_CHAR
     disc_orders1=4
     disc_orders2=1
-    dof_tag_names1='GLOBAL_DOFS'//CHAR(0)
-    dof_tag_names2='GLOBAL_ID'//CHAR(0)
+    dof_tag_names1='GLOBAL_DOFS'//C_NULL_CHAR
+    dof_tag_names2='GLOBAL_ID'//C_NULL_CHAR
     ! fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1;
     fNoBubble = 1
     fMonotoneTypeID = 0
@@ -232,10 +233,10 @@ program imoab_coupler_fortran
         call errorout(ierr, 'cannot compute scalar projection weights')
 
 #ifdef MOAB_HAVE_NETCDF
-        atmocn_map_file_name = 'atm_ocn_map_f.nc'//CHAR(0)
+        atmocn_map_file_name = 'atm_ocn_map_f.nc'//C_NULL_CHAR
         ierr = iMOAB_WriteMappingWeightsToFile( cplAtmOcnPID, weights_identifier1, atmocn_map_file_name)
         call errorout(ierr, 'failed to write map file to disk')
-        !intx_from_file_identifier = 'map-from-file'//CHAR(0)
+        !intx_from_file_identifier = 'map-from-file'//C_NULL_CHAR
        ! ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier,  &
         !                                             atmocn_map_file_name, 0, 0, 0)
         !call errorout(ierr, 'failed to load map file from disk')
@@ -250,12 +251,12 @@ program imoab_coupler_fortran
     atmCompNDoFs = disc_orders1 * disc_orders1
     ocnCompNDoFs = 1 ! /*FV*/;
 
-    bottomTempField          = 'a2oTbot'//CHAR(0)
-    bottomTempProjectedField = 'a2oTbot_proj'//CHAR(0)
-    bottomUVelField          = 'a2oUbot'//CHAR(0)
-    bottomUVelProjectedField = 'a2oUbot_proj'//CHAR(0)
-    bottomVVelField          = 'a2oVbot'//CHAR(0)
-    bottomVVelProjectedField = 'a2oVbot_proj'//CHAR(0)
+    bottomTempField          = 'a2oTbot'//C_NULL_CHAR
+    bottomTempProjectedField = 'a2oTbot_proj'//C_NULL_CHAR
+    bottomUVelField          = 'a2oUbot'//C_NULL_CHAR
+    bottomUVelProjectedField = 'a2oUbot_proj'//C_NULL_CHAR
+    bottomVVelField          = 'a2oVbot'//C_NULL_CHAR
+    bottomVVelProjectedField = 'a2oVbot_proj'//C_NULL_CHAR
 
     if( cplComm .NE. MPI_COMM_NULL ) then
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempField, tagTypes(1), atmCompNDoFs, tagIndex(1))
@@ -287,7 +288,7 @@ program imoab_coupler_fortran
 !             * conditions will be returned in numProcesses 3 arrays, for local, ghost and total
 !             * numbers.
 !             */
-          ierr = iMOAB_GetMeshInfo( cplAtmPID, nverts, nelem, nblocks, nsbc, ndbc );
+          ierr = iMOAB_GetMeshInfo( cplAtmPID, nverts, nelem, nblocks, nsbc, ndbc )
           call errorout(ierr, 'failed to get num primary elems')
           storLeng = nelem(3)*atmCompNDoFs
           allocate (vals(storLeng ) )
@@ -307,22 +308,22 @@ program imoab_coupler_fortran
     endif
 !#if 0
 
-    concat_fieldname  = 'a2oTbot;a2oUbot;a2oVbot;'//CHAR(0)
-    concat_fieldnameT = 'a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;'//CHAR(0)
+    concat_fieldname  = 'a2oTbot;a2oUbot;a2oVbot;'//C_NULL_CHAR
+    concat_fieldnameT = 'a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;'//C_NULL_CHAR
 
 
     if( atmComm .NE. MPI_COMM_NULL ) then
 
 !            // as always, use nonblocking sends
 !            // this is for projection to ocean:
-        ierr = iMOAB_SendElementTagFortran( cmpAtmPID, concat_fieldname, atmCouComm, cplocn)
+        ierr = iMOAB_SendElementTag( cmpAtmPID, concat_fieldname, atmCouComm, cplocn)
         call errorout(ierr, 'cannot send tag values')
 
     endif
 
     if( cplComm .NE. MPI_COMM_NULL ) then
         !// receive on atm on coupler pes, that was redistributed according to coverage
-        ierr = iMOAB_ReceiveElementTagFortran( cplAtmPID, concat_fieldname, atmCouComm, cplocn)
+        ierr = iMOAB_ReceiveElementTag( cplAtmPID, concat_fieldname, atmCouComm, cplocn)
         call errorout(ierr, 'cannot receive tag values')
     endif
 
@@ -335,8 +336,8 @@ program imoab_coupler_fortran
     endif
     if( cplComm .ne. MPI_COMM_NULL )  then
 
-            outputFileOcn= "AtmOnCplF.h5m"//CHAR(0)
-            fileWriteOptions = 'PARALLEL=WRITE_PART'//CHAR(0)
+            outputFileOcn= "AtmOnCplF.h5m"//C_NULL_CHAR
+            fileWriteOptions = 'PARALLEL=WRITE_PART'//C_NULL_CHAR
             ierr                 = iMOAB_WriteMesh( cplAtmPID, outputFileOcn, fileWriteOptions)
             call errorout(ierr, 'could not write AtmOnCpl.h5m to disk')
 
@@ -352,8 +353,8 @@ program imoab_coupler_fortran
 
 
 
-      outputFileOcn= "OcnOnCplF.h5m"//CHAR(0)
-      fileWriteOptions = 'PARALLEL=WRITE_PART'//CHAR(0)
+      outputFileOcn= "OcnOnCplF.h5m"//C_NULL_CHAR
+      fileWriteOptions = 'PARALLEL=WRITE_PART'//C_NULL_CHAR
       ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileOcn, fileWriteOptions)
       call errorout(ierr, 'could not write OcnOnCpl.h5m to disk')
 
@@ -380,36 +381,47 @@ program imoab_coupler_fortran
 !        // original graph (context is -1_
     if( cplComm .ne. MPI_COMM_NULL ) then
         context_id = cmpocn
-        ierr = iMOAB_SendElementTagFortran( cplOcnPID, concat_fieldnameT, ocnCouComm, context_id)
+        ierr = iMOAB_SendElementTag( cplOcnPID, concat_fieldnameT, ocnCouComm, context_id)
         call errorout(ierr, 'cannot send tag values back to ocean pes')
     endif
 
     if( ocnComm .ne. MPI_COMM_NULL ) then
        context_id = cplocn
-       ierr = iMOAB_ReceiveElementTagFortran( cmpOcnPID, concat_fieldnameT, ocnCouComm, context_id)
+       ierr = iMOAB_ReceiveElementTag( cmpOcnPID, concat_fieldnameT, ocnCouComm, context_id)
        call errorout(ierr, 'cannot receive tag values from ocean mesh on coupler pes')
     endif
 
-
-
     if( cplComm .ne. MPI_COMM_NULL ) then
-     context_id = cmpocn
-     ierr = iMOAB_FreeSenderBuffers( cplOcnPID, context_id )
-     call errorout(ierr, 'cannot free sender buffers on coupler')
-   endif
+       context_id = cmpocn
+       ierr = iMOAB_FreeSenderBuffers( cplOcnPID, context_id )
+       call errorout(ierr, 'cannot free sender buffers on coupler')
+    endif
 
     if( ocnComm .ne. MPI_COMM_NULL )  then
 
-            outputFileOcn= "OcnWithProjF.h5m"//CHAR(0)
-            fileWriteOptions = 'PARALLEL=WRITE_PART'//CHAR(0)
-            ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions)
-            call errorout(ierr, 'could not write OcnWithProjF.h5m to disk')
+        outputFileOcn= "OcnWithProjF.h5m"//C_NULL_CHAR
+        fileWriteOptions = 'PARALLEL=WRITE_PART'//C_NULL_CHAR
+        print *,' Writing ocean mesh file with projected solution to disk: ', outputFileOcn
+        ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions)
+        call errorout(ierr, 'could not write OcnWithProjF.h5m to disk')
 
     endif
 
-
 ! end copy
 
+    ierr = iMOAB_DeregisterApplication(cplAtmOcnPID)
+    call errorout(ierr, 'could not de-register OCN component')
+
+    ierr = iMOAB_DeregisterApplication(cplOcnPID)
+    call errorout(ierr, 'could not de-register OCN component')
+    ierr = iMOAB_DeregisterApplication(cmpOcnPID)
+    call errorout(ierr, 'could not de-register OCN component')
+    ierr = iMOAB_DeregisterApplication(cplAtmPID)
+    call errorout(ierr, 'could not de-register OCN component')
+    ierr = iMOAB_DeregisterApplication(cmpAtmPID)
+    call errorout(ierr, 'could not de-register OCN component')
+
+    ! Free all MPI datastructures
     call MPI_Comm_free(atmComm, ierr)
     call MPI_Group_free(atmGroup, ierr)
     call MPI_Comm_free(ocnComm, ierr)
