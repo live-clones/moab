@@ -243,6 +243,7 @@ int main( int argc, char* argv[] )
                     parallel = true;
                     if( argv[i][2] == '1' || argv[i][2] == '2' ) resolve_shared = true;
                     if( argv[i][2] == '2' ) exchange_ghosts = true;
+                    break;
 #endif
 #ifdef MOAB_HAVE_TEMPESTREMAP
                 case 'B':
