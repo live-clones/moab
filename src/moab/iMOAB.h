@@ -106,9 +106,10 @@ ErrCode iMOAB_Finalize();
   <B>Operations:</B> Collective
 
   \param[in]  app_name (iMOAB_String) Application name (PROTEUS, NEK5000, etc)
-  \param[in]  comm (MPI_Comm*)        MPI communicator to be used for all mesh-related queries originating from this
-  application \param[in]  compid (int*)           external component id, unique identifier \param[out] pid (iMOAB_AppID)
-  The unique pointer to the application ID
+  \param[in]  comm (MPI_Comm*)        MPI communicator to be used for all mesh-related queries originating
+                                      from this application
+  \param[in]  compid (int*)           The unique external component identifier
+  \param[out] pid (iMOAB_AppID)       The unique pointer to the application ID
 */
 ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
@@ -140,10 +141,10 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid );
   <B>Operations:</B> Collective
 
   \param[in]  app_name (iMOAB_String) Application name (PROTEUS, NEK5000, etc)
-  \param[in]  comm (int*)             Fortran MPI communicator to be used for all mesh-related queries originating from
-  this application \param[in]  compid (int*)           external component id, unique identifier \param[out] pid
-  (iMOAB_AppID)       The unique pointer to the application ID \param[in]  app_name_length (int)   Length of application
-  name string.
+  \param[in]  comm (int*)             Fortran MPI communicator to be used for all mesh-related queries originating from this application 
+  \param[in]  compid (int*)           External component id, (A *const* unique identifier)
+  \param[out] pid (iMOAB_AppID)       The unique pointer to the application ID
+  \param[in]  app_name_length (int)   Length of application name string.
 */
 ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
@@ -174,10 +175,9 @@ ErrCode iMOAB_DeregisterApplicationFortran( iMOAB_AppID pid );
   \param[in]  filename (iMOAB_String)    The MOAB mesh file (H5M) to probe for header information
   \param[out] num_global_vertices (int*) The total number of vertices in the mesh file
   \param[out] num_global_elements (int*) The total number of elements (of highest dimension only)
-  \param[out] num_dimension (int*)       The highest dimension of elements in the mesh (Edge=1, Tri/Quad=2,
-  Tet/Hex/Prism/Pyramid=3) \param[out] num_parts (int*)           The total number of partitions available in the mesh
-  file, typically partitioned with mbpart during pre-processing \param[in]  filename_length (int)      Length of the
-  file name string
+  \param[out] num_dimension (int*)       The highest dimension of elements in the mesh (Edge=1, Tri/Quad=2, Tet/Hex/Prism/Pyramid=3)
+  \param[out] num_parts (int*)           The total number of partitions available in the mesh file, typically partitioned with mbpart during pre-processing
+  \param[in]  filename_length (int)      Length of the file name string
 */
 ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
                               int* num_dimension, int* num_parts, int filename_length );
@@ -214,10 +214,10 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
 
   <B>Operations:</B> Not collective
 
-  \param[in]  pid (iMOAB_AppID)                   The unique pointer to the application ID
-  \param[in]  coords_len (int*)                   size of the coords array (nverts * dim)
-  \param[in]  dim (int*)                          dimension (usually 3)
-  \param[in]  coordinates (double*)               coordinates of all vertices, interleaved
+  \param[in]  pid (iMOAB_AppID)                The unique pointer to the application ID
+  \param[in]  coords_len (int*)                Size of the \p coordinates array (nverts * dim)
+  \param[in]  dim (int*)                       Dimension of the vertex coordinates (usually 3)
+  \param[in]  coordinates (double*)            Coordinates of all vertices, interleaved
 */
 ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double* coordinates );
 
@@ -226,12 +226,12 @@ ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double
 
   <B>Operations:</B> Not collective
 
-  \param[in]  pid (iMOAB_AppID)                   The unique pointer to the application ID
-  \param[in]  num_elem (int*)                     number of elements
-  \param[in]  type (int*)                         type of element (moab type)
-  \param[in]  num_nodes_per_element (int*)        number of nodes per element
-  \param[in]  connectivity (int *)                connectivity array, with respect to vertices; assumes vertices
-  contiguous \param[in]  block_ID (int *)                    block_ID to which the elements will be added to
+  \param[in]  pid (iMOAB_AppID)                The unique pointer to the application ID
+  \param[in]  num_elem (int*)                  Number of elements
+  \param[in]  type (int*)                      Type of element (moab type)
+  \param[in]  num_nodes_per_element (int*)     Number of nodes per element
+  \param[in]  connectivity (int *)             Connectivity array, with respect to vertices (assumed contiguous)
+  \param[in]  block_ID (int *)                 The local block identifier, which will now contain the elements
 */
 ErrCode iMOAB_CreateElements( iMOAB_AppID pid, int* num_elem, int* type, int* num_nodes_per_element, int* connectivity,
                               int* block_ID );
@@ -277,12 +277,12 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
   <B>Operations:</B> Collective for parallel write, non collective for serial write.
 
   \param[in] pid (iMOAB_AppID)            The unique pointer to the application ID
-  \param[in] filename (iMOAB_String)      The MOAB mesh file (H5M) to write all the entities contained in the internal
-  application mesh set \param[in] write_options (iMOAB_String) Additional options for writing the MOAB mesh in parallel
-  \param[in] filename_length (int)       Length of the filename string
-  \param[in] write_options_length (int)  Length of the write options string
+  \param[in] filename (iMOAB_String)      The MOAB mesh file (H5M) to write all the entities contained in the
+                                          internal application mesh set
+  \param[in] write_options (iMOAB_String) Additional options for writing the MOAB mesh in parallel
+  \param[in] filename_length (int)        Length of the filename string
+  \param[in] write_options_length (int)   Length of the write options string
 */
-
 ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int filename_length,
                          int write_options_length );
 
@@ -322,16 +322,20 @@ ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid );
   <B>Operations:</B> Not Collective
 
   \param[in]  pid (iMOAB_AppID)            The unique pointer to the application ID
-  \param[out] num_visible_vertices (int*)  The number of vertices in the current partition/process arranged as:
-  owned/shared only, ghosted, total_visible (array allocated by client, <TT>size := 3</TT>) \param[out]
-  num_visible_elements (int*)  The number of elements in current partition/process arranged as: owned only,
-  ghosted/shared, total_visible (array allocated by client, <TT>size := 3</TT>) \param[out] num_visible_blocks (int*)
-  The number of material sets in local mesh in current partition/process arranged as: owned only, ghosted/shared,
-  total_visible (array allocated by client, <TT>size := 3</TT>) \param[out] num_visible_surfaceBC (int*) The number of
-  mesh surfaces that have a NEUMANN_SET BC defined in local mesh in current partition/process arranged as: owned only,
-  ghosted/shared, total_visible (array allocated by client, <TT>size := 3</TT>) \param[out] num_visible_vertexBC (int*)
-  The number of vertices that have a DIRICHLET_SET BC defined in local mesh in current partition/process arranged as:
-  owned only, ghosted/shared, total_visible (array allocated by client, <TT>size := 3</TT>)
+  \param[out] num_visible_vertices (int*)  The number of vertices in the current partition/process arranged
+                                           as: owned/shared only, ghosted, total_visible (array allocated by
+                                           client, <TT>size := 3</TT>)
+  \param[out] num_visible_elements (int*)  The number of elements in current partition/process arranged as: owned only,
+                                           ghosted/shared, total_visible (array allocated by client, <TT>size := 3</TT>)
+  \param[out] num_visible_blocks (int*)    The number of material sets in local mesh in current partition/process
+                                           arranged as: owned only, ghosted/shared, total_visible (array allocated by
+                                           client, <TT>size := 3</TT>)
+  \param[out] num_visible_surfaceBC (int*) The number of mesh surfaces that have a NEUMANN_SET BC defined in local mesh
+                                           in current partition/process arranged as: owned only, ghosted/shared,
+                                           total_visible (array allocated by client, <TT>size := 3</TT>)
+  \param[out] num_visible_vertexBC (int*)  The number of vertices that have a DIRICHLET_SET BC defined in local mesh in
+                                           current partition/process arranged as: owned only, ghosted/shared, 
+                                           total_visible (array allocated by client, <TT>size := 3</TT>)
 */
 ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid, int* num_visible_vertices, int* num_visible_elements,
                            int* num_visible_blocks, int* num_visible_surfaceBC, int* num_visible_vertexBC );
@@ -345,9 +349,10 @@ ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid, int* num_visible_vertices, int* num_
   <B>Operations:</B> Not collective
 
   \param[in]  pid (iMOAB_AppID)                   The unique pointer to the application ID
-  \param[in]  vertices_length (int*)              The allocated size of array (typical <TT>size :=
-  num_visible_vertices</TT>) \param[out] global_vertex_ID (iMOAB_GlobalID*)  The global IDs for all locally visible
-  vertices (array allocated by client)
+  \param[in]  vertices_length (int*)              The allocated size of array
+                                                  (typical <TT>size := num_visible_vertices</TT>)
+  \param[out] global_vertex_ID (iMOAB_GlobalID*)  The global IDs for all locally visible
+                                                  vertices (array allocated by client)
 */
 ErrCode iMOAB_GetVertexID( iMOAB_AppID pid, int* vertices_length, iMOAB_GlobalID* global_vertex_ID );
 
@@ -364,9 +369,9 @@ ErrCode iMOAB_GetVertexID( iMOAB_AppID pid, int* vertices_length, iMOAB_GlobalID
   <B>Operations:</B> Not Collective
 
   \param[in]  pid (iMOAB_AppID)             The unique pointer to the application ID
-  \param[in]  vertices_length (int*)         The allocated size of array (typically <TT>size :=
-  num_visible_vertices</TT>) \param[out] visible_global_rank_ID (int*) The processor rank owning each of the local
-  vertices
+  \param[in]  vertices_length (int*)        The allocated size of array
+                                            (typically <TT>size := num_visible_vertices</TT>)
+  \param[out] visible_global_rank_ID (int*) The processor rank owning each of the local vertices
 */
 ErrCode iMOAB_GetVertexOwnership( iMOAB_AppID pid, int* vertices_length, int* visible_global_rank_ID );
 
@@ -380,9 +385,10 @@ ErrCode iMOAB_GetVertexOwnership( iMOAB_AppID pid, int* vertices_length, int* vi
   <B>Operations:</B> Not Collective
 
   \param[in]  pid (iMOAB_AppID)     The unique pointer to the application ID
-  \param[in]  coords_length (int*)   The size of the allocated coordinate array (array allocated by client, <TT>size :=
-  3*num_visible_vertices</TT>) \param[out] coordinates (double*) The pointer to client allocated memory that will be
-  filled with interleaved coordinates
+  \param[in]  coords_length (int*)  The size of the allocated coordinate array (array allocated by
+                                    client, <TT>size := 3*num_visible_vertices</TT>)
+  \param[out] coordinates (double*) The pointer to client allocated memory that will be filled with
+                                    interleaved coordinates
 
 */
 ErrCode iMOAB_GetVisibleVerticesCoordinates( iMOAB_AppID pid, int* coords_length, double* coordinates );
@@ -398,9 +404,10 @@ ErrCode iMOAB_GetVisibleVerticesCoordinates( iMOAB_AppID pid, int* coords_length
   <B>Operations:</B> Not Collective
 
   \param[in]  pid (iMOAB_AppID)                  The unique pointer to the application ID
-  \param[in]  block_length (int*)                The allocated size of array (typical <TT>size :=
-  num_visible_blocks</TT>) \param[out] global_block_IDs (iMOAB_GlobalID*) The global IDs for all locally visible blocks
-  (array allocated by client)
+  \param[in]  block_length (int*)                The allocated size of array
+                                                 (typical <TT>size := num_visible_blocks</TT>)
+  \param[out] global_block_IDs (iMOAB_GlobalID*) The global IDs for all locally visible blocks
+                                                 (array allocated by caller)
 */
 ErrCode iMOAB_GetBlockID( iMOAB_AppID pid, int* block_length, iMOAB_GlobalID* global_block_IDs );
 
@@ -427,11 +434,11 @@ ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
 
   <B>Operations:</B> Not Collective
 
-  \param[in]  pid (iMOAB_AppID)                     The unique pointer to the application ID
-  \param[in]  num_visible_elements (int*)           The number of visible elements (returned by GetMeshInfo)
-  \param[out] element_global_IDs (iMOAB_GlobalID*)  element global ids
-  \param[out] ranks (int*)                          The owning ranks of elements
-  \param[out] block_IDs (iMOAB_GlobalID*)           The block ids the elements belong to
+  \param[in]  pid (iMOAB_AppID)                     The unique pointer to the application ID.
+  \param[in]  num_visible_elements (int*)           The number of visible elements (returned by \c GetMeshInfo).
+  \param[out] element_global_IDs (iMOAB_GlobalID*)  Element global ids to be added to the block.
+  \param[out] ranks (int*)                          The owning ranks of elements.
+  \param[out] block_IDs (iMOAB_GlobalID*)           The block ids containing the elements.
 */
 ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements, iMOAB_GlobalID* element_global_IDs,
                                       int* ranks, iMOAB_GlobalID* block_IDs );
@@ -443,13 +450,14 @@ ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements
 
   <B>Operations:</B> Not Collective
 
-  \param[in]  pid (iMOAB_AppID)                 The unique pointer to the application ID
-  \param[in]  global_block_ID (iMOAB_GlobalID*) The global block ID of the set being queried
-  \param[in]  connectivity_length (int*)        The allocated size of array (typical <TT>size :=
-  vertices_per_element*num_elements_in_block</TT>) \param[out] element_connectivity (int*)       The connectivity array
-  to store element ordering in MOAB canonical numbering scheme (array allocated by client); array contains vertex
-  indices in the local numbering order for vertices elements are in the same order as provided by GetElementOwnership
-  and GetElementID
+  \param[in]  pid (iMOAB_AppID)                 The unique pointer to the application ID.
+  \param[in]  global_block_ID (iMOAB_GlobalID*) The global block ID of the set being queried.
+  \param[in]  connectivity_length (int*)        The allocated size of array.
+                                                (typical <TT>size := vertices_per_element*num_elements_in_block</TT>)
+  \param[out] element_connectivity (int*)       The connectivity array to store element ordering in MOAB canonical
+                                                numbering scheme (array allocated by caller); array contains vertex
+                                                indices in the local numbering order for vertices elements are in 
+                                                the same order as provided by GetElementOwnership and GetElementID.
 */
 ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* connectivity_length,
                                              int* element_connectivity );
@@ -462,10 +470,10 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
   <B>Operations:</B> Not Collective
   \param[in]  pid (iMOAB_AppID)                 The unique pointer to the application ID.
   \param[in]  elem_index (iMOAB_LocalID *)      Local element index.
-  \param[in,out] connectivity_length (int *)     On input, maximum length of connectivity. On output, actual length.
+  \param[in,out] connectivity_length (int *)    On input, maximum length of connectivity. On output, actual length.
   \param[out] element_connectivity (int*)       The connectivity array to store connectivity in MOAB canonical numbering
-  scheme. Array contains vertex indices in the local numbering order for vertices
-
+                                                scheme. Array contains vertex indices in the local numbering order for
+                                                vertices.
 */
 ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index, int* connectivity_length,
                                       int* element_connectivity );
@@ -480,8 +488,9 @@ ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index
   \param[in]  pid (iMOAB_AppID)                 The unique pointer to the application ID
   \param[in]  global_block_ID (iMOAB_GlobalID)  The global block ID of the set being queried
   \param[in]  num_elements_in_block (int*)      The allocated size of ownership array, same as
-  <TT>num_elements_in_block</TT> returned from GetBlockInfo() \param[out] element_ownership (int*)          The
-  ownership array to store processor ID for all elements (array allocated by client)
+                                                <TT>num_elements_in_block</TT> returned from GetBlockInfo()
+  \param[out] element_ownership (int*)          The ownership array to store processor ID for all elements
+                                                (array allocated by caller)
 */
 ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
                                    int* element_ownership );
@@ -496,10 +505,11 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
   \param[in]  pid (iMOAB_AppID)                   The unique pointer to the application ID
   \param[in]  global_block_ID (iMOAB_GlobalID*)   The global block ID of the set being queried
   \param[in]  num_elements_in_block (int*)        The allocated size of global element ID array, same as
-  <TT>num_elements_in_block</TT> returned from GetBlockInfo() \param[out] global_element_ID (iMOAB_GlobalID*) The global
-  IDs for all locally visible elements (array allocated by client) \param[out] local_element_ID (iMOAB_LocalID*)
-  (<I><TT>Optional</TT></I>) The local IDs for all locally visible elements (index in the range of all primary elements
-  in the rank)
+                                                  <TT>num_elements_in_block</TT> returned from GetBlockInfo()
+  \param[out] global_element_ID (iMOAB_GlobalID*) The global IDs for all locally visible elements
+                                                  (array allocated by caller)
+  \param[out] local_element_ID (iMOAB_LocalID*)   (<I><TT>Optional</TT></I>) The local IDs for all locally visible
+                                                  elements (index in the range of all primary elements in the rank)
 */
 ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
                             iMOAB_GlobalID* global_element_ID, iMOAB_LocalID* local_element_ID );
@@ -673,302 +683,227 @@ ErrCode iMOAB_GetNeighborVertices( iMOAB_AppID pid, iMOAB_LocalID* local_vertex_
                                    iMOAB_LocalID* adjacent_vertex_IDs );
 
 /**
-   \brief Set global information for number of vertices and number of elements
-   it is usually available from hdf5 file or it can be computed with MPI_Reduce
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID
-   \param[in]  num_global_verts (int*)                number of total vertices
-   \param[in]  global (MPI_Comm)                      number of total elements
+ * \brief Set global information for number of vertices and number of elements;
+ * it is usually available from the h5m file, or it can be computed with a MPI_Reduce.
+ * 
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID.
+ * \param[in]  num_global_verts (int*)                The number of total vertices in the mesh.
+ * \param[in]  num_global_elems (MPI_Comm)            The number of total elements in the mesh.
  */
-
 ErrCode iMOAB_SetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems );
 
 /**
-   \brief Get global information about number of vertices and number of elements
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID
-   \param[in]  num_global_verts (int*)                number of total vertices
-   \param[in]  global (MPI_Comm)                      number of total elements
+ * \brief Get global information about number of vertices and number of elements.
+ * 
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID.
+ * \param[in]  num_global_verts (int*)                The number of total vertices in the mesh.
+ * \param[in]  num_global_elems (MPI_Comm)            The number of total elements in the mesh.
  */
 ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems );
 
 #ifdef MOAB_HAVE_MPI
-/**
-  \brief migrate (send) a set of elements from a group of tasks (senders) to another group of tasks (receivers)
-  <B>Operations:</B>  Collective on sender group
 
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
-   \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
-   \param[in]  receivingGroup (MPI_Group *)           receiving group
-   \param[in]  rcompid  (int*)                        external id of application that receives the mesh
-   \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
+/**
+ * \brief migrate (send) a set of elements from a group of tasks (senders) to another group of tasks (receivers)
+ * 
+ * \note <B>Operations:</B>  Collective on sender group
+ *
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
+ * \param[in]  joint_communicator (MPI_Comm)                        communicator that overlaps both groups
+ * \param[in]  receivingGroup (MPI_Group *)           receiving group
+ * \param[in]  rcompid  (int*)                        external id of application that receives the mesh
+ * \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
  */
 
-ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGroup, int* rcompid, int* method );
+ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Group* receivingGroup, int* rcompid, int* method );
 
 /**
-  \brief migrate (send) a set of elements from a group of tasks (senders) to another group of tasks (receivers)
-  <B>Operations:</B>  Collective on sender group; Fortran version
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
-   \param[in]  join (int *)                           communicator that overlaps both groups
-   \param[in]  receivingGroup (int *)                 receiving group
-   \param[in]  rcompid  (int*)                        external id of application that receives the mesh
-   \param[in]  method (int*)                          method of partitioning (0 trivial, 1 graph, 2 geometric)
+ * \brief Free up all of the buffers that were allocated when data transfer between
+ * components are performed. The nonblocking send and receive call buffers will be de-allocated
+ * once all the data is received by all involved tasks.
+ * 
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID sender mesh
+ * \param[in]  context_id  (int*)                     context used for sending, to identify the communication graph
+ * \return ErrCode                                    The error code indicating success of failure
  */
-
-// ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method );
-
-/**
-   \brief during nonblocking send, buffers were allocated, to keep data until received
-   Free them after requests are completed
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID sender mesh
-   \param[in]  context_id  (int*)                     context used for sending, to identify the communication graph
-   */
-
 ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_d );
 
 /**
-  \brief migrate (receive) a set of elements from a sender group of tasks
-  <B>Operations:</B>  Collective on receiver group
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
-   \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
-   \param[in]  sendingGroup (MPI_Group *)             sending group
-   \param[in]  scompid ( int *)                       external id of application that sends the mesh
+ * \brief Migrate (receive) a set of elements from a sender group of tasks
+ *
+ * \note <B>Operations:</B>  Collective on receiver group
+ *  
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver).
+ * \param[in]  joint_communicator (MPI_Comm*)         The joint communicator that overlaps both groups.
+ * \param[in]  sending_group (MPI_Group *)            The group of processes that are sending the mesh.
+ * \param[in]  sender_comp_id ( int *)                The unique application identifier that is sending the mesh
+ * \return ErrCode                                    The error code indicating success or failure
  */
-
-ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGroup, int* scompid );
-
+ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Group* sending_group,
+                           int* sender_comp_id );
 
 /**
-  \brief migrate (receive) a set of elements from a sender group of tasks
-  <B>Operations:</B>  Collective on receiver group; Fortran version
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
-   \param[in]  join (int *)                           communicator that overlaps both groups
-   \param[in]  sendingGroup (int *)                   sending group
-   \param[in]  scompid ( int *)                       external id of application that sends the mesh
+ * \brief migrate (send) a list of tags, from a sender group of tasks to a receiver group of tasks
+ * 
+ * \note <B>Operations:</B> Collective over the sender group, nonblocking sends
+ * 
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID of sender mesh.
+ * \param[in]  tag_storage_name (const iMOAB_String)  The name of the tags to be sent between the processes. 
+ *                                                    Generally multiple tag names are concatenated, separated by ";".
+ * \param[in]  joint_communicator (MPI_Comm)          The joint communicator that overlaps both groups.
+ * \param[in]  context_id (int*)                      The identifier for the other participating component in the 
+ *                                                    intersection context (typically target); -1 if this refers to 
+ *                                                    the original migration of meshes (internal detail).
+ * \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string.
+ * \return ErrCode                                    The error code indicating success or failure
  */
-
-// ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid );
-
-
-/**
-  \brief migrate (send) a list of tags, from a sender group of tasks to a receiver group of tasks
-  <B>Operations:</B> Collective over the sender group, nonblocking sends
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
-   \param[in]  tag_storage_name(const iMOAB_String)   name of the tags; concatenated, separated by ";"
-   \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
-   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
-   \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
- */
-
-ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
+ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* joint_communicator, int* context_id,
                               int tag_storage_name_length );
 
-
 /**
-  \brief migrate (send) a list of tags, from a sender group of tasks to a receiver group of tasks
-  <B>Operations:</B> Collective over the sender group, nonblocking sends; Fortran version
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
-   \param[in]  tag_storage_name(const iMOAB_String)   name of the tags; concatenated, separated by ";"
-   \param[in]  join (int *)                           communicator that overlaps both groups
-   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
-   \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
+ * \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
+ * 
+ * \note <B>Operations:</B> Collective over the receiver group, blocking receives
+ *
+ * \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID of receiver mesh.
+ * \param[in]  tag_storage_name (const iMOAB_String)  The name of the tags to be sent between the processes. 
+ *                                                    Generally multiple tag names are concatenated, separated by ";".
+ * \param[in]  joint_communicator (MPI_Comm)          The joint communicator that overlaps both groups.
+ * \param[in]  context_id (int*)                      The identifier for the other participating component in the 
+ *                                                    intersection context (typically target); -1 if this refers to 
+ *                                                    the original migration of meshes (internal detail).
+ * \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string.
  */
-
-// ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
-//                               int tag_storage_name_length );
-
-/**
-  \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
-  <B>Operations:</B> Collective over the receiver group, blocking receives
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
-   \param[in]  tag_storage_name (iMOAB_String)        name of the tags to be received; concatenated, separated by ";"
-   \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
-   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
-   \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
- */
-ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
+ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* joint_communicator, int* context_id,
                                  int tag_storage_name_length );
 
 /**
-  \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
-  <B>Operations:</B> Collective over the receiver group, blocking receives; Fortran version
-
-   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID  mesh (receiver)
-   \param[in]  tag_storage_name (iMOAB_String)        name of the tags to be received; concatenated, separated by ";"
-   \param[in]  join (int *)                           communicator that overlaps both groups
-   \param[in]  context_id (int*)                      id of the other component in intersection; -1 if original migrate
-   \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string
+ * \brief Compute a communication graph between 2 iMOAB applications, based on ID matching of key data.
+ * 
+ * \note <B>Operations:</B> Collective
+ * 
+ * \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the first application ID.
+ * \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the second application ID.
+ * \param[in]  joint_communicator (MPI_Comm*)         The MPI communicator that overlaps both groups.
+ * \param[in]  group1 (MPI_Group *)                   MPI group for first component.
+ * \param[in]  group2 (MPI_Group *)                   MPI group for second component.
+ * \param[in]  type1 (int *)                          The type of mesh used by pid1 (spectral with GLOBAL_DOFS, etc).
+ * \param[in]  type2 (int *)                          The type of mesh used by pid2 (point cloud with GLOBAL_ID, etc).
+ * \param[in]  comp1 (int*)                           The unique identifier of the first component.
+ * \param[in]  comp2 (int*)                           The unique identifier of the second component.
+ * \return ErrCode                                    The error code indicating success or failure.
  */
-// ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
-//                                  int tag_storage_name_length );
-
-/**
-\brief compute a comm graph between 2 moab apps, based on ID matching
-<B>Operations:</B> Collective
-
- \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the first application ID
- \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the second application ID
- \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
- \param[in]  group1 (MPI_Group *)                   MPI group for first comp
- \param[in]  group2 (MPI_Group *)                   MPI group for second comp
- \param[in]  type1 (int *)                          type of mesh (spectral with GLOBAL_DOFS, etc)
- \param[in]  type2 (int *)                          type of mesh (point cloud with GLOBAL_ID, etc)
- \param[in]  comp1 (int*)                           id of the component 1
- \param[in]  cpmp2 (int*)                           id of the component 2
-
-*/
-ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* join, MPI_Group* group1,
+ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* joint_communicator, MPI_Group* group1,
                                 MPI_Group* group2, int* type1, int* type2, int* comp1, int* comp2 );
 
-
 /**
-\brief compute a comm graph between 2 moab apps, based on ID matching
-<B>Operations:</B> Collective over joint comm; Fortran version
-
- \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the first application ID
- \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the second application ID
- \param[in]  join (int *)                           communicator that overlaps both groups
- \param[in]  group1 (int *)                         MPI group for first comp
- \param[in]  group2 (int *)                         MPI group for second comp
- \param[in]  type1 (int *)                          type of mesh (spectral with GLOBAL_DOFS, etc)
- \param[in]  type2 (int *)                          type of mesh (point cloud with GLOBAL_ID, etc)
- \param[in]  comp1 (int*)                           id of the component 1
- \param[in]  cpmp2 (int*)                           id of the component 2
-
-*/
-// ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
-//                                 int* group2, int* type1, int* type2, int* comp1, int* comp2 );
-
-/**
-  \brief Recompute the communication graph between component and coupler, considering intersection coverage .
-  \note
-  Original communication graph for source used an initial partition, while during intersection some of the source
-  elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
-  between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
-  The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the
-cells involved in intersection with the target cells. The new ParCommGraph between cc source mesh and cx source mesh
-will be used just for tag migration, later on; The original ParCommGraph will stay unchanged, because this source mesh
-could be used for other intersection (atm with lnd) ? on component source tasks, we will wait for information; from each
-intx task, will receive cells ids involved in intx 
-  \param[in]  join (MPI_Comm)                        communicator that overlaps component source PEs and coupler PEs 
-  \param[in]  pid_src (iMOAB_AppID)                  moab id for the component mesh on component PE 
-  \param[in]  pid_migr (iMOAB_AppID)                 moab id for the migrated mesh on coupler PEs 
-  \param[in]  pid_intx (iMOAB_AppID)                 moab id for intersection mesh (on coupler PEs) 
-  \param[in]  src_id (int*)                          external id for the component mesh on component PE 
-  \param[in]  migr_id (int*)                         external id for the migrated mesh on coupler PEs 
-  \param[in]  context_id (int*)                      id of the other component in intersection
-  */
-ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
+ * \brief Recompute the communication graph between component and coupler, considering intersection coverage.
+ * 
+ * \note Original communication graph for source used an initial partition, while during intersection some of the source
+ * elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
+ * between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
+ * The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the
+ * cells involved in intersection with the target cells. The new ParCommGraph between cc source mesh and cx source mesh
+ * will be used just for tag migration, later on; The original ParCommGraph will stay unchanged, because this source mesh
+ * could be used for other intersection (atm with lnd) ? on component source tasks, we will wait for information; from each
+ * intersection task, will receive cells ids involved in intersection.
+ * 
+ * \param[in]  joint_communicator (MPI_Comm *)     The joint communicator that overlaps component PEs and coupler PEs.
+ * \param[in]  pid_src (iMOAB_AppID)               The unique application identifier for the component mesh on component PEs.
+ * \param[in]  pid_migr (iMOAB_AppID)              The unique application identifier for the coupler mesh on coupler PEs.
+ * \param[in]  pid_intx (iMOAB_AppID)              The unique application identifier representing the intersection context on coupler PEs.
+ * \param[in]  src_id (int*)                       The external id for the component mesh on component PE.
+ * \param[in]  migr_id (int*)                      The external id for the migrated mesh on coupler PEs.
+ * \param[in]  context_id (int*)                   The unique identifier of the other participating component in intersection (target).
+ * \return ErrCode                                 The error code indicating success or failure.
+ */
+ErrCode iMOAB_CoverageGraph( MPI_Comm* joint_communicator, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
                              int* src_id, int* migr_id, int* context_id );
 
-
 /**
-  \brief Recompute the communication graph between component and coupler, considering intersection coverage.
-  Fortran version
-  \note
-  Original communication graph for source used an initial partition, while during intersection some of the source
-  elements were sent to multiple tasks; send back the intersection coverage information for a direct communication
-  between source cx mesh on coupler tasks and source cc mesh on interested tasks on the component.
-  The intersection tasks will send to the original source component tasks, in a nonblocking way, the ids of all the
-  cells involved in intersection with the target cells. The new ParCommGraph between cc source mesh and cx source mesh
-  will be used just for tag migration, later on; The original ParCommGraph will stay unchanged, because this source mesh
-  could be used for other intersection (atm with lnd) ? on component source tasks, we will wait for information; from each
-  intx task, will receive cells ids involved in intx.
-
-  \param[in]  join (int *)                        communicator that overlaps component source PEs and coupler PEs
-  \param[in]  pid_src (iMOAB_AppID)               moab id for the component mesh on component PE
-  \param[in]  pid_migr (iMOAB_AppID)              moab id for the migrated mesh on coupler PEs
-  \param[in]  pid_intx (iMOAB_AppID)              moab id for intersection mesh (on coupler PEs)
-  \param[in]  src_id (int*)                       external id for the component mesh on component PE
-  \param[in]  migr_id (int*)                      external id for the migrated mesh on coupler PEs
-  \param[in]  context_id (int*)                   id of the other component in intersection
-*/
-// ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-//                              int* src_id, int* migr_id, int* context_id );
-
-/**
-  \brief Dump info about communication graph.
-  <B>Operations:</B> Collective per sender or receiver group
-
-  \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
-  \param[in] context_id  (int*)                            context id names are separated by ";", the same way as for
-  tag migration \param[in] is_sender (int*)                              is it called from sender or receiver side
-  \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
-  \param[in] prefix_len   (int)                            The length of the prefix string
-*/
+ * \brief Dump info about communication graph.
+ *
+ * \note <B>Operations:</B> Collective per sender or receiver group 
+ * 
+ * \param[in] pid  (iMOAB_AppID)          The unique pointer to the application ID.
+ * \param[in] context_id  (int*)          The context_id names are separated by a semi-colon (";");
+ *                                        This is similar to the specifications in tag migration.
+ * \param[in] is_sender (int*)            Specify whether it is called from sender or receiver side.
+ * \param[in] prefix  (iMOAB_String)      The prefix for file names in order to differentiate different stages.
+ * \param[in] prefix_len   (int)          The length of the prefix string.
+ * \return ErrCode                        The error code indicating success or failure.
+ */
 ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix,
                              int prefix_length );
 
 /**
   \brief merge vertices in an explicit, parallel mesh; it will also reassign global IDs on vertices,
      and resolve parallel sharing of vertices
+   
+   \note
    <B>Operations:</B> Collective
 
-   \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the application ID
+   \param[in]  pid (iMOAB_AppID)    The unique pointer to the application ID.
 */
 ErrCode iMOAB_MergeVertices( iMOAB_AppID pid );
 
 #endif  // #ifdef MOAB_HAVE_MPI
+
+
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 /**
-  \brief Compute intersection of the surface meshes defined on a sphere. The resulting intersected mesh consists
-  of (convex) polygons with 1-1 associativity with both the source and destination meshes provided.
-
-  \note
-  The mesh intersection between two heterogeneous resolutions will be computed and stored in the fileset corresponding
-  to the \p pid_intx application. This intersection data can be used to compute solution projection weights between
-  these meshes.
-
-  <B>Operations:</B> Collective on coupler tasks
-
-  \param[in]  pid_source (iMOAB_AppID)               The unique pointer to the source application ID
-  \param[in]  pid_target (iMOAB_AppID)               The unique pointer to the destination application ID
-  \param[in/out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID
-  \param[in] radius_source (double *)                The radius of the sphere on which the source mesh is defined
-  \param[in] radius_target (double *)                The radius of the sphere on which the target mesh is defined
-  \param[in] epsrel (double *)                       The relative tolerance to be used to compute the mesh intersectoin
-  between source and target meshes \param[in] boxeps (double *)                       The tolerance to be used to
-  compute the box mesh
-*/
+ * @brief Compute intersection of the surface meshes defined on a sphere. The resulting intersected mesh consists
+ * of (convex) polygons with 1-1 associativity with both the source and destination meshes provided.
+ * 
+ * \note  The mesh intersection between two heterogeneous resolutions will be computed and stored in the fileset 
+ * corresponding to the \p pid_intersection application. This intersection data can be used to compute solution 
+ * projection weights between these meshes.
+ * 
+ * <B>Operations:</B> Collective on coupler tasks
+ * 
+ * \param[in]  pid_source (iMOAB_AppID)            The unique pointer to the source application ID.
+ * \param[in]  pid_target (iMOAB_AppID)            The unique pointer to the destination application ID.
+ * \param[out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID.
+ * \return ErrCode                                    The error code indicating success or failure.
+ */
 ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
                                                iMOAB_AppID pid_intersection );
 
 /**
-  \brief Compute the intersection of DoFs corresponding to surface meshes defined on a sphere. The resulting intersected
-  mesh essentially contains a communication pattern or a permutation matrix that couples both the source and destination
-  DoFs.
+ * \brief Compute the intersection of DoFs corresponding to surface meshes defined on a sphere. The resulting intersected
+ * mesh essentially contains a communication pattern or a permutation matrix that couples both the source and destination
+ * DoFs.
+ * 
+ * \note <B>Operations:</B> Collective on coupler tasks
+ *  
+ * \param[in]  pid_source (iMOAB_AppID)            The unique pointer to the source application ID.
+ * \param[in]  pid_target (iMOAB_AppID)            The unique pointer to the destination application ID.
+ * \param[out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID.
+ * \return ErrCode                                 The error code indicating success or failure.
+ */
+ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
+                                           iMOAB_AppID pid_intersection );
 
-  <B>Operations:</B> Collective on coupler tasks
-
-  \param[in]  pid_source (iMOAB_AppID)               The unique pointer to the source application ID
-  \param[in]  pid_target (iMOAB_AppID)               The unique pointer to the destination application ID
-  \param[in/out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID
-*/
-ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_tgt, iMOAB_AppID pid_intx );
 
 #ifdef MOAB_HAVE_NETCDF
 
 /**
-  \brief Load the projection weights from disk to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
-  The intersection of the mesh should be computed a-priori.
-
-  <B>Operations:</B> Collective
-
-  \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map
-  \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
-                                                          values could be identifiers such as "scalar", "flux" or "custom".
-  \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
-  \param[in] owned_dof_ids   (int *)                      The list of DoF global IDs that the current process owns and expects back from the root process
-  \param[in] owned_dof_ids_length   (int *)               The length of the owned_dof_ids parameter array
-  \param[in] row_major_ownership   (int *)                The flag to indicate whether specified global IDs correspond to source (0) or target grid (1)
-  \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string
-  \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string
+ * \brief Load the projection weights from disk to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
+ * The intersection of the mesh should be computed a-priori.
+ * 
+ * \note  <B>Operations:</B> Collective
+ * 
+ * \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map.
+ * \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
+ *                                                         values could be identifiers such as "scalar", "flux" or "custom".
+ * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
+ * \param[in] owned_dof_ids   (int *)                      The list of DoF global IDs that the current process owns and expects back from the root process.
+ * \param[in] owned_dof_ids_length   (int *)               The length of the owned_dof_ids parameter array.
+ * \param[in] row_major_ownership   (int *)                The flag to indicate whether specified global IDs correspond to source (0) or target grid (1).
+ * \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string.
+ * \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string.
+ * \return ErrCode                                         The error code indicating success or failure.
 */
 ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
                                            const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
@@ -1027,16 +962,18 @@ ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_A
         int* join, int* group1, int* group2, int* type, int* comp1, int* comp2, int* direction );
 #endif // #ifdef MOAB_HAVE_MPI
 /**
-  \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
-
-  <B>Operations:</B> Collective
-
-  \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map
-  \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
-                                                          values could be identifiers such as "scalar", "flux" or "custom".
-  \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
-  \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string
-  \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string
+ * \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination 
+ * mesh defined on a sphere.
+ * 
+ * \note  <B>Operations:</B> Collective
+ * 
+ * \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map.
+ * \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
+ *                                                         values could be identifiers such as "scalar", "flux" or "custom".
+ * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
+ * \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string.
+ * \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string.
+ * \return ErrCode                                         The error code indicating success or failure.
 */
 ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
                                           const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
@@ -1047,35 +984,37 @@ ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
 #endif
 
 /**
-  \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined
-  on a sphere. The intersection of the mesh should be computed a-priori.
-
-  \note
-  The mesh intersection data-structure is used along with conservative remapping techniques in TempestRemap to compute
-  the projection weights for transferring the tag (\p soln_tag_name) from \p pid_src to \p pid_target applications.
-
-  <B>Operations:</B> Collective
-
-  \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID
-  \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
-                                                           values could be identifiers such as "scalar", "flux" or "custom".
-  \param[in] disc_method_source  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid
-  \param[in] disc_order_source   (int *)                   The discretization order for the solution field on the source grid
-  \param[in] disc_method_target  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid
-  \param[in] disc_order_target   (int *)                   The discretization order for the solution field on the source grid
-  \param[in] fNoBubble           (int *)                   The flag to indicate whether to use bubbles in the interior of SE nodes. Default: true i.e., no bubbles used
-  \param[in] fMonotoneTypeID     (int *)                   The flag to indicate whether solution monotonicity is to be preserved. 0: none, 1:
-  \param[in] fVolumetric         (int *)                   The flag to indicate whether we need to compute volumetric projection weights
-  \param[in] fNoConservation     (int *)                   The flag to indicate whether to ignore conservation of solution field during projection
-  \param[in] fValidate           (int *)                   The flag to indicate whether to validate the consistency and conservation of solution field during projection;
-                                                           Production runs should not have this flag enabled to minimize collective operations.
-  \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization
-  \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization
-  \param[in] solution_weights_identifier_length   (int)    The length of the solution weights identifier string
-  \param[in] disc_method_src_length   (int)                The length of the discretization type string on the source mesh
-  \param[in] disc_method_tgt_length   (int)                The length of the discretization type string on the target mesh
-  \param[in] source_solution_tag_dof_name_length   (int)   The length of the source solution DoF tag name string
-  \param[in] target_solution_tag_dof_name_length   (int)   The length of the target solution DoF tag name string
+ * \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined
+ * on a sphere. The intersection of the mesh should be computed a-priori.
+ * 
+ * \note
+ * The mesh intersection data-structure is used along with conservative remapping techniques in TempestRemap to compute
+ * the projection weights for transferring the tag (\p soln_tag_name) from \p pid_src to \p pid_target applications.
+ * 
+ * <B>Operations:</B> Collective
+ * 
+ * \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID.
+ * \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
+ *                                                          values could be identifiers such as "scalar", "flux" or "custom".
+ * \param[in] disc_method_source  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid.
+ * \param[in] disc_order_source   (int *)                   The discretization order for the solution field on the source grid.
+ * \param[in] disc_method_target  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid.
+ * \param[in] disc_order_target   (int *)                   The discretization order for the solution field on the source grid.
+ * \param[in] fNoBubble           (int *)                   The flag to indicate whether to use bubbles in the interior of SE nodes. 
+ *                                                          Default: true i.e., no bubbles used.
+ * \param[in] fMonotoneTypeID     (int *)                   The flag to indicate whether solution monotonicity is to be preserved. 0: none, 1: mono.
+ * \param[in] fVolumetric         (int *)                   The flag to indicate whether we need to compute volumetric projection weights.
+ * \param[in] fNoConservation     (int *)                   The flag to indicate whether to ignore conservation of solution field during projection.
+ * \param[in] fValidate           (int *)                   The flag to indicate whether to validate the consistency and conservation of solution field during projection;
+ *                                                          Production runs should not have this flag enabled to minimize collective operations.
+ * \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization.
+ * \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization.
+ * \param[in] solution_weights_identifier_length   (int)    The length of the solution weights identifier string.
+ * \param[in] disc_method_src_length   (int)                The length of the discretization type string on the source mesh.
+ * \param[in] disc_method_tgt_length   (int)                The length of the discretization type string on the target mesh.
+ * \param[in] source_solution_tag_dof_name_length   (int)   The length of the source solution DoF tag name string.
+ * \param[in] target_solution_tag_dof_name_length   (int)   The length of the target solution DoF tag name string.
+ * \return ErrCode                                          The error code indicating success or failure.
 */
 ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
                                                const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
@@ -1092,21 +1031,22 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
                                                int target_solution_tag_dof_name_length );
 
 /**
-  \brief Apply the projection weights matrix operator onto the source tag in order to compute the solution (tag)
-  repersented on the target grid. This operation can be understood as the application of a matrix vector product
-  (Y=P*X).
-
-  <B>Operations:</B> Collective
-
-  \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID
-  \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
-                                                           values could be identifiers such as "scalar", "flux" or "custom".
-  \param[in] source_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the source discretization;
-                                                           names are separated by ";", the same way as for tag migration
-  \param[in] target_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the target discretization;
-                                                           names are separated by ";", the same way as for tag migration
-  \param[in] source_solution_tag_name_length   (int)       The length of the source solution field tag name string
-  \param[in] target_solution_tag_name_length   (int)       The length of the target solution field tag name string
+ * \brief Apply the projection weights matrix operator onto the source tag in order to compute the solution (tag)
+ * repersented on the target grid. This operation can be understood as the application of a matrix vector product
+ * (Y=P*X).
+ * 
+ * \note <B>Operations:</B> Collective
+ * 
+ * \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID.
+ * \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
+ *                                                          values could be identifiers such as "scalar", "flux" or "custom".
+ * \param[in] source_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the source discretization;
+ *                                                          names are separated by ";", the same way as for tag migration.
+ * \param[in] target_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the target discretization;
+ *                                                          names are separated by ";", the same way as for tag migration.
+ * \param[in] source_solution_tag_name_length   (int)       The length of the source solution field tag name string.
+ * \param[in] target_solution_tag_name_length   (int)       The length of the target solution field tag name string.
+ * \return ErrCode                                          The error code indicating success or failure.
 */
 ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
                                                const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
@@ -1121,10 +1061,24 @@ ErrCode iMOAB_ApplyScalarProjectionWeights (   iMOAB_AppID pid_intersection,
 #ifdef MOAB_HAVE_MPI
 
 // Helper functions for MPI type conversions between Fortran and C++
+/**
+ * \brief MOAB MPI helper function to convert from a C-based MPI_Comm object
+ * to a Fortran compatible MPI_Fint (integer) value.
+ * 
+ * \param comm       Input MPI_Comm C-object pointer.
+ * \return MPI_Fint  Output Fortran integer representing the comm object.
+ */
 MPI_Fint MOAB_MPI_Comm_c2f(MPI_Comm *comm) {
   return MPI_Comm_c2f(*comm);
 }
 
+/**
+ * \brief MOAB MPI helper function to convert from a Fortran-based MPI_Fint (integer) 
+ * value to a C/C++ compatible MPI_Comm object.
+ * 
+ * \param fgroup (MPI_Fint)  Input Fortran integer representing the MPI_Comm object.
+ * \return MPI_Comm*         Output C/C++-compatible MPI_Comm object pointer.
+ */
 MPI_Comm* MOAB_MPI_Comm_f2c(MPI_Fint fcomm)
 {
   MPI_Comm* ccomm;
@@ -1134,10 +1088,24 @@ MPI_Comm* MOAB_MPI_Comm_f2c(MPI_Fint fcomm)
   return ccomm;
 }
 
+/**
+ * \brief MOAB MPI helper functions to convert from a C-based MPI_Group object
+ * to a Fortran compatible MPI_Fint (integer) value.
+ * 
+ * \param group       Input MPI_Comm C-object pointer.
+ * \return MPI_Fint  Output Fortran integer representing the comm object.
+ */
 MPI_Fint MOAB_MPI_Group_c2f(MPI_Group *group) {
   return MPI_Group_c2f(*group);
 }
 
+/**
+ * \brief MOAB MPI helper function to convert from a Fortran-based MPI_Fint (integer) 
+ * value to a C/C++ compatible MPI_Group object.
+ * 
+ * \param fgroup (MPI_Fint)   Input Fortran integer representing the MPIGroup object.
+ * \return MPI_Group*         Output C/C++-compatible MPI_Group object pointer.
+ */
 MPI_Group* MOAB_MPI_Group_f2c(MPI_Fint fgroup)
 {
   MPI_Group* cgroup;
