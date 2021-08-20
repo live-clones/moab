@@ -156,14 +156,13 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid );
  * \param[in]  communicator (int*)     Fortran MPI communicator to be used for all mesh-related queries originating from this application.
  * \param[in]  compid (int*)           External component id, (A *const* unique identifier).
  * \param[out] pid (iMOAB_AppID)       The unique pointer to the application ID.
- * \param[in]  app_name_length (int)   Length of application name string.
  * \return ErrCode                     The error code indicating success or failure.
  */
 ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* communicator,
 #endif
-                                          int* compid, iMOAB_AppID pid, int app_name_length );
+                                          int* compid, iMOAB_AppID pid );
 
 /**
  * \brief De-Register the Fortran based application: delete mesh (set) associated with the application ID.
@@ -192,11 +191,10 @@ ErrCode iMOAB_DeregisterApplicationFortran( iMOAB_AppID pid );
  *                                        (Edge=1, Tri/Quad=2, Tet/Hex/Prism/Pyramid=3).
  * \param[out] num_parts (int*)           The total number of partitions available in the mesh file, typically 
  *                                        partitioned with mbpart during pre-processing.
- * \param[in]  filename_length (int)      Length of the file name string.
  * \return ErrCode                        The error code indicating success or failure.
  */
 ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
-                              int* num_dimension, int* num_parts, int filename_length );
+                              int* num_dimension, int* num_parts );
 
 /**
  * \brief Load a MOAB mesh file in parallel and exchange ghost layers as requested.
@@ -217,12 +215,10 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
  * \param[in] filename (iMOAB_String)      The MOAB mesh file (H5M) to load onto the internal application mesh set.
  * \param[in] read_options (iMOAB_String)  Additional options for reading the MOAB mesh file in parallel.
  * \param[in] num_ghost_layers (int*)      The total number of ghost layers to exchange during mesh loading.
- * \param[in] filename_length (int)        Length of the filename string.
- * \param[in] read_options_length (int)    Length of the read options string.
  * \return ErrCode                         The error code indicating success or failure.
  */
 ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String read_options,
-                        int* num_ghost_layers, int filename_length, int read_options_length );
+                        int* num_ghost_layers );
 
 /**
  * \brief Create vertices for an app; it assumes no other vertices
@@ -296,12 +292,9 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
  * \param[in] filename (iMOAB_String)      The MOAB mesh file (H5M) to write all the entities contained in the
  *                                         internal application mesh set.
  * \param[in] write_options (iMOAB_String) Additional options for writing the MOAB mesh in parallel.
- * \param[in] filename_length (int)        Length of the filename string.
- * \param[in] write_options_length (int)   Length of the write options string.
  * \return ErrCode                         The error code indicating success or failure.
  */
-ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int filename_length,
-                         int write_options_length );
+ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options );
 
 /**
  * \brief Write a local MOAB mesh copy.
@@ -594,11 +587,10 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
  * \param[in] tag_type (int*)                 The type of MOAB tag (Dense/Sparse, Double/Int/EntityHandle), enum MOAB_TAG_TYPE.
  * \param[in] components_per_entity (int*)    The total size of vector dimension per entity for the tag (e.g., number of doubles per entity).
  * \param[out] tag_index (int*)               The tag index which can be used as identifier in synchronize methods.
- * \param[in] tag_storage_name_length (int)   The length of the tag_storage_name string.
  * \return ErrCode                            The error code indicating success or failure.
  */
 ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* tag_type,
-                                int* components_per_entity, int* tag_index, int tag_storage_name_length );
+                                int* components_per_entity, int* tag_index );
 
 /**
  * \brief Store the specified values in a MOAB integer Tag.
@@ -615,12 +607,12 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
  *                                                     num_visible_elements*components_per_entity).
  * \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements.
  * \param[out] tag_storage_data (int*)                 The array data of type <I>int</I> to replace the internal tag memory; 
- *                                                     The data is assumed to be contiguous over the local set of visible entities (either vertices or elements).
- * \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string.
+ *                                                     The data is assumed to be contiguous over the local set of visible entities 
+ *                                                     (either vertices or elements).
  * \return ErrCode                                     The error code indicating success or failure.
  */
 ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* entity_type, int* tag_storage_data, int tag_storage_name_length );
+                                int* entity_type, int* tag_storage_data );
 
 /**
  * \brief Get the specified values in a MOAB integer Tag.
@@ -635,11 +627,10 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
  * \param[out] tag_storage_data (int*)                 The array data of type <I>int</I> to be copied from the internal tag memory; 
  *                                                     The data is assumed to be contiguous over the local set of visible 
  *                                                     entities (either vertices or elements).
- * \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string.
  * \return ErrCode                                     The error code indicating success or failure.
  */
 ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* entity_type, int* tag_storage_data, int tag_storage_name_length );
+                                int* entity_type, int* tag_storage_data );
 
 /**
  * \brief Store the specified values in a MOAB double Tag.
@@ -654,11 +645,10 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
  * \param[out] tag_storage_data (double*)              The array data of type <I>double</I> to replace the internal tag memory; 
  *                                                     The data is assumed to be contiguous over the local set of visible 
  *                                                     entities (either vertices or elements).
- * \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string.
  * \return ErrCode                                     The error code indicating success or failure.
  */
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* entity_type, double* tag_storage_data, int tag_storage_name_length );
+                                   int* entity_type, double* tag_storage_data );
 
 /**
  * \brief Retrieve the specified values in a MOAB double Tag.
@@ -673,11 +663,10 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
  * \param[out] tag_storage_data (double*)              The array data of type <I>double</I> to replace the internal tag memory; 
  *                                                     The data is assumed to be contiguous over the local set of visible 
  *                                                     entities (either vertices or elements).
- * \param[in]  tag_storage_name_length (iMOAB_String)  The length of the tag_storage_name string.
  * \return ErrCode                                     The error code indicating success or failure.
  */
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* entity_type, double* tag_storage_data, int tag_storage_name_length );
+                                   int* entity_type, double* tag_storage_data );
 
 /**
  * \brief Exchange tag values for the given tags across process boundaries.
@@ -799,7 +788,7 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_d );
  * \param[in]  joint_communicator (MPI_Comm*)         The joint communicator that overlaps both groups.
  * \param[in]  sending_group (MPI_Group *)            The group of processes that are sending the mesh.
  * \param[in]  sender_comp_id ( int *)                The unique application identifier that is sending the mesh
- * \return ErrCode                                    The error code indicating success or failure
+ * \return ErrCode                                    The error code indicating success or failure.
  */
 ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Group* sending_group,
                            int* sender_comp_id );
@@ -816,11 +805,10 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Gr
  * \param[in]  context_id (int*)                      The identifier for the other participating component in the 
  *                                                    intersection context (typically target); -1 if this refers to 
  *                                                    the original migration of meshes (internal detail).
- * \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string.
- * \return ErrCode                                    The error code indicating success or failure
+ * \return ErrCode                                    The error code indicating success or failure.
  */
 ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* joint_communicator,
-                              int* context_id, int tag_storage_name_length );
+                              int* context_id );
 
 /**
  * \brief migrate (receive) a list of tags, from a sender group of tasks to a receiver group of tasks
@@ -834,10 +822,10 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
  * \param[in]  context_id (int*)                      The identifier for the other participating component in the 
  *                                                    intersection context (typically target); -1 if this refers to 
  *                                                    the original migration of meshes (internal detail).
- * \param[in]  tag_storage_name_length (int)          The length of the tag_storage_name string.
+ * \return ErrCode                                    The error code indicating success or failure.
  */
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* joint_communicator,
-                                 int* context_id, int tag_storage_name_length );
+                                 int* context_id );
 
 /**
  * \brief Compute a communication graph between 2 iMOAB applications, based on ID matching of key data.
@@ -892,11 +880,9 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* joint_communicator, iMOAB_AppID pid_src, 
  *                                        This is similar to the specifications in tag migration.
  * \param[in] is_sender (int*)            Specify whether it is called from sender or receiver side.
  * \param[in] prefix  (iMOAB_String)      The prefix for file names in order to differentiate different stages.
- * \param[in] prefix_len   (int)          The length of the prefix string.
  * \return ErrCode                        The error code indicating success or failure.
  */
-ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix,
-                             int prefix_length );
+ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix );
 
 /**
  * \brief merge vertices in an explicit, parallel mesh; it will also reassign global IDs on vertices,
@@ -959,18 +945,11 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source, iMOAB_AppID p
  * \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
  *                                                         values could be identifiers such as "scalar", "flux" or "custom".
  * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
- * \param[in] owned_dof_ids   (int *)                      The list of DoF global IDs that the current process owns and expects back from the root process.
- * \param[in] owned_dof_ids_length   (int *)               The length of the owned_dof_ids parameter array.
- * \param[in] row_major_ownership   (int *)                The flag to indicate whether specified global IDs correspond to source (0) or target grid (1).
- * \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string.
- * \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string.
  * \return ErrCode                                         The error code indicating success or failure.
 */
 ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
                                            const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                           const iMOAB_String remap_weights_filename,
-                                           int solution_weights_identifier_length,
-                                           int remap_weights_filename_length );
+                                           const iMOAB_String remap_weights_filename );
 
 #ifdef MOAB_HAVE_MPI
 /**
@@ -1032,15 +1011,12 @@ ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_A
  * \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
  *                                                         values could be identifiers such as "scalar", "flux" or "custom".
  * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
- * \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string.
- * \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string.
  * \return ErrCode                                         The error code indicating success or failure.
 */
 ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
                                           const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                          const iMOAB_String remap_weights_filename,
-                                          int solution_weights_identifier_length,
-                                          int remap_weights_filename_length );
+                                          const iMOAB_String remap_weights_filename );
+
 // endif for MOAB_HAVE_NETCDF
 #endif
 
@@ -1054,7 +1030,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
  * 
  * <B>Operations:</B> Collective
  * 
- * \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID.
+ * \param[in] pid_intersection (iMOAB_AppID)                The unique pointer to the intersection application ID.
  * \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
  *                                                          values could be identifiers such as "scalar", "flux" or "custom".
  * \param[in] disc_method_source  (iMOAB_String)            The discretization type ("fv", "cgll", "dgll") for the solution field on the source grid.
@@ -1070,11 +1046,6 @@ ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
  *                                                          Production runs should not have this flag enabled to minimize collective operations.
  * \param[in] source_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the source discretization.
  * \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization.
- * \param[in] solution_weights_identifier_length   (int)    The length of the solution weights identifier string.
- * \param[in] disc_method_src_length   (int)                The length of the discretization type string on the source mesh.
- * \param[in] disc_method_tgt_length   (int)                The length of the discretization type string on the target mesh.
- * \param[in] source_solution_tag_dof_name_length   (int)   The length of the source solution DoF tag name string.
- * \param[in] target_solution_tag_dof_name_length   (int)   The length of the target solution DoF tag name string.
  * \return ErrCode                                          The error code indicating success or failure.
 */
 ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
@@ -1084,12 +1055,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
                                                int* fNoBubble, int* fMonotoneTypeID, int* fVolumetric,
                                                int* fNoConservation, int* fValidate,
                                                const iMOAB_String source_solution_tag_dof_name,
-                                               const iMOAB_String target_solution_tag_dof_name,
-                                               int solution_weights_identifier_length,
-                                               int disc_method_src_length,
-                                               int disc_method_tgt_length,
-                                               int source_solution_tag_dof_name_length,
-                                               int target_solution_tag_dof_name_length );
+                                               const iMOAB_String target_solution_tag_dof_name );
 
 /**
  * \brief Apply the projection weights matrix operator onto the source tag in order to compute the solution (tag)
@@ -1098,24 +1064,19 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
  * 
  * \note <B>Operations:</B> Collective
  * 
- * \param[in/out] pid_intersection (iMOAB_AppID)            The unique pointer to the intersection application ID.
+ * \param[in] pid_intersection (iMOAB_AppID)                The unique pointer to the intersection application ID.
  * \param[in] solution_weights_identifier  (iMOAB_String)   The unique identifier used to store the computed projection weights locally. Typically,
  *                                                          values could be identifiers such as "scalar", "flux" or "custom".
  * \param[in] source_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the source discretization;
  *                                                          names are separated by ";", the same way as for tag migration.
  * \param[in] target_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the target discretization;
  *                                                          names are separated by ";", the same way as for tag migration.
- * \param[in] source_solution_tag_name_length   (int)       The length of the source solution field tag name string.
- * \param[in] target_solution_tag_name_length   (int)       The length of the target solution field tag name string.
  * \return ErrCode                                          The error code indicating success or failure.
 */
 ErrCode iMOAB_ApplyScalarProjectionWeights ( iMOAB_AppID pid_intersection,
                                              const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
                                              const iMOAB_String source_solution_tag_name,
-                                             const iMOAB_String target_solution_tag_name,
-                                             int solution_weights_identifier_length,
-                                             int source_solution_tag_name_length,
-                                             int target_solution_tag_name_length );
+                                             const iMOAB_String target_solution_tag_name );
 
 #endif // #ifdef MOAB_HAVE_TEMPESTREMAP
 

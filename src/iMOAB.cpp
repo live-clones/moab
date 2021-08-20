@@ -281,17 +281,11 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* comm,
 #endif
-                                          int* compid, iMOAB_AppID pid, int app_name_length )
+                                          int* compid, iMOAB_AppID pid )
 {
     ErrCode err;
-    assert(app_name != nullptr);
+    assert( app_name != nullptr );
     std::string name( app_name );
-
-    // if( (int)strlen( app_name ) > app_name_length )
-    // {
-    //     std::cout << " length of string issue \n";
-    //     return 1;
-    // }
 
 #ifdef MOAB_HAVE_MPI
     MPI_Comm ccomm;
@@ -451,10 +445,9 @@ static void split_tag_names( std::string input_names, std::string& separator,
 }
 
 ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
-                              int* num_dimension, int* num_parts, int /*filename_length*/ )
+                              int* num_dimension, int* num_parts )
 {
-    assert( filename != nullptr );
-    assert( strlen( filename ) > 0 );
+    assert( filename && strlen( filename ) );
 #ifdef MOAB_HAVE_HDF5
     std::string filen( filename );
 
@@ -590,26 +583,13 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
 }
 
 ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String read_options,
-                        int* num_ghost_layers, int filename_length, int /*read_options_length*/ )
+                        int* num_ghost_layers )
 {
-    assert( filename != nullptr );
-    assert( strlen(filename) > 0 );
-    // int flen = static_cast<int>(strlen( filename ));
-    // if( flen > filename_length )
-    // {
-    //     std::cout << " filename length issue\n";
-    //     return 1;
-    // }
-
-    // if( flen > read_options_length )
-    // {
-    //     std::cout << " read options length issue\n";
-    //     return 1;
-    // }
+    assert( filename && strlen( filename ) );
 
     // make sure we use the file set and pcomm associated with the *pid
     std::ostringstream newopts;
-    newopts << read_options;
+    if( read_options ) newopts << read_options;
 
 #ifdef MOAB_HAVE_MPI
 
@@ -617,7 +597,7 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
     {
         if( context.worldprocs > 1 )
         {
-            std::string opts( read_options );
+            std::string opts( ( read_options ? read_options : "" ) );
             std::string pcid( "PARALLEL_COMM=" );
             std::size_t found = opts.find( pcid );
 
@@ -686,25 +666,13 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
     return iMOAB_UpdateMeshInfo( pid );
 }
 
-ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options, int /*filename_length*/,
-                         int /*write_options_length*/ )
+ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options )
 {
-    // maybe do some processing of strings and lengths
-    // if( (int)strlen( filename ) > filename_length )
-    // {
-    //     std::cout << " file name length issue\n";
-    //     return 1;
-    // }
-
-    // if( (int)strlen( write_options ) > write_options_length )
-    // {
-    //     std::cout << " write options issue\n";
-    //     return 1;
-    // }
+    assert( filename && strlen( filename ) );
 
     std::ostringstream newopts;
 #ifdef MOAB_HAVE_MPI
-    std::string write_opts( write_options );
+    std::string write_opts( ( write_options ? write_options : "" ) );
     std::string pcid( "PARALLEL_COMM=" );
     std::size_t found = write_opts.find( pcid );
 
@@ -725,7 +693,7 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
 
 #endif
 
-    newopts << write_options;
+    if( write_options ) newopts << write_options;
 
     // Now let us actually write the file to disk with appropriate options
     ErrorCode rval = context.MBI->write_file( filename, 0, newopts.str().c_str(), &context.appDatas[*pid].file_set, 1 );CHKERRVAL( rval );
@@ -928,8 +896,10 @@ ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid, int* num_visible_vertices, int* num_
 
 ErrCode iMOAB_GetVertexID( iMOAB_AppID pid, int* vertices_length, iMOAB_GlobalID* global_vertex_ID )
 {
-    Range& verts = context.appDatas[*pid].all_verts;
+    assert( vertices_length && *vertices_length );
+    assert( global_vertex_ID );
 
+    Range& verts = context.appDatas[*pid].all_verts;
     if( (int)verts.size() != *vertices_length )
     {
         return 1;
@@ -943,6 +913,9 @@ ErrCode iMOAB_GetVertexID( iMOAB_AppID pid, int* vertices_length, iMOAB_GlobalID
 
 ErrCode iMOAB_GetVertexOwnership( iMOAB_AppID pid, int* vertices_length, int* visible_global_rank_ID )
 {
+    assert( vertices_length && *vertices_length );
+    assert( visible_global_rank_ID );
+
     Range& verts = context.appDatas[*pid].all_verts;
     int i        = 0;
 #ifdef MOAB_HAVE_MPI
@@ -1389,7 +1362,7 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
 }
 
 ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* tag_type,
-                                int* components_per_entity, int* tag_index, int /*tag_storage_name_length*/ )
+                                int* components_per_entity, int* tag_index )
 {
     // see if the tag is already existing, and if yes, check the type, length
     if( *tag_type < 0 || *tag_type > 5 )
@@ -1457,14 +1430,8 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
         }  // error
     }
 
-    std::string tag_name( tag_storage_name );
-
-    // if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    // {
-    //     tag_name = tag_name.substr( 0, tag_storage_name_length );
-    // }
-
     Tag tagHandle;
+    std::string tag_name( tag_storage_name );
     ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
                                                   tagType, defaultVal );
 
@@ -1509,15 +1476,11 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 }
 
 ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* ent_type, int* tag_storage_data, int /*tag_storage_name_length*/ )
+                                int* ent_type, int* tag_storage_data )
 {
     std::string tag_name( tag_storage_name );
 
-    // if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    // {
-    //     tag_name = tag_name.substr( 0, tag_storage_name_length );
-    // }
-
+    // Get the application data
     appData& data = context.appDatas[*pid];
 
     if( data.tagMap.find( tag_name ) == data.tagMap.end() )
@@ -1567,12 +1530,10 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 }
 
 ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* ent_type, int* tag_storage_data, int /*tag_storage_name_length*/ )
+                                int* ent_type, int* tag_storage_data )
 {
     ErrorCode rval;
     std::string tag_name( tag_storage_name );
-
-    // if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -1623,13 +1584,11 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 }
 
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* ent_type, double* tag_storage_data, int /*tag_storage_name_length*/ )
+                                   int* ent_type, double* tag_storage_data )
 {
     ErrorCode rval;
     // exactly the same code as for int tag :) maybe should check the type of tag too
     std::string tag_name( tag_storage_name );
-
-    // if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -1680,13 +1639,11 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
 }
 
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* ent_type, double* tag_storage_data, int /*tag_storage_name_length*/ )
+                                   int* ent_type, double* tag_storage_data )
 {
     ErrorCode rval;
     // exactly the same code, except tag type check
     std::string tag_name( tag_storage_name );
-
-    // if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
 
     appData& data = context.appDatas[*pid];
 
@@ -1728,9 +1685,7 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     }  // to many entities to get
 
     // restrict the range; everything is contiguous; or not?
-
-    // Range contig_range ( * ( ents_to_get->begin() ), * ( ents_to_get->begin() + nents_to_get - 1
-    // ) );
+    // Range contig_range( *( ents_to_get->begin() ), *( ents_to_get->begin() + nents_to_get - 1 ) );
     rval = context.MBI->tag_get_data( tag, *ents_to_get, tag_storage_data );CHKERRVAL( rval );
 
     return 0;  // no error
@@ -2291,10 +2246,8 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     return 0;
 }
 
-ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
-                              int tag_storage_name_length )
+ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id )
 {
-
     appData& data                               = context.appDatas[*pid];
     std::map< int, ParCommGraph* >::iterator mt = data.pgraph.find( *context_id );
     if( mt == data.pgraph.end() )
@@ -2338,10 +2291,6 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
     // basically, we assume everything is defined already on the tag,
     //   and we can get the tags just by its name
     // we assume that there are separators ";" between the tag names
@@ -2368,8 +2317,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     return 0;
 }
 
-ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
-                                 int tag_storage_name_length )
+ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id )
 {
     appData& data = context.appDatas[*pid];
 
@@ -2416,11 +2364,6 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
      */
 
     std::string tag_name( tag_storage_name );
-
-    if( tag_storage_name_length < (int)strlen( tag_storage_name ) )
-    {
-        tag_name = tag_name.substr( 0, tag_storage_name_length );
-    }
 
     // we assume that there are separators ";" between the tag names
     std::vector< std::string > tagNames;
@@ -3057,15 +3000,13 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     return 0;  // success
 }
 
-ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix,
-                             int length_prefix )
+ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix )
 {
+    assert( prefix && strlen( prefix ) );
+
     ParCommGraph* cgraph = context.appDatas[*pid].pgraph[*context_id];
     std::string prefix_str( prefix );
-    if( length_prefix < (int)strlen( prefix ) )
-    {
-        prefix_str = prefix_str.substr( 0, length_prefix );
-    }
+
     if( NULL != cgraph )
         cgraph->dump_comm_information( prefix_str, *is_sender );
     else
@@ -3086,11 +3027,10 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 ErrCode iMOAB_LoadMappingWeightsFromFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
-    int remap_weights_filename_length )
+    const iMOAB_String remap_weights_filename )
 {
-    assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
-    // assert( row_major_ownership != NULL );
+    assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
+    assert( remap_weights_filename && strlen( remap_weights_filename ) );
 
     ErrorCode rval;
     bool row_based_partition = true;
@@ -3455,10 +3395,10 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 #endif // #ifdef MOAB_HAVE_MPI
 ErrCode iMOAB_WriteMappingWeightsToFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
-    int remap_weights_filename_length )
+    const iMOAB_String remap_weights_filename )
 {
-    // assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
+    assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
+    assert( remap_weights_filename && strlen( remap_weights_filename ) );
 
     ErrorCode rval;
 
@@ -3788,16 +3728,17 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
     iMOAB_AppID pid_intx, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String disc_method_source, int* disc_order_source, const iMOAB_String disc_method_target,
     int* disc_order_target, int* fNoBubble, int* fMonotoneTypeID, int* fVolumetric, int* fNoConservation,
-    int* fValidate, const iMOAB_String source_solution_tag_dof_name, const iMOAB_String target_solution_tag_dof_name,
-    int solution_weights_identifier_length, int disc_method_source_length, int disc_method_target_length,
-    int source_solution_tag_dof_name_length, int target_solution_tag_dof_name_length )
+    int* fValidate, const iMOAB_String source_solution_tag_dof_name, const iMOAB_String target_solution_tag_dof_name
+     )
 {
     moab::ErrorCode rval;
 
     assert( disc_order_source && disc_order_target && *disc_order_source > 0 && *disc_order_target > 0 );
-    // assert( disc_method_source_length > 0 && disc_method_target_length > 0 );
-    // assert( solution_weights_identifier_length > 0 && source_solution_tag_dof_name_length > 0 &&
-    //         target_solution_tag_dof_name_length > 0 );
+    assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
+    assert( disc_method_source && strlen( disc_method_source ) );
+    assert( disc_method_target && strlen( disc_method_target ) );
+    assert( source_solution_tag_dof_name && strlen( source_solution_tag_dof_name ) );
+    assert( target_solution_tag_dof_name && strlen( target_solution_tag_dof_name ) );
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intx];
@@ -3834,13 +3775,13 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
 
 ErrCode iMOAB_ApplyScalarProjectionWeights(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String source_solution_tag_name, const iMOAB_String target_solution_tag_name,
-    int solution_weights_identifier_length, int source_solution_tag_name_length, int target_solution_tag_name_length )
+    const iMOAB_String source_solution_tag_name, const iMOAB_String target_solution_tag_name )
 {
-    moab::ErrorCode rval;
+    assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
+    assert( source_solution_tag_name && strlen( source_solution_tag_name ) );
+    assert( target_solution_tag_name && strlen( target_solution_tag_name ) );
 
-    // assert( solution_weights_identifier_length > 0 && source_solution_tag_name_length > 0 &&
-    //         target_solution_tag_name_length > 0 );
+    moab::ErrorCode rval;
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intersection];
