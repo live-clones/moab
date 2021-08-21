@@ -66,7 +66,7 @@ interface
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: coords_len
     integer(c_int), intent(in) :: dim
-    real(c_double), intent(in) :: coordinates
+    real(c_double), intent(in) :: coordinates(*)
   end function iMOAB_CreateVertices
 
   integer(c_int) function iMOAB_CreateElements(pid, num_elem, type, num_nodes_per_element, connectivity, block_ID) bind(C, name='iMOAB_CreateElements')
@@ -75,7 +75,7 @@ interface
     integer(c_int), intent(in) :: num_elem
     integer(c_int), intent(in) :: type
     integer(c_int), intent(in) :: num_nodes_per_element
-    integer(c_int), intent(in) :: connectivity
+    integer(c_int), intent(in) :: connectivity(*)
     integer(c_int), intent(in) :: block_ID
   end function iMOAB_CreateElements
 
@@ -83,7 +83,7 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: num_verts
-    integer(c_int), intent(in) :: marker
+    integer(c_int), intent(in) :: marker(*)
   end function iMOAB_ResolveSharedEntities
 
   integer(c_int) function iMOAB_DetermineGhostEntities(pid, ghost_dim, num_ghost_layers, bridge_dim) bind(C, name='iMOAB_DetermineGhostEntities')
@@ -121,14 +121,14 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(out) :: vertices_length
-    integer(c_int), intent(out) :: global_vertex_ID
+    integer(c_int), intent(out) :: global_vertex_ID(*)
   end function iMOAB_GetVertexID
 
   integer(c_int) function iMOAB_GetVertexOwnership(pid, vertices_length, visible_global_rank_ID) bind(C, name='iMOAB_GetVertexOwnership')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(out) :: vertices_length
-    integer(c_int), intent(out) :: visible_global_rank_ID
+    integer(c_int), intent(out) :: visible_global_rank_ID(*)
   end function iMOAB_GetVertexOwnership
 
 
@@ -136,7 +136,7 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int, c_double
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(out) :: coords_length
-    real(c_double), intent(out) :: coordinates
+    real(c_double), intent(out) :: coordinates(*)
   end function iMOAB_GetVisibleVerticesCoordinates
 
 
@@ -144,7 +144,7 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(out) :: block_length
-    integer(c_int), intent(out) :: global_block_IDs
+    integer(c_int), intent(out) :: global_block_IDs(*)
   end function iMOAB_GetBlockID
 
 
@@ -152,9 +152,9 @@ interface
                                               num_elements_in_block) bind(C, name='iMOAB_GetBlockInfo')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: global_block_IDs
-    integer(c_int), intent(out) :: vertices_per_element
-    integer(c_int), intent(out) :: num_elements_in_block
+    integer(c_int), intent(out) :: global_block_IDs(*)
+    integer(c_int), intent(out) :: vertices_per_element(*)
+    integer(c_int), intent(out) :: num_elements_in_block(*)
   end function iMOAB_GetBlockInfo
 
   integer(c_int) function iMOAB_GetVisibleElementsInfo(pid, num_visible_elements, element_global_IDs, &
@@ -162,9 +162,9 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: num_visible_elements
-    integer(c_int), intent(out) :: element_global_IDs
-    integer(c_int), intent(out) :: ranks
-    integer(c_int), intent(out) :: block_IDs
+    integer(c_int), intent(out) :: element_global_IDs(*)
+    integer(c_int), intent(out) :: ranks(*)
+    integer(c_int), intent(out) :: block_IDs(*)
   end function iMOAB_GetVisibleElementsInfo
 
 
@@ -276,8 +276,8 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: num_tag
-    integer(c_int), intent(in) :: tag_indices
-    integer(c_int), intent(in) :: entity_type
+    integer(c_int), intent(in) :: tag_indices(*)
+    integer(c_int), intent(in) :: entity_type(*)
   end function iMOAB_SynchronizeTags
 
   integer(c_int) function iMOAB_ReduceTagsMax(pid, tag_index, entity_type) bind(C, name='iMOAB_ReduceTagsMax')

@@ -52,8 +52,7 @@ int main( int argc, char* argv[] )
      * format, and has to be partitioned in advance. There should be at least as many partitions in
      * the file as number of tasks in the communicator.
      */
-    rc = iMOAB_ReadHeaderInfo( filen.c_str(), &num_global_vertices, &num_global_elements, &num_dimension, &num_parts,
-                               (int)( filen.size() ) );
+    rc = iMOAB_ReadHeaderInfo( filen.c_str(), &num_global_vertices, &num_global_elements, &num_dimension, &num_parts );
 
     CHECKRC( rc, "failed to read header info" );
 
@@ -100,11 +99,10 @@ int main( int argc, char* argv[] )
      * vertex entity should have a GLOBAL ID tag in the file, which will be available for visible
      * entities
      */
-    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, num_ghost_layers, (int)( filen.size() ), strlen( read_opts ) );
+    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, num_ghost_layers );
     CHECKRC( rc, "failed to load mesh" );
 
-    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, num_ghost_layers, (int)( filen.size() ),
-                         strlen( read_opts ) );
+    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, num_ghost_layers) ;
     CHECKRC( rc, "failed to load mesh" );
 
     rc = iMOAB_SetGlobalInfo( pid, &num_global_vertices, &num_global_elements );
@@ -174,10 +172,10 @@ int main( int argc, char* argv[] )
     int entTypes[2]    = { 0, 1 }; /* first is on vertex, second is on elements; */
     int tagTypes[2]    = { DENSE_INTEGER, DENSE_DOUBLE };
     int num_components = 1;
-    rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagTypes[0], &num_components, &tagIndex[0], strlen( "INTFIELD" ) );
+    rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagTypes[0], &num_components, &tagIndex[0]);
     CHECKRC( rc, "failed to get tag INTFIELD " );
 
-    rc = iMOAB_DefineTagStorage( pid, "DFIELD", &tagTypes[1], &num_components, &tagIndex[1], strlen( "DFIELD" ) );
+    rc = iMOAB_DefineTagStorage( pid, "DFIELD", &tagTypes[1], &num_components, &tagIndex[1]);
     CHECKRC( rc, "failed to get tag DFIELD " );
 
     // synchronize one of the tags only, just to see what happens
@@ -322,7 +320,7 @@ int main( int argc, char* argv[] )
              */
             int* int_tag_vals = (int*)malloc( sizeof( int ) * nverts[2] );  // for all visible vertices on the rank
             rc =
-                iMOAB_GetIntTagStorage( pid, "INTFIELD", &nverts[2], &entTypes[0], int_tag_vals, strlen( "INTFIELD" ) );
+                iMOAB_GetIntTagStorage( pid, "INTFIELD", &nverts[2], &entTypes[0], int_tag_vals);
             CHECKRC( rc, "failed to get INTFIELD tag" );
             printf( "INTFIELD tag values:\n" );
             for( int i = 0; i < nverts[2]; i++ )
@@ -339,8 +337,8 @@ int main( int argc, char* argv[] )
              */
             double* double_tag_vals =
                 (double*)malloc( sizeof( double ) * nelem[2] );  // for all visible elements on the rank
-            rc = iMOAB_GetDoubleTagStorage( pid, "DFIELD", &nelem[2], &entTypes[1], double_tag_vals,
-                                            strlen( "DFIELD" ) );
+            rc = iMOAB_GetDoubleTagStorage( pid, "DFIELD", &nelem[2], &entTypes[1], double_tag_vals
+                                           );
             CHECKRC( rc, "failed to get DFIELD tag" );
             printf( "DFIELD tag values: (not exchanged) \n" );
             for( int i = 0; i < nelem[2]; i++ )
@@ -402,7 +400,7 @@ int main( int argc, char* argv[] )
      * the file can be written in parallel, and it will contain additional tags defined by the user
      * we may extend the method to write only desired tags to the file
      */
-    rc = iMOAB_WriteMesh( pid, outputFile, writeOptions, strlen( outputFile ), strlen( writeOptions ) );
+    rc = iMOAB_WriteMesh( pid, outputFile, writeOptions);
 
     /*
      * deregistering application will delete all mesh entities associated with the application and

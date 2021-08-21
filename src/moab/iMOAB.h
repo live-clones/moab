@@ -35,6 +35,9 @@
 */
 #include "moab/MOABConfig.h"
 
+#include <cassert>
+#include <cstdlib>
+
 #define iMOAB_AppID    int*
 #define iMOAB_String   char*
 #define iMOAB_GlobalID int
@@ -294,7 +297,7 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
  * \param[in] write_options (iMOAB_String) Additional options for writing the MOAB mesh in parallel.
  * \return ErrCode                         The error code indicating success or failure.
  */
-ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options );
+ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String write_options );
 
 /**
  * \brief Write a local MOAB mesh copy.

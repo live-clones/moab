@@ -73,7 +73,7 @@ int setup_component_coupler_meshes( iMOAB_AppID cmpId, int cmpTag, iMOAB_AppID c
     {
         // load first mesh
         ierr =
-            iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay, filename.length(), readopts.length() );
+            iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay );
         CHECKIERR( ierr, "Cannot load component mesh" )
 
         // then send mesh to coupler pes

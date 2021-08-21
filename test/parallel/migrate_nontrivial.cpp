@@ -132,15 +132,14 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 
         nghlay = 0;
 
-        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay, filen.length(),
-                               strlen( readopts.c_str() ) );
+        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );
         CHECKRC( ierr, "can't load mesh " )
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
 #ifdef GRAPH_INFO
         int is_sender = 1;
         int context   = compid2;
-        iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS", strlen( "MigrateS" ) );
+        iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS" );
 #endif
     }
 
@@ -151,12 +150,12 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
         ierr =
-            iMOAB_WriteMesh( pid2, (char*)outfile, (char*)wopts.c_str(), strlen( outfile ), strlen( wopts.c_str() ) );
+            iMOAB_WriteMesh( pid2, outfile, wopts.c_str() );
         CHECKRC( ierr, "cannot write received mesh" )
 #ifdef GRAPH_INFO
         int is_sender = 0;
         int context   = compid1;
-        iMOAB_DumpCommGraph( pid2, &context, &is_sender, "MigrateR", strlen( "MigrateR" ) );
+        iMOAB_DumpCommGraph( pid2, &context, &is_sender, "MigrateR" );
 #endif
     }
 

@@ -666,7 +666,7 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOA
     return iMOAB_UpdateMeshInfo( pid );
 }
 
-ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String write_options )
+ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String write_options )
 {
     assert( filename && strlen( filename ) );
 
