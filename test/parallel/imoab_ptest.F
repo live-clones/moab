@@ -101,6 +101,9 @@ C      used for ghosting
      &             4, 5, 8, 7,
      &             5, 6, 9, 8/
 
+      call MPI_Init ( ierr )
+      call errorout(ierr, 'fail to initialize MPI')
+
       ierr = iMOAB_Initialize()
       call errorout(ierr, 'fail to initialize iMOAB')
 
