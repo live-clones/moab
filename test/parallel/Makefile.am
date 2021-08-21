@@ -10,9 +10,7 @@ DEFS += -DIS_BUILDING_MB \
 				-DSRCDIR=$(srcdir) \
         -DMESHDIR=$(MESHDIR)
 
-FCDEFS += $(FC_DEFINE)IS_BUILDING_MB \
-					$(FC_DEFINE)SRCDIR=$(srcdir) \
-          $(FC_DEFINE)MESHDIR=$(MESHDIR)
+FCDEFS += $(FC_DEFINE)IS_BUILDING_MB
 
 AM_CPPFLAGS  = -I. \
                -I.. -I$(srcdir)/.. \

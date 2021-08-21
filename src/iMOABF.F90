@@ -148,13 +148,13 @@ interface
   end function iMOAB_GetBlockID
 
 
-  integer(c_int) function iMOAB_GetBlockInfo(pid, global_block_IDs, vertices_per_element, &
+  integer(c_int) function iMOAB_GetBlockInfo(pid, global_block_ID, vertices_per_element, &
                                               num_elements_in_block) bind(C, name='iMOAB_GetBlockInfo')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: global_block_IDs(*)
-    integer(c_int), intent(out) :: vertices_per_element(*)
-    integer(c_int), intent(out) :: num_elements_in_block(*)
+    integer(c_int), intent(out) :: global_block_ID
+    integer(c_int), intent(out) :: vertices_per_element
+    integer(c_int), intent(out) :: num_elements_in_block
   end function iMOAB_GetBlockInfo
 
   integer(c_int) function iMOAB_GetVisibleElementsInfo(pid, num_visible_elements, element_global_IDs, &

@@ -20,6 +20,13 @@ SUBROUTINE errorout(ierr, message)
 #include "moab/MOABConfig.h"
 
 
+#ifdef MOAB_MESH_DIR
+! specify relative path from build directory: 2 levels (test/parallel)
+#define BASE_MESH_DIR '../../'//trim(MOAB_MESH_DIR)
+#else
+#error Specify MOAB_MESH_DIR path
+#endif
+
 program imoab_coupler_fortran
 
     use iso_c_binding
@@ -37,7 +44,6 @@ program imoab_coupler_fortran
     character(:), allocatable :: atmFileName
     character(:), allocatable :: ocnFileName
     character(:), allocatable :: baselineFileName
-    character :: pathFile*1024
     character(:), allocatable :: readopts, fileWriteOptions
     character :: appname*128
     character(:), allocatable :: weights_identifier1
@@ -76,13 +82,6 @@ program imoab_coupler_fortran
     cplocn = 18
     atmocnid = 618
 
-    m = iargc()
-    if (m .lt. 1) then
-      print *, 'specify the meshdir path for input files'
-      call exit(0)
-    endif
-
-    call getarg(1, pathFile)
     call mpi_init(ierr)
     call errorout(ierr,'mpi_init')
     call MPI_COMM_RANK (MPI_COMM_WORLD, my_id, ierr)
@@ -99,9 +98,9 @@ program imoab_coupler_fortran
 !    MPI_Group jgroup;
 !    std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
 !    std::string readoptsLnd( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );
-    atmFileName = trim(pathFile)//'/wholeATM_T.h5m'//C_NULL_CHAR
-    ocnFileName = trim(pathFile)//'/recMeshOcn.h5m'//C_NULL_CHAR
-    baselineFileName = trim(pathFile)//'/baseline1.txt'//C_NULL_CHAR
+    atmFileName = BASE_MESH_DIR//'wholeATM_T.h5m'//C_NULL_CHAR
+    ocnFileName = BASE_MESH_DIR//'recMeshOcn.h5m'//C_NULL_CHAR
+    baselineFileName = BASE_MESH_DIR//'/baseline1.txt'//C_NULL_CHAR
 ! all comms span the whole world, for simplicity
     atmComm = MPI_COMM_NULL
     ocnComm = MPI_COMM_NULL

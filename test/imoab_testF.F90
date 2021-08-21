@@ -19,11 +19,10 @@ use iMOAB
 include 'mpif.h'
 #endif
 
-#ifdef MESHDIR
-! #define BASEPATH MESHDIR
-#define BASEPATH "/home/vijay/code/sigma/moab-pristine/MeshFiles/unittest/"
+#ifdef MOAB_MESH_DIR
+#define BASE_MESH_PATH '../'//MOAB_MESH_DIR
 #else
-#error Specify MESHDIR path
+#error Specify MOAB_MESH_DIR path
 #endif
 
       integer ierr, num_procs, my_id
@@ -48,7 +47,7 @@ include 'mpif.h'
       integer  nCO
       integer  bID
       !     for some tags in the file
-      character*20 tagname1, tagname2
+      character :: tagname1*128, tagname2*128
       integer      tagtype(2), enttype(2), num_co
       integer      tagindex(2)
       integer      ntsync
@@ -67,7 +66,7 @@ include 'mpif.h'
 
       character outfile*1024, wopts*1024
       my_id = 0
-      fname = '/io/p8ex1.h5m'//C_NULL_CHAR
+      fname = 'io/p8ex1.h5m'//C_NULL_CHAR
 
 #ifdef MOAB_HAVE_MPI
       call MPI_INIT ( ierr )
@@ -100,7 +99,7 @@ include 'mpif.h'
 #endif
       call errorout(ierr, 'fail to register application')
 
-      filename = BASEPATH//fname
+      filename = BASE_MESH_PATH//fname
       ierr = iMOAB_ReadHeaderInfo ( filename, ngv, nge, ndim, nparts)
       call errorout(ierr, 'fail to read header info')
 
@@ -196,7 +195,7 @@ include 'mpif.h'
       ifree = eRA + nelem(3)
       do i=1, nelem(3)
           write(*, 101) IWORK(eID+i-1), IWORK(eRA+i-1), IWORK(beID+i-1)
-101       FORMAT( ' global ID ', I5, ' rank: ', I3, ' block ID: ' I4)
+101       FORMAT( ' global ID ', I5, ' rank: ', I3, ' block ID: ', I4)
       enddo
 
       do  i=1,nblocks(3)
