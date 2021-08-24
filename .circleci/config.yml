@@ -8,7 +8,7 @@ jobs:
     # To see the list of pre-built images that CircleCI provides for most common languages see
     # https://circleci.com/docs/2.0/circleci-images/
     docker:
-    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
+    - image: cimg/base:2021.07
     steps:
     # Machine Setup
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
@@ -18,11 +18,11 @@ jobs:
     #   This would typically go in either a build or a build-and-test job when using workflows
     # Run the setup and install any pre-dependencies for building MOAB 
     - run: |
-        sudo apt-get -yy install libhdf5-mpich2-dev libmetis-dev
+        sudo apt -yy install libhdf5-mpi-dev libnetcdf-mpi-dev libmetis-dev
         autoreconf -fi
     # Run the actual configuration command
     - run: |
-        ./configure --with-hdf5=/usr --with-metis=/usr --with-mpi=/usr
+        ./configure --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/mpi --with-netcdf=/usr/lib/x86_64-linux-gnu/netcdf/mpi --with-metis=/usr --with-mpi=/usr
         make all -j4
         make check -j4
 
@@ -38,7 +38,7 @@ jobs:
     # To see the list of pre-built images that CircleCI provides for most common languages see
     # https://circleci.com/docs/2.0/circleci-images/
     docker:
-    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
+      - image: cimg/base:2021.07
     steps:
     # Machine Setup
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
