@@ -197,7 +197,7 @@ test "xno" = "x$CHECK_FC" || CHECK_FC=yes
 # Check for debug flags
 AC_ARG_ENABLE( debug, AS_HELP_STRING([--enable-debug],[Debug symbols (-g)]),
                [enable_debug=$enableval], [enable_debug="no"] )
-AC_ARG_ENABLE( optimize, AS_HELP_STRING([--enable-optimize],[Compile optimized (-O2)]),
+AC_ARG_ENABLE( optimize, AS_HELP_STRING([--enable-optimize],[Compile optimized (-O3)]),
                [enable_optimize=$enableval; enable_cxx_optimize=$enableval; enable_cc_optimize=$enableval; enable_fc_optimize=$enableval;],
                [enable_optimize=""; enable_cxx_optimize="no"; enable_cc_optimize="no"; enable_fc_optimize="no";	]
              )
@@ -209,7 +209,7 @@ EXTRA_PGI_ONLY_FCFLAGS="-Mfree"
 if (test "x$enable_debug" != "xno"); then # debug flags
 # GNU
 EXTRA_GNU_CXXFLAGS="-Wall -Wno-long-long -pipe -pedantic -Wshadow -Wno-unused-parameter -Wpointer-arith -Wformat -Wformat-security -Wextra -Wno-variadic-macros -Wno-unknown-pragmas"
-EXTRA_GNU_FCFLAGS="-pipe -pedantic -ffree-line-length-0"
+EXTRA_GNU_FCFLAGS="-pipe -pedantic"
 # CLANG
 EXTRA_CLANG_CXXFLAGS="$EXTRA_GNU_CXXFLAGS"
 EXTRA_CLANG_FCFLAGS="$EXTRA_GNU_FCFLAGS"
@@ -227,10 +227,10 @@ fi
 if (test "x$enable_cxx_optimize" != "xno"); then  # optimization flags
 #GNU
 EXTRA_GNU_CXXFLAGS="$EXTRA_GNU_CXXFLAGS"
-EXTRA_GNU_FCFLAGS="$EXTRA_GNU_FCFLAGS -ffree-line-length-0"
+EXTRA_GNU_FCFLAGS="$EXTRA_GNU_FCFLAGS"
 #CLANG
 EXTRA_CLANG_CXXFLAGS="$EXTRA_CLANG_CXXFLAGS"
-EXTRA_CLANG_FCFLAGS="$EXTRA_CLANG_FCFLAGS -ffree-line-length-0"
+EXTRA_CLANG_FCFLAGS="$EXTRA_CLANG_FCFLAGS"
 # Intel
 EXTRA_INTEL_CXXFLAGS="$EXTRA_INTEL_CXXFLAGS -ip -no-prec-div"
 EXTRA_INTEL_FCFLAGS="$EXTRA_INTEL_FCFLAGS -ip -no-prec-div"
@@ -243,6 +243,7 @@ EXTRA_BG_FCFLAGS="$EXTRA_BG_FCFLAGS -qarch=qp -qtune=auto -qpic=large -qenablevm
 fi
 
 if (test "x$GXX" = "xyes"); then # G++ specific flags
+  EXTRA_GNU_FCFLAGS="$EXTRA_GNU_FCFLAGS -ffree-line-length-0"
   if (test "x$enable_debug" != "xno"); then
     EXTRA_GNU_ONLY_CXXFLAGS="$EXTRA_GNU_CXXFLAGS"
     EXTRA_GNU_ONLY_FCFLAGS="$EXTRA_GNU_FCFLAGS"
