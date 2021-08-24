@@ -19,7 +19,7 @@ jobs:
     # Run the setup and install any pre-dependencies for building MOAB 
     - run: |
         sudo apt -yy update
-        sudo apt -yy install libhdf5-mpi-dev libnetcdf-mpi-dev libmetis-dev
+        sudo apt -yy install libhdf5-mpi-dev libnetcdf-mpi-dev libmetis-dev libopenblas-dev
         autoreconf -fi
     # Run the actual configuration command
     - run: |
