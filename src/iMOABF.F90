@@ -120,14 +120,14 @@ interface
   integer(c_int) function iMOAB_GetVertexID(pid, vertices_length, global_vertex_ID) bind(C, name='iMOAB_GetVertexID')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: vertices_length
+    integer(c_int), intent(in) :: vertices_length
     integer(c_int), intent(out) :: global_vertex_ID(*)
   end function iMOAB_GetVertexID
 
   integer(c_int) function iMOAB_GetVertexOwnership(pid, vertices_length, visible_global_rank_ID) bind(C, name='iMOAB_GetVertexOwnership')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: vertices_length
+    integer(c_int), intent(in) :: vertices_length
     integer(c_int), intent(out) :: visible_global_rank_ID(*)
   end function iMOAB_GetVertexOwnership
 
@@ -135,7 +135,7 @@ interface
   integer(c_int) function iMOAB_GetVisibleVerticesCoordinates(pid, coords_length, coordinates) bind(C, name='iMOAB_GetVisibleVerticesCoordinates')
     use, intrinsic :: iso_c_binding, only : c_int, c_double
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: coords_length
+    integer(c_int), intent(in) :: coords_length
     real(c_double), intent(out) :: coordinates(*)
   end function iMOAB_GetVisibleVerticesCoordinates
 
@@ -143,7 +143,7 @@ interface
   integer(c_int) function iMOAB_GetBlockID(pid, block_length, global_block_IDs) bind(C, name='iMOAB_GetBlockID')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: block_length
+    integer(c_int), intent(in) :: block_length
     integer(c_int), intent(out) :: global_block_IDs(*)
   end function iMOAB_GetBlockID
 
@@ -152,7 +152,7 @@ interface
                                               num_elements_in_block) bind(C, name='iMOAB_GetBlockInfo')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(out) :: global_block_ID
+    integer(c_int), intent(in) :: global_block_ID
     integer(c_int), intent(out) :: vertices_per_element
     integer(c_int), intent(out) :: num_elements_in_block
   end function iMOAB_GetBlockInfo
@@ -161,7 +161,7 @@ interface
                                                         ranks, block_IDs) bind(C, name='iMOAB_GetVisibleElementsInfo')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
-    integer(c_int), intent(in) :: num_visible_elements
+    integer(c_int), intent(out) :: num_visible_elements
     integer(c_int), intent(out) :: element_global_IDs(*)
     integer(c_int), intent(out) :: ranks(*)
     integer(c_int), intent(out) :: block_IDs(*)
@@ -174,16 +174,16 @@ interface
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: global_block_ID
     integer(c_int), intent(in) :: connectivity_length
-    integer(c_int), intent(out) :: element_connectivity
+    integer(c_int), intent(out) :: element_connectivity(*)
   end function iMOAB_GetBlockElementConnectivities
 
-  integer(c_int) function iMOAB_GetElementConnectivity(pid, elem_index, num_elements_in_block, &
+  integer(c_int) function iMOAB_GetElementConnectivity(pid, elem_index, connectivity_length, &
                                                         element_connectivity) bind(C, name='iMOAB_GetElementConnectivity')
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: elem_index
-    integer(c_int), intent(in) :: num_elements_in_block
-    integer(c_int), intent(out) :: element_connectivity
+    integer(c_int), intent(in) :: connectivity_length
+    integer(c_int), intent(out) :: element_connectivity(*)
   end function iMOAB_GetElementConnectivity
 
   integer(c_int) function iMOAB_GetElementOwnership(pid, global_block_ID, num_elements_in_block, &
@@ -191,8 +191,8 @@ interface
     use, intrinsic :: iso_c_binding, only : c_int
     integer(c_int), intent(in) :: pid
     integer(c_int), intent(in) :: global_block_ID
-    integer(c_int), intent(in) :: num_elements_in_block
-    integer(c_int), intent(out) :: element_ownership
+    integer(c_int), intent(out) :: num_elements_in_block
+    integer(c_int), intent(out) :: element_ownership(*)
   end function iMOAB_GetElementOwnership
 
   integer(c_int) function iMOAB_GetElementID(pid, global_block_ID, num_elements_in_block, &

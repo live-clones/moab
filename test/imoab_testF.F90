@@ -19,9 +19,7 @@ use iMOAB
 include 'mpif.h'
 #endif
 
-#ifdef MOAB_MESH_DIR
-#define BASE_MESH_PATH '../'//MOAB_MESH_DIR
-#else
+#ifndef MOAB_MESH_DIR
 #error Specify MOAB_MESH_DIR path
 #endif
 
@@ -99,7 +97,7 @@ include 'mpif.h'
 #endif
       call errorout(ierr, 'fail to register application')
 
-      filename = BASE_MESH_PATH//fname
+      filename = MOAB_MESH_DIR//fname
       ierr = iMOAB_ReadHeaderInfo ( filename, ngv, nge, ndim, nparts)
       call errorout(ierr, 'fail to read header info')
 
@@ -139,6 +137,8 @@ include 'mpif.h'
       nCO = 3 * nverts(3)
 
       ierr = iMOAB_GetVisibleVerticesCoordinates(pid, nCO, DWORK(vCO))
+      print *,  'nCO = ', nCO
+      print *, 'ierr = ', ierr
       call errorout(ierr, 'failed to get coordinates')
       dfree = vCO + 3 * nverts(3)
 
@@ -209,6 +209,7 @@ include 'mpif.h'
             sizeconn = nebl * vpere
             eCO = ifree
             ierr = iMOAB_GetBlockElementConnectivities(pid, blockID, sizeconn, IWORK(eCO) )
+            print *, ierr
             call errorout(ierr, 'failed to get block elem connectivity')
 
             ifree = ifree + sizeconn

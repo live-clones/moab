@@ -20,10 +20,7 @@ SUBROUTINE errorout(ierr, message)
 #include "moab/MOABConfig.h"
 
 
-#ifdef MOAB_MESH_DIR
-! specify relative path from build directory: 2 levels (test/parallel)
-#define BASE_MESH_DIR '../../'//trim(MOAB_MESH_DIR)
-#else
+#ifndef MOAB_MESH_DIR
 #error Specify MOAB_MESH_DIR path
 #endif
 
@@ -98,9 +95,9 @@ program imoab_coupler_fortran
 !    MPI_Group jgroup;
 !    std::string readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" );
 !    std::string readoptsLnd( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );
-    atmFileName = BASE_MESH_DIR//'wholeATM_T.h5m'//C_NULL_CHAR
-    ocnFileName = BASE_MESH_DIR//'recMeshOcn.h5m'//C_NULL_CHAR
-    baselineFileName = BASE_MESH_DIR//'/baseline1.txt'//C_NULL_CHAR
+    atmFileName = MOAB_MESH_DIR//'wholeATM_T.h5m'//C_NULL_CHAR
+    ocnFileName = MOAB_MESH_DIR//'recMeshOcn.h5m'//C_NULL_CHAR
+    baselineFileName = MOAB_MESH_DIR//'/baseline1.txt'//C_NULL_CHAR
 ! all comms span the whole world, for simplicity
     atmComm = MPI_COMM_NULL
     ocnComm = MPI_COMM_NULL

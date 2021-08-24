@@ -990,6 +990,8 @@ ErrCode iMOAB_GetBlockID( iMOAB_AppID pid, int* block_length, iMOAB_GlobalID* gl
 ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* vertices_per_element,
                             int* num_elements_in_block )
 {
+    assert(global_block_ID);
+
     std::map< int, int >& matMap      = context.appDatas[*pid].matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
@@ -1082,6 +1084,9 @@ ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements
 ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* connectivity_length,
                                              int* element_connectivity )
 {
+    assert(global_block_ID); // ensure global block ID argument is not null
+    assert(connectivity_length); // ensure connectivity length argument is not null
+
     appData& data                     = context.appDatas[*pid];
     std::map< int, int >& matMap      = data.matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
@@ -1128,6 +1133,9 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
 ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index, int* connectivity_length,
                                       int* element_connectivity )
 {
+    assert(elem_index);          // ensure element index argument is not null
+    assert(connectivity_length); // ensure connectivity length argument is not null
+
     appData& data = context.appDatas[*pid];
     assert( ( *elem_index >= 0 ) && ( *elem_index < (int)data.primary_elems.size() ) );
 
@@ -1163,6 +1171,9 @@ ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index
 ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
                                    int* element_ownership )
 {
+    assert(global_block_ID); // ensure global block ID argument is not null
+    assert(num_elements_in_block); // ensure number of elements in block argument is not null
+
     std::map< int, int >& matMap = context.appDatas[*pid].matIndex;
 
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
@@ -1208,6 +1219,9 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
 ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
                             iMOAB_GlobalID* global_element_ID, iMOAB_LocalID* local_element_ID )
 {
+    assert(global_block_ID); // ensure global block ID argument is not null
+    assert(num_elements_in_block); // ensure number of elements in block argument is not null
+
     appData& data                = context.appDatas[*pid];
     std::map< int, int >& matMap = data.matIndex;
 
@@ -2006,8 +2020,9 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
     appData & data = context.appDatas[*pid];
     ParallelComm* pco = context.pcomms[*pid];
 
-    MPI_Comm global = (data.is_fortran ? MPI_Comm_f2c( reinterpret_cast<MPI_Fint>(*join) ) : *join);
-    MPI_Group recvGroup = (data.is_fortran ? MPI_Group_f2c( reinterpret_cast<MPI_Fint>(*receivingGroup) ) : *receivingGroup);
+    MPI_Comm global = ( data.is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
+    MPI_Group recvGroup =
+        ( data.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( receivingGroup ) ) : *receivingGroup );
     MPI_Comm sender = pco->comm();  // the sender comm is obtained from parallel comm in moab; no need to pass it along
     // first see what are the processors in each group; get the sender group too, from the sender communicator
     MPI_Group senderGroup;
@@ -2097,9 +2112,9 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     MPI_Comm receive       = pco->comm();
     EntityHandle local_set = data.file_set;
 
-    MPI_Comm global = ( data.is_fortran ? MPI_Comm_f2c( reinterpret_cast< MPI_Fint >( *join ) ) : *join );
+    MPI_Comm global = ( data.is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
     MPI_Group sendGroup =
-        ( data.is_fortran ? MPI_Group_f2c( reinterpret_cast< MPI_Fint >( *sendingGroup ) ) : *sendingGroup );
+        ( data.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( sendingGroup ) ) : *sendingGroup );
 
     // first see what are the processors in each group; get the sender group too, from the sender
     // communicator
@@ -2261,7 +2276,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     ErrorCode rval;
     EntityHandle cover_set;
 
-    MPI_Comm global = ( data.is_fortran ? MPI_Comm_f2c( reinterpret_cast< MPI_Fint >( *join ) ) : *join );
+    MPI_Comm global = ( data.is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
     if( data.point_cloud )
     {
         owned = data.local_verts;
@@ -2330,7 +2345,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     }
     ParCommGraph* cgraph = mt->second;
 
-    MPI_Comm global   = ( data.is_fortran ? MPI_Comm_f2c( reinterpret_cast< MPI_Fint >( *join ) ) : *join );
+    MPI_Comm global   = ( data.is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
     ParallelComm* pco = context.pcomms[*pid];
     Range owned       = data.owned_elems;
 
@@ -2418,15 +2433,18 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_id )
 ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* join, MPI_Group* group1,
                                 MPI_Group* group2, int* type1, int* type2, int* comp1, int* comp2 )
 {
+    assert(join);
+    assert(group1);
+    assert(group2);
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
 
     appData& sData = context.appDatas[*pid1];
     appData& tData = context.appDatas[*pid2];
 
-    MPI_Comm global = ((sData.is_fortran || tData.is_fortran) ? MPI_Comm_f2c( reinterpret_cast<MPI_Fint> (*join) ) : *join);
-    MPI_Group srcGroup = (sData.is_fortran ? MPI_Group_f2c( reinterpret_cast<MPI_Fint>(*group1) ) : *group1);
-    MPI_Group tgtGroup = (tData.is_fortran ? MPI_Group_f2c( reinterpret_cast<MPI_Fint>(*group2) ) : *group2);
+    MPI_Comm global = ((sData.is_fortran || tData.is_fortran) ? MPI_Comm_f2c( *reinterpret_cast<MPI_Fint*> (join) ) : *join);
+    MPI_Group srcGroup = (sData.is_fortran ? MPI_Group_f2c( *reinterpret_cast<MPI_Fint*>(group1) ) : *group1);
+    MPI_Group tgtGroup = (tData.is_fortran ? MPI_Group_f2c( *reinterpret_cast<MPI_Fint*>(group2) ) : *group2);
     
     MPI_Comm_rank( global, &localRank );
     MPI_Comm_size( global, &numProcs );
