@@ -18,6 +18,7 @@ jobs:
     #   This would typically go in either a build or a build-and-test job when using workflows
     # Run the setup and install any pre-dependencies for building MOAB 
     - run: |
+        sudo apt -yy update
         sudo apt -yy install libhdf5-mpi-dev libnetcdf-mpi-dev libmetis-dev
         autoreconf -fi
     # Run the actual configuration command
