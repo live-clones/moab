@@ -420,7 +420,7 @@ if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@
 endif
 
-DISTCLEANFILES = a.out
+DISTCLEANFILES = a.out imoab.mod
 EXTRA_DIST += CMakeLists.txt parallel/CMakeLists.txt IntxMesh/CMakeLists.txt
 
 ## Rules for Fortran sources compilation
