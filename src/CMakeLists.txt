@@ -184,7 +184,6 @@ set( MOAB_INSTALL_HEADERS
         moab/Forward.hpp
         moab/GeomUtil.hpp
         moab/iMOAB.h
-        moab/imoab_protos.h
         moab/Interface.hpp
         moab/IntxMesh/Intx2Mesh.hpp
         moab/IntxMesh/IntxUtils.hpp
@@ -248,6 +247,12 @@ set( MOAB_INSTALL_HEADERS
         MBCN.h
         MBCN_protos.h
         MBTagConventions.hpp )
+
+
+if ( ENABLE_FORTRAN )
+  set(MOAB_LIB_SOURCES ${MOAB_LIB_SOURCES} iMOABF.F90 )
+  set_source_files_properties(iMOABF.F90  PROPERTIES COMPILE_FLAGS "${CMAKE_Fortran_FLAGS}")
+endif ( ENABLE_FORTRAN )
 
 set( MOAB_GENERATED_INSTALL_HEADERS
      ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp

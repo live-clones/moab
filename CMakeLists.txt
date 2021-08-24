@@ -272,6 +272,30 @@ if ( EIGEN3_FOUND )
   SET(MOAB_HAVE_EIGEN3 ON)
 endif (EIGEN3_FOUND)
 
+if (ENABLE_FORTRAN)
+  enable_language(Fortran)
+
+  # Include CMake's Fortran mangling evaluation macros
+  include(FortranCInterface)
+
+  if ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
+    set(FC_CASE "NAME")
+  else ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
+    set(FC_CASE "name")
+  endif ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
+  if (NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
+    set(FortranCInterface_GLOBAL_SUFFIX "## ${FortranCInterface_GLOBAL_SUFFIX}")
+  endif (NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
+  if (NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
+    set(FortranCInterface_GLOBAL__SUFFIX "## ${FortranCInterface_GLOBAL__SUFFIX}")
+  endif (NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
+
+  set(MOAB_F77_FUNC  "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
+  set(MOAB_F77_FUNC_ "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
+  set(MOAB_FC_FUNC   "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
+  set(MOAB_FC_FUNC_  "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
+endif (ENABLE_FORTRAN)
+
 # check for MPI package
 set (MOAB_HAVE_MPI OFF CACHE INTERNAL "Found necessary MPI components. Configure MOAB with it." )
 if ( ENABLE_MPI )
@@ -522,30 +546,6 @@ CONFIGURE_FILE(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY
     )
-
-if (ENABLE_FORTRAN)
-  enable_language(Fortran)
-
-  # Include CMake's Fortran mangling evaluation macros
-  include(FortranCInterface)
-
-  if ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
-    set(FC_CASE "NAME")
-  else ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
-    set(FC_CASE "name")
-  endif ("${FortranCInterface_GLOBAL_CASE}" MATCHES "UPPER")
-  if (NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
-    set(FortranCInterface_GLOBAL_SUFFIX "## ${FortranCInterface_GLOBAL_SUFFIX}")
-  endif (NOT "${FortranCInterface_GLOBAL_SUFFIX}" STREQUAL "")
-  if (NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
-    set(FortranCInterface_GLOBAL__SUFFIX "## ${FortranCInterface_GLOBAL__SUFFIX}")
-  endif (NOT "${FortranCInterface_GLOBAL__SUFFIX}" STREQUAL "")
-
-  set(MOAB_F77_FUNC  "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
-  set(MOAB_F77_FUNC_ "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
-  set(MOAB_FC_FUNC   "${FortranCInterface_GLOBAL_PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL_SUFFIX}")
-  set(MOAB_FC_FUNC_  "${FortranCInterface_GLOBAL__PREFIX} ${FC_CASE} ${FortranCInterface_GLOBAL__SUFFIX}")
-endif (ENABLE_FORTRAN)
 
 ## Find and use clang-format if available
 find_program( CLANG_FORMAT_EXE NAMES "clang-format" DOC "Path to clang-format executable" )
