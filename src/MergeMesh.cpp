@@ -230,7 +230,7 @@ ErrorCode MergeMesh::merge_using_integer_tag( Range& verts, Tag user_tag, Tag me
     {
         handle_id first = handles[i];
         int j           = i + 1;
-        while( handles[j].val == first.val && j < (int)verts.size() )
+        while( j < (int)verts.size() && handles[j].val == first.val  )
         {
             rval = mbImpl->tag_set_data( mbMergeTag, &( handles[j].eh ), 1, &( first.eh ) );
             if( rval != MB_SUCCESS ) return rval;
