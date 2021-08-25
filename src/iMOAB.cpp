@@ -701,7 +701,7 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMO
     return 0;
 }
 
-ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length )
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix )
 {
     std::ostringstream file_name;
     int rank = 0, size = 1;
@@ -3102,35 +3102,48 @@ ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_A
     MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
     return iMOAB_MigrateMapMesh(pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction); 
 }
-ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, MPI_Comm* join, MPI_Group* group1,
-                              MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction )
+ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, MPI_Comm* jointcomm, MPI_Group* groupA,
+                              MPI_Group* groupB, int* type, int* comp1, int* comp2, int* direction )
 {
+    assert(jointcomm);
+    assert(groupA);
+    assert(groupB);
+
+    MPI_Comm joint_communicator = ( context.appDatas[*pid1].is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) ) : *jointcomm );
+    MPI_Group group_first =
+        ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupA ) ) : *groupA );
+    MPI_Group group_second =
+        ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupB ) ) : *groupB );
+
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
-    MPI_Comm_rank( *join, &localRank );
-    MPI_Comm_size( *join, &numProcs );
-    // instantiate the par comm graph
-    // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
-    // int coid2)
+
+    // Get the local rank and number of processes in the joint communicator
+    MPI_Comm_rank( joint_communicator, &localRank );
+    MPI_Comm_size( joint_communicator, &numProcs );
+
+    // Next instantiate the par comm graph
     // here we need to look at direction
     // this direction is good for atm source -> ocn target coupler example
-
     ParCommGraph* cgraph = NULL;
-    if( *pid1 >= 0 ) cgraph = new ParCommGraph( *join, *group1, *group2, *comp1, *comp2 );
+    if( *pid1 >= 0 ) cgraph = new ParCommGraph( joint_communicator, group_first, group_second, *comp1, *comp2 );
+    
     ParCommGraph* cgraph_rev = NULL;
-    if( *pid3 >= 0 ) cgraph_rev = new ParCommGraph( *join, *group2, *group1, *comp2, *comp1 );
+    if( *pid3 >= 0 ) cgraph_rev = new ParCommGraph( joint_communicator, group_second, group_first, *comp2, *comp1 );
+    
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
     if( *pid1 >= 0 ) context.appDatas[*pid1].pgraph[*comp2] = cgraph;      // the context will be the other comp
     if( *pid3 >= 0 ) context.appDatas[*pid3].pgraph[*comp1] = cgraph_rev;  // from 2 to 1
+    
     // each model has a list of global ids that will need to be sent by gs to rendezvous the other
-    // model on the joint comm
+    // model on the joint_communicator
     TupleList TLcomp1;
     TLcomp1.initialize( 2, 0, 0, 0, 0 );  // to proc, marker
     TupleList TLcomp2;
     TLcomp2.initialize( 2, 0, 0, 0, 0 );  // to proc, marker
+    
     // will push_back a new tuple, if needed
-
     TLcomp1.enableWriteAccess();
 
     // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
@@ -3195,7 +3208,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
         }
     }
 
-    ProcConfig pc( *join );  // proc config does the crystal router
+    ProcConfig pc( joint_communicator );  // proc config does the crystal router
     pc.crystal_router()->gs_transfer( 1, TLcomp1,
                                       0 );  // communication towards joint tasks, with markers
     // sort by value (key 1)
@@ -3412,7 +3425,10 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 
     return 0;
 }
+
 #endif // #ifdef MOAB_HAVE_MPI
+
+
 ErrCode iMOAB_WriteMappingWeightsToFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename )

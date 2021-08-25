@@ -955,54 +955,35 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
                                            const iMOAB_String remap_weights_filename );
 
 #ifdef MOAB_HAVE_MPI
+
 /**
-\brief compute a comm graph between 2 moab apps, based on ID matching, between a component and map that
-was read on coupler;
-Component can be target or source; also migrate meshes to coupler, from the components;
-the mesh on coupler will be either source-like == coverage mesh or target-like
-the map is usually read with rows fully distributed on tasks, so the target mesh will be a proper partition,
-while source mesh coverage is dictated by the active columns on respective tasks
-<B>Operations:</B> Collective
-
- \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the component (component 1)
- \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the read map pid
- \param[in]  pid3 (iMOAB_AppID)                     The unique pointer to the coupler instance of mesh (component 2)
- \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
- \param[in]  group1 (MPI_Group *)                   MPI group for first comp
- \param[in]  group2 (MPI_Group *)                   MPI group for second comp
- \param[in]  type1 (int *)                          type of mesh (1) spectral with GLOBAL_DOFS, (2) Point Cloud (3) FV cell
- \param[in]  comp1 (int*)                           id of the component 1
- \param[in]  comp2 (int*)                           id of the component 2
- \param[in]  direction (int*)                       from source to coupler of from coupler to target / 1 or 2 /
-
+ * \brief Compute a communication graph between 2 moab apps, based on ID matching, between a component and map that
+ * was read on coupler.
+ * 
+ * \note Component can be target or source; also migrate meshes to coupler, from the components;
+ * the mesh on coupler will be either source-like == coverage mesh or target-like the map is usually read 
+ * with rows fully distributed on tasks, so the target mesh will be a proper partition, while source mesh 
+ * coverage is dictated by the active columns on respective tasks.
+ * 
+ * <B>Operations:</B> Collective
+ * 
+ * \param[in]  pid1 (iMOAB_AppID)         The unique pointer to the first component.
+ * \param[in]  pid2 (iMOAB_AppID)         The unique pointer to the second component.
+ * \param[in]  pid3 (iMOAB_AppID)         The unique pointer to the coupler instance of the mesh (component 2).
+ * \param[in]  join (MPI_Comm)            The joint communicator that overlaps both groups.
+ * \param[in]  group1 (MPI_Group *)       The MPI group for the first component.
+ * \param[in]  group2 (MPI_Group *)       The MPI group for the second component.
+ * \param[in]  type1 (int *)              The type of mesh being migrated;
+ *                                        (1) spectral with GLOBAL_DOFS, (2) Point Cloud (3) FV cell.
+ * \param[in]  comp1 (int*)               The universally unique identifier of first component.
+ * \param[in]  comp2 (int*)               The universally unique identifier of second component.
+ * \param[in]  direction (int*)           A parameter indicating direction of the mesh migration.
+ *                                        i.e., whether it is from source to coupler (1), or from coupler to target (2).
+ * \return ErrCode                        The error code indicating success or failure.
 */
 ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
-        MPI_Comm* join, MPI_Group* group1,
-                                MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction );
+        MPI_Comm* join, MPI_Group* group1, MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction );
 
-/**
-\brief compute a comm graph between 2 moab apps, based on ID matching, between a component and map that
-was read on coupler; Fortran wrapper
-Component can be target or source; also migrate meshes to coupler, from the components;
-the mesh on coupler will be either source-like == coverage mesh or target-like
-the map is usually read with rows fully distributed on tasks, so the target mesh will be a proper partition,
-while source mesh coverage is dictated by the active columns on respective tasks
-<B>Operations:</B> Collective
-
- \param[in]  pid1 (iMOAB_AppID)                     The unique pointer to the component (component 1)
- \param[in]  pid2 (iMOAB_AppID)                     The unique pointer to the read map pid
- \param[in]  pid3 (iMOAB_AppID)                     The unique pointer to the coupler instance of mesh (component 2)
- \param[in]  join (int *)                           communicator that overlaps both groups
- \param[in]  group1 (int *)                         MPI group for first comp
- \param[in]  group2 (int *)                         MPI group for second comp
- \param[in]  type1 (int *)                          type of mesh (1) spectral with GLOBAL_DOFS, (2) Point Cloud (3) FV cell
- \param[in]  comp1 (int*)                           id of the component 1
- \param[in]  comp2 (int*)                           id of the component 2
- \param[in]  direction (int*)                       from source to coupler of from coupler to target / 1 or 2 /
-
-*/
-ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
-        int* join, int* group1, int* group2, int* type, int* comp1, int* comp2, int* direction );
 #endif // #ifdef MOAB_HAVE_MPI
 /**
  * \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination 

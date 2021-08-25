@@ -187,8 +187,7 @@ int main( int argc, char* argv[] )
         MPI_Comm_rank( atmComm, &rankInAtmComm );
         ierr = iMOAB_RegisterApplication( "ATM1", &atmComm, &cmpatm, cmpAtmPID );
         CHECKIERR( ierr, "Cannot register ATM App" )
-        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay, atmFilename.length(),
-                               readopts.length() );
+        ierr = iMOAB_LoadMesh( cmpAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay );
         CHECKIERR( ierr, "Cannot load atm mesh" )
     }
 
@@ -198,8 +197,7 @@ int main( int argc, char* argv[] )
         MPI_Comm_rank( ocnComm, &rankInOcnComm );
         ierr = iMOAB_RegisterApplication( "OCN1", &ocnComm, &cmpocn, cmpOcnPID );
         CHECKIERR( ierr, "Cannot register OCN App" )
-        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay, ocnFilename.length(),
-                               readopts.length() );
+        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay );
         CHECKIERR( ierr, "Cannot load ocn mesh" )
     }
 
@@ -219,8 +217,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
 
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(), mapFilename.c_str(),
-                                                 intx_from_file_identifier.size(), mapFilename.size() );
+        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(), mapFilename.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 
@@ -236,7 +233,7 @@ int main( int argc, char* argv[] )
         if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov";
-            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
+            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix );
             CHECKIERR( ierr, "failed to write local mesh" );
         }
 #endif
@@ -255,11 +252,10 @@ int main( int argc, char* argv[] )
         if( *cplOcnPID >= 0 )
         {
             char prefix[] = "ocntgt";
-            ierr          = iMOAB_WriteLocalMesh( cplOcnPID, prefix, strlen( prefix ) );
+            ierr          = iMOAB_WriteLocalMesh( cplOcnPID, prefix );
             CHECKIERR( ierr, "failed to write local ocean mesh" );
             char outputFileRec[] = "CoupOcn.h5m";
-            ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions, strlen( outputFileRec ),
-                                    strlen( fileWriteOptions ) );
+            ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions );
             CHECKIERR( ierr, "failed to write ocean global mesh file" );
         }
 #endif
@@ -280,28 +276,22 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
-                                       strlen( bottomTempField ) );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
-                                       strlen( bottomTempProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag a2oTbot_proj" );
 
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomUVelField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
-                                       strlen( bottomUVelField ) );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomUVelField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag a2oUbot" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomUVelProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
-                                       strlen( bottomUVelProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomUVelProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag a2oUbot_proj" );
 
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomVVelField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
-                                       strlen( bottomVVelField ) );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomVVelField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag a2oUbot" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomVVelProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
-                                       strlen( bottomVVelProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomVVelProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag a2oUbot_proj" );
     }
 
@@ -334,14 +324,11 @@ int main( int argc, char* argv[] )
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
 
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomTempField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomTempField ) );
+            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomTempField, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomUVelField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomUVelField ) );
+            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomUVelField, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomVVelField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomVVelField ) );
+            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomVVelField, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag nul" )
             // set the tag to 0
         }
@@ -359,25 +346,23 @@ int main( int argc, char* argv[] )
         {
             // as always, use nonblocking sends
             // this is for projection to ocean:
-            ierr = iMOAB_SendElementTag( cmpAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn,
-                                         strlen( "a2oTbot;a2oUbot;a2oVbot;" ) );
+            ierr = iMOAB_SendElementTag( cmpAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cplocn );
             CHECKIERR( ierr, "cannot send tag values" )
 #ifdef GRAPH_INFO
             int is_sender = 1;
             int context   = cplocn;
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS", strlen( "AtmMigOcnS" ) );
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS" );
 #endif
         }
         if( couComm != MPI_COMM_NULL )
         {
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cmpatm,
-                                            strlen( "a2oTbot;a2oUbot;a2oVbot;" ) );
+            ierr = iMOAB_ReceiveElementTag( cplAtmPID, "a2oTbot;a2oUbot;a2oVbot;", &atmCouComm, &cmpatm );
             CHECKIERR( ierr, "cannot receive tag values" )
 #ifdef GRAPH_INFO
             int is_sender = 0;
             int context   = atmocnid;  // the same context
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR", strlen( "AtmMigOcnR" ) );
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR" );
 #endif
         }
 
@@ -392,7 +377,7 @@ int main( int argc, char* argv[] )
         if( *cplAtmPID >= 0 && n == 1 )
         {
             char prefix[] = "atmcov_withdata";
-            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
+            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix );
             CHECKIERR( ierr, "failed to write local atm cov mesh with data" );
         }
 
@@ -400,8 +385,7 @@ int main( int argc, char* argv[] )
         {
             // write only for n==1 case
             char outputFileRecvd[] = "recvAtmCoupOcn.h5m";
-            ierr = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions, strlen( outputFileRecvd ),
-                                    strlen( fileWriteOptions ) );
+            ierr = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
             CHECKIERR( ierr, "could not write recvAtmCoupOcn.h5m to disk" )
         }
 #endif
@@ -413,15 +397,13 @@ int main( int argc, char* argv[] )
             PUSH_TIMER( "Apply Scalar projection weights" )
             ierr =
                 iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(), concat_fieldname,
-                                                    concat_fieldnameT, intx_from_file_identifier.size(),
-                                                    strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
+                                                    concat_fieldnameT );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
             if( 1 == n )  // write only for n==1 case
             {
                 char outputFileTgt[] = "fOcnOnCpl.h5m";
-                ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
-                                        strlen( fileWriteOptions ) );
+                ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions );
                 CHECKIERR( ierr, "could not write fOcnOnCpl.h5m to disk" )
             }
         }
@@ -431,15 +413,15 @@ int main( int argc, char* argv[] )
         {
             int tagIndexIn2;
             ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2, strlen( bottomTempProjectedField ) );
+                                           &tagIndexIn2 );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                              "a2oTbot_proj on ocn pes" );
             ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomUVelProjectedField, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2, strlen( bottomUVelProjectedField ) );
+                                           &tagIndexIn2 );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                              "a2oUbot_proj on ocn pes" );
             ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomVVelProjectedField, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2, strlen( bottomVVelProjectedField ) );
+                                           &tagIndexIn2 );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                              "a2oVbot_proj on ocn pes" );
         }
@@ -451,8 +433,7 @@ int main( int argc, char* argv[] )
         {
             // need to use ocean comp id for context
             context_id = cmpocn;  // id for ocean on comp
-            ierr = iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id,
-                                         strlen( "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;" ) );
+            ierr = iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
@@ -460,8 +441,7 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             context_id = cplocn;  // id for ocean on coupler
-            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm,
-                                            &context_id, strlen( "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;" ) );
+            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
@@ -476,8 +456,7 @@ int main( int argc, char* argv[] )
         {
 #ifdef VERBOSE
             char outputFileOcn[] = "OcnWithProj.h5m";
-            ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
-                                    strlen( fileWriteOptions ) );
+            ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
 #endif
             // test results only for n == 1, for bottomTempProjectedField
@@ -495,16 +474,15 @@ int main( int argc, char* argv[] )
                 tempElems.resize( nelem[2] );
                 // get global id storage
                 const std::string GidStr = "GLOBAL_ID";  // hard coded too
-                int lenG                 = (int)GidStr.length();
                 int tag_type = DENSE_INTEGER, ncomp = 1, tagInd = 0;
-                ierr = iMOAB_DefineTagStorage( cmpOcnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd, lenG );
+                ierr = iMOAB_DefineTagStorage( cmpOcnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd );
                 CHECKIERR( ierr, "failed to define global id tag" );
 
                 int ent_type = 1;
-                ierr = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0], lenG );
+                ierr = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
                 CHECKIERR( ierr, "failed to get global ids" );
                 ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2], &ent_type,
-                                                  &tempElems[0], strlen( bottomTempProjectedField ) );
+                                                  &tempElems[0] );
                 CHECKIERR( ierr, "failed to get temperature field" );
                 int err_code = 1;
                 check_baseline_file( baseline, gidElems, tempElems, 1.e-9, err_code );
