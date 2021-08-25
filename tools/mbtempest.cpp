@@ -13,6 +13,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -55,6 +56,7 @@ struct ToolContext
     std::vector< std::string > doftag_names;
     std::string outFilename;
     std::string intxFilename;
+    std::string baselineFile;
     moab::TempestRemapper::TempestMeshType meshType;
     bool computeDual;
     bool computeWeights;
@@ -75,11 +77,11 @@ struct ToolContext
     ToolContext( moab::Interface* icore )
         : mbcore( icore ), proc_id( 0 ), n_procs( 1 ), outputFormatter( std::cout, 0, 0 ),
 #endif
-          blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), meshType( moab::TempestRemapper::DEFAULT ),
-          computeDual( false ), computeWeights( false ), verifyWeights( false ), enforceConvexity( false ),
-          ensureMonotonicity( 0 ), fNoConservation( false ), fVolumetric( false ), rrmGrids( false ),
-          kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ), fOutputConcave( false ),
-          fCheck( n_procs > 1 ? false : true )
+          blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), baselineFile( "" ),
+          meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
+          verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), fNoConservation( false ),
+          fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ),
+          fOutputConcave( false ), fCheck( n_procs > 1 ? false : true )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -98,6 +100,7 @@ struct ToolContext
         doftag_names.clear();
         outFilename.clear();
         intxFilename.clear();
+        baselineFile.clear();
         meshsets.clear();
         delete timer;
     }
@@ -184,6 +187,8 @@ struct ToolContext
                              &computeWeights );
         opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
 
+        opts.addOpt< std::string >( "baseline", "Output baseline file", &baselineFile );
+
         opts.addOpt< void >( "rrmgrids",
                              "At least one of the meshes is a regionally refined grid (relevant to "
                              "accelerate intersection computation)",
@@ -245,17 +250,35 @@ struct ToolContext
             opts.getOptAllArgs( "method,m", disc_methods );
             opts.getOptAllArgs( "global_id,i", doftag_names );
 
-            if( disc_orders.size() == 0 ) { disc_orders.resize( 2, 1 ); }
+            if( disc_orders.size() == 0 )
+            {
+                disc_orders.resize( 2, 1 );
+            }
 
-            if( disc_orders.size() == 1 ) { disc_orders.push_back( 1 ); }
+            if( disc_orders.size() == 1 )
+            {
+                disc_orders.push_back( 1 );
+            }
 
-            if( disc_methods.size() == 0 ) { disc_methods.resize( 2, "fv" ); }
+            if( disc_methods.size() == 0 )
+            {
+                disc_methods.resize( 2, "fv" );
+            }
 
-            if( disc_methods.size() == 1 ) { disc_methods.push_back( "fv" ); }
+            if( disc_methods.size() == 1 )
+            {
+                disc_methods.push_back( "fv" );
+            }
 
-            if( doftag_names.size() == 0 ) { doftag_names.resize( 2, "GLOBAL_ID" ); }
+            if( doftag_names.size() == 0 )
+            {
+                doftag_names.resize( 2, "GLOBAL_ID" );
+            }
 
-            if( doftag_names.size() == 1 ) { doftag_names.push_back( "GLOBAL_ID" ); }
+            if( doftag_names.size() == 1 )
+            {
+                doftag_names.push_back( "GLOBAL_ID" );
+            }
 
             assert( inFilenames.size() == 2 );
             assert( disc_orders.size() == 2 );
@@ -293,7 +316,10 @@ int main( int argc, char* argv[] )
 
     moab::Interface* mbCore = new( std::nothrow ) moab::Core;
 
-    if( NULL == mbCore ) { return 1; }
+    if( NULL == mbCore )
+    {
+        return 1;
+    }
 
     ToolContext* runCtx;
 #ifdef MOAB_HAVE_MPI
@@ -457,7 +483,10 @@ int main( int argc, char* argv[] )
             runCtx->timer_pop();
 
             std::map< std::string, std::string > mapAttributes;
-            if( err ) { rval = moab::MB_FAILURE; }
+            if( err )
+            {
+                rval = moab::MB_FAILURE;
+            }
             else
             {
                 weightMap.Write( "outWeights.nc", mapAttributes );
@@ -675,6 +704,30 @@ int main( int argc, char* argv[] )
                 runCtx->timer_pop();
                 rval = mbCore->write_file( "tgtWithSolnTag2.h5m", NULL, writeOptions, &runCtx->meshsets[1], 1 );MB_CHK_ERR( rval );
 
+                if( nprocs == 1 && runCtx->baselineFile.size() )
+                {
+                    // save the field from tgtWithSolnTag2 in a text file, and global ids for cells
+                    moab::Range tgtCells;
+                    rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, tgtCells );MB_CHK_ERR( rval );
+                    std::vector< int > globIds;
+                    globIds.resize( tgtCells.size() );
+                    std::vector< double > vals;
+                    vals.resize( tgtCells.size() );
+                    moab::Tag projTag;
+                    rval = mbCore->tag_get_handle( "ProjectedSolnTgt", projTag );MB_CHK_ERR( rval );
+                    moab::Tag gid = mbCore->globalId_tag();
+                    rval          = mbCore->tag_get_data( gid, tgtCells, &globIds[0] );MB_CHK_ERR( rval );
+                    rval = mbCore->tag_get_data( projTag, tgtCells, &vals[0] );MB_CHK_ERR( rval );
+                    std::fstream fs;
+                    fs.open( runCtx->baselineFile.c_str(), std::fstream::out );
+                    fs << std::setprecision( 15 );  // maximum precision for doubles
+                    for( size_t i = 0; i < tgtCells.size(); i++ )
+                        fs << globIds[i] << " " << vals[i] << "\n";
+                    fs.close();
+                    // for good measure, save the source file too, with the tag AnalyticalSolnSrcExact
+                    // it will be used later to test, along with a target file
+                    rval = mbCore->write_file( "srcWithSolnTag.h5m", NULL, writeOptions, &runCtx->meshsets[0], 1 );MB_CHK_ERR( rval );
+                }
                 runCtx->timer_push( "compute error metrics against analytical solution on target grid" );
                 std::map< std::string, double > errMetrics;
                 rval = weightMap->ComputeMetrics( moab::Remapper::TargetMesh, tgtAnalyticalFunction,
@@ -703,7 +756,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     int err;
     moab::DebugOutput& outputFormatter = ctx.outputFormatter;
 
-    if( !ctx.proc_id ) { outputFormatter.printf( 0, "Creating TempestRemap Mesh object ...\n" ); }
+    if( !ctx.proc_id )
+    {
+        outputFormatter.printf( 0, "Creating TempestRemap Mesh object ...\n" );
+    }
 
     if( ctx.meshType == moab::TempestRemapper::OVERLAP_FILES )
     {
@@ -711,7 +767,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         err = GenerateOverlapMesh( ctx.inFilenames[0], ctx.inFilenames[1], *tempest_mesh, ctx.outFilename, "NetCDF4",
                                    "exact", true );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -739,7 +798,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         err = GenerateOverlapWithMeshes( *ctx.meshes[0], *ctx.meshes[1], *tempest_mesh, "" /*ctx.outFilename*/,
                                          "NetCDF4", "exact", false );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             remapper.SetMesh( moab::Remapper::OverlapMesh, tempest_mesh );
@@ -793,7 +855,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     {
         err = GenerateICOMesh( *tempest_mesh, ctx.blockSize, ctx.computeDual, ctx.outFilename, "NetCDF4" );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -813,7 +878,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
                                true                         // bool fVerbose
         );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -823,7 +891,10 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     {
         err = GenerateCSMesh( *tempest_mesh, ctx.blockSize, ctx.outFilename, "NetCDF4" );
 
-        if( err ) { rval = moab::MB_FAILURE; }
+        if( err )
+        {
+            rval = moab::MB_FAILURE;
+        }
         else
         {
             ctx.meshes.push_back( tempest_mesh );
@@ -880,7 +951,10 @@ double sample_stationary_vortex( double dLon, double dLat )
         double dZ   = dSinC * dSinT + dCosC * dTrm;
 
         dLon = atan2( dY, dX );
-        if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+        if( dLon < 0.0 )
+        {
+            dLon += 2.0 * M_PI;
+        }
         dLat = asin( dZ );
     }
 
@@ -888,7 +962,10 @@ double sample_stationary_vortex( double dLon, double dLat )
     double dVt  = 3.0 * sqrt( 3.0 ) / 2.0 / cosh( dRho ) / cosh( dRho ) * tanh( dRho );
 
     double dOmega;
-    if( dRho == 0.0 ) { dOmega = 0.0; }
+    if( dRho == 0.0 )
+    {
+        dOmega = 0.0;
+    }
     else
     {
         dOmega = dVt / dRho;

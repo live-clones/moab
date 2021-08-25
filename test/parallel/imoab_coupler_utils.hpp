@@ -93,7 +93,7 @@ int setup_component_coupler_meshes( iMOAB_AppID cmpId, int cmpTag, iMOAB_AppID c
     // we can now free the sender buffers
     if( *cmpcomm != MPI_COMM_NULL )
     {
-        int context_id = -1;
+        int context_id = cmpcouTag;
         ierr           = iMOAB_FreeSenderBuffers( cmpId, &context_id );
         CHECKIERR( ierr, "cannot free buffers used to send atm mesh" )
     }

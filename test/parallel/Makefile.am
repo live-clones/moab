@@ -4,6 +4,7 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 LDADD = $(top_builddir)/src/libMOAB.la
 
 MESHDIR = $(abs_top_srcdir)/MeshFiles/unittest
+RMESHDIR = $(abs_top_srcdir)/MeshFiles/unittest
 
 DEFS += -DIS_BUILDING_MB \
 				-DSRCDIR=$(srcdir) \
@@ -63,9 +64,14 @@ commgraph_test_LDADD = $(LDADD) $(FCLIBS)
 endif
 
 if HAVE_TEMPESTREMAP
-  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast
+  HDF5_TESTS += imoab_coupler imoab_phatm_ocn_coupler test_mapweights_bcast 
   imoab_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_phatm_ocn_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_read_map_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_map2_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+if HAVE_NETCDF
+  HDF5_TESTS += imoab_read_map imoab_map2
+endif
 if HAVE_EXTMESHES
   HDF5_TESTS +=  imoab_apg2_ol_coupler
   imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
@@ -111,8 +117,10 @@ IMOAB_TESTS =
 if ENABLE_FORTRAN
    IMOAB_TESTS += imoab_ptest imoab_ptest2
 if HAVE_TEMPESTREMAP
+IMOAB_TESTS += imoab_coupler_fortran
 imoab_ptest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 imoab_ptest2_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
+imoab_coupler_fortran_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
 else
 imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
 imoab_ptest2_LDADD = $(LDADD) $(FCLIBS)
@@ -170,6 +178,7 @@ parallel_adj_SOURCES = ../adj_moab_test.cpp
 parmerge_test_SOURCES = parmerge_test.cpp
 augment_with_ghosts_SOURCES = augment_with_ghosts.cpp
 imoab_ptest_SOURCES = imoab_ptest.F
+imoab_coupler_fortran_SOURCES = imoab_coupler_fortran.F90
 imoab_ptest2_SOURCES = imoab_ptest2.cpp
 hireconst_test_parallel_SOURCES = hireconst_test_parallel.cpp
 uref_hirec_test_parallel_SOURCES = uref_hirec_test_parallel.cpp ../geomObject.cpp
@@ -177,6 +186,8 @@ migrate_test_SOURCES = migrate_test.cpp
 imoab_coupler_SOURCES = imoab_coupler.cpp
 imoab_phatm_ocn_coupler_SOURCES = imoab_phatm_ocn_coupler.cpp
 imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
+imoab_read_map_SOURCES = imoab_read_map.cpp
+imoab_map2_SOURCES = imoab_map2.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
 commgraph_test_SOURCES = commgraph_test.cpp
@@ -243,7 +254,8 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    LndWithProj3.h5m  fLndOnCpl3.h5m  OcnWithProj3.h5m  fOcnOnCpl3.h5m  recvLnd3.h5m  recvOcn3.h5m \
                    AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m \
                    AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m \
-                   atm_ocn_map.nc file_set7rk_0.h5m file_set7rk_1.h5m
+                   atm_ocn_map.nc file_set7rk_0.h5m file_set7rk_1.h5m \
+		   atmcov_withdata_1.h5m atmcov_withdata_0.h5m CoupOcn.h5m ocntgt_1.h5m ocntgt_0.h5m atmcov_0.h5m atmcov_1.h5m
 
 EXTRA_DIST = imoab_coupler_utils.hpp
 FORTDEFS = $(FCDEFS)

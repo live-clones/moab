@@ -404,7 +404,10 @@ ErrorCode TempestRemapper::ConvertMeshToTempest( Remapper::IntersectionContext c
         if( !m_source ) m_source = new Mesh();
         if( outputEnabled ) dbgprint.printf( 0, "Converting (source) MOAB to TempestRemap Mesh representation ...\n" );
         rval = convert_mesh_to_tempest_private( m_source, m_source_set, m_source_entities, &m_source_vertices );MB_CHK_SET_ERR( rval, "Can't convert source mesh to Tempest" );
-        if( m_source_entities.size() == 0 && m_source_vertices.size() != 0 ) { this->point_cloud_source = true; }
+        if( m_source_entities.size() == 0 && m_source_vertices.size() != 0 )
+        {
+            this->point_cloud_source = true;
+        }
     }
     else if( ctx == Remapper::TargetMesh )
     {
@@ -802,7 +805,31 @@ moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string
 
     return moab::MB_SUCCESS;
 }
+void TempestRemapper::SetMeshSet( Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/,
+                                  moab::EntityHandle mset, moab::Range& entities )
+{
 
+    if( ctx == Remapper::SourceMesh )  // should not be used
+    {
+        m_source_entities = entities;
+        m_source_set      = mset;
+    }
+    else if( ctx == Remapper::TargetMesh )
+    {
+        m_target_entities = entities;
+        m_target_set      = mset;
+    }
+    else if( ctx == Remapper::CoveringMesh )
+    {
+        m_covering_source_entities = entities;
+        m_covering_source_set      = mset;
+    }
+    else
+    {
+        // some error
+    }
+    return;
+}
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef MOAB_HAVE_MPI
@@ -911,7 +938,10 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_el
         const Face& face        = csMesh.faces[k];
         const NodeVector& nodes = csMesh.nodes;
 
-        if( face.edges.size() != 4 ) { _EXCEPTIONT( "Mesh must only contain quadrilateral elements" ); }
+        if( face.edges.size() != 4 )
+        {
+            _EXCEPTIONT( "Mesh must only contain quadrilateral elements" );
+        }
 
         Node centroid;
         centroid.x = centroid.y = centroid.z = 0.0;
@@ -1697,7 +1727,10 @@ ErrorCode TempestRemapper::augment_overlap_set()
             int sourceID = TLc.vi_rd[sizeTuple * i + 1];
             if( sourceID == currentSourceID )
             {
-                if( currentProcsCount.find( proc ) == currentProcsCount.end() ) { currentProcsCount[proc] = 1; }
+                if( currentProcsCount.find( proc ) == currentProcsCount.end() )
+                {
+                    currentProcsCount[proc] = 1;
+                }
                 else
                     currentProcsCount[proc]++;
             }

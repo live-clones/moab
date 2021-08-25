@@ -485,7 +485,10 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
         centroid.z *= factor;
 
         EntityHandle current_eh;
-        if( mapLocalMBNodes.find( centroid ) != mapLocalMBNodes.end() ) { current_eh = mapLocalMBNodes[centroid]; }
+        if( mapLocalMBNodes.find( centroid ) != mapLocalMBNodes.end() )
+        {
+            current_eh = mapLocalMBNodes[centroid];
+        }
 
         rval = m_interface->tag_get_data( m_dofTagSrc, &current_eh, 1, &locdofs[0] );MB_CHK_ERR( rval );
         for( int p = 0; p < m_nDofsPEl_Src; p++ )
@@ -689,6 +692,48 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType
     return moab::MB_SUCCESS;
 }
 
+moab::ErrorCode moab::TempestOnlineMap::set_col_dc_dofs( std::vector< int >& values_entities )
+{
+    // col_gdofmap has global dofs , that should be in the list of values, such that
+    // row_dtoc_dofmap[offsetDOF] = localDOF;
+    // //  we need to find col_dtoc_dofmap such that: col_gdofmap[ col_dtoc_dofmap[i] ] == values_entities [i];
+    // we know that col_gdofmap[0..(nbcols-1)] = global_col_dofs -> in values_entities
+    // form first inverse
+
+    col_dtoc_dofmap.resize( values_entities.size() );
+    for( int j = 0; j < (int)values_entities.size(); j++ )
+    {
+        if( colMap.find( values_entities[j] - 1 ) != colMap.end() )
+            col_dtoc_dofmap[j] = colMap[values_entities[j] - 1];
+        else
+        {
+            col_dtoc_dofmap[j] = -1;  // signal that this value should not be used in
+            // std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not
+            // found in colMap \n";
+        }
+    }
+    return moab::MB_SUCCESS;
+}
+
+moab::ErrorCode moab::TempestOnlineMap::set_row_dc_dofs( std::vector< int >& values_entities )
+{
+    // row_dtoc_dofmap = values_entities; // needs to point to local
+    //  we need to find row_dtoc_dofmap such that: row_gdofmap[ row_dtoc_dofmap[i] ] == values_entities [i];
+
+    row_dtoc_dofmap.resize( values_entities.size() );
+    for( int j = 0; j < (int)values_entities.size(); j++ )
+    {
+        if( rowMap.find( values_entities[j] - 1 ) != rowMap.end() )
+            row_dtoc_dofmap[j] = rowMap[values_entities[j] - 1];  // values are 1 based, but rowMap, colMap are not
+        else
+        {
+            row_dtoc_dofmap[j] = -1;  // not all values are used
+            // std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not
+            // found in rowMap \n";
+        }
+    }
+    return moab::MB_SUCCESS;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
@@ -716,7 +761,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
         DiscretizationType eOutputType;
         int fNoCheckGlob = ( fNoCheck ? 1 : 0 );
 
-        if( strInputType == "fv" ) { eInputType = DiscretizationType_FV; }
+        if( strInputType == "fv" )
+        {
+            eInputType = DiscretizationType_FV;
+        }
         else if( strInputType == "cgll" )
         {
             eInputType = DiscretizationType_CGLL;
@@ -734,7 +782,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             _EXCEPTION1( "Invalid \"in_type\" value (%s), expected [fv|cgll|dgll]", strInputType.c_str() );
         }
 
-        if( strOutputType == "fv" ) { eOutputType = DiscretizationType_FV; }
+        if( strOutputType == "fv" )
+        {
+            eOutputType = DiscretizationType_FV;
+        }
         else if( strOutputType == "cgll" )
         {
             eOutputType = DiscretizationType_CGLL;
@@ -893,14 +944,20 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             if( !m_bPointCloudSource && eInputType == DiscretizationType_FV )
             {
                 this->SetSourceAreas( m_meshInputCov->vecFaceArea );
-                if( m_meshInputCov->vecMask.IsAttached() ) { this->SetSourceMask( m_meshInputCov->vecMask ); }
+                if( m_meshInputCov->vecMask.IsAttached() )
+                {
+                    this->SetSourceMask( m_meshInputCov->vecMask );
+                }
             }
 
             // Set target mesh areas in map
             if( !m_bPointCloudTarget && eOutputType == DiscretizationType_FV )
             {
                 this->SetTargetAreas( m_meshOutput->vecFaceArea );
-                if( m_meshOutput->vecMask.IsAttached() ) { this->SetTargetMask( m_meshOutput->vecMask ); }
+                if( m_meshOutput->vecMask.IsAttached() )
+                {
+                    this->SetTargetMask( m_meshOutput->vecMask );
+                }
             }
 
             // Partial cover
@@ -1237,7 +1294,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             this->IsConsistent( 1.0e-8 );
             if( !fNoConservation ) this->IsConservative( 1.0e-8 );
 
-            if( nMonotoneType != 0 ) { this->IsMonotone( 1.0e-12 ); }
+            if( nMonotoneType != 0 )
+            {
+                this->IsMonotone( 1.0e-12 );
+            }
         }
     }
     catch( Exception& e )
@@ -1563,7 +1623,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
-                                                          : m_remapper->m_covering_source_entities );
+                                                        : m_remapper->m_covering_source_entities );
             discOrder  = m_nDofsPEl_Src;
             discMethod = m_eInputType;
             break;
@@ -1589,7 +1649,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
                                         MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
     if( clonedSolnTag != NULL )
     {
-        if( cloneSolnName.size() == 0 ) { cloneSolnName = solnName + std::string( "Cloned" ); }
+        if( cloneSolnName.size() == 0 )
+        {
+            cloneSolnName = solnName + std::string( "Cloned" );
+        }
         rval = m_interface->tag_get_handle( cloneSolnName.c_str(), discOrder * discOrder, MB_TYPE_DOUBLE,
                                             *clonedSolnTag, MB_TAG_DENSE | MB_TAG_CREAT );MB_CHK_ERR( rval );
     }
@@ -1651,7 +1714,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             {
                 for( int k = 0; k < nElements; k++ )
                 {
-                    if( dataGLLNodes[i][j][k] > iMaxNode ) { iMaxNode = dataGLLNodes[i][j][k]; }
+                    if( dataGLLNodes[i][j][k] > iMaxNode )
+                    {
+                        iMaxNode = dataGLLNodes[i][j][k];
+                    }
                 }
             }
         }
@@ -1697,7 +1763,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
 
                         // Sample data at this point
                         double dNodeLon = atan2( node.y, node.x );
-                        if( dNodeLon < 0.0 ) { dNodeLon += 2.0 * M_PI; }
+                        if( dNodeLon < 0.0 )
+                        {
+                            dNodeLon += 2.0 * M_PI;
+                        }
                         double dNodeLat = asin( node.z );
 
                         double dSample = ( *testFunction )( dNodeLon, dNodeLat );
@@ -1735,7 +1804,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
 
                         // Sample data at this point
                         double dNodeLon = atan2( node.y, node.x );
-                        if( dNodeLon < 0.0 ) { dNodeLon += 2.0 * M_PI; }
+                        if( dNodeLon < 0.0 )
+                        {
+                            dNodeLon += 2.0 * M_PI;
+                        }
                         double dNodeLat = asin( node.z );
 
                         double dSample = ( *testFunction )( dNodeLon, dNodeLat );
@@ -1844,7 +1916,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
                         node.z /= dMagnitude;
 
                         double dLon = atan2( node.y, node.x );
-                        if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+                        if( dLon < 0.0 )
+                        {
+                            dLon += 2.0 * M_PI;
+                        }
                         double dLat = asin( node.z );
 
                         double dSample = ( *testFunction )( dLon, dLat );
@@ -1873,7 +1948,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
                 node.y /= dMagnitude;
                 node.z /= dMagnitude;
                 double dLon = atan2( node.y, node.x );
-                if( dLon < 0.0 ) { dLon += 2.0 * M_PI; }
+                if( dLon < 0.0 )
+                {
+                    dLon += 2.0 * M_PI;
+                }
                 double dLat = asin( node.z );
 
                 double dSample = ( *testFunction )( dLon, dLat );
@@ -1904,7 +1982,7 @@ moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::Intersec
             meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
-                                                          : m_remapper->m_covering_source_entities );
+                                                        : m_remapper->m_covering_source_entities );
             discOrder  = m_nDofsPEl_Src;
             discMethod = m_eInputType;
             break;

@@ -77,5 +77,7 @@ EXTRA_DIST = 125hex.g \
              AtmPhys_01.h5m \
              outCS5ICOD5_map.nc \
              globalmpas_deltri.h5m \
-	     baseline1.txt
+	     baseline1.txt \
+	     atm_ocn_map.nc \
+	     outTri15_8.h5m baseline2.txt mapNE20_FV15.nc srcWithSolnTag.h5m
 

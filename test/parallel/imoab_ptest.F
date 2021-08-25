@@ -123,7 +123,7 @@ c     find out MY process ID, and how many processes were started.
 C       give a component id
       compid = 7
       appname = 'IMTEST'//CHAR(0)
-      ierr = iMOAB_RegisterFortranApplication(appname, MPI_COMM_WORLD,
+      ierr = iMOAB_RegisterApplicationFortran(appname, MPI_COMM_WORLD,
      & compid, pid)
       call errorout(ierr, 'fail to initialize fortran app')
 

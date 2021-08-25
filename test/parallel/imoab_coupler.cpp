@@ -375,7 +375,7 @@ int main( int argc, char* argv[] )
         // will
         //  use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute OCN coverage graph for ATM mesh" )
-        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID,
+        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, &cmpatm, &cplatm,
                                     &cplocn );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for ocean" )
         POP_TIMER( atmCouComm, rankInAtmComm )  // hijack this rank
@@ -400,7 +400,7 @@ int main( int argc, char* argv[] )
         // time,
         /// we will use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute LND coverage graph for ATM mesh" )
-        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmLndPID,
+        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmLndPID, &cmpatm, &cplatm,
                                     &cpllnd );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for land" )
         POP_TIMER( atmCouComm, rankInAtmComm )  // hijack this rank
@@ -447,8 +447,8 @@ int main( int argc, char* argv[] )
 
             const std::string intx_from_file_identifier = "map-from-file";
             ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier.c_str(),
-                                                     atmocn_map_file_name.c_str(), NULL, NULL, NULL,
-                                                     intx_from_file_identifier.size(), atmocn_map_file_name.size() );
+                                                     atmocn_map_file_name.c_str(), intx_from_file_identifier.size(),
+                                                     atmocn_map_file_name.size() );
             CHECKIERR( ierr, "failed to load map file from disk" );
         }
 #endif
@@ -671,6 +671,8 @@ int main( int argc, char* argv[] )
         // original graph (context is -1_
         if( couComm != MPI_COMM_NULL )
         {
+            // need to use ocean comp id for context
+            context_id = cmpocn;  // id for ocean on comp
             ierr = iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id,
                                          strlen( "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;" ) );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
@@ -679,14 +681,18 @@ int main( int argc, char* argv[] )
         // receive on component 2, ocean
         if( ocnComm != MPI_COMM_NULL )
         {
-            ierr = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm,
+            context_id = cplocn;  // id for ocean on coupler
+            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm,
                                             &context_id, strlen( "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;" ) );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
         MPI_Barrier( MPI_COMM_WORLD );
 
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id ); }
+        if( couComm != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+        }
         if( ocnComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileOcn[] = "OcnWithProj.h5m";
@@ -813,6 +819,7 @@ int main( int argc, char* argv[] )
         }
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmplnd;  // land comp id
             ierr = iMOAB_SendElementTag( cplLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm, &context_id,
                                          strlen( "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;" ) );
             CHECKIERR( ierr, "cannot send tag values back to land pes" )
@@ -820,13 +827,17 @@ int main( int argc, char* argv[] )
         // receive on component 3, land
         if( lndComm != MPI_COMM_NULL )
         {
-            ierr = iMOAB_ReceiveElementTag( cmpLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm,
+            context_id = cpllnd;  // land on coupler id
+            ierr       = iMOAB_ReceiveElementTag( cmpLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm,
                                             &context_id, strlen( "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;" ) );
             CHECKIERR( ierr, "cannot receive tag values from land mesh on coupler pes" )
         }
 
         MPI_Barrier( MPI_COMM_WORLD );
-        if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id ); }
+        if( couComm != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
+        }
         if( lndComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileLnd[] = "LndWithProj.h5m";

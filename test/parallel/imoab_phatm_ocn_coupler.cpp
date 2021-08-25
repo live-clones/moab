@@ -380,7 +380,7 @@ int main( int argc, char* argv[] )
         // will
         //  use the element global id, which should uniquely identify the element
 
-        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID,
+        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, &cmpatm, &cplatm,
                                     &cplocn );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for ocean" )
     }
@@ -621,7 +621,8 @@ int main( int argc, char* argv[] )
     // original graph (context is -1_
     if( couComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_SendElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
+        context_id = cmpocn;
+        ierr       = iMOAB_SendElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
                                      strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
     }
@@ -629,14 +630,19 @@ int main( int argc, char* argv[] )
     // receive on component 2, ocean
     if( ocnComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_ReceiveElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
+        context_id = cplocn;
+        ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id,
                                         strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
     }
 
     MPI_Barrier( MPI_COMM_WORLD );
 
-    if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id ); }
+    if( couComm != MPI_COMM_NULL )
+    {
+        context_id = cmpocn;
+        ierr       = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+    }
     if( ocnComm != MPI_COMM_NULL )
     {
         char outputFileOcn[] = "OcnWithProj2.h5m";
@@ -713,20 +719,26 @@ int main( int argc, char* argv[] )
     }
     if( couComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_SendElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id,
+        context_id = cmplnd;
+        ierr       = iMOAB_SendElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id,
                                      strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot send tag values back to land pes" )
     }
     // receive on component 3, land
     if( lndComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_ReceiveElementTag( cmpLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id,
+        context_id = cpllnd;  // receive from coupler on land
+        ierr       = iMOAB_ReceiveElementTag( cmpLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id,
                                         strlen( "T_proj;u_proj;v_proj;" ) );
         CHECKIERR( ierr, "cannot receive tag values from land mesh on coupler pes" )
     }
 
     MPI_Barrier( MPI_COMM_WORLD );
-    if( couComm != MPI_COMM_NULL ) { ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id ); }
+    if( couComm != MPI_COMM_NULL )
+    {
+        context_id = cmplnd;
+        ierr       = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
+    }
     if( lndComm != MPI_COMM_NULL )
     {
         char outputFileLnd[] = "LndWithProj2.h5m";

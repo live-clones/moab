@@ -524,7 +524,10 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityH
     }
     // make sure adjacencies are updated on the new elements
 
-    if( newEnts.empty() ) { std::cout << " WARNING: this task did not receive any entities \n"; }
+    if( newEnts.empty() )
+    {
+        std::cout << " WARNING: this task did not receive any entities \n";
+    }
     // in order for the merging to work, we need to be sure that the adjacencies are updated
     // (created)
     Range local_verts        = newEnts.subset_by_type( MBVERTEX );
@@ -1243,6 +1246,235 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
     if( rootSender ) std::cout << " time spent by Zoltan " << t3 - t2 << " seconds. \n";
     return MB_SUCCESS;
 }
+
+// after map read, we need to know what entities we need to send to receiver
+ErrorCode ParCommGraph::set_split_ranges( int comp, TupleList& TLBackToComp1, std::vector< int >& valuesComp1,
+                                          int lenTag, Range& ents_of_interest, int type )
+{
+    // settle split_ranges // same role as partitioning
+    if( rootSender ) std::cout << " find split_ranges on component " << comp << "  according to read map \n";
+    // Vector to store element
+    // with respective present index
+    int n = TLBackToComp1.get_n();
+    // third_method = true; // do not rely only on involved_IDs_map.size(); this can be 0 in some
+    // cases
+    std::map< int, std::set< int > > uniqueIDs;
+
+    for( int i = 0; i < n; i++ )
+    {
+        int to_proc  = TLBackToComp1.vi_wr[3 * i + 2];
+        int globalId = TLBackToComp1.vi_wr[3 * i + 1];
+        uniqueIDs[to_proc].insert( globalId );
+    }
+
+    for( int i = 0; i < (int)ents_of_interest.size(); i++ )
+    {
+        EntityHandle ent = ents_of_interest[i];
+        for( int j = 0; j < lenTag; j++ )
+        {
+            int marker = valuesComp1[i * lenTag + j];
+            for( auto mit = uniqueIDs.begin(); mit != uniqueIDs.end(); mit++ )
+            {
+                int proc                = mit->first;
+                std::set< int >& setIds = mit->second;
+                if( setIds.find( marker ) != setIds.end() )
+                {
+                    split_ranges[proc].insert( ent );
+                }
+            }
+        }
+    }
+
+    return MB_SUCCESS;
+}
+
+// new methods to migrate mesh after reading map
+ErrorCode ParCommGraph::form_tuples_to_migrate_mesh( Interface* mb, TupleList& TLv, TupleList& TLc, int type,
+                                                     int lenTagType1 )
+{
+    // we will always need GlobalID tag
+    Tag gidtag = mb->globalId_tag();
+    // for Type1, we need GLOBAL_DOFS tag;
+    Tag gds;
+    ErrorCode rval;
+    if( type == 1 )
+    {
+        rval = mb->tag_get_handle( "GLOBAL_DOFS", gds );
+    }
+    // find vertices to be sent, for each of the split_ranges procs
+    std::map< int, Range > verts_to_proc;
+    int numv = 0, numc = 0;
+    for( auto it = split_ranges.begin(); it != split_ranges.end(); it++ )
+    {
+        int to_proc = it->first;
+        Range verts;
+        if( type != 2 )
+        {
+            rval = mb->get_connectivity( it->second, verts );MB_CHK_ERR( rval );
+            numc += (int)it->second.size();
+        }
+        else
+            verts = it->second;
+        verts_to_proc[to_proc] = verts;
+        numv += (int)verts.size();
+    }
+    // first vertices:
+    TLv.initialize( 2, 0, 0, 3, numv );  // to proc, GLOBAL ID, 3 real coordinates
+    TLv.enableWriteAccess();
+    // use the global id of vertices for connectivity
+    for( auto it = verts_to_proc.begin(); it != verts_to_proc.end(); it++ )
+    {
+        int to_proc  = it->first;
+        Range& verts = it->second;
+        for( Range::iterator vit = verts.begin(); vit != verts.end(); ++vit )
+        {
+            EntityHandle v   = *vit;
+            int n            = TLv.get_n();  // current size of tuple list
+            TLv.vi_wr[2 * n] = to_proc;      // send to processor
+
+            rval = mb->tag_get_data( gidtag, &v, 1, &( TLv.vi_wr[2 * n + 1] ) );MB_CHK_ERR( rval );
+            rval = mb->get_coords( &v, 1, &( TLv.vr_wr[3 * n] ) );MB_CHK_ERR( rval );
+            TLv.inc_n();  // increment tuple list size
+        }
+    }
+    if( type == 2 ) return MB_SUCCESS;  // no need to fill TLc
+    // to proc, ID cell, gdstag, nbv, id conn,
+    int size_tuple = 2 + ( ( type != 1 ) ? 0 : lenTagType1 ) + 1 + 10;  // 10 is the max number of vertices in cell
+
+    std::vector< int > gdvals;
+
+    TLc.initialize( size_tuple, 0, 0, 0, numc );  // to proc, GLOBAL ID, 3 real coordinates
+    TLc.enableWriteAccess();
+    for( auto it = split_ranges.begin(); it != split_ranges.end(); it++ )
+    {
+        int to_proc  = it->first;
+        Range& cells = it->second;
+        for( Range::iterator cit = cells.begin(); cit != cells.end(); ++cit )
+        {
+            EntityHandle cell         = *cit;
+            int n                     = TLc.get_n();  // current size of tuple list
+            TLc.vi_wr[size_tuple * n] = to_proc;
+            int current_index         = 2;
+            rval                      = mb->tag_get_data( gidtag, &cell, 1, &( TLc.vi_wr[size_tuple * n + 1] ) );MB_CHK_ERR( rval );
+            if( 1 == type )
+            {
+                rval = mb->tag_get_data( gds, &cell, 1, &( TLc.vi_wr[size_tuple * n + current_index] ) );MB_CHK_ERR( rval );
+                current_index += lenTagType1;
+            }
+            // now get connectivity
+            const EntityHandle* conn = NULL;
+            int nnodes               = 0;
+            rval                     = mb->get_connectivity( cell, conn, nnodes );MB_CHK_ERR( rval );
+            // fill nnodes:
+            TLc.vi_wr[size_tuple * n + current_index] = nnodes;
+            rval = mb->tag_get_data( gidtag, conn, nnodes, &( TLc.vi_wr[size_tuple * n + current_index + 1] ) );MB_CHK_ERR( rval );
+            TLc.inc_n();  // increment tuple list size
+        }
+    }
+    return MB_SUCCESS;
+}
+ErrorCode ParCommGraph::form_mesh_from_tuples( Interface* mb, TupleList& TLv, TupleList& TLc, int type, int lenTagType1,
+                                               EntityHandle fset, Range& primary_ents,
+                                               std::vector< int >& values_entities )
+{
+    // might need to fill also the split_range things
+    // we will always need GlobalID tag
+    Tag gidtag = mb->globalId_tag();
+    // for Type1, we need GLOBAL_DOFS tag;
+    Tag gds;
+    ErrorCode rval;
+    std::vector< int > def_val( lenTagType1, 0 );
+    if( type == 1 )
+    {
+        // we may need to create this tag
+        rval = mb->tag_get_handle( "GLOBAL_DOFS", lenTagType1, MB_TYPE_INTEGER, gds, MB_TAG_CREAT | MB_TAG_DENSE,
+                                   &def_val[0] );MB_CHK_ERR( rval );
+    }
+
+    std::map< int, EntityHandle > vertexMap;  //
+    Range verts;
+    // always form vertices and add them to the fset;
+    int n = TLv.get_n();
+    EntityHandle vertex;
+    for( int i = 0; i < n; i++ )
+    {
+        int gid = TLv.vi_rd[2 * i + 1];
+        if( vertexMap.find( gid ) == vertexMap.end() )
+        {
+            // need to form this vertex
+            rval = mb->create_vertex( &( TLv.vr_rd[3 * i] ), vertex );MB_CHK_ERR( rval );
+            vertexMap[gid] = vertex;
+            verts.insert( vertex );
+            rval = mb->tag_set_data( gidtag, &vertex, 1, &gid );MB_CHK_ERR( rval );
+            // if point cloud,
+        }
+        if( 2 == type )  // point cloud, add it to the split_ranges ?
+        {
+            split_ranges[TLv.vi_rd[2 * i]].insert( vertexMap[gid] );
+        }
+        // todo : when to add the values_entities ?
+    }
+    rval = mb->add_entities( fset, verts );MB_CHK_ERR( rval );
+    if( 2 == type )
+    {
+        primary_ents = verts;
+        values_entities.resize( verts.size() );  // just get the ids of vertices
+        rval = mb->tag_get_data( gidtag, verts, &values_entities[0] );MB_CHK_ERR( rval );
+        return MB_SUCCESS;
+    }
+
+    n              = TLc.get_n();
+    int size_tuple = 2 + ( ( type != 1 ) ? 0 : lenTagType1 ) + 1 + 10;  // 10 is the max number of vertices in cell
+
+    EntityHandle new_element;
+    Range cells;
+    std::map< int, EntityHandle > cellMap;  // do no tcreate one if it already exists, maybe from other processes
+    for( int i = 0; i < n; i++ )
+    {
+        int from_proc  = TLc.vi_rd[size_tuple * i];
+        int globalIdEl = TLc.vi_rd[size_tuple * i + 1];
+        if( cellMap.find( globalIdEl ) == cellMap.end() )  // need to create the cell
+        {
+            int current_index = 2;
+            if( 1 == type ) current_index += lenTagType1;
+            int nnodes = TLc.vi_rd[size_tuple * i + current_index];
+            std::vector< EntityHandle > conn;
+            conn.resize( nnodes );
+            for( int j = 0; j < nnodes; j++ )
+            {
+                conn[j] = vertexMap[TLc.vi_rd[size_tuple * i + current_index + j + 1]];
+            }
+            //
+            EntityType entType = MBQUAD;
+            if( nnodes > 4 ) entType = MBPOLYGON;
+            if( nnodes < 4 ) entType = MBTRI;
+            rval = mb->create_element( entType, &conn[0], nnodes, new_element );MB_CHK_SET_ERR( rval, "can't create new element " );
+            cells.insert( new_element );
+            cellMap[globalIdEl] = new_element;
+            rval                = mb->tag_set_data( gidtag, &new_element, 1, &globalIdEl );MB_CHK_SET_ERR( rval, "can't set global id tag on cell " );
+            if( 1 == type )
+            {
+                // set the gds tag
+                rval = mb->tag_set_data( gds, &new_element, 1, &( TLc.vi_rd[size_tuple * i + 2] ) );MB_CHK_SET_ERR( rval, "can't set gds tag on cell " );
+            }
+        }
+        split_ranges[from_proc].insert( cellMap[globalIdEl] );
+    }
+    rval = mb->add_entities( fset, cells );MB_CHK_ERR( rval );
+    primary_ents = cells;
+    if( 1 == type )
+    {
+        values_entities.resize( lenTagType1 * primary_ents.size() );
+        rval = mb->tag_get_data( gds, primary_ents, &values_entities[0] );MB_CHK_ERR( rval );
+    }
+    else  // type == 3
+    {
+        values_entities.resize( primary_ents.size() );  // just get the ids !
+        rval = mb->tag_get_data( gidtag, primary_ents, &values_entities[0] );MB_CHK_ERR( rval );
+    }
+    return MB_SUCCESS;
+}
+
 // at this moment, each sender task has split_ranges formed;
 // we need to aggregate that info and send it to receiver
 ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm )

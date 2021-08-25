@@ -279,6 +279,16 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     int GetDestinationNDofsPerElement();
 
+    /// <summary>
+    ///     Set the number of Degrees-Of-Freedom per element on the source mesh.
+    /// </summary>
+    void SetSourceNDofsPerElement( int ns );
+
+    /// <summary>
+    ///     Get the number of Degrees-Of-Freedom per element on the destination mesh.
+    /// </summary>
+    void SetDestinationNDofsPerElement( int nt );
+
     ///	<summary>
     ///		Get the global Degrees-Of-Freedom ID on the destination mesh.
     ///	</summary>
@@ -335,6 +345,29 @@ class TempestOnlineMap : public OfflineMap
     moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag,
                                     std::map< std::string, double >& metrics, bool verbose = true );
 
+    moab::ErrorCode fill_row_ids( std::vector< int >& ids_of_interest )
+    {
+        ids_of_interest.reserve( row_gdofmap.size() );
+        // need to add 1
+        for( auto it = row_gdofmap.begin(); it != row_gdofmap.end(); it++ )
+            ids_of_interest.push_back( *it + 1 );
+
+        return moab::MB_SUCCESS;
+    }
+
+    moab::ErrorCode fill_col_ids( std::vector< int >& ids_of_interest )
+    {
+        ids_of_interest.reserve( col_gdofmap.size() );
+        // need to add 1
+        for( auto it = col_gdofmap.begin(); it != col_gdofmap.end(); it++ )
+            ids_of_interest.push_back( *it + 1 );
+        return moab::MB_SUCCESS;
+    }
+
+    moab::ErrorCode set_col_dc_dofs( std::vector< int >& values_entities );
+
+    moab::ErrorCode set_row_dc_dofs( std::vector< int >& values_entities );
+
   private:
     void setup_sizes_dimensions();
 
@@ -377,7 +410,10 @@ class TempestOnlineMap : public OfflineMap
     moab::Tag m_dofTagSrc, m_dofTagDest;
     std::vector< unsigned > row_gdofmap, col_gdofmap, srccol_gdofmap;
 
-    std::vector< unsigned > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
+    // make it int, because it can be -1 in new logic
+    std::vector< int > row_dtoc_dofmap, col_dtoc_dofmap, srccol_dtoc_dofmap;
+
+    std::map< int, int > rowMap, colMap;
 
     DataArray3D< int > dataGLLNodesSrc, dataGLLNodesSrcCov, dataGLLNodesDest;
     DiscretizationType m_srcDiscType, m_destDiscType;
@@ -420,6 +456,30 @@ inline int moab::TempestOnlineMap::GetIndexOfColGlobalDoF( int globalColDoF ) co
 {
     return globalColDoF + 1;  // temporary
 }
+///////////////////////////////////////////////////////////////////////////////
+
+inline int moab::TempestOnlineMap::GetSourceNDofsPerElement()
+{
+    return m_nDofsPEl_Src;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
+{
+    return m_nDofsPEl_Dest;
+}
+
+// setters for m_nDofsPEl_Src, m_nDofsPEl_Dest
+inline void moab::TempestOnlineMap::SetSourceNDofsPerElement( int ns )
+{
+    m_nDofsPEl_Src = ns;
+}
+
+inline void moab::TempestOnlineMap::SetDestinationNDofsPerElement( int nt )
+{
+    m_nDofsPEl_Dest = nt;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef MOAB_HAVE_EIGEN3
@@ -448,20 +508,6 @@ inline int moab::TempestOnlineMap::GetSourceLocalNDofs()
 inline int moab::TempestOnlineMap::GetDestinationLocalNDofs()
 {
     return m_weightMatrix.rows();  // return the local number of columns from the weight matrix
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-inline int moab::TempestOnlineMap::GetSourceNDofsPerElement()
-{
-    return m_nDofsPEl_Src;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-inline int moab::TempestOnlineMap::GetDestinationNDofsPerElement()
-{
-    return m_nDofsPEl_Dest;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

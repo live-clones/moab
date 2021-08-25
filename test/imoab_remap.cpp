@@ -239,8 +239,8 @@ int main( int argc, char* argv[] )
 
         const std::string intx_from_file_identifier = "map-from-file";
         ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, intx_from_file_identifier.c_str(),
-                                                 atmocn_map_file_name.c_str(), NULL, NULL, NULL,
-                                                 intx_from_file_identifier.size(), atmocn_map_file_name.size() );
+                                                 atmocn_map_file_name.c_str(), intx_from_file_identifier.size(),
+                                                 atmocn_map_file_name.size() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 #endif

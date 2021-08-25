@@ -191,7 +191,10 @@ ErrCode iMOAB_Finalize()
 {
     context.refCountMB--;
 
-    if( 0 == context.refCountMB ) { delete context.MBI; }
+    if( 0 == context.refCountMB )
+    {
+        delete context.MBI;
+    }
 
     return MB_SUCCESS;
 }
@@ -273,7 +276,7 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
     return 0;
 }
 
-ErrCode iMOAB_RegisterFortranApplication( const iMOAB_String app_name,
+ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* comm,
 #endif
@@ -378,7 +381,10 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     {
         int pidx = mit->second;
 
-        if( *pid == pidx ) { break; }
+        if( *pid == pidx )
+        {
+            break;
+        }
     }
 
     context.appIdMap.erase( mit );
@@ -388,7 +394,10 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
     {
         int pidx = mit1->second;
 
-        if( *pid == pidx ) { break; }
+        if( *pid == pidx )
+        {
+            break;
+        }
     }
 
     context.appIdCompMap.erase( mit1 );
@@ -429,7 +438,10 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
 #ifdef MOAB_HAVE_HDF5
     std::string filen( filename );
 
-    if( filename_length < (int)strlen( filename ) ) { filen = filen.substr( 0, filename_length ); }
+    if( filename_length < (int)strlen( filename ) )
+    {
+        filen = filen.substr( 0, filename_length );
+    }
 
     *num_global_vertices = 0;
     int edges            = 0;
@@ -469,27 +481,60 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
         struct mhdf_ElemDesc* el_desc = &( data->elems[i] );
         struct mhdf_EntDesc* ent_d    = &( el_desc->desc );
 
-        if( 0 == strcmp( el_desc->type, mhdf_EDGE_TYPE_NAME ) ) { edges += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_EDGE_TYPE_NAME ) )
+        {
+            edges += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_TRI_TYPE_NAME ) ) { faces += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_TRI_TYPE_NAME ) )
+        {
+            faces += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_QUAD_TYPE_NAME ) ) { faces += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_QUAD_TYPE_NAME ) )
+        {
+            faces += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_POLYGON_TYPE_NAME ) ) { faces += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_POLYGON_TYPE_NAME ) )
+        {
+            faces += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_TET_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_TET_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_PYRAMID_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_PYRAMID_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_PRISM_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_PRISM_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mdhf_KNIFE_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mdhf_KNIFE_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mdhf_HEX_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mdhf_HEX_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_POLYHEDRON_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_POLYHEDRON_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
 
-        if( 0 == strcmp( el_desc->type, mhdf_SEPTAHEDRON_TYPE_NAME ) ) { regions += ent_d->count; }
+        if( 0 == strcmp( el_desc->type, mhdf_SEPTAHEDRON_TYPE_NAME ) )
+        {
+            regions += ent_d->count;
+        }
     }
 
     *num_parts = data->numEntSets[0];
@@ -655,7 +700,10 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
     std::string pw( "PARALLEL=WRITE_PART" );
     found = write_opts.find( pw );
 
-    if( found != std::string::npos ) { newopts << "PARALLEL_COMM=" << *pid << ";"; }
+    if( found != std::string::npos )
+    {
+        newopts << "PARALLEL_COMM=" << *pid << ";";
+    }
 
 #endif
 
@@ -663,6 +711,20 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
 
     // Now let us actually write the file to disk with appropriate options
     ErrorCode rval = context.MBI->write_file( filename, 0, newopts.str().c_str(), &context.appDatas[*pid].file_set, 1 );CHKERRVAL( rval );
+
+    return 0;
+}
+
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length )
+{
+    std::ostringstream file_name;
+    int rank = 0;
+#ifdef MOAB_HAVE_MPI
+    rank = context.pcomms[*pid]->rank();
+#endif
+    file_name << prefix << "_" << rank << ".h5m";
+    // Now let us actually write the file to disk with appropriate options
+    ErrorCode rval = context.MBI->write_file( file_name.str().c_str(), 0, 0, &context.appDatas[*pid].file_set, 1 );CHKERRVAL( rval );
 
     return 0;
 }
@@ -849,7 +911,10 @@ ErrCode iMOAB_GetVertexID( iMOAB_AppID pid, int* vertices_length, iMOAB_GlobalID
 {
     Range& verts = context.appDatas[*pid].all_verts;
 
-    if( (int)verts.size() != *vertices_length ) { return 1; }  // problem with array length
+    if( (int)verts.size() != *vertices_length )
+    {
+        return 1;
+    }  // problem with array length
 
     // global id tag is context.globalID_tag
     ErrorCode rval = context.MBI->tag_get_data( context.globalID_tag, verts, global_vertex_ID );CHKERRVAL( rval );
@@ -869,12 +934,18 @@ ErrCode iMOAB_GetVertexOwnership( iMOAB_AppID pid, int* vertices_length, int* vi
         ErrorCode rval = pco->get_owner( *vit, visible_global_rank_ID[i] );CHKERRVAL( rval );
     }
 
-    if( i != *vertices_length ) { return 1; }  // warning array allocation problem
+    if( i != *vertices_length )
+    {
+        return 1;
+    }  // warning array allocation problem
 
 #else
 
     /* everything owned by proc 0 */
-    if( (int)verts.size() != *vertices_length ) { return 1; }  // warning array allocation problem
+    if( (int)verts.size() != *vertices_length )
+    {
+        return 1;
+    }  // warning array allocation problem
 
     for( Range::iterator vit = verts.begin(); vit != verts.end(); vit++, i++ )
     {
@@ -890,7 +961,10 @@ ErrCode iMOAB_GetVisibleVerticesCoordinates( iMOAB_AppID pid, int* coords_length
     Range& verts = context.appDatas[*pid].all_verts;
 
     // interleaved coordinates, so that means deep copy anyway
-    if( *coords_length != 3 * (int)verts.size() ) { return 1; }
+    if( *coords_length != 3 * (int)verts.size() )
+    {
+        return 1;
+    }
 
     ErrorCode rval = context.MBI->get_coords( verts, coordinates );CHKERRVAL( rval );
 
@@ -903,7 +977,10 @@ ErrCode iMOAB_GetBlockID( iMOAB_AppID pid, int* block_length, iMOAB_GlobalID* gl
     // will actually return material set tag value for global
     Range& matSets = context.appDatas[*pid].mat_sets;
 
-    if( *block_length != (int)matSets.size() ) { return 1; }
+    if( *block_length != (int)matSets.size() )
+    {
+        return 1;
+    }
 
     // return material set tag gtags[0 is material set tag
     ErrorCode rval = context.MBI->tag_get_data( context.material_tag, matSets, global_block_IDs );CHKERRVAL( rval );
@@ -924,18 +1001,27 @@ ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
     std::map< int, int >& matMap      = context.appDatas[*pid].matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = context.appDatas[*pid].mat_sets[blockIndex];
     Range blo_elems;
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, blo_elems );
 
-    if( MB_SUCCESS != rval || blo_elems.empty() ) { return 1; }
+    if( MB_SUCCESS != rval || blo_elems.empty() )
+    {
+        return 1;
+    }
 
     EntityType type = context.MBI->type_from_handle( blo_elems[0] );
 
-    if( !blo_elems.all_of_type( type ) ) { return 1; }  // not all of same  type
+    if( !blo_elems.all_of_type( type ) )
+    {
+        return 1;
+    }  // not all of same  type
 
     const EntityHandle* conn = NULL;
     int num_verts            = 0;
@@ -984,9 +1070,15 @@ ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements
             EntityHandle eh = *eit;
             int index       = data.primary_elems.index( eh );
 
-            if( -1 == index ) { return 1; }
+            if( -1 == index )
+            {
+                return 1;
+            }
 
-            if( -1 >= *num_visible_elements ) { return 1; }
+            if( -1 >= *num_visible_elements )
+            {
+                return 1;
+            }
 
             block_IDs[index] = valMatTag;
         }
@@ -1002,7 +1094,10 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
     std::map< int, int >& matMap      = data.matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = data.mat_sets[blockIndex];
@@ -1010,18 +1105,27 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
 
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, elems );CHKERRVAL( rval );
 
-    if( elems.empty() ) { return 1; }
+    if( elems.empty() )
+    {
+        return 1;
+    }
 
     std::vector< EntityHandle > vconnect;
     rval = context.MBI->get_connectivity( &elems[0], elems.size(), vconnect );CHKERRVAL( rval );
 
-    if( *connectivity_length != (int)vconnect.size() ) { return 1; }  // mismatched sizes
+    if( *connectivity_length != (int)vconnect.size() )
+    {
+        return 1;
+    }  // mismatched sizes
 
     for( int i = 0; i < *connectivity_length; i++ )
     {
         int inx = data.all_verts.index( vconnect[i] );
 
-        if( -1 == inx ) { return 1; }  // error, vertex not in local range
+        if( -1 == inx )
+        {
+            return 1;
+        }  // error, vertex not in local range
 
         element_connectivity[i] = inx;
     }
@@ -1042,13 +1146,19 @@ ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index
 
     ErrorCode rval = context.MBI->get_connectivity( eh, conn, num_nodes );CHKERRVAL( rval );
 
-    if( *connectivity_length < num_nodes ) { return 1; }  // wrong number of vertices
+    if( *connectivity_length < num_nodes )
+    {
+        return 1;
+    }  // wrong number of vertices
 
     for( int i = 0; i < num_nodes; i++ )
     {
         int index = data.all_verts.index( conn[i] );
 
-        if( -1 == index ) { return 1; }
+        if( -1 == index )
+        {
+            return 1;
+        }
 
         element_connectivity[i] = index;
     }
@@ -1065,7 +1175,10 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
 
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = context.appDatas[*pid].mat_sets[blockIndex];
@@ -1073,9 +1186,15 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
 
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, elems );CHKERRVAL( rval );
 
-    if( elems.empty() ) { return 1; }
+    if( elems.empty() )
+    {
+        return 1;
+    }
 
-    if( *num_elements_in_block != (int)elems.size() ) { return 1; }  // bad memory allocation
+    if( *num_elements_in_block != (int)elems.size() )
+    {
+        return 1;
+    }  // bad memory allocation
 
     int i = 0;
 #ifdef MOAB_HAVE_MPI
@@ -1102,16 +1221,25 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
 
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
 
-    if( it == matMap.end() ) { return 1; }  // error in finding block with id
+    if( it == matMap.end() )
+    {
+        return 1;
+    }  // error in finding block with id
 
     int blockIndex          = matMap[*global_block_ID];
     EntityHandle matMeshSet = data.mat_sets[blockIndex];
     Range elems;
     ErrorCode rval = context.MBI->get_entities_by_handle( matMeshSet, elems );CHKERRVAL( rval );
 
-    if( elems.empty() ) { return 1; }
+    if( elems.empty() )
+    {
+        return 1;
+    }
 
-    if( *num_elements_in_block != (int)elems.size() ) { return 1; }  // bad memory allocation
+    if( *num_elements_in_block != (int)elems.size() )
+    {
+        return 1;
+    }  // bad memory allocation
 
     rval = context.MBI->tag_get_data( context.globalID_tag, elems, global_element_ID );CHKERRVAL( rval );
 
@@ -1120,7 +1248,10 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
     {
         local_element_ID[i] = data.primary_elems.index( elems[i] );
 
-        if( -1 == local_element_ID[i] ) { return 1; }  // error, not in local primary elements
+        if( -1 == local_element_ID[i] )
+        {
+            return 1;
+        }  // error, not in local primary elements
     }
 
     return 0;
@@ -1168,7 +1299,10 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
                 // get local element id
                 local_element_ID[index] = data.primary_elems.index( primaryEnt );
 
-                if( -1 == local_element_ID[index] ) { return 1; }  // did not find the element locally
+                if( -1 == local_element_ID[index] )
+                {
+                    return 1;
+                }  // did not find the element locally
 
                 int side_number, sense, offset;
                 rval = context.MBI->side_number( primaryEnt, subent, side_number, sense, offset );CHKERRVAL( rval );
@@ -1180,7 +1314,10 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
         }
     }
 
-    if( index != *surface_BC_length ) { return 1; }  // error in array allocations
+    if( index != *surface_BC_length )
+    {
+        return 1;
+    }  // error in array allocations
 
     return 0;
 }
@@ -1214,14 +1351,20 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
             global_vertext_ID[index] = vgid;*/
             local_vertex_ID[index] = data.all_verts.index( vt );
 
-            if( -1 == local_vertex_ID[index] ) { return 1; }  // vertex was not found
+            if( -1 == local_vertex_ID[index] )
+            {
+                return 1;
+            }  // vertex was not found
 
             boundary_condition_value[index] = diriVal;
             index++;
         }
     }
 
-    if( *vertex_BC_length != index ) { return 1; }  // array allocation issue
+    if( *vertex_BC_length != index )
+    {
+        return 1;
+    }  // array allocation issue
 
     return 0;
 }
@@ -1230,7 +1373,10 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
                                 int* components_per_entity, int* tag_index, int tag_storage_name_length )
 {
     // see if the tag is already existing, and if yes, check the type, length
-    if( *tag_type < 0 || *tag_type > 5 ) { return 1; }  // we have 6 types of tags supported so far
+    if( *tag_type < 0 || *tag_type > 5 )
+    {
+        return 1;
+    }  // we have 6 types of tags supported so far
 
     DataType tagDataType;
     TagType tagType;
@@ -1355,7 +1501,10 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1365,7 +1514,10 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );
 
-    if( MB_SUCCESS != rval || dtype != MB_TYPE_INTEGER ) { return 1; }
+    if( MB_SUCCESS != rval || dtype != MB_TYPE_INTEGER )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_set;
@@ -1401,11 +1553,17 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     ErrorCode rval;
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    if( tag_storage_name_length < (int)tag_name.length() )
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1415,7 +1573,10 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );CHKERRVAL( rval );
 
-    if( dtype != MB_TYPE_INTEGER ) { return 1; }
+    if( dtype != MB_TYPE_INTEGER )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_get;
@@ -1452,11 +1613,17 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     // exactly the same code as for int tag :) maybe should check the type of tag too
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    if( tag_storage_name_length < (int)tag_name.length() )
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1466,7 +1633,10 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );
 
-    if( MB_SUCCESS != rval || dtype != MB_TYPE_DOUBLE ) { return 1; }
+    if( MB_SUCCESS != rval || dtype != MB_TYPE_DOUBLE )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_set = NULL;
@@ -1482,7 +1652,10 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
 
     int nents_to_be_set = *num_tag_storage_length / tagLength;
 
-    if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 ) { return 1; }  // to many entities to be set
+    if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
+    {
+        return 1;
+    }  // to many entities to be set
 
     // restrict the range; everything is contiguous; or not?
     // Range contig_range ( * ( ents_to_set->begin() ), * ( ents_to_set->begin() + nents_to_be_set -
@@ -1500,11 +1673,17 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     // exactly the same code, except tag type check
     std::string tag_name( tag_storage_name );
 
-    if( tag_storage_name_length < (int)tag_name.length() ) { tag_name = tag_name.substr( 0, tag_storage_name_length ); }
+    if( tag_storage_name_length < (int)tag_name.length() )
+    {
+        tag_name = tag_name.substr( 0, tag_storage_name_length );
+    }
 
     appData& data = context.appDatas[*pid];
 
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() ) { return 1; }  // tag not defined
+    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
+    {
+        return 1;
+    }  // tag not defined
 
     Tag tag = data.tagMap[tag_name];
 
@@ -1514,7 +1693,10 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     DataType dtype;
     rval = context.MBI->tag_get_data_type( tag, dtype );CHKERRVAL( rval );
 
-    if( dtype != MB_TYPE_DOUBLE ) { return 1; }
+    if( dtype != MB_TYPE_DOUBLE )
+    {
+        return 1;
+    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_get = NULL;
@@ -1530,7 +1712,10 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
 
     int nents_to_get = *num_tag_storage_length / tagLength;
 
-    if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 ) { return 1; }  // to many entities to get
+    if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
+    {
+        return 1;
+    }  // to many entities to get
 
     // restrict the range; everything is contiguous; or not?
 
@@ -1550,12 +1735,18 @@ ErrCode iMOAB_SynchronizeTags( iMOAB_AppID pid, int* num_tag, int* tag_indices, 
 
     for( int i = 0; i < *num_tag; i++ )
     {
-        if( tag_indices[i] < 0 || tag_indices[i] >= (int)data.tagList.size() ) { return 1; }  // error in tag index
+        if( tag_indices[i] < 0 || tag_indices[i] >= (int)data.tagList.size() )
+        {
+            return 1;
+        }  // error in tag index
 
         tags.push_back( data.tagList[tag_indices[i]] );
     }
 
-    if( *ent_type == 0 ) { ent_exchange = data.all_verts; }
+    if( *ent_type == 0 )
+    {
+        ent_exchange = data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ent_exchange = data.primary_elems;
@@ -1586,11 +1777,17 @@ ErrCode iMOAB_ReduceTagsMax( iMOAB_AppID pid, int* tag_index, int* ent_type )
     appData& data = context.appDatas[*pid];
     Range ent_exchange;
 
-    if( *tag_index < 0 || *tag_index >= (int)data.tagList.size() ) { return 1; }  // error in tag index
+    if( *tag_index < 0 || *tag_index >= (int)data.tagList.size() )
+    {
+        return 1;
+    }  // error in tag index
 
     Tag tagh = data.tagList[*tag_index];
 
-    if( *ent_type == 0 ) { ent_exchange = data.all_verts; }
+    if( *ent_type == 0 )
+    {
+        ent_exchange = data.all_verts;
+    }
     else if( *ent_type == 1 )
     {
         ent_exchange = data.primary_elems;
@@ -1626,7 +1823,10 @@ ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid, iMOAB_LocalID* local_index, 
     Range adjs;
     rval = mtu.get_bridge_adjacencies( eh, data.dimension - 1, data.dimension, adjs );CHKERRVAL( rval );
 
-    if( *num_adjacent_elements < (int)adjs.size() ) { return 1; }  // not dimensioned correctly
+    if( *num_adjacent_elements < (int)adjs.size() )
+    {
+        return 1;
+    }  // not dimensioned correctly
 
     *num_adjacent_elements = (int)adjs.size();
 
@@ -1740,8 +1940,14 @@ ErrCode iMOAB_SetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
 ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_global_elems )
 {
     appData& data = context.appDatas[*pid];
-    if( NULL != num_global_verts ) { *num_global_verts = data.num_global_vertices; }
-    if( NULL != num_global_elems ) { *num_global_elems = data.num_global_elements; }
+    if( NULL != num_global_verts )
+    {
+        *num_global_verts = data.num_global_vertices;
+    }
+    if( NULL != num_global_elems )
+    {
+        *num_global_elems = data.num_global_elements;
+    }
 
     return 0;
 }
@@ -1770,7 +1976,10 @@ ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marke
         rval = context.MBI->tag_get_handle( "__sharedmarker", 1, MB_TYPE_INTEGER, stag, MB_TAG_CREAT | MB_TAG_DENSE,
                                             &dum_id );CHKERRVAL( rval );
 
-        if( *num_verts > (int)data.local_verts.size() ) { return 1; }  // we are not setting the size
+        if( *num_verts > (int)data.local_verts.size() )
+        {
+            return 1;
+        }  // we are not setting the size
 
         rval = context.MBI->tag_set_data( stag, data.local_verts, (void*)marker );CHKERRVAL( rval );  // assumes integer tag
 
@@ -1802,7 +2011,10 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
     ErrorCode rval;
 
     // verify we have valid ghost layers input specified. If invalid, exit quick.
-    if( *num_ghost_layers <= 0 ) { return 0; }  // nothing to do
+    if( *num_ghost_layers <= 0 )
+    {
+        return 0;
+    }  // nothing to do
 
     appData& data     = context.appDatas[*pid];
     ParallelComm* pco = context.pcomms[*pid];
@@ -1840,7 +2052,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         new ParCommGraph( *global, senderGroup, *receivingGroup, context.appDatas[*pid].global_id, *rcompid );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    context.appDatas[*pid].pgraph[-1] = cgraph;
+    context.appDatas[*pid].pgraph[*rcompid] = cgraph;
 
     int sender_rank = -1;
     MPI_Comm_rank( sender, &sender_rank );
@@ -1877,7 +2089,10 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
         }
 #endif
 
-        if( ierr != 0 ) { return 1; }
+        if( ierr != 0 )
+        {
+            return 1;
+        }
 
         // every sender computes the trivial partition, it is cheap, and we need to send it anyway
         // to each sender
@@ -1901,6 +2116,15 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
     return 0;
 }
 
+// fortran wrapper
+ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid,
+        int* method )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    MPI_Group recvGroup = MPI_Group_f2c( (MPI_Fint) *receivingGroup );
+    return iMOAB_SendMesh(pid, &jcomm, &recvGroup, rcompid, method );
+}
+
 ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendingGroup, int* scompid )
 {
     appData& data          = context.appDatas[*pid];
@@ -1920,7 +2144,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
         new ParCommGraph( *global, *sendingGroup, receiverGroup, *scompid, context.appDatas[*pid].global_id );
     // TODO we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    context.appDatas[*pid].pgraph[-1] = cgraph;
+    context.appDatas[*pid].pgraph[*scompid] = cgraph;
 
     int receiver_rank = -1;
     MPI_Comm_rank( receive, &receiver_rank );
@@ -2055,20 +2279,33 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
     return 0;
 }
 
+ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    MPI_Group sendGroup = MPI_Group_f2c( (MPI_Fint) *sendingGroup );
+    return iMOAB_ReceiveMesh( pid, &jcomm, &sendGroup, scompid );
+}
+
 ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
                               int tag_storage_name_length )
 {
 
     appData& data                               = context.appDatas[*pid];
     std::map< int, ParCommGraph* >::iterator mt = data.pgraph.find( *context_id );
-    if( mt == data.pgraph.end() ) { return 1; }
+    if( mt == data.pgraph.end() )
+    {
+        return 1;
+    }
     ParCommGraph* cgraph = mt->second;
     ParallelComm* pco    = context.pcomms[*pid];
     Range owned          = data.owned_elems;
     ErrorCode rval;
     EntityHandle cover_set;
 
-    if( data.point_cloud ) { owned = data.local_verts; }
+    if( data.point_cloud )
+    {
+        owned = data.local_verts;
+    }
     // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for
     // after atm ocn intx, from phys (case from imoab_phatm_ocn_coupler.cpp) get then the cover set
     // from ints remapper
@@ -2110,7 +2347,10 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     {
         Tag tagHandle;
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         tagHandles.push_back( tagHandle );
     }
 
@@ -2122,13 +2362,24 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     return 0;
 }
 
+// fortran wrapper
+ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
+                              int tag_storage_name_length )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    return iMOAB_SendElementTag(pid, tag_storage_name, &jcomm, context_id, tag_storage_name_length);
+}
+
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
                                  int tag_storage_name_length )
 {
     appData& data = context.appDatas[*pid];
 
     std::map< int, ParCommGraph* >::iterator mt = data.pgraph.find( *context_id );
-    if( mt == data.pgraph.end() ) { return 1; }
+    if( mt == data.pgraph.end() )
+    {
+        return 1;
+    }
     ParCommGraph* cgraph = mt->second;
 
     ParallelComm* pco = context.pcomms[*pid];
@@ -2144,7 +2395,10 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     {
         rval = context.MBI->get_entities_by_dimension( cover_set, 2, owned );CHKERRVAL( rval );
     }
-    if( data.point_cloud ) { owned = data.local_verts; }
+    if( data.point_cloud )
+    {
+        owned = data.local_verts;
+    }
     // another possibility is for par comm graph to be computed from iMOAB_ComputeCommGraph, for
     // after atm ocn intx, from phys (case from imoab_phatm_ocn_coupler.cpp) get then the cover set
     // from ints remapper
@@ -2178,7 +2432,10 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     {
         Tag tagHandle;
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         tagHandles.push_back( tagHandle );
     }
 
@@ -2196,7 +2453,13 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
 
     return 0;
 }
-
+ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join,
+        int* context_id,  int tag_storage_name_length )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    return iMOAB_ReceiveElementTag( pid, tag_storage_name, &jcomm,
+          context_id, tag_storage_name_length );
+}
 ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_id )
 {
     // need first to find the pgraph that holds the information we need
@@ -2243,16 +2506,15 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
     TLcomp1.enableWriteAccess();
 
     // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
-    Tag tagType1;
-    rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", tagType1 );CHKERRVAL( rval );
+    Tag gdsTag;
     // find the values on first cell
     int lenTagType1 = 1;
-    if( tagType1 )
+    if( 1 == *type1 || 1 == *type2 )
     {
-        rval = context.MBI->tag_get_length( tagType1, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
+        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
+        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
     }
-    Tag tagType2;
-    rval = context.MBI->tag_get_handle( "GLOBAL_ID", tagType2 );CHKERRVAL( rval );
+    Tag tagType2 = context.MBI->globalId_tag();
 
     std::vector< int > valuesComp1;
     // populate first tuple
@@ -2271,10 +2533,10 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
         Range ents_of_interest;
         if( *type1 == 1 )
         {
-            assert( tagType1 );
+            assert( gdsTag );
             rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
         }
         else if( *type1 == 2 )
         {
@@ -2346,10 +2608,10 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
         Range ents_of_interest;
         if( *type2 == 1 )
         {
-            assert( tagType1 );
+            assert( gdsTag );
             rval = context.MBI->get_entities_by_type( fset2, MBQUAD, ents_of_interest );CHKERRVAL( rval );
             valuesComp2.resize( ents_of_interest.size() * lenTagType1 );
-            rval = context.MBI->tag_get_data( tagType1, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
+            rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &valuesComp2[0] );CHKERRVAL( rval );
         }
         else if( *type2 == 2 )
         {
@@ -2517,6 +2779,17 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
     }
     return 0;
 }
+
+ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
+                                int* group2, int* type1, int* type2, int* comp1, int* comp2 )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
+    MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
+    return iMOAB_ComputeCommGraph( pid1, pid2, &jcomm, &gr1,
+            &gr2, type1, type2, comp1, comp2 );
+}
+
 //#undef VERBOSE
 
 ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
@@ -2588,7 +2861,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 // here)
 //  in the intersection
 ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-                             int* context_id )
+                             int* src_id, int* migr_id, int* context_id )
 {
     // first, based on the scompid and migrcomp, find the parCommGraph corresponding to this
     // exchange
@@ -2603,6 +2876,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     // And based on this one, we will build the newly modified one for coverage
     if( *pid_src >= 0 )
     {
+        default_context_id = *migr_id;  // the other one
+        assert( context.appDatas[*pid_src].global_id == *src_id );
         sendGraph = context.appDatas[*pid_src].pgraph[default_context_id];  // maybe check if it does not exist
 
         // report the sender and receiver tasks in the joint comm
@@ -2617,6 +2892,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     if( *pid_migr >= 0 )
     {
         // find the original one
+        default_context_id = *src_id;
+        assert( context.appDatas[*pid_migr].global_id == *migr_id );
         recvGraph = context.appDatas[*pid_migr].pgraph[default_context_id];
         // report the sender and receiver tasks in the joint comm, from migrated mesh pt of view
         srcSenders = recvGraph->senders();
@@ -2781,12 +3058,23 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     return 0;  // success
 }
 
+ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr,
+        iMOAB_AppID pid_intx, int* src_id, int* migr_id, int* context_id )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    return iMOAB_CoverageGraph(&jcomm,  pid_src,  pid_migr,  pid_intx, src_id, migr_id, context_id );
+}
+
+
 ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix,
                              int length_prefix )
 {
     ParCommGraph* cgraph = context.appDatas[*pid].pgraph[*context_id];
     std::string prefix_str( prefix );
-    if( length_prefix < (int)strlen( prefix ) ) { prefix_str = prefix_str.substr( 0, length_prefix ); }
+    if( length_prefix < (int)strlen( prefix ) )
+    {
+        prefix_str = prefix_str.substr( 0, length_prefix );
+    }
     if( NULL != cgraph )
         cgraph->dump_comm_information( prefix_str, *is_sender );
     else
@@ -2807,14 +3095,14 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 ErrCode iMOAB_LoadMappingWeightsFromFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename, int* owned_dof_ids, int* owned_dof_ids_length, int* row_major_ownership,
-    int solution_weights_identifier_length, int remap_weights_filename_length )
+    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
+    int remap_weights_filename_length )
 {
     assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
     // assert( row_major_ownership != NULL );
 
     ErrorCode rval;
-    bool row_based_partition = ( row_major_ownership != NULL && *row_major_ownership > 0 ? true : false );
+    bool row_based_partition = true;
 
     // Get the source and target data and pcomm objects
     appData& data_intx       = context.appDatas[*pid_intersection];
@@ -2848,27 +3136,332 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
-    // Check that both the DoF ownership array and length are NULL. Here we will assume a trivial partition for the map
-    // If both are non-NULL, then ensure that the length of the array is greater than 0.
-    assert( ( owned_dof_ids == NULL && owned_dof_ids_length == NULL ) ||
-            ( owned_dof_ids != NULL && owned_dof_ids_length != NULL && *owned_dof_ids_length > 0 ) );
-
-    // Invoke the actual call to read in the parallel map
-    if( owned_dof_ids == NULL && owned_dof_ids_length == NULL )
-    {
-        std::vector< int > tmp_owned_ids;
-        rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
-    }
-    else
-    {
-        rval = weightMap->ReadParallelMap( remap_weights_filename,
-                                           std::vector< int >( owned_dof_ids, owned_dof_ids + *owned_dof_ids_length ),
-                                           row_based_partition );CHKERRVAL( rval );
-    }
+    std::vector< int > tmp_owned_ids;  // this will do a trivial row distribution
+    rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
 
     return 0;
 }
 
+#ifdef MOAB_HAVE_MPI
+ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
+        int* join, int* group1, int* group2, int* type, int* comp1, int* comp2, int* direction )
+{
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
+    MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
+    MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
+    return iMOAB_MigrateMapMesh(pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction); 
+}
+ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, MPI_Comm* join, MPI_Group* group1,
+                              MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction )
+{
+    ErrorCode rval = MB_SUCCESS;
+    int localRank = 0, numProcs = 1;
+    MPI_Comm_rank( *join, &localRank );
+    MPI_Comm_size( *join, &numProcs );
+    // instantiate the par comm graph
+    // ParCommGraph::ParCommGraph(MPI_Comm joincomm, MPI_Group group1, MPI_Group group2, int coid1,
+    // int coid2)
+    // here we need to look at direction
+    // this direction is good for atm source -> ocn target coupler example
+
+    ParCommGraph* cgraph = NULL;
+    if( *pid1 >= 0 ) cgraph = new ParCommGraph( *join, *group1, *group2, *comp1, *comp2 );
+    ParCommGraph* cgraph_rev = NULL;
+    if( *pid3 >= 0 ) cgraph_rev = new ParCommGraph( *join, *group2, *group1, *comp2, *comp1 );
+    // we should search if we have another pcomm with the same comp ids in the list already
+    // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
+    if( *pid1 >= 0 ) context.appDatas[*pid1].pgraph[*comp2] = cgraph;      // the context will be the other comp
+    if( *pid3 >= 0 ) context.appDatas[*pid3].pgraph[*comp1] = cgraph_rev;  // from 2 to 1
+    // each model has a list of global ids that will need to be sent by gs to rendezvous the other
+    // model on the joint comm
+    TupleList TLcomp1;
+    TLcomp1.initialize( 2, 0, 0, 0, 0 );  // to proc, marker
+    TupleList TLcomp2;
+    TLcomp2.initialize( 2, 0, 0, 0, 0 );  // to proc, marker
+    // will push_back a new tuple, if needed
+
+    TLcomp1.enableWriteAccess();
+
+    // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
+    Tag gdsTag;
+
+    // find the values on first cell
+    int lenTagType1 = 1;
+    if( *type == 1 )
+    {
+        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
+        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
+    }
+    Tag tagType2 = context.MBI->globalId_tag();
+    ;
+
+    std::vector< int > valuesComp1;
+
+    // populate first tuple
+    Range ents_of_interest;  // will be filled with entities on pid1, that need to be distributed,
+                             // rearranged in split_ranges map
+    if( *pid1 >= 0 )
+    {
+        appData& data1     = context.appDatas[*pid1];
+        EntityHandle fset1 = data1.file_set;
+
+        if( *type == 1 )
+        {
+            assert( gdsTag );
+            rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
+            valuesComp1.resize( ents_of_interest.size() * lenTagType1 );
+            rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );
+        }
+        else if( *type == 2 )
+        {
+            rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
+            valuesComp1.resize( ents_of_interest.size() );
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
+        }
+        else if( *type == 3 )  // for FV meshes, just get the global id of cell
+        {
+            rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL( rval );
+            valuesComp1.resize( ents_of_interest.size() );
+            rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &valuesComp1[0] );CHKERRVAL( rval );  // just global ids
+        }
+        else
+        {
+            CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2 or 3
+        }
+        // now fill the tuple list with info and markers
+        // because we will send only the ids, order and compress the list
+        std::set< int > uniq( valuesComp1.begin(), valuesComp1.end() );
+        TLcomp1.resize( uniq.size() );
+        for( std::set< int >::iterator sit = uniq.begin(); sit != uniq.end(); sit++ )
+        {
+            // to proc, marker, element local index, index in el
+            int marker               = *sit;
+            int to_proc              = marker % numProcs;
+            int n                    = TLcomp1.get_n();
+            TLcomp1.vi_wr[2 * n]     = to_proc;  // send to processor
+            TLcomp1.vi_wr[2 * n + 1] = marker;
+            TLcomp1.inc_n();
+        }
+    }
+
+    ProcConfig pc( *join );  // proc config does the crystal router
+    pc.crystal_router()->gs_transfer( 1, TLcomp1,
+                                      0 );  // communication towards joint tasks, with markers
+    // sort by value (key 1)
+#ifdef VERBOSE
+    std::stringstream ff1;
+    ff1 << "TLcomp1_" << localRank << ".txt";
+    TLcomp1.print_to_file( ff1.str().c_str() );  // it will append!
+#endif
+    moab::TupleList::buffer sort_buffer;
+    sort_buffer.buffer_init( TLcomp1.get_n() );
+    TLcomp1.sort( 1, &sort_buffer );
+    sort_buffer.reset();
+#ifdef VERBOSE
+    // after sorting
+    TLcomp1.print_to_file( ff1.str().c_str() );  // it will append!
+#endif
+    // do the same, for the other component, number2, with type2
+    // start copy
+    TLcomp2.enableWriteAccess();
+
+    moab::TempestOnlineMap* weightMap = NULL;  // declare it outside, but it will make sense only for *pid >= 0
+    // we know that :) (or *pid2 >= 0, it means we are on the coupler PEs, read map exists, and coupler procs exist)
+    // populate second tuple with ids  from read map: we need row_gdofmap and col_gdofmap
+    std::vector< int > valuesComp2;
+    if( *pid2 >= 0 )  // we are now on coupler, map side
+    {
+        appData& data2           = context.appDatas[*pid2];
+        TempestMapAppData& tdata = data2.tempestData;
+        // should be only one map, read from file
+        assert( tdata.weightMaps.size() == 1 );
+        // maybe we need to check it is the map we expect
+        weightMap = tdata.weightMaps.begin()->second;
+        // std::vector<int> ids_of_interest;
+        // do a deep copy of the ids of interest: row ids or col ids, target or source direction
+        if( *direction == 1 )
+        {
+            // we are interested in col ids, source
+            // new method from moab::TempestOnlineMap
+            rval = weightMap->fill_col_ids( valuesComp2 );CHKERRVAL( rval );
+        }
+        else if( *direction == 2 )
+        {
+            // we are interested in row ids, for target ids
+            rval = weightMap->fill_row_ids( valuesComp2 );CHKERRVAL( rval );
+        }
+        //
+
+        // now fill the tuple list with info and markers
+        std::set< int > uniq( valuesComp2.begin(), valuesComp2.end() );
+        TLcomp2.resize( uniq.size() );
+        for( std::set< int >::iterator sit = uniq.begin(); sit != uniq.end(); sit++ )
+        {
+            // to proc, marker, element local index, index in el
+            int marker               = *sit;
+            int to_proc              = marker % numProcs;
+            int n                    = TLcomp2.get_n();
+            TLcomp2.vi_wr[2 * n]     = to_proc;  // send to processor
+            TLcomp2.vi_wr[2 * n + 1] = marker;
+            TLcomp2.inc_n();
+        }
+    }
+    pc.crystal_router()->gs_transfer( 1, TLcomp2,
+                                      0 );  // communication towards joint tasks, with markers
+    // sort by value (key 1)
+    // in the rendez-vous approach, markers meet at meet point (rendez-vous) processor marker % nprocs
+#ifdef VERBOSE
+    std::stringstream ff2;
+    ff2 << "TLcomp2_" << localRank << ".txt";
+    TLcomp2.print_to_file( ff2.str().c_str() );
+#endif
+    sort_buffer.buffer_reserve( TLcomp2.get_n() );
+    TLcomp2.sort( 1, &sort_buffer );
+    sort_buffer.reset();
+    // end copy
+#ifdef VERBOSE
+    TLcomp2.print_to_file( ff2.str().c_str() );
+#endif
+    // need to send back the info, from the rendezvous point, for each of the values
+    /* so go over each value, on local process in joint communicator,
+
+    now have to send back the info needed for communication;
+     loop in in sync over both TLComp1 and TLComp2, in local process;
+      So, build new tuple lists, to send synchronous communication
+      populate them at the same time, based on marker, that is indexed
+    */
+
+    TupleList TLBackToComp1;
+    TLBackToComp1.initialize( 3, 0, 0, 0, 0 );  // to proc, marker, from proc on comp2,
+    TLBackToComp1.enableWriteAccess();
+
+    TupleList TLBackToComp2;
+    TLBackToComp2.initialize( 3, 0, 0, 0, 0 );  // to proc, marker,  from proc,
+    TLBackToComp2.enableWriteAccess();
+
+    int n1 = TLcomp1.get_n();
+    int n2 = TLcomp2.get_n();
+
+    int indexInTLComp1 = 0;
+    int indexInTLComp2 = 0;  // advance both, according to the marker
+    if( n1 > 0 && n2 > 0 )
+    {
+
+        while( indexInTLComp1 < n1 && indexInTLComp2 < n2 )  // if any is over, we are done
+        {
+            int currentValue1 = TLcomp1.vi_rd[2 * indexInTLComp1 + 1];
+            int currentValue2 = TLcomp2.vi_rd[2 * indexInTLComp2 + 1];
+            if( currentValue1 < currentValue2 )
+            {
+                // we have a big problem; basically, we are saying that
+                // dof currentValue is on one model and not on the other
+                // std::cout << " currentValue1:" << currentValue1 << " missing in comp2" << "\n";
+                indexInTLComp1++;
+                continue;
+            }
+            if( currentValue1 > currentValue2 )
+            {
+                // std::cout << " currentValue2:" << currentValue2 << " missing in comp1" << "\n";
+                indexInTLComp2++;
+                continue;
+            }
+            int size1 = 1;
+            int size2 = 1;
+            while( indexInTLComp1 + size1 < n1 && currentValue1 == TLcomp1.vi_rd[2 * ( indexInTLComp1 + size1 ) + 1] )
+                size1++;
+            while( indexInTLComp2 + size2 < n2 && currentValue2 == TLcomp2.vi_rd[2 * ( indexInTLComp2 + size2 ) + 1] )
+                size2++;
+            // must be found in both lists, find the start and end indices
+            for( int i1 = 0; i1 < size1; i1++ )
+            {
+                for( int i2 = 0; i2 < size2; i2++ )
+                {
+                    // send the info back to components
+                    int n = TLBackToComp1.get_n();
+                    TLBackToComp1.reserve();
+                    TLBackToComp1.vi_wr[3 * n] =
+                        TLcomp1.vi_rd[2 * ( indexInTLComp1 + i1 )];  // send back to the proc marker
+                                                                     // came from, info from comp2
+                    TLBackToComp1.vi_wr[3 * n + 1] = currentValue1;  // initial value (resend?)
+                    TLBackToComp1.vi_wr[3 * n + 2] = TLcomp2.vi_rd[2 * ( indexInTLComp2 + i2 )];  // from proc on comp2
+                    n                              = TLBackToComp2.get_n();
+                    TLBackToComp2.reserve();
+                    TLBackToComp2.vi_wr[3 * n] =
+                        TLcomp2.vi_rd[2 * ( indexInTLComp2 + i2 )];  // send back info to original
+                    TLBackToComp2.vi_wr[3 * n + 1] = currentValue1;  // initial value (resend?)
+                    TLBackToComp2.vi_wr[3 * n + 2] = TLcomp1.vi_rd[2 * ( indexInTLComp1 + i1 )];  // from proc on comp1
+                    // what if there are repeated markers in TLcomp2? increase just index2
+                }
+            }
+            indexInTLComp1 += size1;
+            indexInTLComp2 += size2;
+        }
+    }
+    pc.crystal_router()->gs_transfer( 1, TLBackToComp1, 0 );  // communication towards original tasks, with info about
+    pc.crystal_router()->gs_transfer( 1, TLBackToComp2, 0 );
+
+    TupleList TLv;  // vertices
+    TupleList TLc;  // cells if needed (not type 2)
+
+    if( *pid1 >= 0 )
+    {
+        // we are on original comp 1 tasks
+        // before ordering
+        // now for each value in TLBackToComp1.vi_rd[3*i+1], on current proc, we know the
+        // processors it communicates with
+#ifdef VERBOSE
+        std::stringstream f1;
+        f1 << "TLBack1_" << localRank << ".txt";
+        TLBackToComp1.print_to_file( f1.str().c_str() );
+#endif
+        // so we are now on pid1, we know now each marker were it has to go
+        // add a new method to ParCommGraph, to set up the split_ranges and involved_IDs_map
+        rval = cgraph->set_split_ranges( *comp1, TLBackToComp1, valuesComp1, lenTagType1, ents_of_interest, *type );CHKERRVAL( rval );
+        // we can just send vertices and elements, with crystal routers;
+        // on the receiving end, make sure they are not duplicated, by looking at the global id
+        // if *type is 1, also send global_dofs tag in the element tuple
+        rval = cgraph->form_tuples_to_migrate_mesh( context.MBI, TLv, TLc, *type, lenTagType1 );CHKERRVAL( rval );
+    }
+    pc.crystal_router()->gs_transfer( 1, TLv, 0 );  // communication towards coupler tasks, with mesh vertices
+    if( *type != 2 ) pc.crystal_router()->gs_transfer( 1, TLc, 0 );  // those are cells
+
+    if( *pid3 >= 0 )  // will receive the mesh, on coupler pes!
+    {
+        appData& data3     = context.appDatas[*pid3];
+        EntityHandle fset3 = data3.file_set;
+        Range primary_ents3;                 // vertices for type 2, cells of dim 2 for type 1 or 3
+        std::vector< int > values_entities;  // will be the size of primary_ents3 * lenTagType1
+        rval = cgraph_rev->form_mesh_from_tuples( context.MBI, TLv, TLc, *type, lenTagType1, fset3, primary_ents3,
+                                                  values_entities );CHKERRVAL( rval );
+        iMOAB_UpdateMeshInfo( pid3 );
+        int ndofPerEl = 1;
+        if( 1 == *type ) ndofPerEl = (int)( sqrt( lenTagType1 ) );
+        // because we are on the coupler, we know that the read map pid2 exists
+        assert( *pid2 >= 0 );
+        appData& dataIntx        = context.appDatas[*pid2];
+        TempestMapAppData& tdata = dataIntx.tempestData;
+
+        // if we are on source coverage, direction 1, we can set covering mesh, covering cells
+        if( 1 == *direction )
+        {
+            tdata.pid_src = pid3;
+            tdata.remapper->SetMeshSet( Remapper::CoveringMesh, fset3, primary_ents3 );
+            weightMap->SetSourceNDofsPerElement( ndofPerEl );
+            weightMap->set_col_dc_dofs( values_entities );  // will set col_dtoc_dofmap
+        }
+        // if we are on target, we can set the target cells
+        else
+        {
+            tdata.pid_dest = pid3;
+            tdata.remapper->SetMeshSet( Remapper::TargetMesh, fset3, primary_ents3 );
+            weightMap->SetDestinationNDofsPerElement( ndofPerEl );
+            weightMap->set_row_dc_dofs( values_entities );  // will set row_dtoc_dofmap
+        }
+    }
+
+    return 0;
+}
+#endif // #ifdef MOAB_HAVE_MPI
 ErrCode iMOAB_WriteMappingWeightsToFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
@@ -3063,7 +3656,10 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         global_areas[1] = srctgt_areas_glb[1];
 
 #ifdef MOAB_HAVE_MPI
-        if( is_parallel ) { MPI_Reduce( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, 0, pco_intx->comm() ); }
+        if( is_parallel )
+        {
+            MPI_Reduce( &local_area, &global_areas[2], 1, MPI_DOUBLE, MPI_SUM, 0, pco_intx->comm() );
+        }
         else
         {
             global_areas[2] = local_area;
@@ -3287,10 +3883,16 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
     {
         Tag tagHandle;
         rval = context.MBI->tag_get_handle( srcNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         srcTagHandles.push_back( tagHandle );
         rval = context.MBI->tag_get_handle( tgtNames[i].c_str(), tagHandle );
-        if( MB_SUCCESS != rval || NULL == tagHandle ) { return 1; }
+        if( MB_SUCCESS != rval || NULL == tagHandle )
+        {
+            return 1;
+        }
         tgtTagHandles.push_back( tagHandle );
     }
 
