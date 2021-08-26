@@ -1066,7 +1066,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius
 
     // Note: lots of communication possible, if mesh is distributed very differently
 #ifdef MOAB_HAVE_MPI
-    if( is_parallel && size > 1 )
+    if( is_parallel )
     {
         rval = mbintx->build_processor_euler_boxes( m_target_set, local_verts );MB_CHK_ERR( rval );
 

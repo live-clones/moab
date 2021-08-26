@@ -836,18 +836,18 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
 // completely the second local mesh set (in intersection)
 ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distributed_set, EntityHandle& covering_set )
 {
+    // primary element came from, in the joint communicator ; this will be forwarded by coverage
+    // mesh needed for tag migrate later on
+    int defaultInt = -1;  // no processor, so it was not migrated from somewhere else
+    ErrorCode rval = mb->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER, orgSendProcTag,
+                                         MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
+
     assert( parcomm != NULL );
     if( 1 == parcomm->proc_config().proc_size() )
     {
         covering_set = initial_distributed_set;  // nothing to move around, it must be serial
         return MB_SUCCESS;
     }
-
-    // primary element came from, in the joint communicator ; this will be forwarded by coverage
-    // mesh needed for tag migrate later on
-    int defaultInt = -1;  // no processor, so it was not migrated from somewhere else
-    ErrorCode rval = mb->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER, orgSendProcTag,
-                                         MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
 
     // mark on the coverage mesh where this element came from
     Tag sendProcTag;  /// for coverage mesh, will store the sender
