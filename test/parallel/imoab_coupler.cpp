@@ -270,6 +270,13 @@ int main( int argc, char* argv[] )
         setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
                                         &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
+    if( couComm != MPI_COMM_NULL && 1 == n )
+    {  // write only for n==1 case
+        char outputFileTgt3[] = "recvAtm.h5m";
+        ierr                  = iMOAB_WriteMesh( cplAtmPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write atm mesh after receiving" )
+    }
 #ifdef GRAPH_INFO
     if( atmComm != MPI_COMM_NULL )
     {
@@ -618,7 +625,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplocn );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
-#ifdef VERBOSE
+//#ifdef VERBOSE
         if( couComm != MPI_COMM_NULL && 1 == n )
         {
             // write only for n==1 case
@@ -627,7 +634,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write recvAtmCoupOcn.h5m to disk" )
         }
-#endif
+//#endif
 
         if( couComm != MPI_COMM_NULL )
         {
