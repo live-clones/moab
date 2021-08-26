@@ -335,14 +335,14 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     int rarr3[6];
     int mpierr = MPI_Reduce(arr3, rarr3, 6, MPI_INT, MPI_MIN, 0, m_pcomm->comm());
 
-    int totalNNZ=0;
-    mpierr = MPI_Reduce(arr3, &totalNNZ, 1, MPI_INT, MPI_SUM, 0, m_pcomm->comm());
+    int total[2];
+    mpierr = MPI_Reduce(arr3, total, 2, MPI_INT, MPI_SUM, 0, m_pcomm->comm());
     if (!rank)
         std::cout << " Rows:(" << rarr3[1] <<", " <<  -rarr3[4] << "), Cols:(" <<
                                   rarr3[2] <<", " <<  -rarr3[5] << "), NNZ:(" <<
-                                  rarr3[0] <<", " <<  -rarr3[3] << "),  total NNZ:" << totalNNZ << "\n";
+                                  rarr3[0] <<", " <<  -rarr3[3] << "),  total NNZ:" << total[0] << " total rows:" << total[1] << "\n";
 #else
-    std::cout << "nr rows: " << nrows << " cols: " << ncols << " non-zeros: " << NNZ << > "\n";
+    std::cout << "nr rows: " << nrows << " cols: " << ncols << " non-zeros: " << NNZ << "\n";
 #endif
 
 #ifdef VERBOSE
