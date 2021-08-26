@@ -237,7 +237,7 @@ int main( int argc, char* argv[] )
         if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov";
-            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix);
+            ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix );
             CHECKIERR( ierr, "failed to write local mesh" );
         }
 #endif
@@ -257,7 +257,7 @@ int main( int argc, char* argv[] )
         if( *cplOcnPID >= 0 )
         {
             char prefix[] = "ocntgt";
-            ierr          = iMOAB_WriteLocalMesh( cplOcnPID, prefix);
+            ierr          = iMOAB_WriteLocalMesh( cplOcnPID, prefix );
             CHECKIERR( ierr, "failed to write local ocean mesh" );
             char outputFileRec[] = "CoupOcn.h5m";
             ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions );
@@ -279,7 +279,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag AnalyticalSolnSrcExact" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1]);
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag Target_proj" );
     }
 
@@ -400,9 +400,8 @@ int main( int argc, char* argv[] )
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( "Apply Scalar projection weights" )
-            ierr =
-                iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(), concat_fieldname,
-                                                    concat_fieldnameT );
+            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(),
+                                                       concat_fieldname, concat_fieldnameT );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
 
@@ -430,7 +429,7 @@ int main( int argc, char* argv[] )
         {
             // need to use ocean comp id for context
             context_id = cmpocn;  // id for ocean on comp
-            ierr = iMOAB_SendElementTag( cplOcnPID, "Target_proj", &ocnCouComm, &context_id );
+            ierr       = iMOAB_SendElementTag( cplOcnPID, "Target_proj", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
@@ -438,8 +437,7 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             context_id = cplocn;  // id for ocean on coupler
-            ierr =
-                iMOAB_ReceiveElementTag( cmpOcnPID, "Target_proj", &ocnCouComm, &context_id );
+            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "Target_proj", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
@@ -477,7 +475,7 @@ int main( int argc, char* argv[] )
                 CHECKIERR( ierr, "failed to define global id tag" );
 
                 int ent_type = 1;
-                ierr = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
+                ierr         = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
                 CHECKIERR( ierr, "failed to get global ids" );
                 ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2], &ent_type,
                                                   &tempElems[0] );

@@ -50,11 +50,11 @@
  */
 enum MOAB_TAG_TYPE
 {
-    DENSE_INTEGER = 0,
-    DENSE_DOUBLE = 1,
-    DENSE_ENTITYHANDLE = 2,
-    SPARSE_INTEGER = 3,
-    SPARSE_DOUBLE = 4,
+    DENSE_INTEGER       = 0,
+    DENSE_DOUBLE        = 1,
+    DENSE_ENTITYHANDLE  = 2,
+    SPARSE_INTEGER      = 3,
+    SPARSE_DOUBLE       = 4,
     SPARSE_ENTITYHANDLE = 5
 };
 
@@ -64,9 +64,9 @@ enum MOAB_TAG_TYPE
  */
 enum MOAB_TAG_OWNER_TYPE
 {
-    TAG_VERTEX = 0,
-    TAG_EDGE = 1,
-    TAG_FACE = 2,
+    TAG_VERTEX  = 0,
+    TAG_EDGE    = 1,
+    TAG_FACE    = 2,
     TAG_ELEMENT = 3
 };
 
@@ -129,7 +129,8 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                    MPI_Comm* comm,
 #endif
-                                   int* compid, iMOAB_AppID pid );
+                                   int* compid,
+                                   iMOAB_AppID pid );
 
 /**
  * \brief De-Register application: delete mesh (set) associated with the application ID.
@@ -165,7 +166,8 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* communicator,
 #endif
-                                          int* compid, iMOAB_AppID pid );
+                                          int* compid,
+                                          iMOAB_AppID pid );
 
 /**
  * \brief De-Register the Fortran based application: delete mesh (set) associated with the application ID.
@@ -196,8 +198,11 @@ ErrCode iMOAB_DeregisterApplicationFortran( iMOAB_AppID pid );
  *                                        partitioned with mbpart during pre-processing.
  * \return ErrCode                        The error code indicating success or failure.
  */
-ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
-                              int* num_dimension, int* num_parts );
+ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename,
+                              int* num_global_vertices,
+                              int* num_global_elements,
+                              int* num_dimension,
+                              int* num_parts );
 
 /**
  * \brief Load a MOAB mesh file in parallel and exchange ghost layers as requested.
@@ -220,7 +225,9 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
  * \param[in] num_ghost_layers (int*)      The total number of ghost layers to exchange during mesh loading.
  * \return ErrCode                         The error code indicating success or failure.
  */
-ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String read_options,
+ErrCode iMOAB_LoadMesh( iMOAB_AppID pid,
+                        const iMOAB_String filename,
+                        const iMOAB_String read_options,
                         int* num_ghost_layers );
 
 /**
@@ -249,7 +256,11 @@ ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double
  * \param[in]  block_ID (int *)                The local block identifier, which will now contain the elements.
  * \return ErrCode                             The error code indicating success or failure.
  */
-ErrCode iMOAB_CreateElements( iMOAB_AppID pid, int* num_elem, int* type, int* num_nodes_per_element, int* connectivity,
+ErrCode iMOAB_CreateElements( iMOAB_AppID pid,
+                              int* num_elem,
+                              int* type,
+                              int* num_nodes_per_element,
+                              int* connectivity,
                               int* block_ID );
 
 /**
@@ -311,7 +322,7 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMO
  * \param[in] prefix (iMOAB_String)   The MOAB file prefix that will be used with task ID in parallel.
  * \return ErrCode                    The error code indicating success or failure.
  */
-ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix);
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix );
 
 /**
  * \brief Update local mesh data structure, from file information.
@@ -351,8 +362,12 @@ ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid );
  *                                          total_visible (array allocated by user, <TT>size := 3</TT>).
  * \return ErrCode                          The error code indicating success or failure.
  */
-ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid, int* num_visible_vertices, int* num_visible_elements,
-                           int* num_visible_blocks, int* num_visible_surfaceBC, int* num_visible_vertexBC );
+ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid,
+                           int* num_visible_vertices,
+                           int* num_visible_elements,
+                           int* num_visible_blocks,
+                           int* num_visible_surfaceBC,
+                           int* num_visible_vertexBC );
 
 /**
  * \brief Get the global vertex IDs for all locally visible (owned and shared/ghosted) vertices.
@@ -441,7 +456,9 @@ ErrCode iMOAB_GetBlockID( iMOAB_AppID pid, int* block_length, iMOAB_GlobalID* gl
  * \param[out] num_elements_in_block (int*)      The number of elements in block.
  * \return ErrCode                               The error code indicating success or failure.
  */
-ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* vertices_per_element,
+ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid,
+                            iMOAB_GlobalID* global_block_ID,
+                            int* vertices_per_element,
                             int* num_elements_in_block );
 
 /**
@@ -460,8 +477,11 @@ ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
  * \param[out] block_IDs (iMOAB_GlobalID*)           The block ids containing the elements.
  * \return ErrCode                                   The error code indicating success or failure.
  */
-ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements, iMOAB_GlobalID* element_global_IDs,
-                                      int* ranks, iMOAB_GlobalID* block_IDs );
+ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid,
+                                      int* num_visible_elements,
+                                      iMOAB_GlobalID* element_global_IDs,
+                                      int* ranks,
+                                      iMOAB_GlobalID* block_IDs );
 
 /**
  * \brief Get the connectivities for elements contained within a certain block.
@@ -480,7 +500,9 @@ ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements
  *                                               the same order as provided by GetElementOwnership and GetElementID.
  * \return ErrCode                               The error code indicating success or failure.
  */
-ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* connectivity_length,
+ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid,
+                                             iMOAB_GlobalID* global_block_ID,
+                                             int* connectivity_length,
                                              int* element_connectivity );
 
 /**
@@ -499,7 +521,9 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
  *                                               vertices.
  * \return ErrCode                               The error code indicating success or failure.
  */
-ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index, int* connectivity_length,
+ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid,
+                                      iMOAB_LocalID* elem_index,
+                                      int* connectivity_length,
                                       int* element_connectivity );
 
 /**
@@ -517,7 +541,9 @@ ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index
  *                                               (array allocated by user).
  * \return ErrCode                               The error code indicating success or failure.
  */
-ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
+ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid,
+                                   iMOAB_GlobalID* global_block_ID,
+                                   int* num_elements_in_block,
                                    int* element_ownership );
 
 /**
@@ -538,8 +564,11 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
  *                                                 elements (index in the range of all primary elements in the rank)
  * \return ErrCode                                 The error code indicating success or failure.
  */
-ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
-                            iMOAB_GlobalID* global_element_ID, iMOAB_LocalID* local_element_ID );
+ErrCode iMOAB_GetElementID( iMOAB_AppID pid,
+                            iMOAB_GlobalID* global_block_ID,
+                            int* num_elements_in_block,
+                            iMOAB_GlobalID* global_element_ID,
+                            iMOAB_LocalID* local_element_ID );
 
 /**
  * \brief Get the surface boundary condition information.
@@ -556,8 +585,11 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
  *                                                (value of the NeumannSet defined on the element).
  * \return ErrCode                                The error code indicating success or failure.
  */
-ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iMOAB_LocalID* local_element_ID,
-                                     int* reference_surface_ID, int* boundary_condition_value );
+ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid,
+                                     int* surface_BC_length,
+                                     iMOAB_LocalID* local_element_ID,
+                                     int* reference_surface_ID,
+                                     int* boundary_condition_value );
 
 /**
  * \brief Get the vertex boundary condition information.
@@ -572,7 +604,9 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
  *                                                 (value of the Dirichlet_Set tag defined on the vertex).
  * \return ErrCode                                 The error code indicating success or failure.
  */
-ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOAB_LocalID* local_vertex_ID,
+ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid,
+                                    int* vertex_BC_length,
+                                    iMOAB_LocalID* local_vertex_ID,
                                     int* boundary_condition_value );
 
 /**
@@ -592,8 +626,11 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
  * \param[out] tag_index (int*)               The tag index which can be used as identifier in synchronize methods.
  * \return ErrCode                            The error code indicating success or failure.
  */
-ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* tag_type,
-                                int* components_per_entity, int* tag_index );
+ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
+                                const iMOAB_String tag_storage_name,
+                                int* tag_type,
+                                int* components_per_entity,
+                                int* tag_index );
 
 /**
  * \brief Store the specified values in a MOAB integer Tag.
@@ -614,8 +651,11 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
  *                                                     (either vertices or elements).
  * \return ErrCode                                     The error code indicating success or failure.
  */
-ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* entity_type, int* tag_storage_data );
+ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid,
+                                const iMOAB_String tag_storage_name,
+                                int* num_tag_storage_length,
+                                int* entity_type,
+                                int* tag_storage_data );
 
 /**
  * \brief Get the specified values in a MOAB integer Tag.
@@ -632,8 +672,11 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
  *                                                     entities (either vertices or elements).
  * \return ErrCode                                     The error code indicating success or failure.
  */
-ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* entity_type, int* tag_storage_data );
+ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid,
+                                const iMOAB_String tag_storage_name,
+                                int* num_tag_storage_length,
+                                int* entity_type,
+                                int* tag_storage_data );
 
 /**
  * \brief Store the specified values in a MOAB double Tag.
@@ -650,8 +693,11 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
  *                                                     entities (either vertices or elements).
  * \return ErrCode                                     The error code indicating success or failure.
  */
-ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* entity_type, double* tag_storage_data );
+ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
+                                   const iMOAB_String tag_storage_name,
+                                   int* num_tag_storage_length,
+                                   int* entity_type,
+                                   double* tag_storage_data );
 
 /**
  * \brief Retrieve the specified values in a MOAB double Tag.
@@ -668,8 +714,11 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
  *                                                     entities (either vertices or elements).
  * \return ErrCode                                     The error code indicating success or failure.
  */
-ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* entity_type, double* tag_storage_data );
+ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
+                                   const iMOAB_String tag_storage_name,
+                                   int* num_tag_storage_length,
+                                   int* entity_type,
+                                   double* tag_storage_data );
 
 /**
  * \brief Exchange tag values for the given tags across process boundaries.
@@ -711,7 +760,9 @@ ErrCode iMOAB_ReduceTagsMax( iMOAB_AppID pid, int* tag_index, int* ent_type );
  *                                                    num_total_sides-num_sides_on_boundary for boundary elements).
  * \return ErrCode                              The error code indicating success or failure.
  */
-ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid, iMOAB_LocalID* local_index, int* num_adjacent_elements,
+ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid,
+                                   iMOAB_LocalID* local_index,
+                                   int* num_adjacent_elements,
                                    iMOAB_LocalID* adjacent_element_IDs );
 
 /**
@@ -729,7 +780,9 @@ ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid, iMOAB_LocalID* local_index, 
  *                                                    num_total_sides-num_sides_on_boundary for boundary elements).
  * \return ErrCode                                    The error code indicating success or failure.
  */
-ErrCode iMOAB_GetNeighborVertices( iMOAB_AppID pid, iMOAB_LocalID* local_vertex_ID, int* num_adjacent_vertices,
+ErrCode iMOAB_GetNeighborVertices( iMOAB_AppID pid,
+                                   iMOAB_LocalID* local_vertex_ID,
+                                   int* num_adjacent_vertices,
                                    iMOAB_LocalID* adjacent_vertex_IDs );
 
 /**
@@ -768,7 +821,10 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
  *                                                0=trivial, 1=Zoltan Graph (PHG), 2=Zoltan Geometric (RCB).
  * \return ErrCode                                The error code indicating success or failure.
  */
-ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Group* receivingGroup, int* rcompid,
+ErrCode iMOAB_SendMesh( iMOAB_AppID pid,
+                        MPI_Comm* joint_communicator,
+                        MPI_Group* receivingGroup,
+                        int* rcompid,
                         int* method );
 
 /**
@@ -793,7 +849,9 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_d );
  * \param[in]  sender_comp_id ( int *)                The unique application identifier that is sending the mesh
  * \return ErrCode                                    The error code indicating success or failure.
  */
-ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Group* sending_group,
+ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid,
+                           MPI_Comm* joint_communicator,
+                           MPI_Group* sending_group,
                            int* sender_comp_id );
 
 /**
@@ -810,7 +868,9 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* joint_communicator, MPI_Gr
  *                                                    the original migration of meshes (internal detail).
  * \return ErrCode                                    The error code indicating success or failure.
  */
-ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* joint_communicator,
+ErrCode iMOAB_SendElementTag( iMOAB_AppID pid,
+                              const iMOAB_String tag_storage_name,
+                              MPI_Comm* joint_communicator,
                               int* context_id );
 
 /**
@@ -827,7 +887,9 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
  *                                                    the original migration of meshes (internal detail).
  * \return ErrCode                                    The error code indicating success or failure.
  */
-ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* joint_communicator,
+ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid,
+                                 const iMOAB_String tag_storage_name,
+                                 MPI_Comm* joint_communicator,
                                  int* context_id );
 
 /**
@@ -846,8 +908,15 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
  * \param[in]  comp2 (int*)                           The unique identifier of the second component.
  * \return ErrCode                                    The error code indicating success or failure.
  */
-ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* joint_communicator, MPI_Group* group1,
-                                MPI_Group* group2, int* type1, int* type2, int* comp1, int* comp2 );
+ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1,
+                                iMOAB_AppID pid2,
+                                MPI_Comm* joint_communicator,
+                                MPI_Group* group1,
+                                MPI_Group* group2,
+                                int* type1,
+                                int* type2,
+                                int* comp1,
+                                int* comp2 );
 
 /**
  * \brief Recompute the communication graph between component and coupler, considering intersection coverage.
@@ -870,8 +939,13 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
  * \param[in]  context_id (int*)                   The unique identifier of the other participating component in intersection (target).
  * \return ErrCode                                 The error code indicating success or failure.
  */
-ErrCode iMOAB_CoverageGraph( MPI_Comm* joint_communicator, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-                             int* src_id, int* migr_id, int* context_id );
+ErrCode iMOAB_CoverageGraph( MPI_Comm* joint_communicator,
+                             iMOAB_AppID pid_src,
+                             iMOAB_AppID pid_migr,
+                             iMOAB_AppID pid_intx,
+                             int* src_id,
+                             int* migr_id,
+                             int* context_id );
 
 /**
  * \brief Dump info about communication graph.
@@ -900,7 +974,6 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid );
 
 #endif  // #ifdef MOAB_HAVE_MPI
 
-
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 /**
@@ -918,7 +991,8 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid );
  * \param[out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID.
  * \return ErrCode                                    The error code indicating success or failure.
  */
-ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
+ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_source,
+                                               iMOAB_AppID pid_target,
                                                iMOAB_AppID pid_intersection );
 
 /**
@@ -933,7 +1007,8 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_source, iMOAB_App
  * \param[out] pid_intersection (iMOAB_AppID)      The unique pointer to the intersection application ID.
  * \return ErrCode                                 The error code indicating success or failure.
  */
-ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
+ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source,
+                                           iMOAB_AppID pid_target,
                                            iMOAB_AppID pid_intersection );
 
 #ifdef MOAB_HAVE_NETCDF
@@ -950,9 +1025,10 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source, iMOAB_AppID p
  * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
  * \return ErrCode                                         The error code indicating success or failure.
 */
-ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
-                                           const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                           const iMOAB_String remap_weights_filename );
+ErrCode iMOAB_LoadMappingWeightsFromFile(
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String remap_weights_filename );
 
 #ifdef MOAB_HAVE_MPI
 
@@ -981,10 +1057,18 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
  *                                        i.e., whether it is from source to coupler (1), or from coupler to target (2).
  * \return ErrCode                        The error code indicating success or failure.
 */
-ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
-        MPI_Comm* join, MPI_Group* group1, MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction );
+ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
+                              iMOAB_AppID pid2,
+                              iMOAB_AppID pid3,
+                              MPI_Comm* join,
+                              MPI_Group* group1,
+                              MPI_Group* group2,
+                              int* type,
+                              int* comp1,
+                              int* comp2,
+                              int* direction );
 
-#endif // #ifdef MOAB_HAVE_MPI
+#endif  // #ifdef MOAB_HAVE_MPI
 /**
  * \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination 
  * mesh defined on a sphere.
@@ -997,9 +1081,10 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
  * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
  * \return ErrCode                                         The error code indicating success or failure.
 */
-ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
-                                          const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                          const iMOAB_String remap_weights_filename );
+ErrCode iMOAB_WriteMappingWeightsToFile(
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String remap_weights_filename );
 
 // endif for MOAB_HAVE_NETCDF
 #endif
@@ -1032,14 +1117,20 @@ ErrCode iMOAB_WriteMappingWeightsToFile ( iMOAB_AppID pid_intersection,
  * \param[in] target_solution_tag_dof_name   (iMOAB_String) The global DoF IDs corresponding to participating degrees-of-freedom for the target discretization.
  * \return ErrCode                                          The error code indicating success or failure.
 */
-ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
-                                               const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                               const iMOAB_String disc_method_source, int* disc_order_source,
-                                               const iMOAB_String disc_method_target, int* disc_order_target,
-                                               int* fNoBubble, int* fMonotoneTypeID, int* fVolumetric,
-                                               int* fNoConservation, int* fValidate,
-                                               const iMOAB_String source_solution_tag_dof_name,
-                                               const iMOAB_String target_solution_tag_dof_name );
+ErrCode iMOAB_ComputeScalarProjectionWeights(
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String disc_method_source,
+    int* disc_order_source,
+    const iMOAB_String disc_method_target,
+    int* disc_order_target,
+    int* fNoBubble,
+    int* fMonotoneTypeID,
+    int* fVolumetric,
+    int* fNoConservation,
+    int* fValidate,
+    const iMOAB_String source_solution_tag_dof_name,
+    const iMOAB_String target_solution_tag_dof_name );
 
 /**
  * \brief Apply the projection weights matrix operator onto the source tag in order to compute the solution (tag)
@@ -1057,12 +1148,13 @@ ErrCode iMOAB_ComputeScalarProjectionWeights ( iMOAB_AppID pid_intersection,
  *                                                          names are separated by ";", the same way as for tag migration.
  * \return ErrCode                                          The error code indicating success or failure.
 */
-ErrCode iMOAB_ApplyScalarProjectionWeights ( iMOAB_AppID pid_intersection,
-                                             const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                             const iMOAB_String source_solution_tag_name,
-                                             const iMOAB_String target_solution_tag_name );
+ErrCode iMOAB_ApplyScalarProjectionWeights(
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String source_solution_tag_name,
+    const iMOAB_String target_solution_tag_name );
 
-#endif // #ifdef MOAB_HAVE_TEMPESTREMAP
+#endif  // #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #ifdef MOAB_HAVE_MPI
 
@@ -1123,7 +1215,7 @@ inline MPI_Group* MOAB_MPI_Group_f2c( MPI_Fint fgroup )
     return cgroup;
 }
 
-#endif // #ifdef MOAB_HAVE_MPI
+#endif  // #ifdef MOAB_HAVE_MPI
 
 #ifdef __cplusplus
 }

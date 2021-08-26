@@ -431,7 +431,7 @@ int main( int argc, char* argv[] )
         std::stringstream outf;
         outf << "intxAtmOcn_" << rankInCouComm << ".h5m";
         std::string intxfile = outf.str();  // write in serial the intx file, for debugging
-        ierr = iMOAB_WriteMesh( cplAtmOcnPID, intxfile.c_str(), serialWriteOptions );
+        ierr                 = iMOAB_WriteMesh( cplAtmOcnPID, intxfile.c_str(), serialWriteOptions );
         CHECKIERR( ierr, "cannot write intx file result" )
     }
 #endif
@@ -439,10 +439,11 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         PUSH_TIMER( "Compute the projection weights with TempestRemap" )
-        ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(), &disc_orders[0],
-            disc_methods[1].c_str(), &disc_orders[1], &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
-            &fValidate, dof_tag_names[0].c_str(), dof_tag_names[1].c_str() );
+        ierr =
+            iMOAB_ComputeScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0].c_str(), disc_methods[0].c_str(),
+                                                  &disc_orders[0], disc_methods[1].c_str(), &disc_orders[1], &fNoBubble,
+                                                  &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
+                                                  dof_tag_names[0].c_str(), dof_tag_names[1].c_str() );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
 
@@ -471,10 +472,11 @@ int main( int argc, char* argv[] )
     {
         /* Compute the weights to preoject the solution from ATM component to LND compoenent */
         PUSH_TIMER( "Compute ATM-LND remapping weights" )
-        ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmLndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
-            disc_methods[2].c_str(), &disc_orders[2], &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
-            &fValidate, dof_tag_names[0].c_str(), dof_tag_names[2].c_str() );
+        ierr =
+            iMOAB_ComputeScalarProjectionWeights( cplAtmLndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(),
+                                                  &disc_orders[0], disc_methods[2].c_str(), &disc_orders[2], &fNoBubble,
+                                                  &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
+                                                  dof_tag_names[0].c_str(), dof_tag_names[2].c_str() );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                          "non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
@@ -617,7 +619,7 @@ int main( int argc, char* argv[] )
         {
             // write only for n==1 case
             char outputFileRecvd[] = "recvAtmCoupOcn.h5m";
-            ierr = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
+            ierr                   = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
             CHECKIERR( ierr, "could not write recvAtmCoupOcn.h5m to disk" )
         }
 #endif
@@ -634,7 +636,7 @@ int main( int argc, char* argv[] )
             if( 1 == n )  // write only for n==1 case
             {
                 char outputFileTgt[] = "fOcnOnCpl.h5m";
-                ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions );
+                ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions );
                 CHECKIERR( ierr, "could not write fOcnOnCpl.h5m to disk" )
             }
         }
@@ -664,7 +666,8 @@ int main( int argc, char* argv[] )
         {
             // need to use ocean comp id for context
             context_id = cmpocn;  // id for ocean on comp
-            ierr = iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id );
+            ierr =
+                iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
@@ -672,7 +675,8 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             context_id = cplocn;  // id for ocean on coupler
-            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm, &context_id );
+            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &ocnCouComm,
+                                            &context_id );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
@@ -687,8 +691,7 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
         {
             char outputFileOcn[] = "OcnWithProj.h5m";
-            ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions
-                                   );
+            ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
             // test results only for n == 1, for bottomTempProjectedField
             if( !no_regression_test )
@@ -753,7 +756,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL && 1 == n )
         {  // write only for n==1 case
             char outputFileRecvd[] = "recvAtmCoupLnd.h5m";
-            ierr = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
+            ierr                   = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
             CHECKIERR( ierr, "could not write recvAtmCoupLnd.h5m to disk" )
         }
 #endif
@@ -773,7 +776,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL && 1 == n )
         {  // write only for n==1 case
             char outputFileTgtLnd[] = "fLndOnCpl.h5m";
-            ierr = iMOAB_WriteMesh( cplLndPID, outputFileTgtLnd, fileWriteOptions );
+            ierr                    = iMOAB_WriteMesh( cplLndPID, outputFileTgtLnd, fileWriteOptions );
             CHECKIERR( ierr, "could not write fLndOnCpl.h5m to disk" )
         }
 #endif
@@ -805,7 +808,8 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmplnd;  // land comp id
-            ierr = iMOAB_SendElementTag( cplLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm, &context_id );
+            ierr =
+                iMOAB_SendElementTag( cplLndPID, "a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;", &lndCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to land pes" )
         }
         // receive on component 3, land

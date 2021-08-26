@@ -41,16 +41,29 @@
 // #define VVERBOSE
 // #define CHECK_INCREASING_DOF
 
-void LinearRemapFVtoGLL( const Mesh& meshInput, const Mesh& meshOutput, const Mesh& meshOverlap,
-                         const DataArray3D< int >& dataGLLNodes, const DataArray3D< double >& dataGLLJacobian,
-                         const DataArray1D< double >& dataGLLNodalArea, int nOrder, OfflineMap& mapRemap,
-                         int nMonotoneType, bool fContinuous, bool fNoConservation );
+void LinearRemapFVtoGLL( const Mesh& meshInput,
+                         const Mesh& meshOutput,
+                         const Mesh& meshOverlap,
+                         const DataArray3D< int >& dataGLLNodes,
+                         const DataArray3D< double >& dataGLLJacobian,
+                         const DataArray1D< double >& dataGLLNodalArea,
+                         int nOrder,
+                         OfflineMap& mapRemap,
+                         int nMonotoneType,
+                         bool fContinuous,
+                         bool fNoConservation );
 
-void LinearRemapFVtoGLL_Volumetric( const Mesh& meshInput, const Mesh& meshOutput, const Mesh& meshOverlap,
+void LinearRemapFVtoGLL_Volumetric( const Mesh& meshInput,
+                                    const Mesh& meshOutput,
+                                    const Mesh& meshOverlap,
                                     const DataArray3D< int >& dataGLLNodes,
                                     const DataArray3D< double >& dataGLLJacobian,
-                                    const DataArray1D< double >& dataGLLNodalArea, int nOrder, OfflineMap& mapRemap,
-                                    int nMonotoneType, bool fContinuous, bool fNoConservation );
+                                    const DataArray1D< double >& dataGLLNodalArea,
+                                    int nOrder,
+                                    OfflineMap& mapRemap,
+                                    int nMonotoneType,
+                                    bool fContinuous,
+                                    bool fNoConservation );
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -221,10 +234,12 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapTags( const std::string srcDofT
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType srcType, bool isSrcContinuous,
+moab::ErrorCode moab::TempestOnlineMap::SetDOFmapAssociation( DiscretizationType srcType,
+                                                              bool isSrcContinuous,
                                                               DataArray3D< int >* srcdataGLLNodes,
                                                               DataArray3D< int >* srcdataGLLNodesSrc,
-                                                              DiscretizationType destType, bool isTgtContinuous,
+                                                              DiscretizationType destType,
+                                                              bool isTgtContinuous,
                                                               DataArray3D< int >* tgtdataGLLNodes )
 {
     moab::ErrorCode rval;
@@ -736,10 +751,19 @@ moab::ErrorCode moab::TempestOnlineMap::set_row_dc_dofs( std::vector< int >& val
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
-    std::string strInputType, std::string strOutputType, const int nPin, const int nPout, bool fBubble,
-    int fMonotoneTypeID, bool fVolumetric, bool fNoConservation, bool fNoCheck, const std::string srcDofTagName,
-    const std::string tgtDofTagName, const bool fInputConcave, const bool fOutputConcave )
+moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string strInputType,
+                                                                  std::string strOutputType,
+                                                                  const int nPin,
+                                                                  const int nPout,
+                                                                  bool fBubble,
+                                                                  int fMonotoneTypeID,
+                                                                  bool fVolumetric,
+                                                                  bool fNoConservation,
+                                                                  bool fNoCheck,
+                                                                  const std::string srcDofTagName,
+                                                                  const std::string tgtDofTagName,
+                                                                  const bool fInputConcave,
+                                                                  const bool fOutputConcave )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -1540,7 +1564,8 @@ int moab::TempestOnlineMap::IsMonotone( double dTolerance )
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( moab::Tag srcSolutionTag, moab::Tag tgtSolutionTag,
+moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( moab::Tag srcSolutionTag,
+                                                      moab::Tag tgtSolutionTag,
                                                       bool transpose )
 {
     moab::ErrorCode rval;
@@ -1605,10 +1630,12 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( moab::Tag srcSolutionTag, 
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& solnTag, const std::string& solnName,
+moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& solnTag,
+                                                                  const std::string& solnName,
                                                                   moab::Remapper::IntersectionContext ctx,
                                                                   sample_function testFunction,
-                                                                  moab::Tag* clonedSolnTag, std::string cloneSolnName )
+                                                                  moab::Tag* clonedSolnTag,
+                                                                  std::string cloneSolnName )
 {
     moab::ErrorCode rval;
     const bool outputEnabled = ( is_root );
@@ -1965,8 +1992,10 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::IntersectionContext ctx, moab::Tag& exactTag,
-                                                        moab::Tag& approxTag, std::map< std::string, double >& metrics,
+moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::IntersectionContext ctx,
+                                                        moab::Tag& exactTag,
+                                                        moab::Tag& approxTag,
+                                                        std::map< std::string, double >& metrics,
                                                         bool verbose )
 {
     moab::ErrorCode rval;

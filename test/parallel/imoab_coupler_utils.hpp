@@ -63,17 +63,25 @@ int create_joint_comm_group( MPI_Group agroup, MPI_Group bgroup, MPI_Group* abgr
     return 0;
 }
 
-int setup_component_coupler_meshes( iMOAB_AppID cmpId, int cmpTag, iMOAB_AppID cplCmpId, int cmpcouTag,
-                                    MPI_Comm* cmpcomm, MPI_Group* cmpPEGroup, MPI_Comm* coucomm, MPI_Group* cplPEGroup,
-                                    MPI_Comm* cmpcoucomm, std::string& filename, std::string& readopts, int nghlay,
+int setup_component_coupler_meshes( iMOAB_AppID cmpId,
+                                    int cmpTag,
+                                    iMOAB_AppID cplCmpId,
+                                    int cmpcouTag,
+                                    MPI_Comm* cmpcomm,
+                                    MPI_Group* cmpPEGroup,
+                                    MPI_Comm* coucomm,
+                                    MPI_Group* cplPEGroup,
+                                    MPI_Comm* cmpcoucomm,
+                                    std::string& filename,
+                                    std::string& readopts,
+                                    int nghlay,
                                     int repartitioner_scheme )
 {
     int ierr = 0;
     if( *cmpcomm != MPI_COMM_NULL )
     {
         // load first mesh
-        ierr =
-            iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay );
+        ierr = iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay );
         CHECKIERR( ierr, "Cannot load component mesh" )
 
         // then send mesh to coupler pes

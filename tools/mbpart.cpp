@@ -285,7 +285,10 @@ int main( int argc, char* argv[] )
             BCids.push_back( std::atoi( ids[i].c_str() ) );
     }
 
-    if( metis_method.empty() ) { metis_method = METIS_DEFAULT_METHOD; }
+    if( metis_method.empty() )
+    {
+        metis_method = METIS_DEFAULT_METHOD;
+    }
 
 #endif  // MOAB_HAVE_METIS
 

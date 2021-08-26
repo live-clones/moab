@@ -204,7 +204,8 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                    MPI_Comm* comm,
 #endif
-                                   int* compid, iMOAB_AppID pid )
+                                   int* compid,
+                                   iMOAB_AppID pid )
 {
     // will create a parallel comm for this application too, so there will be a
     // mapping from *pid to file set and to parallel comm instances
@@ -271,7 +272,7 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
 #endif
 
     app_data.point_cloud = false;
-    app_data.is_fortran = false;
+    app_data.is_fortran  = false;
 
     context.appDatas.push_back(
         app_data );  // it will correspond to app_FileSets[*pid] will be the file set of interest
@@ -282,7 +283,8 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
 #ifdef MOAB_HAVE_MPI
                                           int* comm,
 #endif
-                                          int* compid, iMOAB_AppID pid )
+                                          int* compid,
+                                          iMOAB_AppID pid )
 {
     ErrCode err;
     assert( app_name != nullptr );
@@ -302,11 +304,11 @@ ErrCode iMOAB_RegisterApplicationFortran( const iMOAB_String app_name,
     // now call C style registration function:
     err = iMOAB_RegisterApplication( app_name,
 #ifdef MOAB_HAVE_MPI
-                                      &ccomm,
+                                     &ccomm,
 #endif
-                                      compid, pid );
+                                     compid, pid );
 
-    // Now that we have created the application context, store that 
+    // Now that we have created the application context, store that
     // the application being registered is from a Fortran context
     context.appDatas[*pid].is_fortran = true;
 
@@ -424,7 +426,8 @@ ErrCode iMOAB_DeregisterApplicationFortran( iMOAB_AppID pid )
 }
 
 // Utility function
-static void split_tag_names( std::string input_names, std::string& separator,
+static void split_tag_names( std::string input_names,
+                             std::string& separator,
                              std::vector< std::string >& list_tag_names )
 {
     size_t pos = 0;
@@ -444,8 +447,11 @@ static void split_tag_names( std::string input_names, std::string& separator,
     return;
 }
 
-ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_vertices, int* num_global_elements,
-                              int* num_dimension, int* num_parts )
+ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename,
+                              int* num_global_vertices,
+                              int* num_global_elements,
+                              int* num_dimension,
+                              int* num_parts )
 {
     assert( filename && strlen( filename ) );
 #ifdef MOAB_HAVE_HDF5
@@ -582,7 +588,9 @@ ErrCode iMOAB_ReadHeaderInfo( const iMOAB_String filename, int* num_global_verti
     return 0;
 }
 
-ErrCode iMOAB_LoadMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMOAB_String read_options,
+ErrCode iMOAB_LoadMesh( iMOAB_AppID pid,
+                        const iMOAB_String filename,
+                        const iMOAB_String read_options,
                         int* num_ghost_layers )
 {
     assert( filename && strlen( filename ) );
@@ -806,8 +814,12 @@ ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid )
     return 0;
 }
 
-ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid, int* num_visible_vertices, int* num_visible_elements,
-                           int* num_visible_blocks, int* num_visible_surfaceBC, int* num_visible_vertexBC )
+ErrCode iMOAB_GetMeshInfo( iMOAB_AppID pid,
+                           int* num_visible_vertices,
+                           int* num_visible_elements,
+                           int* num_visible_blocks,
+                           int* num_visible_surfaceBC,
+                           int* num_visible_vertexBC )
 {
     ErrorCode rval;
     appData& data        = context.appDatas[*pid];
@@ -987,10 +999,12 @@ ErrCode iMOAB_GetBlockID( iMOAB_AppID pid, int* block_length, iMOAB_GlobalID* gl
     return 0;
 }
 
-ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* vertices_per_element,
+ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid,
+                            iMOAB_GlobalID* global_block_ID,
+                            int* vertices_per_element,
                             int* num_elements_in_block )
 {
-    assert(global_block_ID);
+    assert( global_block_ID );
 
     std::map< int, int >& matMap      = context.appDatas[*pid].matIndex;
     std::map< int, int >::iterator it = matMap.find( *global_block_ID );
@@ -1027,8 +1041,11 @@ ErrCode iMOAB_GetBlockInfo( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
     return 0;
 }
 
-ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements, iMOAB_GlobalID* element_global_IDs,
-                                      int* ranks, iMOAB_GlobalID* block_IDs )
+ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid,
+                                      int* num_visible_elements,
+                                      iMOAB_GlobalID* element_global_IDs,
+                                      int* ranks,
+                                      iMOAB_GlobalID* block_IDs )
 {
     appData& data = context.appDatas[*pid];
 #ifdef MOAB_HAVE_MPI
@@ -1081,11 +1098,13 @@ ErrCode iMOAB_GetVisibleElementsInfo( iMOAB_AppID pid, int* num_visible_elements
     return 0;
 }
 
-ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* connectivity_length,
+ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid,
+                                             iMOAB_GlobalID* global_block_ID,
+                                             int* connectivity_length,
                                              int* element_connectivity )
 {
-    assert(global_block_ID); // ensure global block ID argument is not null
-    assert(connectivity_length); // ensure connectivity length argument is not null
+    assert( global_block_ID );      // ensure global block ID argument is not null
+    assert( connectivity_length );  // ensure connectivity length argument is not null
 
     appData& data                     = context.appDatas[*pid];
     std::map< int, int >& matMap      = data.matIndex;
@@ -1130,11 +1149,13 @@ ErrCode iMOAB_GetBlockElementConnectivities( iMOAB_AppID pid, iMOAB_GlobalID* gl
     return 0;
 }
 
-ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index, int* connectivity_length,
+ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid,
+                                      iMOAB_LocalID* elem_index,
+                                      int* connectivity_length,
                                       int* element_connectivity )
 {
-    assert(elem_index);          // ensure element index argument is not null
-    assert(connectivity_length); // ensure connectivity length argument is not null
+    assert( elem_index );           // ensure element index argument is not null
+    assert( connectivity_length );  // ensure connectivity length argument is not null
 
     appData& data = context.appDatas[*pid];
     assert( ( *elem_index >= 0 ) && ( *elem_index < (int)data.primary_elems.size() ) );
@@ -1168,11 +1189,13 @@ ErrCode iMOAB_GetElementConnectivity( iMOAB_AppID pid, iMOAB_LocalID* elem_index
     return 0;
 }
 
-ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
+ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid,
+                                   iMOAB_GlobalID* global_block_ID,
+                                   int* num_elements_in_block,
                                    int* element_ownership )
 {
-    assert(global_block_ID); // ensure global block ID argument is not null
-    assert(num_elements_in_block); // ensure number of elements in block argument is not null
+    assert( global_block_ID );        // ensure global block ID argument is not null
+    assert( num_elements_in_block );  // ensure number of elements in block argument is not null
 
     std::map< int, int >& matMap = context.appDatas[*pid].matIndex;
 
@@ -1216,11 +1239,14 @@ ErrCode iMOAB_GetElementOwnership( iMOAB_AppID pid, iMOAB_GlobalID* global_block
     return 0;
 }
 
-ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, int* num_elements_in_block,
-                            iMOAB_GlobalID* global_element_ID, iMOAB_LocalID* local_element_ID )
+ErrCode iMOAB_GetElementID( iMOAB_AppID pid,
+                            iMOAB_GlobalID* global_block_ID,
+                            int* num_elements_in_block,
+                            iMOAB_GlobalID* global_element_ID,
+                            iMOAB_LocalID* local_element_ID )
 {
-    assert(global_block_ID); // ensure global block ID argument is not null
-    assert(num_elements_in_block); // ensure number of elements in block argument is not null
+    assert( global_block_ID );        // ensure global block ID argument is not null
+    assert( num_elements_in_block );  // ensure number of elements in block argument is not null
 
     appData& data                = context.appDatas[*pid];
     std::map< int, int >& matMap = data.matIndex;
@@ -1263,8 +1289,11 @@ ErrCode iMOAB_GetElementID( iMOAB_AppID pid, iMOAB_GlobalID* global_block_ID, in
     return 0;
 }
 
-ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iMOAB_LocalID* local_element_ID,
-                                     int* reference_surface_ID, int* boundary_condition_value )
+ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid,
+                                     int* surface_BC_length,
+                                     iMOAB_LocalID* local_element_ID,
+                                     int* reference_surface_ID,
+                                     int* boundary_condition_value )
 {
     // we have to fill bc data for neumann sets;/
     ErrorCode rval;
@@ -1328,7 +1357,9 @@ ErrCode iMOAB_GetPointerToSurfaceBC( iMOAB_AppID pid, int* surface_BC_length, iM
     return 0;
 }
 
-ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOAB_LocalID* local_vertex_ID,
+ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid,
+                                    int* vertex_BC_length,
+                                    iMOAB_LocalID* local_vertex_ID,
                                     int* boundary_condition_value )
 {
     ErrorCode rval;
@@ -1375,8 +1406,11 @@ ErrCode iMOAB_GetPointerToVertexBC( iMOAB_AppID pid, int* vertex_BC_length, iMOA
     return 0;
 }
 
-ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* tag_type,
-                                int* components_per_entity, int* tag_index )
+ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
+                                const iMOAB_String tag_storage_name,
+                                int* tag_type,
+                                int* components_per_entity,
+                                int* tag_index )
 {
     // see if the tag is already existing, and if yes, check the type, length
     if( *tag_type < 0 || *tag_type > 5 )
@@ -1489,8 +1523,11 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
         return 1;  // some error, maybe the tag was not created
 }
 
-ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* ent_type, int* tag_storage_data )
+ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid,
+                                const iMOAB_String tag_storage_name,
+                                int* num_tag_storage_length,
+                                int* ent_type,
+                                int* tag_storage_data )
 {
     std::string tag_name( tag_storage_name );
 
@@ -1543,8 +1580,11 @@ ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     return 0;  // no error
 }
 
-ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                int* ent_type, int* tag_storage_data )
+ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid,
+                                const iMOAB_String tag_storage_name,
+                                int* num_tag_storage_length,
+                                int* ent_type,
+                                int* tag_storage_data )
 {
     ErrorCode rval;
     std::string tag_name( tag_storage_name );
@@ -1597,8 +1637,11 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_
     return 0;  // no error
 }
 
-ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* ent_type, double* tag_storage_data )
+ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
+                                   const iMOAB_String tag_storage_name,
+                                   int* num_tag_storage_length,
+                                   int* ent_type,
+                                   double* tag_storage_data )
 {
     ErrorCode rval;
     // exactly the same code as for int tag :) maybe should check the type of tag too
@@ -1652,8 +1695,11 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_stora
     return 0;  // no error
 }
 
-ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* num_tag_storage_length,
-                                   int* ent_type, double* tag_storage_data )
+ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
+                                   const iMOAB_String tag_storage_name,
+                                   int* num_tag_storage_length,
+                                   int* ent_type,
+                                   double* tag_storage_data )
 {
     ErrorCode rval;
     // exactly the same code, except tag type check
@@ -1790,7 +1836,9 @@ ErrCode iMOAB_ReduceTagsMax( iMOAB_AppID pid, int* tag_index, int* ent_type )
     return 0;
 }
 
-ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid, iMOAB_LocalID* local_index, int* num_adjacent_elements,
+ErrCode iMOAB_GetNeighborElements( iMOAB_AppID pid,
+                                   iMOAB_LocalID* local_index,
+                                   int* num_adjacent_elements,
                                    iMOAB_LocalID* adjacent_element_IDs )
 {
     ErrorCode rval;
@@ -1847,7 +1895,11 @@ ErrCode iMOAB_CreateVertices( iMOAB_AppID pid, int* coords_len, int* dim, double
     return 0;
 }
 
-ErrCode iMOAB_CreateElements( iMOAB_AppID pid, int* num_elem, int* type, int* num_nodes_per_element, int* connectivity,
+ErrCode iMOAB_CreateElements( iMOAB_AppID pid,
+                              int* num_elem,
+                              int* type,
+                              int* num_nodes_per_element,
+                              int* connectivity,
                               int* block_ID )
 {
     // Create elements
@@ -2011,13 +2063,13 @@ ErrCode iMOAB_DetermineGhostEntities( iMOAB_AppID pid, int* ghost_dim, int* num_
 
 ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGroup, int* rcompid, int* method )
 {
-    assert(join != nullptr);
-    assert(receivingGroup != nullptr);
-    assert(rcompid != nullptr);
+    assert( join != nullptr );
+    assert( receivingGroup != nullptr );
+    assert( rcompid != nullptr );
 
     ErrorCode rval;
     int ierr;
-    appData & data = context.appDatas[*pid];
+    appData& data     = context.appDatas[*pid];
     ParallelComm* pco = context.pcomms[*pid];
 
     MPI_Comm global = ( data.is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
@@ -2102,9 +2154,9 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
 
 ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGroup, int* scompid )
 {
-    assert(join != nullptr);
-    assert(sendingGroup != nullptr);
-    assert(scompid != nullptr);
+    assert( join != nullptr );
+    assert( sendingGroup != nullptr );
+    assert( scompid != nullptr );
 
     ErrorCode rval;
     appData& data          = context.appDatas[*pid];
@@ -2430,22 +2482,30 @@ ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_id )
 <B>Operations:</B> Collective
 */
 //#define VERBOSE
-ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* join, MPI_Group* group1,
-                                MPI_Group* group2, int* type1, int* type2, int* comp1, int* comp2 )
+ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1,
+                                iMOAB_AppID pid2,
+                                MPI_Comm* join,
+                                MPI_Group* group1,
+                                MPI_Group* group2,
+                                int* type1,
+                                int* type2,
+                                int* comp1,
+                                int* comp2 )
 {
-    assert(join);
-    assert(group1);
-    assert(group2);
+    assert( join );
+    assert( group1 );
+    assert( group2 );
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
 
     appData& sData = context.appDatas[*pid1];
     appData& tData = context.appDatas[*pid2];
 
-    MPI_Comm global = ((sData.is_fortran || tData.is_fortran) ? MPI_Comm_f2c( *reinterpret_cast<MPI_Fint*> (join) ) : *join);
-    MPI_Group srcGroup = (sData.is_fortran ? MPI_Group_f2c( *reinterpret_cast<MPI_Fint*>(group1) ) : *group1);
-    MPI_Group tgtGroup = (tData.is_fortran ? MPI_Group_f2c( *reinterpret_cast<MPI_Fint*>(group2) ) : *group2);
-    
+    MPI_Comm global =
+        ( ( sData.is_fortran || tData.is_fortran ) ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
+    MPI_Group srcGroup = ( sData.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group1 ) ) : *group1 );
+    MPI_Group tgtGroup = ( tData.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group2 ) ) : *group2 );
+
     MPI_Comm_rank( global, &localRank );
     MPI_Comm_size( global, &numProcs );
     // instantiate the par comm graph
@@ -2814,8 +2874,13 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
 // id elements that are relevant: they intersected some of the target elements (which are not needed
 // here)
 //  in the intersection
-ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
-                             int* src_id, int* migr_id, int* context_id )
+ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
+                             iMOAB_AppID pid_src,
+                             iMOAB_AppID pid_migr,
+                             iMOAB_AppID pid_intx,
+                             int* src_id,
+                             int* migr_id,
+                             int* context_id )
 {
     // first, based on the scompid and migrcomp, find the parCommGraph corresponding to this
     // exchange
@@ -2824,7 +2889,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     std::vector< int > receivers;
     ParCommGraph* sendGraph = NULL;
     int ierr;
-    int default_context_id = -1;
+    int default_context_id  = -1;
     bool is_fortran_context = false;
 
     // First, find the original graph between PE sets
@@ -2834,7 +2899,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
         default_context_id = *migr_id;  // the other one
         assert( context.appDatas[*pid_src].global_id == *src_id );
         is_fortran_context = context.appDatas[*pid_src].is_fortran || is_fortran_context;
-        sendGraph = context.appDatas[*pid_src].pgraph[default_context_id];  // maybe check if it does not exist
+        sendGraph          = context.appDatas[*pid_src].pgraph[default_context_id];  // maybe check if it does not exist
 
         // report the sender and receiver tasks in the joint comm
         srcSenders = sendGraph->senders();
@@ -2860,8 +2925,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
 #endif
     }
 
-    if( *pid_intx >= 0 )
-        is_fortran_context = context.appDatas[*pid_intx].is_fortran || is_fortran_context;
+    if( *pid_intx >= 0 ) is_fortran_context = context.appDatas[*pid_intx].is_fortran || is_fortran_context;
 
     // loop over pid_intx elements, to see what original processors in joint comm have sent the
     // coverage mesh;
@@ -2874,7 +2938,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     // the crystal router will send ID cell to the original source, on the component task
     // if we are on intx tasks, loop over all intx elements and
 
-    MPI_Comm global = (is_fortran_context ? MPI_Comm_f2c( reinterpret_cast<MPI_Fint>(*join) ) : *join);
+    MPI_Comm global            = ( is_fortran_context ? MPI_Comm_f2c( reinterpret_cast< MPI_Fint >( *join ) ) : *join );
     int currentRankInJointComm = -1;
     ierr                       = MPI_Comm_rank( global, &currentRankInJointComm );
     CHKIERRVAL( ierr );
@@ -3046,7 +3110,8 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 #ifdef MOAB_HAVE_NETCDF
 
 ErrCode iMOAB_LoadMappingWeightsFromFile(
-    iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename )
 {
     assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
@@ -3094,22 +3159,40 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
 }
 
 #ifdef MOAB_HAVE_MPI
-ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
-        int* join, int* group1, int* group2, int* type, int* comp1, int* comp2, int* direction )
+ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1,
+                                     iMOAB_AppID pid2,
+                                     iMOAB_AppID pid3,
+                                     int* join,
+                                     int* group1,
+                                     int* group2,
+                                     int* type,
+                                     int* comp1,
+                                     int* comp2,
+                                     int* direction )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
-    MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
-    return iMOAB_MigrateMapMesh(pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction); 
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
+    MPI_Group gr1  = MPI_Group_f2c( (MPI_Fint)*group1 );
+    MPI_Group gr2  = MPI_Group_f2c( (MPI_Fint)*group2 );
+    return iMOAB_MigrateMapMesh( pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction );
 }
-ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, MPI_Comm* jointcomm, MPI_Group* groupA,
-                              MPI_Group* groupB, int* type, int* comp1, int* comp2, int* direction )
+ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
+                              iMOAB_AppID pid2,
+                              iMOAB_AppID pid3,
+                              MPI_Comm* jointcomm,
+                              MPI_Group* groupA,
+                              MPI_Group* groupB,
+                              int* type,
+                              int* comp1,
+                              int* comp2,
+                              int* direction )
 {
-    assert(jointcomm);
-    assert(groupA);
-    assert(groupB);
+    assert( jointcomm );
+    assert( groupA );
+    assert( groupB );
 
-    MPI_Comm joint_communicator = ( context.appDatas[*pid1].is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) ) : *jointcomm );
+    MPI_Comm joint_communicator =
+        ( context.appDatas[*pid1].is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) )
+                                             : *jointcomm );
     MPI_Group group_first =
         ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupA ) ) : *groupA );
     MPI_Group group_second =
@@ -3127,22 +3210,22 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     // this direction is good for atm source -> ocn target coupler example
     ParCommGraph* cgraph = NULL;
     if( *pid1 >= 0 ) cgraph = new ParCommGraph( joint_communicator, group_first, group_second, *comp1, *comp2 );
-    
+
     ParCommGraph* cgraph_rev = NULL;
     if( *pid3 >= 0 ) cgraph_rev = new ParCommGraph( joint_communicator, group_second, group_first, *comp2, *comp1 );
-    
+
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
     if( *pid1 >= 0 ) context.appDatas[*pid1].pgraph[*comp2] = cgraph;      // the context will be the other comp
     if( *pid3 >= 0 ) context.appDatas[*pid3].pgraph[*comp1] = cgraph_rev;  // from 2 to 1
-    
+
     // each model has a list of global ids that will need to be sent by gs to rendezvous the other
     // model on the joint_communicator
     TupleList TLcomp1;
     TLcomp1.initialize( 2, 0, 0, 0, 0 );  // to proc, marker
     TupleList TLcomp2;
     TLcomp2.initialize( 2, 0, 0, 0, 0 );  // to proc, marker
-    
+
     // will push_back a new tuple, if needed
     TLcomp1.enableWriteAccess();
 
@@ -3426,11 +3509,11 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
     return 0;
 }
 
-#endif // #ifdef MOAB_HAVE_MPI
-
+#endif  // #ifdef MOAB_HAVE_MPI
 
 ErrCode iMOAB_WriteMappingWeightsToFile(
-    iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename )
 {
     assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
@@ -3534,7 +3617,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     bool defaultradius = 1.0;
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
-        rval         = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );CHKERRVAL( rval );
+        rval = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );CHKERRVAL( rval );
         rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, defaultradius );CHKERRVAL( rval );
     }
 
@@ -3736,7 +3819,7 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
      * unscale later. */
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
-        rval         = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, 1.0 );CHKERRVAL( rval );
+        rval = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, 1.0 );CHKERRVAL( rval );
         rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, 1.0 );CHKERRVAL( rval );
     }
 
@@ -3761,11 +3844,19 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
 }
 
 ErrCode iMOAB_ComputeScalarProjectionWeights(
-    iMOAB_AppID pid_intx, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String disc_method_source, int* disc_order_source, const iMOAB_String disc_method_target,
-    int* disc_order_target, int* fNoBubble, int* fMonotoneTypeID, int* fVolumetric, int* fNoConservation,
-    int* fValidate, const iMOAB_String source_solution_tag_dof_name, const iMOAB_String target_solution_tag_dof_name
-     )
+    iMOAB_AppID pid_intx,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String disc_method_source,
+    int* disc_order_source,
+    const iMOAB_String disc_method_target,
+    int* disc_order_target,
+    int* fNoBubble,
+    int* fMonotoneTypeID,
+    int* fVolumetric,
+    int* fNoConservation,
+    int* fValidate,
+    const iMOAB_String source_solution_tag_dof_name,
+    const iMOAB_String target_solution_tag_dof_name )
 {
     moab::ErrorCode rval;
 
@@ -3810,8 +3901,10 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
 }
 
 ErrCode iMOAB_ApplyScalarProjectionWeights(
-    iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String source_solution_tag_name, const iMOAB_String target_solution_tag_name )
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String source_solution_tag_name,
+    const iMOAB_String target_solution_tag_name )
 {
     assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
     assert( source_solution_tag_name && strlen( source_solution_tag_name ) );
