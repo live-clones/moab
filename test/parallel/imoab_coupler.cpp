@@ -698,6 +698,7 @@ int main( int argc, char* argv[] )
 
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmpocn;
             ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
         }
         if( ocnComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
@@ -843,6 +844,7 @@ int main( int argc, char* argv[] )
         MPI_Barrier( MPI_COMM_WORLD );
         if( couComm != MPI_COMM_NULL )
         {
+            context_id = cmplnd;
             ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
         }
         if( lndComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case

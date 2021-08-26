@@ -160,7 +160,7 @@ program imoab_coupler_fortran
 
     ! we can now free the sender buffers
     if (atmComm .NE. MPI_COMM_NULL) then
-        context_id = -1
+        context_id = cplatm
         ierr           = iMOAB_FreeSenderBuffers( cmpatmPid, context_id )
         call errorout(ierr, 'fail to free atm buffers')
     endif
@@ -182,7 +182,7 @@ program imoab_coupler_fortran
 
     ! we can now free the sender buffers
     if (ocnComm .NE. MPI_COMM_NULL) then
-        context_id = -1
+        context_id = cplocn
         ierr           = iMOAB_FreeSenderBuffers( cmpocnPid, context_id )
         call errorout(ierr, 'fail to free ocn buffers')
     endif
@@ -205,7 +205,7 @@ program imoab_coupler_fortran
 !        // will
 !        //  use the element global id, which should uniquely identify the element
 
-        ierr = iMOAB_CoverageGraphFortran( atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, cplocn ) ! it happens over joint communicator
+        ierr = iMOAB_CoverageGraphFortran( atmCouComm, cmpAtmPID, cplAtmPID, cplAtmOcnPID, cmpatm, cplatm, cplocn ) ! it happens over joint communicator
          call errorout(ierr, 'cannot recompute direct coverage graph for ocean')
     endif
 
@@ -379,13 +379,13 @@ program imoab_coupler_fortran
 !        // as always, use nonblocking sends
 !        // original graph (context is -1_
     if( cplComm .ne. MPI_COMM_NULL ) then
-        context_id = -1
+        context_id = cmpocn
         ierr = iMOAB_SendElementTagFortran( cplOcnPID, concat_fieldnameT, ocnCouComm, context_id)
         call errorout(ierr, 'cannot send tag values back to ocean pes')
     endif
 
     if( ocnComm .ne. MPI_COMM_NULL ) then
-       context_id = -1
+       context_id = cplocn
        ierr = iMOAB_ReceiveElementTagFortran( cmpOcnPID, concat_fieldnameT, ocnCouComm, context_id)
        call errorout(ierr, 'cannot receive tag values from ocean mesh on coupler pes')
     endif
@@ -393,7 +393,7 @@ program imoab_coupler_fortran
 
 
     if( cplComm .ne. MPI_COMM_NULL ) then
-     context_id = -1
+     context_id = cmpocn
      ierr = iMOAB_FreeSenderBuffers( cplOcnPID, context_id )
      call errorout(ierr, 'cannot free sender buffers on coupler')
    endif
