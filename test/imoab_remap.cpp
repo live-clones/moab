@@ -19,6 +19,7 @@
         return 1;                  \
     }
 
+//#define ENABLE_ATMLND_COUPLING
 // this test will be run in serial only
 int main( int argc, char* argv[] )
 {
@@ -27,14 +28,17 @@ int main( int argc, char* argv[] )
 
     atmFilename = TestDir + "/wholeATM_T.h5m";
     ocnFilename = TestDir + "/recMeshOcn.h5m";
+#ifdef ENABLE_ATMLND_COUPLING
     lndFilename = TestDir + "/wholeLnd.h5m";
+#endif
     // mapFilename = TestDir + "/outCS5ICOD5_map.nc";
 
     ProgOptions opts;
     opts.addOpt< std::string >( "atmosphere,t", "atm mesh filename (source)", &atmFilename );
     opts.addOpt< std::string >( "ocean,m", "ocean mesh filename (target)", &ocnFilename );
+#ifdef ENABLE_ATMLND_COUPLING
     opts.addOpt< std::string >( "land,l", "land mesh filename (target)", &lndFilename );
-
+#endif
     bool gen_baseline = false;
     opts.addOpt< void >( "genbase,g", "generate baseline 1", &gen_baseline );
 
@@ -45,7 +49,10 @@ int main( int argc, char* argv[] )
     opts.parseCommandLine( argc, argv );
 
     {
-        std::cout << " atm file: " << atmFilename << "\n ocn file: " << ocnFilename << "\n lnd file: " << lndFilename
+        std::cout << " atm file: " << atmFilename << "\n ocn file: " << ocnFilename
+#ifdef ENABLE_ATMLND_COUPLING
+                << "\n lnd file: " << lndFilename
+#endif
                   << "\n";
     }
 
@@ -87,21 +94,21 @@ int main( int argc, char* argv[] )
 #endif
                                       &ocnCompID, ocnPID );
     CHECKIERR( ierr, "failed to register application2" );
-
+#ifdef ENABLE_ATMLND_COUPLING
     ierr = iMOAB_RegisterApplication( "LND-APP",
 #ifdef MOAB_HAVE_MPI
                                       &comm,
 #endif
                                       &lndCompID, lndPID );
     CHECKIERR( ierr, "failed to register application3" );
-
+#endif
     ierr = iMOAB_RegisterApplication( "ATM-OCN-CPL",
 #ifdef MOAB_HAVE_MPI
                                       &comm,
 #endif
                                       &atmocnCompID, atmocnPID );
     CHECKIERR( ierr, "failed to register application4" );
-
+#ifdef ENABLE_ATMLND_COUPLING
     ierr = iMOAB_RegisterApplication( "ATM-LND-CPL",
 #ifdef MOAB_HAVE_MPI
                                       &comm,
@@ -115,7 +122,7 @@ int main( int argc, char* argv[] )
 #endif
                                       &lndatmCompID, lndatmPID );
     CHECKIERR( ierr, "failed to register application5" );
-
+#endif
     const char* read_opts = "";
     int num_ghost_layers  = 0;
     /*
@@ -131,9 +138,11 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_LoadMesh( ocnPID, ocnFilename.c_str(), read_opts, &num_ghost_layers, ocnFilename.size(),
                            strlen( read_opts ) );
     CHECKIERR( ierr, "failed to load mesh" );
+#ifdef ENABLE_ATMLND_COUPLING
     ierr = iMOAB_LoadMesh( lndPID, lndFilename.c_str(), read_opts, &num_ghost_layers, lndFilename.size(),
                            strlen( read_opts ) );
     CHECKIERR( ierr, "failed to load mesh" );
+#endif
 
     int nverts[3], nelem[3];
     /*
@@ -149,11 +158,11 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_GetMeshInfo( ocnPID, nverts, nelem, 0, 0, 0 );
     CHECKIERR( ierr, "failed to get mesh info" );
     printf( "Ocean Component Mesh: %d vertices and %d elements\n", nverts[0], nelem[0] );
-
+#ifdef ENABLE_ATMLND_COUPLING
     ierr = iMOAB_GetMeshInfo( lndPID, nverts, nelem, 0, 0, 0 );
     CHECKIERR( ierr, "failed to get mesh info" );
     printf( "Land Component Mesh: %d vertices and %d elements\n", nverts[0], nelem[0] );
-
+#endif
     /*
      * The 2 tags used in this example exist in the file, already.
      * If a user needs a new tag, it can be defined with the same call as this one
@@ -197,16 +206,16 @@ int main( int argc, char* argv[] )
     ierr = iMOAB_DefineTagStorage( ocnPID, bottomTempProjectedNCField.c_str(), &tagTypes[1], &ocnCompNDoFs,
                                    &tagIndex[2], bottomTempProjectedNCField.size() );
     CHECKIERR( ierr, "failed to define the field tag on OCN" );
-
+#ifdef ENABLE_ATMLND_COUPLING
     ierr = iMOAB_DefineTagStorage( lndPID, bottomTempProjectedField.c_str(), &tagTypes[1], &ocnCompNDoFs, &tagIndex[3],
                                    bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to define the field tag on LND" );
-
+#endif
     /* Next compute the mesh intersection on the sphere between the source (ATM) and target (OCN)
      * meshes */
     ierr = iMOAB_ComputeMeshIntersectionOnSphere( atmPID, ocnPID, atmocnPID );
     CHECKIERR( ierr, "failed to compute mesh intersection between ATM and OCN" );
-
+#ifdef ENABLE_ATMLND_COUPLING
     /* Next compute the mesh intersection on the sphere between the source (ATM) and target (LND)
      * meshes */
     ierr = iMOAB_ComputePointDoFIntersection( atmPID, lndPID, atmlndPID );
@@ -216,7 +225,7 @@ int main( int argc, char* argv[] )
      * meshes */
     ierr = iMOAB_ComputePointDoFIntersection( lndPID, atmPID, lndatmPID );
     CHECKIERR( ierr, "failed to compute point-cloud mapping LND-ATM" );
-
+#endif
     /* We have the mesh intersection now. Let us compute the remapping weights */
     fNoConserve = 0;
 
@@ -244,7 +253,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 #endif
-
+#ifdef ENABLE_ATMLND_COUPLING
     /* Compute the weights to preoject the solution from ATM component to LND compoenent */
     ierr = iMOAB_ComputeScalarProjectionWeights(
         atmlndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0], disc_methods[2].c_str(),
@@ -262,7 +271,7 @@ int main( int argc, char* argv[] )
         dof_tag_names[2].size(), dof_tag_names[0].size() );
     CHECKIERR( ierr, "failed to compute remapping projection weights for LND-ATM scalar "
                      "non-conservative field" );
-
+#endif
     /* We have the mesh intersection now. Let us compute the remapping weights */
     fNoConserve = 0;
     ierr        = iMOAB_ComputeScalarProjectionWeights(
@@ -343,6 +352,7 @@ int main( int argc, char* argv[] )
         check_baseline_file( baseline, gidElems, tempElems, 1.e-9, err_code );
         if( 0 == err_code ) std::cout << " passed baseline test 1\n";
     }
+#ifdef ENABLE_ATMLND_COUPLING
     /* We have the remapping weights now. Let us apply the weights onto the tag we defined
        on the srouce mesh and get the projection on the target mesh */
     ierr = iMOAB_ApplyScalarProjectionWeights( atmlndPID, weights_identifiers[1].c_str(), bottomTempField.c_str(),
@@ -357,34 +367,41 @@ int main( int argc, char* argv[] )
                                             bottomTempFieldATM.c_str(), weights_identifiers[1].size(),
                                             bottomTempField.size(), bottomTempProjectedField.size() );
     CHECKIERR( ierr, "failed to apply projection weights for LND-ATM scalar field" );
-
+#endif
     /*
      * the file can be written in parallel, and it will contain additional tags defined by the user
      * we may extend the method to write only desired tags to the file
      */
     {
         // free allocated data
+#ifdef ENABLE_ATMLND_COUPLING
         char outputFileAtmTgt[] = "fIntxAtmTarget.h5m";
+#endif
         char outputFileOcnTgt[] = "fIntxOcnTarget.h5m";
+#ifdef ENABLE_ATMLND_COUPLING
         char outputFileLndTgt[] = "fIntxLndTarget.h5m";
+#endif
         char writeOptions[]     = "";
 
         ierr = iMOAB_WriteMesh( ocnPID, outputFileOcnTgt, writeOptions, strlen( outputFileOcnTgt ),
                                 strlen( writeOptions ) );
-
+#ifdef ENABLE_ATMLND_COUPLING
         ierr = iMOAB_WriteMesh( lndPID, outputFileLndTgt, writeOptions, strlen( outputFileLndTgt ),
                                 strlen( writeOptions ) );
 
         ierr = iMOAB_WriteMesh( atmPID, outputFileAtmTgt, writeOptions, strlen( outputFileAtmTgt ),
                                 strlen( writeOptions ) );
+#endif
     }
 
     /*
      * deregistering application will delete all mesh entities associated with the application and
      * will free allocated tag storage.
      */
+#ifdef ENABLE_ATMLND_COUPLING
     ierr = iMOAB_DeregisterApplication( lndPID );
     CHECKIERR( ierr, "failed to de-register application3" );
+#endif
     ierr = iMOAB_DeregisterApplication( ocnPID );
     CHECKIERR( ierr, "failed to de-register application2" );
     ierr = iMOAB_DeregisterApplication( atmPID );
