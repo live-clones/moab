@@ -349,7 +349,7 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+#define VERBOSE
 moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& srcVals, std::vector< double >& tgtVals,
                                                       bool transpose )
 {
@@ -359,7 +359,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 
 #ifdef VERBOSE
     std::stringstream sstr;
-    sstr << "projection_" << rank << ".txt";
+    sstr << "projection_size_" << size << "rank_" << rank << ".txt";
     std::ofstream output_file( sstr.str() );
 #endif
     // Perform the actual projection of weights: application of weight matrix onto the source
@@ -392,11 +392,12 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         for( unsigned i = 0; i < srcVals.size(); ++i )
         {
             if( col_dtoc_dofmap[i] >= 0 )
+            {
                 m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Col: " << i << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i] << ", "
-                        << m_colVector( i ) << "\n";
+                output_file << "Col: " << i << ", GID: " << col_gdofmap[i] << ", Data = " << srcVals[i] << "\n";
 #endif
+            }
         }
 
         m_rowVector = m_weightMatrix * m_colVector;
@@ -409,10 +410,12 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
         for( unsigned i = 0; i < tgtVals.size(); ++i )
         {
             if( row_dtoc_dofmap[i] >= 0 )
+            {
                 tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-            output_file << "Row: " << i << ", GID: " << row_gdofmap[i] << ", Data = " << m_rowVector( i ) << "\n";
+                 output_file << "Row: " << i << ", GID: " << row_dtoc_dofmap[i] << ", Data = " << tgtVals[i] << "\n";
 #endif
+            }
         }
     }
 
@@ -426,7 +429,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 }
 
 #endif
-
+#undef VERBOSE
 ///////////////////////////////////////////////////////////////////////////////
 
 extern void ForceConsistencyConservation3( const DataArray1D< double >& vecSourceArea,

@@ -2904,7 +2904,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     }
 
     // loop over pid_intx elements, to see what original processors in joint comm have sent the
-    // coverage mesh if we are on intx tasks, send coverage info towards original component tasks,
+    // coverage mesh;
+    // If we are on intx tasks, send coverage info towards original component tasks,
     // about needed cells
     TupleList TLcovIDs;
     TLcovIDs.initialize( 2, 0, 0, 0, 0 );  // to proc, GLOBAL ID; estimate about 100 IDs to be sent

@@ -39,7 +39,7 @@ using namespace moab;
 #endif
 
 #define ENABLE_ATMOCN_COUPLING
-#define ENABLE_ATMLND_COUPLING
+//#define ENABLE_ATMLND_COUPLING
 
 #if( !defined( ENABLE_ATMOCN_COUPLING ) && !defined( ENABLE_ATMLND_COUPLING ) )
 #error Enable either OCN (ENABLE_ATMOCN_COUPLING) and/or LND (ENABLE_ATMLND_COUPLING) for coupling
