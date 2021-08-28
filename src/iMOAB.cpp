@@ -718,11 +718,12 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
 ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length )
 {
     std::ostringstream file_name;
-    int rank = 0;
+    int rank = 0, size = 1;
 #ifdef MOAB_HAVE_MPI
     rank = context.pcomms[*pid]->rank();
+    size = context.pcomms[*pid]->size();
 #endif
-    file_name << prefix << "_" << rank << ".h5m";
+    file_name << prefix << "_" << size << "_" << rank << ".h5m";
     // Now let us actually write the file to disk with appropriate options
     ErrorCode rval = context.MBI->write_file( file_name.str().c_str(), 0, 0, &context.appDatas[*pid].file_set, 1 );CHKERRVAL( rval );
 
