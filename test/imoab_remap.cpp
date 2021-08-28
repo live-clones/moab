@@ -19,7 +19,7 @@
         return 1;                  \
     }
 
-//#define ENABLE_ATMLND_COUPLING
+#define ENABLE_ATMLND_COUPLING
 // this test will be run in serial only
 int main( int argc, char* argv[] )
 {

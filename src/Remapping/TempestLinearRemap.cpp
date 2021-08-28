@@ -370,7 +370,7 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#define VERBOSE
+//#define VERBOSE
 moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& srcVals, std::vector< double >& tgtVals,
                                                       bool transpose )
 {
@@ -452,7 +452,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 }
 
 #endif
-#undef VERBOSE
+//#undef VERBOSE
 ///////////////////////////////////////////////////////////////////////////////
 
 extern void ForceConsistencyConservation3( const DataArray1D< double >& vecSourceArea,
