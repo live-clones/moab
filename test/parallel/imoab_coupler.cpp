@@ -39,7 +39,7 @@ using namespace moab;
 #endif
 
 #define ENABLE_ATMOCN_COUPLING
-//#define ENABLE_ATMLND_COUPLING
+#define ENABLE_ATMLND_COUPLING
 
 #if( !defined( ENABLE_ATMOCN_COUPLING ) && !defined( ENABLE_ATMLND_COUPLING ) )
 #error Enable either OCN (ENABLE_ATMOCN_COUPLING) and/or LND (ENABLE_ATMLND_COUPLING) for coupling
@@ -630,7 +630,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplocn );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
-//#ifdef VERBOSE
+#ifdef VERBOSE
         if( couComm != MPI_COMM_NULL && 1 == n )
         {
             // write only for n==1 case
@@ -639,7 +639,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write recvAtmCoupOcn.h5m to disk" )
         }
-//#endif
+#endif
 
         if( couComm != MPI_COMM_NULL )
         {
