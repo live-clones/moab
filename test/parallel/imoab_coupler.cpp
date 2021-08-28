@@ -369,6 +369,11 @@ int main( int argc, char* argv[] )
         // ocean partitions check if intx valid, write some h5m intx file
         CHECKIERR( ierr, "cannot compute intersection" )
         POP_TIMER( couComm, rankInCouComm )
+#ifdef VERBOSE
+        char prefix[] = "intx_atmocn";
+        ierr          = iMOAB_WriteLocalMesh( cplAtmOcnPID, prefix, strlen( prefix ) );
+        CHECKIERR( ierr, "failed to write local intx mesh" );
+#endif
     }
 
     if( atmCouComm != MPI_COMM_NULL )
