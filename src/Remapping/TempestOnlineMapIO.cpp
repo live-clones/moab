@@ -1282,14 +1282,15 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         for( int i = 0; i < nS; i++ )
         {
             int rindex, cindex;
-            const int& vecRowValue = vecRow[i];
-            const int& vecColValue = vecCol[i];
+            const int& vecRowValue = vecRow[i] - 1; // the rows, cols are 1 based in the file
+            const int& vecColValue = vecCol[i] - 1;
 
             std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
             if( riter == rowMap.end() )
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
+                row_gdofmap.push_back( vecRowValue );
                 // row_dtoc_dofmap.push_back( vecRowValue );
                 rindexMax++;
             }
@@ -1301,6 +1302,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
+                col_gdofmap.push_back( vecColValue );
                 // col_dtoc_dofmap.push_back( vecColValue );
                 cindexMax++;
             }

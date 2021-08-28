@@ -392,7 +392,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to write local atm cov mesh with data" );
         }
 
-#ifdef VERBOSE
+//#ifdef VERBOSE
         if( couComm != MPI_COMM_NULL && 1 == n )
         {
             // write only for n==1 case
@@ -401,7 +401,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write recvAtmCoupOcn.h5m to disk" )
         }
-#endif
+//#endif
 
         if( couComm != MPI_COMM_NULL )
         {
