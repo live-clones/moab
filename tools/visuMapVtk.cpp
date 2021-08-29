@@ -114,11 +114,18 @@ int main( int argc, char* argv[] )
 {
 
     ProgOptions opts;
+    int dimSource = 2; // for FV meshes is 2; for SE meshes, use fine mesh, dim will be 0
+    int dimTarget = 2; //
+    int otype = 0;
 
     std::string inputfile1, inputSource, inputTarget;
     opts.addOpt< std::string >( "map,m", "input map ", &inputfile1 );
     opts.addOpt< std::string >( "source,s", "source mesh", &inputSource );
     opts.addOpt< std::string >( "target,t", "target mesh", &inputTarget );
+    opts.addOpt< int >( "dimSource,d", "dimension of source  ", &dimSource );
+    opts.addOpt< int >( "dimTarget,g", "dimension of target  ", &dimTarget );
+    opts.addOpt< int > ("typeOutput,o"," output type vtk(0), h5m(1)", &otype);
+
 
     int startSourceID=-1 , endSourceID=-1,  startTargetID=-1, endTargetID=-1 ;
     opts.addOpt< int >( "startSourceID,b", "start source id ", &startSourceID );
@@ -129,6 +136,9 @@ int main( int argc, char* argv[] )
 
     opts.parseCommandLine( argc, argv );
 
+    std::string extension = ".vtk";
+        if (1 == otype)
+            extension = ".h5m";
     // Open netcdf/exodus file
     int fail = nc_open( inputfile1.c_str(), 0, &ncFile1 );
     if( NC_NOWRITE != fail ) { ERR_NC( fail ) }
@@ -187,7 +197,7 @@ int main( int argc, char* argv[] )
     rval = mb->load_file( inputTarget.c_str(), &targetSet, readopts );MB_CHK_SET_ERR( rval, "Failed to read" );
 
     Range sRange;
-    rval = mb->get_entities_by_dimension(sourceSet, 2, sRange); MB_CHK_SET_ERR( rval, "Failed to get sRange" );
+    rval = mb->get_entities_by_dimension(sourceSet, dimSource, sRange); MB_CHK_SET_ERR( rval, "Failed to get sRange" );
     vector<int>  sids;
     sids.resize(sRange.size());
     rval = mb->tag_get_data(gtag, sRange, &sids[0]); MB_CHK_SET_ERR( rval, "Failed to get ids for srange" );
@@ -200,7 +210,7 @@ int main( int argc, char* argv[] )
     }
 
     Range tRange;
-    rval = mb->get_entities_by_dimension(targetSet, 2, tRange); MB_CHK_SET_ERR( rval, "Failed to get tRange" );
+    rval = mb->get_entities_by_dimension(targetSet, dimTarget, tRange); MB_CHK_SET_ERR( rval, "Failed to get tRange" );
     vector<int>  tids;
     tids.resize(tRange.size());
     rval = mb->tag_get_data(gtag, tRange, &tids[0]); MB_CHK_SET_ERR( rval, "Failed to get ids for trange" );
@@ -246,15 +256,24 @@ int main( int argc, char* argv[] )
           targetEnts.insert(th);
           rval = mb->tag_set_data(wtag, &th, 1, &weight); MB_CHK_SET_ERR( rval, "Failed to set weight tag on target" );
         }
-        // remove from partial set the entities it has
-        Range existingCells;
-        rval = mb->get_entities_by_dimension(partialSet, 2, existingCells); MB_CHK_SET_ERR( rval, "Failed to get existing ents" );
-        rval = mb->remove_entities(partialSet, existingCells); MB_CHK_SET_ERR( rval, "Failed to remove existing ents" );
+
+        if (dimTarget == 0)
+        {
+            Range adjCells;
+            //get_adjacencies( const Range& from_entities, const int to_dimension, const bool create_if_missing,
+           //  Range& adj_entities, const int operation_type = Interface::INTERSECT ) = 0;
+            rval = mb->get_adjacencies( targetEnts, 2, false,
+                    adjCells, Interface::UNION );MB_CHK_SET_ERR( rval, " can't get adj cells " );
+            targetEnts.merge(adjCells);
+        }
+
         rval = mb->add_entities(partialSet, targetEnts);
         // write now the set in a numbered file
         std::stringstream fff;
-        fff << name_map << "_column" << col+1 << ".vtk";
+        fff << name_map << "_column" << col+1 << extension;
         rval = mb->write_mesh( fff.str().c_str(), &partialSet, 1 );MB_CHK_ERR( rval );
+        // remove from partial set the entities it has
+        rval = mb->clear_meshset(&partialSet, 1); MB_CHK_SET_ERR( rval, "Failed to empty partial set" );
     }
 
     // how to get a complete column in sparse matrix?
@@ -274,15 +293,21 @@ int main( int argc, char* argv[] )
           sourceEnts.insert(sh);
           rval = mb->tag_set_data(wtag, &sh, 1, &weight); MB_CHK_SET_ERR( rval, "Failed to set weight tag on source" );
         }
-        // remove from partial set the entities it has
-        Range existingCells;
-        rval = mb->get_entities_by_dimension(partialSet, 2, existingCells); MB_CHK_SET_ERR( rval, "Failed to get existing ents" );
-        rval = mb->remove_entities(partialSet, existingCells); MB_CHK_SET_ERR( rval, "Failed to remove existing ents" );
+        if (dimSource == 0)
+        {
+            Range adjCells;
+            //get_adjacencies( const Range& from_entities, const int to_dimension, const bool create_if_missing,
+           //  Range& adj_entities, const int operation_type = Interface::INTERSECT ) = 0;
+            rval = mb->get_adjacencies( sourceEnts, 2, false,
+                    adjCells, Interface::UNION );MB_CHK_SET_ERR( rval, " can't get adj cells " );
+            sourceEnts.merge(adjCells);
+        }
         rval = mb->add_entities(partialSet, sourceEnts);
         // write now the set in a numbered file
         std::stringstream fff;
-        fff << name_map << "_row" << row+1 << ".vtk";
+        fff << name_map << "_row" << row+1 << extension;
         rval = mb->write_mesh( fff.str().c_str(), &partialSet, 1 );MB_CHK_ERR( rval );
+        rval = mb->clear_meshset(&partialSet, 1); MB_CHK_SET_ERR( rval, "Failed to empty partial set" );
     }
     return 0;
 }
