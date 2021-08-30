@@ -407,7 +407,9 @@ ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, s
     return MB_SUCCESS;
 }
 
-ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityHandle local_set,
+ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm,
+                                      ParallelComm* pco,
+                                      EntityHandle local_set,
                                       std::vector< int >& senders_local )
 {
     ErrorCode rval;
@@ -573,7 +575,9 @@ ErrorCode ParCommGraph::release_send_buffers()
 
 // again, will use the send buffers, for nonblocking sends;
 // should be the receives non-blocking too?
-ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned,
+ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm,
+                                         ParallelComm* pco,
+                                         Range& owned,
                                          std::vector< Tag >& tag_handles )
 {
     // basically, owned.size() needs to be equal to sum(corr_sizes)
@@ -643,8 +647,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
         // we know that we will need to send some tag data in a specific order
         // first, get the ids of the local elements, from owned Range; arrange the buffer in order
         // of increasing global id
-        Tag gidTag;
-        rval = mb->tag_get_handle( "GLOBAL_ID", gidTag );MB_CHK_ERR( rval );
+        Tag gidTag = mb->globalId_tag();
         std::vector< int > gids;
         gids.resize( owned.size() );
         rval = mb->tag_get_data( gidTag, owned, &gids[0] );MB_CHK_ERR( rval );
@@ -771,7 +774,9 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm, ParallelComm* pco, Rang
     return MB_SUCCESS;
 }
 
-ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, Range& owned,
+ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm,
+                                            ParallelComm* pco,
+                                            Range& owned,
                                             std::vector< Tag >& tag_handles )
 {
     // opposite to sending, we will use blocking receives
@@ -838,8 +843,7 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
     {
         // we know that we will need to receive some tag data in a specific order (by ids stored)
         // first, get the ids of the local elements, from owned Range; unpack the buffer in order
-        Tag gidTag;
-        rval = mb->tag_get_handle( "GLOBAL_ID", gidTag );MB_CHK_ERR( rval );
+        Tag gidTag = mb->globalId_tag();
         std::vector< int > gids;
         gids.resize( owned.size() );
         rval = mb->tag_get_data( gidTag, owned, &gids[0] );MB_CHK_ERR( rval );
@@ -1144,8 +1148,7 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
     std::vector< int > shprocs( MAX_SHARING_PROCS );
     std::vector< EntityHandle > shhandles( MAX_SHARING_PROCS );
 
-    Tag gidTag;  //
-    rval = mb->tag_get_handle( "GLOBAL_ID", gidTag );MB_CHK_ERR( rval );
+    Tag gidTag = mb->globalId_tag();
     int np;
     unsigned char pstatus;
 
@@ -1248,8 +1251,12 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
 }
 
 // after map read, we need to know what entities we need to send to receiver
-ErrorCode ParCommGraph::set_split_ranges( int comp, TupleList& TLBackToComp1, std::vector< int >& valuesComp1,
-                                          int lenTag, Range& ents_of_interest, int type )
+ErrorCode ParCommGraph::set_split_ranges( int comp,
+                                          TupleList& TLBackToComp1,
+                                          std::vector< int >& valuesComp1,
+                                          int lenTag,
+                                          Range& ents_of_interest,
+                                          int type )
 {
     // settle split_ranges // same role as partitioning
     if( rootSender ) std::cout << " find split_ranges on component " << comp << "  according to read map \n";
@@ -1289,7 +1296,10 @@ ErrorCode ParCommGraph::set_split_ranges( int comp, TupleList& TLBackToComp1, st
 }
 
 // new methods to migrate mesh after reading map
-ErrorCode ParCommGraph::form_tuples_to_migrate_mesh( Interface* mb, TupleList& TLv, TupleList& TLc, int type,
+ErrorCode ParCommGraph::form_tuples_to_migrate_mesh( Interface* mb,
+                                                     TupleList& TLv,
+                                                     TupleList& TLc,
+                                                     int type,
                                                      int lenTagType1 )
 {
     // we will always need GlobalID tag
@@ -1373,8 +1383,13 @@ ErrorCode ParCommGraph::form_tuples_to_migrate_mesh( Interface* mb, TupleList& T
     }
     return MB_SUCCESS;
 }
-ErrorCode ParCommGraph::form_mesh_from_tuples( Interface* mb, TupleList& TLv, TupleList& TLc, int type, int lenTagType1,
-                                               EntityHandle fset, Range& primary_ents,
+ErrorCode ParCommGraph::form_mesh_from_tuples( Interface* mb,
+                                               TupleList& TLv,
+                                               TupleList& TLc,
+                                               int type,
+                                               int lenTagType1,
+                                               EntityHandle fset,
+                                               Range& primary_ents,
                                                std::vector< int >& values_entities )
 {
     // might need to fill also the split_range things
