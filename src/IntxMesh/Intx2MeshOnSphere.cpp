@@ -850,6 +850,14 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     {
         // move all initial cells to coverage set
         rval = mb->add_entities(covering_set, meshCells); MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
+        // if point cloud source, add vertices 
+        if (0 == meshCells.size() || max_edges_1 == 0)
+        {
+            // add vertices from the source set
+            Range verts;
+            rval = mb->get_entities_by_dimension( initial_distributed_set, 0, verts );MB_CHK_SET_ERR( rval, "can't get vertices from mesh set" );
+            rval = mb->add_entities(covering_set, verts); MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
+        }
         return MB_SUCCESS;
     }
 
