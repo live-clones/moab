@@ -94,7 +94,7 @@ AC_SUBST(enable_shared)
 
 # All language options initialized -- now call
 # libtool initialization
-# AC_PROG_LIBTOOL is deprecated
+# LT_INIT is deprecated
 LT_INIT([dlopen])
 LT_LANG([C++])
 
@@ -153,16 +153,10 @@ MB_DEFS="$MB_DEFS $NO_VECTOR_TEMPLATE_INSERT $OLD_STD_COUNT"
 ################################################################################
 #                              Headers
 ################################################################################
-AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
-AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H,  [1], [MOAB qualified HAVE_INTTYPES_H]) ])
-AC_CHECK_HEADER([stdint.h],   [AC_DEFINE(HAVE_STDINT_H,    [1], [MOAB qualified HAVE_STDINT_H])   ])
-AC_CHECK_HEADER([stddef.h],   [AC_DEFINE(HAVE_STDDEF_H,    [1], [MOAB qualified HAVE_STDDEF_H])   ])
-AC_CHECK_HEADER([stdlib.h],   [AC_DEFINE(HAVE_STDLIB_H,    [1], [MOAB qualified HAVE_STDLIB_H])   ])
-AC_CHECK_HEADER([ieeefp.h],   [AC_DEFINE(HAVE_IEEEFP_H,    [1], [MOAB qualified HAVE_IEEEFP_H])   ])
-AC_CHECK_HEADER([termios.h],  [AC_DEFINE(HAVE_TERMIOS_H,   [1], [MOAB qualified HAVE_TERMIOS_H])  ])
-AC_CHECK_HEADER([sys/types.h],[AC_DEFINE(HAVE_SYS_TYPES_H, [1], [MOAB qualified HAVE_SYS_TYPES_H])])
-AC_CHECK_HEADER([sys/ioctl.h],[AC_DEFINE(HAVE_SYS_IOCTL_H, [1], [MOAB qualified HAVE_SYS_IOCTL_H])])
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
 
 SIZEOF_MBENTITYHANDLE=0
 AC_CHECK_SIZEOF([void *])
@@ -270,7 +264,7 @@ if (test "xyes" != "x$enable_pymoab" && test "xno" != "x$enable_pymoab"); then
 else
   if (test "x$enable_pymoab" != "xno"); then
     ENABLE_pymoab=yes
-    AM_PATH_PYTHON([2.7],,[:])
+    AM_PATH_PYTHON([3.1],,[:])
     AX_PYTHON_DEVEL()
 
     AC_MSG_CHECKING([for the numpy Python package])
@@ -1600,9 +1594,11 @@ AC_SUBST([AM_LDFLAGS])
 AC_SUBST([EXPORT_LTFLAGS])
 AC_SUBST([EXPORT_LDFLAGS])
 
-AC_CONFIG_HEADERS([src/moab/EntityHandle.hpp
+AC_CONFIG_HEADERS([
+                   src/moab/MOABConfig.h:config/MOABConfig.h.in
+                   src/moab/EntityHandle.hpp
                    src/parallel/moab_mpi_config.h
-                   src/moab/MOABConfig.h:config/MOABConfig.h.in])
+                   ])
 AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
 
 AC_CONFIG_FILES([Makefile
