@@ -24,12 +24,14 @@
 #define RUN_TEST_ARG2( A, B ) run_test( &( A ), #A, B )
 
 using namespace moab;
+
 //#define GRAPH_INFO
-#define CHECKRC( rc, message )     \
-    if( 0 != ( rc ) )              \
-    {                              \
-        printf( "%s\n", message ); \
-        return MB_FAILURE;         \
+
+#define CHECKRC( rc, message )            \
+    if( 0 != ( rc ) )                     \
+    {                                     \
+        printf( "Error: %s\n", message ); \
+        return MB_FAILURE;                \
     }
 
 int is_any_proc_error( int is_my_error )
@@ -81,25 +83,21 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
     for( int i = startG1; i <= endG1; i++ )
         groupTasks[i - startG1] = i;
 
-    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, &groupTasks[0], &group1 );
-    CHECKRC( ierr, "can't create group1" )
+    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, &groupTasks[0], &group1 );CHECKRC( ierr, "can't create group1" )
 
     groupTasks.resize( endG2 - startG2 + 1 );
     for( int i = startG2; i <= endG2; i++ )
         groupTasks[i - startG2] = i;
 
-    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, &groupTasks[0], &group2 );
-    CHECKRC( ierr, "can't create group2" )
+    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, &groupTasks[0], &group2 );CHECKRC( ierr, "can't create group2" )
 
     // create 2 communicators, one for each group
     int tagcomm1 = 1, tagcomm2 = 2;
     int context_id = -1;  // plain migrate, default context
     MPI_Comm comm1, comm2;
-    ierr = MPI_Comm_create_group( jcomm, group1, tagcomm1, &comm1 );
-    CHECKRC( ierr, "can't create comm1" )
+    ierr = MPI_Comm_create_group( jcomm, group1, tagcomm1, &comm1 );CHECKRC( ierr, "can't create comm1" )
 
-    ierr = MPI_Comm_create_group( jcomm, group2, tagcomm2, &comm2 );
-    CHECKRC( ierr, "can't create comm2" )
+    ierr = MPI_Comm_create_group( jcomm, group2, tagcomm2, &comm2 );CHECKRC( ierr, "can't create comm2" )
 
     ierr = iMOAB_Initialize( 0, 0 );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKRC( ierr, "can't initialize iMOAB" )
@@ -116,13 +114,11 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 
     if( comm1 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_RegisterApplication( "APP1", &comm1, &compid1, pid1 );
-        CHECKRC( ierr, "can't register app1 " )
+        ierr = iMOAB_RegisterApplication( "APP1", &comm1, &compid1, pid1 );CHECKRC( ierr, "can't register app1 " )
     }
     if( comm2 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_RegisterApplication( "APP2", &comm2, &compid2, pid2 );
-        CHECKRC( ierr, "can't register app2 " )
+        ierr = iMOAB_RegisterApplication( "APP2", &comm2, &compid2, pid2 );CHECKRC( ierr, "can't register app2 " )
     }
 
     if( comm1 != MPI_COMM_NULL )
@@ -132,8 +128,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 
         nghlay = 0;
 
-        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );
-        CHECKRC( ierr, "can't load mesh " )
+        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );CHECKRC( ierr, "can't load mesh " )
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
 #ifdef GRAPH_INFO
@@ -149,9 +144,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         CHECKRC( ierr, "cannot receive elements" )
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
-        ierr =
-            iMOAB_WriteMesh( pid2, outfile, wopts.c_str() );
-        CHECKRC( ierr, "cannot write received mesh" )
+        ierr  = iMOAB_WriteMesh( pid2, outfile, wopts.c_str() );CHECKRC( ierr, "cannot write received mesh" )
 #ifdef GRAPH_INFO
         int is_sender = 0;
         int context   = compid1;
@@ -167,18 +160,15 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 
     if( comm2 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DeregisterApplication( pid2 );
-        CHECKRC( ierr, "cannot deregister app 2 receiver" )
+        ierr = iMOAB_DeregisterApplication( pid2 );CHECKRC( ierr, "cannot deregister app 2 receiver" )
     }
 
     if( comm1 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DeregisterApplication( pid1 );
-        CHECKRC( ierr, "cannot deregister app 1 sender" )
+        ierr = iMOAB_DeregisterApplication( pid1 );CHECKRC( ierr, "cannot deregister app 1 sender" )
     }
 
-    ierr = iMOAB_Finalize();
-    CHECKRC( ierr, "did not finalize iMOAB" )
+    ierr = iMOAB_Finalize();CHECKRC( ierr, "did not finalize iMOAB" )
 
     if( MPI_COMM_NULL != comm1 ) MPI_Comm_free( &comm1 );
     if( MPI_COMM_NULL != comm2 ) MPI_Comm_free( &comm2 );

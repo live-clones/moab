@@ -17,11 +17,11 @@
 
 using namespace moab;
 
-#define CHECKRC( rc, message )     \
-    if( 0 != ( rc ) )              \
-    {                              \
-        printf( "%s\n", message ); \
-        return MB_FAILURE;         \
+#define CHECKRC( rc, message )            \
+    if( 0 != ( rc ) )                     \
+    {                                     \
+        printf( "Error: %s\n", message ); \
+        return MB_FAILURE;                \
     }
 
 int is_any_proc_error( int is_my_error )
@@ -118,23 +118,19 @@ ErrorCode migrate( const char* filename, const char* outfile )
     for( int i = startG1; i <= endG1; i++ )
         groupTasks[i - startG1] = i;
 
-    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, groupTasks, &group1 );
-    CHECKRC( ierr, "can't create group1" )
+    ierr = MPI_Group_incl( jgroup, endG1 - startG1 + 1, groupTasks, &group1 );CHECKRC( ierr, "can't create group1" )
 
     for( int i = startG2; i <= endG2; i++ )
         groupTasks[i - startG2] = i;
 
-    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, groupTasks, &group2 );
-    CHECKRC( ierr, "can't create group2" )
+    ierr = MPI_Group_incl( jgroup, endG2 - startG2 + 1, groupTasks, &group2 );CHECKRC( ierr, "can't create group2" )
 
     // create 2 communicators, one for each group
     int tagcomm1 = 1, tagcomm2 = 2;
     MPI_Comm comm1, comm2;
-    ierr = MPI_Comm_create_group( jcomm, group1, tagcomm1, &comm1 );
-    CHECKRC( ierr, "can't create comm1" )
+    ierr = MPI_Comm_create_group( jcomm, group1, tagcomm1, &comm1 );CHECKRC( ierr, "can't create comm1" )
 
-    ierr = MPI_Comm_create_group( jcomm, group2, tagcomm2, &comm2 );
-    CHECKRC( ierr, "can't create comm2" )
+    ierr = MPI_Comm_create_group( jcomm, group2, tagcomm2, &comm2 );CHECKRC( ierr, "can't create comm2" )
 
     ierr = iMOAB_Initialize( 0, 0 );  // not really needed anything from argc, argv, yet; maybe we should
     CHECKRC( ierr, "can't initialize iMOAB" )
@@ -152,13 +148,11 @@ ErrorCode migrate( const char* filename, const char* outfile )
 
     if( comm1 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_RegisterApplication( "APP1", &comm1, &compid1, pid1 );
-        CHECKRC( ierr, "can't register app1 " )
+        ierr = iMOAB_RegisterApplication( "APP1", &comm1, &compid1, pid1 );CHECKRC( ierr, "can't register app1 " )
     }
     if( comm2 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_RegisterApplication( "APP2", &comm2, &compid2, pid2 );
-        CHECKRC( ierr, "can't register app2 " )
+        ierr = iMOAB_RegisterApplication( "APP2", &comm2, &compid2, pid2 );CHECKRC( ierr, "can't register app2 " )
     }
 
     int method = 0;  // trivial partition for sending
@@ -169,8 +163,7 @@ ErrorCode migrate( const char* filename, const char* outfile )
 
         nghlay = 0;
 
-        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );
-        CHECKRC( ierr, "can't load mesh " )
+        ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );CHECKRC( ierr, "can't load mesh " )
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &method );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
     }
@@ -181,9 +174,7 @@ ErrorCode migrate( const char* filename, const char* outfile )
         CHECKRC( ierr, "cannot receive elements" )
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
-        ierr =
-            iMOAB_WriteMesh( pid2, outfile, wopts.c_str() );
-        CHECKRC( ierr, "cannot write received mesh" )
+        ierr  = iMOAB_WriteMesh( pid2, outfile, wopts.c_str() );CHECKRC( ierr, "cannot write received mesh" )
     }
 
     MPI_Barrier( jcomm );
@@ -206,31 +197,24 @@ ErrorCode migrate( const char* filename, const char* outfile )
     // now send a tag from component 2, towards component 1
     if( comm2 != MPI_COMM_NULL )
     {
-        ierr =
-            iMOAB_DefineTagStorage( pid2, "element_field", &tagType, &size_tag, &tagIndex2 );
-        CHECKRC( ierr, "failed to get tag element_field " );
+        ierr = iMOAB_DefineTagStorage( pid2, "element_field", &tagType, &size_tag, &tagIndex2 );CHECKRC( ierr, "failed to get tag element_field " );
         // this tag is already existing in the file
 
         // first, send from compid2 to compid1, from comm2, using common joint comm
         // as always, use nonblocking sends
         // contex_id should be now compid1
         context_id = compid1;
-        ierr       = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id );
-        CHECKRC( ierr, "cannot send tag values" )
+        ierr       = iMOAB_SendElementTag( pid2, "element_field", &jcomm, &context_id );CHECKRC( ierr, "cannot send tag values" )
     }
     // receive on component 1
     if( comm1 != MPI_COMM_NULL )
     {
-        ierr =
-            iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1 );
-        CHECKRC( ierr, "failed to get tag DFIELD " );
+        ierr = iMOAB_DefineTagStorage( pid1, "element_field", &tagType, &size_tag, &tagIndex1 );CHECKRC( ierr, "failed to get tag DFIELD " );
         context_id = compid2;
-        ierr       = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id );
-        CHECKRC( ierr, "cannot send tag values" )
+        ierr       = iMOAB_ReceiveElementTag( pid1, "element_field", &jcomm, &context_id );CHECKRC( ierr, "cannot send tag values" )
         std::string wopts;
         wopts = "PARALLEL=WRITE_PART;";
-        ierr  = iMOAB_WriteMesh( pid1, fileAfterTagMigr.c_str(), wopts.c_str() );
-        CHECKRC( ierr, "cannot write received mesh" )
+        ierr  = iMOAB_WriteMesh( pid1, fileAfterTagMigr.c_str(), wopts.c_str() );CHECKRC( ierr, "cannot write received mesh" )
     }
 
     MPI_Barrier( jcomm );
@@ -240,18 +224,15 @@ ErrorCode migrate( const char* filename, const char* outfile )
 
     if( comm2 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DeregisterApplication( pid2 );
-        CHECKRC( ierr, "cannot deregister app 2 receiver" )
+        ierr = iMOAB_DeregisterApplication( pid2 );CHECKRC( ierr, "cannot deregister app 2 receiver" )
     }
 
     if( comm1 != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DeregisterApplication( pid1 );
-        CHECKRC( ierr, "cannot deregister app 1 sender" )
+        ierr = iMOAB_DeregisterApplication( pid1 );CHECKRC( ierr, "cannot deregister app 1 sender" )
     }
 
-    ierr = iMOAB_Finalize();
-    CHECKRC( ierr, "did not finalize iMOAB" )
+    ierr = iMOAB_Finalize();CHECKRC( ierr, "did not finalize iMOAB" )
 
     if( MPI_COMM_NULL != comm1 ) MPI_Comm_free( &comm1 );
     if( MPI_COMM_NULL != comm2 ) MPI_Comm_free( &comm2 );

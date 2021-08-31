@@ -17,6 +17,7 @@
         printf( "%s. ErrorCode = %d\n", message, rc ); \
         return 1;                                      \
     }
+
 #define PUSH_TIMER( operation )               \
     {                                         \
         timer_ops = timer.time_since_birth(); \

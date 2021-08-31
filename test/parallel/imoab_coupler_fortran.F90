@@ -379,8 +379,10 @@ program imoab_coupler_fortran
 
         outputFileOcn= "OcnWithProjF.h5m"//C_NULL_CHAR
         fileWriteOptions = 'PARALLEL=WRITE_PART'//C_NULL_CHAR
-        print *,' Writing ocean mesh file with projected solution to disk: ', outputFileOcn
-        ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions)
+        if (my_id.eq.0) then
+            print *,' Writing ocean mesh file with projected solution to disk: ', outputFileOcn
+        endif
+        ierr = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions)
         call errorout(ierr, 'could not write OcnWithProjF.h5m to disk')
 
     endif

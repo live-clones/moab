@@ -12,11 +12,11 @@
 #include <cstdio>
 #include <cstring>
 
-#define CHECKRC( rc, message )   \
-    if( 0 != ( rc ) )            \
-    {                            \
-        printf( "%s", message ); \
-        return 1;                \
+#define CHECKRC( rc, message )            \
+    if( 0 != ( rc ) )                     \
+    {                                     \
+        printf( "Error: %s\n", message ); \
+        return 1;                         \
     }
 
 int main( int argc, char* argv[] )
@@ -74,15 +74,13 @@ int main( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
                                     &comm,
 #endif
-                                    &compid, pid );
-    CHECKRC( rc, "failed to register application" );
+                                    &compid, pid );CHECKRC( rc, "failed to register application" );
 
     rc = iMOAB_RegisterApplication( "MBDUPAPP",
 #ifdef MOAB_HAVE_MPI
                                     &comm,
 #endif
-                                    &compdupid, pidDup );
-    CHECKRC( rc, "failed to register duplicate application" );
+                                    &compdupid, pidDup );CHECKRC( rc, "failed to register duplicate application" );
 
 #ifdef MOAB_HAVE_MPI
     const char* read_opts   = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
@@ -99,14 +97,11 @@ int main( int argc, char* argv[] )
      * vertex entity should have a GLOBAL ID tag in the file, which will be available for visible
      * entities
      */
-    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, num_ghost_layers );
-    CHECKRC( rc, "failed to load mesh" );
+    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, num_ghost_layers );CHECKRC( rc, "failed to load mesh" );
 
-    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, num_ghost_layers );
-    CHECKRC( rc, "failed to load mesh" );
+    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, num_ghost_layers );CHECKRC( rc, "failed to load mesh" );
 
-    rc = iMOAB_SetGlobalInfo( pid, &num_global_vertices, &num_global_elements );
-    CHECKRC( rc, "failed to set global info" );
+    rc = iMOAB_SetGlobalInfo( pid, &num_global_vertices, &num_global_elements );CHECKRC( rc, "failed to set global info" );
 
     int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
     /*
@@ -115,8 +110,7 @@ int main( int argc, char* argv[] )
      * primary cells, visible blocks, number of sidesets and nodesets boundary conditions will be
      * returned in size 3 arrays, for local, ghost and total numbers.
      */
-    rc = iMOAB_GetMeshInfo( pid, nverts, nelem, nblocks, nsbc, ndbc );
-    CHECKRC( rc, "failed to get mesh info" );
+    rc = iMOAB_GetMeshInfo( pid, nverts, nelem, nblocks, nsbc, ndbc );CHECKRC( rc, "failed to get mesh info" );
 
     iMOAB_GlobalID* vGlobalID = (iMOAB_GlobalID*)malloc( nverts[2] * sizeof( iMOAB_GlobalID ) );
     /*
@@ -124,8 +118,7 @@ int main( int argc, char* argv[] )
      * Currently, global ID is a 32 bit integer, total number of visible vertices was returned by
      * iMOAB_GetMeshInfo
      */
-    rc = iMOAB_GetVertexID( pid, &nverts[2], vGlobalID );
-    CHECKRC( rc, "failed to get vertex id info" );
+    rc = iMOAB_GetVertexID( pid, &nverts[2], vGlobalID );CHECKRC( rc, "failed to get vertex id info" );
 
     int* vranks = (int*)malloc( nverts[2] * sizeof( int ) );
     /*
@@ -136,8 +129,7 @@ int main( int argc, char* argv[] )
      * arrays. The local index of the vertex will vary from 0 to number of visible vertices (in this
      * example nverts[2]-1)
      */
-    rc = iMOAB_GetVertexOwnership( pid, &nverts[2], vranks );
-    CHECKRC( rc, "failed to get vertex ranks" );
+    rc = iMOAB_GetVertexOwnership( pid, &nverts[2], vranks );CHECKRC( rc, "failed to get vertex ranks" );
 
     double* coords  = (double*)malloc( 3 * nverts[2] * sizeof( double ) );
     int size_coords = 3 * nverts[2];
@@ -145,8 +137,7 @@ int main( int argc, char* argv[] )
      * Coordinates are returned interleaved, for all visible vertices. Size is dimension times
      * number of visible vertices
      */
-    rc = iMOAB_GetVisibleVerticesCoordinates( pid, &size_coords, coords );
-    CHECKRC( rc, "failed to get coordinates" );
+    rc = iMOAB_GetVisibleVerticesCoordinates( pid, &size_coords, coords );CHECKRC( rc, "failed to get coordinates" );
 
     /*
      * Block IDs correspond to MATERIAL_SET tag values in hdf5 file
@@ -158,8 +149,7 @@ int main( int argc, char* argv[] )
      * A MATERIAL_SET tag in moab if SPARSE and type INTEGER.
      */
     iMOAB_GlobalID* gbIDs = (iMOAB_GlobalID*)malloc( nblocks[2] * sizeof( iMOAB_GlobalID ) );
-    rc                    = iMOAB_GetBlockID( pid, &nblocks[2], gbIDs );
-    CHECKRC( rc, "failed to get block info" );
+    rc                    = iMOAB_GetBlockID( pid, &nblocks[2], gbIDs );CHECKRC( rc, "failed to get block info" );
 
     /*
      * The 2 tags used in this example exist in the file, already.
@@ -172,11 +162,9 @@ int main( int argc, char* argv[] )
     int entTypes[2]    = { 0, 1 }; /* first is on vertex, second is on elements; */
     int tagTypes[2]    = { DENSE_INTEGER, DENSE_DOUBLE };
     int num_components = 1;
-    rc                 = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagTypes[0], &num_components, &tagIndex[0] );
-    CHECKRC( rc, "failed to get tag INTFIELD " );
+    rc                 = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagTypes[0], &num_components, &tagIndex[0] );CHECKRC( rc, "failed to get tag INTFIELD " );
 
-    rc = iMOAB_DefineTagStorage( pid, "DFIELD", &tagTypes[1], &num_components, &tagIndex[1] );
-    CHECKRC( rc, "failed to get tag DFIELD " );
+    rc = iMOAB_DefineTagStorage( pid, "DFIELD", &tagTypes[1], &num_components, &tagIndex[1] );CHECKRC( rc, "failed to get tag DFIELD " );
 
     // synchronize one of the tags only, just to see what happens
     int num_tags_to_sync = 1;
@@ -185,8 +173,7 @@ int main( int argc, char* argv[] )
      * synchronize them with a call like this one. The tags to synchronize are referenced by the
      * index returned at their "definition" with iMOAB_DefineTagStorage method.
      */
-    rc = iMOAB_SynchronizeTags( pid, &num_tags_to_sync, &tagIndex[0], &tagTypes[0] );
-    CHECKRC( rc, "failed to sync tag INTFIELD " );
+    rc = iMOAB_SynchronizeTags( pid, &num_tags_to_sync, &tagIndex[0], &tagTypes[0] );CHECKRC( rc, "failed to sync tag INTFIELD " );
 
     for( int irank = 0; irank < nprocs; irank++ )
     {
@@ -214,8 +201,7 @@ int main( int argc, char* argv[] )
              * visible elements info is available for all visible elements, with this call. Similar
              * information can be retrieved by looping over visible blocks
              */
-            rc = iMOAB_GetVisibleElementsInfo( pid, &nelem[2], element_global_IDs, ranks, block_IDs );
-            CHECKRC( rc, "failed to get all elem info" );
+            rc = iMOAB_GetVisibleElementsInfo( pid, &nelem[2], element_global_IDs, ranks, block_IDs );CHECKRC( rc, "failed to get all elem info" );
             for( int i = 0; i < nelem[2]; i++ )
                 printf( " element local id: %3d,  global ID: %3d  rank:%d  block ID: %2d \n", i, element_global_IDs[i],
                         ranks[i], block_IDs[i] );
@@ -231,8 +217,7 @@ int main( int argc, char* argv[] )
              * element connectivity can be retrieved for a single element. Local vertex indices are
              * returned.
              */
-            rc = iMOAB_GetElementConnectivity( pid, &eindex, &nv, conn );
-            CHECKRC( rc, "failed to get first element connectivity" );
+            rc = iMOAB_GetElementConnectivity( pid, &eindex, &nv, conn );CHECKRC( rc, "failed to get first element connectivity" );
             printf( " conn for first element: \n" );
             for( int i = 0; i < nv; i++ )
                 printf( " %3d", conn[i] );
@@ -246,8 +231,7 @@ int main( int argc, char* argv[] )
              * Neighbor elements that share a face with current element can be determined with this
              * call Elements are identified by their local index
              */
-            rc = iMOAB_GetNeighborElements( pid, &local_index, &num_adjacent_elements, adjacent_element_IDs );
-            CHECKRC( rc, "failed to get first element neighbors" );
+            rc = iMOAB_GetNeighborElements( pid, &local_index, &num_adjacent_elements, adjacent_element_IDs );CHECKRC( rc, "failed to get first element neighbors" );
             printf( "  neighbors for first element:\n" );
             for( int i = 0; i < num_adjacent_elements; i++ )
             {
@@ -266,8 +250,7 @@ int main( int argc, char* argv[] )
                  * block ID. Should it be identified with its local index in the list of visible
                  * blocks?
                  */
-                rc = iMOAB_GetBlockInfo( pid, &gbIDs[i], &vertices_per_element, &num_elements_in_block );
-                CHECKRC( rc, "failed to elem block info" );
+                rc = iMOAB_GetBlockInfo( pid, &gbIDs[i], &vertices_per_element, &num_elements_in_block );CHECKRC( rc, "failed to elem block info" );
                 printf( "    has %4d elements with %d vertices per element\n", num_elements_in_block,
                         vertices_per_element );
                 int size_conn                       = num_elements_in_block * vertices_per_element;
@@ -277,16 +260,14 @@ int main( int argc, char* argv[] )
                  * Vertices are identified by their local index (from 0 to number of visible
                  * vertices -1)
                  */
-                rc = iMOAB_GetBlockElementConnectivities( pid, &gbIDs[i], &size_conn, element_connectivity );
-                CHECKRC( rc, "failed to get block elem connectivity" );
+                rc = iMOAB_GetBlockElementConnectivities( pid, &gbIDs[i], &size_conn, element_connectivity );CHECKRC( rc, "failed to get block elem connectivity" );
                 int* element_ownership = (int*)malloc( sizeof( int ) * num_elements_in_block );
 
                 /*
                  * Each element is owned by a particular process. Ownership can be returned for all
                  * elements in a block with this call.
                  */
-                rc = iMOAB_GetElementOwnership( pid, &gbIDs[i], &num_elements_in_block, element_ownership );
-                CHECKRC( rc, "failed to get block elem ownership" );
+                rc = iMOAB_GetElementOwnership( pid, &gbIDs[i], &num_elements_in_block, element_ownership );CHECKRC( rc, "failed to get block elem ownership" );
                 iMOAB_GlobalID* global_element_ID =
                     (iMOAB_GlobalID*)malloc( sizeof( iMOAB_GlobalID ) * num_elements_in_block );
                 iMOAB_LocalID* local_element_ID =
@@ -296,8 +277,7 @@ int main( int argc, char* argv[] )
                  * Global element IDs are determined with this call. Local indices within the
                  * process are returned too.
                  */
-                rc = iMOAB_GetElementID( pid, &gbIDs[i], &num_elements_in_block, global_element_ID, local_element_ID );
-                CHECKRC( rc, "failed to get block elem IDs" );
+                rc = iMOAB_GetElementID( pid, &gbIDs[i], &num_elements_in_block, global_element_ID, local_element_ID );CHECKRC( rc, "failed to get block elem IDs" );
                 for( int j = 0; j < num_elements_in_block; j++ )
                 {
                     printf( "  elem %3d owned by %d gid: %4d lid: %4d  -- ", j, element_ownership[j],
@@ -319,8 +299,7 @@ int main( int argc, char* argv[] )
              * this call (deep copy)
              */
             int* int_tag_vals = (int*)malloc( sizeof( int ) * nverts[2] );  // for all visible vertices on the rank
-            rc                = iMOAB_GetIntTagStorage( pid, "INTFIELD", &nverts[2], &entTypes[0], int_tag_vals );
-            CHECKRC( rc, "failed to get INTFIELD tag" );
+            rc                = iMOAB_GetIntTagStorage( pid, "INTFIELD", &nverts[2], &entTypes[0], int_tag_vals );CHECKRC( rc, "failed to get INTFIELD tag" );
             printf( "INTFIELD tag values:\n" );
             for( int i = 0; i < nverts[2]; i++ )
             {
@@ -336,8 +315,7 @@ int main( int argc, char* argv[] )
              */
             double* double_tag_vals =
                 (double*)malloc( sizeof( double ) * nelem[2] );  // for all visible elements on the rank
-            rc = iMOAB_GetDoubleTagStorage( pid, "DFIELD", &nelem[2], &entTypes[1], double_tag_vals );
-            CHECKRC( rc, "failed to get DFIELD tag" );
+            rc = iMOAB_GetDoubleTagStorage( pid, "DFIELD", &nelem[2], &entTypes[1], double_tag_vals );CHECKRC( rc, "failed to get DFIELD tag" );
             printf( "DFIELD tag values: (not exchanged) \n" );
             for( int i = 0; i < nelem[2]; i++ )
             {
@@ -356,8 +334,7 @@ int main( int argc, char* argv[] )
              * the reference surfaces are indexed from 1 to 6 for hexahedrons, 1 to 4 to
              * tetrahedrons, in the MOAB canonical ordering convention
              */
-            rc = iMOAB_GetPointerToSurfaceBC( pid, &nsbc[2], surfBC_ID, ref_surf, bc_value );
-            CHECKRC( rc, "failed to get surf boundary conditions" );
+            rc = iMOAB_GetPointerToSurfaceBC( pid, &nsbc[2], surfBC_ID, ref_surf, bc_value );CHECKRC( rc, "failed to get surf boundary conditions" );
             printf( " Surface boundary conditions:\n" );
             for( int i = 0; i < nsbc[2]; i++ )
             {
@@ -369,8 +346,7 @@ int main( int argc, char* argv[] )
             /* query vertex BCs */
             iMOAB_LocalID* vertBC_ID = (iMOAB_LocalID*)malloc( sizeof( iMOAB_LocalID ) * ndbc[2] );
             int* vertBC_value        = (int*)malloc( sizeof( int ) * ndbc[2] );
-            rc                       = iMOAB_GetPointerToVertexBC( pid, &ndbc[2], vertBC_ID, vertBC_value );
-            CHECKRC( rc, "failed to get vertex boundary conditions" );
+            rc                       = iMOAB_GetPointerToVertexBC( pid, &ndbc[2], vertBC_ID, vertBC_value );CHECKRC( rc, "failed to get vertex boundary conditions" );
             printf( "  Vertex boundary conditions:\n" );
             for( int i = 0; i < ndbc[2]; i++ )
             {
@@ -404,17 +380,14 @@ int main( int argc, char* argv[] )
      * deregistering application will delete all mesh entities associated with the application and
      * will free allocated tag storage.
      */
-    rc = iMOAB_DeregisterApplication( pid );
-    CHECKRC( rc, "failed to de-register application" );
+    rc = iMOAB_DeregisterApplication( pid );CHECKRC( rc, "failed to de-register application" );
 
-    rc = iMOAB_DeregisterApplication( pidDup );
-    CHECKRC( rc, "failed to de-register application" );
+    rc = iMOAB_DeregisterApplication( pidDup );CHECKRC( rc, "failed to de-register application" );
 
     /*
      * this method will delete MOAB instance
      */
-    rc = iMOAB_Finalize();
-    CHECKRC( rc, "failed to finalize MOAB" );
+    rc = iMOAB_Finalize();CHECKRC( rc, "failed to finalize MOAB" );
 #ifdef MOAB_HAVE_MPI
     MPI_Finalize();
 #endif
