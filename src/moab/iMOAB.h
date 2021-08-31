@@ -54,8 +54,16 @@
 #define ErrCode moab::ErrorCode
 #else
 #define ErrCode int
+#endif
+
+#ifdef _MSC_VER
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#else
+#if !defined( __cplusplus ) || !defined( __PRETTY_FUNCTION__ )
 #define __PRETTY_FUNCTION__ __func__
 #endif
+#endif
+
 /**
  * @brief MOAB tag types can be: dense/sparse, and of int/double/EntityHandle types. 
  * They can also be defined on both elements and vertices of the mesh.
