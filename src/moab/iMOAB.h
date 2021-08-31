@@ -34,7 +34,9 @@
       Preferably local numbering else lot of deciphering for global.
 */
 #include "moab/MOABConfig.h"
+#include "moab/Types.hpp"
 
+#include <cstdio>
 #include <cassert>
 #include <cstdlib>
 
@@ -42,7 +44,7 @@
 #define iMOAB_String   char*
 #define iMOAB_GlobalID int
 #define iMOAB_LocalID  int
-#define ErrCode        int
+#define ErrCode        moab::ErrorCode
 
 /**
  * @brief MOAB tag types can be: dense/sparse, and of int/double/EntityHandle types. 
@@ -69,6 +71,38 @@ enum MOAB_TAG_OWNER_TYPE
     TAG_FACE    = 2,
     TAG_ELEMENT = 3
 };
+
+#define CHK_MPI_ERR( ierr )                          \
+    {                                                \
+        if( 0 != ( ierr ) ) return moab::MB_FAILURE; \
+    }
+
+#define IMOAB_CHECKPOINTER( prmObj, position )                                                 \
+    {                                                                                          \
+        if( prmObj == nullptr )                                                                \
+        {                                                                                      \
+            printf( "InputParamError at %d: '%s' is invalid and null.\n", position, #prmObj ); \
+            return moab::MB_UNHANDLED_OPTION;                                                  \
+        }                                                                                      \
+    }
+
+#ifndef NDEBUG
+#define IMOAB_ASSERT_RET( condition, message, retval )                                                         \
+    {                                                                                                          \
+        if( !( condition ) )                                                                                   \
+        {                                                                                                      \
+            printf( "iMOAB Error: %s.\n Failed condition: %s\n Location: %s in %s:%d.\n", message, #condition, \
+                    __PRETTY_FUNCTION__, __FILE__, __LINE__ );                                                 \
+            return retval;                                                                                     \
+        }                                                                                                      \
+    }
+
+#define IMOAB_ASSERT( condition, message ) IMOAB_ASSERT_RET( condition, message, moab::MB_UNHANDLED_OPTION )
+
+#else
+#define IMOAB_ASSERT( condition, message )
+#define IMOAB_ASSERT_RET( condition, message )
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -1183,7 +1217,7 @@ inline MPI_Comm* MOAB_MPI_Comm_f2c( MPI_Fint fcomm )
     MPI_Comm* ccomm;
     ccomm  = static_cast< MPI_Comm* >( malloc( sizeof( MPI_Comm ) ) );  // memory leak ?!
     *ccomm = MPI_Comm_f2c( fcomm );
-    assert( *ccomm != MPI_COMM_NULL );
+    IMOAB_ASSERT_RET( *ccomm != MPI_COMM_NULL, "The MPI_Comm conversion from Fortran to C failed.", nullptr );
     return ccomm;
 }
 
@@ -1211,7 +1245,7 @@ inline MPI_Group* MOAB_MPI_Group_f2c( MPI_Fint fgroup )
     MPI_Group* cgroup;
     cgroup  = static_cast< MPI_Group* >( malloc( sizeof( MPI_Group ) ) );  // memory leak ?!
     *cgroup = MPI_Group_f2c( fgroup );
-    assert( *cgroup != MPI_GROUP_NULL );
+    IMOAB_ASSERT_RET( *cgroup != MPI_GROUP_NULL, "The MPI_Group conversion from Fortran to C failed.", nullptr );
     return cgroup;
 }
 
