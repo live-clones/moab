@@ -101,6 +101,7 @@ include ( CheckTypeSize )
 set( MOAB_DEFINES "" )
 set( MOAB_LIBS )
 set( MOAB_INSTALL_TARGETS )
+set( MOAB_MESH_DIR        "${CMAKE_SOURCE_DIR}/MeshFiles/unittest/" )
 
 ################################################################################
 # Options that the user controls

@@ -15,14 +15,14 @@
 #define STRINGIFY_( X ) #X
 #define STRINGIFY( X )  STRINGIFY_( X )
 
-#ifdef MESHDIR
+#ifdef MOAB_MESH_DIR
 #ifdef __cplusplus
-const std::string TestDir( STRINGIFY( MESHDIR ) );
+const std::string TestDir( MOAB_MESH_DIR );
 #else
-const char* TestDir = STRINGIFY( MESHDIR );
+const char* TestDir = MOAB_MESH_DIR;
 #endif
 #else
-#error Specify MESHDIR to compile test
+#error Specify MOAB_MESH_DIR to compile test
 #endif
 
 /* How to use this test suite utility:
@@ -282,7 +282,10 @@ int run_test( test_func_err test, const char* func_name )
 #ifdef MOAB_HAVE_MPI
     int isInit;
     MPI_Initialized( &isInit );
-    if( isInit ) { MPI_Comm_rank( MPI_COMM_WORLD, &rank ); }
+    if( isInit )
+    {
+        MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    }
 #endif
 
     if( rank == 0 ) printf( "Running %s ...\n", func_name );
@@ -416,7 +419,11 @@ void check_equal( unsigned long A, unsigned long B, const char* sA, const char* 
     EQUAL_TEST_IMPL( A == B, lu )
 }
 
-void check_equal( unsigned long long A, unsigned long long B, const char* sA, const char* sB, int line,
+void check_equal( unsigned long long A,
+                  unsigned long long B,
+                  const char* sA,
+                  const char* sB,
+                  int line,
                   const char* file )
 {
     EQUAL_TEST_IMPL( A == B, llu )
@@ -437,7 +444,11 @@ void check_equal( const char* A, const char* B, const char* sA, const char* sB, 
     EQUAL_TEST_IMPL( !strcmp( ( A ), ( B ) ), s )
 }
 
-void check_equal( const std::string& A, const std::string& B, const char* sA, const char* sB, int line,
+void check_equal( const std::string& A,
+                  const std::string& B,
+                  const char* sA,
+                  const char* sB,
+                  int line,
                   const char* file )
 {
     check_equal( A.c_str(), B.c_str(), sA, sB, line, file );
@@ -584,8 +595,13 @@ void check_true( bool cond, const char* str, int line, const char* file )
 
 #ifdef MB_CART_VECT_HPP
 
-void check_equal_cartvect( const moab::CartVect& A, const moab::CartVect& B, double eps, const char* sA, const char* sB,
-                           int line, const char* file )
+void check_equal_cartvect( const moab::CartVect& A,
+                           const moab::CartVect& B,
+                           double eps,
+                           const char* sA,
+                           const char* sB,
+                           int line,
+                           const char* file )
 {
     check_equal( A.length(), B.length(), eps, sA, sB, line, file );
 
@@ -608,7 +624,13 @@ void check_equal_cartvect( const moab::CartVect& A, const moab::CartVect& B, dou
 #ifdef __cplusplus
 
 template < typename T >
-void check_array_equal( const T* A, size_t A_size, const T* B, size_t B_size, const char* sA, const char* sB, int line,
+void check_array_equal( const T* A,
+                        size_t A_size,
+                        const T* B,
+                        size_t B_size,
+                        const char* sA,
+                        const char* sB,
+                        int line,
                         const char* file )
 {
     size_t i = 0;
@@ -644,7 +666,10 @@ void check_array_equal( const T* A, size_t A_size, const T* B, size_t B_size, co
     }
 
     std::cout << "  Expected: ";
-    if( !A_size ) { std::cout << "(empty)" << std::endl; }
+    if( !A_size )
+    {
+        std::cout << "(empty)" << std::endl;
+    }
     else
     {
         size_t j   = i - num_front_values;
@@ -662,7 +687,10 @@ void check_array_equal( const T* A, size_t A_size, const T* B, size_t B_size, co
     }
 
     std::cout << "  Actual:   ";
-    if( !B_size ) { std::cout << "(empty)" << std::endl; }
+    if( !B_size )
+    {
+        std::cout << "(empty)" << std::endl;
+    }
     else
     {
         size_t j   = i - num_front_values;
@@ -683,7 +711,11 @@ void check_array_equal( const T* A, size_t A_size, const T* B, size_t B_size, co
 }
 
 template < typename T >
-void check_equal( const std::vector< T >& A, const std::vector< T >& B, const char* sA, const char* sB, int line,
+void check_equal( const std::vector< T >& A,
+                  const std::vector< T >& B,
+                  const char* sA,
+                  const char* sB,
+                  int line,
                   const char* file )
 {
     if( A.empty() || B.empty() )
@@ -701,7 +733,11 @@ void check_equal( const std::vector< T >& A, const std::vector< T >& B, const ch
 
 #ifdef MOAB_RANGE_HPP
 
-void check_equal( const moab::Range& A, const moab::Range& B, const char* sA, const char* sB, int line,
+void check_equal( const moab::Range& A,
+                  const moab::Range& B,
+                  const char* sA,
+                  const char* sB,
+                  int line,
                   const char* file )
 {
     if( A == B ) return;
@@ -716,7 +752,10 @@ void check_equal( const moab::Range& A, const moab::Range& B, const char* sA, co
 
 #endif  // #ifdef MOAB_RANGE_HPP
 
-void check_baseline_file( std::string basefile, std::vector< int >& gids, std::vector< double >& vals, double eps,
+void check_baseline_file( std::string basefile,
+                          std::vector< int >& gids,
+                          std::vector< double >& vals,
+                          double eps,
                           int& err_code )
 {
     err_code = 1;

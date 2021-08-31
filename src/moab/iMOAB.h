@@ -36,16 +36,26 @@
 #include "moab/MOABConfig.h"
 #include "moab/Types.hpp"
 
+#ifdef __cplusplus
 #include <cstdio>
 #include <cassert>
 #include <cstdlib>
+#else
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#endif
 
 #define iMOAB_AppID    int*
 #define iMOAB_String   char*
 #define iMOAB_GlobalID int
 #define iMOAB_LocalID  int
-#define ErrCode        moab::ErrorCode
-
+#ifdef __cplusplus
+#define ErrCode moab::ErrorCode
+#else
+#define ErrCode int
+#define __PRETTY_FUNCTION__ __func__
+#endif
 /**
  * @brief MOAB tag types can be: dense/sparse, and of int/double/EntityHandle types. 
  * They can also be defined on both elements and vertices of the mesh.
@@ -1215,9 +1225,9 @@ inline MPI_Fint MOAB_MPI_Comm_c2f( MPI_Comm* comm )
 inline MPI_Comm* MOAB_MPI_Comm_f2c( MPI_Fint fcomm )
 {
     MPI_Comm* ccomm;
-    ccomm  = static_cast< MPI_Comm* >( malloc( sizeof( MPI_Comm ) ) );  // memory leak ?!
+    ccomm  = (MPI_Comm*)( malloc( sizeof( MPI_Comm ) ) );  // memory leak ?!
     *ccomm = MPI_Comm_f2c( fcomm );
-    IMOAB_ASSERT_RET( *ccomm != MPI_COMM_NULL, "The MPI_Comm conversion from Fortran to C failed.", nullptr );
+    IMOAB_ASSERT_RET( *ccomm != MPI_COMM_NULL, "The MPI_Comm conversion from Fortran to C failed.", NULL );
     return ccomm;
 }
 
@@ -1243,9 +1253,9 @@ inline MPI_Fint MOAB_MPI_Group_c2f( MPI_Group* group )
 inline MPI_Group* MOAB_MPI_Group_f2c( MPI_Fint fgroup )
 {
     MPI_Group* cgroup;
-    cgroup  = static_cast< MPI_Group* >( malloc( sizeof( MPI_Group ) ) );  // memory leak ?!
+    cgroup  = (MPI_Group*)( malloc( sizeof( MPI_Group ) ) );  // memory leak ?!
     *cgroup = MPI_Group_f2c( fgroup );
-    IMOAB_ASSERT_RET( *cgroup != MPI_GROUP_NULL, "The MPI_Group conversion from Fortran to C failed.", nullptr );
+    IMOAB_ASSERT_RET( *cgroup != MPI_GROUP_NULL, "The MPI_Group conversion from Fortran to C failed.", NULL );
     return cgroup;
 }
 

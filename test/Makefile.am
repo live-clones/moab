@@ -138,12 +138,13 @@ else
 imoab_testF_LDADD = $(LDADD) $(FCLIBS)
 endif
 endif
-imoab_test_SOURCES = imoab_test.cpp
+imoab_test_SOURCES = imoab_test.c
 if HAVE_TEMPESTREMAP
 imoab_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 else
 imoab_test_LDADD = $(LDADD)
 endif
+CCLD = $(CXX)
 
 verdict_test_SOURCES = verdict_test.cpp
 range_test_SOURCES = range_test.cpp

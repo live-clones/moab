@@ -264,6 +264,9 @@
 /* "Define if configured with Zoltan library partitioning support." */
 #cmakedefine MOAB_HAVE_ZOLTAN @MOAB_HAVE_ZOLTAN@
 
+/* Path to the mesh files directory needed for unit-tests */
+#cmakedefine MOAB_MESH_DIR "@MOAB_MESH_DIR@"
+
 /* MPICH_IGNORE_CXX_SEEK is not sufficient to avoid conflicts */
 #cmakedefine MOAB_MPI_CXX_CONFLICT @MOAB_MPI_CXX_CONFLICT@
 

@@ -5,24 +5,19 @@
 #endif
 
 #include "moab/iMOAB.h"
-#include "TestUtil.hpp"
+#include <string.h>
 
-// for malloc, free:
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-
-#define CHECKRC( rc, message )            \
-    if( 0 != ( rc ) )                     \
-    {                                     \
-        printf( "Error: %s\n", message ); \
-        return 1;                         \
+#define CHECKRC( rc, message )             \
+    if( 0 != ( rc ) )                      \
+    {                                      \
+        printf( "Error: %s.\n", message ); \
+        return 1;                          \
     }
 
 int main( int argc, char* argv[] )
 {
     int nprocs = 1, rank = 0;
-    std::string filen;
+    char filen[1024] = "";
 #ifdef MOAB_HAVE_MPI
     MPI_Init( &argc, &argv );
 
@@ -32,19 +27,23 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef MOAB_HAVE_HDF5
-    filen = TestDir + "/io/p8ex1.h5m";
+    strcpy( filen, MOAB_MESH_DIR );
+    strcat( filen, "io/p8ex1.h5m" );
 #endif
 
-    if( argc > 1 ) filen = std::string( argv[1] );
+    if( argc > 1 ) strcpy( filen, argv[1] );
 
-    if( !filen.size() ) return 1;
+    if( !strlen( filen ) )
+    {
+        printf( "Invalid filename specified at command line.\n" );
+        return 1;
+    }
     /*
      * MOAB needs to be initialized; A MOAB instance will be created, and will be used by each
      * application in this framework. There is no parallel context yet.
      */
-    ErrCode rc = iMOAB_Initialize( argc, argv );
+    ErrCode rc = iMOAB_Initialize( argc, argv );CHECKRC( rc, "failed to initialize MOAB" );
 
-    CHECKRC( rc, "failed to initialize MOAB" );
     int num_global_vertices = 0, num_global_elements = 0, num_dimension = 0, num_parts = 0;
     /*
      * Header information is cheap to retrieve from an hdf5 file; it can be called by each process
@@ -52,24 +51,24 @@ int main( int argc, char* argv[] )
      * format, and has to be partitioned in advance. There should be at least as many partitions in
      * the file as number of tasks in the communicator.
      */
-    rc = iMOAB_ReadHeaderInfo( filen.c_str(), &num_global_vertices, &num_global_elements, &num_dimension, &num_parts );
-
-    CHECKRC( rc, "failed to read header info" );
+    rc = iMOAB_ReadHeaderInfo( filen, &num_global_vertices, &num_global_elements, &num_dimension, &num_parts );CHECKRC( rc, "failed to read header info" );
 
     if( 0 == rank )
     {
-        printf( "file %s has %d vertices, %d elements, %d parts in partition\n", filen.c_str(), num_global_vertices,
+        printf( "file %s has %d vertices, %d elements, %d parts in partition\n", filen, num_global_vertices,
                 num_global_elements, num_parts );
     }
+
     int appID, appDupID;
     iMOAB_AppID pid    = &appID;
     iMOAB_AppID pidDup = &appDupID;
+    int compid = 11, compdupid = 12;
+
     /*
      * Each application has to be registered once. A mesh set and a parallel communicator will be
      * associated with each application. A unique application id will be returned, and will be used
      * for all future mesh operations/queries.
      */
-    int compid = 11, compdupid = 12;
     rc = iMOAB_RegisterApplication( "MBAPP",
 #ifdef MOAB_HAVE_MPI
                                     &comm,
@@ -97,9 +96,9 @@ int main( int argc, char* argv[] )
      * vertex entity should have a GLOBAL ID tag in the file, which will be available for visible
      * entities
      */
-    rc = iMOAB_LoadMesh( pid, filen.c_str(), read_opts, num_ghost_layers );CHECKRC( rc, "failed to load mesh" );
+    rc = iMOAB_LoadMesh( pid, filen, read_opts, num_ghost_layers );CHECKRC( rc, "failed to load mesh" );
 
-    rc = iMOAB_LoadMesh( pidDup, filen.c_str(), read_opts, num_ghost_layers );CHECKRC( rc, "failed to load mesh" );
+    rc = iMOAB_LoadMesh( pidDup, filen, read_opts, num_ghost_layers );CHECKRC( rc, "failed to load mesh" );
 
     rc = iMOAB_SetGlobalInfo( pid, &num_global_vertices, &num_global_elements );CHECKRC( rc, "failed to set global info" );
 
@@ -187,6 +186,7 @@ int main( int argc, char* argv[] )
                     "  %3d visible neumann BCs\n"
                     "  %3d visible dirichlet BCs\n",
                     rank, nverts[2], nverts[0], nverts[1], nelem[2], nelem[0], nelem[1], nblocks[2], nsbc[2], ndbc[2] );
+
             /* printf some of the vertex id infos */
             int numToPrint = nverts[2];
             printf( "on rank %d vertex info:\n", rank );
@@ -253,6 +253,7 @@ int main( int argc, char* argv[] )
                 rc = iMOAB_GetBlockInfo( pid, &gbIDs[i], &vertices_per_element, &num_elements_in_block );CHECKRC( rc, "failed to elem block info" );
                 printf( "    has %4d elements with %d vertices per element\n", num_elements_in_block,
                         vertices_per_element );
+
                 int size_conn                       = num_elements_in_block * vertices_per_element;
                 iMOAB_LocalID* element_connectivity = (iMOAB_LocalID*)malloc( sizeof( iMOAB_LocalID ) * size_conn );
                 /*
@@ -374,7 +375,7 @@ int main( int argc, char* argv[] )
      * the file can be written in parallel, and it will contain additional tags defined by the user
      * we may extend the method to write only desired tags to the file
      */
-    rc = iMOAB_WriteMesh( pid, outputFile, writeOptions );
+    rc = iMOAB_WriteMesh( pid, outputFile, writeOptions );CHECKRC( rc, "failed to write output file" );
 
     /*
      * deregistering application will delete all mesh entities associated with the application and
