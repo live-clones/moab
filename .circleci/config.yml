@@ -27,56 +27,9 @@ jobs:
         make all -j4
         make check -j4
 
-  distartifacts:
-    working_directory: ~/fathomteam/moab
-    parallelism: 1
-    shell: /bin/bash --login
-    # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
-    # If any of these refer to each other, rewrite them so that they don't or see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables .
-    environment:
-      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
-      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-    # To see the list of pre-built images that CircleCI provides for most common languages see
-    # https://circleci.com/docs/2.0/circleci-images/
-    docker:
-      - image: cimg/base:2021.07
-    steps:
-    # Machine Setup
-    #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
-    # The following `checkout` command checks out your code to your working directory. 
-    - checkout
-    # Dependencies
-    #   This would typically go in either a build or a build-and-test job when using workflows
-    # Run the setup and install any pre-dependencies for building MOAB 
-    - run: |
-        # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
-        mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
-        autoreconf -fi
-        ./configure
-        make dist
-        mv moab-*.tar.gz ${CIRCLE_ARTIFACTS}/moab-${CIRCLE_BRANCH}.tar.gz
-    #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
-    # Save test results
-    - store_test_results:
-        path: /tmp/circleci-test-results
-    # Save artifacts
-    - store_artifacts:
-        path: /tmp/circleci-artifacts
-    - store_artifacts:
-        path: /tmp/circleci-test-results
-
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
-      - distartifacts:
-          requires:
-            - build
-          filters:
-            branches:
-              only: 
-                - master
-                - develop
-                - circleci-20-test
 
