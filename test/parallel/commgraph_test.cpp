@@ -47,11 +47,11 @@
 #include <iostream>
 #include <sstream>
 
-#define CHECKIERR( rc, message )                       \
-    if( 0 != ( rc ) )                                  \
-    {                                                  \
-        printf( "%s. ErrorCode = %d\n", message, rc ); \
-        CHECK( 0 );                                    \
+#define CHECKIERR( rc, message )                        \
+    if( 0 != ( rc ) )                                   \
+    {                                                   \
+        printf( "%s. ErrorCode = %d.\n", message, rc ); \
+        CHECK( 0 );                                     \
     }
 
 using namespace moab;

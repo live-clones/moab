@@ -86,7 +86,7 @@ int main( int argc, char* argv[] )
     int num_ghost_layers[1] = { 1 };
 #else
     const char* read_opts = "";
-    int* num_ghost_layers = nullptr;
+    int* num_ghost_layers = NULL;
 #endif
 
     /*
