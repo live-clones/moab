@@ -357,7 +357,6 @@ endif
 mpiparallelincludedir = $(includedir)
 mpiparallelinclude_HEADERS = \
      parallel/moab_mpi.h \
-     parallel/moab_mpi_config.h \
      parallel/MBParallelConventions.h
 
 moabparallelincludedir = $(includedir)/moab

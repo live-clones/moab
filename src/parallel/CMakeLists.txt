@@ -9,9 +9,6 @@ set( moab_PARALLEL_SRCS
   gs.cpp
 )
 
-#generate the moab_mpi_config.h file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/moab_mpi_config.h.in "${CMAKE_CURRENT_BINARY_DIR}/moab_mpi_config.h" @ONLY)
-
 set(moab_PARALLEL_INSTALL_HDRS moab/gs.hpp
                                moab_mpi.h
                                moab/ParallelComm.hpp
@@ -20,9 +17,6 @@ set(moab_PARALLEL_INSTALL_HDRS moab/gs.hpp
                                moab/ParallelData.hpp
                                moab/ParCommGraph.hpp
                                MBParallelConventions.h )
-
-set( MOAB_GENERATED_INSTALL_PHEADERS
-     ${CMAKE_CURRENT_BINARY_DIR}/moab_mpi_config.h )
 
 include_directories(
     ${MOAB_BINARY_DIR}/src
@@ -54,16 +48,9 @@ set_source_files_properties( ${moab_PARALLEL_SRCS}
 
 add_library(
   moabpar
-  OBJECT ${moab_PARALLEL_INSTALL_HDRS} ${MOAB_GENERATED_INSTALL_PHEADERS} ${moab_PARALLEL_SRCS}
+  OBJECT ${moab_PARALLEL_INSTALL_HDRS} ${moab_PARALLEL_SRCS}
   )
 
 include(AutoconfHeader)
 moab_install_headers(${moab_PARALLEL_INSTALL_HDRS})
-foreach (header ${MOAB_GENERATED_INSTALL_PHEADERS})
-    STRING(REGEX REPLACE "^${CMAKE_CURRENT_BINARY_DIR}/" "" relative ${header})
-    string(REGEX MATCH "(.*)/" DIR ${relative})
-    install(
-      FILES ${header}
-      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${DIR}
-      )
-endforeach()
+

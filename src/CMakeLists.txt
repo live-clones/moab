@@ -21,12 +21,6 @@ if(MOAB_HAVE_MPI AND MPI_FOUND)
   # message(STATUS "MPI_LIBRARIES = ${MPI_LIBRARIES}.")
 endif()
 
-#Create the moab/EntityHandle.hpp file
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/moab/EntityHandle.hpp.in infile2)
-string( REGEX REPLACE "#undef" "#cmakedefine" outstring2 "${infile2}" )
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in" "${outstring2}")
-configure_file(${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp)
-
 set(moab_link_lib)
 message(STATUS "Adding io subdirectory.")
 add_subdirectory(io)
@@ -77,7 +71,7 @@ set(MOAB_LIB_SOURCES
         FileOptions.cpp
         GeomUtil.cpp
         GeomTopoTool.cpp
-	GeomQueryTool.cpp
+        GeomQueryTool.cpp
         HalfFacetRep.cpp
         HigherOrderFactory.cpp
         HomXform.cpp
@@ -170,6 +164,7 @@ set( MOAB_INSTALL_HEADERS
         moab/Core.hpp
         moab/CpuTimer.hpp
         moab/DualTool.hpp
+        moab/EntityHandle.hpp
         moab/Error.hpp
         moab/GeomTopoTool.hpp
         moab/GeomQueryTool.hpp
@@ -250,7 +245,6 @@ set( MOAB_INSTALL_HEADERS
         MBTagConventions.hpp )
 
 set( MOAB_GENERATED_INSTALL_HEADERS
-     ${CMAKE_CURRENT_BINARY_DIR}/moab/EntityHandle.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/moab/MOABConfig.h
      ${CMAKE_CURRENT_BINARY_DIR}/moab_export.h
   )
