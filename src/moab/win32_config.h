@@ -4,8 +4,10 @@
 #if defined WIN32 && defined _MSC_VER
 #include "MOAB_export.h"
 
-#define _USE_MATH_DEFINES // for C++  
-#include <cmath> 
+#ifdef __cplusplus
+#define _USE_MATH_DEFINES  // for C++
+#include <cmath>
+#endif
 
 #else
 #define MOAB_EXPORT

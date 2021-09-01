@@ -17,10 +17,13 @@
 int main( int argc, char* argv[] )
 {
     /* Declarations */
+    ErrCode rc;
     int nprocs = 1, rank = 0;
     char filen[1024] = "";
+    int i, j, k;
 
-    ErrCode rc;
+    int irank = 0, num_tags_to_sync = 1;
+    int* ranks;
 
     int appID, appDupID;
     iMOAB_AppID pid;
@@ -49,8 +52,6 @@ int main( int argc, char* argv[] )
     int tagTypes[2]    = { DENSE_INTEGER, DENSE_DOUBLE };
     int num_components = 1;
 
-    int i, irank = 0, num_tags_to_sync = 1;
-    int* ranks;
     iMOAB_GlobalID *element_global_IDs, *block_IDs;
     int vertices_per_element, num_elements_in_block;
     int conn[27], nv, eindex;
@@ -68,9 +69,9 @@ int main( int argc, char* argv[] )
     int *vertBC_value, *ref_surf, *bc_value;
 
     char *outputFile, *writeOptions;
-    MPI_Comm comm;
 
 #ifdef MOAB_HAVE_MPI
+    MPI_Comm comm;
     MPI_Init( &argc, &argv );
 
     comm = MPI_COMM_WORLD;
@@ -305,11 +306,11 @@ int main( int argc, char* argv[] )
                  * process are returned too.
                  */
                 rc = iMOAB_GetElementID( pid, &gbIDs[i], &num_elements_in_block, global_element_ID, local_element_ID );CHECKRC( rc, "failed to get block elem IDs" );
-                for( int j = 0; j < num_elements_in_block; j++ )
+                for( j = 0; j < num_elements_in_block; j++ )
                 {
                     printf( "  elem %3d owned by %d gid: %4d lid: %4d  -- ", j, element_ownership[j],
                             global_element_ID[j], local_element_ID[j] );
-                    for( int k = 0; k < vertices_per_element; k++ )
+                    for( k = 0; k < vertices_per_element; k++ )
                         printf( " %5d", element_connectivity[j * vertices_per_element + k] );
                     printf( "\n" );
                 }

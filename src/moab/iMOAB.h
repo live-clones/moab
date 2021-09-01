@@ -1024,7 +1024,7 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
  */
 ErrCode iMOAB_MergeVertices( iMOAB_AppID pid );
 
-#endif  // #ifdef MOAB_HAVE_MPI
+#endif /* #ifdef MOAB_HAVE_MPI */
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
@@ -1120,7 +1120,8 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
                               int* comp2,
                               int* direction );
 
-#endif  // #ifdef MOAB_HAVE_MPI
+#endif /* #ifdef MOAB_HAVE_MPI */
+
 /**
  * \brief Write the projection weights to disk in order to transfer a solution from a source surface mesh to a destination 
  * mesh defined on a sphere.
@@ -1138,8 +1139,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile(
     const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename );
 
-// endif for MOAB_HAVE_NETCDF
-#endif
+#endif /* #ifdef MOAB_HAVE_NETCDF */
 
 /**
  * \brief Compute the projection weights to transfer a solution from a source surface mesh to a destination mesh defined
@@ -1206,11 +1206,14 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
     const iMOAB_String source_solution_tag_name,
     const iMOAB_String target_solution_tag_name );
 
-#endif  // #ifdef MOAB_HAVE_TEMPESTREMAP
+#endif /* #ifdef MOAB_HAVE_TEMPESTREMAP */
 
 #ifdef MOAB_HAVE_MPI
 
-// Helper functions for MPI type conversions between Fortran and C++
+/**
+ * Helper functions for MPI type conversions between Fortran and C++
+ */
+
 /**
  * \brief MOAB MPI helper function to convert from a C-based MPI_Comm object
  * to a Fortran compatible MPI_Fint (integer) value.
@@ -1267,10 +1270,10 @@ inline MPI_Group* MOAB_MPI_Group_f2c( MPI_Fint fgroup )
     return cgroup;
 }
 
-#endif  // #ifdef MOAB_HAVE_MPI
+#endif /* #ifdef MOAB_HAVE_MPI */
 
 #ifdef __cplusplus
 }
-#endif  // #ifdef __cplusplus
+#endif /* #ifdef __cplusplus */
 
-#endif  // #ifndef IMOAB_H
+#endif /* #ifndef IMOAB_H */
