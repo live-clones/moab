@@ -119,7 +119,7 @@ enum MOAB_TAG_OWNER_TYPE
 
 #else
 #define IMOAB_ASSERT( condition, message )
-#define IMOAB_ASSERT_RET( condition, message )
+#define IMOAB_ASSERT_RET( condition, message, retval )
 #endif
 
 #ifdef __cplusplus
