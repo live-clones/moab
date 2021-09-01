@@ -155,8 +155,11 @@ MB_DEFS="$MB_DEFS $NO_VECTOR_TEMPLATE_INSERT $OLD_STD_COUNT"
 ################################################################################
 # Autoupdate added the next two lines to ensure that your configure
 # script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
-AC_PROG_EGREP
+m4_ifdef([AC_CHECK_INCLUDES_DEFAULT], [
+          AC_CHECK_INCLUDES_DEFAULT
+          AC_PROG_EGREP
+          ], [AC_HEADER_STDC]
+        )
 
 AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
 AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H,  [1], [MOAB qualified HAVE_INTTYPES_H]) ])
@@ -1604,11 +1607,7 @@ AC_SUBST([AM_LDFLAGS])
 AC_SUBST([EXPORT_LTFLAGS])
 AC_SUBST([EXPORT_LDFLAGS])
 
-AC_CONFIG_HEADERS([
-                   src/moab/MOABConfig.h:config/MOABConfig.h.in
-                   src/moab/EntityHandle.hpp
-                   src/parallel/moab_mpi_config.h
-                   ])
+AC_CONFIG_HEADERS([ src/moab/MOABConfig.h:config/MOABConfig.h.in ])
 AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
 
 AC_CONFIG_FILES([Makefile
