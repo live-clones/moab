@@ -158,6 +158,16 @@ MB_DEFS="$MB_DEFS $NO_VECTOR_TEMPLATE_INSERT $OLD_STD_COUNT"
 AC_CHECK_INCLUDES_DEFAULT
 AC_PROG_EGREP
 
+AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
+AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H,  [1], [MOAB qualified HAVE_INTTYPES_H]) ])
+AC_CHECK_HEADER([stdint.h],   [AC_DEFINE(HAVE_STDINT_H,    [1], [MOAB qualified HAVE_STDINT_H])   ])
+AC_CHECK_HEADER([stddef.h],   [AC_DEFINE(HAVE_STDDEF_H,    [1], [MOAB qualified HAVE_STDDEF_H])   ])
+AC_CHECK_HEADER([stdlib.h],   [AC_DEFINE(HAVE_STDLIB_H,    [1], [MOAB qualified HAVE_STDLIB_H])   ])
+AC_CHECK_HEADER([ieeefp.h],   [AC_DEFINE(HAVE_IEEEFP_H,    [1], [MOAB qualified HAVE_IEEEFP_H])   ])
+AC_CHECK_HEADER([termios.h],  [AC_DEFINE(HAVE_TERMIOS_H,   [1], [MOAB qualified HAVE_TERMIOS_H])  ])
+AC_CHECK_HEADER([sys/types.h],[AC_DEFINE(HAVE_SYS_TYPES_H, [1], [MOAB qualified HAVE_SYS_TYPES_H])])
+AC_CHECK_HEADER([sys/ioctl.h],[AC_DEFINE(HAVE_SYS_IOCTL_H, [1], [MOAB qualified HAVE_SYS_IOCTL_H])])
+
 SIZEOF_MBENTITYHANDLE=0
 AC_CHECK_SIZEOF([void *])
 SIZEOF_VOID_P=$ac_cv_sizeof_void_p
