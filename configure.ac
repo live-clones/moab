@@ -1669,7 +1669,7 @@ AC_CONFIG_FILES([src/mesquite/Makefile
                  test/mesquite/higher_order/Makefile
                  test/mesquite/slaved/Makefile
                  tools/mesquite/Makefile
-                 MeshFiles/mesquite/Makefile
+                 MeshFiles/unittest/mesquite/Makefile
                  ])
 
 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-static=$enable_static --enable-shared=$enable_shared"
