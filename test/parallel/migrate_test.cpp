@@ -78,7 +78,7 @@ int main( int argc, char* argv[] )
     MPI_Comm_group( jcomm, &jgroup );
 
     std::string filename;
-    filename = TestDir + "/field1.h5m";
+    filename = TestDir + "unittest/field1.h5m";
     if( argc > 1 )
     {
         filename = argv[1];

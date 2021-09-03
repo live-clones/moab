@@ -97,7 +97,7 @@ int main( int argc, char* argv[] )
     int cmpatm = 5, cplatm = 6;  // component ids are unique over all pes, and established in advance;
     int cmpPhysAtm = 105;        // different from atm spectral ?
 #ifdef ENABLE_ATMOCN_COUPLING
-    std::string ocnFilename = TestDir + "/recMeshOcn.h5m";
+    std::string ocnFilename = TestDir + "unittest/recMeshOcn.h5m";
     int rankInOcnComm       = -1;
     int cmpocn = 17, cplocn = 18, atmocnid = 618,
         ocnatmid = 1806;  // component ids are unique over all pes, and established in advance;

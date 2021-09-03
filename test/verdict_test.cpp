@@ -7,7 +7,7 @@
 #include <cstdio>
 #include "TestUtil.hpp"
 
-std::string filename = TestDir + "/mbtest1.vtk";
+std::string filename = TestDir + "unittest/mbtest1.vtk";
 
 using namespace moab;
 

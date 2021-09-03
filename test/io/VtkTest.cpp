@@ -14,8 +14,8 @@ using namespace moab;
 
 #include "TestUtil.hpp"
 
-std::string poly_example      = TestDir + "/io/poly8-10.vtk";
-std::string polyhedra_example = TestDir + "/io/polyhedra.vtk";
+std::string poly_example      = TestDir + "unittest/io/poly8-10.vtk";
+std::string polyhedra_example = TestDir + "unittest/io/polyhedra.vtk";
 
 #define DECLARE_TEST( A ) \
     bool test_##A();      \
@@ -213,8 +213,14 @@ static inline bool is_error( ErrorCode b )
 bool read_file( Interface* iface, const char* file );
 bool write_and_read( Interface* iface1, Interface* iface2 );
 
-bool test_read_write_element( const double* coords, unsigned num_coords, const int* vtk_conn, const int* moab_conn,
-                              unsigned num_conn, unsigned num_elem, unsigned vtk_type, EntityType moab_type );
+bool test_read_write_element( const double* coords,
+                              unsigned num_coords,
+                              const int* vtk_conn,
+                              const int* moab_conn,
+                              unsigned num_conn,
+                              unsigned num_elem,
+                              unsigned vtk_type,
+                              EntityType moab_type );
 
 bool test_edge2()
 {
@@ -816,9 +822,15 @@ bool compare_connectivity( EntityType, const int* conn1, const int* conn2, unsig
     return true;
 }
 
-bool match_vertices_and_elements( Interface* iface, EntityType moab_type, unsigned num_vert, unsigned num_elem,
-                                  unsigned vert_per_elem, const double* coords, const int* connectivity,
-                                  EntityHandle* vert_handles, EntityHandle* elem_handles )
+bool match_vertices_and_elements( Interface* iface,
+                                  EntityType moab_type,
+                                  unsigned num_vert,
+                                  unsigned num_elem,
+                                  unsigned vert_per_elem,
+                                  const double* coords,
+                                  const int* connectivity,
+                                  EntityHandle* vert_handles,
+                                  EntityHandle* elem_handles )
 {
     ErrorCode rval;
 
@@ -911,8 +923,13 @@ bool match_vertices_and_elements( Interface* iface, EntityType moab_type, unsign
     return true;
 }
 
-bool check_elements( Interface* iface, EntityType moab_type, unsigned num_elem, unsigned vert_per_elem,
-                     const double* coords, unsigned num_vert, const int* connectivity )
+bool check_elements( Interface* iface,
+                     EntityType moab_type,
+                     unsigned num_elem,
+                     unsigned vert_per_elem,
+                     const double* coords,
+                     unsigned num_vert,
+                     const int* connectivity )
 {
     std::vector< EntityHandle > junk1( num_vert ), junk2( num_elem );
     bool rval = match_vertices_and_elements( iface, moab_type, num_vert, num_elem, vert_per_elem, coords, connectivity,
@@ -921,8 +938,14 @@ bool check_elements( Interface* iface, EntityType moab_type, unsigned num_elem, 
     return true;
 }
 
-bool test_read_write_element( const double* coords, unsigned num_verts, const int* vtk_conn, const int* moab_conn,
-                              unsigned num_conn, unsigned num_elem, unsigned vtk_type, EntityType moab_type )
+bool test_read_write_element( const double* coords,
+                              unsigned num_verts,
+                              const int* vtk_conn,
+                              const int* moab_conn,
+                              unsigned num_conn,
+                              unsigned num_elem,
+                              unsigned vtk_type,
+                              EntityType moab_type )
 
 {
     // construct VTK file
@@ -1041,8 +1064,12 @@ void write_data( char* file, size_t& len, DataType type, unsigned count, const i
     }
 }
 
-bool check_tag_values( Interface* iface, DataType tag_type, int tag_length, int num_entities,
-                       const EntityHandle* entities, const int* values )
+bool check_tag_values( Interface* iface,
+                       DataType tag_type,
+                       int tag_length,
+                       int num_entities,
+                       const EntityHandle* entities,
+                       const int* values )
 {
     Tag tag;
     ErrorCode rval = iface->tag_get_handle( "data", tag_length, tag_type, tag );

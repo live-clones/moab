@@ -33,7 +33,7 @@ int main( int argc, char* argv[] )
     MPI_Init( &argc, &argv );
 #endif
     // Check command line arg
-    std::string def_file( TestDir + "/io/brick_cubit10.2.cub" );
+    std::string def_file( TestDir + "unittest/io/brick_cubit10.2.cub" );
     const char* file = def_file.c_str();
     if( argc < 2 )
     {

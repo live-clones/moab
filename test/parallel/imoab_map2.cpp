@@ -51,7 +51,7 @@ int main( int argc, char* argv[] )
 
     MPI_Comm_group( MPI_COMM_WORLD, &jgroup );  // all processes in jgroup
 
-    std::string atmFilename = TestDir + "/srcWithSolnTag.h5m";
+    std::string atmFilename = TestDir + "unittest/srcWithSolnTag.h5m";
     // on a regular case,  5 ATM, 6 CPLATM (ATMX), 17 OCN     , 18 CPLOCN (OCNX)  ;
     // intx atm/ocn is not in e3sm yet, give a number
     //   6 * 100+ 18 = 618 : atmocnid
@@ -67,10 +67,10 @@ int main( int argc, char* argv[] )
     int cmpatm        = 5,
         cplatm        = 6;  // component ids are unique over all pes, and established in advance;
 
-    std::string ocnFilename = TestDir + "/outTri15_8.h5m";
-    std::string mapFilename = TestDir + "/mapNE20_FV15.nc";  // this is a netcdf file!
+    std::string ocnFilename = TestDir + "unittest/outTri15_8.h5m";
+    std::string mapFilename = TestDir + "unittest/mapNE20_FV15.nc";  // this is a netcdf file!
 
-    std::string baseline = TestDir + "/baseline2.txt";
+    std::string baseline = TestDir + "unittest/baseline2.txt";
     int rankInOcnComm    = -1;
     int cmpocn = 17, cplocn = 18,
         atmocnid = 618;  // component ids are unique over all pes, and established in advance;

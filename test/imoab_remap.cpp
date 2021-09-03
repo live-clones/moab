@@ -26,12 +26,12 @@ int main( int argc, char* argv[] )
     ErrCode ierr;
     std::string atmFilename, ocnFilename, lndFilename, mapFilename;
 
-    atmFilename = TestDir + "/wholeATM_T.h5m";
-    ocnFilename = TestDir + "/recMeshOcn.h5m";
+    atmFilename = TestDir + "unittest/wholeATM_T.h5m";
+    ocnFilename = TestDir + "unittest/recMeshOcn.h5m";
 #ifdef ENABLE_ATMLND_COUPLING
-    lndFilename = TestDir + "/wholeLnd.h5m";
+    lndFilename = TestDir + "unittest/wholeLnd.h5m";
 #endif
-    // mapFilename = TestDir + "/outCS5ICOD5_map.nc";
+    // mapFilename = TestDir + "unittest/outCS5ICOD5_map.nc";
 
     ProgOptions opts;
     opts.addOpt< std::string >( "atmosphere,t", "atm mesh filename (source)", &atmFilename );
@@ -44,7 +44,7 @@ int main( int argc, char* argv[] )
 
     bool no_test_against_baseline = false;
     opts.addOpt< void >( "no_testbase,t", "do not test against baseline 1", &no_test_against_baseline );
-    std::string baseline = TestDir + "/baseline1.txt";
+    std::string baseline = TestDir + "unittest/baseline1.txt";
 
     opts.parseCommandLine( argc, argv );
 

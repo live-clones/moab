@@ -70,11 +70,11 @@ int main()
 {
     /* Reads a Mesh file */
     std::string file_name = TestDir +
-                            //   "/2D/vtk/tris/untangled/equil_tri2.vtk";
-                            //   "/2D/vtk/tris/untangled/tri_20258.vtk";
-                            //   "/3D/vtk/tets/untangled/tet_1.vtk";
-                            //   "/3D/vtk/hexes/untangled/cube_tet_2.vtk";
-                            "/3D/vtk/tets/untangled/tire.vtk";
+                            //   "unittest/mesquite/2D/vtk/tris/untangled/equil_tri2.vtk";
+                            //   "unittest/mesquite/2D/vtk/tris/untangled/tri_20258.vtk";
+                            //   "unittest/mesquite/3D/vtk/tets/untangled/tet_1.vtk";
+                            //   "unittest/mesquite/3D/vtk/hexes/untangled/cube_tet_2.vtk";
+                            "unittest/mesquite/3D/vtk/tets/untangled/tire.vtk";
     printf( "Loading mesh set 1\n" );
     MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;

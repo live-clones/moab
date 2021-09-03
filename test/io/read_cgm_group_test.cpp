@@ -23,9 +23,9 @@ using namespace moab;
     } while( false )
 
 #ifdef HAVE_OCC_STEP
-std::string input_cylcube = TestDir + "/io/cylcube.stp";
+std::string input_cylcube = TestDir + "unittest/io/cylcube.stp";
 #else
-std::string input_cylcube = TestDir + "/io/cylcube.sat";
+std::string input_cylcube = TestDir + "unittest/io/cylcube.sat";
 #endif
 
 // Function used to load the test file
@@ -35,7 +35,8 @@ void read_file( Interface* moab, const char* input_file );
 int geom_id_by_handle( Interface* moab, const EntityHandle set );
 
 // Function for checking retrieved group data
-void check_group_data( std::vector< int >& group_ids, std::vector< std::string >& group_names,
+void check_group_data( std::vector< int >& group_ids,
+                       std::vector< std::string >& group_names,
 #ifdef HAVE_OCC_STEP
                        std::vector< int >& );
 #else
@@ -118,7 +119,8 @@ void read_cylcube_groups_test()
     check_group_data( g_ids, g_names, g_ent_ids );
 }
 
-void check_group_data( std::vector< int >& group_ids, std::vector< std::string >& group_names,
+void check_group_data( std::vector< int >& group_ids,
+                       std::vector< std::string >& group_names,
 #ifdef HAVE_OCC_STEP
                        std::vector< int >& /*group_ent_ids*/ )
 #else

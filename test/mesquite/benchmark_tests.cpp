@@ -75,16 +75,17 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string shape_improv_file_name_1     = TestDir + "/3D/vtk/hexes/untangled/1000hex-block-internal-bias.vtk";
-std::string shape_improv_file_name_2     = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
-std::string laplacian_file_name_1        = TestDir + "/2D/vtk/quads/untangled/square_quad_10_rand.vtk";
-std::string laplacian_file_name_2        = TestDir + "/2D/vtk//quads/untangled/shashkov_quad.vtk";
-std::string untangle_file_name_1         = TestDir + "/2D/vtk/quads/tangled/tangled_horse1.vtk";
-std::string untangle_file_name_2         = TestDir + "/2D/vtk/quads/untangled//shest_grid32.vtk";
-std::string size_adapt_shape_file_name_1 = TestDir + "/2D/vtk/quads/untangled/bias-sphere-quads.vtk";
-std::string min_edge_length_file_name_1  = TestDir + "/2D/vtk/quads/untangled/quads_4by2_bad.vtk";
-std::string min_edge_length_file_name_2  = TestDir + "/2D/vtk/quads/untangled/shashkov_quad.vtk";
-std::string deforming_domain_file_name_1 = TestDir + "/3D/vtk/hexes/untangled/sph-10-zsquare.vtk";
+std::string shape_improv_file_name_1 =
+    TestDir + "unittest/mesquite/3D/vtk/hexes/untangled/1000hex-block-internal-bias.vtk";
+std::string shape_improv_file_name_2     = TestDir + "unittest/mesquite/3D/vtk/tets/untangled/tire.vtk";
+std::string laplacian_file_name_1        = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/square_quad_10_rand.vtk";
+std::string laplacian_file_name_2        = TestDir + "unittest/mesquite/2D/vtk//quads/untangled/shashkov_quad.vtk";
+std::string untangle_file_name_1         = TestDir + "unittest/mesquite/2D/vtk/quads/tangled/tangled_horse1.vtk";
+std::string untangle_file_name_2         = TestDir + "unittest/mesquite/2D/vtk/quads/untangled//shest_grid32.vtk";
+std::string size_adapt_shape_file_name_1 = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/bias-sphere-quads.vtk";
+std::string min_edge_length_file_name_1  = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/quads_4by2_bad.vtk";
+std::string min_edge_length_file_name_2  = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/shashkov_quad.vtk";
+std::string deforming_domain_file_name_1 = TestDir + "unittest/mesquite/3D/vtk/hexes/untangled/sph-10-zsquare.vtk";
 
 void help( const char* )
 {
@@ -100,7 +101,9 @@ void find_z10_extreme_elements( Mesh& mesh, elem_vec_t& polar_elems, elem_vec_t&
 // Get areas of quads and tris
 void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean, double& max, MsqError& err );
 
-void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vector< Mesh::VertexHandle > curves_out[4],
+void classify_boundary( Mesh* mesh,
+                        Mesh::VertexHandle corners_out[4],
+                        std::vector< Mesh::VertexHandle > curves_out[4],
                         MsqError& err );
 const double Z = 7.0;
 // size of new domain
@@ -709,7 +712,9 @@ void elem_areas( Mesh& mesh, const elem_vec_t& elems, double& min, double& mean,
         }                                                                            \
     } while( false )
 
-void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vector< Mesh::VertexHandle > curves_out[4],
+void classify_boundary( Mesh* mesh,
+                        Mesh::VertexHandle corners_out[4],
+                        std::vector< Mesh::VertexHandle > curves_out[4],
                         MsqError& err )
 {
     std::vector< Mesh::VertexHandle > verts;

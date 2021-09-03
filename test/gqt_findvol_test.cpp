@@ -18,7 +18,7 @@ GeomQueryTool* GQT;
 
 Tag id_tag = 0;
 
-const std::string input_file = TestDir + "/find_vol_test_geom.h5m";
+const std::string input_file = TestDir + "unittest/find_vol_test_geom.h5m";
 
 void find_volume_tests();
 
@@ -51,7 +51,10 @@ int main()
 ErrorCode id_lookup( EntityHandle eh, int& id )
 {
     ErrorCode rval;
-    if( !id_tag ) { id_tag = MBI->globalId_tag(); }
+    if( !id_tag )
+    {
+        id_tag = MBI->globalId_tag();
+    }
 
     rval = MBI->tag_get_data( id_tag, &eh, 1, (void*)&id );MB_CHK_SET_ERR( rval, "Failed to lookup volume id" );
 
@@ -71,17 +74,17 @@ struct FindVolTestResult
     int resultB;
 };
 
-// Test Geometry \\
-
+// Test Geometry
+//
 // The test geometry consists of 3 cubes, one of which
 // overlaps another. Volumes 1 and 2 have edges with
 // length 1. Volume 3 has an edge length of 0.5.
 // Volume 1 is centered at (3, 0, 0). Volume 2 is
 // centered on the origin. Volume 3 is centered on (0.5, 0, 0).
 // Volume 4 is the implicit complement.
-
+//
 // XY slice of geometry:
-
+//
 // ###########################                   #############################
 // #                         #                   #                           #
 // #                         #                   #                           #
@@ -137,8 +140,8 @@ void find_volume_tests()
         // Location: Positive Y Surface of Volume 2
         { { 0.6, 0.25000000000001, 0.0 }, { 0.0, 1.0, 0.0 }, 4, 0 },    // 24
         { { 0.6, 0.25000000000001, 0.0 }, { 0.0, -1.0, 0.0 }, 4, -1 },  // 25
-        /// ON-SURFACE POINT TESTS (not checked using PIV loop) \\\
-    // Point on surface of volume 1 w/ random directions
+        // ON-SURFACE POINT TESTS (not checked using PIV loop)
+        // Point on surface of volume 1 w/ random directions
         { { 3.0, 0.5, 0.0 }, { 0.0, 0.0, 0.0 }, 1, 4 },  // 26
         // Point on surface of volume 2 w/ random directions
         { { 0.6, 0.23, 0.0 }, { 0.0, 0.0, 0.0 }, 3, 4 }  // 27
@@ -161,11 +164,13 @@ void find_volume_tests()
 
     for( int i = 1; i < num_tests + 1; i++ )
     {
-
         const FindVolTestResult& test = tests[i - 1];
 
         const double* direction = NULL;
-        if( test.dir[0] != 0.0 || test.dir[1] != 0.0 || test.dir[2] != 0.0 ) { direction = test.dir; }
+        if( test.dir[0] != 0.0 || test.dir[1] != 0.0 || test.dir[2] != 0.0 )
+        {
+            direction = test.dir;
+        }
 
         // if we're testing a random direction, run the test many times
         int num_repeats = direction ? 1 : 100;
@@ -173,7 +178,10 @@ void find_volume_tests()
         {
             rval = GQT->find_volume( test.pnt, volume_found, direction );
             // if not found, we will check later
-            if( rval != MB_ENTITY_NOT_FOUND ) { MB_CHK_SET_ERR_CONT( rval, "Failed in find_volume" ); }
+            if( rval != MB_ENTITY_NOT_FOUND )
+            {
+                MB_CHK_SET_ERR_CONT( rval, "Failed in find_volume" );
+            }
 
             rval = id_lookup( volume_found, vol_id );MB_CHK_SET_ERR_CONT( rval, "Failed in id lookup" );
 

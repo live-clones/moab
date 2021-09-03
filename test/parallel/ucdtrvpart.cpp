@@ -7,7 +7,7 @@
 
 using namespace moab;
 
-std::string example = TestDir + "/io/homme3x3458.t.3.nc";
+std::string example = TestDir + "unittest/io/homme3x3458.t.3.nc";
 
 void test_read_parallel_ucd_trivial();
 void test_read_parallel_ucd_trivial_spectral();

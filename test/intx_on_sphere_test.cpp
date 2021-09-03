@@ -27,8 +27,8 @@ int main( int argc, char* argv[] )
 
     std::string firstModel, secondModel, outputFile;
 
-    firstModel  = TestDir + "/mbcslam/lagrangeHomme.vtk";
-    secondModel = TestDir + "/mbcslam/eulerHomme.vtk";
+    firstModel  = TestDir + "unittest/mbcslam/lagrangeHomme.vtk";
+    secondModel = TestDir + "unittest/mbcslam/eulerHomme.vtk";
 
     ProgOptions opts;
     opts.addOpt< std::string >( "first,t", "first mesh filename (source)", &firstModel );

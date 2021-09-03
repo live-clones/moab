@@ -72,7 +72,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string default_file_name = TestDir + "/3D/vtk/large_box_hex_1000.vtk";
+std::string default_file_name = TestDir + "unittest/mesquite/3D/vtk/large_box_hex_1000.vtk";
 
 void usage()
 {

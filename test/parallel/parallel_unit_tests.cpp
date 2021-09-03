@@ -89,8 +89,11 @@ ErrorCode get_sharing_processors( Interface& moab, EntityHandle entity, std::vec
 // returned first.  The other two sets are returned in the order of the
 // largest contained process rank, where the last entry is zero if
 // there is only one additional set.
-ErrorCode parallel_create_mesh( Interface& mb, int output_vertx_ids[9], EntityHandle output_vertex_handles[9],
-                                Range& output_elements, EntityHandle output_sets[3] = 0 );
+ErrorCode parallel_create_mesh( Interface& mb,
+                                int output_vertx_ids[9],
+                                EntityHandle output_vertex_handles[9],
+                                Range& output_elements,
+                                EntityHandle output_sets[3] = 0 );
 
 // Test if is_my_error is non-zero on any processor in MPI_COMM_WORLD
 int is_any_proc_error( int is_my_error );
@@ -195,16 +198,16 @@ int main( int argc, char* argv[] )
     if( !filename.size() )
     {
 #ifdef MOAB_HAVE_HDF5
-        filename = TestDir + "/64bricks_512hex.h5m";
+        filename = TestDir + "unittest/64bricks_512hex.h5m";
 #else
-        filename = TestDir + "/64bricks_512hex.vtk";
+        filename = TestDir + "unittest/64bricks_512hex.vtk";
 #endif
     }
     std::cout << "Loading " << filename << "..\n";
 #ifdef MOAB_HAVE_HDF5
-    std::string filename2 = TestDir + "/64bricks_1khex.h5m";
-    std::string filename3 = TestDir + "/twoPolyh.h5m";
-    std::string filename4 = TestDir + "/onepart.h5m";
+    std::string filename2 = TestDir + "unittest/64bricks_1khex.h5m";
+    std::string filename3 = TestDir + "unittest/twoPolyh.h5m";
+    std::string filename4 = TestDir + "unittest/onepart.h5m";
 #endif
 
     if( pause_proc != -1 )
@@ -306,7 +309,10 @@ int is_any_proc_error( int is_my_error )
     return err || result;
 }
 
-ErrorCode parallel_create_mesh( Interface& mb, int vtx_ids[9], EntityHandle vtx_handles[9], Range& range,
+ErrorCode parallel_create_mesh( Interface& mb,
+                                int vtx_ids[9],
+                                EntityHandle vtx_handles[9],
+                                Range& range,
                                 EntityHandle* entity_sets )
 {
     // Each processor will create four quads.
@@ -569,8 +575,11 @@ ErrorCode get_ghost_entities( ParallelComm& pcomm, Range& ghost_ents )
     return MB_SUCCESS;
 }
 
-ErrorCode get_ents_from_geometric_sets( Interface& moab, const Tag tags[2], int dimension,
-                                        const std::vector< int >& ids, Range& results )
+ErrorCode get_ents_from_geometric_sets( Interface& moab,
+                                        const Tag tags[2],
+                                        int dimension,
+                                        const std::vector< int >& ids,
+                                        Range& results )
 {
     ErrorCode rval;
     for( size_t i = 0; i < ids.size(); ++i )
@@ -594,8 +603,11 @@ ErrorCode get_ents_from_geometric_sets( Interface& moab, const Tag tags[2], int 
  *\param partition_geom_ids IDs of: geometric volumes owned by this proc and interface topology
  *\param ghost_entity_ids   output list
  */
-ErrorCode get_expected_ghosts( Interface& moab, const std::vector< int > partition_geom_ids[4],
-                               std::vector< int >& ghost_entity_ids, int ghost_dimension, int bridge_dimension,
+ErrorCode get_expected_ghosts( Interface& moab,
+                               const std::vector< int > partition_geom_ids[4],
+                               std::vector< int >& ghost_entity_ids,
+                               int ghost_dimension,
+                               int bridge_dimension,
                                int num_layers )
 {
     ErrorCode rval;
@@ -609,7 +621,10 @@ ErrorCode get_expected_ghosts( Interface& moab, const std::vector< int > partiti
 
     // get adjacent entities
     Range iface_ghosts, iface_ents;
-    if( bridge_dimension == 2 ) { iface_ents = skin; }
+    if( bridge_dimension == 2 )
+    {
+        iface_ents = skin;
+    }
     else
     {
         rval = moab.get_adjacencies( skin, bridge_dimension, true, iface_ents, Interface::UNION );CHKERR( rval );
@@ -866,7 +881,10 @@ ErrorCode test_ghost_tag_exchange( const char* filename )
     {
         int rank;
         rval = pcomm->get_owner( *i, rank );CHKERR( rval );
-        if( rank == (int)pcomm->proc_config().proc_rank() ) { ++i; }
+        if( rank == (int)pcomm->proc_config().proc_rank() )
+        {
+            ++i;
+        }
         else
         {
             ghosts.insert( *i );
@@ -1141,8 +1159,12 @@ ErrorCode test_ghosted_entity_shared_data( const char* )
     return MB_SUCCESS;
 }
 
-ErrorCode check_consistent_ids( Interface& mb, const EntityHandle* entities, const int* orig_ids, int num_ents,
-                                const char* singular_name, const char* plural_name )
+ErrorCode check_consistent_ids( Interface& mb,
+                                const EntityHandle* entities,
+                                const int* orig_ids,
+                                int num_ents,
+                                const char* singular_name,
+                                const char* plural_name )
 {
     ErrorCode rval;
     int rank, size, ierr;
@@ -1288,7 +1310,10 @@ ErrorCode test_shared_sets( const char* )
     PCHECK( MB_SUCCESS == rval );
     sets.insert( set_arr[0] );
     sets.insert( set_arr[1] );
-    if( set_arr[2] ) { sets.insert( set_arr[2] ); }
+    if( set_arr[2] )
+    {
+        sets.insert( set_arr[2] );
+    }
     else
     {
         set_arr[2] = set_arr[1];

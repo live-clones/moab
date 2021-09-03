@@ -47,7 +47,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string DEFAULT_INPUT = TestDir + "/2D/vtk/quads/untangled/bias-sphere-quads.vtk";
+std::string DEFAULT_INPUT = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/bias-sphere-quads.vtk";
 
 void help( const char* argv0 )
 {

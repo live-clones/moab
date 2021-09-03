@@ -60,7 +60,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string DEFAULT_INPUT = TestDir + "/3D/vtk/tets/untangled/flat-tet-sphere.vtk";
+std::string DEFAULT_INPUT = TestDir + "unittest/mesquite/3D/vtk/tets/untangled/flat-tet-sphere.vtk";
 
 void help( const char* argv0 )
 {

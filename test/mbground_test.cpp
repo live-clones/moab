@@ -57,8 +57,8 @@ void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful
 
 int main( int argc, char* argv[] )
 {
-    filename           = TestDir + "/PB.h5m";
-    polyline_file_name = TestDir + "/polyline.txt";
+    filename           = TestDir + "unittest/PB.h5m";
+    polyline_file_name = TestDir + "unittest/polyline.txt";
     filename_out       = "PB_ground.h5m";
     min_dot            = 0.8;
 
@@ -111,7 +111,10 @@ int main( int argc, char* argv[] )
     handle_error_code( rval, number_tests_failed, number_tests_successful );
     std::cout << "\n";
     // when we are done, remove modified file if we want to
-    if( !keep_output ) { remove( filename_out.c_str() ); }
+    if( !keep_output )
+    {
+        remove( filename_out.c_str() );
+    }
     return number_tests_failed;
 }
 

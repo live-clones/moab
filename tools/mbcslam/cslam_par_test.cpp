@@ -59,9 +59,18 @@ int main( int argc, char** argv )
             {
                 EPS1 = atof( argv[++index] );
             }
-            if( !strcmp( argv[index], "-input" ) ) { input_mesh_file = argv[++index]; }
-            if( !strcmp( argv[index], "-radius" ) ) { Radius = atof( argv[++index] ); }
-            if( !strcmp( argv[index], "-deltaT" ) ) { deltaT = atof( argv[++index] ); }
+            if( !strcmp( argv[index], "-input" ) )
+            {
+                input_mesh_file = argv[++index];
+            }
+            if( !strcmp( argv[index], "-radius" ) )
+            {
+                Radius = atof( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-deltaT" ) )
+            {
+                deltaT = atof( argv[++index] );
+            }
             index++;
         }
     }
@@ -142,7 +151,7 @@ void test_intx_in_parallel_elem_based()
     EntityHandle euler_set;
     ErrorCode rval;
     rval = mb.create_meshset( MESHSET_SET, euler_set );MB_CHK_ERR_RET( rval );
-    std::string example( TestDir + "/" + input_mesh_file );
+    std::string example( TestDir + "unittest/" + input_mesh_file );
 
     rval = mb.load_file( example.c_str(), &euler_set, opts.c_str() );
 

@@ -5,7 +5,7 @@
 
 using namespace moab;
 
-std::string example = TestDir + "/io/mpasx1.642.t.2.nc";
+std::string example = TestDir + "unittest/io/mpasx1.642.t.2.nc";
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

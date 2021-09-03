@@ -36,7 +36,7 @@ void test_moab_v3_poly_format()
     ErrorCode rval;
 
     // load file containing a dodecahedron
-    rval = mb.load_mesh( std::string( TestDir + "/h5file/v3_dodec.h5m" ).c_str() );CHECK_ERR( rval );
+    rval = mb.load_mesh( std::string( TestDir + "unittest/h5file/v3_dodec.h5m" ).c_str() );CHECK_ERR( rval );
 
     // get entities from file
     Range verts, faces, polyhedrons;

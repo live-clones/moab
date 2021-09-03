@@ -10,7 +10,7 @@
 
 using namespace moab;
 
-std::string example = TestDir + "/io/gcrm_r3.nc";
+std::string example = TestDir + "unittest/io/gcrm_r3.nc";
 
 void test_read_onevar_trivial();
 #if defined( MOAB_HAVE_MPI ) && defined( MOAB_HAVE_ZOLTAN )

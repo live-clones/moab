@@ -81,7 +81,7 @@ int main( int argc, char* argv[] )
 
 #ifdef MOAB_HAVE_HDF5
     strcpy( filen, MOAB_MESH_DIR );
-    strcat( filen, "io/p8ex1.h5m" );
+    strcat( filen, "unittest/io/p8ex1.h5m" );
 #endif
 
     if( argc > 1 ) strcpy( filen, argv[1] );

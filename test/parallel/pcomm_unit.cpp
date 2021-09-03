@@ -137,8 +137,18 @@ void pack_unpack_noremoteh( Core& moab )
 }
 
 /* Utility method -- check expected sizes */
-void check_sizes( Interface& moab, int num_vtx, int num_edge, int num_tri, int num_quad, int num_polygon, int num_tet,
-                  int num_pyr, int num_wedge, int num_knife, int num_hex, int num_polyhedron )
+void check_sizes( Interface& moab,
+                  int num_vtx,
+                  int num_edge,
+                  int num_tri,
+                  int num_quad,
+                  int num_polygon,
+                  int num_tet,
+                  int num_pyr,
+                  int num_wedge,
+                  int num_knife,
+                  int num_hex,
+                  int num_polyhedron )
 {
     int count;
     ErrorCode rval;
@@ -204,8 +214,7 @@ void create_simple_grid( Interface& moab, unsigned x, unsigned y, unsigned z )
                 const size_t idx           = (size_t)i + (size_t)j * x + (size_t)k * x * y;
                 const EntityHandle conn[8] = {
                     verts[idx],         verts[idx + 1],         verts[idx + x + 1],         verts[idx + x],
-                    verts[idx + x * y], verts[idx + x * y + 1], verts[idx + x * y + x + 1], verts[idx + x * y + x]
-                };
+                    verts[idx + x * y], verts[idx + x * y + 1], verts[idx + x * y + x + 1], verts[idx + x * y + x] };
                 rval = moab.create_element( MBHEX, conn, 8, elems[( x - 1 ) * ( y - 1 ) * k + ( x - 1 ) * j + i] );CHECK_ERR( rval );
             }
     delete[] verts;
@@ -413,9 +422,8 @@ void test_pack_vertices()
     Range verts;
 
     const size_t num_verts             = 4;
-    const double coords[3 * num_verts] = {
-        -0.5, -1. / 3, 0.0, 0.5, -1. / 3, 0.0, 0.0, 2. / 3, 0.0, 0.0, 0.0, 0.745356
-    };
+    const double coords[3 * num_verts] = { -0.5, -1. / 3, 0.0, 0.5, -1. / 3, 0.0,
+                                           0.0,  2. / 3,  0.0, 0.0, 0.0,     0.745356 };
 
     rval = moab.create_vertices( coords, num_verts, verts );CHECK_ERR( rval );
 
@@ -543,7 +551,10 @@ void test_pack_elements()
     CHECK_EQUAL( 4, len3 );
 
     // Check if hexes are reversed
-    if( conn1[0] == conn2[4] ) { std::swap( conn1, conn2 ); }
+    if( conn1[0] == conn2[4] )
+    {
+        std::swap( conn1, conn2 );
+    }
 
     // Check consistant connectivity between hexes
     CHECK_EQUAL( conn1[4], conn2[0] );
@@ -588,8 +599,7 @@ void test_pack_higher_order()
     const size_t num_tet         = 2;
     EntityHandle tet_conn[2][10] = {
         { verts[0], verts[4], verts[9], verts[2], verts[8], verts[12], verts[10], verts[1], verts[3], verts[11] },
-        { verts[0], verts[9], verts[4], verts[6], verts[10], verts[12], verts[8], verts[7], verts[13], verts[5] }
-    };
+        { verts[0], verts[9], verts[4], verts[6], verts[10], verts[12], verts[8], verts[7], verts[13], verts[5] } };
 
     EntityHandle tets[num_tet];
     rval = moab.create_element( MBTET, tet_conn[0], 10, tets[0] );CHECK_ERR( rval );
@@ -984,7 +994,10 @@ void test_pack_sets_of_sets()
     sets.clear();
     rval = moab.get_entities_by_type( set3, MBENTITYSET, sets );CHECK_ERR( rval );
     CHECK_EQUAL( 2, (int)sets.size() );
-    if( sets.front() == set1 ) { CHECK_EQUAL( set2, sets.back() ); }
+    if( sets.front() == set1 )
+    {
+        CHECK_EQUAL( set2, sets.back() );
+    }
     else
     {
         CHECK_EQUAL( set2, sets.front() );
@@ -1559,7 +1572,10 @@ void test_pack_tag_handle_data()
     }
 }
 
-ErrorCode get_entities( Interface* mb, std::vector< EntityHandle >& ent_verts, int verts_per_entity, int dim,
+ErrorCode get_entities( Interface* mb,
+                        std::vector< EntityHandle >& ent_verts,
+                        int verts_per_entity,
+                        int dim,
                         Range& ents )
 {
     assert( !( ent_verts.size() % verts_per_entity ) );
@@ -1733,7 +1749,7 @@ void test_new_pcomm_instance()
     Interface& mb = moab;
 
     // This parallel read will create a ParallelComm instance implicitly
-    std::string example      = TestDir + "/64bricks_1khex.h5m";
+    std::string example      = TestDir + "unittest/64bricks_1khex.h5m";
     std::string read_options = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
     ErrorCode rval           = mb.load_file( example.c_str(), 0, read_options.c_str() );CHECK_ERR( rval );
 

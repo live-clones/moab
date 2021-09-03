@@ -57,7 +57,7 @@ bool chk_igeom_error( int ierr, const char* file, int line )
     return true;
 }
 
-std::string default_file_name = TestDir + "/2D/vtk/quads/untangled/quads_on_sphere_529.vtk";
+std::string default_file_name = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/quads_on_sphere_529.vtk";
 
 void usage()
 {

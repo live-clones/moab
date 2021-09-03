@@ -64,7 +64,7 @@ int main()
 {
     MBMesquite::MeshImpl mesh;
     MsqPrintError err( cout );
-    std::string file_name = TestDir + "/2D/vtk/quads/untangled/square_quad_2.vtk";
+    std::string file_name = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/square_quad_2.vtk";
     mesh.read_vtk( file_name.c_str(), err );
     if( err ) return 1;
 

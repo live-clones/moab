@@ -35,8 +35,12 @@ using namespace moab;
 std::string read_options;
 #endif
 
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
-                              const int degree = 0, const int dim = 2 );
+ErrorCode load_meshset_hirec( const char* infile,
+                              Interface* mbimpl,
+                              EntityHandle& meshset,
+                              ParallelComm*& pc,
+                              const int degree = 0,
+                              const int dim    = 2 );
 ErrorCode test_mesh( const char* infile, const int degree, const bool interp, const int dim );
 
 void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals, double* linearcoords );
@@ -48,9 +52,19 @@ ErrorCode test_unitsq_quads();
 ErrorCode test_unitsphere();
 ErrorCode test_unitcircle();
 
-ErrorCode exact_error_torus( const double R, const double r, const double center[3], int npnts, double* pnt,
-                             double& error_l1, double& error_l2, double& error_li );
-ErrorCode project_exact_torus( Interface* mbImpl, EntityHandle meshset, int dim, const double R, const double r,
+ErrorCode exact_error_torus( const double R,
+                             const double r,
+                             const double center[3],
+                             int npnts,
+                             double* pnt,
+                             double& error_l1,
+                             double& error_l2,
+                             double& error_li );
+ErrorCode project_exact_torus( Interface* mbImpl,
+                               EntityHandle meshset,
+                               int dim,
+                               const double R,
+                               const double r,
                                const double center[3] );
 
 int main( int argc, char* argv[] )
@@ -86,7 +100,10 @@ int main( int argc, char* argv[] )
         {
             if( i + 1 != argc )
             {
-                if( std::string( argv[i] ) == "-degree" ) { degree = atoi( argv[++i] ); }
+                if( std::string( argv[i] ) == "-degree" )
+                {
+                    degree = atoi( argv[++i] );
+                }
                 else if( std::string( argv[i] ) == "-interp" )
                 {
                     interp = atoi( argv[++i] );
@@ -133,8 +150,12 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
-                              const int degree, const int dim )
+ErrorCode load_meshset_hirec( const char* infile,
+                              Interface* mbimpl,
+                              EntityHandle& meshset,
+                              ParallelComm*& pc,
+                              const int degree,
+                              const int dim )
 {
     ErrorCode error;
     error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
@@ -146,7 +167,10 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
     EntityHandle partnset;
     error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );MB_CHK_ERR( error );
 
-    if( nprocs > 1 ) { pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm ); }
+    if( nprocs > 1 )
+    {
+        pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm );
+    }
 
     if( nprocs > 1 )
     {
@@ -253,7 +277,10 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
 
 ErrorCode create_unitsq_tris( Interface* mbImpl, size_t n, std::vector< EntityHandle >& tris )
 {
-    if( n < 2 ) { MB_SET_ERR( MB_FAILURE, "n must be at least 2" ); }
+    if( n < 2 )
+    {
+        MB_SET_ERR( MB_FAILURE, "n must be at least 2" );
+    }
 
     ErrorCode error;
     std::vector< EntityHandle > verts( n * n );
@@ -290,7 +317,10 @@ ErrorCode create_unitsq_tris( Interface* mbImpl, size_t n, std::vector< EntityHa
 
 ErrorCode create_unitsq_quads( Interface* mbImpl, size_t n, std::vector< EntityHandle >& quads )
 {
-    if( n < 2 ) { MB_SET_ERR( MB_FAILURE, "n must be at least 2" ); }
+    if( n < 2 )
+    {
+        MB_SET_ERR( MB_FAILURE, "n must be at least 2" );
+    }
 
     ErrorCode error;
     std::vector< EntityHandle > verts( n * n );
@@ -467,8 +497,8 @@ ErrorCode test_unitsphere()
 {
     // path to test files
     int nfiles              = 4;
-    std::string filenames[] = { TestDir + "/sphere_tris_5.vtk", TestDir + "/sphere_tris_20.vtk",
-                                TestDir + "/sphere_quads_5.vtk", TestDir + "/sphere_quads_20.vtk" };
+    std::string filenames[] = { TestDir + "unittest/sphere_tris_5.vtk", TestDir + "unittest/sphere_tris_20.vtk",
+                                TestDir + "unittest/sphere_quads_5.vtk", TestDir + "unittest/sphere_quads_20.vtk" };
     ErrorCode error;
     int maxdeg = 6;
 
@@ -545,8 +575,8 @@ ErrorCode test_unitcircle()
 {
     // path to test files
     int nfiles              = 4;
-    std::string filenames[] = { TestDir + "/circle_3.vtk", TestDir + "/circle_4.vtk", TestDir + "/circle_10.vtk",
-                                TestDir + "/circle_20.vtk" };
+    std::string filenames[] = { TestDir + "unittest/circle_3.vtk", TestDir + "unittest/circle_4.vtk",
+                                TestDir + "unittest/circle_10.vtk", TestDir + "unittest/circle_20.vtk" };
     ErrorCode error;
     int maxdeg = 6;
 
@@ -620,7 +650,11 @@ ErrorCode test_unitcircle()
     return error;
 }
 
-ErrorCode project_exact_torus( Interface* mbImpl, EntityHandle meshset, int dim, const double R, const double r,
+ErrorCode project_exact_torus( Interface* mbImpl,
+                               EntityHandle meshset,
+                               int dim,
+                               const double R,
+                               const double r,
                                const double center[] )
 {
     ErrorCode error;
@@ -654,8 +688,14 @@ ErrorCode project_exact_torus( Interface* mbImpl, EntityHandle meshset, int dim,
     return MB_SUCCESS;
 }
 
-ErrorCode exact_error_torus( const double R, const double r, const double center[], int npnts, double* pnts,
-                             double& error_l1, double& error_l2, double& error_li )
+ErrorCode exact_error_torus( const double R,
+                             const double r,
+                             const double center[],
+                             int npnts,
+                             double* pnts,
+                             double& error_l1,
+                             double& error_l2,
+                             double& error_li )
 {
     error_l1 = 0;
     error_l2 = 0;
@@ -672,7 +712,10 @@ ErrorCode exact_error_torus( const double R, const double r, const double center
         error_l1     = error_l1 + error_single;
         error_l2     = error_l2 + error_single * error_single;
 
-        if( error_li < error_single ) { error_li = error_single; }
+        if( error_li < error_single )
+        {
+            error_li = error_single;
+        }
     }
 
     error_l1 = error_l1 / (double)npnts;

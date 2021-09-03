@@ -87,7 +87,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string VTK_3D_DIR = TestDir + "/3D/vtk/hexes/tangled/";
+std::string VTK_3D_DIR = TestDir + "unittest/mesquite/3D/vtk/hexes/tangled/";
 
 using namespace std;
 

@@ -20,9 +20,9 @@ using namespace moab;
     } while( false )
 
 #ifdef HAVE_OCC_STEP
-std::string input_file = TestDir + "/io/dum.stp";
+std::string input_file = TestDir + "unittest/io/dum.stp";
 #else
-std::string input_file = TestDir + "/io/dum.sat";
+std::string input_file = TestDir + "unittest/io/dum.sat";
 #endif
 
 // Checks that a file can be loaded twice without errors

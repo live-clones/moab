@@ -7,7 +7,7 @@
 
 using namespace moab;
 
-static const std::string default_input_file = TestDir + "/64bricks_512hex.h5m";
+static const std::string default_input_file = TestDir + "unittest/64bricks_512hex.h5m";
 
 int main()
 {

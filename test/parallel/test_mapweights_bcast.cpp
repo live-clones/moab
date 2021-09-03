@@ -31,20 +31,22 @@
 
 using namespace moab;
 
-std::string inMapFilename = "outCS5ICOD5_map.nc";
+std::string inMapFilename = "";
 
 void test_tempest_map_bcast();
 void read_buffered_map();
+void read_map_from_disk();
 
 int main( int argc, char** argv )
 {
     if( argc > 1 )
         inMapFilename = std::string( argv[1] );
     else
-        inMapFilename = TestDir + "/" + inMapFilename;
+        inMapFilename = TestDir + "unittest/outCS5ICOD5_map.nc";
 
     REGISTER_TEST( test_tempest_map_bcast );
     REGISTER_TEST( read_buffered_map );
+    REGISTER_TEST( read_map_from_disk );
 
 #ifdef MOAB_HAVE_MPI
     MPI_Init( &argc, &argv );
@@ -97,26 +99,41 @@ void read_buffered_map()
 #endif
     {
         ncMap = new NcFile( inMapFilename.c_str(), NcFile::ReadOnly );
-        if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() ); }
+        if( !ncMap->is_valid() )
+        {
+            _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() );
+        }
 
         // Source and Target mesh resolutions
         NcDim* dimNA = ncMap->get_dim( "n_a" );
-        if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
+        if( dimNA == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"n_a\"" );
+        }
         else
             nA = dimNA->size();
 
         NcDim* dimNB = ncMap->get_dim( "n_b" );
-        if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
+        if( dimNB == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"n_b\"" );
+        }
         else
             nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
-        if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        if( dimNVA == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"nv_a\"" );
+        }
         else
             nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
-        if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
+        if( dimNVB == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"nv_b\"" );
+        }
         else
             nVB = dimNVB->size();
 
@@ -142,7 +159,10 @@ void read_buffered_map()
         }
 
         varS = ncMap->get_var( "S" );
-        if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
+        if( varS == NULL )
+        {
+            _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() );
+        }
     }
 
     // const int nTotalBytes = nS * nNNZBytes;
@@ -429,7 +449,10 @@ void read_buffered_map()
     // consistency: row sums
     {
         int isConsistentP = mapRemap.IsConsistent( dTolerance );
-        if( 0 != isConsistentP ) { printf( "Rank %d failed consistency checks...\n", rank ); }
+        if( 0 != isConsistentP )
+        {
+            printf( "Rank %d failed consistency checks...\n", rank );
+        }
         CHECK_EQUAL( 0, isConsistentP );
     }
 
@@ -452,6 +475,26 @@ void read_buffered_map()
     delete ncMap;
 
     return;
+}
+
+void read_map_from_disk()
+{
+    NcError error( NcError::silent_nonfatal );
+    MPI_Comm commW                = MPI_COMM_WORLD;
+    const int rootProc            = 0;
+    const std::string outFilename = inMapFilename;
+    double dTolerance             = 1e-08;
+    int mpierr                    = 0;
+
+    int nprocs, rank;
+    MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
+    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+
+    moab::Interface* mb = new moab::Core();
+    moab::ParallelComm pcomm( MPI_COMM_WORLD );
+
+    moab::TempestRemapper remapper( mb, pcomm );
+    moab::TempestOnlineMap onlinemap();
 }
 
 void test_tempest_map_bcast()

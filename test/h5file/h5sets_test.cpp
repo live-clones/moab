@@ -392,7 +392,10 @@ int main( int argc, char* argv[] )
     exitval += RUN_TEST( test_set_flags );
     exitval += RUN_TEST( regression_mmiller_8_2010 );
     exitval += RUN_TEST( test_sets_fileids );
-    if( do_big_tree_test ) { exitval += RUN_TEST( test_big_tree ); }
+    if( do_big_tree_test )
+    {
+        exitval += RUN_TEST( test_big_tree );
+    }
 
 #ifdef MOAB_HAVE_MPI
     fail = MPI_Finalize();
@@ -417,7 +420,7 @@ void regression_mmiller_8_2010()
     const size_t num_hex = 100;
     const size_t num_set = 25;
 
-    mb.load_file( std::string( TestDir + "/h5file/rocket_ents_in_assm.h5m" ).c_str() );
+    mb.load_file( std::string( TestDir + "unittest/h5file/rocket_ents_in_assm.h5m" ).c_str() );
 
     /* Dump of set contents from input file:
      1r: 172, 4,

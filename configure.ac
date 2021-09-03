@@ -152,7 +152,7 @@ FATHOM_OLD_STD_COUNT
 MB_DEFS="$MB_DEFS $NO_VECTOR_TEMPLATE_INSERT $OLD_STD_COUNT"
 
 ## Define the location of mesh directories for tests
-AC_DEFINE_UNQUOTED([MESH_DIR], ["$project_abstopsrcdir/MeshFiles/unittest/"], [Path to the mesh files directory needed for unit-tests])
+AC_DEFINE_UNQUOTED([MESH_DIR], ["$project_abstopsrcdir/MeshFiles/"], [Path to the base mesh files directory])
 
 ################################################################################
 #                              Headers

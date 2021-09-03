@@ -76,7 +76,7 @@ int main()
     Vector3D s_norm( 0, 0, 1 );
     MBMesquite::PlanarDomain msq_geom( s_norm, pnt );
 
-    std::string default_file_name = TestDir + "/2D/vtk/mixed/untangled/hybrid_3quad_1tri.vtk";
+    std::string default_file_name = TestDir + "unittest/mesquite/2D/vtk/mixed/untangled/hybrid_3quad_1tri.vtk";
     mesh.read_vtk( default_file_name.c_str(), err );
     if( err ) return 1;
 

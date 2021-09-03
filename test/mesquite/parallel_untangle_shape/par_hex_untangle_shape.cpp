@@ -100,8 +100,8 @@ using std::endl;
 
 using namespace MBMesquite;
 
-#define VTK_3D_DIR ( TestDir + "/3D/vtk/hexes/tangled/" )
-#define VTK_2D_DIR ( TestDir + "/2D/vtk/quads/tangled/" )
+#define VTK_3D_DIR ( TestDir + "unittest/mesquite/3D/vtk/hexes/tangled/" )
+#define VTK_2D_DIR ( TestDir + "unittest/mesquite/2D/vtk/quads/tangled/" )
 
 using namespace std;
 
@@ -124,7 +124,9 @@ class ParShapeImprover
 
       public:
         // Constructor sets the instructions in the queue.
-        ParShapeImprovementWrapper( int inner_iterations = 100, double cpu_time = 0.0, double grad_norm = 1.e-8,
+        ParShapeImprovementWrapper( int inner_iterations    = 100,
+                                    double cpu_time         = 0.0,
+                                    double grad_norm        = 1.e-8,
                                     int parallel_iterations = 10 )
             : innerIter( inner_iterations ), maxTime( cpu_time ), gradNorm( grad_norm ), untBeta( DEF_UNT_BETA ),
               successiveEps( DEF_SUC_EPS ), parallelIterations( parallel_iterations ), m_do_untangle_only( false )
@@ -132,8 +134,11 @@ class ParShapeImprover
         }
 
       protected:
-        void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                          QualityAssessor* qa, MsqError& err );
+        void run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                          ParallelMesh* pmesh,
+                          Settings* settings,
+                          QualityAssessor* qa,
+                          MsqError& err );
 
       private:
         int innerIter;
@@ -152,8 +157,11 @@ class ParShapeImprover
     void run( Mesh& mesh, MeshDomain* domain, MsqError& err, bool always_smooth = true, int debug = 0 );
 };
 
-void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh,
-                                                                Settings* settings, QualityAssessor* qa, MsqError& err )
+void ParShapeImprover::ParShapeImprovementWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                                                                ParallelMesh* pmesh,
+                                                                Settings* settings,
+                                                                QualityAssessor* qa,
+                                                                MsqError& err )
 {
     int rank, nprocs;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );

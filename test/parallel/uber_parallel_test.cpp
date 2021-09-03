@@ -48,7 +48,9 @@ int is_any_proc_error( int is_my_error )
     return err || result;
 }
 
-int run_test( ErrorCode ( *func )( const char*, const char* ), const char* func_name, const std::string file_name,
+int run_test( ErrorCode ( *func )( const char*, const char* ),
+              const char* func_name,
+              const std::string file_name,
               const char* option )
 {
     ErrorCode result = ( *func )( file_name.c_str(), option );
@@ -80,8 +82,8 @@ int main( int argc, char* argv[] )
         filename = std::string( argv[1] );
     else
     {
-        filename  = TestDir + "/64bricks_512hex.h5m";
-        filename2 = TestDir + "/hex_2048.vtk";
+        filename  = TestDir + "unittest/64bricks_512hex.h5m";
+        filename2 = TestDir + "unittest/hex_2048.vtk";
     }
 #ifdef MOAB_HAVE_HDF5
     //=========== read_delete, geom_dimension, resolve_shared

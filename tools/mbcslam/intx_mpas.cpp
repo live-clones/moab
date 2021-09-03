@@ -104,7 +104,7 @@ int main( int argc, char** argv )
     MPI_Init( &argc, &argv );
 
     std::string extra_read_opts;
-    std::string fileN          = TestDir + "/io/mpasx1.642.t.2.nc";
+    std::string fileN          = TestDir + "unittest/io/mpasx1.642.t.2.nc";
     const char* filename_mesh1 = fileN.c_str();
     bool flux_form             = false;
     if( argc > 1 )
@@ -116,14 +116,38 @@ int main( int argc, char** argv )
             {
                 gtol = atof( argv[++index] );
             }
-            if( !strcmp( argv[index], "-dt" ) ) { delta_t = atof( argv[++index] ); }
-            if( !strcmp( argv[index], "-input" ) ) { filename_mesh1 = argv[++index]; }
-            if( !strcmp( argv[index], "-R" ) ) { radius = atof( argv[++index] ); }
-            if( !strcmp( argv[index], "-O" ) ) { extra_read_opts = std::string( argv[++index] ); }
-            if( !strcmp( argv[index], "-FF" ) ) { flux_form = true; }
-            if( !strcmp( argv[index], "-v" ) ) { Verbose = true; }
-            if( !strcmp( argv[index], "-t" ) ) { t = atof( argv[++index] ); }
-            if( !strcmp( argv[index], "-t" ) ) { t = atof( argv[++index] ); }
+            if( !strcmp( argv[index], "-dt" ) )
+            {
+                delta_t = atof( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-input" ) )
+            {
+                filename_mesh1 = argv[++index];
+            }
+            if( !strcmp( argv[index], "-R" ) )
+            {
+                radius = atof( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-O" ) )
+            {
+                extra_read_opts = std::string( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-FF" ) )
+            {
+                flux_form = true;
+            }
+            if( !strcmp( argv[index], "-v" ) )
+            {
+                Verbose = true;
+            }
+            if( !strcmp( argv[index], "-t" ) )
+            {
+                t = atof( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-t" ) )
+            {
+                t = atof( argv[++index] );
+            }
             if( !strcmp( argv[index], "-rot" ) )
             {
                 rot = atof( argv[++index] );

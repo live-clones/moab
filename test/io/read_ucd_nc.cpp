@@ -6,8 +6,8 @@
 
 using namespace moab;
 
-std::string example    = TestDir + "/io/homme3x3458.t.3.nc";
-std::string conn_fname = TestDir + "/io/HommeMapping.nc";
+std::string example    = TestDir + "unittest/io/homme3x3458.t.3.nc";
+std::string conn_fname = TestDir + "unittest/io/HommeMapping.nc";
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

@@ -21,8 +21,8 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    std::string filename0 = TestDir + "/brick1.vtk";
-    std::string filename1 = TestDir + "/brick2.vtk";
+    std::string filename0 = TestDir + "unittest/brick1.vtk";
+    std::string filename1 = TestDir + "unittest/brick2.vtk";
 
     moab::Core* mb         = new moab::Core();
     moab::ParallelComm* pc = new moab::ParallelComm( mb, MPI_COMM_WORLD );

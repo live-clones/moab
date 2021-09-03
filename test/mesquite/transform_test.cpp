@@ -69,7 +69,7 @@ int main( int, char*[] )
     MBMesquite::MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
 
-    std::string default_file_name = TestDir + "/2D/vtk/quads/untangled/tfi_horse10x4-12.vtk";
+    std::string default_file_name = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/tfi_horse10x4-12.vtk";
     // mesh->read_exodus("transformed_mesh.exo", err);
     mesh.read_vtk( default_file_name.c_str(), err );
     if( err ) return 1;

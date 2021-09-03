@@ -39,7 +39,7 @@ int main()
     Interface* iface0 = new Core;
     Interface* iface1 = new Core;
 
-    std::string filename = TestDir + "/tet_brick.vtk";
+    std::string filename = TestDir + "unittest/tet_brick.vtk";
 
     ErrorCode err;
     err = iface0->load_file( filename.c_str() );CHECK_ERR( err );
@@ -83,11 +83,17 @@ int main()
         // Create gaps in sequence, to be filled later on.
         for( Range::iterator eit = edges1.begin(); eit != edges1.end(); eit++, ii++ )
         {
-            if( ii % 3 ) { to_delete.insert( *eit ); }
+            if( ii % 3 )
+            {
+                to_delete.insert( *eit );
+            }
         }
         for( Range::iterator eit = tris1.begin(); eit != tris1.end(); eit++, ii++ )
         {
-            if( ii % 3 ) { to_delete.insert( *eit ); }
+            if( ii % 3 )
+            {
+                to_delete.insert( *eit );
+            }
         }
 
         err = iface0->delete_entities( to_delete );

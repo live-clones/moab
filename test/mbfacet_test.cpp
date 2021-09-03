@@ -68,10 +68,10 @@ void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful
 
 int main( int argc, char* argv[] )
 {
-    filename          = TestDir + "/PB.h5m";
-    polygon_file_name = TestDir + "/polyPB.txt";
+    filename          = TestDir + "unittest/PB.h5m";
+    polygon_file_name = TestDir + "unittest/polyPB.txt";
     filename_out      = "PB_facet.h5m";
-    quads_file        = TestDir + "/quads.h5m";
+    quads_file        = TestDir + "unittest/quads.h5m";
 
     min_dot = 0.8;
 
@@ -170,7 +170,10 @@ int main( int argc, char* argv[] )
     std::cout << "\n";
 
     // when we are done, remove modified file if we want to
-    if( !keep_output ) { remove( filename_out.c_str() ); }
+    if( !keep_output )
+    {
+        remove( filename_out.c_str() );
+    }
     return number_tests_failed;
 }
 
@@ -622,7 +625,10 @@ ErrorCode split_quads_test()
     std::string spl_file = "q.split.h5m";
     rval                 = mb->write_file( spl_file.c_str(), 0, 0, &root_set, 1 );MB_CHK_SET_ERR( rval, "can't write result file" );
 
-    if( !keep_output ) { remove( spl_file.c_str() ); }
+    if( !keep_output )
+    {
+        remove( spl_file.c_str() );
+    }
 
     if( number_tests_failed > 0 ) return MB_FAILURE;
 

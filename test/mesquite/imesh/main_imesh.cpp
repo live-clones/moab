@@ -72,7 +72,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string default_file_name = TestDir + "/3D/vtk/large_box_hex_1000.vtk";
+std::string default_file_name = TestDir + "unittest/mesquite/3D/vtk/large_box_hex_1000.vtk";
 
 void usage()
 {
@@ -263,7 +263,10 @@ Mesh* get_imesh_mesh( const char* file_name )
     int ierr;
     iMesh_Instance imesh_mesh = 0;
     iMesh_newMesh( NULL, &imesh_mesh, &ierr, 0 );
-    if( iBase_SUCCESS != ierr ) { return 0; }
+    if( iBase_SUCCESS != ierr )
+    {
+        return 0;
+    }
 
     iBase_EntitySetHandle root_set;
     iMesh_getRootSet( imesh_mesh, &root_set, &ierr );

@@ -41,9 +41,9 @@ int main()
     std::string filename;
 
 #ifdef MOAB_HAVE_HDF5
-    filename = TestDir + "/testquad-cyl.h5m";
+    filename = TestDir + "unittest/testquad-cyl.h5m";
 #else
-    filename = TestDir + "/hexes_mixed.vtk";
+    filename = TestDir + "unittest/hexes_mixed.vtk";
 #endif
 
     ErrorCode err;

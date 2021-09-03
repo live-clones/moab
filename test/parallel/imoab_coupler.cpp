@@ -69,7 +69,7 @@ int main( int argc, char* argv[] )
 
     MPI_Comm_group( MPI_COMM_WORLD, &jgroup );  // all processes in jgroup
 
-    std::string atmFilename = TestDir + "/wholeATM_T.h5m";
+    std::string atmFilename = TestDir + "unittest/wholeATM_T.h5m";
     // on a regular case,  5 ATM, 6 CPLATM (ATMX), 17 OCN     , 18 CPLOCN (OCNX)  ;
     // intx atm/ocn is not in e3sm yet, give a number
     //   6 * 100+ 18 = 618 : atmocnid
@@ -85,15 +85,15 @@ int main( int argc, char* argv[] )
     int cmpatm        = 5,
         cplatm        = 6;  // component ids are unique over all pes, and established in advance;
 #ifdef ENABLE_ATMOCN_COUPLING
-    std::string ocnFilename = TestDir + "/recMeshOcn.h5m";
-    std::string baseline    = TestDir + "/baseline1.txt";
+    std::string ocnFilename = TestDir + "unittest/recMeshOcn.h5m";
+    std::string baseline    = TestDir + "unittest/baseline1.txt";
     int rankInOcnComm       = -1;
     int cmpocn = 17, cplocn = 18,
         atmocnid = 618;  // component ids are unique over all pes, and established in advance;
 #endif
 
 #ifdef ENABLE_ATMLND_COUPLING
-    std::string lndFilename = TestDir + "/wholeLnd.h5m";
+    std::string lndFilename = TestDir + "unittest/wholeLnd.h5m";
     int cpllnd = 10, cmplnd = 9,
         atmlndid = 610;  // component ids are unique over all pes, and established in advance;
 #endif
@@ -685,7 +685,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpocn;
-            ierr = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+            ierr       = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
             CHECKIERR( ierr, "cannot free send/receive buffers for OCN context" )
         }
         if( ocnComm != MPI_COMM_NULL && 1 == n )  // write only for n==1 case
@@ -825,7 +825,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmplnd;
-            ierr = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
+            ierr       = iMOAB_FreeSenderBuffers( cplLndPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers used to resend land tag towards the coverage mesh "
                              "for atm context" )
         }

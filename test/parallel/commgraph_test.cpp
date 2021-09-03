@@ -63,7 +63,7 @@ using namespace moab;
 int ierr;
 int rankInGlobalComm, numProcesses;
 MPI_Group jgroup;
-std::string atmFilename = TestDir + "/wholeATM_T.h5m";
+std::string atmFilename = TestDir + "unittest/wholeATM_T.h5m";
 // on a regular case,  5 ATM
 // cmpatm is for atm on atm pes ! it has the spectral mesh
 // cmpphys is for atm on atm phys pes ! it has the point cloud , phys grid
@@ -73,7 +73,7 @@ int rankInAtmComm = -1;
 // it is the spectral mesh unique comp id
 int cmpatm = 605;  // component ids are unique over all pes, and established in advance;
 
-std::string atmPhysFilename    = TestDir + "/AtmPhys.h5m";
+std::string atmPhysFilename    = TestDir + "unittest/AtmPhys.h5m";
 std::string atmPhysOutFilename = "outPhys.h5m";
 std::string atmFilename2       = "wholeATM_new.h5m";
 int rankInPhysComm             = -1;
@@ -112,7 +112,7 @@ void testspectral_phys()
 void testspectral_lnd()
 {
     // first model is spectral, second is land
-    atmPhysFilename    = TestDir + "/wholeLnd.h5m";
+    atmPhysFilename    = TestDir + "unittest/wholeLnd.h5m";
     atmPhysOutFilename = std::string( "outLnd.h5m" );
     atmFilename2       = std::string( "wholeATM_lnd.h5m" );
     commgraphtest();

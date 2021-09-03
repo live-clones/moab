@@ -23,9 +23,9 @@ using namespace moab;
     } while( false )
 
 #ifdef HAVE_OCC_STEP
-std::string input_cube = TestDir + "/io/cube.stp";
+std::string input_cube = TestDir + "unittest/io/cube.stp";
 #else
-std::string input_cube = TestDir + "/io/cube.sat";
+std::string input_cube = TestDir + "unittest/io/cube.sat";
 #endif
 
 // Function used to load the test file

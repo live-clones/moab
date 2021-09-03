@@ -69,8 +69,9 @@ int main( int argc, char* argv[] )
 
     MPI_Comm_group( MPI_COMM_WORLD, &jgroup );  // all processes in jgroup
 
-    std::string atmFilename = TestDir + "/wholeATM_T.h5m";  // we should use only mesh from here
-    std::string atmPhysMesh = TestDir + "/AtmPhys_01.h5m";  // it has some data associated to vertices, T_ph, u_ph, v_ph
+    std::string atmFilename = TestDir + "unittest/wholeATM_T.h5m";  // we should use only mesh from here
+    std::string atmPhysMesh =
+        TestDir + "unittest/AtmPhys_01.h5m";  // it has some data associated to vertices, T_ph, u_ph, v_ph
     // we will eventually project that data to ocean mesh, after intx atm/ocn
 
     // on a regular case,  5 ATM, 6 CPLATM (ATMX), 17 OCN     , 18 CPLOCN (OCNX)  ;
@@ -89,13 +90,13 @@ int main( int argc, char* argv[] )
         cplatm     = 6;    // component ids are unique over all pes, and established in advance;
     int cmpPhysAtm = 105;  // different from atm spectral ?
 #ifdef ENABLE_ATMOCN_COUPLING
-    std::string ocnFilename = TestDir + "/recMeshOcn.h5m";
+    std::string ocnFilename = TestDir + "unittest/recMeshOcn.h5m";
     int rankInOcnComm       = -1;
     int cmpocn = 17, cplocn = 18,
         atmocnid = 618;  // component ids are unique over all pes, and established in advance;
 #endif
 #ifdef ENABLE_ATMLND_COUPLING
-    std::string lndFilename = TestDir + "/wholeLnd.h5m";
+    std::string lndFilename = TestDir + "unittest/wholeLnd.h5m";
     int cpllnd              = 10,
         cmplnd              = 9;  // component ids are unique over all pes, and established in advance;
 #endif

@@ -39,8 +39,13 @@ using namespace moab;
 std::string read_options;
 #endif
 
-ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int num_levels, int degree, bool interp,
-                                   int dim, geomObject* obj )
+ErrorCode test_closedsurface_mesh( const char* filename,
+                                   int* level_degrees,
+                                   int num_levels,
+                                   int degree,
+                                   bool interp,
+                                   int dim,
+                                   geomObject* obj )
 {
     Core moab;
     Interface* mbImpl = &moab;
@@ -133,8 +138,12 @@ ErrorCode test_closedsurface_mesh( const char* filename, int* level_degrees, int
     return error;
 }
 
-ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename, int* level_degrees, int num_levels,
-                                                      std::vector< int >& degs2fit, bool interp, geomObject* obj )
+ErrorCode closedsurface_uref_hirec_convergence_study( const char* filename,
+                                                      int* level_degrees,
+                                                      int num_levels,
+                                                      std::vector< int >& degs2fit,
+                                                      bool interp,
+                                                      geomObject* obj )
 {
     Core moab;
     Interface* mbImpl = &moab;
@@ -364,7 +373,7 @@ int main( int argc, char* argv[] )
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 #endif
 
-    std::string infile = TestDir + "/sphere_tris_5.vtk";
+    std::string infile = TestDir + "unittest/sphere_tris_5.vtk";
 
     int degree = 2, dim = 2, geom = 0;
     bool interp = false;
@@ -379,7 +388,10 @@ int main( int argc, char* argv[] )
         {
             if( i + 1 != argc )
             {
-                if( std::string( argv[i] ) == "-degree" ) { degree = atoi( argv[++i] ); }
+                if( std::string( argv[i] ) == "-degree" )
+                {
+                    degree = atoi( argv[++i] );
+                }
                 else if( std::string( argv[i] ) == "-interp" )
                 {
                     interp = atoi( argv[++i] );
@@ -397,7 +409,10 @@ int main( int argc, char* argv[] )
                 {
 #ifdef MOAB_HAVE_MPI
 
-                    if( 0 == rank ) { usage(); }
+                    if( 0 == rank )
+                    {
+                        usage();
+                    }
                     MPI_Finalize();
 
 #else

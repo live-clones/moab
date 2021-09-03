@@ -206,7 +206,7 @@ int main( int argc, char* argv[] )
     int typeTest = 3;
     // std::string inputfile, outfile("out.h5m"), netcdfFile, variable_name, sefile_name;
     std::string filename;
-    filename = TestDir + "/field1.h5m";
+    filename = TestDir + "unittest/field1.h5m";
     startG1  = 0;
     startG2  = 0;
     endG1    = 0;

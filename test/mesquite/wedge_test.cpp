@@ -109,8 +109,12 @@ using namespace MBMesquite;
 // move the vertex to the specified position, smooth the mesh,
 // and verify that the vertex was moved back to the origin by
 // the smoother.
-bool smooth_mesh( MeshImpl* mesh, Mesh* ref_mesh, Mesh::VertexHandle vertex_8, Mesh::VertexHandle vertex_9,
-                  Vector3D delta, QualityMetric* metric );
+bool smooth_mesh( MeshImpl* mesh,
+                  Mesh* ref_mesh,
+                  Mesh::VertexHandle vertex_8,
+                  Mesh::VertexHandle vertex_9,
+                  Vector3D delta,
+                  QualityMetric* metric );
 
 const unsigned NUM_ELEM      = 6;
 const unsigned NUM_VERT      = 14;
@@ -124,7 +128,7 @@ int main( int argc, char*[] )
         return 2;
     }
 
-    std::string meshfile = TestDir + "/3D/vtk/prisms/untangled/6-wedge-prism.vtk";
+    std::string meshfile = TestDir + "unittest/mesquite/3D/vtk/prisms/untangled/6-wedge-prism.vtk";
     unsigned i;
 
     MBMesquite::MsqPrintError err( cout );
@@ -221,7 +225,11 @@ int main( int argc, char*[] )
     return 0;
 }
 
-bool smooth_mesh( MeshImpl* mesh, Mesh*, Mesh::VertexHandle vert1, Mesh::VertexHandle vert2, Vector3D delta,
+bool smooth_mesh( MeshImpl* mesh,
+                  Mesh*,
+                  Mesh::VertexHandle vert1,
+                  Mesh::VertexHandle vert2,
+                  Vector3D delta,
                   QualityMetric* metric )
 {
     MBMesquite::MsqPrintError err( cout );

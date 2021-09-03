@@ -6,8 +6,8 @@
 
 using namespace moab;
 
-std::string cubfile   = TestDir + "/io/singlecyl.cub";
-std::string ccmgfiler = TestDir + "/io/singlecyl.ccmg";
+std::string cubfile   = TestDir + "unittest/io/singlecyl.cub";
+std::string ccmgfiler = TestDir + "unittest/io/singlecyl.ccmg";
 std::string ccmgfilew = "singlecyl_tmp.ccmg";
 
 void test_read();

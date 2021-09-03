@@ -72,7 +72,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string DEFAULT_MESH = TestDir + "/2D/vtk/quads/tangled/tangled_quad.vtk";
+std::string DEFAULT_MESH = TestDir + "unittest/mesquite/2D/vtk/quads/tangled/tangled_quad.vtk";
 
 const bool brief_output = true;
 const bool write_output = false;

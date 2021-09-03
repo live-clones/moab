@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-std::string filename = TestDir + "/io/p8ex1.h5m";
+std::string filename = TestDir + "unittest/io/p8ex1.h5m";
 
 using namespace moab;
 void report_sets( moab::Core* mb, int rank, int nproc )

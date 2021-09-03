@@ -39,8 +39,12 @@ using namespace moab;
 std::string read_options;
 #endif
 
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
-                              const int degree, const int dim )
+ErrorCode load_meshset_hirec( const char* infile,
+                              Interface* mbimpl,
+                              EntityHandle& meshset,
+                              ParallelComm*& pc,
+                              const int degree,
+                              const int dim )
 {
     ErrorCode error;
     error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
@@ -52,7 +56,10 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
     EntityHandle partnset;
     error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );MB_CHK_ERR( error );
 
-    if( nprocs > 1 ) { pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm ); }
+    if( nprocs > 1 )
+    {
+        pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm );
+    }
 
     if( nprocs > 1 )
     {
@@ -116,8 +123,12 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
     return error;
 }
 
-ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile, std::vector< int >& degs2fit, bool interp,
-                                                      int dim, geomObject* obj, int& ntestverts,
+ErrorCode closedsurface_uref_hirec_convergence_study( const char* infile,
+                                                      std::vector< int >& degs2fit,
+                                                      bool interp,
+                                                      int dim,
+                                                      geomObject* obj,
+                                                      int& ntestverts,
                                                       std::vector< double >& geoml1errs,
                                                       std::vector< double >& geoml2errs,
                                                       std::vector< double >& geomlinferrs )
@@ -422,7 +433,7 @@ int main( int argc, char* argv[] )
     if( argc == 1 )
     {
         usage();
-        prefix = TestDir + "/sphere_quads_5_ML_";
+        prefix = TestDir + "unittest/sphere_quads_5_ML_";
         suffix = ".h5m";
         istr   = "0";
         iend   = "1";
@@ -439,7 +450,10 @@ int main( int argc, char* argv[] )
         {
             if( i + 1 != argc )
             {
-                if( std::string( argv[i] ) == "-suffix" ) { suffix = std::string( argv[++i] ); }
+                if( std::string( argv[i] ) == "-suffix" )
+                {
+                    suffix = std::string( argv[++i] );
+                }
                 else if( std::string( argv[i] ) == "-str" )
                 {
                     istr = std::string( argv[++i] );
@@ -465,7 +479,10 @@ int main( int argc, char* argv[] )
                 {
 #ifdef MOAB_HAVE_MPI
 
-                    if( 0 == rank ) { usage(); }
+                    if( 0 == rank )
+                    {
+                        usage();
+                    }
 
                     MPI_Finalize();
 #else
@@ -495,7 +512,10 @@ int main( int argc, char* argv[] )
         {
 #ifdef MOAB_HAVE_MPI
 
-            if( 0 == rank ) { std::cout << "Input dimesion should be positive and less than 3;" << std::endl; }
+            if( 0 == rank )
+            {
+                std::cout << "Input dimesion should be positive and less than 3;" << std::endl;
+            }
 
 #else
             std::cout << "Input dimesion should be positive and less than 3;" << std::endl;
@@ -521,7 +541,10 @@ int main( int argc, char* argv[] )
 
     geomObject* obj;
 
-    if( geom == 0 ) { obj = new sphere(); }
+    if( geom == 0 )
+    {
+        obj = new sphere();
+    }
     else
     {
         obj = new torus();

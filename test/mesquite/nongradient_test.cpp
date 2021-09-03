@@ -65,8 +65,8 @@ int main()
 
 #define FILE_NAME1 "bad_circle_tri.vtk"
 #define FILE_NAME2 "tangled_tri.vtk"
-    std::string file_name1 = TestDir + "/2D/vtk/tris/untangled/" FILE_NAME1;
-    std::string file_name2 = TestDir + "/2D/vtk/tris/tangled/" FILE_NAME2;
+    std::string file_name1 = TestDir + "unittest/mesquite/2D/vtk/tris/untangled/" FILE_NAME1;
+    std::string file_name2 = TestDir + "unittest/mesquite/2D/vtk/tris/tangled/" FILE_NAME2;
 
     // Barrier / Max Objective Function Test
 
