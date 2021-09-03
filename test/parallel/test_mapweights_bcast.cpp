@@ -17,6 +17,7 @@
 
 #include "OfflineMap.h"
 #include "moab/Remapping/TempestRemapper.hpp"
+#include "moab/Remapping/TempestOnlineMap.hpp"
 #include "moab/ParallelComm.hpp"
 
 #ifndef IS_BUILDING_MB
@@ -479,22 +480,27 @@ void read_buffered_map()
 
 void read_map_from_disk()
 {
-    NcError error( NcError::silent_nonfatal );
-    MPI_Comm commW                = MPI_COMM_WORLD;
-    const int rootProc            = 0;
-    const std::string outFilename = inMapFilename;
-    double dTolerance             = 1e-08;
-    int mpierr                    = 0;
+    moab::ErrorCode rval;
+    NcError error( NcError::verbose_nonfatal );
+    MPI_Comm commW = MPI_COMM_WORLD;
+    std::vector< int > tmp_owned_ids;
 
-    int nprocs, rank;
-    MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
-    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    std::string remap_weights_filename = TestDir + "unittest/outCS5ICOD5_map.nc";
 
     moab::Interface* mb = new moab::Core();
-    moab::ParallelComm pcomm( MPI_COMM_WORLD );
+    moab::ParallelComm pcomm( mb, commW );
 
-    moab::TempestRemapper remapper( mb, pcomm );
-    moab::TempestOnlineMap onlinemap();
+    moab::TempestRemapper remapper( mb, &pcomm );
+    remapper.meshValidate     = true;
+    remapper.constructEdgeMap = true;
+
+    // Do not create new filesets; Use the sets from our respective applications
+    remapper.initialize( false );
+
+    moab::TempestOnlineMap onlinemap( &remapper );
+
+    rval = onlinemap.ReadParallelMap( remap_weights_filename.c_str(), tmp_owned_ids, true );
+    CHECK_EQUAL( rval, moab::MB_SUCCESS );
 }
 
 void test_tempest_map_bcast()
