@@ -102,6 +102,15 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "startCoupler,g", "start task for coupler layout", &startG4 );
     opts.addOpt< int >( "endCoupler,j", "end task for coupler layout", &endG4 );
 
+    int types[2]       = { 3, 3 };  // type of source and target;  1 = SE, 2,= PC, 3 = FV
+    int disc_orders[2] = { 1, 1 };  // 1 is for FV and PC; 4 could be for SE
+    opts.addOpt< int >( "typeSource,x", "source type", &types[0] );
+    opts.addOpt< int >( "typeTarget,y", "target type", &types[1] );
+    opts.addOpt< int >( "orderSource,u", "source order", &disc_orders[0] );
+    opts.addOpt< int >( "orderTarget,v", "target oorder", &disc_orders[1] );
+    bool analytic_field = false;
+    opts.addOpt< void >( "analytic,q", "analytic field", &analytic_field );
+
     bool no_regression_test = false;
     opts.addOpt< void >( "no_regression,r", "do not do regression test against baseline 1", &no_regression_test );
     opts.parseCommandLine( argc, argv );
@@ -209,8 +218,6 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot register ocn_atm map instance over coupler pes " )
     }
 
-    int disc_orders[3] = { 1, 1, 1 };
-
     const std::string intx_from_file_identifier = "map-from-file";
 
     if( couComm != MPI_COMM_NULL )
@@ -223,8 +230,8 @@ int main( int argc, char* argv[] )
 
     if( atmCouComm != MPI_COMM_NULL )
     {
-        int type      = 3;  // quads in source set
-        int direction = 1;  // from source to coupler; will create a mesh on cplAtmPID
+        int type      = types[0];  // FV
+        int direction = 1;         // from source to coupler; will create a mesh on cplAtmPID
         // because it is like "coverage", context will be cplocn
         ierr = iMOAB_MigrateMapMesh( cmpAtmPID, cplAtmOcnPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &type,
                                      &cmpatm, &cplocn, &direction );
@@ -240,8 +247,8 @@ int main( int argc, char* argv[] )
 
     if( ocnCouComm != MPI_COMM_NULL )
     {
-        int type      = 3;  // cells with GLOBAL_ID in ocean / target set
-        int direction = 2;  // from coupler to target; will create a mesh on cplOcnPID
+        int type      = types[1];  // cells with GLOBAL_ID in ocean / target set
+        int direction = 2;         // from coupler to target; will create a mesh on cplOcnPID
         // it will be like initial migrate cmpocn <-> cplocn
         ierr = iMOAB_MigrateMapMesh( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup, &type,
                                      &cmpocn, &cplocn, &direction );
@@ -262,7 +269,7 @@ int main( int argc, char* argv[] )
 
     int tagIndex[2];
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
-    int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
+    int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = disc_orders[1] * disc_orders[1] /*FV*/;
 
     const char* bottomTempField          = "AnalyticalSolnSrcExact";
     const char* bottomTempProjectedField = "Target_proj";
@@ -276,6 +283,41 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1],
                                        strlen( bottomTempProjectedField ) );
         CHECKIERR( ierr, "failed to define the field tag Target_proj" );
+    }
+
+    if( analytic_field && ( atmComm != MPI_COMM_NULL ) )  // we are on source /atm  pes
+    {
+        // cmpOcnPID, "T_proj;u_proj;v_proj;"
+        ierr = iMOAB_DefineTagStorage( cmpAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
+                                       strlen( bottomTempField ) );
+        CHECKIERR( ierr, "failed to define the field tag AnalyticalSolnSrcExact" );
+
+        int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
+        /*
+         * Each process in the communicator will have access to a local mesh instance, which will contain the
+         * original cells in the local partition and ghost entities. Number of vertices, primary cells, visible
+         * blocks, number of sidesets and nodesets boundary conditions will be returned in numProcesses 3 arrays,
+         * for local, ghost and total numbers.
+         */
+        ierr = iMOAB_GetMeshInfo( cmpAtmPID, nverts, nelem, nblocks, nsbc, ndbc );
+        CHECKIERR( ierr, "failed to get num primary elems" );
+        int numAllElem = nelem[2];
+        int eetype     = 1;
+
+        if( types[0] == 2 )  // point cloud
+        {
+            numAllElem = nverts[2];
+            eetype     = 0;
+        }
+        std::vector< double > vals;
+        int storLeng = atmCompNDoFs * numAllElem;
+        vals.resize( storLeng );
+        for( int k = 0; k < storLeng; k++ )
+            vals[k] = k;
+
+        ierr = iMOAB_SetDoubleTagStorage( cmpAtmPID, bottomTempField, &storLeng, &eetype, &vals[0],
+                                          strlen( bottomTempField ) );
+        CHECKIERR( ierr, "cannot make analytical tag" )
     }
 
     // need to make sure that the coverage mesh (created during intx method) received the tag that
@@ -299,9 +341,14 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_GetMeshInfo( cplAtmPID, nverts, nelem, nblocks, nsbc, ndbc );
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
+            int eetype     = 1;
+            if( types[0] == 2 )  // Point cloud
+            {
+                eetype     = 0;  // vertices
+                numAllElem = nverts[2];
+            }
             std::vector< double > vals;
             int storLeng = atmCompNDoFs * numAllElem;
-            int eetype   = 1;
 
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
