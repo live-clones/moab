@@ -325,22 +325,22 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     m_weightMatrix.setFromTriplets( tripletList.begin(), tripletList.end() );
     m_weightMatrix.makeCompressed();
 
-    int nrows = m_weightMatrix.rows();         // Number of rows
-    int ncols = m_weightMatrix.cols();         // Number of columns
-    int NNZ = m_weightMatrix.nonZeros();     // Number of non zero values
+    int nrows = m_weightMatrix.rows();      // Number of rows
+    int ncols = m_weightMatrix.cols();      // Number of columns
+    int NNZ   = m_weightMatrix.nonZeros();  // Number of non zero values
 #ifdef MOAB_HAVE_MPI
     // find out min/max for NNZ, ncols, nrows
     // should work on std c++ 11
-    int arr3[6] = {NNZ, nrows, ncols, -NNZ, -nrows, -ncols};
+    int arr3[6] = { NNZ, nrows, ncols, -NNZ, -nrows, -ncols };
     int rarr3[6];
-    int mpierr = MPI_Reduce(arr3, rarr3, 6, MPI_INT, MPI_MIN, 0, m_pcomm->comm());
+    MPI_Reduce( arr3, rarr3, 6, MPI_INT, MPI_MIN, 0, m_pcomm->comm() );
 
     int total[2];
-    mpierr = MPI_Reduce(arr3, total, 2, MPI_INT, MPI_SUM, 0, m_pcomm->comm());
-    if (!rank)
-        std::cout << " Rows:(" << rarr3[1] <<", " <<  -rarr3[4] << "), Cols:(" <<
-                                  rarr3[2] <<", " <<  -rarr3[5] << "), NNZ:(" <<
-                                  rarr3[0] <<", " <<  -rarr3[3] << "),  total NNZ:" << total[0] << " total rows:" << total[1] << "\n";
+    MPI_Reduce( arr3, total, 2, MPI_INT, MPI_SUM, 0, m_pcomm->comm() );
+    if( !rank )
+        std::cout << " Rows:(" << rarr3[1] << ", " << -rarr3[4] << "), Cols:(" << rarr3[2] << ", " << -rarr3[5]
+                  << "), NNZ:(" << rarr3[0] << ", " << -rarr3[3] << "),  total NNZ:" << total[0]
+                  << " total rows:" << total[1] << "\n";
 #else
     std::cout << "nr rows: " << nrows << " cols: " << ncols << " non-zeros: " << NNZ << "\n";
 #endif
