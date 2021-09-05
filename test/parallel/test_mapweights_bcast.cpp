@@ -484,6 +484,7 @@ void read_map_from_disk()
     NcError error( NcError::verbose_nonfatal );
     MPI_Comm commW = MPI_COMM_WORLD;
     std::vector< int > tmp_owned_ids;
+    double dTolerance = 1e-08;
 
     std::string remap_weights_filename = TestDir + "unittest/outCS5ICOD5_map.nc";
 
@@ -501,6 +502,22 @@ void read_map_from_disk()
 
     rval = onlinemap.ReadParallelMap( remap_weights_filename.c_str(), tmp_owned_ids, true );
     CHECK_EQUAL( rval, moab::MB_SUCCESS );
+
+    // consistency: row sums
+    int isConsistentP = onlinemap.IsConsistent( dTolerance );
+    CHECK_EQUAL( 0, isConsistentP );
+
+    // conservation: we will disable this conservation check for now
+    // since we do not have information about source and target areas
+    // to accurately decipher conservation data satisfaction
+    // int isConservativeP = onlinemap.IsConservative( dTolerance );
+    // CHECK_EQUAL( 0, isConservativeP );
+
+    // monotonicity: global failures
+    int isMonotoneP = onlinemap.IsMonotone( dTolerance );
+    // Accumulate sum of failures to ensure that it is exactly same as serial case
+    // 4600 fails in serial. What about parallel ? Check and confirm.
+    CHECK_EQUAL( 4600, isMonotoneP );
 }
 
 void test_tempest_map_bcast()
@@ -599,8 +616,8 @@ void test_tempest_map_bcast()
         std::cout << "Total NNZ in remap matrix = " << dataRowsGlobal.GetRows() << std::endl;
     }
 
-    int *rg, *cg;
-    double* de;
+    int *rg = nullptr, *cg = nullptr;
+    double* de               = nullptr;
     int nMapGlobalRowCols[3] = { sparseMatrix.GetRows(), sparseMatrix.GetColumns(),
                                  static_cast< int >( dataEntriesGlobal.GetRows() ) };
 
