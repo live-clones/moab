@@ -1176,7 +1176,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
         nB = (int)leng;
 #else
-        EXCEPTION3( "cannot read the file %s", strSource );
+        _EXCEPTION1( "cannot read the file %s", strSource );
 #endif
     }
 
