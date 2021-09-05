@@ -50,7 +50,7 @@ int is_any_proc_error( int is_my_error )
 
 int run_test( ErrorCode ( *func )( const char*, const char* ),
               const char* func_name,
-              const std::string file_name,
+              const std::string& file_name,
               const char* option )
 {
     ErrorCode result = ( *func )( file_name.c_str(), option );

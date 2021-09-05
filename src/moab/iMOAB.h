@@ -1,38 +1,40 @@
 #ifndef IMOAB_H
 #define IMOAB_H
-/** \file iMOAB.h
-  iMOAB: a language-agnostic, lightweight interface to MOAB
+/**
+ * \file iMOAB.h
+ * iMOAB: a language-agnostic, lightweight interface to MOAB.
+ *
+ * Supports usage from C/C++, Fortran (77/90/2003), Python.
+ *
+ * \remark 1) All data in the interface are exposed via POD-types.
+ * \remark 2) Pass everything by reference, so we do not have to use %VAL()
+ * \remark 3) Arrays are allocated by the user code. No concerns about
+ *            de-allocation of the data will be taken up by the interface.
+ * \remark 4) Always pass the pointer to the start of array along with the
+ *            total allocated size for the array.
+ * \remark 5) Return the filled array requested by user along with
+ *            optionally the actual length of the array that was filled.
+ *            (for typical cases, should be the allocated length)
+ */
 
-  Supports usage from C/C++, Fortran (77/90/2003), Python
-
-  \remark 1) All data in the interface are exposed via POD-types.
-  \remark 2) Pass everything by reference, so we do not have to use %VAL()
-  \remark 3) Arrays are allocated by the user code. No concerns about
-     de-allocation of the data will be taken up by the interface.
-  \remark 4) Always pass the pointer to the start of array along with the
-     total allocated size for the array.
-  \remark 5) Return the filled array requested by user along with
-     optionally the actual length of the array that was filled.
-     (for typical cases, should be the allocated length)
-*/
-
-/** \Notes
-  1) Fortran MPI_Comm won't work. Take an integer argument and use MPI_F2C calls to get the C-Comm object
-  2) ReadHeaderInfo - Does it need the pid ?
-  3) Reuse the comm object from the registration for both load and write operations.
-     Do not take comm objects again to avoid confusion and retain consistency.
-  4) Decipher the global comm object and the subset partioning for each application based on the comm object
-  5) GetMeshInfo - return separately the owned and ghosted vertices/elements -- not together in visible_** but rather
-     owned_** and ghosted_**. Make these arrays of size 2.
-  6) Should we sort the vertices after ghosting, such that the locally owned is first, and the ghosted appended next.
-  7) RCM only for the owned part of the mesh -- do not screw with the ghosted layers
-  8) GetBlockID - identical to GetVertexID -- return the global numbering for block
-  9) GetVertexID -- remember that the order of vertices returned have an implicit numbering embedded in it.
-     DO NOT CHANGE THIS ORDERING...
-  10) GetBlockInfo takes global Block ID; Remove blockname unless there is a separate use case for it..
-  11) GetElementConnectivity - clarify whether we return global or local vertex numbering.
-      Preferably local numbering else lot of deciphering for global.
-*/
+/**
+ * \Notes
+ * 1) Fortran MPI_Comm won't work. Take an integer argument and use MPI_F2C calls to get the C-Comm object
+ * 2) ReadHeaderInfo - Does it need the pid ?
+ * 3) Reuse the comm object from the registration for both load and write operations.
+ *    Do not take comm objects again to avoid confusion and retain consistency.
+ * 4) Decipher the global comm object and the subset partioning for each application based on the comm object
+ * 5) GetMeshInfo - return separately the owned and ghosted vertices/elements -- not together in visible_** but rather
+ *    owned_** and ghosted_**. Make these arrays of size 2.
+ * 6) Should we sort the vertices after ghosting, such that the locally owned is first, and the ghosted appended next.
+ * 7) RCM only for the owned part of the mesh -- do not screw with the ghosted layers
+ * 8) GetBlockID - identical to GetVertexID -- return the global numbering for block
+ * 9) GetVertexID -- remember that the order of vertices returned have an implicit numbering embedded in it.
+ *    DO NOT CHANGE THIS ORDERING...
+ * 10) GetBlockInfo takes global Block ID; Remove blockname unless there is a separate use case for it..
+ * 11) GetElementConnectivity - clarify whether we return global or local vertex numbering.
+ *     Preferably local numbering else lot of deciphering for global.
+ */
 #include "moab/MOABConfig.h"
 #include "moab/Types.hpp"
 

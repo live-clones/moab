@@ -2183,8 +2183,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     // first see what are the processors in each group; get the sender group too, from the sender
     // communicator
     MPI_Group receiverGroup;
-    int ierr = MPI_Comm_group( receive, &receiverGroup );
-    CHK_MPI_ERR( ierr );
+    int ierr = MPI_Comm_group( receive, &receiverGroup );CHK_MPI_ERR( ierr );
 
     // instantiate the par comm graph
     ParCommGraph* cgraph =
@@ -2951,8 +2950,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
 
     MPI_Comm global            = ( is_fortran_context ? MPI_Comm_f2c( reinterpret_cast< MPI_Fint >( *join ) ) : *join );
     int currentRankInJointComm = -1;
-    ierr                       = MPI_Comm_rank( global, &currentRankInJointComm );
-    CHK_MPI_ERR( ierr );
+    ierr                       = MPI_Comm_rank( global, &currentRankInJointComm );CHK_MPI_ERR( ierr );
 
     // if currentRankInJointComm is in receivers list, it means that we are on intx tasks too, we
     // need to send information towards component tasks
