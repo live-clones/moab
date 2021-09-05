@@ -1239,6 +1239,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecRow[0] ); ERR_PARNC( ret );
         ret = ncmpi_inq_varid( ncfile, "col", &varid ); ERR_PARNC( ret );
         ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecCol[0] ); ERR_PARNC( ret );
+	ret = ncmpi_close(ncfile); ERR_PARNC( ret );
 #endif
     }
 
