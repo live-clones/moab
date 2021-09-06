@@ -1,0 +1,190 @@
+#!/bin/bash
+# bootstrap.sh
+#--------------------------------------------------------------------------------------------
+#  The bootstrap script to download, configure, and provide additional functionality to
+#  the GNU Autotools build system for MOAB.  
+#--------------------------------------------------------------------------------------------
+
+#-------------
+#  Variables 
+#-------------
+use_autoreconf=1
+
+# --------------------------------------------------------------
+#  Make sure we are running from the source directory
+# --------------------------------------------------------------
+echo "--------------------------------------------------------------------------"
+echo "Bootstrap for MOAB build system."
+echo "Beginning to run bootstrap in `pwd`."
+dir=`echo "$0" | sed 's,[^/]*$,,'`
+test "x${dir}" = "x" && dir='.'
+if (test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"); then
+    echo "This script must be executed directly from the source directory."
+    echo "--------------------------------------------------------------------------"
+    exit 1
+fi
+echo "--------------------------------------------------------------------------"
+
+#-------------------
+#  Option handling
+#-------------------
+while getopts ":chp:o:s-:" opt; do
+	case ${opt} in
+		# Support for long options 
+		-)
+		case "${OPTARG}" in
+			
+			# Help will display the README
+			help)
+				less README.md
+				exit 0
+				;;
+			
+			# Run without autoreconf
+			no-autoreconf)
+				use_autoreconf=0
+				;;
+
+		esac
+		# Short options
+	esac
+done
+
+convert_version_num()
+{
+    local tool_ver=$1
+    local ndots=`grep -o '\.' <<<$tool_ver | wc -l` 
+    if [ $ndots -eq 0 ]; then
+        tool_ver="${tool_ver}.0.0"
+    fi
+    if [ $ndots -eq 1 ]; then
+        tool_ver="${tool_ver}.0"
+    fi
+    local mult=$((1000*1000))
+    local tool_ver_out=0
+    for val in `sed 's/\./\ /g' <<<$tool_ver`; do
+        tool_ver_out=$(( $tool_ver_out + ${mult}*${val} ))
+        mult=$(( ${mult}/1000 ))
+    done
+    echo $tool_ver_out
+}
+
+#----------------------------
+#  Check for autotools bits
+#----------------------------
+echo "Scanning dependencies..."
+dependencies=( autoconf autoheader aclocal automake glibtoolize autoreconf )
+versions=( 2.69 0.0.0 0.0.0 1.11.0 0.0.0 0.0.0 )
+automake_opts="--add-missing"
+index=0
+for tool in "${dependencies[@]}"; do
+	tool_loc=`which $tool 2>bootstrap.log`
+	tool_ver_orig=`$tool --version | sed -n 1p | tr -cd [:digit:]\.`
+	tool_ver=`convert_version_num $tool_ver_orig`
+        tool_ver_req=`convert_version_num ${versions[index]}`
+
+	if test "x$tool_loc" == "x"; then
+		echo "	Checking for $tool........     [ missing  ]"
+		auto_error=1
+	elif test $tool_ver -lt $tool_ver_req; then
+		echo "	Checking for $tool........		[ outdated ]"
+		echo "		Installed version: $tool_ver_orig"
+		echo "		Required version: ${versions[index]} or greater"
+		auto_error=1
+	else
+		echo "	Checking for $tool........		[  found   ]"
+	fi
+	index=$((index+1))
+done
+
+
+# Print results
+if [[ $auto_error != 1 ]]; then
+	echo "--------------------------------------------------------------------------"
+	echo "  Found all necessary dependencies.  Proceeding with setup..."
+	echo "--------------------------------------------------------------------------"
+else
+	echo "------------------------------------------------------------------------------"
+	echo "  Error!  Outdated or missing dependencies.  Please reinstall and try again."
+	echo "------------------------------------------------------------------------------"
+	exit 1;
+fi
+
+function error_exit
+{
+# Function for exit due to fatal program error
+#   Accepts 1 argument:
+#     string containing descriptive error message
+	echo "			[   error   ]"
+	echo "------------------------------------------------------------------------------"
+  echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+	echo "------------------------------------------------------------------------------"
+  exit 1
+}
+
+#--------------------------------
+#  Prepare the configure script
+#--------------------------------
+echo "Running the autotools..."
+
+if [ $use_autoreconf = 1 ]; then
+	# Run autoreconf
+	echo -n "	Running autoreconf....."
+	PROGNAME="autoreconf"
+	var=`autoreconf -fi --warnings=none 2>&1>&bootstrap.log`
+	if [ "$?" != "0" ]; then 
+		error_exit "$LINENO: Detailed error output available in bootstrap.log file"
+	fi 
+	echo "			[   done   ]"
+else # Use each autotool piece separately
+	# Run aclocal
+	echo -n "	Running aclocal....."
+	PROGNAME="aclocal"
+	var=`aclocal --force -I config/scripts 2>&1>&bootstrap.log`
+	if [ "$?" != "0" ]; then 
+		error_exit "$LINENO: Detailed error output available in bootstrap.log file"
+	fi 
+	echo "			[   done   ]"
+	
+	# Run libtoolize
+	echo -n "	Running libtoolize....."
+	PROGNAME="glibtoolize"
+	var=`glibtoolize --copy --force --quiet 2>&1 >> bootstrap.log`
+	if [ "$?" != "0" ]; then 
+		error_exit "$LINENO: Detailed error output available in bootstrap.log file"
+	fi 
+	echo "			[   done   ]"
+	
+	# Run autoconf
+	echo -n "	Running autoconf....."
+	PROGNAME="autoconf"
+	var=`autoconf --force -i 2>&1 >> bootstrap.log`
+	if [ "$?" != "0" ]; then 
+		error_exit "$LINENO: Detailed error output available in bootstrap.log file"
+	fi 
+	echo "			[   done   ]"
+	
+	# Run autoheader
+	echo -n "	Running autoheader....."
+	PROGNAME="autoheader"
+	var=`autoheader --force 2>&1 >> bootstrap.log`
+	if [ "$?" != "0" ]; then 
+		error_exit "$LINENO: Detailed error output available in bootstrap.log file"
+	fi 
+	echo "			[   done   ]"
+	
+	# Run automake
+	echo -n "	Running automake....."
+	PROGNAME="automake"
+	var=`automake --add-missing --force --force-missing 2>&1 >> bootstrap.log`
+	if [ "$?" != "0" ]; then 
+		error_exit "$LINENO: Detailed error output available in bootstrap.log file"
+	fi 
+	echo "			[   done   ]"
+fi # if [ $use_autoreconf = 1 ]
+	
+echo "--------------------------------------------------------------------------"
+echo "  Done bootstrapping your system.  You may now run ./configure."	
+echo "  To see options use ./bootstrap --help or view the README.md file. "
+echo "--------------------------------------------------------------------------"
+

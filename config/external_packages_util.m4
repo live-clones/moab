@@ -92,6 +92,11 @@ m4_define([_AC_INIT_PARSE_ENABLE2],
 # RESTRICTION ENDS #
 ####################
 
+AC_DEFUN([MOAB_ERROR_MSG],
+[
+m4_ifdef([AC_MSG_ERROR], [AC_MSG_ERROR($1, 1)], [AC_ERROR($1)])
+])
+
 AC_DEFUN([INITIALIZE_EXTERNAL_PACKAGES],
 [
   # Check for command line utility/archive/download programs
@@ -119,7 +124,7 @@ AC_DEFUN([INITIALIZE_EXTERNAL_PACKAGES],
       AC_PATH_PROG(SHASUM_X, shasum, "")
       HASHPRGM="$SHASUM_X -a1"
     else
-      AC_ERROR([No file/directory hash computation program is available. Report to moab-dev@mcs.anl.gov])
+      MOAB_ERROR_MSG([No file/directory hash computation program is available. Report to moab-dev@mcs.anl.gov])
     fi
   fi
   # repository handling programs
@@ -131,7 +136,7 @@ AC_DEFUN([INITIALIZE_EXTERNAL_PACKAGES],
   if (test "x$MKDIR_P" != "x"); then
     MKDIR_P="$MKDIR_P -p"
   else
-    AC_ERROR([Make directory command not found ? Seriously ? Report to moab-dev@mcs.anl.gov])
+    MOAB_ERROR_MSG([Make directory command not found ? Seriously ? Report to moab-dev@mcs.anl.gov])
   fi
   AC_PROG_MKDIR_P
   AC_PROG_MAKE_SET
@@ -219,7 +224,7 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
           # Check if the file requested exists in the remote directory -- inform user if there is a network error
           op_checkifexists="`wget --spider -O/dev/null -q $2 && echo yes || echo no`"
           if (test "$op_checkifexists" != "yes"); then
-            AC_ERROR([ --  Requested URL does not exist in remote host. Try again later. ($2)  -- ])
+            MOAB_ERROR_MSG([ --  Requested URL does not exist in remote host. Try again later. ($2)  -- ])
           fi
           #op_needdownload="`wget --spider -N -q $2 && echo yes || echo no; cd $currdir`"
           op_downloadlog$1="`wget $ADDLN_OPTS -q -c -N --progress=bar $2 -O $3`"
@@ -257,7 +262,7 @@ AC_DEFUN([DOWNLOAD_EXTERNAL_PACKAGE],
   fi
 
   if (test "$filedownloaded" != "yes"); then
-    AC_ERROR([ --  The archive URL ($2) specified cannot be handled by wget, curl or scp  -- ])
+    MOAB_ERROR_MSG([ --  The archive URL ($2) specified cannot be handled by wget, curl or scp  -- ])
   else
     if (test "$verbosemessages" != "no" ); then
       MSG_ECHO_LOG(${op_downloadlog$1})
@@ -331,7 +336,7 @@ AC_DEFUN([CLONE_SOURCE_REPOSITORY],
   fi
 
   if (test "$filedownloaded" != "yes"); then
-    AC_ERROR([ --  The Git repository URL ($2) specified could not be cloned  -- ])
+    MOAB_ERROR_MSG([ --  The Git repository URL ($2) specified could not be cloned  -- ])
   else
      pkg_srcdir="$4"
      MSG_ECHO_LOG(${op_downloadlog$1})
@@ -377,14 +382,14 @@ AC_DEFUN([DEFLATE_EXTERNAL_PACKAGE],
       need_configuration=true
     fi
   else
-    AC_ERROR([ --  Unhandled file format for deflating package $1 -- Filename = $2 -- ])
+    MOAB_ERROR_MSG([ --  Unhandled file format for deflating package $1 -- Filename = $2 -- ])
   fi
 
   if (test "x$op_pkg_subdir" != "x"); then
     pkg_srcdir="$3/$op_pkg_subdir"
     MSG_ECHO_LOG(${op_deflatelog$1})
   else
-    AC_ERROR([ --  Unhandled file format for getting the source tree name for package $1 -- Filename = $2 -- ])
+    MOAB_ERROR_MSG([ --  Unhandled file format for getting the source tree name for package $1 -- Filename = $2 -- ])
   fi
 ])
 
