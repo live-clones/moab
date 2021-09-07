@@ -7,10 +7,6 @@
  *  atm2 will be migrated to coupler pes with inference from ocn RCB
  *
  *  first part of test E: just infer atm from land test
- *
- *
- *
- *
  */
 
 #include "moab/Core.hpp"
@@ -263,7 +259,13 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot write atm mesh after receiving" )
         POP_TIMER( couComm, rankInCouComm )
     }
-
+    if(  atmComm != MPI_COMM_NULL  )
+    {
+        char outputFileAtm[] = "AtmAfterMigr.h5m";
+        ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
+    }
     MPI_Barrier( MPI_COMM_WORLD );
     if( couComm != MPI_COMM_NULL )
     {
@@ -532,6 +534,13 @@ int main( int argc, char* argv[] )
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
     {
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        {
+            char outputFileAtm[] = "AtmAtStartIt.h5m";
+            ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
+                                    strlen( fileWriteOptions ) );
+            CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
+        }
         PUSH_TIMER( "Send/receive data from land component to coupler in atm context" )
         if( lndComm != MPI_COMM_NULL )
         {
@@ -556,6 +565,13 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpLndPID, &cplatm );  // context is for atm
             CHECKIERR( ierr, "cannot free buffers used to send lnd tag towards the coverage mesh for atm" )
         }
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        {
+            char outputFileAtm[] = "AtmAfterTagMigrToLand.h5m";
+            ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
+                                    strlen( fileWriteOptions ) );
+            CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
+        }
 
         if( couComm != MPI_COMM_NULL )
         {
@@ -577,6 +593,13 @@ int main( int argc, char* argv[] )
                                         strlen( fileWriteOptions ) );
                 CHECKIERR( ierr, "failed to write fAtmOnCpl4.h5m " );
             }
+        }
+        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        {
+            char outputFileAtm[] = "AtmBeforeMigr.h5m";
+            ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
+                                    strlen( fileWriteOptions ) );
+            CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
         }
         // send the tag to atm pes, from atm mesh on coupler pes
         //   from couComm, using common joint comm atm_coupler
