@@ -32,6 +32,7 @@ using namespace moab;
 
 //#define GRAPH_INFO
 // #define  ENABLE_OCNATM_COUPLING
+//#define VERBOSE
 
 #ifndef MOAB_HAVE_TEMPESTREMAP
 #error The climate coupler test example requires MOAB configuration with TempestRemap
@@ -250,6 +251,7 @@ int main( int argc, char* argv[] )
         setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
                                         &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
+#ifdef VERBOSE
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileAtmInf[] = "recvAtmInf.h5m";
@@ -259,6 +261,9 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "cannot write atm mesh after receiving" )
         POP_TIMER( couComm, rankInCouComm )
     }
+#endif
+
+#ifdef VERBOSE
     if(  atmComm != MPI_COMM_NULL  )
     {
         char outputFileAtm[] = "AtmAfterMigr.h5m";
@@ -266,6 +271,7 @@ int main( int argc, char* argv[] )
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
     }
+#endif
     MPI_Barrier( MPI_COMM_WORLD );
     if( couComm != MPI_COMM_NULL )
     {
@@ -534,6 +540,7 @@ int main( int argc, char* argv[] )
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
     {
+#ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmAtStartIt.h5m";
@@ -541,6 +548,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
         }
+#endif
         PUSH_TIMER( "Send/receive data from land component to coupler in atm context" )
         if( lndComm != MPI_COMM_NULL )
         {
@@ -565,6 +573,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpLndPID, &cplatm );  // context is for atm
             CHECKIERR( ierr, "cannot free buffers used to send lnd tag towards the coverage mesh for atm" )
         }
+#ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmAfterTagMigrToLand.h5m";
@@ -572,7 +581,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
         }
-
+#endif
         if( couComm != MPI_COMM_NULL )
         {
             const char* concat_fieldname  = "T_proj;u_proj;v_proj;";
@@ -594,6 +603,7 @@ int main( int argc, char* argv[] )
                 CHECKIERR( ierr, "failed to write fAtmOnCpl4.h5m " );
             }
         }
+#ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmBeforeMigr.h5m";
@@ -601,6 +611,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
         }
+#endif
         // send the tag to atm pes, from atm mesh on coupler pes
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
@@ -614,6 +625,7 @@ int main( int argc, char* argv[] )
         }
 
         // receive on component atm
+
         if( atmComm != MPI_COMM_NULL )
         {
             context_id = cplatm;
@@ -622,7 +634,6 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
         }
 
-
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
@@ -630,6 +641,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
         MPI_Barrier( MPI_COMM_WORLD );
+#ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmWithProj3.h5m";
@@ -637,6 +649,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
         }
+#endif
 
 #ifdef ENABLE_OCNATM_COUPLING
         PUSH_TIMER( "Send/receive data from ocn component to coupler in atm context" )

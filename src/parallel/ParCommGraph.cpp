@@ -556,29 +556,31 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm,
 
     if( newEnts.empty() )
     {
-        std::cout << " WARNING: this task did not receive any entities \n";
+        std::cout << "task:" << rankInGroup2 << " in receiver did not receive any entities \n";
     }
-    // in order for the merging to work, we need to be sure that the adjacencies are updated
-    // (created)
-    Range local_verts        = newEnts.subset_by_type( MBVERTEX );
-    newEnts                  = subtract( newEnts, local_verts );
-    Core* mb                 = (Core*)pco->get_moab();
-    AEntityFactory* adj_fact = mb->a_entity_factory();
-    if( !adj_fact->vert_elem_adjacencies() )
-        adj_fact->create_vert_elem_adjacencies();
     else
     {
-        for( Range::iterator it = newEnts.begin(); it != newEnts.end(); it++ )
+        // in order for the merging to work, we need to be sure that the adjacencies are updated
+        // (created)
+        Range local_verts        = newEnts.subset_by_type( MBVERTEX );
+        newEnts                  = subtract( newEnts, local_verts );
+        Core* mb                 = (Core*)pco->get_moab();
+        AEntityFactory* adj_fact = mb->a_entity_factory();
+        if( !adj_fact->vert_elem_adjacencies() )
+            adj_fact->create_vert_elem_adjacencies();
+        else
         {
-            EntityHandle eh          = *it;
-            const EntityHandle* conn = NULL;
-            int num_nodes            = 0;
-            rval                     = mb->get_connectivity( eh, conn, num_nodes );
-            if( MB_SUCCESS != rval ) return rval;
-            adj_fact->notify_create_entity( eh, conn, num_nodes );
+            for( Range::iterator it = newEnts.begin(); it != newEnts.end(); it++ )
+            {
+                EntityHandle eh          = *it;
+                const EntityHandle* conn = NULL;
+                int num_nodes            = 0;
+                rval                     = mb->get_connectivity( eh, conn, num_nodes );
+                if( MB_SUCCESS != rval ) return rval;
+                adj_fact->notify_create_entity( eh, conn, num_nodes );
+            }
         }
     }
-
     return MB_SUCCESS;
 }
 
