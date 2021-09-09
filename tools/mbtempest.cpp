@@ -505,12 +505,12 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 0, rintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 2, rintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[0] );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src );MB_CHK_ERR( rval );
             if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[0], proc_id );MB_CHK_ERR( rval );
             }
-            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src );MB_CHK_ERR( rval );
-            if( !proc_id )
+                        if( !proc_id )
                 outputFormatter.printf( 0, "The source set contains %lu vertices and %lu elements \n",
                                         rintxverts.size(), rintxelems.size() );
 
@@ -518,11 +518,12 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 0, bintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, bintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[1] );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest );MB_CHK_ERR( rval );
             if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[1], proc_id );MB_CHK_ERR( rval );
             }
-            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest );MB_CHK_ERR( rval );
+
             if( !proc_id )
                 outputFormatter.printf( 0, "The target set contains %lu vertices and %lu elements \n",
                                         bintxverts.size(), bintxelems.size() );

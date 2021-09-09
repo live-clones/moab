@@ -799,7 +799,7 @@ double IntxUtils::oriented_spherical_angle( double* A, double* B, double* C )
     return ang;
 }
 
-double IntxAreaUtils::area_spherical_triangle( double* A, double* B, double* C, double Radius )
+double IntxAreaUtils::area_spherical_triangle( double* A, double* B, double* C, double Radius, int rank )
 {
     switch( m_eAreaMethod )
     {
@@ -811,7 +811,7 @@ double IntxAreaUtils::area_spherical_triangle( double* A, double* B, double* C, 
 #endif
         case lHuiller:
         default:
-            return area_spherical_triangle_lHuiller( A, B, C, Radius );
+            return area_spherical_triangle_lHuiller( A, B, C, Radius, rank );
     }
 }
 
@@ -946,7 +946,7 @@ double IntxAreaUtils::area_spherical_triangle_GQ( double* ptA, double* ptB, doub
  *
  *  E = 4*atan(sqrt(tan(s/2)*tan((s-a)/2)*tan((s-b)/2)*tan((s-c)/2)))
  */
-double IntxAreaUtils::area_spherical_triangle_lHuiller( double* ptA, double* ptB, double* ptC, double Radius )
+double IntxAreaUtils::area_spherical_triangle_lHuiller( double* ptA, double* ptB, double* ptC, double Radius, int rank )
 {
 
     // now, a is angle BOC, O is origin
@@ -968,7 +968,7 @@ double IntxAreaUtils::area_spherical_triangle_lHuiller( double* ptA, double* ptB
 #ifdef CHECKNEGATIVEAREA
     if( area < 0 )
     {
-        std::cout << "negative area: " << area << "\n";
+        std::cout << "negative area: " << area << " on task :" << rank << "\n";
         std::cout << std::setprecision( 15 );
         std::cout << "vA: " << vA << "\n";
         std::cout << "vB: " << vB << "\n";
@@ -1238,7 +1238,7 @@ ErrorCode IntxUtils::fix_degenerate_quads( Interface* mb, EntityHandle set )
     return MB_SUCCESS;
 }
 
-ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, double R )
+ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, double R, int rank )
 {
     Range cells2d;
     ErrorCode rval = mb->get_entities_by_dimension( set, 2, cells2d );
@@ -1258,7 +1258,7 @@ ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, 
 
         double area;
         if( R > 0 )
-            area = area_spherical_triangle_lHuiller( coords, coords + 3, coords + 6, R );
+            area = area_spherical_triangle_lHuiller( coords, coords + 3, coords + 6, R, rank );
         else
             area = IntxUtils::area2D( coords, coords + 3, coords + 6 );
         if( area < 0 )

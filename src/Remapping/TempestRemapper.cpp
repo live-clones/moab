@@ -1366,7 +1366,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         {
             IntxAreaUtils areaAdaptor;
             rval = IntxUtils::fix_degenerate_quads( m_interface, m_overlap_set );MB_CHK_ERR( rval );
-            rval = areaAdaptor.positive_orientation( m_interface, m_overlap_set, 1.0 /*radius*/ );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( m_interface, m_overlap_set, 1.0 /*radius*/, rank );MB_CHK_ERR( rval );
         }
 
         // Now let us re-convert the MOAB mesh back to Tempest representation
@@ -1986,6 +1986,10 @@ ErrorCode TempestRemapper::augment_overlap_set()
     // add the new polygons to the overlap set
     // these will be ghosted, so will participate in conservation only
     rval = m_interface->add_entities( m_overlap_set, newPolygons );MB_CHK_ERR( rval );
+    if (!rank)
+    {
+        std::cout << "Augmenting: add " << newPolygons.size() << " polygons on root task \n";
+    }
     return MB_SUCCESS;
 }
 
