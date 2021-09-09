@@ -17,7 +17,7 @@
 #include "MBTagConventions.hpp"
 
 // #define ENABLE_DEBUG
-//#define CHECK_CONVEXITY
+#define CHECK_CONVEXITY
 namespace moab
 {
 
@@ -248,6 +248,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
     }
 #endif
 
+    IntxAreaUtils areaAdaptor;
     // get the edges for the target triangle; the extra points will be on those edges, saved as
     // lists (unordered)
 
@@ -460,7 +461,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
             int k1 = ( k + 1 ) % nP;
             int k2 = ( k1 + 1 ) % nP;
             double orientedArea =
-                area_spherical_triangle_lHuiller( &coords[3 * k], &coords[3 * k1], &coords[3 * k2], Rdest );
+                    areaAdaptor.area_spherical_triangle( &coords[3 * k], &coords[3 * k1], &coords[3 * k2], Rdest, my_rank );
             if( orientedArea < 0 )
             {
                 std::cout << " np before 1 , 2, current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
@@ -472,7 +473,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                 }
                 std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
 
-                std::cout << "rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
+                std::cout << "rank: " << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
                           << " target, src:" << tgt << " " << src << " \n";
             }
         }

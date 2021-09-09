@@ -507,7 +507,7 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 0, rintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 2, rintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[0] );MB_CHK_ERR( rval );
-            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src, proc_id );MB_CHK_ERR( rval );
             if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[0], proc_id );MB_CHK_ERR( rval );
@@ -520,7 +520,7 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 0, bintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, bintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[1] );MB_CHK_ERR( rval );
-            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest, proc_id );MB_CHK_ERR( rval );
             if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[1], proc_id );MB_CHK_ERR( rval );
@@ -536,7 +536,13 @@ int main( int argc, char* argv[] )
         runCtx->timer_push( "construct covering set for intersection" );
         rval = remapper.ConstructCoveringSet( epsrel, 1.0, 1.0, boxeps, runCtx->rrmGrids );MB_CHK_ERR( rval );
         runCtx->timer_pop();
-
+        if (runCtx->dumpTask == proc_id)
+        {
+            moab::EntityHandle covSet = remapper.GetMeshSet( moab::Remapper::CoveringMesh );
+            sstr.str( "" );
+            sstr << "InitialCoverage_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &covSet, 1 );MB_CHK_ERR( rval );
+        }
         // Compute intersections with MOAB with either the Kd-tree or the advancing front algorithm
         runCtx->timer_push( "setup and compute mesh intersections" );
         rval = remapper.ComputeOverlapMesh( runCtx->kdtreeSearch, false );MB_CHK_ERR( rval );
