@@ -815,7 +815,7 @@ double IntxAreaUtils::area_spherical_triangle( double* A, double* B, double* C, 
     }
 }
 
-double IntxAreaUtils::area_spherical_polygon( double* A, int N, double Radius, int* sign )
+double IntxAreaUtils::area_spherical_polygon( double* A, int N, double Radius, int* sign, int rank )
 {
     switch( m_eAreaMethod )
     {
@@ -827,7 +827,7 @@ double IntxAreaUtils::area_spherical_polygon( double* A, int N, double Radius, i
 #endif
         case lHuiller:
         default:
-            return area_spherical_polygon_lHuiller( A, N, Radius, sign );
+            return area_spherical_polygon_lHuiller( A, N, Radius, sign, rank );
     }
 }
 
@@ -862,7 +862,7 @@ double IntxAreaUtils::area_spherical_polygon_girard( double* A, int N, double Ra
     return Radius * Radius * correction;
 }
 
-double IntxAreaUtils::area_spherical_polygon_lHuiller( double* A, int N, double Radius, int* sign )
+double IntxAreaUtils::area_spherical_polygon_lHuiller( double* A, int N, double Radius, int* sign, int rank )
 {
     // This should work for non-convex polygons too
     // In the input vector A, assume that the A, A+3, ..., A+3*(N-1) are the coordinates
@@ -870,12 +870,12 @@ double IntxAreaUtils::area_spherical_polygon_lHuiller( double* A, int N, double 
     // If negative orientation, the area will be negative
     if( N <= 2 ) return 0.;
 
-    int lsign   = 1;  // assume positive orientain
+    int lsign   = 1;  // assume positive orientation
     double area = 0.;
     for( int i = 1; i < N - 1; i++ )
     {
         int i1              = i + 1;
-        double areaTriangle = area_spherical_triangle_lHuiller( A, A + 3 * i, A + 3 * i1, Radius );
+        double areaTriangle = area_spherical_triangle_lHuiller( A, A + 3 * i, A + 3 * i1, Radius, rank );
         if( areaTriangle < 0 )
             lsign = -1;  // signal that we have at least one triangle with negative orientation ;
                          // possible nonconvex polygon
@@ -1022,7 +1022,7 @@ double IntxAreaUtils::area_on_sphere( Interface* mb, EntityHandle set, double R 
     return total_area;
 }
 
-double IntxAreaUtils::area_spherical_element( Interface* mb, EntityHandle elem, double R )
+double IntxAreaUtils::area_spherical_element( Interface* mb, EntityHandle elem, double R, int rank )
 {
     // get the nodes, then the coordinates
     const EntityHandle* verts;
@@ -1038,7 +1038,8 @@ double IntxAreaUtils::area_spherical_element( Interface* mb, EntityHandle elem, 
     rval = mb->get_coords( verts, nsides, &coords[0] );MB_CHK_ERR_RET_VAL( rval, -1.0 );
 
     // compute and return the area of the polygonal element
-    return area_spherical_polygon( &coords[0], nsides, R );
+    int lsign;
+    return area_spherical_polygon( &coords[0], nsides, R, &lsign, rank );
 }
 
 double IntxUtils::distance_on_great_circle( CartVect& p1, CartVect& p2 )
@@ -1268,7 +1269,8 @@ ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, 
             // get coordinates
             rval = mb->get_coords( conn, num_nodes, &coords2[0] );
             if( MB_SUCCESS != rval ) return MB_FAILURE;
-            double totArea = area_spherical_polygon_lHuiller( &coords2[0], num_nodes, R );
+            int lsign;
+            double totArea = area_spherical_polygon_lHuiller( &coords2[0], num_nodes, R, &lsign, rank );
             if( totArea < 0 )
             {
                 std::vector< EntityHandle > newconn( num_nodes );
