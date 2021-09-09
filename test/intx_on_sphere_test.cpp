@@ -153,9 +153,9 @@ int main( int argc, char* argv[] )
             // subtract
             rval = mb->subtract_meshset( comm_set, sf1 );MB_CHK_ERR( rval );
             // compute fractions
-            double area_cov_set = areaAdaptor.area_on_sphere( mb, covering_set, R );
+            double area_cov_set = areaAdaptor.area_on_sphere( mb, covering_set, R, rank );
             assert( area_cov_set > 0 );
-            double comm_area = areaAdaptor.area_on_sphere( mb, comm_set, R );
+            double comm_area = areaAdaptor.area_on_sphere( mb, comm_set, R, rank );
             // more important is actually the number of elements communicated
             int num_cov_cells, num_comm_cells;
             rval = mb->get_number_entities_by_dimension( covering_set, 2, num_cov_cells );MB_CHK_ERR( rval );
@@ -229,8 +229,8 @@ int main( int argc, char* argv[] )
         outf << "intersect" << rank << ".h5m";
         rval = mb->write_file( outf.str().c_str(), 0, 0, &outputSet, 1 );
     }
-    double intx_area    = areaAdaptor.area_on_sphere( mb, outputSet, R );
-    double arrival_area = areaAdaptor.area_on_sphere( mb, sf2, R );
+    double intx_area    = areaAdaptor.area_on_sphere( mb, outputSet, R, rank );
+    double arrival_area = areaAdaptor.area_on_sphere( mb, sf2, R, rank );
     std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";
 

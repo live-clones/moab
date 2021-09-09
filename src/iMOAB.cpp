@@ -3589,7 +3589,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, data_src.dimension, rintxelems );CHKERRVAL( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_src.file_set );CHKERRVAL( rval );
         rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );CHKERRVAL( rval );
-        srctgt_areas[0] = areaAdaptor.area_on_sphere( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
+        srctgt_areas[0] = areaAdaptor.area_on_sphere( context.MBI, data_src.file_set, defaultradius /*radius_source*/, rank );
 #ifdef VERBOSE
         if( is_root )
             outputFormatter.printf( 0, "The red set contains %d vertices and %d elements \n", rintxverts.size(),
@@ -3601,7 +3601,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, data_tgt.dimension, bintxelems );CHKERRVAL( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_tgt.file_set );CHKERRVAL( rval );
         rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );CHKERRVAL( rval );
-        srctgt_areas[1] = areaAdaptor.area_on_sphere( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
+        srctgt_areas[1] = areaAdaptor.area_on_sphere( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/, rank );
 #ifdef VERBOSE
         if( is_root )
             outputFormatter.printf( 0, "The blue set contains %d vertices and %d elements \n", bintxverts.size(),
@@ -3650,7 +3650,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     {
         double local_area,
             global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
-        local_area = areaAdaptor.area_on_sphere( context.MBI, data_intx.file_set, radius_source );
+        local_area = areaAdaptor.area_on_sphere( context.MBI, data_intx.file_set, radius_source, rank );
 
         global_areas[0] = srctgt_areas_glb[0];
         global_areas[1] = srctgt_areas_glb[1];

@@ -452,11 +452,11 @@ int main( int argc, char* argv[] )
 
             double initial_sarea =
                 areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0],
-                                            radius_src );  // use the target to compute the initial area
+                                            radius_src, proc_id );  // use the target to compute the initial area
             double initial_tarea =
                 areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1],
-                                            radius_dest );  // use the target to compute the initial area
-            double intx_area = areaAdaptor.area_on_sphere( mbCore, intxset, radius_src );
+                                            radius_dest, proc_id );  // use the target to compute the initial area
+            double intx_area = areaAdaptor.area_on_sphere( mbCore, intxset, radius_src, proc_id );
 
             outputFormatter.printf( 0, "mesh areas: source = %12.10f, target = %12.10f, intersection = %12.10f \n",
                                     initial_sarea, initial_tarea, intx_area );
@@ -566,9 +566,9 @@ int main( int argc, char* argv[] )
             double local_areas[3],
                 global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_src );
-            local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0], radius_src );
-            local_areas[1] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1], radius_dest );
-            local_areas[2] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[2], radius_src );
+            local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0], radius_src, proc_id );
+            local_areas[1] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1], radius_dest, proc_id );
+            local_areas[2] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[2], radius_src, proc_id );
 
 #ifdef MOAB_HAVE_MPI
             MPI_Allreduce( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
