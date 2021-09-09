@@ -57,8 +57,8 @@ int main( int argc, char* argv[] )
 
     Intx2MeshInPlane worker( mb );
     IntxAreaUtils areaAdaptor;
-    rval = areaAdaptor.positive_orientation( mb, sf1, -1 );MB_CHK_ERR( rval );
-    rval = areaAdaptor.positive_orientation( mb, sf2, -1 );MB_CHK_ERR( rval );
+    rval = areaAdaptor.positive_orientation( mb, sf1, -1, 0 );MB_CHK_ERR( rval );
+    rval = areaAdaptor.positive_orientation( mb, sf2, -1, 0 );MB_CHK_ERR( rval );
 
     worker.set_error_tolerance( 1.e-5 );
     rval = worker.FindMaxEdges( sf1, sf2 );MB_CHK_ERR( rval );

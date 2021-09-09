@@ -55,10 +55,10 @@ int main( int argc, char* argv[] )
     if( MB_SUCCESS != rval ) return 1;
 
     IntxAreaUtils areaAdaptor;
-    rval = areaAdaptor.positive_orientation( mb, sf1, R );
+    rval = areaAdaptor.positive_orientation( mb, sf1, R, 0);
     if( MB_SUCCESS != rval ) return 1;
 
-    rval = areaAdaptor.positive_orientation( mb, sf2, R );
+    rval = areaAdaptor.positive_orientation( mb, sf2, R, 0);
     if( MB_SUCCESS != rval ) return 1;
 
     /*// set the edge tags on all elements sf1
