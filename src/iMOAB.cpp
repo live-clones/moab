@@ -3705,7 +3705,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     {
         double local_area,
             global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
-        local_area = areaAdaptor.area_on_sphere( context.MBI, data_intx.file_set, radius_source );
+        local_area = areaAdaptor.area_on_sphere( context.MBI, data_intx.file_set, radius_source, rank );
 
         global_areas[0] = srctgt_areas_glb[0];
         global_areas[1] = srctgt_areas_glb[1];

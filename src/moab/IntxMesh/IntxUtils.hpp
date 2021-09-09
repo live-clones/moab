@@ -197,9 +197,9 @@ class IntxAreaUtils
 
     double area_spherical_polygon( double* A, int N, double Radius, int* sign = NULL, int rank = -1 );
 
-    double area_spherical_element( Interface* mb, EntityHandle elem, double R, int rank = -1 );
+    double area_spherical_element( Interface* mb, EntityHandle elem, double R, int rank );
 
-    double area_on_sphere( Interface* mb, EntityHandle set, double R );
+    double area_on_sphere( Interface* mb, EntityHandle set, double R, int rank = -1);
 
     ErrorCode positive_orientation( Interface* mb, EntityHandle set, double R, int rank = -1 );
 

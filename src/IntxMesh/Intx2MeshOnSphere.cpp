@@ -582,7 +582,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
         // source to target (so a deformed source corresponds to an arrival tgt)
         /// TODO: VSM: Its unclear whether we need the source or destination radius here.
         double radius = Rsrc;
-        double areap  = intxAreas.area_spherical_element( mb, poly, radius );
+        double areap  = intxAreas.area_spherical_element( mb, poly, radius, my_rank );
         check_intx_area += areap;
         // so the departure cell at time t (srcIndex) covers a portion of a tgtCell
         // that quantity will be transported to the tgtCell at time t+dt

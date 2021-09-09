@@ -984,7 +984,7 @@ double IntxAreaUtils::area_spherical_triangle_lHuiller( double* ptA, double* ptB
 }
 #undef CHECKNEGATIVEAREA
 
-double IntxAreaUtils::area_on_sphere( Interface* mb, EntityHandle set, double R )
+double IntxAreaUtils::area_on_sphere( Interface* mb, EntityHandle set, double R, int rank )
 {
     // Get all entities of dimension 2
     Range inputRange;
@@ -1009,7 +1009,7 @@ double IntxAreaUtils::area_on_sphere( Interface* mb, EntityHandle set, double R 
         if( ownerinfo[ie++] >= 0 ) continue;
 
         EntityHandle eh        = *eit;
-        const double elem_area = this->area_spherical_element( mb, eh, R );
+        const double elem_area = this->area_spherical_element( mb, eh, R, rank );
 
         // check whether the area of the spherical element is positive.
         assert( elem_area > 0 );
