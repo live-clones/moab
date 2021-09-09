@@ -1039,7 +1039,15 @@ double IntxAreaUtils::area_spherical_element( Interface* mb, EntityHandle elem, 
 
     // compute and return the area of the polygonal element
     int lsign;
-    return area_spherical_polygon( &coords[0], nsides, R, &lsign, rank );
+    double area = area_spherical_polygon( &coords[0], nsides, R, &lsign, rank );
+    {
+        if (lsign<0)
+        {
+            std::cout << " IntxAreaUtils::area_spherical_element : lsign :" << lsign << " area:" << area << "\n ";
+            mb->list_entity(elem);
+        }
+    }
+    return area;
 }
 
 double IntxUtils::distance_on_great_circle( CartVect& p1, CartVect& p2 )

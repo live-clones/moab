@@ -552,13 +552,16 @@ int main( int argc, char* argv[] )
         {
             moab::EntityHandle tgtSet = remapper.GetMeshSet( moab::Remapper::TargetMesh );
             moab::EntityHandle covSet = remapper.GetMeshSet( moab::Remapper::CoveringMesh );
+            moab::EntityHandle intxSet = remapper.GetMeshSet( moab::Remapper::OverlapMesh );
             sstr.str( "" );
             sstr << "Target_" << proc_id << ".h5m";
             rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &tgtSet, 1 );MB_CHK_ERR( rval );
             sstr.str( "" );
             sstr << "Coverage_" << proc_id << ".h5m";
             rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &covSet, 1 );MB_CHK_ERR( rval );
-
+            sstr.str( "" );
+            sstr << "Intersect_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &intxSet, 1 );MB_CHK_ERR( rval );
         }
         // print some diagnostic checks to see if the overlap grid resolved the input meshes
         // correctly
