@@ -68,6 +68,7 @@ struct ToolContext
     bool rrmGrids;
     bool kdtreeSearch;
     bool fNoBubble, fInputConcave, fOutputConcave, fCheck;
+    int  dumpTask;
 
 #ifdef MOAB_HAVE_MPI
     ToolContext( moab::Interface* icore, moab::ParallelComm* p_pcomm )
@@ -81,7 +82,7 @@ struct ToolContext
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
           verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), fNoConservation( false ),
           fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ),
-          fOutputConcave( false ), fCheck( n_procs > 1 ? false : true )
+          fOutputConcave( false ), fCheck( n_procs > 1 ? false : true ), dumpTask(-1)
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -202,6 +203,7 @@ struct ToolContext
         opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
                              &enforceConvexity );
         opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes", &fBubble );
+        opts.addOpt< int > ("export,x", "export files for task ", &dumpTask);
 
         opts.parseCommandLine( argc, argv );
 
@@ -510,7 +512,7 @@ int main( int argc, char* argv[] )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[0], proc_id );MB_CHK_ERR( rval );
             }
-                        if( !proc_id )
+            if( !proc_id )
                 outputFormatter.printf( 0, "The source set contains %lu vertices and %lu elements \n",
                                         rintxverts.size(), rintxelems.size() );
 
@@ -540,6 +542,18 @@ int main( int argc, char* argv[] )
         rval = remapper.ComputeOverlapMesh( runCtx->kdtreeSearch, false );MB_CHK_ERR( rval );
         runCtx->timer_pop();
 
+        if (runCtx->dumpTask == proc_id)
+        {
+            moab::EntityHandle tgtSet = remapper.GetMeshSet( moab::Remapper::TargetMesh );
+            moab::EntityHandle covSet = remapper.GetMeshSet( moab::Remapper::CoveringMesh );
+            sstr.str( "" );
+            sstr << "Target_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &tgtSet, 1 );MB_CHK_ERR( rval );
+            sstr.str( "" );
+            sstr << "Coverage_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &covSet, 1 );MB_CHK_ERR( rval );
+
+        }
         // print some diagnostic checks to see if the overlap grid resolved the input meshes
         // correctly
         {
