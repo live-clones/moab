@@ -464,7 +464,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                     areaAdaptor.area_spherical_triangle( &coords[3 * k], &coords[3 * k1], &coords[3 * k2], Rdest, my_rank );
             if( orientedArea < 0 )
             {
-                std::cout << " np before 1 , 2, current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
+                std::cout << " np before + current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
                 for( int i = 0; i < nP; i++ )
                 {
                     int nexti         = ( i + 1 ) % nP;
@@ -472,9 +472,11 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                     std::cout << " " << foundIds[i] << " edge en:" << lengthEdge << "\n";
                 }
                 std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
-
+                int sgid, tgid;
+                rval = mb->tag_get_data(gid, &src, 1, &sgid); MB_CHK_ERR( rval );
+                rval = mb->tag_get_data(gid, &tgt, 1, &tgid); MB_CHK_ERR( rval );
                 std::cout << "rank: " << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
-                          << " target, src:" << tgt << " " << src << " \n";
+                          << " target, src:" << tgid << " " << sgid << " \n";
             }
         }
 #endif
