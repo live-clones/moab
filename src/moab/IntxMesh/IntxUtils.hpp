@@ -130,7 +130,7 @@ class IntxUtils
     static ErrorCode enforce_convexity( Interface* mb, EntityHandle set, int rank = 0 );
 
     // this could be larger than PI, because of orientation; useful for non-convex polygons
-    static double oriented_spherical_angle( double* A, double* B, double* C );
+    static double oriented_spherical_angle( const double* A, const double* B, const double* C );
 
     // looking at quad connectivity, collapse to triangle if 2 nodes equal
     // then delete the old quad
@@ -191,11 +191,11 @@ class IntxAreaUtils
      * sphere the center of the sphere is at origin (0,0,0) this angle can be used in Girard's
      * theorem to compute the area of a spherical polygon
      */
-    double spherical_angle( double* A, double* B, double* C, double Radius );
+    double spherical_angle( const double* A, const double* B, const double* C, double Radius );
 
-    double area_spherical_triangle( double* A, double* B, double* C, double Radius );
+    double area_spherical_triangle( const double* A, const double* B, const double* C, double Radius );
 
-    double area_spherical_polygon( double* A, int N, double Radius, int* sign = NULL );
+    double area_spherical_polygon( const double* A, int N, double Radius, int* sign = NULL );
 
     double area_spherical_element( Interface* mb, EntityHandle elem, double R );
 
@@ -205,24 +205,24 @@ class IntxAreaUtils
 
   private:
     /* lHuiller method for computing area on a spherical triangle */
-    double area_spherical_triangle_lHuiller( double* ptA, double* ptB, double* ptC, double Radius );
+    double area_spherical_triangle_lHuiller( const double* ptA, const double* ptB, const double* ptC, double Radius );
 
     /* lHuiller method for computing area on a spherical polygon */
-    double area_spherical_polygon_lHuiller( double* A, int N, double Radius, int* sign = NULL );
+    double area_spherical_polygon_lHuiller( const double* A, int N, double Radius, int* sign = NULL );
 
     /* Girard method for computing area on a spherical triangle with spherical excess */
-    double area_spherical_triangle_girard( double* A, double* B, double* C, double Radius );
+    double area_spherical_triangle_girard( const double* A, const double* B, const double* C, double Radius );
 
     /* Girard method for computing area on a spherical polygon with spherical excess */
-    double area_spherical_polygon_girard( double* A, int N, double Radius );
+    double area_spherical_polygon_girard( const double* A, int N, double Radius );
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
     /* Gauss-quadrature based integration method for computing area on a spherical triangle */
-    double area_spherical_triangle_GQ( double* ptA, double* ptB, double* ptC, double Radius );
+    double area_spherical_triangle_GQ( const double* ptA, const double* ptB, const double* ptC );
 
     /* Gauss-quadrature based integration method for computing area on a spherical polygon element
      */
-    double area_spherical_polygon_GQ( double* A, int N, double Radius );
+    double area_spherical_polygon_GQ( const double* A, int N );
 #endif
 
   private:

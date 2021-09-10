@@ -302,12 +302,6 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
         rval = mb->tag_set_data( neighTgtEdgeTag, &tgtCell, 1, &( zeroh[0] ) );MB_CHK_SET_ERR( rval, "can't set edge tgt tag" );
     }
 
-    // create the kd tree on source cells, and intersect all targets in an expensive loop
-    // build a kd tree with the rs1 (source) cells
-    AdaptiveKDTree kd( mb );
-    EntityHandle tree_root = 0;
-    rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
-
     // find out max edge on source mesh;
     double max_length = 0;
     {
@@ -349,6 +343,13 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
             std::cout << " box overlap tolerance: " << box_error << "\n";
         }
     }
+
+    // create the kd tree on source cells, and intersect all targets in an expensive loop
+    // build a kd tree with the rs1 (source) cells
+    AdaptiveKDTree kd( mb );
+    EntityHandle tree_root = 0;
+    rval                   = kd.build_tree( rs1, &tree_root );MB_CHK_ERR( rval );
+
     for( Range::iterator it = rs2.begin(); it != rs2.end(); ++it )
     {
         EntityHandle tcell = *it;
@@ -383,7 +384,6 @@ ErrorCode Intx2Mesh::intersect_meshes_kdtree( EntityHandle mbset1, EntityHandle 
         std::vector< EntityHandle > leaves;
         for( int i = 0; i < nnodes; i++ )
         {
-
             leaves.clear();
             rval = kd.distance_search( &positions[3 * i], av_len, leaves, tolerance, epsilon_1 );MB_CHK_ERR( rval );
 
@@ -456,8 +456,6 @@ ErrorCode Intx2Mesh::intersect_meshes( EntityHandle mbset1, EntityHandle mbset2,
 
     rval = mb->get_entities_by_dimension( mbs1, 2, rs1 );MB_CHK_ERR( rval );
     rval = mb->get_entities_by_dimension( mbs2, 2, rs2 );MB_CHK_ERR( rval );
-    // std::cout << "rs1.size() = " << rs1.size() << " and rs2.size() = "  << rs2.size() << "\n";
-    // std::cout.flush();
 
     createTags();  // will also determine max_edges_1, max_edges_2 (for src and tgt meshes)
 
@@ -967,7 +965,10 @@ ErrorCode Intx2Mesh::create_departure_mesh_2nd_alg( EntityHandle& euler_set, Ent
         {
             CartVect bbmin( &allBoxes[6 * p] );
             CartVect bbmax( &allBoxes[6 * p + 3] );
-            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) ) { Rto[p].insert( q ); }
+            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) )
+            {
+                Rto[p].insert( q );
+            }
         }
     }
 
@@ -1241,7 +1242,10 @@ ErrorCode Intx2Mesh::create_departure_mesh_3rd_alg( EntityHandle& lagr_set, Enti
         {
             CartVect bbmin( &allBoxes[6 * p] );
             CartVect bbmax( &allBoxes[6 * p + 3] );
-            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) ) { Rto[p].insert( q ); }
+            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) )
+            {
+                Rto[p].insert( q );
+            }
         }
     }
 
