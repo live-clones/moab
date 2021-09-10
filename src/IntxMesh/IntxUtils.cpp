@@ -1252,6 +1252,7 @@ ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, 
     Range cells2d;
     ErrorCode rval = mb->get_entities_by_dimension( set, 2, cells2d );
     if( MB_SUCCESS != rval ) return rval;
+    Tag gidTag = mb->globalId_tag();
     for( Range::iterator qit = cells2d.begin(); qit != cells2d.end(); ++qit )
     {
         EntityHandle cell        = *qit;
@@ -1288,6 +1289,10 @@ ErrorCode IntxAreaUtils::positive_orientation( Interface* mb, EntityHandle set, 
                 }
                 rval = mb->set_connectivity( cell, &newconn[0], num_nodes );
                 if( MB_SUCCESS != rval ) return rval;
+                int gid;
+                rval = mb->tag_get_data(gidTag, &cell, 1, &gid);
+                if( MB_SUCCESS != rval ) return rval;
+                std::cout <<" revert cell with global id:" << gid << " with num_nodes " << num_nodes << " on rank " << rank <<"\n";
             }
             else
             {
