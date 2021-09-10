@@ -68,6 +68,7 @@ struct ToolContext
     bool rrmGrids;
     bool kdtreeSearch;
     bool fNoBubble, fInputConcave, fOutputConcave, fCheck;
+    bool print_diagnostics;
 
 #ifdef MOAB_HAVE_MPI
     ToolContext( moab::Interface* icore, moab::ParallelComm* p_pcomm )
@@ -81,7 +82,7 @@ struct ToolContext
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
           verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), fNoConservation( false ),
           fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ),
-          fOutputConcave( false ), fCheck( n_procs > 1 ? false : true )
+          fOutputConcave( false ), fCheck( n_procs > 1 ? false : true ), print_diagnostics( true )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -541,6 +542,7 @@ int main( int argc, char* argv[] )
 
         // print some diagnostic checks to see if the overlap grid resolved the input meshes
         // correctly
+        if( runCtx->print_diagnostics )
         {
             double local_areas[3],
                 global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
@@ -834,8 +836,6 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
         }
         // Rescale the radius of both to compute the intersection
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[0], radius_src );MB_CHK_ERR( rval );
-        rval = remapper.ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
-        ctx.meshes[0] = remapper.GetMesh( moab::Remapper::SourceMesh );
 
         // Load the target mesh and validate
         rval = remapper.LoadNativeMesh( ctx.inFilenames[1], ctx.meshsets[1], tmetadata, additional_read_opts );MB_CHK_ERR( rval );
@@ -848,8 +848,17 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
                                   static_cast< moab::TempestRemapper::TempestMeshType >( tmetadata[0] ) );
         }
         rval = moab::IntxUtils::ScaleToRadius( ctx.mbcore, ctx.meshsets[1], radius_dest );MB_CHK_ERR( rval );
-        rval = remapper.ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
-        ctx.meshes[1] = remapper.GetMesh( moab::Remapper::TargetMesh );
+
+        if( ctx.computeWeights )
+        {
+            // convert MOAB representation to TempestRemap's Mesh for source
+            rval = remapper.ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
+            ctx.meshes[0] = remapper.GetMesh( moab::Remapper::SourceMesh );
+
+            // convert MOAB representation to TempestRemap's Mesh for target
+            rval = remapper.ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
+            ctx.meshes[1] = remapper.GetMesh( moab::Remapper::TargetMesh );
+        }
     }
     else if( ctx.meshType == moab::TempestRemapper::ICO )
     {
