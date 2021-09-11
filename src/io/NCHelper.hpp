@@ -47,6 +47,21 @@ class NCHelper
     //! Update time tag values if timesteps spread across files
     ErrorCode update_time_tag_vals();
 
+    // An object to hold vertex coordinates, and an operator
+    // for storing them in a STL tree-based container. use a tolerance saved somewhere as 1.e-12
+    class Node3D
+    {
+    public :
+
+        double coords[3];
+        bool operator<( const Node3D& ) const;
+        Node3D(double x, double y, double z) {
+            coords[0] = x;
+            coords[1] = y;
+            coords[2] = z;
+        }
+    };
+
   protected:
     //! Separate set and non-set variables (common to scd mesh and ucd mesh)
     ErrorCode read_variables_setup( std::vector< std::string >& var_names, std::vector< int >& tstep_nums,
@@ -100,6 +115,7 @@ class NCHelper
 
     //! Dummy variables
     std::set< std::string > dummyVarNames;
+
 };
 
 //! Child helper class for scd mesh, e.g. CAM_EL or CAM_FV

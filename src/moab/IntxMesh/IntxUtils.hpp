@@ -165,6 +165,9 @@ class IntxUtils
     // used to 'repair' scrip-like meshes
     static ErrorCode remove_duplicate_vertices( Interface* mb, EntityHandle file_set, double merge_tol,
                                                 std::vector< Tag >& tagList );
+
+    static ErrorCode remove_padded_vertices( Interface* mb, EntityHandle file_set,
+            std::vector< Tag >& tagList );
 };
 
 class IntxAreaUtils
