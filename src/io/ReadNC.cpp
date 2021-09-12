@@ -166,22 +166,11 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
     // Create partition set, and populate with elements
     if( isParallel )
     {
-        EntityHandle partn_set;
-        rval = mbImpl->create_meshset( MESHSET_SET, partn_set );MB_CHK_SET_ERR( rval, "Trouble creating partition set" );
-
-        rval = mbImpl->add_entities( partn_set, faces );MB_CHK_SET_ERR( rval, "Couldn't add new faces to partition set" );
-
-        Range verts;
-        rval = mbImpl->get_connectivity( faces, verts );MB_CHK_SET_ERR( rval, "Couldn't get verts of faces" );
-
-        rval = mbImpl->add_entities( partn_set, verts );MB_CHK_SET_ERR( rval, "Couldn't add new verts to partition set" );
-
-        myPcomm->partition_sets().insert( partn_set );
-
         // Write partition tag name on partition set
         Tag part_tag = myPcomm->partition_tag();
         int dum_rank = myPcomm->proc_config().proc_rank();
-        rval         = mbImpl->tag_set_data( part_tag, &partn_set, 1, &dum_rank );MB_CHK_SET_ERR( rval, "Trouble writing partition tag name on partition set" );
+        // the tmp_set is the file_set
+        rval         = mbImpl->tag_set_data( part_tag, &tmp_set, 1, &dum_rank );MB_CHK_SET_ERR( rval, "Trouble writing partition tag name on partition set" );
     }
 #endif
 
