@@ -315,8 +315,8 @@ ErrorCode NCHelperScrip::redistribute_local_cells( int start_cell_idx )
     {
         // Read grid_center_lat coordinates of cell centers
         int xCellVarId;
-        int success = NCFUNC( inq_varid )( _fileId, "grid_center_lat", &xCellVarId );
-        if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_center_lat" );
+        int success = NCFUNC( inq_varid )( _fileId, "grid_center_lon", &xCellVarId );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_center_lon" );
         std::vector< double > xc( nLocalCells );
         NCDF_SIZE read_start = static_cast< NCDF_SIZE >( start_cell_idx - 1 );
         NCDF_SIZE read_count = static_cast< NCDF_SIZE >( nLocalCells );
@@ -325,8 +325,8 @@ ErrorCode NCHelperScrip::redistribute_local_cells( int start_cell_idx )
 
         // Read grid_center_lon coordinates of cell centers
         int yCellVarId;
-        success = NCFUNC( inq_varid )( _fileId, "grid_center_lon", &yCellVarId );
-        if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_center_lon" );
+        success = NCFUNC( inq_varid )( _fileId, "grid_center_lat", &yCellVarId );
+        if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_center_lat" );
         std::vector< double > yc( nLocalCells );
         success = NCFUNCAG( _vara_double )( _fileId, yCellVarId, &read_start, &read_count, &yc[0] );
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read grid_center_lon data" );
