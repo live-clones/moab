@@ -2,6 +2,7 @@
 #include "NCHelperEuler.hpp"
 #include "NCHelperFV.hpp"
 #include "NCHelperDomain.hpp"
+#include "NCHelperScrip.hpp"
 #include "NCHelperHOMME.hpp"
 #include "NCHelperMPAS.hpp"
 #include "NCHelperGCRM.hpp"
@@ -60,6 +61,8 @@ NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions
         // gcrm reader
         else if( NCHelperGCRM::can_read_file( readNC ) )
             return new( std::nothrow ) NCHelperGCRM( readNC, fileId, opts, fileSet );
+        else if( NCHelperScrip::can_read_file( readNC, fileId ) )
+             return new( std::nothrow ) NCHelperScrip( readNC, fileId, opts, fileSet );
     }
 
     // Unknown NetCDF grid (will fill this in later for POP, CICE and CLM)

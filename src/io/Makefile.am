@@ -24,6 +24,7 @@ if HAVE_NETCDF
                      NCHelperEuler.cpp NCHelperEuler.hpp \
                      NCHelperFV.cpp NCHelperFV.hpp \
                      NCHelperDomain.cpp NCHelperDomain.hpp \
+                     NCHelperScrip.hpp    NCHelperScrip.cpp \
                      NCHelperHOMME.cpp NCHelperHOMME.hpp \
                      NCHelperMPAS.cpp NCHelperMPAS.hpp \
                      NCHelperGCRM.cpp NCHelperGCRM.hpp \
@@ -45,6 +46,7 @@ if !HAVE_NETCDF
                      NCHelperEuler.cpp NCHelperEuler.hpp \
                      NCHelperFV.cpp NCHelperFV.hpp \
                      NCHelperDomain.cpp NCHelperDomain.hpp \
+                     NCHelperScrip.hpp NCHelperScrip.cpp \
                      NCHelperHOMME.cpp NCHelperHOMME.hpp \
                      NCHelperMPAS.cpp NCHelperMPAS.hpp \
                      NCHelperGCRM.cpp NCHelperGCRM.hpp \
