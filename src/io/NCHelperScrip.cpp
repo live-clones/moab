@@ -163,7 +163,7 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
 #endif
         if( success ) MB_SET_ERR( MB_FAILURE, "Failed to read grid_corner_lat data in a loop" );
         // Increment the index for next subrange
-        indexInArray += ( endh - starth + 1 );
+        indexInArray += ( endh - starth + 1 ) * grid_corners;
     }
 
 #ifdef MOAB_HAVE_PNETCDF
