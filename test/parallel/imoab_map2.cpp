@@ -229,12 +229,14 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_MigrateMapMesh( cmpAtmPID, cplAtmOcnPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &type,
                                      &cmpatm, &cplocn, &direction );
         CHECKIERR( ierr, "failed to migrate mesh for atm on coupler" );
+#ifdef VERBOSE
         if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov";
             ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local mesh" );
         }
+#endif
     }
     MPI_Barrier( MPI_COMM_WORLD );
 
@@ -247,6 +249,7 @@ int main( int argc, char* argv[] )
                                      &cmpocn, &cplocn, &direction );
         CHECKIERR( ierr, "failed to migrate mesh for ocn on coupler" );
 
+#ifdef VERBOSE
         if( *cplOcnPID >= 0 )
         {
             char prefix[] = "ocntgt";
@@ -257,6 +260,7 @@ int main( int argc, char* argv[] )
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "failed to write ocean global mesh file" );
         }
+#endif
     }
     MPI_Barrier( MPI_COMM_WORLD );
 
@@ -344,12 +348,14 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+#ifdef VERBOSE
         if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov_withdata";
             ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local atm cov mesh with data" );
         }
+#endif
 
         if( couComm != MPI_COMM_NULL )
         {
@@ -364,7 +370,7 @@ int main( int argc, char* argv[] )
             POP_TIMER( couComm, rankInCouComm )
 
             {
-                char outputFileTgt[] = "fOcnOnCpl.h5m";
+                char outputFileTgt[] = "fOcnOnCpl2.h5m";
                 ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
                                         strlen( fileWriteOptions ) );
                 CHECKIERR( ierr, "could not write fOcnOnCpl.h5m to disk" )
@@ -410,10 +416,12 @@ int main( int argc, char* argv[] )
 
         if( ocnComm != MPI_COMM_NULL )
         {
+#ifdef VERBOSE
             char outputFileOcn[] = "OcnWithProj.h5m";
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
+#endif
             // test results only for n == 1, for bottomTempProjectedField
             if( !no_regression_test )
             {
