@@ -313,16 +313,37 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     m_mapRemap.GetEntries( lrows, lcols, lvals );
     unsigned locvals = lvals.GetRows();
 
-    m_weightMatrix.reserve( locvals );
-    for( unsigned iv = 0; iv < locvals; iv++ )
+    // first matrix
+    typedef Eigen::Triplet< double > Triplet;
+    std::vector< Triplet > tripletList;
+    tripletList.reserve( locvals );
+    for( int iv = 0; iv < locvals; iv++ )
     {
-        // std::cout << "Row = " << row_ldofmap[lrows[iv]] << ", Col = " << col_ldofmap[lcols[iv]]
-        // << ", DATA = " << lvals[iv] << std::endl; std::cout << "Row = " << lrows[iv] << ", Col =
-        // " << lcols[iv] << ", DATA = " << lvals[iv] << std::endl;
-        m_weightMatrix.insert( lrows[iv], lcols[iv] ) = lvals[iv];
+        tripletList.push_back( Triplet( lrows[iv], lcols[iv], lvals[iv] ) );
     }
 
+    m_weightMatrix.setFromTriplets( tripletList.begin(), tripletList.end() );
     m_weightMatrix.makeCompressed();
+
+    int nrows = m_weightMatrix.rows();      // Number of rows
+    int ncols = m_weightMatrix.cols();      // Number of columns
+    int NNZ   = m_weightMatrix.nonZeros();  // Number of non zero values
+#ifdef MOAB_HAVE_MPI
+    // find out min/max for NNZ, ncols, nrows
+    // should work on std c++ 11
+    int arr3[6] = { NNZ, nrows, ncols, -NNZ, -nrows, -ncols };
+    int rarr3[6];
+    MPI_Reduce( arr3, rarr3, 6, MPI_INT, MPI_MIN, 0, m_pcomm->comm() );
+
+    int total[2];
+    MPI_Reduce( arr3, total, 2, MPI_INT, MPI_SUM, 0, m_pcomm->comm() );
+    if( !rank )
+        std::cout << " Rows:(" << rarr3[1] << ", " << -rarr3[4] << "), Cols:(" << rarr3[2] << ", " << -rarr3[5]
+                  << "), NNZ:(" << rarr3[0] << ", " << -rarr3[3] << "),  total NNZ:" << total[0]
+                  << " total rows:" << total[1] << "\n";
+#else
+    std::cout << "nr rows: " << nrows << " cols: " << ncols << " non-zeros: " << NNZ << "\n";
+#endif
 
 #ifdef VERBOSE
     std::stringstream sstr;
