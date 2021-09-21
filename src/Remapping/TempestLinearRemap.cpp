@@ -291,7 +291,7 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     {
         // std::cout << rank << ": rowsize = " <<  m_nTotDofs_Dest << ", colsize = " <<
         // m_nTotDofs_SrcCov << "\n";
-        return;  // No need to allocate if either rows or cols size are zero
+        //return;  // No need to allocate if either rows or cols size are zero
     }
 
     /* Should the columns be the global size of the matrix ? */
