@@ -61,6 +61,7 @@ int run_test( ErrorCode ( *func )( const char* ), const char* func_name, const c
 ErrorCode migrate_graph( const char* filename );
 ErrorCode migrate_geom( const char* filename );
 ErrorCode migrate_trivial( const char* filename );
+ErrorCode migrate_to_empty_part( const char* filename );
 
 // some global variables, used by all tests
 int rank, size, ierr;
@@ -131,7 +132,7 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );CHECKRC( ierr, "can't load mesh " )
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
-#ifdef GRAPH_INFO
+//#ifdef GRAPH_INFO
         int is_sender = 1;
         int context   = compid2;
         iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS" );
@@ -193,6 +194,11 @@ ErrorCode migrate_trivial( const char* filename )
     return migrate_smart( filename, "migrate_trivial.h5m", 0 );
 }
 
+ErrorCode migrate_to_empty_part( const char* filename )
+{
+    return migrate_smart( filename, "migrate_trivial.h5m", 6 );
+}
+
 int main( int argc, char* argv[] )
 {
     MPI_Init( &argc, &argv );
@@ -234,9 +240,10 @@ int main( int argc, char* argv[] )
 
     int num_errors = 0;
 
-    if( 0 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+    num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
     if( 3 == typeTest || 1 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str() );
     if( 3 == typeTest || 2 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str() );
+    num_errors += RUN_TEST_ARG2( migrate_to_empty_part, filename.c_str() );
 
     if( rank == 0 )
     {

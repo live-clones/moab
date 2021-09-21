@@ -2273,22 +2273,24 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     rval = context.MBI->get_entities_by_handle( local_set, local_ents );MB_CHK_ERR( rval );
 
     // do not do merge if point cloud
-    if( !local_ents.all_of_type( MBVERTEX ) )
+    if (!local_ents.empty())
     {
-        if( (int)senders_local.size() >= 2 )  // need to remove duplicate vertices
-        // that might come from different senders
+        if( !local_ents.all_of_type( MBVERTEX ) )
         {
+            if( (int)senders_local.size() >= 2 )  // need to remove duplicate vertices
+            // that might come from different senders
+            {
 
-            Range local_verts = local_ents.subset_by_type( MBVERTEX );
-            Range local_elems = subtract( local_ents, local_verts );
+                Range local_verts = local_ents.subset_by_type( MBVERTEX );
+                Range local_elems = subtract( local_ents, local_verts );
 
             // remove from local set the vertices
             rval = context.MBI->remove_entities( local_set, local_verts );MB_CHK_ERR( rval );
 
-#ifdef VERBOSE
-            std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
-#endif
-            MergeMesh mm( context.MBI );
+    #ifdef VERBOSE
+                std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
+    #endif
+                MergeMesh mm( context.MBI );
 
             rval = mm.merge_using_integer_tag( local_verts, idtag );MB_CHK_ERR( rval );
 
@@ -2300,10 +2302,10 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
 #endif
             rval = context.MBI->add_entities( local_set, new_verts );MB_CHK_ERR( rval );
         }
+        else
+            data.point_cloud = true;
     }
-    else
-        data.point_cloud = true;
-
+    // it could be point cloud empty ?
     if( !data.point_cloud )
     {
         // still need to resolve shared entities (in this case, vertices )

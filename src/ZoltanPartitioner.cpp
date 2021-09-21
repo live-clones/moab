@@ -2283,7 +2283,7 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
 
     // Create Zoltan object.  This calls Zoltan_Create.
     // old code
-    if (met <= 4) {
+    if (met <= 4 || 6 == met) {
 
 
         if( NULL == myZZ ) myZZ = new Zoltan( pco->comm() );
@@ -2439,6 +2439,22 @@ ErrorCode ZoltanPartitioner::partition_owned_cells( Range& primary, ParallelComm
         myZZ = NULL;
     }
 
+    if (6 == met)
+    {
+        // artificially empty first part, to test what happens with empty parts
+        if (distribution.size()>=2)
+        {
+            auto bg = distribution.begin();
+            if ( 0 == bg->first )
+            {
+                Range & a = bg->second;
+                bg++;
+                bg->second.merge(a);
+                bg = distribution.begin();
+                distribution.erase(bg);
+            }
+        }
+    }
 
     // clear arrays that were resized locally, to free up local memory
 
