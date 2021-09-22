@@ -36,6 +36,8 @@
 #endif
 
 #ifdef MOAB_HAVE_EIGEN3
+#define EIGEN_NO_DEBUG
+#define EIGEN_MAX_CPP_VER 11
 #include "Eigen/Dense"
 #endif
 
@@ -918,6 +920,10 @@ double IntxAreaUtils::area_spherical_polygon_GQ( const double* A, int N )
     return area;
 }
 
+#ifdef NDEBUG
+#undef NDEBUG
+#define DEBUG_MODE
+#endif
 double IntxAreaUtils::area_spherical_triangle_GQ( const double* inode1, const double* inode2, const double* inode3 )
 {
 #if defined( MOAB_HAVE_EIGEN3 )
@@ -934,7 +940,8 @@ double IntxAreaUtils::area_spherical_triangle_GQ( const double* inode1, const do
                            0.2339569672863455,  0.1803807865240693, 0.08566224618958521 };
 
     double dFaceArea = 0.0;
-    Eigen::Vector3d dF, dF2, dDaF, dDbF, dDaG, dDbG, nodeCross;
+    Eigen::Vector3d dF, dF2, dDaF, dDbF, dDaG, dDbG;
+    double nodeCross[3];
 
     // Calculate area at quadrature node and sum it up
     for( int p = 0; p < nOrder; p++ )
@@ -946,15 +953,16 @@ double IntxAreaUtils::area_spherical_triangle_GQ( const double* inode1, const do
             const double dB = dG[q];
 
             // V3d dF = (1.0 - dB) * (((1.0 - dA) * node1) + (dA * node2)) + (dB * node3);
-            dF  = ( ( 1.0 - dB ) * ( 1.0 - dA ) ) * node1 + ( ( 1.0 - dB ) * dA ) * node2 + dB * node3;
+            dF  = ( ( ( 1.0 - dB ) * ( 1.0 - dA ) ) * node1 ) + ( ( ( 1.0 - dB ) * dA ) * node2 ) + ( dB * node3 );
             dF2 = dF.array().square();
 
-            dDaF = ( 1.0 - dB ) * ( node2 - node1 );
+            dDaF = ( node1 - node2 );
 
-            dDbF = -( 1.0 - dA ) * node1 - dA * node2 + node3;
+            // dDbF = -( 1.0 - dA ) * node1 - dA * node2 + node3;
+            dDbF = ( node3 - node1 ) + dA * dDaF;
+            dDaF *= ( dB - 1.0 );
 
-            const double dR         = dF.norm();
-            const double dDenomTerm = 1.0 / ( dR * dR * dR );
+            const double dDenomTerm = std::pow( dF.norm(), -3.0 );
 
             dDaG << dDaF( 0 ) * ( dF2( 1 ) + dF2( 2 ) ) - dF( 0 ) * ( dDaF( 1 ) * dF( 1 ) + dDaF( 2 ) * dF( 2 ) ),
                 dDaF( 1 ) * ( dF2( 0 ) + dF2( 2 ) ) - dF( 1 ) * ( dDaF( 0 ) * dF( 0 ) + dDaF( 2 ) * dF( 2 ) ),
@@ -969,10 +977,12 @@ double IntxAreaUtils::area_spherical_triangle_GQ( const double* inode1, const do
             dDbG *= dDenomTerm;
 
             // Cross product gives local Jacobian: dGaG x dDbG
-            nodeCross << dDaG( 1 ) * dDbG( 2 ) - dDaG( 2 ) * dDbG( 1 ), dDaG( 2 ) * dDbG( 0 ) - dDaG( 0 ) * dDbG( 2 ),
-                dDaG( 0 ) * dDbG( 1 ) - dDaG( 1 ) * dDbG( 0 );
+            nodeCross[0] = dDaG( 1 ) * dDbG( 2 ) - dDaG( 2 ) * dDbG( 1 );
+            nodeCross[1] = dDaG( 2 ) * dDbG( 0 ) - dDaG( 0 ) * dDbG( 2 );
+            nodeCross[2] = dDaG( 0 ) * dDbG( 1 ) - dDaG( 1 ) * dDbG( 0 );
 
-            const double dJacobian = nodeCross.norm();
+            const double dJacobian =
+                std::sqrt( nodeCross[0] * nodeCross[0] + nodeCross[1] * nodeCross[1] + nodeCross[2] * nodeCross[2] );
 
             // dFaceArea += 2.0 * dW[p] * dW[q] * (1.0 - dG[q]) * dJacobian;
             dFaceArea += dW[p] * dW[q] * dJacobian;
@@ -993,6 +1003,10 @@ double IntxAreaUtils::area_spherical_triangle_GQ( const double* inode1, const do
     return CalculateFaceArea( face, nodes );
 #endif
 }
+#ifdef DEBUG_MODE
+#undef DEBUG_MODE
+#define NDEBUG
+#endif
 
 #endif
 
