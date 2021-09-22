@@ -156,10 +156,11 @@ static int process_partition_file( Interface* gMB, std::string& metis_partition_
 
 int main( int argc, char* argv[] )
 {
-    int proc_id = 0;
+    int proc_id = 0, nprocs = 1;
 #ifdef MOAB_HAVE_MPI
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
+    MPI_Comm_size( MPI_COMM_WORLD, &nprocs );
 #endif
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
@@ -783,7 +784,10 @@ int main( int argc, char* argv[] )
                 gMB->get_adjacencies( dim3, 1, true, adj, Interface::UNION );
                 gMB->get_adjacencies( dim2, 1, true, adj, Interface::UNION );
             }
-            if( generate[2] ) { gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION ); }
+            if( generate[2] )
+            {
+                gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION );
+            }
             if( sets[i] ) gMB->add_entities( sets[i], adj );
         }
     }
@@ -882,15 +886,15 @@ int main( int argc, char* argv[] )
     // Useful only for SE meshes with GLL DoFs
     if( spectral_order > 1 && globalid_tag_name.size() > 1 )
     {
-        result = remapper->GenerateMeshMetadata( *tempestMesh, ntot_elements, faces, NULL, globalid_tag_name,
-                                                 spectral_order );MB_CHK_ERR( result );
+        if( nprocs > 1 ) MB_CHK_SET_ERR( MB_FAILURE, "Cannot assign spectral DoF tags in parallel yet." );
+        result = remapper->GenerateMeshMetadata( *tempestMesh, faces, globalid_tag_name, spectral_order, true );MB_CHK_ERR( result );
     }
 
     if( tempestout )
     {
         // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an
         // overlap grid
-        if( use_overlap_context && false )
+        if( use_overlap_context )
         {
             const int nOverlapFaces = faces.size();
             // Overlap mesh: resize the source and target connection arrays
@@ -1020,7 +1024,10 @@ static void print_time( int clk_per_sec, const char* prefix, clock_t ticks, std:
     clock_t centi   = ticks % 100;
     clock_t seconds = ticks / 100;
     stream << prefix;
-    if( seconds < 120 ) { stream << ( ticks / 100 ) << "." << centi << "s" << std::endl; }
+    if( seconds < 120 )
+    {
+        stream << ( ticks / 100 ) << "." << centi << "s" << std::endl;
+    }
     else
     {
         clock_t minutes = ( seconds / 60 ) % 60;

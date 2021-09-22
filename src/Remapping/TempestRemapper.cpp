@@ -31,6 +31,7 @@
 #include "MBParallelConventions.h"
 
 #ifdef MOAB_HAVE_TEMPESTREMAP
+#include "FiniteElementTools.h"
 #include "GaussLobattoQuadrature.h"
 #endif
 
@@ -863,31 +864,8 @@ bool operator<( Node const& lhs, Node const& rhs )
     return std::pow( lhs.x - rhs.x, 2.0 ) + std::pow( lhs.y - rhs.y, 2.0 ) + std::pow( lhs.z - rhs.z, 2.0 );
 }
 
-ErrorCode TempestRemapper::GenerateCSMeshMetadata( const int ntot_elements, moab::Range& ents,
-                                                   moab::Range* secondary_ents, const std::string dofTagName, int nP )
-{
-    Mesh csMesh;
-    int err;
-    moab::ErrorCode rval;
-
-    const int res = std::sqrt( ntot_elements / 6 );
-
-    // create a temporary CS mesh
-    // NOTE: This will not work for RRM grids. Need to run HOMME for that case anyway
-    err = GenerateCSMesh( csMesh, res, "", "NetCDF4" );
-    if( err )
-    {
-        MB_CHK_SET_ERR( MB_FAILURE, "Failed to generate CS mesh through TempestRemap" );
-        ;
-    }
-
-    rval = this->GenerateMeshMetadata( csMesh, ntot_elements, ents, secondary_ents, dofTagName, nP );MB_CHK_SET_ERR( rval, "Failed in call to GenerateMeshMetadata" );
-
-    return moab::MB_SUCCESS;
-}
-
-ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_elements, moab::Range& ents,
-                                                 moab::Range* secondary_ents, const std::string dofTagName, int nP )
+ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, moab::Range& entities, const std::string dofTagName,
+                                                 int nP, bool fNoBubble )
 {
     moab::ErrorCode rval;
 
@@ -896,143 +874,29 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_el
     rval         = m_interface->tag_get_handle( dofTagName.c_str(), nP * nP, MB_TYPE_INTEGER, dofTag,
                                         MB_TAG_DENSE | MB_TAG_CREAT, 0, &created );MB_CHK_SET_ERR( rval, "Failed creating DoF tag" );
 
-    // Number of Faces
-    int nElements = static_cast< int >( csMesh.faces.size() );
+    // Sanity check number of Faces
+    assert( csMesh.faces.size() - entities.size() == 0 );
 
-    assert( nElements == ntot_elements );
-
-    // Initialize data structures
-    DataArray3D< int > dataGLLnodes;
-    dataGLLnodes.Allocate( nP, nP, nElements );
-
-    std::map< Node, int > mapNodes;
-    std::map< Node, moab::EntityHandle > mapLocalMBNodes;
-
-    // GLL Quadrature nodes
-    DataArray1D< double > dG;
-    DataArray1D< double > dW;
-    GaussLobattoQuadrature::GetPoints( nP, 0.0, 1.0, dG, dW );
-
-    moab::Range entities( ents );
-    if( secondary_ents ) entities.insert( secondary_ents->begin(), secondary_ents->end() );
-    double elcoords[3];
-    for( unsigned iel = 0; iel < entities.size(); ++iel )
+    if( created )  // Only update if the tag does not exist already.
     {
-        EntityHandle eh = entities[iel];
-        rval            = m_interface->get_coords( &eh, 1, elcoords );
-        Node elCentroid( elcoords[0], elcoords[1], elcoords[2] );
-        mapLocalMBNodes.insert( std::pair< Node, moab::EntityHandle >( elCentroid, eh ) );
+        // Initialize data structures
+        DataArray3D< int > dataGLLnodes;
+        DataArray3D< double > dataGLLJacobian;
+
+        double dTotalAreaInput = csMesh.CalculateFaceAreas( false );
+
+        double dAccumulatedJacobian = GenerateMetaData( csMesh, nP, fNoBubble, dataGLLnodes, dataGLLJacobian );
+
+        rval = m_interface->tag_set_data( dofTag, entities, dataGLLnodes( 0, 0 ) );MB_CHK_ERR( rval );
+
+        // clear memory
+        dataGLLnodes.Detach();
+        dataGLLJacobian.Detach();
     }
-
-    // Build a Kd-tree for local mesh (nearest neighbor searches)
-    // Loop over all elements in CS-Mesh
-    // Then find if current centroid is in an element
-    //     If yes - then let us compute the DoF numbering and set to tag data
-    //     If no - then compute DoF numbering BUT DO NOT SET to tag data
-    // continue
-    int* dofIDs = new int[nP * nP];
-
-    // Write metadata
-    for( int k = 0; k < nElements; k++ )
+    else
     {
-        const Face& face        = csMesh.faces[k];
-        const NodeVector& nodes = csMesh.nodes;
-
-        if( face.edges.size() != 4 )
-        {
-            _EXCEPTIONT( "Mesh must only contain quadrilateral elements" );
-        }
-
-        Node centroid;
-        centroid.x = centroid.y = centroid.z = 0.0;
-        for( unsigned l = 0; l < face.edges.size(); ++l )
-        {
-            centroid.x += nodes[face[l]].x;
-            centroid.y += nodes[face[l]].y;
-            centroid.z += nodes[face[l]].z;
-        }
-        const double factor = 1.0 / face.edges.size();
-        centroid.x *= factor;
-        centroid.y *= factor;
-        centroid.z *= factor;
-
-        bool locElem = false;
-        EntityHandle current_eh;
-        if( mapLocalMBNodes.find( centroid ) != mapLocalMBNodes.end() )
-        {
-            locElem    = true;
-            current_eh = mapLocalMBNodes[centroid];
-        }
-
-        for( int j = 0; j < nP; j++ )
-        {
-            for( int i = 0; i < nP; i++ )
-            {
-
-                // Get local map vectors
-                Node nodeGLL;
-                Node dDx1G;
-                Node dDx2G;
-
-                // ApplyLocalMap(
-                //     face,
-                //     nodevec,
-                //     dG[i],
-                //     dG[j],
-                //     nodeGLL,
-                //     dDx1G,
-                //     dDx2G);
-                const double& dAlpha = dG[i];
-                const double& dBeta  = dG[j];
-
-                // Calculate nodal locations on the plane
-                double dXc = nodes[face[0]].x * ( 1.0 - dAlpha ) * ( 1.0 - dBeta ) +
-                             nodes[face[1]].x * dAlpha * ( 1.0 - dBeta ) + nodes[face[2]].x * dAlpha * dBeta +
-                             nodes[face[3]].x * ( 1.0 - dAlpha ) * dBeta;
-
-                double dYc = nodes[face[0]].y * ( 1.0 - dAlpha ) * ( 1.0 - dBeta ) +
-                             nodes[face[1]].y * dAlpha * ( 1.0 - dBeta ) + nodes[face[2]].y * dAlpha * dBeta +
-                             nodes[face[3]].y * ( 1.0 - dAlpha ) * dBeta;
-
-                double dZc = nodes[face[0]].z * ( 1.0 - dAlpha ) * ( 1.0 - dBeta ) +
-                             nodes[face[1]].z * dAlpha * ( 1.0 - dBeta ) + nodes[face[2]].z * dAlpha * dBeta +
-                             nodes[face[3]].z * ( 1.0 - dAlpha ) * dBeta;
-
-                double dR = sqrt( dXc * dXc + dYc * dYc + dZc * dZc );
-
-                // Mapped node location
-                nodeGLL.x = dXc / dR;
-                nodeGLL.y = dYc / dR;
-                nodeGLL.z = dZc / dR;
-
-                // Determine if this is a unique Node
-                std::map< Node, int >::const_iterator iter = mapNodes.find( nodeGLL );
-                if( iter == mapNodes.end() )
-                {
-                    // Insert new unique node into map
-                    int ixNode = static_cast< int >( mapNodes.size() );
-                    mapNodes.insert( std::pair< Node, int >( nodeGLL, ixNode ) );
-                    dataGLLnodes[j][i][k] = ixNode + 1;
-                }
-                else
-                {
-                    dataGLLnodes[j][i][k] = iter->second + 1;
-                }
-
-                dofIDs[j * nP + i] = dataGLLnodes[j][i][k];
-            }
-        }
-
-        if( locElem )
-        {
-            rval = m_interface->tag_set_data( dofTag, &current_eh, 1, dofIDs );MB_CHK_SET_ERR( rval, "Failed to tag_set_data for DoFs" );
-        }
+        std::cout << "\"" << dofTagName << "\" DoF tag already exists. Not updating..." << std::flush;
     }
-
-    // clear memory
-    delete[] dofIDs;
-    mapLocalMBNodes.clear();
-    mapNodes.clear();
 
     return moab::MB_SUCCESS;
 }
@@ -1201,8 +1065,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         if( m_overlap != NULL ) delete m_overlap;
         m_overlap         = new Mesh();
         bool concaveMeshA = false, concaveMeshB = false;
-        int err = GenerateOverlapWithMeshes( *m_covering_source, *m_target, *m_overlap, "" /*outFilename*/, "Netcdf4",
-                                             "exact", concaveMeshA, concaveMeshB, false );
+        int err = GenerateOverlapWithMeshesKdx( *m_covering_source, *m_target, *m_overlap, "" /*outFilename*/,
+                                                "Netcdf4", "exact", concaveMeshA, concaveMeshB, false );
         if( err )
         {
             MB_CHK_SET_ERR( MB_FAILURE, "TempestRemap: Can't compute the intersection of meshes on the sphere" );

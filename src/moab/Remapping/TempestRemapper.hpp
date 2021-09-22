@@ -206,20 +206,11 @@ class TempestRemapper : public Remapper
                                                   const bool fInputConcave, const bool fOutputConcave );
 
     /// <summary>
-    ///     Generate the necessary metadata and specifically the GLL node numbering for DoFs for a
-    ///     CS mesh. This negates the need for running external code like HOMME to output the
-    ///     numbering needed for computing maps. The functionality is used through the `mbconvert`
-    ///     tool to compute processor-invariant Global DoF IDs at GLL nodes.
-    /// </summary>
-    moab::ErrorCode GenerateCSMeshMetadata( const int ntot_elements, moab::Range& entities,
-                                            moab::Range* secondary_entities, const std::string dofTagName, int nP );
-
-    /// <summary>
     ///     Generate the necessary metadata for DoF node numbering in a given mesh.
     ///     Currently, only the functionality to generate numbering on CS grids is supported.
     /// </summary>
-    moab::ErrorCode GenerateMeshMetadata( Mesh& mesh, const int ntot_elements, moab::Range& entities,
-                                          moab::Range* secondary_entities, const std::string dofTagName, int nP );
+    moab::ErrorCode GenerateMeshMetadata( Mesh& csMesh, moab::Range& entities, const std::string dofTagName, int nP,
+                                          bool fNoBubble );
 
     /// <summary>
     ///     Compute the local and global IDs for elements in source/target/coverage meshes.
