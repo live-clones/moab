@@ -35,7 +35,7 @@ int main( int argc, char* argv[] )
 {
     std::stringstream sstr;
     // Default area_method = lHuiller; Options: Girard, GaussQuadrature (if TR is available)
-    const IntxAreaUtils::AreaMethod areaMethod = IntxAreaUtils::lHuiller;
+    const IntxAreaUtils::AreaMethod areaMethod = IntxAreaUtils::GaussQuadrature;
 
     int rank = 0, size = 1;
 #ifdef MOAB_HAVE_MPI
@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
     std::string sourceFile, targetFile, intxFile;
     std::string source_verif( "outS.h5m" ), target_verif( "outt.h5m" );
     int sphere           = 1;
-    int oldNamesParents  = 1;
+    int oldNamesParents  = 0;
     double areaErrSource = -1;
     double areaErrTarget = -1;
     ProgOptions opts;
