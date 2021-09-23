@@ -617,7 +617,6 @@ int main( int argc, char* argv[] )
 
                 // Convert the mesh and validate
                 result = remapper->ConvertMeshToTempest( moab::Remapper::OverlapMesh );MB_CHK_ERR( result );
-                // result = remapper->ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( result );
             }
             else
             {
@@ -859,9 +858,6 @@ int main( int argc, char* argv[] )
     Range faces;
     Mesh* tempestMesh =
         remapper->GetMesh( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
-    // moab::EntityHandle& srcmesh =
-    //     remapper->GetMeshSet( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
-
     // Mesh* tempestMesh = remapper->GetMesh( moab::Remapper::SourceMesh );
     moab::EntityHandle& srcmesh = remapper->GetMeshSet( moab::Remapper::SourceMesh );
     result                      = gMB->get_entities_by_dimension( srcmesh, 2, faces );MB_CHK_ERR( result );
@@ -901,22 +897,6 @@ int main( int argc, char* argv[] )
 
     if( tempestout )
     {
-        // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an
-        // overlap grid
-        if( use_overlap_context && false )
-        {
-            const int nOverlapFaces = faces.size();
-            // Overlap mesh: resize the source and target connection arrays
-            tempestMesh->vecSourceFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to source mesh
-            tempestMesh->vecTargetFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to target mesh
-            result = gMB->tag_get_data( srcParentTag, faces, &tempestMesh->vecSourceFaceIx[0] );MB_CHK_ERR( result );
-            result = gMB->tag_get_data( tgtParentTag, faces, &tempestMesh->vecTargetFaceIx[0] );MB_CHK_ERR( result );
-            for( auto ix = 0; ix < nOverlapFaces; ++ix )  // global ID in MOAB are 1-based
-            {
-                tempestMesh->vecSourceFaceIx[ix]--;
-                tempestMesh->vecTargetFaceIx[ix]--;
-            }
-        }
         // Write out the mesh using TempestRemap
         tempestMesh->Write( out, NcFile::Netcdf4 );
     }
