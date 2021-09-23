@@ -574,8 +574,8 @@ int main( int argc, char* argv[] )
 
                 for( unsigned ii = 0; ii < faces.size(); ++ii )
                 {
-                    srcpar[ii] = tempestMesh->vecSourceFaceIx[gids[ii] - 1];
-                    tgtpar[ii] = tempestMesh->vecTargetFaceIx[gids[ii] - 1];
+                    srcpar[ii] = tempestMesh->vecSourceFaceIx[gids[ii] - 1] + 1;
+                    tgtpar[ii] = tempestMesh->vecTargetFaceIx[gids[ii] - 1] + 1;
                 }
 
                 result = gMB->tag_set_data( srcParentTag, faces, &srcpar[0] );MB_CHK_ERR( result );
@@ -604,8 +604,8 @@ int main( int argc, char* argv[] )
                 use_overlap_context = true;
                 ovmesh              = srcmesh;
 
-                Tag countTag;
-                result = gMB->tag_get_handle( "Counting", countTag );
+                // Tag countTag;
+                // result = gMB->tag_get_handle( "Counting", countTag );
                 // std::vector<int> count_ids()
 
                 // Load the meshes and validate
@@ -614,7 +614,10 @@ int main( int argc, char* argv[] )
                 result = reorder_tool.handle_order_from_int_tag( srcParentTag, -1, order );MB_CHK_ERR( result );
                 result = reorder_tool.reorder_entities( order );MB_CHK_ERR( result );
                 result = gMB->tag_delete( order );MB_CHK_ERR( result );
+
+                // Convert the mesh and validate
                 result = remapper->ConvertMeshToTempest( moab::Remapper::OverlapMesh );MB_CHK_ERR( result );
+                // result = remapper->ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( result );
             }
             else
             {
@@ -856,9 +859,12 @@ int main( int argc, char* argv[] )
     Range faces;
     Mesh* tempestMesh =
         remapper->GetMesh( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
-    moab::EntityHandle& srcmesh =
-        remapper->GetMeshSet( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
-    result = gMB->get_entities_by_dimension( srcmesh, 2, faces );MB_CHK_ERR( result );
+    // moab::EntityHandle& srcmesh =
+    //     remapper->GetMeshSet( ( use_overlap_context ? moab::Remapper::OverlapMesh : moab::Remapper::SourceMesh ) );
+
+    // Mesh* tempestMesh = remapper->GetMesh( moab::Remapper::SourceMesh );
+    moab::EntityHandle& srcmesh = remapper->GetMeshSet( moab::Remapper::SourceMesh );
+    result                      = gMB->get_entities_by_dimension( srcmesh, 2, faces );MB_CHK_ERR( result );
     int ntot_elements = 0, nelements = faces.size();
 #ifdef MOAB_HAVE_MPI
     int ierr = MPI_Allreduce( &nelements, &ntot_elements, 1, MPI_INT, MPI_SUM, pcomm->comm() );
@@ -867,34 +873,37 @@ int main( int argc, char* argv[] )
     ntot_elements             = nelements;
 #endif
 
-    Tag gidTag = gMB->globalId_tag();
-    std::vector< int > gids( faces.size() );
-    result = gMB->tag_get_data( gidTag, faces, &gids[0] );MB_CHK_ERR( result );
-
-    if( faces.size() > 1 && gids[0] == gids[1] && !use_overlap_context )
+    if( !use_overlap_context )
     {
+        Tag gidTag = gMB->globalId_tag();
+        std::vector< int > gids( faces.size() );
+        result = gMB->tag_get_data( gidTag, faces, &gids[0] );MB_CHK_ERR( result );
+
+        if( faces.size() > 1 && gids[0] == gids[1] )
+        {
 #ifdef MOAB_HAVE_MPI
-        result = pcomm->assign_global_ids( srcmesh, 2, 1, false );MB_CHK_ERR( result );
+            result = pcomm->assign_global_ids( srcmesh, 2, 1, false );MB_CHK_ERR( result );
 #else
-        result = remapper->assign_vertex_element_IDs( gidTag, srcmesh, 2, 1 );MB_CHK_ERR( result );
-        result = remapper->assign_vertex_element_IDs( gidTag, srcmesh, 0, 1 );MB_CHK_ERR( result );
+            result = remapper->assign_vertex_element_IDs( gidTag, srcmesh, 2, 1 );MB_CHK_ERR( result );
+            result = remapper->assign_vertex_element_IDs( gidTag, srcmesh, 0, 1 );MB_CHK_ERR( result );
 #endif
-    }
+        }
 
-    // VSM: If user requested explicitly for some metadata, we need to generate the DoF ID tag
-    // and set the appropriate numbering based on specified discretization order
-    // Useful only for SE meshes with GLL DoFs
-    if( spectral_order > 1 && globalid_tag_name.size() > 1 )
-    {
-        if( nprocs > 1 ) MB_CHK_SET_ERR( MB_FAILURE, "Cannot assign spectral DoF tags in parallel yet." );
-        result = remapper->GenerateMeshMetadata( *tempestMesh, faces, globalid_tag_name, spectral_order, true );MB_CHK_ERR( result );
+        // VSM: If user requested explicitly for some metadata, we need to generate the DoF ID tag
+        // and set the appropriate numbering based on specified discretization order
+        // Useful only for SE meshes with GLL DoFs
+        if( spectral_order > 1 && globalid_tag_name.size() > 1 )
+        {
+            if( nprocs > 1 ) MB_CHK_SET_ERR( MB_FAILURE, "Cannot assign spectral DoF tags in parallel yet." );
+            result = remapper->GenerateMeshMetadata( *tempestMesh, faces, globalid_tag_name, spectral_order, true );MB_CHK_ERR( result );
+        }
     }
 
     if( tempestout )
     {
         // Check if our MOAB mesh has RED and BLUE tags; this would indicate we are converting an
         // overlap grid
-        if( use_overlap_context )
+        if( use_overlap_context && false )
         {
             const int nOverlapFaces = faces.size();
             // Overlap mesh: resize the source and target connection arrays
@@ -902,6 +911,11 @@ int main( int argc, char* argv[] )
             tempestMesh->vecTargetFaceIx.resize( nOverlapFaces );  // 0-based indices corresponding to target mesh
             result = gMB->tag_get_data( srcParentTag, faces, &tempestMesh->vecSourceFaceIx[0] );MB_CHK_ERR( result );
             result = gMB->tag_get_data( tgtParentTag, faces, &tempestMesh->vecTargetFaceIx[0] );MB_CHK_ERR( result );
+            for( auto ix = 0; ix < nOverlapFaces; ++ix )  // global ID in MOAB are 1-based
+            {
+                tempestMesh->vecSourceFaceIx[ix]--;
+                tempestMesh->vecTargetFaceIx[ix]--;
+            }
         }
         // Write out the mesh using TempestRemap
         tempestMesh->Write( out, NcFile::Netcdf4 );

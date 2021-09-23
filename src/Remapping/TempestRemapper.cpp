@@ -522,12 +522,12 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHa
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-bool IntPairComparator( const std::pair< int, int >& a, const std::pair< int, int >& b )
+bool IntPairComparator( const std::array< int, 3 >& a, const std::array< int, 3 >& b )
 {
-    if( a.first == b.first )
-        return a.second < b.second;
+    if( a[1] == b[1] )
+        return a[2] < b[2];
     else
-        return a.first < b.first;
+        return a[1] < b[1];
 }
 
 moab::ErrorCode moab::TempestRemapper::GetOverlapAugmentedEntities( moab::Range& sharedGhostEntities )
@@ -582,7 +582,8 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
 
     size_t n_overlap_entitites = m_overlap_entities.size();
 
-    std::vector< std::pair< int, int > > sorted_overlap_order( n_overlap_entitites );
+    std::vector< std::array< int, 3 > > sorted_overlap_order( n_overlap_entitites,
+                                                              std::array< int, 3 >( { -1, -1, -1 } ) );
     {
         Tag srcParentTag, tgtParentTag;
         rval = m_interface->tag_get_handle( "SourceParent", srcParentTag );MB_CHK_ERR( rval );
@@ -597,9 +598,10 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         rval = m_interface->tag_get_data( tgtParentTag, m_overlap_entities, &rbids_tgt[0] );MB_CHK_ERR( rval );
         for( size_t ix = 0; ix < n_overlap_entitites; ++ix )
         {
-            sorted_overlap_order[ix].first =
-                ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] );
-            sorted_overlap_order[ix].second = ix;
+            sorted_overlap_order[ix][0] = ix;
+            sorted_overlap_order[ix][1] =
+                ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] - 1 );
+            sorted_overlap_order[ix][2] = ( gid_to_lid_tgt.size() ? gid_to_lid_tgt[rbids_tgt[ix]] : rbids_tgt[ix] - 1 );
         }
         std::sort( sorted_overlap_order.begin(), sorted_overlap_order.end(), IntPairComparator );
         // sorted_overlap_order[ie].second , ie=0,nOverlap-1 is the order such that overlap elems
@@ -615,14 +617,12 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         }
         for( unsigned ie = 0; ie < n_overlap_entitites; ++ie )
         {
-            int ix = sorted_overlap_order[ie].second;  // original index of the element
-            m_overlap->vecSourceFaceIx[ie] =
-                ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] - 1 );
+            int ix                         = sorted_overlap_order[ie][0];  // original index of the element
+            m_overlap->vecSourceFaceIx[ie] = sorted_overlap_order[ie][1];
             if( is_parallel && size > 1 && ghFlags[ix] >= 0 )  // it means it is a ghost overlap element
                 m_overlap->vecTargetFaceIx[ie] = -1;           // this should not participate in smat!
             else
-                m_overlap->vecTargetFaceIx[ie] =
-                    ( gid_to_lid_tgt.size() ? gid_to_lid_tgt[rbids_tgt[ix]] : rbids_tgt[ix] - 1 );
+                m_overlap->vecTargetFaceIx[ie] = sorted_overlap_order[ie][2];
         }
     }
 
@@ -636,18 +636,15 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     // compactness = " << verts.compactness() << std::endl;
 
     std::map< EntityHandle, int > indxMap;
-    bool useRange = true;
-    if( verts.compactness() > 0.01 )
     {
         int j = 0;
         for( Range::iterator it = verts.begin(); it != verts.end(); ++it )
             indxMap[*it] = j++;
-        useRange = false;
     }
 
     for( unsigned ifac = 0; ifac < m_overlap_entities.size(); ++ifac )
     {
-        const unsigned iface = sorted_overlap_order[ifac].second;
+        const unsigned iface = sorted_overlap_order[ifac][0];
         Face& face           = faces[ifac];
         EntityHandle ehandle = m_overlap_entities[iface];
 
@@ -659,11 +656,14 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         face.edges.resize( nnodesf );
         for( int iverts = 0; iverts < nnodesf; ++iverts )
         {
-            int indx = ( useRange ? verts.index( connectface[iverts] ) : indxMap[connectface[iverts]] );
+            int indx = indxMap[connectface[iverts]];
             assert( indx >= 0 );
             face.SetNode( iverts, indx );
         }
     }
+    indxMap.clear();
+
+    sorted_overlap_order.clear();
 
     unsigned nnodes   = verts.size();
     NodeVector& nodes = m_overlap->nodes;
@@ -684,14 +684,14 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     coordz.clear();
     verts.clear();
 
-    m_overlap->RemoveZeroEdges();
-    m_overlap->RemoveCoincidentNodes( false );
+    // m_overlap->RemoveZeroEdges();
+    // m_overlap->RemoveCoincidentNodes( false );
 
     // Generate reverse node array and edge map
     // if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
     // m_overlap->ConstructReverseNodeArray();
 
-    // m_overlap->Validate();
+    m_overlap->Validate();
     return MB_SUCCESS;
 }
 
@@ -705,8 +705,6 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
         m_covering_source = new Mesh();
         rval = convert_mesh_to_tempest_private( m_covering_source, m_covering_source_set, m_covering_source_entities,
                                                 &m_covering_source_vertices );MB_CHK_SET_ERR( rval, "Can't convert source Tempest mesh" );
-        // std::cout << "ComputeGlobalLocalMaps: " << rank << ", " << " covering entities = [" <<
-        // m_covering_source_vertices.size() << ", " << m_covering_source_entities.size() << "]\n";
     }
     gid_to_lid_src.clear();
     lid_to_gid_src.clear();
