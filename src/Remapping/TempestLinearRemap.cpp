@@ -592,7 +592,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
 
             int nOverlapTriangles = faceOverlap.edges.size() - 2;
 
-            // #define USE_MININDEX
+#define USE_MININDEX
 
 #ifdef USE_MININDEX
             // first find out the minimum node, start there the triangle decomposition
@@ -611,6 +611,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             for( int k = 0; k < nOverlapTriangles; k++ )
             {
 #ifdef USE_MININDEX
+                minIndex = 1;
                 // Cornerpoints of triangle, they start at the minimal Node, for consistency
                 const Node& node0 = nodesOverlap[faceOverlap[minIndex]];
                 const Node& node1 = nodesOverlap[faceOverlap[( minIndex + k + 1 ) % nnodes]];
