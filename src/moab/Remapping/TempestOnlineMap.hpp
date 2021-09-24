@@ -152,7 +152,7 @@ class TempestOnlineMap : public OfflineMap
     ///	</summary>
     void LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                       const DataArray3D< double >& dataGLLJacobian, int nMonotoneType,
-                                      bool fContinuousIn, bool fNoConservation );
+                                      bool fContinuousIn, bool fNoConservation, bool fSparseConstraints = true );
 
     ///	<summary>
     ///		Generate the OfflineMap for remapping from finite volumes to finite

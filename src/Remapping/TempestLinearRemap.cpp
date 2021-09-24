@@ -464,7 +464,8 @@ extern void ForceIntArrayConsistencyConservation( const DataArray1D< double >& v
 
 void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                                           const DataArray3D< double >& dataGLLJacobian,
-                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation )
+                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation,
+                                                          bool fSparseConstraints )
 {
     // Order of the polynomial interpolant
     int nP = dataGLLNodes.GetRows();
@@ -518,9 +519,10 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
     std::ofstream output_file( sstr.str() );
 #endif
 
-    // Current Overlap Face
-    int ixOverlap                  = 0;
+    // Only output progress at 10 major checkpoints.
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;
+    // Current Overlap Face
+    size_t ixOverlap = 0;
 
     // Loop over all input Faces
     for( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
@@ -583,40 +585,33 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                 continue;
             }
 
-            // #ifdef VERBOSE
-            // if ( is_root )
-            //     Announce ( "\tLocal ID: %i/%i = %i, areas = %2.8e", j + ixOverlap, nOverlapFaces,
-            //     m_remapper->lid_to_gid_covsrc[m_meshOverlap->vecSourceFaceIx[ixOverlap + j]],
-            //     m_meshOverlap->vecFaceArea[ixOverlap + j] );
-            // #endif
 #define USE_CENTER_POLYGON
 
-#ifdef  USE_CENTER_POLYGON
+#ifdef USE_CENTER_POLYGON
             int nOverlapTriangles = faceOverlap.edges.size();
-            Node center = nodesOverlap[faceOverlap[0]];
-            for (int i=1; i< nOverlapTriangles; i++)
+            Node center           = nodesOverlap[faceOverlap[0]];
+            for( int i = 1; i < nOverlapTriangles; i++ )
             {
                 const Node& node = nodesOverlap[faceOverlap[i]];
-                center = center + node;
+                center           = center + node;
             }
-            center = center/nOverlapTriangles;
-            double magni = sqrt( center.x * center.x + center.y * center.y +
-                    center.z * center.z );
-            center = center/magni; // project back on sphere
+            center       = center / nOverlapTriangles;
+            double magni = sqrt( center.x * center.x + center.y * center.y + center.z * center.z );
+            center       = center / magni;  // project back on sphere
 
 #else
-            int nOverlapTriangles = faceOverlap.edges.size() -2;
+            int nOverlapTriangles = faceOverlap.edges.size() - 2;
 #endif
 
             // Loop over all sub-triangles of this Overlap Face
             for( int k = 0; k < nOverlapTriangles; k++ )
             {
-#ifdef  USE_CENTER_POLYGON
+#ifdef USE_CENTER_POLYGON
                 Face faceTri( 3 );
                 NodeVector nodes( 3 );
                 nodes[0] = center;
                 nodes[1] = nodesOverlap[faceOverlap[k]];
-                int k1 = (k+1)%nOverlapTriangles;
+                int k1   = ( k + 1 ) % nOverlapTriangles;
                 nodes[2] = nodesOverlap[faceOverlap[k1]];
                 faceTri.SetNode( 0, 0 );
                 faceTri.SetNode( 1, 1 );
@@ -624,9 +619,9 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                 // this should be simplified; we are forming these arrays just to compute area of a triangle
                 // face palm :(
                 double dTriangleArea = CalculateFaceArea( faceTri, nodes );
-                const Node& node0 = nodes[0];
-                const Node& node1 = nodes[1];
-                const Node& node2 = nodes[2];
+                const Node& node0    = nodes[0];
+                const Node& node1    = nodes[1];
+                const Node& node2    = nodes[2];
 #else
 
                 // Cornerpoints of triangle
@@ -670,12 +665,25 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                     ApplyInverseMap( faceFirst, nodesFirst, nodeQuadrature, dAlpha, dBeta );
 
                     // Check inverse map value
-                    if( ( dAlpha < -1.0e-13 ) || ( dAlpha > 1.0 + 1.0e-13 ) || ( dBeta < -1.0e-13 ) ||
-                        ( dBeta > 1.0 + 1.0e-13 ) )
+                    if( ( dAlpha < -InverseMapTolerance ) || ( dAlpha > 1.0 + InverseMapTolerance ) ||
+                        ( dBeta < -InverseMapTolerance ) || ( dBeta > 1.0 + InverseMapTolerance ) )
                     {
-                        _EXCEPTION4( "Inverse Map for element %d and subtriangle %d out of range "
-                                     "(%1.5e %1.5e)",
-                                     j, l, dAlpha, dBeta );
+                        printf( "\n==== BEGIN DEBUGGING INFO ====\n" );
+                        printf( "WARNING (%s, Line %u) Inverse map out of range\n", __FILE__, __LINE__ );
+                        int ixSecond = m_meshOverlap->vecTargetFaceIx[ixOverlap + j];
+                        printf( "Source face ix %i, Target face ix %i, Overlap face ix %i\n", ixFirst, ixSecond,
+                                ixOverlap + j );
+                        printf( "Face nodes:\n" );
+                        for( int x = 0; x < faceFirst.edges.size(); x++ )
+                        {
+                            nodesFirst[faceFirst[x]].Print( "" );
+                        }
+                        printf( "Quadrature node:\n" );
+                        nodeQuadrature.Print( "" );
+                        printf( "Alpha, Beta: %1.15e %1.15e\n", dAlpha, dBeta );
+                        printf( "==== END DEBUGGING INFO ====\n" );
+                        //_EXCEPTION2("Inverse Map out of range (%1.5e %1.5e)",
+                        //	dAlpha, dBeta);
                     }
 
                     // Sample the finite element at this point
@@ -726,9 +734,8 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                 }
             }
 
-            const double areaTolerance = 1e-10;
             // Source elements are completely covered by target volumes
-            if( fabs( m_meshInputCov->vecFaceArea[ixFirst] - dTargetArea ) <= areaTolerance )
+            if( fabs( m_meshInputCov->vecFaceArea[ixFirst] - dTargetArea ) <= HighTolerance )
             {
                 vecTargetArea.Allocate( nOverlapFaces );
                 for( int j = 0; j < nOverlapFaces; j++ )
@@ -748,10 +755,8 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                         }
                     }
                 }
-
-                // Target volumes only partially cover source elements
-            }
-            else if( m_meshInputCov->vecFaceArea[ixFirst] - dTargetArea > areaTolerance )
+            }  // Target volumes only partially cover source elements
+            else if( m_meshInputCov->vecFaceArea[ixFirst] - dTargetArea > HighTolerance )
             {
                 double dExtraneousArea = m_meshInputCov->vecFaceArea[ixFirst] - dTargetArea;
 
@@ -808,18 +813,87 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                         dCoeff[nOverlapFaces][p * nP + q] /= dExtraneousArea;
                     }
                 }
-
-                // Source elements only partially cover target volumes
-            }
+            }  // Source elements only partially cover target volumes
             else
             {
+                printf( "\n==== BEGIN DEBUGGING INFO ====\n" );
+                printf( "EXCEPTION (%s, Line %u) Target grid must be a subset of source grid\n", __FILE__, __LINE__ );
+                printf( "Source face ix %i, Overlap face ix [%i,%i]\n", ixFirst, ixOverlap,
+                        ixOverlap + nOverlapFaces - 1 );
+                printf( "Target faces / overlap area:\n" );
+                for( int j = 0; j < nOverlapFaces; j++ )
+                {
+                    printf( "  (%i) (%i) %1.15e\n", ixOverlap + j, m_meshOverlap->vecTargetFaceIx[ixOverlap + j],
+                            m_meshOverlap->vecFaceArea[ixOverlap + j] );
+                }
+                printf( "Source nodes / source area:\n" );
+                for( int p = 0; p < nP; p++ )
+                {
+                    for( int q = 0; q < nP; q++ )
+                    {
+                        printf( "  (%i,%i) %1.15e\n", p, q, dataGLLJacobian[p][q][ixFirst] );
+                    }
+                }
+                printf( "==== END DEBUGGING INFO ====\n" );
+
                 Announce( "Coverage area: %1.10e, and target element area: %1.10e)", ixFirst,
                           m_meshInputCov->vecFaceArea[ixFirst], dTargetArea );
                 _EXCEPTIONT( "Target grid must be a subset of source grid" );
             }
 
-            ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 )
-                                           /*, m_remapper->lid_to_gid_covsrc[ixFirst]*/ );
+            // Force consistency and conservation (over all coefficients)
+            if( ( FORCECC_MAX_TARGET_FACES == ( -1 ) ) || ( nOverlapFaces <= FORCECC_MAX_TARGET_FACES ) )
+            {
+
+                ForceConsistencyConservation3( vecSourceArea, vecTargetArea, dCoeff, ( nMonotoneType > 0 ),
+                                               fSparseConstraints );
+
+                // If too many target faces are included this can greatly slow down the computation and
+                // require a high memory footprint.  In this case only apply forcing to the first
+                // FORCECC_MAX_TARGET_FACES overlap faces.
+            }
+            else
+            {
+                DataArray1D< double > dSubsetTargetArea( FORCECC_MAX_TARGET_FACES );
+                DataArray2D< double > dSubsetCoeff( FORCECC_MAX_TARGET_FACES, nP * nP );
+
+                for( int j = 0; j < FORCECC_MAX_TARGET_FACES; j++ )
+                {
+                    dSubsetTargetArea[j] = vecTargetArea[j];
+                    for( int p = 0; p < nP; p++ )
+                    {
+                        for( int q = 0; q < nP; q++ )
+                        {
+                            dSubsetCoeff[j][p * nP + q] = dCoeff[j][p * nP + q];
+                        }
+                    }
+                }
+
+                for( int j = FORCECC_MAX_TARGET_FACES; j < nOverlapFaces; j++ )
+                {
+                    for( int p = 0; p < nP; p++ )
+                    {
+                        for( int q = 0; q < nP; q++ )
+                        {
+                            vecSourceArea[p * nP + q] -= dCoeff[j][p * nP + q] * vecTargetArea[j];
+                        }
+                    }
+                }
+
+                ForceConsistencyConservation3( vecSourceArea, dSubsetTargetArea, dSubsetCoeff, ( nMonotoneType > 0 ),
+                                               fSparseConstraints );
+
+                for( int j = 0; j < FORCECC_MAX_TARGET_FACES; j++ )
+                {
+                    for( int p = 0; p < nP; p++ )
+                    {
+                        for( int q = 0; q < nP; q++ )
+                        {
+                            dCoeff[j][p * nP + q] = dSubsetCoeff[j][p * nP + q];
+                        }
+                    }
+                }
+            }
 
             for( int j = 0; j < nOverlapFaces; j++ )
             {
