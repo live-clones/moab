@@ -891,7 +891,7 @@ int main( int argc, char* argv[] )
         if( spectral_order > 1 && globalid_tag_name.size() > 1 )
         {
             if( nprocs > 1 ) MB_CHK_SET_ERR( MB_FAILURE, "Cannot assign spectral DoF tags in parallel yet." );
-            result = remapper->GenerateMeshMetadata( *tempestMesh, faces, globalid_tag_name, spectral_order, true );MB_CHK_ERR( result );
+            result = remapper->GenerateMeshMetadata( *tempestMesh, faces, globalid_tag_name, spectral_order, false );MB_CHK_ERR( result );
         }
     }
 

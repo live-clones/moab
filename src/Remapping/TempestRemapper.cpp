@@ -456,13 +456,10 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHa
     // loads
 
     std::map< EntityHandle, int > indxMap;
-    bool useRange = true;
-    if( verts.compactness() > 0.01 )
     {
         int j = 0;
         for( Range::iterator it = verts.begin(); it != verts.end(); it++ )
             indxMap[*it] = j++;
-        useRange = false;
     }
 
     for( unsigned iface = 0; iface < elems.size(); ++iface )
@@ -478,11 +475,12 @@ ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHa
         face.edges.resize( nnodesf );
         for( int iverts = 0; iverts < nnodesf; ++iverts )
         {
-            int indx = ( useRange ? verts.index( connectface[iverts] ) : indxMap[connectface[iverts]] );
+            int indx = indxMap[connectface[iverts]];
             assert( indx >= 0 );
             face.SetNode( iverts, indx );
         }
     }
+    indxMap.clear();
 
     unsigned nnodes = verts.size();
     nodes.resize( nnodes );
@@ -862,6 +860,7 @@ bool operator<( Node const& lhs, Node const& rhs )
     return std::pow( lhs.x - rhs.x, 2.0 ) + std::pow( lhs.y - rhs.y, 2.0 ) + std::pow( lhs.z - rhs.z, 2.0 );
 }
 
+#define NEW_META_METHOD
 ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, moab::Range& entities, const std::string dofTagName,
                                                  int nP, bool fNoBubble )
 {
@@ -875,6 +874,7 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, moab::Range& enti
     // Sanity check number of Faces
     assert( csMesh.faces.size() - entities.size() == 0 );
 
+#ifdef NEW_META_METHOD
     if( created )  // Only update if the tag does not exist already.
     {
         // Initialize data structures
@@ -885,9 +885,26 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, moab::Range& enti
 
         double dAccumulatedJacobian = GenerateMetaData( csMesh, nP, fNoBubble, dataGLLnodes, dataGLLJacobian );
 
-        rval = m_interface->tag_set_data( dofTag, entities, dataGLLnodes( 0, 0 ) );MB_CHK_ERR( rval );
+        if( fabs( dTotalAreaInput - dAccumulatedJacobian ) > HighTolerance )
+        {
+            _EXCEPTION2( "Possibly invalid accumulated Jacobian (%f) on Cubed-Sphere mesh with area = %f\n",
+                         dAccumulatedJacobian, dTotalAreaInput );
+        }
+
+        std::vector< int > dofIDs( entities.size() * nP * nP );
+        int dofindex = 0;
+        // Let us permute the data since MOAB requires it with leading element ordering
+        for( size_t ie = 0; ie < entities.size(); ++ie )
+        {
+            for( int j = 0; j < nP; ++j )
+                for( int i = 0; i < nP; ++i )
+                    dofIDs[dofindex++] = dataGLLnodes[j][i][ie];
+        }
+
+        rval = m_interface->tag_set_data( dofTag, entities, &dofIDs[0] );MB_CHK_ERR( rval );
 
         // clear memory
+        dofIDs.clear();
         dataGLLnodes.Detach();
         dataGLLJacobian.Detach();
     }
@@ -895,6 +912,142 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, moab::Range& enti
     {
         std::cout << "\"" << dofTagName << "\" DoF tag already exists. Not updating..." << std::flush;
     }
+#else
+
+    // Number of Faces
+    int nElements = static_cast< int >( csMesh.faces.size() );
+
+    // Initialize data structures
+    std::map< Node, int > mapNodes;
+    std::map< Node, moab::EntityHandle > mapLocalMBNodes;
+
+    // GLL Quadrature nodes
+    DataArray1D< double > dG;
+    DataArray1D< double > dW;
+    GaussLobattoQuadrature::GetPoints( nP, 0.0, 1.0, dG, dW );
+
+    moab::Range newentities( entities );
+    double elcoords[3];
+    for( unsigned iel = 0; iel < newentities.size(); ++iel )
+    {
+        EntityHandle eh = newentities[iel];
+        rval            = m_interface->get_coords( &eh, 1, elcoords );
+        Node elCentroid( elcoords[0], elcoords[1], elcoords[2] );
+        mapLocalMBNodes.insert( std::pair< Node, moab::EntityHandle >( elCentroid, eh ) );
+    }
+
+    // Build a Kd-tree for local mesh (nearest neighbor searches)
+    // Loop over all elements in CS-Mesh
+    // Then find if current centroid is in an element
+    //     If yes - then let us compute the DoF numbering and set to tag data
+    //     If no - then compute DoF numbering BUT DO NOT SET to tag data
+    // continue
+    int* dofIDs = new int[nP * nP];
+
+    // Write metadata
+    for( int k = 0; k < nElements; k++ )
+    {
+        const Face& face        = csMesh.faces[k];
+        const NodeVector& nodes = csMesh.nodes;
+
+        if( face.edges.size() != 4 )
+        {
+            _EXCEPTIONT( "Mesh must only contain quadrilateral elements" );
+        }
+
+        Node centroid;
+        centroid.x = centroid.y = centroid.z = 0.0;
+        for( unsigned l = 0; l < face.edges.size(); ++l )
+        {
+            centroid.x += nodes[face[l]].x;
+            centroid.y += nodes[face[l]].y;
+            centroid.z += nodes[face[l]].z;
+        }
+        const double factor = 1.0 / face.edges.size();
+        centroid.x *= factor;
+        centroid.y *= factor;
+        centroid.z *= factor;
+
+        bool locElem = false;
+        EntityHandle current_eh;
+        if( mapLocalMBNodes.find( centroid ) != mapLocalMBNodes.end() )
+        {
+            locElem    = true;
+            current_eh = mapLocalMBNodes[centroid];
+        }
+        else
+            std::cout << "ERROR: Could not find a MOAB element in TempestRemap copy of the mesh. Index = " << k
+                      << std::endl;
+
+        for( int j = 0; j < nP; j++ )
+        {
+            for( int i = 0; i < nP; i++ )
+            {
+
+                // Get local map vectors
+                Node nodeGLL;
+                Node dDx1G;
+                Node dDx2G;
+
+                // ApplyLocalMap(
+                //     face,
+                //     nodevec,
+                //     dG[i],
+                //     dG[j],
+                //     nodeGLL,
+                //     dDx1G,
+                //     dDx2G);
+                const double& dAlpha = dG[i];
+                const double& dBeta  = dG[j];
+
+                // Calculate nodal locations on the plane
+                double dXc = nodes[face[0]].x * ( 1.0 - dAlpha ) * ( 1.0 - dBeta ) +
+                             nodes[face[1]].x * dAlpha * ( 1.0 - dBeta ) + nodes[face[2]].x * dAlpha * dBeta +
+                             nodes[face[3]].x * ( 1.0 - dAlpha ) * dBeta;
+
+                double dYc = nodes[face[0]].y * ( 1.0 - dAlpha ) * ( 1.0 - dBeta ) +
+                             nodes[face[1]].y * dAlpha * ( 1.0 - dBeta ) + nodes[face[2]].y * dAlpha * dBeta +
+                             nodes[face[3]].y * ( 1.0 - dAlpha ) * dBeta;
+
+                double dZc = nodes[face[0]].z * ( 1.0 - dAlpha ) * ( 1.0 - dBeta ) +
+                             nodes[face[1]].z * dAlpha * ( 1.0 - dBeta ) + nodes[face[2]].z * dAlpha * dBeta +
+                             nodes[face[3]].z * ( 1.0 - dAlpha ) * dBeta;
+
+                double dR = sqrt( dXc * dXc + dYc * dYc + dZc * dZc );
+
+                // Mapped node location
+                nodeGLL.x = dXc / dR;
+                nodeGLL.y = dYc / dR;
+                nodeGLL.z = dZc / dR;
+
+                // Determine if this is a unique Node
+                std::map< Node, int >::const_iterator iter = mapNodes.find( nodeGLL );
+                if( iter == mapNodes.end() )
+                {
+                    // Insert new unique node into map
+                    int ixNode = static_cast< int >( mapNodes.size() );
+                    mapNodes.insert( std::pair< Node, int >( nodeGLL, ixNode ) );
+                    dofIDs[j * nP + i] = ixNode + 1;
+                }
+                else
+                {
+                    dofIDs[j * nP + i] = iter->second + 1;
+                }
+            }
+        }
+
+        if( locElem )
+        {
+            rval = m_interface->tag_set_data( dofTag, &current_eh, 1, dofIDs );MB_CHK_SET_ERR( rval, "Failed to tag_set_data for DoFs" );
+        }
+    }
+
+    // clear memory
+    delete[] dofIDs;
+    mapLocalMBNodes.clear();
+    mapNodes.clear();
+
+#endif
 
     return moab::MB_SUCCESS;
 }
@@ -1063,8 +1216,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         if( m_overlap != NULL ) delete m_overlap;
         m_overlap         = new Mesh();
         bool concaveMeshA = false, concaveMeshB = false;
-        int err = GenerateOverlapWithMeshesKdx( *m_covering_source, *m_target, *m_overlap, "" /*outFilename*/,
-                                                "Netcdf4", "exact", concaveMeshA, concaveMeshB, false );
+        int err = GenerateOverlapWithMeshes( *m_covering_source, *m_target, *m_overlap, "" /*outFilename*/, "Netcdf4",
+                                             "exact", concaveMeshA, concaveMeshB, false );
         if( err )
         {
             MB_CHK_SET_ERR( MB_FAILURE, "TempestRemap: Can't compute the intersection of meshes on the sphere" );

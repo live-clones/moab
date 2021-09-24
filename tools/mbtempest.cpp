@@ -81,7 +81,7 @@ struct ToolContext
           blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), baselineFile( "" ),
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
           verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), fNoConservation( false ),
-          fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ),
+          fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( false ), fInputConcave( false ),
           fOutputConcave( false ), fCheck( n_procs > 1 ? false : true ), print_diagnostics( true )
     {
         inFilenames.resize( 2 );
@@ -768,8 +768,8 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
     if( ctx.meshType == moab::TempestRemapper::OVERLAP_FILES )
     {
         // For the overlap method, choose between: "fuzzy", "exact" or "mixed"
-        err = GenerateOverlapMeshKdx( ctx.inFilenames[0], ctx.inFilenames[1], *tempest_mesh, ctx.outFilename, "NetCDF4",
-                                      "exact", true );
+        err = GenerateOverlapMesh( ctx.inFilenames[0], ctx.inFilenames[1], *tempest_mesh, ctx.outFilename, "NetCDF4",
+                                   "exact", true );
 
         if( err )
         {
@@ -799,8 +799,8 @@ static moab::ErrorCode CreateTempestMesh( ToolContext& ctx, moab::TempestRemappe
 
         // Now let us construct the overlap mesh, by calling TempestRemap interface directly
         // For the overlap method, choose between: "fuzzy", "exact" or "mixed"
-        err = GenerateOverlapWithMeshesKdx( *ctx.meshes[0], *ctx.meshes[1], *tempest_mesh, "" /*ctx.outFilename*/,
-                                            "NetCDF4", "exact", false );
+        err = GenerateOverlapWithMeshes( *ctx.meshes[0], *ctx.meshes[1], *tempest_mesh, "" /*ctx.outFilename*/,
+                                         "NetCDF4", "exact", false );
 
         if( err )
         {
