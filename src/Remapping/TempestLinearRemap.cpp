@@ -589,40 +589,46 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             //     m_remapper->lid_to_gid_covsrc[m_meshOverlap->vecSourceFaceIx[ixOverlap + j]],
             //     m_meshOverlap->vecFaceArea[ixOverlap + j] );
             // #endif
+#define USE_CENTER_POLYGON
 
-            int nOverlapTriangles = faceOverlap.edges.size() - 2;
-
-#define USE_MININDEX
-
-#ifdef USE_MININDEX
-            // first find out the minimum node, start there the triangle decomposition
-            int minIndex = 0;
-            int nnodes   = faceOverlap.edges.size();
-            for( int j1 = 1; j1 < nnodes; j1++ )
+#ifdef  USE_CENTER_POLYGON
+            int nOverlapTriangles = faceOverlap.edges.size();
+            Node center = nodesOverlap[faceOverlap[0]];
+            for (int i=1; i< nOverlapTriangles; i++)
             {
-                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] )
-                {
-                    minIndex = j1;
-                }
+                const Node& node = nodesOverlap[faceOverlap[i]];
+                center = center + node;
             }
+            center = center/nOverlapTriangles;
+            double magni = sqrt( center.x * center.x + center.y * center.y +
+                    center.z * center.z );
+            center = center/magni; // project back on sphere
+
+#else
+            int nOverlapTriangles = faceOverlap.edges.size() -2;
 #endif
 
             // Loop over all sub-triangles of this Overlap Face
             for( int k = 0; k < nOverlapTriangles; k++ )
             {
-#ifdef USE_MININDEX
-                minIndex = 1;
-                // Cornerpoints of triangle, they start at the minimal Node, for consistency
-                const Node& node0 = nodesOverlap[faceOverlap[minIndex]];
-                const Node& node1 = nodesOverlap[faceOverlap[( minIndex + k + 1 ) % nnodes]];
-                const Node& node2 = nodesOverlap[faceOverlap[( minIndex + k + 2 ) % nnodes]];
-
-                // Calculate the area of the modified Face
+#ifdef  USE_CENTER_POLYGON
                 Face faceTri( 3 );
-                faceTri.SetNode( 0, faceOverlap[minIndex] );
-                faceTri.SetNode( 1, faceOverlap[( minIndex + k + 1 ) % nnodes] );
-                faceTri.SetNode( 2, faceOverlap[( minIndex + k + 2 ) % nnodes] );
+                NodeVector nodes( 3 );
+                nodes[0] = center;
+                nodes[1] = nodesOverlap[faceOverlap[k]];
+                int k1 = (k+1)%nOverlapTriangles;
+                nodes[2] = nodesOverlap[faceOverlap[k1]];
+                faceTri.SetNode( 0, 0 );
+                faceTri.SetNode( 1, 1 );
+                faceTri.SetNode( 2, 2 );
+                // this should be simplified; we are forming these arrays just to compute area of a triangle
+                // face palm :(
+                double dTriangleArea = CalculateFaceArea( faceTri, nodes );
+                const Node& node0 = nodes[0];
+                const Node& node1 = nodes[1];
+                const Node& node2 = nodes[2];
 #else
+
                 // Cornerpoints of triangle
                 const Node& node0 = nodesOverlap[faceOverlap[0]];
                 const Node& node1 = nodesOverlap[faceOverlap[k + 1]];
@@ -633,10 +639,9 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                 faceTri.SetNode( 0, faceOverlap[0] );
                 faceTri.SetNode( 1, faceOverlap[k + 1] );
                 faceTri.SetNode( 2, faceOverlap[k + 2] );
-#endif
 
                 double dTriangleArea = CalculateFaceArea( faceTri, nodesOverlap );
-
+#endif
                 // Coordinates of quadrature Node
                 for( int l = 0; l < TriQuadraturePoints; l++ )
                 {
