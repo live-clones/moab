@@ -36,9 +36,17 @@
 #endif
 
 #ifdef MOAB_HAVE_EIGEN3
+#ifdef NDEBUG
+#undef NDEBUG
+#define DEBUG_MODE
+#endif
 #define EIGEN_NO_DEBUG
 #define EIGEN_MAX_CPP_VER 11
 #include "Eigen/Dense"
+#ifdef DEBUG_MODE
+#undef DEBUG_MODE
+#define NDEBUG
+#endif
 #endif
 
 namespace moab
