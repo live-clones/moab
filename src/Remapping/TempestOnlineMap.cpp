@@ -21,6 +21,9 @@
 #include "SparseMatrix.h"
 #include "STLStringHelper.h"
 
+#include "LinearRemapSE0.h"
+#include "LinearRemapFV.h"
+
 #include "moab/Remapping/TempestOnlineMap.hpp"
 #include "DebugOutput.hpp"
 #include "moab/TupleList.hpp"
@@ -40,17 +43,6 @@
 // #define VERBOSE
 // #define VVERBOSE
 // #define CHECK_INCREASING_DOF
-
-void LinearRemapFVtoGLL( const Mesh& meshInput, const Mesh& meshOutput, const Mesh& meshOverlap,
-                         const DataArray3D< int >& dataGLLNodes, const DataArray3D< double >& dataGLLJacobian,
-                         const DataArray1D< double >& dataGLLNodalArea, int nOrder, OfflineMap& mapRemap,
-                         int nMonotoneType, bool fContinuous, bool fNoConservation );
-
-void LinearRemapFVtoGLL_Volumetric( const Mesh& meshInput, const Mesh& meshOutput, const Mesh& meshOverlap,
-                                    const DataArray3D< int >& dataGLLNodes,
-                                    const DataArray3D< double >& dataGLLJacobian,
-                                    const DataArray1D< double >& dataGLLNodalArea, int nOrder, OfflineMap& mapRemap,
-                                    int nMonotoneType, bool fContinuous, bool fNoConservation );
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -177,19 +169,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapTags( const std::string srcDofT
 
     if( rval == moab::MB_TAG_NOT_FOUND && m_eInputType != DiscretizationType_FV )
     {
-        int ntot_elements = 0, nelements = m_remapper->m_source_entities.size();
-#ifdef MOAB_HAVE_MPI
-        int ierr = MPI_Allreduce( &nelements, &ntot_elements, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
-        if( ierr != 0 ) MB_CHK_SET_ERR( MB_FAILURE, "MPI_Allreduce failed to get total source elements" );
-#else
-        ntot_elements = nelements;
-#endif
-
-        rval = m_remapper->GenerateCSMeshMetadata( ntot_elements, m_remapper->m_covering_source_entities,
-                                                   &m_remapper->m_source_entities, srcDofTagName, m_nDofsPEl_Src );MB_CHK_ERR( rval );
-
-        rval = m_interface->tag_get_handle( srcDofTagName.c_str(), m_nDofsPEl_Src * m_nDofsPEl_Src, MB_TYPE_INTEGER,
-                                            this->m_dofTagSrc, MB_TAG_ANY );MB_CHK_ERR( rval );
+        MB_CHK_SET_ERR( MB_FAILURE, "DoF tag is not set correctly for source mesh." );
     }
     else
         MB_CHK_ERR( rval );
@@ -199,19 +179,7 @@ moab::ErrorCode moab::TempestOnlineMap::SetDOFmapTags( const std::string srcDofT
         m_interface->tag_get_handle( tgtDofTagName.c_str(), tagSize, MB_TYPE_INTEGER, this->m_dofTagDest, MB_TAG_ANY );
     if( rval == moab::MB_TAG_NOT_FOUND && m_eOutputType != DiscretizationType_FV )
     {
-        int ntot_elements = 0, nelements = m_remapper->m_target_entities.size();
-#ifdef MOAB_HAVE_MPI
-        int ierr = MPI_Allreduce( &nelements, &ntot_elements, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
-        if( ierr != 0 ) MB_CHK_SET_ERR( MB_FAILURE, "MPI_Allreduce failed to get total source elements" );
-#else
-        ntot_elements = nelements;
-#endif
-
-        rval = m_remapper->GenerateCSMeshMetadata( ntot_elements, m_remapper->m_target_entities, NULL, tgtDofTagName,
-                                                   m_nDofsPEl_Dest );MB_CHK_ERR( rval );
-
-        rval = m_interface->tag_get_handle( tgtDofTagName.c_str(), m_nDofsPEl_Dest * m_nDofsPEl_Dest, MB_TYPE_INTEGER,
-                                            this->m_dofTagDest, MB_TAG_ANY );MB_CHK_ERR( rval );
+        MB_CHK_SET_ERR( MB_FAILURE, "DoF tag is not set correctly for target mesh." );
     }
     else
         MB_CHK_ERR( rval );
@@ -1175,6 +1143,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
                              "GLL input mesh" );
             }
 
+            // LinearRemapSE4( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, dataGLLNodesSrcCov, dataGLLJacobian,
+            // nMonotoneType, fContinuousIn,
+            //                              fNoConservation, false, *this );
             LinearRemapSE4_Tempest_MOAB( dataGLLNodesSrcCov, dataGLLJacobian, nMonotoneType, fContinuousIn,
                                          fNoConservation );
         }
@@ -1351,7 +1322,7 @@ int moab::TempestOnlineMap::IsConsistent( double dTolerance )
 
     int ierr;
     int fConsistentGlobal = 0;
-    ierr = MPI_Allreduce( &fConsistent, &fConsistentGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
+    ierr                  = MPI_Allreduce( &fConsistent, &fConsistentGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     return fConsistentGlobal;
@@ -1531,7 +1502,7 @@ int moab::TempestOnlineMap::IsMonotone( double dTolerance )
 
     int ierr;
     int fMonotoneGlobal = 0;
-    ierr = MPI_Allreduce( &fMonotone, &fMonotoneGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
+    ierr                = MPI_Allreduce( &fMonotone, &fMonotoneGlobal, 1, MPI_INT, MPI_SUM, m_pcomm->comm() );
     if( ierr != MPI_SUCCESS ) return -1;
 
     return fMonotoneGlobal;
@@ -2030,7 +2001,7 @@ moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::Intersec
     }
 #else
     ntotsize_glob = ntotsize;
-    globerrnorms = errnorms;
+    globerrnorms  = errnorms;
 #endif
     globerrnorms[0] = ( globerrnorms[0] / ntotsize_glob );
     globerrnorms[1] = std::sqrt( globerrnorms[1] / ntotsize_glob );

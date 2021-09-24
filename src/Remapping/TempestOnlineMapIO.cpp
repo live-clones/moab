@@ -717,26 +717,11 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
 
         if( m_srcDiscType == DiscretizationType_CGLL )
         {
-            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, m_meshInput->vecFaceArea );
+            GenerateUniqueJacobian( dataGLLNodesSrc, dataGLLJacobianSrc, vecSourceFaceArea );
         }
         else
         {
-            GenerateDiscontinuousJacobian( dataGLLJacobianSrc, m_meshInput->vecFaceArea );
-        }
-
-        vecSourceFaceArea.Allocate( m_meshInput->faces.size() * m_nDofsPEl_Src * m_nDofsPEl_Src );
-        int offset = 0;
-        for( size_t e = 0; e < m_meshInput->faces.size(); e++ )
-        {
-            for( int s = 0; s < m_nDofsPEl_Src; s++ )
-            {
-                for( int t = 0; t < m_nDofsPEl_Src; t++ )
-                {
-                    vecSourceFaceArea[srccol_dtoc_dofmap[offset + s * m_nDofsPEl_Src + t]] =
-                        dataGLLJacobianSrc[s][t][e];
-                }
-            }
-            offset += m_nDofsPEl_Src * m_nDofsPEl_Src;
+            GenerateDiscontinuousJacobian( dataGLLJacobianSrc, vecSourceFaceArea );
         }
     }
 
@@ -762,25 +747,11 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
 
         if( m_destDiscType == DiscretizationType_CGLL )
         {
-            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, m_meshOutput->vecFaceArea );
+            GenerateUniqueJacobian( dataGLLNodesDest, dataGLLJacobianDest, vecTargetFaceArea );
         }
         else
         {
-            GenerateDiscontinuousJacobian( dataGLLJacobianDest, m_meshOutput->vecFaceArea );
-        }
-
-        vecTargetFaceArea.Allocate( m_meshOutput->faces.size() * m_nDofsPEl_Dest * m_nDofsPEl_Dest );
-        int offset = 0;
-        for( size_t e = 0; e < m_meshOutput->faces.size(); e++ )
-        {
-            for( int s = 0; s < m_nDofsPEl_Dest; s++ )
-            {
-                for( int t = 0; t < m_nDofsPEl_Dest; t++ )
-                {
-                    vecTargetFaceArea[row_dtoc_dofmap[offset + s * m_nDofsPEl_Dest + t]] = dataGLLJacobianDest[s][t][e];
-                }
-            }
-            offset += m_nDofsPEl_Dest * m_nDofsPEl_Dest;
+            GenerateDiscontinuousJacobian( dataGLLJacobianDest, vecTargetFaceArea );
         }
     }
 
