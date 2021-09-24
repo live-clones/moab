@@ -141,7 +141,6 @@ struct ToolContext
         std::string expectedMethod     = "fv";
         std::string expectedDofTagName = "GLOBAL_ID";
         int expectedOrder              = 1;
-        bool fBubble                   = false;
 
         if( !proc_id )
         {
@@ -202,16 +201,13 @@ struct ToolContext
                              &verifyWeights );
         opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
                              &enforceConvexity );
-        opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes", &fBubble );
+        opts.addOpt< void >( "nobubble", "do not use bubble on interior of spectral element nodes", &fNoBubble );
 
         opts.parseCommandLine( argc, argv );
 
         // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree
         // algorithm
         kdtreeSearch = opts.numOptSet( "advfront,a" ) == 0;
-
-        // negate the option
-        fNoBubble = !fBubble;
 
         switch( imeshType )
         {

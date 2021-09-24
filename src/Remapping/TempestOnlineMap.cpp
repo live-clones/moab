@@ -664,10 +664,9 @@ moab::ErrorCode moab::TempestOnlineMap::set_col_dc_dofs( std::vector< int >& val
 {
     // col_gdofmap has global dofs , that should be in the list of values, such that
     // row_dtoc_dofmap[offsetDOF] = localDOF;
-    // //  we need to find col_dtoc_dofmap such that: col_gdofmap[ col_dtoc_dofmap[i] ] == values_entities [i];
-    // we know that col_gdofmap[0..(nbcols-1)] = global_col_dofs -> in values_entities
-    // form first inverse
 
+    // We need to find col_dtoc_dofmap such that: col_gdofmap[ col_dtoc_dofmap[i] ] == values_entities [i];
+    // We know that col_gdofmap[0..(nbcols-1)] = global_col_dofs -> in values_entities form first inverse
     col_dtoc_dofmap.resize( values_entities.size() );
     for( int j = 0; j < (int)values_entities.size(); j++ )
     {
@@ -676,8 +675,6 @@ moab::ErrorCode moab::TempestOnlineMap::set_col_dc_dofs( std::vector< int >& val
         else
         {
             col_dtoc_dofmap[j] = -1;  // signal that this value should not be used in
-            // std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not
-            // found in colMap \n";
         }
     }
     return moab::MB_SUCCESS;
@@ -696,8 +693,6 @@ moab::ErrorCode moab::TempestOnlineMap::set_row_dc_dofs( std::vector< int >& val
         else
         {
             row_dtoc_dofmap[j] = -1;  // not all values are used
-            // std::cout <<"values_entities[j] -  1: " << values_entities[j] -  1 <<" at index j = " << j <<  " not
-            // found in rowMap \n";
         }
     }
     return moab::MB_SUCCESS;
@@ -705,7 +700,7 @@ moab::ErrorCode moab::TempestOnlineMap::set_row_dc_dofs( std::vector< int >& val
 ///////////////////////////////////////////////////////////////////////////////
 
 moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
-    std::string strInputType, std::string strOutputType, const int nPin, const int nPout, bool fBubble,
+    std::string strInputType, std::string strOutputType, const int nPin, const int nPout, bool fNoBubble,
     int fMonotoneTypeID, bool fVolumetric, bool fNoConservation, bool fNoCheck, const std::string srcDofTagName,
     const std::string tgtDofTagName, const bool fInputConcave, const bool fOutputConcave )
 {
@@ -975,7 +970,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
             if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
             double dNumericalArea_loc =
-                GenerateMetaData( *m_meshOutput, nPout, fBubble, dataGLLNodesDest, dataGLLJacobian );
+                GenerateMetaData( *m_meshOutput, nPout, fNoBubble, dataGLLNodesDest, dataGLLJacobian );
 
             double dNumericalArea = dNumericalArea_loc;
 #ifdef MOAB_HAVE_MPI
@@ -1041,8 +1036,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
                     DataArray3D< double > dataGLLJacobianSrc;
-                    GenerateMetaData( *m_meshInputCov, nPin, fBubble, dataGLLNodesSrcCov, dataGLLJacobian );
-                    GenerateMetaData( *m_meshInput, nPin, fBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
+                    GenerateMetaData( *m_meshInputCov, nPin, fNoBubble, dataGLLNodesSrcCov, dataGLLJacobian );
+                    GenerateMetaData( *m_meshInput, nPin, fNoBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
                 }
             }
             // else { /* Source is a point cloud dataset */ }
@@ -1061,7 +1056,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
                 else
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
-                    GenerateMetaData( *m_meshOutput, nPout, fBubble, dataGLLNodesDest, dataGLLJacobian );
+                    GenerateMetaData( *m_meshOutput, nPout, fNoBubble, dataGLLNodesDest, dataGLLJacobian );
                 }
             }
             // else { /* Target is a point cloud dataset */ }
@@ -1083,10 +1078,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
 
             if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
             // double dNumericalAreaCov_loc =
-            GenerateMetaData( *m_meshInputCov, nPin, fBubble, dataGLLNodesSrcCov, dataGLLJacobian );
+            GenerateMetaData( *m_meshInputCov, nPin, fNoBubble, dataGLLNodesSrcCov, dataGLLJacobian );
 
             double dNumericalArea_loc =
-                GenerateMetaData( *m_meshInput, nPin, fBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
+                GenerateMetaData( *m_meshInput, nPin, fNoBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
 
             // if ( is_root ) dbgprint.printf ( 0, "Input Mesh: Coverage Area: %1.15e, Output Area:
             // %1.15e\n", dNumericalAreaCov_loc, dTotalAreaOutput_loc );
@@ -1157,10 +1152,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             // Input metadata
             if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
             double dNumericalAreaIn_loc =
-                GenerateMetaData( *m_meshInputCov, nPin, fBubble, dataGLLNodesSrcCov, dataGLLJacobianIn );
+                GenerateMetaData( *m_meshInputCov, nPin, fNoBubble, dataGLLNodesSrcCov, dataGLLJacobianIn );
 
             double dNumericalAreaSrc_loc =
-                GenerateMetaData( *m_meshInput, nPin, fBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
+                GenerateMetaData( *m_meshInput, nPin, fNoBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
 
             assert( dNumericalAreaIn_loc >= dNumericalAreaSrc_loc );
 
@@ -1180,7 +1175,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights(
             // Output metadata
             if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
             double dNumericalAreaOut_loc =
-                GenerateMetaData( *m_meshOutput, nPout, fBubble, dataGLLNodesDest, dataGLLJacobianOut );
+                GenerateMetaData( *m_meshOutput, nPout, fNoBubble, dataGLLNodesDest, dataGLLJacobianOut );
 
             double dNumericalAreaOut = dNumericalAreaOut_loc;
 #ifdef MOAB_HAVE_MPI

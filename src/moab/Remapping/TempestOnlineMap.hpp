@@ -75,7 +75,7 @@ class TempestOnlineMap : public OfflineMap
     ///     the result in the SparseMatrix.
     ///	</summary>
     moab::ErrorCode GenerateRemappingWeights( std::string strInputType = "fv", std::string strOutputType = "fv",
-                                              const int nPin = 1, const int nPout = 1, bool fBubble = false,
+                                              const int nPin = 1, const int nPout = 1, bool fNoBubble = false,
                                               int fMonotoneTypeID = 0, bool fVolumetric = false,
                                               bool fNoConservation = false, bool fNoCheck = false,
                                               const std::string srcDofTagName = "GLOBAL_ID",
