@@ -75,7 +75,7 @@ struct FindVolTestResult
 };
 
 // Test Geometry
-//
+
 // The test geometry consists of 3 cubes, one of which
 // overlaps another. Volumes 1 and 2 have edges with
 // length 1. Volume 3 has an edge length of 0.5.

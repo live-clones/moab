@@ -557,8 +557,8 @@ void test_huge_var_length()
     std::vector< double > dataArr;  // larger than the buffer
     int N = 2000;
     dataArr.resize( N );  // size will be 8 * N > bufferSize = 10000 set by option during writing
-    for( int i = 0; i < N; i++ )
-        dataArr[i] = i;
+    for( int j = 0; j < N; j++ )
+        dataArr[j] = j;
     const void* ptr = &dataArr[0];
     rval            = mb1.tag_set_by_ptr( tag, &v1, 1, &ptr, &N );CHECK_ERR( rval );
     // second vertex, do a smaller N

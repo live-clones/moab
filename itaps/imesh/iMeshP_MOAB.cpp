@@ -1390,7 +1390,8 @@ static bool append_option( std::string& opt, const char* option, const char* def
     if( strchr( option, sep ) || ( default_value && strchr( default_value, sep ) ) )
     {
         // options can't have a separator in them; XXX work around this
-        return iBase_INVALID_ARGUMENT;
+      return (iBase_INVALID_ARGUMENT > 0); // convert original return to a bool to eliminate warning
+      // return iBase_INVALID_ARGUMENT;
     }
 
     // search for the required option

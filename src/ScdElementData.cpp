@@ -28,17 +28,21 @@ EntityID ScdElementData::calc_num_entities( EntityHandle start_handle, int irang
                                             int* is_periodic )
 {
     size_t result = 1;
-    switch( CN::Dimension( TYPE_FROM_HANDLE( start_handle ) ) )
+    auto dim = CN::Dimension( TYPE_FROM_HANDLE( start_handle ) );
+    switch( dim)
     {
         default:
             result = 0;
             assert( false );
             break;
         case 3:
-            result *= krange;
         case 2:
-            result *= ( is_periodic && is_periodic[1] ? ( jrange + 1 ) : jrange );
         case 1:
+	  if (3 == dim)
+            result *= krange;
+	  if (2 <= dim)
+            result *= ( is_periodic && is_periodic[1] ? ( jrange + 1 ) : jrange );
+	  if (1 <= dim)
             result *= ( is_periodic && is_periodic[0] ? ( irange + 1 ) : irange );
     }
     return result;

@@ -219,6 +219,14 @@ class BVHTree : public Tree
         double Lmax, Rmin;
         BoundBox box;
         Node() : dim( UINT_MAX ), child( UINT_MAX ), Lmax( -DBL_MAX ), Rmin( DBL_MAX ) {}
+        Node( const Node& f )
+        {
+            dim      = f.dim;
+            child    = f.child;
+            Lmax     = f.Lmax;
+            Rmin     = f.Rmin;
+            entities = f.entities;
+        }
         Node& operator=( const Node& f )
         {
             dim      = f.dim;
@@ -239,6 +247,13 @@ class BVHTree : public Tree
         TreeNode( int dm, int chld, double lmx, double rmn, BoundBox& bx )
             : dim( dm ), child( chld ), Lmax( lmx ), Rmin( rmn ), box( bx )
         {
+        }
+        TreeNode( const TreeNode& f )
+        {
+            dim   = f.dim;
+            child = f.child;
+            Lmax  = f.Lmax;
+            Rmin  = f.Rmin;
         }
         TreeNode& operator=( const TreeNode& f )
         {
