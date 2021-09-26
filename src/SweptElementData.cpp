@@ -27,17 +27,21 @@ namespace moab
 EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange )
 {
     size_t result = 1;
-    switch( CN::Dimension( TYPE_FROM_HANDLE( start_handle ) ) )
+    auto dim = CN::Dimension( TYPE_FROM_HANDLE( start_handle ) );
+    switch( dim )
     {
         default:
             result = 0;
             assert( false );
             break;
         case 3:
-            result *= krange;
         case 2:
-            result *= jrange;
         case 1:
+	  if (3 == dim)
+            result *= krange;
+	  if (2 <= dim)
+            result *= jrange;
+	  if (1 <= dim)
             result *= irange;
     }
     return result;

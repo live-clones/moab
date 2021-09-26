@@ -49,8 +49,9 @@ double measure( moab::EntityType type, int num_vertices, const double* vertex_co
         case moab::MBTRI:
             return 0.5 * ( ( coords[1] - coords[0] ) * ( coords[2] - coords[0] ) ).length();
         case moab::MBQUAD:
-            num_vertices = 4;
         case moab::MBPOLYGON: {
+  	    if (moab::MBQUAD == type)
+              num_vertices = 4;
             CartVect mid( 0, 0, 0 );
             for( int i = 0; i < num_vertices; ++i )
                 mid += coords[i];

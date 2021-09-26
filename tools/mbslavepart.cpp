@@ -161,7 +161,7 @@ int main( int argc, char* argv[] )
     std::cout << "Master (elements, parts) : (" << melems.size() << ", " << msets.size()
               << "), Slave (elements, parts) : (" << selems.size() << ", " << ssets.size() << ")" << std::endl;
 
-    double master_radius = 1.0, slave_radius = 1.0;
+    double slave_radius = 1.0;
     std::vector< double > mastercoords;
     Range masterverts, slaveverts;
     {
@@ -173,8 +173,6 @@ int main( int argc, char* argv[] )
         double points[6];
         EntityHandle mfrontback[2] = { masterverts[0], masterverts[masterverts.size() - 1] };
         error                      = mbCore->get_coords( &mfrontback[0], 2, points );MB_CHK_ERR( error );
-        master_radius = 0.5 * ( std::sqrt( points[0] * points[0] + points[1] * points[1] + points[2] * points[2] ) +
-                                std::sqrt( points[3] * points[3] + points[4] * points[4] + points[5] * points[5] ) );
         EntityHandle sfrontback[2] = { slaveverts[0], slaveverts[slaveverts.size() - 1] };
         error                      = mbCore->get_coords( &sfrontback[0], 2, points );MB_CHK_ERR( error );
         slave_radius = 0.5 * ( std::sqrt( points[0] * points[0] + points[1] * points[1] + points[2] * points[2] ) +

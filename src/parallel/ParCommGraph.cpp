@@ -883,14 +883,14 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm, ParallelComm* pco, R
             for( std::vector< int >::iterator it = eids.begin(); it != eids.end(); it++ )
             {
                 int eID                                     = *it;
-                std::map< int, EntityHandle >::iterator mit = gidToHandle.find( eID );
-                if( mit == gidToHandle.end() )
+                std::map< int, EntityHandle >::iterator mit2 = gidToHandle.find( eID );
+                if( mit2 == gidToHandle.end() )
                 {
                     std::cout << " on rank: " << rankInJoin << " cannot find entity handle with global ID " << eID
                               << "\n";
                     return MB_FAILURE;
                 }
-                EntityHandle eh = mit->second;
+                EntityHandle eh = mit2->second;
                 for( i = 0; i < tag_handles.size(); i++ )
                 {
                     rval = mb->tag_set_data( tag_handles[i], &eh, 1, (void*)( buffer->buff_ptr ) );MB_CHK_ERR( rval );

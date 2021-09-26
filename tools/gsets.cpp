@@ -110,6 +110,7 @@ int main( int argc, char* argv[] )
                     break;
                 case 'h':
                     usage( argv[0], false );
+                    break;
                 default:
                     std::cerr << "Unknown flag: '" << argv[i][j] << "'" << std::endl;
                     usage( argv[0] );

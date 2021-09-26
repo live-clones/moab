@@ -132,9 +132,9 @@ ErrorCode HigherOrderFactory::convert_sequence( ElementSequence* seq, EntityHand
         default:
             return MB_TYPE_OUT_OF_RANGE;
         case MBEDGE:
-            mid_face_nodes = false;
         case MBTRI:
         case MBQUAD:
+	  if (seq->type() == MBEDGE) mid_face_nodes = false; // if test to avoid fall-through warning
             mid_volume_nodes = false;
         case MBTET:
         case MBHEX:

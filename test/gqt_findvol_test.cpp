@@ -71,7 +71,7 @@ struct FindVolTestResult
     int resultB;
 };
 
-// Test Geometry \\
+// Test Geometry
 
 // The test geometry consists of 3 cubes, one of which
 // overlaps another. Volumes 1 and 2 have edges with
@@ -137,7 +137,7 @@ void find_volume_tests()
         // Location: Positive Y Surface of Volume 2
         { { 0.6, 0.25000000000001, 0.0 }, { 0.0, 1.0, 0.0 }, 4, 0 },    // 24
         { { 0.6, 0.25000000000001, 0.0 }, { 0.0, -1.0, 0.0 }, 4, -1 },  // 25
-        /// ON-SURFACE POINT TESTS (not checked using PIV loop) \\\
+        /// ON-SURFACE POINT TESTS (not checked using PIV loop)
     // Point on surface of volume 1 w/ random directions
         { { 3.0, 0.5, 0.0 }, { 0.0, 0.0, 0.0 }, 1, 4 },  // 26
         // Point on surface of volume 2 w/ random directions

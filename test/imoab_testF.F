@@ -17,16 +17,16 @@
       integer ierr, num_procs, my_id
       integer pid
       integer compid
-      character*10 appname
-      character*200 filename
-      character*14  fname
-      character*150 readopts
+      character appname(10)
+      character filename(200), tmpname(250)
+      character  fname(200)
+      character readopts(150)
       integer ngv, nge, ndim, nparts
       integer nghlay
       integer nverts(3), nelem(3), nblocks(3), nsbc(3), ndbc(3)
 C      large enough work arrays
       integer iwork(100000)
-      real*8  dwork(100000)
+      double precision dwork(100000)
 C      indices in work arrays for vertex ids, ranks, coordinates
       integer vID, vRA, vCO
 C
@@ -36,7 +36,7 @@ C      size of coordinates array
       integer  nCO
       integer  bID
 C       for some tags in the file
-      character*20 tagname1, tagname2
+      character tagname1(20), tagname2(20)
       integer      tagtype(2), enttype(2), num_co
       integer      tagindex(2)
       integer      stags(2), itags(2), ntsync
@@ -53,7 +53,7 @@ C      IWORK(egID) , IWORK(elID) starts for global el ID, local elem ID
 C       indices for surface BC element, reference surf BC, value
       integer    isBC, irBC, ivBC
 
-      character*100 outfile, wopts
+      character outfile(100), wopts(100)
       my_id = 0
       fname = '/io/p8ex1.h5m' // char(0)
 #ifdef MOAB_HAVE_MPI
@@ -89,7 +89,7 @@ C      give a unique external id; here we just use 8?
 #endif
       call errorout(ierr, 'fail to register application')
 C
-      filename = MESHDIR2//fname
+      filename = MESHDIR2 // fname
       ierr = iMOAB_ReadHeaderInfo ( filename, ngv, nge, ndim, nparts)
       call errorout(ierr, 'fail to read header info')
 
@@ -194,7 +194,7 @@ C printf some of the block info */
         do i=1, nelem(3)
           write(*, 101) IWORK(eID+i-1), IWORK(eRA+i-1), IWORK(beID+i-1)
 101       FORMAT( ' global ID ', I5, ' rank: ',
-     &       I3, ' block ID: ' I4)
+     &       I3, ' block ID: ', I4)
         enddo
 
         do  i=1,nblocks(3)

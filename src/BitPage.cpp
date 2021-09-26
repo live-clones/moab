@@ -29,14 +29,16 @@ BitPage::BitPage( int per_ent, unsigned char init_val )
             assert( false );
             abort();
             break;  // must be power of two
-            // Note: no breaks. fall through such that all bits in init_val are set
+
+            // Note: fall through such that all bits in init_val are set, but with odd structure to avoid
+	    // fall-through warnings
         case 1:
-            init_val |= (unsigned char)( init_val << 1 );
         case 2:
-            init_val |= (unsigned char)( init_val << 2 );
         case 4:
-            init_val |= (unsigned char)( init_val << 4 );
-        case 8:;
+        case 8:
+	  if (1 == per_ent) init_val |= (unsigned char)( init_val << 1 );
+	  if (2 >= per_ent) init_val |= (unsigned char)( init_val << 2 );
+	  if (4 >= per_ent) init_val |= (unsigned char)( init_val << 4 );
     }
     memset( byteArray, init_val, BitTag::PageSize );
 }
