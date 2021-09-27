@@ -1328,12 +1328,10 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     intxCov.insert( covEnts[loc_gid_to_lid_covsrc[blueParent]] );
                 }
 
-                Range notNeededCovCells = moab::subtract( covEnts, intxCov );
                 Range intxCovRange;
-                std::copy( intxCov.rbegin(), intxCov.rend(), range_inserter( intxCovRange ) );
-                Range notNeededCovCells = moab::subtract( covEnts, intxCovRange );
+		std::copy( intxCov.rbegin(), intxCov.rend(), range_inserter( intxCovRange ) );
+		Range notNeededCovCells = moab::subtract( covEnts, intxCovRange );
 
-                // remove now from coverage set the cells that are not needed
                 rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                 covEnts = moab::subtract( covEnts, notNeededCovCells );
 #ifdef VERBOSE
