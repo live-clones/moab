@@ -93,16 +93,6 @@ int main( int argc, char* argv[] )
     rval = moab::IntxUtils::ScaleToRadius( mb, sf1, R );MB_CHK_ERR( rval );
     rval = moab::IntxUtils::ScaleToRadius( mb, sf2, R );MB_CHK_ERR( rval );
 
-#if 0
-  // std::cout << "Fix orientation etc ..\n";
-  //IntxUtils; those calls do nothing for a good mesh
-  rval = fix_degenerate_quads(mb, sf1);MB_CHK_ERR(rval);
-  rval = fix_degenerate_quads(mb, sf2);MB_CHK_ERR(rval);
-
-  rval = positive_orientation(mb, sf1, R);MB_CHK_ERR(rval);
-  rval = positive_orientation(mb, sf2, R);MB_CHK_ERR(rval);
-#endif
-
 #ifdef MOAB_HAVE_MPI
     ParallelComm* pcomm = ParallelComm::get_pcomm( mb, 0 );
 #endif

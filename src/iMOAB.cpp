@@ -3833,8 +3833,10 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
     appData& data_src  = context.appDatas[*pid_src];
     appData& data_tgt  = context.appDatas[*pid_tgt];
     appData& data_intx = context.appDatas[*pid_intx];
+    int rank = 0;
 #ifdef MOAB_HAVE_MPI
     ParallelComm* pco_intx = context.pcomms[*pid_intx];
+    rank = pco_intx->rank();
 #endif
 
     // Mesh intersection has already been computed; Return early.

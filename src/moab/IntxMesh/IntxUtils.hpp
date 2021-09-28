@@ -201,7 +201,7 @@ class IntxAreaUtils
 
     double area_on_sphere( Interface* mb, EntityHandle set, double R, int rank = -1);
 
-    ErrorCode positive_orientation( Interface* mb, EntityHandle set, double R, int rank = -1 );
+    ErrorCode positive_orientation( Interface* mb, EntityHandle set, double R, int rank );
 
   private:
     /* lHuiller method for computing area on a spherical triangle */
