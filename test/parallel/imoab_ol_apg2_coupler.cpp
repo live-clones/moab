@@ -779,7 +779,6 @@ int main( int argc, char* argv[] )
                                             strlen( "T_proj;u_proj;v_proj;" ) );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
-        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 
         // we can now free the sender buffers
         if( lndComm != MPI_COMM_NULL )
@@ -787,6 +786,8 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpLndPID, &cplatm );  // context is for atm
             CHECKIERR( ierr, "cannot free buffers used to send lnd tag towards the coverage mesh for atm" )
         }
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+        MPI_Barrier( MPI_COMM_WORLD );
 
         if( couComm != MPI_COMM_NULL )
         {
