@@ -565,7 +565,6 @@ int main( int argc, char* argv[] )
                                             strlen( "T_proj;u_proj;v_proj;" ) );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
-        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 
         // we can now free the sender buffers
         if( lndComm != MPI_COMM_NULL )
@@ -573,6 +572,7 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpLndPID, &cplatm );  // context is for atm
             CHECKIERR( ierr, "cannot free buffers used to send lnd tag towards the coverage mesh for atm" )
         }
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 #ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
@@ -616,6 +616,7 @@ int main( int argc, char* argv[] )
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
         // original graph: context is now the cpl
+        PUSH_TIMER( "Send/receive data from atm coupler to atm component with land proj" )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
@@ -641,6 +642,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
         MPI_Barrier( MPI_COMM_WORLD );
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 #ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
