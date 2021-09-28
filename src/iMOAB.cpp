@@ -411,8 +411,8 @@ ErrCode iMOAB_DeregisterApplication( iMOAB_AppID pid )
 }
 
 // Utility function
-static void split_tag_names( std::string input_names, std::string& separator,
-                             std::vector< std::string >& list_tag_names )
+void split_tag_names( std::string input_names, std::string& separator,
+		      std::vector< std::string >& list_tag_names )
 {
     size_t pos = 0;
     std::string token;

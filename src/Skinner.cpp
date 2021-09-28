@@ -1060,7 +1060,7 @@ ErrorCode Skinner::find_skin_vertices_1D( Tag tag, const Range& edges, Range& sk
         if( MB_SUCCESS != rval ) return rval;
 #ifdef MOAB_OLD_STD_COUNT
         n = 0;
-        std::count( tag_vals.begin(), tag_vals.end(), '\001', n );
+        std::count( tag_vals.begin(), tag_vals.end(), '\001' );
 #else
         n = std::count( tag_vals.begin(), tag_vals.end(), '\001' );
 #endif
@@ -1119,10 +1119,12 @@ class AdjSides
             switch( CORNERS )
             {
                 case 3:
-                    handles[1] = array[( idx + 2 ) % CORNERS];
                 case 2:
+		  if (3 == CORNERS)
+                    handles[1] = array[( idx + 2 ) % CORNERS];
+		  if (2 <= CORNERS)
                     handles[0] = array[( idx + 1 ) % CORNERS];
-                    break;
+		  break;
                 default:
                     assert( false );
                     break;
@@ -1145,10 +1147,12 @@ class AdjSides
             switch( CORNERS )
             {
                 case 3:
-                    handles[1] = array[indices[( idx + 2 ) % CORNERS]];
                 case 2:
+		  if (3 == CORNERS)
+                    handles[1] = array[indices[( idx + 2 ) % CORNERS]];
+		  if (2 <= CORNERS)
                     handles[0] = array[indices[( idx + 1 ) % CORNERS]];
-                    break;
+		  break;
                 default:
                     assert( false );
                     break;

@@ -14,11 +14,8 @@ using std::string;
 
 int main( int argc, char* argv[] )
 {
-    int proc_id = 0, size = 1;
 #ifdef MOAB_HAVE_MPI
     MPI_Init( &argc, &argv );
-    MPI_Comm_rank( MPI_COMM_WORLD, &proc_id );
-    MPI_Comm_size( MPI_COMM_WORLD, &size );
 #endif
     Core mcore;
     Interface* mb = &mcore;

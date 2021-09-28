@@ -7,7 +7,7 @@
 #endif
 #include "moab/MOABConfig.h"
 #ifdef MOAB_HAVE_MPI
-#include "mpi.h"
+#include "moab_mpi.h"
 #endif
 
 /* Define these here because they are used by many tests

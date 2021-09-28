@@ -267,7 +267,9 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     const EntityHandle* conn = NULL;
     int len                  = 0;
     ErrorCode rval           = MBI->get_connectivity( tri, conn, len );
-    if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+    if( MB_SUCCESS != rval || 3 != len )
+      return true; // NOTE: original code is next line, but return type was wrong; returning true to get same net effect
+      // return MB_FAILURE;
 
     // get adjacent tris (and keep their corresponding senses)
     std::vector< EntityHandle > adj_tris;
@@ -291,7 +293,9 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         {
             const EntityHandle* con = NULL;
             rval                    = MBI->get_connectivity( close_tris[i], con, len );
-            if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+            if( MB_SUCCESS != rval || 3 != len )
+	      // return MB_FAILURE;
+	      return true; // see comment earlier on wrong return type
 
             if( node == con[0] || node == con[1] || node == con[2] )
             {
@@ -302,7 +306,8 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         if( adj_tris.empty() )
         {
             std::cerr << "error: no tris are adjacent to the node" << std::endl;
-            return MB_FAILURE;
+            // return MB_FAILURE;
+	      return true; // see comment earlier on wrong return type
         }
         // edge intersection
     }
@@ -332,7 +337,9 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         {
             const EntityHandle* con = NULL;
             rval                    = MBI->get_connectivity( close_tris[i], con, len );
-            if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+            if( MB_SUCCESS != rval || 3 != len )
+	      // return MB_FAILURE;
+	      return true; // see comment earlier on wrong return type
 
             // check both orientations in case close_tris are not on the same surface
             if( ( endpts[0] == con[0] && endpts[1] == con[1] ) || ( endpts[0] == con[1] && endpts[1] == con[0] ) ||
@@ -354,7 +361,8 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     else
     {
         std::cerr << "error: special case not an node/edge intersection" << std::endl;
-        return MB_FAILURE;
+        // return MB_FAILURE;
+	return true; // see comment earlier on wrong return type
     }
 
     // The close tris were in proximity to the intersection. The adj_tris are
@@ -370,10 +378,14 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     {
         const EntityHandle* con = NULL;
         rval                    = MBI->get_connectivity( adj_tris[i], con, len );
-        if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+        if( MB_SUCCESS != rval || 3 != len )
+	  // return MB_FAILURE;
+	  return true; // see comment earlier on wrong return type
         CartVect coords[3];
         rval = MBI->get_coords( con, len, coords[0].array() );
-        if( MB_SUCCESS != rval ) return MB_FAILURE;
+        if( MB_SUCCESS != rval )
+	  // return MB_FAILURE;
+	  return true; // see comment earlier on wrong return type
 
         // get normal of triangle
         CartVect v0     = coords[1] - coords[0];

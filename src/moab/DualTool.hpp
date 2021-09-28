@@ -95,6 +95,14 @@ class DualTool
             id     = gp.id;
         }
 
+      GraphicsPoint &operator=(GraphicsPoint const &gp) 
+      {
+	for (unsigned i = 0; i < 3; ++i) xyz[i] = gp.xyz[i];
+	id = gp.id;
+	return *this;
+      }
+      
+
         float xyz[3];
         int id;
     };

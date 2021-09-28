@@ -619,8 +619,8 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
                 int num_nodes;
                 rval = mb->get_connectivity( eh, conn, num_nodes );MB_CHK_ERR( rval );
                 // build a new vertex array
-                for( int i = 0; i < num_nodes; i++ )
-                    new_conn[i] = corr[conn[i]];
+                for( int j = 0; j < num_nodes; j++ )
+                    new_conn[j] = corr[conn[j]];
                 EntityType type = mb->type_from_handle( eh );
                 EntityHandle newCell;
                 rval = mb->create_element( type, new_conn, num_nodes, newCell );MB_CHK_ERR( rval );

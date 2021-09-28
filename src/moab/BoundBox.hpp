@@ -24,6 +24,10 @@ class BoundBox
             update_max( points[i].array() );
         }
     }
+  BoundBox( const BoundBox& from ) : bMin(from.bMin), bMax(from.bMax) 
+  {
+  }
+  
     ~BoundBox() {}
 
     bool contains_point( const double* point, const double tol = 0.0 ) const;
