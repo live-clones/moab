@@ -813,6 +813,7 @@ int main( int argc, char* argv[] )
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
         // original graph (context is -1_
+        PUSH_TIMER( "Send/receive data from atm cpl to atm comp/land proj" )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
@@ -838,6 +839,8 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
         MPI_Barrier( MPI_COMM_WORLD );
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+
         if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
         {
             char outputFileAtm[] = "AtmWithProj3.h5m";
