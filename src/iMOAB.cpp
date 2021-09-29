@@ -662,7 +662,7 @@ ErrCode iMOAB_LoadMesh( iMOAB_AppID pid,
         }
     }
 #else
-    IMOAB_ASSERT( num_ghost_layers == nullptr, "Cannot provide ghost layers in serial." );
+    IMOAB_ASSERT( *num_ghost_layers == 0, "Cannot provide ghost layers in serial." );
 #endif
 
     // Now let us actually load the MOAB file with the appropriate read options

@@ -286,8 +286,7 @@ int main( int argc, char* argv[] )
     if( analytic_field && ( atmComm != MPI_COMM_NULL ) )  // we are on source /atm  pes
     {
         // cmpOcnPID, "T_proj;u_proj;v_proj;"
-        ierr = iMOAB_DefineTagStorage( cmpAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0],
-                                       strlen( bottomTempField ) );
+        ierr = iMOAB_DefineTagStorage( cmpAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag AnalyticalSolnSrcExact" );
 
         int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
@@ -313,8 +312,7 @@ int main( int argc, char* argv[] )
         for( int k = 0; k < storLeng; k++ )
             vals[k] = k;
 
-        ierr = iMOAB_SetDoubleTagStorage( cmpAtmPID, bottomTempField, &storLeng, &eetype, &vals[0],
-                                          strlen( bottomTempField ) );
+        ierr = iMOAB_SetDoubleTagStorage( cmpAtmPID, bottomTempField, &storLeng, &eetype, &vals[0] );
         CHECKIERR( ierr, "cannot make analytical tag" )
     }
 

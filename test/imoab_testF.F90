@@ -89,6 +89,9 @@ include 'mpif.h'
       appname = 'PROTEUS'//C_NULL_CHAR
       ! give a unique external id; here we just use 8?
       compid = 8
+      !  number of ghost layers needed by application
+      nghlay = 0
+
 
 #ifdef MOAB_HAVE_MPI
       ierr = iMOAB_RegisterApplication(appname, MPI_COMM_WORLD, compid, pid)
@@ -105,14 +108,12 @@ include 'mpif.h'
             print *, filename, ' has ', nparts, ' parts in partition', ngv, ' vertices ', nge, ' elements of dimension ', ndim
       endif
 #ifdef MOAB_HAVE_MPI
+      nghlay = 1
       readopts='PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;'// &
        'PARALLEL_RESOLVE_SHARED_ENTS'//C_NULL_CHAR
 #else
-      readopts=CHAR(0)
+      readopts=C_NULL_CHAR
 #endif
-
-      !  number of ghost layers needed by application
-      nghlay = 1
 
       !  now let us load the mesh in parallel
       ierr = iMOAB_LoadMesh(pid, filename, readopts, nghlay)
@@ -286,7 +287,7 @@ enddo
 #ifdef MOAB_HAVE_MPI
       wopts   = 'PARALLEL=WRITE_PART'//C_NULL_CHAR
 #else
-      wopts=CHAR(0)
+      wopts=C_NULL_CHAR
 #endif
 
       !     write out the mesh file to disk
