@@ -312,7 +312,9 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
             dZc,
             dSourceCenterLon[i],
             dSourceCenterLat[i]);
+#ifdef VERBOSE
         std::cout << " modify center of triangle from " << iniLon << " " << iniLat <<  " to " << dSourceCenterLon[i] << " " << dSourceCenterLat[i] << "\n";
+#endif
     }
 
 
