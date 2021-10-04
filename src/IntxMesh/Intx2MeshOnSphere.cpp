@@ -836,18 +836,30 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
 // completely the second local mesh set (in intersection)
 ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distributed_set, EntityHandle& covering_set )
 {
-    assert( parcomm != NULL );
-    if( 1 == parcomm->proc_config().proc_size() )
-    {
-        covering_set = initial_distributed_set;  // nothing to move around, it must be serial
-        return MB_SUCCESS;
-    }
-
     // primary element came from, in the joint communicator ; this will be forwarded by coverage
     // mesh needed for tag migrate later on
     int defaultInt = -1;  // no processor, so it was not migrated from somewhere else
     ErrorCode rval = mb->tag_get_handle( "orig_sending_processor", 1, MB_TYPE_INTEGER, orgSendProcTag,
                                          MB_TAG_DENSE | MB_TAG_CREAT, &defaultInt );MB_CHK_SET_ERR( rval, "can't create original sending processor tag" );
+
+    assert( parcomm != NULL );
+    Range meshCells;
+    rval = mb->get_entities_by_dimension( initial_distributed_set, 2, meshCells );MB_CHK_SET_ERR( rval, "can't get cells by dimension from mesh set" );
+
+    if( 1 == parcomm->proc_config().proc_size() )
+    {
+        // move all initial cells to coverage set
+        rval = mb->add_entities(covering_set, meshCells); MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
+        // if point cloud source, add vertices 
+        if (0 == meshCells.size() || max_edges_1 == 0)
+        {
+            // add vertices from the source set
+            Range verts;
+            rval = mb->get_entities_by_dimension( initial_distributed_set, 0, verts );MB_CHK_SET_ERR( rval, "can't get vertices from mesh set" );
+            rval = mb->add_entities(covering_set, verts); MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
+        }
+        return MB_SUCCESS;
+    }
 
     // mark on the coverage mesh where this element came from
     Tag sendProcTag;  /// for coverage mesh, will store the sender
@@ -856,10 +868,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
 
     // this information needs to be forwarded to coverage mesh, if this mesh was already migrated
     // from somewhere else
-    Range meshCells;
-    rval = mb->get_entities_by_dimension( initial_distributed_set, 2, meshCells );MB_CHK_SET_ERR( rval, "can't get cells by dimension from mesh set" );
-
-    // look at the value of orgSendProcTag for one mesh cell; if -1, no need to forward that; if
+        // look at the value of orgSendProcTag for one mesh cell; if -1, no need to forward that; if
     // !=-1, we know that this mesh was migrated, we need to find out more about origin of cell
     int orig_sender      = -1;
     EntityHandle oneCell = 0;

@@ -747,7 +747,7 @@ void check_baseline_file( std::string basefile, std::vector< int >& gids, std::v
         }
         if( fabs( it->second - vals[i] ) > eps )
         {
-            std::cout << " value out of range: index i=" << i << " id: " << gids[i] << vals[i]
+            std::cout << " value out of range: index i=" << i << " id: " << gids[i] << "  value:" <<  vals[i]
                       << " expected : " << it->second << "\n";
             flag_error();
             return;

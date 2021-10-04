@@ -1066,7 +1066,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius
 
     // Note: lots of communication possible, if mesh is distributed very differently
 #ifdef MOAB_HAVE_MPI
-    if( is_parallel && size > 1 )
+    if( is_parallel )
     {
         rval = mbintx->build_processor_euler_boxes( m_target_set, local_verts );MB_CHK_ERR( rval );
 
@@ -1308,17 +1308,17 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     intxCov.insert( covEnts[loc_gid_to_lid_covsrc[blueParent]] );
                 }
 
-                if( size > 1 )
-                {
-                    Range notNeededCovCells = moab::subtract( covEnts, intxCov );
+                Range notNeededCovCells = moab::subtract( covEnts, intxCov );
                     // remove now from coverage set the cells that are not needed
-                    rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
-                    covEnts = moab::subtract( covEnts, notNeededCovCells );
+                rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
+                covEnts = moab::subtract( covEnts, notNeededCovCells );
 #ifdef VERBOSE
-                    std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
-                    std::cout << " remove from coverage set elements that are not intersected: "
+                std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
+                std::cout << " remove from coverage set elements that are not intersected: "
                               << notNeededCovCells.size() << "\n";
 #endif
+                if( size > 1 )
+                {
                     // some source elements cover multiple target partitions; the conservation logic
                     // requires to know all overlap elements for a source element; they need to be
                     // communicated from the other target partitions

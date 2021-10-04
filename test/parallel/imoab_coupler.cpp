@@ -270,6 +270,15 @@ int main( int argc, char* argv[] )
         setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
                                         &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
+#ifdef VERBOSE
+    if( couComm != MPI_COMM_NULL && 1 == n )
+    {  // write only for n==1 case
+        char outputFileTgt3[] = "recvAtm.h5m";
+        ierr                  = iMOAB_WriteMesh( cplAtmPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write atm mesh after receiving" )
+    }
+#endif
 #ifdef GRAPH_INFO
     if( atmComm != MPI_COMM_NULL )
     {
@@ -362,6 +371,11 @@ int main( int argc, char* argv[] )
         // ocean partitions check if intx valid, write some h5m intx file
         CHECKIERR( ierr, "cannot compute intersection" )
         POP_TIMER( couComm, rankInCouComm )
+#ifdef VERBOSE
+        char prefix[] = "intx_atmocn";
+        ierr          = iMOAB_WriteLocalMesh( cplAtmOcnPID, prefix, strlen( prefix ) );
+        CHECKIERR( ierr, "failed to write local intx mesh" );
+#endif
     }
 
     if( atmCouComm != MPI_COMM_NULL )
