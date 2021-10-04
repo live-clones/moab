@@ -24,6 +24,18 @@
 #include "netcdfcpp.h"
 #endif
 
+#ifdef MOAB_HAVE_PNETCDF
+#include <pnetcdf.h>
+
+#define ERR_PARNC( err )                                                              \
+    if( err != NC_NOERR )                                                             \
+    {                                                                                 \
+        fprintf( stderr, "Error at line %d: %s\n", __LINE__, ncmpi_strerror( err ) ); \
+        MPI_Abort( MPI_COMM_WORLD, 1 );                                               \
+    }
+
+#endif
+
 #ifdef MOAB_HAVE_MPI
 
 #define MPI_CHK_ERR( err )                                          \
@@ -1092,6 +1104,11 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
     int nS = 0, nA = 0, nB = 0;
+#ifdef MOAB_HAVE_PNETCDF
+    // some variables will be used just in the case netcdfpar reader fails
+    int ncfile = -1, ret = 0;
+    int ndims, nvars, ngatts, unlimited;
+#endif
 #ifdef MOAB_HAVE_NETCDFPAR
     bool is_independent = true;
     ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
@@ -1110,34 +1127,58 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
     // Read SparseMatrix entries
 
-    NcDim* dimNS = ncMap.get_dim( "n_s" );
-    CHECK_EXCEPTION( dimNS, "dimension", "n_s" );
+    if( ncMap.is_valid() )
+    {
+        NcDim* dimNS = ncMap.get_dim( "n_s" );
+        CHECK_EXCEPTION( dimNS, "dimension", "n_s" );
 
-    NcDim* dimNA = ncMap.get_dim( "n_a" );
-    CHECK_EXCEPTION( dimNA, "dimension", "n_a" );
+        NcDim* dimNA = ncMap.get_dim( "n_a" );
+        CHECK_EXCEPTION( dimNA, "dimension", "n_a" );
 
-    NcDim* dimNB = ncMap.get_dim( "n_b" );
-    CHECK_EXCEPTION( dimNB, "dimension", "n_b" );
+        NcDim* dimNB = ncMap.get_dim( "n_b" );
+        CHECK_EXCEPTION( dimNB, "dimension", "n_b" );
 
-    // store total number of nonzeros
-    nS = dimNS->size();
-    nA = dimNA->size();
-    nB = dimNB->size();
+        // store total number of nonzeros
+        nS = dimNS->size();
+        nA = dimNA->size();
+        nB = dimNB->size();
 
-    varRow = ncMap.get_var( "row" );
-    CHECK_EXCEPTION( varRow, "variable", "row" );
+        varRow = ncMap.get_var( "row" );
+        CHECK_EXCEPTION( varRow, "variable", "row" );
 
-    varCol = ncMap.get_var( "col" );
-    CHECK_EXCEPTION( varCol, "variable", "col" );
+        varCol = ncMap.get_var( "col" );
+        CHECK_EXCEPTION( varCol, "variable", "col" );
 
-    varS = ncMap.get_var( "S" );
-    CHECK_EXCEPTION( varS, "variable", "S" );
+        varS = ncMap.get_var( "S" );
+        CHECK_EXCEPTION( varS, "variable", "S" );
 
 #ifdef MOAB_HAVE_NETCDFPAR
-    ncMap.enable_var_par_access( varRow, is_independent );
-    ncMap.enable_var_par_access( varCol, is_independent );
-    ncMap.enable_var_par_access( varS, is_independent );
+        ncMap.enable_var_par_access( varRow, is_independent );
+        ncMap.enable_var_par_access( varCol, is_independent );
+        ncMap.enable_var_par_access( varS, is_independent );
 #endif
+    }
+    else
+    {
+#ifdef MOAB_HAVE_PNETCDF
+        // read the file using pnetcdf directly, in parallel; need to have MPI, we do not check that anymore
+        // why build wth pnetcdf without MPI ?
+        // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
+        ret = ncmpi_open( m_pcomm->comm(), strSource, NC_NOWRITE, MPI_INFO_NULL, &ncfile ); ERR_PARNC( ret );  // bail out completely
+        ret = ncmpi_inq( ncfile, &ndims, &nvars, &ngatts, &unlimited ); ERR_PARNC( ret );
+        // find dimension ids for n_S
+        int ins;
+        ret = ncmpi_inq_dimid( ncfile, "n_s", &ins ); ERR_PARNC( ret );
+        MPI_Offset leng;
+        ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
+        nS  = (int)leng;
+        ret = ncmpi_inq_dimid( ncfile, "n_b", &ins ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
+        nB = (int)leng;
+#else
+        _EXCEPTION1( "cannot read the file %s", strSource );
+#endif
+    }
 
     std::vector< int > rowOwnership;
     // if owned_dof_ids = NULL, use the default trivial partitioning scheme
@@ -1172,16 +1213,35 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     vecCol.resize( localSize );
     vecS.resize( localSize );
 
-    varRow->set_cur( (long)( offsetRead ) );
-    varRow->get( &( vecRow[0] ), localSize );
+    if( ncMap.is_valid() )
+    {
+        varRow->set_cur( (long)( offsetRead ) );
+        varRow->get( &( vecRow[0] ), localSize );
 
-    varCol->set_cur( (long)( offsetRead ) );
-    varCol->get( &( vecCol[0] ), localSize );
+        varCol->set_cur( (long)( offsetRead ) );
+        varCol->get( &( vecCol[0] ), localSize );
 
-    varS->set_cur( (long)( offsetRead ) );
-    varS->get( &( vecS[0] ), localSize );
+        varS->set_cur( (long)( offsetRead ) );
+        varS->get( &( vecS[0] ), localSize );
 
-    ncMap.close();
+        ncMap.close();
+    }
+    else
+    {
+#ifdef MOAB_HAVE_PNETCDF
+        // fill the local vectors with the variables from pnetcdf file; first inquire, then fill
+        MPI_Offset start = (MPI_Offset)offsetRead;
+        MPI_Offset count = (MPI_Offset)localSize;
+        int varid;
+        ret = ncmpi_inq_varid( ncfile, "S", &varid );  ERR_PARNC( ret );
+        ret = ncmpi_get_vara_double_all( ncfile, varid, &start, &count, &vecS[0] ); ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "row", &varid ); ERR_PARNC( ret );
+        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecRow[0] ); ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "col", &varid ); ERR_PARNC( ret );
+        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecCol[0] ); ERR_PARNC( ret );
+	ret = ncmpi_close(ncfile); ERR_PARNC( ret );
+#endif
+    }
 
     // Now let us set the necessary global-to-local ID maps so that A*x operations
     // can be performed cleanly as if map was computed online
