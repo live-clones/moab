@@ -267,7 +267,7 @@ int main( int argc, char* argv[] )
             targetEnts.merge(adjCells);
         }
 
-        rval = mb->add_entities(partialSet, targetEnts);
+        rval = mb->add_entities(partialSet, targetEnts); MB_CHK_SET_ERR( rval, "Failed to add target entities to partial set" );
         // write now the set in a numbered file
         std::stringstream fff;
         fff << name_map << "_column" << col+1 << extension;
