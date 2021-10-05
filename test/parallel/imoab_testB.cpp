@@ -80,8 +80,8 @@ int main( int argc, char* argv[] )
     int nghlay = 0;  // number of ghost layers for loading the file
     std::vector< int > groupTasks;
     // group 1 is atm, 2 is ocn; atm not used ? skip group 3 (land)
-    int startG1 = 0, startG2 = 0, endG1 = numProcesses - 1, endG2 = numProcesses - 1;
-    int startG4 = startG1, endG4 = endG1;  // these are for coupler layout
+    int  startG2 = 0, endG2 = numProcesses - 1;
+    int startG4 = startG2, endG4 = endG2;  // these are for coupler layout
 
 
     // default: load atm on 2 proc, ocean on 2, land on 2; migrate to 2 procs, then compute intx
@@ -89,22 +89,14 @@ int main( int argc, char* argv[] )
 
     ProgOptions opts;
     opts.addOpt< std::string >( "atmosphere,t", "atm mesh filename (target)", &atmFilename );
-
     opts.addOpt< std::string >( "ocean,m", "ocean mesh filename (source)", &ocnFilename );
-
-    opts.addOpt< int >( "startAtm,a", "start task for atmosphere layout", &startG1 );
-    opts.addOpt< int >( "endAtm,b", "end task for atmosphere layout", &endG1 );
-
     opts.addOpt< int >( "startOcn,c", "start task for ocean layout", &startG2 );
     opts.addOpt< int >( "endOcn,d", "end task for ocean layout", &endG2 );
-
-
 
     opts.addOpt< int >( "startCoupler,g", "start task for coupler layout", &startG4 );
     opts.addOpt< int >( "endCoupler,j", "end task for coupler layout", &endG4 );
 
     opts.addOpt< int >( "partitioning,p", "partitioning option for migration", &repartitioner_scheme );
-
     int n = 1;  // number of send/receive / project / send back cycles
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
