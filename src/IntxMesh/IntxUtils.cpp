@@ -1038,7 +1038,7 @@ double IntxAreaUtils::area_spherical_element( Interface* mb, EntityHandle elem, 
     rval = mb->get_coords( verts, nsides, &coords[0] );MB_CHK_ERR_RET_VAL( rval, -1.0 );
 
     // compute and return the area of the polygonal element
-    int lsign;
+    int lsign = 1;
     double area = area_spherical_polygon( &coords[0], nsides, R, &lsign, rank );
     {
         if (lsign<0)
