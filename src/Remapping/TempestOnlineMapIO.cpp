@@ -259,18 +259,16 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     // if source or target cells have triangles at poles, center of those triangles need to come from
     // the original quad, not from center in 3d, converted to 2d again
     // start copy OnlineMap.cpp tempestremap
-    // right no, do this only for source  mesh; copy the logic for target mesh
+    // right now, do this only for source  mesh; copy the logic for target mesh
 
     for( int i = 0; i < nA; i++ )
     {
-
         const Face& face = m_meshInput->faces[i];
 
         int nNodes          = face.edges.size();
         int indexNodeAtPole = -1;
         if( 3 == nNodes )  // check if one node at the poles
         {
-
             for( int j = 0; j < nNodes; j++ )
                 if( fabs( fabs( dSourceVertexLat[i][j] ) - 90.0 ) < 1.0e-12 )
                 {
@@ -281,35 +279,22 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         if( indexNodeAtPole < 0 ) continue;  // continue i loop, do nothing
         // recompute center of cell, from 3d data; add one 2 nodes at pole, and average
         int nodeAtPole = face[indexNodeAtPole];  // use the overloaded operator
-        double dXc     = 2 * m_meshInput->nodes[nodeAtPole].x;
-        double dYc     = 2 * m_meshInput->nodes[nodeAtPole].y;
-        double dZc     = 2 * m_meshInput->nodes[nodeAtPole].z;
-
+        Node nodePole  = m_meshInput->nodes[nodeAtPole];
+        Node newCenter = nodePole * 2;
         for( int j = 1; j < nNodes; j++ )
         {
             int indexi       = ( indexNodeAtPole + j ) % nNodes;  // nNodes is 3 !
             const Node& node = m_meshInput->nodes[face[indexi]];
-
-            dXc += node.x;
-            dYc += node.y;
-            dZc += node.z;
+            newCenter        = newCenter + node;
         }
-
-        dXc /= static_cast< double >( 4 );
-        dYc /= static_cast< double >( 4 );
-        dZc /= static_cast< double >( 4 );
-
-        double dMag = sqrt( dXc * dXc + dYc * dYc + dZc * dZc );
-
-        dXc /= dMag;
-        dYc /= dMag;
-        dZc /= dMag;
+        newCenter = newCenter * 0.25;
+        newCenter = newCenter.Normalized();
 
 #ifdef VERBOSE
         double iniLon = dSourceCenterLon[i], iniLat = dSourceCenterLat[i];
 #endif
         // dSourceCenterLon, dSourceCenterLat
-        XYZtoRLL_Deg( dXc, dYc, dZc, dSourceCenterLon[i], dSourceCenterLat[i] );
+        XYZtoRLL_Deg( newCenter.x, newCenter.y, newCenter.z, dSourceCenterLon[i], dSourceCenterLat[i] );
 #ifdef VERBOSE
         std::cout << " modify center of triangle from " << iniLon << " " << iniLat << " to " << dSourceCenterLon[i]
                   << " " << dSourceCenterLat[i] << "\n";
