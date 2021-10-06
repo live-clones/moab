@@ -17,10 +17,10 @@
       integer ierr, num_procs, my_id
       integer pid
       integer compid
-      character appname(10)
-      character filename(200), tmpname(250)
-      character  fname(200)
-      character readopts(150)
+      character appname*10
+      character filename*200
+      character  fname*200
+      character readopts*250
       integer ngv, nge, ndim, nparts
       integer nghlay
       integer nverts(3), nelem(3), nblocks(3), nsbc(3), ndbc(3)
@@ -36,7 +36,7 @@ C      size of coordinates array
       integer  nCO
       integer  bID
 C       for some tags in the file
-      character tagname1(20), tagname2(20)
+      character tagname1*20, tagname2*20
       integer      tagtype(2), enttype(2), num_co
       integer      tagindex(2)
       integer      stags(2), itags(2), ntsync
@@ -53,7 +53,7 @@ C      IWORK(egID) , IWORK(elID) starts for global el ID, local elem ID
 C       indices for surface BC element, reference surf BC, value
       integer    isBC, irBC, ivBC
 
-      character outfile(100), wopts(100)
+      character outfile*100, wopts*100
       my_id = 0
       fname = '/io/p8ex1.h5m' // char(0)
 #ifdef MOAB_HAVE_MPI
