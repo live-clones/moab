@@ -611,10 +611,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                     center = center + node;
                 }
                 center = center / nbEdges;
-                double magni = sqrt(
-                        center.x * center.x + center.y * center.y
-                                + center.z * center.z);
-                center = center / magni; // project back on sphere of radius 1
+                center = center.Normalized();// project back on sphere of radius 1
             }
 
             Node node0, node1, node2;
@@ -654,12 +651,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                     nodeQuadrature.z = TriQuadratureG[l][0] * node0.z + TriQuadratureG[l][1] * node1.z +
                                        TriQuadratureG[l][2] * node2.z;
 
-                    double dMag = sqrt( nodeQuadrature.x * nodeQuadrature.x + nodeQuadrature.y * nodeQuadrature.y +
-                                        nodeQuadrature.z * nodeQuadrature.z );
-
-                    nodeQuadrature.x /= dMag;
-                    nodeQuadrature.y /= dMag;
-                    nodeQuadrature.z /= dMag;
+                    nodeQuadrature = nodeQuadrature.Normalized();
 
                     // Find components of quadrature point in basis
                     // of the first Face
@@ -1028,10 +1020,7 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
                     center = center + node;
                 }
                 center = center / nbEdges;
-                double magni = sqrt(
-                        center.x * center.x + center.y * center.y
-                                + center.z * center.z);
-                center = center / magni; // project back on sphere of radius 1
+                center = center.Normalized();// project back on sphere of radius 1
             }
 
             Node node0, node1, node2;
