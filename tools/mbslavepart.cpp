@@ -29,7 +29,10 @@ template < typename K, typename V >
 static V get_map_value( const std::map< K, V >& m, const K& key, const V& defval )
 {
     typename std::map< K, V >::const_iterator it = m.find( key );
-    if( it == m.end() ) { return defval; }
+    if( it == m.end() )
+    {
+        return defval;
+    }
     else
     {
         return it->second;
@@ -297,6 +300,7 @@ int main( int argc, char* argv[] )
 
         if( use_spherical )
         {
+            error = moab::IntxUtils::ScaleToRadius( mbCore, masterfileset, master_radius );MB_CHK_ERR( error );
             error = moab::IntxUtils::ScaleToRadius( mbCore, slavefileset, slave_radius );MB_CHK_ERR( error );
         }
 

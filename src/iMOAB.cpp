@@ -2118,12 +2118,11 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* receivingG
 }
 
 // fortran wrapper
-ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid,
-        int* method )
+ErrCode iMOAB_SendMeshFortran( iMOAB_AppID pid, int* join, int* receivingGroup, int* rcompid, int* method )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group recvGroup = MPI_Group_f2c( (MPI_Fint) *receivingGroup );
-    return iMOAB_SendMesh(pid, &jcomm, &recvGroup, rcompid, method );
+    MPI_Comm jcomm      = MPI_Comm_f2c( (MPI_Fint)*join );
+    MPI_Group recvGroup = MPI_Group_f2c( (MPI_Fint)*receivingGroup );
+    return iMOAB_SendMesh( pid, &jcomm, &recvGroup, rcompid, method );
 }
 
 ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sendingGroup, int* scompid )
@@ -2282,8 +2281,8 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* global, MPI_Group* sending
 
 ErrCode iMOAB_ReceiveMeshFortran( iMOAB_AppID pid, int* join, int* sendingGroup, int* scompid )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group sendGroup = MPI_Group_f2c( (MPI_Fint) *sendingGroup );
+    MPI_Comm jcomm      = MPI_Comm_f2c( (MPI_Fint)*join );
+    MPI_Group sendGroup = MPI_Group_f2c( (MPI_Fint)*sendingGroup );
     return iMOAB_ReceiveMesh( pid, &jcomm, &sendGroup, scompid );
 }
 
@@ -2365,10 +2364,10 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 
 // fortran wrapper
 ErrCode iMOAB_SendElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join, int* context_id,
-                              int tag_storage_name_length )
+                                     int tag_storage_name_length )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    return iMOAB_SendElementTag(pid, tag_storage_name, &jcomm, context_id, tag_storage_name_length);
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
+    return iMOAB_SendElementTag( pid, tag_storage_name, &jcomm, context_id, tag_storage_name_length );
 }
 
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id,
@@ -2455,11 +2454,10 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     return 0;
 }
 ErrCode iMOAB_ReceiveElementTagFortran( iMOAB_AppID pid, const iMOAB_String tag_storage_name, int* join,
-        int* context_id,  int tag_storage_name_length )
+                                        int* context_id, int tag_storage_name_length )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    return iMOAB_ReceiveElementTag( pid, tag_storage_name, &jcomm,
-          context_id, tag_storage_name_length );
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
+    return iMOAB_ReceiveElementTag( pid, tag_storage_name, &jcomm, context_id, tag_storage_name_length );
 }
 ErrCode iMOAB_FreeSenderBuffers( iMOAB_AppID pid, int* context_id )
 {
@@ -2781,14 +2779,13 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1, iMOAB_AppID pid2, MPI_Comm* jo
     return 0;
 }
 
-ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1,
-                                int* group2, int* type1, int* type2, int* comp1, int* comp2 )
+ErrCode iMOAB_ComputeCommGraphFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, int* join, int* group1, int* group2,
+                                       int* type1, int* type2, int* comp1, int* comp2 )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
-    MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
-    return iMOAB_ComputeCommGraph( pid1, pid2, &jcomm, &gr1,
-            &gr2, type1, type2, comp1, comp2 );
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
+    MPI_Group gr1  = MPI_Group_f2c( (MPI_Fint)*group1 );
+    MPI_Group gr2  = MPI_Group_f2c( (MPI_Fint)*group2 );
+    return iMOAB_ComputeCommGraph( pid1, pid2, &jcomm, &gr1, &gr2, type1, type2, comp1, comp2 );
 }
 
 //#undef VERBOSE
@@ -3060,13 +3057,12 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
     return 0;  // success
 }
 
-ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr,
-        iMOAB_AppID pid_intx, int* src_id, int* migr_id, int* context_id )
+ErrCode iMOAB_CoverageGraphFortran( int* join, iMOAB_AppID pid_src, iMOAB_AppID pid_migr, iMOAB_AppID pid_intx,
+                                    int* src_id, int* migr_id, int* context_id )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    return iMOAB_CoverageGraph(&jcomm,  pid_src,  pid_migr,  pid_intx, src_id, migr_id, context_id );
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
+    return iMOAB_CoverageGraph( &jcomm, pid_src, pid_migr, pid_intx, src_id, migr_id, context_id );
 }
-
 
 ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix,
                              int length_prefix )
@@ -3145,13 +3141,13 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
 }
 
 #ifdef MOAB_HAVE_MPI
-ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3,
-        int* join, int* group1, int* group2, int* type, int* comp1, int* comp2, int* direction )
+ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, int* join, int* group1,
+                                     int* group2, int* type, int* comp1, int* comp2, int* direction )
 {
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint) *join );
-    MPI_Group gr1 = MPI_Group_f2c( (MPI_Fint) *group1 );
-    MPI_Group gr2 = MPI_Group_f2c( (MPI_Fint) *group2 );
-    return iMOAB_MigrateMapMesh(pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction); 
+    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
+    MPI_Group gr1  = MPI_Group_f2c( (MPI_Fint)*group1 );
+    MPI_Group gr2  = MPI_Group_f2c( (MPI_Fint)*group2 );
+    return iMOAB_MigrateMapMesh( pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction );
 }
 ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pid3, MPI_Comm* join, MPI_Group* group1,
                               MPI_Group* group2, int* type, int* comp1, int* comp2, int* direction )
@@ -3463,7 +3459,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 
     return 0;
 }
-#endif // #ifdef MOAB_HAVE_MPI
+#endif  // #ifdef MOAB_HAVE_MPI
 ErrCode iMOAB_WriteMappingWeightsToFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
@@ -3566,12 +3562,10 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and
      * unscale later. */
-    bool radii_scaled  = false;
-    bool defaultradius = 1.0;
+    const double defaultradius = 1.0;
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
-        radii_scaled = true;
-        rval         = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );CHKERRVAL( rval );
+        rval = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );CHKERRVAL( rval );
         rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, defaultradius );CHKERRVAL( rval );
     }
 
@@ -3771,12 +3765,11 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and
      * unscale later. */
-    bool radii_scaled = false;
+    const double defaultradius = 1.0;
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
-        radii_scaled = true;
-        rval         = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, 1.0 );CHKERRVAL( rval );
-        rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, 1.0 );CHKERRVAL( rval );
+        rval = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );CHKERRVAL( rval );
+        rval = IntxUtils::ScaleToRadius( context.MBI, data_tgt.file_set, defaultradius );CHKERRVAL( rval );
     }
 
     rval = tdata.remapper->ConvertMeshToTempest( moab::Remapper::SourceMesh );CHKERRVAL( rval );

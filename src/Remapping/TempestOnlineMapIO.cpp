@@ -1103,7 +1103,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     NcError error( NcError::silent_nonfatal );
 
     NcVar *varRow = NULL, *varCol = NULL, *varS = NULL;
-    int nS = 0, nA = 0, nB = 0;
+    int nS = 0, /* nA = 0, */ nB = 0;
 #ifdef MOAB_HAVE_PNETCDF
     // some variables will be used just in the case netcdfpar reader fails
     int ncfile = -1, ret = 0;
@@ -1140,7 +1140,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
         // store total number of nonzeros
         nS = dimNS->size();
-        nA = dimNA->size();
+        // nA = dimNA->size();
         nB = dimNB->size();
 
         varRow = ncMap.get_var( "row" );
@@ -1164,16 +1164,22 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         // read the file using pnetcdf directly, in parallel; need to have MPI, we do not check that anymore
         // why build wth pnetcdf without MPI ?
         // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
-        ret = ncmpi_open( m_pcomm->comm(), strSource, NC_NOWRITE, MPI_INFO_NULL, &ncfile ); ERR_PARNC( ret );  // bail out completely
-        ret = ncmpi_inq( ncfile, &ndims, &nvars, &ngatts, &unlimited ); ERR_PARNC( ret );
+        ret = ncmpi_open( m_pcomm->comm(), strSource, NC_NOWRITE, MPI_INFO_NULL, &ncfile );
+        ERR_PARNC( ret );  // bail out completely
+        ret = ncmpi_inq( ncfile, &ndims, &nvars, &ngatts, &unlimited );
+        ERR_PARNC( ret );
         // find dimension ids for n_S
         int ins;
-        ret = ncmpi_inq_dimid( ncfile, "n_s", &ins ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimid( ncfile, "n_s", &ins );
+        ERR_PARNC( ret );
         MPI_Offset leng;
-        ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimlen( ncfile, ins, &leng );
+        ERR_PARNC( ret );
         nS  = (int)leng;
-        ret = ncmpi_inq_dimid( ncfile, "n_b", &ins ); ERR_PARNC( ret );
-        ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimid( ncfile, "n_b", &ins );
+        ERR_PARNC( ret );
+        ret = ncmpi_inq_dimlen( ncfile, ins, &leng );
+        ERR_PARNC( ret );
         nB = (int)leng;
 #else
         _EXCEPTION1( "cannot read the file %s", strSource );
@@ -1233,13 +1239,20 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         MPI_Offset start = (MPI_Offset)offsetRead;
         MPI_Offset count = (MPI_Offset)localSize;
         int varid;
-        ret = ncmpi_inq_varid( ncfile, "S", &varid );  ERR_PARNC( ret );
-        ret = ncmpi_get_vara_double_all( ncfile, varid, &start, &count, &vecS[0] ); ERR_PARNC( ret );
-        ret = ncmpi_inq_varid( ncfile, "row", &varid ); ERR_PARNC( ret );
-        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecRow[0] ); ERR_PARNC( ret );
-        ret = ncmpi_inq_varid( ncfile, "col", &varid ); ERR_PARNC( ret );
-        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecCol[0] ); ERR_PARNC( ret );
-	ret = ncmpi_close(ncfile); ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "S", &varid );
+        ERR_PARNC( ret );
+        ret = ncmpi_get_vara_double_all( ncfile, varid, &start, &count, &vecS[0] );
+        ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "row", &varid );
+        ERR_PARNC( ret );
+        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecRow[0] );
+        ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "col", &varid );
+        ERR_PARNC( ret );
+        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecCol[0] );
+        ERR_PARNC( ret );
+        ret = ncmpi_close( ncfile );
+        ERR_PARNC( ret );
 #endif
     }
 
@@ -1342,7 +1355,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         for( int i = 0; i < nS; i++ )
         {
             int rindex, cindex;
-            const int& vecRowValue = vecRow[i] - 1; // the rows, cols are 1 based in the file
+            const int& vecRowValue = vecRow[i] - 1;  // the rows, cols are 1 based in the file
             const int& vecColValue = vecCol[i] - 1;
 
             std::map< int, int >::iterator riter = rowMap.find( vecRowValue );

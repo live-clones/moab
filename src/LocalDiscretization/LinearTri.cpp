@@ -16,13 +16,21 @@ ErrorCode LinearTri::initFcn( const double* verts, const int nverts, double*& wo
     // work[9..17] = Tinv
     // work[18] = detT
     // work[19] = detTinv
-    assert( nverts == 3 && verts );
-    if( !work ) work = new double[20];
+    if( nverts != 3 )
+    {
+        std::cout << "Invalid Triangle. Expected 3 vertices.\n";
+        return MB_FAILURE;
+    }
+
+    assert( verts );
 
     Matrix3 J( verts[1 * 3 + 0] - verts[0 * 3 + 0], verts[2 * 3 + 0] - verts[0 * 3 + 0], 0.0,
                verts[1 * 3 + 1] - verts[0 * 3 + 1], verts[2 * 3 + 1] - verts[0 * 3 + 1], 0.0,
                verts[1 * 3 + 2] - verts[0 * 3 + 2], verts[2 * 3 + 2] - verts[0 * 3 + 2], 1.0 );
     J *= 0.5;
+
+    // Update the work array
+    if( !work ) work = new double[20];
 
     J.copyto( work );
     J.inverse().copyto( work + Matrix3::size );

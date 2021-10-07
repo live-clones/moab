@@ -311,13 +311,13 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     DataArray1D< int > lcols;
     DataArray1D< double > lvals;
     m_mapRemap.GetEntries( lrows, lcols, lvals );
-    unsigned locvals = lvals.GetRows();
+    size_t locvals = lvals.GetRows();
 
     // first matrix
     typedef Eigen::Triplet< double > Triplet;
     std::vector< Triplet > tripletList;
     tripletList.reserve( locvals );
-    for( int iv = 0; iv < locvals; iv++ )
+    for( size_t iv = 0; iv < locvals; iv++ )
     {
         tripletList.push_back( Triplet( lrows[iv], lcols[iv], lvals[iv] ) );
     }
@@ -380,9 +380,9 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 
 #ifdef VERBOSE
     std::stringstream sstr;
-    static int callId=0;
+    static int callId = 0;
     callId++;
-    sstr << "projection_id_" <<callId<<"_s_"<< size << "_rk_" << rank << ".txt";
+    sstr << "projection_id_" << callId << "_s_" << size << "_rk_" << rank << ".txt";
     std::ofstream output_file( sstr.str() );
 #endif
     // Perform the actual projection of weights: application of weight matrix onto the source
@@ -418,7 +418,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
             {
                 m_colVector( col_dtoc_dofmap[i] ) = srcVals[i];  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-                output_file  << i << " " << col_gdofmap[col_dtoc_dofmap[i]] + 1 << "  " << srcVals[i] << "\n";
+                output_file << i << " " << col_gdofmap[col_dtoc_dofmap[i]] + 1 << "  " << srcVals[i] << "\n";
 #endif
             }
         }
@@ -436,7 +436,7 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
             {
                 tgtVals[i] = m_rowVector( row_dtoc_dofmap[i] );  // permute and set the row (source) vector properly
 #ifdef VERBOSE
-                 output_file << i << " " << row_gdofmap[row_dtoc_dofmap[i]]+1  << "  " << tgtVals[i] << "\n";
+                output_file << i << " " << row_gdofmap[row_dtoc_dofmap[i]] + 1 << "  " << tgtVals[i] << "\n";
 #endif
             }
         }

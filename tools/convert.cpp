@@ -454,7 +454,6 @@ int main( int argc, char* argv[] )
 
             // Check if we are converting a RLL grid
             NcFile ncInput( inFileName.c_str(), NcFile::ReadOnly );
-            bool isRectilinearGrid = false;
 
             NcError error_temp( NcError::silent_nonfatal );
             // get the attribute
@@ -471,8 +470,6 @@ int main( int argc, char* argv[] )
 
             if( attRectilinear != nullptr )
             {
-                isRectilinearGrid = true;
-
                 // Obtain rectilinear attributes (dimension sizes)
                 NcAtt* attRectilinearDim0Size = ncInput.get_att( "rectilinear_dim0_size" );
                 NcAtt* attRectilinearDim1Size = ncInput.get_att( "rectilinear_dim1_size" );
@@ -784,7 +781,10 @@ int main( int argc, char* argv[] )
                 gMB->get_adjacencies( dim3, 1, true, adj, Interface::UNION );
                 gMB->get_adjacencies( dim2, 1, true, adj, Interface::UNION );
             }
-            if( generate[2] ) { gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION ); }
+            if( generate[2] )
+            {
+                gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION );
+            }
             if( sets[i] ) gMB->add_entities( sets[i], adj );
         }
     }
@@ -1021,7 +1021,10 @@ static void print_time( int clk_per_sec, const char* prefix, clock_t ticks, std:
     clock_t centi   = ticks % 100;
     clock_t seconds = ticks / 100;
     stream << prefix;
-    if( seconds < 120 ) { stream << ( ticks / 100 ) << "." << centi << "s" << std::endl; }
+    if( seconds < 120 )
+    {
+        stream << ( ticks / 100 ) << "." << centi << "s" << std::endl;
+    }
     else
     {
         clock_t minutes = ( seconds / 60 ) % 60;

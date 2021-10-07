@@ -1614,13 +1614,11 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
     const bool outputEnabled = ( is_root );
     int discOrder;
     DiscretizationType discMethod;
-    moab::EntityHandle meshset;
     moab::Range entities;
     Mesh* trmesh;
     switch( ctx )
     {
         case Remapper::SourceMesh:
-            meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
                                                         : m_remapper->m_covering_source_entities );
@@ -1629,8 +1627,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             break;
 
         case Remapper::TargetMesh:
-            meshset = m_remapper->m_target_set;
-            trmesh  = m_remapper->m_target;
+            trmesh = m_remapper->m_target;
             entities =
                 ( m_remapper->point_cloud_target ? m_remapper->m_target_vertices : m_remapper->m_target_entities );
             discOrder  = m_nDofsPEl_Dest;
@@ -1972,28 +1969,19 @@ moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::Intersec
     moab::ErrorCode rval;
     const bool outputEnabled = ( is_root );
     int discOrder;
-    DiscretizationType discMethod;
-    moab::EntityHandle meshset;
     moab::Range entities;
-    Mesh* trmesh;
     switch( ctx )
     {
         case Remapper::SourceMesh:
-            meshset    = m_remapper->m_covering_source_set;
-            trmesh     = m_remapper->m_covering_source;
-            entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
+            entities  = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
                                                         : m_remapper->m_covering_source_entities );
-            discOrder  = m_nDofsPEl_Src;
-            discMethod = m_eInputType;
+            discOrder = m_nDofsPEl_Src;
             break;
 
         case Remapper::TargetMesh:
-            meshset = m_remapper->m_target_set;
-            trmesh  = m_remapper->m_target;
             entities =
                 ( m_remapper->point_cloud_target ? m_remapper->m_target_vertices : m_remapper->m_target_entities );
-            discOrder  = m_nDofsPEl_Dest;
-            discMethod = m_eOutputType;
+            discOrder = m_nDofsPEl_Dest;
             break;
 
         default:
