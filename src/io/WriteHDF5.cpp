@@ -61,6 +61,13 @@ typedef int id_t;
 
 #ifdef MOAB_HAVE_VALGRIND
 #include <valgrind/memcheck.h>
+
+template < typename T >
+inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& v )
+{
+    (void)VALGRIND_MAKE_MEM_UNDEFINED( (T*)&v[0], v.size() * sizeof( T ) );
+}
+
 #else
 #ifndef VALGRIND_CHECK_MEM_IS_DEFINED
 #define VALGRIND_CHECK_MEM_IS_DEFINED( a, b ) ( (void)0 )
@@ -71,16 +78,17 @@ typedef int id_t;
 #ifndef VALGRIND_MAKE_MEM_UNDEFINED
 #define VALGRIND_MAKE_MEM_UNDEFINED( a, b ) ( (void)0 )
 #endif
+
+template < typename T >
+inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& )
+{
+    (void)VALGRIND_MAKE_MEM_UNDEFINED( 0, 0 );
+}
+
 #endif
 
 namespace moab
 {
-
-template < typename T >
-inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& v )
-{
-    (void)VALGRIND_MAKE_MEM_UNDEFINED( (T*)&v[0], v.size() * sizeof( T ) );
-}
 
 #define WRITE_HDF5_BUFFER_SIZE ( 40 * 1024 * 1024 )
 
@@ -709,7 +717,10 @@ ErrorCode WriteHDF5::write_file_impl( const char* filename, bool overwrite, cons
 
     times[TOTAL_TIME] = timer.time_since_birth();
 
-    if( cputime ) { print_times( times ); }
+    if( cputime )
+    {
+        print_times( times );
+    }
 
     return MB_SUCCESS;
 }
@@ -1246,10 +1257,11 @@ ErrorCode WriteHDF5::write_set_data( const WriteUtilIface::EntityListType which_
             // we already have the data in a vector, just copy it.
             if( si != specialSets.end() && si->setHandle == *i )
             {
-                std::vector< wid_t >& list = ( which_data == WriteUtilIface::CONTENTS )  ? si->contentIds
-                                             : ( which_data == WriteUtilIface::PARENTS ) ? si->parentIds
-                                                                                         : si->childIds;
-                size_t append              = list.size();
+                std::vector< wid_t >& list =
+                    ( which_data == WriteUtilIface::CONTENTS )
+                        ? si->contentIds
+                        : ( which_data == WriteUtilIface::PARENTS ) ? si->parentIds : si->childIds;
+                size_t append = list.size();
                 if( count + list.size() > buffer_size )
                 {
                     append          = buffer_size - count;
@@ -2862,7 +2874,10 @@ ErrorCode WriteHDF5::get_tag_size( Tag tag, DataType& moab_type, int& num_bytes,
     rval = iFace->tag_get_data_type( tag, moab_type );
     CHK_MB_ERR_0( rval );
     rval = iFace->tag_get_length( tag, array_length );
-    if( MB_VARIABLE_DATA_LENGTH == rval ) { array_length = MB_VARIABLE_LENGTH; }
+    if( MB_VARIABLE_DATA_LENGTH == rval )
+    {
+        array_length = MB_VARIABLE_LENGTH;
+    }
     else if( MB_SUCCESS != rval )
         return error( rval );
     rval = iFace->tag_get_bytes( tag, num_bytes );
@@ -3208,7 +3223,10 @@ void WriteHDF5::print_id_map( std::ostream& s, const char* pfx ) const
     {
         const char* n1 = CN::EntityTypeName( TYPE_FROM_HANDLE( i->begin ) );
         EntityID id    = ID_FROM_HANDLE( i->begin );
-        if( 1 == i->count ) { s << pfx << n1 << " " << id << " -> " << i->value << std::endl; }
+        if( 1 == i->count )
+        {
+            s << pfx << n1 << " " << id << " -> " << i->value << std::endl;
+        }
         else
         {
             const char* n2 = CN::EntityTypeName( TYPE_FROM_HANDLE( i->begin + i->count - 1 ) );

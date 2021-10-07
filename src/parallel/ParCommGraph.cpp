@@ -1256,7 +1256,7 @@ ErrorCode ParCommGraph::set_split_ranges( int comp,
                                           std::vector< int >& valuesComp1,
                                           int lenTag,
                                           Range& ents_of_interest,
-                                          int type )
+                                          int /*type*/ )
 {
     // settle split_ranges // same role as partitioning
     if( rootSender ) std::cout << " find split_ranges on component " << comp << "  according to read map \n";

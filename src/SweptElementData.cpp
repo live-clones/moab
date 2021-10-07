@@ -30,19 +30,19 @@ EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int ira
     auto dim = CN::Dimension( TYPE_FROM_HANDLE( start_handle ) );
     switch( dim )
     {
+        case 3:
+            result *= krange;
+            // fall through
+        case 2:
+            result *= jrange;
+            // fall through
+        case 1:
+            result *= irange;
+            break;
         default:
             result = 0;
             assert( false );
             break;
-        case 3:
-        case 2:
-        case 1:
-	  if (3 == dim)
-            result *= krange;
-	  if (2 <= dim)
-            result *= jrange;
-	  if (1 <= dim)
-            result *= irange;
     }
     return result;
 }

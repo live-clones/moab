@@ -132,10 +132,13 @@ ErrorCode HigherOrderFactory::convert_sequence( ElementSequence* seq, EntityHand
         default:
             return MB_TYPE_OUT_OF_RANGE;
         case MBEDGE:
+            mid_face_nodes   = false;
+            mid_volume_nodes = false;
+            break;
         case MBTRI:
         case MBQUAD:
-	  if (seq->type() == MBEDGE) mid_face_nodes = false; // if test to avoid fall-through warning
             mid_volume_nodes = false;
+            break;
         case MBTET:
         case MBHEX:
         case MBPRISM:
@@ -336,7 +339,10 @@ ErrorCode HigherOrderFactory::add_mid_face_nodes( ElementSequence* seq )
 
             EntityHandle already_made_node = center_node_exist( tmp_face_conn, adjacent_entities );
 
-            if( already_made_node ) { element[i + num_edges + num_vertices] = already_made_node; }
+            if( already_made_node )
+            {
+                element[i + num_edges + num_vertices] = already_made_node;
+            }
             // create a node
             else
             {
@@ -406,7 +412,10 @@ ErrorCode HigherOrderFactory::add_mid_edge_nodes( ElementSequence* seq )
 
             EntityHandle already_made_node = center_node_exist( tmp_edge_conn[0], tmp_edge_conn[1], adjacent_entities );
 
-            if( already_made_node ) { element[i + num_vertices] = already_made_node; }
+            if( already_made_node )
+            {
+                element[i + num_vertices] = already_made_node;
+            }
             // create a node
             else
             {

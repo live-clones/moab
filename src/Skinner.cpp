@@ -137,7 +137,10 @@ ErrorCode Skinner::add_adjacency( EntityHandle entity )
     if( iter == nodes + num_nodes ) return MB_SUCCESS;
 
     // add this entity to the node
-    if( thisMB->tag_get_data( mAdjTag, iter, 1, &adj ) == MB_SUCCESS && adj != NULL ) { adj->push_back( entity ); }
+    if( thisMB->tag_get_data( mAdjTag, iter, 1, &adj ) == MB_SUCCESS && adj != NULL )
+    {
+        adj->push_back( entity );
+    }
     // create a new vector and add it
     else
     {
@@ -161,7 +164,10 @@ void Skinner::add_adjacency( EntityHandle entity, const EntityHandle* nodes, con
             num_nodes == CN::VerticesPerEntity( TYPE_FROM_HANDLE( entity ) ) );
 
     // add this entity to the node
-    if( thisMB->tag_get_data( mAdjTag, iter, 1, &adj ) == MB_SUCCESS && adj != NULL ) { adj->push_back( entity ); }
+    if( thisMB->tag_get_data( mAdjTag, iter, 1, &adj ) == MB_SUCCESS && adj != NULL )
+    {
+        adj->push_back( entity );
+    }
     // create a new vector and add it
     else
     {
@@ -498,7 +504,10 @@ ErrorCode Skinner::find_skin_noadj(const Range &source_entities,
                 }
                 else
                 {
-                    if( direct == FORWARD ) { forward_target_entities.insert( match ); }
+                    if( direct == FORWARD )
+                    {
+                        forward_target_entities.insert( match );
+                    }
                     else
                     {
                         reverse_target_entities.insert( match );
@@ -530,7 +539,10 @@ void Skinner::find_match( EntityType type, const EntityHandle* conn, const int n
     std::vector< EntityHandle >* adj = NULL;
 
     ErrorCode result = thisMB->tag_get_data( mAdjTag, iter, 1, &adj );
-    if( result == MB_FAILURE || adj == NULL ) { return; }
+    if( result == MB_FAILURE || adj == NULL )
+    {
+        return;
+    }
 
     std::vector< EntityHandle >::iterator jter, end_jter;
     end_jter = adj->end();
@@ -598,7 +610,10 @@ bool Skinner::connectivity_match( const EntityHandle* conn1, const EntityHandle*
         }
         ++i;
     }
-    if( they_match ) { direct = REVERSE; }
+    if( they_match )
+    {
+        direct = REVERSE;
+    }
     return they_match;
 }
 
@@ -668,14 +683,20 @@ ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar
     number_boundary_nodes = 0;
 
     // make sure we have something to work with
-    if( boundary.empty() ) { return MB_FAILURE; }
+    if( boundary.empty() )
+    {
+        return MB_FAILURE;
+    }
 
     // get our working dimensions
     EntityType type      = thisMB->type_from_handle( *( boundary.begin() ) );
     const int source_dim = CN::Dimension( type );
 
     // make sure we can handle the working dimensions
-    if( source_dim != 2 ) { return MB_FAILURE; }
+    if( source_dim != 2 )
+    {
+        return MB_FAILURE;
+    }
     mTargetDim = source_dim - 1;
 
     // initialize
@@ -771,7 +792,10 @@ ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar
                 // the database.  We therefore may need to add it to the
                 // edge_list.  Since it will not hurt the range, we add
                 // whether it was added before or not
-                if( !entity_deletable( match ) ) { edge_list.insert( match ); }
+                if( !entity_deletable( match ) )
+                {
+                    edge_list.insert( match );
+                }
             }
         }
     }
@@ -813,7 +837,10 @@ ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar
         // check the count_tag
         result = thisMB->tag_get_data( count_tag, &( *edge_iter ), 1, &count );
         assert( MB_SUCCESS == result );
-        if( count == 1 ) { boundary_edges.insert( *edge_iter ); }
+        if( count == 1 )
+        {
+            boundary_edges.insert( *edge_iter );
+        }
         else if( count == 2 )
         {
             other_edges.insert( *edge_iter );
@@ -903,7 +930,10 @@ void Skinner::find_inferred_edges( Range& skin_boundary, Range& candidate_edges,
 
         // see if the two entities have a sufficient angle
 
-        if( has_larger_angle( face[0], face[1], reference_cosine ) ) { inferred_edges.insert( *iter ); }
+        if( has_larger_angle( face[0], face[1], reference_cosine ) )
+        {
+            inferred_edges.insert( *iter );
+        }
     }
 
     result = thisMB->tag_delete( mark_tag );
@@ -921,7 +951,10 @@ bool Skinner::has_larger_angle( EntityHandle& entity1, EntityHandle& entity2, do
 
     double cosine = norm[0][0] * norm[1][0] + norm[0][1] * norm[1][1] + norm[0][2] * norm[1][2];
 
-    if( cosine < reference_angle_cosine ) { return true; }
+    if( cosine < reference_angle_cosine )
+    {
+        return true;
+    }
 
     return false;
 }
@@ -1065,7 +1098,10 @@ ErrorCode Skinner::find_skin_vertices_1D( Tag tag, const Range& edges, Range& sk
         n = std::count( tag_vals.begin(), tag_vals.end(), '\001' );
 #endif
         // If adjacent to only one input edge, then vertex is on skin
-        if( n == 1 ) { hint = skin_verts.insert( hint, *it ); }
+        if( n == 1 )
+        {
+            hint = skin_verts.insert( hint, *it );
+        }
     }
 
     return MB_SUCCESS;
@@ -1119,12 +1155,14 @@ class AdjSides
             switch( CORNERS )
             {
                 case 3:
-                case 2:
-		  if (3 == CORNERS)
                     handles[1] = array[( idx + 2 ) % CORNERS];
-		  if (2 <= CORNERS)
-                    handles[0] = array[( idx + 1 ) % CORNERS];
-		  break;
+                    // fall through
+                case 2:
+                    if (3 == CORNERS)
+                      handles[1] = array[( idx + 2 ) % CORNERS];
+                    if (2 <= CORNERS)
+                      handles[0] = array[( idx + 1 ) % CORNERS];
+                    break;
                 default:
                     assert( false );
                     break;
@@ -1147,12 +1185,14 @@ class AdjSides
             switch( CORNERS )
             {
                 case 3:
-                case 2:
-		  if (3 == CORNERS)
                     handles[1] = array[indices[( idx + 2 ) % CORNERS]];
-		  if (2 <= CORNERS)
-                    handles[0] = array[indices[( idx + 1 ) % CORNERS]];
-		  break;
+                    // fall through
+                case 2:
+                    if (3 == CORNERS)
+                      handles[1] = array[indices[( idx + 2 ) % CORNERS]];
+                    if (2 <= CORNERS)
+                      handles[0] = array[indices[( idx + 1 ) % CORNERS]];
+                    break;
                 default:
                     assert( false );
                     break;
