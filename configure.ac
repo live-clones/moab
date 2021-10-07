@@ -1700,6 +1700,13 @@ AC_ARG_ENABLE(all-static,
     fi
 ])
 
+## All configuration done. Let us do some post-processing
+if (test "x$cxx_compiler" = "xGNU" || test "x$cxx_compiler" = "xClang"); then # G++ specific flags
+  if (test "x$enable_debug" != "xno"); then
+    CXXFLAGS="-Werror $CXXFLAGS"
+  fi
+fi
+
 AC_OUTPUT
 
 PRINT_CONFIGURATION_SUMMARY
