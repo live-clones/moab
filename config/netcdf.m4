@@ -173,7 +173,6 @@ fi
 
 AC_SUBST(enablenetcdf)
 AC_SUBST(NETCDF_DIR)
-AC_SUBST(NETCDFCXX_DIR)
 
 ]) # FATHOM_enablenetcdf
 
