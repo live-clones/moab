@@ -24,7 +24,7 @@ AC_DEFUN([FATHOM_CONFIGURE_METIS],[
 
   # Supported Metis versions: 4.0.3, 5.1.0, 5.1.0p2
   # Arguments: 1) Default Version Number, 2) Download by default ?
-  AUSCM_CONFIGURE_DOWNLOAD_METIS([5.1.0p2],[no])
+  AUSCM_CONFIGURE_DOWNLOAD_METIS([5.1.0],[no])
 
   if (test "x$enablemetis" == "xyes" && test "x$METIS_DIR" != "x"); then
 

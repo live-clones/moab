@@ -1069,7 +1069,6 @@ AC_DEFUN([AUSCM_CONFIGURE_DOWNLOAD_METIS],[
   # Invoke the download-metis command
   m4_case( METIS_DOWNLOAD_VERSION, [4.0.3], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([METIS], [http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-4.0.3.tar.gz], [$2] ) ],
                                    [5.1.0], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([METIS], [http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz], [$2] ) ],
-                                   [5.1.0p2], [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([METIS], [http://ftp.mcs.anl.gov/pub/petsc/externalpackages/metis-5.1.0-p2.tar.gz], [$2] ) ],
                                   [ AUSCM_CONFIGURE_EXTERNAL_PACKAGE([METIS], [http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz], [$2] ) ] )
 
   if (test "x$downloadmetis" == "xyes") ; then
@@ -1687,9 +1686,6 @@ AC_DEFUN([AUSCM_AUTOMATED_CONFIGURE_TEMPESTREMAP],
     configure_command="$compiler_opts $tempestremap_src_dir/configure --prefix=$tempestremap_install_dir --libdir=$tempestremap_install_dir/lib --with-pic=1 --enable-shared=$enable_shared"
     if (test "$enablenetcdf" != "no"); then
       configure_command="$configure_command --with-netcdf=$NETCDF_DIR LDFLAGS=\"$NETCDF_LDFLAGS $LDFLAGS\" CPPFLAGS=\"$NETCDF_CPPFLAGS $CPPFLAGS\" LIBS=\"$NETCDF_LIBS $LIBS\""
-      if (test "x$NETCDFCXX_DIR" != "x"); then
-        configure_command="$configure_command --with-netcdf-cxx=$NETCDFCXX_DIR"
-      fi
     else
       AC_MSG_ERROR([TempestRemap requires NetCDF with C++ interfaces to be enabled.])
     fi
