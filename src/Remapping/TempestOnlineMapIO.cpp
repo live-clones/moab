@@ -1385,18 +1385,66 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             tl_re.sort( 1, &sort_buffer ); // so now we order by value
 
             sort_buffer.buffer_init( tl->get_n() );
-            int indexOrder = 2; // order by colVal
+            int indexOrder = 2; //  colVal
             if (row_partition)
-                indexOrder = 1; // order tl by rowVal
-            tl->sort( indexOrder, &sort_buffer );
+                indexOrder = 1; //  rowVal
+            //tl->sort( indexOrder, &sort_buffer );
+
+            std::map<int, int> startDofIndex, endDofIndex; // indices in tl_re for values we want
+            int dofVal =-1;
+            if (tl_re.get_n() > 0)
+                dofVal = tl_re.vi_rd[1]; // first dof val on this rank
+            startDofIndex[dofVal] = 0;
+            endDofIndex [dofVal] = 0 ; // start and end
+            for (int k = 1; k<tl_re.get_n(); k++ )
+            {
+                int newDof = tl_re.vi_rd[2*k+1];
+                if (dofVal == newDof)
+                {
+                    endDofIndex[dofVal] = k; // increment by 1 actually
+                }
+                else
+                {
+                    dofVal = newDof;
+                    startDofIndex[dofVal] = k;
+                    endDofIndex[dofVal] = k;
+                }
+            }
+
+            // basically, for each value we are interested in, index in tl_re with those values are
+            // tl_re.vi_rd[2*startDofIndex+1] == valDof == tl_re.vi_rd[2*endDofIndex+1]
             // so now we have ordered
-            // tl_re shows to what proc do we need to send
+            // tl_re shows to what proc do we need to send the tuple (row, col, val)
             moab::TupleList * tl_back = new moab::TupleList;
             unsigned numr = 1;                          //
             // localSize is a good guess, but maybe it should be bigger ?
-            tl_back->initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
+            // this could be bigger for repeated dofs
+            tl_back->initialize( 3, 0, 0, numr, tl->get_n() );  // to proc, row, col, value
+            tl_back->enableWriteAccess();
             // now loop over tl and tl_re to see where to send
+            // form the new tuple, which will contain the desired dofs per task, per row or column distribution
 
+            for ( int k = 0; k < tl->get_n(); k++)
+            {
+                int valDof = tl->vi_rd[3*k+indexOrder]; // 1 for row, 2 for column // first value, it should be
+                for (int ire = startDofIndex[valDof]; ire <= endDofIndex[valDof]; ire++)
+                {
+                    int to_proc = tl_re.vi_rd[2*ire];
+                    int n = tl_back->get_n();
+                    tl_back->vi_wr[3*n] = to_proc;
+                    tl_back->vi_wr[3*n+1] = tl->vi_rd[3*k+1]; // row
+                    tl_back->vi_wr[3*n+2] = tl->vi_rd[3*k+2]; // col
+                    tl_back->vr_wr[n]    = tl->vi_rd[k];
+                    tl_back->inc_n();
+                }
+            }
+
+            // now communicate to the desired tasks:
+            ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, *tl_back, 0 );
+
+            tl_re.reset(); // clear memory, although this will go out of scope
+            tl->reset();
+            tl = tl_back;
         }
 
         int rindexMax = 0, cindexMax = 0;
@@ -1434,6 +1482,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 
             sparseMatrix( rindex, cindex ) = tl->vr_wr[i];
         }
+        tl->reset();
 
     }
     else

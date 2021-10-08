@@ -205,21 +205,26 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot load atm mesh" )
     }
 
-    MPI_Barrier( MPI_COMM_WORLD );
     if( ocnComm != MPI_COMM_NULL )
     {
         MPI_Comm_rank( ocnComm, &rankInOcnComm );
         ierr = iMOAB_RegisterApplication( "OCN1", &ocnComm, &cmpocn, cmpOcnPID );
         CHECKIERR( ierr, "Cannot register OCN App" )
-        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay, ocnFilename.length(),
-                               readopts.length() );
-        CHECKIERR( ierr, "Cannot load ocn mesh" )
     }
+    MPI_Barrier( MPI_COMM_WORLD );
 
     ierr =
         setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
                                             &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
 
+    if( couComm != MPI_COMM_NULL )
+    {  // write only for n==1 case
+        char outputFileTgt3[] = "recvTgt.h5m";
+        ierr                  = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write target mesh after receiving on coupler" )
+    }
+    CHECKIERR( ierr, "Cannot load and distribute target mesh" )
     MPI_Barrier( MPI_COMM_WORLD );
 
     if( couComm != MPI_COMM_NULL )
