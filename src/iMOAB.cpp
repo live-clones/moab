@@ -3138,6 +3138,9 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
     appData& data_intx       = context.appDatas[*pid_intersection];
     TempestMapAppData& tdata = data_intx.tempestData;
 
+    appData& data1     = context.appDatas[*pid_cpl];
+    EntityHandle fset1 = data1.file_set; // this is source or target, depending on direction
+
     // Get the handle to the remapper object
     if( tdata.remapper == NULL )
     {
@@ -3150,11 +3153,8 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
 #endif
       tdata.remapper->meshValidate     = true;
       tdata.remapper->constructEdgeMap = true;
-
       // Do not create new filesets; Use the sets from our respective applications
       tdata.remapper->initialize( false );
-      // tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )  = data_src.file_set;
-      // tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh )  = data_tgt.file_set;
       tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
     }
 
@@ -3182,10 +3182,7 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
 
     // populate first tuple
     Range ents_of_interest;  // will be filled with entities on coupler, from which we will get the DOFs, based on type
-
-
-    appData& data1     = context.appDatas[*pid_cpl];
-    EntityHandle fset1 = data1.file_set;
+    int ndofPerEl = 1;
 
     if( *type == 1 )
     {
@@ -3193,6 +3190,7 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
         rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
         dofValues.resize( ents_of_interest.size() * lenTagType1 );
         rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );
+        ndofPerEl = lenTagType1;
     }
     else if( *type == 2 )
     {
@@ -3211,10 +3209,28 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
         CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2 or 3
     }
     // pass ordered dofs, and unique
-    std::sort( dofValues.begin(), dofValues.end() );
-    dofValues.erase( std::unique( dofValues.begin(), dofValues.end() ), dofValues.end() ); // remove duplicates
+    std::vector<int> orderDofs(dofValues.begin(), dofValues.end());
 
-    rval = weightMap->ReadParallelMap( remap_weights_filename, dofValues, row_based_partition );CHKERRVAL( rval );
+    std::sort( orderDofs.begin(), orderDofs.end() );
+    orderDofs.erase( std::unique( orderDofs.begin(), orderDofs.end() ), orderDofs.end() ); // remove duplicates
+
+    rval = weightMap->ReadParallelMap( remap_weights_filename, orderDofs, row_based_partition );CHKERRVAL( rval );
+
+    // if we are on target mesh (row based partition)
+    if( row_based_partition )
+    {
+        tdata.pid_dest = pid_cpl;
+        tdata.remapper->SetMeshSet( Remapper::TargetMesh, fset1, ents_of_interest );
+        weightMap->SetDestinationNDofsPerElement( ndofPerEl );
+        weightMap->set_row_dc_dofs( dofValues );  // will set row_dtoc_dofmap
+    }
+    else
+    {
+        tdata.pid_src = pid_cpl;
+        tdata.remapper->SetMeshSet( Remapper::SourceMesh, fset1, ents_of_interest );
+        weightMap->SetSourceNDofsPerElement( ndofPerEl );
+        weightMap->set_col_dc_dofs( dofValues );  // will set col_dtoc_dofmap
+    }
 
     return 0;
 }
