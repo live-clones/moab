@@ -3117,7 +3117,107 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #ifdef MOAB_HAVE_NETCDF
+ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
+                                   iMOAB_AppID pid_cpl,
+                                   int * col_or_row,
+                                   int * type,
+                                   const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+                                   const iMOAB_String remap_weights_filename,
+                                   int solution_weights_identifier_length,
+                                   int remap_weights_filename_length )
+{
+    assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
+    ErrorCode rval;
+    bool row_based_partition = true;
+    if (*col_or_row == 1)
+        row_based_partition = false; // do a column based partition;
 
+    // get the local degrees of freedom, from the pid_cpl and type of mesh
+
+    // Get the source and target data and pcomm objects
+    appData& data_intx       = context.appDatas[*pid_intersection];
+    TempestMapAppData& tdata = data_intx.tempestData;
+
+    // Get the handle to the remapper object
+    if( tdata.remapper == NULL )
+    {
+      // Now allocate and initialize the remapper object
+#ifdef MOAB_HAVE_MPI
+      ParallelComm* pco = context.pcomms[*pid_intersection];
+      tdata.remapper    = new moab::TempestRemapper( context.MBI, pco );
+#else
+      tdata.remapper = new moab::TempestRemapper( context.MBI );
+#endif
+      tdata.remapper->meshValidate     = true;
+      tdata.remapper->constructEdgeMap = true;
+
+      // Do not create new filesets; Use the sets from our respective applications
+      tdata.remapper->initialize( false );
+      // tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )  = data_src.file_set;
+      // tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh )  = data_tgt.file_set;
+      tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
+    }
+
+    // Setup loading of weights onto TempestOnlineMap
+    // Set the context for the remapping weights computation
+    tdata.weightMaps[std::string( solution_weights_identifier )] = new moab::TempestOnlineMap( tdata.remapper );
+
+    // Now allocate and initialize the remapper object
+    moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
+    assert( weightMap != NULL );
+
+    // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
+    Tag gdsTag;
+
+    // find the values on first cell
+    int lenTagType1 = 1;
+    if( *type == 1 )
+    {
+        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
+        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
+    }
+    Tag tagType2 = context.MBI->globalId_tag();
+
+    std::vector< int > dofValues;
+
+    // populate first tuple
+    Range ents_of_interest;  // will be filled with entities on coupler, from which we will get the DOFs, based on type
+
+
+    appData& data1     = context.appDatas[*pid_cpl];
+    EntityHandle fset1 = data1.file_set;
+
+    if( *type == 1 )
+    {
+        assert( gdsTag );
+        rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
+        dofValues.resize( ents_of_interest.size() * lenTagType1 );
+        rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );
+    }
+    else if( *type == 2 )
+    {
+        rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
+        dofValues.resize( ents_of_interest.size() );
+        rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );  // just global ids
+    }
+    else if( *type == 3 )  // for FV meshes, just get the global id of cell
+    {
+        rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL( rval );
+        dofValues.resize( ents_of_interest.size() );
+        rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );  // just global ids
+    }
+    else
+    {
+        CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2 or 3
+    }
+    // pass ordered dofs, and unique
+    std::sort( dofValues.begin(), dofValues.end() );
+    dofValues.erase( std::unique( dofValues.begin(), dofValues.end() ), dofValues.end() ); // remove duplicates
+
+    rval = weightMap->ReadParallelMap( remap_weights_filename, dofValues, row_based_partition );CHKERRVAL( rval );
+
+    return 0;
+}
 ErrCode iMOAB_LoadMappingWeightsFromFile(
     iMOAB_AppID pid_intersection,
     const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
@@ -3249,7 +3349,6 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
         rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );MB_CHK_ERR( rval );  // usually it is 16
     }
     Tag tagType2 = context.MBI->globalId_tag();
-    ;
 
     std::vector< int > valuesComp1;
 
