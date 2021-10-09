@@ -1434,7 +1434,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                     tl_back->vi_wr[3*n] = to_proc;
                     tl_back->vi_wr[3*n+1] = tl->vi_rd[3*k+1]; // row
                     tl_back->vi_wr[3*n+2] = tl->vi_rd[3*k+2]; // col
-                    tl_back->vr_wr[n]    = tl->vi_rd[k];
+                    tl_back->vr_wr[n]    = tl->vr_rd[k];
                     tl_back->inc_n();
                 }
             }

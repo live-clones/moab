@@ -216,14 +216,16 @@ int main( int argc, char* argv[] )
     ierr =
         setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
                                             &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
-
+    CHECKIERR( ierr, "Cannot set-up target meshes" )
+#ifdef VERBOSE
     if( couComm != MPI_COMM_NULL )
-    {  // write only for n==1 case
+    {
         char outputFileTgt3[] = "recvTgt.h5m";
         ierr                  = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions, strlen( outputFileTgt3 ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write target mesh after receiving on coupler" )
     }
+#endif
     CHECKIERR( ierr, "Cannot load and distribute target mesh" )
     MPI_Barrier( MPI_COMM_WORLD );
 
@@ -253,14 +255,14 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_MigrateMapMesh( cmpAtmPID, cplAtmOcnPID, cplAtmPID, &atmCouComm, &atmPEGroup, &couPEGroup, &type,
                                      &cmpatm, &cplocn, &direction );
         CHECKIERR( ierr, "failed to migrate mesh for atm on coupler" );
-//#ifdef VERBOSE
+#ifdef VERBOSE
         if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov";
             ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local mesh" );
         }
-//#endif
+#endif
     }
     MPI_Barrier( MPI_COMM_WORLD );
 
@@ -388,14 +390,14 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
-//#ifdef VERBOSE
+#ifdef VERBOSE
         if( *cplAtmPID >= 0 )
         {
             char prefix[] = "atmcov_withdata";
             ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix, strlen( prefix ) );
             CHECKIERR( ierr, "failed to write local atm cov mesh with data" );
         }
-//#endif
+#endif
 
         if( couComm != MPI_COMM_NULL )
         {
@@ -456,12 +458,12 @@ int main( int argc, char* argv[] )
 
         if( ocnComm != MPI_COMM_NULL )
         {
-//#ifdef VERBOSE
+#ifdef VERBOSE
             char outputFileOcn[] = "OcnWithProj.h5m";
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions, strlen( outputFileOcn ),
                                     strlen( fileWriteOptions ) );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
-//#endif
+#endif
             // test results only for n == 1, for bottomTempProjectedField
             if( !no_regression_test )
             {
