@@ -141,12 +141,13 @@ int main( int argc, char** argv )
     mbi->load_mesh( argv[1] );
 
     double factor = 1.0;
-    if( argc == 4 ) factor = atof( argv[3] );
 
-    putVertexField( mbi, "vertex_field", factor );
-    putElementField( mbi, "element_field", factor );
+    // putVertexField( mbi, "vertex_field", factor );
+    putElementField( mbi, "T_proj", factor );
+    putElementField( mbi, "u_proj", 2 );
+    putElementField( mbi, "v_proj", 3 );
     // putSpectralElementField(mbi, 2, 4, "spectral_element_field", factor);
-    putSpectralElementField( mbi, 2, 4, "a2oTAG", factor );
+    // putSpectralElementField( mbi, 2, 4, "a2oTAG", factor );
 
     ErrorCode result = mbi->write_mesh( argv[2] );
     if( MB_SUCCESS == result )
