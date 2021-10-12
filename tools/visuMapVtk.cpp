@@ -300,7 +300,7 @@ int main( int argc, char* argv[] )
             rval = mb->get_adjacencies( sourceEnts, 2, false, adjCells, Interface::UNION );MB_CHK_SET_ERR( rval, " can't get adj cells " );
             sourceEnts.merge( adjCells );
         }
-        rval = mb->add_entities( partialSet, sourceEnts );
+        rval = mb->add_entities( partialSet, sourceEnts ); MB_CHK_SET_ERR( rval, "Failed to add source entities" );
         // write now the set in a numbered file
         std::stringstream fff;
         fff << name_map << "_row" << row + 1 << extension;
