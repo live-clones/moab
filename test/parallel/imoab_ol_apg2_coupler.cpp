@@ -20,6 +20,9 @@
 #error imoab coupler test requires MPI configuration
 #endif
 
+#ifndef MOAB_HAVE_ZOLTAN
+#error imoab coupler ol2_apg2 requires Zoltan configuration
+#endif
 // MPI includes
 #include "moab_mpi.h"
 #include "moab/ParallelComm.hpp"
@@ -59,12 +62,8 @@ int main( int argc, char* argv[] )
     double timer_ops;
     std::string opName;
 
-    int repartitioner_scheme = 0;
-#ifdef MOAB_HAVE_ZOLTAN
-    repartitioner_scheme = 3;  // use the geometry partitioner RCB, with gnomonic projection
-    // 0 trivial / 1 PHG / 2 RCB / 3 RCB in gnomonic space
-    // 4 would be something for inferred partition; need more infrastructure
-#endif
+    int repartitioner_scheme = 2; // used for land
+    int repartitioner_ocn_atm = 4; // start with 4 for ocn (store), then 5 to reuse it for atm
 
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &rankInGlobalComm );
@@ -141,7 +140,7 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "startCoupler,g", "start task for coupler layout", &startG4 );
     opts.addOpt< int >( "endCoupler,j", "end task for coupler layout", &endG4 );
 
-    opts.addOpt< int >( "partitioning,p", "partitioning option for migration", &repartitioner_scheme );
+    opts.addOpt< int >( "partitioning,p", "partitioning option for migration of land", &repartitioner_scheme );
 
     int n = 1;  // number of send/receive / project / send back cycles
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
@@ -276,19 +275,6 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_RegisterApplication( "LND1", &lndComm, &cmplnd, cmpLndPID );
         CHECKIERR( ierr, "Cannot register LND App " )
     }
-    // we can reuse the ocn, or use the regular repartitioner_scheme = 2;
-    repartitioner_scheme = 2;
-    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
-                                           &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
-                                           repartitioner_scheme );
-
-    if( couComm != MPI_COMM_NULL )
-    {  // write only for n==1 case
-        char outputFileLnd[] = "recvLnd.h5m";
-        ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
-                                strlen( fileWriteOptions ) );
-        CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
-    }
 
 #endif  // #ifdef ENABLE_ATMLND_COUPLING
 
@@ -305,11 +291,13 @@ int main( int argc, char* argv[] )
 
     // store the ocean RCB partition, to be used by atm
 #ifdef ENABLE_OCNATM_COUPLING
-    repartitioner_scheme = 4; // will use RCB + storing of the cuts
+    repartitioner_ocn_atm = 4; // will use RCB + storing of the cuts
     // ocean
+    if( !rankInGlobalComm )
+        std::cout << " use repartitioning scheme " << repartitioner_ocn_atm << " for migration of ocean \n";
     ierr =
         setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
-                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
+                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_ocn_atm );
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
     if( couComm != MPI_COMM_NULL )
     {
@@ -322,10 +310,12 @@ int main( int argc, char* argv[] )
     }
     MPI_Barrier( MPI_COMM_WORLD );
     // atm
-    repartitioner_scheme = 5; // reuse the partition stored at previous step
+    repartitioner_ocn_atm = 5; // reuse the partition stored at previous step
+    if( !rankInGlobalComm )
+        std::cout << " use repartitioning scheme " << repartitioner_ocn_atm << " for migration of atm (induced from ocean)  \n";
     ierr =
         setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
-                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
+                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_ocn_atm );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
     if( couComm != MPI_COMM_NULL )
     {
@@ -341,6 +331,23 @@ int main( int argc, char* argv[] )
 #endif  // #ifdef ENABLE_ATMOCN_COUPLING
 
     MPI_Barrier( MPI_COMM_WORLD );
+#ifdef ENABLE_LNDATM_COUPLING
+    // we can reuse the ocn, repartitioner_scheme = 5,  or use the regular repartitioner_scheme = 2 (command line option -p)
+    if( !rankInGlobalComm )
+        std::cout << " use repartitioning scheme " << repartitioner_scheme << " for migration of land\n";
+    ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
+                                           &couPEGroup, &lndCouComm, lndFilename, readoptsPhysAtm, nghlay,
+                                           repartitioner_scheme );
+
+    if( couComm != MPI_COMM_NULL )
+    {  // write only for n==1 case
+        char outputFileLnd[] = "recvLnd.h5m";
+        ierr                 = iMOAB_WriteMesh( cplLndPID, outputFileLnd, fileWriteOptions, strlen( outputFileLnd ),
+                                strlen( fileWriteOptions ) );
+        CHECKIERR( ierr, "cannot write lnd mesh after receiving" )
+    }
+
+#endif  // #ifdef ENABLE_ATMLND_COUPLING
 
 #ifdef ENABLE_OCNATM_COUPLING
     if( couComm != MPI_COMM_NULL )
