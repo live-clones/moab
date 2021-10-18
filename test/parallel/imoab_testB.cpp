@@ -404,7 +404,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
          // do not write if iters > 0)
-           if( 1 == iters )
+           if( 1 == n )
            {
                char outputFileTgt[] = "fAtmOnCpl5.h5m";
                ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),

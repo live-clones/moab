@@ -541,7 +541,7 @@ int main( int argc, char* argv[] )
     for( int iters = 0; iters < n; iters++ )
     {
 #ifdef VERBOSE
-        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 1 == n ) )
         {
             char outputFileAtm[] = "AtmAtStartIt.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
@@ -574,7 +574,7 @@ int main( int argc, char* argv[] )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 #ifdef VERBOSE
-        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 1 == n ) )
         {
             char outputFileAtm[] = "AtmAfterTagMigrToLand.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
@@ -595,7 +595,7 @@ int main( int argc, char* argv[] )
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
-            if( 0 ==  iters )
+            if( 1 == n )
             {
                 char outputFileTgt[] = "fAtmOnCpl4.h5m";
                 ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
@@ -604,7 +604,7 @@ int main( int argc, char* argv[] )
             }
         }
 #ifdef VERBOSE
-        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 1 == n ) )
         {
             char outputFileAtm[] = "AtmBeforeMigr.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
@@ -644,7 +644,7 @@ int main( int argc, char* argv[] )
         MPI_Barrier( MPI_COMM_WORLD );
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 #ifdef VERBOSE
-        if( ( atmComm != MPI_COMM_NULL ) && ( 0 == iters ) )
+        if( ( atmComm != MPI_COMM_NULL ) && ( 1 == n ) )
         {
             char outputFileAtm[] = "AtmWithProj3.h5m";
             ierr                 = iMOAB_WriteMesh( cmpAtmPID, outputFileAtm, fileWriteOptions, strlen( outputFileAtm ),
@@ -695,7 +695,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
          // do not write if iters > 0)
-           if( 0 == iters )
+           if( 1 == n )
            {
                char outputFileTgt[] = "fAtmOnCpl5.h5m";
                ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
