@@ -300,7 +300,6 @@ int main( int argc, char* argv[] )
 
         if( use_spherical )
         {
-            error = moab::IntxUtils::ScaleToRadius( mbCore, masterfileset, master_radius );MB_CHK_ERR( error );
             error = moab::IntxUtils::ScaleToRadius( mbCore, slavefileset, slave_radius );MB_CHK_ERR( error );
         }
 
