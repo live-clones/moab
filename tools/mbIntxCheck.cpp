@@ -353,17 +353,16 @@ int main( int argc, char* argv[] )
 
     if( !non_convex_intx_cells.empty() )
     {
-
-      sourceCells.clear();
-      targetCells.clear();
+        Range sourceNCCells;
+        Range targetNCCells;
         for( Range::iterator it = non_convex_intx_cells.begin(); it != non_convex_intx_cells.end(); it++ )
         {
             EntityHandle cellIntx = *it;
             int sourceID, targetID;
             rval = mb->tag_get_data( sourceParentTag, &cellIntx, 1, &sourceID );MB_CHK_ERR( rval );
             rval = mb->tag_get_data( targetParentTag, &cellIntx, 1, &targetID );MB_CHK_ERR( rval );
-            sourceCells.insert( sourceMap[sourceID] );
-            targetCells.insert( targetMap[targetID] );
+            sourceNCCells.insert( sourceMap[sourceID] );
+            targetNCCells.insert( targetMap[targetID] );
         }
         EntityHandle nonConvexSet;
         rval = mb->create_meshset( MESHSET_SET, nonConvexSet );MB_CHK_ERR( rval );
@@ -372,14 +371,14 @@ int main( int argc, char* argv[] )
 
         EntityHandle sSet;
         rval = mb->create_meshset( MESHSET_SET, sSet );MB_CHK_ERR( rval );
-        rval = mb->add_entities( sSet, sourceCells );
+        rval = mb->add_entities( sSet, sourceNCCells );
         rval = mb->write_file( "nonConvexSource.h5m", 0, 0, &sSet, 1 );MB_CHK_ERR( rval );
         EntityHandle tSet;
         rval = mb->create_meshset( MESHSET_SET, tSet );MB_CHK_ERR( rval );
-        rval = mb->add_entities( tSet, targetCells );
+        rval = mb->add_entities( tSet, targetNCCells );
         rval = mb->write_file( "nonConvexTarget.h5m", 0, 0, &tSet, 1 );MB_CHK_ERR( rval );
-        rval = mb->add_entities( nonConvexSet, sourceCells );
-        rval = mb->add_entities( nonConvexSet, targetCells );
+        rval = mb->add_entities( nonConvexSet, sourceNCCells );
+        rval = mb->add_entities( nonConvexSet, targetNCCells );
         rval = mb->write_file( "nonConvexAll.h5m", 0, 0, &nonConvexSet, 1 );MB_CHK_ERR( rval );
     }
     return 0;

@@ -22,7 +22,11 @@
 #include <vector>
 
 #ifdef MOAB_HAVE_EIGEN3
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#include <Eigen/Dense>
 #include <Eigen/Sparse>
+#pragma GCC diagnostic pop
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

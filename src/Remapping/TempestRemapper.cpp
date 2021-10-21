@@ -1087,7 +1087,7 @@ ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius
         {
             rval = m_interface->create_meshset( moab::MESHSET_SET, m_covering_source_set );MB_CHK_SET_ERR( rval, "Can't create new set" );
 
-            double tolerance = 1e-6, btolerance = 1e-3;
+            double btolerance = 1e-3;
             moab::AdaptiveKDTree tree( m_interface );
             moab::Range targetVerts;
 
@@ -1282,7 +1282,6 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
             {
                 Range covEnts;
                 rval = m_interface->get_entities_by_dimension( m_covering_source_set, 2, covEnts );MB_CHK_ERR( rval );
-                Tag gidtag = m_interface->globalId_tag();
 
                 std::map< int, int > loc_gid_to_lid_covsrc;
                 std::vector< int > gids( covEnts.size(), -1 );
@@ -1309,13 +1308,13 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                 }
 
                 Range notNeededCovCells = moab::subtract( covEnts, intxCov );
-                    // remove now from coverage set the cells that are not needed
+                // remove now from coverage set the cells that are not needed
                 rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                 covEnts = moab::subtract( covEnts, notNeededCovCells );
 #ifdef VERBOSE
                 std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
-                std::cout << " remove from coverage set elements that are not intersected: "
-                              << notNeededCovCells.size() << "\n";
+                std::cout << " remove from coverage set elements that are not intersected: " << notNeededCovCells.size()
+                          << "\n";
 #endif
                 if( size > 1 )
                 {
@@ -1830,22 +1829,22 @@ ErrorCode TempestRemapper::augment_overlap_set()
                     // mark them, to populate later the TLv2 tuple list
 
                     // just copy the vertices, including 0 ones
-                    for( int j = 0; j < nvert; j++ )
+                    for( int k = 0; k < nvert; k++ )
                     {
-                        int vertexIndex = TLc.vi_rd[i * sizeTuple + 4 + j];
+                        int vertexIndex = TLc.vi_rd[i * sizeTuple + 4 + k];
                         // is this vertex available from org proc?
                         if( availableVerticesFromThisProc.find( vertexIndex ) == availableVerticesFromThisProc.end() )
                         {
                             MB_CHK_SET_ERR( MB_FAILURE, " vertex index not available from processor" );
                         }
-                        TLc2.vi_wr[n2 * sizeTuple2 + 5 + j] = vertexIndex;
+                        TLc2.vi_wr[n2 * sizeTuple2 + 5 + k] = vertexIndex;
                         int indexInTLv                      = availVertexIndicesPerProcessor[orgProc][vertexIndex];
                         indexVerticesInTLv.insert( indexInTLv );
                     }
 
-                    for( int j = nvert; j < globalMaxEdges; j++ )
+                    for( int k = nvert; k < globalMaxEdges; k++ )
                     {
-                        TLc2.vi_wr[n2 * sizeTuple2 + 5 + j] = 0;  // or mark them 0
+                        TLc2.vi_wr[n2 * sizeTuple2 + 5 + k] = 0;  // or mark them 0
                     }
                     TLc2.inc_n();
                 }
@@ -1883,9 +1882,9 @@ ErrorCode TempestRemapper::augment_overlap_set()
             TLv2.vi_wr[3 * nv2]      = sendToProc;
             TLv2.vi_wr[3 * nv2 + 1]  = orgProc;
             TLv2.vi_wr[3 * nv2 + 2]  = indexVertexInOrgProc;
-            for( int j = 0; j < 3; j++ )
-                TLv2.vr_wr[3 * nv2 + j] =
-                    TLv.vr_rd[3 * indexInTLv + j];  // departure position, of the node local_verts[i]
+            for( int k = 0; k < 3; k++ )
+                TLv2.vr_wr[3 * nv2 + k] =
+                    TLv.vr_rd[3 * indexInTLv + k];  // departure position, of the node local_verts[i]
             TLv2.inc_n();
         }
     }
@@ -1939,11 +1938,11 @@ ErrorCode TempestRemapper::augment_overlap_set()
         int nve      = TLc2.vi_wr[i * sizeTuple2 + 4];  // number of vertices for the polygon
         std::vector< EntityHandle > conn;
         conn.resize( nve );
-        for( int j = 0; j < nve; j++ )
+        for( int k = 0; k < nve; k++ )
         {
-            int indexV      = TLc2.vi_wr[i * sizeTuple2 + 5 + j];
+            int indexV      = TLc2.vi_wr[i * sizeTuple2 + 5 + k];
             EntityHandle vh = vertexPerProcAndIndex[orgProc][indexV];
-            conn[j]         = vh;
+            conn[k]         = vh;
         }
         EntityHandle polyNew;
         rval = m_interface->create_element( MBPOLYGON, &conn[0], nve, polyNew );MB_CHK_ERR( rval );

@@ -117,7 +117,10 @@ int IntxUtils::SortAndRemoveDoubles2( double* P, int& nP, double epsilon_1 )
     for( k = 0; k < nP; k++ )
     {
         double x = P[2 * k] - c[0], y = P[2 * k + 1] - c[1];
-        if( x != 0. || y != 0. ) { pairAngleIndex[k].angle = atan2( y, x ); }
+        if( x != 0. || y != 0. )
+        {
+            pairAngleIndex[k].angle = atan2( y, x );
+        }
         else
         {
             pairAngleIndex[k].angle = 0;
@@ -161,7 +164,10 @@ int IntxUtils::SortAndRemoveDoubles2( double* P, int& nP, double epsilon_1 )
     // the first one could be at -PI; last one could be at +PI, according to atan2 span
 
     double d2 = dist2( P, &P[2 * i] );  // check the first and last points (ordered from -pi to +pi)
-    if( d2 > epsilon_1 ) { nP = i + 1; }
+    if( d2 > epsilon_1 )
+    {
+        nP = i + 1;
+    }
     else
         nP = i;            // effectively delete the last point (that would have been the same with first)
     if( nP == 0 ) nP = 1;  // we should be left with at least one point we already tested if nP is 0 originally
@@ -292,7 +298,10 @@ ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdge
                 double E[9];
                 intersect_great_circle_arc_with_clat_arc( A.array(), B.array(), C.array(), D.array(), R, E, np );
                 if( np == 0 ) continue;
-                if( np >= 2 ) { std::cout << "intersection with 2 points :" << A << B << C << D << "\n"; }
+                if( np >= 2 )
+                {
+                    std::cout << "intersection with 2 points :" << A << B << C << D << "\n";
+                }
                 for( int k = 0; k < np; k++ )
                 {
                     gnomonic_projection( CartVect( E + k * 3 ), R, plane, points[2 * nPoints],
@@ -619,8 +628,8 @@ ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inS
                 int num_nodes;
                 rval = mb->get_connectivity( eh, conn, num_nodes );MB_CHK_ERR( rval );
                 // build a new vertex array
-                for( int j = 0; j < num_nodes; j++ )
-                    new_conn[j] = corr[conn[j]];
+                for( int z = 0; z < num_nodes; z++ )
+                    new_conn[z] = corr[conn[z]];
                 EntityType type = mb->type_from_handle( eh );
                 EntityHandle newCell;
                 rval = mb->create_element( type, new_conn, num_nodes, newCell );MB_CHK_ERR( rval );

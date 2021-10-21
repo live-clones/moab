@@ -223,7 +223,7 @@ class ParCommGraph
 
     // after map read, we need to know what entities we need to send to receiver
     ErrorCode set_split_ranges( int comp, TupleList& TLBackToComp1, std::vector< int >& valuesComp1, int lenTag,
-                                Range& ents_of_interest, int type );
+                                Range& ents_of_interest );
 
     // new methods to migrate mesh after reading map
     ErrorCode form_tuples_to_migrate_mesh( Interface* mb, TupleList& TLv, TupleList& TLc, int type, int lenTagType1 );

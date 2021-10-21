@@ -80,7 +80,6 @@ int main( int argc, char* argv[] )
     moab::ErrorCode rval;
     int dimension = 2;
     NcError error2( NcError::verbose_nonfatal );
-    std::stringstream sstr;
     ProgOptions opts;
     std::string h5mfilename, scripfile;
     bool noMap         = false;
@@ -106,7 +105,10 @@ int main( int argc, char* argv[] )
 
     moab::Interface* mbCore = new( std::nothrow ) moab::Core;
 
-    if( NULL == mbCore ) { return 1; }
+    if( NULL == mbCore )
+    {
+        return 1;
+    }
 
     // Set the read options for parallel file loading
     const std::string partition_set_name = "PARALLEL_PARTITION";
@@ -123,7 +125,10 @@ int main( int argc, char* argv[] )
 
         // Open an output file
         NcFile ncMap( scripfile.c_str(), NcFile::Replace, NULL, 0, NcFile::Offset64Bits );
-        if( !ncMap.is_valid() ) { _EXCEPTION1( "Unable to open output map file \"%s\"", scripfile.c_str() ); }
+        if( !ncMap.is_valid() )
+        {
+            _EXCEPTION1( "Unable to open output map file \"%s\"", scripfile.c_str() );
+        }
 
         {
             // NetCDF-SCRIP Global Attributes

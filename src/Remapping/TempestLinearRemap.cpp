@@ -26,10 +26,6 @@
 #include "moab/Remapping/TempestOnlineMap.hpp"
 #include "moab/TupleList.hpp"
 
-#ifdef MOAB_HAVE_EIGEN3
-#include <Eigen/Dense>
-#endif
-
 #include <fstream>
 #include <cmath>
 #include <cstdlib>

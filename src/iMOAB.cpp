@@ -715,7 +715,7 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, iMOAB_String filename, iMOAB_String wr
     return 0;
 }
 
-ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int prefix_length )
+ErrCode iMOAB_WriteLocalMesh( iMOAB_AppID pid, iMOAB_String prefix, int /*prefix_length*/ )
 {
     std::ostringstream file_name;
     int rank = 0, size = 1;
@@ -2961,7 +2961,6 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
         {
             // get coverage set
             assert( *pid_intx >= 0 );
-            appData& dataIntx      = context.appDatas[*pid_intx];
             EntityHandle cover_set = dataIntx.tempestData.remapper->GetMeshSet( Remapper::CoveringMesh );
 
             // get all cells from coverage set
@@ -3020,7 +3019,6 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join, iMOAB_AppID pid_src, iMOAB_AppID pi
             // this par comm graph will need to use the coverage set
             // so we are for sure on intx pes (the receiver is the coupler mesh)
             assert( *pid_intx >= 0 );
-            appData& dataIntx      = context.appDatas[*pid_intx];
             EntityHandle cover_set = dataIntx.tempestData.remapper->GetMeshSet( Remapper::CoveringMesh );
             recvGraph1->set_cover_set( cover_set );
             context.appDatas[*pid_migr].pgraph[*context_id] = recvGraph1;
@@ -3414,7 +3412,7 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1, iMOAB_AppID pid2, iMOAB_AppID pi
 #endif
         // so we are now on pid1, we know now each marker were it has to go
         // add a new method to ParCommGraph, to set up the split_ranges and involved_IDs_map
-        rval = cgraph->set_split_ranges( *comp1, TLBackToComp1, valuesComp1, lenTagType1, ents_of_interest, *type );CHKERRVAL( rval );
+        rval = cgraph->set_split_ranges( *comp1, TLBackToComp1, valuesComp1, lenTagType1, ents_of_interest );CHKERRVAL( rval );
         // we can just send vertices and elements, with crystal routers;
         // on the receiving end, make sure they are not duplicated, by looking at the global id
         // if *type is 1, also send global_dofs tag in the element tuple

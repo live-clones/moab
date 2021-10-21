@@ -1731,7 +1731,7 @@ ErrorCode AdaptiveKDTree::closest_triangle( EntityHandle tree_root, const double
     return MB_SUCCESS;
 }
 
-ErrorCode AdaptiveKDTree::sphere_intersect_triangles( EntityHandle tree_root, const double center[3], double rad,
+ErrorCode AdaptiveKDTree::sphere_intersect_triangles( EntityHandle tree_root, const double center[3], double sradius,
                                                       std::vector< EntityHandle >& triangles )
 {
     ErrorCode rval;
@@ -1744,7 +1744,7 @@ ErrorCode AdaptiveKDTree::sphere_intersect_triangles( EntityHandle tree_root, co
 
     // get leaves of tree that intersect sphere
     assert( tree_root );
-    rval = distance_search( center, rad, leaves, 1.0e-10, 1.0e-6, NULL, NULL, &tree_root );
+    rval = distance_search( center, sradius, leaves, 1.0e-10, 1.0e-6, NULL, NULL, &tree_root );
     if( MB_SUCCESS != rval ) return rval;
 
     // search each leaf for triangles intersecting sphere
@@ -1762,7 +1762,7 @@ ErrorCode AdaptiveKDTree::sphere_intersect_triangles( EntityHandle tree_root, co
             if( MB_SUCCESS != rval ) return rval;
             GeomUtil::closest_location_on_tri( from, coords, closest_pt );
             closest_pt -= from;
-            if( ( closest_pt % closest_pt ) <= ( rad * rad ) ) triangles.push_back( *j );
+            if( ( closest_pt % closest_pt ) <= ( sradius * sradius ) ) triangles.push_back( *j );
         }
     }
 
