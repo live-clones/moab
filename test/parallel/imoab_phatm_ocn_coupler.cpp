@@ -96,7 +96,6 @@ int main( int argc, char* argv[] )
 #endif
 #ifdef ENABLE_ATMLND_COUPLING
     std::string lndFilename = TestDir + "/wholeLnd.h5m";
-    int rankInLndComm       = -1;
     int cpllnd              = 10,
         cmplnd              = 9;  // component ids are unique over all pes, and established in advance;
 #endif

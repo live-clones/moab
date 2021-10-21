@@ -7,7 +7,7 @@
 #endif
 #include "moab/MOABConfig.h"
 #ifdef MOAB_HAVE_MPI
-#include "moab_mpi.h"
+#include "mpi.h"
 #endif
 
 /* Define these here because they are used by many tests
@@ -282,7 +282,10 @@ int run_test( test_func_err test, const char* func_name )
 #ifdef MOAB_HAVE_MPI
     int isInit;
     MPI_Initialized( &isInit );
-    if( isInit ) { MPI_Comm_rank( MPI_COMM_WORLD, &rank ); }
+    if( isInit )
+    {
+        MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    }
 #endif
 
     if( rank == 0 ) printf( "Running %s ...\n", func_name );
@@ -644,7 +647,10 @@ void check_array_equal( const T* A, size_t A_size, const T* B, size_t B_size, co
     }
 
     std::cout << "  Expected: ";
-    if( !A_size ) { std::cout << "(empty)" << std::endl; }
+    if( !A_size )
+    {
+        std::cout << "(empty)" << std::endl;
+    }
     else
     {
         size_t j   = i - num_front_values;
@@ -662,7 +668,10 @@ void check_array_equal( const T* A, size_t A_size, const T* B, size_t B_size, co
     }
 
     std::cout << "  Actual:   ";
-    if( !B_size ) { std::cout << "(empty)" << std::endl; }
+    if( !B_size )
+    {
+        std::cout << "(empty)" << std::endl;
+    }
     else
     {
         size_t j   = i - num_front_values;
@@ -747,7 +756,7 @@ void check_baseline_file( std::string basefile, std::vector< int >& gids, std::v
         }
         if( fabs( it->second - vals[i] ) > eps )
         {
-            std::cout << " value out of range: index i=" << i << " id: " << gids[i] << "  value:" <<  vals[i]
+            std::cout << " value out of range: index i=" << i << " id: " << gids[i] << "  value:" << vals[i]
                       << " expected : " << it->second << "\n";
             flag_error();
             return;
