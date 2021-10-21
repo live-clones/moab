@@ -43,6 +43,8 @@ case "${target_os}" in
         ;;
 esac
 
+AC_ARG_ENABLE([devmode], [AS_HELP_STRING([--enable-devmode],[indicate to whether all developer level options are to be enabled])])
+
 # Pass the conditionals to automake
 AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
@@ -1701,9 +1703,11 @@ AC_ARG_ENABLE(all-static,
 ])
 
 ## All configuration done. Let us do some post-processing
-if (test "x$cxx_compiler" = "xGNU" || test "x$cxx_compiler" = "xClang"); then # G++ specific flags
-  if (test "x$enable_debug" != "xno"); then
-    CXXFLAGS="-Werror $CXXFLAGS"
+if (test "x$enable_devmode" != "xno"); then
+  if (test "x$cxx_compiler" = "xGNU" || test "x$cxx_compiler" = "xClang"); then # G++ specific flags
+    if (test "x$enable_debug" != "xno"); then
+      CXXFLAGS="$CXXFLAGS -Werror"
+    fi
   fi
 fi
 

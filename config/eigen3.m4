@@ -74,9 +74,9 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
 
       # Let us explicitly disable -Wshadow warnings since Eigen3 does not respect shadow declarations
       # and it results in an exorbitant amount of warnings during the build
-      case "$CXXFLAGS" in
-        *"shadow"*) CXXFLAGS="$CXXFLAGS -Wno-shadow"
-      esac
+      #case "$CXXFLAGS" in
+      #  *"shadow"*) CXXFLAGS="$CXXFLAGS -Wno-shadow"
+      #esac
     fi
   fi
   AM_CONDITIONAL(HAVE_EIGEN3, [test "xno" != "x$enableeigen"])
