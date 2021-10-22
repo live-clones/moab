@@ -6,7 +6,7 @@
  *  \ even migrate tests can use some of these utilities
  *  1) create_comm_group(int start, int end, int tag, MPI_Group& group, MPI_Comm& comm)
  *
-*/
+ */
 
 #ifndef TEST_PARALLEL_IMOAB_COUPLER_UTILS_HPP_
 #define TEST_PARALLEL_IMOAB_COUPLER_UTILS_HPP_
@@ -36,7 +36,7 @@
 /*
  *  \brief create an MPI group and an MPI communicator for the group, in the global communicator
  */
-int create_group_and_comm(int start, int end, MPI_Group worldGroup, MPI_Group * group, MPI_Comm * comm)
+int create_group_and_comm( int start, int end, MPI_Group worldGroup, MPI_Group* group, MPI_Comm* comm )
 {
     std::vector< int > groupTasks;
     groupTasks.resize( end - start + 1, 0 );
@@ -52,7 +52,7 @@ int create_group_and_comm(int start, int end, MPI_Group worldGroup, MPI_Group * 
     return 0;
 }
 
-int create_joint_comm_group(MPI_Group agroup, MPI_Group bgroup,  MPI_Group* abgroup, MPI_Comm* abcomm)
+int create_joint_comm_group( MPI_Group agroup, MPI_Group bgroup, MPI_Group* abgroup, MPI_Comm* abcomm )
 {
     int ierr = MPI_Group_union( agroup, bgroup, abgroup );
     CHECKIERR( ierr, "Cannot create joint union group" )
@@ -63,47 +63,45 @@ int create_joint_comm_group(MPI_Group agroup, MPI_Group bgroup,  MPI_Group* abgr
     return 0;
 }
 
-int setup_component_coupler_meshes(iMOAB_AppID cmpId, int cmpTag,
-                                   iMOAB_AppID cplCmpId, int cmpcouTag,
-                                   MPI_Comm *cmpcomm,
-                                   MPI_Group * cmpPEGroup,
-                                   MPI_Comm *coucomm,
-                                   MPI_Group * cplPEGroup,
-                                   MPI_Comm *cmpcoucomm,
-                                   std::string& filename,
-                                   std::string& readopts,
-                                   int nghlay, int repartitioner_scheme, bool loadmesh=true)
+int setup_component_coupler_meshes( iMOAB_AppID cmpId, int cmpTag, iMOAB_AppID cplCmpId, int cmpcouTag,
+                                    MPI_Comm* cmpcomm, MPI_Group* cmpPEGroup, MPI_Comm* coucomm, MPI_Group* cplPEGroup,
+                                    MPI_Comm* cmpcoucomm, std::string& filename, std::string& readopts, int nghlay,
+                                    int repartitioner_scheme, bool migratemesh = true )
 {
     int ierr = 0;
     if( *cmpcomm != MPI_COMM_NULL )
     {
         // load first mesh
-        if( loadmesh )
+        ierr =
+            iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay, filename.length(), readopts.length() );
+        CHECKIERR( ierr, "Cannot load component mesh" )
+
+        if( migratemesh )
         {
-            ierr = iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay, filename.length(),
-                                   readopts.length() );
-            CHECKIERR( ierr, "Cannot load component mesh" )
+            // then send mesh to coupler pes
+            ierr = iMOAB_SendMesh( cmpId, cmpcoucomm, cplPEGroup, &cmpcouTag,
+                                   &repartitioner_scheme );  // send to  coupler pes
+            CHECKIERR( ierr, "cannot send elements" )
+        }
+    }
+
+    if( migratemesh )
+    {
+        // now, receive mesh, on coupler communicator; first mesh 1, atm
+        if( *coucomm != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_ReceiveMesh( cplCmpId, cmpcoucomm, cmpPEGroup,
+                                      &cmpTag );  // receive from component
+            CHECKIERR( ierr, "cannot receive elements on coupler app" )
         }
 
-        // then send mesh to coupler pes
-        ierr = iMOAB_SendMesh( cmpId, cmpcoucomm, cplPEGroup, &cmpcouTag,
-                               &repartitioner_scheme );  // send to  coupler pes
-        CHECKIERR( ierr, "cannot send elements" )
-    }
-    // now, receive mesh, on coupler communicator; first mesh 1, atm
-    if( *coucomm != MPI_COMM_NULL )
-    {
-        ierr = iMOAB_ReceiveMesh( cplCmpId, cmpcoucomm, cmpPEGroup,
-                                  &cmpTag );  // receive from component
-        CHECKIERR( ierr, "cannot receive elements on coupler app" )
-    }
-
-    // we can now free the sender buffers
-    if( *cmpcomm != MPI_COMM_NULL )
-    {
-        int context_id = -1;
-        ierr = iMOAB_FreeSenderBuffers( cmpId, &context_id );
-        CHECKIERR( ierr, "cannot free buffers used to send atm mesh" )
+        // we can now free the sender buffers
+        if( *cmpcomm != MPI_COMM_NULL )
+        {
+            int context_id = -1;
+            ierr           = iMOAB_FreeSenderBuffers( cmpId, &context_id );
+            CHECKIERR( ierr, "cannot free buffers used to send atm mesh" )
+        }
     }
     return 0;
 }

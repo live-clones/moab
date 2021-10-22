@@ -1059,8 +1059,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     NcFile ncMap( strSource, NcFile::ReadOnly );
 #endif
 
-#define CHECK_EXCEPTION( obj, type, varstr )                                                                               \
-    {                                                                                                                \
+#define CHECK_EXCEPTION( obj, type, varstr )                                                                        \
+    {                                                                                                               \
         if( obj == NULL ) { _EXCEPTION3( "Map file \"%s\" does not contain %s \"%s\"", strSource, type, varstr ); } \
     }
 
@@ -1204,8 +1204,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
-                row_gdofmap.push_back( vecColValue );
-                row_dtoc_dofmap.push_back( vecRowValue );
+                row_gdofmap.push_back( vecRowValue );
+                row_dtoc_dofmap.push_back( rindex );
                 rindexMax++;
             }
             else
@@ -1217,7 +1217,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
                 col_gdofmap.push_back( vecColValue );
-                col_dtoc_dofmap.push_back( vecColValue );
+                col_dtoc_dofmap.push_back( cindex );
                 cindexMax++;
             }
             else
@@ -1243,7 +1243,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 rowMap[vecRowValue] = rindexMax;
                 rindex              = rindexMax;
-                row_dtoc_dofmap.push_back( vecRowValue );
+                row_gdofmap.push_back( vecRowValue );
+                row_dtoc_dofmap.push_back( rindex );
                 rindexMax++;
             }
             else
@@ -1254,7 +1255,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             {
                 colMap[vecColValue] = cindexMax;
                 cindex              = cindexMax;
-                col_dtoc_dofmap.push_back( vecColValue );
+                col_gdofmap.push_back( vecColValue );
+                col_dtoc_dofmap.push_back( cindex );
                 cindexMax++;
             }
             else

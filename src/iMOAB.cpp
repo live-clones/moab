@@ -50,13 +50,13 @@ using namespace moab;
 extern "C" {
 #endif
 
-#define CHKERRVAL( ierr )                        \
-    {                                            \
-        if( moab::MB_SUCCESS != (ierr) ) return 1; \
+#define CHKERRVAL( ierr )                            \
+    {                                                \
+        if( moab::MB_SUCCESS != ( ierr ) ) return 1; \
     }
-#define CHKIERRVAL( ierr )        \
-    {                             \
-        if( 0 != (ierr) ) return 1; \
+#define CHKIERRVAL( ierr )            \
+    {                                 \
+        if( 0 != ( ierr ) ) return 1; \
     }
 
 static struct GlobalContext context;
@@ -2717,13 +2717,13 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 
 #endif  // #ifdef MOAB_HAVE_MPI
 
-
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #ifdef MOAB_HAVE_NETCDF
 
-ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pid_target,
-    iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+ErrCode iMOAB_LoadMappingWeightsFromFile(
+    iMOAB_AppID pid_source, iMOAB_AppID pid_target, iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename, int* owned_dof_ids, int* owned_dof_ids_length, int* row_major_ownership,
     int solution_weights_identifier_length, int remap_weights_filename_length )
 {
@@ -2737,22 +2737,21 @@ ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pi
     // Get the source and target data and pcomm objects
     appData& data_src        = context.appDatas[*pid_source];
     appData& data_tgt        = context.appDatas[*pid_target];
-    appData& data_intx   = context.appDatas[*pid_intersection];
+    appData& data_intx       = context.appDatas[*pid_intersection];
     TempestMapAppData& tdata = data_intx.tempestData;
     if( tdata.remapper != nullptr ) return 0;
 #ifdef MOAB_HAVE_MPI
     ParallelComm* pco_intx = context.pcomms[*pid_intersection];
 #endif
 
-    ierr = iMOAB_UpdateMeshInfo( pid_source );CHKIERRVAL( ierr );
-    ierr = iMOAB_UpdateMeshInfo( pid_target );CHKIERRVAL( ierr );
+    // ierr = iMOAB_UpdateMeshInfo( pid_source );CHKIERRVAL( ierr );
+    // ierr = iMOAB_UpdateMeshInfo( pid_target );CHKIERRVAL( ierr );
 
-    data_intx.dimension = data_tgt.dimension;
+    // data_intx.dimension = data_tgt.dimension;
     // set the context for the source and destination applications
-    // set the context for the source and destination applications
-    tdata.pid_src         = pid_source;
-    tdata.pid_dest        = pid_target;
-    data_intx.point_cloud = ( data_src.point_cloud || data_tgt.point_cloud );
+    // tdata.pid_src         = pid_source;
+    // tdata.pid_dest        = pid_target;
+    // data_intx.point_cloud = ( data_src.point_cloud || data_tgt.point_cloud );
 
     // Get the handle to the remapper object
     if( tdata.remapper == nullptr )
@@ -2769,34 +2768,35 @@ ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pi
 
         // Do not create new filesets; Use the sets from our respective applications
         tdata.remapper->initialize( false );
-        tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )   = data_src.file_set;
-        tdata.remapper->GetMeshSet( moab::Remapper::CoveringMesh ) = data_src.file_set;
-        tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh ) = data_tgt.file_set;
-        // tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
+        if( false )
+        {
+            // tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )   = data_src.file_set;
+            // tdata.remapper->GetMeshSet( moab::Remapper::CoveringMesh ) = data_src.file_set;
+            // tdata.remapper->GetMeshSet( moab::Remapper::TargetMesh ) = data_tgt.file_set;
+            tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
 
-        moab::Range& srcents = tdata.remapper->GetMeshEntities( moab::Remapper::SourceMesh );
-        moab::Range& srcverts = tdata.remapper->GetMeshVertices( moab::Remapper::SourceMesh );
-        moab::Range& covents  = tdata.remapper->GetMeshEntities( moab::Remapper::CoveringMesh );
-        moab::Range& covverts = tdata.remapper->GetMeshVertices( moab::Remapper::CoveringMesh );
-        moab::Range& tgtents = tdata.remapper->GetMeshEntities( moab::Remapper::TargetMesh );
-        moab::Range& tgtverts = tdata.remapper->GetMeshVertices( moab::Remapper::TargetMesh );
+            // moab::Range& srcents = tdata.remapper->GetMeshEntities( moab::Remapper::SourceMesh );
+            // moab::Range& srcverts = tdata.remapper->GetMeshVertices( moab::Remapper::SourceMesh );
+            // moab::Range& covents  = tdata.remapper->GetMeshEntities( moab::Remapper::CoveringMesh );
+            // moab::Range& covverts = tdata.remapper->GetMeshVertices( moab::Remapper::CoveringMesh );
+            // moab::Range& tgtents = tdata.remapper->GetMeshEntities( moab::Remapper::TargetMesh );
+            // moab::Range& tgtverts = tdata.remapper->GetMeshVertices( moab::Remapper::TargetMesh );
 
-        rval = context.MBI->get_entities_by_dimension( data_src.file_set, 2, srcents );MB_CHK_ERR( rval );
-        rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, srcverts );MB_CHK_ERR( rval );
-        covents = srcents;
-        covverts = srcverts;
-        rval     = context.MBI->get_entities_by_dimension( data_tgt.file_set, 2, tgtents );MB_CHK_ERR( rval );
-        rval     = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, tgtverts );
-        MB_CHK_ERR( rval );
+            // rval = context.MBI->get_entities_by_dimension( data_src.file_set, 2, srcents );MB_CHK_ERR( rval );
+            // rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, srcverts );MB_CHK_ERR( rval );
+            // covents = srcents;
+            // covverts = srcverts;
+            // rval     = context.MBI->get_entities_by_dimension( data_tgt.file_set, 2, tgtents );MB_CHK_ERR( rval );
+            // rval     = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, tgtverts );MB_CHK_ERR( rval );
 
-        // Now let us re-convert the MOAB mesh back to Tempest representation
-        rval = tdata.remapper->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
+            // Now let us re-convert the MOAB mesh back to Tempest representation
+            rval = tdata.remapper->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
-        printf( "Source mesh = [%zu, %zu] entities and Target mesh = [%zu, %zu] entities \n",
-                srcents.size(), srcverts.size(),
-                tgtents.size(), tgtverts.size() );
+            // printf( "Source mesh = [%zu, %zu] entities and Target mesh = [%zu, %zu] entities \n",
+            //         srcents.size(), srcverts.size(),
+            //         tgtents.size(), tgtverts.size() );
+        }
     }
-
 
     // Setup loading of weights onto TempestOnlineMap
     // Set the context for the remapping weights computation
@@ -2815,9 +2815,7 @@ ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pi
     if( owned_dof_ids == nullptr && owned_dof_ids_length == nullptr )
     {
         std::vector< int > tmp_owned_ids;
-        rval = weightMap->ReadParallelMap( remap_weights_filename,
-                                           tmp_owned_ids,
-                                           row_based_partition );CHKERRVAL( rval );
+        rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );CHKERRVAL( rval );
     }
     else
     {
@@ -2831,7 +2829,8 @@ ErrCode iMOAB_LoadMappingWeightsFromFile( iMOAB_AppID pid_source, iMOAB_AppID pi
 
 ErrCode iMOAB_WriteMappingWeightsToFile(
     iMOAB_AppID pid_intersection, const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length, int remap_weights_filename_length )
+    const iMOAB_String remap_weights_filename, int solution_weights_identifier_length,
+    int remap_weights_filename_length )
 {
     assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
 
@@ -2848,7 +2847,7 @@ ErrCode iMOAB_WriteMappingWeightsToFile(
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
-    std::string filename  = std::string( remap_weights_filename );
+    std::string filename = std::string( remap_weights_filename );
 
     // Write the map file to disk in parallel using either HDF5 or SCRIP interface
     rval = weightMap->WriteParallelMap( filename );CHKERRVAL( rval );
@@ -3074,8 +3073,10 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
     }
 #endif
 
-    ierr = iMOAB_UpdateMeshInfo( pid_src );CHKIERRVAL( ierr );
-    ierr = iMOAB_UpdateMeshInfo( pid_tgt );CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_src );
+    CHKIERRVAL( ierr );
+    ierr = iMOAB_UpdateMeshInfo( pid_tgt );
+    CHKIERRVAL( ierr );
 
     // Rescale the radius of both to compute the intersection
     ComputeSphereRadius( pid_src, &radius_source );
@@ -3243,12 +3244,12 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
     for( size_t i = 0; i < srcNames.size(); i++ )
     {
         Tag srcTagHandle = nullptr;
-        rval = context.MBI->tag_get_handle( srcNames[i].c_str(), srcTagHandle );
+        rval             = context.MBI->tag_get_handle( srcNames[i].c_str(), srcTagHandle );
         if( MB_SUCCESS != rval || nullptr == srcTagHandle ) { return 1; }
         srcTagHandles.push_back( srcTagHandle );
 
         Tag tgtTagHandle = nullptr;
-        rval = context.MBI->tag_get_handle( tgtNames[i].c_str(), tgtTagHandle );
+        rval             = context.MBI->tag_get_handle( tgtNames[i].c_str(), tgtTagHandle );
         if( MB_SUCCESS != rval || nullptr == tgtTagHandle ) { return 1; }
         tgtTagHandles.push_back( tgtTagHandle );
     }
@@ -3304,7 +3305,8 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
         tents = tgtEnts;
     }
 
-    printf( "Source/target entities: %zu, %lu -- %zu, %lu\n", sents.size(), solSTagVals.size(), tents.size(), solTTagVals.size() );
+    printf( "Source/target entities: %zu, %lu -- %zu, %lu\n", sents.size(), solSTagVals.size(), tents.size(),
+            solTTagVals.size() );
 
     for( size_t i = 0; i < srcTagHandles.size(); i++ )
     {

@@ -806,16 +806,16 @@ moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef MOAB_HAVE_MPI
-ErrorCode TempestRemapper::assign_vertex_element_IDs( Tag idtag, EntityHandle this_set,
-                                            const int dimension, const int start_id )
+ErrorCode TempestRemapper::assign_vertex_element_IDs( Tag idtag, EntityHandle this_set, const int dimension,
+                                                      const int start_id )
 {
-    assert(idtag);
+    assert( idtag );
 
     ErrorCode rval;
     Range entities;
     rval = m_interface->get_entities_by_dimension( this_set, dimension, entities );MB_CHK_SET_ERR( rval, "Failed to get entities" );
 
-    if (entities.size() == 0) return moab::MB_SUCCESS;
+    if( entities.size() == 0 ) return moab::MB_SUCCESS;
 
     int idoffset = start_id;
     std::vector< int > gid( entities.size() );
@@ -1282,11 +1282,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     // remove now from coverage set the cells that are not needed
                     rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                     covEnts = moab::subtract( covEnts, notNeededCovCells );
-#ifdef VERBOSE
+                    //#ifdef VERBOSE
                     std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
                     std::cout << " remove from coverage set elements that are not intersected: "
                               << notNeededCovCells.size() << "\n";
-#endif
+                    //#endif
                     // some source elements cover multiple target partitions; the conservation logic
                     // requires to know all overlap elements for a source element; they need to be
                     // communicated from the other target partitions
