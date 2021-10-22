@@ -52,7 +52,7 @@ if HAVE_HDF5
 if HAVE_NETCDF
   bin_PROGRAMS += mbaddnc mbaddchunk
 if HAVE_EIGEN3
-  bin_PROGRAMS += mbcmpmaps
+  bin_PROGRAMS += mbcmpmaps mbvisumap
 endif
 endif
 endif
@@ -225,6 +225,7 @@ mbcmpfiles_SOURCES = compareFiles.cpp
 mbintxchk_SOURCES = mbIntxCheck.cpp
 mbcmpmaps_SOURCES = compareMaps.cpp
 mbcleantags_SOURCES = cleanTags.cpp
+mbvisumap_SOURCES = visuMapVtk.cpp
 
 bin_PROGRAMS += mbslavepart
 mbslavepart_SOURCES = mbslavepart.cpp
