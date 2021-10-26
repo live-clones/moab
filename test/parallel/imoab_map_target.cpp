@@ -84,7 +84,7 @@ int main( int argc, char* argv[] )
     int startG1 = 0, startG2 = 0, endG1 = numProcesses - 1, endG2 = numProcesses - 1;
 
     int startG4 = startG1, endG4 = endG1;  // these are for coupler layout
-    int context_id = -1;                   // used now for freeing buffers
+    int context_id;                   // used now for freeing buffers
 
     int repartitioner_scheme = 0;
 #ifdef MOAB_HAVE_ZOLTAN
@@ -453,6 +453,7 @@ int main( int argc, char* argv[] )
         {
             context_id = cmpocn;
             ierr       = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+            CHECKIERR( ierr, "cannot free buffers for Target_proj tag migration " )
         }
         MPI_Barrier( MPI_COMM_WORLD );
 

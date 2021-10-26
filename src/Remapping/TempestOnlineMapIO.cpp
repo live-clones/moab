@@ -1225,8 +1225,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 #endif
     }
 
-    bool trivial_partitioning = (owned_dof_ids.size() == 0);
-
     // Let us declare the map object for every process
     SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
 
