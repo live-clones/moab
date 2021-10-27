@@ -3143,6 +3143,16 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             recvGraph1->set_cover_set( cover_set );
             context.appDatas[*pid_migr].pgraph[*context_id] = recvGraph1;
         }
+        // initial loop to see how much space we need for TLcovIDs
+        size_t nbIds = 0;
+        for( std::map< int, std::set< int > >::iterator mit = idsFromProcs.begin(); mit != idsFromProcs.end(); mit++ )
+        {
+            std::set< int >& idSet = mit->second;
+            nbIds += idSet.size();
+        }
+
+        TLcovIDs.resize(nbIds);
+
         for( std::map< int, std::set< int > >::iterator mit = idsFromProcs.begin(); mit != idsFromProcs.end(); mit++ )
         {
             int procToSendTo       = mit->first;
@@ -3150,9 +3160,9 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             for( std::set< int >::iterator sit = idSet.begin(); sit != idSet.end(); sit++ )
             {
                 int n = TLcovIDs.get_n();
-                TLcovIDs.reserve();
                 TLcovIDs.vi_wr[2 * n]     = procToSendTo;  // send to processor
                 TLcovIDs.vi_wr[2 * n + 1] = *sit;          // global id needs index in the local_verts range
+                TLcovIDs.inc_n();
             }
         }
     }
