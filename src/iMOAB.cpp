@@ -3072,7 +3072,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             std::set< int >& setInts = idsFromProcs[origProc];
             setInts.insert( gidCell );
         }
-
+// questionable ??
+#if 0
         // if we have no intx cells, it means we are on point clouds; quick fix just use all cells
         // from coverage set
         if( cells.empty() )
@@ -3102,6 +3103,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
                 setInts.insert( gidCell );
             }
         }
+#endif // #if 0
 
 #ifdef VERBOSE
         std::ofstream dbfile;
