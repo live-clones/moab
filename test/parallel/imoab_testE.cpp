@@ -266,7 +266,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileAtmInf[] = "recvAtmInf.h5m";
-        PUSH_TIMER( "Write migrated ATM mesh on coupler PEs, inferred from LND" )
+        PUSH_TIMER( couComm, "Write migrated ATM mesh on coupler PEs, inferred from LND" )
         ierr = iMOAB_WriteMesh( cplAtmPID, outputFileAtmInf, fileWriteOptions, strlen( outputFileAtmInf ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write atm mesh after receiving" )
@@ -290,7 +290,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_RegisterApplication( "LNDATM", &couComm, &lndatmid, cplLndAtmPID );
         CHECKIERR( ierr, "Cannot register lnd_atm intx over coupler pes " )
 
-        PUSH_TIMER( "Compute LND-ATM mesh intersection" )
+        PUSH_TIMER( couComm, "Compute LND-ATM mesh intersection" )
         ierr = iMOAB_ComputeMeshIntersectionOnSphere( cplLndPID, cplAtmPID, cplLndAtmPID );
         CHECKIERR( ierr, "failed to compute land - atm intx for mapping" );
         POP_TIMER( couComm, rankInCouComm )
@@ -303,7 +303,7 @@ int main( int argc, char* argv[] )
         // after this, the sending of tags from lnd pes to coupler pes will use the new par comm graph, that has more
         // precise info about what to send (specifically for atm cover); every time,
         /// we will use the element global id, which should uniquely identify the element
-        PUSH_TIMER( "Compute ATM coverage graph for LND mesh" )
+        PUSH_TIMER( lndCouComm, "Compute ATM coverage graph for LND mesh" )
         ierr = iMOAB_CoverageGraph( &lndCouComm, cmpLndPID, cplLndPID, cplLndAtmPID, &cmplnd, &cpllnd,
                                     &cplatm );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for land" )
@@ -320,7 +320,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileTgt5[] = "recvOcn5.h5m";
-        PUSH_TIMER( "Write migrated OCN mesh on coupler PEs" )
+        PUSH_TIMER( couComm, "Write migrated OCN mesh on coupler PEs" )
         ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt5, fileWriteOptions, strlen( outputFileTgt5 ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
@@ -372,7 +372,7 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        PUSH_TIMER( "Compute OCN-ATM mesh intersection" )
+        PUSH_TIMER( couComm, "Compute OCN-ATM mesh intersection" )
         ierr = iMOAB_ComputeMeshIntersectionOnSphere(
             cplOcnPID, cplAtm2PID, cplOcnAtm2PID );  // coverage mesh was computed here, for cplAtmPID, atm on coupler pes
         // basically, ocn was redistributed according to target (atm) partition, to "cover" the atm partitions
@@ -390,7 +390,7 @@ int main( int argc, char* argv[] )
         // after this, the sending of tags from ocn pes to coupler pes will use the new par comm graph, that has more
         // precise info about what to send for atm cover ; every time, we will
         //  use the element global id, which should uniquely identify the element
-        PUSH_TIMER( "Compute ATM coverage graph for OCN mesh" )
+        PUSH_TIMER( ocnCouComm, "Compute ATM coverage graph for OCN mesh" )
         ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtm2PID, &cmpocn, &cplocn,
                                     &cplatm2 );  // it happens over joint communicator, ocean + coupler
         CHECKIERR( ierr, "cannot recompute direct coverage graph for atm" )
@@ -408,7 +408,7 @@ int main( int argc, char* argv[] )
     {
         // weight identifier lndatm
         // Compute the weights to project the solution from LND component to ATM component
-        PUSH_TIMER( "Compute LND-ATM remapping weights" )
+        PUSH_TIMER( couComm, "Compute LND-ATM remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplLndAtmPID, weights_identifiers[0], disc_methods[1], &disc_orders[1], disc_methods[1], &disc_orders[1],
             &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
@@ -421,7 +421,7 @@ int main( int argc, char* argv[] )
 #ifdef ENABLE_OCNATM_COUPLING
     if( couComm != MPI_COMM_NULL )
     {
-        PUSH_TIMER( "Compute the projection weights with TempestRemap" )
+        PUSH_TIMER( couComm, "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplOcnAtm2PID, weights_identifiers[1], disc_methods[1], &disc_orders[1],  // fv
             disc_methods[1], &disc_orders[1],                                        // fv
@@ -596,7 +596,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot write AtmWithProj3.h5m" )
         }
 #endif
-        PUSH_TIMER( "Send/receive data from land component to coupler in atm context" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from land component to coupler in atm context" )
         if( lndComm != MPI_COMM_NULL )
         {
             // as always, use nonblocking sends
@@ -636,7 +636,7 @@ int main( int argc, char* argv[] )
 
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
-            PUSH_TIMER( "Apply Scalar projection weights" )
+            PUSH_TIMER( couComm, "Apply Scalar projection weights" )
             ierr = iMOAB_ApplyScalarProjectionWeights( cplLndAtmPID, weights_identifiers[0], concat_fieldname,
                                                        concat_fieldnameT, strlen( weights_identifiers[0] ),
                                                        strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
@@ -663,7 +663,7 @@ int main( int argc, char* argv[] )
         //   from couComm, using common joint comm atm_coupler
         // as always, use nonblocking sends
         // original graph: context is now the cpl
-        PUSH_TIMER( "Send/receive data from atm coupler to atm component with land proj" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from atm coupler to atm component with land proj" )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
@@ -688,7 +688,6 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cplAtmPID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
-        MPI_Barrier( MPI_COMM_WORLD );
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 #ifdef VERBOSE
         if( ( atmComm != MPI_COMM_NULL ) && ( 1 == n ) )
@@ -701,7 +700,7 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef ENABLE_OCNATM_COUPLING
-        PUSH_TIMER( "Send/receive data from ocn component to coupler in atm context" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from ocn component to coupler in atm context" )
         if( ocnComm != MPI_COMM_NULL )
         {
           // as always, use nonblocking sends
@@ -726,7 +725,6 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers used to send ocn tag towards the coverage mesh for atm" )
         }
 
-        MPI_Barrier( MPI_COMM_WORLD );
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         if( couComm != MPI_COMM_NULL )
         {
@@ -735,7 +733,7 @@ int main( int argc, char* argv[] )
 
          /* We have the remapping weights computed earlier, and te field. Let us apply the weights onto the tag
           * we defined  on the source mesh and get the projection on the target mesh */
-            PUSH_TIMER( "Apply Scalar projection weights" )
+            PUSH_TIMER( couComm, "Apply Scalar projection weights" )
             ierr = iMOAB_ApplyScalarProjectionWeights( cplOcnAtm2PID, weights_identifiers[1], concat_fieldname,
                                                     concat_fieldnameT, strlen( weights_identifiers[1] ),
                                                     strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
@@ -751,7 +749,7 @@ int main( int argc, char* argv[] )
            }
         }
 
-        PUSH_TIMER( "Send/receive data from atm2 coupler to atm component with ocean proj" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from atm2 coupler to atm component with ocean proj" )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
@@ -776,7 +774,6 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cplAtm2PID, &context_id );
             CHECKIERR( ierr, "cannot free buffers related to send tag" )
         }
-        MPI_Barrier( MPI_COMM_WORLD );
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 
 #endif

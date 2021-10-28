@@ -182,7 +182,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         char outputFileTgt5[] = "recvOcn5.h5m";
-        PUSH_TIMER( "Write migrated OCN mesh on coupler PEs" )
+        PUSH_TIMER( couComm, "Write migrated OCN mesh on coupler PEs" )
         ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt5, fileWriteOptions, strlen( outputFileTgt5 ),
                                 strlen( fileWriteOptions ) );
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
@@ -197,7 +197,7 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        PUSH_TIMER( "Compute OCN-ATM mesh intersection" )
+        PUSH_TIMER( couComm, "Compute OCN-ATM mesh intersection" )
         ierr = iMOAB_ComputeMeshIntersectionOnSphere(
             cplOcnPID, cplAtmPID, cplOcnAtmPID );  // coverage mesh was computed here, for cplAtmPID, atm on coupler pes
         // basically, ocn was redistributed according to target (atm) partition, to "cover" the atm partitions
@@ -215,7 +215,7 @@ int main( int argc, char* argv[] )
         // after this, the sending of tags from ocn pes to coupler pes will use the new par comm graph, that has more
         // precise info about what to send for atm cover ; every time, we will
         //  use the element global id, which should uniquely identify the element
-        PUSH_TIMER( "Compute ATM coverage graph for OCN mesh" )
+        PUSH_TIMER( ocnCouComm, "Compute ATM coverage graph for OCN mesh" )
         ierr = iMOAB_CoverageGraph( &ocnCouComm, cmpOcnPID, cplOcnPID, cplOcnAtmPID, &cmpocn, &cplocn,
                                     &cplatm );  // it happens over joint communicator, ocean + coupler
         CHECKIERR( ierr, "cannot recompute direct coverage graph for atm" )
@@ -231,7 +231,7 @@ int main( int argc, char* argv[] )
     const char* dof_tag_names[3]       = { "GLOBAL_DOFS", "GLOBAL_ID", "GLOBAL_ID" };
     if( couComm != MPI_COMM_NULL )
     {
-        PUSH_TIMER( "Compute the projection weights with TempestRemap" )
+        PUSH_TIMER( couComm, "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplOcnAtmPID, weights_identifiers[0], disc_methods[1], &disc_orders[1],  // fv
             disc_methods[1], &disc_orders[1],                                        // fv
@@ -363,7 +363,7 @@ int main( int argc, char* argv[] )
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
     {
-        PUSH_TIMER( "Send/receive data from ocn component to coupler in atm context" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from ocn component to coupler in atm context" )
         if( ocnComm != MPI_COMM_NULL )
         {
           // as always, use nonblocking sends
@@ -388,7 +388,6 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot free buffers used to send ocn tag towards the coverage mesh for atm" )
         }
 
-        MPI_Barrier( MPI_COMM_WORLD );
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
         if( couComm != MPI_COMM_NULL )
         {
@@ -397,7 +396,7 @@ int main( int argc, char* argv[] )
 
          /* We have the remapping weights computed earlier, and te field. Let us apply the weights onto the tag
           * we defined  on the source mesh and get the projection on the target mesh */
-            PUSH_TIMER( "Apply Scalar projection weights" )
+            PUSH_TIMER( couComm, "Apply Scalar projection weights" )
             ierr = iMOAB_ApplyScalarProjectionWeights( cplOcnAtmPID, weights_identifiers[0], concat_fieldname,
                                                     concat_fieldnameT, strlen( weights_identifiers[0] ),
                                                     strlen( concat_fieldname ), strlen( concat_fieldnameT ) );

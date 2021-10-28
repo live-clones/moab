@@ -422,7 +422,7 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        PUSH_TIMER( "Compute the projection weights with TempestRemap" )
+        PUSH_TIMER( couComm, "Compute the projection weights with TempestRemap" )
         ierr = iMOAB_ComputeScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], disc_methods[0],
                                                      &disc_orders[0], disc_methods[1], &disc_orders[1], &fNoBubble,
                                                      &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
@@ -522,7 +522,7 @@ int main( int argc, char* argv[] )
     }
 
 #ifdef ENABLE_ATMOCN_COUPLING
-    PUSH_TIMER( "Send/receive data from atm component to coupler in ocn context" )
+    PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from atm component to coupler in ocn context" )
     if( atmComm != MPI_COMM_NULL )
     {
         // as always, use nonblocking sends
@@ -546,7 +546,6 @@ int main( int argc, char* argv[] )
         iMOAB_DumpCommGraph( cplAtmOcnPID, &context, &is_sender, "PhysAtmA2OR", );
 #endif
     }
-    POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 
     // we can now free the sender buffers
     if( atmComm != MPI_COMM_NULL )
@@ -554,6 +553,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_FreeSenderBuffers( cmpPhAtmPID, &atmocnid );  // context is for ocean
         CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
     }
+    POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
     /*
     #ifdef VERBOSE
       if (couComm != MPI_COMM_NULL) {
@@ -571,7 +571,7 @@ int main( int argc, char* argv[] )
     {
         /* We have the remapping weights now. Let us apply the weights onto the tag we defined
            on the source mesh and get the projection on the target mesh */
-        PUSH_TIMER( "Apply Scalar projection weights" )
+        PUSH_TIMER( couComm, "Apply Scalar projection weights" )
         ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], concat_fieldname,
                                                    concat_fieldnameT );
         CHECKIERR( ierr, "failed to compute projection weight application" );
@@ -634,7 +634,7 @@ int main( int argc, char* argv[] )
     //     &typeA, &typeB, &cmpatm, &cpllnd);
 
     // end copy
-    PUSH_TIMER( "Send/receive data from phys comp atm to coupler land, using computed graph" )
+    PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from phys comp atm to coupler land, using computed graph" )
     if( atmComm != MPI_COMM_NULL )
     {
 
@@ -649,7 +649,6 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ReceiveElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &atmCouComm, &cmpatm );
         CHECKIERR( ierr, "cannot receive tag values on land on coupler" )
     }
-    POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 
     // we can now free the sender buffers
     if( atmComm != MPI_COMM_NULL )
@@ -657,7 +656,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_FreeSenderBuffers( cmpPhAtmPID, &cpllnd );
         CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the land on coupler" )
     }
-
+    POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 #ifdef VERBOSE
     if( couComm != MPI_COMM_NULL )
     {
