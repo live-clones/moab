@@ -527,6 +527,17 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
     int ixOverlap                  = 0;
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;
 
+    // generic triangle used for area computation, for triangles around the center of overlap face;
+    // used for overlap faces with more than 4 edges;
+    // nodes array will be set for each triangle;
+    // these triangles are not part of the mesh structure, they are just temporary during
+    //   aforementioned decomposition.
+    Face faceTri( 3 );
+    NodeVector nodes( 3 );
+    faceTri.SetNode( 0, 0 );
+    faceTri.SetNode( 1, 1 );
+    faceTri.SetNode( 2, 2 );
+
     // Loop over all input Faces
     for( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
     {
@@ -595,52 +606,43 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             //     m_meshOverlap->vecFaceArea[ixOverlap + j] );
             // #endif
 
-            int nOverlapTriangles = faceOverlap.edges.size() - 2;
-
-            // #define USE_MININDEX
-
-#ifdef USE_MININDEX
-            // first find out the minimum node, start there the triangle decomposition
-            int minIndex = 0;
-            int nnodes   = faceOverlap.edges.size();
-            for( int j1 = 1; j1 < nnodes; j1++ )
-            {
-                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] )
-                {
-                    minIndex = j1;
+            int nbEdges = faceOverlap.edges.size();
+            int nOverlapTriangles = 1;
+            Node center; // not used if nbEdges == 3
+            if (nbEdges > 3) { // decompose from center in this case
+                nOverlapTriangles = nbEdges;
+                for (int k = 0; k < nbEdges; k++) {
+                    const Node &node = nodesOverlap[faceOverlap[k]];
+                    center = center + node;
                 }
+                center = center / nbEdges;
+                center = center.Normalized();// project back on sphere of radius 1
             }
-#endif
+
+            Node node0, node1, node2;
+            double dTriangleArea;
 
             // Loop over all sub-triangles of this Overlap Face
             for( int k = 0; k < nOverlapTriangles; k++ )
             {
-#ifdef USE_MININDEX
-                // Cornerpoints of triangle, they start at the minimal Node, for consistency
-                const Node& node0 = nodesOverlap[faceOverlap[minIndex]];
-                const Node& node1 = nodesOverlap[faceOverlap[( minIndex + k + 1 ) % nnodes]];
-                const Node& node2 = nodesOverlap[faceOverlap[( minIndex + k + 2 ) % nnodes]];
-
-                // Calculate the area of the modified Face
-                Face faceTri( 3 );
-                faceTri.SetNode( 0, faceOverlap[minIndex] );
-                faceTri.SetNode( 1, faceOverlap[( minIndex + k + 1 ) % nnodes] );
-                faceTri.SetNode( 2, faceOverlap[( minIndex + k + 2 ) % nnodes] );
-#else
-                // Cornerpoints of triangle
-                const Node& node0 = nodesOverlap[faceOverlap[0]];
-                const Node& node1 = nodesOverlap[faceOverlap[k + 1]];
-                const Node& node2 = nodesOverlap[faceOverlap[k + 2]];
-
-                // Calculate the area of the modified Face
-                Face faceTri( 3 );
-                faceTri.SetNode( 0, faceOverlap[0] );
-                faceTri.SetNode( 1, faceOverlap[k + 1] );
-                faceTri.SetNode( 2, faceOverlap[k + 2] );
-#endif
-
-                double dTriangleArea = CalculateFaceArea( faceTri, nodesOverlap );
-
+                if (nbEdges == 3) // will come here only once, nOverlapTriangles == 1 in this case
+                {
+                    node0 = nodesOverlap[faceOverlap[0]];
+                    node1 = nodesOverlap[faceOverlap[1]];
+                    node2 = nodesOverlap[faceOverlap[2]];
+                    dTriangleArea = CalculateFaceArea(faceOverlap, nodesOverlap);
+                }
+                else // decompose polygon in triangles around the center
+                {
+                    node0 = center;
+                    node1 = nodesOverlap[faceOverlap[k]];
+                    int k1 = (k + 1) % nbEdges;
+                    node2 = nodesOverlap[faceOverlap[k1]];
+                    nodes[0] = center;
+                    nodes[1] = node1;
+                    nodes[2] = node2;
+                    dTriangleArea = CalculateFaceArea(faceTri, nodes);
+                }
                 // Coordinates of quadrature Node
                 for( int l = 0; l < TriQuadraturePoints; l++ )
                 {
@@ -654,12 +656,7 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
                     nodeQuadrature.z = TriQuadratureG[l][0] * node0.z + TriQuadratureG[l][1] * node1.z +
                                        TriQuadratureG[l][2] * node2.z;
 
-                    double dMag = sqrt( nodeQuadrature.x * nodeQuadrature.x + nodeQuadrature.y * nodeQuadrature.y +
-                                        nodeQuadrature.z * nodeQuadrature.z );
-
-                    nodeQuadrature.x /= dMag;
-                    nodeQuadrature.y /= dMag;
-                    nodeQuadrature.z /= dMag;
+                    nodeQuadrature = nodeQuadrature.Normalized();
 
                     // Find components of quadrature point in basis
                     // of the first Face
@@ -962,6 +959,18 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;
 
     if( is_root ) dbgprint.printf( 0, "Building conservative distribution maps\n" );
+
+    // generic triangle used for area computation, for triangles around the center of overlap face;
+    // used for overlap faces with more than 4 edges;
+    // nodes array will be set for each triangle;
+    // these triangles are not part of the mesh structure, they are just temporary during
+    //   aforementioned decomposition.
+    Face faceTri( 3 );
+    NodeVector nodes( 3 );
+    faceTri.SetNode( 0, 0 );
+    faceTri.SetNode( 1, 1 );
+    faceTri.SetNode( 2, 2 );
+
     for( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
     {
         // Announce computation progress
@@ -996,22 +1005,6 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
 
             const NodeVector& nodesOverlap = m_meshOverlap->nodes;
 
-            int nOverlapTriangles = faceOverlap.edges.size() - 2;
-
-// #define USE_MININDEX
-#ifdef USE_MININDEX
-            // first find out the minimum node, start there the triangle decomposition
-            int minIndex = 0;
-            int nnodes   = faceOverlap.edges.size();
-            for( int j1 = 1; j1 < nnodes; j1++ )
-            {
-                if( nodesOverlap[faceOverlap[j1]] < nodesOverlap[faceOverlap[minIndex]] )
-                {
-                    minIndex = j1;
-                }
-            }
-#endif
-
             // Quantities from the Second Mesh
             int ixSecond = m_meshOverlap->vecTargetFaceIx[ixOverlap + i];
 
@@ -1022,34 +1015,43 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
 
             const Face& faceSecond = m_meshOutput->faces[ixSecond];
 
+            int nbEdges = faceOverlap.edges.size();
+            int nOverlapTriangles = 1;
+            Node center; // not used if nbEdges == 3
+            if (nbEdges > 3) { // decompose from center in this case
+                nOverlapTriangles = nbEdges;
+                for (int k = 0; k < nbEdges; k++) {
+                    const Node &node = nodesOverlap[faceOverlap[k]];
+                    center = center + node;
+                }
+                center = center / nbEdges;
+                center = center.Normalized();// project back on sphere of radius 1
+            }
+
+            Node node0, node1, node2;
+            double dTriArea;
+
             // Loop over all sub-triangles of this Overlap Face
             for( int j = 0; j < nOverlapTriangles; j++ )
             {
-#ifdef USE_MININDEX
-                // Cornerpoints of triangle, they start at the minimal Node, for consistency
-                const Node& node0 = nodesOverlap[faceOverlap[minIndex]];
-                const Node& node1 = nodesOverlap[faceOverlap[( minIndex + j + 1 ) % nnodes]];
-                const Node& node2 = nodesOverlap[faceOverlap[( minIndex + j + 2 ) % nnodes]];
-
-                // Calculate the area of the modified Face
-                Face faceTri( 3 );
-                faceTri.SetNode( 0, faceOverlap[minIndex] );
-                faceTri.SetNode( 1, faceOverlap[( minIndex + j + 1 ) % nnodes] );
-                faceTri.SetNode( 2, faceOverlap[( minIndex + j + 2 ) % nnodes] );
-#else
-                // Cornerpoints of triangle
-                const Node& node0 = nodesOverlap[faceOverlap[0]];
-                const Node& node1 = nodesOverlap[faceOverlap[j + 1]];
-                const Node& node2 = nodesOverlap[faceOverlap[j + 2]];
-
-                // Calculate the area of the modified Face
-                Face faceTri( 3 );
-                faceTri.SetNode( 0, faceOverlap[0] );
-                faceTri.SetNode( 1, faceOverlap[j + 1] );
-                faceTri.SetNode( 2, faceOverlap[j + 2] );
-#endif
-
-                double dTriArea = CalculateFaceArea( faceTri, nodesOverlap );
+                if (nbEdges == 3) // will come here only once, nOverlapTriangles == 1 in this case
+                {
+                    node0 = nodesOverlap[faceOverlap[0]];
+                    node1 = nodesOverlap[faceOverlap[1]];
+                    node2 = nodesOverlap[faceOverlap[2]];
+                    dTriArea = CalculateFaceArea(faceOverlap, nodesOverlap);
+                }
+                else // decompose polygon in triangles around the center
+                {
+                    node0 = center;
+                    node1 = nodesOverlap[faceOverlap[j]];
+                    int j1 = (j + 1) % nbEdges;
+                    node2 = nodesOverlap[faceOverlap[j1]];
+                    nodes[0] = center;
+                    nodes[1] = node1;
+                    nodes[2] = node2;
+                    dTriArea = CalculateFaceArea(faceTri, nodes);
+                }
 
                 for( int k = 0; k < triquadrule.GetPoints(); k++ )
                 {
@@ -1505,12 +1507,6 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
         // Loop through all Overlap Faces
         for( int i = 0; i < nOverlapFaces; i++ )
         {
-            // Quantities from the overlap Mesh
-            // const Face & faceOverlap = m_meshOverlap->faces[ixOverlap + i];
-
-            // const NodeVector & nodesOverlap = m_meshOverlap->nodes;
-
-            // size_t nOverlapTriangles = faceOverlap.edges.size() - 2;
 
             // Quantities from the Second Mesh
             int ixSecond = m_meshOverlap->vecTargetFaceIx[ixOverlap + i];
