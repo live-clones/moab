@@ -1624,7 +1624,7 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm,
 }
 // method to expose local graph info: sender id, receiver id, sizes of elements to send, after or
 // before intersection
-ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
+ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send , int verbose)
 {
     //
     if( -1 != rankInGroup1 && 1 == is_send )  // it is a sender task
@@ -1642,6 +1642,15 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
                 int receiver_proc        = mit->first;
                 std::vector< int >& eids = mit->second;
                 dbfile << "receiver: " << receiver_proc << " size:" << eids.size() << "\n";
+                if (verbose >=1 )
+                {
+                    for (size_t i=0; i< eids.size(); i++)
+                    {
+                        dbfile << eids[i] << " " ;
+                        if (i%20 == 19) dbfile << "\n";
+                    }
+                    dbfile << "\n";
+                }
             }
         }
         else if( graph_type == INITIAL_MIGRATE )  // just after migration
@@ -1680,7 +1689,18 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
                 int sender_proc          = mit->first;
                 std::vector< int >& eids = mit->second;
                 dbfile << "sender: " << sender_proc << " size:" << eids.size() << "\n";
+                if (verbose >=1 )
+                {
+                    for (size_t i=0; i< eids.size(); i++)
+                    {
+                        dbfile << eids[i] << " " ;
+                        if (i%20 == 19) dbfile << "\n";
+                    }
+                    dbfile << "\n";
+                }
             }
+
+
         }
         else if( graph_type == INITIAL_MIGRATE )  // just after migration
         {

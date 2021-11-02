@@ -532,7 +532,8 @@ int main( int argc, char* argv[] )
 #ifdef VERBOSE
         int is_sender = 1;
         int context   = atmocnid;  // used to identity the parcommgraph in charge
-        iMOAB_DumpCommGraph( cmpPhAtmPID, &context, &is_sender, "PhysAtmA2OS", );
+        int verbose = 0;
+        iMOAB_DumpCommGraph( cmpPhAtmPID, &context, &is_sender, &verbose, "PhysAtmA2OS" );
 #endif
     }
     if( couComm != MPI_COMM_NULL )
@@ -543,7 +544,8 @@ int main( int argc, char* argv[] )
 #ifdef VERBOSE
         int is_sender = 0;
         int context   = cmpatm;  // used to identity the parcommgraph in charge
-        iMOAB_DumpCommGraph( cplAtmOcnPID, &context, &is_sender, "PhysAtmA2OR", );
+        int verbose = 0;
+        iMOAB_DumpCommGraph( cplAtmOcnPID, &context, &is_sender, &verbose, "PhysAtmA2OR" );
 #endif
     }
 

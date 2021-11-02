@@ -1225,12 +1225,25 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
  * \param[in] target_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the target discretization;
  *                                                          names are separated by ";", the same way as for tag migration.
  * \return ErrCode                                          The error code indicating success or failure.
-*/
+ */
 ErrCode iMOAB_ApplyScalarProjectionWeights(
     iMOAB_AppID pid_intersection,
     const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String source_solution_tag_name,
     const iMOAB_String target_solution_tag_name );
+
+/**
+  \brief Dump info about communication graph.
+  <B>Operations:</B> Collective per sender or receiver group
+
+  \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
+  \param[in] context_id  (int*)                            context id 
+  \param[in] is_sender (int*)                              is it called from sender or receiver side
+  \param[in] verbose (int*)                                level of verbosity
+  \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
+*/
+ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, int * verbose, const iMOAB_String prefix );
+
 
 #endif /* #ifdef MOAB_HAVE_TEMPESTREMAP */
 

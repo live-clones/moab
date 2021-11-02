@@ -284,14 +284,16 @@ int main( int argc, char* argv[] )
     {
 
         int is_sender = 1;
-        int context   = -1;
-        iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmMigS" );
+        int context   = cplatm;
+        int verbose = 0;
+        iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmMigS" );
     }
     if( couComm != MPI_COMM_NULL )
     {
         int is_sender = 0;
-        int context   = -1;
-        iMOAB_DumpCommGraph( cplAtmPID, &context, &is_sender, "AtmMigR" );
+        int context   = cmpatm;
+        int verbose = 0;
+        iMOAB_DumpCommGraph( cplAtmPID, &context, &is_sender, &verbose, "AtmMigR" );
     }
 #endif
     MPI_Barrier( MPI_COMM_WORLD );
@@ -471,21 +473,12 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         /* Compute the weights to preoject the solution from ATM component to LND compoenent */
-<<<<<<< HEAD
-        PUSH_TIMER( "Compute ATM-LND remapping weights" )
+        PUSH_TIMER( couComm, "Compute ATM-LND remapping weights" )
         ierr =
             iMOAB_ComputeScalarProjectionWeights( cplAtmLndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(),
                                                   &disc_orders[0], disc_methods[2].c_str(), &disc_orders[2], &fNoBubble,
                                                   &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
                                                   dof_tag_names[0].c_str(), dof_tag_names[2].c_str() );
-=======
-        PUSH_TIMER( couComm, "Compute ATM-LND remapping weights" )
-        ierr = iMOAB_ComputeScalarProjectionWeights(
-            cplAtmLndPID, weights_identifiers[1].c_str(), disc_methods[0].c_str(), &disc_orders[0],
-            disc_methods[2].c_str(), &disc_orders[2], &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
-            &fValidate, dof_tag_names[0].c_str(), dof_tag_names[2].c_str(), weights_identifiers[1].size(),
-            disc_methods[0].size(), disc_methods[2].size(), dof_tag_names[0].size(), dof_tag_names[2].size() );
->>>>>>> change PUSH_TIMER macro to include comm
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar "
                          "non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
@@ -601,7 +594,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 1;
             int context   = cplocn;
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS" );
+            int verbose = 0;
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmCovOcnS" );
 #endif
         }
         if( couComm != MPI_COMM_NULL )
@@ -612,7 +606,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 0;
             int context   = cplocn;  // the same context, cplocn
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR" );
+            int verbose = 0;
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmCovOcnR" );
 #endif
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )

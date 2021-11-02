@@ -351,7 +351,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 1;
             int context   = cplocn;
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS" );
+            int verbose = 0;
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmCovOcnS" );
 #endif
         }
         if( couComm != MPI_COMM_NULL )
@@ -362,7 +363,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 0;
             int context   = atmocnid;  // the same context
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR" );
+            int verbose = 0;
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmCovOcnR" );
 #endif
         }
 

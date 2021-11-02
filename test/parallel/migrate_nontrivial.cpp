@@ -132,10 +132,11 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
         ierr = iMOAB_LoadMesh( pid1, filen.c_str(), readopts.c_str(), &nghlay );CHECKRC( ierr, "can't load mesh " )
         ierr = iMOAB_SendMesh( pid1, &jcomm, &group2, &compid2, &partMethod );  // send to component 2
         CHECKRC( ierr, "cannot send elements" )
-//#ifdef GRAPH_INFO
+#ifdef GRAPH_INFO
         int is_sender = 1;
         int context   = compid2;
-        iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS" );
+        int verbose = 0;
+        iMOAB_DumpCommGraph( pid1, &context, &is_sender, &verbose, "MigrateS" );
 #endif
     }
 
@@ -149,7 +150,8 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 #ifdef GRAPH_INFO
         int is_sender = 0;
         int context   = compid1;
-        iMOAB_DumpCommGraph( pid2, &context, &is_sender, "MigrateR" );
+        int verbose = 0;
+        iMOAB_DumpCommGraph( pid2, &context, &is_sender, &verbose, "MigrateR" );
 #endif
     }
 

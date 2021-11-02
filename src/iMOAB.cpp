@@ -3187,15 +3187,14 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
     return moab::MB_SUCCESS;  // success
 }
 
-ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix )
+ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, int * verbose, const iMOAB_String prefix )
 {
-    assert( prefix && strlen( prefix ) );
 
     ParCommGraph* cgraph = context.appDatas[*pid].pgraph[*context_id];
     std::string prefix_str( prefix );
 
     if( NULL != cgraph )
-        cgraph->dump_comm_information( prefix_str, *is_sender );
+        cgraph->dump_comm_information( prefix_str, *is_sender, *verbose );
     else
     {
         std::cout << " cannot find ParCommGraph on app with pid " << *pid << " name: " << context.appDatas[*pid].name
