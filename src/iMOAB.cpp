@@ -793,6 +793,9 @@ ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid )
             {
                 // no elements of dimension 1 or 2 or 3; it could happen for point clouds
                 data.dimension = 0;
+                if (data.all_verts.size() == 0)
+                    data.dimension = -1; // nothing on this
+
             }
         }
     }

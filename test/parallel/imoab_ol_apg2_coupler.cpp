@@ -424,7 +424,7 @@ int main( int argc, char* argv[] )
                                     &cplatm );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for land" )
         POP_TIMER( lndCouComm, rankInLndComm )  // hijack this rank
-//#ifdef GRAPH_INFO
+#ifdef GRAPH_INFO
         if( lndComm != MPI_COMM_NULL )
         {
 
@@ -440,7 +440,7 @@ int main( int argc, char* argv[] )
            int verbo = 1;
            iMOAB_DumpCommGraph( cplLndPID, &context, &is_sender, &verbo, "LndRecAtmC", strlen( "LndRecAtmC" ) );
         }
-//#endif
+#endif
     }
 
 #endif
