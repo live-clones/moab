@@ -22,9 +22,9 @@ AC_DEFUN([FATHOM_CONFIGURE_METIS],[
                [enablemetis=no; METIS_DIR=""]
               )
 
-  # Supported Metis versions: 4.0.3, 5.1.0, 5.1.0p2
+  # Supported Metis versions: 5.1.0
   # Arguments: 1) Default Version Number, 2) Download by default ?
-  AUSCM_CONFIGURE_DOWNLOAD_METIS([5.1.0p2],[no])
+  AUSCM_CONFIGURE_DOWNLOAD_METIS([5.1.0], [no])
 
   if (test "x$enablemetis" == "xyes" && test "x$METIS_DIR" != "x"); then
 
@@ -122,9 +122,9 @@ AC_DEFUN([FATHOM_CONFIGURE_PARMETIS],[
     echo "WARNING: Cannot configure ParMetis without both Metis and MPI depenedencies."
   fi
 
-  # Supported ParMetis versions: 4.0.3, 3.2.0
+  # Supported ParMetis versions: 4.0.3
   # Arguments: 1) Default Version Number, 2) Download by default ?
-  AUSCM_CONFIGURE_DOWNLOAD_PARMETIS([4.0.3],[no])
+  AUSCM_CONFIGURE_DOWNLOAD_PARMETIS([4.0.3], [no])
 
   if (test "x$enableparmetis" != "xno" && test "x$PARMETIS_DIR" != "x"); then
 

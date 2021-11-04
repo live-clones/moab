@@ -22,9 +22,9 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
               witheigeninc=$withval,
               witheigeninc=no)
 
-  # Supported Metis versions: 3.3.9, 3.2.10
+  # Supported Metis versions: 3.4.0, 3.3.7
   # Arguments: 1) Default Version Number, 2) Download by default ?
-  AUSCM_CONFIGURE_DOWNLOAD_EIGEN3([3.3.9],[no])
+  AUSCM_CONFIGURE_DOWNLOAD_EIGEN3([3.4.0], [no])
 
   dnl Fall back on default paths to Eigen's include files
   if (test "x$eigen3_installed" != "xno" && test -f "$eigen3_install_dir/include/Eigen/Eigen"); then
