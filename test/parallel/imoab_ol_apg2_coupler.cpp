@@ -495,6 +495,18 @@ int main( int argc, char* argv[] )
             strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
+
+        PUSH_TIMER( couComm, "write LND-ATM remapping weights" )
+
+        std::string lnd_atm_map_file_name = "lnd_atm_map_testD.nc";
+        if (5 == repartitioner_scheme)
+            lnd_atm_map_file_name = "lnd_atm_map_testD_org.nc";
+
+        ierr = iMOAB_WriteMappingWeightsToFile( cplLndAtmPID, weights_identifiers[1],
+                lnd_atm_map_file_name.c_str(), strlen( weights_identifiers[1] ),
+                lnd_atm_map_file_name.size() );
+        POP_TIMER( couComm, rankInCouComm )
+
     }
 #endif
 
