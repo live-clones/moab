@@ -372,11 +372,12 @@ class TempestOnlineMap : public OfflineMap
     void setup_sizes_dimensions();
 
 #ifdef MOAB_HAVE_MPI
+    // nv becomes in/out too, because it could be 0 on in, in some cases (empty partitions)
     int rearrange_arrays_by_dofs( const std::vector< unsigned int >& gdofmap, DataArray1D< double >& vecFaceArea,
                                   DataArray1D< double >& dCenterLon, DataArray1D< double >& dCenterLat,
                                   DataArray2D< double >& dVertexLat, DataArray2D< double >& dVertexLon,
                                   unsigned& N,  // this will be output too now
-                                  int nv, int& maxdof );
+                                  int& nv, int& maxdof );
 #endif
 
     ///	<summary>
