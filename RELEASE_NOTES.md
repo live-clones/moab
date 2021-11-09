@@ -13,6 +13,7 @@
 - PR #561: Fallback to PNetCDF for reading map files in parallel, when NetCDF4/HDF5-parallel interface is unavailable
 - PR #566: Consistently decompose polygons in parallel so that the order of operations is preserved. This fix ensures results between parallel mbtempest and serial TempestRemap runs return the same map files
 - PR #568: Adding a mirror for TPL tarballs now at ANL FTP site
+- PR #569: Configuration fixes for Eigen3 (CMake) and other misc items for autotools
 
 ### Fixes
 
