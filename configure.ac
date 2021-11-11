@@ -950,9 +950,9 @@ AC_ARG_WITH( [vtk-lib-suffix],
                esac],[VTK_LIB_SUFFIX=] )
 
 # Provide downloadable option for TempestRemap library
-# Supported TempestRemap versions: 2.1.0, 2.0.5, 2.0.3
+# Supported TempestRemap versions: 2.1.1, 2.1.0, 2.0.5, 2.0.3
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.1.0], [no])
+AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.1.1], [no])
 
 # Configuration for TempestRemap library
 AC_ARG_WITH([tempestremap],
@@ -1600,10 +1600,10 @@ AC_SUBST([AM_LDFLAGS])
 AC_SUBST([EXPORT_LTFLAGS])
 AC_SUBST([EXPORT_LDFLAGS])
 
-AC_CONFIG_HEADERS([src/moab/EntityHandle.hpp
-                   src/parallel/moab_mpi_config.h
-                   src/moab/MOABConfig.h:config/MOABConfig.h.in])
+AC_CONFIG_HEADERS([src/moab/MOABConfig.h:config/MOABConfig.h.in])
 AX_PREFIX_CONFIG_H([src/moab/MOABConfig.h],[MOAB],[src/moab/MOABConfig.h])
+AC_CONFIG_HEADERS([src/moab/EntityHandle.hpp
+                   src/parallel/moab_mpi_config.h])
 
 AC_CONFIG_FILES([Makefile
                  moab.make
