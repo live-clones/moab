@@ -297,6 +297,7 @@ intxmeshinclude_HEADERS = \
 # Conditional sources
 if ENABLE_FORTRAN
 libMOAB_la_SOURCES += iMOABF.F90
+nobase_libMOAB_la_include_HEADERS += imoab.mod
 endif # ENABLE_FORTRAN
 
 if ENABLE_mbtempest
