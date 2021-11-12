@@ -77,15 +77,15 @@ int main( int argc, char* argv[] )
     int num_errors = 0;
 
     const char* option;
-    std::string filename, filename2;
+    std::string vtk_test_filename = TestDir + "unittest/hex_2048.vtk";
+
+#ifdef MOAB_HAVE_HDF5
+    std::string filename;
     if( 1 < argc )
         filename = std::string( argv[1] );
     else
-    {
         filename  = TestDir + "unittest/64bricks_512hex.h5m";
-        filename2 = TestDir + "unittest/hex_2048.vtk";
-    }
-#ifdef MOAB_HAVE_HDF5
+
     //=========== read_delete, geom_dimension, resolve_shared
     option = "PARALLEL=READ_DELETE;PARTITION=GEOM_DIMENSION;PARTITION_VAL=3;PARTITION_DISTRIBUTE;"
              "PARALLEL_RESOLVE_SHARED_ENTS;";
@@ -126,16 +126,16 @@ int main( int argc, char* argv[] )
              "SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;";
     num_errors += RUN_TEST_ARG3( test_read, filename, option );
 #endif
-    if( filename2.size() )
+    if( vtk_test_filename.size() )
     {
         //=========== bcast_delete, trivial, resolve_shared
         option = "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARTITION_DISTRIBUTE;PARALLEL_RESOLVE_"
                  "SHARED_ENTS;";
-        num_errors += RUN_TEST_ARG3( test_read, filename2, option );
+        num_errors += RUN_TEST_ARG3( test_read, vtk_test_filename, option );
         //=========== bcast_delete, trivial, resolve_shared + ghosting
         option = "PARALLEL=BCAST_DELETE;PARTITION=TRIVIAL;PARTITION_DISTRIBUTE;PARALLEL_RESOLVE_"
                  "SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;";
-        num_errors += RUN_TEST_ARG3( test_read, filename2, option );
+        num_errors += RUN_TEST_ARG3( test_read, vtk_test_filename, option );
     }
     MPI_Finalize();
 

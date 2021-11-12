@@ -1240,15 +1240,19 @@ inline MPI_Comm* MOAB_MPI_Comm_f2c( MPI_Fint fcomm )
     MPI_Comm* ccomm;
     ccomm  = (MPI_Comm*)( malloc( sizeof( MPI_Comm ) ) );  // memory leak ?!
     *ccomm = MPI_Comm_f2c( fcomm );
-    IMOAB_ASSERT_RET( *ccomm != MPI_COMM_NULL, "The MPI_Comm conversion from Fortran to C failed.", NULL );
-    return ccomm;
+    if ( *ccomm == MPI_COMM_NULL )
+    {
+      free( ccomm );
+      IMOAB_ASSERT_RET( false, "The MPI_Comm conversion from Fortran to C failed.", NULL );
+    }
+    else return ccomm;
 }
 
 /**
  * \brief MOAB MPI helper functions to convert from a C-based MPI_Group object
  * to a Fortran compatible MPI_Fint (integer) value.
  * 
- * \param group       Input MPI_Comm C-object pointer.
+ * \param group      Input MPI_Comm C-object pointer.
  * \return MPI_Fint  Output Fortran integer representing the comm object.
  */
 inline MPI_Fint MOAB_MPI_Group_c2f( MPI_Group* group )
@@ -1268,8 +1272,12 @@ inline MPI_Group* MOAB_MPI_Group_f2c( MPI_Fint fgroup )
     MPI_Group* cgroup;
     cgroup  = (MPI_Group*)( malloc( sizeof( MPI_Group ) ) );  // memory leak ?!
     *cgroup = MPI_Group_f2c( fgroup );
-    IMOAB_ASSERT_RET( *cgroup != MPI_GROUP_NULL, "The MPI_Group conversion from Fortran to C failed.", NULL );
-    return cgroup;
+    if ( *cgroup == MPI_GROUP_NULL )
+    {
+      free( cgroup );
+      IMOAB_ASSERT_RET( false, "The MPI_Group conversion from Fortran to C failed.", NULL );
+    }
+    else return cgroup;
 }
 
 #endif /* #ifdef MOAB_HAVE_MPI */
