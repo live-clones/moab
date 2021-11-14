@@ -106,6 +106,13 @@ enum MOAB_TAG_OWNER_TYPE
         }                                                                                      \
     }
 
+#define IMOAB_THROW_ERROR( message, retval )                            \
+    {                                                                   \
+        printf( "iMOAB Error: %s.\n Location: %s in %s:%d.\n", message, \
+                __PRETTY_FUNCTION__, __FILE__, __LINE__ );              \
+        return retval;                                                  \
+    }
+
 #ifndef NDEBUG
 #define IMOAB_ASSERT_RET( condition, message, retval )                                                         \
     {                                                                                                          \
@@ -1243,7 +1250,7 @@ inline MPI_Comm* MOAB_MPI_Comm_f2c( MPI_Fint fcomm )
     if ( *ccomm == MPI_COMM_NULL )
     {
       free( ccomm );
-      IMOAB_ASSERT_RET( false, "The MPI_Comm conversion from Fortran to C failed.", NULL );
+      IMOAB_THROW_ERROR( "The MPI_Comm conversion from Fortran to C failed.", NULL );
     }
     else return ccomm;
 }
@@ -1275,7 +1282,7 @@ inline MPI_Group* MOAB_MPI_Group_f2c( MPI_Fint fgroup )
     if ( *cgroup == MPI_GROUP_NULL )
     {
       free( cgroup );
-      IMOAB_ASSERT_RET( false, "The MPI_Group conversion from Fortran to C failed.", NULL );
+      IMOAB_THROW_ERROR( "The MPI_Group conversion from Fortran to C failed.", NULL );
     }
     else return cgroup;
 }
