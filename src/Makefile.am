@@ -297,7 +297,8 @@ intxmeshinclude_HEADERS = \
 # Conditional sources
 if ENABLE_FORTRAN
 libMOAB_la_SOURCES += iMOABF.F90
-nobase_libMOAB_la_include_HEADERS += imoab.mod
+imoabincludedir = $(includedir)
+nodist_imoabinclude_HEADERS = imoab.mod
 endif # ENABLE_FORTRAN
 
 if ENABLE_mbtempest
@@ -421,7 +422,7 @@ if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@
 endif
 
-DISTCLEANFILES = a.out imoab.mod
+CLEANFILES = a.out imoab.mod
 EXTRA_DIST += CMakeLists.txt parallel/CMakeLists.txt IntxMesh/CMakeLists.txt
 
 ## Rules for Fortran sources compilation
