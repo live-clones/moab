@@ -419,9 +419,9 @@ int main( int argc, char* argv[] )
 
         PUSH_TIMER( couComm, "write LND-ATM remapping weights" )
 #ifdef  ENABLE_OCNATM_COUPLING
-        const std::string lnd_atm_map_file_name = "lnd_atm_map_testE2.nc";
+        const std::string lnd_atm_map_file_name = "lnd_atm_map_testE2.h5m";
 #else
-        const std::string lnd_atm_map_file_name = "lnd_atm_map_testE1.nc";
+        const std::string lnd_atm_map_file_name = "lnd_atm_map_testE1.h5m";
 #endif
         ierr = iMOAB_WriteMappingWeightsToFile( cplLndAtmPID, weights_identifiers[0],
                 lnd_atm_map_file_name.c_str(), strlen(weights_identifiers[0]),

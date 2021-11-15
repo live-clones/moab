@@ -498,9 +498,9 @@ int main( int argc, char* argv[] )
 
         PUSH_TIMER( couComm, "write LND-ATM remapping weights" )
 
-        std::string lnd_atm_map_file_name = "lnd_atm_map_testD.nc";
+        std::string lnd_atm_map_file_name = "lnd_atm_map_testD.h5m";
         if (5 == repartitioner_scheme)
-            lnd_atm_map_file_name = "lnd_atm_map_testD_org.nc";
+            lnd_atm_map_file_name = "lnd_atm_map_testD_org.h5m";
 
         ierr = iMOAB_WriteMappingWeightsToFile( cplLndAtmPID, weights_identifiers[1],
                 lnd_atm_map_file_name.c_str(), strlen( weights_identifiers[1] ),
