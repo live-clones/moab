@@ -75,19 +75,28 @@ int main( int argc, char* argv[] )
 {
     MBMesquite::MsqPrintError err( cout );
 
-    std::string file_name = TestDir + "/3D/vtk/hexes/untangled/large_box_hex_1000.vtk";
+    std::string file_name = TestDir + "unittest/mesquite/3D/vtk/hexes/untangled/large_box_hex_1000.vtk";
     double OF_value       = 0.;
 
-    if( argc == 1 ) { cerr << "Warning: No file specified, using default: " << file_name << endl; }
+    if( argc == 1 )
+    {
+        cerr << "Warning: No file specified, using default: " << file_name << endl;
+    }
 
-    if( argc > 1 ) { file_name = argv[1]; }
+    if( argc > 1 )
+    {
+        file_name = argv[1];
+    }
     if( argc > 2 )
     {
         char* end_ptr;
         OF_value = strtod( argv[2], &end_ptr );
         if( !*argv[2] || *end_ptr ) usage();
     }
-    if( argc > 3 ) { usage(); }
+    if( argc > 3 )
+    {
+        usage();
+    }
 
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( file_name.c_str(), err );

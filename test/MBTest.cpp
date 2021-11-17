@@ -80,7 +80,7 @@ using namespace moab;
 #ifdef MOAB_HAVE_NETCDF
 ErrorCode load_file_one( Interface* iface )
 {
-    std::string file_name = TestDir + "/mbtest1.g";
+    std::string file_name = TestDir + "unittest/mbtest1.g";
     ErrorCode error       = iface->load_mesh( file_name.c_str() );
     if( MB_SUCCESS != error )
     {
@@ -683,9 +683,13 @@ ErrorCode mb_adjacencies_create_delete_test()
     return MB_SUCCESS;
 }
 
-static ErrorCode create_two_hex_full_mesh( Interface* mb, EntityHandle vertices[12], EntityHandle hexes[2],
-                                           EntityHandle hex1_faces[6], EntityHandle hex2_faces[6],
-                                           EntityHandle hex1_edges[12], EntityHandle hex2_edges[12] )
+static ErrorCode create_two_hex_full_mesh( Interface* mb,
+                                           EntityHandle vertices[12],
+                                           EntityHandle hexes[2],
+                                           EntityHandle hex1_faces[6],
+                                           EntityHandle hex2_faces[6],
+                                           EntityHandle hex1_edges[12],
+                                           EntityHandle hex2_edges[12] )
 {
     ErrorCode rval;
     // create a simple mesh containing 2 hexes
@@ -890,8 +894,7 @@ ErrorCode mb_adjacent_create_test()
     const EntityHandle faces[6][4] = {
         { verts[0], verts[1], verts[5], verts[4] }, { verts[1], verts[2], verts[6], verts[5] },
         { verts[2], verts[3], verts[7], verts[6] }, { verts[3], verts[0], verts[4], verts[7] },
-        { verts[3], verts[2], verts[1], verts[0] }, { verts[4], verts[5], verts[6], verts[7] }
-    };
+        { verts[3], verts[2], verts[1], verts[0] }, { verts[4], verts[5], verts[6], verts[7] } };
     for( int i = 0; i < 6; ++i )
     {  // for each expected face
         // get sorted list of verts first for easy comparison
@@ -941,7 +944,10 @@ ErrorCode nothing_but_type( Range& range, EntityType type )
 
     for( ; iter != end_iter; ++iter )
     {
-        if( TYPE_FROM_HANDLE( *iter ) != type ) { return MB_FAILURE; }
+        if( TYPE_FROM_HANDLE( *iter ) != type )
+        {
+            return MB_FAILURE;
+        }
     }
     return MB_SUCCESS;
 }
@@ -1316,7 +1322,10 @@ ErrorCode mb_mesh_sets_test( int flags )
     result = MB->get_number_entities_by_handle( temp_ms1, size2 );
     if( result != MB_SUCCESS ) return result;
 
-    if( size1 != size2 ) { return MB_FAILURE; }
+    if( size1 != size2 )
+    {
+        return MB_FAILURE;
+    }
 
     temp_range.clear();
     result = MB->get_entities_by_handle( temp_ms1, temp_range );
@@ -2367,8 +2376,10 @@ ErrorCode mb_mesh_set_tracking_test()
 // Compare internal representation of contents for a list (MESHSET_ORDERED)
 // set to expected contents.  Assumes expected contents are correctly
 // ordered.
-static ErrorCode check_list_meshset_internal( const EntityHandle* expected, int num_expected,
-                                              const EntityHandle* contents, int length )
+static ErrorCode check_list_meshset_internal( const EntityHandle* expected,
+                                              int num_expected,
+                                              const EntityHandle* contents,
+                                              int length )
 {
     bool okay = true;
     for( int i = 0; i < std::min( num_expected, length ); ++i )
@@ -2417,8 +2428,10 @@ static ErrorCode check_list_meshset_internal( const EntityHandle* expected, int 
 // Compare internal representation of contents for a ranged (MESHSET_SET)
 // set to expected contents.  Assumes expected contents are correctly
 // ordered.
-static ErrorCode check_ranged_meshset_internal( const EntityHandle* expected, int num_expected,
-                                                const EntityHandle* contents, int length )
+static ErrorCode check_ranged_meshset_internal( const EntityHandle* expected,
+                                                int num_expected,
+                                                const EntityHandle* contents,
+                                                int length )
 {
     if( length % 2 )
     {
@@ -2525,7 +2538,9 @@ static ErrorCode check_ranged_meshset_internal( const EntityHandle* expected, in
 
 // Check the internal representation of a meshset
 // to verify that it is correct.
-static ErrorCode check_meshset_internal( Interface& mb, EntityHandle set, const EntityHandle* expected,
+static ErrorCode check_meshset_internal( Interface& mb,
+                                         EntityHandle set,
+                                         const EntityHandle* expected,
                                          int num_expected )
 {
     ErrorCode rval;
@@ -3136,7 +3151,7 @@ ErrorCode mb_entity_conversion_test()
     Interface* MB = &moab;
 
     // read in a file so you have some data in the database
-    std::string file_name = TestDir + "/mbtest3.g";
+    std::string file_name = TestDir + "unittest/mbtest3.g";
     error                 = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3165,7 +3180,7 @@ ErrorCode mb_entity_conversion_test()
     error = MB->delete_mesh();
     if( error != MB_SUCCESS ) return error;
 
-    file_name = TestDir + "/mbtest3.g";
+    file_name = TestDir + "unittest/mbtest3.g";
     error     = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3190,7 +3205,7 @@ ErrorCode mb_entity_conversion_test()
     error = MB->delete_mesh();
     if( error != MB_SUCCESS ) return error;
 
-    file_name = TestDir + "/mbtest3.g";
+    file_name = TestDir + "unittest/mbtest3.g";
     error     = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3227,7 +3242,7 @@ ErrorCode mb_entity_conversion_test()
     error = MB->delete_mesh();
     if( error != MB_SUCCESS ) return error;
 
-    file_name = TestDir + "/mbtest1.g";
+    file_name = TestDir + "unittest/mbtest1.g";
     error     = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3252,7 +3267,7 @@ ErrorCode mb_entity_conversion_test()
     error = MB->delete_mesh();
     if( error != MB_SUCCESS ) return error;
 
-    file_name = TestDir + "/mbtest1.g";
+    file_name = TestDir + "unittest/mbtest1.g";
     error     = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3277,7 +3292,7 @@ ErrorCode mb_entity_conversion_test()
     error = MB->delete_mesh();
     if( error != MB_SUCCESS ) return error;
 
-    file_name = TestDir + "/mbtest1.g";
+    file_name = TestDir + "unittest/mbtest1.g";
     error     = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3302,7 +3317,7 @@ ErrorCode mb_entity_conversion_test()
     error = MB->delete_mesh();
     if( error != MB_SUCCESS ) return error;
 
-    file_name = TestDir + "/mbtest1.g";
+    file_name = TestDir + "unittest/mbtest1.g";
     error     = MB->load_mesh( file_name.c_str(), NULL, 0 );
     if( error != MB_SUCCESS ) return error;
 
@@ -3639,7 +3654,8 @@ bool points_are_coincident( const double* first, const double* second )
 
     return false;
 }
-ErrorCode find_coincident_nodes( Interface* gMB, const Range& vertices,
+ErrorCode find_coincident_nodes( Interface* gMB,
+                                 const Range& vertices,
                                  std::vector< std::pair< EntityHandle, EntityHandle > >& coin_nodes )
 {
     double first_coords[3], second_coords[3];
@@ -3671,7 +3687,9 @@ ErrorCode find_coincident_nodes( Interface* gMB, const Range& vertices,
     return MB_SUCCESS;
 }
 
-ErrorCode find_coincident_elements( Interface* gMB, const Range& entities, int num_nodes,
+ErrorCode find_coincident_elements( Interface* gMB,
+                                    const Range& entities,
+                                    int num_nodes,
                                     std::vector< std::pair< EntityHandle, EntityHandle > >& coin )
 {
     double coords1[8][3], coords2[8][3];
@@ -4372,10 +4390,9 @@ ErrorCode mb_poly_test()
 
     // test polygon and polyhedron representation
     // create a couple of polygons; vertices first
-    const double vert_pos[48] = {
-        -1, 0, 0, 1,  0,  0, 2,  0,  0, 2,  1,  0, 1, 1,  0, 0, 2,  0, -1, 1,  0, -2,  1,  0,
-        -2, 0, 0, -2, -1, 0, -1, -1, 0, -1, -2, 0, 1, -2, 0, 1, -1, 0, 2,  -1, 0, 1.5, .5, 1
-    };
+    const double vert_pos[48] = { -1, 0,  0,  1, 0, 0,  2, 0, 0,  2, 1, 0,  1,  1,   0,  0,
+                                  2,  0,  -1, 1, 0, -2, 1, 0, -2, 0, 0, -2, -1, 0,   -1, -1,
+                                  0,  -1, -2, 0, 1, -2, 0, 1, -1, 0, 2, -1, 0,  1.5, .5, 1 };
 
     EntityHandle verts[16];
     ErrorCode result;
@@ -6018,11 +6035,9 @@ ErrorCode mb_skin_poly_test()
         { -3, 3 }, { -1, 1 },  { 1, 1 },   { 1, -1 },  { -1, -1 }  // 15
     };
     const int polyconn[4][6] = {
-        { 0, 1, 2, 13, 12, 11 }, { 2, 3, 4, 5, 14, 13 }, { 5, 6, 7, 8, 15, 14 }, { 8, 9, 10, 11, 12, 15 }
-    };
+        { 0, 1, 2, 13, 12, 11 }, { 2, 3, 4, 5, 14, 13 }, { 5, 6, 7, 8, 15, 14 }, { 8, 9, 10, 11, 12, 15 } };
     const int polyside[4][6] = {
-        { 0, 1, 13, 16, 12, 11 }, { 2, 3, 4, 14, 17, 13 }, { 5, 6, 7, 15, 18, 14 }, { 8, 9, 10, 12, 19, 15 }
-    };
+        { 0, 1, 13, 16, 12, 11 }, { 2, 3, 4, 14, 17, 13 }, { 5, 6, 7, 15, 18, 14 }, { 8, 9, 10, 12, 19, 15 } };
 
     ErrorCode rval;
     Core moab;
@@ -6414,8 +6429,7 @@ ErrorCode mb_skin_higher_order_regions_common( bool use_adj )
                           { 1, 1, 0 },
                           { 1, 1, 2 },
                           // mid-volume
-                          { 1, 1, 1 }
-    };
+                          { 1, 1, 1 } };
 
     EntityHandle hexverts[2][27];
     for( int i = 0; i < 2; ++i )
@@ -7160,8 +7174,13 @@ ErrorCode mb_skin_adjacent_surf_patches()
     return error_count ? MB_FAILURE : MB_SUCCESS;
 }
 
-static ErrorCode get_by_all_types_and_tag( Interface* mb, EntityHandle meshset, const Tag* tag_handles,
-                                           const void* const* values, int num_tags, Range& result, int condition,
+static ErrorCode get_by_all_types_and_tag( Interface* mb,
+                                           EntityHandle meshset,
+                                           const Tag* tag_handles,
+                                           const void* const* values,
+                                           int num_tags,
+                                           Range& result,
+                                           int condition,
                                            bool recursive )
 {
     ErrorCode rval;

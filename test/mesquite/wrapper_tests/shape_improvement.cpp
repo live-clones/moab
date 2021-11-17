@@ -64,7 +64,7 @@ int main( int argc, char* argv[] )
 {
     MBMesquite::MsqPrintError err( cout );
 
-    std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
+    std::string file_name = TestDir + "unittest/mesquite/3D/vtk/tets/untangled/tire.vtk";
 
     // command line arguments
     if( argc == 1 )

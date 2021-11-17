@@ -14,15 +14,15 @@
 using namespace moab;
 
 #ifdef HAVE_OCC_STEP
-std::string input_cube = TestDir + "/io/cube.stp";
+std::string input_cube = TestDir + "unittest/io/cube.stp";
 #else
-std::string input_cube = TestDir + "/io/cube.sat";
+std::string input_cube = TestDir + "unittest/io/cube.sat";
 #endif
 
 #ifdef HAVE_OCC_STEP
-std::string input_cone = TestDir + "/io/cone.stp";
+std::string input_cone = TestDir + "unittest/io/cone.stp";
 #else
-std::string input_cone = TestDir + "/io/cone.sat";
+std::string input_cone = TestDir + "unittest/io/cone.sat";
 #endif
 
 // Function used to load the test file
@@ -32,7 +32,11 @@ void read_file( Interface* moab, const char* input_file );
 void test_cube_curve_facet();
 void test_cone_curve_facet();
 
-void read_file( Interface* moab, bool curve_fatal, const char* input_file, ErrorCode check_val, int& curve_fail,
+void read_file( Interface* moab,
+                bool curve_fatal,
+                const char* input_file,
+                ErrorCode check_val,
+                int& curve_fail,
                 int& surface_fail )
 {
     InitCGMA::initialize_cgma();

@@ -66,8 +66,8 @@ void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful
 
 int main( int argc, char* argv[] )
 {
-    filename  = TestDir + "/partBed.smf";
-    filename2 = TestDir + "/test_geom.h5m";
+    filename  = TestDir + "unittest/partBed.smf";
+    filename2 = TestDir + "unittest/test_geom.h5m";
     ofile     = "output.h5m";
     ofile2    = "shell.h5m";
     ofile3    = "shellCopy.h5m";
@@ -132,7 +132,10 @@ int main( int argc, char* argv[] )
     handle_error_code( rval, number_tests_failed, number_tests_successful );
     std::cout << "\n";
 
-    if( only_geometrize ) { return number_tests_failed; }
+    if( only_geometrize )
+    {
+        return number_tests_failed;
+    }
     std::cout << "create shell test: ";
     rval = create_shell_test( mb );
     handle_error_code( rval, number_tests_failed, number_tests_successful );
@@ -183,7 +186,10 @@ ErrorCode geometrize_test( Interface* mb, EntityHandle inputSet )
 
     std::cout << "writing output file: " << ofile.c_str() << " ";
     rval = mb->write_file( ofile.c_str(), 0, 0, &outSet, 1 );MB_CHK_SET_ERR( rval, "Can't write output file\n" );
-    if( remove_output_file ) { remove( ofile.c_str() ); }
+    if( remove_output_file )
+    {
+        remove( ofile.c_str() );
+    }
     return MB_SUCCESS;
 }
 
@@ -194,11 +200,9 @@ ErrorCode create_shell_test( Interface* mb )
     ErrorCode rval = mb->delete_mesh();MB_CHK_SET_ERR( rval, "Can't delete existing mesh\n" );
 
     // create some vertices
-    double coords[] = {
-        0, 0,   0, 1,    0,    0.1, 2,   0,   0, 3,    0, -0.1, 0,    1, 0,   1,    1,   0,   2,   1,
-        0, 3,   1, -0.1, 0,    2,   0,   1,   2, -0.1, 2, 2,    -0.1, 3, 2,   -0.2, 0,   0,   1,   1,
-        0, 0.9, 2, 0.1,  0.85, 3,   0.2, 0.8, 0, 0.1,  2, 1,    0.1,  2, 2.1, 0.2,  2.1, 3.1, 0.2, 2.1
-    };
+    double coords[] = { 0, 0,   0,    1, 0,   0.1, 2, 0,   0,    3, 0,   -0.1, 0,   1,   0,    1,   1,   0,  2, 1, 0,
+                        3, 1,   -0.1, 0, 2,   0,   1, 2,   -0.1, 2, 2,   -0.1, 3,   2,   -0.2, 0,   0,   1,  1, 0, 0.9,
+                        2, 0.1, 0.85, 3, 0.2, 0.8, 0, 0.1, 2,    1, 0.1, 2,    2.1, 0.2, 2.1,  3.1, 0.2, 2.1 };
 
     int nvert = 20;
     Range verts;
@@ -364,7 +368,10 @@ ErrorCode create_shell_test( Interface* mb )
     // now test loading it up
     rval = mb->load_file( ofile2.c_str() );MB_CHK_ERR( rval );
 
-    if( remove_output_file ) { remove( ofile2.c_str() ); }
+    if( remove_output_file )
+    {
+        remove( ofile2.c_str() );
+    }
     // do some tests on geometry
 
     // it would be good to have a method on updating the geom topo tool
@@ -423,7 +430,10 @@ ErrorCode check_model_test( Interface* mb )
     // do some tests on geometry
     // it would be good to have a method on updating the geom topo tool
     // so we do not have to create another one
-    if( remove_output_file ) { remove( ofile3.c_str() ); }
+    if( remove_output_file )
+    {
+        remove( ofile3.c_str() );
+    }
     moab::GeomTopoTool gTopoTool( mb, true );
 
     if( !gTopoTool.check_model() ) return MB_FAILURE;
@@ -532,7 +542,10 @@ ErrorCode test_delete_obb_tree( Interface* mb )
     // Make sure vol tree is gone
     EntityHandle newroot;
     rval = mb->tag_get_data( obbRootTag, &test_vol, 1, &newroot );
-    if( MB_SUCCESS == rval ) { return MB_FAILURE; }
+    if( MB_SUCCESS == rval )
+    {
+        return MB_FAILURE;
+    }
 
     // Make sure its child surf trees also gone
     Range::iterator surf_it;
@@ -540,7 +553,10 @@ ErrorCode test_delete_obb_tree( Interface* mb )
     {
         EntityHandle test_surf_root_gone;
         rval = mb->tag_get_data( obbRootTag, &( *surf_it ), 1, &test_surf_root_gone );
-        if( MB_SUCCESS == rval ) { return MB_FAILURE; }
+        if( MB_SUCCESS == rval )
+        {
+            return MB_FAILURE;
+        }
     }
 
     // Rebuild vol tree
@@ -551,7 +567,10 @@ ErrorCode test_delete_obb_tree( Interface* mb )
 
     // Make sure vol tree is gone
     rval = mb->tag_get_data( obbRootTag, &test_vol, 1, &gbroot );
-    if( MB_SUCCESS == rval ) { return MB_FAILURE; }
+    if( MB_SUCCESS == rval )
+    {
+        return MB_FAILURE;
+    }
 
     // Make sure its child surf trees remain
     for( surf_it = surfs.begin(); surf_it != surfs.end(); ++surf_it )
@@ -566,7 +585,10 @@ ErrorCode test_delete_obb_tree( Interface* mb )
 
     // Make sure surf tree is gone
     rval = mb->tag_get_data( obbRootTag, &test_surf, 1, &gbroot );
-    if( MB_SUCCESS == rval ) { return MB_FAILURE; }
+    if( MB_SUCCESS == rval )
+    {
+        return MB_FAILURE;
+    }
 
     delete gTopoTool;
 
@@ -615,7 +637,10 @@ ErrorCode test_restore_obb_trees( Interface* mb, Interface* mb2, Interface* mb3 
     for( Range::iterator rit = gsets.begin(); rit != gsets.end(); ++rit )
     {
         rval = gTopoTool2->get_root( *rit, test_root2 );
-        if( MB_SUCCESS == rval ) { return MB_FAILURE; }
+        if( MB_SUCCESS == rval )
+        {
+            return MB_FAILURE;
+        }
     }
 
     // 2) Check that roots ARE restored by setting find_geoments and restore_rootSets to true

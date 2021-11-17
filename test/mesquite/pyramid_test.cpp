@@ -71,15 +71,18 @@ using namespace MBMesquite;
 // move the vertex to the specified position, smooth the mesh,
 // and verify that the vertex was moved back to the origin by
 // the smoother.
-bool smooth_mesh( Mesh* mesh, Mesh* ref_mesh, Mesh::VertexHandle free_vertex_at_origin,
-                  Vector3D initial_free_vertex_position, QualityMetric* metric );
+bool smooth_mesh( Mesh* mesh,
+                  Mesh* ref_mesh,
+                  Mesh::VertexHandle free_vertex_at_origin,
+                  Vector3D initial_free_vertex_position,
+                  QualityMetric* metric );
 
 bool smooth_mixed_mesh( const char* filename );
 
 int main( int argc, char* argv[] )
 {
     unsigned i;
-    std::string input_file = TestDir + "/3D/vtk/mixed/tangled/mixed-hex-pyr-tet.vtk";
+    std::string input_file = TestDir + "unittest/mesquite/3D/vtk/mixed/tangled/mixed-hex-pyr-tet.vtk";
     if( argc == 2 )
         input_file = argv[1];
     else if( argc != 1 )
@@ -95,8 +98,8 @@ int main( int argc, char* argv[] )
     QualityMetric* metrics[] = { &m1, &m2, &m3, 0 };
 
     // Read Mesh
-    std::string mesh_file  = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
-    std::string imesh_file = TestDir + "/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
+    std::string mesh_file  = TestDir + "unittest/mesquite/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
+    std::string imesh_file = TestDir + "unittest/mesquite/3D/vtk/pyramids/untangled/12-pyramid-unit-sphere.vtk";
     MBMesquite::MeshImpl mesh;
     mesh.read_vtk( mesh_file.c_str(), err );
     CPPUNIT_ASSERT( !err );
@@ -176,7 +179,10 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-bool smooth_mesh( Mesh* mesh, Mesh*, Mesh::VertexHandle free_vertex_at_origin, Vector3D initial_free_vertex_position,
+bool smooth_mesh( Mesh* mesh,
+                  Mesh*,
+                  Mesh::VertexHandle free_vertex_at_origin,
+                  Vector3D initial_free_vertex_position,
                   QualityMetric* metric )
 {
     MBMesquite::MsqPrintError err( cout );

@@ -239,8 +239,15 @@ ErrorCode compute_velocity_case1( Interface* mb, EntityHandle euler_set, Tag& ta
     return MB_SUCCESS;
 }
 
-ErrorCode compute_tracer_case1( Interface* mb, Intx2MeshOnSphere& worker, EntityHandle euler_set, EntityHandle lagr_set,
-                                EntityHandle out_set, Tag& tagElem, Tag& tagArea, int rank, int tStep,
+ErrorCode compute_tracer_case1( Interface* mb,
+                                Intx2MeshOnSphere& worker,
+                                EntityHandle euler_set,
+                                EntityHandle lagr_set,
+                                EntityHandle out_set,
+                                Tag& tagElem,
+                                Tag& tagArea,
+                                int rank,
+                                int tStep,
                                 Range& connecVerts )
 {
     ErrorCode rval;
@@ -365,7 +372,7 @@ int main( int argc, char** argv )
     ProgOptions opts( LONG_DESC.str(), BRIEF_DESC );
 
     // read a homme file, partitioned in 16 so far
-    std::string fileN          = TestDir + "/mbcslam/fine4.h5m";
+    std::string fileN          = TestDir + "unittest/mbcslam/fine4.h5m";
     const char* filename_mesh1 = fileN.c_str();
 
     opts.addOpt< double >( "gtolerance,g", "geometric absolute tolerance (used for point concidence on the sphere)",

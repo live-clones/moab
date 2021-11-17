@@ -19,8 +19,8 @@ using namespace moab;
         }                                                                                                  \
     } while( false )
 
-std::string test    = TestDir + "/io/test.obj";
-std::string shuttle = TestDir + "/io/shuttle.obj";
+std::string test    = TestDir + "unittest/io/test.obj";
+std::string shuttle = TestDir + "unittest/io/shuttle.obj";
 
 GeomTopoTool* myGeomTool;
 

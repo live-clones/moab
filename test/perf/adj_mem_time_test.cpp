@@ -563,9 +563,9 @@ int main( int argc, char* argv[] )
 
     std::string filename;
 #ifdef MOAB_HAVE_HDF5
-    filename = TestDir + "/32hex_ef.h5m";
+    filename = TestDir + "unittest/32hex_ef.h5m";
 #else
-    filename = TestDir + "/hexes_mixed.vtk";
+    filename = TestDir + "unittest/hexes_mixed.vtk";
 #endif
 
     if( argc == 1 )

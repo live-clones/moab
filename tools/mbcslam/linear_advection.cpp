@@ -22,30 +22,55 @@
 
 using namespace moab;
 
-moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
-                                moab::EntityHandle out_set, moab::Tag& rhoTag, moab::Tag& areaTag,
-                                moab::Tag& rhoCoefsTag, moab::Tag& weightsTag, moab::Tag& planeTag );
+moab::ErrorCode update_density( moab::Interface* mb,
+                                moab::EntityHandle euler_set,
+                                moab::EntityHandle lagr_set,
+                                moab::EntityHandle out_set,
+                                moab::Tag& rhoTag,
+                                moab::Tag& areaTag,
+                                moab::Tag& rhoCoefsTag,
+                                moab::Tag& weightsTag,
+                                moab::Tag& planeTag );
 
-moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
-                                    moab::EntityHandle covering_set, int tStep, moab::Range& connecVerts );
+moab::ErrorCode get_departure_grid( moab::Interface* mb,
+                                    moab::EntityHandle euler_set,
+                                    moab::EntityHandle lagr_set,
+                                    moab::EntityHandle covering_set,
+                                    int tStep,
+                                    moab::Range& connecVerts );
 
-moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag,
-                                 moab::Tag& barycenterTag, moab::Tag& areaTag );
+moab::ErrorCode get_barycenters( moab::Interface* mb,
+                                 moab::EntityHandle set,
+                                 moab::Tag& planeTag,
+                                 moab::Tag& barycenterTag,
+                                 moab::Tag& areaTag );
 moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag );
-moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
-                                           moab::Tag& planeTag, moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
-moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandle euler_set,
-                                          moab::EntityHandle lagr_set, moab::EntityHandle intx_set, moab::Tag& planeTag,
+moab::ErrorCode get_linear_reconstruction( moab::Interface* mb,
+                                           moab::EntityHandle set,
+                                           moab::Tag& rhoTag,
+                                           moab::Tag& planeTag,
+                                           moab::Tag& barycenterTag,
+                                           moab::Tag& linearCoefTag );
+moab::ErrorCode get_intersection_weights( moab::Interface* mb,
+                                          moab::EntityHandle euler_set,
+                                          moab::EntityHandle lagr_set,
+                                          moab::EntityHandle intx_set,
+                                          moab::Tag& planeTag,
                                           moab::Tag& weightsTag );
 
-moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::Tag& barycenterTag,
-                             moab::Tag& rhoTag, int field_type );
+moab::ErrorCode set_density( moab::Interface* mb,
+                             moab::EntityHandle euler_set,
+                             moab::Tag& barycenterTag,
+                             moab::Tag& rhoTag,
+                             int field_type );
 
 moab::ErrorCode create_lagr_mesh( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set );
 
 // functions to compute departure point locations
 void departure_point_swirl( moab::CartVect& arrival_point, double t, double delta_t, moab::CartVect& departure_point );
-void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double delta_t,
+void departure_point_swirl_rot( moab::CartVect& arrival_point,
+                                double t,
+                                double delta_t,
                                 moab::CartVect& departure_point );
 
 double gtol = 1.e-9;  // this is for geometry tolerance
@@ -83,7 +108,7 @@ int main( int argc, char* argv[] )
     // "PARALLEL=READ_PART;PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;GATHER_SET=0;PARTITION_METHOD=TRIVIAL_PARTITION;VARIABLE=";
     // opts << "PARALLEL=READ_PART;PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
     // rval = mb.load_file(file_name.c_str(), &euler_set, opts.str().c_str());
-    std::string fileN = TestDir + "/mbcslam/fine4.h5m";
+    std::string fileN = TestDir + "unittest/mbcslam/fine4.h5m";
 
     rval = mb.load_file( fileN.c_str(), &euler_set );MB_CHK_ERR( rval );
 
@@ -313,7 +338,10 @@ moab::ErrorCode get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set,
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& planeTag, moab::Tag& areaTag,
+moab::ErrorCode get_barycenters( moab::Interface* mb,
+                                 moab::EntityHandle set,
+                                 moab::Tag& planeTag,
+                                 moab::Tag& areaTag,
                                  moab::Tag& barycenterTag )
 {
 
@@ -401,8 +429,11 @@ moab::ErrorCode get_barycenters( moab::Interface* mb, moab::EntityHandle set, mo
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::Tag& barycenterTag,
-                             moab::Tag& rhoTag, int field_type )
+moab::ErrorCode set_density( moab::Interface* mb,
+                             moab::EntityHandle euler_set,
+                             moab::Tag& barycenterTag,
+                             moab::Tag& rhoTag,
+                             int field_type )
 {
     // get cells
     moab::Range cells;
@@ -469,8 +500,12 @@ moab::ErrorCode set_density( moab::Interface* mb, moab::EntityHandle euler_set, 
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag,
-                                           moab::Tag& planeTag, moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
+moab::ErrorCode get_linear_reconstruction( moab::Interface* mb,
+                                           moab::EntityHandle set,
+                                           moab::Tag& rhoTag,
+                                           moab::Tag& planeTag,
+                                           moab::Tag& barycenterTag,
+                                           moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
     Range cells;
@@ -578,8 +613,12 @@ moab::ErrorCode get_linear_reconstruction( moab::Interface* mb, moab::EntityHand
     return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
-                                    moab::EntityHandle covering_set, int tStep, Range& connecVerts )
+moab::ErrorCode get_departure_grid( moab::Interface* mb,
+                                    moab::EntityHandle euler_set,
+                                    moab::EntityHandle lagr_set,
+                                    moab::EntityHandle covering_set,
+                                    int tStep,
+                                    Range& connecVerts )
 {
     EntityHandle dum = 0;
     Tag corrTag;
@@ -619,9 +658,15 @@ moab::ErrorCode get_departure_grid( moab::Interface* mb, moab::EntityHandle eule
 }
 
 // !!! For now serial !!!
-moab::ErrorCode update_density( moab::Interface* mb, moab::EntityHandle euler_set, moab::EntityHandle lagr_set,
-                                moab::EntityHandle out_set, moab::Tag& rhoTag, moab::Tag& areaTag,
-                                moab::Tag& rhoCoefsTag, moab::Tag& weightsTag, moab::Tag& planeTag )
+moab::ErrorCode update_density( moab::Interface* mb,
+                                moab::EntityHandle euler_set,
+                                moab::EntityHandle lagr_set,
+                                moab::EntityHandle out_set,
+                                moab::Tag& rhoTag,
+                                moab::Tag& areaTag,
+                                moab::Tag& rhoCoefsTag,
+                                moab::Tag& weightsTag,
+                                moab::Tag& planeTag )
 {
     //  moab::ParallelComm * parcomm = ParallelComm::get_pcomm(mb, 0);
     ErrorCode rval;
@@ -763,7 +808,9 @@ void departure_point_swirl( moab::CartVect& arrival_point, double t, double delt
 /*
  *  Deformational flow with rotation
  */
-void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double delta_t,
+void departure_point_swirl_rot( moab::CartVect& arrival_point,
+                                double t,
+                                double delta_t,
                                 moab::CartVect& departure_point )
 {
 
@@ -800,8 +847,11 @@ void departure_point_swirl_rot( moab::CartVect& arrival_point, double t, double 
 /*
  *  Zonal flow
  */
-moab::ErrorCode get_intersection_weights( moab::Interface* mb, moab::EntityHandle euler_set,
-                                          moab::EntityHandle lagr_set, moab::EntityHandle intx_set, moab::Tag& planeTag,
+moab::ErrorCode get_intersection_weights( moab::Interface* mb,
+                                          moab::EntityHandle euler_set,
+                                          moab::EntityHandle lagr_set,
+                                          moab::EntityHandle intx_set,
+                                          moab::Tag& planeTag,
                                           moab::Tag& weightsTag )
 {
     // get all intersection polygons

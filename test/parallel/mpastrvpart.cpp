@@ -10,7 +10,7 @@
 
 using namespace moab;
 
-std::string example = TestDir + "/io/mpasx1.642.t.2.nc";
+std::string example = TestDir + "unittest/io/mpasx1.642.t.2.nc";
 
 void test_read_onevar_trivial();
 void test_read_onevar_trivial_no_mixed_elements();

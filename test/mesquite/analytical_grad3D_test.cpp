@@ -71,7 +71,7 @@ int main()
     MsqPrintError err( std::cout );
     MBMesquite::MeshImpl mesh;
 
-    std::string file_name = TestDir + "/3D/vtk/hexes/untangled/hexes_4by2by2.vtk";
+    std::string file_name = TestDir + "unittest/mesquite/3D/vtk/hexes/untangled/hexes_4by2by2.vtk";
     mesh.read_vtk( file_name.c_str(), err );
 
     // creates an intruction queue

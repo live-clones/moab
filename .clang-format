@@ -20,7 +20,7 @@ AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: true
 BinPackArguments: true
-BinPackParameters: true
+BinPackParameters: false
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass:      true
@@ -55,7 +55,7 @@ PenaltyBreakString: 10000
 PenaltyExcessCharacter: 1000
 PenaltyReturnTypeOnItsOwnLine: 6000
 PointerAlignment: Left
-ReflowComments:  true
+ReflowComments:  false
 SortIncludes:    false
 SpaceAfterCStyleCast: false
 #SpaceAfterTemplateKeyword: false
@@ -68,8 +68,8 @@ SpacesInContainerLiterals: false
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: true
 SpacesInSquareBrackets: false
-Standard:        Cpp03
+Standard:        C++11
 TabWidth:        4
 UseTab:          Never
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: true
 ...

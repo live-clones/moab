@@ -77,10 +77,10 @@ using namespace moab;
  * every higher-order node are expected to be the mean of the
  * adjacent corner vertices of the element.
  */
-static const std::string input_file_1 = std::string( TestDir + "/io/test.cub" );
-static const std::string ho_file      = std::string( TestDir + "/io/ho_test.cub" );
-static const std::string cubit12_file = std::string( TestDir + "/io/cubtest12.cub" );
-static const std::string cubit14_file = std::string( TestDir + "/io/cubtest14.cub" );
+static const std::string input_file_1 = std::string( TestDir + "unittest/io/test.cub" );
+static const std::string ho_file      = std::string( TestDir + "unittest/io/ho_test.cub" );
+static const std::string cubit12_file = std::string( TestDir + "unittest/io/cubtest12.cub" );
+static const std::string cubit14_file = std::string( TestDir + "unittest/io/cubtest14.cub" );
 
 void read_file( Interface& moab, const std::string& input_file );
 
@@ -351,7 +351,11 @@ std::vector< int > find_parents( const int parent_conn[][L], int num_parent, int
     return results;
 }
 
-int check_geometric_set( Interface& moab, int dim, int id, const int* children, int num_children,
+int check_geometric_set( Interface& moab,
+                         int dim,
+                         int id,
+                         const int* children,
+                         int num_children,
                          std::vector< int > parents )
 {
     ErrorCode rval;

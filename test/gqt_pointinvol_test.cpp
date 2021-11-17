@@ -26,7 +26,7 @@ GeomQueryTool* GQT;
         }                                                                                                  \
     } while( false )
 
-const std::string input_file = TestDir + "/test_geom.h5m";
+const std::string input_file = TestDir + "unittest/test_geom.h5m";
 
 void gqt_setup_test()
 {

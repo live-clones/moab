@@ -14,9 +14,9 @@
 
 using namespace moab;
 
-std::string meshfile  = TestDir + "/16_unmerged_hex.h5m";
-std::string meshfile2 = TestDir + "/merge_with_tag.h5m";
-std::string meshfile3 = TestDir + "/triangles.h5m";
+std::string meshfile  = TestDir + "unittest/16_unmerged_hex.h5m";
+std::string meshfile2 = TestDir + "unittest/merge_with_tag.h5m";
+std::string meshfile3 = TestDir + "unittest/triangles.h5m";
 std::string outfile   = "mm_out.h5m";
 
 void mergesimple_test();

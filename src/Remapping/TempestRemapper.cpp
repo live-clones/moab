@@ -138,7 +138,8 @@ ErrorCode TempestRemapper::clear()
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-ErrorCode TempestRemapper::LoadMesh( Remapper::IntersectionContext ctx, std::string inputFilename,
+ErrorCode TempestRemapper::LoadMesh( Remapper::IntersectionContext ctx,
+                                     std::string inputFilename,
                                      TempestMeshType type )
 {
     if( ctx == Remapper::SourceMesh )
@@ -237,8 +238,11 @@ ErrorCode TempestRemapper::ConvertTempestMesh( Remapper::IntersectionContext ctx
     }
 }
 
-ErrorCode TempestRemapper::convert_tempest_mesh_private( TempestMeshType meshType, Mesh* mesh, EntityHandle& mesh_set,
-                                                         Range& entities, Range* vertices )
+ErrorCode TempestRemapper::convert_tempest_mesh_private( TempestMeshType meshType,
+                                                         Mesh* mesh,
+                                                         EntityHandle& mesh_set,
+                                                         Range& entities,
+                                                         Range* vertices )
 {
     ErrorCode rval;
 
@@ -430,7 +434,9 @@ ErrorCode TempestRemapper::ConvertMeshToTempest( Remapper::IntersectionContext c
     return rval;
 }
 
-ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh, EntityHandle mesh_set, moab::Range& elems,
+ErrorCode TempestRemapper::convert_mesh_to_tempest_private( Mesh* mesh,
+                                                            EntityHandle mesh_set,
+                                                            moab::Range& elems,
                                                             moab::Range* pverts )
 {
     ErrorCode rval;
@@ -772,7 +778,8 @@ ErrorCode TempestRemapper::ComputeGlobalLocalMaps()
 ///////////////////////////////////////////////////////////////////////////////////
 
 moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string strOutputFileName,
-                                                                     const bool fAllParallel, const bool fInputConcave,
+                                                                     const bool fAllParallel,
+                                                                     const bool fInputConcave,
                                                                      const bool fOutputConcave )
 {
     // Let us alos write out the TempestRemap equivalent so that we can do some verification checks
@@ -806,7 +813,8 @@ moab::ErrorCode moab::TempestRemapper::WriteTempestIntersectionMesh( std::string
     return moab::MB_SUCCESS;
 }
 void TempestRemapper::SetMeshSet( Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/,
-                                  moab::EntityHandle mset, moab::Range& entities )
+                                  moab::EntityHandle mset,
+                                  moab::Range& entities )
 {
 
     if( ctx == Remapper::SourceMesh )  // should not be used
@@ -833,7 +841,9 @@ void TempestRemapper::SetMeshSet( Remapper::IntersectionContext ctx /* Remapper:
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef MOAB_HAVE_MPI
-ErrorCode TempestRemapper::assign_vertex_element_IDs( Tag idtag, EntityHandle this_set, const int dimension,
+ErrorCode TempestRemapper::assign_vertex_element_IDs( Tag idtag,
+                                                      EntityHandle this_set,
+                                                      const int dimension,
                                                       const int start_id )
 {
     assert( idtag );
@@ -863,8 +873,11 @@ bool operator<( Node const& lhs, Node const& rhs )
     return std::pow( lhs.x - rhs.x, 2.0 ) + std::pow( lhs.y - rhs.y, 2.0 ) + std::pow( lhs.z - rhs.z, 2.0 );
 }
 
-ErrorCode TempestRemapper::GenerateCSMeshMetadata( const int ntot_elements, moab::Range& ents,
-                                                   moab::Range* secondary_ents, const std::string dofTagName, int nP )
+ErrorCode TempestRemapper::GenerateCSMeshMetadata( const int ntot_elements,
+                                                   moab::Range& ents,
+                                                   moab::Range* secondary_ents,
+                                                   const std::string dofTagName,
+                                                   int nP )
 {
     Mesh csMesh;
     int err;
@@ -886,8 +899,12 @@ ErrorCode TempestRemapper::GenerateCSMeshMetadata( const int ntot_elements, moab
     return moab::MB_SUCCESS;
 }
 
-ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_elements, moab::Range& ents,
-                                                 moab::Range* secondary_ents, const std::string dofTagName, int nP )
+ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh,
+                                                 const int ntot_elements,
+                                                 moab::Range& ents,
+                                                 moab::Range* secondary_ents,
+                                                 const std::string dofTagName,
+                                                 int nP )
 {
     moab::ErrorCode rval;
 
@@ -1039,7 +1056,10 @@ ErrorCode TempestRemapper::GenerateMeshMetadata( Mesh& csMesh, const int ntot_el
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance, double radius_src, double radius_tgt, double boxeps,
+ErrorCode TempestRemapper::ConstructCoveringSet( double tolerance,
+                                                 double radius_src,
+                                                 double radius_tgt,
+                                                 double boxeps,
                                                  bool regional_mesh )
 {
     ErrorCode rval;
@@ -1818,12 +1838,11 @@ ErrorCode TempestRemapper::augment_overlap_set()
                     if( n2 >= sizeOfTLc2 ) MB_CHK_SET_ERR( MB_FAILURE, " memory overflow" );
                     //
                     std::set< int >& indexVerticesInTLv = verticesToSendForProc[procID];
-                    TLc2.vi_wr[n2 * sizeTuple2]         = procID;    // send to
-                    TLc2.vi_wr[n2 * sizeTuple2 + 1]     = orgProc;   // this cell is coming from here
-                    TLc2.vi_wr[n2 * sizeTuple2 + 2]     = sourceID;  // source parent of the intx cell
-                    TLc2.vi_wr[n2 * sizeTuple2 + 3] =
-                        TLc.vi_rd[sizeTuple * i + 2];  // target parent of the intx cell
-                                                       // number of vertices of the intx cell
+                    TLc2.vi_wr[n2 * sizeTuple2]         = procID;                    // send to
+                    TLc2.vi_wr[n2 * sizeTuple2 + 1]     = orgProc;                   // this cell is coming from here
+                    TLc2.vi_wr[n2 * sizeTuple2 + 2]     = sourceID;                  // source parent of the intx cell
+                    TLc2.vi_wr[n2 * sizeTuple2 + 3] = TLc.vi_rd[sizeTuple * i + 2];  // target parent of the intx cell
+                        // number of vertices of the intx cell
                     int nvert                       = TLc.vi_rd[sizeTuple * i + 3];
                     TLc2.vi_wr[n2 * sizeTuple2 + 4] = nvert;
                     // now loop through the connectivity, and make sure the vertices are available;

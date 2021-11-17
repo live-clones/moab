@@ -3,14 +3,14 @@
 
 using namespace moab;
 
-std::string example_eul    = TestDir + "/io/eul3x48x96.t.3.nc";
-std::string example_eul_t0 = TestDir + "/io/eul3x48x96.t0.nc";
-std::string example_eul_t1 = TestDir + "/io/eul3x48x96.t1.nc";
-std::string example_eul_t2 = TestDir + "/io/eul3x48x96.t2.nc";
-std::string example_fv     = TestDir + "/io/fv3x46x72.t.3.nc";
-std::string example_homme  = TestDir + "/io/homme3x3458.t.3.nc";
-std::string example_mpas   = TestDir + "/io/mpasx1.642.t.2.nc";
-std::string example_gcrm   = TestDir + "/io/gcrm_r3.nc";
+std::string example_eul    = TestDir + "unittest/io/eul3x48x96.t.3.nc";
+std::string example_eul_t0 = TestDir + "unittest/io/eul3x48x96.t0.nc";
+std::string example_eul_t1 = TestDir + "unittest/io/eul3x48x96.t1.nc";
+std::string example_eul_t2 = TestDir + "unittest/io/eul3x48x96.t2.nc";
+std::string example_fv     = TestDir + "unittest/io/fv3x46x72.t.3.nc";
+std::string example_homme  = TestDir + "unittest/io/homme3x3458.t.3.nc";
+std::string example_mpas   = TestDir + "unittest/io/mpasx1.642.t.2.nc";
+std::string example_gcrm   = TestDir + "unittest/io/gcrm_r3.nc";
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

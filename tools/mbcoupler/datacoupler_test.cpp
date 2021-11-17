@@ -64,11 +64,21 @@ void print_usage( char** argv )
 
 #ifdef MOAB_HAVE_HDF5
 
-ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& meshFiles, DataCoupler::Method& method,
-                            std::string& interpTag, std::string& gNormTag, std::string& ssNormTag,
-                            std::vector< const char* >& ssTagNames, std::vector< const char* >& ssTagValues,
-                            std::string& readOpts, std::string& outFile, std::string& writeOpts, std::string& dbgFile,
-                            bool& help, double& epsilon );
+ErrorCode get_file_options( int argc,
+                            char** argv,
+                            std::vector< std::string >& meshFiles,
+                            DataCoupler::Method& method,
+                            std::string& interpTag,
+                            std::string& gNormTag,
+                            std::string& ssNormTag,
+                            std::vector< const char* >& ssTagNames,
+                            std::vector< const char* >& ssTagValues,
+                            std::string& readOpts,
+                            std::string& outFile,
+                            std::string& writeOpts,
+                            std::string& dbgFile,
+                            bool& help,
+                            double& epsilon );
 
 // ErrorCode get_file_options(int argc, char **argv,
 //                           std::vector<const char*> &filenames,
@@ -80,11 +90,20 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 ErrorCode report_iface_ents( Interface* mbImpl, std::vector< ParallelComm* >& pcs, bool print_results );
 #endif
 
-ErrorCode test_interpolation( Interface* mbImpl, DataCoupler::Method method, std::string& interpTag,
-                              std::string& gNormTag, std::string& ssNormTag, std::vector< const char* >& ssTagNames,
-                              std::vector< const char* >& ssTagValues, std::vector< ParallelComm* >& pcs,
-                              double& instant_time, double& pointloc_time, double& interp_time, double& gnorm_time,
-                              double& ssnorm_time, double& toler );
+ErrorCode test_interpolation( Interface* mbImpl,
+                              DataCoupler::Method method,
+                              std::string& interpTag,
+                              std::string& gNormTag,
+                              std::string& ssNormTag,
+                              std::vector< const char* >& ssTagNames,
+                              std::vector< const char* >& ssTagValues,
+                              std::vector< ParallelComm* >& pcs,
+                              double& instant_time,
+                              double& pointloc_time,
+                              double& interp_time,
+                              double& gnorm_time,
+                              double& ssnorm_time,
+                              double& toler );
 
 void reduceMax( double& v )
 {
@@ -287,11 +306,21 @@ bool check_for_flag( const char* str )
 }
 
 // New get_file_options() function with added possibilities for mbcoupler_test.
-ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& meshFiles, DataCoupler::Method& method,
-                            std::string& interpTag, std::string& gNormTag, std::string& ssNormTag,
-                            std::vector< const char* >& ssTagNames, std::vector< const char* >& ssTagValues,
-                            std::string& readOpts, std::string& outFile, std::string& writeOpts, std::string& dbgFile,
-                            bool& help, double& epsilon )
+ErrorCode get_file_options( int argc,
+                            char** argv,
+                            std::vector< std::string >& meshFiles,
+                            DataCoupler::Method& method,
+                            std::string& interpTag,
+                            std::string& gNormTag,
+                            std::string& ssNormTag,
+                            std::vector< const char* >& ssTagNames,
+                            std::vector< const char* >& ssTagValues,
+                            std::string& readOpts,
+                            std::string& outFile,
+                            std::string& writeOpts,
+                            std::string& dbgFile,
+                            bool& help,
+                            double& epsilon )
 {
     // Initialize some of the outputs to null values indicating not present
     // in the argument list.
@@ -513,8 +542,8 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
     if( !haveMeshes )
     {
         meshFiles.resize( 2 );
-        meshFiles[0] = std::string( TestDir + "/64bricks_1khex.h5m" );
-        meshFiles[1] = std::string( TestDir + "/64bricks_12ktet.h5m" );
+        meshFiles[0] = std::string( TestDir + "unittest/64bricks_1khex.h5m" );
+        meshFiles[1] = std::string( TestDir + "unittest/64bricks_12ktet.h5m" );
         std::cout << "Mesh files not entered; using default files " << meshFiles[0] << " and " << meshFiles[1]
                   << std::endl;
     }
@@ -538,12 +567,20 @@ ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& m
 
 // End new get_file_options()
 
-ErrorCode test_interpolation( Interface* mbImpl, DataCoupler::Method method, std::string& interpTag,
-                              std::string& /* gNormTag */, std::string& /* ssNormTag */,
+ErrorCode test_interpolation( Interface* mbImpl,
+                              DataCoupler::Method method,
+                              std::string& interpTag,
+                              std::string& /* gNormTag */,
+                              std::string& /* ssNormTag */,
                               std::vector< const char* >& /* ssTagNames */,
-                              std::vector< const char* >& /* ssTagValues */, std::vector< ParallelComm* >& pcs,
-                              double& instant_time, double& pointloc_time, double& interp_time,
-                              double& /* gnorm_time */, double& /* ssnorm_time */, double& toler )
+                              std::vector< const char* >& /* ssTagValues */,
+                              std::vector< ParallelComm* >& pcs,
+                              double& instant_time,
+                              double& pointloc_time,
+                              double& interp_time,
+                              double& /* gnorm_time */,
+                              double& /* ssnorm_time */,
+                              double& toler )
 {
     assert( method >= DataCoupler::CONSTANT && method <= DataCoupler::SPECTRAL );
 

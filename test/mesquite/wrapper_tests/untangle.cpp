@@ -44,12 +44,15 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string VTK_2D_DIR = TestDir + "/2D/vtk/";
+std::string VTK_2D_DIR = TestDir + "unittest/mesquite/2D/vtk/";
 
 // Test untangle wrapper
 // Assumes all meshes lie in a plane for which the normal is [0,0,1].
-int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_file,
-         int expected_number_of_remaining_inverted_elems, bool flip_domain = false );
+int uwt( bool skip,
+         UntangleWrapper::UntangleMetric metric,
+         const char* input_file,
+         int expected_number_of_remaining_inverted_elems,
+         bool flip_domain = false );
 
 bool brief_output = false;
 bool write_output = false;
@@ -198,7 +201,10 @@ const char* tostr( UntangleWrapper::UntangleMetric m )
     return 0;
 }
 
-int uwt( bool skip, UntangleWrapper::UntangleMetric metric, const char* input_file_base, int expected,
+int uwt( bool skip,
+         UntangleWrapper::UntangleMetric metric,
+         const char* input_file_base,
+         int expected,
          bool flip_domain )
 {
     if( skip ) return 0;

@@ -364,12 +364,12 @@ int main( int argc, char* argv[] )
     std::string filename;
 #ifdef MOAB_HAVE_HDF5
 #ifdef MOAB_HAVE_AHF
-    filename = TestDir + "/spectral.h5m";
+    filename = TestDir + "unittest/spectral.h5m";
 #else
-    filename = TestDir + "/32hex_ef.h5m";
+    filename = TestDir + "unittest/32hex_ef.h5m";
 #endif
 #else
-    filename = TestDir + "/hexes_mixed.vtk";
+    filename = TestDir + "unittest/hexes_mixed.vtk";
 #endif
 
     if( argc == 1 )

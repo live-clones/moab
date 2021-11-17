@@ -28,16 +28,29 @@ void get_gnomonic_plane( moab::Interface* mb, moab::EntityHandle set, moab::Tag&
 
 // computes coefficients (A,B,C) for linear reconstruction in gnomonic coordinates: rho(x,y) = Ax +
 // By + C
-void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
-                                moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
+void get_linear_reconstruction( moab::Interface* mb,
+                                moab::EntityHandle set,
+                                moab::Tag& rhoTag,
+                                moab::Tag& planeTag,
+                                moab::Tag& barycenterTag,
+                                moab::Tag& linearCoefTag );
 
 // evaluates the integral of rho(x,y) over cell, should be equal to cell average rho
-void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
-                                 moab::Tag& barycenterTag, moab::Tag& linearCoefTag );
+void test_linear_reconstruction( moab::Interface* mb,
+                                 moab::EntityHandle set,
+                                 moab::Tag& rhoTag,
+                                 moab::Tag& planeTag,
+                                 moab::Tag& barycenterTag,
+                                 moab::Tag& linearCoefTag );
 
 // set density function
-moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_set, int rank, moab::Tag& tagTracer,
-                                 moab::Tag& tagElem, moab::Tag& tagArea, int field_type );
+moab::ErrorCode add_field_value( moab::Interface* mb,
+                                 moab::EntityHandle euler_set,
+                                 int rank,
+                                 moab::Tag& tagTracer,
+                                 moab::Tag& tagElem,
+                                 moab::Tag& tagArea,
+                                 int field_type );
 
 // functions that implement gnomonic projection as in Homme (different from Moab implementation)
 int gnomonic_projection_test( const moab::CartVect& pos, double R, int plane, double& c1, double& c2 );
@@ -66,7 +79,7 @@ int main( int argc, char* argv[] )
     // opts <<
     // "PARALLEL=READ_PART;PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;GATHER_SET=0;PARTITION_METHOD=TRIVIAL_PARTITION;VARIABLE=";
     // opts << "PARALLEL=READ_PART;PARTITION;PARALLEL_RESOLVE_SHARED_ENTS";
-    std::string fileN = TestDir + "/mbcslam/fine4.h5m";
+    std::string fileN = TestDir + "unittest/mbcslam/fine4.h5m";
 
     rval = mb.load_file( fileN.c_str(), &euler_set );CHECK_ERR( rval );
 
@@ -241,8 +254,12 @@ void get_barycenters( moab::Interface* mb, moab::EntityHandle set, moab::Tag& pl
     return;
 }
 
-void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
-                                moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
+void get_linear_reconstruction( moab::Interface* mb,
+                                moab::EntityHandle set,
+                                moab::Tag& rhoTag,
+                                moab::Tag& planeTag,
+                                moab::Tag& barycenterTag,
+                                moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
     Range cells;
@@ -356,8 +373,12 @@ void get_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moa
     return;
 }
 
-void test_linear_reconstruction( moab::Interface* mb, moab::EntityHandle set, moab::Tag& rhoTag, moab::Tag& planeTag,
-                                 moab::Tag& barycenterTag, moab::Tag& linearCoefTag )
+void test_linear_reconstruction( moab::Interface* mb,
+                                 moab::EntityHandle set,
+                                 moab::Tag& rhoTag,
+                                 moab::Tag& planeTag,
+                                 moab::Tag& barycenterTag,
+                                 moab::Tag& linearCoefTag )
 {
     // get all entities of dimension 2
     Range cells;
@@ -524,7 +545,10 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
 
     if( ( Y < X ) & ( Y > -X ) )
     {
-        if( Z > X ) { plane = 6; }
+        if( Z > X )
+        {
+            plane = 6;
+        }
         else if( Z < -X )
         {
             plane = 5;
@@ -536,7 +560,10 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
     }
     else if( ( Y > X ) & ( Y < -X ) )
     {
-        if( Z > -X ) { plane = 6; }
+        if( Z > -X )
+        {
+            plane = 6;
+        }
         else if( Z < X )
         {
             plane = 5;
@@ -548,7 +575,10 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
     }
     else if( ( Y > X ) & ( Y > -X ) )
     {
-        if( Z > Y ) { plane = 6; }
+        if( Z > Y )
+        {
+            plane = 6;
+        }
         else if( Z < -Y )
         {
             plane = 5;
@@ -560,7 +590,10 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
     }
     else if( ( Y < X ) & ( Y < -X ) )
     {
-        if( Z > -Y ) { plane = 6; }
+        if( Z > -Y )
+        {
+            plane = 6;
+        }
         else if( Z < Y )
         {
             plane = 5;
@@ -572,7 +605,10 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
     }
     else
     {
-        if( fabs( X ) < Z ) { plane = 6; }
+        if( fabs( X ) < Z )
+        {
+            plane = 6;
+        }
         else if( Z < -fabs( X ) )
         {
             plane = 5;
@@ -598,8 +634,13 @@ void decide_gnomonic_plane_test( const CartVect& pos, int& plane )
     return;
 }
 
-moab::ErrorCode add_field_value( moab::Interface* mb, moab::EntityHandle euler_set, int /*rank*/, moab::Tag& tagTracer,
-                                 moab::Tag& tagElem, moab::Tag& tagArea, int field_type )
+moab::ErrorCode add_field_value( moab::Interface* mb,
+                                 moab::EntityHandle euler_set,
+                                 int /*rank*/,
+                                 moab::Tag& tagTracer,
+                                 moab::Tag& tagElem,
+                                 moab::Tag& tagArea,
+                                 int field_type )
 {
 
     /*

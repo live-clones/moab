@@ -11,8 +11,8 @@ using namespace moab;
 /* Input test file: rtttest_v100.rtt
  */
 
-std::string example1 = TestDir + "/io/rtttest_v100.rtt";
-std::string example2 = TestDir + "/io/rtttest_v101.rtt";
+std::string example1 = TestDir + "unittest/io/rtttest_v100.rtt";
+std::string example2 = TestDir + "unittest/io/rtttest_v101.rtt";
 
 void test_loadfile_1();
 void test_meshset_tags_1();

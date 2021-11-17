@@ -5,7 +5,9 @@ bin_PROGRAMS = vtkrandom vtkxform msqshape msqquality
 noinst_LTLIBRARIES = libmsqutil.la
 
 AM_CPPFLAGS  = $(MSQ_INCLUDES) \
-               -I$(top_srcdir)/itaps -I$(top_builddir)/src \
+               -I$(top_srcdir)/itaps \
+               -I$(top_srcdir)/src \
+               -I$(top_builddir)/src \
                -I$(top_srcdir)/itaps/imesh \
                -I$(top_builddir)/itaps/imesh \
                -I$(top_srcdir)/itaps/fbigeom \

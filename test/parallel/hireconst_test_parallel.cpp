@@ -38,8 +38,12 @@ std::string read_options;
 #ifdef MOAB_HAVE_HDF5
 #undef MOAB_HAVE_HDF5
 #endif
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
-                              const int degree = 0, const int dim = 2 );
+ErrorCode load_meshset_hirec( const char* infile,
+                              Interface* mbimpl,
+                              EntityHandle& meshset,
+                              ParallelComm*& pc,
+                              const int degree = 0,
+                              const int dim    = 2 );
 ErrorCode test_mesh( const char* infile, const int degree, const bool interp, const int dim );
 
 void compute_linear_coords( const int nvpe, double* elemcoords, double* naturals, double* linearcoords );
@@ -64,9 +68,9 @@ int main( int argc, char* argv[] )
     ErrorCode error;
 
 #ifdef MOAB_HAVE_HDF5
-    std::string infile = TestDir + "/mbcslam/fine4.h5m";
+    std::string infile = TestDir + "unittest/mbcslam/fine4.h5m";
 #else
-    std::string infile = TestDir + "/sphere_quads_20.vtk";
+    std::string infile = TestDir + "unittest/sphere_quads_20.vtk";
 #endif
 
     if( argc == 1 )
@@ -84,7 +88,10 @@ int main( int argc, char* argv[] )
         {
             if( i + 1 != argc )
             {
-                if( std::string( argv[i] ) == "-degree" ) { degree = atoi( argv[++i] ); }
+                if( std::string( argv[i] ) == "-degree" )
+                {
+                    degree = atoi( argv[++i] );
+                }
                 else if( std::string( argv[i] ) == "-interp" )
                 {
                     interp = atoi( argv[++i] );
@@ -98,7 +105,10 @@ int main( int argc, char* argv[] )
                 {
 #ifdef MOAB_HAVE_MPI
 
-                    if( 0 == rank ) { usage(); }
+                    if( 0 == rank )
+                    {
+                        usage();
+                    }
 
                     MPI_Finalize();
 #else
@@ -164,8 +174,12 @@ int main( int argc, char* argv[] )
 #endif
 }
 
-ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandle& meshset, ParallelComm*& pc,
-                              const int degree, const int dim )
+ErrorCode load_meshset_hirec( const char* infile,
+                              Interface* mbimpl,
+                              EntityHandle& meshset,
+                              ParallelComm*& pc,
+                              const int degree,
+                              const int dim )
 {
     ErrorCode error;
     error = mbimpl->create_meshset( moab::MESHSET_SET, meshset );MB_CHK_ERR( error );
@@ -177,7 +191,10 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
     EntityHandle partnset;
     error = mbimpl->create_meshset( moab::MESHSET_SET, partnset );MB_CHK_ERR( error );
 
-    if( nprocs > 1 ) { pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm ); }
+    if( nprocs > 1 )
+    {
+        pc = moab::ParallelComm::get_pcomm( mbimpl, partnset, &comm );
+    }
 
     if( nprocs > 1 )
     {
@@ -190,7 +207,10 @@ ErrorCode load_meshset_hirec( const char* infile, Interface* mbimpl, EntityHandl
         if( nghlayers )
         {
             // get ghost layers
-            if( dim == 2 ) { read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=2.0."; }
+            if( dim == 2 )
+            {
+                read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=2.0.";
+            }
             else if( dim == 1 )
             {
                 read_options = part_method + ";PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=1.0.";
@@ -291,7 +311,10 @@ ErrorCode test_mesh( const char* infile, const int degree, const bool interp, co
         CartVect newcoords, linearcoords;
         error = hirec.hiproj_walf_in_element( *ielem, nvpe, 1, &( naturalcoords2fit[0] ), newcoords.array() );
 
-        if( MB_FAILURE == error ) { continue; }
+        if( MB_FAILURE == error )
+        {
+            continue;
+        }
 
         std::vector< double > coords( 3 * nvpe );
         error = mbimpl->get_coords( conn, nvpe, &( coords[0] ) );MB_CHK_ERR( error );

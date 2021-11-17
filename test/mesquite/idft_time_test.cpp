@@ -58,7 +58,7 @@ using std::endl;
 
 using namespace MBMesquite;
 
-std::string DEFAULT_INPUT = TestDir + "/2D/vtk/tris/untangled/equil_tri2.vtk";
+std::string DEFAULT_INPUT = TestDir + "unittest/mesquite/2D/vtk/tris/untangled/equil_tri2.vtk";
 
 /* Print usage or help information: exits if err == true */
 void usage( const char* argv0 = 0, bool err = true )
@@ -115,10 +115,15 @@ class NumericQM : public QualityMetric
     virtual MetricType get_metric_type() const;
     virtual std::string get_name() const;
     virtual int get_negate_flag() const;
-    virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+    virtual void get_evaluations( PatchData& pd,
+                                  std::vector< size_t >& handles,
+                                  bool free_vertices_only,
                                   MsqError& err );
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
-    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+    virtual bool evaluate_with_indices( PatchData& pd,
+                                        size_t handle,
+                                        double& value,
+                                        std::vector< size_t >& indices,
                                         MsqError& err );
 };
 QualityMetric::MetricType NumericQM::get_metric_type() const
@@ -163,18 +168,34 @@ class CompareMetric : public QualityMetric
 
     bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t handle,
+                                double& value,
+                                std::vector< size_t >& indices,
                                 MsqError& err );
 
-    bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                 std::vector< Vector3D >& gradient, MsqError& err );
+    bool evaluate_with_gradient( PatchData& pd,
+                                 size_t handle,
+                                 double& value,
+                                 std::vector< size_t >& indices,
+                                 std::vector< Vector3D >& gradient,
+                                 MsqError& err );
 
-    bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_Hessian_diagonal( PatchData& pd,
+                                         size_t handle,
+                                         double& value,
+                                         std::vector< size_t >& indices,
                                          std::vector< Vector3D >& gradient,
-                                         std::vector< SymMatrix3D >& Hessian_diagonal, MsqError& err );
+                                         std::vector< SymMatrix3D >& Hessian_diagonal,
+                                         MsqError& err );
 
-    bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian, MsqError& err );
+    bool evaluate_with_Hessian( PatchData& pd,
+                                size_t handle,
+                                double& value,
+                                std::vector< size_t >& indices,
+                                std::vector< Vector3D >& gradient,
+                                std::vector< Matrix3D >& Hessian,
+                                MsqError& err );
 
     void get_mask_axis( PatchData& pd );
     bool equal( Vector3D grad1, const Vector3D& grad2 ) const;
@@ -334,7 +355,10 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-double run( QualityMetric* metric, Solver solver_type, const char* input_file, double& seconds_out,
+double run( QualityMetric* metric,
+            Solver solver_type,
+            const char* input_file,
+            double& seconds_out,
             int& iterations_out )
 {
     MsqPrintError err( cerr );
@@ -456,7 +480,10 @@ bool NumericQM::evaluate( PatchData& pd, size_t handle, double& value, MsqError&
     return realMetric->evaluate( pd, handle, value, err );
 }
 
-bool NumericQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+bool NumericQM::evaluate_with_indices( PatchData& pd,
+                                       size_t handle,
+                                       double& value,
+                                       std::vector< size_t >& indices,
                                        MsqError& err )
 {
     return realMetric->evaluate_with_indices( pd, handle, value, indices, err );
@@ -483,7 +510,9 @@ int CompareMetric::get_negate_flag() const
     return metric1->get_negate_flag();
 }
 
-void CompareMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+void CompareMetric::get_evaluations( PatchData& pd,
+                                     std::vector< size_t >& handles,
+                                     bool free_vertices_only,
                                      MsqError& err )
 {
     if( maskPlane ) get_mask_axis( pd );
@@ -523,7 +552,10 @@ bool CompareMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqEr
     return r1 && !err;
 }
 
-bool CompareMetric::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+bool CompareMetric::evaluate_with_indices( PatchData& pd,
+                                           size_t handle,
+                                           double& value,
+                                           std::vector< size_t >& indices,
                                            MsqError& err )
 {
     double m2val;
@@ -561,8 +593,12 @@ bool CompareMetric::evaluate_with_indices( PatchData& pd, size_t handle, double&
     return r1 && !err;
 }
 
-bool CompareMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                            std::vector< Vector3D >& gradient, MsqError& err )
+bool CompareMetric::evaluate_with_gradient( PatchData& pd,
+                                            size_t handle,
+                                            double& value,
+                                            std::vector< size_t >& indices,
+                                            std::vector< Vector3D >& gradient,
+                                            MsqError& err )
 {
     double m2val;
     bool r1, r2;
@@ -624,9 +660,13 @@ bool CompareMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double
     return r1 && !err;
 }
 
-bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                    std::vector< SymMatrix3D >& diagonal, MsqError& err )
+bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                    size_t handle,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    std::vector< Vector3D >& gradient,
+                                                    std::vector< SymMatrix3D >& diagonal,
+                                                    MsqError& err )
 {
     double m2val;
     bool r1, r2;
@@ -703,8 +743,12 @@ bool CompareMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle
     return r1 && !err;
 }
 
-bool CompareMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                           std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+bool CompareMetric::evaluate_with_Hessian( PatchData& pd,
+                                           size_t handle,
+                                           double& value,
+                                           std::vector< size_t >& indices,
+                                           std::vector< Vector3D >& gradient,
+                                           std::vector< Matrix3D >& Hessian,
                                            MsqError& err )
 {
     double m2val;

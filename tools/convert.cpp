@@ -243,6 +243,7 @@ int main( int argc, char* argv[] )
                     parallel = true;
                     if( argv[i][2] == '1' || argv[i][2] == '2' ) resolve_shared = true;
                     if( argv[i][2] == '2' ) exchange_ghosts = true;
+                    break;
 #endif
 #ifdef MOAB_HAVE_TEMPESTREMAP
                 case 'B':
@@ -783,7 +784,10 @@ int main( int argc, char* argv[] )
                 gMB->get_adjacencies( dim3, 1, true, adj, Interface::UNION );
                 gMB->get_adjacencies( dim2, 1, true, adj, Interface::UNION );
             }
-            if( generate[2] ) { gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION ); }
+            if( generate[2] )
+            {
+                gMB->get_adjacencies( dim3, 2, true, adj, Interface::UNION );
+            }
             if( sets[i] ) gMB->add_entities( sets[i], adj );
         }
     }
@@ -1020,7 +1024,10 @@ static void print_time( int clk_per_sec, const char* prefix, clock_t ticks, std:
     clock_t centi   = ticks % 100;
     clock_t seconds = ticks / 100;
     stream << prefix;
-    if( seconds < 120 ) { stream << ( ticks / 100 ) << "." << centi << "s" << std::endl; }
+    if( seconds < 120 )
+    {
+        stream << ( ticks / 100 ) << "." << centi << "s" << std::endl;
+    }
     else
     {
         clock_t minutes = ( seconds / 60 ) % 60;

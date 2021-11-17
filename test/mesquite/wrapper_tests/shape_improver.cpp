@@ -47,7 +47,7 @@
 
 using namespace MBMesquite;
 
-std::string DEFAULT_INPUT = TestDir + "/2D/vtk/quads/tangled/inverted-hole-1.vtk";
+std::string DEFAULT_INPUT = TestDir + "unittest/mesquite/2D/vtk/quads/tangled/inverted-hole-1.vtk";
 
 void usage( const char* argv0, bool help = false )
 {

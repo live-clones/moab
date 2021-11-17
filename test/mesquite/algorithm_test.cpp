@@ -72,7 +72,7 @@ int main()
     MsqPrintError err( cout );
     MBMesquite::MeshImpl mesh;
 
-    std::string file_name = TestDir + "/3D/vtk/tets/untangled/tire.vtk";
+    std::string file_name = TestDir + "unittest/mesquite/3D/vtk/tets/untangled/tire.vtk";
     mesh.read_vtk( file_name.c_str(), err );
     if( err ) return 1;
 

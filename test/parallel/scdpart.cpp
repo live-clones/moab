@@ -7,7 +7,7 @@
 
 using namespace moab;
 
-std::string example = TestDir + "/io/eul3x48x96.t.3.nc";
+std::string example = TestDir + "unittest/io/eul3x48x96.t.3.nc";
 
 void test_read_parallel( int nverts );
 void test_read_parallel_alljorkori();

@@ -10,7 +10,7 @@
 
 using namespace moab;
 
-std::string default_input   = TestDir + "/hex01.vtk";
+std::string default_input   = TestDir + "unittest/hex01.vtk";
 const char default_output[] = "dual.vtk";
 
 Interface* gMB;

@@ -129,8 +129,8 @@ MOSTLYCLEANFILES = mb_write.g \
 test_Matrix3_SOURCES = test_Matrix3.cpp
 mgen_test_SOURCES = mgen_test.cpp
 if ENABLE_FORTRAN
-imoab_testF_SOURCES = imoab_testF.F
-imoab_testF_FFLAGS = -DMESHDIR2=\"$(RMESHDIR)\" $(FFLAGS)
+imoab_testF_SOURCES = imoab_testF.F90
+imoab_testF_FCLAGS = -DMESHDIR2=\"$(RMESHDIR)\" $(FCLAGS)
 #imoab_testF_LDADD = $(LDADD) $(FCLIBS)
 if HAVE_TEMPESTREMAP
 imoab_testF_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
@@ -138,12 +138,13 @@ else
 imoab_testF_LDADD = $(LDADD) $(FCLIBS)
 endif
 endif
-imoab_test_SOURCES = imoab_test.cpp
+imoab_test_SOURCES = imoab_test.c
 if HAVE_TEMPESTREMAP
 imoab_test_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 else
 imoab_test_LDADD = $(LDADD)
 endif
+CCLD = $(CXX)
 
 verdict_test_SOURCES = verdict_test.cpp
 range_test_SOURCES = range_test.cpp

@@ -6,8 +6,8 @@
 
 using namespace moab;
 
-std::string cgnsfile  = TestDir + "/io/2d_naca0012.cgns";
-std::string cgnsfilew = TestDir + "/io/test.cgns";
+std::string cgnsfile  = TestDir + "unittest/io/2d_naca0012.cgns";
+std::string cgnsfilew = TestDir + "unittest/io/test.cgns";
 
 void test_read_write();
 

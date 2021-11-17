@@ -56,8 +56,14 @@ int main( int argc, char** argv )
             {
                 EPS1 = atof( argv[++index] );
             }
-            if( !strcmp( argv[index], "-input" ) ) { input_mesh_file = argv[++index]; }
-            if( !strcmp( argv[index], "-cube" ) ) { CubeSide = atof( argv[++index] ); }
+            if( !strcmp( argv[index], "-input" ) )
+            {
+                input_mesh_file = argv[++index];
+            }
+            if( !strcmp( argv[index], "-cube" ) )
+            {
+                CubeSide = atof( argv[++index] );
+            }
             index++;
         }
     }
@@ -147,7 +153,7 @@ void test_intx_in_parallel_elem_based()
     EntityHandle euler_set;
     ErrorCode rval;
     rval = mb.create_meshset( MESHSET_SET, euler_set );CHECK_ERR( rval );
-    std::string example( TestDir + "/" + input_mesh_file );
+    std::string example( TestDir + "unittest/" + input_mesh_file );
 
     rval = mb.load_file( example.c_str(), &euler_set, opts.c_str() );CHECK_ERR( rval );
 
@@ -216,7 +222,7 @@ void test_intx_mpas()
     EntityHandle euler_set;
     ErrorCode rval;
     rval = mb.create_meshset( MESHSET_SET, euler_set );CHECK_ERR( rval );
-    std::string example( TestDir + "/" + mpas_file );
+    std::string example( TestDir + "unittest/" + mpas_file );
 
     rval = mb.load_file( example.c_str(), &euler_set, opts.c_str() );
 

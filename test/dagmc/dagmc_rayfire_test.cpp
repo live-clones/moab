@@ -26,7 +26,7 @@ DagMC* DAG;
         }                                                                                                  \
     } while( false )
 
-std::string input_file = TestDir + "/test_geom.h5m";
+std::string input_file = TestDir + "unittest/test_geom.h5m";
 
 double eps = 1.0e-6;
 

@@ -101,13 +101,17 @@ const char* const averaging_names[] = { "none", "element", "vertex", "patch" };
 const double DEFAULT_OF_POWER            = 1.0;
 const unsigned DEFAULT_METRIC_IDX        = 0;
 const AveragingScheme DEFAULT_AVG_SCHEME = NONE;
-std::string DEFAULT_INPUT_FILE           = TestDir + "/2D/vtk/quads/untangled/quads_4by2_bad.vtk";
+std::string DEFAULT_INPUT_FILE           = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/quads_4by2_bad.vtk";
 std::string DEFAULT_OUTPUT_FILE          = "./out.vtk";
 
 static PlanarDomain make_domain( Mesh* mesh, MsqError& );
 
-static int do_smoother( const char* input_file, const char* output_file, const char* ref_mesh_file, double of_power,
-                        unsigned metric_idx, AveragingScheme avg_scheme )
+static int do_smoother( const char* input_file,
+                        const char* output_file,
+                        const char* ref_mesh_file,
+                        double of_power,
+                        unsigned metric_idx,
+                        AveragingScheme avg_scheme )
 {
     MsqPrintError err( cerr );
 
@@ -191,7 +195,10 @@ static PlanarDomain make_domain( Mesh* mesh, MsqError& err )
     Vector3D maximum( -HUGE_VAL, -HUGE_VAL, -HUGE_VAL );
     std::vector< Mesh::VertexHandle > vertices;
     mesh->get_all_vertices( vertices, err );
-    if( MSQ_CHKERR( err ) ) { return PlanarDomain( minimum, maximum ); }
+    if( MSQ_CHKERR( err ) )
+    {
+        return PlanarDomain( minimum, maximum );
+    }
     if( vertices.empty() )
     {
         std::cerr << "Mesh contains no vertices" << std::endl;
@@ -199,7 +206,10 @@ static PlanarDomain make_domain( Mesh* mesh, MsqError& err )
     }
     std::vector< MsqVertex > coords( vertices.size() );
     mesh->vertices_get_coordinates( arrptr( vertices ), arrptr( coords ), vertices.size(), err );
-    if( MSQ_CHKERR( err ) ) { return PlanarDomain( minimum, maximum ); }
+    if( MSQ_CHKERR( err ) )
+    {
+        return PlanarDomain( minimum, maximum );
+    }
     std::vector< MsqVertex >::const_iterator i;
     for( i = coords.begin(); i != coords.end(); ++i )
     {

@@ -141,7 +141,7 @@ int main( int argc, char** argv )
     int num_components = 1;
     int tagIndex       = 0;  // output
 
-    rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagType, &num_components, &tagIndex, strlen( "INTFIELD" ) );
+    rc = iMOAB_DefineTagStorage( pid, "INTFIELD", &tagType, &num_components, &tagIndex );
     ERROR( rc, "failed to get tag INTFIELD " );
     // set some values
     std::vector< int > valstest( numv );
@@ -151,8 +151,7 @@ int main( int argc, char** argv )
     }
     int num_tag_storage_length = numv * num_components;
     int entType                = 0;  // vertex
-    rc = iMOAB_SetIntTagStorage( pid, "INTFIELD", &num_tag_storage_length, &entType, &valstest[0],
-                                 strlen( "INTFIELD" ) );
+    rc = iMOAB_SetIntTagStorage( pid, "INTFIELD", &num_tag_storage_length, &entType, &valstest[0] );
     ERROR( rc, "failed to set tag INTFIELD " );
 
     rc = iMOAB_ReduceTagsMax( pid, &tagIndex, &entType );
@@ -169,7 +168,7 @@ int main( int argc, char** argv )
 #ifdef MOAB_HAVE_HDF5_PARALLEL
     char outfile[32] = "whole.h5m";
     char wopts[100]  = "PARALLEL=WRITE_PART";
-    rc               = iMOAB_WriteMesh( pid, outfile, wopts, 9, 19 );
+    rc               = iMOAB_WriteMesh( pid, outfile, wopts );
     ERROR( rc, "can't write mesh" );
 #endif
     /*     all done. de-register and finalize */

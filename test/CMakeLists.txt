@@ -56,18 +56,26 @@ if(MOAB_HAVE_HDF5)
              gttool_test.cpp
              restore_topo_geom_incl_test.cpp
              crop_vol_test.cpp
-             imoab_test.cpp
 	     gqt_simple_test.cpp
 	     gqt_rayfire_test.cpp
 	     gqt_pointinvol_test.cpp
             gqt_findvol_test.cpp
 	     test_geom_gqt.cpp)
+  set( HDF5_C_TESTS  imoab_test.c )
 endif()
 
 if(MOAB_HAVE_NETCDF)
   set ( TESTS ${TESTS}
               intx_rll_cs_sphere_test.cpp )
 endif()
+
+foreach( fname ${HDF5_C_TESTS} )
+  string( REPLACE ".c" "" base ${fname} )
+  add_executable( ${base} ${fname})
+  set_target_properties( ${base} PROPERTIES COMPILE_FLAGS "${TEST_COMP_FLAGS} ${MOAB_DEFINES} -DTEST" )
+  target_link_libraries( ${base} MOAB ${CGM_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
+  add_test( ${base} ${EXECUTABLE_OUTPUT_PATH}/${base} )
+endforeach()
 
 foreach( fname ${TESTS} )
   string( REPLACE ".cpp" "" base ${fname} )

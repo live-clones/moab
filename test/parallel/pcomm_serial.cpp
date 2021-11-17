@@ -31,7 +31,7 @@ int main( int argc, char* argv[] )
     int nprocs = 2;
     std::string ptag_name( "GEOM_DIMENSION" );
     std::vector< int > partition_tag_vals;
-    std::string filename = TestDir + "/ptest.cub";
+    std::string filename = TestDir + "unittest/ptest.cub";
     if( argc > 1 ) nprocs = atoi( argv[1] );
     if( argc > 2 ) filename = std::string( argv[2] );
     if( argc > 3 )

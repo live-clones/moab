@@ -17,6 +17,7 @@
 
 #include "OfflineMap.h"
 #include "moab/Remapping/TempestRemapper.hpp"
+#include "moab/Remapping/TempestOnlineMap.hpp"
 #include "moab/ParallelComm.hpp"
 
 #ifndef IS_BUILDING_MB
@@ -31,20 +32,22 @@
 
 using namespace moab;
 
-std::string inMapFilename = "outCS5ICOD5_map.nc";
+std::string inMapFilename = "";
 
 void test_tempest_map_bcast();
 void read_buffered_map();
+void read_map_from_disk();
 
 int main( int argc, char** argv )
 {
     if( argc > 1 )
         inMapFilename = std::string( argv[1] );
     else
-        inMapFilename = TestDir + "/" + inMapFilename;
+        inMapFilename = TestDir + "unittest/outCS5ICOD5_map.nc";
 
     REGISTER_TEST( test_tempest_map_bcast );
     REGISTER_TEST( read_buffered_map );
+    REGISTER_TEST( read_map_from_disk );
 
 #ifdef MOAB_HAVE_MPI
     MPI_Init( &argc, &argv );
@@ -97,26 +100,41 @@ void read_buffered_map()
 #endif
     {
         ncMap = new NcFile( inMapFilename.c_str(), NcFile::ReadOnly );
-        if( !ncMap->is_valid() ) { _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() ); }
+        if( !ncMap->is_valid() )
+        {
+            _EXCEPTION1( "Unable to open input map file \"%s\"", inMapFilename.c_str() );
+        }
 
         // Source and Target mesh resolutions
         NcDim* dimNA = ncMap->get_dim( "n_a" );
-        if( dimNA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_a\"" ); }
+        if( dimNA == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"n_a\"" );
+        }
         else
             nA = dimNA->size();
 
         NcDim* dimNB = ncMap->get_dim( "n_b" );
-        if( dimNB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"n_b\"" ); }
+        if( dimNB == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"n_b\"" );
+        }
         else
             nB = dimNB->size();
 
         NcDim* dimNVA = ncMap->get_dim( "nv_a" );
-        if( dimNVA == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_a\"" ); }
+        if( dimNVA == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"nv_a\"" );
+        }
         else
             nVA = dimNVA->size();
 
         NcDim* dimNVB = ncMap->get_dim( "nv_b" );
-        if( dimNVB == NULL ) { _EXCEPTIONT( "Input map missing dimension \"nv_b\"" ); }
+        if( dimNVB == NULL )
+        {
+            _EXCEPTIONT( "Input map missing dimension \"nv_b\"" );
+        }
         else
             nVB = dimNVB->size();
 
@@ -142,7 +160,10 @@ void read_buffered_map()
         }
 
         varS = ncMap->get_var( "S" );
-        if( varS == NULL ) { _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() ); }
+        if( varS == NULL )
+        {
+            _EXCEPTION1( "Map file \"%s\" does not contain variable \"S\"", inMapFilename.c_str() );
+        }
     }
 
     // const int nTotalBytes = nS * nNNZBytes;
@@ -429,7 +450,10 @@ void read_buffered_map()
     // consistency: row sums
     {
         int isConsistentP = mapRemap.IsConsistent( dTolerance );
-        if( 0 != isConsistentP ) { printf( "Rank %d failed consistency checks...\n", rank ); }
+        if( 0 != isConsistentP )
+        {
+            printf( "Rank %d failed consistency checks...\n", rank );
+        }
         CHECK_EQUAL( 0, isConsistentP );
     }
 
@@ -452,6 +476,48 @@ void read_buffered_map()
     delete ncMap;
 
     return;
+}
+
+void read_map_from_disk()
+{
+    moab::ErrorCode rval;
+    NcError error( NcError::verbose_nonfatal );
+    MPI_Comm commW = MPI_COMM_WORLD;
+    std::vector< int > tmp_owned_ids;
+    double dTolerance = 1e-08;
+
+    std::string remap_weights_filename = TestDir + "unittest/outCS5ICOD5_map.nc";
+
+    moab::Interface* mb = new moab::Core();
+    moab::ParallelComm pcomm( mb, commW );
+
+    moab::TempestRemapper remapper( mb, &pcomm );
+    remapper.meshValidate     = true;
+    remapper.constructEdgeMap = true;
+
+    // Do not create new filesets; Use the sets from our respective applications
+    remapper.initialize( false );
+
+    moab::TempestOnlineMap onlinemap( &remapper );
+
+    rval = onlinemap.ReadParallelMap( remap_weights_filename.c_str(), tmp_owned_ids, true );
+    CHECK_EQUAL( rval, moab::MB_SUCCESS );
+
+    // consistency: row sums
+    int isConsistentP = onlinemap.IsConsistent( dTolerance );
+    CHECK_EQUAL( 0, isConsistentP );
+
+    // conservation: we will disable this conservation check for now
+    // since we do not have information about source and target areas
+    // to accurately decipher conservation data satisfaction
+    // int isConservativeP = onlinemap.IsConservative( dTolerance );
+    // CHECK_EQUAL( 0, isConservativeP );
+
+    // monotonicity: global failures
+    int isMonotoneP = onlinemap.IsMonotone( dTolerance );
+    // Accumulate sum of failures to ensure that it is exactly same as serial case
+    // 4600 fails in serial. What about parallel ? Check and confirm.
+    CHECK_EQUAL( 4600, isMonotoneP );
 }
 
 void test_tempest_map_bcast()
@@ -550,8 +616,8 @@ void test_tempest_map_bcast()
         std::cout << "Total NNZ in remap matrix = " << dataRowsGlobal.GetRows() << std::endl;
     }
 
-    int *rg, *cg;
-    double* de;
+    int *rg = nullptr, *cg = nullptr;
+    double* de               = nullptr;
     int nMapGlobalRowCols[3] = { sparseMatrix.GetRows(), sparseMatrix.GetColumns(),
                                  static_cast< int >( dataEntriesGlobal.GetRows() ) };
 

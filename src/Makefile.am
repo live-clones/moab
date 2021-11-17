@@ -24,7 +24,6 @@ AM_CPPFLAGS += -DIS_BUILDING_MB \
                -I$(srcdir)/parallel \
                -I$(srcdir)/LocalDiscretization \
                -I$(srcdir)/verdict \
-               -I$(srcdir)/RefineMesh \
                -I$(srcdir)/DiscreteGeometry \
                -I$(srcdir)/IntxMesh
 
@@ -212,7 +211,6 @@ nobase_libMOAB_la_include_HEADERS = \
   moab/GeomUtil.hpp \
   moab/Interface.hpp \
   moab/iMOAB.h \
-  moab/imoab_protos.h \
   moab/LloydSmoother.hpp \
   moab/NestedRefine.hpp \
   moab/NestedRefineTemplates.hpp \
@@ -297,6 +295,12 @@ intxmeshinclude_HEADERS = \
   moab/IntxMesh/IntxRllCssphere.hpp
 
 # Conditional sources
+if ENABLE_FORTRAN
+libMOAB_la_SOURCES += iMOABF.F90
+imoabincludedir = $(includedir)
+nodist_imoabinclude_HEADERS = imoab.mod
+endif # ENABLE_FORTRAN
+
 if ENABLE_mbtempest
 MOAB_REMAPPING_SRCS =
 
@@ -418,6 +422,20 @@ if HAVE_CGM
   AM_CPPFLAGS += @CGM_CPPFLAGS@
 endif
 
-DISTCLEANFILES = a.out
+CLEANFILES = a.out imoab.mod
 EXTRA_DIST += CMakeLists.txt parallel/CMakeLists.txt IntxMesh/CMakeLists.txt
 
+## Rules for Fortran sources compilation
+FORTDEFS = $(FCDEFS)
+PPFCCOMPILE = $(FC) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+    $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)
+LTPPFCCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=FC $(AM_LIBTOOLFLAGS) \
+    $(LIBTOOLFLAGS) --mode=compile $(FC) $(FCDEFS) \
+    $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+    $(AM_FCFLAGS) $(FCFLAGS)
+PPF77COMPILE = $(F77) $(FORTDEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+   $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FFLAGS) $(FFLAGS)
+LTPPF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
+   $(LIBTOOLFLAGS) --mode=compile $(F77) $(FCDEFS) \
+   $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+   $(AM_FFLAGS) $(FFLAGS)

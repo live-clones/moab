@@ -1,4 +1,7 @@
 SUBDIRS = h5file io fbigeom irel mbcslam
+if ENABLE_mesquite
+SUBDIRS += mesquite
+endif
 
 EXTRA_DIST = 125hex.g \
              16_unmerged_hex.h5m \

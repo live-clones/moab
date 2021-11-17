@@ -49,9 +49,9 @@ void handle_error_code( ErrorCode rv, int& number_failed, int& number_successful
 
 int main( int argc, char* argv[] )
 {
-    filename_bot      = TestDir + "/BedCrop2.h5m";
-    filename_top      = TestDir + "/SECrop2.h5m";  //"/polyPB.txt";
-    polygon_file_name = TestDir + "/poly14.txt";
+    filename_bot      = TestDir + "unittest/BedCrop2.h5m";
+    filename_top      = TestDir + "unittest/SECrop2.h5m";  //"/polyPB.txt";
+    polygon_file_name = TestDir + "unittest/poly14.txt";
     vol_file          = "volIce.h5m";  // output
 
     number_tests_successful = 0;
@@ -98,7 +98,10 @@ int main( int argc, char* argv[] )
     handle_error_code( rval, number_tests_failed, number_tests_successful );
     std::cout << "\n";
 
-    if( remove_output ) { remove( vol_file.c_str() ); }
+    if( remove_output )
+    {
+        remove( vol_file.c_str() );
+    }
     return number_tests_failed;
 }
 

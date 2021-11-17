@@ -18,6 +18,7 @@ AC_CHECK_PROG( [SED], [sed], [sed], [true] )
 
 # Infer the source directory as the path to the ./configure script
 project_topsrcdir=`dirname $0`
+project_abstopsrcdir=$ac_abs_confdir
 project_topbuilddir="$PWD"
 USER_CONFIGURE_CMD="$0 $ac_configure_args"
 ################################################################################
@@ -149,6 +150,9 @@ AC_CHECK_FUNC([cbrt],      [AC_DEFINE([HAVE_CBRT],     [1],[Define if cbrt is av
 FATHOM_VECTOR_TEMPLATE_INSERT
 FATHOM_OLD_STD_COUNT
 MB_DEFS="$MB_DEFS $NO_VECTOR_TEMPLATE_INSERT $OLD_STD_COUNT"
+
+## Define the location of mesh directories for tests
+AC_DEFINE_UNQUOTED([MESH_DIR], ["$project_abstopsrcdir/MeshFiles/"], [Path to the base mesh files directory])
 
 ################################################################################
 #                              Headers
@@ -1665,7 +1669,7 @@ AC_CONFIG_FILES([src/mesquite/Makefile
                  test/mesquite/higher_order/Makefile
                  test/mesquite/slaved/Makefile
                  tools/mesquite/Makefile
-                 MeshFiles/mesquite/Makefile
+                 MeshFiles/unittest/mesquite/Makefile
                  ])
 
 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-static=$enable_static --enable-shared=$enable_shared"

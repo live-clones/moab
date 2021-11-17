@@ -3,7 +3,7 @@
 #include "moab/CartVect.hpp"
 #include "TestUtil.hpp"
 
-std::string filename = TestDir + "/surfrandomtris-4part.h5m";
+std::string filename = TestDir + "unittest/surfrandomtris-4part.h5m";
 
 using namespace moab;
 

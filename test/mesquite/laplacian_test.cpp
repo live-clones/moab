@@ -69,7 +69,7 @@ using std::endl;
 #include "EdgeLengthQualityMetric.hpp"
 using namespace MBMesquite;
 
-std::string DEFAULT_INPUT = TestDir + "/2D/vtk/quads/untangled/square_quad_2.vtk";
+std::string DEFAULT_INPUT = TestDir + "unittest/mesquite/2D/vtk/quads/untangled/square_quad_2.vtk";
 
 void help( const char* argv0 )
 {

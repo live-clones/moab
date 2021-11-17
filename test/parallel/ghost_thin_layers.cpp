@@ -7,7 +7,7 @@
 #include <sstream>
 
 // a file with 4 quads, in line, partitioned in 4 parts
-std::string filename = TestDir + "/io/ln4.h5m";
+std::string filename = TestDir + "unittest/io/ln4.h5m";
 
 using namespace moab;
 
