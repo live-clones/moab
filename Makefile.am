@@ -106,8 +106,7 @@ examples_pythonex_DATA = \
                examples/python/H5MToScrip.py examples/python/ScripToH5M.py \
                examples/python/gr3rd.py \
                examples/python/interrogate_mesh.py \
-               examples/python/scrip3d.py \
-               examples/python/ocean.QU.240km.scrip.151209.nc
+               examples/python/scrip3d.py 
 examples_appsdir = $(datadir)/examples/apps
 examples_apps_DATA = \
                examples/apps/makefile
