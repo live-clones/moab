@@ -1236,19 +1236,6 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
                                    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
                                    const iMOAB_String remap_weights_filename );
 
-/**
-  \brief Load the projection weights from disk to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
-
-  <B>Operations:</B> Collective on coupler PEs
-
-  \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map
-  \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
-                                                          values could be identifiers such as "scalar", "flux" or "custom".
-  \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
-  \param[in] remap_weights_filename_length   (int)        The length of the mapping file name string
-  \param[in] solution_weights_identifier_length   (int)   The length of the solution weights identifier string
-  */
-
 #endif /* #ifdef MOAB_HAVE_TEMPESTREMAP */
 
 #ifdef MOAB_HAVE_MPI

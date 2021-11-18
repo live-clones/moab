@@ -3122,11 +3122,8 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
                                    int * col_or_row,
                                    int * type,
                                    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                   const iMOAB_String remap_weights_filename,
-                                   int solution_weights_identifier_length,
-                                   int remap_weights_filename_length )
+                                   const iMOAB_String remap_weights_filename )
 {
-    assert( remap_weights_filename_length > 0 && solution_weights_identifier_length > 0 );
     ErrorCode rval;
     bool row_based_partition = true;
     if (*col_or_row == 1)
@@ -3173,8 +3170,8 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
     int lenTagType1 = 1;
     if( *type == 1 )
     {
-        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );CHKERRVAL( rval );
-        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );CHKERRVAL( rval );  // usually it is 16
+        rval = context.MBI->tag_get_handle( "GLOBAL_DOFS", gdsTag );MB_CHK_ERR( rval );
+        rval = context.MBI->tag_get_length( gdsTag, lenTagType1 );MB_CHK_ERR( rval );  // usually it is 16
     }
     Tag tagType2 = context.MBI->globalId_tag();
 
@@ -3187,26 +3184,26 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
     if( *type == 1 )
     {
         assert( gdsTag );
-        rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );CHKERRVAL( rval );
+        rval = context.MBI->get_entities_by_type( fset1, MBQUAD, ents_of_interest );MB_CHK_ERR( rval );
         dofValues.resize( ents_of_interest.size() * lenTagType1 );
-        rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );
+        rval = context.MBI->tag_get_data( gdsTag, ents_of_interest, &dofValues[0] );MB_CHK_ERR( rval );
         ndofPerEl = lenTagType1;
     }
     else if( *type == 2 )
     {
-        rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );CHKERRVAL( rval );
+        rval = context.MBI->get_entities_by_type( fset1, MBVERTEX, ents_of_interest );MB_CHK_ERR( rval );
         dofValues.resize( ents_of_interest.size() );
-        rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );  // just global ids
+        rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &dofValues[0] );MB_CHK_ERR( rval );  // just global ids
     }
     else if( *type == 3 )  // for FV meshes, just get the global id of cell
     {
-        rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );CHKERRVAL( rval );
+        rval = context.MBI->get_entities_by_dimension( fset1, 2, ents_of_interest );MB_CHK_ERR( rval );
         dofValues.resize( ents_of_interest.size() );
-        rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &dofValues[0] );CHKERRVAL( rval );  // just global ids
+        rval = context.MBI->tag_get_data( tagType2, ents_of_interest, &dofValues[0] );MB_CHK_ERR( rval );  // just global ids
     }
     else
     {
-        CHKERRVAL( MB_FAILURE );  // we know only type 1 or 2 or 3
+        MB_CHK_ERR( MB_FAILURE );  // we know only type 1 or 2 or 3
     }
     // pass ordered dofs, and unique
     std::vector<int> orderDofs(dofValues.begin(), dofValues.end());
@@ -3214,7 +3211,7 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
     std::sort( orderDofs.begin(), orderDofs.end() );
     orderDofs.erase( std::unique( orderDofs.begin(), orderDofs.end() ), orderDofs.end() ); // remove duplicates
 
-    rval = weightMap->ReadParallelMap( remap_weights_filename, orderDofs, row_based_partition );CHKERRVAL( rval );
+    rval = weightMap->ReadParallelMap( remap_weights_filename, orderDofs, row_based_partition );MB_CHK_ERR( rval );
 
     // if we are on target mesh (row based partition)
     if( row_based_partition )
@@ -3232,7 +3229,7 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
         weightMap->set_col_dc_dofs( dofValues );  // will set col_dtoc_dofmap
     }
 
-    return 0;
+    return moab::MB_SUCCESS;
 }
 ErrCode iMOAB_LoadMappingWeightsFromFile(
     iMOAB_AppID pid_intersection,
