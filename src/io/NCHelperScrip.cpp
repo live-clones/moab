@@ -111,7 +111,7 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
         localGidCells.insert( 1, nLocalCells );
     }
 #else
-    nLocalCells = nCells;
+    nLocalCells = grid_size;
     localGidCells.insert( 1, nLocalCells );
 #endif
     dbgOut.tprintf( 1, " localGidCells.psize() = %d\n", (int)localGidCells.psize() );
