@@ -167,8 +167,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         // load atm mesh on copler pes
-        ierr = iMOAB_LoadMesh( cplAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay, atmFilename.length(),
-                               readopts.length() );
+        ierr = iMOAB_LoadMesh( cplAtmPID, atmFilename.c_str(), readopts.c_str(), &nghlay );
         CHECKIERR( ierr, "Cannot load atm mesh on coupler pes" )
 
     }
@@ -183,8 +182,7 @@ int main( int argc, char* argv[] )
     {
         char outputFileTgt5[] = "recvOcn5.h5m";
         PUSH_TIMER( couComm, "Write migrated OCN mesh on coupler PEs" )
-        ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt5, fileWriteOptions, strlen( outputFileTgt5 ),
-                                strlen( fileWriteOptions ) );
+        ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt5, fileWriteOptions );
         CHECKIERR( ierr, "cannot write ocn mesh after receiving" )
         POP_TIMER( couComm, rankInCouComm )
     }
@@ -235,9 +233,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeScalarProjectionWeights(
             cplOcnAtmPID, weights_identifiers[0], disc_methods[1], &disc_orders[1],  // fv
             disc_methods[1], &disc_orders[1],                                        // fv
-            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1],
-            strlen( weights_identifiers[0] ), strlen( disc_methods[1] ), strlen( disc_methods[1] ),
-            strlen( dof_tag_names[1] ), strlen( dof_tag_names[1] ) );
+            &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1] );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
     }
@@ -256,25 +252,19 @@ int main( int argc, char* argv[] )
     // ocn - atm coupling T_proj -> T_proj2
     if( couComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
-                                       strlen( bottomTempField ) );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag T_proj" );
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempProjectedField, &tagTypes[1], &atmCompNDoFs, &tagIndex[1],
-                                       strlen( bottomTempProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempProjectedField, &tagTypes[1], &atmCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag T_proj2" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomUVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
-                                       strlen( bottomUVelField ) );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomUVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag u_proj" );
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomUVelProjectedField, &tagTypes[1], &atmCompNDoFs, &tagIndex[1],
-                                       strlen( bottomUVelProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomUVelProjectedField, &tagTypes[1], &atmCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag u_proj2" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomVVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
-                                       strlen( bottomVVelField ) );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomVVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag v_proj" );
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomVVelProjectedField, &tagTypes[1], &atmCompNDoFs, &tagIndex[1],
-                                       strlen( bottomVVelProjectedField ) );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomVVelProjectedField, &tagTypes[1], &atmCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag v_proj2" );
     }
 
@@ -304,14 +294,11 @@ int main( int argc, char* argv[] )
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
             int eetype = 1;
-            ierr       = iMOAB_SetDoubleTagStorage( cplOcnPID, bottomTempField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomTempField ) );
+            ierr       = iMOAB_SetDoubleTagStorage( cplOcnPID, bottomTempField, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag T_proj null" )
-            ierr = iMOAB_SetDoubleTagStorage( cplOcnPID, bottomUVelField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomUVelField ) );
+            ierr = iMOAB_SetDoubleTagStorage( cplOcnPID, bottomUVelField, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag u_proj null" )
-            ierr = iMOAB_SetDoubleTagStorage( cplOcnPID, bottomVVelField, &storLeng, &eetype, &vals[0],
-                                              strlen( bottomVVelField ) );
+            ierr = iMOAB_SetDoubleTagStorage( cplOcnPID, bottomVVelField, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag v_proj null" )
             // set the tag to 0
         }
@@ -319,16 +306,13 @@ int main( int argc, char* argv[] )
     if (analytic_field && (ocnComm != MPI_COMM_NULL) ) // we are on ocean pes
     {
         // cmpOcnPID, "T_proj;u_proj;v_proj;"
-        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomTempField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
-                                               strlen( bottomTempField ) );
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomTempField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag T_proj" );
 
-        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomUVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
-                                               strlen( bottomUVelField ) );
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomUVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag u_proj" );
 
-        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomVVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0],
-                                       strlen( bottomVVelField ) );
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomVVelField, &tagTypes[0], &ocnCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag v_proj" );
 
         int nverts[3], nelem[3], nblocks[3], nsbc[3], ndbc[3];
@@ -347,14 +331,11 @@ int main( int argc, char* argv[] )
         for( int k = 0; k < storLeng; k++ )
             vals[k] = k;
         int eetype = 1;
-        ierr       = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomTempField, &storLeng, &eetype, &vals[0],
-                                          strlen( bottomTempField ) );
+        ierr       = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomTempField, &storLeng, &eetype, &vals[0] );
         CHECKIERR( ierr, "cannot make tag T_proj null" )
-        ierr = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomUVelField, &storLeng, &eetype, &vals[0],
-                                          strlen( bottomUVelField ) );
+        ierr = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomUVelField, &storLeng, &eetype, &vals[0] );
         CHECKIERR( ierr, "cannot make tag u_proj null" )
-        ierr = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomVVelField, &storLeng, &eetype, &vals[0],
-                                          strlen( bottomVVelField ) );
+        ierr = iMOAB_SetDoubleTagStorage( cmpOcnPID, bottomVVelField, &storLeng, &eetype, &vals[0] );
         CHECKIERR( ierr, "cannot make tag v_proj null" )
                     // set the tag to 0
 
@@ -368,15 +349,13 @@ int main( int argc, char* argv[] )
         {
           // as always, use nonblocking sends
           // this is for projection to atm, from ocean:
-            ierr = iMOAB_SendElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm,
-                                      strlen( "T_proj;u_proj;v_proj;" ) );
+            ierr = iMOAB_SendElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm );
             CHECKIERR( ierr, "cannot send tag values" )
         }
         if( couComm != MPI_COMM_NULL )
         {
           // receive on ocn on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm,
-                                         strlen( "T_proj;u_proj;v_proj;" ) );
+            ierr = iMOAB_ReceiveElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
 
@@ -398,16 +377,14 @@ int main( int argc, char* argv[] )
           * we defined  on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( couComm, "Apply Scalar projection weights" )
             ierr = iMOAB_ApplyScalarProjectionWeights( cplOcnAtmPID, weights_identifiers[0], concat_fieldname,
-                                                    concat_fieldnameT, strlen( weights_identifiers[0] ),
-                                                    strlen( concat_fieldname ), strlen( concat_fieldnameT ) );
+                                                    concat_fieldnameT );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
          // do not write if iters > 0)
            if( 1 == n )
            {
                char outputFileTgt[] = "fAtmOnCpl5.h5m";
-               ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions, strlen( outputFileTgt ),
-                                     strlen( fileWriteOptions ) );
+               ierr = iMOAB_WriteMesh( cplAtmPID, outputFileTgt, fileWriteOptions );
                CHECKIERR( ierr, "failed to write fAtmOnCpl3.h5m " );
            }
         }

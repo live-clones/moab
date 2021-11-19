@@ -92,7 +92,8 @@ int setup_component_coupler_meshes( iMOAB_AppID cmpId,
     {
         // need to send the zoltan buffer from coupler root towards the component root
         // it assumes there is a buffer saved somewhere on the root of the coupler, because scheme 4 was called in advance
-        ierr = iMOAB_RetrieveZBuffer( cmpPEGroup, cplPEGroup, cmpcoucomm );
+        int is_fort = 0;
+        ierr = iMOAB_RetrieveZBuffer( cmpPEGroup, cplPEGroup, cmpcoucomm, &is_fort);
         CHECKIERR( ierr, "Cannot retrieve Zoltan buffer" )
     }
 

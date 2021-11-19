@@ -967,8 +967,9 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid,
    \param[in]  cmpGrp (MPI_Group*)                     sender group
    \param[in]  couGrp (MPI_Group*)                     receiver group
    \param[in]  joint  (MPI_Comm*)                      joint communicator
+   \param[in]  is_fortran (int *)                      * = 1 in case of fortran call
  */
-ErrCode iMOAB_RetrieveZBuffer(  MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint  );
+ErrCode iMOAB_RetrieveZBuffer(  MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint, int * is_fortran );
 
 /**
  * \brief Compute a communication graph between 2 iMOAB applications, based on ID matching of key data.
@@ -1024,20 +1025,6 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* joint_communicator,
                              int* src_id,
                              int* migr_id,
                              int* context_id );
-
-/**
- * \brief Dump info about communication graph.
- *
- * \note <B>Operations:</B> Collective per sender or receiver group 
- * 
- * \param[in] pid  (iMOAB_AppID)          The unique pointer to the application ID.
- * \param[in] context_id  (int*)          The context_id names are separated by a semi-colon (";");
- *                                        This is similar to the specifications in tag migration.
- * \param[in] is_sender (int*)            Specify whether it is called from sender or receiver side.
- * \param[in] prefix  (iMOAB_String)      The prefix for file names in order to differentiate different stages.
- * \return ErrCode                        The error code indicating success or failure.
- */
-ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix );
 
 /**
  * \brief merge vertices in an explicit, parallel mesh; it will also reassign global IDs on vertices,

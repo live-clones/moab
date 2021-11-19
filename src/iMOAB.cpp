@@ -2163,7 +2163,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
         rval = cgraph->compute_trivial_partition( number_elems_per_part );MB_CHK_ERR( rval );
 
         // nothing in z buff, just to compile
-        rval = cgraph->send_graph( *global, zoltanBuffer );CHKERRVAL( rval );
+        rval = cgraph->send_graph( global, zoltanBuffer );MB_CHK_ERR( rval );
     }
 #ifdef MOAB_HAVE_ZOLTAN
     else  // *method != 0, so it is either graph or geometric, parallel
@@ -2173,9 +2173,9 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
         {
             zoltanBuffer = context.uniqueZoltanBuffer;
         }
-        rval = cgraph->compute_partition( pco, owned, *method, zoltanBuffer );CHKERRVAL( rval );
+        rval = cgraph->compute_partition( pco, owned, *method, zoltanBuffer );MB_CHK_ERR( rval );
         // basically, send the graph to the receiver side, with unblocking send
-        rval = cgraph->send_graph_partition( pco, *global, zoltanBuffer );CHKERRVAL( rval );
+        rval = cgraph->send_graph_partition( pco, global, zoltanBuffer );MB_CHK_ERR( rval );
     }
 #endif   //  #ifdef MOAB_HAVE_ZOLTAN
     // pco is needed to pack, not for communication
@@ -2221,7 +2221,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     // knows what data to expect
     std::vector< int > pack_array;
     std::vector<char> zoltanBuff;
-    rval = cgraph->receive_comm_graph( *global, pco, pack_array, zoltanBuff );CHKERRVAL( rval );
+    rval = cgraph->receive_comm_graph( global, pco, pack_array, zoltanBuff );MB_CHK_ERR( rval );
 
     // senders across for the current receiver
     int current_receiver = cgraph->receiver( receiver_rank );
@@ -2287,23 +2287,24 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
                 Range local_verts = local_ents.subset_by_type( MBVERTEX );
                 Range local_elems = subtract( local_ents, local_verts );
 
-            // remove from local set the vertices
-            rval = context.MBI->remove_entities( local_set, local_verts );MB_CHK_ERR( rval );
-
-    #ifdef VERBOSE
-                std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
-    #endif
-                MergeMesh mm( context.MBI );
-
-            rval = mm.merge_using_integer_tag( local_verts, idtag );MB_CHK_ERR( rval );
-
-            Range new_verts;  // local elems are local entities without vertices
-            rval = context.MBI->get_connectivity( local_elems, new_verts );MB_CHK_ERR( rval );
+                // remove from local set the vertices
+                rval = context.MBI->remove_entities( local_set, local_verts );MB_CHK_ERR( rval );
 
 #ifdef VERBOSE
-            std::cout << "after merging: new verts: " << new_verts.size() << "\n";
+                std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
 #endif
-            rval = context.MBI->add_entities( local_set, new_verts );MB_CHK_ERR( rval );
+                MergeMesh mm( context.MBI );
+
+                rval = mm.merge_using_integer_tag( local_verts, idtag );MB_CHK_ERR( rval );
+
+                Range new_verts;  // local elems are local entities without vertices
+                rval = context.MBI->get_connectivity( local_elems, new_verts );MB_CHK_ERR( rval );
+
+#ifdef VERBOSE
+                std::cout << "after merging: new verts: " << new_verts.size() << "\n";
+#endif
+                rval = context.MBI->add_entities( local_set, new_verts );MB_CHK_ERR( rval );
+            }
         }
         else
             data.point_cloud = true;
@@ -2354,19 +2355,31 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
 }
 
 // need to send the zoltan buffer from coupler root towards the component root
-ErrCode iMOAB_RetrieveZBuffer( MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint )
+ErrCode iMOAB_RetrieveZBuffer( MPI_Group*  cmpGrp,  MPI_Group* cplGrp,  MPI_Comm* joint, int * is_fortran )
 {
     // need to use MPI_Group_translate_ranks to find the rank of sender root and the rank of receiver root,
     // in the joint communicator
+    assert( cmpGrp != nullptr );
+    assert( cplGrp != nullptr );
+    assert( joint != nullptr );
+
+    MPI_Group cmpGroup =
+        ( *is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( cmpGrp ) ) : *cmpGrp );
+    MPI_Group cplGroup =
+        ( *is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( cplGrp ) ) : *cplGrp );
+    MPI_Comm jointComm = ( *is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( joint ) ) : *joint );
+
+
+
     int rootRank = 0;
     int rankCompRoot = -1; // this will receive the buffer
     int rankCouplerRoot = -1; // this will send the coupler
     int rank, ierr;
     MPI_Group global_grp;
-    MPI_Comm_group( *joint, &global_grp );
-    MPI_Group_translate_ranks( *cmpGrp, 1, &rootRank, global_grp, &rankCompRoot );
-    MPI_Group_translate_ranks( *couGrp, 1, &rootRank, global_grp, &rankCouplerRoot );
-    MPI_Comm_rank( *joint, &rank );
+    MPI_Comm_group( jointComm, &global_grp );
+    MPI_Group_translate_ranks( cmpGroup, 1, &rootRank, global_grp, &rankCompRoot );
+    MPI_Group_translate_ranks( cplGroup, 1, &rootRank, global_grp, &rankCouplerRoot );
+    MPI_Comm_rank( jointComm, &rank );
     MPI_Group_free( &global_grp ); // we do not need the global group anymore
 #ifdef MOAB_HAVE_ZOLTAN
     // send from root of coupler, towards the root of component
@@ -2375,37 +2388,23 @@ ErrCode iMOAB_RetrieveZBuffer( MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm
         if (rank == rankCouplerRoot)
         {
             // do a send of context.uniqueZoltanBuffer, towards the rankCompRoot
-            ierr = MPI_Send( &context.uniqueZoltanBuffer[0], (int)context.uniqueZoltanBuffer.size(), MPI_CHAR, rankCompRoot, 123, *joint);
-            if (ierr!=0)
-                return 1;
+            ierr = MPI_Send( &context.uniqueZoltanBuffer[0], (int)context.uniqueZoltanBuffer.size(), MPI_CHAR, rankCompRoot, 123, jointComm);CHK_MPI_ERR( ierr );
         }
         if (rank == rankCompRoot)
         {
             // first a probe, then a MPI_Recv
             MPI_Status status;
-            ierr = MPI_Probe( rankCouplerRoot, 123, *joint, &status );
-            if( 0 != ierr )
-            {
-                std::cout << " MPI_Probe failure: " << ierr << "\n";
-                return 1;
-            }
+            ierr = MPI_Probe( rankCouplerRoot, 123, jointComm, &status );CHK_MPI_ERR( ierr );
             // get the count of data received from the MPI_Status structure
             int size_buff;
-            ierr = MPI_Get_count( &status, MPI_CHAR, &size_buff );
-            if( 0 != ierr )
-            {
-                std::cout << " MPI_Get_count failure: " << ierr << "\n";
-                return 1;
-            }
+            ierr = MPI_Get_count( &status, MPI_CHAR, &size_buff );CHK_MPI_ERR( ierr );
 
             context.uniqueZoltanBuffer.resize( size_buff );
-            ierr = MPI_Recv( &context.uniqueZoltanBuffer[0], size_buff, MPI_CHAR, rankCouplerRoot, 123, *joint, &status );
-            if (ierr!=0)
-                return 1;
+            ierr = MPI_Recv( &context.uniqueZoltanBuffer[0], size_buff, MPI_CHAR, rankCouplerRoot, 123, jointComm, &status );CHK_MPI_ERR( ierr );
         }
     }
 #endif
-    return 0;
+    return moab::MB_SUCCESS;
 }
 
 ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id )
@@ -3739,7 +3738,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, rintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, data_src.dimension, rintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_src.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, defaultradius /*radius_source*/, rank );MB_CHK_ERR( rval );
         srctgt_areas[0] = areaAdaptor.area_on_sphere( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
 #ifdef VERBOSE
         if( is_root )
@@ -3751,7 +3750,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, bintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, data_tgt.dimension, bintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_tgt.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/, rank );MB_CHK_ERR( rval );
         srctgt_areas[1] = areaAdaptor.area_on_sphere( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
 #ifdef VERBOSE
         if( is_root )
@@ -3889,7 +3888,7 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, rintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, 2, rintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_src.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, radius_source );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, radius_source, rank );MB_CHK_ERR( rval );
 #ifdef VERBOSE
         std::cout << "The red set contains " << rintxverts.size() << " vertices and " << rintxelems.size()
                   << " elements \n";
@@ -3899,7 +3898,7 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, bintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, 2, bintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_tgt.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, radius_target );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, radius_target, rank );MB_CHK_ERR( rval );
 #ifdef VERBOSE
         std::cout << "The blue set contains " << bintxverts.size() << " vertices and " << bintxelems.size()
                   << " elements \n";
