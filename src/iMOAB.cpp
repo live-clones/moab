@@ -3032,7 +3032,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
     // the crystal router will send ID cell to the original source, on the component task
     // if we are on intx tasks, loop over all intx elements and
 
-    MPI_Comm global            = ( is_fortran_context ? MPI_Comm_f2c( reinterpret_cast< MPI_Fint >( *join ) ) : *join );
+    MPI_Comm global            = ( is_fortran_context ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
     int currentRankInJointComm = -1;
     ierr                       = MPI_Comm_rank( global, &currentRankInJointComm );CHK_MPI_ERR( ierr );
 
