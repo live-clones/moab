@@ -416,16 +416,12 @@ interface
 
 #ifdef MOAB_HAVE_NETCDF
 
-  integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, solution_weights_identifier, remap_weights_filename, &
-                                                            owned_dof_ids, owned_dof_ids_length, row_major_ownership) &
+  integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, solution_weights_identifier, remap_weights_filename ) &
                                                             bind(C, name='iMOAB_LoadMappingWeightsFromFile')
     use, intrinsic :: iso_c_binding, only : c_int, c_char
     integer(c_int), intent(in) :: pid_intersection
     character(kind=c_char), intent(in) :: solution_weights_identifier(*)
     character(kind=c_char), intent(in) :: remap_weights_filename(*)
-    integer(c_int), intent(in) :: owned_dof_ids
-    integer(c_int), intent(in) :: owned_dof_ids_length
-    integer(c_int), intent(in) :: row_major_ownership
   end function iMOAB_LoadMappingWeightsFromFile
 
   integer(c_int) function iMOAB_WriteMappingWeightsToFile(pid_intersection, solution_weights_identifier, remap_weights_filename) bind(C, name='iMOAB_WriteMappingWeightsToFile')
