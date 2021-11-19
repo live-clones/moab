@@ -496,6 +496,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     ParallelComm*& myPcomm = _readNC->myPcomm;
     if( myPcomm )
     {
+        double tol = 1.e-12; // this is the same as static tolerance in NCHelper
         ParallelMergeMesh pmm( myPcomm, tol );
         rval = pmm.merge( _fileSet,
                           /* do not do local merge*/ false,
