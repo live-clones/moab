@@ -146,8 +146,9 @@ int main( int argc, char* argv[] )
     opts.addOpt< int >( "iterations,n", "number of iterations for coupler", &n );
 
     bool analytic_field=false;
-
     opts.addOpt< void >( "analytic,q", "analytic field", &analytic_field );
+    bool skip_writing_map = false;
+    opts.addOpt< void >( "skip_writing,s", "do not write map file ", &skip_writing_map );
 
     opts.parseCommandLine( argc, argv );
 
@@ -487,16 +488,18 @@ int main( int argc, char* argv[] )
             &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1] );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
+        if (!skip_writing_map)
+        {
+            PUSH_TIMER( couComm, "write LND-ATM remapping weights" )
 
-        PUSH_TIMER( couComm, "write LND-ATM remapping weights" )
+            std::string lnd_atm_map_file_name = "lnd_atm_map_testD.nc";
+            if (5 == repartitioner_scheme)
+                lnd_atm_map_file_name = "lnd_atm_map_testD_org.nc";
 
-        std::string lnd_atm_map_file_name = "lnd_atm_map_testD.h5m";
-        if (5 == repartitioner_scheme)
-            lnd_atm_map_file_name = "lnd_atm_map_testD_org.h5m";
-
-        ierr = iMOAB_WriteMappingWeightsToFile( cplLndAtmPID, weights_identifiers[1],
-                lnd_atm_map_file_name.c_str() );
-        POP_TIMER( couComm, rankInCouComm )
+            ierr = iMOAB_WriteMappingWeightsToFile( cplLndAtmPID, weights_identifiers[1],
+                    lnd_atm_map_file_name.c_str() );
+            POP_TIMER( couComm, rankInCouComm )
+        }
 
     }
 #endif
