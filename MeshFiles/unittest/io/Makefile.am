@@ -8,12 +8,13 @@ EXTRA_DIST = HommeMapping.nc \
              eul3x48x96.t.3.nc \
              fv3x46x72.t.3.nc \
 	     domain.ocn.ne4np4_oQU240.160614.nc \
+	     ocean.QU.240km.scrip.151209.nc \
 	     cubtest12.cub \
 	     cubtest14.cub \
 	     cubtest.jou \
 	     dum.stp \
 	     gmsh2.msh \
-       gmsh3.msh \
+             gmsh3.msh \
              airfoil_exterior.msh \
              t1.msh \
              ghosts.msh \
