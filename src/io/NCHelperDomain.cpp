@@ -442,12 +442,11 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
         // set area and fraction on those elements too
         for( int k = 0; k < nv; k++ )
         {
-            double x, y;
             int index_v_arr = nv * elem_index + k;
             if( nv > 1 )
             {
-                x                        = xv[index_v_arr];
-                y                        = yv[index_v_arr];
+                double x                        = xv[index_v_arr];
+                double y                        = yv[index_v_arr];
                 double cosphi            = cos( pideg * y );
                 double zmult             = sin( pideg * y );
                 double xmult             = cosphi * cos( x * pideg );
@@ -486,7 +485,6 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     tagList.push_back( ycTag );
     tagList.push_back( areaTag );
     tagList.push_back( fracTag );
-    double tol = 1.e-12; // this is the same as static tolerance in NCHelper
     rval       = IntxUtils::remove_padded_vertices( mbImpl, _fileSet, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
 
     rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_ERR( rval );

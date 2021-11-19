@@ -14,7 +14,7 @@ class NCHelperScrip : public ScdNCHelper
 {
   public:
     NCHelperScrip( ReadNC* readNC, int fileId, const FileOptions& opts, EntityHandle fileSet )
-        : ScdNCHelper( readNC, fileId, opts, fileSet )
+        : ScdNCHelper( readNC, fileId, opts, fileSet ), grid_corners(0), grid_size(0), nLocalCells(0)
     {
     }
     static bool can_read_file( ReadNC* readNC, int fileId );

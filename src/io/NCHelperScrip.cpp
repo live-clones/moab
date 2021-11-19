@@ -243,12 +243,11 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     {
         for( int k = 0; k < nv; k++ )
         {
-            double x, y;
             int index_v_arr = nv * elem_index + k;
             if( nv > 1 )
             {
-                x                        = xv[index_v_arr];
-                y                        = yv[index_v_arr];
+                double x                        = xv[index_v_arr];
+                double y                        = yv[index_v_arr];
                 double cosphi            = cos( pideg * y );
                 double zmult             = sin( pideg * y );
                 double xmult             = cosphi * cos( x * pideg );
@@ -277,17 +276,11 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     // modify local file set, to merge coincident vertices, and to correct repeated vertices in elements
     std::vector< Tag > tagList;
     tagList.push_back( mGlobalIdTag );
-    /*tagList.push_back( xcTag );
-    tagList.push_back( ycTag );
-    tagList.push_back( areaTag );
-    tagList.push_back( fracTag );*/
-    double tol = 1.e-12; // this is the same as static tolerance in NCHelper
     rval       = IntxUtils::remove_padded_vertices( mbImpl, _fileSet, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
 
     rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_ERR( rval );
     Range all_verts;
     rval = mbImpl->get_connectivity( faces, all_verts );MB_CHK_ERR( rval );
-    //printf(" range vert size :%ld \n", all_verts.size());
     rval = mbImpl->add_entities( _fileSet, all_verts );MB_CHK_ERR( rval );
 #ifdef MOAB_HAVE_MPI
     ParallelComm*& myPcomm = _readNC->myPcomm;
