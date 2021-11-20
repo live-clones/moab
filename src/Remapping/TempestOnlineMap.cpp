@@ -968,7 +968,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( !m_bPointCloudSource && eInputType == DiscretizationType_FV )
             {
                 this->SetSourceAreas( m_meshInputCov->vecFaceArea );
-                if( m_meshInputCov->vecMask.IsAttached() )
+                if( m_meshInputCov->vecMask.size() )
                 {
                     this->SetSourceMask( m_meshInputCov->vecMask );
                 }
@@ -978,7 +978,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( !m_bPointCloudTarget && eOutputType == DiscretizationType_FV )
             {
                 this->SetTargetAreas( m_meshOutput->vecFaceArea );
-                if( m_meshOutput->vecMask.IsAttached() )
+                if( m_meshOutput->vecMask.size() )
                 {
                     this->SetTargetMask( m_meshOutput->vecMask );
                 }
