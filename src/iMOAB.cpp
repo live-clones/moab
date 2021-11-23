@@ -1922,7 +1922,7 @@ ErrCode iMOAB_CreateElements( iMOAB_AppID pid,
     ReadUtilIface* read_iface;
     ErrorCode rval = context.MBI->query_interface( read_iface );MB_CHK_ERR( rval );
 
-    EntityType mbtype = ( EntityType )( *type );
+    EntityType mbtype = (EntityType)( *type );
     EntityHandle actual_start_handle;
     EntityHandle* array = NULL;
     rval = read_iface->get_element_connect( *num_elem, *num_nodes_per_element, mbtype, 1, actual_start_handle, array );MB_CHK_ERR( rval );
@@ -2036,7 +2036,7 @@ ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marke
     Tag part_tag;
     dum_id = -1;
     rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                          MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2304,7 +2304,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     Tag part_tag;
     int dum_id = -1;
     rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                              MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2863,7 +2863,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
     Tag part_tag;
     int dum_id = -1;
     rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                              MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -3240,6 +3240,35 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
     return moab::MB_SUCCESS;
 }
 
+ErrCode iMOAB_WriteMappingWeightsToFile(
+    iMOAB_AppID pid_intersection,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String remap_weights_filename )
+{
+    assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
+    assert( remap_weights_filename && strlen( remap_weights_filename ) );
+
+    ErrorCode rval;
+
+    // Get the source and target data and pcomm objects
+    appData& data_intx       = context.appDatas[*pid_intersection];
+    TempestMapAppData& tdata = data_intx.tempestData;
+
+    // Get the handle to the remapper object
+    assert( tdata.remapper != NULL );
+
+    // Now get online weights object and ensure it is valid
+    moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
+    assert( weightMap != NULL );
+
+    std::string filename = std::string( remap_weights_filename );
+
+    // Write the map file to disk in parallel using either HDF5 or SCRIP interface
+    rval = weightMap->WriteParallelMap( filename );MB_CHK_ERR( rval );
+
+    return moab::MB_SUCCESS;
+}
+
 #ifdef MOAB_HAVE_MPI
 ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
                               iMOAB_AppID pid2,
@@ -3576,35 +3605,6 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
 
 #endif  // #ifdef MOAB_HAVE_MPI
 
-ErrCode iMOAB_WriteMappingWeightsToFile(
-    iMOAB_AppID pid_intersection,
-    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename )
-{
-    assert( solution_weights_identifier && strlen( solution_weights_identifier ) );
-    assert( remap_weights_filename && strlen( remap_weights_filename ) );
-
-    ErrorCode rval;
-
-    // Get the source and target data and pcomm objects
-    appData& data_intx       = context.appDatas[*pid_intersection];
-    TempestMapAppData& tdata = data_intx.tempestData;
-
-    // Get the handle to the remapper object
-    assert( tdata.remapper != NULL );
-
-    // Now get online weights object and ensure it is valid
-    moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
-    assert( weightMap != NULL );
-
-    std::string filename = std::string( remap_weights_filename );
-
-    // Write the map file to disk in parallel using either HDF5 or SCRIP interface
-    rval = weightMap->WriteParallelMap( filename );MB_CHK_ERR( rval );
-
-    return moab::MB_SUCCESS;
-}
-
 #endif  // #ifdef MOAB_HAVE_NETCDF
 
 #define USE_API
@@ -3914,6 +3914,7 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
     int* fNoBubble,
     int* fMonotoneTypeID,
     int* fVolumetric,
+    int* fInverseDistanceMap,
     int* fNoConservation,
     int* fValidate,
     const iMOAB_String source_solution_tag_dof_name,
@@ -3940,22 +3941,49 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
+    GenerateOfflineMapAlgorithmOptions mapOptions;
+    mapOptions.nPin           = *disc_order_source;
+    mapOptions.nPout          = *disc_order_target;
+    mapOptions.fSourceConcave = false;
+    mapOptions.fTargetConcave = false;
+
+    mapOptions.strMethod = "";
+    if( fMonotoneTypeID )
+    {
+        switch( *fMonotoneTypeID )
+        {
+            case 0:
+                mapOptions.fMonotone = false;
+                break;
+            case 3:
+                mapOptions.strMethod += "mono3;";
+                break;
+            case 2:
+                mapOptions.strMethod += "mono2;";
+                break;
+            default:
+                mapOptions.fMonotone = true;
+        }
+    }
+    else
+        mapOptions.fMonotone = false;
+
+    mapOptions.fNoBubble       = ( fNoBubble ? *fNoBubble : false );
+    mapOptions.fNoConservation = ( fNoConservation ? *fNoConservation > 0 : false );
+    mapOptions.fNoCorrectAreas = false;
+    mapOptions.fNoCheck        = !( fValidate ? *fValidate : true );
+    if( fVolumetric && *fVolumetric ) mapOptions.strMethod += "volumetric;";
+    if( fInverseDistanceMap && *fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
+
     // Now let us compute the local-global mapping and store it in the context
     // We need this mapping when computing matvec products and to do reductions in parallel
     // Additionally, the call below will also compute weights with TempestRemap
     rval = weightMap->GenerateRemappingWeights(
-        std::string( disc_method_source ),                   // std::string strInputType
-        std::string( disc_method_target ),                   // std::string strOutputType
-        ( *disc_order_source ), ( *disc_order_target ),      // const int nPin, const int nPout
-        ( fNoBubble ? *fNoBubble : false ),                  // bool fNoBubble=false
-        ( fMonotoneTypeID ? *fMonotoneTypeID : 0 ),          // int fMonotoneTypeID=0
-        ( fVolumetric ? *fVolumetric > 0 : false ),          // bool fVolumetric=false
-        ( fNoConservation ? *fNoConservation > 0 : false ),  // bool fNoConservation=false
-        ( fValidate ? *fValidate : false ),                  // bool fNoCheck=false
-        source_solution_tag_dof_name,                        // const std::string srcDofTagName = "GLOBAL_ID"
-        target_solution_tag_dof_name,                        // const std::string tgtDofTagName = "GLOBAL_ID"
-        false,                                               // bool fInputConcave = false
-        false                                                // bool fOutputConcave = false
+        std::string( disc_method_source ),            // const std::string& strInputType
+        std::string( disc_method_target ),            // const std::string& strOutputType
+        mapOptions,                                   // GenerateOfflineMapAlgorithmOptions& mapOptions
+        std::string( source_solution_tag_dof_name ),  // const std::string& srcDofTagName = "GLOBAL_ID"
+        std::string( target_solution_tag_dof_name )   // const std::string& tgtDofTagName = "GLOBAL_ID"
     );MB_CHK_ERR( rval );
 
     return moab::MB_SUCCESS;
