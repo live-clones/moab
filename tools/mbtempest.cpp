@@ -81,8 +81,7 @@ struct ToolContext
           blockSize( 5 ), outFilename( "outputFile.nc" ), intxFilename( "intxFile.h5m" ), baselineFile( "" ),
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
           verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), rrmGrids( false ),
-          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ),
-          fVolumetric( false ), fInverseDistanceMap( false )
+          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ), fVolumetric( false ), fInverseDistanceMap( false )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -312,14 +311,14 @@ struct ToolContext
         assert( ensureMonotonicity >= 0 && ensureMonotonicity <= 3 );
 
         mapOptions.strOutputMapFile = outFilename;
-        mapOptions.strOutputFormat = "Netcdf4";
-        mapOptions.nPin = disc_orders[0];
-        mapOptions.nPout = disc_orders[1];
-        mapOptions.fSourceConcave = false;
-        mapOptions.fTargetConcave = false;
+        mapOptions.strOutputFormat  = "Netcdf4";
+        mapOptions.nPin             = disc_orders[0];
+        mapOptions.nPout            = disc_orders[1];
+        mapOptions.fSourceConcave   = false;
+        mapOptions.fTargetConcave   = false;
 
         mapOptions.strMethod = "";
-        switch(ensureMonotonicity)
+        switch( ensureMonotonicity )
         {
             case 0:
                 mapOptions.fMonotone = false;
@@ -334,11 +333,11 @@ struct ToolContext
                 mapOptions.fMonotone = true;
         }
         mapOptions.fNoCorrectAreas = false;
-        mapOptions.fNoCheck = !fCheck;
+        mapOptions.fNoCheck        = !fCheck;
 
-        assert( fVolumetric && fInverseDistanceMap == false ); // both options cannot be active
-        if (fVolumetric) mapOptions.strMethod += "volumetric;";
-        if (fInverseDistanceMap) mapOptions.strMethod += "invdist;";
+        assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
+        if( fVolumetric ) mapOptions.strMethod += "volumetric;";
+        if( fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
     }
 
   private:
@@ -524,13 +523,10 @@ int main( int argc, char* argv[] )
             runCtx->timer_push( "compute weights with the Tempest meshes" );
             // Call to generate an offline map with the tempest meshes
             OfflineMap weightMap;
-            int err = GenerateOfflineMapWithMeshes(
-                *runCtx->meshes[0], *runCtx->meshes[1], *runCtx->meshes[2],
-                runCtx->disc_methods[0],  // std::string strInputType
-                runCtx->disc_methods[1],  // std::string strOutputType,
-                runCtx->mapOptions,
-                weightMap
-            );
+            int err = GenerateOfflineMapWithMeshes( *runCtx->meshes[0], *runCtx->meshes[1], *runCtx->meshes[2],
+                                                    runCtx->disc_methods[0],  // std::string strInputType
+                                                    runCtx->disc_methods[1],  // std::string strOutputType,
+                                                    runCtx->mapOptions, weightMap );
             runCtx->timer_pop();
 
             std::map< std::string, std::string > mapAttributes;
@@ -707,10 +703,12 @@ int main( int argc, char* argv[] )
                     metafile << "map_aPb = " << runCtx->outFilename << std::endl;
                     metafile << "type_src = " << runCtx->disc_methods[0] << std::endl;
                     metafile << "np_src = " << runCtx->disc_orders[0] << std::endl;
-                    metafile << "concave_src = " << ( runCtx->mapOptions.fSourceConcave ? "true" : "false" ) << std::endl;
+                    metafile << "concave_src = " << ( runCtx->mapOptions.fSourceConcave ? "true" : "false" )
+                             << std::endl;
                     metafile << "type_dst = " << runCtx->disc_methods[1] << std::endl;
                     metafile << "np_dst = " << runCtx->disc_orders[1] << std::endl;
-                    metafile << "concave_dst = " << ( runCtx->mapOptions.fTargetConcave ? "true" : "false" ) << std::endl;
+                    metafile << "concave_dst = " << ( runCtx->mapOptions.fTargetConcave ? "true" : "false" )
+                             << std::endl;
                     metafile << "mono_type = " << runCtx->ensureMonotonicity << std::endl;
                     metafile << "bubble = " << ( runCtx->mapOptions.fNoBubble ? "false" : "true" ) << std::endl;
                     metafile << "version = "
