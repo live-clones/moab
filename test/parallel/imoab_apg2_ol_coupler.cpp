@@ -517,7 +517,7 @@ int main( int argc, char* argv[] )
 #endif
     MPI_Barrier( MPI_COMM_WORLD );
 
-    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1;
+    int fMonotoneTypeID = 0, fVolumetric = 0, fValidate = 1, fNoConserve = 0, fNoBubble = 1, fInverseDistanceMap = 0;
 
 #ifdef ENABLE_ATMOCN_COUPLING
 #ifdef VERBOSE
@@ -538,8 +538,8 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], disc_methods[1],
                                                      &disc_orders[1],                   // fv
                                                      disc_methods[1], &disc_orders[1],  // fv
-                                                     &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
-                                                     &fValidate, dof_tag_names[1], dof_tag_names[1] );
+                                                     &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fInverseDistanceMap,
+                                                     &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1] );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
     }
@@ -551,8 +551,8 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeScalarProjectionWeights( cplOcnAtmPID, weights_identifiers[0], disc_methods[1],
                                                      &disc_orders[1],                   // fv
                                                      disc_methods[1], &disc_orders[1],  // fv
-                                                     &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fNoConserve,
-                                                     &fValidate, dof_tag_names[1], dof_tag_names[1] );
+                                                     &fNoBubble, &fMonotoneTypeID, &fVolumetric, &fInverseDistanceMap,
+                                                     &fNoConserve, &fValidate, dof_tag_names[1], dof_tag_names[1] );
         CHECKIERR( ierr, "cannot compute scalar projection weights" )
         POP_TIMER( couComm, rankInCouComm )
     }
@@ -570,8 +570,8 @@ int main( int argc, char* argv[] )
         PUSH_TIMER( "Compute ATM-LND remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights( cplAtmLndPID, weights_identifiers[0], disc_methods[1],
                                                      &disc_orders[1], disc_methods[1], &disc_orders[1], &fNoBubble,
-                                                     &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
-                                                     dof_tag_names[1], dof_tag_names[1] );
+                                                     &fMonotoneTypeID, &fVolumetric, &fInverseDistanceMap, &fNoConserve,
+                                                     &fValidate, dof_tag_names[1], dof_tag_names[1] );
         CHECKIERR( ierr, "failed to compute remapping projection weights for ATM-LND scalar non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
 
@@ -579,8 +579,8 @@ int main( int argc, char* argv[] )
         PUSH_TIMER( "Compute LND-ATM remapping weights" )
         ierr = iMOAB_ComputeScalarProjectionWeights( cplLndAtmPID, weights_identifiers[0], disc_methods[1],
                                                      &disc_orders[1], disc_methods[1], &disc_orders[1], &fNoBubble,
-                                                     &fMonotoneTypeID, &fVolumetric, &fNoConserve, &fValidate,
-                                                     dof_tag_names[1], dof_tag_names[1] );
+                                                     &fMonotoneTypeID, &fVolumetric, &fInverseDistanceMap, &fNoConserve,
+                                                     &fValidate, dof_tag_names[1], dof_tag_names[1] );
         CHECKIERR( ierr, "failed to compute remapping projection weights for LND-ATM scalar non-conservative field" );
         POP_TIMER( couComm, rankInCouComm )
     }
