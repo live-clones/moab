@@ -3281,22 +3281,6 @@ ErrCode iMOAB_LoadMappingWeightsFromFile(
 }
 
 #ifdef MOAB_HAVE_MPI
-ErrCode iMOAB_MigrateMapMeshFortran( iMOAB_AppID pid1,
-                                     iMOAB_AppID pid2,
-                                     iMOAB_AppID pid3,
-                                     int* join,
-                                     int* group1,
-                                     int* group2,
-                                     int* type,
-                                     int* comp1,
-                                     int* comp2,
-                                     int* direction )
-{
-    MPI_Comm jcomm = MPI_Comm_f2c( (MPI_Fint)*join );
-    MPI_Group gr1  = MPI_Group_f2c( (MPI_Fint)*group1 );
-    MPI_Group gr2  = MPI_Group_f2c( (MPI_Fint)*group2 );
-    return iMOAB_MigrateMapMesh( pid1, pid2, pid3, &jcomm, &gr1, &gr2, type, comp1, comp2, direction );
-}
 ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
                               iMOAB_AppID pid2,
                               iMOAB_AppID pid3,
