@@ -1086,7 +1086,7 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source,
  * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
  * \return ErrCode                                         The error code indicating success or failure.
 */
-ErrCode iMOAB_LoadMappingWeightsFromFile(
+ErrCode iMOAB_LoadMappingWeightsFromFile_Old(
     iMOAB_AppID pid_intersection,
     const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename );
@@ -1229,12 +1229,12 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
                                                           values could be identifiers such as "scalar", "flux" or "custom".
   \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
 */
-ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
-                                   iMOAB_AppID pid_cpl,
-                                   int * col_or_row,
-                                   int * type,
-                                   const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                   const iMOAB_String remap_weights_filename );
+ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
+                                           iMOAB_AppID pid_cpl,
+                                           int * col_or_row,
+                                           int * type,
+                                           const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+                                           const iMOAB_String remap_weights_filename );
 
 #endif /* #ifdef MOAB_HAVE_TEMPESTREMAP */
 

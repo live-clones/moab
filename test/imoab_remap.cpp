@@ -244,7 +244,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "failed to write map file to disk" );
 
         const std::string intx_from_file_identifier = "map-from-file";
-        ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, intx_from_file_identifier.c_str(),
+        ierr = iMOAB_LoadMappingWeightsFromFile_Old( atmocnPID, intx_from_file_identifier.c_str(),
                                                  atmocn_map_file_name.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }

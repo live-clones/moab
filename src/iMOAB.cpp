@@ -3117,12 +3117,12 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #ifdef MOAB_HAVE_NETCDF
-ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
-                                   iMOAB_AppID pid_cpl,
-                                   int * col_or_row,
-                                   int * type,
-                                   const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                   const iMOAB_String remap_weights_filename )
+ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
+                                           iMOAB_AppID pid_cpl,
+                                           int * col_or_row,
+                                           int * type,
+                                           const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+                                           const iMOAB_String remap_weights_filename )
 {
     ErrorCode rval;
     bool row_based_partition = true;
@@ -3231,7 +3231,7 @@ ErrCode iMOAB_LoadMappingWeights ( iMOAB_AppID pid_intersection,
 
     return moab::MB_SUCCESS;
 }
-ErrCode iMOAB_LoadMappingWeightsFromFile(
+ErrCode iMOAB_LoadMappingWeightsFromFile_Old(
     iMOAB_AppID pid_intersection,
     const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String remap_weights_filename )
