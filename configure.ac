@@ -625,10 +625,6 @@ if test "xyes" = "x$MPI_CXX_HELP_NEEDED"; then
 fi
 FATHOM_CHECK_MPITYPE
 
-if (test "$MPIFAMILY" = "OPENMPI" && test "x$ENABLE_FORTRAN" != "xno"); then
-  FCLIBS="$FCLIBS -lmpi_cxx"
-fi
-
 if test "xyes" = "x$enablempi"; then
   FATHOM_CHECK_MPE
   AC_SUBST([WITH_MPE])
