@@ -49,6 +49,8 @@ NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions
             return new( std::nothrow ) NCHelperHOMME( readNC, fileId, opts, fileSet );
         else if( NCHelperDomain::can_read_file( readNC, fileId ) )
             return new( std::nothrow ) NCHelperDomain( readNC, fileId, opts, fileSet );
+        if( NCHelperMPAS::can_read_file( readNC ) )
+            return new( std::nothrow ) NCHelperMPAS( readNC, fileId, opts, fileSet );
     }
     else
     {

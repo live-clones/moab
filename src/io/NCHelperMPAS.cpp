@@ -63,6 +63,8 @@ NCHelperMPAS::NCHelperMPAS( ReadNC* readNC, int fileId, const FileOptions& opts,
     ignoredVarNames.insert( "indexToVertexID" );
     ignoredVarNames.insert( "indexToEdgeID" );
     ignoredVarNames.insert( "indexToCellID" );
+    ignoredVarNames.insert("indMLD");
+    ignoredVarNames.insert("landIceMask");
 }
 
 bool NCHelperMPAS::can_read_file( ReadNC* readNC )
