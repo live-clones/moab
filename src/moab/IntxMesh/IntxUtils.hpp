@@ -34,13 +34,29 @@ class IntxUtils
     static int SortAndRemoveDoubles2( double* P, int& nP, double epsilon );
     // the marks will show what edges of blue intersect the red
 
-    static ErrorCode EdgeIntersections2( double* blue, int nsBlue, double* red, int nsRed, int* markb, int* markr,
-                                         double* points, int& nPoints );
+    static ErrorCode EdgeIntersections2( double* blue,
+                                         int nsBlue,
+                                         double* red,
+                                         int nsRed,
+                                         int* markb,
+                                         int* markr,
+                                         double* points,
+                                         int& nPoints );
 
     // special one, for intersection between rll (constant latitude)  and cs quads
-    static ErrorCode EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdgeType, int nsBlue, double* red,
-                                    CartVect* redc, int nsRed, int* markb, int* markr, int plane, double Radius,
-                                    double* points, int& nPoints );
+    static ErrorCode EdgeIntxRllCs( double* blue,
+                                    CartVect* bluec,
+                                    int* blueEdgeType,
+                                    int nsBlue,
+                                    double* red,
+                                    CartVect* redc,
+                                    int nsRed,
+                                    int* markb,
+                                    int* markr,
+                                    int plane,
+                                    double Radius,
+                                    double* points,
+                                    int& nPoints );
 
     // vec utils related to gnomonic projection on a sphere
     // vec utils
@@ -64,15 +80,22 @@ class IntxUtils
     static ErrorCode gnomonic_projection( const CartVect& pos, double R, int plane, double& c1, double& c2 );
 
     // given the position on plane (one out of 6), find out the position on sphere
-    static ErrorCode reverse_gnomonic_projection( const double& c1, const double& c2, double R, int plane,
+    static ErrorCode reverse_gnomonic_projection( const double& c1,
+                                                  const double& c2,
+                                                  double R,
+                                                  int plane,
                                                   CartVect& pos );
 
     // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
     static void gnomonic_unroll( double& c1, double& c2, double R, int plane );
 
     // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
-    static ErrorCode global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only,
-                                                 EntityHandle& outSet );
+    static ErrorCode global_gnomonic_projection( Interface* mb,
+                                                 EntityHandle inSet,
+                                                 double R,
+                                                 bool centers_only,
+                                                 EntityHandle& outSet,
+                                                 Tag etag );
 
     static void transform_coordinates( double* avg_position, int projection_type );
     /*
@@ -151,19 +174,33 @@ class IntxUtils
      *  AB is a great circle arc
      *  CD is a constant latitude arc
      */
-    static ErrorCode intersect_great_circle_arc_with_clat_arc( double* A, double* B, double* C, double* D, double R,
-                                                               double* E, int& np );
+    static ErrorCode intersect_great_circle_arc_with_clat_arc( double* A,
+                                                               double* B,
+                                                               double* C,
+                                                               double* D,
+                                                               double R,
+                                                               double* E,
+                                                               int& np );
 
     // ErrorCode  set_edge_type_flag(Interface * mb, EntityHandle sf1);
 
-    static int borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed, CartVect* bluec, int nsBlue,
-                                      int* blueEdgeType, double* P, int* side, double epsil );
+    static int borderPointsOfCSinRLL( CartVect* redc,
+                                      double* red2dc,
+                                      int nsRed,
+                                      CartVect* bluec,
+                                      int nsBlue,
+                                      int* blueEdgeType,
+                                      double* P,
+                                      int* side,
+                                      double epsil );
 
     // used only by homme
     static ErrorCode deep_copy_set_with_quads( Interface* mb, EntityHandle source_set, EntityHandle dest_set );
 
     // used to 'repair' scrip-like meshes
-    static ErrorCode remove_duplicate_vertices( Interface* mb, EntityHandle file_set, double merge_tol,
+    static ErrorCode remove_duplicate_vertices( Interface* mb,
+                                                EntityHandle file_set,
+                                                double merge_tol,
                                                 std::vector< Tag >& tagList );
 };
 

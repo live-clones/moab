@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
+#include <set>
 
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
@@ -55,6 +56,9 @@ int main( int argc, char** argv )
     double distance = 0.01;
     opts.addOpt< double >( string( "distance,d" ), string( "distance " ), &distance );
 
+    bool boxed = false;
+    opts.addOpt< void >( "boxed,b", "use rectangular boxed shape ", &boxed );
+
     opts.parseCommandLine( argc, argv );
 
     int rank         = 0;
@@ -66,8 +70,9 @@ int main( int argc, char** argv )
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
     MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
 
-    readopts = string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );  // we do not have to
-                                                                             // resolve shared ents
+    if( numProcesses > 1 )
+        readopts = string( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" );  // we do not have to
+                                                                                 // resolve shared ents
 #endif
     // Instantiate
     Core mb;
@@ -87,6 +92,10 @@ int main( int argc, char** argv )
     Range elems;
     rval = mb.get_entities_by_dimension( fileSet, 2, elems );MB_CHK_SET_ERR( rval, "Error getting 2d elements" );
 
+    if( elems.empty() )
+    {
+        rval = mb.get_entities_by_dimension( fileSet, 0, elems );MB_CHK_SET_ERR( rval, "Error getting vertices" );
+    }
     // create a meshset with close elements
     EntityHandle outSet;
 
@@ -106,14 +115,29 @@ int main( int argc, char** argv )
     }
 
     Range closeByCells;
+    std::set< EntityHandle > closeSet;
     for( Range::iterator it = elems.begin(); it != elems.end(); it++ )
     {
         EntityHandle cell = *it;
         CartVect center;
         rval = mb.get_coords( &cell, 1, &( center[0] ) );MB_CHK_SET_ERR( rval, "Can't get cell center coords" );
-        double dist = ( center - point ).length();
-        if( dist <= distance ) { closeByCells.insert( cell ); }
+        if( boxed )
+        {
+            double xd = fabs( center[0] - x );
+            double yd = fabs( center[1] - y );
+            double zd = fabs( center[2] - z );
+            if( xd <= distance && yd <= distance && zd <= distance ) closeSet.insert( cell );
+        }
+        else
+        {
+            double dist = ( center - point ).length();
+            if( dist <= distance )
+            {
+                closeSet.insert( cell );
+            }
+        }
     }
+    std::copy( closeSet.rbegin(), closeSet.rend(), range_inserter( closeByCells ) );
 
     rval = mb.add_entities( outSet, closeByCells );MB_CHK_SET_ERR( rval, "Can't add to entity set" );
 
