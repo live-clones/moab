@@ -2,6 +2,7 @@
 #include "NCHelperEuler.hpp"
 #include "NCHelperFV.hpp"
 #include "NCHelperDomain.hpp"
+#include "NCHelperScrip.hpp"
 #include "NCHelperHOMME.hpp"
 #include "NCHelperMPAS.hpp"
 #include "NCHelperGCRM.hpp"
@@ -60,6 +61,8 @@ NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions
         // gcrm reader
         else if( NCHelperGCRM::can_read_file( readNC ) )
             return new( std::nothrow ) NCHelperGCRM( readNC, fileId, opts, fileSet );
+        else if( NCHelperScrip::can_read_file( readNC, fileId ) )
+             return new( std::nothrow ) NCHelperScrip( readNC, fileId, opts, fileSet );
     }
 
     // Unknown NetCDF grid (will fill this in later for POP, CICE and CLM)
@@ -1342,4 +1345,25 @@ ErrorCode UcdNCHelper::read_variables( std::vector< std::string >& var_names, st
     return MB_SUCCESS;
 }
 
+static double tolerance = 1.e-12;
+// Used to put points in an STL tree-based container
+bool NCHelper::Node3D::operator<( const NCHelper::Node3D& other ) const
+{
+    if (coords[0] <= other.coords[0] - tolerance)
+        return true;
+    else if (coords[0] >= other.coords[0] + tolerance)
+        return false;
+    if (coords[1] <= other.coords[1] - tolerance)
+        return true;
+    else if (coords[1] >= other.coords[1] + tolerance)
+        return false;
+    if (coords[2] <= other.coords[2] - tolerance)
+        return true;
+    else if (coords[0] >= other.coords[0] + tolerance)
+        return false;
+
+    return false;
+}
+/*bool NCHelper::Node3D::operator == ( const NCHelper::Node3D& other ) const
+     return ( !(*this < other) && ! ( other < *this) ) ;*/
 }  // namespace moab

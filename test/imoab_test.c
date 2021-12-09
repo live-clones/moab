@@ -43,7 +43,7 @@ int main( int argc, char* argv[] )
     int num_ghost_layers[1] = { 1 };
 #else
     const char* read_opts = "";
-    int* num_ghost_layers = NULL;
+    int  num_ghost_layers[1] = { 0 };
 #endif
 
     iMOAB_GlobalID* gbIDs;

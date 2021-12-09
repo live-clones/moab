@@ -346,7 +346,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
 
     //
     EntityHandle* conn_arr;
-    EntityHandle start_vertex;
+    EntityHandle vtx_handle;
     Range tmp_range;
 
     // set connectivity into that space
@@ -369,56 +369,91 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
         // create also nv*nb_with_mask1 vertices, and compute their coordinates
     }
 
-    // Create vertices
-    int nLocalVertices = nb_with_mask1 * nv;
-    std::vector< double* > arrays;
-    rval = _readNC->readMeshIface->get_node_coords( 3, nLocalVertices, 0, start_vertex, arrays );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
+    // Create vertices; first identify different ones, with a tolerance
+    std::map< Node3D, EntityHandle > vertex_map;
 
     // Set vertex coordinates
     // will read all xv, yv, but use only those with correct mask on
-    Range::iterator rit;
-    double* xptr       = arrays[0];
-    double* yptr       = arrays[1];
-    double* zptr       = arrays[2];
-    int index          = 0;  // consider the mask for advancing in moab arrays;
+
     int elem_index     = 0;  // total index in netcdf arrays
     const double pideg = acos( -1.0 ) / 180.0;
-    double radius      = 1;
 
-    // int nj = gDims[4]-gDims[1]; // is it about 1 in irregular cases
-    int j              = lDims[1];
-    int i              = lDims[0];  // if elem_index is getting to next row, increase j
-    int local_row_size = lDims[3] - lDims[0];
     for( ; elem_index < local_elems; elem_index++ )
     {
         if( 0 == mask[elem_index] ) continue;  // nothing to do, do not advance elem_index in actual moab arrays
         // set area and fraction on those elements too
         for( int k = 0; k < nv; k++ )
         {
-            EntityHandle vertex = start_vertex + nv * index + k;
-
             int index_v_arr = nv * elem_index + k;
             double x, y;
             if( nv > 1 )
             {
-                conn_arr[nv * index + k] = vertex;
                 x                        = xv[index_v_arr];
                 y                        = yv[index_v_arr];
                 double cosphi            = cos( pideg * y );
                 double zmult             = sin( pideg * y );
                 double xmult             = cosphi * cos( x * pideg );
                 double ymult             = cosphi * sin( x * pideg );
-                xptr[nv * index + k]     = radius * xmult;
-                yptr[nv * index + k]     = radius * ymult;
-                zptr[nv * index + k]     = radius * zmult;
+                Node3D pt(xmult, ymult, zmult);
+                vertex_map[pt] = 0;
             }
-            else  // nv ==1 , tempest remap case, only xc make sense
+            else
             {
                 x                    = xc[elem_index];
                 y                    = yc[elem_index];
-                xptr[nv * index + k] = x;
-                yptr[nv * index + k] = y;
-                zptr[nv * index + k] = 0;
+                Node3D pt(x, y, 0);
+                vertex_map[pt] = 0;
+            }
+
+        }
+    }
+    int nLocalVertices = (int) vertex_map.size();
+    std::vector< double* > arrays;
+    EntityHandle start_vertex;
+    rval = _readNC->readMeshIface->get_node_coords( 3, nLocalVertices, 0, start_vertex, arrays );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
+
+    vtx_handle = start_vertex;
+    // Copy vertex coordinates into entity sequence coordinate arrays
+    // and copy handle into vertex_map.
+    double *x = arrays[0], *y = arrays[1], *z = arrays[2];
+    for( auto i = vertex_map.begin(); i != vertex_map.end(); ++i )
+    {
+        i->second = vtx_handle;
+        ++vtx_handle;
+        *x = i->first.coords[0];
+        ++x;
+        *y = i->first.coords[1];
+        ++y;
+        *z = i->first.coords[2];
+        ++z;
+    }
+
+    // int nj = gDims[4]-gDims[1]; // is it about 1 in irregular cases
+    int j              = lDims[1];
+    int i              = lDims[0];  // if elem_index is getting to next row, increase j
+    int local_row_size = lDims[3] - lDims[0];
+    elem_index = 0;
+    int index          = 0;  // consider the mask for advancing in moab arrays;
+    //printf(" map size :%ld \n", vertex_map.size());
+    // create now vertex arrays, size vertex_map.size()
+    for( ; elem_index < local_elems; elem_index++ )
+    {
+        if( 0 == mask[elem_index] ) continue;  // nothing to do, do not advance elem_index in actual moab arrays
+        // set area and fraction on those elements too
+        for( int k = 0; k < nv; k++ )
+        {
+            int index_v_arr = nv * elem_index + k;
+            if( nv > 1 )
+            {
+                double x                        = xv[index_v_arr];
+                double y                        = yv[index_v_arr];
+                double cosphi            = cos( pideg * y );
+                double zmult             = sin( pideg * y );
+                double xmult             = cosphi * cos( x * pideg );
+                double ymult             = cosphi * sin( x * pideg );
+                Node3D pt(xmult, ymult, zmult);
+                conn_arr[index * nv + k] =                vertex_map[pt];
+
             }
         }
         EntityHandle cell = start_vertex + index;
@@ -450,17 +485,18 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     tagList.push_back( ycTag );
     tagList.push_back( areaTag );
     tagList.push_back( fracTag );
-    double tol = 1.e-9;
-    rval       = IntxUtils::remove_duplicate_vertices( mbImpl, _fileSet, tol, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
+    rval       = IntxUtils::remove_padded_vertices( mbImpl, _fileSet, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
 
     rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_ERR( rval );
     Range all_verts;
     rval = mbImpl->get_connectivity( faces, all_verts );MB_CHK_ERR( rval );
+    //printf(" range vert size :%ld \n", all_verts.size());
     rval = mbImpl->add_entities( _fileSet, all_verts );MB_CHK_ERR( rval );
 #ifdef MOAB_HAVE_MPI
     ParallelComm*& myPcomm = _readNC->myPcomm;
     if( myPcomm )
     {
+        double tol = 1.e-12; // this is the same as static tolerance in NCHelper
         ParallelMergeMesh pmm( myPcomm, tol );
         rval = pmm.merge( _fileSet,
                           /* do not do local merge*/ false,

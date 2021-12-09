@@ -1845,10 +1845,19 @@ ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file
     rval = mm.merge_all( file_set, merge_tol );MB_CHK_ERR( rval );
 
     // now correct vertices that are repeated in polygons
-    Range cells;
-    rval = mb->get_entities_by_dimension( file_set, 2, cells );MB_CHK_ERR( rval );
+    rval = remove_padded_vertices(mb, file_set, tagList);
+    return MB_SUCCESS;
+}
 
-    verts.clear();
+ErrorCode IntxUtils::remove_padded_vertices( Interface* mb, EntityHandle file_set,
+                                                std::vector< Tag >& tagList )
+{
+
+    // now correct vertices that are repeated in polygons
+    Range cells;
+    ErrorCode rval = mb->get_entities_by_dimension( file_set, 2, cells );MB_CHK_ERR( rval );
+
+    Range verts;
     rval = mb->get_connectivity( cells, verts );MB_CHK_ERR( rval );
 
     Range modifiedCells;  // will be deleted at the end; keep the gid
