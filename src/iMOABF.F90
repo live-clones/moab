@@ -437,14 +437,6 @@ interface
 
 #ifdef MOAB_HAVE_NETCDF
 
-  integer(c_int) function iMOAB_LoadMappingWeightsFromFile_Old(pid_intersection, solution_weights_identifier, remap_weights_filename) &
-                                                            bind(C, name='iMOAB_LoadMappingWeightsFromFile_Old')
-    use, intrinsic :: iso_c_binding, only : c_int, c_char
-    integer(c_int), intent(in) :: pid_intersection
-    character(kind=c_char), intent(in) :: solution_weights_identifier(*)
-    character(kind=c_char), intent(in) :: remap_weights_filename(*)
-  end function iMOAB_LoadMappingWeightsFromFile_Old
-
   integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, pid_cpl, col_or_row, mtype, solution_weights_identifier, &
                                                             remap_weights_filename) &
                                                             bind(C, name='iMOAB_LoadMappingWeightsFromFile')

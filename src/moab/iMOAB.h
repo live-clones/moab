@@ -1074,23 +1074,6 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_source,
 
 #ifdef MOAB_HAVE_NETCDF
 
-/**
- * \brief Load the projection weights from disk to transfer a solution from a source surface mesh to a destination mesh defined on a sphere.
- * The intersection of the mesh should be computed a-priori.
- * 
- * \note  <B>Operations:</B> Collective
- * 
- * \param[in/out] pid_intersection (iMOAB_AppID)           The unique pointer to the application ID to store the map.
- * \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,
- *                                                         values could be identifiers such as "scalar", "flux" or "custom".
- * \param[in] remap_weights_filename  (iMOAB_String)       The filename path to the mapping file to load in memory.
- * \return ErrCode                                         The error code indicating success or failure.
-*/
-ErrCode iMOAB_LoadMappingWeightsFromFile_Old(
-    iMOAB_AppID pid_intersection,
-    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-    const iMOAB_String remap_weights_filename );
-
 #ifdef MOAB_HAVE_MPI
 
 /**
@@ -1222,7 +1205,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
   <B>Operations:</B> Collective
 
   \param[in] pid_intersection (iMOAB_AppID)               The unique pointer to the application ID to store the map
-  \param[in] pid_cpl (iMOAB_AppID)                        The unique pointer to coupler instance of component
+  \param[in] pid_cpl (iMOAB_AppID)                        The unique pointer to coupler instance of component; (-1) for old load
   \param[in] col_or_row (int *)                           The flag to indicate whether distribution is according to source (0) or target grid (1)
   \param[in] type (int *)                                 type of mesh (1) spectral with GLOBAL_DOFS, (2) Point Cloud (3) FV cell
   \param[in] solution_weights_identifier  (iMOAB_String)  The unique identifier used to store the computed projection weights locally. Typically,

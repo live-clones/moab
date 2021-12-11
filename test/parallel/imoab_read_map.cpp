@@ -216,8 +216,11 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-
-        ierr = iMOAB_LoadMappingWeightsFromFile_Old( cplAtmOcnPID, intx_from_file_identifier.c_str(), mapFilename.c_str() );
+        int dummyCpl = -1;
+        int dummy_rowcol = -1;
+        int dummyType = 0;
+        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
+             intx_from_file_identifier.c_str(), mapFilename.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 
