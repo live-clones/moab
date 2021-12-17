@@ -69,6 +69,7 @@ program imoab_coupler_fortran
     integer :: storLeng, eetype ! for tags defs
     character(:), allocatable :: concat_fieldname, concat_fieldnameT, outputFileOcn
     integer :: tagIndexIn2 ! not really needed
+    integer :: dummyCpl, dummyRC, dummyType
 
     cmpatm = 5
     cplatm = 6
@@ -224,10 +225,13 @@ program imoab_coupler_fortran
         atmocn_map_file_name = 'atm_ocn_map_f.nc'//C_NULL_CHAR
         ierr = iMOAB_WriteMappingWeightsToFile( cplAtmOcnPID, weights_identifier1, atmocn_map_file_name)
         call errorout(ierr, 'failed to write map file to disk')
-        !intx_from_file_identifier = 'map-from-file'//C_NULL_CHAR
-       ! ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, intx_from_file_identifier,  &
-        !                                             atmocn_map_file_name, 0, 0, 0)
-        !call errorout(ierr, 'failed to load map file from disk')
+        intx_from_file_identifier = 'map-from-file'//C_NULL_CHAR
+        dummyCpl = -1
+        dummyRC = -1
+        dummyType = 0
+        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, dummyCpl, dummyRC, dummyType, &
+            intx_from_file_identifier, atmocn_map_file_name)
+        call errorout(ierr, 'failed to load map file from disk')
 #endif
     endif
 

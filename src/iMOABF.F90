@@ -317,6 +317,12 @@ interface
     integer(c_int), intent(out) :: num_global_elems
   end function iMOAB_GetGlobalInfo
 
+  integer(c_int) function iMOAB_WriteLocalMesh(pid, prefix) bind(C, name='iMOAB_WriteLocalMesh')
+    use, intrinsic :: iso_c_binding, only : c_int, c_char
+    integer(c_int), intent(in) :: pid
+    character(kind=c_char), intent(in) :: prefix(*)
+  end function iMOAB_WriteLocalMesh
+
 #ifdef MOAB_HAVE_MPI
 
   integer(c_int) function iMOAB_SendMesh(pid, joint_comm, receivingGroup, rcompid, method) bind(C, name='iMOAB_SendMesh')
@@ -395,6 +401,21 @@ interface
     integer(c_int), intent(in) :: pid
   end function iMOAB_MergeVertices
 
+      integer(c_int) function iMOAB_MigrateMapMesh( pid1, pid2, pid3, jointcomm, groupA, groupB, type, comp1, comp2, &
+                                                    direction) bind(C, name='iMOAB_MigrateMapMesh')
+        use, intrinsic :: iso_c_binding, only : c_int
+        integer(c_int), intent(in) :: pid1
+        integer(c_int), intent(in) :: pid2
+        integer(c_int), intent(in) :: pid3
+        integer, intent(in) :: jointcomm  ! MPI_Comm
+        integer, intent(in) :: groupA     ! MPI_Group
+        integer, intent(in) :: groupB     ! MPI_Group
+        integer(c_int), intent(in) :: type
+        integer(c_int), intent(in) :: comp1
+        integer(c_int), intent(in) :: comp2
+        integer(c_int), intent(in) :: direction
+      end function iMOAB_MigrateMapMesh
+
 ! closing endif: MOAB_HAVE_MPI
 #endif
 
@@ -416,10 +437,14 @@ interface
 
 #ifdef MOAB_HAVE_NETCDF
 
-  integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, solution_weights_identifier, remap_weights_filename ) &
+  integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, pid_cpl, col_or_row, mtype, solution_weights_identifier, &
+                                                            remap_weights_filename) &
                                                             bind(C, name='iMOAB_LoadMappingWeightsFromFile')
     use, intrinsic :: iso_c_binding, only : c_int, c_char
     integer(c_int), intent(in) :: pid_intersection
+    integer(c_int), intent(in) :: pid_cpl
+    integer(c_int), intent(in) :: col_or_row
+    integer(c_int), intent(in) :: mtype
     character(kind=c_char), intent(in) :: solution_weights_identifier(*)
     character(kind=c_char), intent(in) :: remap_weights_filename(*)
   end function iMOAB_LoadMappingWeightsFromFile

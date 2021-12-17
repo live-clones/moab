@@ -1143,7 +1143,7 @@ void print_progress( const int barWidth, const float progress, const char* messa
 ///////////////////////////////////////////////////////////////////////////////
 
 moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
-                                                         bool /* row_major_ownership */ )
+                                                         bool row_partition )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -1225,22 +1225,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
 #endif
     }
 
-    std::vector< int > rowOwnership;
-    // if owned_dof_ids = NULL, use the default trivial partitioning scheme
-    if( owned_dof_ids.size() == 0 )
-    {
-        // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
-        rowOwnership.resize( size );
-        int nGRowPerPart   = nB / size;
-        int nGRowRemainder = nB % size;  // Keep the remainder in root
-        rowOwnership[0]    = nGRowPerPart + nGRowRemainder;
-        for( int ip = 1, roffset = rowOwnership[0]; ip < size; ++ip )
-        {
-            roffset += nGRowPerPart;
-            rowOwnership[ip] = roffset;
-        }
-    }
-
     // Let us declare the map object for every process
     SparseMatrix< double >& sparseMatrix = this->GetSparseMatrix();
 
@@ -1304,26 +1288,43 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     // otherwise, just fill the sparse matrix
     if( size > 1 )
     {
-        // send to
-        moab::TupleList tl;
+        std::vector< int > ownership;
+        // the default trivial partitioning scheme
+        int nDofs = nB; // this is for row partitioning
+        if (!row_partition)
+            nDofs = nA; // column partitioning
+
+                // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
+        ownership.resize( size );
+        int nPerPart   = nDofs / size;
+        int nRemainder = nDofs % size;  // Keep the remainder in root
+        ownership[0]    = nPerPart + nRemainder;
+        for( int ip = 1, roffset = ownership[0]; ip < size; ++ip )
+        {
+            roffset += nPerPart;
+            ownership[ip] = roffset;
+        }
+        moab::TupleList * tl = new moab::TupleList;
         unsigned numr = 1;                          //
-        tl.initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
-        tl.enableWriteAccess();
+        tl->initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
+        tl->enableWriteAccess();
         // populate
         for( int i = 0; i < localSize; i++ )
         {
             int rowval  = vecRow[i] - 1;  // dofs are 1 based in the file
             int colval  = vecCol[i] - 1;
             int to_proc = -1;
-            //
+            int dof_val = colval;
+            if (row_partition)
+                dof_val = rowval;
 
-            if( rowOwnership[0] > rowval )
+            if( ownership[0] > dof_val )
                 to_proc = 0;
             else
             {
                 for( int ip = 1; ip < size; ++ip )
                 {
-                    if( rowOwnership[ip - 1] <= rowval && rowOwnership[ip] > rowval )
+                    if( ownership[ip - 1] <= dof_val && ownership[ip] > dof_val )
                     {
                         to_proc = ip;
                         break;
@@ -1331,26 +1332,127 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 }
             }
 
-            int n               = tl.get_n();
-            tl.vi_wr[3 * n]     = to_proc;
-            tl.vi_wr[3 * n + 1] = rowval;
-            tl.vi_wr[3 * n + 2] = colval;
-            tl.vr_wr[n]         = vecS[i];
-
-            tl.inc_n();
+            int n               = tl->get_n();
+            tl->vi_wr[3 * n]     = to_proc;
+            tl->vi_wr[3 * n + 1] = rowval;
+            tl->vi_wr[3 * n + 2] = colval;
+            tl->vr_wr[n]         = vecS[i];
+            tl->inc_n();
         }
+        // heavy communication
+        ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, *tl, 0 );
 
-        // now do the heavy communication
-        ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
+        if (owned_dof_ids.size() > 0)
+        {
+            // we need to send desired dof to the rendez_vous point
+            moab::TupleList tl_re;                                 //
+            tl_re.initialize( 2, 0, 0, 0, owned_dof_ids.size() );  // to proc, value
+            tl_re.enableWriteAccess();
+            // send first to rendez_vous point, decided by trivial partitioning
+
+            for( size_t i = 0; i < owned_dof_ids.size(); i++ )
+            {
+                int to_proc = -1;
+                int dof_val = owned_dof_ids[i] - 1;  // dofs are 1 based in the file, partition from 0 ?
+
+                if( ownership[0] > dof_val )
+                    to_proc = 0;
+                else
+                {
+                    for( int ip = 1; ip < size; ++ip )
+                    {
+                        if( ownership[ip - 1] <= dof_val && ownership[ip] > dof_val )
+                        {
+                            to_proc = ip;
+                            break;
+                        }
+                    }
+                }
+
+                int n               = tl_re.get_n();
+                tl_re.vi_wr[2 * n]     = to_proc;
+                tl_re.vi_wr[2 * n + 1] = dof_val;
+
+
+                tl_re.inc_n();
+            }
+            ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl_re, 0 );
+            // now we know in tl_re where do we need to send back dof_val
+            moab::TupleList::buffer sort_buffer;
+            sort_buffer.buffer_init( tl_re.get_n() );
+            tl_re.sort( 1, &sort_buffer ); // so now we order by value
+
+            sort_buffer.buffer_init( tl->get_n() );
+            int indexOrder = 2; //  colVal
+            if (row_partition)
+                indexOrder = 1; //  rowVal
+            //tl->sort( indexOrder, &sort_buffer );
+
+            std::map<int, int> startDofIndex, endDofIndex; // indices in tl_re for values we want
+            int dofVal =-1;
+            if (tl_re.get_n() > 0)
+                dofVal = tl_re.vi_rd[1]; // first dof val on this rank
+            startDofIndex[dofVal] = 0;
+            endDofIndex [dofVal] = 0 ; // start and end
+            for (int k = 1; k<tl_re.get_n(); k++ )
+            {
+                int newDof = tl_re.vi_rd[2*k+1];
+                if (dofVal == newDof)
+                {
+                    endDofIndex[dofVal] = k; // increment by 1 actually
+                }
+                else
+                {
+                    dofVal = newDof;
+                    startDofIndex[dofVal] = k;
+                    endDofIndex[dofVal] = k;
+                }
+            }
+
+            // basically, for each value we are interested in, index in tl_re with those values are
+            // tl_re.vi_rd[2*startDofIndex+1] == valDof == tl_re.vi_rd[2*endDofIndex+1]
+            // so now we have ordered
+            // tl_re shows to what proc do we need to send the tuple (row, col, val)
+            moab::TupleList * tl_back = new moab::TupleList;
+            unsigned numr = 1;                          //
+            // localSize is a good guess, but maybe it should be bigger ?
+            // this could be bigger for repeated dofs
+            tl_back->initialize( 3, 0, 0, numr, tl->get_n() );  // to proc, row, col, value
+            tl_back->enableWriteAccess();
+            // now loop over tl and tl_re to see where to send
+            // form the new tuple, which will contain the desired dofs per task, per row or column distribution
+
+            for ( int k = 0; k < tl->get_n(); k++)
+            {
+                int valDof = tl->vi_rd[3*k+indexOrder]; // 1 for row, 2 for column // first value, it should be
+                for (int ire = startDofIndex[valDof]; ire <= endDofIndex[valDof]; ire++)
+                {
+                    int to_proc = tl_re.vi_rd[2*ire];
+                    int n = tl_back->get_n();
+                    tl_back->vi_wr[3*n] = to_proc;
+                    tl_back->vi_wr[3*n+1] = tl->vi_rd[3*k+1]; // row
+                    tl_back->vi_wr[3*n+2] = tl->vi_rd[3*k+2]; // col
+                    tl_back->vr_wr[n]    = tl->vr_rd[k];
+                    tl_back->inc_n();
+                }
+            }
+
+            // now communicate to the desired tasks:
+            ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, *tl_back, 0 );
+
+            tl_re.reset(); // clear memory, although this will go out of scope
+            tl->reset();
+            tl = tl_back;
+        }
 
         int rindexMax = 0, cindexMax = 0;
         // populate the sparsematrix, using rowMap and colMap
-        int n = tl.get_n();
+        int n = tl->get_n();
         for( int i = 0; i < n; i++ )
         {
             int rindex, cindex;
-            const int& vecRowValue = tl.vi_wr[3 * i + 1];
-            const int& vecColValue = tl.vi_wr[3 * i + 2];
+            const int& vecRowValue = tl->vi_wr[3 * i + 1];
+            const int& vecColValue = tl->vi_wr[3 * i + 2];
 
             std::map< int, int >::iterator riter = rowMap.find( vecRowValue );
             if( riter == rowMap.end() )
@@ -1376,8 +1478,10 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             else
                 cindex = citer->second;
 
-            sparseMatrix( rindex, cindex ) = tl.vr_wr[i];
+            sparseMatrix( rindex, cindex ) = tl->vr_wr[i];
         }
+        tl->reset();
+
     }
     else
 #endif

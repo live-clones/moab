@@ -1,12 +1,14 @@
 /*
- * This imoab_map2 test will simulate coupling between 2 components
+ * This imoab_map_target test will simulate coupling between 2 components
  * 2 meshes will be loaded from 2 files (src, tgt), and one map file
- * after the map is read, in parallel, on coupler pes, with distributed rows, the
- * coupler meshes for source and target will be generated, in a migration step,
- * in which we will migrate from target pes according to row ids, to coupler target mesh,
- *  and from source to coverage mesh mesh on coupler. During this migration, par comm graphs
- *  will be established between source and coupler and target and coupler, which will assist
- *  in field transfer from source to target, through coupler
+ * the target mesh is migrated to coupler with a partitioning method
+ * after the map is read, in parallel, on coupler pes, with row ownership from
+ * target mesh, the
+ * coupler meshes for source will be generated, in a migration step,
+ * from source to coverage mesh mesh on coupler. During this migration, par comm graph
+ *  will be established between source and coupler, which will assist
+ *  in field transfer from source to coupler; the original migrate
+ *  will be used for target mesh from coupler to target component
  *
  */
 
@@ -82,7 +84,12 @@ int main( int argc, char* argv[] )
     int startG1 = 0, startG2 = 0, endG1 = numProcesses - 1, endG2 = numProcesses - 1;
 
     int startG4 = startG1, endG4 = endG1;  // these are for coupler layout
-    int context_id = -1;                   // used now for freeing buffers
+    int context_id;                   // used now for freeing buffers
+
+    int repartitioner_scheme = 0;
+#ifdef MOAB_HAVE_ZOLTAN
+    repartitioner_scheme = 2;  // use the graph partitioner in that caseS
+#endif
 
     // default: load atm / source on 2 proc, ocean / target on 2,
     // load map on 2 also, in parallel, distributed by rows (which is very bad actually for ocean mesh, because
@@ -197,16 +204,27 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "Cannot load atm mesh" )
     }
 
-    MPI_Barrier( MPI_COMM_WORLD );
     if( ocnComm != MPI_COMM_NULL )
     {
         MPI_Comm_rank( ocnComm, &rankInOcnComm );
         ierr = iMOAB_RegisterApplication( "OCN1", &ocnComm, &cmpocn, cmpOcnPID );
         CHECKIERR( ierr, "Cannot register OCN App" )
-        ierr = iMOAB_LoadMesh( cmpOcnPID, ocnFilename.c_str(), readopts.c_str(), &nghlay );
-        CHECKIERR( ierr, "Cannot load ocn mesh" )
     }
+    MPI_Barrier( MPI_COMM_WORLD );
 
+    ierr =
+        setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
+                                            &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
+    CHECKIERR( ierr, "Cannot set-up target meshes" )
+#ifdef VERBOSE
+    if( couComm != MPI_COMM_NULL )
+    {
+        char outputFileTgt3[] = "recvTgt.h5m";
+        ierr                  = iMOAB_WriteMesh( cplOcnPID, outputFileTgt3, fileWriteOptions );
+        CHECKIERR( ierr, "cannot write target mesh after receiving on coupler" )
+    }
+#endif
+    CHECKIERR( ierr, "Cannot load and distribute target mesh" )
     MPI_Barrier( MPI_COMM_WORLD );
 
     if( couComm != MPI_COMM_NULL )
@@ -220,11 +238,9 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        int dummyCpl = -1;
-        int dummy_rowcol = -1;
-        int dummyType = 0;
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
-              intx_from_file_identifier.c_str(), mapFilename.c_str() );
+        int col_or_row = 0; // row based partition
+        int type = 3; // target is FV cell with global ID as DOFs
+        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, cplOcnPID, &col_or_row, &type, intx_from_file_identifier.c_str(), mapFilename.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 
@@ -242,29 +258,6 @@ int main( int argc, char* argv[] )
             char prefix[] = "atmcov";
             ierr          = iMOAB_WriteLocalMesh( cplAtmPID, prefix );
             CHECKIERR( ierr, "failed to write local mesh" );
-        }
-#endif
-    }
-    MPI_Barrier( MPI_COMM_WORLD );
-
-    if( ocnCouComm != MPI_COMM_NULL )
-    {
-        int type      = types[1];  // cells with GLOBAL_ID in ocean / target set
-        int direction = 2;         // from coupler to target; will create a mesh on cplOcnPID
-        // it will be like initial migrate cmpocn <-> cplocn
-        ierr = iMOAB_MigrateMapMesh( cmpOcnPID, cplAtmOcnPID, cplOcnPID, &ocnCouComm, &ocnPEGroup, &couPEGroup, &type,
-                                     &cmpocn, &cplocn, &direction );
-        CHECKIERR( ierr, "failed to migrate mesh for ocn on coupler" );
-
-#ifdef VERBOSE
-        if( *cplOcnPID >= 0 )
-        {
-            char prefix[] = "ocntgt";
-            ierr          = iMOAB_WriteLocalMesh( cplOcnPID, prefix );
-            CHECKIERR( ierr, "failed to write local ocean mesh" );
-            char outputFileRec[] = "CoupOcn.h5m";
-            ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileRec, fileWriteOptions );
-            CHECKIERR( ierr, "failed to write ocean global mesh file" );
         }
 #endif
     }
@@ -401,13 +394,14 @@ int main( int argc, char* argv[] )
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( "Apply Scalar projection weights" )
-            ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(),
-                                                       concat_fieldname, concat_fieldnameT );
+            ierr =
+                iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(), concat_fieldname,
+                                                    concat_fieldnameT );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
 
             {
-                char outputFileTgt[] = "fOcnOnCpl2.h5m";
+                char outputFileTgt[] = "fOcnOnCpl4.h5m";
                 ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions );
                 CHECKIERR( ierr, "could not write fOcnOnCpl.h5m to disk" )
             }
@@ -430,7 +424,7 @@ int main( int argc, char* argv[] )
         {
             // need to use ocean comp id for context
             context_id = cmpocn;  // id for ocean on comp
-            ierr       = iMOAB_SendElementTag( cplOcnPID, "Target_proj", &ocnCouComm, &context_id );
+            ierr = iMOAB_SendElementTag( cplOcnPID, "Target_proj", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
@@ -438,7 +432,8 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             context_id = cplocn;  // id for ocean on coupler
-            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "Target_proj", &ocnCouComm, &context_id );
+            ierr =
+                iMOAB_ReceiveElementTag( cmpOcnPID, "Target_proj", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
@@ -446,6 +441,7 @@ int main( int argc, char* argv[] )
         {
             context_id = cmpocn;
             ierr       = iMOAB_FreeSenderBuffers( cplOcnPID, &context_id );
+            CHECKIERR( ierr, "cannot free buffers for Target_proj tag migration " )
         }
         MPI_Barrier( MPI_COMM_WORLD );
 
@@ -472,11 +468,11 @@ int main( int argc, char* argv[] )
                 // get global id storage
                 const std::string GidStr = "GLOBAL_ID";  // hard coded too
                 int tag_type = DENSE_INTEGER, ncomp = 1, tagInd = 0;
-                ierr = iMOAB_DefineTagStorage( cmpOcnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd );
+                ierr = iMOAB_DefineTagStorage( cmpOcnPID, GidStr.c_str(), &tag_type, &ncomp, &tagInd);
                 CHECKIERR( ierr, "failed to define global id tag" );
 
                 int ent_type = 1;
-                ierr         = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
+                ierr = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0]);
                 CHECKIERR( ierr, "failed to get global ids" );
                 ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2], &ent_type,
                                                   &tempElems[0] );
