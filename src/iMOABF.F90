@@ -450,8 +450,8 @@ module iMOAB
 
 #ifdef MOAB_HAVE_NETCDF
 
-      integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, pid_cpl, column_or_row, mtype, solution_weights_identifier, &
-                                                                  remap_weights_filename) &
+      integer(c_int) function iMOAB_LoadMappingWeightsFromFile(pid_intersection, pid_cpl, column_or_row, mtype, &
+                                                               solution_weights_identifier, remap_weights_filename) &
                                                                   bind(C, name='iMOAB_LoadMappingWeightsFromFile')
             use, intrinsic :: iso_c_binding, only : c_int, c_char
             integer(c_int), intent(in) :: pid_intersection
