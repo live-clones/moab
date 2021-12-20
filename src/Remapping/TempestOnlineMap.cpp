@@ -753,17 +753,9 @@ moab::ErrorCode moab::TempestOnlineMap::set_row_dc_dofs( std::vector< int >& val
 
 moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string strInputType,
                                                                   std::string strOutputType,
-                                                                  const int nPin,
-                                                                  const int nPout,
-                                                                  bool fBubble,
-                                                                  int fMonotoneTypeID,
-                                                                  bool fVolumetric,
-                                                                  bool fNoConservation,
-                                                                  bool fNoCheck,
-                                                                  const std::string srcDofTagName,
-                                                                  const std::string tgtDofTagName,
-                                                                  const bool fInputConcave,
-                                                                  const bool fOutputConcave )
+                                                                  const GenerateOfflineMapAlgorithmOptions& mapOptions,
+                                                                  const std::string& srcDofTagName,
+                                                                  const std::string& tgtDofTagName )
 {
     NcError error( NcError::silent_nonfatal );
 
@@ -783,7 +775,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
         DiscretizationType eInputType;
         DiscretizationType eOutputType;
-        int fNoCheckGlob = ( fNoCheck ? 1 : 0 );
+        int fNoCheckGlob = ( mapOptions.fNoCheck ? 1 : 0 );
 
         if( strInputType == "fv" )
         {
@@ -827,17 +819,94 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             _EXCEPTION1( "Invalid \"out_type\" value (%s), expected [fv|cgll|dgll]", strOutputType.c_str() );
         }
 
-        // Monotonicity flags
-        int nMonotoneType = fMonotoneTypeID;
-        m_bConserved      = !fNoConservation;
-        m_iMonotonicity   = fMonotoneTypeID;
-        m_eInputType      = eInputType;
-        m_eOutputType     = eOutputType;
+        // set all required input params
+        m_bConserved  = !mapOptions.fNoConservation;
+        m_eInputType  = eInputType;
+        m_eOutputType = eOutputType;
+
+        // Method flags
+        std::string strMapAlgorithm( "" );
+        int nMonotoneType = ( mapOptions.fMonotone ) ? ( 1 ) : ( 0 );
+
+        // Make an index of method arguments
+        std::set< std::string > setMethodStrings;
+        {
+            int iLast = 0;
+            for( size_t i = 0; i <= mapOptions.strMethod.length(); i++ )
+            {
+                if( ( i == mapOptions.strMethod.length() ) || ( mapOptions.strMethod[i] == ';' ) )
+                {
+                    std::string strMethodString = mapOptions.strMethod.substr( iLast, i - iLast );
+                    STLStringHelper::RemoveWhitespaceInPlace( strMethodString );
+                    if( strMethodString.length() > 0 )
+                    {
+                        setMethodStrings.insert( strMethodString );
+                    }
+                    iLast = i + 1;
+                }
+            }
+        }
+        for( auto it : setMethodStrings )
+        {
+            // Piecewise constant monotonicity
+            if( it == "mono2" )
+            {
+                if( nMonotoneType != 0 )
+                {
+                    _EXCEPTIONT( "Multiple monotonicity specifications found (--mono) or (--method \"mono#\")" );
+                }
+                if( ( m_eInputType == DiscretizationType_FV ) || ( m_eOutputType == DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"mono2\" is only used when remapping to/from CGLL or DGLL grids" );
+                }
+                nMonotoneType = 2;
+
+                // Piecewise linear monotonicity
+            }
+            else if( it == "mono3" )
+            {
+                if( nMonotoneType != 0 )
+                {
+                    _EXCEPTIONT( "Multiple monotonicity specifications found (--mono) or (--method \"mono#\")" );
+                }
+                if( ( m_eInputType == DiscretizationType_FV ) || ( m_eOutputType == DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"mono3\" is only used when remapping to/from CGLL or DGLL grids" );
+                }
+                nMonotoneType = 3;
+
+                // Volumetric remapping from FV to GLL
+            }
+            else if( it == "volumetric" )
+            {
+                if( ( m_eInputType != DiscretizationType_FV ) || ( m_eOutputType == DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"volumetric\" may only be used for FV->CGLL or FV->DGLL remapping" );
+                }
+                strMapAlgorithm = "volumetric";
+
+                // Inverse distance mapping
+            }
+            else if( it == "invdist" )
+            {
+                if( ( m_eInputType != DiscretizationType_FV ) || ( m_eOutputType != DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"invdist\" may only be used for FV->FV remapping" );
+                }
+                strMapAlgorithm = "invdist";
+            }
+            else
+            {
+                _EXCEPTION1( "Invalid --method argument \"%s\"", it.c_str() );
+            }
+        }
 
         m_nDofsPEl_Src =
-            ( m_eInputType == DiscretizationType_FV || m_eInputType == DiscretizationType_PCLOUD ? 1 : nPin );
+            ( m_eInputType == DiscretizationType_FV || m_eInputType == DiscretizationType_PCLOUD ? 1
+                                                                                                 : mapOptions.nPin );
         m_nDofsPEl_Dest =
-            ( m_eOutputType == DiscretizationType_FV || m_eOutputType == DiscretizationType_PCLOUD ? 1 : nPout );
+            ( m_eOutputType == DiscretizationType_FV || m_eOutputType == DiscretizationType_PCLOUD ? 1
+                                                                                                   : mapOptions.nPout );
 
         rval = SetDOFmapTags( srcDofTagName, tgtDofTagName );MB_CHK_ERR( rval );
 
@@ -846,7 +915,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
         {
             // Calculate Input Mesh Face areas
             if( is_root ) dbgprint.printf( 0, "Calculating input mesh Face areas\n" );
-            double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas( fInputConcave );
+            double dTotalAreaInput_loc = m_meshInput->CalculateFaceAreas( mapOptions.fSourceConcave );
             dTotalAreaInput            = dTotalAreaInput_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
@@ -855,14 +924,14 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( is_root ) dbgprint.printf( 0, "Input Mesh Geometric Area: %1.15e\n", dTotalAreaInput );
 
             // Input mesh areas
-            m_meshInputCov->CalculateFaceAreas( fInputConcave );
+            m_meshInputCov->CalculateFaceAreas( mapOptions.fSourceConcave );
         }
 
         if( !m_bPointCloudTarget )
         {
             // Calculate Output Mesh Face areas
             if( is_root ) dbgprint.printf( 0, "Calculating output mesh Face areas\n" );
-            double dTotalAreaOutput_loc = m_meshOutput->CalculateFaceAreas( fOutputConcave );
+            double dTotalAreaOutput_loc = m_meshOutput->CalculateFaceAreas( mapOptions.fTargetConcave );
             dTotalAreaOutput            = dTotalAreaOutput_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
@@ -968,7 +1037,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( !m_bPointCloudSource && eInputType == DiscretizationType_FV )
             {
                 this->SetSourceAreas( m_meshInputCov->vecFaceArea );
-                if( m_meshInputCov->vecMask.IsAttached() )
+                if( m_meshInputCov->vecMask.size() )
                 {
                     this->SetSourceMask( m_meshInputCov->vecMask );
                 }
@@ -978,7 +1047,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( !m_bPointCloudTarget && eOutputType == DiscretizationType_FV )
             {
                 this->SetTargetAreas( m_meshOutput->vecFaceArea );
-                if( m_meshOutput->vecMask.IsAttached() )
+                if( m_meshOutput->vecMask.size() )
                 {
                     this->SetTargetMask( m_meshOutput->vecMask );
                 }
@@ -1023,15 +1092,15 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             // Construct remap
             if( is_root ) dbgprint.printf( 0, "Calculating remap weights\n" );
-            LinearRemapFVtoFV_Tempest_MOAB( nPin );
+            LinearRemapFVtoFV_Tempest_MOAB( mapOptions.nPin );
         }
         else if( eInputType == DiscretizationType_FV )
         {
             DataArray3D< double > dataGLLJacobian;
 
             if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
-            double dNumericalArea_loc =
-                GenerateMetaData( *m_meshOutput, nPout, fBubble, dataGLLNodesDest, dataGLLJacobian );
+            double dNumericalArea_loc = GenerateMetaData( *m_meshOutput, mapOptions.nPout, mapOptions.fNoBubble,
+                                                          dataGLLNodesDest, dataGLLJacobian );
 
             double dNumericalArea = dNumericalArea_loc;
 #ifdef MOAB_HAVE_MPI
@@ -1042,7 +1111,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             // Initialize coordinates for map
             this->InitializeSourceCoordinatesFromMeshFV( *m_meshInputCov );
-            this->InitializeTargetCoordinatesFromMeshFE( *m_meshOutput, nPout, dataGLLNodesDest );
+            this->InitializeTargetCoordinatesFromMeshFE( *m_meshOutput, mapOptions.nPout, dataGLLNodesDest );
 
             // Generate the continuous Jacobian
             bool fContinuous = ( eOutputType == DiscretizationType_CGLL );
@@ -1065,18 +1134,19 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                                                ( eOutputType == DiscretizationType_CGLL ), &dataGLLNodesDest );MB_CHK_ERR( rval );
 
             // Generate remap weights
-            if( is_root ) dbgprint.printf( 0, "Calculating remap weights\n" );
-
-            if( fVolumetric )
+            if( strMapAlgorithm == "volumetric" )
             {
+                if( is_root ) dbgprint.printf( 0, "Calculating remapping weights for FV->GLL (volumetric)\n" );
                 LinearRemapFVtoGLL_Volumetric( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, dataGLLNodesDest,
-                                               dataGLLJacobian, this->GetTargetAreas(), nPin, *this, nMonotoneType,
-                                               fContinuous, fNoConservation );
+                                               dataGLLJacobian, this->GetTargetAreas(), mapOptions.nPin, *this,
+                                               nMonotoneType, fContinuous, mapOptions.fNoConservation );
             }
             else
             {
+                if( is_root ) dbgprint.printf( 0, "Calculating remapping weights for FV->GLL\n" );
                 LinearRemapFVtoGLL( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, dataGLLNodesDest, dataGLLJacobian,
-                                    this->GetTargetAreas(), nPin, *this, nMonotoneType, fContinuous, fNoConservation );
+                                    this->GetTargetAreas(), mapOptions.nPin, *this, nMonotoneType, fContinuous,
+                                    mapOptions.fNoConservation );
             }
         }
         else if( ( eInputType == DiscretizationType_PCLOUD ) || ( eOutputType == DiscretizationType_PCLOUD ) )
@@ -1097,8 +1167,10 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
                     DataArray3D< double > dataGLLJacobianSrc;
-                    GenerateMetaData( *m_meshInputCov, nPin, fBubble, dataGLLNodesSrcCov, dataGLLJacobian );
-                    GenerateMetaData( *m_meshInput, nPin, fBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
+                    GenerateMetaData( *m_meshInputCov, mapOptions.nPin, mapOptions.fNoBubble, dataGLLNodesSrcCov,
+                                      dataGLLJacobian );
+                    GenerateMetaData( *m_meshInput, mapOptions.nPin, mapOptions.fNoBubble, dataGLLNodesSrc,
+                                      dataGLLJacobianSrc );
                 }
             }
             // else { /* Source is a point cloud dataset */ }
@@ -1117,7 +1189,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                 else
                 {
                     if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
-                    GenerateMetaData( *m_meshOutput, nPout, fBubble, dataGLLNodesDest, dataGLLJacobian );
+                    GenerateMetaData( *m_meshOutput, mapOptions.nPout, mapOptions.fNoBubble, dataGLLNodesDest,
+                                      dataGLLJacobian );
                 }
             }
             // else { /* Target is a point cloud dataset */ }
@@ -1139,10 +1212,11 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
             // double dNumericalAreaCov_loc =
-            GenerateMetaData( *m_meshInputCov, nPin, fBubble, dataGLLNodesSrcCov, dataGLLJacobian );
+            GenerateMetaData( *m_meshInputCov, mapOptions.nPin, mapOptions.fNoBubble, dataGLLNodesSrcCov,
+                              dataGLLJacobian );
 
-            double dNumericalArea_loc =
-                GenerateMetaData( *m_meshInput, nPin, fBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
+            double dNumericalArea_loc = GenerateMetaData( *m_meshInput, mapOptions.nPin, mapOptions.fNoBubble,
+                                                          dataGLLNodesSrc, dataGLLJacobianSrc );
 
             // if ( is_root ) dbgprint.printf ( 0, "Input Mesh: Coverage Area: %1.15e, Output Area:
             // %1.15e\n", dNumericalAreaCov_loc, dTotalAreaOutput_loc );
@@ -1171,7 +1245,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             }
 
             // Initialize coordinates for map
-            this->InitializeSourceCoordinatesFromMeshFE( *m_meshInputCov, nPin, dataGLLNodesSrcCov );
+            this->InitializeSourceCoordinatesFromMeshFE( *m_meshInputCov, mapOptions.nPin, dataGLLNodesSrcCov );
             this->InitializeTargetCoordinatesFromMeshFV( *m_meshOutput );
 
             // Generate the continuous Jacobian for input mesh
@@ -1193,14 +1267,14 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             // Generate remap
             if( is_root ) dbgprint.printf( 0, "Calculating remap weights\n" );
 
-            if( fVolumetric )
+            if( strMapAlgorithm == "volumetric" )
             {
                 _EXCEPTIONT( "Unimplemented: Volumetric currently unavailable for"
                              "GLL input mesh" );
             }
 
             LinearRemapSE4_Tempest_MOAB( dataGLLNodesSrcCov, dataGLLJacobian, nMonotoneType, fContinuousIn,
-                                         fNoConservation );
+                                         mapOptions.fNoConservation );
         }
         else if( ( eInputType != DiscretizationType_FV ) && ( eOutputType != DiscretizationType_FV ) )
         {
@@ -1209,11 +1283,11 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             // Input metadata
             if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
-            double dNumericalAreaIn_loc =
-                GenerateMetaData( *m_meshInputCov, nPin, fBubble, dataGLLNodesSrcCov, dataGLLJacobianIn );
+            double dNumericalAreaIn_loc = GenerateMetaData( *m_meshInputCov, mapOptions.nPin, mapOptions.fNoBubble,
+                                                            dataGLLNodesSrcCov, dataGLLJacobianIn );
 
-            double dNumericalAreaSrc_loc =
-                GenerateMetaData( *m_meshInput, nPin, fBubble, dataGLLNodesSrc, dataGLLJacobianSrc );
+            double dNumericalAreaSrc_loc = GenerateMetaData( *m_meshInput, mapOptions.nPin, mapOptions.fNoBubble,
+                                                             dataGLLNodesSrc, dataGLLJacobianSrc );
 
             assert( dNumericalAreaIn_loc >= dNumericalAreaSrc_loc );
 
@@ -1232,8 +1306,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             // Output metadata
             if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
-            double dNumericalAreaOut_loc =
-                GenerateMetaData( *m_meshOutput, nPout, fBubble, dataGLLNodesDest, dataGLLJacobianOut );
+            double dNumericalAreaOut_loc = GenerateMetaData( *m_meshOutput, mapOptions.nPout, mapOptions.fNoBubble,
+                                                             dataGLLNodesDest, dataGLLJacobianOut );
 
             double dNumericalAreaOut = dNumericalAreaOut_loc;
 #ifdef MOAB_HAVE_MPI
@@ -1250,8 +1324,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             }
 
             // Initialize coordinates for map
-            this->InitializeSourceCoordinatesFromMeshFE( *m_meshInputCov, nPin, dataGLLNodesSrcCov );
-            this->InitializeTargetCoordinatesFromMeshFE( *m_meshOutput, nPout, dataGLLNodesDest );
+            this->InitializeSourceCoordinatesFromMeshFE( *m_meshInputCov, mapOptions.nPin, dataGLLNodesSrcCov );
+            this->InitializeTargetCoordinatesFromMeshFE( *m_meshOutput, mapOptions.nPout, dataGLLNodesDest );
 
             // Generate the continuous Jacobian for input mesh
             bool fContinuousIn = ( eInputType == DiscretizationType_CGLL );
@@ -1286,8 +1360,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( is_root ) dbgprint.printf( 0, "Calculating remap weights\n" );
 
             LinearRemapGLLtoGLL2_MOAB( dataGLLNodesSrcCov, dataGLLJacobianIn, dataGLLNodesDest, dataGLLJacobianOut,
-                                       this->GetTargetAreas(), nPin, nPout, nMonotoneType, fContinuousIn,
-                                       fContinuousOut, fNoConservation );
+                                       this->GetTargetAreas(), mapOptions.nPin, mapOptions.nPout, nMonotoneType,
+                                       fContinuousIn, fContinuousOut, mapOptions.fNoConservation );
         }
         else
         {
@@ -1316,7 +1390,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
         {
             if( is_root ) dbgprint.printf( 0, "Verifying map" );
             this->IsConsistent( 1.0e-8 );
-            if( !fNoConservation ) this->IsConservative( 1.0e-8 );
+            if( !mapOptions.fNoConservation ) this->IsConservative( 1.0e-8 );
 
             if( nMonotoneType != 0 )
             {
@@ -1650,7 +1724,7 @@ moab::ErrorCode moab::TempestOnlineMap::DefineAnalyticalSolution( moab::Tag& sol
             meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
-                                                        : m_remapper->m_covering_source_entities );
+                                                          : m_remapper->m_covering_source_entities );
             discOrder  = m_nDofsPEl_Src;
             discMethod = m_eInputType;
             break;
@@ -2011,7 +2085,7 @@ moab::ErrorCode moab::TempestOnlineMap::ComputeMetrics( moab::Remapper::Intersec
             meshset    = m_remapper->m_covering_source_set;
             trmesh     = m_remapper->m_covering_source;
             entities   = ( m_remapper->point_cloud_source ? m_remapper->m_covering_source_vertices
-                                                        : m_remapper->m_covering_source_entities );
+                                                          : m_remapper->m_covering_source_entities );
             discOrder  = m_nDofsPEl_Src;
             discMethod = m_eInputType;
             break;

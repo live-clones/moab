@@ -23,14 +23,15 @@ function process_source()
 
 	echo "Processing $srcfile ..."
 	eval `${CLANGFORMAT_EXE} -i -style=file ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *MB_CHK/;MB_CHK/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *RR;/;RR;/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *CHECK_ERR/;CHECK_ERR/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *CHKERR/;CHKERR/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *CHK_ERR/;CHK_ERR/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *ERRORR/;ERRORR/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *MSQ_CHKERR/;MSQ_CHKERR/g;p;}' ${srcfile}`
-	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n  *MSQ_ERRRTN/;MSQ_ERRRTN/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *MB_CHK/;MB_CHK/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *RR;/;RR;/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *CHECK_ERR/;CHECK_ERR/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *CHK_MPI_ERR/;CHK_MPI_ERR/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *CHKERR/;CHKERR/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *CHK_ERR/;CHK_ERR/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *ERRORR/;ERRORR/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *MSQ_CHKERR/;MSQ_CHKERR/g;p;}' ${srcfile}`
+	eval `${SEDWITHOPTIONS} -n -e 'H;${x;s/;\n *MSQ_ERRRTN/;MSQ_ERRRTN/g;p;}' ${srcfile}`
 	eval `${SEDWITHOPTIONS} '/./,$!d' ${srcfile}`
 	eval `rm ${srcfile}.bak`
 

@@ -209,7 +209,7 @@ EXTRA_PGI_ONLY_FCFLAGS="-Mfree"
 if (test "x$enable_debug" != "xno"); then # debug flags
 # GNU
 EXTRA_GNU_CXXFLAGS="-Wall -Wno-long-long -pipe -pedantic -Wshadow -Wno-unused-parameter -Wpointer-arith -Wformat -Wformat-security -Wextra -Wno-variadic-macros -Wno-unknown-pragmas"
-EXTRA_GNU_FCFLAGS="-pipe -pedantic"
+EXTRA_GNU_FCFLAGS="-pipe -pedantic -ffree-line-length-0"
 # CLANG
 EXTRA_CLANG_CXXFLAGS="$EXTRA_GNU_CXXFLAGS"
 EXTRA_CLANG_FCFLAGS="$EXTRA_GNU_FCFLAGS"
@@ -226,8 +226,8 @@ fi
 
 if (test "x$enable_cxx_optimize" != "xno"); then  # optimization flags
 #GNU
-EXTRA_GNU_CXXFLAGS="$EXTRA_GNU_CXXFLAGS"
-EXTRA_GNU_FCFLAGS="$EXTRA_GNU_FCFLAGS"
+EXTRA_GNU_CXXFLAGS="$EXTRA_GNU_CXXFLAGS -ftree-vectorize"
+EXTRA_GNU_FCFLAGS="$EXTRA_GNU_FCFLAGS -ftree-vectorize"
 #CLANG
 EXTRA_CLANG_CXXFLAGS="$EXTRA_CLANG_CXXFLAGS"
 EXTRA_CLANG_FCFLAGS="$EXTRA_CLANG_FCFLAGS"
@@ -240,17 +240,6 @@ EXTRA_PGI_FCFLAGS="$EXTRA_PGI_FCFLAGS -fast"
 # XLC
 EXTRA_BG_CXXFLAGS="$EXTRA_BG_CXXFLAGS -qarch=qp -qtune=auto -qpic=large -qenablevmx"
 EXTRA_BG_FCFLAGS="$EXTRA_BG_FCFLAGS -qarch=qp -qtune=auto -qpic=large -qenablevmx"
-fi
-
-if (test "x$GXX" = "xyes"); then # G++ specific flags
-  EXTRA_GNU_FCFLAGS="$EXTRA_GNU_FCFLAGS -ffree-line-length-0"
-  if (test "x$enable_debug" != "xno"); then
-    EXTRA_GNU_ONLY_CXXFLAGS="$EXTRA_GNU_CXXFLAGS"
-    EXTRA_GNU_ONLY_FCFLAGS="$EXTRA_GNU_FCFLAGS"
-  else
-    EXTRA_GNU_ONLY_CXXFLAGS="$EXTRA_GNU_CXXFLAGS -ftree-vectorize"
-    EXTRA_GNU_ONLY_FCFLAGS="$EXTRA_GNU_FCFLAGS -ftree-vectorize"
-  fi
 fi
 
 # this is just a test comment

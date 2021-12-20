@@ -63,11 +63,12 @@ struct ToolContext
     bool verifyWeights;
     bool enforceConvexity;
     int ensureMonotonicity;
-    bool fNoConservation;
-    bool fVolumetric;
     bool rrmGrids;
     bool kdtreeSearch;
-    bool fNoBubble, fInputConcave, fOutputConcave, fCheck;
+    bool fCheck;
+    bool fVolumetric;
+    bool fInverseDistanceMap;
+    GenerateOfflineMapAlgorithmOptions mapOptions;
 
 #ifdef MOAB_HAVE_MPI
     ToolContext( moab::Interface* icore, moab::ParallelComm* p_pcomm )
@@ -77,11 +78,10 @@ struct ToolContext
     ToolContext( moab::Interface* icore )
         : mbcore( icore ), proc_id( 0 ), n_procs( 1 ), outputFormatter( std::cout, 0, 0 ),
 #endif
-          blockSize( 5 ), outFilename( "output.exo" ), intxFilename( "" ), baselineFile( "" ),
+          blockSize( 5 ), outFilename( "outputFile.nc" ), intxFilename( "intxFile.h5m" ), baselineFile( "" ),
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
-          verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), fNoConservation( false ),
-          fVolumetric( false ), rrmGrids( false ), kdtreeSearch( true ), fNoBubble( true ), fInputConcave( false ),
-          fOutputConcave( false ), fCheck( n_procs > 1 ? false : true )
+          verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), rrmGrids( false ),
+          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ), fVolumetric( false ), fInverseDistanceMap( false )
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -140,7 +140,6 @@ struct ToolContext
         std::string expectedMethod     = "fv";
         std::string expectedDofTagName = "GLOBAL_ID";
         int expectedOrder              = 1;
-        bool fBubble                   = false;
 
         if( !proc_id )
         {
@@ -154,63 +153,85 @@ struct ToolContext
                             "Type of mesh (default=CS; Choose from [CS=0, RLL=1, ICO=2, OVERLAP_FILES=3, "
                             "OVERLAP_MEMORY=4, OVERLAP_MOAB=5])",
                             &imeshType );
+
         opts.addOpt< int >( "res,r", "Resolution of the mesh (default=5)", &blockSize );
+
         opts.addOpt< void >( "dual,d", "Output the dual of the mesh (relevant only for ICO mesh type)", &computeDual );
+
         opts.addOpt< std::string >( "file,f", "Output computed mesh or remapping weights to specified filename",
                                     &outFilename );
         opts.addOpt< std::string >(
             "load,l", "Input mesh filenames for source and target meshes. (relevant only when computing weights)",
             &expectedFName );
-        opts.addOpt< void >( "noconserve,c",
-                             "Do not apply conservation to the resultant weights (relevant only "
-                             "when computing weights)",
-                             &fNoConservation );
-        opts.addOpt< void >( "volumetric,v",
-                             "Apply a volumetric projection to compute the weights (relevant only "
-                             "when computing weights)",
-                             &fVolumetric );
+
         opts.addOpt< void >( "advfront,a",
                              "Use the advancing front intersection instead of the Kd-tree based algorithm "
                              "to compute mesh intersections. (relevant only when computing weights)" );
-        opts.addOpt< int >( "monotonic,n", "Ensure monotonicity in the weight generation", &ensureMonotonicity );
-        opts.addOpt< int >( "order,o", "Discretization orders for the source and target solution fields",
-                            &expectedOrder );
-        opts.addOpt< std::string >( "method,m", "Discretization method for the source and target solution fields",
-                                    &expectedMethod );
-        opts.addOpt< std::string >( "global_id,g",
-                                    "Tag name that contains the global DoF IDs for source and target solution fields",
-                                    &expectedDofTagName );
+
+        opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
 
         opts.addOpt< void >( "weights,w",
                              "Compute and output the weights using the overlap mesh (generally "
                              "relevant only for OVERLAP mesh)",
                              &computeWeights );
-        opts.addOpt< std::string >( "intx,i", "Output TempestRemap intersection mesh filename", &intxFilename );
 
-        opts.addOpt< std::string >( "baseline", "Output baseline file", &baselineFile );
+        opts.addOpt< std::string >( "method,m", "Discretization method for the source and target solution fields",
+                                    &expectedMethod );
+
+        opts.addOpt< int >( "order,o", "Discretization orders for the source and target solution fields",
+                            &expectedOrder );
+
+        opts.addOpt< std::string >( "global_id,g",
+                                    "Tag name that contains the global DoF IDs for source and target solution fields",
+                                    &expectedDofTagName );
+
+        opts.addOpt< void >( "noconserve",
+                             "Do not apply conservation to the resultant weights (relevant only "
+                             "when computing weights)",
+                             &mapOptions.fNoConservation );
+
+        opts.addOpt< void >( "volumetric",
+                             "Apply a volumetric projection to compute the weights (relevant only "
+                             "when computing weights)",
+                             &fVolumetric );
+
+        opts.addOpt< void >( "invdist",
+                             "Apply a inverse distance weight projection to compute the weights (relevant only "
+                             "when computing FV-FV weights)",
+                             &fInverseDistanceMap );
+
+        opts.addOpt< int >( "monotonicity", "Ensure monotonicity in the weight generation. Options=[0,1,2,3]",
+                            &ensureMonotonicity );
+
+        opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
+                             &enforceConvexity );
+
+        opts.addOpt< void >( "nobubble", "do not use bubble on interior of spectral element nodes",
+                             &mapOptions.fNoBubble );
+
+        opts.addOpt< void >( "sparseconstraints", "do not use bubble on interior of spectral element nodes",
+                             &mapOptions.fSparseConstraints );
 
         opts.addOpt< void >( "rrmgrids",
                              "At least one of the meshes is a regionally refined grid (relevant to "
                              "accelerate intersection computation)",
                              &rrmGrids );
+
         opts.addOpt< void >( "checkmap", "Check the generated map for conservation and consistency", &fCheck );
+
         opts.addOpt< void >( "verify",
                              "Verify the accuracy of the maps by projecting analytical functions "
                              "from source to target "
                              "grid by applying the maps",
                              &verifyWeights );
-        opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
-                             &enforceConvexity );
-        opts.addOpt< void >( "bubble", "use bubble on interior of spectral element nodes", &fBubble );
+
+        opts.addOpt< std::string >( "baseline", "Output baseline file", &baselineFile );
 
         opts.parseCommandLine( argc, argv );
 
         // By default - use Kd-tree based search; if user asks for advancing front, disable Kd-tree
         // algorithm
         kdtreeSearch = opts.numOptSet( "advfront,a" ) == 0;
-
-        // negate the option
-        fNoBubble = !fBubble;
 
         switch( imeshType )
         {
@@ -286,6 +307,37 @@ struct ToolContext
         }
 
         expectedFName.clear();
+
+        assert( ensureMonotonicity >= 0 && ensureMonotonicity <= 3 );
+
+        mapOptions.strOutputMapFile = outFilename;
+        mapOptions.strOutputFormat  = "Netcdf4";
+        mapOptions.nPin             = disc_orders[0];
+        mapOptions.nPout            = disc_orders[1];
+        mapOptions.fSourceConcave   = false;
+        mapOptions.fTargetConcave   = false;
+
+        mapOptions.strMethod = "";
+        switch( ensureMonotonicity )
+        {
+            case 0:
+                mapOptions.fMonotone = false;
+                break;
+            case 3:
+                mapOptions.strMethod += "mono3;";
+                break;
+            case 2:
+                mapOptions.strMethod += "mono2;";
+                break;
+            default:
+                mapOptions.fMonotone = true;
+        }
+        mapOptions.fNoCorrectAreas = false;
+        mapOptions.fNoCheck        = !fCheck;
+
+        assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
+        if( fVolumetric ) mapOptions.strMethod += "volumetric;";
+        if( fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
     }
 
   private:
@@ -471,15 +523,10 @@ int main( int argc, char* argv[] )
             runCtx->timer_push( "compute weights with the Tempest meshes" );
             // Call to generate an offline map with the tempest meshes
             OfflineMap weightMap;
-            int err = GenerateOfflineMapWithMeshes(
-                weightMap, *runCtx->meshes[0], *runCtx->meshes[1], *runCtx->meshes[2], "",
-                "",  // std::string strInputMeta, std::string strOutputMeta,
-                runCtx->disc_methods[0],
-                runCtx->disc_methods[1],                         // std::string strInputType, std::string strOutputType,
-                runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin=4, int nPout=4,
-                runCtx->fNoBubble, true,                         // bool fNoBubble = false, bool fCorrectAreas = false,
-                runCtx->ensureMonotonicity                       // int fMonotoneTypeID = 0
-            );
+            int err = GenerateOfflineMapWithMeshes( *runCtx->meshes[0], *runCtx->meshes[1], *runCtx->meshes[2],
+                                                    runCtx->disc_methods[0],  // std::string strInputType
+                                                    runCtx->disc_methods[1],  // std::string strOutputType,
+                                                    runCtx->mapOptions, weightMap );
             runCtx->timer_pop();
 
             std::map< std::string, std::string > mapAttributes;
@@ -614,19 +661,12 @@ int main( int argc, char* argv[] )
             runCtx->timer_pop();
 
             runCtx->timer_push( "compute weights with TempestRemap" );
-
             rval = weightMap->GenerateRemappingWeights(
-                runCtx->disc_methods[0],                         // std::string strInputType
-                runCtx->disc_methods[1],                         // std::string strOutputType,
-                runCtx->disc_orders[0], runCtx->disc_orders[1],  // int nPin, int nPout,
-                runCtx->fNoBubble,                               // bool fNoBubble
-                runCtx->ensureMonotonicity,                      // int fMonotoneTypeID,
-                runCtx->fVolumetric, runCtx->fNoConservation,    // bool fVolumetric, bool fNoConservation,
-                !runCtx->fCheck,                                 //  bool fNoCheck,
-                runCtx->doftag_names[0],                         // std::string source_tag_name
-                runCtx->doftag_names[1],                         // std::string target_tag_name,
-                runCtx->fInputConcave,                           // bool fInputConcave
-                runCtx->fOutputConcave                           // bool fOutputConcave
+                runCtx->disc_methods[0],  // std::string strInputType
+                runCtx->disc_methods[1],  // std::string strOutputType,
+                runCtx->mapOptions,       // const GenerateOfflineMapAlgorithmOptions& options
+                runCtx->doftag_names[0],  // const std::string& source_tag_name
+                runCtx->doftag_names[1]   // const std::string& target_tag_name
             );MB_CHK_ERR( rval );
             runCtx->timer_pop();
 
@@ -663,12 +703,14 @@ int main( int argc, char* argv[] )
                     metafile << "map_aPb = " << runCtx->outFilename << std::endl;
                     metafile << "type_src = " << runCtx->disc_methods[0] << std::endl;
                     metafile << "np_src = " << runCtx->disc_orders[0] << std::endl;
-                    metafile << "concave_src = " << ( runCtx->fInputConcave ? "true" : "false" ) << std::endl;
+                    metafile << "concave_src = " << ( runCtx->mapOptions.fSourceConcave ? "true" : "false" )
+                             << std::endl;
                     metafile << "type_dst = " << runCtx->disc_methods[1] << std::endl;
                     metafile << "np_dst = " << runCtx->disc_orders[1] << std::endl;
-                    metafile << "concave_dst = " << ( runCtx->fOutputConcave ? "true" : "false" ) << std::endl;
+                    metafile << "concave_dst = " << ( runCtx->mapOptions.fTargetConcave ? "true" : "false" )
+                             << std::endl;
                     metafile << "mono_type = " << runCtx->ensureMonotonicity << std::endl;
-                    metafile << "bubble = " << ( runCtx->fNoBubble ? "false" : "true" ) << std::endl;
+                    metafile << "bubble = " << ( runCtx->mapOptions.fNoBubble ? "false" : "true" ) << std::endl;
                     metafile << "version = "
                              << "MOAB v5.1.0+" << std::endl;
                     metafile.close();

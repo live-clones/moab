@@ -74,13 +74,11 @@ class TempestOnlineMap : public OfflineMap
     ///     This method generates the mapping between the two meshes based on the overlap and stores
     ///     the result in the SparseMatrix.
     ///	</summary>
-    moab::ErrorCode GenerateRemappingWeights( std::string strInputType = "fv", std::string strOutputType = "fv",
-                                              const int nPin = 1, const int nPout = 1, bool fBubble = false,
-                                              int fMonotoneTypeID = 0, bool fVolumetric = false,
-                                              bool fNoConservation = false, bool fNoCheck = false,
-                                              const std::string srcDofTagName = "GLOBAL_ID",
-                                              const std::string tgtDofTagName = "GLOBAL_ID",
-                                              const bool fInputConcave = false, const bool fOutputConcave = false );
+    moab::ErrorCode GenerateRemappingWeights( std::string strInputType,
+                                              std::string strOutputType,
+                                              const GenerateOfflineMapAlgorithmOptions& mapOptions,
+                                              const std::string& srcDofTagName = "GLOBAL_ID",
+                                              const std::string& tgtDofTagName = "GLOBAL_ID" );
 
     ///	<summary>
     ///		Generate the metadata associated with the offline map.
@@ -90,7 +88,8 @@ class TempestOnlineMap : public OfflineMap
     ///	<summary>
     ///		Read the OfflineMap from a NetCDF file.
     ///	</summary>
-    moab::ErrorCode ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
+    moab::ErrorCode ReadParallelMap( const char* strSource,
+                                     const std::vector< int >& owned_dof_ids,
                                      bool row_major_ownership = true );
 
     ///	<summary>
@@ -151,16 +150,22 @@ class TempestOnlineMap : public OfflineMap
     ///		spectral element to element average remapping.
     ///	</summary>
     void LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
-                                      const DataArray3D< double >& dataGLLJacobian, int nMonotoneType,
-                                      bool fContinuousIn, bool fNoConservation );
+                                      const DataArray3D< double >& dataGLLJacobian,
+                                      int nMonotoneType,
+                                      bool fContinuousIn,
+                                      bool fNoConservation );
 
     ///	<summary>
     ///		Generate the OfflineMap for remapping from finite volumes to finite
     ///		elements.
     ///	</summary>
-    void LinearRemapFVtoGLL_MOAB( const DataArray3D< int >& dataGLLNodes, const DataArray3D< double >& dataGLLJacobian,
-                                  const DataArray1D< double >& dataGLLNodalArea, int nOrder, int nMonotoneType,
-                                  bool fContinuous, bool fNoConservation );
+    void LinearRemapFVtoGLL_MOAB( const DataArray3D< int >& dataGLLNodes,
+                                  const DataArray3D< double >& dataGLLJacobian,
+                                  const DataArray1D< double >& dataGLLNodalArea,
+                                  int nOrder,
+                                  int nMonotoneType,
+                                  bool fContinuous,
+                                  bool fNoConservation );
 
     ///	<summary>
     ///		Generate the OfflineMap for remapping from finite elements to finite
@@ -170,8 +175,13 @@ class TempestOnlineMap : public OfflineMap
                                     const DataArray3D< double >& dataGLLJacobianIn,
                                     const DataArray3D< int >& dataGLLNodesOut,
                                     const DataArray3D< double >& dataGLLJacobianOut,
-                                    const DataArray1D< double >& dataNodalAreaOut, int nPin, int nPout,
-                                    int nMonotoneType, bool fContinuousIn, bool fContinuousOut, bool fNoConservation );
+                                    const DataArray1D< double >& dataNodalAreaOut,
+                                    int nPin,
+                                    int nPout,
+                                    int nMonotoneType,
+                                    bool fContinuousIn,
+                                    bool fContinuousOut,
+                                    bool fNoConservation );
 
     ///	<summary>
     ///		Generate the OfflineMap for remapping from finite elements to finite
@@ -181,8 +191,12 @@ class TempestOnlineMap : public OfflineMap
                                               const DataArray3D< double >& dataGLLJacobianIn,
                                               const DataArray3D< int >& dataGLLNodesOut,
                                               const DataArray3D< double >& dataGLLJacobianOut,
-                                              const DataArray1D< double >& dataNodalAreaOut, int nPin, int nPout,
-                                              int nMonotoneType, bool fContinuousIn, bool fContinuousOut );
+                                              const DataArray1D< double >& dataNodalAreaOut,
+                                              int nPin,
+                                              int nPout,
+                                              int nMonotoneType,
+                                              bool fContinuousIn,
+                                              bool fContinuousOut );
 
     ///	<summary>
     ///		Copy the local matrix from Tempest SparseMatrix representation (ELL)
@@ -214,9 +228,12 @@ class TempestOnlineMap : public OfflineMap
     ///		the local matrix numbering so that matvec operations can be performed
     ///     consistently.
     ///	</summary>
-    moab::ErrorCode SetDOFmapAssociation( DiscretizationType srcType, bool isSrcContinuous,
-                                          DataArray3D< int >* srcdataGLLNodes, DataArray3D< int >* srcdataGLLNodesSrc,
-                                          DiscretizationType destType, bool isDestContinuous,
+    moab::ErrorCode SetDOFmapAssociation( DiscretizationType srcType,
+                                          bool isSrcContinuous,
+                                          DataArray3D< int >* srcdataGLLNodes,
+                                          DataArray3D< int >* srcdataGLLNodesSrc,
+                                          DiscretizationType destType,
+                                          bool isDestContinuous,
                                           DataArray3D< int >* tgtdataGLLNodes );
 
 #ifdef MOAB_HAVE_EIGEN3
@@ -315,7 +332,8 @@ class TempestOnlineMap : public OfflineMap
     ///     Compute:        \p tgtVals = A(S->T) * \srcVals, or
     ///     if (transpose)  \p tgtVals = [A(T->S)]^T * \srcVals
     ///	</summary>
-    moab::ErrorCode ApplyWeights( std::vector< double >& srcVals, std::vector< double >& tgtVals,
+    moab::ErrorCode ApplyWeights( std::vector< double >& srcVals,
+                                  std::vector< double >& tgtVals,
                                   bool transpose = false );
 
     ///	<summary>
@@ -334,16 +352,22 @@ class TempestOnlineMap : public OfflineMap
     ///     discretization method type and order and sample the solution exactly using the
     ///     analytical function provided by the user.
     /// </summary>
-    moab::ErrorCode DefineAnalyticalSolution( moab::Tag& exactSolnTag, const std::string& solnName,
-                                              Remapper::IntersectionContext ctx, sample_function testFunction,
-                                              moab::Tag* clonedSolnTag = NULL, std::string cloneSolnName = "" );
+    moab::ErrorCode DefineAnalyticalSolution( moab::Tag& exactSolnTag,
+                                              const std::string& solnName,
+                                              Remapper::IntersectionContext ctx,
+                                              sample_function testFunction,
+                                              moab::Tag* clonedSolnTag  = NULL,
+                                              std::string cloneSolnName = "" );
 
     /// <summary>
     ///     Compute the error between a sampled (exact) solution and a projected solution in various
     ///     error norms.
     /// </summary>
-    moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx, moab::Tag& exactTag, moab::Tag& approxTag,
-                                    std::map< std::string, double >& metrics, bool verbose = true );
+    moab::ErrorCode ComputeMetrics( Remapper::IntersectionContext ctx,
+                                    moab::Tag& exactTag,
+                                    moab::Tag& approxTag,
+                                    std::map< std::string, double >& metrics,
+                                    bool verbose = true );
 
     moab::ErrorCode fill_row_ids( std::vector< int >& ids_of_interest )
     {
@@ -372,11 +396,15 @@ class TempestOnlineMap : public OfflineMap
     void setup_sizes_dimensions();
 
 #ifdef MOAB_HAVE_MPI
-    int rearrange_arrays_by_dofs( const std::vector< unsigned int >& gdofmap, DataArray1D< double >& vecFaceArea,
-                                  DataArray1D< double >& dCenterLon, DataArray1D< double >& dCenterLat,
-                                  DataArray2D< double >& dVertexLat, DataArray2D< double >& dVertexLon,
+    int rearrange_arrays_by_dofs( const std::vector< unsigned int >& gdofmap,
+                                  DataArray1D< double >& vecFaceArea,
+                                  DataArray1D< double >& dCenterLon,
+                                  DataArray1D< double >& dCenterLat,
+                                  DataArray2D< double >& dVertexLat,
+                                  DataArray2D< double >& dVertexLon,
                                   unsigned& N,  // this will be output too now
-                                  int nv, int& maxdof );
+                                  int nv,
+                                  int& maxdof );
 #endif
 
     ///	<summary>
