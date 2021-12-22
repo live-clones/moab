@@ -3,7 +3,7 @@ include ../makefile.config
 
 default: all
 
-EXAMPLES = DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv FixPolys
+EXAMPLES = DirectAccessWithHoles DirectAccessNoHoles PointInElementSearch ExtractClose QuadTriConv FixPolys CreateParTag
 PAREXAMPLES = ReduceExchangeTags
 
 ifeq ("$(MOAB_HDF5_ENABLED)","yes")
@@ -28,6 +28,7 @@ ReduceExchangeTags: ReduceExchangeTags.o ${MOAB_LIBDIR}/libMOAB.la
 PointInElementSearch: PointInElementSearch.o ${MOAB_LIBDIR}/libMOAB.la
 ExtractClose: ExtractClose.o ${MOAB_LIBDIR}/libMOAB.la
 FixPolys: FixPolys.o ${MOAB_LIBDIR}/libMOAB.la
+CreateParTag: CreateParTag.o ${MOAB_LIBDIR}/libMOAB.la
 ComputeTriDual: ComputeTriDual.o ${MOAB_LIBDIR}/libMOAB.la
 
 $(EXAMPLES) $(PAREXAMPLES):

@@ -42,6 +42,7 @@ static V get_map_value( const std::map< K, V >& m, const K& key, const V& defval
 int main( int argc, char* argv[] )
 {
     int nprocs = 1, dimension = 3;
+    int dimension_source = 3;
 #ifdef MOAB_HAVE_MPI
     int proc_id = 0;
     MPI_Init( &argc, &argv );
@@ -59,7 +60,8 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "master,m", "Master mesh filename", &masterfile );
     opts.addOpt< std::string >( "slave,s", "Slave mesh filename", &slavefile );
     opts.addOpt< std::string >( "output,o", "Output partitioned mesh filename", &outfile );
-    opts.addOpt< int >( "dim,d", "Dimension of entities to use for partitioning", &dimension );
+    opts.addOpt< int >( "dims,c", "Dimension of entities in source used for partitioning", &dimension_source );
+    opts.addOpt< int >( "dim,d", "Dimension of entities in target to use for partitioning", &dimension );
     opts.addOpt< int >( "defaultpart,p", "Default partition number if target element is not found on source grid",
                         &defaultpart );
     opts.addOpt< double >( "eps,e", "Tolerance for the point search", &tolerance );
@@ -137,7 +139,7 @@ int main( int argc, char* argv[] )
         EntityHandle mset = msets[i];
 
         moab::Range msetelems;
-        error = mbCore->get_entities_by_dimension( mset, dimension, msetelems );MB_CHK_ERR( error );
+        error = mbCore->get_entities_by_dimension( mset, dimension_source, msetelems );MB_CHK_ERR( error );
         melems.merge( msetelems );
 
         int partID;
@@ -218,7 +220,7 @@ int main( int argc, char* argv[] )
 
                 // We only care about the dimension that the user specified.
                 // MOAB partitions are ordered by elements anyway.
-                error = mbCore->get_entities_by_dimension( leaf, dimension, leaf_elems, true );MB_CHK_ERR( error );
+                error = mbCore->get_entities_by_dimension( leaf, dimension_source, leaf_elems, true );MB_CHK_ERR( error );
 
                 if( leaf != 0 && leaf_elems.size() )
                 {

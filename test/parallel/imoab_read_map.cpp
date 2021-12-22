@@ -322,7 +322,7 @@ int main( int argc, char* argv[] )
     for( int iters = 0; iters < n; iters++ )
     {
 
-        PUSH_TIMER( "Send/receive data from atm component to coupler in ocn context" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from atm component to coupler in ocn context" )
         if( atmComm != MPI_COMM_NULL )
         {
             // as always, use nonblocking sends
@@ -332,7 +332,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 1;
             int context   = cplocn;
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnS" );
+            int verbose = 0;
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmCovOcnS" );
 #endif
         }
         if( couComm != MPI_COMM_NULL )
@@ -343,7 +344,8 @@ int main( int argc, char* argv[] )
 #ifdef GRAPH_INFO
             int is_sender = 0;
             int context   = atmocnid;  // the same context
-            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, "AtmCovOcnR" );
+            int verbose = 0;
+            iMOAB_DumpCommGraph( cmpAtmPID, &context, &is_sender, &verbose, "AtmCovOcnR" );
 #endif
         }
 
@@ -375,7 +377,7 @@ int main( int argc, char* argv[] )
         {
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
-            PUSH_TIMER( "Apply Scalar projection weights" )
+            PUSH_TIMER( couComm, "Apply Scalar projection weights" )
             ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, intx_from_file_identifier.c_str(),
                                                        concat_fieldname, concat_fieldnameT );
             CHECKIERR( ierr, "failed to compute projection weight application" );

@@ -17,20 +17,22 @@
         printf( "%s. ErrorCode = %d\n", message, rc ); \
         return 1;                                      \
     }
-
-#define PUSH_TIMER( operation )               \
-    {                                         \
-        timer_ops = timer.time_since_birth(); \
-        opName    = operation;                \
+#define PUSH_TIMER( localcomm, operation )               \
+    {                                                    \
+        MPI_Barrier(localcomm);                          \
+        timer_ops = timer.time_since_birth();            \
+        opName    = operation;                           \
     }
 #define POP_TIMER( localcomm, localrank )                                                         \
     {                                                                                             \
-        double locElapsed = timer.time_since_birth() - timer_ops, minElapsed = 0, maxElapsed = 0; \
+        double locElapsed = timer.time_since_birth() - timer_ops, sum = 0, maxElapsed = 0;        \
         MPI_Reduce( &locElapsed, &maxElapsed, 1, MPI_DOUBLE, MPI_MAX, 0, localcomm );             \
-        MPI_Reduce( &locElapsed, &minElapsed, 1, MPI_DOUBLE, MPI_MIN, 0, localcomm );             \
+        MPI_Reduce( &locElapsed, &sum, 1, MPI_DOUBLE, MPI_SUM, 0, localcomm );                    \
+        int procsize;                                                                             \
+        MPI_Comm_size(localcomm, &procsize);                                                      \
         if( !( localrank ) )                                                                      \
             std::cout << "[LOG] Time taken to " << opName.c_str() << ": max = " << maxElapsed     \
-                      << ", avg = " << ( maxElapsed + minElapsed ) / 2 << "\n";                   \
+                      << ", avg = " << sum/procsize << "\n";                   \
         opName.clear();                                                                           \
     }
 
@@ -81,10 +83,22 @@ int setup_component_coupler_meshes( iMOAB_AppID cmpId,
     int ierr = 0;
     if( *cmpcomm != MPI_COMM_NULL )
     {
-        // load first mesh
-        ierr = iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay );
+        // load mesh on component side
+        ierr =
+            iMOAB_LoadMesh( cmpId, filename.c_str(), readopts.c_str(), &nghlay );
         CHECKIERR( ierr, "Cannot load component mesh" )
+    }
+    if ( *cmpcoucomm != MPI_COMM_NULL &&  5 == repartitioner_scheme )
+    {
+        // need to send the zoltan buffer from coupler root towards the component root
+        // it assumes there is a buffer saved somewhere on the root of the coupler, because scheme 4 was called in advance
+        int is_fort = 0;
+        ierr = iMOAB_RetrieveZBuffer( cmpPEGroup, cplPEGroup, cmpcoucomm, &is_fort);
+        CHECKIERR( ierr, "Cannot retrieve Zoltan buffer" )
+    }
 
+    if( *cmpcomm != MPI_COMM_NULL )
+    {
         // then send mesh to coupler pes
         ierr = iMOAB_SendMesh( cmpId, cmpcoucomm, cplPEGroup, &cmpcouTag,
                                &repartitioner_scheme );  // send to  coupler pes

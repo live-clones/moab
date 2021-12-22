@@ -186,7 +186,9 @@ class ZoltanPartitioner : public PartitionerBase< int >
                                      std::map< int, int > procs,
                                      int& numNewPartitions,
                                      std::map< int, Range >& distribution,
-                                     int met );
+                                     int met ,
+                                     std::vector<char> & ZoltanBuffer);
+
 
 #ifdef MOAB_HAVE_CGM
     ErrorCode write_partition( const int nparts,

@@ -359,7 +359,7 @@ int main( int argc, char* argv[] )
 
     {
 
-        PUSH_TIMER( "Send/receive data from atm component to coupler in ocn context" )
+        PUSH_TIMER( MPI_COMM_WORLD, "Send/receive data from atm component to coupler in ocn context" )
         if( atmComm != MPI_COMM_NULL )
         {
             // as always, use nonblocking sends

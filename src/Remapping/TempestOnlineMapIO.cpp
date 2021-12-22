@@ -58,14 +58,25 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector< unsigne
                                                       int& maxdof )
 {
     // first decide maxdof, for partitioning
+
     unsigned int localmax = 0;
     for( unsigned i = 0; i < N; i++ )
         if( gdofmap[i] > localmax ) localmax = gdofmap[i];
 
-    // decide partitioning based on maxdof/size
-    MPI_Allreduce( &localmax, &maxdof, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
+    int localMax[2];
+    int globalMax[2];
+    localMax[0] = localmax;
+    localMax[1] = nv;
+    // we also need to find out maximum of nv; if nv is 0 (no cells on a task), it will lead to
+    // problems in gs transfer, because the size of the tuple depends on nv
+
+    MPI_Allreduce( localMax, globalMax, 2, MPI_INT, MPI_MAX, m_pcomm->comm() );
+    maxdof = globalMax[0];
+    nv     = globalMax[1];
     // maxdof is 0 based, so actual number is +1
     // maxdof
+    // decide partitioning based on maxdof/size
+
     int size_per_task = ( maxdof + 1 ) / size;  // based on this, processor to process dof x is x/size_per_task
     // so we decide to reorder by actual dof, such that task 0 has dofs from [0 to size_per_task), etc
     moab::TupleList tl;
@@ -95,6 +106,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector< unsigne
     }
 
     // now do the heavy communication
+
     ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, tl, 0 );
 
     // after communication, on each processor we should have tuples coming in
@@ -608,7 +620,6 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
                 tlValCol.vr_wr[ncInd]         = vecS[offset];
                 tlValCol.inc_n();
             }
-
 #endif
             offset++;
         }
@@ -700,6 +711,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         if( itMap != areaAtRow.end() )
         {
             double areaRow = itMap->second;  // we fished a lot for this !
+            assert(localColInd<vecSourceFaceArea.GetRows());
             dFracA[localColInd] += val / vecSourceFaceArea[localColInd] * areaRow;
         }
     }
@@ -718,10 +730,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
 #endif
 
     varRow->set_cur( (long)offbuf[2] );
-    varRow->put( vecRow, nS );
+    varRow->put( &( vecRow[0] ) , nS );
 
     varCol->set_cur( (long)offbuf[2] );
-    varCol->put( vecCol, nS );
+    varCol->put( &( vecCol[0] ), nS );
 
     varS->set_cur( (long)offbuf[2] );
     varS->put( &( vecS[0] ), nS );

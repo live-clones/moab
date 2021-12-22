@@ -44,7 +44,6 @@ ParCommGraph::ParCommGraph( MPI_Comm joincomm, MPI_Group group1, MPI_Group group
     if( 0 == rankInGroup1 ) rootSender = true;
     if( 0 == rankInGroup2 ) rootReceiver = true;
     graph_type = INITIAL_MIGRATE;  // 0
-    comm_graph = NULL;
     context_id = -1;
     cover_set  = 0;  // refers to nothing yet
 }
@@ -63,7 +62,6 @@ ParCommGraph::ParCommGraph( const ParCommGraph& src )
     joinSize      = src.joinSize;
     compid1       = src.compid1;
     compid2       = src.compid2;
-    comm_graph    = NULL;
     graph_type    = src.graph_type;
     context_id    = src.context_id;
     cover_set     = src.cover_set;
@@ -262,7 +260,7 @@ ErrorCode ParCommGraph::split_owned_range( Range& owned )
     return MB_SUCCESS;
 }
 
-ErrorCode ParCommGraph::send_graph( MPI_Comm jcomm )
+ErrorCode ParCommGraph::send_graph( MPI_Comm jcomm , std::vector<char> & zoltanBuffer )
 {
     if( is_root_sender() )
     {
@@ -276,20 +274,35 @@ ErrorCode ParCommGraph::send_graph( MPI_Comm jcomm )
         ErrorCode rval = pack_receivers_graph( packed_recv_array );
         if( MB_SUCCESS != rval ) return rval;
 
-        int size_pack_array = (int)packed_recv_array.size();
-        comm_graph          = new int[size_pack_array + 1];
-        comm_graph[0]       = size_pack_array;
-        for( int k = 0; k < size_pack_array; k++ )
-            comm_graph[k + 1] = packed_recv_array[k];
-        // will add 2 requests
-        /// use tag 10 to send size and tag 20 to send the packed array
-        sendReqs.resize( 1 );
-        // do not send the size in advance, because we use probe now
-        /*ierr = MPI_Isend(&comm_graph[0], 1, MPI_INT, receiver(0), 10, jcomm, &sendReqs[0]); // we
-        have to use global communicator if (ierr!=0) return MB_FAILURE;*/
-        ierr = MPI_Isend( &comm_graph[1], size_pack_array, MPI_INT, receiver( 0 ), 20, jcomm,
+        int size_pack_array = (int)packed_recv_array.size() + 1;
+        // the last integer
+        // will signal if we have to send zoltan buffer too, in a separate message 0 for no, 1 for yes
+        comm_graph = packed_recv_array;
+        comm_graph.resize(size_pack_array); // bigger by 1, to store the semaphore about zBuff
+        // will add 1 or 2 requests; first one with comm graph, second with zoltan buffer if needed
+        if ( zoltanBuffer.size() > 0 )
+        {
+            sendReqs.resize( 2 );
+            comm_graph[ size_pack_array - 1 ] = 1; // send zoltanBuffer too :)
+            zBuff = zoltanBuffer; // do a deep copy here, because the zoltanBuffer will go out of scope, and
+            // we need to keep the sent buffer, after the non-blocking sent is executed; thanks Karen Devine !
+        }
+        else
+        {
+            sendReqs.resize( 1 );
+            comm_graph[ size_pack_array - 1 ] = 0; // do not send zoltan buffer
+        }
+        // we have to use global communicator if (ierr!=0) return MB_FAILURE;*/
+        ierr = MPI_Isend( &comm_graph[0], size_pack_array, MPI_INT, receiver( 0 ), 20, jcomm,
                           &sendReqs[0] );  // we have to use global communicator
         if( ierr != 0 ) return MB_FAILURE;
+        if ( zBuff.size() > 0 )
+        {
+            ierr = MPI_Isend( &zBuff[0], (int)zBuff.size(), MPI_CHAR, receiver( 0 ), 30, jcomm,
+                                      &sendReqs[1] );  // we have to use global communicator
+            if( ierr != 0 ) return MB_FAILURE;
+        }
+
     }
     return MB_SUCCESS;
 }
@@ -311,7 +324,7 @@ ErrorCode ParCommGraph::send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Rang
 
     int indexReq = 0;
     int ierr;                             // MPI error
-    if( is_root_sender() ) indexReq = 1;  // for sendReqs
+    if( is_root_sender() ) indexReq = (int) sendReqs.size() ;  // we could have 1 or 2 MPI_Request's already
     sendReqs.resize( indexReq + split_ranges.size() );
     for( std::map< int, Range >::iterator it = split_ranges.begin(); it != split_ranges.end(); it++ )
     {
@@ -348,13 +361,13 @@ ErrorCode ParCommGraph::send_mesh_parts( MPI_Comm jcomm, ParallelComm* pco, Rang
                           &sendReqs[indexReq] );  // we have to use global communicator
         if( ierr != 0 ) return MB_FAILURE;
         indexReq++;
-        localSendBuffs.push_back( buffer );
+        localSendBuffs.push_back( buffer ); // these buffers will be cleared only after all MPI_Request's have been waited upon
     }
     return MB_SUCCESS;
 }
 
 // this is called on receiver side
-ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array )
+ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array, std::vector<char> & zoltanBuffer )
 {
     // first, receive from sender_rank 0, the communication graph (matrix), so each receiver
     // knows what data to expect
@@ -363,14 +376,6 @@ ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, s
     MPI_Status status;
     if( rootReceiver )
     {
-        /*
-         * MPI_Probe(
-        int source,
-        int tag,
-        MPI_Comm comm,
-        MPI_Status* status)
-         *
-         */
         ierr = MPI_Probe( sender( 0 ), 20, jcomm, &status );
         if( 0 != ierr )
         {
@@ -396,6 +401,29 @@ ErrorCode ParCommGraph::receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, s
             std::cout << " " << pack_array[k];
         std::cout << "\n";
 #endif
+        // the last int tells if we have another receive to do or not (for  zoltan buffer)
+        // look at the last value, to see if we receive zoltan buffer or not
+        int semaphore = pack_array[size_pack_array-1];
+        if ( 1 == semaphore )
+        {
+            // expect zoltanBuffer, the difference is the tag; we still need the joint comm
+            // the buffer was sent with a nonblocking send, from the root sender
+            ierr = MPI_Probe( sender( 0 ), 30, jcomm, &status ); // blocking call, to get size
+            if( 0 != ierr )
+            {
+                std::cout << " MPI_Probe failure: " << ierr << "\n";
+                return MB_FAILURE;
+            }
+            int incoming_msg_size;
+            MPI_Get_count(&status, MPI_CHAR, &incoming_msg_size);
+            zoltanBuffer.resize(incoming_msg_size);
+            ierr =  MPI_Recv(&zoltanBuffer[0], incoming_msg_size, MPI_CHAR, sender( 0 ), 30, jcomm, &status);
+            if( 0 != ierr )
+            {
+                std::cout << " MPI_Recv failure: " << ierr << "\n";
+                return MB_FAILURE;
+            }
+        }
     }
 
     // now broadcast this whole array to all receivers, so they know what to expect
@@ -528,29 +556,31 @@ ErrorCode ParCommGraph::receive_mesh( MPI_Comm jcomm,
 
     if( newEnts.empty() )
     {
-        std::cout << " WARNING: this task did not receive any entities \n";
+        std::cout << "task:" << rankInGroup2 << " in receiver did not receive any entities \n";
     }
-    // in order for the merging to work, we need to be sure that the adjacencies are updated
-    // (created)
-    Range local_verts        = newEnts.subset_by_type( MBVERTEX );
-    newEnts                  = subtract( newEnts, local_verts );
-    Core* mb                 = (Core*)pco->get_moab();
-    AEntityFactory* adj_fact = mb->a_entity_factory();
-    if( !adj_fact->vert_elem_adjacencies() )
-        adj_fact->create_vert_elem_adjacencies();
     else
     {
-        for( Range::iterator it = newEnts.begin(); it != newEnts.end(); it++ )
+        // in order for the merging to work, we need to be sure that the adjacencies are updated
+        // (created)
+        Range local_verts        = newEnts.subset_by_type( MBVERTEX );
+        newEnts                  = subtract( newEnts, local_verts );
+        Core* mb                 = (Core*)pco->get_moab();
+        AEntityFactory* adj_fact = mb->a_entity_factory();
+        if( !adj_fact->vert_elem_adjacencies() )
+            adj_fact->create_vert_elem_adjacencies();
+        else
         {
-            EntityHandle eh          = *it;
-            const EntityHandle* conn = NULL;
-            int num_nodes            = 0;
-            rval                     = mb->get_connectivity( eh, conn, num_nodes );
-            if( MB_SUCCESS != rval ) return rval;
-            adj_fact->notify_create_entity( eh, conn, num_nodes );
+            for( Range::iterator it = newEnts.begin(); it != newEnts.end(); it++ )
+            {
+                EntityHandle eh          = *it;
+                const EntityHandle* conn = NULL;
+                int num_nodes            = 0;
+                rval                     = mb->get_connectivity( eh, conn, num_nodes );
+                if( MB_SUCCESS != rval ) return rval;
+                adj_fact->notify_create_entity( eh, conn, num_nodes );
+            }
         }
     }
-
     return MB_SUCCESS;
 }
 
@@ -564,8 +594,9 @@ ErrorCode ParCommGraph::release_send_buffers()
 
     if( ierr != 0 ) return MB_FAILURE;
     // now we can free all buffers
-    delete[] comm_graph;
-    comm_graph = NULL;
+    comm_graph.clear();
+    zBuff.clear(); // this is for zoltan buffer, it will be used only when sending the
+                   // the RCB tree from component (sender) root to coupler (receiver) root
     std::vector< ParallelComm::Buffer* >::iterator vit;
     for( vit = localSendBuffs.begin(); vit != localSendBuffs.end(); ++vit )
         delete( *vit );
@@ -943,7 +974,6 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm,
             // rval = mb->tag_get_data(owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
         }
         // now, unpack the data and set the tags
-        sendReqs.resize( involved_IDs_map.size() );
         for( std::map< int, std::vector< int > >::iterator mit = involved_IDs_map.begin();
              mit != involved_IDs_map.end(); mit++ )
         {
@@ -1127,7 +1157,7 @@ void ParCommGraph::settle_comm_by_ids( int comp, TupleList& TLBackToComp, std::v
 }
 //#undef VERBOSE
 // new partition calculation
-ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int met )
+ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int met, std::vector<char> & zoltanBuffer )
 {
     // we are on a task on sender, and need to compute a new partition;
     // primary cells need to be distributed to nb receivers tasks
@@ -1240,13 +1270,14 @@ ErrorCode ParCommGraph::compute_partition( ParallelComm* pco, Range& owned, int 
         int numNewPartitions = (int)receiverTasks.size();
         Range primaryCells   = owned.subset_by_dimension( primaryDim );
         rval = mbZTool->partition_owned_cells( primaryCells, pco, extraGraphEdges, extraCellsProc, numNewPartitions,
-                                               distribution, met );MB_CHK_ERR( rval );
+                                               distribution, met, zoltanBuffer );MB_CHK_ERR( rval );
         for( std::map< int, Range >::iterator mit = distribution.begin(); mit != distribution.end(); mit++ )
         {
             int part_index = mit->first;
             assert( part_index < numNewPartitions );
             split_ranges[receiverTasks[part_index]] = mit->second;
         }
+
     }
     // delete now the partitioner
     delete mbZTool;
@@ -1498,7 +1529,7 @@ ErrorCode ParCommGraph::form_mesh_from_tuples( Interface* mb,
 
 // at this moment, each sender task has split_ranges formed;
 // we need to aggregate that info and send it to receiver
-ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm )
+ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm, std::vector<char> & zoltanBuffer )
 {
     // first, accumulate the info to root of sender; use gatherv
     // first, accumulate number of receivers from each sender, to the root receiver
@@ -1592,14 +1623,14 @@ ErrorCode ParCommGraph::send_graph_partition( ParallelComm* pco, MPI_Comm jcomm 
         dbfile.close();
 #endif
         // this is the same as trivial partition
-        ErrorCode rval = send_graph( jcomm );MB_CHK_ERR( rval );
+        ErrorCode rval = send_graph( jcomm, zoltanBuffer );MB_CHK_ERR( rval );
     }
 
     return MB_SUCCESS;
 }
 // method to expose local graph info: sender id, receiver id, sizes of elements to send, after or
 // before intersection
-ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
+ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send , int verbose)
 {
     //
     if( -1 != rankInGroup1 && 1 == is_send )  // it is a sender task
@@ -1617,6 +1648,15 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
                 int receiver_proc        = mit->first;
                 std::vector< int >& eids = mit->second;
                 dbfile << "receiver: " << receiver_proc << " size:" << eids.size() << "\n";
+                if (verbose >=1 )
+                {
+                    for (size_t i=0; i< eids.size(); i++)
+                    {
+                        dbfile << eids[i] << " " ;
+                        if (i%20 == 19) dbfile << "\n";
+                    }
+                    dbfile << "\n";
+                }
             }
         }
         else if( graph_type == INITIAL_MIGRATE )  // just after migration
@@ -1655,7 +1695,18 @@ ErrorCode ParCommGraph::dump_comm_information( std::string prefix, int is_send )
                 int sender_proc          = mit->first;
                 std::vector< int >& eids = mit->second;
                 dbfile << "sender: " << sender_proc << " size:" << eids.size() << "\n";
+                if (verbose >=1 )
+                {
+                    for (size_t i=0; i< eids.size(); i++)
+                    {
+                        dbfile << eids[i] << " " ;
+                        if (i%20 == 19) dbfile << "\n";
+                    }
+                    dbfile << "\n";
+                }
             }
+
+
         }
         else if( graph_type == INITIAL_MIGRATE )  // just after migration
         {
