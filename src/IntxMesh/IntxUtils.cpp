@@ -64,7 +64,7 @@ int IntxUtils::borderPointsOfXinY2( double* X, int nX, double* Y, int nY, double
             double* C = Y + 2 * j1;  // no copy of data
 
             double area2 = ( B[0] - A[0] ) * ( C[1] - A[1] ) - ( C[0] - A[0] ) * ( B[1] - A[1] );
-            if( area2 < -epsilon_area )
+            if( area2 < -epsilon_area * 200 )
             {
                 inside = 0;
                 break;

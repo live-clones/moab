@@ -1288,12 +1288,22 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         {
 #ifdef VERBOSE
             std::stringstream ffc, fft, ffo;
-            ffc << "cover_" << rank << ".h5m";
-            fft << "target_" << rank << ".h5m";
-            ffo << "intx_" << rank << ".h5m";
+            ffc << "cover_" << size << "_" << rank << ".h5m";
+            fft << "target_" << size << "_" << rank << ".h5m";
+            ffo << "intx_" << size << "_" << rank << ".h5m";
             rval = m_interface->write_mesh( ffc.str().c_str(), &m_covering_source_set, 1 );MB_CHK_ERR( rval );
             rval = m_interface->write_mesh( fft.str().c_str(), &m_target_set, 1 );MB_CHK_ERR( rval );
             rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+
+            // write the intx mesh, only in serial
+            std::ostringstream opts;
+            opts << "PARALLEL=WRITE_PART";
+            std::ostringstream file_name;
+            file_name << "intx_gl_" << size <<".h5m";
+            if (size == 1)
+            {
+                 rval = m_interface->write_file( file_name.str().c_str(), 0, opts.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+            }
 #endif
             // because we do not want to work with elements in coverage set that do not participate
             // in intersection, remove them from the coverage set we will not delete them yet, just
