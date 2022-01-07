@@ -99,11 +99,6 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle t
 
     area = 0.;
     nP   = 0;  // number of intersection points we are marking the boundary of src!
-    for( int j = 0; j < nsBlue; j++ )
-    {
-        rval = IntxUtils::gnomonic_projection( srcCoords[j], Rsrc, plane, srcCoords2D[2 * j], srcCoords2D[2 * j + 1] );MB_CHK_ERR( rval );
-    }
-
     if( check_boxes_first )
     {
         // look at the boxes formed with vertices; if they are far away, return false early
@@ -120,14 +115,15 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle t
         // if no overlap in 2d, get out
         if( !overlap3d && plane == planeb )  // CHECK 2D too
         {
+            for( int j = 0; j < nsBlue; j++ )
+            {
+                rval = IntxUtils::gnomonic_projection( srcCoords[j], Rsrc, plane, srcCoords2D[2 * j],
+                                                       srcCoords2D[2 * j + 1] );MB_CHK_ERR( rval );
+            }
             bool overlap2d = GeomUtil::bounding_boxes_overlap_2d( srcCoords2D, nsBlue, tgtCoords2D, nsTgt, box_error );
             if( !overlap2d ) return MB_SUCCESS;  // we are sure they are not overlapping in 2d , either
         }
     }
-
-    int src_id, tgt_id;
-    rval = mb->tag_get_data(gid, &src, 1, &src_id); MB_CHK_SET_ERR( rval, "can't get src id" );
-    rval = mb->tag_get_data(gid, &tgt, 1, &tgt_id); MB_CHK_SET_ERR( rval, "can't get tgt id" );
 #ifdef ENABLE_DEBUG
     if( dbg_1 )
     {
@@ -145,6 +141,11 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle t
         mb->list_entities( &src, 1 );
     }
 #endif
+
+    for( int j = 0; j < nsBlue; j++ )
+    {
+        rval = IntxUtils::gnomonic_projection( srcCoords[j], Rsrc, plane, srcCoords2D[2 * j], srcCoords2D[2 * j + 1] );MB_CHK_ERR( rval );
+    }
 
 #ifdef ENABLE_DEBUG
     if( dbg_1 )
@@ -226,8 +227,8 @@ ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle t
             double orientedArea = IntxUtils::area2D( &P[2 * k], &P[2 * k1], &P[2 * k2] );
             if( orientedArea < 0 )
             {
-                std::cout << " oriented area is negative: " << orientedArea << " k:" << k << " target, src:" << tgt_id
-                          << " " << src_id << " \n";
+                std::cout << " oriented area is negative: " << orientedArea << " k:" << k << " target, src:" << tgt
+                          << " " << src << " \n";
             }
         }
 #endif
@@ -254,9 +255,6 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
             std::cout << " \t" << iP[2 * n] << "\t" << iP[2 * n + 1] << "\n";
     }
 #endif
-    int sgid, tgid;
-    ErrorCode rval = mb->tag_get_data(gid, &src, 1, &sgid); MB_CHK_ERR( rval );
-    rval = mb->tag_get_data(gid, &tgt, 1, &tgid); MB_CHK_ERR( rval );
 
     IntxAreaUtils areaAdaptor;
     // get the edges for the target triangle; the extra points will be on those edges, saved as
@@ -265,7 +263,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
     // first get the list of edges adjacent to the target cell
     // use the neighTgtEdgeTag
     EntityHandle adjTgtEdges[MAXEDGES];
-    rval = mb->tag_get_data( neighTgtEdgeTag, &tgt, 1, &( adjTgtEdges[0] ) );MB_CHK_SET_ERR( rval, "can't get edge target tag" );
+    ErrorCode rval = mb->tag_get_data( neighTgtEdgeTag, &tgt, 1, &( adjTgtEdges[0] ) );MB_CHK_SET_ERR( rval, "can't get edge target tag" );
     // we know that we have only nsTgt edges here; [nsTgt, MAXEDGES) are ignored, but it is small
     // potatoes some of them will be handles to the initial vertices from source or target meshes
 
@@ -485,6 +483,9 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                     std::cout << " " << foundIds[i] << " edge en:" << lengthEdge << "\n";
                 }
                 std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
+                int sgid, tgid;
+                rval = mb->tag_get_data(gid, &src, 1, &sgid); MB_CHK_ERR( rval );
+                rval = mb->tag_get_data(gid, &tgt, 1, &tgid); MB_CHK_ERR( rval );
                 std::cout << "rank: " << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
                           << " target, src:" << tgid << " " << sgid << " \n";
             }
