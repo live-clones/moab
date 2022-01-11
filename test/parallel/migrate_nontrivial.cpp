@@ -253,10 +253,14 @@ int main( int argc, char* argv[] )
 
     int num_errors = 0;
 
-    num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+
     if( 3 == typeTest || 1 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str() );
     if( 3 == typeTest || 2 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str() );
-    num_errors += RUN_TEST_ARG2( migrate_to_empty_part, filename.c_str() );
+    if (2 != typeTest)
+    {
+        num_errors += RUN_TEST_ARG2( migrate_to_empty_part, filename.c_str() );
+        num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+    }
 
     if( rank == 0 )
     {
