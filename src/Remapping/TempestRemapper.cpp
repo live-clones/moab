@@ -1286,6 +1286,14 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 #ifdef MOAB_HAVE_MPI
         if( is_parallel || rrmgrids )
         {
+            // output intx mesh with name
+            std::stringstream fo;
+            fo << get_intx_name() <<"_0" << rank <<  ".h5m";
+            moab::Tag ptag;
+            rval = m_interface->tag_get_handle("PARALLEL_PARTITION", ptag); MB_CHK_ERR( rval );
+            rval = m_interface->tag_set_data(ptag, &m_overlap_set, 1, &rank); MB_CHK_ERR( rval );
+            rval = m_interface->write_mesh( fo.str().c_str(), &m_overlap_set, 1 ); MB_CHK_ERR( rval );
+            //
 #ifdef VERBOSE
             std::stringstream ffc, fft, ffo;
             ffc << "cover_" << size << "_" << rank << ".h5m";

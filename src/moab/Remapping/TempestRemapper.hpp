@@ -260,6 +260,10 @@ class TempestRemapper : public Remapper
     ///	</summary>
     ErrorCode GetIMasks( Remapper::IntersectionContext ctx, std::vector< int >& masks );
 
+    // used in debugging
+    std::string  get_intx_name() { return intx_name;}
+    void  set_intx_name(std::string in) { intx_name = in;}
+
   public:               // public members
     bool meshValidate;  // Validate the mesh after loading from file
 
@@ -331,6 +335,7 @@ class TempestRemapper : public Remapper
     bool rrmgrids;
     bool is_parallel, is_root;
     int rank, size;
+    std::string intx_name;
 };
 
 // Inline functions

@@ -4151,6 +4151,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     tdata.remapper->meshValidate     = true;
     tdata.remapper->constructEdgeMap = true;
 
+    tdata.remapper -> set_intx_name(data_intx.name);
     // Do not create new filesets; Use the sets from our respective applications
     tdata.remapper->initialize( false );
     tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )  = data_src.file_set;
