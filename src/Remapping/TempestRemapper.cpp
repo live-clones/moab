@@ -1286,15 +1286,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 #ifdef MOAB_HAVE_MPI
         if( is_parallel || rrmgrids )
         {
-            // output intx mesh with name
-            std::stringstream fo;
-            fo << get_intx_name() <<"_0" << rank <<  ".h5m";
-            moab::Tag ptag;
-            rval = m_interface->tag_get_handle("PARALLEL_PARTITION", ptag); MB_CHK_ERR( rval );
-            rval = m_interface->tag_set_data(ptag, &m_overlap_set, 1, &rank); MB_CHK_ERR( rval );
-            rval = m_interface->write_mesh( fo.str().c_str(), &m_overlap_set, 1 ); MB_CHK_ERR( rval );
-            //
-#ifdef VERBOSE
+//#ifdef VERBOSE
+        if (rank == 1000 || rank == 1003 ) {
             std::stringstream ffc, fft, ffo;
             ffc << "cover_" << size << "_" << rank << ".h5m";
             fft << "target_" << size << "_" << rank << ".h5m";
@@ -1312,7 +1305,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
             {
                  rval = m_interface->write_file( file_name.str().c_str(), 0, opts.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
             }
-#endif
+        }
+//#endif
             // because we do not want to work with elements in coverage set that do not participate
             // in intersection, remove them from the coverage set we will not delete them yet, just
             // remove from the set !
@@ -1374,6 +1368,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     // used
 
                     rval = augment_overlap_set();MB_CHK_ERR( rval );
+                    if (rank == 1000 || rank == 1003 ) {
+                        std::stringstream  ffo;
+                        ffo << "intx_aug_" << size << "_" << rank << ".h5m";
+                        rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+                    }
                 }
             }
 
@@ -1434,7 +1433,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
     Range boundaryCells;  // these will be filtered from target_set
     rval = m_interface->get_adjacencies( boundaryEdges, 2, false, boundaryCells, Interface::UNION );MB_CHK_ERR( rval );
     boundaryCells = intersect( boundaryCells, targetCells );
-#ifdef VERBOSE
+//#ifdef VERBOSE
+if (1000 == rank || 1003 == rank) {
     EntityHandle tmpSet;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet );MB_CHK_SET_ERR( rval, "Can't create temporary set" );
     // add the boundary set and edges, and save it to a file
@@ -1443,7 +1443,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
     std::stringstream ffs;
     ffs << "boundaryCells_0" << rank << ".h5m";
     rval = m_interface->write_mesh( ffs.str().c_str(), &tmpSet, 1 );MB_CHK_ERR( rval );
-#endif
+}
+//#endif
 
     // now that we have the boundary cells, see which overlap polys have have these as parents;
     //   find the ids of the boundary cells;
@@ -1556,11 +1557,12 @@ ErrorCode TempestRemapper::augment_overlap_set()
     else
         globalMaxEdges = maxEdges;
 
-#ifdef VERBOSE
+//#ifdef VERBOSE
     if( is_root ) std::cout << "maximum number of edges for polygons to send is " << globalMaxEdges << "\n";
-#endif
+//#endif
 
-#ifdef VERBOSE
+//#ifdef VERBOSE
+if (1000 == rank || 1003 == rank) {
     EntityHandle tmpSet2;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet2 );MB_CHK_SET_ERR( rval, "Can't create temporary set2" );
     // add the affected source and overlap elements
@@ -1578,7 +1580,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
     // these will contain coverage cells and intx cells on the boundary
     ffs2 << "affectedCells_" << m_pcomm->rank() << ".h5m";
     rval = m_interface->write_mesh( ffs2.str().c_str(), &tmpSet2, 1 );MB_CHK_ERR( rval );
-#endif
+}
+//#endif
     // form tuple lists to send vertices and cells;
     // the problem is that the lists of vertices will need to have other information, like the
     // processor it comes from, and its index in that list; we may have to duplicate vertices, but
@@ -1994,7 +1997,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
         rval = m_interface->tag_set_data( ghostTag, &polyNew, 1, &orgProc );MB_CHK_ERR( rval );
     }
 
-#ifdef VERBOSE
+//#ifdef VERBOSE
+if (1000 == rank || 1003 == rank) {
     EntityHandle tmpSet3;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet3 );MB_CHK_SET_ERR( rval, "Can't create temporary set3" );
     // add the boundary set and edges, and save it to a file
@@ -2003,7 +2007,8 @@ ErrorCode TempestRemapper::augment_overlap_set()
     std::stringstream ffs4;
     ffs4 << "extraIntxCells" << rank << ".h5m";
     rval = m_interface->write_mesh( ffs4.str().c_str(), &tmpSet3, 1 );MB_CHK_ERR( rval );
-#endif
+}
+//#endif
 
     // add the new polygons to the overlap set
     // these will be ghosted, so will participate in conservation only
