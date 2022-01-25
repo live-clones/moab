@@ -1287,7 +1287,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         if( is_parallel || rrmgrids )
         {
 //#ifdef VERBOSE
-        if (rank == 1000 || rank == 1003 ) {
+        if (rank > 997 &&  rank < 1005 ) {
             std::stringstream ffc, fft, ffo;
             ffc << "cover_" << size << "_" << rank << ".h5m";
             fft << "target_" << size << "_" << rank << ".h5m";
@@ -1368,7 +1368,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     // used
 
                     rval = augment_overlap_set();MB_CHK_ERR( rval );
-                    if (rank == 1000 || rank == 1003 ) {
+                    if (rank > 997 &&  rank < 1005 )  {
                         std::stringstream  ffo;
                         ffo << "intx_aug_" << size << "_" << rank << ".h5m";
                         rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
@@ -1434,7 +1434,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     rval = m_interface->get_adjacencies( boundaryEdges, 2, false, boundaryCells, Interface::UNION );MB_CHK_ERR( rval );
     boundaryCells = intersect( boundaryCells, targetCells );
 //#ifdef VERBOSE
-if (1000 == rank || 1003 == rank) {
+if (rank > 997 &&  rank < 1005 )  {
     EntityHandle tmpSet;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet );MB_CHK_SET_ERR( rval, "Can't create temporary set" );
     // add the boundary set and edges, and save it to a file
@@ -1562,7 +1562,7 @@ if (1000 == rank || 1003 == rank) {
 //#endif
 
 //#ifdef VERBOSE
-if (1000 == rank || 1003 == rank) {
+if (rank > 997 &&  rank < 1005 )  {
     EntityHandle tmpSet2;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet2 );MB_CHK_SET_ERR( rval, "Can't create temporary set2" );
     // add the affected source and overlap elements
@@ -1998,7 +1998,7 @@ if (1000 == rank || 1003 == rank) {
     }
 
 //#ifdef VERBOSE
-if (1000 == rank || 1003 == rank) {
+if (rank > 997 &&  rank < 1005 )  {
     EntityHandle tmpSet3;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet3 );MB_CHK_SET_ERR( rval, "Can't create temporary set3" );
     // add the boundary set and edges, and save it to a file
