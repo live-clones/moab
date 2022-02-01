@@ -127,6 +127,7 @@ void test_sub_entity_nodes_hex_faces()
 {
     test_sub_entity_nodes( MBHEX, 2 );
 }
+void prism_issue();
 
 int main()
 {
@@ -192,6 +193,7 @@ int main()
 
     result += RUN_TEST( test_ho_node_parent );
     result += RUN_TEST( test_ho_node_index );
+    result += RUN_TEST( prism_issue );
     return result;
 }
 
@@ -397,7 +399,10 @@ void test_1d_sub_entity_indices( EntityType type, int num_edges, const int ( *ed
         int indices[3] = { 0, 0, -99 };
         // check correct results
         CN::SubEntityVertexIndices( type, 1, i, indices );
-        if( edge_indices[i][0] == indices[0] ) { CHECK_EQUAL( edge_indices[i][1], indices[1] ); }
+        if( edge_indices[i][0] == indices[0] )
+        {
+            CHECK_EQUAL( edge_indices[i][1], indices[1] );
+        }
         else
         {
             CHECK_EQUAL( edge_indices[i][0], indices[1] );
@@ -500,8 +505,7 @@ void test_sub_entity_indices_pyr()
     const int num_vtx     = 5;
     const int edges[][2]  = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 } };
     const int faces[][5]  = {
-        { 3, 0, 1, 4, 0 }, { 3, 1, 2, 4, 0 }, { 3, 2, 3, 4, 0 }, { 3, 3, 0, 4, 0 }, { 4, 3, 2, 1, 0 }
-    };
+        { 3, 0, 1, 4, 0 }, { 3, 1, 2, 4, 0 }, { 3, 2, 3, 4, 0 }, { 3, 3, 0, 4, 0 }, { 4, 3, 2, 1, 0 } };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[0] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[0] ), faces );
@@ -514,8 +518,7 @@ void test_sub_entity_indices_pri()
     const int num_vtx     = 6;
     const int edges[][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 4 }, { 2, 5 }, { 3, 4 }, { 4, 5 }, { 5, 3 } };
     const int faces[][5] = {
-        { 4, 0, 1, 4, 3 }, { 4, 1, 2, 5, 4 }, { 4, 2, 0, 3, 5 }, { 3, 2, 1, 0, 0 }, { 3, 3, 4, 5, 0 }
-    };
+        { 4, 0, 1, 4, 3 }, { 4, 1, 2, 5, 4 }, { 4, 2, 0, 3, 5 }, { 3, 2, 1, 0, 0 }, { 3, 3, 4, 5, 0 } };
     test_0d_sub_entity_indices( type, num_vtx );
     test_1d_sub_entity_indices( type, sizeof( edges ) / sizeof( edges[0] ), edges );
     test_2d_sub_entity_indices( type, sizeof( faces ) / sizeof( faces[0] ), faces );
@@ -1144,5 +1147,73 @@ void test_sub_entity_nodes( EntityType parent, int num_nodes, int sub_dimension 
 
         // make sure there were no extra node indices returned
         CHECK_EQUAL( idx, num );
+    }
+}
+
+#include "moab/Core.hpp"
+void prism_issue()
+{
+    moab::Core mb;
+
+    std::vector< moab::EntityHandle > conn;
+    double coords[3];
+    for( int i = 0; i < 15; ++i )
+    {
+        moab::EntityHandle h;
+        mb.create_vertex( coords, h );
+        conn.push_back( h );
+    }
+
+    moab::EntityHandle w;
+    mb.create_element( moab::MBPRISM, conn.data(), 15, w );
+
+    // this leads to the failure
+    {
+        std::vector< moab::EntityHandle > adj;
+        mb.get_adjacencies( &w, 1, 2, true, adj );
+    }
+    std::vector< moab::EntityHandle > edges;
+    std::vector< moab::EntityHandle > faces;
+    mb.get_entities_by_dimension( 0, 1, edges );
+    for( const auto& e : edges )
+    {
+        std::vector< moab::EntityHandle > conn;
+        std::cout << "edge " << e << " connectivity: ";
+
+        mb.get_connectivity( &e, 1, conn );
+        for( const auto& n : conn )
+            std::cout << n << " ";
+        std::cout << "\n";
+    }
+    mb.get_entities_by_dimension( 0, 2, faces );
+    for( const auto& f : faces )
+    {
+        std::vector< moab::EntityHandle > conn;
+        std::cout << "face " << f << " connectivity: ";
+
+        mb.get_connectivity( &f, 1, conn );
+        for( const auto& n : conn )
+            std::cout << n << " ";
+        std::cout << "\n";
+    }
+    std::vector< moab::EntityHandle > nodes;
+    mb.get_entities_by_dimension( 0, 0, nodes );
+    for( const auto& n : nodes )
+    {
+        std::vector< moab::EntityHandle > adj;
+        std::cout << "node " << n << " connection: ";
+        adj.clear();
+        mb.get_adjacencies( &n, 1, 1, true, adj );
+        std::cout << adj.size() << " edges,";
+        // there are either 1 or 3 adjacent edges to each vertex (1 for mid edge vertex)
+        CHECK( 1 == adj.size() || 3 == adj.size() );
+        adj.clear();
+        mb.get_adjacencies( &n, 1, 2, true, adj );
+        std::cout << adj.size() << " faces,";
+        // there are either 2 or 3 adjacent faces to each vertex ( 2 for mid edge evertex)
+        CHECK( 2 == adj.size() || 3 == adj.size() );
+        adj.clear();
+        mb.get_adjacencies( &n, 1, 3, true, adj );
+        std::cout << adj.size() << " volumes\n";
     }
 }
