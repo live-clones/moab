@@ -354,7 +354,7 @@ int main( int argc, char* argv[] )
             {
                 int row = it.row();
                 int col = it.col();
-                std::cout << " counter:" << counter << "\t col: " << col << "\t row: "<< row  << "\t diff: " <<  val;
+                std::cout << " counter:" << counter << "\t col: " << col + 1 << "\t row: "<< row + 1  << "\t diff: " <<  val;
                 std::cout <<  "\t map1: " <<weight1.coeffRef(row, col) <<  "\t map2: " <<weight2.coeffRef(row, col) << "\n" ;   // row index
                 counter ++ ;
             }
