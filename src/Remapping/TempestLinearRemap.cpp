@@ -210,7 +210,13 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         // if ( is_root ) Announce ( "Element %i / %i :: [%i, %i]", ixFirst,
         // m_meshInputCov->faces.size(), ixOverlapBegin, ixOverlapEnd );
 
-        if( nOverlapFaces == 0 ) continue;
+        if( nOverlapFaces == 0 )
+        {
+            if (rank > 997 &&  rank < 1005 )  {
+               std::cout <<"rank:" <<  rank <<  m_remapper->GetGlobalID( Remapper::CoveringMesh, ixFirst) << "\n";
+            }
+            continue;
+        }
 
         // Build integration array
         DataArray2D< double > dIntArray;

@@ -1394,7 +1394,11 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         rval = this->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
         rval = this->convert_overlap_mesh_sorted_by_source();MB_CHK_ERR( rval );
-
+        if (rank > 997 &&  rank < 1005 )  {
+            std::stringstream  ffo;
+            ffo << "intx_aug_sort_" << size << "_" << rank << ".h5m";
+            rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+        }
         // free the memory
         delete mbintx;
     }
