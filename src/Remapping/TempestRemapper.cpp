@@ -585,22 +585,22 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     // Allocate for the overlap mesh
     if( !m_overlap ) m_overlap = new Mesh();
 
-    size_t n_overlap_entitites = m_overlap_entities.size();
+    size_t n_overlap_entities = m_overlap_entities.size();
 
-    std::vector< std::pair< int, int > > sorted_overlap_order( n_overlap_entitites );
+    std::vector< std::pair< int, int > > sorted_overlap_order( n_overlap_entities );
     {
         Tag srcParentTag, tgtParentTag;
         rval = m_interface->tag_get_handle( "SourceParent", srcParentTag );MB_CHK_ERR( rval );
         rval = m_interface->tag_get_handle( "TargetParent", tgtParentTag );MB_CHK_ERR( rval );
         // Overlap mesh: resize the source and target connection arrays
-        m_overlap->vecTargetFaceIx.resize( n_overlap_entitites );
-        m_overlap->vecSourceFaceIx.resize( n_overlap_entitites );
+        m_overlap->vecTargetFaceIx.resize( n_overlap_entities );
+        m_overlap->vecSourceFaceIx.resize( n_overlap_entities );
 
         // Overlap mesh: resize the source and target connection arrays
-        std::vector< int > rbids_src( n_overlap_entitites ), rbids_tgt( n_overlap_entitites );
+        std::vector< int > rbids_src( n_overlap_entities ), rbids_tgt( n_overlap_entities );
         rval = m_interface->tag_get_data( srcParentTag, m_overlap_entities, &rbids_src[0] );MB_CHK_ERR( rval );
         rval = m_interface->tag_get_data( tgtParentTag, m_overlap_entities, &rbids_tgt[0] );MB_CHK_ERR( rval );
-        for( size_t ix = 0; ix < n_overlap_entitites; ++ix )
+        for( size_t ix = 0; ix < n_overlap_entities; ++ix )
         {
             sorted_overlap_order[ix].first =
                 ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] );
@@ -614,11 +614,11 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         if( is_parallel && size > 1 )
         {
             Tag ghostTag;
-            ghFlags.resize( n_overlap_entitites );
+            ghFlags.resize( n_overlap_entities );
             rval = m_interface->tag_get_handle( "ORIG_PROC", ghostTag );MB_CHK_ERR( rval );
             rval = m_interface->tag_get_data( ghostTag, m_overlap_entities, &ghFlags[0] );MB_CHK_ERR( rval );
         }
-        for( unsigned ie = 0; ie < n_overlap_entitites; ++ie )
+        for( unsigned ie = 0; ie < n_overlap_entities; ++ie )
         {
             int ix = sorted_overlap_order[ie].second;  // original index of the element
             m_overlap->vecSourceFaceIx[ie] =
@@ -632,7 +632,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     }
 
     FaceVector& faces = m_overlap->faces;
-    faces.resize( n_overlap_entitites );
+    faces.resize( n_overlap_entities );
 
     Range verts;
     // let us now get the vertices from all the elements
@@ -691,6 +691,11 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
 
     m_overlap->RemoveZeroEdges();
     m_overlap->RemoveCoincidentNodes( false );
+    if (n_overlap_entities != m_overlap->faces.size() )
+    {
+        std::cout <<" rank: "<<rank<<" n_overlap_entities: " << n_overlap_entities << "  m_overlap->faces.size() " << m_overlap->faces.size()
+          << " nnodes: " << nnodes << " m_overlap->nodes.size()" << m_overlap->nodes.size() <<"\n";
+    }
 
     // Generate reverse node array and edge map
     // if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
