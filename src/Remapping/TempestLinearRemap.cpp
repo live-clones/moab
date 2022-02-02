@@ -212,8 +212,8 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
 
         if( nOverlapFaces == 0 )
         {
-            if (rank > 997 &&  rank < 1005 )  {
-               std::cout <<"rank:" <<  rank <<  m_remapper->GetGlobalID( Remapper::CoveringMesh, ixFirst) << "\n";
+            {
+               std::cout <<"rank:" <<  rank << " " <<  m_remapper->GetGlobalID( Remapper::CoveringMesh, ixFirst) << "\n";
             }
             continue;
         }
