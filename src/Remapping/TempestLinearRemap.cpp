@@ -181,6 +181,19 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         dbgprint.printf( 0, "Fit weights exponent: %i\n", nFitWeightsExponent );
     }
 
+    if ( 1002 == rank)
+    {
+        int num_ov = m_meshOverlap->faces.size();
+        std::cout << " rank: " << rank << " ov faces:" << num_ov << "\n";
+        // dump some data
+        for (int jj=0; jj<num_ov; jj++)
+        {
+          std::cout << " index:" << jj <<" fix:" << m_meshOverlap->vecSourceFaceIx[jj]<<
+                  " :" << m_meshOverlap->vecTargetFaceIx[jj] << "\n";
+        }
+
+
+    }
     // Current overlap face
     int ixOverlap                  = 0;
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;

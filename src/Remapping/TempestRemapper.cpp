@@ -696,6 +696,18 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         std::cout <<" rank: "<<rank<<" n_overlap_entities: " << n_overlap_entities << "  m_overlap->faces.size() " << m_overlap->faces.size()
           << " nnodes: " << nnodes << " m_overlap->nodes.size()" << m_overlap->nodes.size() <<"\n";
     }
+    if (1002 == rank) {
+        for (auto it = gid_to_lid_covsrc.begin(); it != gid_to_lid_covsrc.end();
+                it++) {
+            std::cout << "gid_to_lid_covsrc[" << it->first << "]=" << it->second
+                    << "\n";
+        }
+        for (auto it = gid_to_lid_tgt.begin(); it != gid_to_lid_tgt.end();
+                it++) {
+            std::cout << "gid_to_lid_tgt[" << it->first << "]=" << it->second
+                    << "\n";
+        }
+    }
 
     // Generate reverse node array and edge map
     // if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
