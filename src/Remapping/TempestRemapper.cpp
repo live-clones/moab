@@ -606,10 +606,27 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
                 ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] );
             sorted_overlap_order[ix].second = ix;
         }
+        if (1002 == rank)
+        {
+            std::cout << " rank " << rank <<" rbids_src, rbids_tgt, first, second \n";
+            for (size_t jj=0; jj<n_overlap_entities; jj++)
+            {
+               std::cout <<  rbids_src[jj] <<" " << rbids_tgt[jj] << " " << sorted_overlap_order[jj].first
+                       << " " << sorted_overlap_order[jj].second << "\n";
+            }
+        }
         std::sort( sorted_overlap_order.begin(), sorted_overlap_order.end(), IntPairComparator );
         // sorted_overlap_order[ie].second , ie=0,nOverlap-1 is the order such that overlap elems
         // are ordered by source parent
-
+        if (1002 == rank)
+        {
+            std::cout << " rank " << rank <<" after sort: first, second \n";
+            for (size_t jj=0; jj<n_overlap_entities; jj++)
+            {
+               std::cout << sorted_overlap_order[jj].first
+                       << " " << sorted_overlap_order[jj].second << "\n";
+            }
+        }
         std::vector< int > ghFlags;
         if( is_parallel && size > 1 )
         {
@@ -630,7 +647,15 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
                     ( gid_to_lid_tgt.size() ? gid_to_lid_tgt[rbids_tgt[ix]] : rbids_tgt[ix] - 1 );
         }
     }
-
+    if (1002 == rank)
+    {
+        std::cout << " rank " << rank <<" m_overlap vecSourceFaceIx and  vecTargetFaceIx \n";
+        for (size_t jj=0; jj<n_overlap_entities; jj++)
+        {
+           std::cout << m_overlap->vecSourceFaceIx[jj]
+                   << " " <<m_overlap->vecTargetFaceIx[jj]<< "\n";
+        }
+    }
     FaceVector& faces = m_overlap->faces;
     faces.resize( n_overlap_entities );
 
