@@ -1248,10 +1248,6 @@ void test_wedges()
         mb.get_adjacencies(&w, 1, 2, true, adj);
         CHECK( 5 == adj.size());
     }
-    moab::EntityHandle sset;
-    mb.create_meshset(MESHSET_SET, sset);
-    mb.add_entities(sset,&wedges[0], wedges.size() );
-    mb.write_mesh("small.vtk", &sset, 1 );
     // <
 
     for (const auto &w : wedges) {
