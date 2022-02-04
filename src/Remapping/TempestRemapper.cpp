@@ -647,15 +647,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
                     ( gid_to_lid_tgt.size() ? gid_to_lid_tgt[rbids_tgt[ix]] : rbids_tgt[ix] - 1 );
         }
     }
-    if (1002 == rank)
-    {
-        std::cout << " rank " << rank <<" m_overlap vecSourceFaceIx and  vecTargetFaceIx \n";
-        for (size_t jj=0; jj<n_overlap_entities; jj++)
-        {
-           std::cout << m_overlap->vecSourceFaceIx[jj]
-                   << " " <<m_overlap->vecTargetFaceIx[jj]<< "\n";
-        }
-    }
+
     FaceVector& faces = m_overlap->faces;
     faces.resize( n_overlap_entities );
 
@@ -722,6 +714,10 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
           << " nnodes: " << nnodes << " m_overlap->nodes.size()" << m_overlap->nodes.size() <<"\n";
     }
     if (1002 == rank) {
+        std::cout << " m_source=" << m_source << "\n";
+        std::cout << " m_covering_source=" << m_covering_source << "\n";
+        std::cout << " m_target=" << m_target << "\n";
+        std::cout << " m_overlap=" << m_overlap << "\n";
         for (auto it = gid_to_lid_covsrc.begin(); it != gid_to_lid_covsrc.end();
                 it++) {
             std::cout << "gid_to_lid_covsrc[" << it->first << "]=" << it->second
@@ -731,6 +727,16 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
                 it++) {
             std::cout << "gid_to_lid_tgt[" << it->first << "]=" << it->second
                     << "\n";
+        }
+    }
+    if (1002 == rank)
+    {
+        std::cout << " rank " << rank <<" m_overlap vecSourceFaceIx and  vecTargetFaceIx \n";
+        for (size_t jj=0; jj<n_overlap_entities; jj++)
+        {
+            std::cout << "index:" << jj << " s: " << m_overlap->vecSourceFaceIx[jj]
+                << " t: " <<m_overlap->vecTargetFaceIx[jj]<< "\n";
+
         }
     }
 

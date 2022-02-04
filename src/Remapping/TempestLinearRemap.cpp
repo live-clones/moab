@@ -185,11 +185,16 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     {
         int num_ov = m_meshOverlap->faces.size();
         std::cout << " rank: " << rank << " ov faces:" << num_ov << "\n";
+        std::cout << " m_meshInput=" << m_meshInput << "\n";
+        std::cout << " m_meshInputCov=" << m_meshInputCov << "\n";
+        std::cout << " m_meshOutput=" << m_meshOutput << "\n";
+        std::cout << " m_meshOverlap=" << m_meshOverlap << "\n";
+
         // dump some data
         for (int jj=0; jj<num_ov; jj++)
         {
-          std::cout << " index:" << jj <<" fix:" << m_meshOverlap->vecSourceFaceIx[jj]<<
-                  " :" << m_meshOverlap->vecTargetFaceIx[jj] << "\n";
+            std::cout << " index:" << jj <<" vecSourceFaceIx " << m_meshOverlap->vecSourceFaceIx[jj]<<
+                 " vecTargetFaceIx: " << m_meshOverlap->vecTargetFaceIx[jj] << "\n";
         }
 
 
