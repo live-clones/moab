@@ -128,6 +128,7 @@ void test_sub_entity_nodes_hex_faces()
     test_sub_entity_nodes( MBHEX, 2 );
 }
 void prism_issue();
+void test_wedges();
 
 int main()
 {
@@ -194,6 +195,7 @@ int main()
     result += RUN_TEST( test_ho_node_parent );
     result += RUN_TEST( test_ho_node_index );
     result += RUN_TEST( prism_issue );
+    result += RUN_TEST( test_wedges );
     return result;
 }
 
@@ -1216,4 +1218,79 @@ void prism_issue()
         mb.get_adjacencies( &n, 1, 3, true, adj );
         std::cout << adj.size() << " volumes\n";
     }
+}
+
+void test_wedges()
+{
+    moab::Core mb;
+
+    //mb.load_file("./wed15_2.h5m");
+    std::vector< moab::EntityHandle > conn;
+    double coords[3];
+    for( int i = 0; i < 22; ++i )
+    {
+        moab::EntityHandle h;
+        mb.create_vertex( coords, h );
+    }
+    moab::EntityHandle conn1[15] = { 10, 20, 14, 1, 8, 5, 21, 19, 15, 16, 22, 18, 9, 7, 6};
+    moab::EntityHandle conn2[15] = { 10, 14, 12, 1, 5, 3, 15, 13, 11, 16, 18, 17, 6, 4, 2};
+
+    moab::EntityHandle w;
+    mb.create_element( moab::MBPRISM, conn1, 15, w );
+    mb.create_element( moab::MBPRISM, conn2, 15, w );
+
+    std::vector<moab::EntityHandle> wedges;
+    mb.get_entities_by_dimension(0, 3, wedges);
+
+    // > If I comment this block there is no problem
+    for (const auto &w : wedges) {
+        std::vector<moab::EntityHandle> adj;
+        mb.get_adjacencies(&w, 1, 2, true, adj);
+        CHECK( 5 == adj.size());
+    }
+    moab::EntityHandle sset;
+    mb.create_meshset(MESHSET_SET, sset);
+    mb.add_entities(sset,&wedges[0], wedges.size() );
+    mb.write_mesh("small.vtk", &sset, 1 );
+    // <
+
+    for (const auto &w : wedges) {
+        std::vector<moab::EntityHandle> conn;
+        mb.get_connectivity(&w, 1, conn);
+        CHECK( 15 == conn.size());
+        for (const auto &n : conn) {
+            std::vector<moab::EntityHandle> edges;
+            mb.get_adjacencies(&n, 1, 1, true, edges);
+            if (edges.size() == 0)
+            {
+                std::cout << " node " << n << " not connected to edges \n";
+                std::vector<moab::EntityHandle> faces;
+                mb.get_adjacencies(&n, 1, 2, false, faces);
+                for (const auto &f : faces)
+                {
+                    std::vector<moab::EntityHandle> connf;
+                    mb.get_connectivity(&f, 1, connf);
+                    std::cout << "face:" << mb.id_from_handle(f);
+                    for (const auto &n1 : connf)
+                        std::cout <<" " << n1 ;
+                    std::cout <<"\n";
+
+                }
+                std::vector<moab::EntityHandle> prisms;
+                mb.get_adjacencies(&n, 1, 3, false, prisms);
+                for (const auto &p : prisms)
+                {
+                    std::vector<moab::EntityHandle> connf;
+                    mb.get_connectivity(&p, 1, connf);
+                    std::cout << "prism:" << mb.id_from_handle(p);
+                    for (const auto &n1 : connf)
+                        std::cout <<" " << n1 ;
+                    std::cout <<"\n";
+
+                }
+                CHECK(edges.size() != 0);
+            }
+        }
+    }
+
 }
