@@ -606,27 +606,10 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
                 ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] );
             sorted_overlap_order[ix].second = ix;
         }
-        if (1002 == rank)
-        {
-            std::cout << " rank " << rank <<" rbids_src, rbids_tgt, first, second \n";
-            for (size_t jj=0; jj<n_overlap_entities; jj++)
-            {
-               std::cout <<  rbids_src[jj] <<" " << rbids_tgt[jj] << " " << sorted_overlap_order[jj].first
-                       << " " << sorted_overlap_order[jj].second << "\n";
-            }
-        }
         std::sort( sorted_overlap_order.begin(), sorted_overlap_order.end(), IntPairComparator );
         // sorted_overlap_order[ie].second , ie=0,nOverlap-1 is the order such that overlap elems
         // are ordered by source parent
-        if (1002 == rank)
-        {
-            std::cout << " rank " << rank <<" after sort: first, second \n";
-            for (size_t jj=0; jj<n_overlap_entities; jj++)
-            {
-               std::cout << sorted_overlap_order[jj].first
-                       << " " << sorted_overlap_order[jj].second << "\n";
-            }
-        }
+
         std::vector< int > ghFlags;
         if( is_parallel && size > 1 )
         {
@@ -708,37 +691,6 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
 
     m_overlap->RemoveZeroEdges();
     m_overlap->RemoveCoincidentNodes( false );
-    if (n_overlap_entities != m_overlap->faces.size() )
-    {
-        std::cout <<" rank: "<<rank<<" n_overlap_entities: " << n_overlap_entities << "  m_overlap->faces.size() " << m_overlap->faces.size()
-          << " nnodes: " << nnodes << " m_overlap->nodes.size()" << m_overlap->nodes.size() <<"\n";
-    }
-    if (1002 == rank) {
-        std::cout << " m_source=" << m_source << "\n";
-        std::cout << " m_covering_source=" << m_covering_source << "\n";
-        std::cout << " m_target=" << m_target << "\n";
-        std::cout << " m_overlap=" << m_overlap << "\n";
-        for (auto it = gid_to_lid_covsrc.begin(); it != gid_to_lid_covsrc.end();
-                it++) {
-            std::cout << "gid_to_lid_covsrc[" << it->first << "]=" << it->second
-                    << "\n";
-        }
-        for (auto it = gid_to_lid_tgt.begin(); it != gid_to_lid_tgt.end();
-                it++) {
-            std::cout << "gid_to_lid_tgt[" << it->first << "]=" << it->second
-                    << "\n";
-        }
-    }
-    if (1002 == rank)
-    {
-        std::cout << " rank " << rank <<" m_overlap vecSourceFaceIx and  vecTargetFaceIx \n";
-        for (size_t jj=0; jj<n_overlap_entities; jj++)
-        {
-            std::cout << "index:" << jj << " s: " << m_overlap->vecSourceFaceIx[jj]
-                << " t: " <<m_overlap->vecTargetFaceIx[jj]<< "\n";
-
-        }
-    }
 
     // Generate reverse node array and edge map
     // if ( constructEdgeMap ) m_overlap->ConstructEdgeMap(false);
@@ -1334,8 +1286,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
 #ifdef MOAB_HAVE_MPI
         if( is_parallel || rrmgrids )
         {
-//#ifdef VERBOSE
-        if (rank > 997 &&  rank < 1005 ) {
+#ifdef VERBOSE
+
             std::stringstream ffc, fft, ffo;
             ffc << "cover_" << size << "_" << rank << ".h5m";
             fft << "target_" << size << "_" << rank << ".h5m";
@@ -1353,8 +1305,8 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
             {
                  rval = m_interface->write_file( file_name.str().c_str(), 0, opts.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
             }
-        }
-//#endif
+
+#endif
             // because we do not want to work with elements in coverage set that do not participate
             // in intersection, remove them from the coverage set we will not delete them yet, just
             // remove from the set !
