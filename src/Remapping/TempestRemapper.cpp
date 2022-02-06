@@ -1300,10 +1300,10 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
             std::ostringstream opts;
             opts << "PARALLEL=WRITE_PART";
             std::ostringstream file_name;
-            file_name << "intx_gl_" << size <<".h5m";
-            if (size == 1)
+            file_name << "intx_gl_" << size << ".h5m";
+            if( size == 1 )
             {
-                 rval = m_interface->write_file( file_name.str().c_str(), 0, opts.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+                rval = m_interface->write_file( file_name.str().c_str(), 0, opts.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
             }
 
 #endif
@@ -1324,7 +1324,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     loc_gid_to_lid_covsrc[gids[ie]] = ie;
                 }
 
-                std::set<EntityHandle> intxCov;
+                std::set< EntityHandle > intxCov;
                 Range intxCells;
                 Tag srcParentTag;
                 rval = m_interface->tag_get_handle( "SourceParent", srcParentTag );MB_CHK_ERR( rval );
@@ -1340,12 +1340,10 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     intxCov.insert( covEnts[loc_gid_to_lid_covsrc[blueParent]] );
                 }
 
-
                 // remove now from coverage set the cells that are not needed
                 Range intxCovRange;
 		        std::copy( intxCov.rbegin(), intxCov.rend(), range_inserter( intxCovRange ) );
 		        Range notNeededCovCells = moab::subtract( covEnts, intxCovRange );
-
                 rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                 covEnts = moab::subtract( covEnts, notNeededCovCells );
 #ifdef VERBOSE
@@ -1368,11 +1366,6 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     // used
 
                     rval = augment_overlap_set();MB_CHK_ERR( rval );
-                    if (rank > 997 &&  rank < 1005 )  {
-                        std::stringstream  ffo;
-                        ffo << "intx_aug_" << size << "_" << rank << ".h5m";
-                        rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
-                    }
                 }
             }
 
@@ -1394,11 +1387,6 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         rval = this->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
         rval = this->convert_overlap_mesh_sorted_by_source();MB_CHK_ERR( rval );
-        if (rank > 997 &&  rank < 1005 )  {
-            std::stringstream  ffo;
-            ffo << "intx_aug_sort_" << size << "_" << rank << ".h5m";
-            rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
-        }
         // free the memory
         delete mbintx;
     }
@@ -1437,8 +1425,7 @@ ErrorCode TempestRemapper::augment_overlap_set()
     Range boundaryCells;  // these will be filtered from target_set
     rval = m_interface->get_adjacencies( boundaryEdges, 2, false, boundaryCells, Interface::UNION );MB_CHK_ERR( rval );
     boundaryCells = intersect( boundaryCells, targetCells );
-//#ifdef VERBOSE
-if (rank > 997 &&  rank < 1005 )  {
+#ifdef VERBOSE
     EntityHandle tmpSet;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet );MB_CHK_SET_ERR( rval, "Can't create temporary set" );
     // add the boundary set and edges, and save it to a file
@@ -1447,8 +1434,7 @@ if (rank > 997 &&  rank < 1005 )  {
     std::stringstream ffs;
     ffs << "boundaryCells_0" << rank << ".h5m";
     rval = m_interface->write_mesh( ffs.str().c_str(), &tmpSet, 1 );MB_CHK_ERR( rval );
-}
-//#endif
+#endif
 
     // now that we have the boundary cells, see which overlap polys have have these as parents;
     //   find the ids of the boundary cells;
@@ -1561,12 +1547,11 @@ if (rank > 997 &&  rank < 1005 )  {
     else
         globalMaxEdges = maxEdges;
 
-//#ifdef VERBOSE
+    //#ifdef VERBOSE
     if( is_root ) std::cout << "maximum number of edges for polygons to send is " << globalMaxEdges << "\n";
-//#endif
+        //#endif
 
-//#ifdef VERBOSE
-if (rank > 997 &&  rank < 1005 )  {
+#ifdef VERBOSE
     EntityHandle tmpSet2;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet2 );MB_CHK_SET_ERR( rval, "Can't create temporary set2" );
     // add the affected source and overlap elements
@@ -1584,8 +1569,7 @@ if (rank > 997 &&  rank < 1005 )  {
     // these will contain coverage cells and intx cells on the boundary
     ffs2 << "affectedCells_" << m_pcomm->rank() << ".h5m";
     rval = m_interface->write_mesh( ffs2.str().c_str(), &tmpSet2, 1 );MB_CHK_ERR( rval );
-}
-//#endif
+#endif
     // form tuple lists to send vertices and cells;
     // the problem is that the lists of vertices will need to have other information, like the
     // processor it comes from, and its index in that list; we may have to duplicate vertices, but
@@ -2001,8 +1985,7 @@ if (rank > 997 &&  rank < 1005 )  {
         rval = m_interface->tag_set_data( ghostTag, &polyNew, 1, &orgProc );MB_CHK_ERR( rval );
     }
 
-//#ifdef VERBOSE
-if (rank > 997 &&  rank < 1005 )  {
+#ifdef VERBOSE
     EntityHandle tmpSet3;
     rval = m_interface->create_meshset( MESHSET_SET, tmpSet3 );MB_CHK_SET_ERR( rval, "Can't create temporary set3" );
     // add the boundary set and edges, and save it to a file
@@ -2011,13 +1994,12 @@ if (rank > 997 &&  rank < 1005 )  {
     std::stringstream ffs4;
     ffs4 << "extraIntxCells" << rank << ".h5m";
     rval = m_interface->write_mesh( ffs4.str().c_str(), &tmpSet3, 1 );MB_CHK_ERR( rval );
-}
-//#endif
+#endif
 
     // add the new polygons to the overlap set
     // these will be ghosted, so will participate in conservation only
     rval = m_interface->add_entities( m_overlap_set, newPolygons );MB_CHK_ERR( rval );
-    if (!rank)
+    if( !rank )
     {
         std::cout << "Augmenting: add " << newPolygons.size() << " polygons on root task \n";
     }
