@@ -5,7 +5,7 @@
  * maybe there is another utility in nco, need to ask Charlie Zender
  *
  * example of usage:
- * ./mbcmpmaps map1.nc map2.nc
+ * ./mbcmpmaps -i map1.nc -j map2.nc
  * will look for row, col, S entries, and use eigen3 sparse matrix constructor
  *
  * can be built only if netcdf and eigen3 are available
@@ -22,7 +22,7 @@
 
 #include "netcdf.h"
 #include <cmath>
-#include <sstream>
+#include <iomanip>
 #include <Eigen/Sparse>
 #define ERR_NC( e )                                \
     {                                              \
@@ -252,6 +252,10 @@ int main( int argc, char* argv[] )
     std::string inputfile1, inputfile2;
     opts.addOpt< std::string >( "firstMap,i", "input filename 1", &inputfile1 );
     opts.addOpt< std::string >( "secondMap,j", "input second map", &inputfile2 );
+    int print_diff = 20;
+    opts.addOpt< int >( "print_differences,p", "print differences ", &print_diff );
+    double fraction = 0.9;
+    opts.addOpt< double >( "fraction_diff,f", "fraction threshold", &fraction );
 
     opts.parseCommandLine( argc, argv );
 
@@ -327,12 +331,37 @@ int main( int argc, char* argv[] )
     weight2.setFromTriplets( tripletList.begin(), tripletList.end() );
     weight2.makeCompressed();
 
+    // default storage type is column major
     Eigen::SparseMatrix< double > diff = weight1 - weight2;
-    double maxv                        = diff.coeffs().maxCoeff();
-    double minv                        = diff.coeffs().minCoeff();
+    diff.makeCompressed(); // is it needed or not ?
+    auto coeffs = diff.coeffs();
+    double maxv                        = coeffs.maxCoeff();
+    double minv                        = coeffs.minCoeff();
     std::cout << " euclidian norm for difference: " << diff.norm()
-              << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
-              << " minv: " << minv << " maxv: " << maxv << "\n";
+                  << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
+                  << " minv: " << minv << " maxv: " << maxv << "\n";
+    // print out the first 10 positions for which the value is outside 90% of min/max values
+    double min_threshold = fraction*minv;
+    double max_threshold = fraction*maxv;
+    int counter = 0;
+    std::cout << std::setprecision(9) ;
+    for (int k=0; (k<diff.outerSize()) ; ++k) // this is by column
+    {
+        for (Eigen::SparseMatrix<double>::InnerIterator it(diff,k); (it) && (counter < print_diff); ++it)
+        {
+            double val = it.value();
+            if ( val <= min_threshold || val >=  max_threshold )
+            {
+                int row = it.row();
+                int col = it.col();
+                std::cout << " counter:" << counter << "\t col: " << col + 1 << "\t row: "<< row + 1  << "\t diff: " <<  val;
+                std::cout <<  "\t map1: " <<weight1.coeffRef(row, col) <<  "\t map2: " <<weight2.coeffRef(row, col) << "\n" ;   // row index
+                counter ++ ;
+            }
+        }
+    }
+
+
 
     // compare frac_a between maps
     diff_vect( "frac_a", na1 );
