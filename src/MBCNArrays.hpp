@@ -690,7 +690,7 @@ const CN::UpConnMap CN::mUpConnMap[MBMAXTYPE][4][4] = {
                 { 0, 1, 6, 7 },
                 { 1, 2, 7, 8 },
                 { 3, 4, 7, 8 },
-                { 4, 5, 7, 8 },
+                { 4, 5, 6, 8 },
                 { 3, 5, 6, 7 } } },           // end target dim 1
             {                                 // target dim 2
               { 2, 2, 2, 2, 2, 2, 2, 2, 2 },  // 2 faces for all edges
@@ -710,10 +710,10 @@ const CN::UpConnMap CN::mUpConnMap[MBMAXTYPE][4][4] = {
               { { 0, 1, 3, 4 }, { 1, 2, 4, 5 }, { 0, 2, 3, 5 }, { 0, 1, 2 }, { 3, 4, 5 } } },  // end target dim 0
             {                                                                                  // target dim 1
               { 4, 4, 4, 3, 3 },  // 4 edges for some faces, 3 for others
-              { { 0, 4, 6, 3 }, { 1, 5, 7, 4 }, { 2, 3, 8, 5 }, { 0, 2, 1 }, { 6, 7, 8 } } },  // end target dim 1
+              { { 0, 4, 6, 3 }, { 1, 5, 7, 4 }, { 3, 8, 5, 2 }, { 2, 1, 0 }, { 6, 7, 8 } } },  // end target dim 1
             {                                                                                  // target dim 2
               { 4, 4, 4, 3, 3 },  // 4 faces for some faces, 3 for others
-              { { 3, 1, 4, 2 }, { 3, 2, 4, 0 }, { 3, 0, 4, 1 }, { 0, 2, 1 }, { 0, 1, 2 } } },  // end target dim 2
+              { { 3, 1, 4, 2 }, { 3, 2, 4, 0 }, { 0, 4, 1, 3 }, { 2, 1, 0 }, { 0, 1, 2 } } },  // end target dim 2
             {                                                                                  // target dimension 3
               { 1, 1, 1, 1, 1 },                       // 0 connected elements for all vertices
               { { 0 }, { 0 }, { 0 }, { 0 }, { 0 } } }  // end target dimension 3
