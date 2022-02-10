@@ -942,44 +942,46 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
         if( !m_bPointCloud )
         {
-            // Verify that overlap mesh is in the correct order
-            int ixSourceFaceMax = ( -1 );
-            int ixTargetFaceMax = ( -1 );
+            // Verify that overlap mesh is in the correct order, only if size == 1
+            if ( 1 == size ){
+                int ixSourceFaceMax = ( -1 );
+                int ixTargetFaceMax = ( -1 );
 
-            if( m_meshOverlap->vecSourceFaceIx.size() != m_meshOverlap->vecTargetFaceIx.size() )
-            {
-                _EXCEPTIONT( "Invalid overlap mesh:\n"
-                             "    Possible mesh file corruption?" );
+                if( m_meshOverlap->vecSourceFaceIx.size() != m_meshOverlap->vecTargetFaceIx.size() )
+                {
+                    _EXCEPTIONT( "Invalid overlap mesh:\n"
+                                 "    Possible mesh file corruption?" );
+                }
+
+                for( unsigned i = 0; i < m_meshOverlap->faces.size(); i++ )
+                {
+                    if( m_meshOverlap->vecSourceFaceIx[i] + 1 > ixSourceFaceMax )
+                        ixSourceFaceMax = m_meshOverlap->vecSourceFaceIx[i] + 1;
+
+                    if( m_meshOverlap->vecTargetFaceIx[i] + 1 > ixTargetFaceMax )
+                        ixTargetFaceMax = m_meshOverlap->vecTargetFaceIx[i] + 1;
+                }
+
+                // Check for forward correspondence in overlap mesh
+                if( m_meshInput->faces.size() - ixSourceFaceMax == 0 )
+                {
+                    if( is_root ) dbgprint.printf( 0, "Overlap mesh forward correspondence found\n" );
+                }
+                else if( m_meshOutput->faces.size() - ixSourceFaceMax == 0 )
+                {  // Check for reverse correspondence in overlap mesh
+                    if( is_root ) dbgprint.printf( 0, "Overlap mesh reverse correspondence found (reversing)\n" );
+
+                    // Reorder overlap mesh
+                    m_meshOverlap->ExchangeFirstAndSecondMesh();
+                }
+                // else
+                // {   // No correspondence found
+                //     _EXCEPTION4 ( "Invalid overlap mesh:\n"
+                //                   "    No correspondence found with input and output meshes (%i,%i)
+                //                   vs (%i,%i)", m_meshInputCov->faces.size(),
+                //                   m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
+                // }
             }
-
-            for( unsigned i = 0; i < m_meshOverlap->faces.size(); i++ )
-            {
-                if( m_meshOverlap->vecSourceFaceIx[i] + 1 > ixSourceFaceMax )
-                    ixSourceFaceMax = m_meshOverlap->vecSourceFaceIx[i] + 1;
-
-                if( m_meshOverlap->vecTargetFaceIx[i] + 1 > ixTargetFaceMax )
-                    ixTargetFaceMax = m_meshOverlap->vecTargetFaceIx[i] + 1;
-            }
-
-            // Check for forward correspondence in overlap mesh
-            if( m_meshInput->faces.size() - ixSourceFaceMax == 0 )
-            {
-                if( is_root ) dbgprint.printf( 0, "Overlap mesh forward correspondence found\n" );
-            }
-            else if( m_meshOutput->faces.size() - ixSourceFaceMax == 0 )
-            {  // Check for reverse correspondence in overlap mesh
-                if( is_root ) dbgprint.printf( 0, "Overlap mesh reverse correspondence found (reversing)\n" );
-
-                // Reorder overlap mesh
-                m_meshOverlap->ExchangeFirstAndSecondMesh();
-            }
-            // else
-            // {   // No correspondence found
-            //     _EXCEPTION4 ( "Invalid overlap mesh:\n"
-            //                   "    No correspondence found with input and output meshes (%i,%i)
-            //                   vs (%i,%i)", m_meshInputCov->faces.size(),
-            //                   m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
-            // }
 
             // Calculate Face areas
             if( is_root ) dbgprint.printf( 0, "Calculating overlap mesh Face areas\n" );
