@@ -83,7 +83,7 @@ endif()
   # python setuptools build/install local version of pymoab for testing
   ADD_CUSTOM_TARGET(pymoab-local-install ALL
     COMMAND export CFLAGS='-w' &&
-    ${PYTHON} setup.py build_ext --inplace
+    pip install -e . 
     DEPENDS ${DEPS} MOAB)
 
   # move pymoab egg into the correct location for a --user setuptools install based on username
