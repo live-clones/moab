@@ -568,7 +568,6 @@ int main( int argc, char* argv[] )
     {
         // Compute the weights to project the solution from ATM component to LND component
         PUSH_TIMER( "Compute ATM-LND remapping weights" )
-        fValidate = 0;
         ierr = iMOAB_ComputeScalarProjectionWeights( cplAtmLndPID, weights_identifiers[0], disc_methods[1],
                                                      &disc_orders[1], disc_methods[1], &disc_orders[1], &fNoBubble,
                                                      &fMonotoneTypeID, &fVolumetric, &fInverseDistanceMap, &fNoConserve,
@@ -578,7 +577,6 @@ int main( int argc, char* argv[] )
 
         // Compute the weights to project the solution from LND component to ATM component
         PUSH_TIMER( "Compute LND-ATM remapping weights" )
-
         ierr = iMOAB_ComputeScalarProjectionWeights( cplLndAtmPID, weights_identifiers[0], disc_methods[1],
                                                      &disc_orders[1], disc_methods[1], &disc_orders[1], &fNoBubble,
                                                      &fMonotoneTypeID, &fVolumetric, &fInverseDistanceMap, &fNoConserve,

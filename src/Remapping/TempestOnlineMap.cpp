@@ -1388,7 +1388,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
         if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
 #endif
         // Verify consistency, conservation and monotonicity, globally
-        if( !fNoCheckLoc )
+        if( !fNoCheckGlob )
         {
             if( is_root ) dbgprint.printf( 0, "Verifying map" );
             this->IsConsistent( 1.0e-8 );
