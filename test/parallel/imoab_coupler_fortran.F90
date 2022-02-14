@@ -91,9 +91,15 @@ program imoab_coupler_fortran
    call errorout(ierr, 'fail to get joint group')
    ! readopts( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARALLEL_RESOLVE_SHARED_ENTS" )
    ! readoptsLnd( "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION" )
-   atmFileName = MOAB_MESH_DIR//'unittest/wholeATM_T.h5m'//C_NULL_CHAR
-   ocnFileName = MOAB_MESH_DIR//'unittest/recMeshOcn.h5m'//C_NULL_CHAR
-   baselineFileName = MOAB_MESH_DIR//'unittest/baseline1.txt'//C_NULL_CHAR
+   atmFileName = &
+     MOAB_MESH_DIR &
+     //'unittest/wholeATM_T.h5m'//C_NULL_CHAR
+   ocnFileName = &
+     MOAB_MESH_DIR &
+     //'unittest/recMeshOcn.h5m'//C_NULL_CHAR
+   baselineFileName = &
+     MOAB_MESH_DIR &
+     //'unittest/baseline1.txt'//C_NULL_CHAR
 
    ! all comms span the whole world, for simplicity
    atmComm = MPI_COMM_NULL
