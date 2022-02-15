@@ -775,7 +775,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
         DiscretizationType eInputType;
         DiscretizationType eOutputType;
-        int fNoCheckGlob = ( mapOptions.fNoCheck ? 1 : 0 );
 
         if( strInputType == "fv" )
         {
@@ -943,7 +942,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
         if( !m_bPointCloud )
         {
             // Verify that overlap mesh is in the correct order, only if size == 1
-            if ( 1 == size ){
+            if( 1 == size )
+            {
                 int ixSourceFaceMax = ( -1 );
                 int ixTargetFaceMax = ( -1 );
 
@@ -1055,18 +1055,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                 }
             }
 
-            // Partial cover
-            if( fabs( dTotalAreaOutput - dTotalAreaInput ) > 1.0e-10 &&
-                fabs( dTotalAreaOverlap - dTotalAreaInput ) > 1.0e-10 )
-            {
-                if( !fNoCheckGlob )
-                {
-                    dbgprint.printf( rank, "WARNING: Significant mismatch between overlap mesh area "
-                                           "and input mesh area.\n  Automatically enabling --nocheck\n" );
-                    fNoCheckGlob = 1;
-                }
-            }
-
             /*
                 // Recalculate input mesh area from overlap mesh
                 if (fabs(dTotalAreaOverlap - dTotalAreaInput) > 1.0e-10) {
@@ -1107,7 +1095,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             double dNumericalArea = dNumericalArea_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
-                MPI_Allreduce( &dNumericalArea_loc, &dNumericalArea, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
+                MPI_Reduce( &dNumericalArea_loc, &dNumericalArea, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
 #endif
             if( is_root ) dbgprint.printf( 0, "Output Mesh Numerical Area: %1.15e\n", dNumericalArea );
 
@@ -1227,7 +1215,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             double dNumericalArea = dNumericalArea_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
-                MPI_Allreduce( &dNumericalArea_loc, &dNumericalArea, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
+                MPI_Reduce( &dNumericalArea_loc, &dNumericalArea, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
 #endif
             if( is_root )
             {
@@ -1285,8 +1273,8 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             // Input metadata
             if( is_root ) dbgprint.printf( 0, "Generating input mesh meta data\n" );
-            double dNumericalAreaIn_loc = GenerateMetaData( *m_meshInputCov, mapOptions.nPin, mapOptions.fNoBubble,
-                                                            dataGLLNodesSrcCov, dataGLLJacobianIn );
+            GenerateMetaData( *m_meshInputCov, mapOptions.nPin, mapOptions.fNoBubble, dataGLLNodesSrcCov,
+                              dataGLLJacobianIn );
 
             double dNumericalAreaSrc_loc = GenerateMetaData( *m_meshInput, mapOptions.nPin, mapOptions.fNoBubble,
                                                              dataGLLNodesSrc, dataGLLJacobianSrc );
@@ -1296,14 +1284,17 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             double dNumericalAreaIn = dNumericalAreaSrc_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
-                MPI_Allreduce( &dNumericalAreaSrc_loc, &dNumericalAreaIn, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
+                MPI_Reduce( &dNumericalAreaSrc_loc, &dNumericalAreaIn, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
 #endif
-            if( is_root ) dbgprint.printf( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalAreaIn );
-
-            if( fabs( dNumericalAreaIn - dTotalAreaInput ) > 1.0e-12 )
+            if( is_root )
             {
-                dbgprint.printf( 0, "WARNING: Significant mismatch between input mesh "
-                                    "numerical area and geometric area\n" );
+                dbgprint.printf( 0, "Input Mesh Numerical Area: %1.15e\n", dNumericalAreaIn );
+
+                if( fabs( dNumericalAreaIn - dTotalAreaInput ) > 1.0e-12 )
+                {
+                    dbgprint.printf( 0, "WARNING: Significant mismatch between input mesh "
+                                        "numerical area and geometric area\n" );
+                }
             }
 
             // Output metadata
@@ -1314,15 +1305,18 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             double dNumericalAreaOut = dNumericalAreaOut_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
-                MPI_Allreduce( &dNumericalAreaOut_loc, &dNumericalAreaOut, 1, MPI_DOUBLE, MPI_SUM, m_pcomm->comm() );
+                MPI_Reduce( &dNumericalAreaOut_loc, &dNumericalAreaOut, 1, MPI_DOUBLE, MPI_SUM, 0, m_pcomm->comm() );
 #endif
-            if( is_root ) dbgprint.printf( 0, "Output Mesh Numerical Area: %1.15e\n", dNumericalAreaOut );
-
-            if( fabs( dNumericalAreaOut - dTotalAreaOutput ) > 1.0e-12 )
+            if( is_root )
             {
-                if( is_root )
-                    dbgprint.printf( 0, "WARNING: Significant mismatch between output mesh "
-                                        "numerical area and geometric area\n" );
+                dbgprint.printf( 0, "Output Mesh Numerical Area: %1.15e\n", dNumericalAreaOut );
+
+                if( fabs( dNumericalAreaOut - dTotalAreaOutput ) > 1.0e-12 )
+                {
+                    if( is_root )
+                        dbgprint.printf( 0, "WARNING: Significant mismatch between output mesh "
+                                            "numerical area and geometric area\n" );
+                }
             }
 
             // Initialize coordinates for map
@@ -1374,7 +1368,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
         copy_tempest_sparsemat_to_eigen3();
 #endif
 
-        int fNoCheckLoc = fNoCheckGlob;
 #ifdef MOAB_HAVE_MPI
         {
             // Remove ghosted entities from overlap set
@@ -1383,12 +1376,9 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             moab::EntityHandle m_meshOverlapSet = m_remapper->GetMeshSet( moab::Remapper::OverlapMesh );
             rval                                = m_interface->remove_entities( m_meshOverlapSet, ghostedEnts );MB_CHK_SET_ERR( rval, "Deleting ghosted entities failed" );
         }
-
-        // Let us see if we need to perform consistency/conservation checks
-        if( m_pcomm ) MPI_Allreduce( &fNoCheckLoc, &fNoCheckGlob, 1, MPI_INT, MPI_MAX, m_pcomm->comm() );
 #endif
         // Verify consistency, conservation and monotonicity, globally
-        if( !fNoCheckGlob )
+        if( !mapOptions.fNoCheck )
         {
             if( is_root ) dbgprint.printf( 0, "Verifying map" );
             this->IsConsistent( 1.0e-8 );
