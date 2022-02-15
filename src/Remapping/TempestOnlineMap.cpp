@@ -1278,9 +1278,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
             double dNumericalAreaSrc_loc = GenerateMetaData( *m_meshInput, mapOptions.nPin, mapOptions.fNoBubble,
                                                              dataGLLNodesSrc, dataGLLJacobianSrc );
-
-            assert( dNumericalAreaIn_loc >= dNumericalAreaSrc_loc );
-
             double dNumericalAreaIn = dNumericalAreaSrc_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
@@ -1301,7 +1298,6 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( is_root ) dbgprint.printf( 0, "Generating output mesh meta data\n" );
             double dNumericalAreaOut_loc = GenerateMetaData( *m_meshOutput, mapOptions.nPout, mapOptions.fNoBubble,
                                                              dataGLLNodesDest, dataGLLJacobianOut );
-
             double dNumericalAreaOut = dNumericalAreaOut_loc;
 #ifdef MOAB_HAVE_MPI
             if( m_pcomm )
