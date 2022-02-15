@@ -273,7 +273,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     // start copy OnlineMap.cpp tempestremap
     // right now, do this only for source  mesh; copy the logic for target mesh
 
-    for( int i = 0; i < nA; i++ )
+    for( unsigned i = 0; i < nA; i++ )
     {
         const Face& face = m_meshInput->faces[i];
 
@@ -1394,7 +1394,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 dofVal = tl_re.vi_rd[1]; // first dof val on this rank
             startDofIndex[dofVal] = 0;
             endDofIndex [dofVal] = 0 ; // start and end
-            for (int k = 1; k<tl_re.get_n(); k++ )
+            for ( unsigned k = 1; k<tl_re.get_n(); k++ )
             {
                 int newDof = tl_re.vi_rd[2*k+1];
                 if (dofVal == newDof)
@@ -1422,7 +1422,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             // now loop over tl and tl_re to see where to send
             // form the new tuple, which will contain the desired dofs per task, per row or column distribution
 
-            for ( int k = 0; k < tl->get_n(); k++)
+            for ( unsigned k = 0; k < tl->get_n(); k++)
             {
                 int valDof = tl->vi_rd[3*k+indexOrder]; // 1 for row, 2 for column // first value, it should be
                 for (int ire = startDofIndex[valDof]; ire <= endDofIndex[valDof]; ire++)
