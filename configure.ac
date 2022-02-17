@@ -136,6 +136,11 @@ if test "xyes" = "x$ENABLE_FORTRAN" && test "x" != "x$FC"; then
   PAC_PROG_FC_CRAY_POINTER([
     FCFLAGS="$FCFLAGS $CRAYPTR_FCFLAGS"
   ])
+
+  # gnu-make fortran module dependencies
+  m4_include([config/fortran_dependencies.m4])
+  FDEP_F90_GNU_MAKE_DEPS
+
 fi
 
 ################################################################################
