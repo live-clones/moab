@@ -62,8 +62,7 @@ int main( int argc, char* argv[] )
     double timer_ops;
     std::string opName;
 
-    int repartitioner_scheme = 0; // used for all, trivial
-    int repartitioner_ocn_atm = 0; //
+    int repartitioner_scheme = 0; // used for all, trivial, by default; with -p 2 will run independent RCB
 
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &rankInGlobalComm );
@@ -292,13 +291,13 @@ int main( int argc, char* argv[] )
 
     // store the ocean RCB partition, to be used by atm
 #ifdef ENABLE_OCNATM_COUPLING
-    repartitioner_ocn_atm = 0; // will use RCB + storing of the cuts
+
     // ocean
     if( !rankInGlobalComm )
-        std::cout << " use repartitioning scheme " << repartitioner_ocn_atm << " for migration of ocean \n";
+        std::cout << " use repartitioning scheme " << repartitioner_scheme << " for migration of ocean \n";
     ierr =
         setup_component_coupler_meshes( cmpOcnPID, cmpocn, cplOcnPID, cplocn, &ocnComm, &ocnPEGroup, &couComm,
-                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_ocn_atm );
+                                        &couPEGroup, &ocnCouComm, ocnFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate ocn mesh" )
     if( couComm != MPI_COMM_NULL )
     {
@@ -310,12 +309,12 @@ int main( int argc, char* argv[] )
     }
     MPI_Barrier( MPI_COMM_WORLD );
     // atm
-    //repartitioner_ocn_atm = 0; // still trivial
+
     if( !rankInGlobalComm )
-        std::cout << " use repartitioning scheme " << repartitioner_ocn_atm << " for migration of atm (induced from ocean)  \n";
+        std::cout << " use repartitioning scheme " << repartitioner_scheme << " for migration of atm \n";
     ierr =
         setup_component_coupler_meshes( cmpAtmPID, cmpatm, cplAtmPID, cplatm, &atmComm, &atmPEGroup, &couComm,
-                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_ocn_atm );
+                                        &couPEGroup, &atmCouComm, atmFilename, readopts, nghlay, repartitioner_scheme );
     CHECKIERR( ierr, "Cannot load and migrate atm mesh" )
     if( couComm != MPI_COMM_NULL )
     {
@@ -331,7 +330,7 @@ int main( int argc, char* argv[] )
 
     MPI_Barrier( MPI_COMM_WORLD );
 #ifdef ENABLE_LNDATM_COUPLING
-    // we can reuse the ocn, repartitioner_scheme = 5,  or use the regular repartitioner_scheme = 2 (command line option -p)
+
     if( !rankInGlobalComm )
         std::cout << " use repartitioning scheme " << repartitioner_scheme << " for migration of land\n";
     ierr = setup_component_coupler_meshes( cmpLndPID, cmplnd, cplLndPID, cpllnd, &lndComm, &lndPEGroup, &couComm,
