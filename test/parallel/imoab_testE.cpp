@@ -33,7 +33,7 @@
 using namespace moab;
 
 //#define GRAPH_INFO
-#define  ENABLE_OCNATM_COUPLING
+//#define  ENABLE_OCNATM_COUPLING
 //#define VERBOSE
 
 #ifndef MOAB_HAVE_TEMPESTREMAP
@@ -294,6 +294,11 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeMeshIntersectionOnSphere( cplLndPID, cplAtmPID, cplLndAtmPID );
         CHECKIERR( ierr, "failed to compute land - atm intx for mapping" );
         POP_TIMER( couComm, rankInCouComm )
+        if (1 == numProcesses)
+        {
+            char outputFile[] = "IntxLndAtm.h5m";
+            ierr = iMOAB_WriteMesh( cplLndAtmPID, outputFile, fileWriteOptions );
+        }
     }
     if( lndCouComm != MPI_COMM_NULL )
     {

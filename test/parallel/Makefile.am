@@ -47,7 +47,7 @@ if HAVE_HDF5_PARALLEL
          ghost_thin_layers commgraph_test 
 
 if HAVE_ZOLTAN
-  HDF5_TESTS += migrate_nontrivial imoab_testE 
+  HDF5_TESTS += migrate_nontrivial imoab_testE imoab_ola_base
 endif
 
 if HAVE_TEMPESTREMAP
@@ -73,13 +73,15 @@ if HAVE_NETCDF
   HDF5_TESTS += imoab_read_map imoab_map2 imoab_map_target
 endif
 if HAVE_EXTMESHES
-  HDF5_TESTS +=  imoab_apg2_ol_coupler imoab_ol_apg2_coupler imoab_testB
+  HDF5_TESTS +=  imoab_apg2_ol_coupler imoab_ol_apg2_coupler imoab_testB imoab_ola_base
   imoab_ol_apg2_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_apg2_ol_coupler_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
   imoab_testB_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_testE_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  imoab_ola_base_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
 endif
   test_mapweights_bcast_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
-  imoab_testE_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS)
+  
 endif
 
 else
@@ -195,6 +197,7 @@ imoab_coupler_twohop_SOURCES = imoab_coupler_twohop.cpp
 imoab_phatm_ocn_coupler_SOURCES = imoab_phatm_ocn_coupler.cpp
 imoab_testB_SOURCES = imoab_testB.cpp
 imoab_testE_SOURCES = imoab_testE.cpp
+imoab_ola_base_SOURCES = imoab_ola_base.cpp
 imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 imoab_read_map_SOURCES = imoab_read_map.cpp
 imoab_map2_SOURCES = imoab_map2.cpp
