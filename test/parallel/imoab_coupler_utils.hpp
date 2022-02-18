@@ -23,6 +23,7 @@
         timer_ops = timer.time_since_birth();            \
         opName    = operation;                           \
     }
+#include <iomanip>
 #define POP_TIMER( localcomm, localrank )                                                         \
     {                                                                                             \
         double locElapsed = timer.time_since_birth() - timer_ops, sum = 0, maxElapsed = 0;        \
@@ -31,7 +32,7 @@
         int procsize;                                                                             \
         MPI_Comm_size(localcomm, &procsize);                                                      \
         if( !( localrank ) )                                                                      \
-            std::cout << "[LOG] Time taken to " << opName.c_str() << ": max = " << maxElapsed     \
+            std::cout << "[LOG] Time taken to " << opName.c_str() << std::setprecision(7) << ": max = " << maxElapsed     \
                       << ", avg = " << sum/procsize << "\n";                   \
         opName.clear();                                                                           \
     }
