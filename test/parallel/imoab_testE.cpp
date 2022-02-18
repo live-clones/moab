@@ -33,7 +33,7 @@
 using namespace moab;
 
 //#define GRAPH_INFO
-//#define  ENABLE_OCNATM_COUPLING
+#define  ENABLE_OCNATM_COUPLING
 //#define VERBOSE
 
 #ifndef MOAB_HAVE_TEMPESTREMAP
