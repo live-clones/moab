@@ -12,14 +12,12 @@ all-local: local-install
 
 local-install:
 	(CFLAGS='-w -fPIC' PYTHONPATH=$(PWD)/$(local_install_path)/:$(PYTHONPATH) \
-	 $(PYTHON) setup.py build_ext --inplace)
+	 pip install -e $(PWD) --prefix $(PWD))
 
 install-exec-local: all-local
 	$(MKDIR_P) $(DESTDIR)$(pythondir)
-	(PYTHONPATH=$(DESTDIR)$(pythondir):$(PYTHONPATH) $(PYTHON) setup.py install \
-		--prefix=$(DESTDIR)$(prefix) \
-		--record $(DESTDIR)$(pythondir)/install_files.txt \
-	)
+	(PYTHONPATH=$(DESTDIR)$(pythondir):$(PYTHONPATH) pip install $(PWD) \
+		--prefix=$(DESTDIR)$(prefix) )
 
 check: all-local
 	cd tests; \
