@@ -1,11 +1,7 @@
 SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake )
 
 # make sure we have the essential elements installed
-FIND_PROGRAM(PYTHON "python")
-
-if(NOT PYTHON)
-  FIND_PROGRAM(PYTHON "python3")
-endif()
+FIND_PROGRAM(PYTHON "python3")
 
 find_package(PythonInterp REQUIRED)
 find_package(PythonDev REQUIRED)
