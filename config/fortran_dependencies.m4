@@ -18,7 +18,7 @@ if test x$_fdep_gnu_make_command = x ; then
 fi
 AC_SUBST([FORTRAN_MODULE_DEPS], ["
 CLEANFILES +=
-include ${srcdir}/config/fortran_dependencies.mk
+include ${project_abstopsrcdir}/config/fortran_dependencies.mk
 "])
 AM_SUBST_NOTMAKE([FORTRAN_MODULE_DEPS])
 ])

@@ -75,7 +75,7 @@ $(call modinfo_name,$1,$2,$3,def): $1 $(dir $1)$(am__dirstamp)
 endef
 $(foreach p,$(_f90_targets),$(if $(call is_per_target,$p),$(foreach s,$(call fortran_sources,$p),$(eval $(call module_targets,$s,$p-,$p))),$(foreach s,$(call fortran_sources,$p),$(eval $(call module_targets,$s,,$p)))))
 
-_f90_depdir=$(abs_builddir)/.fortran_dependencies
+_f90_depdir=$(abs_builddir)/.deps
 _f90_depfile = $(_f90_depdir)/dependencies.mk
 
 # $1 target-name

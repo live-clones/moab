@@ -299,6 +299,8 @@ if ENABLE_FORTRAN
 libMOAB_la_SOURCES += iMOABF.F90
 imoabincludedir = $(includedir)
 nodist_imoabinclude_HEADERS = imoab.mod
+#iMOABF.o: moab/iMOAB.h
+imoab.mod iMOAB.mod IMOAB.mod IMOAB.MOD: moab/iMOAB.h iMOABF.lo
 endif # ENABLE_FORTRAN
 
 if ENABLE_mbtempest
@@ -439,3 +441,7 @@ LTPPF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
    $(LIBTOOLFLAGS) --mode=compile $(F77) $(FCDEFS) \
    $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
    $(AM_FFLAGS) $(FFLAGS)
+
+# @ FORTRAN_MODULE_DEPS @
+
+

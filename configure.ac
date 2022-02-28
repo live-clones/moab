@@ -1677,6 +1677,7 @@ AC_CONFIG_FILES([src/mesquite/Makefile
                  MeshFiles/unittest/mesquite/Makefile
                  ])
 
+
 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-static=$enable_static --enable-shared=$enable_shared"
 # DISTCHECK_CONFIGURE_FLAGS="$USER_CONFIGURE_CMD"
 # make distcheck will use this DISTCHECK_CONFIGURE_FLAGS
@@ -1692,6 +1693,9 @@ for var in CC CXX F90 FC F77 LDFLAGS LIBS; do
     DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS  $var=\"$val\""
   fi
 done
+
+AC_SUBST([FC_MODINC])
+AC_SUBST([FC_MODOUT])
 
 AC_SUBST([DISTCHECK_CONFIGURE_FLAGS])
 
