@@ -4,13 +4,12 @@ SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake )
 FIND_PROGRAM(PYTHON "python")
 
 if(PYTHON)
-  EXECUTE_PROCESS(COMMAND "${PYTHON}" "-V" RESULT_VARIABLE PYTHON_VERSION_STRING)
-  STRING(REPLACE "." " " PYTHON_VERSION_STRING ${PYTHON_VERSION_STRING})
-  STRING(REPLACE " " ";" PYTHON_VERSION_LIST ${PYTHON_VERSION_STRING})
-  LIST(GET PYTHON_VERSION_LIST 1 PYTHON_MAJOR_VERSION)
+  EXECUTE_PROCESS(COMMAND "${PYTHON}" "-c" "import sys; print(sys.version_info.major, sys.version_info.minor)" OUTPUT_STRIP_TRAILING_WHITESPACE  OUTPUT_VARIABLE PYTHON_VERSION_STRING)
+  STRING(REPLACE " " ";" PYTHON_VERSION_LIST "${PYTHON_VERSION_STRING}")
+  LIST(GET PYTHON_VERSION_LIST 0 PYTHON_MAJOR_VERSION)
   if(PYTHON_MAJOR_VERSION LESS 3)
      SET(PYTHON FALSE)
-  endif(PYTHON_MAJOR_VERSION) 
+  endif(PYTHON_MAJOR_VERSION LESS 3)
 endif(PYTHON)
 
 if(NOT PYTHON)
@@ -19,6 +18,15 @@ endif()
 
 find_package(PythonInterp REQUIRED)
 find_package(PythonDev REQUIRED)
+
+if(MOAB_FORCE_32_BIT_HANDLES)
+  MESSAGE( SEND_ERROR "Cannot build pymoab with 32bit EntityHandles enabled. Please remove the --enable-32bit-handles configuration option or build without MOAB's python interface.")
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+  MESSAGE( SEND_ERROR "Cannot build static libraries and the python interface. Please build with shared libraries (-DBUILD_SHARED_LIBS=ON) or build without MOAB's python interface.")
+endif()
+
 # make sure that specific python modules are installed
 SET(NUMPY_MODULE_MISSING false)
 SET(SETUPTOOLS_MODULE_MISSING false)
@@ -30,14 +38,6 @@ endif()
 EXECUTE_PROCESS(COMMAND "${PYTHON}" "-c" "import setuptools" RESULT_VARIABLE SETUPTOOLS_MODULE_MISSING)
 if (SETUPTOOLS_MODULE_MISSING)
   MESSAGE( SEND_ERROR "Python setuptools module is missing.")
-endif()
-
-if(MOAB_FORCE_32_BIT_HANDLES)
-  MESSAGE( SEND_ERROR "Cannot build pymoab with 32bit EntityHandles enabled. Please remove the --enable-32bit-handles configuration option or build without MOAB's python interface.")
-endif()
-
-if(NOT BUILD_SHARED_LIBS)
-  MESSAGE( SEND_ERROR "Cannot build static libraries and the python interface. Please build with shared libraries (-DBUILD_SHARED_LIBS=ON) or build without MOAB's python interface.")
 endif()
 
 include_directories(
