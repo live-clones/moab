@@ -137,10 +137,6 @@ if test "xyes" = "x$ENABLE_FORTRAN" && test "x" != "x$FC"; then
     FCFLAGS="$FCFLAGS $CRAYPTR_FCFLAGS"
   ])
 
-  # gnu-make fortran module dependencies
-  m4_include([config/fortran_dependencies.m4])
-  FDEP_F90_GNU_MAKE_DEPS
-
 fi
 
 ################################################################################
@@ -1693,9 +1689,6 @@ for var in CC CXX F90 FC F77 LDFLAGS LIBS; do
     DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS  $var=\"$val\""
   fi
 done
-
-AC_SUBST([FC_MODINC])
-AC_SUBST([FC_MODOUT])
 
 AC_SUBST([DISTCHECK_CONFIGURE_FLAGS])
 
