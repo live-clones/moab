@@ -136,6 +136,7 @@ if test "xyes" = "x$ENABLE_FORTRAN" && test "x" != "x$FC"; then
   PAC_PROG_FC_CRAY_POINTER([
     FCFLAGS="$FCFLAGS $CRAYPTR_FCFLAGS"
   ])
+
 fi
 
 ################################################################################
@@ -1671,6 +1672,7 @@ AC_CONFIG_FILES([src/mesquite/Makefile
                  tools/mesquite/Makefile
                  MeshFiles/unittest/mesquite/Makefile
                  ])
+
 
 DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-static=$enable_static --enable-shared=$enable_shared"
 # DISTCHECK_CONFIGURE_FLAGS="$USER_CONFIGURE_CMD"

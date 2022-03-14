@@ -311,6 +311,11 @@ if (test "x$ENABLE_FORTRAN" != "xno"); then
     FFLAGS="$FFLAGS -O3"
   fi
   AC_FC_PP_DEFINE
+
+  # Fortran module handling
+  AC_FC_MODULE_FLAG
+  AC_FC_MODULE_OUTPUT_FLAG
+
 fi
 
 # Check for 32/64 bit.
