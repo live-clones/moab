@@ -527,7 +527,7 @@ int main( int argc, char* argv[] )
     {
         // as always, use nonblocking sends
         // this is for projection to ocean:
-        ierr = iMOAB_SendElementTag( cmpPhAtmPID, "T_ph;u_ph;v_ph;", &atmCouComm, &atmocnid );
+        ierr = iMOAB_SendElementTag( cmpPhAtmPID, "T_ph:u_ph:v_ph:", &atmCouComm, &atmocnid );
         CHECKIERR( ierr, "cannot send tag values" )
 #ifdef VERBOSE
         int is_sender = 1;
@@ -538,7 +538,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         // receive on atm on coupler pes, that was redistributed according to coverage
-        ierr = iMOAB_ReceiveElementTag( cplAtmOcnPID, "T16_ph;u16_ph;v16_ph;", &atmCouComm, &cmpatm );
+        ierr = iMOAB_ReceiveElementTag( cplAtmOcnPID, "T16_ph:u16_ph:v16_ph:", &atmCouComm, &cmpatm );
         CHECKIERR( ierr, "cannot receive tag values" )
 #ifdef VERBOSE
         int is_sender = 0;
@@ -564,8 +564,8 @@ int main( int argc, char* argv[] )
     #endif
     */
 
-    const char* concat_fieldname  = "T16_ph;u16_ph;v16_ph;";
-    const char* concat_fieldnameT = "T_proj;u_proj;v_proj;";
+    const char* concat_fieldname  = "T16_ph:u16_ph:v16_ph:";
+    const char* concat_fieldnameT = "T_proj:u_proj:v_proj:";
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -598,7 +598,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmpocn;
-        ierr       = iMOAB_SendElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id );
+        ierr       = iMOAB_SendElementTag( cplOcnPID, "T_proj:u_proj:v_proj:", &ocnCouComm, &context_id );
         CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
     }
 
@@ -606,7 +606,7 @@ int main( int argc, char* argv[] )
     if( ocnComm != MPI_COMM_NULL )
     {
         context_id = cplocn;
-        ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &context_id );
+        ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "T_proj:u_proj:v_proj:", &ocnCouComm, &context_id );
         CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
     }
 
@@ -640,13 +640,13 @@ int main( int argc, char* argv[] )
 
         // as always, use nonblocking sends
         // this is for projection to land:
-        ierr = iMOAB_SendElementTag( cmpPhAtmPID, "T_ph;u_ph;v_ph;", &atmCouComm, &cpllnd );
+        ierr = iMOAB_SendElementTag( cmpPhAtmPID, "T_ph:u_ph:v_ph:", &atmCouComm, &cpllnd );
         CHECKIERR( ierr, "cannot send tag values towards cpl on land" )
     }
     if( couComm != MPI_COMM_NULL )
     {
         // receive on lnd on coupler pes
-        ierr = iMOAB_ReceiveElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &atmCouComm, &cmpatm );
+        ierr = iMOAB_ReceiveElementTag( cplLndPID, "T_proj:u_proj:v_proj:", &atmCouComm, &cmpatm );
         CHECKIERR( ierr, "cannot receive tag values on land on coupler" )
     }
     POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
@@ -687,14 +687,14 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmplnd;
-        ierr       = iMOAB_SendElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id );
+        ierr       = iMOAB_SendElementTag( cplLndPID, "T_proj:u_proj:v_proj:", &lndCouComm, &context_id );
         CHECKIERR( ierr, "cannot send tag values back to land pes" )
     }
     // receive on component 3, land
     if( lndComm != MPI_COMM_NULL )
     {
         context_id = cpllnd;  // receive from coupler on land
-        ierr       = iMOAB_ReceiveElementTag( cmpLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &context_id );
+        ierr       = iMOAB_ReceiveElementTag( cmpLndPID, "T_proj:u_proj:v_proj:", &lndCouComm, &context_id );
         CHECKIERR( ierr, "cannot receive tag values from land mesh on coupler pes" )
     }
 

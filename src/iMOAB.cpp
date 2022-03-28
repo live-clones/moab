@@ -2375,7 +2375,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
     // we assume that there are separators ";" between the tag names
     std::vector< std::string > tagNames;
     std::vector< Tag > tagHandles;
-    std::string separator( ";" );
+    std::string separator( ":" );
     split_tag_names( tag_name, separator, tagNames );
     for( size_t i = 0; i < tagNames.size(); i++ )
     {
@@ -2447,7 +2447,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
     // we assume that there are separators ";" between the tag names
     std::vector< std::string > tagNames;
     std::vector< Tag > tagHandles;
-    std::string separator( ";" );
+    std::string separator( ":" );
     split_tag_names( tag_name, separator, tagNames );
     for( size_t i = 0; i < tagNames.size(); i++ )
     {
@@ -4014,7 +4014,7 @@ ErrCode iMOAB_ApplyScalarProjectionWeights(
     std::vector< std::string > tgtNames;
     std::vector< Tag > srcTagHandles;
     std::vector< Tag > tgtTagHandles;
-    std::string separator( ";" );
+    std::string separator( ":" );
     std::string src_name( source_solution_tag_name );
     std::string tgt_name( target_solution_tag_name );
     split_tag_names( src_name, separator, srcNames );
