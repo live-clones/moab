@@ -95,7 +95,7 @@ std::string fileWriteOptions( "PARALLEL=WRITE_PART" );
 std::string tagT( "a2oTbot" );
 std::string tagU( "a2oUbot" );
 std::string tagV( "a2oVbot" );
-std::string separ( ";" );
+std::string separ( ":" );
 std::string tagT1( "a2oTbot_1" );
 std::string tagU1( "a2oUbot_1" );
 std::string tagV1( "a2oVbot_1" );

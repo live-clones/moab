@@ -301,8 +301,8 @@ program imoab_coupler_fortran
    end if
 
    ! Define the field variables to project
-   concat_fieldname = 'a2oTbot;a2oUbot;a2oVbot;'//C_NULL_CHAR
-   concat_fieldnameT = 'a2oTbot_proj;a2oUbot_proj;a2oVbot_proj;'//C_NULL_CHAR
+   concat_fieldname = 'a2oTbot:a2oUbot:a2oVbot:'//C_NULL_CHAR
+   concat_fieldnameT = 'a2oTbot_proj:a2oUbot_proj:a2oVbot_proj:'//C_NULL_CHAR
 
    if (atmComm .NE. MPI_COMM_NULL) then
 
