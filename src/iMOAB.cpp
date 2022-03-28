@@ -444,7 +444,8 @@ static void split_tag_names( std::string input_names,
     while( ( pos = input_names.find( separator ) ) != std::string::npos )
     {
         token = input_names.substr( 0, pos );
-        list_tag_names.push_back( token );
+        if (!token.empty())
+            list_tag_names.push_back( token );
         // std::cout << token << std::endl;
         input_names.erase( 0, pos + separator.length() );
     }
