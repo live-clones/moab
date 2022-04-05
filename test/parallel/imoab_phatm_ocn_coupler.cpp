@@ -441,13 +441,6 @@ int main( int argc, char* argv[] )
 
     const char* bottomFields          = "T16_ph:u16_ph:v16_ph";
     const char* bottomProjectedFields = "T_proj:u_proj:v_proj";
-    const char* bottomTempField          = "T16_ph";
-    const char* bottomTempProjectedField = "T_proj";
-    // Define more fields
-    const char* bottomUVelField          = "u16_ph";
-    const char* bottomUVelProjectedField = "u_proj";
-    const char* bottomVVelField          = "v16_ph";
-    const char* bottomVVelProjectedField = "v_proj";
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -489,17 +482,13 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem;
+            int storLeng = atmCompNDoFs * numAllElem *3; // 3 tags
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
             int eetype = 1;
-            ierr       = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomTempField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomUVelField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomVVelField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
+            ierr       = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomFields, &storLeng, &eetype, &vals[0] );
+            CHECKIERR( ierr, "cannot make tags nul" )
             // set the tag to 0
         }
     }

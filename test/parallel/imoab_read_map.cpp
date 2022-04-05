@@ -269,14 +269,6 @@ int main( int argc, char* argv[] )
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
 
-    const char* bottomTempField          = "a2oTbot";
-    const char* bottomTempProjectedField = "a2oTbot_proj";
-    // Define more fields
-    const char* bottomUVelField          = "a2oUbot";
-    const char* bottomUVelProjectedField = "a2oUbot_proj";
-    const char* bottomVVelField          = "a2oVbot";
-    const char* bottomVVelProjectedField = "a2oVbot_proj";
-
     const char* bottomFields          = "a2oTbot:a2oUbot:a2oVbot";
     const char* bottomProjectedFields = "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj";
 
@@ -311,20 +303,15 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem;
+            int storLeng = atmCompNDoFs * numAllElem*3; // 3 tags
             int eetype   = 1;
 
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
 
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomTempField, &storLeng, &eetype, &vals[0] );
+            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomFields, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomUVelField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomVVelField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
-            // set the tag to 0
         }
     }
 
@@ -446,7 +433,7 @@ int main( int argc, char* argv[] )
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
 #endif
-            // test results only for n == 1, for bottomTempProjectedField
+            // test results only for n == 1, for bottomTempProjectedField = "a2oTbot_proj"
             if( !no_regression_test )
             {
                 // the same as remap test
@@ -468,7 +455,7 @@ int main( int argc, char* argv[] )
                 int ent_type = 1;
                 ierr         = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
                 CHECKIERR( ierr, "failed to get global ids" );
-                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2], &ent_type,
+                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, "a2oTbot_proj", &nelem[2], &ent_type,
                                                   &tempElems[0] );
                 CHECKIERR( ierr, "failed to get temperature field" );
                 int err_code = 1;

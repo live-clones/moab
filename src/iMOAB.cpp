@@ -1668,36 +1668,20 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid,
 }
 
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
-                                   const iMOAB_String tag_storage_name,
+                                   const iMOAB_String tag_storage_names,
                                    int* num_tag_storage_length,
                                    int* ent_type,
                                    double* tag_storage_data )
 {
     ErrorCode rval;
+    std::string tag_names( tag_storage_names );
     // exactly the same code as for int tag :) maybe should check the type of tag too
-    std::string tag_name( tag_storage_name );
+    std::vector< std::string > tagNames;
+    std::vector< Tag > tagHandles;
+    std::string separator( ":" );
+    split_tag_names( tag_names, separator, tagNames );
 
     appData& data = context.appDatas[*pid];
-
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
-    {
-        return moab::MB_FAILURE;
-    }  // tag not defined
-
-    Tag tag = data.tagMap[tag_name];
-
-    int tagLength = 0;
-    rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
-
-    DataType dtype;
-    rval = context.MBI->tag_get_data_type( tag, dtype );
-
-    if( MB_SUCCESS != rval || dtype != MB_TYPE_DOUBLE )
-    {
-        return moab::MB_FAILURE;
-    }
-
-    // set it on a subset of entities, based on type and length
     Range* ents_to_set = NULL;
 
     if( *ent_type == 0 )  // vertices
@@ -1709,51 +1693,56 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
         ents_to_set = &data.primary_elems;
     }
 
-    int nents_to_be_set = *num_tag_storage_length / tagLength;
+    int nents_to_be_set = (int)(*ents_to_set).size();
+    int position = 0;
 
-    if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
+    for (size_t i=0; i< tagNames.size(); i++)
     {
-        return moab::MB_FAILURE;
-    }  // to many entities to be set
+        if( data.tagMap.find( tagNames[i] ) == data.tagMap.end() )
+        {
+            return moab::MB_FAILURE;
+        }  // some tag not defined yet in the app
 
-    // restrict the range; everything is contiguous; or not?
-    // Range contig_range ( * ( ents_to_set->begin() ), * ( ents_to_set->begin() + nents_to_be_set -
-    // 1 ) );
+        Tag tag = data.tagMap[tagNames[i]];
 
-    rval = context.MBI->tag_set_data( tag, *ents_to_set, tag_storage_data );MB_CHK_ERR( rval );
+        int tagLength = 0;
+        rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
 
+        DataType dtype;
+        rval = context.MBI->tag_get_data_type( tag, dtype ); MB_CHK_ERR( rval );
+
+        if( dtype != MB_TYPE_DOUBLE )
+        {
+            return moab::MB_FAILURE;
+        }
+
+        // set it on the subset of entities, based on type and length
+        if (position + tagLength*nents_to_be_set > * num_tag_storage_length)
+            return moab::MB_FAILURE;  // too many entity values to be set
+
+        rval = context.MBI->tag_set_data( tag, *ents_to_set, &tag_storage_data[position] );MB_CHK_ERR( rval );
+        // increment position to next tag
+        position = position + tagLength*nents_to_be_set;
+    }
     return moab::MB_SUCCESS;  // no error
 }
 
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
-                                   const iMOAB_String tag_storage_name,
+                                   const iMOAB_String tag_storage_names,
                                    int* num_tag_storage_length,
                                    int* ent_type,
                                    double* tag_storage_data )
 {
     ErrorCode rval;
     // exactly the same code, except tag type check
-    std::string tag_name( tag_storage_name );
+    std::string tag_names( tag_storage_names );
+    // exactly the same code as for int tag :) maybe should check the type of tag too
+    std::vector< std::string > tagNames;
+    std::vector< Tag > tagHandles;
+    std::string separator( ":" );
+    split_tag_names( tag_names, separator, tagNames );
 
     appData& data = context.appDatas[*pid];
-
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
-    {
-        return moab::MB_FAILURE;
-    }  // tag not defined
-
-    Tag tag = data.tagMap[tag_name];
-
-    int tagLength = 0;
-    rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
-
-    DataType dtype;
-    rval = context.MBI->tag_get_data_type( tag, dtype );MB_CHK_ERR( rval );
-
-    if( dtype != MB_TYPE_DOUBLE )
-    {
-        return moab::MB_FAILURE;
-    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_get = NULL;
@@ -1766,17 +1755,34 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
     {
         ents_to_get = &data.primary_elems;
     }
-
-    int nents_to_get = *num_tag_storage_length / tagLength;
-
-    if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
+    int nents_to_get = (int)ents_to_get->size();
+    int position = 0;
+    for (size_t i=0; i< tagNames.size(); i++)
     {
-        return moab::MB_FAILURE;
-    }  // to many entities to get
+        if( data.tagMap.find( tagNames[i] ) == data.tagMap.end() )
+        {
+            return moab::MB_FAILURE;
+        }  // tag not defined
 
-    // restrict the range; everything is contiguous; or not?
-    // Range contig_range( *( ents_to_get->begin() ), *( ents_to_get->begin() + nents_to_get - 1 ) );
-    rval = context.MBI->tag_get_data( tag, *ents_to_get, tag_storage_data );MB_CHK_ERR( rval );
+        Tag tag = data.tagMap[ tagNames[i] ];
+
+        int tagLength = 0;
+        rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
+
+        DataType dtype;
+        rval = context.MBI->tag_get_data_type( tag, dtype );MB_CHK_ERR( rval );
+
+        if( dtype != MB_TYPE_DOUBLE )
+        {
+            return moab::MB_FAILURE;
+        }
+
+        if ( position + nents_to_get * tagLength > *num_tag_storage_length )
+            return moab::MB_FAILURE; // too many entity values to get
+
+        rval = context.MBI->tag_get_data( tag, *ents_to_get, &tag_storage_data[position] );MB_CHK_ERR( rval );
+        position = position + nents_to_get * tagLength ;
+    }
 
     return moab::MB_SUCCESS;  // no error
 }
