@@ -1494,48 +1494,62 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
     }
 
     Tag tagHandle;
+    // split storage names if separated list
+
     std::string tag_name( tag_storage_name );
-    ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
-                                                  tagType, defaultVal );
 
-    if( MB_TAG_NOT_FOUND == rval )
+    //  first separate the names of the tags
+    // we assume that there are separators ":" between the tag names
+    std::vector< std::string > tagNames;
+    std::string separator( ":" );
+    split_tag_names( tag_name, separator, tagNames );
+
+    ErrorCode rval = moab::MB_SUCCESS; // assume success already :)
+    appData& data = context.appDatas[*pid];
+
+    for (size_t i=0; i<tagNames.size(); i++)
     {
-        rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
-                                            tagType | MB_TAG_CREAT, defaultVal );
-    }
+        rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
+                                                      tagType, defaultVal );
 
+        if( MB_TAG_NOT_FOUND == rval )
+        {
+            rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
+                                                tagType | MB_TAG_CREAT, defaultVal );
+        }
+
+
+
+        if( MB_ALREADY_ALLOCATED == rval )
+        {
+            std::map< std::string, Tag >& mTags        = data.tagMap;
+            std::map< std::string, Tag >::iterator mit = mTags.find( tag_name );
+
+            if( mit == mTags.end() )
+            {
+                // add it to the map
+                mTags[tagNames[i]] = tagHandle;
+                // push it to the list of tags, too
+                *tag_index = (int)data.tagList.size();
+                data.tagList.push_back( tagHandle );
+            }
+        }
+        else if( MB_SUCCESS == rval )
+        {
+            data.tagMap[tagNames[i]] = tagHandle;
+            *tag_index            = (int)data.tagList.size();
+            data.tagList.push_back( tagHandle );
+        }
+        else
+        {
+            rval = moab::MB_FAILURE;  // some tags were not created
+        }
+    }
     // we don't need default values anymore, avoid leaks
     delete[] defInt;
     delete[] defDouble;
     delete[] defHandle;
-
-    appData& data = context.appDatas[*pid];
-
-    if( MB_ALREADY_ALLOCATED == rval )
-    {
-        std::map< std::string, Tag >& mTags        = data.tagMap;
-        std::map< std::string, Tag >::iterator mit = mTags.find( tag_name );
-
-        if( mit == mTags.end() )
-        {
-            // add it to the map
-            mTags[tag_name] = tagHandle;
-            // push it to the list of tags, too
-            *tag_index = (int)data.tagList.size();
-            data.tagList.push_back( tagHandle );
-        }
-
-        return moab::MB_SUCCESS;  // OK, we found it, and we have it stored in the map tag
-    }
-    else if( MB_SUCCESS == rval )
-    {
-        data.tagMap[tag_name] = tagHandle;
-        *tag_index            = (int)data.tagList.size();
-        data.tagList.push_back( tagHandle );
-        return moab::MB_SUCCESS;
-    }
-    else
-        return moab::MB_FAILURE;  // some error, maybe the tag was not created
+    return rval;
 }
 
 ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid,
@@ -2373,7 +2387,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 
     // basically, we assume everything is defined already on the tag,
     //   and we can get the tags just by its name
-    // we assume that there are separators ";" between the tag names
+    // we assume that there are separators ":" between the tag names
     std::vector< std::string > tagNames;
     std::vector< Tag > tagHandles;
     std::string separator( ":" );
