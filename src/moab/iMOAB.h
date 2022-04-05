@@ -744,13 +744,13 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid,
  * \note <B>Operations:</B> Collective
  *
  * \param[in]  pid (iMOAB_AppID)                       The unique pointer to the application ID.
- * \param[in]  tag_storage_name (iMOAB_String)         The tag name to store/retreive the data in MOAB.
- * \param[in]  num_tag_storage_length (int*)           The size of tag storage data (e.g., num_visible_vertices*components_per_entity
- *                                                     or num_visible_elements*components_per_entity).
+ * \param[in]  tag_storage_name (iMOAB_String)         The tag names, separated, to store the data.
+ * \param[in]  num_tag_storage_length (int*)           The size of total tag storage data (e.g., num_visible_vertices*components_per_entity
+ *                                                     or num_visible_elements*components_per_entity*num_tags).
  * \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements.
  * \param[out] tag_storage_data (double*)              The array data of type <I>double</I> to replace the internal tag memory;
  *                                                     The data is assumed to be contiguous over the local set of visible
- *                                                     entities (either vertices or elements).
+ *                                                     entities (either vertices or elements). unrolled by tags
  * \return ErrCode                                     The error code indicating success or failure.
  */
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
@@ -765,13 +765,13 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
  * \note <B>Operations:</B> Collective
  *
  * \param[in]  pid (iMOAB_AppID)                       The unique pointer to the application ID.
- * \param[in]  tag_storage_name (iMOAB_String)         The tag name to store/retreive the data in MOAB.
- * \param[in]  num_tag_storage_length (int)            The size of tag storage data (e.g., num_visible_vertices*components_per_entity
- *                                                     or num_visible_elements*components_per_entity)
+ * \param[in]  tag_storage_name (iMOAB_String)         The tag names to retrieve the data in MOAB.
+ * \param[in]  num_tag_storage_length (int)            The size of total tag storage data (e.g., num_visible_vertices*components_per_entity*num_tags
+ *                                                     or num_visible_elements*components_per_entity*num_tags)
  * \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements.
  * \param[out] tag_storage_data (double*)              The array data of type <I>double</I> to replace the internal tag memory;
  *                                                     The data is assumed to be contiguous over the local set of visible
- *                                                     entities (either vertices or elements).
+ *                                                     entities (either vertices or elements). unrolled by tags
  * \return ErrCode                                     The error code indicating success or failure.
  */
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,

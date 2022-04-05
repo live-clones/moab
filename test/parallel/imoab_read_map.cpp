@@ -269,33 +269,16 @@ int main( int argc, char* argv[] )
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
 
-    const char* bottomTempField          = "a2oTbot";
-    const char* bottomTempProjectedField = "a2oTbot_proj";
-    // Define more fields
-    const char* bottomUVelField          = "a2oUbot";
-    const char* bottomUVelProjectedField = "a2oUbot_proj";
-    const char* bottomVVelField          = "a2oVbot";
-    const char* bottomVVelProjectedField = "a2oVbot_proj";
+    const char* bottomFields          = "a2oTbot:a2oUbot:a2oVbot";
+    const char* bottomProjectedFields = "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj";
 
     if( couComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomTempField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
-        CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFields, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
+        CHECKIERR( ierr, "failed to define the field tags a2oTbot:a2oUbot:a2oVbot" );
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
-        CHECKIERR( ierr, "failed to define the field tag a2oTbot_proj" );
-
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomUVelField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
-        CHECKIERR( ierr, "failed to define the field tag a2oUbot" );
-
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomUVelProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
-        CHECKIERR( ierr, "failed to define the field tag a2oUbot_proj" );
-
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomVVelField, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
-        CHECKIERR( ierr, "failed to define the field tag a2oUbot" );
-
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomVVelProjectedField, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
-        CHECKIERR( ierr, "failed to define the field tag a2oUbot_proj" );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
+        CHECKIERR( ierr, "failed to define the field tags a2oTbot_proj:a2oUbot_proj:a2oVbot_proj " );
     }
 
     // need to make sure that the coverage mesh (created during intx method) received the tag that
@@ -320,25 +303,20 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem;
+            int storLeng = atmCompNDoFs * numAllElem*3; // 3 tags
             int eetype   = 1;
 
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
 
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomTempField, &storLeng, &eetype, &vals[0] );
+            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomFields, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomUVelField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
-            ierr = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomVVelField, &storLeng, &eetype, &vals[0] );
-            CHECKIERR( ierr, "cannot make tag nul" )
-            // set the tag to 0
         }
     }
 
-    const char* concat_fieldname  = "a2oTbot:a2oUbot:a2oVbot:";
-    const char* concat_fieldnameT = "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj:";
+    const char* concat_fieldname  = "a2oTbot:a2oUbot:a2oVbot";
+    const char* concat_fieldnameT = "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj";
 
     // start a virtual loop for number of iterations
     for( int iters = 0; iters < n; iters++ )
@@ -349,7 +327,7 @@ int main( int argc, char* argv[] )
         {
             // as always, use nonblocking sends
             // this is for projection to ocean:
-            ierr = iMOAB_SendElementTag( cmpAtmPID, "a2oTbot:a2oUbot:a2oVbot:", &atmCouComm, &cplocn );
+            ierr = iMOAB_SendElementTag( cmpAtmPID, "a2oTbot:a2oUbot:a2oVbot", &atmCouComm, &cplocn );
             CHECKIERR( ierr, "cannot send tag values" )
 #ifdef GRAPH_INFO
             int is_sender = 1;
@@ -360,7 +338,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtmPID, "a2oTbot:a2oUbot:a2oVbot:", &atmCouComm, &cmpatm );
+            ierr = iMOAB_ReceiveElementTag( cplAtmPID, "a2oTbot:a2oUbot:a2oVbot", &atmCouComm, &cmpatm );
             CHECKIERR( ierr, "cannot receive tag values" )
 #ifdef GRAPH_INFO
             int is_sender = 0;
@@ -414,18 +392,10 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             int tagIndexIn2;
-            ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomTempProjectedField, &tagTypes[1], &ocnCompNDoFs,
+            ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs,
                                            &tagIndexIn2 );
-            CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
-                             "a2oTbot_proj on ocn pes" );
-            ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomUVelProjectedField, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2 );
-            CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
-                             "a2oUbot_proj on ocn pes" );
-            ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomVVelProjectedField, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2 );
-            CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
-                             "a2oVbot_proj on ocn pes" );
+            CHECKIERR( ierr, "failed to define the field tag for receiving back the tags "
+                             "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj on ocn pes" );
         }
         // send the tag to ocean pes, from ocean mesh on coupler pes
         //   from couComm, using common joint comm ocn_coupler
@@ -436,7 +406,7 @@ int main( int argc, char* argv[] )
             // need to use ocean comp id for context
             context_id = cmpocn;  // id for ocean on comp
             ierr =
-                iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj:", &ocnCouComm, &context_id );
+                iMOAB_SendElementTag( cplOcnPID, "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj", &ocnCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
         }
 
@@ -444,7 +414,7 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             context_id = cplocn;  // id for ocean on coupler
-            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj:", &ocnCouComm,
+            ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj", &ocnCouComm,
                                             &context_id );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
@@ -463,7 +433,7 @@ int main( int argc, char* argv[] )
             ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions );
             CHECKIERR( ierr, "could not write OcnWithProj.h5m to disk" )
 #endif
-            // test results only for n == 1, for bottomTempProjectedField
+            // test results only for n == 1, for bottomTempProjectedField = "a2oTbot_proj"
             if( !no_regression_test )
             {
                 // the same as remap test
@@ -485,7 +455,7 @@ int main( int argc, char* argv[] )
                 int ent_type = 1;
                 ierr         = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
                 CHECKIERR( ierr, "failed to get global ids" );
-                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, bottomTempProjectedField, &nelem[2], &ent_type,
+                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, "a2oTbot_proj", &nelem[2], &ent_type,
                                                   &tempElems[0] );
                 CHECKIERR( ierr, "failed to get temperature field" );
                 int err_code = 1;

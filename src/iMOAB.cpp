@@ -1494,48 +1494,63 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
     }
 
     Tag tagHandle;
+    // split storage names if separated list
+
     std::string tag_name( tag_storage_name );
-    ErrorCode rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
-                                                  tagType, defaultVal );
 
-    if( MB_TAG_NOT_FOUND == rval )
+    //  first separate the names of the tags
+    // we assume that there are separators ":" between the tag names
+    std::vector< std::string > tagNames;
+    std::string separator( ":" );
+    split_tag_names( tag_name, separator, tagNames );
+
+    ErrorCode rval = moab::MB_SUCCESS; // assume success already :)
+    appData& data = context.appDatas[*pid];
+
+    for (size_t i=0; i<tagNames.size(); i++)
     {
-        rval = context.MBI->tag_get_handle( tag_name.c_str(), *components_per_entity, tagDataType, tagHandle,
-                                            tagType | MB_TAG_CREAT, defaultVal );
-    }
+        rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
+                                                      tagType, defaultVal );
 
+        if( MB_TAG_NOT_FOUND == rval )
+        {
+            rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
+                                                tagType | MB_TAG_CREAT, defaultVal );
+        }
+
+
+
+        if( MB_ALREADY_ALLOCATED == rval )
+        {
+            std::map< std::string, Tag >& mTags        = data.tagMap;
+            std::map< std::string, Tag >::iterator mit = mTags.find( tag_name );
+
+            if( mit == mTags.end() )
+            {
+                // add it to the map
+                mTags[tagNames[i]] = tagHandle;
+                // push it to the list of tags, too
+                *tag_index = (int)data.tagList.size();
+                data.tagList.push_back( tagHandle );
+            }
+            rval = MB_SUCCESS;
+        }
+        else if( MB_SUCCESS == rval )
+        {
+            data.tagMap[tagNames[i]] = tagHandle;
+            *tag_index            = (int)data.tagList.size();
+            data.tagList.push_back( tagHandle );
+        }
+        else
+        {
+            rval = moab::MB_FAILURE;  // some tags were not created
+        }
+    }
     // we don't need default values anymore, avoid leaks
     delete[] defInt;
     delete[] defDouble;
     delete[] defHandle;
-
-    appData& data = context.appDatas[*pid];
-
-    if( MB_ALREADY_ALLOCATED == rval )
-    {
-        std::map< std::string, Tag >& mTags        = data.tagMap;
-        std::map< std::string, Tag >::iterator mit = mTags.find( tag_name );
-
-        if( mit == mTags.end() )
-        {
-            // add it to the map
-            mTags[tag_name] = tagHandle;
-            // push it to the list of tags, too
-            *tag_index = (int)data.tagList.size();
-            data.tagList.push_back( tagHandle );
-        }
-
-        return moab::MB_SUCCESS;  // OK, we found it, and we have it stored in the map tag
-    }
-    else if( MB_SUCCESS == rval )
-    {
-        data.tagMap[tag_name] = tagHandle;
-        *tag_index            = (int)data.tagList.size();
-        data.tagList.push_back( tagHandle );
-        return moab::MB_SUCCESS;
-    }
-    else
-        return moab::MB_FAILURE;  // some error, maybe the tag was not created
+    return rval;
 }
 
 ErrCode iMOAB_SetIntTagStorage( iMOAB_AppID pid,
@@ -1653,36 +1668,20 @@ ErrCode iMOAB_GetIntTagStorage( iMOAB_AppID pid,
 }
 
 ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
-                                   const iMOAB_String tag_storage_name,
+                                   const iMOAB_String tag_storage_names,
                                    int* num_tag_storage_length,
                                    int* ent_type,
                                    double* tag_storage_data )
 {
     ErrorCode rval;
+    std::string tag_names( tag_storage_names );
     // exactly the same code as for int tag :) maybe should check the type of tag too
-    std::string tag_name( tag_storage_name );
+    std::vector< std::string > tagNames;
+    std::vector< Tag > tagHandles;
+    std::string separator( ":" );
+    split_tag_names( tag_names, separator, tagNames );
 
     appData& data = context.appDatas[*pid];
-
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
-    {
-        return moab::MB_FAILURE;
-    }  // tag not defined
-
-    Tag tag = data.tagMap[tag_name];
-
-    int tagLength = 0;
-    rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
-
-    DataType dtype;
-    rval = context.MBI->tag_get_data_type( tag, dtype );
-
-    if( MB_SUCCESS != rval || dtype != MB_TYPE_DOUBLE )
-    {
-        return moab::MB_FAILURE;
-    }
-
-    // set it on a subset of entities, based on type and length
     Range* ents_to_set = NULL;
 
     if( *ent_type == 0 )  // vertices
@@ -1694,51 +1693,56 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
         ents_to_set = &data.primary_elems;
     }
 
-    int nents_to_be_set = *num_tag_storage_length / tagLength;
+    int nents_to_be_set = (int)(*ents_to_set).size();
+    int position = 0;
 
-    if( nents_to_be_set > (int)ents_to_set->size() || nents_to_be_set < 1 )
+    for (size_t i=0; i< tagNames.size(); i++)
     {
-        return moab::MB_FAILURE;
-    }  // to many entities to be set
+        if( data.tagMap.find( tagNames[i] ) == data.tagMap.end() )
+        {
+            return moab::MB_FAILURE;
+        }  // some tag not defined yet in the app
 
-    // restrict the range; everything is contiguous; or not?
-    // Range contig_range ( * ( ents_to_set->begin() ), * ( ents_to_set->begin() + nents_to_be_set -
-    // 1 ) );
+        Tag tag = data.tagMap[tagNames[i]];
 
-    rval = context.MBI->tag_set_data( tag, *ents_to_set, tag_storage_data );MB_CHK_ERR( rval );
+        int tagLength = 0;
+        rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
 
+        DataType dtype;
+        rval = context.MBI->tag_get_data_type( tag, dtype ); MB_CHK_ERR( rval );
+
+        if( dtype != MB_TYPE_DOUBLE )
+        {
+            return moab::MB_FAILURE;
+        }
+
+        // set it on the subset of entities, based on type and length
+        if (position + tagLength*nents_to_be_set > * num_tag_storage_length)
+            return moab::MB_FAILURE;  // too many entity values to be set
+
+        rval = context.MBI->tag_set_data( tag, *ents_to_set, &tag_storage_data[position] );MB_CHK_ERR( rval );
+        // increment position to next tag
+        position = position + tagLength*nents_to_be_set;
+    }
     return moab::MB_SUCCESS;  // no error
 }
 
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
-                                   const iMOAB_String tag_storage_name,
+                                   const iMOAB_String tag_storage_names,
                                    int* num_tag_storage_length,
                                    int* ent_type,
                                    double* tag_storage_data )
 {
     ErrorCode rval;
     // exactly the same code, except tag type check
-    std::string tag_name( tag_storage_name );
+    std::string tag_names( tag_storage_names );
+    // exactly the same code as for int tag :) maybe should check the type of tag too
+    std::vector< std::string > tagNames;
+    std::vector< Tag > tagHandles;
+    std::string separator( ":" );
+    split_tag_names( tag_names, separator, tagNames );
 
     appData& data = context.appDatas[*pid];
-
-    if( data.tagMap.find( tag_name ) == data.tagMap.end() )
-    {
-        return moab::MB_FAILURE;
-    }  // tag not defined
-
-    Tag tag = data.tagMap[tag_name];
-
-    int tagLength = 0;
-    rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
-
-    DataType dtype;
-    rval = context.MBI->tag_get_data_type( tag, dtype );MB_CHK_ERR( rval );
-
-    if( dtype != MB_TYPE_DOUBLE )
-    {
-        return moab::MB_FAILURE;
-    }
 
     // set it on a subset of entities, based on type and length
     Range* ents_to_get = NULL;
@@ -1751,17 +1755,34 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
     {
         ents_to_get = &data.primary_elems;
     }
-
-    int nents_to_get = *num_tag_storage_length / tagLength;
-
-    if( nents_to_get > (int)ents_to_get->size() || nents_to_get < 1 )
+    int nents_to_get = (int)ents_to_get->size();
+    int position = 0;
+    for (size_t i=0; i< tagNames.size(); i++)
     {
-        return moab::MB_FAILURE;
-    }  // to many entities to get
+        if( data.tagMap.find( tagNames[i] ) == data.tagMap.end() )
+        {
+            return moab::MB_FAILURE;
+        }  // tag not defined
 
-    // restrict the range; everything is contiguous; or not?
-    // Range contig_range( *( ents_to_get->begin() ), *( ents_to_get->begin() + nents_to_get - 1 ) );
-    rval = context.MBI->tag_get_data( tag, *ents_to_get, tag_storage_data );MB_CHK_ERR( rval );
+        Tag tag = data.tagMap[ tagNames[i] ];
+
+        int tagLength = 0;
+        rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
+
+        DataType dtype;
+        rval = context.MBI->tag_get_data_type( tag, dtype );MB_CHK_ERR( rval );
+
+        if( dtype != MB_TYPE_DOUBLE )
+        {
+            return moab::MB_FAILURE;
+        }
+
+        if ( position + nents_to_get * tagLength > *num_tag_storage_length )
+            return moab::MB_FAILURE; // too many entity values to get
+
+        rval = context.MBI->tag_get_data( tag, *ents_to_get, &tag_storage_data[position] );MB_CHK_ERR( rval );
+        position = position + nents_to_get * tagLength ;
+    }
 
     return moab::MB_SUCCESS;  // no error
 }
@@ -2373,7 +2394,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
 
     // basically, we assume everything is defined already on the tag,
     //   and we can get the tags just by its name
-    // we assume that there are separators ";" between the tag names
+    // we assume that there are separators ":" between the tag names
     std::vector< std::string > tagNames;
     std::vector< Tag > tagHandles;
     std::string separator( ":" );

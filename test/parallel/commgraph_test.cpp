@@ -231,7 +231,7 @@ int commgraphtest()
     if( atmComm != MPI_COMM_NULL )
     {
         // call send tag;
-        std::string tags = tagT + separ + tagU + separ + tagV + separ;
+        std::string tags = tagT + separ + tagU + separ + tagV;
         ierr             = iMOAB_SendElementTag( cmpAtmPID, tags.c_str(), &joinComm, &physatm );
         CHECKIERR( ierr, "cannot send tag values" )
     }
