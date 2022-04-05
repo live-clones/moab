@@ -888,13 +888,17 @@ int main( int argc, char* argv[] )
     {
         /* We have the remapping weights now. Let us apply the weights onto the tag we defined
            on the source mesh and get the projection on the target mesh */
-        PUSH_TIMER( "Apply Scalar projection weights" )
+
         const char* concat_fieldname  = "T_proj:u_proj:v_proj";  // this is now source tag
         const char* concat_fieldnameT = "T2_ph:u2_ph:v2_ph";     // projected tag on
         // make sure the new tags exist on atm coupler mesh;
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFields2, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tags T2_ph, u2_ph, v2_ph" );
 
+        PUSH_TIMER( "Apply Scalar projection weights" )
+        ierr = iMOAB_ApplyScalarProjectionWeights( cplLndAtmPID, weights_identifiers[0], concat_fieldname,
+                                                   concat_fieldnameT );
+        CHECKIERR( ierr, "failed to compute projection weight application" );
         POP_TIMER( couComm, rankInCouComm )
 
         char outputFileTgt[] = "fAtm2OnCpl2.h5m";

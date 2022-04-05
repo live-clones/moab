@@ -1533,6 +1533,7 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
                 *tag_index = (int)data.tagList.size();
                 data.tagList.push_back( tagHandle );
             }
+            rval = MB_SUCCESS;
         }
         else if( MB_SUCCESS == rval )
         {
