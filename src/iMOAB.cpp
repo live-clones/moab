@@ -444,8 +444,7 @@ static void split_tag_names( std::string input_names,
     while( ( pos = input_names.find( separator ) ) != std::string::npos )
     {
         token = input_names.substr( 0, pos );
-        if (!token.empty())
-            list_tag_names.push_back( token );
+        if( !token.empty() ) list_tag_names.push_back( token );
         // std::cout << token << std::endl;
         input_names.erase( 0, pos + separator.length() );
     }
@@ -693,6 +692,9 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMO
     IMOAB_CHECKPOINTER( filename, 2 );
     IMOAB_ASSERT( strlen( filename ), "Invalid filename length." );
 
+    appData& data        = context.appDatas[*pid];
+    EntityHandle fileSet = data.file_set;
+
     std::ostringstream newopts;
 #ifdef MOAB_HAVE_MPI
     std::string write_opts( ( write_options ? write_options : "" ) );
@@ -718,8 +720,30 @@ ErrCode iMOAB_WriteMesh( iMOAB_AppID pid, const iMOAB_String filename, const iMO
 
     if( write_options ) newopts << write_options;
 
+    std::vector< Tag > copyTagList = data.tagList;
+    // append Global ID and Parallel Partition
+    std::string gid_name_tag( "GLOBAL_ID" );
+
+    // export global id tag, we need it always
+    if( data.tagMap.find( gid_name_tag ) == data.tagMap.end() )
+    {
+        Tag gid = context.MBI->globalId_tag();
+        copyTagList.push_back( gid );
+    }
+    // also Parallel_Partition PARALLEL_PARTITION
+    std::string pp_name_tag( "PARALLEL_PARTITION" );
+
+    // write parallel part tag too, if it exists
+    if( data.tagMap.find( pp_name_tag ) == data.tagMap.end() )
+    {
+        Tag ptag;
+        context.MBI->tag_get_handle( pp_name_tag.c_str(), ptag );
+        if( ptag ) copyTagList.push_back( ptag );
+    }
+
     // Now let us actually write the file to disk with appropriate options
-    ErrorCode rval = context.MBI->write_file( filename, 0, newopts.str().c_str(), &context.appDatas[*pid].file_set, 1 );MB_CHK_ERR( rval );
+    ErrorCode rval = context.MBI->write_file( filename, 0, newopts.str().c_str(), &fileSet, 1, &copyTagList[0],
+                                              (int)copyTagList.size() );MB_CHK_ERR( rval );
 
     return moab::MB_SUCCESS;
 }
@@ -1504,21 +1528,19 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
     std::string separator( ":" );
     split_tag_names( tag_name, separator, tagNames );
 
-    ErrorCode rval = moab::MB_SUCCESS; // assume success already :)
-    appData& data = context.appDatas[*pid];
+    ErrorCode rval = moab::MB_SUCCESS;  // assume success already :)
+    appData& data  = context.appDatas[*pid];
 
-    for (size_t i=0; i<tagNames.size(); i++)
+    for( size_t i = 0; i < tagNames.size(); i++ )
     {
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
-                                                      tagType, defaultVal );
+                                            tagType, defaultVal );
 
         if( MB_TAG_NOT_FOUND == rval )
         {
             rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
                                                 tagType | MB_TAG_CREAT, defaultVal );
         }
-
-
 
         if( MB_ALREADY_ALLOCATED == rval )
         {
@@ -1538,7 +1560,7 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
         else if( MB_SUCCESS == rval )
         {
             data.tagMap[tagNames[i]] = tagHandle;
-            *tag_index            = (int)data.tagList.size();
+            *tag_index               = (int)data.tagList.size();
             data.tagList.push_back( tagHandle );
         }
         else
@@ -1681,7 +1703,7 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
     std::string separator( ":" );
     split_tag_names( tag_names, separator, tagNames );
 
-    appData& data = context.appDatas[*pid];
+    appData& data      = context.appDatas[*pid];
     Range* ents_to_set = NULL;
 
     if( *ent_type == 0 )  // vertices
@@ -1693,10 +1715,10 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
         ents_to_set = &data.primary_elems;
     }
 
-    int nents_to_be_set = (int)(*ents_to_set).size();
-    int position = 0;
+    int nents_to_be_set = (int)( *ents_to_set ).size();
+    int position        = 0;
 
-    for (size_t i=0; i< tagNames.size(); i++)
+    for( size_t i = 0; i < tagNames.size(); i++ )
     {
         if( data.tagMap.find( tagNames[i] ) == data.tagMap.end() )
         {
@@ -1709,7 +1731,7 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
         rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
 
         DataType dtype;
-        rval = context.MBI->tag_get_data_type( tag, dtype ); MB_CHK_ERR( rval );
+        rval = context.MBI->tag_get_data_type( tag, dtype );MB_CHK_ERR( rval );
 
         if( dtype != MB_TYPE_DOUBLE )
         {
@@ -1717,12 +1739,12 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
         }
 
         // set it on the subset of entities, based on type and length
-        if (position + tagLength*nents_to_be_set > * num_tag_storage_length)
+        if( position + tagLength * nents_to_be_set > *num_tag_storage_length )
             return moab::MB_FAILURE;  // too many entity values to be set
 
         rval = context.MBI->tag_set_data( tag, *ents_to_set, &tag_storage_data[position] );MB_CHK_ERR( rval );
         // increment position to next tag
-        position = position + tagLength*nents_to_be_set;
+        position = position + tagLength * nents_to_be_set;
     }
     return moab::MB_SUCCESS;  // no error
 }
@@ -1756,15 +1778,15 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
         ents_to_get = &data.primary_elems;
     }
     int nents_to_get = (int)ents_to_get->size();
-    int position = 0;
-    for (size_t i=0; i< tagNames.size(); i++)
+    int position     = 0;
+    for( size_t i = 0; i < tagNames.size(); i++ )
     {
         if( data.tagMap.find( tagNames[i] ) == data.tagMap.end() )
         {
             return moab::MB_FAILURE;
         }  // tag not defined
 
-        Tag tag = data.tagMap[ tagNames[i] ];
+        Tag tag = data.tagMap[tagNames[i]];
 
         int tagLength = 0;
         rval          = context.MBI->tag_get_length( tag, tagLength );MB_CHK_ERR( rval );
@@ -1777,11 +1799,11 @@ ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
             return moab::MB_FAILURE;
         }
 
-        if ( position + nents_to_get * tagLength > *num_tag_storage_length )
-            return moab::MB_FAILURE; // too many entity values to get
+        if( position + nents_to_get * tagLength > *num_tag_storage_length )
+            return moab::MB_FAILURE;  // too many entity values to get
 
         rval = context.MBI->tag_get_data( tag, *ents_to_get, &tag_storage_data[position] );MB_CHK_ERR( rval );
-        position = position + nents_to_get * tagLength ;
+        position = position + nents_to_get * tagLength;
     }
 
     return moab::MB_SUCCESS;  // no error
@@ -1944,7 +1966,7 @@ ErrCode iMOAB_CreateElements( iMOAB_AppID pid,
     ReadUtilIface* read_iface;
     ErrorCode rval = context.MBI->query_interface( read_iface );MB_CHK_ERR( rval );
 
-    EntityType mbtype = (EntityType)( *type );
+    EntityType mbtype = ( EntityType )( *type );
     EntityHandle actual_start_handle;
     EntityHandle* array = NULL;
     rval = read_iface->get_element_connect( *num_elem, *num_nodes_per_element, mbtype, 1, actual_start_handle, array );MB_CHK_ERR( rval );
@@ -2058,7 +2080,7 @@ ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marke
     Tag part_tag;
     dum_id = -1;
     rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                          MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2326,7 +2348,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     Tag part_tag;
     int dum_id = -1;
     rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                              MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2885,7 +2907,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
     Tag part_tag;
     int dum_id = -1;
     rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                              MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2970,7 +2992,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
     // the crystal router will send ID cell to the original source, on the component task
     // if we are on intx tasks, loop over all intx elements and
 
-    MPI_Comm global            = ( is_fortran_context ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
+    MPI_Comm global = ( is_fortran_context ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
     int currentRankInJointComm = -1;
     ierr                       = MPI_Comm_rank( global, &currentRankInJointComm );CHK_MPI_ERR( ierr );
 
@@ -3139,17 +3161,17 @@ ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, c
 #ifdef MOAB_HAVE_TEMPESTREMAP
 
 #ifdef MOAB_HAVE_NETCDF
-ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
-                                           iMOAB_AppID pid_cpl,
-                                           int * col_or_row,
-                                           int * type,
-                                           const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
-                                           const iMOAB_String remap_weights_filename )
+ErrCode iMOAB_LoadMappingWeightsFromFile(
+    iMOAB_AppID pid_intersection,
+    iMOAB_AppID pid_cpl,
+    int* col_or_row,
+    int* type,
+    const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
+    const iMOAB_String remap_weights_filename )
 {
     ErrorCode rval;
     bool row_based_partition = true;
-    if (*col_or_row == 1)
-        row_based_partition = false; // do a column based partition;
+    if( *col_or_row == 1 ) row_based_partition = false;  // do a column based partition;
 
     // get the local degrees of freedom, from the pid_cpl and type of mesh
 
@@ -3160,18 +3182,18 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
     // Get the handle to the remapper object
     if( tdata.remapper == NULL )
     {
-      // Now allocate and initialize the remapper object
+        // Now allocate and initialize the remapper object
 #ifdef MOAB_HAVE_MPI
-      ParallelComm* pco = context.pcomms[*pid_intersection];
-      tdata.remapper    = new moab::TempestRemapper( context.MBI, pco );
+        ParallelComm* pco = context.pcomms[*pid_intersection];
+        tdata.remapper    = new moab::TempestRemapper( context.MBI, pco );
 #else
-      tdata.remapper = new moab::TempestRemapper( context.MBI );
+        tdata.remapper = new moab::TempestRemapper( context.MBI );
 #endif
-      tdata.remapper->meshValidate     = true;
-      tdata.remapper->constructEdgeMap = true;
-      // Do not create new filesets; Use the sets from our respective applications
-      tdata.remapper->initialize( false );
-      tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
+        tdata.remapper->meshValidate     = true;
+        tdata.remapper->constructEdgeMap = true;
+        // Do not create new filesets; Use the sets from our respective applications
+        tdata.remapper->initialize( false );
+        tdata.remapper->GetMeshSet( moab::Remapper::OverlapMesh ) = data_intx.file_set;
     }
 
     // Setup loading of weights onto TempestOnlineMap
@@ -3182,10 +3204,10 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
     moab::TempestOnlineMap* weightMap = tdata.weightMaps[std::string( solution_weights_identifier )];
     assert( weightMap != NULL );
 
-    if (*pid_cpl>=0) // it means we are looking for how to distribute the degrees of freedom, new map reader
+    if( *pid_cpl >= 0 )  // it means we are looking for how to distribute the degrees of freedom, new map reader
     {
         appData& data1     = context.appDatas[*pid_cpl];
-        EntityHandle fset1 = data1.file_set; // this is source or target, depending on direction
+        EntityHandle fset1 = data1.file_set;  // this is source or target, depending on direction
 
         // tags of interest are either GLOBAL_DOFS or GLOBAL_ID
         Tag gdsTag;
@@ -3202,7 +3224,8 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
         std::vector< int > dofValues;
 
         // populate first tuple
-        Range ents_of_interest;  // will be filled with entities on coupler, from which we will get the DOFs, based on type
+        Range
+            ents_of_interest;  // will be filled with entities on coupler, from which we will get the DOFs, based on type
         int ndofPerEl = 1;
 
         if( *type == 1 )
@@ -3230,10 +3253,10 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
             MB_CHK_ERR( MB_FAILURE );  // we know only type 1 or 2 or 3
         }
         // pass ordered dofs, and unique
-        std::vector<int> orderDofs(dofValues.begin(), dofValues.end());
+        std::vector< int > orderDofs( dofValues.begin(), dofValues.end() );
 
         std::sort( orderDofs.begin(), orderDofs.end() );
-        orderDofs.erase( std::unique( orderDofs.begin(), orderDofs.end() ), orderDofs.end() ); // remove duplicates
+        orderDofs.erase( std::unique( orderDofs.begin(), orderDofs.end() ), orderDofs.end() );  // remove duplicates
 
         rval = weightMap->ReadParallelMap( remap_weights_filename, orderDofs, row_based_partition );MB_CHK_ERR( rval );
 
@@ -3253,7 +3276,7 @@ ErrCode iMOAB_LoadMappingWeightsFromFile ( iMOAB_AppID pid_intersection,
             weightMap->set_col_dc_dofs( dofValues );  // will set col_dtoc_dofmap
         }
     }
-    else // old reader, trivial distribution by row
+    else  // old reader, trivial distribution by row
     {
         std::vector< int > tmp_owned_ids;  // this will do a trivial row distribution
         rval = weightMap->ReadParallelMap( remap_weights_filename, tmp_owned_ids, row_based_partition );MB_CHK_ERR( rval );
