@@ -15,7 +15,7 @@ from pymoab import types
 from pymoab.rng import Range
 
 
-print "== Gathering information.  (Invoke with --help for more details. All arguments are optional)"
+print("== Gathering information.  (Invoke with --help for more details. All arguments are optional)")
 parser = OptionParser()
 parser.description = "This script takes a scrip file and generates a MOAB h5m file."
 
