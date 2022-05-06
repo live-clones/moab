@@ -381,7 +381,7 @@ int main( int argc, char* argv[] )
                                     &cplocn );  // it happens over joint communicator
         CHECKIERR( ierr, "cannot recompute direct coverage graph for ocean" )
     }
-#endif
+
     // need to compute graph between phys atm and atm/ocn intx coverage
     if( atmCouComm != MPI_COMM_NULL )
     {
@@ -390,6 +390,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_ComputeCommGraph( cmpPhAtmPID, cplAtmOcnPID, &atmCouComm, &atmPEGroup, &couPEGroup, &typeA, &typeB,
                                        &cmpatm, &atmocnid );
     }
+#endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     // we will compute comm graph between atm phys and land, directly; we do not need any
