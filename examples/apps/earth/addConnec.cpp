@@ -53,7 +53,6 @@ int main( int argc, char* argv[] )
     Core* mb2 = new Core();
     rval      = mb2->load_file( sourcefile.c_str() );MB_CHK_SET_ERR( rval, "can't load source file" );
 
-
     // get vertices on ini mesh; get global id on ini mesh
     // get global id on source mesh
     Tag gid;
@@ -80,59 +79,56 @@ int main( int argc, char* argv[] )
     Range sourceVerts;
     rval = mb2->get_entities_by_dimension( 0, 0, sourceVerts );MB_CHK_SET_ERR( rval, "can't get verts on source mesh " );
     std::vector< int > gids2;
-	gids2.resize( sourceVerts.size() );
-	rval = mb2->tag_get_data( gid2, sourceVerts, &( gids2[0] ) );MB_CHK_SET_ERR( rval, "can't get gid2 on cloud mesh " );
-	std::map< int, EntityHandle > fromGid2ToEh;
-	i = 0;
-	for( Range::iterator vit = sourceVerts.begin(); vit != sourceVerts.end(); vit++, i++ )
-	{
-		fromGid2ToEh[gids2[i]] = *vit;
-	}
-
-	Range usedVerts;
-    for( size_t i=0; i< gids2.size(); i++)
+    gids2.resize( sourceVerts.size() );
+    rval = mb2->tag_get_data( gid2, sourceVerts, &( gids2[0] ) );MB_CHK_SET_ERR( rval, "can't get gid2 on cloud mesh " );
+    std::map< int, EntityHandle > fromGid2ToEh;
+    i = 0;
+    for( Range::iterator vit = sourceVerts.begin(); vit != sourceVerts.end(); vit++, i++ )
     {
-        int globalId              = gids2[i];
+        fromGid2ToEh[gids2[i]] = *vit;
+    }
+
+    Range usedVerts;
+    for( size_t i = 0; i < gids2.size(); i++ )
+    {
+        int globalId          = gids2[i];
         EntityHandle usedVert = fromGidToEh[globalId];
-        usedVerts.insert(usedVert);
+        usedVerts.insert( usedVert );
     }
     Range cells;
-    rval = mb->get_adjacencies(usedVerts, 2, false, cells, Interface::UNION);MB_CHK_SET_ERR( rval, "can't get adj cells " );
+    rval = mb->get_adjacencies( usedVerts, 2, false, cells, Interface::UNION );MB_CHK_SET_ERR( rval, "can't get adj cells " );
 
     // now create a new cell in mb2 for each one in mb
-    for (Range::iterator cit = cells.begin(); cit != cells.end(); cit++)
+    for( Range::iterator cit = cells.begin(); cit != cells.end(); cit++ )
     {
-    	EntityHandle cell = *cit;
-    	int nnodes=0;
-    	const EntityHandle * conn = NULL;
-    	rval = mb->get_connectivity(cell, conn, nnodes); MB_CHK_SET_ERR( rval, "can't get connectivity " );
+        EntityHandle cell        = *cit;
+        int nnodes               = 0;
+        const EntityHandle* conn = NULL;
+        rval                     = mb->get_connectivity( cell, conn, nnodes );MB_CHK_SET_ERR( rval, "can't get connectivity " );
 
-    	std::vector<EntityHandle> nconn(nnodes);
-    	bool goodCell=true;
-    	for (int i=0; i<nnodes; i++)
-    	{
-    		EntityHandle v = conn[i];
-    		int index = iniVerts.index(v);
-    		if (index<0)
-    			goodCell = false;
-    		int id = gids[index];
-    		if (fromGid2ToEh.find(id)==fromGid2ToEh.end())
-    			goodCell = false;
-    		else
-    		    nconn[i] = fromGid2ToEh[id];
-    	}
-    	if (!goodCell)
-    		continue;
-    	EntityType type = MBTRI;
-		if( nnodes == 3 )
-			type = MBTRI;
-		else if( nnodes == 4 )
-			type = MBQUAD;
-		else if( nnodes > 4 )
-			type = MBPOLYGON;
-    	EntityHandle nel;
-    	rval = mb2->create_element(type, &nconn[0], nnodes, nel); MB_CHK_SET_ERR( rval, "can't create new cell " );
-
+        std::vector< EntityHandle > nconn( nnodes );
+        bool goodCell = true;
+        for( int i = 0; i < nnodes; i++ )
+        {
+            EntityHandle v = conn[i];
+            int index      = iniVerts.index( v );
+            if( index < 0 ) goodCell = false;
+            int id = gids[index];
+            if( fromGid2ToEh.find( id ) == fromGid2ToEh.end() )
+                goodCell = false;
+            else
+                nconn[i] = fromGid2ToEh[id];
+        }
+        if( !goodCell ) continue;
+        EntityType type = MBTRI;
+        if( nnodes == 3 )
+            type = MBTRI;
+        else if( nnodes == 4 )
+            type = MBQUAD;
+        else if( nnodes > 4 )
+            type = MBPOLYGON;
+        EntityHandle nel;
+        rval = mb2->create_element( type, &nconn[0], nnodes, nel );MB_CHK_SET_ERR( rval, "can't create new cell " );
     }
     // save file
     rval = mb2->write_file( outfile.c_str() );MB_CHK_SET_ERR( rval, "can't write file" );
@@ -142,8 +138,3 @@ int main( int argc, char* argv[] )
 
     return 0;
 }
-
-
-
-
-
