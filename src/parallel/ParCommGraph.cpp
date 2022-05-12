@@ -725,7 +725,7 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm,
 
             int bytes_per_tag;
             rval = mb->tag_get_bytes( tag_handles[i], bytes_per_tag );MB_CHK_ERR( rval );
-            valuesTags[i].resize( owned.size() * bytes_per_tag );
+            valuesTags[i].resize( owned.size() * bytes_per_tag / sizeof(double) );
             // fill the whole array, we will pick up from here
             rval = mb->tag_get_data( tag_handles[i], owned, (void*)( &( valuesTags[i][0] ) ) );MB_CHK_ERR( rval );
         }
@@ -931,7 +931,7 @@ ErrorCode ParCommGraph::receive_tag_values( MPI_Comm jcomm,
         {
             int bytes_per_tag;
             rval = mb->tag_get_bytes( tag_handles[i], bytes_per_tag );MB_CHK_ERR( rval );
-            valuesTags[i].resize( owned.size() * bytes_per_tag );
+            valuesTags[i].resize( owned.size() * bytes_per_tag / sizeof(double) );
             // fill the whole array, we will pick up from here
             // we will fill this array, using data from received buffer
             // rval = mb->tag_get_data(owned, (void*)( &(valuesTags[i][0])) );MB_CHK_ERR ( rval );
