@@ -440,16 +440,16 @@ int main( int argc, char* argv[] )
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
 
-    const char* bottomFields          = "T16_ph:u16_ph:v16_ph";
-    const char* bottomProjectedFields = "T_proj:u_proj:v_proj";
+    const char* bottomFields          = "Sa_z:Sa_topo:Sa_u:Sa_v:Sa_tbot:Sa_ptem:Sa_shum:Sa_pbot:Sa_dens:Sa_uovern:Sa_pslv:Sa_co2prog:Sa_co2diag:Faxa_rainc:Faxa_rainl:Faxa_snowc:Faxa_snowl:Faxa_lwdn:Faxa_swndr:Faxa_swvdr:Faxa_swndf:Faxa_swvdf:Faxa_swnet:Faxa_bcphidry:Faxa_bcphodry:Faxa_bcphiwet:Faxa_ocphidry:Faxa_ocphodry:Faxa_ocphiwet:Faxa_dstwet1:Faxa_dstwet2:Faxa_dstwet3:Faxa_dstwet4:Faxa_dstdry1:Faxa_dstdry2:Faxa_dstdry3:Faxa_dstdry4";
+    const char* bottomFieldsExt = "Sa_z_ext:Sa_topo_ext:Sa_u_ext:Sa_v_ext:Sa_tbot_ext:Sa_ptem_ext:Sa_shum_ext:Sa_pbot_ext:Sa_dens_ext:Sa_uovern_ext:Sa_pslv_ext:Sa_co2prog_ext:Sa_co2diag_ext:Faxa_rainc_ext:Faxa_rainl_ext:Faxa_snowc_ext:Faxa_snowl_ext:Faxa_lwdn_ext:Faxa_swndr_ext:Faxa_swvdr_ext:Faxa_swndf_ext:Faxa_swvdf_ext:Faxa_swnet_ext:Faxa_bcphidry_ext:Faxa_bcphodry_ext:Faxa_bcphiwet_ext:Faxa_ocphidry_ext:Faxa_ocphodry_ext:Faxa_ocphiwet_ext:Faxa_dstwet1_ext:Faxa_dstwet2_ext:Faxa_dstwet3_ext:Faxa_dstwet4_ext:Faxa_dstdry1_ext:Faxa_dstdry2_ext:Faxa_dstdry3_ext:Faxa_dstdry4_ext";
 
     if( couComm != MPI_COMM_NULL )
     {
-        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFields, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
+        ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFieldsExt, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tags T16_ph:u16_ph:v16_ph " );
 #ifdef ENABLE_ATMOCN_COUPLING
 
-        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
+        ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tags T_proj:u_proj:v_proj" );
 #endif
 
@@ -457,8 +457,8 @@ int main( int argc, char* argv[] )
         // need to define tag storage for land; will use the same T_proj, u_proj, v_proj name,
         // because it will be used to send between point clouds ! use the same ndof and same size as
         // ocnCompNDoFs (1) !!
-        ierr = iMOAB_DefineTagStorage( cplLndPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
-        CHECKIERR( ierr, "failed to define the field tag T_proj:u_proj:v_proj" );
+        ierr = iMOAB_DefineTagStorage( cplLndPID, bottomFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
+        CHECKIERR( ierr, "failed to define the bottomFields tag on coupler land" );
 #endif
     }
     // need to make sure that the coverage mesh (created during intx method) received the tag that
@@ -483,12 +483,12 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem *3; // 3 tags
+            int storLeng = atmCompNDoFs * numAllElem *37; // 37 tags
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
             int eetype = 1;
-            ierr       = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomFields, &storLeng, &eetype, &vals[0] );
+            ierr       = iMOAB_SetDoubleTagStorage( cplAtmPID, bottomFieldsExt, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tags nul" )
             // set the tag to 0
         }
@@ -500,7 +500,7 @@ int main( int argc, char* argv[] )
     {
         // as always, use nonblocking sends
         // this is for projection to ocean:
-        ierr = iMOAB_SendElementTag( cmpPhAtmPID, "T_ph:u_ph:v_ph", &atmCouComm, &atmocnid );
+        ierr = iMOAB_SendElementTag( cmpPhAtmPID, bottomFields, &atmCouComm, &atmocnid );
         CHECKIERR( ierr, "cannot send tag values" )
 #ifdef VERBOSE
         int is_sender = 1;
@@ -511,7 +511,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         // receive on atm on coupler pes, that was redistributed according to coverage
-        ierr = iMOAB_ReceiveElementTag( cplAtmOcnPID, "T16_ph:u16_ph:v16_ph", &atmCouComm, &cmpatm );
+        ierr = iMOAB_ReceiveElementTag( cplAtmOcnPID, bottomFieldsExt, &atmCouComm, &cmpatm );
         CHECKIERR( ierr, "cannot receive tag values" )
 #ifdef VERBOSE
         int is_sender = 0;
@@ -537,16 +537,13 @@ int main( int argc, char* argv[] )
     #endif
     */
 
-    const char* concat_fieldname  = "T16_ph:u16_ph:v16_ph";
-    const char* concat_fieldnameT = "T_proj:u_proj:v_proj";
-
     if( couComm != MPI_COMM_NULL )
     {
         /* We have the remapping weights now. Let us apply the weights onto the tag we defined
            on the source mesh and get the projection on the target mesh */
         PUSH_TIMER( "Apply Scalar projection weights" )
-        ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], concat_fieldname,
-                                                   concat_fieldnameT );
+        ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], bottomFieldsExt,
+        		bottomFields );
         CHECKIERR( ierr, "failed to compute projection weight application" );
         POP_TIMER( couComm, rankInCouComm )
 
@@ -557,8 +554,8 @@ int main( int argc, char* argv[] )
     if( ocnComm != MPI_COMM_NULL )
     {
         int tagIndexIn2;
-        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
-        CHECKIERR( ierr, "failed to define the field tags for receiving back the tag T_proj:u_proj:v_proj on ocn pes" );
+        ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
+        CHECKIERR( ierr, "failed to define the field tags for receiving back the atm tags on ocn pes" );
     }
     // send the tag to ocean pes, from ocean mesh on coupler pes
     //   from couComm, using common joint comm ocn_coupler
@@ -567,7 +564,7 @@ int main( int argc, char* argv[] )
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmpocn;
-        ierr       = iMOAB_SendElementTag( cplOcnPID, "T_proj:u_proj:v_proj", &ocnCouComm, &context_id );
+        ierr       = iMOAB_SendElementTag( cplOcnPID, bottomFields, &ocnCouComm, &context_id );
         CHECKIERR( ierr, "cannot send tag values back to ocean pes" )
     }
 
@@ -575,10 +572,9 @@ int main( int argc, char* argv[] )
     if( ocnComm != MPI_COMM_NULL )
     {
         context_id = cplocn;
-        ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "T_proj:u_proj:v_proj", &ocnCouComm, &context_id );
+        ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, bottomFields, &ocnCouComm, &context_id );
         CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
     }
-
     MPI_Barrier( MPI_COMM_WORLD );
 
     if( couComm != MPI_COMM_NULL )
@@ -591,9 +587,8 @@ int main( int argc, char* argv[] )
         char outputFileOcn[] = "OcnWithProj2.h5m";
         ierr                 = iMOAB_WriteMesh( cmpOcnPID, outputFileOcn, fileWriteOptions );
     }
-#endif
 
-    MPI_Barrier( MPI_COMM_WORLD );
+#endif
 
 #ifdef ENABLE_ATMLND_COUPLING
     // start land proj:
@@ -609,13 +604,13 @@ int main( int argc, char* argv[] )
 
         // as always, use nonblocking sends
         // this is for projection to land:
-        ierr = iMOAB_SendElementTag( cmpPhAtmPID, "T_ph:u_ph:v_ph", &atmCouComm, &cpllnd );
+        ierr = iMOAB_SendElementTag( cmpPhAtmPID, bottomFields, &atmCouComm, &cpllnd );
         CHECKIERR( ierr, "cannot send tag values towards cpl on land" )
     }
     if( couComm != MPI_COMM_NULL )
     {
         // receive on lnd on coupler pes
-        ierr = iMOAB_ReceiveElementTag( cplLndPID, "T_proj:u_proj:v_proj", &atmCouComm, &cmpatm );
+        ierr = iMOAB_ReceiveElementTag( cplLndPID, bottomFields, &atmCouComm, &cmpatm );
         CHECKIERR( ierr, "cannot receive tag values on land on coupler" )
     }
     POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
@@ -624,7 +619,7 @@ int main( int argc, char* argv[] )
     if( atmComm != MPI_COMM_NULL )
     {
         ierr = iMOAB_FreeSenderBuffers( cmpPhAtmPID, &cpllnd );
-        CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the land on coupler" )
+        CHECKIERR( ierr, "cannot free buffers used to send atm tag towards the land on coupler" )
     }
 
 #ifdef VERBOSE
@@ -646,20 +641,20 @@ int main( int argc, char* argv[] )
     if( lndComm != MPI_COMM_NULL )
     {
         int tagIndexIn2;
-        ierr = iMOAB_DefineTagStorage( cmpLndPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
+        ierr = iMOAB_DefineTagStorage( cmpLndPID, bottomFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
         CHECKIERR( ierr, "failed to define the field tag for receiving back the tag T_proj:u_proj:v_proj on lnd pes" );
     }
     if( couComm != MPI_COMM_NULL )
     {
         context_id = cmplnd;
-        ierr       = iMOAB_SendElementTag( cplLndPID, "T_proj:u_proj:v_proj", &lndCouComm, &context_id );
+        ierr       = iMOAB_SendElementTag( cplLndPID, bottomFields, &lndCouComm, &context_id );
         CHECKIERR( ierr, "cannot send tag values back to land pes" )
     }
     // receive on component 3, land
     if( lndComm != MPI_COMM_NULL )
     {
         context_id = cpllnd;  // receive from coupler on land
-        ierr       = iMOAB_ReceiveElementTag( cmpLndPID, "T_proj:u_proj:v_proj", &lndCouComm, &context_id );
+        ierr       = iMOAB_ReceiveElementTag( cmpLndPID, bottomFields, &lndCouComm, &context_id );
         CHECKIERR( ierr, "cannot receive tag values from land mesh on coupler pes" )
     }
 
