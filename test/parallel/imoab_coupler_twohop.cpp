@@ -476,6 +476,8 @@ int main( int argc, char* argv[] )
     {
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFields, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
+        ierr = iMOAB_DefineTagStorage( cplAtm2PID, bottomFields, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
+        CHECKIERR( ierr, "failed to define the field tag a2oTbot" );
 
 #ifdef ENABLE_ATMOCN_COUPLING
         ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
@@ -691,7 +693,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &cmpatm );
+            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomFields, &atmCouComm, &cmpatm );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
@@ -702,45 +704,43 @@ int main( int argc, char* argv[] )
             ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplatm );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
-#ifdef VERBOSE
+// #ifdef VERBOSE
         if( couComm != MPI_COMM_NULL && 1 == n )
         {  // write only for n==1 case
-            char outputFileRecvd[] = "recvAtmCoupLnd.h5m";
-            ierr                   = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
+            char outputFileRecvd[] = "recvAtm2CoupFull.h5m";
+            ierr                   = iMOAB_WriteMesh( cplAtm2PID, outputFileRecvd, fileWriteOptions );
             CHECKIERR( ierr, "could not write recvAtmCoupLnd.h5m to disk" )
         }
-#endif
+// #endif
 
         PUSH_TIMER( "Send/receive data from atm2 coupler to ocean coupler based on coverage data" )
-        if( atmComm != MPI_COMM_NULL )
+        if( couComm != MPI_COMM_NULL )
         {
             // as always, use nonblocking sends
             // this is for projection to ocean:
-            ierr = iMOAB_SendElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &atm2ocnid );
+            ierr = iMOAB_SendElementTag( cplAtm2PID, bottomFields, &couComm, &atm2ocnid );
             CHECKIERR( ierr, "cannot send tag values" )
-        }
-        if( couComm != MPI_COMM_NULL )
-        {
+
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &atm2ocnid );
+            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &couComm, &atm2ocnid );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
 
         // we can now free the sender buffers
-        if( atmComm != MPI_COMM_NULL )
+        if( couComm != MPI_COMM_NULL )
         {
             ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplocn );  // context is for ocean
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
-#ifdef VERBOSE
+// #ifdef VERBOSE
         if( couComm != MPI_COMM_NULL && 1 == n )
         {  // write only for n==1 case
-            char outputFileRecvd[] = "recvAtmCoupLnd.h5m";
-            ierr                   = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
+            char outputFileRecvd[] = "recvAtm2CoupOcnCtx.h5m";
+            ierr                   = iMOAB_WriteMesh( cplAtm2PID, outputFileRecvd, fileWriteOptions );
             CHECKIERR( ierr, "could not write recvAtmCoupLnd.h5m to disk" )
         }
-#endif
+// #endif
 
         if( couComm != MPI_COMM_NULL )
         {
