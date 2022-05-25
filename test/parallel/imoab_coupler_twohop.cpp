@@ -188,8 +188,6 @@ int main( int argc, char* argv[] )
     iMOAB_AppID cmpAtmPID = &cmpAtmAppID;  // atm
     int cplAtmAppID       = -1;            // -1 means it is not initialized
     iMOAB_AppID cplAtmPID = &cplAtmAppID;  // atm on coupler PEs
-    int cplAtm2AppID        = -1;            // -1 means it is not initialized
-    iMOAB_AppID cplAtm2PID = &cplAtm2AppID;  // atm on second coupler PEs
 #ifdef ENABLE_ATMOCN_COUPLING
     int cmpOcnAppID       = -1;
     iMOAB_AppID cmpOcnPID = &cmpOcnAppID;        // ocn
@@ -199,7 +197,9 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef ENABLE_ATMCPLOCN_COUPLING
-    int cplAtm2OcnAppID = -1;   // -1 means it is not initialized
+    int cplAtm2AppID          = -1;                // -1 means it is not initialized
+    iMOAB_AppID cplAtm2PID    = &cplAtm2AppID;     // atm on second coupler PEs
+    int cplAtm2OcnAppID       = -1;                // -1 means it is not initialized
     iMOAB_AppID cplAtm2OcnPID = &cplAtm2OcnAppID;  // intx atm - lnd on coupler PEs
 #endif
 
@@ -356,9 +356,9 @@ int main( int argc, char* argv[] )
         // ocean partitions check if intx valid, write some h5m intx file
         CHECKIERR( ierr, "cannot compute intersection for atm2/ocn" )
         POP_TIMER( couComm, rankInCouComm )
-    }
-    if( atmCouComm != MPI_COMM_NULL )
-    {
+    // }
+    // if( atmCouComm != MPI_COMM_NULL )
+    // {
         // the new graph will be for sending data from atm comp to coverage mesh for land mesh;
         // it involves initial atm app; cmpAtmPID; also migrate atm mesh on coupler pes, cplAtmPID
         // results are in cplAtmLndPID, intx mesh; remapper also has some info about coverage mesh
@@ -367,10 +367,16 @@ int main( int argc, char* argv[] )
         // time,
         /// we will use the element global id, which should uniquely identify the element
         PUSH_TIMER( "Compute OCN coverage graph for ATM2 mesh" )
-        ierr = iMOAB_CoverageGraph( &atmCouComm, cmpAtmPID, cplAtm2PID, cplAtm2OcnPID, &cmpatm, &cplatm2,
-                                    &cplocn );  // it happens over joint communicator
+        // Context: cplatm2 already holds the comm-graph for communicating between atm component and coupler2
+        // We just need to create a comm graph to internally transfer data from coupler atm to coupler ocean
+        // ierr = iMOAB_CoverageGraph( &couComm, cplAtm2PID, cplAtm2OcnPID, cplAtm2OcnPID, &cplatm2, &atm2ocnid,
+                                    // &cplocn );  // it happens over joint communicator
+        int type1 = 1;
+        int type2 = 1;
+        ierr      = iMOAB_ComputeCommGraph( cplAtm2PID, cplAtm2OcnPID, &couComm, &couPEGroup, &couPEGroup, &type1, &type2,
+                                            &cplatm2, &atm2ocnid );
         CHECKIERR( ierr, "cannot recompute direct coverage graph for ocean from atm2" )
-        POP_TIMER( atmCouComm, rankInAtmComm )  // hijack this rank
+        POP_TIMER( couComm, rankInCouComm )  // hijack this rank
     }
 #endif
 
@@ -674,18 +680,49 @@ int main( int argc, char* argv[] )
 #endif
 
 #ifdef ENABLE_ATMCPLOCN_COUPLING
-        PUSH_TIMER( "Send/receive data from atm2 component to coupler in ocn context" )
+        PUSH_TIMER( "Send/receive data from atm2 component to coupler of all data" )
         if( atmComm != MPI_COMM_NULL )
         {
             // as always, use nonblocking sends
             // this is for projection to ocean:
-            ierr = iMOAB_SendElementTag( cmpAtmPID, bottomFields, &atmCouComm, &cplocn );
+            ierr = iMOAB_SendElementTag( cmpAtmPID, bottomFields, &atmCouComm, &cplatm2 );
             CHECKIERR( ierr, "cannot send tag values" )
         }
         if( couComm != MPI_COMM_NULL )
         {
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &cplocn );
+            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &cmpatm );
+            CHECKIERR( ierr, "cannot receive tag values" )
+        }
+        POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
+
+        // we can now free the sender buffers
+        if( atmComm != MPI_COMM_NULL )
+        {
+            ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplatm );  // context is for ocean
+            CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
+        }
+#ifdef VERBOSE
+        if( couComm != MPI_COMM_NULL && 1 == n )
+        {  // write only for n==1 case
+            char outputFileRecvd[] = "recvAtmCoupLnd.h5m";
+            ierr                   = iMOAB_WriteMesh( cplAtmPID, outputFileRecvd, fileWriteOptions );
+            CHECKIERR( ierr, "could not write recvAtmCoupLnd.h5m to disk" )
+        }
+#endif
+
+        PUSH_TIMER( "Send/receive data from atm2 coupler to ocean coupler based on coverage data" )
+        if( atmComm != MPI_COMM_NULL )
+        {
+            // as always, use nonblocking sends
+            // this is for projection to ocean:
+            ierr = iMOAB_SendElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &atm2ocnid );
+            CHECKIERR( ierr, "cannot send tag values" )
+        }
+        if( couComm != MPI_COMM_NULL )
+        {
+            // receive on atm on coupler pes, that was redistributed according to coverage
+            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &atmCouComm, &atm2ocnid );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
