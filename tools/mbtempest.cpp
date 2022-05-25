@@ -335,7 +335,7 @@ struct ToolContext
         mapOptions.fNoCorrectAreas = false;
         mapOptions.fNoCheck        = !fCheck;
 
-        assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
+        //assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
         if( fVolumetric ) mapOptions.strMethod += "volumetric;";
         if( fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
     }

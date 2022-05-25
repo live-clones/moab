@@ -94,8 +94,11 @@ class TempestRemapper : public Remapper
     ///     intersection algorithm can the intersection mesh only locally without any process
     ///     communication.
     /// </summary>
-    moab::ErrorCode ConstructCoveringSet( double tolerance = 1e-8, double radius_src = 1.0, double radius_tgt = 1.0,
-                                          double boxeps = 0.1, bool regional_mesh = false );
+    moab::ErrorCode ConstructCoveringSet( double tolerance   = 1e-8,
+                                          double radius_src  = 1.0,
+                                          double radius_tgt  = 1.0,
+                                          double boxeps      = 0.1,
+                                          bool regional_mesh = false );
 
     /// <summary>
     ///     Compute the intersection mesh between the source and target grids that have been
@@ -129,7 +132,8 @@ class TempestRemapper : public Remapper
     /// </summary>
     void SetMesh( Remapper::IntersectionContext ctx, Mesh* mesh, bool overwrite = true );
 
-    void SetMeshSet( Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/, moab::EntityHandle mset,
+    void SetMeshSet( Remapper::IntersectionContext ctx /* Remapper::CoveringMesh*/,
+                     moab::EntityHandle mset,
                      moab::Range& entities );
     /// <summary>
     ///     Get the covering mesh (TempestRemap) object.
@@ -177,7 +181,8 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///     Set the mesh type corresponding to the intersection context
     /// </summary>
-    void SetMeshType( Remapper::IntersectionContext ctx, TempestMeshType type,
+    void SetMeshType( Remapper::IntersectionContext ctx,
+                      TempestMeshType type,
                       const std::vector< int >* metadata = nullptr );
 
     /// <summary>
@@ -202,8 +207,10 @@ class TempestRemapper : public Remapper
     ///     using the TempestRemap output interface. This information can then be used with the
     ///     "GenerateOfflineMap" tool in TempestRemap as needed.
     /// </summary>
-    moab::ErrorCode WriteTempestIntersectionMesh( std::string strOutputFileName, const bool fAllParallel,
-                                                  const bool fInputConcave, const bool fOutputConcave );
+    moab::ErrorCode WriteTempestIntersectionMesh( std::string strOutputFileName,
+                                                  const bool fAllParallel,
+                                                  const bool fInputConcave,
+                                                  const bool fOutputConcave );
 
     /// <summary>
     ///     Generate the necessary metadata and specifically the GLL node numbering for DoFs for a
@@ -211,15 +218,22 @@ class TempestRemapper : public Remapper
     ///     numbering needed for computing maps. The functionality is used through the `mbconvert`
     ///     tool to compute processor-invariant Global DoF IDs at GLL nodes.
     /// </summary>
-    moab::ErrorCode GenerateCSMeshMetadata( const int ntot_elements, moab::Range& entities,
-                                            moab::Range* secondary_entities, const std::string dofTagName, int nP );
+    moab::ErrorCode GenerateCSMeshMetadata( const int ntot_elements,
+                                            moab::Range& entities,
+                                            moab::Range* secondary_entities,
+                                            const std::string dofTagName,
+                                            int nP );
 
     /// <summary>
     ///     Generate the necessary metadata for DoF node numbering in a given mesh.
     ///     Currently, only the functionality to generate numbering on CS grids is supported.
     /// </summary>
-    moab::ErrorCode GenerateMeshMetadata( Mesh& mesh, const int ntot_elements, moab::Range& entities,
-                                          moab::Range* secondary_entities, const std::string dofTagName, int nP );
+    moab::ErrorCode GenerateMeshMetadata( Mesh& mesh,
+                                          const int ntot_elements,
+                                          moab::Range& entities,
+                                          moab::Range* secondary_entities,
+                                          const std::string dofTagName,
+                                          int nP );
 
     /// <summary>
     ///     Compute the local and global IDs for elements in source/target/coverage meshes.
@@ -236,9 +250,15 @@ class TempestRemapper : public Remapper
     /// <summary>
     ///    Internal method to assign vertex and element global IDs if one does not exist already
     /// </summary>
-    moab::ErrorCode assign_vertex_element_IDs( Tag idtag, EntityHandle this_set, const int dimension = 2,
-                                               const int start_id = 1 );
+    moab::ErrorCode assign_vertex_element_IDs( Tag idtag,
+                                               EntityHandle this_set,
+                                               const int dimension = 2,
+                                               const int start_id  = 1 );
 #endif
+    //	<summary>
+    ///		Get the masks that could have been defined
+    ///	</summary>
+    ErrorCode GetIMasks( Remapper::IntersectionContext ctx, std::vector< int >& masks );
 
   public:               // public members
     bool meshValidate;  // Validate the mesh after loading from file
@@ -253,11 +273,16 @@ class TempestRemapper : public Remapper
     // private methods
     moab::ErrorCode load_tempest_mesh_private( std::string inputFilename, Mesh** tempest_mesh );
 
-    moab::ErrorCode convert_mesh_to_tempest_private( Mesh* mesh, moab::EntityHandle meshset, moab::Range& entities,
+    moab::ErrorCode convert_mesh_to_tempest_private( Mesh* mesh,
+                                                     moab::EntityHandle meshset,
+                                                     moab::Range& entities,
                                                      moab::Range* pverts );
 
-    moab::ErrorCode convert_tempest_mesh_private( TempestMeshType type, Mesh* mesh, moab::EntityHandle& meshset,
-                                                  moab::Range& entities, moab::Range* vertices );
+    moab::ErrorCode convert_tempest_mesh_private( TempestMeshType type,
+                                                  Mesh* mesh,
+                                                  moab::EntityHandle& meshset,
+                                                  moab::Range& entities,
+                                                  moab::Range* vertices );
 
     moab::ErrorCode augment_overlap_set();
 
@@ -461,7 +486,8 @@ inline const moab::Range& TempestRemapper::GetMeshVertices( Remapper::Intersecti
     }
 }
 
-inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx, TempestRemapper::TempestMeshType type,
+inline void TempestRemapper::SetMeshType( Remapper::IntersectionContext ctx,
+                                          TempestRemapper::TempestMeshType type,
                                           const std::vector< int >* metadata )
 {
     switch( ctx )

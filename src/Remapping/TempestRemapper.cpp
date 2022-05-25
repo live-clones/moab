@@ -1329,13 +1329,13 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                 }
 
                 Range notNeededCovCells = moab::subtract( covEnts, intxCov );
-                    // remove now from coverage set the cells that are not needed
+                // remove now from coverage set the cells that are not needed
                 rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                 covEnts = moab::subtract( covEnts, notNeededCovCells );
 #ifdef VERBOSE
                 std::cout << " total participating elements in the covering set: " << intxCov.size() << "\n";
-                std::cout << " remove from coverage set elements that are not intersected: "
-                              << notNeededCovCells.size() << "\n";
+                std::cout << " remove from coverage set elements that are not intersected: " << notNeededCovCells.size()
+                          << "\n";
 #endif
                 if( size > 1 )
                 {
@@ -1990,5 +1990,48 @@ ErrorCode TempestRemapper::augment_overlap_set()
 }
 
 #endif
+
+ErrorCode TempestRemapper::GetIMasks( Remapper::IntersectionContext ctx, std::vector< int >& masks )
+{
+    Tag maskTag;
+    // it should have been created already, if not, we might have a problem
+    int def_val = 1;
+    ErrorCode rval =
+        m_interface->tag_get_handle( "GRID_IMASK", 1, MB_TYPE_INTEGER, maskTag, MB_TAG_DENSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble creating GRID_IMASK tag" );
+
+    switch( ctx )
+    {
+        case Remapper::SourceMesh: {
+            if( point_cloud_source )
+            {
+                masks.resize( m_source_vertices.size() );
+                rval = m_interface->tag_get_data( maskTag, m_source_vertices, &masks[0] );MB_CHK_SET_ERR( rval, "Trouble getting GRID_IMASK tag" );
+            }
+            else
+            {
+                masks.resize( m_source_entities.size() );
+                rval = m_interface->tag_get_data( maskTag, m_source_entities, &masks[0] );MB_CHK_SET_ERR( rval, "Trouble getting GRID_IMASK tag" );
+            }
+            return MB_SUCCESS;
+        }
+        case Remapper::TargetMesh: {
+            if( point_cloud_target )
+            {
+                masks.resize( m_target_vertices.size() );
+                rval = m_interface->tag_get_data( maskTag, m_target_vertices, &masks[0] );MB_CHK_SET_ERR( rval, "Trouble getting GRID_IMASK tag" );
+            }
+            else
+            {
+                masks.resize( m_target_entities.size() );
+                rval = m_interface->tag_get_data( maskTag, m_target_entities, &masks[0] );MB_CHK_SET_ERR( rval, "Trouble getting GRID_IMASK tag" );
+            }
+            return MB_SUCCESS;
+        }
+        case Remapper::CoveringMesh:
+        case Remapper::OverlapMesh:
+        default:
+            return MB_SUCCESS;
+    }
+}
 
 }  // namespace moab
