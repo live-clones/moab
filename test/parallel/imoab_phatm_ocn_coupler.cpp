@@ -483,7 +483,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem *16; // instead of 37 tags, use only 17 now
+            int storLeng = atmCompNDoFs * numAllElem *37; 
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
