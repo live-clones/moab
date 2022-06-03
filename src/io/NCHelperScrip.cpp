@@ -150,8 +150,9 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     // important upgrade: read masks if they exist, and save them as tags
     int gmId           = -1;
     int sizeMasks      = 0;
+#ifdef MOAB_HAVE_PNETCDF
     int factorRequests = 2;  // we would read in general only 2 variables, xv and yv
-
+#endif
     success     = NCFUNC( inq_varid )( _fileId, "grid_imask", &gmId );
     Tag maskTag = 0;  // not sure yet if we have the masks or not
     if( success )
@@ -161,7 +162,9 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     else
     {
         sizeMasks      = nLocalCells;
+#ifdef MOAB_HAVE_PNETCDF
         factorRequests = 3;  // we also need to read masks distributed
+#endif
         // create the maskTag GRID_IMASK, with default value of 1
         int def_val = 1;
         rval =
@@ -219,6 +222,7 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
 #else
             success = NCFUNCAG( _vara_int )( _fileId, gmId, &read_st, &read_ct, &( masks[indexInMaskArray] ) );
 #endif
+            if( success ) MB_SET_ERR( MB_FAILURE, "Failed on mask read " );
             indexInMaskArray += endh - starth + 1;
         }
     }
