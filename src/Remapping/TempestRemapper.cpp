@@ -876,7 +876,7 @@ bool operator<( Node const& lhs, Node const& rhs )
 ErrorCode TempestRemapper::GenerateCSMeshMetadata( const int ntot_elements,
                                                    moab::Range& ents,
                                                    moab::Range* secondary_ents,
-                                                   const std::string dofTagName,
+                                                   const std::string & dofTagName,
                                                    int nP )
 {
     Mesh csMesh;
