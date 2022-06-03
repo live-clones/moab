@@ -60,6 +60,28 @@ ErrorCode NCHelperScrip::init_mesh_vals()
     int create_conv_tags_flag = 1;
     rval                      = mbImpl->tag_set_data( convTagsCreated, &_fileSet, 1, &create_conv_tags_flag );MB_CHK_SET_ERR( rval, "Trouble setting _CONV_TAGS_CREATED tag" );
 
+    // decide now the units, by looking at grid_center_lon
+    int xCellVarId;
+    int success = NCFUNC( inq_varid )( _fileId, "grid_center_lon", &xCellVarId );
+    if( success ) MB_CHK_SET_ERR( MB_FAILURE, "Trouble getting grid_center_lon" );
+    std::map< std::string, ReadNC::VarData >& varInfo = _readNC->varInfo;
+    auto vmit                                         = varInfo.find( "grid_center_lon" );
+    if( varInfo.end() == vmit )
+        MB_SET_ERR( MB_FAILURE, "Couldn't find variable "
+                                    << "grid_center_lon" );
+    ReadNC::VarData& glData = vmit->second;
+    auto attIt              = glData.varAtts.find( "units" );
+    if( attIt != glData.varAtts.end() )
+    {
+        unsigned int sz = attIt->second.attLen;
+        std::string att_data;
+        att_data.resize( sz + 1 );
+        att_data[sz] = '\000';
+        success =
+            NCFUNC( get_att_text )( _fileId, attIt->second.attVarId, attIt->second.attName.c_str(), &att_data[0] );
+        if( 0 == success && att_data.find( "radians" ) != std::string::npos ) degrees = false;
+    }
+
     return MB_SUCCESS;
 }
 ErrorCode NCHelperScrip::create_mesh( Range& faces )
@@ -215,8 +237,9 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     // Set vertex coordinates
     // will read all xv, yv, but use only those with correct mask on
 
-    int elem_index     = 0;  // local index in netcdf arrays
-    const double pideg = acos( -1.0 ) / 180.0;
+    int elem_index = 0;   // local index in netcdf arrays
+    double pideg   = 1.;  // radians
+    if( degrees ) pideg = acos( -1.0 ) / 180.0;
 
     for( ; elem_index < nLocalCells; elem_index++ )
     {
@@ -372,7 +395,8 @@ ErrorCode NCHelperScrip::redistribute_local_cells( int start_cell_idx )
         std::vector< double > xCell( nLocalCells );
         std::vector< double > yCell( nLocalCells );
         std::vector< double > zCell( nLocalCells );
-        const double pideg = acos( -1.0 ) / 180.0;
+        double pideg = 1.;  // radians
+        if( degrees ) pideg = acos( -1.0 ) / 180.0;
         double x, y, cosphi;
         for( int i = 0; i < nLocalCells; i++ )
         {
