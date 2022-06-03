@@ -356,7 +356,23 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
 
         // assign global ids only for vertices, cells have them fine
         rval = myPcomm->assign_global_ids( _fileSet, /*dim*/ 0 );MB_CHK_ERR( rval );
+        // remove all sets, edges and vertices from the file set
+        Range edges, vertices;
+        rval = mbImpl->get_entities_by_dimension(_fileSet, 1, edges, /*recursive*/ true);MB_CHK_ERR( rval );
+        rval = mbImpl->get_entities_by_dimension(_fileSet, 0, vertices, /*recursive*/ true);MB_CHK_ERR( rval );
+        rval = mbImpl->remove_entities(_fileSet, edges);MB_CHK_ERR( rval );
+        rval = mbImpl->remove_entities(_fileSet, vertices);MB_CHK_ERR( rval );
+
+        Range intfSets = myPcomm->interface_sets();
+        // empty intf sets
+        rval = mbImpl->clear_meshset(intfSets);MB_CHK_ERR( rval );
+        // delete the sets without shame :)
+        //sets.merge(intfSets);
+        //rval = myPcomm->delete_entities(sets);MB_CHK_ERR( rval ); // will also clean shared ents !
+        rval = myPcomm->delete_entities(edges);MB_CHK_ERR( rval ); // will also clean shared ents !
     }
+#else
+    rval = mbImpl->remove_entities( _fileSet, all_verts );MB_CHK_ERR( rval );
 #endif
 
     return MB_SUCCESS;
