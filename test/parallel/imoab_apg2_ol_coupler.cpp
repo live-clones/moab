@@ -891,7 +891,7 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFields2, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tags T2_ph, u2_ph, v2_ph" );
 
-        PUSH_TIMER( "Apply Scalar projection weights" )
+        PUSH_TIMER(couComm, "Apply Scalar projection weights" )
         ierr = iMOAB_ApplyScalarProjectionWeights( cplLndAtmPID, weights_identifiers[0], concat_fieldname,
                                                    concat_fieldnameT );
         CHECKIERR( ierr, "failed to compute projection weight application" );
@@ -989,15 +989,9 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-<<<<<<< HEAD
-        PUSH_TIMER( "Apply Scalar projection weights for lnd - atm coupling" )
+        PUSH_TIMER(couComm, "Apply Scalar projection weights for lnd - atm coupling" )
         const char* concat_fieldname  = "T_proj:u_proj:v_proj";  // this is now source tag, on land cpl
         const char* concat_fieldnameT = "T3_ph:u3_ph:v3_ph";     // projected tag on
-=======
-        PUSH_TIMER( couComm, "Apply Scalar projection weights for lnd - atm coupling" )
-        const char* concat_fieldname  = "T_proj;u_proj;v_proj;";  // this is now source tag, on land cpl
-        const char* concat_fieldnameT = "T3_ph;u3_ph;v3_ph;";     // projected tag on
->>>>>>> rebase zoltan serialization branch
         // make sure the new tags exist on atm coupler mesh;
         ierr = iMOAB_DefineTagStorage( cplAtmPID, bottomFields3, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag T3_ph" );
