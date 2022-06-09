@@ -70,7 +70,7 @@ int main( int argc, char* argv[] )
     // build now the map
     std::map< int, EntityHandle > fromGidToEh;
     int i = 0;
-    for( Range::iterator vit = iniVerts.begin(); vit != iniVerts.end(); vit++, i++ )
+    for( Range::iterator vit = iniVerts.begin(); vit != iniVerts.end(); ++vit, i++ )
     {
         fromGidToEh[gids[i]] = *vit;
     }
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
     rval = mb2->tag_get_data( gid2, sourceVerts, &( gids2[0] ) );MB_CHK_SET_ERR( rval, "can't get gid2 on cloud mesh " );
     std::map< int, EntityHandle > fromGid2ToEh;
     i = 0;
-    for( Range::iterator vit = sourceVerts.begin(); vit != sourceVerts.end(); vit++, i++ )
+    for( Range::iterator vit = sourceVerts.begin(); vit != sourceVerts.end(); ++vit, i++ )
     {
         fromGid2ToEh[gids2[i]] = *vit;
     }
@@ -99,7 +99,7 @@ int main( int argc, char* argv[] )
     rval = mb->get_adjacencies( usedVerts, 2, false, cells, Interface::UNION );MB_CHK_SET_ERR( rval, "can't get adj cells " );
 
     // now create a new cell in mb2 for each one in mb
-    for( Range::iterator cit = cells.begin(); cit != cells.end(); cit++ )
+    for( Range::iterator cit = cells.begin(); cit != cells.end(); ++cit )
     {
         EntityHandle cell        = *cit;
         int nnodes               = 0;
