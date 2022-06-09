@@ -1064,12 +1064,6 @@ ErrorCode GeomTopoTool::next_vol( EntityHandle surface, EntityHandle old_volume,
             rval = MB_FAILURE;
     }
 
-    if( rval != MB_SUCCESS )
-    {
-        std::cerr << "mesh error in next_vol for surf " << surface
-                  << std::endl;  // todo: use geomtopotool to get id by entity handle
-    }
-
     return rval;
 }
 
