@@ -44,6 +44,10 @@ AddFieldtoPG2: AddFieldtoPG2.o ${MOAB_LIBDIR}/libMOAB.la
 run-AddFieldtoPG2: AddFieldtoPG2
 	${RUNSERIAL} ./AddFieldtoPG2
 	
+addConnec: addConnec.o ${MOAB_LIBDIR}/libMOAB.la
+	@echo "[CXXLD]  $@"
+	${VERBOSE}${MOAB_CXX} -o $@ $< ${MOAB_LIBS_LINK}
+
 run: all $(addprefix run-,$(ALLEXAMPLES))
 
 clean: clobber

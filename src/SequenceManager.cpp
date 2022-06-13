@@ -21,7 +21,7 @@
 namespace moab
 {
 
-const EntityID SequenceManager::DEFAULT_VERTEX_SEQUENCE_SIZE  = 512 * 1024;
+const EntityID SequenceManager::DEFAULT_VERTEX_SEQUENCE_SIZE  = 16 * 1024;
 const EntityID SequenceManager::DEFAULT_ELEMENT_SEQUENCE_SIZE = DEFAULT_VERTEX_SEQUENCE_SIZE;
 const EntityID SequenceManager::DEFAULT_POLY_SEQUENCE_SIZE    = 16 * 1024;
 const EntityID SequenceManager::DEFAULT_MESHSET_SEQUENCE_SIZE = DEFAULT_VERTEX_SEQUENCE_SIZE;

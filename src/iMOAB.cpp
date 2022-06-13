@@ -2427,7 +2427,8 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
         if( MB_SUCCESS != rval || NULL == tagHandle )
         {
-            return moab::MB_FAILURE;
+        	std::cout<<" can't get tag handle for tag named:" << tagNames[i].c_str() << " at index "<< i << "\n";
+        	MB_CHK_SET_ERR( rval, "can't get tag handle" );
         }
         tagHandles.push_back( tagHandle );
     }
@@ -2499,7 +2500,8 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
         if( MB_SUCCESS != rval || NULL == tagHandle )
         {
-            return moab::MB_FAILURE;
+        	std::cout<<" can't get tag handle for tag named:" << tagNames[i].c_str() << " at index "<< i << "\n";
+        	MB_CHK_SET_ERR( rval, "can't get tag handle" );
         }
         tagHandles.push_back( tagHandle );
     }
@@ -3722,7 +3724,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
 
     /* Let make sure that the radius match for source and target meshes. If not, rescale now and
      * unscale later. */
-    bool defaultradius = 1.0;
+    double defaultradius = 1.0;
     if( fabs( radius_source - radius_target ) > 1e-10 )
     { /* the radii are different */
         rval = IntxUtils::ScaleToRadius( context.MBI, data_src.file_set, defaultradius );MB_CHK_ERR( rval );
