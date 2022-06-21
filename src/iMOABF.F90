@@ -267,6 +267,18 @@ module iMOAB
         real(c_double), intent(in) :: tag_storage_data(*)
       end function iMOAB_SetDoubleTagStorage
 
+      integer(c_int) function iMOAB_SetDoubleTagStorageWithGid(pid, tag_storage_name, num_tag_storage_length, entity_type, &
+                                         tag_storage_data, globalIds) bind(C, name='iMOAB_SetDoubleTagStorageWithGid')
+        use, intrinsic :: iso_c_binding, only: c_int, c_char, c_double
+        integer(c_int), intent(in) :: pid
+        character(kind=c_char), intent(in) :: tag_storage_name(*)
+        integer(c_int), intent(in) :: num_tag_storage_length
+        integer(c_int), intent(in) :: entity_type
+        real(c_double), intent(in) :: tag_storage_data(*)
+        integer(c_int), intent(in) :: globalIds(*)
+      end function iMOAB_SetDoubleTagStorageWithGid
+
+
       integer(c_int) function iMOAB_GetDoubleTagStorage(pid, tag_storage_name, num_tag_storage_length, entity_type, &
                                                         tag_storage_data) bind(C, name='iMOAB_GetDoubleTagStorage')
         use, intrinsic :: iso_c_binding, only: c_int, c_char, c_double

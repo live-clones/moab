@@ -82,5 +82,6 @@ EXTRA_DIST = 125hex.g \
              globalmpas_deltri.h5m \
 	     baseline1.txt \
 	     atm_ocn_map.nc \
-	     outTri15_8.h5m baseline2.txt mapNE20_FV15.nc srcWithSolnTag.h5m
+	     outTri15_8.h5m baseline2.txt mapNE20_FV15.nc srcWithSolnTag.h5m \
+	     recLand.h5m WHOLE_cx_lnd.h5m
 

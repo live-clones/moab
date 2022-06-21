@@ -114,7 +114,7 @@ endif
 
 IMOAB_TESTS =
 if ENABLE_FORTRAN
-   IMOAB_TESTS += imoab_ptest imoab_ptest2
+   IMOAB_TESTS += imoab_ptest imoab_ptest2 imoab_setwithGid
 if HAVE_TEMPESTREMAP
 IMOAB_TESTS += imoab_coupler_fortran
 imoab_ptest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
@@ -188,6 +188,7 @@ imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 imoab_read_map_SOURCES = imoab_read_map.cpp
 imoab_map2_SOURCES = imoab_map2.cpp
 imoab_map_target_SOURCES = imoab_map_target.cpp
+imoab_setwithGid_SOURCES = imoab_setwithGid.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
 commgraph_test_SOURCES = commgraph_test.cpp
