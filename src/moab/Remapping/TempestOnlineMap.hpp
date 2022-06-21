@@ -402,6 +402,7 @@ class TempestOnlineMap : public OfflineMap
                                   DataArray1D< double >& dCenterLat,
                                   DataArray2D< double >& dVertexLat,
                                   DataArray2D< double >& dVertexLon,
+                                  std::vector< int >& masks,
                                   unsigned& N,  // this will be output too now
                                   int nv,
                                   int& maxdof );

@@ -46,11 +46,16 @@
         return moab::MB_FAILURE;                                    \
     }
 
-int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
-    const std::vector< unsigned int >& gdofmap, DataArray1D< double >& vecFaceArea, DataArray1D< double >& dCenterLon,
-    DataArray1D< double >& dCenterLat, DataArray2D< double >& dVertexLon, DataArray2D< double >& dVertexLat,
-    unsigned& N,  // will have the local, after
-    int nv, int& maxdof )
+int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector< unsigned int >& gdofmap,
+                                                      DataArray1D< double >& vecFaceArea,
+                                                      DataArray1D< double >& dCenterLon,
+                                                      DataArray1D< double >& dCenterLat,
+                                                      DataArray2D< double >& dVertexLon,
+                                                      DataArray2D< double >& dVertexLat,
+                                                      std::vector< int >& masks,
+                                                      unsigned& N,  // will have the local, after
+                                                      int nv,
+                                                      int& maxdof )
 {
     // first decide maxdof, for partitioning
     unsigned int localmax = 0;
@@ -65,17 +70,19 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
     // so we decide to reorder by actual dof, such that task 0 has dofs from [0 to size_per_task), etc
     moab::TupleList tl;
     unsigned numr = 2 * nv + 3;         //  doubles: area, centerlon, center lat, nv (vertex lon, vertex lat)
-    tl.initialize( 2, 0, 0, numr, N );  // to proc, dof, then
+    tl.initialize( 3, 0, 0, numr, N );  // to proc, dof, then
     tl.enableWriteAccess();
     // populate
     for( unsigned i = 0; i < N; i++ )
     {
         int gdof    = gdofmap[i];
         int to_proc = gdof / size_per_task;
+        int mask    = masks[i];
         if( to_proc >= size ) to_proc = size - 1;  // the last ones go to last proc
         int n                  = tl.get_n();
-        tl.vi_wr[2 * n]        = to_proc;
-        tl.vi_wr[2 * n + 1]    = gdof;
+        tl.vi_wr[3 * n]        = to_proc;
+        tl.vi_wr[3 * n + 1]    = gdof;
+        tl.vi_wr[3 * n + 2]    = mask;
         tl.vr_wr[n * numr]     = vecFaceArea[i];
         tl.vr_wr[n * numr + 1] = dCenterLon[i];
         tl.vr_wr[n * numr + 2] = dCenterLat[i];
@@ -99,17 +106,19 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
     int nb_unique = 1;
     for( unsigned i = 0; i < tl.get_n() - 1; i++ )
     {
-        if( tl.vi_wr[2 * i + 1] != tl.vi_wr[2 * i + 3] ) nb_unique++;
+        if( tl.vi_wr[3 * i + 1] != tl.vi_wr[3 * i + 4] ) nb_unique++;
     }
     vecFaceArea.Allocate( nb_unique );
     dCenterLon.Allocate( nb_unique );
     dCenterLat.Allocate( nb_unique );
     dVertexLon.Allocate( nb_unique, nv );
     dVertexLat.Allocate( nb_unique, nv );
+    masks.resize( nb_unique );
     int current_size = 1;
     vecFaceArea[0]   = tl.vr_wr[0];
     dCenterLon[0]    = tl.vr_wr[1];
     dCenterLat[0]    = tl.vr_wr[2];
+    masks[0]         = tl.vi_wr[2];
     for( int j = 0; j < nv; j++ )
     {
         dVertexLon[0][j] = tl.vr_wr[3 + j];
@@ -118,7 +127,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
     for( unsigned i = 0; i < tl.get_n() - 1; i++ )
     {
         int i1 = i + 1;
-        if( tl.vi_wr[2 * i + 1] != tl.vi_wr[2 * i + 3] )
+        if( tl.vi_wr[3 * i + 1] != tl.vi_wr[3 * i + 4] )
         {
             vecFaceArea[current_size] = tl.vr_wr[i1 * numr];
             dCenterLon[current_size]  = tl.vr_wr[i1 * numr + 1];
@@ -128,6 +137,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs(
                 dVertexLon[current_size][j] = tl.vr_wr[i1 * numr + 3 + j];
                 dVertexLat[current_size][j] = tl.vr_wr[i1 * numr + 3 + nv + j];
             }
+            masks[current_size] = tl.vi_wr[3 * i1 + 2];
             current_size++;
         }
         else
@@ -265,6 +275,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     unsigned nA = ( vecSourceFaceArea.GetRows() );
     unsigned nB = ( vecTargetFaceArea.GetRows() );
 
+    std::vector< int > masksA, masksB;
+    ErrorCode rval = m_remapper->GetIMasks( moab::Remapper::SourceMesh, masksA );MB_CHK_SET_ERR( rval, "Trouble getting masks for source" );
+    rval = m_remapper->GetIMasks( moab::Remapper::TargetMesh, masksB );MB_CHK_SET_ERR( rval, "Trouble getting masks for target" );
+
     // Number of nodes per Face
     int nSourceNodesPerFace = dSourceVertexLon.GetColumns();
     int nTargetNodesPerFace = dTargetVertexLon.GetColumns();
@@ -320,7 +334,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     {
 
         int ierr = rearrange_arrays_by_dofs( srccol_gdofmap, vecSourceFaceArea, dSourceCenterLon, dSourceCenterLat,
-                                             dSourceVertexLon, dSourceVertexLat, nA, nSourceNodesPerFace,
+                                             dSourceVertexLon, dSourceVertexLat, masksA, nA, nSourceNodesPerFace,
                                              max_col_dof );  // now nA will be close to maxdof/size
         if( ierr != 0 )
         {
@@ -329,7 +343,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
         // rearrange target data: (nB)
         //
         ierr = rearrange_arrays_by_dofs( row_gdofmap, vecTargetFaceArea, dTargetCenterLon, dTargetCenterLat,
-                                         dTargetVertexLon, dTargetVertexLat, nB, nTargetNodesPerFace,
+                                         dTargetVertexLon, dTargetVertexLat, masksB, nB, nTargetNodesPerFace,
                                          max_row_dof );  // now nA will be close to maxdof/size
         if( ierr != 0 )
         {
@@ -438,6 +452,10 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     NcVar* varXVA = ncMap.add_var( "xv_a", ncDouble, dimNA, dimNVA );
     NcVar* varXVB = ncMap.add_var( "xv_b", ncDouble, dimNB, dimNVB );
 
+    // Write masks
+    NcVar* varMaskA = ncMap.add_var( "mask_a", ncInt, dimNA );
+    NcVar* varMaskB = ncMap.add_var( "mask_b", ncInt, dimNB );
+
 #ifdef MOAB_HAVE_NETCDFPAR
     ncMap.enable_var_par_access( varYCA, is_independent );
     ncMap.enable_var_par_access( varYCB, is_independent );
@@ -447,6 +465,8 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     ncMap.enable_var_par_access( varYVB, is_independent );
     ncMap.enable_var_par_access( varXVA, is_independent );
     ncMap.enable_var_par_access( varXVB, is_independent );
+    ncMap.enable_var_par_access( varMaskA, is_independent );
+    ncMap.enable_var_par_access( varMaskB, is_independent );
 #endif
 
     varYCA->add_att( "units", "degrees" );
@@ -514,6 +534,11 @@ moab::ErrorCode moab::TempestOnlineMap::WriteSCRIPMapFile( const std::string& st
     varXVA->put( &( dSourceVertexLon[0][0] ), nA, nSourceNodesPerFace );
     varXVB->set_cur( (long)offbuf[1] );
     varXVB->put( &( dTargetVertexLon[0][0] ), nB, nTargetNodesPerFace );
+
+    varMaskA->set_cur( (long)offbuf[0] );
+    varMaskA->put( &( masksA[0] ), nA );
+    varMaskB->set_cur( (long)offbuf[1] );
+    varMaskB->put( &( masksB[0] ), nB );
 
     // Write areas
     NcVar* varAreaA = ncMap.add_var( "area_a", ncDouble, dimNA );
@@ -995,8 +1020,7 @@ moab::ErrorCode moab::TempestOnlineMap::WriteHDF5MapFile( const std::string& str
                                  map_disc_details[5] };
     int loc_buf[7]           = {
         tot_src_ents, tot_tgt_ents, weightMatNNZ, m_remapper->max_source_edges, m_remapper->max_target_edges,
-        maxrow,       maxcol
-    };
+        maxrow,       maxcol };
     int glb_buf[4] = { 0, 0, 0, 0 };
     MPI_Reduce( &loc_buf[0], &glb_buf[0], 3, MPI_INT, MPI_SUM, 0, m_pcomm->comm() );
     glb_smatmetadata[0] = glb_buf[0];
@@ -1142,7 +1166,8 @@ void print_progress( const int barWidth, const float progress, const char* messa
 
 ///////////////////////////////////////////////////////////////////////////////
 
-moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, const std::vector< int >& owned_dof_ids,
+moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource,
+                                                         const std::vector< int >& owned_dof_ids,
                                                          bool row_partition )
 {
     NcError error( NcError::silent_nonfatal );
@@ -1209,16 +1234,22 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         // read the file using pnetcdf directly, in parallel; need to have MPI, we do not check that anymore
         // why build wth pnetcdf without MPI ?
         // ParNcFile ncMap( m_pcomm->comm(), MPI_INFO_NULL, strSource, NcFile::ReadOnly, NcFile::Netcdf4 );
-        ret = ncmpi_open( m_pcomm->comm(), strSource, NC_NOWRITE, MPI_INFO_NULL, &ncfile ); ERR_PARNC( ret );  // bail out completely
-        ret = ncmpi_inq( ncfile, &ndims, &nvars, &ngatts, &unlimited ); ERR_PARNC( ret );
+        ret = ncmpi_open( m_pcomm->comm(), strSource, NC_NOWRITE, MPI_INFO_NULL, &ncfile );
+        ERR_PARNC( ret );  // bail out completely
+        ret = ncmpi_inq( ncfile, &ndims, &nvars, &ngatts, &unlimited );
+        ERR_PARNC( ret );
         // find dimension ids for n_S
         int ins;
-        ret = ncmpi_inq_dimid( ncfile, "n_s", &ins ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimid( ncfile, "n_s", &ins );
+        ERR_PARNC( ret );
         MPI_Offset leng;
-        ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimlen( ncfile, ins, &leng );
+        ERR_PARNC( ret );
         nS  = (int)leng;
-        ret = ncmpi_inq_dimid( ncfile, "n_b", &ins ); ERR_PARNC( ret );
-        ret = ncmpi_inq_dimlen( ncfile, ins, &leng ); ERR_PARNC( ret );
+        ret = ncmpi_inq_dimid( ncfile, "n_b", &ins );
+        ERR_PARNC( ret );
+        ret = ncmpi_inq_dimlen( ncfile, ins, &leng );
+        ERR_PARNC( ret );
         nB = (int)leng;
 #else
         _EXCEPTION1( "cannot read the file %s", strSource );
@@ -1262,13 +1293,20 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         MPI_Offset start = (MPI_Offset)offsetRead;
         MPI_Offset count = (MPI_Offset)localSize;
         int varid;
-        ret = ncmpi_inq_varid( ncfile, "S", &varid );  ERR_PARNC( ret );
-        ret = ncmpi_get_vara_double_all( ncfile, varid, &start, &count, &vecS[0] ); ERR_PARNC( ret );
-        ret = ncmpi_inq_varid( ncfile, "row", &varid ); ERR_PARNC( ret );
-        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecRow[0] ); ERR_PARNC( ret );
-        ret = ncmpi_inq_varid( ncfile, "col", &varid ); ERR_PARNC( ret );
-        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecCol[0] ); ERR_PARNC( ret );
-	ret = ncmpi_close(ncfile); ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "S", &varid );
+        ERR_PARNC( ret );
+        ret = ncmpi_get_vara_double_all( ncfile, varid, &start, &count, &vecS[0] );
+        ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "row", &varid );
+        ERR_PARNC( ret );
+        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecRow[0] );
+        ERR_PARNC( ret );
+        ret = ncmpi_inq_varid( ncfile, "col", &varid );
+        ERR_PARNC( ret );
+        ret = ncmpi_get_vara_int_all( ncfile, varid, &start, &count, &vecCol[0] );
+        ERR_PARNC( ret );
+        ret = ncmpi_close( ncfile );
+        ERR_PARNC( ret );
 #endif
     }
 
@@ -1290,22 +1328,21 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
     {
         std::vector< int > ownership;
         // the default trivial partitioning scheme
-        int nDofs = nB; // this is for row partitioning
-        if (!row_partition)
-            nDofs = nA; // column partitioning
+        int nDofs = nB;                   // this is for row partitioning
+        if( !row_partition ) nDofs = nA;  // column partitioning
 
-                // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
+        // assert(row_major_ownership == true); // this block is valid only for row-based partitioning
         ownership.resize( size );
         int nPerPart   = nDofs / size;
         int nRemainder = nDofs % size;  // Keep the remainder in root
-        ownership[0]    = nPerPart + nRemainder;
+        ownership[0]   = nPerPart + nRemainder;
         for( int ip = 1, roffset = ownership[0]; ip < size; ++ip )
         {
             roffset += nPerPart;
             ownership[ip] = roffset;
         }
-        moab::TupleList * tl = new moab::TupleList;
-        unsigned numr = 1;                          //
+        moab::TupleList* tl = new moab::TupleList;
+        unsigned numr       = 1;                     //
         tl->initialize( 3, 0, 0, numr, localSize );  // to proc, row, col, value
         tl->enableWriteAccess();
         // populate
@@ -1315,8 +1352,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             int colval  = vecCol[i] - 1;
             int to_proc = -1;
             int dof_val = colval;
-            if (row_partition)
-                dof_val = rowval;
+            if( row_partition ) dof_val = rowval;
 
             if( ownership[0] > dof_val )
                 to_proc = 0;
@@ -1332,7 +1368,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                 }
             }
 
-            int n               = tl->get_n();
+            int n                = tl->get_n();
             tl->vi_wr[3 * n]     = to_proc;
             tl->vi_wr[3 * n + 1] = rowval;
             tl->vi_wr[3 * n + 2] = colval;
@@ -1342,7 +1378,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         // heavy communication
         ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, *tl, 0 );
 
-        if (owned_dof_ids.size() > 0)
+        if( owned_dof_ids.size() > 0 )
         {
             // we need to send desired dof to the rendez_vous point
             moab::TupleList tl_re;                                 //
@@ -1369,10 +1405,9 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
                     }
                 }
 
-                int n               = tl_re.get_n();
+                int n                  = tl_re.get_n();
                 tl_re.vi_wr[2 * n]     = to_proc;
                 tl_re.vi_wr[2 * n + 1] = dof_val;
-
 
                 tl_re.inc_n();
             }
@@ -1380,32 +1415,30 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             // now we know in tl_re where do we need to send back dof_val
             moab::TupleList::buffer sort_buffer;
             sort_buffer.buffer_init( tl_re.get_n() );
-            tl_re.sort( 1, &sort_buffer ); // so now we order by value
+            tl_re.sort( 1, &sort_buffer );  // so now we order by value
 
             sort_buffer.buffer_init( tl->get_n() );
-            int indexOrder = 2; //  colVal
-            if (row_partition)
-                indexOrder = 1; //  rowVal
+            int indexOrder = 2;                  //  colVal
+            if( row_partition ) indexOrder = 1;  //  rowVal
             //tl->sort( indexOrder, &sort_buffer );
 
-            std::map<int, int> startDofIndex, endDofIndex; // indices in tl_re for values we want
-            int dofVal =-1;
-            if (tl_re.get_n() > 0)
-                dofVal = tl_re.vi_rd[1]; // first dof val on this rank
+            std::map< int, int > startDofIndex, endDofIndex;  // indices in tl_re for values we want
+            int dofVal = -1;
+            if( tl_re.get_n() > 0 ) dofVal = tl_re.vi_rd[1];  // first dof val on this rank
             startDofIndex[dofVal] = 0;
-            endDofIndex [dofVal] = 0 ; // start and end
-            for ( unsigned k = 1; k<tl_re.get_n(); k++ )
+            endDofIndex[dofVal]   = 0;  // start and end
+            for( unsigned k = 1; k < tl_re.get_n(); k++ )
             {
-                int newDof = tl_re.vi_rd[2*k+1];
-                if (dofVal == newDof)
+                int newDof = tl_re.vi_rd[2 * k + 1];
+                if( dofVal == newDof )
                 {
-                    endDofIndex[dofVal] = k; // increment by 1 actually
+                    endDofIndex[dofVal] = k;  // increment by 1 actually
                 }
                 else
                 {
-                    dofVal = newDof;
+                    dofVal                = newDof;
                     startDofIndex[dofVal] = k;
-                    endDofIndex[dofVal] = k;
+                    endDofIndex[dofVal]   = k;
                 }
             }
 
@@ -1413,8 +1446,8 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             // tl_re.vi_rd[2*startDofIndex+1] == valDof == tl_re.vi_rd[2*endDofIndex+1]
             // so now we have ordered
             // tl_re shows to what proc do we need to send the tuple (row, col, val)
-            moab::TupleList * tl_back = new moab::TupleList;
-            unsigned numr = 1;                          //
+            moab::TupleList* tl_back = new moab::TupleList;
+            unsigned numr            = 1;  //
             // localSize is a good guess, but maybe it should be bigger ?
             // this could be bigger for repeated dofs
             tl_back->initialize( 3, 0, 0, numr, tl->get_n() );  // to proc, row, col, value
@@ -1422,17 +1455,17 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             // now loop over tl and tl_re to see where to send
             // form the new tuple, which will contain the desired dofs per task, per row or column distribution
 
-            for ( unsigned k = 0; k < tl->get_n(); k++)
+            for( unsigned k = 0; k < tl->get_n(); k++ )
             {
-                int valDof = tl->vi_rd[3*k+indexOrder]; // 1 for row, 2 for column // first value, it should be
-                for (int ire = startDofIndex[valDof]; ire <= endDofIndex[valDof]; ire++)
+                int valDof = tl->vi_rd[3 * k + indexOrder];  // 1 for row, 2 for column // first value, it should be
+                for( int ire = startDofIndex[valDof]; ire <= endDofIndex[valDof]; ire++ )
                 {
-                    int to_proc = tl_re.vi_rd[2*ire];
-                    int n = tl_back->get_n();
-                    tl_back->vi_wr[3*n] = to_proc;
-                    tl_back->vi_wr[3*n+1] = tl->vi_rd[3*k+1]; // row
-                    tl_back->vi_wr[3*n+2] = tl->vi_rd[3*k+2]; // col
-                    tl_back->vr_wr[n]    = tl->vr_rd[k];
+                    int to_proc               = tl_re.vi_rd[2 * ire];
+                    int n                     = tl_back->get_n();
+                    tl_back->vi_wr[3 * n]     = to_proc;
+                    tl_back->vi_wr[3 * n + 1] = tl->vi_rd[3 * k + 1];  // row
+                    tl_back->vi_wr[3 * n + 2] = tl->vi_rd[3 * k + 2];  // col
+                    tl_back->vr_wr[n]         = tl->vr_rd[k];
                     tl_back->inc_n();
                 }
             }
@@ -1440,7 +1473,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             // now communicate to the desired tasks:
             ( m_pcomm->proc_config().crystal_router() )->gs_transfer( 1, *tl_back, 0 );
 
-            tl_re.reset(); // clear memory, although this will go out of scope
+            tl_re.reset();  // clear memory, although this will go out of scope
             tl->reset();
             tl = tl_back;
         }
@@ -1481,7 +1514,6 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
             sparseMatrix( rindex, cindex ) = tl->vr_wr[i];
         }
         tl->reset();
-
     }
     else
 #endif
@@ -1491,7 +1523,7 @@ moab::ErrorCode moab::TempestOnlineMap::ReadParallelMap( const char* strSource, 
         for( int i = 0; i < nS; i++ )
         {
             int rindex, cindex;
-            const int& vecRowValue = vecRow[i] - 1; // the rows, cols are 1 based in the file
+            const int& vecRowValue = vecRow[i] - 1;  // the rows, cols are 1 based in the file
             const int& vecColValue = vecCol[i] - 1;
 
             std::map< int, int >::iterator riter = rowMap.find( vecRowValue );

@@ -61,9 +61,10 @@ NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions
         // gcrm reader
         else if( NCHelperGCRM::can_read_file( readNC ) )
             return new( std::nothrow ) NCHelperGCRM( readNC, fileId, opts, fileSet );
-        else if( NCHelperScrip::can_read_file( readNC, fileId ) )
-             return new( std::nothrow ) NCHelperScrip( readNC, fileId, opts, fileSet );
     }
+    // SCRIP can be CF or non CF, if it comes from MPAS :)
+    if( NCHelperScrip::can_read_file( readNC, fileId ) )
+                 return new( std::nothrow ) NCHelperScrip( readNC, fileId, opts, fileSet );
 
     // Unknown NetCDF grid (will fill this in later for POP, CICE and CLM)
     return NULL;
