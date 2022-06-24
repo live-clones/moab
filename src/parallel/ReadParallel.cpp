@@ -51,8 +51,11 @@ ReadParallel::ReadParallel( Interface* impl, ParallelComm* pc )
     impl->query_interface( mError );
 }
 
-ErrorCode ReadParallel::load_file( const char** file_names, const int num_files, const EntityHandle* file_set,
-                                   const FileOptions& opts, const ReaderIface::SubsetList* subset_list,
+ErrorCode ReadParallel::load_file( const char** file_names,
+                                   const int num_files,
+                                   const EntityHandle* file_set,
+                                   const FileOptions& opts,
+                                   const ReaderIface::SubsetList* subset_list,
                                    const Tag* file_id_tag )
 {
     int tmpval;
@@ -66,7 +69,10 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
     // Get parallel settings
     int parallel_mode;
     ErrorCode result = opts.match_option( "PARALLEL", parallelOptsNames, parallel_mode );
-    if( MB_FAILURE == result ) { MB_SET_ERR( MB_FAILURE, "Unexpected value for 'PARALLEL' option" ); }
+    if( MB_FAILURE == result )
+    {
+        MB_SET_ERR( MB_FAILURE, "Unexpected value for 'PARALLEL' option" );
+    }
     else if( MB_ENTITY_NOT_FOUND == result )
     {
         parallel_mode = 0;
@@ -128,7 +134,10 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
     else if( MB_SUCCESS == result )
     {
         int num_fields = sscanf( ghost_str.c_str(), "%d.%d.%d.%d", &ghost_dim, &bridge_dim, &num_layers, &addl_ents );
-        if( 3 > num_fields ) { MB_SET_ERR( MB_FAILURE, "Didn't read 3 fields from PARALLEL_GHOSTS string" ); }
+        if( 3 > num_fields )
+        {
+            MB_SET_ERR( MB_FAILURE, "Didn't read 3 fields from PARALLEL_GHOSTS string" );
+        }
     }
 
     // Get resolve_shared_ents option
@@ -256,14 +265,26 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
     return MB_SUCCESS;
 }
 
-ErrorCode ReadParallel::load_file( const char** file_names, const int num_files, const EntityHandle* file_set_ptr,
-                                   int /*parallel_mode*/, std::string& partition_tag_name,
-                                   std::vector< int >& partition_tag_vals, bool distrib, bool partition_by_rank,
-                                   std::vector< int >& pa_vec, const FileOptions& opts,
-                                   const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag,
-                                   const int reader_rank, const bool cputime, const int resolve_dim,
-                                   const int shared_dim, const int ghost_dim, const int bridge_dim,
-                                   const int num_layers, const int addl_ents )
+ErrorCode ReadParallel::load_file( const char** file_names,
+                                   const int num_files,
+                                   const EntityHandle* file_set_ptr,
+                                   int /*parallel_mode*/,
+                                   std::string& partition_tag_name,
+                                   std::vector< int >& partition_tag_vals,
+                                   bool distrib,
+                                   bool partition_by_rank,
+                                   std::vector< int >& pa_vec,
+                                   const FileOptions& opts,
+                                   const ReaderIface::SubsetList* subset_list,
+                                   const Tag* file_id_tag,
+                                   const int reader_rank,
+                                   const bool cputime,
+                                   const int resolve_dim,
+                                   const int shared_dim,
+                                   const int ghost_dim,
+                                   const int bridge_dim,
+                                   const int num_layers,
+                                   const int addl_ents )
 {
     ErrorCode result = MB_SUCCESS;
     if( myPcomm == NULL ) myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD );
@@ -582,7 +603,10 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
                 MB_SET_ERR( MB_FAILURE, "Unexpected parallel action" );
         }  // switch (*vit)
 
-        if( MB_SUCCESS != tmp_result ) { MB_SET_ERR( MB_FAILURE, "Failed in step " << ParallelActionsNames[*vit] ); }
+        if( MB_SUCCESS != tmp_result )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in step " << ParallelActionsNames[*vit] );
+        }
 
         if( cputime ) act_times[i] = MPI_Wtime();
     }  // for (i = 1, vit = pa_vec.begin(); vit != pa_vec.end(); ++vit, i++)
@@ -627,8 +651,10 @@ ErrorCode ReadParallel::load_file( const char** file_names, const int num_files,
     return MB_SUCCESS;
 }
 
-ErrorCode ReadParallel::delete_nonlocal_entities( std::string& ptag_name, std::vector< int >& ptag_vals,
-                                                  bool distribute, EntityHandle file_set )
+ErrorCode ReadParallel::delete_nonlocal_entities( std::string& ptag_name,
+                                                  std::vector< int >& ptag_vals,
+                                                  bool distribute,
+                                                  EntityHandle file_set )
 {
     Range partition_sets;
 
@@ -745,7 +771,10 @@ ErrorCode ReadParallel::delete_nonlocal_entities( EntityHandle file_set )
     Range file_ents;
     result = mbImpl->get_entities_by_handle( file_set, file_ents );MB_CHK_SET_ERR( result, "Couldn't get pre-existing entities" );
 
-    if( 0 == myPcomm->proc_config().proc_rank() ) { myDebug.print( 2, "File entities: ", file_ents ); }
+    if( 0 == myPcomm->proc_config().proc_rank() )
+    {
+        myDebug.print( 2, "File entities: ", file_ents );
+    }
 
     // Get deletable entities by subtracting partition ents from file ents
     Range deletable_ents = subtract( file_ents, partition_ents );
@@ -765,7 +794,10 @@ ErrorCode ReadParallel::delete_nonlocal_entities( EntityHandle file_set )
 
     myDebug.tprint( 2, "Deleting deletable entities.\n" );
 
-    if( 0 == myPcomm->proc_config().proc_rank() ) { myDebug.print( 2, "Deletable sets: ", deletable_sets ); }
+    if( 0 == myPcomm->proc_config().proc_rank() )
+    {
+        myDebug.print( 2, "Deletable sets: ", deletable_sets );
+    }
 
     // Delete sets, then ents
     if( !deletable_sets.empty() )
@@ -775,7 +807,10 @@ ErrorCode ReadParallel::delete_nonlocal_entities( EntityHandle file_set )
 
     deletable_ents -= deletable_sets;
 
-    if( 0 == myPcomm->proc_config().proc_rank() ) { myDebug.print( 2, "Deletable entities: ", deletable_ents ); }
+    if( 0 == myPcomm->proc_config().proc_rank() )
+    {
+        myDebug.print( 2, "Deletable entities: ", deletable_ents );
+    }
 
     if( !deletable_ents.empty() )
     {

@@ -120,7 +120,7 @@ ReadCCMIO::ReadCCMIO( Interface* impl )
 
     const int negonearr[] = { -1, -1, -1, -1 };
     result                = impl->tag_get_handle( HAS_MID_NODES_TAG_NAME, 4, MB_TYPE_INTEGER, mHasMidNodesTag,
-                                   MB_TAG_CREAT | MB_TAG_SPARSE, negonearr );MB_CHK_SET_ERR_RET( result, "Failed to get HAS_MID_NODES tag" );
+                                                  MB_TAG_CREAT | MB_TAG_SPARSE, negonearr );MB_CHK_SET_ERR_RET( result, "Failed to get HAS_MID_NODES tag" );
 
     mGlobalIdTag = impl->globalId_tag();
 
@@ -133,8 +133,11 @@ ReadCCMIO::~ReadCCMIO()
     mbImpl->release_interface( readMeshIface );
 }
 
-ErrorCode ReadCCMIO::load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& /* opts */,
-                                const ReaderIface::SubsetList* subset_list, const Tag* /* file_id_tag */ )
+ErrorCode ReadCCMIO::load_file( const char* file_name,
+                                const EntityHandle* file_set,
+                                const FileOptions& /* opts */,
+                                const ReaderIface::SubsetList* subset_list,
+                                const Tag* /* file_id_tag */ )
 {
     CCMIOID rootID, problemID, stateID, processorID, verticesID, topologyID, solutionID;
     CCMIOError error = kCCMIONoErr;
@@ -194,7 +197,10 @@ ErrorCode ReadCCMIO::get_state( CCMIOID rootID, CCMIOID& problemID, CCMIOID& sta
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::load_metadata( CCMIOID rootID, CCMIOID problemID, CCMIOID /* stateID */, CCMIOID processorID,
+ErrorCode ReadCCMIO::load_metadata( CCMIOID rootID,
+                                    CCMIOID problemID,
+                                    CCMIOID /* stateID */,
+                                    CCMIOID processorID,
                                     const EntityHandle* file_set )
 {
     // Read the simulation title.
@@ -325,7 +331,10 @@ ErrorCode ReadCCMIO::get_dbl_option( const char* opt_str, EntityHandle seth, Tag
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::get_str_option( const char* opt_str, EntityHandle seth, Tag& tag, CCMIOID node,
+ErrorCode ReadCCMIO::get_str_option( const char* opt_str,
+                                     EntityHandle seth,
+                                     Tag& tag,
+                                     CCMIOID node,
                                      const char* other_tag_name )
 {
     int len;
@@ -387,8 +396,13 @@ ErrorCode ReadCCMIO::load_neuset_data( CCMIOID problemID )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::read_processor( CCMIOID /* stateID */, CCMIOID problemID, CCMIOID processorID, CCMIOID verticesID,
-                                     CCMIOID topologyID, CCMIOSize_t proc, Range* new_ents )
+ErrorCode ReadCCMIO::read_processor( CCMIOID /* stateID */,
+                                     CCMIOID problemID,
+                                     CCMIOID processorID,
+                                     CCMIOID verticesID,
+                                     CCMIOID topologyID,
+                                     CCMIOSize_t proc,
+                                     Range* new_ents )
 {
     ErrorCode rval;
 
@@ -402,8 +416,12 @@ ErrorCode ReadCCMIO::read_processor( CCMIOID /* stateID */, CCMIOID problemID, C
     return rval;
 }
 
-ErrorCode ReadCCMIO::read_cells( CCMIOSize_t /* proc */, CCMIOID problemID, CCMIOID /* verticesID */,
-                                 CCMIOID topologyID, TupleList& vert_map, Range* new_ents )
+ErrorCode ReadCCMIO::read_cells( CCMIOSize_t /* proc */,
+                                 CCMIOID problemID,
+                                 CCMIOID /* verticesID */,
+                                 CCMIOID topologyID,
+                                 TupleList& vert_map,
+                                 Range* new_ents )
 {
     // Read the faces.
     // face_map fields: s:forward/reverse, i: cell id, ul: face handle, r: none
@@ -485,7 +503,8 @@ ErrorCode ReadCCMIO::read_topology_types( CCMIOID& topologyID, std::map< int, in
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::read_gids_and_types( CCMIOID /* problemID */, CCMIOID topologyID,
+ErrorCode ReadCCMIO::read_gids_and_types( CCMIOID /* problemID */,
+                                          CCMIOID topologyID,
                                           std::vector< EntityHandle >& cells )
 {
     // Get the cells entity and number of cells
@@ -534,7 +553,8 @@ ErrorCode ReadCCMIO::construct_cells( TupleList& face_map,
 #ifndef TUPLE_LIST
                                       SenseList& sense_map,
 #endif
-                                      TupleList& /* vert_map */, std::map< int, int >& cell_topo_types,
+                                      TupleList& /* vert_map */,
+                                      std::map< int, int >& cell_topo_types,
                                       std::vector< EntityHandle >& new_cells )
 {
     std::vector< EntityHandle > facehs;
@@ -573,7 +593,10 @@ ErrorCode ReadCCMIO::construct_cells( TupleList& face_map,
         senses.clear();
         senses = ( *smit ).second;
         typeit = cell_topo_types.find( this_id );
-        if( typeit != cell_topo_types.end() ) { rval = ccmio_to_moab_type( typeit->second, this_type, has_mid_nodes ); }
+        if( typeit != cell_topo_types.end() )
+        {
+            rval = ccmio_to_moab_type( typeit->second, this_type, has_mid_nodes );
+        }
         else
         {
             this_type     = MBMAXTYPE;
@@ -653,8 +676,11 @@ ErrorCode ReadCCMIO::ccmio_to_moab_type( int ccm_type, EntityType& moab_type, bo
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs, std::vector< int >& senses,
-                                             EntityType this_type, bool /* has_mid_nodes */, EntityHandle& cell )
+ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs,
+                                             std::vector< int >& senses,
+                                             EntityType this_type,
+                                             bool /* has_mid_nodes */,
+                                             EntityHandle& cell )
 {
     ErrorCode rval;
 
@@ -866,7 +892,9 @@ ErrorCode ReadCCMIO::create_cell_from_faces( std::vector< EntityHandle >& facehs
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::read_all_faces( CCMIOID topologyID, TupleList& vert_map, TupleList& face_map,
+ErrorCode ReadCCMIO::read_all_faces( CCMIOID topologyID,
+                                     TupleList& vert_map,
+                                     TupleList& face_map,
 #ifndef TUPLE_LIST
                                      SenseList& sense_map,
 #endif
@@ -919,7 +947,10 @@ ErrorCode ReadCCMIO::read_all_faces( CCMIOID topologyID, TupleList& vert_map, Tu
     return rval;
 }
 
-ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleList& vert_map, TupleList& face_map,
+ErrorCode ReadCCMIO::read_faces( CCMIOID faceID,
+                                 CCMIOEntity bdy_or_int,
+                                 TupleList& vert_map,
+                                 TupleList& face_map,
 #ifndef TUPLE_LIST
                                  SenseList& sense_map,
 #endif
@@ -1014,7 +1045,9 @@ ErrorCode ReadCCMIO::read_faces( CCMIOID faceID, CCMIOEntity bdy_or_int, TupleLi
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::make_faces( int* farray, TupleList& vert_map, std::vector< EntityHandle >& new_faces,
+ErrorCode ReadCCMIO::make_faces( int* farray,
+                                 TupleList& vert_map,
+                                 std::vector< EntityHandle >& new_faces,
                                  int num_faces )
 {
     std::vector< EntityHandle > verts;
@@ -1057,8 +1090,12 @@ ErrorCode ReadCCMIO::make_faces( int* farray, TupleList& vert_map, std::vector< 
     return rval;
 }
 
-ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processorID */, CCMIOID verticesID,
-                                    CCMIOID /* topologyID */, Range* verts, TupleList& vert_map )
+ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */,
+                                    CCMIOID /* processorID */,
+                                    CCMIOID verticesID,
+                                    CCMIOID /* topologyID */,
+                                    Range* verts,
+                                    TupleList& vert_map )
 {
     CCMIOError error = kCCMIONoErr;
 
@@ -1136,8 +1173,13 @@ ErrorCode ReadCCMIO::read_vertices( CCMIOSize_t /* proc */, CCMIOID /* processor
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::get_processors( CCMIOID stateID, CCMIOID& processorID, CCMIOID& verticesID, CCMIOID& topologyID,
-                                     CCMIOID& solutionID, std::vector< CCMIOSize_t >& procs, bool& /* has_solution */ )
+ErrorCode ReadCCMIO::get_processors( CCMIOID stateID,
+                                     CCMIOID& processorID,
+                                     CCMIOID& verticesID,
+                                     CCMIOID& topologyID,
+                                     CCMIOID& solutionID,
+                                     std::vector< CCMIOSize_t >& procs,
+                                     bool& /* has_solution */ )
 {
     CCMIOSize_t proc = CCMIOSIZEC( 0 );
     CCMIOError error = kCCMIONoErr;
@@ -1157,8 +1199,10 @@ ErrorCode ReadCCMIO::get_processors( CCMIOID stateID, CCMIOID& processorID, CCMI
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCCMIO::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                      const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadCCMIO::read_tag_values( const char* /* file_name */,
+                                      const char* /* tag_name */,
+                                      const FileOptions& /* opts */,
+                                      std::vector< int >& /* tag_values_out */,
                                       const SubsetList* /* subset_list */ )
 {
     return MB_FAILURE;

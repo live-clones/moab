@@ -38,7 +38,9 @@ void tokenize( const std::string& str, std::vector< std::string >& tokens, const
         }
 }
 
-ErrorCode get_group_names( Interface* MBI, const EntityHandle group_set, const Tag nameTag,
+ErrorCode get_group_names( Interface* MBI,
+                           const EntityHandle group_set,
+                           const Tag nameTag,
                            std::vector< std::string >& grp_names )
 {
     // get names
@@ -54,9 +56,15 @@ ErrorCode get_group_names( Interface* MBI, const EntityHandle group_set, const T
 
 // For each material, sum the volume. If the coordinates were updated for
 // deformation, summarize the volume change.
-ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_file_set, const Tag categoryTag,
-                                        const Tag dimTag, const Tag sizeTag, const Tag nameTag, const Tag idTag,
-                                        const bool conserve_mass, const bool debug )
+ErrorCode summarize_cell_volume_change( Interface* MBI,
+                                        const EntityHandle cgm_file_set,
+                                        const Tag categoryTag,
+                                        const Tag dimTag,
+                                        const Tag sizeTag,
+                                        const Tag nameTag,
+                                        const Tag idTag,
+                                        const bool conserve_mass,
+                                        const bool debug )
 {
     // get groups
     ErrorCode rval;
@@ -177,8 +185,11 @@ ErrorCode summarize_cell_volume_change( Interface* MBI, const EntityHandle cgm_f
 // To prevent this, remove the cgm surface set if the cub surface set exists,
 // but had its faced removed (due to dead elements). Remember that the cgm_file_set
 // is not TRACKING.
-ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cgm_file_set, const Tag idTag,
-                                           const Tag dimTag, const bool /*debug */ )
+ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI,
+                                           const EntityHandle cgm_file_set,
+                                           const Tag idTag,
+                                           const Tag dimTag,
+                                           const bool /*debug */ )
 {
 
     ErrorCode result;
@@ -286,9 +297,15 @@ ErrorCode remove_empty_cgm_surfs_and_vols( Interface* MBI, const EntityHandle cg
 
 // Given parent volume senses, an id, and a set handle, this function creates a
 // new surface set with dimension, geometry category, id, and sense tags.
-ErrorCode build_new_surface( Interface* MBI, EntityHandle& new_surf, const EntityHandle forward_parent_vol,
-                             const EntityHandle reverse_parent_vol, const int new_surf_id, const Tag dimTag,
-                             const Tag idTag, const Tag categoryTag, const Tag senseTag )
+ErrorCode build_new_surface( Interface* MBI,
+                             EntityHandle& new_surf,
+                             const EntityHandle forward_parent_vol,
+                             const EntityHandle reverse_parent_vol,
+                             const int new_surf_id,
+                             const Tag dimTag,
+                             const Tag idTag,
+                             const Tag categoryTag,
+                             const Tag senseTag )
 {
 
     ErrorCode result;
@@ -480,8 +497,12 @@ ErrorCode skin_hex_elems(Interface *MBI, Range elems, const int dim,
 #endif  // dead code isolation
 // Given a 1D array of data, axis labels, title, and number of bins, create a
 // histogram.
-void plot_histogram( const std::string& title, const std::string& x_axis_label, const std::string& y_axis_label,
-                     const int n_bins, const double data[], const int n_data )
+void plot_histogram( const std::string& title,
+                     const std::string& x_axis_label,
+                     const std::string& y_axis_label,
+                     const int n_bins,
+                     const double data[],
+                     const int n_data )
 {
     // find max and min
     double min = std::numeric_limits< double >::max();
@@ -629,7 +650,9 @@ double measure( Interface* MBI, const EntityHandle element )
  Special Case: If the surface is planar, and the plane includes the origin,
  the signed volume will be ~0. If the signed volume is ~0 then offset everything
  by a random amount and try again. */
-ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set, const CartVect& offset,
+ErrorCode get_signed_volume( Interface* MBI,
+                             const EntityHandle surf_set,
+                             const CartVect& offset,
                              double& signed_volume )
 {
     ErrorCode rval;
@@ -668,8 +691,13 @@ ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set, const 
 // represent the quads in the cub surface. Calculate the signed volume of both
 // the cgm and cub surface. If they are different, change the cgm sense so that
 // it matches the sense of the cub surface.
-ErrorCode fix_surface_senses( Interface* MBI, const EntityHandle cgm_file_set, const EntityHandle cub_file_set,
-                              const Tag idTag, const Tag dimTag, const Tag senseTag, const bool debug )
+ErrorCode fix_surface_senses( Interface* MBI,
+                              const EntityHandle cgm_file_set,
+                              const EntityHandle cub_file_set,
+                              const Tag idTag,
+                              const Tag dimTag,
+                              const Tag senseTag,
+                              const bool debug )
 {
     ErrorCode result;
     const int two               = 2;
@@ -760,8 +788,12 @@ ErrorCode fix_surface_senses( Interface* MBI, const EntityHandle cgm_file_set, c
 // cgm_surf, if there exists a cub_surf with the same id, replace the cgm tris
 // with cub_tris (created from the quads). Note the a surface that is not
 // meshed (in cub file) will not be effected.
-ErrorCode replace_faceted_cgm_surfs( Interface* MBI, const EntityHandle cgm_file_set, const EntityHandle cub_file_set,
-                                     const Tag idTag, const Tag dimTag, const bool debug )
+ErrorCode replace_faceted_cgm_surfs( Interface* MBI,
+                                     const EntityHandle cgm_file_set,
+                                     const EntityHandle cub_file_set,
+                                     const Tag idTag,
+                                     const Tag dimTag,
+                                     const bool debug )
 {
     ErrorCode result;
     const int two               = 2;
@@ -825,9 +857,14 @@ ErrorCode replace_faceted_cgm_surfs( Interface* MBI, const EntityHandle cgm_file
 // IF MODIFYING THIS CODE, BE AWARE THAT DEAD ELEMENTS CAN BE ADJACENT TO MORE
 // THAN ONE SURFACE, MAKING THE ASSOCIATION BETWEEN NEWLY EXPOSED AND EXISTING
 // SURFACES AMBIGUOUS.
-ErrorCode add_dead_elems_to_impl_compl( Interface* MBI, const EntityHandle cgm_file_set,
-                                        const EntityHandle cub_file_set, const Tag idTag, const Tag dimTag,
-                                        const Tag categoryTag, const Tag senseTag, const bool debug )
+ErrorCode add_dead_elems_to_impl_compl( Interface* MBI,
+                                        const EntityHandle cgm_file_set,
+                                        const EntityHandle cub_file_set,
+                                        const Tag idTag,
+                                        const Tag dimTag,
+                                        const Tag categoryTag,
+                                        const Tag senseTag,
+                                        const bool debug )
 {
 
     // Get the cgm surfaces

@@ -73,7 +73,10 @@ class ShapeImprover : public Wrapper
 
   protected:
     MESQUITE_EXPORT
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                      ParallelMesh* pmesh,
+                      Settings* settings,
+                      QualityAssessor* qa,
                       MsqError& err );
 
   private:

@@ -140,7 +140,10 @@ void VerdictVector::blow_out( double gamma, double rmin )
     //  r() = sqrt( (2. - r()) * r() ) * gamma  + r() * (1-gamma);
     assert( gamma > 0.0 );
     // the following limits should really be roundoff-based
-    if( r() > rmin * 1.001 && r() < 1.001 ) { r() = rmin + pow( r(), gamma ) * ( 1.0 - rmin ); }
+    if( r() > rmin * 1.001 && r() < 1.001 )
+    {
+        r() = rmin + pow( r(), gamma ) * ( 1.0 - rmin );
+    }
     rtheta_to_xy();
 }
 
@@ -212,7 +215,10 @@ double VerdictVector::vector_angle_quick( const VerdictVector& vec1, const Verdi
 
     angle = atan2( yv, xv );
 
-    if( angle < 0.0 ) { angle += TWO_VERDICT_PI; }
+    if( angle < 0.0 )
+    {
+        angle += TWO_VERDICT_PI;
+    }
     return angle;
 }
 
@@ -300,7 +306,10 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
     {
         // The normal and vector1 are not colinear, now check for vector2
         dot = vector2 % normal;
-        if( dot * dot >= vector2.length_squared() * normal_lensq * dot_tol ) { normal = vector1 * vector2; }
+        if( dot * dot >= vector2.length_squared() * normal_lensq * dot_tol )
+        {
+            normal = vector1 * vector2;
+        }
     }
 
     // Assume a plane such that the normal vector is the plane's normal.
@@ -318,10 +327,16 @@ double VerdictVector::vector_angle( const VerdictVector& vector1, const VerdictV
     double xv = vector2 % yAxis;
 
     //  assert(x != 0.0 || y != 0.0);
-    if( xv == 0.0 && yv == 0.0 ) { return 0.0; }
+    if( xv == 0.0 && yv == 0.0 )
+    {
+        return 0.0;
+    }
     double angle = atan2( yv, xv );
 
-    if( angle < 0.0 ) { angle += TWO_VERDICT_PI; }
+    if( angle < 0.0 )
+    {
+        angle += TWO_VERDICT_PI;
+    }
     return angle;
 }
 

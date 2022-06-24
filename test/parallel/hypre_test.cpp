@@ -8,8 +8,12 @@ using namespace std;
 
 #undef DEBUG
 
-moab::ErrorCode GenerateTestMatrixAndVectors( int nx, int ny, int nz, moab::HypreParMatrix& A,
-                                              moab::HypreParVector& sol, moab::HypreParVector& rhs,
+moab::ErrorCode GenerateTestMatrixAndVectors( int nx,
+                                              int ny,
+                                              int nz,
+                                              moab::HypreParMatrix& A,
+                                              moab::HypreParVector& sol,
+                                              moab::HypreParVector& rhs,
                                               moab::HypreParVector& exactsol );
 
 int main( int argc, char* argv[] )
@@ -192,8 +196,12 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-moab::ErrorCode GenerateTestMatrixAndVectors( int nx, int ny, int nz, moab::HypreParMatrix& A,
-                                              moab::HypreParVector& sol, moab::HypreParVector& rhs,
+moab::ErrorCode GenerateTestMatrixAndVectors( int nx,
+                                              int ny,
+                                              int nz,
+                                              moab::HypreParMatrix& A,
+                                              moab::HypreParVector& sol,
+                                              moab::HypreParVector& rhs,
                                               moab::HypreParVector& exactsol )
 {
 #ifdef DEBUG
@@ -265,9 +273,12 @@ moab::ErrorCode GenerateTestMatrixAndVectors( int nx, int ny, int nz, moab::Hypr
                                 ( curcol >= 0 && curcol < total_nrow ) )
                             {
                                 if( !use_7pt_stencil || ( sz * sz + sy * sy + sx * sx <= 1 ) )
-                                {  // This logic will skip over point that are not part of a 7-pt
-                                   // stencil
-                                    if( curcol == currow ) { colvals.push_back( 27.0 ); }
+                                {   // This logic will skip over point that are not part of a 7-pt
+                                    // stencil
+                                    if( curcol == currow )
+                                    {
+                                        colvals.push_back( 27.0 );
+                                    }
                                     else
                                     {
                                         colvals.push_back( -1.0 );

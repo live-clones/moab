@@ -44,7 +44,9 @@ void VertexQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, b
     get_vertex_evaluations( pd, handles, free_vertices_only, err );
 }
 
-void VertexQM::get_vertex_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+void VertexQM::get_vertex_evaluations( PatchData& pd,
+                                       std::vector< size_t >& handles,
+                                       bool free_vertices_only,
                                        MsqError& /*err*/ )
 {
     if( free_vertices_only )

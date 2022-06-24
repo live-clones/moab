@@ -831,7 +831,10 @@ static string dtostr( double i )
  *         Actual test imlplementation (common code for many tests)
  *******************************************************************************/
 
-void LinearMappingFunctionTest::do_coeff_test( MappingFunction& mf, unsigned subdim, map_func mf2, unsigned count,
+void LinearMappingFunctionTest::do_coeff_test( MappingFunction& mf,
+                                               unsigned subdim,
+                                               map_func mf2,
+                                               unsigned count,
                                                double* xi )
 {
     // make sure it fails if passed a nonlinear element
@@ -884,7 +887,10 @@ void LinearMappingFunctionTest::do_coeff_test( MappingFunction& mf, unsigned sub
     }
 }
 
-void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned subdim, map_func mf2, unsigned count,
+void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf,
+                                               unsigned subdim,
+                                               map_func mf2,
+                                               unsigned count,
                                                double* xi )
 {
     // make sure it fails if passed a nonlinear element
@@ -961,7 +967,10 @@ void LinearMappingFunctionTest::do_deriv_test( MappingFunction2D& mf, unsigned s
     }
 }
 
-void LinearMappingFunctionTest::do_deriv_test( MappingFunction3D& mf, unsigned subdim, map_func mf2, unsigned count,
+void LinearMappingFunctionTest::do_deriv_test( MappingFunction3D& mf,
+                                               unsigned subdim,
+                                               map_func mf2,
+                                               unsigned count,
                                                double* xi )
 {
     // make sure it fails if passed a nonlinear element

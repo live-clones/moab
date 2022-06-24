@@ -10,10 +10,14 @@ namespace moab
 class UnstructuredElemSeq : public ElementSequence
 {
   public:
-    UnstructuredElemSeq( EntityHandle start_handle, EntityID entity_count, unsigned nodes_per_entity,
+    UnstructuredElemSeq( EntityHandle start_handle,
+                         EntityID entity_count,
+                         unsigned nodes_per_entity,
                          SequenceData* data );
 
-    UnstructuredElemSeq( EntityHandle start_handle, EntityID entity_count, unsigned nodes_per_entity,
+    UnstructuredElemSeq( EntityHandle start_handle,
+                         EntityID entity_count,
+                         unsigned nodes_per_entity,
                          EntityID sequence_data_size );
 
     virtual ~UnstructuredElemSeq();
@@ -24,11 +28,15 @@ class UnstructuredElemSeq : public ElementSequence
 
     SequenceData* create_data_subset( EntityHandle start, EntityHandle end ) const;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        std::vector< EntityHandle >& connect,
                                         bool topological = false ) const;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
-                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const;
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        EntityHandle const*& connect,
+                                        int& connect_length,
+                                        bool topological                     = false,
+                                        std::vector< EntityHandle >* storage = 0 ) const;
 
     ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length );
 

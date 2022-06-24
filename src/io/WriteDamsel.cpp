@@ -123,10 +123,15 @@ WriteDamsel::~WriteDamsel()
     if( mWriteIface ) mbImpl->release_interface( mWriteIface );
 }
 
-ErrorCode WriteDamsel::write_file( const char* file_name, const bool /* overwrite */, const FileOptions& opts,
-                                   const EntityHandle* meshset_list, const int num_sets,
-                                   const std::vector< std::string >& /* qa_records */, const Tag* /* tag_list */,
-                                   int /* num_tags */, int /* requested_output_dimension */ )
+ErrorCode WriteDamsel::write_file( const char* file_name,
+                                   const bool /* overwrite */,
+                                   const FileOptions& opts,
+                                   const EntityHandle* meshset_list,
+                                   const int num_sets,
+                                   const std::vector< std::string >& /* qa_records */,
+                                   const Tag* /* tag_list */,
+                                   int /* num_tags */,
+                                   int /* requested_output_dimension */ )
 {
     // Gather all entities into one big range
     Range all_ents;
@@ -219,7 +224,7 @@ ErrorCode WriteDamsel::init_tag_info()
             // Create a damsel counterpart for this tag
             Tag thandle = *vit;
             err         = DMSLtag_define( dU.dmslModel, (damsel_handle_ptr)&thandle,
-                                  DamselUtil::mtod_data_type[( *vit )->get_data_type()], ( *vit )->get_name().c_str() );
+                                          DamselUtil::mtod_data_type[( *vit )->get_data_type()], ( *vit )->get_name().c_str() );
             CHK_DMSL_ERR( err, "Failure to get Damsel tag for MOAB tag" );
             dU.tagMap.push_back( DamselUtil::tinfo( thandle, 0, ( *vit )->get_storage_type() ) );
         }

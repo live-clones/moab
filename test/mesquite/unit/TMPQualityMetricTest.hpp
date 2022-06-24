@@ -183,7 +183,10 @@ class TestGradTargetMetric : public Base
         return true;
     }
 
-    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result, MsqMatrix< 2, 2 >& d,
+    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                             const MsqMatrix< 2, 2 >&,
+                             double& result,
+                             MsqMatrix< 2, 2 >& d,
                              MsqError& err )
     {
         return evaluate_with_grad( A, result, d, err );
@@ -207,7 +210,10 @@ class TestGradTargetMetric : public Base
         return true;
     }
 
-    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result, MsqMatrix< 3, 3 >& d,
+    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A,
+                             const MsqMatrix< 3, 3 >&,
+                             double& result,
+                             MsqMatrix< 3, 3 >& d,
                              MsqError& err )
     {
         return evaluate_with_grad( A, result, d, err );
@@ -957,7 +963,8 @@ inline void TMPQualityMetricTest< QMType >::test_gradient_3D()
 
 template < class QMType >
 inline void TMPQualityMetricTest< QMType >::compare_analytical_and_numerical_gradients( QualityMetric* qm,
-                                                                                        PatchData& pd, int dim )
+                                                                                        PatchData& pd,
+                                                                                        int dim )
 {
     MsqPrintError err( std::cout );
 

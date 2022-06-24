@@ -27,7 +27,7 @@ namespace moab
 EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange )
 {
     size_t result = 1;
-    auto dim = CN::Dimension( TYPE_FROM_HANDLE( start_handle ) );
+    auto dim      = CN::Dimension( TYPE_FROM_HANDLE( start_handle ) );
     switch( dim )
     {
         case 3:
@@ -47,8 +47,14 @@ EntityID SweptElementData::calc_num_entities( EntityHandle start_handle, int ira
     return result;
 }
 
-SweptElementData::SweptElementData( EntityHandle shandle, const int imin, const int jmin, const int kmin,
-                                    const int imax, const int jmax, const int kmax, const int* /*Cq*/ )
+SweptElementData::SweptElementData( EntityHandle shandle,
+                                    const int imin,
+                                    const int jmin,
+                                    const int kmin,
+                                    const int imax,
+                                    const int jmax,
+                                    const int kmax,
+                                    const int* /*Cq*/ )
     : SequenceData( 0, shandle, shandle + calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin ) - 1 )
 {
     // need to have meaningful parameters
@@ -143,8 +149,10 @@ bool SweptElementData::boundary_complete() const
     return false;
 }
 
-SequenceData* SweptElementData::subset( EntityHandle /*start*/, EntityHandle /*end*/,
-                                        const int* /*sequence_data_sizes*/, const int* /*tag_data_sizes*/ ) const
+SequenceData* SweptElementData::subset( EntityHandle /*start*/,
+                                        EntityHandle /*end*/,
+                                        const int* /*sequence_data_sizes*/,
+                                        const int* /*tag_data_sizes*/ ) const
 {
     return 0;
 }

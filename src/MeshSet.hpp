@@ -87,8 +87,11 @@ class MeshSet
 
     //! replace one entity with another in the set (contents and parent/child
     //! lists); returns whether it was replaced or not
-    ErrorCode replace_entities( EntityHandle my_handle, const EntityHandle* old_entities,
-                                const EntityHandle* new_entities, size_t num_entities, AEntityFactory* mAdjFact );
+    ErrorCode replace_entities( EntityHandle my_handle,
+                                const EntityHandle* old_entities,
+                                const EntityHandle* new_entities,
+                                size_t num_entities,
+                                AEntityFactory* mAdjFact );
 
     /** Clear *contents* of set (not parents or children) */
     inline ErrorCode clear( EntityHandle myhandle, AEntityFactory* adjacencies );
@@ -141,7 +144,9 @@ class MeshSet
     inline ErrorCode unite( const MeshSet* meshset_2, EntityHandle my_handle, AEntityFactory* adjacencies );
 
     //! add these entities to this meshset
-    inline ErrorCode add_entities( const EntityHandle* entity_handles, const int num_entities, EntityHandle my_handle,
+    inline ErrorCode add_entities( const EntityHandle* entity_handles,
+                                   const int num_entities,
+                                   EntityHandle my_handle,
                                    AEntityFactory* adjacencies );
 
     //! add these entities to this meshset
@@ -151,7 +156,9 @@ class MeshSet
     inline ErrorCode remove_entities( const Range& entities, EntityHandle my_handle, AEntityFactory* adjacencies );
 
     //! remove these entities from this meshset
-    inline ErrorCode remove_entities( const EntityHandle* entities, const int num_entities, EntityHandle my_handle,
+    inline ErrorCode remove_entities( const EntityHandle* entities,
+                                      const int num_entities,
+                                      EntityHandle my_handle,
                                       AEntityFactory* adjacencies );
 
     //! return the number of entities contained in this meshset
@@ -179,7 +186,9 @@ class MeshSet
     ErrorCode insert_entity_vector( const EntityHandle* vect, size_t len, EntityHandle my_h, AEntityFactory* adj );
 
     /** Insert vector of handle range pairs into MeshSet */
-    ErrorCode insert_entity_ranges( const EntityHandle* range_vect, size_t len, EntityHandle my_h,
+    ErrorCode insert_entity_ranges( const EntityHandle* range_vect,
+                                    size_t len,
+                                    EntityHandle my_h,
                                     AEntityFactory* adj );
 
     /** Insert Range of handles into MeshSet */
@@ -189,7 +198,9 @@ class MeshSet
     ErrorCode remove_entity_vector( const EntityHandle* vect, size_t len, EntityHandle my_h, AEntityFactory* adj );
 
     /** Remove vector of handle range pairs from MeshSet */
-    ErrorCode remove_entity_ranges( const EntityHandle* range_vect, size_t len, EntityHandle my_h,
+    ErrorCode remove_entity_ranges( const EntityHandle* range_vect,
+                                    size_t len,
+                                    EntityHandle my_h,
                                     AEntityFactory* adj );
 
     /** Remove Range of handles from MeshSet */
@@ -514,7 +525,10 @@ inline ErrorCode MeshSet::get_entities( Range& entities ) const
 {
     size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based() ) { std::copy( ptr, ptr + count, range_inserter( entities ) ); }
+    if( vector_based() )
+    {
+        std::copy( ptr, ptr + count, range_inserter( entities ) );
+    }
     else
     {
         assert( count % 2 == 0 );
@@ -530,7 +544,10 @@ inline ErrorCode MeshSet::get_entities_by_type( EntityType type, std::vector< En
 {
     size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( MBMAXTYPE == type ) { return get_entities( entity_list ); }
+    if( MBMAXTYPE == type )
+    {
+        return get_entities( entity_list );
+    }
     else if( vector_based() )
     {
         std::remove_copy_if( ptr, ptr + count, std::back_inserter( entity_list ), not_type_test( type ) );
@@ -568,7 +585,10 @@ inline ErrorCode MeshSet::get_entities_by_type( EntityType type, Range& entity_l
 {
     size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( MBMAXTYPE == type ) { return get_entities( entity_list ); }
+    if( MBMAXTYPE == type )
+    {
+        return get_entities( entity_list );
+    }
     else if( vector_based() )
     {
         std::remove_copy_if( ptr, ptr + count, range_inserter( entity_list ), not_type_test( type ) );
@@ -607,7 +627,10 @@ inline unsigned int MeshSet::num_entities_by_type( EntityType type ) const
     unsigned int result;
     size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( MBMAXTYPE == type ) { return num_entities(); }
+    if( MBMAXTYPE == type )
+    {
+        return num_entities();
+    }
     else if( vector_based() )
     {
 #ifndef __SUNPRO_CC
@@ -763,7 +786,10 @@ inline ErrorCode MeshSet::get_non_set_entities( Range& range ) const
 {
     size_t count;
     const EntityHandle* ptr = get_contents( count );
-    if( vector_based() ) { std::remove_copy_if( ptr, ptr + count, range_inserter( range ), type_test( MBENTITYSET ) ); }
+    if( vector_based() )
+    {
+        std::remove_copy_if( ptr, ptr + count, range_inserter( range ), type_test( MBENTITYSET ) );
+    }
     else
     {
         Range::iterator in = range.begin();
@@ -829,7 +855,9 @@ inline ErrorCode MeshSet::unite( const MeshSet* meshset_2, EntityHandle my_handl
 }
 
 //! add these entities to this meshset
-inline ErrorCode MeshSet::add_entities( const EntityHandle* entity_handles, const int num_ents, EntityHandle my_handle,
+inline ErrorCode MeshSet::add_entities( const EntityHandle* entity_handles,
+                                        const int num_ents,
+                                        EntityHandle my_handle,
                                         AEntityFactory* adjacencies )
 {
     return insert_entity_vector( entity_handles, num_ents, my_handle, adjacencies );
@@ -848,7 +876,9 @@ inline ErrorCode MeshSet::remove_entities( const Range& entities, EntityHandle m
 }
 
 //! remove these entities from this meshset
-inline ErrorCode MeshSet::remove_entities( const EntityHandle* entities, const int num_ents, EntityHandle my_handle,
+inline ErrorCode MeshSet::remove_entities( const EntityHandle* entities,
+                                           const int num_ents,
+                                           EntityHandle my_handle,
                                            AEntityFactory* adjacencies )
 {
     return remove_entity_vector( entities, num_ents, my_handle, adjacencies );

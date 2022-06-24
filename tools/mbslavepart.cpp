@@ -29,7 +29,10 @@ template < typename K, typename V >
 static V get_map_value( const std::map< K, V >& m, const K& key, const V& defval )
 {
     typename std::map< K, V >::const_iterator it = m.find( key );
-    if( it == m.end() ) { return defval; }
+    if( it == m.end() )
+    {
+        return defval;
+    }
     else
     {
         return it->second;
@@ -109,7 +112,7 @@ int main( int argc, char* argv[] )
     Tag gidtag = 0, parttag = 0, sparttag = 0;
     int dum_id = -1;
     error      = mbCore->tag_get_handle( partition_set_name.c_str(), 1, MB_TYPE_INTEGER, parttag,
-                                    MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );MB_CHK_ERR( error );
+                                         MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );MB_CHK_ERR( error );
     gidtag = mbCore->globalId_tag();
     if( keepsparts )
     {

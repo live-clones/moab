@@ -36,7 +36,11 @@ using namespace std;
 #define MESH_DIR "."
 #endif
 
-ErrorCode read_file( string& fname, EntityHandle& seth, Range& solids, Range& solid_elems, Range& fluids,
+ErrorCode read_file( string& fname,
+                     EntityHandle& seth,
+                     Range& solids,
+                     Range& solid_elems,
+                     Range& fluids,
                      Range& fluid_elems );
 void deform_func( const BoundBox& bbox, double* xold, double* xnew );
 ErrorCode deform_master( Range& fluid_elems, Range& solid_elems, Tag& xnew );
@@ -124,7 +128,10 @@ class DeformMeshRemap
 
     //! Write the tag to the vertices, then save to the specified file
     //! If restore_coords is true, coords are restored to their initial state after file is written
-    ErrorCode write_and_save( Range& ents, EntityHandle seth, Tag tagh, const char* filename,
+    ErrorCode write_and_save( Range& ents,
+                              EntityHandle seth,
+                              Tag tagh,
+                              const char* filename,
                               bool restore_coords = false );
 
     //! Find fluid/solid sets from complement of solid/fluid sets
@@ -494,7 +501,10 @@ int main( int argc, char** argv )
     return rval;
 }
 
-ErrorCode DeformMeshRemap::write_and_save( Range& ents, EntityHandle seth, Tag tagh, const char* filename,
+ErrorCode DeformMeshRemap::write_and_save( Range& ents,
+                                           EntityHandle seth,
+                                           Tag tagh,
+                                           const char* filename,
                                            bool restore_coords )
 {
     Tag tmp_tag = 0;
@@ -671,7 +681,10 @@ ErrorCode DeformMeshRemap::read_file( int m_or_s, string& fname, EntityHandle& s
         int set_no            = *sit;
         const void* setno_ptr = &set_no;
         rval                  = mbImpl->get_entities_by_type_and_tag( seth, MBENTITYSET, &tagh, &setno_ptr, 1, sets );
-        if( MB_SUCCESS != rval || sets.empty() ) { MB_SET_ERR( MB_FAILURE, "Couldn't find solid set #" << *sit ); }
+        if( MB_SUCCESS != rval || sets.empty() )
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't find solid set #" << *sit );
+        }
         else
             solidSets[m_or_s].merge( sets );
     }
@@ -699,7 +712,10 @@ ErrorCode DeformMeshRemap::read_file( int m_or_s, string& fname, EntityHandle& s
         int set_no            = *sit;
         const void* setno_ptr = &set_no;
         rval                  = mbImpl->get_entities_by_type_and_tag( seth, MBENTITYSET, &tagh, &setno_ptr, 1, sets );
-        if( MB_SUCCESS != rval || sets.empty() ) { MB_SET_ERR( MB_FAILURE, "Couldn't find fluid set #" << *sit ); }
+        if( MB_SUCCESS != rval || sets.empty() )
+        {
+            MB_SET_ERR( MB_FAILURE, "Couldn't find fluid set #" << *sit );
+        }
         else
             fluidSets[m_or_s].merge( sets );
     }
@@ -751,9 +767,15 @@ ErrorCode DeformMeshRemap::find_other_sets( int m_or_s, EntityHandle file_set )
     ErrorCode rval = mbImpl->tag_get_handle( MATERIAL_SET_TAG_NAME, tagh );MB_CHK_SET_ERR( rval, "Couldn't get material set tag name" );
     Range matsets;
     rval = mbImpl->get_entities_by_type_and_tag( file_set, MBENTITYSET, &tagh, NULL, 1, matsets );
-    if( MB_SUCCESS != rval || matsets.empty() ) { MB_SET_ERR( MB_FAILURE, "Couldn't get any material sets" ); }
+    if( MB_SUCCESS != rval || matsets.empty() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Couldn't get any material sets" );
+    }
     *unfilled_sets = subtract( matsets, *filled_sets );
-    if( unfilled_sets->empty() ) { MB_SET_ERR( MB_FAILURE, "Failed to find any unfilled material sets" ); }
+    if( unfilled_sets->empty() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to find any unfilled material sets" );
+    }
     Range tmp_range;
     for( Range::iterator rit = unfilled_sets->begin(); rit != unfilled_sets->end(); ++rit )
     {
@@ -762,7 +784,10 @@ ErrorCode DeformMeshRemap::find_other_sets( int m_or_s, EntityHandle file_set )
     int dim = mbImpl->dimension_from_handle( *tmp_range.rbegin() );
     assert( dim > 0 && dim < 4 );
     *unfilled_elems = tmp_range.subset_by_dimension( dim );
-    if( unfilled_elems->empty() ) { MB_SET_ERR( MB_FAILURE, "Failed to find any unfilled set entities" ); }
+    if( unfilled_elems->empty() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to find any unfilled set entities" );
+    }
 
     if( debug )
         cout << "found " << unfilled_sets->size() << " sets and " << unfilled_elems->size() << " elements." << endl;

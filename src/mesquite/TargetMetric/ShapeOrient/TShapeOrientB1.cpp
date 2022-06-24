@@ -59,7 +59,9 @@ bool TShapeOrientB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqEr
     return true;
 }
 
-bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T,
+                                         double& result,
+                                         MsqMatrix< 2, 2 >& deriv_wrt_T,
                                          MsqError& err )
 {
     const double norm    = Frobenius( T );
@@ -83,8 +85,11 @@ bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& res
     return true;
 }
 
-bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                         MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
+bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T,
+                                         double& result,
+                                         MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                         MsqMatrix< 2, 2 > second_wrt_T[3],
+                                         MsqError& err )
 {
     const double norm    = Frobenius( T );
     const double invroot = 1.0 / MSQ_SQRT_TWO;
@@ -129,7 +134,9 @@ bool TShapeOrientB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqEr
     return true;
 }
 
-bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T,
+                                         double& result,
+                                         MsqMatrix< 3, 3 >& deriv_wrt_T,
                                          MsqError& err )
 {
     const double norm    = Frobenius( T );
@@ -153,8 +160,11 @@ bool TShapeOrientB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& res
     return true;
 }
 
-bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                         MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
+bool TShapeOrientB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T,
+                                         double& result,
+                                         MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                         MsqMatrix< 3, 3 > second_wrt_T[6],
+                                         MsqError& err )
 {
     const double norm    = Frobenius( T );
     const double invroot = 1.0 / MSQ_SQRT_THREE;

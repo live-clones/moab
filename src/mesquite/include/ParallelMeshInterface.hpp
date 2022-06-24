@@ -52,12 +52,16 @@ class MESQUITE_EXPORT ParallelMesh : virtual public Mesh
   public:
     /*! Get global ids for given vertices.
      */
-    virtual void vertices_get_global_id( const VertexHandle vert_array[], size_t global_id[], size_t num_vtx,
+    virtual void vertices_get_global_id( const VertexHandle vert_array[],
+                                         size_t global_id[],
+                                         size_t num_vtx,
                                          MsqError& err ) = 0;
 
     /*! Get processor ids for given vertices.
      */
-    virtual void vertices_get_processor_id( const VertexHandle vert_array[], int proc_id[], size_t num_vtx,
+    virtual void vertices_get_processor_id( const VertexHandle vert_array[],
+                                            int proc_id[],
+                                            size_t num_vtx,
                                             MsqError& err ) = 0;
 
     /*! Set parallel helper

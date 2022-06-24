@@ -432,7 +432,10 @@ void TupleList::getTupleSize( uint& mi_out, uint& ml_out, uint& mul_out, uint& m
 uint TupleList::inc_n()
 {
     // Check for direct write access
-    if( !writeEnabled ) { enableWriteAccess(); }
+    if( !writeEnabled )
+    {
+        enableWriteAccess();
+    }
     n++;
     return n;
 }
@@ -440,7 +443,10 @@ uint TupleList::inc_n()
 void TupleList::set_n( uint n_in )
 {
     // Check for direct write access;
-    if( !writeEnabled ) { enableWriteAccess(); }
+    if( !writeEnabled )
+    {
+        enableWriteAccess();
+    }
     n = n_in;
 }
 
@@ -576,7 +582,7 @@ ErrorCode TupleList::sort( uint key, TupleList::buffer* buf )
 
 #define DIGIT_BITS      8
 #define DIGIT_VALUES    ( 1 << DIGIT_BITS )
-#define DIGIT_MASK      ( ( Value )( DIGIT_VALUES - 1 ) )
+#define DIGIT_MASK      ( (Value)( DIGIT_VALUES - 1 ) )
 #define CEILDIV( a, b ) ( ( ( a ) + (b)-1 ) / ( b ) )
 #define DIGITS          CEILDIV( CHAR_BIT * sizeof( Value ), DIGIT_BITS )
 #define VALUE_BITS      ( DIGIT_BITS * DIGITS )
@@ -653,7 +659,11 @@ unsigned TupleList::radix_zeros( Value bitorkey, Index count[DIGITS][DIGIT_VALUE
 }
 
 template < class Value >
-void TupleList::radix_index_pass_b( const Value* A, Index n, Index stride, unsigned sh, Index* off,
+void TupleList::radix_index_pass_b( const Value* A,
+                                    Index n,
+                                    Index stride,
+                                    unsigned sh,
+                                    Index* off,
                                     SortData< Value >* out )
 {
     Index i = 0;
@@ -666,7 +676,10 @@ void TupleList::radix_index_pass_b( const Value* A, Index n, Index stride, unsig
 }
 
 template < class Value >
-void TupleList::radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+void TupleList::radix_index_pass_m( const SortData< Value >* src,
+                                    const SortData< Value >* end,
+                                    unsigned sh,
+                                    Index* off,
                                     SortData< Value >* out )
 {
     do
@@ -677,7 +690,10 @@ void TupleList::radix_index_pass_m( const SortData< Value >* src, const SortData
 }
 
 template < class Value >
-void TupleList::radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+void TupleList::radix_index_pass_e( const SortData< Value >* src,
+                                    const SortData< Value >* end,
+                                    unsigned sh,
+                                    Index* off,
                                     Index* out )
 {
     do

@@ -17,7 +17,7 @@
 #define MHDF_FILE_HANDLE_H
 
 #ifdef _WIN32 /* windows */
-#  include <BaseTsd.h>
+#include <BaseTsd.h>
 typedef ULONG32 uint32_t;
 #endif
 #include "mhdf.h"
@@ -26,12 +26,13 @@ typedef ULONG32 uint32_t;
 extern "C" {
 #endif
 
-typedef struct struct_FileHandle {
-  uint32_t magic;
-  hid_t hdf_handle;
-  int open_handle_count;
-  hid_t id_type;    /* data type to use when creating tables of IDs */
-  long max_id;
+typedef struct struct_FileHandle
+{
+    uint32_t magic;
+    hid_t hdf_handle;
+    int open_handle_count;
+    hid_t id_type; /* data type to use when creating tables of IDs */
+    long max_id;
 } FileHandle;
 
 FileHandle* mhdf_alloc_FileHandle( hid_t hdf_handle, hid_t id_type, mhdf_Status* status );

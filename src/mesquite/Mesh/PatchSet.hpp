@@ -77,8 +77,10 @@ class MESQUITE_EXPORT PatchSet
      *                         vertices in the closure of the elements are
      *                         free.
      */
-    virtual void get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
-                            std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err ) = 0;
+    virtual void get_patch( PatchHandle patch_handle,
+                            std::vector< Mesh::ElementHandle >& elem_handles_out,
+                            std::vector< Mesh::VertexHandle >& free_vertices_out,
+                            MsqError& err ) = 0;
 
     /**\brief get the Mesh object passed to set_mesh() */
     inline Mesh* get_mesh() const

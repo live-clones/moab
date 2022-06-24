@@ -119,7 +119,10 @@ std::string CLArgToggle::brief() const
 
 std::string CLArgToggle::manstr() const
 {
-    if( !mOpposite ) { return make_man_string(); }
+    if( !mOpposite )
+    {
+        return make_man_string();
+    }
     else if( mOpposite->flag() > flag() )
     {
         std::ostringstream result;

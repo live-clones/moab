@@ -47,8 +47,13 @@ class SweptVertexData : public SequenceData
 
   public:
     //! constructor
-    SweptVertexData( const EntityHandle start_vertex, const int imin, const int jmin, const int kmin, const int imax,
-                     const int jmax, const int kmax );
+    SweptVertexData( const EntityHandle start_vertex,
+                     const int imin,
+                     const int jmin,
+                     const int kmin,
+                     const int imax,
+                     const int jmax,
+                     const int kmax );
 
     virtual ~SweptVertexData() {}
 
@@ -107,7 +112,9 @@ class SweptVertexData : public SequenceData
     bool contains( const HomCoord& coords ) const;
     bool contains( const int i, const int j, const int k ) const;
 
-    SequenceData* subset( EntityHandle start, EntityHandle end, const int* sequence_data_sizes,
+    SequenceData* subset( EntityHandle start,
+                          EntityHandle end,
+                          const int* sequence_data_sizes,
                           const int* tag_data_sizes ) const;
 };
 

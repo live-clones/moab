@@ -81,8 +81,11 @@ WriteGMV::~WriteGMV()
     mbImpl->release_interface( mWriteIface );
 }
 
-ErrorCode WriteGMV::write_file( const char* file_name, const EntityHandle output_set, const int user_dimension,
-                                const bool mesh, const bool poly_mesh )
+ErrorCode WriteGMV::write_file( const char* file_name,
+                                const EntityHandle output_set,
+                                const int user_dimension,
+                                const bool mesh,
+                                const bool poly_mesh )
 {
     // general function for writing a mesh
 
@@ -105,9 +108,15 @@ ErrorCode WriteGMV::write_file( const char* file_name, const EntityHandle output
     return result;
 }
 
-ErrorCode WriteGMV::write_file( const char* filename, const bool, const FileOptions& /*opts*/,
-                                const EntityHandle* output_sets, const int num_output_sets,
-                                const std::vector< std::string >&, const Tag*, int, int dimension )
+ErrorCode WriteGMV::write_file( const char* filename,
+                                const bool,
+                                const FileOptions& /*opts*/,
+                                const EntityHandle* output_sets,
+                                const int num_output_sets,
+                                const std::vector< std::string >&,
+                                const Tag*,
+                                int,
+                                int dimension )
 {
     EntityHandle output_set = 0;
     if( output_sets && num_output_sets > 0 )
@@ -116,13 +125,19 @@ ErrorCode WriteGMV::write_file( const char* filename, const bool, const FileOpti
         output_set = output_sets[0];
     }
 
-    if( dimension == 0 ) { mbImpl->get_dimension( dimension ); }
+    if( dimension == 0 )
+    {
+        mbImpl->get_dimension( dimension );
+    }
 
     return write_file( filename, output_set, dimension, true, true );
 }
 
-ErrorCode WriteGMV::local_write_mesh( const char* file_name, const EntityHandle output_set, const int user_dimension,
-                                      const bool mesh, const bool poly_mesh )
+ErrorCode WriteGMV::local_write_mesh( const char* file_name,
+                                      const EntityHandle output_set,
+                                      const int user_dimension,
+                                      const bool mesh,
+                                      const bool poly_mesh )
 {
     std::ofstream ofile;
     ErrorCode result;

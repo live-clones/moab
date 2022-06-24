@@ -69,21 +69,28 @@ void MsqIGeom::element_normal_at( Mesh::ElementHandle, Vector3D& coordinate ) co
     if( iBase_SUCCESS != ierr ) process_itaps_error( ierr );
 }
 
-void MsqIGeom::vertex_normal_at( const Mesh::VertexHandle*, Vector3D coordinates[], unsigned count,
+void MsqIGeom::vertex_normal_at( const Mesh::VertexHandle*,
+                                 Vector3D coordinates[],
+                                 unsigned count,
                                  MsqError& err ) const
 {
     int ierr = normal( geomEntHandle, coordinates, count );
     if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
-void MsqIGeom::closest_point( Mesh::VertexHandle /*handle*/, const Vector3D& position, Vector3D& closest,
-                              Vector3D& p_normal, MsqError& err ) const
+void MsqIGeom::closest_point( Mesh::VertexHandle /*handle*/,
+                              const Vector3D& position,
+                              Vector3D& closest,
+                              Vector3D& p_normal,
+                              MsqError& err ) const
 {
     int ierr = closest_and_normal( geomEntHandle, position, closest, p_normal );
     if( iBase_SUCCESS != ierr ) MSQ_SETERR( err )( process_itaps_error( ierr ), MsqError::INTERNAL_ERROR );
 }
 
-void MsqIGeom::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,
+void MsqIGeom::domain_DoF( const Mesh::VertexHandle*,
+                           unsigned short* dof_array,
+                           size_t num_vertices,
                            MsqError& err ) const
 {
     unsigned short dim;
@@ -144,7 +151,9 @@ int MsqCommonIGeom::normal( const iBase_EntityHandle* geom_handles, Vector3D coo
     return ierr;
 }
 
-int MsqCommonIGeom::closest_and_normal( iBase_EntityHandle geom, const Vector3D& position, Vector3D& closest,
+int MsqCommonIGeom::closest_and_normal( iBase_EntityHandle geom,
+                                        const Vector3D& position,
+                                        Vector3D& closest,
                                         Vector3D& p_normal ) const
 {
     int ierr;

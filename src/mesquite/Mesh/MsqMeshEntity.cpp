@@ -220,7 +220,10 @@ double MsqMeshEntity::compute_signed_area( PatchData& pd, MsqError& err )
             MSQ_ERRZERO( err );
             tem = ( cross_vec.length() / 2.0 );
             // if normals do not point in same general direction, negate area
-            if( cross_vec % surface_normal < 0 ) { tem *= -1; }
+            if( cross_vec % surface_normal < 0 )
+            {
+                tem *= -1;
+            }
 
             return tem;
 
@@ -231,7 +234,10 @@ double MsqMeshEntity::compute_signed_area( PatchData& pd, MsqError& err )
             MSQ_ERRZERO( err );
             tem = ( cross_vec.length() / 2.0 );
             // if normals do not point in same general direction, negate area
-            if( cross_vec % surface_normal < 0 ) { tem *= -1; }
+            if( cross_vec % surface_normal < 0 )
+            {
+                tem *= -1;
+            }
             cross_vec = ( ( verts[vertexIndices[3]] - verts[vertexIndices[2]] ) *
                           ( verts[vertexIndices[1]] - verts[vertexIndices[2]] ) );
             tem2      = ( cross_vec.length() / 2.0 );
@@ -260,7 +266,8 @@ double MsqMeshEntity::compute_signed_area( PatchData& pd, MsqError& err )
   entity.
 
 */
-void MsqMeshEntity::get_connected_vertices( std::size_t vertex_index, std::vector< std::size_t >& vert_indices,
+void MsqMeshEntity::get_connected_vertices( std::size_t vertex_index,
+                                            std::vector< std::size_t >& vert_indices,
                                             MsqError& err )
 {
     // index is set to the index in the vertexIndices corresponding
@@ -400,8 +407,11 @@ ostream& operator<<( ostream& stream, const MsqMeshEntity& entity )
   relaxation methods in the laplacian smoothers.
 
 */
-size_t MsqMeshEntity::get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert, size_t local_map_size,
-                                                         int* local_map, MsqError& err ) const
+size_t MsqMeshEntity::get_local_matrix_map_about_vertex( PatchData& pd,
+                                                         MsqVertex* vert,
+                                                         size_t local_map_size,
+                                                         int* local_map,
+                                                         MsqError& err ) const
 {
     // i iterates through elem's vertices
     int i = 0;
@@ -555,7 +565,10 @@ void MsqMeshEntity::check_element_orientation( PatchData& pd, int& inverted, int
             for( i = 0; i < TopologyInfo::faces( mType ); ++i )
                 if( sample.mid_face_node( i ) ) inverted += inverted_jacobian_3d( pd, all, Sample( 2, i ), err );
         }
-        if( sample.have_any_mid_region_node() ) { inverted += inverted_jacobian_3d( pd, all, Sample( 3, 0 ), err ); }
+        if( sample.have_any_mid_region_node() )
+        {
+            inverted += inverted_jacobian_3d( pd, all, Sample( 3, 0 ), err );
+        }
     }
 }
 

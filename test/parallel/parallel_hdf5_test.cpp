@@ -204,7 +204,10 @@ int main( int argc, char* argv[] )
     }
 
     int result = 0;
-    if( ReadIntervals ) { result = RUN_TEST( test_read_time ); }
+    if( ReadIntervals )
+    {
+        result = RUN_TEST( test_read_time );
+    }
     else
     {
         ReadIntervals = DefaultReadIntervals;
@@ -782,10 +785,16 @@ void test_var_length_parallel()
 }
 
 // create row of cubes of mesh
-void create_input_file( const char* file_name, int intervals, int num_cpu, int blocks_per_cpu = 1,
-                        const char* ijk_vert_tag_name = 0, const char* ij_set_tag_name = 0,
-                        const char* global_tag_name = 0, const int* global_mesh_value = 0,
-                        const int* global_default_value = 0, bool create_bcsets = false )
+void create_input_file( const char* file_name,
+                        int intervals,
+                        int num_cpu,
+                        int blocks_per_cpu              = 1,
+                        const char* ijk_vert_tag_name   = 0,
+                        const char* ij_set_tag_name     = 0,
+                        const char* global_tag_name     = 0,
+                        const int* global_mesh_value    = 0,
+                        const int* global_default_value = 0,
+                        bool create_bcsets              = false )
 {
     Core moab;
     Interface& mb = moab;
@@ -947,7 +956,10 @@ void test_read_elements_common( bool by_rank, int intervals, bool /* print_time 
     EntityHandle part = parts.front();
     int id;
     rval = mb.tag_get_data( part_tag, &part, 1, &id );CHECK_ERR( rval );
-    if( by_rank ) { CHECK_EQUAL( rank, id ); }
+    if( by_rank )
+    {
+        CHECK_EQUAL( rank, id );
+    }
 
     // check that all of the elements in the mesh are in the part
     int npart, nall;
@@ -1292,7 +1304,7 @@ void test_write_different_element_types()
 
 Tag get_tag( Interface& mb, int rank, bool create )
 {
-    DataType type   = ( DataType )( rank % ( MB_MAX_DATA_TYPE + 1 ) );
+    DataType type   = (DataType)( rank % ( MB_MAX_DATA_TYPE + 1 ) );
     TagType storage = ( type == MB_TYPE_BIT ) ? MB_TAG_BIT : ( rank % 2 ) ? MB_TAG_DENSE : MB_TAG_SPARSE;
     int len         = rank % 3 + 1;
     TagType cbit    = create ? MB_TAG_EXCL : (TagType)0;
@@ -1376,8 +1388,7 @@ void test_write_polygons()
         { -1, 0, static_cast< double >( rank ) },
         { static_cast< double >( -r ), static_cast< double >( -r ), static_cast< double >( rank ) },
         { 0, -1, static_cast< double >( rank ) },
-        { static_cast< double >( r ), static_cast< double >( -r ), static_cast< double >( rank ) }
-    };
+        { static_cast< double >( r ), static_cast< double >( -r ), static_cast< double >( rank ) } };
     const int nvtx = rank % 4 + 5;
     std::vector< EntityHandle > conn( nvtx );
     for( int i = 0; i < nvtx; ++i )

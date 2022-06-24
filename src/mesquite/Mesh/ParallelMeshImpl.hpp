@@ -94,18 +94,26 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
     //! is fixed and cannot be moved.  Note that this is a read-only
     //! property; this flag can't be modified by users of the
     //! MBMesquite::Mesh interface.
-    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& fixed_flag_array,
-                                          size_t num_vtx, MsqError& err );
+    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[],
+                                          std::vector< bool >& fixed_flag_array,
+                                          size_t num_vtx,
+                                          MsqError& err );
 
-    void vertices_set_fixed_flag( const VertexHandle vert_array[], const bool fixed_flag_array[], size_t num_vtx,
+    void vertices_set_fixed_flag( const VertexHandle vert_array[],
+                                  const bool fixed_flag_array[],
+                                  size_t num_vtx,
                                   MsqError& err );
 
-    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& slaved_flag_array,
-                                           size_t num_vtx, MsqError& err );
+    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[],
+                                           std::vector< bool >& slaved_flag_array,
+                                           size_t num_vtx,
+                                           MsqError& err );
 
     // Get/set location of a vertex
-    virtual void vertices_get_coordinates( const Mesh::VertexHandle vert_array[], MBMesquite::MsqVertex* coordinates,
-                                           size_t num_vtx, MsqError& err );
+    virtual void vertices_get_coordinates( const Mesh::VertexHandle vert_array[],
+                                           MBMesquite::MsqVertex* coordinates,
+                                           size_t num_vtx,
+                                           MsqError& err );
     virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err );
 
     // Each vertex has a byte-sized flag that can be used to store
@@ -113,14 +121,18 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
     // implementation.  It is intended to be used by Mesquite algorithms.
     // Until a vertex's byte has been explicitly set, its value is 0.
     virtual void vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqError& err );
-    virtual void vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+    virtual void vertices_set_byte( const VertexHandle* vert_array,
+                                    const unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err );
 
     // Retrieve the byte value for the specified vertex or vertices.
     // The byte value is 0 if it has not yet been set via one of the
     // *_set_byte() functions.
     virtual void vertex_get_byte( const VertexHandle vertex, unsigned char* byte, MsqError& err );
-    virtual void vertices_get_byte( const VertexHandle* vertex, unsigned char* byte_array, size_t array_size,
+    virtual void vertices_get_byte( const VertexHandle* vertex,
+                                    unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err );
 
     //**************** Vertex Topology *****************
@@ -141,8 +153,10 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      *                       which the adjacency list begins for that
      *                       vertex.
      */
-    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array, size_t num_vertex,
-                                                 std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array,
+                                                 size_t num_vertex,
+                                                 std::vector< ElementHandle >& elements,
+                                                 std::vector< size_t >& offsets,
                                                  MsqError& err );
 
     //*************** Element Topology *************
@@ -162,14 +176,18 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      *                     is the index into #vert_handles at which
      *                     the connectivity list for that element begins.
      */
-    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles, size_t num_elems,
+    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles,
+                                                 size_t num_elems,
                                                  std::vector< VertexHandle >& vert_handles,
-                                                 std::vector< size_t >& offsets, MsqError& err );
+                                                 std::vector< size_t >& offsets,
+                                                 MsqError& err );
 
     // Returns the topologies of the given entities.  The "entity_topologies"
     // array must be at least "num_elements" in size.
-    virtual void elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
-                                          size_t num_elements, MsqError& err );
+    virtual void elements_get_topologies( const ElementHandle* element_handle_array,
+                                          EntityTopology* element_topologies,
+                                          size_t num_elements,
+                                          MsqError& err );
 
     //*************** Tags  ***********
 
@@ -185,7 +203,10 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      * \param default_value Default value to assign to all entities - may be NULL
      * \return - Handle for tag definition
      */
-    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length, const void* default_value,
+    virtual TagHandle tag_create( const std::string& tag_name,
+                                  TagType type,
+                                  unsigned length,
+                                  const void* default_value,
                                   MsqError& err );
 
     /** \brief Remove a tag and all corresponding data
@@ -205,7 +226,10 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      * \param type_out   Passed back tag type.
      * \param length_out Passed back number of values per entity.
      */
-    virtual void tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+    virtual void tag_properties( TagHandle handle,
+                                 std::string& name_out,
+                                 TagType& type_out,
+                                 unsigned& length_out,
                                  MsqError& err );
 
     /** \brief Set tag values on elements
@@ -218,8 +242,11 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      *                   This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_set_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       const void* tag_data, MsqError& err );
+    virtual void tag_set_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       const void* tag_data,
+                                       MsqError& err );
 
     /** \brief Set tag values on vertices
      *
@@ -231,8 +258,11 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      *                   This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_set_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      const void* tag_data, MsqError& err );
+    virtual void tag_set_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      const void* tag_data,
+                                      MsqError& err );
 
     /** \brief Get tag values on elements
      *
@@ -244,8 +274,11 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      *                   in memory.  This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_get_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       void* tag_data, MsqError& err );
+    virtual void tag_get_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       void* tag_data,
+                                       MsqError& err );
 
     /** \brief Get tag values on vertices.
      *
@@ -257,8 +290,11 @@ class MESQUITE_EXPORT ParallelMeshImpl : public ParallelMesh
      *                   in memory.  This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_get_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      void* tag_data, MsqError& err );
+    virtual void tag_get_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      void* tag_data,
+                                      MsqError& err );
 
     //**************** Memory Management ****************
     // Tells the mesh that the client is finished with a given

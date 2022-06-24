@@ -20,9 +20,15 @@ namespace moab
 {
 
 //! constructor
-SweptVertexData::SweptVertexData( const EntityHandle start_vertex, const int imin, const int jmin, const int kmin,
-                                  const int imax, const int jmax, const int kmax )
-    : SequenceData( 3, start_vertex,
+SweptVertexData::SweptVertexData( const EntityHandle start_vertex,
+                                  const int imin,
+                                  const int jmin,
+                                  const int kmin,
+                                  const int imax,
+                                  const int jmax,
+                                  const int kmax )
+    : SequenceData( 3,
+                    start_vertex,
                     start_vertex + ( imax - imin + 1 ) * ( jmax - jmin + 1 ) * ( kmax - kmin + 1 ) - 1 )
 {
     // need to have meaningful parameters
@@ -44,7 +50,9 @@ SweptVertexData::SweptVertexData( const EntityHandle start_vertex, const int imi
     create_sequence_data( 2, sizeof( double ) );
 }
 
-SequenceData* SweptVertexData::subset( EntityHandle /*start*/, EntityHandle /*end*/, const int* /*sequence_data_sizes*/,
+SequenceData* SweptVertexData::subset( EntityHandle /*start*/,
+                                       EntityHandle /*end*/,
+                                       const int* /*sequence_data_sizes*/,
                                        const int* /*tag_data_sizes*/ ) const
 {
     return 0;

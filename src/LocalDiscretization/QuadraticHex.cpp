@@ -57,8 +57,12 @@ double QuadraticHex::DSH( const int i, const double params )
     }
 }
 
-ErrorCode QuadraticHex::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
-                                 double* /*work*/, double* result )
+ErrorCode QuadraticHex::evalFcn( const double* params,
+                                 const double* field,
+                                 const int /*ndim*/,
+                                 const int num_tuples,
+                                 double* /*work*/,
+                                 double* result )
 {
     assert( params && field && num_tuples > 0 );
     std::fill( result, result + num_tuples, 0.0 );
@@ -72,8 +76,12 @@ ErrorCode QuadraticHex::evalFcn( const double* params, const double* field, cons
     return MB_SUCCESS;
 }
 
-ErrorCode QuadraticHex::jacobianFcn( const double* params, const double* verts, const int nverts, const int ndim,
-                                     double* /*work*/, double* result )
+ErrorCode QuadraticHex::jacobianFcn( const double* params,
+                                     const double* verts,
+                                     const int nverts,
+                                     const int ndim,
+                                     double* /*work*/,
+                                     double* result )
 {
     assert( 27 == nverts && params && verts );
     if( 27 != nverts ) return MB_FAILURE;
@@ -96,16 +104,29 @@ ErrorCode QuadraticHex::jacobianFcn( const double* params, const double* verts, 
     return MB_SUCCESS;
 }
 
-ErrorCode QuadraticHex::integrateFcn( const double* /*field*/, const double* /*verts*/, const int /*nverts*/,
-                                      const int /*ndim*/, const int /*num_tuples*/, double* /*work*/,
+ErrorCode QuadraticHex::integrateFcn( const double* /*field*/,
+                                      const double* /*verts*/,
+                                      const int /*nverts*/,
+                                      const int /*ndim*/,
+                                      const int /*num_tuples*/,
+                                      double* /*work*/,
                                       double* /*result*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode QuadraticHex::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
-                                        const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                        const double inside_tol, double* work, double* params, int* is_inside )
+ErrorCode QuadraticHex::reverseEvalFcn( EvalFcn eval,
+                                        JacobianFcn jacob,
+                                        InsideFcn ins,
+                                        const double* posn,
+                                        const double* verts,
+                                        const int nverts,
+                                        const int ndim,
+                                        const double iter_tol,
+                                        const double inside_tol,
+                                        double* work,
+                                        double* params,
+                                        int* is_inside )
 {
     assert( posn && verts );
     return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
@@ -117,8 +138,11 @@ int QuadraticHex::insideFcn( const double* params, const int ndim, const double 
     return EvalSet::inside_function( params, ndim, tol );
 }
 
-ErrorCode QuadraticHex::normalFcn( const int /*ientDim*/, const int /*facet*/, const int /*nverts*/,
-                                   const double* /*verts*/, double* /*normal[3]*/ )
+ErrorCode QuadraticHex::normalFcn( const int /*ientDim*/,
+                                   const int /*facet*/,
+                                   const int /*nverts*/,
+                                   const double* /*verts*/,
+                                   double* /*normal[3]*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }

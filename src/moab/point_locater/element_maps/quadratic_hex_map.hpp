@@ -65,8 +65,11 @@ namespace element_utility
       public:
         // Natural coordinates
         template < typename Moab, typename Entity_handle, typename Points, typename Point >
-        std::pair< bool, Point > operator()( const Moab& /* moab */, const Entity_handle& /* h */, const Points& v,
-                                             const Point& p, const double tol = 1.e-6 ) const
+        std::pair< bool, Point > operator()( const Moab& /* moab */,
+                                             const Entity_handle& /* h */,
+                                             const Points& v,
+                                             const Point& p,
+                                             const double tol = 1.e-6 ) const
         {
             Point result( 3, 0.0 );
             bool point_found = solve_inverse( p, result, v, tol ) && is_contained( result, tol );
@@ -137,7 +140,10 @@ namespace element_utility
                 ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) ) << " Iterate: ";
                 ss << xi[0] << ", " << xi[1] << ", " << xi[2] << std::endl;
 #endif
-                if( ++num_iterations >= 5 ) { return false; }
+                if( ++num_iterations >= 5 )
+                {
+                    return false;
+                }
                 Matrix J;
                 jacobian( xi, points, J );
                 double det = moab::Matrix::determinant3( J );

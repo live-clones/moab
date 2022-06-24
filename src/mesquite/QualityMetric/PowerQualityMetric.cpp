@@ -63,16 +63,22 @@ bool PowerQualityMetric::evaluate( PatchData& pd, size_t handle, double& value, 
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool PowerQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                std::vector< size_t >& indices, MsqError& err )
+bool PowerQualityMetric::evaluate_with_indices( PatchData& pd,
+                                                size_t handle,
+                                                double& value,
+                                                std::vector< size_t >& indices,
+                                                MsqError& err )
 {
     bool rval = mMetric.evaluate_with_indices( pd, handle, value, indices, err );
     value     = mPower.raise( value );
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool PowerQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                 std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+bool PowerQualityMetric::evaluate_with_gradient( PatchData& pd,
+                                                 size_t handle,
+                                                 double& value,
+                                                 std::vector< size_t >& indices,
+                                                 std::vector< Vector3D >& gradient,
                                                  MsqError& err )
 {
     bool rval      = mMetric.evaluate_with_gradient( pd, handle, value, indices, gradient, err );
@@ -84,9 +90,13 @@ bool PowerQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, d
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool PowerQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                std::vector< Matrix3D >& Hessian, MsqError& err )
+bool PowerQualityMetric::evaluate_with_Hessian( PatchData& pd,
+                                                size_t handle,
+                                                double& value,
+                                                std::vector< size_t >& indices,
+                                                std::vector< Vector3D >& gradient,
+                                                std::vector< Matrix3D >& Hessian,
+                                                MsqError& err )
 {
     indices.clear();
     bool rval      = mMetric.evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );

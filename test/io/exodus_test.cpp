@@ -684,12 +684,9 @@ void check_type( const TestType& type )
     CHECK_EQUAL( type.name, std::string( ExoIIUtil::ElementTypeNames[type.exo_type] ) );
     CHECK_EQUAL( type.num_nodes, ExoIIUtil::VerticesPerElement[type.exo_type] );
     auto dim = CN::Dimension( type.moab_type );
-    if (3 == dim)
-      CHECK_EQUAL( has_mid_nodes[3], ExoIIUtil::HasMidNodes[type.exo_type][3] );
-    if (2 <= dim) 
-      CHECK_EQUAL( has_mid_nodes[2], ExoIIUtil::HasMidNodes[type.exo_type][2] );
-    if (1 <= dim)
-      CHECK_EQUAL( has_mid_nodes[1], ExoIIUtil::HasMidNodes[type.exo_type][1] );
+    if( 3 == dim ) CHECK_EQUAL( has_mid_nodes[3], ExoIIUtil::HasMidNodes[type.exo_type][3] );
+    if( 2 <= dim ) CHECK_EQUAL( has_mid_nodes[2], ExoIIUtil::HasMidNodes[type.exo_type][2] );
+    if( 1 <= dim ) CHECK_EQUAL( has_mid_nodes[1], ExoIIUtil::HasMidNodes[type.exo_type][1] );
 
     Core moab;
     ExoIIUtil tool( &moab );

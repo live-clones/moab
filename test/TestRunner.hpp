@@ -35,7 +35,10 @@
  *       The above macros constitute the entire intended API.
  ***************************************************************************************/
 
-static void runner_register_test( const char* filename, int line_number, const char* name, test_func function,
+static void runner_register_test( const char* filename,
+                                  int line_number,
+                                  const char* name,
+                                  test_func function,
                                   test_func requisite = 0 );
 static int runner_run_tests( int argc, char* argv[] );
 
@@ -324,13 +327,19 @@ int runner_run_tests( int argc, char* argv[] )
 #ifdef MOAB_HAVE_MPI
     int isInit;
     MPI_Initialized( &isInit );
-    if( isInit ) { MPI_Comm_rank( MPI_COMM_WORLD, &rank ); }
+    if( isInit )
+    {
+        MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    }
 #endif
 
     // Print brief summary
     if( rank == 0 )
     {
-        if( num_run == (int)RunnerTestCount && !fail_count ) { printf( "All %d tests passed.\n", num_run ); }
+        if( num_run == (int)RunnerTestCount && !fail_count )
+        {
+            printf( "All %d tests passed.\n", num_run );
+        }
         else if( num_run == num_selected && !fail_count )
         {
             printf( "All %d selected tests passed.\n", num_run );

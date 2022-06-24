@@ -39,7 +39,10 @@ namespace MBMesquite
 
 IdealShapeTarget::~IdealShapeTarget() {}
 
-bool IdealShapeTarget::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+bool IdealShapeTarget::get_3D_target( PatchData& pd,
+                                      size_t element,
+                                      Sample sample,
+                                      MsqMatrix< 3, 3 >& W_out,
                                       MsqError& err )
 {
     MsqMeshEntity& elem = pd.element_by_index( element );
@@ -47,7 +50,10 @@ bool IdealShapeTarget::get_3D_target( PatchData& pd, size_t element, Sample samp
     return !MSQ_CHKERR( err );
 }
 
-bool IdealShapeTarget::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+bool IdealShapeTarget::get_surface_target( PatchData& pd,
+                                           size_t element,
+                                           Sample sample,
+                                           MsqMatrix< 3, 2 >& W_out,
                                            MsqError& err )
 {
     MsqMatrix< 2, 2 > W_2d;
@@ -63,7 +69,10 @@ bool IdealShapeTarget::get_surface_target( PatchData& pd, size_t element, Sample
     return true;
 }
 
-bool IdealShapeTarget::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+bool IdealShapeTarget::get_2D_target( PatchData& pd,
+                                      size_t element,
+                                      Sample sample,
+                                      MsqMatrix< 2, 2 >& W_out,
                                       MsqError& err )
 {
     MsqMeshEntity& elem = pd.element_by_index( element );

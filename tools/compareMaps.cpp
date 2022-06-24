@@ -44,7 +44,10 @@ int ncFile1;
         {                                                       \
             size_t tmp_val;                                     \
             gdfail = nc_inq_dimlen( ncFile1, ncdim, &tmp_val ); \
-            if( NC_NOERR != gdfail ) { ERR_NC( gdfail ) }       \
+            if( NC_NOERR != gdfail )                            \
+            {                                                   \
+                ERR_NC( gdfail )                                \
+            }                                                   \
             else                                                \
                 ( val ) = tmp_val;                              \
         }                                                       \
@@ -68,7 +71,10 @@ int ncFile1;
             {                                                          \
                 ( dims ).resize( ndims );                              \
                 gvfail = nc_inq_vardimid( ncFile1, id, &( dims )[0] ); \
-                if( NC_NOERR != gvfail ) { ERR_NC( gvfail ) }          \
+                if( NC_NOERR != gvfail )                               \
+                {                                                      \
+                    ERR_NC( gvfail )                                   \
+                }                                                      \
             }                                                          \
         }                                                              \
     }
@@ -80,11 +86,17 @@ int ncFile1;
         {                                                                               \
             size_t ntmp;                                                                \
             int ivfail = nc_inq_dimlen( ncFile1, ( vals )[0], &ntmp );                  \
-            if( NC_NOERR != ivfail ) { ERR_NC( ivfail ) }                               \
+            if( NC_NOERR != ivfail )                                                    \
+            {                                                                           \
+                ERR_NC( ivfail )                                                        \
+            }                                                                           \
             ( vals ).resize( ntmp );                                                    \
             size_t ntmp1 = 0;                                                           \
             ivfail       = nc_get_vara_int( ncFile1, id, &ntmp1, &ntmp, &( vals )[0] ); \
-            if( NC_NOERR != ivfail ) { ERR_NC( ivfail ) }                               \
+            if( NC_NOERR != ivfail )                                                    \
+            {                                                                           \
+                ERR_NC( ivfail )                                                        \
+            }                                                                           \
         }                                                                               \
     }
 
@@ -96,11 +108,17 @@ int ncFile1;
         {                                                                                  \
             size_t ntmp;                                                                   \
             int dvfail = nc_inq_dimlen( ncFile1, dum_dims[0], &ntmp );                     \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
+            if( NC_NOERR != dvfail )                                                       \
+            {                                                                              \
+                ERR_NC( dvfail )                                                           \
+            }                                                                              \
             ( vals ).resize( ntmp );                                                       \
             size_t ntmp1 = 0;                                                              \
             dvfail       = nc_get_vara_double( ncFile1, id, &ntmp1, &ntmp, &( vals )[0] ); \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
+            if( NC_NOERR != dvfail )                                                       \
+            {                                                                              \
+                ERR_NC( dvfail )                                                           \
+            }                                                                              \
         }                                                                                  \
     }
 
@@ -113,7 +131,10 @@ int ncFile2;
         {                                                       \
             size_t tmp_val;                                     \
             gdfail = nc_inq_dimlen( ncFile2, ncdim, &tmp_val ); \
-            if( NC_NOERR != gdfail ) { ERR_NC( gdfail ) }       \
+            if( NC_NOERR != gdfail )                            \
+            {                                                   \
+                ERR_NC( gdfail )                                \
+            }                                                   \
             else                                                \
                 ( val ) = tmp_val;                              \
         }                                                       \
@@ -137,7 +158,10 @@ int ncFile2;
             {                                                          \
                 ( dims ).resize( ndims );                              \
                 gvfail = nc_inq_vardimid( ncFile2, id, &( dims )[0] ); \
-                if( NC_NOERR != gvfail ) { ERR_NC( gvfail ) }          \
+                if( NC_NOERR != gvfail )                               \
+                {                                                      \
+                    ERR_NC( gvfail )                                   \
+                }                                                      \
             }                                                          \
         }                                                              \
     }
@@ -149,11 +173,17 @@ int ncFile2;
         {                                                                               \
             size_t ntmp;                                                                \
             int ivfail = nc_inq_dimlen( ncFile2, ( vals )[0], &ntmp );                  \
-            if( NC_NOERR != ivfail ) { ERR_NC( ivfail ) }                               \
+            if( NC_NOERR != ivfail )                                                    \
+            {                                                                           \
+                ERR_NC( ivfail )                                                        \
+            }                                                                           \
             ( vals ).resize( ntmp );                                                    \
             size_t ntmp1 = 0;                                                           \
             ivfail       = nc_get_vara_int( ncFile2, id, &ntmp1, &ntmp, &( vals )[0] ); \
-            if( NC_NOERR != ivfail ) { ERR_NC( ivfail ) }                               \
+            if( NC_NOERR != ivfail )                                                    \
+            {                                                                           \
+                ERR_NC( ivfail )                                                        \
+            }                                                                           \
         }                                                                               \
     }
 
@@ -165,11 +195,17 @@ int ncFile2;
         {                                                                                  \
             size_t ntmp;                                                                   \
             int dvfail = nc_inq_dimlen( ncFile2, dum_dims[0], &ntmp );                     \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
+            if( NC_NOERR != dvfail )                                                       \
+            {                                                                              \
+                ERR_NC( dvfail )                                                           \
+            }                                                                              \
             ( vals ).resize( ntmp );                                                       \
             size_t ntmp1 = 0;                                                              \
             dvfail       = nc_get_vara_double( ncFile2, id, &ntmp1, &ntmp, &( vals )[0] ); \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                  \
+            if( NC_NOERR != dvfail )                                                       \
+            {                                                                              \
+                ERR_NC( dvfail )                                                           \
+            }                                                                              \
         }                                                                                  \
     }
 
@@ -181,13 +217,22 @@ int ncFile2;
         {                                                                                   \
             size_t ntmp[2];                                                                 \
             int dvfail = nc_inq_dimlen( ncFile1, dum_dims[0], &ntmp[0] );                   \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            if( NC_NOERR != dvfail )                                                        \
+            {                                                                               \
+                ERR_NC( dvfail )                                                            \
+            }                                                                               \
             dvfail = nc_inq_dimlen( ncFile1, dum_dims[1], &ntmp[1] );                       \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            if( NC_NOERR != dvfail )                                                        \
+            {                                                                               \
+                ERR_NC( dvfail )                                                            \
+            }                                                                               \
             ( vals ).resize( ntmp[0] * ntmp[1] );                                           \
             size_t ntmp1[2] = { 0, 0 };                                                     \
             dvfail          = nc_get_vara_double( ncFile1, id, ntmp1, ntmp, &( vals )[0] ); \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            if( NC_NOERR != dvfail )                                                        \
+            {                                                                               \
+                ERR_NC( dvfail )                                                            \
+            }                                                                               \
         }                                                                                   \
     }
 
@@ -199,13 +244,22 @@ int ncFile2;
         {                                                                                   \
             size_t ntmp[2];                                                                 \
             int dvfail = nc_inq_dimlen( ncFile2, dum_dims[0], &ntmp[0] );                   \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            if( NC_NOERR != dvfail )                                                        \
+            {                                                                               \
+                ERR_NC( dvfail )                                                            \
+            }                                                                               \
             dvfail = nc_inq_dimlen( ncFile2, dum_dims[1], &ntmp[1] );                       \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            if( NC_NOERR != dvfail )                                                        \
+            {                                                                               \
+                ERR_NC( dvfail )                                                            \
+            }                                                                               \
             ( vals ).resize( ntmp[0] * ntmp[1] );                                           \
             size_t ntmp1[2] = { 0, 0 };                                                     \
             dvfail          = nc_get_vara_double( ncFile2, id, ntmp1, ntmp, &( vals )[0] ); \
-            if( NC_NOERR != dvfail ) { ERR_NC( dvfail ) }                                   \
+            if( NC_NOERR != dvfail )                                                        \
+            {                                                                               \
+                ERR_NC( dvfail )                                                            \
+            }                                                                               \
         }                                                                                   \
     }
 
@@ -261,12 +315,18 @@ int main( int argc, char* argv[] )
 
     // Open netcdf/exodus file
     int fail = nc_open( inputfile1.c_str(), 0, &ncFile1 );
-    if( NC_NOWRITE != fail ) { ERR_NC( fail ) }
+    if( NC_NOWRITE != fail )
+    {
+        ERR_NC( fail )
+    }
 
     std::cout << " opened " << inputfile1 << " for map 1 \n";
 
     fail = nc_open( inputfile2.c_str(), 0, &ncFile2 );
-    if( NC_NOWRITE != fail ) { ERR_NC( fail ) }
+    if( NC_NOWRITE != fail )
+    {
+        ERR_NC( fail )
+    }
 
     std::cout << " opened " << inputfile2 << " for map 2 \n";
     int temp_dim;
@@ -333,35 +393,35 @@ int main( int argc, char* argv[] )
 
     // default storage type is column major
     Eigen::SparseMatrix< double > diff = weight1 - weight2;
-    diff.makeCompressed(); // is it needed or not ?
+    diff.makeCompressed();  // is it needed or not ?
     auto coeffs = diff.coeffs();
-    double maxv                        = coeffs.maxCoeff();
-    double minv                        = coeffs.minCoeff();
+    double maxv = coeffs.maxCoeff();
+    double minv = coeffs.minCoeff();
     std::cout << " euclidian norm for difference: " << diff.norm()
-                  << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
-                  << " minv: " << minv << " maxv: " << maxv << "\n";
+              << " \n squared norm for difference: " << diff.squaredNorm() << "\n"
+              << " minv: " << minv << " maxv: " << maxv << "\n";
     // print out the first 10 positions for which the value is outside 90% of min/max values
-    double min_threshold = fraction*minv;
-    double max_threshold = fraction*maxv;
-    int counter = 0;
-    std::cout << std::setprecision(9) ;
-    for (int k=0; (k<diff.outerSize()) ; ++k) // this is by column
+    double min_threshold = fraction * minv;
+    double max_threshold = fraction * maxv;
+    int counter          = 0;
+    std::cout << std::setprecision( 9 );
+    for( int k = 0; ( k < diff.outerSize() ); ++k )  // this is by column
     {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(diff,k); (it) && (counter < print_diff); ++it)
+        for( Eigen::SparseMatrix< double >::InnerIterator it( diff, k ); ( it ) && ( counter < print_diff ); ++it )
         {
             double val = it.value();
-            if ( val <= min_threshold || val >=  max_threshold )
+            if( val <= min_threshold || val >= max_threshold )
             {
                 int row = it.row();
                 int col = it.col();
-                std::cout << " counter:" << counter << "\t col: " << col + 1 << "\t row: "<< row + 1  << "\t diff: " <<  val;
-                std::cout <<  "\t map1: " <<weight1.coeffRef(row, col) <<  "\t map2: " <<weight2.coeffRef(row, col) << "\n" ;   // row index
-                counter ++ ;
+                std::cout << " counter:" << counter << "\t col: " << col + 1 << "\t row: " << row + 1
+                          << "\t diff: " << val;
+                std::cout << "\t map1: " << weight1.coeffRef( row, col ) << "\t map2: " << weight2.coeffRef( row, col )
+                          << "\n";  // row index
+                counter++;
             }
         }
     }
-
-
 
     // compare frac_a between maps
     diff_vect( "frac_a", na1 );

@@ -21,7 +21,7 @@
  * this tag.  The value of the tag is an integer "part identifier".
  */
 #define PARALLEL_PARTITION_TAG_NAME "PARALLEL_PARTITION"
-#define PARALLEL_PART_TAG_NAME PARALLEL_PARTITION_TAG_NAME
+#define PARALLEL_PART_TAG_NAME      PARALLEL_PARTITION_TAG_NAME
 
 /** \brief Tag that groups the set of parts/partitions that are
  *         a covering of the mesh.
@@ -42,7 +42,7 @@
  * This single-valued tag implies an entity is shared with one other proc
  */
 #define PARALLEL_SHARED_PROC_TAG_NAME "__PARALLEL_SHARED_PROC"
- 
+
 /** \brief Tag storing which other processorS a given entity is shared with
  *
  * This multiple-valued tag implies an entity is shared with multiple
@@ -50,13 +50,13 @@
  * what the maximum number of processors is which share an entity
  */
 #define PARALLEL_SHARED_PROCS_TAG_NAME "__PARALLEL_SHARED_PROCS"
- 
+
 /** \brief Tag storing the handle of a shared entity on the other proc
  *
  * This single-valued tag implies an entity is shared with one other proc
  */
 #define PARALLEL_SHARED_HANDLE_TAG_NAME "__PARALLEL_SHARED_HANDLE"
- 
+
 /** \brief Tag storing handles of a shared entity on other processors
  *
  * This multiple-valued tag implies an entity is shared with multiple
@@ -64,7 +64,7 @@
  * what the maximum number of processors is which share an entity
  */
 #define PARALLEL_SHARED_HANDLES_TAG_NAME "__PARALLEL_SHARED_HANDLES"
- 
+
 /** \brief Tag storing parallel status (as bits in this tag)
  *
  * This tag stores various aspects of parallel status in bits; see also 
@@ -79,14 +79,14 @@
  */
 #define PARALLEL_STATUS_TAG_NAME "__PARALLEL_STATUS"
 
-#define PSTATUS_NOT_OWNED 0x1
-#define PSTATUS_SHARED 0x2
+#define PSTATUS_NOT_OWNED   0x1
+#define PSTATUS_SHARED      0x2
 #define PSTATUS_MULTISHARED 0x4
-#define PSTATUS_INTERFACE 0x8
+#define PSTATUS_INTERFACE   0x8
 // note, these numbers are in hex, so 0x10 is the 4th bit, or 2^4.
 #define PSTATUS_GHOST 0x10
 
 #define PSTATUS_AND 0x1
-#define PSTATUS_OR 0x2
+#define PSTATUS_OR  0x2
 #define PSTATUS_NOT 0x3
 #endif

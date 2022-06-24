@@ -311,7 +311,10 @@ int main( int argc, char** argv )
 
         if( !read_qnv ) ++cfd_iter;
 
-        if( !found ) { std::cout << n << " " << testvc << std::endl; }
+        if( !found )
+        {
+            std::cout << n << " " << testvc << std::endl;
+        }
         found = false;
     }
 

@@ -40,11 +40,17 @@ class ReadTetGen : public ReaderIface
     static ReaderIface* factory( Interface* );
 
     //! load a file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadTetGen( Interface* impl = NULL );
@@ -70,9 +76,13 @@ class ReadTetGen : public ReaderIface
      *\param opts             Input options list.
      *\param file_stream      The stream to open for the file.
      */
-    ErrorCode open_file( const std::string& input_file_name, const std::string& input_name_base,
-                         const std::string& input_name_suffix, const char* file_type_suffix,
-                         const char* file_name_option, const FileOptions& opts, std::ifstream& file_stream,
+    ErrorCode open_file( const std::string& input_file_name,
+                         const std::string& input_name_base,
+                         const std::string& input_name_suffix,
+                         const char* file_type_suffix,
+                         const char* file_name_option,
+                         const FileOptions& opts,
+                         std::ifstream& file_stream,
                          bool file_required = false );
 
     /**\brief Read a line from a file
@@ -105,13 +115,20 @@ class ReadTetGen : public ReaderIface
      * \param group_designator Input: special tag name used to designate an
      *                    attribute as the group (surface or volume) ID.
      */
-    ErrorCode parse_attr_list( const std::string& option_str, std::vector< Tag >& tag_list,
-                               std::vector< int >& index_list, const char* group_designator = 0 );
+    ErrorCode parse_attr_list( const std::string& option_str,
+                               std::vector< Tag >& tag_list,
+                               std::vector< int >& index_list,
+                               const char* group_designator = 0 );
 
-    ErrorCode read_node_file( std::istream& file, const Tag* attr_tag_list, const int* attr_tag_index,
-                              int attr_tag_list_len, std::vector< EntityHandle >& nodes );
+    ErrorCode read_node_file( std::istream& file,
+                              const Tag* attr_tag_list,
+                              const int* attr_tag_index,
+                              int attr_tag_list_len,
+                              std::vector< EntityHandle >& nodes );
 
-    ErrorCode read_elem_file( EntityType type, std::istream& file, const std::vector< EntityHandle >& nodes,
+    ErrorCode read_elem_file( EntityType type,
+                              std::istream& file,
+                              const std::vector< EntityHandle >& nodes,
                               Range& elems );
 };
 

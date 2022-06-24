@@ -52,7 +52,9 @@ bool TShapeNB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& 
     return true;
 }
 
-bool TShapeNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TShapeNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T,
+                                    double& result,
+                                    MsqMatrix< 2, 2 >& deriv_wrt_T,
                                     MsqError& /*err*/ )
 {
     result      = sqr_Frobenius( T ) - 2.0 * det( T );
@@ -62,8 +64,11 @@ bool TShapeNB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, 
     return true;
 }
 
-bool TShapeNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                    MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& /*err*/ )
+bool TShapeNB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T,
+                                    double& result,
+                                    MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                    MsqMatrix< 2, 2 > second_wrt_T[3],
+                                    MsqError& /*err*/ )
 {
     result      = sqr_Frobenius( T ) - 2.0 * det( T );
     deriv_wrt_T = T;
@@ -82,7 +87,9 @@ bool TShapeNB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& 
     return true;
 }
 
-bool TShapeNB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TShapeNB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T,
+                                    double& result,
+                                    MsqMatrix< 3, 3 >& deriv_wrt_T,
                                     MsqError& /*err*/ )
 {
     double f = Frobenius( T );
@@ -96,8 +103,11 @@ bool TShapeNB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, 
     return true;
 }
 
-bool TShapeNB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                    MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& /*err*/ )
+bool TShapeNB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T,
+                                    double& result,
+                                    MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                    MsqMatrix< 3, 3 > second_wrt_T[6],
+                                    MsqError& /*err*/ )
 {
     double f = Frobenius( T );
     double d = det( T );

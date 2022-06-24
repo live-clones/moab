@@ -103,7 +103,10 @@ ProgOptions::~ProgOptions()
 {
     for( std::vector< help_line >::iterator i = option_help_strings.begin(); i != option_help_strings.end(); ++i )
     {
-        if( ( *i ).first ) { delete( *i ).first; }
+        if( ( *i ).first )
+        {
+            delete( *i ).first;
+        }
     }
 
     for( std::vector< help_line >::iterator i = arg_help_strings.begin(); i != arg_help_strings.end(); ++i )
@@ -128,7 +131,10 @@ void ProgOptions::get_namestrings( const std::string& namestring, std::string* l
 void ProgOptions::setVersion( const std::string& version_string, bool addFlag )
 {
     progversion = version_string;
-    if( addFlag ) { addOpt< void >( "version", "Print version number and exit", version_flag ); }
+    if( addFlag )
+    {
+        addOpt< void >( "version", "Print version number and exit", version_flag );
+    }
 }
 
 template < typename T >
@@ -183,7 +189,9 @@ void ProgOptions::addRequiredArg( const std::string& helpname, const std::string
 }
 
 template < typename T >
-void ProgOptions::addOptionalArgs( unsigned max_count, const std::string& helpname, const std::string& helpstring,
+void ProgOptions::addOptionalArgs( unsigned max_count,
+                                   const std::string& helpname,
+                                   const std::string& helpstring,
                                    int flags )
 {
     // If there was a previous one, we need to remove it
@@ -222,7 +230,10 @@ void ProgOptions::printHelp( std::ostream& out )
     if( !brief_help.empty() ) out << brief_help << std::endl;
     for( std::vector< std::string >::iterator i = main_help.begin(); i != main_help.end(); ++i )
     {
-        if( ( *i ).length() ) { out << std::endl << *i << std::endl; }
+        if( ( *i ).length() )
+        {
+            out << std::endl << *i << std::endl;
+        }
     }
 
     printUsage( out );
@@ -307,13 +318,19 @@ std::string ProgOptions::get_option_usage_prefix( const ProgOpt& option )
     {
 
         s << "-" << option.shortname;
-        if( has_longname ) { s << " "; }
+        if( has_longname )
+        {
+            s << " ";
+        }
     }
     else if( option.flags & int_flag )
     {
 
         s << "-<n>";
-        if( has_longname ) { s << " "; }
+        if( has_longname )
+        {
+            s << " ";
+        }
     }
     if( has_longname )
     {
@@ -368,7 +385,10 @@ ProgOpt* ProgOptions::lookup_option( const std::string& namestring )
     ProgOpt* opt = lookup( long_names, longname );
     if( !opt ) opt = lookup( short_names, shortname );
 
-    if( !opt ) { error( "Invalid option: " + namestring ); }
+    if( !opt )
+    {
+        error( "Invalid option: " + namestring );
+    }
 
     return opt;
 }
@@ -491,28 +511,43 @@ bool ProgOptions::evaluate( const ProgOpt& opt, void* target, const std::string&
         case INT: {
             int temp;
             int* i = target ? reinterpret_cast< int* >( target ) : &temp;
-            if( opt.args.size() < 1 ) { error( "Missing argument to " + option + " option" ); }
+            if( opt.args.size() < 1 )
+            {
+                error( "Missing argument to " + option + " option" );
+            }
             const char* arg = opt.args.at( idx ).c_str();
             char* p;
             *i = std::strtol( arg, &p, 0 );
-            if( *p != '\0' ) { error( "Bad integer argument '" + opt.args.at( idx ) + "' to " + option + " option." ); }
+            if( *p != '\0' )
+            {
+                error( "Bad integer argument '" + opt.args.at( idx ) + "' to " + option + " option." );
+            }
             return true;
         }
         case REAL: {
             double temp;
             double* i = target ? reinterpret_cast< double* >( target ) : &temp;
-            if( opt.args.size() < 1 ) { error( "Missing argument to " + option + " option" ); }
+            if( opt.args.size() < 1 )
+            {
+                error( "Missing argument to " + option + " option" );
+            }
             const char* arg = opt.args.at( idx ).c_str();
             char* p;
             *i = std::strtod( arg, &p );
-            if( *p != '\0' ) { error( "Bad real argument '" + opt.args.at( idx ) + "' to " + option + " option." ); }
+            if( *p != '\0' )
+            {
+                error( "Bad real argument '" + opt.args.at( idx ) + "' to " + option + " option." );
+            }
             return true;
         }
 
         case STRING: {
             std::string temp;
             std::string* i = target ? reinterpret_cast< std::string* >( target ) : &temp;
-            if( opt.args.size() < 1 ) { error( "Missing argument to " + option + " option" ); }
+            if( opt.args.size() < 1 )
+            {
+                error( "Missing argument to " + option + " option" );
+            }
             if( opt.flags & rank_subst )
                 *i = do_rank_subst( opt.args.at( idx ) );
             else
@@ -538,7 +573,10 @@ bool ProgOptions::getOpt( const std::string& namestring, T* t )
 
     ProgOpt* opt = lookup_option( namestring );
 
-    if( get_opt_type< T >() != opt->type ) { error( "Option '" + namestring + "' looked up with incompatible type" ); }
+    if( get_opt_type< T >() != opt->type )
+    {
+        error( "Option '" + namestring + "' looked up with incompatible type" );
+    }
 
     // This call to evaluate is inefficient, because opt was already evaluated when it was parsed.
     if( opt->args.size() )
@@ -564,7 +602,10 @@ void ProgOptions::getOptAllArgs( const std::string& namestring, std::vector< T >
         return;
     }
 
-    if( get_opt_type< T >() != opt->type ) { error( "Option '" + namestring + "' looked up with incompatible type" ); }
+    if( get_opt_type< T >() != opt->type )
+    {
+        error( "Option '" + namestring + "' looked up with incompatible type" );
+    }
 
     values.resize( opt->args.size() );
 
@@ -584,7 +625,10 @@ int ProgOptions::numOptSet( const std::string& namestring )
     ProgOpt* opt = lookup( long_names, longname );
     if( !opt ) opt = lookup( short_names, shortname );
 
-    if( !opt ) { error( "Could not look up option: " + namestring ); }
+    if( !opt )
+    {
+        error( "Could not look up option: " + namestring );
+    }
 
     return opt->args.size();
 }
@@ -595,7 +639,10 @@ T ProgOptions::getReqArg( const std::string& namestring )
 
     ProgOpt* opt = lookup( required_args, namestring );
 
-    if( !opt ) { error( "Could not look up required arg: " + namestring ); }
+    if( !opt )
+    {
+        error( "Could not look up required arg: " + namestring );
+    }
 
     // if parseProgramOptions succeeded, we can assume each required arg has a value,
     // so calling evaluate is valid
@@ -609,9 +656,15 @@ void ProgOptions::getArgs( const std::string& namestring, std::vector< T >& valu
 {
     ProgOpt* opt = lookup( required_args, namestring );
 
-    if( !opt ) { error( "Could not look up required arg: " + namestring ); }
+    if( !opt )
+    {
+        error( "Could not look up required arg: " + namestring );
+    }
 
-    if( get_opt_type< T >() != opt->type ) { error( "Option '" + namestring + "' looked up with incompatible type" ); }
+    if( get_opt_type< T >() != opt->type )
+    {
+        error( "Option '" + namestring + "' looked up with incompatible type" );
+    }
 
     values.resize( opt->args.size() );
 
@@ -661,11 +714,20 @@ bool ProgOptions::process_option( ProgOpt* opt, std::string arg, const char* val
     }
     else
     {
-        if( value ) { error( "Unexpected value for flag: " + arg ); }
+        if( value )
+        {
+            error( "Unexpected value for flag: " + arg );
+        }
 
         // do flag operations
-        if( opt->cancel_opt ) { opt->cancel_opt->args.clear(); }
-        if( opt->storage ) { *static_cast< bool* >( opt->storage ) = ( opt->flags & store_false ) ? false : true; }
+        if( opt->cancel_opt )
+        {
+            opt->cancel_opt->args.clear();
+        }
+        if( opt->storage )
+        {
+            *static_cast< bool* >( opt->storage ) = ( opt->flags & store_false ) ? false : true;
+        }
         opt->args.push_back( "" );
     }
 
@@ -866,7 +928,10 @@ void ProgOptions::write_man_page( std::ostream& s )
                 s << ' ' << c << " \"-" << it->first->shortname << '"';
                 c = '|';
             }
-            if( !it->first->longname.empty() ) { s << ' ' << c << " \"--" << it->first->longname << '"'; }
+            if( !it->first->longname.empty() )
+            {
+                s << ' ' << c << " \"--" << it->first->longname << '"';
+            }
             if( it->first->cancel_opt )
             {
                 skip_list.insert( it->first->cancel_opt );

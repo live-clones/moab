@@ -280,7 +280,10 @@ int main( int argc, char* argv[] )
     CALL( tag_get_bytes, ( data_tag.handle, data_size ) );
 
     // If write dat wasn't specified, use data tag
-    if( !write_tag_name ) { write_tag = data_tag.handle; }
+    if( !write_tag_name )
+    {
+        write_tag = data_tag.handle;
+    }
     // If write tag was specified, if it exists its type
     // msut match that of the data tag.  If it doesn't exist,
     // create it.

@@ -60,9 +60,14 @@ class WriteTemplate : public WriterIface
     static WriterIface* factory( Interface* );
 
     //! writes out a file
-    ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
-                          const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+    ErrorCode write_file( const char* file_name,
+                          const bool overwrite,
+                          const FileOptions& opts,
+                          const EntityHandle* output_list,
+                          const int num_sets,
+                          const std::vector< std::string >& qa_list,
+                          const Tag* tag_list  = NULL,
+                          int num_tags         = 0,
                           int export_dimension = 3 );
 
     //! struct used to hold data for each block to be output; used by
@@ -141,17 +146,20 @@ class WriteTemplate : public WriterIface
 
     Tag mEntityMark;  // used to say whether an entity will be exported
 
-    ErrorCode gather_mesh_information( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_info,
+    ErrorCode gather_mesh_information( MeshInfo& mesh_info,
+                                       std::vector< MaterialSetData >& matset_info,
                                        std::vector< NeumannSetData >& neuset_info,
                                        std::vector< DirichletSetData >& dirset_info,
-                                       std::vector< EntityHandle >& matsets, std::vector< EntityHandle >& neusets,
+                                       std::vector< EntityHandle >& matsets,
+                                       std::vector< EntityHandle >& neusets,
                                        std::vector< EntityHandle >& dirsets );
 
     ErrorCode initialize_file( MeshInfo& mesh_info );
 
     ErrorCode write_nodes( const int num_nodes, const Range& nodes, const int dimension );
 
-    ErrorCode write_matsets( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_data,
+    ErrorCode write_matsets( MeshInfo& mesh_info,
+                             std::vector< MaterialSetData >& matset_data,
                              std::vector< NeumannSetData >& neuset_data );
 
     ErrorCode get_valid_sides( Range& elems, const int sense, WriteTemplate::NeumannSetData& neuset_data );

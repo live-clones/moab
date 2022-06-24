@@ -196,8 +196,14 @@ class gs_data
      * param crystal   moab_crystal_data contains MPI_Comm and is used for
      *                 message passing
      */
-    gs_data( uint n, const long* label, const Ulong* ulabel, uint maxv, const unsigned int nlabels,
-             const unsigned int nulabels, crystal_data* crystal, ErrorCode& Init_Result )
+    gs_data( uint n,
+             const long* label,
+             const Ulong* ulabel,
+             uint maxv,
+             const unsigned int nlabels,
+             const unsigned int nulabels,
+             crystal_data* crystal,
+             ErrorCode& Init_Result )
     {
         Init_Result = this->initialize( n, label, ulabel, maxv, nlabels, nulabels, crystal );
     };
@@ -214,8 +220,13 @@ class gs_data
 
     /**Sets up the moab_gs_data; see constructor for parameter documentation
      */
-    ErrorCode initialize( uint n, const long* label, const Ulong* ulabel, uint maxv, const unsigned int nlabels,
-                          const unsigned int nulabels, crystal_data* crystal );
+    ErrorCode initialize( uint n,
+                          const long* label,
+                          const Ulong* ulabel,
+                          uint maxv,
+                          const unsigned int nlabels,
+                          const unsigned int nulabels,
+                          crystal_data* crystal );
 
     void reset();
 

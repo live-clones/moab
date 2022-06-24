@@ -47,17 +47,27 @@ class AWSizeB1 : public AWMetricBarrier
 
     MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A,
+                                           const MsqMatrix< 2, 2 >& W,
+                                           double& result,
                                            MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                                                     const MsqMatrix< 2, 2 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_A,
+                                                     MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A,
+                                           const MsqMatrix< 3, 3 >& W,
+                                           double& result,
                                            MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A,
+                                                     const MsqMatrix< 3, 3 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_A,
+                                                     MsqError& err );
 };
 
 }  // namespace MBMesquite

@@ -348,7 +348,11 @@ ErrorCode test_adjacencies( Interface* mbImpl, NestedRefine* nr, const Range& al
     return MB_SUCCESS;
 }
 
-ErrorCode refine_entities( Interface* mb, ParallelComm* pc, EntityHandle fset, int* level_degrees, const int num_levels,
+ErrorCode refine_entities( Interface* mb,
+                           ParallelComm* pc,
+                           EntityHandle fset,
+                           int* level_degrees,
+                           const int num_levels,
                            bool output )
 {
     ErrorCode error;
@@ -870,9 +874,8 @@ ErrorCode create_simple_mesh( Interface* mbImpl, EntityType type )
 
         const size_t num_vtx = sizeof( coords ) / sizeof( double ) / 3;
 
-        const int conn[] = {
-            0, 5, 6, 0, 1, 5, 1, 4, 5, 1, 2, 4, 2, 3, 4, 7, 8, 0, 8, 1, 0, 8, 9, 1, 9, 2, 1, 9, 10, 2
-        };
+        const int conn[] = { 0, 5, 6, 0, 1, 5, 1, 4, 5, 1, 2, 4, 2, 3,  4,
+                             7, 8, 0, 8, 1, 0, 8, 9, 1, 9, 2, 1, 9, 10, 2 };
 
         const size_t num_elems = sizeof( conn ) / sizeof( int ) / 3;
 

@@ -266,7 +266,10 @@ void dot_nodes( std::ostream& s, Range& sets )
     }
 }
 
-static void dot_down_link( std::ostream& s, EntityHandle parent, EntityHandle child, bool dashed,
+static void dot_down_link( std::ostream& s,
+                           EntityHandle parent,
+                           EntityHandle child,
+                           bool dashed,
                            const char* label = 0 )
 {
     s << 's' << mb.id_from_handle( parent ) << " -> " << 's' << mb.id_from_handle( child );

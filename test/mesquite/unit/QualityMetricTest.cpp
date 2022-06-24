@@ -83,10 +83,17 @@ class QualityMetricTest : public CppUnit::TestFixture
     void test_diagonal_parabolic();
     void test_diagonal_tau();
 
-    void compare_indices( QualityMetric& qm, PatchData& pd, size_t sample, double value,
+    void compare_indices( QualityMetric& qm,
+                          PatchData& pd,
+                          size_t sample,
+                          double value,
                           const std::vector< size_t >& indices );
-    void compare_gradient( QualityMetric& qm, PatchData& pd, size_t sample, double value,
-                           const std::vector< size_t >& indices, const std::vector< Vector3D >& grad );
+    void compare_gradient( QualityMetric& qm,
+                           PatchData& pd,
+                           size_t sample,
+                           double value,
+                           const std::vector< size_t >& indices,
+                           const std::vector< Vector3D >& grad );
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( QualityMetricTest, "QualityMetricTest" );
@@ -128,7 +135,10 @@ class LinearVertexMetric : public VertexQM
         value = pd.vertex_by_index( vtx_idx )[0];
         return true;
     }
-    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t vtx_idx,
+                                double& value,
+                                std::vector< size_t >& indices,
                                 MsqError& )
     {
         value = pd.vertex_by_index( vtx_idx )[0];
@@ -159,7 +169,10 @@ class ConstantElementMetric : public ElementQM
         value = 1.0;
         return true;
     }
-    bool evaluate_with_indices( PatchData& pd, size_t elem_idx, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t elem_idx,
+                                double& value,
+                                std::vector< size_t >& indices,
                                 MsqError& )
     {
         MsqMeshEntity& elem = pd.element_by_index( elem_idx );
@@ -197,7 +210,10 @@ class ParabolicVertexMetric : public VertexQM
         value *= value;
         return true;
     }
-    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t vtx_idx,
+                                double& value,
+                                std::vector< size_t >& indices,
                                 MsqError& )
     {
         value = pd.vertex_by_index( vtx_idx )[1];
@@ -247,7 +263,10 @@ class TriTauMetric : public ElementQM
         return true;
     }
 
-    bool evaluate_with_indices( PatchData& pd, size_t elem_idx, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t elem_idx,
+                                double& value,
+                                std::vector< size_t >& indices,
                                 MsqError& )
     {
         MsqMatrix< 3, 3 > M = matrix( pd, elem_idx );
@@ -723,7 +742,10 @@ void QualityMetricTest::test_diagonal_tau()
     CPPUNIT_ASSERT_MATRICES_EQUAL( exp1, Hessian[1], EPSILON );
 }
 
-void QualityMetricTest::compare_indices( QualityMetric& qm, PatchData& pd, size_t sample, double value,
+void QualityMetricTest::compare_indices( QualityMetric& qm,
+                                         PatchData& pd,
+                                         size_t sample,
+                                         double value,
                                          const std::vector< size_t >& indices )
 {
     double value2;
@@ -739,8 +761,12 @@ void QualityMetricTest::compare_indices( QualityMetric& qm, PatchData& pd, size_
     ASSERT_STD_VECTORS_EQUAL( indices2, indices1 );
 }
 
-void QualityMetricTest::compare_gradient( QualityMetric& qm, PatchData& pd, size_t sample, double value,
-                                          const std::vector< size_t >& indices, const std::vector< Vector3D >& grad )
+void QualityMetricTest::compare_gradient( QualityMetric& qm,
+                                          PatchData& pd,
+                                          size_t sample,
+                                          double value,
+                                          const std::vector< size_t >& indices,
+                                          const std::vector< Vector3D >& grad )
 {
     double value2;
     std::vector< size_t > indices2;

@@ -335,7 +335,10 @@ C_FUNC_DEF double v_tri_minimum_angle( int /*num_nodes*/, double coordinates[][3
     // from the shortest side, calculate the angle of the
     // opposite angle
     double min_angle;
-    if( short_side == 0 ) { min_angle = sides[2].interior_angle( sides[1] ); }
+    if( short_side == 0 )
+    {
+        min_angle = sides[2].interior_angle( sides[1] );
+    }
     else if( short_side == 1 )
     {
         min_angle = sides[0].interior_angle( sides[2] );
@@ -377,7 +380,10 @@ C_FUNC_DEF double v_tri_maximum_angle( int /*num_nodes*/, double coordinates[][3
     sides_lengths[1] = sides[1].length_squared();
     sides_lengths[2] = sides[2].length_squared();
 
-    if( sides_lengths[0] == 0.0 || sides_lengths[1] == 0.0 || sides_lengths[2] == 0.0 ) { return 0.0; }
+    if( sides_lengths[0] == 0.0 || sides_lengths[1] == 0.0 || sides_lengths[2] == 0.0 )
+    {
+        return 0.0;
+    }
 
     // using the law of sines, we know that the maximum
     // angle is opposite of the longest side
@@ -390,7 +396,10 @@ C_FUNC_DEF double v_tri_maximum_angle( int /*num_nodes*/, double coordinates[][3
     // from the longest side, calculate the angle of the
     // opposite angle
     double max_angle;
-    if( short_side == 0 ) { max_angle = sides[2].interior_angle( sides[1] ); }
+    if( short_side == 0 )
+    {
+        max_angle = sides[2].interior_angle( sides[1] );
+    }
     else if( short_side == 1 )
     {
         max_angle = sides[0].interior_angle( sides[2] );
@@ -765,7 +774,9 @@ C_FUNC_DEF double v_tri_distortion( int num_nodes, double coordinates[][3] )
   method multiple times.
 
 */
-C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_tri_quality( int num_nodes,
+                               double coordinates[][3],
+                               unsigned int metrics_request_flag,
                                TriMetricVals* metric_vals )
 {
 
@@ -910,7 +921,10 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
             if( temp_scaled_jac < min_scaled_jac ) min_scaled_jac = temp_scaled_jac;
         }
         // multiply by -1 if the normals are in opposite directions
-        if( is_inverted ) { min_scaled_jac *= -1; }
+        if( is_inverted )
+        {
+            min_scaled_jac *= -1;
+        }
         metric_vals->scaled_jacobian = (double)min_scaled_jac;
     }
 
@@ -920,7 +934,10 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
         // calculate once and reuse
         static const double rootOf3 = sqrt( 3.0 );
         // if it is inverted, the condition number is considered to be infinity.
-        if( is_inverted ) { metric_vals->condition = VERDICT_DBL_MAX; }
+        if( is_inverted )
+        {
+            metric_vals->condition = VERDICT_DBL_MAX;
+        }
         else
         {
             double area2x = ( sides[0] * sides[2] ).length();
@@ -937,7 +954,10 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
     {
         // if element is inverted, shape is zero.  We don't need to
         // calculate anything.
-        if( is_inverted ) { metric_vals->shape = 0.0; }
+        if( is_inverted )
+        {
+            metric_vals->shape = 0.0;
+        }
         else
         {  // otherwise, we calculate the shape
             // calculate once and reuse
@@ -1040,7 +1060,10 @@ C_FUNC_DEF void v_tri_quality( int num_nodes, double coordinates[][3], unsigned 
     else
         metric_vals->distortion = (double)VERDICT_MAX( metric_vals->distortion, -VERDICT_DBL_MAX );
 
-    if( metrics_request_flag & V_TRI_EDGE_RATIO ) { metric_vals->edge_ratio = v_tri_edge_ratio( 3, coordinates ); }
+    if( metrics_request_flag & V_TRI_EDGE_RATIO )
+    {
+        metric_vals->edge_ratio = v_tri_edge_ratio( 3, coordinates );
+    }
     if( metrics_request_flag & V_TRI_RADIUS_RATIO )
     {
         metric_vals->radius_ratio = v_tri_radius_ratio( 3, coordinates );

@@ -116,8 +116,8 @@ class BitPage
      *\param start   The handle of the entity corresponding to the
      *               tag value stored at 'offset'
      */
-    void search( unsigned char value, int offset, int count, int bits_per_ent, Range& results,
-                 EntityHandle start ) const;
+    void search( unsigned char value, int offset, int count, int bits_per_ent, Range& results, EntityHandle start )
+        const;
 
   private:
     /**\brief The actual array of bytes */

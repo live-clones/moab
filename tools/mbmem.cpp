@@ -47,7 +47,10 @@ enum Units
 Units UNITS = HUMAN;
 
 // The core functionality of this example
-static void print_memory_stats( moab::Interface& mb, bool per_type = true, bool per_tag = true, bool totals = true,
+static void print_memory_stats( moab::Interface& mb,
+                                bool per_type = true,
+                                bool per_tag  = true,
+                                bool totals   = true,
                                 bool sysstats = true );
 
 // Generate a series of meshes for testing
@@ -323,7 +326,10 @@ void print_memory_stats( moab::Interface& mb, bool per_type, bool per_tag, bool 
         {
 #ifndef _WIN32
             struct rusage sysdata;
-            if( getrusage( RUSAGE_SELF, &sysdata ) ) { std::cerr << "getrusage failed" << std::endl; }
+            if( getrusage( RUSAGE_SELF, &sysdata ) )
+            {
+                std::cerr << "getrusage failed" << std::endl;
+            }
             else
             {
                 rss              = sysdata.ru_maxrss;

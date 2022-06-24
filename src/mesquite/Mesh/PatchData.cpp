@@ -382,8 +382,11 @@ in the PatchData; the PatchDataVerticesMemento is unchanged.
    \param step_size will multiply the moving direction given in dk
    for each vertex.
   */
-void PatchData::set_free_vertices_constrained( PatchDataVerticesMemento* memento, Vector3D dk[], size_t nb_vtx,
-                                               double step_size, MsqError& err )
+void PatchData::set_free_vertices_constrained( PatchDataVerticesMemento* memento,
+                                               Vector3D dk[],
+                                               size_t nb_vtx,
+                                               double step_size,
+                                               MsqError& err )
 {
     if( memento->originator != this || nb_vtx != num_free_vertices() )
     {
@@ -541,7 +544,8 @@ void PatchData::get_element_vertex_coordinates( size_t elem_index, std::vector< 
     MsqMeshEntity::get_vertex_index_array() if you don't need
     to fill an STL vector.
 */
-void PatchData::get_element_vertex_indices( size_t elem_index, std::vector< size_t >& vertex_indices,
+void PatchData::get_element_vertex_indices( size_t elem_index,
+                                            std::vector< size_t >& vertex_indices,
                                             MsqError& /*err*/ )
 {
     // Ask the element for its vertex indices
@@ -558,8 +562,10 @@ void PatchData::get_vertex_element_indices( size_t vertex_index, std::vector< si
     std::copy( ptr, ptr + count, elem_indices.begin() );
 }
 
-void PatchData::get_vertex_element_indices( size_t vertex_index, unsigned element_dimension,
-                                            std::vector< size_t >& elem_indices, MsqError& err )
+void PatchData::get_vertex_element_indices( size_t vertex_index,
+                                            unsigned element_dimension,
+                                            std::vector< size_t >& elem_indices,
+                                            MsqError& err )
 {
     elem_indices.clear();
     size_t count;
@@ -577,7 +583,10 @@ void PatchData::get_vertex_element_indices( size_t vertex_index, unsigned elemen
 const size_t* PatchData::get_vertex_element_adjacencies( size_t vertex_index, size_t& array_len_out, MsqError& )
 {
     // Make sure we've got the data
-    if( vertAdjacencyArray.empty() ) { generate_vertex_to_element_data(); }
+    if( vertAdjacencyArray.empty() )
+    {
+        generate_vertex_to_element_data();
+    }
 
     const size_t begin = vertAdjacencyOffsets[vertex_index];
     const size_t end   = vertAdjacencyOffsets[vertex_index + 1];
@@ -593,7 +602,8 @@ const size_t* PatchData::get_vertex_element_adjacencies( size_t vertex_index, si
     the vector.
 
 */
-void PatchData::get_adjacent_vertex_indices( size_t vertex_index, std::vector< size_t >& vert_indices,
+void PatchData::get_adjacent_vertex_indices( size_t vertex_index,
+                                             std::vector< size_t >& vert_indices,
                                              MsqError& err ) const
 {
     bitMap.clear();
@@ -735,7 +745,10 @@ void PatchData::get_adjacent_entities_via_n_dim( int n, size_t ent_ind, std::vec
                     k2 = 0;
                 }
                 // if this_ent occured enough times and isn't ent_ind
-                if( counter > n && this_ent != ent_ind ) { adj_ents.push_back( this_ent ); }
+                if( counter > n && this_ent != ent_ind )
+                {
+                    adj_ents.push_back( this_ent );
+                }
             }
             ++j;
         }
@@ -1006,7 +1019,9 @@ void PatchData::generate_vertex_to_element_data()
     vertAdjacencyOffsets[num_nodes()] = num_vert_uses;
 }
 
-void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_layers, PatchData& subpatch,
+void PatchData::get_subpatch( size_t center_vertex_index,
+                              unsigned num_adj_elem_layers,
+                              PatchData& subpatch,
                               MsqError& err )
 {
     // Make sure we're in range
@@ -1105,7 +1120,7 @@ void PatchData::get_subpatch( size_t center_vertex_index, unsigned num_adj_elem_
     subpatch.vertexArray.resize( vertices.size() );
     for( unsigned i = 0; i < vertices.size(); ++i )
     {
-        size_t vert_index               = ( size_t )( subpatch.vertexHandlesArray[i] );
+        size_t vert_index               = (size_t)( subpatch.vertexHandlesArray[i] );
         vertices[i]                     = vert_index;
         subpatch.vertexHandlesArray[i]  = vertexHandlesArray[vert_index];
         subpatch.vertexArray[i]         = vertexArray[vert_index];
@@ -1282,7 +1297,10 @@ void PatchData::get_domain_normals_at_corners( size_t elem_index, Vector3D norma
     for( size_t i = 0; i < count; ++i )
     {
         const size_t v = vertex_indices[i];
-        if( vertexNormalIndices.empty() ) { normals_out[i] = normalData[v]; }
+        if( vertexNormalIndices.empty() )
+        {
+            normals_out[i] = normalData[v];
+        }
         else if( vertexNormalIndices[v] < normalData.size() )
         {
             normals_out[i] = normalData[vertexNormalIndices[v]];
@@ -1295,7 +1313,9 @@ void PatchData::get_domain_normals_at_corners( size_t elem_index, Vector3D norma
     }
 }
 
-void PatchData::get_domain_normal_at_vertex( size_t vert_index, Mesh::EntityHandle handle, Vector3D& normal,
+void PatchData::get_domain_normal_at_vertex( size_t vert_index,
+                                             Mesh::EntityHandle handle,
+                                             Vector3D& normal,
                                              MsqError& err )
 {
     if( !domain_set() )
@@ -1309,7 +1329,10 @@ void PatchData::get_domain_normal_at_vertex( size_t vert_index, Mesh::EntityHand
         update_cached_normals( err );MSQ_ERRRTN( err );
     }
 
-    if( vertexNormalIndices.empty() ) { normal = normalData[vert_index]; }
+    if( vertexNormalIndices.empty() )
+    {
+        normal = normalData[vert_index];
+    }
     else if( vertexNormalIndices[vert_index] < normalData.size() )
     {
         normal = normalData[vertexNormalIndices[vert_index]];
@@ -1518,7 +1541,8 @@ void print_patch_data( const PatchData& pd )
     std::cout << pd << std::endl;
 }
 
-void PatchData::enslave_higher_order_nodes( const size_t* elem_offset_array, unsigned char* vertex_flags,
+void PatchData::enslave_higher_order_nodes( const size_t* elem_offset_array,
+                                            unsigned char* vertex_flags,
                                             MsqError& ) const
 {
     for( size_t i = 0; i < elementArray.size(); ++i )
@@ -1657,8 +1681,13 @@ size_t PatchData::num_corners() const
     return result;
 }
 
-void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, EntityTopology type,
-                      const size_t* connectivity, const bool* fixed, MsqError& err )
+void PatchData::fill( size_t num_vertex,
+                      const double* coords,
+                      size_t num_elem,
+                      EntityTopology type,
+                      const size_t* connectivity,
+                      const bool* fixed,
+                      MsqError& err )
 {
     std::vector< EntityTopology > types( num_elem );
     std::fill( types.begin(), types.end(), type );
@@ -1666,8 +1695,13 @@ void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, 
     this->fill( num_vertex, coords, num_elem, type_ptr, connectivity, fixed, err );MSQ_CHKERR( err );
 }
 
-void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, const EntityTopology* types,
-                      const size_t* conn, const bool* fixed, MsqError& err )
+void PatchData::fill( size_t num_vertex,
+                      const double* coords,
+                      size_t num_elem,
+                      const EntityTopology* types,
+                      const size_t* conn,
+                      const bool* fixed,
+                      MsqError& err )
 {
     std::vector< size_t > lengths( num_elem );
     std::transform( types, types + num_elem, lengths.begin(), std::ptr_fun( TopologyInfo::corners ) );
@@ -1675,8 +1709,14 @@ void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, 
     this->fill( num_vertex, coords, num_elem, types, len_ptr, conn, fixed, err );MSQ_CHKERR( err );
 }
 
-void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, const EntityTopology* types,
-                      const size_t* lengths, const size_t* conn, const bool* fixed, MsqError& err )
+void PatchData::fill( size_t num_vertex,
+                      const double* coords,
+                      size_t num_elem,
+                      const EntityTopology* types,
+                      const size_t* lengths,
+                      const size_t* conn,
+                      const bool* fixed,
+                      MsqError& err )
 {
     size_t i;
 
@@ -1752,7 +1792,10 @@ void PatchData::fill( size_t num_vertex, const double* coords, size_t num_elem, 
 
 void PatchData::make_handles_unique( Mesh::EntityHandle* handles, size_t& count, size_t* index_map )
 {
-    if( count < 2 ) { return; }
+    if( count < 2 )
+    {
+        return;
+    }
     // save this now, as we'll be changing count later
     const size_t* index_end = index_map + count;
 
@@ -1793,7 +1836,8 @@ void PatchData::fill_global_patch( MsqError& err )
 }
 
 void PatchData::set_mesh_entities( std::vector< Mesh::ElementHandle >& elements,
-                                   std::vector< Mesh::VertexHandle >& free_vertices, MsqError& err )
+                                   std::vector< Mesh::VertexHandle >& free_vertices,
+                                   MsqError& err )
 {
     Mesh* current_mesh = get_mesh();
     if( !current_mesh )
@@ -1962,7 +2006,10 @@ void PatchData::get_samples( size_t element, std::vector< Sample >& samples, Msq
 
 bool PatchData::attach_extra_data( ExtraData* data )
 {
-    if( data->patchNext ) { return false; }
+    if( data->patchNext )
+    {
+        return false;
+    }
 
     if( !data->patchPtr )
         data->patchPtr = this;
@@ -2004,7 +2051,9 @@ void PatchData::notify_new_patch()
         iter->notify_new_patch();
 }
 
-void PatchData::notify_sub_patch( PatchData& sub_patch, const size_t* vertex_map, const size_t* element_map,
+void PatchData::notify_sub_patch( PatchData& sub_patch,
+                                  const size_t* vertex_map,
+                                  const size_t* element_map,
                                   MsqError& err )
 {
     for( ExtraData* iter = dataList; iter; iter = iter->patchNext )

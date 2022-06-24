@@ -118,8 +118,12 @@ class MESQUITE_EXPORT MappingFunction
      *                but for element types with large numbers of nodes it may
      *                have a significant impact on performance.
      */
-    virtual void coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                               size_t& num_coeff_out, MsqError& err ) const = 0;
+    virtual void coefficients( Sample location,
+                               NodeSet nodeset,
+                               double* coeff_out,
+                               size_t* indices_out,
+                               size_t& num_coeff_out,
+                               MsqError& err ) const = 0;
 
     /*\brief Convert connectivity list indices for different element types.
      *
@@ -129,9 +133,12 @@ class MESQUITE_EXPORT MappingFunction
      * into a second element type such that the node in the same logical
      * position (e.g. middle of edge 1) is indicated.
      */
-    static inline void convert_connectivity_indices( EntityTopology topology, int num_nodes_in_input_elem_type,
-                                                     int num_nodes_in_output_elem_type, size_t* index_list,
-                                                     unsigned num_indices, MsqError& err );
+    static inline void convert_connectivity_indices( EntityTopology topology,
+                                                     int num_nodes_in_input_elem_type,
+                                                     int num_nodes_in_output_elem_type,
+                                                     size_t* index_list,
+                                                     unsigned num_indices,
+                                                     MsqError& err );
 
     /*\brief Convert connectivity list indices for different element types.
      *
@@ -141,17 +148,22 @@ class MESQUITE_EXPORT MappingFunction
      * those of the specified element type such that indices indicate
      * nodes at the corresponding logical locations (e.g. middle of edge 1).
      */
-    inline void convert_connectivity_indices( int num_nodes_in_output_element_type, size_t* index_list,
-                                              unsigned num_indices, MsqError& err ) const
+    inline void convert_connectivity_indices( int num_nodes_in_output_element_type,
+                                              size_t* index_list,
+                                              unsigned num_indices,
+                                              MsqError& err ) const
     {
         convert_connectivity_indices( element_topology(), num_nodes(), num_nodes_in_output_element_type, index_list,
                                       num_indices, err );
     }
 
   private:
-    static void convert_connectivity_indices_impl( EntityTopology topology, int num_nodes_in_input_elem_type,
-                                                   int num_nodes_in_output_elem_type, size_t* index_list,
-                                                   unsigned num_indices, MsqError& err );
+    static void convert_connectivity_indices_impl( EntityTopology topology,
+                                                   int num_nodes_in_input_elem_type,
+                                                   int num_nodes_in_output_elem_type,
+                                                   size_t* index_list,
+                                                   unsigned num_indices,
+                                                   MsqError& err );
 };
 
 /**\brief MappingFunction for topologically 2D (surface) elements. */
@@ -253,8 +265,12 @@ class MESQUITE_EXPORT MappingFunction2D : public MappingFunction
      *                tuples returned in vertices_out and d_coeff_d_xi_out,
      *                respectively.
      */
-    virtual void derivatives( Sample location, NodeSet nodeset, size_t* vertex_indices_out,
-                              MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const = 0;
+    virtual void derivatives( Sample location,
+                              NodeSet nodeset,
+                              size_t* vertex_indices_out,
+                              MsqVector< 2 >* d_coeff_d_xi_out,
+                              size_t& num_vtx,
+                              MsqError& err ) const = 0;
 
     /**\brief Mapping function derivatives and Jacobian
      *
@@ -297,9 +313,15 @@ class MESQUITE_EXPORT MappingFunction2D : public MappingFunction
      *\param jacobian_out    The Jacobian of the mapping function at the
      *                       specified logical location.
      */
-    virtual void jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset, Sample location,
-                           size_t* vertex_patch_indices_out, MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx_out,
-                           MsqMatrix< 3, 2 >& jacobian_out, MsqError& err ) const;
+    virtual void jacobian( const PatchData& pd,
+                           size_t element_number,
+                           NodeSet nodeset,
+                           Sample location,
+                           size_t* vertex_patch_indices_out,
+                           MsqVector< 2 >* d_coeff_d_xi_out,
+                           size_t& num_vtx_out,
+                           MsqMatrix< 3, 2 >& jacobian_out,
+                           MsqError& err ) const;
 
     /**\brief Get ideal Jacobian matrix
      *
@@ -416,8 +438,12 @@ class MESQUITE_EXPORT MappingFunction3D : public MappingFunction
      *                tuples returned in vertices_out and d_coeff_d_xi_out,
      *                respectively.
      */
-    virtual void derivatives( Sample location, NodeSet nodeset, size_t* vertex_indices_out,
-                              MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const = 0;
+    virtual void derivatives( Sample location,
+                              NodeSet nodeset,
+                              size_t* vertex_indices_out,
+                              MsqVector< 3 >* d_coeff_d_xi_out,
+                              size_t& num_vtx,
+                              MsqError& err ) const = 0;
 
     /**\brief Mapping function derivatives and Jacobian
      *
@@ -459,9 +485,15 @@ class MESQUITE_EXPORT MappingFunction3D : public MappingFunction
      *\param jacobian_out    The Jacobian of the mapping function at the
      *                       specified logical location.
      */
-    virtual void jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset, Sample location,
-                           size_t* vertex_patch_indices_out, MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx_out,
-                           MsqMatrix< 3, 3 >& jacobian_out, MsqError& err ) const;
+    virtual void jacobian( const PatchData& pd,
+                           size_t element_number,
+                           NodeSet nodeset,
+                           Sample location,
+                           size_t* vertex_patch_indices_out,
+                           MsqVector< 3 >* d_coeff_d_xi_out,
+                           size_t& num_vtx_out,
+                           MsqMatrix< 3, 3 >& jacobian_out,
+                           MsqError& err ) const;
 
     /**\brief Get ideal Jacobian matrix
      *
@@ -479,8 +511,12 @@ class MESQUITE_EXPORT MappingFunction3D : public MappingFunction
     virtual void ideal( Sample location, MsqMatrix< 3, 3 >& jacobian_out, MsqError& err ) const;
 };
 
-inline void MappingFunction::convert_connectivity_indices( EntityTopology topo, int input_type, int output_type,
-                                                           size_t* index_list, unsigned num_indices, MsqError& err )
+inline void MappingFunction::convert_connectivity_indices( EntityTopology topo,
+                                                           int input_type,
+                                                           int output_type,
+                                                           size_t* index_list,
+                                                           unsigned num_indices,
+                                                           MsqError& err )
 {
     // If the types are the same or either type has only corner
     // vertices, then no conversion is necessary.

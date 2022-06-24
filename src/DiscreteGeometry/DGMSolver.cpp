@@ -55,7 +55,9 @@ unsigned int DGMSolver::compute_numcols_vander_multivar( unsigned int kvars, uns
     return mcols;
 }
 
-void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars, const int degree,
+void DGMSolver::gen_multivar_monomial_basis( const int kvars,
+                                             const double* vars,
+                                             const int degree,
                                              std::vector< double >& basis )
 {
     unsigned int len = compute_numcols_vander_multivar( kvars, degree );
@@ -95,7 +97,10 @@ void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars
     assert( len == iend - istr );
 }
 
-void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const double* us, const int degree,
+void DGMSolver::gen_vander_multivar( const int mrows,
+                                     const int kvars,
+                                     const double* us,
+                                     const int degree,
                                      std::vector< double >& V )
 {
     unsigned int ncols = compute_numcols_vander_multivar( kvars, degree );
@@ -292,8 +297,16 @@ void DGMSolver::backsolve( int mrows, int ncols, double* R, int bncols, double* 
     }
 }
 
-void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool interp, int mrows, int ncols, double* R,
-                                               int bncols, double* bs, const double* ws, int* degree_out )
+void DGMSolver::backsolve_polyfit_safeguarded( int dim,
+                                               int degree,
+                                               const bool interp,
+                                               int mrows,
+                                               int ncols,
+                                               double* R,
+                                               int bncols,
+                                               double* bs,
+                                               const double* ws,
+                                               int* degree_out )
 {
     if( ncols < 1 ) std::cout << "ERROR: Invalid input to safeguarded polyfit backsolve routine.\n";
 #if 0
@@ -634,8 +647,12 @@ void DGMSolver::vec_projoff( const int len, const double* a, const double* b, do
     }
 }
 
-void DGMSolver::vec_linear_operation( const int len, const double mu, const double* a, const double psi,
-                                      const double* b, double* c )
+void DGMSolver::vec_linear_operation( const int len,
+                                      const double mu,
+                                      const double* a,
+                                      const double psi,
+                                      const double* b,
+                                      double* c )
 {
     if( !a || !b || !c )
     {
@@ -647,8 +664,11 @@ void DGMSolver::vec_linear_operation( const int len, const double mu, const doub
     }
 }
 
-void DGMSolver::get_tri_natural_coords( const int dim, const double* cornercoords, const int npts,
-                                        const double* currcoords, double* naturalcoords )
+void DGMSolver::get_tri_natural_coords( const int dim,
+                                        const double* cornercoords,
+                                        const int npts,
+                                        const double* currcoords,
+                                        double* naturalcoords )
 {
     assert( dim == 2 || dim == 3 );
     double a = 0, b = 0, d = 0, tol = 1e-12;

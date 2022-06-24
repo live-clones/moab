@@ -67,8 +67,11 @@ ErrorCode ReadDamsel::parse_options( const FileOptions& opts, bool& parallel )
 // Partition collection is a *flat* collection of handles for entities and other collections that
 // will be represented on a part
 
-ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_set, const FileOptions& opts,
-                                 const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadDamsel::load_file( const char* filename,
+                                 const EntityHandle* file_set,
+                                 const FileOptions& opts,
+                                 const ReaderIface::SubsetList* subset_list,
+                                 const Tag* file_id_tag )
 {
     ErrorCode rval;
 
@@ -85,7 +88,10 @@ ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_
     // Model attach - need model id from make model, filename
 #ifdef MOAB_HAVE_MPI
     MPI_Comm comm = MPI_COMM_WORLD;
-    if( nativeParallel ) { comm = myPcomm->proc_config().proc_comm(); }
+    if( nativeParallel )
+    {
+        comm = myPcomm->proc_config().proc_comm();
+    }
 #endif
 
     damsel_err_t err;
@@ -242,8 +248,11 @@ ErrorCode ReadDamsel::load_file( const char* filename, const EntityHandle* file_
     return MB_SUCCESS;
 }
 
-ErrorCode ReadDamsel::read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                                       std::vector< int >& tag_values_out, const SubsetList* subset_list )
+ErrorCode ReadDamsel::read_tag_values( const char* file_name,
+                                       const char* tag_name,
+                                       const FileOptions& opts,
+                                       std::vector< int >& tag_values_out,
+                                       const SubsetList* subset_list )
 {
     return MB_FAILURE;
 }
@@ -388,7 +397,9 @@ ErrorCode ReadDamsel::process_ent_info( const damsel_entity_buf_type& einfo )
     return rval;
 }
 
-ErrorCode ReadDamsel::process_entity_tags( int count, damsel_container tag_container, damsel_container app_cont,
+ErrorCode ReadDamsel::process_entity_tags( int count,
+                                           damsel_container tag_container,
+                                           damsel_container app_cont,
                                            Range& these_ents )
 {
     // Process tags on these entities
@@ -436,7 +447,7 @@ ErrorCode ReadDamsel::get_contents( damsel_model m, damsel_container c, Range& e
                 RangeMap< damsel_handle, EntityHandle, 0 >::iterator beg = dmHandleRMap.lower_bound( start );
                 if( beg == dmHandleRMap.end() ) return MB_SUCCESS;
                 unsigned long diff = std::max( ( *beg ).begin - start, (damsel_handle)0 );
-                unsigned long num  = std::min( count - diff, ( size_t )( *beg ).count );
+                unsigned long num  = std::min( count - diff, (size_t)( *beg ).count );
                 ents.insert( ( *beg ).begin + diff, ( *beg ).begin + diff + num - 1 );
                 count -= ( diff + num );
                 ++beg;
@@ -494,7 +505,7 @@ ErrorCode ReadDamsel::get_contents( damsel_model m, damsel_container c, EntityHa
                 RangeMap< damsel_handle, EntityHandle, 0 >::iterator beg = dmHandleRMap.lower_bound( start );
                 if( beg == dmHandleRMap.end() ) return MB_SUCCESS;
                 unsigned int diff = std::max( ( *beg ).begin - start, (damsel_handle)0 );
-                unsigned int num  = std::min( count - diff, ( size_t )( *beg ).count );
+                unsigned int num  = std::min( count - diff, (size_t)( *beg ).count );
                 for( EntityHandle hdl = ( *beg ).begin + diff; hdl <= (int)( *beg ).begin + diff + num - 1; hdl++ )
                     ents[ind++] = hdl;
                 count -= ( diff + num );

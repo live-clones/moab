@@ -122,15 +122,15 @@ int main( int argc, char* argv[] )
     // Create tag for cell barycenters in 3D Cartesian space
     moab::Tag barycenterTag = 0;
     rval                    = mb.tag_get_handle( "CellBarycenter", 3, moab::MB_TYPE_DOUBLE, barycenterTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
+                                                 moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for cell density reconstruction coefficients
     moab::Tag rhoCoefTag = 0;
     rval                 = mb.tag_get_handle( "LinearCoefRho", 3, moab::MB_TYPE_DOUBLE, rhoCoefTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
+                                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for index of gnomonic plane for each cell
     moab::Tag planeTag = 0;
     rval               = mb.tag_get_handle( "gnomonicPlane", 1, moab::MB_TYPE_INTEGER, planeTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
+                                            moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );
     // Create tag for intersection weights
     moab::Tag weightsTag = 0;
     rval = mb.tag_get_handle( "Weights", 3, moab::MB_TYPE_DOUBLE, weightsTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR( rval );

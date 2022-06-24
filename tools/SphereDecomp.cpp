@@ -155,7 +155,8 @@ ErrorCode SphereDecomp::build_hexes( std::vector< EntityHandle >& sphere_hexes,
     return MB_SUCCESS;
 }
 
-ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHandle >& sphere_hexes,
+ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet,
+                                       std::vector< EntityHandle >& sphere_hexes,
                                        std::vector< EntityHandle >& interstic_hexes )
 {
     // 99: (#subdiv_verts/entity=9) * (#edges=6 + #faces=4 + 1=tet)
@@ -587,8 +588,11 @@ ErrorCode SphereDecomp::subdivide_tet( EntityHandle tet, std::vector< EntityHand
     return result;
 }
 
-ErrorCode SphereDecomp::retrieve_subdiv_verts( EntityHandle tet, EntityHandle this_ent, const EntityHandle* tet_conn,
-                                               const int dim, EntityHandle* subdiv_verts )
+ErrorCode SphereDecomp::retrieve_subdiv_verts( EntityHandle tet,
+                                               EntityHandle this_ent,
+                                               const EntityHandle* tet_conn,
+                                               const int dim,
+                                               EntityHandle* subdiv_verts )
 {
     // get the subdiv verts for this entity
     ErrorCode result;

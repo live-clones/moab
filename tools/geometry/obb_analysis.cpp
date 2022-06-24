@@ -201,7 +201,10 @@ ErrorCode obbvis_create( GeomTopoTool& gtt, std::vector< int >& volumes, int gri
         }
     }
 
-    if( verbose ) { std::cout << "Writing " << filename << std::endl; }
+    if( verbose )
+    {
+        std::cout << "Writing " << filename << std::endl;
+    }
     rval = mb2.write_file( filename.c_str() );
     CHECKERR( mb2, rval );
 
@@ -368,7 +371,9 @@ static std::string make_property_string( DagMC& dag, EntityHandle eh, std::vecto
 }
 */
 
-ErrorCode obbstat_write( GeomTopoTool& gtt, std::vector< int >& volumes, std::vector< std::string >& properties,
+ErrorCode obbstat_write( GeomTopoTool& gtt,
+                         std::vector< int >& volumes,
+                         std::vector< std::string >& properties,
                          std::ostream& out )
 {
 

@@ -120,8 +120,11 @@ class HessTestMetricAbs : public AWMetric
         result = sqr_Frobenius( 2 * A - transpose( A ) - W );
         return true;
     }
-    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                             MsqMatrix< 2, 2 >& wrt_A, MsqError& )
+    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                             const MsqMatrix< 2, 2 >& W,
+                             double& result,
+                             MsqMatrix< 2, 2 >& wrt_A,
+                             MsqError& )
     {
         result = sqr_Frobenius( 2 * A - transpose( A ) - W );
         wrt_A  = 10 * A - 8 * transpose( A ) - 4 * W + 2 * transpose( W );
@@ -133,8 +136,11 @@ class HessTestMetricAbs : public AWMetric
         result = sqr_Frobenius( 2 * A - transpose( A ) - W );
         return true;
     }
-    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
-                             MsqMatrix< 3, 3 >& wrt_A, MsqError& )
+    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A,
+                             const MsqMatrix< 3, 3 >& W,
+                             double& result,
+                             MsqMatrix< 3, 3 >& wrt_A,
+                             MsqError& )
     {
         result = sqr_Frobenius( 2 * A - transpose( A ) - W );
         wrt_A  = 10 * A - 8 * transpose( A ) - 4 * W + 2 * transpose( W );
@@ -170,7 +176,10 @@ class HessTestMetricAbs_2 : public AWMetric
         return true;
     }
 
-    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result, MsqMatrix< 2, 2 >& d,
+    bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                             const MsqMatrix< 2, 2 >&,
+                             double& result,
+                             MsqMatrix< 2, 2 >& d,
                              MsqError& err )
     {
         result = Frobenius( A );
@@ -178,8 +187,12 @@ class HessTestMetricAbs_2 : public AWMetric
         return true;
     }
 
-    bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >&, double& result, MsqMatrix< 2, 2 >& d,
-                             MsqMatrix< 2, 2 > d2[3], MsqError& err )
+    bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A,
+                             const MsqMatrix< 2, 2 >&,
+                             double& result,
+                             MsqMatrix< 2, 2 >& d,
+                             MsqMatrix< 2, 2 > d2[3],
+                             MsqError& err )
     {
         result = Frobenius( A );
         d      = A / result;
@@ -200,7 +213,10 @@ class HessTestMetricAbs_2 : public AWMetric
         return true;
     }
 
-    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result, MsqMatrix< 3, 3 >& d,
+    bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A,
+                             const MsqMatrix< 3, 3 >&,
+                             double& result,
+                             MsqMatrix< 3, 3 >& d,
                              MsqError& err )
     {
         result = Frobenius( A );
@@ -208,8 +224,12 @@ class HessTestMetricAbs_2 : public AWMetric
         return true;
     }
 
-    bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >&, double& result, MsqMatrix< 3, 3 >& d,
-                             MsqMatrix< 3, 3 > d2[6], MsqError& err )
+    bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A,
+                             const MsqMatrix< 3, 3 >&,
+                             double& result,
+                             MsqMatrix< 3, 3 >& d,
+                             MsqMatrix< 3, 3 > d2[6],
+                             MsqError& err )
     {
         result = Frobenius( A );
         d      = A / result;

@@ -71,8 +71,12 @@ class WeightReader : public WeightCalculator, private ExtraDataUser< WeightReade
   private:
     virtual void notify_patch_destroyed( WeightReaderData& data );
     virtual void notify_new_patch( PatchData& pd, WeightReaderData& data );
-    virtual void notify_sub_patch( PatchData& pd, WeightReaderData& data, PatchData& subpatch, const size_t* vertex_map,
-                                   const size_t* element_map, MsqError& err );
+    virtual void notify_sub_patch( PatchData& pd,
+                                   WeightReaderData& data,
+                                   PatchData& subpatch,
+                                   const size_t* vertex_map,
+                                   const size_t* element_map,
+                                   MsqError& err );
 
     std::string tagBaseName;
 };

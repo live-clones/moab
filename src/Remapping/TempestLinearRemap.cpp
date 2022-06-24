@@ -37,12 +37,19 @@
 
 // #define VERBOSE
 
-extern void BuildIntegrationArray( const Mesh& m_meshInput, const Mesh& m_meshOverlap,
-                                   const TriangularQuadratureRule& triquadrule, int ixFirstFace, int ixOverlapBegin,
-                                   int ixOverlapEnd, int nOrder, DataArray2D< double >& dIntArray );
+extern void BuildIntegrationArray( const Mesh& m_meshInput,
+                                   const Mesh& m_meshOverlap,
+                                   const TriangularQuadratureRule& triquadrule,
+                                   int ixFirstFace,
+                                   int ixOverlapBegin,
+                                   int ixOverlapEnd,
+                                   int nOrder,
+                                   DataArray2D< double >& dIntArray );
 
-extern void InvertFitArray_Corrected( const DataArray1D< double >& dConstraint, DataArray2D< double >& dFitArray,
-                                      DataArray1D< double >& dFitWeights, DataArray2D< double >& dFitArrayPlus );
+extern void InvertFitArray_Corrected( const DataArray1D< double >& dConstraint,
+                                      DataArray2D< double >& dFitArray,
+                                      DataArray1D< double >& dFitWeights,
+                                      DataArray2D< double >& dFitArrayPlus );
 
 /// <summary>
 ///     Face index and distance metric pair.
@@ -54,12 +61,19 @@ typedef std::pair< int, int > FaceDistancePair;
 /// </summary>
 typedef std::vector< FaceDistancePair > AdjacentFaceVector;
 
-extern void BuildFitArray( const Mesh& mesh, const TriangularQuadratureRule& triquadrule, int ixFirst,
-                           const AdjacentFaceVector& vecAdjFaces, int nOrder, int nFitWeightsExponent,
-                           const DataArray1D< double >& dConstraint, DataArray2D< double >& dFitArray,
+extern void BuildFitArray( const Mesh& mesh,
+                           const TriangularQuadratureRule& triquadrule,
+                           int ixFirst,
+                           const AdjacentFaceVector& vecAdjFaces,
+                           int nOrder,
+                           int nFitWeightsExponent,
+                           const DataArray1D< double >& dConstraint,
+                           DataArray2D< double >& dFitArray,
                            DataArray1D< double >& dFitWeights );
 
-extern void GetAdjacentFaceVectorByEdge( const Mesh& mesh, int iFaceInitial, int nRequiredFaceSetSize,
+extern void GetAdjacentFaceVectorByEdge( const Mesh& mesh,
+                                         int iFaceInitial,
+                                         int nRequiredFaceSetSize,
                                          AdjacentFaceVector& vecFaces );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -371,7 +385,8 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
 
 ///////////////////////////////////////////////////////////////////////////////
 //#define VERBOSE
-moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& srcVals, std::vector< double >& tgtVals,
+moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& srcVals,
+                                                      std::vector< double >& tgtVals,
                                                       bool transpose )
 {
     // Reset the source and target data first
@@ -456,20 +471,25 @@ moab::ErrorCode moab::TempestOnlineMap::ApplyWeights( std::vector< double >& src
 ///////////////////////////////////////////////////////////////////////////////
 
 extern void ForceConsistencyConservation3( const DataArray1D< double >& vecSourceArea,
-                                           const DataArray1D< double >& vecTargetArea, DataArray2D< double >& dCoeff,
-                                           bool fMonotone, bool fSparseConstraints = false );
+                                           const DataArray1D< double >& vecTargetArea,
+                                           DataArray2D< double >& dCoeff,
+                                           bool fMonotone,
+                                           bool fSparseConstraints = false );
 
 ///////////////////////////////////////////////////////////////////////////////
 
 extern void ForceIntArrayConsistencyConservation( const DataArray1D< double >& vecSourceArea,
                                                   const DataArray1D< double >& vecTargetArea,
-                                                  DataArray2D< double >& dCoeff, bool fMonotone );
+                                                  DataArray2D< double >& dCoeff,
+                                                  bool fMonotone );
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int >& dataGLLNodes,
                                                           const DataArray3D< double >& dataGLLJacobian,
-                                                          int nMonotoneType, bool fContinuousIn, bool fNoConservation )
+                                                          int nMonotoneType,
+                                                          bool fContinuousIn,
+                                                          bool fNoConservation )
 {
     // Order of the polynomial interpolant
     int nP = dataGLLNodes.GetRows();
@@ -606,17 +626,19 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             //     m_meshOverlap->vecFaceArea[ixOverlap + j] );
             // #endif
 
-            int nbEdges = faceOverlap.edges.size();
+            int nbEdges           = faceOverlap.edges.size();
             int nOverlapTriangles = 1;
-            Node center; // not used if nbEdges == 3
-            if (nbEdges > 3) { // decompose from center in this case
+            Node center;  // not used if nbEdges == 3
+            if( nbEdges > 3 )
+            {  // decompose from center in this case
                 nOverlapTriangles = nbEdges;
-                for (int k = 0; k < nbEdges; k++) {
-                    const Node &node = nodesOverlap[faceOverlap[k]];
-                    center = center + node;
+                for( int k = 0; k < nbEdges; k++ )
+                {
+                    const Node& node = nodesOverlap[faceOverlap[k]];
+                    center           = center + node;
                 }
                 center = center / nbEdges;
-                center = center.Normalized();// project back on sphere of radius 1
+                center = center.Normalized();  // project back on sphere of radius 1
             }
 
             Node node0, node1, node2;
@@ -625,23 +647,23 @@ void moab::TempestOnlineMap::LinearRemapSE4_Tempest_MOAB( const DataArray3D< int
             // Loop over all sub-triangles of this Overlap Face
             for( int k = 0; k < nOverlapTriangles; k++ )
             {
-                if (nbEdges == 3) // will come here only once, nOverlapTriangles == 1 in this case
+                if( nbEdges == 3 )  // will come here only once, nOverlapTriangles == 1 in this case
                 {
-                    node0 = nodesOverlap[faceOverlap[0]];
-                    node1 = nodesOverlap[faceOverlap[1]];
-                    node2 = nodesOverlap[faceOverlap[2]];
-                    dTriangleArea = CalculateFaceArea(faceOverlap, nodesOverlap);
+                    node0         = nodesOverlap[faceOverlap[0]];
+                    node1         = nodesOverlap[faceOverlap[1]];
+                    node2         = nodesOverlap[faceOverlap[2]];
+                    dTriangleArea = CalculateFaceArea( faceOverlap, nodesOverlap );
                 }
-                else // decompose polygon in triangles around the center
+                else  // decompose polygon in triangles around the center
                 {
-                    node0 = center;
-                    node1 = nodesOverlap[faceOverlap[k]];
-                    int k1 = (k + 1) % nbEdges;
-                    node2 = nodesOverlap[faceOverlap[k1]];
-                    nodes[0] = center;
-                    nodes[1] = node1;
-                    nodes[2] = node2;
-                    dTriangleArea = CalculateFaceArea(faceTri, nodes);
+                    node0         = center;
+                    node1         = nodesOverlap[faceOverlap[k]];
+                    int k1        = ( k + 1 ) % nbEdges;
+                    node2         = nodesOverlap[faceOverlap[k1]];
+                    nodes[0]      = center;
+                    nodes[1]      = node1;
+                    nodes[2]      = node2;
+                    dTriangleArea = CalculateFaceArea( faceTri, nodes );
                 }
                 // Coordinates of quadrature Node
                 for( int l = 0; l < TriQuadraturePoints; l++ )
@@ -892,9 +914,13 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
                                                         const DataArray3D< double >& dataGLLJacobianIn,
                                                         const DataArray3D< int >& dataGLLNodesOut,
                                                         const DataArray3D< double >& dataGLLJacobianOut,
-                                                        const DataArray1D< double >& dataNodalAreaOut, int nPin,
-                                                        int nPout, int nMonotoneType, bool fContinuousIn,
-                                                        bool fContinuousOut, bool fNoConservation )
+                                                        const DataArray1D< double >& dataNodalAreaOut,
+                                                        int nPin,
+                                                        int nPout,
+                                                        int nMonotoneType,
+                                                        bool fContinuousIn,
+                                                        bool fContinuousOut,
+                                                        bool fNoConservation )
 {
     // Triangular quadrature rule
     TriangularQuadratureRule triquadrule( 8 );
@@ -1015,17 +1041,19 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
 
             const Face& faceSecond = m_meshOutput->faces[ixSecond];
 
-            int nbEdges = faceOverlap.edges.size();
+            int nbEdges           = faceOverlap.edges.size();
             int nOverlapTriangles = 1;
-            Node center; // not used if nbEdges == 3
-            if (nbEdges > 3) { // decompose from center in this case
+            Node center;  // not used if nbEdges == 3
+            if( nbEdges > 3 )
+            {  // decompose from center in this case
                 nOverlapTriangles = nbEdges;
-                for (int k = 0; k < nbEdges; k++) {
-                    const Node &node = nodesOverlap[faceOverlap[k]];
-                    center = center + node;
+                for( int k = 0; k < nbEdges; k++ )
+                {
+                    const Node& node = nodesOverlap[faceOverlap[k]];
+                    center           = center + node;
                 }
                 center = center / nbEdges;
-                center = center.Normalized();// project back on sphere of radius 1
+                center = center.Normalized();  // project back on sphere of radius 1
             }
 
             Node node0, node1, node2;
@@ -1034,23 +1062,23 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_MOAB( const DataArray3D< int >
             // Loop over all sub-triangles of this Overlap Face
             for( int j = 0; j < nOverlapTriangles; j++ )
             {
-                if (nbEdges == 3) // will come here only once, nOverlapTriangles == 1 in this case
+                if( nbEdges == 3 )  // will come here only once, nOverlapTriangles == 1 in this case
                 {
-                    node0 = nodesOverlap[faceOverlap[0]];
-                    node1 = nodesOverlap[faceOverlap[1]];
-                    node2 = nodesOverlap[faceOverlap[2]];
-                    dTriArea = CalculateFaceArea(faceOverlap, nodesOverlap);
+                    node0    = nodesOverlap[faceOverlap[0]];
+                    node1    = nodesOverlap[faceOverlap[1]];
+                    node2    = nodesOverlap[faceOverlap[2]];
+                    dTriArea = CalculateFaceArea( faceOverlap, nodesOverlap );
                 }
-                else // decompose polygon in triangles around the center
+                else  // decompose polygon in triangles around the center
                 {
-                    node0 = center;
-                    node1 = nodesOverlap[faceOverlap[j]];
-                    int j1 = (j + 1) % nbEdges;
-                    node2 = nodesOverlap[faceOverlap[j1]];
+                    node0    = center;
+                    node1    = nodesOverlap[faceOverlap[j]];
+                    int j1   = ( j + 1 ) % nbEdges;
+                    node2    = nodesOverlap[faceOverlap[j1]];
                     nodes[0] = center;
                     nodes[1] = node1;
                     nodes[2] = node2;
-                    dTriArea = CalculateFaceArea(faceTri, nodes);
+                    dTriArea = CalculateFaceArea( faceTri, nodes );
                 }
 
                 for( int k = 0; k < triquadrule.GetPoints(); k++ )
@@ -1435,8 +1463,11 @@ void moab::TempestOnlineMap::LinearRemapGLLtoGLL2_Pointwise_MOAB( const DataArra
                                                                   const DataArray3D< int >& dataGLLNodesOut,
                                                                   const DataArray3D< double >& /*dataGLLJacobianOut*/,
                                                                   const DataArray1D< double >& dataNodalAreaOut,
-                                                                  int nPin, int nPout, int nMonotoneType,
-                                                                  bool fContinuousIn, bool fContinuousOut )
+                                                                  int nPin,
+                                                                  int nPout,
+                                                                  int nMonotoneType,
+                                                                  bool fContinuousIn,
+                                                                  bool fContinuousOut )
 {
     // Gauss-Lobatto quadrature within Faces
     DataArray1D< double > dGL;

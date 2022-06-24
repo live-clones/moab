@@ -45,7 +45,10 @@ Header file for the MBMesquite::ShapeQualityMetric class
 
 namespace MBMesquite
 {
-static inline bool condition_number_2d( const Vector3D temp_vec[], size_t e_ind, PatchData& pd, double& fval,
+static inline bool condition_number_2d( const Vector3D temp_vec[],
+                                        size_t e_ind,
+                                        PatchData& pd,
+                                        double& fval,
                                         MsqError& err )
 {
     // norm squared of J

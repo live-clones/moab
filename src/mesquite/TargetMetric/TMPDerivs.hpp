@@ -161,7 +161,8 @@ inline void set_scaled_2nd_deriv_norm_sqr_adj( MsqMatrix< 3, 3 > R[6], double al
  *         symmetric matrix.
  */
 template < unsigned D >
-inline void pluseq_scaled_outer_product_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double alpha,
+inline void pluseq_scaled_outer_product_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2],
+                                           double alpha,
                                            const MsqMatrix< D, D >& M );
 inline void pluseq_scaled_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& M )
 {
@@ -179,7 +180,8 @@ inline void pluseq_scaled_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, c
  *         symmetric matrix.
  */
 template < unsigned D >
-inline void set_scaled_outer_product_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double alpha,
+inline void set_scaled_outer_product_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2],
+                                        double alpha,
                                         const MsqMatrix< D, D >& M );
 
 inline void set_scaled_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& M )
@@ -197,7 +199,9 @@ inline void set_scaled_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, cons
  *\param R The 6 blocks of the upper triangular portion of a 9x9
  *         symmetric matrix.
  */
-inline void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A,
+inline void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6],
+                                             double alpha,
+                                             const MsqMatrix< 3, 3 >& A,
                                              const MsqMatrix< 3, 3 >& B );
 
 /**\brief \f$ R += \alpha \left( A \otimes B + B \otimes A \right) \f$
@@ -205,7 +209,9 @@ inline void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alph
  *\param R The 3 blocks of the upper triangular portion of a 4x4
  *         symmetric matrix.
  */
-inline void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const MsqMatrix< 2, 2 >& A,
+inline void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3],
+                                             double alpha,
+                                             const MsqMatrix< 2, 2 >& A,
                                              const MsqMatrix< 2, 2 >& B );
 
 /**\brief \f$ R = \alpha \left( A \otimes B + B \otimes A \right) \f$
@@ -213,7 +219,9 @@ inline void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alph
  *\param R The 6 blocks of the upper triangular portion of a 9x9
  *         symmetric matrix.
  */
-inline void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A,
+inline void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6],
+                                          double alpha,
+                                          const MsqMatrix< 3, 3 >& A,
                                           const MsqMatrix< 3, 3 >& B );
 
 /**\brief \f$ R = \alpha \left( A \otimes B + B \otimes A \right) \f$
@@ -221,7 +229,9 @@ inline void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, 
  *\param R The 3 blocks of the upper triangular portion of a 4x4
  *         symmetric matrix.
  */
-inline void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const MsqMatrix< 2, 2 >& A,
+inline void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3],
+                                          double alpha,
+                                          const MsqMatrix< 2, 2 >& A,
                                           const MsqMatrix< 2, 2 >& B );
 
 /**\brief \f$ R += \alpha (I \otimes I) \f$
@@ -258,7 +268,8 @@ inline void pluseq_outer_product_I( MsqMatrix< 3, 3 > R[6], const MsqMatrix< 3, 
  *         symmetric matrix.
  */
 template < unsigned D >
-inline void pluseq_scaled_sum_outer_product_I_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double alpha,
+inline void pluseq_scaled_sum_outer_product_I_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2],
+                                                 double alpha,
                                                  const MsqMatrix< D, D >& A );
 inline void pluseq_scaled_sum_outer_product_I( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A_in )
 {
@@ -293,13 +304,16 @@ inline void second_deriv_wrt_product_factor( MsqMatrix< 2, 2 > R[3], const MsqMa
  *
  * \f$ \psi(T) = \sqrt{ |T|^2 + 2 \tau } \f$
  */
-inline void set_scaled_2nd_deriv_wrt_psi( MsqMatrix< 2, 2 > R[3], const double alpha, const double psi,
+inline void set_scaled_2nd_deriv_wrt_psi( MsqMatrix< 2, 2 > R[3],
+                                          const double alpha,
+                                          const double psi,
                                           const MsqMatrix< 2, 2 >& T );
 
 /**\brief \f$  R = R + \alpha * Z \f$
  */
 template < unsigned D >
-inline void pluseq_scaled_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double alpha,
+inline void pluseq_scaled_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2],
+                             double alpha,
                              const MsqMatrix< D, D > Z[D * ( D + 1 ) / 2] );
 
 void set_scaled_I( MsqMatrix< 3, 3 > R[6], double alpha )
@@ -553,7 +567,9 @@ void set_scaled_outer_product_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double 
 #endif
 
 #ifdef MSQ_ROW_BASED_OUTER_PRODUCT
-void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A_in,
+void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6],
+                                      double alpha,
+                                      const MsqMatrix< 3, 3 >& A_in,
                                       const MsqMatrix< 3, 3 >& B )
 {
     // apply scalar first
@@ -584,7 +600,9 @@ void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, cons
     // block 1,2
     R[4] += transpose( A.row( 1 ) ) * B.row( 2 ) + transpose( B.row( 1 ) ) * A.row( 2 );
 }
-void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A_in,
+void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6],
+                                   double alpha,
+                                   const MsqMatrix< 3, 3 >& A_in,
                                    const MsqMatrix< 3, 3 >& B )
 {
     // apply scalar first
@@ -616,7 +634,9 @@ void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const M
     R[4] += transpose( B.row( 1 ) ) * A.row( 2 );
 }
 #else
-void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A_in,
+void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6],
+                                      double alpha,
+                                      const MsqMatrix< 3, 3 >& A_in,
                                       const MsqMatrix< 3, 3 >& B )
 {
     // apply scalar first
@@ -647,7 +667,9 @@ void pluseq_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, cons
     // block 1,2
     R[4] += A.column( 1 ) * transpose( B.column( 2 ) ) + B.column( 1 ) * transpose( A.column( 2 ) );
 }
-void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const MsqMatrix< 3, 3 >& A_in,
+void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6],
+                                   double alpha,
+                                   const MsqMatrix< 3, 3 >& A_in,
                                    const MsqMatrix< 3, 3 >& B )
 {
     // apply scalar first
@@ -681,7 +703,9 @@ void set_scaled_sum_outer_product( MsqMatrix< 3, 3 > R[6], double alpha, const M
 #endif
 
 #ifdef MSQ_ROW_BASED_OUTER_PRODUCT
-void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const MsqMatrix< 2, 2 >& A_in,
+void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3],
+                                      double alpha,
+                                      const MsqMatrix< 2, 2 >& A_in,
                                       const MsqMatrix< 2, 2 >& B )
 {
     // apply scalar first
@@ -701,7 +725,9 @@ void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, cons
     // block 0,1
     R[1] += transpose( A.row( 0 ) ) * B.row( 1 ) + transpose( B.row( 0 ) ) * A.row( 1 );
 }
-void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const MsqMatrix< 2, 2 >& A_in,
+void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3],
+                                   double alpha,
+                                   const MsqMatrix< 2, 2 >& A_in,
                                    const MsqMatrix< 2, 2 >& B )
 {
     // apply scalar first
@@ -721,7 +747,9 @@ void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const M
     R[1] += transpose( B.row( 0 ) ) * A.row( 1 );
 }
 #else
-void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const MsqMatrix< 2, 2 >& A_in,
+void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3],
+                                      double alpha,
+                                      const MsqMatrix< 2, 2 >& A_in,
                                       const MsqMatrix< 2, 2 >& B )
 {
     // apply scalar first
@@ -741,7 +769,9 @@ void pluseq_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, cons
     // block 0,1
     R[1] += A.column( 0 ) * transpose( B.column( 1 ) ) + B.column( 0 ) * transpose( A.column( 1 ) );
 }
-void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3], double alpha, const MsqMatrix< 2, 2 >& A_in,
+void set_scaled_sum_outer_product( MsqMatrix< 2, 2 > R[3],
+                                   double alpha,
+                                   const MsqMatrix< 2, 2 >& A_in,
                                    const MsqMatrix< 2, 2 >& B )
 {
     // apply scalar first
@@ -848,7 +878,8 @@ inline void pluseq_outer_product_I( MsqMatrix< 2, 2 > R[3], const MsqMatrix< 2, 
 #endif
 
 template < unsigned D >
-void pluseq_scaled_sum_outer_product_I_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double alpha,
+void pluseq_scaled_sum_outer_product_I_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2],
+                                          double alpha,
                                           const MsqMatrix< D, D >& A_in )
 {
     // apply scalar first
@@ -866,7 +897,9 @@ void second_deriv_wrt_product_factor_t( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], 
         R[i] = ( Z * R[i] ) * Zt;
 }
 
-void set_scaled_2nd_deriv_wrt_psi( MsqMatrix< 2, 2 > R[3], const double alpha, const double psi,
+void set_scaled_2nd_deriv_wrt_psi( MsqMatrix< 2, 2 > R[3],
+                                   const double alpha,
+                                   const double psi,
                                    const MsqMatrix< 2, 2 >& T )
 {
     const double t = trace( T );
@@ -879,7 +912,8 @@ void set_scaled_2nd_deriv_wrt_psi( MsqMatrix< 2, 2 > R[3], const double alpha, c
 }
 
 template < unsigned D >
-inline void pluseq_scaled( MsqMatrix< D, D > R[D * ( D + 1 ) / 2], double alpha,
+inline void pluseq_scaled( MsqMatrix< D, D > R[D * ( D + 1 ) / 2],
+                           double alpha,
                            const MsqMatrix< D, D > Z[D * ( D + 1 ) / 2] )
 {
     for( unsigned i = 0; i < D * ( D + 1 ) / 2; ++i )

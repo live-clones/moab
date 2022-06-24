@@ -40,7 +40,8 @@ class NCWriteHelper
 
     //! Initialize file: this is where all defines are done
     //! The VarData dimension ids are filled up after define
-    ErrorCode init_file( std::vector< std::string >& var_names, std::vector< std::string >& desired_names,
+    ErrorCode init_file( std::vector< std::string >& var_names,
+                         std::vector< std::string >& desired_names,
                          bool _append );
 
     //! Take the info from VarData and write first non-set variables, then set variables

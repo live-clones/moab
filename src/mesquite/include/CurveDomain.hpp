@@ -59,7 +59,9 @@ class CurveDomain
      *                 from the point \c from_here in the forward
      *                 direction along the curve.
      */
-    virtual void position_from_length( const double from_here[3], double length, double result_point[3],
+    virtual void position_from_length( const double from_here[3],
+                                       double length,
+                                       double result_point[3],
                                        MsqError& err ) = 0;
 };
 

@@ -59,7 +59,9 @@ inline bool TUntangleMu::eval( const MsqMatrix< DIM, DIM >& T, double& result, M
 }
 
 template < unsigned DIM >
-inline bool TUntangleMu::grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+inline bool TUntangleMu::grad( const MsqMatrix< DIM, DIM >& T,
+                               double& result,
+                               MsqMatrix< DIM, DIM >& deriv_wrt_T,
                                MsqError& err )
 {
     bool valid = mBaseMetric->evaluate_with_grad( T, result, deriv_wrt_T, err );
@@ -81,8 +83,11 @@ inline bool TUntangleMu::grad( const MsqMatrix< DIM, DIM >& T, double& result, M
 }
 
 template < unsigned DIM >
-inline bool TUntangleMu::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
-                               MsqMatrix< DIM, DIM >* second_wrt_T, MsqError& err )
+inline bool TUntangleMu::hess( const MsqMatrix< DIM, DIM >& T,
+                               double& result,
+                               MsqMatrix< DIM, DIM >& deriv_wrt_T,
+                               MsqMatrix< DIM, DIM >* second_wrt_T,
+                               MsqError& err )
 {
     bool valid = mBaseMetric->evaluate_with_hess( T, result, deriv_wrt_T, second_wrt_T, err );
     if( MSQ_CHKERR( err ) || !valid ) return false;

@@ -50,14 +50,20 @@ class VertexQM : public QualityMetric
     }
 
     /**\brief Returns list of vertex indices in PatchData */
-    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                  bool free_vertices_only, MsqError& err );
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd,
+                                                  std::vector< size_t >& handles,
+                                                  bool free_vertices_only,
+                                                  MsqError& err );
 
-    MESQUITE_EXPORT static void get_vertex_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                        bool free_vertices_only, MsqError& err );
+    MESQUITE_EXPORT static void get_vertex_evaluations( PatchData& pd,
+                                                        std::vector< size_t >& handles,
+                                                        bool free_vertices_only,
+                                                        MsqError& err );
 
-    MESQUITE_EXPORT static void get_vertex_corner_handles( PatchData& pd, size_t vertex_index,
-                                                           std::vector< size_t >& handles_out, MsqError& err );
+    MESQUITE_EXPORT static void get_vertex_corner_handles( PatchData& pd,
+                                                           size_t vertex_index,
+                                                           std::vector< size_t >& handles_out,
+                                                           MsqError& err );
 };
 
 }  // namespace MBMesquite

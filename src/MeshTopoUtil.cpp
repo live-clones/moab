@@ -58,7 +58,8 @@ ErrorCode MeshTopoUtil::get_average_position( Range& entities, double* avg_posit
 }
 
 //! given an entity, get its average position (avg vertex locations)
-ErrorCode MeshTopoUtil::get_average_position( const EntityHandle* entities, const int num_entities,
+ErrorCode MeshTopoUtil::get_average_position( const EntityHandle* entities,
+                                              const int num_entities,
                                               double* avg_position )
 {
     double dum_pos[3];
@@ -102,9 +103,12 @@ ErrorCode MeshTopoUtil::get_average_position( const EntityHandle entity, double*
 // that entity, ordered by connection through next higher dimension entities;
 // if any of the star entities is in only one entity of next higher dimension,
 // on_boundary is returned true
-ErrorCode MeshTopoUtil::star_entities( const EntityHandle star_center, std::vector< EntityHandle >& star_ents,
-                                       bool& bdy_entity, const EntityHandle starting_star_entity,
-                                       std::vector< EntityHandle >* star_entities_dp2, Range* star_candidates_dp2 )
+ErrorCode MeshTopoUtil::star_entities( const EntityHandle star_center,
+                                       std::vector< EntityHandle >& star_ents,
+                                       bool& bdy_entity,
+                                       const EntityHandle starting_star_entity,
+                                       std::vector< EntityHandle >* star_entities_dp2,
+                                       Range* star_candidates_dp2 )
 {
     // now start the traversal
     bdy_entity               = false;
@@ -184,9 +188,12 @@ ErrorCode MeshTopoUtil::star_entities( const EntityHandle star_center, std::vect
     return MB_SUCCESS;
 }
 
-ErrorCode MeshTopoUtil::star_next_entity( const EntityHandle star_center, const EntityHandle last_entity,
-                                          const EntityHandle last_dp1, Range* star_candidates_dp1,
-                                          EntityHandle& next_entity, EntityHandle& next_dp1 )
+ErrorCode MeshTopoUtil::star_next_entity( const EntityHandle star_center,
+                                          const EntityHandle last_entity,
+                                          const EntityHandle last_dp1,
+                                          Range* star_candidates_dp1,
+                                          EntityHandle& next_entity,
+                                          EntityHandle& next_dp1 )
 {
     // given a star_center, a last_entity (whose dimension should be 1 greater than center)
     // and last_dp1 (dimension 2 higher than center), returns the next star entity across
@@ -350,7 +357,9 @@ ErrorCode MeshTopoUtil::star_entities_nonmanifold( const EntityHandle star_entit
     // stars
     if( !dp2_manifold.empty() )
     {
-        for( Range::iterator rit = dp2_manifold.begin(); rit != dp2_manifold.end(); ++rit ) {}
+        for( Range::iterator rit = dp2_manifold.begin(); rit != dp2_manifold.end(); ++rit )
+        {
+        }
     }
 
     return MB_SUCCESS;
@@ -390,7 +399,10 @@ ErrorCode MeshTopoUtil::get_manifold( const EntityHandle star_entity, const int 
 }
 
 //! get "bridge" or "2nd order" adjacencies, going through dimension bridge_dim
-ErrorCode MeshTopoUtil::get_bridge_adjacencies( Range& from_entities, int bridge_dim, int to_dim, Range& to_ents,
+ErrorCode MeshTopoUtil::get_bridge_adjacencies( Range& from_entities,
+                                                int bridge_dim,
+                                                int to_dim,
+                                                Range& to_ents,
                                                 int num_layers )
 {
     Range bridge_ents, accum_layers, new_toents( from_entities );
@@ -433,7 +445,9 @@ ErrorCode MeshTopoUtil::get_bridge_adjacencies( Range& from_entities, int bridge
 }
 
 //! get "bridge" or "2nd order" adjacencies, going through dimension bridge_dim
-ErrorCode MeshTopoUtil::get_bridge_adjacencies( const EntityHandle from_entity, const int bridge_dim, const int to_dim,
+ErrorCode MeshTopoUtil::get_bridge_adjacencies( const EntityHandle from_entity,
+                                                const int bridge_dim,
+                                                const int to_dim,
                                                 Range& to_adjs )
 {
     // get pointer to connectivity for this entity
@@ -543,7 +557,8 @@ EntityHandle MeshTopoUtil::common_entity( const EntityHandle ent1, const EntityH
 //! \param parent The parent element
 //! \param child The child element
 //! \param opposite_element The index of the opposite element
-ErrorCode MeshTopoUtil::opposite_entity( const EntityHandle parent, const EntityHandle child,
+ErrorCode MeshTopoUtil::opposite_entity( const EntityHandle parent,
+                                         const EntityHandle child,
                                          EntityHandle& opposite_element )
 {
     // get the side no.
@@ -588,8 +603,10 @@ ErrorCode MeshTopoUtil::split_entities_manifold( Range& entities, Range& new_ent
     return MB_SUCCESS;
 }
 
-ErrorCode MeshTopoUtil::split_entities_manifold( EntityHandle* entities, const int num_entities,
-                                                 EntityHandle* new_entities, Range* fill_entities,
+ErrorCode MeshTopoUtil::split_entities_manifold( EntityHandle* entities,
+                                                 const int num_entities,
+                                                 EntityHandle* new_entities,
+                                                 Range* fill_entities,
                                                  EntityHandle* gowith_ents )
 {
     // split entities by duplicating them; splitting manifold means that there is at
@@ -599,7 +616,7 @@ ErrorCode MeshTopoUtil::split_entities_manifold( EntityHandle* entities, const i
 #define ITERATE_RANGE( range, it ) for( Range::iterator it = ( range ).begin(); ( it ) != ( range ).end(); ++( it ) )
 #define GET_CONNECT_DECL( ent, connect, num_connect )                                     \
     const EntityHandle* connect = NULL;                                                   \
-    int num_connect           = 0;                                                      \
+    int num_connect             = 0;                                                      \
     {                                                                                     \
         ErrorCode connect_result = mbImpl->get_connectivity( ent, connect, num_connect ); \
         if( MB_SUCCESS != connect_result ) return connect_result;                         \
@@ -734,7 +751,9 @@ ErrorCode MeshTopoUtil::split_entities_manifold( EntityHandle* entities, const i
     return result;
 }
 
-ErrorCode MeshTopoUtil::split_entity_nonmanifold( EntityHandle split_ent, Range& old_adjs, Range& new_adjs,
+ErrorCode MeshTopoUtil::split_entity_nonmanifold( EntityHandle split_ent,
+                                                  Range& old_adjs,
+                                                  Range& new_adjs,
                                                   EntityHandle& new_entity )
 {
     // split an entity into two entities; new entity gets explicit adj to new_adjs,
@@ -967,7 +986,10 @@ bool MeshTopoUtil::equivalent_entities( const EntityHandle entity, Range* equiv_
     result = mbImpl->get_adjacencies( connect, num_connect, mbImpl->dimension_from_handle( entity ), false, dum );
     dum.erase( entity );
 
-    if( NULL != equiv_ents ) { equiv_ents->swap( dum ); }
+    if( NULL != equiv_ents )
+    {
+        equiv_ents->swap( dum );
+    }
 
     if( !dum.empty() )
         return true;

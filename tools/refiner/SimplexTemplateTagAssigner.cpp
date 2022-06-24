@@ -42,8 +42,14 @@ SimplexTemplateTagAssigner::~SimplexTemplateTagAssigner() {}
  * world coordinates (3).
  * @param[in] t1 Pointer to endpoint 1 tag values.
  */
-void SimplexTemplateTagAssigner::operator()( const double* c0, const void* t0, EntityHandle h0, const double* cm,
-                                             void* tm, const double* c1, const void* t1, EntityHandle h1 )
+void SimplexTemplateTagAssigner::operator()( const double* c0,
+                                             const void* t0,
+                                             EntityHandle h0,
+                                             const double* cm,
+                                             void* tm,
+                                             const double* c1,
+                                             const void* t1,
+                                             EntityHandle h1 )
 {
     double c0m_squared = 0.;
     double c01_squared = 0.;

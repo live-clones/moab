@@ -30,7 +30,10 @@
 using namespace moab;
 
 template < typename T >
-ErrorCode get_vartag_data( moab::Interface* mbCore, Tag tag, moab::Range& sets, int& out_data_size,
+ErrorCode get_vartag_data( moab::Interface* mbCore,
+                           Tag tag,
+                           moab::Range& sets,
+                           int& out_data_size,
                            std::vector< T >& data )
 {
     int* tag_sizes        = new int[sets.size()];
@@ -106,7 +109,10 @@ int main( int argc, char* argv[] )
 
     moab::Interface* mbCore = new( std::nothrow ) moab::Core;
 
-    if( NULL == mbCore ) { return 1; }
+    if( NULL == mbCore )
+    {
+        return 1;
+    }
 
     // Set the read options for parallel file loading
     const std::string partition_set_name = "PARALLEL_PARTITION";
@@ -123,7 +129,10 @@ int main( int argc, char* argv[] )
 
         // Open an output file
         NcFile ncMap( scripfile.c_str(), NcFile::Replace, NULL, 0, NcFile::Offset64Bits );
-        if( !ncMap.is_valid() ) { _EXCEPTION1( "Unable to open output map file \"%s\"", scripfile.c_str() ); }
+        if( !ncMap.is_valid() )
+        {
+            _EXCEPTION1( "Unable to open output map file \"%s\"", scripfile.c_str() );
+        }
 
         {
             // NetCDF-SCRIP Global Attributes

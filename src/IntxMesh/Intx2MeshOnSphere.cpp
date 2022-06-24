@@ -71,9 +71,15 @@ double Intx2MeshOnSphere::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
 /* the elements are convex for sure, then do a gnomonic projection of both,
  *  compute intersection in the plane, then go back to the sphere for the points
  *  */
-ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P,
-                                                                  int& nP, double& area, int markb[MAXEDGES],
-                                                                  int markr[MAXEDGES], int& nsBlue, int& nsTgt,
+ErrorCode Intx2MeshOnSphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt,
+                                                                  EntityHandle src,
+                                                                  double* P,
+                                                                  int& nP,
+                                                                  double& area,
+                                                                  int markb[MAXEDGES],
+                                                                  int markr[MAXEDGES],
+                                                                  int& nsBlue,
+                                                                  int& nsTgt,
                                                                   bool check_boxes_first )
 {
     // the area will be used from now on, to see how well we fill the target cell with polygons
@@ -802,7 +808,7 @@ ErrorCode Intx2MeshOnSphere::build_processor_euler_boxes( EntityHandle euler_set
     {
         std::vector< double > allBoxes_tmp( 24 * parcomm->proc_config().proc_size() );
         mpi_err  = MPI_Allgather( &allBoxes[24 * my_rank], 6, MPI_DOUBLE, &allBoxes_tmp[0], 24, MPI_DOUBLE,
-                                 parcomm->proc_config().proc_comm() );
+                                  parcomm->proc_config().proc_comm() );
         allBoxes = allBoxes_tmp;
     }
 #endif
@@ -849,14 +855,14 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
     if( 1 == parcomm->proc_config().proc_size() )
     {
         // move all initial cells to coverage set
-        rval = mb->add_entities(covering_set, meshCells); MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
-        // if point cloud source, add vertices 
-        if (0 == meshCells.size() || max_edges_1 == 0)
+        rval = mb->add_entities( covering_set, meshCells );MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
+        // if point cloud source, add vertices
+        if( 0 == meshCells.size() || max_edges_1 == 0 )
         {
             // add vertices from the source set
             Range verts;
             rval = mb->get_entities_by_dimension( initial_distributed_set, 0, verts );MB_CHK_SET_ERR( rval, "can't get vertices from mesh set" );
-            rval = mb->add_entities(covering_set, verts); MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
+            rval = mb->add_entities( covering_set, verts );MB_CHK_SET_ERR( rval, "can't add primary ents to covering set" );
         }
         return MB_SUCCESS;
     }
@@ -868,7 +874,7 @@ ErrorCode Intx2MeshOnSphere::construct_covering_set( EntityHandle& initial_distr
 
     // this information needs to be forwarded to coverage mesh, if this mesh was already migrated
     // from somewhere else
-        // look at the value of orgSendProcTag for one mesh cell; if -1, no need to forward that; if
+    // look at the value of orgSendProcTag for one mesh cell; if -1, no need to forward that; if
     // !=-1, we know that this mesh was migrated, we need to find out more about origin of cell
     int orig_sender      = -1;
     EntityHandle oneCell = 0;

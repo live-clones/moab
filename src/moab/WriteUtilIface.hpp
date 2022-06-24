@@ -54,8 +54,12 @@ class WriteUtilIface
     //! \param start_node_id Starting value for node ids
     //! \param arrays Pointers to memory where coordinate data will be written
     //! \return status Return status
-    virtual ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const Range& entities,
-                                       Tag node_id_tag, const int start_node_id, std::vector< double* >& arrays ) = 0;
+    virtual ErrorCode get_node_coords( const int num_arrays,
+                                       const int num_nodes,
+                                       const Range& entities,
+                                       Tag node_id_tag,
+                                       const int start_node_id,
+                                       std::vector< double* >& arrays ) = 0;
 
     /** Get array of coordinate values for nodes
      *
@@ -75,8 +79,10 @@ class WriteUtilIface
      *\param output_array The memory in which to write the node coordinates.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_node_coords( const int which_array, Range::const_iterator begin,
-                                       const Range::const_iterator& end, const size_t output_size,
+    virtual ErrorCode get_node_coords( const int which_array,
+                                       Range::const_iterator begin,
+                                       const Range::const_iterator& end,
+                                       const size_t output_size,
                                        double* const output_array ) = 0;
 
     //! Given information about elements to be written and a pointer to memory
@@ -91,8 +97,13 @@ class WriteUtilIface
     //! \param start_element_id Starting value for element ids
     //! \param array Pointer to memory where connectivity data will be written
     //! \return status Return status
-    virtual ErrorCode get_element_connect( const int num_elements, const int verts_per_element, Tag node_id_tag,
-                                           const Range& entities, Tag element_id_tag, int start_element_id, int* array,
+    virtual ErrorCode get_element_connect( const int num_elements,
+                                           const int verts_per_element,
+                                           Tag node_id_tag,
+                                           const Range& entities,
+                                           Tag element_id_tag,
+                                           int start_element_id,
+                                           int* array,
                                            bool add_sizes = false ) = 0;
 
     /** Get connectivity for elements
@@ -123,9 +134,13 @@ class WriteUtilIface
      *\param add_sizes If true, writes size of connect array before connectivity in array
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_element_connect( Range::const_iterator begin, const Range::const_iterator& end,
-                                           const int vertices_per_elem, Tag node_id_tag, const size_t array_size,
-                                           int* const element_array, bool add_sizes = false ) = 0;
+    virtual ErrorCode get_element_connect( Range::const_iterator begin,
+                                           const Range::const_iterator& end,
+                                           const int vertices_per_elem,
+                                           Tag node_id_tag,
+                                           const size_t array_size,
+                                           int* const element_array,
+                                           bool add_sizes = false ) = 0;
 
     /** Get connectivity for elements
      *
@@ -152,8 +167,10 @@ class WriteUtilIface
      *                    connectivity list.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_element_connect( Range::const_iterator begin, const Range::const_iterator& end,
-                                           const int vertices_per_elem, const size_t array_size,
+    virtual ErrorCode get_element_connect( Range::const_iterator begin,
+                                           const Range::const_iterator& end,
+                                           const int vertices_per_elem,
+                                           const size_t array_size,
                                            EntityHandle* const element_array ) = 0;
 
     /** Get poly (polygon or polyhedron) connectivity size
@@ -163,7 +180,8 @@ class WriteUtilIface
      *              For the specified range of polyhedra.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_poly_connect_size( Range::const_iterator begin, const Range::const_iterator& end,
+    virtual ErrorCode get_poly_connect_size( Range::const_iterator begin,
+                                             const Range::const_iterator& end,
                                              int& connectivity_size ) = 0;
 
     /** Get poly (polygon or polyhedron) connectivity.
@@ -206,16 +224,22 @@ class WriteUtilIface
      *                          presumably want to pass to the next call.)
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_poly_connect( Range::const_iterator& iter, const Range::const_iterator& end,
-                                        const Tag node_id_tag, size_t& element_array_len, int* const element_array,
-                                        size_t& index_array_len, int* const index_array, int& index_offset ) = 0;
+    virtual ErrorCode get_poly_connect( Range::const_iterator& iter,
+                                        const Range::const_iterator& end,
+                                        const Tag node_id_tag,
+                                        size_t& element_array_len,
+                                        int* const element_array,
+                                        size_t& index_array_len,
+                                        int* const index_array,
+                                        int& index_offset ) = 0;
 
     //! Given elements to be written, gather all the nodes which define those elements
     //! \param elements Range of elements to be written
     //! \param node_bit_mark_tag Bit tag to use to identify nodes
     //! \param nodes Range of nodes gathered from elements (returned)
     //! \return status Return status
-    virtual ErrorCode gather_nodes_from_elements( const Range& elements, const Tag node_bit_mark_tag,
+    virtual ErrorCode gather_nodes_from_elements( const Range& elements,
+                                                  const Tag node_bit_mark_tag,
                                                   Range& nodes ) = 0;
 
     //! assign ids to input entities starting with start_id, written to id_tag
@@ -275,8 +299,10 @@ class WriteUtilIface
      *\param include_variable_length_tags If false, return only fixed-length
      *                                    tags.
      */
-    virtual ErrorCode get_tag_list( std::vector< Tag >& result_list, const Tag* user_tag_list = 0,
-                                    int user_tag_list_length = 0, bool include_variable_length_tags = true ) = 0;
+    virtual ErrorCode get_tag_list( std::vector< Tag >& result_list,
+                                    const Tag* user_tag_list          = 0,
+                                    int user_tag_list_length          = 0,
+                                    bool include_variable_length_tags = true ) = 0;
 
     enum EntityListType
     {
@@ -308,10 +334,12 @@ class WriteUtilIface
      *          structured mesh and therefore do not have explicit storage.
      *        MB_TYPE_OUT_OF_RANGE if called for vertices.
      */
-    virtual ErrorCode get_entity_list_pointers( Range::const_iterator query_begin, Range::const_iterator query_end,
+    virtual ErrorCode get_entity_list_pointers( Range::const_iterator query_begin,
+                                                Range::const_iterator query_end,
                                                 EntityHandle const** output_pointer_array,
-                                                EntityListType relation = CONTENTS, int* lengths = 0,
-                                                unsigned char* flags = 0 ) = 0;
+                                                EntityListType relation = CONTENTS,
+                                                int* lengths            = 0,
+                                                unsigned char* flags    = 0 ) = 0;
 
     /*\brief Get pointers to internal storage of entity data
      *
@@ -335,10 +363,12 @@ class WriteUtilIface
      *          structured mesh and therefore do not have explicit storage.
      *        MB_TYPE_OUT_OF_RANGE if called for vertices.
      */
-    virtual ErrorCode get_entity_list_pointers( EntityHandle const* entities, int num_entities,
+    virtual ErrorCode get_entity_list_pointers( EntityHandle const* entities,
+                                                int num_entities,
                                                 EntityHandle const** output_pointer_array,
-                                                EntityListType relation = CONTENTS, int* lengths = 0,
-                                                unsigned char* flags = 0 ) = 0;
+                                                EntityListType relation = CONTENTS,
+                                                int* lengths            = 0,
+                                                unsigned char* flags    = 0 ) = 0;
 };
 
 template < typename T >

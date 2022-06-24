@@ -35,8 +35,12 @@ const char CENTROID_NAME[] = "centroid";                                // tag s
 //! into 10 vertical strips MBQUAD_INT/10 elements wide.  Tag elements,
 //! vertices and/or sets with ID in [1,10] stored in ID_TAG_NAME
 //! tag.  Write new mesh to TEST_FILE.
-void create_mesh( bool create_element_sets, bool create_vertex_sets, bool tag_elements_with_id,
-                  bool tag_vertices_with_id, const char* adj_elem_tag_name = 0, bool var_len_adj_elems = false );
+void create_mesh( bool create_element_sets,
+                  bool create_vertex_sets,
+                  bool tag_elements_with_id,
+                  bool tag_vertices_with_id,
+                  const char* adj_elem_tag_name = 0,
+                  bool var_len_adj_elems        = false );
 // Given a list of vertices adjacent to a quad strip, identify it as one of the
 // NUM_SETS strips of quads written by create_mesh.
 int identify_set( Interface& mb, const Range& verts );
@@ -380,8 +384,12 @@ void test_read_nodes_common( int num_read_sets, bool blocked )
 //! into 10 vertical strips MBQUAD_INT/10 elements wide.  Tag elements,
 //! vertices and/or sets with ID in [1,10] stored in ID_TAG_NAME
 //! tag.  Write new mesh to TEST_FILE.
-void create_mesh( bool create_element_sets, bool create_vertex_sets, bool tag_elements_with_id,
-                  bool tag_vertices_with_id, const char* adj_elem_tag_name, bool var_len_adj_elems )
+void create_mesh( bool create_element_sets,
+                  bool create_vertex_sets,
+                  bool tag_elements_with_id,
+                  bool tag_vertices_with_id,
+                  const char* adj_elem_tag_name,
+                  bool var_len_adj_elems )
 {
     Core moab;
     Interface& mb = moab;
@@ -588,7 +596,10 @@ void test_read_two_sets_elems()
 
     int id1 = identify_set( mb, sets.front() );
     int id2 = identify_set( mb, sets.back() );
-    if( id1 == ids[0] ) { CHECK_EQUAL( ids[1], id2 ); }
+    if( id1 == ids[0] )
+    {
+        CHECK_EQUAL( ids[1], id2 );
+    }
     else
     {
         CHECK_EQUAL( ids[1], id1 );
@@ -997,7 +1008,10 @@ static void check_children( bool contents, GatherTestMode mode, Interface& mb, i
             rval = mb.get_entities_by_type( set, MBENTITYSET, children );
         else
             rval = mb.get_child_meshsets( set, children );CHECK_ERR( rval );
-        if( i == 1 ) { CHECK( children.empty() ); }
+        if( i == 1 )
+        {
+            CHECK( children.empty() );
+        }
         else
         {
             CHECK_EQUAL( 1, (int)children.size() );

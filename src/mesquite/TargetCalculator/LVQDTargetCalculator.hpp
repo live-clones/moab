@@ -53,7 +53,9 @@ namespace MBMesquite
 class LVQDTargetCalculator : public TargetCalculator
 {
   public:
-    LVQDTargetCalculator( TargetCalculator* lambda_source, TargetCalculator* V_source, TargetCalculator* Q_source,
+    LVQDTargetCalculator( TargetCalculator* lambda_source,
+                          TargetCalculator* V_source,
+                          TargetCalculator* Q_source,
                           TargetCalculator* delta_source );
 
     ~LVQDTargetCalculator();
@@ -69,8 +71,15 @@ class LVQDTargetCalculator : public TargetCalculator
   private:
     int add_source( TargetCalculator* source );
 
-    bool evaluate_guide_2D( PatchData& pd, size_t element, Sample sample, int idx, double& lambda, MsqMatrix< 3, 2 >& V,
-                            MsqMatrix< 2, 2 >& Q, MsqMatrix< 2, 2 >& delta, MsqError& err );
+    bool evaluate_guide_2D( PatchData& pd,
+                            size_t element,
+                            Sample sample,
+                            int idx,
+                            double& lambda,
+                            MsqMatrix< 3, 2 >& V,
+                            MsqMatrix< 2, 2 >& Q,
+                            MsqMatrix< 2, 2 >& delta,
+                            MsqError& err );
 
     TargetCalculator* uniqueGuides[4];    //!< Up to 4 unique target sources
     int numUniqueGuides;                  //!< Number of unique target sources

@@ -47,8 +47,14 @@ bool debug_splits          = false;
 
 // will compute intersection between a segment and slice of a plane
 // output is the intersection point
-bool intersect_segment_and_plane_slice( CartVect& from, CartVect& to, CartVect& p1, CartVect& p2, CartVect&,
-                                        CartVect& normPlane, CartVect& intx_point, double& parPos )
+bool intersect_segment_and_plane_slice( CartVect& from,
+                                        CartVect& to,
+                                        CartVect& p1,
+                                        CartVect& p2,
+                                        CartVect&,
+                                        CartVect& normPlane,
+                                        CartVect& intx_point,
+                                        double& parPos )
 {
     //
     // plane eq is normPlane % r + d = 0, or normPlane % r - normPlane%p1 = 0
@@ -89,7 +95,10 @@ bool intersect_segment_and_plane_slice( CartVect& from, CartVect& to, CartVect& 
     return true;
 }
 
-ErrorCode area_coordinates( Interface* mbi, EntityHandle tri, CartVect& pnt, double* area_coord,
+ErrorCode area_coordinates( Interface* mbi,
+                            EntityHandle tri,
+                            CartVect& pnt,
+                            double* area_coord,
                             EntityHandle& boundary_handle )
 {
 
@@ -139,7 +148,10 @@ ErrorCode area_coordinates( Interface* mbi, EntityHandle tri, CartVect& pnt, dou
     CartVect v2( P[2] - P[0] );
 
     double areaDouble = ( v1 * v2 ).length();  // the same for CartVect
-    if( areaDouble < tolerance_segment * tolerance_segment ) { MBERRORR( MB_FAILURE, "area of triangle too small" ); }
+    if( areaDouble < tolerance_segment * tolerance_segment )
+    {
+        MBERRORR( MB_FAILURE, "area of triangle too small" );
+    }
     area_coord[0] = ( r1 * r2 ).length() / areaDouble;
     area_coord[1] = ( r2 * r0 ).length() / areaDouble;
     area_coord[2] = ( r0 * r1 ).length() / areaDouble;
@@ -230,7 +242,10 @@ ErrorCode FBEngine::Init()
 
         ErrorCode rval = _my_geomTopoTool->find_geomsets( _my_gsets );
         assert( rval == MB_SUCCESS );
-        if( MB_SUCCESS != rval ) { return rval; }
+        if( MB_SUCCESS != rval )
+        {
+            return rval;
+        }
 
         rval = split_quads();
         assert( rval == MB_SUCCESS );
@@ -445,7 +460,10 @@ ErrorCode FBEngine::createEntSet( int isList, EntityHandle* pSet )
 ErrorCode FBEngine::getEntities( EntityHandle set_handle, int entity_type, Range& gentities )
 {
     int i;
-    if( 0 > entity_type || 4 < entity_type ) { return MB_FAILURE; }
+    if( 0 > entity_type || 4 < entity_type )
+    {
+        return MB_FAILURE;
+    }
     else if( entity_type < 4 )
     {                                                            // 4 means all entities
         gentities = _my_geomTopoTool->geoRanges()[entity_type];  // all from root set!
@@ -528,8 +546,13 @@ ErrorCode FBEngine::getEntType( EntityHandle gent, int* type )
     *type = -1;  // failure
     return MB_FAILURE;
 }
-ErrorCode FBEngine::getEntBoundBox( EntityHandle gent, double* min_x, double* min_y, double* min_z, double* max_x,
-                                    double* max_y, double* max_z )
+ErrorCode FBEngine::getEntBoundBox( EntityHandle gent,
+                                    double* min_x,
+                                    double* min_y,
+                                    double* min_z,
+                                    double* max_x,
+                                    double* max_y,
+                                    double* max_z )
 {
     ErrorCode rval;
     int type;
@@ -579,8 +602,13 @@ ErrorCode FBEngine::getEntBoundBox( EntityHandle gent, double* min_x, double* mi
 
     return MB_SUCCESS;
 }
-ErrorCode FBEngine::getEntClosestPt( EntityHandle this_gent, double near_x, double near_y, double near_z, double* on_x,
-                                     double* on_y, double* on_z )
+ErrorCode FBEngine::getEntClosestPt( EntityHandle this_gent,
+                                     double near_x,
+                                     double near_y,
+                                     double near_z,
+                                     double* on_x,
+                                     double* on_y,
+                                     double* on_z )
 {
     ErrorCode rval;
     int type;
@@ -638,13 +666,19 @@ ErrorCode FBEngine::getVtxCoord( EntityHandle vertex_handle, double* x0, double*
     ErrorCode rval = getEntType( vertex_handle, &type );
     MBERRORR( rval, "Failed to get entity type in getVtxCoord." );
 
-    if( type != 0 ) { MBERRORR( MB_FAILURE, "Entity is not a vertex type." ); }
+    if( type != 0 )
+    {
+        MBERRORR( MB_FAILURE, "Entity is not a vertex type." );
+    }
 
     Range entities;
     rval = MBI->get_entities_by_type( vertex_handle, MBVERTEX, entities );
     MBERRORR( rval, "can't get nodes in vertex set." );
 
-    if( entities.size() != 1 ) { MBERRORR( MB_FAILURE, "Vertex has multiple points." ); }
+    if( entities.size() != 1 )
+    {
+        MBERRORR( MB_FAILURE, "Vertex has multiple points." );
+    }
     double coords[3];
     EntityHandle node = entities[0];
     rval              = MBI->get_coords( &node, 1, coords );
@@ -676,8 +710,13 @@ ErrorCode FBEngine::gsubtract( EntityHandle entity_set_1, EntityHandle entity_se
     return rval;
 }
 
-ErrorCode FBEngine::getEntNrmlXYZ( EntityHandle entity_handle, double x, double y, double z, double* nrml_i,
-                                   double* nrml_j, double* nrml_k )
+ErrorCode FBEngine::getEntNrmlXYZ( EntityHandle entity_handle,
+                                   double x,
+                                   double y,
+                                   double z,
+                                   double* nrml_i,
+                                   double* nrml_j,
+                                   double* nrml_k )
 {
     // just do for surface and volume
     int type;
@@ -727,10 +766,16 @@ ErrorCode FBEngine::getEntNrmlXYZ( EntityHandle entity_handle, double x, double 
     return MB_SUCCESS;
 }
 
-ErrorCode FBEngine::getPntRayIntsct( double x, double y, double z, double dir_x, double dir_y, double dir_z,
+ErrorCode FBEngine::getPntRayIntsct( double x,
+                                     double y,
+                                     double z,
+                                     double dir_x,
+                                     double dir_y,
+                                     double dir_z,
                                      std::vector< EntityHandle >& intersect_entity_handles,
                                      /* int storage_order,*/
-                                     std::vector< double >& intersect_coords, std::vector< double >& param_coords )
+                                     std::vector< double >& intersect_coords,
+                                     std::vector< double >& param_coords )
 {
     // this is pretty cool
     // we will return only surfaces (gentities )
@@ -904,7 +949,9 @@ ErrorCode FBEngine::createTag( const char* tag_name, int tag_size, int tag_type,
     return MB_SUCCESS;
 }
 
-ErrorCode FBEngine::getArrData( const EntityHandle* entity_handles, int entity_handles_size, Tag tag_handle,
+ErrorCode FBEngine::getArrData( const EntityHandle* entity_handles,
+                                int entity_handles_size,
+                                Tag tag_handle,
                                 void* tag_values_out )
 {
     // responsibility of the user to have tag_values_out properly allocated
@@ -912,7 +959,9 @@ ErrorCode FBEngine::getArrData( const EntityHandle* entity_handles, int entity_h
     return MBI->tag_get_data( tag_handle, entity_handles, entity_handles_size, tag_values_out );
 }
 
-ErrorCode FBEngine::setArrData( const EntityHandle* entity_handles, int entity_handles_size, Tag tag_handle,
+ErrorCode FBEngine::setArrData( const EntityHandle* entity_handles,
+                                int entity_handles_size,
+                                Tag tag_handle,
                                 const void* tag_values )
 {
     // responsibility of the user to have tag_values_out properly allocated
@@ -1011,16 +1060,38 @@ ErrorCode FBEngine::getEntNrmlSense( EntityHandle /*face*/, EntityHandle /*regio
     return MB_NOT_IMPLEMENTED;  // not implemented
 }
 
-ErrorCode FBEngine::getEgEvalXYZ( EntityHandle /*edge*/, double /*x*/, double /*y*/, double /*z*/, double& /*on_x*/,
-                                  double& /*on_y*/, double& /*on_z*/, double& /*tngt_i*/, double& /*tngt_j*/,
-                                  double& /*tngt_k*/, double& /*cvtr_i*/, double& /*cvtr_j*/, double& /*cvtr_k*/ )
+ErrorCode FBEngine::getEgEvalXYZ( EntityHandle /*edge*/,
+                                  double /*x*/,
+                                  double /*y*/,
+                                  double /*z*/,
+                                  double& /*on_x*/,
+                                  double& /*on_y*/,
+                                  double& /*on_z*/,
+                                  double& /*tngt_i*/,
+                                  double& /*tngt_j*/,
+                                  double& /*tngt_k*/,
+                                  double& /*cvtr_i*/,
+                                  double& /*cvtr_j*/,
+                                  double& /*cvtr_k*/ )
 {
     return MB_NOT_IMPLEMENTED;  // not implemented
 }
-ErrorCode FBEngine::getFcEvalXYZ( EntityHandle /*face*/, double /*x*/, double /*y*/, double /*z*/, double& /*on_x*/,
-                                  double& /*on_y*/, double& /*on_z*/, double& /*nrml_i*/, double& /*nrml_j*/,
-                                  double& /*nrml_k*/, double& /*cvtr1_i*/, double& /*cvtr1_j*/, double& /*cvtr1_k*/,
-                                  double& /*cvtr2_i*/, double& /*cvtr2_j*/, double& /*cvtr2_k*/ )
+ErrorCode FBEngine::getFcEvalXYZ( EntityHandle /*face*/,
+                                  double /*x*/,
+                                  double /*y*/,
+                                  double /*z*/,
+                                  double& /*on_x*/,
+                                  double& /*on_y*/,
+                                  double& /*on_z*/,
+                                  double& /*nrml_i*/,
+                                  double& /*nrml_j*/,
+                                  double& /*nrml_k*/,
+                                  double& /*cvtr1_i*/,
+                                  double& /*cvtr1_j*/,
+                                  double& /*cvtr1_k*/,
+                                  double& /*cvtr2_i*/,
+                                  double& /*cvtr2_j*/,
+                                  double& /*cvtr2_k*/ )
 {
     return MB_NOT_IMPLEMENTED;  // not implemented
 }
@@ -1138,8 +1209,12 @@ ErrorCode FBEngine::isEntAdj( EntityHandle entity1, EntityHandle entity2, bool& 
     return MB_SUCCESS;
 }
 
-ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector< double >& xyz, double* direction,
-                                                  int closed, double min_dot, EntityHandle& oNewFace )
+ErrorCode FBEngine::split_surface_with_direction( EntityHandle face,
+                                                  std::vector< double >& xyz,
+                                                  double* direction,
+                                                  int closed,
+                                                  double min_dot,
+                                                  EntityHandle& oNewFace )
 {
 
     // first of all, find all intersection points (piercing in the face along the direction)
@@ -1373,7 +1448,10 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
             // EntityHandle vertex1 = nodesAlongPolyline[i];// irrespective of the entity type i,
             // we already have the vertex there
             EntityType et2 = _mbImpl->type_from_handle( e2 );
-            if( et2 == MBVERTEX ) { nodesAlongPolyline.push_back( e2 ); }
+            if( et2 == MBVERTEX )
+            {
+                nodesAlongPolyline.push_back( e2 );
+            }
             else  // if (et2==MBEDGE)
             {
                 CartVect coord_vert = points[j + 1];
@@ -1432,8 +1510,10 @@ ErrorCode FBEngine::split_surface_with_direction( EntityHandle face, std::vector
  *  // the entities are now only nodes and edges, no triangles!!!
  *  the first and last ones are also nodes for sure
  */
-ErrorCode FBEngine::split_surface( EntityHandle face, std::vector< EntityHandle >& chainedEdges,
-                                   std::vector< EntityHandle >& splittingNodes, EntityHandle& newFace )
+ErrorCode FBEngine::split_surface( EntityHandle face,
+                                   std::vector< EntityHandle >& chainedEdges,
+                                   std::vector< EntityHandle >& splittingNodes,
+                                   EntityHandle& newFace )
 {
     // use now the chained edges to create a new face (loop or clean split)
     // use a fill to determine the new sets, up to the polyline
@@ -1597,7 +1677,9 @@ ErrorCode FBEngine::smooth_new_intx_points( EntityHandle face, std::vector< Enti
 // we will use the fact that the splitting edge is oriented right now
 // to the left will be new face, to the right, old face
 // (to the left, positively oriented triangles)
-ErrorCode FBEngine::separate( EntityHandle face, std::vector< EntityHandle >& chainedEdges, Range& first,
+ErrorCode FBEngine::separate( EntityHandle face,
+                              std::vector< EntityHandle >& chainedEdges,
+                              Range& first,
                               Range& second )
 {
     // Range unaffectedTriangles = subtract(iniTriangles, _piercedTriangles);
@@ -1910,7 +1992,10 @@ ErrorCode FBEngine::BreakTriangle( EntityHandle, EntityHandle, EntityHandle, Ent
     return MB_FAILURE;
 }
 // case 2, n1 and n2 on boundary
-ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHandle e2, EntityHandle n1,
+ErrorCode FBEngine::BreakTriangle2( EntityHandle tri,
+                                    EntityHandle e1,
+                                    EntityHandle e2,
+                                    EntityHandle n1,
                                     EntityHandle n2 )  // nodesAlongPolyline are on entities!
 {
     // we have the nodes, we just need to reconnect to form new triangles
@@ -2036,8 +2121,12 @@ ErrorCode FBEngine::BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHan
 // vertices, edges, triangles
 // it could be just a list of vertices (easiest case to handle after)
 
-ErrorCode FBEngine::compute_intersection_points( EntityHandle&, EntityHandle from, EntityHandle to, CartVect& Dir,
-                                                 std::vector< CartVect >& points, std::vector< EntityHandle >& entities,
+ErrorCode FBEngine::compute_intersection_points( EntityHandle&,
+                                                 EntityHandle from,
+                                                 EntityHandle to,
+                                                 CartVect& Dir,
+                                                 std::vector< CartVect >& points,
+                                                 std::vector< EntityHandle >& entities,
                                                  std::vector< EntityHandle >& triangles )
 {
     // keep a stack of triangles to process, and do not add those already processed
@@ -2473,7 +2562,9 @@ ErrorCode FBEngine::split_edge_at_mesh_node( EntityHandle edge, EntityHandle nod
     return MB_SUCCESS;
 }
 
-ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge, EntityHandle node, EntityHandle brokenEdge,
+ErrorCode FBEngine::split_bedge_at_new_mesh_node( EntityHandle edge,
+                                                  EntityHandle node,
+                                                  EntityHandle brokenEdge,
                                                   EntityHandle& new_edge )
 {
     // the node should be in the list of nodes
@@ -2782,7 +2873,8 @@ bool FBEngine::find_vertex_set_for_node( EntityHandle iNode, EntityHandle& oVert
     }
     return found;
 }
-ErrorCode FBEngine::redistribute_boundary_edges_to_faces( EntityHandle face, EntityHandle newFace,
+ErrorCode FBEngine::redistribute_boundary_edges_to_faces( EntityHandle face,
+                                                          EntityHandle newFace,
                                                           std::vector< EntityHandle >& chainedEdges )
 {
 
@@ -2859,7 +2951,10 @@ ErrorCode FBEngine::set_neumann_tags( EntityHandle face, EntityHandle newFace )
     // check the value for face
     int nval;
     rval = _mbImpl->tag_get_data( ntag, &face, 1, &nval );
-    if( MB_SUCCESS == rval ) { nval++; }
+    if( MB_SUCCESS == rval )
+    {
+        nval++;
+    }
     else
     {
         nval = 1;
@@ -2999,7 +3094,10 @@ ErrorCode FBEngine::split_internal_edge( EntityHandle& edge, EntityHandle& newVe
     ErrorCode rval = _mbImpl->get_adjacencies( &edge, 1, 2, false, adj_tri );
     MBERRORR( rval, "can't get adj_tris" );
     adj_tri = subtract( adj_tri, _piercedTriangles );
-    if( adj_tri.size() >= 3 ) { std::cout << "WARNING: non manifold geometry. Are you sure?"; }
+    if( adj_tri.size() >= 3 )
+    {
+        std::cout << "WARNING: non manifold geometry. Are you sure?";
+    }
     for( Range::iterator it = adj_tri.begin(); it != adj_tri.end(); ++it )
     {
         EntityHandle tri = *it;
@@ -3090,7 +3188,9 @@ ErrorCode FBEngine::divide_triangle( EntityHandle triangle, EntityHandle& newVer
     return MB_SUCCESS;
 }
 
-ErrorCode FBEngine::create_volume_with_direction( EntityHandle newFace1, EntityHandle newFace2, double* direction,
+ErrorCode FBEngine::create_volume_with_direction( EntityHandle newFace1,
+                                                  EntityHandle newFace2,
+                                                  double* direction,
                                                   EntityHandle& volume )
 {
 
@@ -3180,7 +3280,9 @@ ErrorCode FBEngine::get_nodes_from_edge( EntityHandle gedge, std::vector< Entity
     nodes[ents.size()] = conn[1];
     return MB_SUCCESS;
 }
-ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHandle tEdge, double* direction,
+ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge,
+                                                   EntityHandle tEdge,
+                                                   double* direction,
                                                    EntityHandle& newLatFace )
 {
     // in weird cases might need to create new vertices in the interior;
@@ -3433,7 +3535,10 @@ ErrorCode FBEngine::weave_lateral_face_from_edges( EntityHandle bEdge, EntityHan
     while( 1 )
     {
         if( ( indexB == N1 - 1 ) && ( indexT == N2 - 1 ) ) break;  // we cannot advance anymore
-        if( indexB == N1 - 1 ) { weaveDown = false; }
+        if( indexB == N1 - 1 )
+        {
+            weaveDown = false;
+        }
         else if( indexT == N2 - 1 )
         {
             weaveDown = true;

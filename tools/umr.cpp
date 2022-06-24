@@ -77,7 +77,11 @@ bool parse_id_list( const char* string, int dim, int nval, std::vector< int >& r
 
 bool make_opts_string( std::vector< std::string > options, std::string& opts );
 
-ErrorCode get_degree_seq( Core& mb, EntityHandle fileset, int dim, double desired_vol, int& num_levels,
+ErrorCode get_degree_seq( Core& mb,
+                          EntityHandle fileset,
+                          int dim,
+                          double desired_vol,
+                          int& num_levels,
                           std::vector< int >& level_degs );
 
 ErrorCode get_max_volume( Core& mb, EntityHandle fileset, int dim, double& vmax );
@@ -404,7 +408,11 @@ int main( int argc, char* argv[] )
     exit( SUCCESS );
 }
 
-ErrorCode get_degree_seq( Core& mb, EntityHandle fileset, int dim, double desired_vol, int& num_levels,
+ErrorCode get_degree_seq( Core& mb,
+                          EntityHandle fileset,
+                          int dim,
+                          double desired_vol,
+                          int& num_levels,
                           std::vector< int >& level_degs )
 {
     // Find max volume

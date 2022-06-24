@@ -79,8 +79,12 @@ class ExtraDataUser
 
     virtual void notify_new_patch( PatchData& patch, T& data ) = 0;
 
-    virtual void notify_sub_patch( PatchData& patch, T& data, PatchData& sub_patch, const size_t* vertex_index_map,
-                                   const size_t* element_index_map, MsqError& err ) = 0;
+    virtual void notify_sub_patch( PatchData& patch,
+                                   T& data,
+                                   PatchData& sub_patch,
+                                   const size_t* vertex_index_map,
+                                   const size_t* element_index_map,
+                                   MsqError& err ) = 0;
 
   private:
     ExtraUserData< T >* listHead;
@@ -108,7 +112,9 @@ class ExtraUserData : public ExtraData
 
     virtual void notify_new_patch();
 
-    virtual void notify_sub_patch( PatchData& sub_patch, const size_t* vtx_index_map, const size_t* elm_index_map,
+    virtual void notify_sub_patch( PatchData& sub_patch,
+                                   const size_t* vtx_index_map,
+                                   const size_t* elm_index_map,
                                    MsqError& err );
 };
 
@@ -125,7 +131,9 @@ void ExtraUserData< T >::notify_new_patch()
 }
 
 template < typename T >
-void ExtraUserData< T >::notify_sub_patch( PatchData& sub, const size_t* vertex_map, const size_t* element_map,
+void ExtraUserData< T >::notify_sub_patch( PatchData& sub,
+                                           const size_t* vertex_map,
+                                           const size_t* element_map,
                                            MsqError& err )
 {
     dataOwner->notify_sub_patch( *get_patch_data(), userData, sub, vertex_map, element_map, err );

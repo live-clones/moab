@@ -61,11 +61,13 @@ class NCHelperMPAS : public UcdNCHelper
     //! Create local cells without padding (cells are divided into groups based on the number of
     //! edges)
     ErrorCode create_local_cells( const std::vector< int >& vertices_on_local_cells,
-                                  const std::vector< int >& num_edges_on_local_cells, EntityHandle start_vertex,
+                                  const std::vector< int >& num_edges_on_local_cells,
+                                  EntityHandle start_vertex,
                                   Range& faces );
 
     //! Create local cells with padding (padded cells will have the same number of edges)
-    ErrorCode create_padded_local_cells( const std::vector< int >& vertices_on_local_cells, EntityHandle start_vertex,
+    ErrorCode create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
+                                         EntityHandle start_vertex,
                                          Range& faces );
 
     //! Create gather set vertices

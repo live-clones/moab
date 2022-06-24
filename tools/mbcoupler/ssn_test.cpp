@@ -31,13 +31,20 @@ using namespace moab;
 bool debug = true;
 
 // Forward declarations
-void get_file_options( int argc, char** argv, std::vector< const char* >& filenames, std::string& norm_tag,
-                       std::vector< const char* >& tag_names, std::vector< const char* >& tag_values,
-                       std::string& file_opts, int* err );
+void get_file_options( int argc,
+                       char** argv,
+                       std::vector< const char* >& filenames,
+                       std::string& norm_tag,
+                       std::vector< const char* >& tag_names,
+                       std::vector< const char* >& tag_values,
+                       std::string& file_opts,
+                       int* err );
 
 void print_tuples( TupleList* tlp );
 
-int print_vertex_fields( Interface* mbi, std::vector< std::vector< EntityHandle > >& groups, Tag& norm_hdl,
+int print_vertex_fields( Interface* mbi,
+                         std::vector< std::vector< EntityHandle > >& groups,
+                         Tag& norm_hdl,
                          Coupler::IntegType integ_type );
 
 double const_field( double x, double y, double z );
@@ -363,7 +370,10 @@ int main( int argc, char** argv )
         std::cout << "********** Test pack_tuples and unpack_tuples **********" << std::endl;
         void* mp_buf;
         int buf_sz;
-        if( rank == 0 ) { buf_sz = pack_tuples( &test_tuple, &mp_buf ); }
+        if( rank == 0 )
+        {
+            buf_sz = pack_tuples( &test_tuple, &mp_buf );
+        }
 
         // Send buffer size
         err = MPI_Bcast( &buf_sz, 1, MPI_INT, 0, MPI_COMM_WORLD );
@@ -375,7 +385,10 @@ int main( int argc, char** argv )
         }
 
         // Allocate a buffer in the other procs
-        if( rank != 0 ) { mp_buf = malloc( buf_sz * sizeof( uint ) ); }
+        if( rank != 0 )
+        {
+            mp_buf = malloc( buf_sz * sizeof( uint ) );
+        }
 
         err = MPI_Bcast( mp_buf, buf_sz * sizeof( uint ), MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD );
         if( err != MPI_SUCCESS )
@@ -637,9 +650,14 @@ ErrorCode integrate_scalar_field_test()
 }
 
 // Function to parse input parameters
-void get_file_options( int argc, char** argv, std::vector< const char* >& filenames, std::string& normTag,
-                       std::vector< const char* >& tagNames, std::vector< const char* >& tagValues,
-                       std::string& fileOpts, int* err )
+void get_file_options( int argc,
+                       char** argv,
+                       std::vector< const char* >& filenames,
+                       std::string& normTag,
+                       std::vector< const char* >& tagNames,
+                       std::vector< const char* >& tagValues,
+                       std::string& fileOpts,
+                       int* err )
 {
     int npos = 1;
 
@@ -798,7 +816,9 @@ void print_tuples( TupleList* tlp )
 }
 
 // Function to print vertex field values
-int print_vertex_fields( Interface* mbi, std::vector< std::vector< EntityHandle > >& groups, Tag& norm_hdl,
+int print_vertex_fields( Interface* mbi,
+                         std::vector< std::vector< EntityHandle > >& groups,
+                         Tag& norm_hdl,
                          Coupler::IntegType integ_type )
 {
     int err = 0;

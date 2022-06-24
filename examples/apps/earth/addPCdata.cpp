@@ -83,7 +83,10 @@ int main( int argc, char* argv[] )
     void* defVal;
     int defInt       = -100000;
     double defDouble = -1.e10;
-    if( type == MB_TYPE_INTEGER ) { defVal = (void*)( &defInt ); }
+    if( type == MB_TYPE_INTEGER )
+    {
+        defVal = (void*)( &defInt );
+    }
     else if( type == MB_TYPE_DOUBLE )
     {
         defVal = (void*)( &defDouble );

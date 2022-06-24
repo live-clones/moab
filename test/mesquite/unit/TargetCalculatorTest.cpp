@@ -225,12 +225,18 @@ inline void TargetCalculatorTest::check_valid_Q( MsqMatrix< D, D > Q )
 
     // columns must be of equal length
     CPPUNIT_ASSERT_DOUBLES_EQUAL( length( Q.column( 0 ) ), length( Q.column( 1 ) ), EPSBIG );
-    if( D == 3 ) { CPPUNIT_ASSERT_DOUBLES_EQUAL( length( Q.column( 0 ) ), length( Q.column( 2 ) ), EPSBIG ); }
+    if( D == 3 )
+    {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( length( Q.column( 0 ) ), length( Q.column( 2 ) ), EPSBIG );
+    }
 
     // diagonal elements must be greater than zero
     CPPUNIT_ASSERT( Q( 0, 0 ) - EPS >= 0.0 );
     CPPUNIT_ASSERT( Q( 1, 1 ) - EPS >= 0.0 );
-    if( D == 3 ) { CPPUNIT_ASSERT( Q( 2, 2 ) - EPS >= 0.0 ); }
+    if( D == 3 )
+    {
+        CPPUNIT_ASSERT( Q( 2, 2 ) - EPS >= 0.0 );
+    }
 }
 
 template < unsigned D >
@@ -898,9 +904,8 @@ void TargetCalculatorTest::test_ideal_skew_tet()
 
 void TargetCalculatorTest::test_ideal_skew_prism()
 {
-    Sample points[] = {
-        Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ), Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 )
-    };
+    Sample points[]   = { Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ),
+                        Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 ) };
     const int num_pts = sizeof( points ) / sizeof( points[0] );
 
     MsqError err;
@@ -924,9 +929,8 @@ void TargetCalculatorTest::test_ideal_skew_prism()
 
 void TargetCalculatorTest::test_ideal_skew_pyramid()
 {
-    Sample points[] = {
-        Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ), Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 )
-    };
+    Sample points[]   = { Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ),
+                        Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 ) };
     const int num_pts = sizeof( points ) / sizeof( points[0] );
 
     MsqError err;
@@ -1027,9 +1031,8 @@ void TargetCalculatorTest::test_ideal_shape_prism()
     // Ideal wedge should have Aspect (i.e. delta) == identity,
     // so shape should be equal to skew.
 
-    Sample points[] = {
-        Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ), Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 )
-    };
+    Sample points[]   = { Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ),
+                        Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 ) };
     const int num_pts = sizeof( points ) / sizeof( points[0] );
 
     MsqError err;
@@ -1048,9 +1051,8 @@ void TargetCalculatorTest::test_ideal_shape_prism()
 
 void TargetCalculatorTest::test_ideal_shape_pyramid()
 {
-    Sample points[] = {
-        Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ), Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 )
-    };
+    Sample points[]   = { Sample( 0, 0 ), Sample( 0, 1 ), Sample( 0, 2 ),
+                        Sample( 0, 3 ), Sample( 2, 0 ), Sample( 3, 0 ) };
     const int num_pts = sizeof( points ) / sizeof( points[0] );
 
     MsqError err;
@@ -1134,10 +1136,9 @@ void TargetCalculatorTest::test_jacobian_3D()
     MsqError err;
     PatchData pd;
     LinearHexahedron map;
-    const Vector3D hex_coords[] = {
-        Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 3, 2, 0 ), Vector3D( 1, 2, 0 ),
-        Vector3D( 1, 0, 1 ), Vector3D( 3, 0, 2 ), Vector3D( 3, 2, 2 ), Vector3D( 2, 2, 2 )
-    };
+    const Vector3D hex_coords[]  = { Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 3, 2, 0 ),
+                                    Vector3D( 1, 2, 0 ), Vector3D( 1, 0, 1 ), Vector3D( 3, 0, 2 ),
+                                    Vector3D( 3, 2, 2 ), Vector3D( 2, 2, 2 ) };
     const MsqVector< 3 >* coords = reinterpret_cast< const MsqVector< 3 >* >( hex_coords );
 
     Sample pts[]      = { Sample( 0, 0 ), Sample( 1, 6 ), Sample( 3, 0 ) };
@@ -1193,8 +1194,10 @@ class DummyRefMesh : public ReferenceMeshInterface
   public:
     DummyRefMesh( const Vector3D* coords, int num_verts ) : mCoords( coords, coords + num_verts ) {}
 
-    void get_reference_vertex_coordinates( const Mesh::VertexHandle* handles, const size_t num_vertices,
-                                           Vector3D* coords, MsqError& err )
+    void get_reference_vertex_coordinates( const Mesh::VertexHandle* handles,
+                                           const size_t num_vertices,
+                                           Vector3D* coords,
+                                           MsqError& err )
     {
         const size_t* indices = reinterpret_cast< const size_t* >( handles );
         for( size_t i = 0; i < num_vertices; ++i )
@@ -1213,17 +1216,15 @@ void TargetCalculatorTest::test_get_refmesh_Jacobian_3D()
 {
     MsqError err;
 
-    const Vector3D hex_coords[] = {
-        Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 3, 2, 0 ), Vector3D( 1, 2, 0 ),
-        Vector3D( 1, 0, 1 ), Vector3D( 3, 0, 2 ), Vector3D( 3, 2, 2 ), Vector3D( 2, 2, 2 )
-    };
+    const Vector3D hex_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 2, 0, 0 ), Vector3D( 3, 2, 0 ),
+                                    Vector3D( 1, 2, 0 ), Vector3D( 1, 0, 1 ), Vector3D( 3, 0, 2 ),
+                                    Vector3D( 3, 2, 2 ), Vector3D( 2, 2, 2 ) };
     DummyRefMesh ref_mesh( hex_coords, 8 );
 
-    const Vector3D rect_coords[] = {
-        Vector3D( 0, 0, 0 ), Vector3D( 1, 0, 0 ), Vector3D( 1, 1, 0 ), Vector3D( 0, 1, 0 ),
-        Vector3D( 0, 0, 5 ), Vector3D( 1, 0, 5 ), Vector3D( 1, 1, 5 ), Vector3D( 0, 1, 5 )
-    };
-    size_t conn[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    const Vector3D rect_coords[] = { Vector3D( 0, 0, 0 ), Vector3D( 1, 0, 0 ), Vector3D( 1, 1, 0 ),
+                                     Vector3D( 0, 1, 0 ), Vector3D( 0, 0, 5 ), Vector3D( 1, 0, 5 ),
+                                     Vector3D( 1, 1, 5 ), Vector3D( 0, 1, 5 ) };
+    size_t conn[]                = { 0, 1, 2, 3, 4, 5, 6, 7 };
     bool fixed[8];
     std::fill( fixed, fixed + sizeof( fixed ) / sizeof( fixed[0] ), false );
     PatchData pd;

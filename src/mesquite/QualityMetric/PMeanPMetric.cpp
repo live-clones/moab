@@ -41,8 +41,11 @@
 namespace MBMesquite
 {
 
-bool PMeanPMetric::average( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
-                            double& value, MsqError& err )
+bool PMeanPMetric::average( PatchData& pd,
+                            QualityMetric* metric,
+                            const std::vector< size_t >& qm_handles,
+                            double& value,
+                            MsqError& err )
 {
     bool rval = true;
     value     = 0;
@@ -57,8 +60,12 @@ bool PMeanPMetric::average( PatchData& pd, QualityMetric* metric, const std::vec
     return rval;
 }
 
-bool PMeanPMetric::average_with_indices( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
-                                         double& value, std::vector< size_t >& indices, MsqError& err )
+bool PMeanPMetric::average_with_indices( PatchData& pd,
+                                         QualityMetric* metric,
+                                         const std::vector< size_t >& qm_handles,
+                                         double& value,
+                                         std::vector< size_t >& indices,
+                                         MsqError& err )
 {
     indices.clear();
 
@@ -81,9 +88,13 @@ bool PMeanPMetric::average_with_indices( PatchData& pd, QualityMetric* metric, c
     return rval;
 }
 
-bool PMeanPMetric::average_with_gradient( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
-                                          double& value, std::vector< size_t >& indices,
-                                          std::vector< Vector3D >& gradient, MsqError& err )
+bool PMeanPMetric::average_with_gradient( PatchData& pd,
+                                          QualityMetric* metric,
+                                          const std::vector< size_t >& qm_handles,
+                                          double& value,
+                                          std::vector< size_t >& indices,
+                                          std::vector< Vector3D >& gradient,
+                                          MsqError& err )
 {
     indices.clear();
     gradient.clear();
@@ -132,10 +143,14 @@ bool PMeanPMetric::average_with_gradient( PatchData& pd, QualityMetric* metric, 
     return rval;
 }
 
-bool PMeanPMetric::average_with_Hessian_diagonal( PatchData& pd, QualityMetric* metric,
-                                                  const std::vector< size_t >& qm_handles, double& value,
-                                                  std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                  std::vector< SymMatrix3D >& diagonal, MsqError& err )
+bool PMeanPMetric::average_with_Hessian_diagonal( PatchData& pd,
+                                                  QualityMetric* metric,
+                                                  const std::vector< size_t >& qm_handles,
+                                                  double& value,
+                                                  std::vector< size_t >& indices,
+                                                  std::vector< Vector3D >& gradient,
+                                                  std::vector< SymMatrix3D >& diagonal,
+                                                  MsqError& err )
 {
     // clear temporary storage
     mIndices.clear();
@@ -234,9 +249,13 @@ bool PMeanPMetric::average_with_Hessian_diagonal( PatchData& pd, QualityMetric* 
     return rval;
 }
 
-bool PMeanPMetric::average_with_Hessian( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
-                                         double& value, std::vector< size_t >& indices,
-                                         std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+bool PMeanPMetric::average_with_Hessian( PatchData& pd,
+                                         QualityMetric* metric,
+                                         const std::vector< size_t >& qm_handles,
+                                         double& value,
+                                         std::vector< size_t >& indices,
+                                         std::vector< Vector3D >& gradient,
+                                         std::vector< Matrix3D >& Hessian,
                                          MsqError& err )
 {
     // clear temporary storage

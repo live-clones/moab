@@ -230,9 +230,14 @@ ErrorCode Skinner::find_geometric_skin( const EntityHandle meshset, Range& forwa
     return result;
 }
 
-ErrorCode Skinner::find_skin( const EntityHandle meshset, const Range& source_entities, bool get_vertices,
-                              Range& output_handles, Range* output_reverse_handles, bool create_vert_elem_adjs,
-                              bool create_skin_elements, bool look_for_scd )
+ErrorCode Skinner::find_skin( const EntityHandle meshset,
+                              const Range& source_entities,
+                              bool get_vertices,
+                              Range& output_handles,
+                              Range* output_reverse_handles,
+                              bool create_vert_elem_adjs,
+                              bool create_skin_elements,
+                              bool look_for_scd )
 {
     if( source_entities.empty() ) return MB_SUCCESS;
 
@@ -251,7 +256,9 @@ ErrorCode Skinner::find_skin( const EntityHandle meshset, const Range& source_en
                                get_vertices ? 0 : &output_handles, output_reverse_handles, create_skin_elements );
 }
 
-ErrorCode Skinner::find_skin_scd( const Range& source_entities, bool get_vertices, Range& output_handles,
+ErrorCode Skinner::find_skin_scd( const Range& source_entities,
+                                  bool get_vertices,
+                                  Range& output_handles,
                                   bool create_skin_elements )
 {
     // get the scd interface and check if it's been initialized
@@ -522,7 +529,10 @@ ErrorCode Skinner::find_skin_noadj(const Range &source_entities,
     return MB_SUCCESS;
 }
 
-void Skinner::find_match( EntityType type, const EntityHandle* conn, const int num_nodes, EntityHandle& match,
+void Skinner::find_match( EntityType type,
+                          const EntityHandle* conn,
+                          const int num_nodes,
+                          EntityHandle& match,
                           Skinner::direction& direct )
 {
     match = 0;
@@ -569,7 +579,9 @@ void Skinner::find_match( EntityType type, const EntityHandle* conn, const int n
     }
 }
 
-bool Skinner::connectivity_match( const EntityHandle* conn1, const EntityHandle* conn2, const int num_verts,
+bool Skinner::connectivity_match( const EntityHandle* conn1,
+                                  const EntityHandle* conn2,
+                                  const int num_verts,
                                   Skinner::direction& direct )
 {
     const EntityHandle* iter = std::find( conn2, conn2 + num_verts, conn1[0] );
@@ -644,9 +656,13 @@ bool Skinner::entity_deletable( EntityHandle entity )
     return true;
 }
 
-ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar_elements, EntityHandle boundary_edges,
-                                         EntityHandle inferred_edges, EntityHandle non_manifold_edges,
-                                         EntityHandle other_edges, int& number_boundary_nodes )
+ErrorCode Skinner::classify_2d_boundary( const Range& boundary,
+                                         const Range& bar_elements,
+                                         EntityHandle boundary_edges,
+                                         EntityHandle inferred_edges,
+                                         EntityHandle non_manifold_edges,
+                                         EntityHandle other_edges,
+                                         int& number_boundary_nodes )
 {
     Range bedges, iedges, nmedges, oedges;
     ErrorCode result =
@@ -668,8 +684,12 @@ ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar
     return MB_SUCCESS;
 }
 
-ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar_elements, Range& boundary_edges,
-                                         Range& inferred_edges, Range& non_manifold_edges, Range& other_edges,
+ErrorCode Skinner::classify_2d_boundary( const Range& boundary,
+                                         const Range& bar_elements,
+                                         Range& boundary_edges,
+                                         Range& inferred_edges,
+                                         Range& non_manifold_edges,
+                                         Range& other_edges,
                                          int& number_boundary_nodes )
 {
 
@@ -877,7 +897,9 @@ ErrorCode Skinner::classify_2d_boundary( const Range& boundary, const Range& bar
     return MB_SUCCESS;
 }
 
-void Skinner::find_inferred_edges( Range& skin_boundary, Range& candidate_edges, Range& inferred_edges,
+void Skinner::find_inferred_edges( Range& skin_boundary,
+                                   Range& candidate_edges,
+                                   Range& inferred_edges,
                                    double reference_angle_degrees )
 {
 
@@ -960,8 +982,12 @@ bool Skinner::has_larger_angle( EntityHandle& entity1, EntityHandle& entity2, do
 }
 
 // get skin entities of prescribed dimension
-ErrorCode Skinner::find_skin( const EntityHandle this_set, const Range& entities, int dim, Range& skin_entities,
-                              bool create_vert_elem_adjs, bool create_skin_elements )
+ErrorCode Skinner::find_skin( const EntityHandle this_set,
+                              const Range& entities,
+                              int dim,
+                              Range& skin_entities,
+                              bool create_vert_elem_adjs,
+                              bool create_skin_elements )
 {
     Range tmp_skin;
     ErrorCode result =
@@ -984,8 +1010,12 @@ ErrorCode Skinner::find_skin( const EntityHandle this_set, const Range& entities
     return result;
 }
 
-ErrorCode Skinner::find_skin_vertices( const EntityHandle this_set, const Range& entities, Range* skin_verts,
-                                       Range* skin_elems, Range* skin_rev_elems, bool create_skin_elems,
+ErrorCode Skinner::find_skin_vertices( const EntityHandle this_set,
+                                       const Range& entities,
+                                       Range* skin_verts,
+                                       Range* skin_elems,
+                                       Range* skin_rev_elems,
+                                       bool create_skin_elems,
                                        bool corners_only )
 {
     ErrorCode rval;
@@ -1158,10 +1188,8 @@ class AdjSides
                     handles[1] = array[( idx + 2 ) % CORNERS];
                     // fall through
                 case 2:
-                    if (3 == CORNERS)
-                      handles[1] = array[( idx + 2 ) % CORNERS];
-                    if (2 <= CORNERS)
-                      handles[0] = array[( idx + 1 ) % CORNERS];
+                    if( 3 == CORNERS ) handles[1] = array[( idx + 2 ) % CORNERS];
+                    if( 2 <= CORNERS ) handles[0] = array[( idx + 1 ) % CORNERS];
                     break;
                 default:
                     assert( false );
@@ -1188,10 +1216,8 @@ class AdjSides
                     handles[1] = array[indices[( idx + 2 ) % CORNERS]];
                     // fall through
                 case 2:
-                    if (3 == CORNERS)
-                      handles[1] = array[indices[( idx + 2 ) % CORNERS]];
-                    if (2 <= CORNERS)
-                      handles[0] = array[indices[( idx + 1 ) % CORNERS]];
+                    if( 3 == CORNERS ) handles[1] = array[indices[( idx + 2 ) % CORNERS]];
+                    if( 2 <= CORNERS ) handles[0] = array[indices[( idx + 1 ) % CORNERS]];
                     break;
                 default:
                     assert( false );
@@ -1294,7 +1320,10 @@ class AdjSides
      *\param elem_side Which side of adj_elem are we storing
      *             (CN side number.)
      */
-    void insert( const EntityHandle* handles, int skip_idx, EntityHandle adj_elem, unsigned short elem_side,
+    void insert( const EntityHandle* handles,
+                 int skip_idx,
+                 EntityHandle adj_elem,
+                 unsigned short elem_side,
                  const short* indices )
     {
         Side side( handles, skip_idx, adj_elem, elem_side, indices );
@@ -1400,8 +1429,11 @@ bool AdjSides< 4 >::Side::operator==( const Side& other ) const
 //        a lower-dim element representing the side.
 // side_type - The EntityType of the desired side.
 // side_conn - The connectivity of the new side.
-ErrorCode Skinner::create_side( const EntityHandle this_set, EntityHandle elem, EntityType side_type,
-                                const EntityHandle* side_conn, EntityHandle& side_elem )
+ErrorCode Skinner::create_side( const EntityHandle this_set,
+                                EntityHandle elem,
+                                EntityType side_type,
+                                const EntityHandle* side_conn,
+                                EntityHandle& side_elem )
 {
     const int max_side = 9;
     const EntityHandle* conn;
@@ -1518,8 +1550,13 @@ bool Skinner::face_reversed( EntityHandle region, const EntityHandle* face_corne
     return ( !r && sense == -1 );
 }
 
-ErrorCode Skinner::find_skin_vertices_2D( const EntityHandle this_set, Tag tag, const Range& faces, Range* skin_verts,
-                                          Range* skin_edges, Range* reversed_edges, bool create_edges,
+ErrorCode Skinner::find_skin_vertices_2D( const EntityHandle this_set,
+                                          Tag tag,
+                                          const Range& faces,
+                                          Range* skin_verts,
+                                          Range* skin_edges,
+                                          Range* reversed_edges,
+                                          bool create_edges,
                                           bool corners_only )
 {
     // This function iterates over all the vertices contained in the
@@ -1728,9 +1765,14 @@ ErrorCode Skinner::find_skin_vertices_2D( const EntityHandle this_set, Tag tag, 
     return MB_SUCCESS;
 }
 
-ErrorCode Skinner::find_skin_vertices_3D( const EntityHandle this_set, Tag tag, const Range& entities,
-                                          Range* skin_verts, Range* skin_faces, Range* reversed_faces,
-                                          bool create_faces, bool corners_only )
+ErrorCode Skinner::find_skin_vertices_3D( const EntityHandle this_set,
+                                          Tag tag,
+                                          const Range& entities,
+                                          Range* skin_verts,
+                                          Range* skin_faces,
+                                          Range* reversed_faces,
+                                          bool create_faces,
+                                          bool corners_only )
 {
     // This function iterates over all the vertices contained in the
     // input vol elem list.  For each such vertex, it then iterates over

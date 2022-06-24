@@ -53,8 +53,11 @@ class GeomTopoTool
      determines whether or not to restore the internal index that links geomSets to their
      corresponding OBB Root.  Only relevant if find_geoments is true. (default = true)
      */
-    GeomTopoTool( Interface* impl, bool find_geoments = false, EntityHandle modelRootSet = 0,
-                  bool p_rootSets_vector = true, bool restore_rootSets = true );
+    GeomTopoTool( Interface* impl,
+                  bool find_geoments        = false,
+                  EntityHandle modelRootSet = 0,
+                  bool p_rootSets_vector    = true,
+                  bool restore_rootSets     = true );
 
     ~GeomTopoTool();
 

@@ -166,8 +166,11 @@ namespace ElemUtil
                ( fabs( xi[1] - 1.0 ) < etol ) && ( fabs( xi[2] - 1.0 ) < etol );
     }
 
-    bool point_in_trilinear_hex( const CartVect* hex, const CartVect& xyz, const CartVect& box_min,
-                                 const CartVect& box_max, double etol )
+    bool point_in_trilinear_hex( const CartVect* hex,
+                                 const CartVect& xyz,
+                                 const CartVect& box_min,
+                                 const CartVect& box_max,
+                                 double etol )
     {
         // all values scaled by 2 (eliminates 3 flops)
         const CartVect mid = box_max + box_min;
@@ -399,7 +402,10 @@ namespace Element
     //
     void Map::set_vertices( const std::vector< CartVect >& v )
     {
-        if( v.size() != this->vertex.size() ) { throw ArgError(); }
+        if( v.size() != this->vertex.size() )
+        {
+            throw ArgError();
+        }
         this->vertex = v;
     }
 
@@ -504,7 +510,7 @@ namespace Element
     {
         this->Map::set_vertices( v );
         this->T             = Matrix3( v[1][0] - v[0][0], v[2][0] - v[0][0], 0, v[1][1] - v[0][1], v[2][1] - v[0][1], 0,
-                           v[1][2] - v[0][2], v[2][2] - v[0][2], 1 );
+                                       v[1][2] - v[0][2], v[2][2] - v[0][2], 1 );
         this->T_inverse     = this->T.inverse();
         this->det_T         = this->T.determinant();
         this->det_T_inverse = ( this->det_T < 1e-12 ? std::numeric_limits< double >::max() : 1.0 / this->det_T );
@@ -793,8 +799,7 @@ namespace Element
         { 0, -1, 0 },                                 //      |  .                  |  .
         { 1, 0, 0 },                                  //      1   -----  9   -----  2
         { 0, 1, 0 },                                  //
-        { -1, 0, 0 },   { 0, 0, -1 },  { 0, 0, 1 },  { 0, 0, 0 }
-    };
+        { -1, 0, 0 },   { 0, 0, -1 },  { 0, 0, 1 },  { 0, 0, 0 } };
     // QuadraticHex::QuadraticHex(const std::vector<CartVect>& vertices) : Map(vertices){};
     QuadraticHex::QuadraticHex() : Map( 0 ) {}
 

@@ -27,7 +27,9 @@ namespace moab
 {
 
 //! Get appropriate helper instance for WriteNC class; based on some info in the file set
-NCWriteHelper* NCWriteHelper::get_nc_helper( WriteNC* writeNC, int fileId, const FileOptions& opts,
+NCWriteHelper* NCWriteHelper::get_nc_helper( WriteNC* writeNC,
+                                             int fileId,
+                                             const FileOptions& opts,
                                              EntityHandle fileSet )
 {
     std::string& grid_type = writeNC->grid_type;
@@ -269,7 +271,8 @@ ErrorCode NCWriteHelper::collect_variable_data( std::vector< std::string >& var_
     return MB_SUCCESS;
 }
 
-ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names, std::vector< std::string >& desired_names,
+ErrorCode NCWriteHelper::init_file( std::vector< std::string >& var_names,
+                                    std::vector< std::string >& desired_names,
                                     bool append )
 {
     std::vector< std::string >& dimNames                  = _writeNC->dimNames;
@@ -480,7 +483,10 @@ ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names, st
         if( dummyVarNames.find( coordName ) != dummyVarNames.end() ) continue;
 
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( coordName );
-        if( vit == varInfo.end() ) { MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName ); }
+        if( vit == varInfo.end() )
+        {
+            MB_SET_ERR( MB_FAILURE, "Can't find coordinate variable " << coordName );
+        }
 
         vsetdatas.push_back( vit->second );
     }
@@ -489,7 +495,10 @@ ErrorCode NCWriteHelper::write_values( std::vector< std::string >& var_names, st
     for( unsigned int i = 0; i < var_names.size(); i++ )
     {
         std::map< std::string, WriteNC::VarData >::iterator vit = varInfo.find( var_names[i] );
-        if( vit == varInfo.end() ) { MB_SET_ERR( MB_FAILURE, "Can't find requested variable " << var_names[i] ); }
+        if( vit == varInfo.end() )
+        {
+            MB_SET_ERR( MB_FAILURE, "Can't find requested variable " << var_names[i] );
+        }
 
         WriteNC::VarData& variableData = vit->second;
         if( WriteNC::ENTLOCSET == variableData.entLoc )

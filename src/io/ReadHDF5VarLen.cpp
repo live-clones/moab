@@ -11,7 +11,8 @@
 namespace moab
 {
 
-bool ReadHDF5VarLen::is_ranged( EntityHandle file_id, Range::const_iterator& ranged_iter,
+bool ReadHDF5VarLen::is_ranged( EntityHandle file_id,
+                                Range::const_iterator& ranged_iter,
                                 Range::const_iterator range_end )
 {
     if( ranged_iter == range_end ) return false;
@@ -23,9 +24,13 @@ bool ReadHDF5VarLen::is_ranged( EntityHandle file_id, Range::const_iterator& ran
     return true;
 }
 
-ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set, const Range& offsets, EntityHandle start_offset,
-                                     hid_t data_type, const Range& file_ids,
-                                     const std::vector< unsigned >& vals_per_ent, const Range& ranged_file_ids )
+ErrorCode ReadHDF5VarLen::read_data( ReadHDF5Dataset& data_set,
+                                     const Range& offsets,
+                                     EntityHandle start_offset,
+                                     hid_t data_type,
+                                     const Range& file_ids,
+                                     const std::vector< unsigned >& vals_per_ent,
+                                     const Range& ranged_file_ids )
 {
     ErrorCode rval;
     const size_t value_size          = H5Tget_size( data_type );
@@ -283,8 +288,12 @@ ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set,
   return MB_SUCCESS;
 }
 */
-ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set, const Range& file_ids, EntityHandle start_file_id,
-                                        EntityHandle nudge, Range& offsets_out, std::vector< unsigned >& counts_out )
+ErrorCode ReadHDF5VarLen::read_offsets( ReadHDF5Dataset& data_set,
+                                        const Range& file_ids,
+                                        EntityHandle start_file_id,
+                                        EntityHandle nudge,
+                                        Range& offsets_out,
+                                        std::vector< unsigned >& counts_out )
 {
 
     // Use hints to make sure insertion into ranges is O(1)

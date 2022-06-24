@@ -92,7 +92,9 @@ class ExoIIInterface
     //! get the element type of the entity; this entity can either be a meshset,
     //! in which case it will be assumed to be a material set meshset, or an
     //! individual entity.
-    virtual ExoIIElementType get_element_type( EntityHandle entity, Tag mid_nodes_tag, Tag geom_dimension_tag,
+    virtual ExoIIElementType get_element_type( EntityHandle entity,
+                                               Tag mid_nodes_tag,
+                                               Tag geom_dimension_tag,
                                                EntityType indiv_entity_type = MBMAXTYPE ) = 0;
 
     virtual int has_mid_nodes( ExoIIElementType elem_type, int dimension ) = 0;

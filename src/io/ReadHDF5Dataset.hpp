@@ -69,7 +69,10 @@ class ReadHDF5Dataset
      *\NOTE Class instance will not be usable until one of either
      *      \c set_file_ids or \c set_all_file_ids is called.
      */
-    ReadHDF5Dataset( const char* debug_desc, hid_t data_set_handle, bool parallel, const Comm* communicator = 0,
+    ReadHDF5Dataset( const char* debug_desc,
+                     hid_t data_set_handle,
+                     bool parallel,
+                     const Comm* communicator        = 0,
                      bool close_data_set_on_destruct = true );
 
     ReadHDF5Dataset( const char* debug_desc, bool parallel, const Comm* communicator = 0 );

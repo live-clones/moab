@@ -52,8 +52,11 @@ bool AWShape2DNB2::evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >
     return true;
 }
 
-bool AWShape2DNB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
-                                       MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& )
+bool AWShape2DNB2::evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                                       const MsqMatrix< 2, 2 >& W,
+                                       double& result,
+                                       MsqMatrix< 2, 2 >& deriv_wrt_A,
+                                       MsqError& )
 {
     const double alpha           = det( A );
     const double omega           = det( W );

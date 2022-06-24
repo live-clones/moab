@@ -97,8 +97,10 @@ class VertexPatches : public PatchSet
      *\param free_vertices_out the list of vertices interior to the patch
      */
     MESQUITE_EXPORT
-    virtual void get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
-                            std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err );
+    virtual void get_patch( PatchHandle patch_handle,
+                            std::vector< Mesh::ElementHandle >& elem_handles_out,
+                            std::vector< Mesh::VertexHandle >& free_vertices_out,
+                            MsqError& err );
 
   private:
     std::vector< size_t > junk;

@@ -124,8 +124,10 @@ class MESQUITE_EXPORT Mesh
     //! is fixed and cannot be moved.  Note that this is a read-only
     //! property; this flag can't be modified by users of the
     //! MBMesquite::Mesh interface.
-    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& fixed_flag_array,
-                                          size_t num_vtx, MsqError& err ) = 0;
+    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[],
+                                          std::vector< bool >& fixed_flag_array,
+                                          size_t num_vtx,
+                                          MsqError& err ) = 0;
 
     //! Returns true or false, indicating whether the vertex
     //! is a higher-order node that should be slaved to the logical
@@ -134,11 +136,15 @@ class MESQUITE_EXPORT Mesh
     //! Note: This function will never be called unless this behavior is
     //! requested by calling:
     //! InstructionQueue::set_slaved_ho_node_mode( Settings::SLAVE_FLAG )
-    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& slaved_flag_array,
-                                           size_t num_vtx, MsqError& err ) = 0;
+    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[],
+                                           std::vector< bool >& slaved_flag_array,
+                                           size_t num_vtx,
+                                           MsqError& err ) = 0;
 
     //! Get/set location of a vertex
-    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+    virtual void vertices_get_coordinates( const VertexHandle vert_array[],
+                                           MsqVertex* coordinates,
+                                           size_t num_vtx,
                                            MsqError& err )                                                 = 0;
     virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err ) = 0;
 
@@ -147,14 +153,18 @@ class MESQUITE_EXPORT Mesh
     //! implementation.  It is intended to be used by Mesquite algorithms.
     //! Until a vertex's byte has been explicitly set, its value is 0.
     virtual void vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqError& err ) = 0;
-    virtual void vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+    virtual void vertices_set_byte( const VertexHandle* vert_array,
+                                    const unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err )                                        = 0;
 
     //! Retrieve the byte value for the specified vertex or vertices.
     //! The byte value is 0 if it has not yet been set via one of the
     //! *_set_byte() functions.
     virtual void vertex_get_byte( const VertexHandle vertex, unsigned char* byte, MsqError& err ) = 0;
-    virtual void vertices_get_byte( const VertexHandle* vertex, unsigned char* byte_array, size_t array_size,
+    virtual void vertices_get_byte( const VertexHandle* vertex,
+                                    unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err )                                               = 0;
 
     //**************** Vertex Topology *****************
@@ -174,8 +184,10 @@ class MESQUITE_EXPORT Mesh
      *                       which the adjacency list begins for that
      *                       vertex.
      */
-    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array, size_t num_vertex,
-                                                 std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array,
+                                                 size_t num_vertex,
+                                                 std::vector< ElementHandle >& elements,
+                                                 std::vector< size_t >& offsets,
                                                  MsqError& err ) = 0;
 
     //*************** Element Topology *************
@@ -195,14 +207,18 @@ class MESQUITE_EXPORT Mesh
      *                     is the index into #vert_handles at which
      *                     the connectivity list for that element begins.
      */
-    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles, size_t num_elems,
+    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles,
+                                                 size_t num_elems,
                                                  std::vector< VertexHandle >& vert_handles,
-                                                 std::vector< size_t >& offsets, MsqError& err ) = 0;
+                                                 std::vector< size_t >& offsets,
+                                                 MsqError& err ) = 0;
 
     //! Returns the topologies of the given entities.  The "entity_topologies"
     //! array must be at least "num_elements" in size.
-    virtual void elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
-                                          size_t num_elements, MsqError& err ) = 0;
+    virtual void elements_get_topologies( const ElementHandle* element_handle_array,
+                                          EntityTopology* element_topologies,
+                                          size_t num_elements,
+                                          MsqError& err ) = 0;
 
     //***************  Tags  ***********
 
@@ -228,7 +244,10 @@ class MESQUITE_EXPORT Mesh
      * \param default_value Default value to assign to all entities - may be NULL
      * \return - Handle for tag definition
      */
-    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length, const void* default_value,
+    virtual TagHandle tag_create( const std::string& tag_name,
+                                  TagType type,
+                                  unsigned length,
+                                  const void* default_value,
                                   MsqError& err ) = 0;
 
     /** \brief Remove a tag and all corresponding data
@@ -254,7 +273,10 @@ class MESQUITE_EXPORT Mesh
      * \param type_out   Passed back tag type.
      * \param length_out Passed back number of values per entity.
      */
-    virtual void tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+    virtual void tag_properties( TagHandle handle,
+                                 std::string& name_out,
+                                 TagType& type_out,
+                                 unsigned& length_out,
                                  MsqError& err ) = 0;
 
     /** \brief Set tag values on elements
@@ -267,8 +289,11 @@ class MESQUITE_EXPORT Mesh
      *                   This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_set_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       const void* tag_data, MsqError& err ) = 0;
+    virtual void tag_set_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       const void* tag_data,
+                                       MsqError& err ) = 0;
 
     /** \brief Set tag values on vertices
      *
@@ -280,8 +305,11 @@ class MESQUITE_EXPORT Mesh
      *                   This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_set_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      const void* tag_data, MsqError& err ) = 0;
+    virtual void tag_set_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      const void* tag_data,
+                                      MsqError& err ) = 0;
 
     /** \brief Get tag values on elements
      *
@@ -293,8 +321,11 @@ class MESQUITE_EXPORT Mesh
      *                   in memory.  This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_get_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       void* tag_data, MsqError& err ) = 0;
+    virtual void tag_get_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       void* tag_data,
+                                       MsqError& err ) = 0;
 
     /** \brief Get tag values on vertices.
      *
@@ -306,8 +337,11 @@ class MESQUITE_EXPORT Mesh
      *                   in memory.  This data is expected to be
      *                   num_elems*tag_length*sizeof(tag_type) bytes.
      */
-    virtual void tag_get_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      void* tag_data, MsqError& err ) = 0;
+    virtual void tag_get_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      void* tag_data,
+                                      MsqError& err ) = 0;
 
     //**************** Memory Management ****************
     //! Tells the mesh that the client is finished with a given
@@ -398,7 +432,9 @@ class MESQUITE_EXPORT MeshDomain
      *                     domain normals.
      *\param count         The length of the coordinates array.
      */
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[], unsigned count,
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handles,
+                                   Vector3D coordinates[],
+                                   unsigned count,
                                    MsqError& err ) const = 0;
 
     /**\brief evaluate closest point and normal
@@ -413,8 +449,11 @@ class MESQUITE_EXPORT MeshDomain
      *\param closest       Closest position in the domain.
      *\param normal        Domain normal at the location of 'closest'
      */
-    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
-                                Vector3D& normal, MsqError& err ) const = 0;
+    virtual void closest_point( Mesh::VertexHandle handle,
+                                const Vector3D& position,
+                                Vector3D& closest,
+                                Vector3D& normal,
+                                MsqError& err ) const = 0;
 
     /**\brief Get degrees of freedom in vertex movement.
      *
@@ -426,7 +465,9 @@ class MESQUITE_EXPORT MeshDomain
      * vertex is constrained to lie on (e.g. point = 0, curve = 1,
      * surface = 2, volume = 3.)
      */
-    virtual void domain_DoF( const Mesh::EntityHandle* handle_array, unsigned short* dof_array, size_t num_handles,
+    virtual void domain_DoF( const Mesh::EntityHandle* handle_array,
+                             unsigned short* dof_array,
+                             size_t num_handles,
                              MsqError& err ) const = 0;
 };
 
@@ -453,8 +494,11 @@ class MESQUITE_EXPORT MeshDomainAssoc
      * param skip_compatibility_checki  when true, does not perform the compatibility check.
      *                                  When false, the check is performed.
      */
-    MeshDomainAssoc( MBMesquite::Mesh* mesh, MBMesquite::MeshDomain* domain, bool full_compatibility_check = false,
-                     bool proceed = false, bool skip_compatibility_check = false )
+    MeshDomainAssoc( MBMesquite::Mesh* mesh,
+                     MBMesquite::MeshDomain* domain,
+                     bool full_compatibility_check = false,
+                     bool proceed                  = false,
+                     bool skip_compatibility_check = false )
         : mMesh( mesh ), mMeshDomain( domain ), mesh_and_domain_are_compatible( false )
     {
         // check for real instance.  If either value is NULL then it's just an

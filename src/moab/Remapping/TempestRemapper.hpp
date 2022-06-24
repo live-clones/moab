@@ -221,7 +221,7 @@ class TempestRemapper : public Remapper
     moab::ErrorCode GenerateCSMeshMetadata( const int ntot_elements,
                                             moab::Range& entities,
                                             moab::Range* secondary_entities,
-                                            const std::string & dofTagName,
+                                            const std::string& dofTagName,
                                             int nP );
 
     /// <summary>

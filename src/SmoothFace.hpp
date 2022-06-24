@@ -57,16 +57,28 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
 
     void facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plane, CartVect& areacoord );
 
-    ErrorCode project_to_facets_main( CartVect& this_point, bool trim, bool& outside,
+    ErrorCode project_to_facets_main( CartVect& this_point,
+                                      bool trim,
+                                      bool& outside,
                                       CartVect* closest_point_ptr = NULL,  // interested only in normal
                                       CartVect* normal_ptr        = NULL );       // interested only in closest point
 
-    ErrorCode project_to_facets( std::vector< EntityHandle >& facet_list, EntityHandle& lastFacet, int interpOrder,
-                                 double compareTol, CartVect& this_point, bool trim, bool& outside,
-                                 CartVect* closest_point_ptr, CartVect* normal_ptr );
+    ErrorCode project_to_facets( std::vector< EntityHandle >& facet_list,
+                                 EntityHandle& lastFacet,
+                                 int interpOrder,
+                                 double compareTol,
+                                 CartVect& this_point,
+                                 bool trim,
+                                 bool& outside,
+                                 CartVect* closest_point_ptr,
+                                 CartVect* normal_ptr );
 
-    ErrorCode project_to_facet( EntityHandle facet, CartVect& pt, CartVect& areacoord, CartVect& close_point,
-                                bool& outside_facet, double compare_tol );
+    ErrorCode project_to_facet( EntityHandle facet,
+                                CartVect& pt,
+                                CartVect& areacoord,
+                                CartVect& close_point,
+                                bool& outside_facet,
+                                double compare_tol );
 
     bool is_at_vertex( EntityHandle facet,         // (IN) facet we are evaluating
                        CartVect& pt,               // (IN) the point
@@ -94,8 +106,13 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
                                         CartVect N[2] );  // here we need the gradient tag
 
     // make this one public, will be called during initialization !!!
-    ErrorCode init_edge_control_points( CartVect& P0, CartVect& P3, CartVect& N0, CartVect& N3, CartVect& T0,
-                                        CartVect& T3, CartVect* Pi );
+    ErrorCode init_edge_control_points( CartVect& P0,
+                                        CartVect& P3,
+                                        CartVect& N0,
+                                        CartVect& N3,
+                                        CartVect& T0,
+                                        CartVect& T3,
+                                        CartVect* Pi );
 
     // moved from private, because will be called from PaveDriver
     ErrorCode compute_control_points_on_edges( double min_dot, Tag edgeCtrlTag, Tag markTag );
@@ -145,7 +162,8 @@ class SmoothFace  // public CMLSurfEval, public SmoothBase
     ErrorCode init_bezier_edge( EntityHandle edge, double min_dot );
     //
 
-    ErrorCode find_edges_orientations( EntityHandle edges[3], const EntityHandle* conn3,
+    ErrorCode find_edges_orientations( EntityHandle edges[3],
+                                       const EntityHandle* conn3,
                                        int orient[3] );  // maybe we will set it?
 
     ErrorCode init_facet_control_points( CartVect N[6],     // vertex normals (per edge)

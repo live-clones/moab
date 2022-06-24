@@ -121,8 +121,12 @@ void WeightReader::notify_new_patch( PatchData&, WeightReaderData& data )
     data.weights.clear();
 }
 
-void WeightReader::notify_sub_patch( PatchData& /*pd*/, WeightReaderData& data, PatchData& subpatch, const size_t*,
-                                     const size_t*, MsqError& /*err*/ )
+void WeightReader::notify_sub_patch( PatchData& /*pd*/,
+                                     WeightReaderData& data,
+                                     PatchData& subpatch,
+                                     const size_t*,
+                                     const size_t*,
+                                     MsqError& /*err*/ )
 {
     WeightReaderData& other = get_data( subpatch );
     if( other.handles.empty() ) other.handles = data.handles;

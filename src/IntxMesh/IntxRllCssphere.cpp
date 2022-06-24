@@ -58,9 +58,16 @@ double IntxRllCssphere::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
 /* the elements are convex for sure, then do a gnomonic projection of both,
  *  compute intersection in the plane, then go back to the sphere for the points
  *  */
-ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP,
-                                                                double& area, int markb[MAXEDGES], int markr[MAXEDGES],
-                                                                int& nsSrc, int& nsTgt, bool check_boxes_first )
+ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt,
+                                                                EntityHandle src,
+                                                                double* P,
+                                                                int& nP,
+                                                                double& area,
+                                                                int markb[MAXEDGES],
+                                                                int markr[MAXEDGES],
+                                                                int& nsSrc,
+                                                                int& nsTgt,
+                                                                bool check_boxes_first )
 {
     // the area will be used from now on, to see how well we fill the tgt cell with polygons
     // the points will be at most 40; they will describe a convex patch, after the points will be
@@ -134,7 +141,7 @@ ErrorCode IntxRllCssphere::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt
 
     int side[MAXEDGES] = { 0 };  // this refers to what side? src or tgt?// more tolerant here with epsilon_area
     int extraPoints    = IntxUtils::borderPointsOfXinY2( srcCoords2D, nsSrc, tgtCoords2D, nsTgt, &( P[2 * nP] ), side,
-                                                      2 * epsilon_area );
+                                                         2 * epsilon_area );
     if( extraPoints >= 1 )
     {
         for( int k = 0; k < nsSrc; k++ )

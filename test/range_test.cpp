@@ -116,7 +116,7 @@ void intersect_test()
     r1.insert( h1, h10 );
     r2.insert( h5, h20 );
     rhs = intersect( r1, r2 );
-    CHECK_EQUAL( ( size_t )( h10 - h5 + 1 ), rhs.size() );
+    CHECK_EQUAL( (size_t)( h10 - h5 + 1 ), rhs.size() );
 
     // half-below test
     r1.clear();
@@ -125,7 +125,7 @@ void intersect_test()
     r1.insert( h5, h20 );
     r2.insert( h1, h10 );
     rhs = intersect( r1, r2 );
-    CHECK_EQUAL( ( size_t )( h10 - h5 + 1 ), rhs.size() );
+    CHECK_EQUAL( (size_t)( h10 - h5 + 1 ), rhs.size() );
 }
 
 void merge_test()

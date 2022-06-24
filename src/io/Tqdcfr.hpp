@@ -126,8 +126,10 @@ class Tqdcfr : public ReaderIface
 
         void print();
 
-        static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
-                                           Tqdcfr* instance, GeomHeader*& entity_headers );
+        static ErrorCode read_info_header( const unsigned int model_offset,
+                                           const FEModelHeader::ArrayInfo& info,
+                                           Tqdcfr* instance,
+                                           GeomHeader*& entity_headers );
 
         GeomHeader();
     };
@@ -141,8 +143,10 @@ class Tqdcfr : public ReaderIface
 
         void print();
 
-        static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
-                                           Tqdcfr* instance, GroupHeader*& entity_headers );
+        static ErrorCode read_info_header( const unsigned int model_offset,
+                                           const FEModelHeader::ArrayInfo& info,
+                                           Tqdcfr* instance,
+                                           GroupHeader*& entity_headers );
 
         GroupHeader();
     };
@@ -161,8 +165,10 @@ class Tqdcfr : public ReaderIface
 
         void print();
 
-        static ErrorCode read_info_header( const double data_version, const unsigned int model_offset,
-                                           const FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
+        static ErrorCode read_info_header( const double data_version,
+                                           const unsigned int model_offset,
+                                           const FEModelHeader::ArrayInfo& info,
+                                           Tqdcfr* instance,
                                            BlockHeader*& block_headers );
 
         BlockHeader();
@@ -177,8 +183,10 @@ class Tqdcfr : public ReaderIface
 
         void print();
 
-        static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
-                                           Tqdcfr* instance, NodesetHeader*& entity_headers );
+        static ErrorCode read_info_header( const unsigned int model_offset,
+                                           const FEModelHeader::ArrayInfo& info,
+                                           Tqdcfr* instance,
+                                           NodesetHeader*& entity_headers );
 
         NodesetHeader();
     };
@@ -192,8 +200,10 @@ class Tqdcfr : public ReaderIface
 
         void print();
 
-        static ErrorCode read_info_header( const unsigned int model_offset, const FEModelHeader::ArrayInfo& info,
-                                           Tqdcfr* instance, SidesetHeader*& entity_headers );
+        static ErrorCode read_info_header( const unsigned int model_offset,
+                                           const FEModelHeader::ArrayInfo& info,
+                                           Tqdcfr* instance,
+                                           SidesetHeader*& entity_headers );
 
         SidesetHeader();
     };
@@ -283,16 +293,26 @@ class Tqdcfr : public ReaderIface
     static ReaderIface* factory( Interface* );
 
     // read cub file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     ErrorCode read_nodeset( const unsigned int nsindex, ModelEntry* model, NodesetHeader* nodeseth );
-    ErrorCode read_sideset( const unsigned int ssindex, const double data_version, ModelEntry* model,
+    ErrorCode read_sideset( const unsigned int ssindex,
+                            const double data_version,
+                            ModelEntry* model,
                             SidesetHeader* sideseth );
-    ErrorCode read_block( const unsigned int blindex, const double data_version, ModelEntry* model,
+    ErrorCode read_block( const unsigned int blindex,
+                          const double data_version,
+                          ModelEntry* model,
                           BlockHeader* blockh );
     ErrorCode read_group( const unsigned int gr_index, ModelEntry* model, GroupHeader* grouph );
     ErrorCode read_nodes( const unsigned int gindex, ModelEntry* model, GeomHeader* entity );
@@ -419,32 +439,48 @@ class Tqdcfr : public ReaderIface
 
     //! get entities with individually-specified types; if is_group is false,
     //! increment each mem_type by 2 since they're CSOEntityType's and not group types
-    ErrorCode get_entities( const unsigned int* mem_types, int* id_buf, const unsigned int id_buf_size,
-                            const bool is_group, std::vector< EntityHandle >& entities );
+    ErrorCode get_entities( const unsigned int* mem_types,
+                            int* id_buf,
+                            const unsigned int id_buf_size,
+                            const bool is_group,
+                            std::vector< EntityHandle >& entities );
 
     //! get entities specified by type and ids, append to entities
-    ErrorCode get_entities( const unsigned int this_type, int* id_buf, const unsigned int id_buf_size,
-                            std::vector< EntityHandle >& entities, std::vector< EntityHandle >& excl_entities );
+    ErrorCode get_entities( const unsigned int this_type,
+                            int* id_buf,
+                            const unsigned int id_buf_size,
+                            std::vector< EntityHandle >& entities,
+                            std::vector< EntityHandle >& excl_entities );
 
     //! get ref entity sets with specified type and ids
-    ErrorCode get_ref_entities( const unsigned int this_type, int* id_buf, const unsigned id_buf_size,
+    ErrorCode get_ref_entities( const unsigned int this_type,
+                                int* id_buf,
+                                const unsigned id_buf_size,
                                 std::vector< EntityHandle >& entities );
 
     //! get mesh entities with specified type and ids
-    ErrorCode get_mesh_entities( const unsigned int this_type, int* id_buf, const unsigned id_buf_size,
-                                 std::vector< EntityHandle >& entities, std::vector< EntityHandle >& excl_entities );
+    ErrorCode get_mesh_entities( const unsigned int this_type,
+                                 int* id_buf,
+                                 const unsigned id_buf_size,
+                                 std::vector< EntityHandle >& entities,
+                                 std::vector< EntityHandle >& excl_entities );
 
     //! process entities in a sideset according to sense flags stored in uint_buf
     //! or char_buf (depending on sense_size)
-    ErrorCode process_sideset_10( const int this_type, const int num_ents, const int sense_size,
-                                  std::vector< EntityHandle >& ss_entities, Tqdcfr::SidesetHeader* sideseth );
+    ErrorCode process_sideset_10( const int this_type,
+                                  const int num_ents,
+                                  const int sense_size,
+                                  std::vector< EntityHandle >& ss_entities,
+                                  Tqdcfr::SidesetHeader* sideseth );
 
-    ErrorCode process_sideset_11( std::vector< EntityHandle >& ss_entities, int num_wrts,
+    ErrorCode process_sideset_11( std::vector< EntityHandle >& ss_entities,
+                                  int num_wrts,
                                   Tqdcfr::SidesetHeader* sideseth );
 
     // put entities into the specfied set, and excluded entities into a
     // std::vector pointed to by the "Exclude_Entities" tag on that set
-    ErrorCode put_into_set( EntityHandle set_handle, std::vector< EntityHandle >& entities,
+    ErrorCode put_into_set( EntityHandle set_handle,
+                            std::vector< EntityHandle >& entities,
                             std::vector< EntityHandle >& excl_entities );
 
     // look in metadatacontainer[set_index] for name data; if found, set name (and extra names,

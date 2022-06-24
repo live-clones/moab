@@ -13,7 +13,10 @@
 class ParNcFile : public NcFile
 {
   public:
-    ParNcFile( MPI_Comm comm, MPI_Info comm_info, const char* path, FileMode fmode = ReadOnly,
+    ParNcFile( MPI_Comm comm,
+               MPI_Info comm_info,
+               const char* path,
+               FileMode fmode     = ReadOnly,
                FileFormat fformat = Classic )
         : NcFile(), m_comm( comm )
     {

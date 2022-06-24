@@ -142,8 +142,11 @@ class MESQUITE_EXPORT OFEvaluator
      *\param Hessian_diag_blocks Output, 3x3 submatrices along diagonal of
      *                           Hessian of objective function
      */
-    bool update( PatchData& pd, double& value, std::vector< Vector3D >& grad,
-                 std::vector< SymMatrix3D >& Hessian_diag_blocks, MsqError& err );
+    bool update( PatchData& pd,
+                 double& value,
+                 std::vector< Vector3D >& grad,
+                 std::vector< SymMatrix3D >& Hessian_diag_blocks,
+                 MsqError& err );
 
     /**\brief Update accumulated values for changes to vertex positions
      *        in a patch.
@@ -241,8 +244,11 @@ class MESQUITE_EXPORT OFEvaluator
      *\param Hessian_diag_blocks Output, 3x3 submatrices along diagonal of
      *                           Hessian of objective function
      */
-    bool evaluate( PatchData& pd, double& value, std::vector< Vector3D >& grad,
-                   std::vector< SymMatrix3D >& Hessian_diag_blocks, MsqError& err ) const;
+    bool evaluate( PatchData& pd,
+                   double& value,
+                   std::vector< Vector3D >& grad,
+                   std::vector< SymMatrix3D >& Hessian_diag_blocks,
+                   MsqError& err ) const;
 
     /**\brief Evaluate the objective function without changing any
      *        accumulated values.
@@ -260,7 +266,10 @@ class MESQUITE_EXPORT OFEvaluator
      *             with respect to each FREE vertex in the patch.
      *\param Hessian Output, the Hessian of the objective function.
      */
-    bool evaluate( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqHessian& Hessian,
+    bool evaluate( PatchData& pd,
+                   double& value,
+                   std::vector< Vector3D >& grad,
+                   MsqHessian& Hessian,
                    MsqError& err ) const;
 
     /**\brief Reset for next inner iteration

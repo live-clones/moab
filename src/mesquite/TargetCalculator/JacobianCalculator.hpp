@@ -59,8 +59,13 @@ class JacobianCalculator
      *\param location Logical position within element at which to evaluate Jacobian
      *\param J_out The resulting Jacobian matrix.
      */
-    void get_Jacobian_2D( const MappingFunction2D* mf, NodeSet ho_bits, Sample location, const Vector3D* vertex_coords,
-                          size_t num_vertex, MsqMatrix< 3, 2 >& J_out, MsqError& err );
+    void get_Jacobian_2D( const MappingFunction2D* mf,
+                          NodeSet ho_bits,
+                          Sample location,
+                          const Vector3D* vertex_coords,
+                          size_t num_vertex,
+                          MsqMatrix< 3, 2 >& J_out,
+                          MsqError& err );
 
     /**\brief Calculate Jacobian for volume element
      *
@@ -71,8 +76,13 @@ class JacobianCalculator
      *\param location Logical position within element at which to evaluate Jacobian
      *\param J_out The resulting Jacobian matrix.
      */
-    void get_Jacobian_3D( const MappingFunction3D* mf, NodeSet ho_bits, Sample location, const Vector3D* vertex_coords,
-                          size_t num_vertex, MsqMatrix< 3, 3 >& J_out, MsqError& err );
+    void get_Jacobian_3D( const MappingFunction3D* mf,
+                          NodeSet ho_bits,
+                          Sample location,
+                          const Vector3D* vertex_coords,
+                          size_t num_vertex,
+                          MsqMatrix< 3, 3 >& J_out,
+                          MsqError& err );
 
   private:
     enum

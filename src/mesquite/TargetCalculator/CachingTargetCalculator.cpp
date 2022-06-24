@@ -51,8 +51,12 @@ void CachingTargetCalculator::notify_patch_destroyed( CachedTargetData& data )
     data.clear();
 }
 
-void CachingTargetCalculator::notify_sub_patch( PatchData&, CachedTargetData& data, PatchData& subpatch, const size_t*,
-                                                const size_t* element_map, MsqError& /*err*/ )
+void CachingTargetCalculator::notify_sub_patch( PatchData&,
+                                                CachedTargetData& data,
+                                                PatchData& subpatch,
+                                                const size_t*,
+                                                const size_t* element_map,
+                                                MsqError& /*err*/ )
 {
     // If no cached data for this patch, just return
     if( data.has_data() ) return;
@@ -213,7 +217,10 @@ static void populate_data( PatchData& pd, CachedTargetData* data, TargetCalculat
     }
 }
 
-bool CachingTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+bool CachingTargetCalculator::get_3D_target( PatchData& pd,
+                                             size_t element,
+                                             Sample sample,
+                                             MsqMatrix< 3, 3 >& W_out,
                                              MsqError& err )
 {
     CachedTargetData& data = get_data( pd );
@@ -231,7 +238,10 @@ bool CachingTargetCalculator::get_3D_target( PatchData& pd, size_t element, Samp
     return true;
 }
 
-bool CachingTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+bool CachingTargetCalculator::get_2D_target( PatchData& pd,
+                                             size_t element,
+                                             Sample sample,
+                                             MsqMatrix< 2, 2 >& W_out,
                                              MsqError& err )
 {
     CachedTargetData& data = get_data( pd );
@@ -261,8 +271,11 @@ bool CachingTargetCalculator::get_2D_target( PatchData& pd, size_t element, Samp
     return true;
 }
 
-bool CachingTargetCalculator::get_surface_target( PatchData& pd, size_t element, Sample sample,
-                                                  MsqMatrix< 3, 2 >& W_out, MsqError& err )
+bool CachingTargetCalculator::get_surface_target( PatchData& pd,
+                                                  size_t element,
+                                                  Sample sample,
+                                                  MsqMatrix< 3, 2 >& W_out,
+                                                  MsqError& err )
 {
     CachedTargetData& data = get_data( pd );
     if( data.targetsSurface.empty() )

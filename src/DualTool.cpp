@@ -80,7 +80,7 @@ DualTool::DualTool( Interface* impl ) : mbImpl( impl )
 
     unsigned int dummy = 0;
     result             = mbImpl->tag_get_handle( IS_DUAL_CELL_TAG_NAME, 1, MB_TYPE_INTEGER, isDualCellTag,
-                                     MB_TAG_SPARSE | MB_TAG_CREAT, &dummy );
+                                                 MB_TAG_SPARSE | MB_TAG_CREAT, &dummy );
     assert( MB_SUCCESS == result );
 
     result = mbImpl->tag_get_handle( DUAL_ENTITY_TAG_NAME, 1, MB_TYPE_HANDLE, dualEntityTag,
@@ -103,7 +103,9 @@ DualTool::DualTool( Interface* impl ) : mbImpl( impl )
 
     globalIdTag = mbImpl->globalId_tag();
 
-    if( MB_SUCCESS == result ) {}  // empty statement to get rid of warning.
+    if( MB_SUCCESS == result )
+    {
+    }  // empty statement to get rid of warning.
 
     maxHexId = -1;
 }
@@ -228,7 +230,9 @@ ErrorCode DualTool::construct_dual_vertices( const Range& all_regions, Range& du
     return result;
 }
 
-ErrorCode DualTool::construct_dual_vertex( EntityHandle entity, EntityHandle& dual_ent, const bool extra,
+ErrorCode DualTool::construct_dual_vertex( EntityHandle entity,
+                                           EntityHandle& dual_ent,
+                                           const bool extra,
                                            const bool add_graphics_pt )
 {
     // no dual entity; construct one; first need the avg coordinates
@@ -656,7 +660,8 @@ ErrorCode DualTool::construct_dual_cells( const Range& all_verts, Range& dual_en
 
 //! given an edge handle, return a list of dual vertices in radial order
 //! around the edge
-ErrorCode DualTool::get_radial_dverts( const EntityHandle edge, std::vector< EntityHandle >& rad_dverts,
+ErrorCode DualTool::get_radial_dverts( const EntityHandle edge,
+                                       std::vector< EntityHandle >& rad_dverts,
                                        bool& bdy_edge )
 {
     rad_dverts.clear();
@@ -781,7 +786,9 @@ ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities, co
 }
 
 //! get the faces of the dual
-ErrorCode DualTool::get_dual_entities( const int dim, EntityHandle* entities, const int num_entities,
+ErrorCode DualTool::get_dual_entities( const int dim,
+                                       EntityHandle* entities,
+                                       const int num_entities,
                                        std::vector< EntityHandle >& dual_ents )
 {
     Range tmp_range;
@@ -1167,7 +1174,8 @@ ErrorCode DualTool::construct_hp_parent_child()
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::get_graphics_points( EntityHandle dual_ent, std::vector< int >& npts,
+ErrorCode DualTool::get_graphics_points( EntityHandle dual_ent,
+                                         std::vector< int >& npts,
                                          std::vector< GraphicsPoint >& points )
 {
     // shouldn't be a set
@@ -1217,7 +1225,8 @@ ErrorCode DualTool::get_graphics_points( EntityHandle dual_ent, std::vector< int
     return result;
 }
 
-ErrorCode DualTool::get_cell_points( EntityHandle dual_ent, std::vector< int >& npts,
+ErrorCode DualTool::get_cell_points( EntityHandle dual_ent,
+                                     std::vector< int >& npts,
                                      std::vector< GraphicsPoint >& points )
 {
     assert( MBPOLYGON == mbImpl->type_from_handle( dual_ent ) );
@@ -1263,8 +1272,10 @@ ErrorCode DualTool::get_cell_points( EntityHandle dual_ent, std::vector< int >& 
     return result;
 }
 
-ErrorCode DualTool::get_graphics_points( const Range& in_range, std::vector< GraphicsPoint >& points,
-                                         const bool assign_ids, const int start_id )
+ErrorCode DualTool::get_graphics_points( const Range& in_range,
+                                         std::vector< GraphicsPoint >& points,
+                                         const bool assign_ids,
+                                         const int start_id )
 {
     // return graphics points on dual entities in in_range or in entities
     // in sets in in_range
@@ -1315,7 +1326,8 @@ ErrorCode DualTool::get_graphics_points( const Range& in_range, std::vector< Gra
     return result;
 }
 
-EntityHandle DualTool::next_loop_vertex( const EntityHandle last_v, const EntityHandle this_v,
+EntityHandle DualTool::next_loop_vertex( const EntityHandle last_v,
+                                         const EntityHandle this_v,
                                          const EntityHandle dual_surf )
 {
     // given two vertices, find the next one on the loop; if one is a dual
@@ -1384,7 +1396,8 @@ EntityHandle DualTool::get_dual_hyperplane( const EntityHandle ncell )
 }
 
 //! set the dual surface or curve for an entity
-ErrorCode DualTool::set_dual_surface_or_curve( EntityHandle entity, const EntityHandle dual_hyperplane,
+ErrorCode DualTool::set_dual_surface_or_curve( EntityHandle entity,
+                                               const EntityHandle dual_hyperplane,
                                                const int dual_entity_dimension )
 {
     if( 1 == dual_entity_dimension )
@@ -1786,9 +1799,14 @@ ErrorCode DualTool::face_open_collapse( EntityHandle ocl, EntityHandle ocr )
     return check_dual_adjs();
 }
 
-ErrorCode DualTool::foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHandle* split_quads,
-                                  EntityHandle* split_edges, EntityHandle* split_nodes, Range& hexes,
-                                  EntityHandle* other_edges, EntityHandle* other_nodes )
+ErrorCode DualTool::foc_get_ents( EntityHandle ocl,
+                                  EntityHandle ocr,
+                                  EntityHandle* split_quads,
+                                  EntityHandle* split_edges,
+                                  EntityHandle* split_nodes,
+                                  Range& hexes,
+                                  EntityHandle* other_edges,
+                                  EntityHandle* other_nodes )
 {
     // get the entities used for foc; ocl and ocr are dual 1-cells
     // representing quads to be split; returned from this function:
@@ -1928,11 +1946,16 @@ ErrorCode DualTool::foc_get_ents( EntityHandle ocl, EntityHandle ocr, EntityHand
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHandle* split_edges,
-                                            EntityHandle* split_nodes, std::vector< EntityHandle >* star_dp1,
-                                            std::vector< EntityHandle >* star_dp2, EntityHandle* /*other_edges*/,
-                                            EntityHandle* /*other_nodes*/, EntityHandle* new_quads,
-                                            EntityHandle* new_edges, EntityHandle* new_nodes )
+ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads,
+                                            EntityHandle* split_edges,
+                                            EntityHandle* split_nodes,
+                                            std::vector< EntityHandle >* star_dp1,
+                                            std::vector< EntityHandle >* star_dp2,
+                                            EntityHandle* /*other_edges*/,
+                                            EntityHandle* /*other_nodes*/,
+                                            EntityHandle* new_quads,
+                                            EntityHandle* new_edges,
+                                            EntityHandle* new_nodes )
 {
 
     // if there's a bdy in the star around the shared edge(s), get the quads on that
@@ -2072,8 +2095,11 @@ ErrorCode DualTool::split_pair_nonmanifold( EntityHandle* split_quads, EntityHan
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* /*star_dp2*/,
-                                       EntityHandle* split_edges, EntityHandle split_node, Range* addl_ents )
+ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1,
+                                       std::vector< EntityHandle >* /*star_dp2*/,
+                                       EntityHandle* split_edges,
+                                       EntityHandle split_node,
+                                       Range* addl_ents )
 {
     // if we're splitting 2 edges, there might be other edges that have the split
     // node; also need to know which side they're on
@@ -2102,8 +2128,10 @@ ErrorCode DualTool::foc_get_addl_ents( std::vector< EntityHandle >* star_dp1, st
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads, EntityHandle* split_edges,
-                                   std::vector< EntityHandle >* star_dp1, std::vector< EntityHandle >* star_dp2 )
+ErrorCode DualTool::foc_get_stars( EntityHandle* split_quads,
+                                   EntityHandle* split_edges,
+                                   std::vector< EntityHandle >* star_dp1,
+                                   std::vector< EntityHandle >* star_dp2 )
 {
     bool on_bdy = false, on_bdy_tmp;
     ErrorCode result;
@@ -2465,8 +2493,12 @@ ErrorCode DualTool::get_opposite_verts( const EntityHandle middle_edge, const En
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::get_dual_entities( const EntityHandle dual_ent, Range* dcells, Range* dedges, Range* dverts,
-                                       Range* dverts_loop, Range* dedges_loop )
+ErrorCode DualTool::get_dual_entities( const EntityHandle dual_ent,
+                                       Range* dcells,
+                                       Range* dedges,
+                                       Range* dverts,
+                                       Range* dverts_loop,
+                                       Range* dedges_loop )
 {
     ErrorCode result = MB_SUCCESS;
 
@@ -2786,7 +2818,8 @@ ErrorCode DualTool::face_shrink( EntityHandle odedge )
     return result;
 }
 
-ErrorCode DualTool::fs_get_quad_loops( EntityHandle* hexes, std::vector< EntityHandle >* connects,
+ErrorCode DualTool::fs_get_quad_loops( EntityHandle* hexes,
+                                       std::vector< EntityHandle >* connects,
                                        std::vector< EntityHandle >* side_quads )
 {
     for( int i = 0; i < 4; i++ )
@@ -3102,7 +3135,9 @@ ErrorCode DualTool::fsr_get_fourth_quad( std::vector< EntityHandle >* connects,
     return MB_SUCCESS;
 }
 
-ErrorCode DualTool::fs_get_quads( EntityHandle odedge, EntityHandle* quads, EntityHandle* hexes,
+ErrorCode DualTool::fs_get_quads( EntityHandle odedge,
+                                  EntityHandle* quads,
+                                  EntityHandle* hexes,
                                   std::vector< EntityHandle >* connects )
 {
     // need to get the three quads along the chord

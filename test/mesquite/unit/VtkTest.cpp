@@ -403,10 +403,13 @@ class VtkTest : public CppUnit::TestFixture
 
     void test_elements();
 
-    int tri_check_validity( const MBMesquite::MsqMeshEntity* element_array, size_t num_elements,
-                            const MBMesquite::MsqVertex* vtx_array, size_t num_vertices );
+    int tri_check_validity( const MBMesquite::MsqMeshEntity* element_array,
+                            size_t num_elements,
+                            const MBMesquite::MsqVertex* vtx_array,
+                            size_t num_vertices );
 
-    int tet_validity_check( const MBMesquite::MsqMeshEntity* element_array, size_t num_elements,
+    int tet_validity_check( const MBMesquite::MsqMeshEntity* element_array,
+                            size_t num_elements,
                             const MBMesquite::MsqVertex* vtx_array );
 };
 // Check if the 2x2x2 brick of structured mesh
@@ -1094,8 +1097,10 @@ void VtkTest::test_elements()
     CPPUNIT_ASSERT( tri_check_validity( element_array, num_elements, vtx_array, num_vertices ) == 1 );
 }
 
-int VtkTest::tri_check_validity( const MBMesquite::MsqMeshEntity* element_array, size_t num_elements,
-                                 const MBMesquite::MsqVertex* vtx_array, size_t num_vertices )
+int VtkTest::tri_check_validity( const MBMesquite::MsqMeshEntity* element_array,
+                                 size_t num_elements,
+                                 const MBMesquite::MsqVertex* vtx_array,
+                                 size_t num_vertices )
 {
 
     /* check that the simplicial mesh is still valid,
@@ -1135,7 +1140,8 @@ int VtkTest::tri_check_validity( const MBMesquite::MsqMeshEntity* element_array,
     return ( valid );
 }
 
-int VtkTest::tet_validity_check( const MBMesquite::MsqMeshEntity* element_array, size_t num_elements,
+int VtkTest::tet_validity_check( const MBMesquite::MsqMeshEntity* element_array,
+                                 size_t num_elements,
                                  const MBMesquite::MsqVertex* vtx_array )
 {
     int valid   = 1;
@@ -1190,13 +1196,19 @@ int VtkTest::tet_validity_check( const MBMesquite::MsqMeshEntity* element_array,
 
         /* Use the length scale to get a better idea if the tet is flat or
            just really small. */
-        if( fabs( dScale ) < dEps ) { return ( valid = 0 ); }
+        if( fabs( dScale ) < dEps )
+        {
+            return ( valid = 0 );
+        }
         else
         {
             dDet /= ( dScale * dScale * dScale );
         }
 
-        if( dDet > dEps ) { valid = 1; }
+        if( dDet > dEps )
+        {
+            valid = 1;
+        }
         else if( dDet < -dEps )
         {
             valid = -1;

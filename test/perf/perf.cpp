@@ -306,7 +306,9 @@ void init()
     ErrorCode rval =
         gMB->tag_get_handle( "position_tag", 3, MB_TYPE_DOUBLE, pos_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
     assert( MB_SUCCESS == rval );
-    if( rval ) {}  // empty line to remove compiler warning
+    if( rval )
+    {
+    }  // empty line to remove compiler warning
     rval = gMB->tag_get_handle( "position2_tag", 3, MB_TYPE_DOUBLE, pos2_tag, MB_TAG_DENSE | MB_TAG_CREAT, def_val );
     assert( MB_SUCCESS == rval );
 }
@@ -436,8 +438,11 @@ void query_vert_to_elem()
     RC( "query_vert_to_elem" );
 }
 
-void query_elem_to_vert_iters( int chunk_size, bool check_valid, std::vector< EntityHandle >& connect,
-                               double* dum_coords, double* dum_pos )
+void query_elem_to_vert_iters( int chunk_size,
+                               bool check_valid,
+                               std::vector< EntityHandle >& connect,
+                               double* dum_coords,
+                               double* dum_pos )
 {
     std::vector< EntityHandle > hexes;
     SetIterator* iter;
@@ -475,8 +480,11 @@ void query_elem_to_vert_iters( int chunk_size, bool check_valid, std::vector< En
     delete iter;
 }
 
-void query_vert_to_elem_iters( int chunk_size, bool check_valid, std::vector< EntityHandle >& /*connect*/,
-                               double* dum_coords, double* dum_pos )
+void query_vert_to_elem_iters( int chunk_size,
+                               bool check_valid,
+                               std::vector< EntityHandle >& /*connect*/,
+                               double* dum_coords,
+                               double* dum_pos )
 {
     std::vector< EntityHandle > verts, neighbor_hexes;
     SetIterator* iter;

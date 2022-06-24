@@ -23,8 +23,14 @@ double IntxUtilsCSLAM::quasi_smooth_field( double lam, double tet, double* param
     double r1    = moab::IntxUtils::distance_on_sphere( lam, tet, la1, te1 );
     double r2    = moab::IntxUtils::distance_on_sphere( lam, tet, la2, te2 );
     double value = b;
-    if( r1 < r ) { value += c * hmax / 2 * ( 1 + cos( M_PI * r1 / r ) ); }
-    if( r2 < r ) { value += c * hmax / 2 * ( 1 + cos( M_PI * r2 / r ) ); }
+    if( r1 < r )
+    {
+        value += c * hmax / 2 * ( 1 + cos( M_PI * r1 / r ) );
+    }
+    if( r2 < r )
+    {
+        value += c * hmax / 2 * ( 1 + cos( M_PI * r2 / r ) );
+    }
     return value;
 }
 
@@ -82,7 +88,9 @@ double IntxUtilsCSLAM::slotted_cylinder_field( double lam, double tet, double* p
  *
  *  cosine bell: center lambda0, theta0:
  */
-void IntxUtilsCSLAM::departure_point_case1( CartVect& arrival_point, double t, double delta_t,
+void IntxUtilsCSLAM::departure_point_case1( CartVect& arrival_point,
+                                            double t,
+                                            double delta_t,
                                             CartVect& departure_point )
 {
     // always assume radius is 1 here?

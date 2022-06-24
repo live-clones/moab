@@ -32,7 +32,10 @@ ErrorCode LloydSmoother::perform_smooth()
 {
     ErrorCode rval;
 
-    if( myElems.empty() ) { MB_SET_ERR( MB_FAILURE, "No elements specified to Lloyd smoother" ); }
+    if( myElems.empty() )
+    {
+        MB_SET_ERR( MB_FAILURE, "No elements specified to Lloyd smoother" );
+    }
     else if( mbImpl->dimension_from_handle( *myElems.begin() ) != mbImpl->dimension_from_handle( *myElems.rbegin() ) )
     {
         MB_SET_ERR( MB_FAILURE, "Elements of unequal dimension specified to Lloyd smoother" );
