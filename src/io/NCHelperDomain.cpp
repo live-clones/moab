@@ -47,7 +47,9 @@ ErrorCode NCHelperDomain::init_mesh_vals()
     std::vector< int >& dimLens                       = _readNC->dimLens;
     std::map< std::string, ReadNC::VarData >& varInfo = _readNC->varInfo;
     DebugOutput& dbgOut                               = _readNC->dbgOut;
+#ifdef MOAB_HAVE_MPI
     bool& isParallel                                  = _readNC->isParallel;
+#endif
     int& partMethod                                   = _readNC->partMethod;
     ScdParData& parData                               = _readNC->parData;
 

@@ -18,14 +18,23 @@ namespace moab
 
 unsigned int DGMSolver::nchoosek( unsigned int n, unsigned int k )
 {
-    if( k > n ) { return 0; }
+    if( k > n )
+    {
+        return 0;
+    }
     unsigned long long ans = 1;
-    if( k > ( n >> 1 ) ) { k = n - k; }
+    if( k > ( n >> 1 ) )
+    {
+        k = n - k;
+    }
     for( unsigned int i = 1; i <= k; ++i )
     {
         ans *= n--;
         ans /= i;
-        if( ans > std::numeric_limits< unsigned int >::max() ) { return 0; }
+        if( ans > std::numeric_limits< unsigned int >::max() )
+        {
+            return 0;
+        }
     }
     return ans;
 }
@@ -57,7 +66,10 @@ void DGMSolver::gen_multivar_monomial_basis( const int kvars, const double* vars
 #endif
     basis.push_back( 1 );
     ++iend;
-    if( !degree ) { return; }
+    if( !degree )
+    {
+        return;
+    }
     std::vector< size_t > varspos( kvars );
     // degree 1
     for( int ivar = 0; ivar < kvars; ++ivar )
@@ -95,7 +107,10 @@ void DGMSolver::gen_vander_multivar( const int mrows, const int kvars, const dou
         V.push_back( 1 );
     }
     ++icol;
-    if( !degree ) { return; }
+    if( !degree )
+    {
+        return;
+    }
     std::vector< size_t > varspos( kvars );
     // degree 1
     for( int ivar = 0; ivar < kvars; ++ivar )
@@ -280,6 +295,7 @@ void DGMSolver::backsolve( int mrows, int ncols, double* R, int bncols, double* 
 void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool interp, int mrows, int ncols, double* R,
                                                int bncols, double* bs, const double* ws, int* degree_out )
 {
+    if( ncols < 1 ) std::cout << "ERROR: Invalid input to safeguarded polyfit backsolve routine.\n";
 #if 0
     std::cout.precision(12);
     std::cout<<"Before backsolve  "<<std::endl;
@@ -352,7 +368,10 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
             for( int d = deg; d >= 0; d-- )
             {
                 int cstart = 0;
-                if( dim == 1 ) { cstart = d; }
+                if( dim == 1 )
+                {
+                    cstart = d;
+                }
                 else if( dim == 2 )
                 {
                     cstart = ( ( d + 1 ) * d ) / 2;
@@ -466,7 +485,10 @@ void DGMSolver::backsolve_polyfit_safeguarded( int dim, int degree, const bool i
 
 void DGMSolver::vec_dotprod( const int len, const double* a, const double* b, double* c )
 {
-    if( !a || !b || !c ) { MB_SET_ERR_RET( "NULL Pointer" ); }
+    if( !a || !b || !c )
+    {
+        MB_SET_ERR_RET( "NULL Pointer" );
+    }
     for( int i = 0; i < len; ++i )
     {
         c[i] = a[i] * b[i];
@@ -475,7 +497,10 @@ void DGMSolver::vec_dotprod( const int len, const double* a, const double* b, do
 
 void DGMSolver::vec_scalarprod( const int len, const double* a, const double c, double* b )
 {
-    if( !a || !b ) { MB_SET_ERR_RET( "NULL Pointer" ); }
+    if( !a || !b )
+    {
+        MB_SET_ERR_RET( "NULL Pointer" );
+    }
     for( int i = 0; i < len; ++i )
     {
         b[i] = c * a[i];
@@ -491,7 +516,10 @@ void DGMSolver::vec_crossprod( const double a[3], const double b[3], double ( &c
 
 double DGMSolver::vec_innerprod( const int len, const double* a, const double* b )
 {
-    if( !a || !b ) { MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 ); }
+    if( !a || !b )
+    {
+        MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 );
+    }
     double ans = 0;
     for( int i = 0; i < len; ++i )
     {
@@ -502,12 +530,18 @@ double DGMSolver::vec_innerprod( const int len, const double* a, const double* b
 
 double DGMSolver::vec_2norm( const int len, const double* a )
 {
-    if( !a ) { MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 ); }
+    if( !a )
+    {
+        MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 );
+    }
     double w = 0, s = 0;
     for( int k = 0; k < len; k++ )
         w = std::max( w, fabs( a[k] ) );
 
-    if( w == 0 ) { return 0; }
+    if( w == 0 )
+    {
+        return 0;
+    }
     else
     {
         for( int k = 0; k < len; k++ )
@@ -521,7 +555,10 @@ double DGMSolver::vec_2norm( const int len, const double* a )
 
 double DGMSolver::vec_normalize( const int len, const double* a, double* b )
 {
-    if( !a || !b ) { MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 ); }
+    if( !a || !b )
+    {
+        MB_SET_ERR_RET_VAL( "NULL Pointer", 0.0 );
+    }
     double nrm = 0, mx = 0;
     for( int i = 0; i < len; ++i )
     {
@@ -540,7 +577,10 @@ double DGMSolver::vec_normalize( const int len, const double* a, double* b )
         nrm += ( a[i] / mx ) * ( a[i] / mx );
     }
     nrm = mx * sqrt( nrm );
-    if( nrm == 0 ) { return nrm; }
+    if( nrm == 0 )
+    {
+        return nrm;
+    }
     for( int i = 0; i < len; ++i )
     {
         b[i] = a[i] / nrm;
@@ -560,7 +600,10 @@ double DGMSolver::vec_distance( const int len, const double* a, const double* b 
 
 void DGMSolver::vec_projoff( const int len, const double* a, const double* b, double* c )
 {
-    if( !a || !b || !c ) { MB_SET_ERR_RET( "NULL Pointer" ); }
+    if( !a || !b || !c )
+    {
+        MB_SET_ERR_RET( "NULL Pointer" );
+    }
     // c = a-<a,b>b/<b,b>;
     double bnrm = vec_2norm( len, b );
     if( bnrm == 0 )
@@ -594,7 +637,10 @@ void DGMSolver::vec_projoff( const int len, const double* a, const double* b, do
 void DGMSolver::vec_linear_operation( const int len, const double mu, const double* a, const double psi,
                                       const double* b, double* c )
 {
-    if( !a || !b || !c ) { MB_SET_ERR_RET( "NULL Pointer" ); }
+    if( !a || !b || !c )
+    {
+        MB_SET_ERR_RET( "NULL Pointer" );
+    }
     for( int i = 0; i < len; ++i )
     {
         c[i] = mu * a[i] + psi * b[i];

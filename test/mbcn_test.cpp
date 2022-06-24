@@ -900,9 +900,10 @@ void test_has_mid_nodes( EntityType type )
         switch( dim )
         {
             case 3:
-                if( ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
             case 2:
-                if( ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
+	      // extra clauses to avoid fall-through error
+                if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
+                if( 2 <= dim && ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
         }
         if( ho_nodes[dim] ) ++num_vtx;
 
@@ -941,9 +942,10 @@ void test_ho_node_parent()
             switch( dim )
             {
                 case 3:
-                    if( ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
                 case 2:
-                    if( ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
+	      // extra clauses to avoid fall-through error
+                    if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
+                    if( 2 <= dim && ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
             }
             if( ho_nodes[dim] ) ++num_vtx;
 
@@ -1008,9 +1010,10 @@ void test_ho_node_index()
             switch( dim )
             {
                 case 3:
-                    if( ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
                 case 2:
-                    if( ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
+	      // extra clauses to avoid fall-through error
+		    if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
+                    if( 2 <= dim && ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
             }
             if( ho_nodes[dim] ) ++num_vtx;
 
@@ -1053,19 +1056,24 @@ void test_sub_entity_nodes( EntityType parent, int sub_dimension )
     const int num_edge   = CN::NumSubEntities( parent, 1 );
     const int num_face   = CN::NumSubEntities( parent, 2 );
 
-    switch( CN::Dimension( parent ) )
+    auto dim =  CN::Dimension( parent );
+    switch(dim)
     {
         case 3:
+        case 2:
+        case 1:
             test_sub_entity_nodes( parent, num_corner + num_face, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + num_edge + num_face, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + num_face + 1, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + num_edge + num_face + 1, sub_dimension );
-        case 2:
+	  if (2 <= dim) {
             test_sub_entity_nodes( parent, num_corner + num_edge, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + num_edge + 1, sub_dimension );
-        case 1:
+	  }
+	  if (1 <= dim) {	      
             test_sub_entity_nodes( parent, num_corner, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + 1, sub_dimension );
+	  }
             break;
         default:
             CHECK( false );

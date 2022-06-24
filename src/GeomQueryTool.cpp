@@ -210,7 +210,10 @@ ErrorCode GQT_IntRegCtxt::update_orient( EntityHandle set, int* surfTriOrient )
         }
         // surfTriOrient will be used by plucker_ray_tri_intersect to avoid
         // intersections with wrong orientation.
-        if( *geomVol == vols[0] ) { *surfTriOrient = *desiredOrient * 1; }
+        if( *geomVol == vols[0] )
+        {
+            *surfTriOrient = *desiredOrient * 1;
+        }
         else if( *geomVol == vols[1] )
         {
             *surfTriOrient = *desiredOrient * ( -1 );
@@ -266,8 +269,9 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     // get the node of the triangle
     const EntityHandle* conn = NULL;
     int len                  = 0;
-    ErrorCode rval           = MBI->get_connectivity( tri, conn, len );
-    if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+    ErrorCode rval           = MBI->get_connectivity( tri, conn, len );MB_CHK_ERR_RET_VAL( rval, false );
+    // NOTE: original code is next line, but return type was wrong; returning true to get same net effect
+    if( 3 != len ) return false;
 
     // get adjacent tris (and keep their corresponding senses)
     std::vector< EntityHandle > adj_tris;
@@ -290,8 +294,8 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         for( unsigned i = 0; i < close_tris.size(); ++i )
         {
             const EntityHandle* con = NULL;
-            rval                    = MBI->get_connectivity( close_tris[i], con, len );
-            if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+            rval                    = MBI->get_connectivity( close_tris[i], con, len );MB_CHK_ERR_RET_VAL( rval, false );
+            if( 3 != len ) return false;
 
             if( node == con[0] || node == con[1] || node == con[2] )
             {
@@ -302,7 +306,7 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         if( adj_tris.empty() )
         {
             std::cerr << "error: no tris are adjacent to the node" << std::endl;
-            return MB_FAILURE;
+            return false;
         }
         // edge intersection
     }
@@ -331,8 +335,8 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
         for( unsigned i = 0; i < close_tris.size(); ++i )
         {
             const EntityHandle* con = NULL;
-            rval                    = MBI->get_connectivity( close_tris[i], con, len );
-            if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+            rval                    = MBI->get_connectivity( close_tris[i], con, len );MB_CHK_ERR_RET_VAL( rval, false );
+            if( 3 != len ) return false;
 
             // check both orientations in case close_tris are not on the same surface
             if( ( endpts[0] == con[0] && endpts[1] == con[1] ) || ( endpts[0] == con[1] && endpts[1] == con[0] ) ||
@@ -354,7 +358,7 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     else
     {
         std::cerr << "error: special case not an node/edge intersection" << std::endl;
-        return MB_FAILURE;
+        return false;
     }
 
     // The close tris were in proximity to the intersection. The adj_tris are
@@ -369,11 +373,11 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     for( unsigned i = 0; i < adj_tris.size(); ++i )
     {
         const EntityHandle* con = NULL;
-        rval                    = MBI->get_connectivity( adj_tris[i], con, len );
-        if( MB_SUCCESS != rval || 3 != len ) return MB_FAILURE;
+        rval                    = MBI->get_connectivity( adj_tris[i], con, len );MB_CHK_ERR_RET_VAL( rval, false );
+        if( 3 != len ) return false;
+
         CartVect coords[3];
-        rval = MBI->get_coords( con, len, coords[0].array() );
-        if( MB_SUCCESS != rval ) return MB_FAILURE;
+        rval = MBI->get_coords( con, len, coords[0].array() );MB_CHK_ERR_RET_VAL( rval, false );
 
         // get normal of triangle
         CartVect v0     = coords[1] - coords[0];
@@ -509,7 +513,10 @@ void GQT_IntRegCtxt::add_intersection( EntityHandle set, EntityHandle facet, dou
 
     // Mode 1, detected by non-null neg_ray_len pointer
     // keep the closest nonneg intersection and one negative intersection, if closer
-    if( search_win.second && search_win.first ) { return add_mode1_intersection( set, facet, dist, search_win ); }
+    if( search_win.second && search_win.first )
+    {
+        return add_mode1_intersection( set, facet, dist, search_win );
+    }
 
     // ---------------------------------------------------------------------------
     /*   Mode 2: Used if neg_ray_len is not specified
@@ -574,7 +581,10 @@ void GQT_IntRegCtxt::add_intersection( EntityHandle set, EntityHandle facet, dou
     // this one is closer, replace the existing one with this one.
     else if( len_idx >= 0 )
     {
-        if( dist <= *search_win.first ) { set_intersection( len_idx, set, facet, dist ); }
+        if( dist <= *search_win.first )
+        {
+            set_intersection( len_idx, set, facet, dist );
+        }
     }
     // Otherwise if we want an intersection outside the tolerance
     // and don'thave one yet, add it.
@@ -631,7 +641,10 @@ GeomQueryTool::GeomQueryTool( GeomTopoTool* geomtopotool, bool trace_counting, d
 
 GeomQueryTool::~GeomQueryTool()
 {
-    if( owns_gtt ) { delete geomTopoTool; }
+    if( owns_gtt )
+    {
+        delete geomTopoTool;
+    }
 }
 
 ErrorCode GeomQueryTool::initialize()
@@ -727,7 +740,10 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
 
     // check behind the ray origin for intersections
     double neg_ray_len;
-    if( 0 == overlapThickness ) { neg_ray_len = -numericalPrecision; }
+    if( 0 == overlapThickness )
+    {
+        neg_ray_len = -numericalPrecision;
+    }
     else
     {
         neg_ray_len = -overlapThickness;
@@ -739,7 +755,10 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     // the nonneg_ray_len should not be less than -neg_ray_len, or an overlap
     // may be missed due to optimization within ray_intersect_sets
     if( nonneg_ray_len < -neg_ray_len ) nonneg_ray_len = -neg_ray_len;
-    if( 0 > nonneg_ray_len || 0 <= neg_ray_len ) { MB_SET_ERR( MB_FAILURE, "Incorrect ray length provided" ); }
+    if( 0 > nonneg_ray_len || 0 <= neg_ray_len )
+    {
+        MB_SET_ERR( MB_FAILURE, "Incorrect ray length provided" );
+    }
 
     // min_tolerance_intersections is passed but not used in this call
     const int min_tolerance_intersections = 0;
@@ -763,15 +782,24 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     if( dists.empty() )
     {
         next_surf = 0;
-        if( debug ) { std::cout << "          next_surf=0 dist=(undef)" << std::endl; }
+        if( debug )
+        {
+            std::cout << "          next_surf=0 dist=(undef)" << std::endl;
+        }
         return MB_SUCCESS;
     }
 
     // Assume that a (neg, nonneg) pair of RTIs could be returned,
     // however, only one or the other may exist. dists[] may be populated, but
     // intersections are ONLY indicated by nonzero surfs[] and facets[].
-    if( 2 != dists.size() || 2 != facets.size() ) { MB_SET_ERR( MB_FAILURE, "Incorrect number of facets/distances" ); }
-    if( 0.0 < dists[0] || 0.0 > dists[1] ) { MB_SET_ERR( MB_FAILURE, "Invalid intersection distance signs" ); }
+    if( 2 != dists.size() || 2 != facets.size() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Incorrect number of facets/distances" );
+    }
+    if( 0.0 < dists[0] || 0.0 > dists[1] )
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid intersection distance signs" );
+    }
 
     // If both negative and nonnegative RTIs are returned, the negative RTI must
     // closer to the origin.
@@ -789,8 +817,14 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
         std::vector< EntityHandle > vols;
         EntityHandle nx_vol;
         rval = MBI->get_parent_meshsets( surfs[0], vols );MB_CHK_SET_ERR( rval, "Failed to get the parent meshsets" );
-        if( 2 != vols.size() ) { MB_SET_ERR( MB_FAILURE, "Invaid number of parent volumes found" ); }
-        if( vols.front() == volume ) { nx_vol = vols.back(); }
+        if( 2 != vols.size() )
+        {
+            MB_SET_ERR( MB_FAILURE, "Invaid number of parent volumes found" );
+        }
+        if( vols.front() == volume )
+        {
+            nx_vol = vols.back();
+        }
         else
         {
             nx_vol = vols.front();
@@ -811,7 +845,10 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     if( -1 == exit_idx )
     {
         next_surf = 0;
-        if( debug ) { std::cout << "next surf hit = 0, dist = (undef)" << std::endl; }
+        if( debug )
+        {
+            std::cout << "next surf hit = 0, dist = (undef)" << std::endl;
+        }
         return MB_SUCCESS;
     }
 
@@ -819,11 +856,17 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     next_surf      = surfs[exit_idx];
     next_surf_dist = ( 0 > dists[exit_idx] ? 0 : dists[exit_idx] );
 
-    if( history ) { history->prev_facets.push_back( facets[exit_idx] ); }
+    if( history )
+    {
+        history->prev_facets.push_back( facets[exit_idx] );
+    }
 
     if( debug )
     {
-        if( 0 > dists[exit_idx] ) { std::cout << "          OVERLAP track length=" << dists[exit_idx] << std::endl; }
+        if( 0 > dists[exit_idx] )
+        {
+            std::cout << "          OVERLAP track length=" << dists[exit_idx] << std::endl;
+        }
         std::cout << "          next_surf = " << next_surf  // todo: use geomtopotool to get id by entity handle
                   << ", dist = " << next_surf_dist << " new_pt=";
         for( int i = 0; i < 3; ++i )
@@ -1182,7 +1225,10 @@ ErrorCode GeomQueryTool::find_volume( const double xyz[3], EntityHandle& volume,
     normal.normalize();
 
     // reverse direction if a hit in the negative direction is found
-    if( dists[0] < 0 ) { uvw *= -1; }
+    if( dists[0] < 0 )
+    {
+        uvw *= -1;
+    }
 
     // if this is a "forward" intersection return the first sense entity
     // otherwise return the second, "reverse" sense entity
@@ -1290,7 +1336,10 @@ ErrorCode GeomQueryTool::measure_volume( EntityHandle volume, double& result )
         for( Range::iterator j = triangles.begin(); j != triangles.end(); ++j )
         {
             rval = MBI->get_connectivity( *j, conn, len, true );MB_CHK_SET_ERR( rval, "Failed to get the connectivity of the current triangle" );
-            if( 3 != len ) { MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" ); }
+            if( 3 != len )
+            {
+                MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" );
+            }
             rval = MBI->get_coords( conn, 3, coords[0].array() );MB_CHK_SET_ERR( rval, "Failed to get the coordinates of the current triangle's vertices" );
 
             coords[1] -= coords[0];
@@ -1326,7 +1375,10 @@ ErrorCode GeomQueryTool::measure_area( EntityHandle surface, double& result )
     for( Range::iterator j = triangles.begin(); j != triangles.end(); ++j )
     {
         rval = MBI->get_connectivity( *j, conn, len, true );MB_CHK_SET_ERR( rval, "Failed to get the current triangle's connectivity" );
-        if( 3 != len ) { MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" ); }
+        if( 3 != len )
+        {
+            MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" );
+        }
         rval = MBI->get_coords( conn, 3, coords[0].array() );MB_CHK_SET_ERR( rval, "Failed to get the current triangle's vertex coordinates" );
 
         // calculated area using cross product of triangle edges
@@ -1364,7 +1416,10 @@ ErrorCode GeomQueryTool::get_normal( EntityHandle surf, const double in_pt[3], d
     for( unsigned i = 0; i < facets.size(); ++i )
     {
         rval = MBI->get_connectivity( facets[i], conn, len );MB_CHK_SET_ERR( rval, "Failed to get facet connectivity" );
-        if( 3 != len ) { MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" ); }
+        if( 3 != len )
+        {
+            MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" );
+        }
 
         rval = MBI->get_coords( conn, 3, coords[0].array() );MB_CHK_SET_ERR( rval, "Failed to get vertex coordinates" );
 
@@ -1401,7 +1456,10 @@ ErrorCode GeomQueryTool::boundary_case( EntityHandle volume, int& result, double
         int len, sense_out;
 
         rval = MBI->get_connectivity( facet, conn, len );MB_CHK_SET_ERR( rval, "Failed to get the triangle's connectivity" );
-        if( 3 != len ) { MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" ); }
+        if( 3 != len )
+        {
+            MB_SET_ERR( MB_FAILURE, "Incorrect connectivity length for triangle" );
+        }
 
         rval = MBI->get_coords( conn, 3, coords[0].array() );MB_CHK_SET_ERR( rval, "Failed to get vertex coordinates" );
 

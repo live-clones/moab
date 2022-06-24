@@ -13,7 +13,7 @@ AC_DEFUN([AX_CXX_HAVE_ISFINITE],
 
    AC_CACHE_CHECK(for isfinite, ax_cv_cxx_have_isfinite,
     [AC_LANG_SAVE
-     AC_LANG_CPLUSPLUS
+     AC_LANG([C++])
      AC_LINK_IFELSE(
        [AC_LANG_PROGRAM(
          [[#include <cmath>]],
@@ -42,7 +42,7 @@ AC_DEFUN([AX_CXX_HAVE_STDISFINITE],
 
    AC_CACHE_CHECK(for std::isfinite, ax_cv_cxx_have_stdisfinite,
     [AC_LANG_SAVE
-     AC_LANG_CPLUSPLUS
+     AC_LANG([C++])
      AC_LINK_IFELSE(
        [AC_LANG_PROGRAM(
          [[#include <cmath>]],
@@ -72,7 +72,7 @@ AC_DEFUN([AX_CXX_HAVE_FINITE],
 
    AC_CACHE_CHECK(for finite, ax_cv_cxx_have_finite,
     [AC_LANG_SAVE
-     AC_LANG_CPLUSPLUS
+     AC_LANG([C++])
      AC_LINK_IFELSE(
        [AC_LANG_PROGRAM(
          [[#include <cmath>]],

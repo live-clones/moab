@@ -18,7 +18,7 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
 [
   dnl User-specific include path
   AC_ARG_WITH(eigen3,
-              AC_HELP_STRING([--with-eigen3=PATH],[Specify the path for Eigen3 header files]),
+              AS_HELP_STRING([--with-eigen3=PATH],[Specify the path for Eigen3 header files]),
               witheigeninc=$withval,
               witheigeninc=no)
 
@@ -51,10 +51,10 @@ AC_DEFUN([FATHOM_CONFIGURE_EIGEN3],
     dnl AC_CHECK_FILE([$EIGEN3_DIR/Eigen], [eigenincFound="OK"], [eigenincFound="FAIL"])
     eigenincFound=no;
     AC_LANG_SAVE
-    AC_LANG_CPLUSPLUS
+    AC_LANG([C++])
     oldCPPFLAGS="$CPPFLAGS"
     CPPFLAGS="-I$EIGEN3_DIR $CPPFLAGS"
-    AC_CHECK_HEADERS($EIGEN3_DIR/Eigen/Eigen, eigenincFound=yes)
+    AC_CHECK_HEADER([$EIGEN3_DIR/Eigen/Eigen], eigenincFound=yes)
     CPPFLAGS=$oldCPPFLAGS
     AC_LANG_RESTORE
 

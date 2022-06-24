@@ -15,7 +15,7 @@
 namespace moab
 {
 
-bool NCHelperScrip::can_read_file( ReadNC* readNC, int fileId )
+bool NCHelperScrip::can_read_file( ReadNC* readNC, int /*fileId*/ )
 {
     std::vector< std::string >& dimNames = readNC->dimNames;
 

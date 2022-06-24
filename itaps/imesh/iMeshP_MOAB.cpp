@@ -797,7 +797,10 @@ void iMeshP_getAdjEntIndices( iMesh_Instance instance, iMeshP_PartitionHandle pa
     // adj_entity_handles, so if adj_entity_handles is already allocated and
     // of sufficient size, use it rather than allocating another temporary.
     iBase_EntityHandle* unique_adj = 0;
-    if( *adj_entity_handles_allocated >= size ) { unique_adj = *adj_entity_handles; }
+    if( *adj_entity_handles_allocated >= size )
+    {
+        unique_adj = *adj_entity_handles;
+    }
     else
     {
         unique_adj = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * size );
@@ -1390,7 +1393,7 @@ static bool append_option( std::string& opt, const char* option, const char* def
     if( strchr( option, sep ) || ( default_value && strchr( default_value, sep ) ) )
     {
         // options can't have a separator in them; XXX work around this
-        return iBase_INVALID_ARGUMENT;
+        return false;  // iBase_INVALID_ARGUMENT;
     }
 
     // search for the required option
@@ -1426,7 +1429,10 @@ void iMeshP_loadAll( iMesh_Instance instance, const iMeshP_PartitionHandle parti
 
     // create partition set if user didn't give us one.
     EntityHandle partitioning;
-    if( partition ) { partitioning = itaps_cast< EntityHandle >( partition ); }
+    if( partition )
+    {
+        partitioning = itaps_cast< EntityHandle >( partition );
+    }
     else
     {
         rval = MOABI->create_meshset( MESHSET_SET, partitioning );CHKERR( rval, "failed to create meshset" );
@@ -1435,7 +1441,10 @@ void iMeshP_loadAll( iMesh_Instance instance, const iMeshP_PartitionHandle parti
     // get ParallelComm for partition
     MPI_Comm default_comm = MPI_COMM_WORLD;
     ParallelComm* pcomm   = ParallelComm::get_pcomm( MOABI, partitioning, &default_comm );
-    if( !pcomm ) { RETURN( iBase_FAILURE ); }
+    if( !pcomm )
+    {
+        RETURN( iBase_FAILURE );
+    }
 
     // add necessary values to options string
     std::string opt = std::string( options, options + options_len );
@@ -1535,7 +1544,10 @@ void iMeshP_assignGlobalIds( iMesh_Instance instance, const iMeshP_PartitionHand
     // get ParallelComm for partition
     MPI_Comm default_comm;
     ParallelComm* pcomm = ParallelComm::get_pcomm( MOABI, partitionset, &default_comm );
-    if( !pcomm ) { RETURN( iBase_FAILURE ); }
+    if( !pcomm )
+    {
+        RETURN( iBase_FAILURE );
+    }
 
     rval = pcomm->assign_global_ids( this_mb_set, dimension, start_id, largest_dim_only, parallel, owned_only );
 

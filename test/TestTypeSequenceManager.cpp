@@ -1046,7 +1046,7 @@ void call_find( TypeSequenceManager* seqman, const std::set< int >& removed, int
     int n_queries = 10000;
     for( int i = 0; i < n_queries; i++ )
     {
-        int idx = ( (double)rand() / RAND_MAX * num_orig_entities ) + 1;
+        long unsigned idx = ( (double)rand() / RAND_MAX * num_orig_entities ) + 1;
 
         // do not check for entities we've removed
         if( removed.count( idx ) != 0 ) continue;

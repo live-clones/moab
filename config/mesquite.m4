@@ -79,16 +79,12 @@ fi
 # other and the C++ one is what is actually used for this in Mesquite.
 AC_LANG_PUSH(C++)
 AC_MSG_CHECKING( for fpsetmask );
-AC_TRY_COMPILE( [#include <ieeefp.h>],
-                [fpsetmask(FP_X_INV|FP_X_OFL|FP_X_DZ);],
-                [AM_CPPFLAGS="${AM_CPPFLAGS} -DHAVE_FPSETMASK"
-                 AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)] )
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <ieeefp.h>]], [[fpsetmask(FP_X_INV|FP_X_OFL|FP_X_DZ);]])],[AM_CPPFLAGS="${AM_CPPFLAGS} -DHAVE_FPSETMASK"
+                 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no) ])
 AC_MSG_CHECKING( for feenableexcept );
-AC_TRY_COMPILE( [#define _GNU_SOURCE
-                 #include <fenv.h>  ],
-                [feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);],
-                [AM_CPPFLAGS="${AM_CPPFLAGS} -DHAVE_FEENABLEEXCEPT"
-                 AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)] )
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#define _GNU_SOURCE
+                 #include <fenv.h>  ]], [[feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);]])],[AM_CPPFLAGS="${AM_CPPFLAGS} -DHAVE_FEENABLEEXCEPT"
+                 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no) ])
 AC_LANG_POP(C++)
 
 #-----------------------------------------------------------------------------
@@ -100,10 +96,7 @@ AC_LANG_POP(C++)
 # Check for C++ features
 #-----------------------------------------------------------------------------
 AC_MSG_CHECKING( [for fd() in std::basic_file] )
-AC_TRY_COMPILE([#include <fstream>],
-               [using namespace std; ofstream f; int fd = f.rdbuf()->fd();],
-               [CPPFLAGS="$CPPFLAGS -DFSTREAM_HAS_FD"; AC_MSG_RESULT(yes)],
-               [AC_MSG_RESULT(no)])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <fstream>]], [[using namespace std; ofstream f; int fd = f.rdbuf()->fd();]])],[CPPFLAGS="$CPPFLAGS -DFSTREAM_HAS_FD"; AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 #-------------------------------------------------------------------------------
 # Configure different options

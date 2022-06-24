@@ -354,8 +354,8 @@ int main( int argc, char* argv[] )
     if( !non_convex_intx_cells.empty() )
     {
 
-        Range sourceCells;
-        Range targetCells;
+      sourceCells.clear();
+      targetCells.clear();
         for( Range::iterator it = non_convex_intx_cells.begin(); it != non_convex_intx_cells.end(); it++ )
         {
             EntityHandle cellIntx = *it;

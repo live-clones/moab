@@ -1,6 +1,9 @@
 #ifndef MOAB_MPI_H
 #define MOAB_MPI_H
 #include "moab_mpi_config.h"
+// following is to disable inclusion of an openmpi header that causes a compile warning
+// since we don't use c++ mpi bindings, we don't need it, and doing this allows us to mark warnings as errors
+#define OMPI_SKIP_MPICXX 1
 
 #ifndef __cplusplus
 #  include <mpi.h>

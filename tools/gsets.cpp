@@ -110,6 +110,7 @@ int main( int argc, char* argv[] )
                     break;
                 case 'h':
                     usage( argv[0], false );
+                    break;
                 default:
                     std::cerr << "Unknown flag: '" << argv[i][j] << "'" << std::endl;
                     usage( argv[0] );
@@ -123,7 +124,10 @@ int main( int argc, char* argv[] )
         usage( argv[0] );
     }
 
-    if( all_flag ) { printGeomSets = printMeshSets = printNamedSets = printAnonSets = true; }
+    if( all_flag )
+    {
+        printGeomSets = printMeshSets = printNamedSets = printAnonSets = true;
+    }
     else if( geom_flag || mesh_flag || name_flag )
     {
         printGeomSets  = geom_flag;
@@ -140,17 +144,32 @@ int main( int argc, char* argv[] )
     Tag t;
     if( printGeomSets )
     {
-        if( MB_SUCCESS == mb.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { geomTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
+        {
+            geomTag = t;
+        }
     }
     if( printMeshSets )
     {
-        if( MB_SUCCESS == mb.tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { blockTag = t; }
-        if( MB_SUCCESS == mb.tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { nodeTag = t; }
-        if( MB_SUCCESS == mb.tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) ) { sideTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( MATERIAL_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
+        {
+            blockTag = t;
+        }
+        if( MB_SUCCESS == mb.tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
+        {
+            nodeTag = t;
+        }
+        if( MB_SUCCESS == mb.tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, t ) )
+        {
+            sideTag = t;
+        }
     }
     if( printNamedSets )
     {
-        if( MB_SUCCESS == mb.tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, t ) ) { nameTag = t; }
+        if( MB_SUCCESS == mb.tag_get_handle( NAME_TAG_NAME, NAME_TAG_SIZE, MB_TYPE_OPAQUE, t ) )
+        {
+            nameTag = t;
+        }
     }
     idTag = mb.globalId_tag();
 
