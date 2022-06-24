@@ -44,8 +44,10 @@ class MESQUITE_EXPORT CylinderDomain : public MBMesquite::MeshDomain
      *\param axis_direction - Vector defining the direction of the axis
      *\param axis_point     - A point through which the axis passes.
      */
-    inline CylinderDomain( double p_radius, Vector3D axis_direction = Vector3D( 0, 0, 1 ),
-                           Vector3D axis_point = Vector3D( 0, 0, 0 ), bool outward_normal = true )
+    inline CylinderDomain( double p_radius,
+                           Vector3D axis_direction = Vector3D( 0, 0, 1 ),
+                           Vector3D axis_point     = Vector3D( 0, 0, 0 ),
+                           bool outward_normal     = true )
         : mAxis( axis_direction / axis_direction.length() ), mCenter( axis_point ), mRadius( p_radius ),
           outwardSign( outward_normal ? 1.0 : -1.0 )
     {
@@ -59,13 +61,20 @@ class MESQUITE_EXPORT CylinderDomain : public MBMesquite::MeshDomain
 
     virtual void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    virtual void vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coords[], unsigned count,
+    virtual void vertex_normal_at( const Mesh::VertexHandle* handle,
+                                   Vector3D coords[],
+                                   unsigned count,
                                    MsqError& err ) const;
 
-    virtual void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
-                                Vector3D& normal, MsqError& err ) const;
+    virtual void closest_point( Mesh::VertexHandle handle,
+                                const Vector3D& position,
+                                Vector3D& closest,
+                                Vector3D& normal,
+                                MsqError& err ) const;
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
+                             unsigned short* dof_array,
+                             size_t count,
                              MsqError& err ) const;
 
     const Vector3D& axis() const
@@ -82,7 +91,9 @@ class MESQUITE_EXPORT CylinderDomain : public MBMesquite::MeshDomain
     }
 
   protected:
-    virtual void evaluate( Mesh::VertexHandle handle, const Vector3D& point, Vector3D& closest,
+    virtual void evaluate( Mesh::VertexHandle handle,
+                           const Vector3D& point,
+                           Vector3D& closest,
                            Vector3D& normal ) const;
 
   private:

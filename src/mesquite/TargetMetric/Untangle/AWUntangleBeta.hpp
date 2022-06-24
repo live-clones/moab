@@ -52,17 +52,27 @@ class AWUntangleBeta : public AWMetric
 
     MESQUITE_EXPORT virtual std::string get_name() const;
 
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A,
+                                           const MsqMatrix< 2, 2 >& W,
+                                           double& result,
                                            MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A,
+                                           const MsqMatrix< 3, 3 >& W,
+                                           double& result,
                                            MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                                                     const MsqMatrix< 2, 2 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_A,
+                                                     MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A,
+                                                     const MsqMatrix< 3, 3 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_A,
+                                                     MsqError& err );
     /*
       MESQUITE_EXPORT virtual
       bool evaluate_with_hess( const MsqMatrix<2,2>& A,
@@ -85,7 +95,9 @@ class AWUntangleBeta : public AWMetric
     template < unsigned D >
     inline bool eval( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result );
     template < unsigned D >
-    inline bool grad( const MsqMatrix< D, D >& A, const MsqMatrix< D, D >& W, double& result,
+    inline bool grad( const MsqMatrix< D, D >& A,
+                      const MsqMatrix< D, D >& W,
+                      double& result,
                       MsqMatrix< D, D >& first );
     //  template <unsigned D> inline
     //  bool hess( const MsqMatrix<D,D>& T, double& result, MsqMatrix<D,D>& first, MsqMatrix<D,D>*

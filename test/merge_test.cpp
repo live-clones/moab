@@ -211,7 +211,8 @@ ErrorCode find_coincident_edges( Range entities, std::vector< std::pair< EntityH
     return MB_SUCCESS;
 }
 
-ErrorCode find_coincident_elements( Range entities, int num_nodes,
+ErrorCode find_coincident_elements( Range entities,
+                                    int num_nodes,
                                     std::vector< std::pair< EntityHandle, EntityHandle > >& coin )
 {
     double coords1[8][3], coords2[8][3];
@@ -950,8 +951,7 @@ int main()
         std::string( "test/2hexcase5.g" ),  std::string( "test/2quadcase1.g" ), std::string( "test/2quadcase2.g" ),
         std::string( "test/2quadcase3.g" ), std::string( "test/2quadcase4.g" ), std::string( "test/2tetcase1.g" ),
         std::string( "test/2tetcase2.g" ),  std::string( "test/2tetcase3.g" ),  std::string( "test/2tetcase4.g" ),
-        std::string( "test/2tricase1.g" ),  std::string( "test/2tricase2.g" ),  std::string( "test/2tricase3.g" )
-    };
+        std::string( "test/2tricase1.g" ),  std::string( "test/2tricase2.g" ),  std::string( "test/2tricase3.g" ) };
 
     // Create the MB database instance.
     gMB = new Core();

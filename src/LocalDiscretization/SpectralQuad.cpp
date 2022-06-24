@@ -75,8 +75,12 @@ void SpectralQuad::set_gl_points( double* x, double* y, double* z )
     _xyz[1] = y;
     _xyz[2] = z;
 }
-CartVect SpectralQuad::evalFcn( const double* params, const double* field, const int ndim, const int num_tuples,
-                                double* work, double* result )
+CartVect SpectralQuad::evalFcn( const double* params,
+                                const double* field,
+                                const int ndim,
+                                const int num_tuples,
+                                double* work,
+                                double* result )
 {
     // piece that we shouldn't want to cache
     int d = 0;
@@ -92,8 +96,14 @@ CartVect SpectralQuad::evalFcn( const double* params, const double* field, const
     return result;
 }
 // replicate the functionality of hex_findpt
-bool SpectralQuad::reverseEvalFcn( const double* posn, const double* verts, const int nverts, const int ndim,
-                                   const double iter_tol, const double inside_tol, double* work, double* params,
+bool SpectralQuad::reverseEvalFcn( const double* posn,
+                                   const double* verts,
+                                   const int nverts,
+                                   const int ndim,
+                                   const double iter_tol,
+                                   const double inside_tol,
+                                   double* work,
+                                   double* params,
                                    int* is_inside )
 {
     params = init;
@@ -119,8 +129,12 @@ bool SpectralQuad::reverseEvalFcn( const double* posn, const double* verts, cons
     return insideFcn( params, 2, inside_tol );
 }
 
-Matrix3 SpectralQuad::jacobian( const double* params, const double* verts, const int nverts, const int ndim,
-                                double* work, double* result )
+Matrix3 SpectralQuad::jacobian( const double* params,
+                                const double* verts,
+                                const int nverts,
+                                const int ndim,
+                                double* work,
+                                double* result )
 {
     // not implemented
     Matrix3 J( 0. );
@@ -138,8 +152,13 @@ void SpectralQuad::evaluate_vector( const CartVect& params, const double* field,
 
     *eval = tensor_i2( _ld[0].J, _ld[0].n, _ld[1].J, _ld[1].n, field, _odwork );
 }
-void SpectralQuad::integrate_vector( const double* field, const double* verts, const int nverts, const int ndim,
-                                     const int num_tuples, double* work, double* result )
+void SpectralQuad::integrate_vector( const double* field,
+                                     const double* verts,
+                                     const int nverts,
+                                     const int ndim,
+                                     const int num_tuples,
+                                     double* work,
+                                     double* result )
 {
     // not implemented
 }

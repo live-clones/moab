@@ -440,8 +440,18 @@ int main( int argc, char* argv[] )
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int atmCompNDoFs = disc_orders[0] * disc_orders[0], ocnCompNDoFs = 1 /*FV*/;
 
-    const char* bottomFields          = "Sa_z:Sa_topo:Sa_u:Sa_v:Sa_tbot:Sa_ptem:Sa_shum:Sa_pbot:Sa_dens:Sa_uovern:Sa_pslv:Sa_co2prog:Sa_co2diag:Faxa_rainc:Faxa_rainl:Faxa_snowc:Faxa_snowl:Faxa_lwdn:Faxa_swndr:Faxa_swvdr:Faxa_swndf:Faxa_swvdf:Faxa_swnet:Faxa_bcphidry:Faxa_bcphodry:Faxa_bcphiwet:Faxa_ocphidry:Faxa_ocphodry:Faxa_ocphiwet:Faxa_dstwet1:Faxa_dstwet2:Faxa_dstwet3:Faxa_dstwet4:Faxa_dstdry1:Faxa_dstdry2:Faxa_dstdry3:Faxa_dstdry4";
-    const char* bottomFieldsExt = "Sa_z_ext:Sa_topo_ext:Sa_u_ext:Sa_v_ext:Sa_tbot_ext:Sa_ptem_ext:Sa_shum_ext:Sa_pbot_ext:Sa_dens_ext:Sa_uovern_ext:Sa_pslv_ext:Sa_co2prog_ext:Sa_co2diag_ext:Faxa_rainc_ext:Faxa_rainl_ext:Faxa_snowc_ext:Faxa_snowl_ext:Faxa_lwdn_ext:Faxa_swndr_ext:Faxa_swvdr_ext:Faxa_swndf_ext:Faxa_swvdf_ext:Faxa_swnet_ext:Faxa_bcphidry_ext:Faxa_bcphodry_ext:Faxa_bcphiwet_ext:Faxa_ocphidry_ext:Faxa_ocphodry_ext:Faxa_ocphiwet_ext:Faxa_dstwet1_ext:Faxa_dstwet2_ext:Faxa_dstwet3_ext:Faxa_dstwet4_ext:Faxa_dstdry1_ext:Faxa_dstdry2_ext:Faxa_dstdry3_ext:Faxa_dstdry4_ext";
+    const char* bottomFields =
+        "Sa_z:Sa_topo:Sa_u:Sa_v:Sa_tbot:Sa_ptem:Sa_shum:Sa_pbot:Sa_dens:Sa_uovern:Sa_pslv:Sa_co2prog:Sa_co2diag:Faxa_"
+        "rainc:Faxa_rainl:Faxa_snowc:Faxa_snowl:Faxa_lwdn:Faxa_swndr:Faxa_swvdr:Faxa_swndf:Faxa_swvdf:Faxa_swnet:Faxa_"
+        "bcphidry:Faxa_bcphodry:Faxa_bcphiwet:Faxa_ocphidry:Faxa_ocphodry:Faxa_ocphiwet:Faxa_dstwet1:Faxa_dstwet2:Faxa_"
+        "dstwet3:Faxa_dstwet4:Faxa_dstdry1:Faxa_dstdry2:Faxa_dstdry3:Faxa_dstdry4";
+    const char* bottomFieldsExt =
+        "Sa_z_ext:Sa_topo_ext:Sa_u_ext:Sa_v_ext:Sa_tbot_ext:Sa_ptem_ext:Sa_shum_ext:Sa_pbot_ext:Sa_dens_ext:Sa_uovern_"
+        "ext:Sa_pslv_ext:Sa_co2prog_ext:Sa_co2diag_ext:Faxa_rainc_ext:Faxa_rainl_ext:Faxa_snowc_ext:Faxa_snowl_ext:"
+        "Faxa_lwdn_ext:Faxa_swndr_ext:Faxa_swvdr_ext:Faxa_swndf_ext:Faxa_swvdf_ext:Faxa_swnet_ext:Faxa_bcphidry_ext:"
+        "Faxa_bcphodry_ext:Faxa_bcphiwet_ext:Faxa_ocphidry_ext:Faxa_ocphodry_ext:Faxa_ocphiwet_ext:Faxa_dstwet1_ext:"
+        "Faxa_dstwet2_ext:Faxa_dstwet3_ext:Faxa_dstwet4_ext:Faxa_dstdry1_ext:Faxa_dstdry2_ext:Faxa_dstdry3_ext:Faxa_"
+        "dstdry4_ext";
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -483,7 +493,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem *37; 
+            int storLeng = atmCompNDoFs * numAllElem * 37;
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
@@ -542,8 +552,8 @@ int main( int argc, char* argv[] )
         /* We have the remapping weights now. Let us apply the weights onto the tag we defined
            on the source mesh and get the projection on the target mesh */
         PUSH_TIMER( "Apply Scalar projection weights" )
-        ierr = iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], bottomFieldsExt,
-        		bottomFields );
+        ierr =
+            iMOAB_ApplyScalarProjectionWeights( cplAtmOcnPID, weights_identifiers[0], bottomFieldsExt, bottomFields );
         CHECKIERR( ierr, "failed to compute projection weight application" );
         POP_TIMER( couComm, rankInCouComm )
 

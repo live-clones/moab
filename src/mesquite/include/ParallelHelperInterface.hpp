@@ -75,9 +75,15 @@ class MESQUITE_EXPORT ParallelHelper
     virtual bool is_our_vertex( Mesh::VertexHandle vertex_handle, MsqError& ) const               = 0;
     virtual void communicate_min_max_to_all( double* minimum, double* maximum, MsqError& ) const  = 0;
     virtual void communicate_min_max_to_zero( double* minimum, double* maximum, MsqError& ) const = 0;
-    virtual void communicate_sums_to_zero( size_t* freeElementCount, int* invertedElementCount, size_t* elementCount,
-                                           int* invertedSampleCount, size_t* sampleCount, long unsigned int* count,
-                                           long unsigned int* invalid, double* sum, double* sqrSum,
+    virtual void communicate_sums_to_zero( size_t* freeElementCount,
+                                           int* invertedElementCount,
+                                           size_t* elementCount,
+                                           int* invertedSampleCount,
+                                           size_t* sampleCount,
+                                           long unsigned int* count,
+                                           long unsigned int* invalid,
+                                           double* sum,
+                                           double* sqrSum,
                                            MsqError& ) const                                      = 0;
     virtual void communicate_power_sum_to_zero( double* pMean, MsqError& ) const                  = 0;
     virtual void communicate_histogram_to_zero( std::vector< int >& histogram, MsqError& ) const  = 0;

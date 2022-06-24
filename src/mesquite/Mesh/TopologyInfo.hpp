@@ -107,7 +107,11 @@ class MESQUITE_EXPORT TopologyInfo
      * determine which mid-nodes are present given the topology
      * and total number of nodes.
      */
-    static void higher_order( EntityTopology topo, unsigned num_nodes, bool& midedge, bool& midface, bool& midvol,
+    static void higher_order( EntityTopology topo,
+                              unsigned num_nodes,
+                              bool& midedge,
+                              bool& midface,
+                              bool& midvol,
                               MsqError& err );
 
     /** \brief Check which mid-nodes a higher-order element has.
@@ -160,15 +164,24 @@ class MESQUITE_EXPORT TopologyInfo
      *         ordering of element connectivity, or -1 of element type contains
      *         no such node.
      */
-    static int higher_order_from_side( EntityTopology topo, unsigned num_nodes, unsigned side_dimension,
-                                       unsigned side_number, MsqError& err );
+    static int higher_order_from_side( EntityTopology topo,
+                                       unsigned num_nodes,
+                                       unsigned side_dimension,
+                                       unsigned side_number,
+                                       MsqError& err );
 
     /**\brief Get side given a higher-order node */
-    static void side_from_higher_order( EntityTopology topo, unsigned num_nodes, unsigned node_number,
-                                        unsigned& side_dim_out, unsigned& side_num_out, MsqError& err );
+    static void side_from_higher_order( EntityTopology topo,
+                                        unsigned num_nodes,
+                                        unsigned node_number,
+                                        unsigned& side_dim_out,
+                                        unsigned& side_num_out,
+                                        MsqError& err );
 
     /** Get logical position given an element type node node index*/
-    static inline Sample sample_from_node( EntityTopology topo, unsigned num_nodes, unsigned node_number,
+    static inline Sample sample_from_node( EntityTopology topo,
+                                           unsigned num_nodes,
+                                           unsigned node_number,
                                            MsqError& err )
     {
         unsigned dim, num;
@@ -196,7 +209,9 @@ class MESQUITE_EXPORT TopologyInfo
      * vertices of that face, ordered in a counter-clockwise cycle
      * around a vector pointing out of the element for an ideal element.
      */
-    static const unsigned* face_vertices( EntityTopology topo, unsigned face_number, unsigned& num_vertices_out,
+    static const unsigned* face_vertices( EntityTopology topo,
+                                          unsigned face_number,
+                                          unsigned& num_vertices_out,
                                           MsqError& err );
     static const unsigned* face_vertices( EntityTopology topo, unsigned face_number, unsigned& num_vertices_out );
 
@@ -212,9 +227,14 @@ class MESQUITE_EXPORT TopologyInfo
      * element are returned.  Fails if side dimension
      * greater than the dimension of the specified topology type.
      */
-    static const unsigned* side_vertices( EntityTopology topo, unsigned side_dimension, unsigned side_number,
-                                          unsigned& num_verts_out, MsqError& err );
-    static const unsigned* side_vertices( EntityTopology topo, unsigned side_dimension, unsigned side_number,
+    static const unsigned* side_vertices( EntityTopology topo,
+                                          unsigned side_dimension,
+                                          unsigned side_number,
+                                          unsigned& num_verts_out,
+                                          MsqError& err );
+    static const unsigned* side_vertices( EntityTopology topo,
+                                          unsigned side_dimension,
+                                          unsigned side_number,
                                           unsigned& num_verts_out );
 
     /**\brief Return which side the specified mid-node lies on
@@ -232,8 +252,12 @@ class MESQUITE_EXPORT TopologyInfo
      *             midnode (0 = vertex, 1 = edge, 2 = face, 3 = volume)
      *\param side_number_out The canonical number of the side
      */
-    static void side_number( EntityTopology topo, unsigned connectivity_length, unsigned node_index,
-                             unsigned& side_dimension_out, unsigned& side_number_out, MsqError& err );
+    static void side_number( EntityTopology topo,
+                             unsigned connectivity_length,
+                             unsigned node_index,
+                             unsigned& side_dimension_out,
+                             unsigned& side_number_out,
+                             MsqError& err );
 
     /**\brief  Get adjacent corner vertices
      *
@@ -282,7 +306,8 @@ class MESQUITE_EXPORT TopologyInfo
      * Then:
      *   b[r[k]] == i
      */
-    static const unsigned* reverse_vertex_adjacency_offsets( EntityTopology topo, unsigned index,
+    static const unsigned* reverse_vertex_adjacency_offsets( EntityTopology topo,
+                                                             unsigned index,
                                                              unsigned& num_idx_out );
 
     /**\brief Find which edge of an element has the passed vertex indices
@@ -306,8 +331,11 @@ class MESQUITE_EXPORT TopologyInfo
      *\param reversed_out   True if face is reversed wrt face_vertices
      *\return               The face number.
      */
-    static unsigned find_face( EntityTopology topo, const unsigned* face_vertices, unsigned num_face_vertices,
-                               bool& reversed_out, MsqError& err );
+    static unsigned find_face( EntityTopology topo,
+                               const unsigned* face_vertices,
+                               unsigned num_face_vertices,
+                               bool& reversed_out,
+                               MsqError& err );
 
     /**\brief Find which side of an element has the passed vertex indices
      *
@@ -320,8 +348,13 @@ class MESQUITE_EXPORT TopologyInfo
      *\param number_out     The enumerated index for the side
      *\param reversed_out   True if side is reversed wrt side_vertices
      */
-    static void find_side( EntityTopology topo, const unsigned* side_vertices, unsigned num_vertices,
-                           unsigned& dimension_out, unsigned& number_out, bool& reversed_out, MsqError& err );
+    static void find_side( EntityTopology topo,
+                           const unsigned* side_vertices,
+                           unsigned num_vertices,
+                           unsigned& dimension_out,
+                           unsigned& number_out,
+                           bool& reversed_out,
+                           MsqError& err );
 
     /**\brief Test if two elements share lower-order topology
      *
@@ -341,10 +374,14 @@ class MESQUITE_EXPORT TopologyInfo
      *\param element_2_side_number Whcih lower-order topology to compare
      *\param side_dimension        The dimension of the lower-order topology
      */
-    static bool compare_sides( const size_t* element_1_vertices, EntityTopology element_1_topology,
-                               unsigned element_1_side_number, const size_t* element_2_vertices,
-                               EntityTopology element_2_topology, unsigned element_2_side_number,
-                               unsigned side_dimension, MsqError& err );
+    static bool compare_sides( const size_t* element_1_vertices,
+                               EntityTopology element_1_topology,
+                               unsigned element_1_side_number,
+                               const size_t* element_2_vertices,
+                               EntityTopology element_2_topology,
+                               unsigned element_2_side_number,
+                               unsigned side_dimension,
+                               MsqError& err );
 
   private:
     enum

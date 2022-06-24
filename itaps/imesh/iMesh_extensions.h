@@ -33,15 +33,15 @@ extern "C" {
  * \param *entity_handles_size Pointer to occupied size of entity_handles array
  * \param *err Pointer to error type returned from function
  */
-void iMesh_getEntitiesRec( iMesh_Instance                     instance,
+void iMesh_getEntitiesRec( iMesh_Instance instance,
                            /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                           /*in*/ const int                   entity_type,
-                           /*in*/ const int                   entity_topology,
-                           /*in*/ const int                   recursive,
-                           /*out*/ iBase_EntityHandle**       entity_handles,
-                           /*out*/ int*                       entity_handles_allocated,
-                           /*out*/ int*                       entity_handles_size,
-                           /*out*/ int*                       err );
+                           /*in*/ const int entity_type,
+                           /*in*/ const int entity_topology,
+                           /*in*/ const int recursive,
+                           /*out*/ iBase_EntityHandle** entity_handles,
+                           /*out*/ int* entity_handles_allocated,
+                           /*out*/ int* entity_handles_size,
+                           /*out*/ int* err );
 
 /**\brief  Get the number of entities with the specified type in the instance or set, recursive
  *
@@ -58,12 +58,12 @@ void iMesh_getEntitiesRec( iMesh_Instance                     instance,
  * \param num_type Pointer to number of entities, returned from function
  * \param *err Pointer to error type returned from function
  */
-void iMesh_getNumOfTypeRec( iMesh_Instance                     instance,
+void iMesh_getNumOfTypeRec( iMesh_Instance instance,
                             /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                            /*in*/ const int                   entity_type,
-                            /*in*/ const int                   recursive,
-                            /*out*/ int*                       num_type,
-                            /*out*/ int*                       err );
+                            /*in*/ const int entity_type,
+                            /*in*/ const int recursive,
+                            /*out*/ int* num_type,
+                            /*out*/ int* err );
 
 /**\brief  Get the number of entities with the specified topology in the instance or set
  *
@@ -80,12 +80,12 @@ void iMesh_getNumOfTypeRec( iMesh_Instance                     instance,
  * \param num_topo Pointer to number of entities, returned from function
  * \param *err Pointer to error type returned from function
  */
-void iMesh_getNumOfTopoRec( iMesh_Instance                     instance,
+void iMesh_getNumOfTopoRec( iMesh_Instance instance,
                             /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                            /*in*/ const int                   entity_topology,
-                            /*in*/ const int                   recursive,
-                            /*out*/ int*                       num_topo,
-                            /*out*/ int*                       err );
+                            /*in*/ const int entity_topology,
+                            /*in*/ const int recursive,
+                            /*out*/ int* num_topo,
+                            /*out*/ int* err );
 
 /**\brief  Get entities with specified type, topology, tag(s) and (optionally) tag value(s)
  *
@@ -107,18 +107,18 @@ void iMesh_getNumOfTopoRec( iMesh_Instance                     instance,
  * \param *entity_handles_size Pointer to occupied size of entity_handles array
  * \param *err Pointer to error type returned from function
  */
-void iMesh_getEntsByTagsRec( iMesh_Instance                     instance,
+void iMesh_getEntsByTagsRec( iMesh_Instance instance,
                              /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                             /*in*/ const int                   entity_type,
-                             /*in*/ const int                   entity_topology,
-                             /*in*/ const iBase_TagHandle*      tag_handles,
-                             /*in*/ const char* const*          tag_vals,
-                             /*in*/ const int                   num_tags_vals,
-                             /*in*/ const int                   recursive,
-                             /*out*/ iBase_EntityHandle**       entity_handles,
-                             /*out*/ int*                       entity_handles_allocated,
-                             /*out*/ int*                       entity_handles_size,
-                             /*out*/ int*                       err );
+                             /*in*/ const int entity_type,
+                             /*in*/ const int entity_topology,
+                             /*in*/ const iBase_TagHandle* tag_handles,
+                             /*in*/ const char* const* tag_vals,
+                             /*in*/ const int num_tags_vals,
+                             /*in*/ const int recursive,
+                             /*out*/ iBase_EntityHandle** entity_handles,
+                             /*out*/ int* entity_handles_allocated,
+                             /*out*/ int* entity_handles_size,
+                             /*out*/ int* err );
 
 /**\brief  Get entity sets with specified tag(s) and (optionally) tag value(s)
  *
@@ -138,16 +138,16 @@ void iMesh_getEntsByTagsRec( iMesh_Instance                     instance,
  * \param *set_handles_size Pointer to occupied size of entity_handles array
  * \param *err Pointer to error type returned from function
  */
-void iMesh_getEntSetsByTagsRec( iMesh_Instance                     instance,
+void iMesh_getEntSetsByTagsRec( iMesh_Instance instance,
                                 /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                                /*in*/ const iBase_TagHandle*      tag_handles,
-                                /*in*/ const char* const*          tag_vals,
-                                /*in*/ const int                   num_tags_vals,
-                                /*in*/ const int                   recursive,
-                                /*out*/ iBase_EntitySetHandle**    set_handles,
-                                /*out*/ int*                       set_handles_allocated,
-                                /*out*/ int*                       set_handles_size,
-                                /*out*/ int*                       err );
+                                /*in*/ const iBase_TagHandle* tag_handles,
+                                /*in*/ const char* const* tag_vals,
+                                /*in*/ const int num_tags_vals,
+                                /*in*/ const int recursive,
+                                /*out*/ iBase_EntitySetHandle** set_handles,
+                                /*out*/ int* set_handles_allocated,
+                                /*out*/ int* set_handles_size,
+                                /*out*/ int* err );
 
 /**\brief Get MBCN type corresponding to iMesh topology value
  *
@@ -159,7 +159,7 @@ void iMesh_getEntSetsByTagsRec( iMesh_Instance                     instance,
  * \param mbcn_type MBEntityType corresponding to entity topology
  */
 void iMesh_MBCNType( /*in*/ const int imesh_entity_topology,
-                     /*out*/ int*     mbcn_type );
+                     /*out*/ int* mbcn_type );
 
 /**\brief Access tag data via direct pointer into contiguous blocks
  *
@@ -362,11 +362,11 @@ void iMesh_initEntArrIterRec( iMesh_Instance instance,
                                                                                *entire interface
                                                                                ******************************************************************************/
 
-void iMesh_getAllIfaceTags( iMesh_Instance              instance,
+void iMesh_getAllIfaceTags( iMesh_Instance instance,
                             /*inout*/ iBase_TagHandle** tag_handles,
-                            /*inout*/ int*              tag_handles_allocated,
-                            /*out*/ int*                tag_handles_size,
-                            /*out*/ int*                err );
+                            /*inout*/ int* tag_handles_allocated,
+                            /*out*/ int* tag_handles_size,
+                            /*out*/ int* err );
 
 /***************************************************************************/ /**
                                                                                * \ingroup  Tags

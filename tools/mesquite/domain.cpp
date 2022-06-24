@@ -250,7 +250,10 @@ MeshDomain* process_domain_args( MeshImpl* mesh )
         EntityTopology max_type = *std::max_element( types.begin(), types.end() );
         int max_elem_dim        = TopologyInfo::dimension( max_type );
 
-        if( max_domain_dim == max_elem_dim && domains.size() == 1 ) { rval = domains.front(); }
+        if( max_domain_dim == max_elem_dim && domains.size() == 1 )
+        {
+            rval = domains.front();
+        }
         else
         {
             DomainClassifier* result = new DomainClassifier();
@@ -267,7 +270,10 @@ MeshDomain* process_domain_args( MeshImpl* mesh )
             rval = result;
         }
     }
-    if( skin_mesh.value() ) { mesh->mark_skin_fixed( err, false ); }
+    if( skin_mesh.value() )
+    {
+        mesh->mark_skin_fixed( err, false );
+    }
     if( err )
     {
         std::cerr << err << std::endl;

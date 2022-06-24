@@ -90,11 +90,17 @@ moab::ErrorCode compute_dual_mesh( moab::Interface* mb, moab::EntityHandle& dual
             double dDotNorm = ( node0 % nodeDiff ) / ( dNode0Mag * dNodeDiffMag );
 
             // double dAngle;
-            if( dDotNorm > 1.0 ) { dDotNorm = 1.0; }
+            if( dDotNorm > 1.0 )
+            {
+                dDotNorm = 1.0;
+            }
 
             dAngles[j] = acos( dDotNorm );
 
-            if( dSide > 0.0 ) { dAngles[j] = -dAngles[j] + 2.0 * M_PI; }
+            if( dSide > 0.0 )
+            {
+                dAngles[j] = -dAngles[j] + 2.0 * M_PI;
+            }
         }
 
         std::vector< moab::EntityHandle >& face = polygonConn[nEdges];

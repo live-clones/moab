@@ -57,8 +57,12 @@ namespace GeomUtil
      *                 Note:  seg_start must be less than seg_end
      *\return true if line semgent intersects box, false otherwise.
      */
-    bool segment_box_intersect( CartVect box_min, CartVect box_max, const CartVect& seg_pt,
-                                const CartVect& seg_unit_dir, double& seg_start, double& seg_end );
+    bool segment_box_intersect( CartVect box_min,
+                                CartVect box_max,
+                                const CartVect& seg_pt,
+                                const CartVect& seg_unit_dir,
+                                double& seg_start,
+                                double& seg_end );
 
     /**\brief Test for intersection between a ray and a triangle.
      *\param ray_point  The start point of the ray.
@@ -71,8 +75,11 @@ namespace GeomUtil
      *                  intersect test.
      *\return true if intersection, false otherwise.
      */
-    bool ray_tri_intersect( const CartVect vertices[3], const CartVect& ray_point, const CartVect& ray_unit_direction,
-                            double& t_out, const double* ray_length = 0 );
+    bool ray_tri_intersect( const CartVect vertices[3],
+                            const CartVect& ray_point,
+                            const CartVect& ray_unit_direction,
+                            double& t_out,
+                            const double* ray_length = 0 );
 
     /**\brief Plücker test for intersection between a ray and a triangle.
      *\param vertices            Nodes of the triangle.
@@ -117,11 +124,17 @@ namespace GeomUtil
        6 = pip1 = pip2 == 0 -> NODE2 */
     const intersection_type type_list[] = { INTERIOR, EDGE0, EDGE1, NODE1, EDGE2, NODE0, NODE2 };
 
-    bool plucker_ray_tri_intersect( const CartVect vertices[3], const CartVect& ray_point,
-                                    const CartVect& ray_unit_direction, double& dist_out,
-                                    const double* nonneg_ray_length = 0, const double* neg_ray_length = 0,
-                                    const int* orientation = 0, intersection_type* int_type = 0 );
-    double plucker_edge_test( const CartVect& vertexa, const CartVect& vertexb, const CartVect& ray,
+    bool plucker_ray_tri_intersect( const CartVect vertices[3],
+                                    const CartVect& ray_point,
+                                    const CartVect& ray_unit_direction,
+                                    double& dist_out,
+                                    const double* nonneg_ray_length = 0,
+                                    const double* neg_ray_length    = 0,
+                                    const int* orientation          = 0,
+                                    intersection_type* int_type     = 0 );
+    double plucker_edge_test( const CartVect& vertexa,
+                              const CartVect& vertexb,
+                              const CartVect& ray,
                               const CartVect& ray_normal );
 
     //! Find range of overlap between ray and axis-aligned box.
@@ -141,8 +154,12 @@ namespace GeomUtil
     //!                 the ray exited the leaf.  If return value is false,
     //!                 then this value is undefined.
     //!\return true if ray intersects leaf, false otherwise.
-    bool ray_box_intersect( const CartVect& box_min, const CartVect& box_max, const CartVect& ray_pt,
-                            const CartVect& ray_dir, double& t_enter, double& t_exit );
+    bool ray_box_intersect( const CartVect& box_min,
+                            const CartVect& box_max,
+                            const CartVect& ray_pt,
+                            const CartVect& ray_dir,
+                            double& t_enter,
+                            double& t_exit );
 
     /**\brief Test if plane intersects axis-aligned box
      *
@@ -167,7 +184,9 @@ namespace GeomUtil
      *                    +X, +Y, and +Z sides respectively.
      *\return true if overlap, false otherwise.
      */
-    bool box_plane_overlap( const CartVect& plane_normal, double plane_coeff, CartVect box_min_corner,
+    bool box_plane_overlap( const CartVect& plane_normal,
+                            double plane_coeff,
+                            CartVect box_min_corner,
                             CartVect box_max_corner );
 
     /**\brief Test if triangle intersects axis-aligned box
@@ -191,8 +210,10 @@ namespace GeomUtil
      *                    test.
      *\return true if overlap, false otherwise.
      */
-    bool box_tri_overlap( const CartVect triangle_corners[3], const CartVect& box_min_corner,
-                          const CartVect& box_max_corner, double tolerance );
+    bool box_tri_overlap( const CartVect triangle_corners[3],
+                          const CartVect& box_min_corner,
+                          const CartVect& box_max_corner,
+                          double tolerance );
 
     /**\brief Test if triangle intersects axis-aligned box
      *
@@ -203,10 +224,13 @@ namespace GeomUtil
      *                    box_center to the boundary of the box.
      *\return true if overlap, false otherwise.
      */
-    bool box_tri_overlap( const CartVect triangle_corners[3], const CartVect& box_center,
+    bool box_tri_overlap( const CartVect triangle_corners[3],
+                          const CartVect& box_center,
                           const CartVect& box_half_dims );
 
-    bool box_point_overlap( const CartVect& box_min_corner, const CartVect& box_max_corner, const CartVect& point,
+    bool box_point_overlap( const CartVect& box_min_corner,
+                            const CartVect& box_max_corner,
+                            const CartVect& point,
                             double tolerance );
 
     /**\brief Test if the specified element intersects an axis-aligned box.
@@ -220,8 +244,11 @@ namespace GeomUtil
      *\param box_half_dims Half of the width of the box in each axial
      *                     direction.
      */
-    bool box_elem_overlap( const CartVect* elem_corners, EntityType elem_type, const CartVect& box_center,
-                           const CartVect& box_half_dims, int nodecount = 0 );
+    bool box_elem_overlap( const CartVect* elem_corners,
+                           EntityType elem_type,
+                           const CartVect& box_center,
+                           const CartVect& box_half_dims,
+                           int nodecount = 0 );
 
     /**\brief Test if the specified element intersects an axis-aligned box.
      *
@@ -234,7 +261,9 @@ namespace GeomUtil
      *\param box_half_dims Half of the width of the box in each axial
      *                     direction.
      */
-    bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType elem_type, const CartVect& box_center,
+    bool box_linear_elem_overlap( const CartVect* elem_corners,
+                                  EntityType elem_type,
+                                  const CartVect& box_center,
                                   const CartVect& box_half_dims );
 
     /**\brief Test if the specified element intersects an axis-aligned box.
@@ -251,7 +280,9 @@ namespace GeomUtil
      */
     bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType elem_type, const CartVect& box_half_dims );
 
-    void closest_location_on_box( const CartVect& box_min_corner, const CartVect& box_max_corner, const CartVect& point,
+    void closest_location_on_box( const CartVect& box_min_corner,
+                                  const CartVect& box_max_corner,
+                                  const CartVect& point,
                                   CartVect& closest );
 
     /**\brief find closest location on triangle
@@ -271,7 +302,9 @@ namespace GeomUtil
      *\param num_vertices Length of 'vertices' array.
      *\param closest_out Result position
      */
-    void closest_location_on_polygon( const CartVect& location, const CartVect* vertices, int num_vertices,
+    void closest_location_on_polygon( const CartVect& location,
+                                      const CartVect* vertices,
+                                      int num_vertices,
                                       CartVect& closest_out );
 
     /**\brief find closest topological location on triangle
@@ -286,8 +319,11 @@ namespace GeomUtil
      *                     3-5 : edge beginning at closest_topo - 3
      *                       6 : triangle interior
      */
-    void closest_location_on_tri( const CartVect& location, const CartVect* vertices, double tolerance,
-                                  CartVect& closest_out, int& closest_topo );
+    void closest_location_on_tri( const CartVect& location,
+                                  const CartVect* vertices,
+                                  double tolerance,
+                                  CartVect& closest_out,
+                                  int& closest_topo );
 
     // Finds whether or not a box defined by the center and the half
     // width intersects a trilinear hex defined by its eight vertices.
@@ -302,8 +338,11 @@ namespace GeomUtil
     // they are overlapping if they are overlapping in all directions
     // for example in x direction:
     //   box_max2[0] + tolerance < box_min1[0] -- false
-    bool boxes_overlap( const CartVect& box_min1, const CartVect& box_max1, const CartVect& box_min2,
-                        const CartVect& box_max2, double tolerance );
+    bool boxes_overlap( const CartVect& box_min1,
+                        const CartVect& box_max1,
+                        const CartVect& box_min2,
+                        const CartVect& box_max2,
+                        double tolerance );
 
     // see if boxes formed by 2 lists of "CartVect"s overlap
     bool bounding_boxes_overlap( const CartVect* list1, int num1, const CartVect* list2, int num2, double tolerance );

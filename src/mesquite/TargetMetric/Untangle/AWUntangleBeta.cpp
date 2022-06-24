@@ -62,7 +62,9 @@ inline bool AWUntangleBeta::eval( const MsqMatrix< DIM, DIM >& A, const MsqMatri
 }
 
 template < unsigned DIM >
-inline bool AWUntangleBeta::grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+inline bool AWUntangleBeta::grad( const MsqMatrix< DIM, DIM >& A,
+                                  const MsqMatrix< DIM, DIM >& W,
+                                  double& result,
                                   MsqMatrix< DIM, DIM >& deriv )
 {
     const double alpha = det( A );

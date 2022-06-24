@@ -104,8 +104,10 @@ class QualityMetric
      *\param free_vertices_only If true, only pass back evaluation points
      *         that depend on at least one free vertex.
      */
-    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                  bool free_vertices_only, MsqError& err ) = 0;
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd,
+                                                  std::vector< size_t >& handles,
+                                                  bool free_vertices_only,
+                                                  MsqError& err ) = 0;
 
     /**\brief Get locations at which metric can be evaluated for
      *        use in BCD intialization and QualityAssessor.
@@ -123,8 +125,10 @@ class QualityMetric
      *\param free_vertices_only If true, only pass back evaluation points
      *         that depend on at least one free vertex.
      */
-    MESQUITE_EXPORT virtual void get_single_pass( PatchData& pd, std::vector< size_t >& handles,
-                                                  bool free_vertices_only, MsqError& err );
+    MESQUITE_EXPORT virtual void get_single_pass( PatchData& pd,
+                                                  std::vector< size_t >& handles,
+                                                  bool free_vertices_only,
+                                                  MsqError& err );
 
     /**\brief Get metric value at a logical location in the patch.
      *
@@ -144,8 +148,11 @@ class QualityMetric
      *\param indices The free vertices that the evaluation is a function
      *               of, specified as vertex indices in the PatchData.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices, MsqError& err ) = 0;
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd,
+                                                        size_t handle,
+                                                        double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError& err ) = 0;
 
     /**\brief Get metric value and gradient at a logical location in the patch.
      *
@@ -159,9 +166,12 @@ class QualityMetric
      *               coordinates of the free vertices passed back in
      *               the indices list.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd,
+                                                         size_t handle,
+                                                         double& value,
                                                          std::vector< size_t >& indices,
-                                                         std::vector< Vector3D >& gradient, MsqError& err );
+                                                         std::vector< Vector3D >& gradient,
+                                                         MsqError& err );
 
     /**\brief Get metric value and gradient at a logical location in the patch.
      *
@@ -177,7 +187,9 @@ class QualityMetric
      *\param Hessian_diagonal The 3x3 blocks along the diagonal of
      *               the Hessian matrix.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                                 size_t handle,
+                                                                 double& value,
                                                                  std::vector< size_t >& indices,
                                                                  std::vector< Vector3D >& gradient,
                                                                  std::vector< SymMatrix3D >& Hessian_diagonal,
@@ -201,10 +213,13 @@ class QualityMetric
      *               Hessian with respect to the vertices at the
      *               corresponding positions in the indices list.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
+    MESQUITE_EXPORT virtual bool evaluate_with_Hessian( PatchData& pd,
+                                                        size_t handle,
+                                                        double& value,
                                                         std::vector< size_t >& indices,
                                                         std::vector< Vector3D >& gradient,
-                                                        std::vector< Matrix3D >& Hessian, MsqError& err );
+                                                        std::vector< Matrix3D >& Hessian,
+                                                        MsqError& err );
 
     //! Escobar Barrier Function for Shape and Other Metrics
     // det = signed determinant of Jacobian Matrix at a Vertex
@@ -225,7 +240,8 @@ class QualityMetric
      *\param gradients       Array of gradients
      */
     MESQUITE_EXPORT
-    static void remove_fixed_gradients( EntityTopology type, uint32_t fixed_vertices,
+    static void remove_fixed_gradients( EntityTopology type,
+                                        uint32_t fixed_vertices,
                                         std::vector< Vector3D >& gradients );
 
     /** \brief Remove from vectors any gradient terms and hessian
@@ -239,7 +255,8 @@ class QualityMetric
      *\param hess_diagonal_blocks   Array of diagonal blocks of Hessian matrix.
      */
     MESQUITE_EXPORT
-    static void remove_fixed_diagonals( EntityTopology type, uint32_t fixed_vertices,
+    static void remove_fixed_diagonals( EntityTopology type,
+                                        uint32_t fixed_vertices,
                                         std::vector< Vector3D >& gradients,
                                         std::vector< SymMatrix3D >& hess_diagonal_blocks );
 
@@ -253,7 +270,8 @@ class QualityMetric
      *\param hessians        Array of Hessian blocks (upper trianguler, row-major)
      */
     MESQUITE_EXPORT
-    static void remove_fixed_hessians( EntityTopology type, uint32_t fixed_vertices,
+    static void remove_fixed_hessians( EntityTopology type,
+                                       uint32_t fixed_vertices,
                                        std::vector< Matrix3D >& hessians );
 
     /** \brief Convert fixed vertex format from list to bit flags
@@ -266,13 +284,16 @@ class QualityMetric
      * vertices and set (1) for fixed vertices.
      */
     MESQUITE_EXPORT
-    static uint32_t fixed_vertex_bitmap( PatchData& pd, const MsqMeshEntity* elem,
+    static uint32_t fixed_vertex_bitmap( PatchData& pd,
+                                         const MsqMeshEntity* elem,
                                          std::vector< size_t >& free_indices );
 
     //! takes an array of coefficients and an array of metrics (both of length num_value)
     //! and averages the contents using averaging method 'method'.
     MESQUITE_EXPORT
-    double weighted_average_metrics( const double coef[], const double metric_values[], const int& num_values,
+    double weighted_average_metrics( const double coef[],
+                                     const double metric_values[],
+                                     const int& num_values,
                                      MsqError& err );
 
     /*!AveragingMethod allows you to set how the quality metric values
@@ -302,7 +323,8 @@ class QualityMetric
     //!
     //! Do any preliminary global initialization, consistency checking,
     //! etc.  Default implementation does nothing.
-    MESQUITE_EXPORT virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+    MESQUITE_EXPORT virtual void initialize_queue( MeshDomainAssoc* mesh_and_domain,
+                                                   const Settings* settings,
                                                    MsqError& err );
 
   private:

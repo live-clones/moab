@@ -186,7 +186,9 @@ class CN
     //! \param sub_dimension Dimension of sub-entity
     //! \param sub_index Index of sub-entity
     //! \param sub_entity_conn Connectivity of sub-entity (returned to calling function)
-    static void inline SubEntityVertexIndices( const EntityType this_type, const int sub_dimension, const int sub_index,
+    static void inline SubEntityVertexIndices( const EntityType this_type,
+                                               const int sub_dimension,
+                                               const int sub_index,
                                                int sub_entity_conn[] );
 
     //! return the vertex indices of the specified sub-entity.
@@ -194,8 +196,11 @@ class CN
     //! \param sub_dimension Dimension of sub-entity
     //! \param sub_index Index of sub-entity
     //! \param num_sub_ent_vertices the number of vertices in the sub-entity
-    static const short* SubEntityVertexIndices( const EntityType this_type, const int sub_dimension,
-                                                const int sub_index, EntityType& sub_type, int& num_sub_ent_vertices );
+    static const short* SubEntityVertexIndices( const EntityType this_type,
+                                                const int sub_dimension,
+                                                const int sub_index,
+                                                EntityType& sub_type,
+                                                int& num_sub_ent_vertices );
 
     //! return the node indices of the specified sub-entity.
     //! \param this_topo            The topology of the queried element type
@@ -205,8 +210,12 @@ class CN
     //! \param sub_entity_topo      (Output) Topology of requested sub-entity.
     //! \param num_sub_entity_nodes (Output) Number of nodes in the requested sub-entity.
     //! \param sub_entity_conn      (Output) Connectivity of sub-entity
-    static void SubEntityNodeIndices( const EntityType this_topo, const int num_nodes, const int sub_dimension,
-                                      const int sub_index, EntityType& sub_entity_topo, int& num_sub_entity_nodes,
+    static void SubEntityNodeIndices( const EntityType this_topo,
+                                      const int num_nodes,
+                                      const int sub_dimension,
+                                      const int sub_index,
+                                      EntityType& sub_entity_topo,
+                                      int& num_sub_entity_nodes,
                                       int sub_entity_conn[] );
 
     //! return the vertices of the specified sub entity
@@ -217,8 +226,12 @@ class CN
     //! \param sub_entity_conn Connectivity of sub-entity, based on parent_conn and canonical
     //!           ordering for parent_type
     //! \param num_sub_vertices Number of vertices in sub-entity
-    static void SubEntityConn( const void* parent_conn, const EntityType parent_type, const int sub_dimension,
-                               const int sub_index, void* sub_entity_conn, int& num_sub_vertices );
+    static void SubEntityConn( const void* parent_conn,
+                               const EntityType parent_type,
+                               const int sub_dimension,
+                               const int sub_index,
+                               void* sub_entity_conn,
+                               int& num_sub_vertices );
 
     //! For a specified set of sides of given dimension, return the intersection
     //! or union of all sides of specified target dimension adjacent to those sides.
@@ -230,9 +243,13 @@ class CN
     //! \param index_list Indices of target entities (returned)
     //! \param operation_type Specify either CN::INTERSECT or CN::UNION to get intersection
     //!        or union of target entity lists over source entities
-    static short int AdjacentSubEntities( const EntityType this_type, const int* source_indices,
-                                          const int num_source_indices, const int source_dim, const int target_dim,
-                                          std::vector< int >& index_list, const int operation_type = CN::INTERSECT );
+    static short int AdjacentSubEntities( const EntityType this_type,
+                                          const int* source_indices,
+                                          const int num_source_indices,
+                                          const int source_dim,
+                                          const int target_dim,
+                                          std::vector< int >& index_list,
+                                          const int operation_type = CN::INTERSECT );
 
     //! return the side index represented in the input sub-entity connectivity in the input
     //! parent entity connectivity array.
@@ -245,23 +262,53 @@ class CN
     //! \param sense Sense of child entity with respect to order in <em>child_conn</em> (returned)
     //! \param offset Offset of <em>child_conn</em> with respect to canonical ordering data
     //! (returned) \return status Returns zero if successful, -1 if not
-    static short int SideNumber( const EntityType parent_type, const int* parent_conn, const int* child_conn,
-                                 const int child_num_verts, const int child_dim, int& side_number, int& sense,
+    static short int SideNumber( const EntityType parent_type,
+                                 const int* parent_conn,
+                                 const int* child_conn,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
                                  int& offset );
-    static short int SideNumber( const EntityType parent_type, const unsigned int* parent_conn,
-                                 const unsigned int* child_conn, const int child_num_verts, const int child_dim,
-                                 int& side_number, int& sense, int& offset );
-    static short int SideNumber( const EntityType parent_type, const long* parent_conn, const long* child_conn,
-                                 const int child_num_verts, const int child_dim, int& side_number, int& sense,
+    static short int SideNumber( const EntityType parent_type,
+                                 const unsigned int* parent_conn,
+                                 const unsigned int* child_conn,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
                                  int& offset );
-    static short int SideNumber( const EntityType parent_type, const unsigned long* parent_conn,
-                                 const unsigned long* child_conn, const int child_num_verts, const int child_dim,
-                                 int& side_number, int& sense, int& offset );
-    static short int SideNumber( const EntityType parent_type, const unsigned long long* parent_conn,
-                                 const unsigned long long* child_conn, const int child_num_verts, const int child_dim,
-                                 int& side_number, int& sense, int& offset );
-    static short int SideNumber( const EntityType parent_type, void* const* parent_conn, void* const* child_conn,
-                                 const int child_num_verts, const int child_dim, int& side_number, int& sense,
+    static short int SideNumber( const EntityType parent_type,
+                                 const long* parent_conn,
+                                 const long* child_conn,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
+                                 int& offset );
+    static short int SideNumber( const EntityType parent_type,
+                                 const unsigned long* parent_conn,
+                                 const unsigned long* child_conn,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
+                                 int& offset );
+    static short int SideNumber( const EntityType parent_type,
+                                 const unsigned long long* parent_conn,
+                                 const unsigned long long* child_conn,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
+                                 int& offset );
+    static short int SideNumber( const EntityType parent_type,
+                                 void* const* parent_conn,
+                                 void* const* child_conn,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
                                  int& offset );
 
     //! return the side index represented in the input sub-entity connectivity
@@ -274,8 +321,13 @@ class CN
     //! \param sense Sense of child entity with respect to order in <em>child_conn</em> (returned)
     //! \param offset Offset of <em>child_conn</em> with respect to canonical ordering data
     //! (returned) \return status Returns zero if successful, -1 if not
-    static short int SideNumber( const EntityType parent_type, const int* child_conn_indices, const int child_num_verts,
-                                 const int child_dim, int& side_number, int& sense, int& offset );
+    static short int SideNumber( const EntityType parent_type,
+                                 const int* child_conn_indices,
+                                 const int child_num_verts,
+                                 const int child_dim,
+                                 int& side_number,
+                                 int& sense,
+                                 int& offset );
 
     //! return the dimension and index of the opposite side, given parent entity type and child
     //! dimension and index.  This function is only defined for certain types of parent/child types:
@@ -291,8 +343,11 @@ class CN
     //! \param child_index The index of the child element
     //! \param opposite_index The index of the opposite element
     //! \return status Returns 0 if successful, -1 if not
-    static short int OppositeSide( const EntityType parent_type, const int child_index, const int child_dim,
-                                   int& opposite_index, int& opposite_dim );
+    static short int OppositeSide( const EntityType parent_type,
+                                   const int child_index,
+                                   const int child_dim,
+                                   int& opposite_index,
+                                   int& opposite_dim );
 
     //! given two connectivity arrays, determine whether or not they represent the same entity.
     //! \param conn1 Connectivity array of first entity
@@ -301,17 +356,35 @@ class CN
     //! \param direct If positive, entities have the same sense (returned)
     //! \param offset Offset of <em>conn2</em>'s first vertex in <em>conn1</em>
     //! \return bool Returns true if <em>conn1</em> and <em>conn2</em> match
-    static bool ConnectivityMatch( const int* conn1, const int* conn2, const int num_vertices, int& direct,
+    static bool ConnectivityMatch( const int* conn1,
+                                   const int* conn2,
+                                   const int num_vertices,
+                                   int& direct,
                                    int& offset );
-    static bool ConnectivityMatch( const unsigned int* conn1, const unsigned int* conn2, const int num_vertices,
-                                   int& direct, int& offset );
-    static bool ConnectivityMatch( const long* conn1, const long* conn2, const int num_vertices, int& direct,
+    static bool ConnectivityMatch( const unsigned int* conn1,
+                                   const unsigned int* conn2,
+                                   const int num_vertices,
+                                   int& direct,
                                    int& offset );
-    static bool ConnectivityMatch( const unsigned long* conn1, const unsigned long* conn2, const int num_vertices,
-                                   int& direct, int& offset );
-    static bool ConnectivityMatch( const unsigned long long* conn1, const unsigned long long* conn2,
-                                   const int num_vertices, int& direct, int& offset );
-    static bool ConnectivityMatch( void* const* conn1, void* const* conn2, const int num_vertices, int& direct,
+    static bool ConnectivityMatch( const long* conn1,
+                                   const long* conn2,
+                                   const int num_vertices,
+                                   int& direct,
+                                   int& offset );
+    static bool ConnectivityMatch( const unsigned long* conn1,
+                                   const unsigned long* conn2,
+                                   const int num_vertices,
+                                   int& direct,
+                                   int& offset );
+    static bool ConnectivityMatch( const unsigned long long* conn1,
+                                   const unsigned long long* conn2,
+                                   const int num_vertices,
+                                   int& direct,
+                                   int& offset );
+    static bool ConnectivityMatch( void* const* conn1,
+                                   void* const* conn2,
+                                   const int num_vertices,
+                                   int& direct,
                                    int& offset );
 
     //! Set permutation or reverse permutation vector
@@ -324,7 +397,10 @@ class CN
     //! \param pvec Permutation array
     //! \param num_entries Number of indicies in permutation array
     //! \param is_reverse Array is reverse permutation
-    static inline void setPermutation( const EntityType t, const int dim, short int* pvec, const int num_entries,
+    static inline void setPermutation( const EntityType t,
+                                       const int dim,
+                                       short int* pvec,
+                                       const int num_entries,
                                        const bool is_reverse = false );
 
     //! Reset permutation or reverse permutation vector
@@ -339,13 +415,25 @@ class CN
     //! \param pvec Handle array being permuted
     //! \param indices_per_ent Number of indices per entity
     //! \param num_entries Number of entities in pvec
-    static int permuteThis( const EntityType t, const int dim, int* pvec, const int indices_per_ent,
+    static int permuteThis( const EntityType t,
+                            const int dim,
+                            int* pvec,
+                            const int indices_per_ent,
                             const int num_entries );
-    static int permuteThis( const EntityType t, const int dim, unsigned int* pvec, const int indices_per_ent,
+    static int permuteThis( const EntityType t,
+                            const int dim,
+                            unsigned int* pvec,
+                            const int indices_per_ent,
                             const int num_entries );
-    static int permuteThis( const EntityType t, const int dim, long* pvec, const int indices_per_ent,
+    static int permuteThis( const EntityType t,
+                            const int dim,
+                            long* pvec,
+                            const int indices_per_ent,
                             const int num_entries );
-    static int permuteThis( const EntityType t, const int dim, void** pvec, const int indices_per_ent,
+    static int permuteThis( const EntityType t,
+                            const int dim,
+                            void** pvec,
+                            const int indices_per_ent,
                             const int num_entries );
 
     //! Reverse permute a handle array according to reverse permutation vector set with setPermute;
@@ -355,13 +443,25 @@ class CN
     //! \param pvec Handle array being reverse permuted
     //! \param indices_per_ent Number of indices per entity
     //! \param num_entries Number of entities in pvec
-    static int revPermuteThis( const EntityType t, const int dim, int* pvec, const int indices_per_ent,
+    static int revPermuteThis( const EntityType t,
+                               const int dim,
+                               int* pvec,
+                               const int indices_per_ent,
                                const int num_entries );
-    static int revPermuteThis( const EntityType t, const int dim, unsigned int* pvec, const int indices_per_ent,
+    static int revPermuteThis( const EntityType t,
+                               const int dim,
+                               unsigned int* pvec,
+                               const int indices_per_ent,
                                const int num_entries );
-    static int revPermuteThis( const EntityType t, const int dim, long* pvec, const int indices_per_ent,
+    static int revPermuteThis( const EntityType t,
+                               const int dim,
+                               long* pvec,
+                               const int indices_per_ent,
                                const int num_entries );
-    static int revPermuteThis( const EntityType t, const int dim, void** pvec, const int indices_per_ent,
+    static int revPermuteThis( const EntityType t,
+                               const int dim,
+                               void** pvec,
+                               const int indices_per_ent,
                                const int num_entries );
 
     //! true if entities of a given type and number of nodes indicates mid edge nodes are present.
@@ -408,7 +508,10 @@ class CN
     //! \param ho_node_index The position of the HO node in the connectivity list (zero based)
     //! \param parent_dim Dimension of sub-entity high-order node resolves (returned)
     //! \param parent_index Index of sub-entity high-order node resolves (returned)
-    static void HONodeParent( EntityType elem_type, int num_nodes, int ho_node_index, int& parent_dim,
+    static void HONodeParent( EntityType elem_type,
+                              int num_nodes,
+                              int ho_node_index,
+                              int& parent_dim,
                               int& parent_index );
 
     //! for an entity of this type with num_verts vertices, and a specified subfacet
@@ -419,7 +522,9 @@ class CN
     //! \param subfacet_dim Dimension of sub-entity being queried
     //! \param subfacet_index Index of sub-entity being queried
     //! \return index Index of sub-entity's higher-order node
-    static short int HONodeIndex( const EntityType this_type, const int num_verts, const int subfacet_dim,
+    static short int HONodeIndex( const EntityType this_type,
+                                  const int num_verts,
+                                  const int subfacet_dim,
                                   const int subfacet_index );
 };
 
@@ -430,7 +535,9 @@ inline short int CN::GetBasis()
 }
 
 //! return the connectivity of the specified sub-entity.
-inline void CN::SubEntityVertexIndices( const EntityType this_type, const int sub_dimension, const int index,
+inline void CN::SubEntityVertexIndices( const EntityType this_type,
+                                        const int sub_dimension,
+                                        const int index,
                                         int sub_entity_conn[] )
 {
     EntityType type;
@@ -473,7 +580,10 @@ inline void CN::HasMidNodes( const EntityType this_type, const int num_nodes, in
 }
 
 //! Set permutation or reverse permutation vector
-inline void CN::setPermutation( const EntityType t, const int dim, short int* pvec, const int num_entries,
+inline void CN::setPermutation( const EntityType t,
+                                const int dim,
+                                short int* pvec,
+                                const int num_entries,
                                 const bool is_reverse )
 {
     short int *this_vec = permuteVec[t][dim], *that_vec = revPermuteVec[t][dim];

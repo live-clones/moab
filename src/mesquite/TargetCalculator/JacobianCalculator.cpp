@@ -38,8 +38,12 @@
 namespace MBMesquite
 {
 
-void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf, NodeSet ho_bits, Sample location,
-                                          const Vector3D* verts, size_t num_type_vert, MsqMatrix< 3, 2 >& J_out,
+void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf,
+                                          NodeSet ho_bits,
+                                          Sample location,
+                                          const Vector3D* verts,
+                                          size_t num_type_vert,
+                                          MsqMatrix< 3, 2 >& J_out,
                                           MsqError& err )
 {
     size_t num_vtx = 0;
@@ -57,8 +61,12 @@ void JacobianCalculator::get_Jacobian_2D( const MappingFunction2D* mf, NodeSet h
     J_out.set_column( 1, MsqMatrix< 3, 1 >( c[1].to_array() ) );
 }
 
-void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf, NodeSet ho_bits, Sample location,
-                                          const Vector3D* verts, size_t num_type_vert, MsqMatrix< 3, 3 >& J_out,
+void JacobianCalculator::get_Jacobian_3D( const MappingFunction3D* mf,
+                                          NodeSet ho_bits,
+                                          Sample location,
+                                          const Vector3D* verts,
+                                          size_t num_type_vert,
+                                          MsqMatrix< 3, 3 >& J_out,
                                           MsqError& err )
 {
     size_t num_vtx = 0;

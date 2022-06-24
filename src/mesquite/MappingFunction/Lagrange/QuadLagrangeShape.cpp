@@ -44,8 +44,12 @@ int QuadLagrangeShape::num_nodes() const
     return 9;
 }
 
-void QuadLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                                      size_t& num_coeff, MsqError& err ) const
+void QuadLagrangeShape::coefficients( Sample loc,
+                                      NodeSet nodeset,
+                                      double* coeff_out,
+                                      size_t* indices_out,
+                                      size_t& num_coeff,
+                                      MsqError& err ) const
 {
     if( !nodeset.have_any_mid_node() )
     {
@@ -123,7 +127,10 @@ void QuadLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff
     }
 }
 
-static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
+static void derivatives_at_corner( unsigned corner,
+                                   NodeSet nodeset,
+                                   size_t* vertices,
+                                   MsqVector< 2 >* derivs,
                                    size_t& num_vtx )
 {
     static const unsigned xi_adj_corners[]  = { 1, 0, 3, 2 };
@@ -171,7 +178,10 @@ static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* ver
     }
 }
 
-static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
+static void derivatives_at_mid_edge( unsigned edge,
+                                     NodeSet nodeset,
+                                     size_t* vertices,
+                                     MsqVector< 2 >* derivs,
                                      size_t& num_vtx )
 {
     static const double values[][9]      = { { -0.5, -0.5, 0.5, 0.5, -1.0, 2.0, 1.0, 2.0, 4.0 },
@@ -371,8 +381,12 @@ static void derivatives_at_mid_elem( NodeSet nodeset, size_t* vertices, MsqVecto
     // N_8 (mid-quad node) never contributes to Jacobian at element center!!!
 }
 
-void QuadLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                     MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
+void QuadLagrangeShape::derivatives( Sample loc,
+                                     NodeSet nodeset,
+                                     size_t* vertex_indices_out,
+                                     MsqVector< 2 >* d_coeff_d_xi_out,
+                                     size_t& num_vtx,
+                                     MsqError& err ) const
 {
     if( !nodeset.have_any_mid_node() )
     {

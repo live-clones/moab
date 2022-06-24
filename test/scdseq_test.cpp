@@ -32,10 +32,18 @@ void test_parallel_partitions();
 
 ErrorCode test_parallel_partition( int* gdims, int nprocs, int part_method );
 
-ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const int jmin, const int kmin, const int imax,
-                                 const int jmax, const int kmax, const EntityHandle this_start );
+ErrorCode check_vertex_sequence( const ScdBox* this_box,
+                                 const int imin,
+                                 const int jmin,
+                                 const int kmin,
+                                 const int imax,
+                                 const int jmax,
+                                 const int kmax,
+                                 const EntityHandle this_start );
 ErrorCode evaluate_vertex_box( ScdBox* this_box );
-ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_params, const HomCoord& max_params,
+ErrorCode check_element_sequence( const ScdBox* this_box,
+                                  const HomCoord& min_params,
+                                  const HomCoord& max_params,
                                   const EntityHandle this_start );
 ErrorCode evaluate_element_sequence( ScdBox* this_box );
 ErrorCode eseq_test1a( ScdInterface* scdi, HomCoord tmp_min, HomCoord tmp_max );
@@ -50,10 +58,19 @@ ErrorCode create_1d_3_sequences( ScdInterface* scdi, HomCoord tmp_min, HomCoord 
 
 ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vseq, ScdBox** eseq );
 
-ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, ScdBox** vseq,
+ErrorCode create_2dtri_3_sequences( ScdInterface* scdi,
+                                    const int int1,
+                                    const int int2,
+                                    const int int3,
+                                    ScdBox** vseq,
                                     ScdBox** eseq );
-ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, const int int4,
-                                    ScdBox** vseq, ScdBox** eseq );
+ErrorCode create_3dtri_3_sequences( ScdInterface* scdi,
+                                    const int int1,
+                                    const int int2,
+                                    const int int3,
+                                    const int int4,
+                                    ScdBox** vseq,
+                                    ScdBox** eseq );
 ErrorCode access_adjacencies( ScdBox* box );
 
 void test_partition_methods();
@@ -62,8 +79,14 @@ void test_partition_method( ScdParData::PartitionMethod pm );
 
 // first comes general-capability code used by various tests; main and test functions
 // come after these, starting with main
-ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const int jmin, const int kmin, const int imax,
-                                 const int jmax, const int kmax, const EntityHandle this_start )
+ErrorCode check_vertex_sequence( const ScdBox* this_box,
+                                 const int imin,
+                                 const int jmin,
+                                 const int kmin,
+                                 const int imax,
+                                 const int jmax,
+                                 const int kmax,
+                                 const EntityHandle this_start )
 {
     ErrorCode result = MB_SUCCESS;
 
@@ -91,7 +114,9 @@ ErrorCode check_vertex_sequence( const ScdBox* this_box, const int imin, const i
     return result;
 }
 
-ErrorCode check_element_sequence( const ScdBox* this_box, const HomCoord& min_params, const HomCoord& max_params,
+ErrorCode check_element_sequence( const ScdBox* this_box,
+                                  const HomCoord& min_params,
+                                  const HomCoord& max_params,
                                   const EntityHandle this_start )
 {
     ErrorCode result = MB_SUCCESS;
@@ -780,7 +805,11 @@ ErrorCode create_2d_3_sequences( ScdInterface* scdi, ScdBox** vbox, ScdBox** ebo
     return result;
 }
 
-ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, ScdBox** vbox,
+ErrorCode create_2dtri_3_sequences( ScdInterface* scdi,
+                                    const int int1,
+                                    const int int2,
+                                    const int int3,
+                                    ScdBox** vbox,
                                     ScdBox** ebox )
 {
     // create 3 rectangular sequences arranged such that the all share a common (tri-valent) corner;
@@ -900,8 +929,13 @@ ErrorCode create_2dtri_3_sequences( ScdInterface* scdi, const int int1, const in
     return result;
 }
 
-ErrorCode create_3dtri_3_sequences( ScdInterface* scdi, const int int1, const int int2, const int int3, const int int4,
-                                    ScdBox** vbox, ScdBox** ebox )
+ErrorCode create_3dtri_3_sequences( ScdInterface* scdi,
+                                    const int int1,
+                                    const int int2,
+                                    const int int3,
+                                    const int int4,
+                                    ScdBox** vbox,
+                                    ScdBox** ebox )
 {
     // create 3 brick sequences arranged such that the all share a common (tri-valent) edge;
     // orient each region similarly to the 2dtri_3_sequences test problem, swept into 3d in the

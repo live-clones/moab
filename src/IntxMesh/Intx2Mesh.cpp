@@ -890,7 +890,7 @@ ErrorCode Intx2Mesh::build_processor_euler_boxes( EntityHandle euler_set, Range&
     {
         std::vector< double > allBoxes_tmp( 6 * parcomm->proc_config().proc_size() );
         mpi_err  = MPI_Allgather( &allBoxes[6 * my_rank], 6, MPI_DOUBLE, &allBoxes_tmp[0], 6, MPI_DOUBLE,
-                                 parcomm->proc_config().proc_comm() );
+                                  parcomm->proc_config().proc_comm() );
         allBoxes = allBoxes_tmp;
     }
 #endif
@@ -967,7 +967,10 @@ ErrorCode Intx2Mesh::create_departure_mesh_2nd_alg( EntityHandle& euler_set, Ent
         {
             CartVect bbmin( &allBoxes[6 * p] );
             CartVect bbmax( &allBoxes[6 * p + 3] );
-            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) ) { Rto[p].insert( q ); }
+            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) )
+            {
+                Rto[p].insert( q );
+            }
         }
     }
 
@@ -1241,7 +1244,10 @@ ErrorCode Intx2Mesh::create_departure_mesh_3rd_alg( EntityHandle& lagr_set, Enti
         {
             CartVect bbmin( &allBoxes[6 * p] );
             CartVect bbmax( &allBoxes[6 * p + 3] );
-            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) ) { Rto[p].insert( q ); }
+            if( GeomUtil::boxes_overlap( bbmin, bbmax, qbmin, qbmax, box_error ) )
+            {
+                Rto[p].insert( q );
+            }
         }
     }
 

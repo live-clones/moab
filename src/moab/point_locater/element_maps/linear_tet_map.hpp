@@ -21,11 +21,16 @@ namespace element_utility
         Linear_tet_map( const Self& f ) : Tinv( f.Tinv ), eh( f.eh ) {}
         // Natural coordinates
         template < typename Moab, typename Points, typename Point >
-        std::pair< bool, Point > operator()( const Moab& moab, const Entity_handle _eh, const Points& v, const Point& p,
+        std::pair< bool, Point > operator()( const Moab& moab,
+                                             const Entity_handle _eh,
+                                             const Points& v,
+                                             const Point& p,
                                              const double tol = 1e-6 )
         {
             // Remove the warning about unused parameter
-            if( NULL != &moab ) {}
+            if( NULL != &moab )
+            {
+            }
 
             set_tet( _eh, v );
             // TODO: Make sure this is correct
@@ -41,7 +46,10 @@ namespace element_utility
             for( std::size_t i = 0; i < 3; ++i )
             {
                 sum += result[i];
-                if( result[i] < -tol ) { return false; }
+                if( result[i] < -tol )
+                {
+                    return false;
+                }
             }
             return sum < 1.0 + tol;
         }

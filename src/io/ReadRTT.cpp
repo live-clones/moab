@@ -96,15 +96,21 @@ ReadRTT::~ReadRTT()
     delete myGeomTool;
 }
 
-ErrorCode ReadRTT::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/, const FileOptions& /*opts*/,
-                                    std::vector< int >& /*tag_values_out*/, const SubsetList* /*subset_list*/ )
+ErrorCode ReadRTT::read_tag_values( const char* /*file_name*/,
+                                    const char* /*tag_name*/,
+                                    const FileOptions& /*opts*/,
+                                    std::vector< int >& /*tag_values_out*/,
+                                    const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // load the file as called by the Interface function
-ErrorCode ReadRTT::load_file( const char* filename, const EntityHandle*, const FileOptions&,
-                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
+ErrorCode ReadRTT::load_file( const char* filename,
+                              const EntityHandle*,
+                              const FileOptions&,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* /*file_id_tag*/ )
 {
     ErrorCode rval;
 
@@ -166,7 +172,8 @@ ErrorCode ReadRTT::load_file( const char* filename, const EntityHandle*, const F
 /*
  * builds the topology of the problem
  */
-ErrorCode ReadRTT::generate_topology( std::vector< side > side_data, std::vector< cell > cell_data,
+ErrorCode ReadRTT::generate_topology( std::vector< side > side_data,
+                                      std::vector< cell > cell_data,
                                       std::map< int, EntityHandle >& surface_map )
 {
 
@@ -238,8 +245,10 @@ ErrorCode ReadRTT::generate_topology( std::vector< side > side_data, std::vector
 /*
  * builds the moab representation of the mesh
  */
-ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet > facet_data,
-                               std::vector< tet > tet_data, std::map< int, EntityHandle > surface_map )
+ErrorCode ReadRTT::build_moab( std::vector< node > node_data,
+                               std::vector< facet > facet_data,
+                               std::vector< tet > tet_data,
+                               std::map< int, EntityHandle > surface_map )
 {
 
     ErrorCode rval;         // reusable return value
@@ -810,8 +819,10 @@ std::vector< std::string > ReadRTT::split_string( std::string string_to_split, c
 /*
  * Generate the parent-child links bwetween the cell and surface meshsets
  */
-void ReadRTT::generate_parent_child_links( int num_ents[4], std::vector< EntityHandle > entity_map[4],
-                                           std::vector< side > side_data, std::vector< cell > cell_data )
+void ReadRTT::generate_parent_child_links( int num_ents[4],
+                                           std::vector< EntityHandle > entity_map[4],
+                                           std::vector< side > side_data,
+                                           std::vector< cell > cell_data )
 {
     ErrorCode rval;  // return value
     // loop over the number of surfaces
@@ -850,8 +861,10 @@ void ReadRTT::generate_parent_child_links( int num_ents[4], std::vector< EntityH
 /*
  * sets the sense of the surfaces wrt to volumes using geom topo tool
  */
-void ReadRTT::set_surface_senses( int num_ents[4], std::vector< EntityHandle > entity_map[4],
-                                  std::vector< side > side_data, std::vector< cell > cell_data )
+void ReadRTT::set_surface_senses( int num_ents[4],
+                                  std::vector< EntityHandle > entity_map[4],
+                                  std::vector< side > side_data,
+                                  std::vector< cell > cell_data )
 {
 
     ErrorCode rval;  // return value

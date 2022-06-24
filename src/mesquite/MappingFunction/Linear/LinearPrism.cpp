@@ -114,7 +114,11 @@ static void coefficients_at_mid_elem( double* coeff_out, size_t* indices_out, si
     indices_out[5]     = 5;
 }
 
-void LinearPrism::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out, size_t& num_coeff,
+void LinearPrism::coefficients( Sample loc,
+                                NodeSet nodeset,
+                                double* coeff_out,
+                                size_t* indices_out,
+                                size_t& num_coeff,
                                 MsqError& err ) const
 {
     if( nodeset.have_any_mid_node() )
@@ -142,7 +146,9 @@ void LinearPrism::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, 
     }
 }
 
-static void derivatives_at_corner( unsigned corner, size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+static void derivatives_at_corner( unsigned corner,
+                                   size_t* vertex_indices_out,
+                                   MsqVector< 3 >* d_coeff_d_xi_out,
                                    size_t& num_vtx )
 {
     int tri = ( corner / 3 );  // 0 for xi=0, 1 for xi=1
@@ -174,7 +180,9 @@ static void derivatives_at_corner( unsigned corner, size_t* vertex_indices_out, 
     d_coeff_d_xi_out[3][2] = 0.0;
 }
 
-static void derivatives_at_mid_edge( unsigned edge, size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+static void derivatives_at_mid_edge( unsigned edge,
+                                     size_t* vertex_indices_out,
+                                     MsqVector< 3 >* d_coeff_d_xi_out,
                                      size_t& num_vtx )
 {
     int opp;  // vertex opposite edge in same triagle
@@ -282,7 +290,9 @@ static void derivatives_at_mid_edge( unsigned edge, size_t* vertex_indices_out, 
             break;
     }
 }
-static void derivatives_at_mid_face( unsigned face, size_t* vertex_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
+static void derivatives_at_mid_face( unsigned face,
+                                     size_t* vertex_indices_out,
+                                     MsqVector< 3 >* d_coeff_d_xi_out,
                                      size_t& num_vtx )
 {
     num_vtx               = 6;
@@ -385,8 +395,12 @@ static void derivatives_at_mid_elem( size_t* vertex_indices_out, MsqVector< 3 >*
     d_coeff_d_xi_out[5][2] = 0.5;
 }
 
-void LinearPrism::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                               MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
+void LinearPrism::derivatives( Sample loc,
+                               NodeSet nodeset,
+                               size_t* vertex_indices_out,
+                               MsqVector< 3 >* d_coeff_d_xi_out,
+                               size_t& num_vtx,
+                               MsqError& err ) const
 {
     if( nodeset.have_any_mid_node() )
     {

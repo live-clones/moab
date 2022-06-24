@@ -38,7 +38,9 @@ void regression_svn1960();
    referencing a SequnceData with the range [1,22000]
  */
 void make_basic_sequence( TypeSequenceManager& seq );
-void make_basic_sequence( TypeSequenceManager& seq, EntitySequence*& seq3to7, EntitySequence*& seq100to111,
+void make_basic_sequence( TypeSequenceManager& seq,
+                          EntitySequence*& seq3to7,
+                          EntitySequence*& seq100to111,
                           EntitySequence*& seq1001 );
 
 /* Compare expected sequence contents to actual contents.
@@ -50,7 +52,10 @@ bool seqman_equal( const EntityHandle pair_array[][2], unsigned num_pairs, const
  * Insert a sequence into a sequence manager.  Delete passed
  * sequence (and optionally SequenceData) if insertion fails.
  */
-ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, EntityID count, SequenceData* data,
+ErrorCode insert_seq( TypeSequenceManager& seqman,
+                      EntityHandle start_handle,
+                      EntityID count,
+                      SequenceData* data,
                       bool del_data = false );
 
 int main()
@@ -143,7 +148,10 @@ void make_basic_sequence( TypeSequenceManager& seqman )
     make_basic_sequence( seqman, s, t, u );
 }
 
-ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, EntityID count, SequenceData* data,
+ErrorCode insert_seq( TypeSequenceManager& seqman,
+                      EntityHandle start_handle,
+                      EntityID count,
+                      SequenceData* data,
                       bool del_data )
 {
     EntitySequence* seq = new DumSeq( start_handle, count, data );
@@ -161,7 +169,9 @@ ErrorCode insert_seq( TypeSequenceManager& seqman, EntityHandle start_handle, En
     return rval;
 }
 
-void make_basic_sequence( TypeSequenceManager& seqman, EntitySequence*& seq1, EntitySequence*& seq2,
+void make_basic_sequence( TypeSequenceManager& seqman,
+                          EntitySequence*& seq1,
+                          EntitySequence*& seq2,
                           EntitySequence*& seq3 )
 {
     CHECK( seqman.empty() );
@@ -1055,7 +1065,10 @@ void call_find( TypeSequenceManager* seqman, const std::set< int >& removed, int
         CHECK_EQUAL( MB_SUCCESS, rval );
         // check that the returned sequence actually contains this entity
         // (this is where threaded access used to fail)
-        if( idx < seq->start_handle() || idx > seq->end_handle() ) { n_failures += 1; }
+        if( idx < seq->start_handle() || idx > seq->end_handle() )
+        {
+            n_failures += 1;
+        }
     }
 }
 #ifndef MOAB_FORCE_32_BIT_HANDLES
@@ -1095,7 +1108,10 @@ void test_threaded_access( int n_threads )
     for( size_t i = 0; i < failures.size(); i++ )
         n_failures += failures[i];
 
-    if( n_failures > 0 ) { std::cout << n_failures << " invalid sequences found." << std::endl; }
+    if( n_failures > 0 )
+    {
+        std::cout << n_failures << " invalid sequences found." << std::endl;
+    }
 
     CHECK_EQUAL( 0, n_failures );
 }

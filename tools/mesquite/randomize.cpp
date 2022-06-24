@@ -93,7 +93,10 @@ void UnOptimizer::optimize_vertex_positions( PatchData& pd, MsqError& err )
         if( state ) break;
         coeff *= 0.5;
     }
-    if( !state ) { pd.set_to_vertices_memento( memento, err ); }
+    if( !state )
+    {
+        pd.set_to_vertices_memento( memento, err );
+    }
 }
 
 int main( int argc, char* argv[] )

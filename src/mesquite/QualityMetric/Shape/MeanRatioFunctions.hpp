@@ -129,7 +129,11 @@ namespace MBMesquite
 /* Function evaluation requires 44 flops.                                    */
 /*   Reductions possible when b == 1 or c == 1                               */
 /*****************************************************************************/
-inline bool m_fcn_2e( double& obj, const Vector3D x[3], const Vector3D& n, const double a, const Exponent& b,
+inline bool m_fcn_2e( double& obj,
+                      const Vector3D x[3],
+                      const Vector3D& n,
+                      const double a,
+                      const Exponent& b,
                       const Exponent& c )
 {
     double matr[9], f;
@@ -170,8 +174,13 @@ inline bool m_fcn_2e( double& obj, const Vector3D x[3], const Vector3D& n, const
 /* Gradient evaluation requires 88 flops.                                    */
 /*   Reductions possible when b == 1 or c == 1                               */
 /*****************************************************************************/
-inline bool g_fcn_2e( double& obj, Vector3D g_obj[3], const Vector3D x[3], const Vector3D& n, const double a,
-                      const Exponent& b, const Exponent& c )
+inline bool g_fcn_2e( double& obj,
+                      Vector3D g_obj[3],
+                      const Vector3D x[3],
+                      const Vector3D& n,
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c )
 {
     double matr[9], f;
     double adj_m[9], g;  // adj_m[2,5,8] not used
@@ -246,8 +255,14 @@ inline bool g_fcn_2e( double& obj, Vector3D g_obj[3], const Vector3D x[3], const
 /* Hessian evaluation requires 316 flops.                                    */
 /*   Reductions possible when b == 1 or c == 1                               */
 /*****************************************************************************/
-inline bool h_fcn_2e( double& obj, Vector3D g_obj[3], Matrix3D h_obj[6], const Vector3D x[3], const Vector3D& n,
-                      const double a, const Exponent& b, const Exponent& c )
+inline bool h_fcn_2e( double& obj,
+                      Vector3D g_obj[3],
+                      Matrix3D h_obj[6],
+                      const Vector3D x[3],
+                      const Vector3D& n,
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c )
 {
     double matr[9], f;
     double adj_m[9], g;  // adj_m[2,5,8] not used
@@ -547,8 +562,13 @@ inline bool h_fcn_2e( double& obj, Vector3D g_obj[3], Matrix3D h_obj[6], const V
 /* Function evaluation -- requires 41 flops.                                 */
 /*   Reductions possible when b == 1, c == 1, or d == 1                      */
 /*****************************************************************************/
-inline bool m_fcn_2i( double& obj, const Vector3D x[3], const Vector3D& n, const double a, const Exponent& b,
-                      const Exponent& c, const Vector3D& d )
+inline bool m_fcn_2i( double& obj,
+                      const Vector3D x[3],
+                      const Vector3D& n,
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c,
+                      const Vector3D& d )
 {
     double matr[9];
     double f;
@@ -589,8 +609,14 @@ inline bool m_fcn_2i( double& obj, const Vector3D x[3], const Vector3D& n, const
 /* Gradient requires 82 flops.                                               */
 /*   Reductions possible when b == 1, c == 1, or d == 1                      */
 /*****************************************************************************/
-inline bool g_fcn_2i( double& obj, Vector3D g_obj[3], const Vector3D x[3], const Vector3D& n, const double a,
-                      const Exponent& b, const Exponent& c, const Vector3D& d )
+inline bool g_fcn_2i( double& obj,
+                      Vector3D g_obj[3],
+                      const Vector3D x[3],
+                      const Vector3D& n,
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c,
+                      const Vector3D& d )
 {
     double matr[9], f;
     double adj_m[9], g;  // adj_m[2,5,8] not used
@@ -662,8 +688,15 @@ inline bool g_fcn_2i( double& obj, Vector3D g_obj[3], const Vector3D x[3], const
 /* Hessian requires 253 flops.                                               */
 /*   Reductions possible when b == 1, c == 1, or d == 1                      */
 /*****************************************************************************/
-inline bool h_fcn_2i( double& obj, Vector3D g_obj[3], Matrix3D h_obj[6], const Vector3D x[3], const Vector3D& n,
-                      const double a, const Exponent& b, const Exponent& c, const Vector3D& d )
+inline bool h_fcn_2i( double& obj,
+                      Vector3D g_obj[3],
+                      Matrix3D h_obj[6],
+                      const Vector3D x[3],
+                      const Vector3D& n,
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c,
+                      const Vector3D& d )
 {
     double matr[9], f;
     double adj_m[9], g;  // adj_m[2,5,8] not used
@@ -978,7 +1011,11 @@ inline bool m_fcn_3e( double& obj, const Vector3D x[4], const double a, const Ex
 /* Gradient evaluation requires 133 flops.                                   */
 /*   Reductions possible when b == 1 or c == 1                               */
 /*****************************************************************************/
-inline bool g_fcn_3e( double& obj, Vector3D g_obj[4], const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3e( double& obj,
+                      Vector3D g_obj[4],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
                       const Exponent& c )
 {
     double matr[9], f;
@@ -1070,8 +1107,13 @@ inline bool g_fcn_3e( double& obj, Vector3D g_obj[4], const Vector3D x[4], const
 /* Hessian evaluation requires 634 flops.                                    */
 /*   Reductions possible when b == 1 or c == 1                               */
 /*****************************************************************************/
-inline bool h_fcn_3e( double& obj, Vector3D g_obj[4], Matrix3D h_obj[10], const Vector3D x[4], const double a,
-                      const Exponent& b, const Exponent& c )
+inline bool h_fcn_3e( double& obj,
+                      Vector3D g_obj[4],
+                      Matrix3D h_obj[10],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c )
 {
     double matr[9], f;
     double adj_m[9], g;
@@ -1636,7 +1678,11 @@ inline bool h_fcn_3e( double& obj, Vector3D g_obj[4], Matrix3D h_obj[10], const 
 /* obtaining the gradient and Hessian with respect to a single vertex.       */
 /*****************************************************************************/
 
-inline bool g_fcn_3e_v3( double& obj, Vector3D& g_obj, const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3e_v3( double& obj,
+                         Vector3D& g_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
                          const Exponent& c )
 {
     double matr[9], f, g;
@@ -1691,7 +1737,11 @@ inline bool g_fcn_3e_v3( double& obj, Vector3D& g_obj, const Vector3D x[4], cons
     return true;
 }
 
-inline bool g_fcn_3e_v0( double& obj, Vector3D& g_obj, const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3e_v0( double& obj,
+                         Vector3D& g_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
                          const Exponent& c )
 {
     static Vector3D my_x[4];
@@ -1703,7 +1753,11 @@ inline bool g_fcn_3e_v0( double& obj, Vector3D& g_obj, const Vector3D x[4], cons
     return g_fcn_3e_v3( obj, g_obj, my_x, a, b, c );
 }
 
-inline bool g_fcn_3e_v1( double& obj, Vector3D& g_obj, const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3e_v1( double& obj,
+                         Vector3D& g_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
                          const Exponent& c )
 {
     static Vector3D my_x[4];
@@ -1715,7 +1769,11 @@ inline bool g_fcn_3e_v1( double& obj, Vector3D& g_obj, const Vector3D x[4], cons
     return g_fcn_3e_v3( obj, g_obj, my_x, a, b, c );
 }
 
-inline bool g_fcn_3e_v2( double& obj, Vector3D& g_obj, const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3e_v2( double& obj,
+                         Vector3D& g_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
                          const Exponent& c )
 {
     static Vector3D my_x[4];
@@ -1727,8 +1785,13 @@ inline bool g_fcn_3e_v2( double& obj, Vector3D& g_obj, const Vector3D x[4], cons
     return g_fcn_3e_v3( obj, g_obj, my_x, a, b, c );
 }
 
-inline bool h_fcn_3e_v3( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Vector3D x[4], const double a,
-                         const Exponent& b, const Exponent& c )
+inline bool h_fcn_3e_v3( double& obj,
+                         Vector3D& g_obj,
+                         Matrix3D& h_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
+                         const Exponent& c )
 {
     double matr[9], f, g;
     double dg[9], loc0, /*loc1,*/ loc3, loc4;
@@ -1817,8 +1880,13 @@ inline bool h_fcn_3e_v3( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Ve
     return true;
 }
 
-inline bool h_fcn_3e_v0( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Vector3D x[4], const double a,
-                         const Exponent& b, const Exponent& c )
+inline bool h_fcn_3e_v0( double& obj,
+                         Vector3D& g_obj,
+                         Matrix3D& h_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
+                         const Exponent& c )
 {
     static Vector3D my_x[4];
 
@@ -1829,8 +1897,13 @@ inline bool h_fcn_3e_v0( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Ve
     return h_fcn_3e_v3( obj, g_obj, h_obj, my_x, a, b, c );
 }
 
-inline bool h_fcn_3e_v1( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Vector3D x[4], const double a,
-                         const Exponent& b, const Exponent& c )
+inline bool h_fcn_3e_v1( double& obj,
+                         Vector3D& g_obj,
+                         Matrix3D& h_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
+                         const Exponent& c )
 {
     static Vector3D my_x[4];
 
@@ -1841,8 +1914,13 @@ inline bool h_fcn_3e_v1( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Ve
     return h_fcn_3e_v3( obj, g_obj, h_obj, my_x, a, b, c );
 }
 
-inline bool h_fcn_3e_v2( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Vector3D x[4], const double a,
-                         const Exponent& b, const Exponent& c )
+inline bool h_fcn_3e_v2( double& obj,
+                         Vector3D& g_obj,
+                         Matrix3D& h_obj,
+                         const Vector3D x[4],
+                         const double a,
+                         const Exponent& b,
+                         const Exponent& c )
 {
     static Vector3D my_x[4];
 
@@ -1864,7 +1942,11 @@ inline bool h_fcn_3e_v2( double& obj, Vector3D& g_obj, Matrix3D& h_obj, const Ve
 /* Function evaluation requires 53 flops.                                    */
 /*   Reductions possible when b == 1, c == 1, or d == 1                      */
 /*****************************************************************************/
-inline bool m_fcn_3i( double& obj, const Vector3D x[4], const double a, const Exponent& b, const Exponent& c,
+inline bool m_fcn_3i( double& obj,
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c,
                       const Vector3D& d )
 {
     double matr[9], f;
@@ -1905,8 +1987,13 @@ inline bool m_fcn_3i( double& obj, const Vector3D x[4], const double a, const Ex
 /* Gradient evaluation requires 115 flops.                                   */
 /*   Reductions possible when b == 1, c == 1, or d == 1                      */
 /*****************************************************************************/
-inline bool g_fcn_3i( double& obj, Vector3D g_obj[4], const Vector3D x[4], const double a, const Exponent& b,
-                      const Exponent& c, const Vector3D& d )
+inline bool g_fcn_3i( double& obj,
+                      Vector3D g_obj[4],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c,
+                      const Vector3D& d )
 {
     double matr[9], f;
     double adj_m[9], g;
@@ -1985,8 +2072,14 @@ inline bool g_fcn_3i( double& obj, Vector3D g_obj[4], const Vector3D x[4], const
 /* Hessian evaluation requires 469 flops.                                    */
 /*   Reductions possible when b == 1, c == 1, or d == 1                      */
 /*****************************************************************************/
-inline int h_fcn_3i( double& obj, Vector3D g_obj[4], Matrix3D h_obj[10], const Vector3D x[4], const double a,
-                     const Exponent& b, const Exponent& c, const Vector3D& d )
+inline int h_fcn_3i( double& obj,
+                     Vector3D g_obj[4],
+                     Matrix3D h_obj[10],
+                     const Vector3D x[4],
+                     const double a,
+                     const Exponent& b,
+                     const Exponent& c,
+                     const Vector3D& d )
 {
     double matr[9], f;
     double adj_m[9], g;
@@ -2434,7 +2527,11 @@ inline bool m_fcn_3p( double& obj, const Vector3D x[4], const double a, const Ex
     return true;
 }
 
-inline bool g_fcn_3p( double& obj, Vector3D g_obj[4], const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3p( double& obj,
+                      Vector3D g_obj[4],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
                       const Exponent& c )
 {
     const double h  = 0.5; /* h = 1 / (2*height) */
@@ -2513,8 +2610,13 @@ inline bool g_fcn_3p( double& obj, Vector3D g_obj[4], const Vector3D x[4], const
     return true;
 }
 
-inline bool h_fcn_3p( double& obj, Vector3D g_obj[4], Matrix3D h_obj[10], const Vector3D x[4], const double a,
-                      const Exponent& b, const Exponent& c )
+inline bool h_fcn_3p( double& obj,
+                      Vector3D g_obj[4],
+                      Matrix3D h_obj[10],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c )
 {
     const double h  = 0.5; /* h = 1 / (2*height) */
     const double th = 1.0; /* h = 1 / (height)   */
@@ -3024,7 +3126,11 @@ inline bool m_fcn_3w( double& obj, const Vector3D x[4], const double a, const Ex
     return true;
 }
 
-inline bool g_fcn_3w( double& obj, Vector3D g_obj[4], const Vector3D x[4], const double a, const Exponent& b,
+inline bool g_fcn_3w( double& obj,
+                      Vector3D g_obj[4],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
                       const Exponent& c )
 {
     double matr[9], f;
@@ -3101,8 +3207,13 @@ inline bool g_fcn_3w( double& obj, Vector3D g_obj[4], const Vector3D x[4], const
     return true;
 }
 
-inline bool h_fcn_3w( double& obj, Vector3D g_obj[4], Matrix3D h_obj[10], const Vector3D x[4], const double a,
-                      const Exponent& b, const Exponent& c )
+inline bool h_fcn_3w( double& obj,
+                      Vector3D g_obj[4],
+                      Matrix3D h_obj[10],
+                      const Vector3D x[4],
+                      const double a,
+                      const Exponent& b,
+                      const Exponent& c )
 {
     double matr[9], f;
     double adj_m[9], g;

@@ -55,12 +55,20 @@ class MsqIMeshP : public MsqIMesh, virtual public ParallelMesh
     MsqIMeshP();
     virtual ~MsqIMeshP();
 
-    MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition, iBase_EntitySetHandle meshset,
-               iBase_EntityType element_dimension, MsqError& err, const iBase_TagHandle* fixed_tag = 0,
+    MsqIMeshP( iMesh_Instance imesh,
+               iMeshP_PartitionHandle partition,
+               iBase_EntitySetHandle meshset,
+               iBase_EntityType element_dimension,
+               MsqError& err,
+               const iBase_TagHandle* fixed_tag  = 0,
                const iBase_TagHandle* slaved_tag = 0 );
 
-    MsqIMeshP( iMesh_Instance imesh, iMeshP_PartitionHandle partition, iBase_EntityType element_dimension,
-               MsqError& err, const iBase_TagHandle* fixed_tag = 0, const iBase_TagHandle* slaved_tag = 0 );
+    MsqIMeshP( iMesh_Instance imesh,
+               iMeshP_PartitionHandle partition,
+               iBase_EntityType element_dimension,
+               MsqError& err,
+               const iBase_TagHandle* fixed_tag  = 0,
+               const iBase_TagHandle* slaved_tag = 0 );
 
     //********** Inherited Functions from ParallelMesh ****************
 

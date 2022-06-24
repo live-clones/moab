@@ -388,7 +388,9 @@ void RefinerTagManager::set_sharing( EntityHandle ent_handle, ProcessSet& procs 
  * This is used to determine which processes an output entity should reside on when
  * it is defined using several input entities (such as vertices).
  */
-void RefinerTagManager::get_common_processes( int num, const EntityHandle* src, ProcessSet& common_shared_procs,
+void RefinerTagManager::get_common_processes( int num,
+                                              const EntityHandle* src,
+                                              ProcessSet& common_shared_procs,
                                               bool on_output_mesh )
 {
     Interface* mesh;

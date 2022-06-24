@@ -57,8 +57,10 @@ class EdgeQM : public QualityMetric
      *subset of edges adjacent to at least one free vertex are
      *returned.
      */
-    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                  bool free_vertices_only, MsqError& err );
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd,
+                                                  std::vector< size_t >& handles,
+                                                  bool free_vertices_only,
+                                                  MsqError& err );
 
     /**\brief Returns list of edge indices in PatchData
      *
@@ -71,11 +73,15 @@ class EdgeQM : public QualityMetric
      *the opposite vertex is greater than the one with the flag
      *set.
      */
-    MESQUITE_EXPORT virtual void get_single_pass( PatchData& pd, std::vector< size_t >& handles,
-                                                  bool free_vertices_only, MsqError& err );
+    MESQUITE_EXPORT virtual void get_single_pass( PatchData& pd,
+                                                  std::vector< size_t >& handles,
+                                                  bool free_vertices_only,
+                                                  MsqError& err );
 
-    MESQUITE_EXPORT static void get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                      bool free_vertices_only, bool single_pass_evaluate,
+    MESQUITE_EXPORT static void get_edge_evaluations( PatchData& pd,
+                                                      std::vector< size_t >& handles,
+                                                      bool free_vertices_only,
+                                                      bool single_pass_evaluate,
                                                       MsqError& err );
 
     /**\brief Default implementation for all edge-based metrics
@@ -83,8 +89,11 @@ class EdgeQM : public QualityMetric
      * Fill 'indices' with all free vertex indices in element,
      * and call 'evaluate'.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd,
+                                                        size_t handle,
+                                                        double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError& err );
 
     enum
     {

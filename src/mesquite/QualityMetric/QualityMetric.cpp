@@ -45,7 +45,9 @@ namespace MBMesquite
 
 void QualityMetric::initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 
-void QualityMetric::get_single_pass( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+void QualityMetric::get_single_pass( PatchData& pd,
+                                     std::vector< size_t >& handles,
+                                     bool free_vertices_only,
                                      MsqError& err )
 {
     get_evaluations( pd, handles, free_vertices_only, err );
@@ -93,8 +95,12 @@ static inline double get_delta_C( const PatchData& pd, const std::vector< size_t
     return 3e-6 * sqrt( min_dist_sqr ) + 5e-7 * sqrt( sum_dist_sqr / ( end - beg ) );
 }
 
-bool QualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                            std::vector< Vector3D >& gradient, MsqError& err )
+bool QualityMetric::evaluate_with_gradient( PatchData& pd,
+                                            size_t handle,
+                                            double& value,
+                                            std::vector< size_t >& indices,
+                                            std::vector< Vector3D >& gradient,
+                                            MsqError& err )
 {
     indices.clear();
     bool valid = evaluate_with_indices( pd, handle, value, indices, err );
@@ -164,8 +170,12 @@ bool QualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double
     return true;
 }
 
-bool QualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                           std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+bool QualityMetric::evaluate_with_Hessian( PatchData& pd,
+                                           size_t handle,
+                                           double& value,
+                                           std::vector< size_t >& indices,
+                                           std::vector< Vector3D >& gradient,
+                                           std::vector< Matrix3D >& Hessian,
                                            MsqError& err )
 {
     indices.clear();
@@ -186,7 +196,10 @@ bool QualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
 
     // get initial pertubation amount
     double delta_C;
-    if( haveFiniteDiffEps ) { delta_C = finiteDiffEps; }
+    if( haveFiniteDiffEps )
+    {
+        delta_C = finiteDiffEps;
+    }
     else
     {
         delta_C = get_delta_C( pd, indices, err );
@@ -257,9 +270,13 @@ bool QualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
     return true;
 }
 
-bool QualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                    std::vector< SymMatrix3D >& Hessian_diagonal, MsqError& err )
+bool QualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                    size_t handle,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    std::vector< Vector3D >& gradient,
+                                                    std::vector< SymMatrix3D >& Hessian_diagonal,
+                                                    MsqError& err )
 {
     bool rval = evaluate_with_Hessian( pd, handle, value, indices, gradient, tmpHess, err );
     if( MSQ_CHKERR( err ) || !rval ) return rval;
@@ -286,7 +303,7 @@ uint32_t QualityMetric::fixed_vertex_bitmap( PatchData& pd, const MsqMeshEntity*
         if( vertices[i] < pd.num_free_vertices() )
         {
             indices.push_back( vertices[i] );
-            result &= ~( uint32_t )( 1 << i );
+            result &= ~(uint32_t)( 1 << i );
         }
     }
     return result;
@@ -309,7 +326,9 @@ void QualityMetric::remove_fixed_gradients( EntityTopology elem_type, uint32_t f
     grads.resize( w );
 }
 
-void QualityMetric::remove_fixed_diagonals( EntityTopology type, uint32_t fixed, std::vector< Vector3D >& grads,
+void QualityMetric::remove_fixed_diagonals( EntityTopology type,
+                                            uint32_t fixed,
+                                            std::vector< Vector3D >& grads,
                                             std::vector< SymMatrix3D >& diags )
 {
     const unsigned num_vertex = TopologyInfo::corners( type );
@@ -353,15 +372,20 @@ void QualityMetric::remove_fixed_hessians( EntityTopology elem_type, uint32_t fi
     hessians.resize( w );
 }
 
-double QualityMetric::weighted_average_metrics( const double coef[], const double metric_values[],
-                                                const int& num_values, MsqError& /*err*/ )
+double QualityMetric::weighted_average_metrics( const double coef[],
+                                                const double metric_values[],
+                                                const int& num_values,
+                                                MsqError& /*err*/ )
 {
     // MSQ_MAX needs to be made global?
     // double MSQ_MAX=1e10;
     double total_value = 0.0;
     int i              = 0;
     // if no values, return zero
-    if( num_values <= 0 ) { return 0.0; }
+    if( num_values <= 0 )
+    {
+        return 0.0;
+    }
 
     for( i = 0; i < num_values; ++i )
     {

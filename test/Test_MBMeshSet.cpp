@@ -50,7 +50,11 @@ enum BoolOp
     SUBTRACT
 };
 //! Perform boolean op on two entity sets and verify result
-bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents, unsigned flags2,
+bool test_boolean( Core& mb,
+                   BoolOp op,
+                   unsigned flags1,
+                   const Range& set1_ents,
+                   unsigned flags2,
                    const Range& set2_ents );
 void test_iterator( Interface& moab, SetIterator* iter, EntityHandle set, EntityType etype, int dim );
 void test_iterators( unsigned int flags, bool type, bool dim );
@@ -346,7 +350,10 @@ void make_mesh( Interface& iface )
     }
 }
 
-void make_mesh( Interface& mb, EntityHandle& first_vert, EntityHandle& last_vert, EntityHandle& first_hex,
+void make_mesh( Interface& mb,
+                EntityHandle& first_vert,
+                EntityHandle& last_vert,
+                EntityHandle& first_hex,
                 EntityHandle& last_hex )
 {
     make_mesh( mb );
@@ -412,8 +419,11 @@ void print_mbrange( const char* prefix, const Range& range )
     print_handles( std::cout, prefix, range.begin(), range.end() );
 }
 
-bool compare_set_contents( unsigned flags, const std::vector< EntityHandle >& expected, int set_count,
-                           std::vector< EntityHandle >& vect, const Range& range )
+bool compare_set_contents( unsigned flags,
+                           const std::vector< EntityHandle >& expected,
+                           int set_count,
+                           std::vector< EntityHandle >& vect,
+                           const Range& range )
 {
 
     std::vector< EntityHandle > sorted( expected );
@@ -1015,7 +1025,11 @@ void test_entities_by_dimension( unsigned flags )
     CHECK( check_set_contents( mb, 3, set, flags ) );
 }
 
-bool test_boolean( Core& mb, BoolOp op, unsigned flags1, const Range& set1_ents, unsigned flags2,
+bool test_boolean( Core& mb,
+                   BoolOp op,
+                   unsigned flags1,
+                   const Range& set1_ents,
+                   unsigned flags2,
                    const Range& set2_ents )
 {
     ErrorCode rval;
@@ -1202,8 +1216,7 @@ void regression_insert_set_1()
         0x2554,     0x255c,     e + 0x0099, e + 0x009b, e + 0x00c0, e + 0x00c2, e + 0x0729, e + 0x0732, e + 0x0a3b,
         e + 0x0a3d, e + 0x0ba9, e + 0x0bab, e + 0x2322, e + 0x232b, q + 0x00c,  q + 0x017,  q + 0x0e9,  q + 0x112,
         q + 0x2f2,  q + 0x303,  q + 0x67e,  q + 0x6a5,  q + 0x866,  q + 0x871,  q + 0x8f5,  q + 0x900,  q + 0xc06,
-        q + 0xc17,  q + 0xc7e,  q + 0xc9b,  q + 0xce0,  q + 0xd07
-    };
+        q + 0xc17,  q + 0xc7e,  q + 0xc9b,  q + 0xce0,  q + 0xd07 };
 
     const EntityHandle new_ranges[] = { 0x7e1,  0x829,  0xb37,  0xb63,  0xb6b,  0xb6b,  0xb73,  0xb75,  0xbed,
                                         0xbee,  0xc0b,  0xc10,  0x19fd, 0x19fd, 0x19ff, 0x19ff, 0x1a02, 0x1a04,

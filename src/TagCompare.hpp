@@ -273,7 +273,9 @@ static inline void find_tag_values( Functor compare, IteratorType begin, Iterato
 }
 
 template < class Functor, class IteratorType >
-static inline void find_tag_values( Functor compare, IteratorType begin, IteratorType end,
+static inline void find_tag_values( Functor compare,
+                                    IteratorType begin,
+                                    IteratorType end,
                                     std::vector< EntityHandle >& results )
 {
     for( IteratorType i = begin; i != end; ++i )
@@ -281,8 +283,11 @@ static inline void find_tag_values( Functor compare, IteratorType begin, Iterato
 }
 
 template < class Functor, class TagMap >
-static inline void find_map_values( Functor compare, Range::const_iterator lower, Range::const_iterator upper,
-                                    const TagMap& tag_map, Range& results )
+static inline void find_map_values( Functor compare,
+                                    Range::const_iterator lower,
+                                    Range::const_iterator upper,
+                                    const TagMap& tag_map,
+                                    Range& results )
 {
     Range::iterator insert = results.begin();
     for( ; lower != upper; ++lower )
@@ -299,8 +304,12 @@ static inline void find_map_values( Functor compare, Range::const_iterator lower
  *\param ContainerType : std::vector<EntityHandle> or Range
  */
 template < class IteratorType, class ContainerType >
-static inline void find_tag_values_equal( const TagInfo& tag_info, const void* value, int size, IteratorType begin,
-                                          IteratorType end, ContainerType& results )
+static inline void find_tag_values_equal( const TagInfo& tag_info,
+                                          const void* value,
+                                          int size,
+                                          IteratorType begin,
+                                          IteratorType end,
+                                          ContainerType& results )
 {
     switch( tag_info.get_data_type() )
     {
@@ -331,8 +340,12 @@ static inline void find_tag_values_equal( const TagInfo& tag_info, const void* v
     }
 }
 template < class IteratorType, class ContainerType >
-static inline void find_tag_varlen_values_equal( const TagInfo& tag_info, const void* value, int size,
-                                                 IteratorType begin, IteratorType end, ContainerType& results )
+static inline void find_tag_varlen_values_equal( const TagInfo& tag_info,
+                                                 const void* value,
+                                                 int size,
+                                                 IteratorType begin,
+                                                 IteratorType end,
+                                                 ContainerType& results )
 {
     switch( tag_info.get_data_type() )
     {
@@ -360,8 +373,12 @@ static inline void find_tag_varlen_values_equal( const TagInfo& tag_info, const 
  *\param ContainerType : std::vector<EntityHandle> or Range
  */
 template < class TagMap >
-static inline void find_map_values_equal( const TagInfo& tag_info, const void* value, int size,
-                                          Range::const_iterator begin, Range::const_iterator end, const TagMap& tag_map,
+static inline void find_map_values_equal( const TagInfo& tag_info,
+                                          const void* value,
+                                          int size,
+                                          Range::const_iterator begin,
+                                          Range::const_iterator end,
+                                          const TagMap& tag_map,
                                           Range& results )
 {
     switch( tag_info.get_data_type() )
@@ -397,9 +414,13 @@ static inline void find_map_values_equal( const TagInfo& tag_info, const void* v
     }
 }
 template < class TagMap >
-static inline void find_map_varlen_values_equal( const TagInfo& tag_info, const void* value, int size,
-                                                 Range::const_iterator begin, Range::const_iterator end,
-                                                 const TagMap& tag_map, Range& results )
+static inline void find_map_varlen_values_equal( const TagInfo& tag_info,
+                                                 const void* value,
+                                                 int size,
+                                                 Range::const_iterator begin,
+                                                 Range::const_iterator end,
+                                                 const TagMap& tag_map,
+                                                 Range& results )
 {
     switch( tag_info.get_data_type() )
     {

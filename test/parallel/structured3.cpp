@@ -66,9 +66,9 @@ void create_parallel_mesh()
     double times[5];  // tstart, tvert, tnonvert, tghost, titer;
     times[0] = MPI_Wtime();
     rval     = scdi->construct_box( HomCoord(), HomCoord(), NULL, 0,  // no vertex positions
-                                new_box, NULL,                    // not locally periodic
-                                &par_data, true,
-                                false );  // assign global ids, don't resolve shared verts
+                                    new_box, NULL,                    // not locally periodic
+                                    &par_data, true,
+                                    false );  // assign global ids, don't resolve shared verts
     CHECK_ERR( rval );
 
     // get global id tag

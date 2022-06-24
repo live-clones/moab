@@ -98,7 +98,10 @@ const Vector3D* EdgeIterator::mid() const
 
 void EdgeIterator::step( MsqError& err )
 {
-    if( adjIter != adjList.end() ) { ++adjIter; }
+    if( adjIter != adjList.end() )
+    {
+        ++adjIter;
+    }
 
     while( adjIter == adjList.end() && ++vertIdx < patchPtr->num_nodes() )
     {

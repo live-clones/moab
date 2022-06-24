@@ -216,7 +216,8 @@ inline CppUnit::Message mat_not_equal_check_msg( const MBMesquite::MsqMatrix< R,
 }
 
 template < unsigned R, unsigned C >
-inline bool mat_equal_check( const MBMesquite::MsqMatrix< R, C >& A, const MBMesquite::MsqMatrix< R, C >& B,
+inline bool mat_equal_check( const MBMesquite::MsqMatrix< R, C >& A,
+                             const MBMesquite::MsqMatrix< R, C >& B,
                              double eps )
 {
     for( unsigned i = 0; i < R; ++i )

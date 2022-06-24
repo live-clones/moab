@@ -66,8 +66,11 @@ class EdgeLengthQualityMetric : public VertexQM, public AveragingQM
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t vertex, double& value, MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
-                                                        std::vector< size_t >& indices, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd,
+                                                        size_t vertex,
+                                                        double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError& err );
 
   private:
     bool evaluate_common( PatchData& pd, size_t vertex, double& value, std::vector< size_t >& vertices, MsqError& err );

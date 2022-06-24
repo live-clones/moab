@@ -75,7 +75,8 @@ void CompositeOFScalarAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, c
 }
 
 bool CompositeOFScalarAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                                const Settings* settings, PatchSet* user_set,
+                                                                const Settings* settings,
+                                                                PatchSet* user_set,
                                                                 MsqError& err )
 {
     bool rval = objFunc->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
@@ -89,25 +90,34 @@ bool CompositeOFScalarAdd::evaluate( EvalType type, PatchData& pd, double& value
     return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarAdd::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                                   std::vector< Vector3D >& grad_out, MsqError& err )
+bool CompositeOFScalarAdd::evaluate_with_gradient( EvalType type,
+                                                   PatchData& pd,
+                                                   double& value_out,
+                                                   std::vector< Vector3D >& grad_out,
+                                                   MsqError& err )
 {
     bool ok = objFunc->evaluate_with_gradient( type, pd, value_out, grad_out, err );
     value_out += mAlpha;
     return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+bool CompositeOFScalarAdd::evaluate_with_Hessian_diagonal( EvalType type,
+                                                           PatchData& pd,
+                                                           double& value_out,
                                                            std::vector< Vector3D >& grad_out,
-                                                           std::vector< SymMatrix3D >& diag_out, MsqError& err )
+                                                           std::vector< SymMatrix3D >& diag_out,
+                                                           MsqError& err )
 {
     bool ok = objFunc->evaluate_with_Hessian_diagonal( type, pd, value_out, grad_out, diag_out, err );
     value_out += mAlpha;
     return !MSQ_CHKERR( err ) && ok;
 }
 
-bool CompositeOFScalarAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                                  std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out,
+bool CompositeOFScalarAdd::evaluate_with_Hessian( EvalType type,
+                                                  PatchData& pd,
+                                                  double& value_out,
+                                                  std::vector< Vector3D >& grad_out,
+                                                  MsqHessian& Hessian_out,
                                                   MsqError& err )
 {
     bool ok = objFunc->evaluate_with_Hessian( type, pd, value_out, grad_out, Hessian_out, err );

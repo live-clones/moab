@@ -52,8 +52,12 @@ class WriteUtil : public WriteUtilIface
         const int num_sets           = 0 /**< number of sets in list */ );
 
     //! Gets arrays for coordinate data from the MB
-    ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const Range& entities, Tag node_id_tag,
-                               const int start_node_id, std::vector< double* >& arrays );
+    ErrorCode get_node_coords( const int num_arrays,
+                               const int num_nodes,
+                               const Range& entities,
+                               Tag node_id_tag,
+                               const int start_node_id,
+                               std::vector< double* >& arrays );
 
     /** Get an array of coordinate values for nodes
      *
@@ -73,8 +77,11 @@ class WriteUtil : public WriteUtilIface
      *\param output_array The memory in which to write the node coordinates.
      *\author Jason Kraftcheck
      */
-    ErrorCode get_node_coords( const int which_array, Range::const_iterator begin, const Range::const_iterator& end,
-                               const size_t output_size, double* const output_array );
+    ErrorCode get_node_coords( const int which_array,
+                               Range::const_iterator begin,
+                               const Range::const_iterator& end,
+                               const size_t output_size,
+                               double* const output_array );
 
     /** Get connectivity for elements
      *
@@ -89,8 +96,13 @@ class WriteUtil : public WriteUtilIface
      *\param start_element_id Starting id value for element_id_tag
      *\param add_sizes If true, writes size of connect array before connectivity in array
      */
-    ErrorCode get_element_connect( const int num_elements, const int verts_per_element, Tag node_id_tag,
-                                   const Range& entities, Tag element_id_tag, int start_element_id, int* array,
+    ErrorCode get_element_connect( const int num_elements,
+                                   const int verts_per_element,
+                                   Tag node_id_tag,
+                                   const Range& entities,
+                                   Tag element_id_tag,
+                                   int start_element_id,
+                                   int* array,
                                    bool add_sizes = false );
 
     /** Get connectivity for elements
@@ -121,9 +133,13 @@ class WriteUtil : public WriteUtilIface
      *\param add_sizes If true, writes size of connect array before connectivity in array
      *\author Jason Kraftcheck
      */
-    ErrorCode get_element_connect( Range::const_iterator begin, const Range::const_iterator& end,
-                                   const int vertices_per_elem, Tag node_id_tag, const size_t array_size,
-                                   int* const element_array, bool add_sizes = false );
+    ErrorCode get_element_connect( Range::const_iterator begin,
+                                   const Range::const_iterator& end,
+                                   const int vertices_per_elem,
+                                   Tag node_id_tag,
+                                   const size_t array_size,
+                                   int* const element_array,
+                                   bool add_sizes = false );
 
     /** Get connectivity for elements
      *
@@ -150,8 +166,10 @@ class WriteUtil : public WriteUtilIface
      *                    connectivity list.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_element_connect( Range::const_iterator begin, const Range::const_iterator& end,
-                                           const int vertices_per_elem, const size_t array_size,
+    virtual ErrorCode get_element_connect( Range::const_iterator begin,
+                                           const Range::const_iterator& end,
+                                           const int vertices_per_elem,
+                                           const size_t array_size,
                                            EntityHandle* const element_array );
 
     /** Get poly (polygon or polyhedron) connectivity size
@@ -161,7 +179,8 @@ class WriteUtil : public WriteUtilIface
      *              For the specified range of polyhedra.
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_poly_connect_size( Range::const_iterator begin, const Range::const_iterator& end,
+    virtual ErrorCode get_poly_connect_size( Range::const_iterator begin,
+                                             const Range::const_iterator& end,
                                              int& connectivity_size );
 
     /** Get poly (polygon or polyhedron) connectivity.
@@ -191,9 +210,14 @@ class WriteUtil : public WriteUtilIface
      *                          presumably want to pass to the next call.)
      *\author Jason Kraftcheck
      */
-    virtual ErrorCode get_poly_connect( Range::const_iterator& iter, const Range::const_iterator& end,
-                                        const Tag node_id_tag, size_t& handle_array_len, int* const handle_array,
-                                        size_t& index_array_len, int* const index_array, int& index_offset );
+    virtual ErrorCode get_poly_connect( Range::const_iterator& iter,
+                                        const Range::const_iterator& end,
+                                        const Tag node_id_tag,
+                                        size_t& handle_array_len,
+                                        int* const handle_array,
+                                        size_t& index_array_len,
+                                        int* const index_array,
+                                        int& index_offset );
 
     //! Get a set of nodes that represent a set of elements
     ErrorCode gather_nodes_from_elements( const Range& elements, const Tag node_bit_mark_tag, Range& nodes );
@@ -235,8 +259,10 @@ class WriteUtil : public WriteUtilIface
      *\param include_variable_length_tags If false, return only fixed-length
      *                                    tags.
      */
-    virtual ErrorCode get_tag_list( std::vector< Tag >& result_list, const Tag* user_tag_list = 0,
-                                    int user_tag_list_length = 0, bool include_variable_length_tags = true );
+    virtual ErrorCode get_tag_list( std::vector< Tag >& result_list,
+                                    const Tag* user_tag_list          = 0,
+                                    int user_tag_list_length          = 0,
+                                    bool include_variable_length_tags = true );
 
     /*\brief Get pointers to internal storage of entity data
      *
@@ -260,10 +286,12 @@ class WriteUtil : public WriteUtilIface
      *          structured mesh and therefore do not have explicit storage.
      *        MB_TYPE_OUT_OF_RANGE if called for vertices.
      */
-    virtual ErrorCode get_entity_list_pointers( Range::const_iterator query_begin, Range::const_iterator query_end,
+    virtual ErrorCode get_entity_list_pointers( Range::const_iterator query_begin,
+                                                Range::const_iterator query_end,
                                                 EntityHandle const** output_pointer_array,
-                                                EntityListType relation = CONTENTS, int* lengths = 0,
-                                                unsigned char* flags = 0 );
+                                                EntityListType relation = CONTENTS,
+                                                int* lengths            = 0,
+                                                unsigned char* flags    = 0 );
 
     /*\brief Get pointers to internal storage of entity data
      *
@@ -287,10 +315,12 @@ class WriteUtil : public WriteUtilIface
      *          structured mesh and therefore do not have explicit storage.
      *        MB_TYPE_OUT_OF_RANGE if called for vertices.
      */
-    virtual ErrorCode get_entity_list_pointers( EntityHandle const* entities, int num_entities,
+    virtual ErrorCode get_entity_list_pointers( EntityHandle const* entities,
+                                                int num_entities,
                                                 EntityHandle const** output_pointer_array,
-                                                EntityListType relation = CONTENTS, int* lengths = 0,
-                                                unsigned char* flags = 0 );
+                                                EntityListType relation = CONTENTS,
+                                                int* lengths            = 0,
+                                                unsigned char* flags    = 0 );
 };
 
 }  // namespace moab

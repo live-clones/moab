@@ -65,14 +65,21 @@ bool NumericalQM::evaluate( PatchData& pd, size_t handle, double& value, MsqErro
     return realMetric->evaluate( pd, handle, value, err );
 }
 
-bool NumericalQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+bool NumericalQM::evaluate_with_indices( PatchData& pd,
+                                         size_t handle,
+                                         double& value,
+                                         std::vector< size_t >& indices,
                                          MsqError& err )
 {
     return realMetric->evaluate_with_indices( pd, handle, value, indices, err );
 }
 
-bool NumericalQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                          std::vector< Vector3D >& gradient, MsqError& err )
+bool NumericalQM::evaluate_with_gradient( PatchData& pd,
+                                          size_t handle,
+                                          double& value,
+                                          std::vector< size_t >& indices,
+                                          std::vector< Vector3D >& gradient,
+                                          MsqError& err )
 {
     if( numericGrad )
         return realMetric->QualityMetric::evaluate_with_gradient( pd, handle, value, indices, gradient, err );
@@ -80,9 +87,13 @@ bool NumericalQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& 
         return realMetric->evaluate_with_gradient( pd, handle, value, indices, gradient, err );
 }
 
-bool NumericalQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                  std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                  std::vector< SymMatrix3D >& hess, MsqError& err )
+bool NumericalQM::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                  size_t handle,
+                                                  double& value,
+                                                  std::vector< size_t >& indices,
+                                                  std::vector< Vector3D >& gradient,
+                                                  std::vector< SymMatrix3D >& hess,
+                                                  MsqError& err )
 {
     if( numericHess )
         return realMetric->QualityMetric::evaluate_with_Hessian_diagonal( pd, handle, value, indices, gradient, hess,
@@ -91,8 +102,12 @@ bool NumericalQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, 
         return realMetric->evaluate_with_Hessian_diagonal( pd, handle, value, indices, gradient, hess, err );
 }
 
-bool NumericalQM::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                         std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+bool NumericalQM::evaluate_with_Hessian( PatchData& pd,
+                                         size_t handle,
+                                         double& value,
+                                         std::vector< size_t >& indices,
+                                         std::vector< Vector3D >& gradient,
+                                         std::vector< Matrix3D >& Hessian,
                                          MsqError& err )
 
 {

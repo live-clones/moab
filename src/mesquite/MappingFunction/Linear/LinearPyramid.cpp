@@ -68,7 +68,10 @@ static inline void set_equal_derivatives( double value, size_t* indices, MsqVect
     derivs[4][2] = 1.0;
 }
 
-static inline void set_edge_derivatives( unsigned base_corner, double value, size_t* indices, MsqVector< 3 >* derivs,
+static inline void set_edge_derivatives( unsigned base_corner,
+                                         double value,
+                                         size_t* indices,
+                                         MsqVector< 3 >* derivs,
                                          size_t& num_vtx )
 {
     const int direction = base_corner % 2;
@@ -107,7 +110,10 @@ static inline void set_edge_derivatives( unsigned base_corner, double value, siz
     derivs[4][2] = 1.0;
 }
 
-static inline void set_corner_derivatives( unsigned corner, double value, size_t* indices, MsqVector< 3 >* derivs,
+static inline void set_corner_derivatives( unsigned corner,
+                                           double value,
+                                           size_t* indices,
+                                           MsqVector< 3 >* derivs,
                                            size_t& num_vtx )
 {
     const unsigned adj_in_xi  = ( 5 - corner ) % 4;
@@ -225,8 +231,12 @@ static void coefficients_at_mid_elem( double* coeff_out, size_t* indices_out, si
     indices_out[4] = 4;
 }
 
-void LinearPyramid::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                                  size_t& num_coeff, MsqError& err ) const
+void LinearPyramid::coefficients( Sample loc,
+                                  NodeSet nodeset,
+                                  double* coeff_out,
+                                  size_t* indices_out,
+                                  size_t& num_coeff,
+                                  MsqError& err ) const
 {
     if( nodeset.have_any_mid_node() )
     {
@@ -253,8 +263,12 @@ void LinearPyramid::coefficients( Sample loc, NodeSet nodeset, double* coeff_out
     }
 }
 
-void LinearPyramid::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                 MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
+void LinearPyramid::derivatives( Sample loc,
+                                 NodeSet nodeset,
+                                 size_t* vertex_indices_out,
+                                 MsqVector< 3 >* d_coeff_d_xi_out,
+                                 size_t& num_vtx,
+                                 MsqError& err ) const
 {
     if( nodeset.have_any_mid_node() )
     {
@@ -265,7 +279,10 @@ void LinearPyramid::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_ind
     switch( loc.dimension )
     {
         case 0:
-            if( loc.number == 4 ) { set_equal_derivatives( 0.0, vertex_indices_out, d_coeff_d_xi_out, num_vtx ); }
+            if( loc.number == 4 )
+            {
+                set_equal_derivatives( 0.0, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
+            }
             else
             {
                 set_corner_derivatives( loc.number, 1.0, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
@@ -282,7 +299,10 @@ void LinearPyramid::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_ind
             }
             break;
         case 2:
-            if( loc.number == 4 ) { set_equal_derivatives( 0.5, vertex_indices_out, d_coeff_d_xi_out, num_vtx ); }
+            if( loc.number == 4 )
+            {
+                set_equal_derivatives( 0.5, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
+            }
             else
             {
                 set_edge_derivatives( loc.number, 0.25, vertex_indices_out, d_coeff_d_xi_out, num_vtx );

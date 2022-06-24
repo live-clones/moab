@@ -270,7 +270,10 @@ namespace MeshWriter
      * Read a set of input files to determine the bounding box
      * of the combined data.
      */
-    static void find_gnuplot_agregate_range( int count, const char* basename, Vector3D& min, Vector3D& max,
+    static void find_gnuplot_agregate_range( int count,
+                                             const char* basename,
+                                             Vector3D& min,
+                                             Vector3D& max,
                                              MsqError& err )
     {
         // read all input files to determine extents
@@ -538,7 +541,7 @@ namespace MeshWriter
         // Choose an "up" direction
 
         Axis max = X;
-        for( Axis i = Y; i <= Z; i = ( Axis )( i + 1 ) )
+        for( Axis i = Y; i <= Z; i = (Axis)( i + 1 ) )
             if( fabs( n[i] ) > fabs( n[max] ) ) max = i;
 
         Axis up;
@@ -630,7 +633,10 @@ namespace MeshWriter
         vertMax  = (int)( ( flip ? -h_min : h_max ) * myScale ) + vertOffset;
     }
 
-    Transform2D::Transform2D( const Vector3D* verts, size_t num_vert, Projection& projection, unsigned width,
+    Transform2D::Transform2D( const Vector3D* verts,
+                              size_t num_vert,
+                              Projection& projection,
+                              unsigned width,
                               unsigned height )
         : myProj( projection ), vertSign( 1 )
     {
@@ -748,7 +754,10 @@ namespace MeshWriter
             s << "newpath" << endl;
             s << s_w << ' ' << s_h << " moveto" << endl;
 
-            if( !iter.mid() ) { s << e_w << ' ' << e_h << " lineto" << endl; }
+            if( !iter.mid() )
+            {
+                s << e_w << ' ' << e_h << " lineto" << endl;
+            }
             else
             {
                 write_eps_quadratic_edge( s, transf, iter.start(), *iter.mid(), iter.end() );
@@ -811,8 +820,14 @@ namespace MeshWriter
         return result;
     }
 
-    void write_eps_triangle( Mesh* mesh, Mesh::ElementHandle elem, const char* filename, bool draw_iso_lines,
-                             bool draw_nodes, MsqError& err, int width, int height )
+    void write_eps_triangle( Mesh* mesh,
+                             Mesh::ElementHandle elem,
+                             const char* filename,
+                             bool draw_iso_lines,
+                             bool draw_nodes,
+                             MsqError& err,
+                             int width,
+                             int height )
     {
         // Get triangle vertices
         MsqVertex coords[6];
@@ -844,8 +859,15 @@ namespace MeshWriter
         write_eps_triangle( coords2, verts.size(), filename, draw_iso_lines, draw_nodes, err, fixed, width, height );
     }
 
-    void write_eps_triangle( const Vector3D* coords, size_t num_vtx, const char* filename, bool draw_iso_lines,
-                             bool draw_nodes, MsqError& err, const std::vector< bool >& fixed, int width, int height )
+    void write_eps_triangle( const Vector3D* coords,
+                             size_t num_vtx,
+                             const char* filename,
+                             bool draw_iso_lines,
+                             bool draw_nodes,
+                             MsqError& err,
+                             const std::vector< bool >& fixed,
+                             int width,
+                             int height )
     {
         const int PT_RAD        = 3;           // radius of circles for drawing nodes, in points
         const int PAD           = PT_RAD + 2;  // margin in points

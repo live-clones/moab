@@ -111,7 +111,8 @@ ErrorCode SpatialLocator::initialize_intermediate_partition( ParallelComm* pc )
 
 // this function sets up the TupleList TLreg_o containing the registration messages
 // and sends it
-ErrorCode SpatialLocator::register_src_with_intermediate_procs( ParallelComm* pc, double abs_iter_tol,
+ErrorCode SpatialLocator::register_src_with_intermediate_procs( ParallelComm* pc,
+                                                                double abs_iter_tol,
                                                                 TupleList& TLreg_o )
 {
     int corner_ijk[6];
@@ -163,8 +164,11 @@ ErrorCode SpatialLocator::register_src_with_intermediate_procs( ParallelComm* pc
     return MB_SUCCESS;
 }
 
-ErrorCode SpatialLocator::par_locate_points( ParallelComm* /*pc*/, Range& /*vertices*/, const double /*rel_iter_tol*/,
-                                             const double /*abs_iter_tol*/, const double /*inside_tol*/ )
+ErrorCode SpatialLocator::par_locate_points( ParallelComm* /*pc*/,
+                                             Range& /*vertices*/,
+                                             const double /*rel_iter_tol*/,
+                                             const double /*abs_iter_tol*/,
+                                             const double /*inside_tol*/ )
 {
     return MB_UNSUPPORTED_OPERATION;
 }
@@ -174,8 +178,11 @@ bool is_neg( int i )
     return ( i == -1 );
 }
 
-ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos, int num_points,
-                                             const double rel_iter_tol, const double abs_iter_tol,
+ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc,
+                                             const double* pos,
+                                             int num_points,
+                                             const double rel_iter_tol,
+                                             const double abs_iter_tol,
                                              const double inside_tol )
 {
     ErrorCode rval;
@@ -346,7 +353,9 @@ ErrorCode SpatialLocator::par_locate_points( ParallelComm* pc, const double* pos
 
 #endif
 
-ErrorCode SpatialLocator::locate_points( Range& verts, const double rel_iter_tol, const double abs_iter_tol,
+ErrorCode SpatialLocator::locate_points( Range& verts,
+                                         const double rel_iter_tol,
+                                         const double abs_iter_tol,
                                          const double inside_tol )
 {
     bool i_initialized = false;
@@ -370,8 +379,11 @@ ErrorCode SpatialLocator::locate_points( Range& verts, const double rel_iter_tol
     return MB_SUCCESS;
 }
 
-ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, const double rel_iter_tol,
-                                         const double abs_iter_tol, const double inside_tol )
+ErrorCode SpatialLocator::locate_points( const double* pos,
+                                         int num_points,
+                                         const double rel_iter_tol,
+                                         const double abs_iter_tol,
+                                         const double inside_tol )
 {
     bool i_initialized = false;
     if( !timerInitialized )
@@ -397,8 +409,13 @@ ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, cons
     return MB_SUCCESS;
 }
 
-ErrorCode SpatialLocator::locate_points( Range& verts, EntityHandle* ents, double* params, int* is_inside,
-                                         const double rel_iter_tol, const double abs_iter_tol, const double inside_tol )
+ErrorCode SpatialLocator::locate_points( Range& verts,
+                                         EntityHandle* ents,
+                                         double* params,
+                                         int* is_inside,
+                                         const double rel_iter_tol,
+                                         const double abs_iter_tol,
+                                         const double inside_tol )
 {
     bool i_initialized = false;
     if( !timerInitialized )
@@ -420,8 +437,13 @@ ErrorCode SpatialLocator::locate_points( Range& verts, EntityHandle* ents, doubl
     return rval;
 }
 
-ErrorCode SpatialLocator::locate_points( const double* pos, int num_points, EntityHandle* ents, double* params,
-                                         int* is_inside, const double /* rel_iter_tol */, const double abs_iter_tol,
+ErrorCode SpatialLocator::locate_points( const double* pos,
+                                         int num_points,
+                                         EntityHandle* ents,
+                                         double* params,
+                                         int* is_inside,
+                                         const double /* rel_iter_tol */,
+                                         const double abs_iter_tol,
                                          const double inside_tol )
 {
     bool i_initialized = false;
@@ -483,7 +505,9 @@ int SpatialLocator::local_num_located()
         if( nl )
         {
             int idx = nl - locTable.vul_rd;
-            if( idx ) {}
+            if( idx )
+            {
+            }
         }
     }
     return num_located;

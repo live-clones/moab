@@ -224,8 +224,10 @@ ExoIIElementType ExoIIUtil::static_element_name_to_type( const char* name )
     return EXOII_MAX_ELEM_TYPE;
 }
 
-ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const EntityHandle entity,
-                                                     const Tag mid_nodes_tag, const Tag geom_dimension_tag,
+ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl,
+                                                     const EntityHandle entity,
+                                                     const Tag mid_nodes_tag,
+                                                     const Tag geom_dimension_tag,
                                                      const EntityType indiv_entity_type )
 {
     // branch based on what kind of entity we're looking at
@@ -295,7 +297,8 @@ ExoIIElementType ExoIIUtil::static_get_element_type( Interface* mdbImpl, const E
     // return EXOII_MAX_ELEM_TYPE;
 }
 
-ExoIIElementType ExoIIUtil::get_element_type_from_num_verts( const int num_verts, const EntityType entity_type,
+ExoIIElementType ExoIIUtil::get_element_type_from_num_verts( const int num_verts,
+                                                             const EntityType entity_type,
                                                              const int dimension )
 {
     if( MBPOLYGON == entity_type && 2 == dimension ) return EXOII_POLYGON;

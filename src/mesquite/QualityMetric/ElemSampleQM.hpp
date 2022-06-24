@@ -65,8 +65,10 @@ class ElemSampleQM : public QualityMetric
      * returns sample points for all elements in a PatchData, this
      * method returns only the subset corresponding to a single element.
      */
-    MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd, size_t elem_index,
-                                                          std::vector< size_t >& handles, MsqError& err ) = 0;
+    MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd,
+                                                          size_t elem_index,
+                                                          std::vector< size_t >& handles,
+                                                          MsqError& err ) = 0;
 
     /** Misc constants used in defining how element index, side dimension,
      *  and side number are packed into a single handle describing a logical
@@ -79,8 +81,7 @@ class ElemSampleQM : public QualityMetric
            /** the maximum number of elements in a PatchData without overflowing handle space */
            MAX_ELEM_PER_PATCH = ( (size_t)1 ) << ELEM_INDEX_BITS,
            /** Mask to remove sample bits from handle */
-           ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1
-    };
+           ELEM_SAMPLE_MASK = MAX_ELEM_PER_PATCH - 1 };
 #else /* MS Visual C compiler broken for 64-bit enums */
     static const size_t ELEM_INDEX_BITS    = sizeof( size_t ) * 8 - Sample::NUMBER_PACKED_BITS;
     static const size_t MAX_ELEM_PER_PATCH = ( (size_t)1 ) << ELEM_INDEX_BITS;

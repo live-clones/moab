@@ -49,7 +49,10 @@ int TriLagrangeShape::num_nodes() const
 
 NodeSet TriLagrangeShape::sample_points( NodeSet ns ) const
 {
-    if( ns.have_any_mid_node() ) { ns.set_all_corner_nodes( TRIANGLE ); }
+    if( ns.have_any_mid_node() )
+    {
+        ns.set_all_corner_nodes( TRIANGLE );
+    }
     else
     {
         ns.clear();
@@ -58,8 +61,12 @@ NodeSet TriLagrangeShape::sample_points( NodeSet ns ) const
     return ns;
 }
 
-void TriLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                                     size_t& num_coeff, MsqError& err ) const
+void TriLagrangeShape::coefficients( Sample loc,
+                                     NodeSet nodeset,
+                                     double* coeff_out,
+                                     size_t* indices_out,
+                                     size_t& num_coeff,
+                                     MsqError& err ) const
 {
     if( nodeset.have_any_mid_face_node() )
     {
@@ -136,7 +143,10 @@ static inline void get_linear_derivatives( size_t* vertices, MsqVector< 2 >* der
     derivs[2][1] = 1.0;
 }
 
-static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
+static void derivatives_at_corner( unsigned corner,
+                                   NodeSet nodeset,
+                                   size_t* vertices,
+                                   MsqVector< 2 >* derivs,
                                    size_t& num_vtx )
 {
     num_vtx = 3;
@@ -215,7 +225,10 @@ static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* ver
 static const double edr[3][3] = { { 0.0, -2.0, 2.0 }, { 0.0, 2.0, 2.0 }, { 0.0, -2.0, -2.0 } };
 static const double eds[3][3] = { { -2.0, -2.0, 0.0 }, { 2.0, 2.0, 0.0 }, { 2.0, -2.0, 0.0 } };
 
-static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* vertices, MsqVector< 2 >* derivs,
+static void derivatives_at_mid_edge( unsigned edge,
+                                     NodeSet nodeset,
+                                     size_t* vertices,
+                                     MsqVector< 2 >* derivs,
                                      size_t& num_vtx )
 {
     // The mid-edge behavior is rather strange.
@@ -294,8 +307,12 @@ static void derivatives_at_mid_elem( NodeSet nodeset, size_t* vertices, MsqVecto
     }
 }
 
-void TriLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                    MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
+void TriLagrangeShape::derivatives( Sample loc,
+                                    NodeSet nodeset,
+                                    size_t* vertex_indices_out,
+                                    MsqVector< 2 >* d_coeff_d_xi_out,
+                                    size_t& num_vtx,
+                                    MsqError& err ) const
 {
     if( !nodeset.have_any_mid_node() )
     {

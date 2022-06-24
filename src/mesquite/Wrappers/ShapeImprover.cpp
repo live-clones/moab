@@ -81,8 +81,11 @@ void ShapeImprover::set_parallel_iterations( int count )
     parallelIterations = count;
 }
 
-void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                                 QualityAssessor* qa, MsqError& err )
+void ShapeImprover::run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                                 ParallelMesh* pmesh,
+                                 Settings* settings,
+                                 QualityAssessor* qa,
+                                 MsqError& err )
 {
     // Quality Metrics
     IdealShapeTarget target;

@@ -108,15 +108,19 @@ ErrorCode ReadABAQUS::check_file_stats()
 
 */
 
-ErrorCode ReadABAQUS::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                       const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadABAQUS::read_tag_values( const char* /* file_name */,
+                                       const char* /* tag_name */,
+                                       const FileOptions& /* opts */,
+                                       std::vector< int >& /* tag_values_out */,
                                        const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandle* file_set_ptr,
-                                 const FileOptions& /*opts*/, const ReaderIface::SubsetList* subset_list,
+ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name,
+                                 const EntityHandle* file_set_ptr,
+                                 const FileOptions& /*opts*/,
+                                 const ReaderIface::SubsetList* subset_list,
                                  const Tag* /*file_id_tag*/ )
 {
     ErrorCode status;
@@ -169,7 +173,10 @@ ErrorCode ReadABAQUS::load_file( const char* abaqus_file_name, const EntityHandl
             case abq_comment_line:
                 break;
             case abq_data_line:
-                if( !in_unsupported ) { MB_SET_ERR( MB_FAILURE, "Expected Keyword" ); }
+                if( !in_unsupported )
+                {
+                    MB_SET_ERR( MB_FAILURE, "Expected Keyword" );
+                }
                 break;
             default:
                 MB_SET_ERR( MB_FAILURE, "Invalid/unrecognized line" );
@@ -634,7 +641,10 @@ ErrorCode ReadABAQUS::read_part( EntityHandle file_set )
                 next_line_type = get_next_line_type();
                 break;
             case abq_data_line:
-                if( !in_unsupported ) { MB_SET_ERR( MB_FAILURE, "Data lines not allowed in PART keyword" ); }
+                if( !in_unsupported )
+                {
+                    MB_SET_ERR( MB_FAILURE, "Data lines not allowed in PART keyword" );
+                }
                 next_line_type = get_next_line_type();
                 break;
             case abq_blank_line:
@@ -1315,7 +1325,10 @@ ErrorCode ReadABAQUS::read_node_list( EntityHandle parent_set, EntityHandle asse
         if( abq_data_line == next_line_type )
         {
             tokenize( readline, tokens, ", \n" );
-            if( tokens.size() < 4 ) { MB_SET_ERR( MB_FAILURE, "Not enough data on node data line" ); }
+            if( tokens.size() < 4 )
+            {
+                MB_SET_ERR( MB_FAILURE, "Not enough data on node data line" );
+            }
             node_ids.push_back( atoi( tokens[0].c_str() ) );
             for( unsigned int i = 1; i < 4; i++ )
                 coord_list.push_back( atof( tokens[i].c_str() ) );
@@ -1407,7 +1420,8 @@ ErrorCode ReadABAQUS::read_node_list( EntityHandle parent_set, EntityHandle asse
 
 // SET CREATION & ACCESS UTILITIES
 
-ErrorCode ReadABAQUS::get_elements_by_id( EntityHandle parent_set, std::vector< int > element_ids_subset,
+ErrorCode ReadABAQUS::get_elements_by_id( EntityHandle parent_set,
+                                          std::vector< int > element_ids_subset,
                                           Range& element_range )
 {
     ErrorCode status;
@@ -1453,7 +1467,9 @@ ErrorCode ReadABAQUS::get_nodes_by_id( EntityHandle parent_set, std::vector< int
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_set_by_name( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+ErrorCode ReadABAQUS::get_set_by_name( EntityHandle parent_set,
+                                       int ABQ_set_type,
+                                       const std::string& set_name,
                                        EntityHandle& set_handle )
 {
     ErrorCode status;
@@ -1475,7 +1491,10 @@ ErrorCode ReadABAQUS::get_set_by_name( EntityHandle parent_set, int ABQ_set_type
         if( set_name == std::string( this_set_name ) ) set_handle = *this_set;
     }
 
-    if( 0 == set_handle ) { MB_SET_ERR( MB_FAILURE, "Did not find requested set" ); }
+    if( 0 == set_handle )
+    {
+        MB_SET_ERR( MB_FAILURE, "Did not find requested set" );
+    }
 
     return MB_SUCCESS;
 }
@@ -1499,7 +1518,9 @@ ErrorCode ReadABAQUS::get_set_elements( EntityHandle set_handle, Range& element_
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_set_elements_by_name( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+ErrorCode ReadABAQUS::get_set_elements_by_name( EntityHandle parent_set,
+                                                int ABQ_set_type,
+                                                const std::string& set_name,
                                                 Range& element_range )
 {
     ErrorCode status;
@@ -1519,7 +1540,9 @@ ErrorCode ReadABAQUS::get_set_elements_by_name( EntityHandle parent_set, int ABQ
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::get_set_nodes( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+ErrorCode ReadABAQUS::get_set_nodes( EntityHandle parent_set,
+                                     int ABQ_set_type,
+                                     const std::string& set_name,
                                      Range& node_range )
 {
     ErrorCode status;
@@ -1543,12 +1566,18 @@ ErrorCode ReadABAQUS::get_set_nodes( EntityHandle parent_set, int ABQ_set_type, 
     status = mdbImpl->get_adjacencies( ent_list, 0, false, node_range );
     MB_RETURN_IF_FAIL;
 
-    if( node_range.size() == 0 ) { std::cout << "No nodes were found in set " << set_name << std::endl; }
+    if( node_range.size() == 0 )
+    {
+        std::cout << "No nodes were found in set " << set_name << std::endl;
+    }
 
     return MB_SUCCESS;
 }
 
-Tag ReadABAQUS::get_tag( const char* tag_name, int tag_size, TagType tag_type, DataType tag_data_type,
+Tag ReadABAQUS::get_tag( const char* tag_name,
+                         int tag_size,
+                         TagType tag_type,
+                         DataType tag_data_type,
                          const void* def_val )
 {
     Tag retval;
@@ -1559,9 +1588,12 @@ Tag ReadABAQUS::get_tag( const char* tag_name, int tag_size, TagType tag_type, D
     return MB_SUCCESS == rval ? retval : 0;
 }
 
-ErrorCode ReadABAQUS::create_instance_of_part( const EntityHandle file_set, const EntityHandle assembly_set,
-                                               const std::string& part_name, const std::string& /*instance_name*/,
-                                               EntityHandle& instance_set, const std::vector< double >& translation,
+ErrorCode ReadABAQUS::create_instance_of_part( const EntityHandle file_set,
+                                               const EntityHandle assembly_set,
+                                               const std::string& part_name,
+                                               const std::string& /*instance_name*/,
+                                               EntityHandle& instance_set,
+                                               const std::vector< double >& translation,
                                                const std::vector< double >& rotation )
 {
     ErrorCode status;
@@ -1867,7 +1899,7 @@ ErrorCode ReadABAQUS::create_instance_of_part( const EntityHandle file_set, cons
     tag_val     = ABQ_NODE_SET;
     tag_data[0] = &tag_val;
     status      = mdbImpl->get_entities_by_type_and_tag( instance_set, MBENTITYSET, &mSetTypeTag, tag_data, 1,
-                                                    instance_entity_list );
+                                                         instance_entity_list );
     MB_RETURN_IF_FAIL;
 
     tmp_instance_handles.clear();
@@ -1880,7 +1912,7 @@ ErrorCode ReadABAQUS::create_instance_of_part( const EntityHandle file_set, cons
     tag_val     = ABQ_ELEMENT_SET;
     tag_data[0] = &tag_val;
     status      = mdbImpl->get_entities_by_type_and_tag( instance_set, MBENTITYSET, &mSetTypeTag, tag_data, 1,
-                                                    instance_entity_list );
+                                                         instance_entity_list );
     MB_RETURN_IF_FAIL;
 
     tmp_instance_handles.clear();
@@ -1891,7 +1923,9 @@ ErrorCode ReadABAQUS::create_instance_of_part( const EntityHandle file_set, cons
     return MB_SUCCESS;
 }
 
-ErrorCode ReadABAQUS::add_entity_set( EntityHandle parent_set, int ABQ_Set_Type, const std::string& set_name,
+ErrorCode ReadABAQUS::add_entity_set( EntityHandle parent_set,
+                                      int ABQ_Set_Type,
+                                      const std::string& set_name,
                                       EntityHandle& entity_set )
 {
     ErrorCode status;

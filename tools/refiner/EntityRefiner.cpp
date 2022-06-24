@@ -34,7 +34,10 @@ EntityRefiner::~EntityRefiner()
 bool EntityRefiner::prepare( RefinerTagManager* tmgr, EntityRefinerOutputFunctor* ofunc )
 {
     bool rval = true;
-    if( this->edge_size_evaluator ) { this->edge_size_evaluator->set_tag_manager( tmgr ); }
+    if( this->edge_size_evaluator )
+    {
+        this->edge_size_evaluator->set_tag_manager( tmgr );
+    }
     else
     {
         rval = false;
@@ -70,7 +73,10 @@ bool EntityRefiner::set_edge_size_evaluator( EdgeSizeEvaluator* ese )
 {
     if( !ese || ese == this->edge_size_evaluator ) return false;
 
-    if( this->edge_size_evaluator ) { delete this->edge_size_evaluator; }
+    if( this->edge_size_evaluator )
+    {
+        delete this->edge_size_evaluator;
+    }
     this->edge_size_evaluator = ese;
 
     return true;
@@ -95,7 +101,10 @@ bool EntityRefiner::set_output_functor( EntityRefinerOutputFunctor* func_obj )
 {
     if( !func_obj || func_obj == this->output_functor ) return false;
 
-    if( this->output_functor ) { delete this->output_functor; }
+    if( this->output_functor )
+    {
+        delete this->output_functor;
+    }
     this->output_functor = func_obj;
     return true;
 }
@@ -115,7 +124,10 @@ bool EntityRefiner::set_output_functor( EntityRefinerOutputFunctor* func_obj )
  */
 bool EntityRefiner::set_minimum_number_of_subdivisions( int mn )
 {
-    if( mn < 0 || mn == this->minimum_number_of_subdivisions ) { return false; }
+    if( mn < 0 || mn == this->minimum_number_of_subdivisions )
+    {
+        return false;
+    }
 
     this->minimum_number_of_subdivisions = mn;
     return true;
@@ -141,7 +153,10 @@ bool EntityRefiner::set_minimum_number_of_subdivisions( int mn )
  */
 bool EntityRefiner::set_maximum_number_of_subdivisions( int mx )
 {
-    if( mx < 0 || mx == this->maximum_number_of_subdivisions ) { return false; }
+    if( mx < 0 || mx == this->maximum_number_of_subdivisions )
+    {
+        return false;
+    }
 
     this->maximum_number_of_subdivisions = mx;
     this->update_heap_size();

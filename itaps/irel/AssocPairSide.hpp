@@ -14,15 +14,23 @@ class AssocPairSide
     virtual int create_relation_side()  = 0;
     virtual int destroy_relation_side() = 0;
 
-    virtual int get_all_entities( int dimension, iBase_EntityHandle** entities, int* entities_alloc,
+    virtual int get_all_entities( int dimension,
+                                  iBase_EntityHandle** entities,
+                                  int* entities_alloc,
                                   int* entities_size ) = 0;
 
     virtual int get_all_sets( iBase_EntitySetHandle** sets, int* sets_alloc, int* sets_size ) = 0;
 
-    virtual int get_entities( int dimension, iBase_EntitySetHandle set_handle, iBase_EntityHandle** entities,
-                              int* entities_allocated, int* entities_size ) = 0;
+    virtual int get_entities( int dimension,
+                              iBase_EntitySetHandle set_handle,
+                              iBase_EntityHandle** entities,
+                              int* entities_allocated,
+                              int* entities_size ) = 0;
 
-    virtual int get_ents_dims( iBase_EntityHandle* entities, int entities_size, int** ent_types, int* ent_types_alloc,
+    virtual int get_ents_dims( iBase_EntityHandle* entities,
+                               int entities_size,
+                               int** ent_types,
+                               int* ent_types_alloc,
                                int* ent_types_size ) = 0;
 
     virtual int get_related_ents( iBase_EntityHandle** entities, int* entities_alloc, int* entities_size ) = 0;

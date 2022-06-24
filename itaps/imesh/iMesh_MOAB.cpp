@@ -227,7 +227,10 @@ void iMesh_getErrorType( iMesh_Instance instance, int* error_type )
 
 void iMesh_getDescription( iMesh_Instance instance, char* descr, int descr_len )
 {
-    if( instance == NULL ) { strcpy( descr, "iMesh_getDescription: Invalid instance" ); }
+    if( instance == NULL )
+    {
+        strcpy( descr, "iMesh_getDescription: Invalid instance" );
+    }
     else
     {
         unsigned int len = MIN( strlen( MBIMESHI->lastErrorDescription ), static_cast< unsigned int >( descr_len ) );
@@ -287,8 +290,13 @@ void iMesh_dtor( iMesh_Instance instance, int* err )
     *err = iBase_SUCCESS;
 }
 
-void iMesh_load( iMesh_Instance instance, const iBase_EntitySetHandle handle, const char* name, const char* options,
-                 int* err, int name_len, int options_len )
+void iMesh_load( iMesh_Instance instance,
+                 const iBase_EntitySetHandle handle,
+                 const char* name,
+                 const char* options,
+                 int* err,
+                 int name_len,
+                 int options_len )
 {
     // get filename, option & null-terminate
     std::string filename( name, name_len );
@@ -324,8 +332,13 @@ void iMesh_load( iMesh_Instance instance, const iBase_EntitySetHandle handle, co
     RETURN( iBase_SUCCESS );
 }
 
-void iMesh_save( iMesh_Instance instance, const iBase_EntitySetHandle handle, const char* name, const char* options,
-                 int* err, const int name_len, int options_len )
+void iMesh_save( iMesh_Instance instance,
+                 const iBase_EntitySetHandle handle,
+                 const char* name,
+                 const char* options,
+                 int* err,
+                 const int name_len,
+                 int options_len )
 {
     // get filename & attempt to NULL-terminate
     std::string filename( name, name_len );
@@ -365,9 +378,11 @@ void iMesh_getDfltStorage( iMesh_Instance instance, int* order, int* err )
     RETURN( iBase_SUCCESS );
 }
 
-void iMesh_getAdjTable( iMesh_Instance instance, int** adjacency_table,
+void iMesh_getAdjTable( iMesh_Instance instance,
+                        int** adjacency_table,
                         /*inout*/ int* adjacency_table_allocated,
-                        /*out*/ int* adjacency_table_size, int* err )
+                        /*out*/ int* adjacency_table_size,
+                        int* err )
 {
     int geom_dim;
     iMesh_getGeometricDimension( instance, &geom_dim, err );
@@ -378,10 +393,15 @@ void iMesh_getAdjTable( iMesh_Instance instance, int** adjacency_table,
     RETURN( iBase_SUCCESS );
 }
 
-void iMesh_setAdjTable( iMesh_Instance instance, int* adj_table,
-                        /*inout*/ int adj_table_size, int* err )
+void iMesh_setAdjTable( iMesh_Instance instance,
+                        int* adj_table,
+                        /*inout*/ int adj_table_size,
+                        int* err )
 {
-    if( 16 != adj_table_size ) { RETURN( iBase_INVALID_ARGUMENT ); }
+    if( 16 != adj_table_size )
+    {
+        RETURN( iBase_INVALID_ARGUMENT );
+    }
 
     int geom_dim;
     iMesh_getGeometricDimension( instance, &geom_dim, err );
@@ -393,14 +413,18 @@ void iMesh_setAdjTable( iMesh_Instance instance, int* adj_table,
 
 void iMesh_getNumOfType( iMesh_Instance instance,
                          /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                         /*in*/ const int entity_type, int* num_type, int* err )
+                         /*in*/ const int entity_type,
+                         int* num_type,
+                         int* err )
 {
     iMesh_getNumOfTypeRec( instance, entity_set_handle, entity_type, false, num_type, err );
 }
 
 void iMesh_getNumOfTopo( iMesh_Instance instance,
                          /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                         /*in*/ const int entity_topology, int* num_topo, int* err )
+                         /*in*/ const int entity_topology,
+                         int* num_topo,
+                         int* err )
 {
     iMesh_getNumOfTopoRec( instance, entity_set_handle, entity_topology, false, num_topo, err );
 }
@@ -418,7 +442,8 @@ void iMesh_getEntities( iMesh_Instance instance,
                         /*in*/ const int entity_topology,
                         /*inout*/ iBase_EntityHandle** entity_handles,
                         /*inout*/ int* entity_handles_allocated,
-                        /*out*/ int* entity_handles_size, int* err )
+                        /*out*/ int* entity_handles_size,
+                        int* err )
 {
     iMesh_getEntitiesRec( instance, entity_set_handle, entity_type, entity_topology, false, entity_handles,
                           entity_handles_allocated, entity_handles_size, err );
@@ -430,7 +455,8 @@ void iMesh_getVtxArrCoords( iMesh_Instance instance,
                             /*inout*/ int storage_order,
                             /*inout*/ double** coords,
                             /*inout*/ int* coords_allocated,
-                            /*out*/ int* coords_size, int* err )
+                            /*out*/ int* coords_size,
+                            int* err )
 {
     int geom_dim;
     MOABI->get_dimension( geom_dim );
@@ -484,7 +510,8 @@ void iMesh_initEntArrIter( iMesh_Instance instance,
                            /*in*/ const int requested_entity_topology,
                            /*in*/ const int requested_array_size,
                            /*in*/ const int resilient,
-                           /*out*/ iBase_EntityArrIterator* entArr_iterator, int* err )
+                           /*out*/ iBase_EntityArrIterator* entArr_iterator,
+                           int* err )
 {
     iMesh_initEntArrIterRec( instance, entity_set_handle, requested_entity_type, requested_entity_topology,
                              requested_array_size, resilient, false, entArr_iterator, err );
@@ -497,7 +524,9 @@ void iMesh_getNextEntArrIter( iMesh_Instance instance,
                               /*in*/ iBase_EntityArrIterator entArr_iterator,
                               /*inout*/ iBase_EntityHandle** entity_handles,
                               /*inout*/ int* entity_handles_allocated,
-                              /*out*/ int* entity_handles_size, int* has_data, int* err )
+                              /*out*/ int* entity_handles_size,
+                              int* has_data,
+                              int* err )
 {
     // check the size of the destination array
     ALLOC_CHECK_ARRAY_NOFAIL( entity_handles, entArr_iterator->array_size() );
@@ -511,14 +540,16 @@ void iMesh_getNextEntArrIter( iMesh_Instance instance,
  * Method:  resetEntArrIter[]
  */
 void iMesh_resetEntArrIter( iMesh_Instance instance,
-                            /*in*/ iBase_EntityArrIterator entArr_iterator, int* err )
+                            /*in*/ iBase_EntityArrIterator entArr_iterator,
+                            int* err )
 {
     ErrorCode result = entArr_iterator->reset( MOABI );CHKERR( result, "Re-query of iterator data for iMesh_resetEntArrIter failed" );
     RETURN( iBase_SUCCESS );
 }
 
 void iMesh_endEntArrIter( iMesh_Instance instance,
-                          /*in*/ iBase_EntityArrIterator entArr_iterator, int* err )
+                          /*in*/ iBase_EntityArrIterator entArr_iterator,
+                          int* err )
 {
     delete entArr_iterator;
     RETURN( iBase_SUCCESS );
@@ -529,7 +560,8 @@ void iMesh_getEntArrTopo( iMesh_Instance instance,
                           /*in*/ const int entity_handles_size,
                           /*inout*/ int** topology,
                           /*inout*/ int* topology_allocated,
-                          /*out*/ int* topology_size, int* err )
+                          /*out*/ int* topology_size,
+                          int* err )
 {
     // go through each entity and look up its type
     ALLOC_CHECK_ARRAY_NOFAIL( topology, entity_handles_size );
@@ -547,7 +579,8 @@ void iMesh_getEntArrType( iMesh_Instance instance,
                           /*in*/ const int entity_handles_size,
                           /*inout*/ int** etype,
                           /*inout*/ int* etype_allocated,
-                          /*out*/ int* etype_size, int* err )
+                          /*out*/ int* etype_size,
+                          int* err )
 {
     // go through each entity and look up its type
     ALLOC_CHECK_ARRAY_NOFAIL( etype, entity_handles_size );
@@ -569,7 +602,8 @@ void iMesh_getEntArrAdj( iMesh_Instance instance,
                          /*out*/ int* adjacentEntityHandles_size,
                          /*inout*/ int** offset,
                          /*inout*/ int* offset_allocated,
-                         /*out*/ int* offset_size, int* err )
+                         /*out*/ int* offset_size,
+                         int* err )
 {
     ErrorCode result = MB_SUCCESS;
 
@@ -644,7 +678,10 @@ void iMesh_getEntArrAdj( iMesh_Instance instance,
             num_connect = adj_ents.size();
         }
 
-        if( prev_off + num_connect <= array_alloc ) { std::copy( connect, connect + num_connect, array + prev_off ); }
+        if( prev_off + num_connect <= array_alloc )
+        {
+            std::copy( connect, connect + num_connect, array + prev_off );
+        }
         else if( allocated_array )
         {
             // if array is not allocated yet, guess at initial size
@@ -691,10 +728,18 @@ void iMesh_getEntArrAdj( iMesh_Instance instance,
     RETURN( iBase_SUCCESS );
 }
 
-void iMesh_getEntArr2ndAdj( iMesh_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
-                            int bridge_entity_type, int requested_entity_type, iBase_EntityHandle** adj_entity_handles,
-                            int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** offset,
-                            int* offset_allocated, int* offset_size, int* err )
+void iMesh_getEntArr2ndAdj( iMesh_Instance instance,
+                            iBase_EntityHandle const* entity_handles,
+                            int entity_handles_size,
+                            int bridge_entity_type,
+                            int requested_entity_type,
+                            iBase_EntityHandle** adj_entity_handles,
+                            int* adj_entity_handles_allocated,
+                            int* adj_entity_handles_size,
+                            int** offset,
+                            int* offset_allocated,
+                            int* offset_size,
+                            int* err )
 {
     CHKENUM( bridge_entity_type, iBase_EntityType, iBase_INVALID_ENTITY_TYPE );
     CHKENUM( requested_entity_type, iBase_EntityType, iBase_INVALID_ENTITY_TYPE );
@@ -833,7 +878,10 @@ void iMesh_getAdjEntIndices( iMesh_Instance instance,
     // adj_entity_handles, so if adj_entity_handles is already allocated and
     // of sufficient size, use it rather than allocating another temporary.
     iBase_EntityHandle* unique_adj = 0;
-    if( *adj_entity_handles_allocated >= size ) { unique_adj = *adj_entity_handles; }
+    if( *adj_entity_handles_allocated >= size )
+    {
+        unique_adj = *adj_entity_handles;
+    }
     else
     {
         unique_adj = (iBase_EntityHandle*)malloc( sizeof( iBase_EntityHandle ) * size );
@@ -897,7 +945,8 @@ void iMesh_getAdjEntIndices( iMesh_Instance instance,
 
 void iMesh_createEntSet( iMesh_Instance instance,
                          /*in*/ const int isList,
-                         /*out*/ iBase_EntitySetHandle* entity_set_created, int* err )
+                         /*out*/ iBase_EntitySetHandle* entity_set_created,
+                         int* err )
 {
     // create the entity set
     EntityHandle meshset;
@@ -916,7 +965,8 @@ void iMesh_createEntSet( iMesh_Instance instance,
 }
 
 void iMesh_destroyEntSet( iMesh_Instance instance,
-                          /*in*/ iBase_EntitySetHandle entity_set, int* err )
+                          /*in*/ iBase_EntitySetHandle entity_set,
+                          int* err )
 {
     EntityHandle set = ENTITY_HANDLE( entity_set );
     ErrorCode result = MOABI->delete_entities( &set, 1 );CHKERR( result, "iMesh_destroyEntSet: couldn't delete the set." );
@@ -925,7 +975,9 @@ void iMesh_destroyEntSet( iMesh_Instance instance,
 }
 
 void iMesh_isList( iMesh_Instance instance,
-                   /*in*/ const iBase_EntitySetHandle entity_set, int* is_list, int* err )
+                   /*in*/ const iBase_EntitySetHandle entity_set,
+                   int* is_list,
+                   int* err )
 {
     unsigned int options;
     ErrorCode result = MOABI->get_meshset_options( ENTITY_HANDLE( entity_set ), options );CHKERR( result, "iMesh_isList: couldn't query set." );
@@ -939,7 +991,9 @@ void iMesh_isList( iMesh_Instance instance,
 
 void iMesh_getNumEntSets( iMesh_Instance instance,
                           /*in*/ const iBase_EntitySetHandle entity_set_handle,
-                          /*in*/ const int num_hops, int* num_sets, int* err )
+                          /*in*/ const int num_hops,
+                          int* num_sets,
+                          int* err )
 {
     ErrorCode rval =
         MOABI->num_contained_meshsets( ENTITY_HANDLE( entity_set_handle ), num_sets, std::max( 0, num_hops + 1 ) );CHKERR( rval, "iMesh_entitysetGetNumberEntitySets:ERROR getting number of entitysets." );
@@ -952,7 +1006,8 @@ void iMesh_getEntSets( iMesh_Instance instance,
                        /*in*/ const int num_hops,
                        /*inout*/ iBase_EntitySetHandle** contained_entset_handles,
                        /*inout*/ int* contained_entset_handles_allocated,
-                       /*inout*/ int* contained_entset_handles_size, int* err )
+                       /*inout*/ int* contained_entset_handles_size,
+                       int* err )
 {
     std::vector< EntityHandle > sets;
     ErrorCode rval =
@@ -967,7 +1022,8 @@ void iMesh_getEntSets( iMesh_Instance instance,
 void iMesh_addEntArrToSet( iMesh_Instance instance,
                            /*in*/ const iBase_EntityHandle* entity_handles,
                            /*in*/ int entity_handles_size,
-                           /*in*/ iBase_EntitySetHandle entity_set, int* err )
+                           /*in*/ iBase_EntitySetHandle entity_set,
+                           int* err )
 {
     const EntityHandle* ents = CONST_HANDLE_ARRAY_PTR( entity_handles );
     ErrorCode result         = MOABI->add_entities( ENTITY_HANDLE( entity_set ), ents, entity_handles_size );
@@ -978,7 +1034,8 @@ void iMesh_addEntArrToSet( iMesh_Instance instance,
 
 void iMesh_addEntToSet( iMesh_Instance instance,
                         /*in*/ iBase_EntityHandle entity_handle,
-                        /*in*/ iBase_EntitySetHandle entity_set, int* err )
+                        /*in*/ iBase_EntitySetHandle entity_set,
+                        int* err )
 {
     iMesh_addEntArrToSet( instance, &entity_handle, 1, entity_set, err );
 }
@@ -986,7 +1043,8 @@ void iMesh_addEntToSet( iMesh_Instance instance,
 void iMesh_rmvEntArrFromSet( iMesh_Instance instance,
                              /*in*/ const iBase_EntityHandle* entity_handles,
                              /*in*/ int entity_handles_size,
-                             /*in*/ iBase_EntitySetHandle entity_set, int* err )
+                             /*in*/ iBase_EntitySetHandle entity_set,
+                             int* err )
 {
     const EntityHandle* ents = CONST_HANDLE_ARRAY_PTR( entity_handles );
 
@@ -998,14 +1056,16 @@ void iMesh_rmvEntArrFromSet( iMesh_Instance instance,
 
 void iMesh_rmvEntFromSet( iMesh_Instance instance,
                           /*in*/ iBase_EntityHandle entity_handle,
-                          /*in*/ iBase_EntitySetHandle entity_set, int* err )
+                          /*in*/ iBase_EntitySetHandle entity_set,
+                          int* err )
 {
     iMesh_rmvEntArrFromSet( instance, &entity_handle, 1, entity_set, err );
 }
 
 void iMesh_addEntSet( iMesh_Instance instance,
                       /*in*/ iBase_EntitySetHandle entity_set_to_add,
-                      /*in*/ iBase_EntitySetHandle entity_set_handle, int* err )
+                      /*in*/ iBase_EntitySetHandle entity_set_handle,
+                      int* err )
 {
     if( !entity_set_to_add || !entity_set_handle )
         ERROR( iBase_INVALID_ARGUMENT, "iMesh_addEntSet: ERROR invalid argument" );
@@ -1019,7 +1079,8 @@ void iMesh_addEntSet( iMesh_Instance instance,
 
 void iMesh_rmvEntSet( iMesh_Instance instance,
                       /*in*/ iBase_EntitySetHandle entity_set_to_remove,
-                      /*in*/ iBase_EntitySetHandle entity_set_handle, int* err )
+                      /*in*/ iBase_EntitySetHandle entity_set_handle,
+                      int* err )
 {
     if( !entity_set_to_remove || !entity_set_handle )
         ERROR( iBase_INVALID_ARGUMENT, "iMesh_rmvEntSet: ERROR invalid argument" );
@@ -1033,7 +1094,9 @@ void iMesh_rmvEntSet( iMesh_Instance instance,
 
 void iMesh_isEntContained( iMesh_Instance instance,
                            /*in*/ iBase_EntitySetHandle containing_entity_set,
-                           /*in*/ iBase_EntityHandle contained_entity, int* is_contained, int* err )
+                           /*in*/ iBase_EntityHandle contained_entity,
+                           int* is_contained,
+                           int* err )
 {
     int junk1 = 1, junk2 = 1;
     iMesh_isEntArrContained( instance, containing_entity_set, &contained_entity, 1, &is_contained, &junk1, &junk2,
@@ -1071,7 +1134,9 @@ void iMesh_isEntArrContained( iMesh_Instance instance,
 
 void iMesh_isEntSetContained( iMesh_Instance instance,
                               /*in*/ const iBase_EntitySetHandle containing_entity_set,
-                              /*in*/ const iBase_EntitySetHandle contained_entity_set, int* is_contained, int* err )
+                              /*in*/ const iBase_EntitySetHandle contained_entity_set,
+                              int* is_contained,
+                              int* err )
 {
     iMesh_isEntContained( instance, containing_entity_set,
                           reinterpret_cast< iBase_EntityHandle >( contained_entity_set ), is_contained, err );
@@ -1079,7 +1144,8 @@ void iMesh_isEntSetContained( iMesh_Instance instance,
 
 void iMesh_addPrntChld( iMesh_Instance instance,
                         /*inout*/ iBase_EntitySetHandle parent_entity_set,
-                        /*inout*/ iBase_EntitySetHandle child_entity_set, int* err )
+                        /*inout*/ iBase_EntitySetHandle child_entity_set,
+                        int* err )
 {
     ErrorCode result = MOABI->add_parent_child( ENTITY_HANDLE( parent_entity_set ), ENTITY_HANDLE( child_entity_set ) );
 
@@ -1090,7 +1156,8 @@ void iMesh_addPrntChld( iMesh_Instance instance,
 
 void iMesh_rmvPrntChld( iMesh_Instance instance,
                         /*inout*/ iBase_EntitySetHandle parent_entity_set,
-                        /*inout*/ iBase_EntitySetHandle child_entity_set, int* err )
+                        /*inout*/ iBase_EntitySetHandle child_entity_set,
+                        int* err )
 {
     ErrorCode result =
         MOABI->remove_parent_child( ENTITY_HANDLE( parent_entity_set ), ENTITY_HANDLE( child_entity_set ) );
@@ -1102,7 +1169,9 @@ void iMesh_rmvPrntChld( iMesh_Instance instance,
 
 void iMesh_isChildOf( iMesh_Instance instance,
                       /*in*/ const iBase_EntitySetHandle parent_entity_set,
-                      /*in*/ const iBase_EntitySetHandle child_entity_set, int* is_child, int* err )
+                      /*in*/ const iBase_EntitySetHandle child_entity_set,
+                      int* is_child,
+                      int* err )
 {
     if( !child_entity_set ) ERROR( iBase_INVALID_ENTITYSET_HANDLE, "iMesh_isChildOf: ERROR invalid entity set." );
 
@@ -1124,7 +1193,9 @@ void iMesh_isChildOf( iMesh_Instance instance,
 
 void iMesh_getNumChld( iMesh_Instance instance,
                        /*in*/ const iBase_EntitySetHandle entity_set,
-                       /*in*/ const int num_hops, int* num_child, int* err )
+                       /*in*/ const int num_hops,
+                       int* num_child,
+                       int* err )
 {
     *num_child       = 0;
     ErrorCode result = MOABI->num_child_meshsets( ENTITY_HANDLE( entity_set ), num_child, num_hops + 1 );
@@ -1137,7 +1208,9 @@ void iMesh_getNumChld( iMesh_Instance instance,
 
 void iMesh_getNumPrnt( iMesh_Instance instance,
                        /*in*/ const iBase_EntitySetHandle entity_set,
-                       /*in*/ const int num_hops, int* num_parent, int* err )
+                       /*in*/ const int num_hops,
+                       int* num_parent,
+                       int* err )
 {
     *num_parent      = 0;
     ErrorCode result = MOABI->num_parent_meshsets( ENTITY_HANDLE( entity_set ), num_parent, num_hops + 1 );
@@ -1152,7 +1225,8 @@ void iMesh_getChldn( iMesh_Instance instance,
                      /*in*/ const int num_hops,
                      /*out*/ iBase_EntitySetHandle** entity_set_handles,
                      /*out*/ int* entity_set_handles_allocated,
-                     /*out*/ int* entity_set_handles_size, int* err )
+                     /*out*/ int* entity_set_handles_size,
+                     int* err )
 {
     std::vector< EntityHandle > children;
 
@@ -1174,7 +1248,8 @@ void iMesh_getPrnts( iMesh_Instance instance,
                      /*in*/ const int num_hops,
                      /*out*/ iBase_EntitySetHandle** entity_set_handles,
                      /*out*/ int* entity_set_handles_allocated,
-                     /*out*/ int* entity_set_handles_size, int* err )
+                     /*out*/ int* entity_set_handles_size,
+                     int* err )
 {
     std::vector< EntityHandle > parents;
 
@@ -1197,7 +1272,8 @@ void iMesh_setVtxArrCoords( iMesh_Instance instance,
                             /*in*/ const int vertex_handles_size,
                             /*in*/ const int storage_order,
                             /*in*/ const double* new_coords,
-                            /*in*/ const int new_coords_size, int* err )
+                            /*in*/ const int new_coords_size,
+                            int* err )
 {
     CHKENUM( storage_order, iBase_StorageOrder, iBase_INVALID_ARGUMENT );
 
@@ -1253,7 +1329,8 @@ void iMesh_createVtxArr( iMesh_Instance instance,
                          /*in*/ const int new_coords_size,
                          /*inout*/ iBase_EntityHandle** new_vertex_handles,
                          /*inout*/ int* new_vertex_handles_allocated,
-                         /*inout*/ int* new_vertex_handles_size, int* err )
+                         /*inout*/ int* new_vertex_handles_size,
+                         int* err )
 {
     int geom_dim;
     MOABI->get_dimension( geom_dim );
@@ -1313,7 +1390,8 @@ void iMesh_createEntArr( iMesh_Instance instance,
                          /*out*/ int* new_entity_handles_size,
                          /*inout*/ int** status,
                          /*inout*/ int* status_allocated,
-                         /*out*/ int* status_size, int* err )
+                         /*out*/ int* status_size,
+                         int* err )
 {
     // for now, throw an error if lower order entity handles aren't vertices
     if( iMesh_POINT > new_entity_topology || iMesh_SEPTAHEDRON < new_entity_topology )
@@ -1340,7 +1418,10 @@ void iMesh_createEntArr( iMesh_Instance instance,
                                        "function, use createVtxArr instead." );
     }
 
-    if( num_ents == 0 ) { ERROR( iBase_INVALID_ENTITY_COUNT, "iMesh_createEntArr: called to create 0 entities." ); }
+    if( num_ents == 0 )
+    {
+        ERROR( iBase_INVALID_ENTITY_COUNT, "iMesh_createEntArr: called to create 0 entities." );
+    }
 
     // if there aren't any elements in the array, allocate it
 
@@ -1386,9 +1467,13 @@ void iMesh_createEntArr( iMesh_Instance instance,
 
 void iMesh_deleteEntArr( iMesh_Instance instance,
                          /*in*/ const iBase_EntityHandle* entity_handles,
-                         /*in*/ const int entity_handles_size, int* err )
+                         /*in*/ const int entity_handles_size,
+                         int* err )
 {
-    if( 0 == entity_handles_size ) { RETURN( iBase_SUCCESS ); }
+    if( 0 == entity_handles_size )
+    {
+        RETURN( iBase_SUCCESS );
+    }
 
     ErrorCode result = MOABI->delete_entities( CONST_HANDLE_ARRAY_PTR( entity_handles ), entity_handles_size );CHKERR( result, "iMesh_deleteEntArr: trouble deleting entities." );
 
@@ -1399,14 +1484,17 @@ void iMesh_createTag( iMesh_Instance instance,
                       /*in*/ const char* tag_name,
                       /*in*/ const int tag_size,
                       /*in*/ const int tag_type,
-                      /*out*/ iBase_TagHandle* tag_handle, int* err, const int tag_name_size )
+                      /*out*/ iBase_TagHandle* tag_handle,
+                      int* err,
+                      const int tag_name_size )
 {
     iMesh_createTagWithOptions( instance, tag_name, NULL, tag_size, tag_type, tag_handle, err, tag_name_size, 0 );
 }
 
 void iMesh_destroyTag( iMesh_Instance instance,
                        /*in*/ iBase_TagHandle tag_handle,
-                       /*in*/ const int forced, int* err )
+                       /*in*/ const int forced,
+                       int* err )
 {
     // might need to check if it's used first
     if( false == forced )
@@ -1442,7 +1530,10 @@ void iMesh_destroyTag( iMesh_Instance instance,
 }
 
 void iMesh_getTagName( iMesh_Instance instance,
-                       /*in*/ const iBase_TagHandle tag_handle, char* out_data, int* err, int out_data_len )
+                       /*in*/ const iBase_TagHandle tag_handle,
+                       char* out_data,
+                       int* err,
+                       int out_data_len )
 {
     static ::std::string name;
     ErrorCode result = MOABI->tag_get_name( TAG_HANDLE( tag_handle ), name );CHKERR( result, "iMesh_getTagName: problem getting name." );
@@ -1452,7 +1543,9 @@ void iMesh_getTagName( iMesh_Instance instance,
 }
 
 void iMesh_getTagType( iMesh_Instance instance,
-                       /*in*/ const iBase_TagHandle tag_handle, int* value_type, int* err )
+                       /*in*/ const iBase_TagHandle tag_handle,
+                       int* value_type,
+                       int* err )
 {
     DataType this_type;
     ErrorCode result = MOABI->tag_get_data_type( TAG_HANDLE( tag_handle ), this_type );CHKERR( result, "iMesh_getTagType: problem getting type." );
@@ -1476,7 +1569,9 @@ void iMesh_getTagType( iMesh_Instance instance,
 }
 
 void iMesh_getTagSizeValues( iMesh_Instance instance,
-                             /*in*/ const iBase_TagHandle tag_handle, int* tag_size_val, int* err )
+                             /*in*/ const iBase_TagHandle tag_handle,
+                             int* tag_size_val,
+                             int* err )
 {
     ErrorCode result = MOABI->tag_get_length( TAG_HANDLE( tag_handle ), *tag_size_val );CHKERR( result, "iMesh_getTagSize: problem getting size." );
 
@@ -1484,7 +1579,9 @@ void iMesh_getTagSizeValues( iMesh_Instance instance,
 }
 
 void iMesh_getTagSizeBytes( iMesh_Instance instance,
-                            /*in*/ const iBase_TagHandle tag_handle, int* tag_size_bytes, int* err )
+                            /*in*/ const iBase_TagHandle tag_handle,
+                            int* tag_size_bytes,
+                            int* err )
 {
     ErrorCode result = MOABI->tag_get_bytes( TAG_HANDLE( tag_handle ), *tag_size_bytes );CHKERR( result, "iMesh_getTagSize: problem getting size." );
 
@@ -1492,7 +1589,10 @@ void iMesh_getTagSizeBytes( iMesh_Instance instance,
 }
 
 void iMesh_getTagHandle( iMesh_Instance instance,
-                         /*in*/ const char* tag_name, iBase_TagHandle* tag_handle, int* err, const int tag_name_len )
+                         /*in*/ const char* tag_name,
+                         iBase_TagHandle* tag_handle,
+                         int* err,
+                         const int tag_name_len )
 {
     std::string tmp_tagname( tag_name, tag_name_len );
     eatwhitespace( tmp_tagname );
@@ -1517,7 +1617,8 @@ void iMesh_getTagHandle( iMesh_Instance instance,
 void iMesh_getAllIfaceTags( iMesh_Instance instance,
                             /*inout*/ iBase_TagHandle** tag_handles,
                             /*inout*/ int* tag_handles_allocated,
-                            /*out*/ int* tag_handles_size, int* err )
+                            /*out*/ int* tag_handles_size,
+                            int* err )
 {
     std::vector< Tag > all_tags;
 
@@ -1537,7 +1638,8 @@ void iMesh_setEntSetData( iMesh_Instance instance,
                           /*in*/ iBase_EntitySetHandle entity_set_handle,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*in*/ const void* tag_value,
-                          /*in*/ const int, int* err )
+                          /*in*/ const int,
+                          int* err )
 {
     ErrorCode result;
 
@@ -1550,7 +1652,8 @@ void iMesh_setEntSetData( iMesh_Instance instance,
 void iMesh_setEntSetIntData( iMesh_Instance instance,
                              /*in*/ iBase_EntitySetHandle entity_set,
                              /*in*/ const iBase_TagHandle tag_handle,
-                             /*in*/ const int tag_value, int* err )
+                             /*in*/ const int tag_value,
+                             int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_INTEGER );
     iMesh_setEntSetData( instance, entity_set, tag_handle, &tag_value, sizeof( int ), err );
@@ -1559,7 +1662,8 @@ void iMesh_setEntSetIntData( iMesh_Instance instance,
 void iMesh_setEntSetDblData( iMesh_Instance instance,
                              /*in*/ iBase_EntitySetHandle entity_set,
                              /*in*/ const iBase_TagHandle tag_handle,
-                             /*in*/ const double tag_value, int* err )
+                             /*in*/ const double tag_value,
+                             int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_DOUBLE );
     iMesh_setEntSetData( instance, entity_set, tag_handle, &tag_value, sizeof( double ), err );
@@ -1568,7 +1672,8 @@ void iMesh_setEntSetDblData( iMesh_Instance instance,
 void iMesh_setEntSetEHData( iMesh_Instance instance,
                             /*in*/ iBase_EntitySetHandle entity_set,
                             /*in*/ const iBase_TagHandle tag_handle,
-                            /*in*/ const iBase_EntityHandle tag_value, int* err )
+                            /*in*/ const iBase_EntityHandle tag_value,
+                            int* err )
 {
     // XXX: decide how best to handle validating entity handles as tag data
     CHKNONEMPTY();
@@ -1579,7 +1684,8 @@ void iMesh_setEntSetEHData( iMesh_Instance instance,
 void iMesh_setEntSetESHData( iMesh_Instance instance,
                              /*in*/ iBase_EntitySetHandle entity_set,
                              /*in*/ const iBase_TagHandle tag_handle,
-                             /*in*/ const iBase_EntitySetHandle tag_value, int* err )
+                             /*in*/ const iBase_EntitySetHandle tag_value,
+                             int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_SET_HANDLE );
     iMesh_setEntSetData( instance, entity_set, tag_handle, &tag_value, sizeof( iBase_EntitySetHandle ), err );
@@ -1590,7 +1696,8 @@ void iMesh_getEntSetData( iMesh_Instance instance,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*inout*/ void* tag_value,
                           /*inout*/ int* tag_value_allocated,
-                          /*inout*/ int* tag_value_size, int* err )
+                          /*inout*/ int* tag_value_size,
+                          int* err )
 {
     EntityHandle eh = ENTITY_HANDLE( entity_set_handle );
     Tag tag         = TAG_HANDLE( tag_handle );
@@ -1609,7 +1716,9 @@ void iMesh_getEntSetData( iMesh_Instance instance,
 
 void iMesh_getEntSetIntData( iMesh_Instance instance,
                              /*in*/ const iBase_EntitySetHandle entity_set,
-                             /*in*/ const iBase_TagHandle tag_handle, int* out_data, int* err )
+                             /*in*/ const iBase_TagHandle tag_handle,
+                             int* out_data,
+                             int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_INTEGER );
     void* tag_ptr = out_data;
@@ -1619,7 +1728,9 @@ void iMesh_getEntSetIntData( iMesh_Instance instance,
 
 void iMesh_getEntSetDblData( iMesh_Instance instance,
                              /*in*/ const iBase_EntitySetHandle entity_set,
-                             /*in*/ const iBase_TagHandle tag_handle, double* out_data, int* err )
+                             /*in*/ const iBase_TagHandle tag_handle,
+                             double* out_data,
+                             int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_DOUBLE );
     void* tag_ptr = out_data;
@@ -1629,7 +1740,9 @@ void iMesh_getEntSetDblData( iMesh_Instance instance,
 
 void iMesh_getEntSetEHData( iMesh_Instance instance,
                             /*in*/ const iBase_EntitySetHandle entity_set,
-                            /*in*/ const iBase_TagHandle tag_handle, iBase_EntityHandle* out_data, int* err )
+                            /*in*/ const iBase_TagHandle tag_handle,
+                            iBase_EntityHandle* out_data,
+                            int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_HANDLE );
     void* tag_ptr = out_data;
@@ -1639,7 +1752,9 @@ void iMesh_getEntSetEHData( iMesh_Instance instance,
 
 void iMesh_getEntSetESHData( iMesh_Instance instance,
                              /*in*/ const iBase_EntitySetHandle entity_set,
-                             /*in*/ const iBase_TagHandle tag_handle, iBase_EntitySetHandle* out_data, int* err )
+                             /*in*/ const iBase_TagHandle tag_handle,
+                             iBase_EntitySetHandle* out_data,
+                             int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_SET_HANDLE );
     void* tag_ptr = out_data;
@@ -1651,7 +1766,8 @@ void iMesh_getAllEntSetTags( iMesh_Instance instance,
                              /*in*/ const iBase_EntitySetHandle entity_set_handle,
                              /*out*/ iBase_TagHandle** tag_handles,
                              /*out*/ int* tag_handles_allocated,
-                             /*out*/ int* tag_handles_size, int* err )
+                             /*out*/ int* tag_handles_size,
+                             int* err )
 {
     EntityHandle eh = ENTITY_HANDLE( entity_set_handle );
     std::vector< Tag > all_tags;
@@ -1670,7 +1786,8 @@ void iMesh_getAllEntSetTags( iMesh_Instance instance,
 
 void iMesh_rmvEntSetTag( iMesh_Instance instance,
                          /*in*/ iBase_EntitySetHandle entity_set_handle,
-                         /*in*/ const iBase_TagHandle tag_handle, int* err )
+                         /*in*/ const iBase_TagHandle tag_handle,
+                         int* err )
 {
     EntityHandle set = ENTITY_HANDLE( entity_set_handle );
     ErrorCode result = MOABI->tag_delete_data( TAG_HANDLE( tag_handle ), &set, 1 );
@@ -1684,8 +1801,10 @@ void iMesh_rmvEntSetTag( iMesh_Instance instance,
 
 void iMesh_setVtxCoord( iMesh_Instance instance,
                         /*in*/ iBase_EntityHandle vertex_handle,
-                        /*in*/ const double x, /*in*/ const double y,
-                        /*in*/ const double z, int* err )
+                        /*in*/ const double x,
+                        /*in*/ const double y,
+                        /*in*/ const double z,
+                        int* err )
 
 {
     const double xyz[3] = { x, y, z };
@@ -1696,9 +1815,11 @@ void iMesh_setVtxCoord( iMesh_Instance instance,
 }
 
 void iMesh_createVtx( iMesh_Instance instance,
-                      /*in*/ const double x, /*in*/ const double y,
+                      /*in*/ const double x,
+                      /*in*/ const double y,
                       /*in*/ const double z,
-                      /*out*/ iBase_EntityHandle* new_vertex_handle, int* err )
+                      /*out*/ iBase_EntityHandle* new_vertex_handle,
+                      int* err )
 {
     int dum             = 1;
     const double xyz[3] = { x, y, z };
@@ -1712,7 +1833,8 @@ void iMesh_createEnt( iMesh_Instance instance,
                       /*in*/ const iBase_EntityHandle* lower_order_entity_handles,
                       /*in*/ const int lower_order_entity_handles_size,
                       /*out*/ iBase_EntityHandle* new_entity_handle,
-                      /*out*/ int* status, int* err )
+                      /*out*/ int* status,
+                      int* err )
 {
     if( 0 == lower_order_entity_handles_size )
     {
@@ -1748,7 +1870,8 @@ void iMesh_createEnt( iMesh_Instance instance,
 }
 
 void iMesh_deleteEnt( iMesh_Instance instance,
-                      /*in*/ iBase_EntityHandle entity_handle, int* err )
+                      /*in*/ iBase_EntityHandle entity_handle,
+                      int* err )
 {
     iMesh_deleteEntArr( instance, &entity_handle, 1, err );
 }
@@ -1759,7 +1882,8 @@ void iMesh_getArrData( iMesh_Instance instance,
                        /*in*/ const iBase_TagHandle tag_handle,
                        /*inout*/ void* tag_values,
                        /*inout*/ int* tag_values_allocated,
-                       /*out*/ int* tag_values_size, int* err )
+                       /*out*/ int* tag_values_size,
+                       int* err )
 {
     if( 0 == entity_handles_size ) RETURN( iBase_SUCCESS );
     CHKNONEMPTY();
@@ -1811,7 +1935,8 @@ void iMesh_getIntArrData( iMesh_Instance instance,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*inout*/ int** tag_values,
                           /*inout*/ int* tag_values_allocated,
-                          /*out*/ int* tag_values_size, int* err )
+                          /*out*/ int* tag_values_size,
+                          int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_INTEGER );
     *tag_values_allocated *= sizeof( int );
@@ -1828,7 +1953,8 @@ void iMesh_getDblArrData( iMesh_Instance instance,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*inout*/ double** tag_values,
                           /*inout*/ int* tag_values_allocated,
-                          /*out*/ int* tag_values_size, int* err )
+                          /*out*/ int* tag_values_size,
+                          int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_DOUBLE );
     *tag_values_allocated *= sizeof( double );
@@ -1845,7 +1971,8 @@ void iMesh_getEHArrData( iMesh_Instance instance,
                          /*in*/ const iBase_TagHandle tag_handle,
                          /*inout*/ iBase_EntityHandle** tag_value,
                          /*inout*/ int* tag_value_allocated,
-                         /*out*/ int* tag_value_size, int* err )
+                         /*out*/ int* tag_value_size,
+                         int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_HANDLE );
     *tag_value_allocated *= sizeof( iBase_EntityHandle );
@@ -1862,7 +1989,8 @@ void iMesh_getESHArrData( iMesh_Instance instance,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*inout*/ iBase_EntitySetHandle** tag_value,
                           /*inout*/ int* tag_value_allocated,
-                          /*out*/ int* tag_value_size, int* err )
+                          /*out*/ int* tag_value_size,
+                          int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_SET_HANDLE );
     *tag_value_allocated *= sizeof( iBase_EntityHandle );
@@ -1878,7 +2006,8 @@ void iMesh_setArrData( iMesh_Instance instance,
                        /*in*/ const int entity_handles_size,
                        /*in*/ const iBase_TagHandle tag_handle,
                        /*in*/ const void* tag_values,
-                       /*in*/ const int tag_values_size, int* err )
+                       /*in*/ const int tag_values_size,
+                       int* err )
 {
     if( 0 == entity_handles_size ) RETURN( iBase_SUCCESS );
     CHKNONEMPTY();
@@ -1904,7 +2033,8 @@ void iMesh_setIntArrData( iMesh_Instance instance,
                           /*in*/ const int entity_handles_size,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*in*/ const int* tag_values,
-                          /*in*/ const int tag_values_size, int* err )
+                          /*in*/ const int tag_values_size,
+                          int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_INTEGER );
     iMesh_setArrData( instance, entity_handles, entity_handles_size, tag_handle,
@@ -1916,7 +2046,8 @@ void iMesh_setDblArrData( iMesh_Instance instance,
                           /*in*/ const int entity_handles_size,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*in*/ const double* tag_values,
-                          /*in*/ const int tag_values_size, int* err )
+                          /*in*/ const int tag_values_size,
+                          int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_DOUBLE );
     iMesh_setArrData( instance, entity_handles, entity_handles_size, tag_handle,
@@ -1928,7 +2059,8 @@ void iMesh_setEHArrData( iMesh_Instance instance,
                          /*in*/ const int entity_handles_size,
                          /*in*/ const iBase_TagHandle tag_handle,
                          /*in*/ const iBase_EntityHandle* tag_values,
-                         /*in*/ const int tag_values_size, int* err )
+                         /*in*/ const int tag_values_size,
+                         int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_HANDLE );
     iMesh_setArrData( instance, entity_handles, entity_handles_size, tag_handle,
@@ -1941,7 +2073,8 @@ void iMesh_setESHArrData( iMesh_Instance instance,
                           /*in*/ const int entity_handles_size,
                           /*in*/ const iBase_TagHandle tag_handle,
                           /*in*/ const iBase_EntitySetHandle* tag_values,
-                          /*in*/ const int tag_values_size, int* err )
+                          /*in*/ const int tag_values_size,
+                          int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_SET_HANDLE );
     iMesh_setArrData( instance, entity_handles, entity_handles_size, tag_handle,
@@ -1952,7 +2085,8 @@ void iMesh_setESHArrData( iMesh_Instance instance,
 void iMesh_rmvArrTag( iMesh_Instance instance,
                       /*in*/ const iBase_EntityHandle* entity_handles,
                       /*in*/ const int entity_handles_size,
-                      /*in*/ const iBase_TagHandle tag_handle, int* err )
+                      /*in*/ const iBase_TagHandle tag_handle,
+                      int* err )
 {
     if( 0 == entity_handles_size ) RETURN( iBase_SUCCESS );
     CHKNONEMPTY();
@@ -1972,14 +2106,17 @@ void iMesh_getData( iMesh_Instance instance,
                     /*in*/ const iBase_TagHandle tag_handle,
                     /*out*/ void* tag_value,
                     /*inout*/ int* tag_value_allocated,
-                    /*out*/ int* tag_value_size, int* err )
+                    /*out*/ int* tag_value_size,
+                    int* err )
 {
     iMesh_getArrData( instance, &entity_handle, 1, tag_handle, tag_value, tag_value_allocated, tag_value_size, err );
 }
 
 void iMesh_getIntData( iMesh_Instance instance,
                        /*in*/ const iBase_EntityHandle entity_handle,
-                       /*in*/ const iBase_TagHandle tag_handle, int* out_data, int* err )
+                       /*in*/ const iBase_TagHandle tag_handle,
+                       int* out_data,
+                       int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_INTEGER );
     void* val_ptr = out_data;
@@ -1989,7 +2126,9 @@ void iMesh_getIntData( iMesh_Instance instance,
 
 void iMesh_getDblData( iMesh_Instance instance,
                        /*in*/ const iBase_EntityHandle entity_handle,
-                       /*in*/ const iBase_TagHandle tag_handle, double* out_data, int* err )
+                       /*in*/ const iBase_TagHandle tag_handle,
+                       double* out_data,
+                       int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_DOUBLE );
     void* val_ptr = out_data;
@@ -1999,7 +2138,9 @@ void iMesh_getDblData( iMesh_Instance instance,
 
 void iMesh_getEHData( iMesh_Instance instance,
                       /*in*/ const iBase_EntityHandle entity_handle,
-                      /*in*/ const iBase_TagHandle tag_handle, iBase_EntityHandle* out_data, int* err )
+                      /*in*/ const iBase_TagHandle tag_handle,
+                      iBase_EntityHandle* out_data,
+                      int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_HANDLE );
     void* val_ptr = out_data;
@@ -2009,7 +2150,9 @@ void iMesh_getEHData( iMesh_Instance instance,
 
 void iMesh_getESHData( iMesh_Instance instance,
                        /*in*/ const iBase_EntityHandle entity_handle,
-                       /*in*/ const iBase_TagHandle tag_handle, iBase_EntitySetHandle* out_data, int* err )
+                       /*in*/ const iBase_TagHandle tag_handle,
+                       iBase_EntitySetHandle* out_data,
+                       int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_SET_HANDLE );
     void* val_ptr = out_data;
@@ -2021,7 +2164,8 @@ void iMesh_setData( iMesh_Instance instance,
                     /*in*/ iBase_EntityHandle entity_handle,
                     /*in*/ const iBase_TagHandle tag_handle,
                     /*in*/ const void* tag_value,
-                    /*in*/ const int tag_value_size, int* err )
+                    /*in*/ const int tag_value_size,
+                    int* err )
 {
     iMesh_setArrData( instance, &entity_handle, 1, tag_handle, tag_value, tag_value_size, err );
 }
@@ -2029,7 +2173,8 @@ void iMesh_setData( iMesh_Instance instance,
 void iMesh_setIntData( iMesh_Instance instance,
                        /*in*/ iBase_EntityHandle entity_handle,
                        /*in*/ const iBase_TagHandle tag_handle,
-                       /*in*/ const int tag_value, int* err )
+                       /*in*/ const int tag_value,
+                       int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_INTEGER );
     iMesh_setArrData( instance, &entity_handle, 1, tag_handle, reinterpret_cast< const char* >( &tag_value ),
@@ -2040,7 +2185,8 @@ void iMesh_setDblData( iMesh_Instance instance,
 
                        /*in*/ iBase_EntityHandle entity_handle,
                        /*in*/ const iBase_TagHandle tag_handle,
-                       /*in*/ const double tag_value, int* err )
+                       /*in*/ const double tag_value,
+                       int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_DOUBLE );
     iMesh_setArrData( instance, &entity_handle, 1, tag_handle, reinterpret_cast< const char* >( &tag_value ),
@@ -2050,7 +2196,8 @@ void iMesh_setDblData( iMesh_Instance instance,
 void iMesh_setEHData( iMesh_Instance instance,
                       /*in*/ iBase_EntityHandle entity_handle,
                       /*in*/ const iBase_TagHandle tag_handle,
-                      /*in*/ const iBase_EntityHandle tag_value, int* err )
+                      /*in*/ const iBase_EntityHandle tag_value,
+                      int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_HANDLE );
     iMesh_setArrData( instance, &entity_handle, 1, tag_handle, reinterpret_cast< const char* >( &tag_value ),
@@ -2060,7 +2207,8 @@ void iMesh_setEHData( iMesh_Instance instance,
 void iMesh_setESHData( iMesh_Instance instance,
                        /*in*/ iBase_EntityHandle entity_handle,
                        /*in*/ const iBase_TagHandle tag_handle,
-                       /*in*/ const iBase_EntitySetHandle tag_value, int* err )
+                       /*in*/ const iBase_EntitySetHandle tag_value,
+                       int* err )
 {
     CHKTAGTYPE( tag_handle, iBase_ENTITY_SET_HANDLE );
     iMesh_setArrData( instance, &entity_handle, 1, tag_handle, reinterpret_cast< const char* >( &tag_value ),
@@ -2071,7 +2219,8 @@ void iMesh_getAllTags( iMesh_Instance instance,
                        /*in*/ const iBase_EntityHandle entity_handle,
                        /*inout*/ iBase_TagHandle** tag_handles,
                        /*inout*/ int* tag_handles_allocated,
-                       /*out*/ int* tag_handles_size, int* err )
+                       /*out*/ int* tag_handles_size,
+                       int* err )
 {
     std::vector< Tag > all_tags;
 
@@ -2089,7 +2238,8 @@ void iMesh_getAllTags( iMesh_Instance instance,
 
 void iMesh_rmvTag( iMesh_Instance instance,
                    /*in*/ iBase_EntityHandle entity_handle,
-                   /*in*/ const iBase_TagHandle tag_handle, int* err )
+                   /*in*/ const iBase_TagHandle tag_handle,
+                   int* err )
 {
     iMesh_rmvArrTag( instance, &entity_handle, 1, tag_handle, err );
 }
@@ -2099,7 +2249,8 @@ void iMesh_initEntIter( iMesh_Instance instance,
                         /*in*/ const int requested_entity_type,
                         /*in*/ const int requested_entity_topology,
                         /*in*/ const int resilient,
-                        /*out*/ iBase_EntityIterator* entity_iterator, int* err )
+                        /*out*/ iBase_EntityIterator* entity_iterator,
+                        int* err )
 {
     iMesh_initEntArrIterRec( instance, entity_set_handle, requested_entity_type, requested_entity_topology, 1,
                              resilient, false, reinterpret_cast< iBase_EntityArrIterator* >( entity_iterator ), err );
@@ -2107,7 +2258,9 @@ void iMesh_initEntIter( iMesh_Instance instance,
 
 void iMesh_getNextEntIter( iMesh_Instance instance,
                            /*in*/ iBase_EntityIterator entity_iterator,
-                           /*out*/ iBase_EntityHandle* entity_handle, int* is_end, int* err )
+                           /*out*/ iBase_EntityHandle* entity_handle,
+                           int* is_end,
+                           int* err )
 {
     int eh_size = 1;
     iMesh_getNextEntArrIter( instance, reinterpret_cast< iBase_EntityArrIterator >( entity_iterator ), &entity_handle,
@@ -2115,26 +2268,32 @@ void iMesh_getNextEntIter( iMesh_Instance instance,
 }
 
 void iMesh_resetEntIter( iMesh_Instance instance,
-                         /*in*/ iBase_EntityIterator entity_iterator, int* err )
+                         /*in*/ iBase_EntityIterator entity_iterator,
+                         int* err )
 {
     iMesh_resetEntArrIter( instance, reinterpret_cast< iBase_EntityArrIterator >( entity_iterator ), err );
 }
 
 void iMesh_endEntIter( iMesh_Instance instance,
-                       /*in*/ iBase_EntityIterator entity_iterator, int* err )
+                       /*in*/ iBase_EntityIterator entity_iterator,
+                       int* err )
 {
     iMesh_endEntArrIter( instance, reinterpret_cast< iBase_EntityArrIterator >( entity_iterator ), err );
 }
 
 void iMesh_getEntTopo( iMesh_Instance instance,
-                       /*in*/ const iBase_EntityHandle entity_handle, int* out_topo, int* err )
+                       /*in*/ const iBase_EntityHandle entity_handle,
+                       int* out_topo,
+                       int* err )
 {
     *out_topo = tstt_topology_table[MOABI->type_from_handle( ENTITY_HANDLE( entity_handle ) )];
     RETURN( iBase_SUCCESS );
 }
 
 void iMesh_getEntType( iMesh_Instance instance,
-                       /*in*/ const iBase_EntityHandle entity_handle, int* out_type, int* err )
+                       /*in*/ const iBase_EntityHandle entity_handle,
+                       int* out_type,
+                       int* err )
 {
     *out_type = tstt_type_table[MOABI->type_from_handle( ENTITY_HANDLE( entity_handle ) )];
     RETURN( iBase_SUCCESS );
@@ -2142,7 +2301,10 @@ void iMesh_getEntType( iMesh_Instance instance,
 
 void iMesh_getVtxCoord( iMesh_Instance instance,
                         /*in*/ const iBase_EntityHandle vertex_handle,
-                        /*out*/ double* x, /*out*/ double* y, /*out*/ double* z, int* err )
+                        /*out*/ double* x,
+                        /*out*/ double* y,
+                        /*out*/ double* z,
+                        int* err )
 {
     int order     = iBase_BLOCKED;
     double xyz[3] = { 0 }, *tmp_xyz = xyz;
@@ -2162,7 +2324,8 @@ void iMesh_getEntAdj( iMesh_Instance instance,
                       /*in*/ const int entity_type_requested,
                       /*inout*/ iBase_EntityHandle** adj_entity_handles,
                       /*inout*/ int* adj_entity_handles_allocated,
-                      /*out*/ int* adj_entity_handles_size, int* err )
+                      /*out*/ int* adj_entity_handles_size,
+                      int* err )
 {
     int offsets[2];
     int* offsets_ptr = offsets;
@@ -2173,9 +2336,14 @@ void iMesh_getEntAdj( iMesh_Instance instance,
                         &offset_size, err );
 }
 
-void iMesh_getEnt2ndAdj( iMesh_Instance instance, iBase_EntityHandle entity_handle, int order_adjacent_key,
-                         int requested_entity_type, iBase_EntityHandle** adj_entities, int* adj_entities_allocated,
-                         int* adj_entities_size, int* err )
+void iMesh_getEnt2ndAdj( iMesh_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         int order_adjacent_key,
+                         int requested_entity_type,
+                         iBase_EntityHandle** adj_entities,
+                         int* adj_entities_allocated,
+                         int* adj_entities_size,
+                         int* err )
 {
     int offsets[2];
     int* offsets_ptr = offsets;
@@ -2189,7 +2357,8 @@ void iMesh_getEnt2ndAdj( iMesh_Instance instance, iBase_EntityHandle entity_hand
 void iMesh_subtract( iMesh_Instance instance,
                      /*in*/ const iBase_EntitySetHandle entity_set_1,
                      /*in*/ const iBase_EntitySetHandle entity_set_2,
-                     /*out*/ iBase_EntitySetHandle* result_entity_set, int* err )
+                     /*out*/ iBase_EntitySetHandle* result_entity_set,
+                     int* err )
 {
     EntityHandle temp_set;
     EntityHandle set1 = ENTITY_HANDLE( entity_set_1 ), set2 = ENTITY_HANDLE( entity_set_2 );
@@ -2235,7 +2404,8 @@ void iMesh_subtract( iMesh_Instance instance,
 void iMesh_intersect( iMesh_Instance instance,
                       /*in*/ const iBase_EntitySetHandle entity_set_1,
                       /*in*/ const iBase_EntitySetHandle entity_set_2,
-                      /*out*/ iBase_EntitySetHandle* result_entity_set, int* err )
+                      /*out*/ iBase_EntitySetHandle* result_entity_set,
+                      int* err )
 {
     EntityHandle temp_set;
     EntityHandle set1 = ENTITY_HANDLE( entity_set_1 ), set2 = ENTITY_HANDLE( entity_set_2 );
@@ -2340,7 +2510,8 @@ void iMesh_intersect( iMesh_Instance instance,
 void iMesh_unite( iMesh_Instance instance,
                   /*in*/ const iBase_EntitySetHandle entity_set_1,
                   /*in*/ const iBase_EntitySetHandle entity_set_2,
-                  /*out*/ iBase_EntitySetHandle* result_entity_set, int* err )
+                  /*out*/ iBase_EntitySetHandle* result_entity_set,
+                  int* err )
 {
     EntityHandle temp_set;
     EntityHandle set1 = ENTITY_HANDLE( entity_set_1 ), set2 = ENTITY_HANDLE( entity_set_2 );
@@ -2717,7 +2888,8 @@ void iMesh_MBCNType( /*in*/ const int imesh_entity_topology,
 }
 
 void iMesh_tagIterate( iMesh_Instance instance,
-                       /*in*/ const iBase_TagHandle tag_handle, iBase_EntityArrIterator entArr_iterator,
+                       /*in*/ const iBase_TagHandle tag_handle,
+                       iBase_EntityArrIterator entArr_iterator,
                        /**< [in] Iterator being queried */
                        void* data,
                        /**< [out] Pointer to pointer that will be set to tag data memory
@@ -2737,7 +2909,8 @@ void iMesh_tagIterate( iMesh_Instance instance,
     RETURN( iBase_SUCCESS );
 }
 
-void iMesh_connectIterate( iMesh_Instance instance, iBase_EntityArrIterator entArr_iterator,
+void iMesh_connectIterate( iMesh_Instance instance,
+                           iBase_EntityArrIterator entArr_iterator,
                            /**< [in] Iterator being queried */
                            iBase_EntityHandle** connect,
                            /**< [out] Pointer to pointer that will be set to connectivity data memory */
@@ -2759,7 +2932,8 @@ void iMesh_connectIterate( iMesh_Instance instance, iBase_EntityArrIterator entA
     RETURN( iBase_SUCCESS );
 }
 
-void iMesh_coordsIterate( iMesh_Instance instance, iBase_EntityArrIterator entArr_iterator,
+void iMesh_coordsIterate( iMesh_Instance instance,
+                          iBase_EntityArrIterator entArr_iterator,
                           /**< [in] Iterator being queried */
                           double** xcoords_ptr,
                           /**< [out] Pointer to pointer that will be set to x coordinate data memory */
@@ -2826,7 +3000,8 @@ void iMesh_initEntArrIterRec( iMesh_Instance instance,
                               /*in*/ const int requested_array_size,
                               /*in*/ const int resilient,
                               /*in*/ const int recursive,
-                              /*out*/ iBase_EntityArrIterator* entArr_iterator, int* err )
+                              /*out*/ iBase_EntityArrIterator* entArr_iterator,
+                              int* err )
 {
     CHKENUM( requested_entity_type, iBase_EntityType, iBase_INVALID_ENTITY_TYPE );
     CHKENUM( requested_entity_topology, iMesh_EntityTopology, iBase_INVALID_ENTITY_TOPOLOGY );
@@ -3116,7 +3291,10 @@ void iMesh_createStructuredMesh( iMesh_Instance instance,
 
     Tag gid_tag     = 0;
     int *v_gid_data = NULL, *e_gid_data = NULL;
-    if( vert_gids || elem_gids ) { gid_tag = MOABI->globalId_tag(); }
+    if( vert_gids || elem_gids )
+    {
+        gid_tag = MOABI->globalId_tag();
+    }
 
     if( vert_gids )
     {
@@ -3197,7 +3375,9 @@ void iMesh_createStructuredMesh( iMesh_Instance instance,
     }
 #else
     // empty statement to remove compiler warning
-    if( resolve_shared || ghost_dim || bridge_dim || num_layers || addl_ents ) {}
+    if( resolve_shared || ghost_dim || bridge_dim || num_layers || addl_ents )
+    {
+    }
 #endif
 
     RETURN( iBase_SUCCESS );

@@ -54,8 +54,10 @@ class GlobalPatch : public PatchSet
      *\param elem_handles_out the list of elements in the mesh
      *\param free_vertices_out the list of vertices interior to the patch
      */
-    virtual void get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
-                            std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err );
+    virtual void get_patch( PatchHandle patch_handle,
+                            std::vector< Mesh::ElementHandle >& elem_handles_out,
+                            std::vector< Mesh::VertexHandle >& free_vertices_out,
+                            MsqError& err );
 };
 
 }  // namespace MBMesquite

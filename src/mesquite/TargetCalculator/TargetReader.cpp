@@ -40,8 +40,12 @@
 namespace MBMesquite
 {
 
-static TagHandle get_tag( Mesh* mesh, unsigned num_matrices, unsigned dimension, const char* base_name,
-                          bool orient_surface, MsqError& err )
+static TagHandle get_tag( Mesh* mesh,
+                          unsigned num_matrices,
+                          unsigned dimension,
+                          const char* base_name,
+                          bool orient_surface,
+                          MsqError& err )
 {
     unsigned matrix_size;
     if( dimension == 2 && !orient_surface )
@@ -75,7 +79,10 @@ TargetReader::TargetReader( bool orient2d, std::string name ) : tagBaseName( nam
 
 TargetReader::~TargetReader() {}
 
-bool TargetReader::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+bool TargetReader::get_3D_target( PatchData& pd,
+                                  size_t element,
+                                  Sample sample,
+                                  MsqMatrix< 3, 3 >& W_out,
                                   MsqError& err )
 {
     // calculate index of sample in array
@@ -126,7 +133,10 @@ bool TargetReader::get_3D_target( PatchData& pd, size_t element, Sample sample, 
     return true;
 }
 
-bool TargetReader::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+bool TargetReader::get_2D_target( PatchData& pd,
+                                  size_t element,
+                                  Sample sample,
+                                  MsqMatrix< 2, 2 >& W_out,
                                   MsqError& err )
 {
     // which type of 2D target do we actually have
@@ -184,7 +194,10 @@ bool TargetReader::get_2D_target( PatchData& pd, size_t element, Sample sample, 
     return true;
 }
 
-bool TargetReader::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+bool TargetReader::get_surface_target( PatchData& pd,
+                                       size_t element,
+                                       Sample sample,
+                                       MsqMatrix< 3, 2 >& W_out,
                                        MsqError& err )
 {
     // which type of 2D target do we actually have
@@ -258,8 +271,12 @@ void TargetReader::notify_new_patch( PatchData&, TargetReaderData& data )
     data.targetsSurface.clear();
 }
 
-void TargetReader::notify_sub_patch( PatchData& /*pd*/, TargetReaderData& data, PatchData& subpatch, const size_t*,
-                                     const size_t*, MsqError& /*err*/ )
+void TargetReader::notify_sub_patch( PatchData& /*pd*/,
+                                     TargetReaderData& data,
+                                     PatchData& subpatch,
+                                     const size_t*,
+                                     const size_t*,
+                                     MsqError& /*err*/ )
 {
     TargetReaderData& other = get_data( subpatch );
     if( other.handles2D.empty() && other.handles3D.empty() )

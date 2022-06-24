@@ -37,7 +37,9 @@ class DGMSolver
      *input container to hold output which is appended to existing data; users don't have to
      *preallocate for basis, this function will allocate interally
      */
-    static void gen_multivar_monomial_basis( const int kvars, const double* vars, const int degree,
+    static void gen_multivar_monomial_basis( const int kvars,
+                                             const double* vars,
+                                             const int degree,
                                              std::vector< double >& basis );
 
     //! \brief compute multivariate vandermonde matrix, monomial basis ordered in the same way as
@@ -56,7 +58,10 @@ class DGMSolver
        allocate interally; the Vandermonde matrix is stored in an array, columnwise, like {1 ... 1
        u1 ...um u1^2 ... um^2 ...}
     */
-    static void gen_vander_multivar( const int mrows, const int kvars, const double* us, const int degree,
+    static void gen_vander_multivar( const int mrows,
+                                     const int kvars,
+                                     const double* us,
+                                     const int degree,
                                      std::vector< double >& V );
 
     static void rescale_matrix( int mrows, int ncols, double* V, double* ts );
@@ -67,8 +72,16 @@ class DGMSolver
 
     static void backsolve( int mrows, int ncols, double* R, int bncols, double* bs, double* ws );
 
-    static void backsolve_polyfit_safeguarded( int dim, int degree, const bool interp, int mrows, int ncols, double* R,
-                                               int bncols, double* bs, const double* ws, int* degree_out );
+    static void backsolve_polyfit_safeguarded( int dim,
+                                               int degree,
+                                               const bool interp,
+                                               int mrows,
+                                               int ncols,
+                                               double* R,
+                                               int bncols,
+                                               double* bs,
+                                               const double* ws,
+                                               int* degree_out );
 
     static void vec_dotprod( const int len, const double* a, const double* b, double* c );
 
@@ -86,11 +99,18 @@ class DGMSolver
 
     static void vec_projoff( const int len, const double* a, const double* b, double* c );
 
-    static void vec_linear_operation( const int len, const double mu, const double* a, const double psi,
-                                      const double* b, double* c );
+    static void vec_linear_operation( const int len,
+                                      const double mu,
+                                      const double* a,
+                                      const double psi,
+                                      const double* b,
+                                      double* c );
 
-    static void get_tri_natural_coords( const int dim, const double* cornercoords, const int npts,
-                                        const double* currcoords, double* naturalcoords );
+    static void get_tri_natural_coords( const int dim,
+                                        const double* cornercoords,
+                                        const int npts,
+                                        const double* currcoords,
+                                        double* naturalcoords );
 };
 
 }  // namespace moab

@@ -26,7 +26,7 @@ void test_correct_ghost()
 
     char read_opts[] = "PARALLEL=READ_PART;PARALLEL_RESOLVE_SHARED_ENTS;PARTITION=PARALLEL_"
                        "PARTITION;PARALLEL_GHOSTS=2.0.1";
-    rval = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
+    rval             = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
 
     if( nproc >= 3 )
     {
@@ -57,7 +57,7 @@ void test_read_with_thin_ghost_layer()
 
     char read_opts[] = "PARALLEL=READ_PART;PARALLEL_RESOLVE_SHARED_ENTS;PARTITION=PARALLEL_"
                        "PARTITION;PARALLEL_GHOSTS=2.0.1;PARALLEL_THIN_GHOST_LAYER;";
-    rval = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
+    rval             = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
 
     rval = pcomm->exchange_ghost_cells( 2, 0, 2, 0, true );CHECK_ERR( rval );  // true to store remote handles
 

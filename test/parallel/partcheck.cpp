@@ -126,7 +126,10 @@ int main( int argc, char* argv[] )
 
     std::string part_opt( part_tag_opt );
     size_t p = part_opt.find_last_of( '=' );
-    if( p == std::string::npos ) { opts << ";PARTITION=" << part_opt; }
+    if( p == std::string::npos )
+    {
+        opts << ";PARTITION=" << part_opt;
+    }
     else
     {
         char* endptr = 0;
@@ -146,7 +149,10 @@ int main( int argc, char* argv[] )
         }
     }
 
-    if( resolve_shared ) { opts << ";PARALLEL_RESOLVE_SHARED_ENTS"; }
+    if( resolve_shared )
+    {
+        opts << ";PARALLEL_RESOLVE_SHARED_ENTS";
+    }
 
     if( debug_flag_str )
     {
@@ -180,7 +186,10 @@ int main( int argc, char* argv[] )
         sec = ( t - init_time ) / (double)CLOCKS_PER_SEC;
     double allsec;
     MPI_Reduce( &sec, &allsec, 1, MPI_DOUBLE, MPI_MAX, 0, pcomm->comm() );
-    if( pcomm->rank() == 0 ) { std::cout << "Read completed in " << allsec << " seconds" << std::endl; }
+    if( pcomm->rank() == 0 )
+    {
+        std::cout << "Read completed in " << allsec << " seconds" << std::endl;
+    }
 
     int result = check_parallel_read( mb, pcomm, resolve_shared );
 

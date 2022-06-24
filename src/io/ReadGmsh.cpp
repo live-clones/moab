@@ -60,15 +60,20 @@ ReadGmsh::~ReadGmsh()
     }
 }
 
-ErrorCode ReadGmsh::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                     const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadGmsh::read_tag_values( const char* /* file_name */,
+                                     const char* /* tag_name */,
+                                     const FileOptions& /* opts */,
+                                     std::vector< int >& /* tag_values_out */,
                                      const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const FileOptions&,
-                               const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadGmsh::load_file( const char* filename,
+                               const EntityHandle*,
+                               const FileOptions&,
+                               const ReaderIface::SubsetList* subset_list,
+                               const Tag* file_id_tag )
 {
     int num_material_sets        = 0;
     const int* material_set_list = 0;
@@ -98,7 +103,10 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
 
     // Open file and hand off pointer to tokenizer
     FILE* file_ptr = fopen( filename, "r" );
-    if( !file_ptr ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, filename << ": " << strerror( errno ) ); }
+    if( !file_ptr )
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, filename << ": " << strerror( errno ) );
+    }
     FileTokenizer tokens( file_ptr, readMeshIface );
 
     // Determine file format version
@@ -314,10 +322,13 @@ ErrorCode ReadGmsh::load_file( const char* filename, const EntityHandle*, const 
 }
 
 //! Create an element sequence
-ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector< int >& elem_ids,
-                                     const std::vector< int >& matl_ids, const std::vector< int >& geom_ids,
+ErrorCode ReadGmsh::create_elements( const GmshElemType& type,
+                                     const std::vector< int >& elem_ids,
+                                     const std::vector< int >& matl_ids,
+                                     const std::vector< int >& geom_ids,
                                      const std::vector< int >& prtn_ids,
-                                     const std::vector< EntityHandle >& connectivity, const Tag* file_id_tag )
+                                     const std::vector< EntityHandle >& connectivity,
+                                     const Tag* file_id_tag )
 {
     ErrorCode result;
 
@@ -385,7 +396,9 @@ ErrorCode ReadGmsh::create_elements( const GmshElemType& type, const std::vector
 }
 
 //! Add elements to sets as dictated by grouping ID in file.
-ErrorCode ReadGmsh::create_sets( EntityType type, const Range& elements, const std::vector< int >& set_ids,
+ErrorCode ReadGmsh::create_sets( EntityType type,
+                                 const Range& elements,
+                                 const std::vector< int >& set_ids,
                                  int set_type )
 {
     ErrorCode result;

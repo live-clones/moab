@@ -901,7 +901,7 @@ void test_has_mid_nodes( EntityType type )
         {
             case 3:
             case 2:
-	      // extra clauses to avoid fall-through error
+                // extra clauses to avoid fall-through error
                 if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
                 if( 2 <= dim && ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
         }
@@ -943,7 +943,7 @@ void test_ho_node_parent()
             {
                 case 3:
                 case 2:
-	      // extra clauses to avoid fall-through error
+                    // extra clauses to avoid fall-through error
                     if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
                     if( 2 <= dim && ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
             }
@@ -1011,8 +1011,8 @@ void test_ho_node_index()
             {
                 case 3:
                 case 2:
-	      // extra clauses to avoid fall-through error
-		    if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
+                    // extra clauses to avoid fall-through error
+                    if( 3 == dim && ho_nodes[2] ) num_vtx += CN::NumSubEntities( type, 2 );
                     if( 2 <= dim && ho_nodes[1] ) num_vtx += CN::NumSubEntities( type, 1 );
             }
             if( ho_nodes[dim] ) ++num_vtx;
@@ -1056,8 +1056,8 @@ void test_sub_entity_nodes( EntityType parent, int sub_dimension )
     const int num_edge   = CN::NumSubEntities( parent, 1 );
     const int num_face   = CN::NumSubEntities( parent, 2 );
 
-    auto dim =  CN::Dimension( parent );
-    switch(dim)
+    auto dim = CN::Dimension( parent );
+    switch( dim )
     {
         case 3:
         case 2:
@@ -1066,14 +1066,16 @@ void test_sub_entity_nodes( EntityType parent, int sub_dimension )
             test_sub_entity_nodes( parent, num_corner + num_edge + num_face, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + num_face + 1, sub_dimension );
             test_sub_entity_nodes( parent, num_corner + num_edge + num_face + 1, sub_dimension );
-	  if (2 <= dim) {
-            test_sub_entity_nodes( parent, num_corner + num_edge, sub_dimension );
-            test_sub_entity_nodes( parent, num_corner + num_edge + 1, sub_dimension );
-	  }
-	  if (1 <= dim) {	      
-            test_sub_entity_nodes( parent, num_corner, sub_dimension );
-            test_sub_entity_nodes( parent, num_corner + 1, sub_dimension );
-	  }
+            if( 2 <= dim )
+            {
+                test_sub_entity_nodes( parent, num_corner + num_edge, sub_dimension );
+                test_sub_entity_nodes( parent, num_corner + num_edge + 1, sub_dimension );
+            }
+            if( 1 <= dim )
+            {
+                test_sub_entity_nodes( parent, num_corner, sub_dimension );
+                test_sub_entity_nodes( parent, num_corner + 1, sub_dimension );
+            }
             break;
         default:
             CHECK( false );
@@ -1240,61 +1242,61 @@ void test_wedges()
         moab::EntityHandle h;
         mb.create_vertex( coords, h );
     }
-    moab::EntityHandle conn1[15] = { 10, 20, 14, 1, 8, 5, 21, 19, 15, 16, 22, 18, 9, 7, 6};
-    moab::EntityHandle conn2[15] = { 10, 14, 12, 1, 5, 3, 15, 13, 11, 16, 18, 17, 6, 4, 2};
+    moab::EntityHandle conn1[15] = { 10, 20, 14, 1, 8, 5, 21, 19, 15, 16, 22, 18, 9, 7, 6 };
+    moab::EntityHandle conn2[15] = { 10, 14, 12, 1, 5, 3, 15, 13, 11, 16, 18, 17, 6, 4, 2 };
 
     moab::EntityHandle w;
     mb.create_element( moab::MBPRISM, conn1, 15, w );
     mb.create_element( moab::MBPRISM, conn2, 15, w );
 
-    std::vector<moab::EntityHandle> wedges;
-    mb.get_entities_by_dimension(0, 3, wedges);
+    std::vector< moab::EntityHandle > wedges;
+    mb.get_entities_by_dimension( 0, 3, wedges );
 
     // > If I comment this block there is no problem
-    for (const auto &w : wedges) {
-        std::vector<moab::EntityHandle> adj;
-        mb.get_adjacencies(&w, 1, 2, true, adj);
-        CHECK( 5 == adj.size());
+    for( const auto& w : wedges )
+    {
+        std::vector< moab::EntityHandle > adj;
+        mb.get_adjacencies( &w, 1, 2, true, adj );
+        CHECK( 5 == adj.size() );
     }
     // <
 
-    for (const auto &w : wedges) {
-        std::vector<moab::EntityHandle> conn;
-        mb.get_connectivity(&w, 1, conn);
-        CHECK( 15 == conn.size());
-        for (const auto &n : conn) {
-            std::vector<moab::EntityHandle> edges;
-            mb.get_adjacencies(&n, 1, 1, true, edges);
-            if (edges.size() == 0)
+    for( const auto& w : wedges )
+    {
+        std::vector< moab::EntityHandle > conn;
+        mb.get_connectivity( &w, 1, conn );
+        CHECK( 15 == conn.size() );
+        for( const auto& n : conn )
+        {
+            std::vector< moab::EntityHandle > edges;
+            mb.get_adjacencies( &n, 1, 1, true, edges );
+            if( edges.size() == 0 )
             {
                 std::cout << " node " << n << " not connected to edges \n";
-                std::vector<moab::EntityHandle> faces;
-                mb.get_adjacencies(&n, 1, 2, false, faces);
-                for (const auto &f : faces)
+                std::vector< moab::EntityHandle > faces;
+                mb.get_adjacencies( &n, 1, 2, false, faces );
+                for( const auto& f : faces )
                 {
-                    std::vector<moab::EntityHandle> connf;
-                    mb.get_connectivity(&f, 1, connf);
-                    std::cout << "face:" << mb.id_from_handle(f);
-                    for (const auto &n1 : connf)
-                        std::cout <<" " << n1 ;
-                    std::cout <<"\n";
-
+                    std::vector< moab::EntityHandle > connf;
+                    mb.get_connectivity( &f, 1, connf );
+                    std::cout << "face:" << mb.id_from_handle( f );
+                    for( const auto& n1 : connf )
+                        std::cout << " " << n1;
+                    std::cout << "\n";
                 }
-                std::vector<moab::EntityHandle> prisms;
-                mb.get_adjacencies(&n, 1, 3, false, prisms);
-                for (const auto &p : prisms)
+                std::vector< moab::EntityHandle > prisms;
+                mb.get_adjacencies( &n, 1, 3, false, prisms );
+                for( const auto& p : prisms )
                 {
-                    std::vector<moab::EntityHandle> connf;
-                    mb.get_connectivity(&p, 1, connf);
-                    std::cout << "prism:" << mb.id_from_handle(p);
-                    for (const auto &n1 : connf)
-                        std::cout <<" " << n1 ;
-                    std::cout <<"\n";
-
+                    std::vector< moab::EntityHandle > connf;
+                    mb.get_connectivity( &p, 1, connf );
+                    std::cout << "prism:" << mb.id_from_handle( p );
+                    for( const auto& n1 : connf )
+                        std::cout << " " << n1;
+                    std::cout << "\n";
                 }
-                CHECK(edges.size() != 0);
+                CHECK( edges.size() != 0 );
             }
         }
     }
-
 }

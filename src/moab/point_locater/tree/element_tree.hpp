@@ -324,7 +324,10 @@ class Element_tree
             // looks like: [x_1 = 00 | x_2 = 00 | .. | z_1 = 00 | z_2 = 00]
             // two bits, left = 00, middle = 01, right = 10
             const int index = 4 * dim + 2 * iteration;
-            if( on_left ) { split_data.sizes[0]++; }
+            if( on_left )
+            {
+                split_data.sizes[0]++;
+            }
             else if( in_middle )
             {
                 split_data.sizes[1]++;
@@ -341,7 +344,10 @@ class Element_tree
 #ifdef ELEMENT_TREE_DEBUG
         std::size_t _count = std::accumulate( split_data.sizes.begin(), split_data.sizes.end(), 0 );
         std::size_t total  = std::distance( begin, end );
-        if( total != _count ) { std::cout << total << "vs. " << _count << std::endl; }
+        if( total != _count )
+        {
+            std::cout << total << "vs. " << _count << std::endl;
+        }
         std::cout << " left_line: " << left_line;
         std::cout << " right_line: " << right_line << std::endl;
         std::cout << "co/mputed partition size: ";
@@ -373,7 +379,10 @@ class Element_tree
             // the split line a bit and hope for the best..
             const double left_distance  = std::abs( data.left_line - data.split );
             const double right_distance = std::abs( data.right_line - data.split );
-            if( ( data.sizes[0] == 0 ) && ( data.sizes[2] != 0 ) ) { data.split += right_distance; }
+            if( ( data.sizes[0] == 0 ) && ( data.sizes[2] != 0 ) )
+            {
+                data.split += right_distance;
+            }
             else if( data.sizes[2] == 0 && data.sizes[0] != 0 )
             {
                 data.split -= left_distance;
@@ -458,8 +467,13 @@ class Element_tree
 #define MAX_DEPTH         30
 #define EPSILON           1e-1
     template < typename Iterator, typename Node_index, typename Directions, typename Partition_data >
-    void build_tree( Iterator begin, Iterator end, const Node_index node, const Directions& directions,
-                     Partition_data& _data, int& depth, const bool is_middle = false )
+    void build_tree( Iterator begin,
+                     Iterator end,
+                     const Node_index node,
+                     const Directions& directions,
+                     Partition_data& _data,
+                     int& depth,
+                     const bool is_middle = false )
     {
         std::size_t number_elements = std::distance( begin, end );
         if( depth < MAX_DEPTH && number_elements > ELEMENTS_PER_LEAF && ( !is_middle || directions.any() ) )
@@ -519,7 +533,10 @@ class Element_tree
             }
             depth = *std::max_element( depths.begin(), depths.end() );
         }
-        if( tree_[node].leaf() ) { common_tree::assign_entities( tree_[node].entities, begin, end ); }
+        if( tree_[node].leaf() )
+        {
+            common_tree::assign_entities( tree_[node].entities, begin, end );
+        }
     }
 
     template < typename Vector, typename Node_index, typename Result >
@@ -536,13 +553,19 @@ class Element_tree
                 if( common_tree::box_contains_point( i->first, point ) )
                 {
                     Return_type r = entity_contains( moab, i->second, point );
-                    if( r.first ) { result = std::make_pair( i->second, r.second ); }
+                    if( r.first )
+                    {
+                        result = std::make_pair( i->second, r.second );
+                    }
                     return result;
                 }
             }
             return Result( 0, point );
         }
-        if( point[node.dim] < node.left_line ) { return _find_point( point, node.left_, result ); }
+        if( point[node.dim] < node.left_line )
+        {
+            return _find_point( point, node.left_, result );
+        }
         else if( point[node.dim] > node.right_line )
         {
             return _find_point( point, node.right_, result );
@@ -550,8 +573,14 @@ class Element_tree
         else
         {
             Entity_handle middle = _find_point( point, node.middle_, result );
-            if( middle != 0 ) { return result; }
-            if( point[node.dim] < node.split ) { return _find_point( point, node.left_, result ); }
+            if( middle != 0 )
+            {
+                return result;
+            }
+            if( point[node.dim] < node.split )
+            {
+                return _find_point( point, node.left_, result );
+            }
             return _find_point( point, node.right_, result );
         }
     }

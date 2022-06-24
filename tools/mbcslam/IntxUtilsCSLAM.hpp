@@ -26,7 +26,9 @@ class IntxUtilsCSLAM
     static double slotted_cylinder_field( double lam, double tet, double* params );
 
     // More MBCSLAM specific API
-    static void departure_point_case1( moab::CartVect& arrival_point, double t, double delta_t,
+    static void departure_point_case1( moab::CartVect& arrival_point,
+                                       double t,
+                                       double delta_t,
                                        moab::CartVect& departure_point );
 
     static void velocity_case1( moab::CartVect& arrival_point, double t, moab::CartVect& velo );

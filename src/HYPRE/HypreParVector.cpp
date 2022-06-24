@@ -41,7 +41,9 @@ HypreParVector::HypreParVector( moab::ParallelComm* p_comm ) : pcomm( p_comm )
     initialized = size = gsize = rstart = rend = 0;
 }
 
-HypreParVector::HypreParVector( moab::ParallelComm* p_comm, HYPRE_Int glob_size, HYPRE_Int p_irstart,
+HypreParVector::HypreParVector( moab::ParallelComm* p_comm,
+                                HYPRE_Int glob_size,
+                                HYPRE_Int p_irstart,
                                 HYPRE_Int p_irend )
     : rstart( p_irstart ), rend( p_irend ), pcomm( p_comm )
 {
@@ -81,7 +83,10 @@ HypreParVector::HypreParVector( HypreParMatrix& A, int tr )
     pcomm = A.GetParallelCommunicator();
     int* part;
 
-    if( tr ) { part = A.ColPart(); }
+    if( tr )
+    {
+        part = A.ColPart();
+    }
     else
         part = A.RowPart();
 
@@ -139,7 +144,10 @@ HypreParVector& HypreParVector::operator=( const HypreParVector& y )
     rend   = y.rend;
     size   = y.size;
 
-    if( x ) { HYPRE_IJVectorDestroy( x ); }
+    if( x )
+    {
+        HYPRE_IJVectorDestroy( x );
+    }
 
     x             = y.x;
     x_par         = y.x_par;
@@ -222,7 +230,10 @@ void HypreParVector::Print( const char* fname ) const
 
 HypreParVector::~HypreParVector()
 {
-    if( own_ParVector ) { HYPRE_IJVectorDestroy( x ); }
+    if( own_ParVector )
+    {
+        HYPRE_IJVectorDestroy( x );
+    }
 }
 
 double HypreParVector::InnerProduct( HypreParVector& x, HypreParVector& y )

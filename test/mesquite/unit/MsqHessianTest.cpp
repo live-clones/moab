@@ -286,7 +286,9 @@ class MsqHessianTest : public CppUnit::TestFixture, public MBMesquite::MsqHessia
     }
 };
 
-void MsqHessianTest::accumulate_entries( const PatchData& pd, size_t elem_index, const Matrix3D* mat3d_array,
+void MsqHessianTest::accumulate_entries( const PatchData& pd,
+                                         size_t elem_index,
+                                         const Matrix3D* mat3d_array,
                                          MsqError& err )
 {
     const MsqMeshEntity& elem = pd.element_by_index( elem_index );

@@ -84,9 +84,15 @@ class Intx2Mesh
     // so, if you intersect 2 convex polygons with MAXEDGES , you will get a convex polygon
     // with 2*MAXEDGES, at most
     // will also return the number of nodes of tgt and src elements
-    virtual ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP,
-                                                           double& area, int markb[MAXEDGES], int markr[MAXEDGES],
-                                                           int& nsidesSrc, int& nsidesTgt,
+    virtual ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt,
+                                                           EntityHandle src,
+                                                           double* P,
+                                                           int& nP,
+                                                           double& area,
+                                                           int markb[MAXEDGES],
+                                                           int markr[MAXEDGES],
+                                                           int& nsidesSrc,
+                                                           int& nsidesTgt,
                                                            bool check_boxes_first = false ) = 0;
 
     // this is also abstract

@@ -92,15 +92,22 @@ class XYRectangle : public MBMesquite::MeshDomain
     void element_normal_at( MBMesquite::Mesh::ElementHandle entity_handle, MBMesquite::Vector3D& coordinate ) const;
 
     MESQUITE_EXPORT
-    void vertex_normal_at( const MBMesquite::Mesh::VertexHandle* handles, MBMesquite::Vector3D coordinates[],
-                           unsigned count, MBMesquite::MsqError& err ) const;
+    void vertex_normal_at( const MBMesquite::Mesh::VertexHandle* handles,
+                           MBMesquite::Vector3D coordinates[],
+                           unsigned count,
+                           MBMesquite::MsqError& err ) const;
 
     MESQUITE_EXPORT
-    void closest_point( MBMesquite::Mesh::VertexHandle handle, const MBMesquite::Vector3D& position,
-                        MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal, MBMesquite::MsqError& err ) const;
+    void closest_point( MBMesquite::Mesh::VertexHandle handle,
+                        const MBMesquite::Vector3D& position,
+                        MBMesquite::Vector3D& closest,
+                        MBMesquite::Vector3D& normal,
+                        MBMesquite::MsqError& err ) const;
 
     MESQUITE_EXPORT
-    void domain_DoF( const MBMesquite::Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_handles,
+    void domain_DoF( const MBMesquite::Mesh::VertexHandle* handle_array,
+                     unsigned short* dof_array,
+                     size_t num_handles,
                      MBMesquite::MsqError& err ) const;
 
   private:

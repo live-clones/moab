@@ -88,22 +88,22 @@ int main( int argc, char* argv[] )
     rval = mb.tag_get_handle( "Density", 1, moab::MB_TYPE_DOUBLE, rhoTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     moab::Tag rhoNodeTag = 0;
     rval                 = mb.tag_get_handle( "DensityNode", 1, moab::MB_TYPE_DOUBLE, rhoNodeTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
+                                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Create tag for cell area
     moab::Tag areaTag = 0;
     rval = mb.tag_get_handle( "Area", 1, moab::MB_TYPE_DOUBLE, areaTag, moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Create tag for cell barycenters in 3D Cartesian space
     moab::Tag barycenterTag = 0;
     rval                    = mb.tag_get_handle( "CellBarycenter", 3, moab::MB_TYPE_DOUBLE, barycenterTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
+                                                 moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Create tag for cell density reconstruction coefficients
     moab::Tag coefRhoTag = 0;
     rval                 = mb.tag_get_handle( "LinearCoefRho", 3, moab::MB_TYPE_DOUBLE, coefRhoTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
+                                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Create tag for index of gnomonic plane for each cell
     moab::Tag planeTag = 0;
     rval               = mb.tag_get_handle( "gnomonicPlane", 1, moab::MB_TYPE_INTEGER, planeTag,
-                              moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
+                                            moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );CHECK_ERR( rval );
     // Set density distributions
     rval = add_field_value( &mb, euler_set, rank, rhoNodeTag, rhoTag, areaTag, 2 );CHECK_ERR( rval );
     // get cell plane

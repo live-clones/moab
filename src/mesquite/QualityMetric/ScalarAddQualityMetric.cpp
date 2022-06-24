@@ -46,7 +46,9 @@ std::string ScalarAddQualityMetric::get_name() const
     return str.str();
 }
 
-void ScalarAddQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+void ScalarAddQualityMetric::get_evaluations( PatchData& pd,
+                                              std::vector< size_t >& handles,
+                                              bool free_vertices_only,
                                               MsqError& err )
 {
     mMetric->get_evaluations( pd, handles, free_vertices_only, err );MSQ_CHKERR( err );
@@ -59,16 +61,22 @@ bool ScalarAddQualityMetric::evaluate( PatchData& pd, size_t handle, double& val
     return rval;
 }
 
-bool ScalarAddQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >& indices, MsqError& err )
+bool ScalarAddQualityMetric::evaluate_with_indices( PatchData& pd,
+                                                    size_t handle,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    MsqError& err )
 {
     bool rval = mMetric->evaluate_with_indices( pd, handle, value, indices, err );
     value += mOffset;
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool ScalarAddQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                     std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+bool ScalarAddQualityMetric::evaluate_with_gradient( PatchData& pd,
+                                                     size_t handle,
+                                                     double& value,
+                                                     std::vector< size_t >& indices,
+                                                     std::vector< Vector3D >& gradient,
                                                      MsqError& err )
 {
     bool rval = mMetric->evaluate_with_gradient( pd, handle, value, indices, gradient, err );
@@ -76,9 +84,13 @@ bool ScalarAddQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handl
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool ScalarAddQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                    std::vector< Matrix3D >& Hessian, MsqError& err )
+bool ScalarAddQualityMetric::evaluate_with_Hessian( PatchData& pd,
+                                                    size_t handle,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    std::vector< Vector3D >& gradient,
+                                                    std::vector< Matrix3D >& Hessian,
+                                                    MsqError& err )
 {
     bool rval = mMetric->evaluate_with_Hessian( pd, handle, value, indices, gradient, Hessian, err );
     value += mOffset;

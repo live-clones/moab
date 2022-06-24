@@ -54,19 +54,22 @@ const int TIME_STR_LEN = 11;
 
 #define INS_ID( stringvar, prefix, id ) sprintf( stringvar, prefix, id )
 
-#define GET_DIM( ncdim, name, val )                                                                             \
-    {                                                                                                           \
-        int gdfail = nc_inq_dimid( ncFile, name, &( ncdim ) );                                                  \
-        if( NC_NOERR == gdfail )                                                                                \
-        {                                                                                                       \
-            size_t tmp_val;                                                                                     \
-            gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                                                  \
-            if( NC_NOERR != gdfail ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF:: couldn't get dimension length" ); } \
-            else                                                                                                \
-                ( val ) = tmp_val;                                                                              \
-        }                                                                                                       \
-        else                                                                                                    \
-            ( val ) = 0;                                                                                        \
+#define GET_DIM( ncdim, name, val )                                                    \
+    {                                                                                  \
+        int gdfail = nc_inq_dimid( ncFile, name, &( ncdim ) );                         \
+        if( NC_NOERR == gdfail )                                                       \
+        {                                                                              \
+            size_t tmp_val;                                                            \
+            gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                         \
+            if( NC_NOERR != gdfail )                                                   \
+            {                                                                          \
+                MB_SET_ERR( MB_FAILURE, "WriteNCDF:: couldn't get dimension length" ); \
+            }                                                                          \
+            else                                                                       \
+                ( val ) = tmp_val;                                                     \
+        }                                                                              \
+        else                                                                           \
+            ( val ) = 0;                                                               \
     }
 
 #define GET_DIMB( ncdim, name, varname, id, val ) \
@@ -164,9 +167,15 @@ void WriteNCDF::time_and_date( char* time_string, char* date_string )
     date_string[10] = (char)NULL;
 }
 
-ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwrite, const FileOptions& opts,
-                                 const EntityHandle* ent_handles, const int num_sets,
-                                 const std::vector< std::string >& qa_records, const Tag*, int, int user_dimension )
+ErrorCode WriteNCDF::write_file( const char* exodus_file_name,
+                                 const bool overwrite,
+                                 const FileOptions& opts,
+                                 const EntityHandle* ent_handles,
+                                 const int num_sets,
+                                 const std::vector< std::string >& qa_records,
+                                 const Tag*,
+                                 int,
+                                 int user_dimension )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 
@@ -281,7 +290,10 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
         std::vector< int > dims;
         GET_VAR( "time_whole", nc_var, dims );
         fail = nc_put_vara_double( ncFile, nc_var, &start, &count, &timev );
-        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing dist factor array" ); }
+        if( NC_NOERR != fail )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed writing dist factor array" );
+        }
     }
 
     if( write_nodes( mesh_info.num_nodes, mesh_info.nodes, mesh_info.num_dim ) != MB_SUCCESS )
@@ -341,12 +353,16 @@ ErrorCode WriteNCDF::write_file( const char* exodus_file_name, const bool overwr
     // mesh_info.qaRecords.swap(qa_records);
     // Close the file
     fail = nc_close( ncFile );
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble closing file" ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble closing file" );
+    }
 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
+ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info,
+                                              std::vector< MaterialSetData >& block_info,
                                               std::vector< NeumannSetData >& sideset_info,
                                               std::vector< DirichletSetData >& nodeset_info,
                                               std::vector< EntityHandle >& blocks,
@@ -404,7 +420,10 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
 
         // Find the dimension of the last entity in this range
         int this_dim = CN::Dimension( TYPE_FROM_HANDLE( dummy_range.back() ) );
-        if( this_dim > 3 ) { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Block " << id << " contains entity sets" ); }
+        if( this_dim > 3 )
+        {
+            MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Block " << id << " contains entity sets" );
+        }
         block_data.elements = dummy_range.subset_by_dimension( this_dim );
 
         // End of -- wait a minute, we are doing some filtering here that doesn't make sense at this
@@ -628,7 +647,9 @@ ErrorCode WriteNCDF::gather_mesh_information( ExodusMeshInfo& mesh_info, std::ve
     return MB_SUCCESS;
 }
 
-ErrorCode WriteNCDF::get_valid_sides( Range& elems, ExodusMeshInfo& /*mesh_info*/, const int sense,
+ErrorCode WriteNCDF::get_valid_sides( Range& elems,
+                                      ExodusMeshInfo& /*mesh_info*/,
+                                      const int sense,
                                       NeumannSetData& sideset_data )
 {
     // This is where we see if underlying element of side set element is included in output
@@ -752,7 +773,10 @@ ErrorCode WriteNCDF::write_qa_string( const char* string, int record_number, int
     std::vector< int > dims;
     int temp_var = -1;
     GET_VAR( "qa_records", temp_var, dims );
-    if( -1 == temp_var ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF:: Problem getting qa record variable" ); }
+    if( -1 == temp_var )
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF:: Problem getting qa record variable" );
+    }
     size_t count[3], start[3];
 
     // Write out the record
@@ -764,7 +788,10 @@ ErrorCode WriteNCDF::write_qa_string( const char* string, int record_number, int
     count[1] = 1;
     count[2] = (long)strlen( string ) + 1;
     int fail = nc_put_vara_text( ncFile, temp_var, start, count, string );
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed to position qa string variable" ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to position qa string variable" );
+    }
 
     return MB_SUCCESS;
 }
@@ -775,7 +802,10 @@ ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
     int nc_var = -1;
     std::vector< int > dims;
     GET_VAR( "coor_names", nc_var, dims );
-    if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Trouble getting coordinate name variable" ); }
+    if( -1 == nc_var )
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble getting coordinate name variable" );
+    }
 
     size_t start[2] = { 0, 0 }, count[2] = { 1, ExoIIInterface::MAX_STR_LENGTH };
     char dum_str[ExoIIInterface::MAX_STR_LENGTH];
@@ -858,19 +888,31 @@ ErrorCode WriteNCDF::write_nodes( int num_nodes, Range& nodes, int dimension )
     // Write the nodes
     nc_var = -1;
     GET_VAR( "coord", nc_var, dims );
-    if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Trouble getting coordinate variable" ); }
+    if( -1 == nc_var )
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble getting coordinate variable" );
+    }
     start[0] = 0;
     count[1] = num_nodes;
     fail     = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[0][0] ) );
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble writing x coordinate" ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble writing x coordinate" );
+    }
 
     start[0] = 1;
     fail     = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[1][0] ) );
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble writing y coordinate" ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble writing y coordinate" );
+    }
 
     start[0] = 2;
     fail     = nc_put_vara_double( ncFile, nc_var, start, count, &( coord_arrays[2][0] ) );
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Trouble writing z coordinate" ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Trouble writing z coordinate" );
+    }
 
     delete[] coord_arrays[0];
     delete[] coord_arrays[1];
@@ -959,9 +1001,11 @@ ErrorCode WriteNCDF::write_poly_faces( ExodusMeshInfo& mesh_info )
 
     return MB_SUCCESS;
 }
-ErrorCode WriteNCDF::write_header( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_info,
+ErrorCode WriteNCDF::write_header( ExodusMeshInfo& mesh_info,
+                                   std::vector< MaterialSetData >& block_info,
                                    std::vector< NeumannSetData >& sideset_info,
-                                   std::vector< DirichletSetData >& nodeset_info, const char* filename )
+                                   std::vector< DirichletSetData >& nodeset_info,
+                                   const char* filename )
 {
     // Get the date and time
     char time[TIME_STR_LEN];
@@ -1013,7 +1057,10 @@ ErrorCode WriteNCDF::write_elementblocks( ExodusMeshInfo& mesh_info, std::vector
         // Write out the block status
 
         int status = 1;
-        if( 0 == block.number_elements ) { MB_SET_ERR( MB_FAILURE, "No elements in block " << id ); }
+        if( 0 == block.number_elements )
+        {
+            MB_SET_ERR( MB_FAILURE, "No elements in block " << id );
+        }
 
         if( write_exodus_integer_variable( "eb_status", &status, block_index, num_values ) != MB_SUCCESS )
         {
@@ -1205,7 +1252,10 @@ ErrorCode WriteNCDF::write_global_node_order_map( int num_nodes, Range& nodes )
 
     if( map ) delete[] map;
 
-    if( error < 0 ) { MB_SET_ERR( MB_FAILURE, "Failed writing global node order map" ); }
+    if( error < 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed writing global node order map" );
+    }
 
     return MB_SUCCESS;
 }
@@ -1228,7 +1278,10 @@ ErrorCode WriteNCDF::write_global_element_order_map( int num_elements )
 
     if( map ) delete[] map;
 
-    if( error < 0 ) { MB_SET_ERR( MB_FAILURE, "Failed writing global element order map" ); }
+    if( error < 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed writing global element order map" );
+    }
 
     return MB_SUCCESS;
 }
@@ -1253,12 +1306,17 @@ ErrorCode WriteNCDF::write_element_order_map( int num_elements )
 
     if( map ) delete[] map;
 
-    if( error < 0 ) { MB_SET_ERR( MB_FAILURE, "Failed writing element map" ); }
+    if( error < 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed writing element map" );
+    }
 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, int* variable_array, int start_position,
+ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name,
+                                                    int* variable_array,
+                                                    int start_position,
                                                     int number_values )
 {
     // Note: this routine bypasses the standard exodusII interface for efficiency!
@@ -1281,7 +1339,10 @@ ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, i
     count[0] = number_values;
 
     int fail = NC_NOERR;
-    if( sizeof( int ) == sizeof( long ) ) { fail = nc_put_vara_int( ncFile, nc_var, start, count, variable_array ); }
+    if( sizeof( int ) == sizeof( long ) )
+    {
+        fail = nc_put_vara_int( ncFile, nc_var, start, count, variable_array );
+    }
     else
     {
         long* lptr = new long[number_values];
@@ -1291,7 +1352,10 @@ ErrorCode WriteNCDF::write_exodus_integer_variable( const char* variable_name, i
         delete[] lptr;
     }
 
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed to store variable " << variable_name ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to store variable " << variable_name );
+    }
 
     return MB_SUCCESS;
 }
@@ -1357,19 +1421,31 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
         std::vector< int > dims;
         INS_ID( wname, "node_ns%d", ns_index + 1 );
         GET_VAR( wname, nc_var, dims );
-        if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get node_ns variable" ); }
+        if( -1 == nc_var )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to get node_ns variable" );
+        }
 
         size_t start = 0, count = number_nodes;
         int fail = nc_put_vara_int( ncFile, nc_var, &start, &count, exodus_id_array );
-        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing exodus id array" ); }
+        if( NC_NOERR != fail )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed writing exodus id array" );
+        }
 
         // Write out nodeset distribution factors
         INS_ID( wname, "dist_fact_ns%d", ns_index + 1 );
         nc_var = -1;
         GET_VAR( wname, nc_var, dims );
-        if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get dist_fact variable" ); }
+        if( -1 == nc_var )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to get dist_fact variable" );
+        }
         fail = nc_put_vara_double( ncFile, nc_var, &start, &count, dist_factor_array );
-        if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing dist factor array" ); }
+        if( NC_NOERR != fail )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed writing dist factor array" );
+        }
 
         delete[] dist_factor_array;
         delete[] exodus_id_array;
@@ -1444,25 +1520,43 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
             std::vector< int > dims;
             INS_ID( wname, "elem_ss%d", ss_index );
             GET_VAR( wname, nc_var, dims );
-            if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get elem_ss variable" ); }
+            if( -1 == nc_var )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed to get elem_ss variable" );
+            }
             size_t start = 0, count = number_elements;
             int fail = nc_put_vara_int( ncFile, nc_var, &start, &count, output_element_ids );
-            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing sideset element array" ); }
+            if( NC_NOERR != fail )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed writing sideset element array" );
+            }
 
             INS_ID( wname, "side_ss%d", ss_index );
             nc_var = -1;
             GET_VAR( wname, nc_var, dims );
-            if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get side_ss variable" ); }
+            if( -1 == nc_var )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed to get side_ss variable" );
+            }
             fail = nc_put_vara_int( ncFile, nc_var, &start, &count, output_element_side_numbers );
-            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing sideset side array" ); }
+            if( NC_NOERR != fail )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed writing sideset side array" );
+            }
 
             INS_ID( wname, "dist_fact_ss%d", ss_index );
             nc_var = -1;
             GET_VAR( wname, nc_var, dims );
-            if( -1 == nc_var ) { MB_SET_ERR( MB_FAILURE, "Failed to get sideset dist factors variable" ); }
+            if( -1 == nc_var )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed to get sideset dist factors variable" );
+            }
             count = sideset_data.ss_dist_factors.size();
             fail  = nc_put_vara_double( ncFile, nc_var, &start, &count, &( sideset_data.ss_dist_factors[0] ) );
-            if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Failed writing sideset dist factors array" ); }
+            if( NC_NOERR != fail )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed writing sideset dist factors array" );
+            }
         }
 
         delete[] output_element_ids;
@@ -1472,10 +1566,13 @@ ErrorCode WriteNCDF::write_BCs( std::vector< NeumannSetData >& sidesets, std::ve
     return MB_SUCCESS;
 }
 
-ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vector< MaterialSetData >& block_data,
+ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info,
+                                             std::vector< MaterialSetData >& block_data,
                                              std::vector< NeumannSetData >& sideset_data,
-                                             std::vector< DirichletSetData >& nodeset_data, const char* title_string,
-                                             bool write_maps, bool /* write_sideset_distribution_factors */ )
+                                             std::vector< DirichletSetData >& nodeset_data,
+                                             const char* title_string,
+                                             bool write_maps,
+                                             bool /* write_sideset_distribution_factors */ )
 {
     // This routine takes the place of the exodusii routine ex_put_init,
     // and additionally pre-defines variables such as qa, element blocks,
@@ -1936,7 +2033,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     int ns_idstat = -1, ns_idarr = -1;
     if( non_empty_nss > 0 )
     {
-        if( nc_def_dim( ncFile, "num_node_sets", ( size_t )( non_empty_nss ), &num_ns ) != NC_NOERR )
+        if( nc_def_dim( ncFile, "num_node_sets", (size_t)( non_empty_nss ), &num_ns ) != NC_NOERR )
         {
             MB_SET_ERR( MB_FAILURE, "WriteNCDF: failed to define number of node sets" );
         }
@@ -2158,7 +2255,10 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     }
 
     // Take it out of define mode
-    if( NC_NOERR != nc_enddef( ncFile ) ) { MB_SET_ERR( MB_FAILURE, "WriteNCDF: Trouble leaving define mode" ); }
+    if( NC_NOERR != nc_enddef( ncFile ) )
+    {
+        MB_SET_ERR( MB_FAILURE, "WriteNCDF: Trouble leaving define mode" );
+    }
 
     return MB_SUCCESS;
 }
@@ -2166,17 +2266,25 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
 ErrorCode WriteNCDF::open_file( const char* filename )
 {
     // Not a valid filename
-    if( strlen( (const char*)filename ) == 0 ) { MB_SET_ERR( MB_FAILURE, "Output Exodus filename not specified" ); }
+    if( strlen( (const char*)filename ) == 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Output Exodus filename not specified" );
+    }
 
     int fail = nc_create( filename, NC_CLOBBER, &ncFile );
 
     // File couldn't be opened
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Cannot open " << filename ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Cannot open " << filename );
+    }
 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteNCDF::get_sideset_elems( EntityHandle sideset, int current_sense, Range& forward_elems,
+ErrorCode WriteNCDF::get_sideset_elems( EntityHandle sideset,
+                                        int current_sense,
+                                        Range& forward_elems,
                                         Range& reverse_elems )
 {
     Range ss_elems, ss_meshsets;

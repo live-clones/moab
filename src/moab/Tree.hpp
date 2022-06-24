@@ -63,8 +63,9 @@ class Tree
      * \param opts Options for tree (see function description)
      * \return Error is returned only on build failure
      */
-    virtual ErrorCode build_tree( const Range& entities, EntityHandle* tree_root_set = NULL,
-                                  FileOptions* options = NULL ) = 0;
+    virtual ErrorCode build_tree( const Range& entities,
+                                  EntityHandle* tree_root_set = NULL,
+                                  FileOptions* options        = NULL ) = 0;
 
     /** \brief Get bounding box for tree below tree_node, or entire tree
      * If no tree has been built yet, returns +/- DBL_MAX for all dimensions.  Note for some tree
@@ -105,9 +106,13 @@ class Tree
      * \param start_node Start from this tree node (non-NULL) instead of tree root (NULL)
      * \return Non-success returned only in case of failure; not-found indicated by leaf_out=0
      */
-    virtual ErrorCode point_search( const double* point, EntityHandle& leaf_out, const double iter_tol = 1.0e-10,
-                                    const double inside_tol = 1.0e-6, bool* multiple_leaves = NULL,
-                                    EntityHandle* start_node = NULL, CartVect* params = NULL ) = 0;
+    virtual ErrorCode point_search( const double* point,
+                                    EntityHandle& leaf_out,
+                                    const double iter_tol    = 1.0e-10,
+                                    const double inside_tol  = 1.0e-6,
+                                    bool* multiple_leaves    = NULL,
+                                    EntityHandle* start_node = NULL,
+                                    CartVect* params         = NULL ) = 0;
 
     /** \brief Find all leaves within a given distance from point
      * If dists_out input non-NULL, also returns distances from each leaf; if
@@ -124,9 +129,12 @@ class Tree
      * \param params_out If non-NULL, will contain parameters of the point in the ents in leaves_out
      * \param start_node Start from this tree node (non-NULL) instead of tree root (NULL)
      */
-    virtual ErrorCode distance_search( const double* point, const double distance,
-                                       std::vector< EntityHandle >& leaves_out, const double iter_tol = 1.0e-10,
-                                       const double inside_tol = 1.0e-6, std::vector< double >* dists_out = NULL,
+    virtual ErrorCode distance_search( const double* point,
+                                       const double distance,
+                                       std::vector< EntityHandle >& leaves_out,
+                                       const double iter_tol               = 1.0e-10,
+                                       const double inside_tol             = 1.0e-6,
+                                       std::vector< double >* dists_out    = NULL,
                                        std::vector< CartVect >* params_out = NULL,
                                        EntityHandle* start_node            = NULL ) = 0;
 
@@ -265,7 +273,9 @@ inline ErrorCode Tree::get_bounding_box( BoundBox& box, EntityHandle* tree_node 
         return MB_FAILURE;
 }
 
-inline ErrorCode Tree::get_info( EntityHandle /* root */, double* /*min[3]*/, double* /* max[3]*/,
+inline ErrorCode Tree::get_info( EntityHandle /* root */,
+                                 double* /*min[3]*/,
+                                 double* /* max[3]*/,
                                  unsigned int& /*dep*/ )
 {
     return MB_NOT_IMPLEMENTED;

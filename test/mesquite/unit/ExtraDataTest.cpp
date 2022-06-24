@@ -101,7 +101,9 @@ class TestExtraData : public MBMesquite::ExtraData
 
     virtual void notify_patch_destroyed();
     virtual void notify_new_patch();
-    virtual void notify_sub_patch( PatchData& sub_patch, const size_t* vertex_map, const size_t* element_map,
+    virtual void notify_sub_patch( PatchData& sub_patch,
+                                   const size_t* vertex_map,
+                                   const size_t* element_map,
                                    MsqError& err );
 
     std::vector< size_t > vertexMap, elementMap;

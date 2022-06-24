@@ -59,7 +59,9 @@ bool TInverseMeanRatio::evaluate( const MsqMatrix< 2, 2 >& T, double& result, Ms
     }
 }
 
-bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 2, 2 >& T,
+                                            double& result,
+                                            MsqMatrix< 2, 2 >& deriv_wrt_T,
                                             MsqError& err )
 {
     const double d = det( T );
@@ -81,8 +83,11 @@ bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& 
     }
 }
 
-bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& dA,
-                                            MsqMatrix< 2, 2 > d2A[3], MsqError& err )
+bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 2, 2 >& T,
+                                            double& result,
+                                            MsqMatrix< 2, 2 >& dA,
+                                            MsqMatrix< 2, 2 > d2A[3],
+                                            MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )
@@ -140,7 +145,9 @@ bool TInverseMeanRatio::evaluate( const MsqMatrix< 3, 3 >& T, double& result, Ms
     }
 }
 
-bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 3, 3 >& T,
+                                            double& result,
+                                            MsqMatrix< 3, 3 >& deriv_wrt_T,
                                             MsqError& err )
 {
     const double d = det( T );
@@ -163,8 +170,11 @@ bool TInverseMeanRatio::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& 
     return true;
 }
 
-bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& dA,
-                                            MsqMatrix< 3, 3 > d2A[6], MsqError& err )
+bool TInverseMeanRatio::evaluate_with_hess( const MsqMatrix< 3, 3 >& T,
+                                            double& result,
+                                            MsqMatrix< 3, 3 >& dA,
+                                            MsqMatrix< 3, 3 > d2A[6],
+                                            MsqError& err )
 {
     const double d = det( T );
     if( invalid_determinant( d ) )

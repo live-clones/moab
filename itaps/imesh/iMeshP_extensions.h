@@ -27,9 +27,15 @@ void iMeshP_getCommunicator( iMesh_Instance instance, int* fcomm, MPI_Comm* ccom
  *
  *  COMMUNICATION:  Collective.
  */
-void iMeshP_assignGlobalIds( iMesh_Instance instance, const iMeshP_PartitionHandle partition,
-                             const iBase_EntitySetHandle this_set, const int dimension, const int start_id,
-                             const int largest_dim_only, const int parallel, const int owned_only, int* err );
+void iMeshP_assignGlobalIds( iMesh_Instance instance,
+                             const iMeshP_PartitionHandle partition,
+                             const iBase_EntitySetHandle this_set,
+                             const int dimension,
+                             const int start_id,
+                             const int largest_dim_only,
+                             const int parallel,
+                             const int owned_only,
+                             int* err );
 
 #ifdef __cplusplus
 }

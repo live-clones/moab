@@ -52,8 +52,11 @@ LaplaceWrapper::LaplaceWrapper()
 
 LaplaceWrapper::~LaplaceWrapper() {}
 
-void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                                  QualityAssessor* qa, MsqError& err )
+void LaplaceWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                                  ParallelMesh* pmesh,
+                                  Settings* settings,
+                                  QualityAssessor* qa,
+                                  MsqError& err )
 {
     if( maxTime <= 0.0 && movementFactor <= 0.0 && iterationLimit <= 0 )
     {

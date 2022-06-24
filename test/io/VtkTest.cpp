@@ -438,7 +438,7 @@ bool test_structured_points_2d()
                         "DIMENSIONS 4 4 1\n"
                         "ORIGIN 0 0 0\n"
                         "SPACING 1 1 1\n";
-    bool rval1 = test_structured_2d( file );
+    bool rval1        = test_structured_2d( file );
 
     // test again w/ old 1.0 ASPECT_RATIO keyword
     const char file2[] = "# vtk DataFile Version 3.0\n"
@@ -448,7 +448,7 @@ bool test_structured_points_2d()
                          "DIMENSIONS 4 4 1\n"
                          "ORIGIN 0 0 0\n"
                          "ASPECT_RATIO 1 1 1\n";
-    bool rval2 = test_structured_2d( file2 );
+    bool rval2         = test_structured_2d( file2 );
 
     return rval1 && rval2;
 }
@@ -509,7 +509,7 @@ bool test_structured_grid_2d()
                       "DATASET STRUCTURED_GRID\n"
                       "DIMENSIONS 4 4 1\n"
                       "POINTS 16 double\n";
-    int len = strlen( file );
+    int len         = strlen( file );
     for( unsigned i = 0; i < 16; ++i )
         len += sprintf( file + len, "%f %f %f\n", grid_3x3[3 * i], grid_3x3[3 * i + 1], grid_3x3[3 * i + 2] );
 
@@ -953,7 +953,7 @@ bool test_read_write_element( const double* coords,
                       "MOAB Version 1.00\n"
                       "ASCII\n"
                       "DATASET UNSTRUCTURED_GRID\n";
-    size_t len = strlen( file );
+    size_t len      = strlen( file );
 
     len += sprintf( file + len, "POINTS %u double\n", num_verts );
     for( unsigned i = 0; i < num_verts; ++i )

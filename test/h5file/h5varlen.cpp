@@ -296,14 +296,14 @@ void test_global_value_common( bool mesh_value )
     void* default_val    = mesh_value ? 0 : handles;
     int default_val_size = mesh_value ? 0 : 3;
     rval                 = mb.tag_get_handle( "handle_tag", default_val_size, MB_TYPE_HANDLE, handle_tag,
-                              MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
+                                              MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
 
     // create tag to hold vertex coordinates
     Tag coord_tag    = 0;
     default_val      = mesh_value ? 0 : coords;
     default_val_size = mesh_value ? 0 : 9;
     rval             = mb.tag_get_handle( "coord_tag", default_val_size, MB_TYPE_DOUBLE, coord_tag,
-                              MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
+                                          MB_TAG_SPARSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
 
     // if doing mesh tag, set it
     if( mesh_value )
@@ -400,7 +400,7 @@ void test_global_opaque_common( bool mesh_value )
     const void* default_val = mesh_value ? 0 : data;
     int default_val_size    = mesh_value ? 0 : datalen;
     rval                    = mb.tag_get_handle( "opaque_tag", default_val_size, MB_TYPE_OPAQUE, tag,
-                              MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
+                                                 MB_TAG_DENSE | MB_TAG_VARLEN | MB_TAG_EXCL, default_val );CHECK_ERR( rval );
 
     // if doing mesh tag, set it
     if( mesh_value )

@@ -78,7 +78,7 @@ inline EntityHandle FIRST_HANDLE( unsigned type )
 
 inline EntityHandle LAST_HANDLE( unsigned type )
 {
-    return ( ( EntityHandle )( type + 1 ) << MB_ID_WIDTH ) - 1;
+    return ( (EntityHandle)( type + 1 ) << MB_ID_WIDTH ) - 1;
 }
 
 //! Get the entity id out of the handle.

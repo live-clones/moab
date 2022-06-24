@@ -54,10 +54,11 @@
  * or later.
  */
 #ifdef __cplusplus
-namespace moab { 
-# define MOAB_ENTITY_TYPE_NAME EntityType
-# else /* __cplusplus */
-# define MOAB_ENTITY_TYPE_NAME MBEntityType
+namespace moab
+{
+#define MOAB_ENTITY_TYPE_NAME EntityType
+#else /* __cplusplus */
+#define MOAB_ENTITY_TYPE_NAME MBEntityType
 #endif /* __cplusplus */
 
 /*! Entity types defined in MOAB and MBCN
@@ -67,49 +68,49 @@ namespace moab {
  */
 enum MOAB_ENTITY_TYPE_NAME
 {
-  MBVERTEX = 0, /**< Mesh Vertex AKA node */
-  MBEDGE,       /**< Mesh Edge */
-  MBTRI,        /**< Triangular element (including shells) */
-  MBQUAD,       /**< Quadrilateral element (including shells) */
-  MBPOLYGON,    /**< Polygon */
-  MBTET,        /**< Tetrahedral element */
-  MBPYRAMID,    /**< Pyramid element (where are the face ids for this defined?) */
-  MBPRISM,      /**< Wedge element (Exodus has one, Cubit doesn't. Does Mesh need it?) */
-  MBKNIFE,      /**< Knife element */
-  MBHEX,        /**< Hexahedral element */
-  MBPOLYHEDRON, /**< Polyhedron */
-  MBENTITYSET,    /**< MeshSet */
-  MBMAXTYPE  /**< Just a place keeper - must be the # of entities, for array */
+    MBVERTEX = 0, /**< Mesh Vertex AKA node */
+    MBEDGE,       /**< Mesh Edge */
+    MBTRI,        /**< Triangular element (including shells) */
+    MBQUAD,       /**< Quadrilateral element (including shells) */
+    MBPOLYGON,    /**< Polygon */
+    MBTET,        /**< Tetrahedral element */
+    MBPYRAMID,    /**< Pyramid element (where are the face ids for this defined?) */
+    MBPRISM,      /**< Wedge element (Exodus has one, Cubit doesn't. Does Mesh need it?) */
+    MBKNIFE,      /**< Knife element */
+    MBHEX,        /**< Hexahedral element */
+    MBPOLYHEDRON, /**< Polyhedron */
+    MBENTITYSET,  /**< MeshSet */
+    MBMAXTYPE     /**< Just a place keeper - must be the # of entities, for array */
     /**< dimensioning purposes  */
 };
 
 #ifdef __cplusplus
 /** prefix increment operator for MBEntityType */
-inline MOAB_ENTITY_TYPE_NAME & operator++(MOAB_ENTITY_TYPE_NAME &type)
+inline MOAB_ENTITY_TYPE_NAME& operator++( MOAB_ENTITY_TYPE_NAME& type )
 {
-  return type = static_cast<MOAB_ENTITY_TYPE_NAME>(type+1);
+    return type = static_cast< MOAB_ENTITY_TYPE_NAME >( type + 1 );
 }
 
 /** postfix increment operator for MBEntityType */
-inline MOAB_ENTITY_TYPE_NAME operator++(MOAB_ENTITY_TYPE_NAME &type, int)
+inline MOAB_ENTITY_TYPE_NAME operator++( MOAB_ENTITY_TYPE_NAME& type, int )
 {
-  MOAB_ENTITY_TYPE_NAME oldval = type;
-  ++type;
-  return oldval;
+    MOAB_ENTITY_TYPE_NAME oldval = type;
+    ++type;
+    return oldval;
 }
 
 /** prefix increment operator for MBEntityType */
-inline MOAB_ENTITY_TYPE_NAME & operator--(MOAB_ENTITY_TYPE_NAME &type)
+inline MOAB_ENTITY_TYPE_NAME& operator--( MOAB_ENTITY_TYPE_NAME& type )
 {
-  return type = static_cast<MOAB_ENTITY_TYPE_NAME>(type-1);
+    return type = static_cast< MOAB_ENTITY_TYPE_NAME >( type - 1 );
 }
 
 /** postfix increment operator for MBEntityType */
-inline MOAB_ENTITY_TYPE_NAME operator--(MOAB_ENTITY_TYPE_NAME &type, int)
+inline MOAB_ENTITY_TYPE_NAME operator--( MOAB_ENTITY_TYPE_NAME& type, int )
 {
-  MOAB_ENTITY_TYPE_NAME oldval = type;
-  --type;
-  return oldval;
+    MOAB_ENTITY_TYPE_NAME oldval = type;
+    --type;
+    return oldval;
 }
 
 } /* namespace moab*/
@@ -119,26 +120,26 @@ inline MOAB_ENTITY_TYPE_NAME operator--(MOAB_ENTITY_TYPE_NAME &type, int)
 #endif /* MB_ENTITY_TYPE_H */
 
 #ifdef __cplusplus
-#  ifndef MOAB_ENTITY_TYPE_NS_ONLY
-#    define MOAB_ENTITY_TYPE_NS_ONLY
-     typedef moab::EntityType MBEntityType;
-     using moab::MBVERTEX;
-     using moab::MBEDGE;
-     using moab::MBTRI;
-     using moab::MBQUAD;
-     using moab::MBPOLYGON;
-     using moab::MBTET;
-     using moab::MBPYRAMID;
-     using moab::MBPRISM;
-     using moab::MBKNIFE;
-     using moab::MBHEX;
-     using moab::MBPOLYHEDRON;
-     using moab::MBENTITYSET;
-     using moab::MBMAXTYPE;
-#  endif /* MOAB_ENTITY_TYPE_NS_ONLY */
-#else /* __cplusplus */
-#  ifndef MOAB_ENTITY_TYPE_C
-#    define MOAB_ENTITY_TYPE_C
-     typedef enum MBEntityType MBEntityType;
-#  endif /* MOAB_ENTITY_TYPE_C */
+#ifndef MOAB_ENTITY_TYPE_NS_ONLY
+#define MOAB_ENTITY_TYPE_NS_ONLY
+typedef moab::EntityType MBEntityType;
+using moab::MBEDGE;
+using moab::MBENTITYSET;
+using moab::MBHEX;
+using moab::MBKNIFE;
+using moab::MBMAXTYPE;
+using moab::MBPOLYGON;
+using moab::MBPOLYHEDRON;
+using moab::MBPRISM;
+using moab::MBPYRAMID;
+using moab::MBQUAD;
+using moab::MBTET;
+using moab::MBTRI;
+using moab::MBVERTEX;
+#endif /* MOAB_ENTITY_TYPE_NS_ONLY */
+#else  /* __cplusplus */
+#ifndef MOAB_ENTITY_TYPE_C
+#define MOAB_ENTITY_TYPE_C
+typedef enum MBEntityType MBEntityType;
+#endif /* MOAB_ENTITY_TYPE_C */
 #endif /* __cplusplus */

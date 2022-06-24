@@ -103,8 +103,11 @@ void UntangleWrapper::set_vertex_movement_limit_factor( double f )
     movementFactor = f;
 }
 
-void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                                   QualityAssessor* qa, MsqError& err )
+void UntangleWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                                   ParallelMesh* pmesh,
+                                   Settings* settings,
+                                   QualityAssessor* qa,
+                                   MsqError& err )
 {
     Instruction::initialize_vertex_byte( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 

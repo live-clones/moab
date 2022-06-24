@@ -43,7 +43,9 @@ void ElementQM::get_evaluations( PatchData& pd, std::vector< size_t >& handles, 
     get_element_evaluations( pd, handles, free_vertices_only, err );
 }
 
-void ElementQM::get_element_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+void ElementQM::get_element_evaluations( PatchData& pd,
+                                         std::vector< size_t >& handles,
+                                         bool free_vertices_only,
                                          MsqError& /*err*/ )
 {
     size_t num_elem = pd.num_elements();
@@ -69,7 +71,10 @@ void ElementQM::get_element_evaluations( PatchData& pd, std::vector< size_t >& h
     }
 }
 
-bool ElementQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+bool ElementQM::evaluate_with_indices( PatchData& pd,
+                                       size_t handle,
+                                       double& value,
+                                       std::vector< size_t >& indices,
                                        MsqError& err )
 {
     const MsqMeshEntity& elem = pd.element_by_index( handle );

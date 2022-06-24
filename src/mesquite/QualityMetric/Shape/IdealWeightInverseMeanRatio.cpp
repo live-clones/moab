@@ -198,8 +198,11 @@ bool IdealWeightInverseMeanRatio::evaluate( PatchData& pd, size_t handle, double
     return true;
 }
 
-bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t handle, double& m,
-                                                          std::vector< size_t >& indices, std::vector< Vector3D >& g,
+bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd,
+                                                          size_t handle,
+                                                          double& m,
+                                                          std::vector< size_t >& indices,
+                                                          std::vector< Vector3D >& g,
                                                           MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
@@ -336,10 +339,13 @@ bool IdealWeightInverseMeanRatio::evaluate_with_gradient( PatchData& pd, size_t 
     return true;
 }
 
-bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& m,
+bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                                  size_t handle,
+                                                                  double& m,
                                                                   std::vector< size_t >& indices,
                                                                   std::vector< Vector3D >& g,
-                                                                  std::vector< SymMatrix3D >& h, MsqError& err )
+                                                                  std::vector< SymMatrix3D >& h,
+                                                                  MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
     EntityTopology topo    = e->get_element_type();
@@ -499,9 +505,13 @@ bool IdealWeightInverseMeanRatio::evaluate_with_Hessian_diagonal( PatchData& pd,
     return true;
 }
 
-bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd, size_t handle, double& m,
-                                                         std::vector< size_t >& indices, std::vector< Vector3D >& g,
-                                                         std::vector< Matrix3D >& h, MsqError& err )
+bool IdealWeightInverseMeanRatio::evaluate_with_Hessian( PatchData& pd,
+                                                         size_t handle,
+                                                         double& m,
+                                                         std::vector< size_t >& indices,
+                                                         std::vector< Vector3D >& g,
+                                                         std::vector< Matrix3D >& h,
+                                                         MsqError& err )
 {
     const MsqMeshEntity* e = &pd.element_by_index( handle );
     EntityTopology topo    = e->get_element_type();

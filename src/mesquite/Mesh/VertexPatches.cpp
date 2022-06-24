@@ -65,8 +65,10 @@ void VertexPatches::get_patch_handles( std::vector< PatchHandle >& patch_handles
     }
 }
 
-void VertexPatches::get_patch( PatchHandle patch_handle, std::vector< Mesh::ElementHandle >& elem_handles_out,
-                               std::vector< Mesh::VertexHandle >& free_vertices_out, MsqError& err )
+void VertexPatches::get_patch( PatchHandle patch_handle,
+                               std::vector< Mesh::ElementHandle >& elem_handles_out,
+                               std::vector< Mesh::VertexHandle >& free_vertices_out,
+                               MsqError& err )
 {
     free_vertices_out.clear();
     elem_handles_out.clear();

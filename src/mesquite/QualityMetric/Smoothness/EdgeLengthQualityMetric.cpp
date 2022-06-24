@@ -52,8 +52,11 @@ int EdgeLengthQualityMetric::get_negate_flag() const
     return 1;
 }
 
-bool EdgeLengthQualityMetric::evaluate_common( PatchData& pd, size_t this_vert, double& fval,
-                                               std::vector< size_t >& adj_verts, MsqError& err )
+bool EdgeLengthQualityMetric::evaluate_common( PatchData& pd,
+                                               size_t this_vert,
+                                               double& fval,
+                                               std::vector< size_t >& adj_verts,
+                                               MsqError& err )
 {
     fval = 0.0;
     pd.get_adjacent_vertex_indices( this_vert, adj_verts, err );
@@ -76,8 +79,11 @@ bool EdgeLengthQualityMetric::evaluate( PatchData& pd, size_t vertex, double& va
     return !MSQ_CHKERR( err ) && rval;
 }
 
-bool EdgeLengthQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
-                                                     std::vector< size_t >& indices, MsqError& err )
+bool EdgeLengthQualityMetric::evaluate_with_indices( PatchData& pd,
+                                                     size_t vertex,
+                                                     double& value,
+                                                     std::vector< size_t >& indices,
+                                                     MsqError& err )
 {
     indices.clear();
     bool rval = evaluate_common( pd, vertex, value, indices, err );

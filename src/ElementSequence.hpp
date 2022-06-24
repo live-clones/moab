@@ -23,11 +23,15 @@ class ElementSequence : public EntitySequence
         return nodesPerElement;
     }
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        std::vector< EntityHandle >& connect,
                                         bool topological = false ) const = 0;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
-                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const = 0;
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        EntityHandle const*& connect,
+                                        int& connect_length,
+                                        bool topological                     = false,
+                                        std::vector< EntityHandle >* storage = 0 ) const = 0;
 
     virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length ) = 0;
 

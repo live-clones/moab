@@ -67,7 +67,10 @@ class LocalSizeQualityMetric : public VertexQM, public AveragingQM
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+    virtual bool evaluate_with_indices( PatchData& pd,
+                                        size_t handle,
+                                        double& value,
+                                        std::vector< size_t >& indices,
                                         MsqError& err );
 };
 

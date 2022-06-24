@@ -21,8 +21,13 @@ double find_angle( const moab::CartVect& A, const moab::CartVect& B )
 
 #define CHECK_EIGVECREAL_EQUAL( EXP, ACT, EPS ) \
     check_equal_eigvect( ( EXP ), ( ACT ), ( EPS ), #EXP, #ACT, __LINE__, __FILE__ )
-void check_equal_eigvect( const moab::CartVect& A, const moab::CartVect& B, double eps, const char* sA, const char* sB,
-                          int line, const char* file )
+void check_equal_eigvect( const moab::CartVect& A,
+                          const moab::CartVect& B,
+                          double eps,
+                          const char* sA,
+                          const char* sB,
+                          int line,
+                          const char* file )
 {
     check_equal( A.length(), B.length(), eps, sA, sB, line, file );
 

@@ -64,7 +64,9 @@ const CartVect rotax2   = CartVect( 1.0, 1.0, 0.0 ) * CartVect( 1.0, -1.0, 1.0 )
 const CartVect rotax[3] = { rotax0, rotax1, rotax2 };
 const OrientedBox rotbox_cv( rotax, origin );
 
-const Matrix3 rotaxes( rotax0, rotax1, rotax2,
+const Matrix3 rotaxes( rotax0,
+                       rotax1,
+                       rotax2,
                        false );  // so these are columns, as in the constructor that takes 3 "CartVect"s
 const OrientedBox rotbox( rotaxes, origin );
 

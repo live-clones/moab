@@ -596,8 +596,8 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset_async( std::vector< ReadNC:
                     {
                         EntityHandle starth     = pair_iter->first;
                         EntityHandle endh       = pair_iter->second;  // inclusive
-                        vdatas[i].readStarts[1] = ( NCDF_SIZE )( starth - 1 );
-                        vdatas[i].readCounts[1] = ( NCDF_SIZE )( endh - starth + 1 );
+                        vdatas[i].readStarts[1] = (NCDF_SIZE)( starth - 1 );
+                        vdatas[i].readCounts[1] = (NCDF_SIZE)( endh - starth + 1 );
 
                         // Do a partial read, in each subrange
                         // wait outside this loop
@@ -699,8 +699,8 @@ ErrorCode NCHelperGCRM::read_ucd_variables_to_nonset( std::vector< ReadNC::VarDa
                     {
                         EntityHandle starth = pair_iter->first;
                         EntityHandle endh = pair_iter->second;  // Inclusive
-                        vdatas[i].readStarts[1] = ( NCDF_SIZE )( starth - 1 );
-                        vdatas[i].readCounts[1] = ( NCDF_SIZE )( endh - starth + 1 );
+                        vdatas[i].readStarts[1] = (NCDF_SIZE)( starth - 1 );
+                        vdatas[i].readCounts[1] = (NCDF_SIZE)( endh - starth + 1 );
 
                         success = NCFUNCAG( _vara_double )( _fileId, vdatas[i].varId, &( vdatas[i].readStarts[0] ),
                                                             &( vdatas[i].readCounts[0] ),
@@ -904,8 +904,8 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     {
         EntityHandle starth  = pair_iter->first;
         EntityHandle endh    = pair_iter->second;
-        NCDF_SIZE read_start = ( NCDF_SIZE )( starth - 1 );
-        NCDF_SIZE read_count = ( NCDF_SIZE )( endh - starth + 1 );
+        NCDF_SIZE read_start = (NCDF_SIZE)( starth - 1 );
+        NCDF_SIZE read_count = (NCDF_SIZE)( endh - starth + 1 );
 
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
@@ -940,8 +940,8 @@ ErrorCode NCHelperGCRM::create_local_vertices( const std::vector< int >& vertice
     {
         EntityHandle starth  = pair_iter->first;
         EntityHandle endh    = pair_iter->second;
-        NCDF_SIZE read_start = ( NCDF_SIZE )( starth - 1 );
-        NCDF_SIZE read_count = ( NCDF_SIZE )( endh - starth + 1 );
+        NCDF_SIZE read_start = (NCDF_SIZE)( starth - 1 );
+        NCDF_SIZE read_count = (NCDF_SIZE)( endh - starth + 1 );
 
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
@@ -1121,7 +1121,8 @@ ErrorCode NCHelperGCRM::create_local_edges( EntityHandle start_vertex )
 }
 
 ErrorCode NCHelperGCRM::create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
-                                                   EntityHandle start_vertex, Range& faces )
+                                                   EntityHandle start_vertex,
+                                                   Range& faces )
 {
     Interface*& mbImpl = _readNC->mbImpl;
     Tag& mGlobalIdTag  = _readNC->mGlobalIdTag;

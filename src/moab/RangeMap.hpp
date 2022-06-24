@@ -153,7 +153,9 @@ class RangeMap
 
 template < typename KeyType, typename ValType, ValType NullVal >
 inline std::pair< typename RangeMap< KeyType, ValType, NullVal >::iterator, bool > RangeMap<
-    KeyType, ValType, NullVal >::insert( KeyType first_key, ValType first_val, KeyType count )
+    KeyType,
+    ValType,
+    NullVal >::insert( KeyType first_key, ValType first_val, KeyType count )
 {
     Range block                    = { first_key, count, first_val };
     typename RangeList::iterator i = std::lower_bound( data.begin(), data.end(), block );
@@ -292,7 +294,8 @@ inline bool RangeMap< KeyType, ValType, NullVal >::intersects( KeyType start, Ke
 
 template < typename KeyType, typename ValType, ValType NullVal >
 inline typename RangeMap< KeyType, ValType, NullVal >::iterator RangeMap< KeyType, ValType, NullVal >::erase(
-    KeyType key, KeyType count )
+    KeyType key,
+    KeyType count )
 {
     Range search = { key, 1, NullVal };
     typename RangeList::iterator i, j;

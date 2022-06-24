@@ -142,7 +142,9 @@ const char* mpi_err_str( int errorcode )
 template < typename T >
 inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& v )
 {
-    if( v.size() ) {}
+    if( v.size() )
+    {
+    }
     (void)VALGRIND_MAKE_MEM_UNDEFINED( &v[0], v.size() * sizeof( T ) );
 }
 
@@ -179,8 +181,13 @@ inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& )
 #define END_SERIAL
 #endif
 
-static int my_Gatherv( void* sendbuf, int sendcount, MPI_Datatype sendtype, std::vector< unsigned char >& recvbuf,
-                       std::vector< int >& recvcounts, int root, MPI_Comm comm )
+static int my_Gatherv( void* sendbuf,
+                       int sendcount,
+                       MPI_Datatype sendtype,
+                       std::vector< unsigned char >& recvbuf,
+                       std::vector< int >& recvcounts,
+                       int root,
+                       MPI_Comm comm )
 {
     int nproc, rank, bytes, err;
     MPI_Comm_size( comm, &nproc );
@@ -215,9 +222,8 @@ static void print_type_sets( Interface* iFace, DebugOutput* str, Range& sets )
     iFace->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, nid );
     iFace->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, sid );
     Range typesets[10];
-    const char* typenames[] = {
-        "Block ", "Sideset ", "NodeSet", "Vertex", "Curve", "Surface", "Volume", "Body", "Other"
-    };
+    const char* typenames[] = { "Block ",  "Sideset ", "NodeSet", "Vertex", "Curve",
+                                "Surface", "Volume",   "Body",    "Other" };
     for( Range::iterator riter = sets.begin(); riter != sets.end(); ++riter )
     {
         unsigned dim, id;  //, oldsize;
@@ -325,10 +331,14 @@ ErrorCode WriteHDF5Parallel::gather_interface_meshes( Range& nonowned )
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5Parallel::parallel_create_file( const char* filename, bool overwrite,
+ErrorCode WriteHDF5Parallel::parallel_create_file( const char* filename,
+                                                   bool overwrite,
                                                    const std::vector< std::string >& qa_records,
-                                                   const FileOptions& opts, const Tag* user_tag_list,
-                                                   int user_tag_count, int dimension, double* times )
+                                                   const FileOptions& opts,
+                                                   const Tag* user_tag_list,
+                                                   int user_tag_count,
+                                                   int dimension,
+                                                   double* times )
 {
     ErrorCode rval;
     mhdf_Status status;
@@ -381,7 +391,10 @@ ErrorCode WriteHDF5Parallel::parallel_create_file( const char* filename, bool ov
 
         dbgOut.tprint( 1, "call mhdf_createFile\n" );
         filePtr = mhdf_createFile( filename, overwrite, type_names, MBMAXTYPE, id_type, &status );
-        if( !filePtr ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
+        if( !filePtr )
+        {
+            MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) );
+        }
 
         dbgOut.tprint( 1, "call write_qa\n" );
         rval = write_qa( qa_records );
@@ -467,7 +480,10 @@ ErrorCode WriteHDF5Parallel::parallel_create_file( const char* filename, bool ov
     H5Pset_fapl_mpio( hdf_opt, myPcomm->proc_config().proc_comm(), info );
     filePtr = mhdf_openFileWithOpt( filename, 1, &junk, id_type, hdf_opt, &status );
     H5Pclose( hdf_opt );
-    if( !filePtr ) { MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) ); }
+    if( !filePtr )
+    {
+        MB_SET_ERR( MB_FAILURE, mhdf_message( &status ) );
+    }
 
     if( collectiveIO )
     {
@@ -614,7 +630,8 @@ ErrorCode WriteHDF5Parallel::append_serial_tag_data( std::vector< unsigned char 
 }
 
 ErrorCode WriteHDF5Parallel::check_serial_tag_data( const std::vector< unsigned char >& buffer,
-                                                    std::vector< TagDesc* >* missing, std::vector< TagDesc* >* newlist )
+                                                    std::vector< TagDesc* >* missing,
+                                                    std::vector< TagDesc* >* newlist )
 {
     ErrorCode rval;
 
@@ -780,7 +797,7 @@ ErrorCode WriteHDF5Parallel::create_tag_tables()
     if( code > 1 )
     {
         MB_SET_ERR_CONT( "Inconsistent tag definitions between procs" );
-        return error( ( ErrorCode )( code - 2 ) );
+        return error( (ErrorCode)( code - 2 ) );
     }
 
     // If not done...
@@ -1060,9 +1077,14 @@ struct DatasetVals
 };
 STATIC_ASSERT( ( sizeof( DatasetVals ) == 3 * sizeof( long ) ) );
 
-ErrorCode WriteHDF5Parallel::create_dataset( int num_datasets, const long* num_owned, long* offsets_out,
-                                             long* max_proc_entities, long* total_entities,
-                                             const DataSetCreator& creator, ExportSet* groups[], wid_t* first_ids_out )
+ErrorCode WriteHDF5Parallel::create_dataset( int num_datasets,
+                                             const long* num_owned,
+                                             long* offsets_out,
+                                             long* max_proc_entities,
+                                             long* total_entities,
+                                             const DataSetCreator& creator,
+                                             ExportSet* groups[],
+                                             wid_t* first_ids_out )
 {
     int result;
     ErrorCode rval;
@@ -1145,7 +1167,10 @@ ErrorCode WriteHDF5Parallel::create_dataset( int num_datasets, const long* num_o
     }
 
     // Send each proc it's offset in the table
-    if( rank == 0 ) { (void)VALGRIND_CHECK_MEM_IS_DEFINED( &counts[0], num_datasets * nproc * sizeof( long ) ); }
+    if( rank == 0 )
+    {
+        (void)VALGRIND_CHECK_MEM_IS_DEFINED( &counts[0], num_datasets * nproc * sizeof( long ) );
+    }
     result = MPI_Scatter( &counts[0], num_datasets, MPI_LONG, offsets_out, num_datasets, MPI_LONG, 0, comm );
     CHECK_MPI( result );
 
@@ -1171,7 +1196,7 @@ ErrorCode WriteHDF5Parallel::create_node_table( int dimension )
     const long count   = nodeSet.range.size();
     ExportSet* array[] = { &nodeSet };
     ErrorCode rval     = create_dataset( 1, &count, &nodeSet.offset, &nodeSet.max_num_ents, &nodeSet.total_num_ents,
-                                     NodeSetCreator(), array, &nodeSet.first_id );
+                                         NodeSetCreator(), array, &nodeSet.first_id );
     CHECK_MB( rval );
     return assign_ids( nodeSet.range, nodeSet.first_id + nodeSet.offset );
 }
@@ -2363,7 +2388,10 @@ ErrorCode WriteHDF5Parallel::exchange_file_ids( const Range& nonlocal )
 
 void WriteHDF5Parallel::print_times( const double* times ) const
 {
-    if( !myPcomm ) { WriteHDF5::print_times( times ); }
+    if( !myPcomm )
+    {
+        WriteHDF5::print_times( times );
+    }
     else
     {
         double recv[NUM_TIMES];

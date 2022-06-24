@@ -25,14 +25,14 @@
 int mhdf_haveAdjacency( mhdf_FileHandle file, const char* elem_group, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       elem_id;
-    int         result;
+    hid_t elem_id;
+    int result;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( file );
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
 
-    if( elem_group == mhdf_node_type_handle( ) )
+    if( elem_group == mhdf_node_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen( file_ptr->hdf_handle, NODE_GROUP, H5P_DEFAULT );
@@ -61,8 +61,8 @@ int mhdf_haveAdjacency( mhdf_FileHandle file, const char* elem_group, mhdf_Statu
 hid_t mhdf_createAdjacency( mhdf_FileHandle file, const char* elem_handle, long adj_list_size, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       elem_id, table_id;
-    hsize_t     dim = (hsize_t)adj_list_size;
+    hid_t elem_id, table_id;
+    hsize_t dim = (hsize_t)adj_list_size;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( file );
@@ -74,8 +74,10 @@ hid_t mhdf_createAdjacency( mhdf_FileHandle file, const char* elem_handle, long 
         return -1;
     }
 
-    if( elem_handle == mhdf_node_type_handle( ) )
-    { table_id = mhdf_create_table( file_ptr->hdf_handle, NODE_ADJCY_PATH, file_ptr->id_type, 1, &dim, status ); }
+    if( elem_handle == mhdf_node_type_handle() )
+    {
+        table_id = mhdf_create_table( file_ptr->hdf_handle, NODE_ADJCY_PATH, file_ptr->id_type, 1, &dim, status );
+    }
     else
     {
         elem_id = mhdf_elem_group_from_handle( file_ptr, elem_handle, status );
@@ -93,8 +95,8 @@ hid_t mhdf_openAdjacency( mhdf_FileHandle file, const char* elem_handle, long* a
 
 {
     FileHandle* file_ptr;
-    hid_t       elem_id, table_id;
-    hsize_t     dim;
+    hid_t elem_id, table_id;
+    hsize_t dim;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( file );
@@ -106,8 +108,10 @@ hid_t mhdf_openAdjacency( mhdf_FileHandle file, const char* elem_handle, long* a
         return -1;
     }
 
-    if( elem_handle == mhdf_node_type_handle( ) )
-    { table_id = mhdf_open_table( file_ptr->hdf_handle, NODE_ADJCY_PATH, 1, &dim, status ); }
+    if( elem_handle == mhdf_node_type_handle() )
+    {
+        table_id = mhdf_open_table( file_ptr->hdf_handle, NODE_ADJCY_PATH, 1, &dim, status );
+    }
     else
     {
         elem_id = mhdf_elem_group_from_handle( file_ptr, elem_handle, status );
@@ -128,7 +132,12 @@ void mhdf_writeAdjacency( hid_t table_id, long offset, long count, hid_t type, c
     API_END;
 }
 
-void mhdf_writeAdjacencyWithOpt( hid_t table_id, long offset, long count, hid_t type, const void* data, hid_t prop,
+void mhdf_writeAdjacencyWithOpt( hid_t table_id,
+                                 long offset,
+                                 long count,
+                                 hid_t type,
+                                 const void* data,
+                                 hid_t prop,
                                  mhdf_Status* status )
 {
     API_BEGIN;
@@ -142,7 +151,12 @@ void mhdf_readAdjacency( hid_t table_id, long offset, long count, hid_t type, vo
     mhdf_read_data( table_id, offset, count, type, data, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_readAdjacencyWithOpt( hid_t table_id, long offset, long count, hid_t type, void* data, hid_t prop,
+void mhdf_readAdjacencyWithOpt( hid_t table_id,
+                                long offset,
+                                long count,
+                                hid_t type,
+                                void* data,
+                                hid_t prop,
                                 mhdf_Status* status )
 {
     API_BEGIN;

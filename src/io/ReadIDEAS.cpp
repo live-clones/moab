@@ -27,20 +27,31 @@ ReadIDEAS::ReadIDEAS( Interface* impl ) : MBI( impl )
     impl->query_interface( readMeshIface );
 }
 
-ErrorCode ReadIDEAS::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                      const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadIDEAS::read_tag_values( const char* /* file_name */,
+                                      const char* /* tag_name */,
+                                      const FileOptions& /* opts */,
+                                      std::vector< int >& /* tag_values_out */,
                                       const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadIDEAS::load_file( const char* fname, const EntityHandle*, const FileOptions& /*options*/,
-                                const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadIDEAS::load_file( const char* fname,
+                                const EntityHandle*,
+                                const FileOptions& /*options*/,
+                                const ReaderIface::SubsetList* subset_list,
+                                const Tag* file_id_tag )
 {
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for IDEAS" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for IDEAS" );
+    }
 
     file.open( fname );
-    if( !file.good() ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "Failed to open file: " << fname ); }
+    if( !file.good() )
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, "Failed to open file: " << fname );
+    }
 
     ErrorCode rval;
 

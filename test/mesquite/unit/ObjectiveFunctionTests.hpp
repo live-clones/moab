@@ -79,8 +79,11 @@ class ObjectiveFunctionTests
     static void test_negate_flag( OFTestMode test_mode, ObjectiveFunctionTemplate* of );
 
     /** Test OF value */
-    static void test_value( const double* input_values, unsigned num_input_values, double expected_value,
-                            OFTestMode test_mode, ObjectiveFunctionTemplate* of );
+    static void test_value( const double* input_values,
+                            unsigned num_input_values,
+                            double expected_value,
+                            OFTestMode test_mode,
+                            ObjectiveFunctionTemplate* of );
 
     /** Compare numerical and analytical gradient values */
     static inline void compare_numerical_gradient( ObjectiveFunctionTemplate* of );
@@ -185,7 +188,11 @@ class OFTestQM : public QualityMetric
         return evaluate( pd, h, v, err );
     }
 
-    virtual bool evaluate_with_gradient( PatchData& pd, size_t h, double& v, vector< size_t >& i, vector< Vector3D >& g,
+    virtual bool evaluate_with_gradient( PatchData& pd,
+                                         size_t h,
+                                         double& v,
+                                         vector< size_t >& i,
+                                         vector< Vector3D >& g,
                                          MsqError& err )
     {
         g.clear();
@@ -197,8 +204,13 @@ class OFTestQM : public QualityMetric
         return rval;
     }
 
-    virtual bool evaluate_with_Hessian( PatchData& pd, size_t h, double& v, vector< size_t >& i, vector< Vector3D >& g,
-                                        vector< Matrix3D >& H, MsqError& err )
+    virtual bool evaluate_with_Hessian( PatchData& pd,
+                                        size_t h,
+                                        double& v,
+                                        vector< size_t >& i,
+                                        vector< Vector3D >& g,
+                                        vector< Matrix3D >& H,
+                                        MsqError& err )
     {
         H.clear();
         bool rval = evaluate_with_gradient( pd, h, v, i, g, err );

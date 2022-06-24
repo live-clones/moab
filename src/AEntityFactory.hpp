@@ -69,8 +69,10 @@ class AEntityFactory
      *adjacencies from entities of that dimension to each target_entity are created (this function
      *uses AEntityFactory::get_element for each element)
      */
-    ErrorCode get_elements( EntityHandle source_entity, const unsigned int target_dimension,
-                            std::vector< EntityHandle >& target_entities, const bool create_if_missing,
+    ErrorCode get_elements( EntityHandle source_entity,
+                            const unsigned int target_dimension,
+                            std::vector< EntityHandle >& target_entities,
+                            const bool create_if_missing,
                             const int create_adjacency_option = -1 );
 
     //! get the vertices for a polyhedron (special implementation because for polyhedra
@@ -88,9 +90,13 @@ class AEntityFactory
     //! so that never creates other ancillary entities); explicitly require
     //! the vertex_list_size for consistency, even though we could probably get
     //! it from target_type
-    ErrorCode get_element( const EntityHandle* vertex_list, const int vertex_list_size, const EntityType target_type,
-                           EntityHandle& target_entity, const bool create_if_missing,
-                           const EntityHandle source_entity = 0, const int create_adjacency_option = -1 );
+    ErrorCode get_element( const EntityHandle* vertex_list,
+                           const int vertex_list_size,
+                           const EntityType target_type,
+                           EntityHandle& target_entity,
+                           const bool create_if_missing,
+                           const EntityHandle source_entity  = 0,
+                           const int create_adjacency_option = -1 );
 
     /**\brief Get adjacent entities
      *
@@ -100,13 +106,16 @@ class AEntityFactory
      *\param adjacent_entities The resulting adjacent entities are appended to this
      *                         list.
      */
-    ErrorCode get_adjacencies( const EntityHandle entity, const unsigned int to_dimension, bool create_if_missing,
+    ErrorCode get_adjacencies( const EntityHandle entity,
+                               const unsigned int to_dimension,
+                               bool create_if_missing,
                                std::vector< EntityHandle >& adjacent_entities );
 
     //! return const array * for adjacencies
     ErrorCode get_adjacencies( EntityHandle entity, const EntityHandle*& adjacent_entities, int& num_entities ) const;
 
-    ErrorCode get_adjacencies( EntityHandle entity, std::vector< EntityHandle >*& adj_vec_ptr_out,
+    ErrorCode get_adjacencies( EntityHandle entity,
+                               std::vector< EntityHandle >*& adj_vec_ptr_out,
                                bool create_if_missing = false );
 
     //! returns the entities in sorted order
@@ -128,8 +137,10 @@ class AEntityFactory
     ErrorCode notify_create_entity( const EntityHandle entity, const EntityHandle* node_array, const int number_nodes );
 
     //! calling code notifying that an entity changed its connectivity
-    ErrorCode notify_change_connectivity( EntityHandle entity, const EntityHandle* old_array,
-                                          const EntityHandle* new_array, int number_nodes );
+    ErrorCode notify_change_connectivity( EntityHandle entity,
+                                          const EntityHandle* old_array,
+                                          const EntityHandle* new_array,
+                                          int number_nodes );
 
     //! return true if 2 entities are explicitly adjacent
     bool explicitly_adjacent( const EntityHandle ent1, const EntityHandle ent2 );
@@ -141,7 +152,8 @@ class AEntityFactory
     ErrorCode merge_adjust_adjacencies( EntityHandle entity_to_keep, EntityHandle entity_to_remove );
 
     void get_memory_use( unsigned long long& total_entity_storage, unsigned long long& total_storage );
-    ErrorCode get_memory_use( const Range& entities, unsigned long long& total_entity_storage,
+    ErrorCode get_memory_use( const Range& entities,
+                              unsigned long long& total_entity_storage,
                               unsigned long long& total_amortized_storage );
 
   private:
@@ -149,7 +161,9 @@ class AEntityFactory
     ErrorCode get_adjacency_ptr( EntityHandle, const std::vector< EntityHandle >*& ) const;
     ErrorCode set_adjacency_ptr( EntityHandle, std::vector< EntityHandle >* );
 
-    ErrorCode get_vertices( EntityHandle h, const EntityHandle*& vect_out, int& count_out,
+    ErrorCode get_vertices( EntityHandle h,
+                            const EntityHandle*& vect_out,
+                            int& count_out,
                             std::vector< EntityHandle >& storage );
 
     //! private constructor to prevent the construction of a default one
@@ -163,23 +177,33 @@ class AEntityFactory
 
     //! compare vertex_list to the vertices in this_entity,
     //!  and return true if they contain the same vertices
-    bool entities_equivalent( const EntityHandle this_entity, const EntityHandle* vertex_list,
-                              const int vertex_list_size, const EntityType target_type );
+    bool entities_equivalent( const EntityHandle this_entity,
+                              const EntityHandle* vertex_list,
+                              const int vertex_list_size,
+                              const EntityType target_type );
 
-    ErrorCode get_zero_to_n_elements( EntityHandle source_entity, const unsigned int target_dimension,
-                                      std::vector< EntityHandle >& target_entities, const bool create_if_missing,
+    ErrorCode get_zero_to_n_elements( EntityHandle source_entity,
+                                      const unsigned int target_dimension,
+                                      std::vector< EntityHandle >& target_entities,
+                                      const bool create_if_missing,
                                       const int create_adjacency_option = -1 );
 
-    ErrorCode get_down_adjacency_elements( EntityHandle source_entity, const unsigned int target_dimension,
-                                           std::vector< EntityHandle >& target_entities, const bool create_if_missing,
+    ErrorCode get_down_adjacency_elements( EntityHandle source_entity,
+                                           const unsigned int target_dimension,
+                                           std::vector< EntityHandle >& target_entities,
+                                           const bool create_if_missing,
                                            const int create_adjacency_option = -1 );
 
-    ErrorCode get_down_adjacency_elements_poly( EntityHandle source_entity, const unsigned int target_dimension,
+    ErrorCode get_down_adjacency_elements_poly( EntityHandle source_entity,
+                                                const unsigned int target_dimension,
                                                 std::vector< EntityHandle >& target_entities,
-                                                const bool create_if_missing, const int create_adjacency_option = -1 );
+                                                const bool create_if_missing,
+                                                const int create_adjacency_option = -1 );
 
-    ErrorCode get_up_adjacency_elements( EntityHandle source_entity, const unsigned int target_dimension,
-                                         std::vector< EntityHandle >& target_entities, const bool create_if_missing,
+    ErrorCode get_up_adjacency_elements( EntityHandle source_entity,
+                                         const unsigned int target_dimension,
+                                         std::vector< EntityHandle >& target_entities,
+                                         const bool create_if_missing,
                                          const int create_adjacency_option = -1 );
 
     //! check for equivalent entities that may be formed when merging two entities, and

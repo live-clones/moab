@@ -67,12 +67,16 @@ class LVQDTargetTest : public CppUnit::TestFixture
     PatchData pd2D, pd3D;
 
     // Use LVQDTargetCalculator to calculate the product of the passed values.
-    MsqMatrix< 3, 2 > target( const double* L, const MsqMatrix< 3, 2 >* V, const MsqMatrix< 2, 2 >* Q,
+    MsqMatrix< 3, 2 > target( const double* L,
+                              const MsqMatrix< 3, 2 >* V,
+                              const MsqMatrix< 2, 2 >* Q,
                               const MsqMatrix< 2, 2 >* D );
     // Use LVQDTargetCalculator to calculate the product of the passed values.
     MsqMatrix< 2, 2 > target( const double* L, const MsqMatrix< 2, 2 >* Q, const MsqMatrix< 2, 2 >* D );
     // Use LVQDTargetCalculator to calculate the product of the passed values.
-    MsqMatrix< 3, 3 > target( const double* L, const MsqMatrix< 3, 3 >* V, const MsqMatrix< 3, 3 >* Q,
+    MsqMatrix< 3, 3 > target( const double* L,
+                              const MsqMatrix< 3, 3 >* V,
+                              const MsqMatrix< 3, 3 >* Q,
                               const MsqMatrix< 3, 3 >* D );
 
   public:
@@ -229,7 +233,9 @@ void LVQDTargetTest::setUp()
     ASSERT_NO_ERROR( err );
 };
 
-MsqMatrix< 3, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 2 >* V, const MsqMatrix< 2, 2 >* Q,
+MsqMatrix< 3, 2 > LVQDTargetTest::target( const double* L,
+                                          const MsqMatrix< 3, 2 >* V,
+                                          const MsqMatrix< 2, 2 >* Q,
                                           const MsqMatrix< 2, 2 >* D )
 {
     ConstantTarget W_size( L ? *L : 1.0, true );
@@ -271,7 +277,9 @@ MsqMatrix< 2, 2 > LVQDTargetTest::target( const double* L, const MsqMatrix< 2, 2
     return W;
 }
 
-MsqMatrix< 3, 3 > LVQDTargetTest::target( const double* L, const MsqMatrix< 3, 3 >* V, const MsqMatrix< 3, 3 >* Q,
+MsqMatrix< 3, 3 > LVQDTargetTest::target( const double* L,
+                                          const MsqMatrix< 3, 3 >* V,
+                                          const MsqMatrix< 3, 3 >* Q,
                                           const MsqMatrix< 3, 3 >* D )
 {
     ConstantTarget W_size( L ? *L : 1.0, true );

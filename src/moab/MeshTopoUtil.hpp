@@ -56,8 +56,10 @@ class MeshTopoUtil
     //! that entity, ordered by connection through next higher dimension entities;
     //! if any of the star entities is in only entity of next higher dimension,
     //! on_boundary is returned true
-    ErrorCode star_entities( const EntityHandle star_center, std::vector< EntityHandle >& star_entities,
-                             bool& bdy_entity, const EntityHandle starting_star_entity = 0,
+    ErrorCode star_entities( const EntityHandle star_center,
+                             std::vector< EntityHandle >& star_entities,
+                             bool& bdy_entity,
+                             const EntityHandle starting_star_entity        = 0,
                              std::vector< EntityHandle >* star_entities_dp1 = NULL,
                              Range* star_entities_candidates_dp1            = NULL );
 
@@ -74,16 +76,24 @@ class MeshTopoUtil
     //! and last_dp1 (dimension 2 higher than center), returns the next star entity across
     //! last_dp1, and the next dp1 entity sharing next_entity; if star_candidates is non-empty,
     //! star must come from those
-    ErrorCode star_next_entity( const EntityHandle star_center, const EntityHandle last_entity,
-                                const EntityHandle last_dp1, Range* star_candidates_dp1, EntityHandle& next_entity,
+    ErrorCode star_next_entity( const EntityHandle star_center,
+                                const EntityHandle last_entity,
+                                const EntityHandle last_dp1,
+                                Range* star_candidates_dp1,
+                                EntityHandle& next_entity,
                                 EntityHandle& next_dp1 );
 
     //! get "bridge" or "2nd order" adjacencies, going through dimension bridge_dim
-    ErrorCode get_bridge_adjacencies( Range& from_entities, int bridge_dim, int to_dim, Range& to_ents,
+    ErrorCode get_bridge_adjacencies( Range& from_entities,
+                                      int bridge_dim,
+                                      int to_dim,
+                                      Range& to_ents,
                                       int num_layers = 1 );
 
     //! get "bridge" or "2nd order" adjacencies, going through dimension bridge_dim
-    ErrorCode get_bridge_adjacencies( const EntityHandle from_entity, const int bridge_dim, const int to_dim,
+    ErrorCode get_bridge_adjacencies( const EntityHandle from_entity,
+                                      const int bridge_dim,
+                                      const int to_dim,
                                       Range& to_adjs );
 
     //! return a common entity of the specified dimension, or 0 if there isn't one
@@ -102,7 +112,9 @@ class MeshTopoUtil
     //! of next higher dimension; assumes that there are >= 2 connected regions of
     //! (d+2)-dimensional entities; a new d-entity is created for each region after the
     //! first, and it's made explicitly-adjacent to the region to which it corresponds
-    ErrorCode split_entity_nonmanifold( EntityHandle split_ent, Range& old_adjs, Range& new_adjs,
+    ErrorCode split_entity_nonmanifold( EntityHandle split_ent,
+                                        Range& old_adjs,
+                                        Range& new_adjs,
                                         EntityHandle& new_entity );
 
     //! split entities that are manifold (shared by two or less entities of each higher dimension),
@@ -128,8 +140,11 @@ class MeshTopoUtil
                        remains on the boundary (i.e. not adj to any entity of higher
                        dimension).  Dimension of gowith_ents must be the same as entities.
     */
-    ErrorCode split_entities_manifold( EntityHandle* entities, const int num_entities, EntityHandle* new_entities,
-                                       Range* fill_entities, EntityHandle* gowith_ents = NULL );
+    ErrorCode split_entities_manifold( EntityHandle* entities,
+                                       const int num_entities,
+                                       EntityHandle* new_entities,
+                                       Range* fill_entities,
+                                       EntityHandle* gowith_ents = NULL );
 
     //! return whether entity is equivalent to any other of same type and same vertices;
     //! if equivalent entity is found, it's returned in equiv_ents and return value is true,

@@ -77,7 +77,7 @@ int main( int argc, char** argv )
     for( int i = 0; i < num_queries; i++ )
     {
         pos  = box.bMin + CartVect( box_extents[0] * .01 * ( rand() % 100 ), box_extents[1] * .01 * ( rand() % 100 ),
-                                   box_extents[2] * .01 * ( rand() % 100 ) );
+                                    box_extents[2] * .01 * ( rand() % 100 ) );
         rval = sl.locate_point( pos.array(), elem, params.array(), &is_inside, 0.0, 0.0 );MB_CHK_ERR( rval );
         if( is_inside ) num_inside++;
     }

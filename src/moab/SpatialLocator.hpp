@@ -78,28 +78,42 @@ class SpatialLocator
     }
 
     /* locate a set of vertices, Range variant */
-    ErrorCode locate_points( Range& vertices, EntityHandle* ents, double* params, int* is_inside = NULL,
-                             const double rel_iter_tol = 1.0e-10, const double abs_iter_tol = 1.0e-10,
-                             const double inside_tol = 1.0e-6 );
+    ErrorCode locate_points( Range& vertices,
+                             EntityHandle* ents,
+                             double* params,
+                             int* is_inside            = NULL,
+                             const double rel_iter_tol = 1.0e-10,
+                             const double abs_iter_tol = 1.0e-10,
+                             const double inside_tol   = 1.0e-6 );
 
     /* locate a set of points */
-    ErrorCode locate_points( const double* pos, int num_points, EntityHandle* ents, double* params,
-                             int* is_inside = NULL, const double rel_iter_tol = 1.0e-10,
-                             const double abs_iter_tol = 1.0e-10, const double inside_tol = 1.0e-6 );
+    ErrorCode locate_points( const double* pos,
+                             int num_points,
+                             EntityHandle* ents,
+                             double* params,
+                             int* is_inside            = NULL,
+                             const double rel_iter_tol = 1.0e-10,
+                             const double abs_iter_tol = 1.0e-10,
+                             const double inside_tol   = 1.0e-6 );
 
     /* locate a set of vertices or entity centroids, storing results on TupleList in this class
      * Locate a set of vertices or entity centroids, storing the detailed results in member
      * variable (TupleList) locTable (see comments on locTable for structure of that tuple).
      */
-    ErrorCode locate_points( Range& ents, const double rel_iter_tol = 1.0e-10, const double abs_iter_tol = 1.0e-10,
-                             const double inside_tol = 1.0e-6 );
+    ErrorCode locate_points( Range& ents,
+                             const double rel_iter_tol = 1.0e-10,
+                             const double abs_iter_tol = 1.0e-10,
+                             const double inside_tol   = 1.0e-6 );
 
     /* locate a set of points, storing results on TupleList in this class
      * Locate a set of points, storing the detailed results in member variable (TupleList) locTable
      * (see comments on locTable for structure of that tuple).
      */
-    ErrorCode locate_points( const double* pos, int num_points, const double rel_iter_tol = 1.0e-10,
-                             const double abs_iter_tol = 1.0e-10, const double inside_tol = 1.0e-6 );
+    ErrorCode locate_points( const double* pos,
+                             int num_points,
+                             const double rel_iter_tol = 1.0e-10,
+                             const double abs_iter_tol = 1.0e-10,
+                             const double inside_tol   = 1.0e-6 );
 
     /* Count the number of located points in locTable
      * Return the number of entries in locTable that have non-zero entity handles, which
@@ -121,17 +135,23 @@ class SpatialLocator
      * variables (TupleList) locTable and parLocTable (see comments on locTable and parLocTable for
      * structure of those tuples).
      */
-    ErrorCode par_locate_points( ParallelComm* pc, Range& vertices, const double rel_iter_tol = 1.0e-10,
-                                 const double abs_iter_tol = 1.0e-10, const double inside_tol = 1.0e-6 );
+    ErrorCode par_locate_points( ParallelComm* pc,
+                                 Range& vertices,
+                                 const double rel_iter_tol = 1.0e-10,
+                                 const double abs_iter_tol = 1.0e-10,
+                                 const double inside_tol   = 1.0e-6 );
 
     /* locate a set of points, storing results on TupleList in this class
      * Locate a set of points, storing the detailed results in member
      * variables (TupleList) locTable and parLocTable (see comments on locTable and parLocTable for
      * structure of those tuples).
      */
-    ErrorCode par_locate_points( ParallelComm* pc, const double* pos, int num_points,
-                                 const double rel_iter_tol = 1.0e-10, const double abs_iter_tol = 1.0e-10,
-                                 const double inside_tol = 1.0e-6 );
+    ErrorCode par_locate_points( ParallelComm* pc,
+                                 const double* pos,
+                                 int num_points,
+                                 const double rel_iter_tol = 1.0e-10,
+                                 const double abs_iter_tol = 1.0e-10,
+                                 const double inside_tol   = 1.0e-6 );
 #endif
 
     /** \brief Return the MOAB interface associated with this locator
@@ -142,9 +162,13 @@ class SpatialLocator
     }
 
     /* locate a point */
-    ErrorCode locate_point( const double* pos, EntityHandle& ent, double* params, int* is_inside = NULL,
-                            const double rel_iter_tol = 1.0e-10, const double abs_iter_tol = 1.0e-10,
-                            const double inside_tol = 1.0e-6 );
+    ErrorCode locate_point( const double* pos,
+                            EntityHandle& ent,
+                            double* params,
+                            int* is_inside            = NULL,
+                            const double rel_iter_tol = 1.0e-10,
+                            const double abs_iter_tol = 1.0e-10,
+                            const double inside_tol   = 1.0e-6 );
 
     /* return the tree */
     Tree* get_tree()
@@ -324,8 +348,12 @@ inline SpatialLocator::~SpatialLocator()
     if( iCreatedTree && myTree ) delete myTree;
 }
 
-inline ErrorCode SpatialLocator::locate_point( const double* pos, EntityHandle& ent, double* params, int* is_inside,
-                                               const double rel_iter_tol, const double abs_iter_tol,
+inline ErrorCode SpatialLocator::locate_point( const double* pos,
+                                               EntityHandle& ent,
+                                               double* params,
+                                               int* is_inside,
+                                               const double rel_iter_tol,
+                                               const double abs_iter_tol,
                                                const double inside_tol )
 {
     return locate_points( pos, 1, &ent, params, is_inside, rel_iter_tol, abs_iter_tol, inside_tol );

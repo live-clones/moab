@@ -19,7 +19,10 @@ ErrorCode PolyElementSeq::get_connectivity( EntityHandle handle, std::vector< En
     return MB_SUCCESS;
 }
 
-ErrorCode PolyElementSeq::get_connectivity( EntityHandle handle, EntityHandle const*& conn_ptr, int& len, bool,
+ErrorCode PolyElementSeq::get_connectivity( EntityHandle handle,
+                                            EntityHandle const*& conn_ptr,
+                                            int& len,
+                                            bool,
                                             std::vector< EntityHandle >* ) const
 {
     conn_ptr = get_array() + nodes_per_element() * ( handle - start_handle() );

@@ -24,9 +24,16 @@
 namespace moab
 {
 
-SweptElementSeq::SweptElementSeq( EntityHandle shandle, const int imin, const int jmin, const int kmin, const int imax,
-                                  const int jmax, const int kmax, const int* Cq )
-    : ElementSequence( shandle, ScdElementData::calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin ),
+SweptElementSeq::SweptElementSeq( EntityHandle shandle,
+                                  const int imin,
+                                  const int jmin,
+                                  const int kmin,
+                                  const int imax,
+                                  const int jmax,
+                                  const int kmax,
+                                  const int* Cq )
+    : ElementSequence( shandle,
+                       ScdElementData::calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin ),
                        CN::VerticesPerEntity( TYPE_FROM_HANDLE( shandle ) ),
                        new SweptElementData( shandle, imin, jmin, kmin, imax, jmax, kmax, Cq ) )
 {
@@ -34,7 +41,8 @@ SweptElementSeq::SweptElementSeq( EntityHandle shandle, const int imin, const in
 
 SweptElementSeq::~SweptElementSeq() {}
 
-ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle,
+                                             std::vector< EntityHandle >& connect,
                                              bool /*topological*/ ) const
 {
     int i, j, k;
@@ -43,8 +51,11 @@ ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle, std::vector< E
     return rval;
 }
 
-ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
-                                             bool topo, std::vector< EntityHandle >* storage ) const
+ErrorCode SweptElementSeq::get_connectivity( EntityHandle handle,
+                                             EntityHandle const*& connect,
+                                             int& connect_length,
+                                             bool topo,
+                                             std::vector< EntityHandle >* storage ) const
 {
     if( !storage )
     {

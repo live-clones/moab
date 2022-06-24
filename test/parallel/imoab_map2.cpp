@@ -220,11 +220,11 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        int dummyCpl = -1;
+        int dummyCpl     = -1;
         int dummy_rowcol = -1;
-        int dummyType = 0;
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
-              intx_from_file_identifier.c_str(), mapFilename.c_str() );
+        int dummyType    = 0;
+        ierr             = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
+                                                             intx_from_file_identifier.c_str(), mapFilename.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 
@@ -408,7 +408,7 @@ int main( int argc, char* argv[] )
 
             {
                 char outputFileTgt[] = "fOcnOnCpl2.h5m";
-                ierr = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions );
+                ierr                 = iMOAB_WriteMesh( cplOcnPID, outputFileTgt, fileWriteOptions );
                 CHECKIERR( ierr, "could not write fOcnOnCpl.h5m to disk" )
             }
         }

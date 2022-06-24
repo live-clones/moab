@@ -50,7 +50,10 @@ class MeshOutputFunctor : public EntityRefinerOutputFunctor
     MeshOutputFunctor( RefinerTagManager* tag_mgr );
     ~MeshOutputFunctor();
 
-    void print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash, const double* vcoords,
+    void print_vert_crud( EntityHandle vout,
+                          int nvhash,
+                          EntityHandle* vhash,
+                          const double* vcoords,
                           const void* vtags );
     void assign_global_ids( ParallelComm* comm );
     void exchange_handles( ParallelComm* comm );

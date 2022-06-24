@@ -43,13 +43,16 @@ class BoundedCylinderDomain : public CylinderDomain
      *\param axis_direction - Vector defining the direction of the axis
      *\param axis_point     - A point through which the axis passes.
      */
-    inline BoundedCylinderDomain( double pradius, Vector3D axis_direction = Vector3D( 0, 0, 1 ),
-                                  Vector3D axis_point = Vector3D( 0, 0, 0 ) )
+    inline BoundedCylinderDomain( double pradius,
+                                  Vector3D axis_direction = Vector3D( 0, 0, 1 ),
+                                  Vector3D axis_point     = Vector3D( 0, 0, 0 ) )
         : CylinderDomain( pradius, axis_direction, axis_point )
     {
     }
 
-    virtual void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+    virtual void domain_DoF( const Mesh::VertexHandle* handle_array,
+                             unsigned short* dof_array,
+                             size_t count,
                              MsqError& err ) const;
 
     /**\brief define a circular curve bounding the cylinder
@@ -77,7 +80,9 @@ class BoundedCylinderDomain : public CylinderDomain
   protected:
     void evaluate( double t, const Vector3D& point, Vector3D& closest, Vector3D& normal ) const;
 
-    virtual void evaluate( Mesh::VertexHandle handle, const Vector3D& point, Vector3D& closest,
+    virtual void evaluate( Mesh::VertexHandle handle,
+                           const Vector3D& point,
+                           Vector3D& closest,
                            Vector3D& normal ) const;
 
     bool find_curve( Mesh::VertexHandle handle, double& t ) const;

@@ -61,8 +61,11 @@ namespace DomainUtil
         return ( max[0] >= max[1] && max[0] >= max[2] ) ? max[0] : ( max[1] >= max[2] ) ? max[1] : max[2];
     }
 
-    void get_fixed_vertices( Mesh* mesh, const Mesh::VertexHandle* verts, size_t num_verts,
-                             std::vector< Mesh::VertexHandle >& fixed_verts, MsqError& err )
+    void get_fixed_vertices( Mesh* mesh,
+                             const Mesh::VertexHandle* verts,
+                             size_t num_verts,
+                             std::vector< Mesh::VertexHandle >& fixed_verts,
+                             MsqError& err )
     {
         std::vector< bool > fixed( num_verts );
         mesh->vertices_get_fixed_flag( verts, fixed, num_verts, err );MSQ_ERRRTN( err );

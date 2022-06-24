@@ -65,8 +65,12 @@ bool ElementPMeanP::evaluate( PatchData& pd, size_t handle, double& value, MsqEr
     return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                            std::vector< Vector3D >& gradient, MsqError& err )
+bool ElementPMeanP::evaluate_with_gradient( PatchData& pd,
+                                            size_t handle,
+                                            double& value,
+                                            std::vector< size_t >& indices,
+                                            std::vector< Vector3D >& gradient,
+                                            MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric();
     mHandles.clear();
@@ -76,8 +80,12 @@ bool ElementPMeanP::evaluate_with_gradient( PatchData& pd, size_t handle, double
     return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                           std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd,
+                                           size_t handle,
+                                           double& value,
+                                           std::vector< size_t >& indices,
+                                           std::vector< Vector3D >& gradient,
+                                           std::vector< Matrix3D >& Hessian,
                                            MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric();
@@ -88,9 +96,13 @@ bool ElementPMeanP::evaluate_with_Hessian( PatchData& pd, size_t handle, double&
     return !MSQ_CHKERR( err ) && result;
 }
 
-bool ElementPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                    std::vector< SymMatrix3D >& diagonal, MsqError& err )
+bool ElementPMeanP::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                    size_t handle,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    std::vector< Vector3D >& gradient,
+                                                    std::vector< SymMatrix3D >& diagonal,
+                                                    MsqError& err )
 {
     ElemSampleQM* qm = get_quality_metric();
     mHandles.clear();

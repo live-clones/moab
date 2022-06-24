@@ -69,7 +69,10 @@ ErrorCode BitTag::release_all_data( SequenceManager*, Error*, bool )
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::get_data( const SequenceManager*, Error*, const EntityHandle* handles, size_t num_handles,
+ErrorCode BitTag::get_data( const SequenceManager*,
+                            Error*,
+                            const EntityHandle* handles,
+                            size_t num_handles,
                             void* gen_data ) const
 {
     EntityType type;
@@ -89,8 +92,11 @@ ErrorCode BitTag::get_data( const SequenceManager*, Error*, const EntityHandle* 
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::set_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* handles,
-                            size_t num_handles, const void* gen_data )
+ErrorCode BitTag::set_data( SequenceManager* seqman,
+                            Error* /* error */,
+                            const EntityHandle* handles,
+                            size_t num_handles,
+                            const void* gen_data )
 {
     ErrorCode rval = seqman->check_valid_entities( NULL, handles, num_handles, true );MB_CHK_ERR( rval );
 
@@ -109,8 +115,12 @@ ErrorCode BitTag::set_data( SequenceManager* seqman, Error* /* error */, const E
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::clear_data( SequenceManager* seqman, Error* /* error */, const EntityHandle* handles,
-                              size_t num_handles, const void* value_ptr, int value_len )
+ErrorCode BitTag::clear_data( SequenceManager* seqman,
+                              Error* /* error */,
+                              const EntityHandle* handles,
+                              size_t num_handles,
+                              const void* value_ptr,
+                              int value_len )
 {
     if( value_len ) return MB_INVALID_SIZE;
 
@@ -170,7 +180,7 @@ ErrorCode BitTag::get_data( const SequenceManager*, Error*, const Range& handles
 
         while( count )
         {
-            size_t pcount = std::min( ( EntityID )( per_page - offset ), count );
+            size_t pcount = std::min( (EntityID)( per_page - offset ), count );
             if( pageList[type][page] )
                 pageList[type][page]->get_bits( offset, pcount, storedBitsPerEntity, data );
             else
@@ -207,7 +217,7 @@ ErrorCode BitTag::set_data( SequenceManager* seqman, Error* /* error */, const R
             if( page >= pageList[type].size() ) pageList[type].resize( page + 1, 0 );
             if( !pageList[type][page] ) pageList[type][page] = new BitPage( storedBitsPerEntity, def );
 
-            size_t pcount = std::min( ( EntityID )( per_page - offset ), count );
+            size_t pcount = std::min( (EntityID)( per_page - offset ), count );
             pageList[type][page]->set_bits( offset, pcount, storedBitsPerEntity, data );
             data += pcount;
             count -= pcount;
@@ -219,7 +229,10 @@ ErrorCode BitTag::set_data( SequenceManager* seqman, Error* /* error */, const R
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::clear_data( SequenceManager* seqman, Error* /* error */, const Range& handles, const void* value_ptr,
+ErrorCode BitTag::clear_data( SequenceManager* seqman,
+                              Error* /* error */,
+                              const Range& handles,
+                              const void* value_ptr,
                               int value_len )
 {
     if( value_len ) return MB_INVALID_SIZE;
@@ -243,7 +256,7 @@ ErrorCode BitTag::clear_data( SequenceManager* seqman, Error* /* error */, const
             if( page >= pageList[type].size() ) pageList[type].resize( page + 1, 0 );
             if( !pageList[type][page] ) pageList[type][page] = new BitPage( storedBitsPerEntity, default_val() );
 
-            size_t pcount = std::min( ( EntityID )( per_page - offset ), count );
+            size_t pcount = std::min( (EntityID)( per_page - offset ), count );
             pageList[type][page]->set_bits( offset, pcount, storedBitsPerEntity, value );
             count -= pcount;
             offset = 0;
@@ -270,7 +283,7 @@ ErrorCode BitTag::remove_data( SequenceManager*, Error*, const Range& handles )
 
         while( count )
         {
-            size_t pcount = std::min( ( EntityID )( per_page - offset ), count );
+            size_t pcount = std::min( (EntityID)( per_page - offset ), count );
             if( page < pageList[type].size() && pageList[type][page] )
                 pageList[type][page]->set_bits( offset, pcount, storedBitsPerEntity, val );
             count -= pcount;
@@ -282,7 +295,11 @@ ErrorCode BitTag::remove_data( SequenceManager*, Error*, const Range& handles )
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::get_data( const SequenceManager*, Error* /* error */, const EntityHandle*, size_t, const void**,
+ErrorCode BitTag::get_data( const SequenceManager*,
+                            Error* /* error */,
+                            const EntityHandle*,
+                            size_t,
+                            const void**,
                             int* ) const
 {
     MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Operation get_data not supported for bit tags" );
@@ -293,7 +310,11 @@ ErrorCode BitTag::get_data( const SequenceManager*, Error* /* error */, const Ra
     MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Operation get_data not supported for bit tags" );
 }
 
-ErrorCode BitTag::set_data( SequenceManager*, Error* /* error */, const EntityHandle*, size_t, void const* const*,
+ErrorCode BitTag::set_data( SequenceManager*,
+                            Error* /* error */,
+                            const EntityHandle*,
+                            size_t,
+                            void const* const*,
                             const int* )
 {
     MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Operation set_data not supported for bit tags" );
@@ -304,7 +325,11 @@ ErrorCode BitTag::set_data( SequenceManager*, Error* /* error */, const Range&, 
     MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Operation set_data not supported for bit tags" );
 }
 
-ErrorCode BitTag::tag_iterate( SequenceManager*, Error* /* error */, Range::iterator&, const Range::iterator&, void*&,
+ErrorCode BitTag::tag_iterate( SequenceManager*,
+                               Error* /* error */,
+                               Range::iterator&,
+                               const Range::iterator&,
+                               void*&,
                                bool )
 {
     MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "Operation tag_iterate not supported for bit tags" );
@@ -353,7 +378,7 @@ inline void BitTag::get_tagged( Range::const_iterator begin, Range::const_iterat
         ++i;
         while( count > 0 )
         {
-            EntityID pcount = std::min( count, ( EntityID )( per_page - offset ) );
+            EntityID pcount = std::min( count, (EntityID)( per_page - offset ) );
             if( page < pageList[type].size() && pageList[type][page] )
                 hint = entities.insert( hint, h, h + pcount - 1 );
 
@@ -381,14 +406,18 @@ inline void BitTag::get_tagged( Container& entities, EntityType type, const Rang
     }
 }
 
-ErrorCode BitTag::get_tagged_entities( const SequenceManager*, Range& entities, EntityType type,
+ErrorCode BitTag::get_tagged_entities( const SequenceManager*,
+                                       Range& entities,
+                                       EntityType type,
                                        const Range* intersect ) const
 {
     get_tagged< Range >( entities, type, intersect );
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::num_tagged_entities( const SequenceManager*, size_t& count, EntityType type,
+ErrorCode BitTag::num_tagged_entities( const SequenceManager*,
+                                       size_t& count,
+                                       EntityType type,
                                        const Range* intersect ) const
 {
     InsertCount counter( count );
@@ -397,8 +426,12 @@ ErrorCode BitTag::num_tagged_entities( const SequenceManager*, size_t& count, En
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::find_entities_with_value( const SequenceManager*, Error* /* error */, Range& output_entities,
-                                            const void* value, int value_bytes, EntityType type,
+ErrorCode BitTag::find_entities_with_value( const SequenceManager*,
+                                            Error* /* error */,
+                                            Range& output_entities,
+                                            const void* value,
+                                            int value_bytes,
+                                            EntityType type,
                                             const Range* intersect_entities ) const
 {
     if( value_bytes && value_bytes != 1 )
@@ -434,7 +467,9 @@ ErrorCode BitTag::get_entities_with_bits( EntityType type, Range& entities, unsi
     return MB_SUCCESS;
 }
 
-ErrorCode BitTag::get_entities_with_bits( const Range& range, EntityType in_type, Range& entities,
+ErrorCode BitTag::get_entities_with_bits( const Range& range,
+                                          EntityType in_type,
+                                          Range& entities,
                                           unsigned char bits ) const
 {
     if( MBMAXTYPE == in_type )
@@ -467,7 +502,7 @@ ErrorCode BitTag::get_entities_with_bits( const Range& range, EntityType in_type
         ++i;
         while( count > 0 )
         {
-            EntityID pcount = std::min( count, ( EntityID )( per_page - offset ) );
+            EntityID pcount = std::min( count, (EntityID)( per_page - offset ) );
             if( page < pageList[type].size() && pageList[type][page] )
                 pageList[type][page]->search( bits, offset, pcount, storedBitsPerEntity, entities, h );
 

@@ -63,16 +63,23 @@ class AffineMapMetric : public ElemSampleQM
 
     MESQUITE_EXPORT virtual int get_negate_flag() const;
 
-    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles,
-                                                  bool free_vertices_only, MsqError& err );
+    MESQUITE_EXPORT virtual void get_evaluations( PatchData& pd,
+                                                  std::vector< size_t >& handles,
+                                                  bool free_vertices_only,
+                                                  MsqError& err );
 
-    MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd, size_t elem_index,
-                                                          std::vector< size_t >& handles, MsqError& err );
+    MESQUITE_EXPORT virtual void get_element_evaluations( PatchData& pd,
+                                                          size_t elem_index,
+                                                          std::vector< size_t >& handles,
+                                                          MsqError& err );
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                        std::vector< size_t >& indices, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_indices( PatchData& pd,
+                                                        size_t handle,
+                                                        double& value,
+                                                        std::vector< size_t >& indices,
+                                                        MsqError& err );
 
     void set_target_calculator( TargetCalculator* tc )
     {

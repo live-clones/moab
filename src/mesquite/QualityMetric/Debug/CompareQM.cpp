@@ -158,7 +158,9 @@ bool CompareQM::evaluate( PatchData& pd, size_t handle, double& value, MsqError&
     return true;
 }
 
-void CompareQM::index_mismatch( size_t handle, const std::vector< size_t >& idx1, const std::vector< size_t >& idx2,
+void CompareQM::index_mismatch( size_t handle,
+                                const std::vector< size_t >& idx1,
+                                const std::vector< size_t >& idx2,
                                 MsqError& err )
 {
     std::vector< size_t >::const_iterator i;
@@ -191,8 +193,11 @@ void CompareQM::index_mismatch( size_t handle, const std::vector< size_t >& idx1
     MSQ_SETERR( err )( "Cannot compare incompatible metrics", MsqError::INVALID_STATE );
 }
 
-void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1, const std::vector< size_t >& idx2,
-                               std::vector< size_t >& map_out, MsqError& err )
+void CompareQM::check_indices( size_t handle,
+                               const std::vector< size_t >& idx1,
+                               const std::vector< size_t >& idx2,
+                               std::vector< size_t >& map_out,
+                               MsqError& err )
 {
     if( idx1.size() != idx2.size() )
     {
@@ -212,7 +217,10 @@ void CompareQM::check_indices( size_t handle, const std::vector< size_t >& idx1,
     }
 }
 
-bool CompareQM::evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+bool CompareQM::evaluate_with_indices( PatchData& pd,
+                                       size_t handle,
+                                       double& value,
+                                       std::vector< size_t >& indices,
                                        MsqError& err )
 {
     bool valid1, valid2;
@@ -230,8 +238,11 @@ bool CompareQM::evaluate_with_indices( PatchData& pd, size_t handle, double& val
     return true;
 }
 
-void CompareQM::check_grad( size_t handle, const std::vector< size_t >& indices, const std::vector< size_t >& index_map,
-                            const std::vector< Vector3D >& grad1, const std::vector< Vector3D >& grad2 )
+void CompareQM::check_grad( size_t handle,
+                            const std::vector< size_t >& indices,
+                            const std::vector< size_t >& index_map,
+                            const std::vector< Vector3D >& grad1,
+                            const std::vector< Vector3D >& grad2 )
 {
     assert( index_map.size() == indices.size() );
     assert( index_map.size() == grad1.size() );
@@ -259,8 +270,12 @@ void CompareQM::check_grad( size_t handle, const std::vector< size_t >& indices,
     }
 }
 
-bool CompareQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                        std::vector< Vector3D >& grad, MsqError& err )
+bool CompareQM::evaluate_with_gradient( PatchData& pd,
+                                        size_t handle,
+                                        double& value,
+                                        std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& grad,
+                                        MsqError& err )
 {
     bool valid1, valid2;
     double value2;
@@ -279,8 +294,10 @@ bool CompareQM::evaluate_with_gradient( PatchData& pd, size_t handle, double& va
     return true;
 }
 
-void CompareQM::check_hess_diag( size_t handle, const std::vector< size_t >& indices,
-                                 const std::vector< size_t >& index_map, const std::vector< SymMatrix3D >& hess1,
+void CompareQM::check_hess_diag( size_t handle,
+                                 const std::vector< size_t >& indices,
+                                 const std::vector< size_t >& index_map,
+                                 const std::vector< SymMatrix3D >& hess1,
                                  const std::vector< SymMatrix3D >& hess2 )
 {
     assert( index_map.size() == indices.size() );
@@ -309,9 +326,13 @@ void CompareQM::check_hess_diag( size_t handle, const std::vector< size_t >& ind
     }
 }
 
-bool CompareQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, double& value,
-                                                std::vector< size_t >& indices, std::vector< Vector3D >& grad,
-                                                std::vector< SymMatrix3D >& hess, MsqError& err )
+bool CompareQM::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                size_t handle,
+                                                double& value,
+                                                std::vector< size_t >& indices,
+                                                std::vector< Vector3D >& grad,
+                                                std::vector< SymMatrix3D >& hess,
+                                                MsqError& err )
 {
     bool valid1, valid2;
     double value2;
@@ -332,8 +353,11 @@ bool CompareQM::evaluate_with_Hessian_diagonal( PatchData& pd, size_t handle, do
     return true;
 }
 
-void CompareQM::check_hess( size_t handle, const std::vector< size_t >& indices, const std::vector< size_t >& index_map,
-                            const std::vector< Matrix3D >& hess1, const std::vector< Matrix3D >& hess2 )
+void CompareQM::check_hess( size_t handle,
+                            const std::vector< size_t >& indices,
+                            const std::vector< size_t >& index_map,
+                            const std::vector< Matrix3D >& hess1,
+                            const std::vector< Matrix3D >& hess2 )
 {
     const size_t n = index_map.size();
     const size_t N = ( n + 1 ) * n / 2;
@@ -392,8 +416,13 @@ void CompareQM::check_hess( size_t handle, const std::vector< size_t >& indices,
     }
 }
 
-bool CompareQM::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                       std::vector< Vector3D >& grad, std::vector< Matrix3D >& hess, MsqError& err )
+bool CompareQM::evaluate_with_Hessian( PatchData& pd,
+                                       size_t handle,
+                                       double& value,
+                                       std::vector< size_t >& indices,
+                                       std::vector< Vector3D >& grad,
+                                       std::vector< Matrix3D >& hess,
+                                       MsqError& err )
 {
     bool valid1, valid2;
     double value2;
@@ -484,8 +513,12 @@ void CompareQM::HessStat::add_nondiag_diff( Matrix3D hess1, Matrix3D hess2 )
     add_nondiag( hess );
 }
 
-static void print( const char* title, const char* name1, const char* name2, const SimpleStats& s1,
-                   const SimpleStats& s2, const SimpleStats& sd )
+static void print( const char* title,
+                   const char* name1,
+                   const char* name2,
+                   const SimpleStats& s1,
+                   const SimpleStats& s2,
+                   const SimpleStats& sd )
 {
     const char named[] = "difference";
     int len = std::max( std::max( strlen( named ), strlen( title ) ), std::max( strlen( name1 ), strlen( name2 ) ) );

@@ -9,42 +9,46 @@ static int print_file_summary( struct mhdf_FileDesc* data );
 
 int main( int argc, char* argv[] )
 {
-    int                   result;
-    mhdf_FileHandle       file;
-    mhdf_Status           status;
-    unsigned long         max_id;
+    int result;
+    mhdf_FileHandle file;
+    mhdf_Status status;
+    unsigned long max_id;
     struct mhdf_FileDesc* data;
 
     if( argc != 2 )
     {
-        fprintf( stderr, "Usage: %s <filename>\n", argv[ 0 ] );
+        fprintf( stderr, "Usage: %s <filename>\n", argv[0] );
         return 1;
     }
 
-    file = mhdf_openFile( argv[ 1 ], 0, &max_id, -1, &status );
+    file = mhdf_openFile( argv[1], 0, &max_id, -1, &status );
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "%s: %s\n", argv[ 1 ], mhdf_message( &status ) );
+        fprintf( stderr, "%s: %s\n", argv[1], mhdf_message( &status ) );
         return 1;
     }
 
     data = mhdf_getFileSummary( file, H5T_NATIVE_ULONG, &status, 0 ); /* no extra set info here*/
     if( mhdf_isError( &status ) )
     {
-        fprintf( stderr, "%s: %s\n", argv[ 1 ], mhdf_message( &status ) );
+        fprintf( stderr, "%s: %s\n", argv[1], mhdf_message( &status ) );
         return 1;
     }
 
     mhdf_closeFile( file, &status );
 
-    printf( "%s:\n", argv[ 1 ] );
+    printf( "%s:\n", argv[1] );
     result = print_file_summary( data );
     free( data );
     return result;
 }
 
-static void print_ent_desc( const char* name, const char* subname, struct mhdf_EntDesc* data, const char* vals_label,
-                            const char* extra_label, struct mhdf_FileDesc* all )
+static void print_ent_desc( const char* name,
+                            const char* subname,
+                            struct mhdf_EntDesc* data,
+                            const char* vals_label,
+                            const char* extra_label,
+                            struct mhdf_FileDesc* all )
 {
     int i, len = 10;
 
@@ -65,9 +69,9 @@ static void print_ent_desc( const char* name, const char* subname, struct mhdf_E
 
     if( !data->num_dense_tags ) return;
 
-    printf( "      %-*s: \"%s\"", len, "dense tags", all->tags[ data->dense_tag_indices[ 0 ] ].name );
+    printf( "      %-*s: \"%s\"", len, "dense tags", all->tags[data->dense_tag_indices[0]].name );
     for( i = 1; i < data->num_dense_tags; ++i )
-        printf( ", \"%s\"", all->tags[ data->dense_tag_indices[ i ] ].name );
+        printf( ", \"%s\"", all->tags[data->dense_tag_indices[i]].name );
     printf( "\n" );
 }
 
@@ -79,12 +83,12 @@ static void print_elem_desc( struct mhdf_ElemDesc* data, struct mhdf_FileDesc* a
 
 static const char* tag_type_name( enum mhdf_TagDataType type )
 {
-    static const char opaque[] = "opaque";
+    static const char opaque[]  = "opaque";
     static const char integer[] = "integer";
-    static const char real[] = "real";
-    static const char bits[] = "bit field";
+    static const char real[]    = "real";
+    static const char bits[]    = "bit field";
     static const char boolean[] = "boolean";
-    static const char id[] = "entity id";
+    static const char id[]      = "entity id";
     static const char unknown[] = "(UNKNOWN TYPE ID)";
     switch( type )
     {
@@ -106,12 +110,12 @@ static const char* tag_type_name( enum mhdf_TagDataType type )
 
 static const char* string_tag_value( const void* value, enum mhdf_TagDataType type, int size )
 {
-    static char          buffer[ 1024 ];
-    const char*          data = value;
-    char*                offset = buffer;
-    int                  print, i;
-    const int*           intptr = value;
-    const double*        dblptr = value;
+    static char buffer[1024];
+    const char* data = value;
+    char* offset     = buffer;
+    int print, i;
+    const int* intptr          = value;
+    const double* dblptr       = value;
     const unsigned long* idptr = value;
 
     if( size <= 0 )
@@ -125,13 +129,13 @@ static const char* string_tag_value( const void* value, enum mhdf_TagDataType ty
         case mhdf_OPAQUE:
             print = 1;
             for( i = 0; i < size; ++i )
-                if( !isprint( data[ i ] ) ) print = 0;
+                if( !isprint( data[i] ) ) print = 0;
             if( print )
             {
-                offset[ 0 ] = '"';
+                offset[0] = '"';
                 memcpy( offset + 1, data, size );
-                offset[ size + 1 ] = '"';
-                offset[ size + 2 ] = '\0';
+                offset[size + 1] = '"';
+                offset[size + 2] = '\0';
                 offset += size + 2;
             }
             else
@@ -139,26 +143,32 @@ static const char* string_tag_value( const void* value, enum mhdf_TagDataType ty
                 strcpy( offset, "0x" );
                 offset += 2;
                 for( i = 0; i < size; ++i )
-                    offset += sprintf( offset, "%02x", (unsigned int)data[ i ] );
+                    offset += sprintf( offset, "%02x", (unsigned int)data[i] );
             }
             break;
         case mhdf_INTEGER:
-            if( size == 1 ) { offset += sprintf( offset, "%d", intptr[ 0 ] ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%d", intptr[0] );
+            }
             else
             {
-                offset += sprintf( offset, "{%d", intptr[ 0 ] );
+                offset += sprintf( offset, "{%d", intptr[0] );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%d", intptr[ i ] );
+                    offset += sprintf( offset, ",%d", intptr[i] );
                 offset += sprintf( offset, "}" );
             }
             break;
         case mhdf_FLOAT:
-            if( size == 1 ) { offset += sprintf( offset, "%g", dblptr[ 0 ] ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%g", dblptr[0] );
+            }
             else
             {
-                offset += sprintf( offset, "{%g", dblptr[ 0 ] );
+                offset += sprintf( offset, "{%g", dblptr[0] );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%g", dblptr[ i ] );
+                    offset += sprintf( offset, ",%g", dblptr[i] );
                 offset += sprintf( offset, "}" );
             }
             break;
@@ -173,22 +183,28 @@ static const char* string_tag_value( const void* value, enum mhdf_TagDataType ty
             }
             break;
         case mhdf_BOOLEAN:
-            if( size == 1 ) { offset += sprintf( offset, "%s", data[ 0 ] ? "true" : "false" ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%s", data[0] ? "true" : "false" );
+            }
             else
             {
-                offset += sprintf( offset, "{%s", data[ 0 ] ? "true" : "false" );
+                offset += sprintf( offset, "{%s", data[0] ? "true" : "false" );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%s", data[ i ] ? "true" : "false" );
+                    offset += sprintf( offset, ",%s", data[i] ? "true" : "false" );
                 offset += sprintf( offset, "}" );
             }
             break;
         case mhdf_ENTITY_ID:
-            if( size == 1 ) { offset += sprintf( offset, "%lu", idptr[ 0 ] ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%lu", idptr[0] );
+            }
             else
             {
-                offset += sprintf( offset, "{%lu", idptr[ 0 ] );
+                offset += sprintf( offset, "{%lu", idptr[0] );
                 for( i = 1; i < size; ++i )
-                    offset += sprintf( offset, ",%lu", idptr[ i ] );
+                    offset += sprintf( offset, ",%lu", idptr[i] );
                 offset += sprintf( offset, "}" );
             }
             break;
@@ -202,13 +218,13 @@ static const char* string_tag_value( const void* value, enum mhdf_TagDataType ty
 
 static const char* ent_desc_name( struct mhdf_FileDesc* all, int idx )
 {
-    static const char nodes[] = "Nodes";
-    static const char sets[] = "Sets";
+    static const char nodes[]   = "Nodes";
+    static const char sets[]    = "Sets";
     static const char invalid[] = "<INVALID INDEX!>";
     if( idx == -2 ) return sets;
     if( idx == -1 ) return nodes;
     if( idx >= all->num_elem_desc || idx < -2 ) return invalid;
-    return all->elems[ idx ].handle;
+    return all->elems[idx].handle;
 }
 
 static void print_tag_desc( struct mhdf_TagDesc* data, struct mhdf_FileDesc* all )
@@ -232,13 +248,13 @@ static void print_tag_desc( struct mhdf_TagDesc* data, struct mhdf_FileDesc* all
     {
         printf( "      %-*s: (sparse)", width, "tables" );
         for( i = 0; i < data->num_dense_indices; ++i )
-            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[ i ] ) );
+            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[i] ) );
     }
     else if( data->num_dense_indices )
     {
-        printf( "      %-*s: %s", width, "tables", ent_desc_name( all, data->dense_elem_indices[ 0 ] ) );
+        printf( "      %-*s: %s", width, "tables", ent_desc_name( all, data->dense_elem_indices[0] ) );
         for( i = 1; i < data->num_dense_indices; ++i )
-            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[ i ] ) );
+            printf( ", %s", ent_desc_name( all, data->dense_elem_indices[i] ) );
     }
     else
     {

@@ -110,7 +110,10 @@ bool SmoothCurve::position_from_u( double u, double& x, double& y, double& z, do
     int index           = ptr - &_fractions[0];
     double nextFraction = _fractions[index];
     double prevFraction = 0;
-    if( index > 0 ) { prevFraction = _fractions[index - 1]; }
+    if( index > 0 )
+    {
+        prevFraction = _fractions[index - 1];
+    }
     double t = ( u - prevFraction ) / ( nextFraction - prevFraction );
 
     EntityHandle edge = _entities[index];
@@ -422,8 +425,10 @@ void SmoothCurve::compute_tangents_for_each_edge()
     return;
 }
 
-void SmoothCurve::compute_control_points_on_boundary_edges( double, std::map< EntityHandle, SmoothFace* >& mapSurfaces,
-                                                            Tag controlPointsTag, Tag markTag )
+void SmoothCurve::compute_control_points_on_boundary_edges( double,
+                                                            std::map< EntityHandle, SmoothFace* >& mapSurfaces,
+                                                            Tag controlPointsTag,
+                                                            Tag markTag )
 {
     // these points really need the surfaces they belong to, because the control points on edges
     // depend on the normals on surfaces

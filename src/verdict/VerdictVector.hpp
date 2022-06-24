@@ -403,7 +403,10 @@ inline VerdictVector operator~( const VerdictVector& vec )
     double mag = sqrt( vec.xVal * vec.xVal + vec.yVal * vec.yVal + vec.zVal * vec.zVal );
 
     VerdictVector temp = vec;
-    if( mag != 0.0 ) { temp /= mag; }
+    if( mag != 0.0 )
+    {
+        temp /= mag;
+    }
     return temp;
 }
 

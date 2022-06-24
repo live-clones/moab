@@ -322,7 +322,10 @@ static void eval( f_t function, NodeSet nodeset, double xi, double eta, double r
         results[i] = function( i, xi, eta );
 
     // if center node is present, adjust mid-edge coefficients
-    if( !nodeset.mid_face_node( 0 ) ) { results[8] = 0; }
+    if( !nodeset.mid_face_node( 0 ) )
+    {
+        results[8] = 0;
+    }
     else
     {
         for( unsigned i = 0; i < 4; ++i )
@@ -334,7 +337,10 @@ static void eval( f_t function, NodeSet nodeset, double xi, double eta, double r
     // if mid-edge nodes are present, adjust values for adjacent corners
     for( unsigned i = 0; i < 4; ++i )
     {
-        if( !nodeset.mid_edge_node( i ) ) { results[i + 4] = 0.0; }
+        if( !nodeset.mid_edge_node( i ) )
+        {
+            results[i + 4] = 0.0;
+        }
         else
         {
             results[i] -= 0.5 * results[i + 4];              // 1st adjacent corner
@@ -400,8 +406,12 @@ static void check_no_zeros( const MsqVector< 2 >* derivs, size_t num_vtx )
     }
 }
 
-static void compare_coefficients( const double* coeffs, const size_t* indices, size_t num_coeff,
-                                  const double* expected_coeffs, unsigned loc, NodeSet bits )
+static void compare_coefficients( const double* coeffs,
+                                  const size_t* indices,
+                                  size_t num_coeff,
+                                  const double* expected_coeffs,
+                                  unsigned loc,
+                                  NodeSet bits )
 {
     // find the location in the returned list for each node
     size_t revidx[9];
@@ -432,8 +442,13 @@ static void compare_coefficients( const double* coeffs, const size_t* indices, s
     ASSERT_VALUES_EQUAL( expected_coeffs[8], test_vals[8], loc, bits );
 }
 
-static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 2 >* derivs,
-                                 const double* expected_dxi, const double* expected_deta, unsigned loc, NodeSet bits )
+static void compare_derivatives( const size_t* vertices,
+                                 size_t num_vtx,
+                                 const MsqVector< 2 >* derivs,
+                                 const double* expected_dxi,
+                                 const double* expected_deta,
+                                 unsigned loc,
+                                 NodeSet bits )
 {
     check_valid_indices( vertices, num_vtx, bits );
     check_no_zeros( derivs, num_vtx );

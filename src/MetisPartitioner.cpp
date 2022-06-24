@@ -44,10 +44,15 @@ MetisPartitioner::MetisPartitioner( Interface* impl, const bool use_coords )
 
 MetisPartitioner::~MetisPartitioner() {}
 
-ErrorCode MetisPartitioner::partition_mesh( const idx_t nparts, const char* method, const int part_dim,
-                                            const bool write_as_sets, const bool write_as_tags,
-                                            const bool partition_tagged_sets, const bool partition_tagged_ents,
-                                            const char* aggregating_tag, const bool print_time )
+ErrorCode MetisPartitioner::partition_mesh( const idx_t nparts,
+                                            const char* method,
+                                            const int part_dim,
+                                            const bool write_as_sets,
+                                            const bool write_as_tags,
+                                            const bool partition_tagged_sets,
+                                            const bool partition_tagged_ents,
+                                            const char* aggregating_tag,
+                                            const bool print_time )
 {
 #ifdef MOAB_HAVE_MPI
     // should only be called in serial
@@ -175,10 +180,13 @@ ErrorCode MetisPartitioner::partition_mesh( const idx_t nparts, const char* meth
     return MB_SUCCESS;
 }
 
-ErrorCode MetisPartitioner::assemble_taggedents_graph( const int dimension, std::vector< double >& coords,
+ErrorCode MetisPartitioner::assemble_taggedents_graph( const int dimension,
+                                                       std::vector< double >& coords,
                                                        std::vector< idx_t >& moab_ids,
-                                                       std::vector< idx_t >& adjacencies, std::vector< idx_t >& length,
-                                                       Range& elems, const char* aggregating_tag )
+                                                       std::vector< idx_t >& adjacencies,
+                                                       std::vector< idx_t >& length,
+                                                       Range& elems,
+                                                       const char* aggregating_tag )
 {
     Tag partSetTag;
     ErrorCode result = mbImpl->tag_get_handle( aggregating_tag, 1, MB_TYPE_INTEGER, partSetTag );
@@ -237,10 +245,13 @@ ErrorCode MetisPartitioner::assemble_taggedents_graph( const int dimension, std:
     return MB_SUCCESS;
 }
 
-ErrorCode MetisPartitioner::assemble_taggedsets_graph( const int dimension, std::vector< double >& coords,
+ErrorCode MetisPartitioner::assemble_taggedsets_graph( const int dimension,
+                                                       std::vector< double >& coords,
                                                        std::vector< idx_t >& moab_ids,
-                                                       std::vector< idx_t >& adjacencies, std::vector< idx_t >& length,
-                                                       Range& elems, const char* aggregating_tag )
+                                                       std::vector< idx_t >& adjacencies,
+                                                       std::vector< idx_t >& length,
+                                                       Range& elems,
+                                                       const char* aggregating_tag )
 {
     length.push_back( 0 );
     // assemble a graph with vertices equal to elements of specified dimension, edges
@@ -359,9 +370,12 @@ ErrorCode MetisPartitioner::assemble_taggedsets_graph( const int dimension, std:
     return MB_SUCCESS;
 }
 
-ErrorCode MetisPartitioner::assemble_graph( const int dimension, std::vector< double >& coords,
-                                            std::vector< idx_t >& moab_ids, std::vector< idx_t >& adjacencies,
-                                            std::vector< idx_t >& length, Range& elems )
+ErrorCode MetisPartitioner::assemble_graph( const int dimension,
+                                            std::vector< double >& coords,
+                                            std::vector< idx_t >& moab_ids,
+                                            std::vector< idx_t >& adjacencies,
+                                            std::vector< idx_t >& length,
+                                            Range& elems )
 {
     length.push_back( 0 );
     // assemble a graph with vertices equal to elements of specified dimension, edges
@@ -443,8 +457,11 @@ ErrorCode MetisPartitioner::assemble_graph( const int dimension, std::vector< do
     return MB_SUCCESS;
 }
 
-ErrorCode MetisPartitioner::write_aggregationtag_partition( const idx_t nparts, Range& elems, const idx_t* assignment,
-                                                            const bool write_as_sets, const bool write_as_tags )
+ErrorCode MetisPartitioner::write_aggregationtag_partition( const idx_t nparts,
+                                                            Range& elems,
+                                                            const idx_t* assignment,
+                                                            const bool write_as_sets,
+                                                            const bool write_as_tags )
 {
     ErrorCode result;
 
@@ -558,8 +575,11 @@ ErrorCode MetisPartitioner::write_aggregationtag_partition( const idx_t nparts, 
     return MB_SUCCESS;
 }
 
-ErrorCode MetisPartitioner::write_partition( const idx_t nparts, Range& elems, const idx_t* assignment,
-                                             const bool write_as_sets, const bool write_as_tags )
+ErrorCode MetisPartitioner::write_partition( const idx_t nparts,
+                                             Range& elems,
+                                             const idx_t* assignment,
+                                             const bool write_as_sets,
+                                             const bool write_as_tags )
 {
     ErrorCode result;
 
@@ -567,7 +587,7 @@ ErrorCode MetisPartitioner::write_partition( const idx_t nparts, Range& elems, c
     Tag part_set_tag;
     idx_t dum_id = -1, i;
     result       = mbImpl->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_set_tag,
-                                     MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );MB_CHK_ERR( result );
+                                           MB_TAG_SPARSE | MB_TAG_CREAT, &dum_id );MB_CHK_ERR( result );
 
     // get any sets already with this tag, and clear them
     Range tagged_sets;
