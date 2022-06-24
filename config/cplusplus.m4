@@ -9,18 +9,12 @@ AC_CACHE_CHECK([for C++ unordered_map],
                [mk_cv_cxx_unordered_map],
                [AC_LANG_PUSH(C++)
                 mk_cv_cxx_unordered_map=no
-                AC_TRY_COMPILE([#include <unordered_map>],
-                               [std::unordered_map<int,int> map],
-                               [mk_cv_cxx_unordered_map="std"; incdir=])
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <unordered_map>]], [[std::unordered_map<int,int> map]])],[mk_cv_cxx_unordered_map="std"; incdir=],[])
                 if test "xno" == "x$mk_cv_cxx_unordered_map"; then
-                  AC_TRY_COMPILE([#include <tr1/unordered_map>],
-                                 [std::tr1::unordered_map<int,int> map],
-                                 [mk_cv_cxx_unordered_map="std::tr1"; incdir=tr1/])
+                  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <tr1/unordered_map>]], [[std::tr1::unordered_map<int,int> map]])],[mk_cv_cxx_unordered_map="std::tr1"; incdir=tr1/],[])
                 fi
                 if test "xno" == "x$mk_cv_cxx_unordered_map"; then
-                  AC_TRY_COMPILE([#include <boost/unordered_map>],
-                                 [boost::unordered_map<int,int> map],
-                                 [mk_cv_cxx_unordered_map="boost"; incdir=boost/])
+                  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <boost/unordered_map>]], [[boost::unordered_map<int,int> map]])],[mk_cv_cxx_unordered_map="boost"; incdir=boost/],[])
                 fi
                 AC_LANG_POP(C++)])
 if test "xno" != "x$mk_cv_cxx_unordered_map"; then
@@ -49,15 +43,12 @@ AC_DEFUN([FATHOM_CANT_USE_STD], [
 AC_CACHE_CHECK([for C++-standard library in std:: namespace],
                [snl_cv_cxx_stl_in_std],
                [AC_LANG_SAVE
-                AC_LANG_CPLUSPLUS
-                AC_TRY_COMPILE([#include <vector>
+                AC_LANG([C++])
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <vector>
                                 #include <string>
                                 #include <map>
-                                #include <algorithm>],
-                               [std::vector<std::string> v;
-                                std::map<std::string,std::string> m; ],
-                               [snl_cv_cxx_stl_in_std=yes],
-                               [snl_cv_cxx_stl_in_std=no])
+                                #include <algorithm>]], [[std::vector<std::string> v;
+                                std::map<std::string,std::string> m; ]])],[snl_cv_cxx_stl_in_std=yes],[snl_cv_cxx_stl_in_std=no])
                 AC_LANG_RESTORE])
                 
 CANT_USE_STD=
@@ -69,14 +60,11 @@ fi
 AC_CACHE_CHECK([for C++-standard I/O in std:: namespace],
                [snl_cv_cxx_io_in_std],
                [AC_LANG_SAVE
-                AC_LANG_CPLUSPLUS
-                AC_TRY_COMPILE([#include <iosfwd>
+                AC_LANG([C++])
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <iosfwd>
                                 #include <iostream>
                                 #include <ostream>
-                                #include <sstream>],
-                               [std::cout << std::endl;],
-                               [snl_cv_cxx_io_in_std=yes],
-                               [snl_cv_cxx_io_in_std=no])
+                                #include <sstream>]], [[std::cout << std::endl;]])],[snl_cv_cxx_io_in_std=yes],[snl_cv_cxx_io_in_std=no])
                 AC_LANG_RESTORE])
                 
 CANT_USE_STD_IO=
@@ -100,7 +88,7 @@ AC_DEFUN([FATHOM_TEMPLATE_DEFS_INCLUDED], [
 AC_CACHE_CHECK([if C++ template definitions should be included],
                [snl_cv_cxx_template_defs_included],
                [AC_LANG_SAVE
-                AC_LANG_CPLUSPLUS
+                AC_LANG([C++])
 
                 src=conftest.cc
                 templ=conftemp.cc
@@ -135,12 +123,9 @@ AC_DEFUN([FATHOM_TEMPLATE_SPECIALIZATION], [
 AC_CACHE_CHECK([if C++ compiler supports template class specialization],
                [snl_cv_template_specialization],
                [AC_LANG_SAVE
-                AC_LANG_CPLUSPLUS
-                AC_TRY_COMPILE([template <unsigned S> class MyTempl { public: char data[S]; };
-                                template <> class MyTempl<0> { public: char value; };],
-                               [MyTempl<1> one; MyTempl<0> zero; one.data[0] = zero.value = '\0';],
-                               [snl_cv_template_specialization=yes],
-                               [snl_cv_template_specialization=no])
+                AC_LANG([C++])
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[template <unsigned S> class MyTempl { public: char data[S]; };
+                                template <> class MyTempl<0> { public: char value; };]], [[MyTempl<1> one; MyTempl<0> zero; one.data[0] = zero.value = '\0';]])],[snl_cv_template_specialization=yes],[snl_cv_template_specialization=no])
                 AC_LANG_RESTORE])
 
 TEMPLATE_SPECIALIZATION=
@@ -159,13 +144,10 @@ AC_DEFUN([FATHOM_TEMPLATE_FUNC_SPECIALIZATION], [
 AC_CACHE_CHECK([if C++ compiler supports template function specialization],
                [snl_cv_template_func_specialization],
                [AC_LANG_SAVE
-                AC_LANG_CPLUSPLUS
-                AC_TRY_COMPILE([template <typename T> T templ_func( int i );
+                AC_LANG([C++])
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[template <typename T> T templ_func( int i );
                                 template <> int templ_func<int>( int j ) 
-                                  { return j; }],
-                               [return templ_func<int>( 0 );],
-                               [snl_cv_template_func_specialization=yes],
-                               [snl_cv_template_func_specialization=no])
+                                  { return j; }]], [[return templ_func<int>( 0 );]])],[snl_cv_template_func_specialization=yes],[snl_cv_template_func_specialization=no])
                 AC_LANG_RESTORE])
 
 TEMPLATE_FUNC_SPECIALIZATION=
