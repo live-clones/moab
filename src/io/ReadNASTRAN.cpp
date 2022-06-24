@@ -58,20 +58,27 @@ ReadNASTRAN::~ReadNASTRAN()
     }
 }
 
-ErrorCode ReadNASTRAN::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/,
-                                        const FileOptions& /*opts*/, std::vector< int >& /*tag_values_out*/,
+ErrorCode ReadNASTRAN::read_tag_values( const char* /*file_name*/,
+                                        const char* /*tag_name*/,
+                                        const FileOptions& /*opts*/,
+                                        std::vector< int >& /*tag_values_out*/,
                                         const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // Load the file as called by the Interface function
-ErrorCode ReadNASTRAN::load_file( const char* filename, const EntityHandle* /* file_set */,
-                                  const FileOptions& /* opts */, const ReaderIface::SubsetList* subset_list,
+ErrorCode ReadNASTRAN::load_file( const char* filename,
+                                  const EntityHandle* /* file_set */,
+                                  const FileOptions& /* opts */,
+                                  const ReaderIface::SubsetList* subset_list,
                                   const Tag* file_id_tag )
 {
     // At this time there is no support for reading a subset of the file
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for NASTRAN" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for NASTRAN" );
+    }
 
     nodeIdMap.clear();
     elemIdMap.clear();
@@ -213,7 +220,8 @@ ErrorCode ReadNASTRAN::determine_line_format( const std::string& line, line_form
 }
 
 /* Tokenize the line. Continue-lines have not been implemented. */
-ErrorCode ReadNASTRAN::tokenize_line( const std::string& line, const line_format format,
+ErrorCode ReadNASTRAN::tokenize_line( const std::string& line,
+                                      const line_format format,
                                       std::vector< std::string >& tokens )
 {
     size_t line_size = line.size();
@@ -306,7 +314,10 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
             exponent    = token.substr( found_E + 1 );
             // If there is a "+" on the exponent, cut it off
             std::size_t found_plus = exponent.find( "+" );
-            if( std::string::npos != found_plus ) { exponent = exponent.substr( found_plus + 1 ); }
+            if( std::string::npos != found_plus )
+            {
+                exponent = exponent.substr( found_plus + 1 );
+            }
         }
         else
         {
@@ -333,7 +344,9 @@ ErrorCode ReadNASTRAN::get_real( const std::string& token, double& real )
 
 /* It has been determined that this line is a vertex. Read the rest of
    the line and create the vertex. */
-ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, const bool debug, double* coords[3],
+ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens,
+                                  const bool debug,
+                                  double* coords[3],
                                   int& id )
 {
     // Read the node's id (unique)
@@ -363,8 +376,10 @@ ErrorCode ReadNASTRAN::read_node( const std::vector< std::string >& tokens, cons
 /* The type of element has already been identified. Read the rest of the
    line and create the element. Assume that all of the nodes have already
    been created. */
-ErrorCode ReadNASTRAN::read_element( const std::vector< std::string >& tokens, std::vector< Range >& materials,
-                                     const EntityType element_type, const bool /*debug*/ )
+ErrorCode ReadNASTRAN::read_element( const std::vector< std::string >& tokens,
+                                     std::vector< Range >& materials,
+                                     const EntityType element_type,
+                                     const bool /*debug*/ )
 {
     // Read the element's id (unique) and material set
     ErrorCode result;

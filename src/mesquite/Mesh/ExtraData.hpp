@@ -81,8 +81,10 @@ class ExtraData
      *\param element_index_map The indices in the original patch for each
      *          element in the subpatch.
      */
-    virtual void notify_sub_patch( PatchData& sub_patch, const size_t* vertex_index_map,
-                                   const size_t* element_index_map, MsqError& err ) = 0;
+    virtual void notify_sub_patch( PatchData& sub_patch,
+                                   const size_t* vertex_index_map,
+                                   const size_t* element_index_map,
+                                   MsqError& err ) = 0;
 
   private:
     friend class PatchData;

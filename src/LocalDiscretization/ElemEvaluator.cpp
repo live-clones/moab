@@ -16,9 +16,18 @@
 
 namespace moab
 {
-ErrorCode EvalSet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f, const double* posn,
-                                     const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                     const double inside_tol, double* work, double* params, int* inside )
+ErrorCode EvalSet::evaluate_reverse( EvalFcn eval,
+                                     JacobianFcn jacob,
+                                     InsideFcn inside_f,
+                                     const double* posn,
+                                     const double* verts,
+                                     const int nverts,
+                                     const int ndim,
+                                     const double iter_tol,
+                                     const double inside_tol,
+                                     double* work,
+                                     double* params,
+                                     int* inside )
 {
     // TODO: should differentiate between epsilons used for
     // Newton Raphson iteration, and epsilons used for curved boundary geometry errors
@@ -125,8 +134,12 @@ ErrorCode EvalSet::get_eval_set( EntityType tp, unsigned int num_vertices, EvalS
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ElemEvaluator::find_containing_entity( Range& entities, const double* point, const double iter_tol,
-                                                 const double inside_tol, EntityHandle& containing_ent, double* params,
+ErrorCode ElemEvaluator::find_containing_entity( Range& entities,
+                                                 const double* point,
+                                                 const double iter_tol,
+                                                 const double inside_tol,
+                                                 EntityHandle& containing_ent,
+                                                 double* params,
                                                  unsigned int* num_evals )
 {
     int is_inside;

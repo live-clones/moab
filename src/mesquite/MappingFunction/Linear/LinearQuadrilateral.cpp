@@ -46,8 +46,12 @@ int LinearQuadrilateral::num_nodes() const
     return 4;
 }
 
-void LinearQuadrilateral::coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                                        size_t& num_coeff, MsqError& err ) const
+void LinearQuadrilateral::coefficients( Sample location,
+                                        NodeSet nodeset,
+                                        double* coeff_out,
+                                        size_t* indices_out,
+                                        size_t& num_coeff,
+                                        MsqError& err ) const
 {
     if( nodeset.have_any_mid_node() )
     {
@@ -58,7 +62,10 @@ void LinearQuadrilateral::coefficients( Sample location, NodeSet nodeset, double
     coefficients( location, nodeset, coeff_out, indices_out, num_coeff );
 }
 
-void LinearQuadrilateral::coefficients( Sample location, NodeSet, double* coeff_out, size_t* indices_out,
+void LinearQuadrilateral::coefficients( Sample location,
+                                        NodeSet,
+                                        double* coeff_out,
+                                        size_t* indices_out,
                                         size_t& num_coeff )
 {
     switch( location.dimension )
@@ -157,8 +164,12 @@ static void derivatives_at_mid_elem( size_t* vertices, MsqVector< 2 >* derivs, s
     derivs[3][1] = 0.5;
 }
 
-void LinearQuadrilateral::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                       MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
+void LinearQuadrilateral::derivatives( Sample loc,
+                                       NodeSet nodeset,
+                                       size_t* vertex_indices_out,
+                                       MsqVector< 2 >* d_coeff_d_xi_out,
+                                       size_t& num_vtx,
+                                       MsqError& err ) const
 {
     if( nodeset.have_any_mid_node() )
     {
@@ -169,8 +180,11 @@ void LinearQuadrilateral::derivatives( Sample loc, NodeSet nodeset, size_t* vert
     derivatives( loc, nodeset, vertex_indices_out, d_coeff_d_xi_out, num_vtx );
 }
 
-void LinearQuadrilateral::derivatives( Sample loc, NodeSet, size_t* vertex_indices_out,
-                                       MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx )
+void LinearQuadrilateral::derivatives( Sample loc,
+                                       NodeSet,
+                                       size_t* vertex_indices_out,
+                                       MsqVector< 2 >* d_coeff_d_xi_out,
+                                       size_t& num_vtx )
 {
     switch( loc.dimension )
     {

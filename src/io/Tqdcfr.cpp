@@ -284,15 +284,20 @@ Tqdcfr::~Tqdcfr()
     }
 }
 
-ErrorCode Tqdcfr::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                   const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode Tqdcfr::read_tag_values( const char* /* file_name */,
+                                   const char* /* tag_name */,
+                                   const FileOptions& /* opts */,
+                                   std::vector< int >& /* tag_values_out */,
                                    const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const FileOptions& opts,
-                             const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode Tqdcfr::load_file( const char* file_name,
+                             const EntityHandle*,
+                             const FileOptions& opts,
+                             const ReaderIface::SubsetList* subset_list,
+                             const Tag* file_id_tag )
 {
     ErrorCode result;
 
@@ -302,11 +307,17 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
         if( 0 < tmpval ) debug = true;
     }
 
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CUB files" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CUB files" );
+    }
 
     // Open file
     cubFile = fopen( file_name, "rb" );
-    if( NULL == cubFile ) { MB_SET_ERR( MB_FAILURE, "File not found" ); }
+    if( NULL == cubFile )
+    {
+        MB_SET_ERR( MB_FAILURE, "File not found" );
+    }
 
     // Verify magic string
     FREADC( 4 );
@@ -464,7 +475,10 @@ ErrorCode Tqdcfr::load_file( const char* file_name, const EntityHandle*, const F
         // **************************
         GeomTopoTool gtt( mdbImpl, true, 0, true, false );
         result = gtt.restore_topology_from_adjacency();
-        if( MB_SUCCESS != result ) { std::cout << "Failed to restore topology " << std::endl; }
+        if( MB_SUCCESS != result )
+        {
+            std::cout << "Failed to restore topology " << std::endl;
+        }
     }
 
     // done with the cubit file
@@ -540,7 +554,7 @@ ErrorCode Tqdcfr::convert_nodesets_sidesets()
         {
             int default_val = 0;
             tmp_result      = mdbImpl->tag_get_handle( DIRICHLET_SET_TAG_NAME, 1, MB_TYPE_INTEGER, nsTag,
-                                                  MB_TAG_SPARSE | MB_TAG_CREAT, &default_val );
+                                                       MB_TAG_SPARSE | MB_TAG_CREAT, &default_val );
             if( MB_SUCCESS != tmp_result ) result = tmp_result;
         }
         if( MB_SUCCESS == tmp_result ) tmp_result = mdbImpl->tag_set_data( nsTag, new_nodesets, &new_nodeset_ids[0] );
@@ -554,7 +568,7 @@ ErrorCode Tqdcfr::convert_nodesets_sidesets()
         {
             int default_val = 0;
             tmp_result      = mdbImpl->tag_get_handle( NEUMANN_SET_TAG_NAME, 1, MB_TYPE_INTEGER, ssTag,
-                                                  MB_TAG_SPARSE | MB_TAG_CREAT, &default_val );
+                                                       MB_TAG_SPARSE | MB_TAG_CREAT, &default_val );
             if( MB_SUCCESS != tmp_result ) result = tmp_result;
         }
         if( MB_SUCCESS == tmp_result ) tmp_result = mdbImpl->tag_set_data( ssTag, new_sidesets, &new_sideset_ids[0] );
@@ -657,7 +671,9 @@ ErrorCode Tqdcfr::read_nodeset( const unsigned int nsindex, Tqdcfr::ModelEntry* 
     return result;
 }
 
-ErrorCode Tqdcfr::read_sideset( const unsigned int ssindex, const double data_version, Tqdcfr::ModelEntry* model,
+ErrorCode Tqdcfr::read_sideset( const unsigned int ssindex,
+                                const double data_version,
+                                Tqdcfr::ModelEntry* model,
                                 Tqdcfr::SidesetHeader* sideseth )
 {
     if( sideseth->memCt == 0 ) return MB_SUCCESS;
@@ -824,8 +840,11 @@ ErrorCode Tqdcfr::read_sideset( const unsigned int ssindex, const double data_ve
     return MB_SUCCESS;
 }
 
-ErrorCode Tqdcfr::process_sideset_10( const int this_type, const int num_ents, const int sense_size,
-                                      std::vector< EntityHandle >& ss_entities, Tqdcfr::SidesetHeader* sideseth )
+ErrorCode Tqdcfr::process_sideset_10( const int this_type,
+                                      const int num_ents,
+                                      const int sense_size,
+                                      std::vector< EntityHandle >& ss_entities,
+                                      Tqdcfr::SidesetHeader* sideseth )
 {
     std::vector< EntityHandle > forward, reverse;
     if( this_type == 3      // Surface
@@ -894,7 +913,8 @@ ErrorCode Tqdcfr::process_sideset_10( const int this_type, const int num_ents, c
     return result;
 }
 
-ErrorCode Tqdcfr::process_sideset_11( std::vector< EntityHandle >& ss_entities, int num_wrts,
+ErrorCode Tqdcfr::process_sideset_11( std::vector< EntityHandle >& ss_entities,
+                                      int num_wrts,
                                       Tqdcfr::SidesetHeader* sideseth )
 {
     std::vector< EntityHandle > forward, reverse;
@@ -959,7 +979,9 @@ ErrorCode Tqdcfr::process_sideset_11( std::vector< EntityHandle >& ss_entities, 
     return result;
 }
 
-ErrorCode Tqdcfr::read_block( const unsigned int blindex, const double /*data_version*/, Tqdcfr::ModelEntry* model,
+ErrorCode Tqdcfr::read_block( const unsigned int blindex,
+                              const double /*data_version*/,
+                              Tqdcfr::ModelEntry* model,
                               Tqdcfr::BlockHeader* blockh )
 {
     if( blockh->memCt == 0 ) return MB_SUCCESS;
@@ -1189,7 +1211,8 @@ ErrorCode Tqdcfr::read_group( const unsigned int group_index, Tqdcfr::ModelEntry
     return result;
 }
 
-ErrorCode Tqdcfr::put_into_set( EntityHandle set_handle, std::vector< EntityHandle >& entities,
+ErrorCode Tqdcfr::put_into_set( EntityHandle set_handle,
+                                std::vector< EntityHandle >& entities,
                                 std::vector< EntityHandle >& excl_entities )
 {
     // And put entities into this block's set
@@ -1216,8 +1239,11 @@ ErrorCode Tqdcfr::put_into_set( EntityHandle set_handle, std::vector< EntityHand
     return MB_SUCCESS;
 }
 
-ErrorCode Tqdcfr::get_entities( const unsigned int* mem_types, int* id_buf, const unsigned int id_buf_size,
-                                const bool is_group, std::vector< EntityHandle >& entities )
+ErrorCode Tqdcfr::get_entities( const unsigned int* mem_types,
+                                int* id_buf,
+                                const unsigned int id_buf_size,
+                                const bool is_group,
+                                std::vector< EntityHandle >& entities )
 {
     ErrorCode tmp_result, result = MB_SUCCESS;
 
@@ -1235,8 +1261,11 @@ ErrorCode Tqdcfr::get_entities( const unsigned int* mem_types, int* id_buf, cons
     return result;
 }
 
-ErrorCode Tqdcfr::get_entities( const unsigned int this_type, int* id_buf, const unsigned int id_buf_size,
-                                std::vector< EntityHandle >& entities, std::vector< EntityHandle >& excl_entities )
+ErrorCode Tqdcfr::get_entities( const unsigned int this_type,
+                                int* id_buf,
+                                const unsigned int id_buf_size,
+                                std::vector< EntityHandle >& entities,
+                                std::vector< EntityHandle >& excl_entities )
 {
     ErrorCode result = MB_FAILURE;
 
@@ -1248,7 +1277,9 @@ ErrorCode Tqdcfr::get_entities( const unsigned int this_type, int* id_buf, const
     return result;
 }
 
-ErrorCode Tqdcfr::get_ref_entities( const unsigned int this_type, int* id_buf, const unsigned int id_buf_size,
+ErrorCode Tqdcfr::get_ref_entities( const unsigned int this_type,
+                                    int* id_buf,
+                                    const unsigned int id_buf_size,
                                     std::vector< EntityHandle >& entities )
 {
     for( unsigned int i = 0; i < id_buf_size; i++ )
@@ -1257,8 +1288,11 @@ ErrorCode Tqdcfr::get_ref_entities( const unsigned int this_type, int* id_buf, c
     return MB_SUCCESS;
 }
 
-ErrorCode Tqdcfr::get_mesh_entities( const unsigned int this_type, int* id_buf, const unsigned int id_buf_size,
-                                     std::vector< EntityHandle >& entities, std::vector< EntityHandle >& excl_entities )
+ErrorCode Tqdcfr::get_mesh_entities( const unsigned int this_type,
+                                     int* id_buf,
+                                     const unsigned int id_buf_size,
+                                     std::vector< EntityHandle >& entities,
+                                     std::vector< EntityHandle >& excl_entities )
 {
     ErrorCode result                      = MB_SUCCESS;
     std::vector< EntityHandle >* ent_list = NULL;
@@ -1280,7 +1314,10 @@ ErrorCode Tqdcfr::get_mesh_entities( const unsigned int this_type, int* id_buf, 
             ent_list      = &entities;
         }
     }
-    if( NULL == ent_list ) { MB_SET_ERR( MB_FAILURE, "Entities list is NULL" ); }
+    if( NULL == ent_list )
+    {
+        MB_SET_ERR( MB_FAILURE, "Entities list is NULL" );
+    }
 
     // Get entities with this type, and get their cub id tags
     if( MBVERTEX == this_ent_type )
@@ -1289,7 +1326,7 @@ ErrorCode Tqdcfr::get_mesh_entities( const unsigned int this_type, int* id_buf, 
         if( NULL == cubMOABVertexMap )
         {
             for( unsigned int i = 0; i < id_buf_size; i++ )
-                ent_list->push_back( ( EntityHandle )( id_buf[i] + currVHandleOffset ) );
+                ent_list->push_back( (EntityHandle)( id_buf[i] + currVHandleOffset ) );
         }
         else
         {
@@ -1498,7 +1535,7 @@ ErrorCode Tqdcfr::read_nodes( const unsigned int gindex, Tqdcfr::ModelEntry* mod
     Tag fixedFlagTag;
     int dum_val = 0;
     result      = mdbImpl->tag_get_handle( "NodeFixed", 1, MB_TYPE_INTEGER, fixedFlagTag, MB_TAG_SPARSE | MB_TAG_CREAT,
-                                      &dum_val );
+                                           &dum_val );
     if( MB_SUCCESS != result ) return result;
     result = mdbImpl->tag_set_data( fixedFlagTag, dum_range, &fixed_flags[0] );
 
@@ -1632,7 +1669,10 @@ void Tqdcfr::check_contiguous( const unsigned int num_ents, int& contig, unsigne
     max_id  = uint_buf[0];
     for( i = 1; i < num_ents; id_it++, i++, curr_id++ )
     {
-        if( *id_it != curr_id ) { contig = 0; }
+        if( *id_it != curr_id )
+        {
+            contig = 0;
+        }
         min_id = MIN( min_id, uint_buf[i] );
         max_id = MAX( max_id, uint_buf[i] );
     }
@@ -1834,7 +1874,8 @@ ErrorCode Tqdcfr::read_md_string( std::string& name )
 }
 
 ErrorCode Tqdcfr::GeomHeader::read_info_header( const unsigned int model_offset,
-                                                const Tqdcfr::FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
+                                                const Tqdcfr::FEModelHeader::ArrayInfo& info,
+                                                Tqdcfr* instance,
                                                 Tqdcfr::GeomHeader*& geom_headers )
 {
     geom_headers = new GeomHeader[info.numEntities];
@@ -1909,7 +1950,8 @@ ErrorCode Tqdcfr::GeomHeader::read_info_header( const unsigned int model_offset,
 }
 
 ErrorCode Tqdcfr::GroupHeader::read_info_header( const unsigned int model_offset,
-                                                 const Tqdcfr::FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
+                                                 const Tqdcfr::FEModelHeader::ArrayInfo& info,
+                                                 Tqdcfr* instance,
                                                  Tqdcfr::GroupHeader*& group_headers )
 {
     group_headers = new GroupHeader[info.numEntities];
@@ -1955,8 +1997,10 @@ ErrorCode Tqdcfr::GroupHeader::read_info_header( const unsigned int model_offset
     return MB_SUCCESS;
 }
 
-ErrorCode Tqdcfr::BlockHeader::read_info_header( const double data_version, const unsigned int model_offset,
-                                                 const Tqdcfr::FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
+ErrorCode Tqdcfr::BlockHeader::read_info_header( const double data_version,
+                                                 const unsigned int model_offset,
+                                                 const Tqdcfr::FEModelHeader::ArrayInfo& info,
+                                                 Tqdcfr* instance,
                                                  Tqdcfr::BlockHeader*& block_headers )
 {
     block_headers = new BlockHeader[info.numEntities];
@@ -2077,7 +2121,8 @@ ErrorCode Tqdcfr::BlockHeader::read_info_header( const double data_version, cons
 }
 
 ErrorCode Tqdcfr::NodesetHeader::read_info_header( const unsigned int model_offset,
-                                                   const Tqdcfr::FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
+                                                   const Tqdcfr::FEModelHeader::ArrayInfo& info,
+                                                   Tqdcfr* instance,
                                                    Tqdcfr::NodesetHeader*& nodeset_headers )
 {
     nodeset_headers = new NodesetHeader[info.numEntities];
@@ -2125,7 +2170,8 @@ ErrorCode Tqdcfr::NodesetHeader::read_info_header( const unsigned int model_offs
 }
 
 ErrorCode Tqdcfr::SidesetHeader::read_info_header( const unsigned int model_offset,
-                                                   const Tqdcfr::FEModelHeader::ArrayInfo& info, Tqdcfr* instance,
+                                                   const Tqdcfr::FEModelHeader::ArrayInfo& info,
+                                                   Tqdcfr* instance,
                                                    Tqdcfr::SidesetHeader*& sideset_headers )
 {
     sideset_headers = new SidesetHeader[info.numEntities];
@@ -2208,7 +2254,8 @@ void Tqdcfr::ModelEntry::print_block_headers( const char* prefix, BlockHeader* h
     }
 }
 
-void Tqdcfr::ModelEntry::print_nodeset_headers( const char* prefix, NodesetHeader* header,
+void Tqdcfr::ModelEntry::print_nodeset_headers( const char* prefix,
+                                                NodesetHeader* header,
                                                 const unsigned int num_headers )
 {
     if( !debug ) return;
@@ -2220,7 +2267,8 @@ void Tqdcfr::ModelEntry::print_nodeset_headers( const char* prefix, NodesetHeade
     }
 }
 
-void Tqdcfr::ModelEntry::print_sideset_headers( const char* prefix, SidesetHeader* header,
+void Tqdcfr::ModelEntry::print_sideset_headers( const char* prefix,
+                                                SidesetHeader* header,
                                                 const unsigned int num_headers )
 {
     if( !debug ) return;
@@ -2433,7 +2481,7 @@ ErrorCode Tqdcfr::interpret_acis_records( std::vector< AcisRecord >& records )
     // Make a tag for the vector holding unrecognized attributes
     void* default_val = NULL;
     ErrorCode result  = mdbImpl->tag_get_handle( "ATTRIB_VECTOR", sizeof( void* ), MB_TYPE_OPAQUE, attribVectorTag,
-                                                MB_TAG_CREAT | MB_TAG_SPARSE, &default_val );
+                                                 MB_TAG_CREAT | MB_TAG_SPARSE, &default_val );
     if( MB_SUCCESS != result ) return result;
 
     unsigned int current_record = 0;
@@ -2582,7 +2630,10 @@ ErrorCode Tqdcfr::parse_acis_attribs( const unsigned int entity_rec_num, std::ve
     }
 
     // Parsed the data; now put on mdb entities; first we need to find the entity
-    if( records[entity_rec_num].entity == 0 ) { records[entity_rec_num].entity = uidSetMap[uid]; }
+    if( records[entity_rec_num].entity == 0 )
+    {
+        records[entity_rec_num].entity = uidSetMap[uid];
+    }
 
     if( 0 == records[entity_rec_num].entity ) return MB_SUCCESS;  // We do not have a MOAB entity for this, skip
 

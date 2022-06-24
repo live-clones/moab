@@ -40,8 +40,10 @@
 typedef boost::singleton_pool< moab::Range::PairNode, sizeof( moab::Range::PairNode ) > PairAlloc;
 //   static inline moab::Range::PairNode* alloc_pair()
 //    { return new (PairAlloc::malloc()) moab::Range::PairNode; }
-static inline moab::Range::PairNode* alloc_pair( moab::Range::PairNode* n, moab::Range::PairNode* p,
-                                                 moab::EntityHandle f, moab::EntityHandle s )
+static inline moab::Range::PairNode* alloc_pair( moab::Range::PairNode* n,
+                                                 moab::Range::PairNode* p,
+                                                 moab::EntityHandle f,
+                                                 moab::EntityHandle s )
 {
     return new( PairAlloc::malloc() ) moab::Range::PairNode( n, p, f, s );
 }
@@ -53,8 +55,10 @@ static inline void free_pair( moab::Range::PairNode* node )
 #else
 //   static inline moab::Range::PairNode* alloc_pair()
 //    { return new moab::Range::PairNode; }
-static inline moab::Range::PairNode* alloc_pair( moab::Range::PairNode* n, moab::Range::PairNode* p,
-                                                 moab::EntityHandle f, moab::EntityHandle s )
+static inline moab::Range::PairNode* alloc_pair( moab::Range::PairNode* n,
+                                                 moab::Range::PairNode* p,
+                                                 moab::EntityHandle f,
+                                                 moab::EntityHandle s )
 {
     return new moab::Range::PairNode( n, p, f, s );
 }
@@ -88,7 +92,10 @@ size_t Range::size() const
 Range::const_iterator& Range::const_iterator::operator+=( EntityID sstep )
 {
     // Check negative now to avoid infinite loop below.
-    if( sstep < 0 ) { return operator-=( -sstep ); }
+    if( sstep < 0 )
+    {
+        return operator-=( -sstep );
+    }
     EntityHandle step = sstep;
 
     // Handle current PairNode.  Either step is within the current
@@ -126,7 +133,10 @@ Range::const_iterator& Range::const_iterator::operator+=( EntityID sstep )
 Range::const_iterator& Range::const_iterator::operator-=( EntityID sstep )
 {
     // Check negative now to avoid infinite loop below.
-    if( sstep < 0 ) { return operator+=( -sstep ); }
+    if( sstep < 0 )
+    {
+        return operator+=( -sstep );
+    }
     EntityHandle step = sstep;
 
     // Handle current PairNode.  Either step is within the current
@@ -570,7 +580,10 @@ const std::string Range::str_rep( const char* indent_prefix ) const
 {
     std::stringstream str_stream;
     std::string indent_prefix_str;
-    if( NULL != indent_prefix ) { indent_prefix_str += indent_prefix; }
+    if( NULL != indent_prefix )
+    {
+        indent_prefix_str += indent_prefix;
+    }
 
     if( empty() )
     {
@@ -780,7 +793,10 @@ Range& Range::operator-=( const Range& range2 )
 EntityID operator-( const Range::const_iterator& it2, const Range::const_iterator& it1 )
 {
     assert( !it2.mValue || *it2 >= *it1 );
-    if( it2.mNode == it1.mNode ) { return *it2 - *it1; }
+    if( it2.mNode == it1.mNode )
+    {
+        return *it2 - *it1;
+    }
 
     EntityID result = it1.mNode->second - it1.mValue + 1;
     for( Range::PairNode* n = it1.mNode->mNext; n != it2.mNode; n = n->mNext )

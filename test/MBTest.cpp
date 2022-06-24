@@ -1897,7 +1897,7 @@ ErrorCode mb_mesh_set_appends( int flags )
     // Test again, but specify tag value
     results = elems;
     rval    = mb->get_entities_by_type_and_tag( set, TYPE_FROM_HANDLE( entity ), &sparse, vals, 1, results,
-                                             Interface::UNION );
+                                                Interface::UNION );
     if( MB_SUCCESS != rval ) return rval;
     if( results != expected ) return MB_FAILURE;
 
@@ -2495,7 +2495,7 @@ static ErrorCode check_ranged_meshset_internal( const EntityHandle* expected,
         int k = j;
         while( k < num_expected && expected[k] <= contents[i + 1] )
             ++k;
-        if( ( EntityHandle )( k - j ) <= ( contents[i + 1] - contents[i] ) )
+        if( (EntityHandle)( k - j ) <= ( contents[i + 1] - contents[i] ) )
         {
             std::cerr << "Handle range [" << contents[i] << ',' << contents[i + 1]
                       << "] contains unexpected handles.  Expected handles: ";
@@ -2855,7 +2855,7 @@ ErrorCode mb_tags_test()
 
     int def_data = 9;
     result       = MB->tag_get_handle( "dense stale_data", 1, MB_TYPE_INTEGER, stale_dense, MB_TAG_DENSE | MB_TAG_EXCL,
-                                 &def_data );
+                                       &def_data );
     if( MB_SUCCESS != result ) return result;
     result = MB->tag_get_handle( "sparse stale data", 1, MB_TYPE_INTEGER, stale_sparse, MB_TAG_SPARSE | MB_TAG_EXCL );
     if( MB_SUCCESS != result ) return result;

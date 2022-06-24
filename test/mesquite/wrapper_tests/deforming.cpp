@@ -61,7 +61,9 @@ void usage( const char* argv0 )
     std::exit( 1 );
 }
 
-void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vector< Mesh::VertexHandle > curves_out[4],
+void classify_boundary( Mesh* mesh,
+                        Mesh::VertexHandle corners_out[4],
+                        std::vector< Mesh::VertexHandle > curves_out[4],
                         MsqError& err );
 
 void cond_write_file( MeshImpl& mesh, const char* filename )
@@ -184,7 +186,9 @@ int main( int argc, char* argv[] )
         }                                                                            \
     } while( false )
 
-void classify_boundary( Mesh* mesh, Mesh::VertexHandle corners_out[4], std::vector< Mesh::VertexHandle > curves_out[4],
+void classify_boundary( Mesh* mesh,
+                        Mesh::VertexHandle corners_out[4],
+                        std::vector< Mesh::VertexHandle > curves_out[4],
                         MsqError& err )
 {
     std::vector< Mesh::VertexHandle > verts;

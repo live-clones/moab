@@ -205,7 +205,10 @@ int main( int argc, char** argv )
             field_type = atoi( argv[++index] );
         }
 
-        if( !strcmp( argv[index], "-skipdp" ) ) { skip = true; }
+        if( !strcmp( argv[index], "-skipdp" ) )
+        {
+            skip = true;
+        }
         index++;
     }
 
@@ -219,7 +222,10 @@ int main( int argc, char** argv )
     std::cout << " -t " << t << " -dt " << dt << " input: " << input_mesh1 << "  output: " << output << "\n";
 
     // skip if we need for DP (already existing)
-    if( skip ) { std::cout << " do not add DP tag \n"; }
+    if( skip )
+    {
+        std::cout << " do not add DP tag \n";
+    }
     else
     {
         Range verts;

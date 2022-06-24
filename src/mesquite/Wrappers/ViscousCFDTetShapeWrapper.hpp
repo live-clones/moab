@@ -48,7 +48,10 @@ class MESQUITE_EXPORT ViscousCFDTetShapeWrapper : public Wrapper
     int parallelIterations;
     double maxVtxMovement;
 
-    void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, QualityAssessor* qa,
+    void run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                      ParallelMesh* pmesh,
+                      Settings* settings,
+                      QualityAssessor* qa,
                       MsqError& err );
 
   public:
@@ -61,8 +64,11 @@ class MESQUITE_EXPORT ViscousCFDTetShapeWrapper : public Wrapper
      *\param max_iterations       Termination optimizaiton after this many solver
      *                            steps.
      */
-    ViscousCFDTetShapeWrapper( double max_vertex_movement, double a = 0.4395, double d_prime = 135,
-                               int max_iterations = 50, int parallel_iterations = 10 )
+    ViscousCFDTetShapeWrapper( double max_vertex_movement,
+                               double a                = 0.4395,
+                               double d_prime          = 135,
+                               int max_iterations      = 50,
+                               int parallel_iterations = 10 )
         : dCutoff( d_prime ), aVal( a ), iterationLimit( max_iterations ), parallelIterations( parallel_iterations ),
           maxVtxMovement( max_vertex_movement )
     {

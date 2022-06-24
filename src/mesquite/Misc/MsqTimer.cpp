@@ -147,7 +147,10 @@ MBMesquite::StopWatchCollection::Key MBMesquite::StopWatchCollection::add( const
             }
         }
         // If not, create a new one
-        if( i == mEntries.size() ) { mEntries.push_back( std::pair< std::string, StopWatch >( name, StopWatch() ) ); }
+        if( i == mEntries.size() )
+        {
+            mEntries.push_back( std::pair< std::string, StopWatch >( name, StopWatch() ) );
+        }
         key = i + 1;
     }
     // If it already existed...

@@ -24,7 +24,9 @@ class EntitySequence
         split_from.endHandle = here - 1;
     }
 
-    SequenceData* create_data_subset( EntityHandle start_handle, EntityHandle end_handle, int num_sequence_arrays,
+    SequenceData* create_data_subset( EntityHandle start_handle,
+                                      EntityHandle end_handle,
+                                      int num_sequence_arrays,
                                       unsigned const* bytes_per_element ) const;
 
     ErrorCode prepend_entities( EntityID count );

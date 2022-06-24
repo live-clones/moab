@@ -55,7 +55,9 @@ static inline bool eval( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, D
 }
 
 template < unsigned DIM >
-static inline bool grad( const MsqMatrix< DIM, DIM >& A, const MsqMatrix< DIM, DIM >& W, double& result,
+static inline bool grad( const MsqMatrix< DIM, DIM >& A,
+                         const MsqMatrix< DIM, DIM >& W,
+                         double& result,
                          MsqMatrix< DIM, DIM >& deriv )
 {
     const double nsW = sqr_Frobenius( W );

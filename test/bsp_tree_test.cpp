@@ -64,7 +64,11 @@ int main()
 }
 
 // Make CHECK_EQUAL macro work for planes
-void check_equal( const BSPTree::Plane& p1, const BSPTree::Plane& p2, const char* exp1, const char* exp2, int line,
+void check_equal( const BSPTree::Plane& p1,
+                  const BSPTree::Plane& p2,
+                  const char* exp1,
+                  const char* exp2,
+                  int line,
                   const char* file )
 {
     if( fabs( p1.norm[0] - p2.norm[0] ) > 1e-6 || fabs( p1.norm[1] - p2.norm[1] ) > 1e-6 ||
@@ -177,9 +181,8 @@ void test_iterator()
 bool compare_hexes( const double expected[8][3], const double actual[8][3], double epsilon )
 {
     // for each of three possible rotations
-    const int rotation_maps[3][8] = { { 0, 1, 2, 3, 4, 5, 6, 7 },
-                                      { 3, 2, 6, 7, 0, 1, 5, 4 },
-                                      { 7, 3, 2, 6, 4, 0, 1, 5 } };
+    const int rotation_maps[3][8] = {
+        { 0, 1, 2, 3, 4, 5, 6, 7 }, { 3, 2, 6, 7, 0, 1, 5, 4 }, { 7, 3, 2, 6, 4, 0, 1, 5 } };
     for( int i = 0; i < 3; ++i )
     {
         // compare for rotationts about axis from face 4 to 5
@@ -224,7 +227,12 @@ static void aabox_corners( const double min[3], const double max[3], double corn
     memcpy( corners, expt, sizeof( expt ) );
 }
 
-static void aabox_corners( double min_x, double min_y, double min_z, double max_x, double max_y, double max_z,
+static void aabox_corners( double min_x,
+                           double min_y,
+                           double min_z,
+                           double max_x,
+                           double max_y,
+                           double max_z,
                            double corners[8][3] )
 {
     double min[] = { min_x, min_y, min_z };
@@ -961,8 +969,10 @@ void test_merge_leaf()
     CHECK_EQUAL( MB_ENTITY_NOT_FOUND, rval );
 }
 
-static std::vector< int > neighbors( const BSPTreeBoxIter& iter, const EntityHandle leaves[8],
-                                     BSPTreeBoxIter::SideBits side, double epsilon )
+static std::vector< int > neighbors( const BSPTreeBoxIter& iter,
+                                     const EntityHandle leaves[8],
+                                     BSPTreeBoxIter::SideBits side,
+                                     double epsilon )
 {
     std::vector< BSPTreeBoxIter > list;
     ErrorCode rval = iter.get_neighbors( side, list, epsilon );CHECK_ERR( rval );

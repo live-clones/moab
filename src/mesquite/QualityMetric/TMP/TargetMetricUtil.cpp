@@ -39,7 +39,9 @@
 namespace MBMesquite
 {
 
-void surface_to_2d( const MsqMatrix< 3, 2 >& A, const MsqMatrix< 3, 2 >& W, MsqMatrix< 2, 2 >& W_22,
+void surface_to_2d( const MsqMatrix< 3, 2 >& A,
+                    const MsqMatrix< 3, 2 >& W,
+                    MsqMatrix< 2, 2 >& W_22,
                     MsqMatrix< 3, 2 >& RZ )
 {
     MsqMatrix< 3, 1 > W1 = W.column( 0 );

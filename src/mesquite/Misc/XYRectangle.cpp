@@ -119,7 +119,9 @@ void XYRectangle::element_normal_at( Mesh::ElementHandle /*handle*/, Vector3D& n
     norm[normalDir] = 1.0;
 }
 
-void XYRectangle::vertex_normal_at( const Mesh::VertexHandle* /*vertices*/, Vector3D normals[], unsigned count,
+void XYRectangle::vertex_normal_at( const Mesh::VertexHandle* /*vertices*/,
+                                    Vector3D normals[],
+                                    unsigned count,
                                     MsqError& ) const
 {
     Vector3D norm( 0, 0, 0 );
@@ -127,8 +129,11 @@ void XYRectangle::vertex_normal_at( const Mesh::VertexHandle* /*vertices*/, Vect
     std::fill( normals, normals + count, norm );
 }
 
-void XYRectangle::closest_point( Mesh::VertexHandle vertex, const Vector3D& position, Vector3D& closest,
-                                 Vector3D& normal, MsqError& ) const
+void XYRectangle::closest_point( Mesh::VertexHandle vertex,
+                                 const Vector3D& position,
+                                 Vector3D& closest,
+                                 Vector3D& normal,
+                                 MsqError& ) const
 {
     normal = position;
     vertex_normal_at( vertex, normal );
@@ -136,7 +141,9 @@ void XYRectangle::closest_point( Mesh::VertexHandle vertex, const Vector3D& posi
     closest[2] = 0;
 }
 
-void XYRectangle::domain_DoF( const Mesh::VertexHandle* vertices, unsigned short* dof_array, size_t num_handles,
+void XYRectangle::domain_DoF( const Mesh::VertexHandle* vertices,
+                              unsigned short* dof_array,
+                              size_t num_handles,
                               MsqError& ) const
 {
     for( unsigned i = 0; i < num_handles; ++i )

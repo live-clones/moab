@@ -62,10 +62,15 @@ WriteSmf::~WriteSmf()
     mbImpl->release_interface( writeTool );
 }
 
-ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
-                                const EntityHandle* output_list, const int num_sets,
-                                const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
-                                int /* num_tags */, int /* export_dimension */ )
+ErrorCode WriteSmf::write_file( const char* file_name,
+                                const bool overwrite,
+                                const FileOptions& opts,
+                                const EntityHandle* output_list,
+                                const int num_sets,
+                                const std::vector< std::string >& /* qa_list */,
+                                const Tag* /* tag_list */,
+                                int /* num_tags */,
+                                int /* export_dimension */ )
 {
     ErrorCode rval;
 
@@ -82,7 +87,10 @@ ErrorCode WriteSmf::write_file( const char* file_name, const bool overwrite, con
 
     // Create file
     std::ofstream file( file_name );
-    if( !file ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Could not open file: " << file_name ); }
+    if( !file )
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "Could not open file: " << file_name );
+    }
     file.precision( precision );
 
     // Get entities to write

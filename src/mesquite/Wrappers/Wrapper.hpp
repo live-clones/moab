@@ -70,8 +70,11 @@ class MESQUITE_EXPORT Wrapper : public IQInterface
     void run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings, MsqError& err );
 
     /** Function that each wrapper must implement */
-    virtual void run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                              QualityAssessor* quality_assessor, MsqError& err ) = 0;
+    virtual void run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                              ParallelMesh* pmesh,
+                              Settings* settings,
+                              QualityAssessor* quality_assessor,
+                              MsqError& err ) = 0;
 
   private:
     QualityAssessor* qualAssessor;

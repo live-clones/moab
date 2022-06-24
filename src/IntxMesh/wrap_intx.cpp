@@ -66,7 +66,9 @@ static Intx2MeshOnSphere* pworker = NULL;
 extern "C" {
 #endif
 
-void initialize_area_and_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set, double* area_vals,
+void initialize_area_and_tracer( iMesh_Instance instance,
+                                 iBase_EntitySetHandle imesh_euler_set,
+                                 double* area_vals,
                                  int* ierr )
 {
 
@@ -97,8 +99,12 @@ void initialize_area_and_tracer( iMesh_Instance instance, iBase_EntitySetHandle 
     return;
 }
 
-void update_tracer_test( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_set,
-                         iBase_EntitySetHandle imesh_output_set, int numTracers, double* tracer_vals, int* ierr )
+void update_tracer_test( iMesh_Instance instance,
+                         iBase_EntitySetHandle imesh_euler_set,
+                         iBase_EntitySetHandle imesh_output_set,
+                         int numTracers,
+                         double* tracer_vals,
+                         int* ierr )
 {
 
     EntityHandle eul_set    = (EntityHandle)imesh_euler_set;
@@ -213,9 +219,17 @@ void update_tracer( iMesh_Instance instance, iBase_EntitySetHandle imesh_euler_s
     return;
 }
 
-ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coarseSet, double* coords, int* corners,
-                              int nc, int nelem, EntityHandle& start_vert, int& totalNumVertices,
-                              int& numCornerVertices, std::vector< double* >& coordv )
+ErrorCode create_coarse_mesh( Interface* mb,
+                              ParallelComm* pcomm,
+                              EntityHandle coarseSet,
+                              double* coords,
+                              int* corners,
+                              int nc,
+                              int nelem,
+                              EntityHandle& start_vert,
+                              int& totalNumVertices,
+                              int& numCornerVertices,
+                              std::vector< double* >& coordv )
 {
 
     int rank = pcomm->proc_config().proc_rank();
@@ -356,8 +370,14 @@ ErrorCode create_coarse_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle c
 }
 
 // start_v and coordv refer to all vertices, including the coarse ones
-ErrorCode fill_coord_on_edges( Interface* mb, std::vector< double* >& coordv, double* coords, Range& edges,
-                               EntityHandle start_v, Range& coarseQuads, int nc, int numCornerVertices,
+ErrorCode fill_coord_on_edges( Interface* mb,
+                               std::vector< double* >& coordv,
+                               double* coords,
+                               Range& edges,
+                               EntityHandle start_v,
+                               Range& coarseQuads,
+                               int nc,
+                               int numCornerVertices,
                                Tag& fineVertOnEdgeTag )
 {
     ErrorCode rval = MB_SUCCESS;
@@ -450,8 +470,15 @@ ErrorCode fill_coord_on_edges( Interface* mb, std::vector< double* >& coordv, do
 
  return rval;
  }*/
-ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coarseSet, EntityHandle fine_set,
-                            double* coords, int nc, int nelem, EntityHandle start_vert, int numCornerVertices,
+ErrorCode create_fine_mesh( Interface* mb,
+                            ParallelComm* pcomm,
+                            EntityHandle coarseSet,
+                            EntityHandle fine_set,
+                            double* coords,
+                            int nc,
+                            int nelem,
+                            EntityHandle start_vert,
+                            int numCornerVertices,
                             std::vector< double* >& coordv )
 {
     int rank   = pcomm->proc_config().proc_rank();
@@ -749,9 +776,16 @@ ErrorCode create_fine_mesh( Interface* mb, ParallelComm* pcomm, EntityHandle coa
 }
 
 // this is called from Fortran 90
-void create_mesh( iMesh_Instance instance, iBase_EntitySetHandle* imesh_euler_set,
-                  iBase_EntitySetHandle* imesh_departure_set, iBase_EntitySetHandle* imesh_intx_set, double* coords,
-                  int* corners, int nc, int nelem, MPI_Fint comm, int* ierr )
+void create_mesh( iMesh_Instance instance,
+                  iBase_EntitySetHandle* imesh_euler_set,
+                  iBase_EntitySetHandle* imesh_departure_set,
+                  iBase_EntitySetHandle* imesh_intx_set,
+                  double* coords,
+                  int* corners,
+                  int nc,
+                  int nelem,
+                  MPI_Fint comm,
+                  int* ierr )
 {
     /* double * coords=(double*) icoords;
      int * corners = (int*) icorners;*/
@@ -843,8 +877,13 @@ ErrorCode set_departure_points_position( Interface* mb, EntityHandle lagrSet, do
 
     return MB_SUCCESS;
 }
-void intersection_at_level( iMesh_Instance instance, iBase_EntitySetHandle fine_set, iBase_EntitySetHandle lagr_set,
-                            iBase_EntitySetHandle intx_set, double* dep_coords, double radius2, int* ierr )
+void intersection_at_level( iMesh_Instance instance,
+                            iBase_EntitySetHandle fine_set,
+                            iBase_EntitySetHandle lagr_set,
+                            iBase_EntitySetHandle intx_set,
+                            double* dep_coords,
+                            double radius2,
+                            int* ierr )
 {
     *ierr         = 1;
     Interface* mb = MOABI;
@@ -896,8 +935,11 @@ void intersection_at_level( iMesh_Instance instance, iBase_EntitySetHandle fine_
 
     return;
 }
-void cleanup_after_intersection( iMesh_Instance instance, iBase_EntitySetHandle fine_set,
-                                 iBase_EntitySetHandle lagr_set, iBase_EntitySetHandle intx_set, int* ierr )
+void cleanup_after_intersection( iMesh_Instance instance,
+                                 iBase_EntitySetHandle fine_set,
+                                 iBase_EntitySetHandle lagr_set,
+                                 iBase_EntitySetHandle intx_set,
+                                 int* ierr )
 {
     *ierr         = 1;
     Interface* mb = MOABI;

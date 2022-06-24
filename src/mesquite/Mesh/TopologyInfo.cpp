@@ -342,7 +342,11 @@ TopologyInfo::TopologyInfo()
     }
 }
 
-void TopologyInfo::higher_order( EntityTopology topo, unsigned num_nodes, bool& midedge, bool& midface, bool& midvol,
+void TopologyInfo::higher_order( EntityTopology topo,
+                                 unsigned num_nodes,
+                                 bool& midedge,
+                                 bool& midface,
+                                 bool& midvol,
                                  MsqError& err )
 {
     int ho  = higher_order( topo, num_nodes, err );
@@ -392,13 +396,19 @@ int TopologyInfo::higher_order( EntityTopology topo, unsigned num_nodes, MsqErro
         }
     }
 
-    if( nodes ) { MSQ_SETERR( err )( "Invalid element topology", MsqError::INVALID_STATE ); }
+    if( nodes )
+    {
+        MSQ_SETERR( err )( "Invalid element topology", MsqError::INVALID_STATE );
+    }
 
     return result;
 }
 
-int TopologyInfo::higher_order_from_side( EntityTopology topo, unsigned num_nodes, unsigned side_dimension,
-                                          unsigned side_number, MsqError& err )
+int TopologyInfo::higher_order_from_side( EntityTopology topo,
+                                          unsigned num_nodes,
+                                          unsigned side_dimension,
+                                          unsigned side_number,
+                                          MsqError& err )
 {
     bool mids[4] = { true };
     higher_order( topo, num_nodes, mids[1], mids[2], mids[3], err );
@@ -430,8 +440,12 @@ int TopologyInfo::higher_order_from_side( EntityTopology topo, unsigned num_node
     return result;
 }
 
-void TopologyInfo::side_from_higher_order( EntityTopology topo, unsigned num_nodes, unsigned node_number,
-                                           unsigned& side_dim_out, unsigned& side_num_out, MsqError& err )
+void TopologyInfo::side_from_higher_order( EntityTopology topo,
+                                           unsigned num_nodes,
+                                           unsigned node_number,
+                                           unsigned& side_dim_out,
+                                           unsigned& side_num_out,
+                                           MsqError& err )
 {
     bool midedge, midface, midvol;
     higher_order( topo, num_nodes, midedge, midface, midvol, err );MSQ_ERRRTN( err );
@@ -487,7 +501,10 @@ const unsigned* TopologyInfo::edge_vertices( EntityTopology topo, unsigned edge,
 
 const unsigned* TopologyInfo::edge_vertices( EntityTopology topo, unsigned edge )
 {
-    if( topo < (EntityTopology)FIRST_FACE || topo > (EntityTopology)LAST_VOL || edge >= edges( topo ) ) { return 0; }
+    if( topo < (EntityTopology)FIRST_FACE || topo > (EntityTopology)LAST_VOL || edge >= edges( topo ) )
+    {
+        return 0;
+    }
     return instance.edgeMap[topo - FIRST_FACE][edge];
 }
 
@@ -505,13 +522,19 @@ const unsigned* TopologyInfo::face_vertices( EntityTopology topo, unsigned face,
 }
 const unsigned* TopologyInfo::face_vertices( EntityTopology topo, unsigned face, unsigned& length )
 {
-    if( topo < (EntityTopology)FIRST_VOL || topo > (EntityTopology)LAST_VOL || face >= faces( topo ) ) { return 0; }
+    if( topo < (EntityTopology)FIRST_VOL || topo > (EntityTopology)LAST_VOL || face >= faces( topo ) )
+    {
+        return 0;
+    }
 
     length = instance.faceMap[topo - FIRST_VOL][face][0];
     return instance.faceMap[topo - FIRST_VOL][face] + 1;
 }
 
-const unsigned* TopologyInfo::side_vertices( EntityTopology topo, unsigned dim, unsigned side, unsigned& count_out,
+const unsigned* TopologyInfo::side_vertices( EntityTopology topo,
+                                             unsigned dim,
+                                             unsigned side,
+                                             unsigned& count_out,
                                              MsqError& err )
 {
     static const unsigned all[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -565,8 +588,12 @@ const unsigned* TopologyInfo::side_vertices( EntityTopology topo, unsigned dim, 
     return result;
 }
 
-void TopologyInfo::side_number( EntityTopology topo, unsigned num_nodes, unsigned node_index, unsigned& side_dim_out,
-                                unsigned& side_num_out, MsqError& err )
+void TopologyInfo::side_number( EntityTopology topo,
+                                unsigned num_nodes,
+                                unsigned node_index,
+                                unsigned& side_dim_out,
+                                unsigned& side_num_out,
+                                MsqError& err )
 {
     if( topo >= (EntityTopology)MIXED || num_nodes < instance.adjMap[topo][0] )
     {
@@ -631,7 +658,8 @@ const unsigned* TopologyInfo::adjacent_vertices( EntityTopology topo, unsigned i
     return vect + 1;
 }
 
-const unsigned* TopologyInfo::reverse_vertex_adjacency_offsets( EntityTopology topo, unsigned index,
+const unsigned* TopologyInfo::reverse_vertex_adjacency_offsets( EntityTopology topo,
+                                                                unsigned index,
                                                                 unsigned& num_adj_out )
 {
     const unsigned count = corners( topo );
@@ -646,8 +674,14 @@ const unsigned* TopologyInfo::reverse_vertex_adjacency_offsets( EntityTopology t
     return vect + 1;
 }
 
-bool TopologyInfo::compare_sides( const size_t* verts1, EntityTopology type1, unsigned side1, const size_t* verts2,
-                                  EntityTopology type2, unsigned side2, unsigned side_dim, MsqError& err )
+bool TopologyInfo::compare_sides( const size_t* verts1,
+                                  EntityTopology type1,
+                                  unsigned side1,
+                                  const size_t* verts2,
+                                  EntityTopology type2,
+                                  unsigned side2,
+                                  unsigned side_dim,
+                                  MsqError& err )
 {
     const unsigned *conn1, *conn2;
     unsigned len1, len2;
@@ -683,7 +717,9 @@ bool TopologyInfo::compare_sides( const size_t* verts1, EntityTopology type1, un
     return true;
 }
 
-unsigned TopologyInfo::find_edge( EntityTopology topo, const unsigned* side_vertices, bool& reversed_out,
+unsigned TopologyInfo::find_edge( EntityTopology topo,
+                                  const unsigned* side_vertices,
+                                  bool& reversed_out,
                                   MsqError& err )
 {
     if( dimension( topo ) <= 1 )
@@ -714,8 +750,11 @@ unsigned TopologyInfo::find_edge( EntityTopology topo, const unsigned* side_vert
     return (unsigned)-1;
 }
 
-unsigned TopologyInfo::find_face( EntityTopology topo, const unsigned* side_vertices, unsigned num_vertices,
-                                  bool& reversed_out, MsqError& err )
+unsigned TopologyInfo::find_face( EntityTopology topo,
+                                  const unsigned* side_vertices,
+                                  unsigned num_vertices,
+                                  bool& reversed_out,
+                                  MsqError& err )
 {
     if( dimension( topo ) <= 2 )
     {
@@ -755,8 +794,13 @@ unsigned TopologyInfo::find_face( EntityTopology topo, const unsigned* side_vert
     return (unsigned)-1;
 }
 
-void TopologyInfo::find_side( EntityTopology topo, const unsigned* side_vertices, unsigned num_vertices,
-                              unsigned& dimension_out, unsigned& number_out, bool& reversed_out, MsqError& err )
+void TopologyInfo::find_side( EntityTopology topo,
+                              const unsigned* side_vertices,
+                              unsigned num_vertices,
+                              unsigned& dimension_out,
+                              unsigned& number_out,
+                              bool& reversed_out,
+                              MsqError& err )
 {
     switch( num_vertices )
     {

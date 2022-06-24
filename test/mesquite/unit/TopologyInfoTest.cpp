@@ -123,7 +123,10 @@ class TopologyInfoTest : public CppUnit::TestFixture
 
     void test_face_elem( EntityTopology topo, unsigned num_nodes, unsigned num_sides );
 
-    void test_vol_elem( EntityTopology topo, unsigned num_nodes, unsigned num_verts, unsigned num_edges,
+    void test_vol_elem( EntityTopology topo,
+                        unsigned num_nodes,
+                        unsigned num_verts,
+                        unsigned num_edges,
                         unsigned num_faces );
 
     void test_poly( EntityTopology topo );
@@ -281,7 +284,10 @@ void TopologyInfoTest::test_face_elem( EntityTopology topo, unsigned num_nodes, 
     }
 }
 
-void TopologyInfoTest::test_vol_elem( EntityTopology topo, unsigned num_nodes, unsigned num_verts, unsigned num_edges,
+void TopologyInfoTest::test_vol_elem( EntityTopology topo,
+                                      unsigned num_nodes,
+                                      unsigned num_verts,
+                                      unsigned num_edges,
                                       unsigned num_faces )
 {
     MsqPrintError err( cout );
@@ -1113,7 +1119,7 @@ void TopologyInfoTest::polyhedron()
 void TopologyInfoTest::bad_type()
 {
     MBMesquite::MsqError err;
-    EntityTopology bad_types[] = { (EntityTopology)0, (EntityTopology)1, MIXED, ( EntityTopology )( MIXED + 1 ) };
+    EntityTopology bad_types[] = { (EntityTopology)0, (EntityTopology)1, MIXED, (EntityTopology)( MIXED + 1 ) };
 
     for( unsigned i = 0; i < ( sizeof( bad_types ) / sizeof( EntityTopology ) ); ++i )
     {
@@ -1179,8 +1185,7 @@ void TopologyInfoTest::hex_adj_vert()
 void TopologyInfoTest::pyr_adj_vert()
 {
     unsigned data[][5] = {
-        { 3, 1, 3, 4, 0 }, { 3, 2, 0, 4, 0 }, { 3, 3, 1, 4, 0 }, { 3, 0, 2, 4, 0 }, { 4, 3, 2, 1, 0 }
-    };
+        { 3, 1, 3, 4, 0 }, { 3, 2, 0, 4, 0 }, { 3, 3, 1, 4, 0 }, { 3, 0, 2, 4, 0 }, { 4, 3, 2, 1, 0 } };
     test_adj( MBMesquite::PYRAMID, data );
 }
 

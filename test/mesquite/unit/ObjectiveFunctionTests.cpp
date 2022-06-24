@@ -51,7 +51,8 @@ static bool init_pd( PatchData& pd )
 }
 
 /** Internal helper function for test_eval_type */
-double ObjectiveFunctionTests::evaluate_internal( ObjectiveFunction::EvalType type, OFTestMode test_mode,
+double ObjectiveFunctionTests::evaluate_internal( ObjectiveFunction::EvalType type,
+                                                  OFTestMode test_mode,
                                                   ObjectiveFunction* of )
 {
     MsqPrintError err( cout );
@@ -86,7 +87,8 @@ double ObjectiveFunctionTests::evaluate_internal( ObjectiveFunction::EvalType ty
     return result;
 }
 
-void ObjectiveFunctionTests::test_eval_type( ObjectiveFunction::EvalType type, OFTestMode test_mode,
+void ObjectiveFunctionTests::test_eval_type( ObjectiveFunction::EvalType type,
+                                             OFTestMode test_mode,
                                              ObjectiveFunctionTemplate* of )
 {
     // define two sets of quality metric values
@@ -258,8 +260,11 @@ void ObjectiveFunctionTests::test_eval_type( ObjectiveFunction::EvalType type, O
     }
 }
 
-void ObjectiveFunctionTests::test_value( const double* input_values, unsigned num_input_values, double expected_value,
-                                         OFTestMode test_mode, ObjectiveFunctionTemplate* of )
+void ObjectiveFunctionTests::test_value( const double* input_values,
+                                         unsigned num_input_values,
+                                         double expected_value,
+                                         OFTestMode test_mode,
+                                         ObjectiveFunctionTemplate* of )
 {
     OFTestQM metric( input_values, num_input_values );
     of->set_quality_metric( &metric );
@@ -596,9 +601,18 @@ void ObjectiveFunctionTests::compare_numerical_hessian( ObjectiveFunction* of, b
             {
                 Matrix3D* m  = hess.get_block( i, j );
                 Matrix3D* mt = hess.get_block( j, i );
-                if( NULL != m ) { CHECK_EQUAL_MATRICES( block, *m ); }
-                if( NULL != mt ) { CHECK_EQUAL_MATRICES( transpose( block ), *m ); }
-                if( NULL == mt && NULL == m ) { CHECK_EQUAL_MATRICES( Matrix3D( 0.0 ), block ); }
+                if( NULL != m )
+                {
+                    CHECK_EQUAL_MATRICES( block, *m );
+                }
+                if( NULL != mt )
+                {
+                    CHECK_EQUAL_MATRICES( transpose( block ), *m );
+                }
+                if( NULL == mt && NULL == m )
+                {
+                    CHECK_EQUAL_MATRICES( Matrix3D( 0.0 ), block );
+                }
             }
         }
     }
@@ -645,7 +659,11 @@ class OFTestBadQM : public QualityMetric
         return false;
     }
 
-    virtual bool evaluate_with_gradient( PatchData&, size_t h, double&, vector< size_t >&, vector< Vector3D >&,
+    virtual bool evaluate_with_gradient( PatchData&,
+                                         size_t h,
+                                         double&,
+                                         vector< size_t >&,
+                                         vector< Vector3D >&,
                                          MsqError& err )
     {
         CPPUNIT_ASSERT_EQUAL( HANDLE_VAL, h );
@@ -653,8 +671,13 @@ class OFTestBadQM : public QualityMetric
         return false;
     }
 
-    virtual bool evaluate_with_Hessian( PatchData&, size_t h, double&, vector< size_t >&, vector< Vector3D >&,
-                                        vector< Matrix3D >&, MsqError& err )
+    virtual bool evaluate_with_Hessian( PatchData&,
+                                        size_t h,
+                                        double&,
+                                        vector< size_t >&,
+                                        vector< Vector3D >&,
+                                        vector< Matrix3D >&,
+                                        MsqError& err )
     {
         CPPUNIT_ASSERT_EQUAL( HANDLE_VAL, h );
         if( mError ) MSQ_SETERR( err )( MsqError::INVALID_STATE );

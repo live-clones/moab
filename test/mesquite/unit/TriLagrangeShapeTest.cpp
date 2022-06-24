@@ -263,8 +263,12 @@ static void check_no_zeros( const MsqVector< 2 >* derivs, size_t num_vtx )
     }
 }
 
-static void compare_coefficients( const double* coeffs, const size_t* indices, const double* expected_coeffs,
-                                  size_t num_coeff, unsigned loc, NodeSet bits )
+static void compare_coefficients( const double* coeffs,
+                                  const size_t* indices,
+                                  const double* expected_coeffs,
+                                  size_t num_coeff,
+                                  unsigned loc,
+                                  NodeSet bits )
 {
     // find the location in the returned list for each node
     size_t revidx[6];
@@ -290,8 +294,12 @@ static void compare_coefficients( const double* coeffs, const size_t* indices, c
     ASSERT_VALUES_EQUAL( expected_coeffs[5], test_vals[5], loc, bits );
 }
 
-static void compare_derivatives( const size_t* vertices, size_t num_vtx, const MsqVector< 2 >* derivs,
-                                 const double* expected_derivs, unsigned loc, NodeSet bits )
+static void compare_derivatives( const size_t* vertices,
+                                 size_t num_vtx,
+                                 const MsqVector< 2 >* derivs,
+                                 const double* expected_derivs,
+                                 unsigned loc,
+                                 NodeSet bits )
 {
     check_valid_indices( vertices, num_vtx );
     check_no_zeros( derivs, num_vtx );

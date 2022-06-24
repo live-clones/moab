@@ -408,7 +408,9 @@ void ParallelComm::remove_pcomm( ParallelComm* pc )
     std::vector< ParallelComm* >::iterator pc_it = std::find( pc_array.begin(), pc_array.end(), pc );
     assert( MB_SUCCESS == result && pc_it != pc_array.end() );
     // Empty if test to get around compiler warning about unused var
-    if( MB_SUCCESS == result ) {}
+    if( MB_SUCCESS == result )
+    {
+    }
 
     *pc_it = NULL;
     mbImpl->tag_set_data( pc_tag, &root, 1, (void*)&pc_array[0] );
@@ -416,8 +418,12 @@ void ParallelComm::remove_pcomm( ParallelComm* pc )
 
 //! Assign a global id space, for largest-dimension or all entities (and
 //! in either case for vertices too)
-ErrorCode ParallelComm::assign_global_ids( EntityHandle this_set, const int dimension, const int start_id,
-                                           const bool largest_dim_only, const bool parallel, const bool owned_only )
+ErrorCode ParallelComm::assign_global_ids( EntityHandle this_set,
+                                           const int dimension,
+                                           const int start_id,
+                                           const bool largest_dim_only,
+                                           const bool parallel,
+                                           const bool owned_only )
 {
     Range entities[4];
     ErrorCode result;
@@ -446,8 +452,11 @@ ErrorCode ParallelComm::assign_global_ids( EntityHandle this_set, const int dime
 
 //! Assign a global id space, for largest-dimension or all entities (and
 //! in either case for vertices too)
-ErrorCode ParallelComm::assign_global_ids( Range entities[], const int dimension, const int start_id,
-                                           const bool parallel, const bool owned_only )
+ErrorCode ParallelComm::assign_global_ids( Range entities[],
+                                           const int dimension,
+                                           const int start_id,
+                                           const bool parallel,
+                                           const bool owned_only )
 {
     int local_num_elements[4];
     ErrorCode result;
@@ -524,7 +533,9 @@ int ParallelComm::get_buffers( int to_proc, bool* is_new )
     return ind;
 }
 
-ErrorCode ParallelComm::broadcast_entities( const int from_proc, Range& entities, const bool adjacencies,
+ErrorCode ParallelComm::broadcast_entities( const int from_proc,
+                                            Range& entities,
+                                            const bool adjacencies,
                                             const bool tags )
 {
 #ifndef MOAB_HAVE_MPI
@@ -548,7 +559,10 @@ ErrorCode ParallelComm::broadcast_entities( const int from_proc, Range& entities
     }
 
     success = MPI_Bcast( &buff_size, 1, MPI_INT, from_proc, procConfig.proc_comm() );
-    if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "MPI_Bcast of buffer size failed" ); }
+    if( MPI_SUCCESS != success )
+    {
+        MB_SET_ERR( MB_FAILURE, "MPI_Bcast of buffer size failed" );
+    }
 
     if( !buff_size )  // No data
         return MB_SUCCESS;
@@ -560,7 +574,10 @@ ErrorCode ParallelComm::broadcast_entities( const int from_proc, Range& entities
     {
         int sz  = std::min( buff_size, MAX_BCAST_SIZE );
         success = MPI_Bcast( buff.mem_ptr + offset, sz, MPI_UNSIGNED_CHAR, from_proc, procConfig.proc_comm() );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "MPI_Bcast of buffer failed" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "MPI_Bcast of buffer failed" );
+        }
 
         offset += sz;
         buff_size -= sz;
@@ -581,7 +598,9 @@ ErrorCode ParallelComm::broadcast_entities( const int from_proc, Range& entities
 #endif
 }
 
-ErrorCode ParallelComm::scatter_entities( const int from_proc, std::vector< Range >& entities, const bool adjacencies,
+ErrorCode ParallelComm::scatter_entities( const int from_proc,
+                                          std::vector< Range >& entities,
+                                          const bool adjacencies,
                                           const bool tags )
 {
 #ifndef MOAB_HAVE_MPI
@@ -676,10 +695,18 @@ ErrorCode ParallelComm::scatter_entities( const int from_proc, std::vector< Rang
 #endif
 }
 
-ErrorCode ParallelComm::send_entities( const int to_proc, Range& orig_ents, const bool adjs, const bool tags,
-                                       const bool store_remote_handles, const bool is_iface, Range& /*final_ents*/,
-                                       int& incoming1, int& incoming2, TupleList& entprocs,
-                                       std::vector< MPI_Request >& recv_remoteh_reqs, bool /*wait_all*/ )
+ErrorCode ParallelComm::send_entities( const int to_proc,
+                                       Range& orig_ents,
+                                       const bool adjs,
+                                       const bool tags,
+                                       const bool store_remote_handles,
+                                       const bool is_iface,
+                                       Range& /*final_ents*/,
+                                       int& incoming1,
+                                       int& incoming2,
+                                       TupleList& entprocs,
+                                       std::vector< MPI_Request >& recv_remoteh_reqs,
+                                       bool /*wait_all*/ )
 {
 #ifndef MOAB_HAVE_MPI
     return MB_FAILURE;
@@ -694,7 +721,10 @@ ErrorCode ParallelComm::send_entities( const int to_proc, Range& orig_ents, cons
     // Filter out entities already shared with destination
     Range tmp_range;
     result = filter_pstatus( orig_ents, PSTATUS_SHARED, PSTATUS_AND, to_proc, &tmp_range );MB_CHK_SET_ERR( result, "Failed to filter on owner" );
-    if( !tmp_range.empty() ) { orig_ents = subtract( orig_ents, tmp_range ); }
+    if( !tmp_range.empty() )
+    {
+        orig_ents = subtract( orig_ents, tmp_range );
+    }
 
     result = pack_buffer( orig_ents, adjs, tags, store_remote_handles, to_proc, localOwnedBuffs[ind], &entprocs );MB_CHK_SET_ERR( result, "Failed to pack buffer in send_entities" );
 
@@ -710,8 +740,11 @@ ErrorCode ParallelComm::send_entities( const int to_proc, Range& orig_ents, cons
 #endif
 }
 
-ErrorCode ParallelComm::send_entities( std::vector< unsigned int >& send_procs, std::vector< Range* >& send_ents,
-                                       int& incoming1, int& incoming2, const bool store_remote_handles )
+ErrorCode ParallelComm::send_entities( std::vector< unsigned int >& send_procs,
+                                       std::vector< Range* >& send_ents,
+                                       int& incoming1,
+                                       int& incoming2,
+                                       const bool store_remote_handles )
 {
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
@@ -740,7 +773,10 @@ ErrorCode ParallelComm::send_entities( std::vector< unsigned int >& send_procs, 
         // Filter out entities already shared with destination
         Range tmp_range;
         result = filter_pstatus( *send_ents[i], PSTATUS_SHARED, PSTATUS_AND, buffProcs[ind], &tmp_range );MB_CHK_SET_ERR( result, "Failed to filter on owner" );
-        if( !tmp_range.empty() ) { *send_ents[i] = subtract( *send_ents[i], tmp_range ); }
+        if( !tmp_range.empty() )
+        {
+            *send_ents[i] = subtract( *send_ents[i], tmp_range );
+        }
     }
 
     //===========================================
@@ -834,7 +870,8 @@ void print_buff( unsigned char* ch, int size )
         std::cout << ch[i];
     std::cout << "\n";
 }
-ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs, std::vector< std::vector< int > >& msgsizes,
+ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs,
+                                            std::vector< std::vector< int > >& msgsizes,
                                             std::vector< std::vector< EntityHandle > >& senddata,
                                             std::vector< std::vector< EntityHandle > >& recvdata )
 {
@@ -877,7 +914,10 @@ ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs, std:
 
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, *sit,
                              MB_MESG_ENTS_SIZE, procConfig.proc_comm(), &recv_ent_reqs[3 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in send_recv_entities" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in send_recv_entities" );
+        }
     }
 
     //  std::set<unsigned int>::iterator it;
@@ -923,7 +963,10 @@ ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs, std:
 
         PRINT_DEBUG_WAITANY( recv_ent_reqs, MB_MESG_ENTS_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_ent_reqs[0], &index_in_recv_requests, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in send_recv_entities" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in send_recv_entities" );
+        }
 
         // Processor index in the list is divided by 3
         ind = index_in_recv_requests / 3;
@@ -973,7 +1016,8 @@ ErrorCode ParallelComm::send_recv_entities( std::vector< int >& send_procs, std:
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::update_remote_data( EntityHandle entity, std::vector< int >& procs,
+ErrorCode ParallelComm::update_remote_data( EntityHandle entity,
+                                            std::vector< int >& procs,
                                             std::vector< EntityHandle >& handles )
 {
     ErrorCode error;
@@ -1028,13 +1072,20 @@ ErrorCode ParallelComm::get_remote_handles( EntityHandle* local_vec, EntityHandl
 
 //////////////////////////////////////////////////////////////////
 
-ErrorCode ParallelComm::recv_entities( const int from_proc, const bool store_remote_handles, const bool is_iface,
-                                       Range& final_ents, int& incoming1, int& incoming2,
+ErrorCode ParallelComm::recv_entities( const int from_proc,
+                                       const bool store_remote_handles,
+                                       const bool is_iface,
+                                       Range& final_ents,
+                                       int& incoming1,
+                                       int& incoming2,
                                        std::vector< std::vector< EntityHandle > >& L1hloc,
                                        std::vector< std::vector< EntityHandle > >& L1hrem,
-                                       std::vector< std::vector< int > >& L1p, std::vector< EntityHandle >& L2hloc,
-                                       std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
-                                       std::vector< MPI_Request >& recv_remoteh_reqs, bool /*wait_all*/ )
+                                       std::vector< std::vector< int > >& L1p,
+                                       std::vector< EntityHandle >& L2hloc,
+                                       std::vector< EntityHandle >& L2hrem,
+                                       std::vector< unsigned int >& L2p,
+                                       std::vector< MPI_Request >& recv_remoteh_reqs,
+                                       bool /*wait_all*/ )
 {
 #ifndef MOAB_HAVE_MPI
     return MB_FAILURE;
@@ -1046,7 +1097,10 @@ ErrorCode ParallelComm::recv_entities( const int from_proc, const bool store_rem
                        MB_MESG_ENTS_SIZE, incoming1 );
     int success = MPI_Irecv( remoteOwnedBuffs[ind1]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, from_proc,
                              MB_MESG_ENTS_SIZE, procConfig.proc_comm(), &recvReqs[2 * ind1] );
-    if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" ); }
+    if( success != MPI_SUCCESS )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" );
+    }
 
     // Receive messages in while loop
     return recv_messages( from_proc, store_remote_handles, is_iface, final_ents, incoming1, incoming2, L1hloc, L1hrem,
@@ -1054,8 +1108,11 @@ ErrorCode ParallelComm::recv_entities( const int from_proc, const bool store_rem
 #endif
 }
 
-ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs, int incoming1, int incoming2,
-                                       const bool store_remote_handles, const bool migrate )
+ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs,
+                                       int incoming1,
+                                       int incoming2,
+                                       const bool store_remote_handles,
+                                       const bool migrate )
 {
     //===========================================
     // Receive/unpack new entities
@@ -1078,7 +1135,10 @@ ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs, int
         PRINT_DEBUG_WAITANY( recvReqs, MB_MESG_ENTS_SIZE, procConfig.proc_rank() );
 
         success = MPI_Waitany( 2 * buffProcs.size(), &recvReqs[0], &ind, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" );
+        }
 
         PRINT_DEBUG_RECD( status );
 
@@ -1188,7 +1248,10 @@ ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs, int
     {
         PRINT_DEBUG_WAITANY( recvRemotehReqs, MB_MESG_REMOTEH_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 2 * buffProcs.size(), &recvRemotehReqs[0], &ind, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" );
+        }
 
         // OK, received something; decrement incoming counter
         incoming2--;
@@ -1226,12 +1289,18 @@ ErrorCode ParallelComm::recv_entities( std::set< unsigned int >& recv_procs, int
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::recv_messages( const int from_proc, const bool store_remote_handles, const bool is_iface,
-                                       Range& final_ents, int& incoming1, int& incoming2,
+ErrorCode ParallelComm::recv_messages( const int from_proc,
+                                       const bool store_remote_handles,
+                                       const bool is_iface,
+                                       Range& final_ents,
+                                       int& incoming1,
+                                       int& incoming2,
                                        std::vector< std::vector< EntityHandle > >& L1hloc,
                                        std::vector< std::vector< EntityHandle > >& L1hrem,
-                                       std::vector< std::vector< int > >& L1p, std::vector< EntityHandle >& L2hloc,
-                                       std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
+                                       std::vector< std::vector< int > >& L1p,
+                                       std::vector< EntityHandle >& L2hloc,
+                                       std::vector< EntityHandle >& L2hrem,
+                                       std::vector< unsigned int >& L2p,
                                        std::vector< MPI_Request >& recv_remoteh_reqs )
 {
 #ifndef MOAB_HAVE_MPI
@@ -1248,7 +1317,10 @@ ErrorCode ParallelComm::recv_messages( const int from_proc, const bool store_rem
     {
         PRINT_DEBUG_WAITANY( recvReqs, MB_MESG_TAGS_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 2, &recvReqs[2 * ind1], &ind2, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in recv_messages" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in recv_messages" );
+        }
 
         PRINT_DEBUG_RECD( status );
 
@@ -1295,7 +1367,8 @@ ErrorCode ParallelComm::recv_messages( const int from_proc, const bool store_rem
 #endif
 }
 
-ErrorCode ParallelComm::recv_remote_handle_messages( const int from_proc, int& incoming2,
+ErrorCode ParallelComm::recv_remote_handle_messages( const int from_proc,
+                                                     int& incoming2,
                                                      std::vector< EntityHandle >& L2hloc,
                                                      std::vector< EntityHandle >& L2hrem,
                                                      std::vector< unsigned int >& L2p,
@@ -1313,7 +1386,10 @@ ErrorCode ParallelComm::recv_remote_handle_messages( const int from_proc, int& i
     {
         PRINT_DEBUG_WAITANY( recv_remoteh_reqs, MB_MESG_REMOTEH_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 2, &recv_remoteh_reqs[2 * ind1], &ind2, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in recv_remote_handle_messages" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in recv_remote_handle_messages" );
+        }
 
         // OK, received something; decrement incoming counter
         incoming2--;
@@ -1339,9 +1415,14 @@ ErrorCode ParallelComm::recv_remote_handle_messages( const int from_proc, int& i
 #endif
 }
 
-ErrorCode ParallelComm::pack_buffer( Range& orig_ents, const bool /*adjacencies*/, const bool tags,
-                                     const bool store_remote_handles, const int to_proc, Buffer* buff,
-                                     TupleList* entprocs, Range* allsent )
+ErrorCode ParallelComm::pack_buffer( Range& orig_ents,
+                                     const bool /*adjacencies*/,
+                                     const bool tags,
+                                     const bool store_remote_handles,
+                                     const int to_proc,
+                                     Buffer* buff,
+                                     TupleList* entprocs,
+                                     Range* allsent )
 {
     // Pack the buffer with the entity ranges, adjacencies, and tags sections
     //
@@ -1379,12 +1460,18 @@ ErrorCode ParallelComm::pack_buffer( Range& orig_ents, const bool /*adjacencies*
     return result;
 }
 
-ErrorCode ParallelComm::unpack_buffer( unsigned char* buff_ptr, const bool store_remote_handles, const int from_proc,
-                                       const int ind, std::vector< std::vector< EntityHandle > >& L1hloc,
+ErrorCode ParallelComm::unpack_buffer( unsigned char* buff_ptr,
+                                       const bool store_remote_handles,
+                                       const int from_proc,
+                                       const int ind,
+                                       std::vector< std::vector< EntityHandle > >& L1hloc,
                                        std::vector< std::vector< EntityHandle > >& L1hrem,
-                                       std::vector< std::vector< int > >& L1p, std::vector< EntityHandle >& L2hloc,
-                                       std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
-                                       std::vector< EntityHandle >& new_ents, const bool created_iface )
+                                       std::vector< std::vector< int > >& L1p,
+                                       std::vector< EntityHandle >& L2hloc,
+                                       std::vector< EntityHandle >& L2hrem,
+                                       std::vector< unsigned int >& L2p,
+                                       std::vector< EntityHandle >& new_ents,
+                                       const bool created_iface )
 {
     unsigned char* tmp_buff = buff_ptr;
     ErrorCode result;
@@ -1492,8 +1579,12 @@ int ParallelComm::estimate_sets_buffer_size( Range& entities, const bool /*store
     return buff_size;
 }
 
-ErrorCode ParallelComm::pack_entities( Range& entities, Buffer* buff, const bool store_remote_handles,
-                                       const int to_proc, const bool /*is_iface*/, TupleList* entprocs,
+ErrorCode ParallelComm::pack_entities( Range& entities,
+                                       Buffer* buff,
+                                       const bool store_remote_handles,
+                                       const int to_proc,
+                                       const bool /*is_iface*/,
+                                       TupleList* entprocs,
                                        Range* /*allsent*/ )
 {
     // Packed information:
@@ -1654,14 +1745,17 @@ ErrorCode ParallelComm::pack_entities( Range& entities, Buffer* buff, const bool
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::build_sharedhps_list( const EntityHandle entity, const unsigned char pstatus,
+ErrorCode ParallelComm::build_sharedhps_list( const EntityHandle entity,
+                                              const unsigned char pstatus,
                                               const int
 #ifndef NDEBUG
                                                   sharedp
 #endif
                                               ,
-                                              const std::set< unsigned int >& procs, unsigned int& num_ents,
-                                              int* tmp_procs, EntityHandle* tmp_handles )
+                                              const std::set< unsigned int >& procs,
+                                              unsigned int& num_ents,
+                                              int* tmp_procs,
+                                              EntityHandle* tmp_handles )
 {
     num_ents = 0;
     unsigned char pstat;
@@ -1670,7 +1764,9 @@ ErrorCode ParallelComm::build_sharedhps_list( const EntityHandle entity, const u
 
     // Build shared proc/handle lists
     // Start with multi-shared, since if it is the owner will be first
-    if( pstatus & PSTATUS_MULTISHARED ) {}
+    if( pstatus & PSTATUS_MULTISHARED )
+    {
+    }
     else if( pstatus & PSTATUS_NOT_OWNED )
     {
         // If not multishared and not owned, other sharing proc is owner, put that
@@ -1737,8 +1833,12 @@ ErrorCode ParallelComm::build_sharedhps_list( const EntityHandle entity, const u
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::pack_entity_seq( const int nodes_per_entity, const bool store_remote_handles, const int to_proc,
-                                         Range& these_ents, std::vector< EntityHandle >& entities_vec, Buffer* buff )
+ErrorCode ParallelComm::pack_entity_seq( const int nodes_per_entity,
+                                         const bool store_remote_handles,
+                                         const int to_proc,
+                                         Range& these_ents,
+                                         std::vector< EntityHandle >& entities_vec,
+                                         Buffer* buff )
 {
     int tmp_space = 3 * sizeof( int ) + nodes_per_entity * these_ents.size() * sizeof( EntityHandle );
     buff->check_space( tmp_space );
@@ -1772,8 +1872,11 @@ ErrorCode ParallelComm::pack_entity_seq( const int nodes_per_entity, const bool 
     return result;
 }
 
-ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, EntityHandle* from_vec,
-                                            EntityHandle* to_vec_tmp, int num_ents, int to_proc,
+ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles,
+                                            EntityHandle* from_vec,
+                                            EntityHandle* to_vec_tmp,
+                                            int num_ents,
+                                            int to_proc,
                                             const std::vector< EntityHandle >& new_ents )
 {
     // NOTE: THIS IMPLEMENTATION IS JUST LIKE THE RANGE-BASED VERSION, NO REUSE
@@ -1853,7 +1956,10 @@ ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, Ent
                     }
                     int err;
                     to_vec[i] = CREATE_HANDLE( MBMAXTYPE, j, err );
-                    if( err ) { MB_SET_ERR( MB_FAILURE, "Failed to create handle in remote_handles" ); }
+                    if( err )
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Failed to create handle in remote_handles" );
+                    }
                 }
             }
         }
@@ -1865,8 +1971,10 @@ ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, Ent
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, const Range& from_range,
-                                            EntityHandle* to_vec, int to_proc,
+ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles,
+                                            const Range& from_range,
+                                            EntityHandle* to_vec,
+                                            int to_proc,
                                             const std::vector< EntityHandle >& new_ents )
 {
     // NOTE: THIS IMPLEMENTATION IS JUST LIKE THE VECTOR-BASED VERSION, NO REUSE
@@ -1932,7 +2040,10 @@ ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, con
                     }
                     int err;
                     to_vec[i] = CREATE_HANDLE( MBMAXTYPE, j, err );
-                    if( err ) { MB_SET_ERR( MB_FAILURE, "Failed to create handle in remote_handles" ); }
+                    if( err )
+                    {
+                        MB_SET_ERR( MB_FAILURE, "Failed to create handle in remote_handles" );
+                    }
                 }
             }
         }
@@ -1941,8 +2052,11 @@ ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, con
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, const Range& from_range, Range& to_range,
-                                            int to_proc, const std::vector< EntityHandle >& new_ents )
+ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles,
+                                            const Range& from_range,
+                                            Range& to_range,
+                                            int to_proc,
+                                            const std::vector< EntityHandle >& new_ents )
 {
     std::vector< EntityHandle > to_vector( from_range.size() );
 
@@ -1951,13 +2065,18 @@ ErrorCode ParallelComm::get_remote_handles( const bool store_remote_handles, con
     return result;
 }
 
-ErrorCode ParallelComm::unpack_entities( unsigned char*& buff_ptr, const bool store_remote_handles,
-                                         const int /*from_ind*/, const bool is_iface,
+ErrorCode ParallelComm::unpack_entities( unsigned char*& buff_ptr,
+                                         const bool store_remote_handles,
+                                         const int /*from_ind*/,
+                                         const bool is_iface,
                                          std::vector< std::vector< EntityHandle > >& L1hloc,
                                          std::vector< std::vector< EntityHandle > >& L1hrem,
-                                         std::vector< std::vector< int > >& L1p, std::vector< EntityHandle >& L2hloc,
-                                         std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
-                                         std::vector< EntityHandle >& new_ents, const bool created_iface )
+                                         std::vector< std::vector< int > >& L1p,
+                                         std::vector< EntityHandle >& L2hloc,
+                                         std::vector< EntityHandle >& L2hrem,
+                                         std::vector< unsigned int >& L2p,
+                                         std::vector< EntityHandle >& new_ents,
+                                         const bool created_iface )
 {
     // General algorithm:
     // - unpack # entities
@@ -2033,7 +2152,10 @@ ErrorCode ParallelComm::unpack_entities( unsigned char*& buff_ptr, const bool st
         UNPACK_INT( buff_ptr, num_ents2 );
 
         // Unpack the nodes per entity
-        if( MBVERTEX != this_type && num_ents2 ) { UNPACK_INT( buff_ptr, verts_per_entity ); }
+        if( MBVERTEX != this_type && num_ents2 )
+        {
+            UNPACK_INT( buff_ptr, verts_per_entity );
+        }
 
         std::vector< int > ps( MAX_SHARING_PROCS, -1 );
         std::vector< EntityHandle > hs( MAX_SHARING_PROCS, 0 );
@@ -2063,7 +2185,10 @@ ErrorCode ParallelComm::unpack_entities( unsigned char*& buff_ptr, const bool st
                 UNPACK_EH( buff_save, &hs[0], num_ps );
             }
 
-            if( MBVERTEX == this_type ) { UNPACK_DBLS( buff_ptr, coords, 3 ); }
+            if( MBVERTEX == this_type )
+            {
+                UNPACK_DBLS( buff_ptr, coords, 3 );
+            }
             else
             {
                 assert( verts_per_entity <= CN::MAX_NODES_PER_ELEMENT );
@@ -2294,7 +2419,10 @@ ErrorCode ParallelComm::print_buffer( unsigned char* buff_ptr, int mesg_tag, int
             UNPACK_INT( buff_ptr, num_ents2 );
 
             // Unpack the nodes per entity
-            if( MBVERTEX != this_type && num_ents2 ) { UNPACK_INT( buff_ptr, verts_per_entity ); }
+            if( MBVERTEX != this_type && num_ents2 )
+            {
+                UNPACK_INT( buff_ptr, verts_per_entity );
+            }
 
             std::cerr << "Type: " << CN::EntityTypeName( this_type ) << "; num_ents = " << num_ents2;
             if( MBVERTEX != this_type ) std::cerr << "; verts_per_ent = " << verts_per_entity;
@@ -2498,7 +2626,9 @@ ErrorCode ParallelComm::list_entities( const Range& ents )
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::update_remote_data( Range& local_range, Range& remote_range, int other_proc,
+ErrorCode ParallelComm::update_remote_data( Range& local_range,
+                                            Range& remote_range,
+                                            int other_proc,
                                             const unsigned char add_pstat )
 {
     Range::iterator rit, rit2;
@@ -2513,8 +2643,11 @@ ErrorCode ParallelComm::update_remote_data( Range& local_range, Range& remote_ra
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::update_remote_data( const EntityHandle new_h, const int* ps, const EntityHandle* hs,
-                                            const int num_ps, const unsigned char add_pstat
+ErrorCode ParallelComm::update_remote_data( const EntityHandle new_h,
+                                            const int* ps,
+                                            const EntityHandle* hs,
+                                            const int num_ps,
+                                            const unsigned char add_pstat
                                             // The following lines left in for future debugging, at least until I trust
                                             // this function; tjt, 10/4/2013
                                             //                                           , int *new_ps,
@@ -2641,8 +2774,11 @@ ErrorCode ParallelComm::update_remote_data( const EntityHandle new_h, const int*
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::update_remote_data_old( const EntityHandle new_h, const int* ps, const EntityHandle* hs,
-                                                const int num_ps, const unsigned char add_pstat )
+ErrorCode ParallelComm::update_remote_data_old( const EntityHandle new_h,
+                                                const int* ps,
+                                                const EntityHandle* hs,
+                                                const int num_ps,
+                                                const unsigned char add_pstat )
 {
     EntityHandle tag_hs[MAX_SHARING_PROCS];
     int tag_ps[MAX_SHARING_PROCS];
@@ -2841,7 +2977,10 @@ ErrorCode ParallelComm::get_sharing_data( const Range& entities, std::set< int >
             return MB_SUCCESS;
         }
 
-        if( rit == entities.begin() ) { std::copy( sp2, sp2 + num_ps, std::inserter( procs, procs.begin() ) ); }
+        if( rit == entities.begin() )
+        {
+            std::copy( sp2, sp2 + num_ps, std::inserter( procs, procs.begin() ) );
+        }
         else
         {
             std::sort( sp2, sp2 + num_ps );
@@ -2865,7 +3004,10 @@ ErrorCode ParallelComm::get_sharing_data( const Range& entities, std::set< int >
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_sharing_data( const EntityHandle entity, int* ps, EntityHandle* hs, unsigned char& pstat,
+ErrorCode ParallelComm::get_sharing_data( const EntityHandle entity,
+                                          int* ps,
+                                          EntityHandle* hs,
+                                          unsigned char& pstat,
                                           unsigned int& num_ps )
 {
     ErrorCode result = mbImpl->tag_get_data( pstatus_tag(), &entity, 1, &pstat );MB_CHK_SET_ERR( result, "Failed to get pstatus tag data" );
@@ -2902,10 +3044,16 @@ ErrorCode ParallelComm::get_sharing_data( const EntityHandle entity, int* ps, En
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::find_existing_entity( const bool is_iface, const int owner_p, const EntityHandle owner_h,
-                                              const int num_ps, const EntityHandle* connect, const int num_connect,
-                                              const EntityType this_type, std::vector< EntityHandle >& L2hloc,
-                                              std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
+ErrorCode ParallelComm::find_existing_entity( const bool is_iface,
+                                              const int owner_p,
+                                              const EntityHandle owner_h,
+                                              const int num_ps,
+                                              const EntityHandle* connect,
+                                              const int num_connect,
+                                              const EntityType this_type,
+                                              std::vector< EntityHandle >& L2hloc,
+                                              std::vector< EntityHandle >& L2hrem,
+                                              std::vector< unsigned int >& L2p,
                                               EntityHandle& new_h )
 {
     new_h = 0;
@@ -2939,7 +3087,8 @@ ErrorCode ParallelComm::find_existing_entity( const bool is_iface, const int own
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_local_handles( const Range& remote_handles, Range& local_handles,
+ErrorCode ParallelComm::get_local_handles( const Range& remote_handles,
+                                           Range& local_handles,
                                            const std::vector< EntityHandle >& new_ents )
 {
     std::vector< EntityHandle > rh_vec;
@@ -2957,7 +3106,8 @@ ErrorCode ParallelComm::get_local_handles( EntityHandle* from_vec, int num_ents,
     return get_local_handles( from_vec, num_ents, tmp_ents );
 }
 
-ErrorCode ParallelComm::get_local_handles( EntityHandle* from_vec, int num_ents,
+ErrorCode ParallelComm::get_local_handles( EntityHandle* from_vec,
+                                           int num_ents,
                                            const std::vector< EntityHandle >& new_ents )
 {
     for( int i = 0; i < num_ents; i++ )
@@ -3157,8 +3307,10 @@ ErrorCode ParallelComm::pack_sets( Range& entities, Buffer* buff, const bool sto
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::unpack_sets( unsigned char*& buff_ptr, std::vector< EntityHandle >& entities,
-                                     const bool store_remote_handles, const int from_proc )
+ErrorCode ParallelComm::unpack_sets( unsigned char*& buff_ptr,
+                                     std::vector< EntityHandle >& entities,
+                                     const bool store_remote_handles,
+                                     const int from_proc )
 {
     // Now the sets; assume any sets the application wants to pass are in the entities list
     ErrorCode result;
@@ -3295,23 +3447,33 @@ ErrorCode ParallelComm::unpack_sets( unsigned char*& buff_ptr, std::vector< Enti
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::pack_adjacencies( Range& /*entities*/, Range::const_iterator& /*start_rit*/,
-                                          Range& /*whole_range*/, unsigned char*& /*buff_ptr*/, int& /*count*/,
-                                          const bool /*just_count*/, const bool /*store_handles*/,
+ErrorCode ParallelComm::pack_adjacencies( Range& /*entities*/,
+                                          Range::const_iterator& /*start_rit*/,
+                                          Range& /*whole_range*/,
+                                          unsigned char*& /*buff_ptr*/,
+                                          int& /*count*/,
+                                          const bool /*just_count*/,
+                                          const bool /*store_handles*/,
                                           const int /*to_proc*/ )
 {
     return MB_FAILURE;
 }
 
-ErrorCode ParallelComm::unpack_adjacencies( unsigned char*& /*buff_ptr*/, Range& /*entities*/,
-                                            const bool /*store_handles*/, const int /*from_proc*/ )
+ErrorCode ParallelComm::unpack_adjacencies( unsigned char*& /*buff_ptr*/,
+                                            Range& /*entities*/,
+                                            const bool /*store_handles*/,
+                                            const int /*from_proc*/ )
 {
     return MB_FAILURE;
 }
 
-ErrorCode ParallelComm::pack_tags( Range& entities, const std::vector< Tag >& src_tags,
-                                   const std::vector< Tag >& dst_tags, const std::vector< Range >& tag_ranges,
-                                   Buffer* buff, const bool store_remote_handles, const int to_proc )
+ErrorCode ParallelComm::pack_tags( Range& entities,
+                                   const std::vector< Tag >& src_tags,
+                                   const std::vector< Tag >& dst_tags,
+                                   const std::vector< Range >& tag_ranges,
+                                   Buffer* buff,
+                                   const bool store_remote_handles,
+                                   const int to_proc )
 {
     ErrorCode result;
     std::vector< Tag >::const_iterator tag_it, dst_it;
@@ -3391,9 +3553,13 @@ ErrorCode ParallelComm::packed_tag_size( Tag tag, const Range& tagged_entities, 
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::pack_tag( Tag src_tag, Tag dst_tag, const Range& tagged_entities,
-                                  const std::vector< EntityHandle >& whole_vec, Buffer* buff,
-                                  const bool store_remote_handles, const int to_proc )
+ErrorCode ParallelComm::pack_tag( Tag src_tag,
+                                  Tag dst_tag,
+                                  const Range& tagged_entities,
+                                  const std::vector< EntityHandle >& whole_vec,
+                                  Buffer* buff,
+                                  const bool store_remote_handles,
+                                  const int to_proc )
 {
     ErrorCode result;
     std::vector< int > var_len_sizes;
@@ -3481,7 +3647,8 @@ ErrorCode ParallelComm::pack_tag( Tag src_tag, Tag dst_tag, const Range& tagged_
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_tag_send_list( const Range& whole_range, std::vector< Tag >& all_tags,
+ErrorCode ParallelComm::get_tag_send_list( const Range& whole_range,
+                                           std::vector< Tag >& all_tags,
                                            std::vector< Range >& tag_ranges )
 {
     std::vector< Tag > tmp_tags;
@@ -3509,8 +3676,10 @@ ErrorCode ParallelComm::get_tag_send_list( const Range& whole_range, std::vector
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::unpack_tags( unsigned char*& buff_ptr, std::vector< EntityHandle >& entities,
-                                     const bool /*store_remote_handles*/, const int /*from_proc*/,
+ErrorCode ParallelComm::unpack_tags( unsigned char*& buff_ptr,
+                                     std::vector< EntityHandle >& entities,
+                                     const bool /*store_remote_handles*/,
+                                     const int /*from_proc*/,
                                      const MPI_Op* const mpi_op )
 {
     // Tags
@@ -3714,7 +3883,10 @@ ErrorCode ParallelComm::reduce( const MPI_Op mpi_op, int num_ents, void* old_val
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::reduce_void( int tag_data_type, const MPI_Op mpi_op, int num_ents, void* old_vals,
+ErrorCode ParallelComm::reduce_void( int tag_data_type,
+                                     const MPI_Op mpi_op,
+                                     int num_ents,
+                                     void* old_vals,
                                      void* new_vals )
 {
     ErrorCode result;
@@ -3792,8 +3964,12 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, int resolve_
     return resolve_shared_ents( this_set, proc_ents, resolve_dim, shared_dim, NULL, id_tag );
 }
 
-ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_ents, int resolve_dim, int shared_dim,
-                                             Range* skin_ents, const Tag* id_tag )
+ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set,
+                                             Range& proc_ents,
+                                             int resolve_dim,
+                                             int shared_dim,
+                                             Range* skin_ents,
+                                             const Tag* id_tag )
 {
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
@@ -3820,7 +3996,10 @@ ErrorCode ParallelComm::resolve_shared_ents( EntityHandle this_set, Range& proc_
     }
     int max_global_resolve_dim = -1;
     int err = MPI_Allreduce( &resolve_dim, &max_global_resolve_dim, 1, MPI_INT, MPI_MAX, proc_config().proc_comm() );
-    if( MPI_SUCCESS != err ) { MB_SET_ERR( MB_FAILURE, "Unable to guess global resolve_dim" ); }
+    if( MPI_SUCCESS != err )
+    {
+        MB_SET_ERR( MB_FAILURE, "Unable to guess global resolve_dim" );
+    }
     if( shared_dim < 0 || resolve_dim < 0 )
     {
         // MB_SET_ERR(MB_FAILURE, "Unable to guess shared_dim or resolve_dim");
@@ -4078,7 +4257,9 @@ void ParallelComm::define_mpe()
 #endif
 }
 
-ErrorCode ParallelComm::resolve_shared_ents( ParallelComm** pc, const unsigned int np, EntityHandle this_set,
+ErrorCode ParallelComm::resolve_shared_ents( ParallelComm** pc,
+                                             const unsigned int np,
+                                             EntityHandle this_set,
                                              const int part_dim )
 {
     std::vector< Range > verts( np );
@@ -4226,8 +4407,11 @@ ErrorCode ParallelComm::tag_iface_entities()
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::set_pstatus_entities( Range& pstatus_ents, unsigned char pstatus_val, bool lower_dim_ents,
-                                              bool verts_too, int operation )
+ErrorCode ParallelComm::set_pstatus_entities( Range& pstatus_ents,
+                                              unsigned char pstatus_val,
+                                              bool lower_dim_ents,
+                                              bool verts_too,
+                                              int operation )
 {
     std::vector< unsigned char > pstatus_vals( pstatus_ents.size() );
     Range all_ents, *range_ptr = &pstatus_ents;
@@ -4258,8 +4442,12 @@ ErrorCode ParallelComm::set_pstatus_entities( Range& pstatus_ents, unsigned char
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::set_pstatus_entities( EntityHandle* pstatus_ents, int num_ents, unsigned char pstatus_val,
-                                              bool lower_dim_ents, bool verts_too, int operation )
+ErrorCode ParallelComm::set_pstatus_entities( EntityHandle* pstatus_ents,
+                                              int num_ents,
+                                              unsigned char pstatus_val,
+                                              bool lower_dim_ents,
+                                              bool verts_too,
+                                              int operation )
 {
     std::vector< unsigned char > pstatus_vals( num_ents );
     ErrorCode result;
@@ -4371,7 +4559,10 @@ ErrorCode ParallelComm::resolve_shared_sets( EntityHandle file, const Tag* idtag
         mbImpl->get_entities_by_handle( *it, contents );
         contents.erase( contents.lower_bound( MBENTITYSET ), contents.end() );
         filter_pstatus( contents, PSTATUS_SHARED, PSTATUS_OR );
-        if( contents.empty() ) { ++it; }
+        if( contents.empty() )
+        {
+            ++it;
+        }
         else
         {
             hint = candidate_sets.insert( hint, *it );
@@ -4900,7 +5091,7 @@ ErrorCode ParallelComm::create_iface_pc_links()
     Tag tmp_iface_tag;
     EntityHandle tmp_iface_set = 0;
     ErrorCode result           = mbImpl->tag_get_handle( "__tmp_iface", 1, MB_TYPE_HANDLE, tmp_iface_tag,
-                                               MB_TAG_DENSE | MB_TAG_CREAT, &tmp_iface_set );MB_CHK_SET_ERR( result, "Failed to create temporary interface set tag" );
+                                                         MB_TAG_DENSE | MB_TAG_CREAT, &tmp_iface_set );MB_CHK_SET_ERR( result, "Failed to create temporary interface set tag" );
 
     Range iface_ents;
     std::vector< EntityHandle > tag_vals;
@@ -4954,7 +5145,9 @@ ErrorCode ParallelComm::create_iface_pc_links()
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_proc_nvecs( int resolve_dim, int shared_dim, Range* skin_ents,
+ErrorCode ParallelComm::get_proc_nvecs( int resolve_dim,
+                                        int shared_dim,
+                                        Range* skin_ents,
                                         std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs )
 {
     // Set sharing procs tags on other skin ents
@@ -5017,7 +5210,8 @@ ErrorCode ParallelComm::get_proc_nvecs( int resolve_dim, int shared_dim, Range* 
 // Also will check for doubles in the list if the list is sorted
 ErrorCode ParallelComm::tag_shared_verts( TupleList& shared_ents,
                                           std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs,
-                                          Range& /*proc_verts*/, unsigned int i_extra )
+                                          Range& /*proc_verts*/,
+                                          unsigned int i_extra )
 {
     Tag shp_tag, shps_tag, shh_tag, shhs_tag, pstat_tag;
     ErrorCode result = get_shared_proc_tags( shp_tag, shps_tag, shh_tag, shhs_tag, pstat_tag );MB_CHK_SET_ERR( result, "Failed to get shared proc tags in tag_shared_verts" );
@@ -5133,7 +5327,8 @@ ErrorCode ParallelComm::tag_shared_verts( TupleList& shared_ents,
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::tag_shared_verts( TupleList& shared_ents, Range* skin_ents,
+ErrorCode ParallelComm::tag_shared_verts( TupleList& shared_ents,
+                                          Range* skin_ents,
                                           std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs,
                                           Range& /*proc_verts*/ )
 {
@@ -5326,8 +5521,12 @@ ErrorCode ParallelComm::get_pstatus_entities( int dim, unsigned char pstatus_val
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::check_global_ids( EntityHandle this_set, const int dimension, const int start_id,
-                                          const bool largest_dim_only, const bool parallel, const bool owned_only )
+ErrorCode ParallelComm::check_global_ids( EntityHandle this_set,
+                                          const int dimension,
+                                          const int start_id,
+                                          const bool largest_dim_only,
+                                          const bool parallel,
+                                          const bool owned_only )
 {
     // Global id tag
     Tag gid_tag = mbImpl->globalId_tag();
@@ -5367,7 +5566,10 @@ bool ParallelComm::is_iface_proc( EntityHandle this_set, int to_proc )
     return false;
 }
 
-ErrorCode ParallelComm::filter_pstatus( Range& ents, unsigned char pstat, unsigned char op, int to_proc,
+ErrorCode ParallelComm::filter_pstatus( Range& ents,
+                                        unsigned char pstat,
+                                        unsigned char op,
+                                        int to_proc,
                                         Range* returned_ents )
 {
     Range tmp_ents;
@@ -5442,7 +5644,10 @@ ErrorCode ParallelComm::filter_pstatus( Range& ents, unsigned char pstat, unsign
                 for( unsigned int j = 0; j < MAX_SHARING_PROCS; j++ )
                 {
                     // If to_proc shares this entity, add it to list
-                    if( sharing_procs[j] == to_proc ) { hint = tmp_ents2.insert( hint, *rit ); }
+                    if( sharing_procs[j] == to_proc )
+                    {
+                        hint = tmp_ents2.insert( hint, *rit );
+                    }
                     else if( -1 == sharing_procs[j] )
                         break;
 
@@ -5471,8 +5676,13 @@ ErrorCode ParallelComm::filter_pstatus( Range& ents, unsigned char pstat, unsign
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int num_layers, int addl_ents,
-                                              bool store_remote_handles, bool wait_all, EntityHandle* file_set )
+ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim,
+                                              int bridge_dim,
+                                              int num_layers,
+                                              int addl_ents,
+                                              bool store_remote_handles,
+                                              bool wait_all,
+                                              EntityHandle* file_set )
 {
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
@@ -5531,7 +5741,10 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
                            MB_MESG_ENTS_SIZE, incoming1 );
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, buffProcs[ind],
                              MB_MESG_ENTS_SIZE, procConfig.proc_comm(), &recv_ent_reqs[3 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" );
+        }
     }
 
     //===========================================
@@ -5603,7 +5816,10 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
         PRINT_DEBUG_WAITANY( recv_ent_reqs, MB_MESG_ENTS_SIZE, procConfig.proc_rank() );
 
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_ent_reqs[0], &ind, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" );
+        }
 
         PRINT_DEBUG_RECD( status );
 
@@ -5709,14 +5925,23 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
         //===========================================
         if( wait_all )
         {
-            if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+            if( myDebug->get_verbosity() == 5 )
+            {
+                success = MPI_Barrier( procConfig.proc_comm() );
+            }
             else
             {
                 MPI_Status mult_status[3 * MAX_SHARING_PROCS];
                 success = MPI_Waitall( 3 * buffProcs.size(), &recv_ent_reqs[0], mult_status );
-                if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" ); }
+                if( MPI_SUCCESS != success )
+                {
+                    MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" );
+                }
                 success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], mult_status );
-                if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" ); }
+                if( MPI_SUCCESS != success )
+                {
+                    MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" );
+                }
                 /*success = MPI_Waitall(3*buffProcs.size(), &recv_remoteh_reqs[0], mult_status);
                 if (MPI_SUCCESS != success) {
                   MB_SET_ERR(MB_FAILURE, "Failed in waitall in ghost exchange");
@@ -5733,12 +5958,18 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
     // we still need to wait on sendReqs, if they are not fulfilled yet
     if( wait_all )
     {
-        if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+        if( myDebug->get_verbosity() == 5 )
+        {
+            success = MPI_Barrier( procConfig.proc_comm() );
+        }
         else
         {
             MPI_Status mult_status[3 * MAX_SHARING_PROCS];
             success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], mult_status );
-            if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" ); }
+            if( MPI_SUCCESS != success )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" );
+            }
         }
     }
     //===========================================
@@ -5770,7 +6001,10 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
     {
         PRINT_DEBUG_WAITANY( recv_remoteh_reqs, MB_MESG_REMOTEH_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_remoteh_reqs[0], &ind, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" );
+        }
 
         // OK, received something; decrement incoming counter
         incoming2--;
@@ -5809,14 +6043,20 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
     //===========================================
     if( wait_all )
     {
-        if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+        if( myDebug->get_verbosity() == 5 )
+        {
+            success = MPI_Barrier( procConfig.proc_comm() );
+        }
         else
         {
             MPI_Status mult_status[3 * MAX_SHARING_PROCS];
             success = MPI_Waitall( 3 * buffProcs.size(), &recv_remoteh_reqs[0], mult_status );
             if( MPI_SUCCESS == success ) success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], mult_status );
         }
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitall in ghost exchange" );
+        }
     }
 
 #ifndef NDEBUG
@@ -5835,9 +6075,17 @@ ErrorCode ParallelComm::exchange_ghost_cells( int ghost_dim, int bridge_dim, int
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::send_buffer( const unsigned int to_proc, Buffer* send_buff, int mesg_tag, MPI_Request& send_req,
-                                     MPI_Request& ack_req, int* ack_buff, int& this_incoming, int next_mesg_tag,
-                                     Buffer* next_recv_buff, MPI_Request* next_recv_req, int* next_incoming )
+ErrorCode ParallelComm::send_buffer( const unsigned int to_proc,
+                                     Buffer* send_buff,
+                                     int mesg_tag,
+                                     MPI_Request& send_req,
+                                     MPI_Request& ack_req,
+                                     int* ack_buff,
+                                     int& this_incoming,
+                                     int next_mesg_tag,
+                                     Buffer* next_recv_buff,
+                                     MPI_Request* next_recv_req,
+                                     int* next_incoming )
 {
     ErrorCode result = MB_SUCCESS;
     int success;
@@ -5880,10 +6128,20 @@ ErrorCode ParallelComm::send_buffer( const unsigned int to_proc, Buffer* send_bu
     return result;
 }
 
-ErrorCode ParallelComm::recv_buffer( int mesg_tag_expected, const MPI_Status& mpi_status, Buffer* recv_buff,
-                                     MPI_Request& recv_req, MPI_Request& /*ack_recvd_req*/, int& this_incoming,
-                                     Buffer* send_buff, MPI_Request& send_req, MPI_Request& sent_ack_req, bool& done,
-                                     Buffer* next_buff, int next_tag, MPI_Request* next_req, int* next_incoming )
+ErrorCode ParallelComm::recv_buffer( int mesg_tag_expected,
+                                     const MPI_Status& mpi_status,
+                                     Buffer* recv_buff,
+                                     MPI_Request& recv_req,
+                                     MPI_Request& /*ack_recvd_req*/,
+                                     int& this_incoming,
+                                     Buffer* send_buff,
+                                     MPI_Request& send_req,
+                                     MPI_Request& sent_ack_req,
+                                     bool& done,
+                                     Buffer* next_buff,
+                                     int next_tag,
+                                     MPI_Request* next_req,
+                                     int* next_incoming )
 {
     // Process a received message; if there will be more coming,
     // post a receive for 2nd part then send an ack message
@@ -5908,14 +6166,20 @@ ErrorCode ParallelComm::recv_buffer( int mesg_tag_expected, const MPI_Status& mp
                            recv_buff->get_stored_size() - INITIAL_BUFF_SIZE, mesg_tag_expected + 1, this_incoming );
         success = MPI_Irecv( recv_buff->mem_ptr + INITIAL_BUFF_SIZE, recv_buff->get_stored_size() - INITIAL_BUFF_SIZE,
                              MPI_UNSIGNED_CHAR, from_proc, mesg_tag_expected + 1, procConfig.proc_comm(), &recv_req );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post 2nd iRecv in ghost exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post 2nd iRecv in ghost exchange" );
+        }
 
         // Send ack, doesn't matter what data actually is
         PRINT_DEBUG_ISEND( procConfig.proc_rank(), from_proc, recv_buff->mem_ptr, mesg_tag_expected - 1,
                            sizeof( int ) );
         success = MPI_Isend( recv_buff->mem_ptr, sizeof( int ), MPI_UNSIGNED_CHAR, from_proc, mesg_tag_expected - 1,
                              procConfig.proc_comm(), &sent_ack_req );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to send ack in ghost exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to send ack in ghost exchange" );
+        }
     }
     else if( mpi_status.MPI_TAG == mesg_tag_expected - 1 )
     {
@@ -5934,7 +6198,10 @@ ErrorCode ParallelComm::recv_buffer( int mesg_tag_expected, const MPI_Status& mp
 
             success = MPI_Irecv( next_buff->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, from_proc, next_tag,
                                  procConfig.proc_comm(), next_req );
-            if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post next irecv in ghost exchange" ); }
+            if( success != MPI_SUCCESS )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed to post next irecv in ghost exchange" );
+            }
         }
 
         // Send 2nd message
@@ -5945,7 +6212,10 @@ ErrorCode ParallelComm::recv_buffer( int mesg_tag_expected, const MPI_Status& mp
                 0 <= send_buff->get_stored_size() );
         success = MPI_Isend( send_buff->mem_ptr + INITIAL_BUFF_SIZE, send_buff->get_stored_size() - INITIAL_BUFF_SIZE,
                              MPI_UNSIGNED_CHAR, from_proc, mesg_tag_expected + 1, procConfig.proc_comm(), &send_req );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to send 2nd message in ghost exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to send 2nd message in ghost exchange" );
+        }
     }
     else if( ( mpi_status.MPI_TAG == mesg_tag_expected && recv_buff->get_stored_size() <= (int)INITIAL_BUFF_SIZE ) ||
              mpi_status.MPI_TAG == mesg_tag_expected + 1 )
@@ -6141,7 +6411,11 @@ ErrorCode ParallelComm::check_clean_iface( Range& allsent )
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::set_sharing_data( EntityHandle ent, unsigned char pstatus, int old_nump, int new_nump, int* ps,
+ErrorCode ParallelComm::set_sharing_data( EntityHandle ent,
+                                          unsigned char pstatus,
+                                          int old_nump,
+                                          int new_nump,
+                                          int* ps,
                                           EntityHandle* hs )
 {
     // If new nump is less than 3, the entity is no longer mutishared
@@ -6233,8 +6507,13 @@ ErrorCode ParallelComm::set_sharing_data( EntityHandle ent, unsigned char pstatu
     return result;
 }
 
-ErrorCode ParallelComm::get_sent_ents( const bool is_iface, const int bridge_dim, const int ghost_dim,
-                                       const int num_layers, const int addl_ents, Range* sent_ents, Range& allsent,
+ErrorCode ParallelComm::get_sent_ents( const bool is_iface,
+                                       const int bridge_dim,
+                                       const int ghost_dim,
+                                       const int num_layers,
+                                       const int addl_ents,
+                                       Range* sent_ents,
+                                       Range& allsent,
                                        TupleList& entprocs )
 {
     ErrorCode result;
@@ -6298,8 +6577,13 @@ ErrorCode ParallelComm::get_sent_ents( const bool is_iface, const int bridge_dim
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::exchange_ghost_cells( ParallelComm** pcs, unsigned int num_procs, int ghost_dim, int bridge_dim,
-                                              int num_layers, int addl_ents, bool store_remote_handles,
+ErrorCode ParallelComm::exchange_ghost_cells( ParallelComm** pcs,
+                                              unsigned int num_procs,
+                                              int ghost_dim,
+                                              int bridge_dim,
+                                              int num_layers,
+                                              int addl_ents,
+                                              bool store_remote_handles,
                                               EntityHandle* file_sets )
 {
     // Static version of function, exchanging info through buffers rather
@@ -6497,7 +6781,10 @@ ErrorCode ParallelComm::post_irecv( std::vector< unsigned int >& exchange_procs 
                            MB_MESG_ENTS_SIZE, incoming );
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, buffProcs[ind],
                              MB_MESG_ENTS_SIZE, procConfig.proc_comm(), &recvReqs[2 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in owned entity exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in owned entity exchange" );
+        }
     }
 
     return MB_SUCCESS;
@@ -6535,7 +6822,10 @@ ErrorCode ParallelComm::post_irecv( std::vector< unsigned int >& shared_procs, s
                            MB_MESG_ENTS_SIZE, incoming );
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, buffProcs[ind],
                              MB_MESG_ENTS_SIZE, procConfig.proc_comm(), &recvReqs[2 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in owned entity exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in owned entity exchange" );
+        }
     }
 
     return MB_SUCCESS;
@@ -6544,8 +6834,11 @@ ErrorCode ParallelComm::post_irecv( std::vector< unsigned int >& shared_procs, s
 ErrorCode ParallelComm::exchange_owned_meshs( std::vector< unsigned int >& exchange_procs,
                                               std::vector< Range* >& exchange_ents,
                                               std::vector< MPI_Request >& recv_ent_reqs,
-                                              std::vector< MPI_Request >& recv_remoteh_reqs, bool store_remote_handles,
-                                              bool wait_all, bool migrate, int dim )
+                                              std::vector< MPI_Request >& recv_remoteh_reqs,
+                                              bool store_remote_handles,
+                                              bool wait_all,
+                                              bool migrate,
+                                              int dim )
 {
     // Filter out entities already shared with destination
     // Exchange twice for entities and sets
@@ -6611,8 +6904,11 @@ ErrorCode ParallelComm::exchange_owned_meshs( std::vector< unsigned int >& excha
 ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchange_procs,
                                              std::vector< Range* >& exchange_ents,
                                              std::vector< MPI_Request >& recv_ent_reqs,
-                                             std::vector< MPI_Request >& recv_remoteh_reqs, const bool recv_posted,
-                                             bool store_remote_handles, bool wait_all, bool migrate )
+                                             std::vector< MPI_Request >& recv_remoteh_reqs,
+                                             const bool recv_posted,
+                                             bool store_remote_handles,
+                                             bool wait_all,
+                                             bool migrate )
 {
 #ifdef MOAB_HAVE_MPE
     if( myDebug->get_verbosity() == 2 )
@@ -6642,7 +6938,10 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
         // Filter out entities already shared with destination
         Range tmp_range;
         result = filter_pstatus( *exchange_ents[i], PSTATUS_SHARED, PSTATUS_AND, buffProcs[ind], &tmp_range );MB_CHK_SET_ERR( result, "Failed to filter on owner" );
-        if( !tmp_range.empty() ) { *exchange_ents[i] = subtract( *exchange_ents[i], tmp_range ); }
+        if( !tmp_range.empty() )
+        {
+            *exchange_ents[i] = subtract( *exchange_ents[i], tmp_range );
+        }
     }
 
     //===========================================
@@ -6671,7 +6970,10 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
                                INITIAL_BUFF_SIZE, MB_MESG_ENTS_SIZE, incoming1 );
             success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, buffProcs[ind],
                                  MB_MESG_ENTS_SIZE, procConfig.proc_comm(), &recv_ent_reqs[3 * ind] );
-            if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in owned entity exchange" ); }
+            if( success != MPI_SUCCESS )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed to post irecv in owned entity exchange" );
+            }
         }
     }
     else
@@ -6766,7 +7068,10 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
         PRINT_DEBUG_WAITANY( recv_ent_reqs, MB_MESG_ENTS_SIZE, procConfig.proc_rank() );
 
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_ent_reqs[0], &ind, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" );
+        }
 
         PRINT_DEBUG_RECD( status );
 
@@ -6848,12 +7153,18 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
     // we still need to wait on sendReqs, if they are not fulfilled yet
     if( wait_all )
     {
-        if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+        if( myDebug->get_verbosity() == 5 )
+        {
+            success = MPI_Barrier( procConfig.proc_comm() );
+        }
         else
         {
             MPI_Status mult_status[3 * MAX_SHARING_PROCS];
             success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], mult_status );
-            if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in exchange owned mesh" ); }
+            if( MPI_SUCCESS != success )
+            {
+                MB_SET_ERR( MB_FAILURE, "Failed in waitall in exchange owned mesh" );
+            }
         }
     }
 
@@ -6885,7 +7196,10 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
     {
         PRINT_DEBUG_WAITANY( recv_remoteh_reqs, MB_MESG_REMOTEH_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_remoteh_reqs[0], &ind, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in owned entity exchange" );
+        }
 
         // OK, received something; decrement incoming counter
         incoming2--;
@@ -6926,14 +7240,20 @@ ErrorCode ParallelComm::exchange_owned_mesh( std::vector< unsigned int >& exchan
     //===========================================
     if( wait_all )
     {
-        if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+        if( myDebug->get_verbosity() == 5 )
+        {
+            success = MPI_Barrier( procConfig.proc_comm() );
+        }
         else
         {
             MPI_Status mult_status[3 * MAX_SHARING_PROCS];
             success = MPI_Waitall( 3 * buffProcs.size(), &recv_remoteh_reqs[0], mult_status );
             if( MPI_SUCCESS == success ) success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], mult_status );
         }
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in owned entity exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitall in owned entity exchange" );
+        }
     }
 
 #ifndef NDEBUG
@@ -7039,8 +7359,11 @@ ErrorCode ParallelComm::check_sent_ents( Range& allsent )
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::pack_remote_handles( std::vector< EntityHandle >& L1hloc, std::vector< EntityHandle >& L1hrem,
-                                             std::vector< int >& L1p, unsigned int /*to_proc*/, Buffer* buff )
+ErrorCode ParallelComm::pack_remote_handles( std::vector< EntityHandle >& L1hloc,
+                                             std::vector< EntityHandle >& L1hrem,
+                                             std::vector< int >& L1p,
+                                             unsigned int /*to_proc*/,
+                                             Buffer* buff )
 {
     assert( std::find( L1hloc.begin(), L1hloc.end(), (EntityHandle)0 ) == L1hloc.end() );
 
@@ -7061,8 +7384,10 @@ ErrorCode ParallelComm::pack_remote_handles( std::vector< EntityHandle >& L1hloc
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::unpack_remote_handles( unsigned int from_proc, unsigned char*& buff_ptr,
-                                               std::vector< EntityHandle >& L2hloc, std::vector< EntityHandle >& L2hrem,
+ErrorCode ParallelComm::unpack_remote_handles( unsigned int from_proc,
+                                               unsigned char*& buff_ptr,
+                                               std::vector< EntityHandle >& L2hloc,
+                                               std::vector< EntityHandle >& L2hrem,
                                                std::vector< unsigned int >& L2p )
 {
     // Incoming remote handles; use to set remote handles
@@ -7101,7 +7426,11 @@ ErrorCode ParallelComm::unpack_remote_handles( unsigned int from_proc, unsigned 
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_ghosted_entities( int bridge_dim, int ghost_dim, int to_proc, int num_layers, int addl_ents,
+ErrorCode ParallelComm::get_ghosted_entities( int bridge_dim,
+                                              int ghost_dim,
+                                              int to_proc,
+                                              int num_layers,
+                                              int addl_ents,
                                               Range& ghosted_ents )
 {
     // Get bridge ents on interface(s)
@@ -7186,7 +7515,8 @@ ErrorCode ParallelComm::add_verts( Range& sent_ents )
     return result;
 }
 
-ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags, const std::vector< Tag >& dst_tags,
+ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags,
+                                       const std::vector< Tag >& dst_tags,
                                        const Range& entities_in )
 {
     ErrorCode result;
@@ -7216,7 +7546,10 @@ ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags, const
 
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, *sit,
                              MB_MESG_TAGS_SIZE, procConfig.proc_comm(), &recv_tag_reqs[3 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" );
+        }
     }
 
     // Pack and send tags from this proc to others
@@ -7281,7 +7614,10 @@ ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags, const
         int index_in_recv_requests;
         PRINT_DEBUG_WAITANY( recv_tag_reqs, MB_MESG_TAGS_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_tag_reqs[0], &index_in_recv_requests, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in tag exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in tag exchange" );
+        }
         // Processor index in the list is divided by 3
         ind = index_in_recv_requests / 3;
 
@@ -7308,13 +7644,19 @@ ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags, const
     }
 
     // OK, now wait
-    if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+    if( myDebug->get_verbosity() == 5 )
+    {
+        success = MPI_Barrier( procConfig.proc_comm() );
+    }
     else
     {
         MPI_Status status[3 * MAX_SHARING_PROCS];
         success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], status );
     }
-    if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failure in waitall in tag exchange" ); }
+    if( MPI_SUCCESS != success )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failure in waitall in tag exchange" );
+    }
 
     // If source tag is not equal to destination tag, then
     // do local copy for owned entities (communicate w/ self)
@@ -7343,7 +7685,10 @@ ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags, const
                 int sz, size2;
                 result = mbImpl->tag_get_bytes( src_tags[i], sz );MB_CHK_SET_ERR( result, "tag_get_size failed" );
                 result = mbImpl->tag_get_bytes( dst_tags[i], size2 );MB_CHK_SET_ERR( result, "tag_get_size failed" );
-                if( sz != size2 ) { MB_SET_ERR( MB_FAILURE, "tag sizes don't match" ); }
+                if( sz != size2 )
+                {
+                    MB_SET_ERR( MB_FAILURE, "tag sizes don't match" );
+                }
 
                 data.resize( sz * tagged_ents.size() );
                 result = mbImpl->tag_get_data( src_tags[i], tagged_ents, &data[0] );MB_CHK_SET_ERR( result, "tag_get_data failed" );
@@ -7357,8 +7702,10 @@ ErrorCode ParallelComm::exchange_tags( const std::vector< Tag >& src_tags, const
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const std::vector< Tag >& dst_tags,
-                                     const MPI_Op mpi_op, const Range& entities_in )
+ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags,
+                                     const std::vector< Tag >& dst_tags,
+                                     const MPI_Op mpi_op,
+                                     const Range& entities_in )
 {
     ErrorCode result;
     int success;
@@ -7396,9 +7743,15 @@ ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const s
         if( *vits == *vitd ) continue;
 
         result = mbImpl->tag_get_bytes( *vitd, tagd_size );MB_CHK_SET_ERR( result, "Coudln't get dst tag bytes" );
-        if( tags_size != tagd_size ) { MB_SET_ERR( MB_FAILURE, "Sizes between src and dst tags don't match" ); }
+        if( tags_size != tagd_size )
+        {
+            MB_SET_ERR( MB_FAILURE, "Sizes between src and dst tags don't match" );
+        }
         result = mbImpl->tag_get_data_type( *vitd, tagd_type );MB_CHK_SET_ERR( result, "Coudln't get dst tag data type" );
-        if( tags_type != tagd_type ) { MB_SET_ERR( MB_FAILURE, "Src and dst tags must be of same data type" ); }
+        if( tags_type != tagd_type )
+        {
+            MB_SET_ERR( MB_FAILURE, "Src and dst tags must be of same data type" );
+        }
     }
 
     // Get all procs interfacing to this proc
@@ -7423,7 +7776,10 @@ ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const s
 
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, *sit,
                              MB_MESG_TAGS_SIZE, procConfig.proc_comm(), &recv_tag_reqs[3 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in ghost exchange" );
+        }
     }
 
     // Pack and send tags from this proc to others
@@ -7491,7 +7847,10 @@ ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const s
         int index_in_recv_requests;
         PRINT_DEBUG_WAITANY( recv_tag_reqs, MB_MESG_TAGS_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_tag_reqs[0], &index_in_recv_requests, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" );
+        }
         ind = index_in_recv_requests / 3;
 
         PRINT_DEBUG_RECD( status );
@@ -7517,13 +7876,19 @@ ErrorCode ParallelComm::reduce_tags( const std::vector< Tag >& src_tags, const s
     }
 
     // OK, now wait
-    if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+    if( myDebug->get_verbosity() == 5 )
+    {
+        success = MPI_Barrier( procConfig.proc_comm() );
+    }
     else
     {
         MPI_Status status[3 * MAX_SHARING_PROCS];
         success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], status );
     }
-    if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failure in waitall in tag exchange" ); }
+    if( MPI_SUCCESS != success )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failure in waitall in tag exchange" );
+    }
 
     myDebug->tprintf( 1, "Exiting reduce_tags" );
 
@@ -7564,7 +7929,7 @@ Tag ParallelComm::sharedh_tag()
     {
         EntityHandle def_val = 0;
         ErrorCode result     = mbImpl->tag_get_handle( PARALLEL_SHARED_HANDLE_TAG_NAME, 1, MB_TYPE_HANDLE, sharedhTag,
-                                                   MB_TAG_DENSE | MB_TAG_CREAT, &def_val );
+                                                       MB_TAG_DENSE | MB_TAG_CREAT, &def_val );
         if( MB_SUCCESS != result ) return 0;
     }
 
@@ -7591,7 +7956,7 @@ Tag ParallelComm::pstatus_tag()
     {
         unsigned char tmp_pstatus = 0;
         ErrorCode result          = mbImpl->tag_get_handle( PARALLEL_STATUS_TAG_NAME, 1, MB_TYPE_OPAQUE, pstatusTag,
-                                                   MB_TAG_DENSE | MB_TAG_CREAT, &tmp_pstatus );
+                                                            MB_TAG_DENSE | MB_TAG_CREAT, &tmp_pstatus );
         if( MB_SUCCESS != result ) return 0;
     }
 
@@ -7678,7 +8043,10 @@ ParallelComm* ParallelComm::get_pcomm( Interface* impl, EntityHandle prtn, const
 
     int pcomm_id;
     rval = impl->tag_get_data( prtn_tag, &prtn, 1, &pcomm_id );
-    if( MB_SUCCESS == rval ) { result = get_pcomm( impl, pcomm_id ); }
+    if( MB_SUCCESS == rval )
+    {
+        result = get_pcomm( impl, pcomm_id );
+    }
     else if( MB_TAG_NOT_FOUND == rval && comm )
     {
         result = new ParallelComm( impl, *comm, &pcomm_id );
@@ -7861,7 +8229,10 @@ ErrorCode ParallelComm::create_part( EntityHandle& set_out )
     }
 
     moab::Range& pSets = this->partition_sets();
-    if( pSets.index( set_out ) < 0 ) { pSets.insert( set_out ); }
+    if( pSets.index( set_out ) < 0 )
+    {
+        pSets.insert( set_out );
+    }
 
     return MB_SUCCESS;
 }
@@ -7879,7 +8250,10 @@ ErrorCode ParallelComm::destroy_part( EntityHandle part_id )
     }
 
     moab::Range& pSets = this->partition_sets();
-    if( pSets.index( part_id ) >= 0 ) { pSets.erase( part_id ); }
+    if( pSets.index( part_id ) >= 0 )
+    {
+        pSets.erase( part_id );
+    }
     return mbImpl->delete_entities( &part_id, 1 );
 }
 
@@ -7891,7 +8265,8 @@ ErrorCode ParallelComm::collective_sync_partition()
     return err ? MB_FAILURE : MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_part_neighbor_ids( EntityHandle part, int neighbors_out[MAX_SHARING_PROCS],
+ErrorCode ParallelComm::get_part_neighbor_ids( EntityHandle part,
+                                               int neighbors_out[MAX_SHARING_PROCS],
                                                int& num_neighbors_out )
 {
     ErrorCode rval;
@@ -7996,8 +8371,10 @@ ErrorCode ParallelComm::get_owning_part( EntityHandle handle, int& owning_part_i
     return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_sharing_parts( EntityHandle entity, int part_ids_out[MAX_SHARING_PROCS],
-                                           int& num_part_ids_out, EntityHandle remote_handles[MAX_SHARING_PROCS] )
+ErrorCode ParallelComm::get_sharing_parts( EntityHandle entity,
+                                           int part_ids_out[MAX_SHARING_PROCS],
+                                           int& num_part_ids_out,
+                                           EntityHandle remote_handles[MAX_SHARING_PROCS] )
 {
     // FIXME : assumes one part per proc, and therefore part_id == rank
 
@@ -8413,7 +8790,10 @@ ErrorCode ParallelComm::check_my_shared_handles( std::vector< std::vector< Share
         return MB_SUCCESS;
 }
 
-ErrorCode ParallelComm::get_shared_entities( int other_proc, Range& shared_ents, int dim, const bool iface,
+ErrorCode ParallelComm::get_shared_entities( int other_proc,
+                                             Range& shared_ents,
+                                             int dim,
+                                             const bool iface,
                                              const bool owned_filter )
 {
     shared_ents.clear();
@@ -8491,7 +8871,8 @@ ErrorCode ParallelComm::get_entityset_procs( EntityHandle set, std::vector< unsi
     return sharedSetData->get_sharing_procs( set, ranks );
 }
 
-ErrorCode ParallelComm::get_entityset_owner( EntityHandle entity_set, unsigned& owner_rank,
+ErrorCode ParallelComm::get_entityset_owner( EntityHandle entity_set,
+                                             unsigned& owner_rank,
                                              EntityHandle* remote_handle ) const
 {
     if( remote_handle )
@@ -8500,7 +8881,8 @@ ErrorCode ParallelComm::get_entityset_owner( EntityHandle entity_set, unsigned& 
         return sharedSetData->get_owner( entity_set, owner_rank );
 }
 
-ErrorCode ParallelComm::get_entityset_local_handle( unsigned owning_rank, EntityHandle remote_handle,
+ErrorCode ParallelComm::get_entityset_local_handle( unsigned owning_rank,
+                                                    EntityHandle remote_handle,
                                                     EntityHandle& local_handle ) const
 {
     return sharedSetData->get_local_handle( owning_rank, remote_handle, local_handle );
@@ -8521,7 +8903,10 @@ ErrorCode ParallelComm::get_owned_sets( unsigned owning_rank, Range& sets_out ) 
     return sharedSetData->get_shared_sets( owning_rank, sets_out );
 }
 
-ErrorCode ParallelComm::gather_data( Range& gather_ents, Tag& tag_handle, Tag id_tag, EntityHandle gather_set,
+ErrorCode ParallelComm::gather_data( Range& gather_ents,
+                                     Tag& tag_handle,
+                                     Tag id_tag,
+                                     EntityHandle gather_set,
                                      int root_proc_rank )
 {
     int dim           = mbImpl->dimension_from_handle( *gather_ents.begin() );
@@ -8640,7 +9025,8 @@ ErrorCode ParallelComm::gather_data( Range& gather_ents, Tag& tag_handle, Tag id
  *   so on average, the message size is num_edges * (sizeof(eh) + sizeof(int) + 1*3*sizeof(double))
  *          = num_edges * (8 + 4 + 24)
  */
-ErrorCode ParallelComm::settle_intersection_points( Range& edges, Range& shared_edges_owned,
+ErrorCode ParallelComm::settle_intersection_points( Range& edges,
+                                                    Range& shared_edges_owned,
                                                     std::vector< std::vector< EntityHandle >* >& extraNodesVec,
                                                     double tolerance )
 {
@@ -8672,7 +9058,10 @@ ErrorCode ParallelComm::settle_intersection_points( Range& edges, Range& shared_
 
         success = MPI_Irecv( remoteOwnedBuffs[ind]->mem_ptr, INITIAL_BUFF_SIZE, MPI_UNSIGNED_CHAR, *sit,
                              MB_MESG_TAGS_SIZE, procConfig.proc_comm(), &recv_intx_reqs[3 * ind] );
-        if( success != MPI_SUCCESS ) { MB_SET_ERR( MB_FAILURE, "Failed to post irecv in settle intersection point" ); }
+        if( success != MPI_SUCCESS )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed to post irecv in settle intersection point" );
+        }
     }
 
     // Pack and send intersection points from this proc to others
@@ -8756,7 +9145,10 @@ ErrorCode ParallelComm::settle_intersection_points( Range& edges, Range& shared_
         int index_in_recv_requests;
         PRINT_DEBUG_WAITANY( recv_intx_reqs, MB_MESG_TAGS_SIZE, procConfig.proc_rank() );
         success = MPI_Waitany( 3 * buffProcs.size(), &recv_intx_reqs[0], &index_in_recv_requests, &status );
-        if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" ); }
+        if( MPI_SUCCESS != success )
+        {
+            MB_SET_ERR( MB_FAILURE, "Failed in waitany in ghost exchange" );
+        }
         // Processor index in the list is divided by 3
         ind = index_in_recv_requests / 3;
 
@@ -8767,13 +9159,13 @@ ErrorCode ParallelComm::settle_intersection_points( Range& edges, Range& shared_
 
         bool done = false;
         result    = recv_buffer( MB_MESG_TAGS_SIZE, status, remoteOwnedBuffs[ind],
-                              recv_intx_reqs[3 * ind + 1],  // This is for receiving the second message
-                              recv_intx_reqs[3 * ind + 2],  // This would be for ack, but it is not
-                                                            // used; consider removing it
-                              incoming, localOwnedBuffs[ind],
-                              sendReqs[3 * ind + 1],  // Send request for sending the second message
-                              sendReqs[3 * ind + 2],  // This is for sending the ack
-                              done );MB_CHK_SET_ERR( result, "Failed to resize recv buffer" );
+                                 recv_intx_reqs[3 * ind + 1],  // This is for receiving the second message
+                                 recv_intx_reqs[3 * ind + 2],  // This would be for ack, but it is not
+                                                               // used; consider removing it
+                                 incoming, localOwnedBuffs[ind],
+                                 sendReqs[3 * ind + 1],  // Send request for sending the second message
+                                 sendReqs[3 * ind + 2],  // This is for sending the ack
+                                 done );MB_CHK_SET_ERR( result, "Failed to resize recv buffer" );
         if( done )
         {
             Buffer* buff = remoteOwnedBuffs[ind];
@@ -8836,13 +9228,19 @@ ErrorCode ParallelComm::settle_intersection_points( Range& edges, Range& shared_
     }
 
     // OK, now wait
-    if( myDebug->get_verbosity() == 5 ) { success = MPI_Barrier( procConfig.proc_comm() ); }
+    if( myDebug->get_verbosity() == 5 )
+    {
+        success = MPI_Barrier( procConfig.proc_comm() );
+    }
     else
     {
         MPI_Status status[3 * MAX_SHARING_PROCS];
         success = MPI_Waitall( 3 * buffProcs.size(), &sendReqs[0], status );
     }
-    if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failure in waitall in tag exchange" ); }
+    if( MPI_SUCCESS != success )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failure in waitall in tag exchange" );
+    }
 
     myDebug->tprintf( 1, "Exiting settle_intersection_points" );
 

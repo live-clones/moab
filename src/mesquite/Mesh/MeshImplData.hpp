@@ -68,7 +68,9 @@ class MeshImplData
 
     /** Copy internal representation into CSR rep
      *  Does not include mid-nodes. */
-    void copy_mesh( size_t* vertex_handle_array, size_t* element_hanlde_array, size_t* element_conn_offsets,
+    void copy_mesh( size_t* vertex_handle_array,
+                    size_t* element_hanlde_array,
+                    size_t* element_conn_offsets,
                     size_t* element_conn_indices );
 
     /** Get all vertices, including mid-nodes */
@@ -159,8 +161,10 @@ class MeshImplData
     void delete_element( size_t index, MsqError& err );
 
     /** Get all mid-nodes and their adjacent corner vertices */
-    void copy_higher_order( std::vector< size_t >& mid_nodes, std::vector< size_t >& vertices,
-                            std::vector< size_t >& vertex_indices, std::vector< size_t >& index_offsets,
+    void copy_higher_order( std::vector< size_t >& mid_nodes,
+                            std::vector< size_t >& vertices,
+                            std::vector< size_t >& vertex_indices,
+                            std::vector< size_t >& index_offsets,
                             MsqError& err );
 
     /** \brief Get elements adjacent to ALL of the passed nodes.
@@ -169,7 +173,8 @@ class MeshImplData
      * adjacency lists of the specified vertices.
      */
     void get_adjacent_elements( std::vector< size_t >::const_iterator nodes,
-                                std::vector< size_t >::const_iterator nodes_end, std::vector< size_t >& elems_out,
+                                std::vector< size_t >::const_iterator nodes_end,
+                                std::vector< size_t >& elems_out,
                                 MsqError& err );
 
     /**\brief Skin mesh

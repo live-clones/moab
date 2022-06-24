@@ -106,7 +106,10 @@ void build_connect( const int nelem, int*& connect )
 int main( int argc, char* argv[] )
 {
     int nelem = 20;
-    if( argc > 1 ) { sscanf( argv[1], "%d", &nelem ); }
+    if( argc > 1 )
+    {
+        sscanf( argv[1], "%d", &nelem );
+    }
     std::cout << "number of elements: " << nelem << std::endl;
 
     // create a hex mesh in a 1x1x1 cube with nelem number of

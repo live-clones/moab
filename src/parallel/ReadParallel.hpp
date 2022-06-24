@@ -21,20 +21,40 @@ class ReadParallel
     static ReaderIface* factory( Interface* );
 
     //! load a file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const ReaderIface::SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const ReaderIface::SubsetList* subset_list = 0,
+                         const Tag* file_id_tag                     = 0 );
 
     //! load multiple files
-    ErrorCode load_file( const char** file_names, const int num_files, const EntityHandle* file_set,
-                         const FileOptions& opts, const ReaderIface::SubsetList* subset_list = 0,
-                         const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char** file_names,
+                         const int num_files,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const ReaderIface::SubsetList* subset_list = 0,
+                         const Tag* file_id_tag                     = 0 );
 
-    ErrorCode load_file( const char** file_names, const int num_files, const EntityHandle* file_set, int parallel_mode,
-                         std::string& partition_tag_name, std::vector< int >& partition_tag_vals, bool distrib,
-                         bool partition_by_rank, std::vector< int >& pa_vec, const FileOptions& opts,
-                         const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag, const int reader_rank,
-                         const bool cputime, const int resolve_dim, const int shared_dim, const int ghost_dim,
-                         const int bridge_dim, const int num_layers, const int addl_ents );
+    ErrorCode load_file( const char** file_names,
+                         const int num_files,
+                         const EntityHandle* file_set,
+                         int parallel_mode,
+                         std::string& partition_tag_name,
+                         std::vector< int >& partition_tag_vals,
+                         bool distrib,
+                         bool partition_by_rank,
+                         std::vector< int >& pa_vec,
+                         const FileOptions& opts,
+                         const ReaderIface::SubsetList* subset_list,
+                         const Tag* file_id_tag,
+                         const int reader_rank,
+                         const bool cputime,
+                         const int resolve_dim,
+                         const int shared_dim,
+                         const int ghost_dim,
+                         const int bridge_dim,
+                         const int num_layers,
+                         const int addl_ents );
     //! Constructor
     ReadParallel( Interface* impl = NULL, ParallelComm* pc = NULL );
 
@@ -73,7 +93,9 @@ class ReadParallel
     };
 
     //! PUBLIC TO ALLOW TESTING
-    ErrorCode delete_nonlocal_entities( std::string& ptag_name, std::vector< int >& ptag_vals, bool distribute,
+    ErrorCode delete_nonlocal_entities( std::string& ptag_name,
+                                        std::vector< int >& ptag_vals,
+                                        bool distribute,
                                         EntityHandle file_set );
 
     ErrorCode delete_nonlocal_entities( EntityHandle file_set );
@@ -92,8 +114,11 @@ class ReadParallel
     Error* mError;
 };
 
-inline ErrorCode ReadParallel::load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                                          const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+inline ErrorCode ReadParallel::load_file( const char* file_name,
+                                          const EntityHandle* file_set,
+                                          const FileOptions& opts,
+                                          const ReaderIface::SubsetList* subset_list,
+                                          const Tag* file_id_tag )
 {
     return load_file( &file_name, 1, file_set, opts, subset_list, file_id_tag );
 }

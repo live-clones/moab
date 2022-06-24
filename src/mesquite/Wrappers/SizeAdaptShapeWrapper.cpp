@@ -53,8 +53,11 @@
 namespace MBMesquite
 {
 
-void SizeAdaptShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                                         QualityAssessor* qa, MsqError& err )
+void SizeAdaptShapeWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                                         ParallelMesh* pmesh,
+                                         Settings* settings,
+                                         QualityAssessor* qa,
+                                         MsqError& err )
 {
     InstructionQueue q;
     Mesh* mesh = mesh_and_domain->get_mesh();

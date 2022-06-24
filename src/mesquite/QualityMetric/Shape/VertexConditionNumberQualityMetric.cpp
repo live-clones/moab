@@ -74,7 +74,10 @@ bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_ve
     const size_t* v_to_e_array = pd.get_vertex_element_adjacencies( this_vert, num_elems, err );
     MSQ_ERRZERO( err );
 
-    if( num_elems <= 0 ) { return true; }
+    if( num_elems <= 0 )
+    {
+        return true;
+    }
 
     // create an array to store the local metric values before averaging
     // Can we remove this dynamic allocatio?
@@ -149,8 +152,11 @@ bool VertexConditionNumberQualityMetric::evaluate( PatchData& pd, size_t this_ve
     return true;
 }
 
-bool VertexConditionNumberQualityMetric::evaluate_with_indices( PatchData& pd, size_t this_vert, double& value,
-                                                                std::vector< size_t >& indices, MsqError& err )
+bool VertexConditionNumberQualityMetric::evaluate_with_indices( PatchData& pd,
+                                                                size_t this_vert,
+                                                                double& value,
+                                                                std::vector< size_t >& indices,
+                                                                MsqError& err )
 {
     bool rval = evaluate( pd, this_vert, value, err );
     MSQ_ERRFALSE( err );

@@ -44,9 +44,16 @@ double Intx2MeshInPlane::setup_tgt_cell( EntityHandle tgt, int& nsTgt )
     return cellArea;
 }
 
-ErrorCode Intx2MeshInPlane::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP,
-                                                                 double& area, int markb[MAXEDGES], int markr[MAXEDGES],
-                                                                 int& nsSrc, int& nsTgt, bool check_boxes_first )
+ErrorCode Intx2MeshInPlane::computeIntersectionBetweenTgtAndSrc( EntityHandle tgt,
+                                                                 EntityHandle src,
+                                                                 double* P,
+                                                                 int& nP,
+                                                                 double& area,
+                                                                 int markb[MAXEDGES],
+                                                                 int markr[MAXEDGES],
+                                                                 int& nsSrc,
+                                                                 int& nsTgt,
+                                                                 bool check_boxes_first )
 {
 
     int num_nodes  = 0;

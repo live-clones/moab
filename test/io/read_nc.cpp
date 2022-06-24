@@ -6,7 +6,7 @@ using namespace moab;
 std::string example_eul    = TestDir + "unittest/io/eul3x48x96.t.3.nc";
 std::string example_fv     = TestDir + "unittest/io/fv3x46x72.t.3.nc";
 std::string example_domain = TestDir + "unittest/io/domain.ocn.ne4np4_oQU240.160614.nc";
-std::string example_scrip = TestDir + "unittest/io/ocean.QU.240km.scrip.151209.nc";
+std::string example_scrip  = TestDir + "unittest/io/ocean.QU.240km.scrip.151209.nc";
 
 #ifdef MOAB_HAVE_MPI
 #include "moab_mpi.h"

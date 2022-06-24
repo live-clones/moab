@@ -46,7 +46,11 @@ class EdgeSizeSimpleImplicit : public EdgeSizeEvaluator
     /** \brief Given an edge of length L, true when edge midpoint is within $\alpha^2$ of
      * $\left(\frac{2f(x,y,z)}{L}\right)^2$.
      */
-    virtual bool evaluate_edge( const double* p0, const void* t0, double* p1, void* t1, const double* p2,
+    virtual bool evaluate_edge( const double* p0,
+                                const void* t0,
+                                double* p1,
+                                void* t1,
+                                const double* p2,
                                 const void* t2 );
 
     /// Set the 10 coefficients of the implicit function. The vector contains the entries of A,

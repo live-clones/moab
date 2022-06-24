@@ -59,16 +59,30 @@ static void usage( char* argv0, bool help = false )
     exit( 0 );
 }
 
-static void generate_random_points( Interface& mesh, size_t num_points, std::vector< CartVect >& points,
+static void generate_random_points( Interface& mesh,
+                                    size_t num_points,
+                                    std::vector< CartVect >& points,
                                     std::vector< EntityHandle >& point_elems );
 
-static void do_kdtree_test( Interface& mesh, int tree_depth, int elem_per_leaf, long num_test,
-                            const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
-                            clock_t& build_time, clock_t& test_time, size_t& depth );
+static void do_kdtree_test( Interface& mesh,
+                            int tree_depth,
+                            int elem_per_leaf,
+                            long num_test,
+                            const std::vector< CartVect >& points,
+                            std::vector< EntityHandle >& point_elems,
+                            clock_t& build_time,
+                            clock_t& test_time,
+                            size_t& depth );
 
-static void do_linear_test( Interface& mesh, int tree_depth, int elem_per_leaf, long num_test,
-                            const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
-                            clock_t& build_time, clock_t& test_time, size_t& depth );
+static void do_linear_test( Interface& mesh,
+                            int tree_depth,
+                            int elem_per_leaf,
+                            long num_test,
+                            const std::vector< CartVect >& points,
+                            std::vector< EntityHandle >& point_elems,
+                            clock_t& build_time,
+                            clock_t& test_time,
+                            size_t& depth );
 
 int main( int argc, char* argv[] )
 {
@@ -257,7 +271,9 @@ static CartVect random_point_in_hex( Interface& mb, EntityHandle hex )
     return point;
 }
 
-void generate_random_points( Interface& mb, size_t num_points, std::vector< CartVect >& points,
+void generate_random_points( Interface& mb,
+                             size_t num_points,
+                             std::vector< CartVect >& points,
                              std::vector< EntityHandle >& point_elems )
 {
     Range elems;
@@ -291,9 +307,15 @@ void generate_random_points( Interface& mb, size_t num_points, std::vector< Cart
     }
 }
 
-void do_kdtree_test( Interface& mb, int tree_depth, int elem_per_leaf, long num_test,
-                     const std::vector< CartVect >& points, std::vector< EntityHandle >& point_elems,
-                     clock_t& build_time, clock_t& test_time, size_t& depth )
+void do_kdtree_test( Interface& mb,
+                     int tree_depth,
+                     int elem_per_leaf,
+                     long num_test,
+                     const std::vector< CartVect >& points,
+                     std::vector< EntityHandle >& point_elems,
+                     clock_t& build_time,
+                     clock_t& test_time,
+                     size_t& depth )
 {
     ErrorCode rval;
     clock_t init = clock();
@@ -347,8 +369,15 @@ void do_kdtree_test( Interface& mb, int tree_depth, int elem_per_leaf, long num_
     depth = max_d;
 }
 
-void do_linear_test( Interface& mb, int, int, long num_test, const std::vector< CartVect >& points,
-                     std::vector< EntityHandle >& point_elems, clock_t& build_time, clock_t& test_time, size_t& depth )
+void do_linear_test( Interface& mb,
+                     int,
+                     int,
+                     long num_test,
+                     const std::vector< CartVect >& points,
+                     std::vector< EntityHandle >& point_elems,
+                     clock_t& build_time,
+                     clock_t& test_time,
+                     size_t& depth )
 {
     clock_t init = clock();
     Range hexes;

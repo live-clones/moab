@@ -33,8 +33,17 @@ struct MBuuid
         memset( this, 0, sizeof( MBuuid ) );
     }
     //! constructor that takes initialization arguments
-    MBuuid( unsigned l, unsigned short w1, unsigned short w2, unsigned char b1, unsigned char b2, unsigned char b3,
-            unsigned char b4, unsigned char b5, unsigned char b6, unsigned char b7, unsigned char b8 )
+    MBuuid( unsigned l,
+            unsigned short w1,
+            unsigned short w2,
+            unsigned char b1,
+            unsigned char b2,
+            unsigned char b3,
+            unsigned char b4,
+            unsigned char b5,
+            unsigned char b6,
+            unsigned char b7,
+            unsigned char b8 )
     {
         data1    = l;
         data2    = w1;

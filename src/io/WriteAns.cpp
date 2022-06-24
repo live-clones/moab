@@ -74,9 +74,15 @@ WriteAns::~WriteAns()
     // mbImpl->release_interface(mWriteIface);
 }
 
-ErrorCode WriteAns::write_file( const char* file_name, const bool /* overwrite (commented out to remove warning) */,
-                                const FileOptions&, const EntityHandle* ent_handles, const int num_sets,
-                                const std::vector< std::string >&, const Tag*, int, int )
+ErrorCode WriteAns::write_file( const char* file_name,
+                                const bool /* overwrite (commented out to remove warning) */,
+                                const FileOptions&,
+                                const EntityHandle* ent_handles,
+                                const int num_sets,
+                                const std::vector< std::string >&,
+                                const Tag*,
+                                int,
+                                int )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 

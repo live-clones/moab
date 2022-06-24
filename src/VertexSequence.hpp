@@ -26,7 +26,9 @@ class VertexSequence : public EntitySequence
 
     inline ErrorCode get_coordinates( EntityHandle handle, double coords[3] ) const;
 
-    inline ErrorCode get_coordinates_ref( EntityHandle handle, const double*& x, const double*& y,
+    inline ErrorCode get_coordinates_ref( EntityHandle handle,
+                                          const double*& x,
+                                          const double*& y,
                                           const double*& z ) const;
 
     inline ErrorCode set_coordinates( EntityHandle entity, double x, double y, double z );
@@ -111,7 +113,9 @@ ErrorCode VertexSequence::get_coordinates( EntityHandle handle, double coords[3]
     return MB_SUCCESS;
 }
 
-ErrorCode VertexSequence::get_coordinates_ref( EntityHandle handle, const double*& x, const double*& y,
+ErrorCode VertexSequence::get_coordinates_ref( EntityHandle handle,
+                                               const double*& x,
+                                               const double*& y,
                                                const double*& z ) const
 {
     EntityID offset = handle - data()->start_handle();

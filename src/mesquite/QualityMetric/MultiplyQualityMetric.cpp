@@ -65,12 +65,17 @@ int MultiplyQualityMetric::get_negate_flag() const
     return metric1.get_negate_flag();
 }
 
-void MultiplyQualityMetric::get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_only,
+void MultiplyQualityMetric::get_evaluations( PatchData& pd,
+                                             std::vector< size_t >& handles,
+                                             bool free_only,
                                              MsqError& err )
 {
     metric1.get_evaluations( pd, handles, free_only, err );MSQ_ERRRTN( err );
     metric2.get_evaluations( pd, mHandles, free_only, err );MSQ_ERRRTN( err );
-    if( handles != mHandles ) { MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_STATE ); }
+    if( handles != mHandles )
+    {
+        MSQ_SETERR( err )( "Incompatible metrics", MsqError::INVALID_STATE );
+    }
 }
 
 bool MultiplyQualityMetric::evaluate( PatchData& pd, size_t handle, double& value, MsqError& err )
@@ -85,8 +90,11 @@ bool MultiplyQualityMetric::evaluate( PatchData& pd, size_t handle, double& valu
     return rval1 && rval2;
 }
 
-bool MultiplyQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle, double& value,
-                                                   std::vector< size_t >& indices, MsqError& err )
+bool MultiplyQualityMetric::evaluate_with_indices( PatchData& pd,
+                                                   size_t handle,
+                                                   double& value,
+                                                   std::vector< size_t >& indices,
+                                                   MsqError& err )
 {
     double val1, val2;
     bool rval1, rval2;
@@ -104,8 +112,11 @@ bool MultiplyQualityMetric::evaluate_with_indices( PatchData& pd, size_t handle,
     return rval1 && rval2;
 }
 
-bool MultiplyQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
-                                                    std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+bool MultiplyQualityMetric::evaluate_with_gradient( PatchData& pd,
+                                                    size_t handle,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    std::vector< Vector3D >& gradient,
                                                     MsqError& err )
 {
     std::vector< size_t >::iterator i;
@@ -142,9 +153,13 @@ bool MultiplyQualityMetric::evaluate_with_gradient( PatchData& pd, size_t handle
     return rval1 && rval2;
 }
 
-bool MultiplyQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t handle, double& value,
-                                                   std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                                                   std::vector< Matrix3D >& Hessian, MsqError& err )
+bool MultiplyQualityMetric::evaluate_with_Hessian( PatchData& pd,
+                                                   size_t handle,
+                                                   double& value,
+                                                   std::vector< size_t >& indices,
+                                                   std::vector< Vector3D >& gradient,
+                                                   std::vector< Matrix3D >& Hessian,
+                                                   MsqError& err )
 {
     std::vector< size_t >::iterator i;
     size_t j, r, c, n, h;

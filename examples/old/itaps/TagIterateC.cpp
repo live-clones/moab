@@ -27,7 +27,10 @@ int main( int argc, char* argv[] )
     double* tag_data;
     int num_regions;
 
-    if( argc == 2 ) { filename = argv[1]; }
+    if( argc == 2 )
+    {
+        filename = argv[1];
+    }
     else
     {
         printf( "Usage: %s <mesh_filename>\n", argv[0] );

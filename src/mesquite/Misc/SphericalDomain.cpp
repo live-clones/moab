@@ -74,15 +74,18 @@ void MBMesquite::SphericalDomain::element_normal_at( Mesh::ElementHandle h, Vect
 }
 
 void MBMesquite::SphericalDomain::vertex_normal_at( const MBMesquite::Mesh::VertexHandle* handle,
-                                                    MBMesquite::Vector3D coords[], unsigned count,
+                                                    MBMesquite::Vector3D coords[],
+                                                    unsigned count,
                                                     MBMesquite::MsqError& ) const
 {
     for( unsigned i = 0; i < count; ++i )
         vertex_normal_at( handle[i], coords[i] );
 }
 
-void MBMesquite::SphericalDomain::closest_point( MBMesquite::Mesh::VertexHandle, const MBMesquite::Vector3D& position,
-                                                 MBMesquite::Vector3D& closest, MBMesquite::Vector3D& normal,
+void MBMesquite::SphericalDomain::closest_point( MBMesquite::Mesh::VertexHandle,
+                                                 const MBMesquite::Vector3D& position,
+                                                 MBMesquite::Vector3D& closest,
+                                                 MBMesquite::Vector3D& normal,
                                                  MBMesquite::MsqError& ) const
 {
     normal = position - mCenter;
@@ -91,7 +94,9 @@ void MBMesquite::SphericalDomain::closest_point( MBMesquite::Mesh::VertexHandle,
     closest = mCenter + mRadius * normal;
 }
 
-void MBMesquite::SphericalDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_vertices,
+void MBMesquite::SphericalDomain::domain_DoF( const Mesh::VertexHandle*,
+                                              unsigned short* dof_array,
+                                              size_t num_vertices,
                                               MsqError& ) const
 {
     std::fill( dof_array, dof_array + num_vertices, 2 );
@@ -104,8 +109,11 @@ void MBMesquite::SphericalDomain::fit_vertices( Mesh* mesh, MsqError& err, doubl
     if( !MSQ_CHKERR( err ) ) fit_vertices( mesh, arrptr( verts ), verts.size(), err, epsilon );
 }
 
-void MBMesquite::SphericalDomain::fit_vertices( Mesh* mesh, const Mesh::VertexHandle* verts, size_t num_verts,
-                                                MsqError& err, double epsilon )
+void MBMesquite::SphericalDomain::fit_vertices( Mesh* mesh,
+                                                const Mesh::VertexHandle* verts,
+                                                size_t num_verts,
+                                                MsqError& err,
+                                                double epsilon )
 {
     std::vector< MsqVertex > coords( num_verts );
     mesh->vertices_get_coordinates( verts, arrptr( coords ), num_verts, err );MSQ_ERRRTN( err );

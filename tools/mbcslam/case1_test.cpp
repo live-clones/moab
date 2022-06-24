@@ -107,9 +107,18 @@ int main( int argc, char** argv )
             {
                 gtol = atof( argv[++index] );
             }
-            if( !strcmp( argv[index], "-cube" ) ) { CubeSide = atof( argv[++index] ); }
-            if( !strcmp( argv[index], "-dt" ) ) { delta_t = atof( argv[++index] ); }
-            if( !strcmp( argv[index], "-input" ) ) { filename_mesh1 = argv[++index]; }
+            if( !strcmp( argv[index], "-cube" ) )
+            {
+                CubeSide = atof( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-dt" ) )
+            {
+                delta_t = atof( argv[++index] );
+            }
+            if( !strcmp( argv[index], "-input" ) )
+            {
+                filename_mesh1 = argv[++index];
+            }
             index++;
         }
     }

@@ -32,7 +32,10 @@ namespace common_tree
         for( Iterator i = v.begin(); i != v.end(); ++i )
         {
             out << *i;
-            if( i + 1 != v.end() ) { out << ", "; }
+            if( i + 1 != v.end() )
+            {
+                out << ", ";
+            }
         }
         out << " ]" << std::endl;
     }
@@ -45,7 +48,10 @@ namespace common_tree
         for( T i = begin; i != end; ++i )
         {
             std::cout << ( *i )->second.second.to_ulong();
-            if( i + 1 != end ) { std::cout << ", "; }
+            if( i + 1 != end )
+            {
+                std::cout << ", ";
+            }
         }
         std::cout << " ]" << std::endl;
     }
@@ -56,7 +62,10 @@ namespace common_tree
     {
         for( std::size_t i = 0; i < box.min.size(); ++i )
         {
-            if( p[i] < ( box.min[i] - tol ) || p[i] > ( box.max[i] ) + tol ) { return false; }
+            if( p[i] < ( box.min[i] - tol ) || p[i] > ( box.max[i] ) + tol )
+            {
+                return false;
+            }
         }
         return true;
     }
@@ -66,8 +75,14 @@ namespace common_tree
     {
         for( std::size_t i = 0; i < a.min.size(); ++i )
         {
-            if( b.min[i] < ( a.min[i] - tol ) ) { return false; }
-            if( b.max[i] > ( a.max[i] + tol ) ) { return false; }
+            if( b.min[i] < ( a.min[i] - tol ) )
+            {
+                return false;
+            }
+            if( b.max[i] > ( a.max[i] + tol ) )
+            {
+                return false;
+            }
         }
         return true;
     }
@@ -188,7 +203,10 @@ namespace common_tree
         update_bounding_max( a.max, b.max.begin() );
         update_bounding_min( a.min, b.min.begin() );
 #ifdef COMMON_TREE_DEBUG
-        if( !box_contains_box( a, b ) ) { std::cout << a << b << std::endl; }
+        if( !box_contains_box( a, b ) )
+        {
+            std::cout << a << b << std::endl;
+        }
 #endif
     }
 
@@ -208,7 +226,9 @@ namespace common_tree
     // Requirements: Data contains at least a bounding box.
     // And a non-default constructor which takes only a Box&
     template < typename Entity_handles, typename Element_map, typename Bounding_box, typename Moab >
-    void construct_element_map( const Entity_handles& elements, Element_map& map, Bounding_box& bounding_box,
+    void construct_element_map( const Entity_handles& elements,
+                                Element_map& map,
+                                Bounding_box& bounding_box,
                                 Moab& moab )
     {
         typedef typename Element_map::mapped_type Box_data;
@@ -229,7 +249,10 @@ namespace common_tree
             Coordinates coordinate( DIM * num_vertices, 0.0 );
             moab.get_coords( vertex_handle, num_vertices, &coordinate[0] );
             Bounding_box box( coordinate.begin(), coordinate.begin() + 3 );
-            if( i == elements.begin() ) { bounding_box = box; }
+            if( i == elements.begin() )
+            {
+                bounding_box = box;
+            }
             for( Coordinate_iterator j = coordinate.begin() + DIM; j != coordinate.end(); j += DIM )
             {
                 update_bounding_max( box.max, j );

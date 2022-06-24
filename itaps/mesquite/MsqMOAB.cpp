@@ -24,8 +24,12 @@ namespace MBMesquite
  *                          Mesh Definition
  ************************************************************************/
 
-MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityHandle meshset, moab::EntityType type, MsqError& err,
-                  const moab::Tag* fixed_tag, const moab::Tag* slaved_tag )
+MsqMOAB::MsqMOAB( moab::Core* mesh,
+                  moab::EntityHandle meshset,
+                  moab::EntityType type,
+                  MsqError& err,
+                  const moab::Tag* fixed_tag,
+                  const moab::Tag* slaved_tag )
     : meshInstance( mesh ), inputSetType( moab::MBMAXTYPE ), inputSet( 0 ), byteTag( 0 ), createdByteTag( false ),
       geometricDimension( 0 )
 {
@@ -33,7 +37,10 @@ MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityHandle meshset, moab::EntityType
     set_active_set( meshset, type, err );MSQ_ERRRTN( err );
 }
 
-MsqMOAB::MsqMOAB( moab::Core* mesh, moab::EntityType type, MsqError& err, const moab::Tag* fixed_tag,
+MsqMOAB::MsqMOAB( moab::Core* mesh,
+                  moab::EntityType type,
+                  MsqError& err,
+                  const moab::Tag* fixed_tag,
                   const moab::Tag* slaved_tag )
     : meshInstance( mesh ), inputSetType( moab::MBMAXTYPE ), inputSet( 0 ), byteTag( 0 ), createdByteTag( false ),
       geometricDimension( 0 )
@@ -79,7 +86,9 @@ moab::DataType MsqMOAB::check_valid_flag_tag( moab::Tag tag, const char* /*which
     return type;
 }
 
-void MsqMOAB::init_active_mesh( moab::Core* /*mesh*/, MsqError& err, const moab::Tag* fixed_tag,
+void MsqMOAB::init_active_mesh( moab::Core* /*mesh*/,
+                                MsqError& err,
+                                const moab::Tag* fixed_tag,
                                 const moab::Tag* slaved_tag )
 {
     moab::ErrorCode ierr;
@@ -134,8 +143,8 @@ void MsqMOAB::init_active_mesh( moab::Core* /*mesh*/, MsqError& err, const moab:
     {
         int defval = 0;
         ierr       = meshInstance->tag_get_handle( VERTEX_BYTE_TAG_NAME, 1, moab::MB_TYPE_INTEGER, byteTag,
-                                             moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &defval,
-                                             &createdByteTag );  // MB_CHK_ERR_RET(ierr);
+                                                   moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &defval,
+                                                   &createdByteTag );  // MB_CHK_ERR_RET(ierr);
     }
     else
     {
@@ -209,10 +218,18 @@ int MsqMOAB::get_geometric_dimension( MBMesquite::MsqError& /*err*/ )
 
 //************ Vertex Properties ********************
 
-void MsqMOAB::get_flag_data( moab::Tag tag, bool have_tag, moab::DataType type, const VertexHandle vert_array[],
-                             std::vector< bool >& flag_array, size_t num_vtx, MsqError& err )
+void MsqMOAB::get_flag_data( moab::Tag tag,
+                             bool have_tag,
+                             moab::DataType type,
+                             const VertexHandle vert_array[],
+                             std::vector< bool >& flag_array,
+                             size_t num_vtx,
+                             MsqError& err )
 {
-    if( !num_vtx ) { return; }
+    if( !num_vtx )
+    {
+        return;
+    }
 
     if( !have_tag )
     {
@@ -267,23 +284,32 @@ void MsqMOAB::get_flag_data( moab::Tag tag, bool have_tag, moab::DataType type, 
 // is fixed and cannot be moved.  Note that this is a read-only
 // property; this flag can't be modified by users of the
 // MBMesquite::Mesh interface.
-void MsqMOAB::vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& bool_array, size_t num_vtx,
+void MsqMOAB::vertices_get_fixed_flag( const VertexHandle vert_array[],
+                                       std::vector< bool >& bool_array,
+                                       size_t num_vtx,
                                        MsqError& err )
 {
     get_flag_data( fixedTag, haveFixedTag, fixedTagType, vert_array, bool_array, num_vtx, err );
 }
 
-void MsqMOAB::vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& bool_array,
-                                        size_t num_vtx, MsqError& err )
+void MsqMOAB::vertices_get_slaved_flag( const VertexHandle vert_array[],
+                                        std::vector< bool >& bool_array,
+                                        size_t num_vtx,
+                                        MsqError& err )
 {
     get_flag_data( slavedTag, haveSlavedTag, slavedTagType, vert_array, bool_array, num_vtx, err );
 }
 
 // Get vertex coordinates
-void MsqMOAB::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle vert_array[], MsqVertex* coordinates,
-                                        size_t num_vtx, MsqError& err )
+void MsqMOAB::vertices_get_coordinates( const MBMesquite::Mesh::VertexHandle vert_array[],
+                                        MsqVertex* coordinates,
+                                        size_t num_vtx,
+                                        MsqError& err )
 {
-    if( !num_vtx ) { return; }
+    if( !num_vtx )
+    {
+        return;
+    }
 
     err.set_error( MBMesquite::MsqError::UNKNOWN_ERROR );
     std::vector< double > dbl_store( 3 * num_vtx );
@@ -346,10 +372,15 @@ void MsqMOAB::vertex_set_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned c
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+void MsqMOAB::vertices_set_byte( const VertexHandle* vert_array,
+                                 const unsigned char* byte_array,
+                                 size_t array_size,
                                  MsqError& err )
 {
-    if( !array_size ) { return; }
+    if( !array_size )
+    {
+        return;
+    }
 
     err.set_error( MBMesquite::MsqError::UNKNOWN_ERROR );
     std::vector< int > data( array_size );
@@ -375,10 +406,15 @@ void MsqMOAB::vertex_get_byte( MBMesquite::Mesh::VertexHandle vertex, unsigned c
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array, size_t array_size,
+void MsqMOAB::vertices_get_byte( const VertexHandle* vert_array,
+                                 unsigned char* byte_array,
+                                 size_t array_size,
                                  MsqError& err )
 {
-    if( !array_size ) { return; }
+    if( !array_size )
+    {
+        return;
+    }
 
     err.set_error( MBMesquite::MsqError::UNKNOWN_ERROR );
     std::vector< int > data( array_size );
@@ -393,8 +429,11 @@ void MsqMOAB::vertices_get_byte( const VertexHandle* vert_array, unsigned char* 
 
 //**************** Topology *****************
 
-void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t num_source, moab::EntityType target_type,
-                                     std::vector< EntityHandle >& target, std::vector< size_t >& offsets,
+void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source,
+                                     size_t num_source,
+                                     moab::EntityType target_type,
+                                     std::vector< EntityHandle >& target,
+                                     std::vector< size_t >& offsets,
                                      MsqError& err )
 {
     if( num_source == 0 )
@@ -545,7 +584,10 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
             }
         }
 
-        if( moab::MB_SUCCESS == ierr ) { have_adj = true; }
+        if( moab::MB_SUCCESS == ierr )
+        {
+            have_adj = true;
+        }
     }
 
     // Try with empty sidl array, and copy into elements vector
@@ -616,8 +658,10 @@ void MsqMOAB::get_adjacent_entities( const moab::EntityHandle* source, size_t nu
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices, size_t num_vertex,
-                                              std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices,
+                                              size_t num_vertex,
+                                              std::vector< ElementHandle >& elements,
+                                              std::vector< size_t >& offsets,
                                               MsqError& err )
 {
     // moab::ErrorCode ierr;
@@ -645,7 +689,10 @@ void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices, size
 
             cont = meshInstance->contains_entities( inputSet, &bh[read_idx], 1 );
 
-            if( cont ) { elements[write_idx++] = elements[read_idx]; }
+            if( cont )
+            {
+                elements[write_idx++] = elements[read_idx];
+            }
         }
 
         *offset_iter = write_idx;
@@ -662,8 +709,10 @@ void MsqMOAB::vertices_get_attached_elements( const VertexHandle* vertices, size
  *\param vertices - Array of vertex handles in connectivity list.
  *\param offsets  - Indices into \ref vertex_handles, one per element
  */
-void MsqMOAB::elements_get_attached_vertices( const ElementHandle* elements, size_t num_elems,
-                                              std::vector< VertexHandle >& vertices, std::vector< size_t >& offsets,
+void MsqMOAB::elements_get_attached_vertices( const ElementHandle* elements,
+                                              size_t num_elems,
+                                              std::vector< VertexHandle >& vertices,
+                                              std::vector< size_t >& offsets,
                                               MBMesquite::MsqError& err )
 {
     moab::ErrorCode ierr;
@@ -713,7 +762,10 @@ void MsqMOAB::get_all_elements( std::vector< ElementHandle >& elements, MsqError
         ierr = meshInstance->get_number_entities_by_dimension( inputSet, 3, num_vol, false );MB_CHK_ERR_RET( ierr );
         elements.resize( num_face + num_vol );
 
-        if( elements.empty() ) { return; }
+        if( elements.empty() )
+        {
+            return;
+        }
 
         moab::EntityHandle* ptr = reinterpret_cast< moab::EntityHandle* >( arrptr( elements ) );
 
@@ -739,7 +791,10 @@ void MsqMOAB::get_all_elements( std::vector< ElementHandle >& elements, MsqError
         int count;
         ierr = meshInstance->get_number_entities_by_type( inputSet, inputSetType, count, false );MB_CHK_ERR_RET( ierr );
 
-        if( !count ) { return; }
+        if( !count )
+        {
+            return;
+        }
 
         elements.resize( count );
 
@@ -758,7 +813,10 @@ void MsqMOAB::get_all_vertices( std::vector< VertexHandle >& vertices, MsqError&
     std::vector< ElementHandle > elems;
     get_all_elements( elems, err );MSQ_CHKERR( err );
 
-    if( elems.empty() ) { return; }
+    if( elems.empty() )
+    {
+        return;
+    }
 
     std::vector< size_t > offsets;
     elements_get_attached_vertices( arrptr( elems ), elems.size(), vertices, offsets, err );MSQ_CHKERR( err );
@@ -769,10 +827,15 @@ void MsqMOAB::get_all_vertices( std::vector< VertexHandle >& vertices, MsqError&
 
 // Returns the topologies of the given entities.  The "entity_topologies"
 // array must be at least "num_elements" in size.
-void MsqMOAB::elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
-                                       size_t num_elements, MsqError& err )
+void MsqMOAB::elements_get_topologies( const ElementHandle* element_handle_array,
+                                       EntityTopology* element_topologies,
+                                       size_t num_elements,
+                                       MsqError& err )
 {
-    if( !num_elements ) { return; }
+    if( !num_elements )
+    {
+        return;
+    }
 
     assert( sizeof( ElementHandle ) == sizeof( moab::EntityHandle ) );
     const moab::EntityHandle* arr = reinterpret_cast< const moab::EntityHandle* >( element_handle_array );
@@ -788,7 +851,8 @@ void MsqMOAB::elements_get_topologies( const ElementHandle* element_handle_array
 //**************** Memory Management ****************
 // Tells the mesh that the client is finished with a given
 // entity handle.
-void MsqMOAB::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*handle_array*/, size_t /*num_handles*/,
+void MsqMOAB::release_entity_handles( const MBMesquite::Mesh::EntityHandle* /*handle_array*/,
+                                      size_t /*num_handles*/,
                                       MsqError& /*err*/ )
 {
     // Do nothing
@@ -832,7 +896,7 @@ TagHandle MsqMOAB::tag_create( const std::string& name, TagType type, unsigned l
     moab::ErrorCode ierr;
     moab::Tag result = 0;
     ierr             = meshInstance->tag_get_handle( name.c_str(), length, moab_type, result,
-                                         moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR_RET_VAL( ierr, result );
+                                                     moab::MB_TAG_CREAT | moab::MB_TAG_DENSE );MB_CHK_ERR_RET_VAL( ierr, result );
 
     err.set_error( MBMesquite::MsqError::NO_ERROR );
     return static_cast< TagHandle >( result );
@@ -854,7 +918,10 @@ TagHandle MsqMOAB::tag_get( const std::string& name, MsqError& err )
     return static_cast< TagHandle >( handle );
 }
 
-void MsqMOAB::tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+void MsqMOAB::tag_properties( TagHandle handle,
+                              std::string& name_out,
+                              TagType& type_out,
+                              unsigned& length_out,
                               MsqError& err )
 {
     std::string buffer;
@@ -896,19 +963,28 @@ void MsqMOAB::tag_properties( TagHandle handle, std::string& name_out, TagType& 
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::tag_set_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array, const void* data,
+void MsqMOAB::tag_set_element_data( TagHandle tag,
+                                    size_t num_elems,
+                                    const ElementHandle* array,
+                                    const void* data,
                                     MsqError& err )
 {
     tag_set_data( tag, num_elems, array, data, err );
 }
 
-void MsqMOAB::tag_set_vertex_data( TagHandle tag, size_t num_elems, const VertexHandle* array, const void* data,
+void MsqMOAB::tag_set_vertex_data( TagHandle tag,
+                                   size_t num_elems,
+                                   const VertexHandle* array,
+                                   const void* data,
                                    MsqError& err )
 {
     tag_set_data( tag, num_elems, array, data, err );
 }
 
-void MsqMOAB::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle* array, const void* data,
+void MsqMOAB::tag_set_data( TagHandle tag,
+                            size_t num_elems,
+                            const EntityHandle* array,
+                            const void* data,
                             MsqError& err )
 {
     moab::ErrorCode ierr;
@@ -923,13 +999,19 @@ void MsqMOAB::tag_set_data( TagHandle tag, size_t num_elems, const EntityHandle*
     err.set_error( MBMesquite::MsqError::NO_ERROR );
 }
 
-void MsqMOAB::tag_get_element_data( TagHandle tag, size_t num_elems, const ElementHandle* array, void* data,
+void MsqMOAB::tag_get_element_data( TagHandle tag,
+                                    size_t num_elems,
+                                    const ElementHandle* array,
+                                    void* data,
                                     MsqError& err )
 {
     tag_get_data( tag, num_elems, array, data, err );
 }
 
-void MsqMOAB::tag_get_vertex_data( TagHandle tag, size_t num_verts, const VertexHandle* array, void* data,
+void MsqMOAB::tag_get_vertex_data( TagHandle tag,
+                                   size_t num_verts,
+                                   const VertexHandle* array,
+                                   void* data,
                                    MsqError& err )
 {
     tag_get_data( tag, num_verts, array, data, err );

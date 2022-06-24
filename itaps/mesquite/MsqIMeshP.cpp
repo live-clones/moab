@@ -48,15 +48,23 @@ to run mesquite by default.
 namespace MBMesquite
 {
 
-MsqIMeshP::MsqIMeshP( iMesh_Instance mesh, iMeshP_PartitionHandle partition, iBase_EntitySetHandle meshset,
-                      iBase_EntityType type, MsqError& err, const iBase_TagHandle* fixed_tag,
+MsqIMeshP::MsqIMeshP( iMesh_Instance mesh,
+                      iMeshP_PartitionHandle partition,
+                      iBase_EntitySetHandle meshset,
+                      iBase_EntityType type,
+                      MsqError& err,
+                      const iBase_TagHandle* fixed_tag,
                       const iBase_TagHandle* slaved_tag )
     : MsqIMesh( mesh, meshset, type, err, fixed_tag, slaved_tag ), partitionInstance( partition )
 {
 }
 
-MsqIMeshP::MsqIMeshP( iMesh_Instance mesh, iMeshP_PartitionHandle partition, iBase_EntityType element_dimension,
-                      MsqError& err, const iBase_TagHandle* fixed_tag, const iBase_TagHandle* slaved_tag )
+MsqIMeshP::MsqIMeshP( iMesh_Instance mesh,
+                      iMeshP_PartitionHandle partition,
+                      iBase_EntityType element_dimension,
+                      MsqError& err,
+                      const iBase_TagHandle* fixed_tag,
+                      const iBase_TagHandle* slaved_tag )
     : MsqIMesh( mesh, element_dimension, err, fixed_tag, slaved_tag ), partitionInstance( partition )
 {
 }
@@ -65,7 +73,9 @@ MsqIMeshP::~MsqIMeshP() {}
 
 //**************** Parallel Methods ******************************
 
-void MsqIMeshP::vertices_get_global_id( const VertexHandle vert_array[], size_t gid[], size_t num_vtx,
+void MsqIMeshP::vertices_get_global_id( const VertexHandle vert_array[],
+                                        size_t gid[],
+                                        size_t num_vtx,
                                         MsqError& /*err*/ )
 {
     int itaps_err;
@@ -83,29 +93,34 @@ void MsqIMeshP::vertices_get_global_id( const VertexHandle vert_array[], size_t 
     // get global ids for all vertex handles
     for( unsigned i = 0; i < num_vtx; i++ )
     {
-        iMeshP_getEntOwnerPart( meshInstance, partitionInstance, ( iBase_EntityHandle )( vert_array[i] ), &part_id,
+        iMeshP_getEntOwnerPart( meshInstance, partitionInstance, (iBase_EntityHandle)( vert_array[i] ), &part_id,
                                 &itaps_err );
         int part_rank;
         iMeshP_getRankOfPart( meshInstance, partitionInstance, part_id, &part_rank, &itaps_err );
-        if( part_rank == rank ) { gid[i] = ( size_t )( vert_array[i] ); }
+        if( part_rank == rank )
+        {
+            gid[i] = (size_t)( vert_array[i] );
+        }
         else
         {
             iBase_EntityHandle handle;
-            iMeshP_getOwnerCopy( meshInstance, partitionInstance, ( iBase_EntityHandle )( vert_array[i] ), &part_id,
+            iMeshP_getOwnerCopy( meshInstance, partitionInstance, (iBase_EntityHandle)( vert_array[i] ), &part_id,
                                  &handle, &itaps_err );
             gid[i] = (size_t)handle;
         }
     }
 }
 
-void MsqIMeshP::vertices_get_processor_id( const VertexHandle vert_array[], int pid[], size_t num_vtx,
+void MsqIMeshP::vertices_get_processor_id( const VertexHandle vert_array[],
+                                           int pid[],
+                                           size_t num_vtx,
                                            MsqError& /*err*/ )
 {
     int itaps_err;
     for( unsigned i = 0; i < num_vtx; i++ )
     {
         iMeshP_Part part_id;
-        iMeshP_getEntOwnerPart( meshInstance, partitionInstance, ( iBase_EntityHandle )( vert_array[i] ), &part_id,
+        iMeshP_getEntOwnerPart( meshInstance, partitionInstance, (iBase_EntityHandle)( vert_array[i] ), &part_id,
                                 &itaps_err );
         iMeshP_getRankOfPart( meshInstance, partitionInstance, part_id, &( pid[i] ), &itaps_err );
     }

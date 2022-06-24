@@ -56,7 +56,10 @@ double Vector3D::interior_angle( const Vector3D& lhs, const Vector3D& rhs, MsqEr
     }
 
     // Adjust the cosine if slightly out of range
-    if( ( angle_cos > 1.0 ) && ( angle_cos < 1.0001 ) ) { angle_cos = 1.0; }
+    if( ( angle_cos > 1.0 ) && ( angle_cos < 1.0001 ) )
+    {
+        angle_cos = 1.0;
+    }
     else if( angle_cos < -1.0 && angle_cos > -1.0001 )
     {
         angle_cos = -1.0;

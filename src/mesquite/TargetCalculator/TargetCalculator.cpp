@@ -213,8 +213,12 @@ MsqMatrix< 2, 2 > TargetCalculator::shape( const MsqMatrix< 2, 2 >& W )
     return result;
 }
 
-bool TargetCalculator::factor_3D( const MsqMatrix< 3, 3 >& A, double& Lambda, MsqMatrix< 3, 3 >& V,
-                                  MsqMatrix< 3, 3 >& Q, MsqMatrix< 3, 3 >& Delta, MsqError& /*err*/ )
+bool TargetCalculator::factor_3D( const MsqMatrix< 3, 3 >& A,
+                                  double& Lambda,
+                                  MsqMatrix< 3, 3 >& V,
+                                  MsqMatrix< 3, 3 >& Q,
+                                  MsqMatrix< 3, 3 >& Delta,
+                                  MsqError& /*err*/ )
 {
     MsqVector< 3 > a1xa2 = A.column( 0 ) * A.column( 1 );
     double alpha         = a1xa2 % A.column( 2 );
@@ -262,8 +266,12 @@ bool TargetCalculator::factor_3D( const MsqMatrix< 3, 3 >& A, double& Lambda, Ms
     return true;
 }
 
-bool TargetCalculator::factor_surface( const MsqMatrix< 3, 2 >& A, double& Lambda, MsqMatrix< 3, 2 >& V,
-                                       MsqMatrix< 2, 2 >& Q, MsqMatrix< 2, 2 >& Delta, MsqError& /*err*/ )
+bool TargetCalculator::factor_surface( const MsqMatrix< 3, 2 >& A,
+                                       double& Lambda,
+                                       MsqMatrix< 3, 2 >& V,
+                                       MsqMatrix< 2, 2 >& Q,
+                                       MsqMatrix< 2, 2 >& Delta,
+                                       MsqError& /*err*/ )
 {
     MsqVector< 3 > cross = A.column( 0 ) * A.column( 1 );
     double alpha         = length( cross );
@@ -294,8 +302,12 @@ bool TargetCalculator::factor_surface( const MsqMatrix< 3, 2 >& A, double& Lambd
     return true;
 }
 
-bool TargetCalculator::factor_2D( const MsqMatrix< 2, 2 >& A, double& Lambda, MsqMatrix< 2, 2 >& V,
-                                  MsqMatrix< 2, 2 >& Q, MsqMatrix< 2, 2 >& Delta, MsqError& /*err*/ )
+bool TargetCalculator::factor_2D( const MsqMatrix< 2, 2 >& A,
+                                  double& Lambda,
+                                  MsqMatrix< 2, 2 >& V,
+                                  MsqMatrix< 2, 2 >& Q,
+                                  MsqMatrix< 2, 2 >& Delta,
+                                  MsqError& /*err*/ )
 {
     double alpha = det( A );
     Lambda       = sqrt( fabs( alpha ) );
@@ -415,7 +427,10 @@ static inline bool ideal_constant_skew_I_2D( EntityTopology element_type, MsqMat
     }
 }
 
-void TargetCalculator::ideal_skew_3D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 3, 3 >& q,
+void TargetCalculator::ideal_skew_3D( EntityTopology element_type,
+                                      Sample s,
+                                      const PatchData& pd,
+                                      MsqMatrix< 3, 3 >& q,
                                       MsqError& err )
 {
     if( !ideal_constant_skew_I_3D( element_type, q ) )
@@ -431,7 +446,10 @@ void TargetCalculator::ideal_skew_3D( EntityTopology element_type, Sample s, con
     }
 }
 
-void TargetCalculator::ideal_skew_2D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 2, 2 >& q,
+void TargetCalculator::ideal_skew_2D( EntityTopology element_type,
+                                      Sample s,
+                                      const PatchData& pd,
+                                      MsqMatrix< 2, 2 >& q,
                                       MsqError& err )
 {
     if( !ideal_constant_skew_I_2D( element_type, q ) )
@@ -448,7 +466,10 @@ void TargetCalculator::ideal_skew_2D( EntityTopology element_type, Sample s, con
     }
 }
 
-void TargetCalculator::ideal_shape_3D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 3, 3 >& q,
+void TargetCalculator::ideal_shape_3D( EntityTopology element_type,
+                                       Sample s,
+                                       const PatchData& pd,
+                                       MsqMatrix< 3, 3 >& q,
                                        MsqError& err )
 {
     if( !ideal_constant_skew_I_3D( element_type, q ) )
@@ -464,7 +485,10 @@ void TargetCalculator::ideal_shape_3D( EntityTopology element_type, Sample s, co
     }
 }
 
-void TargetCalculator::ideal_shape_2D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 2, 2 >& q,
+void TargetCalculator::ideal_shape_2D( EntityTopology element_type,
+                                       Sample s,
+                                       const PatchData& pd,
+                                       MsqMatrix< 2, 2 >& q,
                                        MsqError& err )
 {
     if( !ideal_constant_skew_I_2D( element_type, q ) )
@@ -517,8 +541,13 @@ static NodeSet get_nodeset( EntityTopology type, int num_nodes, MsqError& err )
     return bits;
 }
 
-void TargetCalculator::jacobian_3D( PatchData& pd, EntityTopology type, int num_nodes, Sample location,
-                                    const Vector3D* coords, MsqMatrix< 3, 3 >& J, MsqError& err )
+void TargetCalculator::jacobian_3D( PatchData& pd,
+                                    EntityTopology type,
+                                    int num_nodes,
+                                    Sample location,
+                                    const Vector3D* coords,
+                                    MsqMatrix< 3, 3 >& J,
+                                    MsqError& err )
 {
     // Get element properties
     NodeSet bits = get_nodeset( type, num_nodes, err );MSQ_ERRRTN( err );
@@ -545,8 +574,13 @@ void TargetCalculator::jacobian_3D( PatchData& pd, EntityTopology type, int num_
         J += outer( verts[indices[i]], derivs[i] );
 }
 
-void TargetCalculator::jacobian_2D( PatchData& pd, EntityTopology type, int num_nodes, Sample location,
-                                    const Vector3D* coords, MsqMatrix< 3, 2 >& J, MsqError& err )
+void TargetCalculator::jacobian_2D( PatchData& pd,
+                                    EntityTopology type,
+                                    int num_nodes,
+                                    Sample location,
+                                    const Vector3D* coords,
+                                    MsqMatrix< 3, 2 >& J,
+                                    MsqError& err )
 {
     // Get element properties
     NodeSet bits = get_nodeset( type, num_nodes, err );MSQ_ERRRTN( err );
@@ -573,8 +607,12 @@ void TargetCalculator::jacobian_2D( PatchData& pd, EntityTopology type, int num_
         J += outer( verts[indices[i]], derivs[i] );
 }
 
-void TargetCalculator::get_refmesh_Jacobian_3D( ReferenceMeshInterface* ref_mesh, PatchData& pd, size_t element,
-                                                Sample sample, MsqMatrix< 3, 3 >& W_out, MsqError& err )
+void TargetCalculator::get_refmesh_Jacobian_3D( ReferenceMeshInterface* ref_mesh,
+                                                PatchData& pd,
+                                                size_t element,
+                                                Sample sample,
+                                                MsqMatrix< 3, 3 >& W_out,
+                                                MsqError& err )
 {
     // get element
     MsqMeshEntity& elem       = pd.element_by_index( element );
@@ -599,8 +637,12 @@ void TargetCalculator::get_refmesh_Jacobian_3D( ReferenceMeshInterface* ref_mesh
     jacobian_3D( pd, type, n, sample, vert_coords, W_out, err );MSQ_ERRRTN( err );
 }
 
-void TargetCalculator::get_refmesh_Jacobian_2D( ReferenceMeshInterface* ref_mesh, PatchData& pd, size_t element,
-                                                Sample sample, MsqMatrix< 3, 2 >& W_out, MsqError& err )
+void TargetCalculator::get_refmesh_Jacobian_2D( ReferenceMeshInterface* ref_mesh,
+                                                PatchData& pd,
+                                                size_t element,
+                                                Sample sample,
+                                                MsqMatrix< 3, 2 >& W_out,
+                                                MsqError& err )
 {
     // get element
     MsqMeshEntity& elem       = pd.element_by_index( element );

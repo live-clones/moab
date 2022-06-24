@@ -147,8 +147,12 @@ class VerdictWrapper
     double jac;
     rval = quality_measure(hex, MB_JACOBIAN, jac); \endcode
     */
-    ErrorCode quality_measure( EntityHandle eh, QualityType q, double& quality, int num_nodes = 0,
-                               EntityType etype = MBMAXTYPE, double* coords = NULL );
+    ErrorCode quality_measure( EntityHandle eh,
+                               QualityType q,
+                               double& quality,
+                               int num_nodes    = 0,
+                               EntityType etype = MBMAXTYPE,
+                               double* coords   = NULL );
     //! return a quality name
     /** return quality name (convert an enum QualityType to a string)
     \param  q quality type

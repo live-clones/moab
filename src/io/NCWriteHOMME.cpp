@@ -269,8 +269,8 @@ ErrorCode NCWriteHOMME::write_nonset_variables( std::vector< WriteNC::VarData >&
                     {
                         EntityHandle starth                = pair_iter->first;
                         EntityHandle endh                  = pair_iter->second;
-                        variableData.writeStarts[ncol_idx] = ( NCDF_SIZE )( starth - 1 );
-                        variableData.writeCounts[ncol_idx] = ( NCDF_SIZE )( endh - starth + 1 );
+                        variableData.writeStarts[ncol_idx] = (NCDF_SIZE)( starth - 1 );
+                        variableData.writeCounts[ncol_idx] = (NCDF_SIZE)( endh - starth + 1 );
 
                         // Do a partial write, in each subrange
 #ifdef MOAB_HAVE_PNETCDF

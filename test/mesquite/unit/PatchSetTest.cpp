@@ -69,8 +69,11 @@ class FakeMesh : public MBMesquite::Mesh
 
     void vertices_get_slaved_flag( const VertexHandle* verts, std::vector< bool >& fixed, size_t n, MsqError& err );
 
-    void vertices_get_attached_elements( const VertexHandle* array, size_t len, vector< ElementHandle >& elems,
-                                         vector< size_t >& offsets, MsqError& err );
+    void vertices_get_attached_elements( const VertexHandle* array,
+                                         size_t len,
+                                         vector< ElementHandle >& elems,
+                                         vector< size_t >& offsets,
+                                         MsqError& err );
 
     int get_geometric_dimension( MsqError& err )
     {
@@ -106,7 +109,10 @@ class FakeMesh : public MBMesquite::Mesh
     }
     void vertices_get_byte( const VertexHandle*, unsigned char*, size_t, MsqError& err );
 
-    void elements_get_attached_vertices( const ElementHandle*, size_t, vector< VertexHandle >&, vector< size_t >&,
+    void elements_get_attached_vertices( const ElementHandle*,
+                                         size_t,
+                                         vector< VertexHandle >&,
+                                         vector< size_t >&,
                                          MsqError& err )
     {
         NI( err );
@@ -238,8 +244,11 @@ void FakeMesh::vertices_get_slaved_flag( const VertexHandle*, std::vector< bool 
     CPPUNIT_ASSERT( false );
 }
 
-void FakeMesh::vertices_get_attached_elements( const VertexHandle* verts, size_t n, vector< ElementHandle >& elems,
-                                               vector< size_t >& offsets, MsqError& err )
+void FakeMesh::vertices_get_attached_elements( const VertexHandle* verts,
+                                               size_t n,
+                                               vector< ElementHandle >& elems,
+                                               vector< size_t >& offsets,
+                                               MsqError& err )
 {
     if( doError )
     {

@@ -67,9 +67,14 @@ WriteVtk::~WriteVtk()
     mbImpl->release_interface( writeTool );
 }
 
-ErrorCode WriteVtk::write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
-                                const EntityHandle* output_list, const int num_sets,
-                                const std::vector< std::string >& /* qa_list */, const Tag* tag_list, int num_tags,
+ErrorCode WriteVtk::write_file( const char* file_name,
+                                const bool overwrite,
+                                const FileOptions& opts,
+                                const EntityHandle* output_list,
+                                const int num_sets,
+                                const std::vector< std::string >& /* qa_list */,
+                                const Tag* tag_list,
+                                int num_tags,
                                 int /* export_dimension */ )
 {
     ErrorCode rval;
@@ -101,7 +106,10 @@ ErrorCode WriteVtk::write_file( const char* file_name, const bool overwrite, con
 
     // Create file
     std::ofstream file( file_name );
-    if( !file ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Could not open file: " << file_name ); }
+    if( !file )
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "Could not open file: " << file_name );
+    }
     file.precision( precision );
 
     // Write file
@@ -188,7 +196,10 @@ ErrorCode WriteVtk::gather_mesh( const EntityHandle* set_list, int num_sets, Ran
         }
     }
 
-    if( nodes.empty() ) { MB_SET_ERR( MB_ENTITY_NOT_FOUND, "Nothing to write" ); }
+    if( nodes.empty() )
+    {
+        MB_SET_ERR( MB_ENTITY_NOT_FOUND, "Nothing to write" );
+    }
 
     return MB_SUCCESS;
 }
@@ -370,7 +381,10 @@ ErrorCode WriteVtk::write_elems( std::ostream& stream, const Range& nodes, const
     return MB_SUCCESS;
 }
 
-ErrorCode WriteVtk::write_tags( std::ostream& stream, bool nodes, const Range& entities, const Tag* tag_list,
+ErrorCode WriteVtk::write_tags( std::ostream& stream,
+                                bool nodes,
+                                const Range& entities,
+                                const Tag* tag_list,
                                 int num_tags )
 {
     ErrorCode rval;
@@ -547,7 +561,10 @@ ErrorCode WriteVtk::write_bit_tag( std::ostream& stream, Tag tag, const Range& e
     if( MB_SUCCESS != mbImpl->tag_get_name( tag, name ) || MB_SUCCESS != mbImpl->tag_get_length( tag, vals_per_tag ) )
         return MB_FAILURE;
 
-    if( vals_per_tag > 8 ) { MB_SET_ERR( MB_FAILURE, "Invalid tag size for bit tag \"" << name << "\"" ); }
+    if( vals_per_tag > 8 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Invalid tag size for bit tag \"" << name << "\"" );
+    }
 
     // Get a tag value for each entity.
     // Get bits for each entity and unpack into

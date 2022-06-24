@@ -361,8 +361,8 @@ ErrorCode NCWriteMPAS::write_nonset_variables( std::vector< WriteNC::VarData >& 
                     {
                         EntityHandle starth                = pair_iter->first;
                         EntityHandle endh                  = pair_iter->second;
-                        variableData.writeStarts[ents_idx] = ( NCDF_SIZE )( starth - 1 );
-                        variableData.writeCounts[ents_idx] = ( NCDF_SIZE )( endh - starth + 1 );
+                        variableData.writeStarts[ents_idx] = (NCDF_SIZE)( starth - 1 );
+                        variableData.writeCounts[ents_idx] = (NCDF_SIZE)( endh - starth + 1 );
 
                         // Do a partial write, in each subrange
 #ifdef MOAB_HAVE_PNETCDF

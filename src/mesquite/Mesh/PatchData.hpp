@@ -98,8 +98,13 @@ class PatchData
      *                    no vertices are fixed.
      */
     MESQUITE_EXPORT
-    void fill( size_t num_vertex, const double* vtx_coords, size_t num_elem, EntityTopology type,
-               const size_t* connectivity, const bool* vertex_fixed_flags, MsqError& err );
+    void fill( size_t num_vertex,
+               const double* vtx_coords,
+               size_t num_elem,
+               EntityTopology type,
+               const size_t* connectivity,
+               const bool* vertex_fixed_flags,
+               MsqError& err );
 
     /**\brief For use by testing code -- create patch explicitly
      *
@@ -115,8 +120,13 @@ class PatchData
      *                    no vertices are fixed.
      */
     MESQUITE_EXPORT
-    void fill( size_t num_vertex, const double* vtx_coords, size_t num_elem, const EntityTopology* elem_types,
-               const size_t* connectivity, const bool* vertex_fixed_flags, MsqError& err );
+    void fill( size_t num_vertex,
+               const double* vtx_coords,
+               size_t num_elem,
+               const EntityTopology* elem_types,
+               const size_t* connectivity,
+               const bool* vertex_fixed_flags,
+               MsqError& err );
 
     /**\brief For use by testing code -- create patch explicitly
      *
@@ -134,8 +144,13 @@ class PatchData
      *                    no vertices are fixed.
      */
     MESQUITE_EXPORT
-    void fill( size_t num_vertex, const double* vtx_coords, size_t num_elem, const EntityTopology* elem_types,
-               const size_t* vertex_per_elem, const size_t* elem_connectivity, const bool* vertex_fixed_flags,
+    void fill( size_t num_vertex,
+               const double* vtx_coords,
+               size_t num_elem,
+               const EntityTopology* elem_types,
+               const size_t* vertex_per_elem,
+               const size_t* elem_connectivity,
+               const bool* vertex_fixed_flags,
                MsqError& err );
 
     /**\brief Create global patch
@@ -147,7 +162,8 @@ class PatchData
 
     MESQUITE_EXPORT
     void set_mesh_entities( std::vector< Mesh::ElementHandle >& patch_elems,
-                            std::vector< Mesh::VertexHandle >& free_vertices, MsqError& err );
+                            std::vector< Mesh::VertexHandle >& free_vertices,
+                            MsqError& err );
 
   private:
     //! Doesn't allow PatchData to be copied implicitly.
@@ -310,8 +326,10 @@ class PatchData
     /** Get the indices of elements adjacent to the specified vertex,
      *  and having the specified dimension */
     MESQUITE_EXPORT
-    void get_vertex_element_indices( size_t vertex_index, unsigned element_dimension,
-                                     std::vector< size_t >& elem_indices, MsqError& err );
+    void get_vertex_element_indices( size_t vertex_index,
+                                     unsigned element_dimension,
+                                     std::vector< size_t >& elem_indices,
+                                     MsqError& err );
 
     /*! Get indices of elements attached to specified vertex */
     MESQUITE_EXPORT
@@ -376,7 +394,9 @@ class PatchData
      *                   element, no domain at all, etc.
      */
     MESQUITE_EXPORT
-    void get_domain_normal_at_vertex( size_t vert_index, Mesh::ElementHandle element, Vector3D& normal_out,
+    void get_domain_normal_at_vertex( size_t vert_index,
+                                      Mesh::ElementHandle element,
+                                      Vector3D& normal_out,
                                       MsqError& err );
 
     /*! Get the normal to the domain at the centroid (projected to the
@@ -447,8 +467,11 @@ class PatchData
       \param step_size a scalar that multiplies the vectors given in dk.
     */
     MESQUITE_EXPORT
-    void set_free_vertices_constrained( PatchDataVerticesMemento* memento, Vector3D dk[], size_t nb_vtx,
-                                        double step_size, MsqError& err );
+    void set_free_vertices_constrained( PatchDataVerticesMemento* memento,
+                                        Vector3D dk[],
+                                        size_t nb_vtx,
+                                        double step_size,
+                                        MsqError& err );
 
     //! Project gradient vector terms onto geometric domain
     MESQUITE_EXPORT
@@ -624,7 +647,9 @@ class PatchData
      *                  i-th entry in this list is the corresponding index in
      *                  this patch.
      */
-    void notify_sub_patch( PatchData& sub_patch, const size_t* vertex_index_map, const size_t* element_index_map,
+    void notify_sub_patch( PatchData& sub_patch,
+                           const size_t* vertex_index_map,
+                           const size_t* element_index_map,
                            MsqError& err );
     /**\brief notify all attached ExtraData instances that this patch is being destroyed */
     void notify_patch_destroyed();
@@ -632,7 +657,8 @@ class PatchData
     /** Call before initialize_data to change vertex_flags for
      *  higher-order nodes to MSQ_DEPENDENT.
      */
-    void enslave_higher_order_nodes( const size_t* element_offset_array, unsigned char* vertex_flags,
+    void enslave_higher_order_nodes( const size_t* element_offset_array,
+                                     unsigned char* vertex_flags,
                                      MsqError& err ) const;
 
     /** Call after filling vertex handle and connectivity arrays to

@@ -123,8 +123,11 @@ void ConicDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coords
         vertex_normal_at( h[i], coords[i] );
 }
 
-void ConicDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
-                                 Vector3D& normal, MsqError& ) const
+void ConicDomain::closest_point( Mesh::VertexHandle handle,
+                                 const Vector3D& position,
+                                 Vector3D& closest,
+                                 Vector3D& normal,
+                                 MsqError& ) const
 {
     evaluate( handle, position, closest, normal );
 }

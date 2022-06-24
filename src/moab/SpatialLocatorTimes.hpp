@@ -86,7 +86,9 @@ inline void SpatialLocatorTimes::reset()
 }
 
 #ifdef MOAB_HAVE_MPI
-inline ErrorCode SpatialLocatorTimes::accumulate_times( MPI_Comm comm, double* min_times, double* max_times,
+inline ErrorCode SpatialLocatorTimes::accumulate_times( MPI_Comm comm,
+                                                        double* min_times,
+                                                        double* max_times,
                                                         double* avg_times )
 {
     ErrorCode rval = MB_SUCCESS;

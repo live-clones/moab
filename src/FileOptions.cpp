@@ -337,7 +337,10 @@ ErrorCode FileOptions::get_toggle_option( const char* name, bool default_value, 
 
     int index;
     ErrorCode result = match_option( name, values, index );
-    if( result == MB_SUCCESS ) { value = index < num_true; }
+    if( result == MB_SUCCESS )
+    {
+        value = index < num_true;
+    }
     else if( result == MB_ENTITY_NOT_FOUND )
     {
         value  = default_value;

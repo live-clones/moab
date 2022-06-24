@@ -911,7 +911,9 @@ inline MsqMatrix< R, C > operator*( double s, const MsqMatrix< R, C >& m )
 }
 
 template < unsigned R, unsigned RC, unsigned C >
-inline double multiply_helper_result_val( unsigned r, unsigned c, const MsqMatrix< R, RC >& A,
+inline double multiply_helper_result_val( unsigned r,
+                                          unsigned c,
+                                          const MsqMatrix< R, RC >& A,
                                           const MsqMatrix< RC, C >& B )
 {
     double tmp = A( r, 0 ) * B( 0, c );

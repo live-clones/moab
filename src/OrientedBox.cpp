@@ -324,7 +324,9 @@ ErrorCode OrientedBox::compute_from_2d_cells( OrientedBox& result, Interface* in
     return compute_from_covariance_data( result, instance, data, points );
 }
 
-ErrorCode OrientedBox::compute_from_covariance_data( OrientedBox& result, Interface* instance, CovarienceData& data,
+ErrorCode OrientedBox::compute_from_covariance_data( OrientedBox& result,
+                                                     Interface* instance,
+                                                     CovarienceData& data,
                                                      const Range& vertices )
 {
     if( data.area <= 0.0 )
@@ -367,8 +369,10 @@ bool OrientedBox::contained( const CartVect& point, double tol ) const
 #endif
 }
 
-ErrorCode OrientedBox::compute_from_covariance_data( OrientedBox& result, Interface* moab_instance,
-                                                     const CovarienceData* data, unsigned data_length,
+ErrorCode OrientedBox::compute_from_covariance_data( OrientedBox& result,
+                                                     Interface* moab_instance,
+                                                     const CovarienceData* data,
+                                                     unsigned data_length,
                                                      const Range& vertices )
 {
     // Sum input CovarienceData structures
@@ -437,8 +441,11 @@ ErrorCode OrientedBox::compute_from_covariance_data( OrientedBox& result, Interf
  * Use inequalities to test dist against ray length limits. Be aware that
  * inequalities change due to sign of direction.plane_normal.
  */
-inline bool check_ray_limits( const double normal_par_pos, const double normal_par_dir, const double half_extent,
-                              const double* nonneg_ray_len, const double* neg_ray_len )
+inline bool check_ray_limits( const double normal_par_pos,
+                              const double normal_par_dir,
+                              const double half_extent,
+                              const double* nonneg_ray_len,
+                              const double* neg_ray_len )
 {
 
     const double extent_pos_diff = half_extent - normal_par_pos;
@@ -488,8 +495,11 @@ inline bool check_ray_limits( const double normal_par_pos, const double normal_p
 /* This implementation copied from cgmMC (overlap.C).
  * Original author:  Tim Tautges?
  */
-bool OrientedBox::intersect_ray( const CartVect& ray_origin, const CartVect& ray_direction, const double reps,
-                                 const double* nonneg_ray_len, const double* neg_ray_len ) const
+bool OrientedBox::intersect_ray( const CartVect& ray_origin,
+                                 const CartVect& ray_direction,
+                                 const double reps,
+                                 const double* nonneg_ray_len,
+                                 const double* neg_ray_len ) const
 {
     // test distance from box center to line
     const CartVect cx       = center - ray_origin;

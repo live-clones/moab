@@ -717,7 +717,10 @@ C_FUNC_DEF double v_quad_maximum_angle( int /*num_nodes*/, double coordinates[][
     double areas[4];
     signed_corner_areas( areas, coordinates );
 
-    if( areas[0] < 0 || areas[1] < 0 || areas[2] < 0 || areas[3] < 0 ) { max_angle = 360 - max_angle; }
+    if( areas[0] < 0 || areas[1] < 0 || areas[2] < 0 || areas[3] < 0 )
+    {
+        max_angle = 360 - max_angle;
+    }
 
     if( max_angle > 0 ) return (double)VERDICT_MIN( max_angle, VERDICT_DBL_MAX );
     return (double)VERDICT_MAX( max_angle, -VERDICT_DBL_MAX );
@@ -1252,7 +1255,9 @@ C_FUNC_DEF double v_quad_distortion( int num_nodes, double coordinates[][3] )
 /*!
   multiple quality measures of a quad
 */
-C_FUNC_DEF void v_quad_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_quad_quality( int num_nodes,
+                                double coordinates[][3],
+                                unsigned int metrics_request_flag,
                                 QuadMetricVals* metric_vals )
 {
 

@@ -82,8 +82,11 @@ ReadHDF5Dataset::ReadHDF5Dataset( const char* debug_desc, bool parallel, const C
 #endif
 }
 
-ReadHDF5Dataset::ReadHDF5Dataset( const char* debug_desc, hid_t data_set_handle, bool parallel,
-                                  const Comm* communicator, bool close_data_set )
+ReadHDF5Dataset::ReadHDF5Dataset( const char* debug_desc,
+                                  hid_t data_set_handle,
+                                  bool parallel,
+                                  const Comm* communicator,
+                                  bool close_data_set )
     : closeDataSet( close_data_set ), dataSet( data_set_handle ), dataSpace( -1 ), dataType( -1 ), fileType( -1 ),
       ioProp( H5P_DEFAULT ), dataSpaceRank( 0 ), rowsInTable( 0 ), doConversion( false ), nativeParallel( parallel ),
       readCount( 0 ), bufferSize( 0 ), mpiComm( communicator ), mpeDesc( debug_desc )
@@ -221,7 +224,7 @@ void ReadHDF5Dataset::set_file_ids( const Range& file_ids, EntityHandle start_id
 void ReadHDF5Dataset::set_all_file_ids( hsize_t row_count, hid_t data_type )
 {
     internalRange.clear();
-    internalRange.insert( (EntityHandle)1, ( EntityHandle )( rowsInTable ) );
+    internalRange.insert( (EntityHandle)1, (EntityHandle)( rowsInTable ) );
     set_file_ids( internalRange, 1, row_count, data_type );
 }
 
@@ -250,7 +253,10 @@ void ReadHDF5Dataset::read( void* buffer, size_t& rows_read )
         while( currOffset != new_end )
         {
             size_t count = *( currOffset.end_of_block() ) - *currOffset + 1;
-            if( new_end != rangeEnd && *currOffset + count > *new_end ) { count = *new_end - *currOffset; }
+            if( new_end != rangeEnd && *currOffset + count > *new_end )
+            {
+                count = *new_end - *currOffset;
+            }
             rows_read += count;
 
             dataSetOffset[0] = *currOffset - startID;

@@ -216,11 +216,11 @@ int main( int argc, char* argv[] )
 
     if( couComm != MPI_COMM_NULL )
     {
-        int dummyCpl = -1;
+        int dummyCpl     = -1;
         int dummy_rowcol = -1;
-        int dummyType = 0;
-        ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
-             intx_from_file_identifier.c_str(), mapFilename.c_str() );
+        int dummyType    = 0;
+        ierr             = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
+                                                             intx_from_file_identifier.c_str(), mapFilename.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 
@@ -303,7 +303,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem*3; // 3 tags
+            int storLeng = atmCompNDoFs * numAllElem * 3;  // 3 tags
             int eetype   = 1;
 
             vals.resize( storLeng );
@@ -392,8 +392,8 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             int tagIndexIn2;
-            ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2 );
+            ierr =
+                iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tags "
                              "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj on ocn pes" );
         }
@@ -415,7 +415,7 @@ int main( int argc, char* argv[] )
         {
             context_id = cplocn;  // id for ocean on coupler
             ierr       = iMOAB_ReceiveElementTag( cmpOcnPID, "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj", &ocnCouComm,
-                                            &context_id );
+                                                  &context_id );
             CHECKIERR( ierr, "cannot receive tag values from ocean mesh on coupler pes" )
         }
 
@@ -455,8 +455,7 @@ int main( int argc, char* argv[] )
                 int ent_type = 1;
                 ierr         = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
                 CHECKIERR( ierr, "failed to get global ids" );
-                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, "a2oTbot_proj", &nelem[2], &ent_type,
-                                                  &tempElems[0] );
+                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, "a2oTbot_proj", &nelem[2], &ent_type, &tempElems[0] );
                 CHECKIERR( ierr, "failed to get temperature field" );
                 int err_code = 1;
                 check_baseline_file( baseline, gidElems, tempElems, 1.e-9, err_code );

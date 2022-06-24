@@ -178,7 +178,9 @@ int print_mesh_info( iMesh_Instance mesh, iBase_EntityHandle ment )
   Load Mesh
   @li Load a geom and a mesh file
 */
-int load_geom_mesh_test( const char* geom_filename, const char* mesh_filename, FBiGeom_Instance geom,
+int load_geom_mesh_test( const char* geom_filename,
+                         const char* mesh_filename,
+                         FBiGeom_Instance geom,
                          iMesh_Instance mesh )
 {
     /* load a geom */

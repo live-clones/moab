@@ -186,7 +186,10 @@ void ConjugateGradient::optimize_vertex_positions( PatchData& pd, MsqError& err 
         int k = 0;
         alp   = get_step( pd, f, k, err );
         j += k;
-        if( conjGradDebug > 2 ) { MSQ_PRINT( 2 )( "\n  Alp initial, alp = %20.18f", alp ); }
+        if( conjGradDebug > 2 )
+        {
+            MSQ_PRINT( 2 )( "\n  Alp initial, alp = %20.18f", alp );
+        }
 
         // if alp == 0, revert to steepest descent search direction
         if( alp == 0 )
@@ -329,7 +332,10 @@ double ConjugateGradient::get_step( PatchData& pd, double f0, int& j, MsqError& 
             err.clear();  // barrier violation does not represent an actual error here
         MSQ_ERRZERO( err );
         // if not feasible, try a smaller alp (take smaller step)
-        if( !feasible ) { alp *= rho; }
+        if( !feasible )
+        {
+            alp *= rho;
+        }
     }  // end while ...
 
     // if above while ended due to j>=jmax, no valid step was found.
@@ -359,7 +365,10 @@ double ConjugateGradient::get_step( PatchData& pd, double f0, int& j, MsqError& 
             pd.set_to_vertices_memento( pMemento, err );
             MSQ_ERRZERO( err );
             // if our step has now improved the objective function value
-            if( f < f0 ) { found = 1; }
+            if( f < f0 )
+            {
+                found = 1;
+            }
         }  //   end while j less than jmax
            // Message::print_info("\nj = %d found = %d f = %20.18f f0 = %20.18f\n",j,found,f,f0);
            // if above ended because of j>=jmax, take no step
@@ -387,7 +396,10 @@ double ConjugateGradient::get_step( PatchData& pd, double f0, int& j, MsqError& 
             ( "Non-convex feasiblility region found while "
               "computing new f.",
               MsqError::INVALID_MESH );
-            if( fnew < f ) { f = fnew; }
+            if( fnew < f )
+            {
+                f = fnew;
+            }
             else
             {
                 // Reset the vertices to original position
@@ -428,7 +440,10 @@ double ConjugateGradient::get_step( PatchData& pd, double f0, int& j, MsqError& 
                 MSQ_ERRZERO( err );
                 return alp;
             }
-            if( fnew < f ) { f = fnew; }
+            if( fnew < f )
+            {
+                f = fnew;
+            }
             else
             {
                 found = 1;

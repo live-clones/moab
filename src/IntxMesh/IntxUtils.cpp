@@ -117,7 +117,10 @@ int IntxUtils::SortAndRemoveDoubles2( double* P, int& nP, double epsilon_1 )
     for( k = 0; k < nP; k++ )
     {
         double x = P[2 * k] - c[0], y = P[2 * k + 1] - c[1];
-        if( x != 0. || y != 0. ) { pairAngleIndex[k].angle = atan2( y, x ); }
+        if( x != 0. || y != 0. )
+        {
+            pairAngleIndex[k].angle = atan2( y, x );
+        }
         else
         {
             pairAngleIndex[k].angle = 0;
@@ -161,7 +164,10 @@ int IntxUtils::SortAndRemoveDoubles2( double* P, int& nP, double epsilon_1 )
     // the first one could be at -PI; last one could be at +PI, according to atan2 span
 
     double d2 = dist2( P, &P[2 * i] );  // check the first and last points (ordered from -pi to +pi)
-    if( d2 > epsilon_1 ) { nP = i + 1; }
+    if( d2 > epsilon_1 )
+    {
+        nP = i + 1;
+    }
     else
         nP = i;            // effectively delete the last point (that would have been the same with first)
     if( nP == 0 ) nP = 1;  // we should be left with at least one point we already tested if nP is 0 originally
@@ -170,8 +176,14 @@ int IntxUtils::SortAndRemoveDoubles2( double* P, int& nP, double epsilon_1 )
 
 // the marks will show what edges of blue intersect the red
 
-ErrorCode IntxUtils::EdgeIntersections2( double* blue, int nsBlue, double* red, int nsRed, int* markb, int* markr,
-                                         double* points, int& nPoints )
+ErrorCode IntxUtils::EdgeIntersections2( double* blue,
+                                         int nsBlue,
+                                         double* red,
+                                         int nsRed,
+                                         int* markb,
+                                         int* markr,
+                                         double* points,
+                                         int& nPoints )
 {
     /* EDGEINTERSECTIONS computes edge intersections of two elements
      [P,n]=EdgeIntersections(X,Y) computes for the two given elements  * red
@@ -229,9 +241,19 @@ ErrorCode IntxUtils::EdgeIntersections2( double* blue, int nsBlue, double* red, 
 }
 
 // special one, for intersection between rll (constant latitude)  and cs quads
-ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdgeType, int nsBlue, double* red,
-                                    CartVect* redc, int nsRed, int* markb, int* markr, int plane, double R,
-                                    double* points, int& nPoints )
+ErrorCode IntxUtils::EdgeIntxRllCs( double* blue,
+                                    CartVect* bluec,
+                                    int* blueEdgeType,
+                                    int nsBlue,
+                                    double* red,
+                                    CartVect* redc,
+                                    int nsRed,
+                                    int* markb,
+                                    int* markr,
+                                    int plane,
+                                    double R,
+                                    double* points,
+                                    int& nPoints )
 {
     // if blue edge type is 1, intersect in 3d then project to 2d by gnomonic projection
     // everything else the same (except if there are 2 points resulting, which is rare)
@@ -292,7 +314,10 @@ ErrorCode IntxUtils::EdgeIntxRllCs( double* blue, CartVect* bluec, int* blueEdge
                 double E[9];
                 intersect_great_circle_arc_with_clat_arc( A.array(), B.array(), C.array(), D.array(), R, E, np );
                 if( np == 0 ) continue;
-                if( np >= 2 ) { std::cout << "intersection with 2 points :" << A << B << C << D << "\n"; }
+                if( np >= 2 )
+                {
+                    std::cout << "intersection with 2 points :" << A << B << C << D << "\n";
+                }
                 for( int k = 0; k < np; k++ )
                 {
                     gnomonic_projection( CartVect( E + k * 3 ), R, plane, points[2 * nPoints],
@@ -422,7 +447,10 @@ ErrorCode IntxUtils::gnomonic_projection( const CartVect& pos, double R, int pla
 }
 
 // given the position on plane (one out of 6), find out the position on sphere
-ErrorCode IntxUtils::reverse_gnomonic_projection( const double& c1, const double& c2, double R, int plane,
+ErrorCode IntxUtils::reverse_gnomonic_projection( const double& c1,
+                                                  const double& c2,
+                                                  double R,
+                                                  int plane,
                                                   CartVect& pos )
 {
 
@@ -518,7 +546,10 @@ void IntxUtils::gnomonic_unroll( double& c1, double& c2, double R, int plane )
     return;
 }
 // given a mesh on the sphere, project all centers in 6 gnomonic planes, or project mesh too
-ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb, EntityHandle inSet, double R, bool centers_only,
+ErrorCode IntxUtils::global_gnomonic_projection( Interface* mb,
+                                                 EntityHandle inSet,
+                                                 double R,
+                                                 bool centers_only,
                                                  EntityHandle& outSet )
 {
     std::string parTagName( "PARALLEL_PARTITION" );
@@ -1386,8 +1417,13 @@ static bool verify( CartVect a, CartVect b, CartVect c, CartVect d, double x, do
     return true;
 }
 
-ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc( double* A, double* B, double* C, double* D, double R,
-                                                               double* E, int& np )
+ErrorCode IntxUtils::intersect_great_circle_arc_with_clat_arc( double* A,
+                                                               double* B,
+                                                               double* C,
+                                                               double* D,
+                                                               double R,
+                                                               double* E,
+                                                               int& np )
 {
     const double distTol   = R * 1.e-6;
     const double Tolerance = R * R * 1.e-12;  // radius should be 1, usually
@@ -1694,8 +1730,15 @@ ErrorCode set_edge_type_flag(Interface * mb, EntityHandle sf1)
 
 // decide in a different metric if the corners of CS quad are
 // in the interior of an RLL quad
-int IntxUtils::borderPointsOfCSinRLL( CartVect* redc, double* red2dc, int nsRed, CartVect* bluec, int nsBlue,
-                                      int* blueEdgeType, double* P, int* side, double epsil )
+int IntxUtils::borderPointsOfCSinRLL( CartVect* redc,
+                                      double* red2dc,
+                                      int nsRed,
+                                      CartVect* bluec,
+                                      int nsBlue,
+                                      int* blueEdgeType,
+                                      double* P,
+                                      int* side,
+                                      double epsil )
 {
     int extraPoints = 0;
     // first decide the blue z coordinates
@@ -1831,7 +1874,9 @@ ErrorCode IntxUtils::deep_copy_set_with_quads( Interface* mb, EntityHandle sourc
     return MB_SUCCESS;
 }
 
-ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file_set, double merge_tol,
+ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb,
+                                                EntityHandle file_set,
+                                                double merge_tol,
                                                 std::vector< Tag >& tagList )
 {
     Range verts;
@@ -1845,12 +1890,11 @@ ErrorCode IntxUtils::remove_duplicate_vertices( Interface* mb, EntityHandle file
     rval = mm.merge_all( file_set, merge_tol );MB_CHK_ERR( rval );
 
     // now correct vertices that are repeated in polygons
-    rval = remove_padded_vertices(mb, file_set, tagList);
+    rval = remove_padded_vertices( mb, file_set, tagList );
     return MB_SUCCESS;
 }
 
-ErrorCode IntxUtils::remove_padded_vertices( Interface* mb, EntityHandle file_set,
-                                                std::vector< Tag >& tagList )
+ErrorCode IntxUtils::remove_padded_vertices( Interface* mb, EntityHandle file_set, std::vector< Tag >& tagList )
 {
 
     // now correct vertices that are repeated in polygons

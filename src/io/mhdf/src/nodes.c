@@ -26,8 +26,8 @@
 int mhdf_haveNodes( mhdf_FileHandle file, mhdf_Status* status )
 {
     FileHandle* file_ptr = (FileHandle*)file;
-    hid_t       root_id, node_id;
-    int         result;
+    hid_t root_id, node_id;
+    int result;
     API_BEGIN;
 
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
@@ -69,13 +69,16 @@ int mhdf_haveNodes( mhdf_FileHandle file, mhdf_Status* status )
     return result;
 }
 
-hid_t mhdf_createNodeCoords( mhdf_FileHandle file_handle, int dimension, long num_nodes, long* first_id_out,
+hid_t mhdf_createNodeCoords( mhdf_FileHandle file_handle,
+                             int dimension,
+                             long num_nodes,
+                             long* first_id_out,
                              mhdf_Status* status )
 {
     FileHandle* file_ptr = (FileHandle*)file_handle;
-    hid_t       table_id;
-    hsize_t     dims[ 2 ];
-    long        first_id;
+    hid_t table_id;
+    hsize_t dims[2];
+    long first_id;
     API_BEGIN;
 
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
@@ -86,8 +89,8 @@ hid_t mhdf_createNodeCoords( mhdf_FileHandle file_handle, int dimension, long nu
         return -1;
     }
 
-    dims[ 0 ] = (hsize_t)num_nodes;
-    dims[ 1 ] = (hsize_t)dimension;
+    dims[0]  = (hsize_t)num_nodes;
+    dims[1]  = (hsize_t)dimension;
     table_id = mhdf_create_table( file_ptr->hdf_handle, NODE_COORD_PATH, H5T_NATIVE_DOUBLE, 2, dims, status );
     if( table_id < 0 ) return -1;
 
@@ -112,12 +115,15 @@ hid_t mhdf_createNodeCoords( mhdf_FileHandle file_handle, int dimension, long nu
     return table_id;
 }
 
-hid_t mhdf_openNodeCoords( mhdf_FileHandle file_handle, long* num_nodes_out, int* dimension_out, long* first_id_out,
+hid_t mhdf_openNodeCoords( mhdf_FileHandle file_handle,
+                           long* num_nodes_out,
+                           int* dimension_out,
+                           long* first_id_out,
                            mhdf_Status* status )
 {
     FileHandle* file_ptr = (FileHandle*)file_handle;
-    hid_t       table_id;
-    hsize_t     dims[ 2 ];
+    hid_t table_id;
+    hsize_t dims[2];
     API_BEGIN;
 
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
@@ -125,8 +131,8 @@ hid_t mhdf_openNodeCoords( mhdf_FileHandle file_handle, long* num_nodes_out, int
     table_id = mhdf_open_table2( file_ptr->hdf_handle, NODE_COORD_PATH, 2, dims, first_id_out, status );
     if( table_id < 0 ) return -1;
 
-    *num_nodes_out = dims[ 0 ];
-    *dimension_out = dims[ 1 ];
+    *num_nodes_out = dims[0];
+    *dimension_out = dims[1];
     file_ptr->open_handle_count++;
     mhdf_setOkay( status );
     API_END_H( 1 );
@@ -136,7 +142,7 @@ hid_t mhdf_openNodeCoords( mhdf_FileHandle file_handle, long* num_nodes_out, int
 hid_t mhdf_openNodeCoordsSimple( mhdf_FileHandle file_handle, mhdf_Status* status )
 {
     FileHandle* file_ptr = (FileHandle*)file_handle;
-    hid_t       table_id;
+    hid_t table_id;
     API_BEGIN;
 
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
@@ -156,7 +162,11 @@ void mhdf_writeNodeCoords( hid_t table_id, long offset, long count, const double
     mhdf_write_data( table_id, offset, count, H5T_NATIVE_DOUBLE, coords, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_writeNodeCoordsWithOpt( hid_t table_id, long offset, long count, const double* coords, hid_t prop,
+void mhdf_writeNodeCoordsWithOpt( hid_t table_id,
+                                  long offset,
+                                  long count,
+                                  const double* coords,
+                                  hid_t prop,
                                   mhdf_Status* status )
 {
     API_BEGIN;
@@ -170,7 +180,11 @@ void mhdf_readNodeCoords( hid_t table_id, long offset, long count, double* coord
     mhdf_read_data( table_id, offset, count, H5T_NATIVE_DOUBLE, coords, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_readNodeCoordsWithOpt( hid_t table_id, long offset, long count, double* coords, hid_t prop,
+void mhdf_readNodeCoordsWithOpt( hid_t table_id,
+                                 long offset,
+                                 long count,
+                                 double* coords,
+                                 hid_t prop,
                                  mhdf_Status* status )
 {
     API_BEGIN;
@@ -178,15 +192,24 @@ void mhdf_readNodeCoordsWithOpt( hid_t table_id, long offset, long count, double
     API_END;
 }
 
-void mhdf_writeNodeCoord( hid_t table_id, long offset, long count, int dimension, const double* coords,
+void mhdf_writeNodeCoord( hid_t table_id,
+                          long offset,
+                          long count,
+                          int dimension,
+                          const double* coords,
                           mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_column( table_id, dimension, offset, count, H5T_NATIVE_DOUBLE, coords, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_writeNodeCoordWithOpt( hid_t table_id, long offset, long count, int dimension, const double* coords,
-                                 hid_t prop, mhdf_Status* status )
+void mhdf_writeNodeCoordWithOpt( hid_t table_id,
+                                 long offset,
+                                 long count,
+                                 int dimension,
+                                 const double* coords,
+                                 hid_t prop,
+                                 mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_column( table_id, dimension, offset, count, H5T_NATIVE_DOUBLE, coords, prop, status );
@@ -199,7 +222,12 @@ void mhdf_readNodeCoord( hid_t table_id, long offset, long count, int dimension,
     mhdf_read_column( table_id, dimension, offset, count, H5T_NATIVE_DOUBLE, coords, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_readNodeCoordWithOpt( hid_t table_id, long offset, long count, int dimension, double* coords, hid_t prop,
+void mhdf_readNodeCoordWithOpt( hid_t table_id,
+                                long offset,
+                                long count,
+                                int dimension,
+                                double* coords,
+                                hid_t prop,
                                 mhdf_Status* status )
 {
     API_BEGIN;

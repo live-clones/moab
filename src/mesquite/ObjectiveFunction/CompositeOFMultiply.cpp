@@ -88,7 +88,8 @@ void CompositeOFMultiply::initialize_queue( MeshDomainAssoc* mesh_and_domain, co
 }
 
 bool CompositeOFMultiply::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
-                                                               const Settings* settings, PatchSet* user_set,
+                                                               const Settings* settings,
+                                                               PatchSet* user_set,
                                                                MsqError& err )
 {
     bool rval1, rval2;
@@ -112,8 +113,11 @@ bool CompositeOFMultiply::evaluate( EvalType type, PatchData& pd, double& value_
     return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                                  std::vector< Vector3D >& grad_out, MsqError& err )
+bool CompositeOFMultiply::evaluate_with_gradient( EvalType type,
+                                                  PatchData& pd,
+                                                  double& value_out,
+                                                  std::vector< Vector3D >& grad_out,
+                                                  MsqError& err )
 {
     double value_2;
     bool ok;
@@ -139,9 +143,12 @@ bool CompositeOFMultiply::evaluate_with_gradient( EvalType type, PatchData& pd, 
     return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type,
+                                                          PatchData& pd,
+                                                          double& value_out,
                                                           std::vector< Vector3D >& grad_out,
-                                                          std::vector< SymMatrix3D >& diag_out, MsqError& err )
+                                                          std::vector< SymMatrix3D >& diag_out,
+                                                          MsqError& err )
 {
     double value_2;
     bool valid;
@@ -167,7 +174,11 @@ bool CompositeOFMultiply::evaluate_with_Hessian_diagonal( EvalType type, PatchDa
     return true;
 }
 
-bool CompositeOFMultiply::evaluate_with_Hessian( EvalType, PatchData&, double&, std::vector< Vector3D >&, MsqHessian&,
+bool CompositeOFMultiply::evaluate_with_Hessian( EvalType,
+                                                 PatchData&,
+                                                 double&,
+                                                 std::vector< Vector3D >&,
+                                                 MsqHessian&,
                                                  MsqError& err )
 {
     MSQ_SETERR( err )

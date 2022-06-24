@@ -175,14 +175,20 @@ ReaderWriterSet::ReaderWriterSet( Core* mdb ) : mbCore( mdb )
 
 ReaderWriterSet::~ReaderWriterSet() {}
 
-ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer, const char* description,
-                                             const char* const* extensions, const char* name )
+ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader,
+                                             writer_factory_t writer,
+                                             const char* description,
+                                             const char* const* extensions,
+                                             const char* name )
 {
     if( !reader && !writer ) return MB_FAILURE;
 
     // check for duplicate names
     iterator h = handler_by_name( name );
-    if( h != end() ) { MB_SET_ERR( MB_FAILURE, "Conflicting string name for file formats: \"" << name << "\"" ); }
+    if( h != end() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Conflicting string name for file formats: \"" << name << "\"" );
+    }
 
     // count extensions and check for duplicates
     const char* const* iter;
@@ -205,8 +211,11 @@ ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_fac
     return MB_SUCCESS;
 }
 
-ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader, writer_factory_t writer, const char* description,
-                                             const char* extension, const char* name )
+ErrorCode ReaderWriterSet::register_factory( reader_factory_t reader,
+                                             writer_factory_t writer,
+                                             const char* description,
+                                             const char* extension,
+                                             const char* name )
 {
     const char* extensions[2] = { extension, NULL };
     return register_factory( reader, writer, description, extensions, name );
@@ -236,8 +245,12 @@ std::string ReaderWriterSet::extension_from_filename( const std::string& filenam
     return filename.substr( idx + 1 );
 }
 
-ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t write_f, const char* nm, const char* desc,
-                                   const char* const* ext, int num_ext )
+ReaderWriterSet::Handler::Handler( reader_factory_t read_f,
+                                   writer_factory_t write_f,
+                                   const char* nm,
+                                   const char* desc,
+                                   const char* const* ext,
+                                   int num_ext )
     : mReader( read_f ), mWriter( write_f ), mName( nm ), mDescription( desc ), mExtensions( num_ext )
 {
     for( int i = 0; i < num_ext; ++i )
@@ -248,7 +261,8 @@ ReaderWriterSet::Handler::Handler( reader_factory_t read_f, writer_factory_t wri
 #define strcasecmp( A, B ) _stricmp( A, B )
 #endif
 
-ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::string& ext, bool with_reader,
+ReaderWriterSet::iterator ReaderWriterSet::handler_from_extension( const std::string& ext,
+                                                                   bool with_reader,
                                                                    bool with_writer ) const
 {
     iterator iter;

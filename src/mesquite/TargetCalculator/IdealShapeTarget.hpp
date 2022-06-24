@@ -59,7 +59,10 @@ class MESQUITE_EXPORT IdealShapeTarget : public TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+    virtual bool get_surface_target( PatchData& pd,
+                                     size_t element,
+                                     Sample sample,
+                                     MsqMatrix< 3, 2 >& W_out,
                                      MsqError& err );
 
     /**\brief Get a target matrix

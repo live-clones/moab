@@ -14,7 +14,9 @@ class PolyElementSeq : public UnstructuredElemSeq
     {
     }
 
-    PolyElementSeq( EntityHandle shandle, EntityID entity_count, unsigned nodes_per_entity,
+    PolyElementSeq( EntityHandle shandle,
+                    EntityID entity_count,
+                    unsigned nodes_per_entity,
                     EntityID sequence_data_size )
         : UnstructuredElemSeq( shandle, entity_count, nodes_per_entity, sequence_data_size )
     {
@@ -24,11 +26,15 @@ class PolyElementSeq : public UnstructuredElemSeq
 
     virtual EntitySequence* split( EntityHandle here );
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        std::vector< EntityHandle >& connect,
                                         bool topological = false ) const;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
-                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const;
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        EntityHandle const*& connect,
+                                        int& connect_length,
+                                        bool topological                     = false,
+                                        std::vector< EntityHandle >* storage = 0 ) const;
 
   protected:
     PolyElementSeq( PolyElementSeq& split_from, EntityHandle here ) : UnstructuredElemSeq( split_from, here ) {}

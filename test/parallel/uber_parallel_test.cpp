@@ -84,7 +84,7 @@ int main( int argc, char* argv[] )
     if( 1 < argc )
         filename = std::string( argv[1] );
     else
-        filename  = TestDir + "unittest/64bricks_512hex.h5m";
+        filename = TestDir + "unittest/64bricks_512hex.h5m";
 
     //=========== read_delete, geom_dimension, resolve_shared
     option = "PARALLEL=READ_DELETE;PARTITION=GEOM_DIMENSION;PARTITION_VAL=3;PARTITION_DISTRIBUTE;"

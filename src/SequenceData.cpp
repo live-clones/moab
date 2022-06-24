@@ -81,7 +81,9 @@ SequenceData* SequenceData::subset( EntityHandle start, EntityHandle end, const 
     return new SequenceData( this, start, end, sequence_data_sizes );
 }
 
-SequenceData::SequenceData( const SequenceData* from, EntityHandle start, EntityHandle end,
+SequenceData::SequenceData( const SequenceData* from,
+                            EntityHandle start,
+                            EntityHandle end,
                             const int* sequence_data_sizes )
     : numSequenceData( from->numSequenceData ), numTagData( from->numTagData ), startHandle( start ), endHandle( end )
 {
@@ -126,7 +128,9 @@ void SequenceData::move_tag_data( SequenceData* destination, const int* tag_size
         if( !arraySet[i] ) continue;
 
         assert( i <= (unsigned)num_tag_sizes );
-        if( num_tag_sizes ) {}  // empty line to prevent compiler warning
+        if( num_tag_sizes )
+        {
+        }  // empty line to prevent compiler warning
 
         const int tag_size = tag_sizes[i - 1];
         if( !destination->arraySet[i] ) destination->arraySet[i] = malloc( count * tag_size );
@@ -138,7 +142,9 @@ void SequenceData::move_tag_data( SequenceData* destination, const int* tag_size
 void SequenceData::release_tag_data( const int* tag_sizes, int num_tag_sizes )
 {
     assert( num_tag_sizes >= (int)numTagData );
-    if( num_tag_sizes ) {}  // empty line to prevent compiler warning
+    if( num_tag_sizes )
+    {
+    }  // empty line to prevent compiler warning
     for( unsigned i = 0; i < numTagData; ++i )
         release_tag_data( i, tag_sizes[i] );
 }

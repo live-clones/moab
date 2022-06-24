@@ -76,8 +76,11 @@ class ReadNC : public ReaderIface
     static ReaderIface* factory( Interface* );
 
     //! Load an NC file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
     //! Constructor
     ReadNC( Interface* impl = NULL );
@@ -85,8 +88,11 @@ class ReadNC : public ReaderIface
     //! Destructor
     virtual ~ReadNC();
 
-    virtual ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                                       std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    virtual ErrorCode read_tag_values( const char* file_name,
+                                       const char* tag_name,
+                                       const FileOptions& opts,
+                                       std::vector< int >& tag_values_out,
+                                       const SubsetList* subset_list = 0 );
 
     //! ENTLOCNSEDGE for north/south edge
     //! ENTLOCWEEDGE for west/east edge
@@ -139,7 +145,9 @@ class ReadNC : public ReaderIface
     ErrorCode read_header();
 
     //! Get all global attributes in the file
-    ErrorCode get_attributes( int var_id, int num_atts, std::map< std::string, AttData >& atts,
+    ErrorCode get_attributes( int var_id,
+                              int num_atts,
+                              std::map< std::string, AttData >& atts,
                               const char* prefix = "" );
 
     //! Get all dimensions in the file
@@ -148,8 +156,10 @@ class ReadNC : public ReaderIface
     //! Get the variable names and other info defined for this file
     ErrorCode get_variables();
 
-    ErrorCode parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
-                             std::vector< int >& tstep_nums, std::vector< double >& tstep_vals );
+    ErrorCode parse_options( const FileOptions& opts,
+                             std::vector< std::string >& var_names,
+                             std::vector< int >& tstep_nums,
+                             std::vector< double >& tstep_vals );
 
     //------------member variables ------------//
 

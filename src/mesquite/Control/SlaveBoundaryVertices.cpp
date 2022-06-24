@@ -48,7 +48,8 @@ std::string SlaveBoundaryVertices::get_name() const
     return "SlaveBoundaryVertices";
 }
 
-double SlaveBoundaryVertices::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
+double SlaveBoundaryVertices::loop_over_mesh( MeshDomainAssoc* mesh_and_domain,
+                                              const Settings* settings,
                                               MsqError& err )
 {
     Mesh* mesh         = mesh_and_domain->get_mesh();

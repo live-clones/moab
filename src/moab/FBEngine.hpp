@@ -46,22 +46,43 @@ class FBEngine
 
     ErrorCode getEntType( EntityHandle gent, int* type );
 
-    ErrorCode getEntBoundBox( EntityHandle this_gent, double* x0, double* y0, double* z0, double* x1, double* y1,
+    ErrorCode getEntBoundBox( EntityHandle this_gent,
+                              double* x0,
+                              double* y0,
+                              double* z0,
+                              double* x1,
+                              double* y1,
                               double* z1 );
-    ErrorCode getEntClosestPt( EntityHandle this_gent, double x, double y, double z, double* x1, double* y1,
+    ErrorCode getEntClosestPt( EntityHandle this_gent,
+                               double x,
+                               double y,
+                               double z,
+                               double* x1,
+                               double* y1,
                                double* y3 );
 
     ErrorCode getVtxCoord( EntityHandle this_gent, double* x0, double* y0, double* z0 );
 
     ErrorCode gsubtract( EntityHandle entity_set_1, EntityHandle entity_set_2, EntityHandle result_entity_set );
 
-    ErrorCode getEntNrmlXYZ( EntityHandle entity_handle, double x, double y, double z, double* nrml_i, double* nrml_j,
+    ErrorCode getEntNrmlXYZ( EntityHandle entity_handle,
+                             double x,
+                             double y,
+                             double z,
+                             double* nrml_i,
+                             double* nrml_j,
                              double* nrml_k );
 
-    ErrorCode getPntRayIntsct( double x, double y, double z, double dir_x, double dir_y, double dir_z,
+    ErrorCode getPntRayIntsct( double x,
+                               double y,
+                               double z,
+                               double dir_x,
+                               double dir_y,
+                               double dir_z,
                                std::vector< EntityHandle >& intersect_entity_handles,
                                /* int storage_order,*/
-                               std::vector< double >& intersect_coords, std::vector< double >& param_coords );
+                               std::vector< double >& intersect_coords,
+                               std::vector< double >& param_coords );
 
     // some new methods, that are needed
 
@@ -72,10 +93,14 @@ class FBEngine
         return _mbImpl;
     }
 
-    ErrorCode getArrData( const moab::EntityHandle* entity_handles, int entity_handles_size, Tag tag_handle,
+    ErrorCode getArrData( const moab::EntityHandle* entity_handles,
+                          int entity_handles_size,
+                          Tag tag_handle,
                           void* tag_values_out );
 
-    ErrorCode setArrData( const EntityHandle* entity_handles, int entity_handles_size, Tag tag_handle,
+    ErrorCode setArrData( const EntityHandle* entity_handles,
+                          int entity_handles_size,
+                          Tag tag_handle,
                           const void* tag_values );
 
     ErrorCode getEntAdj( EntityHandle handle, int type_requested, Range& adjEnts );
@@ -87,12 +112,35 @@ class FBEngine
     // to do
     ErrorCode getEntNrmlSense( EntityHandle face, EntityHandle region, int& sense );
 
-    ErrorCode getEgEvalXYZ( EntityHandle edge, double x, double y, double z, double& on_x, double& on_y, double& on_z,
-                            double& tngt_i, double& tngt_j, double& tngt_k, double& cvtr_i, double& cvtr_j,
+    ErrorCode getEgEvalXYZ( EntityHandle edge,
+                            double x,
+                            double y,
+                            double z,
+                            double& on_x,
+                            double& on_y,
+                            double& on_z,
+                            double& tngt_i,
+                            double& tngt_j,
+                            double& tngt_k,
+                            double& cvtr_i,
+                            double& cvtr_j,
                             double& cvtr_k );
-    ErrorCode getFcEvalXYZ( EntityHandle face, double x, double y, double z, double& on_x, double& on_y, double& on_z,
-                            double& nrml_i, double& nrml_j, double& nrml_k, double& cvtr1_i, double& cvtr1_j,
-                            double& cvtr1_k, double& cvtr2_i, double& cvtr2_j, double& cvtr2_k );
+    ErrorCode getFcEvalXYZ( EntityHandle face,
+                            double x,
+                            double y,
+                            double z,
+                            double& on_x,
+                            double& on_y,
+                            double& on_z,
+                            double& nrml_i,
+                            double& nrml_j,
+                            double& nrml_k,
+                            double& cvtr1_i,
+                            double& cvtr1_j,
+                            double& cvtr1_k,
+                            double& cvtr2_i,
+                            double& cvtr2_j,
+                            double& cvtr2_k );
 
     ErrorCode getEgVtxSense( EntityHandle edge, EntityHandle vtx1, EntityHandle vtx2, int& sense );
 
@@ -104,17 +152,25 @@ class FBEngine
 
     ErrorCode isEntAdj( EntityHandle entity1, EntityHandle entity2, bool& adjacent_out );
 
-    ErrorCode split_surface_with_direction( EntityHandle face, std::vector< double >& xyz, double* direction,
-                                            int closed, double min_dot, EntityHandle& oNewFace );
+    ErrorCode split_surface_with_direction( EntityHandle face,
+                                            std::vector< double >& xyz,
+                                            double* direction,
+                                            int closed,
+                                            double min_dot,
+                                            EntityHandle& oNewFace );
     // these new points will be on edges or triangles, if in interior of triangles
-    ErrorCode split_surface( EntityHandle face, std::vector< EntityHandle >& chainedEdges,
-                             std::vector< EntityHandle >& splittingNodes, EntityHandle& newFace );
+    ErrorCode split_surface( EntityHandle face,
+                             std::vector< EntityHandle >& chainedEdges,
+                             std::vector< EntityHandle >& splittingNodes,
+                             EntityHandle& newFace );
 
     ErrorCode split_edge_at_point( EntityHandle edge, CartVect& point, EntityHandle& new_edge );
 
     ErrorCode split_edge_at_mesh_node( EntityHandle edge, EntityHandle node, EntityHandle& new_edge );
 
-    ErrorCode split_bedge_at_new_mesh_node( EntityHandle b_edge, EntityHandle atNode, EntityHandle brokenEdge,
+    ErrorCode split_bedge_at_new_mesh_node( EntityHandle b_edge,
+                                            EntityHandle atNode,
+                                            EntityHandle brokenEdge,
                                             EntityHandle& new_edge );
     // helper for cleaning the stuff
     // will be called if the topology is modified
@@ -129,13 +185,17 @@ class FBEngine
         return this->_my_geomTopoTool;
     }
 
-    ErrorCode create_volume_with_direction( EntityHandle newFace1, EntityHandle newFace2, double* direction,
+    ErrorCode create_volume_with_direction( EntityHandle newFace1,
+                                            EntityHandle newFace2,
+                                            double* direction,
                                             EntityHandle& volume );
 
     // get nodes from edge in order
     ErrorCode get_nodes_from_edge( EntityHandle gedge, std::vector< EntityHandle >& nodes );
 
-    ErrorCode weave_lateral_face_from_edges( EntityHandle bEdge, EntityHandle tEdge, double* direction,
+    ErrorCode weave_lateral_face_from_edges( EntityHandle bEdge,
+                                             EntityHandle tEdge,
+                                             double* direction,
                                              EntityHandle& newLatFace );
 
     // chain "chain"-able edges
@@ -165,14 +225,25 @@ class FBEngine
 
     ErrorCode getAdjacentEntities( const EntityHandle from, const int to_dim, Range& adj_ents );
 
-    ErrorCode compute_intersection_points( EntityHandle& face, EntityHandle from, EntityHandle to, CartVect& Dir,
-                                           std::vector< CartVect >& points, std::vector< EntityHandle >& entities,
+    ErrorCode compute_intersection_points( EntityHandle& face,
+                                           EntityHandle from,
+                                           EntityHandle to,
+                                           CartVect& Dir,
+                                           std::vector< CartVect >& points,
+                                           std::vector< EntityHandle >& entities,
                                            std::vector< EntityHandle >& triangles );
 
-    ErrorCode BreakTriangle( EntityHandle tri, EntityHandle e1, EntityHandle e3, EntityHandle n1, EntityHandle n2,
+    ErrorCode BreakTriangle( EntityHandle tri,
+                             EntityHandle e1,
+                             EntityHandle e3,
+                             EntityHandle n1,
+                             EntityHandle n2,
                              EntityHandle n3 );  // nodesAlongPolyline are on entities!
 
-    ErrorCode BreakTriangle2( EntityHandle tri, EntityHandle e1, EntityHandle e2, EntityHandle n1,
+    ErrorCode BreakTriangle2( EntityHandle tri,
+                              EntityHandle e1,
+                              EntityHandle e2,
+                              EntityHandle n1,
                               EntityHandle n2 );  // nodesAlongPolyline are on entities!
 
     void print_debug_triangle( EntityHandle triangle );
@@ -195,7 +266,8 @@ class FBEngine
     // only the new geo edge (splitting) will be part of both, with the
     // orientation already decided
     //
-    ErrorCode redistribute_boundary_edges_to_faces( EntityHandle face, EntityHandle newFace,
+    ErrorCode redistribute_boundary_edges_to_faces( EntityHandle face,
+                                                    EntityHandle newFace,
                                                     std::vector< EntityHandle >& chainedEdges );
 
     // used as a way to isolate the faces after splitting

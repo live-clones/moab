@@ -93,7 +93,9 @@ C_FUNC_DEF double v_pyramid_volume( int num_nodes, double coordinates[][3] )
     return (double)volume;
 }
 
-C_FUNC_DEF void v_pyramid_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_pyramid_quality( int num_nodes,
+                                   double coordinates[][3],
+                                   unsigned int metrics_request_flag,
                                    PyramidMetricVals* metric_vals )
 {
     memset( metric_vals, 0, sizeof( PyramidMetricVals ) );

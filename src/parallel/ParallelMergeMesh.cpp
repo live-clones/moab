@@ -45,7 +45,10 @@ ErrorCode ParallelMergeMesh::PerformMerge( EntityHandle levelset, bool skip_loca
     // Get the local skin elements
     rval = PopulateMySkinEnts( levelset, dim, skip_local_merge );
     // If there is only 1 proc, we can return now
-    if( rval != MB_SUCCESS || myPcomm->size() == 1 ) { return rval; }
+    if( rval != MB_SUCCESS || myPcomm->size() == 1 )
+    {
+        return rval;
+    }
 
     // Determine the global bounding box
     double gbox[6];
@@ -113,7 +116,10 @@ ErrorCode ParallelMergeMesh::PopulateMySkinEnts( const EntityHandle meshset, int
         MergeMesh merger( myMB, false );
         merger.merge_entities( ents, myEps );
         // We can return if there is only 1 proc
-        if( rval != MB_SUCCESS || myPcomm->size() == 1 ) { return rval; }
+        if( rval != MB_SUCCESS || myPcomm->size() == 1 )
+        {
+            return rval;
+        }
 
         // Rebuild the ents range
         ents.clear();
@@ -353,7 +359,10 @@ ErrorCode ParallelMergeMesh::PartitionGlobalBox( double* gbox, double* lengths, 
 int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned numProcs, bool altRatio )
 {
     // If theres only 1 processor, then just return 1
-    if( numProcs == 1 ) { return 1; }
+    if( numProcs == 1 )
+    {
+        return 1;
+    }
     // Initialize with the ratio of 1 proc
     double ratio    = -DBL_MAX;
     unsigned factor = 1;
@@ -398,7 +407,10 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
             factor = i;
             // Once we have passed the goal ratio, we can break since we'll only move away from the
             // goal ratio
-            if( ratio >= goalRatio ) { break; }
+            if( ratio >= goalRatio )
+            {
+                break;
+            }
         }
     }
     // If we haven't reached the goal ratio yet, check out factor = numProcs
@@ -411,7 +423,10 @@ int ParallelMergeMesh::PartitionSide( double sideLen, double restLen, unsigned n
     }
 
     // Figure out if our oldRatio is better than ratio
-    if( fabs( ratio - goalRatio ) > fabs( oldRatio - goalRatio ) ) { factor = oldFactor; }
+    if( fabs( ratio - goalRatio ) > fabs( oldRatio - goalRatio ) )
+    {
+        factor = oldFactor;
+    }
     // Return our findings
     return factor;
 }
@@ -439,9 +454,15 @@ ErrorCode ParallelMergeMesh::PopulateMyMatches()
         {
             j++;
             tup_r += tup_mr;
-            if( j >= myTup.get_n() ) { break; }
+            if( j >= myTup.get_n() )
+            {
+                break;
+            }
             CartVect cv( myTup.vr_rd[tup_r] - xi, myTup.vr_rd[tup_r + 1] - yi, myTup.vr_rd[tup_r + 2] - zi );
-            if( cv.length_squared() > eps2 ) { done = true; }
+            if( cv.length_squared() > eps2 )
+            {
+                done = true;
+            }
         }
         // Allocate the tuple list before adding matches
         while( myMatches.get_n() + ( j - i ) * ( j - i - 1 ) >= myMatches.get_max() )
@@ -515,7 +536,10 @@ ErrorCode ParallelMergeMesh::TagSharedElements( int dim )
     {
         Range tmp_ents;
         rval = myMB->get_entities_by_handle( *rit, tmp_ents, true );
-        if( MB_SUCCESS != rval ) { return rval; }
+        if( MB_SUCCESS != rval )
+        {
+            return rval;
+        }
         proc_ents.merge( tmp_ents );
     }
     if( myMB->dimension_from_handle( *proc_ents.rbegin() ) != myMB->dimension_from_handle( *proc_ents.begin() ) )
@@ -534,29 +558,47 @@ ErrorCode ParallelMergeMesh::TagSharedElements( int dim )
     std::map< std::vector< int >, std::vector< EntityHandle > > proc_nranges;
     Range proc_verts;
     rval = myMB->get_adjacencies( proc_ents, 0, false, proc_verts, Interface::UNION );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
 
     rval = myPcomm->tag_shared_verts( myMatches, proc_nranges, proc_verts );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
 
     // get entities shared by 1 or n procs
     rval = myPcomm->get_proc_nvecs( dim, dim - 1, &mySkinEnts[0], proc_nranges );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
 
     // create the sets for each interface; store them as tags on
     // the interface instance
     Range iface_sets;
     rval = myPcomm->create_interface_sets( proc_nranges );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     // establish comm procs and buffers for them
     std::set< unsigned int > procs;
     rval = myPcomm->get_interface_procs( procs, true );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
 
     // resolve shared entity remote handles; implemented in ghost cell exchange
     // code because it's so similar
     rval = myPcomm->exchange_ghost_cells( -1, -1, 0, true, true );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     // now build parent/child links for interface sets
     rval = myPcomm->create_iface_pc_links();
     return rval;
@@ -640,11 +682,17 @@ void ParallelMergeMesh::SwapTuples( TupleList& tup, unsigned long a, unsigned lo
 
 // Perform the sorting of a tuple by real
 // To sort an entire tuple_list, call (tup,0,tup.n,epsilon)
-void ParallelMergeMesh::PerformRealSort( TupleList& tup, unsigned long left, unsigned long right, double eps,
+void ParallelMergeMesh::PerformRealSort( TupleList& tup,
+                                         unsigned long left,
+                                         unsigned long right,
+                                         double eps,
                                          uint tup_mr )
 {
     // If list size is only 1 or 0 return
-    if( left + 1 >= right ) { return; }
+    if( left + 1 >= right )
+    {
+        return;
+    }
     unsigned long swap = left, tup_l = left * tup_mr, tup_t = tup_l + tup_mr;
 
     // Swap the median with the left position for a (hopefully) better split
@@ -671,7 +719,10 @@ void ParallelMergeMesh::PerformRealSort( TupleList& tup, unsigned long left, uns
 }
 
 // Note, this takes the actual tup.vr[] index (aka i*tup.mr)
-bool ParallelMergeMesh::TupleGreaterThan( TupleList& tup, unsigned long vrI, unsigned long vrJ, double eps,
+bool ParallelMergeMesh::TupleGreaterThan( TupleList& tup,
+                                          unsigned long vrI,
+                                          unsigned long vrJ,
+                                          double eps,
                                           uint tup_mr )
 {
     unsigned check = 0;

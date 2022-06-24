@@ -106,7 +106,8 @@ ErrorCode SharedSetData::get_owner( EntityHandle entity_set, unsigned& rank_out,
     return MB_SUCCESS;
 }
 
-ErrorCode SharedSetData::get_local_handle( unsigned owner_rank, EntityHandle remote_handle,
+ErrorCode SharedSetData::get_local_handle( unsigned owner_rank,
+                                           EntityHandle remote_handle,
                                            EntityHandle& local_handle ) const
 {
     RHMap::const_iterator i = handleMap.find( owner_rank );
@@ -137,7 +138,10 @@ ErrorCode SharedSetData::set_owner( EntityHandle set, unsigned owner_rank, Entit
     if( data.ownerHandle )
     {
         RHMap::iterator i = handleMap.find( data.ownerRank );
-        if( i != handleMap.end() ) { i->second.erase( data.ownerHandle, 1 ); }
+        if( i != handleMap.end() )
+        {
+            i->second.erase( data.ownerHandle, 1 );
+        }
     }
 
     data.ownerRank   = owner_rank;

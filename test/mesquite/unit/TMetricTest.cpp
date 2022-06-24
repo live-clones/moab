@@ -166,7 +166,10 @@ class HessTestMetricRel_2 : public TMetric
         return true;
     }
 
-    bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& d, MsqMatrix< 2, 2 > d2[3],
+    bool evaluate_with_hess( const MsqMatrix< 2, 2 >& T,
+                             double& result,
+                             MsqMatrix< 2, 2 >& d,
+                             MsqMatrix< 2, 2 > d2[3],
                              MsqError& err )
     {
         result = Frobenius( T );
@@ -195,7 +198,10 @@ class HessTestMetricRel_2 : public TMetric
         return true;
     }
 
-    bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& d, MsqMatrix< 3, 3 > d2[6],
+    bool evaluate_with_hess( const MsqMatrix< 3, 3 >& T,
+                             double& result,
+                             MsqMatrix< 3, 3 >& d,
+                             MsqMatrix< 3, 3 > d2[6],
                              MsqError& err )
     {
         result = Frobenius( T );

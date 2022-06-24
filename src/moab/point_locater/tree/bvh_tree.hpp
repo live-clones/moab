@@ -80,10 +80,11 @@ namespace
         template < typename Iterator >
         class Iterator_comparator
         {
-          // deprecation of binary_function
-          typedef Iterator first_argument_type;
-          typedef Iterator second_argument_type;
-          typedef bool result_type;
+            // deprecation of binary_function
+            typedef Iterator first_argument_type;
+            typedef Iterator second_argument_type;
+            typedef bool result_type;
+
           public:
             bool operator()( const Iterator& a, const Iterator& b ) const
             {
@@ -263,7 +264,9 @@ class Bvh_tree
     }
 
     template < typename Iterator, typename Bounding_box, typename Buckets >
-    void establish_buckets( const Iterator begin, const Iterator end, const Bounding_box& interval,
+    void establish_buckets( const Iterator begin,
+                            const Iterator end,
+                            const Bounding_box& interval,
                             Buckets& buckets ) const
     {
         // put each element into its bucket
@@ -274,7 +277,10 @@ class Bvh_tree
             {
                 const std::size_t index = bucket_index( box, interval, dim );
                 _bvh::_Bucket& bucket   = buckets[dim][index];
-                if( bucket.size > 0 ) { ct::update_bounding_box( bucket.bounding_box, box ); }
+                if( bucket.size > 0 )
+                {
+                    ct::update_bounding_box( bucket.bounding_box, box );
+                }
                 else
                 {
                     bucket.bounding_box = box;
@@ -319,7 +325,10 @@ class Bvh_tree
             std::size_t j               = 0;
             for( Bucket_iterator i = buckets_.begin(); i != buckets_.end(); ++i, ++j )
             {
-                if( i->size > 0 ) { nonempty.push_back( j ); }
+                if( i->size > 0 )
+                {
+                    nonempty.push_back( j );
+                }
             }
             Bounding_box test_box = buckets_[nonempty.front()].bounding_box;
             for( std::size_t i = 0; i < nonempty.size(); ++i )
@@ -522,7 +531,10 @@ class Bvh_tree
         initialize_splits( splits, buckets, data );
         choose_best_split( splits, data );
         const bool use_median = ( 0 == data.nl ) || ( data.nr == 0 );
-        if( !use_median ) { order_elements( begin, end, data ); }
+        if( !use_median )
+        {
+            order_elements( begin, end, data );
+        }
         else
         {
             median_order( begin, end, data );
@@ -556,7 +568,10 @@ class Bvh_tree
                 }
                 if( !box_contains_box( data.right_box, ( *i )->second.first ) )
                 {
-                    if( !issue ) { std::cerr << "Bounding right box issue!" << std::endl; }
+                    if( !issue )
+                    {
+                        std::cerr << "Bounding right box issue!" << std::endl;
+                    }
                     issue = true;
                 }
             }
@@ -574,7 +589,10 @@ class Bvh_tree
                 }
                 if( !box_contains_box( data.left_box, ( *i )->second.first ) )
                 {
-                    if( !issue ) { std::cerr << "Bounding left box issue!" << std::endl; }
+                    if( !issue )
+                    {
+                        std::cerr << "Bounding left box issue!" << std::endl;
+                    }
                     issue = true;
                 }
                 if( seen_one )
@@ -669,7 +687,10 @@ class Bvh_tree
                 if( ct::box_contains_point( i->first, point, tol ) )
                 {
                     const std::pair< bool, Vector > r = entity_contains( moab, i->second, point );
-                    if( r.first ) { return result = std::make_pair( i->second, r.second ); }
+                    if( r.first )
+                    {
+                        return result = std::make_pair( i->second, r.second );
+                    }
                 }
             }
             result = Result( 0, point );
@@ -679,7 +700,10 @@ class Bvh_tree
         // 0 < Rmin - Lmax < 2tol
         if( ( node.Lmax + tol ) < ( node.Rmin - tol ) )
         {
-            if( point[node.dim] <= ( node.Lmax + tol ) ) { return _find_point( point, node.child, tol, result ); }
+            if( point[node.dim] <= ( node.Lmax + tol ) )
+            {
+                return _find_point( point, node.child, tol, result );
+            }
             else if( point[node.dim] >= ( node.Rmin - tol ) )
             {
                 return _find_point( point, node.child + 1, tol, result );
@@ -715,7 +739,10 @@ class Bvh_tree
         //				(node.Lmax - point[ node.dim]);
         bool dir = false;
         _find_point( point, node.child + dir, tol, result );
-        if( result.first == 0 ) { return _find_point( point, node.child + ( !dir ), tol, result ); }
+        if( result.first == 0 )
+        {
+            return _find_point( point, node.child + ( !dir ), tol, result );
+        }
         return result;
     }
 
@@ -746,7 +773,10 @@ class Bvh_tree
                     if( ct::box_contains_point( j->first, point, tol ) )
                     {
                         const std::pair< bool, Vector > result = entity_contains( moab, j->second, point );
-                        if( result.first ) { return j->second; }
+                        if( result.first )
+                        {
+                            return j->second;
+                        }
                     }
                 }
             }

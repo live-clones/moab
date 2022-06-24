@@ -48,10 +48,15 @@ struct ElemInfo
 };
 
 //! Writes out a file
-ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite, const FileOptions& options,
-                                 const EntityHandle* output_list, const int num_sets,
-                                 const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
-                                 int /* num_tags */, int /* export_dimension */ )
+ErrorCode WriteGmsh::write_file( const char* file_name,
+                                 const bool overwrite,
+                                 const FileOptions& options,
+                                 const EntityHandle* output_list,
+                                 const int num_sets,
+                                 const std::vector< std::string >& /* qa_list */,
+                                 const Tag* /* tag_list */,
+                                 int /* num_tags */,
+                                 int /* export_dimension */ )
 {
     ErrorCode rval;
     Tag global_id = 0, block_tag = 0, geom_tag = 0, prtn_tag = 0;
@@ -128,7 +133,10 @@ ErrorCode WriteGmsh::write_file( const char* file_name, const bool overwrite, co
         }
     }
 
-    if( elements.empty() ) { MB_SET_ERR( MB_ENTITY_NOT_FOUND, "Nothing to write" ); }
+    if( elements.empty() )
+    {
+        MB_SET_ERR( MB_ENTITY_NOT_FOUND, "Nothing to write" );
+    }
 
     // Get global IDs for all elements.
     // First try to get from tag.  If tag is not defined or not set

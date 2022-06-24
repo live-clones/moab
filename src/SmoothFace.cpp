@@ -396,8 +396,13 @@ ErrorCode SmoothFace::compute_tangents_for_each_edge()
 // Member Type:  PRIVATE
 // Description:  compute the control points for an edge
 //===========================================================================
-ErrorCode SmoothFace::init_edge_control_points( CartVect& P0, CartVect& P3, CartVect& N0, CartVect& N3, CartVect& T0,
-                                                CartVect& T3, CartVect* Pi )
+ErrorCode SmoothFace::init_edge_control_points( CartVect& P0,
+                                                CartVect& P3,
+                                                CartVect& N0,
+                                                CartVect& N3,
+                                                CartVect& T0,
+                                                CartVect& T3,
+                                                CartVect* Pi )
 {
     CartVect Vi[4];
     Vi[0] = P0;
@@ -428,7 +433,8 @@ ErrorCode SmoothFace::init_edge_control_points( CartVect& P0, CartVect& P3, Cart
     return MB_SUCCESS;
 }
 
-ErrorCode SmoothFace::find_edges_orientations( EntityHandle edges[3], const EntityHandle* conn3,
+ErrorCode SmoothFace::find_edges_orientations( EntityHandle edges[3],
+                                               const EntityHandle* conn3,
                                                int orient[3] )  // maybe we will set it?
 {
     // find the edge that is adjacent to 2 vertices at a time
@@ -893,7 +899,9 @@ ErrorCode SmoothFace::eval_bezier_patch( EntityHandle tri, CartVect& areacoord, 
 // Member Type:  PUBLIC
 // Descriptoin:  Project a point to the plane of a facet
 //===========================================================================
-void SmoothFace::project_to_facet_plane( EntityHandle tri, CartVect& pt, CartVect& point_on_plane,
+void SmoothFace::project_to_facet_plane( EntityHandle tri,
+                                         CartVect& pt,
+                                         CartVect& point_on_plane,
                                          double& dist_to_plane )
 {
     double plane[4];
@@ -925,19 +933,25 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
     int nnodes                = 0;
     ErrorCode rval            = _mb->get_connectivity( facet, conn3, nnodes );
     assert( MB_SUCCESS == rval );
-    if( rval ) {}  // empty statement to prevent compiler warning
+    if( rval )
+    {
+    }  // empty statement to prevent compiler warning
 
     // double coords[9]; // store the coordinates for the nodes
     //_mb->get_coords(conn3, 3, coords);
     CartVect p[3];
     rval = _mb->get_coords( conn3, 3, (double*)&p[0] );
     assert( MB_SUCCESS == rval );
-    if( rval ) {}  // empty statement to prevent compiler warning
+    if( rval )
+    {
+    }  // empty statement to prevent compiler warning
     double plane[4];
 
     rval = _mb->tag_get_data( _planeTag, &facet, 1, plane );
     assert( rval == MB_SUCCESS );
-    if( rval ) {}                  // empty statement to prevent compiler warning
+    if( rval )
+    {
+    }                              // empty statement to prevent compiler warning
     CartVect normal( &plane[0] );  // just first 3 components are used
 
     double area2;
@@ -948,7 +962,10 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
     CartVect v2( p[2] - p[0] );
 
     area2 = ( v1 * v2 ).length_squared();  // the same for CartVect
-    if( area2 < 100 * tol ) { tol = .01 * area2; }
+    if( area2 < 100 * tol )
+    {
+        tol = .01 * area2;
+    }
     CartVect absnorm( fabs( normal[0] ), fabs( normal[1] ), fabs( normal[2] ) );
 
     // project to the closest coordinate plane so we only have to do this in 2D
@@ -1055,8 +1072,11 @@ void SmoothFace::facet_area_coordinate( EntityHandle facet, CartVect& pt_on_plan
     }
 }
 
-ErrorCode SmoothFace::project_to_facets_main( CartVect& this_point, bool trim, bool& outside,
-                                              CartVect* closest_point_ptr, CartVect* normal_ptr )
+ErrorCode SmoothFace::project_to_facets_main( CartVect& this_point,
+                                              bool trim,
+                                              bool& outside,
+                                              CartVect* closest_point_ptr,
+                                              CartVect* normal_ptr )
 {
 
     // if there are a lot of facets on this surface - use the OBB search first
@@ -1078,9 +1098,15 @@ ErrorCode SmoothFace::project_to_facets_main( CartVect& this_point, bool trim, b
 
     return rval;
 }
-ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list, EntityHandle& lastFacet,
-                                         int interpOrder, double compareTol, CartVect& this_point, bool, bool& outside,
-                                         CartVect* closest_point_ptr, CartVect* normal_ptr )
+ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list,
+                                         EntityHandle& lastFacet,
+                                         int interpOrder,
+                                         double compareTol,
+                                         CartVect& this_point,
+                                         bool,
+                                         bool& outside,
+                                         CartVect* closest_point_ptr,
+                                         CartVect* normal_ptr )
 {
 
     bool outside_facet      = false;
@@ -1129,7 +1155,10 @@ ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list
             best_areacoord     = areacoord;
             best_outside_facet = outside_facet;
 
-            if( dist < compareTol ) { break; }
+            if( dist < compareTol )
+            {
+                break;
+            }
             big_dist = 10.0 * mindist;
         }
         // facet->marked(1);
@@ -1139,11 +1168,17 @@ ErrorCode SmoothFace::project_to_facets( std::vector< EntityHandle >& facet_list
     if( normal_ptr )
     {
         CartVect normal;
-        if( eval_bezier_patch_normal( best_facet, best_areacoord, normal ) != MB_SUCCESS ) { return MB_FAILURE; }
+        if( eval_bezier_patch_normal( best_facet, best_areacoord, normal ) != MB_SUCCESS )
+        {
+            return MB_FAILURE;
+        }
         *normal_ptr = normal;
     }
 
-    if( closest_point_ptr ) { *closest_point_ptr = best_point; }
+    if( closest_point_ptr )
+    {
+        *closest_point_ptr = best_point;
+    }
 
     outside   = best_outside_facet;
     lastFacet = best_facet;
@@ -1226,7 +1261,10 @@ ErrorCode SmoothFace::project_to_patch( EntityHandle facet,   // (IN) the facet 
         // coordinates to use and compute the third.
 
         int system;
-        if( lastac[0] >= lastac[1] && lastac[0] >= lastac[2] ) { system = 0; }
+        if( lastac[0] >= lastac[1] && lastac[0] >= lastac[2] )
+        {
+            system = 0;
+        }
         else if( lastac[1] >= lastac[2] )
         {
             system = 1;
@@ -1323,14 +1361,20 @@ ErrorCode SmoothFace::project_to_patch( EntityHandle facet,   // (IN) the facet 
         else if( absnorm[1] >= absnorm[2] && absnorm[1] >= absnorm[0] )
         {
             det = du[0] * dv[2] - dv[0] * du[2];
-            if( fabs( det ) <= DBL_EPSILON ) { return MB_FAILURE; }
+            if( fabs( det ) <= DBL_EPSILON )
+            {
+                return MB_FAILURE;
+            }
             umove = ( move[0] * dv[2] - dv[0] * move[2] ) / det;
             vmove = ( du[0] * move[2] - move[0] * du[2] ) / det;
         }
         else
         {
             det = du[1] * dv[2] - dv[1] * du[2];
-            if( fabs( det ) <= DBL_EPSILON ) { return MB_FAILURE; }
+            if( fabs( det ) <= DBL_EPSILON )
+            {
+                return MB_FAILURE;
+            }
             umove = ( move[1] * dv[2] - dv[1] * move[2] ) / det;
             vmove = ( du[1] * move[2] - move[1] * du[2] ) / det;
         }
@@ -1358,7 +1402,10 @@ ErrorCode SmoothFace::project_to_patch( EntityHandle facet,   // (IN) the facet 
 
         // Keep it inside the patch
 
-        if( newac[0] >= -atol && newac[1] >= -atol && newac[2] >= -atol ) { nout = 0; }
+        if( newac[0] >= -atol && newac[1] >= -atol && newac[2] >= -atol )
+        {
+            nout = 0;
+        }
         else
         {
             if( move_ac_inside( newac, atol ) ) nout++;
@@ -1413,7 +1460,10 @@ ErrorCode SmoothFace::project_to_patch( EntityHandle facet,   // (IN) the facet 
             // Check if we are continuing to project outside the facet.
             // If so, then stop now
 
-            if( nout > 3 ) { done = true; }
+            if( nout > 3 )
+            {
+                done = true;
+            }
 
             // set up for next iteration
 
@@ -1435,7 +1485,10 @@ ErrorCode SmoothFace::project_to_patch( EntityHandle facet,   // (IN) the facet 
     }
 
     eval_pt = bestpt;
-    if( eval_norm ) { *eval_norm = bestnorm; }
+    if( eval_norm )
+    {
+        *eval_norm = bestnorm;
+    }
     outside = ( nout > 0 ) ? true : false;
     ac      = bestac;
 
@@ -1489,8 +1542,12 @@ void SmoothFace::ac_at_edge( CartVect& fac,  // facet area coordinate
 // Description:  project to a single facet.  Uses the input areacoord as
 //              a starting guess.
 //===========================================================================
-ErrorCode SmoothFace::project_to_facet( EntityHandle facet, CartVect& pt, CartVect& areacoord, CartVect& close_point,
-                                        bool& outside_facet, double compare_tol )
+ErrorCode SmoothFace::project_to_facet( EntityHandle facet,
+                                        CartVect& pt,
+                                        CartVect& areacoord,
+                                        CartVect& close_point,
+                                        bool& outside_facet,
+                                        double compare_tol )
 {
     const EntityHandle* conn3 = NULL;
     int nnodes                = 0;
@@ -1545,7 +1602,10 @@ bool SmoothFace::is_at_vertex( EntityHandle facet,        // (IN) facet we are e
         if( dist <= compare_tol )
         {
             eval_pt = vert_loc;
-            if( eval_norm_ptr ) { *eval_norm_ptr = NN[2]; }
+            if( eval_norm_ptr )
+            {
+                *eval_norm_ptr = NN[2];
+            }
             return true;
         }
     }
@@ -1572,7 +1632,10 @@ bool SmoothFace::is_at_vertex( EntityHandle facet,        // (IN) facet we are e
         if( dist <= compare_tol )
         {
             eval_pt = vert_loc;
-            if( eval_norm_ptr ) { *eval_norm_ptr = NN[0]; }
+            if( eval_norm_ptr )
+            {
+                *eval_norm_ptr = NN[0];
+            }
             return true;
         }
     }

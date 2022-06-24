@@ -34,19 +34,22 @@ int ncFile;
 
 #define INS_ID( stringvar, prefix, id ) sprintf( stringvar, prefix, id )
 
-#define GET_DIM( ncdim, name, val )                                                                             \
-    {                                                                                                           \
-        int gdfail = nc_inq_dimid( ncFile, name, &( ncdim ) );                                                  \
-        if( NC_NOERR == gdfail )                                                                                \
-        {                                                                                                       \
-            size_t tmp_val;                                                                                     \
-            gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                                                  \
-            if( NC_NOERR != gdfail ) { MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" ); } \
-            else                                                                                                \
-                ( val ) = tmp_val;                                                                              \
-        }                                                                                                       \
-        else                                                                                                    \
-            ( val ) = 0;                                                                                        \
+#define GET_DIM( ncdim, name, val )                                                    \
+    {                                                                                  \
+        int gdfail = nc_inq_dimid( ncFile, name, &( ncdim ) );                         \
+        if( NC_NOERR == gdfail )                                                       \
+        {                                                                              \
+            size_t tmp_val;                                                            \
+            gdfail = nc_inq_dimlen( ncFile, ncdim, &tmp_val );                         \
+            if( NC_NOERR != gdfail )                                                   \
+            {                                                                          \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" ); \
+            }                                                                          \
+            else                                                                       \
+                ( val ) = tmp_val;                                                     \
+        }                                                                              \
+        else                                                                           \
+            ( val ) = 0;                                                               \
     }
 
 #define GET_DIMB( ncdim, name, varname, id, val ) \
@@ -73,60 +76,69 @@ int ncFile;
         }                                                                                        \
     }
 
-#define GET_1D_INT_VAR( name, id, vals )                                                                        \
-    {                                                                                                           \
-        GET_VAR( name, id, vals );                                                                              \
-        if( -1 != ( id ) )                                                                                      \
-        {                                                                                                       \
-            size_t ntmp;                                                                                        \
-            int ivfail = nc_inq_dimlen( ncFile, ( vals )[0], &ntmp );                                           \
-            if( NC_NOERR != ivfail ) { MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" ); } \
-            ( vals ).resize( ntmp );                                                                            \
-            size_t ntmp1 = 0;                                                                                   \
-            ivfail       = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                          \
-            if( NC_NOERR != ivfail )                                                                            \
-            {                                                                                                   \
-                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) );                  \
-            }                                                                                                   \
-        }                                                                                                       \
+#define GET_1D_INT_VAR( name, id, vals )                                                       \
+    {                                                                                          \
+        GET_VAR( name, id, vals );                                                             \
+        if( -1 != ( id ) )                                                                     \
+        {                                                                                      \
+            size_t ntmp;                                                                       \
+            int ivfail = nc_inq_dimlen( ncFile, ( vals )[0], &ntmp );                          \
+            if( NC_NOERR != ivfail )                                                           \
+            {                                                                                  \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" );         \
+            }                                                                                  \
+            ( vals ).resize( ntmp );                                                           \
+            size_t ntmp1 = 0;                                                                  \
+            ivfail       = nc_get_vara_int( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );         \
+            if( NC_NOERR != ivfail )                                                           \
+            {                                                                                  \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) ); \
+            }                                                                                  \
+        }                                                                                      \
     }
 
-#define GET_1D_DBL_VAR( name, id, vals )                                                                        \
-    {                                                                                                           \
-        std::vector< int > dum_dims;                                                                            \
-        GET_VAR( name, id, dum_dims );                                                                          \
-        if( -1 != ( id ) )                                                                                      \
-        {                                                                                                       \
-            size_t ntmp;                                                                                        \
-            int dvfail = nc_inq_dimlen( ncFile, dum_dims[0], &ntmp );                                           \
-            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" ); } \
-            ( vals ).resize( ntmp );                                                                            \
-            size_t ntmp1 = 0;                                                                                   \
-            dvfail       = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                       \
-            if( NC_NOERR != dvfail )                                                                            \
-            {                                                                                                   \
-                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) );                  \
-            }                                                                                                   \
-        }                                                                                                       \
+#define GET_1D_DBL_VAR( name, id, vals )                                                       \
+    {                                                                                          \
+        std::vector< int > dum_dims;                                                           \
+        GET_VAR( name, id, dum_dims );                                                         \
+        if( -1 != ( id ) )                                                                     \
+        {                                                                                      \
+            size_t ntmp;                                                                       \
+            int dvfail = nc_inq_dimlen( ncFile, dum_dims[0], &ntmp );                          \
+            if( NC_NOERR != dvfail )                                                           \
+            {                                                                                  \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" );         \
+            }                                                                                  \
+            ( vals ).resize( ntmp );                                                           \
+            size_t ntmp1 = 0;                                                                  \
+            dvfail       = nc_get_vara_double( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );      \
+            if( NC_NOERR != dvfail )                                                           \
+            {                                                                                  \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) ); \
+            }                                                                                  \
+        }                                                                                      \
     }
 
-#define GET_1D_FLT_VAR( name, id, vals )                                                                        \
-    {                                                                                                           \
-        std::vector< int > dum_dims;                                                                            \
-        GET_VAR( name, id, dum_dims );                                                                          \
-        if( -1 != ( id ) )                                                                                      \
-        {                                                                                                       \
-            size_t ntmp;                                                                                        \
-            int dvfail = nc_inq_dimlen( ncFile, dum_dims[0], &ntmp );                                           \
-            if( NC_NOERR != dvfail ) { MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" ); } \
-            ( vals ).resize( ntmp );                                                                            \
-            size_t ntmp1 = 0;                                                                                   \
-            dvfail       = nc_get_vara_float( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );                        \
-            if( NC_NOERR != dvfail )                                                                            \
-            {                                                                                                   \
-                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) );                  \
-            }                                                                                                   \
-        }                                                                                                       \
+#define GET_1D_FLT_VAR( name, id, vals )                                                       \
+    {                                                                                          \
+        std::vector< int > dum_dims;                                                           \
+        GET_VAR( name, id, dum_dims );                                                         \
+        if( -1 != ( id ) )                                                                     \
+        {                                                                                      \
+            size_t ntmp;                                                                       \
+            int dvfail = nc_inq_dimlen( ncFile, dum_dims[0], &ntmp );                          \
+            if( NC_NOERR != dvfail )                                                           \
+            {                                                                                  \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension length" );         \
+            }                                                                                  \
+            ( vals ).resize( ntmp );                                                           \
+            size_t ntmp1 = 0;                                                                  \
+            dvfail       = nc_get_vara_float( ncFile, id, &ntmp1, &ntmp, &( vals )[0] );       \
+            if( NC_NOERR != dvfail )                                                           \
+            {                                                                                  \
+                MB_SET_ERR( MB_FAILURE, "addncdata:: Problem getting variable " << ( name ) ); \
+            }                                                                                  \
+        }                                                                                      \
     }
 
 int main( int argc, char* argv[] )
@@ -262,7 +274,10 @@ int main( int argc, char* argv[] )
     if( ( dims.size() >= 1 && dims.size() <= 2 ) && ( vertex_data || cell_data ) )
     {
 
-        if( dims.size() == 2 ) { fail = nc_inq_dim( ncFile, dims[otherDim], recname, &size_tag ); }
+        if( dims.size() == 2 )
+        {
+            fail = nc_inq_dim( ncFile, dims[otherDim], recname, &size_tag );
+        }
 
         int def_val = 0;
         rval = mb->tag_get_handle( variable_name.c_str(), (int)size_tag, mbtype, newTag, MB_TAG_CREAT | MB_TAG_DENSE,

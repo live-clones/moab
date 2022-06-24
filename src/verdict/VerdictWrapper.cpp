@@ -137,8 +137,12 @@ static const char* nameType[MBMAXTYPE] = {
     "MBENTITYSET",  /**< MeshSet */
 };
 
-ErrorCode VerdictWrapper::quality_measure( EntityHandle eh, QualityType q, double& quality, int num_nodes,
-                                           EntityType etype, double* coords )
+ErrorCode VerdictWrapper::quality_measure( EntityHandle eh,
+                                           QualityType q,
+                                           double& quality,
+                                           int num_nodes,
+                                           EntityType etype,
+                                           double* coords )
 {
     double coordinates[27][3];  // at most 27 nodes per element
 

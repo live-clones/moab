@@ -53,16 +53,22 @@ class ReadNASTRAN : public ReaderIface
     // factory method
     static ReaderIface* factory( Interface* );
 
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
     // constructor
     ReadNASTRAN( Interface* impl = NULL );
 
     // destructor
     virtual ~ReadNASTRAN();
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
   protected:
   private:
@@ -89,11 +95,15 @@ class ReadNASTRAN : public ReaderIface
 
     ErrorCode get_real( const std::string&, double& real );
 
-    ErrorCode read_node( const std::vector< std::string >& tokens, const bool debug, double* coord_arrays[3],
+    ErrorCode read_node( const std::vector< std::string >& tokens,
+                         const bool debug,
+                         double* coord_arrays[3],
                          int& node_id );
 
-    ErrorCode read_element( const std::vector< std::string >& tokens, std::vector< Range >& materials,
-                            const EntityType element_type, const bool debug );
+    ErrorCode read_element( const std::vector< std::string >& tokens,
+                            std::vector< Range >& materials,
+                            const EntityType element_type,
+                            const bool debug );
 
     ErrorCode create_materials( const std::vector< Range >& materials );
 

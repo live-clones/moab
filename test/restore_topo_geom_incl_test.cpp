@@ -26,7 +26,10 @@ void test_two_cubes();
 void test_three_cubes();
 void test_four_cubes();
 
-ErrorCode build_cube( Interface* mbi, std::vector< double > scale_vec, std::vector< double > trans_vec, int object_id,
+ErrorCode build_cube( Interface* mbi,
+                      std::vector< double > scale_vec,
+                      std::vector< double > trans_vec,
+                      int object_id,
                       EntityHandle& volume )
 {
     GeomTopoTool* GTT = new GeomTopoTool( mbi );
@@ -178,7 +181,10 @@ bool check_tree( Interface* mbi, GeomTopoTool* GTT, std::map< int, std::set< int
 
     Range vols;
     rval = GTT->get_gsets_by_dimension( 3, vols );
-    if( ref_map.size() != vols.size() ) { return false; }
+    if( ref_map.size() != vols.size() )
+    {
+        return false;
+    }
 
     // go through volumes, create sets of children
     for( Range::iterator it = vols.begin(); it != vols.end(); ++it )
@@ -187,7 +193,10 @@ bool check_tree( Interface* mbi, GeomTopoTool* GTT, std::map< int, std::set< int
         rval = mbi->tag_get_data( id_tag, &( *it ), 1, &vol_id );MB_CHK_ERR( rval );
 
         // check if test vol in ref map
-        if( ref_map.find( vol_id ) == ref_map.end() ) { return false; }
+        if( ref_map.find( vol_id ) == ref_map.end() )
+        {
+            return false;
+        }
 
         // put range of child surfaces into set
         Range child_surfs;
@@ -203,7 +212,10 @@ bool check_tree( Interface* mbi, GeomTopoTool* GTT, std::map< int, std::set< int
         }
 
         // compare sets
-        if( test_set != ref_map[vol_id] ) { return false; }
+        if( test_set != ref_map[vol_id] )
+        {
+            return false;
+        }
     }
 
     return true;
@@ -222,7 +234,10 @@ Range get_children_by_dimension( Interface* mbi, EntityHandle parent, int desire
     for( it = all_children.begin(); it != all_children.end(); ++it )
     {
         rval = mbi->tag_get_data( geom_tag, &( *it ), 1, &actual_dimension );MB_CHK_SET_ERR_RET_VAL( rval, "Failed to get geom tag from child meshset", all_children );
-        if( actual_dimension == desired_dimension ) { desired_children.insert( *it ); }
+        if( actual_dimension == desired_dimension )
+        {
+            desired_children.insert( *it );
+        }
     }
 
     return desired_children;
@@ -402,7 +417,10 @@ void heappermute( Interface* mbi, int v[], int n, std::map< int, std::set< int >
         for( int i = 0; i < n; i++ )
         {
             heappermute( mbi, v, n - 1, ref_map, len );
-            if( n % 2 == 1 ) { swap( &v[0], &v[n - 1] ); }
+            if( n % 2 == 1 )
+            {
+                swap( &v[0], &v[n - 1] );
+            }
 
             else
             {

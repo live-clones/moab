@@ -64,7 +64,8 @@ class SphericalDomainTest : public CppUnit::TestFixture
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( SphericalDomainTest, "SphericalDomainTest" );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( SphericalDomainTest, "Unit" );
 
-void SphericalDomainTest::check_closest_pt( const SphericalDomain& dom, const Vector3D& input_pt,
+void SphericalDomainTest::check_closest_pt( const SphericalDomain& dom,
+                                            const Vector3D& input_pt,
                                             const Vector3D& output_pt )
 {
     Vector3D vo = output_pt - dom.center();

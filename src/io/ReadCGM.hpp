@@ -58,11 +58,17 @@ class ReadCGM : public ReaderIface
     //  * FACET_DISTANCE_TOLERANCE=<real> (default: 0.001)
     //  * MAX_FACET_EDGE_LENGTH=<real> (default: 0.0)
     //  * CGM_ATTRIBS=<yes|no>         (default: no)
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadCGM( Interface* impl = NULL );
@@ -75,8 +81,13 @@ class ReadCGM : public ReaderIface
     int get_failed_surface_count();
 
   private:
-    ErrorCode set_options( const FileOptions& opts, int& norm_tol, double& faceting_tol, double& len_tol, bool& act_att,
-                           bool& verbose_warnings, bool& fatal_on_curves );
+    ErrorCode set_options( const FileOptions& opts,
+                           int& norm_tol,
+                           double& faceting_tol,
+                           double& len_tol,
+                           bool& act_att,
+                           bool& verbose_warnings,
+                           bool& fatal_on_curves );
 
     ErrorCode create_entity_sets( std::map< RefEntity*, EntityHandle > ( &entmap )[5] );
 
@@ -99,11 +110,16 @@ class ReadCGM : public ReaderIface
     ErrorCode create_vertices( std::map< RefEntity*, EntityHandle >& vertex_map );
 
     ErrorCode create_curve_facets( std::map< RefEntity*, EntityHandle >& curve_map,
-                                   std::map< RefEntity*, EntityHandle >& vertex_map, int norm_tol, double faceting_tol,
-                                   bool verbose_warn = false, bool fatal_on_curves = false );
+                                   std::map< RefEntity*, EntityHandle >& vertex_map,
+                                   int norm_tol,
+                                   double faceting_tol,
+                                   bool verbose_warn    = false,
+                                   bool fatal_on_curves = false );
 
     ErrorCode create_surface_facets( std::map< RefEntity*, EntityHandle >& surface_map,
-                                     std::map< RefEntity*, EntityHandle >& vertex_map, int norm_tol, double facet_tol,
+                                     std::map< RefEntity*, EntityHandle >& vertex_map,
+                                     int norm_tol,
+                                     double facet_tol,
                                      double length_tol );
     /**
      * Dumps the failed faceting information to screen

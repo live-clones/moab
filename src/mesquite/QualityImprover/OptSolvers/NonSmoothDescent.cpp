@@ -137,8 +137,14 @@ void NonSmoothDescent::cleanup()
     MSQ_DBGOUT( 1 ) << "- Done with NonSmoothDescent::cleanup()\n";
 }
 
-void NonSmoothDescent::find_plane_points( Direction dir1, Direction dir2, const std::vector< Vector3D >& vec,
-                                          Vector3D& pt1, Vector3D& pt2, Vector3D& /*pt3*/, Status& status, MsqError& )
+void NonSmoothDescent::find_plane_points( Direction dir1,
+                                          Direction dir2,
+                                          const std::vector< Vector3D >& vec,
+                                          Vector3D& pt1,
+                                          Vector3D& pt2,
+                                          Vector3D& /*pt3*/,
+                                          Status& status,
+                                          MsqError& )
 {
     int i;
     int num_min, num_max;
@@ -490,7 +496,10 @@ void NonSmoothDescent::search_direction( PatchData& /*pd*/, Vector3D& mSearch, M
                 b = ( mG( 0, 0 ) - mG( 0, 1 ) ) / denom;
                 a = 1 - b;
                 if( ( b < 0 ) || ( b > 1 ) ) viable = false; /* 0 < b < 1 */
-                if( viable ) { mSearch = a * dir[0] + b * dir[1]; }
+                if( viable )
+                {
+                    mSearch = a * dir[0] + b * dir[1];
+                }
                 else
                 {
                     /* the gradients are dependent, move along one face */
@@ -1007,7 +1016,10 @@ void NonSmoothDescent::find_active_set( const std::vector< double >& function, A
         }
         else
         {
-            if( temp < activeEpsilon ) { active_set.add( i, fabs( function_val - active_value0 ) < EPSILON ); }
+            if( temp < activeEpsilon )
+            {
+                active_set.add( i, fabs( function_val - active_value0 ) < EPSILON );
+            }
         }
     }
 }
@@ -1066,13 +1078,19 @@ bool NonSmoothDescent::validity_check( PatchData& pd, MsqError& err )
 
         /* Use the length scale to get a better idea if the tet is flat or
            just really small. */
-        if( fabs( dScale ) < EPSILON ) { return false; }
+        if( fabs( dScale ) < EPSILON )
+        {
+            return false;
+        }
         else
         {
             dDet /= ( dScale * dScale * dScale );
         }
 
-        if( dDet > dEps ) { valid = true; }
+        if( dDet > dEps )
+        {
+            valid = true;
+        }
         else if( dDet < -dEps )
         {
             return false;
@@ -1089,7 +1107,8 @@ bool NonSmoothDescent::validity_check( PatchData& pd, MsqError& err )
     return ( valid );
 }
 
-void NonSmoothDescent::get_active_directions( const std::vector< Vector3D >& pGradient, std::vector< Vector3D >& dir,
+void NonSmoothDescent::get_active_directions( const std::vector< Vector3D >& pGradient,
+                                              std::vector< Vector3D >& dir,
                                               MsqError& /*err*/ )
 {
     const size_t num_active = mActive.active_ind.size();
@@ -1100,7 +1119,8 @@ void NonSmoothDescent::get_active_directions( const std::vector< Vector3D >& pGr
     }
 }
 
-bool NonSmoothDescent::check_vector_dots( const std::vector< Vector3D >& vec, const Vector3D& normal,
+bool NonSmoothDescent::check_vector_dots( const std::vector< Vector3D >& vec,
+                                          const Vector3D& normal,
                                           MsqError& /*err*/ )
 {
     double test_dot = vec[0] % normal;
@@ -1151,7 +1171,10 @@ bool NonSmoothDescent::convex_hull_test( const std::vector< Vector3D >& vec, Msq
             this->find_plane_points( MSQ_XDIR, MSQ_ZDIR, vec, pt1, pt2, pt3, status, err );
             dir_done = MSQ_XDIR;
         }
-        if( status == MSQ_TWO_PT_PLANE ) { pt3 = Vector3D( 0, 0, 0 ); }
+        if( status == MSQ_TWO_PT_PLANE )
+        {
+            pt3 = Vector3D( 0, 0, 0 );
+        }
         if( ( status == MSQ_TWO_PT_PLANE ) || ( status == MSQ_THREE_PT_PLANE ) )
         {
             this->find_plane_normal( pt1, pt2, pt3, normal, err );
@@ -1269,11 +1292,23 @@ static double condition3x3( const double A[9] )
 
     denom = -a11 * a22 * a33 + a11 * a23 * a32 + a21 * a12 * a33 - a21 * a13 * a32 - a31 * a12 * a23 + a31 * a13 * a22;
 
-    if( ( fabs( a11 ) > EPSILON ) && ( fabs( denom / a11 ) > EPSILON ) ) { zero_denom = false; }
-    if( ( fabs( a22 ) > EPSILON ) && ( fabs( denom / a22 ) > EPSILON ) ) { zero_denom = false; }
-    if( ( fabs( a33 ) > EPSILON ) && ( fabs( denom / a33 ) > EPSILON ) ) { zero_denom = false; }
+    if( ( fabs( a11 ) > EPSILON ) && ( fabs( denom / a11 ) > EPSILON ) )
+    {
+        zero_denom = false;
+    }
+    if( ( fabs( a22 ) > EPSILON ) && ( fabs( denom / a22 ) > EPSILON ) )
+    {
+        zero_denom = false;
+    }
+    if( ( fabs( a33 ) > EPSILON ) && ( fabs( denom / a33 ) > EPSILON ) )
+    {
+        zero_denom = false;
+    }
 
-    if( zero_denom ) { return HUGE_VAL; }
+    if( zero_denom )
+    {
+        return HUGE_VAL;
+    }
     else
     {
         s1 = sqrt( a11 * a11 + a12 * a12 + a13 * a13 + a21 * a21 + a22 * a22 + a23 * a23 + a31 * a31 + a32 * a32 +
@@ -1305,9 +1340,9 @@ static double condition3x3( const double A[9] )
 
 double NonSmoothDescent::SymmetricMatrix::condition3x3() const
 {
-    double values[9] = { operator()( 0, 0 ), operator()( 0, 1 ), operator()( 0, 2 ),
-                         operator()( 1, 0 ), operator()( 1, 1 ), operator()( 1, 2 ),
-                         operator()( 2, 0 ), operator()( 2, 1 ), operator()( 2, 2 ) };
+    double values[9] =
+        { operator()( 0, 0 ), operator()( 0, 1 ), operator()( 0, 2 ), operator()( 1, 0 ), operator()( 1, 1 ),
+          operator()( 1, 2 ), operator()( 2, 0 ), operator()( 2, 1 ), operator()( 2, 2 ) };
     return MBMesquite::condition3x3( values );
 }
 
@@ -1459,10 +1494,19 @@ void NonSmoothDescent::search_edges_faces( const Vector3D* dir, Vector3D& mSearc
             }
         }
     }
-    if( optStatus != MSQ_EQUILIBRIUM ) { mSearch = temp_search; }
+    if( optStatus != MSQ_EQUILIBRIUM )
+    {
+        mSearch = temp_search;
+    }
 }
 
-bool NonSmoothDescent::solve2x2( double a11, double a12, double a21, double a22, double b1, double b2, double x[2],
+bool NonSmoothDescent::solve2x2( double a11,
+                                 double a12,
+                                 double a21,
+                                 double a22,
+                                 double b1,
+                                 double b2,
+                                 double x[2],
                                  MsqError& /*err*/ )
 {
     double factor;
@@ -1520,7 +1564,10 @@ void NonSmoothDescent::get_min_estimate( double* final_est, MsqError& /*err*/ )
         for( size_t i = 0; i < qmHandles.size(); i++ )
         {
             est_imp = -mAlpha * mGS[i];
-            if( ( est_imp > *final_est ) && ( fabs( est_imp ) > EPSILON ) ) { *final_est = est_imp; }
+            if( ( est_imp > *final_est ) && ( fabs( est_imp ) > EPSILON ) )
+            {
+                *final_est = est_imp;
+            }
         }
     }
 }
@@ -1570,11 +1617,17 @@ void NonSmoothDescent::compute_alpha( MsqError& /*err*/ )
                 mAlpha = fabs( alpha_i );
                 MSQ_PRINT( 3 )( "Setting alpha %lu %g\n", (unsigned long)i, alpha_i );
             }
-            if( ( alpha_i > 0 ) && ( alpha_i < min_positive_value ) ) { min_positive_value = alpha_i; }
+            if( ( alpha_i > 0 ) && ( alpha_i < min_positive_value ) )
+            {
+                min_positive_value = alpha_i;
+            }
         }
     }
 
-    if( ( mAlpha == HUGE_VAL ) && ( min_positive_value != HUGE_VAL ) ) { mAlpha = min_positive_value; }
+    if( ( mAlpha == HUGE_VAL ) && ( min_positive_value != HUGE_VAL ) )
+    {
+        mAlpha = min_positive_value;
+    }
 
     /* if it never gets set, set it to the default */
     if( mAlpha == HUGE_VAL )

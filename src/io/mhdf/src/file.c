@@ -34,15 +34,19 @@
 
 static int make_hdf_group( const char* path, hid_t file, size_t size, mhdf_Status* status );
 
-mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char** elem_type_list, size_t elem_list_len,
-                                 hid_t id_type, mhdf_Status* status )
+mhdf_FileHandle mhdf_createFile( const char* filename,
+                                 int overwrite,
+                                 const char** elem_type_list,
+                                 size_t elem_list_len,
+                                 hid_t id_type,
+                                 mhdf_Status* status )
 {
-    FileHandle*   file_ptr;
-    unsigned int  flags;
+    FileHandle* file_ptr;
+    unsigned int flags;
     unsigned char idx;
-    size_t        i;
-    hid_t         enum_id, group_id;
-    int           rval;
+    size_t i;
+    hid_t enum_id, group_id;
+    int rval;
     API_BEGIN;
 
     if( elem_list_len > 255 )
@@ -57,7 +61,7 @@ mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char
     if( !file_ptr ) return NULL;
 
     /* Create the file */
-    flags = overwrite ? H5F_ACC_TRUNC : H5F_ACC_EXCL;
+    flags                = overwrite ? H5F_ACC_TRUNC : H5F_ACC_EXCL;
     file_ptr->hdf_handle = H5Fcreate( filename, flags, H5P_DEFAULT, H5P_DEFAULT );
     if( file_ptr->hdf_handle < 0 )
     {
@@ -106,10 +110,10 @@ mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char
     }
     for( i = 0; i < elem_list_len; ++i )
     {
-        if( !elem_type_list[ i ] || !*elem_type_list[ i ] ) continue;
+        if( !elem_type_list[i] || !*elem_type_list[i] ) continue;
 
         idx = (unsigned char)i;
-        if( H5Tenum_insert( enum_id, elem_type_list[ i ], &idx ) < 0 )
+        if( H5Tenum_insert( enum_id, elem_type_list[i], &idx ) < 0 )
         {
             mhdf_setFail( status, "Failed to store elem type list." );
             H5Fclose( file_ptr->hdf_handle );
@@ -134,7 +138,10 @@ mhdf_FileHandle mhdf_createFile( const char* filename, int overwrite, const char
     return file_ptr;
 }
 
-mhdf_FileHandle mhdf_openFile( const char* filename, int writeable, unsigned long* max_id_out, hid_t id_type,
+mhdf_FileHandle mhdf_openFile( const char* filename,
+                               int writeable,
+                               unsigned long* max_id_out,
+                               hid_t id_type,
                                mhdf_Status* status )
 {
     return mhdf_openFileWithOpt( filename, writeable, max_id_out, id_type, H5P_DEFAULT, status );
@@ -148,22 +155,22 @@ int mhdf_countOpenHandles( mhdf_FileHandle file_handle )
 static herr_t get_max_id( hid_t group_id, const char* subgroup, const char* datatable, unsigned long* data )
 {
     unsigned long id;
-    hid_t         elem_id, conn_id, attr_id, space_id;
-    herr_t        rval;
-    int           rank;
-    hsize_t       dims[ 2 ];
+    hid_t elem_id, conn_id, attr_id, space_id;
+    herr_t rval;
+    int rank;
+    hsize_t dims[2];
 
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     elem_id = H5Gopen2( group_id, subgroup, H5P_DEFAULT );
 #else
-    elem_id = H5Gopen( group_id, subgroup );
+    elem_id      = H5Gopen( group_id, subgroup );
 #endif
     if( elem_id < 0 ) return (herr_t)-1;
 
 #if defined( H5Dopen_vers ) && H5Dopen_vers > 1
     conn_id = H5Dopen2( elem_id, datatable, H5P_DEFAULT );
 #else
-    conn_id = H5Dopen( elem_id, datatable );
+    conn_id      = H5Dopen( elem_id, datatable );
 #endif
     H5Gclose( elem_id );
     if( conn_id < 0 ) return (herr_t)-1;
@@ -199,7 +206,7 @@ static herr_t get_max_id( hid_t group_id, const char* subgroup, const char* data
     H5Aclose( attr_id );
     if( rval < 0 ) return rval;
 
-    id += dims[ 0 ];
+    id += dims[0];
     if( id > *data ) *data = id;
     return 0;
 }
@@ -211,14 +218,14 @@ static herr_t max_id_iter( hid_t group_id, const char* name, void* data )
 
 static int scan_for_max_id( FileHandle* file_ptr, mhdf_Status* status )
 {
-    hid_t  group_id;
+    hid_t group_id;
     herr_t rval;
 
     /* Check for new format, with max_id as attrib of root group */
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     group_id = H5Gopen2( file_ptr->hdf_handle, ROOT_GROUP, H5P_DEFAULT );
 #else
-    group_id = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
+    group_id     = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
 #endif
     if( group_id < 0 )
     {
@@ -267,15 +274,19 @@ static int scan_for_max_id( FileHandle* file_ptr, mhdf_Status* status )
     return 1;
 }
 
-mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsigned long* max_id_out, hid_t id_type,
-                                      hid_t access_prop, mhdf_Status* status )
+mhdf_FileHandle mhdf_openFileWithOpt( const char* filename,
+                                      int writable,
+                                      unsigned long* max_id_out,
+                                      hid_t id_type,
+                                      hid_t access_prop,
+                                      mhdf_Status* status )
 {
-    FileHandle*  file_ptr;
+    FileHandle* file_ptr;
     unsigned int flags;
-    hid_t        group_id;
-    int          check_is_hdf5 = 1;
+    hid_t group_id;
+    int check_is_hdf5 = 1;
 #ifdef MOAB_HAVE_HDF5_PARALLEL
-    herr_t   err;
+    herr_t err;
     MPI_Comm comm;
     MPI_Info info;
 #endif
@@ -314,7 +325,7 @@ mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsign
     }
 
     /* Create the file */
-    flags = writable ? H5F_ACC_RDWR : H5F_ACC_RDONLY;
+    flags                = writable ? H5F_ACC_RDWR : H5F_ACC_RDONLY;
     file_ptr->hdf_handle = H5Fopen( filename, flags, access_prop );
     if( file_ptr->hdf_handle < 0 )
     {
@@ -327,7 +338,7 @@ mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsign
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     group_id = H5Gopen2( file_ptr->hdf_handle, ROOT_GROUP, H5P_DEFAULT );
 #else
-    group_id = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
+    group_id     = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
 #endif
     if( group_id < 0 )
     {
@@ -354,12 +365,15 @@ mhdf_FileHandle mhdf_openFileWithOpt( const char* filename, int writable, unsign
     return file_ptr;
 }
 
-void mhdf_getElemName( mhdf_FileHandle file_handle, unsigned int type_index, char* buffer, size_t buf_size,
+void mhdf_getElemName( mhdf_FileHandle file_handle,
+                       unsigned int type_index,
+                       char* buffer,
+                       size_t buf_size,
                        mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    herr_t      rval;
-    hid_t       enum_id;
+    herr_t rval;
+    hid_t enum_id;
     API_BEGIN;
 
     if( type_index > 255 )
@@ -395,7 +409,7 @@ void mhdf_getElemName( mhdf_FileHandle file_handle, unsigned int type_index, cha
 int mhdf_checkOpenHandles( mhdf_FileHandle handle, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    int         result;
+    int result;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( handle );
@@ -456,7 +470,7 @@ void mhdf_closeFile( mhdf_FileHandle handle, mhdf_Status* status )
 void mhdf_closeData( mhdf_FileHandle file, hid_t handle, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    herr_t      rval = -1;
+    herr_t rval = -1;
 
     file_ptr = (FileHandle*)( file );
     if( !mhdf_check_valid_file( file_ptr, status ) ) return;
@@ -479,7 +493,10 @@ void mhdf_closeData( mhdf_FileHandle file, hid_t handle, mhdf_Status* status )
             rval = -1;
     }
 
-    if( rval < 0 ) { mhdf_setFail( status, "H5Xclose failed.  Invalid handle?\n" ); }
+    if( rval < 0 )
+    {
+        mhdf_setFail( status, "H5Xclose failed.  Invalid handle?\n" );
+    }
     else
     {
         file_ptr->open_handle_count--;
@@ -490,10 +507,10 @@ void mhdf_closeData( mhdf_FileHandle file, hid_t handle, mhdf_Status* status )
 void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned int elem_type, mhdf_Status* status )
 {
     FileHandle* file_ptr = (FileHandle*)file_handle;
-    hid_t       group_id, tag_id, enum_id;
-    char *      path, *ptr;
-    size_t      name_len;
-    herr_t      rval;
+    hid_t group_id, tag_id, enum_id;
+    char *path, *ptr;
+    size_t name_len;
+    herr_t rval;
     API_BEGIN;
 
     if( !mhdf_check_valid_file( file_ptr, status ) ) return;
@@ -514,7 +531,7 @@ void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned in
 #if defined( H5Gcreate_vers ) && H5Gcreate_vers > 1
     group_id = H5Gcreate2( file_ptr->hdf_handle, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 #else
-    group_id = H5Gcreate( file_ptr->hdf_handle, path, 3 );
+    group_id     = H5Gcreate( file_ptr->hdf_handle, path, 3 );
 #endif
     if( group_id < 0 )
     {
@@ -527,7 +544,7 @@ void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned in
 #if defined( H5Gcreate_vers ) && H5Gcreate_vers > 1
     tag_id = H5Gcreate2( group_id, DENSE_TAG_SUBGROUP, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 #else
-    tag_id = H5Gcreate( group_id, DENSE_TAG_SUBGROUP, 0 );
+    tag_id       = H5Gcreate( group_id, DENSE_TAG_SUBGROUP, 0 );
 #endif
     if( tag_id < 0 )
     {
@@ -568,20 +585,20 @@ void mhdf_addElement( mhdf_FileHandle file_handle, const char* name, unsigned in
 
 char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out, mhdf_Status* status )
 {
-    hsize_t     count, length, i;
-    char**      buffer;
-    char*       current;
-    hid_t       group_id;
-    herr_t      rval;
-    ssize_t     rlen = 0;
-    size_t      remaining;
+    hsize_t count, length, i;
+    char** buffer;
+    char* current;
+    hid_t group_id;
+    herr_t rval;
+    ssize_t rlen = 0;
+    size_t remaining;
     FileHandle* file_ptr = (FileHandle*)file_handle;
     if( !mhdf_check_valid_file( file_ptr, status ) ) return NULL;
 
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     group_id = H5Gopen2( file_ptr->hdf_handle, ELEMENT_GROUP, H5P_DEFAULT );
 #else
-    group_id = H5Gopen( file_ptr->hdf_handle, ELEMENT_GROUP );
+    group_id     = H5Gopen( file_ptr->hdf_handle, ELEMENT_GROUP );
 #endif
     if( group_id < 0 )
     {
@@ -610,13 +627,13 @@ char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out
         H5Gclose( group_id );
         return NULL;
     }
-    current = (char*)( buffer + count );
+    current   = (char*)( buffer + count );
     remaining = rlen;
 
     for( i = 0; i < count; ++i )
     {
-        buffer[ i ] = current;
-        rlen = H5Gget_objname_by_idx( group_id, i, current, remaining ) + 1;
+        buffer[i] = current;
+        rlen      = H5Gget_objname_by_idx( group_id, i, current, remaining ) + 1;
         if( rlen < 0 )
         {
             H5Gclose( group_id );
@@ -635,13 +652,16 @@ char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out
     return buffer;
 }
 
-void mhdf_getElemTypeName( mhdf_FileHandle file_handle, const char* elem_handle, char* buffer, size_t buf_len,
+void mhdf_getElemTypeName( mhdf_FileHandle file_handle,
+                           const char* elem_handle,
+                           char* buffer,
+                           size_t buf_len,
                            mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       elem_id, type_id, attr_id;
-    char        bytes[ 16 ];
-    herr_t      rval;
+    hid_t elem_id, type_id, attr_id;
+    char bytes[16];
+    herr_t rval;
     API_BEGIN;
 
     if( NULL == buffer || buf_len < 2 )
@@ -649,7 +669,7 @@ void mhdf_getElemTypeName( mhdf_FileHandle file_handle, const char* elem_handle,
         mhdf_setFail( status, "invalid input" );
         return;
     }
-    buffer[ 0 ] = '\0';
+    buffer[0] = '\0';
 
     file_ptr = (FileHandle*)( file_handle );
     if( !mhdf_check_valid_file( file_ptr, status ) ) return;
@@ -695,7 +715,9 @@ static int make_hdf_group( const char* path, hid_t file, size_t sz, mhdf_Status*
 #if defined( H5Gcreate_vers ) && H5Gcreate_vers > 1
     hid_t handle = H5Gcreate2( file, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
     /* empty statement to avoid compiler warning */
-    if( sz ) {}
+    if( sz )
+    {
+    }
 #else
     hid_t handle = H5Gcreate( file, path, sz );
 #endif
@@ -726,8 +748,8 @@ const char* mhdf_set_type_handle( void )
 int mhdf_isPolyElement( mhdf_FileHandle file_handle, const char* elem_handle, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       elem_id;
-    int         rval;
+    hid_t elem_id;
+    int rval;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( file_handle );
@@ -746,9 +768,9 @@ int mhdf_isPolyElement( mhdf_FileHandle file_handle, const char* elem_handle, mh
 void mhdf_writeHistory( mhdf_FileHandle file_handle, const char** strings, int num_strings, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       data_id, type_id, space_id;
-    hsize_t     dim = (hsize_t)num_strings;
-    herr_t      rval;
+    hid_t data_id, type_id, space_id;
+    hsize_t dim = (hsize_t)num_strings;
+    herr_t rval;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( file_handle );
@@ -774,7 +796,7 @@ void mhdf_writeHistory( mhdf_FileHandle file_handle, const char** strings, int n
     data_id =
         H5Dcreate2( file_ptr->hdf_handle, HISTORY_PATH, type_id, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 #else
-    data_id = H5Dcreate( file_ptr->hdf_handle, HISTORY_PATH, type_id, space_id, H5P_DEFAULT );
+    data_id      = H5Dcreate( file_ptr->hdf_handle, HISTORY_PATH, type_id, space_id, H5P_DEFAULT );
 #endif
     H5Sclose( space_id );
     if( data_id < 0 )
@@ -801,10 +823,10 @@ void mhdf_writeHistory( mhdf_FileHandle file_handle, const char** strings, int n
 char** mhdf_readHistory( mhdf_FileHandle file_handle, int* num_strings, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       data_id, type_id, space_id, group_id;
-    hsize_t     dim;
-    herr_t      rval;
-    char**      array;
+    hid_t data_id, type_id, space_id, group_id;
+    hsize_t dim;
+    herr_t rval;
+    char** array;
     API_BEGIN;
 
     file_ptr = (FileHandle*)( file_handle );
@@ -814,7 +836,7 @@ char** mhdf_readHistory( mhdf_FileHandle file_handle, int* num_strings, mhdf_Sta
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     group_id = H5Gopen2( file_ptr->hdf_handle, ROOT_GROUP, H5P_DEFAULT );
 #else
-    group_id = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
+    group_id     = H5Gopen( file_ptr->hdf_handle, ROOT_GROUP );
 #endif
     if( group_id < 0 )
     {
@@ -834,7 +856,7 @@ char** mhdf_readHistory( mhdf_FileHandle file_handle, int* num_strings, mhdf_Sta
 #if defined( H5Dopen_vers ) && H5Dopen_vers > 1
     data_id = H5Dopen2( group_id, HISTORY_NAME, H5P_DEFAULT );
 #else
-    data_id = H5Dopen( group_id, HISTORY_NAME );
+    data_id      = H5Dopen( group_id, HISTORY_NAME );
 #endif
     H5Gclose( group_id );
     if( data_id < 0 )

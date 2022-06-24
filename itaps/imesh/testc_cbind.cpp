@@ -891,7 +891,10 @@ int entity_sets_subtest( iMesh_Instance mesh, int is_list, int /*num_iter*/ )
         return FALSE;
     }
 
-    if( !check_esets( mesh, n_whole_mesh + num_type + 2 ) ) { return FALSE; }
+    if( !check_esets( mesh, n_whole_mesh + num_type + 2 ) )
+    {
+        return FALSE;
+    }
 
     /* Subtract */
     /* add all EDGEs and FACEs to temp_es1 */
@@ -1785,7 +1788,10 @@ int tag_info_test( iMesh_Instance mesh )
 
     /* look for that tag, to make sure it got deleted */
     iMesh_getTagHandle( mesh, tag_name, &tag_handle, &result, tag_name_size );
-    if( iBase_SUCCESS != result ) { error = TRUE; }
+    if( iBase_SUCCESS != result )
+    {
+        error = TRUE;
+    }
     if( !error )
     {
         printf( "tagGetHandle was able to find handle for deleted tag.\n" );
@@ -1864,7 +1870,9 @@ int vertex_int_tag_test( iMesh_Instance mesh, iBase_EntityHandle* verts, int /*v
     return TRUE;
 }
 
-int vertex_double_tag_test( iMesh_Instance mesh, iBase_EntityHandle* verts, int /*verts_size*/,
+int vertex_double_tag_test( iMesh_Instance mesh,
+                            iBase_EntityHandle* verts,
+                            int /*verts_size*/,
                             iBase_TagHandle* double_tag )
 {
     int result;
@@ -1939,7 +1947,9 @@ struct TagStruct
     int test_int1, test_int2;
 };
 
-int vertex_struct_tag_test( iMesh_Instance mesh, iBase_EntityHandle* verts, int /*verts_size*/,
+int vertex_struct_tag_test( iMesh_Instance mesh,
+                            iBase_EntityHandle* verts,
+                            int /*verts_size*/,
                             iBase_TagHandle* struct_tag )
 {
     int result;
@@ -2018,7 +2028,10 @@ int vertex_tag_delete_test( iMesh_Instance mesh, iBase_EntityHandle* verts, int 
     }
 
     iMesh_destroyTag( mesh, all_tags[1], FALSE, &result );
-    if( iBase_SUCCESS != result ) { delete_err = TRUE; }
+    if( iBase_SUCCESS != result )
+    {
+        delete_err = TRUE;
+    }
     if( !delete_err )
     {
         printf( "Error when unforced-deleting tag in use on a vertex.\n" );
@@ -2140,7 +2153,9 @@ int entityset_int_tag_test( iMesh_Instance mesh, iBase_EntitySetHandle* sets, in
     return TRUE;
 }
 
-int entityset_double_tag_test( iMesh_Instance mesh, iBase_EntitySetHandle* sets, int sets_size,
+int entityset_double_tag_test( iMesh_Instance mesh,
+                               iBase_EntitySetHandle* sets,
+                               int sets_size,
                                iBase_TagHandle* double_tag )
 {
     int result;
@@ -2207,7 +2222,9 @@ int entityset_double_tag_test( iMesh_Instance mesh, iBase_EntitySetHandle* sets,
     return TRUE;
 }
 
-int entityset_struct_tag_test( iMesh_Instance mesh, iBase_EntitySetHandle* /*sets*/, int /*sets_size*/,
+int entityset_struct_tag_test( iMesh_Instance mesh,
+                               iBase_EntitySetHandle* /*sets*/,
+                               int /*sets_size*/,
                                iBase_TagHandle* struct_tag )
 {
     int result;
@@ -2289,7 +2306,10 @@ int entityset_tag_delete_test( iMesh_Instance mesh, iBase_EntitySetHandle* sets,
     }
 
     iMesh_destroyTag( mesh, all_tags[1], FALSE, &result );
-    if( iBase_SUCCESS != result ) { delete_err = TRUE; }
+    if( iBase_SUCCESS != result )
+    {
+        delete_err = TRUE;
+    }
     if( !delete_err )
     {
         printf( "Error when unforced-deleting tag in use on a entityset.\n" );
@@ -2553,7 +2573,10 @@ int mesh_tag_delete_test( iMesh_Instance mesh )
     }
 
     iMesh_destroyTag( mesh, all_tags[1], FALSE, &result );
-    if( iBase_SUCCESS != result ) { delete_err = TRUE; }
+    if( iBase_SUCCESS != result )
+    {
+        delete_err = TRUE;
+    }
     if( !delete_err )
     {
         printf( "Error when unforced-deleting tag in use on a entityset.\n" );
@@ -2780,8 +2803,13 @@ int array_allocation( iMesh_Instance mesh )
     return 1;
 }
 
-int compare_single_iter( const char* info, iMesh_Instance mesh, iBase_EntitySetHandle set, iBase_EntityHandle* contents,
-                         int contents_size, enum iBase_EntityType type, enum iMesh_EntityTopology topo )
+int compare_single_iter( const char* info,
+                         iMesh_Instance mesh,
+                         iBase_EntitySetHandle set,
+                         iBase_EntityHandle* contents,
+                         int contents_size,
+                         enum iBase_EntityType type,
+                         enum iMesh_EntityTopology topo )
 {
     iBase_EntityIterator iter = 0;
     int i, twice, has_data, result = iBase_SUCCESS, result2;
@@ -2862,8 +2890,14 @@ end_single_iter:
     return result;
 }
 
-int compare_array_iter( const char* info, iMesh_Instance mesh, iBase_EntitySetHandle set, iBase_EntityHandle* contents,
-                        int contents_size, int array_size, enum iBase_EntityType type, enum iMesh_EntityTopology topo )
+int compare_array_iter( const char* info,
+                        iMesh_Instance mesh,
+                        iBase_EntitySetHandle set,
+                        iBase_EntityHandle* contents,
+                        int contents_size,
+                        int array_size,
+                        enum iBase_EntityType type,
+                        enum iMesh_EntityTopology topo )
 {
     iBase_EntityArrIterator iter = 0;
     int i, j, twice, has_data, result = iBase_SUCCESS, result2;
@@ -2969,8 +3003,12 @@ end_arr_iter:
     return result;
 }
 
-int test_iterator_common( const char* info, iMesh_Instance mesh, iBase_EntitySetHandle set, int array_size,
-                          enum iBase_EntityType type, enum iMesh_EntityTopology topo )
+int test_iterator_common( const char* info,
+                          iMesh_Instance mesh,
+                          iBase_EntitySetHandle set,
+                          int array_size,
+                          enum iBase_EntityType type,
+                          enum iMesh_EntityTopology topo )
 {
     iBase_EntityHandle* contents = NULL;
     int content_size = 0, content_alloc = 0;
@@ -3063,7 +3101,10 @@ int main( int argc, char* argv[] )
     int result;
     iMesh_Instance mesh = NULL;
 
-    if( argc == 2 ) { filename = argv[1]; }
+    if( argc == 2 )
+    {
+        filename = argv[1];
+    }
     else
     {
         printf( "Usage: %s <mesh_filename>\n", argv[0] );

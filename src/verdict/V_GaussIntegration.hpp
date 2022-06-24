@@ -55,12 +55,17 @@ void calculate_shape_function_2d_quad();
 //- calculate the shape functions and derivatives of shape functions
 //- at gaussian points for 2D quad elements
 
-void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[], double dndy2_at_gauss_ptsp[],
+void get_shape_func( double shape_function[],
+                     double dndy1_at_gauss_pts[],
+                     double dndy2_at_gauss_ptsp[],
                      double gauss_weight[] );
 //- get shape functions and the derivatives
 
-void get_shape_func( double shape_function[], double dndy1_at_gauss_pts[], double dndy2_at_gauss_pts[],
-                     double dndy3_at_gauss_pts[], double gauss_weight[] );
+void get_shape_func( double shape_function[],
+                     double dndy1_at_gauss_pts[],
+                     double dndy2_at_gauss_pts[],
+                     double dndy3_at_gauss_pts[],
+                     double gauss_weight[] );
 //- get shape functions and the derivatives for 3D elements
 
 void calculate_derivative_at_nodes( double dndy1_at_nodes[][maxNumberNodes], double dndy2_at_nodes[][maxNumberNodes] );
@@ -70,7 +75,8 @@ void calculate_shape_function_3d_hex();
 //- calculate shape functions and derivatives of shape functions
 //- at gaussian points for 3D hex elements
 
-void calculate_derivative_at_nodes_3d( double dndy1_at_nodes[][maxNumberNodes], double dndy2_at_nodes[][maxNumberNodes],
+void calculate_derivative_at_nodes_3d( double dndy1_at_nodes[][maxNumberNodes],
+                                       double dndy2_at_nodes[][maxNumberNodes],
                                        double dndy3_at_nodes[][maxNumberNodes] );
 //- calculate shape function derivatives at nodes for hex elements
 

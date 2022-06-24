@@ -45,8 +45,11 @@ ObjectiveFunction* PatchPowerMeanP::clone() const
     return new PatchPowerMeanP( *this );
 }
 
-bool PatchPowerMeanP::initialize_block_coordinate_descent( Mesh* mesh, MeshDomain* domain, const Settings* settings,
-                                                           PatchSet* patch_set, MsqError& err )
+bool PatchPowerMeanP::initialize_block_coordinate_descent( Mesh* mesh,
+                                                           MeshDomain* domain,
+                                                           const Settings* settings,
+                                                           PatchSet* patch_set,
+                                                           MsqError& err )
 {
     clear();
     PatchIterator patches( patch_set );
@@ -94,8 +97,11 @@ bool PatchPowerMeanP::evaluate( EvalType type, PatchData& pd, double& value_out,
     return true;
 }
 
-bool PatchPowerMeanP::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                              std::vector< Vector3D >& grad_out, MsqError& err )
+bool PatchPowerMeanP::evaluate_with_gradient( EvalType type,
+                                              PatchData& pd,
+                                              double& value_out,
+                                              std::vector< Vector3D >& grad_out,
+                                              MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -136,8 +142,12 @@ bool PatchPowerMeanP::evaluate_with_gradient( EvalType type, PatchData& pd, doub
     return true;
 }
 
-bool PatchPowerMeanP::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                             std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
+bool PatchPowerMeanP::evaluate_with_Hessian( EvalType type,
+                                             PatchData& pd,
+                                             double& value_out,
+                                             std::vector< Vector3D >& grad_out,
+                                             MsqHessian& Hessian_out,
+                                             MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );

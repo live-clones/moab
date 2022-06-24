@@ -58,7 +58,9 @@ class BSPTree
 
     BSPTree( Interface* iface, const char* tagname = 0, unsigned meshset_creation_flags = MESHSET_SET );
 
-    BSPTree( Interface* iface, bool destroy_created_trees, const char* tagname = 0,
+    BSPTree( Interface* iface,
+             bool destroy_created_trees,
+             const char* tagname             = 0,
              unsigned meshset_creation_flags = MESHSET_SET );
 
     ~BSPTree();
@@ -217,7 +219,9 @@ class BSPTree
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, const std::vector< EntityHandle >& left_entities,
+    ErrorCode split_leaf( BSPTreeIter& leaf,
+                          Plane plane,
+                          const std::vector< EntityHandle >& left_entities,
                           const std::vector< EntityHandle >& right_entities );
 
     //! Merge the leaf pointed to by the current iterator with it's
@@ -336,7 +340,9 @@ class BSPTreeIter
     //!                 the ray exited the leaf.  If return value is false,
     //!                 then this value is undefined.
     //!\return true if ray intersects leaf, false otherwise.
-    virtual bool intersect_ray( const double ray_point[3], const double ray_vect[3], double& t_enter,
+    virtual bool intersect_ray( const double ray_point[3],
+                                const double ray_vect[3],
+                                double& t_enter,
                                 double& t_exit ) const;
 
     //! Return true if thos node and the passed node share the
@@ -399,7 +405,7 @@ class BSPTreeBoxIter : public BSPTreeIter
 
     static SideBits opposite_face( const SideBits& bits )
     {
-        return ( SideBits )( ( ~bits ) & 0xFF );
+        return (SideBits)( ( ~bits ) & 0xFF );
     }
 
     static ErrorCode face_corners( const SideBits face, const double hex_corners[8][3], double face_corners_out[4][3] );

@@ -17,7 +17,10 @@ int compare_edge( const void* a, const void* b )
 {
     struct edge* ia = (struct edge*)a;
     struct edge* ib = (struct edge*)b;
-    if( ia->v0 == ib->v0 ) { return (int)( 100.f * ia->v1 - 100.f * ib->v1 ); }
+    if( ia->v0 == ib->v0 )
+    {
+        return (int)( 100.f * ia->v1 - 100.f * ib->v1 );
+    }
     else
     {
         return (int)( 100.f * ia->v0 - 100.f * ib->v0 );

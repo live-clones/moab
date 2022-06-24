@@ -69,7 +69,9 @@ HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm ) : pcomm( p_comm )
 }
 
 // Square block-diagonal constructor
-HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm, HYPRE_Int glob_size, HYPRE_Int* row_starts,
+HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm,
+                                HYPRE_Int glob_size,
+                                HYPRE_Int* row_starts,
                                 HYPRE_Int nnz_pr )
     : pcomm( p_comm )
 {
@@ -77,7 +79,9 @@ HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm, HYPRE_Int glob_size,
     resize( glob_size, row_starts, nnz_pr );
 }
 
-void HypreParMatrix::resize( HYPRE_Int glob_size, HYPRE_Int* row_starts, HYPRE_Int nnz_pr_diag,
+void HypreParMatrix::resize( HYPRE_Int glob_size,
+                             HYPRE_Int* row_starts,
+                             HYPRE_Int nnz_pr_diag,
                              HYPRE_Int nnz_pr_offdiag )
 {
     /* Create the matrix.
@@ -123,8 +127,12 @@ void HypreParMatrix::resize( HYPRE_Int glob_size, HYPRE_Int* row_starts, HYPRE_I
     width  = GetNumCols();
 }
 
-void HypreParMatrix::resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_cols, HYPRE_Int* row_starts,
-                             HYPRE_Int* col_starts, HYPRE_Int* nnz_pr_diag, HYPRE_Int* onz_pr_diag,
+void HypreParMatrix::resize( HYPRE_Int global_num_rows,
+                             HYPRE_Int global_num_cols,
+                             HYPRE_Int* row_starts,
+                             HYPRE_Int* col_starts,
+                             HYPRE_Int* nnz_pr_diag,
+                             HYPRE_Int* onz_pr_diag,
                              HYPRE_Int nnz_pr_offdiag )
 {
     /* Create the matrix.
@@ -153,7 +161,10 @@ void HypreParMatrix::resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_col
         HYPRE_IJMatrixSetRowSizes( A, nnz_pr_diag );
     }
 
-    if( nnz_pr_offdiag ) { HYPRE_IJMatrixSetMaxOffProcElmts( A, nnz_pr_offdiag ); }
+    if( nnz_pr_offdiag )
+    {
+        HYPRE_IJMatrixSetMaxOffProcElmts( A, nnz_pr_offdiag );
+    }
 
     /* Initialize before setting coefficients */
     HYPRE_IJMatrixInitialize( A );
@@ -172,9 +183,14 @@ void HypreParMatrix::resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_col
 }
 
 // Rectangular block-diagonal constructor
-HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm, HYPRE_Int global_num_rows, HYPRE_Int global_num_cols,
-                                HYPRE_Int* row_starts, HYPRE_Int* col_starts, HYPRE_Int nnz_pr_diag,
-                                HYPRE_Int onz_pr_diag, HYPRE_Int nnz_pr_offdiag )
+HypreParMatrix::HypreParMatrix( moab::ParallelComm* p_comm,
+                                HYPRE_Int global_num_rows,
+                                HYPRE_Int global_num_cols,
+                                HYPRE_Int* row_starts,
+                                HYPRE_Int* col_starts,
+                                HYPRE_Int nnz_pr_diag,
+                                HYPRE_Int onz_pr_diag,
+                                HYPRE_Int nnz_pr_offdiag )
     : pcomm( p_comm )
 {
     Init();
@@ -479,7 +495,10 @@ void HypreParMatrix::InvScaleRows( const Eigen::VectorXd& diag )
     {
 #ifdef MOAB_DEBUG
 
-        if( 0.0 == diag( i ) ) { MB_SET_ERR_RET( "HypreParMatrix::InvDiagScale : Division by 0" ); }
+        if( 0.0 == diag( i ) )
+        {
+            MB_SET_ERR_RET( "HypreParMatrix::InvDiagScale : Division by 0" );
+        }
 
 #endif
         val = 1. / diag( i );
@@ -522,20 +541,29 @@ void HypreParMatrix::operator*=( double s )
     }
 }
 
-HYPRE_Int HypreParMatrix::GetValues( const HYPRE_Int nrows, HYPRE_Int* ncols, HYPRE_Int* rows, HYPRE_Int* cols,
+HYPRE_Int HypreParMatrix::GetValues( const HYPRE_Int nrows,
+                                     HYPRE_Int* ncols,
+                                     HYPRE_Int* rows,
+                                     HYPRE_Int* cols,
                                      HYPRE_Complex* values )
 {
     return HYPRE_IJMatrixGetValues( A, nrows, ncols, rows, cols, values );
 }
 
-HYPRE_Int HypreParMatrix::SetValues( const HYPRE_Int nrows, HYPRE_Int* ncols, const HYPRE_Int* rows,
-                                     const HYPRE_Int* cols, const HYPRE_Complex* values )
+HYPRE_Int HypreParMatrix::SetValues( const HYPRE_Int nrows,
+                                     HYPRE_Int* ncols,
+                                     const HYPRE_Int* rows,
+                                     const HYPRE_Int* cols,
+                                     const HYPRE_Complex* values )
 {
     return HYPRE_IJMatrixSetValues( A, nrows, ncols, rows, cols, values );
 }
 
-HYPRE_Int HypreParMatrix::AddToValues( const HYPRE_Int nrows, HYPRE_Int* ncols, const HYPRE_Int* rows,
-                                       const HYPRE_Int* cols, const HYPRE_Complex* values )
+HYPRE_Int HypreParMatrix::AddToValues( const HYPRE_Int nrows,
+                                       HYPRE_Int* ncols,
+                                       const HYPRE_Int* rows,
+                                       const HYPRE_Int* cols,
+                                       const HYPRE_Complex* values )
 {
     return HYPRE_IJMatrixAddToValues( A, nrows, ncols, rows, cols, values );
 }
@@ -581,7 +609,10 @@ void HypreParMatrix::Threshold( double threshold )
 
     /* hypre_CSRMatrixDeleteZeros will return a NULL pointer rather than a usable
        CSR matrix if it finds no non-zeros */
-    if( csr_A_wo_z == NULL ) { csr_A_wo_z = csr_A; }
+    if( csr_A_wo_z == NULL )
+    {
+        csr_A_wo_z = csr_A;
+    }
     else
     {
         ierr += hypre_CSRMatrixDestroy( csr_A );
@@ -595,7 +626,8 @@ void HypreParMatrix::Threshold( double threshold )
     HYPRE_IJMatrixGetObject( A, (void**)A_parcsr );
 }
 
-void HypreParMatrix::EliminateRowsCols( const std::vector< HYPRE_Int >& rows_cols, const HypreParVector& X,
+void HypreParMatrix::EliminateRowsCols( const std::vector< HYPRE_Int >& rows_cols,
+                                        const HypreParVector& X,
                                         HypreParVector& B )
 {
     std::vector< HYPRE_Int > rc_sorted;
@@ -635,9 +667,15 @@ void HypreParMatrix::Read( const char* fname )
 
 void HypreParMatrix::Destroy()
 {
-    if( interpreter ) { hypre_TFree( interpreter ); }
+    if( interpreter )
+    {
+        hypre_TFree( interpreter );
+    }
 
-    if( A == NULL ) { return; }
+    if( A == NULL )
+    {
+        return;
+    }
 
     else
     {
@@ -669,7 +707,10 @@ HypreParMatrix* RAP( HypreParMatrix* A, HypreParMatrix* P )
     hypre_ParCSRMatrixSetRowStartsOwner( rap, 0 );
     hypre_ParCSRMatrixSetColStartsOwner( rap, 0 );
 
-    if( P_owns_its_col_starts ) { hypre_ParCSRMatrixSetColStartsOwner( P->A_parcsr, 1 ); }
+    if( P_owns_its_col_starts )
+    {
+        hypre_ParCSRMatrixSetColStartsOwner( P->A_parcsr, 1 );
+    }
 
     HypreParMatrix* tmpMat = new HypreParMatrix( A->pcomm, A->M(), A->N(), A->RowPart(), A->ColPart(), 0, 0 );
     hypre_IJMatrixObject( tmpMat->A ) = rap;
@@ -708,8 +749,11 @@ HypreParMatrix* RAP( HypreParMatrix* Rt, HypreParMatrix* A, HypreParMatrix* P )
     return tmpMat;
 }
 
-void EliminateBC( HypreParMatrix& A, HypreParMatrix& Ae, const std::vector< int >& ess_dof_list,
-                  const HypreParVector& X, HypreParVector& B )
+void EliminateBC( HypreParMatrix& A,
+                  HypreParMatrix& Ae,
+                  const std::vector< int >& ess_dof_list,
+                  const HypreParVector& X,
+                  HypreParVector& B )
 {
     // B -= Ae*X
     Ae.Mult( -1.0, X, 1.0, B );
@@ -735,16 +779,25 @@ void EliminateBC( HypreParMatrix& A, HypreParMatrix& Ae, const std::vector< int 
         // Check that in the rows specified by the ess_dof_list, the matrix A has
         // only one entry -- the diagonal.
         // if (I[r+1] != I[r]+1 || J[I[r]] != r || I_offd[r] != I_offd[r+1])
-        if( J[I[r]] != r ) { MB_SET_ERR_RET( "the diagonal entry must be the first entry in the row!" ); }
+        if( J[I[r]] != r )
+        {
+            MB_SET_ERR_RET( "the diagonal entry must be the first entry in the row!" );
+        }
 
         for( int j = I[r] + 1; j < I[r + 1]; j++ )
         {
-            if( data[j] != 0.0 ) { MB_SET_ERR_RET( "all off-diagonal entries must be zero!" ); }
+            if( data[j] != 0.0 )
+            {
+                MB_SET_ERR_RET( "all off-diagonal entries must be zero!" );
+            }
         }
 
         for( int j = I_offd[r]; j < I_offd[r + 1]; j++ )
         {
-            if( data_offd[j] != 0.0 ) { MB_SET_ERR_RET( "all off-diagonal entries must be zero!" ); }
+            if( data_offd[j] != 0.0 )
+            {
+                MB_SET_ERR_RET( "all off-diagonal entries must be zero!" );
+            }
         }
 
 #endif
@@ -756,7 +809,10 @@ void EliminateBC( HypreParMatrix& A, HypreParMatrix& Ae, const std::vector< int 
 
 int ParCSRRelax_Taubin( hypre_ParCSRMatrix* A,  // matrix to relax with
                         hypre_ParVector* f,     // right-hand side
-                        double lambda, double mu, int N, double max_eig,
+                        double lambda,
+                        double mu,
+                        int N,
+                        double max_eig,
                         hypre_ParVector* u,  // initial/updated approximation
                         hypre_ParVector* r   // another temp vector
 )
@@ -788,10 +844,14 @@ int ParCSRRelax_Taubin( hypre_ParCSRMatrix* A,  // matrix to relax with
 
 int ParCSRRelax_FIR( hypre_ParCSRMatrix* A,  // matrix to relax with
                      hypre_ParVector* f,     // right-hand side
-                     double max_eig, int poly_order, double* fir_coeffs,
+                     double max_eig,
+                     int poly_order,
+                     double* fir_coeffs,
                      hypre_ParVector* u,   // initial/updated approximation
                      hypre_ParVector* x0,  // temporaries
-                     hypre_ParVector* x1, hypre_ParVector* x2, hypre_ParVector* x3 )
+                     hypre_ParVector* x1,
+                     hypre_ParVector* x2,
+                     hypre_ParVector* x3 )
 
 {
     hypre_CSRMatrix* A_diag = hypre_ParCSRMatrixDiag( A );

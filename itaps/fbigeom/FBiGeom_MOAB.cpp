@@ -91,8 +91,12 @@ void FBiGeom_dtor( FBiGeom_Instance instance, int* err )
     *err = iBase_SUCCESS;
 }
 
-void FBiGeom_newGeomFromMesh( iMesh_Instance mesh, iBase_EntitySetHandle set, const char* options,
-                              FBiGeom_Instance* geom, int* err, int )
+void FBiGeom_newGeomFromMesh( iMesh_Instance mesh,
+                              iBase_EntitySetHandle set,
+                              const char* options,
+                              FBiGeom_Instance* geom,
+                              int* err,
+                              int )
 {
     MBiMesh* mbimesh           = reinterpret_cast< MBiMesh* >( mesh );
     moab::Interface* mbi       = mbimesh->mbImpl;
@@ -184,7 +188,11 @@ void FBiGeom_load( FBiGeom_Instance instance, char const* name, char const* opti
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_save( FBiGeom_Instance instance, char const* name, char const* options, int* err, int name_len,
+void FBiGeom_save( FBiGeom_Instance instance,
+                   char const* name,
+                   char const* options,
+                   int* err,
+                   int name_len,
                    int options_len )
 {
     iMesh_save( IMESH_INSTANCE( instance ), NULL, name, options, err, name_len, options_len );
@@ -203,12 +211,19 @@ void FBiGeom_getBoundBox( FBiGeom_Instance instance, double*, double*, double*, 
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEntities( FBiGeom_Instance instance, iBase_EntitySetHandle set_handle, int entity_type,
-                          iBase_EntityHandle** entity_handles, int* entity_handles_allocated, int* entity_handles_size,
+void FBiGeom_getEntities( FBiGeom_Instance instance,
+                          iBase_EntitySetHandle set_handle,
+                          int entity_type,
+                          iBase_EntityHandle** entity_handles,
+                          int* entity_handles_allocated,
+                          int* entity_handles_size,
                           int* err )
 {
 
-    if( 0 > entity_type || 4 < entity_type ) { ERROR( iBase_INVALID_ENTITY_TYPE, "Bad entity type." ); }
+    if( 0 > entity_type || 4 < entity_type )
+    {
+        ERROR( iBase_INVALID_ENTITY_TYPE, "Bad entity type." );
+    }
     else /* 0<= entity_type <= 4) */
     {
         Range gentities;
@@ -222,10 +237,16 @@ void FBiGeom_getEntities( FBiGeom_Instance instance, iBase_EntitySetHandle set_h
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getNumOfType( FBiGeom_Instance instance, iBase_EntitySetHandle set_handle, int entity_type, int* num_out,
+void FBiGeom_getNumOfType( FBiGeom_Instance instance,
+                           iBase_EntitySetHandle set_handle,
+                           int entity_type,
+                           int* num_out,
                            int* err )
 {
-    if( 0 > entity_type || 4 < entity_type ) { ERROR( iBase_INVALID_ENTITY_TYPE, "Bad entity type." ); }
+    if( 0 > entity_type || 4 < entity_type )
+    {
+        ERROR( iBase_INVALID_ENTITY_TYPE, "Bad entity type." );
+    }
     ErrorCode rval = FBE_cast( instance )->getNumOfType( (EntityHandle)set_handle, entity_type, num_out );CHKERR( rval, "can't get number of type " );
 
     RETURN( iBase_SUCCESS );
@@ -239,8 +260,13 @@ void FBiGeom_getEntType( FBiGeom_Instance instance, iBase_EntityHandle entity_ha
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrType( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
-                         int** type, int* type_allocated, int* type_size, int* err )
+void FBiGeom_getArrType( FBiGeom_Instance instance,
+                         iBase_EntityHandle const* entity_handles,
+                         int entity_handles_size,
+                         int** type,
+                         int* type_allocated,
+                         int* type_size,
+                         int* err )
 {
     CHECK_SIZE( *type, *type_allocated, entity_handles_size, int, NULL );
     *type_size = entity_handles_size;
@@ -250,14 +276,21 @@ void FBiGeom_getArrType( FBiGeom_Instance instance, iBase_EntityHandle const* en
     for( int i = 0; i < entity_handles_size; i++ )
     {
         FBiGeom_getEntType( instance, entity_handles[i], *type + i, &tmp_err );
-        if( iBase_SUCCESS != tmp_err ) { ERROR( tmp_err, "Failed to get entity type in FBiGeom_getArrType." ); }
+        if( iBase_SUCCESS != tmp_err )
+        {
+            ERROR( tmp_err, "Failed to get entity type in FBiGeom_getArrType." );
+        }
     }
 
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int to_dimension,
-                        iBase_EntityHandle** adj_entities, int* adj_entities_allocated, int* adj_entities_size,
+void FBiGeom_getEntAdj( FBiGeom_Instance instance,
+                        iBase_EntityHandle entity_handle,
+                        int to_dimension,
+                        iBase_EntityHandle** adj_entities,
+                        int* adj_entities_allocated,
+                        int* adj_entities_size,
                         int* err )
 {
     Range adjs;
@@ -276,10 +309,17 @@ void FBiGeom_getEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_han
 }
 
 // I suspect this is wrong
-void FBiGeom_getArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
-                        int requested_entity_type, iBase_EntityHandle** adj_entity_handles,
-                        int* adj_entity_handles_allocated, int* adj_entity_handles_size, int** offset,
-                        int* offset_allocated, int* offset_size, int* err )
+void FBiGeom_getArrAdj( FBiGeom_Instance instance,
+                        iBase_EntityHandle const* entity_handles,
+                        int entity_handles_size,
+                        int requested_entity_type,
+                        iBase_EntityHandle** adj_entity_handles,
+                        int* adj_entity_handles_allocated,
+                        int* adj_entity_handles_size,
+                        int** offset,
+                        int* offset_allocated,
+                        int* offset_size,
+                        int* err )
 {
     // check offset array size
     Range temp_range, total_range;
@@ -306,9 +346,14 @@ void FBiGeom_getArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* ent
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, int bridge_dimension,
-                           int to_dimension, iBase_EntityHandle** adjacent_entities, int* adjacent_entities_allocated,
-                           int* adjacent_entities_size, int* err )
+void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance,
+                           iBase_EntityHandle entity_handle,
+                           int bridge_dimension,
+                           int to_dimension,
+                           iBase_EntityHandle** adjacent_entities,
+                           int* adjacent_entities_allocated,
+                           int* adjacent_entities_size,
+                           int* err )
 {
     Range to_ents, bridge_ents, tmp_ents;
     ErrorCode rval = FBE_cast( instance )->getEntAdj( MBH_cast( entity_handle ), bridge_dimension, bridge_ents );
@@ -325,7 +370,10 @@ void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_
 
         for( jter = tmp_ents.begin(); jter != end_jter; ++jter )
         {
-            if( to_ents.find( *jter ) == to_ents.end() ) { to_ents.insert( *jter ); }
+            if( to_ents.find( *jter ) == to_ents.end() )
+            {
+                to_ents.insert( *jter );
+            }
         }
         tmp_ents.clear();
     }
@@ -337,16 +385,29 @@ void FBiGeom_getEnt2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArr2ndAdj( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, int, iBase_EntityHandle**,
-                           int*, int*, int**, int*, int*, int* err )
+void FBiGeom_getArr2ndAdj( FBiGeom_Instance instance,
+                           iBase_EntityHandle const*,
+                           int,
+                           int,
+                           int,
+                           iBase_EntityHandle**,
+                           int*,
+                           int*,
+                           int**,
+                           int*,
+                           int*,
+                           int* err )
 {
     // not implemented
     // who would need this monster, anyway?
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_isEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_handle1, iBase_EntityHandle entity_handle2,
-                       int* are_adjacent, int* err )
+void FBiGeom_isEntAdj( FBiGeom_Instance instance,
+                       iBase_EntityHandle entity_handle1,
+                       iBase_EntityHandle entity_handle2,
+                       int* are_adjacent,
+                       int* err )
 {
 
     bool adjacent_out;
@@ -357,9 +418,15 @@ void FBiGeom_isEntAdj( FBiGeom_Instance instance, iBase_EntityHandle entity_hand
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_isArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles_1, int entity_handles_1_size,
-                       iBase_EntityHandle const* entity_handles_2, int entity_handles_2_size, int** is_adjacent_info,
-                       int* is_adjacent_info_allocated, int* is_adjacent_info_size, int* err )
+void FBiGeom_isArrAdj( FBiGeom_Instance instance,
+                       iBase_EntityHandle const* entity_handles_1,
+                       int entity_handles_1_size,
+                       iBase_EntityHandle const* entity_handles_2,
+                       int entity_handles_2_size,
+                       int** is_adjacent_info,
+                       int* is_adjacent_info_allocated,
+                       int* is_adjacent_info_size,
+                       int* err )
 {
     int index1 = 0;
     int index2 = 0;
@@ -407,8 +474,15 @@ void FBiGeom_isArrAdj( FBiGeom_Instance instance, iBase_EntityHandle const* enti
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEntClosestPt( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double near_x, double near_y,
-                              double near_z, double* on_x, double* on_y, double* on_z, int* err )
+void FBiGeom_getEntClosestPt( FBiGeom_Instance instance,
+                              iBase_EntityHandle entity_handle,
+                              double near_x,
+                              double near_y,
+                              double near_z,
+                              double* on_x,
+                              double* on_y,
+                              double* on_z,
+                              int* err )
 {
 
     ErrorCode rval =
@@ -417,10 +491,16 @@ void FBiGeom_getEntClosestPt( FBiGeom_Instance instance, iBase_EntityHandle enti
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrClosestPt( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, int storage_order, double const* near_coordinates,
-                              int near_coordinates_size, double** on_coordinates, int* on_coordinates_allocated,
-                              int* on_coordinates_size, int* err )
+void FBiGeom_getArrClosestPt( FBiGeom_Instance instance,
+                              iBase_EntityHandle const* entity_handles,
+                              int entity_handles_size,
+                              int storage_order,
+                              double const* near_coordinates,
+                              int near_coordinates_size,
+                              double** on_coordinates,
+                              int* on_coordinates_allocated,
+                              int* on_coordinates_size,
+                              int* err )
 {
     CHECK_SIZE( *on_coordinates, *on_coordinates_allocated, near_coordinates_size, double, NULL );
 
@@ -447,17 +527,31 @@ void FBiGeom_getArrClosestPt( FBiGeom_Instance instance, iBase_EntityHandle cons
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEntNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
-                            double* nrml_i, double* nrml_j, double* nrml_k, int* err )
+void FBiGeom_getEntNrmlXYZ( FBiGeom_Instance instance,
+                            iBase_EntityHandle entity_handle,
+                            double x,
+                            double y,
+                            double z,
+                            double* nrml_i,
+                            double* nrml_j,
+                            double* nrml_k,
+                            int* err )
 {
 
     ErrorCode rval = FBE_cast( instance )->getEntNrmlXYZ( MBH_cast( entity_handle ), x, y, z, nrml_i, nrml_j, nrml_k );CHKERR( rval, "Failed to get normal" );
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                            int entity_handles_size, int storage_order, double const* coordinates, int coordinates_size,
-                            double** normals, int* normals_allocated, int* normals_size, int* err )
+void FBiGeom_getArrNrmlXYZ( FBiGeom_Instance instance,
+                            iBase_EntityHandle const* entity_handles,
+                            int entity_handles_size,
+                            int storage_order,
+                            double const* coordinates,
+                            int coordinates_size,
+                            double** normals,
+                            int* normals_allocated,
+                            int* normals_size,
+                            int* err )
 {
     // set up iteration according to storage order.
     // allow either gentity_handles or near_coordinates to contain
@@ -534,8 +628,17 @@ void FBiGeom_getArrNrmlXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double x, double y, double z,
-                              double* pt_x, double* pt_y, double* pt_z, double* nrml_i, double* nrml_j, double* nrml_k,
+void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance,
+                              iBase_EntityHandle entity_handle,
+                              double x,
+                              double y,
+                              double z,
+                              double* pt_x,
+                              double* pt_y,
+                              double* pt_z,
+                              double* nrml_i,
+                              double* nrml_j,
+                              double* nrml_k,
                               int* err )
 {
     // just do for surface and volume
@@ -558,10 +661,18 @@ void FBiGeom_getEntNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle enti
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, int storage_order, double const* near_coordinates,
-                              int near_coordinates_size, double** on_coordinates, int* on_coordinates_allocated,
-                              int* on_coordinates_size, double** normals, int* normals_allocated, int* normals_size,
+void FBiGeom_getArrNrmlPlXYZ( FBiGeom_Instance instance,
+                              iBase_EntityHandle const* entity_handles,
+                              int entity_handles_size,
+                              int storage_order,
+                              double const* near_coordinates,
+                              int near_coordinates_size,
+                              double** on_coordinates,
+                              int* on_coordinates_allocated,
+                              int* on_coordinates_size,
+                              double** normals,
+                              int* normals_allocated,
+                              int* normals_size,
                               int* err )
 {
     // set up iteration according to storage order.
@@ -652,20 +763,42 @@ void FBiGeom_getArrNrmlPlXYZ( FBiGeom_Instance instance, iBase_EntityHandle cons
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEntTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double*, double*,
-                            double*, int* err )
+void FBiGeom_getEntTgntXYZ( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            double,
+                            double,
+                            double,
+                            double*,
+                            double*,
+                            double*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getArrTgntXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                            double**, int*, int*, int* err )
+void FBiGeom_getArrTgntXYZ( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double const*,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEntBoundBox( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* min_x, double* min_y,
-                             double* min_z, double* max_x, double* max_y, double* max_z, int* err )
+void FBiGeom_getEntBoundBox( FBiGeom_Instance instance,
+                             iBase_EntityHandle entity_handle,
+                             double* min_x,
+                             double* min_y,
+                             double* min_z,
+                             double* max_x,
+                             double* max_y,
+                             double* max_z,
+                             int* err )
 {
     ErrorCode rval;
     int type;
@@ -717,9 +850,16 @@ void FBiGeom_getEntBoundBox( FBiGeom_Instance instance, iBase_EntityHandle entit
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrBoundBox( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                             int entity_handles_size, int storage_order, double** min_corner, int* min_corner_allocated,
-                             int* min_corner_size, double** max_corner, int* max_corner_allocated, int* max_corner_size,
+void FBiGeom_getArrBoundBox( FBiGeom_Instance instance,
+                             iBase_EntityHandle const* entity_handles,
+                             int entity_handles_size,
+                             int storage_order,
+                             double** min_corner,
+                             int* min_corner_allocated,
+                             int* min_corner_size,
+                             double** max_corner,
+                             int* max_corner_allocated,
+                             int* max_corner_size,
                              int* err )
 {
     // check or pre-allocate the coordinate arrays
@@ -762,16 +902,25 @@ void FBiGeom_getArrBoundBox( FBiGeom_Instance instance, iBase_EntityHandle const
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getVtxCoord( FBiGeom_Instance instance, iBase_EntityHandle vertex_handle, double* x, double* y, double* z,
+void FBiGeom_getVtxCoord( FBiGeom_Instance instance,
+                          iBase_EntityHandle vertex_handle,
+                          double* x,
+                          double* y,
+                          double* z,
                           int* err )
 {
     ErrorCode rval = FBE_cast( instance )->getVtxCoord( MBH_cast( vertex_handle ), x, y, z );CHKERR( rval, "Failed to vertex position" );
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getVtxArrCoords( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles,
-                              int entity_handles_size, int storage_order, double** coordinates,
-                              int* coordinates_allocated, int* coordinates_size, int* err )
+void FBiGeom_getVtxArrCoords( FBiGeom_Instance instance,
+                              iBase_EntityHandle const* entity_handles,
+                              int entity_handles_size,
+                              int storage_order,
+                              double** coordinates,
+                              int* coordinates_allocated,
+                              int* coordinates_size,
+                              int* err )
 {
     // check or pre-allocate the coordinate arrays
     CHECK_SIZE( *coordinates, *coordinates_allocated, 3 * entity_handles_size, double, NULL );
@@ -804,12 +953,24 @@ void FBiGeom_getVtxArrCoords( FBiGeom_Instance instance, iBase_EntityHandle cons
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance, double x, double y, double z, double dir_x, double dir_y,
-                              double dir_z, iBase_EntityHandle** intersect_entity_handles,
-                              int* intersect_entity_handles_allocated, int* intersect_entity_handles_size,
-                              int storage_order, double** intersect_coords, int* intersect_coords_allocated,
-                              int* intersect_coords_size, double** param_coords, int* param_coords_allocated,
-                              int* param_coords_size, int* err )
+void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance,
+                              double x,
+                              double y,
+                              double z,
+                              double dir_x,
+                              double dir_y,
+                              double dir_z,
+                              iBase_EntityHandle** intersect_entity_handles,
+                              int* intersect_entity_handles_allocated,
+                              int* intersect_entity_handles_size,
+                              int storage_order,
+                              double** intersect_coords,
+                              int* intersect_coords_allocated,
+                              int* intersect_coords_size,
+                              double** param_coords,
+                              int* param_coords_allocated,
+                              int* param_coords_size,
+                              int* err )
 {
     // this is pretty cool
     // we will return only surfaces
@@ -850,24 +1011,50 @@ void FBiGeom_getPntRayIntsct( FBiGeom_Instance instance, double x, double y, dou
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getPntArrRayIntsct( FBiGeom_Instance instance, int, const double*, int, const double*, int,
-                                 iBase_EntityHandle**, int*, int*, int**, int*, int*, double**, int*, int*, double**,
-                                 int*, int*, int* err )
+void FBiGeom_getPntArrRayIntsct( FBiGeom_Instance instance,
+                                 int,
+                                 const double*,
+                                 int,
+                                 const double*,
+                                 int,
+                                 iBase_EntityHandle**,
+                                 int*,
+                                 int*,
+                                 int**,
+                                 int*,
+                                 int*,
+                                 double**,
+                                 int*,
+                                 int*,
+                                 double**,
+                                 int*,
+                                 int*,
+                                 int* err )
 {
     // not implemented
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEntNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle face, iBase_EntityHandle region,
-                              int* sense_out, int* err )
+void FBiGeom_getEntNrmlSense( FBiGeom_Instance instance,
+                              iBase_EntityHandle face,
+                              iBase_EntityHandle region,
+                              int* sense_out,
+                              int* err )
 {
     moab::EntityHandle mbregion = (moab::EntityHandle)region;
     moab::EntityHandle mbface   = (moab::EntityHandle)face;
     moab::ErrorCode rval        = FBE_cast( instance )->getEgFcSense( mbface, mbregion, *sense_out );CHKERR( rval, "can't get normal sense " );
     RETURN( iBase_SUCCESS );
 }
-void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*, int,
-                              int**, int*, int*, int* err )
+void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance,
+                              iBase_EntityHandle const*,
+                              int,
+                              iBase_EntityHandle const*,
+                              int,
+                              int**,
+                              int*,
+                              int*,
+                              int* err )
 {
     // not implemented
     RETURN( iBase_NOT_SUPPORTED );
@@ -882,7 +1069,10 @@ void FBiGeom_getArrNrmlSense( FBiGeom_Instance instance, iBase_EntityHandle cons
  * \param sense_out Sense of edge with respect to face
  */
 
-void FBiGeom_getEgFcSense( FBiGeom_Instance instance, iBase_EntityHandle edge, iBase_EntityHandle face, int* sense_out,
+void FBiGeom_getEgFcSense( FBiGeom_Instance instance,
+                           iBase_EntityHandle edge,
+                           iBase_EntityHandle face,
+                           int* sense_out,
                            int* err )
 {
     // this one is important, for establishing the orientation of the edges in faces
@@ -893,28 +1083,53 @@ void FBiGeom_getEgFcSense( FBiGeom_Instance instance, iBase_EntityHandle edge, i
     CHKERR( rval, "Failed to get edge senses in FBiGeom_getEgFcSense." );
     RETURN( iBase_SUCCESS );
 }
-void FBiGeom_getEgFcArrSense( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*, int,
-                              int**, int*, int*, int* err )
+void FBiGeom_getEgFcArrSense( FBiGeom_Instance instance,
+                              iBase_EntityHandle const*,
+                              int,
+                              iBase_EntityHandle const*,
+                              int,
+                              int**,
+                              int*,
+                              int*,
+                              int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEgVtxSense( FBiGeom_Instance instance, iBase_EntityHandle edge, iBase_EntityHandle vertex1,
-                            iBase_EntityHandle vertex2, int* sense_out, int* err )
+void FBiGeom_getEgVtxSense( FBiGeom_Instance instance,
+                            iBase_EntityHandle edge,
+                            iBase_EntityHandle vertex1,
+                            iBase_EntityHandle vertex2,
+                            int* sense_out,
+                            int* err )
 {
 
     ErrorCode rval =
         FBE_cast( instance )->getEgVtxSense( MBH_cast( edge ), MBH_cast( vertex1 ), MBH_cast( vertex2 ), *sense_out );CHKERR( rval, "Failed to get vertex sense wrt edge in FBiGeom_getEgVtxSense" );
     RETURN( iBase_SUCCESS );
 }
-void FBiGeom_getEgVtxArrSense( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*,
-                               int, iBase_EntityHandle const*, int, int**, int*, int*, int* err )
+void FBiGeom_getEgVtxArrSense( FBiGeom_Instance instance,
+                               iBase_EntityHandle const*,
+                               int,
+                               iBase_EntityHandle const*,
+                               int,
+                               iBase_EntityHandle const*,
+                               int,
+                               int**,
+                               int*,
+                               int*,
+                               int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_measure( FBiGeom_Instance instance, iBase_EntityHandle const* entity_handles, int entity_handles_size,
-                      double** measures, int* measures_allocated, int* measures_size, int* err )
+void FBiGeom_measure( FBiGeom_Instance instance,
+                      iBase_EntityHandle const* entity_handles,
+                      int entity_handles_size,
+                      double** measures,
+                      int* measures_allocated,
+                      int* measures_size,
+                      int* err )
 {
 
     CHECK_SIZE( *measures, *measures_allocated, entity_handles_size, double, NULL );
@@ -923,7 +1138,10 @@ void FBiGeom_measure( FBiGeom_Instance instance, iBase_EntityHandle const* entit
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getFaceType( FBiGeom_Instance instance, iBase_EntityHandle, char* face_type, int* err,
+void FBiGeom_getFaceType( FBiGeom_Instance instance,
+                          iBase_EntityHandle,
+                          char* face_type,
+                          int* err,
                           int* face_type_length )
 {
     std::string type = "nonplanar";  // for swept faces created with rays between surfaces,
@@ -954,19 +1172,38 @@ void FBiGeom_isArrParametric( FBiGeom_Instance instance, iBase_EntityHandle cons
     // not implemented
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEntUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double*, double*, double*,
+void FBiGeom_getEntUVtoXYZ( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            double,
+                            double,
+                            double*,
+                            double*,
+                            double*,
                             int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrUVtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                            double**, int*, int*, int* err )
+void FBiGeom_getArrUVtoXYZ( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double const*,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double* x, double* y,
-                           double* z, int* err )
+void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance,
+                           iBase_EntityHandle entity_handle,
+                           double u,
+                           double* x,
+                           double* y,
+                           double* z,
+                           int* err )
 {
     int type;
     FBiGeom_getEntType( instance, entity_handle, &type, err );
@@ -979,13 +1216,27 @@ void FBiGeom_getEntUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle entity_
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrUtoXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*, int, double const*, int, int, double**,
-                           int*, int*, int* err )
+void FBiGeom_getArrUtoXYZ( FBiGeom_Instance instance,
+                           iBase_EntityHandle const*,
+                           int,
+                           double const*,
+                           int,
+                           int,
+                           double**,
+                           int*,
+                           int*,
+                           int* err )
 {
     // not implemented
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEntXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double*, double*,
+void FBiGeom_getEntXYZtoUV( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            double,
+                            double,
+                            double,
+                            double*,
+                            double*,
                             int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
@@ -994,49 +1245,109 @@ void FBiGeom_getEntXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle, double
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrXYZtoUV( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                            double**, int*, int*, int* err )
+void FBiGeom_getArrXYZtoUV( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double const*,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrXYZtoU( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int, double**,
-                           int*, int*, int* err )
+void FBiGeom_getArrXYZtoU( FBiGeom_Instance instance,
+                           iBase_EntityHandle const*,
+                           int,
+                           int,
+                           double const*,
+                           int,
+                           double**,
+                           int*,
+                           int*,
+                           int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEntXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double*, double*,
+void FBiGeom_getEntXYZtoUVHint( FBiGeom_Instance instance,
+                                iBase_EntityHandle,
+                                double,
+                                double,
+                                double,
+                                double*,
+                                double*,
                                 int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrXYZtoUVHint( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                                double**, int*, int*, int* err )
+void FBiGeom_getArrXYZtoUVHint( FBiGeom_Instance instance,
+                                iBase_EntityHandle const*,
+                                int,
+                                int,
+                                double const*,
+                                int,
+                                double**,
+                                int*,
+                                int*,
+                                int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEntUVRange( FBiGeom_Instance instance, iBase_EntityHandle, double*, double*, double*, double*,
+void FBiGeom_getEntUVRange( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            double*,
+                            double*,
+                            double*,
+                            double*,
                             int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEntURange( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double* u_min, double* u_max,
+void FBiGeom_getEntURange( FBiGeom_Instance instance,
+                           iBase_EntityHandle entity_handle,
+                           double* u_min,
+                           double* u_max,
                            int* err )
 {
     ErrorCode rval = FBE_cast( instance )->getEntURange( (EntityHandle)entity_handle, *u_min, *u_max );CHKERR( rval, "Failed to get range" );
     RETURN( iBase_SUCCESS );
 }
-void FBiGeom_getArrUVRange( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double**, int*, int*,
-                            double**, int*, int*, int* err )
+void FBiGeom_getArrUVRange( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrURange( FBiGeom_Instance instance, iBase_EntityHandle const*, int, double**, int*, int*, double**,
-                           int*, int*, int* err )
+void FBiGeom_getArrURange( FBiGeom_Instance instance,
+                           iBase_EntityHandle const*,
+                           int,
+                           double**,
+                           int*,
+                           int*,
+                           double**,
+                           int*,
+                           int*,
+                           int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEntUtoUV( FBiGeom_Instance instance, iBase_EntityHandle, iBase_EntityHandle, double, double*, double*,
+void FBiGeom_getEntUtoUV( FBiGeom_Instance instance,
+                          iBase_EntityHandle,
+                          iBase_EntityHandle,
+                          double,
+                          double*,
+                          double*,
                           int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
@@ -1049,75 +1360,210 @@ void FBiGeom_getVtxToU( FBiGeom_Instance instance, iBase_EntityHandle, iBase_Ent
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrUtoUV( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*, int,
-                          double const*, int, int, double**, int*, int*, int* err )
+void FBiGeom_getArrUtoUV( FBiGeom_Instance instance,
+                          iBase_EntityHandle const*,
+                          int,
+                          iBase_EntityHandle const*,
+                          int,
+                          double const*,
+                          int,
+                          int,
+                          double**,
+                          int*,
+                          int*,
+                          int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getVtxArrToUV( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*, int,
-                            int, double**, int*, int*, int* err )
+void FBiGeom_getVtxArrToUV( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getVtxArrToU( FBiGeom_Instance instance, iBase_EntityHandle const*, int, iBase_EntityHandle const*, int,
-                           double**, int*, int*, int* err )
-{
-    RETURN( iBase_NOT_SUPPORTED );
-}
-void FBiGeom_getEntNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double*, double*, double*,
+void FBiGeom_getVtxArrToU( FBiGeom_Instance instance,
+                           iBase_EntityHandle const*,
+                           int,
+                           iBase_EntityHandle const*,
+                           int,
+                           double**,
+                           int*,
+                           int*,
                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrNrmlUV( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int, double**,
-                           int*, int*, int* err )
+void FBiGeom_getEntNrmlUV( FBiGeom_Instance instance,
+                           iBase_EntityHandle,
+                           double,
+                           double,
+                           double*,
+                           double*,
+                           double*,
+                           int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEntTgntU( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, double u, double* tgnt_i,
-                          double* tgnt_j, double* tgnt_k, int* err )
+void FBiGeom_getArrNrmlUV( FBiGeom_Instance instance,
+                           iBase_EntityHandle const*,
+                           int,
+                           int,
+                           double const*,
+                           int,
+                           double**,
+                           int*,
+                           int*,
+                           int* err )
+{
+    RETURN( iBase_NOT_SUPPORTED );
+}
+void FBiGeom_getEntTgntU( FBiGeom_Instance instance,
+                          iBase_EntityHandle entity_handle,
+                          double u,
+                          double* tgnt_i,
+                          double* tgnt_j,
+                          double* tgnt_k,
+                          int* err )
 {
     ErrorCode rval =
         FBE_cast( instance )->getEntTgntU( (moab::EntityHandle)entity_handle, u, *tgnt_i, *tgnt_j, *tgnt_k );CHKERR( rval, "Failed to get tangent from u" );
     RETURN( iBase_SUCCESS );
 }
-void FBiGeom_getArrTgntU( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int, double**,
-                          int*, int*, int* err )
+void FBiGeom_getArrTgntU( FBiGeom_Instance instance,
+                          iBase_EntityHandle const*,
+                          int,
+                          int,
+                          double const*,
+                          int,
+                          double**,
+                          int*,
+                          int*,
+                          int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEnt1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double**, int*, int*,
-                            double**, int*, int*, int* err )
+void FBiGeom_getEnt1stDrvt( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            double,
+                            double,
+                            double**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArr1stDrvt( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                            double**, int*, int*, int**, int*, int*, double**, int*, int*, int**, int*, int*, int* err )
+void FBiGeom_getArr1stDrvt( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double const*,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            int**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            int**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getEnt2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double**, int*, int*,
-                            double**, int*, int*, double**, int*, int*, int* err )
+void FBiGeom_getEnt2ndDrvt( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            double,
+                            double,
+                            double**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArr2ndDrvt( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                            double**, int*, int*, int**, int*, int*, double**, int*, int*, int**, int*, int*, double**,
-                            int*, int*, int**, int*, int*, int* err )
+void FBiGeom_getArr2ndDrvt( FBiGeom_Instance instance,
+                            iBase_EntityHandle const*,
+                            int,
+                            int,
+                            double const*,
+                            int,
+                            double**,
+                            int*,
+                            int*,
+                            int**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            int**,
+                            int*,
+                            int*,
+                            double**,
+                            int*,
+                            int*,
+                            int**,
+                            int*,
+                            int*,
+                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getFcCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double*, double*, double*,
-                          double*, double*, double*, int* err )
+void FBiGeom_getFcCvtrUV( FBiGeom_Instance instance,
+                          iBase_EntityHandle,
+                          double,
+                          double,
+                          double*,
+                          double*,
+                          double*,
+                          double*,
+                          double*,
+                          double*,
+                          int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getFcArrCvtrUV( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                             double**, int*, int*, double**, int*, int*, int* err )
+void FBiGeom_getFcArrCvtrUV( FBiGeom_Instance instance,
+                             iBase_EntityHandle const*,
+                             int,
+                             int,
+                             double const*,
+                             int,
+                             double**,
+                             int*,
+                             int*,
+                             double**,
+                             int*,
+                             int*,
+                             int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_isEntPeriodic( FBiGeom_Instance /*instance*/, iBase_EntityHandle /*entity_handle*/, int* in_u, int* in_v,
+void FBiGeom_isEntPeriodic( FBiGeom_Instance /*instance*/,
+                            iBase_EntityHandle /*entity_handle*/,
+                            int* in_u,
+                            int* in_v,
                             int* err )
 {
     *in_u = 0;
@@ -1143,7 +1589,11 @@ void FBiGeom_initEntIter( FBiGeom_Instance instance, iBase_EntitySetHandle, int,
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_initEntArrIter( FBiGeom_Instance instance, iBase_EntitySetHandle, int, int, iBase_EntityArrIterator*,
+void FBiGeom_initEntArrIter( FBiGeom_Instance instance,
+                             iBase_EntitySetHandle,
+                             int,
+                             int,
+                             iBase_EntityArrIterator*,
                              int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
@@ -1154,8 +1604,13 @@ void FBiGeom_getNextEntIter( FBiGeom_Instance instance, iBase_EntityIterator, iB
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getNextEntArrIter( FBiGeom_Instance instance, iBase_EntityArrIterator, iBase_EntityHandle**, int*, int*,
-                                int*, int* err )
+void FBiGeom_getNextEntArrIter( FBiGeom_Instance instance,
+                                iBase_EntityArrIterator,
+                                iBase_EntityHandle**,
+                                int*,
+                                int*,
+                                int*,
+                                int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
@@ -1185,8 +1640,14 @@ void FBiGeom_copyEnt( FBiGeom_Instance instance, iBase_EntityHandle, iBase_Entit
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_sweepEntAboutAxis( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double,
-                                iBase_EntityHandle*, int* err )
+void FBiGeom_sweepEntAboutAxis( FBiGeom_Instance instance,
+                                iBase_EntityHandle,
+                                double,
+                                double,
+                                double,
+                                double,
+                                iBase_EntityHandle*,
+                                int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
@@ -1242,13 +1703,27 @@ void FBiGeom_rotateEnt( FBiGeom_Instance instance, iBase_EntityHandle, double, d
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_reflectEnt( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double, double, double,
+void FBiGeom_reflectEnt( FBiGeom_Instance instance,
+                         iBase_EntityHandle,
+                         double,
+                         double,
+                         double,
+                         double,
+                         double,
+                         double,
                          int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_scaleEnt( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double, double, double,
+void FBiGeom_scaleEnt( FBiGeom_Instance instance,
+                       iBase_EntityHandle,
+                       double,
+                       double,
+                       double,
+                       double,
+                       double,
+                       double,
                        int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
@@ -1259,20 +1734,33 @@ void FBiGeom_uniteEnts( FBiGeom_Instance instance, iBase_EntityHandle const*, in
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_subtractEnts( FBiGeom_Instance instance, iBase_EntityHandle, iBase_EntityHandle, iBase_EntityHandle*,
+void FBiGeom_subtractEnts( FBiGeom_Instance instance,
+                           iBase_EntityHandle,
+                           iBase_EntityHandle,
+                           iBase_EntityHandle*,
                            int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_intersectEnts( FBiGeom_Instance instance, iBase_EntityHandle, iBase_EntityHandle, iBase_EntityHandle*,
+void FBiGeom_intersectEnts( FBiGeom_Instance instance,
+                            iBase_EntityHandle,
+                            iBase_EntityHandle,
+                            iBase_EntityHandle*,
                             int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_sectionEnt( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double, int,
-                         iBase_EntityHandle*, int* err )
+void FBiGeom_sectionEnt( FBiGeom_Instance instance,
+                         iBase_EntityHandle,
+                         double,
+                         double,
+                         double,
+                         double,
+                         int,
+                         iBase_EntityHandle*,
+                         int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
@@ -1304,8 +1792,11 @@ void FBiGeom_isList( FBiGeom_Instance instance, iBase_EntitySetHandle, int*, int
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getNumEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle, int /*num_hops*/,
-                            int* num_sets, int* err )
+void FBiGeom_getNumEntSets( FBiGeom_Instance instance,
+                            iBase_EntitySetHandle entity_set_handle,
+                            int /*num_hops*/,
+                            int* num_sets,
+                            int* err )
 {
     //  here, we get only the entity sets that have gents as members
     // we have the convention that entity sets of geom dimension 4 are
@@ -1330,9 +1821,13 @@ void FBiGeom_getNumEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle ent
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle, int,
-                         iBase_EntitySetHandle** contained_set_handles, int* contained_set_handles_allocated,
-                         int* contained_set_handles_size, int* err )
+void FBiGeom_getEntSets( FBiGeom_Instance instance,
+                         iBase_EntitySetHandle entity_set_handle,
+                         int,
+                         iBase_EntitySetHandle** contained_set_handles,
+                         int* contained_set_handles_allocated,
+                         int* contained_set_handles_size,
+                         int* err )
 {
     //  we get only the entity sets that have gents as members
     // we keep the convention that entity sets of geom dimension 4 are
@@ -1357,111 +1852,162 @@ void FBiGeom_getEntSets( FBiGeom_Instance instance, iBase_EntitySetHandle entity
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_addEntToSet( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_EntitySetHandle entity_set,
+void FBiGeom_addEntToSet( FBiGeom_Instance instance,
+                          iBase_EntityHandle entity_handle,
+                          iBase_EntitySetHandle entity_set,
                           int* err )
 {
     iMesh_addEntToSet( IMESH_INSTANCE( instance ), entity_handle, entity_set, err );
 }
 
-void FBiGeom_rmvEntFromSet( FBiGeom_Instance instance, iBase_EntityHandle entity_handle,
-                            iBase_EntitySetHandle entity_set, int* err )
+void FBiGeom_rmvEntFromSet( FBiGeom_Instance instance,
+                            iBase_EntityHandle entity_handle,
+                            iBase_EntitySetHandle entity_set,
+                            int* err )
 {
     iMesh_rmvEntFromSet( IMESH_INSTANCE( instance ), entity_handle, entity_set, err );
 }
 
-void FBiGeom_addEntArrToSet( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                             int entity_handles_size, iBase_EntitySetHandle entity_set, int* err )
+void FBiGeom_addEntArrToSet( FBiGeom_Instance instance,
+                             const iBase_EntityHandle* entity_handles,
+                             int entity_handles_size,
+                             iBase_EntitySetHandle entity_set,
+                             int* err )
 {
     iMesh_addEntArrToSet( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, entity_set, err );
 }
 
-void FBiGeom_rmvEntArrFromSet( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                               int entity_handles_size, iBase_EntitySetHandle entity_set, int* err )
+void FBiGeom_rmvEntArrFromSet( FBiGeom_Instance instance,
+                               const iBase_EntityHandle* entity_handles,
+                               int entity_handles_size,
+                               iBase_EntitySetHandle entity_set,
+                               int* err )
 {
     iMesh_rmvEntArrFromSet( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, entity_set, err );
 }
 
-void FBiGeom_addEntSet( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_to_add,
-                        iBase_EntitySetHandle entity_set_handle, int* err )
+void FBiGeom_addEntSet( FBiGeom_Instance instance,
+                        iBase_EntitySetHandle entity_set_to_add,
+                        iBase_EntitySetHandle entity_set_handle,
+                        int* err )
 {
     iMesh_addEntSet( IMESH_INSTANCE( instance ), entity_set_to_add, entity_set_handle, err );
 }
 
-void FBiGeom_rmvEntSet( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_to_remove,
-                        iBase_EntitySetHandle entity_set_handle, int* err )
+void FBiGeom_rmvEntSet( FBiGeom_Instance instance,
+                        iBase_EntitySetHandle entity_set_to_remove,
+                        iBase_EntitySetHandle entity_set_handle,
+                        int* err )
 {
     iMesh_rmvEntSet( IMESH_INSTANCE( instance ), entity_set_to_remove, entity_set_handle, err );
 }
 
-void FBiGeom_isEntContained( FBiGeom_Instance instance, iBase_EntitySetHandle containing_entity_set,
-                             iBase_EntityHandle contained_entity, int* is_contained, int* err )
+void FBiGeom_isEntContained( FBiGeom_Instance instance,
+                             iBase_EntitySetHandle containing_entity_set,
+                             iBase_EntityHandle contained_entity,
+                             int* is_contained,
+                             int* err )
 {
     iMesh_isEntContained( IMESH_INSTANCE( instance ), containing_entity_set, contained_entity, is_contained, err );
 }
 
-void FBiGeom_isEntArrContained( FBiGeom_Instance instance, iBase_EntitySetHandle containing_set,
-                                const iBase_EntityHandle* entity_handles, int num_entity_handles, int** is_contained,
-                                int* is_contained_allocated, int* is_contained_size, int* err )
+void FBiGeom_isEntArrContained( FBiGeom_Instance instance,
+                                iBase_EntitySetHandle containing_set,
+                                const iBase_EntityHandle* entity_handles,
+                                int num_entity_handles,
+                                int** is_contained,
+                                int* is_contained_allocated,
+                                int* is_contained_size,
+                                int* err )
 {
     iMesh_isEntArrContained( IMESH_INSTANCE( instance ), containing_set, entity_handles, num_entity_handles,
                              is_contained, is_contained_allocated, is_contained_size, err );
 }
 
-void FBiGeom_isEntSetContained( FBiGeom_Instance instance, iBase_EntitySetHandle containing_entity_set,
-                                iBase_EntitySetHandle contained_entity_set, int* is_contained, int* err )
+void FBiGeom_isEntSetContained( FBiGeom_Instance instance,
+                                iBase_EntitySetHandle containing_entity_set,
+                                iBase_EntitySetHandle contained_entity_set,
+                                int* is_contained,
+                                int* err )
 {
     iMesh_isEntSetContained( IMESH_INSTANCE( instance ), containing_entity_set, contained_entity_set, is_contained,
                              err );
 }
 
-void FBiGeom_addPrntChld( FBiGeom_Instance instance, iBase_EntitySetHandle parent_entity_set,
-                          iBase_EntitySetHandle child_entity_set, int* err )
+void FBiGeom_addPrntChld( FBiGeom_Instance instance,
+                          iBase_EntitySetHandle parent_entity_set,
+                          iBase_EntitySetHandle child_entity_set,
+                          int* err )
 {
     iMesh_addPrntChld( IMESH_INSTANCE( instance ), parent_entity_set, child_entity_set, err );
 }
 
-void FBiGeom_rmvPrntChld( FBiGeom_Instance instance, iBase_EntitySetHandle parent_entity_set,
-                          iBase_EntitySetHandle child_entity_set, int* err )
+void FBiGeom_rmvPrntChld( FBiGeom_Instance instance,
+                          iBase_EntitySetHandle parent_entity_set,
+                          iBase_EntitySetHandle child_entity_set,
+                          int* err )
 {
     iMesh_rmvPrntChld( IMESH_INSTANCE( instance ), parent_entity_set, child_entity_set, err );
 }
 
-void FBiGeom_isChildOf( FBiGeom_Instance instance, iBase_EntitySetHandle parent_entity_set,
-                        iBase_EntitySetHandle child_entity_set, int* is_child, int* err )
+void FBiGeom_isChildOf( FBiGeom_Instance instance,
+                        iBase_EntitySetHandle parent_entity_set,
+                        iBase_EntitySetHandle child_entity_set,
+                        int* is_child,
+                        int* err )
 {
     iMesh_isChildOf( IMESH_INSTANCE( instance ), parent_entity_set, child_entity_set, is_child, err );
 }
 
-void FBiGeom_getNumChld( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int num_hops, int* num_child,
+void FBiGeom_getNumChld( FBiGeom_Instance instance,
+                         iBase_EntitySetHandle entity_set,
+                         int num_hops,
+                         int* num_child,
                          int* err )
 {
     iMesh_getNumChld( IMESH_INSTANCE( instance ), entity_set, num_hops, num_child, err );
 }
 
-void FBiGeom_getNumPrnt( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, int num_hops, int* num_parent,
+void FBiGeom_getNumPrnt( FBiGeom_Instance instance,
+                         iBase_EntitySetHandle entity_set,
+                         int num_hops,
+                         int* num_parent,
                          int* err )
 {
     iMesh_getNumPrnt( IMESH_INSTANCE( instance ), entity_set, num_hops, num_parent, err );
 }
 
-void FBiGeom_getChldn( FBiGeom_Instance instance, iBase_EntitySetHandle from_entity_set, int num_hops,
-                       iBase_EntitySetHandle** entity_set_handles, int* entity_set_handles_allocated,
-                       int* entity_set_handles_size, int* err )
+void FBiGeom_getChldn( FBiGeom_Instance instance,
+                       iBase_EntitySetHandle from_entity_set,
+                       int num_hops,
+                       iBase_EntitySetHandle** entity_set_handles,
+                       int* entity_set_handles_allocated,
+                       int* entity_set_handles_size,
+                       int* err )
 {
     iMesh_getChldn( IMESH_INSTANCE( instance ), from_entity_set, num_hops, entity_set_handles,
                     entity_set_handles_allocated, entity_set_handles_size, err );
 }
 
-void FBiGeom_getPrnts( FBiGeom_Instance instance, iBase_EntitySetHandle from_entity_set, int num_hops,
-                       iBase_EntitySetHandle** entity_set_handles, int* entity_set_handles_allocated,
-                       int* entity_set_handles_size, int* err )
+void FBiGeom_getPrnts( FBiGeom_Instance instance,
+                       iBase_EntitySetHandle from_entity_set,
+                       int num_hops,
+                       iBase_EntitySetHandle** entity_set_handles,
+                       int* entity_set_handles_allocated,
+                       int* entity_set_handles_size,
+                       int* err )
 {
     iMesh_getPrnts( IMESH_INSTANCE( instance ), from_entity_set, num_hops, entity_set_handles,
                     entity_set_handles_allocated, entity_set_handles_size, err );
 }
 
-void FBiGeom_createTag( FBiGeom_Instance instance, const char* tag_name, int tag_size, int tag_type,
-                        iBase_TagHandle* tag_handle, int* err, int tag_name_len )
+void FBiGeom_createTag( FBiGeom_Instance instance,
+                        const char* tag_name,
+                        int tag_size,
+                        int tag_type,
+                        iBase_TagHandle* tag_handle,
+                        int* err,
+                        int tag_name_len )
 {
 
     iMesh_createTag( IMESH_INSTANCE( instance ), tag_name, tag_size, tag_type, tag_handle, err, tag_name_len );
@@ -1488,7 +2034,10 @@ void FBiGeom_getTagSizeBytes( FBiGeom_Instance instance, iBase_TagHandle tag_han
     iMesh_getTagSizeBytes( IMESH_INSTANCE( instance ), tag_handle, tag_size, err );
 }
 
-void FBiGeom_getTagHandle( FBiGeom_Instance instance, const char* tag_name, iBase_TagHandle* tag_handle, int* err,
+void FBiGeom_getTagHandle( FBiGeom_Instance instance,
+                           const char* tag_name,
+                           iBase_TagHandle* tag_handle,
+                           int* err,
                            int tag_name_len )
 {
     iMesh_getTagHandle( IMESH_INSTANCE( instance ), tag_name, tag_handle, err, tag_name_len );
@@ -1499,230 +2048,353 @@ void FBiGeom_getTagType( FBiGeom_Instance instance, iBase_TagHandle tag_handle, 
     iMesh_getTagType( IMESH_INSTANCE( instance ), tag_handle, tag_type, err );
 }
 
-void FBiGeom_setEntSetData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                            iBase_TagHandle tag_handle, const void* tag_value, int tag_value_size, int* err )
+void FBiGeom_setEntSetData( FBiGeom_Instance instance,
+                            iBase_EntitySetHandle entity_set_handle,
+                            iBase_TagHandle tag_handle,
+                            const void* tag_value,
+                            int tag_value_size,
+                            int* err )
 {
     iMesh_setEntSetData( IMESH_INSTANCE( instance ), entity_set_handle, tag_handle, tag_value, tag_value_size, err );
 }
 
-void FBiGeom_setEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                               int tag_value, int* err )
+void FBiGeom_setEntSetIntData( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set,
+                               iBase_TagHandle tag_handle,
+                               int tag_value,
+                               int* err )
 {
     iMesh_setEntSetIntData( IMESH_INSTANCE( instance ), entity_set, tag_handle, tag_value, err );
 }
 
-void FBiGeom_setEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                               double tag_value, int* err )
+void FBiGeom_setEntSetDblData( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set,
+                               iBase_TagHandle tag_handle,
+                               double tag_value,
+                               int* err )
 {
     iMesh_setEntSetDblData( IMESH_INSTANCE( instance ), entity_set, tag_handle, tag_value, err );
 }
 
-void FBiGeom_setEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                              iBase_EntityHandle tag_value, int* err )
+void FBiGeom_setEntSetEHData( FBiGeom_Instance instance,
+                              iBase_EntitySetHandle entity_set,
+                              iBase_TagHandle tag_handle,
+                              iBase_EntityHandle tag_value,
+                              int* err )
 {
     iMesh_setEntSetEHData( IMESH_INSTANCE( instance ), entity_set, tag_handle, tag_value, err );
 }
 
-void FBiGeom_setEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                               iBase_EntitySetHandle tag_value, int* err )
+void FBiGeom_setEntSetESHData( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set,
+                               iBase_TagHandle tag_handle,
+                               iBase_EntitySetHandle tag_value,
+                               int* err )
 {
     iMesh_setEntSetESHData( IMESH_INSTANCE( instance ), entity_set, tag_handle, tag_value, err );
 }
 
-void FBiGeom_getEntSetData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                            iBase_TagHandle tag_handle, void** tag_value, int* tag_value_allocated, int* tag_value_size,
+void FBiGeom_getEntSetData( FBiGeom_Instance instance,
+                            iBase_EntitySetHandle entity_set_handle,
+                            iBase_TagHandle tag_handle,
+                            void** tag_value,
+                            int* tag_value_allocated,
+                            int* tag_value_size,
                             int* err )
 {
     iMesh_getEntSetData( IMESH_INSTANCE( instance ), entity_set_handle, tag_handle, tag_value, tag_value_allocated,
                          tag_value_size, err );
 }
 
-void FBiGeom_getEntSetIntData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                               int* out_data, int* err )
+void FBiGeom_getEntSetIntData( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set,
+                               iBase_TagHandle tag_handle,
+                               int* out_data,
+                               int* err )
 {
     iMesh_getEntSetIntData( IMESH_INSTANCE( instance ), entity_set, tag_handle, out_data, err );
 }
 
-void FBiGeom_getEntSetDblData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                               double* out_data, int* err )
+void FBiGeom_getEntSetDblData( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set,
+                               iBase_TagHandle tag_handle,
+                               double* out_data,
+                               int* err )
 {
     iMesh_getEntSetDblData( IMESH_INSTANCE( instance ), entity_set, tag_handle, out_data, err );
 }
 
-void FBiGeom_getEntSetEHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                              iBase_EntityHandle* out_data, int* err )
+void FBiGeom_getEntSetEHData( FBiGeom_Instance instance,
+                              iBase_EntitySetHandle entity_set,
+                              iBase_TagHandle tag_handle,
+                              iBase_EntityHandle* out_data,
+                              int* err )
 {
     iMesh_getEntSetEHData( IMESH_INSTANCE( instance ), entity_set, tag_handle, out_data, err );
 }
 
-void FBiGeom_getEntSetESHData( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set, iBase_TagHandle tag_handle,
-                               iBase_EntitySetHandle* out_data, int* err )
+void FBiGeom_getEntSetESHData( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set,
+                               iBase_TagHandle tag_handle,
+                               iBase_EntitySetHandle* out_data,
+                               int* err )
 {
     iMesh_getEntSetESHData( IMESH_INSTANCE( instance ), entity_set, tag_handle, out_data, err );
 }
 
-void FBiGeom_getAllEntSetTags( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                               iBase_TagHandle** tag_handles, int* tag_handles_allocated, int* tag_handles_size,
+void FBiGeom_getAllEntSetTags( FBiGeom_Instance instance,
+                               iBase_EntitySetHandle entity_set_handle,
+                               iBase_TagHandle** tag_handles,
+                               int* tag_handles_allocated,
+                               int* tag_handles_size,
                                int* err )
 {
     iMesh_getAllEntSetTags( IMESH_INSTANCE( instance ), entity_set_handle, tag_handles, tag_handles_allocated,
                             tag_handles_size, err );
 }
 
-void FBiGeom_rmvEntSetTag( FBiGeom_Instance instance, iBase_EntitySetHandle entity_set_handle,
-                           iBase_TagHandle tag_handle, int* err )
+void FBiGeom_rmvEntSetTag( FBiGeom_Instance instance,
+                           iBase_EntitySetHandle entity_set_handle,
+                           iBase_TagHandle tag_handle,
+                           int* err )
 {
     iMesh_rmvEntSetTag( IMESH_INSTANCE( instance ), entity_set_handle, tag_handle, err );
 }
 
-void FBiGeom_getArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
-                         iBase_TagHandle tag_handle, void** tag_values, int* tag_values_allocated, int* tag_values_size,
+void FBiGeom_getArrData( FBiGeom_Instance instance,
+                         const iBase_EntityHandle* entity_handles,
+                         int entity_handles_size,
+                         iBase_TagHandle tag_handle,
+                         void** tag_values,
+                         int* tag_values_allocated,
+                         int* tag_values_size,
                          int* err )
 {
     iMesh_getArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                       tag_values_allocated, tag_values_size, err );
 }
 
-void FBiGeom_getIntArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle, int** tag_values,
-                            int* tag_values_allocated, int* tag_values_size, int* err )
+void FBiGeom_getIntArrData( FBiGeom_Instance instance,
+                            const iBase_EntityHandle* entity_handles,
+                            int entity_handles_size,
+                            iBase_TagHandle tag_handle,
+                            int** tag_values,
+                            int* tag_values_allocated,
+                            int* tag_values_size,
+                            int* err )
 {
     iMesh_getIntArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                          tag_values_allocated, tag_values_size, err );
 }
 
-void FBiGeom_getDblArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle, double** tag_values,
-                            int* tag_values_allocated, int* tag_values_size, int* err )
+void FBiGeom_getDblArrData( FBiGeom_Instance instance,
+                            const iBase_EntityHandle* entity_handles,
+                            int entity_handles_size,
+                            iBase_TagHandle tag_handle,
+                            double** tag_values,
+                            int* tag_values_allocated,
+                            int* tag_values_size,
+                            int* err )
 {
     iMesh_getDblArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                          tag_values_allocated, tag_values_size, err );
 }
 
-void FBiGeom_getEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
-                           iBase_TagHandle tag_handle, iBase_EntityHandle** tag_value, int* tag_value_allocated,
-                           int* tag_value_size, int* err )
+void FBiGeom_getEHArrData( FBiGeom_Instance instance,
+                           const iBase_EntityHandle* entity_handles,
+                           int entity_handles_size,
+                           iBase_TagHandle tag_handle,
+                           iBase_EntityHandle** tag_value,
+                           int* tag_value_allocated,
+                           int* tag_value_size,
+                           int* err )
 {
     iMesh_getEHArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_value,
                         tag_value_allocated, tag_value_size, err );
 }
 
-void FBiGeom_getESHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle, iBase_EntitySetHandle** tag_value,
-                            int* tag_value_allocated, int* tag_value_size, int* err )
+void FBiGeom_getESHArrData( FBiGeom_Instance instance,
+                            const iBase_EntityHandle* entity_handles,
+                            int entity_handles_size,
+                            iBase_TagHandle tag_handle,
+                            iBase_EntitySetHandle** tag_value,
+                            int* tag_value_allocated,
+                            int* tag_value_size,
+                            int* err )
 {
     iMesh_getESHArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_value,
                          tag_value_allocated, tag_value_size, err );
 }
 
-void FBiGeom_setArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
-                         iBase_TagHandle tag_handle, const void* tag_values, int tag_values_size, int* err )
+void FBiGeom_setArrData( FBiGeom_Instance instance,
+                         const iBase_EntityHandle* entity_handles,
+                         int entity_handles_size,
+                         iBase_TagHandle tag_handle,
+                         const void* tag_values,
+                         int tag_values_size,
+                         int* err )
 {
     iMesh_setArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                       tag_values_size, err );
 }
 
-void FBiGeom_setIntArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle, const int* tag_values,
-                            int tag_values_size, int* err )
+void FBiGeom_setIntArrData( FBiGeom_Instance instance,
+                            const iBase_EntityHandle* entity_handles,
+                            int entity_handles_size,
+                            iBase_TagHandle tag_handle,
+                            const int* tag_values,
+                            int tag_values_size,
+                            int* err )
 {
     iMesh_setIntArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                          tag_values_size, err );
 }
 
-void FBiGeom_setDblArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle, const double* tag_values,
-                            const int tag_values_size, int* err )
+void FBiGeom_setDblArrData( FBiGeom_Instance instance,
+                            const iBase_EntityHandle* entity_handles,
+                            int entity_handles_size,
+                            iBase_TagHandle tag_handle,
+                            const double* tag_values,
+                            const int tag_values_size,
+                            int* err )
 {
     iMesh_setDblArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                          tag_values_size, err );
 }
 
-void FBiGeom_setEHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
-                           iBase_TagHandle tag_handle, const iBase_EntityHandle* tag_values, int tag_values_size,
+void FBiGeom_setEHArrData( FBiGeom_Instance instance,
+                           const iBase_EntityHandle* entity_handles,
+                           int entity_handles_size,
+                           iBase_TagHandle tag_handle,
+                           const iBase_EntityHandle* tag_values,
+                           int tag_values_size,
                            int* err )
 {
     iMesh_setEHArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                         tag_values_size, err );
 }
 
-void FBiGeom_setESHArrData( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles,
-                            int entity_handles_size, iBase_TagHandle tag_handle,
-                            const iBase_EntitySetHandle* tag_values, int tag_values_size, int* err )
+void FBiGeom_setESHArrData( FBiGeom_Instance instance,
+                            const iBase_EntityHandle* entity_handles,
+                            int entity_handles_size,
+                            iBase_TagHandle tag_handle,
+                            const iBase_EntitySetHandle* tag_values,
+                            int tag_values_size,
+                            int* err )
 {
     iMesh_setESHArrData( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, tag_values,
                          tag_values_size, err );
 }
 
-void FBiGeom_rmvArrTag( FBiGeom_Instance instance, const iBase_EntityHandle* entity_handles, int entity_handles_size,
-                        iBase_TagHandle tag_handle, int* err )
+void FBiGeom_rmvArrTag( FBiGeom_Instance instance,
+                        const iBase_EntityHandle* entity_handles,
+                        int entity_handles_size,
+                        iBase_TagHandle tag_handle,
+                        int* err )
 {
     iMesh_rmvArrTag( IMESH_INSTANCE( instance ), entity_handles, entity_handles_size, tag_handle, err );
 }
 
-void FBiGeom_getData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                      void** tag_value, int* tag_value_allocated, int* tag_value_size, int* err )
+void FBiGeom_getData( FBiGeom_Instance instance,
+                      iBase_EntityHandle entity_handle,
+                      iBase_TagHandle tag_handle,
+                      void** tag_value,
+                      int* tag_value_allocated,
+                      int* tag_value_size,
+                      int* err )
 {
     iMesh_getData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, tag_value, tag_value_allocated,
                    tag_value_size, err );
 }
 
-void FBiGeom_getIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                         int* out_data, int* err )
+void FBiGeom_getIntData( FBiGeom_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         iBase_TagHandle tag_handle,
+                         int* out_data,
+                         int* err )
 {
     iMesh_getIntData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, out_data, err );
 }
 
-void FBiGeom_getDblData( FBiGeom_Instance instance, const iBase_EntityHandle entity_handle,
-                         const iBase_TagHandle tag_handle, double* out_data, int* err )
+void FBiGeom_getDblData( FBiGeom_Instance instance,
+                         const iBase_EntityHandle entity_handle,
+                         const iBase_TagHandle tag_handle,
+                         double* out_data,
+                         int* err )
 {
     iMesh_getDblData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, out_data, err );
 }
 
-void FBiGeom_getEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                        iBase_EntityHandle* out_data, int* err )
+void FBiGeom_getEHData( FBiGeom_Instance instance,
+                        iBase_EntityHandle entity_handle,
+                        iBase_TagHandle tag_handle,
+                        iBase_EntityHandle* out_data,
+                        int* err )
 {
     iMesh_getEHData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, out_data, err );
 }
 
-void FBiGeom_getESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                         iBase_EntitySetHandle* out_data, int* err )
+void FBiGeom_getESHData( FBiGeom_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         iBase_TagHandle tag_handle,
+                         iBase_EntitySetHandle* out_data,
+                         int* err )
 {
     iMesh_getESHData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, out_data, err );
 }
 
-void FBiGeom_setData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                      const void* tag_value, int tag_value_size, int* err )
+void FBiGeom_setData( FBiGeom_Instance instance,
+                      iBase_EntityHandle entity_handle,
+                      iBase_TagHandle tag_handle,
+                      const void* tag_value,
+                      int tag_value_size,
+                      int* err )
 {
     iMesh_setData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, tag_value, tag_value_size, err );
 }
 
-void FBiGeom_setIntData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                         int tag_value, int* err )
+void FBiGeom_setIntData( FBiGeom_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         iBase_TagHandle tag_handle,
+                         int tag_value,
+                         int* err )
 {
     iMesh_setIntData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, tag_value, err );
 }
 
-void FBiGeom_setDblData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                         double tag_value, int* err )
+void FBiGeom_setDblData( FBiGeom_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         iBase_TagHandle tag_handle,
+                         double tag_value,
+                         int* err )
 {
     iMesh_setDblData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, tag_value, err );
 }
 
-void FBiGeom_setEHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                        iBase_EntityHandle tag_value, int* err )
+void FBiGeom_setEHData( FBiGeom_Instance instance,
+                        iBase_EntityHandle entity_handle,
+                        iBase_TagHandle tag_handle,
+                        iBase_EntityHandle tag_value,
+                        int* err )
 {
     iMesh_setEHData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, tag_value, err );
 }
 
-void FBiGeom_setESHData( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle tag_handle,
-                         iBase_EntitySetHandle tag_value, int* err )
+void FBiGeom_setESHData( FBiGeom_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         iBase_TagHandle tag_handle,
+                         iBase_EntitySetHandle tag_value,
+                         int* err )
 {
     iMesh_setESHData( IMESH_INSTANCE( instance ), entity_handle, tag_handle, tag_value, err );
 }
 
-void FBiGeom_getAllTags( FBiGeom_Instance instance, iBase_EntityHandle entity_handle, iBase_TagHandle** tag_handles,
-                         int* tag_handles_allocated, int* tag_handles_size, int* err )
+void FBiGeom_getAllTags( FBiGeom_Instance instance,
+                         iBase_EntityHandle entity_handle,
+                         iBase_TagHandle** tag_handles,
+                         int* tag_handles_allocated,
+                         int* tag_handles_size,
+                         int* err )
 {
     iMesh_getAllTags( IMESH_INSTANCE( instance ), entity_handle, tag_handles, tag_handles_allocated, tag_handles_size,
                       err );
@@ -1733,52 +2405,108 @@ void FBiGeom_rmvTag( FBiGeom_Instance instance, iBase_EntityHandle entity_handle
     iMesh_rmvTag( IMESH_INSTANCE( instance ), entity_handle, tag_handle, err );
 }
 
-void FBiGeom_subtract( FBiGeom_Instance instance, iBase_EntitySetHandle, iBase_EntitySetHandle, iBase_EntitySetHandle*,
+void FBiGeom_subtract( FBiGeom_Instance instance,
+                       iBase_EntitySetHandle,
+                       iBase_EntitySetHandle,
+                       iBase_EntitySetHandle*,
                        int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_intersect( FBiGeom_Instance instance, iBase_EntitySetHandle, iBase_EntitySetHandle, iBase_EntitySetHandle*,
+void FBiGeom_intersect( FBiGeom_Instance instance,
+                        iBase_EntitySetHandle,
+                        iBase_EntitySetHandle,
+                        iBase_EntitySetHandle*,
                         int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_unite( FBiGeom_Instance instance, iBase_EntitySetHandle, iBase_EntitySetHandle, iBase_EntitySetHandle*,
+void FBiGeom_unite( FBiGeom_Instance instance,
+                    iBase_EntitySetHandle,
+                    iBase_EntitySetHandle,
+                    iBase_EntitySetHandle*,
                     int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
 // TODO methods not yet implemented
-void FBiGeom_getEntClosestPtTrimmed( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double*,
-                                     double*, double*, int* err )
+void FBiGeom_getEntClosestPtTrimmed( FBiGeom_Instance instance,
+                                     iBase_EntityHandle,
+                                     double,
+                                     double,
+                                     double,
+                                     double*,
+                                     double*,
+                                     double*,
+                                     int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getFcCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double*, double*,
-                           double*, double*, double*, double*, int* err )
+void FBiGeom_getFcCvtrXYZ( FBiGeom_Instance instance,
+                           iBase_EntityHandle,
+                           double,
+                           double,
+                           double,
+                           double*,
+                           double*,
+                           double*,
+                           double*,
+                           double*,
+                           double*,
+                           int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEgCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle, double, double, double, double*, double*,
-                           double*, int* err )
+void FBiGeom_getEgCvtrXYZ( FBiGeom_Instance instance,
+                           iBase_EntityHandle,
+                           double,
+                           double,
+                           double,
+                           double*,
+                           double*,
+                           double*,
+                           int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEntArrCvtrXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                               double**, int*, int*, double**, int*, int*, int* err )
+void FBiGeom_getEntArrCvtrXYZ( FBiGeom_Instance instance,
+                               iBase_EntityHandle const*,
+                               int,
+                               int,
+                               double const*,
+                               int,
+                               double**,
+                               int*,
+                               int*,
+                               double**,
+                               int*,
+                               int*,
+                               int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge, double x, double y, double z,
-                           double* on_x, double* on_y, double* on_z, double* tngt_i, double* tngt_j, double* tngt_k,
-                           double* cvtr_i, double* cvtr_j, double* cvtr_k, int* err )
+void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance,
+                           iBase_EntityHandle edge,
+                           double x,
+                           double y,
+                           double z,
+                           double* on_x,
+                           double* on_y,
+                           double* on_z,
+                           double* tngt_i,
+                           double* tngt_j,
+                           double* tngt_k,
+                           double* cvtr_i,
+                           double* cvtr_j,
+                           double* cvtr_k,
+                           int* err )
 {
     ErrorCode rval = FBE_cast( instance )
                          ->getEgEvalXYZ( (moab::EntityHandle)edge, x, y, z, *on_x, *on_y, *on_z, *tngt_i, *tngt_j,
@@ -1786,10 +2514,24 @@ void FBiGeom_getEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle edge, d
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_handle, double x, double y, double z,
-                           double* on_x, double* on_y, double* on_z, double* nrml_i, double* nrml_j, double* nrml_k,
-                           double* cvtr1_i, double* cvtr1_j, double* cvtr1_k, double* cvtr2_i, double* cvtr2_j,
-                           double* cvtr2_k, int* err )
+void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance,
+                           iBase_EntityHandle face_handle,
+                           double x,
+                           double y,
+                           double z,
+                           double* on_x,
+                           double* on_y,
+                           double* on_z,
+                           double* nrml_i,
+                           double* nrml_j,
+                           double* nrml_k,
+                           double* cvtr1_i,
+                           double* cvtr1_j,
+                           double* cvtr1_k,
+                           double* cvtr2_i,
+                           double* cvtr2_j,
+                           double* cvtr2_k,
+                           int* err )
 {
     /*
       moab::ErrorCode rval = _fbEngine->getFcEvalXYZ( (moab::EntityHandle) face,
@@ -1814,14 +2556,44 @@ void FBiGeom_getFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle face_ha
     RETURN( iBase_SUCCESS );
 }
 
-void FBiGeom_getArrEgEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                              double**, int*, int*, double**, int*, int*, double**, int*, int*, int* err )
+void FBiGeom_getArrEgEvalXYZ( FBiGeom_Instance instance,
+                              iBase_EntityHandle const*,
+                              int,
+                              int,
+                              double const*,
+                              int,
+                              double**,
+                              int*,
+                              int*,
+                              double**,
+                              int*,
+                              int*,
+                              double**,
+                              int*,
+                              int*,
+                              int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getArrFcEvalXYZ( FBiGeom_Instance instance, iBase_EntityHandle const*, int, int, double const*, int,
-                              double**, int*, int*, double**, int*, int*, double**, int*, int*, double**, int*, int*,
+void FBiGeom_getArrFcEvalXYZ( FBiGeom_Instance instance,
+                              iBase_EntityHandle const*,
+                              int,
+                              int,
+                              double const*,
+                              int,
+                              double**,
+                              int*,
+                              int*,
+                              double**,
+                              int*,
+                              int*,
+                              double**,
+                              int*,
+                              int*,
+                              double**,
+                              int*,
+                              int*,
                               int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
@@ -1832,13 +2604,27 @@ void FBiGeom_getPntClsf( FBiGeom_Instance instance, double, double, double, iBas
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getPntArrClsf( FBiGeom_Instance instance, int, double const*, int, iBase_EntityHandle**, int*, int*,
+void FBiGeom_getPntArrClsf( FBiGeom_Instance instance,
+                            int,
+                            double const*,
+                            int,
+                            iBase_EntityHandle**,
+                            int*,
+                            int*,
                             int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
 
-void FBiGeom_getFacets( FBiGeom_Instance instance, iBase_EntityHandle, double, double, int, int, int, int, int,
+void FBiGeom_getFacets( FBiGeom_Instance instance,
+                        iBase_EntityHandle,
+                        double,
+                        double,
+                        int,
+                        int,
+                        int,
+                        int,
+                        int,
                         int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );
@@ -1848,7 +2634,12 @@ void FBiGeom_getEntTolerance( FBiGeom_Instance instance, iBase_EntityHandle, dou
 {
     RETURN( iBase_NOT_SUPPORTED );
 }
-void FBiGeom_getArrTolerance( FBiGeom_Instance instance, iBase_EntityHandle const*, int, double**, int*, int*,
+void FBiGeom_getArrTolerance( FBiGeom_Instance instance,
+                              iBase_EntityHandle const*,
+                              int,
+                              double**,
+                              int*,
+                              int*,
                               int* err )
 {
     RETURN( iBase_NOT_SUPPORTED );

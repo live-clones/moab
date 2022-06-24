@@ -37,7 +37,9 @@
 namespace MBMesquite
 {
 
-void BoundedCylinderDomain::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+void BoundedCylinderDomain::domain_DoF( const Mesh::VertexHandle* handle_array,
+                                        unsigned short* dof_array,
+                                        size_t count,
                                         MsqError& ) const
 {
     double t;
@@ -96,7 +98,10 @@ void BoundedCylinderDomain::evaluate( double t, const Vector3D& point, Vector3D&
 
     normal           = point - axis_point;
     const double len = normal.length();
-    if( len < EPSILON ) { this->CylinderDomain::evaluate( 0, axis_point, closest, normal ); }
+    if( len < EPSILON )
+    {
+        this->CylinderDomain::evaluate( 0, axis_point, closest, normal );
+    }
     else
     {
         normal /= len;
@@ -104,7 +109,9 @@ void BoundedCylinderDomain::evaluate( double t, const Vector3D& point, Vector3D&
     }
 }
 
-void BoundedCylinderDomain::evaluate( Mesh::VertexHandle handle, const Vector3D& point, Vector3D& closest,
+void BoundedCylinderDomain::evaluate( Mesh::VertexHandle handle,
+                                      const Vector3D& point,
+                                      Vector3D& closest,
                                       Vector3D& normal ) const
 {
     double t;

@@ -67,23 +67,34 @@ ReadSms::~ReadSms()
     }
 }
 
-ErrorCode ReadSms::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadSms::read_tag_values( const char* /* file_name */,
+                                    const char* /* tag_name */,
+                                    const FileOptions& /* opts */,
+                                    std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadSms::load_file( const char* filename, const EntityHandle* /* file_set */, const FileOptions& /* opts */,
-                              const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadSms::load_file( const char* filename,
+                              const EntityHandle* /* file_set */,
+                              const FileOptions& /* opts */,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* file_id_tag )
 {
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for Sms" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for Sms" );
+    }
 
     setId = 1;
 
     // Open file
     FILE* file_ptr = fopen( filename, "r" );
-    if( !file_ptr ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, filename << ": " << strerror( errno ) ); }
+    if( !file_ptr )
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, filename << ": " << strerror( errno ) );
+    }
 
     const ErrorCode result = load_file_impl( file_ptr, file_id_tag );
     fclose( file_ptr );
@@ -104,15 +115,21 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
 
     int negone = -1;
     result     = mdbImpl->tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, geomDimension,
-                                      MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
+                                          MB_TAG_SPARSE | MB_TAG_CREAT, &negone );
     CHECK( "Failed to create geom dim tag." );
 
     int n;
     char line[256], all_line[1024];
     int file_type;
 
-    if( fgets( all_line, sizeof( all_line ), file_ptr ) == NULL ) { return MB_FAILURE; }
-    if( sscanf( all_line, "%s %d", line, &file_type ) != 2 ) { return MB_FAILURE; }
+    if( fgets( all_line, sizeof( all_line ), file_ptr ) == NULL )
+    {
+        return MB_FAILURE;
+    }
+    if( sscanf( all_line, "%s %d", line, &file_type ) != 2 )
+    {
+        return MB_FAILURE;
+    }
 
     if( 3 == file_type )
     {
@@ -288,8 +305,8 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
             shverts.clear();
         }
 
-        result = mdbImpl->create_element( ( EntityType )( MBTRI + num_bounding - 3 ), &bound_verts[0],
-                                          bound_verts.size(), new_faces[i] );
+        result = mdbImpl->create_element( (EntityType)( MBTRI + num_bounding - 3 ), &bound_verts[0], bound_verts.size(),
+                                          new_faces[i] );
         CHECK( "Failed to create edge." );
 
         result = mdbImpl->add_entities( this_gent, &new_faces[i], 1 );
@@ -381,8 +398,12 @@ ErrorCode ReadSms::load_file_impl( FILE* file_ptr, const Tag* file_id_tag )
     return MB_SUCCESS;
 }
 
-ErrorCode ReadSms::get_set( std::vector< EntityHandle >* sets, int set_dim, int set_id, Tag dim_tag,
-                            EntityHandle& this_set, const Tag* file_id_tag )
+ErrorCode ReadSms::get_set( std::vector< EntityHandle >* sets,
+                            int set_dim,
+                            int set_id,
+                            Tag dim_tag,
+                            EntityHandle& this_set,
+                            const Tag* file_id_tag )
 {
     ErrorCode result = MB_SUCCESS;
 

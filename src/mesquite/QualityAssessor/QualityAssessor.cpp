@@ -75,7 +75,9 @@ const char* default_name( bool free_only )
     return free_only ? free_name : all_name;
 }
 
-QualityAssessor::QualityAssessor( bool p_print_summary, bool free_only, const char* inverted_tag_name,
+QualityAssessor::QualityAssessor( bool p_print_summary,
+                                  bool free_only,
+                                  const char* inverted_tag_name,
                                   std::string p_name )
     : myData( new Data ), qualityAssessorName( p_name ), outputStream( std::cout ), printSummary( p_print_summary ),
       skipFixedSamples( free_only )
@@ -88,7 +90,9 @@ QualityAssessor::QualityAssessor( bool p_print_summary, bool free_only, const ch
         elementTypeCount[i - POLYGON] = 0;
 }
 
-QualityAssessor::QualityAssessor( std::ostream& stream, bool free_only, const char* inverted_tag_name,
+QualityAssessor::QualityAssessor( std::ostream& stream,
+                                  bool free_only,
+                                  const char* inverted_tag_name,
                                   std::string name )
     : myData( new Data ), qualityAssessorName( name ), outputStream( stream ), printSummary( true ),
       skipFixedSamples( free_only )
@@ -101,9 +105,14 @@ QualityAssessor::QualityAssessor( std::ostream& stream, bool free_only, const ch
         elementTypeCount[i - POLYGON] = 0;
 }
 
-QualityAssessor::QualityAssessor( std::ostream& output_stream, QualityMetric* metric, int histogram_intervals,
-                                  double power_mean, bool free_only, const char* metric_value_tag_name,
-                                  const char* inverted_tag_name, std::string name )
+QualityAssessor::QualityAssessor( std::ostream& output_stream,
+                                  QualityMetric* metric,
+                                  int histogram_intervals,
+                                  double power_mean,
+                                  bool free_only,
+                                  const char* metric_value_tag_name,
+                                  const char* inverted_tag_name,
+                                  std::string name )
     : myData( new Data ), qualityAssessorName( name ), outputStream( output_stream ), printSummary( true ),
       skipFixedSamples( free_only )
 {
@@ -117,9 +126,14 @@ QualityAssessor::QualityAssessor( std::ostream& output_stream, QualityMetric* me
         elementTypeCount[i - POLYGON] = 0;
 }
 
-QualityAssessor::QualityAssessor( QualityMetric* metric, int histogram_intervals, double power_mean, bool free_only,
-                                  const char* metric_value_tag_name, bool p_print_summary,
-                                  const char* inverted_tag_name, std::string name )
+QualityAssessor::QualityAssessor( QualityMetric* metric,
+                                  int histogram_intervals,
+                                  double power_mean,
+                                  bool free_only,
+                                  const char* metric_value_tag_name,
+                                  bool p_print_summary,
+                                  const char* inverted_tag_name,
+                                  std::string name )
     : myData( new Data ), qualityAssessorName( name ), outputStream( std::cout ), printSummary( p_print_summary ),
       skipFixedSamples( free_only )
 {
@@ -220,8 +234,11 @@ bool QualityAssessor::get_inverted_element_count( int& inverted_elems, int& inve
     return true;
 }
 
-void QualityAssessor::add_quality_assessment( QualityMetric* metric, int histogram_intervals, double power_mean,
-                                              const char* tag_name, const char* label )
+void QualityAssessor::add_quality_assessment( QualityMetric* metric,
+                                              int histogram_intervals,
+                                              double power_mean,
+                                              const char* tag_name,
+                                              const char* label )
 {
     list_type::iterator i = find_or_add( metric, label );
     ( *i )->pMean         = power_mean;
@@ -281,8 +298,11 @@ the stoppingMetric pointer and the stoppingFunction data members.
 \param qm Pointer to QualityMetric.
 \param func (QAFUNCTION) Wrapper function for qm (e.g. MINIMUM, MAXIMUM,...).
     */
-void QualityAssessor::set_stopping_assessment( QualityMetric* metric, int histogram_intervals, double power_mean,
-                                               const char* tag_name, const char* label )
+void QualityAssessor::set_stopping_assessment( QualityMetric* metric,
+                                               int histogram_intervals,
+                                               double power_mean,
+                                               const char* tag_name,
+                                               const char* label )
 {
     list_type::iterator i = find_stopping_assessment();
     if( i != assessList.end() ) ( *i )->set_stopping_function( false );
@@ -311,8 +331,13 @@ for the histogram.
 \param max_val (double) Maximum range of histogram.
 \param intervals Number of histogram intervals
     */
-void QualityAssessor::add_histogram_assessment( QualityMetric* metric, double min_val, double max_val, int intervals,
-                                                double power_mean, const char* tag_name, const char* label )
+void QualityAssessor::add_histogram_assessment( QualityMetric* metric,
+                                                double min_val,
+                                                double max_val,
+                                                int intervals,
+                                                double power_mean,
+                                                const char* tag_name,
+                                                const char* label )
 {
     if( intervals < 1 ) intervals = 1;
     list_type::iterator i = find_or_add( metric, label );
@@ -392,15 +417,19 @@ double QualityAssessor::loop_over_mesh( MeshDomainAssoc* mesh_and_domain, const 
   set_stopping_assessemnt().
   \param ms (const MeshSet &) MeshSet used for quality assessment.
  */
-double QualityAssessor::loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, const Settings* settings,
+double QualityAssessor::loop_over_mesh( ParallelMesh* mesh,
+                                        MeshDomain* domain,
+                                        const Settings* settings,
                                         MsqError& err )
 {
     MeshDomainAssoc mesh_and_domain = MeshDomainAssoc( (Mesh*)mesh, domain, false, true );
     return loop_over_mesh_internal( &mesh_and_domain, settings, mesh->get_parallel_helper(), err );
 }
 
-double QualityAssessor::loop_over_mesh_internal( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                                 ParallelHelper* helper, MsqError& err )
+double QualityAssessor::loop_over_mesh_internal( MeshDomainAssoc* mesh_and_domain,
+                                                 const Settings* settings,
+                                                 ParallelHelper* helper,
+                                                 MsqError& err )
 {
     // Clear out any previous data
     reset_data();
@@ -1143,8 +1172,10 @@ const QualityAssessor::Assessor* QualityAssessor::get_results( const char* name 
     return 0;
 }
 
-void QualityAssessor::Assessor::get_histogram( double& lower_bound_out, double& upper_bound_out,
-                                               std::vector< int >& counts_out, MsqError& err ) const
+void QualityAssessor::Assessor::get_histogram( double& lower_bound_out,
+                                               double& upper_bound_out,
+                                               std::vector< int >& counts_out,
+                                               MsqError& err ) const
 {
     if( !have_histogram() )
     {

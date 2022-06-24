@@ -394,7 +394,7 @@ int main( int argc, char* argv[] )
             Tag sense_tag;
             int dum_sense = 0;
             result        = iface->tag_get_handle( "SENSE", 1, MB_TYPE_INTEGER, sense_tag, MB_TAG_SPARSE | MB_TAG_CREAT,
-                                            &dum_sense );
+                                                   &dum_sense );
             if( result != MB_SUCCESS ) return 1;
             int sense_val = -1;
             result        = iface->tag_set_data( neuset_tag, &reverse_neuset, 1, &sense_val );
@@ -470,7 +470,10 @@ void get_time_mem( double& tot_time, double& tot_mem )
     double stime = (double)r_usage.ru_stime.tv_sec + ( (double)r_usage.ru_stime.tv_usec / 1.e6 );
     tot_time     = utime + stime;
     tot_mem      = 0;
-    if( 0 != r_usage.ru_maxrss ) { tot_mem = (double)r_usage.ru_maxrss; }
+    if( 0 != r_usage.ru_maxrss )
+    {
+        tot_mem = (double)r_usage.ru_maxrss;
+    }
     else
     {
         // this machine doesn't return rss - try going to /proc

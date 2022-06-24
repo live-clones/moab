@@ -18,8 +18,11 @@ struct iBase_EntityArrIterator_Private
     bool isRecursive;
 
   public:
-    iBase_EntityArrIterator_Private( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set,
-                                     int array_sz, bool recursive = false )
+    iBase_EntityArrIterator_Private( iBase_EntityType type,
+                                     iMesh_EntityTopology topology,
+                                     EntityHandle set,
+                                     int array_sz,
+                                     bool recursive = false )
         : entType( type ), entTopo( topology ), entSet( set ), arrSize( array_sz ), isRecursive( recursive )
     {
     }
@@ -82,7 +85,9 @@ inline ErrorCode step_iterator( T& curr, const T& end, int num_steps, bool& at_e
 
 template < typename T >
 inline ErrorCode step_iterator( typename std::vector< T >::const_iterator& curr,
-                                const typename std::vector< T >::const_iterator& end, int num_steps, bool& at_end )
+                                const typename std::vector< T >::const_iterator& end,
+                                int num_steps,
+                                bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
 
@@ -96,7 +101,9 @@ inline ErrorCode step_iterator( typename std::vector< T >::const_iterator& curr,
     return MB_SUCCESS;
 }
 
-inline ErrorCode step_iterator( Range::const_iterator& curr, const Range::const_iterator& end, int num_steps,
+inline ErrorCode step_iterator( Range::const_iterator& curr,
+                                const Range::const_iterator& end,
+                                int num_steps,
                                 bool& at_end )
 {
     if( 0 > num_steps ) return MB_FAILURE;
@@ -118,7 +125,10 @@ class MBIter : public iBase_EntityArrIterator_Private
     typename Container::const_iterator iterPos;
 
   public:
-    MBIter( iBase_EntityType type, iMesh_EntityTopology topology, EntityHandle set, int arr_size,
+    MBIter( iBase_EntityType type,
+            iMesh_EntityTopology topology,
+            EntityHandle set,
+            int arr_size,
             bool recursive = false )
         : iBase_EntityArrIterator_Private( type, topology, set, arr_size, recursive ), iterPos( iterData.end() )
     {

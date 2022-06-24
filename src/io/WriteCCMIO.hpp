@@ -61,9 +61,14 @@ class WriteCCMIO : public WriterIface
     static WriterIface* factory( Interface* );
 
     //! writes out a file
-    ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
-                          const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+    ErrorCode write_file( const char* file_name,
+                          const bool overwrite,
+                          const FileOptions& opts,
+                          const EntityHandle* output_list,
+                          const int num_sets,
+                          const std::vector< std::string >& qa_list,
+                          const Tag* tag_list  = NULL,
+                          int num_tags         = 0,
                           int export_dimension = 3 );
 
   protected:
@@ -157,7 +162,8 @@ class WriteCCMIO : public WriterIface
 
     //! gathers elements in each matset, and all the vertices used by them;
     //! marks the vertices with the mEntityMark bit flag
-    ErrorCode gather_matset_info( std::vector< EntityHandle >& matsets, std::vector< MaterialSetData >& matset_data,
+    ErrorCode gather_matset_info( std::vector< EntityHandle >& matsets,
+                                  std::vector< MaterialSetData >& matset_data,
                                   Range& all_verts );
 
     //! gathers elements in each neuset
@@ -171,8 +177,10 @@ class WriteCCMIO : public WriterIface
     ErrorCode write_nodes( CCMIOID rootID, const Range& nodes, const int dimension, CCMIOID& verticesID );
 
     //! write cells and internal/boundary faces, using vgids and verts input
-    ErrorCode write_cells_and_faces( CCMIOID rootID, std::vector< WriteCCMIO::MaterialSetData >& matset_data,
-                                     std::vector< WriteCCMIO::NeumannSetData >& neuset_data, Range& verts,
+    ErrorCode write_cells_and_faces( CCMIOID rootID,
+                                     std::vector< WriteCCMIO::MaterialSetData >& matset_data,
+                                     std::vector< WriteCCMIO::NeumannSetData >& neuset_data,
+                                     Range& verts,
                                      CCMIOID& topologyID );
 
     //! write external faces, including connectivity and connected cells
@@ -182,8 +190,11 @@ class WriteCCMIO : public WriterIface
     // caller is responsible for deleting
     ErrorCode get_gids( const Range& ents, int*& gids, int& minid, int& maxid );
 
-    ErrorCode write_meshes( MeshInfo& mesh_info, std::vector< MaterialSetData >& matset_data,
-                            std::vector< NeumannSetData >& neuset_data, Range& verts, const int* vgids );
+    ErrorCode write_meshes( MeshInfo& mesh_info,
+                            std::vector< MaterialSetData >& matset_data,
+                            std::vector< NeumannSetData >& neuset_data,
+                            Range& verts,
+                            const int* vgids );
 
     ErrorCode get_valid_sides( Range& elems, const int sense, WriteCCMIO::NeumannSetData& neuset_data );
 
@@ -193,14 +204,20 @@ class WriteCCMIO : public WriterIface
 
     ErrorCode transform_coords( const int dimension, const int num_nodes, double* coords );
 
-    ErrorCode write_problem_description( CCMIOID rootID, CCMIOID stateID, CCMIOID& problemID, CCMIOID processorID,
+    ErrorCode write_problem_description( CCMIOID rootID,
+                                         CCMIOID stateID,
+                                         CCMIOID& problemID,
+                                         CCMIOID processorID,
                                          std::vector< MaterialSetData >& matset_data,
                                          std::vector< NeumannSetData >& neuset_data );
 
     // get the material, dirichlet, neumann, and partition sets to be written,
     // either from input sets or in the whole mesh
-    ErrorCode get_sets( const EntityHandle* ent_handles, int num_sets, std::vector< EntityHandle >& matsets,
-                        std::vector< EntityHandle >& dirsets, std::vector< EntityHandle >& neusets,
+    ErrorCode get_sets( const EntityHandle* ent_handles,
+                        int num_sets,
+                        std::vector< EntityHandle >& matsets,
+                        std::vector< EntityHandle >& dirsets,
+                        std::vector< EntityHandle >& neusets,
                         std::vector< EntityHandle >& partsets );
 
     //! create state and processor nodes
@@ -219,7 +236,10 @@ class WriteCCMIO : public WriterIface
 
     ErrorCode write_dbl_option( const char* opt_name, EntityHandle seth, Tag& tag, CCMIOID& node );
 
-    ErrorCode write_str_option( const char* opt_name, EntityHandle seth, Tag& tag, CCMIOID& node,
+    ErrorCode write_str_option( const char* opt_name,
+                                EntityHandle seth,
+                                Tag& tag,
+                                CCMIOID& node,
                                 const char* other_name = NULL );
 };
 

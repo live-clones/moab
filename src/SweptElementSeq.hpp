@@ -32,8 +32,14 @@ class SweptElementSeq : public ElementSequence
 {
   public:
     //! constructor
-    SweptElementSeq( EntityHandle start_handle, const int imin, const int jmin, const int kmin, const int imax,
-                     const int jmax, const int kmax, const int* Cq );
+    SweptElementSeq( EntityHandle start_handle,
+                     const int imin,
+                     const int jmin,
+                     const int kmin,
+                     const int imax,
+                     const int jmax,
+                     const int kmax,
+                     const int* Cq );
 
     virtual ~SweptElementSeq();
 
@@ -158,7 +164,9 @@ class SweptElementSeq : public ElementSequence
     }
 
     //! get connectivity of an entity given entity's parameters
-    ErrorCode get_params_connectivity( const int i, const int j, const int k,
+    ErrorCode get_params_connectivity( const int i,
+                                       const int j,
+                                       const int k,
                                        std::vector< EntityHandle >& connectivity ) const
     {
         return sdata()->get_params_connectivity( i, j, k, connectivity );
@@ -166,11 +174,15 @@ class SweptElementSeq : public ElementSequence
 
     /***************** Methods from ElementSeq *****************/
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        std::vector< EntityHandle >& connect,
                                         bool topological = false ) const;
 
-    virtual ErrorCode get_connectivity( EntityHandle handle, EntityHandle const*& connect, int& connect_length,
-                                        bool topological = false, std::vector< EntityHandle >* storage = 0 ) const;
+    virtual ErrorCode get_connectivity( EntityHandle handle,
+                                        EntityHandle const*& connect,
+                                        int& connect_length,
+                                        bool topological                     = false,
+                                        std::vector< EntityHandle >* storage = 0 ) const;
 
     virtual ErrorCode set_connectivity( EntityHandle handle, EntityHandle const* connect, int connect_length );
 

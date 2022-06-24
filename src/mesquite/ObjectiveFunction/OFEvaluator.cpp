@@ -38,7 +38,9 @@ namespace MBMesquite
 
 OFEvaluator::OFEvaluator( ObjectiveFunction* of ) : OF( of ), doBCD( false ) {}
 
-bool OFEvaluator::initialize( MeshDomainAssoc* mesh_and_domain, const Settings* settings, PatchSet* user_set,
+bool OFEvaluator::initialize( MeshDomainAssoc* mesh_and_domain,
+                              const Settings* settings,
+                              PatchSet* user_set,
                               MsqError& err )
 {
     if( doBCD )
@@ -105,8 +107,11 @@ bool OFEvaluator::update( PatchData& pd, double& value, std::vector< Vector3D >&
     return !MSQ_CHKERR( err ) && b;
 }
 
-bool OFEvaluator::update( PatchData& pd, double& value, std::vector< Vector3D >& grad,
-                          std::vector< SymMatrix3D >& hess_diag, MsqError& err )
+bool OFEvaluator::update( PatchData& pd,
+                          double& value,
+                          std::vector< Vector3D >& grad,
+                          std::vector< SymMatrix3D >& hess_diag,
+                          MsqError& err )
 {
     if( !have_objective_function() )
     {
@@ -119,7 +124,10 @@ bool OFEvaluator::update( PatchData& pd, double& value, std::vector< Vector3D >&
     return !MSQ_CHKERR( err ) && b;
 }
 
-bool OFEvaluator::update( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqHessian& Hessian,
+bool OFEvaluator::update( PatchData& pd,
+                          double& value,
+                          std::vector< Vector3D >& grad,
+                          MsqHessian& Hessian,
                           MsqError& err )
 {
     if( !have_objective_function() )
@@ -154,8 +162,11 @@ bool OFEvaluator::evaluate( PatchData& pd, double& value, std::vector< Vector3D 
     return !MSQ_CHKERR( err ) && b;
 }
 
-bool OFEvaluator::evaluate( PatchData& pd, double& value, std::vector< Vector3D >& grad,
-                            std::vector< SymMatrix3D >& hess_diag, MsqError& err ) const
+bool OFEvaluator::evaluate( PatchData& pd,
+                            double& value,
+                            std::vector< Vector3D >& grad,
+                            std::vector< SymMatrix3D >& hess_diag,
+                            MsqError& err ) const
 {
     if( !have_objective_function() )
     {
@@ -166,7 +177,10 @@ bool OFEvaluator::evaluate( PatchData& pd, double& value, std::vector< Vector3D 
     return !MSQ_CHKERR( err ) && b;
 }
 
-bool OFEvaluator::evaluate( PatchData& pd, double& value, std::vector< Vector3D >& grad, MsqHessian& Hessian,
+bool OFEvaluator::evaluate( PatchData& pd,
+                            double& value,
+                            std::vector< Vector3D >& grad,
+                            MsqHessian& Hessian,
                             MsqError& err ) const
 {
     if( !have_objective_function() )

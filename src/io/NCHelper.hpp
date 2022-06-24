@@ -51,11 +51,11 @@ class NCHelper
     // for storing them in a STL tree-based container. use a tolerance saved somewhere as 1.e-12
     class Node3D
     {
-    public :
-
+      public:
         double coords[3];
         bool operator<( const Node3D& ) const;
-        Node3D(double x, double y, double z) {
+        Node3D( double x, double y, double z )
+        {
             coords[0] = x;
             coords[1] = y;
             coords[2] = z;
@@ -64,8 +64,10 @@ class NCHelper
 
   protected:
     //! Separate set and non-set variables (common to scd mesh and ucd mesh)
-    ErrorCode read_variables_setup( std::vector< std::string >& var_names, std::vector< int >& tstep_nums,
-                                    std::vector< ReadNC::VarData >& vdatas, std::vector< ReadNC::VarData >& vsetdatas );
+    ErrorCode read_variables_setup( std::vector< std::string >& var_names,
+                                    std::vector< int >& tstep_nums,
+                                    std::vector< ReadNC::VarData >& vdatas,
+                                    std::vector< ReadNC::VarData >& vsetdatas );
 
     //! Read set variables (common to scd mesh and ucd mesh)
     ErrorCode read_variables_to_set( std::vector< ReadNC::VarData >& vdatas, std::vector< int >& tstep_nums );
@@ -81,7 +83,8 @@ class NCHelper
     //! and value, and ';' separating one name/data type/value from
     //! the next'. attLen stores the end position for each name/data
     //! type/ value.
-    ErrorCode create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap, std::string& attString,
+    ErrorCode create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap,
+                                    std::string& attString,
                                     std::vector< int >& attLen );
 
     //! For a dimension that does not have a corresponding coordinate variable (e.g. ncol for
@@ -115,7 +118,6 @@ class NCHelper
 
     //! Dummy variables
     std::set< std::string > dummyVarNames;
-
 };
 
 //! Child helper class for scd mesh, e.g. CAM_EL or CAM_FV

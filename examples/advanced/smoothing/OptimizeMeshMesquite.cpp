@@ -308,7 +308,10 @@ int run_global_smoother( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
     if( err ) return 1;
 
     // launches optimization on mesh_set
-    if( domain ) { queue1.run_instructions( &mesh_and_domain, err ); }
+    if( domain )
+    {
+        queue1.run_instructions( &mesh_and_domain, err );
+    }
     else
     {
         queue1.run_instructions( mesh, err );
@@ -396,7 +399,10 @@ int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
         rand.set_outer_termination_criterion( &sc_rand );
         qtmp.set_master_quality_improver( &rand, err );
         if( err ) return 1;
-        if( domain ) { qtmp.run_instructions( &mesh_and_domain, err ); }
+        if( domain )
+        {
+            qtmp.run_instructions( &mesh_and_domain, err );
+        }
         else
         {
             qtmp.run_instructions( mesh, err );
@@ -429,7 +435,10 @@ int run_local_smoother2( MeshDomainAssoc& mesh_and_domain, MsqError& err, double
     if( err ) return 1;
 
     // launches optimization on mesh_set
-    if( domain ) { queue1.run_instructions( &mesh_and_domain, err ); }
+    if( domain )
+    {
+        queue1.run_instructions( &mesh_and_domain, err );
+    }
     else
     {
         queue1.run_instructions( mesh, err );
@@ -480,7 +489,10 @@ int run_quality_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err )
     if( err ) return 1;
 
     // launches optimization on mesh_set
-    if( domain ) { q.run_instructions( &mesh_and_domain, err ); }
+    if( domain )
+    {
+        q.run_instructions( &mesh_and_domain, err );
+    }
     else
     {
         q.run_instructions( mesh, err );
@@ -558,7 +570,10 @@ int run_solution_mesh_optimizer( MeshDomainAssoc& mesh_and_domain, MsqError& err
     if( err ) return 1;
 
     // launches optimization on mesh_set
-    if( domain ) { queue1.run_instructions( &mesh_and_domain, err ); }
+    if( domain )
+    {
+        queue1.run_instructions( &mesh_and_domain, err );
+    }
     else
     {
         queue1.run_instructions( mesh, err );
@@ -634,7 +649,7 @@ int get_imesh_mesh( MBMesquite::Mesh** mesh, const char* file_name, int dimensio
         moab::Tag solindTag;
         double def_val_dbl = 0.0;
         rval               = mbi->tag_get_handle( "solution_indicator", 1, moab::MB_TYPE_DOUBLE, solindTag,
-                                    moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val_dbl );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
+                                                  moab::MB_TAG_CREAT | moab::MB_TAG_DENSE, &def_val_dbl );MB_CHK_SET_ERR( rval, "Getting tag handle failed" );
         solution_indicator.resize( cells.size(), 0.01 );
         for( unsigned i = 0; i < cells.size() / 4; i++ )
             solution_indicator[i] = 0.1;

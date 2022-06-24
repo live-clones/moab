@@ -45,8 +45,12 @@ NodeSet MappingFunction::sample_points( NodeSet higher_order ) const
     return higher_order;
 }
 
-void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, int input_type, int output_type,
-                                                         size_t* index_list, unsigned num_indices, MsqError& err )
+void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo,
+                                                         int input_type,
+                                                         int output_type,
+                                                         size_t* index_list,
+                                                         unsigned num_indices,
+                                                         MsqError& err )
 {
     bool in_edges, in_faces, in_region, out_edges, out_faces, out_region;
     TopologyInfo::higher_order( topo, input_type, in_edges, in_faces, in_region, err );MSQ_ERRRTN( err );
@@ -126,9 +130,15 @@ void MappingFunction::convert_connectivity_indices_impl( EntityTopology topo, in
     }
 }
 
-void MappingFunction2D::jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset, Sample location,
-                                  size_t* vertex_patch_indices_out, MsqVector< 2 >* d_coeff_d_xi_out,
-                                  size_t& num_vtx_out, MsqMatrix< 3, 2 >& jacobian_out, MsqError& err ) const
+void MappingFunction2D::jacobian( const PatchData& pd,
+                                  size_t element_number,
+                                  NodeSet nodeset,
+                                  Sample location,
+                                  size_t* vertex_patch_indices_out,
+                                  MsqVector< 2 >* d_coeff_d_xi_out,
+                                  size_t& num_vtx_out,
+                                  MsqMatrix< 3, 2 >& jacobian_out,
+                                  MsqError& err ) const
 {
     const MsqMeshEntity& elem = pd.element_by_index( element_number );
     const size_t* conn        = elem.get_vertex_index_array();
@@ -182,9 +192,15 @@ void MappingFunction2D::ideal( Sample location, MsqMatrix< 3, 2 >& J, MsqError& 
     J *= size;
 }
 
-void MappingFunction3D::jacobian( const PatchData& pd, size_t element_number, NodeSet nodeset, Sample location,
-                                  size_t* vertex_patch_indices_out, MsqVector< 3 >* d_coeff_d_xi_out,
-                                  size_t& num_vtx_out, MsqMatrix< 3, 3 >& jacobian_out, MsqError& err ) const
+void MappingFunction3D::jacobian( const PatchData& pd,
+                                  size_t element_number,
+                                  NodeSet nodeset,
+                                  Sample location,
+                                  size_t* vertex_patch_indices_out,
+                                  MsqVector< 3 >* d_coeff_d_xi_out,
+                                  size_t& num_vtx_out,
+                                  MsqMatrix< 3, 3 >& jacobian_out,
+                                  MsqError& err ) const
 {
     const MsqMeshEntity& elem = pd.element_by_index( element_number );
     const size_t* conn        = elem.get_vertex_index_array();
