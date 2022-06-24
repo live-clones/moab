@@ -729,8 +729,8 @@ ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset_async( std::vector< ReadNC
                     {
                         EntityHandle starth     = pair_iter->first;
                         EntityHandle endh       = pair_iter->second;  // Inclusive
-                        vdatas[i].readStarts[2] = ( NCDF_SIZE )( starth - 1 );
-                        vdatas[i].readCounts[2] = ( NCDF_SIZE )( endh - starth + 1 );
+                        vdatas[i].readStarts[2] = (NCDF_SIZE)( starth - 1 );
+                        vdatas[i].readCounts[2] = (NCDF_SIZE)( endh - starth + 1 );
 
                         // Do a partial read, in each subrange
                         // Wait outside this loop
@@ -825,8 +825,8 @@ ErrorCode NCHelperHOMME::read_ucd_variables_to_nonset( std::vector< ReadNC::VarD
                     {
                         EntityHandle starth = pair_iter->first;
                         EntityHandle endh = pair_iter->second;  // Inclusive
-                        vdatas[i].readStarts[2] = ( NCDF_SIZE )( starth - 1 );
-                        vdatas[i].readCounts[2] = ( NCDF_SIZE )( endh - starth + 1 );
+                        vdatas[i].readStarts[2] = (NCDF_SIZE)( starth - 1 );
+                        vdatas[i].readCounts[2] = (NCDF_SIZE)( endh - starth + 1 );
 
                         success = NCFUNCAG( _vara_double )( _fileId, vdatas[i].varId, &( vdatas[i].readStarts[0] ),
                                                             &( vdatas[i].readCounts[0] ),

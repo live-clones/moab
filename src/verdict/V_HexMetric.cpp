@@ -190,7 +190,10 @@ double safe_ratio3( const double numerator, const double denominator, const doub
 
     const double filter_n = max_ratio * 1.0e-16;
     const double filter_d = 1.0e-16;
-    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d ) { return_value = numerator / denominator; }
+    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d )
+    {
+        return_value = numerator / denominator;
+    }
     else
     {
         return_value = fabs( numerator ) / max_ratio >= fabs( denominator )
@@ -209,7 +212,10 @@ double safe_ratio( const double numerator, const double denominator )
     double return_value;
     const double filter_n = VERDICT_DBL_MAX;
     const double filter_d = VERDICT_DBL_MIN;
-    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d ) { return_value = numerator / denominator; }
+    if( fabs( numerator ) <= filter_n && fabs( denominator ) >= filter_d )
+    {
+        return_value = numerator / denominator;
+    }
     else
     {
         return_value = VERDICT_DBL_MAX;
@@ -222,7 +228,10 @@ double condition_comp( const VerdictVector& xxi, const VerdictVector& xet, const
 {
     double det = xxi % ( xet * xze );
 
-    if( det <= VERDICT_DBL_MIN ) { return VERDICT_DBL_MAX; }
+    if( det <= VERDICT_DBL_MIN )
+    {
+        return VERDICT_DBL_MAX;
+    }
 
     double term1 = xxi % xxi + xet % xet + xze % xze;
     double term2 =
@@ -1016,7 +1025,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
     xze = calc_hex_efg( 3, node_pos );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[1][0] - coordinates[0][0], coordinates[1][1] - coordinates[0][1],
              coordinates[1][2] - coordinates[0][2] );
@@ -1028,7 +1040,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[4][2] - coordinates[0][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[2][0] - coordinates[1][0], coordinates[2][1] - coordinates[1][1],
              coordinates[2][2] - coordinates[1][2] );
@@ -1040,7 +1055,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[5][2] - coordinates[1][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[3][0] - coordinates[2][0], coordinates[3][1] - coordinates[2][1],
              coordinates[3][2] - coordinates[2][2] );
@@ -1052,7 +1070,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[6][2] - coordinates[2][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[0][0] - coordinates[3][0], coordinates[0][1] - coordinates[3][1],
              coordinates[0][2] - coordinates[3][2] );
@@ -1064,7 +1085,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[7][2] - coordinates[3][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[7][0] - coordinates[4][0], coordinates[7][1] - coordinates[4][1],
              coordinates[7][2] - coordinates[4][2] );
@@ -1076,7 +1100,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[0][2] - coordinates[4][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[4][0] - coordinates[5][0], coordinates[4][1] - coordinates[5][1],
              coordinates[4][2] - coordinates[5][2] );
@@ -1088,7 +1115,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[1][2] - coordinates[5][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[5][0] - coordinates[6][0], coordinates[5][1] - coordinates[6][1],
              coordinates[5][2] - coordinates[6][2] );
@@ -1100,7 +1130,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[2][2] - coordinates[6][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     xxi.set( coordinates[6][0] - coordinates[7][0], coordinates[6][1] - coordinates[7][1],
              coordinates[6][2] - coordinates[7][2] );
@@ -1112,7 +1145,10 @@ C_FUNC_DEF double v_hex_oddy( int /*num_nodes*/, double coordinates[][3] )
              coordinates[3][2] - coordinates[7][2] );
 
     current_oddy = oddy_comp( xxi, xet, xze );
-    if( current_oddy > oddy ) { oddy = current_oddy; }
+    if( current_oddy > oddy )
+    {
+        oddy = current_oddy;
+    }
 
     if( oddy > 0 ) return (double)VERDICT_MIN( oddy, VERDICT_DBL_MAX );
     return (double)VERDICT_MAX( oddy, -VERDICT_DBL_MAX );
@@ -1218,7 +1254,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = calc_hex_efg( 3, node_pos );
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(0,0,0):
 
@@ -1227,7 +1266,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[4] - node_pos[0];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(1,0,0):
 
@@ -1236,7 +1278,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[5] - node_pos[1];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(1,1,0):
 
@@ -1245,7 +1290,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[6] - node_pos[2];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(0,1,0):
 
@@ -1254,7 +1302,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[7] - node_pos[3];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(0,0,1):
 
@@ -1263,7 +1314,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[0] - node_pos[4];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(1,0,1):
 
@@ -1272,7 +1326,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[1] - node_pos[5];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(1,1,1):
 
@@ -1281,7 +1338,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[2] - node_pos[6];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     // J(1,1,1):
 
@@ -1290,7 +1350,10 @@ C_FUNC_DEF double v_hex_max_aspect_frobenius( int /*num_nodes*/, double coordina
     xze = node_pos[3] - node_pos[7];
 
     current_condition = condition_comp( xxi, xet, xze );
-    if( current_condition > condition ) { condition = current_condition; }
+    if( current_condition > condition )
+    {
+        condition = current_condition;
+    }
 
     condition /= 3.0;
 
@@ -1331,7 +1394,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = calc_hex_efg( 3, node_pos );
 
     current_jacobian = xxi % ( xet * xze ) / 64.0;
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(0,0,0):
 
@@ -1340,7 +1406,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[4] - node_pos[0];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(1,0,0):
 
@@ -1349,7 +1418,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[5] - node_pos[1];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(1,1,0):
 
@@ -1358,7 +1430,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[6] - node_pos[2];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(0,1,0):
 
@@ -1367,7 +1442,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[7] - node_pos[3];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(0,0,1):
 
@@ -1376,7 +1454,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[0] - node_pos[4];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(1,0,1):
 
@@ -1385,7 +1466,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[1] - node_pos[5];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(1,1,1):
 
@@ -1394,7 +1478,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[2] - node_pos[6];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     // J(0,1,1):
 
@@ -1403,7 +1490,10 @@ C_FUNC_DEF double v_hex_jacobian( int /*num_nodes*/, double coordinates[][3] )
     xze = node_pos[3] - node_pos[7];
 
     current_jacobian = xxi % ( xet * xze );
-    if( current_jacobian < jacobian ) { jacobian = current_jacobian; }
+    if( current_jacobian < jacobian )
+    {
+        jacobian = current_jacobian;
+    }
 
     if( jacobian > 0 ) return (double)VERDICT_MIN( jacobian, VERDICT_DBL_MAX );
     return (double)VERDICT_MAX( jacobian, -VERDICT_DBL_MAX );
@@ -1665,7 +1755,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1684,7 +1777,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1703,7 +1799,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1722,7 +1821,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1741,7 +1843,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1760,7 +1865,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1779,7 +1887,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1798,7 +1909,10 @@ C_FUNC_DEF double v_hex_shear( int /*num_nodes*/, double coordinates[][3] )
 
     lengths = sqrt( len1_sq * len2_sq * len3_sq );
     det     = xxi % ( xet * xze );
-    if( det < VERDICT_DBL_MIN ) { return 0; }
+    if( det < VERDICT_DBL_MIN )
+    {
+        return 0;
+    }
 
     shear     = det / lengths;
     min_shear = VERDICT_MIN( shear, min_shear );
@@ -1838,7 +1952,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(1,0,0):
 
@@ -1852,7 +1969,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(1,1,0):
 
@@ -1866,7 +1986,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(0,1,0):
 
@@ -1880,7 +2003,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(0,0,1):
 
@@ -1894,7 +2020,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(1,0,1):
 
@@ -1908,7 +2037,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(1,1,1):
 
@@ -1922,7 +2054,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     // J(1,1,1):
 
@@ -1936,7 +2071,10 @@ C_FUNC_DEF double v_hex_shape( int /*num_nodes*/, double coordinates[][3] )
     else
         return 0;
 
-    if( shape < min_shape ) { min_shape = shape; }
+    if( shape < min_shape )
+    {
+        min_shape = shape;
+    }
 
     if( min_shape <= VERDICT_DBL_MIN ) min_shape = 0;
 
@@ -2510,7 +2648,9 @@ C_FUNC_DEF double hex_jac_normjac_oddy_cond( int choices[],
 /*!
   multiple quality metrics of a hex
 */
-C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_hex_quality( int num_nodes,
+                               double coordinates[][3],
+                               unsigned int metrics_request_flag,
                                HexMetricVals* metric_vals )
 {
     memset( metric_vals, 0, sizeof( HexMetricVals ) );
@@ -2578,7 +2718,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         }
     }
 
-    if( metrics_request_flag & V_HEX_VOLUME ) { metric_vals->volume = v_hex_volume( 8, coordinates ); }
+    if( metrics_request_flag & V_HEX_VOLUME )
+    {
+        metric_vals->volume = v_hex_volume( 8, coordinates );
+    }
 
     if( metrics_request_flag &
         ( V_HEX_JACOBIAN | V_HEX_SCALED_JACOBIAN | V_HEX_CONDITION | V_HEX_SHEAR | V_HEX_SHAPE |
@@ -2632,13 +2775,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( xxi, xet, xze );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( xxi, xet, xze );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         // J(0,0,0)
@@ -2668,13 +2817,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( edges[0], -edges[3], edges[8] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( edges[0], -edges[3], edges[8] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2685,7 +2840,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(1,0,0)
@@ -2715,13 +2873,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( edges[1], -edges[0], edges[9] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( edges[1], -edges[0], edges[9] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2732,7 +2896,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(1,1,0)
@@ -2762,13 +2929,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( edges[2], -edges[1], edges[10] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( edges[2], -edges[1], edges[10] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2779,7 +2952,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(0,1,0)
@@ -2809,13 +2985,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( edges[3], -edges[2], edges[11] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( edges[3], -edges[2], edges[11] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2826,7 +3008,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(0,0,1)
@@ -2856,13 +3041,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( edges[4], -edges[8], -edges[7] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( edges[4], -edges[8], -edges[7] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2873,7 +3064,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(1,0,1)
@@ -2903,13 +3097,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( -edges[4], edges[5], -edges[9] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( -edges[4], edges[5], -edges[9] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2920,7 +3120,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(1,1,1)
@@ -2950,13 +3153,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( -edges[5], edges[6], -edges[10] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( -edges[5], edges[6], -edges[10] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -2967,7 +3176,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         // J(0,1,1)
@@ -2997,13 +3209,19 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
         if( metrics_request_flag & V_HEX_CONDITION )
         {
             current_condition = condition_comp( -edges[6], edges[7], -edges[11] );
-            if( current_condition > condition ) { condition = current_condition; }
+            if( current_condition > condition )
+            {
+                condition = current_condition;
+            }
         }
 
         if( metrics_request_flag & V_HEX_ODDY )
         {
             current_oddy = oddy_comp( -edges[6], edges[7], -edges[11] );
-            if( current_oddy > oddy ) { oddy = current_oddy; }
+            if( current_oddy > oddy )
+            {
+                oddy = current_oddy;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_SHAPE | V_HEX_SHAPE_AND_SIZE ) )
@@ -3014,7 +3232,10 @@ C_FUNC_DEF void v_hex_quality( int num_nodes, double coordinates[][3], unsigned 
             else
                 current_shape = 0;
 
-            if( current_shape < shape ) { shape = current_shape; }
+            if( current_shape < shape )
+            {
+                shape = current_shape;
+            }
         }
 
         if( metrics_request_flag & ( V_HEX_RELATIVE_SIZE_SQUARED | V_HEX_SHAPE_AND_SIZE | V_HEX_SHEAR_AND_SIZE ) )

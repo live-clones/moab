@@ -60,21 +60,38 @@ class PMeanPMetric
   protected:
     bool average( PatchData& pd, QualityMetric* qm, const std::vector< size_t >& qm_handles, double& value, MsqError& );
 
-    bool average_with_indices( PatchData& pd, QualityMetric* qm, const std::vector< size_t >& qm_handles, double& value,
-                               std::vector< size_t >& indices, MsqError& err );
+    bool average_with_indices( PatchData& pd,
+                               QualityMetric* qm,
+                               const std::vector< size_t >& qm_handles,
+                               double& value,
+                               std::vector< size_t >& indices,
+                               MsqError& err );
 
-    bool average_with_gradient( PatchData& pd, QualityMetric* qm, const std::vector< size_t >& qm_handles,
-                                double& value, std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
+    bool average_with_gradient( PatchData& pd,
+                                QualityMetric* qm,
+                                const std::vector< size_t >& qm_handles,
+                                double& value,
+                                std::vector< size_t >& indices,
+                                std::vector< Vector3D >& gradient,
                                 MsqError& err );
 
-    bool average_with_Hessian_diagonal( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
-                                        double& value, std::vector< size_t >& indices,
-                                        std::vector< Vector3D >& gradient, std::vector< SymMatrix3D >& Hessian_diagonal,
+    bool average_with_Hessian_diagonal( PatchData& pd,
+                                        QualityMetric* metric,
+                                        const std::vector< size_t >& qm_handles,
+                                        double& value,
+                                        std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& gradient,
+                                        std::vector< SymMatrix3D >& Hessian_diagonal,
                                         MsqError& err );
 
-    bool average_with_Hessian( PatchData& pd, QualityMetric* metric, const std::vector< size_t >& qm_handles,
-                               double& value, std::vector< size_t >& indices, std::vector< Vector3D >& gradient,
-                               std::vector< Matrix3D >& Hessian, MsqError& err );
+    bool average_with_Hessian( PatchData& pd,
+                               QualityMetric* metric,
+                               const std::vector< size_t >& qm_handles,
+                               double& value,
+                               std::vector< size_t >& indices,
+                               std::vector< Vector3D >& gradient,
+                               std::vector< Matrix3D >& Hessian,
+                               MsqError& err );
 
   private:
     Exponent P;

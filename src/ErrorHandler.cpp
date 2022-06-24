@@ -56,7 +56,11 @@ void MBErrorHandler_GetLastError( std::string& error )
     error = lastError;
 }
 
-void MBTraceBackErrorHandler( int line, const char* func, const char* file, const char* dir, const char* err_msg,
+void MBTraceBackErrorHandler( int line,
+                              const char* func,
+                              const char* file,
+                              const char* dir,
+                              const char* err_msg,
                               ErrorType err_type )
 {
     if( NULL == errorOutput ) return;
@@ -89,8 +93,13 @@ void MBTraceBackErrorHandler( int line, const char* func, const char* file, cons
     }
 }
 
-ErrorCode MBError( int line, const char* func, const char* file, const char* dir, ErrorCode err_code,
-                   const char* err_msg, ErrorType err_type )
+ErrorCode MBError( int line,
+                   const char* func,
+                   const char* file,
+                   const char* dir,
+                   ErrorCode err_code,
+                   const char* err_msg,
+                   ErrorType err_type )
 {
     // When this routine is called to handle an existing error (instead of creating a new one),
     // we need to check if the returned non-success result from a function might be a non-error

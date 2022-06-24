@@ -52,8 +52,8 @@ const double TRI_XFORM_VALS[] = { 1.0, -1.0 / sqrt( 3.0 ), 0.0, 2.0 / sqrt( 3.0 
 MsqMatrix< 2, 2 > TRI_XFORM( TRI_XFORM_VALS );
 
 const double TET_XFORM_VALS[] = {
-    1.0, -1.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0, 2.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0, 0.0, sqrt( 3.0 / 2.0 )
-};
+    1.0, -1.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0, 2.0 / sqrt( 3.0 ), -1.0 / sqrt( 6.0 ), 0.0,
+    0.0, sqrt( 3.0 / 2.0 ) };
 MsqMatrix< 3, 3 > TET_XFORM( TET_XFORM_VALS );
 
 AffineMapMetric::AffineMapMetric( TargetCalculator* tc, WeightCalculator* wc, TMetric* target_metric )
@@ -81,7 +81,9 @@ void AffineMapMetric::get_evaluations( PatchData& pd, std::vector< size_t >& han
     get_sample_pt_evaluations( pd, handles, free, err );
 }
 
-void AffineMapMetric::get_element_evaluations( PatchData& pd, size_t p_elem, std::vector< size_t >& handles,
+void AffineMapMetric::get_element_evaluations( PatchData& pd,
+                                               size_t p_elem,
+                                               std::vector< size_t >& handles,
                                                MsqError& err )
 {
     get_elem_sample_points( pd, p_elem, handles, err );
@@ -168,8 +170,11 @@ bool AffineMapMetric::evaluate( PatchData& pd, size_t p_handle, double& value, M
     return rval;
 }
 
-bool AffineMapMetric::evaluate_with_indices( PatchData& pd, size_t p_handle, double& value,
-                                             std::vector< size_t >& indices, MsqError& err )
+bool AffineMapMetric::evaluate_with_indices( PatchData& pd,
+                                             size_t p_handle,
+                                             double& value,
+                                             std::vector< size_t >& indices,
+                                             MsqError& err )
 {
     Sample s              = ElemSampleQM::sample( p_handle );
     size_t e              = ElemSampleQM::elem( p_handle );

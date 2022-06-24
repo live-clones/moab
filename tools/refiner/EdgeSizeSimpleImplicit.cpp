@@ -19,7 +19,11 @@ EdgeSizeSimpleImplicit::EdgeSizeSimpleImplicit()
 
 EdgeSizeSimpleImplicit::~EdgeSizeSimpleImplicit() {}
 
-bool EdgeSizeSimpleImplicit::evaluate_edge( const double* p0, const void* t0, double* p1, void* t1, const double* p2,
+bool EdgeSizeSimpleImplicit::evaluate_edge( const double* p0,
+                                            const void* t0,
+                                            double* p1,
+                                            void* t1,
+                                            const double* p2,
                                             const void* t2 )
 {
     (void)t0;

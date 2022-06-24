@@ -35,15 +35,20 @@ ReadTemplate::~ReadTemplate()
     }
 }
 
-ErrorCode ReadTemplate::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                         const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadTemplate::read_tag_values( const char* /* file_name */,
+                                         const char* /* tag_name */,
+                                         const FileOptions& /* opts */,
+                                         std::vector< int >& /* tag_values_out */,
                                          const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadTemplate::load_file( const char* filename, const EntityHandle* file_set, const FileOptions& opts,
-                                   const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
+ErrorCode ReadTemplate::load_file( const char* filename,
+                                   const EntityHandle* file_set,
+                                   const FileOptions& opts,
+                                   const ReaderIface::SubsetList* subset_list,
+                                   const Tag* /*file_id_tag*/ )
 {
     if( subset_list )
     {
@@ -64,7 +69,10 @@ ErrorCode ReadTemplate::load_file( const char* filename, const EntityHandle* fil
     // Open file; filePtr is member of ReadTemplate, change to whatever mechanism is used to
     // identify file
     FILE* filePtr = fopen( fileName, "r" );
-    if( !filePtr ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, fileName << ": fopen returned error" ); }
+    if( !filePtr )
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, fileName << ": fopen returned error" );
+    }
 
     // Read number of verts, elements, sets
     long num_verts = 0, num_elems = 0, num_sets = 0;
@@ -135,7 +143,9 @@ ErrorCode ReadTemplate::read_vertices( int num_verts, EntityHandle& start_vertex
     for( long i = 0; i < num_verts; ++i )
     {
         // Read x/y/z; do something with them for now to avoid warning
-        if( x || y || z ) {}
+        if( x || y || z )
+        {
+        }
     }
 
     if( num_verts ) read_ents.insert( start_vertex, start_vertex + num_verts - 1 );
@@ -144,7 +154,9 @@ ErrorCode ReadTemplate::read_vertices( int num_verts, EntityHandle& start_vertex
 }
 
 //! Read/create elements
-ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex, EntityHandle& start_elem,
+ErrorCode ReadTemplate::read_elements( int num_elems,
+                                       EntityHandle start_vertex,
+                                       EntityHandle& start_elem,
                                        Range& read_ents )
 {
     // Get the entity type being read
@@ -193,8 +205,12 @@ ErrorCode ReadTemplate::read_elements( int num_elems, EntityHandle start_vertex,
 }
 
 //! Read/create sets
-ErrorCode ReadTemplate::create_sets( int num_sets, EntityHandle /*start_vertex*/, int /*num_verts*/,
-                                     EntityHandle /*start_elem*/, int /*num_elems*/, Range& read_ents )
+ErrorCode ReadTemplate::create_sets( int num_sets,
+                                     EntityHandle /*start_vertex*/,
+                                     int /*num_verts*/,
+                                     EntityHandle /*start_elem*/,
+                                     int /*num_elems*/,
+                                     Range& read_ents )
 {
     ErrorCode result = MB_SUCCESS;
     EntityHandle this_set;

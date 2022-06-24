@@ -37,11 +37,17 @@ class ReadGmsh : public ReaderIface
     //! factory method
     static ReaderIface* factory( Interface* );
 
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadGmsh( Interface* impl = NULL );
@@ -50,12 +56,17 @@ class ReadGmsh : public ReaderIface
     virtual ~ReadGmsh();
 
   private:
-    ErrorCode create_elements( const GmshElemType& type, const std::vector< int >& elem_ids,
-                               const std::vector< int >& matl_ids, const std::vector< int >& geom_ids,
-                               const std::vector< int >& prtn_ids, const std::vector< EntityHandle >& connectivity,
+    ErrorCode create_elements( const GmshElemType& type,
+                               const std::vector< int >& elem_ids,
+                               const std::vector< int >& matl_ids,
+                               const std::vector< int >& geom_ids,
+                               const std::vector< int >& prtn_ids,
+                               const std::vector< EntityHandle >& connectivity,
                                const Tag* file_id_tag );
 
-    ErrorCode create_sets( EntityType element_type, const Range& elements, const std::vector< int >& set_ids,
+    ErrorCode create_sets( EntityType element_type,
+                           const Range& elements,
+                           const std::vector< int >& set_ids,
                            int set_type );
 
     ErrorCode create_geometric_topology();

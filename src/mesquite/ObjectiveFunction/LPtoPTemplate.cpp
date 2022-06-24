@@ -81,7 +81,10 @@ ObjectiveFunction* LPtoPTemplate::clone() const
     return new LPtoPTemplate( *this );
 }
 
-double LPtoPTemplate::get_value( double power_sum, size_t count, EvalType type, size_t& global_count,
+double LPtoPTemplate::get_value( double power_sum,
+                                 size_t count,
+                                 EvalType type,
+                                 size_t& global_count,
                                  MsqError& /*err*/ )
 {
     double result = 0;
@@ -165,8 +168,11 @@ bool LPtoPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, b
     return true;
 }
 
-bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double& OF_val,
-                                            std::vector< Vector3D >& grad_out, MsqError& err )
+bool LPtoPTemplate::evaluate_with_gradient( EvalType type,
+                                            PatchData& pd,
+                                            double& OF_val,
+                                            std::vector< Vector3D >& grad_out,
+                                            MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -225,9 +231,12 @@ bool LPtoPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double
     return true;
 }
 
-bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& OF_val,
+bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type,
+                                                    PatchData& pd,
+                                                    double& OF_val,
                                                     std::vector< Vector3D >& grad,
-                                                    std::vector< SymMatrix3D >& hess_diag, MsqError& err )
+                                                    std::vector< SymMatrix3D >& hess_diag,
+                                                    MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -353,8 +362,12 @@ bool LPtoPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd
            hessian is computed.
     \param hessian this object must have been previously initialized.
 */
-bool LPtoPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double& OF_val, std::vector< Vector3D >& grad,
-                                           MsqHessian& hessian, MsqError& err )
+bool LPtoPTemplate::evaluate_with_Hessian( EvalType type,
+                                           PatchData& pd,
+                                           double& OF_val,
+                                           std::vector< Vector3D >& grad,
+                                           MsqHessian& hessian,
+                                           MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );

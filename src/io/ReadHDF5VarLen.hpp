@@ -82,8 +82,12 @@ class ReadHDF5VarLen
      *                        argument to \c storedata should be passed
      *                        as \c true.
      */
-    ErrorCode read_data( ReadHDF5Dataset& data_set, const Range& offsets, EntityHandle start_offset, hid_t data_type,
-                         const Range& file_ids, const std::vector< unsigned >& vals_per_ent,
+    ErrorCode read_data( ReadHDF5Dataset& data_set,
+                         const Range& offsets,
+                         EntityHandle start_offset,
+                         hid_t data_type,
+                         const Range& file_ids,
+                         const std::vector< unsigned >& vals_per_ent,
                          const Range& ranged_file_ids );
 
     /**\brief Read set description table or offset vector for
@@ -121,11 +125,19 @@ class ReadHDF5VarLen
                                std::vector<unsigned> counts_out[],
                                Range* ranged_file_ids = 0 );
    */
-    ErrorCode read_offsets( ReadHDF5Dataset& data_set, const Range& file_ids, EntityHandle start_file_id,
-                            EntityHandle nudge, Range& offsets_out, std::vector< unsigned >& counts_out );
+    ErrorCode read_offsets( ReadHDF5Dataset& data_set,
+                            const Range& file_ids,
+                            EntityHandle start_file_id,
+                            EntityHandle nudge,
+                            Range& offsets_out,
+                            std::vector< unsigned >& counts_out );
 
-    ErrorCode read( ReadHDF5Dataset& offset_data, ReadHDF5Dataset& value_data, const Range& file_ids,
-                    EntityHandle start_file_id, hid_t data_type, const Range* ranged = 0 )
+    ErrorCode read( ReadHDF5Dataset& offset_data,
+                    ReadHDF5Dataset& value_data,
+                    const Range& file_ids,
+                    EntityHandle start_file_id,
+                    hid_t data_type,
+                    const Range* ranged = 0 )
     {
         ErrorCode rval;
         const EntityHandle nudge = 1;

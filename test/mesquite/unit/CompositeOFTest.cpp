@@ -268,7 +268,9 @@ void CompositeOFTest::test_scalar_multiply_gradient()
     compare_numerical_gradient( &OF );
 }
 
-void CompositeOFTest::get_hessians( MsqHessian& LP1_hess, MsqHessian& LP2_hess, ObjectiveFunction& OF,
+void CompositeOFTest::get_hessians( MsqHessian& LP1_hess,
+                                    MsqHessian& LP2_hess,
+                                    ObjectiveFunction& OF,
                                     MsqHessian& OF_hess )
 {
     MsqPrintError err( cout );
@@ -380,7 +382,10 @@ void CompositeOFTest::test_add_hessian()
             b1 = hess1.get_block( r, c );
             b2 = hess2.get_block( r, c );
             b  = hess.get_block( r, c );
-            if( b ) { CPPUNIT_ASSERT_MATRICES_EQUAL( *b1 + *b2, *b, 1e-6 ); }
+            if( b )
+            {
+                CPPUNIT_ASSERT_MATRICES_EQUAL( *b1 + *b2, *b, 1e-6 );
+            }
         }
     }
 }
@@ -419,7 +424,10 @@ void CompositeOFTest::test_scalar_add_hessian()
         {
             b1 = hess1.get_block( r, c );
             b  = hess.get_block( r, c );
-            if( b ) { CPPUNIT_ASSERT_MATRICES_EQUAL( *b1, *b, 1e-6 ); }
+            if( b )
+            {
+                CPPUNIT_ASSERT_MATRICES_EQUAL( *b1, *b, 1e-6 );
+            }
         }
     }
 }
@@ -441,7 +449,10 @@ void CompositeOFTest::test_scalar_multiply_hessian()
         {
             b1 = hess1.get_block( r, c );
             b  = hess.get_block( r, c );
-            if( b ) { CPPUNIT_ASSERT_MATRICES_EQUAL( scale * *b1, *b, 1e-6 ); }
+            if( b )
+            {
+                CPPUNIT_ASSERT_MATRICES_EQUAL( scale * *b1, *b, 1e-6 );
+            }
         }
     }
 }

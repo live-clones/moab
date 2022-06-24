@@ -58,7 +58,9 @@ bool TSizeB1::evaluate( const MsqMatrix< 2, 2 >& T, double& result, MsqError& er
     return true;
 }
 
-bool TSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
+bool TSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T,
+                                  double& result,
+                                  MsqMatrix< 2, 2 >& deriv_wrt_T,
                                   MsqError& err )
 {
     double d = det( T );
@@ -72,8 +74,11 @@ bool TSizeB1::evaluate_with_grad( const MsqMatrix< 2, 2 >& T, double& result, Ms
     return true;
 }
 
-bool TSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T, double& result, MsqMatrix< 2, 2 >& deriv_wrt_T,
-                                  MsqMatrix< 2, 2 > second_wrt_T[3], MsqError& err )
+bool TSizeB1::evaluate_with_hess( const MsqMatrix< 2, 2 >& T,
+                                  double& result,
+                                  MsqMatrix< 2, 2 >& deriv_wrt_T,
+                                  MsqMatrix< 2, 2 > second_wrt_T[3],
+                                  MsqError& err )
 {
     double d = det( T );
     if( TMetric::invalid_determinant( d ) )
@@ -103,7 +108,9 @@ bool TSizeB1::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqError& er
     return true;
 }
 
-bool TSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
+bool TSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T,
+                                  double& result,
+                                  MsqMatrix< 3, 3 >& deriv_wrt_T,
                                   MsqError& err )
 {
     double d = det( T );
@@ -117,8 +124,11 @@ bool TSizeB1::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, Ms
     return true;
 }
 
-bool TSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv_wrt_T,
-                                  MsqMatrix< 3, 3 > second_wrt_T[6], MsqError& err )
+bool TSizeB1::evaluate_with_hess( const MsqMatrix< 3, 3 >& T,
+                                  double& result,
+                                  MsqMatrix< 3, 3 >& deriv_wrt_T,
+                                  MsqMatrix< 3, 3 > second_wrt_T[6],
+                                  MsqError& err )
 {
     double d = det( T );
     if( TMetric::invalid_determinant( d ) )

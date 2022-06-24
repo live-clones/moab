@@ -117,8 +117,10 @@ class SmoothCurve
     // this will recompute the 2 tangents for each edge, considering the geo edge they are into
     void compute_tangents_for_each_edge();
 
-    void compute_control_points_on_boundary_edges( double min_dot, std::map< EntityHandle, SmoothFace* >& mapSurfaces,
-                                                   Tag controlPointsTag, Tag markTag );
+    void compute_control_points_on_boundary_edges( double min_dot,
+                                                   std::map< EntityHandle, SmoothFace* >& mapSurfaces,
+                                                   Tag controlPointsTag,
+                                                   Tag markTag );
 
     ErrorCode evaluate_smooth_edge( EntityHandle eh, double& tt, CartVect& outv, CartVect& out_tangent );
 

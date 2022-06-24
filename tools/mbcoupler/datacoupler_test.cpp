@@ -324,10 +324,10 @@ ErrorCode get_file_options( int argc,
 {
     // Initialize some of the outputs to null values indicating not present
     // in the argument list.
-    gNormTag  = "";
-    ssNormTag = "";
-    readOpts  = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;PARALLEL_"
-               "RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME";
+    gNormTag                   = "";
+    ssNormTag                  = "";
+    readOpts                   = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;PARALLEL_"
+                                 "RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME";
     outFile                    = "";
     writeOpts                  = "PARALLEL=WRITE_PART;CPUTIME";
     dbgFile                    = "";

@@ -87,7 +87,10 @@ void MsqDebug::set( unsigned flag, bool state )
 {
     if( state )
     {
-        if( flag >= flags.size() ) { flags.resize( flag + 1 ); }
+        if( flag >= flags.size() )
+        {
+            flags.resize( flag + 1 );
+        }
         flags[flag] = true;
     }
     else

@@ -53,7 +53,10 @@ ErrorCode get_ents( Interface& mbi, std::string& filename, int& dim, Range& elem
         CHK( rval, "get_entities_by_dimension" );
         if( elems.empty() ) dim--;
     }
-    if( elems.empty() ) { CHK( MB_FAILURE, "No elements in file" ); }
+    if( elems.empty() )
+    {
+        CHK( MB_FAILURE, "No elements in file" );
+    }
 
     // check to see they're all the same type & #vertices
     tp             = mbi.type_from_handle( *elems.begin() );
@@ -66,7 +69,10 @@ ErrorCode get_ents( Interface& mbi, std::string& filename, int& dim, Range& elem
     CHK( rval, "get_connectivity" );
     rval = mbi.get_connectivity( *elems.rbegin(), c1, nv2 );
     CHK( rval, "get_connectivity" );
-    if( nv != nv2 ) { CHK( MB_FAILURE, "Elements must have same #vertices" ); }
+    if( nv != nv2 )
+    {
+        CHK( MB_FAILURE, "Elements must have same #vertices" );
+    }
 
     return MB_SUCCESS;
 }
@@ -119,8 +125,12 @@ ErrorCode get_elem_map( EntityType tp, std::vector< CartVect >& vcoords, int nco
     return MB_SUCCESS;
 }
 
-ErrorCode time_forward_eval( Interface* mbi, int method, Range& elems, std::vector< CartVect >& params,
-                             std::vector< CartVect >& coords, double& evtime )
+ErrorCode time_forward_eval( Interface* mbi,
+                             int method,
+                             Range& elems,
+                             std::vector< CartVect >& params,
+                             std::vector< CartVect >& coords,
+                             double& evtime )
 {
     evtime = mytime();
     ErrorCode rval;
@@ -165,8 +175,12 @@ ErrorCode time_forward_eval( Interface* mbi, int method, Range& elems, std::vect
     return MB_SUCCESS;
 }
 
-ErrorCode time_reverse_eval( Interface* mbi, int method, Range& elems, std::vector< CartVect >& coords,
-                             std::vector< CartVect >& params, double& retime )
+ErrorCode time_reverse_eval( Interface* mbi,
+                             int method,
+                             Range& elems,
+                             std::vector< CartVect >& coords,
+                             std::vector< CartVect >& params,
+                             double& retime )
 {
     retime = mytime();
     ErrorCode rval;
@@ -316,8 +330,15 @@ ErrorCode put_random_field( Interface& mbi, Tag& tag, Range& elems )
     return rval;
 }
 
-ErrorCode elem_evals( Interface* mbi, int method, Range& elems, Tag tag, std::vector< CartVect >& params,
-                      std::vector< CartVect >& coords, double& evtime, double& retime, double& jactime,
+ErrorCode elem_evals( Interface* mbi,
+                      int method,
+                      Range& elems,
+                      Tag tag,
+                      std::vector< CartVect >& params,
+                      std::vector< CartVect >& coords,
+                      double& evtime,
+                      double& retime,
+                      double& jactime,
                       double& inttime )
 {
     evtime = 0, retime = 0, jactime = 0, inttime = 0;  // initializations to avoid compiler warning

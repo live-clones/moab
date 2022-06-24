@@ -72,19 +72,46 @@ class SimplexTemplateRefiner : public EntityRefiner
     static int templates[];
 
     void refine_0_simplex( const double* v0, const void* t0, EntityHandle h0 );
-    bool refine_1_simplex( int max_depth, const double* v0, const void* t0, EntityHandle h0, const double* v1,
-                           const void* t1, EntityHandle h1 );
-    bool refine_2_simplex( int max_depth, int move, const double* v0, const void* t0, EntityHandle h0, const double* v1,
-                           const void* t1, EntityHandle h1, const double* v2, const void* t2, EntityHandle h2 );
-    bool refine_3_simplex( int max_depth, double* v0, void* t0, EntityHandle h0, double* v1, void* t1, EntityHandle h1,
-                           double* v2, void* t2, EntityHandle h2, double* v3, void* t3, EntityHandle h3 );
+    bool refine_1_simplex( int max_depth,
+                           const double* v0,
+                           const void* t0,
+                           EntityHandle h0,
+                           const double* v1,
+                           const void* t1,
+                           EntityHandle h1 );
+    bool refine_2_simplex( int max_depth,
+                           int move,
+                           const double* v0,
+                           const void* t0,
+                           EntityHandle h0,
+                           const double* v1,
+                           const void* t1,
+                           EntityHandle h1,
+                           const double* v2,
+                           const void* t2,
+                           EntityHandle h2 );
+    bool refine_3_simplex( int max_depth,
+                           double* v0,
+                           void* t0,
+                           EntityHandle h0,
+                           double* v1,
+                           void* t1,
+                           EntityHandle h1,
+                           double* v2,
+                           void* t2,
+                           EntityHandle h2,
+                           double* v3,
+                           void* t3,
+                           EntityHandle h3 );
 
     int best_tets( int* alternates, double* [14], int, int )
     {
         return alternates[0];
     }
     void assign_parametric_coordinates( int num_nodes, const double* src, double* tgt );
-    static bool compare_Hopf_cross_string_dist( const double* v00, const double* v01, const double* v10,
+    static bool compare_Hopf_cross_string_dist( const double* v00,
+                                                const double* v01,
+                                                const double* v10,
                                                 const double* v11 );
 };
 

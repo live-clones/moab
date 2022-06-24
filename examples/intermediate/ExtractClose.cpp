@@ -112,7 +112,10 @@ int main( int argc, char** argv )
         CartVect center;
         rval = mb.get_coords( &cell, 1, &( center[0] ) );MB_CHK_SET_ERR( rval, "Can't get cell center coords" );
         double dist = ( center - point ).length();
-        if( dist <= distance ) { closeByCells.insert( cell ); }
+        if( dist <= distance )
+        {
+            closeByCells.insert( cell );
+        }
     }
 
     rval = mb.add_entities( outSet, closeByCells );MB_CHK_SET_ERR( rval, "Can't add to entity set" );

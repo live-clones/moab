@@ -52,8 +52,10 @@ int LVQDTargetCalculator::add_source( TargetCalculator* source )
     return idx;
 }
 
-LVQDTargetCalculator::LVQDTargetCalculator( TargetCalculator* lambda_source, TargetCalculator* V_source,
-                                            TargetCalculator* Q_source, TargetCalculator* delta_source )
+LVQDTargetCalculator::LVQDTargetCalculator( TargetCalculator* lambda_source,
+                                            TargetCalculator* V_source,
+                                            TargetCalculator* Q_source,
+                                            TargetCalculator* delta_source )
     : numUniqueGuides( 0 )
 {
     lambdaIdx = add_source( lambda_source );
@@ -69,7 +71,10 @@ bool LVQDTargetCalculator::have_surface_orient() const
     return ( vIdx >= 0 );
 }
 
-bool LVQDTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+bool LVQDTargetCalculator::get_3D_target( PatchData& pd,
+                                          size_t element,
+                                          Sample sample,
+                                          MsqMatrix< 3, 3 >& W_out,
                                           MsqError& err )
 {
     double lambda[4];
@@ -114,8 +119,14 @@ bool LVQDTargetCalculator::get_3D_target( PatchData& pd, size_t element, Sample 
     return true;
 }
 
-bool LVQDTargetCalculator::evaluate_guide_2D( PatchData& pd, size_t element, Sample sample, int idx, double& lambda,
-                                              MsqMatrix< 3, 2 >& V, MsqMatrix< 2, 2 >& Q, MsqMatrix< 2, 2 >& delta,
+bool LVQDTargetCalculator::evaluate_guide_2D( PatchData& pd,
+                                              size_t element,
+                                              Sample sample,
+                                              int idx,
+                                              double& lambda,
+                                              MsqMatrix< 3, 2 >& V,
+                                              MsqMatrix< 2, 2 >& Q,
+                                              MsqMatrix< 2, 2 >& delta,
                                               MsqError& err )
 {
     bool valid;
@@ -140,7 +151,10 @@ bool LVQDTargetCalculator::evaluate_guide_2D( PatchData& pd, size_t element, Sam
     return true;
 }
 
-bool LVQDTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+bool LVQDTargetCalculator::get_2D_target( PatchData& pd,
+                                          size_t element,
+                                          Sample sample,
+                                          MsqMatrix< 2, 2 >& W_out,
                                           MsqError& err )
 {
     double lambda[4];
@@ -183,7 +197,10 @@ bool LVQDTargetCalculator::get_2D_target( PatchData& pd, size_t element, Sample 
     return true;
 }
 
-bool LVQDTargetCalculator::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+bool LVQDTargetCalculator::get_surface_target( PatchData& pd,
+                                               size_t element,
+                                               Sample sample,
+                                               MsqMatrix< 3, 2 >& W_out,
                                                MsqError& err )
 {
     double lambda[4];

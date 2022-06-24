@@ -70,9 +70,9 @@ class DamselUtil
     template < class T >
     struct MtagP
     {
-      // deprecation of unary_function
-      typedef T argument_type;
-      typedef bool result_type;
+        // deprecation of unary_function
+        typedef T argument_type;
+        typedef bool result_type;
 
       public:
         MtagP( const Tag& th )
@@ -89,9 +89,9 @@ class DamselUtil
     template < class T >
     struct DtagP
     {
-      // deprecation of unary_function
-      typedef T argument_type;
-      typedef bool result_type;
+        // deprecation of unary_function
+        typedef T argument_type;
+        typedef bool result_type;
 
       public:
         DtagP( const damsel_handle& th )

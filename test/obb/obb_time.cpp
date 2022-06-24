@@ -165,7 +165,10 @@ int main( int argc, char* argv[] )
     }
 
     OrientedBoxTreeTool::TrvStats* stats = NULL;
-    if( do_trv_stats ) { stats = new OrientedBoxTreeTool::TrvStats; }
+    if( do_trv_stats )
+    {
+        stats = new OrientedBoxTreeTool::TrvStats;
+    }
 
     const unsigned cached = 1000;
     std::vector< double > intersections;
@@ -224,7 +227,10 @@ int main( int argc, char* argv[] )
             return 4;
         }
 
-        if( !intersections.empty() ) { ++xsct; }
+        if( !intersections.empty() )
+        {
+            ++xsct;
+        }
 
         if( randrays.size() < cached && ( !intersections.empty() || !num_xsct || xsct >= num_xsct ) )
         {

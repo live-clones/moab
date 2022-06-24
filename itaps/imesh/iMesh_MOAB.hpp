@@ -119,15 +119,23 @@ class iMeshArrayManager
     void** arrayPtr;
 
   public:
-    iMeshArrayManager( iMesh_Instance instance, void** array_ptr, int& array_allocated_space, int& array_size,
-                       int count, int val_size, int* err )
+    iMeshArrayManager( iMesh_Instance instance,
+                       void** array_ptr,
+                       int& array_allocated_space,
+                       int& array_size,
+                       int count,
+                       int val_size,
+                       int* err )
         : arrayPtr( 0 )
     {
         if( !array_allocated_space || !*array_ptr )
         {
             *array_ptr            = std::malloc( val_size * count );
             array_allocated_space = array_size = count;
-            if( !*array_ptr ) { ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." ); }
+            if( !*array_ptr )
+            {
+                ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." );
+            }
             arrayPtr = array_ptr;
         }
         else

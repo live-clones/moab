@@ -304,8 +304,13 @@ class MetricLogger : public QualityMetric
         MSQ_SETERR( err )( MsqError::NOT_IMPLEMENTED );
         return false;
     }
-    bool evaluate_with_Hessian( PatchData&, size_t, double&, vector< size_t >&, vector< Vector3D >&,
-                                vector< Matrix3D >&, MsqError& err )
+    bool evaluate_with_Hessian( PatchData&,
+                                size_t,
+                                double&,
+                                vector< size_t >&,
+                                vector< Vector3D >&,
+                                vector< Matrix3D >&,
+                                MsqError& err )
     {  // shouldn't be called by QualityAssessor
         CPPUNIT_ASSERT( false );
         MSQ_SETERR( err )( MsqError::NOT_IMPLEMENTED );
@@ -928,7 +933,10 @@ void QualityAssessorTest::test_tag_inverted()
     invertedMesh.tag_get_element_data( tag, 2, arrptr( elements ), data, err );
     ASSERT_NO_ERROR( err );
 
-    if( data[0] ) { CPPUNIT_ASSERT_EQUAL( 0, data[1] ); }
+    if( data[0] )
+    {
+        CPPUNIT_ASSERT_EQUAL( 0, data[1] );
+    }
     else
     {
         CPPUNIT_ASSERT_EQUAL( 0, data[0] );

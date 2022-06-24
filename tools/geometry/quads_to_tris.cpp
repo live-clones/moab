@@ -18,8 +18,9 @@
 using namespace moab;
 
 // Generic function to create two tris from a quad. This can be improved later.
-ErrorCode make_tris_from_quad( Interface* MBI, EntityHandle quad, /* input */
-                               EntityHandle& tri0,                /* output */
+ErrorCode make_tris_from_quad( Interface* MBI,
+                               EntityHandle quad,  /* input */
+                               EntityHandle& tri0, /* output */
                                EntityHandle& tri1 /* output */ )
 {
 

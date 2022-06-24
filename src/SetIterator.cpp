@@ -18,7 +18,11 @@ SetIterator::~SetIterator()
     myCore->remove_set_iterator( this );
 }
 
-RangeSetIterator::RangeSetIterator( Core* core, EntityHandle eset, int chunk_sz, EntityType ent_tp, int ent_dim,
+RangeSetIterator::RangeSetIterator( Core* core,
+                                    EntityHandle eset,
+                                    int chunk_sz,
+                                    EntityType ent_tp,
+                                    int ent_dim,
                                     bool check_valid )
     : SetIterator( core, eset, chunk_sz, ent_tp, ent_dim, check_valid ), iterPos( 0 ), pairPtr( NULL ), numPairs( 0 )
 {
@@ -117,7 +121,9 @@ ErrorCode RangeSetIterator::get_next_arr( std::vector< EntityHandle >& arr, bool
     return MB_SUCCESS;
 }
 
-ErrorCode RangeSetIterator::get_next_by_type( const EntityHandle*& ptr, int count, std::vector< EntityHandle >& arr,
+ErrorCode RangeSetIterator::get_next_by_type( const EntityHandle*& ptr,
+                                              int count,
+                                              std::vector< EntityHandle >& arr,
                                               bool& atend )
 {
     unsigned int num_ret = 0;
@@ -166,11 +172,16 @@ ErrorCode RangeSetIterator::get_next_by_type( const EntityHandle*& ptr, int coun
     return MB_SUCCESS;
 }
 
-ErrorCode RangeSetIterator::get_next_by_dimension( const EntityHandle*& ptr, int count,
-                                                   std::vector< EntityHandle >& arr, bool& atend )
+ErrorCode RangeSetIterator::get_next_by_dimension( const EntityHandle*& ptr,
+                                                   int count,
+                                                   std::vector< EntityHandle >& arr,
+                                                   bool& atend )
 {
     // iterating by dimension - type should be maxtype
-    if( entType != MBMAXTYPE ) { MB_SET_ERR( MB_FAILURE, "Both dimension and type should not be set on an iterator" ); }
+    if( entType != MBMAXTYPE )
+    {
+        MB_SET_ERR( MB_FAILURE, "Both dimension and type should not be set on an iterator" );
+    }
 
     unsigned int num_ret = 0;
     size_t idx           = 0;

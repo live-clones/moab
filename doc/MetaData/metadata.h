@@ -904,4 +904,3 @@ nx*ny*nz values)
     \ref table6
 
 */
-

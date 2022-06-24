@@ -101,7 +101,9 @@ ReadCGM::ReadCGM( Interface* impl )
                                     MB_TAG_SPARSE | MB_TAG_CREAT );
     assert( !rval );
 #ifdef NDEBUG
-    if( !rval ) {};  // Line to avoid compiler warning about variable set but not used
+    if( !rval )
+    {
+    };  // Line to avoid compiler warning about variable set but not used
 #endif
 }
 
@@ -111,16 +113,23 @@ ReadCGM::~ReadCGM()
     delete myGeomTool;
 }
 
-ErrorCode ReadCGM::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadCGM::read_tag_values( const char* /* file_name */,
+                                    const char* /* tag_name */,
+                                    const FileOptions& /* opts */,
+                                    std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // Sets options passed into ReadCGM::load_file
-ErrorCode ReadCGM::set_options( const FileOptions& opts, int& norm_tol, double& faceting_tol, double& len_tol,
-                                bool& act_att, bool& verbose_warnings, bool& fatal_on_curves )
+ErrorCode ReadCGM::set_options( const FileOptions& opts,
+                                int& norm_tol,
+                                double& faceting_tol,
+                                double& len_tol,
+                                bool& act_att,
+                                bool& verbose_warnings,
+                                bool& fatal_on_curves )
 {
     ErrorCode rval;
 
@@ -450,7 +459,10 @@ ErrorCode ReadCGM::store_group_content( std::map< RefEntity*, EntityHandle > ( &
                     for( int vi = vols.size(); vi--; )
                     {
                         RefVolume* vol = vols.get_and_step();
-                        if( entitymap[3].find( vol ) != entitymap[3].end() ) { entities.insert( entitymap[3][vol] ); }
+                        if( entitymap[3].find( vol ) != entitymap[3].end() )
+                        {
+                            entities.insert( entitymap[3][vol] );
+                        }
                         else
                         {
                             std::cerr << "Warning: CGM Body has orphan RefVolume" << std::endl;
@@ -487,7 +499,10 @@ void ReadCGM::set_cgm_attributes( bool const act_attributes, bool const verbose 
         CGMApp::instance()->attrib_manager()->set_all_auto_actuate_flags( act_attributes );
     }
 
-    if( !verbose ) { CGMApp::instance()->attrib_manager()->silent_flag( true ); }
+    if( !verbose )
+    {
+        CGMApp::instance()->attrib_manager()->silent_flag( true );
+    }
 }
 
 ErrorCode ReadCGM::create_vertices( std::map< RefEntity*, EntityHandle >& vertex_map )
@@ -521,7 +536,9 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
 #else
                                         int /* norm_tol */,
 #endif
-                                        double faceting_tol, bool verbose_warn, bool fatal_on_curves )
+                                        double faceting_tol,
+                                        bool verbose_warn,
+                                        bool fatal_on_curves )
 {
     ErrorCode rval;
     CubitStatus s;
@@ -659,8 +676,10 @@ ErrorCode ReadCGM::create_curve_facets( std::map< RefEntity*, EntityHandle >& cu
 }
 
 ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& surface_map,
-                                          std::map< RefEntity*, EntityHandle >& vertex_map, int norm_tol,
-                                          double facet_tol, double length_tol )
+                                          std::map< RefEntity*, EntityHandle >& vertex_map,
+                                          int norm_tol,
+                                          double facet_tol,
+                                          double length_tol )
 {
     ErrorCode rval;
     std::map< RefEntity*, EntityHandle >::iterator ci;
@@ -783,13 +802,19 @@ ErrorCode ReadCGM::create_surface_facets( std::map< RefEntity*, EntityHandle >& 
 }
 
 // Copy geometry into mesh database
-ErrorCode ReadCGM::load_file( const char* cgm_file_name, const EntityHandle* file_set, const FileOptions& opts,
-                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
+ErrorCode ReadCGM::load_file( const char* cgm_file_name,
+                              const EntityHandle* file_set,
+                              const FileOptions& opts,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* /*file_id_tag*/ )
 {
     // Blocks_to_load and num_blocks are ignored.
     ErrorCode rval;
 
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CGM data" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for CGM data" );
+    }
 
     int norm_tol;
     double faceting_tol;

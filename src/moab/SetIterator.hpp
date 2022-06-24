@@ -61,7 +61,11 @@ class SetIterator
      * \param ent_type Entity type for this iterator
      * \param ent_dim Entity dimension for this iterator
      */
-    inline SetIterator( Core* core, EntityHandle eset, unsigned int chunk_sz, EntityType ent_tp, int ent_dim,
+    inline SetIterator( Core* core,
+                        EntityHandle eset,
+                        unsigned int chunk_sz,
+                        EntityType ent_tp,
+                        int ent_dim,
                         bool check_valid = false )
         : myCore( core ), entSet( eset ), chunkSize( chunk_sz ), entType( ent_tp ), entDimension( ent_dim ),
           checkValid( check_valid ){};
@@ -115,13 +119,19 @@ class RangeSetIterator : public SetIterator
      * \param ent_type Entity type for this iterator
      * \param ent_dim Entity dimension for this iterator
      */
-    RangeSetIterator( Core* core, EntityHandle ent_set, int chunk_size, EntityType ent_type, int ent_dimension,
+    RangeSetIterator( Core* core,
+                      EntityHandle ent_set,
+                      int chunk_size,
+                      EntityType ent_type,
+                      int ent_dimension,
                       bool check_valid = false );
 
   private:
     ErrorCode get_next_by_type( const EntityHandle*& ptr, int count, std::vector< EntityHandle >& arr, bool& atend );
 
-    ErrorCode get_next_by_dimension( const EntityHandle*& ptr, int count, std::vector< EntityHandle >& arr,
+    ErrorCode get_next_by_dimension( const EntityHandle*& ptr,
+                                     int count,
+                                     std::vector< EntityHandle >& arr,
                                      bool& atend );
 
     //! Build the special pair vector for the root set
@@ -166,7 +176,11 @@ class VectorSetIterator : public SetIterator
      * \param ent_type Entity type for this iterator
      * \param ent_dim Entity dimension for this iterator
      */
-    inline VectorSetIterator( Core* core, EntityHandle eset, int chunk_sz, EntityType ent_tp, int ent_dim,
+    inline VectorSetIterator( Core* core,
+                              EntityHandle eset,
+                              int chunk_sz,
+                              EntityType ent_tp,
+                              int ent_dim,
                               bool check_valid = false )
         : SetIterator( core, eset, chunk_sz, ent_tp, ent_dim, check_valid ), iterPos( 0 )
     {

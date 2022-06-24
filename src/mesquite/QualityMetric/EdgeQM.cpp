@@ -66,8 +66,11 @@ inline bool operator==( const EdgeData& e1, const EdgeData& e2 )
     return e1.endVtx == e2.endVtx;
 }
 
-void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
-                                   bool single_pass_evaluate, MsqError& err )
+void EdgeQM::get_edge_evaluations( PatchData& pd,
+                                   std::vector< size_t >& handles,
+                                   bool free_vertices_only,
+                                   bool single_pass_evaluate,
+                                   MsqError& err )
 {
     std::vector< EdgeData > vtx_edges;
     size_t n_verts  = free_vertices_only ? pd.num_free_vertices() : pd.num_nodes();
@@ -127,7 +130,10 @@ void EdgeQM::get_edge_evaluations( PatchData& pd, std::vector< size_t >& handles
     }  // end for each (free) vertex
 }
 
-bool EdgeQM::evaluate_with_indices( PatchData& pd, size_t p_handle, double& value, std::vector< size_t >& indices,
+bool EdgeQM::evaluate_with_indices( PatchData& pd,
+                                    size_t p_handle,
+                                    double& value,
+                                    std::vector< size_t >& indices,
                                     MsqError& err )
 {
     const MsqMeshEntity& element = pd.element_by_index( elem( p_handle ) );

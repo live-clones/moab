@@ -66,16 +66,24 @@ WriteSTL::~WriteSTL()
     mbImpl->release_interface( mWriteIface );
 }
 
-ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
-                                const EntityHandle* ent_handles, const int num_sets,
-                                const std::vector< std::string >& qa_list, const Tag* tag_list, int num_tags,
+ErrorCode WriteSTL::write_file( const char* file_name,
+                                const bool overwrite,
+                                const FileOptions& opts,
+                                const EntityHandle* ent_handles,
+                                const int num_sets,
+                                const std::vector< std::string >& qa_list,
+                                const Tag* tag_list,
+                                int num_tags,
                                 int /* export_dimension */ )
 {
     char header[81];
     Range triangles;
     ErrorCode rval;
 
-    if( tag_list && num_tags ) { MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "STL file does not support tag data" ); }
+    if( tag_list && num_tags )
+    {
+        MB_SET_ERR( MB_TYPE_OUT_OF_RANGE, "STL file does not support tag data" );
+    }
 
     rval = make_header( header, qa_list );
     if( MB_SUCCESS != rval ) return rval;
@@ -83,17 +91,26 @@ ErrorCode WriteSTL::write_file( const char* file_name, const bool overwrite, con
     rval = get_triangles( ent_handles, num_sets, triangles );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( triangles.empty() ) { MB_SET_ERR( MB_ENTITY_NOT_FOUND, "No triangles to write" ); }
+    if( triangles.empty() )
+    {
+        MB_SET_ERR( MB_ENTITY_NOT_FOUND, "No triangles to write" );
+    }
 
     bool is_ascii = false, is_binary = false;
     if( MB_SUCCESS == opts.get_null_option( "ASCII" ) ) is_ascii = true;
     if( MB_SUCCESS == opts.get_null_option( "BINARY" ) ) is_binary = true;
-    if( is_ascii && is_binary ) { MB_SET_ERR( MB_FAILURE, "Conflicting options: BINARY ASCII" ); }
+    if( is_ascii && is_binary )
+    {
+        MB_SET_ERR( MB_FAILURE, "Conflicting options: BINARY ASCII" );
+    }
 
     bool big_endian = false, little_endian = false;
     if( MB_SUCCESS == opts.get_null_option( "BIG_ENDIAN" ) ) big_endian = true;
     if( MB_SUCCESS == opts.get_null_option( "LITTLE_ENDIAN" ) ) little_endian = true;
-    if( big_endian && little_endian ) { MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" ); }
+    if( big_endian && little_endian )
+    {
+        MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" );
+    }
     ByteOrder byte_order = big_endian ? STL_BIG_ENDIAN : little_endian ? STL_LITTLE_ENDIAN : STL_UNKNOWN_BYTE_ORDER;
 
     FILE* file = open_file( file_name, overwrite, is_binary );
@@ -142,7 +159,10 @@ FILE* WriteSTL::open_file( const char* name, bool overwrite, bool binary )
 
     // Open the file.
     int fd = open( name, flags, creat_mode );
-    if( fd < 0 ) { MB_SET_ERR_RET_VAL( name << ": " << strerror( errno ), NULL ); }
+    if( fd < 0 )
+    {
+        MB_SET_ERR_RET_VAL( name << ": " << strerror( errno ), NULL );
+    }
     FILE* result = fdopen( fd, binary ? "wb" : "w" );
     if( !result ) close( fd );
 
@@ -261,7 +281,9 @@ struct BinTri
     char pad[2];
 };
 
-ErrorCode WriteSTL::binary_write_triangles( FILE* file, const char header[81], ByteOrder byte_order,
+ErrorCode WriteSTL::binary_write_triangles( FILE* file,
+                                            const char header[81],
+                                            ByteOrder byte_order,
                                             const Range& triangles )
 {
     ErrorCode rval;

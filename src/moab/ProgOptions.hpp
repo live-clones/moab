@@ -156,7 +156,9 @@ class ProgOptions
      * @param helpstring The help text for the arguments
      */
     template < typename T >
-    void addOptionalArgs( unsigned max_count, const std::string& helpname, const std::string& helpstring,
+    void addOptionalArgs( unsigned max_count,
+                          const std::string& helpname,
+                          const std::string& helpstring,
                           int flags = 0 );
 
     /**

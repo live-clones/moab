@@ -246,11 +246,11 @@ int main( int argc, char* argv[] )
 
         const std::string intx_from_file_identifier = "map-from-file";
         // use old reader, coupler PID is -1
-        int dummyCpl = -1;
+        int dummyCpl     = -1;
         int dummy_rowcol = -1;
-        int dummyType = 0;
-        ierr = iMOAB_LoadMappingWeightsFromFile( atmocnPID, &dummyCpl, &dummy_rowcol, &dummyType,
-                intx_from_file_identifier.c_str(), atmocn_map_file_name.c_str() );
+        int dummyType    = 0;
+        ierr             = iMOAB_LoadMappingWeightsFromFile( atmocnPID, &dummyCpl, &dummy_rowcol, &dummyType,
+                                                             intx_from_file_identifier.c_str(), atmocn_map_file_name.c_str() );
         CHECKIERR( ierr, "failed to load map file from disk" );
     }
 #endif

@@ -87,7 +87,9 @@ int FBGeomAssocPairSide::destroy_relation_side()
     RETURNR( iBase_SUCCESS );
 }
 
-int FBGeomAssocPairSide::get_all_entities( int dimension, iBase_EntityHandle** entities, int* entities_alloc,
+int FBGeomAssocPairSide::get_all_entities( int dimension,
+                                           iBase_EntityHandle** entities,
+                                           int* entities_alloc,
                                            int* entities_size )
 {
     int this_type = ( dimension == -1 ? iBase_ALL_TYPES : dimension );
@@ -107,8 +109,11 @@ int FBGeomAssocPairSide::get_all_sets( iBase_EntitySetHandle** sets, int* sets_a
     RETURNR( iBase_SUCCESS );
 }
 
-int FBGeomAssocPairSide::get_entities( int dimension, iBase_EntitySetHandle set_handle, iBase_EntityHandle** entities,
-                                       int* entities_alloc, int* entities_size )
+int FBGeomAssocPairSide::get_entities( int dimension,
+                                       iBase_EntitySetHandle set_handle,
+                                       iBase_EntityHandle** entities,
+                                       int* entities_alloc,
+                                       int* entities_size )
 {
     int this_type = ( dimension == -1 ? iBase_ALL_TYPES : dimension );
     int result;
@@ -118,8 +123,11 @@ int FBGeomAssocPairSide::get_entities( int dimension, iBase_EntitySetHandle set_
     RETURNR( iBase_SUCCESS );
 }
 
-int FBGeomAssocPairSide::get_ents_dims( iBase_EntityHandle* entities, int entities_size, int** ent_types,
-                                        int* ent_types_alloc, int* ent_types_size )
+int FBGeomAssocPairSide::get_ents_dims( iBase_EntityHandle* entities,
+                                        int entities_size,
+                                        int** ent_types,
+                                        int* ent_types_alloc,
+                                        int* ent_types_size )
 {
     int result;
 
@@ -128,7 +136,8 @@ int FBGeomAssocPairSide::get_ents_dims( iBase_EntityHandle* entities, int entiti
     RETURNR( iBase_SUCCESS );
 }
 
-int FBGeomAssocPairSide::get_related_ents( iBase_EntityHandle** /*entities*/, int* /*entities_alloc*/,
+int FBGeomAssocPairSide::get_related_ents( iBase_EntityHandle** /*entities*/,
+                                           int* /*entities_alloc*/,
                                            int* /*entities_size*/ )
 {
     RETURNR( iBase_FAILURE );

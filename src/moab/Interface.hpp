@@ -34,7 +34,6 @@
  * <a href="pages.html">Full List of Documents</a>
  */
 
-
 #ifndef MOAB_INTERFACE_HPP
 #define MOAB_INTERFACE_HPP
 
@@ -233,8 +232,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
         load_mesh( "temp.gen", active_block_id_list, 3 );  //load blocks 1, 4, 10
         \endcode
     */
-    virtual ErrorCode load_mesh( const char* file_name, const int* active_block_id_list = NULL,
-                                 const int num_blocks = 0 ) = 0;
+    virtual ErrorCode load_mesh( const char* file_name,
+                                 const int* active_block_id_list = NULL,
+                                 const int num_blocks            = 0 ) = 0;
 
     /**\brief Load or import a file.
      *
@@ -271,9 +271,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *      version of this function unconditionally created a set and
      *      passed it back to the caller via a non-const reference argument.
      */
-    virtual ErrorCode load_file( const char* file_name, const EntityHandle* file_set = 0, const char* options = 0,
-                                 const char* set_tag_name = 0, const int* set_tag_values = 0,
-                                 int num_set_tag_values = 0 ) = 0;
+    virtual ErrorCode load_file( const char* file_name,
+                                 const EntityHandle* file_set = 0,
+                                 const char* options          = 0,
+                                 const char* set_tag_name     = 0,
+                                 const int* set_tag_values    = 0,
+                                 int num_set_tag_values       = 0 ) = 0;
 
     //! Writes mesh to a file.
     /** Write mesh to file 'file_name'; if output_list is non-NULL, only
@@ -287,8 +290,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
         EntityHandle output_list[] = {meshset1, meshset2, meshset3};
         write_mesh( "output_file.gen", output_list, 3 ); \endcode
     */
-    virtual ErrorCode write_mesh( const char* file_name, const EntityHandle* output_list = NULL,
-                                  const int num_sets = 0 ) = 0;
+    virtual ErrorCode write_mesh( const char* file_name,
+                                  const EntityHandle* output_list = NULL,
+                                  const int num_sets              = 0 ) = 0;
 
     /**\brief Write or export a file.
      *
@@ -315,9 +319,13 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                write whatever data the target file format supports.
      *\param num_tags The length of tag_list.
      */
-    virtual ErrorCode write_file( const char* file_name, const char* file_type = 0, const char* options = 0,
-                                  const EntityHandle* output_sets = 0, int num_output_sets = 0, const Tag* tag_list = 0,
-                                  int num_tags = 0 ) = 0;
+    virtual ErrorCode write_file( const char* file_name,
+                                  const char* file_type           = 0,
+                                  const char* options             = 0,
+                                  const EntityHandle* output_sets = 0,
+                                  int num_output_sets             = 0,
+                                  const Tag* tag_list             = 0,
+                                  int num_tags                    = 0 ) = 0;
 
     /**\brief Write or export a file.
      *
@@ -343,8 +351,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                write whatever data the target file format supports.
      *\param num_tags The length of tag_list.
      */
-    virtual ErrorCode write_file( const char* file_name, const char* file_type, const char* options,
-                                  const Range& output_sets, const Tag* tag_list = 0, int num_tags = 0 ) = 0;
+    virtual ErrorCode write_file( const char* file_name,
+                                  const char* file_type,
+                                  const char* options,
+                                  const Range& output_sets,
+                                  const Tag* tag_list = 0,
+                                  int num_tags        = 0 ) = 0;
 
     //! Deletes all mesh entities from this MB instance
     virtual ErrorCode delete_mesh() = 0;
@@ -404,7 +416,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
     /** Identical to range-based function, except entity handles are specified using a 1d vector
         and vector length.
     */
-    virtual ErrorCode get_coords( const EntityHandle* entity_handles, const int num_entities,
+    virtual ErrorCode get_coords( const EntityHandle* entity_handles,
+                                  const int num_entities,
                                   double* coords ) const = 0;
 
     /**\brief Get vertex coordinates in blocks by dimension.
@@ -420,7 +433,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param y_coords        Output: the Y coordinate of each vertex.  May be NULL.
      *\param z_coords        Output: the Z coordinate of each vertex.  May be NULL.
      */
-    virtual ErrorCode get_coords( const Range& entity_handles, double* x_coords, double* y_coords,
+    virtual ErrorCode get_coords( const Range& entity_handles,
+                                  double* x_coords,
+                                  double* y_coords,
                                   double* z_coords ) const = 0;
 
     //! Sets the xyz coordinates for a vector of vertices
@@ -433,7 +448,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         double coords[3] = {0.234, -2.52, 12.023};
         set_coords( entity_handle, 1, coords ); \endcode
     */
-    virtual ErrorCode set_coords( const EntityHandle* entity_handles, const int num_entities,
+    virtual ErrorCode set_coords( const EntityHandle* entity_handles,
+                                  const int num_entities,
                                   const double* coords ) = 0;
 
     //! Sets the xyz coordinates for a vector of vertices
@@ -495,13 +511,16 @@ class MOAB_EXPORT Interface : public UnknownInterface
     //! Gets the connectivity for a vector of elements
     /** Same as vector-based version except range is returned (unordered!)
      */
-    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles, const int num_handles, Range& connectivity,
+    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles,
+                                        const int num_handles,
+                                        Range& connectivity,
                                         bool corners_only = false ) const = 0;
 
     //! Gets the connectivity for elements
     /** Same as vector-based version except range is returned (unordered!)
      */
-    virtual ErrorCode get_connectivity( const Range& entity_handles, Range& connectivity,
+    virtual ErrorCode get_connectivity( const Range& entity_handles,
+                                        Range& connectivity,
                                         bool corners_only = false ) const = 0;
 
     //! Gets the connectivity for a vector of elements
@@ -518,8 +537,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
        index of the start of entity i's connectivity, with the last value in offsets one beyond the
        last entry
     */
-    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles, const int num_handles,
-                                        std::vector< EntityHandle >& connectivity, bool corners_only = false,
+    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles,
+                                        const int num_handles,
+                                        std::vector< EntityHandle >& connectivity,
+                                        bool corners_only           = false,
                                         std::vector< int >* offsets = NULL ) const = 0;
 
     //! Gets a pointer to constant connectivity data of <em>entity_handle</em>
@@ -553,8 +574,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
        this argument, space will be allocated in this vector for the connectivity data and the
        connectivity pointer will be set to the data in this vector.
     */
-    virtual ErrorCode get_connectivity( const EntityHandle entity_handle, const EntityHandle*& connectivity,
-                                        int& num_nodes, bool corners_only = false,
+    virtual ErrorCode get_connectivity( const EntityHandle entity_handle,
+                                        const EntityHandle*& connectivity,
+                                        int& num_nodes,
+                                        bool corners_only                    = false,
                                         std::vector< EntityHandle >* storage = 0 ) const = 0;
 
     //! Sets the connectivity for an EntityHandle.  For non-element handles, return an error.
@@ -567,7 +590,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         EntityHandle conn[] = {node1, node2, node3};
         set_connectivity( tri_element, conn, 3 ); \endcode
     */
-    virtual ErrorCode set_connectivity( const EntityHandle entity_handle, EntityHandle* connect,
+    virtual ErrorCode set_connectivity( const EntityHandle entity_handle,
+                                        EntityHandle* connect,
                                         const int num_connect ) = 0;
 
     /**@}*/
@@ -600,8 +624,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
             \endcode
     */
 
-    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
-                                       const int to_dimension, const bool create_if_missing,
+    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities,
+                                       const int num_entities,
+                                       const int to_dimension,
+                                       const bool create_if_missing,
                                        std::vector< EntityHandle >& adj_entities,
                                        const int operation_type = Interface::INTERSECT ) = 0;
 
@@ -610,16 +636,22 @@ class MOAB_EXPORT Interface : public UnknownInterface
     /** Identical to vector-based get_adjacencies function, except results are returned in a
         range instead of a vector.
     */
-    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
-                                       const int to_dimension, const bool create_if_missing, Range& adj_entities,
+    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities,
+                                       const int num_entities,
+                                       const int to_dimension,
+                                       const bool create_if_missing,
+                                       Range& adj_entities,
                                        const int operation_type = Interface::INTERSECT ) = 0;
 
     //! Get the adjacencies associated with a range of entities to entities of a specfied dimension.
     /** Identical to vector-based get_adjacencies function, except "from" entities specified in a
         range instead of a vector.
     */
-    virtual ErrorCode get_adjacencies( const Range& from_entities, const int to_dimension, const bool create_if_missing,
-                                       Range& adj_entities, const int operation_type = Interface::INTERSECT ) = 0;
+    virtual ErrorCode get_adjacencies( const Range& from_entities,
+                                       const int to_dimension,
+                                       const bool create_if_missing,
+                                       Range& adj_entities,
+                                       const int operation_type = Interface::INTERSECT ) = 0;
 
     //! Adds adjacencies between "from" and "to" entities.
     /** \param from_handle Entities on which the adjacencies are placed
@@ -628,8 +660,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
        both_ways If true, add the adjacency information in both directions; if false, adjacencies
        are added only to <em>from_handle</em>
     */
-    virtual ErrorCode add_adjacencies( const EntityHandle from_handle, const EntityHandle* to_handles,
-                                       const int num_handles, bool both_ways ) = 0;
+    virtual ErrorCode add_adjacencies( const EntityHandle from_handle,
+                                       const EntityHandle* to_handles,
+                                       const int num_handles,
+                                       bool both_ways ) = 0;
 
     //! Adds adjacencies; same as vector-based, but with range instead
     virtual ErrorCode add_adjacencies( const EntityHandle from_handle, Range& adjacencies, bool both_ways ) = 0;
@@ -640,7 +674,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param to_handles Entities to which adjacencies are being removed.
         \param num_handles Number of handles in <em>to_handles</em>
     */
-    virtual ErrorCode remove_adjacencies( const EntityHandle from_handle, const EntityHandle* to_handles,
+    virtual ErrorCode remove_adjacencies( const EntityHandle from_handle,
+                                          const EntityHandle* to_handles,
                                           const int num_handles ) = 0;
 
     /**\brief Get a ptr to adjacency lists
@@ -655,8 +690,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
      * array is the vector of adjacencies for this entity \param count Number of entities in the
      * contiguous chunk starting from *iter
      */
-    virtual ErrorCode adjacencies_iterate( Range::const_iterator iter, Range::const_iterator end,
-                                           const std::vector< EntityHandle >**& adjs_ptr, int& count ) = 0;
+    virtual ErrorCode adjacencies_iterate( Range::const_iterator iter,
+                                           Range::const_iterator end,
+                                           const std::vector< EntityHandle >**& adjs_ptr,
+                                           int& count ) = 0;
     /**@}*/
 
     //! Enumerated type used in get_adjacencies() and other functions
@@ -684,7 +721,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
           get_entities_by_dimension( 0, 1, edges );
           \endcode
     */
-    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset, const int dimension, Range& entities,
+    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset,
+                                                 const int dimension,
+                                                 Range& entities,
                                                  const bool recursive = false ) const = 0;
 
     //! Retrieves all entities of a given topological dimension in the database or meshset.
@@ -701,7 +740,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
           get_entities_by_dimension( 0, 1, edges );
           \endcode
     */
-    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset, const int dimension,
+    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset,
+                                                 const int dimension,
                                                  std::vector< EntityHandle >& entities,
                                                  const bool recursive = false ) const = 0;
 
@@ -721,7 +761,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
           get_entities_by_type( meshset, MBQUAD, quads );
           \endcode
     */
-    virtual ErrorCode get_entities_by_type( const EntityHandle meshset, const EntityType type, Range& entities,
+    virtual ErrorCode get_entities_by_type( const EntityHandle meshset,
+                                            const EntityType type,
+                                            Range& entities,
                                             const bool recursive = false ) const = 0;
 
     //! Retrieve all entities of a given type in the database or meshset.
@@ -740,7 +782,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
           get_entities_by_type( meshset, MBQUAD, quads );
           \endcode
     */
-    virtual ErrorCode get_entities_by_type( const EntityHandle meshset, const EntityType type,
+    virtual ErrorCode get_entities_by_type( const EntityHandle meshset,
+                                            const EntityType type,
                                             std::vector< EntityHandle >& entities,
                                             const bool recursive = false ) const = 0;
 
@@ -775,9 +818,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
           Interface::UNION);
           \endcode
     */
-    virtual ErrorCode get_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
-                                                    const Tag* tag_handles, const void* const* values,
-                                                    const int num_tags, Range& entities,
+    virtual ErrorCode get_entities_by_type_and_tag( const EntityHandle meshset,
+                                                    const EntityType type,
+                                                    const Tag* tag_handles,
+                                                    const void* const* values,
+                                                    const int num_tags,
+                                                    Range& entities,
                                                     const int condition  = Interface::INTERSECT,
                                                     const bool recursive = false ) const = 0;
 
@@ -794,7 +840,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
           get_entities_by_handle(meshset, entities, true);
           \endcode
     */
-    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset, Range& entities,
+    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset,
+                                              Range& entities,
                                               const bool recursive = false ) const = 0;
 
     //! Returns all entities in the data base or meshset, in a vector (order preserved)
@@ -810,7 +857,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
           get_entities_by_handle(meshset, entities, true);
           \endcode
     */
-    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset, std::vector< EntityHandle >& entities,
+    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset,
+                                              std::vector< EntityHandle >& entities,
                                               const bool recursive = false ) const = 0;
 
     //! Return the number of entities of given dimension in the database or meshset
@@ -819,8 +867,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
        of the given dimension \param recursive If true, meshsets containing meshsets are queried
        recursively.  Returns the contents of meshsets, but not the meshsets themselves if true.
     */
-    virtual ErrorCode get_number_entities_by_dimension( const EntityHandle meshset, const int dimension,
-                                                        int& num_entities, const bool recursive = false ) const = 0;
+    virtual ErrorCode get_number_entities_by_dimension( const EntityHandle meshset,
+                                                        const int dimension,
+                                                        int& num_entities,
+                                                        const bool recursive = false ) const = 0;
 
     //! Retrieve the number of entities of a given type in the database or meshset.
     /** Identical to get_entities_by_dimension, except returns number instead of entities
@@ -832,7 +882,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
                          both recursive=true and type=MBENTITYSET is an error, as it would always
                          result in an empty list.
     */
-    virtual ErrorCode get_number_entities_by_type( const EntityHandle meshset, const EntityType type, int& num_entities,
+    virtual ErrorCode get_number_entities_by_type( const EntityHandle meshset,
+                                                   const EntityType type,
+                                                   int& num_entities,
                                                    const bool recursive = false ) const = 0;
 
     //! Retrieve number of entities in the database or meshset which have any or all of the
@@ -849,9 +901,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
                          both recursive=true and type=MBENTITYSET is an error, as it would always
                          result in an empty list.
     */
-    virtual ErrorCode get_number_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
-                                                           const Tag* tag_handles, const void* const* values,
-                                                           const int num_tags, int& num_entities,
+    virtual ErrorCode get_number_entities_by_type_and_tag( const EntityHandle meshset,
+                                                           const EntityType type,
+                                                           const Tag* tag_handles,
+                                                           const void* const* values,
+                                                           const int num_tags,
+                                                           int& num_entities,
                                                            const int condition  = Interface::INTERSECT,
                                                            const bool recursive = false ) const = 0;
 
@@ -862,7 +917,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
        true, meshsets containing meshsets are queried recursively.  Returns the contents of
        meshsets, but not the meshsets themselves if true.
     */
-    virtual ErrorCode get_number_entities_by_handle( const EntityHandle meshset, int& num_entities,
+    virtual ErrorCode get_number_entities_by_handle( const EntityHandle meshset,
+                                                     int& num_entities,
                                                      const bool recursive = false ) const = 0;
 
     /**@}*/
@@ -886,7 +942,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
         EntityHandle quad_handle = 0;
         create_element( MBQUAD, quad_conn, 4, quad_handle ); \endcode
     */
-    virtual ErrorCode create_element( const EntityType type, const EntityHandle* connectivity, const int num_vertices,
+    virtual ErrorCode create_element( const EntityType type,
+                                      const EntityHandle* connectivity,
+                                      const int num_vertices,
                                       EntityHandle& element_handle ) = 0;
 
     //! Creates a vertex with the specified coordinates.
@@ -919,7 +977,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param delete_removed_entity If true, <em>entity_to_remove</em> is deleted after merge is
        complete
     */
-    virtual ErrorCode merge_entities( EntityHandle entity_to_keep, EntityHandle entity_to_remove, bool auto_merge,
+    virtual ErrorCode merge_entities( EntityHandle entity_to_keep,
+                                      EntityHandle entity_to_remove,
+                                      bool auto_merge,
                                       bool delete_removed_entity ) = 0;
 
     //! Removes entities in a vector from the data base.
@@ -1013,12 +1073,18 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                   the location at which to store the total memory used
      *                   for all tags.
      */
-    virtual void estimated_memory_use(
-        const EntityHandle* ent_array = 0, unsigned long num_ents = 0, unsigned long long* total_storage = 0,
-        unsigned long long* total_amortized_storage = 0, unsigned long long* entity_storage = 0,
-        unsigned long long* amortized_entity_storage = 0, unsigned long long* adjacency_storage = 0,
-        unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0, unsigned num_tags = 0,
-        unsigned long long* tag_storage = 0, unsigned long long* amortized_tag_storage = 0 ) = 0;
+    virtual void estimated_memory_use( const EntityHandle* ent_array                   = 0,
+                                       unsigned long num_ents                          = 0,
+                                       unsigned long long* total_storage               = 0,
+                                       unsigned long long* total_amortized_storage     = 0,
+                                       unsigned long long* entity_storage              = 0,
+                                       unsigned long long* amortized_entity_storage    = 0,
+                                       unsigned long long* adjacency_storage           = 0,
+                                       unsigned long long* amortized_adjacency_storage = 0,
+                                       const Tag* tag_array                            = 0,
+                                       unsigned num_tags                               = 0,
+                                       unsigned long long* tag_storage                 = 0,
+                                       unsigned long long* amortized_tag_storage       = 0 ) = 0;
 
     /**\brief Calculate amount of memory used to store MOAB data
      *
@@ -1047,14 +1113,17 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                   the location at which to store the total memory used
      *                   for all tags.
      */
-    virtual void estimated_memory_use( const Range& ents, unsigned long long* total_storage = 0,
+    virtual void estimated_memory_use( const Range& ents,
+                                       unsigned long long* total_storage               = 0,
                                        unsigned long long* total_amortized_storage     = 0,
                                        unsigned long long* entity_storage              = 0,
                                        unsigned long long* amortized_entity_storage    = 0,
                                        unsigned long long* adjacency_storage           = 0,
-                                       unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0,
-                                       unsigned num_tags = 0, unsigned long long* tag_storage = 0,
-                                       unsigned long long* amortized_tag_storage = 0 ) = 0;
+                                       unsigned long long* amortized_adjacency_storage = 0,
+                                       const Tag* tag_array                            = 0,
+                                       unsigned num_tags                               = 0,
+                                       unsigned long long* tag_storage                 = 0,
+                                       unsigned long long* amortized_tag_storage       = 0 ) = 0;
     /**@}*/
 
     /** \name Higher-order elements */
@@ -1098,8 +1167,11 @@ class MOAB_EXPORT Interface : public UnknownInterface
        function_object If non-NULL, the node_added or node_removed functions on this object are
        called when nodes are added or removed from an entity, respectively
     */
-    virtual ErrorCode convert_entities( const EntityHandle meshset, const bool mid_edge, const bool mid_face,
-                                        const bool mid_region, HONodeAddedRemoved* function_object = 0 ) = 0;
+    virtual ErrorCode convert_entities( const EntityHandle meshset,
+                                        const bool mid_edge,
+                                        const bool mid_face,
+                                        const bool mid_region,
+                                        HONodeAddedRemoved* function_object = 0 ) = 0;
 
     //! Returns the side number, in canonical ordering, of <em>child</em> with respect to
     //! <em>parent</em>
@@ -1117,7 +1189,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param offset Offset between first vertex of <em>child</em> and first vertex of side
         <em>side_number</em> on <em>parent</em>
     */
-    virtual ErrorCode side_number( const EntityHandle parent, const EntityHandle child, int& side_number, int& sense,
+    virtual ErrorCode side_number( const EntityHandle parent,
+                                   const EntityHandle child,
+                                   int& side_number,
+                                   int& sense,
                                    int& offset ) const = 0;
 
     //! Find the higher-order node on a subfacet of an entity
@@ -1130,8 +1205,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param high_order_node If the subfacet has a high-order node defined on
        <em>parent_handle</em>, the handle for that node.
     */
-    virtual ErrorCode high_order_node( const EntityHandle parent_handle, const EntityHandle* subfacet_conn,
-                                       const EntityType subfacet_type, EntityHandle& high_order_node ) const = 0;
+    virtual ErrorCode high_order_node( const EntityHandle parent_handle,
+                                       const EntityHandle* subfacet_conn,
+                                       const EntityType subfacet_type,
+                                       EntityHandle& high_order_node ) const = 0;
 
     //! Return the handle of the side element of a given dimension and index
     /** Given a parent entity and a target dimension and side number, return the handle of
@@ -1142,7 +1219,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
        index of the side being queried. \param target_entity The handle of the entity representing
        this side, if any.
     */
-    virtual ErrorCode side_element( const EntityHandle source_entity, const int dim, const int side_number,
+    virtual ErrorCode side_element( const EntityHandle source_entity,
+                                    const int dim,
+                                    const int side_number,
                                     EntityHandle& target_entity ) const = 0;
 
     /**@}*/
@@ -1209,11 +1288,20 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *def_val_len, MB_TYPE_DOUBLE, vtag, MB_TAG_SPARSE|MB_TAG_VARLEN|MB_TAG_CREAT, &default_val );
      * \endcode
      */
-    virtual ErrorCode tag_get_handle( const char* name, int size, DataType type, Tag& tag_handle, unsigned flags = 0,
-                                      const void* default_value = 0, bool* created = 0 ) = 0;
+    virtual ErrorCode tag_get_handle( const char* name,
+                                      int size,
+                                      DataType type,
+                                      Tag& tag_handle,
+                                      unsigned flags            = 0,
+                                      const void* default_value = 0,
+                                      bool* created             = 0 ) = 0;
 
     /**\brief same as non-const version, except that MB_TAG_CREAT flag is ignored. */
-    virtual ErrorCode tag_get_handle( const char* name, int size, DataType type, Tag& tag_handle, unsigned flags = 0,
+    virtual ErrorCode tag_get_handle( const char* name,
+                                      int size,
+                                      DataType type,
+                                      Tag& tag_handle,
+                                      unsigned flags            = 0,
                                       const void* default_value = 0 ) const = 0;
 
     //! Get the name of a tag corresponding to a handle
@@ -1309,7 +1397,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
        vector of entity handles \param tag_data Pointer to memory into which tag data will be
        written
     */
-    virtual ErrorCode tag_get_data( const Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
+    virtual ErrorCode tag_get_data( const Tag tag_handle,
+                                    const EntityHandle* entity_handles,
+                                    int num_entities,
                                     void* tag_data ) const = 0;
 
     //! Get the value of the indicated tag on the specified entities in the specified range
@@ -1332,7 +1422,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param tag_data Pointer to memory holding tag values to be set, <em>one entry per entity
        handle</em>
     */
-    virtual ErrorCode tag_set_data( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
+    virtual ErrorCode tag_set_data( Tag tag_handle,
+                                    const EntityHandle* entity_handles,
+                                    int num_entities,
                                     const void* tag_data ) = 0;
 
     //! Set the value of the indicated tag on the specified entities in the specified range
@@ -1357,8 +1449,11 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                      const void** tag_data, int* tag_sizes = 0 ) const = 0;
+    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle,
+                                      const EntityHandle* entity_handles,
+                                      int num_entities,
+                                      const void** tag_data,
+                                      int* tag_sizes = 0 ) const = 0;
 
     /**\brief Get pointers to tag data
      *
@@ -1372,7 +1467,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle, const Range& entity_handles, const void** tag_data,
+    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle,
+                                      const Range& entity_handles,
+                                      const void** tag_data,
                                       int* tag_sizes = 0 ) const = 0;
 
     /**\brief Set tag data given an array of pointers to tag values.
@@ -1389,8 +1486,11 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_set_by_ptr( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                      void const* const* tag_data, const int* tag_sizes = 0 ) = 0;
+    virtual ErrorCode tag_set_by_ptr( Tag tag_handle,
+                                      const EntityHandle* entity_handles,
+                                      int num_entities,
+                                      void const* const* tag_data,
+                                      const int* tag_sizes = 0 ) = 0;
 
     /**\brief Set tag data given an array of pointers to tag values.
      *
@@ -1404,7 +1504,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_set_by_ptr( Tag tag_handle, const Range& entity_handles, void const* const* tag_data,
+    virtual ErrorCode tag_set_by_ptr( Tag tag_handle,
+                                      const Range& entity_handles,
+                                      void const* const* tag_data,
                                       const int* tag_sizes = 0 ) = 0;
 
     /**\brief Set tag data given value.
@@ -1419,7 +1521,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                      tag value.  This argument will be ignored for
      *                      fixed-length tags.
      */
-    virtual ErrorCode tag_clear_data( Tag tag_handle, const Range& entity_handles, const void* value,
+    virtual ErrorCode tag_clear_data( Tag tag_handle,
+                                      const Range& entity_handles,
+                                      const void* value,
                                       int value_size = 0 ) = 0;
 
     /**\brief Set tag data given value.
@@ -1434,8 +1538,11 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                      tag value.  This argument will be ignored for
      *                      fixed-length tags.
      */
-    virtual ErrorCode tag_clear_data( Tag tag_handle, const EntityHandle* entity_handles, int num_entity_handles,
-                                      const void* value, int value_size = 0 ) = 0;
+    virtual ErrorCode tag_clear_data( Tag tag_handle,
+                                      const EntityHandle* entity_handles,
+                                      int num_entity_handles,
+                                      const void* value,
+                                      int value_size = 0 ) = 0;
 
     //! Delete the data of a vector of entity handles and sparse tag
     /** Delete the data of a tag on a vector of entity handles.  Only sparse tag data are deleted
@@ -1500,8 +1607,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
      * }
      *\endcode
      */
-    virtual ErrorCode tag_iterate( Tag tag_handle, Range::const_iterator begin, Range::const_iterator end, int& count,
-                                   void*& data_ptr, bool allocate = true ) = 0;
+    virtual ErrorCode tag_iterate( Tag tag_handle,
+                                   Range::const_iterator begin,
+                                   Range::const_iterator end,
+                                   int& count,
+                                   void*& data_ptr,
+                                   bool allocate = true ) = 0;
 
     //! Remove a tag from the database and delete all of its associated data
     /** Deletes a tag and all associated data.
@@ -1614,7 +1725,9 @@ class MOAB_EXPORT Interface : public UnknownInterface
      * \param num_entities Number of entities
      * \return bool If true, all entities are contained in set
      */
-    virtual bool contains_entities( EntityHandle meshset, const EntityHandle* entities, int num_entities,
+    virtual bool contains_entities( EntityHandle meshset,
+                                    const EntityHandle* entities,
+                                    int num_entities,
                                     const int operation_type = Interface::INTERSECT ) = 0;
 
     //! Replace entities in a set with other entities
@@ -1642,8 +1755,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *                        set.
      *         - MB_FAILURE : internal error
      */
-    virtual ErrorCode replace_entities( EntityHandle meshset, const EntityHandle* old_entities,
-                                        const EntityHandle* new_entities, int num_entities ) = 0;
+    virtual ErrorCode replace_entities( EntityHandle meshset,
+                                        const EntityHandle* old_entities,
+                                        const EntityHandle* new_entities,
+                                        int num_entities ) = 0;
     /**@}*/
 
     /** \name Set parents/children */
@@ -1657,7 +1772,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param parents STL vector holding the parents returned by this function
         \param num_hops Number of generations to traverse (0 = all)
     */
-    virtual ErrorCode get_parent_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& parents,
+    virtual ErrorCode get_parent_meshsets( const EntityHandle meshset,
+                                           std::vector< EntityHandle >& parents,
                                            const int num_hops = 1 ) const = 0;
 
     //! Get parent mesh sets of a mesh set
@@ -1667,7 +1783,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param parents Range holding the parents returned by this function
         \param num_hops Number of generations to traverse (0 = all)
     */
-    virtual ErrorCode get_parent_meshsets( const EntityHandle meshset, Range& parents,
+    virtual ErrorCode get_parent_meshsets( const EntityHandle meshset,
+                                           Range& parents,
                                            const int num_hops = 1 ) const = 0;
 
     //! Get child mesh sets of a mesh set
@@ -1677,7 +1794,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param children STL vector holding the children returned by this function
         \param num_hops Number of generations to traverse (0 = all)
     */
-    virtual ErrorCode get_child_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& children,
+    virtual ErrorCode get_child_meshsets( const EntityHandle meshset,
+                                          std::vector< EntityHandle >& children,
                                           const int num_hops = 1 ) const = 0;
 
     //! Get child mesh sets of a mesh set
@@ -1687,7 +1805,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param children Range holding the children returned by this function
         \param num_hops Number of generations to traverse (0 = all)
     */
-    virtual ErrorCode get_child_meshsets( const EntityHandle meshset, Range& children,
+    virtual ErrorCode get_child_meshsets( const EntityHandle meshset,
+                                          Range& children,
                                           const int num_hops = 1 ) const = 0;
 
     /**\brief Get mesh sets contained in a mesh set
@@ -1701,7 +1820,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param contained The result list.
      *\param num_hops Number of generations to traverse (0 = all)
      */
-    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& contained,
+    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset,
+                                              std::vector< EntityHandle >& contained,
                                               const int num_hops = 1 ) const = 0;
 
     /**\brief Get mesh sets contained in a mesh set
@@ -1715,7 +1835,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param contained The result list.
      *\param num_hops Number of generations to traverse (0 = all)
      */
-    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset, Range& contained,
+    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset,
+                                              Range& contained,
                                               const int num_hops = 1 ) const = 0;
 
     //! Get the number of parent mesh sets of a mesh set
@@ -1740,7 +1861,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
      *\param number   (Output) The result count.
      *\param num_hops Search depth (0 => unbounded).
      */
-    virtual ErrorCode num_contained_meshsets( const EntityHandle meshset, int* number,
+    virtual ErrorCode num_contained_meshsets( const EntityHandle meshset,
+                                              int* number,
                                               const int num_hops = 1 ) const = 0;
 
     //! Add a parent mesh set to a mesh set
@@ -1757,7 +1879,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param child_meshset The child mesh set being given a new parent.
         \param parent_meshset The parent being added to <em>child_meshset</em>
     */
-    virtual ErrorCode add_parent_meshsets( EntityHandle child_meshset, const EntityHandle* parent_meshsets,
+    virtual ErrorCode add_parent_meshsets( EntityHandle child_meshset,
+                                           const EntityHandle* parent_meshsets,
                                            int num_parent_meshsets ) = 0;
 
     //! Add a child mesh set to a mesh set
@@ -1774,7 +1897,8 @@ class MOAB_EXPORT Interface : public UnknownInterface
         \param parent_meshset The parent mesh set being given a new child.
         \param child_meshset The child being added to <em>parent_meshset</em>
     */
-    virtual ErrorCode add_child_meshsets( EntityHandle parent_meshset, const EntityHandle* child_meshsets,
+    virtual ErrorCode add_child_meshsets( EntityHandle parent_meshset,
+                                          const EntityHandle* child_meshsets,
                                           int num_child_meshsets ) = 0;
 
     //! Add parent and child links between mesh sets
@@ -1834,8 +1958,12 @@ class MOAB_EXPORT Interface : public UnknownInterface
      * \param check_valid If true, entities are checked for validity before being returned
      */
 
-    virtual ErrorCode create_set_iterator( EntityHandle meshset, EntityType ent_type, int ent_dim, int chunk_size,
-                                           bool check_valid, SetIterator*& set_iter ) = 0;
+    virtual ErrorCode create_set_iterator( EntityHandle meshset,
+                                           EntityType ent_type,
+                                           int ent_dim,
+                                           int chunk_size,
+                                           bool check_valid,
+                                           SetIterator*& set_iter ) = 0;
     /**@}*/
 
     // ************************  Interface options controllable by user  ***************
@@ -1873,10 +2001,10 @@ class MOAB_EXPORT Interface : public UnknownInterface
 //! std::remove_if(list.begin(), list.end(), type_equals(gMB, MBTRI));
 class type_equals
 {
-  // deprecation of unary_function
-  typedef EntityHandle argument_type;
-  typedef bool result_type;
-  
+    // deprecation of unary_function
+    typedef EntityHandle argument_type;
+    typedef bool result_type;
+
   public:
     //! interface object
     Interface* meshDB;
@@ -1900,10 +2028,10 @@ class type_equals
 //! std::remove_if(list.begin(), list.end(), type_not_equals(gMB, MBTRI));
 class type_not_equals
 {
-  // deprecation of unary_function
-  typedef EntityHandle argument_type;
-  typedef bool result_type;
-  
+    // deprecation of unary_function
+    typedef EntityHandle argument_type;
+    typedef bool result_type;
+
   public:
     //! interface object
     Interface* meshDB;

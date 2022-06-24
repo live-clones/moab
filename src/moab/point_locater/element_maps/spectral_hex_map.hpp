@@ -40,8 +40,14 @@ namespace element_utility
       private:
         void initialize_spectral_hex( int order )
         {
-            if( _init && _n == order ) { return; }
-            if( _init && _n != order ) { free_data(); }
+            if( _init && _n == order )
+            {
+                return;
+            }
+            if( _init && _n != order )
+            {
+                free_data();
+            }
             _init = true;
             _n    = order;
             for( int d = 0; d < 3; d++ )
@@ -68,8 +74,11 @@ namespace element_utility
       public:
         // Natural coordinates
         template < typename Moab, typename Entity_handle, typename Points, typename Point >
-        std::pair< bool, Point > operator()( const Moab& /* moab */, const Entity_handle& /* h */, const Points& v,
-                                             const Point& p, const double tol = 1.e-6 )
+        std::pair< bool, Point > operator()( const Moab& /* moab */,
+                                             const Entity_handle& /* h */,
+                                             const Points& v,
+                                             const Point& p,
+                                             const double tol = 1.e-6 )
         {
             Point result( 3, 0.0 );
             /*
@@ -122,7 +131,10 @@ namespace element_utility
                 ss << "Iter #: " << num_iterations << " Err: " << sqrt( normsq( delta ) ) << " Iterate: ";
                 ss << xi[0] << ", " << xi[1] << ", " << xi[2] << std::endl;
 #endif
-                if( ++num_iterations >= 5 ) { return false; }
+                if( ++num_iterations >= 5 )
+                {
+                    return false;
+                }
                 Matrix J;
                 jacobian( xi, points, J );
                 double det = moab::Matrix::determinant3( J );

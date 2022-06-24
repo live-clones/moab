@@ -407,8 +407,8 @@ ErrorCode NCHelperMPAS::create_mesh( Range& faces )
     {
         EntityHandle starth  = pair_iter->first;
         EntityHandle endh    = pair_iter->second;
-        NCDF_SIZE read_start = ( NCDF_SIZE )( starth - 1 );
-        NCDF_SIZE read_count = ( NCDF_SIZE )( endh - starth + 1 );
+        NCDF_SIZE read_start = (NCDF_SIZE)( starth - 1 );
+        NCDF_SIZE read_count = (NCDF_SIZE)( endh - starth + 1 );
 
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
@@ -522,7 +522,7 @@ ErrorCode NCHelperMPAS::create_mesh( Range& faces )
     // Set tag for numCellGroups
     Tag numCellGroupsTag = 0;
     rval                 = mbImpl->tag_get_handle( "__NUM_CELL_GROUPS", 1, MB_TYPE_INTEGER, numCellGroupsTag,
-                                   MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating __NUM_CELL_GROUPS tag" );
+                                                   MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating __NUM_CELL_GROUPS tag" );
     rval = mbImpl->tag_set_data( numCellGroupsTag, &_fileSet, 1, &numCellGroups );MB_CHK_SET_ERR( rval, "Trouble setting data to __NUM_CELL_GROUPS tag" );
 
     if( createGatherSet )
@@ -756,8 +756,8 @@ ErrorCode NCHelperMPAS::read_ucd_variables_to_nonset_async( std::vector< ReadNC:
                     {
                         EntityHandle starth     = pair_iter->first;
                         EntityHandle endh       = pair_iter->second;  // Inclusive
-                        vdatas[i].readStarts[1] = ( NCDF_SIZE )( starth - 1 );
-                        vdatas[i].readCounts[1] = ( NCDF_SIZE )( endh - starth + 1 );
+                        vdatas[i].readStarts[1] = (NCDF_SIZE)( starth - 1 );
+                        vdatas[i].readCounts[1] = (NCDF_SIZE)( endh - starth + 1 );
 
                         // Do a partial read, in each subrange
                         // Wait outside this loop
@@ -890,8 +890,8 @@ ErrorCode NCHelperMPAS::read_ucd_variables_to_nonset( std::vector< ReadNC::VarDa
                     {
                         EntityHandle starth = pair_iter->first;
                         EntityHandle endh = pair_iter->second;  // Inclusive
-                        vdatas[i].readStarts[1] = ( NCDF_SIZE )( starth - 1 );
-                        vdatas[i].readCounts[1] = ( NCDF_SIZE )( endh - starth + 1 );
+                        vdatas[i].readStarts[1] = (NCDF_SIZE)( starth - 1 );
+                        vdatas[i].readCounts[1] = (NCDF_SIZE)( endh - starth + 1 );
 
                         success = NCFUNCAG( _vara_double )( _fileId, vdatas[i].varId, &( vdatas[i].readStarts[0] ),
                                                             &( vdatas[i].readCounts[0] ),
@@ -1093,8 +1093,8 @@ ErrorCode NCHelperMPAS::create_local_vertices( const std::vector< int >& vertice
     {
         EntityHandle starth  = pair_iter->first;
         EntityHandle endh    = pair_iter->second;
-        NCDF_SIZE read_start = ( NCDF_SIZE )( starth - 1 );
-        NCDF_SIZE read_count = ( NCDF_SIZE )( endh - starth + 1 );
+        NCDF_SIZE read_start = (NCDF_SIZE)( starth - 1 );
+        NCDF_SIZE read_count = (NCDF_SIZE)( endh - starth + 1 );
 
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
@@ -1129,8 +1129,8 @@ ErrorCode NCHelperMPAS::create_local_vertices( const std::vector< int >& vertice
     {
         EntityHandle starth  = pair_iter->first;
         EntityHandle endh    = pair_iter->second;
-        NCDF_SIZE read_start = ( NCDF_SIZE )( starth - 1 );
-        NCDF_SIZE read_count = ( NCDF_SIZE )( endh - starth + 1 );
+        NCDF_SIZE read_start = (NCDF_SIZE)( starth - 1 );
+        NCDF_SIZE read_count = (NCDF_SIZE)( endh - starth + 1 );
 
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
@@ -1165,8 +1165,8 @@ ErrorCode NCHelperMPAS::create_local_vertices( const std::vector< int >& vertice
     {
         EntityHandle starth  = pair_iter->first;
         EntityHandle endh    = pair_iter->second;
-        NCDF_SIZE read_start = ( NCDF_SIZE )( starth - 1 );
-        NCDF_SIZE read_count = ( NCDF_SIZE )( endh - starth + 1 );
+        NCDF_SIZE read_start = (NCDF_SIZE)( starth - 1 );
+        NCDF_SIZE read_count = (NCDF_SIZE)( endh - starth + 1 );
 
         // Do a partial read in each subrange
 #ifdef MOAB_HAVE_PNETCDF
@@ -1338,7 +1338,8 @@ ErrorCode NCHelperMPAS::create_local_edges( EntityHandle start_vertex,
 
 ErrorCode NCHelperMPAS::create_local_cells( const std::vector< int >& vertices_on_local_cells,
                                             const std::vector< int >& num_edges_on_local_cells,
-                                            EntityHandle start_vertex, Range& faces )
+                                            EntityHandle start_vertex,
+                                            Range& faces )
 {
     Interface*& mbImpl = _readNC->mbImpl;
     Tag& mGlobalIdTag  = _readNC->mGlobalIdTag;
@@ -1415,7 +1416,8 @@ ErrorCode NCHelperMPAS::create_local_cells( const std::vector< int >& vertices_o
 }
 
 ErrorCode NCHelperMPAS::create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
-                                                   EntityHandle start_vertex, Range& faces )
+                                                   EntityHandle start_vertex,
+                                                   Range& faces )
 {
     Interface*& mbImpl = _readNC->mbImpl;
     Tag& mGlobalIdTag  = _readNC->mGlobalIdTag;

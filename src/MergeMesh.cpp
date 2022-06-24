@@ -30,8 +30,13 @@ MergeMesh::~MergeMesh()
     mbMergeTag = NULL;
 }
 
-ErrorCode MergeMesh::merge_entities( EntityHandle* elems, int elems_size, const double merge_tol, const int do_merge,
-                                     const int update_sets, Tag merge_tag, bool do_higher_dim )
+ErrorCode MergeMesh::merge_entities( EntityHandle* elems,
+                                     int elems_size,
+                                     const double merge_tol,
+                                     const int do_merge,
+                                     const int update_sets,
+                                     Tag merge_tag,
+                                     bool do_higher_dim )
 {
     mergeTol   = merge_tol;
     mergeTolSq = merge_tol * merge_tol;
@@ -52,11 +57,18 @@ ErrorCode MergeMesh::merge_entities( EntityHandle* elems, int elems_size, const 
  throw MKException(iBase_FAILURE, "");
  }*/
 
-ErrorCode MergeMesh::merge_entities( Range& elems, const double merge_tol, const int do_merge, const int, Tag merge_tag,
+ErrorCode MergeMesh::merge_entities( Range& elems,
+                                     const double merge_tol,
+                                     const int do_merge,
+                                     const int,
+                                     Tag merge_tag,
                                      bool merge_higher_dim )
 {
     // If merge_higher_dim is true, do_merge must also be true
-    if( merge_higher_dim && !do_merge ) { return MB_FAILURE; }
+    if( merge_higher_dim && !do_merge )
+    {
+        return MB_FAILURE;
+    }
 
     mergeTol   = merge_tol;
     mergeTolSq = merge_tol * merge_tol;
@@ -167,7 +179,10 @@ ErrorCode MergeMesh::perform_merge( Tag merge_tag )
         assert( merge_tag_val[i] );
         if( MBVERTEX == TYPE_FROM_HANDLE( merge_tag_val[i] ) ) mergedToVertices.insert( merge_tag_val[i] );
         result = mbImpl->merge_entities( merge_tag_val[i], *rit, false, false );
-        if( MB_SUCCESS != result ) { return result; }
+        if( MB_SUCCESS != result )
+        {
+            return result;
+        }
     }
     result = mbImpl->delete_entities( deadEntsRange );
     return result;
@@ -187,7 +202,10 @@ int compare_handle_id( const void* a, const void* b )
 
     handle_id* ia = (handle_id*)a;
     handle_id* ib = (handle_id*)b;
-    if( ia->val == ib->val ) { return ( ia->eh < ib->eh ) ? -1 : 1; }
+    if( ia->val == ib->val )
+    {
+        return ( ia->eh < ib->eh ) ? -1 : 1;
+    }
     else
     {
         return ( ia->val - ib->val );
@@ -230,7 +248,7 @@ ErrorCode MergeMesh::merge_using_integer_tag( Range& verts, Tag user_tag, Tag me
     {
         handle_id first = handles[i];
         int j           = i + 1;
-        while( j < (int)verts.size() && handles[j].val == first.val  )
+        while( j < (int)verts.size() && handles[j].val == first.val )
         {
             rval = mbImpl->tag_set_data( mbMergeTag, &( handles[j].eh ), 1, &( first.eh ) );
             if( rval != MB_SUCCESS ) return rval;
@@ -322,7 +340,10 @@ ErrorCode MergeMesh::find_merged_to( EntityHandle& tree_root, AdaptiveKDTree& tr
                 if( ( from - CartVect( &coords[3 * j] ) ).length_squared() < mergeTolSq )
                 {
                     merge_tag_val[j] = *rit;
-                    if( j < lr_size ) { inleaf_merged = true; }
+                    if( j < lr_size )
+                    {
+                        inleaf_merged = true;
+                    }
                     else
                     {
                         outleaf_merged = true;

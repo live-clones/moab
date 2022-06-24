@@ -53,16 +53,21 @@ namespace MBMesquite
  *                 at which the side vertices are located.
  *\param vtx_set_2 Vertex of second element.
  */
-static bool compare_sides( unsigned num_vtx, const unsigned* idx_set_1, const Mesh::VertexHandle* vtx_set_1,
-                           const unsigned* idx_set_2, const Mesh::VertexHandle* vtx_set_2 );
+static bool compare_sides( unsigned num_vtx,
+                           const unsigned* idx_set_1,
+                           const Mesh::VertexHandle* vtx_set_1,
+                           const unsigned* idx_set_2,
+                           const Mesh::VertexHandle* vtx_set_2 );
 
 /**\brief Skin mesh
  *
  * Find vertices and lower-dimension elements on the boundary
  * of a mesh.
  */
-static void find_skin( Mesh* mesh, std::vector< Mesh::VertexHandle >& skin_verts,
-                       std::vector< Mesh::ElementHandle >& skin_elems, MsqError& err );
+static void find_skin( Mesh* mesh,
+                       std::vector< Mesh::VertexHandle >& skin_verts,
+                       std::vector< Mesh::ElementHandle >& skin_elems,
+                       MsqError& err );
 
 /**\brief Group MeshDomain objectects by topological dimension.
  *
@@ -78,8 +83,11 @@ static void find_skin( Mesh* mesh, std::vector< Mesh::VertexHandle >& skin_verts
  *                domain of the corresponding topological dimension
  *                occurs.
  */
-static void dimension_sort_domains( MeshDomain** domains, const int* dims, unsigned count,
-                                    std::vector< DomainClassifier::DomainSet >& results, int dim_indices[4],
+static void dimension_sort_domains( MeshDomain** domains,
+                                    const int* dims,
+                                    unsigned count,
+                                    std::vector< DomainClassifier::DomainSet >& results,
+                                    int dim_indices[4],
                                     MsqError& err );
 
 /**\brief Classify mesh vertices using vertex position
@@ -95,8 +103,12 @@ static void dimension_sort_domains( MeshDomain** domains, const int* dims, unsig
  *\param vertices    Vertices to classify
  *\param epsilon     Maximum distance a vertex may deviate from its domain.
  */
-static void geom_classify_vertices( Mesh* mesh, DomainClassifier::DomainSet* dim_sorted_domains, unsigned num_domain,
-                                    const std::vector< Mesh::VertexHandle >& vertices, double epsilon, MsqError& err );
+static void geom_classify_vertices( Mesh* mesh,
+                                    DomainClassifier::DomainSet* dim_sorted_domains,
+                                    unsigned num_domain,
+                                    const std::vector< Mesh::VertexHandle >& vertices,
+                                    double epsilon,
+                                    MsqError& err );
 
 /**\brief Classify mesh elements using vertex classification
  *
@@ -116,17 +128,29 @@ static void geom_classify_vertices( Mesh* mesh, DomainClassifier::DomainSet* dim
  *\param uknown   Elements for which all vertices are classified to
  *                domains with dimension less than two.
  */
-static void vert_classify_elements( Mesh* mesh, DomainClassifier::DomainSet* dim_sorted_domains, unsigned num_domain,
-                                    int dim_indices[4], const std::vector< Mesh::ElementHandle >& elems,
-                                    std::vector< Mesh::ElementHandle >& unknown_elems, MsqError& err );
+static void vert_classify_elements( Mesh* mesh,
+                                    DomainClassifier::DomainSet* dim_sorted_domains,
+                                    unsigned num_domain,
+                                    int dim_indices[4],
+                                    const std::vector< Mesh::ElementHandle >& elems,
+                                    std::vector< Mesh::ElementHandle >& unknown_elems,
+                                    MsqError& err );
 
 /**\brief Classify mesh elements geometrically. */
-static void geom_classify_elements( Mesh* mesh, DomainClassifier::DomainSet* dim_sorted_domains, unsigned num_domain,
-                                    int dim_indices[4], const std::vector< Mesh::ElementHandle >& elems,
-                                    std::vector< Mesh::ElementHandle >& unknown_elems, double epsilon, MsqError& err );
+static void geom_classify_elements( Mesh* mesh,
+                                    DomainClassifier::DomainSet* dim_sorted_domains,
+                                    unsigned num_domain,
+                                    int dim_indices[4],
+                                    const std::vector< Mesh::ElementHandle >& elems,
+                                    std::vector< Mesh::ElementHandle >& unknown_elems,
+                                    double epsilon,
+                                    MsqError& err );
 
-static bool compare_sides( unsigned num_vtx, const unsigned* idx_set_1, const Mesh::VertexHandle* vtx_set_1,
-                           const unsigned* idx_set_2, const Mesh::VertexHandle* vtx_set_2 )
+static bool compare_sides( unsigned num_vtx,
+                           const unsigned* idx_set_1,
+                           const Mesh::VertexHandle* vtx_set_1,
+                           const unsigned* idx_set_2,
+                           const Mesh::VertexHandle* vtx_set_2 )
 {
     unsigned i;
     for( i = 0;; ++i )
@@ -155,8 +179,10 @@ static bool compare_sides( unsigned num_vtx, const unsigned* idx_set_1, const Me
     }
 }
 
-static void find_skin( Mesh* mesh, std::vector< Mesh::VertexHandle >& skin_verts,
-                       std::vector< Mesh::ElementHandle >& skin_elems, MsqError& err )
+static void find_skin( Mesh* mesh,
+                       std::vector< Mesh::VertexHandle >& skin_verts,
+                       std::vector< Mesh::ElementHandle >& skin_elems,
+                       MsqError& err )
 {
     std::vector< Mesh::ElementHandle > elements, adj_elem, side_elem;
     std::vector< Mesh::VertexHandle > vertices, adj_vtx;
@@ -271,8 +297,11 @@ static void find_skin( Mesh* mesh, std::vector< Mesh::VertexHandle >& skin_verts
     skin_elems.erase( std::unique( skin_elems.begin(), skin_elems.end() ), skin_elems.end() );
 }
 
-static void dimension_sort_domains( MeshDomain** domains, const int* dims, unsigned count,
-                                    std::vector< DomainClassifier::DomainSet >& results, int dim_indices[4],
+static void dimension_sort_domains( MeshDomain** domains,
+                                    const int* dims,
+                                    unsigned count,
+                                    std::vector< DomainClassifier::DomainSet >& results,
+                                    int dim_indices[4],
                                     MsqError& err )
 {
     results.clear();
@@ -300,8 +329,12 @@ static void dimension_sort_domains( MeshDomain** domains, const int* dims, unsig
         dim_indices[dim] = idx;
 }
 
-static void geom_classify_vertices( Mesh* mesh, DomainClassifier::DomainSet* dim_sorted_domains, unsigned num_domain,
-                                    const std::vector< Mesh::VertexHandle >& vertices, double epsilon, MsqError& err )
+static void geom_classify_vertices( Mesh* mesh,
+                                    DomainClassifier::DomainSet* dim_sorted_domains,
+                                    unsigned num_domain,
+                                    const std::vector< Mesh::VertexHandle >& vertices,
+                                    double epsilon,
+                                    MsqError& err )
 {
     Vector3D pt;
     MsqVertex coord;
@@ -334,9 +367,13 @@ static void geom_classify_vertices( Mesh* mesh, DomainClassifier::DomainSet* dim
     }
 }
 
-static void vert_classify_elements( Mesh* mesh, DomainClassifier::DomainSet* dim_sorted_domains, unsigned num_domain,
-                                    int dim_indices[4], const std::vector< Mesh::ElementHandle >& elems,
-                                    std::vector< Mesh::ElementHandle >& unknown_elems, MsqError& err )
+static void vert_classify_elements( Mesh* mesh,
+                                    DomainClassifier::DomainSet* dim_sorted_domains,
+                                    unsigned num_domain,
+                                    int dim_indices[4],
+                                    const std::vector< Mesh::ElementHandle >& elems,
+                                    std::vector< Mesh::ElementHandle >& unknown_elems,
+                                    MsqError& err )
 {
     // sort vertex lists for faster search
     for( unsigned i = 0; i < num_domain; ++i )
@@ -387,9 +424,14 @@ static void vert_classify_elements( Mesh* mesh, DomainClassifier::DomainSet* dim
     }
 }
 
-static void geom_classify_elements( Mesh* mesh, DomainClassifier::DomainSet* dim_sorted_domains, unsigned,
-                                    int dim_indices[4], const std::vector< Mesh::ElementHandle >& elems,
-                                    std::vector< Mesh::ElementHandle >& unknown_elems, double epsilon, MsqError& err )
+static void geom_classify_elements( Mesh* mesh,
+                                    DomainClassifier::DomainSet* dim_sorted_domains,
+                                    unsigned,
+                                    int dim_indices[4],
+                                    const std::vector< Mesh::ElementHandle >& elems,
+                                    std::vector< Mesh::ElementHandle >& unknown_elems,
+                                    double epsilon,
+                                    MsqError& err )
 {
     if( elems.empty() ) return;
 
@@ -438,9 +480,13 @@ static void geom_classify_elements( Mesh* mesh, DomainClassifier::DomainSet* dim
     }
 }
 
-void DomainClassifier::classify_geometrically( DomainClassifier& result, Mesh* mesh, double tolerance,
-                                               MeshDomain** domain_array, const int* dimension_array,
-                                               unsigned array_length, MsqError& err )
+void DomainClassifier::classify_geometrically( DomainClassifier& result,
+                                               Mesh* mesh,
+                                               double tolerance,
+                                               MeshDomain** domain_array,
+                                               const int* dimension_array,
+                                               unsigned array_length,
+                                               MsqError& err )
 {
     if( !array_length ) return;
 
@@ -484,9 +530,13 @@ void DomainClassifier::classify_geometrically( DomainClassifier& result, Mesh* m
     classify_by_handle( result, mesh, arrptr( domains ), domains.size(), err );
 }
 
-void DomainClassifier::classify_skin_geometrically( DomainClassifier& result, Mesh* mesh, double tolerance,
-                                                    MeshDomain** domain_array, const int* dimension_array,
-                                                    unsigned array_length, MsqError& err )
+void DomainClassifier::classify_skin_geometrically( DomainClassifier& result,
+                                                    Mesh* mesh,
+                                                    double tolerance,
+                                                    MeshDomain** domain_array,
+                                                    const int* dimension_array,
+                                                    unsigned array_length,
+                                                    MsqError& err )
 {
     if( !array_length ) return;
 
@@ -519,8 +569,12 @@ void DomainClassifier::classify_skin_geometrically( DomainClassifier& result, Me
     classify_by_handle( result, mesh, arrptr( domains ), domains.size(), err );
 }
 
-void DomainClassifier::classify_by_tag( DomainClassifier& result, Mesh* mesh, const char* tag_name,
-                                        MeshDomain** domain_array, const int* id_array, unsigned array_length,
+void DomainClassifier::classify_by_tag( DomainClassifier& result,
+                                        Mesh* mesh,
+                                        const char* tag_name,
+                                        MeshDomain** domain_array,
+                                        const int* id_array,
+                                        unsigned array_length,
                                         MsqError& err )
 {
     TagHandle tag = mesh->tag_get( tag_name, err );MSQ_ERRRTN( err );
@@ -564,7 +618,10 @@ void DomainClassifier::classify_by_tag( DomainClassifier& result, Mesh* mesh, co
     if( !elements.empty() )
     {
         mesh->tag_get_element_data( tag, elements.size(), arrptr( elements ), arrptr( ids ), err );
-        if( err ) { err.clear(); }
+        if( err )
+        {
+            err.clear();
+        }
         else
         {
             for( size_t k = 0; k < elements.size(); ++k )
@@ -578,7 +635,10 @@ void DomainClassifier::classify_by_tag( DomainClassifier& result, Mesh* mesh, co
     if( !sets.empty() ) classify_by_handle( result, mesh, arrptr( sets ), sets.size(), err );
 }
 
-void DomainClassifier::classify_by_handle( DomainClassifier& result, Mesh* mesh, DomainSet* sets, unsigned array_length,
+void DomainClassifier::classify_by_handle( DomainClassifier& result,
+                                           Mesh* mesh,
+                                           DomainSet* sets,
+                                           unsigned array_length,
                                            MsqError& err )
 {
     result.clear();
@@ -1141,7 +1201,9 @@ void DomainClassifier::element_normal_at( Mesh::ElementHandle entity_handle, Vec
         dom->element_normal_at( entity_handle, coordinate );
 }
 
-void DomainClassifier::vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[], unsigned count,
+void DomainClassifier::vertex_normal_at( const Mesh::VertexHandle* handles,
+                                         Vector3D coordinates[],
+                                         unsigned count,
                                          MsqError& err ) const
 {
     for( unsigned i = 0; i < count; ++i )
@@ -1156,14 +1218,19 @@ void DomainClassifier::vertex_normal_at( const Mesh::VertexHandle* handles, Vect
     }
 }
 
-void DomainClassifier::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
-                                      Vector3D& normal, MsqError& err ) const
+void DomainClassifier::closest_point( Mesh::VertexHandle handle,
+                                      const Vector3D& position,
+                                      Vector3D& closest,
+                                      Vector3D& normal,
+                                      MsqError& err ) const
 {
     if( const MeshDomain* dom = find_vertex_domain( handle ) )
         dom->closest_point( handle, position, closest, normal, err );
 }
 
-void DomainClassifier::domain_DoF( const Mesh::VertexHandle* handles, unsigned short* dof_array, size_t num_handles,
+void DomainClassifier::domain_DoF( const Mesh::VertexHandle* handles,
+                                   unsigned short* dof_array,
+                                   size_t num_handles,
                                    MsqError& err ) const
 {
     for( size_t i = 0; i < num_handles; ++i )

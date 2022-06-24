@@ -120,17 +120,23 @@ class AveragingQMTest : public CppUnit::TestFixture
 
     void check_average_gradient_fails( QualityMetric::AveragingMethod scheme );
 
-    void check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme, double inner_power, double outer_power,
+    void check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme,
+                                        double inner_power,
+                                        double outer_power,
                                         bool scale );
 
     void check_hessian_diagonal_fails( QualityMetric::AveragingMethod scheme );
 
-    void check_pmean_hessian( QualityMetric::AveragingMethod scheme, double inner_power, double outer_power,
+    void check_pmean_hessian( QualityMetric::AveragingMethod scheme,
+                              double inner_power,
+                              double outer_power,
                               bool scale );
 
     void check_hessian_fails( QualityMetric::AveragingMethod scheme );
 
-    void check_average_and_weights( const double* vals, unsigned n, QualityMetric::AveragingMethod method,
+    void check_average_and_weights( const double* vals,
+                                    unsigned n,
+                                    QualityMetric::AveragingMethod method,
                                     const double* weights );
 
   public:
@@ -206,8 +212,7 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( AveragingQMTest, "Unit" );
 
 const double AveragingQMTest::VAL_LIST_1[5] = { 1, 2, -1, -2, 5 };
 const double AveragingQMTest::VAL_LIST_2[8] = {
-    M_PI, std::exp( 1.0 ), -20, 8, M_PI / 4, std::log( 2.0 ), std::sqrt( 2.0 ), -1
-};
+    M_PI, std::exp( 1.0 ), -20, 8, M_PI / 4, std::log( 2.0 ), std::sqrt( 2.0 ), -1 };
 const unsigned AveragingQMTest::LEN_LIST_1 = sizeof( VAL_LIST_1 ) / sizeof( double );
 const unsigned AveragingQMTest::LEN_LIST_2 = sizeof( VAL_LIST_2 ) / sizeof( double );
 
@@ -491,7 +496,9 @@ void AveragingQMTest::test_average_metrics_sum_of_ratios_squared()
     CPPUNIT_ASSERT_DOUBLES_EQUAL( exp, act, 1e-8 );
 }
 
-void AveragingQMTest::check_average_and_weights( const double* vals, unsigned n, QualityMetric::AveragingMethod method,
+void AveragingQMTest::check_average_and_weights( const double* vals,
+                                                 unsigned n,
+                                                 QualityMetric::AveragingMethod method,
                                                  const double* weights )
 {
     MsqPrintError err( std::cout );
@@ -791,8 +798,13 @@ void AveragingQMTest::test_average_corner_gradients_sum_of_ratios_squared()
     check_average_gradient_fails( QualityMetric::SUM_OF_RATIOS_SQUARED );
 }
 
-static double pmean_of_triangle_corner_hessians( double inner_power, double outer_power, const double* v,
-                                                 const Vector3D* cg, const Matrix3D* ch, Vector3D* tg, Matrix3D* th,
+static double pmean_of_triangle_corner_hessians( double inner_power,
+                                                 double outer_power,
+                                                 const double* v,
+                                                 const Vector3D* cg,
+                                                 const Matrix3D* ch,
+                                                 Vector3D* tg,
+                                                 Matrix3D* th,
                                                  bool scale )
 {
     Matrix3D op;
@@ -843,8 +855,10 @@ static double pmean_of_triangle_corner_hessians( double inner_power, double oute
     return m;
 }
 
-void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme, double inner_power,
-                                                     double outer_power, bool scale )
+void AveragingQMTest::check_pmean_hessian_diagonals( QualityMetric::AveragingMethod scheme,
+                                                     double inner_power,
+                                                     double outer_power,
+                                                     bool scale )
 {
     MsqPrintError err( std::cout );
     AveragingQM aqm( scheme );
@@ -996,8 +1010,10 @@ void AveragingQMTest::test_average_corner_hessian_diagonals_sum_of_ratios_square
     check_hessian_diagonal_fails( QualityMetric::SUM_OF_RATIOS_SQUARED );
 }
 
-void AveragingQMTest::check_pmean_hessian( QualityMetric::AveragingMethod scheme, double inner_power,
-                                           double outer_power, bool scale )
+void AveragingQMTest::check_pmean_hessian( QualityMetric::AveragingMethod scheme,
+                                           double inner_power,
+                                           double outer_power,
+                                           bool scale )
 {
     // define corner values, gradients and Hessians for a triangle
     double vals[]           = { 1, 2, 0.5 };

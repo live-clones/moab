@@ -95,22 +95,31 @@ class ParallelComm
     //! in either case for vertices too)
     //!\param owned_only If true, do not get global IDs for non-owned entities
     //!                  from remote processors.
-    ErrorCode assign_global_ids( EntityHandle this_set, const int dimension, const int start_id = 1,
-                                 const bool largest_dim_only = true, const bool parallel = true,
-                                 const bool owned_only = false );
+    ErrorCode assign_global_ids( EntityHandle this_set,
+                                 const int dimension,
+                                 const int start_id          = 1,
+                                 const bool largest_dim_only = true,
+                                 const bool parallel         = true,
+                                 const bool owned_only       = false );
 
     //! assign a global id space, for largest-dimension or all entities (and
     //! in either case for vertices too)
-    ErrorCode assign_global_ids( Range entities[], const int dimension, const int start_id, const bool parallel,
+    ErrorCode assign_global_ids( Range entities[],
+                                 const int dimension,
+                                 const int start_id,
+                                 const bool parallel,
                                  const bool owned_only );
 
     //! check for global ids; based only on tag handle being there or not;
     //! if it's not there, create them for the specified dimensions
     //!\param owned_only If true, do not get global IDs for non-owned entities
     //!                  from remote processors.
-    ErrorCode check_global_ids( EntityHandle this_set, const int dimension, const int start_id = 1,
-                                const bool largest_dim_only = true, const bool parallel = true,
-                                const bool owned_only = false );
+    ErrorCode check_global_ids( EntityHandle this_set,
+                                const int dimension,
+                                const int start_id          = 1,
+                                const bool largest_dim_only = true,
+                                const bool parallel         = true,
+                                const bool owned_only       = false );
 
     // ==================================
     // \section HIGH-LEVEL COMMUNICATION (send/recv/bcast/scatter ents, exchange tags)
@@ -131,15 +140,24 @@ class ParallelComm
      * keep track if any messages are coming to this processor (newly added) \param wait_all If
      * true, wait until all messages received/sent complete
      */
-    ErrorCode send_entities( const int to_proc, Range& orig_ents, const bool adjs, const bool tags,
-                             const bool store_remote_handles, const bool is_iface, Range& final_ents, int& incoming1,
+    ErrorCode send_entities( const int to_proc,
+                             Range& orig_ents,
+                             const bool adjs,
+                             const bool tags,
+                             const bool store_remote_handles,
+                             const bool is_iface,
+                             Range& final_ents,
+                             int& incoming1,
                              int& incoming2,                                 // newly added
                              TupleList& entprocs,                            // newly added
                              std::vector< MPI_Request >& recv_remoteh_reqs,  // newly added
                              bool wait_all = true );
 
-    ErrorCode send_entities( std::vector< unsigned int >& send_procs, std::vector< Range* >& send_ents, int& incoming1,
-                             int& incoming2, const bool store_remote_handles );
+    ErrorCode send_entities( std::vector< unsigned int >& send_procs,
+                             std::vector< Range* >& send_ents,
+                             int& incoming1,
+                             int& incoming2,
+                             const bool store_remote_handles );
 
     /** \brief Receive entities from another processor, optionally waiting until it's done
      *
@@ -152,16 +170,26 @@ class ParallelComm
      * incoming keep track if any messages are coming to this processor (newly added) \param
      * wait_all If true, wait until all messages received/sent complete
      */
-    ErrorCode recv_entities( const int from_proc, const bool store_remote_handles, const bool is_iface,
-                             Range& final_ents, int& incomming1, int& incoming2,
+    ErrorCode recv_entities( const int from_proc,
+                             const bool store_remote_handles,
+                             const bool is_iface,
+                             Range& final_ents,
+                             int& incomming1,
+                             int& incoming2,
                              std::vector< std::vector< EntityHandle > >& L1hloc,
-                             std::vector< std::vector< EntityHandle > >& L1hrem, std::vector< std::vector< int > >& L1p,
-                             std::vector< EntityHandle >& L2hloc, std::vector< EntityHandle >& L2hrem,
-                             std::vector< unsigned int >& L2p, std::vector< MPI_Request >& recv_remoteh_reqs,
+                             std::vector< std::vector< EntityHandle > >& L1hrem,
+                             std::vector< std::vector< int > >& L1p,
+                             std::vector< EntityHandle >& L2hloc,
+                             std::vector< EntityHandle >& L2hrem,
+                             std::vector< unsigned int >& L2p,
+                             std::vector< MPI_Request >& recv_remoteh_reqs,
                              bool wait_all = true );
 
-    ErrorCode recv_entities( std::set< unsigned int >& recv_procs, int incoming1, int incoming2,
-                             const bool store_remote_handles, const bool migrate = false );
+    ErrorCode recv_entities( std::set< unsigned int >& recv_procs,
+                             int incoming1,
+                             int incoming2,
+                             const bool store_remote_handles,
+                             const bool migrate = false );
 
     /** \brief Receive messages from another processor in while loop
      *
@@ -171,15 +199,25 @@ class ParallelComm
      * (currently unsupported) \param final_ents Range containing all entities received \param
      * incoming keep track if any messages are coming to this processor (newly added)
      */
-    ErrorCode recv_messages( const int from_proc, const bool store_remote_handles, const bool is_iface,
-                             Range& final_ents, int& incoming1, int& incoming2,
+    ErrorCode recv_messages( const int from_proc,
+                             const bool store_remote_handles,
+                             const bool is_iface,
+                             Range& final_ents,
+                             int& incoming1,
+                             int& incoming2,
                              std::vector< std::vector< EntityHandle > >& L1hloc,
-                             std::vector< std::vector< EntityHandle > >& L1hrem, std::vector< std::vector< int > >& L1p,
-                             std::vector< EntityHandle >& L2hloc, std::vector< EntityHandle >& L2hrem,
-                             std::vector< unsigned int >& L2p, std::vector< MPI_Request >& recv_remoteh_reqs );
+                             std::vector< std::vector< EntityHandle > >& L1hrem,
+                             std::vector< std::vector< int > >& L1p,
+                             std::vector< EntityHandle >& L2hloc,
+                             std::vector< EntityHandle >& L2hrem,
+                             std::vector< unsigned int >& L2p,
+                             std::vector< MPI_Request >& recv_remoteh_reqs );
 
-    ErrorCode recv_remote_handle_messages( const int from_proc, int& incoming2, std::vector< EntityHandle >& L2hloc,
-                                           std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
+    ErrorCode recv_remote_handle_messages( const int from_proc,
+                                           int& incoming2,
+                                           std::vector< EntityHandle >& L2hloc,
+                                           std::vector< EntityHandle >& L2hrem,
+                                           std::vector< unsigned int >& L2p,
                                            std::vector< MPI_Request >& recv_remoteh_reqs );
 
     /** \brief Exchange ghost cells with neighboring procs
@@ -201,14 +239,24 @@ class ParallelComm
      *       are cleared.
      */
 
-    ErrorCode exchange_ghost_cells( int ghost_dim, int bridge_dim, int num_layers, int addl_ents,
-                                    bool store_remote_handles, bool wait_all = true, EntityHandle* file_set = NULL );
+    ErrorCode exchange_ghost_cells( int ghost_dim,
+                                    int bridge_dim,
+                                    int num_layers,
+                                    int addl_ents,
+                                    bool store_remote_handles,
+                                    bool wait_all          = true,
+                                    EntityHandle* file_set = NULL );
 
     /** \brief Static version of exchange_ghost_cells, exchanging info through
      * buffers rather than messages
      */
-    static ErrorCode exchange_ghost_cells( ParallelComm** pc, unsigned int num_procs, int ghost_dim, int bridge_dim,
-                                           int num_layers, int addl_ents, bool store_remote_handles,
+    static ErrorCode exchange_ghost_cells( ParallelComm** pc,
+                                           unsigned int num_procs,
+                                           int ghost_dim,
+                                           int bridge_dim,
+                                           int num_layers,
+                                           int addl_ents,
+                                           bool store_remote_handles,
                                            EntityHandle* file_sets = NULL );
 
     /** \brief Post "MPI_Irecv" before meshing
@@ -226,19 +274,27 @@ class ParallelComm
      * \param exchange_ents exchanged entities for each processors
      * \param migrate if the owner if entities are changed or not
      */
-    ErrorCode exchange_owned_meshs( std::vector< unsigned int >& exchange_procs, std::vector< Range* >& exchange_ents,
+    ErrorCode exchange_owned_meshs( std::vector< unsigned int >& exchange_procs,
+                                    std::vector< Range* >& exchange_ents,
                                     std::vector< MPI_Request >& recv_ent_reqs,
-                                    std::vector< MPI_Request >& recv_remoteh_reqs, bool store_remote_handles,
-                                    bool wait_all = true, bool migrate = false, int dim = 0 );
+                                    std::vector< MPI_Request >& recv_remoteh_reqs,
+                                    bool store_remote_handles,
+                                    bool wait_all = true,
+                                    bool migrate  = false,
+                                    int dim       = 0 );
 
     /** \brief Exchange owned mesh for input mesh entities and sets
      * This function is called twice by exchange_owned_meshs to exchange entities before sets
      * \param migrate if the owner if entities are changed or not
      */
-    ErrorCode exchange_owned_mesh( std::vector< unsigned int >& exchange_procs, std::vector< Range* >& exchange_ents,
+    ErrorCode exchange_owned_mesh( std::vector< unsigned int >& exchange_procs,
+                                   std::vector< Range* >& exchange_ents,
                                    std::vector< MPI_Request >& recv_ent_reqs,
-                                   std::vector< MPI_Request >& recv_remoteh_reqs, const bool recv_posted,
-                                   bool store_remote_handles, bool wait_all, bool migrate = false );
+                                   std::vector< MPI_Request >& recv_remoteh_reqs,
+                                   const bool recv_posted,
+                                   bool store_remote_handles,
+                                   bool wait_all,
+                                   bool migrate = false );
 
     /** \brief Exchange tags for all shared and ghosted entities
      * This function should be called collectively over the communicator for this ParallelComm.
@@ -249,7 +305,8 @@ class ParallelComm
      * \param dst_tags Tag handles to store the tags on the non-owning procs
      * \param entities Entities for which tags are exchanged
      */
-    ErrorCode exchange_tags( const std::vector< Tag >& src_tags, const std::vector< Tag >& dst_tags,
+    ErrorCode exchange_tags( const std::vector< Tag >& src_tags,
+                             const std::vector< Tag >& dst_tags,
                              const Range& entities );
 
     /** \brief Exchange tags for all shared and ghosted entities
@@ -281,7 +338,9 @@ class ParallelComm
      * \param entities Entities on which reduction will be made; if empty, operates on all shared
      *                 entities
      */
-    ErrorCode reduce_tags( const std::vector< Tag >& src_tags, const std::vector< Tag >& dst_tags, const MPI_Op mpi_op,
+    ErrorCode reduce_tags( const std::vector< Tag >& src_tags,
+                           const std::vector< Tag >& dst_tags,
+                           const MPI_Op mpi_op,
                            const Range& entities );
 
     /** \brief Perform data reduction operation for all shared and ghosted entities
@@ -310,8 +369,10 @@ class ParallelComm
      * \param adjacencies If true, adjacencies are sent for equiv entities (currently unsupported)
      * \param tags If true, all non-default-valued tags are sent for sent entities
      */
-    ErrorCode broadcast_entities( const int from_proc, Range& entities, const bool adjacencies = false,
-                                  const bool tags = true );
+    ErrorCode broadcast_entities( const int from_proc,
+                                  Range& entities,
+                                  const bool adjacencies = false,
+                                  const bool tags        = true );
 
     /** \brief Scatter entities on from_proc to other processors
      * This function assumes remote handles are *not* being stored, since (usually)
@@ -321,8 +382,10 @@ class ParallelComm
      * \param adjacencies If true, adjacencies are sent for equiv entities (currently unsupported)
      * \param tags If true, all non-default-valued tags are sent for sent entities
      */
-    ErrorCode scatter_entities( const int from_proc, std::vector< Range >& entities, const bool adjacencies = false,
-                                const bool tags = true );
+    ErrorCode scatter_entities( const int from_proc,
+                                std::vector< Range >& entities,
+                                const bool adjacencies = false,
+                                const bool tags        = true );
 
     /////////////////////////////////////////////////////////////////////////////////
     // Send and Receive routines for a sequence of entities: use case UMR
@@ -330,11 +393,13 @@ class ParallelComm
 
     /** \brief Send and receives data from a set of processors
      */
-    ErrorCode send_recv_entities( std::vector< int >& send_procs, std::vector< std::vector< int > >& msgsizes,
+    ErrorCode send_recv_entities( std::vector< int >& send_procs,
+                                  std::vector< std::vector< int > >& msgsizes,
                                   std::vector< std::vector< EntityHandle > >& senddata,
                                   std::vector< std::vector< EntityHandle > >& recvdata );
 
-    ErrorCode update_remote_data( EntityHandle entity, std::vector< int >& procs,
+    ErrorCode update_remote_data( EntityHandle entity,
+                                  std::vector< int >& procs,
                                   std::vector< EntityHandle >& handles );
 
     ErrorCode get_remote_handles( EntityHandle* local_vec, EntityHandle* rem_vec, int num_ents, int to_proc );
@@ -361,8 +426,12 @@ class ParallelComm
      * \param proc_ents Entities for which to resolve shared entities
      * \param shared_dim Maximum dimension of shared entities to look for
      */
-    ErrorCode resolve_shared_ents( EntityHandle this_set, Range& proc_ents, int resolve_dim = -1, int shared_dim = -1,
-                                   Range* skin_ents = NULL, const Tag* id_tag = 0 );
+    ErrorCode resolve_shared_ents( EntityHandle this_set,
+                                   Range& proc_ents,
+                                   int resolve_dim   = -1,
+                                   int shared_dim    = -1,
+                                   Range* skin_ents  = NULL,
+                                   const Tag* id_tag = 0 );
 
     /** \brief Resolve shared entities between processors
      *
@@ -375,10 +444,14 @@ class ParallelComm
      * \param dim Dimension of entities in the partition
      * \param shared_dim Maximum dimension of shared entities to look for
      */
-    ErrorCode resolve_shared_ents( EntityHandle this_set, int resolve_dim = 3, int shared_dim = -1,
+    ErrorCode resolve_shared_ents( EntityHandle this_set,
+                                   int resolve_dim   = 3,
+                                   int shared_dim    = -1,
                                    const Tag* id_tag = 0 );
 
-    static ErrorCode resolve_shared_ents( ParallelComm** pc, const unsigned int np, EntityHandle this_set,
+    static ErrorCode resolve_shared_ents( ParallelComm** pc,
+                                          const unsigned int np,
+                                          EntityHandle this_set,
                                           const int to_dim );
 
     /** Remove shared sets.
@@ -457,7 +530,10 @@ class ParallelComm
      * \param hs Pointer to shared proc handle data
      * \param pstat Reference to pstatus data returned from this function
      */
-    ErrorCode get_sharing_data( const EntityHandle entity, int* ps, EntityHandle* hs, unsigned char& pstat,
+    ErrorCode get_sharing_data( const EntityHandle entity,
+                                int* ps,
+                                EntityHandle* hs,
+                                unsigned char& pstat,
                                 unsigned int& num_ps );
 
     /** \brief Get the shared processors/handles for an entity
@@ -467,7 +543,10 @@ class ParallelComm
      * \param hs Pointer to shared proc handle data
      * \param pstat Reference to pstatus data returned from this function
      */
-    ErrorCode get_sharing_data( const EntityHandle entity, int* ps, EntityHandle* hs, unsigned char& pstat,
+    ErrorCode get_sharing_data( const EntityHandle entity,
+                                int* ps,
+                                EntityHandle* hs,
+                                unsigned char& pstat,
                                 int& num_ps );
 
     /** \brief Get the intersection or union of all sharing processors
@@ -478,7 +557,9 @@ class ParallelComm
      * \param procs Processors returned
      * \param op Either Interface::UNION or Interface::INTERSECT
      */
-    ErrorCode get_sharing_data( const EntityHandle* entities, int num_entities, std::set< int >& procs,
+    ErrorCode get_sharing_data( const EntityHandle* entities,
+                                int num_entities,
+                                std::set< int >& procs,
                                 int op = Interface::INTERSECT );
 
     /** \brief Get the intersection or union of all sharing processors
@@ -495,7 +576,10 @@ class ParallelComm
      * \param iface If true, return only entities on the interface
      * \param owned_filter If true, return only owned shared entities
      */
-    ErrorCode get_shared_entities( int other_proc, Range& shared_ents, int dim = -1, const bool iface = false,
+    ErrorCode get_shared_entities( int other_proc,
+                                   Range& shared_ents,
+                                   int dim                 = -1,
+                                   const bool iface        = false,
                                    const bool owned_filter = false );
     /*
     //! return partition sets; if tag_name is input, gets sets with
@@ -521,11 +605,13 @@ class ParallelComm
     //! Get rank of the owner of a shared set.
     //! Returns this proc if set is not shared.
     //! Optionally returns handle on owning process for shared set.
-    ErrorCode get_entityset_owner( EntityHandle entity_set, unsigned& owner_rank,
+    ErrorCode get_entityset_owner( EntityHandle entity_set,
+                                   unsigned& owner_rank,
                                    EntityHandle* remote_handle = 0 ) const;
 
     //! Given set owner and handle on owner, find local set handle
-    ErrorCode get_entityset_local_handle( unsigned owning_rank, EntityHandle remote_handle,
+    ErrorCode get_entityset_local_handle( unsigned owning_rank,
+                                          EntityHandle remote_handle,
                                           EntityHandle& local_handle ) const;
 
     //! Get all shared sets
@@ -569,7 +655,10 @@ class ParallelComm
     }
 
     //! return the tags used to indicate shared procs and handles
-    ErrorCode get_shared_proc_tags( Tag& sharedp_tag, Tag& sharedps_tag, Tag& sharedh_tag, Tag& sharedhs_tag,
+    ErrorCode get_shared_proc_tags( Tag& sharedp_tag,
+                                    Tag& sharedps_tag,
+                                    Tag& sharedh_tag,
+                                    Tag& sharedhs_tag,
                                     Tag& pstatus_tag );
 
     //! return partition, interface set ranges
@@ -648,7 +737,9 @@ class ParallelComm
     ErrorCode get_part_neighbor_ids( EntityHandle part, int neighbors_out[MAX_SHARING_PROCS], int& num_neighbors_out );
     ErrorCode get_interface_sets( EntityHandle part, Range& iface_sets_out, int* adj_part_id = 0 );
     ErrorCode get_owning_part( EntityHandle entity, int& owning_part_id_out, EntityHandle* owning_handle = 0 );
-    ErrorCode get_sharing_parts( EntityHandle entity, int part_ids_out[MAX_SHARING_PROCS], int& num_part_ids_out,
+    ErrorCode get_sharing_parts( EntityHandle entity,
+                                 int part_ids_out[MAX_SHARING_PROCS],
+                                 int& num_part_ids_out,
                                  EntityHandle remote_handles[MAX_SHARING_PROCS] = 0 );
 
     /** Filter the entities by pstatus tag.
@@ -671,7 +762,10 @@ class ParallelComm
      *\param result_ents If non-null, results of filter are put in the
      *       pointed-to range
      */
-    ErrorCode filter_pstatus( Range& ents, const unsigned char pstatus_val, const unsigned char op, int to_proc = -1,
+    ErrorCode filter_pstatus( Range& ents,
+                              const unsigned char pstatus_val,
+                              const unsigned char op,
+                              int to_proc          = -1,
                               Range* returned_ents = NULL );
 
     /** \brief Get entities on interfaces shared with another proc
@@ -727,26 +821,49 @@ class ParallelComm
     };
 
     //! public 'cuz we want to unit test these externally
-    ErrorCode pack_buffer( Range& orig_ents, const bool adjacencies, const bool tags, const bool store_remote_handles,
-                           const int to_proc, Buffer* buff, TupleList* entprocs = NULL, Range* allsent = NULL );
+    ErrorCode pack_buffer( Range& orig_ents,
+                           const bool adjacencies,
+                           const bool tags,
+                           const bool store_remote_handles,
+                           const int to_proc,
+                           Buffer* buff,
+                           TupleList* entprocs = NULL,
+                           Range* allsent      = NULL );
 
-    ErrorCode unpack_buffer( unsigned char* buff_ptr, const bool store_remote_handles, const int from_proc,
-                             const int ind, std::vector< std::vector< EntityHandle > >& L1hloc,
-                             std::vector< std::vector< EntityHandle > >& L1hrem, std::vector< std::vector< int > >& L1p,
-                             std::vector< EntityHandle >& L2hloc, std::vector< EntityHandle >& L2hrem,
-                             std::vector< unsigned int >& L2p, std::vector< EntityHandle >& new_ents,
+    ErrorCode unpack_buffer( unsigned char* buff_ptr,
+                             const bool store_remote_handles,
+                             const int from_proc,
+                             const int ind,
+                             std::vector< std::vector< EntityHandle > >& L1hloc,
+                             std::vector< std::vector< EntityHandle > >& L1hrem,
+                             std::vector< std::vector< int > >& L1p,
+                             std::vector< EntityHandle >& L2hloc,
+                             std::vector< EntityHandle >& L2hrem,
+                             std::vector< unsigned int >& L2p,
+                             std::vector< EntityHandle >& new_ents,
                              const bool created_iface = false );
 
-    ErrorCode pack_entities( Range& entities, Buffer* buff, const bool store_remote_handles, const int to_proc,
-                             const bool is_iface, TupleList* entprocs = NULL, Range* allsent = NULL );
+    ErrorCode pack_entities( Range& entities,
+                             Buffer* buff,
+                             const bool store_remote_handles,
+                             const int to_proc,
+                             const bool is_iface,
+                             TupleList* entprocs = NULL,
+                             Range* allsent      = NULL );
 
     //! unpack entities in buff_ptr
-    ErrorCode unpack_entities( unsigned char*& buff_ptr, const bool store_remote_handles, const int from_ind,
-                               const bool is_iface, std::vector< std::vector< EntityHandle > >& L1hloc,
+    ErrorCode unpack_entities( unsigned char*& buff_ptr,
+                               const bool store_remote_handles,
+                               const int from_ind,
+                               const bool is_iface,
+                               std::vector< std::vector< EntityHandle > >& L1hloc,
                                std::vector< std::vector< EntityHandle > >& L1hrem,
-                               std::vector< std::vector< int > >& L1p, std::vector< EntityHandle >& L2hloc,
-                               std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
-                               std::vector< EntityHandle >& new_ents, const bool created_iface = false );
+                               std::vector< std::vector< int > >& L1p,
+                               std::vector< EntityHandle >& L2hloc,
+                               std::vector< EntityHandle >& L2hrem,
+                               std::vector< unsigned int >& L2p,
+                               std::vector< EntityHandle >& new_ents,
+                               const bool created_iface = false );
 
     //! Call exchange_all_shared_handles, then compare the results with tag data
     //! on local shared entities.
@@ -789,15 +906,20 @@ class ParallelComm
     /* \brief Unpack message with remote handles
      * PUBLIC ONLY FOR TESTING!
      */
-    ErrorCode unpack_remote_handles( unsigned int from_proc, unsigned char*& buff_ptr,
-                                     std::vector< EntityHandle >& L2hloc, std::vector< EntityHandle >& L2hrem,
+    ErrorCode unpack_remote_handles( unsigned int from_proc,
+                                     unsigned char*& buff_ptr,
+                                     std::vector< EntityHandle >& L2hloc,
+                                     std::vector< EntityHandle >& L2hrem,
                                      std::vector< unsigned int >& L2p );
 
     /* \brief Pack message with remote handles
      * PUBLIC ONLY FOR TESTING!
      */
-    ErrorCode pack_remote_handles( std::vector< EntityHandle >& L1hloc, std::vector< EntityHandle >& L1hrem,
-                                   std::vector< int >& procs, unsigned int to_proc, Buffer* buff );
+    ErrorCode pack_remote_handles( std::vector< EntityHandle >& L1hloc,
+                                   std::vector< EntityHandle >& L1hrem,
+                                   std::vector< int >& procs,
+                                   unsigned int to_proc,
+                                   Buffer* buff );
 
     // each iterate in proc_nvecs contains a set of procs and the entities *possibly*
     // on the interface between those procs; this function makes sets for each,
@@ -811,7 +933,8 @@ class ParallelComm
 
     ErrorCode tag_shared_verts( TupleList& shared_ents,
                                 std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs,
-                                Range& proc_verts, unsigned int i_extra = 1 );
+                                Range& proc_verts,
+                                unsigned int i_extra = 1 );
 
     ErrorCode list_entities( const EntityHandle* ents, int num_ents );
 
@@ -846,8 +969,11 @@ class ParallelComm
      * \param gather_set On root, set containing global mesh onto which to put data
      * \param root_proc_rank Rank of the specified root processor (default rank is 0)
      */
-    ErrorCode gather_data( Range& gather_ents, Tag& tag_handle, Tag id_tag = 0, EntityHandle gather_set = 0,
-                           int root_proc_rank = 0 );
+    ErrorCode gather_data( Range& gather_ents,
+                           Tag& tag_handle,
+                           Tag id_tag              = 0,
+                           EntityHandle gather_set = 0,
+                           int root_proc_rank      = 0 );
 
     /* \brief communicate extra points positions on boundary
      * This function is called after intersection of 2 meshes, to settle the
@@ -867,7 +993,8 @@ class ParallelComm
      * \param shared_edges_owned edges for which to communicate data
      * \param extraNodesVec handles of intersection vertices on all edges;
      */
-    ErrorCode settle_intersection_points( Range& edges, Range& shared_edges_owned,
+    ErrorCode settle_intersection_points( Range& edges,
+                                          Range& shared_edges_owned,
                                           std::vector< std::vector< EntityHandle >* >& extraNodesVec,
                                           double tolerance );
 
@@ -904,15 +1031,25 @@ class ParallelComm
     // common initialization code, called from various constructors
     void initialize();
 
-    ErrorCode set_sharing_data( EntityHandle ent, unsigned char pstatus, int old_nump, int new_nump, int* ps,
+    ErrorCode set_sharing_data( EntityHandle ent,
+                                unsigned char pstatus,
+                                int old_nump,
+                                int new_nump,
+                                int* ps,
                                 EntityHandle* hs );
 
     ErrorCode check_clean_iface( Range& allsent );
 
     void define_mpe();
 
-    ErrorCode get_sent_ents( const bool is_iface, const int bridge_dim, const int ghost_dim, const int num_layers,
-                             const int addl_ents, Range* sent_ents, Range& allsent, TupleList& entprocs );
+    ErrorCode get_sent_ents( const bool is_iface,
+                             const int bridge_dim,
+                             const int ghost_dim,
+                             const int num_layers,
+                             const int addl_ents,
+                             Range* sent_ents,
+                             Range& allsent,
+                             TupleList& entprocs );
 
     /** \brief Set pstatus values on entities
      *
@@ -924,8 +1061,11 @@ class ParallelComm
      * \param operation If UNION, pstatus_val is OR-d with existing value, otherwise
      *        existing value is over-written
      */
-    ErrorCode set_pstatus_entities( Range& pstatus_ents, unsigned char pstatus_val, bool lower_dim_ents = false,
-                                    bool verts_too = true, int operation = Interface::UNION );
+    ErrorCode set_pstatus_entities( Range& pstatus_ents,
+                                    unsigned char pstatus_val,
+                                    bool lower_dim_ents = false,
+                                    bool verts_too      = true,
+                                    int operation       = Interface::UNION );
 
     /** \brief Set pstatus values on entities (vector-based function)
      *
@@ -937,9 +1077,12 @@ class ParallelComm
      * \param operation If UNION, pstatus_val is OR-d with existing value, otherwise
      *        existing value is over-written
      */
-    ErrorCode set_pstatus_entities( EntityHandle* pstatus_ents, int num_ents, unsigned char pstatus_val,
-                                    bool lower_dim_ents = false, bool verts_too = true,
-                                    int operation = Interface::UNION );
+    ErrorCode set_pstatus_entities( EntityHandle* pstatus_ents,
+                                    int num_ents,
+                                    unsigned char pstatus_val,
+                                    bool lower_dim_ents = false,
+                                    bool verts_too      = true,
+                                    int operation       = Interface::UNION );
 
     //! estimate size required to pack entities
     int estimate_ents_buffer_size( Range& entities, const bool store_remote_handles );
@@ -948,58 +1091,102 @@ class ParallelComm
     int estimate_sets_buffer_size( Range& entities, const bool store_remote_handles );
 
     //! send the indicated buffer, possibly sending size first
-    ErrorCode send_buffer( const unsigned int to_proc, Buffer* send_buff, const int msg_tag, MPI_Request& send_req,
-                           MPI_Request& ack_recv_req, int* ack_buff, int& this_incoming, int next_mesg_tag = -1,
-                           Buffer* next_recv_buff = NULL, MPI_Request* next_recv_req = NULL,
-                           int* next_incoming = NULL );
+    ErrorCode send_buffer( const unsigned int to_proc,
+                           Buffer* send_buff,
+                           const int msg_tag,
+                           MPI_Request& send_req,
+                           MPI_Request& ack_recv_req,
+                           int* ack_buff,
+                           int& this_incoming,
+                           int next_mesg_tag          = -1,
+                           Buffer* next_recv_buff     = NULL,
+                           MPI_Request* next_recv_req = NULL,
+                           int* next_incoming         = NULL );
 
     //! process incoming message; if longer than the initial size, post
     //! recv for next part then send ack; if ack, send second part; else
     //! indicate that we're done and buffer is ready for processing
-    ErrorCode recv_buffer( int mesg_tag_expected, const MPI_Status& mpi_status, Buffer* recv_buff,
-                           MPI_Request& recv_2nd_req, MPI_Request& ack_req, int& this_incoming, Buffer* send_buff,
-                           MPI_Request& send_req, MPI_Request& sent_ack_req, bool& done, Buffer* next_buff = NULL,
-                           int next_tag = -1, MPI_Request* next_req = NULL, int* next_incoming = NULL );
+    ErrorCode recv_buffer( int mesg_tag_expected,
+                           const MPI_Status& mpi_status,
+                           Buffer* recv_buff,
+                           MPI_Request& recv_2nd_req,
+                           MPI_Request& ack_req,
+                           int& this_incoming,
+                           Buffer* send_buff,
+                           MPI_Request& send_req,
+                           MPI_Request& sent_ack_req,
+                           bool& done,
+                           Buffer* next_buff     = NULL,
+                           int next_tag          = -1,
+                           MPI_Request* next_req = NULL,
+                           int* next_incoming    = NULL );
 
     //! pack a range of entities with equal # verts per entity, along with
     //! the range on the sending proc
-    ErrorCode pack_entity_seq( const int nodes_per_entity, const bool store_remote_handles, const int to_proc,
-                               Range& these_ents, std::vector< EntityHandle >& entities, Buffer* buff );
+    ErrorCode pack_entity_seq( const int nodes_per_entity,
+                               const bool store_remote_handles,
+                               const int to_proc,
+                               Range& these_ents,
+                               std::vector< EntityHandle >& entities,
+                               Buffer* buff );
 
     ErrorCode print_buffer( unsigned char* buff_ptr, int mesg_type, int from_proc, bool sent );
 
     //! for all the entities in the received buffer; for each, save
     //! entities in this instance which match connectivity, or zero if none found
-    ErrorCode unpack_iface_entities( unsigned char*& buff_ptr, const int from_proc, const int ind,
+    ErrorCode unpack_iface_entities( unsigned char*& buff_ptr,
+                                     const int from_proc,
+                                     const int ind,
                                      std::vector< EntityHandle >& recd_ents );
 
     ErrorCode pack_sets( Range& entities, Buffer* buff, const bool store_handles, const int to_proc );
 
-    ErrorCode unpack_sets( unsigned char*& buff_ptr, std::vector< EntityHandle >& entities, const bool store_handles,
+    ErrorCode unpack_sets( unsigned char*& buff_ptr,
+                           std::vector< EntityHandle >& entities,
+                           const bool store_handles,
                            const int to_proc );
 
-    ErrorCode pack_adjacencies( Range& entities, Range::const_iterator& start_rit, Range& whole_range,
-                                unsigned char*& buff_ptr, int& count, const bool just_count, const bool store_handles,
+    ErrorCode pack_adjacencies( Range& entities,
+                                Range::const_iterator& start_rit,
+                                Range& whole_range,
+                                unsigned char*& buff_ptr,
+                                int& count,
+                                const bool just_count,
+                                const bool store_handles,
                                 const int to_proc );
 
-    ErrorCode unpack_adjacencies( unsigned char*& buff_ptr, Range& entities, const bool store_handles,
+    ErrorCode unpack_adjacencies( unsigned char*& buff_ptr,
+                                  Range& entities,
+                                  const bool store_handles,
                                   const int from_proc );
 
     /* \brief Unpack message with remote handles (const pointer to buffer)
      */
-    ErrorCode unpack_remote_handles( unsigned int from_proc, const unsigned char* buff_ptr,
-                                     std::vector< EntityHandle >& L2hloc, std::vector< EntityHandle >& L2hrem,
+    ErrorCode unpack_remote_handles( unsigned int from_proc,
+                                     const unsigned char* buff_ptr,
+                                     std::vector< EntityHandle >& L2hloc,
+                                     std::vector< EntityHandle >& L2hrem,
                                      std::vector< unsigned int >& L2p );
 
     //! given connectivity and type, find an existing entity, if there is one
-    ErrorCode find_existing_entity( const bool is_iface, const int owner_p, const EntityHandle owner_h,
-                                    const int num_ents, const EntityHandle* connect, const int num_connect,
-                                    const EntityType this_type, std::vector< EntityHandle >& L2hloc,
-                                    std::vector< EntityHandle >& L2hrem, std::vector< unsigned int >& L2p,
+    ErrorCode find_existing_entity( const bool is_iface,
+                                    const int owner_p,
+                                    const EntityHandle owner_h,
+                                    const int num_ents,
+                                    const EntityHandle* connect,
+                                    const int num_connect,
+                                    const EntityType this_type,
+                                    std::vector< EntityHandle >& L2hloc,
+                                    std::vector< EntityHandle >& L2hrem,
+                                    std::vector< unsigned int >& L2p,
                                     EntityHandle& new_h );
 
-    ErrorCode build_sharedhps_list( const EntityHandle entity, const unsigned char pstatus, const int sharedp,
-                                    const std::set< unsigned int >& procs, unsigned int& num_ents, int* tmp_procs,
+    ErrorCode build_sharedhps_list( const EntityHandle entity,
+                                    const unsigned char pstatus,
+                                    const int sharedp,
+                                    const std::set< unsigned int >& procs,
+                                    unsigned int& num_ents,
+                                    int* tmp_procs,
                                     EntityHandle* tmp_handles );
 
     /**\brief Get list of tags for which to exchange data
@@ -1016,7 +1203,8 @@ class ParallelComm
      *                      subset of 'all_entities' for which a tag value has
      *                      been set.
      */
-    ErrorCode get_tag_send_list( const Range& all_entities, std::vector< Tag >& all_tags,
+    ErrorCode get_tag_send_list( const Range& all_entities,
+                                 std::vector< Tag >& all_tags,
                                  std::vector< Range >& tag_ranges );
 
     /**\brief Serialize entity tag data
@@ -1063,8 +1251,12 @@ class ParallelComm
      *\param tag_ranges    List of entities to serialize tag data, one
      *                            for each corresponding tag handle in 'all_tags.
      */
-    ErrorCode pack_tags( Range& entities, const std::vector< Tag >& src_tags, const std::vector< Tag >& dst_tags,
-                         const std::vector< Range >& tag_ranges, Buffer* buff, const bool store_handles,
+    ErrorCode pack_tags( Range& entities,
+                         const std::vector< Tag >& src_tags,
+                         const std::vector< Tag >& dst_tags,
+                         const std::vector< Range >& tag_ranges,
+                         Buffer* buff,
+                         const bool store_handles,
                          const int to_proc );
 
     /**\brief Calculate buffer size required to pack tag data
@@ -1099,18 +1291,28 @@ class ParallelComm
      *                     which to store the corresponding remote entity
      *                     handles.
      */
-    ErrorCode pack_tag( Tag source_tag, Tag destination_tag, const Range& entities,
-                        const std::vector< EntityHandle >& whole_range, Buffer* buff, const bool store_remote_handles,
+    ErrorCode pack_tag( Tag source_tag,
+                        Tag destination_tag,
+                        const Range& entities,
+                        const std::vector< EntityHandle >& whole_range,
+                        Buffer* buff,
+                        const bool store_remote_handles,
                         const int to_proc );
 
-    ErrorCode unpack_tags( unsigned char*& buff_ptr, std::vector< EntityHandle >& entities, const bool store_handles,
-                           const int to_proc, const MPI_Op* const mpi_op = NULL );
+    ErrorCode unpack_tags( unsigned char*& buff_ptr,
+                           std::vector< EntityHandle >& entities,
+                           const bool store_handles,
+                           const int to_proc,
+                           const MPI_Op* const mpi_op = NULL );
 
-    ErrorCode tag_shared_verts( TupleList& shared_verts, Range* skin_ents,
+    ErrorCode tag_shared_verts( TupleList& shared_verts,
+                                Range* skin_ents,
                                 std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs,
                                 Range& proc_verts );
 
-    ErrorCode get_proc_nvecs( int resolve_dim, int shared_dim, Range* skin_ents,
+    ErrorCode get_proc_nvecs( int resolve_dim,
+                              int shared_dim,
+                              Range* skin_ents,
                               std::map< std::vector< int >, std::vector< EntityHandle > >& proc_nvecs );
 
     // after verifying shared entities, now parent/child links between sets can be established
@@ -1130,7 +1332,11 @@ class ParallelComm
     //! for specified bridge/ghost dimension, to_proc, and number
     //! of layers, get the entities to be ghosted, and info on additional procs
     //! needing to communicate with to_proc
-    ErrorCode get_ghosted_entities( int bridge_dim, int ghost_dim, int to_proc, int num_layers, int addl_ents,
+    ErrorCode get_ghosted_entities( int bridge_dim,
+                                    int ghost_dim,
+                                    int to_proc,
+                                    int num_layers,
+                                    int addl_ents,
                                     Range& ghosted_ents );
 
     //! add vertices adjacent to entities in this list
@@ -1148,36 +1354,55 @@ class ParallelComm
     //! if no remote handle and new_ents is non-null, substitute
     //! instead CREATE_HANDLE(MBMAXTYPE, index) where index is handle's
     //! position in new_ents
-    ErrorCode get_remote_handles( const bool store_remote_handles, EntityHandle* from_vec, EntityHandle* to_vec_tmp,
-                                  int num_ents, int to_proc, const std::vector< EntityHandle >& new_ents );
+    ErrorCode get_remote_handles( const bool store_remote_handles,
+                                  EntityHandle* from_vec,
+                                  EntityHandle* to_vec_tmp,
+                                  int num_ents,
+                                  int to_proc,
+                                  const std::vector< EntityHandle >& new_ents );
 
     //! same as other version, except from_range and to_range should be
     //! different here
-    ErrorCode get_remote_handles( const bool store_remote_handles, const Range& from_range, Range& to_range,
-                                  int to_proc, const std::vector< EntityHandle >& new_ents );
+    ErrorCode get_remote_handles( const bool store_remote_handles,
+                                  const Range& from_range,
+                                  Range& to_range,
+                                  int to_proc,
+                                  const std::vector< EntityHandle >& new_ents );
 
     //! same as other version, except packs range into vector
-    ErrorCode get_remote_handles( const bool store_remote_handles, const Range& from_range, EntityHandle* to_vec,
-                                  int to_proc, const std::vector< EntityHandle >& new_ents );
+    ErrorCode get_remote_handles( const bool store_remote_handles,
+                                  const Range& from_range,
+                                  EntityHandle* to_vec,
+                                  int to_proc,
+                                  const std::vector< EntityHandle >& new_ents );
 
     //! goes through from_vec, and for any with type MBMAXTYPE, replaces with
     //! new_ents value at index corresponding to id of entity in from_vec
     ErrorCode get_local_handles( EntityHandle* from_vec, int num_ents, const Range& new_ents );
 
     //! same as above except puts results in range
-    ErrorCode get_local_handles( const Range& remote_handles, Range& local_handles,
+    ErrorCode get_local_handles( const Range& remote_handles,
+                                 Range& local_handles,
                                  const std::vector< EntityHandle >& new_ents );
 
     //! same as above except gets new_ents from vector
     ErrorCode get_local_handles( EntityHandle* from_vec, int num_ents, const std::vector< EntityHandle >& new_ents );
 
-    ErrorCode update_remote_data( Range& local_range, Range& remote_range, int other_proc,
+    ErrorCode update_remote_data( Range& local_range,
+                                  Range& remote_range,
+                                  int other_proc,
                                   const unsigned char add_pstat );
 
-    ErrorCode update_remote_data( const EntityHandle new_h, const int* ps, const EntityHandle* hs, const int num_ps,
+    ErrorCode update_remote_data( const EntityHandle new_h,
+                                  const int* ps,
+                                  const EntityHandle* hs,
+                                  const int num_ps,
                                   const unsigned char add_pstat );
 
-    ErrorCode update_remote_data_old( const EntityHandle new_h, const int* ps, const EntityHandle* hs, const int num_ps,
+    ErrorCode update_remote_data_old( const EntityHandle new_h,
+                                      const int* ps,
+                                      const EntityHandle* hs,
+                                      const int num_ps,
                                       const unsigned char add_pstat );
 
     /** \brief Set pstatus tag interface bit on entities in sets passed in
@@ -1285,7 +1510,10 @@ inline void ParallelComm::Buffer::reserve( unsigned int new_size )
 
 #ifdef DEBUG_BUFFER
     int tmp_pos = 0;
-    if( mem_ptr ) { tmp_pos = buff_ptr - mem_ptr; }
+    if( mem_ptr )
+    {
+        tmp_pos = buff_ptr - mem_ptr;
+    }
     buff_ptr = (unsigned char*)malloc( new_size );
     assert( 0 <= tmp_pos && tmp_pos <= (int)alloc_size );
     if( tmp_pos ) memcpy( buff_ptr, mem_ptr, tmp_pos );
@@ -1343,7 +1571,10 @@ inline const std::vector< unsigned int >& ParallelComm::buff_procs() const
     return buffProcs;
 }
 
-inline ErrorCode ParallelComm::get_shared_proc_tags( Tag& sharedp, Tag& sharedps, Tag& sharedh, Tag& sharedhs,
+inline ErrorCode ParallelComm::get_shared_proc_tags( Tag& sharedp,
+                                                     Tag& sharedps,
+                                                     Tag& sharedh,
+                                                     Tag& sharedhs,
                                                      Tag& pstatus )
 {
     sharedp  = sharedp_tag();
@@ -1417,7 +1648,8 @@ inline ErrorCode ParallelComm::get_owner( EntityHandle entity, int& owner )
 
 /* \brief Unpack message with remote handles (const pointer to buffer)
  */
-inline ErrorCode ParallelComm::unpack_remote_handles( unsigned int from_proc, const unsigned char* buff_ptr,
+inline ErrorCode ParallelComm::unpack_remote_handles( unsigned int from_proc,
+                                                      const unsigned char* buff_ptr,
                                                       std::vector< EntityHandle >& L2hloc,
                                                       std::vector< EntityHandle >& L2hrem,
                                                       std::vector< unsigned int >& L2p )
@@ -1438,7 +1670,9 @@ inline void ParallelComm::set_size( unsigned int s )
     procConfig.proc_size( s );
 }
 
-inline ErrorCode ParallelComm::get_sharing_data( const EntityHandle* entities, int num_entities, std::set< int >& procs,
+inline ErrorCode ParallelComm::get_sharing_data( const EntityHandle* entities,
+                                                 int num_entities,
+                                                 std::set< int >& procs,
                                                  int op )
 {
     Range dum_range;
@@ -1448,8 +1682,11 @@ inline ErrorCode ParallelComm::get_sharing_data( const EntityHandle* entities, i
     return get_sharing_data( dum_range, procs, op );
 }
 
-inline ErrorCode ParallelComm::get_sharing_data( const EntityHandle entity, int* ps, EntityHandle* hs,
-                                                 unsigned char& pstat, int& num_ps )
+inline ErrorCode ParallelComm::get_sharing_data( const EntityHandle entity,
+                                                 int* ps,
+                                                 EntityHandle* hs,
+                                                 unsigned char& pstat,
+                                                 int& num_ps )
 {
     unsigned int dum_ps;
     ErrorCode result = get_sharing_data( entity, ps, hs, pstat, dum_ps );

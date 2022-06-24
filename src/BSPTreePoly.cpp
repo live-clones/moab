@@ -432,7 +432,10 @@ ErrorCode BSPTreePoly::set( const CartVect hex_corners[8] )
             {
                 e = ( -e ) % 12;
                 assert( !edges[e]->reversePtr );
-                if( !prev ) { edges[e]->reversePtr = new EdgeUse( edges[e], faceList ); }
+                if( !prev )
+                {
+                    edges[e]->reversePtr = new EdgeUse( edges[e], faceList );
+                }
                 else
                 {
                     edges[e]->reversePtr = new EdgeUse( edges[e] );
@@ -443,7 +446,10 @@ ErrorCode BSPTreePoly::set( const CartVect hex_corners[8] )
             else
             {
                 assert( !edges[e]->forwardPtr );
-                if( !prev ) { edges[e]->forwardPtr = new EdgeUse( edges[e], faceList ); }
+                if( !prev )
+                {
+                    edges[e]->forwardPtr = new EdgeUse( edges[e], faceList );
+                }
                 else
                 {
                     edges[e]->forwardPtr = new EdgeUse( edges[e] );

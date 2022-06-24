@@ -53,7 +53,11 @@ ObjectiveFunction::~ObjectiveFunction() {}
   The objective function value at the perturbed vertex position is given
   in local_val.
 */
-double ObjectiveFunction::get_eps( PatchData& pd, EvalType type, double& local_val, int dim, size_t vertex_index,
+double ObjectiveFunction::get_eps( PatchData& pd,
+                                   EvalType type,
+                                   double& local_val,
+                                   int dim,
+                                   size_t vertex_index,
                                    MsqError& err )
 {
     double eps       = 1.e-07;
@@ -83,8 +87,12 @@ double ObjectiveFunction::get_eps( PatchData& pd, EvalType type, double& local_v
     return 0.0;
 }  // end function get_eps
 
-bool ObjectiveFunction::compute_subpatch_numerical_gradient( EvalType type, EvalType subtype, PatchData& pd,
-                                                             double& flocal, Vector3D& grad, MsqError& err )
+bool ObjectiveFunction::compute_subpatch_numerical_gradient( EvalType type,
+                                                             EvalType subtype,
+                                                             PatchData& pd,
+                                                             double& flocal,
+                                                             Vector3D& grad,
+                                                             MsqError& err )
 {
     assert( pd.num_free_vertices() == 1 );
 
@@ -92,7 +100,10 @@ bool ObjectiveFunction::compute_subpatch_numerical_gradient( EvalType type, Eval
     double eps     = 0;
 
     bool b = evaluate( type, pd, flocal, OF_FREE_EVALS_ONLY, err );
-    if( MSQ_CHKERR( err ) || !b ) { return false; }
+    if( MSQ_CHKERR( err ) || !b )
+    {
+        return false;
+    }
 
     // loop over the three coords x,y,z
     for( int j = 0; j < 3; ++j )
@@ -110,14 +121,21 @@ bool ObjectiveFunction::compute_subpatch_numerical_gradient( EvalType type, Eval
     return true;
 }
 
-bool ObjectiveFunction::compute_patch_numerical_gradient( EvalType type, EvalType subtype, PatchData& pd,
-                                                          double& flocal, std::vector< Vector3D >& grad, MsqError& err )
+bool ObjectiveFunction::compute_patch_numerical_gradient( EvalType type,
+                                                          EvalType subtype,
+                                                          PatchData& pd,
+                                                          double& flocal,
+                                                          std::vector< Vector3D >& grad,
+                                                          MsqError& err )
 {
     double flocald = 0;
     double eps     = 0;
 
     bool b = evaluate( type, pd, flocal, OF_FREE_EVALS_ONLY, err );
-    if( MSQ_CHKERR( err ) || !b ) { return false; }
+    if( MSQ_CHKERR( err ) || !b )
+    {
+        return false;
+    }
 
     for( size_t i = 0; i < pd.num_free_vertices(); ++i )
     {
@@ -159,8 +177,11 @@ bool ObjectiveFunction::compute_patch_numerical_gradient( EvalType type, EvalTyp
   \param grad  Array of Vector3D of length the number of vertices used to store gradient.
   \param OF_val will be set to the objective function value.
  */
-bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type, PatchData& pd, double& OF_val,
-                                                std::vector< Vector3D >& grad, MsqError& err )
+bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type,
+                                                PatchData& pd,
+                                                double& OF_val,
+                                                std::vector< Vector3D >& grad,
+                                                MsqError& err )
 {
     bool b;
     grad.resize( pd.num_free_vertices() );
@@ -220,9 +241,12 @@ bool ObjectiveFunction::evaluate_with_gradient( EvalType eval_type, PatchData& p
     return true;
 }
 
-bool ObjectiveFunction::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+bool ObjectiveFunction::evaluate_with_Hessian_diagonal( EvalType type,
+                                                        PatchData& pd,
+                                                        double& value_out,
                                                         std::vector< Vector3D >& grad_out,
-                                                        std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
+                                                        std::vector< SymMatrix3D >& hess_diag_out,
+                                                        MsqError& err )
 {
     MsqHessian hess;
     hess.initialize( pd, err );
@@ -235,8 +259,11 @@ bool ObjectiveFunction::evaluate_with_Hessian_diagonal( EvalType type, PatchData
     return val;
 }
 
-bool ObjectiveFunction::evaluate_with_Hessian( EvalType /*type*/, PatchData& /*pd*/, double& /*value_out*/,
-                                               std::vector< Vector3D >& /*grad_out*/, MsqHessian& /*Hessian_out*/,
+bool ObjectiveFunction::evaluate_with_Hessian( EvalType /*type*/,
+                                               PatchData& /*pd*/,
+                                               double& /*value_out*/,
+                                               std::vector< Vector3D >& /*grad_out*/,
+                                               MsqHessian& /*Hessian_out*/,
                                                MsqError& err )
 {
     MSQ_SETERR( err )

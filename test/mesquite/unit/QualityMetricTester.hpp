@@ -73,7 +73,8 @@ class QualityMetricTester
 
     QualityMetricTester( ElemTypeGroup group, const Settings* set = 0 );
 
-    QualityMetricTester( const EntityTopology* supported_elem_types, size_t supported_elem_types_len,
+    QualityMetricTester( const EntityTopology* supported_elem_types,
+                         size_t supported_elem_types_len,
                          const Settings* set = 0 );
 
     /** Ideal pyramids should be considerd to have a heigth

@@ -53,16 +53,38 @@ string test_file_name = string( "input/surfrandomtris-4part.h5m" );
         if( !global_rank ) std::cerr << ( MSG ) << std::endl; \
     } while( false )
 
-ErrorCode perform_laplacian_smoothing( Core* mb, Range& cells, Range& verts, int dim, Tag fixed, bool use_hc = false,
-                                       bool use_acc = false, int acc_method = 1, int num_its = 10,
-                                       double rel_eps = 1e-5, double alpha = 0.0, double beta = 0.5,
+ErrorCode perform_laplacian_smoothing( Core* mb,
+                                       Range& cells,
+                                       Range& verts,
+                                       int dim,
+                                       Tag fixed,
+                                       bool use_hc    = false,
+                                       bool use_acc   = false,
+                                       int acc_method = 1,
+                                       int num_its    = 10,
+                                       double rel_eps = 1e-5,
+                                       double alpha   = 0.0,
+                                       double beta    = 0.5,
                                        int report_its = 1 );
 
-ErrorCode hcFilter( Core* mb, moab::ParallelComm* pcomm, moab::Range& verts, int dim, Tag fixed,
-                    std::vector< double >& verts_o, std::vector< double >& verts_n, double alpha, double beta );
+ErrorCode hcFilter( Core* mb,
+                    moab::ParallelComm* pcomm,
+                    moab::Range& verts,
+                    int dim,
+                    Tag fixed,
+                    std::vector< double >& verts_o,
+                    std::vector< double >& verts_n,
+                    double alpha,
+                    double beta );
 
-ErrorCode laplacianFilter( Core* mb, moab::ParallelComm* pcomm, moab::Range& verts, int dim, Tag fixed,
-                           std::vector< double >& verts_o, std::vector< double >& verts_n, bool use_updated = true );
+ErrorCode laplacianFilter( Core* mb,
+                           moab::ParallelComm* pcomm,
+                           moab::Range& verts,
+                           int dim,
+                           Tag fixed,
+                           std::vector< double >& verts_o,
+                           std::vector< double >& verts_n,
+                           bool use_updated = true );
 
 int main( int argc, char** argv )
 {
@@ -234,9 +256,19 @@ int main( int argc, char** argv )
     return 0;
 }
 
-ErrorCode perform_laplacian_smoothing( Core* mb, Range& cells, Range& verts, int dim, Tag fixed, bool use_hc,
-                                       bool use_acc, int acc_method, int num_its, double rel_eps, double alpha,
-                                       double beta, int report_its )
+ErrorCode perform_laplacian_smoothing( Core* mb,
+                                       Range& cells,
+                                       Range& verts,
+                                       int dim,
+                                       Tag fixed,
+                                       bool use_hc,
+                                       bool use_acc,
+                                       int acc_method,
+                                       int num_its,
+                                       double rel_eps,
+                                       double alpha,
+                                       double beta,
+                                       int report_its )
 {
     ErrorCode rval;
     int global_rank = 0, global_size = 1;
@@ -547,7 +579,10 @@ ErrorCode perform_laplacian_smoothing( Core* mb, Range& cells, Range& verts, int
         if( global_size > 1 ) MPI_Allreduce( &mxdelta, &global_max, 1, MPI_DOUBLE, MPI_MAX, pcomm->comm() );
 #endif
 
-        if( !( nit % report_its ) ) { dbgprint( "\tIterate " << nit << ": Global Max delta = " << global_max << "." ); }
+        if( !( nit % report_its ) )
+        {
+            dbgprint( "\tIterate " << nit << ": Global Max delta = " << global_max << "." );
+        }
 
 #ifdef WRITE_DEBUG_FILES
         {
@@ -594,8 +629,14 @@ ErrorCode perform_laplacian_smoothing( Core* mb, Range& cells, Range& verts, int
 
   Additional references: http://www.doc.ic.ac.uk/~gr409/thesis-MSc.pdf
 */
-ErrorCode laplacianFilter( Core* mb, moab::ParallelComm* pcomm, moab::Range& verts, int dim, Tag fixed,
-                           std::vector< double >& verts_o, std::vector< double >& verts_n, bool use_updated )
+ErrorCode laplacianFilter( Core* mb,
+                           moab::ParallelComm* pcomm,
+                           moab::Range& verts,
+                           int dim,
+                           Tag fixed,
+                           std::vector< double >& verts_o,
+                           std::vector< double >& verts_n,
+                           bool use_updated )
 {
     ErrorCode rval;
     std::vector< int > fix_tag( verts.size() );
@@ -673,8 +714,15 @@ ErrorCode laplacianFilter( Core* mb, moab::ParallelComm* pcomm, moab::Range& ver
       alpha [0..1] influences previous points pv, e.g. 0
       beta  [0..1] e.g. > 0.5
 */
-ErrorCode hcFilter( Core* mb, moab::ParallelComm* pcomm, moab::Range& verts, int dim, Tag fixed,
-                    std::vector< double >& verts_o, std::vector< double >& verts_n, double alpha, double beta )
+ErrorCode hcFilter( Core* mb,
+                    moab::ParallelComm* pcomm,
+                    moab::Range& verts,
+                    int dim,
+                    Tag fixed,
+                    std::vector< double >& verts_o,
+                    std::vector< double >& verts_n,
+                    double alpha,
+                    double beta )
 {
     ErrorCode rval;
     std::vector< double > verts_hc( verts_o.size() );

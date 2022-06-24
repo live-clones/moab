@@ -170,8 +170,11 @@ class SplitVerticesBase
     SplitVerticesBase( RefinerTagManager* tag_mgr );
     virtual ~SplitVerticesBase();
 
-    virtual bool find_or_create( const EntityHandle* split_src, const double* coords, EntityHandle& vert_handle,
-                                 std::map< ProcessSet, int >& proc_partition_counts, bool handles_on_output_mesh ) = 0;
+    virtual bool find_or_create( const EntityHandle* split_src,
+                                 const double* coords,
+                                 EntityHandle& vert_handle,
+                                 std::map< ProcessSet, int >& proc_partition_counts,
+                                 bool handles_on_output_mesh ) = 0;
 
     virtual void assign_global_ids( std::map< ProcessSet, int >& gids ) = 0;
 
@@ -195,7 +198,10 @@ class EntitySource : public std::vector< EntitySourceRecord >
 
     EntitySource( int num_corners, RefinerTagManager* tag_mgr );
     ~EntitySource();
-    bool create_element( EntityType etyp, int nconn, const EntityHandle* split_src, EntityHandle& elem_handle,
+    bool create_element( EntityType etyp,
+                         int nconn,
+                         const EntityHandle* split_src,
+                         EntityHandle& elem_handle,
                          std::map< ProcessSet, int >& proc_partition_counts );
 
     void assign_global_ids( std::map< ProcessSet, int >& gids );
@@ -221,8 +227,11 @@ class SplitVertices : public std::map< SplitVertexIndex< _n >, EntityHandle >, p
 
     SplitVertices( RefinerTagManager* tag_mgr );
     virtual ~SplitVertices();
-    virtual bool find_or_create( const EntityHandle* split_src, const double* coords, EntityHandle& vert_handle,
-                                 std::map< ProcessSet, int >& proc_partition_counts, bool handles_on_output_mesh );
+    virtual bool find_or_create( const EntityHandle* split_src,
+                                 const double* coords,
+                                 EntityHandle& vert_handle,
+                                 std::map< ProcessSet, int >& proc_partition_counts,
+                                 bool handles_on_output_mesh );
 
     virtual void assign_global_ids( std::map< ProcessSet, int >& gids );
 };
@@ -240,12 +249,17 @@ SplitVertices< _n >::~SplitVertices()
 }
 
 template < int _n >
-bool SplitVertices< _n >::find_or_create( const EntityHandle* split_src, const double* coords,
-                                          EntityHandle& vert_handle, std::map< ProcessSet, int >& proc_partition_counts,
+bool SplitVertices< _n >::find_or_create( const EntityHandle* split_src,
+                                          const double* coords,
+                                          EntityHandle& vert_handle,
+                                          std::map< ProcessSet, int >& proc_partition_counts,
                                           bool handles_on_output_mesh )
 {
     // Get the global IDs of the input vertices
-    if( handles_on_output_mesh ) { this->tag_manager->get_output_gids( _n, split_src, this->split_gids ); }
+    if( handles_on_output_mesh )
+    {
+        this->tag_manager->get_output_gids( _n, split_src, this->split_gids );
+    }
     else
     {
         this->tag_manager->get_input_gids( _n, split_src, this->split_gids );
@@ -260,7 +274,10 @@ bool SplitVertices< _n >::find_or_create( const EntityHandle* split_src, const d
         this->tag_manager->get_common_processes( _n, split_src, this->common_shared_procs, handles_on_output_mesh );
         proc_partition_counts[this->common_shared_procs]++;
         key.set_common_processes( this->common_shared_procs );
-        if( this->mesh_out->create_vertex( coords + 3, vert_handle ) != MB_SUCCESS ) { return false; }
+        if( this->mesh_out->create_vertex( coords + 3, vert_handle ) != MB_SUCCESS )
+        {
+            return false;
+        }
         ( *this )[key] = vert_handle;
         this->tag_manager->set_sharing( vert_handle, this->common_shared_procs );
         return true;

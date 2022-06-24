@@ -85,8 +85,10 @@ void CompositeOFAdd::initialize_queue( MeshDomainAssoc* mesh_and_domain, const S
     objFunc2->initialize_queue( mesh_and_domain, settings, err );MSQ_ERRRTN( err );
 }
 
-bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                                          PatchSet* user_set, MsqError& err )
+bool CompositeOFAdd::initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
+                                                          const Settings* settings,
+                                                          PatchSet* user_set,
+                                                          MsqError& err )
 {
     bool rval1, rval2;
     rval1 = objFunc1->initialize_block_coordinate_descent( mesh_and_domain, settings, user_set, err );
@@ -109,8 +111,11 @@ bool CompositeOFAdd::evaluate( EvalType type, PatchData& pd, double& value_out, 
     return true;
 }
 
-bool CompositeOFAdd::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                             std::vector< Vector3D >& grad_out, MsqError& err )
+bool CompositeOFAdd::evaluate_with_gradient( EvalType type,
+                                             PatchData& pd,
+                                             double& value_out,
+                                             std::vector< Vector3D >& grad_out,
+                                             MsqError& err )
 {
     double value_2;
     bool ok;
@@ -134,9 +139,12 @@ bool CompositeOFAdd::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
     return true;
 }
 
-bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type,
+                                                     PatchData& pd,
+                                                     double& value_out,
                                                      std::vector< Vector3D >& grad_out,
-                                                     std::vector< SymMatrix3D >& diag_out, MsqError& err )
+                                                     std::vector< SymMatrix3D >& diag_out,
+                                                     MsqError& err )
 {
     double value_2;
     bool valid;
@@ -156,8 +164,12 @@ bool CompositeOFAdd::evaluate_with_Hessian_diagonal( EvalType type, PatchData& p
     return true;
 }
 
-bool CompositeOFAdd::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                            std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
+bool CompositeOFAdd::evaluate_with_Hessian( EvalType type,
+                                            PatchData& pd,
+                                            double& value_out,
+                                            std::vector< Vector3D >& grad_out,
+                                            MsqHessian& Hessian_out,
+                                            MsqError& err )
 {
     double value_2;
     bool ok;

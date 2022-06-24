@@ -172,7 +172,10 @@ bool FakeTargetCalc::get_3D_target( PatchData& pd, size_t elem, Sample sample, M
     return true;
 }
 
-bool FakeTargetCalc::get_surface_target( PatchData& pd, size_t elem, Sample sample, MsqMatrix< 3, 2 >& W_out,
+bool FakeTargetCalc::get_surface_target( PatchData& pd,
+                                         size_t elem,
+                                         Sample sample,
+                                         MsqMatrix< 3, 2 >& W_out,
                                          MsqError& )
 {
     CPPUNIT_ASSERT_EQUAL( 2u, TopologyInfo::dimension( pd.element_by_index( elem ).get_element_type() ) );

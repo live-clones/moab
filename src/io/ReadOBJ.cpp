@@ -102,15 +102,21 @@ ReadOBJ::~ReadOBJ()
     delete myGeomTool;
 }
 
-ErrorCode ReadOBJ::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/, const FileOptions& /*opts*/,
-                                    std::vector< int >& /*tag_values_out*/, const SubsetList* /*subset_list*/ )
+ErrorCode ReadOBJ::read_tag_values( const char* /*file_name*/,
+                                    const char* /*tag_name*/,
+                                    const FileOptions& /*opts*/,
+                                    std::vector< int >& /*tag_values_out*/,
+                                    const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // Load the file as called by the Interface function
-ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const FileOptions&,
-                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
+ErrorCode ReadOBJ::load_file( const char* filename,
+                              const EntityHandle*,
+                              const FileOptions&,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* /*file_id_tag*/ )
 {
     ErrorCode rval;
     int ignored = 0;   // Number of lines not beginning with o, v, or f
@@ -123,7 +129,10 @@ ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const F
     int num_groups;
 
     // At this time, there is no support for reading a subset of the file
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for OBJ." ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for OBJ." );
+    }
 
     std::ifstream input_file( filename );  // Filestream for OBJ file
 
@@ -220,7 +229,10 @@ ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const F
                         rval = split_quad( tokens, vertex_list, new_faces_eh );MB_CHK_ERR( rval );
 
                         // Add new faces created by split quad to meshset
-                        if( rval == MB_SUCCESS ) { MBI->add_entities( curr_meshset, new_faces_eh ); }
+                        if( rval == MB_SUCCESS )
+                        {
+                            MBI->add_entities( curr_meshset, new_faces_eh );
+                        }
                     }
 
                     else
@@ -245,7 +257,10 @@ ErrorCode ReadOBJ::load_file( const char* filename, const EntityHandle*, const F
     }
 
     // If no object lines are read (those beginning w/ 'o'), file is not obj type
-    if( object_id == 0 && group_id == 0 ) { MB_SET_ERR( MB_FAILURE, "This is not an obj file. " ); }
+    if( object_id == 0 && group_id == 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "This is not an obj file. " );
+    }
 
     std::cout << "There were " << ignored << " ignored lines in this file." << std::endl;
 
@@ -440,7 +455,8 @@ ErrorCode ReadOBJ::create_new_vertex( std::vector< std::string > v_tokens, Entit
    a structure that has the three
    connectivity points as members.
  */
-ErrorCode ReadOBJ::create_new_face( std::vector< std::string > f_tokens, const std::vector< EntityHandle >& vertex_list,
+ErrorCode ReadOBJ::create_new_face( std::vector< std::string > f_tokens,
+                                    const std::vector< EntityHandle >& vertex_list,
                                     EntityHandle& face_eh )
 {
     face next_face;
@@ -468,7 +484,8 @@ ErrorCode ReadOBJ::create_new_face( std::vector< std::string > f_tokens, const s
 }
 
 // The split_quad function divides a quad face into 4 tri faces.
-ErrorCode ReadOBJ::split_quad( std::vector< std::string > f_tokens, std::vector< EntityHandle >& vertex_list,
+ErrorCode ReadOBJ::split_quad( std::vector< std::string > f_tokens,
+                               std::vector< EntityHandle >& vertex_list,
                                Range& face_eh )
 {
     ErrorCode rval;

@@ -61,8 +61,12 @@ std::string AWQualityMetric::get_name() const
     return targetMetric->get_name();
 }
 
-bool AWQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double& value, size_t* indices,
-                                         size_t& num_indices, MsqError& err )
+bool AWQualityMetric::evaluate_internal( PatchData& pd,
+                                         size_t p_handle,
+                                         double& value,
+                                         size_t* indices,
+                                         size_t& num_indices,
+                                         MsqError& err )
 {
     const Sample s        = ElemSampleQM::sample( p_handle );
     const size_t e        = ElemSampleQM::elem( p_handle );
@@ -115,8 +119,11 @@ bool AWQualityMetric::evaluate_internal( PatchData& pd, size_t p_handle, double&
     return rval;
 }
 
-bool AWQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, double& value,
-                                              std::vector< size_t >& indices, std::vector< Vector3D >& grad,
+bool AWQualityMetric::evaluate_with_gradient( PatchData& pd,
+                                              size_t p_handle,
+                                              double& value,
+                                              std::vector< size_t >& indices,
+                                              std::vector< Vector3D >& grad,
                                               MsqError& err )
 {
     const Sample s        = ElemSampleQM::sample( p_handle );
@@ -179,9 +186,13 @@ bool AWQualityMetric::evaluate_with_gradient( PatchData& pd, size_t p_handle, do
     return rval;
 }
 
-bool AWQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, double& value,
-                                             std::vector< size_t >& indices, std::vector< Vector3D >& grad,
-                                             std::vector< Matrix3D >& Hessian, MsqError& err )
+bool AWQualityMetric::evaluate_with_Hessian( PatchData& pd,
+                                             size_t p_handle,
+                                             double& value,
+                                             std::vector< size_t >& indices,
+                                             std::vector< Vector3D >& grad,
+                                             std::vector< Matrix3D >& Hessian,
+                                             MsqError& err )
 {
     const Sample s        = ElemSampleQM::sample( p_handle );
     const size_t e        = ElemSampleQM::elem( p_handle );
@@ -263,9 +274,13 @@ bool AWQualityMetric::evaluate_with_Hessian( PatchData& pd, size_t p_handle, dou
     return rval;
 }
 
-bool AWQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd, size_t p_handle, double& value,
-                                                      std::vector< size_t >& indices, std::vector< Vector3D >& grad,
-                                                      std::vector< SymMatrix3D >& diagonal, MsqError& err )
+bool AWQualityMetric::evaluate_with_Hessian_diagonal( PatchData& pd,
+                                                      size_t p_handle,
+                                                      double& value,
+                                                      std::vector< size_t >& indices,
+                                                      std::vector< Vector3D >& grad,
+                                                      std::vector< SymMatrix3D >& diagonal,
+                                                      MsqError& err )
 {
     const Sample s        = ElemSampleQM::sample( p_handle );
     const size_t e        = ElemSampleQM::elem( p_handle );

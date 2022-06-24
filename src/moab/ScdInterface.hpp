@@ -186,9 +186,15 @@ class MOAB_EXPORT ScdInterface
      * \param resolve_shared_ents If != -1, resolves shared entities up to and including dimension
      * equal to value
      */
-    ErrorCode construct_box( HomCoord low, HomCoord high, const double* const coords, unsigned int num_coords,
-                             ScdBox*& new_box, int* const lperiodic = NULL, ScdParData* const par_data = NULL,
-                             bool assign_global_ids = false, int resolve_shared_ents = -1 );
+    ErrorCode construct_box( HomCoord low,
+                             HomCoord high,
+                             const double* const coords,
+                             unsigned int num_coords,
+                             ScdBox*& new_box,
+                             int* const lperiodic       = NULL,
+                             ScdParData* const par_data = NULL,
+                             bool assign_global_ids     = false,
+                             int resolve_shared_ents    = -1 );
 
     //! Create a structured sequence of vertices, quads, or hexes
     /** Starting handle for the sequence is available from the returned ScdBox.
@@ -202,8 +208,12 @@ class MOAB_EXPORT ScdInterface
      * \param is_periodic[3] If is_periodic[s] is non-zero, mesh should be periodic in direction s
      * (s=[0,1,2])
      */
-    ErrorCode create_scd_sequence( const HomCoord& low, const HomCoord& high, EntityType type, int starting_id,
-                                   ScdBox*& new_box, int* is_periodic = NULL );
+    ErrorCode create_scd_sequence( const HomCoord& low,
+                                   const HomCoord& high,
+                                   EntityType type,
+                                   int starting_id,
+                                   ScdBox*& new_box,
+                                   int* is_periodic = NULL );
 
     //! Return all the structured mesh blocks in this MOAB instance, as ScdBox objects
     /** Return the structured blocks in this MOAB instance.  If these were not searched for
@@ -274,8 +284,12 @@ class MOAB_EXPORT ScdInterface
      * \param lperiodic Whether or not a given dimension is locally periodic
      * \param pdims Number of procs in i, j, k directions
      */
-    static ErrorCode compute_partition( int np, int nr, const ScdParData& par_data, int* ldims, int* lperiodic = NULL,
-                                        int* pdims = NULL );
+    static ErrorCode compute_partition( int np,
+                                        int nr,
+                                        const ScdParData& par_data,
+                                        int* ldims,
+                                        int* lperiodic = NULL,
+                                        int* pdims     = NULL );
 
     //! Get information about the neighbor in the dijk[] direction, where dijk can be -1 or 1 for
     //! all 3 params
@@ -289,8 +303,14 @@ class MOAB_EXPORT ScdInterface
      * across_bdy[i] is -1(1), interface with pto is across periodic lower(upper) bdy in parameter
      * i, 0 otherwise
      */
-    static ErrorCode get_neighbor( int np, int nr, const ScdParData& spd, const int* const dijk, int& pto, int* rdims,
-                                   int* facedims, int* across_bdy );
+    static ErrorCode get_neighbor( int np,
+                                   int nr,
+                                   const ScdParData& spd,
+                                   const int* const dijk,
+                                   int& pto,
+                                   int* rdims,
+                                   int* facedims,
+                                   int* across_bdy );
 
     //! Tag vertices with sharing data for parallel representations
     /** Given the ParallelComm object to use, tag the vertices shared with other processors
@@ -317,7 +337,9 @@ class MOAB_EXPORT ScdInterface
      * \param is_periodic[3] If is_periodic[s] is non-zero, mesh should be periodic in direction s
      * (s=[0,1,2])
      */
-    ErrorCode create_box_set( const HomCoord& low, const HomCoord& high, EntityHandle& scd_set,
+    ErrorCode create_box_set( const HomCoord& low,
+                              const HomCoord& high,
+                              EntityHandle& scd_set,
                               int* is_periodic = NULL );
 
     //! Compute a partition of structured parameter space
@@ -325,37 +347,62 @@ class MOAB_EXPORT ScdInterface
      * If j is greater than #procs, partition that, else k, else i.
      * For description of arguments, see ScdInterface::compute_partition.
      */
-    inline static ErrorCode compute_partition_alljorkori( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                          int* lijk, int* lperiodic, int* pijk );
+    inline static ErrorCode compute_partition_alljorkori( int np,
+                                                          int nr,
+                                                          const int gijk[6],
+                                                          const int* const gperiodic,
+                                                          int* lijk,
+                                                          int* lperiodic,
+                                                          int* pijk );
 
     //! Compute a partition of structured parameter space
     /** Partitions the structured parametric space by partitioning j, and possibly k,
      * seeking square regions of jk space
      * For description of arguments, see ScdInterface::compute_partition.
      */
-    inline static ErrorCode compute_partition_alljkbal( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                        int* lijk, int* lperiodic, int* pijk );
+    inline static ErrorCode compute_partition_alljkbal( int np,
+                                                        int nr,
+                                                        const int gijk[6],
+                                                        const int* const gperiodic,
+                                                        int* lijk,
+                                                        int* lperiodic,
+                                                        int* pijk );
 
     //! Compute a partition of structured parameter space
     /** Partitions the structured parametric space by seeking square ij partitions
      * For description of arguments, see ScdInterface::compute_partition.
      */
-    inline static ErrorCode compute_partition_sqij( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                    int* lijk, int* lperiodic, int* pijk );
+    inline static ErrorCode compute_partition_sqij( int np,
+                                                    int nr,
+                                                    const int gijk[6],
+                                                    const int* const gperiodic,
+                                                    int* lijk,
+                                                    int* lperiodic,
+                                                    int* pijk );
 
     //! Compute a partition of structured parameter space
     /** Partitions the structured parametric space by seeking square jk partitions
      * For description of arguments, see ScdInterface::compute_partition.
      */
-    inline static ErrorCode compute_partition_sqjk( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                    int* lijk, int* lperiodic, int* pijk );
+    inline static ErrorCode compute_partition_sqjk( int np,
+                                                    int nr,
+                                                    const int gijk[6],
+                                                    const int* const gperiodic,
+                                                    int* lijk,
+                                                    int* lperiodic,
+                                                    int* pijk );
 
     //! Compute a partition of structured parameter space
     /** Partitions the structured parametric space by seeking square ijk partitions
      * For description of arguments, see ScdInterface::compute_partition.
      */
-    inline static ErrorCode compute_partition_sqijk( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                     int* lijk, int* lperiodic, int* pijk );
+    inline static ErrorCode compute_partition_sqijk( int np,
+                                                     int nr,
+                                                     const int gijk[6],
+                                                     const int* const gperiodic,
+                                                     int* lijk,
+                                                     int* lperiodic,
+                                                     int* pijk );
 
     //! Get vertices shared with other processors
     /** Shared vertices returned as indices into each proc's handle space
@@ -364,28 +411,67 @@ class MOAB_EXPORT ScdInterface
      * \param offsets Offsets into indices list for each proc
      * \param shared_indices local/remote indices of shared vertices
      */
-    static ErrorCode get_shared_vertices( ParallelComm* pcomm, ScdBox* box, std::vector< int >& procs,
-                                          std::vector< int >& offsets, std::vector< int >& shared_indices );
+    static ErrorCode get_shared_vertices( ParallelComm* pcomm,
+                                          ScdBox* box,
+                                          std::vector< int >& procs,
+                                          std::vector< int >& offsets,
+                                          std::vector< int >& shared_indices );
 
-    static ErrorCode get_indices( const int* const ldims, const int* const rdims, const int* const across_bdy,
-                                  int* face_dims, std::vector< int >& shared_indices );
+    static ErrorCode get_indices( const int* const ldims,
+                                  const int* const rdims,
+                                  const int* const across_bdy,
+                                  int* face_dims,
+                                  std::vector< int >& shared_indices );
 
-    static ErrorCode get_neighbor_alljorkori( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                              const int* const dijk, int& pto, int* rdims, int* facedims,
+    static ErrorCode get_neighbor_alljorkori( int np,
+                                              int pfrom,
+                                              const int* const gdims,
+                                              const int* const gperiodic,
+                                              const int* const dijk,
+                                              int& pto,
+                                              int* rdims,
+                                              int* facedims,
                                               int* across_bdy );
 
-    static ErrorCode get_neighbor_alljkbal( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                            const int* const dijk, int& pto, int* rdims, int* facedims,
+    static ErrorCode get_neighbor_alljkbal( int np,
+                                            int pfrom,
+                                            const int* const gdims,
+                                            const int* const gperiodic,
+                                            const int* const dijk,
+                                            int& pto,
+                                            int* rdims,
+                                            int* facedims,
                                             int* across_bdy );
 
-    static ErrorCode get_neighbor_sqij( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                        const int* const dijk, int& pto, int* rdims, int* facedims, int* across_bdy );
+    static ErrorCode get_neighbor_sqij( int np,
+                                        int pfrom,
+                                        const int* const gdims,
+                                        const int* const gperiodic,
+                                        const int* const dijk,
+                                        int& pto,
+                                        int* rdims,
+                                        int* facedims,
+                                        int* across_bdy );
 
-    static ErrorCode get_neighbor_sqjk( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                        const int* const dijk, int& pto, int* rdims, int* facedims, int* across_bdy );
+    static ErrorCode get_neighbor_sqjk( int np,
+                                        int pfrom,
+                                        const int* const gdims,
+                                        const int* const gperiodic,
+                                        const int* const dijk,
+                                        int& pto,
+                                        int* rdims,
+                                        int* facedims,
+                                        int* across_bdy );
 
-    static ErrorCode get_neighbor_sqijk( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                         const int* const dijk, int& pto, int* rdims, int* facedims, int* across_bdy );
+    static ErrorCode get_neighbor_sqijk( int np,
+                                         int pfrom,
+                                         const int* const gdims,
+                                         const int* const gperiodic,
+                                         const int* const dijk,
+                                         int& pto,
+                                         int* rdims,
+                                         int* facedims,
+                                         int* across_bdy );
 
     static int gtol( const int* gijk, int i, int j, int k );
 
@@ -441,8 +527,15 @@ class MOAB_EXPORT ScdBox
      * \param bb_min Lower corner of rectangle referenced
      * \param bb_max Upper corner of rectangle referenced
      */
-    ErrorCode add_vbox( ScdBox* vbox, HomCoord from1, HomCoord to1, HomCoord from2, HomCoord to2, HomCoord from3,
-                        HomCoord to3, bool bb_input = false, const HomCoord& bb_min = HomCoord::getUnitv( 0 ),
+    ErrorCode add_vbox( ScdBox* vbox,
+                        HomCoord from1,
+                        HomCoord to1,
+                        HomCoord from2,
+                        HomCoord to2,
+                        HomCoord from3,
+                        HomCoord to3,
+                        bool bb_input          = false,
+                        const HomCoord& bb_min = HomCoord::getUnitv( 0 ),
                         const HomCoord& bb_max = HomCoord::getUnitv( 0 ) );
     // const HomCoord &bb_min = HomCoord::unitv[0],
     // const HomCoord &bb_max = HomCoord::unitv[0]);
@@ -575,7 +668,12 @@ class MOAB_EXPORT ScdBox
      * \param ent Entity returned from this function
      * \param create_if_missing If true, creates the entity if it doesn't already exist
      */
-    ErrorCode get_adj_edge_or_face( int dim, int i, int j, int k, int dir, EntityHandle& ent,
+    ErrorCode get_adj_edge_or_face( int dim,
+                                    int i,
+                                    int j,
+                                    int k,
+                                    int dir,
+                                    EntityHandle& ent,
                                     bool create_if_missing = true ) const;
 
     //! Return whether the box contains the parameters passed in
@@ -748,8 +846,12 @@ class MOAB_EXPORT ScdBox
     int boxSizeIM1;
 };
 
-inline ErrorCode ScdInterface::compute_partition( int np, int nr, const ScdParData& par_data, int* ldims,
-                                                  int* lperiodic, int* pdims )
+inline ErrorCode ScdInterface::compute_partition( int np,
+                                                  int nr,
+                                                  const ScdParData& par_data,
+                                                  int* ldims,
+                                                  int* lperiodic,
+                                                  int* pdims )
 {
     ErrorCode rval = MB_SUCCESS;
     switch( par_data.partMethod )
@@ -778,8 +880,12 @@ inline ErrorCode ScdInterface::compute_partition( int np, int nr, const ScdParDa
     return rval;
 }
 
-inline ErrorCode ScdInterface::compute_partition_alljorkori( int np, int nr, const int gijk[6],
-                                                             const int* const gperiodic, int* ldims, int* lperiodic,
+inline ErrorCode ScdInterface::compute_partition_alljorkori( int np,
+                                                             int nr,
+                                                             const int gijk[6],
+                                                             const int* const gperiodic,
+                                                             int* ldims,
+                                                             int* lperiodic,
                                                              int* pijk )
 {
     // partition *the elements* over the parametric space; 1d partition for now, in the j, k, or i
@@ -874,8 +980,12 @@ inline ErrorCode ScdInterface::compute_partition_alljorkori( int np, int nr, con
     return MB_SUCCESS;
 }
 
-inline ErrorCode ScdInterface::compute_partition_alljkbal( int np, int nr, const int gijk[6],
-                                                           const int* const gperiodic, int* ldims, int* lperiodic,
+inline ErrorCode ScdInterface::compute_partition_alljkbal( int np,
+                                                           int nr,
+                                                           const int gijk[6],
+                                                           const int* const gperiodic,
+                                                           int* ldims,
+                                                           int* lperiodic,
                                                            int* pijk )
 {
     int tmp_lp[3], tmp_pijk[3];
@@ -946,7 +1056,10 @@ inline ErrorCode ScdInterface::compute_partition_alljkbal( int np, int nr, const
         if( gperiodic[1] && np > 1 )
         {
             lperiodic[1] = 0;
-            if( nr / nk == nj - 1 ) { ldims[1]++; }
+            if( nr / nk == nj - 1 )
+            {
+                ldims[1]++;
+            }
         }
 
         pijk[0] = 1;
@@ -957,8 +1070,13 @@ inline ErrorCode ScdInterface::compute_partition_alljkbal( int np, int nr, const
     return MB_SUCCESS;
 }
 
-inline ErrorCode ScdInterface::compute_partition_sqij( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                       int* ldims, int* lperiodic, int* pijk )
+inline ErrorCode ScdInterface::compute_partition_sqij( int np,
+                                                       int nr,
+                                                       const int gijk[6],
+                                                       const int* const gperiodic,
+                                                       int* ldims,
+                                                       int* lperiodic,
+                                                       int* pijk )
 {
     int tmp_lp[3], tmp_pijk[3];
     if( !lperiodic ) lperiodic = tmp_lp;
@@ -999,7 +1117,10 @@ inline ErrorCode ScdInterface::compute_partition_sqij( int np, int nr, const int
 
         unsigned int ind                        = 0;
         std::vector< double >::iterator optimal = std::lower_bound( ppfactors.begin(), ppfactors.end(), ijratio );
-        if( optimal == ppfactors.end() ) { ind = ppfactors.size() - 1; }
+        if( optimal == ppfactors.end() )
+        {
+            ind = ppfactors.size() - 1;
+        }
         else
         {
             ind = optimal - ppfactors.begin();
@@ -1050,8 +1171,13 @@ inline ErrorCode ScdInterface::compute_partition_sqij( int np, int nr, const int
     return MB_SUCCESS;
 }
 
-inline ErrorCode ScdInterface::compute_partition_sqjk( int np, int nr, const int gijk[6], const int* const gperiodic,
-                                                       int* ldims, int* lperiodic, int* pijk )
+inline ErrorCode ScdInterface::compute_partition_sqjk( int np,
+                                                       int nr,
+                                                       const int gijk[6],
+                                                       const int* const gperiodic,
+                                                       int* ldims,
+                                                       int* lperiodic,
+                                                       int* pijk )
 {
     int tmp_lp[3], tmp_pijk[3];
     if( !lperiodic ) lperiodic = tmp_lp;
@@ -1132,8 +1258,12 @@ inline ErrorCode ScdInterface::compute_partition_sqjk( int np, int nr, const int
     return MB_SUCCESS;
 }
 
-inline ErrorCode ScdInterface::compute_partition_sqijk( int np, int nr, const int* const gijk,
-                                                        const int* const gperiodic, int* ldims, int* lperiodic,
+inline ErrorCode ScdInterface::compute_partition_sqijk( int np,
+                                                        int nr,
+                                                        const int* const gijk,
+                                                        const int* const gperiodic,
+                                                        int* ldims,
+                                                        int* lperiodic,
                                                         int* pijk )
 {
     if( gperiodic[0] || gperiodic[1] || gperiodic[2] ) return MB_FAILURE;
@@ -1238,8 +1368,11 @@ inline int ScdInterface::gtol( const int* gijk, int i, int j, int k )
              ( j - gijk[1] ) * ( gijk[3] - gijk[0] + 1 ) + i - gijk[0] );
 }
 
-inline ErrorCode ScdInterface::get_indices( const int* const ldims, const int* const rdims, const int* const across_bdy,
-                                            int* face_dims, std::vector< int >& shared_indices )
+inline ErrorCode ScdInterface::get_indices( const int* const ldims,
+                                            const int* const rdims,
+                                            const int* const across_bdy,
+                                            int* face_dims,
+                                            std::vector< int >& shared_indices )
 {
     // check for going across periodic bdy and face_dims not in my ldims (I'll always be on top in
     // that case)...
@@ -1274,8 +1407,14 @@ inline ErrorCode ScdInterface::get_indices( const int* const ldims, const int* c
     return MB_SUCCESS;
 }
 
-inline ErrorCode ScdInterface::get_neighbor( int np, int pfrom, const ScdParData& spd, const int* const dijk, int& pto,
-                                             int* rdims, int* facedims, int* across_bdy )
+inline ErrorCode ScdInterface::get_neighbor( int np,
+                                             int pfrom,
+                                             const ScdParData& spd,
+                                             const int* const dijk,
+                                             int& pto,
+                                             int* rdims,
+                                             int* facedims,
+                                             int* across_bdy )
 {
     if( !dijk[0] && !dijk[1] && !dijk[2] )
     {

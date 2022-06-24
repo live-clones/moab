@@ -73,13 +73,19 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
     virtual bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
     MESQUITE_EXPORT
-    virtual bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                         std::vector< Vector3D >& grad_out, MsqError& err );
+    virtual bool evaluate_with_gradient( EvalType type,
+                                         PatchData& pd,
+                                         double& value_out,
+                                         std::vector< Vector3D >& grad_out,
+                                         MsqError& err );
 
     MESQUITE_EXPORT
-    virtual bool evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+    virtual bool evaluate_with_Hessian_diagonal( EvalType type,
+                                                 PatchData& pd,
+                                                 double& value_out,
                                                  std::vector< Vector3D >& grad_out,
-                                                 std::vector< SymMatrix3D >& hess_diag_out, MsqError& err );
+                                                 std::vector< SymMatrix3D >& hess_diag_out,
+                                                 MsqError& err );
 
     MESQUITE_EXPORT
     virtual ObjectiveFunction* clone() const;
@@ -103,7 +109,12 @@ class VarianceTemplate : public ObjectiveFunctionTemplate
      *\param result_sum The sum term of the variance
      *\param result_sqr The sum of squares term of the variance
      */
-    void accumulate( double sum, double sqr_sum, size_t count, EvalType type, double& result_sum, double& result_sqr,
+    void accumulate( double sum,
+                     double sqr_sum,
+                     size_t count,
+                     EvalType type,
+                     double& result_sum,
+                     double& result_sqr,
                      size_t& global_count );
 
     size_t mCount;     /**< The number of accumulated entires */

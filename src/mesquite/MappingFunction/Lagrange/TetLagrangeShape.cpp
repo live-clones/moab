@@ -49,7 +49,10 @@ int TetLagrangeShape::num_nodes() const
 
 NodeSet TetLagrangeShape::sample_points( NodeSet ns ) const
 {
-    if( ns.have_any_mid_node() ) { ns.set_all_corner_nodes( TETRAHEDRON ); }
+    if( ns.have_any_mid_node() )
+    {
+        ns.set_all_corner_nodes( TETRAHEDRON );
+    }
     else
     {
         ns.clear();
@@ -65,7 +68,10 @@ static void coefficients_at_corner( unsigned corner, double* coeff_out, size_t* 
     coeff_out[0]   = 1.0;
 }
 
-static void coefficients_at_mid_edge( unsigned edge, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+static void coefficients_at_mid_edge( unsigned edge,
+                                      NodeSet nodeset,
+                                      double* coeff_out,
+                                      size_t* indices_out,
                                       size_t& num_coeff )
 {
     if( nodeset.mid_edge_node( edge ) )
@@ -91,7 +97,10 @@ static void coefficients_at_mid_edge( unsigned edge, NodeSet nodeset, double* co
     }
 }
 
-static void coefficients_at_mid_face( unsigned face, NodeSet nodeset, double* coeff_out, size_t* indices_out,
+static void coefficients_at_mid_face( unsigned face,
+                                      NodeSet nodeset,
+                                      double* coeff_out,
+                                      size_t* indices_out,
                                       size_t& num_coeff )
 {
     const double one_ninth  = 1.0 / 9.0;
@@ -267,8 +276,12 @@ static void coefficients_at_mid_elem( NodeSet nodeset, double* coeff_out, size_t
     }
 }
 
-void TetLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                                     size_t& num_coeff, MsqError& err ) const
+void TetLagrangeShape::coefficients( Sample loc,
+                                     NodeSet nodeset,
+                                     double* coeff_out,
+                                     size_t* indices_out,
+                                     size_t& num_coeff,
+                                     MsqError& err ) const
 {
     if( nodeset.have_any_mid_face_node() | nodeset.have_any_mid_region_node() )
     {
@@ -321,7 +334,10 @@ static void get_linear_derivatives( size_t* vertices, MsqVector< 3 >* derivs )
 
 static const unsigned edges[][2] = { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 0, 3 }, { 1, 3 }, { 2, 3 } };
 
-static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* derivs,
+static void derivatives_at_corner( unsigned corner,
+                                   NodeSet nodeset,
+                                   size_t* vertices,
+                                   MsqVector< 3 >* derivs,
                                    size_t& num_vtx )
 {
     // begin with derivatives for linear tetrahedron
@@ -478,7 +494,10 @@ static void derivatives_at_corner( unsigned corner, NodeSet nodeset, size_t* ver
     }
 }
 
-static void derivatives_at_mid_edge( unsigned edge, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* derivs,
+static void derivatives_at_mid_edge( unsigned edge,
+                                     NodeSet nodeset,
+                                     size_t* vertices,
+                                     MsqVector< 3 >* derivs,
                                      size_t& num_vtx )
 {
     int sign;
@@ -1022,7 +1041,10 @@ const double ho_ds[6][4] = { { -ft, -ft, 0., -ft }, { ft, ft, 0., ft }, { ft, -f
 const double ho_dt[6][4] = { { -ft, -ft, 0., -ft }, { 0., 0., 0., 0. }, { 0., -ft, -ft, -ft },
                              { 0., -ft, 0., ft },   { ft, ft, 0., ft }, { 0., ft, ft, ft } };
 
-static void derivatives_at_mid_face( unsigned face, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* derivs,
+static void derivatives_at_mid_face( unsigned face,
+                                     NodeSet nodeset,
+                                     size_t* vertices,
+                                     MsqVector< 3 >* derivs,
                                      size_t& num_vtx )
 {
     // begin with derivatives for linear tetrahedron
@@ -1099,8 +1121,12 @@ static void derivatives_at_mid_elem( NodeSet nodeset, size_t* vertices, MsqVecto
         }
 }
 
-void TetLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertex_indices_out,
-                                    MsqVector< 3 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const
+void TetLagrangeShape::derivatives( Sample loc,
+                                    NodeSet nodeset,
+                                    size_t* vertex_indices_out,
+                                    MsqVector< 3 >* d_coeff_d_xi_out,
+                                    size_t& num_vtx,
+                                    MsqError& err ) const
 {
     if( !nodeset.have_any_mid_node() )
     {

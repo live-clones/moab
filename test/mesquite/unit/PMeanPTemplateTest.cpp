@@ -406,7 +406,10 @@ class DistTestMetric : public VertexQM
         return 1;
     }
     bool evaluate( PatchData& pd, size_t vtx_idx, double& value, MsqError& err );
-    bool evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t vtx_idx,
+                                double& value,
+                                vector< size_t >& indices,
                                 MsqError& err );
     // bool evaluate_with_gradient( PatchData& pd, size_t vtx_idx, double &value, vector<size_t>&
     // indices, vector<Vector3D>& grad, MsqError& err );
@@ -427,7 +430,10 @@ bool DistTestMetric::evaluate( PatchData& pd, size_t vtx_idx, double& value, Msq
     return !falseEval;
 }
 
-bool DistTestMetric::evaluate_with_indices( PatchData& pd, size_t vtx_idx, double& value, vector< size_t >& indices,
+bool DistTestMetric::evaluate_with_indices( PatchData& pd,
+                                            size_t vtx_idx,
+                                            double& value,
+                                            vector< size_t >& indices,
                                             MsqError& err )
 {
     if( failEval )
@@ -544,7 +550,10 @@ void PMeanPTemplateTest::test_Hessian( double power )
     if( !grad.empty() ) check_result( mPatch, power, value, arrptr( grad ), arrptr( Hessians ) );
 }
 
-void PMeanPTemplateTest::check_result( PatchData& pd, double power, double value, Vector3D* gradient,
+void PMeanPTemplateTest::check_result( PatchData& pd,
+                                       double power,
+                                       double value,
+                                       Vector3D* gradient,
                                        Matrix3D* Hessian )
 {
     MsqPrintError err( cout );

@@ -51,7 +51,10 @@ bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity
     const EntityHandle* conn;
     int num_nodes;
     Interface* imesh = this->tag_manager->get_input_mesh();
-    if( imesh->get_connectivity( entity, conn, num_nodes ) != MB_SUCCESS ) { return false; }
+    if( imesh->get_connectivity( entity, conn, num_nodes ) != MB_SUCCESS )
+    {
+        return false;
+    }
     this->corner_coords.resize( 6 * num_nodes );
     this->corner_tags.resize( num_nodes );
     this->corner_handles.resize( num_nodes );
@@ -62,7 +65,10 @@ bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity
     void* tag_data;
     for( int n = 0; n < num_nodes; ++n )
     {
-        if( imesh->get_coords( &conn[n], 1, &corner_coords[6 * n + 3] ) != MB_SUCCESS ) { return false; }
+        if( imesh->get_coords( &conn[n], 1, &corner_coords[6 * n + 3] ) != MB_SUCCESS )
+        {
+            return false;
+        }
         tag_data = this->heap_tag_storage();
         for( int i = 0; i < this->tag_manager->get_number_of_vertex_tags(); ++i )
         {
@@ -72,7 +78,10 @@ bool SimplexTemplateRefiner::refine_entity( EntityType etyp, EntityHandle entity
                 return false;
             }
         }
-        if( this->input_is_output ) { this->corner_handles[n] = conn[n]; }
+        if( this->input_is_output )
+        {
+            this->corner_handles[n] = conn[n];
+        }
         else
         {
             this->corner_handles[n] = this->output_functor->map_vertex( conn[n], &corner_coords[6 * n], tag_data );
@@ -209,8 +218,13 @@ void SimplexTemplateRefiner::refine_0_simplex( const double* v0, const void* t0,
 
 /**\brief Refine an edge.
  */
-bool SimplexTemplateRefiner::refine_1_simplex( int max_depth, const double* v0, const void* t0, EntityHandle h0,
-                                               const double* v1, const void* t1, EntityHandle h1 )
+bool SimplexTemplateRefiner::refine_1_simplex( int max_depth,
+                                               const double* v0,
+                                               const void* t0,
+                                               EntityHandle h0,
+                                               const double* v1,
+                                               const void* t1,
+                                               EntityHandle h1 )
 {
     int edge_code = 0;
 
@@ -259,9 +273,17 @@ bool SimplexTemplateRefiner::refine_1_simplex( int max_depth, const double* v0, 
 
 /**\brief Refine a triangle.
  */
-bool SimplexTemplateRefiner::refine_2_simplex( int max_depth, int move, const double* v0, const void* t0,
-                                               EntityHandle h0, const double* v1, const void* t1, EntityHandle h1,
-                                               const double* v2, const void* t2, EntityHandle h2 )
+bool SimplexTemplateRefiner::refine_2_simplex( int max_depth,
+                                               int move,
+                                               const double* v0,
+                                               const void* t0,
+                                               EntityHandle h0,
+                                               const double* v1,
+                                               const void* t1,
+                                               EntityHandle h1,
+                                               const double* v2,
+                                               const void* t2,
+                                               EntityHandle h2 )
 {
     int edge_code = 0;
 
@@ -405,9 +427,19 @@ bool SimplexTemplateRefiner::refine_2_simplex( int max_depth, int move, const do
 
 /**\brief Refine a tetrahedron.
  */
-bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* t0, EntityHandle h0, double* v1,
-                                               void* t1, EntityHandle h1, double* v2, void* t2, EntityHandle h2,
-                                               double* v3, void* t3, EntityHandle h3 )
+bool SimplexTemplateRefiner::refine_3_simplex( int max_depth,
+                                               double* v0,
+                                               void* t0,
+                                               EntityHandle h0,
+                                               double* v1,
+                                               void* t1,
+                                               EntityHandle h1,
+                                               double* v2,
+                                               void* t2,
+                                               EntityHandle h2,
+                                               double* v3,
+                                               void* t3,
+                                               EntityHandle h3 )
 {
     int edge_code = 0;
 
@@ -1551,7 +1583,10 @@ bool SimplexTemplateRefiner::refine_3_simplex( int max_depth, double* v0, void* 
     int* perm;
     int sgn;
 #ifdef MB_DEBUG_TESSELLATOR
-    if( output_tets.empty() ) { cout << "Argh! Case " << C << " Perm " << P << " has no output!" << endl; }
+    if( output_tets.empty() )
+    {
+        cout << "Argh! Case " << C << " Perm " << P << " has no output!" << endl;
+    }
 #endif  // MB_DEBUG_TESSELLATOR
     while( !output_tets.empty() )
     {
@@ -1613,7 +1648,9 @@ void SimplexTemplateRefiner::assign_parametric_coordinates( int num_nodes, const
  * We use this to test which triangulation has the best
  * aspect ratio when there are 2 to choose from.
  */
-bool SimplexTemplateRefiner::compare_Hopf_cross_string_dist( const double* a0, const double* a1, const double* b0,
+bool SimplexTemplateRefiner::compare_Hopf_cross_string_dist( const double* a0,
+                                                             const double* a1,
+                                                             const double* b0,
                                                              const double* b1 )
 {
     double sq_mag_a = 0.;
@@ -1787,8 +1824,7 @@ int SimplexTemplateRefiner::permutations_from_index[24][14] = {
 
     { 2, 0, 3, 1, 6, 7, 9, 5, 4, 8, 13, 10, 11, 12 }, /* Face 2-3-0 */
     { 0, 3, 2, 1, 7, 9, 6, 4, 8, 5, 13, 11, 12, 10 },
-    { 3, 2, 0, 1, 9, 6, 7, 8, 5, 4, 13, 12, 10, 11 }
-};
+    { 3, 2, 0, 1, 9, 6, 7, 8, 5, 4, 13, 12, 10, 11 } };
 
 /*
  * Below is a list of output tetrahedra. The array is

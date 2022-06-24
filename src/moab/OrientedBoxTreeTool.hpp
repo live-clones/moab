@@ -224,7 +224,9 @@ class OrientedBoxTreeTool
       public:
         /* provide a default behavior that will simply add the intersection data to the relevent
            lists with no logic or discrimination */
-        virtual ErrorCode register_intersection( EntityHandle set, EntityHandle tri, double dist,
+        virtual ErrorCode register_intersection( EntityHandle set,
+                                                 EntityHandle tri,
+                                                 double dist,
                                                  IntersectSearchWindow& /* search_win */,
                                                  GeomUtil::intersection_type /* int_type */ )
         {
@@ -274,10 +276,14 @@ class OrientedBoxTreeTool
      *\param unit_ray_dir  The ray direction vector (must be unit length)
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
-    ErrorCode ray_intersect_triangles( std::vector< double >& distances_out, std::vector< EntityHandle >& facets_out,
-                                       EntityHandle root_set, double tolerance, const double ray_point[3],
-                                       const double unit_ray_dir[3], const double* ray_length = 0,
-                                       TrvStats* accum = 0 );
+    ErrorCode ray_intersect_triangles( std::vector< double >& distances_out,
+                                       std::vector< EntityHandle >& facets_out,
+                                       EntityHandle root_set,
+                                       double tolerance,
+                                       const double ray_point[3],
+                                       const double unit_ray_dir[3],
+                                       const double* ray_length = 0,
+                                       TrvStats* accum          = 0 );
 
     /**\brief Intersect ray with tree
      *
@@ -289,8 +295,13 @@ class OrientedBoxTreeTool
      *\param unit_ray_dir  The ray direction vector (must be unit length)
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
-    ErrorCode ray_intersect_boxes( Range& boxes_out, EntityHandle root_set, double tolerance, const double ray_point[3],
-                                   const double unit_ray_dir[3], const double* ray_length = 0, TrvStats* accum = 0 );
+    ErrorCode ray_intersect_boxes( Range& boxes_out,
+                                   EntityHandle root_set,
+                                   double tolerance,
+                                   const double ray_point[3],
+                                   const double unit_ray_dir[3],
+                                   const double* ray_length = 0,
+                                   TrvStats* accum          = 0 );
 
     /**\brief Intersect ray with triangles contained in passed MBENTITYSETs
      *
@@ -299,9 +310,12 @@ class OrientedBoxTreeTool
      */
     ErrorCode ray_intersect_triangles( std::vector< double >& intersection_distances_out,
                                        std::vector< EntityHandle >& intersection_facets_out,
-                                       const Range& leaf_boxes_containing_tris, double tolerance,
-                                       const double ray_point[3], const double unit_ray_dir[3],
-                                       const double* ray_length = 0, unsigned int* raytri_test_count = 0 );
+                                       const Range& leaf_boxes_containing_tris,
+                                       double tolerance,
+                                       const double ray_point[3],
+                                       const double unit_ray_dir[3],
+                                       const double* ray_length        = 0,
+                                       unsigned int* raytri_test_count = 0 );
 
     /**\brief Intersect a ray with the triangles contained within the tree
      *
@@ -324,24 +338,38 @@ class OrientedBoxTreeTool
      *\param accum         Optional class for tree traversal statistics.
      */
 
-    ErrorCode ray_intersect_sets( std::vector< double >& distances_out, std::vector< EntityHandle >& sets_out,
-                                  std::vector< EntityHandle >& facets_out, EntityHandle root_set, double tolerance,
-                                  const double ray_point[3], const double unit_ray_dir[3],
-                                  IntersectSearchWindow& search_win, IntRegCtxt& register_intersection,
+    ErrorCode ray_intersect_sets( std::vector< double >& distances_out,
+                                  std::vector< EntityHandle >& sets_out,
+                                  std::vector< EntityHandle >& facets_out,
+                                  EntityHandle root_set,
+                                  double tolerance,
+                                  const double ray_point[3],
+                                  const double unit_ray_dir[3],
+                                  IntersectSearchWindow& search_win,
+                                  IntRegCtxt& register_intersection,
                                   TrvStats* accum = 0 );
 
     /*\brief Version that doesn't require a search window or an intersection registration context
      *
      *
      */
-    ErrorCode ray_intersect_sets( std::vector< double >& distances_out, std::vector< EntityHandle >& sets_out,
-                                  std::vector< EntityHandle >& facets_out, EntityHandle root_set, double tolerance,
-                                  const double ray_point[3], const double unit_ray_dir[3], const double* ray_length = 0,
-                                  TrvStats* accum = 0 );
+    ErrorCode ray_intersect_sets( std::vector< double >& distances_out,
+                                  std::vector< EntityHandle >& sets_out,
+                                  std::vector< EntityHandle >& facets_out,
+                                  EntityHandle root_set,
+                                  double tolerance,
+                                  const double ray_point[3],
+                                  const double unit_ray_dir[3],
+                                  const double* ray_length = 0,
+                                  TrvStats* accum          = 0 );
 
-    ErrorCode ray_intersect_sets( EntityHandle root_set, double tolerance, const double ray_point[3],
-                                  const double unit_ray_dir[3], IntersectSearchWindow& search_win,
-                                  IntRegCtxt& register_intersection, TrvStats* accum = 0 );
+    ErrorCode ray_intersect_sets( EntityHandle root_set,
+                                  double tolerance,
+                                  const double ray_point[3],
+                                  const double unit_ray_dir[3],
+                                  IntersectSearchWindow& search_win,
+                                  IntRegCtxt& register_intersection,
+                                  TrvStats* accum = 0 );
 
     /**\brief Find closest surface, facet in surface, and location on facet
      *
@@ -352,8 +380,12 @@ class OrientedBoxTreeTool
      *\param set_out Set containing closest facet.  0 if tree was not
      *               constructed using 'set_build'
      */
-    ErrorCode closest_to_location( const double* point, EntityHandle tree_root, double* point_out,
-                                   EntityHandle& facet_out, EntityHandle* set_out = 0, TrvStats* accum = 0 );
+    ErrorCode closest_to_location( const double* point,
+                                   EntityHandle tree_root,
+                                   double* point_out,
+                                   EntityHandle& facet_out,
+                                   EntityHandle* set_out = 0,
+                                   TrvStats* accum       = 0 );
 
     /**\brief Find closest facet(s) to input position.
      *
@@ -362,9 +394,12 @@ class OrientedBoxTreeTool
      *\param facets_out Closest 2D elements to input position are appended to this list
      *\param sets_out If non-null, sets owning facets are appended to this list.
      */
-    ErrorCode closest_to_location( const double* point, EntityHandle tree_root, double tolerance,
-                                   std::vector< EntityHandle >& facets_out, std::vector< EntityHandle >* sets_out = 0,
-                                   TrvStats* accum = 0 );
+    ErrorCode closest_to_location( const double* point,
+                                   EntityHandle tree_root,
+                                   double tolerance,
+                                   std::vector< EntityHandle >& facets_out,
+                                   std::vector< EntityHandle >* sets_out = 0,
+                                   TrvStats* accum                       = 0 );
 
     /**\brief Find facets intersected by a sphere
      *
@@ -377,12 +412,19 @@ class OrientedBoxTreeTool
      *                  list in an order corresponding to the entries in
      *                  facets_out.
      */
-    ErrorCode sphere_intersect_triangles( const double* center, double radius, EntityHandle tree_root,
+    ErrorCode sphere_intersect_triangles( const double* center,
+                                          double radius,
+                                          EntityHandle tree_root,
                                           std::vector< EntityHandle >& facets_out,
-                                          std::vector< EntityHandle >* sets_out = 0, TrvStats* accum = 0 );
+                                          std::vector< EntityHandle >* sets_out = 0,
+                                          TrvStats* accum                       = 0 );
 
-    ErrorCode get_close_tris( CartVect int_pt, double tol, const EntityHandle* rootSet, const EntityHandle* geomVol,
-                              const Tag* senseTag, std::vector< EntityHandle >& close_tris,
+    ErrorCode get_close_tris( CartVect int_pt,
+                              double tol,
+                              const EntityHandle* rootSet,
+                              const EntityHandle* geomVol,
+                              const Tag* senseTag,
+                              std::vector< EntityHandle >& close_tris,
                               std::vector< int >& close_senses );
 
     /**\brief Get oriented box at node in tree
@@ -409,7 +451,9 @@ class OrientedBoxTreeTool
      *                      integer tag containing an ID for the entities.
      *                      Not used if list_contents is false.
      */
-    void print( EntityHandle tree_root_set, std::ostream& stream, bool list_contents = false,
+    void print( EntityHandle tree_root_set,
+                std::ostream& stream,
+                bool list_contents      = false,
                 const char* id_tag_name = 0 );
 
     /**\brief Print tree statistics
@@ -430,8 +474,14 @@ class OrientedBoxTreeTool
      * \param node_count Number of nodes in tree
      * \param num_leaves Number of leaf nodes in tree
      */
-    ErrorCode stats( EntityHandle set, unsigned& entities_in_tree, double& root_volume, double& tot_node_volume,
-                     double& tot_to_root_volume, unsigned& tree_height, unsigned& node_count, unsigned& num_leaves );
+    ErrorCode stats( EntityHandle set,
+                     unsigned& entities_in_tree,
+                     double& root_volume,
+                     double& tot_node_volume,
+                     double& tot_to_root_volume,
+                     unsigned& tree_height,
+                     unsigned& node_count,
+                     unsigned& num_leaves );
 
     /** \brief Implement this and pass instance to preorder_traverse
      *
@@ -494,8 +544,13 @@ class OrientedBoxTreeTool
 
     ErrorCode build_sets( std::list< SetData >& sets, EntityHandle& node_set, int depth, const Settings& settings );
 
-    ErrorCode recursive_stats( OrientedBoxTreeTool* tool, Interface* instance, EntityHandle set, int depth,
-                               StatData& data, unsigned& count_out, CartVect& dimensions_out );
+    ErrorCode recursive_stats( OrientedBoxTreeTool* tool,
+                               Interface* instance,
+                               EntityHandle set,
+                               int depth,
+                               StatData& data,
+                               unsigned& count_out,
+                               CartVect& dimensions_out );
 
     Interface* instance;
     Tag tagHandle;

@@ -74,7 +74,10 @@ ErrorCode TagInfo::validate_lengths( Error* /* error_handler */, const int* leng
     int bits = 0;
     if( variable_length() )
     {
-        if( !lengths ) { MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag" ); }
+        if( !lengths )
+        {
+            MB_SET_ERR( MB_VARIABLE_DATA_LENGTH, "No size specified for variable-length tag" );
+        }
         const unsigned type_size = size_from_data_type( get_data_type() );
         if( type_size == 1 ) return MB_SUCCESS;
         for( size_t i = 0; i < num_lengths; ++i )

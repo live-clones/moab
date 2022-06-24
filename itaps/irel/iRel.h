@@ -102,8 +102,8 @@
                                                                                *disabled.
                                                                                ******************************************************************************/
 #define IREL_CREATE_NAME__( A, B, C ) A##_##B##_##C
-#define IREL_CREATE_NAME_( A, B, C ) IREL_CREATE_NAME__( A, B, C )
-#define IREL_CREATE_NAME( A ) IREL_CREATE_NAME_( A, IREL_VERSION_MAJOR, IREL_VERSION_MINOR )
+#define IREL_CREATE_NAME_( A, B, C )  IREL_CREATE_NAME__( A, B, C )
+#define IREL_CREATE_NAME( A )         IREL_CREATE_NAME_( A, IREL_VERSION_MAJOR, IREL_VERSION_MINOR )
 /*
 #undef  iRel_create
 #define iRel_create IREL_CREATE_NAME(iRel_create)
@@ -116,7 +116,7 @@
 extern "C" {
 #endif
 
-typedef void*                           iRel_Instance;
+typedef void* iRel_Instance;
 typedef struct iRel_PairHandle_Private* iRel_PairHandle;
 
 /***************************************************************************/ /**

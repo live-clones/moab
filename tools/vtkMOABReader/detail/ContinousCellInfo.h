@@ -1,18 +1,20 @@
 #ifndef __smoab_detail_ContinousCellInfo_h
 #define __smoab_detail_ContinousCellInfo_h
 
-
-namespace smoab { namespace detail {
-
-struct ContinousCellInfo
+namespace smoab
 {
-  int type;
-  int numVerts;
-  int numUnusedVerts;
-  int numCells;
+namespace detail
+{
 
-};
+    struct ContinousCellInfo
+    {
+        int type;
+        int numVerts;
+        int numUnusedVerts;
+        int numCells;
+    };
 
-} } //namespace smoab::detail
+}  // namespace detail
+}  // namespace smoab
 
 #endif

@@ -90,9 +90,13 @@ void WriteTemplate::reset_matset( std::vector< WriteTemplate::MaterialSetData >&
 
 ErrorCode WriteTemplate::write_file( const char* file_name,
                                      const bool /* overwrite (commented out to remove warning) */,
-                                     const FileOptions& /*opts*/, const EntityHandle* ent_handles, const int num_sets,
-                                     const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
-                                     int /* num_tags */, int /* export_dimension */ )
+                                     const FileOptions& /*opts*/,
+                                     const EntityHandle* ent_handles,
+                                     const int num_sets,
+                                     const std::vector< std::string >& /* qa_list */,
+                                     const Tag* /* tag_list */,
+                                     int /* num_tags */,
+                                     int /* export_dimension */ )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 
@@ -577,7 +581,10 @@ ErrorCode WriteTemplate::initialize_file( MeshInfo& mesh_info )
 ErrorCode WriteTemplate::open_file( const char* filename )
 {
     // Not a valid filename
-    if( strlen( (const char*)filename ) == 0 ) { MB_SET_ERR( MB_FAILURE, "Output filename not specified" ); }
+    if( strlen( (const char*)filename ) == 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Output filename not specified" );
+    }
 
     /* Template - open file & store somewhere */
 
@@ -590,7 +597,9 @@ ErrorCode WriteTemplate::open_file( const char* filename )
     return MB_SUCCESS;
 }
 
-ErrorCode WriteTemplate::get_neuset_elems( EntityHandle neuset, int current_sense, Range& forward_elems,
+ErrorCode WriteTemplate::get_neuset_elems( EntityHandle neuset,
+                                           int current_sense,
+                                           Range& forward_elems,
                                            Range& reverse_elems )
 {
     Range neuset_elems, neuset_meshsets;

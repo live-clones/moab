@@ -57,8 +57,10 @@ bool ReadSTL::Point::operator<( const ReadSTL::Point& other ) const
     return 0 > memcmp( this, &other, sizeof( ReadSTL::Point ) );
 }
 
-ErrorCode ReadSTL::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadSTL::read_tag_values( const char* /* file_name */,
+                                    const char* /* tag_name */,
+                                    const FileOptions& /* opts */,
+                                    std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
@@ -67,10 +69,16 @@ ErrorCode ReadSTL::read_tag_values( const char* /* file_name */, const char* /* 
 // Generic load function for both ASCII and binary. Calls
 // pure-virtual function implemented in subclasses to read
 // the data from the file.
-ErrorCode ReadSTL::load_file( const char* filename, const EntityHandle* /* file_set */, const FileOptions& opts,
-                              const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadSTL::load_file( const char* filename,
+                              const EntityHandle* /* file_set */,
+                              const FileOptions& opts,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* file_id_tag )
 {
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for STL" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for STL" );
+    }
 
     ErrorCode result;
 
@@ -79,12 +87,18 @@ ErrorCode ReadSTL::load_file( const char* filename, const EntityHandle* /* file_
     bool is_ascii = false, is_binary = false;
     if( MB_SUCCESS == opts.get_null_option( "ASCII" ) ) is_ascii = true;
     if( MB_SUCCESS == opts.get_null_option( "BINARY" ) ) is_binary = true;
-    if( is_ascii && is_binary ) { MB_SET_ERR( MB_FAILURE, "Conflicting options: BINARY ASCII" ); }
+    if( is_ascii && is_binary )
+    {
+        MB_SET_ERR( MB_FAILURE, "Conflicting options: BINARY ASCII" );
+    }
 
     bool big_endian = false, little_endian = false;
     if( MB_SUCCESS == opts.get_null_option( "BIG_ENDIAN" ) ) big_endian = true;
     if( MB_SUCCESS == opts.get_null_option( "LITTLE_ENDIAN" ) ) little_endian = true;
-    if( big_endian && little_endian ) { MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" ); }
+    if( big_endian && little_endian )
+    {
+        MB_SET_ERR( MB_FAILURE, "Conflicting options: BIG_ENDIAN LITTLE_ENDIAN" );
+    }
     ByteOrder byte_order = big_endian ? STL_BIG_ENDIAN : little_endian ? STL_LITTLE_ENDIAN : STL_UNKNOWN_BYTE_ORDER;
 
     if( is_ascii )
@@ -170,7 +184,10 @@ ErrorCode ReadSTL::load_file( const char* filename, const EntityHandle* /* file_
 ErrorCode ReadSTL::ascii_read_triangles( const char* name, std::vector< ReadSTL::Triangle >& tris )
 {
     FILE* file = fopen( name, "r" );
-    if( !file ) { return MB_FILE_DOES_NOT_EXIST; }
+    if( !file )
+    {
+        return MB_FILE_DOES_NOT_EXIST;
+    }
 
     char header[81];
     if( !fgets( header, sizeof( header ), file ) ||  // Read header line
@@ -245,11 +262,15 @@ struct BinaryTri
 };
 
 // Read a binary STL file
-ErrorCode ReadSTL::binary_read_triangles( const char* name, ReadSTL::ByteOrder byte_order,
+ErrorCode ReadSTL::binary_read_triangles( const char* name,
+                                          ReadSTL::ByteOrder byte_order,
                                           std::vector< ReadSTL::Triangle >& tris )
 {
     FILE* file = fopen( name, "rb" );
-    if( !file ) { return MB_FILE_DOES_NOT_EXIST; }
+    if( !file )
+    {
+        return MB_FILE_DOES_NOT_EXIST;
+    }
 
     // Read header block
     BinaryHeader header;

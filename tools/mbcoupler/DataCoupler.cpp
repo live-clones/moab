@@ -19,7 +19,11 @@
 namespace moab
 {
 
-DataCoupler::DataCoupler( Interface* impl, Range& source_ents, int coupler_id, ParallelComm* pc, bool init_locator,
+DataCoupler::DataCoupler( Interface* impl,
+                          Range& source_ents,
+                          int coupler_id,
+                          ParallelComm* pc,
+                          bool init_locator,
                           int dim )
     : mbImpl( impl ), myPcomm( pc ), myId( coupler_id ), myDim( dim )
 {
@@ -59,7 +63,9 @@ DataCoupler::~DataCoupler()
     delete myLocator;
 }
 
-ErrorCode DataCoupler::locate_points( Range& targ_ents, const double rel_iter_tol, const double abs_iter_tol,
+ErrorCode DataCoupler::locate_points( Range& targ_ents,
+                                      const double rel_iter_tol,
+                                      const double abs_iter_tol,
                                       const double inside_tol )
 {
     targetEnts = targ_ents;
@@ -72,7 +78,10 @@ ErrorCode DataCoupler::locate_points( Range& targ_ents, const double rel_iter_to
     return myLocator->locate_points( targ_ents, rel_iter_tol, abs_iter_tol, inside_tol );
 }
 
-ErrorCode DataCoupler::locate_points( double* xyz, int num_points, const double rel_iter_tol, const double abs_iter_tol,
+ErrorCode DataCoupler::locate_points( double* xyz,
+                                      int num_points,
+                                      const double rel_iter_tol,
+                                      const double abs_iter_tol,
                                       const double inside_tol )
 {
 #ifdef MOAB_HAVE_MPI
@@ -83,8 +92,11 @@ ErrorCode DataCoupler::locate_points( double* xyz, int num_points, const double 
     return myLocator->locate_points( xyz, num_points, rel_iter_tol, abs_iter_tol, inside_tol );
 }
 
-ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int method, const std::string& interp_tag,
-                                    double* interp_vals, std::vector< int >* point_indices, bool normalize )
+ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int method,
+                                    const std::string& interp_tag,
+                                    double* interp_vals,
+                                    std::vector< int >* point_indices,
+                                    bool normalize )
 {
     // Tag name input, translate to tag handle and pass down the chain
 
@@ -94,8 +106,12 @@ ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int method, const st
     return interpolate( method, tag, interp_vals, point_indices, normalize );
 }
 
-ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int* /* methods */, Tag* tags, int* points_per_method,
-                                    int num_methods, double* interp_vals, std::vector< int >* point_indices,
+ErrorCode DataCoupler::interpolate( /*DataCoupler::Method*/ int* /* methods */,
+                                    Tag* tags,
+                                    int* points_per_method,
+                                    int num_methods,
+                                    double* interp_vals,
+                                    std::vector< int >* point_indices,
                                     bool /*normalize*/ )
 {
     // Lowest-level interpolate function, does actual interpolation using calls to ElemEvaluator

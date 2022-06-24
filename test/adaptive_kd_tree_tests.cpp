@@ -16,14 +16,23 @@ using namespace moab;
 #endif
 
 /* Utility method - compare two range boxes */
-bool box_equal( const AdaptiveKDTreeIter& iter, double x_min, double y_min, double z_min, double x_max, double y_max,
+bool box_equal( const AdaptiveKDTreeIter& iter,
+                double x_min,
+                double y_min,
+                double z_min,
+                double x_max,
+                double y_max,
                 double z_max )
 {
     return iter.box_min()[0] == x_min && iter.box_min()[1] == y_min && iter.box_min()[2] == z_min &&
            iter.box_max()[0] == x_max && iter.box_max()[1] == y_max && iter.box_max()[2] == z_max;
 }
 
-void build_triangles( Interface* moab, Range& tris, int num_vert, const double* coords, int num_tri,
+void build_triangles( Interface* moab,
+                      Range& tris,
+                      int num_vert,
+                      const double* coords,
+                      int num_tri,
                       const unsigned* conn )
 {
     std::vector< EntityHandle > verts( num_vert );
@@ -78,8 +87,7 @@ void build_triangle_box_large( Interface* moab, Range& tris )
 
                               -1, -1, -3, 1, -1, -3, 1, 1, -3, -1, 1, -3,
 
-                              -1, -1, 3, 1, -1, 3, 1, 1, 3, -1, 1, 3
-    };
+                              -1, -1, 3, 1, -1, 3, 1, 1, 3, -1, 1, 3 };
     const unsigned conn[] = {
         // face 0
         0, 8, 24, 8, 32, 24, 8, 33, 32, 8, 9, 33, 9, 1, 33, 1, 26, 33, 24, 35, 25, 24, 32, 35, 32, 33, 35, 33, 34, 35,
@@ -98,8 +106,7 @@ void build_triangle_box_large( Interface* moab, Range& tris )
         11, 50, 49, 11, 49, 10, 51, 3, 14, 51, 13, 3, 51, 12, 13, 51, 50, 12, 11, 12, 50, 11, 2, 12,
         // face 5
         4, 52, 16, 4, 23, 52, 22, 52, 23, 22, 55, 52, 22, 21, 55, 22, 7, 21, 17, 16, 52, 17, 52, 53, 54, 53, 52, 54, 52,
-        55, 54, 55, 21, 54, 21, 20, 18, 5, 17, 18, 17, 53, 18, 53, 54, 18, 54, 19, 6, 19, 54, 6, 54, 20
-    };
+        55, 54, 55, 21, 54, 21, 20, 18, 5, 17, 18, 17, 53, 18, 53, 54, 18, 54, 19, 6, 19, 54, 6, 54, 20 };
 
     build_triangles( moab, tris, 56, coords, 108, conn );
 }

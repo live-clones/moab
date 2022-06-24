@@ -72,7 +72,10 @@ inline double determinant( const VerdictVector& v1, const VerdictVector& v2, con
 
 extern double verdictSqrt2;
 
-inline double normalize_jacobian( double jacobi, VerdictVector& v1, VerdictVector& v2, VerdictVector& v3,
+inline double normalize_jacobian( double jacobi,
+                                  VerdictVector& v1,
+                                  VerdictVector& v2,
+                                  VerdictVector& v3,
                                   int tet_flag = 0 )
 {
     double return_value = 0.0;
@@ -92,7 +95,10 @@ inline double normalize_jacobian( double jacobi, VerdictVector& v1, VerdictVecto
 
         // if some numerical scaling problem, or just plain roundoff,
         // then push back into range [-1,1].
-        if( length_product < fabs( jacobi ) ) { length_product = fabs( jacobi ); }
+        if( length_product < fabs( jacobi ) )
+        {
+            length_product = fabs( jacobi );
+        }
 
         if( tet_flag == 1 )
             return_value = verdictSqrt2 * jacobi / length_product;
@@ -112,11 +118,20 @@ inline double norm_squared( double m11, double m21, double m12, double m22 )
     ( gm12 ) = ( m11 ) * ( m12 ) + ( m21 ) * ( m22 );         \
     ( gm22 ) = ( m12 ) * ( m12 ) + ( m22 ) * ( m22 );
 
-inline int skew_matrix( double gm11, double gm12, double gm22, double det, double& qm11, double& qm21, double& qm12,
+inline int skew_matrix( double gm11,
+                        double gm12,
+                        double gm22,
+                        double det,
+                        double& qm11,
+                        double& qm21,
+                        double& qm12,
                         double& qm22 )
 {
     double tmp = sqrt( gm11 * gm22 );
-    if( tmp == 0 ) { return false; }
+    if( tmp == 0 )
+    {
+        return false;
+    }
 
     qm11 = 1;
     qm21 = 0;
@@ -125,8 +140,12 @@ inline int skew_matrix( double gm11, double gm12, double gm22, double det, doubl
     return true;
 }
 
-inline void inverse( const VerdictVector& x1, const VerdictVector& x2, const VerdictVector& x3, VerdictVector& u1,
-                     VerdictVector& u2, VerdictVector& u3 )
+inline void inverse( const VerdictVector& x1,
+                     const VerdictVector& x2,
+                     const VerdictVector& x3,
+                     VerdictVector& u1,
+                     VerdictVector& u2,
+                     VerdictVector& u3 )
 {
     double detx = determinant( x1, x2, x3 );
     VerdictVector rx1, rx2, rx3;
@@ -188,8 +207,12 @@ inline void form_T(double a1[3],
 }
 */
 
-inline void form_Q( const VerdictVector& v1, const VerdictVector& v2, const VerdictVector& v3, VerdictVector& q1,
-                    VerdictVector& q2, VerdictVector& q3 )
+inline void form_Q( const VerdictVector& v1,
+                    const VerdictVector& v2,
+                    const VerdictVector& v3,
+                    VerdictVector& q1,
+                    VerdictVector& q2,
+                    VerdictVector& q3 )
 {
 
     double g11, g12, g13, g22, g23, g33;
@@ -232,8 +255,15 @@ inline void form_Q( const VerdictVector& v1, const VerdictVector& v2, const Verd
     q3.set( q13, q23, q33 );
 }
 
-inline void product( VerdictVector& a1, VerdictVector& a2, VerdictVector& a3, VerdictVector& b1, VerdictVector& b2,
-                     VerdictVector& b3, VerdictVector& c1, VerdictVector& c2, VerdictVector& c3 )
+inline void product( VerdictVector& a1,
+                     VerdictVector& a2,
+                     VerdictVector& a3,
+                     VerdictVector& b1,
+                     VerdictVector& b2,
+                     VerdictVector& b3,
+                     VerdictVector& c1,
+                     VerdictVector& c2,
+                     VerdictVector& c3 )
 {
 
     VerdictVector x1, x2, x3;
@@ -253,7 +283,11 @@ inline double norm_squared( VerdictVector& x1, VerdictVector& x2, VerdictVector&
     return ( x1 % x1 ) + ( x2 % x2 ) + ( x3 % x3 );
 }
 
-inline double skew_x( VerdictVector& q1, VerdictVector& q2, VerdictVector& q3, VerdictVector& qw1, VerdictVector& qw2,
+inline double skew_x( VerdictVector& q1,
+                      VerdictVector& q2,
+                      VerdictVector& q3,
+                      VerdictVector& qw1,
+                      VerdictVector& qw2,
                       VerdictVector& qw3 )
 {
     double normsq1, normsq2, kappa;

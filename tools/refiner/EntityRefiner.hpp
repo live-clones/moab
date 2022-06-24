@@ -108,7 +108,10 @@ class EntityRefinerOutputFunctor
      * @param[in] vtags Field values at the mid-face point.
      * @retval    A handle for the mid-face point on the output mesh.
      */
-    virtual EntityHandle operator()( EntityHandle h0, EntityHandle h1, EntityHandle h2, const double* vcoords,
+    virtual EntityHandle operator()( EntityHandle h0,
+                                     EntityHandle h1,
+                                     EntityHandle h2,
+                                     const double* vcoords,
                                      const void* vtags )
     {
         EntityHandle harr[3];

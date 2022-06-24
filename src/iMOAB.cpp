@@ -1966,7 +1966,7 @@ ErrCode iMOAB_CreateElements( iMOAB_AppID pid,
     ReadUtilIface* read_iface;
     ErrorCode rval = context.MBI->query_interface( read_iface );MB_CHK_ERR( rval );
 
-    EntityType mbtype = ( EntityType )( *type );
+    EntityType mbtype = (EntityType)( *type );
     EntityHandle actual_start_handle;
     EntityHandle* array = NULL;
     rval = read_iface->get_element_connect( *num_elem, *num_nodes_per_element, mbtype, 1, actual_start_handle, array );MB_CHK_ERR( rval );
@@ -2080,7 +2080,7 @@ ErrCode iMOAB_ResolveSharedEntities( iMOAB_AppID pid, int* num_verts, int* marke
     Tag part_tag;
     dum_id = -1;
     rval   = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                          MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2348,7 +2348,7 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     Tag part_tag;
     int dum_id = -1;
     rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                              MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {
@@ -2427,8 +2427,7 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_na
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
         if( MB_SUCCESS != rval || NULL == tagHandle )
         {
-        	std::cout<<" can't get tag handle for tag named:" << tagNames[i].c_str() << " at index "<< i << "\n";
-        	MB_CHK_SET_ERR( rval, "can't get tag handle" );
+            std::cout << " can't get tag handle for tag named:" << tagNames[i].c_str() << " at index " << i << "\n";MB_CHK_SET_ERR( rval, "can't get tag handle" );
         }
         tagHandles.push_back( tagHandle );
     }
@@ -2500,8 +2499,7 @@ ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), tagHandle );
         if( MB_SUCCESS != rval || NULL == tagHandle )
         {
-        	std::cout<<" can't get tag handle for tag named:" << tagNames[i].c_str() << " at index "<< i << "\n";
-        	MB_CHK_SET_ERR( rval, "can't get tag handle" );
+            std::cout << " can't get tag handle for tag named:" << tagNames[i].c_str() << " at index " << i << "\n";MB_CHK_SET_ERR( rval, "can't get tag handle" );
         }
         tagHandles.push_back( tagHandle );
     }
@@ -2909,7 +2907,7 @@ ErrCode iMOAB_MergeVertices( iMOAB_AppID pid )
     Tag part_tag;
     int dum_id = -1;
     rval       = context.MBI->tag_get_handle( "PARALLEL_PARTITION", 1, MB_TYPE_INTEGER, part_tag,
-                                        MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
+                                              MB_TAG_CREAT | MB_TAG_SPARSE, &dum_id );
 
     if( part_tag == NULL || ( ( rval != MB_SUCCESS ) && ( rval != MB_ALREADY_ALLOCATED ) ) )
     {

@@ -5,8 +5,7 @@ const char* const moab::ErrorCodeStr[] = {
     "MB_ENTITY_NOT_FOUND", "MB_MULTIPLE_ENTITIES_FOUND", "MB_TAG_NOT_FOUND",     "MB_FILE_DOES_NOT_EXIST",
     "MB_FILE_WRITE_ERROR", "MB_NOT_IMPLEMENTED",         "MB_ALREADY_ALLOCATED", "MB_VARIABLE_DATA_LENGTH",
     "MB_INVALID_SIZE",     "MB_UNSUPPORTED_OPERATION",   "MB_UNHANDLED_OPTION",  "MB_STRUCTURED_MESH",
-    "MB_FAILURE"
-};
+    "MB_FAILURE" };
 
 const char* const moab::DataTypeStr[] = { "MB_TYPE_OPAQUE", "MB_TYPE_INTEGER", "MB_TYPE_DOUBLE", "MB_TYPE_BIT",
                                           "MB_TYPE_HANDLE" };

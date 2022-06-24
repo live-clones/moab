@@ -35,9 +35,9 @@
 #include "MsqError.hpp"
 #include "PatchData.hpp"
 
-#define USE_FN_PC1    // Use 1st preconditioner from Todd's code
+#define USE_FN_PC1    // Use 1st preconditioner from Todd's code \
                       // (alternate is whatever is in MsqHessian already)
-#undef DO_STEEP_DESC  // Jason's apparently broken hack to fall back to
+#undef DO_STEEP_DESC  // Jason's apparently broken hack to fall back to \
                       // steepest descent search direction
 
 namespace MBMesquite
@@ -139,7 +139,8 @@ void TrustRegion::compute_preconditioner( MsqError&
 #endif
 }
 
-void TrustRegion::apply_preconditioner( Vector3D* z, Vector3D* r,
+void TrustRegion::apply_preconditioner( Vector3D* z,
+                                        Vector3D* r,
                                         MsqError&
 #ifndef USE_FN_PC1
                                             err
@@ -303,7 +304,10 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
             continue;
         }
 
-        if( ( fabs( kappa ) <= tr_num_tol ) && ( fabs( objn - obj ) <= tr_num_tol ) ) { kappa = 1; }
+        if( ( fabs( kappa ) <= tr_num_tol ) && ( fabs( objn - obj ) <= tr_num_tol ) )
+        {
+            kappa = 1;
+        }
         else
         {
             kappa = ( objn - obj ) / kappa;
@@ -322,7 +326,10 @@ void TrustRegion::optimize_vertex_positions( PatchData& pd, MsqError& err )
         {
             /* Iterate is a very good step, increase radius */
             radius *= tr_incr;
-            if( radius > 1e20 ) { radius = 1e20; }
+            if( radius > 1e20 )
+            {
+                radius = 1e20;
+            }
         }
 
         func.update( pd, obj, mGrad, mHess, err );

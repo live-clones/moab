@@ -138,7 +138,10 @@ class Point_search
                     for( int k = 0; k < 3; ++k )
                     {
                         ss << ( *i )[k];
-                        if( k < 2 ) { ss << ", "; }
+                        if( k < 2 )
+                        {
+                            ss << ", ";
+                        }
                         else
                         {
                             ss << std::endl;

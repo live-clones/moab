@@ -56,7 +56,7 @@ ErrorCode NCHelperScrip::init_mesh_vals()
     Tag convTagsCreated = 0;
     int def_val         = 0;
     ErrorCode rval      = mbImpl->tag_get_handle( "__CONV_TAGS_CREATED", 1, MB_TYPE_INTEGER, convTagsCreated,
-                                             MB_TAG_SPARSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble getting _CONV_TAGS_CREATED tag" );
+                                                  MB_TAG_SPARSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble getting _CONV_TAGS_CREATED tag" );
     int create_conv_tags_flag = 1;
     rval                      = mbImpl->tag_set_data( convTagsCreated, &_fileSet, 1, &create_conv_tags_flag );MB_CHK_SET_ERR( rval, "Trouble setting _CONV_TAGS_CREATED tag" );
 
@@ -148,8 +148,8 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     if( success ) MB_SET_ERR( MB_FAILURE, "Failed to get variable id of grid_corner_lat" );
 
     // important upgrade: read masks if they exist, and save them as tags
-    int gmId           = -1;
-    int sizeMasks      = 0;
+    int gmId      = -1;
+    int sizeMasks = 0;
 #ifdef MOAB_HAVE_PNETCDF
     int factorRequests = 2;  // we would read in general only 2 variables, xv and yv
 #endif
@@ -161,7 +161,7 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
     }
     else
     {
-        sizeMasks      = nLocalCells;
+        sizeMasks = nLocalCells;
 #ifdef MOAB_HAVE_PNETCDF
         factorRequests = 3;  // we also need to read masks distributed
 #endif
@@ -362,18 +362,18 @@ ErrorCode NCHelperScrip::create_mesh( Range& faces )
         rval = myPcomm->assign_global_ids( _fileSet, /*dim*/ 0 );MB_CHK_ERR( rval );
         // remove all sets, edges and vertices from the file set
         Range edges, vertices;
-        rval = mbImpl->get_entities_by_dimension(_fileSet, 1, edges, /*recursive*/ true);MB_CHK_ERR( rval );
-        rval = mbImpl->get_entities_by_dimension(_fileSet, 0, vertices, /*recursive*/ true);MB_CHK_ERR( rval );
-        rval = mbImpl->remove_entities(_fileSet, edges);MB_CHK_ERR( rval );
-        rval = mbImpl->remove_entities(_fileSet, vertices);MB_CHK_ERR( rval );
+        rval = mbImpl->get_entities_by_dimension( _fileSet, 1, edges, /*recursive*/ true );MB_CHK_ERR( rval );
+        rval = mbImpl->get_entities_by_dimension( _fileSet, 0, vertices, /*recursive*/ true );MB_CHK_ERR( rval );
+        rval = mbImpl->remove_entities( _fileSet, edges );MB_CHK_ERR( rval );
+        rval = mbImpl->remove_entities( _fileSet, vertices );MB_CHK_ERR( rval );
 
         Range intfSets = myPcomm->interface_sets();
         // empty intf sets
-        rval = mbImpl->clear_meshset(intfSets);MB_CHK_ERR( rval );
+        rval = mbImpl->clear_meshset( intfSets );MB_CHK_ERR( rval );
         // delete the sets without shame :)
         //sets.merge(intfSets);
         //rval = myPcomm->delete_entities(sets);MB_CHK_ERR( rval ); // will also clean shared ents !
-        rval = myPcomm->delete_entities(edges);MB_CHK_ERR( rval ); // will also clean shared ents !
+        rval = myPcomm->delete_entities( edges );MB_CHK_ERR( rval );  // will also clean shared ents !
     }
 #else
     rval = mbImpl->remove_entities( _fileSet, all_verts );MB_CHK_ERR( rval );

@@ -106,7 +106,9 @@ void MsqIRel::element_normal_at( Mesh::ElementHandle handle, Vector3D& coordinat
     MsqIRel::vertex_normal_at( handle, coordinate );
 }
 
-void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coordinates[], unsigned count,
+void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle,
+                                Vector3D coordinates[],
+                                unsigned count,
                                 MsqError& err ) const
 {
     int ierr, dim;
@@ -136,7 +138,9 @@ void MsqIRel::vertex_normal_at( const Mesh::VertexHandle* handle, Vector3D coord
     }
 }
 
-void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t count,
+void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array,
+                          unsigned short* dof_array,
+                          size_t count,
                           MsqError& err ) const
 {
     int ierr;
@@ -150,7 +154,10 @@ void MsqIRel::domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short
     }
 }
 
-void MsqIRel::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest, Vector3D& p_normal,
+void MsqIRel::closest_point( Mesh::VertexHandle handle,
+                             const Vector3D& position,
+                             Vector3D& closest,
+                             Vector3D& p_normal,
                              MsqError& err ) const
 {
     int ierr, dim;
@@ -193,7 +200,9 @@ int MsqIRel::geom_from_mesh( Mesh::EntityHandle mesh_ent_handle, iBase_EntityHan
     return iBase_SUCCESS;
 }
 
-int MsqIRel::geom_from_mesh( const Mesh::EntityHandle* handles, iBase_EntityHandle* geom_handles, unsigned short* dims,
+int MsqIRel::geom_from_mesh( const Mesh::EntityHandle* handles,
+                             iBase_EntityHandle* geom_handles,
+                             unsigned short* dims,
                              size_t count ) const
 {
     int ierr, dim;

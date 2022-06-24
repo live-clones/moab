@@ -164,7 +164,10 @@ void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* nump
         for( moab::Range::iterator rit = ents.begin(); rit != ents.end(); ++rit )
         {
             pc->get_owner( *rit, tmp );
-            if( tmp == myID ) { o_ct++; }
+            if( tmp == myID )
+            {
+                o_ct++;
+            }
         }
         MPI_Reduce( &o_ct, &o_tot, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
         if( myID == 0 )
@@ -186,7 +189,10 @@ void print_output( moab::ParallelComm* pc, moab::Core* mb, int myID, int /* nump
         for( moab::Range::iterator s_rit = skin.begin(); s_rit != skin.end(); ++s_rit )
         {
             pc->get_owner( *s_rit, tmp );
-            if( tmp == myID ) { o_ct++; }
+            if( tmp == myID )
+            {
+                o_ct++;
+            }
             else
             {
                 no_ct++;

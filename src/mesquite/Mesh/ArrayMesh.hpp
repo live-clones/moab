@@ -69,10 +69,16 @@ class ArrayMesh : public Mesh
      *                         logical position of the element mapping/shape
      *                         function..
      */
-    ArrayMesh( int coords_per_vertex, unsigned long num_vertices, double* interleaved_vertex_coords,
-               const int* vertex_fixed_flags, unsigned long num_elements, EntityTopology element_type,
-               const unsigned long* element_connectivity_array, bool one_based_conn_indices = false,
-               unsigned nodes_per_element = 0, const int* vertex_slaved_flags = 0 );
+    ArrayMesh( int coords_per_vertex,
+               unsigned long num_vertices,
+               double* interleaved_vertex_coords,
+               const int* vertex_fixed_flags,
+               unsigned long num_elements,
+               EntityTopology element_type,
+               const unsigned long* element_connectivity_array,
+               bool one_based_conn_indices    = false,
+               unsigned nodes_per_element     = 0,
+               const int* vertex_slaved_flags = 0 );
 
     /** Create a MBMesquite::Mesh instance that wraps application-provided
      *  arrays.
@@ -118,21 +124,32 @@ class ArrayMesh : public Mesh
      *                         logical position of the element mapping/shape
      *                         function..
      */
-    ArrayMesh( int coords_per_vertex, unsigned long num_vertices, double* interleaved_vertex_coords,
-               const int* vertex_fixed_flags, unsigned long num_elements, const EntityTopology* element_types,
+    ArrayMesh( int coords_per_vertex,
+               unsigned long num_vertices,
+               double* interleaved_vertex_coords,
+               const int* vertex_fixed_flags,
+               unsigned long num_elements,
+               const EntityTopology* element_types,
                const unsigned long* element_connectivity_array,
-               const unsigned long* element_connectivity_offsets = NULL, bool one_based_conn_indices = false,
-               const int* vertex_slaved_flags = 0 );
+               const unsigned long* element_connectivity_offsets = NULL,
+               bool one_based_conn_indices                       = false,
+               const int* vertex_slaved_flags                    = 0 );
 
     ArrayMesh();
 
     ~ArrayMesh();
 
     void clear_mesh();
-    void set_mesh( int coords_per_vertex, unsigned long num_vertices, double* interleaved_vertex_coords,
-                   const int* vertex_fixed_flags, unsigned long num_elements, EntityTopology element_type,
-                   const unsigned long* element_connectivity_array, bool one_based_conn_indices = false,
-                   unsigned nodes_per_element = 0, const int* vertex_slaved_flags = 0 );
+    void set_mesh( int coords_per_vertex,
+                   unsigned long num_vertices,
+                   double* interleaved_vertex_coords,
+                   const int* vertex_fixed_flags,
+                   unsigned long num_elements,
+                   EntityTopology element_type,
+                   const unsigned long* element_connectivity_array,
+                   bool one_based_conn_indices    = false,
+                   unsigned nodes_per_element     = 0,
+                   const int* vertex_slaved_flags = 0 );
 
     /**\brief Give mesquite access to per-entity application data via a tag
      *
@@ -160,8 +177,12 @@ class ArrayMesh : public Mesh
      *                       if the cooresponding data array is null.  May be
      *                       NULL if no default value.
      */
-    TagHandle add_read_only_tag_data( const char* tag_name, TagType data_type, int vals_per_entity,
-                                      const void* vertex_data, const void* element_data, const void* default_value,
+    TagHandle add_read_only_tag_data( const char* tag_name,
+                                      TagType data_type,
+                                      int vals_per_entity,
+                                      const void* vertex_data,
+                                      const void* element_data,
+                                      const void* default_value,
                                       MsqError& err );
 
     /**\brief Give mesquite access to per-entity application data via a tag
@@ -188,8 +209,13 @@ class ArrayMesh : public Mesh
      *                       if the cooresponding data array is null.  May be
      *                       NULL if no default value.
      */
-    TagHandle add_writable_tag_data( const char* tag_name, TagType tag_data_type, int vals_per_entity,
-                                     void* vertex_data, void* element_data, const void* default_value, MsqError& err );
+    TagHandle add_writable_tag_data( const char* tag_name,
+                                     TagType tag_data_type,
+                                     int vals_per_entity,
+                                     void* vertex_data,
+                                     void* element_data,
+                                     const void* default_value,
+                                     MsqError& err );
 
     virtual int get_geometric_dimension( MsqError& err );
 
@@ -199,54 +225,88 @@ class ArrayMesh : public Mesh
     virtual VertexIterator* vertex_iterator( MsqError& err );
     virtual ElementIterator* element_iterator( MsqError& err );
 
-    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& fixed_flag_array,
-                                          size_t num_vtx, MsqError& err );
-    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& slaved_flag_array,
-                                           size_t num_vtx, MsqError& err );
-    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[],
+                                          std::vector< bool >& fixed_flag_array,
+                                          size_t num_vtx,
+                                          MsqError& err );
+    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[],
+                                           std::vector< bool >& slaved_flag_array,
+                                           size_t num_vtx,
+                                           MsqError& err );
+    virtual void vertices_get_coordinates( const VertexHandle vert_array[],
+                                           MsqVertex* coordinates,
+                                           size_t num_vtx,
                                            MsqError& err );
     virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err );
 
     virtual void vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqError& err );
-    virtual void vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+    virtual void vertices_set_byte( const VertexHandle* vert_array,
+                                    const unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err );
 
     virtual void vertex_get_byte( const VertexHandle vertex, unsigned char* byte, MsqError& err );
-    virtual void vertices_get_byte( const VertexHandle* vertex, unsigned char* byte_array, size_t array_size,
+    virtual void vertices_get_byte( const VertexHandle* vertex,
+                                    unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err );
 
-    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array, size_t num_vertex,
-                                                 std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array,
+                                                 size_t num_vertex,
+                                                 std::vector< ElementHandle >& elements,
+                                                 std::vector< size_t >& offsets,
                                                  MsqError& err );
 
-    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles, size_t num_elems,
+    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles,
+                                                 size_t num_elems,
                                                  std::vector< VertexHandle >& vert_handles,
-                                                 std::vector< size_t >& offsets, MsqError& err );
+                                                 std::vector< size_t >& offsets,
+                                                 MsqError& err );
 
-    virtual void elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
-                                          size_t num_elements, MsqError& err );
+    virtual void elements_get_topologies( const ElementHandle* element_handle_array,
+                                          EntityTopology* element_topologies,
+                                          size_t num_elements,
+                                          MsqError& err );
 
-    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length, const void* default_value,
+    virtual TagHandle tag_create( const std::string& tag_name,
+                                  TagType type,
+                                  unsigned length,
+                                  const void* default_value,
                                   MsqError& err );
 
     virtual void tag_delete( TagHandle handle, MsqError& err );
 
     virtual TagHandle tag_get( const std::string& name, MsqError& err );
 
-    virtual void tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+    virtual void tag_properties( TagHandle handle,
+                                 std::string& name_out,
+                                 TagType& type_out,
+                                 unsigned& length_out,
                                  MsqError& err );
 
-    virtual void tag_set_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       const void* tag_data, MsqError& err );
+    virtual void tag_set_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       const void* tag_data,
+                                       MsqError& err );
 
-    virtual void tag_set_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      const void* tag_data, MsqError& err );
+    virtual void tag_set_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      const void* tag_data,
+                                      MsqError& err );
 
-    virtual void tag_get_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       void* tag_data, MsqError& err );
+    virtual void tag_get_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       void* tag_data,
+                                       MsqError& err );
 
-    virtual void tag_get_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      void* tag_data, MsqError& err );
+    virtual void tag_get_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      void* tag_data,
+                                      MsqError& err );
 
     virtual void release_entity_handles( const EntityHandle* handle_array, size_t num_handles, MsqError& err );
 
@@ -300,9 +360,16 @@ class ArrayMesh : public Mesh
         Tag* next;                        //!< Linked-list next pointer
     };
 
-    Tag* allocate_tag( const char* name, bool owned, TagType type, unsigned size, const void* vertex_ro_data,
-                       void* vertex_rw_data, const void* element_ro_data, void* element_rw_data,
-                       const void* default_value, MsqError& err );
+    Tag* allocate_tag( const char* name,
+                       bool owned,
+                       TagType type,
+                       unsigned size,
+                       const void* vertex_ro_data,
+                       void* vertex_rw_data,
+                       const void* element_ro_data,
+                       void* element_rw_data,
+                       const void* default_value,
+                       MsqError& err );
 
     Tag* tagList;
 

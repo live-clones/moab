@@ -292,7 +292,9 @@ void InstructionQueue::set_master_quality_improver( QualityImprover* instr, MsqE
     }
 }
 
-void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
+void InstructionQueue::run_common( MeshDomainAssoc* mesh_and_domain,
+                                   ParallelMesh* pmesh,
+                                   Settings* settings,
                                    MsqError& err )
 {
     MSQ_DBGOUT( 1 ) << version_string( false ) << "\n";

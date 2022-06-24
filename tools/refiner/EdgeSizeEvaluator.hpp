@@ -37,7 +37,11 @@ class EdgeSizeEvaluator
     EdgeSizeEvaluator();
     virtual ~EdgeSizeEvaluator();
 
-    virtual bool evaluate_edge( const double* p0, const void* t0, double* p1, void* t1, const double* p2,
+    virtual bool evaluate_edge( const double* p0,
+                                const void* t0,
+                                double* p1,
+                                void* t1,
+                                const double* p2,
                                 const void* t2 ) = 0;
 
     void set_tag_manager( RefinerTagManager* tmgr )

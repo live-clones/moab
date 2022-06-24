@@ -115,7 +115,7 @@ int main()
     moab::Tag temp_tag;
     double temp_default_value = 0.0;
     rval                      = mbint.tag_get_handle( "temperature", 1, moab::MB_TYPE_DOUBLE, temp_tag,
-                                 moab::MB_TAG_DENSE | moab::MB_TAG_CREAT, &temp_default_value );MB_CHK_SET_ERR( rval, "mbint.tag_get_handle(temperature) failed" );
+                                                      moab::MB_TAG_DENSE | moab::MB_TAG_CREAT, &temp_default_value );MB_CHK_SET_ERR( rval, "mbint.tag_get_handle(temperature) failed" );
 
     moab::Tag vel_tag;
     double vel_default_value[2] = { 0.0, 0.0 };

@@ -417,7 +417,10 @@ void MsqHessian::add( const MsqHessian& other )
 void MsqHessian::get_diagonal_blocks( std::vector< Matrix3D >& diag, MsqError& /*err*/ ) const
 {
     // make sure we have enough memory, so that no reallocation is needed later.
-    if( diag.size() != size() ) { diag.reserve( size() ); }
+    if( diag.size() != size() )
+    {
+        diag.reserve( size() );
+    }
 
     for( size_t i = 0; i < size(); ++i )
     {
@@ -459,7 +462,10 @@ void MsqHessian::compute_preconditioner( MsqError& /*err*/ )
         // use the diagonal method.
         bool use_diag = false;
 
-        if( fabs( ( *diag_block )[0][0] ) < DBL_EPSILON ) { use_diag = true; }
+        if( fabs( ( *diag_block )[0][0] ) < DBL_EPSILON )
+        {
+            use_diag = true;
+        }
         else
         {
             mPreconditioner[m][0][0] = 1.0 / ( *diag_block )[0][0];

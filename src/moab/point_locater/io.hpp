@@ -12,8 +12,9 @@ namespace point_locator
     namespace io
     {
 
-        template < typename String = std::string, typename String_vector = std::vector< std::string >,
-                   typename Char_vector = std::vector< const char* > >
+        template < typename String        = std::string,
+                   typename String_vector = std::vector< std::string >,
+                   typename Char_vector   = std::vector< const char* > >
         class File_options
         {
           public:
@@ -46,18 +47,26 @@ namespace point_locator
         }
 
         // New get_file_options() function with added possibilities for mbcoupler_test.
-        ErrorCode get_file_options( int argc, char** argv, std::vector< std::string >& meshFiles,
-                                    std::string& interpTag, std::string& gNormTag, std::string& ssNormTag,
-                                    std::vector< const char* >& ssTagNames, std::vector< const char* >& ssTagValues,
-                                    std::string& readOpts, std::string& outFile, std::string& writeOpts,
-                                    std::string& dbgFile, bool& help )
+        ErrorCode get_file_options( int argc,
+                                    char** argv,
+                                    std::vector< std::string >& meshFiles,
+                                    std::string& interpTag,
+                                    std::string& gNormTag,
+                                    std::string& ssNormTag,
+                                    std::vector< const char* >& ssTagNames,
+                                    std::vector< const char* >& ssTagValues,
+                                    std::string& readOpts,
+                                    std::string& outFile,
+                                    std::string& writeOpts,
+                                    std::string& dbgFile,
+                                    bool& help )
         {
             // Initialize some of the outputs to null values indicating not present
             // in the argument list.
-            gNormTag  = "";
-            ssNormTag = "";
-            readOpts  = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                       "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME";
+            gNormTag                   = "";
+            ssNormTag                  = "";
+            readOpts                   = "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                                         "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME";
             outFile                    = "";
             writeOpts                  = "PARALLEL=WRITE_PART;CPUTIME";
             dbgFile                    = "";

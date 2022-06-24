@@ -48,9 +48,12 @@ class EdgeLengthMetric : public EdgeQM
     MESQUITE_EXPORT virtual int get_negate_flag() const;
 
     MESQUITE_EXPORT virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
-    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value,
+    MESQUITE_EXPORT virtual bool evaluate_with_gradient( PatchData& pd,
+                                                         size_t handle,
+                                                         double& value,
                                                          std::vector< size_t >& indices,
-                                                         std::vector< Vector3D >& gradient, MsqError& err );
+                                                         std::vector< Vector3D >& gradient,
+                                                         MsqError& err );
 
   private:
     double mGamma;

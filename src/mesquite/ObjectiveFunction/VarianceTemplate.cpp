@@ -52,8 +52,13 @@ void VarianceTemplate::clear()
     saveSum = saveSqrSum = 0;
 }
 
-void VarianceTemplate::accumulate( double sum, double sqr_sum, size_t count, EvalType type, double& result_sum,
-                                   double& result_sqr, size_t& global_count )
+void VarianceTemplate::accumulate( double sum,
+                                   double sqr_sum,
+                                   size_t count,
+                                   EvalType type,
+                                   double& result_sum,
+                                   double& result_sqr,
+                                   size_t& global_count )
 {
     switch( type )
     {
@@ -133,8 +138,11 @@ bool VarianceTemplate::evaluate( EvalType type, PatchData& pd, double& value_out
     return true;
 }
 
-bool VarianceTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                               std::vector< Vector3D >& grad_out, MsqError& err )
+bool VarianceTemplate::evaluate_with_gradient( EvalType type,
+                                               PatchData& pd,
+                                               double& value_out,
+                                               std::vector< Vector3D >& grad_out,
+                                               MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -198,9 +206,12 @@ bool VarianceTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, dou
     return true;
 }
 
-bool VarianceTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+bool VarianceTemplate::evaluate_with_Hessian_diagonal( EvalType type,
+                                                       PatchData& pd,
+                                                       double& value_out,
                                                        std::vector< Vector3D >& grad_out,
-                                                       std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
+                                                       std::vector< SymMatrix3D >& hess_diag_out,
+                                                       MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );

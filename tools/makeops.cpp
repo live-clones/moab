@@ -74,7 +74,10 @@ int main( int argc, char** argv )
 
     for( std::vector< OperationType >::iterator vit = op_types.begin(); vit != op_types.end(); ++vit )
     {
-        if( *vit == ATOMIC_PILLOW ) { tmp_result = make_atomic_pillow(); }
+        if( *vit == ATOMIC_PILLOW )
+        {
+            tmp_result = make_atomic_pillow();
+        }
         else if( *vit == FACE_OPEN_COLLAPSE )
         {
             tmp_result = make_face_open_collapse();
@@ -205,8 +208,7 @@ ErrorCode make_chord_push()
                            0.0, 0.0, -1.5, 0.0, 1.0, -1.0, -1.0, 0.5, -1.0, -1.0, -0.5, -1.0, 0.0, -1.0, -1.0, 1.0,
                            -0.5, -1.0, 1.0, 0.5, -1.0,
                            // 2 extra vertices for chord push
-                           0.0, -.333, 0.05, 0.0, -.667, 0.10
-    };
+                           0.0, -.333, 0.05, 0.0, -.667, 0.10 };
 
     int connect[] = { // 3 "normal" hexes first
                       // top hex
@@ -225,8 +227,7 @@ ErrorCode make_chord_push()
                       0, 4,
                       // face between bottom 2 normal hexes (needed for explicit
                       // adjacency)
-                      0, 4, 11, 7
-    };
+                      0, 4, 11, 7 };
 
     ErrorCode result;
     EntityHandle vtx_handles[16];
@@ -316,8 +317,7 @@ ErrorCode make_triple_chord_push()
                            0.0, 0.0, -1.5, 0.0, 1.0, -1.0, -1.0, 0.5, -1.0, -1.0, -0.5, -1.0, 0.0, -1.0, -1.0, 1.0,
                            -0.5, -1.0, 1.0, 0.5, -1.0,
                            // 2 extra vertices in middle
-                           0.0, 0.0, -0.25, 0.0, 0.0, 0.0
-    };
+                           0.0, 0.0, -0.25, 0.0, 0.0, 0.0 };
 
     int connect[] = { // 3 "normal" hexes first
                       // top hex
@@ -329,8 +329,7 @@ ErrorCode make_triple_chord_push()
                       // front triple chord push hex
                       0, 4, 3, 2, 6, 5, 15, 1,
                       // back triple chord push hex
-                      2, 1, 15, 3, 14, 6, 5, 4
-    };
+                      2, 1, 15, 3, 14, 6, 5, 4 };
 
     ErrorCode result;
     EntityHandle vtx_handles[16];

@@ -630,7 +630,9 @@ void ObjectiveFunctionTest::test_compute_ana_hessian_tet_scaled()
     delete mean_ratio;
 }
 
-void ObjectiveFunctionTest::test_LPtoP_value( short P, bool scale, const std::vector< double >& values,
+void ObjectiveFunctionTest::test_LPtoP_value( short P,
+                                              bool scale,
+                                              const std::vector< double >& values,
                                               OFTestMode mode )
 {
     CPPUNIT_ASSERT( !values.empty() );

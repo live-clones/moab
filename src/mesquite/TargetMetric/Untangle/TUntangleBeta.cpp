@@ -73,7 +73,9 @@ inline bool TUntangleBeta::grad( const MsqMatrix< DIM, DIM >& T, double& result,
 }
 
 template < unsigned DIM >
-inline bool TUntangleBeta::hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv_wrt_T,
+inline bool TUntangleBeta::hess( const MsqMatrix< DIM, DIM >& T,
+                                 double& result,
+                                 MsqMatrix< DIM, DIM >& deriv_wrt_T,
                                  MsqMatrix< DIM, DIM >* second_wrt_T )
 {
     double tau = det( T );

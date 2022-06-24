@@ -57,7 +57,9 @@ class FindVolumeIntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt
         facets.push_back( 0 );
     }
 
-    ErrorCode register_intersection( EntityHandle set, EntityHandle tri, double dist,
+    ErrorCode register_intersection( EntityHandle set,
+                                     EntityHandle tri,
+                                     double dist,
                                      OrientedBoxTreeTool::IntersectSearchWindow& search_win,
                                      GeomUtil::intersection_type /*it*/ )
     {
@@ -150,32 +152,47 @@ class GQT_IntRegCtxt : public OrientedBoxTreeTool::IntRegCtxt
     std::vector< std::vector< EntityHandle > > neighborhoods;
     std::vector< EntityHandle > neighborhood;
 
-    void add_intersection( EntityHandle set, EntityHandle tri, double dist,
+    void add_intersection( EntityHandle set,
+                           EntityHandle tri,
+                           double dist,
                            OrientedBoxTreeTool::IntersectSearchWindow& search_win );
     void append_intersection( EntityHandle set, EntityHandle facet, double dist );
     void set_intersection( int len_idx, EntityHandle set, EntityHandle facet, double dist );
-    void add_mode1_intersection( EntityHandle set, EntityHandle facet, double dist,
+    void add_mode1_intersection( EntityHandle set,
+                                 EntityHandle facet,
+                                 double dist,
                                  OrientedBoxTreeTool::IntersectSearchWindow& search_win );
-    bool edge_node_piercing_intersect( const EntityHandle tri, const CartVect& ray_direction,
+    bool edge_node_piercing_intersect( const EntityHandle tri,
+                                       const CartVect& ray_direction,
                                        const GeomUtil::intersection_type int_type,
                                        const std::vector< EntityHandle >& close_tris,
-                                       const std::vector< int >& close_senses, const Interface* MBI,
+                                       const std::vector< int >& close_senses,
+                                       const Interface* MBI,
                                        std::vector< EntityHandle >* neighborhood_tris = 0 );
 
     bool in_prevFacets( const EntityHandle tri );
     bool in_neighborhoods( const EntityHandle tri );
 
   public:
-    GQT_IntRegCtxt( OrientedBoxTreeTool* obbtool, const double ray_point[3], const double ray_dir[3], double tolerance,
-                    int min_tolerance_intersections, const EntityHandle* root_set, const EntityHandle* geom_volume,
-                    const Tag* sense_tag, const int* desired_orient, const std::vector< EntityHandle >* prev_facets )
+    GQT_IntRegCtxt( OrientedBoxTreeTool* obbtool,
+                    const double ray_point[3],
+                    const double ray_dir[3],
+                    double tolerance,
+                    int min_tolerance_intersections,
+                    const EntityHandle* root_set,
+                    const EntityHandle* geom_volume,
+                    const Tag* sense_tag,
+                    const int* desired_orient,
+                    const std::vector< EntityHandle >* prev_facets )
         : tool( obbtool ), ray_origin( ray_point ), ray_direction( ray_dir ), tol( tolerance ),
           minTolInt( min_tolerance_intersections ), rootSet( root_set ), geomVol( geom_volume ), senseTag( sense_tag ),
           desiredOrient( desired_orient ), prevFacets( prev_facets ){
 
-          };
+                                           };
 
-    virtual ErrorCode register_intersection( EntityHandle set, EntityHandle triangle, double distance,
+    virtual ErrorCode register_intersection( EntityHandle set,
+                                             EntityHandle triangle,
+                                             double distance,
                                              OrientedBoxTreeTool::IntersectSearchWindow&,
                                              GeomUtil::intersection_type int_type );
 
@@ -259,10 +276,12 @@ bool GQT_IntRegCtxt::in_neighborhoods( const EntityHandle tri )
  *\param neighborhood  Vector of triangles in the topological neighborhood of the intersection
  *\return              True if piercing, false otherwise.
  */
-bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const CartVect& ray_dir,
+bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri,
+                                                   const CartVect& ray_dir,
                                                    const GeomUtil::intersection_type int_type,
                                                    const std::vector< EntityHandle >& close_tris,
-                                                   const std::vector< int >& close_senses, const Interface* MBI,
+                                                   const std::vector< int >& close_senses,
+                                                   const Interface* MBI,
                                                    std::vector< EntityHandle >* neighborhood_tris )
 {
 
@@ -401,7 +420,9 @@ bool GQT_IntRegCtxt::edge_node_piercing_intersect( const EntityHandle tri, const
     return true;
 }
 
-ErrorCode GQT_IntRegCtxt::register_intersection( EntityHandle set, EntityHandle t, double int_dist,
+ErrorCode GQT_IntRegCtxt::register_intersection( EntityHandle set,
+                                                 EntityHandle t,
+                                                 double int_dist,
                                                  OrientedBoxTreeTool::IntersectSearchWindow& search_win,
                                                  GeomUtil::intersection_type int_type )
 {
@@ -471,7 +492,9 @@ void GQT_IntRegCtxt::set_intersection( int len_idx, EntityHandle set, EntityHand
    variables not used: min_tol_int, tol
    1) keep the closest nonneg intersection and one negative intersection, if closer
 */
-void GQT_IntRegCtxt::add_mode1_intersection( EntityHandle set, EntityHandle facet, double dist,
+void GQT_IntRegCtxt::add_mode1_intersection( EntityHandle set,
+                                             EntityHandle facet,
+                                             double dist,
                                              OrientedBoxTreeTool::IntersectSearchWindow& search_win )
 {
     if( 2 != intersections.size() )
@@ -507,7 +530,9 @@ void GQT_IntRegCtxt::add_mode1_intersection( EntityHandle set, EntityHandle face
     return;
 }
 
-void GQT_IntRegCtxt::add_intersection( EntityHandle set, EntityHandle facet, double dist,
+void GQT_IntRegCtxt::add_intersection( EntityHandle set,
+                                       EntityHandle facet,
+                                       double dist,
                                        OrientedBoxTreeTool::IntersectSearchWindow& search_win )
 {
 
@@ -597,8 +622,13 @@ void GQT_IntRegCtxt::add_intersection( EntityHandle set, EntityHandle facet, dou
     }
 }
 
-GeomQueryTool::GeomQueryTool( Interface* impl, bool find_geomsets, EntityHandle modelRootSet, bool p_rootSets_vector,
-                              bool restore_rootSets, bool trace_counting, double overlap_thickness,
+GeomQueryTool::GeomQueryTool( Interface* impl,
+                              bool find_geomsets,
+                              EntityHandle modelRootSet,
+                              bool p_rootSets_vector,
+                              bool restore_rootSets,
+                              bool trace_counting,
+                              double overlap_thickness,
                               double numerical_precision )
     : owns_gtt( true )
 {
@@ -618,7 +648,9 @@ GeomQueryTool::GeomQueryTool( Interface* impl, bool find_geomsets, EntityHandle 
     n_ray_fire_calls  = 0;
 }
 
-GeomQueryTool::GeomQueryTool( GeomTopoTool* geomtopotool, bool trace_counting, double overlap_thickness,
+GeomQueryTool::GeomQueryTool( GeomTopoTool* geomtopotool,
+                              bool trace_counting,
+                              double overlap_thickness,
                               double numerical_precision )
     : owns_gtt( false )
 {
@@ -704,9 +736,15 @@ void GeomQueryTool::RayHistory::add_entity( EntityHandle ent )
     prev_facets.push_back( ent );
 }
 
-ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point[3], const double dir[3],
-                                   EntityHandle& next_surf, double& next_surf_dist, RayHistory* history,
-                                   double user_dist_limit, int ray_orientation, OrientedBoxTreeTool::TrvStats* stats )
+ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume,
+                                   const double point[3],
+                                   const double dir[3],
+                                   EntityHandle& next_surf,
+                                   double& next_surf_dist,
+                                   RayHistory* history,
+                                   double user_dist_limit,
+                                   int ray_orientation,
+                                   OrientedBoxTreeTool::TrvStats* stats )
 {
 
     // take some stats that are independent of nps
@@ -879,8 +917,11 @@ ErrorCode GeomQueryTool::ray_fire( const EntityHandle volume, const double point
     return MB_SUCCESS;
 }
 
-ErrorCode GeomQueryTool::point_in_volume( const EntityHandle volume, const double xyz[3], int& result,
-                                          const double* uvw, const RayHistory* history )
+ErrorCode GeomQueryTool::point_in_volume( const EntityHandle volume,
+                                          const double xyz[3],
+                                          int& result,
+                                          const double* uvw,
+                                          const RayHistory* history )
 {
     // take some stats that are independent of nps
     if( counting ) ++n_pt_in_vol_calls;
@@ -1063,8 +1104,11 @@ ErrorCode GeomQueryTool::point_in_box( EntityHandle volume, const double point[3
     return rval;
 }
 
-ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume, const EntityHandle surface,
-                                               const double xyz[3], const double uvw[3], int& result,
+ErrorCode GeomQueryTool::test_volume_boundary( const EntityHandle volume,
+                                               const EntityHandle surface,
+                                               const double xyz[3],
+                                               const double uvw[3],
+                                               int& result,
                                                const RayHistory* history )
 {
     ErrorCode rval;
@@ -1270,7 +1314,9 @@ ErrorCode GeomQueryTool::find_volume_slow( const double xyz[3], EntityHandle& vo
 }
 
 // detemine distance to nearest surface
-ErrorCode GeomQueryTool::closest_to_location( EntityHandle volume, const double coords[3], double& result,
+ErrorCode GeomQueryTool::closest_to_location( EntityHandle volume,
+                                              const double coords[3],
+                                              double& result,
                                               EntityHandle* closest_surface )
 {
     // Get OBB Tree for volume
@@ -1391,7 +1437,9 @@ ErrorCode GeomQueryTool::measure_area( EntityHandle surface, double& result )
     return MB_SUCCESS;
 }
 
-ErrorCode GeomQueryTool::get_normal( EntityHandle surf, const double in_pt[3], double angle[3],
+ErrorCode GeomQueryTool::get_normal( EntityHandle surf,
+                                     const double in_pt[3],
+                                     double angle[3],
                                      const RayHistory* history )
 {
     EntityHandle root;
@@ -1441,8 +1489,13 @@ ErrorCode GeomQueryTool::get_normal( EntityHandle surf, const double in_pt[3], d
 // result= 1 -> inside volume or entering volume
 // result= 0 -> outside volume or leaving volume
 // result=-1 -> on boundary with null or tangent uvw
-ErrorCode GeomQueryTool::boundary_case( EntityHandle volume, int& result, double u, double v, double w,
-                                        EntityHandle facet, EntityHandle surface )
+ErrorCode GeomQueryTool::boundary_case( EntityHandle volume,
+                                        int& result,
+                                        double u,
+                                        double v,
+                                        double w,
+                                        EntityHandle facet,
+                                        EntityHandle surface )
 {
     ErrorCode rval;
 

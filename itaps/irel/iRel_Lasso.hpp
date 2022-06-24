@@ -29,10 +29,13 @@
         if( err != iBase_SUCCESS ) return err; \
     } while( false )
 
-#define CHK_PAIR()                                                               \
-    do                                                                           \
-    {                                                                            \
-        if( NULL == pair ) { ERROR( iBase_FAILURE, "Invalid relation pair." ); } \
+#define CHK_PAIR()                                            \
+    do                                                        \
+    {                                                         \
+        if( NULL == pair )                                    \
+        {                                                     \
+            ERROR( iBase_FAILURE, "Invalid relation pair." ); \
+        }                                                     \
     } while( false )
 
 #endif

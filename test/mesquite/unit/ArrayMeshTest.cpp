@@ -1011,7 +1011,10 @@ void ArrayMeshTest::test_tag_data( TagEntType type, TagStorage storage )
         ASSERT_STD_VECTORS_EQUAL( values5, values2 );
 
         // if WRITABLE storeage, original input array should have changed also
-        if( WRITABLE == storage ) { ASSERT_STD_VECTORS_EQUAL( values, values5 ); }
+        if( WRITABLE == storage )
+        {
+            ASSERT_STD_VECTORS_EQUAL( values, values5 );
+        }
     }
 
     // create a new tag with a default value

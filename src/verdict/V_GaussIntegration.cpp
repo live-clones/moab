@@ -70,8 +70,10 @@ void GaussIntegration::initialize( int n, int m, int dim, int tri )
     }
 }
 
-void GaussIntegration::get_shape_func( double shape_function[], double dndy1_at_gauss_pts[],
-                                       double dndy2_at_gauss_pts[], double gauss_weight[] )
+void GaussIntegration::get_shape_func( double shape_function[],
+                                       double dndy1_at_gauss_pts[],
+                                       double dndy2_at_gauss_pts[],
+                                       double gauss_weight[] )
 {
     int i, j;
     for( i = 0; i < totalNumberGaussPts; i++ )
@@ -88,8 +90,11 @@ void GaussIntegration::get_shape_func( double shape_function[], double dndy1_at_
         gauss_weight[i] = totalGaussWeight[i];
 }
 
-void GaussIntegration::get_shape_func( double shape_function[], double dndy1_at_gauss_pts[],
-                                       double dndy2_at_gauss_pts[], double dndy3_at_gauss_pts[], double gauss_weight[] )
+void GaussIntegration::get_shape_func( double shape_function[],
+                                       double dndy1_at_gauss_pts[],
+                                       double dndy2_at_gauss_pts[],
+                                       double dndy3_at_gauss_pts[],
+                                       double gauss_weight[] )
 {
     int i, j;
     for( i = 0; i < totalNumberGaussPts; i++ )
@@ -512,7 +517,9 @@ void GaussIntegration::calculate_derivative_at_nodes_3d( double dndy1_at_nodes[]
     }
 }
 
-void GaussIntegration::get_signs_for_node_local_coord_hex( int node_id, double& sign_node_y1, double& sign_node_y2,
+void GaussIntegration::get_signs_for_node_local_coord_hex( int node_id,
+                                                           double& sign_node_y1,
+                                                           double& sign_node_y2,
                                                            double& sign_node_y3 )
 {
     switch( node_id )

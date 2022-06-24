@@ -41,7 +41,10 @@ LambdaConstant::LambdaConstant( double lambda, TargetCalculator* W ) : mLambda( 
 
 LambdaConstant::~LambdaConstant() {}
 
-bool LambdaConstant::get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+bool LambdaConstant::get_3D_target( PatchData& pd,
+                                    size_t element,
+                                    Sample sample,
+                                    MsqMatrix< 3, 3 >& W_out,
                                     MsqError& err )
 {
     bool valid = mTarget->get_3D_target( pd, element, sample, W_out, err );
@@ -52,7 +55,10 @@ bool LambdaConstant::get_3D_target( PatchData& pd, size_t element, Sample sample
     return true;
 }
 
-bool LambdaConstant::get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+bool LambdaConstant::get_surface_target( PatchData& pd,
+                                         size_t element,
+                                         Sample sample,
+                                         MsqMatrix< 3, 2 >& W_out,
                                          MsqError& err )
 {
     bool valid = mTarget->get_surface_target( pd, element, sample, W_out, err );
@@ -63,7 +69,10 @@ bool LambdaConstant::get_surface_target( PatchData& pd, size_t element, Sample s
     return true;
 }
 
-bool LambdaConstant::get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+bool LambdaConstant::get_2D_target( PatchData& pd,
+                                    size_t element,
+                                    Sample sample,
+                                    MsqMatrix< 2, 2 >& W_out,
                                     MsqError& err )
 {
     bool valid = mTarget->get_2D_target( pd, element, sample, W_out, err );

@@ -99,7 +99,9 @@ C_FUNC_DEF double v_wedge_volume( int num_nodes, double coordinates[][3] )
     return (double)volume;
 }
 
-C_FUNC_DEF void v_wedge_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_wedge_quality( int num_nodes,
+                                 double coordinates[][3],
+                                 unsigned int metrics_request_flag,
                                  WedgeMetricVals* metric_vals )
 {
     memset( metric_vals, 0, sizeof( WedgeMetricVals ) );

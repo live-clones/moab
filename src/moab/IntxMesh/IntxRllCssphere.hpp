@@ -31,8 +31,15 @@ class IntxRllCssphere : public moab::Intx2Mesh
 
     // main method to intersect meshes on a sphere
 
-    ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt, EntityHandle src, double* P, int& nP, double& area,
-                                                   int markb[MAXEDGES], int markr[MAXEDGES], int& nsSrc, int& nsTgt,
+    ErrorCode computeIntersectionBetweenTgtAndSrc( EntityHandle tgt,
+                                                   EntityHandle src,
+                                                   double* P,
+                                                   int& nP,
+                                                   double& area,
+                                                   int markb[MAXEDGES],
+                                                   int markr[MAXEDGES],
+                                                   int& nsSrc,
+                                                   int& nsTgt,
                                                    bool check_boxes_first = false );
 
     ErrorCode findNodes( EntityHandle tgt, int nsTgt, EntityHandle src, int nsSrc, double* iP, int nP );

@@ -112,10 +112,15 @@ void WriteSLAC::reset_matset( std::vector< WriteSLAC::MaterialSetData >& matset_
         delete( *iter ).elements;
 }
 
-ErrorCode WriteSLAC::write_file( const char* file_name, const bool overwrite, const FileOptions&,
-                                 const EntityHandle* ent_handles, const int num_sets,
-                                 const std::vector< std::string >& /* qa_list */, const Tag* /* tag_list */,
-                                 int /* num_tags */, int /* export_dimension */ )
+ErrorCode WriteSLAC::write_file( const char* file_name,
+                                 const bool overwrite,
+                                 const FileOptions&,
+                                 const EntityHandle* ent_handles,
+                                 const int num_sets,
+                                 const std::vector< std::string >& /* qa_list */,
+                                 const Tag* /* tag_list */,
+                                 int /* num_tags */,
+                                 int /* export_dimension */ )
 {
     assert( 0 != mMaterialSetTag && 0 != mNeumannSetTag && 0 != mDirichletSetTag );
 
@@ -204,10 +209,13 @@ ErrorCode WriteSLAC::write_file( const char* file_name, const bool overwrite, co
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSLAC::gather_mesh_information(
-    MeshInfo& mesh_info, std::vector< WriteSLAC::MaterialSetData >& matset_info,
-    std::vector< WriteSLAC::NeumannSetData >& neuset_info, std::vector< WriteSLAC::DirichletSetData >& dirset_info,
-    std::vector< EntityHandle >& matsets, std::vector< EntityHandle >& neusets, std::vector< EntityHandle >& dirsets )
+ErrorCode WriteSLAC::gather_mesh_information( MeshInfo& mesh_info,
+                                              std::vector< WriteSLAC::MaterialSetData >& matset_info,
+                                              std::vector< WriteSLAC::NeumannSetData >& neuset_info,
+                                              std::vector< WriteSLAC::DirichletSetData >& dirset_info,
+                                              std::vector< EntityHandle >& matsets,
+                                              std::vector< EntityHandle >& neusets,
+                                              std::vector< EntityHandle >& dirsets )
 {
     std::vector< EntityHandle >::iterator vector_iter, end_vector_iter;
 
@@ -614,7 +622,8 @@ ErrorCode WriteSLAC::gather_interior_exterior( MeshInfo& mesh_info,
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSLAC::write_matsets( MeshInfo& mesh_info, std::vector< WriteSLAC::MaterialSetData >& matset_data,
+ErrorCode WriteSLAC::write_matsets( MeshInfo& mesh_info,
+                                    std::vector< WriteSLAC::MaterialSetData >& matset_data,
                                     std::vector< WriteSLAC::NeumannSetData >& neuset_data )
 {
     unsigned int i;
@@ -931,16 +940,24 @@ ErrorCode WriteSLAC::initialize_file( MeshInfo& mesh_info )
 ErrorCode WriteSLAC::open_file( const char* filename )
 {
     // Not a valid filname
-    if( strlen( (const char*)filename ) == 0 ) { MB_SET_ERR( MB_FAILURE, "Output filename not specified" ); }
+    if( strlen( (const char*)filename ) == 0 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Output filename not specified" );
+    }
 
     int fail = nc_create( filename, NC_CLOBBER, &ncFile );
     // File couldn't be opened
-    if( NC_NOERR != fail ) { MB_SET_ERR( MB_FAILURE, "Cannot open " << filename ); }
+    if( NC_NOERR != fail )
+    {
+        MB_SET_ERR( MB_FAILURE, "Cannot open " << filename );
+    }
 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteSLAC::get_neuset_elems( EntityHandle neuset, int current_sense, Range& forward_elems,
+ErrorCode WriteSLAC::get_neuset_elems( EntityHandle neuset,
+                                       int current_sense,
+                                       Range& forward_elems,
                                        Range& reverse_elems )
 {
     Range ss_elems, ss_meshsets;

@@ -354,11 +354,17 @@ class ReadABAQUS : public ReaderIface
     void tokenize( const std::string& str, std::vector< std::string >& tokens, const char* delimiters );
 
     //! Load an ABAQUS file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadABAQUS( Interface* impl = NULL );
@@ -380,31 +386,46 @@ class ReadABAQUS : public ReaderIface
     ErrorCode read_solid_section( EntityHandle parent_set );
     ErrorCode read_instance( EntityHandle assembly_set, EntityHandle file_set );
 
-    ErrorCode get_elements_by_id( EntityHandle parent_set, std::vector< int > element_ids_subset,
+    ErrorCode get_elements_by_id( EntityHandle parent_set,
+                                  std::vector< int > element_ids_subset,
                                   Range& element_range );
 
     ErrorCode get_nodes_by_id( EntityHandle parent_set, std::vector< int > node_ids_subset, Range& node_range );
 
-    ErrorCode get_set_by_name( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+    ErrorCode get_set_by_name( EntityHandle parent_set,
+                               int ABQ_set_type,
+                               const std::string& set_name,
                                EntityHandle& set_handle );
 
     ErrorCode get_set_elements( EntityHandle set_handle, Range& element_range );
 
-    ErrorCode get_set_elements_by_name( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+    ErrorCode get_set_elements_by_name( EntityHandle parent_set,
+                                        int ABQ_set_type,
+                                        const std::string& set_name,
                                         Range& element_range );
 
-    ErrorCode get_set_nodes( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+    ErrorCode get_set_nodes( EntityHandle parent_set,
+                             int ABQ_set_type,
+                             const std::string& set_name,
                              Range& node_range );
 
-    ErrorCode add_entity_set( EntityHandle parent_set, int ABQ_set_type, const std::string& set_name,
+    ErrorCode add_entity_set( EntityHandle parent_set,
+                              int ABQ_set_type,
+                              const std::string& set_name,
                               EntityHandle& entity_set );
 
-    ErrorCode create_instance_of_part( const EntityHandle file_set, const EntityHandle parent_set,
-                                       const std::string& part_name, const std::string& instance_name,
-                                       EntityHandle& entity_set, const std::vector< double >& translation,
+    ErrorCode create_instance_of_part( const EntityHandle file_set,
+                                       const EntityHandle parent_set,
+                                       const std::string& part_name,
+                                       const std::string& instance_name,
+                                       EntityHandle& entity_set,
+                                       const std::vector< double >& translation,
                                        const std::vector< double >& rotation );
 
-    Tag get_tag( const char* tag_name, int tag_size, TagType tag_type, DataType tag_data_type,
+    Tag get_tag( const char* tag_name,
+                 int tag_size,
+                 TagType tag_type,
+                 DataType tag_data_type,
                  const void* def_val = 0 );
 
     void cyl2rect( std::vector< double > coord_list );

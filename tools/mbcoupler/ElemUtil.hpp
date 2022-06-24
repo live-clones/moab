@@ -19,8 +19,11 @@ namespace ElemUtil
     bool nat_coords_trilinear_hex( const CartVect* hex_corners, const CartVect& x, CartVect& xi, double tol );
     bool point_in_trilinear_hex( const CartVect* hex_corners, const CartVect& xyz, double etol );
 
-    bool point_in_trilinear_hex( const CartVect* hex_corners, const CartVect& xyz, const CartVect& box_min,
-                                 const CartVect& box_max, double etol );
+    bool point_in_trilinear_hex( const CartVect* hex_corners,
+                                 const CartVect& xyz,
+                                 const CartVect& box_min,
+                                 const CartVect& box_max,
+                                 double etol );
 
     // wrapper to hex_findpt
     void nat_coords_trilinear_hex2( const CartVect* hex_corners, const CartVect& x, CartVect& xi, double til );
@@ -429,7 +432,8 @@ namespace Element
         void set_gl_points( double* x, double* y, double* z );
         virtual CartVect evaluate( const CartVect& xi ) const;  // a 2d, so 3rd component is 0, always
         virtual CartVect ievaluate(
-            const CartVect& x, double tol = 1e-6,
+            const CartVect& x,
+            double tol         = 1e-6,
             const CartVect& x0 = CartVect( 0.0 ) ) const;  // a 2d, so 3rd component is 0, always
         virtual Matrix3 jacobian( const CartVect& xi ) const;
         double evaluate_scalar_field( const CartVect& xi, const double* field_vertex_values ) const;

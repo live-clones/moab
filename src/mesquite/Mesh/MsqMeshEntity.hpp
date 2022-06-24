@@ -87,7 +87,10 @@ class MESQUITE_EXPORT MsqMeshEntity
     //! gets the vertices of the mesh entity
     void get_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
     void append_vertex_indices( std::vector< std::size_t >& vertex_list ) const;
-    size_t get_local_matrix_map_about_vertex( PatchData& pd, MsqVertex* vert, size_t local_map_size, int* local_map,
+    size_t get_local_matrix_map_about_vertex( PatchData& pd,
+                                              MsqVertex* vert,
+                                              size_t local_map_size,
+                                              int* local_map,
                                               MsqError& err ) const;
     //! gets the vertices of the mesh entity
     void get_node_indices( std::vector< std::size_t >& vertex_list ) const;

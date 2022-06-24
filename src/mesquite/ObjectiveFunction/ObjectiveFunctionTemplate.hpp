@@ -60,8 +60,10 @@ class MESQUITE_EXPORT ObjectiveFunctionTemplate : public ObjectiveFunction
         qualityMetric = metric;
     }
 
-    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain, const Settings* settings,
-                                                      PatchSet* user_set, MsqError& err );
+    virtual bool initialize_block_coordinate_descent( MeshDomainAssoc* mesh_and_domain,
+                                                      const Settings* settings,
+                                                      PatchSet* user_set,
+                                                      MsqError& err );
 
     virtual int min_patch_layers() const;
 

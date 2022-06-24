@@ -219,10 +219,19 @@ class NonSmoothDescent : public VertexMover
     bool check_equilibrium( OptStatus& opt_status, MsqError& err );
     bool convex_hull_test( const std::vector< Vector3D >& vec, MsqError& err );
     bool check_vector_dots( const std::vector< Vector3D >& vec, const Vector3D& normal, MsqError& err );
-    void find_plane_normal( const Vector3D& pt1, const Vector3D& pt2, const Vector3D& pt3, Vector3D& cross,
+    void find_plane_normal( const Vector3D& pt1,
+                            const Vector3D& pt2,
+                            const Vector3D& pt3,
+                            Vector3D& cross,
                             MsqError& /*err*/ );
-    void find_plane_points( Direction dir1, Direction dir2, const std::vector< Vector3D >& vec, Vector3D& pt1,
-                            Vector3D& pt2, Vector3D& pt3, Status& status, MsqError& );
+    void find_plane_points( Direction dir1,
+                            Direction dir2,
+                            const std::vector< Vector3D >& vec,
+                            Vector3D& pt1,
+                            Vector3D& pt2,
+                            Vector3D& pt3,
+                            Status& status,
+                            MsqError& );
 
     /* from the matrix file */
     void form_grammian( const std::vector< Vector3D >& vec, MsqError& err );
@@ -239,8 +248,11 @@ class NonSmoothDescent : public VertexMover
     NonSmoothDescent& operator=( const NonSmoothDescent& pd );  // disable assignment
 };
 
-inline void NonSmoothDescent::find_plane_normal( const Vector3D& pt1, const Vector3D& pt2, const Vector3D& pt3,
-                                                 Vector3D& cross, MsqError& /*err*/ )
+inline void NonSmoothDescent::find_plane_normal( const Vector3D& pt1,
+                                                 const Vector3D& pt2,
+                                                 const Vector3D& pt3,
+                                                 Vector3D& cross,
+                                                 MsqError& /*err*/ )
 {
     Vector3D vecA = pt2 - pt1;
     Vector3D vecB = pt3 - pt1;

@@ -29,7 +29,10 @@ void chkerr( Interface* mbi, ErrorCode code, int line, const char* file )
             std::cerr << "Error message: " << message << std::endl;
         std::string fname = file;
         size_t slash      = fname.find_last_of( '/' );
-        if( slash != fname.npos ) { fname = fname.substr( slash + 1 ); }
+        if( slash != fname.npos )
+        {
+            fname = fname.substr( slash + 1 );
+        }
         std::cerr << "At " << fname << " line: " << line << std::endl;
         std::exit( EXIT_FAILURE );
     }
@@ -52,7 +55,9 @@ void chkerr( GeomTopoTool& gtt, ErrorCode code, int line, const char* file )
  *
  * @param offset Offset to apply to surface to avoid a zero result.
  */
-static ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set, const CartVect& offset,
+static ErrorCode get_signed_volume( Interface* MBI,
+                                    const EntityHandle surf_set,
+                                    const CartVect& offset,
                                     double& signed_volume )
 {
     ErrorCode rval;
@@ -90,8 +95,11 @@ static ErrorCode get_signed_volume( Interface* MBI, const EntityHandle surf_set,
  * Replace the triangles in an old surface with those in a new surface, ensuring
  * that their surfaces senses match before the replacement
  */
-static ErrorCode replace_surface( Interface* mbi, EntityHandle old_surf, EntityHandle old_file_set,
-                                  EntityHandle new_surf, const Tag& senseTag )
+static ErrorCode replace_surface( Interface* mbi,
+                                  EntityHandle old_surf,
+                                  EntityHandle old_file_set,
+                                  EntityHandle new_surf,
+                                  const Tag& senseTag )
 {
 
     ErrorCode rval;
@@ -176,7 +184,10 @@ static ErrorCode replace_surface( Interface* mbi, EntityHandle old_surf, EntityH
     rval         = mbi->add_entities( old_surf, new_tris );
     if( MB_SUCCESS != rval ) return rval;
 
-    if( verbose ) { std::cout << num_old_tris << " tris -> " << num_new_tris << " tris" << std::endl; }
+    if( verbose )
+    {
+        std::cout << num_old_tris << " tris -> " << num_new_tris << " tris" << std::endl;
+    }
 
     return MB_SUCCESS;
 }
@@ -185,8 +196,12 @@ static ErrorCode replace_surface( Interface* mbi, EntityHandle old_surf, EntityH
  * Given an "old" file and a "new" file, replace the facets in any surface of the old
  * file with facets from the new file.
  */
-static ErrorCode merge_input_surfs( Interface* mbi, const EntityHandle old_file_set, const EntityHandle new_file_set,
-                                    const Tag& idTag, const Tag& dimTag, const Tag& senseTag )
+static ErrorCode merge_input_surfs( Interface* mbi,
+                                    const EntityHandle old_file_set,
+                                    const EntityHandle new_file_set,
+                                    const Tag& idTag,
+                                    const Tag& dimTag,
+                                    const Tag& senseTag )
 {
     ErrorCode rval;
 
@@ -228,7 +243,10 @@ static ErrorCode merge_input_surfs( Interface* mbi, const EntityHandle old_file_
 
         // TODO: check for quads and convert to triangles
 
-        if( verbose ) { std::cout << "Surface " << surf_id << ": " << std::flush; }
+        if( verbose )
+        {
+            std::cout << "Surface " << surf_id << ": " << std::flush;
+        }
         rval = replace_surface( mbi, old_surf, old_file_set, new_surf, senseTag );
         if( MB_SUCCESS != rval ) return rval;
         count++;
@@ -285,11 +303,20 @@ int main( int argc, char* argv[] )
         options += ( X );                      \
     }
 
-    if( po.numOptSet( "no-attribs" ) ) { OPTION_APPEND( "CGM_ATTRIBS=no" ); }
+    if( po.numOptSet( "no-attribs" ) )
+    {
+        OPTION_APPEND( "CGM_ATTRIBS=no" );
+    }
 
-    if( po.numOptSet( "fatal_curves" ) ) { OPTION_APPEND( "FATAL_ON_CURVES" ); }
+    if( po.numOptSet( "fatal_curves" ) )
+    {
+        OPTION_APPEND( "FATAL_ON_CURVES" );
+    }
 
-    if( po.numOptSet( "all-warnings" ) ) { OPTION_APPEND( "VERBOSE_CGM_WARNINGS" ); }
+    if( po.numOptSet( "all-warnings" ) )
+    {
+        OPTION_APPEND( "VERBOSE_CGM_WARNINGS" );
+    }
 
     // This is more roundabout than necessary, but we don't want *any* of the CGM-specific options
     //   to appear in the option string unless they were explicitly requested
@@ -390,7 +417,10 @@ int main( int argc, char* argv[] )
 
     if( !po.numOptSet( "no-outmesh" ) )
     {
-        if( verbose ) { std::cout << "Writing " << output_file << std::endl; }
+        if( verbose )
+        {
+            std::cout << "Writing " << output_file << std::endl;
+        }
         ret = mbi.write_file( output_file.c_str(), NULL, NULL, &input_file_set, 1 );
         CHECKERR( mbi, ret );
     }
@@ -399,7 +429,10 @@ int main( int argc, char* argv[] )
     if( obb_task )
     {
 
-        if( verbose ) { std::cout << "Loading data into GeomTopoTool" << std::endl; }
+        if( verbose )
+        {
+            std::cout << "Loading data into GeomTopoTool" << std::endl;
+        }
         GeomTopoTool* gtt = new GeomTopoTool( &mbi, false );
         ret               = gtt->find_geomsets();
         CHECKERR( *gtt, ret );

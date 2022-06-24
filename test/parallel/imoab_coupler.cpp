@@ -456,11 +456,11 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to write map file to disk" );
 
             const std::string intx_from_file_identifier = "map-from-file";
-            int dummyCpl = -1;
-            int dummy_rowcol = -1;
-            int dummyType = 0;
+            int dummyCpl                                = -1;
+            int dummy_rowcol                            = -1;
+            int dummyType                               = 0;
             ierr = iMOAB_LoadMappingWeightsFromFile( cplAtmOcnPID, &dummyCpl, &dummy_rowcol, &dummyType,
-                 intx_from_file_identifier.c_str(), atmocn_map_file_name.c_str() );
+                                                     intx_from_file_identifier.c_str(), atmocn_map_file_name.c_str() );
             CHECKIERR( ierr, "failed to load map file from disk" );
         }
 #endif
@@ -517,7 +517,6 @@ int main( int argc, char* argv[] )
         ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag a2oTbot_proj" );
 #endif
-
     }
 
     // need to make sure that the coverage mesh (created during intx method) received the tag that
@@ -542,7 +541,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem *3; // 3 tags
+            int storLeng = atmCompNDoFs * numAllElem * 3;  // 3 tags
             int eetype   = 1;
 
             vals.resize( storLeng );
@@ -625,8 +624,8 @@ int main( int argc, char* argv[] )
         if( ocnComm != MPI_COMM_NULL )
         {
             int tagIndexIn2;
-            ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2 );
+            ierr =
+                iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tags "
                              "a2oTbot_proj, a2oUbot_proj, a2oVbot_proj on ocn pes" );
         }
@@ -687,8 +686,7 @@ int main( int argc, char* argv[] )
                 int ent_type = 1;
                 ierr         = iMOAB_GetIntTagStorage( cmpOcnPID, GidStr.c_str(), &nelem[2], &ent_type, &gidElems[0] );
                 CHECKIERR( ierr, "failed to get global ids" );
-                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, "a2oTbot_proj", &nelem[2], &ent_type,
-                                                  &tempElems[0] );
+                ierr = iMOAB_GetDoubleTagStorage( cmpOcnPID, "a2oTbot_proj", &nelem[2], &ent_type, &tempElems[0] );
                 CHECKIERR( ierr, "failed to get temperature field" );
                 int err_code = 1;
                 check_baseline_file( baseline, gidElems, tempElems, 1.e-9, err_code );
@@ -764,8 +762,8 @@ int main( int argc, char* argv[] )
         if( lndComm != MPI_COMM_NULL )
         {
             int tagIndexIn2;
-            ierr = iMOAB_DefineTagStorage( cmpLndPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs,
-                                           &tagIndexIn2 );
+            ierr =
+                iMOAB_DefineTagStorage( cmpLndPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
             CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                              "a2oTbot_proj, a2oUbot_proj, a2oVbot_proj  on lnd pes" );
         }

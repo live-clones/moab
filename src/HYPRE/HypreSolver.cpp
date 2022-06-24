@@ -55,7 +55,10 @@ HYPRE_Int HypreSolver::Solve( const HypreParVector& b, HypreParVector& x ) const
 {
     HYPRE_Int err;
 
-    if( A == NULL ) { MB_SET_ERR_RET_VAL( "HypreSolver::Solve (...) : HypreParMatrix A is missing", 1 ); }
+    if( A == NULL )
+    {
+        MB_SET_ERR_RET_VAL( "HypreSolver::Solve (...) : HypreParMatrix A is missing", 1 );
+    }
 
     if( !setup_called )
     {
@@ -63,7 +66,10 @@ HYPRE_Int HypreSolver::Solve( const HypreParVector& b, HypreParVector& x ) const
         setup_called = 1;
     }
 
-    if( !iterative_mode ) { x = 0.0; }
+    if( !iterative_mode )
+    {
+        x = 0.0;
+    }
 
     err = SolveFcn()( *this, *A, b.x_par, x.x_par );
     return err;
@@ -71,9 +77,15 @@ HYPRE_Int HypreSolver::Solve( const HypreParVector& b, HypreParVector& x ) const
 
 HypreSolver::~HypreSolver()
 {
-    if( B ) { delete B; }
+    if( B )
+    {
+        delete B;
+    }
 
-    if( X ) { delete X; }
+    if( X )
+    {
+        delete X;
+    }
 }
 
 HyprePCG::HyprePCG( HypreParMatrix& _A ) : HypreSolver( &_A, true )
@@ -111,9 +123,15 @@ void HyprePCG::SetResidualConvergenceOptions( int res_frequency, double rtol )
 {
     HYPRE_PCGSetTwoNorm( pcg_solver, 1 );
 
-    if( res_frequency > 0 ) { HYPRE_PCGSetRecomputeResidualP( pcg_solver, res_frequency ); }
+    if( res_frequency > 0 )
+    {
+        HYPRE_PCGSetRecomputeResidualP( pcg_solver, res_frequency );
+    }
 
-    if( rtol > 0.0 ) { HYPRE_PCGSetResidualTol( pcg_solver, rtol ); }
+    if( rtol > 0.0 )
+    {
+        HYPRE_PCGSetResidualTol( pcg_solver, rtol );
+    }
 }
 
 HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
@@ -166,7 +184,10 @@ HYPRE_Int HyprePCG::Solve( const HypreParVector& b, HypreParVector& x ) const
 #endif
     }
 
-    if( !iterative_mode ) { x = 0.0; }
+    if( !iterative_mode )
+    {
+        x = 0.0;
+    }
 
     err = HYPRE_ParCSRPCGSolve( pcg_solver, *A, (HYPRE_ParVector)b, (HYPRE_ParVector)x );
 
@@ -292,7 +313,10 @@ HYPRE_Int HypreGMRES::Solve( const HypreParVector& b, HypreParVector& x ) const
 #endif
     }
 
-    if( !iterative_mode ) { x = 0.0; }
+    if( !iterative_mode )
+    {
+        x = 0.0;
+    }
 
     err = HYPRE_ParCSRGMRESSolve( gmres_solver, *A, b, x );
 
@@ -434,7 +458,10 @@ void HypreBoomerAMG::ResetAMGPrecond()
 
 void HypreBoomerAMG::SetOperator( const HypreParMatrix& op )
 {
-    if( A ) { ResetAMGPrecond(); }
+    if( A )
+    {
+        ResetAMGPrecond();
+    }
 
     // update base classes: Operator, Solver, HypreSolver
     A            = const_cast< HypreParMatrix* >( &op );

@@ -563,14 +563,23 @@ double VertexMover::loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, cons
     // Initialize outer loop
 
     this->initialize( patch, err );
-    if( MSQ_CHKERR( err ) ) { MSQ_SETERR( perr )( "initialize patch", MsqError::INVALID_STATE ); }  // goto ERROR;
+    if( MSQ_CHKERR( err ) )
+    {
+        MSQ_SETERR( perr )( "initialize patch", MsqError::INVALID_STATE );
+    }  // goto ERROR;
 
     MeshDomainAssoc mesh_and_domain2 = MeshDomainAssoc( (Mesh*)mesh, domain );
     obj_func.initialize( &mesh_and_domain2, settings, patch_set, err );
-    if( MSQ_CHKERR( err ) ) { MSQ_SETERR( perr )( "initialize obj_func", MsqError::INVALID_STATE ); }  // goto ERROR;
+    if( MSQ_CHKERR( err ) )
+    {
+        MSQ_SETERR( perr )( "initialize obj_func", MsqError::INVALID_STATE );
+    }  // goto ERROR;
 
     outer_crit->reset_outer( (Mesh*)mesh, domain, obj_func, settings, err );
-    if( MSQ_CHKERR( err ) ) { MSQ_SETERR( perr )( "reset_outer", MsqError::INVALID_STATE ); }  // goto ERROR;
+    if( MSQ_CHKERR( err ) )
+    {
+        MSQ_SETERR( perr )( "reset_outer", MsqError::INVALID_STATE );
+    }  // goto ERROR;
 
     // Loop until outer termination criterion is met
     inner_crit_terminated = false;
@@ -655,7 +664,10 @@ double VertexMover::loop_over_mesh( ParallelMesh* mesh, MeshDomain* domain, cons
                       << " inner_crit_terminated_local = " << inner_crit_terminated_local
                       << " all_culled = " << all_culled << " all_culled_local = " << all_culled_local << std::endl;
 
-        if( MSQ_CHKERR( err ) ) { MSQ_SETERR( perr )( "loop start", MsqError::INVALID_STATE ); }  // goto ERROR;
+        if( MSQ_CHKERR( err ) )
+        {
+            MSQ_SETERR( perr )( "loop start", MsqError::INVALID_STATE );
+        }  // goto ERROR;
 
         if( done ) break;
 

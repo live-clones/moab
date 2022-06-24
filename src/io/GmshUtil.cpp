@@ -72,8 +72,7 @@ const GmshElemType GmshUtil::gmshElemTypes[] = {
     { "3rd order tetrahedron", 29, MBMAXTYPE, 0, 0 },  // tet w/ 2 nodes per edge and 1 per face
     { "4th order tetrahedron", 30, MBMAXTYPE, 0, 0 },  // tet w/ 3 nodes per edge, 3 per face, and 1 mid-voluem
     { "5th order tetrahedron", 31, MBMAXTYPE, 0, 0 },  // tet w/ 4 nodes per edge, 6 per face, and 4 mid-voluem
-    { 0, 32, MBMAXTYPE, 0, 0 }
-};
+    { 0, 32, MBMAXTYPE, 0, 0 } };
 
 const unsigned GmshUtil::numGmshElemType = sizeof( GmshUtil::gmshElemTypes ) / sizeof( GmshUtil::gmshElemTypes[0] );
 
@@ -98,8 +97,7 @@ const int mb_to_gmsh_type[][MAX_NODES] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 12 },     // MBHEX
     TWENTYEIGHT_ZEROS,                                                                            // MBPOLYHEDRON
     TWENTYEIGHT_ZEROS,                                                                            // MBENTITYSET
-    TWENTYEIGHT_ZEROS
-};  // MBMAXTYPE
+    TWENTYEIGHT_ZEROS };                                                                          // MBMAXTYPE
 
 int GmshUtil::get_gmsh_type( EntityType type, unsigned num_nodes )
 {

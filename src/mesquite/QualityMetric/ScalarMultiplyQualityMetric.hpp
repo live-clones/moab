@@ -69,14 +69,26 @@ class ScalarMultiplyQualityMetric : public QualityMetric
 
     bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+    bool evaluate_with_indices( PatchData& pd,
+                                size_t handle,
+                                double& value,
+                                std::vector< size_t >& indices,
                                 MsqError& err );
 
-    bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                 std::vector< Vector3D >& gradient, MsqError& err );
+    bool evaluate_with_gradient( PatchData& pd,
+                                 size_t handle,
+                                 double& value,
+                                 std::vector< size_t >& indices,
+                                 std::vector< Vector3D >& gradient,
+                                 MsqError& err );
 
-    bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian, MsqError& err );
+    bool evaluate_with_Hessian( PatchData& pd,
+                                size_t handle,
+                                double& value,
+                                std::vector< size_t >& indices,
+                                std::vector< Vector3D >& gradient,
+                                std::vector< Matrix3D >& Hessian,
+                                MsqError& err );
 
   private:
     QualityMetric* mMetric;

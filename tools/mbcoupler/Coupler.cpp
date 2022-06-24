@@ -44,7 +44,11 @@ bool debug = false;
 int pack_tuples( TupleList* tl, void** ptr );
 void unpack_tuples( void* ptr, TupleList** tlp );
 
-Coupler::Coupler( Interface* impl, ParallelComm* pc, Range& local_elems, int coupler_id, bool init_tree,
+Coupler::Coupler( Interface* impl,
+                  ParallelComm* pc,
+                  Range& local_elems,
+                  int coupler_id,
+                  bool init_tree,
                   int max_ent_dim )
     : mbImpl( impl ), myPc( pc ), myId( coupler_id ), numIts( 3 ), max_dim( max_ent_dim ), _ntot( 0 ),
       spherical( false )
@@ -166,7 +170,7 @@ ErrorCode Coupler::initialize_tree()
         {
             std::vector< double > allBoxes_tmp( 6 * myPc->proc_config().proc_size() );
             mpi_err  = MPI_Allgather( &allBoxes[6 * my_rank], 6, MPI_DOUBLE, &allBoxes_tmp[0], 6, MPI_DOUBLE,
-                                     myPc->proc_config().proc_comm() );
+                                      myPc->proc_config().proc_comm() );
             allBoxes = allBoxes_tmp;
         }
 #endif
@@ -189,7 +193,9 @@ ErrorCode Coupler::initialize_tree()
     return result;
 }
 
-ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource, EntityHandle rootTarget, bool& specSou,
+ErrorCode Coupler::initialize_spectral_elements( EntityHandle rootSource,
+                                                 EntityHandle rootTarget,
+                                                 bool& specSou,
                                                  bool& specTar )
 {
     /*void * _spectralSource;
@@ -310,7 +316,11 @@ ErrorCode Coupler::locate_points( Range& targ_ents, double rel_eps, double abs_e
     return locate_points( &locs[0], targ_ents.size(), rel_eps, abs_eps, tl, store_local );
 }
 
-ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double rel_eps, double abs_eps, TupleList* tl,
+ErrorCode Coupler::locate_points( double* xyz,
+                                  unsigned int num_points,
+                                  double rel_eps,
+                                  double abs_eps,
+                                  TupleList* tl,
                                   bool store_local )
 {
     assert( tl || store_local );
@@ -551,8 +561,14 @@ ErrorCode Coupler::locate_points( double* xyz, unsigned int num_points, double r
     return MB_SUCCESS;
 }
 
-ErrorCode Coupler::test_local_box( double* xyz, int from_proc, int remote_index, int /*index*/, bool& point_located,
-                                   double rel_eps, double abs_eps, TupleList* tl )
+ErrorCode Coupler::test_local_box( double* xyz,
+                                   int from_proc,
+                                   int remote_index,
+                                   int /*index*/,
+                                   bool& point_located,
+                                   double rel_eps,
+                                   double abs_eps,
+                                   TupleList* tl )
 {
     std::vector< EntityHandle > entities;
     std::vector< CartVect > nat_coords;
@@ -626,8 +642,11 @@ ErrorCode Coupler::test_local_box( double* xyz, int from_proc, int remote_index,
     return MB_SUCCESS;
 }
 
-ErrorCode Coupler::interpolate( Coupler::Method method, const std::string& interp_tag, double* interp_vals,
-                                TupleList* tl, bool normalize )
+ErrorCode Coupler::interpolate( Coupler::Method method,
+                                const std::string& interp_tag,
+                                double* interp_vals,
+                                TupleList* tl,
+                                bool normalize )
 {
     Tag tag;
     ErrorCode result;
@@ -643,8 +662,13 @@ ErrorCode Coupler::interpolate( Coupler::Method method, const std::string& inter
     return interpolate( method, tag, interp_vals, tl, normalize );
 }
 
-ErrorCode Coupler::interpolate( Coupler::Method* methods, Tag* tags, int* points_per_method, int num_methods,
-                                double* interp_vals, TupleList* tl, bool /* normalize */ )
+ErrorCode Coupler::interpolate( Coupler::Method* methods,
+                                Tag* tags,
+                                int* points_per_method,
+                                int num_methods,
+                                double* interp_vals,
+                                TupleList* tl,
+                                bool /* normalize */ )
 {
     // if (!((LINEAR_FE == method) || (CONSTANT == method)))
     // return MB_FAILURE;
@@ -722,7 +746,9 @@ ErrorCode Coupler::interpolate( Coupler::Method* methods, Tag* tags, int* points
     return MB_SUCCESS;
 }
 
-ErrorCode Coupler::nat_param( double xyz[3], std::vector< EntityHandle >& entities, std::vector< CartVect >& nat_coords,
+ErrorCode Coupler::nat_param( double xyz[3],
+                              std::vector< EntityHandle >& entities,
+                              std::vector< CartVect >& nat_coords,
                               double epsilon )
 {
     if( !myTree ) return MB_FAILURE;
@@ -1096,7 +1122,9 @@ ErrorCode Coupler::constant_interp( EntityHandle elem, Tag tag, double& field )
 }
 
 // Normalize a field over the entire mesh represented by the root_set.
-ErrorCode Coupler::normalize_mesh( EntityHandle root_set, const char* norm_tag, Coupler::IntegType integ_type,
+ErrorCode Coupler::normalize_mesh( EntityHandle root_set,
+                                   const char* norm_tag,
+                                   Coupler::IntegType integ_type,
                                    int num_integ_pts )
 {
     ErrorCode err;
@@ -1125,8 +1153,13 @@ ErrorCode Coupler::normalize_mesh( EntityHandle root_set, const char* norm_tag, 
 }
 
 // Normalize a field over the subset of entities identified by the tags and values passed
-ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag, const char** tag_names, int num_tags,
-                                     const char** tag_values, Coupler::IntegType integ_type, int num_integ_pts )
+ErrorCode Coupler::normalize_subset( EntityHandle root_set,
+                                     const char* norm_tag,
+                                     const char** tag_names,
+                                     int num_tags,
+                                     const char** tag_values,
+                                     Coupler::IntegType integ_type,
+                                     int num_integ_pts )
 {
     moab::ErrorCode err;
     std::vector< Tag > tag_handles;
@@ -1143,8 +1176,13 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     return normalize_subset( root_set, norm_tag, &tag_handles[0], num_tags, tag_values, integ_type, num_integ_pts );
 }
 
-ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag, Tag* tag_handles, int num_tags,
-                                     const char** tag_values, Coupler::IntegType integ_type, int num_integ_pts )
+ErrorCode Coupler::normalize_subset( EntityHandle root_set,
+                                     const char* norm_tag,
+                                     Tag* tag_handles,
+                                     int num_tags,
+                                     const char** tag_values,
+                                     Coupler::IntegType integ_type,
+                                     int num_integ_pts )
 {
     ErrorCode err;
 
@@ -1162,9 +1200,11 @@ ErrorCode Coupler::normalize_subset( EntityHandle root_set, const char* norm_tag
     return err;
 }
 
-ErrorCode Coupler::do_normalization( const char* norm_tag, std::vector< std::vector< EntityHandle > >& entity_sets,
+ErrorCode Coupler::do_normalization( const char* norm_tag,
+                                     std::vector< std::vector< EntityHandle > >& entity_sets,
                                      std::vector< std::vector< EntityHandle > >& entity_groups,
-                                     Coupler::IntegType integ_type, int num_integ_pts )
+                                     Coupler::IntegType integ_type,
+                                     int num_integ_pts )
 {
     // SLAVE START ****************************************************************
     ErrorCode err;
@@ -1250,8 +1290,11 @@ ErrorCode Coupler::do_normalization( const char* norm_tag, std::vector< std::vec
 // Functions supporting the subset normalization function
 
 // Retrieve groups of entities matching tags and values if present
-ErrorCode Coupler::get_matching_entities( EntityHandle root_set, const char** tag_names, const char** tag_values,
-                                          int num_tags, std::vector< std::vector< EntityHandle > >* entity_sets,
+ErrorCode Coupler::get_matching_entities( EntityHandle root_set,
+                                          const char** tag_names,
+                                          const char** tag_values,
+                                          int num_tags,
+                                          std::vector< std::vector< EntityHandle > >* entity_sets,
                                           std::vector< std::vector< EntityHandle > >* entity_groups )
 {
     ErrorCode err;
@@ -1269,8 +1312,11 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, const char** ta
 }
 
 // Retrieve groups of entities matching tags and values if present
-ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handles, const char** tag_values,
-                                          int num_tags, std::vector< std::vector< EntityHandle > >* entity_sets,
+ErrorCode Coupler::get_matching_entities( EntityHandle root_set,
+                                          Tag* tag_handles,
+                                          const char** tag_values,
+                                          int num_tags,
+                                          std::vector< std::vector< EntityHandle > >* entity_sets,
                                           std::vector< std::vector< EntityHandle > >* entity_groups )
 {
     // SLAVE START ****************************************************************
@@ -1457,7 +1503,9 @@ ErrorCode Coupler::get_matching_entities( EntityHandle root_set, Tag* tag_handle
 // Return a tuple_list containing  tag values for each Entity Set
 // The tuple_list will have a column for each tag and a row for each
 // Entity Set. It is assumed all of the tags are integer tags.
-ErrorCode Coupler::create_tuples( Range& ent_sets, const char** tag_names, unsigned int num_tags,
+ErrorCode Coupler::create_tuples( Range& ent_sets,
+                                  const char** tag_names,
+                                  unsigned int num_tags,
                                   TupleList** tuple_list )
 {
     ErrorCode err;
@@ -1602,8 +1650,10 @@ ErrorCode Coupler::consolidate_tuples( TupleList** all_tuples, unsigned int num_
 
 // Calculate integrated field values for groups of entities
 ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle > >& groups,
-                                         std::vector< double >& integ_vals, const char* norm_tag,
-                                         int /*num_integ_vals*/, Coupler::IntegType integ_type )
+                                         std::vector< double >& integ_vals,
+                                         const char* norm_tag,
+                                         int /*num_integ_vals*/,
+                                         Coupler::IntegType integ_type )
 {
     ErrorCode err;
 
@@ -1655,7 +1705,10 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
             /* allocate the field data array */
             double* vfield = (double*)malloc( sizeof( double ) * ( connectivity_size ) );
             err            = mbImpl->tag_get_data( norm_hdl, verts, connectivity_size, vfield );
-            if( MB_SUCCESS != err ) { free( coords ); }
+            if( MB_SUCCESS != err )
+            {
+                free( coords );
+            }
             ERRORR( "Failed to get vertex coordinates.", err );
 
             // Get coordinates of all corner vertices (in normal order) and
@@ -1732,7 +1785,8 @@ ErrorCode Coupler::get_group_integ_vals( std::vector< std::vector< EntityHandle 
 
 // Apply a normalization factor to group of entities
 ErrorCode Coupler::apply_group_norm_factor( std::vector< std::vector< EntityHandle > >& entity_sets,
-                                            std::vector< double >& norm_factors, const char* norm_tag,
+                                            std::vector< double >& norm_factors,
+                                            const char* norm_tag,
                                             Coupler::IntegType /*integ_type*/ )
 {
     ErrorCode err;

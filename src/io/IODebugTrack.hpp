@@ -43,7 +43,9 @@ class IODebugTrack
      *\param output_stream Stream to which to print error messages
      *\param table_size Max table size.  No limit if unspecified
      */
-    IODebugTrack( bool enable, const std::string& table_name, std::ostream& output_stream,
+    IODebugTrack( bool enable,
+                  const std::string& table_name,
+                  std::ostream& output_stream,
                   unsigned long table_size = 0 );
 
     /**\brief Constuctor requires stream to which to log errors

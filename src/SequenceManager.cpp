@@ -102,8 +102,10 @@ ErrorCode SequenceManager::check_valid_entities( Error* /* error */, const Range
     return MB_SUCCESS;
 }
 
-ErrorCode SequenceManager::check_valid_entities( Error* /* error_handler */, const EntityHandle* entities,
-                                                 size_t num_entities, bool root_set_okay ) const
+ErrorCode SequenceManager::check_valid_entities( Error* /* error_handler */,
+                                                 const EntityHandle* entities,
+                                                 size_t num_entities,
+                                                 bool root_set_okay ) const
 {
     ErrorCode rval;
     const EntitySequence* ptr = 0;
@@ -214,7 +216,9 @@ ErrorCode SequenceManager::create_vertex( const double coords[3], EntityHandle& 
     return vseq->set_coordinates( handle, coords );
 }
 
-ErrorCode SequenceManager::create_element( EntityType type, const EntityHandle* conn, unsigned conn_len,
+ErrorCode SequenceManager::create_element( EntityType type,
+                                           const EntityHandle* conn,
+                                           unsigned conn_len,
                                            EntityHandle& handle )
 {
     if( type <= MBVERTEX || type >= MBENTITYSET ) return MB_TYPE_OUT_OF_RANGE;
@@ -229,7 +233,10 @@ ErrorCode SequenceManager::create_element( EntityType type, const EntityHandle* 
     {
         SequenceData* seq_data = 0;
         unsigned size          = DEFAULT_ELEMENT_SEQUENCE_SIZE;
-        if( type == MBPOLYGON || type == MBPOLYHEDRON ) { size = default_poly_sequence_size( conn_len ); }
+        if( type == MBPOLYGON || type == MBPOLYHEDRON )
+        {
+            size = default_poly_sequence_size( conn_len );
+        }
         EntityID seq_data_size = 0;
         handle = typeData[type].find_free_sequence( size, start, end, seq_data, seq_data_size, conn_len );
         if( !handle ) return MB_FAILURE;
@@ -367,7 +374,10 @@ ErrorCode SequenceManager::allocate_mesh_set( EntityHandle handle, unsigned flag
     }
     else
     {
-        if( data ) { seq = new MeshSetSequence( handle, 1, flags, data ); }
+        if( data )
+        {
+            seq = new MeshSetSequence( handle, 1, flags, data );
+        }
         else
         {
             assert( handle >= block_start && handle <= block_end );
@@ -397,8 +407,12 @@ void SequenceManager::trim_sequence_block( EntityHandle start_handle, EntityHand
     if( end_handle - start_handle >= max_size ) end_handle = start_handle + max_size - 1;
 }
 
-EntityHandle SequenceManager::sequence_start_handle( EntityType type, EntityID count, int size, EntityID start,
-                                                     SequenceData*& data, EntityID& data_size )
+EntityHandle SequenceManager::sequence_start_handle( EntityType type,
+                                                     EntityID count,
+                                                     int size,
+                                                     EntityID start,
+                                                     SequenceData*& data,
+                                                     EntityID& data_size )
 {
     TypeSequenceManager& tsm = typeData[type];
     data                     = 0;
@@ -416,7 +430,7 @@ EntityHandle SequenceManager::sequence_start_handle( EntityType type, EntityID c
 EntityID SequenceManager::new_sequence_size( EntityHandle start, EntityID requested_size, int sequence_size ) const
 {
 
-    requested_size = ( EntityID )( this->sequence_multiplier * requested_size );
+    requested_size = (EntityID)( this->sequence_multiplier * requested_size );
 
     if( sequence_size < (int)requested_size ) return requested_size;
 
@@ -434,8 +448,13 @@ EntityID SequenceManager::new_sequence_size( EntityHandle start, EntityID reques
         return available_size;
 }
 
-ErrorCode SequenceManager::create_entity_sequence( EntityType type, EntityID count, int size, EntityID start,
-                                                   EntityHandle& handle, EntitySequence*& sequence, int sequence_size )
+ErrorCode SequenceManager::create_entity_sequence( EntityType type,
+                                                   EntityID count,
+                                                   int size,
+                                                   EntityID start,
+                                                   EntityHandle& handle,
+                                                   EntitySequence*& sequence,
+                                                   int sequence_size )
 {
     SequenceData* data = NULL;
     EntityID data_size = 0;
@@ -505,8 +524,11 @@ ErrorCode SequenceManager::create_entity_sequence( EntityType type, EntityID cou
     return MB_SUCCESS;
 }
 
-ErrorCode SequenceManager::create_meshset_sequence( EntityID count, EntityID start, const unsigned* flags,
-                                                    EntityHandle& handle, EntitySequence*& sequence )
+ErrorCode SequenceManager::create_meshset_sequence( EntityID count,
+                                                    EntityID start,
+                                                    const unsigned* flags,
+                                                    EntityHandle& handle,
+                                                    EntitySequence*& sequence )
 {
     SequenceData* data = 0;
     EntityID data_size = 0;
@@ -533,8 +555,11 @@ ErrorCode SequenceManager::create_meshset_sequence( EntityID count, EntityID sta
     return MB_SUCCESS;
 }
 
-ErrorCode SequenceManager::create_meshset_sequence( EntityID count, EntityID start, unsigned flags,
-                                                    EntityHandle& handle, EntitySequence*& sequence )
+ErrorCode SequenceManager::create_meshset_sequence( EntityID count,
+                                                    EntityID start,
+                                                    unsigned flags,
+                                                    EntityHandle& handle,
+                                                    EntitySequence*& sequence )
 {
     SequenceData* data = 0;
     EntityID data_size = 0;
@@ -560,9 +585,17 @@ ErrorCode SequenceManager::create_meshset_sequence( EntityID count, EntityID sta
     return MB_SUCCESS;
 }
 
-ErrorCode SequenceManager::create_scd_sequence( int imin, int jmin, int kmin, int imax, int jmax, int kmax,
-                                                EntityType type, EntityID start_id_hint, EntityHandle& handle,
-                                                EntitySequence*& sequence, int* is_periodic )
+ErrorCode SequenceManager::create_scd_sequence( int imin,
+                                                int jmin,
+                                                int kmin,
+                                                int imax,
+                                                int jmax,
+                                                int kmax,
+                                                EntityType type,
+                                                EntityID start_id_hint,
+                                                EntityHandle& handle,
+                                                EntitySequence*& sequence,
+                                                int* is_periodic )
 {
     int this_dim = CN::Dimension( type );
 
@@ -572,7 +605,7 @@ ErrorCode SequenceManager::create_scd_sequence( int imin, int jmin, int kmin, in
     // Compute # entities; not as easy as it would appear...
     EntityID num_ent;
     if( MBVERTEX == type )
-        num_ent = ( EntityID )( imax - imin + 1 ) * ( EntityID )( jmax - jmin + 1 ) * ( EntityID )( kmax - kmin + 1 );
+        num_ent = (EntityID)( imax - imin + 1 ) * (EntityID)( jmax - jmin + 1 ) * (EntityID)( kmax - kmin + 1 );
     else
     {
         num_ent = ( imax - imin + ( is_periodic && is_periodic[0] ? 1 : 0 ) ) *
@@ -617,16 +650,28 @@ ErrorCode SequenceManager::create_scd_sequence( int imin, int jmin, int kmin, in
     return MB_SUCCESS;
 }
 
-ErrorCode SequenceManager::create_scd_sequence( const HomCoord& coord_min, const HomCoord& coord_max, EntityType type,
-                                                EntityID start_id_hint, EntityHandle& first_handle_out,
-                                                EntitySequence*& sequence_out, int* is_periodic )
+ErrorCode SequenceManager::create_scd_sequence( const HomCoord& coord_min,
+                                                const HomCoord& coord_max,
+                                                EntityType type,
+                                                EntityID start_id_hint,
+                                                EntityHandle& first_handle_out,
+                                                EntitySequence*& sequence_out,
+                                                int* is_periodic )
 {
     return create_scd_sequence( coord_min.i(), coord_min.j(), coord_min.k(), coord_max.i(), coord_max.j(),
                                 coord_max.k(), type, start_id_hint, first_handle_out, sequence_out, is_periodic );
 }
 
-ErrorCode SequenceManager::create_sweep_sequence( int imin, int jmin, int kmin, int imax, int jmax, int kmax, int* Cq,
-                                                  EntityType type, EntityID start_id_hint, EntityHandle& handle,
+ErrorCode SequenceManager::create_sweep_sequence( int imin,
+                                                  int jmin,
+                                                  int kmin,
+                                                  int imax,
+                                                  int jmax,
+                                                  int kmax,
+                                                  int* Cq,
+                                                  EntityType type,
+                                                  EntityID start_id_hint,
+                                                  EntityHandle& handle,
                                                   EntitySequence*& sequence )
 {
     int this_dim = CN::Dimension( type );
@@ -635,7 +680,7 @@ ErrorCode SequenceManager::create_sweep_sequence( int imin, int jmin, int kmin, 
 
     EntityID num_ent;
     if( MBVERTEX == type )
-        num_ent = ( EntityID )( imax - imin + 1 ) * ( EntityID )( jmax - jmin + 1 ) * ( EntityID )( kmax - kmin + 1 );
+        num_ent = (EntityID)( imax - imin + 1 ) * (EntityID)( jmax - jmin + 1 ) * (EntityID)( kmax - kmin + 1 );
     else
     {
         num_ent = ( imax - imin ) * ( this_dim >= 2 ? ( jmax - jmin ) : 1 ) * ( this_dim >= 3 ? ( kmax - kmin ) : 1 );
@@ -676,17 +721,28 @@ ErrorCode SequenceManager::create_sweep_sequence( int imin, int jmin, int kmin, 
     return MB_SUCCESS;
 }
 
-ErrorCode SequenceManager::create_sweep_sequence( const HomCoord& coord_min, const HomCoord& coord_max, int* Cq,
-                                                  EntityType type, EntityID start_id_hint,
-                                                  EntityHandle& first_handle_out, EntitySequence*& sequence_out )
+ErrorCode SequenceManager::create_sweep_sequence( const HomCoord& coord_min,
+                                                  const HomCoord& coord_max,
+                                                  int* Cq,
+                                                  EntityType type,
+                                                  EntityID start_id_hint,
+                                                  EntityHandle& first_handle_out,
+                                                  EntitySequence*& sequence_out )
 {
     return create_sweep_sequence( coord_min.i(), coord_min.j(), coord_min.k(), coord_max.i(), coord_max.j(),
                                   coord_max.k(), Cq, type, start_id_hint, first_handle_out, sequence_out );
 }
 
-ErrorCode SequenceManager::add_vsequence( EntitySequence* vert_seq, EntitySequence* elem_seq, const HomCoord& p1,
-                                          const HomCoord& q1, const HomCoord& p2, const HomCoord& q2,
-                                          const HomCoord& p3, const HomCoord& q3, bool bb_input, const HomCoord* bb_min,
+ErrorCode SequenceManager::add_vsequence( EntitySequence* vert_seq,
+                                          EntitySequence* elem_seq,
+                                          const HomCoord& p1,
+                                          const HomCoord& q1,
+                                          const HomCoord& p2,
+                                          const HomCoord& q2,
+                                          const HomCoord& p3,
+                                          const HomCoord& q3,
+                                          bool bb_input,
+                                          const HomCoord* bb_min,
                                           const HomCoord* bb_max )
 {
     // Check first that they're structured vtx/elem sequences
@@ -725,13 +781,15 @@ void SequenceManager::get_memory_use( unsigned long long& total_entity_storage,
     }
 }
 
-void SequenceManager::get_memory_use( EntityType type, unsigned long long& total_entity_storage,
+void SequenceManager::get_memory_use( EntityType type,
+                                      unsigned long long& total_entity_storage,
                                       unsigned long long& total_storage ) const
 {
     typeData[type].get_memory_use( total_entity_storage, total_storage );
 }
 
-void SequenceManager::get_memory_use( const Range& entities, unsigned long long& total_entity_storage,
+void SequenceManager::get_memory_use( const Range& entities,
+                                      unsigned long long& total_entity_storage,
                                       unsigned long long& total_amortized_storage ) const
 {
     total_entity_storage    = 0;
@@ -768,7 +826,10 @@ void SequenceManager::get_memory_use( const Range& entities, unsigned long long&
 
 ErrorCode SequenceManager::reserve_tag_array( Error* /* error_handler */, int size, int& index )
 {
-    if( size < 1 && size != MB_VARIABLE_LENGTH ) { MB_SET_ERR( MB_INVALID_SIZE, "Invalid tag size: " << size ); }
+    if( size < 1 && size != MB_VARIABLE_LENGTH )
+    {
+        MB_SET_ERR( MB_INVALID_SIZE, "Invalid tag size: " << size );
+    }
 
     std::vector< int >::iterator i = std::find( tagSizes.begin(), tagSizes.end(), UNUSED_SIZE );
     if( i == tagSizes.end() )

@@ -52,7 +52,9 @@ class NestedRefine
      * EntityHandle STL vector that returns the handles of the sets created for each mesh level.
      */
 
-    ErrorCode generate_mesh_hierarchy( int num_level, int* level_degrees, std::vector< EntityHandle >& level_sets,
+    ErrorCode generate_mesh_hierarchy( int num_level,
+                                       int* level_degrees,
+                                       std::vector< EntityHandle >& level_sets,
                                        bool optimize = false );
 
     //! Given an entity and its level, return its connectivity.
@@ -83,7 +85,8 @@ class NestedRefine
      * \param target_entities Vector in which the adjacent EntityHandle are returned.
      */
 
-    ErrorCode get_adjacencies( const EntityHandle source_entity, const unsigned int target_dimension,
+    ErrorCode get_adjacencies( const EntityHandle source_entity,
+                               const unsigned int target_dimension,
                                std::vector< EntityHandle >& target_entities );
 
     // Interlevel parent-child or vice-versa queries
@@ -107,7 +110,9 @@ class NestedRefine
      * \param children Vector containing all childrens from the requested child_level
      */
 
-    ErrorCode parent_to_child( EntityHandle parent, int parent_level, int child_level,
+    ErrorCode parent_to_child( EntityHandle parent,
+                               int parent_level,
+                               int child_level,
                                std::vector< EntityHandle >& children );
 
     /** Given a vertex from a certain level, it returns a std::vector of all entities from any
@@ -120,7 +125,9 @@ class NestedRefine
      * vertex
      */
 
-    ErrorCode vertex_to_entities_up( EntityHandle vertex, int vert_level, int parent_level,
+    ErrorCode vertex_to_entities_up( EntityHandle vertex,
+                                     int vert_level,
+                                     int parent_level,
                                      std::vector< EntityHandle >& incident_entities );
 
     /** Given a vertex from a certain level, it returns a std::vector of all children entities of
@@ -132,7 +139,9 @@ class NestedRefine
      * \param incident_entities Vector containing entities from the child level
      */
 
-    ErrorCode vertex_to_entities_down( EntityHandle vertex, int vert_level, int child_level,
+    ErrorCode vertex_to_entities_down( EntityHandle vertex,
+                                       int vert_level,
+                                       int child_level,
                                        std::vector< EntityHandle >& incident_entities );
 
     ErrorCode get_vertex_duplicates( EntityHandle vertex, int level, EntityHandle& dupvertex );
@@ -257,7 +266,10 @@ class NestedRefine
     ErrorCode construct_hm_1D( int cur_level, int deg );
     ErrorCode construct_hm_1D( int cur_level, int deg, EntityType type, std::vector< EntityHandle >& trackverts );
     ErrorCode construct_hm_2D( int cur_level, int deg );
-    ErrorCode construct_hm_2D( int cur_level, int deg, EntityType type, std::vector< EntityHandle >& trackvertsC_edg,
+    ErrorCode construct_hm_2D( int cur_level,
+                               int deg,
+                               EntityType type,
+                               std::vector< EntityHandle >& trackvertsC_edg,
                                std::vector< EntityHandle >& trackvertsF );
     ErrorCode construct_hm_3D( int cur_level, int deg );
 
@@ -272,17 +284,39 @@ class NestedRefine
     int get_local_vid( EntityHandle vid, EntityHandle ent, int level );
 
     // Book-keeping functions
-    ErrorCode update_tracking_verts( EntityHandle cid, int cur_level, int deg,
+    ErrorCode update_tracking_verts( EntityHandle cid,
+                                     int cur_level,
+                                     int deg,
                                      std::vector< EntityHandle >& trackvertsC_edg,
-                                     std::vector< EntityHandle >& trackvertsC_face, EntityHandle* vbuffer );
-    ErrorCode reorder_indices( int cur_level, int deg, EntityHandle cell, int lfid, EntityHandle sib_cell, int sib_lfid,
-                               int index, int* id_sib );
-    ErrorCode reorder_indices( int deg, EntityHandle* face1_conn, EntityHandle* face2_conn, int nvF,
-                               std::vector< int >& lemap, std::vector< int >& vidx, int* leorient = NULL );
+                                     std::vector< EntityHandle >& trackvertsC_face,
+                                     EntityHandle* vbuffer );
+    ErrorCode reorder_indices( int cur_level,
+                               int deg,
+                               EntityHandle cell,
+                               int lfid,
+                               EntityHandle sib_cell,
+                               int sib_lfid,
+                               int index,
+                               int* id_sib );
+    ErrorCode reorder_indices( int deg,
+                               EntityHandle* face1_conn,
+                               EntityHandle* face2_conn,
+                               int nvF,
+                               std::vector< int >& lemap,
+                               std::vector< int >& vidx,
+                               int* leorient = NULL );
     ErrorCode reorder_indices( int deg, int nvF, int comb, int* childfid_map );
-    ErrorCode reorder_indices( EntityHandle* face1_conn, EntityHandle* face2_conn, int nvF, int* conn_map, int& comb,
+    ErrorCode reorder_indices( EntityHandle* face1_conn,
+                               EntityHandle* face2_conn,
+                               int nvF,
+                               int* conn_map,
+                               int& comb,
                                int* orient = NULL );
-    ErrorCode get_lid_inci_child( EntityType type, int deg, int lfid, int leid, std::vector< int >& child_ids,
+    ErrorCode get_lid_inci_child( EntityType type,
+                                  int deg,
+                                  int lfid,
+                                  int leid,
+                                  std::vector< int >& child_ids,
                                   std::vector< int >& child_lvids );
 
     // Permutation matrices
@@ -304,14 +338,24 @@ class NestedRefine
     ErrorCode print_maps_3D( int level, EntityType type );
 
     // Coordinates
-    ErrorCode compute_coordinates( int cur_level, int deg, EntityType type, EntityHandle* vbuffer, int vtotal,
-                                   double* corner_coords, std::vector< int >& vflag, int nverts_prev );
+    ErrorCode compute_coordinates( int cur_level,
+                                   int deg,
+                                   EntityType type,
+                                   EntityHandle* vbuffer,
+                                   int vtotal,
+                                   double* corner_coords,
+                                   std::vector< int >& vflag,
+                                   int nverts_prev );
 
     // Update the ahf maps
 
     ErrorCode update_local_ahf( int deg, EntityType type, EntityHandle* vbuffer, EntityHandle* ent_buffer, int etotal );
 
-    ErrorCode update_local_ahf( int deg, EntityType type, int pat_id, EntityHandle* vbuffer, EntityHandle* ent_buffer,
+    ErrorCode update_local_ahf( int deg,
+                                EntityType type,
+                                int pat_id,
+                                EntityHandle* vbuffer,
+                                EntityHandle* ent_buffer,
                                 int etotal );
 
     //  ErrorCode update_global_ahf(EntityType type, int cur_level, int deg);
@@ -381,30 +425,42 @@ class NestedRefine
     ErrorCode resolve_shared_ents_opt( EntityHandle* hm_set, int num_levels );
 
     ErrorCode collect_shared_entities_by_dimension( Range sharedEnts, Range& allEnts );
-    ErrorCode collect_FList( int to_proc, Range faces, std::vector< EntityHandle >& FList,
+    ErrorCode collect_FList( int to_proc,
+                             Range faces,
+                             std::vector< EntityHandle >& FList,
                              std::vector< EntityHandle >& RList );
-    ErrorCode collect_EList( int to_proc, Range edges, std::vector< EntityHandle >& EList,
+    ErrorCode collect_EList( int to_proc,
+                             Range edges,
+                             std::vector< EntityHandle >& EList,
                              std::vector< EntityHandle >& RList );
-    ErrorCode collect_VList( int to_proc, Range verts, std::vector< EntityHandle >& VList,
+    ErrorCode collect_VList( int to_proc,
+                             Range verts,
+                             std::vector< EntityHandle >& VList,
                              std::vector< EntityHandle >& RList );
 
-    ErrorCode decipher_remote_handles( std::vector< int >& sharedprocs, std::vector< std::vector< int > >& auxinfo,
+    ErrorCode decipher_remote_handles( std::vector< int >& sharedprocs,
+                                       std::vector< std::vector< int > >& auxinfo,
                                        std::vector< std::vector< EntityHandle > >& localbuffers,
                                        std::vector< std::vector< EntityHandle > >& remotebuffers,
                                        std::multimap< EntityHandle, int >& remProcs,
                                        std::multimap< EntityHandle, EntityHandle >& remHandles );
 
-    ErrorCode decipher_remote_handles_face( int shared_proc, int numfaces, std::vector< EntityHandle >& localFaceList,
+    ErrorCode decipher_remote_handles_face( int shared_proc,
+                                            int numfaces,
+                                            std::vector< EntityHandle >& localFaceList,
                                             std::vector< EntityHandle >& remFaceList,
                                             std::multimap< EntityHandle, int >& remProcs,
                                             std::multimap< EntityHandle, EntityHandle >& remHandles );
 
-    ErrorCode decipher_remote_handles_edge( int shared_proc, int numedges, std::vector< EntityHandle >& localEdgeList,
+    ErrorCode decipher_remote_handles_edge( int shared_proc,
+                                            int numedges,
+                                            std::vector< EntityHandle >& localEdgeList,
                                             std::vector< EntityHandle >& remEdgeList,
                                             std::multimap< EntityHandle, int >& remProcs,
                                             std::multimap< EntityHandle, EntityHandle >& remHandles );
 
-    ErrorCode decipher_remote_handles_vertex( int shared_proc, int numverts,
+    ErrorCode decipher_remote_handles_vertex( int shared_proc,
+                                              int numverts,
                                               std::vector< EntityHandle >& localVertexList,
                                               std::vector< EntityHandle >& remVertexList,
                                               std::multimap< EntityHandle, int >& remProcs,
@@ -413,14 +469,21 @@ class NestedRefine
     ErrorCode update_parallel_tags( std::multimap< EntityHandle, int >& remProcs,
                                     std::multimap< EntityHandle, EntityHandle >& remHandles );
 
-    ErrorCode get_data_from_buff( int dim, int type, int level, int entityidx, int nentities,
-                                  std::vector< EntityHandle >& buffer, std::vector< EntityHandle >& data );
+    ErrorCode get_data_from_buff( int dim,
+                                  int type,
+                                  int level,
+                                  int entityidx,
+                                  int nentities,
+                                  std::vector< EntityHandle >& buffer,
+                                  std::vector< EntityHandle >& data );
 
     bool check_for_parallelinfo( EntityHandle entity, int proc, std::multimap< EntityHandle, int >& remProcs );
 
-    ErrorCode check_for_parallelinfo( EntityHandle entity, int proc,
+    ErrorCode check_for_parallelinfo( EntityHandle entity,
+                                      int proc,
                                       std::multimap< EntityHandle, EntityHandle >& remHandles,
-                                      std::multimap< EntityHandle, int >& remProcs, EntityHandle& rhandle );
+                                      std::multimap< EntityHandle, int >& remProcs,
+                                      EntityHandle& rhandle );
 
 #endif
 };

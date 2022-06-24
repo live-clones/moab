@@ -43,8 +43,12 @@ int HexLagrangeShape::num_nodes() const
     return 27;
 }
 
-void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                                     size_t& num_coeff, MsqError& err ) const
+void HexLagrangeShape::coefficients( Sample loc,
+                                     NodeSet nodeset,
+                                     double* coeff_out,
+                                     size_t* indices_out,
+                                     size_t& num_coeff,
+                                     MsqError& err ) const
 {
     if( nodeset.num_nodes() != 27 )
     {
@@ -84,8 +88,12 @@ void HexLagrangeShape::coefficients( Sample loc, NodeSet nodeset, double* coeff_
     }
 }
 
-void HexLagrangeShape::derivatives( Sample loc, NodeSet nodeset, size_t* vertices, MsqVector< 3 >* derivs,
-                                    size_t& num_vtx, MsqError& err ) const
+void HexLagrangeShape::derivatives( Sample loc,
+                                    NodeSet nodeset,
+                                    size_t* vertices,
+                                    MsqVector< 3 >* derivs,
+                                    size_t& num_vtx,
+                                    MsqError& err ) const
 {
     if( nodeset.num_nodes() != 27 )
     {

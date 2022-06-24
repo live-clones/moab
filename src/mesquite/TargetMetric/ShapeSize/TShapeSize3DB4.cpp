@@ -60,7 +60,9 @@ bool TShapeSize3DB4::evaluate( const MsqMatrix< 3, 3 >& T, double& result, MsqEr
     return true;
 }
 
-bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv,
+bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T,
+                                         double& result,
+                                         MsqMatrix< 3, 3 >& deriv,
                                          MsqError& err )
 {
     const double tau = det( T );
@@ -82,8 +84,11 @@ bool TShapeSize3DB4::evaluate_with_grad( const MsqMatrix< 3, 3 >& T, double& res
     return true;
 }
 
-bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix< 3, 3 >& T, double& result, MsqMatrix< 3, 3 >& deriv,
-                                         MsqMatrix< 3, 3 > second[6], MsqError& err )
+bool TShapeSize3DB4::evaluate_with_hess( const MsqMatrix< 3, 3 >& T,
+                                         double& result,
+                                         MsqMatrix< 3, 3 >& deriv,
+                                         MsqMatrix< 3, 3 > second[6],
+                                         MsqError& err )
 {
     const double tau = det( T );
     if( invalid_determinant( tau ) )

@@ -106,8 +106,8 @@
                                                                                *disabled.
                                                                                ******************************************************************************/
 #define IMESH_NEW_MESH_NAME__( A, B, C ) A##_##B##_##C
-#define IMESH_NEW_MESH_NAME_( A, B, C ) IMESH_NEW_MESH_NAME__( A, B, C )
-#define IMESH_NEW_MESH_NAME( A ) IMESH_NEW_MESH_NAME_( A, IMESH_VERSION_MAJOR, IMESH_VERSION_MINOR )
+#define IMESH_NEW_MESH_NAME_( A, B, C )  IMESH_NEW_MESH_NAME__( A, B, C )
+#define IMESH_NEW_MESH_NAME( A )         IMESH_NEW_MESH_NAME_( A, IMESH_VERSION_MAJOR, IMESH_VERSION_MINOR )
 /*
 #undef  iMesh_newMesh
 #define iMesh_newMesh IMESH_NEW_MESH_NAME(iMesh_newMesh)

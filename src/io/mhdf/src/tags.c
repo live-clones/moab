@@ -29,9 +29,9 @@
 
 hid_t mhdf_getNativeType( hid_t input_type, int size, mhdf_Status* status )
 {
-    H5T_sign_t  sgn;
+    H5T_sign_t sgn;
     H5T_class_t cls;
-    hid_t       tmp_id, type_id;
+    hid_t tmp_id, type_id;
 
     mhdf_setOkay( status );
 
@@ -105,8 +105,8 @@ hid_t mhdf_getNativeType( hid_t input_type, int size, mhdf_Status* status )
 
 static hid_t get_tag( mhdf_FileHandle file_handle, const char* tag_name, hid_t* id_type, mhdf_Status* status )
 {
-    hid_t       group_id, tag_id;
-    char*       path;
+    hid_t group_id, tag_id;
+    char* path;
     FileHandle* file_ptr;
 
     file_ptr = (FileHandle*)file_handle;
@@ -132,7 +132,7 @@ static hid_t get_tag( mhdf_FileHandle file_handle, const char* tag_name, hid_t* 
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     tag_id = H5Gopen2( group_id, path, H5P_DEFAULT );
 #else
-    tag_id = H5Gopen( group_id, path );
+    tag_id   = H5Gopen( group_id, path );
 #endif
     H5Gclose( group_id );
     free( path );
@@ -164,7 +164,7 @@ static hid_t get_tag_type( FileHandle* file_ptr, const char* tag_path, mhdf_Stat
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
     tag_id = H5Gopen2( group_id, tag_path, H5P_DEFAULT );
 #else
-    tag_id = H5Gopen( group_id, tag_path );
+    tag_id   = H5Gopen( group_id, tag_path );
 #endif
     H5Gclose( group_id );
     if( tag_id < 0 )
@@ -176,7 +176,7 @@ static hid_t get_tag_type( FileHandle* file_ptr, const char* tag_path, mhdf_Stat
 #if defined( H5Topen_vers ) && H5Topen_vers > 1
     type_id = H5Topen2( tag_id, TAG_TYPE_NAME, H5P_DEFAULT );
 #else
-    type_id = H5Topen( tag_id, TAG_TYPE_NAME );
+    type_id  = H5Topen( tag_id, TAG_TYPE_NAME );
 #endif
     H5Gclose( tag_id );
     if( type_id < 0 )
@@ -196,11 +196,15 @@ static hid_t get_tag_type( FileHandle* file_ptr, const char* tag_path, mhdf_Stat
  *\param value_size   Size of attribute data, as multiple of type indicated
  *                    by type_id.  Should be 1 except for variable-length tag data.
  */
-static int store_tag_val_in_attrib( hid_t tag_id, const char* attrib_name, hid_t type_id, const void* value,
-                                    hsize_t value_size, mhdf_Status* status )
+static int store_tag_val_in_attrib( hid_t tag_id,
+                                    const char* attrib_name,
+                                    hid_t type_id,
+                                    const void* value,
+                                    hsize_t value_size,
+                                    mhdf_Status* status )
 {
     hid_t write_type;
-    int   rval;
+    int rval;
     if( value_size == 1 )
         write_type = type_id;
     else if( H5Tget_class( type_id ) == H5T_OPAQUE )
@@ -228,20 +232,28 @@ static int store_tag_val_in_attrib( hid_t tag_id, const char* attrib_name, hid_t
     return rval;
 }
 
-static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_name, enum mhdf_TagDataType tag_type,
-                                int size, int storage, const void* default_value, int default_value_size_in,
-                                const void* global_value, int global_value_size_in, hid_t hdf_type, hid_t hdf_base_type,
+static hid_t create_tag_common( mhdf_FileHandle file_handle,
+                                const char* tag_name,
+                                enum mhdf_TagDataType tag_type,
+                                int size,
+                                int storage,
+                                const void* default_value,
+                                int default_value_size_in,
+                                const void* global_value,
+                                int global_value_size_in,
+                                hid_t hdf_type,
+                                hid_t hdf_base_type,
                                 mhdf_Status* status )
 {
-    hid_t       temp_id, group_id, tag_id;
-    char*       path;
+    hid_t temp_id, group_id, tag_id;
+    char* path;
     FileHandle* file_ptr;
-    herr_t      rval;
-    hsize_t     arr_len;
-    int         one = 1, var_len = 0;
-    hsize_t     default_value_size = default_value_size_in;
-    hsize_t     global_value_size = global_value_size_in;
-    int         close_base_type = 0;
+    herr_t rval;
+    hsize_t arr_len;
+    int one = 1, var_len = 0;
+    hsize_t default_value_size = default_value_size_in;
+    hsize_t global_value_size  = global_value_size_in;
+    int close_base_type        = 0;
 
     /* Force standard data types over user-specified types */
 
@@ -286,7 +298,7 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
 #if defined( H5Gcreate_vers ) && H5Gcreate_vers > 1
     tag_id = H5Gcreate2( group_id, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 #else
-    tag_id = H5Gcreate( group_id, path, 3 );
+    tag_id   = H5Gcreate( group_id, path, 3 );
 #endif
     if( tag_id < 0 )
     {
@@ -320,7 +332,7 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
     if( hdf_type )
     {
         hdf_type = H5Tcopy( hdf_type );
-        arr_len = 1;
+        arr_len  = 1;
     }
     else
     {
@@ -328,7 +340,7 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
         {
             default:
             case mhdf_OPAQUE:
-                arr_len = 1;
+                arr_len  = 1;
                 hdf_type = H5Tcreate( H5T_OPAQUE, abs( size ) );
                 H5Tset_tag( hdf_type, "tag_data" );
                 break;
@@ -363,22 +375,22 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
                 break;
 
             case mhdf_ENTITY_ID:
-                arr_len = abs( size );
+                arr_len  = abs( size );
                 hdf_type = H5Tcopy( H5T_NATIVE_ULONG );
                 break;
 
             case mhdf_BOOLEAN:
-                arr_len = abs( size );
+                arr_len  = abs( size );
                 hdf_type = H5Tcopy( H5T_NATIVE_UCHAR );
                 break;
 
             case mhdf_INTEGER:
-                arr_len = abs( size );
+                arr_len  = abs( size );
                 hdf_type = H5Tcopy( H5T_NATIVE_INT );
                 break;
 
             case mhdf_FLOAT:
-                arr_len = abs( size );
+                arr_len  = abs( size );
                 hdf_type = H5Tcopy( H5T_NATIVE_DOUBLE );
                 break;
         }
@@ -431,7 +443,10 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
 
         if( hdf_base_type )
         {
-            if( H5Tequal( hdf_base_type, hdf_type ) > 0 ) { hdf_base_type = hdf_type; }
+            if( H5Tequal( hdf_base_type, hdf_type ) > 0 )
+            {
+                hdf_base_type = hdf_type;
+            }
             else
             {
 #if defined( H5Tarray_create_vers ) && H5Tarray_create_vers > 1
@@ -446,7 +461,7 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
                     H5Tclose( hdf_type );
                     return -1;
                 }
-                hdf_base_type = temp_id;
+                hdf_base_type   = temp_id;
                 close_base_type = 1;
             }
         }
@@ -459,7 +474,7 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
 #if defined( H5Tcommit_vers ) && H5Tcommit_vers > 1
     rval = H5Tcommit2( tag_id, TAG_TYPE_NAME, hdf_type, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 #else
-    rval = H5Tcommit( tag_id, TAG_TYPE_NAME, hdf_type );
+    rval     = H5Tcommit( tag_id, TAG_TYPE_NAME, hdf_type );
 #endif
     if( rval < 0 )
     {
@@ -522,8 +537,8 @@ static hid_t create_tag_common( mhdf_FileHandle file_handle, const char* tag_nam
 hid_t mhdf_getTagDataType( mhdf_FileHandle file_handle, const char* tag_name, mhdf_Status* status )
 {
     FileHandle* file_ptr;
-    hid_t       result;
-    char*       path;
+    hid_t result;
+    char* path;
     API_BEGIN;
 
     /* Validate input */
@@ -540,7 +555,10 @@ hid_t mhdf_getTagDataType( mhdf_FileHandle file_handle, const char* tag_name, mh
     /* Create path string for tag object */
 
     path = mhdf_name_to_path_copy( tag_name, status );
-    if( !path ) { return -1; }
+    if( !path )
+    {
+        return -1;
+    }
 
     result = get_tag_type( file_ptr, path, status );
 
@@ -549,9 +567,16 @@ hid_t mhdf_getTagDataType( mhdf_FileHandle file_handle, const char* tag_name, mh
     return result;
 }
 
-void mhdf_createTag( mhdf_FileHandle file_handle, const char* tag_name, enum mhdf_TagDataType tag_type, int size,
-                     int storage, const void* default_value, const void* global_value, hid_t hdf_type,
-                     hid_t hdf_base_type, mhdf_Status* status )
+void mhdf_createTag( mhdf_FileHandle file_handle,
+                     const char* tag_name,
+                     enum mhdf_TagDataType tag_type,
+                     int size,
+                     int storage,
+                     const void* default_value,
+                     const void* global_value,
+                     hid_t hdf_type,
+                     hid_t hdf_base_type,
+                     mhdf_Status* status )
 {
     hid_t tag_id;
     API_BEGIN;
@@ -561,12 +586,20 @@ void mhdf_createTag( mhdf_FileHandle file_handle, const char* tag_name, enum mhd
     API_END;
 }
 
-void mhdf_createVarLenTag( mhdf_FileHandle file_handle, const char* tag_name, enum mhdf_TagDataType tag_type,
-                           int storage, const void* default_value, int default_value_length, const void* global_value,
-                           int global_value_length, hid_t hdf_type, hid_t hdf_base_type, mhdf_Status* status )
+void mhdf_createVarLenTag( mhdf_FileHandle file_handle,
+                           const char* tag_name,
+                           enum mhdf_TagDataType tag_type,
+                           int storage,
+                           const void* default_value,
+                           int default_value_length,
+                           const void* global_value,
+                           int global_value_length,
+                           hid_t hdf_type,
+                           hid_t hdf_base_type,
+                           mhdf_Status* status )
 {
     hid_t tag_id;
-    int   one = 1;
+    int one = 1;
 
     API_BEGIN;
     tag_id = create_tag_common( file_handle, tag_name, tag_type, -1, storage, default_value, default_value_length,
@@ -581,8 +614,8 @@ void mhdf_createVarLenTag( mhdf_FileHandle file_handle, const char* tag_name, en
 
 int mhdf_getNumberTags( mhdf_FileHandle file_handle, mhdf_Status* status )
 {
-    hid_t       group_id;
-    hsize_t     result;
+    hid_t group_id;
+    hsize_t result;
     FileHandle* file_ptr;
     API_BEGIN;
 
@@ -621,12 +654,12 @@ int mhdf_getNumberTags( mhdf_FileHandle file_handle, mhdf_Status* status )
 
 char** mhdf_getTagNames( mhdf_FileHandle file_handle, int* num_names_out, mhdf_Status* status )
 {
-    hid_t       group_id;
+    hid_t group_id;
     FileHandle* file_ptr;
-    hsize_t     count, idx;
-    char*       name;
-    char**      result;
-    ssize_t     size;
+    hsize_t count, idx;
+    char* name;
+    char** result;
+    ssize_t size;
     API_BEGIN;
 
     /* Validate input */
@@ -683,7 +716,7 @@ char** mhdf_getTagNames( mhdf_FileHandle file_handle, int* num_names_out, mhdf_S
         if( size < 1 || NULL == ( name = (char*)mhdf_malloc( size + 1, status ) ) )
         {
             while( ( --idx ) > 0 )
-                free( result[ idx ] );
+                free( result[idx] );
             free( result );
             H5Gclose( group_id );
             mhdf_setFail( status, "Internal failure calling H5Gget_objname_by_idx." );
@@ -696,7 +729,7 @@ char** mhdf_getTagNames( mhdf_FileHandle file_handle, int* num_names_out, mhdf_S
             mhdf_setFail( status, "Invalid character string in internal file path: \"%s\"\n", name );
             return NULL;
         }
-        result[ idx ] = name;
+        result[idx] = name;
     }
 
     H5Gclose( group_id );
@@ -707,19 +740,19 @@ char** mhdf_getTagNames( mhdf_FileHandle file_handle, int* num_names_out, mhdf_S
 
 static int get_attrib_array_length_handle( hid_t attrib_id )
 {
-    hid_t   type_id;
-    int     rank;
-    hsize_t dims[ H5S_MAX_RANK ];
-    int     perm[ H5S_MAX_RANK ];
+    hid_t type_id;
+    int rank;
+    hsize_t dims[H5S_MAX_RANK];
+    int perm[H5S_MAX_RANK];
 
     type_id = H5Aget_type( attrib_id );
     switch( H5Tget_class( type_id ) )
     {
         case H5T_NO_CLASS:
-            dims[ 0 ] = -1;
+            dims[0] = -1;
             break;
         case H5T_OPAQUE:
-            dims[ 0 ] = H5Tget_size( type_id );
+            dims[0] = H5Tget_size( type_id );
             break;
         case H5T_ARRAY:
 #if defined( H5Tget_array_dims_vers ) && H5Tget_array_dims_vers > 1
@@ -733,12 +766,12 @@ static int get_attrib_array_length_handle( hid_t attrib_id )
             else
                 return -1;
         default:
-            dims[ 0 ] = 1;
+            dims[0] = 1;
             break;
     }
 
     H5Tclose( type_id );
-    return dims[ 0 ];
+    return dims[0];
 }
 
 /*
@@ -760,7 +793,7 @@ static int get_attrib_array_length_index( hid_t object_id, unsigned int index )
 static int get_attrib_array_length_name( hid_t file, const char* path )
 {
     hid_t attrib_id;
-    int   result;
+    int result;
 
     attrib_id = H5Aopen_name( file, path );
     if( attrib_id < 0 ) return -1;
@@ -770,18 +803,24 @@ static int get_attrib_array_length_name( hid_t file, const char* path )
     return result;
 }
 
-void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mhdf_TagDataType* class_out,
-                      int* size_out, int* tstt_storage_out, int* have_default_out, int* have_global_out,
-                      int* have_sparse_out, mhdf_Status* status )
+void mhdf_getTagInfo( mhdf_FileHandle file_handle,
+                      const char* tag_name,
+                      enum mhdf_TagDataType* class_out,
+                      int* size_out,
+                      int* tstt_storage_out,
+                      int* have_default_out,
+                      int* have_global_out,
+                      int* have_sparse_out,
+                      mhdf_Status* status )
 {
-    hid_t        tag_id, type_id, super_id;
-    int          i, rval, is_handle;
-    hsize_t      size, sup_size;
+    hid_t tag_id, type_id, super_id;
+    int i, rval, is_handle;
+    hsize_t size, sup_size;
     unsigned int idx;
-    int          rank, var_data;
-    hsize_t      dims[ H5S_MAX_RANK ];
-    int          perm[ H5S_MAX_RANK ];
-    H5T_class_t  class_tmp;
+    int rank, var_data;
+    hsize_t dims[H5S_MAX_RANK];
+    int perm[H5S_MAX_RANK];
+    H5T_class_t class_tmp;
 
     API_BEGIN;
 
@@ -913,17 +952,17 @@ void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mh
     {
         case H5T_INTEGER:
             *class_out = ( size == 1 ) ? mhdf_BOOLEAN : mhdf_INTEGER;
-            *size_out = 1;
+            *size_out  = 1;
             break;
 
         case H5T_FLOAT:
             *class_out = mhdf_FLOAT;
-            *size_out = 1;
+            *size_out  = 1;
             break;
 
         case H5T_BITFIELD:
             *class_out = mhdf_BITFIELD;
-            *size_out = H5Tget_precision( type_id );
+            *size_out  = H5Tget_precision( type_id );
             if( *size_out <= 0 )
             {
                 mhdf_setFail( status, "H5Tget_precision failed." );
@@ -936,7 +975,7 @@ void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mh
         default:
         case H5T_OPAQUE:
             *class_out = mhdf_OPAQUE;
-            *size_out = size;
+            *size_out  = size;
             break;
 
         case H5T_ARRAY:
@@ -945,7 +984,7 @@ void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mh
             (void)perm; /* suppress warning */
             rank = H5Tget_array_dims2( type_id, dims );
 #else
-            rank = H5Tget_array_dims( type_id, dims, perm );
+            rank      = H5Tget_array_dims( type_id, dims, perm );
 #endif
             if( rank <= 0 )
             {
@@ -955,7 +994,7 @@ void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mh
                 return;
             }
             for( i = 1; i < rank; ++i )
-                dims[ 0 ] *= dims[ i ];
+                dims[0] *= dims[i];
 
             super_id = H5Tget_super( type_id );
             if( super_id < 0 )
@@ -990,17 +1029,17 @@ void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mh
             {
                 case H5T_INTEGER:
                     *class_out = ( sup_size == 1 ) ? mhdf_BOOLEAN : mhdf_INTEGER;
-                    *size_out = dims[ 0 ];
+                    *size_out  = dims[0];
                     break;
 
                 case H5T_FLOAT:
                     *class_out = mhdf_FLOAT;
-                    *size_out = dims[ 0 ];
+                    *size_out  = dims[0];
                     break;
 
                 default:
                     *class_out = mhdf_OPAQUE;
-                    *size_out = size;
+                    *size_out  = size;
                     break;
             }
 
@@ -1033,13 +1072,17 @@ void mhdf_getTagInfo( mhdf_FileHandle file_handle, const char* tag_name, enum mh
     API_END;
 }
 
-static int read_tag_attrib_data( hid_t tag_id, const char* attrib_name, hid_t type_id, void* data, int is_var_len,
+static int read_tag_attrib_data( hid_t tag_id,
+                                 const char* attrib_name,
+                                 hid_t type_id,
+                                 void* data,
+                                 int is_var_len,
                                  mhdf_Status* status )
 {
-    int      rval, ilen;
+    int rval, ilen;
     unsigned idx;
-    hid_t    read_type = type_id;
-    hsize_t  len;
+    hid_t read_type = type_id;
+    hsize_t len;
 
     /* Check if tag has attribute */
     rval = mhdf_find_attribute( tag_id, attrib_name, &idx, status );
@@ -1089,11 +1132,15 @@ static int read_tag_attrib_data( hid_t tag_id, const char* attrib_name, hid_t ty
     return rval;
 }
 
-void mhdf_getTagValues( mhdf_FileHandle file_handle, const char* tag_name, hid_t output_data_type, void* default_value,
-                        void* global_value, mhdf_Status* status )
+void mhdf_getTagValues( mhdf_FileHandle file_handle,
+                        const char* tag_name,
+                        hid_t output_data_type,
+                        void* default_value,
+                        void* global_value,
+                        mhdf_Status* status )
 {
-    hid_t        tag_id;
-    int          rval, var_data;
+    hid_t tag_id;
+    int rval, var_data;
     unsigned int idx;
     API_BEGIN;
 
@@ -1140,16 +1187,16 @@ void mhdf_getTagValues( mhdf_FileHandle file_handle, const char* tag_name, hid_t
 
 int mhdf_haveDenseTag( mhdf_FileHandle file_handle, const char* tag_name, const char* type_handle, mhdf_Status* status )
 {
-    char*       path;
-    hid_t       elem_id, group_id;
+    char* path;
+    hid_t elem_id, group_id;
     FileHandle* file_ptr;
-    int         rval = 0;
+    int rval = 0;
     API_BEGIN;
 
     file_ptr = (FileHandle*)file_handle;
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
 
-    if( type_handle == mhdf_node_type_handle( ) )
+    if( type_handle == mhdf_node_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen2( file_ptr->hdf_handle, NODE_GROUP, H5P_DEFAULT );
@@ -1158,7 +1205,7 @@ int mhdf_haveDenseTag( mhdf_FileHandle file_handle, const char* tag_name, const 
 #endif
         if( elem_id < 0 ) mhdf_setFail( status, "Could not open node group." );
     }
-    else if( type_handle == mhdf_set_type_handle( ) )
+    else if( type_handle == mhdf_set_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen2( file_ptr->hdf_handle, SET_GROUP, H5P_DEFAULT );
@@ -1209,26 +1256,32 @@ int mhdf_haveDenseTag( mhdf_FileHandle file_handle, const char* tag_name, const 
     H5Gclose( group_id );
     free( path );
 
-    if( rval >= 0 ) { mhdf_setOkay( status ); }
+    if( rval >= 0 )
+    {
+        mhdf_setOkay( status );
+    }
 
     API_END;
     return rval;
 }
 
-hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle, const char* tag_name, const char* type_handle,
-                               long num_values, mhdf_Status* status )
+hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle,
+                               const char* tag_name,
+                               const char* type_handle,
+                               long num_values,
+                               mhdf_Status* status )
 {
-    char*       path;
-    hid_t       elem_id, data_id, type_id;
+    char* path;
+    hid_t elem_id, data_id, type_id;
     FileHandle* file_ptr;
-    size_t      name_len, path_len, dir_len;
-    hsize_t     size;
+    size_t name_len, path_len, dir_len;
+    hsize_t size;
     API_BEGIN;
 
     file_ptr = (FileHandle*)file_handle;
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
 
-    if( type_handle == mhdf_node_type_handle( ) )
+    if( type_handle == mhdf_node_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen2( file_ptr->hdf_handle, NODE_GROUP, H5P_DEFAULT );
@@ -1237,7 +1290,7 @@ hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle, const char* tag_name
 #endif
         if( elem_id < 0 ) mhdf_setFail( status, "Could not open node group." );
     }
-    else if( type_handle == mhdf_set_type_handle( ) )
+    else if( type_handle == mhdf_set_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen2( file_ptr->hdf_handle, SET_GROUP, H5P_DEFAULT );
@@ -1252,10 +1305,10 @@ hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle, const char* tag_name
     }
     if( elem_id < 0 ) return -1;
 
-    dir_len = strlen( DENSE_TAG_SUBGROUP );
+    dir_len  = strlen( DENSE_TAG_SUBGROUP );
     name_len = mhdf_name_to_path( tag_name, NULL, 0 );
     path_len = dir_len + name_len + 1;
-    path = (char*)mhdf_malloc( path_len, status );
+    path     = (char*)mhdf_malloc( path_len, status );
     if( NULL == path )
     {
         H5Gclose( elem_id );
@@ -1271,7 +1324,7 @@ hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle, const char* tag_name
         return -1;
     }
 
-    size = (hsize_t)num_values;
+    size    = (hsize_t)num_values;
     data_id = mhdf_create_table( elem_id, path, type_id, 1, &size, status );
     free( path );
     H5Gclose( elem_id );
@@ -1283,20 +1336,23 @@ hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle, const char* tag_name
     return data_id;
 }
 
-hid_t mhdf_openDenseTagData( mhdf_FileHandle file_handle, const char* tag_name, const char* type_handle,
-                             long* num_values_out, mhdf_Status* status )
+hid_t mhdf_openDenseTagData( mhdf_FileHandle file_handle,
+                             const char* tag_name,
+                             const char* type_handle,
+                             long* num_values_out,
+                             mhdf_Status* status )
 {
-    char*       path;
-    hid_t       elem_id, data_id;
+    char* path;
+    hid_t elem_id, data_id;
     FileHandle* file_ptr;
-    size_t      name_len, path_len, dir_len;
-    hsize_t     size;
+    size_t name_len, path_len, dir_len;
+    hsize_t size;
     API_BEGIN;
 
     file_ptr = (FileHandle*)file_handle;
     if( !mhdf_check_valid_file( file_ptr, status ) ) return -1;
 
-    if( type_handle == mhdf_node_type_handle( ) )
+    if( type_handle == mhdf_node_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen2( file_ptr->hdf_handle, NODE_GROUP, H5P_DEFAULT );
@@ -1305,7 +1361,7 @@ hid_t mhdf_openDenseTagData( mhdf_FileHandle file_handle, const char* tag_name, 
 #endif
         if( elem_id < 0 ) mhdf_setFail( status, "Could not open node group." );
     }
-    else if( type_handle == mhdf_set_type_handle( ) )
+    else if( type_handle == mhdf_set_type_handle() )
     {
 #if defined( H5Gopen_vers ) && H5Gopen_vers > 1
         elem_id = H5Gopen2( file_ptr->hdf_handle, SET_GROUP, H5P_DEFAULT );
@@ -1320,10 +1376,10 @@ hid_t mhdf_openDenseTagData( mhdf_FileHandle file_handle, const char* tag_name, 
     }
     if( elem_id < 0 ) return -1;
 
-    dir_len = strlen( DENSE_TAG_SUBGROUP );
+    dir_len  = strlen( DENSE_TAG_SUBGROUP );
     name_len = mhdf_name_to_path( tag_name, NULL, 0 );
     path_len = dir_len + name_len + 1;
-    path = (char*)mhdf_malloc( path_len, status );
+    path     = (char*)mhdf_malloc( path_len, status );
     if( NULL == path )
     {
         H5Gclose( elem_id );
@@ -1343,10 +1399,13 @@ hid_t mhdf_openDenseTagData( mhdf_FileHandle file_handle, const char* tag_name, 
     return data_id;
 }
 
-void mhdf_createSparseTagData( mhdf_FileHandle file_handle, const char* tag_name, long num_values,
-                               hid_t handles_out[ 2 ], mhdf_Status* status )
+void mhdf_createSparseTagData( mhdf_FileHandle file_handle,
+                               const char* tag_name,
+                               long num_values,
+                               hid_t handles_out[2],
+                               mhdf_Status* status )
 {
-    hid_t   tag_id, index_id, data_id, type_id, id_type;
+    hid_t tag_id, index_id, data_id, type_id, id_type;
     hsize_t count = (hsize_t)num_values;
     API_BEGIN;
 
@@ -1382,16 +1441,20 @@ void mhdf_createSparseTagData( mhdf_FileHandle file_handle, const char* tag_name
         return;
     }
 
-    handles_out[ 0 ] = index_id;
-    handles_out[ 1 ] = data_id;
+    handles_out[0] = index_id;
+    handles_out[1] = data_id;
     mhdf_setOkay( status );
     API_END_H( 2 );
 }
 
-void mhdf_createVarLenTagData( mhdf_FileHandle file_handle, const char* tag_name, long num_entities, long num_values,
-                               hid_t handles_out[ 3 ], mhdf_Status* status )
+void mhdf_createVarLenTagData( mhdf_FileHandle file_handle,
+                               const char* tag_name,
+                               long num_entities,
+                               long num_values,
+                               hid_t handles_out[3],
+                               mhdf_Status* status )
 {
-    hid_t   tag_id, index_id, data_id, type_id, offset_id, id_type;
+    hid_t tag_id, index_id, data_id, type_id, offset_id, id_type;
     hsize_t count = (hsize_t)num_entities;
     API_BEGIN;
 
@@ -1427,7 +1490,7 @@ void mhdf_createVarLenTagData( mhdf_FileHandle file_handle, const char* tag_name
         return;
     }
 
-    count = (hsize_t)num_values;
+    count   = (hsize_t)num_values;
     data_id = mhdf_create_table( tag_id, SPARSE_VALUES_NAME, type_id, 1, &count, status );
     H5Tclose( type_id );
     H5Gclose( tag_id );
@@ -1438,19 +1501,23 @@ void mhdf_createVarLenTagData( mhdf_FileHandle file_handle, const char* tag_name
         return;
     }
 
-    handles_out[ 0 ] = index_id;
-    handles_out[ 1 ] = data_id;
-    handles_out[ 2 ] = offset_id;
+    handles_out[0] = index_id;
+    handles_out[1] = data_id;
+    handles_out[2] = offset_id;
     mhdf_setOkay( status );
     API_END_H( 3 );
 }
 
-void mhdf_openSparseTagData( mhdf_FileHandle file_handle, const char* tag_name, long* num_entity_out,
-                             long* num_values_out, hid_t handles_out[ 3 ], mhdf_Status* status )
+void mhdf_openSparseTagData( mhdf_FileHandle file_handle,
+                             const char* tag_name,
+                             long* num_entity_out,
+                             long* num_values_out,
+                             hid_t handles_out[3],
+                             mhdf_Status* status )
 {
-    hid_t    tag_id, index_id, data_id, offset_id = -1;
-    hsize_t  num_ent, data_size, num_data;
-    int      rval;
+    hid_t tag_id, index_id, data_id, offset_id = -1;
+    hsize_t num_ent, data_size, num_data;
+    int rval;
     unsigned idx;
     API_BEGIN;
 
@@ -1512,66 +1579,102 @@ void mhdf_openSparseTagData( mhdf_FileHandle file_handle, const char* tag_name, 
     *num_entity_out = (long)num_ent;
     if( num_values_out ) *num_values_out = (long)data_size;
 
-    handles_out[ 0 ] = index_id;
-    handles_out[ 1 ] = data_id;
-    if( offset_id >= 0 ) handles_out[ 2 ] = offset_id;
+    handles_out[0] = index_id;
+    handles_out[1] = data_id;
+    if( offset_id >= 0 ) handles_out[2] = offset_id;
     mhdf_setOkay( status );
     API_END_H( 2 );
 }
 
-void mhdf_writeSparseTagEntities( hid_t table_id, long offset, long count, hid_t int_type, const void* id_list,
+void mhdf_writeSparseTagEntities( hid_t table_id,
+                                  long offset,
+                                  long count,
+                                  hid_t int_type,
+                                  const void* id_list,
                                   mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, int_type, id_list, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_writeSparseTagEntitiesWithOpt( hid_t table_id, long offset, long count, hid_t int_type, const void* id_list,
-                                         hid_t io_prop, mhdf_Status* status )
+void mhdf_writeSparseTagEntitiesWithOpt( hid_t table_id,
+                                         long offset,
+                                         long count,
+                                         hid_t int_type,
+                                         const void* id_list,
+                                         hid_t io_prop,
+                                         mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, int_type, id_list, io_prop, status );
     API_END;
 }
 
-void mhdf_writeTagValues( hid_t table_id, long offset, long count, hid_t tag_type, const void* tag_data,
+void mhdf_writeTagValues( hid_t table_id,
+                          long offset,
+                          long count,
+                          hid_t tag_type,
+                          const void* tag_data,
                           mhdf_Status* status )
 {
     mhdf_writeTagValuesWithOpt( table_id, offset, count, tag_type, tag_data, H5P_DEFAULT, status );
 }
 
-void mhdf_writeTagValuesWithOpt( hid_t table_id, long offset, long count, hid_t tag_type, const void* tag_data,
-                                 hid_t io_prop, mhdf_Status* status )
+void mhdf_writeTagValuesWithOpt( hid_t table_id,
+                                 long offset,
+                                 long count,
+                                 hid_t tag_type,
+                                 const void* tag_data,
+                                 hid_t io_prop,
+                                 mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, tag_type, tag_data, io_prop, status );
     API_END;
 }
 
-void mhdf_writeSparseTagIndices( hid_t table_id, long offset, long count, hid_t int_type, const void* indices,
+void mhdf_writeSparseTagIndices( hid_t table_id,
+                                 long offset,
+                                 long count,
+                                 hid_t int_type,
+                                 const void* indices,
                                  mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, int_type, indices, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_writeSparseTagIndicesWithOpt( hid_t table_id, long offset, long count, hid_t int_type, const void* indices,
-                                        hid_t io_prop, mhdf_Status* status )
+void mhdf_writeSparseTagIndicesWithOpt( hid_t table_id,
+                                        long offset,
+                                        long count,
+                                        hid_t int_type,
+                                        const void* indices,
+                                        hid_t io_prop,
+                                        mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_write_data( table_id, offset, count, int_type, indices, io_prop, status );
     API_END;
 }
 
-void mhdf_readSparseTagEntities( hid_t table_id, long offset, long count, hid_t int_type, void* id_list,
+void mhdf_readSparseTagEntities( hid_t table_id,
+                                 long offset,
+                                 long count,
+                                 hid_t int_type,
+                                 void* id_list,
                                  mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_read_data( table_id, offset, count, int_type, id_list, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_readSparseTagEntitiesWithOpt( hid_t table_id, long offset, long count, hid_t int_type, void* id_list,
-                                        hid_t io_prop, mhdf_Status* status )
+void mhdf_readSparseTagEntitiesWithOpt( hid_t table_id,
+                                        long offset,
+                                        long count,
+                                        hid_t int_type,
+                                        void* id_list,
+                                        hid_t io_prop,
+                                        mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_read_data( table_id, offset, count, int_type, id_list, io_prop, status );
@@ -1582,7 +1685,12 @@ void mhdf_readTagValues( hid_t table_id, long offset, long count, hid_t tag_type
 {
     mhdf_readTagValuesWithOpt( table_id, offset, count, tag_type, tag_data, H5P_DEFAULT, status );
 }
-void mhdf_readTagValuesWithOpt( hid_t table_id, long offset, long count, hid_t tag_type, void* tag_data, hid_t io_prop,
+void mhdf_readTagValuesWithOpt( hid_t table_id,
+                                long offset,
+                                long count,
+                                hid_t tag_type,
+                                void* tag_data,
+                                hid_t io_prop,
                                 mhdf_Status* status )
 {
     API_BEGIN;
@@ -1590,15 +1698,24 @@ void mhdf_readTagValuesWithOpt( hid_t table_id, long offset, long count, hid_t t
     API_END;
 }
 
-void mhdf_readSparseTagIndices( hid_t table_id, long offset, long count, hid_t int_type, void* indices,
+void mhdf_readSparseTagIndices( hid_t table_id,
+                                long offset,
+                                long count,
+                                hid_t int_type,
+                                void* indices,
                                 mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_read_data( table_id, offset, count, int_type, indices, H5P_DEFAULT, status );
     API_END;
 }
-void mhdf_readSparseTagIndicesWithOpt( hid_t table_id, long offset, long count, hid_t int_type, void* indices,
-                                       hid_t io_prop, mhdf_Status* status )
+void mhdf_readSparseTagIndicesWithOpt( hid_t table_id,
+                                       long offset,
+                                       long count,
+                                       hid_t int_type,
+                                       void* indices,
+                                       hid_t io_prop,
+                                       mhdf_Status* status )
 {
     API_BEGIN;
     mhdf_read_data( table_id, offset, count, int_type, indices, io_prop, status );

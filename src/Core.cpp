@@ -413,8 +413,12 @@ ErrorCode Core::load_mesh( const char* file_name, const int* block_id_list, cons
     return load_file( file_name, 0, 0, name, block_id_list, num_blocks );
 }
 
-ErrorCode Core::load_file( const char* file_name, const EntityHandle* file_set, const char* setoptions,
-                           const char* set_tag_name, const int* set_tag_vals, int num_set_tag_vals )
+ErrorCode Core::load_file( const char* file_name,
+                           const EntityHandle* file_set,
+                           const char* setoptions,
+                           const char* set_tag_name,
+                           const int* set_tag_vals,
+                           int num_set_tag_vals )
 {
     FileOptions opts( setoptions );
     ErrorCode rval;
@@ -504,8 +508,11 @@ void Core::clean_up_failed_read( const Range& initial_ents, std::vector< Tag > i
     }
 }
 
-ErrorCode Core::serial_load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                                  const ReaderIface::SubsetList* subsets, const Tag* id_tag )
+ErrorCode Core::serial_load_file( const char* file_name,
+                                  const EntityHandle* file_set,
+                                  const FileOptions& opts,
+                                  const ReaderIface::SubsetList* subsets,
+                                  const Tag* id_tag )
 {
     int status;
 #if defined( WIN32 ) || defined( WIN64 ) || defined( MSC_VER )
@@ -515,7 +522,10 @@ ErrorCode Core::serial_load_file( const char* file_name, const EntityHandle* fil
     struct stat stat_data;
     status = stat( file_name, &stat_data );
 #endif
-    if( status ) { MB_SET_GLB_ERR( MB_FILE_DOES_NOT_EXIST, file_name << ": " << strerror( errno ) ); }
+    if( status )
+    {
+        MB_SET_GLB_ERR( MB_FILE_DOES_NOT_EXIST, file_name << ": " << strerror( errno ) );
+    }
 #if defined( WIN32 ) || defined( WIN64 ) || defined( MSC_VER )
     else if( stat_data.st_mode & _S_IFDIR )
     {
@@ -603,8 +613,11 @@ ErrorCode Core::serial_load_file( const char* file_name, const EntityHandle* fil
     return rval;
 }  // namespace moab
 
-ErrorCode Core::serial_read_tag( const char* file_name, const char* tag_name, const FileOptions& opts,
-                                 std::vector< int >& vals, const ReaderIface::SubsetList* subsets )
+ErrorCode Core::serial_read_tag( const char* file_name,
+                                 const char* tag_name,
+                                 const FileOptions& opts,
+                                 std::vector< int >& vals,
+                                 const ReaderIface::SubsetList* subsets )
 {
     ErrorCode rval             = MB_FAILURE;
     const ReaderWriterSet* set = reader_writer_set();
@@ -640,16 +653,25 @@ ErrorCode Core::write_mesh( const char* file_name, const EntityHandle* output_li
     return write_file( file_name, 0, 0, output_list, num_sets );
 }
 
-ErrorCode Core::write_file( const char* file_name, const char* file_type, const char* options_string,
-                            const EntityHandle* output_sets, int num_output_sets, const Tag* tag_list, int num_tags )
+ErrorCode Core::write_file( const char* file_name,
+                            const char* file_type,
+                            const char* options_string,
+                            const EntityHandle* output_sets,
+                            int num_output_sets,
+                            const Tag* tag_list,
+                            int num_tags )
 {
     Range range;
     std::copy( output_sets, output_sets + num_output_sets, range_inserter( range ) );
     return write_file( file_name, file_type, options_string, range, tag_list, num_tags );
 }
 
-ErrorCode Core::write_file( const char* file_name, const char* file_type, const char* options_string,
-                            const Range& output_sets, const Tag* tag_list, int num_tags )
+ErrorCode Core::write_file( const char* file_name,
+                            const char* file_type,
+                            const char* options_string,
+                            const Range& output_sets,
+                            const Tag* tag_list,
+                            int num_tags )
 {
     // convert range to vector
     std::vector< EntityHandle > list( output_sets.size() );
@@ -660,7 +682,10 @@ ErrorCode Core::write_file( const char* file_name, const char* file_type, const 
     ErrorCode rval;
 
     rval = opts.get_null_option( "CREATE" );
-    if( rval == MB_TYPE_OUT_OF_RANGE ) { MB_SET_GLB_ERR( MB_FAILURE, "Unexpected value for CREATE option" ); }
+    if( rval == MB_TYPE_OUT_OF_RANGE )
+    {
+        MB_SET_GLB_ERR( MB_FAILURE, "Unexpected value for CREATE option" );
+    }
     bool overwrite = ( rval == MB_ENTITY_NOT_FOUND );
 
     // Get the file writer
@@ -799,8 +824,12 @@ ErrorCode Core::get_vertex_coordinates( std::vector< double >& coords ) const
     return MB_SUCCESS;
 }
 
-ErrorCode Core::coords_iterate( Range::const_iterator iter, Range::const_iterator end, double*& xcoords_ptr,
-                                double*& ycoords_ptr, double*& zcoords_ptr, int& count )
+ErrorCode Core::coords_iterate( Range::const_iterator iter,
+                                Range::const_iterator end,
+                                double*& xcoords_ptr,
+                                double*& ycoords_ptr,
+                                double*& zcoords_ptr,
+                                int& count )
 {
     EntitySequence* seq;
     ErrorCode rval = sequence_manager()->find( *iter, seq );
@@ -810,7 +839,10 @@ ErrorCode Core::coords_iterate( Range::const_iterator iter, Range::const_iterato
         MB_SET_ERR( rval, "Couldn't find sequence for start handle" );
     }
     VertexSequence* vseq = dynamic_cast< VertexSequence* >( seq );
-    if( !vseq ) { MB_SET_ERR( MB_ENTITY_NOT_FOUND, "Couldn't find sequence for start handle" ); }
+    if( !vseq )
+    {
+        MB_SET_ERR( MB_ENTITY_NOT_FOUND, "Couldn't find sequence for start handle" );
+    }
 
     unsigned int offset = *iter - vseq->data()->start_handle();
     xcoords_ptr         = reinterpret_cast< double* >( vseq->data()->get_sequence_data( 0 ) ) + offset;
@@ -991,7 +1023,9 @@ ErrorCode Core::get_coords( const EntityHandle* entities, const int num_entities
     return status;
 }
 
-ErrorCode Core::get_coords( const EntityHandle entity_handle, const double*& x, const double*& y,
+ErrorCode Core::get_coords( const EntityHandle entity_handle,
+                            const double*& x,
+                            const double*& y,
                             const double*& z ) const
 {
     ErrorCode status = MB_TYPE_OUT_OF_RANGE;
@@ -1106,7 +1140,9 @@ ErrorCode Core::get_connectivity_by_type( const EntityType entity_type, std::vec
 }
 
 //! get the connectivity for element /handles.  For non-element handles, return an error
-ErrorCode Core::get_connectivity( const EntityHandle* entity_handles, const int num_handles, Range& connectivity,
+ErrorCode Core::get_connectivity( const EntityHandle* entity_handles,
+                                  const int num_handles,
+                                  Range& connectivity,
                                   bool corners_only ) const
 {
     std::vector< EntityHandle > tmp_connect;
@@ -1118,8 +1154,10 @@ ErrorCode Core::get_connectivity( const EntityHandle* entity_handles, const int 
 }
 
 //! get the connectivity for element /handles.  For non-element handles, return an error
-ErrorCode Core::get_connectivity( const EntityHandle* entity_handles, const int num_handles,
-                                  std::vector< EntityHandle >& connectivity, bool corners_only,
+ErrorCode Core::get_connectivity( const EntityHandle* entity_handles,
+                                  const int num_handles,
+                                  std::vector< EntityHandle >& connectivity,
+                                  bool corners_only,
                                   std::vector< int >* offsets ) const
 {
     connectivity.clear();  // this seems wrong as compared to other API functions,
@@ -1141,8 +1179,11 @@ ErrorCode Core::get_connectivity( const EntityHandle* entity_handles, const int 
 }
 
 //! get the connectivity for element handles.  For non-element handles, return an error
-ErrorCode Core::get_connectivity( const EntityHandle entity_handle, const EntityHandle*& connectivity,
-                                  int& number_nodes, bool corners_only, std::vector< EntityHandle >* storage ) const
+ErrorCode Core::get_connectivity( const EntityHandle entity_handle,
+                                  const EntityHandle*& connectivity,
+                                  int& number_nodes,
+                                  bool corners_only,
+                                  std::vector< EntityHandle >* storage ) const
 {
     ErrorCode status;
 
@@ -1199,8 +1240,12 @@ ErrorCode Core::set_connectivity( const EntityHandle entity_handle, EntityHandle
 }
 
 template < typename ITER >
-static inline ErrorCode get_adjacencies_union( Core* gMB, ITER begin, ITER end, int to_dimension,
-                                               bool create_if_missing, Range& adj_entities )
+static inline ErrorCode get_adjacencies_union( Core* gMB,
+                                               ITER begin,
+                                               ITER end,
+                                               int to_dimension,
+                                               bool create_if_missing,
+                                               Range& adj_entities )
 {
     const size_t DEFAULT_MAX_BLOCKS_SIZE = 4000;
     const size_t MAX_OUTER_ITERATIONS    = 100;
@@ -1228,7 +1273,10 @@ static inline ErrorCode get_adjacencies_union( Core* gMB, ITER begin, ITER end, 
         temp_vec.clear();
         for( size_t j = 0; j < count; ++i, ++j )
         {
-            if( CN::Dimension( TYPE_FROM_HANDLE( *i ) ) == to_dimension ) { temp_vec.push_back( *i ); }
+            if( CN::Dimension( TYPE_FROM_HANDLE( *i ) ) == to_dimension )
+            {
+                temp_vec.push_back( *i );
+            }
             else if( to_dimension == 0 && TYPE_FROM_HANDLE( *i ) != MBPOLYHEDRON )
             {
                 tmp_result = gMB->get_connectivity( *i, conn, conn_len, false, &storage );
@@ -1266,7 +1314,10 @@ static inline ErrorCode get_adjacencies_union( Core* gMB, ITER begin, ITER end, 
 }
 
 template < typename ITER >
-static inline ErrorCode get_adjacencies_intersection( Core* mb, ITER begin, ITER end, const int to_dimension,
+static inline ErrorCode get_adjacencies_intersection( Core* mb,
+                                                      ITER begin,
+                                                      ITER end,
+                                                      const int to_dimension,
                                                       const bool create_if_missing,
                                                       std::vector< EntityHandle >& adj_entities )
 {
@@ -1349,8 +1400,12 @@ static inline ErrorCode get_adjacencies_intersection( Core* mb, ITER begin, ITER
 }
 
 template < typename ITER >
-static inline ErrorCode get_adjacencies_intersection( Core* mb, ITER begin, ITER end, const int to_dimension,
-                                                      const bool create_if_missing, Range& adj_entities )
+static inline ErrorCode get_adjacencies_intersection( Core* mb,
+                                                      ITER begin,
+                                                      ITER end,
+                                                      const int to_dimension,
+                                                      const bool create_if_missing,
+                                                      Range& adj_entities )
 {
     std::vector< EntityHandle > results;
     ErrorCode rval = moab::get_adjacencies_intersection( mb, begin, end, to_dimension, create_if_missing, results );MB_CHK_ERR( rval );
@@ -1377,7 +1432,10 @@ static inline ErrorCode get_adjacencies_intersection( Core* mb, ITER begin, ITER
 #ifdef MOAB_HAVE_AHF
 
 template < typename ITER >
-static inline ErrorCode get_adjacencies_intersection_ahf( Core* mb, ITER begin, ITER end, const int to_dimension,
+static inline ErrorCode get_adjacencies_intersection_ahf( Core* mb,
+                                                          ITER begin,
+                                                          ITER end,
+                                                          const int to_dimension,
                                                           std::vector< EntityHandle >& adj_entities )
 {
     const size_t SORT_THRESHOLD = 200;
@@ -1452,8 +1510,11 @@ static inline ErrorCode get_adjacencies_intersection_ahf( Core* mb, ITER begin, 
 
 ///////////////////////////////////////////
 
-ErrorCode Core::get_adjacencies( const EntityHandle* from_entities, const int num_entities, const int to_dimension,
-                                 const bool create_if_missing, std::vector< EntityHandle >& adj_entities,
+ErrorCode Core::get_adjacencies( const EntityHandle* from_entities,
+                                 const int num_entities,
+                                 const int to_dimension,
+                                 const bool create_if_missing,
+                                 std::vector< EntityHandle >& adj_entities,
                                  const int operation_type )
 {
 
@@ -1544,8 +1605,12 @@ ErrorCode Core::get_adjacencies( const EntityHandle* from_entities, const int nu
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_adjacencies( const EntityHandle* from_entities, const int num_entities, const int to_dimension,
-                                 const bool create_if_missing, Range& adj_entities, const int operation_type )
+ErrorCode Core::get_adjacencies( const EntityHandle* from_entities,
+                                 const int num_entities,
+                                 const int to_dimension,
+                                 const bool create_if_missing,
+                                 Range& adj_entities,
+                                 const int operation_type )
 {
     if( operation_type == Interface::INTERSECT )
         return get_adjacencies_intersection( this, from_entities, from_entities + num_entities, to_dimension,
@@ -1614,8 +1679,11 @@ ErrorCode Core::get_connectivity( const Range& from_entities, Range& adj_entitie
     return result;
 }
 
-ErrorCode Core::connect_iterate( Range::const_iterator iter, Range::const_iterator end, EntityHandle*& connect,
-                                 int& verts_per_entity, int& count )
+ErrorCode Core::connect_iterate( Range::const_iterator iter,
+                                 Range::const_iterator end,
+                                 EntityHandle*& connect,
+                                 int& verts_per_entity,
+                                 int& count )
 {
     // Make sure the entity should have a connectivity.
     EntityType entity_type = TYPE_FROM_HANDLE( *iter );
@@ -1634,7 +1702,10 @@ ErrorCode Core::connect_iterate( Range::const_iterator iter, Range::const_iterat
     assert( eseq != NULL );
 
     connect = eseq->get_connectivity_array();
-    if( !connect ) { MB_SET_ERR( MB_FAILURE, "Couldn't find connectivity array for start handle" ); }
+    if( !connect )
+    {
+        MB_SET_ERR( MB_FAILURE, "Couldn't find connectivity array for start handle" );
+    }
 
     connect += eseq->nodes_per_element() * ( *iter - eseq->start_handle() );
 
@@ -1670,8 +1741,11 @@ ErrorCode Core::get_vertices( const Range& from_entities, Range& vertices )
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_adjacencies( const Range& from_entities, const int to_dimension, const bool create_if_missing,
-                                 Range& adj_entities, const int operation_type )
+ErrorCode Core::get_adjacencies( const Range& from_entities,
+                                 const int to_dimension,
+                                 const bool create_if_missing,
+                                 Range& adj_entities,
+                                 const int operation_type )
 {
     if( operation_type == Interface::INTERSECT )
         return get_adjacencies_intersection( this, from_entities.begin(), from_entities.end(), to_dimension,
@@ -1685,8 +1759,10 @@ ErrorCode Core::get_adjacencies( const Range& from_entities, const int to_dimens
                                       adj_entities );
 }
 
-ErrorCode Core::add_adjacencies( const EntityHandle entity_handle, const EntityHandle* adjacencies,
-                                 const int num_handles, bool both_ways )
+ErrorCode Core::add_adjacencies( const EntityHandle entity_handle,
+                                 const EntityHandle* adjacencies,
+                                 const int num_handles,
+                                 bool both_ways )
 {
     ErrorCode result = MB_SUCCESS;
 
@@ -1710,7 +1786,8 @@ ErrorCode Core::add_adjacencies( const EntityHandle entity_handle, Range& adjace
     return MB_SUCCESS;
 }
 
-ErrorCode Core::remove_adjacencies( const EntityHandle entity_handle, const EntityHandle* adjacencies,
+ErrorCode Core::remove_adjacencies( const EntityHandle entity_handle,
+                                    const EntityHandle* adjacencies,
                                     const int num_handles )
 {
     ErrorCode result = MB_SUCCESS;
@@ -1724,8 +1801,10 @@ ErrorCode Core::remove_adjacencies( const EntityHandle entity_handle, const Enti
     return MB_SUCCESS;
 }
 
-ErrorCode Core::adjacencies_iterate( Range::const_iterator iter, Range::const_iterator end,
-                                     const std::vector< EntityHandle >**& adjs_ptr, int& count )
+ErrorCode Core::adjacencies_iterate( Range::const_iterator iter,
+                                     Range::const_iterator end,
+                                     const std::vector< EntityHandle >**& adjs_ptr,
+                                     int& count )
 {
     // Make sure the entity should have a connectivity.
     EntityType entity_type = TYPE_FROM_HANDLE( *iter );
@@ -1752,7 +1831,9 @@ ErrorCode Core::adjacencies_iterate( Range::const_iterator iter, Range::const_it
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_entities_by_dimension( const EntityHandle meshset, const int dimension, Range& entities,
+ErrorCode Core::get_entities_by_dimension( const EntityHandle meshset,
+                                           const int dimension,
+                                           Range& entities,
                                            const bool recursive ) const
 {
     ErrorCode result = MB_SUCCESS;
@@ -1779,8 +1860,10 @@ ErrorCode Core::get_entities_by_dimension( const EntityHandle meshset, const int
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_entities_by_dimension( const EntityHandle meshset, const int dimension,
-                                           std::vector< EntityHandle >& entities, const bool recursive ) const
+ErrorCode Core::get_entities_by_dimension( const EntityHandle meshset,
+                                           const int dimension,
+                                           std::vector< EntityHandle >& entities,
+                                           const bool recursive ) const
 {
     ErrorCode result = MB_SUCCESS;
     if( meshset )
@@ -1806,7 +1889,9 @@ ErrorCode Core::get_entities_by_dimension( const EntityHandle meshset, const int
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_entities_by_type( const EntityHandle meshset, const EntityType entity_type, Range& entities,
+ErrorCode Core::get_entities_by_type( const EntityHandle meshset,
+                                      const EntityType entity_type,
+                                      Range& entities,
                                       const bool recursive ) const
 {
     ErrorCode result = MB_SUCCESS;
@@ -1825,8 +1910,10 @@ ErrorCode Core::get_entities_by_type( const EntityHandle meshset, const EntityTy
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_entities_by_type( const EntityHandle meshset, const EntityType entity_type,
-                                      std::vector< EntityHandle >& entities, const bool recursive ) const
+ErrorCode Core::get_entities_by_type( const EntityHandle meshset,
+                                      const EntityType entity_type,
+                                      std::vector< EntityHandle >& entities,
+                                      const bool recursive ) const
 {
     ErrorCode result = MB_SUCCESS;
     if( meshset )
@@ -1844,9 +1931,14 @@ ErrorCode Core::get_entities_by_type( const EntityHandle meshset, const EntityTy
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_entities_by_type_and_tag( const EntityHandle meshset, const EntityType entity_type, const Tag* tags,
-                                              const void* const* values, const int num_tags, Range& entities,
-                                              const int condition, const bool recursive ) const
+ErrorCode Core::get_entities_by_type_and_tag( const EntityHandle meshset,
+                                              const EntityType entity_type,
+                                              const Tag* tags,
+                                              const void* const* values,
+                                              const int num_tags,
+                                              Range& entities,
+                                              const int condition,
+                                              const bool recursive ) const
 {
     ErrorCode result;
     Range range;
@@ -1917,7 +2009,8 @@ ErrorCode Core::get_entities_by_handle( const EntityHandle meshset, Range& entit
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_entities_by_handle( const EntityHandle meshset, std::vector< EntityHandle >& entities,
+ErrorCode Core::get_entities_by_handle( const EntityHandle meshset,
+                                        std::vector< EntityHandle >& entities,
                                         const bool recursive ) const
 {
     ErrorCode result;
@@ -1940,7 +2033,9 @@ ErrorCode Core::get_entities_by_handle( const EntityHandle meshset, std::vector<
 }
 
 //! get # entities of a given dimension
-ErrorCode Core::get_number_entities_by_dimension( const EntityHandle meshset, const int dim, int& number,
+ErrorCode Core::get_number_entities_by_dimension( const EntityHandle meshset,
+                                                  const int dim,
+                                                  int& number,
                                                   const bool recursive ) const
 {
     ErrorCode result = MB_SUCCESS;
@@ -1966,7 +2061,9 @@ ErrorCode Core::get_number_entities_by_dimension( const EntityHandle meshset, co
 }
 
 //! returns the number of entities with a given type and tag
-ErrorCode Core::get_number_entities_by_type( const EntityHandle meshset, const EntityType entity_type, int& num_ent,
+ErrorCode Core::get_number_entities_by_type( const EntityHandle meshset,
+                                             const EntityType entity_type,
+                                             int& num_ent,
                                              const bool recursive ) const
 {
     ErrorCode result = MB_SUCCESS;
@@ -1989,9 +2086,13 @@ ErrorCode Core::get_number_entities_by_type( const EntityHandle meshset, const E
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_number_entities_by_type_and_tag( const EntityHandle meshset, const EntityType entity_type,
-                                                     const Tag* tag_handles, const void* const* values,
-                                                     const int num_tags, int& num_entities, int condition,
+ErrorCode Core::get_number_entities_by_type_and_tag( const EntityHandle meshset,
+                                                     const EntityType entity_type,
+                                                     const Tag* tag_handles,
+                                                     const void* const* values,
+                                                     const int num_tags,
+                                                     int& num_entities,
+                                                     int condition,
                                                      const bool recursive ) const
 {
     Range dum_ents;
@@ -2029,7 +2130,9 @@ ErrorCode Core::get_number_entities_by_handle( const EntityHandle meshset, int& 
 }
 
 //! return the tag data for a given EntityHandle and Tag
-ErrorCode Core::tag_get_data( const Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
+ErrorCode Core::tag_get_data( const Tag tag_handle,
+                              const EntityHandle* entity_handles,
+                              int num_entities,
                               void* tag_data ) const
 {
     assert( valid_tag_handle( tag_handle ) );
@@ -2045,7 +2148,9 @@ ErrorCode Core::tag_get_data( const Tag tag_handle, const Range& entity_handles,
 }
 
 //! set the data  for given EntityHandles and Tag
-ErrorCode Core::tag_set_data( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
+ErrorCode Core::tag_set_data( Tag tag_handle,
+                              const EntityHandle* entity_handles,
+                              int num_entities,
                               const void* tag_data )
 {
     assert( valid_tag_handle( tag_handle ) );
@@ -2061,8 +2166,11 @@ ErrorCode Core::tag_set_data( Tag tag_handle, const Range& entity_handles, const
 }
 
 //! return the tag data for a given EntityHandle and Tag
-ErrorCode Core::tag_get_by_ptr( const Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                const void** tag_data, int* tag_sizes ) const
+ErrorCode Core::tag_get_by_ptr( const Tag tag_handle,
+                                const EntityHandle* entity_handles,
+                                int num_entities,
+                                const void** tag_data,
+                                int* tag_sizes ) const
 {
     assert( valid_tag_handle( tag_handle ) );
     CHECK_MESH_NULL
@@ -2076,7 +2184,9 @@ ErrorCode Core::tag_get_by_ptr( const Tag tag_handle, const EntityHandle* entity
 }
 
 //! return the tag data for a given EntityHandle and Tag
-ErrorCode Core::tag_get_by_ptr( const Tag tag_handle, const Range& entity_handles, const void** tag_data,
+ErrorCode Core::tag_get_by_ptr( const Tag tag_handle,
+                                const Range& entity_handles,
+                                const void** tag_data,
                                 int* tag_sizes ) const
 {
     assert( valid_tag_handle( tag_handle ) );
@@ -2092,8 +2202,11 @@ ErrorCode Core::tag_get_by_ptr( const Tag tag_handle, const Range& entity_handle
 }
 
 //! set the data  for given EntityHandles and Tag
-ErrorCode Core::tag_set_by_ptr( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                void const* const* tag_data, const int* tag_sizes )
+ErrorCode Core::tag_set_by_ptr( Tag tag_handle,
+                                const EntityHandle* entity_handles,
+                                int num_entities,
+                                void const* const* tag_data,
+                                const int* tag_sizes )
 {
     assert( valid_tag_handle( tag_handle ) );
     CHECK_MESH_NULL
@@ -2110,7 +2223,9 @@ ErrorCode Core::tag_set_by_ptr( Tag tag_handle, const EntityHandle* entity_handl
 }
 
 //! set the data  for given EntityHandles and Tag
-ErrorCode Core::tag_set_by_ptr( Tag tag_handle, const Range& entity_handles, void const* const* tag_data,
+ErrorCode Core::tag_set_by_ptr( Tag tag_handle,
+                                const Range& entity_handles,
+                                void const* const* tag_data,
                                 const int* tag_sizes )
 {
     assert( valid_tag_handle( tag_handle ) );
@@ -2128,8 +2243,11 @@ ErrorCode Core::tag_set_by_ptr( Tag tag_handle, const Range& entity_handles, voi
 }
 
 //! set the data  for given EntityHandles and Tag
-ErrorCode Core::tag_clear_data( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                const void* tag_data, int tag_size )
+ErrorCode Core::tag_clear_data( Tag tag_handle,
+                                const EntityHandle* entity_handles,
+                                int num_entities,
+                                const void* tag_data,
+                                int tag_size )
 {
     assert( valid_tag_handle( tag_handle ) );
     CHECK_MESH_NULL
@@ -2154,8 +2272,13 @@ static bool is_zero_bytes( const void* mem, size_t size )
     return true;
 }
 
-ErrorCode Core::tag_get_handle( const char* name, int size, DataType data_type, Tag& tag_handle, unsigned flags,
-                                const void* default_value, bool* created )
+ErrorCode Core::tag_get_handle( const char* name,
+                                int size,
+                                DataType data_type,
+                                Tag& tag_handle,
+                                unsigned flags,
+                                const void* default_value,
+                                bool* created )
 {
     if( created ) *created = false;
 
@@ -2288,7 +2411,11 @@ ErrorCode Core::tag_get_handle( const char* name, int size, DataType data_type, 
     return MB_SUCCESS;
 }
 
-ErrorCode Core::tag_get_handle( const char* name, int size, DataType data_type, Tag& tag_handle, unsigned flags,
+ErrorCode Core::tag_get_handle( const char* name,
+                                int size,
+                                DataType data_type,
+                                Tag& tag_handle,
+                                unsigned flags,
                                 const void* default_value ) const
 {
     // If caller specified MB_TAG_EXCL, then we must fail because
@@ -2346,8 +2473,12 @@ ErrorCode Core::tag_delete( Tag tag_handle )
     return MB_SUCCESS;
 }
 
-ErrorCode Core::tag_iterate( Tag tag_handle, Range::const_iterator iter, Range::const_iterator end, int& count,
-                             void*& data_ptr, bool allocate )
+ErrorCode Core::tag_iterate( Tag tag_handle,
+                             Range::const_iterator iter,
+                             Range::const_iterator end,
+                             int& count,
+                             void*& data_ptr,
+                             bool allocate )
 {
     Range::const_iterator init = iter;
     assert( valid_tag_handle( tag_handle ) );
@@ -2506,7 +2637,9 @@ Tag Core::geom_dimension_tag()
 }
 
 //! creates an element based on the type and connectivity.  returns a handle and error code
-ErrorCode Core::create_element( const EntityType entity_type, const EntityHandle* connectivity, const int num_nodes,
+ErrorCode Core::create_element( const EntityType entity_type,
+                                const EntityHandle* connectivity,
+                                const int num_nodes,
                                 EntityHandle& handle )
 {
     // make sure we have enough vertices for this entity type
@@ -2554,7 +2687,9 @@ ErrorCode Core::create_vertices( const double* coordinates, const int nverts, Ra
 }
 
 //! merges two  entities
-ErrorCode Core::merge_entities( EntityHandle entity_to_keep, EntityHandle entity_to_remove, bool auto_merge,
+ErrorCode Core::merge_entities( EntityHandle entity_to_keep,
+                                EntityHandle entity_to_remove,
+                                bool auto_merge,
                                 bool delete_removed_entity )
 {
     if( auto_merge ) return MB_FAILURE;
@@ -2860,8 +2995,11 @@ ErrorCode Core::list_entity( const EntityHandle entity ) const
     return result;
 }
 
-ErrorCode Core::convert_entities( const EntityHandle meshset, const bool mid_side, const bool mid_face,
-                                  const bool mid_volume, Interface::HONodeAddedRemoved* function_object )
+ErrorCode Core::convert_entities( const EntityHandle meshset,
+                                  const bool mid_side,
+                                  const bool mid_face,
+                                  const bool mid_volume,
+                                  Interface::HONodeAddedRemoved* function_object )
 {
     HigherOrderFactory fact( this, function_object );
     return fact.convert( meshset, mid_side, mid_face, mid_volume );
@@ -2870,7 +3008,10 @@ ErrorCode Core::convert_entities( const EntityHandle meshset, const bool mid_sid
 //! function to get the side number given two elements; returns
 //! MB_FAILURE if child not related to parent; does *not* create adjacencies
 //! between parent and child
-ErrorCode Core::side_number( const EntityHandle parent, const EntityHandle child, int& sd_number, int& sense,
+ErrorCode Core::side_number( const EntityHandle parent,
+                             const EntityHandle child,
+                             int& sd_number,
+                             int& sense,
                              int& offset ) const
 {
     // get the connectivity of parent and child
@@ -2990,8 +3131,10 @@ ErrorCode Core::side_number( const EntityHandle parent, const EntityHandle child
 
 //! given an entity and the connectivity and type of one of its subfacets, find the
 //! high order node on that subfacet, if any
-ErrorCode Core::high_order_node( const EntityHandle parent_handle, const EntityHandle* subfacet_conn,
-                                 const EntityType subfacet_type, EntityHandle& hon ) const
+ErrorCode Core::high_order_node( const EntityHandle parent_handle,
+                                 const EntityHandle* subfacet_conn,
+                                 const EntityType subfacet_type,
+                                 EntityHandle& hon ) const
 {
     hon = 0;
 
@@ -3036,7 +3179,10 @@ ErrorCode Core::high_order_node( const EntityHandle parent_handle, const EntityH
         {
             subfacet_indices[j] =
                 std::find( parent_conn, parent_conn + num_parent_vertices, subfacet_conn[j] ) - parent_conn;
-            if( subfacet_indices[j] >= num_parent_vertices ) { return MB_FAILURE; }
+            if( subfacet_indices[j] >= num_parent_vertices )
+            {
+                return MB_FAILURE;
+            }
         }
 
         int dum, side_no, temp_offset;
@@ -3056,7 +3202,9 @@ ErrorCode Core::high_order_node( const EntityHandle parent_handle, const EntityH
 }
 
 //! given an entity and a target dimension & side number, get that entity
-ErrorCode Core::side_element( const EntityHandle source_entity, const int dim, const int sd_number,
+ErrorCode Core::side_element( const EntityHandle source_entity,
+                              const int dim,
+                              const int sd_number,
                               EntityHandle& target_entity ) const
 {
     // get a handle on the connectivity
@@ -3231,7 +3379,9 @@ ErrorCode Core::remove_entities( EntityHandle meshset, const EntityHandle* entit
 }
 
 //! return true if all entities are contained in set
-bool Core::contains_entities( EntityHandle meshset, const EntityHandle* entities, int num_entities,
+bool Core::contains_entities( EntityHandle meshset,
+                              const EntityHandle* entities,
+                              int num_entities,
                               const int operation_type )
 {
     if( !meshset )  // root
@@ -3243,8 +3393,10 @@ bool Core::contains_entities( EntityHandle meshset, const EntityHandle* entities
 }
 
 // replace entities in a meshset
-ErrorCode Core::replace_entities( EntityHandle meshset, const EntityHandle* old_entities,
-                                  const EntityHandle* new_entities, int num_entities )
+ErrorCode Core::replace_entities( EntityHandle meshset,
+                                  const EntityHandle* old_entities,
+                                  const EntityHandle* new_entities,
+                                  int num_entities )
 {
     MeshSet* set = get_mesh_set( sequence_manager(), meshset );
     if( set )
@@ -3253,7 +3405,8 @@ ErrorCode Core::replace_entities( EntityHandle meshset, const EntityHandle* old_
         return MB_ENTITY_NOT_FOUND;
 }
 
-ErrorCode Core::get_parent_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& parents,
+ErrorCode Core::get_parent_meshsets( const EntityHandle meshset,
+                                     std::vector< EntityHandle >& parents,
                                      const int num_hops ) const
 {
     if( 0 == meshset ) return MB_ENTITY_NOT_FOUND;
@@ -3277,7 +3430,8 @@ ErrorCode Core::get_parent_meshsets( const EntityHandle meshset, Range& parents,
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_child_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& children,
+ErrorCode Core::get_child_meshsets( const EntityHandle meshset,
+                                    std::vector< EntityHandle >& children,
                                     const int num_hops ) const
 {
     if( 0 == meshset ) return MB_ENTITY_NOT_FOUND;
@@ -3301,10 +3455,14 @@ ErrorCode Core::get_child_meshsets( const EntityHandle meshset, Range& children,
     return MB_SUCCESS;
 }
 
-ErrorCode Core::get_contained_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& children,
+ErrorCode Core::get_contained_meshsets( const EntityHandle meshset,
+                                        std::vector< EntityHandle >& children,
                                         const int num_hops ) const
 {
-    if( 0 == meshset ) { return get_entities_by_type( meshset, MBENTITYSET, children ); }
+    if( 0 == meshset )
+    {
+        return get_entities_by_type( meshset, MBENTITYSET, children );
+    }
 
     const EntitySequence* seq;
     ErrorCode rval = sequence_manager()->find( meshset, seq );
@@ -3316,7 +3474,10 @@ ErrorCode Core::get_contained_meshsets( const EntityHandle meshset, std::vector<
 
 ErrorCode Core::get_contained_meshsets( const EntityHandle meshset, Range& children, const int num_hops ) const
 {
-    if( 0 == meshset ) { return get_entities_by_type( meshset, MBENTITYSET, children ); }
+    if( 0 == meshset )
+    {
+        return get_entities_by_type( meshset, MBENTITYSET, children );
+    }
 
     std::vector< EntityHandle > child_vec;
     ErrorCode result = get_contained_meshsets( meshset, child_vec, num_hops );MB_CHK_ERR( result );
@@ -3351,7 +3512,10 @@ ErrorCode Core::num_child_meshsets( const EntityHandle meshset, int* number, con
 
 ErrorCode Core::num_contained_meshsets( const EntityHandle meshset, int* number, const int num_hops ) const
 {
-    if( 0 == meshset ) { return get_number_entities_by_type( 0, MBENTITYSET, *number ); }
+    if( 0 == meshset )
+    {
+        return get_number_entities_by_type( 0, MBENTITYSET, *number );
+    }
 
     const EntitySequence* seq;
     ErrorCode rval = sequence_manager()->find( meshset, seq );
@@ -3703,8 +3867,12 @@ bool Core::is_valid( const EntityHandle this_ent ) const
     return seq != 0 && result == MB_SUCCESS;
 }
 
-ErrorCode Core::create_set_iterator( EntityHandle meshset, EntityType ent_type, int ent_dim, int chunk_size,
-                                     bool check_valid, SetIterator*& set_iter )
+ErrorCode Core::create_set_iterator( EntityHandle meshset,
+                                     EntityType ent_type,
+                                     int ent_dim,
+                                     int chunk_size,
+                                     bool check_valid,
+                                     SetIterator*& set_iter )
 {
     // check the type of set
     unsigned int setoptions;
@@ -3731,7 +3899,10 @@ ErrorCode Core::create_set_iterator( EntityHandle meshset, EntityType ent_type, 
 ErrorCode Core::remove_set_iterator( SetIterator* set_iter )
 {
     std::vector< SetIterator* >::iterator vit = std::find( setIterators.begin(), setIterators.end(), set_iter );
-    if( vit == setIterators.end() ) { MB_SET_ERR( MB_FAILURE, "Didn't find that iterator" ); }
+    if( vit == setIterators.end() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Didn't find that iterator" );
+    }
 
     setIterators.erase( vit );
 
@@ -3749,11 +3920,16 @@ ErrorCode Core::get_set_iterators( EntityHandle meshset, std::vector< SetIterato
     return MB_SUCCESS;
 }
 
-void Core::estimated_memory_use_internal( const Range* ents, type_memstorage* total_storage,
-                                          type_memstorage* total_amortized_storage, type_memstorage* entity_storage,
-                                          type_memstorage* amortized_entity_storage, type_memstorage* adjacency_storage,
-                                          type_memstorage* amortized_adjacency_storage, const Tag* tag_array,
-                                          unsigned num_tags, type_memstorage* tag_storage,
+void Core::estimated_memory_use_internal( const Range* ents,
+                                          type_memstorage* total_storage,
+                                          type_memstorage* total_amortized_storage,
+                                          type_memstorage* entity_storage,
+                                          type_memstorage* amortized_entity_storage,
+                                          type_memstorage* adjacency_storage,
+                                          type_memstorage* amortized_adjacency_storage,
+                                          const Tag* tag_array,
+                                          unsigned num_tags,
+                                          type_memstorage* tag_storage,
                                           type_memstorage* amortized_tag_storage )
 {
     // Figure out which values we need to calculate
@@ -3895,11 +4071,18 @@ void Core::estimated_memory_use_internal( const Range* ents, type_memstorage* to
             *amortized_entity_storage + *amortized_adjacency_storage + *amortized_total_tag_storage;
 }
 
-void Core::estimated_memory_use( const EntityHandle* ent_array, unsigned long num_ents, type_memstorage* total_storage,
-                                 type_memstorage* total_amortized_storage, type_memstorage* entity_storage,
-                                 type_memstorage* amortized_entity_storage, type_memstorage* adjacency_storage,
-                                 type_memstorage* amortized_adjacency_storage, const Tag* tag_array, unsigned num_tags,
-                                 type_memstorage* tag_storage, type_memstorage* amortized_tag_storage )
+void Core::estimated_memory_use( const EntityHandle* ent_array,
+                                 unsigned long num_ents,
+                                 type_memstorage* total_storage,
+                                 type_memstorage* total_amortized_storage,
+                                 type_memstorage* entity_storage,
+                                 type_memstorage* amortized_entity_storage,
+                                 type_memstorage* adjacency_storage,
+                                 type_memstorage* amortized_adjacency_storage,
+                                 const Tag* tag_array,
+                                 unsigned num_tags,
+                                 type_memstorage* tag_storage,
+                                 type_memstorage* amortized_tag_storage )
 {
     Range range;
 
@@ -3926,11 +4109,17 @@ void Core::estimated_memory_use( const EntityHandle* ent_array, unsigned long nu
                                    num_tags, tag_storage, amortized_tag_storage );
 }
 
-void Core::estimated_memory_use( const Range& ents, type_memstorage* total_storage,
-                                 type_memstorage* total_amortized_storage, type_memstorage* entity_storage,
-                                 type_memstorage* amortized_entity_storage, type_memstorage* adjacency_storage,
-                                 type_memstorage* amortized_adjacency_storage, const Tag* tag_array, unsigned num_tags,
-                                 type_memstorage* tag_storage, type_memstorage* amortized_tag_storage )
+void Core::estimated_memory_use( const Range& ents,
+                                 type_memstorage* total_storage,
+                                 type_memstorage* total_amortized_storage,
+                                 type_memstorage* entity_storage,
+                                 type_memstorage* amortized_entity_storage,
+                                 type_memstorage* adjacency_storage,
+                                 type_memstorage* amortized_adjacency_storage,
+                                 const Tag* tag_array,
+                                 unsigned num_tags,
+                                 type_memstorage* tag_storage,
+                                 type_memstorage* amortized_tag_storage )
 {
     estimated_memory_use_internal( &ents, total_storage, total_amortized_storage, entity_storage,
                                    amortized_entity_storage, adjacency_storage, amortized_adjacency_storage, tag_array,
@@ -4047,8 +4236,11 @@ void Core::print_database() const
     }
 }
 
-ErrorCode Core::create_scd_sequence( const HomCoord& coord_min, const HomCoord& coord_max, EntityType entity_type,
-                                     EntityID start_id_hint, EntityHandle& first_handle_out,
+ErrorCode Core::create_scd_sequence( const HomCoord& coord_min,
+                                     const HomCoord& coord_max,
+                                     EntityType entity_type,
+                                     EntityID start_id_hint,
+                                     EntityHandle& first_handle_out,
                                      EntitySequence*& sequence_out )
 {
     // NR: Previously, the structured element sequences were created via direct call to
@@ -4067,9 +4259,17 @@ ErrorCode Core::create_scd_sequence( const HomCoord& coord_min, const HomCoord& 
     return sequence_manager()->find( first_handle_out, sequence_out );
 }
 
-ErrorCode Core::add_vsequence( EntitySequence* vert_seq, EntitySequence* elem_seq, const HomCoord& p1,
-                               const HomCoord& q1, const HomCoord& p2, const HomCoord& q2, const HomCoord& p3,
-                               const HomCoord& q3, bool bb_input, const HomCoord* bb_min, const HomCoord* bb_max )
+ErrorCode Core::add_vsequence( EntitySequence* vert_seq,
+                               EntitySequence* elem_seq,
+                               const HomCoord& p1,
+                               const HomCoord& q1,
+                               const HomCoord& p2,
+                               const HomCoord& q2,
+                               const HomCoord& p3,
+                               const HomCoord& q3,
+                               bool bb_input,
+                               const HomCoord* bb_min,
+                               const HomCoord* bb_max )
 {
     return sequence_manager()->add_vsequence( vert_seq, elem_seq, p1, q1, p2, q2, p3, q3, bb_input, bb_min, bb_max );
 }
