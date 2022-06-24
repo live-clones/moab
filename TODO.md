@@ -39,9 +39,8 @@
 ## Intersection
 
 1. The intersection points are currently not shared correctly between tasks. When intersection point is on the boundary edge (edge that is shared between partitions), the settle_intersection_points method just sends from the owning processor the correct position for the 3d point. It should also send the entity handle, which should be used for shared tag handle. It can never be multi-shared, so this makes it easier. Also, the non-owning task should send the entity handle towards the owner (would be owner), because this intx point will now be shared. Without this addition, parallel file I/O of the intersection mesh will fail.
-2. Verify the DoF numbering for FEM weight generation with `mbtempest` tool
-3. Remove or minimize the MOAB overload for the mesh loops in TempestOfflineMap.cpp
-4. Modify TempestRemap sources so that it is aware of parallel callers (MOAB)
+2. Remove or minimize the MOAB overload for the mesh loops in TempestOfflineMap.cpp
+3. Modify TempestRemap sources so that it is aware of parallel callers (MOAB)
 
 ## Local Discretization
 
@@ -61,9 +60,9 @@ Currently, iRel usage requires that we match the geometry entity with the mesh s
 However, if these models were created through arbitrary workflows like say a geometry model through `Cubit` and a mesh corresponding to that geometry through `Gmsh`, iRel cannot work out the associations.
 
 1. Create a stp file from either Cubit or Gmsh
-2) Mesh with any one of the supported mesher like Gmsh or Netgen
-3) If Gmsh has the same strategy as Cubit (boundary first, then interior), in principle we could identify all 0d, 1d, 2d, 3d cells in the mesh; also, depending on the format Gmsh has, some "parent" type information could be saved in the mesh itself.
-4) Then do a geometric search, to find the associativity relations by "brute" force, if nothing else is possible.
+2. Mesh with any one of the supported mesher like Gmsh or Netgen
+3. If Gmsh has the same strategy as Cubit (boundary first, then interior), in principle we could identify all 0d, 1d, 2d, 3d cells in the mesh; also, depending on the format Gmsh has, some "parent" type information could be saved in the mesh itself.
+4. Then do a geometric search, to find the associativity relations by "brute" force, if nothing else is possible.
 
    Brute force means that by looking at a mesh edge, for example, find the curve in the stp file, that is the closest to the mesh edge. It is a complex process, and we will need some iterations to compute the inverse, etc (For any point in space, we could get what is the closest point on a curve in iGeom. There are also some geometry trees that can be used (similar to Kd-tree, for geometry entities, not for mesh). This needs to be investigated further within iGeom and CGM.
 
@@ -89,10 +88,12 @@ switch( datatype )
 5. Add more examples showing Mesquite usage with MOAB
 6. Verify mesh optimization algorithms in both serial and parallel and see if all of the indicators work as they should
 7. Unify error propagation between MOAB and Mesquite
-8. Unify EntityHandle definition between MOAB and Mesquite (void*)
+8. Unify EntityHandle definition between MOAB and Mesquite (void\*)
 
 ## Hybrid computing
 
 1. Profile first and investigate algorithms that are amenable for OpenMP parallelism
 2. Make sure all Core interface functions are thread-safe
 3. Add examples that demonstrate hybrid MPI-OpenMP parallelism
+4. Add ArborX interfaces to exploit node level parallelism with Kokkos backend
+

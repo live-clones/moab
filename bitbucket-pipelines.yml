@@ -13,7 +13,7 @@ pipelines:
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
                 - cd build_atools && ../configure --with-mpi=/usr/lib/x86_64-linux-gnu/openmpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr --with-eigen3=/usr/include/eigen3 --disable-mbcoupler
-                - make distcheck V=1 
+                - make check V=1 
                 # Now configure with CMake build system
                 # CMake Shared Library Builds
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
@@ -34,7 +34,7 @@ pipelines:
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System Static Library Build"
                 - cd build_atools && ../configure --with-mpi=/usr/lib/x86_64-linux-gnu/openmpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3 --disable-mbcoupler
-                - make distcheck V=1 
+                - make check V=1 
                 # Now configure with CMake build system
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
                 - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DCMAKE_CXX_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON  -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
@@ -53,7 +53,7 @@ pipelines:
                 # Configure and build with Autotools
                 - autoreconf -fi && echo "Running the Autotools Build System"
                 - cd build_atools && ../configure --with-mpi=/usr/lib/x86_64-linux-gnu/openmpi --enable-shared --enable-static --enable-pymoab PYTHON=python3 --enable-optimize --with-hdf5=/usr/lib/x86_64-linux-gnu/hdf5/openmpi --with-metis=/usr FLIBS="-lmpi_cxx" --with-eigen3=/usr/include/eigen3 --disable-mbcoupler
-                - make distcheck V=1 
+                - make check V=1 
                 # Now configure with CMake build system
                 - cd ../build_cmake && echo "Running the CMake Shared Build System"
                 - cmake .. -DCMAKE_C_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DCMAKE_CXX_FLAGS="-fPIC -DPIC -Wno-cast-function-type" -DBUILD_SHARED_LIBS=ON -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" -DENABLE_MPI=ON -DMPIHOME=/usr -DENABLE_PYMOAB=ON -DENABLE_HDF5=ON -DHDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi -DENABLE_NETCDF=ON -DNETCDF_ROOT=/usr/lib/x86_64-linux-gnu/netcdf/mpi -DENABLE_METIS=ON -DMETIS_DIR=/usr -DEIGEN3_DIR=/usr/include/eigen3
