@@ -299,6 +299,9 @@ if ENABLE_FORTRAN
 libMOAB_la_SOURCES += iMOABF.F90
 imoabincludedir = $(includedir)
 nodist_imoabinclude_HEADERS = imoab.mod
+
+imoab.mod: moab/iMOAB.h iMOABF.F90
+iMOAB.o: imoab.mod
 endif # ENABLE_FORTRAN
 
 if ENABLE_mbtempest
