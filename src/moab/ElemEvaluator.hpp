@@ -71,6 +71,14 @@ class EvalSet
     {
     }
 
+  /** \brief Copy constructor */
+  EvalSet(EvalSet const &eval) : evalFcn(eval.evalFcn), reverseEvalFcn(eval.reverseEvalFcn), normalFcn(eval.normalFcn),
+				 jacobianFcn(eval.jacobianFcn), integrateFcn(eval.integrateFcn),
+				 initFcn(eval.initFcn), insideFcn(eval.insideFcn)
+  {
+  }
+  
+
     /** \brief Given an entity handle, get an appropriate eval set, based on type & #vertices */
     static ErrorCode get_eval_set( Interface* mb, EntityHandle eh, EvalSet& eval_set );
 

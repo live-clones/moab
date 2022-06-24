@@ -851,22 +851,14 @@ static bool do_file( const char* filename )
         tool.preorder_traverse( root, op );
     }
 
-    bool print_errors = false, print_contents = false;
-    switch( verbosity )
-    {
-        default:
-            print_contents = true;
-        case 4:
-            tool.print( root, std::cout, print_contents );
-        case 3:
-            print_errors = true;
-        case 2:
-            rval = tool.stats( root, std::cout );
-            if( MB_SUCCESS != rval ) std::cout << "****** Failed to get tree statistics ******" << std::endl;
-        case 1:
-        case 0:;
+    bool print_errors = (verbosity > 2), print_contents = (verbosity > 4);
+    if (verbosity > 3)
+      tool.print( root, std::cout, print_contents );
+    if (verbosity > 1) {
+      rval = tool.stats( root, std::cout );
+      if( MB_SUCCESS != rval ) std::cout << "****** Failed to get tree statistics ******" << std::endl;
     }
-
+    
     TreeValidator op( iface, &tool, print_errors, std::cout, tolerance, haveSurfTree, settings );
     rval        = tool.preorder_traverse( root, op );
     bool result = op.is_valid();

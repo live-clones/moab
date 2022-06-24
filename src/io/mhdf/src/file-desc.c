@@ -262,17 +262,15 @@ static struct mhdf_FileDesc* get_tag_desc( mhdf_FileHandle file_handle, struct m
                     type = H5Tcopy( H5T_NATIVE_B16 );
                     break;
                 case 3:
-                    ++valsize;
                 case 4:
+  		    valsize += 4 - valsize; // to avoid fallthrough warning
                     type = H5Tcopy( H5T_NATIVE_B32 );
                     break;
                 case 5:
-                    ++valsize;
                 case 6:
-                    ++valsize;
                 case 7:
-                    ++valsize;
                 case 8:
+		    valsize += 8 - valsize; // to avoid fallthrough warning
                     type = H5Tcopy( H5T_NATIVE_B64 );
                     break;
                 default:

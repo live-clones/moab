@@ -1541,7 +1541,7 @@ ErrorCode WriteNCDF::initialize_exodus_file( ExodusMeshInfo& mesh_info, std::vec
     int length = strlen( working_title );
     for( int pos = 0; pos < length; pos++ )
     {
-        if( working_title[pos] == '\\' ) strncpy( &working_title[pos], "/", 1 );
+        if( working_title[pos] == '\\' ) working_title[pos] = '/';
     }
 
     if( NC_NOERR != nc_put_att_text( ncFile, NC_GLOBAL, "title", length, working_title ) )

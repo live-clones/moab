@@ -95,7 +95,7 @@ AC_SUBST(enable_shared)
 
 # All language options initialized -- now call
 # libtool initialization
-# AC_PROG_LIBTOOL is deprecated
+# LT_INIT is deprecated
 LT_INIT([dlopen])
 LT_LANG([C++])
 
@@ -158,8 +158,12 @@ AC_DEFINE_UNQUOTED([MESH_DIR], ["$project_abstopsrcdir/MeshFiles/"], [Path to th
 ################################################################################
 #                              Headers
 ################################################################################
-AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
+#AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
 AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H,  [1], [MOAB qualified HAVE_INTTYPES_H]) ])
 AC_CHECK_HEADER([stdint.h],   [AC_DEFINE(HAVE_STDINT_H,    [1], [MOAB qualified HAVE_STDINT_H])   ])
 AC_CHECK_HEADER([stddef.h],   [AC_DEFINE(HAVE_STDDEF_H,    [1], [MOAB qualified HAVE_STDDEF_H])   ])

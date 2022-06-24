@@ -16,14 +16,23 @@ ErrorCode LinearTet::initFcn( const double* verts, const int nverts, double*& wo
     // work[9..17] = Tinv
     // work[18] = detT
     // work[19] = detTinv
-    assert( nverts == 4 && verts );
-    if( !work ) work = new double[20];
+    if( nverts != 4 )
+    {
+        std::cout << "Invalid Tetrahedron. Expected 4 vertices.\n";
+        return MB_FAILURE;
+    }
+
+    assert( verts );
 
     Matrix3 J( verts[1 * 3 + 0] - verts[0 * 3 + 0], verts[2 * 3 + 0] - verts[0 * 3 + 0],
                verts[3 * 3 + 0] - verts[0 * 3 + 0], verts[1 * 3 + 1] - verts[0 * 3 + 1],
                verts[2 * 3 + 1] - verts[0 * 3 + 1], verts[3 * 3 + 1] - verts[0 * 3 + 1],
                verts[1 * 3 + 2] - verts[0 * 3 + 2], verts[2 * 3 + 2] - verts[0 * 3 + 2],
                verts[3 * 3 + 2] - verts[0 * 3 + 2] );
+
+    // Update the work array
+    if( !work ) work = new double[20];
+
     J.copyto( work );
     J.inverse().copyto( work + Matrix3::size );
     work[18] = J.determinant();
