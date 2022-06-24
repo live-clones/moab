@@ -114,7 +114,7 @@ int GeomTopoTool::dimension( EntityHandle this_set )
     int dim;
     result = mdbImpl->tag_get_data( geomTag, &this_set, 1, &dim );
     if( MB_SUCCESS != result ) return -1;
-    return dim;
+    else return dim;
 }
 
 int GeomTopoTool::global_id( EntityHandle this_set )
@@ -139,15 +139,15 @@ int GeomTopoTool::global_id( EntityHandle this_set )
     int id;
     result = mdbImpl->tag_get_data( gidTag, &this_set, 1, &id );
     if( MB_SUCCESS != result ) return -1;
-    return id;
+    else return id;
 }
 
 EntityHandle GeomTopoTool::entity_by_id( int dimension1, int id )
 {
-    if( 0 > dimension1 && 3 < dimension1 )
+    if( 0 > dimension1 || 3 < dimension1 )
     {
         MB_CHK_SET_ERR_CONT( MB_FAILURE, "Incorrect dimension provided" );
-    };
+    }
     const Tag tags[]         = { gidTag, geomTag };
     const void* const vals[] = { &id, &dimension1 };
     ErrorCode rval;
@@ -156,8 +156,7 @@ EntityHandle GeomTopoTool::entity_by_id( int dimension1, int id )
     rval = mdbImpl->get_entities_by_type_and_tag( 0, MBENTITYSET, tags, vals, 2, results );
 
     if( MB_SUCCESS != rval ) return 0;
-
-    return results.front();
+    else return results.front();
 }
 
 ErrorCode GeomTopoTool::other_entity( EntityHandle bounded,

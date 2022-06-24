@@ -301,7 +301,7 @@ imoabincludedir = $(includedir)
 nodist_imoabinclude_HEADERS = imoab.mod
 
 imoab.mod: moab/iMOAB.h iMOABF.F90
-libMOAB_la_LIBADD += imoab.mod 
+iMOAB.o: imoab.mod
 endif # ENABLE_FORTRAN
 
 if ENABLE_mbtempest
