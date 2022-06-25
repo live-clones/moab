@@ -283,8 +283,8 @@ void MeshOutputFunctor::operator()( EntityType etyp )
     {
 #ifdef MB_DEBUG
         std::cout << " *** ";
-#endif  // MB_DEBUG \
-    // FIXME: Handle tag assignment for elements as well as vertices
+#endif  // MB_DEBUG 
+        // FIXME: Handle tag assignment for elements as well as vertices
         this->tag_manager->assign_element_tags( elem_handle );
     }
 #ifdef MB_DEBUG
