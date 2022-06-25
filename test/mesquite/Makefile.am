@@ -38,7 +38,9 @@ AM_CPPFLAGS  = -DSRCDIR=$(srcdir) \
                -I$(top_srcdir)/src \
                -I$(top_builddir)/src \
                -I$(top_srcdir)/test
-
+if HAVE_MPI
+AM_CPPFLAGS += -I$(top_srcdir)/src/parallel
+endif
 LDADD = $(top_builddir)/src/mesquite/libmbmesquite.la
 check_PROGRAMS = algorithm_test activeset analytical_grad3D paraboloid_domain high_aspect_ratio idft_time jacobi
 check_PROGRAMS += laplacian laplacian_polygon nongradient pyramid wedge simple_hybrid synchronous transform untangle
