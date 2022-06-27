@@ -207,20 +207,20 @@ class BSPTree
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane& plane );
+    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane );
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane& plane, EntityHandle& left_child, EntityHandle& right_child );
+    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& left_child, EntityHandle& right_child );
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
-    ErrorCode split_leaf( BSPTreeIter& leaf, Plane& plane, const Range& left_entities, const Range& right_entities );
+    ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left_entities, const Range& right_entities );
 
     //! Split leaf of tree
     //! Updates iterator location to point to first new leaf node.
     ErrorCode split_leaf( BSPTreeIter& leaf,
-                          Plane& plane,
+                          Plane plane,
                           const std::vector< EntityHandle >& left_entities,
                           const std::vector< EntityHandle >& right_entities );
 
