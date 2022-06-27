@@ -304,6 +304,8 @@ struct ToolContext
             assert( inFilenames.size() == 2 );
             assert( disc_orders.size() == 2 );
             assert( disc_methods.size() == 2 );
+            mapOptions.nPin             = disc_orders[0];
+            mapOptions.nPout            = disc_orders[1];
         }
 
         expectedFName.clear();
@@ -312,8 +314,7 @@ struct ToolContext
 
         mapOptions.strOutputMapFile = outFilename;
         mapOptions.strOutputFormat  = "Netcdf4";
-        mapOptions.nPin             = disc_orders[0];
-        mapOptions.nPout            = disc_orders[1];
+
         mapOptions.fSourceConcave   = false;
         mapOptions.fTargetConcave   = false;
 

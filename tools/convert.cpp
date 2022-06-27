@@ -177,6 +177,7 @@ int main( int argc, char* argv[] )
 
     bool append_rank        = false;
     bool percent_rank_subst = false;
+    bool file_written = false;
     int i, dim;
     std::list< std::string >::iterator j;
     bool dims[4]       = { false, false, false, false };
@@ -912,12 +913,13 @@ int main( int argc, char* argv[] )
 			}
 			// Write out the mesh using TempestRemap
 			tempestMesh->Write( out, NcFile::Netcdf4 );
+			file_written = true;
 		}
+		delete remapper; // done with it
     }
-    else
-    {
 #endif
-
+    if (!file_written)
+    {
         if( have_sets )
             result = gMB->write_file( out.c_str(), format, write_options.c_str(), &set_list[0], set_list.size() );
         else
@@ -934,10 +936,7 @@ int main( int argc, char* argv[] )
 #endif
             return WRITE_ERROR;
         }
-#ifdef MOAB_HAVE_TEMPESTREMAP
     }
-    if (remapper) delete remapper;
-#endif
 
     if( !proc_id ) std::cerr << "Wrote \"" << out << "\"" << std::endl;
     if( print_times && !proc_id ) write_times( std::cout );
