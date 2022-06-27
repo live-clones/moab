@@ -63,7 +63,7 @@ void usage( const char* argv0 )
 
 int check_slaved_coords( Mesh& mesh,
                          Settings::HigherOrderSlaveMode mode,
-                         std::string name,
+                         std::string& name,
                          bool have_slaved_flag,
                          MsqError& err );
 
@@ -264,7 +264,7 @@ Vector3D get_slaved_coords( Mesh& mesh, Mesh::VertexHandle vertex, MsqError& err
 
 int check_slaved_coords( Mesh& mesh,
                          Settings::HigherOrderSlaveMode mode,
-                         std::string name,
+                         std::string& name,
                          bool have_slaved_flag,
                          MsqError& err )
 {

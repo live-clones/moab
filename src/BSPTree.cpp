@@ -250,7 +250,7 @@ ErrorCode BSPTree::get_tree_end_iterator( EntityHandle root, BSPTreeIter& iter )
     return iter.step_to_first_leaf( BSPTreeIter::RIGHT );
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& left, EntityHandle& right )
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane& plane, EntityHandle& left, EntityHandle& right )
 {
     ErrorCode rval;
 
@@ -277,13 +277,13 @@ ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, EntityHandle& lef
     return MB_SUCCESS;
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane )
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane& plane )
 {
     EntityHandle left, right;
     return split_leaf( leaf, plane, left, right );
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left_entities, const Range& right_entities )
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane& plane, const Range& left_entities, const Range& right_entities )
 {
     EntityHandle left, right, parent = leaf.handle();
     ErrorCode rval = split_leaf( leaf, plane, left, right );
@@ -302,7 +302,7 @@ ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left
 }
 
 ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf,
-                               Plane plane,
+                               Plane& plane,
                                const std::vector< EntityHandle >& left_entities,
                                const std::vector< EntityHandle >& right_entities )
 {

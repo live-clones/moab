@@ -230,13 +230,8 @@ class BVHTree : public Tree
         double Lmax, Rmin;
         BoundBox box;
         Node() : dim( UINT_MAX ), child( UINT_MAX ), Lmax( -DBL_MAX ), Rmin( DBL_MAX ) {}
-        Node( const Node& f )
+        Node( const Node& f ) : entities( f.entities ), dim( f.dim ), child( f.child ), Lmax( f.Lmax ), Rmin( f.Rmin )
         {
-            dim      = f.dim;
-            child    = f.child;
-            Lmax     = f.Lmax;
-            Rmin     = f.Rmin;
-            entities = f.entities;
         }
         Node& operator=( const Node& f )
         {
