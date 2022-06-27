@@ -77,7 +77,7 @@ ZoltanPartitioner::ZoltanPartitioner( Interface* impl,
                                       GeometryQueryTool* gqt
 #endif
                                       )
-    : PartitionerBase< int >( impl, use_coords ), myZZ( NULL ), argcArg( argc ), argvArg( argv )
+    : PartitionerBase< int >( impl, use_coords ), myZZ( NULL ), argcArg( argc ), argvArg( argv ), myNumPts( 0 )
 #ifdef MOAB_HAVE_CGM
       ,
       gti( gqt )

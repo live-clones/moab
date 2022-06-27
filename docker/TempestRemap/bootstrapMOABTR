@@ -94,13 +94,12 @@ libraries in their own applications." > $MOABHOMEDIR/.WELCOMEMSG
 ## Generate .bash_profile file
 echo "# ~/.bash_profile: executed by bash(1) for login shells.
 
+cat $MOABHOMEDIR/.WELCOMEMSG
 if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
 " > $MOABHOMEDIR/.bash_profile
 
 echo "# ~/.bashrc: executed by bash(1) for non-login shells.
 
-cd $HOME
-cat $HOME/.WELCOMEMSG
 source /etc/profile
 export MOAB_DIR=/opt/moab
 export CC=/opt/view/bin/mpicc CXX=/opt/view/bin/mpicxx FC=/opt/view/bin/mpif90 F90=/opt/view/bin/mpif90 F77=/opt/view/bin/mpif77
