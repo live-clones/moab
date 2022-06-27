@@ -264,80 +264,64 @@ struct ToolContext
                 break;
         }
 
-        if( meshType > moab::TempestRemapper::ICO )
+        if( meshType > moab::TempestRemapper::ICO ) // compute overlap mesh and maps possibly
         {
             opts.getOptAllArgs( "load,l", inFilenames );
             opts.getOptAllArgs( "order,o", disc_orders );
             opts.getOptAllArgs( "method,m", disc_methods );
             opts.getOptAllArgs( "global_id,i", doftag_names );
 
-            if( disc_orders.size() == 0 )
-            {
-                disc_orders.resize( 2, 1 );
-            }
-
-            if( disc_orders.size() == 1 )
-            {
-                disc_orders.push_back( 1 );
-            }
-
-            if( disc_methods.size() == 0 )
-            {
-                disc_methods.resize( 2, "fv" );
-            }
-
-            if( disc_methods.size() == 1 )
-            {
-                disc_methods.push_back( "fv" );
-            }
-
-            if( doftag_names.size() == 0 )
-            {
-                doftag_names.resize( 2, "GLOBAL_ID" );
-            }
-
-            if( doftag_names.size() == 1 )
-            {
-                doftag_names.push_back( "GLOBAL_ID" );
-            }
-
             assert( inFilenames.size() == 2 );
             assert( disc_orders.size() == 2 );
             assert( disc_methods.size() == 2 );
+            assert( ensureMonotonicity >= 0 && ensureMonotonicity <= 3 );
+
+            // get discretization order parameters
+            if( disc_orders.size() == 0 ) disc_orders.resize( 2, 1 );
+            if( disc_orders.size() == 1 ) disc_orders.push_back( 1 );
+
+            // get discretization method parameters
+            if( disc_methods.size() == 0 ) disc_methods.resize( 2, "fv" );
+            if( disc_methods.size() == 1 ) disc_methods.push_back( "fv" );
+
+            // get DoF tagname parameters
+            if( doftag_names.size() == 0 ) doftag_names.resize( 2, "GLOBAL_ID" );
+            if( doftag_names.size() == 1 ) doftag_names.push_back( "GLOBAL_ID" );
+
+            // for computing maps and overlaps, set discretization orders
+            mapOptions.nPin           = disc_orders[0];
+            mapOptions.nPout          = disc_orders[1];
+            mapOptions.fSourceConcave = false;
+            mapOptions.fTargetConcave = false;
+
+            mapOptions.strMethod = "";
+            switch( ensureMonotonicity )
+            {
+                case 0:
+                    mapOptions.fMonotone = false;
+                    break;
+                case 3:
+                    mapOptions.strMethod += "mono3;";
+                    break;
+                case 2:
+                    mapOptions.strMethod += "mono2;";
+                    break;
+                default:
+                    mapOptions.fMonotone = true;
+            }
+            mapOptions.fNoCorrectAreas = false;
+            mapOptions.fNoCheck        = !fCheck;
+
+            //assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
+            if( fVolumetric ) mapOptions.strMethod += "volumetric;";
+            if( fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
         }
 
+        // clear temporary string name
         expectedFName.clear();
-
-        assert( ensureMonotonicity >= 0 && ensureMonotonicity <= 3 );
 
         mapOptions.strOutputMapFile = outFilename;
         mapOptions.strOutputFormat  = "Netcdf4";
-        mapOptions.nPin             = disc_orders[0];
-        mapOptions.nPout            = disc_orders[1];
-        mapOptions.fSourceConcave   = false;
-        mapOptions.fTargetConcave   = false;
-
-        mapOptions.strMethod = "";
-        switch( ensureMonotonicity )
-        {
-            case 0:
-                mapOptions.fMonotone = false;
-                break;
-            case 3:
-                mapOptions.strMethod += "mono3;";
-                break;
-            case 2:
-                mapOptions.strMethod += "mono2;";
-                break;
-            default:
-                mapOptions.fMonotone = true;
-        }
-        mapOptions.fNoCorrectAreas = false;
-        mapOptions.fNoCheck        = !fCheck;
-
-        //assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
-        if( fVolumetric ) mapOptions.strMethod += "volumetric;";
-        if( fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
     }
 
   private:
