@@ -459,7 +459,6 @@ int main( int argc, char* argv[] )
 
                 // Check if we are converting a RLL grid
                 NcFile ncInput( inFileName.c_str(), NcFile::ReadOnly );
-                bool isRectilinearGrid = false;
 
                 NcError error_temp( NcError::silent_nonfatal );
                 // get the attribute
@@ -476,8 +475,6 @@ int main( int argc, char* argv[] )
 
                 if( attRectilinear != nullptr )
                 {
-                    isRectilinearGrid = true;
-
                     // Obtain rectilinear attributes (dimension sizes)
                     NcAtt* attRectilinearDim0Size = ncInput.get_att( "rectilinear_dim0_size" );
                     NcAtt* attRectilinearDim1Size = ncInput.get_att( "rectilinear_dim1_size" );
@@ -610,8 +607,7 @@ int main( int argc, char* argv[] )
                     ovmesh              = srcmesh;
 
                     Tag countTag;
-                    result = gMB->tag_get_handle( "Counting", countTag );
-                    // std::vector<int> count_ids()
+                    result = gMB->tag_get_handle( "Counting", countTag );MB_CHK_ERR( result );
 
                     // Load the meshes and validate
                     Tag order;
