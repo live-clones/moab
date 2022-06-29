@@ -1,7 +1,9 @@
 # CircleCI configuration file
 version: 2.1
+
 orbs:
-  docker: circleci/docker@1.7.0
+  docker: circleci/docker@2.1.2
+
 jobs:
   build:
     working_directory: ~/fathomteam/moab
@@ -31,12 +33,12 @@ jobs:
   dockerbuild:
     docker:
       # replace with your preferred image
-      - image: cimg/base:stable
+      - image: cimg/base:2021.07
     steps:
       - docker/build:
-          image: vijaysm/moab-root 
-          path: ./docker/TempestRemap 
-          tag: moabtr 
+          image: vijaysm/moab-root
+          path: docker/TempestRemap
+          tag: moabtr
 
 workflows:
   version: 2.1
@@ -47,16 +49,19 @@ workflows:
     jobs:
       # - dockerbuild
       - docker/publish:
-          image: vijaysm/moab-root 
-          docker-username: DOCKER_LOGIN 
-          docker-password: DOCKER_PASSWORD 
-          deploy: true 
-          lint-dockerfile: true 
-          remote-docker-dlc: false 
-          treat-warnings-as-errors: false 
-          update-description: false 
-          use-docker-credentials-store: false 
-          use-remote-docker: false 
-          tag: moabtr 
-          path: docker/TempestRemap 
-
+          image: vijaysm/moab-root
+          docker-username: DOCKER_LOGIN
+          docker-password: DOCKER_PASSWORD
+          deploy: true
+          lint-dockerfile: false
+          remote-docker-dlc: false
+          treat-warnings-as-errors: false
+          update-description: false
+          use-docker-credentials-store: false
+          use-remote-docker: false
+          tag: moabtr
+          path: docker/TempestRemap
+          filters:
+            branches:
+              only:
+                - release/*
