@@ -143,7 +143,7 @@ int ncFile;
 
 int main( int argc, char* argv[] )
 {
-
+    ErrorCode rval;
     ProgOptions opts;
 
     std::string inputfile, outfile( "out.h5m" ), netcdfFile, variable_name, sefile_name;
@@ -157,7 +157,6 @@ int main( int argc, char* argv[] )
     opts.addOpt< std::string >( "sefile,s", "spectral elements file (coarse SE mesh)", &sefile_name );
     opts.parseCommandLine( argc, argv );
 
-    ErrorCode rval;
     Core* mb = new Core();
 
     rval = mb->load_file( inputfile.c_str() );MB_CHK_SET_ERR( rval, "can't load input file" );
@@ -231,6 +230,7 @@ int main( int argc, char* argv[] )
     for( size_t j = 0; j < dims.size(); j++ )
     {
         fail = nc_inq_dim( ncFile, dims[j], recname, &recs );
+        if( NC_NOERR != fail ) MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension" );
         std::string name_dim( recname );
         std::cout << " dimension index " << j << " in file: " << dims[j] << " name: " << name_dim << " recs:" << recs
                   << "\n";
@@ -245,13 +245,16 @@ int main( int argc, char* argv[] )
             cell_data = true;
         }
     }
+
     int otherDim    = 1 - dimIndex;  // used only if 2 dimensions ; could be 0 or 1;
     size_t size_tag = 1;             // good for one dimension
     std::vector< int > evals;        // size of size_tag
     std::vector< double > dvals;     // size of size_tag
     nc_type dataType;
+
     // read the variable, and set it to the tag
     fail            = nc_inq_vartype( ncFile, nc_var, &dataType );
+    if( NC_NOERR != fail ) MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get variable type" );
     DataType mbtype = MB_TYPE_DOUBLE;
     bool float_var  = false;
     if( NC_INT == dataType )
@@ -263,6 +266,7 @@ int main( int argc, char* argv[] )
 
     int time_id = -1;
     fail        = nc_inq_varid( ncFile, "time", &time_id );
+    if( NC_NOERR != fail ) MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get time variable id" );
     std::vector< float > times;
     if( NC_NOERR == fail )
     {
@@ -277,6 +281,7 @@ int main( int argc, char* argv[] )
         if( dims.size() == 2 )
         {
             fail = nc_inq_dim( ncFile, dims[otherDim], recname, &size_tag );
+            if( NC_NOERR != fail ) MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension" );
         }
 
         int def_val = 0;
@@ -405,7 +410,9 @@ int main( int argc, char* argv[] )
         size_t dim0, dim1;  // dim 2 is ncol..
         char recname0[NC_MAX_NAME + 1], recname1[NC_MAX_NAME + 1];
         fail = nc_inq_dim( ncFile, dims[0], recname0, &dim0 );
+        if( NC_NOERR != fail ) MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension" );
         fail = nc_inq_dim( ncFile, dims[1], recname1, &dim1 );
+        if( NC_NOERR != fail ) MB_SET_ERR( MB_FAILURE, "addncdata:: Couldn't get dimension" );
         std::string name0( recname0 );
         std::string name1( recname1 );
         std::string timestr( "time" );
@@ -523,3 +530,4 @@ int main( int argc, char* argv[] )
     }
     return 0;
 }
+

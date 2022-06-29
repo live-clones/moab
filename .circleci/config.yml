@@ -1,5 +1,9 @@
 # CircleCI configuration file
-version: 2
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.1.2
+
 jobs:
   build:
     working_directory: ~/fathomteam/moab
@@ -26,10 +30,38 @@ jobs:
         ./configure --with-hdf5=/usr/include/hdf5/openmpi --with-netcdf=/usr/lib/x86_64-linux-gnu/netcdf/mpi --with-metis=/usr LDFLAGS="-L/usr/lib/x86_64-linux-gnu/hdf5/openmpi/ -L/usr/lib/x86_64-linux-gnu/openblas-serial" --with-mpi=/usr/lib/x86_64-linux-gnu/openmpi CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77
         make all -j4
         make check -j4
+  dockerbuild:
+    docker:
+      # replace with your preferred image
+      - image: cimg/base:2021.07
+    steps:
+      - docker/build:
+          image: vijaysm/moab-root
+          path: docker/TempestRemap
+          tag: moabtr
 
 workflows:
-  version: 2
+  version: 2.1
   build_and_test:
     jobs:
       - build
-
+  docker_build:
+    jobs:
+      # - dockerbuild
+      - docker/publish:
+          image: vijaysm/moab-root
+          docker-username: DOCKER_LOGIN
+          docker-password: DOCKER_PASSWORD
+          deploy: true
+          lint-dockerfile: false
+          remote-docker-dlc: false
+          treat-warnings-as-errors: false
+          update-description: false
+          use-docker-credentials-store: false
+          use-remote-docker: false
+          tag: moabtr
+          path: docker/TempestRemap
+          filters:
+            branches:
+              only:
+                - release/*
