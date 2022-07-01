@@ -4844,7 +4844,15 @@ ErrorCode ParallelComm::augment_default_sets_with_ghosts( EntityHandle file_set 
         EntityHandle handles[MAX_SHARING_PROCS];
         int nprocs;
         unsigned char pstat;
-        rval = get_sharing_data( geh, procs, handles, pstat, nprocs );MB_CHK_SET_ERR( rval, "Failed to get sharing data" );
+        rval = get_sharing_data( geh, procs, handles, pstat, nprocs );
+        if( rval != MB_SUCCESS )
+        {
+            for( int i = 0; i < num_tags; i++ )
+                delete[] tagVals[i];
+            delete[] tagVals;
+
+            MB_CHK_SET_ERR( rval, "Failed to get sharing data" );
+        }
         if( pstat & PSTATUS_NOT_OWNED ) continue;  // we will send info only for entities that we own
         own_and_sha.insert( geh );
         for( int i = 0; i < num_tags; i++ )
@@ -9371,8 +9379,8 @@ ErrorCode ParallelComm::correct_thin_ghost_layers()
      */
 
     ErrorCode result = MB_SUCCESS;
-    int ent_procs[MAX_SHARING_PROCS];
-    EntityHandle handles[MAX_SHARING_PROCS];
+    int ent_procs[MAX_SHARING_PROCS + 1];
+    EntityHandle handles[MAX_SHARING_PROCS + 1];
     int num_sharing;
     SharedEntityData tmp;
 

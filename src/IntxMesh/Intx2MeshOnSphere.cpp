@@ -345,6 +345,9 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                     minArea   = area;
                 }
             }
+            // verify that index_min is valid
+            assert( index_min >= 0 );
+
             if( minArea < epsilon_1 / 2 )  // we found the smallest area, so we think we found the
                                            // target edge it belongs
             {

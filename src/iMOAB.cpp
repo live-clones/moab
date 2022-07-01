@@ -241,7 +241,7 @@ ErrCode iMOAB_RegisterApplication( const iMOAB_String app_name,
 
     // now create ParallelComm and a file set for this application
 #ifdef MOAB_HAVE_MPI
-    if( comm )
+    if( *comm )
     {
         ParallelComm* pco = new ParallelComm( context.MBI, *comm );
 
