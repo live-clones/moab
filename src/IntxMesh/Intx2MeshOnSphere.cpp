@@ -16,6 +16,8 @@
 #endif
 #include "MBTagConventions.hpp"
 
+#include <cassert>
+
 // #define ENABLE_DEBUG
 //#define CHECK_CONVEXITY
 namespace moab
