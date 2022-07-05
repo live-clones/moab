@@ -12,12 +12,12 @@ all-local: local-install
 
 local-install:
 	(CFLAGS='-w -fPIC' PYTHONPATH=$(PWD)/$(local_install_path)/:$(PYTHONPATH) \
-	 pip install -e $(PWD) --use-feature=in-tree-build --prefix $(PWD))
+	 pip install -e $(PWD) --prefix $(PWD))
 
 install-exec-local: all-local
 	$(MKDIR_P) $(DESTDIR)$(pythondir)
 	(PYTHONPATH=$(DESTDIR)$(pythondir):$(PYTHONPATH) pip install $(PWD) \
-		--use-feature=in-tree-build --prefix=$(DESTDIR)$(prefix) )
+		--prefix=$(DESTDIR)$(prefix) )
 
 check: all-local
 	cd tests; \
