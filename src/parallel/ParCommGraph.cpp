@@ -686,7 +686,13 @@ ErrorCode ParCommGraph::send_tag_values( MPI_Comm jcomm,
                 EntityHandle eh = gidToHandle[eID];
                 for( i = 0; i < tag_handles.size(); i++ )
                 {
-                    rval = mb->tag_get_data( tag_handles[i], &eh, 1, (void*)( buffer->buff_ptr ) );MB_CHK_ERR( rval );
+                    rval = mb->tag_get_data( tag_handles[i], &eh, 1, (void*)( buffer->buff_ptr ) );
+                    if( rval != MB_SUCCESS )
+                    {
+                        delete buffer;  // free parallel comm buffer first
+
+                        MB_SET_ERR( rval, "Tag get data failed" );
+                    }
 #ifdef VERBOSE
                     dbfile << "global ID " << eID << " local handle " << mb->id_from_handle( eh ) << " vals: ";
                     double* vals = (double*)( buffer->buff_ptr );
