@@ -64,7 +64,7 @@ if(NOT PYMOAB_PREFIX)
     SET(PYMOAB_USER_INSTALL_LOCATION YES)
   else()
     # if no prefix is supplied, install to system location
-    SET(PYMOAB_PREFIX "/usr/lib")
+    SET(PYMOAB_PREFIX "/usr/local/lib")
     SET(PYMOAB_RELATIVE_INSTALL "/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/")
     SET(PYMOAB_USER_INSTALL_LOCATION NO)
   endif(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
