@@ -6,7 +6,7 @@ EXTRA_DIST += $(srcdir)/interface_notes.txt $(srcdir)/pyproject.toml $(srcdir)/r
 
 test_files = test_core.py test_hom.py test_scd.py test_range.py test_tag.py test_topo_util.py test_skinner.py
 
-local_install_path = local_inst
+local_install_path = $(subst $(prefix)/,,$(pythondir))
 
 all-local: local-install
 
@@ -27,9 +27,9 @@ check: all-local
 	done
 
 clean-local:
-	-rm -rf build pymoab/*.cpp pymoab/__pycache__ pymoab/*.so pymoab/*.pyc tests/*.pyc pymoab.egg-info dist
+	-rm -rf build lib pymoab/*.cpp pymoab/__pycache__ pymoab/*.so pymoab/*.pyc tests/*.pyc pymoab.egg-info
 
 uninstall:
 	rm -rf $(DESTDIR)$(pythondir)/*
 
-CLEANFILES = tests/quads_test.vtk tests/outfile.h5m tests/write_tag_test.h5m
+CLEANFILES = tests/quads_test.vtk tests/outfile.h5m tests/write_tag_test.h5m $(local_install_path)/*
