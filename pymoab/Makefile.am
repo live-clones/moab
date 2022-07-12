@@ -11,8 +11,9 @@ local_install_path = $(subst $(prefix)/,,$(pythondir))
 all-local: local-install
 
 local-install:
-	(CFLAGS='-w -fPIC' PYTHONPATH=$(PWD)/$(local_install_path)/:$(PYTHONPATH) \
-	 pip install -e $(PWD) --prefix $(PWD))
+	$(MKDIR_P) $(abs_top_builddir)/pymoab/$(local_install_path)
+	(CFLAGS='-w -fPIC' PYTHONPATH=$(abs_top_builddir)/pymoab/$(local_install_path)/:$(PYTHONPATH) \
+		pip install -e $(PWD) --prefix $(abs_top_builddir)/pymoab)
 
 install-exec-local: all-local
 	$(MKDIR_P) $(DESTDIR)$(pythondir)
@@ -23,7 +24,7 @@ check: all-local
 	cd tests; \
 	for i in $(test_files); \
 	do \
-		(@SLIBENVPATH@=$(abs_top_builddir)/src/.libs/:$(@SLIBENVPATH@) PYTHONPATH=$(abs_builddir)/../pymoab/:$(PYTHONPATH) $(PYTHON) $$i) || exit 1; \
+		(@SLIBENVPATH@=$(abs_top_builddir)/src/.libs/:$(@SLIBENVPATH@) PYTHONPATH=$(abs_top_builddir)/pymoab:$(PYTHONPATH) $(PYTHON) $$i) || exit 1; \
 	done
 
 clean-local:
