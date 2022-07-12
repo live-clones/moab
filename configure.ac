@@ -279,7 +279,7 @@ if (test "xyes" != "x$enable_pymoab" && test "xno" != "x$enable_pymoab"); then
 else
   if (test "x$enable_pymoab" != "xno"); then
     ENABLE_pymoab=yes
-    AM_PATH_PYTHON([2.7],,[:])
+    AM_PATH_PYTHON([3.1],,[:])
     AX_PYTHON_DEVEL()
 
     AC_MSG_CHECKING([for the numpy Python package])
