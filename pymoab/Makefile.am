@@ -13,11 +13,11 @@ all-local: local-install
 local-install:
 	$(MKDIR_P) $(abs_top_builddir)/pymoab/$(local_install_path)
 	(CFLAGS='-w -fPIC' PYTHONPATH=$(abs_top_builddir)/pymoab/$(local_install_path)/:$(PYTHONPATH) \
-		pip install -e $(PWD) --prefix $(abs_top_builddir)/pymoab)
+		$(PYTHON) -m pip install -e $(PWD) --prefix $(abs_top_builddir)/pymoab)
 
 install-exec-local: all-local
 	$(MKDIR_P) $(DESTDIR)$(pythondir)
-	(PYTHONPATH=$(DESTDIR)$(pythondir):$(PYTHONPATH) pip install $(PWD) \
+	(PYTHONPATH=$(DESTDIR)$(pythondir):$(PYTHONPATH) $(PYTHON) -m pip install $(PWD) \
 		--prefix=$(DESTDIR)$(prefix) )
 
 check: all-local
