@@ -83,7 +83,7 @@ Detailed API documentation and user/development guides are available for the fol
 
 ### **CMake based configuration workflow**
 
-  - Please ensure you have CMake (>3.0) available locally.
+  - Please ensure you have CMake (>3.5) available locally.
   - Run `ccmake` visual configuration editor or `cmake` to get a bare configuration of MOAB
   - If you would like to override the compiler used by default, use the following variables to override
     - C: `-DCMAKE_C_COMPILER=mpicc`
