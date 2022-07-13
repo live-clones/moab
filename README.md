@@ -30,6 +30,7 @@ There are several hooks to online continuous integration systems, nightly and co
 [![Buildbot Status](http://gnep.mcs.anl.gov:8010/badges/moab-all.svg)](https://gnep.mcs.anl.gov:8010)
 [![Bitbucket Pipelines Status](https://img.shields.io/bitbucket/pipelines/fathomteam/moab/master?label=bitbucket&style=plastic)](https://bitbucket.org/fathomteam/moab/addon/pipelines/home#!/results/branch/master/page/1)
 [![CircleCI Status](https://circleci.com/bb/fathomteam/moab/tree/master.svg?style=shield)](https://circleci.com/bb/fathomteam/moab) 
+[![Codeship Status](https://app.codeship.com/projects/d84b8203-8cf9-4763-ae59-24e623ca5d19/status?branch=master)](https://app.codeship.com/projects/459370)
 [![Buddy Pipeline](https://app.buddy.works/vijaym/moab/pipelines/pipeline/398746/badge.svg?token=6b9e040bcd31cd1d8d2f409795f7896548b8604925af3de730aea2499d59520c "buddy pipeline")](https://app.buddy.works/vijaym/moab/pipelines/pipeline/398746)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/6201/badge.svg)](https://scan.coverity.com/projects/moab)
 [![codcov](https://codecov.io/bb/fathomteam/moab/branch/master/graph/badge.svg)](https://codecov.io/bb/fathomteam/moab)
