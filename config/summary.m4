@@ -22,6 +22,7 @@ AC_DEFUN([PRINT_CONFIGURATION_SUMMARY],[
   SUMMARY_LINE([Static Build], [$enable_static])
   SUMMARY_LINE([Shared Build], [$enable_shared])
   SUMMARY_LINE([BLAS/LAPACK support], [$enable_blaslapack])
+  SUMMARY_LINE([Python support], [$enable_pymoab])
   SUMMARY_LINE([Eigen3 support], [$enableeigen])
   case "x$CGM_MISSING" in
    "xno") SUMMARY_LINE([CGM support], [yes]) ;;

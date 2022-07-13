@@ -1727,7 +1727,8 @@ AC_MSG_NOTICE([
 *************************************************************************
 *     The PyMOAB interface will be installed to a custom location.
 *     In order to access this module from a python interpreter, please add
-*     its install location to the PYTHONPATH environment variable:
+*     its install location to the PYTHONPATH environment variable, *after*
+*     invoking `make install`:
 *
 *     export PYTHONPATH=$pythondir:\$PYTHONPATH
 *
