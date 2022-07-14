@@ -8,4 +8,4 @@ if [[ ! -d $PYMOAB_INSTALL_PREFIX ]]; then
   mkdir -p @PYMOAB_INSTALL_PREFIX@
 fi
 
-pip install . --prefix=@CMAKE_INSTALL_PREFIX@
+@PYTHON_EXECUTABLE@ -m pip install . --prefix=@CMAKE_INSTALL_PREFIX@
