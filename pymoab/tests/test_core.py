@@ -3,21 +3,22 @@ from pymoab import types
 from pymoab.rng import Range
 from driver import test_driver, CHECK, CHECK_EQ, CHECK_NOT_EQ, CHECK_ITER_EQ
 import numpy as np
-import os
+import os, sys
 
 bytes_per_char_ = np.array(["a"]).nbytes
+filepath = "."
 
 def test_load_mesh():
     mb = core.Core()
     try:
-        mb.load_file("cyl_grps.h5m")
+        mb.load_file("{0}/cyl_grps.h5m".format(filepath))
     except:
         try:
             print( """
             WARNING: .h5m file load failed. If hdf5 support is enabled in this
             build there could be a problem.
             """)
-            mb.load_file("cyl_grps.vtk")
+            mb.load_file("{0}/cyl_grps.vtk".format(filepath))
         except:
             raise(IOError, "Failed to load MOAB file.")
 
@@ -25,14 +26,14 @@ def test_load_mesh():
     mb1 = core.Core()
     file_set = mb1.create_meshset()
     try:
-        mb1.load_file("cyl_grps.h5m",file_set)
+        mb1.load_file("{0}/cyl_grps.h5m".format(filepath),file_set)
     except:
         try:
             print("""
             WARNING: .h5m file load failed. If hdf5 support is enabled in this
             build there could be a problem.
             """)
-            mb1.load_file("cyl_grps.vtk",file_set)
+            mb1.load_file("{0}/cyl_grps.vtk".format(filepath),file_set)
         except:
             raise(IOError, "Failed to load MOAB file.")
 
@@ -44,16 +45,16 @@ def test_write_mesh():
     mb.create_vertices(np.ones(3))
 
     try:
-        mb.write_file("outfile.h5m")
-        assert os.path.isfile("outfile.h5m")
+        mb.write_file("{0}/outfile.h5m".format(filepath))
+        assert os.path.isfile("{0}/outfile.h5m".format(filepath))
     except:
         try:
             print("""
             WARNING: .h5m file write failed. If hdf5 support is enabled in this
             build there could be a problem.
             """)
-            mb.write_file("outfile.vtk")
-            assert os.path.isfile("outfile.vtk")
+            mb.write_file("{0}/outfile.vtk".format(filepath))
+            assert os.path.isfile("{0}/outfile.vtk".format(filepath))
         except:
             raise(IOError, "Failed to write MOAB file.")
 
@@ -61,7 +62,7 @@ def test_write_ents():
     try:
         mb = core.Core()
         vs = mb.create_vertices(np.ones(3))
-        mb.write_file("ents.h5m", vs)
+        mb.write_file("{0}/ents.h5m".format(filepath), vs)
     except(IOError):
         pass
 
@@ -70,7 +71,7 @@ def test_write_tags():
     """Test write tag functionality"""
 
     # test values
-    outfile = "write_tag_test.h5m"
+    outfile = "{0}/write_tag_test.h5m".format(filepath)
 
     mb = core.Core()
     vs = mb.create_vertices(np.ones(3))
@@ -1121,6 +1122,9 @@ def test_entity_handle_tags():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        filepath = sys.argv[1]
+
     tests = [test_load_mesh,
              test_write_mesh,
              test_write_ents,
