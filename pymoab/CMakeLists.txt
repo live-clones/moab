@@ -27,6 +27,8 @@ if(NOT BUILD_SHARED_LIBS)
   MESSAGE( SEND_ERROR "Cannot build static libraries and the python interface. Please build with shared libraries (-DBUILD_SHARED_LIBS=ON) or build without MOAB's python interface.")
 endif()
 
+mark_as_advanced(CLEAR PYTHON_EXECUTABLE parent_scope)
+
 # make sure that specific python modules are installed
 SET(NUMPY_MODULE_MISSING false)
 SET(SETUPTOOLS_MODULE_MISSING false)
