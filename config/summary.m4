@@ -17,6 +17,7 @@ AC_DEFUN([PRINT_CONFIGURATION_SUMMARY],[
   MSG_ECHO_CUSTOM([${UNDERLINE_BEG}${BOLD}MOAB Configuration Summary${UNDERLINE_END}${NORMAL} ])
   BLANK_LINE
 
+  SUMMARY_LINE([Installation Prefix], [$prefix])
   SUMMARY_LINE([Debug Mode], [$enable_debug])
   SUMMARY_LINE([Optimized Mode], [$enable_cxx_optimize])
   SUMMARY_LINE([Static Build], [$enable_static])

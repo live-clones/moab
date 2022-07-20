@@ -361,21 +361,21 @@ else
 		     pymoab/tests/cyl_grps.h5m:pymoab/tests/cyl_grps.h5m
 		     pymoab/tests/cyl_grps.vtk:pymoab/tests/cyl_grps.vtk])
     # if a python install location is specified, use that
-    if test "x$PYMOAB_PREFIX" != "x"; then
+    if (test "x$PYMOAB_PREFIX" != "x"); then
       pymoab_custom_install=yes
       pymoab_prefix=${PYMOAB_PREFIX}
       pythondir=$pymoab_prefix
     else
       # if a prefix was supplied, then install under the lib directory
       # of the specified prefix location
-      if test "x$prefix" != "xNONE"; then
+      if (test "x$prefix" != "xNONE"); then
         pymoab_prefix=$prefix/lib/python${PYTHON_VERSION}/site-packages
         pymoab_custom_install=yes
         pythondir=$pymoab_prefix
       else
         # if no specific location is used and no prefix was supplied,
         # then install to the system location
-        pymoab_prefix=/usr/lib/python${PYTHON_VERSION}/dist-packages
+        pymoab_prefix=/usr/local/lib/python${PYTHON_VERSION}/site-packages
         pythondir=$pymoab_prefix
       fi
     fi
