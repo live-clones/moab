@@ -1,6 +1,6 @@
 # MOAB Library Release Notes
 
-## Version 5.3.2
+## Version 5.4.0
 
 ### Features
 
@@ -14,7 +14,7 @@
 - *PR #590*: PyMOAB is now installed with pip instead of setup.py
 - *PR #587*: Read masks from SCRIP file and propagate to final remap operator
 - *PR #586*: Reduce memory allocation for vertex tags defined on sequences (16\*1024 instead of 512\*1024) 
-- *PR #592*: Fix several compiler warnings, updated autotools support (autoconf<=2.71), parallel build with module dependency (iMOAB), Codacy issues
+- *PR #592*: Fix several compiler warnings, documentation, updated autotools support (autoconf<=2.71), updated CMake/PyMOAB support, parallel build with module dependency (iMOAB), Codacy issues
 
 ### Fixes
 
